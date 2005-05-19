@@ -87,52 +87,6 @@ Public Module modDate
     ATCformat = retval
   End Function
 
-  Function MonthName3(ByRef MonthNum As Integer) As Object
-    '##SUMMARY MonthName3 - convert a month number to a 3 character string
-    '##PARM MonthNum - month number to convert
-    Select Case MonthNum
-      Case 1
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Jan"
-      Case 2
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Feb"
-      Case 3
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Mar"
-      Case 4
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Apr"
-      Case 5
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "May"
-      Case 6
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Jun"
-      Case 7
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Jul"
-      Case 8
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Aug"
-      Case 9
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Sep"
-      Case 10
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Oct"
-      Case 11
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Nov"
-      Case 12
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "Dec"
-      Case Else
-        'UPGRADE_WARNING: Couldn't resolve default property of object MonthName3
-        MonthName3 = "<?>"
-    End Select
-  End Function
-
   Public Function Date2J(ByRef d() As Integer) As Double
     '##SUMMARY Date2J - convert a date arry to a modfied Julian date (MJD)
     '##PARM d - date array to convert
