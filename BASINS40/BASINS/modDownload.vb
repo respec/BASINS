@@ -1,0 +1,795 @@
+Option Strict Off
+Option Explicit On 
+
+Imports MapWinGIS
+Imports System.Collections.Specialized
+Imports System.Windows.Forms.Application
+Imports atcUtility
+
+Module modDownload
+
+  Private Const XMLappName As String = "BASINS System Application"
+
+  'Returns file name of new project or "" if not built
+  Public Function CreateNewProjectAndDownloadCoreDataInteractive(ByVal aThemeTag As String, ByVal aSelectedFeatures As ArrayList) As String
+    Dim dataPath As String
+    Dim DefaultProjectFileName As String
+    Dim ProjectFileName As String
+    Dim NoData As Boolean
+    Dim defDirName As String
+    Dim newDataDir As String
+    Dim aprStr As String
+    Dim wholeaprStr As String
+    Dim fdn As String
+    Dim iSuffix As Integer
+    Dim myProjection As String
+    Dim cdlg As Windows.Forms.SaveFileDialog
+    Dim numFiles As Long
+
+StartOver:
+
+    dataPath = g_BasinsDrives.Chars(0) & ":\Basins\data\"
+
+    'NoData = False
+
+    Select Case aSelectedFeatures.Count
+      Case 0
+        If NoData Then
+          'Already came through here, don't ask again
+        Else
+          NoData = True
+          If MsgBox("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "BASINS Data Extraction") = MsgBoxResult.No Then Exit Function
+        End If
+        defDirName = "NewProject"
+      Case 1
+        defDirName = aSelectedFeatures(0)
+      Case Else : defDirName = "Multiple"
+    End Select
+
+    If FileExists(dataPath & defDirName, True) Then 'First one will not have -0
+      iSuffix = 0
+      Do
+        iSuffix = iSuffix + 1
+      Loop While FileExists(dataPath & defDirName & "-" & iSuffix, True)
+      defDirName = defDirName & "-" & iSuffix
+    End If
+
+    DefaultProjectFileName = dataPath & defDirName & "\" & defDirName & ".mwprj"
+    System.IO.Directory.CreateDirectory(PathNameOnly(DefaultProjectFileName))
+
+    cdlg = New Windows.Forms.SaveFileDialog
+    cdlg.Title = "Save new project as..."
+    cdlg.CheckPathExists = False
+    cdlg.FileName = DefaultProjectFileName
+    If cdlg.ShowDialog() <> Windows.Forms.DialogResult.OK Then
+      cdlg.FileName = "\"
+      cdlg.Dispose()
+      System.IO.Directory.Delete(PathNameOnly(DefaultProjectFileName), False) 'Cancelled save dialog
+      Return ""
+    Else
+      ProjectFileName = cdlg.FileName
+      newDataDir = PathNameOnly(ProjectFileName) & "\"
+
+      'Make sure cdlg is not holding a reference to the file so we can delete the dir if needed
+      cdlg.FileName = "\"
+      cdlg.Dispose()
+
+      'If the user did not choose the default folder or a subfolder of it
+      If Not newDataDir.ToLower.StartsWith(PathNameOnly(DefaultProjectFileName).ToLower) Then
+        'Remove speculatively created folder since they chose something else
+        Try
+          System.IO.Directory.Delete(PathNameOnly(DefaultProjectFileName), False) 'Cancelled save dialog
+        Catch ex As Exception
+          LogDbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
+        End Try
+        'Check to see if chosen data dir already contains any files
+        numFiles = System.IO.Directory.GetFiles(newDataDir).LongLength
+        If numFiles > 0 Then
+          If MsgBox("The directory '" & newDataDir & "'" & vbCr _
+                  & "already contains " & numFiles & " files. Delete all files and subdirectories?", _
+                  MsgBoxStyle.YesNo, "BASINS Build New") = MsgBoxResult.No Then
+            GoTo StartOver
+          Else
+            Try
+              System.IO.Directory.Delete(newDataDir, True)
+            Catch ex As Exception
+              LogDbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & newDataDir & vbCrLf & ex.Message)
+            End Try
+          End If
+        End If
+      End If
+
+      myProjection = atcProjector.Methods.AskUser
+      If myProjection.Length = 0 Then 'Cancelled projection specification dialog
+        Try 'remove already created data directory
+          System.IO.Directory.Delete(PathNameOnly(DefaultProjectFileName), False)
+        Catch ex As Exception
+          LogDbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
+        End Try
+        Return ""
+      Else
+        SaveFileString(newDataDir & "prj.proj", myProjection) 'Side effect: makes data directory
+
+        'TODO: test this with no area selected
+        If Not NoData Then
+          'download and project core data
+          CreateNewProjectAndDownloadCoreData(aThemeTag, aSelectedFeatures, dataPath, newDataDir, ProjectFileName)
+        End If
+        Return ProjectFileName
+      End If
+    End If
+  End Function
+
+  'Returns file name of new project or "" if not built
+  Public Sub CreateNewProjectAndDownloadCoreData(ByVal aThemeTag As String, _
+                                                 ByVal aSelectedFeatures As ArrayList, _
+                                                 ByVal aDataPath As String, _
+                                                 ByVal aNewDataDir As String, _
+                                                 ByVal aProjectFileName As String)
+    Dim downloadxml As String
+    Dim iFeature As Integer
+    Dim downloadFilename As String = aDataPath & "download.xml"
+    Dim projectorFilename As String = aDataPath & "ATCProjector.xml"
+
+    downloadxml = "<clsWebDataManager>" & vbCrLf & " <status_variables>" & vbCrLf & "  <download_type status=""set by " & XMLappName & """>BasinsInitialSetup</download_type>" & vbCrLf & "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & "  <project_dir status=""set by " & XMLappName & """>" & aNewDataDir & "</project_dir>" & vbCrLf
+
+    For iFeature = 0 To aSelectedFeatures.Count - 1
+      downloadxml &= "  <" & aThemeTag & " status=""set by " & XMLappName & """>" & aSelectedFeatures(iFeature) & "</" & aThemeTag & ">" & vbCrLf
+    Next
+
+    downloadxml &= " </status_variables>" & vbCrLf & "</clsWebDataManager>" & vbCrLf
+
+    If FileExists(projectorFilename) Then Kill(projectorFilename)
+
+    SaveFileString(downloadFilename, downloadxml)
+    If DataDownload(downloadFilename) Then 'Succeeded, as far as we know
+      g_MapWin.Layers.Clear()
+      g_MapWin.Project.Save(aProjectFileName)
+      g_MapWin.Project.Modified = True
+      ProcessProjectorFile(projectorFilename)
+      AddAllShapesInDir(aNewDataDir, aNewDataDir)
+      g_MapWin.Project.Save(aProjectFileName)
+      g_MapWin.Project.Modified = False
+    End If
+  End Sub
+
+  'Download new data for an existing project
+  Public Sub DownloadNewData(ByRef project_dir As String)
+    Dim downloadFilename As String = project_dir & "download.xml"
+    Dim projectorFilename As String = PathNameOnly(project_dir.Substring(0, project_dir.Length - 1)) & "\ATCProjector.xml"
+    SaveFileString(downloadFilename, "<clsWebDataManager>" & vbCrLf & " <status_variables>" & vbCrLf & "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & "  <project_dir status=""set by " & XMLappName & """>" & project_dir & "</project_dir>" & vbCrLf & " </status_variables>" & vbCrLf & "</clsWebDataManager>")
+    If FileExists(projectorFilename) Then Kill(projectorFilename)
+    If DataDownload(downloadFilename) Then
+      ProcessProjectorFile(projectorFilename)
+    End If
+    Kill(downloadFilename)
+  End Sub
+
+  Private Sub ProcessProjectorFile(ByVal aProjectorFilename As String)
+    Dim i As Integer
+    Dim fu As Short
+    Dim ichars As Short
+    Dim ilen As Integer
+    Dim newstrline As String
+    Dim ctemp As String
+    Dim iname As String
+    Dim firstpart As String
+    Dim theInputDirName As String
+    Dim theOutputDirName As String
+    Dim theOutputFileName As String
+    Dim equalpos As Integer
+    Dim InputFileList As New NameValueCollection
+    Dim vFilename As Object
+    Dim curFilename As String
+    Dim project_dir As String
+    Dim defaultsXML As Chilkat.Xml
+
+    If Not FileExists(aProjectorFilename) Then
+      LogDbg("No new ATCProjector.xml to process")
+    Else
+      fu = FreeFile()
+      FileOpen(fu, aProjectorFilename, OpenMode.Input)
+
+      Do Until EOF(fu)
+        newstrline = LineInput(fu)
+        newstrline = Trim(newstrline)
+        LogDbg("Processing line: " & newstrline)
+        If LCase(Left(newstrline, 10)) = "<add_shape" Then
+          StrSplit(newstrline, ">", "")
+          theOutputFileName = Trim(StrSplit(newstrline, "<", ""))
+          If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
+          AddShapeToMW(theOutputFileName, GetDefaultsFor(theOutputFileName, project_dir, defaultsXML))
+        Else
+          Select Case LCase(Left(newstrline, 12))
+            Case "<add_allshap"
+              StrSplit(newstrline, ">", "")
+              theOutputFileName = Trim(StrSplit(newstrline, "<", ""))
+              AddAllShapesInDir(theOutputFileName, project_dir)
+            Case "<projector>", "</projector>"
+            Case "<project_dir" : StrSplit(newstrline, ">", "")
+              project_dir = StrSplit(newstrline, "<", "")
+              If Right(project_dir, 1) <> "\" Then project_dir = project_dir & "\"
+            Case "<convert_sha"
+              equalpos = InStr(newstrline, "output=""")
+              If (equalpos > 0) Then
+                theOutputFileName = Mid(newstrline, equalpos + 8)
+                iname = CStr(InStr(theOutputFileName, """>"))
+                If CDbl(iname) > 0 Then
+                  curFilename = Mid(theOutputFileName, CDbl(iname) + 2)
+                  theOutputFileName = Left(theOutputFileName, CDbl(iname) - 1)
+                  iname = CStr(InStr(curFilename, "<"))
+                  If CDbl(iname) > 0 Then
+                    curFilename = Left(curFilename, CDbl(iname) - 1)
+                    ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
+                  End If
+                End If
+              End If
+            Case "<convert_cov"
+              LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
+            Case "<convert_gri"
+              LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
+            Case "<convert_dir"
+              'loop through a directory, projecting all files in it
+              StrSplit(newstrline, " ", "")
+              ichars = Len(newstrline)
+              ctemp = newstrline
+              iname = CStr(InStr(1, ctemp, ">"))
+              firstpart = Mid(ctemp, 1, CInt(iname))
+              theInputDirName = Mid(ctemp, CDbl(iname) + 1, Len(ctemp) - CDbl(iname) - 14)
+              equalpos = InStr(1, firstpart, "=")
+              If (equalpos > 0) Then
+                theOutputDirName = Mid(firstpart, equalpos + 2, CDbl(iname) - equalpos - 3)
+              Else
+                theOutputDirName = theInputDirName
+              End If
+              If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
+
+              InputFileList.Clear()
+
+              AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
+
+              For Each vFilename In InputFileList
+                curFilename = vFilename
+                ilen = Len(curFilename)
+                If (FileExt(curFilename) = "shp") Then
+                  'this is a shapefile
+                  theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
+                  'change projection and merge
+                  If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
+                    'if the output file exists and it is a landuse shape, dont bother
+                  Else
+                    ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
+                  End If
+                End If
+              Next vFilename
+
+            Case Else
+              LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
+          End Select
+        End If
+NextLine:
+      Loop
+      FileClose(fu)
+    End If
+  End Sub
+
+  Private Sub ShapeUtilMerge(ByVal aCurFilename As String, ByVal aOutputFilename As String, ByVal aProjectionFilename As String)
+    Dim exe As String = FindFile("Please locate ShapeUtil.exe", "\basins\etc\datadownload\ShapeUtil.exe")
+    If exe.Length > 0 Then
+      Dim layersDBF As String = GetSetting("ShapeMerge", "files", "layers.dbf")
+      If Not FileExists(layersDBF) Then
+        LogDbg("Did not find layers.dbf in registry " & layersDBF)
+        layersDBF = PathNameOnly(exe) & "\layers.dbf"
+        If FileExists(layersDBF) Then
+          LogDbg("Saving layers.dbf location for ShapeUtil: " & layersDBF)
+          SaveSetting("ShapeMerge", "files", "layers.dbf", layersDBF)
+        Else
+          LogDbg("Did not find layers.dbf in same path as ShapeUtil " & layersDBF)
+        End If
+      Else
+        LogDbg("Found " & layersDBF)
+      End If
+      LogCmd("MSG2 Merging " & aCurFilename)
+      LogCmd("MSG6 into " & aOutputFilename)
+      Shell(exe & " """ & aOutputFilename & """ """ & aCurFilename & """ """ & aProjectionFilename & """", AppWinStyle.NormalNoFocus, True)
+    Else
+      LogDbg("Failed to find ShapeUtil.exe for merging " & aCurFilename & " into " & aOutputFilename)
+    End If
+  End Sub
+
+  Private Function DataDownload(ByRef aCommandLine As String) As Boolean
+    Dim exe As String = FindFile("Please locate DataDownload.exe", "\Basins\etc\DataDownload\DataDownload.exe")
+    If exe.Length > 0 Then
+      If Shell(exe & " " & aCommandLine, AppWinStyle.NormalFocus, True) = 0 Then
+        Return True
+      Else
+        Return False
+      End If
+    End If
+    '        Dim pManager As WebDataManager.clsWebDataManager
+    '        Dim curStep As String
+
+    '        On Error GoTo ErrHand
+
+    '        curStep = "Set pManager = New clsWebDataManager"
+    '        pManager = New WebDataManager.clsWebDataManager
+    '        'Set pManager.Logger = glogger
+
+    '        curStep = "CurrentStatusFromFile '" & aCommandLine & "'"
+    '        If Len(aCommandLine) > 0 Then pManager.CurrentStatusFromFile(aCommandLine)
+
+    '        curStep = "Manager.SelectDataType"
+    '        pManager.SelectDataType()
+    '        While pManager.State < 1000
+    '            System.Windows.Forms.Application.DoEvents()
+    '            System.Threading.Thread.Sleep(50)
+    '        End While
+
+    '        Exit Sub
+
+    'ErrHand:
+    '        MsgBox(curStep & vbCr & Err.Description, MsgBoxStyle.OKOnly, "BASINS Data Download Main")
+  End Function
+
+  Private Function GetDefaultsXML() As Chilkat.Xml
+    Dim defaultsXml As Chilkat.Xml
+    Dim defaultsPath As String 'full file name of defaults XML
+    defaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", "\basins\etc\BasinsDefaultLayers.xml")
+    'defaultsPath = "E:\BASINS\etc\BasinsDefaultRenderers.xml"
+    If FileExists(defaultsPath) Then
+      defaultsXml = New Chilkat.Xml
+      defaultsXml.LoadXmlFile(defaultsPath)
+    End If
+    Return defaultsXml
+  End Function
+
+  'Adds all shape files found in aPath to the current MapWindow project
+  Public Sub AddAllShapesInDir(ByVal aPath As String, ByVal project_dir As String)
+    Dim iLayer As Integer
+    Dim Filename As String
+    Dim allFiles As NameValueCollection
+    Dim defaultsXML As Chilkat.Xml = GetDefaultsXML()
+
+    LogDbg("AddAllShapesInDir: '" & aPath & "'")
+
+    If Right(aPath, 1) <> "\" Then aPath = aPath & "\"
+    AddFilesInDir(allFiles, aPath, True, "*.shp")
+
+    For iLayer = 0 To allFiles.Count - 1
+      Filename = allFiles.Item(iLayer)
+      AddShapeToMW(Filename, GetDefaultsFor(Filename, project_dir, defaultsXML))
+    Next
+
+    'Remove any empty groups (for example, group "Data Layers" should be empty)
+    For iGroup As Integer = g_MapWin.Layers.Groups.Count - 1 To 0 Step -1
+      If g_MapWin.Layers.Groups.ItemByPosition(iGroup).LayerCount = 0 Then
+        g_MapWin.Layers.Groups.Remove(g_MapWin.Layers.Groups.ItemByPosition(iGroup).Handle)
+      End If
+    Next
+    g_MapWin.PreviewMap.GetPictureFromMap()
+
+  End Sub
+
+  'Given a file name and the XML describing how to render it, add a shape layer to MapWindow
+  Private Function AddShapeToMW(ByVal Filename As String, _
+                                ByRef layerXml As Chilkat.Xml) As MapWindow.Interfaces.Layer
+    Dim LayerName As String
+    Dim Group As String
+    Dim Visible As Boolean
+    Dim Style As atcRenderStyle = New atcRenderStyle
+
+    Dim MWlay As MapWindow.Interfaces.Layer
+    Dim shpFile As MapWinGIS.Shapefile
+    Dim RGBcolor As Int32
+    Dim RGBoutline As Int32
+
+    'Don't add layer again if we already have it
+    For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
+      MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer))
+      If MWlay.FileName().ToLower = Filename.ToLower Then
+        Return MWlay
+      End If
+    Next
+    MWlay = Nothing
+
+    Try
+      If layerXml Is Nothing Then
+        LayerName = FilenameOnly(Filename)
+        Visible = False 'True
+        Group = "Other"
+      Else
+        LayerName = layerXml.GetAttrValue("Name")
+        Style.xml = layerXml.FirstChild
+        Group = layerXml.GetAttrValue("Group")
+        If Group Is Nothing Then Group = "Other"
+        Select Case layerXml.GetAttrValue("Visible").ToLower
+          Case "yes" : Visible = True
+          Case "no" : Visible = False
+          Case Else : Visible = False
+        End Select
+      End If
+
+      g_MapWin.StatusBar.Item(1).Text = "Opening " & Filename
+      shpFile = New MapWinGIS.Shapefile
+      shpFile.Open(Filename)
+      Select Case shpFile.ShapefileType
+        Case MapWinGIS.ShpfileType.SHP_POINT, _
+                MapWinGIS.ShpfileType.SHP_POINTM, _
+                MapWinGIS.ShpfileType.SHP_POINTZ, _
+                MapWinGIS.ShpfileType.SHP_MULTIPOINT
+          RGBcolor = RGB(Style.MarkColor.R, Style.MarkColor.G, Style.MarkColor.B)
+          MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.MarkSize)
+          Select Case Style.MarkStyle                        'TODO: translate Cross, X, Bitmap properly
+            Case "Circle" : MWlay.PointType = MapWinGIS.tkPointType.ptCircle
+            Case "Square" : MWlay.PointType = MapWinGIS.tkPointType.ptSquare
+            Case "Cross" : MWlay.PointType = MapWinGIS.tkPointType.ptTriangleRight
+            Case "X" : MWlay.PointType = MapWinGIS.tkPointType.ptTriangleLeft
+            Case "Diamond" : MWlay.PointType = MapWinGIS.tkPointType.ptDiamond
+            Case "Bitmap"
+              Select Case Style.MarkBitsAsHex
+                Case "3C 42 81 99 99 81 42 3C" : MWlay.PointType = MapWinGIS.tkPointType.ptCircle
+                Case "00 7E 7E 7E 7E 7E 7E 00" : MWlay.PointType = MapWinGIS.tkPointType.ptSquare
+                Case "0000 0000 0000 3FF8 3FF8 1FF0 1FF0 0FE0 0FE0 07C0 07C0 0380 0380 0100 0000 0000"
+                  MWlay.PointType = MapWinGIS.tkPointType.ptTriangleDown
+                Case Else
+                  MWlay.PointType = MapWinGIS.tkPointType.ptDiamond
+              End Select
+              'MWlay.PointType = MapWinGIS.tkPointType.ptUserDefined
+              'mwlay.UserPointType = 'TODO: translate bitmap into Image
+          End Select
+
+        Case MapWinGIS.ShpfileType.SHP_POLYLINE, MapWinGIS.ShpfileType.SHP_POLYLINEM, MapWinGIS.ShpfileType.SHP_POLYLINEZ
+          RGBcolor = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
+          MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBcolor, Style.LineWidth)
+        Case MapWinGIS.ShpfileType.SHP_POLYGON, MapWinGIS.ShpfileType.SHP_POLYGONM, MapWinGIS.ShpfileType.SHP_POLYGONZ
+          RGBcolor = RGB(Style.FillColor.R, Style.FillColor.G, Style.FillColor.B)
+          RGBoutline = RGB(Style.LineColor.R, Style.LineColor.G, Style.LineColor.B)
+          MWlay = g_MapWin.Layers.Add(shpFile, LayerName, RGBcolor, RGBoutline, Style.LineWidth)
+          Select Case LCase(Style.FillStyle)
+            Case "none"
+              MWlay.FillStipple = MapWinGIS.tkFillStipple.fsNone
+              If MWlay.Color.Equals(System.Drawing.Color.Black) Then
+                MWlay.Color = System.Drawing.Color.White
+              End If
+              MWlay.DrawFill = False
+            Case "solid" '"Solid"
+            Case "horizontal" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsHorizontalBars
+            Case "vertical" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsVerticalBars
+            Case "down" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsDiagonalDownRight
+            Case "up" : MWlay.FillStipple = MapWinGIS.tkFillStipple.fsDiagonalDownLeft
+            Case "cross"
+            Case "diagcross"
+          End Select
+      End Select
+      Select Case Style.LineStyle.ToLower
+        Case "solid" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsNone
+        Case "dash" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashed
+        Case "dot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDotted
+        Case "dashdot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashDotDash
+        Case "dashdotdot" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsDashDotDash
+          'Case "alternate" : MWlay.LineStipple = MapWinGIS.tkLineStipple.lsCustom
+          '    MWlay.UserLineStipple = 
+      End Select
+
+      MWlay.Visible = Visible
+
+      'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
+      If LCase(Filename).IndexOf("\landuse\") > 0 Then
+        SetLandUseColors(MWlay, shpFile)
+      ElseIf LCase(Filename).IndexOf("\nhd\") > 0 Then
+        MWlay.Name &= " " & FilenameOnly(shpFile.Filename)
+      ElseIf LCase(Filename).IndexOf("\census\") > 0 Then
+        SetCensusColors(MWlay, shpFile)
+      ElseIf LCase(Filename).EndsWith("cat.shp") Then
+        MWlay.ZoomTo()
+      End If
+      If Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
+
+      If MWlay.Visible Then
+        g_MapWin.View.Redraw()
+        DoEvents()
+      End If
+      g_MapWin.Project.Modified = True
+    Catch ex As Exception
+      LogMsg("Could not add '" & Filename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Shape")
+    End Try
+
+    Return MWlay
+  End Function
+
+  Private Sub AddLayerToGroup(ByVal aLay As MapWindow.Interfaces.Layer, ByVal aGroupName As String)
+    Dim GroupHandle As Object
+    Dim iExistingGroup As Integer = 0
+
+    While iExistingGroup < g_MapWin.Layers.Groups.Count AndAlso _
+          g_MapWin.Layers.Groups.ItemByPosition(iExistingGroup).Text <> aGroupName
+      iExistingGroup += 1
+    End While
+
+    If iExistingGroup < g_MapWin.Layers.Groups.Count Then
+      GroupHandle = g_MapWin.Layers.Groups.ItemByPosition(iExistingGroup).Handle
+    Else
+      'TODO: read group order from a file rather than hard-coded array
+      Dim GroupOrder() As String = {"Data Layers", _
+                                    "Hydrology", _
+                                    "Observed Data Stations", _
+                                    "Point Sources & Withdrawals", _
+                                    "Political", _
+                                    "Census", _
+                                    "Transportation", _
+                                    "Soil, Land Use/Cover", _
+                                    "Other"}
+      Dim iNewGroup As Integer = Array.IndexOf(GroupOrder, aGroupName)
+      iExistingGroup = g_MapWin.Layers.Groups.Count
+      If iNewGroup > 0 Then
+        While iExistingGroup > 0 AndAlso _
+              Array.IndexOf(GroupOrder, _
+                            g_MapWin.Layers.Groups.ItemByPosition(iExistingGroup - 1).Text) < iNewGroup
+          iExistingGroup -= 1
+        End While
+      End If
+      GroupHandle = g_MapWin.Layers.Groups.Add(aGroupName, iExistingGroup)
+    End If
+
+    Select Case aLay.LayerType
+      Case MapWindow.Interfaces.eLayerType.Grid, MapWindow.Interfaces.eLayerType.Image, MapWindow.Interfaces.eLayerType.PolygonShapefile
+        aLay.MoveTo(0, GroupHandle) 'move grid/image/polygon to bottom of group
+      Case MapWindow.Interfaces.eLayerType.LineShapefile, MapWindow.Interfaces.eLayerType.PointShapefile
+        aLay.MoveTo(99, GroupHandle) 'move line/point layer to top of group
+      Case Else
+        LogDbg("AddLayerToGroup: Unexpected layer type: " & aLay.LayerType & " for layer " & aLay.Name)
+        aLay.MoveTo(0, GroupHandle)
+    End Select
+  End Sub
+
+  Private Sub SetLandUseColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
+    Dim colorBreak As MapWinGIS.ShapefileColorBreak
+    Dim colorScheme As MapWinGIS.ShapefileColorScheme
+
+    MWlay.Name &= " " & FilenameOnly(shpFile.Filename).Substring(2)
+    colorScheme = New MapWinGIS.ShapefileColorScheme
+    colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "lucode")
+    If colorScheme.FieldIndex > 0 Then
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Urban or Built-up Land"
+      colorBreak.StartValue = 1
+      colorBreak.EndValue = 19
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(120, 120, 120))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Agricultural Land"
+      colorBreak.StartValue = 20
+      colorBreak.EndValue = 29
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 255, 0))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Rangeland"
+      colorBreak.StartValue = 30
+      colorBreak.EndValue = 39
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(146, 174, 47))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Forest Land"
+      colorBreak.StartValue = 40
+      colorBreak.EndValue = 49
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(161, 102, 50))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Water"
+      colorBreak.StartValue = 50
+      colorBreak.EndValue = 59
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 0, 255))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Wetland"
+      colorBreak.StartValue = 60
+      colorBreak.EndValue = 69
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 209, 220))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Barren Land"
+      colorBreak.StartValue = 70
+      colorBreak.EndValue = 79
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(255, 255, 0))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Tundra"
+      colorBreak.StartValue = 80
+      colorBreak.EndValue = 89
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(60, 105, 0))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+
+      colorBreak = New MapWinGIS.ShapefileColorBreak
+      colorBreak.Caption = "Perennial Snow or Ice"
+      colorBreak.StartValue = 90
+      colorBreak.EndValue = 99
+      colorBreak.StartColor = System.Convert.ToUInt32(RGB(210, 210, 210))
+      colorBreak.EndColor = colorBreak.StartColor
+      colorScheme.Add(colorBreak)
+      MWlay.ColoringScheme = colorScheme
+      'MWlay.Color = System.Drawing.Color.White
+      MWlay.DrawFill = True
+      MWlay.LineOrPointSize = 0
+      MWlay.OutlineColor = System.Drawing.Color.Black
+    End If
+  End Sub
+
+  Public Sub SetCensusRenderer(ByVal MWlay As MapWindow.Interfaces.Layer, Optional ByVal shpFile As MapWinGIS.Shapefile = Nothing)
+    Dim fldCFCC As Integer
+    Dim curCFCC As Integer
+    Dim iShape As Integer
+    Dim nShapes As Integer = MWlay.Shapes.NumShapes
+    Dim shp As MapWindow.Interfaces.Shape
+
+    If shpFile Is Nothing Then shpFile = MWlay.GetObject
+
+    fldCFCC = ShpFieldNumFromName(shpFile, "CFCC")
+
+    g_MapWin.View.LockMap() 'keep the map from updating during the loop.
+
+    For iShape = 0 To nShapes - 1
+      shp = MWlay.Shapes(iShape)
+      curCFCC = shpFile.CellValue(fldCFCC, iShape).ToString.Substring(1)
+      Select Case curCFCC
+        Case 1, 11 To 18
+          'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(132, 0, 0)))
+          shp.LineOrPointSize = 2
+        Case 2, 21 To 28
+          'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(0, 0, 0)))
+          shp.LineOrPointSize = 2
+        Case 3, 31 To 38
+          'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(122, 122, 122)))
+          shp.LineOrPointSize = 2
+        Case 4, 41 To 48, 63, 64
+          'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(166, 166, 166)))
+        Case Else 'A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
+          'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(200, 200, 200)))
+          shp.LineStipple = MapWinGIS.tkLineStipple.lsDotted
+      End Select
+    Next
+
+    g_MapWin.View.UnlockMap() 'let the map redraw again
+  End Sub
+
+  'Public Sub SetCensusRenderer(ByVal MWlay As MapWindow.Interfaces.Layer, Optional ByVal shpFile As MapWinGIS.Shapefile = Nothing)
+  '    Dim fldCFCC As Integer
+  '    Dim iShape As Integer
+
+  '    If shpFile Is Nothing Then
+  '        shpFile = New MapWinGIS.Shapefile
+  '        shpFile.Open(MWlay.FileName)
+  '    End If
+
+  '    fldCFCC = ShpFieldNumFromName(shpFile, "CFCC")
+
+  '    For iShape = 0 To MWlay.Shapes.NumShapes - 1
+  '        Dim shp As MapWindow.Interfaces.Shape = MWlay.Shapes(iShape)
+  '        Dim iCFCC As Integer = shpFile.CellValue(fldCFCC, iShape).ToString.Substring(1)
+  '        Select Case iCFCC
+  '            Case 1, 11 To 18
+  '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(132, 0, 0)))
+  '                shp.LineOrPointSize = 2
+  '            Case 2, 21 To 28
+  '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(0, 0, 0)))
+  '                shp.LineOrPointSize = 2
+  '            Case 3, 31 To 38
+  '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(122, 122, 122)))
+  '                shp.LineOrPointSize = 2
+  '            Case 4, 41 To 48, 63, 64
+  '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(166, 166, 166)))
+  '            Case Else 'A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
+  '                'shp.Color = System.Drawing.Color.FromArgb(System.Convert.ToInt32(RGB(200, 200, 200)))
+  '                shp.LineStipple = MapWinGIS.tkLineStipple.lsDotted
+  '        End Select
+  '    Next
+  'End Sub
+
+  Private Sub SetCensusColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
+    Dim colorBreak As MapWinGIS.ShapefileColorBreak
+    Dim colorScheme As MapWinGIS.ShapefileColorScheme
+    Dim prefix As String = (MWlay.FileName.ToUpper.Chars(MWlay.FileName.Length - 5))
+
+    MWlay.Name &= " " & Left(FilenameOnly(shpFile.Filename), 8)
+
+    If MWlay.FileName.ToLower.EndsWith("_tgr_a.shp") Or _
+       MWlay.FileName.ToLower.EndsWith("_tgr_p.shp") Then
+      'Color the roads
+      colorScheme = New MapWinGIS.ShapefileColorScheme
+      colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "CFCC")
+      If colorScheme.FieldIndex > 0 Then
+        colorBreak = New MapWinGIS.ShapefileColorBreak
+        colorBreak.Caption = "Primary limited access"
+        colorBreak.StartValue = prefix & "1"
+        colorBreak.EndValue = prefix & "18"
+        colorBreak.StartColor = System.Convert.ToUInt32(RGB(132, 0, 0))
+        colorBreak.EndColor = colorBreak.StartColor
+        'TODO: renderer should be able to change line width: LineWidth = 2
+        colorScheme.Add(colorBreak)
+
+        colorBreak = New MapWinGIS.ShapefileColorBreak
+        colorBreak.Caption = "Primary non-limited access"
+        colorBreak.StartValue = prefix & "2"
+        colorBreak.EndValue = prefix & "28"
+        colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 0, 0))
+        colorBreak.EndColor = colorBreak.StartColor
+        'TODO: renderer should be able to change line width: LineWidth = 2
+        colorScheme.Add(colorBreak)
+
+        colorBreak = New MapWinGIS.ShapefileColorBreak
+        colorBreak.Caption = "Secondary"
+        colorBreak.StartValue = prefix & "3"
+        colorBreak.EndValue = prefix & "38"
+        colorBreak.StartColor = System.Convert.ToUInt32(RGB(122, 122, 122))
+        'TODO: renderer should be able to change line width: LineWidth = 2
+        colorBreak.EndColor = colorBreak.StartColor
+        colorScheme.Add(colorBreak)
+
+        colorBreak = New MapWinGIS.ShapefileColorBreak
+        colorBreak.Caption = "Local"
+        colorBreak.StartValue = prefix & "4" 'TODO: A4, A41, A42, A43, A44, A45, A46, A47, A48, A63, A64
+        colorBreak.EndValue = prefix & "48"
+        colorBreak.StartColor = System.Convert.ToUInt32(RGB(166, 166, 166))
+        colorBreak.EndColor = colorBreak.StartColor
+        colorScheme.Add(colorBreak)
+
+        colorBreak = New MapWinGIS.ShapefileColorBreak
+        colorBreak.Caption = "Other"
+        colorBreak.StartValue = prefix & "5" 'TODO: A5, A51, A52, A53, A6, A60, A61, A62, A65, A7, A70, A71, A72, A73, A74
+        colorBreak.EndValue = "Z"
+        colorBreak.StartColor = System.Convert.ToUInt32(RGB(200, 200, 200))
+        'TODO: renderer should be able to change line style: LineStyle = Dashed
+        colorBreak.EndColor = colorBreak.StartColor
+        colorScheme.Add(colorBreak)
+
+        MWlay.ColoringScheme = colorScheme
+        MWlay.LineOrPointSize = 1
+        MWlay.OutlineColor = System.Drawing.Color.Black
+
+        SetCensusRenderer(MWlay, shpFile)
+      End If
+    End If
+  End Sub
+
+  Private Function ShpFieldNumFromName(ByVal aShpFile As MapWinGIS.Shapefile, ByVal aFieldName As String) As Integer
+    Dim lFieldName As String = LCase(aFieldName)
+    Dim iField As Integer
+    For iField = 0 To aShpFile.NumFields
+      If LCase(aShpFile.Field(iField).Name) = lFieldName Then Return iField
+    Next
+    Return 0
+  End Function
+
+  Private Function GetDefaultsFor(ByVal Filename As String, _
+                                  ByVal project_dir As String, _
+                                  ByRef aDefaultsXml As Chilkat.Xml) As Chilkat.Xml
+    Dim lName As String
+    Dim layerXml As Chilkat.Xml
+
+    lName = LCase(Filename.Substring(project_dir.Length))
+
+    If Not aDefaultsXml Is Nothing Then
+      For iLayer As Integer = 0 To aDefaultsXml.NumChildren - 1
+        layerXml = aDefaultsXml.GetChild(iLayer)
+        If PatternMatch(lName, "*" & layerXml.GetAttrValue("Filename") & "*") Then
+          Return layerXml
+        End If
+      Next
+    End If
+    Return Nothing
+  End Function
+End Module
