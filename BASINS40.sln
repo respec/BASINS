@@ -1,0 +1,85 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUtility", "atcUtility\atcUtility.vbproj", "{67027820-9036-481E-80F6-077E5085F59D}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcData", "atcData\atcData.vbproj", "{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcControls", "atcControls\atcControls.vbproj", "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGraph", "atcGraph\atcGraph.vbproj", "{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcHSPF", "atcHSPF\atcHSPF.vbproj", "{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcHydrologicIndices", "atcHydrologicIndices\atcHydrologicIndices.vbproj", "{BD299EB7-7A62-4EF9-8806-86E9288C498F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcWDM", "atcWDM\atcWDM.vbproj", "{F0F41E48-35ED-43F4-AB00-30252B0E5690}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS", "BASINS\BASINS.vbproj", "{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcProjector", "atcProjector\atcProjector.vbproj", "{863771D3-EA5B-45D2-8416-B75E9ADA8D7B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{67027820-9036-481E-80F6-077E5085F59D}.Debug.ActiveCfg = Debug|.NET
+		{67027820-9036-481E-80F6-077E5085F59D}.Debug.Build.0 = Debug|.NET
+		{67027820-9036-481E-80F6-077E5085F59D}.Release.ActiveCfg = Release|.NET
+		{67027820-9036-481E-80F6-077E5085F59D}.Release.Build.0 = Release|.NET
+		{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}.Debug.ActiveCfg = Debug|.NET
+		{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}.Debug.Build.0 = Debug|.NET
+		{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}.Release.ActiveCfg = Release|.NET
+		{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}.Release.Build.0 = Release|.NET
+		{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}.Debug.ActiveCfg = Debug|.NET
+		{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}.Debug.Build.0 = Debug|.NET
+		{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}.Release.ActiveCfg = Release|.NET
+		{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}.Release.Build.0 = Release|.NET
+		{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}.Debug.ActiveCfg = Debug|.NET
+		{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}.Debug.Build.0 = Debug|.NET
+		{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}.Release.ActiveCfg = Release|.NET
+		{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}.Release.Build.0 = Release|.NET
+		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Debug.ActiveCfg = Debug|.NET
+		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Debug.Build.0 = Debug|.NET
+		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Release.ActiveCfg = Release|.NET
+		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Release.Build.0 = Release|.NET
+		{BD299EB7-7A62-4EF9-8806-86E9288C498F}.Debug.ActiveCfg = Debug|.NET
+		{BD299EB7-7A62-4EF9-8806-86E9288C498F}.Debug.Build.0 = Debug|.NET
+		{BD299EB7-7A62-4EF9-8806-86E9288C498F}.Release.ActiveCfg = Release|.NET
+		{BD299EB7-7A62-4EF9-8806-86E9288C498F}.Release.Build.0 = Release|.NET
+		{F0F41E48-35ED-43F4-AB00-30252B0E5690}.Debug.ActiveCfg = Debug|.NET
+		{F0F41E48-35ED-43F4-AB00-30252B0E5690}.Debug.Build.0 = Debug|.NET
+		{F0F41E48-35ED-43F4-AB00-30252B0E5690}.Release.ActiveCfg = Release|.NET
+		{F0F41E48-35ED-43F4-AB00-30252B0E5690}.Release.Build.0 = Release|.NET
+		{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}.Debug.ActiveCfg = Debug|.NET
+		{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}.Debug.Build.0 = Debug|.NET
+		{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}.Release.ActiveCfg = Release|.NET
+		{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}.Release.Build.0 = Release|.NET
+		{863771D3-EA5B-45D2-8416-B75E9ADA8D7B}.Debug.ActiveCfg = Debug|.NET
+		{863771D3-EA5B-45D2-8416-B75E9ADA8D7B}.Debug.Build.0 = Debug|.NET
+		{863771D3-EA5B-45D2-8416-B75E9ADA8D7B}.Release.ActiveCfg = Release|.NET
+		{863771D3-EA5B-45D2-8416-B75E9ADA8D7B}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
