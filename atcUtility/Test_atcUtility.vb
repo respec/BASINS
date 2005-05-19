@@ -207,8 +207,7 @@ End Class
   End Sub
 
   Public Sub TestEquals()
-    'Equals()
-    Assert.Ignore("Test not yet written")
+    'not applicable?
   End Sub
 
   Public Sub TestToString()
@@ -416,8 +415,7 @@ End Class
   End Sub
 
   Public Sub TestEquals()
-    'Equals()
-    Assert.Ignore("Test not yet written")
+    'not applicable?
   End Sub
 
   Public Sub TestToString()
@@ -714,15 +712,27 @@ End Class
 End Class
 
 <TestFixture()> Public Class Test_modDate
+  Private d(6) As Integer
+  Private dS As String
+  Private dJ As Double = 53509.43264
+  Private dX As Double = 0.00001
+
+  <TestFixtureSetUp()> Public Sub init()
+    d(0) = 2005
+    d(1) = 5
+    d(2) = 19
+    d(3) = 10
+    d(4) = 23
+    d(5) = 0
+    dS = Format(d(0), "0000") & "/" & Format(d(1), "00") & "/19 10:23"
+  End Sub
 
   Public Sub TestVBdate2MJD()
-    'VBdate2MJD()
-    Assert.Ignore("Test not yet written")
+    Assert.AreEqual(VBdate2MJD(dS), dJ, dX)
   End Sub
 
   Public Sub TestMJD2VBdate()
-    'MJD2VBdate()
-    Assert.Ignore("Test not yet written")
+    Assert.AreEqual(Format(MJD2VBdate(dJ), "yyyy/MM/dd hh:mm"), dS)
   End Sub
 
   Public Sub TestATCformat()
@@ -730,24 +740,12 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestMonthName3()
-    'MonthName3()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestMonthName_Renamed()
-    'MonthName_Renamed()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
   Public Sub TestDate2J()
-    'Date2J()
-    Assert.Ignore("Test not yet written")
+    Assert.AreEqual(Date2J(d), dJ, dX)
   End Sub
 
   Public Sub TestHMS2J()
-    'HMS2J()
-    Assert.Ignore("Test not yet written")
+    Assert.AreEqual(HMS2J(d(3), d(4), d(5)), dJ Mod 1, dX)
   End Sub
 
   Public Sub TestJ2Date()
@@ -1566,13 +1564,11 @@ End Class
   End Sub
 
   Public Sub TestToString()
-    'ToString()
-    Assert.Ignore("Test not yet written")
+    Assert.AreEqual(ToString().ToLower, "atcutility.test_tableopener")
   End Sub
 
   Public Sub TestGetType()
-    'GetType()
-    Assert.Ignore("Test not yet written")
+    'not applicable
   End Sub
 
 End Class
@@ -1612,10 +1608,12 @@ End Class
   End Sub
 
   Public Sub TestEquals()
+    'not applicable for module, dummy follows
     Assert.AreEqual(Equals(Me), True)
   End Sub
 
   Public Sub TestToString()
+    'not applicable for module, dummy follows
     Assert.AreEqual(ToString().ToLower, "atcutility.test_utilcolor")
   End Sub
 
