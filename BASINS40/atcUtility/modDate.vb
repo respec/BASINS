@@ -18,17 +18,17 @@ Public Module modDate
   '##GLOBAL JulianYear - estimate of year as number of days
   Public Const JulianYear As Double = 365.25
 
-  Public Function VBdate2MJD(ByRef d As Date) As Double
+  Public Function VBdate2MJD(ByVal d As Date) As Double
     '##SUMMARY VBdate2MJD - convert a VB date to a modfied Julian date(MJD), _
     'VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858
     '##PARAM d - VBdate to convert
-    VBdate2MJD = d.ToOADate + 15018
+    VBdate2MJD = d.ToOADate + 15018.0#
   End Function
 
-  Public Function MJD2VBdate(ByRef j As Double) As Date
+  Public Function MJD2VBdate(ByVal j As Double) As Date
     '##SUMMARY MJD2VBdate - convert a modified Julian date(MJD) to a VB date
     '##PARM j - MJD to convert
-    MJD2VBdate = System.DateTime.FromOADate(j - 15018)
+    MJD2VBdate = System.DateTime.FromOADate(j - 15018.0#)
   End Function
 
   'Decimal-aligns numbers by padding before and/or after number with spaces
@@ -87,7 +87,7 @@ Public Module modDate
     ATCformat = retval
   End Function
 
-  Public Function Date2J(ByRef d() As Integer) As Double
+  Public Function Date2J(ByVal d() As Integer) As Double
     '##SUMMARY Date2J - convert a date arry to a modfied Julian date (MJD)
     '##PARM d - date array to convert
     Dim jd As Integer
@@ -100,7 +100,7 @@ Public Module modDate
     Date2J = jd + jhms
   End Function
 
-  Function HMS2J(ByRef h As Integer, ByRef m As Integer, ByRef s As Integer) As Double
+  Function HMS2J(ByVal h As Integer, ByVal m As Integer, ByVal s As Integer) As Double
     '##SUMMARY HMS2J - convert an hour, minute, and second to a modifed Julian date (MJD)
     '##PARM h - hour to convert
     '##PARM m - minute to convert
@@ -108,7 +108,7 @@ Public Module modDate
     HMS2J = CDbl(h / 24) + CDbl(m / 1440) + CDbl(s / 86400)
   End Function
 
-  Sub J2Date(ByRef j As Double, ByRef d() As Integer)
+  Sub J2Date(ByVal j As Double, ByRef d() As Integer)
     '##SUMMARY J2Date - convert a modified Julian date (MJD) to a long array
     '##PARM j - modfied Julian date to convert
     '##PARM d - array containing output year , month, day, hour, minute, second
@@ -123,7 +123,7 @@ Public Module modDate
     Call J2HMS(jhms, d(3), d(4), d(5), f)
   End Sub
 
-  Sub J2HMS(ByRef j As Double, ByRef h As Integer, ByRef m As Integer, ByRef s As Integer, ByRef f As Double)
+  Sub J2HMS(ByVal j As Double, ByRef h As Integer, ByRef m As Integer, ByRef s As Integer, ByRef f As Double)
     '##SUMMARY J2HMS - convert a time portion of a modfied Julian date to its component parts
     '##Parm j - MJD to convert
     '##PARM h - hour portion of MJD
@@ -131,7 +131,7 @@ Public Module modDate
     '##PARM s - second portion of MJD
     Dim t As Double
     '##LOCAL t - intermediate result, units change from hours to seconds
-    t = 0.0000004 + (j * 24)
+    t = 0.0000004 + ((j Mod 1) * 24)
     h = Fix(t)
     t = (t - h) * 60
     m = Fix(t)
@@ -140,7 +140,7 @@ Public Module modDate
     f = t - s
   End Sub
 
-  Sub INVMJD(ByRef MJD As Integer, ByRef yr As Integer, ByRef mn As Integer, ByRef dy As Integer)
+  Sub INVMJD(ByVal MJD As Integer, ByRef yr As Integer, ByRef mn As Integer, ByRef dy As Integer)
     '##SUMMARY INVMJD - invert modified Julian date as computed by function MJD (from DelbertDFranz) _
     'Developed from information given in: "Astronomical Formulae _
     'for Calculators', Jean Meeus, published by Willmann-Bell.
@@ -185,7 +185,7 @@ Public Module modDate
     End If
   End Sub
 
-  Function MJD(ByRef yr As Integer, ByRef mn As Integer, ByRef dy As Integer) As Integer
+  Function MJD(ByVal yr As Integer, ByVal mn As Integer, ByVal dy As Integer) As Integer
     '##SUMMARY MJD - 'Compute modified julian date for any date _
     'with a year greater than 1582 (from DelbertDFranz) _
     'We take the resulting date to represent the elapsed time from _
@@ -220,7 +220,7 @@ Public Module modDate
     MJD = Int((36525 * y) / 100) + Int(30.6001 * (m + 1)) + dy + b - 679006
   End Function
 
-  Function Jday(ByRef yr As Integer, ByRef mo As Integer, ByRef dy As Integer, ByRef hr As Integer, ByRef mn As Integer, ByRef sc As Integer) As Double
+  Function Jday(ByVal yr As Integer, ByVal mo As Integer, ByVal dy As Integer, ByVal hr As Integer, ByVal mn As Integer, ByVal sc As Integer) As Double
     'SUMMARY jday - convert portions of date to a modfied Julian date (MJD)
     '##PARM yr - calendar year
     '##PARM mn - number of month(1-12)
@@ -239,7 +239,7 @@ Public Module modDate
     Jday = Date2J(d)
   End Function
 
-  Function JDateIntrvl(ByRef j As Double) As Integer
+  Function JDateIntrvl(ByVal j As Double) As Integer
     '##SUMMARY JDateIntrvl - determines the date interval (6-second thru 1-year) of _
     'a modfied Julian date
     '##PARM j - MJD to determine interval of
@@ -249,7 +249,7 @@ Public Module modDate
     JDateIntrvl = DateIntrvl(d)
   End Function
 
-  Function DateIntrvl(ByRef d() As Integer) As Integer
+  Function DateIntrvl(ByVal d() As Integer) As Integer
     '##SUMMARY DateIntrvl - determines the date interval (6-second thru 1-year) of a date array
     '##PARM d - date array to determine interval of
     Dim i As Integer
@@ -291,7 +291,7 @@ Public Module modDate
     DateIntrvl = i
   End Function
 
-  Function daymon(ByRef yr As Integer, ByRef mo As Integer) As Integer
+  Function daymon(ByVal yr As Integer, ByVal mo As Integer) As Integer
     '##SUMMARY daymon - return the number of days in the given month for the given _
     'year, with leap year taken into account.  For an invalid month, -1 is returned. _
     'For an invalid year and a valid month, the correct number of days is returned, _
@@ -325,7 +325,7 @@ Public Module modDate
     End If
   End Function
 
-  Public Function addUniqueDate(ByRef j As Double, ByRef ja() As Double, ByRef ji() As Integer) As Boolean
+  Public Function addUniqueDate(ByVal j As Double, ByRef ja() As Double, ByRef ji() As Integer) As Boolean
     '##SUMMARY addUniqueDate - adds a unique MJD date to an array of dates if it is not already there _
     'returns true if date added, false if date was already in array
     '##PARM j - MJD date to try to add
@@ -353,7 +353,7 @@ Public Module modDate
     addUniqueDate = Not fnd 'true if date added
   End Function
 
-  Public Function DumpDate(ByRef j As Double, Optional ByRef s As Object = "JDate") As String
+  Public Function DumpDate(ByVal j As Double, Optional ByVal s As Object = "JDate") As String
     '##SUMMARY DumpDate - convert a modfied Julian date to a string
     '##PARM j - date to convert
     '##PARM s - optional prefix for output string
@@ -363,7 +363,11 @@ Public Module modDate
     'UPGRADE_WARNING: Couldn't resolve default property of object s
     DumpDate = s & ":" & j & ":" & d(0) & "/" & d(1) & "/" & d(2) & " " & d(3) & ":" & d(4) & ":" & d(5)
   End Function
-  Public Sub DTMCMN(ByRef sdates() As Integer, ByRef edates() As Integer, ByRef TSTEP() As Integer, ByRef TCODE() As Integer, ByRef sdat() As Integer, ByRef edat() As Integer, ByRef ts As Integer, ByRef tc As Integer, ByRef retcod As Integer) 'tc As ATCTimeUnit
+  Public Sub DTMCMN(ByVal sdates() As Integer, ByVal edates() As Integer, _
+                    ByVal TSTEP() As Integer, ByVal TCODE() As Integer, _
+                    ByRef sdat() As Integer, ByRef edat() As Integer, _
+                    ByRef ts As Integer, ByRef tc As Integer, _
+                    ByRef retcod As Integer) 'tc As ATCTimeUnit
     '##SUMMARY DTMCMN - determine the time period common to a number of pairs of dates. _
     'also determines the smallest common time step and unit.
     '##PARM sdates - input array of beginning dates
@@ -425,7 +429,8 @@ Public Module modDate
     End If
   End Sub
 
-  Public Sub DatCmn(ByRef sd() As Integer, ByRef ed() As Integer, ByRef SDate() As Integer, ByRef EDate() As Integer, ByRef retcod As Integer)
+  Public Sub DatCmn(ByVal sd() As Integer, ByVal ed() As Integer, _
+                    ByRef SDate() As Integer, ByRef EDate() As Integer, ByRef retcod As Integer)
     '##SUMMARY DatCmn - determine the time period common to a number of sets of dates.
     '##PARM sd     - input array of beginning dates
     '##PARM ed     - input array of ending dates
@@ -482,7 +487,9 @@ Public Module modDate
     End If
   End Sub
 
-  Private Sub cmptim(ByRef tcode1 As Integer, ByRef tstep1 As Integer, ByRef tcode2 As Integer, ByRef tstep2 As Integer, ByRef tstepf As Integer, ByRef tcdcmp As Integer) 'tcode1 As ATCTimeUnit, tcode2 As ATCTimeUnit
+  Private Sub cmptim(ByVal tcode1 As Integer, ByVal tstep1 As Integer, _
+                     ByVal tcode2 As Integer, ByVal tstep2 As Integer, _
+                     ByRef tstepf As Integer, ByRef tcdcmp As Integer) 'tcode1 As ATCTimeUnit, tcode2 As ATCTimeUnit
 
     '     Compare one time unit and step to a second time unit and
     '     step.  Two flags are returned.  The first flag indicates
@@ -583,7 +590,9 @@ Public Module modDate
     End If
   End Sub
 
-  Private Sub cmptm2(ByRef tc1 As Integer, ByRef ts1 As Integer, ByRef tc2 As Integer, ByRef ts2 As Integer, ByRef tstepf As Integer, ByRef tcdcmp As Integer)
+  Private Sub cmptm2(ByVal tc1 As Integer, ByVal ts1 As Integer, _
+                     ByVal tc2 As Integer, ByVal ts2 As Integer, _
+                     ByRef tstepf As Integer, ByRef tcdcmp As Integer)
 
     '     This routine compares one time unit and step to a second time
     '     unit and step.  Two flags are returned.  The first flag
@@ -672,7 +681,9 @@ Public Module modDate
     End If
   End Sub
 
-  Public Function TimAddJ(ByRef jStartDate As Double, ByRef TCODE As Integer, ByRef TSTEP As Integer, ByRef NVALS As Integer) As Double
+  Public Function TimAddJ(ByVal jStartDate As Double, _
+                          ByVal TCODE As Integer, ByVal TSTEP As Integer, _
+                          ByVal NVALS As Integer) As Double
     Dim DATE1(6) As Integer
     Dim DATE2(6) As Integer
     Select Case TCODE
@@ -687,7 +698,9 @@ Public Module modDate
     End Select
   End Function
 
-  Public Sub TIMADD(ByRef DATE1() As Integer, ByRef TCODE As Integer, ByRef TSTEP As Integer, ByRef NVALS As Integer, ByRef DATE2() As Integer)
+  Public Sub TIMADD(ByVal DATE1() As Integer, _
+                    ByVal TCODE As Integer, ByVal TSTEP As Integer, _
+                    ByVal NVALS As Integer, ByRef DATE2() As Integer)
 
     ' Add NVALS time steps to first date to compute second date.
     ' The first date is assumed to be valid.
@@ -793,7 +806,9 @@ Public Module modDate
     DATE2(5) = TSC
   End Sub
 
-  Public Sub timdif(ByRef DATE1() As Integer, ByRef DATE2() As Integer, ByRef TCODE As Integer, ByRef TSTEP As Integer, ByRef NVALS As Integer)
+  Public Sub timdif(ByVal DATE1() As Integer, ByVal DATE2() As Integer, _
+                    ByVal TCODE As Integer, ByVal TSTEP As Integer, _
+                    ByRef NVALS As Integer)
 
     '     Calculate the number of time steps between two dates.  Part
     '     intervals at a time step less than TCODE and TSSTEP are not
@@ -814,7 +829,8 @@ Public Module modDate
     NVALS = pTimDif(Date2J(DATE1), Date2J(DATE2), DATE1, DATE2, TCODE, TSTEP)
   End Sub
 
-  Public Function timdifJ(ByRef StartJDate As Double, ByRef EndJDate As Double, ByRef TCODE As Integer, ByRef TSTEP As Integer) As Integer
+  Public Function timdifJ(ByVal StartJDate As Double, ByVal EndJDate As Double, _
+                          ByVal TCODE As Integer, ByVal TSTEP As Integer) As Integer
     '     Calculate the number of time steps between two dates.  Part
     '     intervals at a time step less than TCODE and TSSTEP are not
     '     included.  If the second date is before the first date, or the
@@ -841,7 +857,9 @@ Public Module modDate
     End If
   End Function
 
-  Private Function pTimDif(ByRef StartJDate As Double, ByRef EndJDate As Double, ByRef DATE1() As Integer, ByRef DATE2() As Integer, ByRef TCODE As Integer, ByRef TSTEP As Integer) As Integer
+  Private Function pTimDif(ByVal StartJDate As Double, ByVal EndJDate As Double, _
+                           ByVal DATE1() As Integer, ByVal DATE2() As Integer, _
+                           ByVal TCODE As Integer, ByVal TSTEP As Integer) As Integer
     Dim NVALS As Integer
     Dim tmpDATE(5) As Integer
     'convert dates to old format
