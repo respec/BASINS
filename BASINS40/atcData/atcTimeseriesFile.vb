@@ -4,6 +4,14 @@ Public Class atcTimeseriesFile
   Private pFileName As String
   Private pTimeseries As ArrayList 'of atcTimeseries
 
+  Public Enum EnumExistAction
+    ExistNoAction = 0
+    ExistReplace = 1
+    ExistAppend = 2
+    ExistRenumber = 4
+    ExistAskUser = 8
+  End Enum
+
   'Filter for files that this class can read, formatted for common dialog.
   'Returns empty string if there is no particular filter that would work.
   Public Overridable ReadOnly Property FileFilter() As String
@@ -59,8 +67,14 @@ Public Class atcTimeseriesFile
   'Save all current data to a new file
   'Or save recently updated data to current file if SaveFileName = Me.FileName
   'Returns True if successful
-  Public Overridable Function Save(ByVal SaveFileName As String) As Boolean
+  Public Overridable Function Save(ByVal SaveFileName As String, _
+                          Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
     Err.Raise(0, Me, "Save must be overridden to be used, atcTimeseriesFile does not implement.")
+  End Function
+
+  Private Function AddTimeseries(ByRef t As atcTimeseries, _
+                        Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+    If Not pTimeseries.Contains(t) Then pTimeseries.Add(t)
   End Function
 
   Public Sub New()

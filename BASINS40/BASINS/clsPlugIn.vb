@@ -139,6 +139,7 @@ Public Class PlugIn
       mnu = .AddMenu(DataMenuName & "_Download", DataMenuName, Nothing, "&Download")
       mnu = .AddMenu(DataMenuName & "_DownloadTest", DataMenuName, Nothing, "Download &Test")
       mnu = .AddMenu(DataMenuName & "_OpenTimeseries", DataMenuName, Nothing, "Open Timeseries File")
+      mnu = .AddMenu(DataMenuName & "_GenerateTimeseries", DataMenuName, Nothing, "Generate Timeseries")
       'With g_MapWin.Plugins
       '  For iPlugin = 0 To .Count - 1
       '    If Not .Item(iPlugin) Is Nothing Then
@@ -163,6 +164,7 @@ Public Class PlugIn
     g_MapWin.Menus.Remove(DataMenuName & "_Download")
     g_MapWin.Menus.Remove(DataMenuName & "_DownloadTest")
     g_MapWin.Menus.Remove(DataMenuName & "_OpenTimeseries")
+    g_MapWin.Menus.Remove(DataMenuName & "_GenerateTimeseries")
     g_MapWin.Menus.Remove(DataMenuName)
 
     g_MapWin.Menus.Remove(ToolsMenuName & "_Graph")
@@ -289,6 +291,10 @@ Public Class PlugIn
         Case "OpenTimeseries"
           Dim FileToOpen As String = FindFile("Select data file to open", , , pTimeseriesManager.FileFilters, True)
           If FileExists(FileToOpen) Then OpenDataFile(FileToOpen)
+        Case "GenerateTimeseries"
+          Dim frmGener As New frmGenerateTimeseries
+          frmGener.Populate(pTimeseriesManager)
+          frmGener.Show()
         Case Else : MsgBox("Data Tool " & ItemName)
       End Select
       Handled = True
