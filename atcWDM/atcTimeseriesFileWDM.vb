@@ -281,8 +281,8 @@ Cntinu:
     End Select
   End Function
 
-  'TODO: re-implement AddTimSer and add to DataFile interface
-  Private Function AddTimSer(ByRef t As atcTimeseries, Optional ByRef ExistAction As Integer = 0) As Boolean 'Implements ATCData.ATCclsTserFile.AddTimSer
+  'TODO: re-implement
+  '  Private Function AddTimeseries(ByRef t As atcTimeseries, Optional ByRef ExistAction As Integer = 0) As Boolean 'Implements ATCData.ATCclsTserFile.AddTimSer
     '    Dim retcod, dsn, i, lExAct, TsInd As Integer
     '    Dim S As String
     '    Dim BtnName() As Object
@@ -456,7 +456,7 @@ Cntinu:
     '    Exit Function
     'ErrHandler:
     '    MsgBox("Error adding timser" & vbCr & Err.Description, MsgBoxStyle.Critical, Label)
-  End Function
+  'End Function
 
   Private Function findNextDsn(ByRef dsn As Integer) As Integer
     Dim vData As Object
@@ -507,9 +507,12 @@ Cntinu:
     If lWdmOpen <> 1 Then i = F90_WDMCLO(pFileUnit)
   End Function
 
-  Public Overrides Function Save(ByVal SaveFileName As String) As Boolean
+  Public Overrides Function Save(ByVal SaveFileName As String, _
+                        Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
     Dim i, lFileUnit As Integer
     Dim lWdmOpen As Integer
+
+    'TODO: check FileName and SaveFileName, use value of ExistAction
 
     If Len(FileName) > 0 Then lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName)) Else lWdmOpen = -1
 

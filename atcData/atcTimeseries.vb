@@ -13,7 +13,9 @@ Public Class atcTimeseries
   Private pAttributes As DataAttributes
   Private pValueAttributes() As DataAttributes
 
-  Public Event ReadMe(ByVal aReadMe As atcTimeseries)
+  Public Overrides Function ToString() As String
+    Return pNumValues & " values, #" & pSerial
+  End Function
 
   'Set or get an individual value
   Public Property Value(ByVal index As Long) As Double

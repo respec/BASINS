@@ -107,11 +107,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcBasicStatistics.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "atcDataAttributes.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
