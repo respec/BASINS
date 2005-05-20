@@ -313,908 +313,909 @@ Public Module modString
     '    StrAdd = old & nst
     'End Function
 
-    Public Sub Scalit(ByRef itype As Short, ByRef mMin As Single, ByRef mMax As Single, ByRef plmn As Single, ByRef plmx As Single)
-        ' ##SUMMARY Determines an appropriate scale based on the _
-        'minimum and maximum values and whether an arithmetic, probability, _
-        'or logarithmic scale is requested. Minimum and maximum for probability _
-        'plots must be standard deviates. For log scales, the minimum _
-        'and maximum must not be transformed.
-        ' ##PARAM itype I Integer indicating type of number scale (0-1 = arithmetic, 2 = probability, other = logarithmic)
-        ' ##PARAM mMin I Single-precision minimum incoming data value
-        ' ##PARAM mMax I Single-precision maximum incoming data value
-        ' ##PARAM plmn O Single-precision return value for scale minimum
-        ' ##PARAM plmx O Single-precision return value for scale maximum
-        Dim a As Short
-        Dim i As Short
-        Dim inc As Short
-        Dim x As Single
-        Dim m As Single
-        Dim tmax As Single
-        ' ##LOCAL a - short integer holds log10 min/max values rounded down to nearest magnitude
-        ' ##LOCAL i - short integer used as index for r()
-        ' ##LOCAL inc - short integer increments i by 1 or -1
-        ' ##LOCAL X - single-precision rounded data min/max values
-        ' ##LOCAL M - single-precision estimator of min/max values for arithmetic scale
-        ' ##LOCAL tmax - single-precision min/max values for distribution plots (+ = max, - = min)
+  Public Sub Scalit(ByVal itype As Short, ByVal mMin As Single, ByVal mMax As Single, _
+                    ByRef plmn As Single, ByRef plmx As Single)
+    ' ##SUMMARY Determines an appropriate scale based on the _
+    'minimum and maximum values and whether an arithmetic, probability, _
+    'or logarithmic scale is requested. Minimum and maximum for probability _
+    'plots must be standard deviates. For log scales, the minimum _
+    'and maximum must not be transformed.
+    ' ##PARAM itype I Integer indicating type of number scale (0-1 = arithmetic, 2 = probability, other = logarithmic)
+    ' ##PARAM mMin I Single-precision minimum incoming data value
+    ' ##PARAM mMax I Single-precision maximum incoming data value
+    ' ##PARAM plmn O Single-precision return value for scale minimum
+    ' ##PARAM plmx O Single-precision return value for scale maximum
+    Dim a As Short
+    Dim i As Short
+    Dim inc As Short
+    Dim x As Single
+    Dim m As Single
+    Dim tmax As Single
+    ' ##LOCAL a - short integer holds log10 min/max values rounded down to nearest magnitude
+    ' ##LOCAL i - short integer used as index for r()
+    ' ##LOCAL inc - short integer increments i by 1 or -1
+    ' ##LOCAL X - single-precision rounded data min/max values
+    ' ##LOCAL M - single-precision estimator of min/max values for arithmetic scale
+    ' ##LOCAL tmax - single-precision min/max values for distribution plots (+ = max, - = min)
 
-        Static r(15) As Single
-        If itype = 0 Or itype = 1 Then
-            'arithmetic scale
-            'get next lowest mult of 10
+    Static r(15) As Single
+    If itype = 0 Or itype = 1 Then
+      'arithmetic scale
+      'get next lowest mult of 10
 
-            ' ##LOCAL r - holds possible values for multiplier used in determining M from X
-            If r(1) < 0.09 Then
-                r(1) = 0.1
-                r(2) = 0.15
-                r(3) = 0.2
-                r(4) = 0.4
-                r(5) = 0.5
-                r(6) = 0.6
-                r(7) = 0.8
-                r(8) = 1.0#
-                r(9) = 1.5
-                r(10) = 2.0#
-                r(11) = 4.0#
-                r(12) = 5.0#
-                r(13) = 6.0#
-                r(14) = 8.0#
-                r(15) = 10.0#
-            End If
+      ' ##LOCAL r - holds possible values for multiplier used in determining M from X
+      If r(1) < 0.09 Then
+        r(1) = 0.1
+        r(2) = 0.15
+        r(3) = 0.2
+        r(4) = 0.4
+        r(5) = 0.5
+        r(6) = 0.6
+        r(7) = 0.8
+        r(8) = 1.0#
+        r(9) = 1.5
+        r(10) = 2.0#
+        r(11) = 4.0#
+        r(12) = 5.0#
+        r(13) = 6.0#
+        r(14) = 8.0#
+        r(15) = 10.0#
+      End If
 
-            x = Rndlow(mMax)
-            If x > 0.0# Then
-                inc = 1
-                i = 1
-            Else
-                inc = -1
-                i = 15
-            End If
-            Do
-                m = r(i) * x
-                i = i + inc
-            Loop While mMax > m And i <= 15 And i >= 1
-            plmx = m
+      x = Rndlow(mMax)
+      If x > 0.0# Then
+        inc = 1
+        i = 1
+      Else
+        inc = -1
+        i = 15
+      End If
+      Do
+        m = r(i) * x
+        i = i + inc
+      Loop While mMax > m And i <= 15 And i >= 1
+      plmx = m
 
-            If mMin < 0.5 * mMax And mMin >= 0.0# And itype = 1 Then
-                plmn = 0.0#
-            Else
-                'get next lowest mult of 10
-                x = Rndlow(mMin)
-                If x >= 0.0# Then
-                    inc = -1
-                    i = 15
-                Else
-                    inc = 1
-                    i = 1
-                End If
-                Do
-                    m = r(i) * x
-                    i = i + inc
-                Loop While mMin < m And i >= 1 And i <= 15
-                plmn = m
-            End If
-
-        ElseIf itype = 2 Then
-            'logarithmic scale
-            If mMin > 0.000000001 Then
-                a = Fix(Log10(CDbl(mMin)))
-            Else
-                'too small or neg value, set to -9
-                a = -9
-            End If
-            If mMin < 1.0# Then a = a - 1
-            plmn = 10.0# ^ a
-
-            If mMax > 0.000000001 Then
-                a = Fix(Log10(CDbl(mMax)))
-            Else
-                'too small or neg value, set to -8
-                a = -8
-            End If
-            If mMax > 1.0# Then a = a + 1
-            plmx = 10.0# ^ a
-
-            If plmn * 10000000.0# < plmx Then
-                'limit range to 7 cycles
-                plmn = plmx / 10000000.0#
-            End If
-
+      If mMin < 0.5 * mMax And mMin >= 0.0# And itype = 1 Then
+        plmn = 0.0#
+      Else
+        'get next lowest mult of 10
+        x = Rndlow(mMin)
+        If x >= 0.0# Then
+          inc = -1
+          i = 15
         Else
-            'probability plots - assumes data transformed to normal deviates
-            tmax = System.Math.Abs(mMax)
-            If System.Math.Abs(mMin) > tmax Then tmax = System.Math.Abs(mMin)
-            tmax = CSng(Fix(tmax * 10.0#) + 1) / 10.0#
-            If tmax > 4.0# Then tmax = 4.0#
-            plmn = -tmax
-            plmx = tmax
+          inc = 1
+          i = 1
         End If
+        Do
+          m = r(i) * x
+          i = i + inc
+        Loop While mMin < m And i >= 1 And i <= 15
+        plmn = m
+      End If
 
-    End Sub
+    ElseIf itype = 2 Then
+      'logarithmic scale
+      If mMin > 0.000000001 Then
+        a = Fix(Log10(CDbl(mMin)))
+      Else
+        'too small or neg value, set to -9
+        a = -9
+      End If
+      If mMin < 1.0# Then a = a - 1
+      plmn = 10.0# ^ a
 
-    Public Function Rndlow(ByRef px As Single) As Single
-        ' ##SUMMARY Sets values less than 1.0E-19 to 0.0 for the _
-        'plotting routines for bug in DISSPLA/PR1ME. Otherwise returns values _
-        'rounded to lower magnitude.
-        ' ##SUMMARY   Example: Rndlow(1.0E-20) = 0
-        ' ##SUMMARY   Example: Rndlow(11000) = 10000
-        ' ##PARAM px I Single-precision datum
-        ' ##RETURNS Incoming px value, rounded to 0.0 if less than 1.0E-19.
-        Dim a As Integer
-        Dim x As Single
-        Dim sign As Single
-        ' ##LOCAL a - short integer holds absolute value of log10 rounded down to nearest magnitude
-        ' ##LOCAL X - single-precision set to absolute value of px
-        ' ##LOCAL sign - single-precision holds positive or negative sign for px
+      If mMax > 0.000000001 Then
+        a = Fix(Log10(CDbl(mMax)))
+      Else
+        'too small or neg value, set to -8
+        a = -8
+      End If
+      If mMax > 1.0# Then a = a + 1
+      plmx = 10.0# ^ a
 
-        sign = 1.0#
-        If px < 0.0# Then sign = -1.0#
-        x = System.Math.Abs(px)
-        If x < 1.0E-19 Then
-            Rndlow = 0.0#
-        Else
-            a = Int(Log10(CDbl(x)))
-            Rndlow = sign * 10.0# ^ a
-        End If
+      If plmn * 10000000.0# < plmx Then
+        'limit range to 7 cycles
+        plmn = plmx / 10000000.0#
+      End If
 
-    End Function
+    Else
+      'probability plots - assumes data transformed to normal deviates
+      tmax = System.Math.Abs(mMax)
+      If System.Math.Abs(mMin) > tmax Then tmax = System.Math.Abs(mMin)
+      tmax = CSng(Fix(tmax * 10.0#) + 1) / 10.0#
+      If tmax > 4.0# Then tmax = 4.0#
+      plmn = -tmax
+      plmx = tmax
+    End If
 
-    Public Function FirstStringPos(ByRef start As Integer, ByRef Source As String, ByVal ParamArray SearchFor() As Object) As Integer
-        ' ##SUMMARY Searches Source for each item in SearchFor array.
-        ' ##PARAM start I Position in Source to start search
-        ' ##PARAM Source I String to be searched
-        ' ##PARAM SearchFor I Array of strings to be individually searched for
-        ' ##RETURNS  Position of first occurrence of SearchFor item in Source. _
-        'Returns 0 if none were found.
-        Dim vSearchFor As Object
-        Dim foundPos As Integer
-        Dim findPos As Integer
-        ' ##LOCAL vSearchFor - member of ParamArray; substring to be searched for in Source
-        ' ##LOCAL foundPos - position of substring in Source
-        ' ##LOCAL findPos - position of first occurence of any member of ParamArray in Source
+  End Sub
 
-        For Each vSearchFor In SearchFor
-            findPos = InStr(start, Source, vSearchFor)
-            If findPos > 0 Then
-                If foundPos = 0 Or foundPos > findPos Then foundPos = findPos
-            End If
-        Next vSearchFor
-        FirstStringPos = foundPos
-    End Function
+  Public Function Rndlow(ByRef px As Single) As Single
+    ' ##SUMMARY Sets values less than 1.0E-19 to 0.0 for the _
+    'plotting routines for bug in DISSPLA/PR1ME. Otherwise returns values _
+    'rounded to lower magnitude.
+    ' ##SUMMARY   Example: Rndlow(1.0E-20) = 0
+    ' ##SUMMARY   Example: Rndlow(11000) = 10000
+    ' ##PARAM px I Single-precision datum
+    ' ##RETURNS Incoming px value, rounded to 0.0 if less than 1.0E-19.
+    Dim a As Integer
+    Dim x As Single
+    Dim sign As Single
+    ' ##LOCAL a - short integer holds absolute value of log10 rounded down to nearest magnitude
+    ' ##LOCAL X - single-precision set to absolute value of px
+    ' ##LOCAL sign - single-precision holds positive or negative sign for px
 
-    Public Function FirstCharPos(ByRef start As Integer, ByRef Source As String, ByRef chars As String) As Integer
-        ' ##SUMMARY Searches str for each character in chars.
-        ' ##PARAM start I Position in str to start search
-        ' ##PARAM str I String to be searched
-        ' ##PARAM chars I String of characters to be individually searched for
-        ' ##RETURNS  Position of first occurrence of chars character in Source. _
-        'Returns len(str) + 1 if no characters from chars were found in Source.
-        Dim retval As Integer
-        Dim curval As Integer
-        Dim CharPos As Integer
-        Dim LenChars As Integer
-        ' ##LOCAL retval - long return value for FirstCharPos
-        ' ##LOCAL curval - long position of currently first-occurring character
-        ' ##LOCAL CharPos - long length of chars
-        ' ##LOCAL LenChars - long length of subString
+    sign = 1.0#
+    If px < 0.0# Then sign = -1.0#
+    x = System.Math.Abs(px)
+    If x < 1.0E-19 Then
+      Rndlow = 0.0#
+    Else
+      a = Int(Log10(CDbl(x)))
+      Rndlow = sign * 10.0# ^ a
+    End If
 
-        retval = Len(Source) + 1
-        LenChars = Len(chars)
-        For CharPos = 1 To LenChars
-            curval = InStr(start, Source, Mid(chars, CharPos, 1))
-            If curval > 0 And curval < retval Then retval = curval
-        Next CharPos
-        FirstCharPos = retval
-    End Function
+  End Function
 
-    Public Function StrNoNull(ByRef S As String) As String
-        ' ##SUMMARY Replaces null string with blank character.
-        ' ##SUMMARY   Example: StrNoNull("NotNull") = "NotNull"
-        ' ##SUMMARY   Example: StrNoNull("") = " "
-        ' ##PARAM s I String to be analyzed
-        ' ##RETURNS  Returns a blank character if string is null. _
-        'Returns incoming string otherwise.
-        If Len(S) = 0 Then
-            StrNoNull = " "
-        Else
-            StrNoNull = S
-        End If
-    End Function
+  Public Function FirstStringPos(ByVal start As Integer, ByVal Source As String, ByVal ParamArray SearchFor() As Object) As Integer
+    ' ##SUMMARY Searches Source for each item in SearchFor array.
+    ' ##PARAM start I Position in Source to start search
+    ' ##PARAM Source I String to be searched
+    ' ##PARAM SearchFor I Array of strings to be individually searched for
+    ' ##RETURNS  Position of first occurrence of SearchFor item in Source. _
+    'Returns 0 if none were found.
+    Dim vSearchFor As Object
+    Dim foundPos As Integer
+    Dim findPos As Integer
+    ' ##LOCAL vSearchFor - member of ParamArray; substring to be searched for in Source
+    ' ##LOCAL foundPos - position of substring in Source
+    ' ##LOCAL findPos - position of first occurence of any member of ParamArray in Source
 
-    'Function StrRetRem(ByRef S As String) As String
-    '    ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of comma or space.
-    '    ' ##SUMMARY   Example: StrRetRem("This string") = "This", and s is reduced to "string"
-    '    ' ##SUMMARY   Example: StrRetRem("This,string") = "This", and s is reduced to "string"
-    '    ' ##PARAM s M String to be analyzed
-    '    ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. _
-    '    'Returns input parameter without that portion. If no comma or space in string, _
-    '    'returns whole string, and input parameter reduced to null string.
-    '    Dim l As String
-    '    Dim i As Integer
-    '    Dim j As Integer
-    '    ' ##LOCAL l - string to return
-    '    ' ##LOCAL i - position of blank delimeter
-    '    ' ##LOCAL j - position of comma delimeter
+    For Each vSearchFor In SearchFor
+      findPos = InStr(start, Source, vSearchFor)
+      If findPos > 0 Then
+        If foundPos = 0 Or foundPos > findPos Then foundPos = findPos
+      End If
+    Next vSearchFor
+    FirstStringPos = foundPos
+  End Function
 
-    '    S = LTrim(S) 'remove leading blanks
+  Public Function FirstCharPos(ByVal start As Integer, ByVal Source As String, ByVal chars As String) As Integer
+    ' ##SUMMARY Searches str for each character in chars.
+    ' ##PARAM start I Position in str to start search
+    ' ##PARAM str I String to be searched
+    ' ##PARAM chars I String of characters to be individually searched for
+    ' ##RETURNS  Position of first occurrence of chars character in Source. _
+    'Returns len(str) + 1 if no characters from chars were found in Source.
+    Dim retval As Integer
+    Dim curval As Integer
+    Dim CharPos As Integer
+    Dim LenChars As Integer
+    ' ##LOCAL retval - long return value for FirstCharPos
+    ' ##LOCAL curval - long position of currently first-occurring character
+    ' ##LOCAL CharPos - long length of chars
+    ' ##LOCAL LenChars - long length of subString
 
-    '    i = InStr(S, "'")
-    '    If i = 1 Then 'string beginning
-    '        S = Mid(S, 2)
-    '        i = InStr(S, "'") 'string end
-    '    Else
-    '        i = InStr(S, " ") 'blank delimeter
-    '        j = InStr(S, ",") 'comma delimeter
-    '        If j > 0 Then 'comma found
-    '            If i = 0 Or j < i Then
-    '                i = j
-    '            End If
-    '        End If
-    '    End If
+    retval = Len(Source) + 1
+    LenChars = Len(chars)
+    For CharPos = 1 To LenChars
+      curval = InStr(start, Source, Mid(chars, CharPos, 1))
+      If curval > 0 And curval < retval Then retval = curval
+    Next CharPos
+    FirstCharPos = retval
+  End Function
 
-    '    If i > 0 Then 'found delimeter
-    '        l = Left(S, i - 1) 'string to return
-    '        S = LTrim(Mid(S, i + 1)) 'string remaining
-    '        If InStr(Left(S, 1), ",") = 1 And i <> j Then S = Mid(S, 2)
-    '    Else 'take it all
-    '        l = S
-    '        S = "" 'nothing left
-    '    End If
+  Public Function StrNoNull(ByVal S As String) As String
+    ' ##SUMMARY Replaces null string with blank character.
+    ' ##SUMMARY   Example: StrNoNull("NotNull") = "NotNull"
+    ' ##SUMMARY   Example: StrNoNull("") = " "
+    ' ##PARAM s I String to be analyzed
+    ' ##RETURNS  Returns a blank character if string is null. _
+    'Returns incoming string otherwise.
+    If Len(S) = 0 Then
+      StrNoNull = " "
+    Else
+      StrNoNull = S
+    End If
+  End Function
 
-    '    StrRetRem = l
+  'Function StrRetRem(ByRef S As String) As String
+  '    ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of comma or space.
+  '    ' ##SUMMARY   Example: StrRetRem("This string") = "This", and s is reduced to "string"
+  '    ' ##SUMMARY   Example: StrRetRem("This,string") = "This", and s is reduced to "string"
+  '    ' ##PARAM s M String to be analyzed
+  '    ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. _
+  '    'Returns input parameter without that portion. If no comma or space in string, _
+  '    'returns whole string, and input parameter reduced to null string.
+  '    Dim l As String
+  '    Dim i As Integer
+  '    Dim j As Integer
+  '    ' ##LOCAL l - string to return
+  '    ' ##LOCAL i - position of blank delimeter
+  '    ' ##LOCAL j - position of comma delimeter
 
-    'End Function
+  '    S = LTrim(S) 'remove leading blanks
 
-    'Function StrTokens(ByVal Source As String, ByRef delim As String, ByRef quote As String) As String()
-    '    ' ##SUMMARY Divides string into portions separated by specified delimeter.
-    '    ' ##SUMMARY   Example: StrTokens("Very,Special,string") = Array size 2;
-    '    ' ##SUMMARY                                               (0)="Very", (1)="Special", (2)="string" and
-    '    ' ##SUMMARY                                               String is reduced to ""
-    '    ' ##PARAM Source M String to be analyzed
-    '    ' ##PARAM delim I delimeter to look for in string Source
-    '    ' ##PARAM quote I Multi-character string exempted from search.
-    '    ' ##RETURNS  Returns array of string portions separated by specified delimeter.
-    '    Dim retval() As String
-    '    Dim sizeRetval As Integer
-    '    Dim nTokens As Integer
-    '    ' ##LOCAL retval - string array to return
-    '    ' ##LOCAL sizeRetval - dimension variable for sizing string array
-    '    ' ##LOCAL nTokens - number of tokens found in string Source
+  '    i = InStr(S, "'")
+  '    If i = 1 Then 'string beginning
+  '        S = Mid(S, 2)
+  '        i = InStr(S, "'") 'string end
+  '    Else
+  '        i = InStr(S, " ") 'blank delimeter
+  '        j = InStr(S, ",") 'comma delimeter
+  '        If j > 0 Then 'comma found
+  '            If i = 0 Or j < i Then
+  '                i = j
+  '            End If
+  '        End If
+  '    End If
 
-    '    sizeRetval = 20
-    '    ReDim retval(sizeRetval)
-    '    While Len(Source) > 0
-    '        If nTokens > sizeRetval Then
-    '            sizeRetval = sizeRetval * 2
-    '            ReDim Preserve retval(sizeRetval)
-    '        End If
-    '        retval(nTokens) = StrSplit(Source, delim, quote)
-    '        nTokens = nTokens + 1
-    '    End While
-    '    ReDim Preserve retval(nTokens - 1)
-    '    Return retval
-    'End Function
+  '    If i > 0 Then 'found delimeter
+  '        l = Left(S, i - 1) 'string to return
+  '        S = LTrim(Mid(S, i + 1)) 'string remaining
+  '        If InStr(Left(S, 1), ",") = 1 And i <> j Then S = Mid(S, 2)
+  '    Else 'take it all
+  '        l = S
+  '        S = "" 'nothing left
+  '    End If
 
-    'Sub DumpStrings(ByRef arr() As String)
-    '    ' ##SUMMARY Outputs array of strings to debug window.
-    '    ' ##PARAM arr I array of strings to output
-    '    Dim i As Integer
-    '    ' ##LOCAL i - counter for looping through arrays
-    '    For i = LBound(arr) To UBound(arr)
-    '        System.Diagnostics.Debug.WriteLine(String.Format("00", i) & ": " & arr(i))
-    '    Next
-    'End Sub
+  '    StrRetRem = l
+
+  'End Function
+
+  'Function StrTokens(ByVal Source As String, ByRef delim As String, ByRef quote As String) As String()
+  '    ' ##SUMMARY Divides string into portions separated by specified delimeter.
+  '    ' ##SUMMARY   Example: StrTokens("Very,Special,string") = Array size 2;
+  '    ' ##SUMMARY                                               (0)="Very", (1)="Special", (2)="string" and
+  '    ' ##SUMMARY                                               String is reduced to ""
+  '    ' ##PARAM Source M String to be analyzed
+  '    ' ##PARAM delim I delimeter to look for in string Source
+  '    ' ##PARAM quote I Multi-character string exempted from search.
+  '    ' ##RETURNS  Returns array of string portions separated by specified delimeter.
+  '    Dim retval() As String
+  '    Dim sizeRetval As Integer
+  '    Dim nTokens As Integer
+  '    ' ##LOCAL retval - string array to return
+  '    ' ##LOCAL sizeRetval - dimension variable for sizing string array
+  '    ' ##LOCAL nTokens - number of tokens found in string Source
+
+  '    sizeRetval = 20
+  '    ReDim retval(sizeRetval)
+  '    While Len(Source) > 0
+  '        If nTokens > sizeRetval Then
+  '            sizeRetval = sizeRetval * 2
+  '            ReDim Preserve retval(sizeRetval)
+  '        End If
+  '        retval(nTokens) = StrSplit(Source, delim, quote)
+  '        nTokens = nTokens + 1
+  '    End While
+  '    ReDim Preserve retval(nTokens - 1)
+  '    Return retval
+  'End Function
+
+  'Sub DumpStrings(ByRef arr() As String)
+  '    ' ##SUMMARY Outputs array of strings to debug window.
+  '    ' ##PARAM arr I array of strings to output
+  '    Dim i As Integer
+  '    ' ##LOCAL i - counter for looping through arrays
+  '    For i = LBound(arr) To UBound(arr)
+  '        System.Diagnostics.Debug.WriteLine(String.Format("00", i) & ": " & arr(i))
+  '    Next
+  'End Sub
 
 
-    Public Function StrSplit(ByRef Source As String, ByRef delim As String, ByRef quote As String) As String
-        ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of specified _
-        'delimeter. Quote specifies a particular string that is exempt from the delimeter search.
-        ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "") = "Julie", and "Todd, Jane, and Ray" is returned as Source.
-        ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "Julie, Todd") = "Julie, Todd", and "Jane, and Ray" is returned as Source.
-        ' ##PARAM Source M String to be analyzed
-        ' ##PARAM delim I Single-character string delimeter
-        ' ##PARAM quote I Multi-character string exempted from search.
-        ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. _
-        'Returns input parameter without that portion. If no delimiter in string, _
-        'returns whole string, and input parameter reduced to null string.
-        Dim retval As String
-        Dim i As Integer
-        Dim quoted As Boolean
-        Dim trimlen As Integer
-        Dim quotlen As Integer
-        ' ##LOCAL retval - string to return as StrSplit
-        ' ##LOCAL i - long character position of search through Source
-        ' ##LOCAL quoted - Boolean whether quote was encountered in Source
-        ' ##LOCAL trimlen - long length of delimeter, or quote if encountered first
-        ' ##LOCAL quotlen - long length of quote
+  Public Function StrSplit(ByRef Source As String, ByRef delim As String, ByRef quote As String) As String
+    ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of specified _
+    'delimeter. Quote specifies a particular string that is exempt from the delimeter search.
+    ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "") = "Julie", and "Todd, Jane, and Ray" is returned as Source.
+    ' ##SUMMARY   Example: StrSplit("Julie, Todd, Jane, and Ray", ",", "Julie, Todd") = "Julie, Todd", and "Jane, and Ray" is returned as Source.
+    ' ##PARAM Source M String to be analyzed
+    ' ##PARAM delim I Single-character string delimeter
+    ' ##PARAM quote I Multi-character string exempted from search.
+    ' ##RETURNS  Returns leading portion of incoming string up to first occurence of delimeter. _
+    'Returns input parameter without that portion. If no delimiter in string, _
+    'returns whole string, and input parameter reduced to null string.
+    Dim retval As String
+    Dim i As Integer
+    Dim quoted As Boolean
+    Dim trimlen As Integer
+    Dim quotlen As Integer
+    ' ##LOCAL retval - string to return as StrSplit
+    ' ##LOCAL i - long character position of search through Source
+    ' ##LOCAL quoted - Boolean whether quote was encountered in Source
+    ' ##LOCAL trimlen - long length of delimeter, or quote if encountered first
+    ' ##LOCAL quotlen - long length of quote
 
-        Source = LTrim(Source) 'remove leading blanks
-        quotlen = Len(quote)
-        If quotlen > 0 Then
-            i = InStr(Source, quote)
-            If i = 1 Then 'string beginning
-                trimlen = quotlen
-                Source = Mid(Source, trimlen + 1)
-                i = InStr(Source, quote) 'string end
-                quoted = True
-            Else
-                i = InStr(Source, delim)
-                trimlen = Len(delim)
-            End If
-        Else
-            i = InStr(Source, delim)
-            trimlen = Len(delim)
-        End If
+    Source = LTrim(Source) 'remove leading blanks
+    quotlen = Len(quote)
+    If quotlen > 0 Then
+      i = InStr(Source, quote)
+      If i = 1 Then 'string beginning
+        trimlen = quotlen
+        Source = Mid(Source, trimlen + 1)
+        i = InStr(Source, quote) 'string end
+        quoted = True
+      Else
+        i = InStr(Source, delim)
+        trimlen = Len(delim)
+      End If
+    Else
+      i = InStr(Source, delim)
+      trimlen = Len(delim)
+    End If
 
-        If i > 0 Then 'found delimeter
-            retval = Left(Source, i - 1) 'string to return
-            If Right(retval, 1) = " " Then retval = RTrim(retval)
-            Source = LTrim(Mid(Source, i + trimlen)) 'string remaining
-            If quoted And Len(Source) > 0 Then
-                If Left(Source, Len(delim)) = delim Then Source = LTrim(Mid(Source, Len(delim) + 1))
-            End If
-        Else 'take it all
-            retval = Source
-            Source = "" 'nothing left
-        End If
+    If i > 0 Then 'found delimeter
+      retval = Left(Source, i - 1) 'string to return
+      If Right(retval, 1) = " " Then retval = RTrim(retval)
+      Source = LTrim(Mid(Source, i + trimlen)) 'string remaining
+      If quoted And Len(Source) > 0 Then
+        If Left(Source, Len(delim)) = delim Then Source = LTrim(Mid(Source, Len(delim) + 1))
+      End If
+    Else 'take it all
+      retval = Source
+      Source = "" 'nothing left
+    End If
 
-        StrSplit = retval
+    StrSplit = retval
 
-    End Function
+  End Function
 
-    'Public Function StrRepeat(ByRef repeat As Integer, ByRef Source As String) As String
-    '    ' ##SUMMARY Repeats specified string specified number of times.
-    '    ' ##SUMMARY   Example: StrRepeat(3, "I wish I were in Kansas. ")
-    '    ' ##PARAM repeat I Number of times for Source to be repeated
-    '    ' ##PARAM Source I String to be repeated then returned
-    '    ' ##RETURNS Returns input parameter Source in succession specified number of times.
-    '    Dim retval As String
-    '    Dim i As Integer
-    '    ' ##LOCAL retval - string to return as StrRepeat
-    '    ' ##LOCAL i - long index for 'repeat' loop
+  'Public Function StrRepeat(ByRef repeat As Integer, ByRef Source As String) As String
+  '    ' ##SUMMARY Repeats specified string specified number of times.
+  '    ' ##SUMMARY   Example: StrRepeat(3, "I wish I were in Kansas. ")
+  '    ' ##PARAM repeat I Number of times for Source to be repeated
+  '    ' ##PARAM Source I String to be repeated then returned
+  '    ' ##RETURNS Returns input parameter Source in succession specified number of times.
+  '    Dim retval As String
+  '    Dim i As Integer
+  '    ' ##LOCAL retval - string to return as StrRepeat
+  '    ' ##LOCAL i - long index for 'repeat' loop
 
-    '    For i = 1 To repeat
-    '        retval = retval & Source
-    '    Next
-    '    StrRepeat = retval
-    'End Function
+  '    For i = 1 To repeat
+  '        retval = retval & Source
+  '    Next
+  '    StrRepeat = retval
+  'End Function
 
-    'Function StrFirstInt(ByRef Source As String) As Integer
-    '    ' ##SUMMARY Divides alpha numeric sequence into leading numbers and trailing characters.
-    '    ' ##SUMMARY   Example: StrFirstInt("123Go!) = "123", and returns "Go!" as Source
-    '    ' ##PARAM Source M String to be analyzed
-    '    ' ##RETURNS  Returns leading numbers in Source, and returns Source without those numbers.
-    '    Dim retval As Integer
-    '    Dim pos As Integer
-    '    ' ##LOCAL retval - number found at beginning of Source
-    '    ' ##LOCAL pos - long character position in search through Source
+  'Function StrFirstInt(ByRef Source As String) As Integer
+  '    ' ##SUMMARY Divides alpha numeric sequence into leading numbers and trailing characters.
+  '    ' ##SUMMARY   Example: StrFirstInt("123Go!) = "123", and returns "Go!" as Source
+  '    ' ##PARAM Source M String to be analyzed
+  '    ' ##RETURNS  Returns leading numbers in Source, and returns Source without those numbers.
+  '    Dim retval As Integer
+  '    Dim pos As Integer
+  '    ' ##LOCAL retval - number found at beginning of Source
+  '    ' ##LOCAL pos - long character position in search through Source
 
-    '    pos = 1
-    '    If IsNumeric(Left(Source, 2)) Then pos = 3 'account for negative number - sign
-    '    While IsNumeric(Mid(Source, pos, 1))
-    '        pos = pos + 1
-    '    End While
-    '    If pos < 2 Then
-    '        retval = 0
-    '    Else
-    '        retval = CInt(Left(Source, pos - 1))
-    '        Source = LTrim(Mid(Source, pos))
-    '    End If
-    '    StrFirstInt = retval
-    'End Function
+  '    pos = 1
+  '    If IsNumeric(Left(Source, 2)) Then pos = 3 'account for negative number - sign
+  '    While IsNumeric(Mid(Source, pos, 1))
+  '        pos = pos + 1
+  '    End While
+  '    If pos < 2 Then
+  '        retval = 0
+  '    Else
+  '        retval = CInt(Left(Source, pos - 1))
+  '        Source = LTrim(Mid(Source, pos))
+  '    End If
+  '    StrFirstInt = retval
+  'End Function
 
-    'Sub StrToDate(ByRef txt As String, ByRef datevar As Object)
-    '    ' ##SUMMARY Converts yyyy/mm/dd date string to date variant.
-    '    ' ##PARAM txt I Date string
-    '    ' ##PARAM datevar O Date variant
-    '    Dim ilen As Integer
-    '    Dim ipos As Integer
-    '    Dim dattmp As Object
-    '    ' ##LOCAL ilen - long length of text string
-    '    ' ##LOCAL ipos - long character position in parse through text
-    '    ' ##LOCAL dattmp - intermediate date variant
+  'Sub StrToDate(ByRef txt As String, ByRef datevar As Object)
+  '    ' ##SUMMARY Converts yyyy/mm/dd date string to date variant.
+  '    ' ##PARAM txt I Date string
+  '    ' ##PARAM datevar O Date variant
+  '    Dim ilen As Integer
+  '    Dim ipos As Integer
+  '    Dim dattmp As Object
+  '    ' ##LOCAL ilen - long length of text string
+  '    ' ##LOCAL ipos - long character position in parse through text
+  '    ' ##LOCAL dattmp - intermediate date variant
 
-    '    txt = Trim(txt)
-    '    ilen = Len(txt)
-    '    datevar = ""
-    '    If ilen > 0 Then
-    '        ipos = InStr(txt, "/")
-    '        If ipos > 0 Then
-    '            dattmp = Right(txt, ilen - ipos) & "/" & Left(txt, ipos - 1)
-    '        End If
-    '    End If
-    '    datevar = DateSerial(Year(dattmp), Month(dattmp), VB.Day(dattmp))
-    'End Sub
+  '    txt = Trim(txt)
+  '    ilen = Len(txt)
+  '    datevar = ""
+  '    If ilen > 0 Then
+  '        ipos = InStr(txt, "/")
+  '        If ipos > 0 Then
+  '            dattmp = Right(txt, ilen - ipos) & "/" & Left(txt, ipos - 1)
+  '        End If
+  '    End If
+  '    datevar = DateSerial(Year(dattmp), Month(dattmp), VB.Day(dattmp))
+  'End Sub
 
-    'Sub GetDate(ByRef big As Double, ByRef dyval As Object)
-    '    ' ##SUMMARY Converts double-precision date to date variant.
-    '    ' ##PARAM big I Double-precision date (i.e., 19851101 = Nov 1, 1985)
-    '    ' ##PARAM dyval O Date variant
-    '    Dim yr As Integer
-    '    Dim mo As Integer
-    '    Dim dy As Integer
-    '    Dim tmp As Integer
-    '    ' ##LOCAL yr - long year
-    '    ' ##LOCAL mo - long month
-    '    ' ##LOCAL dy - long day
-    '    ' ##LOCAL tmp - long temporary value of double-precision date as it is parsed
+  'Sub GetDate(ByRef big As Double, ByRef dyval As Object)
+  '    ' ##SUMMARY Converts double-precision date to date variant.
+  '    ' ##PARAM big I Double-precision date (i.e., 19851101 = Nov 1, 1985)
+  '    ' ##PARAM dyval O Date variant
+  '    Dim yr As Integer
+  '    Dim mo As Integer
+  '    Dim dy As Integer
+  '    Dim tmp As Integer
+  '    ' ##LOCAL yr - long year
+  '    ' ##LOCAL mo - long month
+  '    ' ##LOCAL dy - long day
+  '    ' ##LOCAL tmp - long temporary value of double-precision date as it is parsed
 
-    '    yr = big / 10000
-    '    tmp = big - (yr * 10000)
-    '    mo = tmp / 100
-    '    dy = tmp - (mo * 100)
-    '    dyval = DateSerial(yr, mo, dy)
-    'End Sub
+  '    yr = big / 10000
+  '    tmp = big - (yr * 10000)
+  '    mo = tmp / 100
+  '    dy = tmp - (mo * 100)
+  '    dyval = DateSerial(yr, mo, dy)
+  'End Sub
 
-    'Sub GetDateParts(ByRef big As Double, ByRef yr As Integer, ByRef mo As Integer, ByRef dy As Integer)
-    '    ' ##SUMMARY Converts double-precision date to traditional year, month, and day parts.
-    '    ' ##SUMMARY   Example: big = 19851101 returns yr = 1985, mo = 11, dy = 1
-    '    ' ##PARAM big I Double-precision date
-    '    ' ##PARAM yr O Long year
-    '    ' ##PARAM mo O Long month
-    '    ' ##PARAM dy O Long day
-    '    Dim tmp As Double
-    '    ' ##LOCAL tmp - double-precision temporary value of date as it is parsed
+  'Sub GetDateParts(ByRef big As Double, ByRef yr As Integer, ByRef mo As Integer, ByRef dy As Integer)
+  '    ' ##SUMMARY Converts double-precision date to traditional year, month, and day parts.
+  '    ' ##SUMMARY   Example: big = 19851101 returns yr = 1985, mo = 11, dy = 1
+  '    ' ##PARAM big I Double-precision date
+  '    ' ##PARAM yr O Long year
+  '    ' ##PARAM mo O Long month
+  '    ' ##PARAM dy O Long day
+  '    Dim tmp As Double
+  '    ' ##LOCAL tmp - double-precision temporary value of date as it is parsed
 
-    '    yr = big / 10000
-    '    tmp = big - (yr * 10000)
-    '    mo = tmp / 100
-    '    dy = tmp - (mo * 100)
-    'End Sub
+  '    yr = big / 10000
+  '    tmp = big - (yr * 10000)
+  '    mo = tmp / 100
+  '    dy = tmp - (mo * 100)
+  'End Sub
 
-    'Public Function CountString(ByRef Source As String, ByRef Find As String) As Integer
-    '    ' ##SUMMARY Searches for occurences of Find in Source.
-    '    ' ##SUMMARY   Example: CountString("The lead man was lead-footed", "lead") = 2
-    '    ' ##PARAM Source I Full string to be searched
-    '    ' ##PARAM Find I Substring to be searched for
-    '    ' ##RETURNS  Returns number of occurences of Find in Source.
-    '    Dim retval As Integer
-    '    Dim findPos As Integer
-    '    Dim findlen As Integer
-    '    ' ##LOCAL retval - string to be returned as CountString
-    '    ' ##LOCAL findpos - long position of Find in Source
-    '    ' ##LOCAL findlen - long length of Find
+  'Public Function CountString(ByRef Source As String, ByRef Find As String) As Integer
+  '    ' ##SUMMARY Searches for occurences of Find in Source.
+  '    ' ##SUMMARY   Example: CountString("The lead man was lead-footed", "lead") = 2
+  '    ' ##PARAM Source I Full string to be searched
+  '    ' ##PARAM Find I Substring to be searched for
+  '    ' ##RETURNS  Returns number of occurences of Find in Source.
+  '    Dim retval As Integer
+  '    Dim findPos As Integer
+  '    Dim findlen As Integer
+  '    ' ##LOCAL retval - string to be returned as CountString
+  '    ' ##LOCAL findpos - long position of Find in Source
+  '    ' ##LOCAL findlen - long length of Find
 
-    '    findlen = Len(Find)
-    '    If findlen > 0 Then
-    '        findPos = InStr(Source, Find)
-    '        While findPos > 0
-    '            retval = retval + 1
-    '            findPos = InStr(findPos + findlen, Source, Find)
-    '        End While
-    '    End If
-    '    CountString = retval
-    'End Function
+  '    findlen = Len(Find)
+  '    If findlen > 0 Then
+  '        findPos = InStr(Source, Find)
+  '        While findPos > 0
+  '            retval = retval + 1
+  '            findPos = InStr(findPos + findlen, Source, Find)
+  '        End While
+  '    End If
+  '    CountString = retval
+  'End Function
 
-    Public Function ReplaceStringNoCase(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
-        ' ##SUMMARY Replaces Find in Source with Replace (not case sensitive).
-        ' ##SUMMARY Example: ReplaceStringNoCase("He came and he went", "He", "She") = "She came and She went"
-        ' ##PARAM Source I Full string to be searched
-        ' ##PARAM Find I Substring to be searched for and replaced
-        ' ##PARAM Replace I Substring to replace Find
-        ' ##RETURNS Returns new string like Source except that _
-        'any occurences of Find (not case sensitive) are replaced with Replace.
-        Dim retval As String
-        Dim findPos As Integer
-        Dim lastFindEnd As Integer
-        Dim findlen As Integer
-        Dim replacelen As Integer
-        Dim lSource As String
-        Dim lFind As String
-        ' ##LOCAL retval - string to be returned as ReplaceString
-        ' ##LOCAL findpos - long position of Find in Source
-        ' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
-        ' ##LOCAL findlen - long length of Find
-        ' ##LOCAL replacelen - long length of Replace
-        ' ##LOCAL lSource - local version of input parameter Source
-        ' ##LOCAL lFind - local version of input parameter Find
+  Public Function ReplaceStringNoCase(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
+    ' ##SUMMARY Replaces Find in Source with Replace (not case sensitive).
+    ' ##SUMMARY Example: ReplaceStringNoCase("He came and he went", "He", "She") = "She came and She went"
+    ' ##PARAM Source I Full string to be searched
+    ' ##PARAM Find I Substring to be searched for and replaced
+    ' ##PARAM Replace I Substring to replace Find
+    ' ##RETURNS Returns new string like Source except that _
+    'any occurences of Find (not case sensitive) are replaced with Replace.
+    Dim retval As String
+    Dim findPos As Integer
+    Dim lastFindEnd As Integer
+    Dim findlen As Integer
+    Dim replacelen As Integer
+    Dim lSource As String
+    Dim lFind As String
+    ' ##LOCAL retval - string to be returned as ReplaceString
+    ' ##LOCAL findpos - long position of Find in Source
+    ' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
+    ' ##LOCAL findlen - long length of Find
+    ' ##LOCAL replacelen - long length of Replace
+    ' ##LOCAL lSource - local version of input parameter Source
+    ' ##LOCAL lFind - local version of input parameter Find
 
-        findlen = Len(Find)
-        If findlen > 0 Then
-            replacelen = Len(ReplaceWith)
-            lSource = LCase(Source)
-            lFind = LCase(Find)
-            findPos = InStr(lSource, lFind)
-            lastFindEnd = 1
-            While findPos > 0
-                retval = retval & Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
-                lastFindEnd = findPos + findlen
-                findPos = InStr(findPos + findlen, lSource, lFind)
-            End While
-            ReplaceStringNoCase = retval & Mid(Source, lastFindEnd)
-        Else
-            ReplaceStringNoCase = Source
-        End If
-    End Function
+    findlen = Len(Find)
+    If findlen > 0 Then
+      replacelen = Len(ReplaceWith)
+      lSource = LCase(Source)
+      lFind = LCase(Find)
+      findPos = InStr(lSource, lFind)
+      lastFindEnd = 1
+      While findPos > 0
+        retval = retval & Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
+        lastFindEnd = findPos + findlen
+        findPos = InStr(findPos + findlen, lSource, lFind)
+      End While
+      ReplaceStringNoCase = retval & Mid(Source, lastFindEnd)
+    Else
+      ReplaceStringNoCase = Source
+    End If
+  End Function
 
-    Public Function ReplaceString(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
-        ' ##SUMMARY Replaces Find in Source with Replace (case sensitive).
-        ' ##SUMMARY   Example: ReplaceString("He left", "He", "She") = "She left"
-        ' ##PARAM Source I Full string to be searched
-        ' ##PARAM Find I Substring to be searched for and replaced
-        ' ##PARAM Replace I Substring to replace Find
-        ' ##RETURNS Returns new string like Source except that _
-        'any occurences of Find (case sensitive) are replaced with Replace.
-        Dim retval As String
-        Dim findPos As Integer
-        Dim lastFindEnd As Integer
-        Dim findlen As Integer
-        Dim replacelen As Integer
-        ' ##LOCAL retval - string to be returned as ReplaceString
-        ' ##LOCAL findpos - long position of Find in Source
-        ' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
-        ' ##LOCAL findlen - long length of Find
-        ' ##LOCAL replacelen - long length of Replace
+  Public Function ReplaceString(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
+    ' ##SUMMARY Replaces Find in Source with Replace (case sensitive).
+    ' ##SUMMARY   Example: ReplaceString("He left", "He", "She") = "She left"
+    ' ##PARAM Source I Full string to be searched
+    ' ##PARAM Find I Substring to be searched for and replaced
+    ' ##PARAM Replace I Substring to replace Find
+    ' ##RETURNS Returns new string like Source except that _
+    'any occurences of Find (case sensitive) are replaced with Replace.
+    Dim retval As String
+    Dim findPos As Integer
+    Dim lastFindEnd As Integer
+    Dim findlen As Integer
+    Dim replacelen As Integer
+    ' ##LOCAL retval - string to be returned as ReplaceString
+    ' ##LOCAL findpos - long position of Find in Source
+    ' ##LOCAL lastFindEnd - long position of first character after last replaced string in Source
+    ' ##LOCAL findlen - long length of Find
+    ' ##LOCAL replacelen - long length of Replace
 
-        findlen = Len(Find)
-        If findlen > 0 Then
-            replacelen = Len(ReplaceWith)
-            findPos = InStr(Source, Find)
-            lastFindEnd = 1
-            While findPos > 0
-                retval = retval & Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
-                lastFindEnd = findPos + findlen
-                findPos = InStr(findPos + findlen, Source, Find)
-            End While
-            ReplaceString = retval & Mid(Source, lastFindEnd)
-        Else
-            ReplaceString = Source
-        End If
-    End Function
+    findlen = Len(Find)
+    If findlen > 0 Then
+      replacelen = Len(ReplaceWith)
+      findPos = InStr(Source, Find)
+      lastFindEnd = 1
+      While findPos > 0
+        retval = retval & Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
+        lastFindEnd = findPos + findlen
+        findPos = InStr(findPos + findlen, Source, Find)
+      End While
+      ReplaceString = retval & Mid(Source, lastFindEnd)
+    Else
+      ReplaceString = Source
+    End If
+  End Function
 
-    'Public Sub StrTrim(ByRef istr As String)
-    '    ' ##SUMMARY Removes all blanks from a string.
-    '    ' ##SUMMARY   Example: StrTrim "No Blanks" changes istr to "NoBlanks"
-    '    ' ##PARAM istr I String to be searched
-    '    Dim lstr As String
-    '    Dim bpos As Integer
-    '    ' ##LOCAL lstr - local string
-    '    ' ##LOCAL bpos - long position of blank
+  'Public Sub StrTrim(ByRef istr As String)
+  '    ' ##SUMMARY Removes all blanks from a string.
+  '    ' ##SUMMARY   Example: StrTrim "No Blanks" changes istr to "NoBlanks"
+  '    ' ##PARAM istr I String to be searched
+  '    Dim lstr As String
+  '    Dim bpos As Integer
+  '    ' ##LOCAL lstr - local string
+  '    ' ##LOCAL bpos - long position of blank
 
-    '    lstr = ""
-    '    bpos = InStr(istr, " ")
-    '    While bpos > 0
-    '        lstr = lstr & Mid(istr, 1, bpos)
-    '        istr = LTrim(Mid(istr, bpos))
-    '        bpos = InStr(istr, " ")
-    '    End While
-    '    istr = lstr & istr
+  '    lstr = ""
+  '    bpos = InStr(istr, " ")
+  '    While bpos > 0
+  '        lstr = lstr & Mid(istr, 1, bpos)
+  '        istr = LTrim(Mid(istr, bpos))
+  '        bpos = InStr(istr, " ")
+  '    End While
+  '    istr = lstr & istr
 
-    'End Sub
+  'End Sub
 
-    Public Function StrPrintable(ByRef S As String, Optional ByRef ReplaceWith As String = "") As String
-        ' ##SUMMARY Converts, if necessary, non-printable characters in string to printable _
-        'alternative.
-        ' ##PARAM S I String to be converted, if necessary.
-        ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="").
-        ' ##RETURNS Input parameter S with non-printable characters replaced with specific _
-        'printable character.
-        Dim retval As String = "" 'return string
-        Dim i As Short            'loop counter
-        Dim strLen As Short       'length of string
-        Dim ch As String          'individual character in string
+  Public Function StrPrintable(ByRef S As String, Optional ByRef ReplaceWith As String = "") As String
+    ' ##SUMMARY Converts, if necessary, non-printable characters in string to printable _
+    'alternative.
+    ' ##PARAM S I String to be converted, if necessary.
+    ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="").
+    ' ##RETURNS Input parameter S with non-printable characters replaced with specific _
+    'printable character.
+    Dim retval As String = "" 'return string
+    Dim i As Short            'loop counter
+    Dim strLen As Short       'length of string
+    Dim ch As String          'individual character in string
 
-        strLen = Len(S)
-        For i = 1 To strLen
-            ch = Mid(S, i, 1)
-            Select Case Asc(ch)
-                Case 0 : GoTo EndFound
-                Case 32 To 126 : retval = retval & ch
-                Case Else : retval = retval & ReplaceWith
-            End Select
-        Next
+    strLen = Len(S)
+    For i = 1 To strLen
+      ch = Mid(S, i, 1)
+      Select Case Asc(ch)
+        Case 0 : GoTo EndFound
+        Case 32 To 126 : retval = retval & ch
+        Case Else : retval = retval & ReplaceWith
+      End Select
+    Next
 EndFound:
-        StrPrintable = retval
-    End Function
+    StrPrintable = retval
+  End Function
 
-    Public Function StrSafeFilename(ByRef S As String, Optional ByRef ReplaceWith As String = "_") As String
-        ' ##SUMMARY Converts, if necessary, non-printable characters in filename to printable _
-        'alternative.
-        ' ##PARAM S I Filename to be converted, if necessary.
-        ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="").
-        ' ##RETURNS Input parameter S with non-printable characters replaced with specific _
-        'printable character (default="").
-        Dim retval As String 'return string
-        Dim i As Short 'loop counter
-        Dim strLen As Short 'length of string
-        Dim ch As String 'individual character in filename
+  Public Function StrSafeFilename(ByRef S As String, Optional ByRef ReplaceWith As String = "_") As String
+    ' ##SUMMARY Converts, if necessary, non-printable characters in filename to printable _
+    'alternative.
+    ' ##PARAM S I Filename to be converted, if necessary.
+    ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="").
+    ' ##RETURNS Input parameter S with non-printable characters replaced with specific _
+    'printable character (default="").
+    Dim retval As String 'return string
+    Dim i As Short 'loop counter
+    Dim strLen As Short 'length of string
+    Dim ch As String 'individual character in filename
 
-        strLen = Len(S)
-        For i = 1 To strLen
-            ch = Mid(S, i, 1)
-            Select Case Asc(ch)
-                Case 0 : GoTo EndFound
-                Case Is < 32, 34, 42, 47, 58, 60, 62, 63, 92, 124, Is > 126 : retval = retval & ReplaceWith
-                Case Else : retval = retval & ch
-            End Select
-        Next
+    strLen = Len(S)
+    For i = 1 To strLen
+      ch = Mid(S, i, 1)
+      Select Case Asc(ch)
+        Case 0 : GoTo EndFound
+        Case Is < 32, 34, 42, 47, 58, 60, 62, 63, 92, 124, Is > 126 : retval = retval & ReplaceWith
+        Case Else : retval = retval & ch
+      End Select
+    Next
 EndFound:
-        StrSafeFilename = retval
-    End Function
+    StrSafeFilename = retval
+  End Function
 
-    Public Function StrPad(ByRef S As String, ByVal NewLength As Short, Optional ByRef PadWith As String = " ", Optional ByRef PadLeft As Boolean = True) As String
-        ' ##SUMMARY Pads a string with specific character to achieve a specified length.
-        ' ##PARAM S M String to be padded.
-        ' ##PARAM NewLength I Length of padded string to be returned.
-        ' ##PARAM PadWith I Character with which to pad the string.
-        ' ##PARAM PadLeft I Pad left if true, pad right if false.
-        ' ##RETURNS Input parameter S padded to left or right (default=left) with _
-        'specific character (default=space) to specified length.
-        Dim CharsToAdd As Short 'number of characters added to S
+  Public Function StrPad(ByRef S As String, ByVal NewLength As Short, Optional ByRef PadWith As String = " ", Optional ByRef PadLeft As Boolean = True) As String
+    ' ##SUMMARY Pads a string with specific character to achieve a specified length.
+    ' ##PARAM S M String to be padded.
+    ' ##PARAM NewLength I Length of padded string to be returned.
+    ' ##PARAM PadWith I Character with which to pad the string.
+    ' ##PARAM PadLeft I Pad left if true, pad right if false.
+    ' ##RETURNS Input parameter S padded to left or right (default=left) with _
+    'specific character (default=space) to specified length.
+    Dim CharsToAdd As Short 'number of characters added to S
 
-        CharsToAdd = NewLength - Len(S)
-        If CharsToAdd <= 0 Then
-            StrPad = S
-        ElseIf PadLeft Then
-            StrPad = New String(PadWith, CharsToAdd) & S
-        Else
-            StrPad = S & New String(PadWith, CharsToAdd)
-        End If
+    CharsToAdd = NewLength - Len(S)
+    If CharsToAdd <= 0 Then
+      StrPad = S
+    ElseIf PadLeft Then
+      StrPad = New String(PadWith, CharsToAdd) & S
+    Else
+      StrPad = S & New String(PadWith, CharsToAdd)
+    End If
 
-    End Function
+  End Function
 
-    'Public Sub DecimalAlign(ByRef S() As String, Optional ByRef PadLeft As Boolean = True, Optional ByRef PadRight As Boolean = True, Optional ByRef MinWidth As Short = 0)
-    '    ' ##SUMMARY Formats array of floating point decimals around location of decimal place.
-    '    ' ##PARAM S M String array containing values to be formatted.
-    '    ' ##PARAM PadLeft I Number of spaces reserved to the left of the decimal place.
-    '    ' ##PARAM PadRight I Number of spaces reserved to the right of the decimal place.
-    '    ' ##PARAM MinWidth I Minimum number of spaces reserved for overall formatted number.
-    '    Dim MaxDecimalPos As Short 'furthest decimal position from left for all numbers in s
-    '    Dim MaxAfterDecimal As Short 'furthest decimal position from right for all numbers in s
-    '    Dim AfterDecimal() As Short 'array of digits after decimal
-    '    Dim DecimalPos() As Short 'array of decimal positions from left
-    '    Dim iMin As Short 'lower bound of s
-    '    Dim iMax As Short 'upper bound of s
-    '    Dim i As Short 'loop counter
+  'Public Sub DecimalAlign(ByRef S() As String, Optional ByRef PadLeft As Boolean = True, Optional ByRef PadRight As Boolean = True, Optional ByRef MinWidth As Short = 0)
+  '    ' ##SUMMARY Formats array of floating point decimals around location of decimal place.
+  '    ' ##PARAM S M String array containing values to be formatted.
+  '    ' ##PARAM PadLeft I Number of spaces reserved to the left of the decimal place.
+  '    ' ##PARAM PadRight I Number of spaces reserved to the right of the decimal place.
+  '    ' ##PARAM MinWidth I Minimum number of spaces reserved for overall formatted number.
+  '    Dim MaxDecimalPos As Short 'furthest decimal position from left for all numbers in s
+  '    Dim MaxAfterDecimal As Short 'furthest decimal position from right for all numbers in s
+  '    Dim AfterDecimal() As Short 'array of digits after decimal
+  '    Dim DecimalPos() As Short 'array of decimal positions from left
+  '    Dim iMin As Short 'lower bound of s
+  '    Dim iMax As Short 'upper bound of s
+  '    Dim i As Short 'loop counter
 
-    '    iMin = LBound(S)
-    '    iMax = UBound(S)
-    '    ReDim DecimalPos(iMax)
-    '    ReDim AfterDecimal(iMax)
-    '    For i = iMin To iMax
-    '        DecimalPos(i) = InStr(S(i), ".")
-    '        If DecimalPos(i) = 0 Then DecimalPos(i) = Len(S(i)) + 1
-    '        If DecimalPos(i) > MaxDecimalPos Then MaxDecimalPos = DecimalPos(i)
-    '        If PadRight Then
-    '            AfterDecimal(i) = Len(S(i)) - DecimalPos(i)
-    '            If AfterDecimal(i) > MaxAfterDecimal Then MaxAfterDecimal = AfterDecimal(i)
-    '        End If
-    '    Next
-    '    For i = iMin To iMax
-    '        If PadLeft Then
-    '            If DecimalPos(i) < MaxDecimalPos Then
-    '                S(i) = Space(MaxDecimalPos - DecimalPos(i)) & S(i)
-    '            End If
-    '        End If
-    '        If PadRight Then
-    '            If AfterDecimal(i) < MaxAfterDecimal Then
-    '                S(i) = S(i) & Space(MaxAfterDecimal - AfterDecimal(i))
-    '            End If
-    '        End If
-    '        If MinWidth > 0 Then S(i) = StrPad(S(i), MinWidth)
-    '    Next
+  '    iMin = LBound(S)
+  '    iMax = UBound(S)
+  '    ReDim DecimalPos(iMax)
+  '    ReDim AfterDecimal(iMax)
+  '    For i = iMin To iMax
+  '        DecimalPos(i) = InStr(S(i), ".")
+  '        If DecimalPos(i) = 0 Then DecimalPos(i) = Len(S(i)) + 1
+  '        If DecimalPos(i) > MaxDecimalPos Then MaxDecimalPos = DecimalPos(i)
+  '        If PadRight Then
+  '            AfterDecimal(i) = Len(S(i)) - DecimalPos(i)
+  '            If AfterDecimal(i) > MaxAfterDecimal Then MaxAfterDecimal = AfterDecimal(i)
+  '        End If
+  '    Next
+  '    For i = iMin To iMax
+  '        If PadLeft Then
+  '            If DecimalPos(i) < MaxDecimalPos Then
+  '                S(i) = Space(MaxDecimalPos - DecimalPos(i)) & S(i)
+  '            End If
+  '        End If
+  '        If PadRight Then
+  '            If AfterDecimal(i) < MaxAfterDecimal Then
+  '                S(i) = S(i) & Space(MaxAfterDecimal - AfterDecimal(i))
+  '            End If
+  '        End If
+  '        If MinWidth > 0 Then S(i) = StrPad(S(i), MinWidth)
+  '    Next
 
-    'End Sub
+  'End Sub
 
-    Public Function SwapBytes(ByRef n As Integer) As Integer
-        ' ##SUMMARY Swaps between big and little endian 32-bit integers.
-        ' ##SUMMARY   Example: SwapBytes(1) = 16777216
-        ' ##PARAM N I Any long integer
-        ' ##RETURNS Modified input parameter N.
-        Dim OrigBytes As Byte()
-        Dim NewBytes As Byte()
-        ' ##LOCAL OrigBytes - stores original bytes
-        ' ##LOCAL NewBytes - stores new bytes
+  Public Function SwapBytes(ByRef n As Integer) As Integer
+    ' ##SUMMARY Swaps between big and little endian 32-bit integers.
+    ' ##SUMMARY   Example: SwapBytes(1) = 16777216
+    ' ##PARAM N I Any long integer
+    ' ##RETURNS Modified input parameter N.
+    Dim OrigBytes As Byte()
+    Dim NewBytes As Byte()
+    ' ##LOCAL OrigBytes - stores original bytes
+    ' ##LOCAL NewBytes - stores new bytes
 
-        OrigBytes = System.BitConverter.GetBytes(n)
-        ReDim NewBytes(3)
-        NewBytes(0) = OrigBytes(3)
-        NewBytes(1) = OrigBytes(2)
-        NewBytes(2) = OrigBytes(1)
-        NewBytes(3) = OrigBytes(0)
-        Return System.BitConverter.ToInt32(NewBytes, 0)
-    End Function
+    OrigBytes = System.BitConverter.GetBytes(n)
+    ReDim NewBytes(3)
+    NewBytes(0) = OrigBytes(3)
+    NewBytes(1) = OrigBytes(2)
+    NewBytes(2) = OrigBytes(1)
+    NewBytes(3) = OrigBytes(0)
+    Return System.BitConverter.ToInt32(NewBytes, 0)
+  End Function
 
-    Public Function ReadBigInt(ByRef InFile As Short) As Integer
-        ' ##SUMMARY Reads big-endian integer from file number and converts to _
-        'Intel little-endian value.
-        ' ##SUMMARY   Example: ReadBigInt(1) = 1398893856
-        ' ##PARAM InFile I Open file number
-        ' ##RETURNS Input parameter InFile converted to Intel little-endian value.
-        Dim n As Integer
-        ' ##LOCAL n - variable into which data is read
+  Public Function ReadBigInt(ByRef InFile As Short) As Integer
+    ' ##SUMMARY Reads big-endian integer from file number and converts to _
+    'Intel little-endian value.
+    ' ##SUMMARY   Example: ReadBigInt(1) = 1398893856
+    ' ##PARAM InFile I Open file number
+    ' ##RETURNS Input parameter InFile converted to Intel little-endian value.
+    Dim n As Integer
+    ' ##LOCAL n - variable into which data is read
 
-        FileGet(InFile, n)
-        Return SwapBytes(n)
-    End Function
+    FileGet(InFile, n)
+    Return SwapBytes(n)
+  End Function
 
-    Public Sub WriteBigInt(ByRef OutFile As Short, ByRef Value As Integer)
-        ' ##SUMMARY Writes 32-bit integer as big endian to specified disk file.
-        ' ##PARAM OutFile I File number
-        ' ##PARAM Value I 32-bit integer
-        FilePut(OutFile, SwapBytes(Value))
-    End Sub
+  Public Sub WriteBigInt(ByRef OutFile As Short, ByRef Value As Integer)
+    ' ##SUMMARY Writes 32-bit integer as big endian to specified disk file.
+    ' ##PARAM OutFile I File number
+    ' ##PARAM Value I 32-bit integer
+    FilePut(OutFile, SwapBytes(Value))
+  End Sub
 
-    'Public Sub DispError(ByRef SubID As String, ByRef e As Object)
-    '    ' ##SUMMARY Displays error in message box for up to first 4 errors from same module.
-    '    ' ##PARAM SubID I ID of subroutine
-    '    ' ##PARAM E I Error object
-    '    Static ecnt As Integer
-    '    ' ##LOCAL ecnt - running count of errors from module
+  'Public Sub DispError(ByRef SubID As String, ByRef e As Object)
+  '    ' ##SUMMARY Displays error in message box for up to first 4 errors from same module.
+  '    ' ##PARAM SubID I ID of subroutine
+  '    ' ##PARAM E I Error object
+  '    Static ecnt As Integer
+  '    ' ##LOCAL ecnt - running count of errors from module
 
-    '    ecnt = ecnt + 1
-    '    If ecnt < 5 Then
+  '    ecnt = ecnt + 1
+  '    If ecnt < 5 Then
   '        MsgBox("From Sub " & SubID & ":" & vbCrLf & e.Description & vbCrLf & "Error number " & e.Number & vbCrLf, 48)
-    '    End If
+  '    End If
 
-    'End Sub
+  'End Sub
 
-    'Sub ChkProb(ByRef id As String, ByRef txt As String, ByRef Min As String, ByRef Max As String, ByRef opt As Integer, ByRef rsp As Integer)
-    '    ' ##SUMMARY Displays problem message box when entered value out of range.
-    '    ' ##PARAM id I Name of variable
-    '    ' ##PARAM txt I Entered value of variable
-    '    ' ##PARAM Min I Minimum variable value
-    '    ' ##PARAM Max I Maximum variable value
-    '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = OK)
-    '    ' ##PARAM rsp O Response indicating whether overriding limits allowed (0 = no)
-    '    Dim eStr As String
-    '    Dim NL As String
-    '    ' ##LOCAL eStr - error string
-    '    ' ##LOCAL nl - carriage return line feed string
+  'Sub ChkProb(ByRef id As String, ByRef txt As String, ByRef Min As String, ByRef Max As String, ByRef opt As Integer, ByRef rsp As Integer)
+  '    ' ##SUMMARY Displays problem message box when entered value out of range.
+  '    ' ##PARAM id I Name of variable
+  '    ' ##PARAM txt I Entered value of variable
+  '    ' ##PARAM Min I Minimum variable value
+  '    ' ##PARAM Max I Maximum variable value
+  '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = OK)
+  '    ' ##PARAM rsp O Response indicating whether overriding limits allowed (0 = no)
+  '    Dim eStr As String
+  '    Dim NL As String
+  '    ' ##LOCAL eStr - error string
+  '    ' ##LOCAL nl - carriage return line feed string
 
-    '    NL = Chr(13) & Chr(10)
-    '    eStr = "'" & txt & "' is not a valid value for" & NL
-    '    eStr = eStr & "'" & id & "'" & NL & NL
-    '    eStr = eStr & "Min:  " & Min
-    '    eStr = eStr & "  Max:  " & Max & NL
-    '    If opt = 1 Then 'confirm override of limits
-    '        eStr = eStr & "Please confirm that you want to use it."
-    '        rsp = MsgBox(eStr, 305, id & "Problem")
-    '    Else
-    '        MsgBox(eStr, MsgBoxStyle.Exclamation, id & "Problem")
-    '        rsp = 0
-    '    End If
+  '    NL = Chr(13) & Chr(10)
+  '    eStr = "'" & txt & "' is not a valid value for" & NL
+  '    eStr = eStr & "'" & id & "'" & NL & NL
+  '    eStr = eStr & "Min:  " & Min
+  '    eStr = eStr & "  Max:  " & Max & NL
+  '    If opt = 1 Then 'confirm override of limits
+  '        eStr = eStr & "Please confirm that you want to use it."
+  '        rsp = MsgBox(eStr, 305, id & "Problem")
+  '    Else
+  '        MsgBox(eStr, MsgBoxStyle.Exclamation, id & "Problem")
+  '        rsp = 0
+  '    End If
 
-    'End Sub
+  'End Sub
 
-    'Sub ChkTxtI(ByRef id As String, ByRef Min As Integer, ByRef Max As Integer, ByRef txt As String, ByRef cVal As Integer, ByRef chdFlg As Integer)
-    '    ' ##SUMMARY Checks entered integer value for valid range. _
-    '    'Automatically allows user confirmation to override Min/Max limits.
-    '    ' ##PARAM ID I Variable name
-    '    ' ##PARAM Min I Minimum variable value
-    '    ' ##PARAM Max I Maximum variable value
-    '    ' ##PARAM txt I Entered value of variable
-    '    ' ##PARAM cVal I Previous value of variable
-    '    ' ##PARAM chdFlg O Flag for whether integer value changed (0 = no, 1 = yes)
-    '    Dim opt As Integer
-    '    ' ##LOCAL opt - long set to 1 allowing user confirmation to override limits
+  'Sub ChkTxtI(ByRef id As String, ByRef Min As Integer, ByRef Max As Integer, ByRef txt As String, ByRef cVal As Integer, ByRef chdFlg As Integer)
+  '    ' ##SUMMARY Checks entered integer value for valid range. _
+  '    'Automatically allows user confirmation to override Min/Max limits.
+  '    ' ##PARAM ID I Variable name
+  '    ' ##PARAM Min I Minimum variable value
+  '    ' ##PARAM Max I Maximum variable value
+  '    ' ##PARAM txt I Entered value of variable
+  '    ' ##PARAM cVal I Previous value of variable
+  '    ' ##PARAM chdFlg O Flag for whether integer value changed (0 = no, 1 = yes)
+  '    Dim opt As Integer
+  '    ' ##LOCAL opt - long set to 1 allowing user confirmation to override limits
 
-    '    opt = 1
-    '    Call ChkTxtIOpt(id, Min, Max, opt, txt, cVal, chdFlg)
+  '    opt = 1
+  '    Call ChkTxtIOpt(id, Min, Max, opt, txt, cVal, chdFlg)
 
-    'End Sub
+  'End Sub
 
-    'Sub ChkTxtR(ByRef id As String, ByRef Min As Single, ByRef Max As Single, ByRef txt As String, ByRef cVal As Single, ByRef chdFlg As Integer)
-    '    ' ##SUMMARY Checks entered real value for valid range. _
-    '    'Automatically allows user confirmation to override Min/Max limits.
-    '    ' ##PARAM ID I Variable name
-    '    ' ##PARAM Min I Minimum variable value
-    '    ' ##PARAM Max I Maximum variable value
-    '    ' ##PARAM txt I Entered value of variable
-    '    ' ##PARAM cVal I Previous value of variable
-    '    ' ##PARAM chdFlg O Flag for whether real value changed (0 = no, 1 = yes)
-    '    Dim opt As Integer
-    '    ' ##LOCAL opt - long set to 1 allowing user confirmation to override limits
+  'Sub ChkTxtR(ByRef id As String, ByRef Min As Single, ByRef Max As Single, ByRef txt As String, ByRef cVal As Single, ByRef chdFlg As Integer)
+  '    ' ##SUMMARY Checks entered real value for valid range. _
+  '    'Automatically allows user confirmation to override Min/Max limits.
+  '    ' ##PARAM ID I Variable name
+  '    ' ##PARAM Min I Minimum variable value
+  '    ' ##PARAM Max I Maximum variable value
+  '    ' ##PARAM txt I Entered value of variable
+  '    ' ##PARAM cVal I Previous value of variable
+  '    ' ##PARAM chdFlg O Flag for whether real value changed (0 = no, 1 = yes)
+  '    Dim opt As Integer
+  '    ' ##LOCAL opt - long set to 1 allowing user confirmation to override limits
 
-    '    opt = 1
-    '    Call ChkTxtROpt(id, Min, Max, opt, txt, cVal, chdFlg)
+  '    opt = 1
+  '    Call ChkTxtROpt(id, Min, Max, opt, txt, cVal, chdFlg)
 
-    'End Sub
+  'End Sub
 
-    'Public Sub ChkTxtIOpt(ByRef id As String, ByRef Min As Integer, ByRef Max As Integer, ByRef opt As Integer, ByRef txt As String, ByRef cVal As Integer, ByRef chdFlg As Integer)
-    '    ' ##SUMMARY Checks entered integer value for valid range. _
-    '    'If opt = 1, allows user confirmation to override value outside Min/Max limits.
-    '    ' ##PARAM ID I Variable name
-    '    ' ##PARAM Min I Minimum variable value
-    '    ' ##PARAM Max I Maximum variable value
-    '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = yes)
-    '    ' ##PARAM txt I Entered value of variable
-    '    ' ##PARAM cVal I Previous value of variable
-    '    ' ##PARAM chdFlg O Flag for whether integer value changed (0 = no, 1 = yes)
-    '    Dim oldval As Integer
-    '    Dim newval As Integer
-    '    Dim probFlg As Integer
-    '    Dim rsp As Integer
-    '    ' ##LOCAL oldval - long previous value of variable
-    '    ' ##LOCAL newval - long user-entered value rounded to nearest integer
-    '    ' ##LOCAL probFlg - long problem flag (-1 = no change, 0 = no problem, 1 = invalid change)
-    '    ' ##LOCAL rsp - long response indicating whether overriding limits allowed (0 = no, 1 = yes)
+  'Public Sub ChkTxtIOpt(ByRef id As String, ByRef Min As Integer, ByRef Max As Integer, ByRef opt As Integer, ByRef txt As String, ByRef cVal As Integer, ByRef chdFlg As Integer)
+  '    ' ##SUMMARY Checks entered integer value for valid range. _
+  '    'If opt = 1, allows user confirmation to override value outside Min/Max limits.
+  '    ' ##PARAM ID I Variable name
+  '    ' ##PARAM Min I Minimum variable value
+  '    ' ##PARAM Max I Maximum variable value
+  '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = yes)
+  '    ' ##PARAM txt I Entered value of variable
+  '    ' ##PARAM cVal I Previous value of variable
+  '    ' ##PARAM chdFlg O Flag for whether integer value changed (0 = no, 1 = yes)
+  '    Dim oldval As Integer
+  '    Dim newval As Integer
+  '    Dim probFlg As Integer
+  '    Dim rsp As Integer
+  '    ' ##LOCAL oldval - long previous value of variable
+  '    ' ##LOCAL newval - long user-entered value rounded to nearest integer
+  '    ' ##LOCAL probFlg - long problem flag (-1 = no change, 0 = no problem, 1 = invalid change)
+  '    ' ##LOCAL rsp - long response indicating whether overriding limits allowed (0 = no, 1 = yes)
 
-    '    probFlg = 1
-    '    chdFlg = 0
-    '    If IsNumeric(txt) Then
-    '        '   no really bad problems
-    '        oldval = cVal
-    '        newval = CShort(txt)
-    '        If (oldval = newval) Then
-    '            '     no change
-    '            probFlg = -1
-    '        ElseIf (newval >= Min And newval <= Max) Then
-    '            '     update listing
-    '            cVal = newval
-    '            probFlg = 0
-    '            chdFlg = 1
-    '        End If
-    '    End If
-    '    If probFlg = 1 Then
-    '        '   not a valid change
-    '        Call ChkProb(id, txt, CStr(Min), CStr(Max), opt, rsp)
-    '    End If
-    '    txt = CStr(cVal)
+  '    probFlg = 1
+  '    chdFlg = 0
+  '    If IsNumeric(txt) Then
+  '        '   no really bad problems
+  '        oldval = cVal
+  '        newval = CShort(txt)
+  '        If (oldval = newval) Then
+  '            '     no change
+  '            probFlg = -1
+  '        ElseIf (newval >= Min And newval <= Max) Then
+  '            '     update listing
+  '            cVal = newval
+  '            probFlg = 0
+  '            chdFlg = 1
+  '        End If
+  '    End If
+  '    If probFlg = 1 Then
+  '        '   not a valid change
+  '        Call ChkProb(id, txt, CStr(Min), CStr(Max), opt, rsp)
+  '    End If
+  '    txt = CStr(cVal)
 
-    'End Sub
+  'End Sub
 
-    'Public Sub ChkTxtROpt(ByRef id As String, ByRef Min As Single, ByRef Max As Single, ByRef opt As Integer, ByRef txt As String, ByRef cVal As Single, ByRef chdFlg As Integer)
-    '    ' ##SUMMARY Checks entered real value for valid range. _
-    '    'If opt = 1, allows user confirmation to override value outside Min/Max limits.
-    '    ' ##PARAM ID I Variable name
-    '    ' ##PARAM Min I Minimum variable value
-    '    ' ##PARAM Max I Maximum variable value
-    '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = yes)
-    '    ' ##PARAM txt I Entered value of variable
-    '    ' ##PARAM cVal I Previous value of variable
-    '    ' ##PARAM chdFlg O Flag for whether real value changed (0 = no, 1 = yes)
-    '    Dim oldval As Single
-    '    Dim newval As Single
-    '    Dim rsp As Integer
-    '    ' ##LOCAL oldval - long previous value of variable
-    '    ' ##LOCAL newval - long user-entered value rounded to nearest integer
-    '    ' ##LOCAL rsp - long response indicating whether overriding limits allowed (0 = no, 1 = yes)
+  'Public Sub ChkTxtROpt(ByRef id As String, ByRef Min As Single, ByRef Max As Single, ByRef opt As Integer, ByRef txt As String, ByRef cVal As Single, ByRef chdFlg As Integer)
+  '    ' ##SUMMARY Checks entered real value for valid range. _
+  '    'If opt = 1, allows user confirmation to override value outside Min/Max limits.
+  '    ' ##PARAM ID I Variable name
+  '    ' ##PARAM Min I Minimum variable value
+  '    ' ##PARAM Max I Maximum variable value
+  '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = yes)
+  '    ' ##PARAM txt I Entered value of variable
+  '    ' ##PARAM cVal I Previous value of variable
+  '    ' ##PARAM chdFlg O Flag for whether real value changed (0 = no, 1 = yes)
+  '    Dim oldval As Single
+  '    Dim newval As Single
+  '    Dim rsp As Integer
+  '    ' ##LOCAL oldval - long previous value of variable
+  '    ' ##LOCAL newval - long user-entered value rounded to nearest integer
+  '    ' ##LOCAL rsp - long response indicating whether overriding limits allowed (0 = no, 1 = yes)
 
-    '    If IsNumeric(txt) Then
-    '        'no really bad problems
-    '        oldval = cVal
-    '        newval = CDbl(txt)
-    '        If (oldval = newval) Then
-    '            'no change
-    '            chdFlg = 0
-    '        ElseIf (newval >= Min And newval <= Max) Then
-    '            'update listing
-    '            cVal = newval
-    '            chdFlg = 1
-    '        Else
-    '            'not a valid change
-    '            Call ChkProb(id, txt, CStr(Min), CStr(Max), opt, rsp)
-    '            If rsp = 1 Then
-    '                'user wants to use value anyway
-    '                cVal = newval
-    '                chdFlg = -1
-    '            Else
-    '                'don't use value
-    '                chdFlg = 0
-    '            End If
-    '        End If
-    '    ElseIf lenStr(txt) > 0 Then
-    '        MsgBox("Value entered is not a number.", 48)
-    '        chdFlg = 0
-    '    End If
-    '    If cVal <> -999 Then
-    '        '-999 indicates undefined value, leave field blank
-    '        txt = CStr(cVal)
-    '    End If
-    'End Sub
+  '    If IsNumeric(txt) Then
+  '        'no really bad problems
+  '        oldval = cVal
+  '        newval = CDbl(txt)
+  '        If (oldval = newval) Then
+  '            'no change
+  '            chdFlg = 0
+  '        ElseIf (newval >= Min And newval <= Max) Then
+  '            'update listing
+  '            cVal = newval
+  '            chdFlg = 1
+  '        Else
+  '            'not a valid change
+  '            Call ChkProb(id, txt, CStr(Min), CStr(Max), opt, rsp)
+  '            If rsp = 1 Then
+  '                'user wants to use value anyway
+  '                cVal = newval
+  '                chdFlg = -1
+  '            Else
+  '                'don't use value
+  '                chdFlg = 0
+  '            End If
+  '        End If
+  '    ElseIf lenStr(txt) > 0 Then
+  '        MsgBox("Value entered is not a number.", 48)
+  '        chdFlg = 0
+  '    End If
+  '    If cVal <> -999 Then
+  '        '-999 indicates undefined value, leave field blank
+  '        txt = CStr(cVal)
+  '    End If
+  'End Sub
 
-    Public Function Long2String(ByRef Value As Integer) As String
-        ' ##SUMMARY Parses long integer to FourByteType then prints out corresponding ascii codes.
-        ' ##SUMMARY   Example: Long2String(98) = "b   "
-        ' ##PARAM Value I Value to be converted
-        ' ##RETURNS Input parameter Val in string form.
-        Dim bVal As Byte()
-        Dim S As String
-        ' ##LOCAL bval - FourByteType equivalent value of lVal
+  Public Function Long2String(ByRef Value As Integer) As String
+    ' ##SUMMARY Parses long integer to FourByteType then prints out corresponding ascii codes.
+    ' ##SUMMARY   Example: Long2String(98) = "b   "
+    ' ##PARAM Value I Value to be converted
+    ' ##RETURNS Input parameter Val in string form.
+    Dim bVal As Byte()
+    Dim S As String
+    ' ##LOCAL bval - FourByteType equivalent value of lVal
 
-        bVal = System.BitConverter.GetBytes(Value)
-        Return Chr(bVal(0)) & Chr(bVal(1)) & Chr(bVal(2)) & Chr(bVal(3))
-    End Function
+    bVal = System.BitConverter.GetBytes(Value)
+    Return Chr(bVal(0)) & Chr(bVal(1)) & Chr(bVal(2)) & Chr(bVal(3))
+  End Function
 
   Public Function Long2Single(ByRef Value As Integer) As Single
     ' ##SUMMARY Sets long integer to LongType then converts to SingleType.
@@ -1299,7 +1300,7 @@ ErrorReading:
     InFile = FreeFile()
     FileOpen(InFile, filename, OpenMode.Binary)
     FileLength = LOF(InFile)
-    ReDim retval(FileLength)
+    ReDim retval(FileLength - 1)
     FileGet(InFile, retval)
     FileClose(InFile)
     Return retval
