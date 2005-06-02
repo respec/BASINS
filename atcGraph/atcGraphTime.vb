@@ -1,16 +1,22 @@
-Imports atcData
 Imports System.Drawing
+
+Imports atcData
+Imports atcUtility
+
 Imports ZedGraph
 
 Public Class atcGraphTime
 
-  Public Sub AddDatasetTimeseries(ByVal pane As GraphPane, ByVal t As atcTimeseries, ByVal CurveLabel As String)
-    Dim x As Double() = t.Dates.Values
-    Dim y As Double() = t.Values
+  Public Shared Sub AddDatasetTimeseries(ByVal pane As GraphPane, ByVal t As atcTimeseries, ByVal CurveLabel As String)
+    'Dim x As Double() = t.Dates.Values
+    'Dim y As Double() = t.Values
+    Dim curveColor As Color = GetMatchingColor(t.Attributes.GetValue("scenario"))
     Dim curve As LineItem
 
-    curve = pane.AddCurve(CurveLabel, x, y, Color.Blue, SymbolType.None)
+    curve = pane.AddCurve(CurveLabel, t.Dates.Values, t.Values, curveColor, SymbolType.None)
     curve.Line.Width = 1
+    curve.Line.StepType = StepType.ForwardStep
+    If pane.CurveList.Count > 1 Then curve.IsY2Axis = True
     'curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
     'curve.Line.IsSmooth = True
     'curve.Line.SmoothTension = 0.6F

@@ -59,7 +59,14 @@ Public Class DataAttributes
   'Set attribute with definition aAttrDefinition to value aValue
   Public Sub SetValue(ByVal aAttrDefinition As atcAttributeDefinition, ByVal aValue As Object)
     Dim key As String = aAttrDefinition.Name.ToLower
+    Dim lAlias As String = pAliases.Item(key)
+
     Dim tmpAttrDefVal As atcDefinedValue
+
+    If Not lAlias Is Nothing Then 'We have a preferred alias for this name
+      key = lAlias.ToLower        'use the preferred alias instead
+      aAttrDefinition.Name = lAlias
+    End If
 
     tmpAttrDefVal = pAttributes.Item(key)
     If tmpAttrDefVal Is Nothing Then
@@ -105,16 +112,28 @@ Public Class DataAttributes
     If pAliases Is Nothing Then
       pAliases = New Hashtable 'of alias and internal name
       With pAliases
-        .Add("location", "locn")
-        .Add("idlocn", "locn")
-        .Add("loc", "locn")
-        .Add("scenario", "scen")
-        .Add("idscen", "scen")
-        .Add("sen", "scen")
-        .Add("stanam", "desc")
-        .Add("station name", "desc")
-        .Add("long filename", "filename")
-        .Add("path", "filename")
+        .Add("scen", "Scenario")
+        .Add("idscen", "Scenario")
+        .Add("sen", "Scenario")
+
+        .Add("locn", "Location")
+        .Add("idlocn", "Location")
+        .Add("loc", "Location")
+
+        .Add("con", "Constituent")
+        .Add("cons", "Constituent")
+
+        .Add("desc", "Description")
+        .Add("stanam", "Description")
+        .Add("station name", "Description")
+
+        .Add("long filename", "FileName")
+        .Add("path", "FileName")
+
+        .Add("ts", "Time Steps")
+        .Add("tu", "Time Unit")
+
+        .Add("id", "ID")
       End With
     End If
 
@@ -130,16 +149,16 @@ Public Class DataAttributes
   Public Function GetDefinedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As atcDefinedValue
     Dim key As String = aAttributeName.ToLower
     Dim tmpAttribute As atcDefinedValue
-    Try
-      tmpAttribute = pAttributes.Item(key)
+    tmpAttribute = pAttributes.Item(key)
+    If Not tmpAttribute Is Nothing Then
       Return tmpAttribute
-    Catch e As Exception 'Could not find 
-      Try
-        key = pAliases.Item(key)
-        Return GetDefinedValue(key, aDefault)
-      Catch
+    Else
+      key = pAliases.Item(key).ToString.ToLower
+      If key Is Nothing OrElse key.Equals(aAttributeName.ToLower) Then
         Return aDefault 'Not found and could not calculate
-      End Try
-    End Try
+      Else
+        Return GetDefinedValue(key, aDefault)
+      End If
+    End If
   End Function
 End Class

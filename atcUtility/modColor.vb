@@ -13,8 +13,8 @@ Public Module UtilColor
 
   Private nColorRules As Integer
   Private colorMatchingRules() As String
-  Private colorRamp() As Integer
-  Private colorsUsed() As Integer
+  Private colorRamp() As Color
+  Private colorsUsed() As Color
   Private MatchingColorsFilename As String
 
   Public Sub InitMatchingColors(ByRef Filename As String)
@@ -67,8 +67,7 @@ Public Module UtilColor
 NeverMind:
   End Sub
 
-  Public Function GetMatchingColor(Optional ByVal Specification As String = "") As Integer
-    Dim retval As Integer
+  Public Function GetMatchingColor(Optional ByVal Specification As String = "") As Color
     Dim rule, used As Integer
 
     If Len(MatchingColorsFilename) = 0 Then
@@ -79,7 +78,7 @@ NeverMind:
       For rule = 1 To nColorRules
         If PatternMatch(LCase(Specification), LCase(colorMatchingRules(rule))) Then
           For used = 1 To UBound(colorsUsed)
-            If colorsUsed(used) = colorRamp(rule) Then GoTo NextPatternMatch
+            If colorsUsed(used).Equals(colorRamp(rule)) Then GoTo NextPatternMatch
           Next
           GoTo FoundColor
         End If
@@ -88,7 +87,7 @@ NextPatternMatch:
 NextUnusedColor:
       For rule = 1 To nColorRules
         For used = 1 To UBound(colorsUsed)
-          If colorsUsed(used) = colorRamp(rule) Then GoTo NextRule
+          If colorsUsed(used).Equals(colorRamp(rule)) Then GoTo NextRule
         Next
         GoTo FoundColor
 NextRule:
@@ -96,7 +95,7 @@ NextRule:
     End If
 GetRandomColor:
     'Did not find a matching color or an unused color in the ramp - find a random one
-    GetMatchingColor = RGB(64 + Rnd() * 128, 64 + Rnd() * 128, 64 + Rnd() * 128)
+    GetMatchingColor = Color.FromArgb(255, 64 + Rnd() * 128, 64 + Rnd() * 128, 64 + Rnd() * 128)
     Exit Function
 
 FoundColor:
@@ -142,28 +141,28 @@ erropen:
     colorDB = Nothing
   End Function
 
-  Public Function TextOrNumericColor(ByVal colr As String) As Integer
+  Public Function TextOrNumericColor(ByVal colr As String) As Color
     Static AlreadyReportedError As Boolean
 
     Dim c As String
 
     c = LCase(Trim(colr))
-    TextOrNumericColor = -1
+    TextOrNumericColor = Color.Empty
     Dim r As String
     If IsNumeric(c) Then
-      TextOrNumericColor = CInt(c)
+      TextOrNumericColor = Color.FromArgb(CInt(c))
     Else
       If Left(c, grayNameNumStart - 1) = LCase(grayBasename) Then
         r = Mid(colr, grayNameNumStart)
-        If IsNumeric(r) Then TextOrNumericColor = RGB(CInt(r), CInt(r), CInt(r))
+        If IsNumeric(r) Then TextOrNumericColor = Color.FromArgb(0, CInt(r), CInt(r), CInt(r))
       End If
-      If TextOrNumericColor = -1 Then
+      If TextOrNumericColor.Equals(Color.Empty) Then
         Dim db As clsATCTable = colorDB()
         If Not db Is Nothing Then
           If db.FindFirst(1, c) Then
-            TextOrNumericColor = CInt(db.Value(2))
+            TextOrNumericColor = Color.FromArgb(CInt(db.Value(2)))
           Else
-            TextOrNumericColor = &H808080 'default to gray
+            TextOrNumericColor = Color.Gray
           End If
         End If
       End If
@@ -176,20 +175,22 @@ erropen:
     End If
   End Function
 
-  Public Function colorName(ByVal rgb_Renamed As Integer) As String
+  Public Function colorName(ByVal aColor As Color) As String
     Static HadErrOpen As Boolean
     Dim iColor As Integer
 
     Dim retval As String
     Dim g, r, b As Integer
 
-    r = System.Drawing.ColorTranslator.FromOle(rgb_Renamed).R
-    g = System.Drawing.ColorTranslator.FromOle(rgb_Renamed).G
-    b = System.Drawing.ColorTranslator.FromOle(rgb_Renamed).B
+    retval = aColor.Name
+
+    r = aColor.R
+    g = aColor.G
+    b = aColor.B
 
     'If it is not black or white, check for gray
-    If rgb_Renamed <> System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.White) And rgb_Renamed <> 0 And rgb_Renamed <> 1 Then
-      If r = g And g = b Then
+    If Not aColor.Equals(Color.White) AndAlso Not aColor.Equals(Color.Black) Then
+      If r = g AndAlso g = b Then
         colorName = grayBasename & r
         Exit Function
       End If
@@ -202,31 +203,31 @@ erropen:
     Dim b1, thisColor, r1, g1 As Integer
     Dim thisDist, minDist As Single
     Dim minDistName As String
-    If db.FindFirst(2, CStr(rgb_Renamed)) Then
+    If db.FindFirst(2, aColor.ToArgb) Then
       retval = db.Value(1)
     Else
-      If rgb_Renamed = rgb_Renamed And &HFFFFFF Then
-        If forceKnownColor Then 'Search for closest color in database
-          minDist = 255 ^ 2 * 3
-          For iColor = 1 To db.NumRecords
-            db.CurrentRecord = iColor
-            thisColor = CInt(db.Value(2))
-            r1 = System.Drawing.ColorTranslator.FromOle(thisColor).R
-            g1 = System.Drawing.ColorTranslator.FromOle(thisColor).G
-            b1 = System.Drawing.ColorTranslator.FromOle(thisColor).B
-            thisDist = (r - r1) ^ 2 + (b - b1) ^ 2 + (g - g1) ^ 2
-            If thisDist < minDist Then
-              minDist = thisDist
-              minDistName = db.Value(1)
-            End If
-          Next
-          retval = minDistName
-        Else
-          GoTo SetHexValue
-        End If
-      Else 'try again with 24-bit value
-        retval = colorName(rgb_Renamed And &HFFFFFF)
+      'If rgb_Renamed = rgb_Renamed And &HFFFFFF Then
+      If forceKnownColor Then 'Search for closest color in database
+        minDist = 255 ^ 2 * 3
+        For iColor = 1 To db.NumRecords
+          db.CurrentRecord = iColor
+          thisColor = CInt(db.Value(2))
+          r1 = System.Drawing.ColorTranslator.FromOle(thisColor).R
+          g1 = System.Drawing.ColorTranslator.FromOle(thisColor).G
+          b1 = System.Drawing.ColorTranslator.FromOle(thisColor).B
+          thisDist = (r - r1) ^ 2 + (b - b1) ^ 2 + (g - g1) ^ 2
+          If thisDist < minDist Then
+            minDist = thisDist
+            minDistName = db.Value(1)
+          End If
+        Next
+        retval = minDistName
+      Else
+        GoTo SetHexValue
       End If
+      'Else 'try again with 24-bit value
+      'retval = colorName(rgb_Renamed And &HFFFFFF)
+      'End If
     End If
     colorName = retval
     Exit Function
@@ -235,7 +236,7 @@ erropen:
     HadErrOpen = True
     GoTo SetHexValue
 SetHexValue:
-    retval = Hex(rgb_Renamed)
+    retval = aColor.ToArgb
     If Len(retval) < 8 Then retval = New String("0", 8 - Len(retval)) & retval
     colorName = "&H" & retval
   End Function

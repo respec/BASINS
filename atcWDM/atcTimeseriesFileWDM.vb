@@ -948,6 +948,7 @@ Cntinu:
           aReadMe.Values = dv
           aReadMe.Dates.Values = dd
           aReadMe.ValuesNeedToBeRead = False
+          aReadMe.Dates.ValuesNeedToBeRead = False
         End If
       End With
       If lWdmOpen <> 1 Then F90_WDMCLO(pFileUnit)

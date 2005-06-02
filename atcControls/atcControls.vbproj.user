@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic LastOpenVersion = "7.10.3077" >
         <Build>
-            <Settings ReferencePath = "C:\dev\BASINS40\ATCutility\obj\Debug\" >
+            <Settings ReferencePath = "C:\dev\MapWindow40\Bin\;C:\dev\MapWindow40\Bin\Plugins\" >
                 <Config
                     Name = "Debug"
                     EnableASPDebugging = "false"

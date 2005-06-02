@@ -14,7 +14,12 @@ Public Class atcTimeseries
   Private pValueAttributes() As DataAttributes
 
   Public Overrides Function ToString() As String
-    Return pNumValues & " values, #" & pSerial
+    Dim id As String = pAttributes.GetValue("id")
+    If id.Length = 0 Then id = CStr(pSerial)
+
+    Return pAttributes.GetValue("Scenario") & " " _
+         & pAttributes.GetValue("Location") & " " _
+         & pAttributes.GetValue("Constituent") & " (" & id & ")"
   End Function
 
   'Set or get an individual value
@@ -32,7 +37,7 @@ Public Class atcTimeseries
       If index >= 0 And index < pNumValues Then
         pValues(index) = newValue
       Else
-        'TODO: handle setting value outside range as error?
+        'TODO: handle setting value outside range as error? Expand as needed?
       End If
     End Set
   End Property
@@ -45,6 +50,7 @@ Public Class atcTimeseries
     End Get
     Set(ByVal newValues() As Double)
       pValues = newValues
+      pNumValues = newValues.GetUpperBound(0) + 1
     End Set
   End Property
 
@@ -134,7 +140,7 @@ Public Class atcTimeseries
   'Get or set the number of values
   Public Property numValues() As Long
     Get
-      If pNumValues = 0 Then 'might have only read header
+      If pValuesNeedToBeRead Then 'might have only read header
         EnsureValuesRead()
       End If
       Return pNumValues

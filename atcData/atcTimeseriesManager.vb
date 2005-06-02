@@ -58,13 +58,18 @@ Public Class atcTimeseriesManager
 
 
   'Open a file and return the new atcTimeseriesFile object
-  Public Function Open(ByVal aFileName As String) As atcTimeseriesFile
+  'aFileFilter: selected filter in Open dialog - used to determine which class can open file
+  'if aFileFilter is omitted, Open tries searching for a class that supports the extension of aFileName
+  Public Function Open(ByVal aFileName As String, Optional ByVal aFileFilter As String = "") As atcTimeseriesFile
     Dim newFile As atcTimeseriesFile
+
+    If aFileFilter.Length = 0 Then aFileFilter = System.IO.Path.GetExtension(aFileName)
+    aFileFilter = aFileFilter.ToLower
 
     For Each atf As atcTimeseriesFile In TimeseriesFilePlugins()
       'Might need a better test than this, or try more than one if multiple types open 
       'files with the same extension or if filter is not set for a atcTimeseriesFile type
-      If atf.FileFilter.ToLower.IndexOf(System.IO.Path.GetExtension(aFileName)) >= 0 Then
+      If atf.FileFilter.ToLower.IndexOf(aFileFilter) >= 0 Then
         Dim typ As System.Type = atf.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         newFile = asm.CreateInstance(typ.FullName)
@@ -72,13 +77,15 @@ Public Class atcTimeseriesManager
     Next
 
     If newFile Is Nothing Then
-      Err.Raise(0, Me, "Could not find a loaded plugin that can open file '" & aFileName & "'")
+      'TODO: how do we want to handle this?
+      'Err.Raise(0, Me, "Could not find a loaded plugin that can open file '" & aFileName & "'")
     Else
       If newFile.Open(aFileName) Then
         pFiles.Add(newFile)
         Return newFile
       Else
-        Err.Raise(0, Me, "Could open file '" & aFileName & "' with '" & newFile.Name & "'")
+        'TODO: handle false return from Open
+        'Err.Raise(0, Me, "Could open file '" & aFileName & "' with '" & newFile.Name & "'")
       End If
     End If
     'Should not get here - either an error will be raised or newFile returned above

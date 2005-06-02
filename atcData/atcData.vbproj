@@ -86,6 +86,16 @@
                     HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
                     Private = "False"
                 />
+                <Reference
+                    Name = "System.Windows.Forms"
+                    AssemblyName = "System.Windows.Forms"
+                    HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
+                />
+                <Reference
+                    Name = "System.Data"
+                    AssemblyName = "System.Data"
+                    HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
+                />
             </References>
             <Imports>
                 <Import Namespace = "Microsoft.VisualBasic" />
@@ -130,6 +140,16 @@
                     RelPath = "atcTimeseriesManager.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmSelectTimeseries.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmSelectTimeseries.resx"
+                    DependentUpon = "frmSelectTimeseries.vb"
+                    BuildAction = "EmbeddedResource"
                 />
             </Include>
         </Files>

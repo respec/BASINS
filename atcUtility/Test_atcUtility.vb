@@ -1479,8 +1479,8 @@ End Class
   End Sub
 
   Public Sub TestcolorName()
-    Assert.AreEqual("red", colorName(&HFF).ToLower, "Fail to Match Red")
-    Assert.AreEqual("cyan", colorName(&HFFFF00).ToLower, "Fail to Match Cyan")
+    Assert.AreEqual("red", colorName(System.Drawing.Color.Red).ToLower, "Fail to Match Red")
+    Assert.AreEqual("cyan", colorName(System.Drawing.Color.Cyan).ToLower, "Fail to Match Cyan")
   End Sub
 
   Public Sub TestGetHashCode()
