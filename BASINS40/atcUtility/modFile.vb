@@ -399,12 +399,13 @@ NoSuchFile:
 
   End Sub
 
-  Public Function FindFile(ByVal FileDialogTitle As String, _
-                  Optional ByVal DefaultFileName As String = " ", _
-                  Optional ByVal DefaultExt As String = "", _
-                  Optional ByVal FileFilter As String = "", _
-                  Optional ByVal UserVerifyFileName As Boolean = False, _
-                  Optional ByVal ChDir2FileDir As Boolean = False) As String
+  Public Function FindFile(ByVal aFileDialogTitle As String, _
+                  Optional ByVal aDefaultFileName As String = " ", _
+                  Optional ByVal aDefaultExt As String = "", _
+                  Optional ByVal aFileFilter As String = "", _
+                  Optional ByVal aUserVerifyFileName As Boolean = False, _
+                  Optional ByVal aChDir2FileDir As Boolean = False, _
+                  Optional ByRef aFilterIndex As Integer = 1) As String
     Dim lDir As String
     Dim baseFileName As String 'file name (with no path) of file we are looking for
     Dim lFileName As String
@@ -412,19 +413,19 @@ NoSuchFile:
     Dim lFileNameFoundInRegistry As Boolean
     Dim LookingForDir As Boolean
 
-    If (Len(DefaultExt)) = 0 Then 'try to get from default name
-      DefaultExt = FileExt(DefaultFileName)
+    If (Len(aDefaultExt)) = 0 Then 'try to get from default name
+      aDefaultExt = FileExt(aDefaultFileName)
     End If
 
-    If (Len(FileFilter)) = 0 Then 'try to get from default ext
-      If Len(DefaultExt) > 0 Then
-        FileFilter &= DefaultExt & " Files (*." & DefaultExt & ")|*." & DefaultExt & "|"
+    If (Len(aFileFilter)) = 0 Then 'try to get from default ext
+      If Len(aDefaultExt) > 0 Then
+        aFileFilter &= aDefaultExt & " Files (*." & aDefaultExt & ")|*." & aDefaultExt & "|"
       End If
-      FileFilter &= "All files (*.*)|*.*"
+      aFileFilter &= "All files (*.*)|*.*"
     End If
 
     lDir = CurDir()
-    lFileName = Trim(DefaultFileName)
+    lFileName = Trim(aDefaultFileName)
 
     On Error Resume Next
 
@@ -444,7 +445,7 @@ NoSuchFile:
         If FileExists(lRegistryFileName, True) Then 'got from registry
           lFileName = lRegistryFileName
           lFileNameFoundInRegistry = True
-          If ChDir2FileDir Then
+          If aChDir2FileDir Then
             ChDriveDir(System.IO.Path.GetFileName(lRegistryFileName))
           End If
         Else 'bad name in registry, message to user needed?
@@ -459,7 +460,7 @@ NoSuchFile:
         baseFileName = System.IO.Path.GetFileName(lFileName)
       End If
       If Len(baseFileName) > 0 Then
-        lFileName = DefaultFileName
+        lFileName = aDefaultFileName
         If Not FileExists(lFileName, True) Then lFileName = "c:\" & baseFileName
         If Not FileExists(lFileName, True) Then lFileName = "c:\winnt\" & baseFileName
         If Not FileExists(lFileName, True) Then lFileName = "c:\winnt\system\" & baseFileName
@@ -478,24 +479,25 @@ NoSuchFile:
           lFileName = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\" & baseFileName
         End If
         If FileExists(lFileName, True) Then
-          DefaultFileName = lFileName
+          aDefaultFileName = lFileName
         Else
           lFileName = ""
         End If
       End If
     End If
 
-    If Not FileExists(lFileName, True) Or UserVerifyFileName Then 'ask the user
+    If Not FileExists(lFileName, True) Or aUserVerifyFileName Then 'ask the user
       Dim cdlg As New Windows.Forms.OpenFileDialog
       With cdlg
-        .Title = FileDialogTitle
+        .Title = aFileDialogTitle
         lFileName = AbsolutePath(lFileName, CurDir)
-        .FileName = DefaultFileName
-        .Filter = FileFilter
-        .FilterIndex = 1
-        .DefaultExt = DefaultExt
+        .FileName = aDefaultFileName
+        .Filter = aFileFilter
+        .FilterIndex = aFilterIndex
+        .DefaultExt = aDefaultExt
         If .ShowDialog() = Windows.Forms.DialogResult.OK Then
           lFileName = AbsolutePath(.FileName, CurDir)
+          aFilterIndex = .FilterIndex
           'If lFileName <> lRegistryFileName Then 'try to force registry update
           '    lFileNameFoundInRegistry = False
           'End If
@@ -515,7 +517,7 @@ NoSuchFile:
       'End If
     End If
 
-    If Not ChDir2FileDir Or Len(lFileName) = 0 Then
+    If Not aChDir2FileDir Or Len(lFileName) = 0 Then
       ChDriveDir(lDir)
     End If
 

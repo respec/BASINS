@@ -644,7 +644,7 @@ LeaveSub:
     End If
   End Function
 
-  Private Function FormatValue$(ByVal Val As Object)
+  Private Function FormatValue(ByVal Val As Object) As String
     Dim retval$
 
     retval = CStr(Val)
@@ -652,23 +652,23 @@ LeaveSub:
     Select Case DataType
       Case ATCoDataType.ATCoTxt : Exit Function
       Case ATCoDataType.ATCoClr
-        Dim clrName$, tmpLng&
-        tmpLng = -1
+        Dim clrName As String
+        Dim tmpClr As Color = Color.Empty
         If IsNumeric(Val) Then
           clrName = colorName(Val)
-          tmpLng = CLng(Val)
+          tmpClr = Color.FromArgb(Val)
         Else
           clrName = Val
         End If
         'Separate if statements in case colorName(val) comes back still numeric
-        If tmpLng = -1 Then tmpLng = TextOrNumericColor(clrName)
+        If tmpClr.Equals(Color.Empty) Then tmpClr = TextOrNumericColor(clrName)
         If IsNumeric(clrName) Then
           retval = ""
         Else
           retval = clrName
         End If
-        text1.BackColor = Color.FromArgb(tmpLng)
-        If Color.FromArgb(tmpLng).GetBrightness > 0.4 Then
+        text1.BackColor = tmpClr
+        If tmpClr.GetBrightness > 0.4 Then
           text1.ForeColor = System.Drawing.Color.Black
         Else
           text1.ForeColor = System.Drawing.Color.White

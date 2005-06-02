@@ -167,13 +167,13 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "frmGenerateTimeseries.vb"
+                    RelPath = "frmScript.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "frmGenerateTimeseries.resx"
-                    DependentUpon = "frmGenerateTimeseries.vb"
+                    RelPath = "frmScript.resx"
+                    DependentUpon = "frmScript.vb"
                     BuildAction = "EmbeddedResource"
                 />
                 <File

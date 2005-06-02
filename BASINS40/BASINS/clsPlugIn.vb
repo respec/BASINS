@@ -111,6 +111,7 @@ Public Class PlugIn
     mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
     mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_WDMUtil", ToolsMenuName, Nothing, "&WDMUtil")
     mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_RunScript", ToolsMenuName, Nothing, "Run Script")
+    mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_OpenScript", ToolsMenuName, Nothing, "Edit Script")
     'mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
 
     g_MapWin.Menus.AddMenu(ModelsMenuName, "", Nothing, ModelsMenuString, ToolsMenuName)
@@ -137,9 +138,9 @@ Public Class PlugIn
       .Remove(DataMenuString)
       .AddMenu(DataMenuName, "", Nothing, DataMenuString, "mnuFile")
       mnu = .AddMenu(DataMenuName & "_Download", DataMenuName, Nothing, "&Download")
-      mnu = .AddMenu(DataMenuName & "_DownloadTest", DataMenuName, Nothing, "Download &Test")
+      'mnu = .AddMenu(DataMenuName & "_DownloadTest", DataMenuName, Nothing, "Download &Test")
       mnu = .AddMenu(DataMenuName & "_OpenTimeseries", DataMenuName, Nothing, "Open Timeseries File")
-      mnu = .AddMenu(DataMenuName & "_GenerateTimeseries", DataMenuName, Nothing, "Generate Timeseries")
+      'mnu = .AddMenu(DataMenuName & "_SelectTimeseries", DataMenuName, Nothing, "Select Timeseries")
       'With g_MapWin.Plugins
       '  For iPlugin = 0 To .Count - 1
       '    If Not .Item(iPlugin) Is Nothing Then
@@ -162,9 +163,9 @@ Public Class PlugIn
     'todo: remove the menu items under "BASINS"
 
     g_MapWin.Menus.Remove(DataMenuName & "_Download")
-    g_MapWin.Menus.Remove(DataMenuName & "_DownloadTest")
+    'g_MapWin.Menus.Remove(DataMenuName & "_DownloadTest")
     g_MapWin.Menus.Remove(DataMenuName & "_OpenTimeseries")
-    g_MapWin.Menus.Remove(DataMenuName & "_GenerateTimeseries")
+    'g_MapWin.Menus.Remove(DataMenuName & "_SelectTimeseries")
     g_MapWin.Menus.Remove(DataMenuName)
 
     g_MapWin.Menus.Remove(ToolsMenuName & "_Graph")
@@ -173,6 +174,7 @@ Public Class PlugIn
     g_MapWin.Menus.Remove(ToolsMenuName & "_GenScn")
     g_MapWin.Menus.Remove(ToolsMenuName & "_WDMUtil")
     g_MapWin.Menus.Remove(ToolsMenuName & "_RunScript")
+    g_MapWin.Menus.Remove(ToolsMenuName & "_OpenScript")
     g_MapWin.Menus.Remove(ToolsMenuName)
 
     g_MapWin.Menus.Remove(ModelsMenuName & "_SWAT")
@@ -289,12 +291,15 @@ Public Class PlugIn
             DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
           End If
         Case "OpenTimeseries"
-          Dim FileToOpen As String = FindFile("Select data file to open", , , pTimeseriesManager.FileFilters, True)
-          If FileExists(FileToOpen) Then OpenDataFile(FileToOpen)
-        Case "GenerateTimeseries"
-          Dim frmGener As New frmGenerateTimeseries
-          frmGener.Populate(pTimeseriesManager)
-          frmGener.Show()
+          Dim FileFilter As String = pTimeseriesManager.FileFilters
+          Dim FileFilterIndex As Integer = 1
+          Dim FileToOpen As String = FindFile("Select data file to open", , , FileFilter, True, , FileFilterIndex)
+          If FileExists(FileToOpen) Then
+            OpenDataFile(FileToOpen, FindFileFilter(FileFilter, FileFilterIndex))
+          End If
+          'Case "SelectTimeseries"
+          '  Dim frmTS As New frmSelectTimeseries
+          '  MsgBox(frmTS.AskUser(pTimeseriesManager).Count)
         Case Else : MsgBox("Data Tool " & ItemName)
       End Select
       Handled = True
@@ -307,7 +312,34 @@ Public Class PlugIn
     End If
   End Sub
 
-  Sub OpenDataFile(ByVal aFileName As String)
+  'Given a set of file filters as used by common dialog, return the filter with the given index
+  ' FileFilters("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1) = "WDM Files (*.wdm)|*.wdm"
+  Private Function FindFileFilter(ByVal FileFilters As String, ByVal FileFilterIndex As Integer)
+    Dim prevPipe As Integer = 0
+    Dim pipePos As Integer
+
+    'Find pipe symbol before desired filter, or start of string
+    While FileFilterIndex > 1
+      pipePos = FileFilters.IndexOf("|", prevPipe + 1)
+      If pipePos > 0 Then
+        prevPipe = pipePos
+        pipePos = FileFilters.IndexOf("|", prevPipe + 1)
+        If pipePos > 0 Then
+          prevPipe = pipePos
+        End If
+      End If
+      FileFilterIndex -= 1
+    End While
+
+    'Find pipe symbol after desired filter, or end of string
+    pipePos = FileFilters.IndexOf("|", prevPipe + 1)
+    If pipePos > 0 Then pipePos = FileFilters.IndexOf("|", pipePos + 1)
+    If pipePos < 0 Then pipePos = FileFilters.Length + 1
+
+    FindFileFilter = FileFilters.Substring(prevPipe + 1, pipePos - prevPipe - 2)
+  End Function
+
+  Sub OpenDataFile(ByVal aFileName As String, Optional ByVal aFileFilter As String = "")
     Dim s As String
     Dim i As Integer
     Dim lDebugFile As String = "c:\test\BASINS4\wdmFileDump.txt"
@@ -319,7 +351,7 @@ Public Class PlugIn
     g_MapWin.StatusBar.ProgressBarValue = 5
     g_MapWin.StatusBar.ShowProgressBar = True
 
-    lFile = pTimeseriesManager.Open(aFileName)
+    lFile = pTimeseriesManager.Open(aFileName, aFileFilter)
 
     g_MapWin.StatusBar.ProgressBarValue = 50
 
@@ -345,21 +377,20 @@ Public Class PlugIn
 
     g_MapWin.StatusBar.ProgressBarValue = 75
 
-    GraphTest(lDataset)
+    'GraphTest(lDataset)
 
     g_MapWin.StatusBar.ProgressBarValue = 100
     g_MapWin.StatusBar.ShowProgressBar = False
   End Sub
 
   Private Sub GraphTest(ByVal aDataset As atcTimeseries)
-    Dim gForm As New atcGraphForm
-    Dim gTime As New atcGraphTime
+    Dim gForm As New atcGraphForm(pTimeseriesManager)
 
     gForm.Show()
     gForm.Pane.XAxis.Type = ZedGraph.AxisType.Date
     gForm.Pane.XAxis.MajorUnit = ZedGraph.DateUnit.Day
     gForm.Pane.XAxis.MinorUnit = ZedGraph.DateUnit.Hour
-    gTime.AddDatasetTimeseries(gForm.Pane, aDataset, aDataset.Attributes.GetValue("id"))
+    atcGraphTime.AddDatasetTimeseries(gForm.Pane, aDataset, aDataset.Attributes.GetValue("id"))
     gForm.Pane.AxisChange(gForm.CreateGraphics)
 
   End Sub
@@ -368,19 +399,8 @@ Public Class PlugIn
     Dim exename As String
     Select Case ToolName
       Case "Graph"
-        Dim gForm As New atcGraphForm
-        Dim gTime As New atcGraphTime
-        Dim t As New atcTimeseries(Nothing)
-        Dim x As Double() = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-        Dim y As Double() = {1, 4, 9, 16, 25, 36, 49, 64, 81, 100}
-        t.numValues = 10
-        t.Values = y
-        t.Dates = New atcTimeseries(Nothing)
-        t.Dates.Values = x
-
+        Dim gForm As New atcGraphForm(pTimeseriesManager)
         gForm.Show()
-        gTime.AddDatasetTimeseries(gForm.Pane, t, "Test")
-        gForm.Pane.AxisChange(gForm.CreateGraphics)
         Return True
 
       Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
@@ -391,25 +411,61 @@ Public Class PlugIn
         End If
         exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
       Case "RunScript"
-
-        exename = FindFile("Please locate script to run", "", "vb", "VB.net and C# Files (*.vb, *.cs)|*.vb;*.cs|All files (*.*)|*.*", True)
+        exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+        If FileExists(exename) Then
+          RunBasinsScript(WholeFileString(exename), cmdLine.Split(","))
+          Return True
+        Else
+          LogMsg("Unable to find script " & exename, "Launch")
+          Return False
+        End If
+      Case "OpenScript"
+        Dim lfrm As New frmScript
+        lfrm.BasinsPlugin = Me
+        lfrm.Show()
+        Return True
     End Select
 
     If FileExists(exename) Then
-      If ToolName = "RunScript" Then
-        RunScript(WholeFileString(exename), cmdLine.Split(","))
-      Else
-        'Ensure space between exename and cmdline if needed
-        If cmdLine.Length > 0 AndAlso Not cmdLine.StartsWith(" ") Then cmdLine = " " & cmdLine
+      'Ensure space between exename and cmdline if needed
+      If cmdLine.Length > 0 AndAlso Not cmdLine.StartsWith(" ") Then cmdLine = " " & cmdLine
 
-        Shell("""" & exename & """" & cmdLine, AppWinStyle.NormalFocus, False)
-        Return True
-      End If
+      Shell("""" & exename & """" & cmdLine, AppWinStyle.NormalFocus, False)
+      Return True
     Else
       LogMsg("Unable to launch " & ToolName, "Launch")
       Return False
     End If
   End Function
+
+  Public Function RunBasinsScript(ByVal aScript As String, _
+                                  ByVal args() As Object, _
+                         Optional ByVal refs As String = "System.dll,Microsoft.VisualBasic.dll,atcData.dll") As Object
+
+    'Replace some text arguments with objects
+    For iArg As Integer = 0 To args.GetUpperBound(0)
+      If args(iArg).GetType Is GetType(String) Then
+        Select Case args(iArg).ToLower
+          Case "timeseriesmanager" : args(iArg) = pTimeseriesManager
+          Case "basinsplugin" : args(iArg) = Me
+          Case "mapwin" : args(iArg) = g_MapWin
+        End Select
+      End If
+    Next
+
+    RunScript(aScript, refs.Split(","), args)
+
+  End Function
+
+  'Public Sub CompilePlugin(ByVal aScript As String, _
+  '                         ByRef aErrors As String, _
+  '                         ByVal refs() As String, _
+  '                         ByVal aFileName As String)
+  '  CompileScript(aScript, aErrors, refs, aFileName)
+  '  If aErrors.Length = 0 Then
+  '    g_MapWin.Plugins.AddFromFile(aFileName)
+  '  End If
+  'End Sub
 
   Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
     'This event fires when the user removes a layer from MapWindow.  This is useful to know if your
