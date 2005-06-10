@@ -1,7 +1,7 @@
 Imports atcData
 
 Public Class atcHydroligicIndices
-  Inherits atcDataPlugin
+  Inherits atcTimeseriesCompute
   Private pAvailableStatistics As Hashtable
   Private pAvailableTimeseriesOperations As Hashtable
 
@@ -19,7 +19,7 @@ Public Class atcHydroligicIndices
         retval &= def.Value.Name & ", "
       Next
 
-      For Each def As DictionaryEntry In AvailableTimeseriesOperations
+      For Each def As DictionaryEntry In AvailableOperations
         retval &= def.Value.Name & ", "
       Next
 
@@ -138,7 +138,7 @@ Public Class atcHydroligicIndices
   End Sub
 
   'List of atcAttributeDefinition objects representing operations supported by ComputeTimeseries
-  Public Overrides ReadOnly Property AvailableTimeseriesOperations() As Hashtable
+  Public Overrides ReadOnly Property AvailableOperations() As Hashtable
     Get
       If pAvailableTimeseriesOperations Is Nothing Then
         pAvailableTimeseriesOperations = New Hashtable

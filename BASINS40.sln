@@ -15,10 +15,6 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGraph", "atcGraph\atcGra
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcHSPF", "atcHSPF\atcHSPF.vbproj", "{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcHydrologicIndices", "atcHydrologicIndices\atcHydrologicIndices.vbproj", "{BD299EB7-7A62-4EF9-8806-86E9288C498F}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
@@ -57,10 +53,6 @@ Global
 		{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}.Debug.Build.0 = Debug|.NET
 		{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}.Release.ActiveCfg = Release|.NET
 		{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}.Release.Build.0 = Release|.NET
-		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Debug.ActiveCfg = Debug|.NET
-		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Debug.Build.0 = Debug|.NET
-		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Release.ActiveCfg = Release|.NET
-		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Release.Build.0 = Release|.NET
 		{BD299EB7-7A62-4EF9-8806-86E9288C498F}.Debug.ActiveCfg = Debug|.NET
 		{BD299EB7-7A62-4EF9-8806-86E9288C498F}.Debug.Build.0 = Debug|.NET
 		{BD299EB7-7A62-4EF9-8806-86E9288C498F}.Release.ActiveCfg = Release|.NET

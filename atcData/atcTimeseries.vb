@@ -1,5 +1,5 @@
 Public Class atcTimeseries
-  Private Shared pNextSerial As Integer
+  Private Shared pNextSerial As Integer = 0
 
   Private pDates As atcTimeseries
   'Private pDateLengths As atcTimeseries
@@ -15,11 +15,11 @@ Public Class atcTimeseries
 
   Public Overrides Function ToString() As String
     Dim id As String = pAttributes.GetValue("id")
-    If id.Length = 0 Then id = CStr(pSerial)
+    'If id.Length = 0 Then id = "# " & CStr(pSerial)
 
     Return pAttributes.GetValue("Scenario") & " " _
          & pAttributes.GetValue("Location") & " " _
-         & pAttributes.GetValue("Constituent") & " (" & id & ")"
+         & pAttributes.GetValue("Constituent") & " " & id & " # " & CStr(pSerial)
   End Function
 
   'Set or get an individual value

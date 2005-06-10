@@ -1,5 +1,6 @@
 Imports atcData
-Public Class frmSelectTimeseries
+
+Friend Class frmSelectTimeseries
   Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -78,7 +79,7 @@ Public Class frmSelectTimeseries
     Me.btnAddAttribute.Location = New System.Drawing.Point(480, 24)
     Me.btnAddAttribute.Name = "btnAddAttribute"
     Me.btnAddAttribute.Size = New System.Drawing.Size(16, 16)
-    Me.btnAddAttribute.TabIndex = 15
+    Me.btnAddAttribute.TabIndex = 1
     Me.btnAddAttribute.Text = "+"
     '
     'gridMatching
@@ -94,7 +95,7 @@ Public Class frmSelectTimeseries
     Me.gridMatching.ReadOnly = True
     Me.gridMatching.RowHeadersVisible = False
     Me.gridMatching.Size = New System.Drawing.Size(496, 144)
-    Me.gridMatching.TabIndex = 14
+    Me.gridMatching.TabIndex = 1
     '
     'lblMatching
     '
@@ -131,7 +132,7 @@ Public Class frmSelectTimeseries
     Me.gridSelected.ReadOnly = True
     Me.gridSelected.RowHeadersVisible = False
     Me.gridSelected.Size = New System.Drawing.Size(496, 64)
-    Me.gridSelected.TabIndex = 15
+    Me.gridSelected.TabIndex = 2
     '
     'pnlButtons
     '
@@ -148,7 +149,7 @@ Public Class frmSelectTimeseries
     Me.btnCancel.Location = New System.Drawing.Point(104, 0)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(80, 24)
-    Me.btnCancel.TabIndex = 1
+    Me.btnCancel.TabIndex = 4
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
@@ -156,7 +157,7 @@ Public Class frmSelectTimeseries
     Me.btnOk.Location = New System.Drawing.Point(0, 0)
     Me.btnOk.Name = "btnOk"
     Me.btnOk.Size = New System.Drawing.Size(80, 24)
-    Me.btnOk.TabIndex = 0
+    Me.btnOk.TabIndex = 3
     Me.btnOk.Text = "Ok"
     '
     'frmSelectTimeseries
@@ -215,20 +216,21 @@ Public Class frmSelectTimeseries
     ReDim plstCriteria(0)
     Dim tblSty As Windows.Forms.DataGridTableStyle
 
-    AddCriteria("Scenario")
-    AddCriteria("Location")
-    AddCriteria("Constituent")
+    For Each lAttribName As String In pTimeseriesManager.SelectionAttributes
+      AddCriteria(lAttribName)
+    Next
 
     pMatchingTable = New System.Data.DataTable
     With pMatchingTable.Columns
       .Add(New System.Data.DataColumn("atcTimeseries"))
       .Item(0).DataType = GetType(atcTimeseries)
       pMatchingTable.PrimaryKey = New Data.DataColumn() {.Item(0)}
-      .Add(New System.Data.DataColumn("Scenario"))
-      .Add(New System.Data.DataColumn("Location"))
-      .Add(New System.Data.DataColumn("Constituent"))
-      .Add(New System.Data.DataColumn("ID"))
+
+      For Each lAttribName As String In pTimeseriesManager.DisplayAttributes
+        .Add(New System.Data.DataColumn(lAttribName))
+      Next
     End With
+
     For Each lColumn As System.Data.DataColumn In pMatchingTable.Columns
       lColumn.DataType = GetType(String)
       lColumn.ReadOnly = True
@@ -326,12 +328,13 @@ NextTS:
   End Sub
 
   Private Sub AddTStoTable(ByVal aTS As atcData.atcTimeseries, ByVal aTable As System.Data.DataTable)
-    aTable.Rows.Add(New Object() { _
-      aTS.Serial, _
-      aTS.Attributes.GetValue(aTable.Columns(1).ColumnName), _
-      aTS.Attributes.GetValue(aTable.Columns(2).ColumnName), _
-      aTS.Attributes.GetValue(aTable.Columns(3).ColumnName), _
-      aTS.Attributes.GetValue(aTable.Columns(4).ColumnName)})
+    Dim row() As Object
+    ReDim row(aTable.Columns.Count - 1)
+    row(0) = aTS.Serial
+    For iColumn As Integer = 1 To aTable.Columns.Count - 1
+      row(iColumn) = aTS.Attributes.GetValue(aTable.Columns(iColumn).ColumnName)
+    Next
+    aTable.Rows.Add(row)
   End Sub
   Private Function GetIndex(ByVal aName As String) As Integer
     Return CInt(Mid(aName, InStr(aName, "#") + 1))
@@ -385,6 +388,7 @@ NextTS:
     With pcboCriteria(iCriteria)
       .Name = "cboCriteria#" & iCriteria
       .DropDownStyle = Windows.Forms.ComboBoxStyle.DropDownList
+      .MaxDropDownItems = 30
       .Sorted = True
     End With
 
@@ -404,7 +408,17 @@ NextTS:
     End If
     If aText.Length > 0 Then
       pcboCriteria(iCriteria).Text = aText
+    Else 'Find next criteria that is not yet in use
+      For Each curName As String In pcboCriteria(iCriteria).Items
+        For iOtherCriteria As Integer = 0 To iCriteria - 1
+          If curName.Equals(pcboCriteria(iOtherCriteria).SelectedItem) Then GoTo NextName
+        Next
+        pcboCriteria(iCriteria).Text = curName
+        Exit For
+NextName:
+      Next
     End If
+
     frmSelectTimeseries_Resize(Nothing, Nothing)
 
   End Sub
@@ -431,6 +445,15 @@ NextTS:
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
     pSelectedOK = True
+
+    'Update SelectionAttributes from current set of pcboCriteria
+    pTimeseriesManager.SelectionAttributes.Clear()
+    For iCriteria As Integer = 0 To pcboCriteria.GetUpperBound(0)
+      Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
+      If Not attrName Is Nothing Then
+        pTimeseriesManager.SelectionAttributes.Add(attrName)
+      End If
+    Next
     Me.Close()
   End Sub
 

@@ -66,6 +66,7 @@ Public Class frmScript
     Me.txtScript.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtScript.Font = New System.Drawing.Font("Courier New", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.txtScript.Location = New System.Drawing.Point(8, 48)
     Me.txtScript.Name = "txtScript"
     Me.txtScript.Size = New System.Drawing.Size(400, 280)
