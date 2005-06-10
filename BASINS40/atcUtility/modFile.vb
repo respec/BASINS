@@ -531,29 +531,33 @@ NoSuchFile:
 
   'Given a set of file filters as used by common dialog, return the filter with the given index
   ' FileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1) = "WDM Files (*.wdm)|*.wdm"
-  Public Function FindFileFilter(ByVal FileFilters As String, ByVal FileFilterIndex As Integer)
+  Public Function FindFileFilter(ByVal FileFilters As String, ByVal FileFilterIndex As Integer) As String
     Dim prevPipe As Integer = 0
     Dim pipePos As Integer
 
-    'Find pipe symbol before desired filter, or start of string
-    While FileFilterIndex > 1
-      pipePos = FileFilters.IndexOf("|", prevPipe + 1)
-      If pipePos > 0 Then
-        prevPipe = pipePos
+    Try
+      'Find pipe symbol before desired filter, or start of string
+      While FileFilterIndex > 1
         pipePos = FileFilters.IndexOf("|", prevPipe + 1)
         If pipePos > 0 Then
           prevPipe = pipePos
+          pipePos = FileFilters.IndexOf("|", prevPipe + 1)
+          If pipePos > 0 Then
+            prevPipe = pipePos
+          End If
         End If
-      End If
-      FileFilterIndex -= 1
-    End While
+        FileFilterIndex -= 1
+      End While
 
-    'Find pipe symbol after desired filter, or end of string
-    pipePos = FileFilters.IndexOf("|", prevPipe + 1)
-    If pipePos > 0 Then pipePos = FileFilters.IndexOf("|", pipePos + 1)
-    If pipePos < 0 Then pipePos = FileFilters.Length + 1
+      'Find pipe symbol after desired filter, or end of string
+      pipePos = FileFilters.IndexOf("|", prevPipe + 1)
+      If pipePos > 0 Then pipePos = FileFilters.IndexOf("|", pipePos + 1)
+      If pipePos < 0 Then pipePos = FileFilters.Length + 1
 
-    FindFileFilter = FileFilters.Substring(prevPipe + 1, pipePos - prevPipe - 2)
+      FindFileFilter = FileFilters.Substring(prevPipe + 1, pipePos - prevPipe - 2)
+    Catch
+      Return ""
+    End Try
   End Function
 
 End Module

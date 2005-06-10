@@ -49,16 +49,31 @@ Public Class atcTimeseriesManager
     End Get
   End Property
 
-  'The currently loaded plugins that inherit atcTimeseriesFile
-  'All are empty atcTimeseriesFile objects.
-  Public Function TimeseriesFilePlugins() As ICollection
+  ''The currently loaded plugins that inherit atcTimeseriesFile
+  ''All are empty atcTimeseriesFile objects.
+  'Public Function TimeseriesFilePlugins() As ICollection
+  '  Return GetPlugins(GetType(atcTimeseriesFile))
+  '  'Dim retval As New ArrayList
+  '  'Dim lastPlugIn As Integer = pMapWin.Plugins.Count() - 1
+  '  'For iPlugin As Integer = 0 To lastPlugIn
+  '  '  Dim curPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
+  '  '  If Not curPlugin Is Nothing Then
+  '  '    If CType(curPlugin, Object).GetType().IsSubclassOf(GetType(atcTimeseriesFile)) Then
+  '  '      retval.Add(curPlugin)
+  '  '    End If
+  '  '  End If
+  '  'Next
+  '  'Return retval
+  'End Function
+
+  'The currently loaded plugins that inherit the specified class; returns empty objects
+  Public Function GetPlugins(ByVal aBaseType As Type) As ICollection
     Dim retval As New ArrayList
     Dim lastPlugIn As Integer = pMapWin.Plugins.Count() - 1
     For iPlugin As Integer = 0 To lastPlugIn
       Dim curPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
       If Not curPlugin Is Nothing Then
-        Dim pluginName As String = curPlugin.Name
-        If CType(curPlugin, Object).GetType().IsSubclassOf(GetType(atcTimeseriesFile)) Then
+        If CType(curPlugin, Object).GetType().IsSubclassOf(aBaseType) Then
           retval.Add(curPlugin)
         End If
       End If
@@ -66,31 +81,10 @@ Public Class atcTimeseriesManager
     Return retval
   End Function
 
-  'The currently loaded plugins that inherit atcDataPlugin but not atcTimeseriesFile
-  'All are empty atcDataPlugin objects.
-  Public Function TimeseriesDataPlugins() As ICollection
-    Dim retval As New ArrayList
-    Dim lastPlugIn As Integer = pMapWin.Plugins.Count() - 1
-    For iPlugin As Integer = 0 To lastPlugIn
-      Dim curPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
-      If Not curPlugin Is Nothing Then
-        Dim pluginName As String = curPlugin.Name
-        Dim pluginType As System.Type = CType(curPlugin, Object).GetType()
-        If pluginType.IsSubclassOf(GetType(atcDataPlugin)) Then
-          If Not pluginType.IsSubclassOf(GetType(atcTimeseriesFile)) Then
-            retval.Add(curPlugin)
-          End If
-        End If
-      End If
-    Next
-    Return retval
-  End Function
-
-
   'Open a file and return the new atcTimeseriesFile object
   'aFileFilter: selected filter in Open dialog - used to determine which class can open file
   'if aFileFilter is omitted, Open tries searching for a class that supports the extension of aFileName
-  Public Function Open(ByVal aFileName As String, Optional ByVal aFileFilter As String = "") As atcTimeseriesFile
+  Public Function OpenFile(ByVal aFileName As String, Optional ByVal aFileFilter As String = "") As atcTimeseriesFile
     Dim newFile As atcTimeseriesFile
 
     pBasins.Busy = True
@@ -103,7 +97,8 @@ Public Class atcTimeseriesManager
     If aFileFilter.Length = 0 Then aFileFilter = System.IO.Path.GetExtension(aFileName)
     aFileFilter = aFileFilter.ToLower
 
-    For Each atf As atcTimeseriesFile In TimeseriesFilePlugins()
+    Dim TimeseriesFilePlugins As ICollection = GetPlugins(GetType(atcTimeseriesFile))
+    For Each atf As atcTimeseriesFile In TimeseriesFilePlugins
       'Might need a better test than this, or try more than one if multiple types open 
       'files with the same extension or if filter is not set for a atcTimeseriesFile type
       If atf.FileFilter.ToLower.IndexOf(aFileFilter) >= 0 Then
@@ -136,17 +131,18 @@ Public Class atcTimeseriesManager
   'Returns FileFilters of all loaded atcTimeseriesFile types, formatted for common dialog
   Public Function FileFilters() As String
     Dim retval As String = ""
-    For Each atf As atcTimeseriesFile In TimeseriesFilePlugins()
+    Dim TimeseriesFilePlugins As ICollection = GetPlugins(GetType(atcTimeseriesFile))
+    For Each atf As atcTimeseriesFile In TimeseriesFilePlugins
       If retval.Length > 0 Then retval += "|" 'separate with |
       retval += atf.FileFilter
     Next
     Return retval
   End Function
 
-  Public Function UserSelectTimeseries(Optional ByVal aTitle As String = "") As ICollection
+  Public Function UserSelectTimeseries(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
     Dim frmSelect As New atcData.frmSelectTimeseries
     If aTitle.Length > 0 Then frmSelect.Text = aTitle
-    Return frmSelect.AskUser(Me)
+    Return frmSelect.AskUser(Me, aGroup)
   End Function
 
   Public Sub UserManage(Optional ByVal aTitle As String = "")
@@ -183,7 +179,7 @@ Public Class atcTimeseriesManager
       While Not lchildXML Is Nothing
         Select Case lchildXML.Tag
           Case "TimeseriesFile"
-            Open(lchildXML.GetAttrValue("FileName"), lchildXML.GetAttrValue("Filter"))
+            OpenFile(lchildXML.GetAttrValue("FileName"), lchildXML.GetAttrValue("Filter"))
           Case "SelectionAttribute"
             If Not clearedSelectionAttributes Then
               clearedSelectionAttributes = True
@@ -191,11 +187,11 @@ Public Class atcTimeseriesManager
             End If
             pSelectionAttributes.Add(lchildXML.Content)
           Case "DisplayAttribute"
-              If Not clearedDisplayAttributes Then
-                pDisplayAttributes.Clear()
-                clearedDisplayAttributes = True
-              End If
-              pDisplayAttributes.Add(lchildXML.Content)
+            If Not clearedDisplayAttributes Then
+              pDisplayAttributes.Clear()
+              clearedDisplayAttributes = True
+            End If
+            pDisplayAttributes.Add(lchildXML.Content)
         End Select
         If Not lchildXML.NextSibling2 Then lchildXML = Nothing
       End While

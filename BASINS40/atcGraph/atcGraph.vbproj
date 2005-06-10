@@ -141,6 +141,11 @@
                     DependentUpon = "atcGraphForm.vb"
                     BuildAction = "EmbeddedResource"
                 />
+                <File
+                    RelPath = "atcGraphPlugin.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
             </Include>
         </Files>
     </VisualBasic>

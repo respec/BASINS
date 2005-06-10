@@ -22,8 +22,17 @@ Public Class atcTimeseriesGroup
     pTS = New ArrayList
   End Sub
 
+  Private Property PrivateList() As ArrayList
+    Get
+      Return pTS
+    End Get
+    Set(ByVal newValue As ArrayList)
+      pTS = newValue
+    End Set
+  End Property
+
   'Get a Timeseries by index
-  Default Public Property Item(ByVal index) As atcTimeseries
+  Default Public Property Item(ByVal index As Integer) As atcTimeseries
     Get
       Return pTS.Item(index)
     End Get
@@ -45,8 +54,10 @@ Public Class atcTimeseriesGroup
     RaiseEvent Added(aList) 'Insert is the other place where items are added
   End Sub
 
+  'Remove all Timeseries and selection
   Public Sub Clear()
-    pTS.Clear()
+    Remove(pTS)
+    If Not pSelectedTS Is Nothing Then pSelectedTS.Clear()
   End Sub
 
   Public Function Clone() As atcTimeseriesGroup
@@ -54,6 +65,33 @@ Public Class atcTimeseriesGroup
     newGroup.Add(pTS)
     Return newGroup
   End Function
+
+  'Change this group to match the new group and raise the appropriate events
+  Public Sub ChangeTo(ByVal aNewGroup As atcTimeseriesGroup)
+    If aNewGroup Is Nothing Then
+      Clear()
+    Else
+
+      Dim RemoveList As New ArrayList
+      For Each oldTS As atcTimeseries In pTS
+        If Not aNewGroup.Contains(oldTS) Then
+          RemoveList.Add(oldTS)
+        End If
+      Next
+
+      Dim AddList As New ArrayList
+      For Each savedTS As atcTimeseries In aNewGroup
+        If Not pTS.Contains(savedTS) Then
+          AddList.Add(savedTS)
+        End If
+      Next
+
+      pTS = aNewGroup.PrivateList.Clone
+      RaiseEvent Added(AddList)
+      RaiseEvent Removed(RemoveList)
+
+    End If
+  End Sub
 
   Public Function Contains(ByVal aTS As atcTimeseries) As Boolean
     Return pTS.Contains(aTS)
@@ -78,6 +116,13 @@ Public Class atcTimeseriesGroup
   'Find the index of the specified Timeseries given that it is at or after aStartIndex
   Public Function IndexOf(ByVal aTS As atcTimeseries, ByVal aStartIndex As Integer) As Integer
     Return pTS.IndexOf(aTS, aStartIndex)
+  End Function
+
+  Public Function IndexOfSerial(ByVal aSerial As Integer) As Integer
+    For iTS As Integer = 0 To pTS.Count - 1
+      If pTS(iTS).Serial = aSerial Then Return iTS
+    Next
+    Return -1
   End Function
 
   'Insert a new Timeseries at the specified index
@@ -117,7 +162,9 @@ Public Class atcTimeseriesGroup
 
   Public Property SelectedTimeseries() As atcTimeseriesGroup
     Get
-      If pSelectedTS Is Nothing Then pSelectedTS = New atcTimeseriesGroup
+      If pSelectedTS Is Nothing Then 'Initialize now if not already done
+        pSelectedTS = New atcTimeseriesGroup
+      End If
       Return pSelectedTS
     End Get
     Set(ByVal newValue As atcTimeseriesGroup)

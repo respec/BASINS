@@ -155,7 +155,7 @@ Friend Class frmManager
 
   Private Sub toolbarTop_ButtonClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.ToolBarButtonClickEventArgs) Handles toolbarTop.ButtonClick
     Select Case e.Button.Text
-      Case "Open" : pManager.Open("")
+      Case "Open" : pManager.OpenFile("")
       Case "Close"
         'TODO: how do we remove a file from pManager.Files?
     End Select

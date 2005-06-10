@@ -191,25 +191,31 @@ Friend Class frmSelectTimeseries
   Private pMatchingTable As System.Data.DataTable
   Private pSelectedTable As System.Data.DataTable
 
-  Private pMatchingTS As Hashtable
-  Private pSelectedTS As Hashtable
+  Private pMatchingTS As atcTimeseriesGroup
+  Private pSelectedTS As atcTimeseriesGroup
 
   Private pSelectedOK As Boolean
 
   Private pTotalTS As Integer
 
-  Public Function AskUser(ByVal aManager As atcTimeseriesManager) As ICollection
+  Public Function AskUser(ByVal aManager As atcTimeseriesManager, Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
+    Dim pSaveGroup As atcTimeseriesGroup = Nothing
+    If aGroup Is Nothing Then
+      pSelectedTS = New atcTimeseriesGroup
+    Else
+      pSaveGroup = aGroup.Clone
+      pSelectedTS = aGroup
+    End If
     Populate(aManager)
     Me.ShowDialog()
-    If Not pSelectedOK Then
-      pSelectedTS.Clear()
+    If Not pSelectedOK Then 'User clicked Cancel or closed dialog
+      pSelectedTS.ChangeTo(pSaveGroup)
     End If
-    Return pSelectedTS.Values
+    Return pSelectedTS
   End Function
 
   Private Sub Populate(ByVal aTimeseriesManager As atcTimeseriesManager)
-    pMatchingTS = New Hashtable
-    pSelectedTS = New Hashtable
+    pMatchingTS = New atcTimeseriesGroup
 
     pTimeseriesManager = aTimeseriesManager
     ReDim pcboCriteria(0)
@@ -252,6 +258,11 @@ Friend Class frmSelectTimeseries
     gridSelected.TableStyles(0).GridColumnStyles(0).Width = 0
 
     PopulateMatching()
+
+    'Populate pSelectedTable from selected group
+    For Each ts As atcTimeseries In pSelectedTS
+      AddTStoTable(ts, pSelectedTable)
+    Next
   End Sub
 
   'Private Sub PopulateOperations()
@@ -318,7 +329,7 @@ Friend Class frmSelectTimeseries
           End If
         Next
         'Matched all criteria, add to matching table
-        pMatchingTS.Add(ts.Serial, ts)
+        pMatchingTS.Add(ts)
         AddTStoTable(ts, pMatchingTable)
 NextTS:
       Next
@@ -344,20 +355,6 @@ NextTS:
     If Not sender.SelectedItem Is Nothing Then
       PopulateCriteriaList(sender.SelectedItem, plstCriteria(GetIndex(sender.name)))
     End If
-  End Sub
-
-  Private Sub gridMatching_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles gridMatching.MouseDown
-    Dim lRow As Integer = gridMatching.HitTest(e.X, e.Y).Row
-    Dim lTs As atcData.atcTimeseries = pMatchingTS.Item(CInt(gridMatching.Item(lRow, 0)))
-    If pSelectedTS.ContainsKey(lTs.Serial) Then
-      pSelectedTS.Remove(lTs.Serial)
-      pSelectedTable.Rows.Remove(pSelectedTable.Rows.Find(lTs.Serial))
-    Else
-      pSelectedTS.Add(lTs.Serial, lTs)
-      AddTStoTable(lTs, pSelectedTable)
-    End If
-    groupSelected.Text = "Selected Timeseries (" & pSelectedTable.Rows.Count & " of " & pTotalTS & ")"
-
   End Sub
 
   Private Sub lstCriteria_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -462,12 +459,41 @@ NextName:
     Me.Close()
   End Sub
 
+  Private Sub gridMatching_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles gridMatching.MouseDown
+    Dim lRow As Integer = gridMatching.HitTest(e.X, e.Y).Row
+    If IsNumeric(gridMatching.Item(lRow, 0)) Then 'clicked a row containing a serial number
+      Dim lSerial As Integer = CInt(gridMatching.Item(lRow, 0)) 'Serial number in clicked row
+      Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
+      If iTS >= 0 Then 'Already selected, unselect
+        pSelectedTS.Remove(iTS)
+        pSelectedTable.Rows.Remove(pSelectedTable.Rows.Find(lSerial))
+      Else 'Not already selected, select it now
+        iTS = pMatchingTS.IndexOfSerial(lSerial)
+        If iTS >= 0 Then 'Found matching serial number in pMatchingTS
+          Dim selTS As atcData.atcTimeseries = pMatchingTS(iTS)
+          pSelectedTS.Add(selTS)
+          AddTStoTable(selTS, pSelectedTable)
+        End If
+      End If
+    End If
+
+    groupSelected.Text = "Selected Timeseries (" & pSelectedTable.Rows.Count & " of " & pTotalTS & ")"
+
+  End Sub
+
   Private Sub gridSelected_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles gridSelected.MouseDown
     Dim lRow As Integer = gridSelected.HitTest(e.X, e.Y).Row
-    Dim lTs As atcData.atcTimeseries = pSelectedTS.Item(CInt(gridSelected.Item(lRow, 0)))
-    pSelectedTS.Remove(lTs.Serial)
-    pSelectedTable.Rows.Remove(pSelectedTable.Rows(lRow))
-    groupSelected.Text = "Selected Timeseries (" & pSelectedTable.Rows.Count & " of " & pTotalTS & ")"
+    If IsNumeric(gridSelected.Item(lRow, 0)) Then 'clicked a row containing a serial number
+      Dim lSerial As Integer = CInt(gridSelected.Item(lRow, 0)) 'Serial number in row to be removed
+      Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
+      If iTS >= 0 Then 'Found matching serial number in pSelectedTS
+        pSelectedTS.Remove(iTS)
+        pSelectedTable.Rows.Remove(pSelectedTable.Rows.Find(lSerial))
+        groupSelected.Text = "Selected Timeseries (" & pSelectedTable.Rows.Count & " of " & pTotalTS & ")"
+      Else
+        'TODO: should never reach this line
+      End If
+    End If
   End Sub
 
 End Class
