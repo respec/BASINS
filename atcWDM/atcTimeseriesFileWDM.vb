@@ -145,7 +145,7 @@ Public Class atcTimeseriesFileWDM
   Private Function writeDataHeader(ByRef dataObject As atcTimeseries, Optional ByRef oldID As Integer = -1) As Boolean
     Dim wdmfg, salen, dsn, saind, retcod, i As Integer
     Dim c, S, l, d As String
-    Dim attribs As DataAttributes = dataObject.Attributes
+    Dim attribs As atcDataAttributes = dataObject.Attributes
     Dim lWdmOpen As Integer
 
     lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))

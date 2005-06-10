@@ -118,8 +118,8 @@ Public Class PlugIn
     'mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
 
     g_MapWin.Menus.AddMenu(ModelsMenuName, "", Nothing, ModelsMenuString, ToolsMenuName)
-    mnu = g_MapWin.Menus.AddMenu(ModelsMenuName & "_HSPF", ModelsMenuName, Nothing, "&HSPF")
-    mnu.Tooltip = "Hydrological Simulation Program - Fortran"
+    'mnu = g_MapWin.Menus.AddMenu(ModelsMenuName & "_HSPF", ModelsMenuName, Nothing, "&HSPF")
+    'mnu.Tooltip = "Hydrological Simulation Program - Fortran"
     mnu = g_MapWin.Menus.AddMenu(ModelsMenuName & "_SWAT", ModelsMenuName, Nothing, "&SWAT")
     mnu.Tooltip = "SWAT"
     mnu = g_MapWin.Menus.AddMenu(ModelsMenuName & "_PLOAD", ModelsMenuName, Nothing, "&PLOAD")
@@ -130,7 +130,7 @@ Public Class PlugIn
     mnu.Tooltip = "AQUATOX"
 
     'load HSPF plugin (an integral part of BASINS)
-    g_MapWin.Plugins.StartPlugin("atcHSPF_PlugIn")
+    'g_MapWin.Plugins.StartPlugin("atcHSPF_PlugIn")
 
   End Sub
 
@@ -186,10 +186,10 @@ Public Class PlugIn
     g_MapWin.Menus.Remove(ModelsMenuName & "_PLOAD")
     g_MapWin.Menus.Remove(ModelsMenuName & "_AGWA")
     g_MapWin.Menus.Remove(ModelsMenuName & "_AQUATOX")
-    If Not g_MapWin.Plugins.PluginIsLoaded("HSPF_PlugIn") Then
-      g_MapWin.Menus.Remove(ModelsMenuName & "_HSPF")
-      g_MapWin.Menus.Remove(ModelsMenuName)
-    End If
+    'If Not g_MapWin.Plugins.PluginIsLoaded("HSPF_PlugIn") Then
+    'g_MapWin.Menus.Remove(ModelsMenuName & "_HSPF")
+    'g_MapWin.Menus.Remove(ModelsMenuName)
+    'End If
 
     g_MapWin.Menus.Remove(ProjectsMenuName)
 
