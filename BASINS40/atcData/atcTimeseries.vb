@@ -10,8 +10,8 @@ Public Class atcTimeseries
   Private pSerial As Integer
   Private pNumValues As Integer
   Private pValues() As Double
-  Private pAttributes As DataAttributes
-  Private pValueAttributes() As DataAttributes
+  Private pAttributes As atcDataAttributes
+  Private pValueAttributes() As atcDataAttributes
 
   Public Overrides Function ToString() As String
     Dim id As String = pAttributes.GetValue("id")
@@ -55,22 +55,22 @@ Public Class atcTimeseries
   End Property
 
   'Attributes associated with the whole Timeseries (location, constituent, etc.)
-  Public ReadOnly Property Attributes() As DataAttributes
+  Public ReadOnly Property Attributes() As atcDataAttributes
     Get
       Return pAttributes
     End Get
   End Property
 
   'Attributes associated with individual values (quality flags)
-  Public Property ValueAttributes(ByVal index As Long) As DataAttributes
+  Public Property ValueAttributes(ByVal index As Long) As atcDataAttributes
     Get
       EnsureValuesRead()
       If index >= 0 And index < pNumValues Then
         If pValueAttributes Is Nothing Then 'Need to allocate pValueAttributes
           ReDim pValueAttributes(pNumValues)
         End If
-        If pValueAttributes(index) Is Nothing Then 'Create new DataAttributes for this value
-          pValueAttributes(index) = New DataAttributes(Nothing)
+        If pValueAttributes(index) Is Nothing Then 'Create new atcDataAttributes for this value
+          pValueAttributes(index) = New atcDataAttributes(Nothing)
         End If
         Return pValueAttributes(index)
       Else
@@ -78,7 +78,7 @@ Public Class atcTimeseries
         Return Nothing
       End If
     End Get
-    Set(ByVal newValue As DataAttributes)
+    Set(ByVal newValue As atcDataAttributes)
       EnsureValuesRead()
       If index >= 0 And index < pNumValues Then
         If pValueAttributes Is Nothing Then 'Need to allocate pValueAttributes
@@ -123,7 +123,7 @@ Public Class atcTimeseries
   Public Sub Clear()
     ReDim pValues(0)
     numValues = 0
-    pAttributes = New DataAttributes(Me)
+    pAttributes = New atcDataAttributes(Me)
     If Not pValueAttributes Is Nothing Then
       ReDim pValueAttributes(pNumValues)
     End If

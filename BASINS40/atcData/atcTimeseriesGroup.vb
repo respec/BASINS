@@ -20,19 +20,7 @@ Public Class atcTimeseriesGroup
 
   Public Sub New()
     pTS = New ArrayList
-    pSelectedTS = New atcTimeseriesGroup
   End Sub
-
-  ''The group of atcTimeseries objects
-  ''Do not modify the ArrayList returned, use Add and Remove on the atcTimeseriesGroup
-  'Public Property List() As ArrayList
-  '  Get
-  '    Return pTS
-  '  End Get
-  '  Set(ByVal newValue As ArrayList)
-  '    pTS = newValue
-  '  End Set
-  'End Property
 
   'Get a Timeseries by index
   Default Public Property Item(ByVal index) As atcTimeseries
@@ -127,10 +115,14 @@ Public Class atcTimeseriesGroup
     Remove(removeList)
   End Sub
 
-  Public ReadOnly Property SelectedTimeseries() As atcTimeseriesGroup
+  Public Property SelectedTimeseries() As atcTimeseriesGroup
     Get
+      If pSelectedTS Is Nothing Then pSelectedTS = New atcTimeseriesGroup
       Return pSelectedTS
     End Get
+    Set(ByVal newValue As atcTimeseriesGroup)
+      pSelectedTS = newValue
+    End Set
   End Property
 
   Public Overrides Function ToString() As String

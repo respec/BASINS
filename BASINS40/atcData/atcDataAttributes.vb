@@ -1,5 +1,5 @@
 'Store attributes (and calculate some attributes if given an atcTimeseries)
-Public Class DataAttributes
+Public Class atcDataAttributes
   Private pOwner As atcTimeseries
   Private pAttributes As Hashtable         'of atcDefinedValue
   Private Shared pAliases As Hashtable     'of String, so more than one AttributeName can map to the same attribute
