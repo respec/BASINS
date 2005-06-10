@@ -112,16 +112,17 @@ Public Class atcDataAttributes
     If pAliases Is Nothing Then
       pAliases = New Hashtable 'of alias and internal name
       With pAliases
+        .Add("sen", "Scenario")
         .Add("scen", "Scenario")
         .Add("idscen", "Scenario")
-        .Add("sen", "Scenario")
 
+        .Add("loc", "Location")
         .Add("locn", "Location")
         .Add("idlocn", "Location")
-        .Add("loc", "Location")
 
         .Add("con", "Constituent")
         .Add("cons", "Constituent")
+        .Add("idcons", "Constituent")
 
         .Add("desc", "Description")
         .Add("stanam", "Description")
