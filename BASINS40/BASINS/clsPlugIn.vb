@@ -31,7 +31,10 @@ Public Class PlugIn
 
   Private pNationalDataDir As String = ""
   Private pLogFilename As String = ""
-  Private pTimeseriesManager As atcTimeseriesManager
+  Private WithEvents pTimeseriesManager As atcTimeseriesManager
+
+  Private pBusy As Integer = 0 'Incremented by setting Busy = True, decremented by setting Busy = False
+  Private pBeforeBusyCursor As MapWinGIS.tkCursor
 
   Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
     'This is the name that appears in the Plug-ins menu
@@ -82,7 +85,7 @@ Public Class PlugIn
 
     g_MapWin = aMapWin
 
-    pTimeseriesManager = New atcTimeseriesManager(g_MapWin)
+    pTimeseriesManager = New atcTimeseriesManager(g_MapWin, Me)
     FindBasinsDrives()
 
     'g_MapWin.Menus.AddMenu(NewProjectMenuName, "mnuFile", Nothing, NewProjectMenuString, "mnuNew")
@@ -139,7 +142,8 @@ Public Class PlugIn
       .AddMenu(DataMenuName, "", Nothing, DataMenuString, "mnuFile")
       mnu = .AddMenu(DataMenuName & "_Download", DataMenuName, Nothing, "&Download")
       'mnu = .AddMenu(DataMenuName & "_DownloadTest", DataMenuName, Nothing, "Download &Test")
-      mnu = .AddMenu(DataMenuName & "_OpenTimeseries", DataMenuName, Nothing, "Open Timeseries File")
+      'mnu = .AddMenu(DataMenuName & "_OpenTimeseries", DataMenuName, Nothing, "Open Timeseries File")
+      mnu = .AddMenu(DataMenuName & "_ManageTimeseries", DataMenuName, Nothing, "Manage Timeseries Files")
       'mnu = .AddMenu(DataMenuName & "_SelectTimeseries", DataMenuName, Nothing, "Select Timeseries")
       'With g_MapWin.Plugins
       '  For iPlugin = 0 To .Count - 1
@@ -164,7 +168,8 @@ Public Class PlugIn
 
     g_MapWin.Menus.Remove(DataMenuName & "_Download")
     'g_MapWin.Menus.Remove(DataMenuName & "_DownloadTest")
-    g_MapWin.Menus.Remove(DataMenuName & "_OpenTimeseries")
+    'g_MapWin.Menus.Remove(DataMenuName & "_OpenTimeseries")
+    g_MapWin.Menus.Remove(DataMenuName & "_ManageTimeseries")
     'g_MapWin.Menus.Remove(DataMenuName & "_SelectTimeseries")
     g_MapWin.Menus.Remove(DataMenuName)
 
@@ -290,16 +295,10 @@ Public Class PlugIn
           Else
             DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
           End If
-        Case "OpenTimeseries"
-          Dim FileFilter As String = pTimeseriesManager.FileFilters
-          Dim FileFilterIndex As Integer = 1
-          Dim FileToOpen As String = FindFile("Select data file to open", , , FileFilter, True, , FileFilterIndex)
-          If FileExists(FileToOpen) Then
-            OpenDataFile(FileToOpen, FindFileFilter(FileFilter, FileFilterIndex))
-          End If
-          'Case "SelectTimeseries"
-          '  Dim frmTS As New frmSelectTimeseries
-          '  MsgBox(frmTS.AskUser(pTimeseriesManager).Count)
+          'Case "OpenTimeseries"
+          '  pTimeseriesManager.Open("")
+        Case "ManageTimeseries"
+          pTimeseriesManager.UserManage()
         Case Else : MsgBox("Data Tool " & ItemName)
       End Select
       Handled = True
@@ -312,38 +311,29 @@ Public Class PlugIn
     End If
   End Sub
 
-  'Given a set of file filters as used by common dialog, return the filter with the given index
-  ' FileFilters("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1) = "WDM Files (*.wdm)|*.wdm"
-  Private Function FindFileFilter(ByVal FileFilters As String, ByVal FileFilterIndex As Integer)
-    Dim prevPipe As Integer = 0
-    Dim pipePos As Integer
-
-    'Find pipe symbol before desired filter, or start of string
-    While FileFilterIndex > 1
-      pipePos = FileFilters.IndexOf("|", prevPipe + 1)
-      If pipePos > 0 Then
-        prevPipe = pipePos
-        pipePos = FileFilters.IndexOf("|", prevPipe + 1)
-        If pipePos > 0 Then
-          prevPipe = pipePos
+  Public Property Busy() As Boolean
+    Get
+      If pBusy > 0 Then Return True Else Return False
+    End Get
+    Set(ByVal newValue As Boolean)
+      If newValue Then
+        pBusy += 1
+        If pBusy = 1 Then 'We just became busy, so set the main cursor
+          g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrWait
+        End If
+      Else
+        pBusy -= 1
+        If pBusy = 0 Then 'Not busy any more, set cursor back to default
+          g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrMapDefault
         End If
       End If
-      FileFilterIndex -= 1
-    End While
+    End Set
+  End Property
 
-    'Find pipe symbol after desired filter, or end of string
-    pipePos = FileFilters.IndexOf("|", prevPipe + 1)
-    If pipePos > 0 Then pipePos = FileFilters.IndexOf("|", pipePos + 1)
-    If pipePos < 0 Then pipePos = FileFilters.Length + 1
-
-    FindFileFilter = FileFilters.Substring(prevPipe + 1, pipePos - prevPipe - 2)
-  End Function
-
-  Sub OpenDataFile(ByVal aFileName As String, Optional ByVal aFileFilter As String = "")
+  Private Sub pTimeseriesManager_OpenedFile(ByVal aFile As atcData.atcTimeseriesFile) Handles pTimeseriesManager.OpenedFile
     Dim s As String
     Dim i As Integer
     Dim lDebugFile As String = "c:\test\BASINS4\wdmFileDump.txt"
-    Dim lFile As atcTimeseriesFile
     Dim lAttributeDetailsShow As Boolean
     Dim lNvals As Integer
     Dim lDataset As atcTimeseries
@@ -351,15 +341,13 @@ Public Class PlugIn
     g_MapWin.StatusBar.ProgressBarValue = 5
     g_MapWin.StatusBar.ShowProgressBar = True
 
-    lFile = pTimeseriesManager.Open(aFileName, aFileFilter)
-
     g_MapWin.StatusBar.ProgressBarValue = 50
 
-    s = aFileName & " contains " & lFile.Timeseries.Count() & " datasets" & vbCrLf & vbCrLf
+    s = aFile.FileName & " contains " & aFile.Timeseries.Count() & " datasets" & vbCrLf & vbCrLf
     SaveFileString(lDebugFile, s)
 
     lAttributeDetailsShow = True
-    For Each lDataset In lFile.Timeseries
+    For Each lDataset In aFile.Timeseries
       lNvals = lDataset.numValues
       s = "DSN " & lDataset.Attributes.GetValue("id") & " contains " & lNvals & " values" & vbCrLf
       For Each lAttribute As DictionaryEntry In lDataset.Attributes.GetAll
@@ -390,7 +378,7 @@ Public Class PlugIn
     gForm.Pane.XAxis.Type = ZedGraph.AxisType.Date
     gForm.Pane.XAxis.MajorUnit = ZedGraph.DateUnit.Day
     gForm.Pane.XAxis.MinorUnit = ZedGraph.DateUnit.Hour
-    atcGraphTime.AddDatasetTimeseries(gForm.Pane, aDataset, aDataset.Attributes.GetValue("id"))
+    gForm.AddDatasetTimeseries(aDataset, aDataset.Attributes.GetValue("id"))
     gForm.Pane.AxisChange(gForm.CreateGraphics)
 
   End Sub
@@ -406,10 +394,10 @@ Public Class PlugIn
       Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
       Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
       Case "HSPF"
-        If g_MapWin.Plugins.PluginIsLoaded("atcHSPF_PlugIn") Then 'defer to other plugin
-          Return False
-        End If
-        exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
+        'If g_MapWin.Plugins.PluginIsLoaded("atcModelSetup_PlugIn") Then 'defer to other plugin
+        Return False
+        'End If
+        'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
       Case "RunScript"
         exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
         If FileExists(exename) Then
@@ -552,6 +540,9 @@ Public Class PlugIn
     'separate database for each project (i.e. one database for the upper Missouri River Basin, a different 
     'one for the Lower Colorado Basin.) In this case, the plug-in would store the database name in the 
     'SettingsString of the project. 
+    Dim newXML As New Chilkat.Xml
+    newXML.LoadXml(SettingsString)
+    pTimeseriesManager.XML = newXML.FindChild("TimeseriesManager")
   End Sub
 
   Public Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
@@ -562,6 +553,10 @@ Public Class PlugIn
     'separate database for each project (i.e. one database for the upper Missouri River Basin, a different 
     'one for the Lower Colorado Basin.) In this case, the plug-in would store the database name in the 
     'SettingsString of the project. 
+    Dim saveXML As New Chilkat.Xml
+    saveXML.Tag = "BASINS"
+    saveXML.AddChildTree(pTimeseriesManager.XML)
+    SettingsString = saveXML.GetXml
   End Sub
 
   Public Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected

@@ -2,7 +2,7 @@ Public Class atcTimeseriesFile
   Inherits atcDataPlugin
 
   Private pFileName As String
-  Private pTimeseries As ArrayList 'of atcTimeseries
+  Private pTimeseries As atcTimeseriesGroup
 
   Public Enum EnumExistAction
     ExistNoAction = 0
@@ -32,7 +32,7 @@ Public Class atcTimeseriesFile
   End Property
 
   'The atcTimeseries objects in this file
-  Public Overridable ReadOnly Property Timeseries() As ArrayList
+  Public Overridable ReadOnly Property Timeseries() As atcTimeseriesGroup
     Get
       Return pTimeseries
     End Get
@@ -72,13 +72,17 @@ Public Class atcTimeseriesFile
     Err.Raise(0, Me, "Save must be overridden to be used, atcTimeseriesFile does not implement.")
   End Function
 
-  Private Function AddTimeseries(ByRef t As atcTimeseries, _
-                        Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
-    If Not pTimeseries.Contains(t) Then pTimeseries.Add(t)
+  Public Overridable Function AddTimeseries(ByRef t As atcTimeseries, _
+                       Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+    If pTimeseries.Contains(t) Then
+      Return False 'can't add, already have it
+    Else
+      pTimeseries.Add(t)
+      Return True
+    End If
   End Function
 
   Public Sub New()
-    pTimeseries = Nothing
-    pTimeseries = New ArrayList
+    pTimeseries = New atcTimeseriesGroup
   End Sub
 End Class

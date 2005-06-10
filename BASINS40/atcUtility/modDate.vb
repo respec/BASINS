@@ -12,23 +12,30 @@ Public Module modDate
   Public Const JulianMinute As Double = 1 / 1440
   '##GLOBAL JulianSecond - one second as fraction of a day
   Public Const JulianSecond As Double = 1 / 86400
+
   'When doing math on months and years, it is more accurate to use timdif and timadd in UtilDateExt
   '##GLOBAL JulianMonth - estimate of month as number of days
   Public Const JulianMonth As Double = 30.44
   '##GLOBAL JulianYear - estimate of year as number of days
   Public Const JulianYear As Double = 365.25
 
+  'Julian days from actual year zero to modified Julian day we use as zero
+  Private Const JulianModification1858 As Integer = 679006 '17 Nov 1858
+  Private Const JulianModification1899 As Integer = 694024 '30 Dec 1899
+  'This is the offset we actually use
+  Public Const JulianModification As Integer = JulianModification1899
+
   Public Function VBdate2MJD(ByVal d As Date) As Double
     '##SUMMARY VBdate2MJD - convert a VB date to a modfied Julian date(MJD), _
     'VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858
     '##PARAM d - VBdate to convert
-    VBdate2MJD = d.ToOADate + 15018.0#
+    VBdate2MJD = d.ToOADate + JulianModification1899 - JulianModification
   End Function
 
   Public Function MJD2VBdate(ByVal j As Double) As Date
     '##SUMMARY MJD2VBdate - convert a modified Julian date(MJD) to a VB date
     '##PARM j - MJD to convert
-    MJD2VBdate = System.DateTime.FromOADate(j - 15018.0#)
+    MJD2VBdate = System.DateTime.FromOADate(j + JulianModification - JulianModification1899)
   End Function
 
   'Decimal-aligns numbers by padding before and/or after number with spaces
@@ -158,7 +165,7 @@ Public Module modDate
     '##LOCAL Z - intermediate result
 
     'convert to Julian time plus the .5 day correction. yields an integer
-    Z = MJD + 679006 + 1720994 + 1
+    Z = MJD + JulianModification + 1720994 + 1
 
     If (Z < 2299161) Then
       a = Z
@@ -217,7 +224,7 @@ Public Module modDate
     a = Int(y / 100)
     b = 2 - a + Int(a / 4)
 
-    MJD = Int((36525 * y) / 100) + Int(30.6001 * (m + 1)) + dy + b - 679006
+    MJD = Int((36525 * y) / 100) + Int(30.6001 * (m + 1)) + dy + b - JulianModification
   End Function
 
   Function Jday(ByVal yr As Integer, ByVal mo As Integer, ByVal dy As Integer, ByVal hr As Integer, ByVal mn As Integer, ByVal sc As Integer) As Double
@@ -363,6 +370,7 @@ Public Module modDate
     'UPGRADE_WARNING: Couldn't resolve default property of object s
     DumpDate = s & ":" & j & ":" & d(0) & "/" & d(1) & "/" & d(2) & " " & d(3) & ":" & d(4) & ":" & d(5)
   End Function
+
   Public Sub DTMCMN(ByVal sdates() As Integer, ByVal edates() As Integer, _
                     ByVal TSTEP() As Integer, ByVal TCODE() As Integer, _
                     ByRef sdat() As Integer, ByRef edat() As Integer, _
@@ -682,7 +690,8 @@ Public Module modDate
   End Sub
 
   Public Function TimAddJ(ByVal jStartDate As Double, _
-                          ByVal TCODE As Integer, ByVal TSTEP As Integer, _
+                          ByVal TCODE As Integer, _
+                          ByVal TSTEP As Integer, _
                           ByVal NVALS As Integer) As Double
     Dim DATE1(6) As Integer
     Dim DATE2(6) As Integer

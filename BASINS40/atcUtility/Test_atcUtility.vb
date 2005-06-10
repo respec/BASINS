@@ -4,7 +4,9 @@ Option Explicit On
 
 Imports NUnit.Framework
 Imports atcUtility.modReflection
- 
+
+Imports System.Drawing
+
 <TestFixture()> Public Class Test_Builder
   Public Sub TestsAllPresent()
     Dim lTestBuildStatus As String
@@ -714,8 +716,9 @@ End Class
 <TestFixture()> Public Class Test_modDate
   Private d(6) As Integer
   Private dS As String
-  Private dJ As Double = 53509.43264
+  Private dJ As Double = 38491.4326388889
   Private dX As Double = 0.00001
+  Private dVB As Date
 
   <TestFixtureSetUp()> Public Sub init()
     d(0) = 2005
@@ -727,14 +730,15 @@ End Class
     dS = Format(d(0), "0000") & "/" & Format(d(1), "00") & "/" & _
          Format(d(2), "00") & " " & Format(d(3), "00") & ":" & _
          Format(d(4), "00")
+    dVB = New Date(d(0), d(1), d(2), d(3), d(4), d(5))
   End Sub
 
   Public Sub TestVBdate2MJD()
-    Assert.AreEqual(dJ, VBdate2MJD(dS), dX)
+    Assert.AreEqual(dJ, VBdate2MJD(dVB), dX)
   End Sub
 
   Public Sub TestMJD2VBdate()
-    Assert.AreEqual(dS, Format(MJD2VBdate(dJ), "yyyy/MM/dd hh:mm"))
+    Assert.AreEqual(dVB.Ticks, MJD2VBdate(dJ).Ticks)
   End Sub
 
   Public Sub TestATCformat()
@@ -953,6 +957,10 @@ End Class
     Next
   End Sub
 
+  Public Sub TestFindFileFilter()
+    Assert.AreEqual(FindFileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1), "WDM Files (*.wdm)|*.wdm")
+  End Sub
+
   Public Sub TestAbsolutePath()
     Assert.AreEqual(AbsolutePath("..\Data\DataFile.wdm", "C:\BASINS\models"), "C:\BASINS\Data\DataFile.wdm")
   End Sub
@@ -972,7 +980,7 @@ End Class
 
   Public Sub TestReplaceStringToFile()
     Dim lf As String = "c:\test\atcUtility\data\stringToFile.txt"
-    ReplaceStringToFile("He left", "He", "She", lF)
+    ReplaceStringToFile("He left", "He", "She", lf)
     Assert.AreEqual("She left", WholeFileString(lf))
     Kill(lf)
   End Sub
@@ -1468,19 +1476,22 @@ End Class
   End Sub
 
   Public Sub TestGetMatchingColor()
-    Assert.AreEqual(&HFF0000, GetMatchingColor("OBSERVED::"), "Fail to Match Blue")
+    Assert.AreEqual(Color.Blue.ToArgb, GetMatchingColor("OBSERVED::").ToArgb, "Fail to Match OBSERVED Blue")
+    Assert.AreEqual(Color.Red.ToArgb, GetMatchingColor("SIMULATED::").ToArgb, "Fail to Match SIMULATED Red")
   End Sub
 
   Public Sub TestTextOrNumericColor()
-    Assert.AreEqual(&HFF, TextOrNumericColor("red"), "Fail to Match Red")
-    Assert.AreEqual(&HFF, TextOrNumericColor("255"), "Fail to Match Red as 255")
-    Assert.AreEqual(&HFF0000, TextOrNumericColor("blue"), "Fail to Match Blue")
-    Assert.AreEqual(&HFF00, TextOrNumericColor("green"), "Fail to Match Green")
+    Dim lRed As Color = Color.Red
+    Dim lGot As Color
+    Assert.AreEqual(lRed.ToArgb, TextOrNumericColor("red").ToArgb, "Fail to Match Red")
+    Assert.AreEqual(lRed.ToArgb, TextOrNumericColor(lRed.ToArgb).ToArgb, "Fail to Match Red as ARGB")
+    Assert.AreEqual(Color.Green.ToArgb, TextOrNumericColor("green").ToArgb, "Fail to Match Green")
+    Assert.AreEqual(Color.Blue.ToArgb, TextOrNumericColor("blue").ToArgb, "Fail to Match Blue")
   End Sub
 
   Public Sub TestcolorName()
-    Assert.AreEqual("red", colorName(System.Drawing.Color.Red).ToLower, "Fail to Match Red")
-    Assert.AreEqual("cyan", colorName(System.Drawing.Color.Cyan).ToLower, "Fail to Match Cyan")
+    Assert.AreEqual("red", colorName(Color.Red).ToLower, "Fail to Match Red")
+    Assert.AreEqual("cyan", colorName(Color.Cyan).ToLower, "Fail to Match Cyan")
   End Sub
 
   Public Sub TestGetHashCode()
@@ -1499,6 +1510,85 @@ End Class
 
   Public Sub TestGetType()
     'not applicable
+  End Sub
+
+End Class
+
+<TestFixture()> Public Class Test_atcCollection
+
+  Public Sub TestGetEnumerator()
+    'GetEnumerator()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestGetHashCode()
+    'GetHashCode()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestEquals()
+    'Equals()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestToString()
+    'ToString()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestAdd()
+    'Add()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestClear()
+    'Clear()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_Count()
+    'get_Count()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestItemByIndex()
+    'ItemByIndex()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestIndexFromKey()
+    'IndexFromKey()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestIndexFromValue()
+    'IndexFromValue()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestKeyByIndex()
+    'KeyByIndex()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestRemoveByIndex()
+    'RemoveByIndex()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestRemoveByKey()
+    'RemoveByKey()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestRemoveByValue()
+    'RemoveByValue()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestGetType()
+    'GetType()
+    Assert.Ignore("Test not yet written")
   End Sub
 
 End Class

@@ -61,7 +61,11 @@ Public Module modFile
     ' ##SUMMARY   Example: PathNameOnly ("C:\foo\bar.txt") = "C:\foo"
     ' ##PARAM istr I Filename with path and extension.
     ' ##RETURNS Directory path without filename or extension.
-    Return System.IO.Path.GetDirectoryName(istr)
+    Try
+      Return System.IO.Path.GetDirectoryName(istr)
+    Catch e As Exception
+      Return ""
+    End Try
   End Function
 
   Public Function FilenameSetExt(ByRef istr As String, ByRef newExt As String) As String
@@ -523,6 +527,33 @@ NoSuchFile:
 
     Return lFileName
 
+  End Function
+
+  'Given a set of file filters as used by common dialog, return the filter with the given index
+  ' FileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1) = "WDM Files (*.wdm)|*.wdm"
+  Public Function FindFileFilter(ByVal FileFilters As String, ByVal FileFilterIndex As Integer)
+    Dim prevPipe As Integer = 0
+    Dim pipePos As Integer
+
+    'Find pipe symbol before desired filter, or start of string
+    While FileFilterIndex > 1
+      pipePos = FileFilters.IndexOf("|", prevPipe + 1)
+      If pipePos > 0 Then
+        prevPipe = pipePos
+        pipePos = FileFilters.IndexOf("|", prevPipe + 1)
+        If pipePos > 0 Then
+          prevPipe = pipePos
+        End If
+      End If
+      FileFilterIndex -= 1
+    End While
+
+    'Find pipe symbol after desired filter, or end of string
+    pipePos = FileFilters.IndexOf("|", prevPipe + 1)
+    If pipePos > 0 Then pipePos = FileFilters.IndexOf("|", pipePos + 1)
+    If pipePos < 0 Then pipePos = FileFilters.Length + 1
+
+    FindFileFilter = FileFilters.Substring(prevPipe + 1, pipePos - prevPipe - 2)
   End Function
 
 End Module

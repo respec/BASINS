@@ -1,30 +1,32 @@
+Imports atcData
+Imports atcUtility
+
+Imports ZedGraph
+
 Imports System
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
 Imports System.Collections
 Imports System.ComponentModel
 Imports System.Windows.Forms
-Imports ZedGraph
 
 Public Class atcGraphForm
   Inherits System.Windows.Forms.Form
 
-  'Private pMaster As ZedGraph.MasterPane
+  'Form object that contains graph(s)
+  Private pMaster As ZedGraph.MasterPane
 
-  'Private pGraphPane As GraphPane
+  'All the currently open files
   Private pTimeseriesManager As atcData.atcTimeseriesManager
+
+  'Graph editing form
   Private WithEvents pEditor As atcGraphEdit
 
+  'The group of atcTimeseries displayed on the graph
+  Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
+
   Private Sub InitMasterPane()
-    'pGraphPane = New GraphPane(New RectangleF(10, 10, 10, 10), "", "", "")
-
-    'pGraphPane.XAxis.Type = ZedGraph.AxisType.Date
-    'pGraphPane.XAxis.MajorUnit = ZedGraph.DateUnit.Day
-    'pGraphPane.XAxis.MinorUnit = ZedGraph.DateUnit.Hour
-    ''atcGraphTime.AddDatasetTimeseries(pGraphPane, t, "Test")
-    'pGraphPane.AxisChange(Me.CreateGraphics)
-
-    Dim pMaster As MasterPane = zgc.MasterPane
+    pMaster = zgc.MasterPane
     pMaster.PaneList.Clear() 'remove default GraphPane
     'pMaster.PaneFill = New Fill(Color.White, Color.MediumSlateBlue, 45.0F)
     pMaster.Legend.IsVisible = False
@@ -52,6 +54,7 @@ Public Class atcGraphForm
     InitializeComponent() 'required by Windows Form Designer
     InitMasterPane()
     Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
+    mnuFileAdd_Click(Nothing, Nothing)
   End Sub
 
   'Required by the Windows Form Designer
@@ -208,121 +211,10 @@ Public Class atcGraphForm
     End Get
   End Property
 
-  'Public Sub Demo()
-  '  Me.Show()
-  '  pGraphPane.Title = "Wacky Widget Company" & vbCr & "Production Report"
-  '  pGraphPane.XAxis.Title = "Time, Days" & vbCr & "(Since Plant Construction Startup)"
-  '  pGraphPane.YAxis.Title = "Widget Production" & vbCr & "(units/hour)"
-  '  Dim x As Double() = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000}
-  '  Dim y As Double() = {20, 10, 50, 25, 35, 75, 90, 40, 33, 50}
-  '  Dim curve As LineItem
-  '  curve = pGraphPane.AddCurve("Larry", x, y, Color.Green, SymbolType.Circle)
-  '  curve.Line.Width = 1.5F
-  '  curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
-  '  curve.Line.IsSmooth = True
-  '  curve.Line.SmoothTension = 0.6F
-  '  curve.Symbol.Fill = New Fill(Color.White)
-  '  curve.Symbol.Size = 10
-  '  Dim x3 As Double() = {150, 250, 400, 520, 780, 940}
-  '  Dim y3 As Double() = {5.2, 49, 33.8, 88.57, 99.9, 36.8}
-  '  curve = pGraphPane.AddCurve("Moe", x3, y3, Color.FromArgb(200, 55, 135), SymbolType.Triangle)
-  '  curve.Line.Width = 1.5F
-  '  curve.Symbol.Fill = New Fill(Color.White)
-  '  curve.Line.Fill = New Fill(Color.White, Color.FromArgb(160, 230, 145, 205), 90.0F)
-  '  curve.Symbol.Size = 10
-  '  Dim x4 As Double() = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000}
-  '  Dim y4 As Double() = {30, 45, 53, 60, 75, 83, 84, 79, 71, 57}
-  '  Dim bar As BarItem = pGraphPane.AddBar("Wheezy", x4, y4, Color.SteelBlue)
-  '  bar.Bar.Fill = New Fill(Color.RosyBrown, Color.White, Color.RosyBrown)
-  '  pGraphPane.ClusterScaleWidth = 100
-  '  pGraphPane.BarType = BarType.Stack
-  '  Dim x2 As Double() = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000}
-  '  Dim y2 As Double() = {10, 15, 17, 20, 25, 27, 29, 26, 24, 18}
-  '  bar = pGraphPane.AddBar("Curly", x2, y2, Color.RoyalBlue)
-  '  bar.Bar.Fill = New Fill(Color.RoyalBlue, Color.White, Color.RoyalBlue)
-  '  pGraphPane.ClusterScaleWidth = 100
-  '  pGraphPane.PaneFill = New Fill(Color.WhiteSmoke, Color.Lavender, 0.0F)
-  '  pGraphPane.AxisFill = New Fill(Color.FromArgb(255, 255, 245), Color.FromArgb(255, 255, 190), 90.0F)
-  '  pGraphPane.XAxis.IsShowGrid = True
-  '  pGraphPane.YAxis.IsShowGrid = True
-  '  pGraphPane.YAxis.Max = 120
-  '  Dim text As TextItem = New TextItem("First Prod" & Microsoft.VisualBasic.Chr(10) & "21-Oct-93", 175.0F, 80.0F)
-  '  text.Location.AlignH = AlignH.Center
-  '  text.Location.AlignV = AlignV.Bottom
-  '  text.FontSpec.Fill = New Fill(Color.White, Color.PowderBlue, 45.0F)
-  '  pGraphPane.GraphItemList.Add(text)
-  '  Dim arrow As ArrowItem = New ArrowItem(Color.Black, 12.0F, 175.0F, 77.0F, 100.0F, 45.0F)
-  '  arrow.Location.CoordinateFrame = CoordType.AxisXYScale
-  '  pGraphPane.GraphItemList.Add(arrow)
-  '  text = New TextItem("Upgrade", 700.0F, 50.0F)
-  '  text.FontSpec.Angle = 90
-  '  text.FontSpec.FontColor = Color.Black
-  '  text.Location.AlignH = AlignH.Right
-  '  text.Location.AlignV = AlignV.Center
-  '  text.FontSpec.Fill.IsVisible = False
-  '  text.FontSpec.Border.IsVisible = False
-  '  pGraphPane.GraphItemList.Add(text)
-  '  arrow = New ArrowItem(Color.Black, 15, 700, 53, 700, 80)
-  '  arrow.Location.CoordinateFrame = CoordType.AxisXYScale
-  '  arrow.PenWidth = 2.0F
-  '  pGraphPane.GraphItemList.Add(arrow)
-  '  text = New TextItem("Confidential", 0.85F, -0.03F)
-  '  text.Location.CoordinateFrame = CoordType.AxisFraction
-  '  text.FontSpec.Angle = 15.0F
-  '  text.FontSpec.FontColor = Color.Red
-  '  text.FontSpec.IsBold = True
-  '  text.FontSpec.Size = 16
-  '  text.FontSpec.Border.IsVisible = False
-  '  text.FontSpec.Border.Color = Color.Red
-  '  text.FontSpec.Fill.IsVisible = False
-  '  text.Location.AlignH = AlignH.Left
-  '  text.Location.AlignV = AlignV.Bottom
-  '  pGraphPane.GraphItemList.Add(text)
-  '  Dim box As BoxItem = New BoxItem(New RectangleF(0, 110, 1200, 10), Color.Empty, Color.FromArgb(225, 245, 225))
-  '  box.Location.CoordinateFrame = CoordType.AxisXYScale
-  '  box.Location.AlignH = AlignH.Left
-  '  box.Location.AlignV = AlignV.Top
-  '  box.ZOrder = ZOrder.E_BehindAxis
-  '  pGraphPane.GraphItemList.Add(box)
-  '  text = New TextItem("Peak Range", 1170, 105)
-  '  text.Location.CoordinateFrame = CoordType.AxisXYScale
-  '  text.Location.AlignH = AlignH.Right
-  '  text.Location.AlignV = AlignV.Center
-  '  text.FontSpec.IsItalic = True
-  '  text.FontSpec.IsBold = False
-  '  text.FontSpec.Fill.IsVisible = False
-  '  text.FontSpec.Border.IsVisible = False
-  '  pGraphPane.GraphItemList.Add(text)
-  '  pGraphPane.AxisChange(Me.CreateGraphics)
-  'End Sub
-
-  'Private Sub Graph_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-  '  SetSize()
-  'End Sub
-
-  'Private Sub Graph_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles MyBase.Paint
-  '  'pGraphPane.Draw(e.Graphics)
-  '  pMaster.Draw(e.Graphics)
-  'End Sub
-
-  'Private Sub Graph_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-  '  SetSize()
-  '  Invalidate()
-  'End Sub
-
-  'Private Sub SetSize()
-  '  Dim paneRect As RectangleF = New RectangleF(Me.ClientRectangle.X, Me.ClientRectangle.Y, Me.ClientRectangle.Width, Me.ClientRectangle.Height)
-  '  'Me.pGraphPane.PaneRect = paneRect
-  '  zgc.MasterPane.PaneRect = paneRect
-  '  zgc.MasterPane.AutoPaneLayout(Me.CreateGraphics, PaneLayout.SingleColumn)
-
-  'End Sub
-
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    Dim frmSelect As New atcData.frmSelectTimeseries
-    Dim SelectedTS As ICollection = frmSelect.AskUser(pTimeseriesManager)
+    Dim SelectedTS As ICollection = pTimeseriesManager.UserSelectTimeseries("Select Timeseries to Add to Graph")
     For Each t As atcData.atcTimeseries In SelectedTS
-      atcGraphTime.AddDatasetTimeseries(Me.Pane, t, t.ToString())
+      AddDatasetTimeseries(t, t.ToString())
     Next
     zgc.AxisChange()
     Invalidate()
@@ -330,44 +222,43 @@ Public Class atcGraphForm
   End Sub
 
   Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
+    Dim printdlg As New PrintDialog
+    Dim printdoc As New Printing.PrintDocument
+    AddHandler printdoc.PrintPage, AddressOf Me.PrintPage
 
+    printdlg.Document = printdoc
+    printdlg.AllowSelection = False
+    printdlg.ShowHelp = True
+
+    ' If the result is OK then print the document.
+    If (printdlg.ShowDialog = DialogResult.OK) Then
+      Dim saveRect As RectangleF = Pane.PaneRect
+      printdoc.Print()
+      ' Restore graph size to fit form's bounds. 
+      Pane.ReSize(Me.CreateGraphics, saveRect)
+    End If
   End Sub
 
-  ''' <summary> Prints the displayed graph. </summary> 
-  ''' <param name="sender"> Object raising this event. </param> 
-  ''' <param name="e"> Event arguments passing graphics context to print to. </param> 
-  'Private Sub docPrinter_PrintPage(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintPageEventArgs) Handles docPrinter.PrintPage
-  '  Dim sBuf As String
+  '' <summary> Prints the displayed graph. </summary> 
+  '' <param name="sender"> Object raising this event. </param> 
+  '' <param name="e"> Event arguments passing graphics context to print to. </param> 
+  Private Sub PrintPage(ByVal sender As System.Object, ByVal e As Printing.PrintPageEventArgs)
+    Dim sBuf As String
 
-  '  ' Validate. 
-  '  If (e Is Nothing) Then Return
-  '  If (e.Graphics Is Nothing) Then Return
+    ' Validate. 
+    If (e Is Nothing) Then Return
+    If (e.Graphics Is Nothing) Then Return
 
-  '  ' Resize the graph to fit the printout. 
-  '  ' Store current graph size into Tag so as to change it back at end of print job. 
-  '  pGraphPane.Tag = pGraphPane.PaneRect
-  '  With e.MarginBounds
-  '    pGraphPane.ReSize(e.Graphics, New RectangleF(.X, .Y, .Width, .Height))
-  '  End With
+    ' Resize the graph to fit the printout. 
+    With e.MarginBounds
+      Pane.ReSize(e.Graphics, New RectangleF(.X, .Y, .Width, .Height))
+    End With
 
-  '  ' Print the graph. 
-  '  pGraphPane.Draw(e.Graphics)
+    ' Print the graph. 
+    Pane.Draw(e.Graphics)
 
-  '  ' Setting this FALSE ends the print job. 
-  '  e.HasMorePages = False
-  'End Sub
-
-  '''' <summary> Called at end of print job. Restores graph pane size. </summary> 
-  '''' <param name="sender"> Object raising this event. </param> 
-  '''' <param name="e"> Event arguments passing printer information. </param> 
-  'Private Sub docPrinter_EndPrint()
-  '  ' Restore graph size to fit form's bounds. 
-  '  If (Not (pGraphPane.Tag Is Nothing)) Then
-  '    pGraphPane.ReSize(chtMain.CreateGraphics, _
-  '    DirectCast(pGraphPane.Tag, RectangleF))
-  '    pGraphPane.Tag = Nothing
-  '  End If
-  'End Sub
+    e.HasMorePages = False 'ends the print job
+  End Sub
 
   Private Sub pEditor_Apply() Handles pEditor.Apply
     zgc.AxisChange()
@@ -393,5 +284,28 @@ Public Class atcGraphForm
   Private Sub mnuEditY_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY.Click
     pEditor = New atcGraphEdit
     pEditor.Edit(zgc.GraphPane.YAxis)
+  End Sub
+
+  Public Sub AddDatasetTimeseries(ByVal t As atcTimeseries, ByVal CurveLabel As String)
+    Dim curveColor As Color = GetMatchingColor(t.Attributes.GetValue("scenario"))
+    Dim curve As LineItem
+
+    curve = Pane.AddCurve(CurveLabel, t.Dates.Values, t.Values, curveColor, SymbolType.None)
+    curve.Line.Width = 1
+    curve.Line.StepType = StepType.ForwardStep
+    If Pane.CurveList.Count > 1 Then curve.IsY2Axis = True
+    'curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
+    'curve.Line.IsSmooth = True
+    'curve.Line.SmoothTension = 0.6F
+    'curve.Symbol.Fill = New Fill(Color.White)
+    'curve.Symbol.Size = 10
+    'curve.Symbol.IsVisible = False
+
+  End Sub
+
+  Private Sub pTimeseriesGroup_Added(ByVal aAdded As System.Collections.ArrayList) Handles pTimeseriesGroup.Added
+    For Each ts As atcTimeseries In aAdded
+      AddDatasetTimeseries(ts, ts.ToString)
+    Next
   End Sub
 End Class

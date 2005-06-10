@@ -281,8 +281,9 @@ Cntinu:
     End Select
   End Function
 
-  'TODO: re-implement
-  '  Private Function AddTimeseries(ByRef t As atcTimeseries, Optional ByRef ExistAction As Integer = 0) As Boolean 'Implements ATCData.ATCclsTserFile.AddTimSer
+  Public Overrides Function AddTimeseries(ByRef t As atcData.atcTimeseries, Optional ByRef ExistAction As atcData.atcTimeseriesFile.EnumExistAction = atcData.atcTimeseriesFile.EnumExistAction.ExistReplace) As Boolean
+    MyBase.AddTimeseries(t, ExistAction)
+    'TODO: re-implement
     '    Dim retcod, dsn, i, lExAct, TsInd As Integer
     '    Dim S As String
     '    Dim BtnName() As Object
@@ -456,7 +457,7 @@ Cntinu:
     '    Exit Function
     'ErrHandler:
     '    MsgBox("Error adding timser" & vbCr & Err.Description, MsgBoxStyle.Critical, Label)
-  'End Function
+  End Function
 
   Private Function findNextDsn(ByRef dsn As Integer) As Integer
     Dim vData As Object
@@ -485,13 +486,13 @@ Cntinu:
       RemoveTimSer = True
       searchSerial = t.Serial
       For i = 1 To Timeseries.Count()
-        If Timeseries.Item(i).serial = searchSerial Then Timeseries.Remove(i) : Exit For
+        If Timeseries.Item(i).Serial = searchSerial Then Timeseries.Remove(i) : Exit For
       Next
 
       removeDate = True
       searchSerial = t.Dates.Serial
       For i = 1 To Timeseries.Count()
-        If Timeseries.Item(i).Dates.serial = searchSerial Then removeDate = False : Exit For
+        If Timeseries.Item(i).Dates.Serial = searchSerial Then removeDate = False : Exit For
       Next
 
       If removeDate Then
@@ -905,6 +906,9 @@ Cntinu:
         End If
 
         If Not CBool(.GetValue("HeaderOnly", False)) Then
+          aReadMe.ValuesNeedToBeRead = False
+          aReadMe.Dates.ValuesNeedToBeRead = False
+
           Dim lSJDay As Double = .GetValue("SJDay", 0)
           J2Date(lSJDay, sdat)
           nVals = aReadMe.numValues
@@ -927,7 +931,6 @@ Cntinu:
 
             ReDim dv(nVals)
             ReDim dd(nVals)
-            lSJDay += MJDto1900
             dd(0) = lSJDay
             Dim lInterval As Double = .GetValue("interval", 0)
             Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
@@ -937,7 +940,7 @@ Cntinu:
                 dd(iVal) = lSJDay + iVal * lInterval
               Else
                 TIMADD(sdat, lTimeUnits, lTimeStep, iVal, edat)
-                dd(iVal) = Date2J(edat) + MJDto1900
+                dd(iVal) = Date2J(edat)
               End If
             Next
           Else
@@ -947,8 +950,6 @@ Cntinu:
           End If
           aReadMe.Values = dv
           aReadMe.Dates.Values = dd
-          aReadMe.ValuesNeedToBeRead = False
-          aReadMe.Dates.ValuesNeedToBeRead = False
         End If
       End With
       If lWdmOpen <> 1 Then F90_WDMCLO(pFileUnit)

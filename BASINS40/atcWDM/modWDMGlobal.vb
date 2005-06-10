@@ -6,13 +6,9 @@ Imports ATCutility
 
 Module WDMGlobal
 
-  'VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858
-  '15018 julian days from WDM zero date to VB zero date
-  Public Const MJDto1900 As Double = -15018
-
   Private pMsgUnit As Integer 'fortran unit number for hspfmsg.wdm; used by clsTserWDM
   Private pMsg As atcMsgWDM      'see clsMsgWDM
-	
+
   Private pUnitsDef As atcAttributeDefinition
   Private pUnitsDefEditable As atcAttributeDefinition
 

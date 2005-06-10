@@ -141,11 +141,6 @@
                     DependentUpon = "atcGraphForm.vb"
                     BuildAction = "EmbeddedResource"
                 />
-                <File
-                    RelPath = "atcGraphTime.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
             </Include>
         </Files>
     </VisualBasic>

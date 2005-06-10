@@ -154,13 +154,13 @@ erropen:
     Else
       If Left(c, grayNameNumStart - 1) = LCase(grayBasename) Then
         r = Mid(colr, grayNameNumStart)
-        If IsNumeric(r) Then TextOrNumericColor = Color.FromArgb(0, CInt(r), CInt(r), CInt(r))
+        If IsNumeric(r) Then TextOrNumericColor = Color.FromArgb(255, CInt(r), CInt(r), CInt(r))
       End If
       If TextOrNumericColor.Equals(Color.Empty) Then
         Dim db As clsATCTable = colorDB()
         If Not db Is Nothing Then
           If db.FindFirst(1, c) Then
-            TextOrNumericColor = Color.FromArgb(CInt(db.Value(2)))
+            TextOrNumericColor = ColorTranslator.FromOle(CInt(db.Value(2)))
           Else
             TextOrNumericColor = Color.Gray
           End If
@@ -196,14 +196,15 @@ erropen:
       End If
     End If
 
-    Dim db As clsATCTable
-    db = colorDB()
+    Dim db As clsATCTable = colorDB()
     If db Is Nothing Then GoTo SetHexValue
 
-    Dim b1, thisColor, r1, g1 As Integer
+    Dim b1, r1, g1 As Integer
+    Dim colorRaw As String
+    Dim thisColor As Color
     Dim thisDist, minDist As Single
     Dim minDistName As String
-    If db.FindFirst(2, aColor.ToArgb) Then
+    If db.FindFirst(2, ColorTranslator.ToOle(aColor)) Then
       retval = db.Value(1)
     Else
       'If rgb_Renamed = rgb_Renamed And &HFFFFFF Then
@@ -211,14 +212,17 @@ erropen:
         minDist = 255 ^ 2 * 3
         For iColor = 1 To db.NumRecords
           db.CurrentRecord = iColor
-          thisColor = CInt(db.Value(2))
-          r1 = System.Drawing.ColorTranslator.FromOle(thisColor).R
-          g1 = System.Drawing.ColorTranslator.FromOle(thisColor).G
-          b1 = System.Drawing.ColorTranslator.FromOle(thisColor).B
-          thisDist = (r - r1) ^ 2 + (b - b1) ^ 2 + (g - g1) ^ 2
-          If thisDist < minDist Then
-            minDist = thisDist
-            minDistName = db.Value(1)
+          colorRaw = db.Value(2)
+          If IsNumeric(colorRaw) Then
+            thisColor = ColorTranslator.FromOle(CInt(colorRaw))
+            r1 = thisColor.R
+            g1 = thisColor.G
+            b1 = thisColor.B
+            thisDist = (r - r1) ^ 2 + (b - b1) ^ 2 + (g - g1) ^ 2
+            If thisDist < minDist Then
+              minDist = thisDist
+              minDistName = db.Value(1)
+            End If
           End If
         Next
         retval = minDistName
@@ -236,7 +240,7 @@ erropen:
     HadErrOpen = True
     GoTo SetHexValue
 SetHexValue:
-    retval = aColor.ToArgb
+    retval = Hex(aColor.ToArgb)
     If Len(retval) < 8 Then retval = New String("0", 8 - Len(retval)) & retval
     colorName = "&H" & retval
   End Function
@@ -248,12 +252,12 @@ SetHexValue:
   '  Public Sub testColor(ByVal fwd As Boolean, _
   '                       ByVal prevColorName As String, _
   '                       ByRef nextColorName As String, _
-  '                       ByRef nextColor As System.Drawing.Color)
+  '                       ByRef nextColor As Color)
 
   '    Dim c As String
 
   '    c = LCase(Trim(prevColorName))
-  '    nextColor = System.Drawing.Color.FromArgb(-1) '-1
+  '    nextColor = Color.FromArgb(-1) '-1
   '    If IsNumeric(c) Then 'They gave us a number, not a name, so default to white
   '      nextColor = Color.Black  'vbBlack
   '      nextColorName = "black"

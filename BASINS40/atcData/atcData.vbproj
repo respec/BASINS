@@ -96,6 +96,16 @@
                     AssemblyName = "System.Data"
                     HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
                 />
+                <Reference
+                    Name = "atcUtility"
+                    Project = "{67027820-9036-481E-80F6-077E5085F59D}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
+                <Reference
+                    Name = "ChilkatDotNet"
+                    AssemblyName = "ChilkatDotNet"
+                    HintPath = "..\..\MapWindow40\Bin\ChilkatDotNet.dll"
+                />
             </References>
             <Imports>
                 <Import Namespace = "Microsoft.VisualBasic" />
@@ -132,7 +142,17 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcTimeseriesCompute.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "atcTimeseriesFile.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "atcTimeseriesGroup.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -140,6 +160,16 @@
                     RelPath = "atcTimeseriesManager.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmManager.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmManager.resx"
+                    DependentUpon = "frmManager.vb"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "frmSelectTimeseries.vb"
