@@ -41,6 +41,11 @@ Public Class atcGraphForm
 
     Dim g As Graphics = Me.CreateGraphics()
     pMaster.AutoPaneLayout(g, PaneLayout.SingleColumn)
+
+    For Each ts As atcTimeseries In pTimeseriesGroup
+      AddDatasetTimeseries(ts, ts.ToString)
+    Next
+
     pMaster.AxisChange(g)
     Invalidate()
     g.Dispose()
@@ -48,9 +53,15 @@ Public Class atcGraphForm
 
 #Region " Windows Form Designer generated code "
 
-  Public Sub New(ByVal aTimeseriesManager As atcData.atcTimeseriesManager)
+  Public Sub New(ByVal aTimeseriesManager As atcData.atcTimeseriesManager, _
+        Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
     MyBase.New()
     pTimeseriesManager = aTimeseriesManager
+    If aTimeseriesGroup Is Nothing Then
+      pTimeseriesGroup = New atcTimeseriesGroup
+    Else
+      pTimeseriesGroup = aTimeseriesGroup
+    End If
     InitializeComponent() 'required by Windows Form Designer
     InitMasterPane()
     Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
@@ -212,13 +223,14 @@ Public Class atcGraphForm
   End Property
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    Dim SelectedTS As ICollection = pTimeseriesManager.UserSelectTimeseries("Select Timeseries to Add to Graph")
-    For Each t As atcData.atcTimeseries In SelectedTS
-      AddDatasetTimeseries(t, t.ToString())
-    Next
-    zgc.AxisChange()
-    Invalidate()
-    Me.Refresh()
+    'Dim SelectedTS As ICollection = pTimeseriesManager.UserSelectTimeseries("Select Timeseries to Add to Graph")
+    'For Each t As atcData.atcTimeseries In SelectedTS
+    '  AddDatasetTimeseries(t, t.ToString())
+    'Next
+    'zgc.AxisChange()
+    'Invalidate()
+    'Me.Refresh()
+    pTimeseriesManager.UserSelectTimeseries("Select Timeseries to Add to Graph", pTimeseriesGroup)
   End Sub
 
   Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
@@ -303,9 +315,21 @@ Public Class atcGraphForm
 
   End Sub
 
-  Private Sub pTimeseriesGroup_Added(ByVal aAdded As System.Collections.ArrayList) Handles pTimeseriesGroup.Added
+  Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pTimeseriesGroup.Added
     For Each ts As atcTimeseries In aAdded
       AddDatasetTimeseries(ts, ts.ToString)
     Next
+    zgc.AxisChange()
+    Invalidate()
+    Me.Refresh()
+  End Sub
+
+  Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pTimeseriesGroup.Removed
+    For Each ts As atcTimeseries In aRemoved
+      Pane.CurveList.Remove(Pane.CurveList.Item(ts.ToString))
+    Next
+    zgc.AxisChange()
+    Invalidate()
+    Me.Refresh()
   End Sub
 End Class

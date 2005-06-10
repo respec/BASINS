@@ -107,15 +107,7 @@ Public Class PlugIn
 
     RefreshDataMenu()
 
-    g_MapWin.Menus.AddMenu(ToolsMenuName, "", Nothing, ToolsMenuString, DataMenuName)
-    mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_Graph", ToolsMenuName, Nothing, "Graph")
-    mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_ArcView3", ToolsMenuName, Nothing, "ArcView &3")
-    mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_ArcGIS", ToolsMenuName, Nothing, "&ArcGIS")
-    mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
-    mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_WDMUtil", ToolsMenuName, Nothing, "&WDMUtil")
-    mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_RunScript", ToolsMenuName, Nothing, "Run Script")
-    mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_OpenScript", ToolsMenuName, Nothing, "Edit Script")
-    'mnu = g_MapWin.Menus.AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
+    RefreshToolsMenu()
 
     g_MapWin.Menus.AddMenu(ModelsMenuName, "", Nothing, ModelsMenuString, ToolsMenuName)
     'mnu = g_MapWin.Menus.AddMenu(ModelsMenuName & "_HSPF", ModelsMenuName, Nothing, "&HSPF")
@@ -134,6 +126,33 @@ Public Class PlugIn
 
   End Sub
 
+  Private Sub RefreshToolsMenu()
+    Dim mnu As MapWindow.Interfaces.MenuItem
+    Dim iPlugin As Integer
+    With g_MapWin.Menus
+      .Remove(ToolsMenuString)
+      .AddMenu(ToolsMenuName, "", Nothing, ToolsMenuString, DataMenuName)
+
+      'mnu = .AddMenu(ToolsMenuName & "_Graph", ToolsMenuName, Nothing, "Graph")
+      mnu = .AddMenu(ToolsMenuName & "_ArcView3", ToolsMenuName, Nothing, "ArcView &3")
+      mnu = .AddMenu(ToolsMenuName & "_ArcGIS", ToolsMenuName, Nothing, "&ArcGIS")
+      mnu = .AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
+      mnu = .AddMenu(ToolsMenuName & "_WDMUtil", ToolsMenuName, Nothing, "&WDMUtil")
+      mnu = .AddMenu(ToolsMenuName & "_RunScript", ToolsMenuName, Nothing, "Run Script")
+      mnu = .AddMenu(ToolsMenuName & "_OpenScript", ToolsMenuName, Nothing, "Edit Script")
+      mnu = .AddMenu(ToolsMenuName & "_Refresh", ToolsMenuName, Nothing, "Refresh")
+      'mnu = .AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
+
+      Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
+      If DisplayPlugins.Count > 0 Then
+        mnu = .AddMenu(ToolsMenuName & "_Separator1", ToolsMenuName, Nothing, "-")
+      End If
+      For Each atf As atcTimeseriesDisplay In DisplayPlugins
+        mnu = .AddMenu(ToolsMenuName & "_" & atf.Name, ToolsMenuName, Nothing, atf.Name)
+      Next
+    End With
+  End Sub
+
   Private Sub RefreshDataMenu()
     Dim mnu As MapWindow.Interfaces.MenuItem
     Dim iPlugin As Integer
@@ -145,6 +164,7 @@ Public Class PlugIn
       'mnu = .AddMenu(DataMenuName & "_OpenTimeseries", DataMenuName, Nothing, "Open Timeseries File")
       mnu = .AddMenu(DataMenuName & "_ManageTimeseries", DataMenuName, Nothing, "Manage Timeseries Files")
       'mnu = .AddMenu(DataMenuName & "_SelectTimeseries", DataMenuName, Nothing, "Select Timeseries")
+
       'With g_MapWin.Plugins
       '  For iPlugin = 0 To .Count - 1
       '    If Not .Item(iPlugin) Is Nothing Then
@@ -173,13 +193,16 @@ Public Class PlugIn
     'g_MapWin.Menus.Remove(DataMenuName & "_SelectTimeseries")
     g_MapWin.Menus.Remove(DataMenuName)
 
-    g_MapWin.Menus.Remove(ToolsMenuName & "_Graph")
+    'g_MapWin.Menus.Remove(ToolsMenuName & "_Graph")
+    'TODO: remove DisplayPlugins menu items
+    g_MapWin.Menus.Remove(ToolsMenuName & "_Separator1")
     g_MapWin.Menus.Remove(ToolsMenuName & "_ArcView3")
     g_MapWin.Menus.Remove(ToolsMenuName & "_ArcGIS")
     g_MapWin.Menus.Remove(ToolsMenuName & "_GenScn")
     g_MapWin.Menus.Remove(ToolsMenuName & "_WDMUtil")
     g_MapWin.Menus.Remove(ToolsMenuName & "_RunScript")
     g_MapWin.Menus.Remove(ToolsMenuName & "_OpenScript")
+    g_MapWin.Menus.Remove(ToolsMenuName & "_Refresh")
     g_MapWin.Menus.Remove(ToolsMenuName)
 
     g_MapWin.Menus.Remove(ModelsMenuName & "_SWAT")
@@ -364,33 +387,13 @@ Public Class PlugIn
     Next
 
     g_MapWin.StatusBar.ProgressBarValue = 75
-
-    'GraphTest(lDataset)
-
     g_MapWin.StatusBar.ProgressBarValue = 100
     g_MapWin.StatusBar.ShowProgressBar = False
-  End Sub
-
-  Private Sub GraphTest(ByVal aDataset As atcTimeseries)
-    Dim gForm As New atcGraphForm(pTimeseriesManager)
-
-    gForm.Show()
-    gForm.Pane.XAxis.Type = ZedGraph.AxisType.Date
-    gForm.Pane.XAxis.MajorUnit = ZedGraph.DateUnit.Day
-    gForm.Pane.XAxis.MinorUnit = ZedGraph.DateUnit.Hour
-    gForm.AddDatasetTimeseries(aDataset, aDataset.Attributes.GetValue("id"))
-    gForm.Pane.AxisChange(gForm.CreateGraphics)
-
   End Sub
 
   Private Function LaunchTool(ByVal ToolName As String, Optional ByVal cmdLine As String = "") As Boolean
     Dim exename As String
     Select Case ToolName
-      Case "Graph"
-        Dim gForm As New atcGraphForm(pTimeseriesManager)
-        gForm.Show()
-        Return True
-
       Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
       Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
       Case "HSPF"
@@ -412,6 +415,26 @@ Public Class PlugIn
         lfrm.BasinsPlugin = Me
         lfrm.Show()
         Return True
+      Case "Refresh"
+        'RefreshDataMenu()
+        RefreshToolsMenu()
+        Return True
+      Case Else 'Search for plugin to launch
+        'Dim g As New atcGraphPlugin
+        'g.Show(pTimeseriesManager)
+        'Return True
+
+        Dim newDisplay As atcTimeseriesDisplay
+        Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
+        For Each atf As atcTimeseriesDisplay In DisplayPlugins
+          If atf.Name = ToolName Then
+            Dim typ As System.Type = atf.GetType()
+            Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+            newDisplay = asm.CreateInstance(typ.FullName)
+            newDisplay.Show(pTimeseriesManager)
+            Return True
+          End If
+        Next        
     End Select
 
     If FileExists(exename) Then
