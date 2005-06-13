@@ -56,7 +56,11 @@ Public Class atcTimeseriesGroup
 
   'Remove all Timeseries and selection
   Public Sub Clear()
-    Remove(pTS)
+    If pTS.Count > 0 Then
+      Dim lRemoved As ArrayList = pTS
+      pTS = New ArrayList
+      RaiseEvent Removed(lRemoved)
+    End If
     If Not pSelectedTS Is Nothing Then pSelectedTS.Clear()
   End Sub
 
