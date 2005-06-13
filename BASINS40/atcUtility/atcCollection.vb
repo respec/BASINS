@@ -29,9 +29,17 @@ Public Class atcCollection
     Return pValues.GetEnumerator
   End Function
 
-  Public Function ItemByIndex(ByVal aIndex As Integer) As Object
-    Return pValues(aIndex)
-  End Function
+  Public ReadOnly Property ItemByIndex(ByVal aIndex As Integer) As Object
+    Get
+      Return pValues(aIndex)
+    End Get
+  End Property
+
+  Public ReadOnly Property ItemByKey(ByVal aKey As String) As Object
+    Get
+      Return ItemByIndex(IndexFromKey(aKey))
+    End Get
+  End Property
 
   'Returns first index where the specified key can be found or -1 if key does not exist
   'if StartAt is greater than zero, skips that many keys before starting search
