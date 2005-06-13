@@ -154,28 +154,37 @@ Public Class frmScript
 
       Case "Plugin"
         Dim cdSave As New Windows.Forms.SaveFileDialog
+        Dim pluginName As String = System.IO.Path.GetFileNameWithoutExtension(pFileName)
         Dim errors As String = ""
+        Dim assy As System.Reflection.Assembly
         cdSave.Filter = "DLL files (*.dll)|*.dll"
         cdSave.FileName = g_MapWin.Plugins.PluginFolder _
-                        & System.IO.Path.GetFileNameWithoutExtension(pFileName) & ".dll"
+                        & System.IO.Path.DirectorySeparatorChar _
+                        & pluginName & ".dll"
+        pluginName = System.IO.Path.GetFileNameWithoutExtension(cdsave.FileName)
+        g_MapWin.Plugins.Remove(pluginName)
         If cdSave.ShowDialog() = Windows.Forms.DialogResult.OK Then
-          CompileScript(txtScript.Text, _
+          If FileExists(cdSave.FileName) Then
+            System.IO.File.Move(cdSave.FileName, cdSave.FileName & ".old")
+          End If
+          assy = CompileScript(txtScript.Text, _
                         errors, _
                         Split("System.dll,Microsoft.VisualBasic.dll,atcData.dll,atcUtility.dll,MapWinInterfaces.dll", ","), _
                         cdSave.FileName)
           If errors.Length = 0 Then
+            'TODO: g_MapWin.Plugins.LoadFromObject() instead of AddFromFile
             If Not g_MapWin.Plugins.AddFromFile(cdSave.FileName) Then
               MsgBox("Could not add plugin" & vbCr & cdsave.FileName, , "Plugins.AddFromFile")
             Else
-              If Not g_MapWin.Plugins.StartPlugin(System.IO.Path.GetFileNameWithoutExtension(cdsave.FileName)) Then
+              If Not g_MapWin.Plugins.StartPlugin(pluginName) Then
                 g_MapWin.Plugins.ShowPluginDialog()
                 'MsgBox("Could not start plugin" & vbCr & cdsave.FileName, , "Plugins.StartPlugin")
               End If
             End If
           Else
-              MsgBox(errors, , "Compile errors")
-            End If
+            MsgBox(errors, , "Compile errors")
           End If
+        End If
     End Select
   End Sub
 
