@@ -33,7 +33,7 @@
                     DebugSymbols = "true"
                     IncrementalBuild = "true"
                     Optimize = "false"
-                    OutputPath = "..\..\MapWindow40\Bin\Plugins\"
+                    OutputPath = "..\..\MapWindow40\Bin\Plugins\BASINS\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -73,12 +73,6 @@
                     Name = "System.Windows.Forms"
                     AssemblyName = "System.Windows.Forms"
                     HintPath = "..\..\..\..\..\WINNT\Microsoft.NET\Framework\v1.0.3705\System.Windows.Forms.dll"
-                />
-                <Reference
-                    Name = "ChilkatDotNet"
-                    AssemblyName = "ChilkatDotNet"
-                    HintPath = "C:\Program Files\Chilkat Software Inc\Chilkat.NET\ChilkatDotNet.dll"
-                    Private = "False"
                 />
                 <Reference
                     Name = "System.Drawing"
@@ -122,12 +116,6 @@
                     Private = "False"
                 />
                 <Reference
-                    Name = "ZedGraph"
-                    AssemblyName = "ZedGraph"
-                    HintPath = "..\..\MapWindow40\Bin\Plugins\ZedGraph.dll"
-                    Private = "False"
-                />
-                <Reference
                     Name = "MapWinGIS"
                     Guid = "{C368D713-CC5F-40ED-9F53-F84FE197B96A}"
                     VersionMajor = "3"
@@ -140,6 +128,16 @@
                     Name = "System.Data"
                     AssemblyName = "System.Data"
                     HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
+                />
+                <Reference
+                    Name = "ZedGraph"
+                    AssemblyName = "ZedGraph"
+                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ZedGraph.dll"
+                />
+                <Reference
+                    Name = "ChilkatDotNet"
+                    AssemblyName = "ChilkatDotNet"
+                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ChilkatDotNet.dll"
                 />
             </References>
             <Imports>

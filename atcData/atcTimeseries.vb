@@ -4,7 +4,7 @@ Public Class atcTimeseries
   Private pDates As atcTimeseries
   'Private pDateLengths As atcTimeseries
 
-  Private pFile As atcTimeseriesFile
+  Private pFile As atcDataSource
   Private pValuesNeedToBeRead As Boolean
 
   Private pSerial As Integer
@@ -131,7 +131,7 @@ Public Class atcTimeseries
   End Sub
 
   'Create a new Timeseries and reference the file it came from
-  Public Sub New(ByVal aFile As atcTimeseriesFile)
+  Public Sub New(ByVal aFile As atcDataSource)
     Clear()
     pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
     pFile = aFile
