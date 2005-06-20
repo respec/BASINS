@@ -1,7 +1,7 @@
-Public Class atcTimeseriesFile
+Public Class atcDataSource
   Inherits atcDataPlugin
 
-  Private pFileName As String
+  Private pFileNameOrConnectString As String
   Private pTimeseries As atcTimeseriesGroup
 
   Public Enum EnumExistAction
@@ -24,10 +24,10 @@ Public Class atcTimeseriesFile
   'Should only be set by inheriting class, only during Open or Save
   Public Overridable Property FileName() As String
     Get
-      Return pFileName
+      Return pFileNameOrConnectString
     End Get
     Set(ByVal newValue As String)
-      pFileName = newValue
+      pFileNameOrConnectString = newValue
     End Set
   End Property
 
@@ -52,16 +52,16 @@ Public Class atcTimeseriesFile
     End Get
   End Property
 
-  'Opens named file and reads enough to determine whether file is correct type
-  'Returns True if file is successfully opened
-  Public Overridable Function Open(ByVal newFileName As String) As Boolean
-    Err.Raise(0, Me, "Open must be overridden to be used, atcTimeseriesFile does not implement.")
+  'Opens file or database and reads enough to determine whether it is correct type
+  'Returns True if successfully opened
+  Public Overridable Function Open(ByVal aFileNameOrConnectString As String) As Boolean
+    Err.Raise(0, Me, "Open must be overridden to be used, atcDataSource does not implement.")
   End Function
 
   'Read all the data into an atcTimeseries (which must be from this file)
   'Called only from within atcTimeseries.EnsureValuesRead.
   Public Overridable Sub ReadData(ByVal aTimeseries As atcTimeseries)
-    Err.Raise(0, Me, "ReadData must be overridden to be used, atcTimeseriesFile does not implement.")
+    Err.Raise(0, Me, "ReadData must be overridden to be used, atcDataSource does not implement.")
   End Sub
 
   'Save all current data to a new file
@@ -69,7 +69,7 @@ Public Class atcTimeseriesFile
   'Returns True if successful
   Public Overridable Function Save(ByVal SaveFileName As String, _
                           Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
-    Err.Raise(0, Me, "Save must be overridden to be used, atcTimeseriesFile does not implement.")
+    Err.Raise(0, Me, "Save must be overridden to be used, atcDataSource does not implement.")
   End Function
 
   Public Overridable Function AddTimeseries(ByRef t As atcTimeseries, _

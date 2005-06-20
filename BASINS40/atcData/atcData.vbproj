@@ -33,7 +33,7 @@
                     DebugSymbols = "true"
                     IncrementalBuild = "true"
                     Optimize = "false"
-                    OutputPath = "..\..\MapWindow40\Bin\"
+                    OutputPath = "..\..\MapWindow40\Bin\Plugins\BASINS\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -100,11 +100,13 @@
                     Name = "atcUtility"
                     Project = "{67027820-9036-481E-80F6-077E5085F59D}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
                 <Reference
                     Name = "ChilkatDotNet"
                     AssemblyName = "ChilkatDotNet"
-                    HintPath = "..\..\MapWindow40\Bin\ChilkatDotNet.dll"
+                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ChilkatDotNet.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>
@@ -132,7 +134,17 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcDataManager.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "atcDataPlugin.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "atcDataSource.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -152,17 +164,12 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcTimeseriesFile.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "atcTimeseriesGroup.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcTimeseriesManager.vb"
+                    RelPath = "clsJavaPluginAdapter.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

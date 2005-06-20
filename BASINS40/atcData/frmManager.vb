@@ -5,7 +5,7 @@ Imports atcUtility
 Friend Class frmManager
   Inherits System.Windows.Forms.Form
 
-  Private WithEvents pManager As atcTimeseriesManager
+  Private WithEvents pManager As atcDataManager
 
 #Region " Windows Form Designer generated code "
 
@@ -108,16 +108,16 @@ Friend Class frmManager
 
 #End Region
 
-  Public Sub Edit(ByVal aManager As atcTimeseriesManager)
+  Public Sub Edit(ByVal aManager As atcDataManager)
     pManager = aManager
     treeFiles.Nodes.Clear()
-    For Each lFile As atcTimeseriesFile In pManager.Files
+    For Each lFile As atcDataSource In pManager.Files
       AddFileToTree(treeFiles.Nodes, lFile)
     Next
     Me.Show()
   End Sub
 
-  Private Sub AddFileToTree(ByVal aAddTo As TreeNodeCollection, ByVal aFile As atcTimeseriesFile)
+  Private Sub AddFileToTree(ByVal aAddTo As TreeNodeCollection, ByVal aFile As atcDataSource)
     Dim fileNode As TreeNode = aAddTo.Add(aFile.Name & " " & aFile.FileName & " (" & aFile.Timeseries.Count & ")")
     fileNode.Tag = aFile
     Dim ts As atcTimeseries
@@ -132,8 +132,8 @@ Friend Class frmManager
   Private Sub treeFiles_AfterSelect(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles treeFiles.AfterSelect
     Dim obj As Object = treeFiles.SelectedNode.Tag
 
-    If obj.GetType.IsSubclassOf(GetType(atcTimeseriesFile)) Then
-      Dim tsf As atcTimeseriesFile = obj
+    If obj.GetType.IsSubclassOf(GetType(atcDataSource)) Then
+      Dim tsf As atcDataSource = obj
       txtDetails.Text = tsf.Name & " File '" & tsf.FileName & "'"
       txtDetails.Text &= vbCrLf & Format(tsf.Timeseries.Count, "#,###") & " Timeseries"
       If FileExists(tsf.FileName) Then
@@ -155,13 +155,13 @@ Friend Class frmManager
 
   Private Sub toolbarTop_ButtonClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.ToolBarButtonClickEventArgs) Handles toolbarTop.ButtonClick
     Select Case e.Button.Text
-      Case "Open" : pManager.OpenFile("")
+      Case "Open" : pManager.OpenData("")
       Case "Close"
         'TODO: how do we remove a file from pManager.Files?
     End Select
   End Sub
 
-  Private Sub pManager_OpenedFile(ByVal aTimeseriesFile As atcTimeseriesFile) Handles pManager.OpenedFile
+  Private Sub pManager_OpenedFile(ByVal aTimeseriesFile As atcDataSource) Handles pManager.OpenedData
     Edit(pManager)
   End Sub
 End Class

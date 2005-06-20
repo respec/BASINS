@@ -4,8 +4,8 @@ Option Explicit On
 Imports atcData
 Imports atcUtility
 
-Public Class atcTimeseriesFileWDM
-  Inherits atcTimeseriesFile
+Public Class atcDataSourceWDM
+  Inherits atcDataSource
   '##MODULE_REMARKS Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
   Private pDcnt As Integer
@@ -281,7 +281,7 @@ Cntinu:
     End Select
   End Function
 
-  Public Overrides Function AddTimeseries(ByRef t As atcData.atcTimeseries, Optional ByRef ExistAction As atcData.atcTimeseriesFile.EnumExistAction = atcData.atcTimeseriesFile.EnumExistAction.ExistReplace) As Boolean
+  Public Overrides Function AddTimeseries(ByRef t As atcData.atcTimeseries, Optional ByRef ExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
     MyBase.AddTimeseries(t, ExistAction)
     'TODO: re-implement
     '    Dim retcod, dsn, i, lExAct, TsInd As Integer

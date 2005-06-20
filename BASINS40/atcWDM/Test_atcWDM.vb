@@ -52,7 +52,7 @@ End Class
 
 End Class
 
-<TestFixture()> Public Class Test_atcTimeseriesFileWDM
+<TestFixture()> Public Class Test_atcDataSourceWDM
 
   Public Sub TestSave()
     'Save()

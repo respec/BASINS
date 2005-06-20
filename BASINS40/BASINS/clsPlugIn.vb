@@ -31,7 +31,7 @@ Public Class PlugIn
 
   Private pNationalDataDir As String = ""
   Private pLogFilename As String = ""
-  Private WithEvents pTimeseriesManager As atcTimeseriesManager
+  Private WithEvents pTimeseriesManager As atcDataManager
 
   Private pBusy As Integer = 0 'Incremented by setting Busy = True, decremented by setting Busy = False
   Private pBeforeBusyCursor As MapWinGIS.tkCursor
@@ -85,7 +85,7 @@ Public Class PlugIn
 
     g_MapWin = aMapWin
 
-    pTimeseriesManager = New atcTimeseriesManager(g_MapWin, Me)
+    pTimeseriesManager = New atcDataManager(g_MapWin, Me)
     FindBasinsDrives()
 
     'g_MapWin.Menus.AddMenu(NewProjectMenuName, "mnuFile", Nothing, NewProjectMenuString, "mnuNew")
@@ -140,7 +140,6 @@ Public Class PlugIn
       mnu = .AddMenu(ToolsMenuName & "_WDMUtil", ToolsMenuName, Nothing, "&WDMUtil")
       mnu = .AddMenu(ToolsMenuName & "_RunScript", ToolsMenuName, Nothing, "Run Script")
       mnu = .AddMenu(ToolsMenuName & "_OpenScript", ToolsMenuName, Nothing, "Edit Script")
-      mnu = .AddMenu(ToolsMenuName & "_Refresh", ToolsMenuName, Nothing, "Refresh")
       'mnu = .AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
 
       Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
@@ -184,16 +183,10 @@ Public Class PlugIn
     'buttons from the tool bar tool bar or menu items from the menu that you may have added.
     'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
 
-    'todo: remove the menu items under "BASINS"
-
     g_MapWin.Menus.Remove(DataMenuName & "_Download")
-    'g_MapWin.Menus.Remove(DataMenuName & "_DownloadTest")
-    'g_MapWin.Menus.Remove(DataMenuName & "_OpenTimeseries")
     g_MapWin.Menus.Remove(DataMenuName & "_ManageTimeseries")
-    'g_MapWin.Menus.Remove(DataMenuName & "_SelectTimeseries")
     g_MapWin.Menus.Remove(DataMenuName)
 
-    'g_MapWin.Menus.Remove(ToolsMenuName & "_Graph")
     'TODO: remove DisplayPlugins menu items
     g_MapWin.Menus.Remove(ToolsMenuName & "_Separator1")
     g_MapWin.Menus.Remove(ToolsMenuName & "_ArcView3")
@@ -202,17 +195,13 @@ Public Class PlugIn
     g_MapWin.Menus.Remove(ToolsMenuName & "_WDMUtil")
     g_MapWin.Menus.Remove(ToolsMenuName & "_RunScript")
     g_MapWin.Menus.Remove(ToolsMenuName & "_OpenScript")
-    g_MapWin.Menus.Remove(ToolsMenuName & "_Refresh")
     g_MapWin.Menus.Remove(ToolsMenuName)
 
     g_MapWin.Menus.Remove(ModelsMenuName & "_SWAT")
     g_MapWin.Menus.Remove(ModelsMenuName & "_PLOAD")
     g_MapWin.Menus.Remove(ModelsMenuName & "_AGWA")
     g_MapWin.Menus.Remove(ModelsMenuName & "_AQUATOX")
-    'If Not g_MapWin.Plugins.PluginIsLoaded("HSPF_PlugIn") Then
-    'g_MapWin.Menus.Remove(ModelsMenuName & "_HSPF")
-    'g_MapWin.Menus.Remove(ModelsMenuName)
-    'End If
+    g_MapWin.Menus.Remove(ModelsMenuName) 'TODO: don't unload if another plugin is still using it
 
     g_MapWin.Menus.Remove(ProjectsMenuName)
 
@@ -353,7 +342,7 @@ Public Class PlugIn
     End Set
   End Property
 
-  Private Sub pTimeseriesManager_OpenedFile(ByVal aFile As atcData.atcTimeseriesFile) Handles pTimeseriesManager.OpenedFile
+  Private Sub pTimeseriesManager_OpenedFile(ByVal aFile As atcData.atcDataSource) Handles pTimeseriesManager.OpenedData
     Dim s As String
     Dim i As Integer
     Dim lDebugFile As String = "c:\test\BASINS4\wdmFileDump.txt"
@@ -415,10 +404,6 @@ Public Class PlugIn
         lfrm.BasinsPlugin = Me
         lfrm.Show()
         Return True
-      Case "Refresh"
-        'RefreshDataMenu()
-        RefreshToolsMenu()
-        Return True
       Case Else 'Search for plugin to launch
         'Dim g As New atcGraphPlugin
         'g.Show(pTimeseriesManager)
@@ -434,7 +419,7 @@ Public Class PlugIn
             newDisplay.Show(pTimeseriesManager)
             Return True
           End If
-        Next        
+        Next
     End Select
 
     If FileExists(exename) Then
@@ -553,6 +538,12 @@ Public Class PlugIn
     'Plug-ins can communicate with eachother using Messages.  If a message is sent then this event fires.
     'If you know the message is "for you" then you can set Handled=True and then it will not be sent to any
     'other plug-ins.
+    If msg.StartsWith("atcDataPlugin") Then
+      Me.RefreshToolsMenu()
+      'If msg.Substring(15).StartsWith("loading") Then
+
+      'End If
+    End If
   End Sub
 
   Public Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading

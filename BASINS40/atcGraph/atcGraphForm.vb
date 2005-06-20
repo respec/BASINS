@@ -17,7 +17,7 @@ Public Class atcGraphForm
   Private pMaster As ZedGraph.MasterPane
 
   'All the currently open files
-  Private pTimeseriesManager As atcData.atcTimeseriesManager
+  Private pTimeseriesManager As atcData.atcDataManager
 
   'Graph editing form
   Private WithEvents pEditor As atcGraphEdit
@@ -53,7 +53,7 @@ Public Class atcGraphForm
 
 #Region " Windows Form Designer generated code "
 
-  Public Sub New(ByVal aTimeseriesManager As atcData.atcTimeseriesManager, _
+  Public Sub New(ByVal aTimeseriesManager As atcData.atcDataManager, _
         Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
     MyBase.New()
     pTimeseriesManager = aTimeseriesManager

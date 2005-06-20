@@ -186,7 +186,7 @@ Friend Class frmSelectTimeseries
   Private pcboCriteria() As Windows.Forms.ComboBox
   Private plstCriteria() As Windows.Forms.ListBox
 
-  Private pTimeseriesManager As atcTimeseriesManager
+  Private pTimeseriesManager As atcDataManager
 
   Private pMatchingTable As System.Data.DataTable
   Private pSelectedTable As System.Data.DataTable
@@ -198,7 +198,7 @@ Friend Class frmSelectTimeseries
 
   Private pTotalTS As Integer
 
-  Public Function AskUser(ByVal aManager As atcTimeseriesManager, Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
+  Public Function AskUser(ByVal aManager As atcDataManager, Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
     Dim pSaveGroup As atcTimeseriesGroup = Nothing
     If aGroup Is Nothing Then
       pSelectedTS = New atcTimeseriesGroup
@@ -214,7 +214,7 @@ Friend Class frmSelectTimeseries
     Return pSelectedTS
   End Function
 
-  Private Sub Populate(ByVal aTimeseriesManager As atcTimeseriesManager)
+  Private Sub Populate(ByVal aTimeseriesManager As atcDataManager)
     pMatchingTS = New atcTimeseriesGroup
 
     pTimeseriesManager = aTimeseriesManager
@@ -281,7 +281,7 @@ Friend Class frmSelectTimeseries
     For i = 0 To pcboCriteria.GetUpperBound(0)
       pcboCriteria(i).Items.Clear()
     Next
-    For Each tsFile As atcTimeseriesFile In pTimeseriesManager.Files
+    For Each tsFile As atcDataSource In pTimeseriesManager.Files
       For Each ts As atcTimeseries In tsFile.Timeseries
         For Each de As DictionaryEntry In ts.Attributes.GetAll
           If Not pcboCriteria(0).Items.Contains(de.Key) Then
@@ -296,7 +296,7 @@ Friend Class frmSelectTimeseries
 
   Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As Windows.Forms.ListBox)
     aList.Items.Clear()
-    For Each tsFile As atcTimeseriesFile In pTimeseriesManager.Files
+    For Each tsFile As atcDataSource In pTimeseriesManager.Files
       For Each ts As atcTimeseries In tsFile.Timeseries
         Dim val As Object = ts.Attributes.GetValue(aAttributeName, Nothing)
         If Not val Is Nothing Then
@@ -313,7 +313,7 @@ Friend Class frmSelectTimeseries
     pMatchingTable.Rows.Clear()
     pMatchingTS.Clear()
     pTotalTS = 0
-    For Each tsFile As atcTimeseriesFile In pTimeseriesManager.Files
+    For Each tsFile As atcDataSource In pTimeseriesManager.Files
       For Each ts As atcTimeseries In tsFile.Timeseries
         pTotalTS += 1
         For iCriteria As Integer = 0 To iLastCriteria
