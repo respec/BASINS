@@ -983,6 +983,7 @@ Cntinu:
     lData.Dates = lDates
     lData.Attributes.SetValue("id", dsn)
     lData.ValuesNeedToBeRead = True
+    lData.Dates.ValuesNeedToBeRead = True
     Timeseries.Add(lData)
 
     lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))
