@@ -17,12 +17,12 @@ Public Class atcGraphForm
   Private pMaster As ZedGraph.MasterPane
 
   'All the currently open files
-  Private pTimeseriesManager As atcData.atcDataManager
+  Private pDataManager As atcData.atcDataManager
 
   'Graph editing form
   Private WithEvents pEditor As atcGraphEdit
 
-  'The group of atcTimeseries displayed on the graph
+  'The group of atcTimeseries displayed
   Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
 
   Private Sub InitMasterPane()
@@ -56,7 +56,7 @@ Public Class atcGraphForm
   Public Sub New(ByVal aTimeseriesManager As atcData.atcDataManager, _
         Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
     MyBase.New()
-    pTimeseriesManager = aTimeseriesManager
+    pDataManager = aTimeseriesManager
     If aTimeseriesGroup Is Nothing Then
       pTimeseriesGroup = New atcTimeseriesGroup
     Else
@@ -66,7 +66,7 @@ Public Class atcGraphForm
     InitMasterPane()
     Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
 
-    Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
     For Each atf As atcTimeseriesDisplay In DisplayPlugins
       mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
@@ -215,14 +215,7 @@ Public Class atcGraphForm
   End Property
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    'Dim SelectedTS As ICollection = pTimeseriesManager.UserSelectTimeseries("Select Timeseries to Add to Graph")
-    'For Each t As atcData.atcTimeseries In SelectedTS
-    '  AddDatasetTimeseries(t, t.ToString())
-    'Next
-    'zgc.AxisChange()
-    'Invalidate()
-    'Me.Refresh()
-    pTimeseriesManager.UserSelectTimeseries("Select Timeseries to Add to Graph", pTimeseriesGroup)
+    pDataManager.UserSelectTimeseries(, pTimeseriesGroup)
   End Sub
 
   Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
@@ -330,13 +323,13 @@ Public Class atcGraphForm
 
   Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
     Dim newDisplay As atcTimeseriesDisplay
-    Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
     For Each atf As atcTimeseriesDisplay In DisplayPlugins
       If atf.Name = sender.Text Then
         Dim typ As System.Type = atf.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pTimeseriesManager, pTimeseriesGroup)
+        newDisplay.Show(pDataManager, pTimeseriesGroup)
         Exit Sub
       End If
     Next

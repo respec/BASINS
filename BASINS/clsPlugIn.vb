@@ -133,7 +133,6 @@ Public Class PlugIn
       .Remove(ToolsMenuString)
       .AddMenu(ToolsMenuName, "", Nothing, ToolsMenuString, DataMenuName)
 
-      'mnu = .AddMenu(ToolsMenuName & "_Graph", ToolsMenuName, Nothing, "Graph")
       mnu = .AddMenu(ToolsMenuName & "_ArcView3", ToolsMenuName, Nothing, "ArcView &3")
       mnu = .AddMenu(ToolsMenuName & "_ArcGIS", ToolsMenuName, Nothing, "&ArcGIS")
       mnu = .AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
@@ -159,12 +158,9 @@ Public Class PlugIn
       .Remove(DataMenuString)
       .AddMenu(DataMenuName, "", Nothing, DataMenuString, "mnuFile")
       mnu = .AddMenu(DataMenuName & "_Download", DataMenuName, Nothing, "&Download")
-      'mnu = .AddMenu(DataMenuName & "_DownloadTest", DataMenuName, Nothing, "Download &Test")
-      'mnu = .AddMenu(DataMenuName & "_OpenTimeseries", DataMenuName, Nothing, "Open Timeseries File")
 
       mnu = .AddMenu(DataMenuName & "_ComputeTimeseries", DataMenuName, Nothing, "Compute Timeseries")
-      mnu = .AddMenu(DataMenuName & "_ManageTimeseries", DataMenuName, Nothing, "Manage Timeseries Files")
-      'mnu = .AddMenu(DataMenuName & "_SelectTimeseries", DataMenuName, Nothing, "Select Timeseries")
+      mnu = .AddMenu(DataMenuName & "_ManageDataSources", DataMenuName, Nothing, "Manage Data Sources")
 
       'With g_MapWin.Plugins
       '  For iPlugin = 0 To .Count - 1
@@ -187,7 +183,7 @@ Public Class PlugIn
 
     g_MapWin.Menus.Remove(DataMenuName & "_Download")
     g_MapWin.Menus.Remove(DataMenuName & "_ComputeTimeseries")
-    g_MapWin.Menus.Remove(DataMenuName & "_ManageTimeseries")
+    g_MapWin.Menus.Remove(DataMenuName & "_ManageDataSources")
     g_MapWin.Menus.Remove(DataMenuName)
 
     'TODO: remove DisplayPlugins menu items
@@ -314,7 +310,7 @@ Public Class PlugIn
           '  pTimeseriesManager.Open("")
         Case "ComputeTimeseries"
           pTimeseriesManager.UserCompute()
-        Case "ManageTimeseries"
+        Case "ManageDataSources"
           pTimeseriesManager.UserManage()
         Case Else : MsgBox("Data Tool " & ItemName)
       End Select
