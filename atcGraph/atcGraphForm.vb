@@ -74,6 +74,12 @@ Public Class atcGraphForm
     If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
       mnuFileAdd_Click(Nothing, Nothing)
     End If
+
+    If pTimeseriesGroup.Count > 0 Then
+      Me.Show()
+    Else 'use declined to specify timeseries
+      Me.Close()
+    End If
   End Sub
 
   'Required by the Windows Form Designer
