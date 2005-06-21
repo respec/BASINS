@@ -65,7 +65,15 @@ Public Class atcGraphForm
     InitializeComponent() 'required by Windows Form Designer
     InitMasterPane()
     Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
-    mnuFileAdd_Click(Nothing, Nothing)
+
+    Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
+    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+      mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    Next
+
+    If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
+      mnuFileAdd_Click(Nothing, Nothing)
+    End If
   End Sub
 
   'Required by the Windows Form Designer
@@ -84,9 +92,6 @@ Public Class atcGraphForm
   Friend WithEvents mnuEditCurves As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditFont As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuAnalysisGraph As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuAnalysisList As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuAnalysisGenerate As System.Windows.Forms.MenuItem
   Friend WithEvents zgc As ZedGraph.ZedGraphControl
   Friend WithEvents mnuEditY As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditX As System.Windows.Forms.MenuItem
@@ -98,16 +103,13 @@ Public Class atcGraphForm
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
     Me.mnuFilePrint = New System.Windows.Forms.MenuItem
     Me.mnuEdit = New System.Windows.Forms.MenuItem
+    Me.mnuEditX = New System.Windows.Forms.MenuItem
     Me.mnuEditY = New System.Windows.Forms.MenuItem
     Me.mnuEditTitles = New System.Windows.Forms.MenuItem
     Me.mnuEditCurves = New System.Windows.Forms.MenuItem
     Me.mnuEditFont = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-    Me.mnuAnalysisGraph = New System.Windows.Forms.MenuItem
-    Me.mnuAnalysisList = New System.Windows.Forms.MenuItem
-    Me.mnuAnalysisGenerate = New System.Windows.Forms.MenuItem
     Me.zgc = New ZedGraph.ZedGraphControl
-    Me.mnuEditX = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -141,6 +143,11 @@ Public Class atcGraphForm
     Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditX, Me.mnuEditY, Me.mnuEditTitles, Me.mnuEditCurves, Me.mnuEditFont})
     Me.mnuEdit.Text = "&Edit"
     '
+    'mnuEditX
+    '
+    Me.mnuEditX.Index = 0
+    Me.mnuEditX.Text = "&X Axis"
+    '
     'mnuEditY
     '
     Me.mnuEditY.Index = 1
@@ -164,23 +171,7 @@ Public Class atcGraphForm
     'mnuAnalysis
     '
     Me.mnuAnalysis.Index = 2
-    Me.mnuAnalysis.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAnalysisGraph, Me.mnuAnalysisList, Me.mnuAnalysisGenerate})
     Me.mnuAnalysis.Text = "&Analysis"
-    '
-    'mnuAnalysisGraph
-    '
-    Me.mnuAnalysisGraph.Index = 0
-    Me.mnuAnalysisGraph.Text = "&Graph"
-    '
-    'mnuAnalysisList
-    '
-    Me.mnuAnalysisList.Index = 1
-    Me.mnuAnalysisList.Text = "&List"
-    '
-    'mnuAnalysisGenerate
-    '
-    Me.mnuAnalysisGenerate.Index = 2
-    Me.mnuAnalysisGenerate.Text = "&Generate"
     '
     'zgc
     '
@@ -193,18 +184,13 @@ Public Class atcGraphForm
     Me.zgc.Name = "zgc"
     Me.zgc.PointDateFormat = "g"
     Me.zgc.PointValueFormat = "G"
-    Me.zgc.Size = New System.Drawing.Size(544, 497)
+    Me.zgc.Size = New System.Drawing.Size(652, 573)
     Me.zgc.TabIndex = 0
-    '
-    'mnuEditX
-    '
-    Me.mnuEditX.Index = 0
-    Me.mnuEditX.Text = "&X Axis"
     '
     'atcGraphForm
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(544, 497)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(652, 573)
     Me.Controls.Add(Me.zgc)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
@@ -302,7 +288,10 @@ Public Class atcGraphForm
     Dim curveColor As Color = GetMatchingColor(t.Attributes.GetValue("scenario"))
     Dim curve As LineItem
 
-    curve = Pane.AddCurve(CurveLabel, t.Dates.Values, t.Values, curveColor, SymbolType.None)
+    Dim y() As Double = t.Values
+    Dim x() As Double = t.Dates.Values
+    curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
+
     curve.Line.Width = 1
     curve.Line.StepType = StepType.ForwardStep
     If Pane.CurveList.Count > 1 Then curve.IsY2Axis = True
@@ -331,5 +320,19 @@ Public Class atcGraphForm
     zgc.AxisChange()
     Invalidate()
     Me.Refresh()
+  End Sub
+
+  Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
+    Dim newDisplay As atcTimeseriesDisplay
+    Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
+    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+      If atf.Name = sender.Text Then
+        Dim typ As System.Type = atf.GetType()
+        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+        newDisplay = asm.CreateInstance(typ.FullName)
+        newDisplay.Show(pTimeseriesManager, pTimeseriesGroup)
+        Exit Sub
+      End If
+    Next
   End Sub
 End Class

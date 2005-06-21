@@ -358,22 +358,22 @@ Public Class PlugIn
     s = aFile.FileName & " contains " & aFile.Timeseries.Count() & " datasets" & vbCrLf & vbCrLf
     SaveFileString(lDebugFile, s)
 
-    lAttributeDetailsShow = True
-    For Each lDataset In aFile.Timeseries
-      lNvals = lDataset.numValues
-      s = "DSN " & lDataset.Attributes.GetValue("id") & " contains " & lNvals & " values" & vbCrLf
-      For Each lAttribute As DictionaryEntry In lDataset.Attributes.GetAll
-        s &= "  " & lAttribute.Key & " '" & lAttribute.Value & "'"
-        If lAttributeDetailsShow Then
-          s &= " (" & Trim(lDataset.Attributes.GetDefinition(lAttribute.Key).Description)
-        End If
-        s &= vbCrLf
-      Next
-      For i = 0 To 3
-        s &= "  Value(" & i & ") = " & lDataset.Dates.Value(i) & " " & lDataset.Value(i) & vbCrLf
-      Next
-      AppendFileString(lDebugFile, s)
-    Next
+    'lAttributeDetailsShow = True
+    'For Each lDataset In aFile.Timeseries
+    '  lNvals = lDataset.numValues
+    '  s = "DSN " & lDataset.Attributes.GetValue("id") & " contains " & lNvals & " values" & vbCrLf
+    '  For Each lAttribute As DictionaryEntry In lDataset.Attributes.GetAll
+    '    s &= "  " & lAttribute.Key & " '" & lAttribute.Value & "'"
+    '    If lAttributeDetailsShow Then
+    '      s &= " (" & Trim(lDataset.Attributes.GetDefinition(lAttribute.Key).Description)
+    '    End If
+    '    s &= vbCrLf
+    '  Next
+    '  For i = 0 To 3
+    '    s &= "  Value(" & i & ") = " & lDataset.Dates.Value(i) & " " & lDataset.Value(i) & vbCrLf
+    '  Next
+    '  AppendFileString(lDebugFile, s)
+    'Next
 
     g_MapWin.StatusBar.ProgressBarValue = 75
     g_MapWin.StatusBar.ProgressBarValue = 100

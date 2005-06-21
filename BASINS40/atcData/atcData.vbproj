@@ -169,11 +169,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "clsJavaPluginAdapter.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "frmManager.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
