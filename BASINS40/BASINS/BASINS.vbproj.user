@@ -13,7 +13,7 @@
                     StartAction = "Program"
                     StartArguments = ""
                     StartPage = ""
-                    StartProgram = "C:\dev\MapWindow40\Bin\Basins4.exe"
+                    StartProgram = "C:\dev\MapWindow40\Bin\MapWindow.exe"
                     StartURL = ""
                     StartWorkingDirectory = ""
                     StartWithIE = "true"

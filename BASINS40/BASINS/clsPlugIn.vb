@@ -161,6 +161,8 @@ Public Class PlugIn
       mnu = .AddMenu(DataMenuName & "_Download", DataMenuName, Nothing, "&Download")
       'mnu = .AddMenu(DataMenuName & "_DownloadTest", DataMenuName, Nothing, "Download &Test")
       'mnu = .AddMenu(DataMenuName & "_OpenTimeseries", DataMenuName, Nothing, "Open Timeseries File")
+
+      mnu = .AddMenu(DataMenuName & "_ComputeTimeseries", DataMenuName, Nothing, "Compute Timeseries")
       mnu = .AddMenu(DataMenuName & "_ManageTimeseries", DataMenuName, Nothing, "Manage Timeseries Files")
       'mnu = .AddMenu(DataMenuName & "_SelectTimeseries", DataMenuName, Nothing, "Select Timeseries")
 
@@ -184,6 +186,7 @@ Public Class PlugIn
     'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
 
     g_MapWin.Menus.Remove(DataMenuName & "_Download")
+    g_MapWin.Menus.Remove(DataMenuName & "_ComputeTimeseries")
     g_MapWin.Menus.Remove(DataMenuName & "_ManageTimeseries")
     g_MapWin.Menus.Remove(DataMenuName)
 
@@ -309,6 +312,8 @@ Public Class PlugIn
           End If
           'Case "OpenTimeseries"
           '  pTimeseriesManager.Open("")
+        Case "ComputeTimeseries"
+          pTimeseriesManager.UserCompute()
         Case "ManageTimeseries"
           pTimeseriesManager.UserManage()
         Case Else : MsgBox("Data Tool " & ItemName)
@@ -342,7 +347,7 @@ Public Class PlugIn
     End Set
   End Property
 
-  Private Sub pTimeseriesManager_OpenedFile(ByVal aFile As atcData.atcDataSource) Handles pTimeseriesManager.OpenedData
+  Private Sub pTimeseriesManager_OpenedData(ByVal aFile As atcData.atcDataSource) Handles pTimeseriesManager.OpenedData
     Dim s As String
     Dim i As Integer
     Dim lDebugFile As String = "c:\test\BASINS4\wdmFileDump.txt"

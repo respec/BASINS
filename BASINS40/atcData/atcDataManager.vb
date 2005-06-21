@@ -1,4 +1,4 @@
-'Manages a set of currently open data files
+'Manages a set of currently open DataSources
 'Uses the set of plugins currently loaded to find ones that inherit atcDataSource
 
 Imports atcUtility
@@ -8,7 +8,7 @@ Imports System.Reflection
 Public Class atcDataManager
   Private pMapWin As MapWindow.Interfaces.IMapWin
   Private pBasins As Object
-  Private pFiles As ArrayList 'of atcDataSource
+  Private pDataSources As ArrayList 'of atcDataSource
   Private pSelectionAttributes As ArrayList
   Private pDisplayAttributes As ArrayList
 
@@ -17,8 +17,14 @@ Public Class atcDataManager
   Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aBasins As Object)
     pMapWin = aMapWin
     pBasins = aBasins
+    Me.Clear()
+  End Sub
 
-    pFiles = New ArrayList
+  Public Sub Clear()
+    pDataSources = New ArrayList
+    Dim lMemory As New atcDataSource
+    lMemory.FileName = "<in memory>"
+    pDataSources.Add(lMemory)
 
     pSelectionAttributes = New ArrayList
     pSelectionAttributes.Add("Scenario")
@@ -28,10 +34,10 @@ Public Class atcDataManager
     pDisplayAttributes = pSelectionAttributes.Clone()
   End Sub
 
-  'The set of atcDataSource objects representing currently open files
-  Public ReadOnly Property Files() As ArrayList
+  'The set of atcDataSource objects representing currently open DataSources
+  Public ReadOnly Property DataSources() As ArrayList
     Get
-      Return pFiles
+      Return pDataSources
     End Get
   End Property
 
@@ -114,7 +120,7 @@ Public Class atcDataManager
       'TODO: LogError("Could not find a loaded plugin that can open '" & aFileNameOrConnectString & "'")
     Else
       If newSource.Open(aFileNameOrConnectString) Then
-        pFiles.Add(newSource)
+        pDataSources.Add(newSource)
         RaiseEvent OpenedData(newSource)
         OpenData = newSource
       Else
@@ -133,6 +139,11 @@ Public Class atcDataManager
       retval += atf.FileFilter
     Next
     Return retval
+  End Function
+
+  Public Function UserCompute(Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseries
+    Dim frmCompute As New atcData.frmComputeTimeseries
+    Return frmCompute.AskUser(Me, aGroup)
   End Function
 
   Public Function UserSelectTimeseries(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
@@ -158,7 +169,7 @@ Public Class atcDataManager
       For Each lName As String In pDisplayAttributes
         saveXML.NewChild("DisplayAttribute", lName)
       Next
-      For Each lFile As atcDataSource In pFiles
+      For Each lFile As atcDataSource In pDataSources
         lchildXML = saveXML.NewChild("TimeseriesFile", "")
         lchildXML.AddAttribute("FileName", lFile.FileName)
         lchildXML.AddAttribute("Filter", lFile.FileFilter)
@@ -169,7 +180,7 @@ Public Class atcDataManager
       Dim clearedSelectionAttributes As Boolean = False
       Dim clearedDisplayAttributes As Boolean = False
       Dim lchildXML As Chilkat.Xml
-      pFiles.Clear()
+      Me.Clear()
       lchildXML = newValue.FirstChild
 
       While Not lchildXML Is Nothing

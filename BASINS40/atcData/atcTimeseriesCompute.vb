@@ -21,7 +21,20 @@ Public Class atcTimeseriesCompute
 
   'Compute a new atcTimeseries
   'Args are each usually either Double or atcTimeseries
-  Public Overridable Function ComputeTimeseries(ByVal aOperationName As String, ByVal args As ArrayList) As atcTimeseries
+  Public Overridable Function ComputeTimeseries(ByVal aOperationName As String, _
+                                                ByVal args As ArrayList) As atcTimeseries
   End Function
 
+  'Add the controls to the given collection that will be used to specify the named operation.
+  'Operations that do not populate the interface cannot be used interactively.
+  Public Overridable Sub PopulateInterface(ByVal aOperationName As String, _
+                             ByVal aContainer As System.Windows.Forms.Control.ControlCollection, _
+                             ByVal aDataManager As atcDataManager)
+    aContainer.Clear()
+  End Sub
+
+  'Get the state of the controls added by PopulateInterface, return appropriate args for ComputeTimeseries
+  'Operations that do not populate the interface will not have to be able to ExtractArgs either
+  Public Overridable Function ExtractArgs() As ArrayList
+  End Function
 End Class
