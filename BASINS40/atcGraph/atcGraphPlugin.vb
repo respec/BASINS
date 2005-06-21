@@ -13,7 +13,6 @@ Public Class atcGraphPlugin
   Public Overrides Sub Show(ByVal aTimeseriesManager As atcData.atcDataManager, _
                    Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
     Dim gForm As New atcGraphForm(aTimeseriesManager, aTimeseriesGroup)
-    gForm.Show()
   End Sub
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
