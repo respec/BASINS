@@ -169,6 +169,16 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "frmComputeTimeseries.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmComputeTimeseries.resx"
+                    DependentUpon = "frmComputeTimeseries.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "frmManager.vb"
                     SubType = "Form"
                     BuildAction = "Compile"

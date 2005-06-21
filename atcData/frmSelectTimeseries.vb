@@ -186,7 +186,7 @@ Friend Class frmSelectTimeseries
   Private pcboCriteria() As Windows.Forms.ComboBox
   Private plstCriteria() As Windows.Forms.ListBox
 
-  Private pTimeseriesManager As atcDataManager
+  Private pDataManager As atcDataManager
 
   Private pMatchingTable As System.Data.DataTable
   Private pSelectedTable As System.Data.DataTable
@@ -217,12 +217,12 @@ Friend Class frmSelectTimeseries
   Private Sub Populate(ByVal aTimeseriesManager As atcDataManager)
     pMatchingTS = New atcTimeseriesGroup
 
-    pTimeseriesManager = aTimeseriesManager
+    pDataManager = aTimeseriesManager
     ReDim pcboCriteria(0)
     ReDim plstCriteria(0)
     Dim tblSty As Windows.Forms.DataGridTableStyle
 
-    For Each lAttribName As String In pTimeseriesManager.SelectionAttributes
+    For Each lAttribName As String In pDataManager.SelectionAttributes
       AddCriteria(lAttribName)
     Next
 
@@ -232,7 +232,7 @@ Friend Class frmSelectTimeseries
       .Item(0).DataType = GetType(atcTimeseries)
       pMatchingTable.PrimaryKey = New Data.DataColumn() {.Item(0)}
 
-      For Each lAttribName As String In pTimeseriesManager.DisplayAttributes
+      For Each lAttribName As String In pDataManager.DisplayAttributes
         .Add(New System.Data.DataColumn(lAttribName))
       Next
     End With
@@ -281,8 +281,8 @@ Friend Class frmSelectTimeseries
     For i = 0 To pcboCriteria.GetUpperBound(0)
       pcboCriteria(i).Items.Clear()
     Next
-    For Each tsFile As atcDataSource In pTimeseriesManager.Files
-      For Each ts As atcTimeseries In tsFile.Timeseries
+    For Each source As atcDataSource In pDataManager.DataSources
+      For Each ts As atcTimeseries In source.Timeseries
         For Each de As DictionaryEntry In ts.Attributes.GetAll
           If Not pcboCriteria(0).Items.Contains(de.Key) Then
             For i = 0 To pcboCriteria.GetUpperBound(0)
@@ -296,8 +296,8 @@ Friend Class frmSelectTimeseries
 
   Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As Windows.Forms.ListBox)
     aList.Items.Clear()
-    For Each tsFile As atcDataSource In pTimeseriesManager.Files
-      For Each ts As atcTimeseries In tsFile.Timeseries
+    For Each source As atcDataSource In pDataManager.DataSources
+      For Each ts As atcTimeseries In source.Timeseries
         Dim val As Object = ts.Attributes.GetValue(aAttributeName, Nothing)
         If Not val Is Nothing Then
           If Not aList.Items.Contains(val) Then
@@ -313,8 +313,8 @@ Friend Class frmSelectTimeseries
     pMatchingTable.Rows.Clear()
     pMatchingTS.Clear()
     pTotalTS = 0
-    For Each tsFile As atcDataSource In pTimeseriesManager.Files
-      For Each ts As atcTimeseries In tsFile.Timeseries
+    For Each source As atcDataSource In pDataManager.DataSources
+      For Each ts As atcTimeseries In source.Timeseries
         pTotalTS += 1
         For iCriteria As Integer = 0 To iLastCriteria
           Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
@@ -444,11 +444,11 @@ NextName:
     pSelectedOK = True
 
     'Update SelectionAttributes from current set of pcboCriteria
-    pTimeseriesManager.SelectionAttributes.Clear()
+    pDataManager.SelectionAttributes.Clear()
     For iCriteria As Integer = 0 To pcboCriteria.GetUpperBound(0)
       Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
       If Not attrName Is Nothing Then
-        pTimeseriesManager.SelectionAttributes.Add(attrName)
+        pDataManager.SelectionAttributes.Add(attrName)
       End If
     Next
     Me.Close()

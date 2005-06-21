@@ -101,7 +101,7 @@ Friend Class frmManager
     Me.Controls.Add(Me.treeFiles)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmManager"
-    Me.Text = "Timeseries Files"
+    Me.Text = "Data Sources"
     Me.ResumeLayout(False)
 
   End Sub
@@ -111,8 +111,8 @@ Friend Class frmManager
   Public Sub Edit(ByVal aManager As atcDataManager)
     pManager = aManager
     treeFiles.Nodes.Clear()
-    For Each lFile As atcDataSource In pManager.Files
-      AddFileToTree(treeFiles.Nodes, lFile)
+    For Each source As atcDataSource In pManager.DataSources
+      AddFileToTree(treeFiles.Nodes, source)
     Next
     Me.Show()
   End Sub
@@ -161,7 +161,7 @@ Friend Class frmManager
     End Select
   End Sub
 
-  Private Sub pManager_OpenedFile(ByVal aTimeseriesFile As atcDataSource) Handles pManager.OpenedData
+  Private Sub pManager_OpenedData(ByVal aDataSource As atcDataSource) Handles pManager.OpenedData
     Edit(pManager)
   End Sub
 End Class

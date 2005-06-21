@@ -13,7 +13,7 @@ Public Class atcDataSource
   End Enum
 
   'Filter for files that this class can read, formatted for common dialog.
-  'Returns empty string if there is no particular filter that would work.
+  'Returns empty string if this atcDataSource does not use files.
   Public Overridable ReadOnly Property FileFilter() As String
     Get
       Return "" '"All Files (*.*)|*.*"
@@ -45,7 +45,7 @@ Public Class atcDataSource
     End Get
   End Property
 
-  'True if SaveAs is implemented - files can be saved
+  'True if Save is implemented - files can be saved
   Public Overridable ReadOnly Property CanSave() As Boolean
     Get
       Return False
@@ -68,12 +68,12 @@ Public Class atcDataSource
   'Or save recently updated data to current file if SaveFileName = Me.FileName
   'Returns True if successful
   Public Overridable Function Save(ByVal SaveFileName As String, _
-                          Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+         Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
     Err.Raise(0, Me, "Save must be overridden to be used, atcDataSource does not implement.")
   End Function
 
   Public Overridable Function AddTimeseries(ByRef t As atcTimeseries, _
-                       Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+         Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
     If pTimeseries.Contains(t) Then
       Return False 'can't add, already have it
     Else
