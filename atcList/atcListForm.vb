@@ -1,5 +1,7 @@
 Imports atcData
 
+Imports System.Windows.Forms
+
 Friend Class atcListForm
   Inherits System.Windows.Forms.Form
 
@@ -27,7 +29,7 @@ Friend Class atcListForm
 
     If pTimeseriesGroup.Count > 0 Then
       Me.Show()
-      Populate()
+      PopulateGrid()
     Else 'use declined to specify timeseries
       Me.Close()
     End If
@@ -49,45 +51,20 @@ Friend Class atcListForm
   'NOTE: The following procedure is required by the Windows Form Designer
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
-  Friend WithEvents gridMain As System.Windows.Forms.DataGrid
   Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcListForm))
-    Me.gridMain = New System.Windows.Forms.DataGrid
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
-    Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
-    CType(Me.gridMain, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.SuspendLayout()
-    '
-    'gridMain
-    '
-    Me.gridMain.AllowNavigation = False
-    Me.gridMain.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.gridMain.CaptionVisible = False
-    Me.gridMain.DataMember = ""
-    Me.gridMain.HeaderForeColor = System.Drawing.SystemColors.ControlText
-    Me.gridMain.Location = New System.Drawing.Point(0, -16)
-    Me.gridMain.Name = "gridMain"
-    Me.gridMain.ReadOnly = True
-    Me.gridMain.RowHeadersVisible = False
-    Me.gridMain.Size = New System.Drawing.Size(528, 560)
-    Me.gridMain.TabIndex = 13
+    Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     '
     'MainMenu1
     '
     Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAnalysis})
-    '
-    'mnuAnalysis
-    '
-    Me.mnuAnalysis.Index = 1
-    Me.mnuAnalysis.Text = "Analysis"
     '
     'mnuFile
     '
@@ -100,17 +77,19 @@ Friend Class atcListForm
     Me.mnuFileAdd.Index = 0
     Me.mnuFileAdd.Text = "Add Timeseries"
     '
+    'mnuAnalysis
+    '
+    Me.mnuAnalysis.Index = 1
+    Me.mnuAnalysis.Text = "Analysis"
+    '
     'atcListForm
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(528, 541)
-    Me.Controls.Add(Me.gridMain)
+    Me.ClientSize = New System.Drawing.Size(528, 545)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "atcListForm"
     Me.Text = "Timeseries List"
-    CType(Me.gridMain, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.ResumeLayout(False)
 
   End Sub
 
@@ -118,69 +97,40 @@ Friend Class atcListForm
 
   Private pDataManager As atcDataManager
 
-  Private pTable As System.Data.DataTable
+  'The grid control
+  Private WithEvents agdMain As atcControls.atcGrid
 
   'The group of atcTimeseries displayed
   Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
 
-  Private Sub Populate()
-    Dim tblSty As Windows.Forms.DataGridTableStyle
+  'Translator class between pTimeseriesGroup and agdMain
+  Private pSource As ListGridSource
 
-    pTable = New System.Data.DataTable
-    With pTable.Columns
-      .Add(New System.Data.DataColumn("atcTimeseries"))
-      .Item(0).DataType = GetType(atcTimeseries)
-      pTable.PrimaryKey = New Data.DataColumn() {.Item(0)}
+  Private Sub PopulateGrid()
+    pSource = New ListGridSource(pDataManager, pTimeseriesGroup)
 
-      For Each lAttribName As String In pDataManager.DisplayAttributes
-        .Add(New System.Data.DataColumn(lAttribName))
-      Next
+    If Not agdMain Is Nothing Then
+      Me.Controls.Remove(agdMain)
+    End If
+
+    agdMain = New atcControls.atcGrid(pSource)
+    With agdMain
+      .Location = New System.Drawing.Point(0, 0)
+      .Name = "agdMain"
+      .Size = Me.ClientSize
+      .TabIndex = 14
+      .Anchor = AnchorStyles.Top _
+             Or AnchorStyles.Bottom _
+             Or AnchorStyles.Left _
+             Or AnchorStyles.Right
+      Me.Controls.Add(agdMain)
+      .Refresh()
     End With
-
-    For Each lColumn As System.Data.DataColumn In pTable.Columns
-      lColumn.DataType = GetType(String)
-      lColumn.ReadOnly = True
-    Next
-
-    gridMain.SetDataBinding(pTable, "")
-
-    ' Hide the first column of each grid (holds serial #)
-    tblSty = New Windows.Forms.DataGridTableStyle
-    tblSty.RowHeadersVisible = False
-    gridMain.TableStyles.Add(tblSty)
-    gridMain.TableStyles(0).GridColumnStyles(0).Width = 0
-
-    'Populate pTable from selected group
-    For Each ts As atcTimeseries In pTimeseriesGroup
-      AddTStoTable(ts, pTable)
-    Next
   End Sub
 
-  Private Sub AddTStoTable(ByVal aTS As atcData.atcTimeseries, ByVal aTable As System.Data.DataTable)
-    Dim row() As Object
-    ReDim row(aTable.Columns.Count - 1)
-    row(0) = aTS.Serial
-    For iColumn As Integer = 1 To aTable.Columns.Count - 1
-      row(iColumn) = aTS.Attributes.GetValue(aTable.Columns(iColumn).ColumnName)
-    Next
-    aTable.Rows.Add(row)
-  End Sub
   Private Function GetIndex(ByVal aName As String) As Integer
     Return CInt(Mid(aName, InStr(aName, "#") + 1))
   End Function
-
-  Private Sub gridMatching_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs)
-    Dim lRow As Integer = gridMain.HitTest(e.X, e.Y).Row
-    If IsNumeric(gridMain.Item(lRow, 0)) Then 'clicked a row containing a serial number
-      Dim lSerial As Integer = CInt(gridMain.Item(lRow, 0)) 'Serial number in clicked row
-      Dim iTS As Integer = pTimeseriesGroup.IndexOfSerial(lSerial)
-      If iTS >= 0 Then 'Already selected, unselect
-        'TODO
-      Else 'Not already selected, select it now
-        'TODO
-      End If
-    End If
-  End Sub
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
     Dim newDisplay As atcTimeseriesDisplay
@@ -201,13 +151,54 @@ Friend Class atcListForm
   End Sub
 
   Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pTimeseriesGroup.Added
-    Populate()
+    PopulateGrid()
     'TODO: could efficiently insert newly added item(s)
   End Sub
 
   Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pTimeseriesGroup.Removed
-    Populate()
+    PopulateGrid()
     'TODO: could efficiently remove by serial number
   End Sub
 
+End Class
+
+Friend Class ListGridSource
+  Inherits atcControls.atcGridSource
+
+  Private pDataManager As atcDataManager
+  Private pTimeseriesGroup As atcTimeseriesGroup
+
+  Sub New(ByVal aDataManager As atcData.atcDataManager, _
+          ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup)
+    pDataManager = aDataManager
+    pTimeseriesGroup = aTimeseriesGroup
+  End Sub
+
+  Public Overrides Property Columns() As Integer
+    Get
+      Return pTimeseriesGroup.Count + 1
+    End Get
+    Set(ByVal Value As Integer)
+    End Set
+  End Property
+
+  Public Overrides Property Rows() As Integer
+    Get
+      Return pDataManager.DisplayAttributes.Count()
+    End Get
+    Set(ByVal Value As Integer)
+    End Set
+  End Property
+
+  Public Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+    Get
+      If aColumn = 0 Then
+        Return pDataManager.DisplayAttributes(aRow)
+      Else
+        Return pTimeseriesGroup(aColumn - 1).Attributes.GetValue(pDataManager.DisplayAttributes(aRow))
+      End If
+    End Get
+    Set(ByVal Value As String)
+    End Set
+  End Property
 End Class

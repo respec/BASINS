@@ -111,6 +111,11 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "atcGridSource.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "atcText.vb"
                     SubType = "UserControl"
                     BuildAction = "Compile"

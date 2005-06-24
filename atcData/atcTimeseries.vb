@@ -135,6 +135,7 @@ Public Class atcTimeseries
     Clear()
     pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
     pFile = aFile
+    Me.Attributes.SetValue("File", aFile.FileName)
   End Sub
 
   'Get or set the number of values
