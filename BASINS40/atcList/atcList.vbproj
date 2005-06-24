@@ -3,7 +3,7 @@
         ProjectType = "Local"
         ProductVersion = "7.10.3077"
         SchemaVersion = "2.0"
-        ProjectGuid = "{A1A87CB8-8B9E-4c90-9549-C065357E499F}"
+        ProjectGuid = "{A1A87CB8-8B9E-4C90-9549-C065357E499F}"
     >
         <Build>
             <Settings
@@ -105,6 +105,16 @@
                     AssemblyName = "MapWinInterfaces"
                     HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
                     Private = "False"
+                />
+                <Reference
+                    Name = "atcControls"
+                    Project = "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
+                <Reference
+                    Name = "System.Xml"
+                    AssemblyName = "System.Xml"
+                    HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Xml.dll"
                 />
             </References>
             <Imports>

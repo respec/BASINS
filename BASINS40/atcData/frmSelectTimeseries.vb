@@ -1,5 +1,7 @@
 Imports atcData
 
+Imports System.Windows.Forms
+
 Friend Class frmSelectTimeseries
   Inherits System.Windows.Forms.Form
 
@@ -31,122 +33,95 @@ Friend Class frmSelectTimeseries
   'NOTE: The following procedure is required by the Windows Form Designer
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
-  Friend WithEvents gridMatching As System.Windows.Forms.DataGrid
-  Friend WithEvents gridSelected As System.Windows.Forms.DataGrid
-  Friend WithEvents btnAddAttribute As System.Windows.Forms.Button
   Friend WithEvents groupTop As System.Windows.Forms.GroupBox
-  Friend WithEvents lblMatching As System.Windows.Forms.Label
-  Friend WithEvents groupSelected As System.Windows.Forms.GroupBox
   Friend WithEvents pnlButtons As System.Windows.Forms.Panel
   Friend WithEvents btnOk As System.Windows.Forms.Button
   Friend WithEvents btnCancel As System.Windows.Forms.Button
+  Friend WithEvents splitAboveSelected As System.Windows.Forms.Splitter
+  Friend WithEvents groupSelected As System.Windows.Forms.GroupBox
+  Friend WithEvents panelCriteria As System.Windows.Forms.Panel
+  Friend WithEvents btnAddAttribute As System.Windows.Forms.Button
+  Friend WithEvents splitAboveMatching As System.Windows.Forms.Splitter
+  Friend WithEvents lblMatching As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectTimeseries))
     Me.groupTop = New System.Windows.Forms.GroupBox
-    Me.btnAddAttribute = New System.Windows.Forms.Button
-    Me.gridMatching = New System.Windows.Forms.DataGrid
     Me.lblMatching = New System.Windows.Forms.Label
-    Me.groupSelected = New System.Windows.Forms.GroupBox
-    Me.gridSelected = New System.Windows.Forms.DataGrid
+    Me.splitAboveMatching = New System.Windows.Forms.Splitter
+    Me.panelCriteria = New System.Windows.Forms.Panel
+    Me.btnAddAttribute = New System.Windows.Forms.Button
     Me.pnlButtons = New System.Windows.Forms.Panel
     Me.btnCancel = New System.Windows.Forms.Button
     Me.btnOk = New System.Windows.Forms.Button
+    Me.splitAboveSelected = New System.Windows.Forms.Splitter
+    Me.groupSelected = New System.Windows.Forms.GroupBox
     Me.groupTop.SuspendLayout()
-    CType(Me.gridMatching, System.ComponentModel.ISupportInitialize).BeginInit()
-    Me.groupSelected.SuspendLayout()
-    CType(Me.gridSelected, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.panelCriteria.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     Me.SuspendLayout()
     '
     'groupTop
     '
-    Me.groupTop.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.groupTop.Controls.Add(Me.btnAddAttribute)
-    Me.groupTop.Controls.Add(Me.gridMatching)
     Me.groupTop.Controls.Add(Me.lblMatching)
-    Me.groupTop.Location = New System.Drawing.Point(8, 8)
+    Me.groupTop.Controls.Add(Me.splitAboveMatching)
+    Me.groupTop.Controls.Add(Me.panelCriteria)
+    Me.groupTop.Dock = System.Windows.Forms.DockStyle.Top
+    Me.groupTop.Location = New System.Drawing.Point(0, 0)
     Me.groupTop.Name = "groupTop"
-    Me.groupTop.Size = New System.Drawing.Size(512, 352)
+    Me.groupTop.Size = New System.Drawing.Size(528, 352)
     Me.groupTop.TabIndex = 10
     Me.groupTop.TabStop = False
     Me.groupTop.Text = "Select Attribute Values to Filter Available Data"
     '
+    'lblMatching
+    '
+    Me.lblMatching.Dock = System.Windows.Forms.DockStyle.Top
+    Me.lblMatching.Location = New System.Drawing.Point(3, 168)
+    Me.lblMatching.Name = "lblMatching"
+    Me.lblMatching.Size = New System.Drawing.Size(522, 16)
+    Me.lblMatching.TabIndex = 14
+    Me.lblMatching.Text = "Matching Timeseries (click to select)"
+    '
+    'splitAboveMatching
+    '
+    Me.splitAboveMatching.Dock = System.Windows.Forms.DockStyle.Top
+    Me.splitAboveMatching.Location = New System.Drawing.Point(3, 160)
+    Me.splitAboveMatching.Name = "splitAboveMatching"
+    Me.splitAboveMatching.Size = New System.Drawing.Size(522, 8)
+    Me.splitAboveMatching.TabIndex = 12
+    Me.splitAboveMatching.TabStop = False
+    '
+    'panelCriteria
+    '
+    Me.panelCriteria.Controls.Add(Me.btnAddAttribute)
+    Me.panelCriteria.Dock = System.Windows.Forms.DockStyle.Top
+    Me.panelCriteria.Location = New System.Drawing.Point(3, 16)
+    Me.panelCriteria.Name = "panelCriteria"
+    Me.panelCriteria.Size = New System.Drawing.Size(522, 144)
+    Me.panelCriteria.TabIndex = 11
+    '
     'btnAddAttribute
     '
     Me.btnAddAttribute.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnAddAttribute.Location = New System.Drawing.Point(480, 24)
+    Me.btnAddAttribute.Location = New System.Drawing.Point(496, 8)
     Me.btnAddAttribute.Name = "btnAddAttribute"
     Me.btnAddAttribute.Size = New System.Drawing.Size(16, 16)
-    Me.btnAddAttribute.TabIndex = 1
+    Me.btnAddAttribute.TabIndex = 2
     Me.btnAddAttribute.Text = "+"
-    '
-    'gridMatching
-    '
-    Me.gridMatching.AllowNavigation = False
-    Me.gridMatching.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.gridMatching.CaptionVisible = False
-    Me.gridMatching.DataMember = ""
-    Me.gridMatching.HeaderForeColor = System.Drawing.SystemColors.ControlText
-    Me.gridMatching.Location = New System.Drawing.Point(8, 200)
-    Me.gridMatching.Name = "gridMatching"
-    Me.gridMatching.ReadOnly = True
-    Me.gridMatching.RowHeadersVisible = False
-    Me.gridMatching.Size = New System.Drawing.Size(496, 144)
-    Me.gridMatching.TabIndex = 1
-    '
-    'lblMatching
-    '
-    Me.lblMatching.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.lblMatching.Location = New System.Drawing.Point(8, 176)
-    Me.lblMatching.Name = "lblMatching"
-    Me.lblMatching.Size = New System.Drawing.Size(216, 16)
-    Me.lblMatching.TabIndex = 10
-    Me.lblMatching.Text = "Matching Timeseries (click to select)"
-    '
-    'groupSelected
-    '
-    Me.groupSelected.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.groupSelected.Controls.Add(Me.gridSelected)
-    Me.groupSelected.Location = New System.Drawing.Point(8, 368)
-    Me.groupSelected.Name = "groupSelected"
-    Me.groupSelected.Size = New System.Drawing.Size(512, 112)
-    Me.groupSelected.TabIndex = 11
-    Me.groupSelected.TabStop = False
-    Me.groupSelected.Text = "Selected Timeseries"
-    '
-    'gridSelected
-    '
-    Me.gridSelected.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.gridSelected.CaptionVisible = False
-    Me.gridSelected.CausesValidation = False
-    Me.gridSelected.DataMember = ""
-    Me.gridSelected.HeaderForeColor = System.Drawing.SystemColors.ControlText
-    Me.gridSelected.Location = New System.Drawing.Point(8, 40)
-    Me.gridSelected.Name = "gridSelected"
-    Me.gridSelected.ReadOnly = True
-    Me.gridSelected.RowHeadersVisible = False
-    Me.gridSelected.Size = New System.Drawing.Size(496, 64)
-    Me.gridSelected.TabIndex = 2
     '
     'pnlButtons
     '
-    Me.pnlButtons.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
-    Me.pnlButtons.Location = New System.Drawing.Point(8, 488)
+    Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 485)
     Me.pnlButtons.Name = "pnlButtons"
-    Me.pnlButtons.Size = New System.Drawing.Size(184, 24)
+    Me.pnlButtons.Size = New System.Drawing.Size(528, 40)
     Me.pnlButtons.TabIndex = 12
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(104, 0)
+    Me.btnCancel.Location = New System.Drawing.Point(104, 8)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(80, 24)
     Me.btnCancel.TabIndex = 4
@@ -154,26 +129,44 @@ Friend Class frmSelectTimeseries
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(0, 0)
+    Me.btnOk.Location = New System.Drawing.Point(8, 8)
     Me.btnOk.Name = "btnOk"
     Me.btnOk.Size = New System.Drawing.Size(80, 24)
     Me.btnOk.TabIndex = 3
     Me.btnOk.Text = "Ok"
     '
+    'splitAboveSelected
+    '
+    Me.splitAboveSelected.Dock = System.Windows.Forms.DockStyle.Top
+    Me.splitAboveSelected.Location = New System.Drawing.Point(0, 352)
+    Me.splitAboveSelected.Name = "splitAboveSelected"
+    Me.splitAboveSelected.Size = New System.Drawing.Size(528, 8)
+    Me.splitAboveSelected.TabIndex = 11
+    Me.splitAboveSelected.TabStop = False
+    '
+    'groupSelected
+    '
+    Me.groupSelected.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.groupSelected.Location = New System.Drawing.Point(0, 360)
+    Me.groupSelected.Name = "groupSelected"
+    Me.groupSelected.Size = New System.Drawing.Size(528, 125)
+    Me.groupSelected.TabIndex = 14
+    Me.groupSelected.TabStop = False
+    Me.groupSelected.Text = "Selected Timeseries"
+    '
     'frmSelectTimeseries
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(528, 525)
-    Me.Controls.Add(Me.pnlButtons)
     Me.Controls.Add(Me.groupSelected)
+    Me.Controls.Add(Me.splitAboveSelected)
+    Me.Controls.Add(Me.pnlButtons)
     Me.Controls.Add(Me.groupTop)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmSelectTimeseries"
     Me.Text = "Select Timeseries"
     Me.groupTop.ResumeLayout(False)
-    CType(Me.gridMatching, System.ComponentModel.ISupportInitialize).EndInit()
-    Me.groupSelected.ResumeLayout(False)
-    CType(Me.gridSelected, System.ComponentModel.ISupportInitialize).EndInit()
+    Me.panelCriteria.ResumeLayout(False)
     Me.pnlButtons.ResumeLayout(False)
     Me.ResumeLayout(False)
 
@@ -181,19 +174,24 @@ Friend Class frmSelectTimeseries
 
 #End Region
 
-  Private Const pPad As Integer = 15
+  Private Const PADDING As Integer = 15
+  Private Const REMOVE_VALUE = "~Remove~"
 
   Private pcboCriteria() As Windows.Forms.ComboBox
   Private plstCriteria() As Windows.Forms.ListBox
 
   Private pDataManager As atcDataManager
 
-  Private pMatchingTable As System.Data.DataTable
-  Private pSelectedTable As System.Data.DataTable
+  Private WithEvents pMatchingGrid As atcControls.atcGrid
+  Private WithEvents pSelectedGrid As atcControls.atcGrid
 
   Private pMatchingTS As atcTimeseriesGroup
   Private pSelectedTS As atcTimeseriesGroup
 
+  Private pMatchingSource As GridSource
+  Private pSelectedSource As GridSource
+
+  Private pInitializing As Boolean
   Private pSelectedOK As Boolean
 
   Private pTotalTS As Integer
@@ -214,72 +212,58 @@ Friend Class frmSelectTimeseries
     Return pSelectedTS
   End Function
 
-  Private Sub Populate(ByVal aTimeseriesManager As atcDataManager)
-    pMatchingTS = New atcTimeseriesGroup
+  Private Sub Populate(ByVal aDataManager As atcDataManager)
+    pInitializing = True
+    pDataManager = aDataManager
 
-    pDataManager = aTimeseriesManager
+    pMatchingTS = New atcTimeseriesGroup
+    pMatchingSource = New GridSource(pDataManager, pMatchingTS)
+    pSelectedSource = New GridSource(pDataManager, pSelectedTS)
+
+    'If Not pMatchingGrid Is Nothing Then
+    '  groupTop.Controls.Remove(pMatchingGrid)
+    'End If
+
+    pMatchingGrid = New atcControls.atcGrid(pMatchingSource)
+    With pMatchingGrid
+      .Name = "pMatchingGrid"
+      .Location = New Drawing.Point(3, 184)
+      .Size = New System.Drawing.Size(522, 165)
+      .Dock = DockStyle.Fill
+    End With
+    groupTop.Controls.Add(pMatchingGrid)
+    AddHandler pMatchingGrid.MouseDownCell, AddressOf pMatchingGrid_MouseDownCell
+
+    If Not pSelectedGrid Is Nothing Then
+      groupSelected.Controls.Remove(pSelectedGrid)
+    End If
+
+    pSelectedGrid = New atcControls.atcGrid(pSelectedSource)
+    With pSelectedGrid
+      .Name = "pSelectedGrid"
+      .Dock = DockStyle.Fill
+    End With
+    groupSelected.Controls.Add(pSelectedGrid)
+    AddHandler pSelectedGrid.MouseDownCell, AddressOf pSelectedGrid_MouseDownCell
+
     ReDim pcboCriteria(0)
     ReDim plstCriteria(0)
-    Dim tblSty As Windows.Forms.DataGridTableStyle
 
     For Each lAttribName As String In pDataManager.SelectionAttributes
       AddCriteria(lAttribName)
     Next
 
-    pMatchingTable = New System.Data.DataTable
-    With pMatchingTable.Columns
-      .Add(New System.Data.DataColumn("atcTimeseries"))
-      .Item(0).DataType = GetType(atcTimeseries)
-      pMatchingTable.PrimaryKey = New Data.DataColumn() {.Item(0)}
-
-      For Each lAttribName As String In pDataManager.DisplayAttributes
-        .Add(New System.Data.DataColumn(lAttribName))
-      Next
-    End With
-
-    For Each lColumn As System.Data.DataColumn In pMatchingTable.Columns
-      lColumn.DataType = GetType(String)
-      lColumn.ReadOnly = True
-    Next
-
-    gridMatching.SetDataBinding(pMatchingTable, "")
-    pSelectedTable = pMatchingTable.Clone
-    gridSelected.SetDataBinding(pSelectedTable, "")
-
-    ' Hide the first column of each grid (holds serial #)
-    tblSty = New Windows.Forms.DataGridTableStyle
-    tblSty.RowHeadersVisible = False
-    gridMatching.TableStyles.Add(tblSty)
-    gridMatching.TableStyles(0).GridColumnStyles(0).Width = 0
-
-    tblSty = New Windows.Forms.DataGridTableStyle
-    tblSty.RowHeadersVisible = False
-    gridSelected.TableStyles.Add(tblSty)
-    gridSelected.TableStyles(0).GridColumnStyles(0).Width = 0
+    'TODO: Hide the serial # in the grid
 
     PopulateMatching()
-
-    'Populate pSelectedTable from selected group
-    For Each ts As atcTimeseries In pSelectedTS
-      AddTStoTable(ts, pSelectedTable)
-    Next
+    pInitializing = False
   End Sub
-
-  'Private Sub PopulateOperations()
-  '  Dim lNode As System.Windows.Forms.TreeNode
-  '  For Each curPlugin As atcDataPlugin In pManager.TimeseriesDataPlugins
-  '    lNode = treeOperations.Nodes.Add(curPlugin.Name)
-  '    lNode.Expand()
-  '    For Each def As DictionaryEntry In curPlugin.AvailableTimeseriesOperations
-  '      lNode.Nodes.Add(def.Value.Name)
-  '    Next
-  '  Next
-  'End Sub
 
   Private Sub PopulateCriteriaCombos()
     Dim i As Integer
     For i = 0 To pcboCriteria.GetUpperBound(0)
       pcboCriteria(i).Items.Clear()
+      pcboCriteria(i).Items.Add(REMOVE_VALUE)
     Next
     For Each source As atcDataSource In pDataManager.DataSources
       For Each ts As atcTimeseries In source.Timeseries
@@ -310,7 +294,6 @@ Friend Class frmSelectTimeseries
 
   Private Sub PopulateMatching()
     Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
-    pMatchingTable.Rows.Clear()
     pMatchingTS.Clear()
     pTotalTS = 0
     For Each source As atcDataSource In pDataManager.DataSources
@@ -330,39 +313,60 @@ Friend Class frmSelectTimeseries
         Next
         'Matched all criteria, add to matching table
         pMatchingTS.Add(ts)
-        AddTStoTable(ts, pMatchingTable)
 NextTS:
       Next
     Next
-    lblMatching.Text = "Matching Timeseries (" & pMatchingTable.Rows.Count & " of " & pTotalTS & ")"
-    gridMatching.Refresh()
+    lblMatching.Text = "Matching Timeseries (" & pMatchingTS.Count & " of " & pTotalTS & ")"
+    pMatchingGrid.Refresh()
   End Sub
 
-  Private Sub AddTStoTable(ByVal aTS As atcData.atcTimeseries, ByVal aTable As System.Data.DataTable)
-    Dim row() As Object
-    ReDim row(aTable.Columns.Count - 1)
-    row(0) = aTS.Serial
-    For iColumn As Integer = 1 To aTable.Columns.Count - 1
-      row(iColumn) = aTS.Attributes.GetValue(aTable.Columns(iColumn).ColumnName)
-    Next
-    aTable.Rows.Add(row)
-  End Sub
   Private Function GetIndex(ByVal aName As String) As Integer
     Return CInt(Mid(aName, InStr(aName, "#") + 1))
   End Function
 
   Private Sub cboCriteria_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
     If Not sender.SelectedItem Is Nothing Then
-      PopulateCriteriaList(sender.SelectedItem, plstCriteria(GetIndex(sender.name)))
+      If sender.SelectedItem = REMOVE_VALUE Then
+        RemoveCriteria(sender, plstCriteria(GetIndex(sender.name)))
+      Else
+        PopulateCriteriaList(sender.SelectedItem, plstCriteria(GetIndex(sender.name)))
+        If Not pInitializing Then
+          UpdateManagerSelectionAttributes()
+          PopulateMatching()
+          pSelectedGrid.Refresh()
+        End If
+      End If
     End If
   End Sub
 
   Private Sub lstCriteria_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
-    PopulateMatching()
+    If Not pInitializing Then
+      UpdateManagerSelectionAttributes()
+      PopulateMatching()
+      pSelectedGrid.Refresh()
+    End If
   End Sub
 
   Private Sub btnAddAttribute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddAttribute.Click
     AddCriteria()
+  End Sub
+
+  Private Sub RemoveCriteria(ByVal cbo As Windows.Forms.ComboBox, ByVal lst As Windows.Forms.ListBox)
+    Dim iRemoving As Integer = GetIndex(cbo.Name)
+    RemoveHandler cbo.SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
+    RemoveHandler lst.SelectedValueChanged, AddressOf lstCriteria_SelectedIndexChanged
+    panelCriteria.Controls.Remove(cbo)
+    panelCriteria.Controls.Remove(lst)
+    For iMoving As Integer = iRemoving To pcboCriteria.GetUpperBound(0) - 1
+      pcboCriteria(iMoving) = pcboCriteria(iMoving + 1)
+      plstCriteria(iMoving) = plstCriteria(iMoving + 1)
+    Next
+    ReDim Preserve pcboCriteria(pcboCriteria.GetUpperBound(0) - 1)
+    ReDim Preserve plstCriteria(plstCriteria.GetUpperBound(0) - 1)
+    SizeCriteria()
+    UpdateManagerSelectionAttributes()
+    PopulateMatching()
+    pSelectedGrid.Refresh()
   End Sub
 
   Private Sub AddCriteria(Optional ByVal aText As String = "")
@@ -376,8 +380,8 @@ NextTS:
     pcboCriteria(iCriteria) = New Windows.Forms.ComboBox
     plstCriteria(iCriteria) = New Windows.Forms.ListBox
 
-    groupTop.Controls.Add(pcboCriteria(iCriteria))
-    groupTop.Controls.Add(plstCriteria(iCriteria))
+    panelCriteria.Controls.Add(pcboCriteria(iCriteria))
+    panelCriteria.Controls.Add(plstCriteria(iCriteria))
 
     AddHandler pcboCriteria(iCriteria).SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
     AddHandler plstCriteria(iCriteria).SelectedValueChanged, AddressOf lstCriteria_SelectedIndexChanged
@@ -394,6 +398,7 @@ NextTS:
       .IntegralHeight = False
       .SelectionMode = Windows.Forms.SelectionMode.MultiSimple
       .Sorted = True
+      '.Dock = Windows.Forms.DockStyle.Left
     End With
 
     If iCriteria = 0 Then
@@ -407,33 +412,48 @@ NextTS:
       pcboCriteria(iCriteria).Text = aText
     Else 'Find next criteria that is not yet in use
       For Each curName As String In pcboCriteria(iCriteria).Items
-        For iOtherCriteria As Integer = 0 To iCriteria - 1
-          If curName.Equals(pcboCriteria(iOtherCriteria).SelectedItem) Then GoTo NextName
-        Next
-        pcboCriteria(iCriteria).Text = curName
-        Exit For
+        If curName <> REMOVE_VALUE Then
+          For iOtherCriteria As Integer = 0 To iCriteria - 1
+            If curName.Equals(pcboCriteria(iOtherCriteria).SelectedItem) Then GoTo NextName
+          Next
+          pcboCriteria(iCriteria).Text = curName
+          Exit For
+        End If
 NextName:
       Next
     End If
 
-    frmSelectTimeseries_Resize(Nothing, Nothing)
+    If Not pInitializing Then
+      UpdateManagerSelectionAttributes()
+      PopulateMatching()
+      pSelectedGrid.Refresh()
+    End If
+    SizeCriteria()
 
   End Sub
 
   Private Sub frmSelectTimeseries_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+    SizeCriteria()
+  End Sub
+
+  Private Sub panelCriteria_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles panelCriteria.SizeChanged
+    SizeCriteria()
+  End Sub
+
+  Private Sub SizeCriteria()
     If Not pcboCriteria Is Nothing Then
       Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
-      Dim perCriteriaWidth As Integer = (btnAddAttribute.Left - pPad) / (iLastCriteria + 1)
-      Dim curLeft As Integer = pPad
+      Dim perCriteriaWidth As Integer = (btnAddAttribute.Left - PADDING) / (iLastCriteria + 1)
+      Dim curLeft As Integer = 3 'pMatchingGrid.Left
       For iCriteria As Integer = 0 To iLastCriteria
         pcboCriteria(iCriteria).Top = btnAddAttribute.Top
         pcboCriteria(iCriteria).Left = curLeft
-        pcboCriteria(iCriteria).Width = perCriteriaWidth - pPad
+        pcboCriteria(iCriteria).Width = perCriteriaWidth - PADDING
 
-        plstCriteria(iCriteria).Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + pPad
+        plstCriteria(iCriteria).Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING
         plstCriteria(iCriteria).Left = curLeft
         plstCriteria(iCriteria).Width = pcboCriteria(iCriteria).Width
-        plstCriteria(iCriteria).Height = lblMatching.Top - plstCriteria(iCriteria).Top - pPad
+        plstCriteria(iCriteria).Height = panelCriteria.Height - plstCriteria(iCriteria).Top - PADDING
 
         curLeft += perCriteriaWidth
       Next
@@ -442,15 +462,6 @@ NextName:
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
     pSelectedOK = True
-
-    'Update SelectionAttributes from current set of pcboCriteria
-    pDataManager.SelectionAttributes.Clear()
-    For iCriteria As Integer = 0 To pcboCriteria.GetUpperBound(0)
-      Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
-      If Not attrName Is Nothing Then
-        pDataManager.SelectionAttributes.Add(attrName)
-      End If
-    Next
     Me.Close()
   End Sub
 
@@ -459,41 +470,94 @@ NextName:
     Me.Close()
   End Sub
 
-  Private Sub gridMatching_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles gridMatching.MouseDown
-    Dim lRow As Integer = gridMatching.HitTest(e.X, e.Y).Row
-    If IsNumeric(gridMatching.Item(lRow, 0)) Then 'clicked a row containing a serial number
-      Dim lSerial As Integer = CInt(gridMatching.Item(lRow, 0)) 'Serial number in clicked row
+  'Update SelectionAttributes from current set of pcboCriteria
+  Private Sub UpdateManagerSelectionAttributes()
+    pDataManager.SelectionAttributes.Clear()
+    For iCriteria As Integer = 0 To pcboCriteria.GetUpperBound(0)
+      Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
+      If Not attrName Is Nothing Then
+        pDataManager.SelectionAttributes.Add(attrName)
+      End If
+    Next
+  End Sub
+
+  Private Sub pMatchingGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+    If IsNumeric(pMatchingSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
+      Dim lSerial As Integer = CInt(pMatchingSource.CellValue(aRow, 0)) 'Serial number in clicked row
       Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
       If iTS >= 0 Then 'Already selected, unselect
         pSelectedTS.Remove(iTS)
-        pSelectedTable.Rows.Remove(pSelectedTable.Rows.Find(lSerial))
       Else 'Not already selected, select it now
         iTS = pMatchingTS.IndexOfSerial(lSerial)
         If iTS >= 0 Then 'Found matching serial number in pMatchingTS
           Dim selTS As atcData.atcTimeseries = pMatchingTS(iTS)
           pSelectedTS.Add(selTS)
-          AddTStoTable(selTS, pSelectedTable)
         End If
       End If
+      pSelectedGrid.Refresh()
     End If
-
-    groupSelected.Text = "Selected Timeseries (" & pSelectedTable.Rows.Count & " of " & pTotalTS & ")"
-
+    groupSelected.Text = "Selected Timeseries (" & pSelectedTS.Count & " of " & pTotalTS & ")"
   End Sub
 
-  Private Sub gridSelected_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles gridSelected.MouseDown
-    Dim lRow As Integer = gridSelected.HitTest(e.X, e.Y).Row
-    If IsNumeric(gridSelected.Item(lRow, 0)) Then 'clicked a row containing a serial number
-      Dim lSerial As Integer = CInt(gridSelected.Item(lRow, 0)) 'Serial number in row to be removed
+  Private Sub pSelectedGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+    If IsNumeric(pSelectedSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
+      Dim lSerial As Integer = CInt(pSelectedSource.CellValue(aRow, 0)) 'Serial number in row to be removed
       Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
       If iTS >= 0 Then 'Found matching serial number in pSelectedTS
         pSelectedTS.Remove(iTS)
-        pSelectedTable.Rows.Remove(pSelectedTable.Rows.Find(lSerial))
-        groupSelected.Text = "Selected Timeseries (" & pSelectedTable.Rows.Count & " of " & pTotalTS & ")"
+        groupSelected.Text = "Selected Timeseries (" & pSelectedTS.Count & " of " & pTotalTS & ")"
+        pSelectedGrid.Refresh()
       Else
         'TODO: should never reach this line
       End If
     End If
   End Sub
 
+End Class
+
+Friend Class GridSource
+  Inherits atcControls.atcGridSource
+
+  Private pDataManager As atcDataManager
+  Private pTimeseriesGroup As atcTimeseriesGroup
+
+  Sub New(ByVal aDataManager As atcData.atcDataManager, _
+          ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup)
+    pDataManager = aDataManager
+    pTimeseriesGroup = aTimeseriesGroup
+  End Sub
+
+  Public Overrides Property Columns() As Integer
+    Get
+      Return pDataManager.SelectionAttributes.Count() + 1
+    End Get
+    Set(ByVal Value As Integer)
+    End Set
+  End Property
+
+  Public Overrides Property Rows() As Integer
+    Get
+      Return pTimeseriesGroup.Count + 1
+    End Get
+    Set(ByVal Value As Integer)
+    End Set
+  End Property
+
+  Public Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+    Get
+      If aRow = 0 Then
+        If aColumn = 0 Then
+          Return ""
+        Else
+          Return pDataManager.SelectionAttributes(aColumn - 1)
+        End If
+      ElseIf aColumn = 0 Then
+        Return pTimeseriesGroup(aRow - 1).Serial()
+      Else
+        Return pTimeseriesGroup(aRow - 1).Attributes.GetValue(pDataManager.SelectionAttributes(aColumn - 1))
+      End If
+    End Get
+    Set(ByVal Value As String)
+    End Set
+  End Property
 End Class

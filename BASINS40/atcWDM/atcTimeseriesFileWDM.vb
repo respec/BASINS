@@ -974,11 +974,9 @@ Cntinu:
     Dim lWdmOpen As Integer
     Dim i As Integer
 
-    lDates = Nothing
     lDates = New atcTimeseries(Me)
     pDates.Add(lDates)
 
-    lData = Nothing
     lData = New atcTimeseries(Me)
     lData.Dates = lDates
     lData.Attributes.SetValue("id", dsn)

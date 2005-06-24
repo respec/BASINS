@@ -182,7 +182,8 @@ Public Class atcGraphForm
     'zgc
     '
     Me.zgc.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.zgc.IsEnablePan = True
+    Me.zgc.IsEnableHPan = True
+    Me.zgc.IsEnableVPan = True
     Me.zgc.IsEnableZoom = True
     Me.zgc.IsShowContextMenu = True
     Me.zgc.IsShowPointValues = False
