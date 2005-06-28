@@ -1,5 +1,7 @@
 Option Strict Off
-Option Explicit On
+Option Explicit On 
+
+Imports System.DateTime
 
 Public Module modDate
   '##MODULE_REMARKS Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
@@ -35,7 +37,7 @@ Public Module modDate
   Public Function MJD2VBdate(ByVal j As Double) As Date
     '##SUMMARY MJD2VBdate - convert a modified Julian date(MJD) to a VB date
     '##PARM j - MJD to convert
-    MJD2VBdate = System.DateTime.FromOADate(j + JulianModification - JulianModification1899)
+    MJD2VBdate = FromOADate(j + JulianModification - JulianModification1899)
   End Function
 
   'Decimal-aligns numbers by padding before and/or after number with spaces
@@ -700,16 +702,32 @@ Public Module modDate
                           ByVal NVALS As Integer) As Double
     Dim DATE1(6) As Integer
     Dim DATE2(6) As Integer
-    Select Case TCODE
-      Case 1 : TimAddJ = jStartDate + TSTEP * NVALS * JulianSecond
-      Case 2 : TimAddJ = jStartDate + TSTEP * NVALS * JulianMinute
-      Case 3 : TimAddJ = jStartDate + TSTEP * NVALS * JulianHour
-      Case 4 : TimAddJ = jStartDate + TSTEP * NVALS ' JulianDay = 1
-      Case 5, 6, 7 'month, year, century
-        J2Date(jStartDate, DATE1)
-        TIMADD(DATE1, TCODE, TSTEP, NVALS, DATE2)
-        TimAddJ = Date2J(DATE2)
-    End Select
+    Dim lDate As DateTime, lDateNew As DateTime
+
+    If NVALS >= 0 Then 'add
+      Select Case TCODE
+        Case 1 : TimAddJ = jStartDate + TSTEP * NVALS * JulianSecond
+        Case 2 : TimAddJ = jStartDate + TSTEP * NVALS * JulianMinute
+        Case 3 : TimAddJ = jStartDate + TSTEP * NVALS * JulianHour
+        Case 4 : TimAddJ = jStartDate + TSTEP * NVALS ' JulianDay = 1
+        Case 5, 6, 7 'month, year, century
+          J2Date(jStartDate, DATE1)
+          TIMADD(DATE1, TCODE, TSTEP, NVALS, DATE2)
+          TimAddJ = Date2J(DATE2)
+      End Select
+    Else 'subtract
+      lDate = FromOADate(jStartDate)
+      Select Case TCODE
+        Case 1 : lDateNew = lDate.AddSeconds(TSTEP * NVALS)
+        Case 2 : lDateNew = lDate.AddMinutes(TSTEP * NVALS)
+        Case 3 : lDateNew = lDate.AddHours(TSTEP * NVALS)
+        Case 4 : lDateNew = lDate.AddDays(TSTEP * NVALS)
+        Case 5 : lDateNew = lDate.AddMonths(TSTEP * NVALS)
+        Case 6 : lDateNew = lDate.AddYears(TSTEP * NVALS)
+        Case 7 : lDateNew = lDate.AddYears(TSTEP * NVALS * 100)
+      End Select
+      TimAddJ = lDateNew.ToOADate
+    End If
   End Function
 
   Public Sub TIMADD(ByVal DATE1() As Integer, _

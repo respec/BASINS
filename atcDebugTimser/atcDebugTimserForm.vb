@@ -111,6 +111,13 @@ Friend Class atcDebugTimserForm
   Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
 
   Private Sub PopulateTree()
+    Dim lAttributeName As String
+    Dim lAttributeValue As String
+    Dim lNumValues As Integer
+    Dim lNumValuesShow As Integer = 8 'make number of values to display editable
+    Dim lNumValuesNow As Integer
+    Dim lValueStart As Integer
+
     If Not atrMain Is Nothing Then
       Me.Controls.Remove(atrMain)
     End If
@@ -136,24 +143,48 @@ Friend Class atcDebugTimserForm
         lAttributeNode = lNode.Nodes.Add("Attributes")
         Dim lAttributes As SortedList = lTimeseries.Attributes.GetAll
         For i As Integer = 0 To lAttributes.Count - 1
-          lAttributeNode.Nodes.Add(lAttributes.GetKey(i) & " : " & lAttributes.GetByIndex(i))
+          lAttributeName = lAttributes.GetKey(i)
+          If InStr(LCase(lAttributeName), "jday", CompareMethod.Text) Then
+            lAttributeValue = DumpDate(lAttributes.GetByIndex(i))
+          Else
+            lAttributeValue = lAttributes.GetByIndex(i)
+          End If
+          lAttributeNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
         Next
         lAttributeNode.ExpandAll()
         lAttributeNode.EnsureVisible()
+
+        Dim lInternalNode As New TreeNode
+        lInternalNode = lNode.Nodes.Add("Internal")
+        lNumValues = lTimeseries.numValues
+        lInternalNode.Nodes.Add("NumValues :" & lNumValues)
+        lInternalNode.ExpandAll()
+        lInternalNode.EnsureVisible()
 
         lNode.Nodes.Add("Computed")
         'all computed attributes here?
 
         Dim lDataNode As New TreeNode
         lDataNode = lNode.Nodes.Add("Data")
-        Dim lnumValues = lTimeseries.numValues
-        If lnumValues > 100 Then 'make number of values to display editable
-          lnumValues = 100
+        If lNumValues > lNumValuesShow Then
+          lNumValuesNow = lNumValuesShow
         End If
-        For j As Integer = 0 To lnumValues - 1
+        For j As Integer = 0 To lNumValuesNow - 1
           lDataNode.Nodes.Add(DumpDate(lTimeseries.Dates.Value(j)) & " : " & _
                               lTimeseries.Value(j))
         Next
+        If lNumValues > lNumValuesShow Then  'some from end too
+          If lNumValues - lNumValuesShow > lNumValuesShow Then
+            lDataNode.Nodes.Add("  <" & lNumValues - (2 * lNumValuesShow) & " values skipped>")
+            lValueStart = lNumValues - lNumValuesShow
+          Else
+            lValueStart = lNumValuesNow
+          End If
+          For j As Integer = lValueStart To lTimeseries.numValues - 1
+            lDataNode.Nodes.Add(DumpDate(lTimeseries.Dates.Value(j)) & " : " & _
+                                lTimeseries.Value(j))
+          Next
+        End If
       Next
     End With
   End Sub

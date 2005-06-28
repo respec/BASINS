@@ -131,7 +131,7 @@ Public Class atcDataAttributes
         .Add("long filename", "FileName")
         .Add("path", "FileName")
 
-        .Add("ts", "Time Steps")
+        .Add("ts", "Time Step")
         .Add("tu", "Time Unit")
 
         .Add("id", "ID")
