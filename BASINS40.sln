@@ -39,6 +39,10 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcList", "atcList\atcList.
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcDebugTimser", "atcDebugTimser\atcDebugTimser.vbproj", "{F4EF0925-945B-418C-9A81-8490D89985DB}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -85,6 +89,10 @@ Global
 		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Debug.Build.0 = Debug|.NET
 		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Release.ActiveCfg = Release|.NET
 		{A1A87CB8-8B9E-4C90-9549-C065357E499F}.Release.Build.0 = Release|.NET
+		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug.ActiveCfg = Debug|.NET
+		{F4EF0925-945B-418C-9A81-8490D89985DB}.Debug.Build.0 = Debug|.NET
+		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release.ActiveCfg = Release|.NET
+		{F4EF0925-945B-418C-9A81-8490D89985DB}.Release.Build.0 = Release|.NET
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
