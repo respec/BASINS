@@ -1,0 +1,226 @@
+Imports System.Windows.Forms
+Imports atcData
+Imports atcUtility
+
+Friend Class atcDebugTimserForm
+  Inherits System.Windows.Forms.Form
+
+#Region " Windows Form Designer generated code "
+
+  Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
+        Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
+    MyBase.New()
+    pDataManager = aDataManager
+    If aTimeseriesGroup Is Nothing Then
+      pTimeseriesGroup = New atcTimeseriesGroup
+    Else
+      pTimeseriesGroup = aTimeseriesGroup
+    End If
+    InitializeComponent() 'required by Windows Form Designer
+
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
+    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+      mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    Next
+
+    If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
+      mnuFileAdd_Click(Nothing, Nothing)
+    End If
+
+    If pTimeseriesGroup.Count > 0 Then
+      Me.Show()
+      PopulateTree()
+    Else 'use declined to specify timeseries
+      Me.Close()
+    End If
+  End Sub
+
+  'Form overrides dispose to clean up the component list.
+  Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+    If disposing Then
+      If Not (components Is Nothing) Then
+        components.Dispose()
+      End If
+    End If
+    MyBase.Dispose(disposing)
+  End Sub
+
+  'Required by the Windows Form Designer
+  Private components As System.ComponentModel.IContainer
+
+  'NOTE: The following procedure is required by the Windows Form Designer
+  'It can be modified using the Windows Form Designer.  
+  'Do not modify it using the code editor.
+  Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
+  Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
+  <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDebugTimserForm))
+    Me.MainMenu1 = New System.Windows.Forms.MainMenu
+    Me.mnuFile = New System.Windows.Forms.MenuItem
+    Me.mnuFileAdd = New System.Windows.Forms.MenuItem
+    Me.mnuFileSave = New System.Windows.Forms.MenuItem
+    Me.mnuAnalysis = New System.Windows.Forms.MenuItem
+    '
+    'MainMenu1
+    '
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAnalysis})
+    '
+    'mnuFile
+    '
+    Me.mnuFile.Index = 0
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuFileSave})
+    Me.mnuFile.Text = "File"
+    '
+    'mnuFileAdd
+    '
+    Me.mnuFileAdd.Index = 0
+    Me.mnuFileAdd.Text = "Add Timeseries"
+    '
+    'mnuFileSave
+    '
+    Me.mnuFileSave.Index = 1
+    Me.mnuFileSave.Text = "Save"
+    '
+    'mnuAnalysis
+    '
+    Me.mnuAnalysis.Index = 1
+    Me.mnuAnalysis.Text = "Analysis"
+    '
+    'atcDebugTimserForm
+    '
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(633, 628)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.Menu = Me.MainMenu1
+    Me.Name = "atcDebugTimserForm"
+    Me.Text = "Timeseries Debug"
+
+  End Sub
+
+#End Region
+
+  Private pDataManager As atcDataManager
+
+  'The tree control
+  Private WithEvents atrMain As TreeView
+
+  'The group of atcTimeseries displayed
+  Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
+
+  Private Sub PopulateTree()
+    If Not atrMain Is Nothing Then
+      Me.Controls.Remove(atrMain)
+    End If
+
+    'memory leak if we don't clean out old tree?
+    atrMain = New TreeView
+    With atrMain
+      .Location = New System.Drawing.Point(0, 0)
+      .Name = "atrMain"
+      .Size = Me.ClientSize
+      .TabIndex = 14
+      .Anchor = AnchorStyles.Top _
+             Or AnchorStyles.Bottom _
+             Or AnchorStyles.Left _
+             Or AnchorStyles.Right
+      Me.Controls.Add(atrMain)
+      .Refresh()
+      For Each lTimeseries As atcTimeseries In pTimeseriesGroup
+        Dim lNode As New TreeNode
+        lNode = .Nodes.Add(lTimeseries.ToString)
+
+        Dim lAttributeNode As New TreeNode
+        lAttributeNode = lNode.Nodes.Add("Attributes")
+        Dim lAttributes As SortedList = lTimeseries.Attributes.GetAll
+        For i As Integer = 0 To lAttributes.Count - 1
+          lAttributeNode.Nodes.Add(lAttributes.GetKey(i) & " : " & lAttributes.GetByIndex(i))
+        Next
+        lAttributeNode.ExpandAll()
+        lAttributeNode.EnsureVisible()
+
+        lNode.Nodes.Add("Computed")
+        'all computed attributes here?
+
+        Dim lDataNode As New TreeNode
+        lDataNode = lNode.Nodes.Add("Data")
+        Dim lnumValues = lTimeseries.numValues
+        If lnumValues > 100 Then 'make number of values to display editable
+          lnumValues = 100
+        End If
+        For j As Integer = 0 To lnumValues - 1
+          lDataNode.Nodes.Add(DumpDate(lTimeseries.Dates.Value(j)) & " : " & _
+                              lTimeseries.Value(j))
+        Next
+      Next
+    End With
+  End Sub
+
+  Private Function GetIndex(ByVal aName As String) As Integer
+    Return CInt(Mid(aName, InStr(aName, "#") + 1))
+  End Function
+
+  Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
+    Dim newDisplay As atcTimeseriesDisplay
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
+    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+      If atf.Name = sender.Text Then
+        Dim typ As System.Type = atf.GetType()
+        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+        newDisplay = asm.CreateInstance(typ.FullName)
+        newDisplay.Show(pDataManager, pTimeseriesGroup)
+        Exit Sub
+      End If
+    Next
+  End Sub
+
+  Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
+    pDataManager.UserSelectTimeseries(, pTimeseriesGroup)
+  End Sub
+
+  Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pTimeseriesGroup.Added
+    PopulateTree()
+    'TODO: could efficiently insert newly added item(s)
+  End Sub
+
+  Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pTimeseriesGroup.Removed
+    PopulateTree()
+    'TODO: could efficiently remove by serial number
+  End Sub
+
+  Private Sub mnuFileSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
+    Dim lFileName As String
+    Dim cdlg As New Windows.Forms.SaveFileDialog
+    With cdlg
+      .Title = "Select File to Save Into"
+      .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
+      .FilterIndex = 1
+      .DefaultExt = "txt"
+      If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        lFileName = AbsolutePath(.FileName, CurDir)
+      Else 'Return empty string if user clicked Cancel
+        lFileName = ""
+      End If
+    End With
+
+    If Len(lFileName) > 0 Then
+      Dim s As String
+      For i As Integer = 0 To atrMain.GetNodeCount(False) - 1
+        With atrMain.Nodes(i)
+          s = s & .Text & vbCrLf
+          For j As Integer = 0 To .GetNodeCount(False) - 1
+            With .Nodes(j)
+              s = s & vbTab & .Text & vbCrLf
+              For k As Integer = 0 To .GetNodeCount(False) - 1
+                s = s & vbTab & vbTab & .Nodes(k).Text & vbCrLf
+              Next
+            End With
+          Next
+        End With
+      Next
+      SaveFileString(lFileName, s)
+    End If
+  End Sub
+End Class

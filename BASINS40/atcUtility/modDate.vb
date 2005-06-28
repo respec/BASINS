@@ -360,15 +360,20 @@ Public Module modDate
     addUniqueDate = Not fnd 'true if date added
   End Function
 
-  Public Function DumpDate(ByVal j As Double, Optional ByVal s As Object = "JDate") As String
+  Public Function DumpDate(ByVal j As Double) As String ', Optional ByVal s As String = "JDate:"
     '##SUMMARY DumpDate - convert a modfied Julian date to a string
     '##PARM j - date to convert
     '##PARM s - optional prefix for output string
     Dim d(5) As Integer
     'LOCAL d - date array set to values from j
     J2Date(j, d)
-    'UPGRADE_WARNING: Couldn't resolve default property of object s
-    DumpDate = s & ":" & j & ":" & d(0) & "/" & d(1) & "/" & d(2) & " " & d(3) & ":" & d(4) & ":" & d(5)
+    DumpDate = Format(j, "00000.00000") & " : " & _
+               Format(d(0), "0000") & "/" & _
+               Format(d(1), "00") & "/" & _
+               Format(d(2), "00") & " " & _
+               Format(d(3), "00") & ":" & _
+               Format(d(4), "00") & ":" & _
+               Format(d(5), "00")
   End Function
 
   Public Sub DTMCMN(ByVal sdates() As Integer, ByVal edates() As Integer, _
