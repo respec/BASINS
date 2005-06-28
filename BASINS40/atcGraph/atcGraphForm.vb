@@ -290,10 +290,15 @@ Public Class atcGraphForm
 
     Dim y() As Double = t.Values
     Dim x() As Double = t.Dates.Values
-    curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
 
-    curve.Line.Width = 1
-    curve.Line.StepType = StepType.ForwardStep
+    If t.Attributes.GetValue("point", False) Then
+      curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.Plus)
+      curve.Line.IsVisible = False
+    Else
+      curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
+      curve.Line.Width = 1
+      curve.Line.StepType = StepType.RearwardStep
+    End If
     If Pane.CurveList.Count > 1 Then curve.IsY2Axis = True
     'curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
     'curve.Line.IsSmooth = True

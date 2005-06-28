@@ -932,6 +932,11 @@ Cntinu:
             ReDim dv(nVals)
             ReDim dd(nVals)
             dd(0) = lSJDay
+            If .GetValue("Point", False) Then
+              dv(0) = Double.NaN
+            Else
+              dv(0) = v(1)
+            End If
             Dim lInterval As Double = .GetValue("interval", 0)
             Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
             For iVal = 1 To nVals
