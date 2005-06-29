@@ -43,25 +43,33 @@ Friend Class frmSelectTimeseries
   Friend WithEvents btnAddAttribute As System.Windows.Forms.Button
   Friend WithEvents splitAboveMatching As System.Windows.Forms.Splitter
   Friend WithEvents lblMatching As System.Windows.Forms.Label
+  Friend WithEvents pMatchingGrid As atcControls.atcGrid
+  Friend WithEvents pSelectedGrid As atcControls.atcGrid
+  Friend WithEvents btnOpen As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectTimeseries))
     Me.groupTop = New System.Windows.Forms.GroupBox
+    Me.pMatchingGrid = New atcControls.atcGrid
     Me.lblMatching = New System.Windows.Forms.Label
     Me.splitAboveMatching = New System.Windows.Forms.Splitter
     Me.panelCriteria = New System.Windows.Forms.Panel
     Me.btnAddAttribute = New System.Windows.Forms.Button
     Me.pnlButtons = New System.Windows.Forms.Panel
+    Me.btnOpen = New System.Windows.Forms.Button
     Me.btnCancel = New System.Windows.Forms.Button
     Me.btnOk = New System.Windows.Forms.Button
     Me.splitAboveSelected = New System.Windows.Forms.Splitter
     Me.groupSelected = New System.Windows.Forms.GroupBox
+    Me.pSelectedGrid = New atcControls.atcGrid
     Me.groupTop.SuspendLayout()
     Me.panelCriteria.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
+    Me.groupSelected.SuspendLayout()
     Me.SuspendLayout()
     '
     'groupTop
     '
+    Me.groupTop.Controls.Add(Me.pMatchingGrid)
     Me.groupTop.Controls.Add(Me.lblMatching)
     Me.groupTop.Controls.Add(Me.splitAboveMatching)
     Me.groupTop.Controls.Add(Me.panelCriteria)
@@ -72,6 +80,16 @@ Friend Class frmSelectTimeseries
     Me.groupTop.TabIndex = 10
     Me.groupTop.TabStop = False
     Me.groupTop.Text = "Select Attribute Values to Filter Available Data"
+    '
+    'pMatchingGrid
+    '
+    Me.pMatchingGrid.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pMatchingGrid.LineColor = System.Drawing.Color.Empty
+    Me.pMatchingGrid.LineWidth = 0.0!
+    Me.pMatchingGrid.Location = New System.Drawing.Point(3, 184)
+    Me.pMatchingGrid.Name = "pMatchingGrid"
+    Me.pMatchingGrid.Size = New System.Drawing.Size(522, 165)
+    Me.pMatchingGrid.TabIndex = 15
     '
     'lblMatching
     '
@@ -111,6 +129,7 @@ Friend Class frmSelectTimeseries
     '
     'pnlButtons
     '
+    Me.pnlButtons.Controls.Add(Me.btnOpen)
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
@@ -118,6 +137,14 @@ Friend Class frmSelectTimeseries
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.Size = New System.Drawing.Size(528, 40)
     Me.pnlButtons.TabIndex = 12
+    '
+    'btnOpen
+    '
+    Me.btnOpen.Location = New System.Drawing.Point(200, 8)
+    Me.btnOpen.Name = "btnOpen"
+    Me.btnOpen.Size = New System.Drawing.Size(136, 24)
+    Me.btnOpen.TabIndex = 5
+    Me.btnOpen.Text = "Manage Data Sources"
     '
     'btnCancel
     '
@@ -146,6 +173,7 @@ Friend Class frmSelectTimeseries
     '
     'groupSelected
     '
+    Me.groupSelected.Controls.Add(Me.pSelectedGrid)
     Me.groupSelected.Dock = System.Windows.Forms.DockStyle.Fill
     Me.groupSelected.Location = New System.Drawing.Point(0, 360)
     Me.groupSelected.Name = "groupSelected"
@@ -153,6 +181,16 @@ Friend Class frmSelectTimeseries
     Me.groupSelected.TabIndex = 14
     Me.groupSelected.TabStop = False
     Me.groupSelected.Text = "Selected Timeseries"
+    '
+    'pSelectedGrid
+    '
+    Me.pSelectedGrid.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.pSelectedGrid.LineColor = System.Drawing.Color.Empty
+    Me.pSelectedGrid.LineWidth = 0.0!
+    Me.pSelectedGrid.Location = New System.Drawing.Point(3, 16)
+    Me.pSelectedGrid.Name = "pSelectedGrid"
+    Me.pSelectedGrid.Size = New System.Drawing.Size(522, 106)
+    Me.pSelectedGrid.TabIndex = 0
     '
     'frmSelectTimeseries
     '
@@ -168,6 +206,7 @@ Friend Class frmSelectTimeseries
     Me.groupTop.ResumeLayout(False)
     Me.panelCriteria.ResumeLayout(False)
     Me.pnlButtons.ResumeLayout(False)
+    Me.groupSelected.ResumeLayout(False)
     Me.ResumeLayout(False)
 
   End Sub
@@ -180,10 +219,7 @@ Friend Class frmSelectTimeseries
   Private pcboCriteria() As Windows.Forms.ComboBox
   Private plstCriteria() As Windows.Forms.ListBox
 
-  Private pDataManager As atcDataManager
-
-  Private WithEvents pMatchingGrid As atcControls.atcGrid
-  Private WithEvents pSelectedGrid As atcControls.atcGrid
+  Private WithEvents pDataManager As atcDataManager
 
   Private pMatchingTS As atcTimeseriesGroup
   Private pSelectedTS As atcTimeseriesGroup
@@ -196,7 +232,7 @@ Friend Class frmSelectTimeseries
 
   Private pTotalTS As Integer
 
-  Public Function AskUser(ByVal aManager As atcDataManager, Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
+  Public Function AskUser(ByVal aDataManager As atcDataManager, Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
     Dim pSaveGroup As atcTimeseriesGroup = Nothing
     If aGroup Is Nothing Then
       pSelectedTS = New atcTimeseriesGroup
@@ -204,7 +240,24 @@ Friend Class frmSelectTimeseries
       pSaveGroup = aGroup.Clone
       pSelectedTS = aGroup
     End If
-    Populate(aManager)
+
+    pDataManager = aDataManager
+
+    'If pDataManager.DataSources.Count = 1 Then
+    '  pDataManager.UserManage()
+    '  While pDataManager.DataSources.Count = 1
+    '    Application.DoEvents()
+    '  End While
+    'End If
+
+    pMatchingTS = New atcTimeseriesGroup
+    pMatchingSource = New GridSource(pDataManager, pMatchingTS)
+    pSelectedSource = New GridSource(pDataManager, pSelectedTS)
+
+    pMatchingGrid.Initialize(pMatchingSource)
+    pSelectedGrid.Initialize(pSelectedSource)
+
+    Populate()
     Me.ShowDialog()
     If Not pSelectedOK Then 'User clicked Cancel or closed dialog
       pSelectedTS.ChangeTo(pSaveGroup)
@@ -212,39 +265,16 @@ Friend Class frmSelectTimeseries
     Return pSelectedTS
   End Function
 
-  Private Sub Populate(ByVal aDataManager As atcDataManager)
+  Private Sub Populate()
     pInitializing = True
-    pDataManager = aDataManager
 
-    pMatchingTS = New atcTimeseriesGroup
-    pMatchingSource = New GridSource(pDataManager, pMatchingTS)
-    pSelectedSource = New GridSource(pDataManager, pSelectedTS)
-
-    'If Not pMatchingGrid Is Nothing Then
-    '  groupTop.Controls.Remove(pMatchingGrid)
-    'End If
-
-    pMatchingGrid = New atcControls.atcGrid(pMatchingSource)
-    With pMatchingGrid
-      .Name = "pMatchingGrid"
-      .Location = New Drawing.Point(3, 184)
-      .Size = New System.Drawing.Size(522, 165)
-      .Dock = DockStyle.Fill
-    End With
-    groupTop.Controls.Add(pMatchingGrid)
-    AddHandler pMatchingGrid.MouseDownCell, AddressOf pMatchingGrid_MouseDownCell
-
-    If Not pSelectedGrid Is Nothing Then
-      groupSelected.Controls.Remove(pSelectedGrid)
-    End If
-
-    pSelectedGrid = New atcControls.atcGrid(pSelectedSource)
-    With pSelectedGrid
-      .Name = "pSelectedGrid"
-      .Dock = DockStyle.Fill
-    End With
-    groupSelected.Controls.Add(pSelectedGrid)
-    AddHandler pSelectedGrid.MouseDownCell, AddressOf pSelectedGrid_MouseDownCell
+    Try
+      For iCriteria As Integer = pcboCriteria.GetUpperBound(0) To 0 Step -1
+        RemoveCriteria(pcboCriteria(iCriteria), plstCriteria(iCriteria))
+      Next
+    Catch ex As Exception
+      'first time through there is nothing to remove, error is normal
+    End Try
 
     ReDim pcboCriteria(0)
     ReDim plstCriteria(0)
@@ -252,8 +282,6 @@ Friend Class frmSelectTimeseries
     For Each lAttribName As String In pDataManager.SelectionAttributes
       AddCriteria(lAttribName)
     Next
-
-    'TODO: Hide the serial # in the grid
 
     PopulateMatching()
     pInitializing = False
@@ -330,16 +358,16 @@ NextTS:
         RemoveCriteria(sender, plstCriteria(GetIndex(sender.name)))
       Else
         PopulateCriteriaList(sender.SelectedItem, plstCriteria(GetIndex(sender.name)))
-        If Not pInitializing Then
-          UpdateManagerSelectionAttributes()
-          PopulateMatching()
-          pSelectedGrid.Refresh()
-        End If
+        UpdatedCriteria()
       End If
     End If
   End Sub
 
   Private Sub lstCriteria_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    UpdatedCriteria()
+  End Sub
+
+  Private Sub UpdatedCriteria()
     If Not pInitializing Then
       UpdateManagerSelectionAttributes()
       PopulateMatching()
@@ -364,9 +392,7 @@ NextTS:
     ReDim Preserve pcboCriteria(pcboCriteria.GetUpperBound(0) - 1)
     ReDim Preserve plstCriteria(plstCriteria.GetUpperBound(0) - 1)
     SizeCriteria()
-    UpdateManagerSelectionAttributes()
-    PopulateMatching()
-    pSelectedGrid.Refresh()
+    UpdatedCriteria()
   End Sub
 
   Private Sub AddCriteria(Optional ByVal aText As String = "")
@@ -423,13 +449,8 @@ NextName:
       Next
     End If
 
-    If Not pInitializing Then
-      UpdateManagerSelectionAttributes()
-      PopulateMatching()
-      pSelectedGrid.Refresh()
-    End If
     SizeCriteria()
-
+    UpdatedCriteria()
   End Sub
 
   Private Sub frmSelectTimeseries_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
@@ -444,7 +465,11 @@ NextName:
     If Not pcboCriteria Is Nothing Then
       Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
       Dim perCriteriaWidth As Integer = (btnAddAttribute.Left - PADDING) / (iLastCriteria + 1)
-      Dim curLeft As Integer = 3 'pMatchingGrid.Left
+      Dim curLeft As Integer = 3
+
+      pMatchingGrid.ColumnWidth(0) = 0
+      pSelectedGrid.ColumnWidth(0) = 0
+
       For iCriteria As Integer = 0 To iLastCriteria
         pcboCriteria(iCriteria).Top = btnAddAttribute.Top
         pcboCriteria(iCriteria).Left = curLeft
@@ -456,7 +481,12 @@ NextName:
         plstCriteria(iCriteria).Height = panelCriteria.Height - plstCriteria(iCriteria).Top - PADDING
 
         curLeft += perCriteriaWidth
+
+        pMatchingGrid.ColumnWidth(iCriteria + 1) = perCriteriaWidth 'curLeft - pMatchingGrid.ColumnWidth(iCriteria)
+        pSelectedGrid.ColumnWidth(iCriteria + 1) = pMatchingGrid.ColumnWidth(iCriteria + 1)
       Next
+      pMatchingGrid.Refresh()
+      pSelectedGrid.Refresh()
     End If
   End Sub
 
@@ -481,7 +511,7 @@ NextName:
     Next
   End Sub
 
-  Private Sub pMatchingGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+  Private Sub pMatchingGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles pMatchingGrid.MouseDownCell
     If IsNumeric(pMatchingSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
       Dim lSerial As Integer = CInt(pMatchingSource.CellValue(aRow, 0)) 'Serial number in clicked row
       Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
@@ -499,7 +529,7 @@ NextName:
     groupSelected.Text = "Selected Timeseries (" & pSelectedTS.Count & " of " & pTotalTS & ")"
   End Sub
 
-  Private Sub pSelectedGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+  Private Sub pSelectedGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles pSelectedGrid.MouseDownCell
     If IsNumeric(pSelectedSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
       Dim lSerial As Integer = CInt(pSelectedSource.CellValue(aRow, 0)) 'Serial number in row to be removed
       Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
@@ -513,6 +543,13 @@ NextName:
     End If
   End Sub
 
+  Private Sub btnOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOpen.Click
+    pDataManager.UserManage() ' .OpenData("")
+  End Sub
+
+  Private Sub pDataManager_OpenedData(ByVal aTimeseriesFile As atcDataSource) Handles pDataManager.OpenedData
+    Populate()
+  End Sub
 End Class
 
 Friend Class GridSource
@@ -558,6 +595,15 @@ Friend Class GridSource
       End If
     End Get
     Set(ByVal Value As String)
+    End Set
+  End Property
+
+  Public Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+    Get
+      Return atcControls.atcAlignment.HAlignLeft
+    End Get
+    Set(ByVal Value As atcControls.atcAlignment)
+
     End Set
   End Property
 End Class

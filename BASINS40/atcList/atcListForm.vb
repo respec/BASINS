@@ -7,32 +7,9 @@ Friend Class atcListForm
 
 #Region " Windows Form Designer generated code "
 
-  Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
-        Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
+  Public Sub New()
     MyBase.New()
-    pDataManager = aDataManager
-    If aTimeseriesGroup Is Nothing Then
-      pTimeseriesGroup = New atcTimeseriesGroup
-    Else
-      pTimeseriesGroup = aTimeseriesGroup
-    End If
     InitializeComponent() 'required by Windows Form Designer
-
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
-    For Each atf As atcTimeseriesDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
-    Next
-
-    If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
-      mnuFileAdd_Click(Nothing, Nothing)
-    End If
-
-    If pTimeseriesGroup.Count > 0 Then
-      Me.Show()
-      PopulateGrid()
-    Else 'use declined to specify timeseries
-      Me.Close()
-    End If
   End Sub
 
   'Form overrides dispose to clean up the component list.
@@ -55,12 +32,15 @@ Friend Class atcListForm
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
+  Friend WithEvents agdMain As atcControls.atcGrid
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcListForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
+    Me.agdMain = New atcControls.atcGrid
+    Me.SuspendLayout()
     '
     'MainMenu1
     '
@@ -82,14 +62,26 @@ Friend Class atcListForm
     Me.mnuAnalysis.Index = 1
     Me.mnuAnalysis.Text = "Analysis"
     '
+    'agdMain
+    '
+    Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.agdMain.LineColor = System.Drawing.Color.Empty
+    Me.agdMain.LineWidth = 0.0!
+    Me.agdMain.Location = New System.Drawing.Point(0, 0)
+    Me.agdMain.Name = "agdMain"
+    Me.agdMain.Size = New System.Drawing.Size(528, 545)
+    Me.agdMain.TabIndex = 0
+    '
     'atcListForm
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(528, 545)
+    Me.Controls.Add(Me.agdMain)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "atcListForm"
     Me.Text = "Timeseries List"
+    Me.ResumeLayout(False)
 
   End Sub
 
@@ -97,35 +89,44 @@ Friend Class atcListForm
 
   Private pDataManager As atcDataManager
 
-  'The grid control
-  Private WithEvents agdMain As atcControls.atcGrid
-
   'The group of atcTimeseries displayed
   Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
 
   'Translator class between pTimeseriesGroup and agdMain
   Private pSource As ListGridSource
 
-  Private Sub PopulateGrid()
-    pSource = New ListGridSource(pDataManager, pTimeseriesGroup)
-
-    If Not agdMain Is Nothing Then
-      Me.Controls.Remove(agdMain)
+  Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
+               Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
+    pDataManager = aDataManager
+    If aTimeseriesGroup Is Nothing Then
+      pTimeseriesGroup = New atcTimeseriesGroup
+    Else
+      pTimeseriesGroup = aTimeseriesGroup
     End If
 
-    agdMain = New atcControls.atcGrid(pSource)
-    With agdMain
-      .Location = New System.Drawing.Point(0, 0)
-      .Name = "agdMain"
-      .Size = Me.ClientSize
-      .TabIndex = 14
-      .Anchor = AnchorStyles.Top _
-             Or AnchorStyles.Bottom _
-             Or AnchorStyles.Left _
-             Or AnchorStyles.Right
-      Me.Controls.Add(agdMain)
-      .Refresh()
-    End With
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
+    mnuAnalysis.MenuItems.Clear()
+    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+      mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    Next
+
+    If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
+      mnuFileAdd_Click(Nothing, Nothing)
+    End If
+
+    If pTimeseriesGroup.Count > 0 Then
+      Me.Show()
+      PopulateGrid()
+    Else 'user declined to specify timeseries
+      Me.Close()
+    End If
+
+  End Sub
+
+  Private Sub PopulateGrid()
+    pSource = New ListGridSource(pDataManager, pTimeseriesGroup)
+    agdMain.Initialize(pSource)
+    agdMain.Refresh()
   End Sub
 
   Private Function GetIndex(ByVal aName As String) As Integer
@@ -159,7 +160,6 @@ Friend Class atcListForm
     PopulateGrid()
     'TODO: could efficiently remove by serial number
   End Sub
-
 End Class
 
 Friend Class ListGridSource
@@ -199,6 +199,15 @@ Friend Class ListGridSource
       End If
     End Get
     Set(ByVal Value As String)
+    End Set
+  End Property
+
+  Public Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+    Get
+      Return atcControls.atcAlignment.HAlignLeft
+    End Get
+    Set(ByVal Value As atcControls.atcAlignment)
+
     End Set
   End Property
 End Class
