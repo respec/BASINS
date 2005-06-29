@@ -964,6 +964,7 @@ Cntinu:
   Private Sub RefreshDsn(ByRef dsn As Integer)
     Dim lData As atcTimeseries
     Dim lDates As atcTimeseries
+    Dim lDate As Date
     'Dim lDataHeader As ATCData.ATTimSerDataHeader
     'Dim lDateSum As ATCData.ATTimSerDateSummary
     'Dim lAttr As ATCData.ATTimSerAttribute
@@ -999,11 +1000,20 @@ Cntinu:
         If Not (AttrStored(saind)) Then
           lName = pMsg.Attributes.Item(saind).Name
           s = AttrVal2String(saind, saval)
-          If lName = "DCODE" Then
-            'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
-          Else
-            lData.Attributes.SetValue(pMsg.Attributes.Item(saind), s)
-          End If
+          Select Case UCase(lName)
+            Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
+              lDate = New Date(CInt(s.Substring(0, 4)), _
+                               CInt(s.Substring(4, 2)), _
+                               CInt(s.Substring(6, 2)), _
+                               CInt(s.Substring(8, 2)), _
+                               CInt(s.Substring(10, 2)), _
+                               CInt(s.Substring(12, 2)))
+              lData.Attributes.SetValue(pMsg.Attributes.Item(saind), lDate)
+            Case "DCODE"
+              'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
+            Case Else
+              lData.Attributes.SetValue(pMsg.Attributes.Item(saind), s)
+          End Select
         End If
       Else 'all done
         Exit Do

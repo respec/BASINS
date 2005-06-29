@@ -135,6 +135,9 @@ Public Class atcDataAttributes
         .Add("tu", "Time Unit")
 
         .Add("id", "ID")
+
+        .Add("datcre", "Date Created")
+        .Add("datmod", "Date Modified")
       End With
     End If
 

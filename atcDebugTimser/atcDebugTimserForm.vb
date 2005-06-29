@@ -180,7 +180,7 @@ Friend Class atcDebugTimserForm
           Else
             lValueStart = lNumValuesNow
           End If
-          For j As Integer = lValueStart To lTimeseries.numValues - 1
+          For j As Integer = lValueStart To lTimeseries.numValues
             lDataNode.Nodes.Add(DumpDate(lTimeseries.Dates.Value(j)) & " : " & _
                                 lTimeseries.Value(j))
           Next
