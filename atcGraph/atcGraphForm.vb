@@ -46,6 +46,11 @@ Public Class atcGraphForm
 
     For Each ts As atcTimeseries In pTimeseriesGroup
       AddDatasetTimeseries(ts, ts.ToString)
+      With Pane.XAxis
+        If ts.Dates.Value(0) < .Min Then .Min = ts.Dates.Value(0)
+        If ts.Dates.Value(ts.Dates.numValues) > .Max Then .Max = ts.Dates.Value(ts.Dates.numValues)
+      End With
+
     Next
 
     pMaster.AxisChange(g)
@@ -65,13 +70,7 @@ Public Class atcGraphForm
       pTimeseriesGroup = aTimeseriesGroup
     End If
     InitializeComponent() 'required by Windows Form Designer
-    InitMasterPane()
     Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
-
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
-    For Each atf As atcTimeseriesDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
-    Next
 
     If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
       mnuFileAdd_Click(Nothing, Nothing)
@@ -79,6 +78,13 @@ Public Class atcGraphForm
 
     If pTimeseriesGroup.Count > 0 Then
       Me.Show()
+      InitMasterPane()
+
+      Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
+      For Each atf As atcTimeseriesDisplay In DisplayPlugins
+        mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+      Next
+
     Else 'use declined to specify timeseries
       Me.Close()
     End If
@@ -292,11 +298,6 @@ Public Class atcGraphForm
 
     Dim y() As Double = t.Values
     Dim x() As Double = t.Dates.Values
-
-    With Pane.XAxis
-      If x(0) < .Min Then .Min = x(0)
-      If x(UBound(x)) > .Max Then .Max = x(UBound(x))
-    End With
 
     If t.Attributes.GetValue("point", False) Then
       curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.Star)

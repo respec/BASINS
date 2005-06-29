@@ -26,7 +26,7 @@ Public Class atcTimeseries
   Public Property Value(ByVal index As Long) As Double
     Get
       EnsureValuesRead()
-      If index >= 0 And index < pNumValues Then
+      If index >= 0 And index <= pNumValues Then
         Return pValues(index)
       Else
         'TODO: handle request for value outside range as error?
@@ -34,7 +34,7 @@ Public Class atcTimeseries
       End If
     End Get
     Set(ByVal newValue As Double)
-      If index >= 0 And index < pNumValues Then
+      If index >= 0 And index <= pNumValues Then
         pValues(index) = newValue
       Else
         'TODO: handle setting value outside range as error? Expand as needed?
@@ -50,7 +50,7 @@ Public Class atcTimeseries
     End Get
     Set(ByVal newValues() As Double)
       pValues = newValues
-      pNumValues = newValues.GetUpperBound(0) + 1
+      pNumValues = newValues.GetUpperBound(0)
     End Set
   End Property
 
@@ -65,7 +65,7 @@ Public Class atcTimeseries
   Public Property ValueAttributes(ByVal index As Long) As atcDataAttributes
     Get
       EnsureValuesRead()
-      If index >= 0 And index < pNumValues Then
+      If index >= 0 And index <= pNumValues Then
         If pValueAttributes Is Nothing Then 'Need to allocate pValueAttributes
           ReDim pValueAttributes(pNumValues)
         End If
@@ -80,7 +80,7 @@ Public Class atcTimeseries
     End Get
     Set(ByVal newValue As atcDataAttributes)
       EnsureValuesRead()
-      If index >= 0 And index < pNumValues Then
+      If index >= 0 And index <= pNumValues Then
         If pValueAttributes Is Nothing Then 'Need to allocate pValueAttributes
           ReDim pValueAttributes(pNumValues)
         End If
