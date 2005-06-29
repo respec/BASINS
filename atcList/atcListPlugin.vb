@@ -12,7 +12,8 @@ Public Class atcListPlugin
 
   Public Overrides Sub Show(ByVal aTimeseriesManager As atcData.atcDataManager, _
                    Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
-    Dim lForm As New atcListForm(aTimeseriesManager, aTimeseriesGroup)
+    Dim lForm As New atcListForm
+    lForm.Initialize(aTimeseriesManager, aTimeseriesGroup)
   End Sub
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)

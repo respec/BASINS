@@ -85,9 +85,8 @@ Friend Class frmManager
     Me.lstFiles.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lstFiles.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.lstFiles.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.lstFiles.IntegralHeight = False
-    Me.lstFiles.ItemHeight = 20
     Me.lstFiles.Location = New System.Drawing.Point(0, 40)
     Me.lstFiles.Name = "lstFiles"
     Me.lstFiles.Size = New System.Drawing.Size(504, 192)
@@ -117,10 +116,10 @@ Friend Class frmManager
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(504, 309)
-    Me.Controls.Add(Me.panelOpening)
     Me.Controls.Add(Me.lstFiles)
     Me.Controls.Add(Me.txtDetails)
     Me.Controls.Add(Me.toolbarTop)
+    Me.Controls.Add(Me.panelOpening)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmManager"
     Me.Text = "Data Sources"
@@ -144,6 +143,7 @@ Friend Class frmManager
     Select Case e.Button.Text
       Case "Open"
         panelOpening.Visible = True
+        panelOpening.BringToFront()
         pManager.OpenData("")
         panelOpening.Visible = False
       Case "Close"
@@ -172,5 +172,10 @@ Friend Class frmManager
         Exit For
       End If
     Next
+  End Sub
+
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    Debug.Write("Closing frmManager")
+    pManager = Nothing
   End Sub
 End Class
