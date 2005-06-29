@@ -37,6 +37,8 @@ Public Class atcGraphForm
     myPane.XAxis.Type = ZedGraph.AxisType.Date
     myPane.XAxis.MajorUnit = ZedGraph.DateUnit.Day
     myPane.XAxis.MinorUnit = ZedGraph.DateUnit.Hour
+    myPane.XAxis.Max = 0
+    myPane.XAxis.Min = 100000
     pMaster.PaneList.Add(myPane)
 
     Dim g As Graphics = Me.CreateGraphics()
@@ -291,15 +293,32 @@ Public Class atcGraphForm
     Dim y() As Double = t.Values
     Dim x() As Double = t.Dates.Values
 
+    With Pane.XAxis
+      If x(0) < .Min Then .Min = x(0)
+      If x(UBound(x)) > .Max Then .Max = x(UBound(x))
+    End With
+
     If t.Attributes.GetValue("point", False) Then
-      curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.Plus)
+      curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.Star)
       curve.Line.IsVisible = False
     Else
       curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
       curve.Line.Width = 1
       curve.Line.StepType = StepType.RearwardStep
     End If
-    If Pane.CurveList.Count > 1 Then curve.IsY2Axis = True
+
+    'TODO: label Y Axis
+
+    'TODO: 3rd Y Axis above (for PREC)
+
+    If Pane.CurveList.Count > 1 Then 'TODO: this could be much smarter - same CONS on same axis, etc
+      curve.IsY2Axis = True
+      With Pane.Y2Axis
+        .IsVisible = True
+        .IsShowTitle = True
+      End With
+    End If
+
     'curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
     'curve.Line.IsSmooth = True
     'curve.Line.SmoothTension = 0.6F
