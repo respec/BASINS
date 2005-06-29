@@ -44,8 +44,51 @@ Public Class atcGrid
   'NOTE: The following procedure is required by the Windows Form Designer
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
+  Friend WithEvents VScroll As System.Windows.Forms.VScrollBar
+  Friend WithEvents HScroll As System.Windows.Forms.HScrollBar
+  Friend WithEvents scrollCorner As System.Windows.Forms.Panel
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-    components = New System.ComponentModel.Container
+    Me.VScroll = New System.Windows.Forms.VScrollBar
+    Me.HScroll = New System.Windows.Forms.HScrollBar
+    Me.scrollCorner = New System.Windows.Forms.Panel
+    Me.SuspendLayout()
+    '
+    'VScroll
+    '
+    Me.VScroll.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.VScroll.Location = New System.Drawing.Point(144, 0)
+    Me.VScroll.Name = "VScroll"
+    Me.VScroll.Size = New System.Drawing.Size(16, 72)
+    Me.VScroll.TabIndex = 1
+    Me.VScroll.Visible = False
+    '
+    'HScroll
+    '
+    Me.HScroll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.HScroll.Location = New System.Drawing.Point(0, 144)
+    Me.HScroll.Name = "HScroll"
+    Me.HScroll.Size = New System.Drawing.Size(88, 16)
+    Me.HScroll.TabIndex = 2
+    Me.HScroll.Visible = False
+    '
+    'scrollCorner
+    '
+    Me.scrollCorner.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.scrollCorner.Location = New System.Drawing.Point(144, 144)
+    Me.scrollCorner.Name = "scrollCorner"
+    Me.scrollCorner.Size = New System.Drawing.Size(16, 16)
+    Me.scrollCorner.TabIndex = 3
+    Me.scrollCorner.Visible = False
+    '
+    'atcGrid
+    '
+    Me.Controls.Add(Me.scrollCorner)
+    Me.Controls.Add(Me.HScroll)
+    Me.Controls.Add(Me.VScroll)
+    Me.Name = "atcGrid"
+    Me.Size = New System.Drawing.Size(160, 160)
+    Me.ResumeLayout(False)
+
   End Sub
 
 #End Region
@@ -158,6 +201,8 @@ Public Class atcGrid
     If Me.Visible And Not pSource Is Nothing Then
       Dim x As Single = 0
       Dim y As Single = 0
+      Dim visibleHeight As Single = Me.Height
+      Dim visibleWidth As Single = Me.Width
       Dim lLinePen As New Pen(pLineColor, pLineWidth)
       Dim lOutsideBrush As New SolidBrush(pLineColor)
       Dim lCellBrush As New SolidBrush(pCellBackColor)
@@ -171,36 +216,64 @@ Public Class atcGrid
       Dim lCellValueSize As SizeF
 
       'Clear whole area to default cell background color
-      g.FillRectangle(lCellBrush, 0, 0, g.VisibleClipBounds.Width, g.VisibleClipBounds.Height)
+      g.FillRectangle(lCellBrush, 0, 0, visibleWidth, visibleHeight)
 
       'Draw Row Lines
       pRowBottom = New ArrayList
+      If pTopRow = 0 Then VScroll.Visible = False
       For iRow = pTopRow To lRows - 1
         y += RowHeight(iRow)
-        g.DrawLine(lLinePen, g.VisibleClipBounds.Left, y, g.VisibleClipBounds.Right, y)
+        g.DrawLine(lLinePen, 0, y, visibleWidth, y)
         pRowBottom.Add(y)
-        If y > g.VisibleClipBounds.Bottom Then Exit For
+        If y > visibleHeight Then
+          visibleWidth -= VScroll.Width
+          VScroll.Visible = True
+          If iRow - pTopRow > 2 Then
+            VScroll.LargeChange = iRow - pTopRow - 1
+          Else
+            VScroll.LargeChange = 1
+          End If
+          VScroll.Maximum = pSource.Rows '- VScroll.LargeChange + 2
+          'Debug.WriteLine("Rows = " & lRows & ", TopRow = " & pTopRow & ", LargeChange = " & VScroll.LargeChange & ", Maximum = " & VScroll.Maximum)
+          Exit For
+        End If
       Next
       'Fill unused space below bottom line
-      g.FillRectangle(lOutsideBrush, 0, y, g.VisibleClipBounds.Width, g.VisibleClipBounds.Height - y)
+      g.FillRectangle(lOutsideBrush, 0, y, visibleWidth, visibleHeight - y)
 
       'Draw Column Lines
       pColRight = New ArrayList
+      If pLeftColumn = 0 Then HScroll.Visible = False
       For iColumn = pLeftColumn To lColumns - 1
         x += ColumnWidth(iColumn)
-        g.DrawLine(lLinePen, x, g.VisibleClipBounds.Top, x, g.VisibleClipBounds.Bottom)
+        g.DrawLine(lLinePen, x, 0, x, visibleHeight)
         pColRight.Add(x)
+        If x > visibleWidth Then
+          visibleHeight -= HScroll.Height
+          If Not VScroll.Visible AndAlso y > visibleHeight Then
+            'TODO: add VScroll because last line got hidden by HScroll
+          End If
+          HScroll.Visible = True
+          If iColumn - pLeftColumn > 2 Then
+            HScroll.LargeChange = iColumn - pLeftColumn - 1
+          Else
+            HScroll.LargeChange = 1
+          End If
+          HScroll.Maximum = pSource.Columns '- HScroll.LargeChange + 1
+          Exit For
+        End If
       Next
       'Fill unused space right of rightmost column
-      g.FillRectangle(lOutsideBrush, x, 0, g.VisibleClipBounds.Width - x, g.VisibleClipBounds.Height)
+      g.FillRectangle(lOutsideBrush, x, 0, visibleWidth - x, visibleHeight)
 
       Dim lCellLeft As Single
       Dim lCellTop As Single = 0
       Dim lastRowDrawn As Integer = pTopRow + pRowBottom.Count - 1
+      Dim lastColDrawn As Integer = pLeftColumn + pColRight.Count - 1
 
       For iRow = pTopRow To lastRowDrawn
         lCellLeft = 0
-        For iColumn = pLeftColumn To lColumns - 1
+        For iColumn = pLeftColumn To lastColDrawn
           If ColumnWidth(iColumn) > 0 Then
             lCellValue = pSource.CellValue(iRow, iColumn)
             If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
@@ -219,9 +292,9 @@ Public Class atcGrid
                 Case atcAlignment.HAlignLeft
                   x = lCellLeft
                 Case atcAlignment.HAlignRight
-                  x = pColRight(iColumn) - lCellValueSize.Width
+                  x = pColRight(iColumn - pLeftColumn) - lCellValueSize.Width
                 Case atcAlignment.HAlignCenter
-                  x = lCellLeft + (pColRight(iColumn) - lCellLeft - lCellValueSize.Width) / 2
+                  x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft - lCellValueSize.Width) / 2
                   'Case atcAlignment.HAlignDecimal 'TODO: implement decimal alignment
                 Case Else 'Default to left alignment 
                   x = lCellLeft
@@ -230,16 +303,16 @@ Public Class atcGrid
                 Case atcAlignment.VAlignTop
                   y = lCellTop
                 Case atcAlignment.VAlignBottom
-                  y = pRowBottom(iRow) - lCellValueSize.Height
+                  y = pRowBottom(iRow - pTopRow) - lCellValueSize.Height
                 Case Else 'atcAlignment.VAlignCenter 'Default to centering vertically 
-                  y = lCellTop + (pRowBottom(iRow) - lCellTop - lCellValueSize.Height) / 2
+                  y = lCellTop + (pRowBottom(iRow - pTopRow) - lCellTop - lCellValueSize.Height) / 2
               End Select
               g.DrawString(lCellValue, pFont, Brushes.Black, x, y) 'TODO: allow flexibility of brush
             End If
-            If iColumn < lColumns - 1 Then lCellLeft = pColRight(iColumn)
+            If iColumn < lColumns - 1 Then lCellLeft = pColRight(iColumn - pLeftColumn)
           End If
         Next
-        If iRow < lRows - 1 Then lCellTop = pRowBottom(iRow)
+        If iRow < lRows - 1 Then lCellTop = pRowBottom(iRow - pTopRow) 'Top of next row is bottom of this one
       Next
     End If
   End Sub
@@ -266,11 +339,35 @@ Public Class atcGrid
       lColumn += 1
     End While
     If lRow < pSource.Rows And lColumn < pSource.Columns Then
-      RaiseEvent MouseDownCell(lRow, lColumn)
+      RaiseEvent MouseDownCell(lRow + pTopRow, lColumn + pLeftColumn)
     End If
   End Sub
 
   Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+    If HScroll.Visible Then
+      VScroll.Height = Me.Height - HScroll.Height
+    Else
+      VScroll.Height = Me.Height
+    End If
+
+    If VScroll.Visible Then
+      HScroll.Width = Me.Width - VScroll.Width
+    Else
+      HScroll.Width = Me.Width
+    End If
+
+    scrollCorner.Visible = VScroll.Visible And HScroll.Visible
+
     Me.Refresh()
+  End Sub
+
+  Private Sub VScroll_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles VScroll.ValueChanged
+    pTopRow = VScroll.Value
+    Refresh()
+  End Sub
+
+  Private Sub HScroll_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles HScroll.ValueChanged
+    pLeftColumn = HScroll.Value
+    Refresh()
   End Sub
 End Class
