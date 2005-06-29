@@ -34,11 +34,31 @@ Public Class atcGraphForm
     Dim myPane As GraphPane = New GraphPane
 
     'myPane.PaneFill = New Fill(Color.White, Color.LightYellow, 45.0F)
-    myPane.XAxis.Type = ZedGraph.AxisType.Date
-    myPane.XAxis.MajorUnit = ZedGraph.DateUnit.Day
-    myPane.XAxis.MinorUnit = ZedGraph.DateUnit.Hour
-    myPane.XAxis.Max = 0
-    myPane.XAxis.Min = 100000
+    With myPane
+      With .XAxis
+        .Type = ZedGraph.AxisType.Date
+        '.MajorUnit = ZedGraph.DateUnit.Day
+        '.MinorUnit = ZedGraph.DateUnit.Hour
+        .Max = 0
+        .Min = 100000
+        .IsTic = False
+        .IsMinorTic = False
+        .IsInsideTic = True
+        .IsMinorInsideTic = True
+      End With
+      With .YAxis
+        .IsTic = False
+        .IsMinorTic = False
+        .IsInsideTic = True
+        .IsMinorInsideTic = True
+      End With
+      With .Y2Axis
+        .IsTic = False
+        .IsMinorTic = False
+        .IsInsideTic = True
+        .IsMinorInsideTic = True
+      End With
+    End With
     pMaster.PaneList.Add(myPane)
 
     Dim g As Graphics = Me.CreateGraphics()
@@ -227,6 +247,12 @@ Public Class atcGraphForm
     pDataManager.UserSelectTimeseries(, pTimeseriesGroup)
   End Sub
 
+
+  Private Sub mnuFileSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
+    'TODO: add graph file save
+    MsgBox("File:Save not yet implemented", MsgBoxStyle.Exclamation)
+  End Sub
+
   Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
     Dim printdlg As New PrintDialog
     Dim printdoc As New Printing.PrintDocument
@@ -293,8 +319,12 @@ Public Class atcGraphForm
   End Sub
 
   Public Sub AddDatasetTimeseries(ByVal t As atcTimeseries, ByVal CurveLabel As String)
+    Dim lCons As String = t.Attributes.GetValue("constituent")
+    Dim lOldCons As String
+
     Dim curveColor As Color = GetMatchingColor(t.Attributes.GetValue("scenario"))
     Dim curve As LineItem
+    Dim lOldCurve As LineItem
 
     Dim y() As Double = t.Values
     Dim x() As Double = t.Dates.Values
@@ -312,12 +342,30 @@ Public Class atcGraphForm
 
     'TODO: 3rd Y Axis above (for PREC)
 
-    If Pane.CurveList.Count > 1 Then 'TODO: this could be much smarter - same CONS on same axis, etc
-      curve.IsY2Axis = True
-      With Pane.Y2Axis
-        .IsVisible = True
-        .IsShowTitle = True
-      End With
+    If Pane.CurveList.Count > 1 Then
+      For Each ts As atcTimeseries In pTimeseriesGroup
+        lOldCurve = Pane.CurveList.Item(ts.ToString)
+        If Not lOldCurve Is Nothing Then
+          lOldCons = ts.Attributes.GetValue("constituent")
+          If lOldCons = lCons Then
+            curve.IsY2Axis = lOldCurve.IsY2Axis
+          Else
+            curve.IsY2Axis = Not (lOldCurve.IsY2Axis)
+          End If
+          If curve.IsY2Axis Then
+            With Pane.Y2Axis
+              .IsOppositeTic = False
+              .IsMinorOppositeTic = False
+              .IsVisible = True
+              .IsShowTitle = True
+            End With
+            With Pane.YAxis
+              .IsOppositeTic = False
+              .IsMinorOppositeTic = False
+            End With
+          End If
+        End If
+      Next
     End If
 
     'curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
@@ -360,4 +408,5 @@ Public Class atcGraphForm
       End If
     Next
   End Sub
+
 End Class
