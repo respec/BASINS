@@ -14,6 +14,7 @@ Public Class atcTimeseriesFileHspfBinOut
   Private pMonitor As Object
   Private pMonitorSet As Boolean = False
   Private pDates As ArrayList 'of atcTimeseries
+  Private pNvals As Integer
 
   Private pBinFile As clsHspfBinary
   Private pHSPFNetwork As clsNetworkHSPFOutput
@@ -102,8 +103,6 @@ Public Class atcTimeseriesFileHspfBinOut
     Dim lBinHeader As clsHspfBinHeader
     Dim lData As clsHspfBinData
     Dim lTu As Integer, lTs As Integer, lIntvl As Integer
-    Dim lNvals As Integer
-    'Dim lSDate(5) As Integer, lEDate(5) As Integer
     Dim lTDate(5) As Integer
     Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
     Dim i As Integer, j As Integer, s As String
@@ -144,6 +143,9 @@ Public Class atcTimeseriesFileHspfBinOut
         lBaseAttributes = New atcDataAttributes(lBaseTSer)
         With lBaseAttributes
           .SetValue("CIntvl", True)
+          Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(pBinFile.Filename)
+          .SetValue("Date Created", lFileDetails.CreationTime)
+          .SetValue("Date Modified", lFileDetails.LastWriteTime)
           If lEJDate - lSJDate >= 1 Then 'daily or longer interval
             lTs = 1
             lTu = lBinHeader.Data.ItemByIndex(0).OutLev + 1
@@ -165,8 +167,7 @@ Public Class atcTimeseriesFileHspfBinOut
           lTDate = lBinHeader.Data.ItemByIndex(lBinHeader.Data.Count - 1).DateArray
           lEJDate = Date2J(lTDate)
           .SetValue("EJDay", lEJDate)
-          lNvals = timdifJ(lSJDate, lEJDate, lTu, lTs)
-          .SetValue("Nvals", lNvals)
+          pNvals = timdifJ(lSJDate, lEJDate, lTu, lTs)
         End With
 
         For j = 0 To .VarNames.Count - 1
@@ -212,7 +213,6 @@ Public Class atcTimeseriesFileHspfBinOut
     Dim lBd As clsHspfBinData
     Dim lKey As String
     Dim lCurJday As Double
-    Dim lNvals As Integer
     Dim lSJday As Integer
     Dim lEJday As Integer
     Dim v() As Double, i As Integer, j As Integer, f() As Integer
@@ -234,10 +234,9 @@ Public Class atcTimeseriesFileHspfBinOut
         'i = i + 1
         'End While
         If lVind >= 0 Then
-          lNvals = t.Attributes.GetValue("Nvals")
-          ReDim v(lNvals)
-          ReDim f(lNvals)
-          ReDim d(lNvals)
+          ReDim v(pNvals)
+          ReDim f(pNvals)
+          ReDim d(pNvals)
           lSJday = t.Attributes.GetValue("SJDay")
           lEJday = t.Attributes.GetValue("EJDay")
           lOutLev = .Data.ItemByIndex(0).OutLev
