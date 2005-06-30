@@ -44,32 +44,32 @@ Public Class atcGrid
   'NOTE: The following procedure is required by the Windows Form Designer
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
-  Friend WithEvents VScroll As System.Windows.Forms.VScrollBar
-  Friend WithEvents HScroll As System.Windows.Forms.HScrollBar
   Friend WithEvents scrollCorner As System.Windows.Forms.Panel
+  Friend WithEvents VScroller As System.Windows.Forms.VScrollBar
+  Friend WithEvents HScroller As System.Windows.Forms.HScrollBar
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-    Me.VScroll = New System.Windows.Forms.VScrollBar
-    Me.HScroll = New System.Windows.Forms.HScrollBar
+    Me.VScroller = New System.Windows.Forms.VScrollBar
+    Me.HScroller = New System.Windows.Forms.HScrollBar
     Me.scrollCorner = New System.Windows.Forms.Panel
     Me.SuspendLayout()
     '
-    'VScroll
+    'VScroller
     '
-    Me.VScroll.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.VScroll.Location = New System.Drawing.Point(144, 0)
-    Me.VScroll.Name = "VScroll"
-    Me.VScroll.Size = New System.Drawing.Size(16, 72)
-    Me.VScroll.TabIndex = 1
-    Me.VScroll.Visible = False
+    Me.VScroller.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.VScroller.Location = New System.Drawing.Point(144, 0)
+    Me.VScroller.Name = "VScroller"
+    Me.VScroller.Size = New System.Drawing.Size(16, 72)
+    Me.VScroller.TabIndex = 1
+    Me.VScroller.Visible = False
     '
-    'HScroll
+    'HScroller
     '
-    Me.HScroll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.HScroll.Location = New System.Drawing.Point(0, 144)
-    Me.HScroll.Name = "HScroll"
-    Me.HScroll.Size = New System.Drawing.Size(88, 16)
-    Me.HScroll.TabIndex = 2
-    Me.HScroll.Visible = False
+    Me.HScroller.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.HScroller.Location = New System.Drawing.Point(0, 144)
+    Me.HScroller.Name = "HScroller"
+    Me.HScroller.Size = New System.Drawing.Size(88, 16)
+    Me.HScroller.TabIndex = 2
+    Me.HScroller.Visible = False
     '
     'scrollCorner
     '
@@ -83,8 +83,8 @@ Public Class atcGrid
     'atcGrid
     '
     Me.Controls.Add(Me.scrollCorner)
-    Me.Controls.Add(Me.HScroll)
-    Me.Controls.Add(Me.VScroll)
+    Me.Controls.Add(Me.HScroller)
+    Me.Controls.Add(Me.VScroller)
     Me.Name = "atcGrid"
     Me.Size = New System.Drawing.Size(160, 160)
     Me.ResumeLayout(False)
@@ -201,16 +201,41 @@ Public Class atcGrid
     If Me.Visible And Not pSource Is Nothing Then
       Dim x As Single = 0
       Dim y As Single = 0
+
+      Dim lRows As Integer = pSource.Rows
+      Dim lColumns As Integer = pSource.Columns
+
+      Dim iRow As Integer
+      Dim iColumn As Integer
+
       Dim visibleHeight As Single = Me.Height
       Dim visibleWidth As Single = Me.Width
+
+      If pTopRow > 0 Then 'Scrolled down at least one row
+        If lRows < pTopRow Then  'Scrolled past last row
+          pTopRow = 0            'Reset scrollbar to top row
+          Me.VScroller.Value = 0
+        Else
+          'Check to see if all rows could fit
+          y = 0
+          For iRow = 0 To lRows - 1
+            y += RowHeight(iRow)
+            If y > visibleHeight Then Exit For
+          Next
+          'If all rows can fit
+          If y <= visibleHeight Or lRows < pTopRow Then
+            pTopRow = 0            'Reset scrollbar to top row
+            Me.VScroller.Value = 0
+          End If
+        End If
+      End If
+      If lColumns < pLeftColumn Then 'Scrolled past rightmost column
+        Me.HScroller.Value = 0       'Reset scrollbar to leftmost column
+      End If
       Dim lLinePen As New Pen(pLineColor, pLineWidth)
       Dim lOutsideBrush As New SolidBrush(pLineColor)
       Dim lCellBrush As New SolidBrush(pCellBackColor)
 
-      Dim iRow As Integer
-      Dim iColumn As Integer
-      Dim lRows As Integer = pSource.Rows
-      Dim lColumns As Integer = pSource.Columns
       Dim lCellValue As String
       Dim lCellAlignment As Integer
       Dim lCellValueSize As SizeF
@@ -220,21 +245,22 @@ Public Class atcGrid
 
       'Draw Row Lines
       pRowBottom = New ArrayList
-      If pTopRow = 0 Then VScroll.Visible = False
+      If pTopRow = 0 Then VScroller.Visible = False
+      y = 0
       For iRow = pTopRow To lRows - 1
         y += RowHeight(iRow)
         g.DrawLine(lLinePen, 0, y, visibleWidth, y)
         pRowBottom.Add(y)
         If y > visibleHeight Then
-          visibleWidth -= VScroll.Width
-          VScroll.Visible = True
+          visibleWidth -= VScroller.Width
+          VScroller.Visible = True
           If iRow - pTopRow > 2 Then
-            VScroll.LargeChange = iRow - pTopRow - 1
+            VScroller.LargeChange = iRow - pTopRow - 1
           Else
-            VScroll.LargeChange = 1
+            VScroller.LargeChange = 1
           End If
-          VScroll.Maximum = pSource.Rows '- VScroll.LargeChange + 2
-          'Debug.WriteLine("Rows = " & lRows & ", TopRow = " & pTopRow & ", LargeChange = " & VScroll.LargeChange & ", Maximum = " & VScroll.Maximum)
+          VScroller.Maximum = pSource.Rows '- VScroller.LargeChange + 2
+          'Debug.WriteLine("Rows = " & lRows & ", TopRow = " & pTopRow & ", LargeChange = " & VScroller.LargeChange & ", Maximum = " & VScroller.Maximum)
           Exit For
         End If
       Next
@@ -243,23 +269,24 @@ Public Class atcGrid
 
       'Draw Column Lines
       pColRight = New ArrayList
-      If pLeftColumn = 0 Then HScroll.Visible = False
+      x = 0
+      If pLeftColumn = 0 Then HScroller.Visible = False
       For iColumn = pLeftColumn To lColumns - 1
         x += ColumnWidth(iColumn)
         g.DrawLine(lLinePen, x, 0, x, visibleHeight)
         pColRight.Add(x)
         If x > visibleWidth Then
-          visibleHeight -= HScroll.Height
-          If Not VScroll.Visible AndAlso y > visibleHeight Then
+          visibleHeight -= HScroller.Height
+          If Not VScroller.Visible AndAlso y > visibleHeight Then
             'TODO: add VScroll because last line got hidden by HScroll
           End If
-          HScroll.Visible = True
+          HScroller.Visible = True
           If iColumn - pLeftColumn > 2 Then
-            HScroll.LargeChange = iColumn - pLeftColumn - 1
+            HScroller.LargeChange = iColumn - pLeftColumn - 1
           Else
-            HScroll.LargeChange = 1
+            HScroller.LargeChange = 1
           End If
-          HScroll.Maximum = pSource.Columns '- HScroll.LargeChange + 1
+          HScroller.Maximum = pSource.Columns '- HScroller.LargeChange + 1
           Exit For
         End If
       Next
@@ -344,30 +371,31 @@ Public Class atcGrid
   End Sub
 
   Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-    If HScroll.Visible Then
-      VScroll.Height = Me.Height - HScroll.Height
+    If HScroller.Visible Then
+      VScroller.Height = Me.Height - HScroller.Height
     Else
-      VScroll.Height = Me.Height
+      VScroller.Height = Me.Height
     End If
 
-    If VScroll.Visible Then
-      HScroll.Width = Me.Width - VScroll.Width
+    If VScroller.Visible Then
+      HScroller.Width = Me.Width - VScroller.Width
     Else
-      HScroll.Width = Me.Width
+      HScroller.Width = Me.Width
     End If
 
-    scrollCorner.Visible = VScroll.Visible And HScroll.Visible
+    scrollCorner.Visible = VScroller.Visible And HScroller.Visible
 
     Me.Refresh()
   End Sub
 
-  Private Sub VScroll_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles VScroll.ValueChanged
-    pTopRow = VScroll.Value
+  Private Sub VScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles VScroller.ValueChanged
+    pTopRow = VScroller.Value
     Refresh()
   End Sub
 
-  Private Sub HScroll_ValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles HScroll.ValueChanged
-    pLeftColumn = HScroll.Value
+  Private Sub HScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HScroller.ValueChanged
+    pLeftColumn = HScroller.Value
     Refresh()
   End Sub
+
 End Class
