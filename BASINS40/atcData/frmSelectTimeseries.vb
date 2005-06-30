@@ -213,7 +213,7 @@ Friend Class frmSelectTimeseries
 
 #End Region
 
-  Private Const PADDING As Integer = 15
+  Private Const PADDING As Integer = 5
   Private Const REMOVE_VALUE = "~Remove~"
   Private Const NOTHING_VALUE = "~Missing~"
 
@@ -292,7 +292,9 @@ Friend Class frmSelectTimeseries
     Dim i As Integer
     For i = 0 To pcboCriteria.GetUpperBound(0)
       pcboCriteria(i).Items.Clear()
-      pcboCriteria(i).Items.Add(REMOVE_VALUE)
+      If pcboCriteria.GetUpperBound(0) > 0 Then
+        pcboCriteria(i).Items.Add(REMOVE_VALUE)
+      End If
     Next
     For Each source As atcDataSource In pDataManager.DataSources
       For Each ts As atcTimeseries In source.Timeseries
@@ -396,6 +398,10 @@ NextTS:
     Next
     ReDim Preserve pcboCriteria(pcboCriteria.GetUpperBound(0) - 1)
     ReDim Preserve plstCriteria(plstCriteria.GetUpperBound(0) - 1)
+    If pcboCriteria.GetUpperBound(0) = 0 Then
+      pcboCriteria(0).Items.Remove(REMOVE_VALUE)
+    End If
+
     SizeCriteria()
     UpdatedCriteria()
   End Sub
@@ -420,7 +426,7 @@ NextTS:
     With pcboCriteria(iCriteria)
       .Name = "cboCriteria#" & iCriteria
       .DropDownStyle = Windows.Forms.ComboBoxStyle.DropDownList
-      .MaxDropDownItems = 30
+      .MaxDropDownItems = 40
       .Sorted = True
     End With
 
@@ -435,6 +441,10 @@ NextTS:
     If iCriteria = 0 Then
       PopulateCriteriaCombos()
     Else 'populate from first combo box
+      If Not pcboCriteria(0).Items.Contains(REMOVE_VALUE) Then
+        pcboCriteria(0).Items.Add(REMOVE_VALUE)
+      End If
+
       For iItem As Integer = 0 To pcboCriteria(0).Items.Count - 1
         pcboCriteria(iCriteria).Items.Add(pcboCriteria(0).Items.Item(iItem))
       Next
@@ -464,6 +474,17 @@ NextName:
 
   Private Sub panelCriteria_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles panelCriteria.SizeChanged
     SizeCriteria()
+  End Sub
+
+  Private Sub ResizeOneCriteria(ByVal aCriteria As Integer, ByVal aWidth As Integer)
+    Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
+    pcboCriteria(aCriteria).Width = aWidth - PADDING
+    plstCriteria(aCriteria).Width = pcboCriteria(aCriteria).Width
+    While aCriteria < iLastCriteria
+      aCriteria += 1
+      pcboCriteria(aCriteria).Left = pcboCriteria(aCriteria - 1).Left + pcboCriteria(aCriteria - 1).Width + PADDING
+      plstCriteria(aCriteria).Left = pcboCriteria(aCriteria).Left
+    End While
   End Sub
 
   Private Sub SizeCriteria()
@@ -557,6 +578,19 @@ NextName:
   Private Sub pDataManager_OpenedData(ByVal aTimeseriesFile As atcDataSource) Handles pDataManager.OpenedData
     Populate()
   End Sub
+
+  Private Sub pMatchingGrid_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles pMatchingGrid.UserResizedColumn
+    pSelectedGrid.ColumnWidth(aColumn) = aWidth
+    pSelectedGrid.Refresh()
+    ResizeOneCriteria(aColumn - 1, aWidth)
+  End Sub
+
+  Private Sub pSelectedGrid_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles pSelectedGrid.UserResizedColumn
+    pMatchingGrid.ColumnWidth(aColumn) = aWidth
+    pMatchingGrid.Refresh()
+    ResizeOneCriteria(aColumn - 1, aWidth)
+  End Sub
+
 End Class
 
 Friend Class GridSource
