@@ -215,6 +215,7 @@ Friend Class frmSelectTimeseries
 
   Private Const PADDING As Integer = 15
   Private Const REMOVE_VALUE = "~Remove~"
+  Private Const NOTHING_VALUE = "~Missing~"
 
   Private pcboCriteria() As Windows.Forms.ComboBox
   Private plstCriteria() As Windows.Forms.ListBox
@@ -311,10 +312,9 @@ Friend Class frmSelectTimeseries
     For Each source As atcDataSource In pDataManager.DataSources
       For Each ts As atcTimeseries In source.Timeseries
         Dim val As Object = ts.Attributes.GetValue(aAttributeName, Nothing)
-        If Not val Is Nothing Then
-          If Not aList.Items.Contains(val) Then
-            aList.Items.Add(val)
-          End If
+        If val Is Nothing Then val = NOTHING_VALUE
+        If Not aList.Items.Contains(val) Then
+          aList.Items.Add(val)
         End If
       Next
     Next
@@ -332,7 +332,8 @@ Friend Class frmSelectTimeseries
           If Not attrName Is Nothing Then
             Dim selectedValues As Windows.Forms.ListBox.SelectedObjectCollection = plstCriteria(iCriteria).SelectedItems
             If selectedValues.Count > 0 Then 'none selected = all selected
-              Dim attrValue As Object = ts.Attributes.GetValue(attrName)
+              Dim attrValue As Object = ts.Attributes.GetValue(attrName, Nothing)
+              If attrValue Is Nothing Then attrValue = NOTHING_VALUE
               If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
                 GoTo NextTS
               End If
@@ -355,7 +356,9 @@ NextTS:
   Private Sub cboCriteria_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
     If Not sender.SelectedItem Is Nothing Then
       If sender.SelectedItem = REMOVE_VALUE Then
-        RemoveCriteria(sender, plstCriteria(GetIndex(sender.name)))
+        If plstCriteria.GetUpperBound(0) > 0 Then
+          RemoveCriteria(sender, plstCriteria(GetIndex(sender.name)))
+        End If
       Else
         PopulateCriteriaList(sender.SelectedItem, plstCriteria(GetIndex(sender.name)))
         UpdatedCriteria()
@@ -388,6 +391,8 @@ NextTS:
     For iMoving As Integer = iRemoving To pcboCriteria.GetUpperBound(0) - 1
       pcboCriteria(iMoving) = pcboCriteria(iMoving + 1)
       plstCriteria(iMoving) = plstCriteria(iMoving + 1)
+      pcboCriteria(iMoving).Name = "cboCriteria#" & iMoving
+      plstCriteria(iMoving).Name = "lstCriteria#" & iMoving
     Next
     ReDim Preserve pcboCriteria(pcboCriteria.GetUpperBound(0) - 1)
     ReDim Preserve plstCriteria(plstCriteria.GetUpperBound(0) - 1)
@@ -464,29 +469,31 @@ NextName:
   Private Sub SizeCriteria()
     If Not pcboCriteria Is Nothing Then
       Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
-      Dim perCriteriaWidth As Integer = (btnAddAttribute.Left - PADDING) / (iLastCriteria + 1)
-      Dim curLeft As Integer = 3
+      If iLastCriteria >= 0 Then
+        Dim perCriteriaWidth As Integer = (btnAddAttribute.Left - PADDING) / (iLastCriteria + 1)
+        Dim curLeft As Integer = 3
 
-      pMatchingGrid.ColumnWidth(0) = 0
-      pSelectedGrid.ColumnWidth(0) = 0
+        pMatchingGrid.ColumnWidth(0) = 0
+        pSelectedGrid.ColumnWidth(0) = 0
 
-      For iCriteria As Integer = 0 To iLastCriteria
-        pcboCriteria(iCriteria).Top = btnAddAttribute.Top
-        pcboCriteria(iCriteria).Left = curLeft
-        pcboCriteria(iCriteria).Width = perCriteriaWidth - PADDING
+        For iCriteria As Integer = 0 To iLastCriteria
+          pcboCriteria(iCriteria).Top = btnAddAttribute.Top
+          pcboCriteria(iCriteria).Left = curLeft
+          pcboCriteria(iCriteria).Width = perCriteriaWidth - PADDING
 
-        plstCriteria(iCriteria).Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING
-        plstCriteria(iCriteria).Left = curLeft
-        plstCriteria(iCriteria).Width = pcboCriteria(iCriteria).Width
-        plstCriteria(iCriteria).Height = panelCriteria.Height - plstCriteria(iCriteria).Top - PADDING
+          plstCriteria(iCriteria).Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING
+          plstCriteria(iCriteria).Left = curLeft
+          plstCriteria(iCriteria).Width = pcboCriteria(iCriteria).Width
+          plstCriteria(iCriteria).Height = panelCriteria.Height - plstCriteria(iCriteria).Top - PADDING
 
-        curLeft += perCriteriaWidth
+          curLeft += perCriteriaWidth
 
-        pMatchingGrid.ColumnWidth(iCriteria + 1) = perCriteriaWidth 'curLeft - pMatchingGrid.ColumnWidth(iCriteria)
-        pSelectedGrid.ColumnWidth(iCriteria + 1) = pMatchingGrid.ColumnWidth(iCriteria + 1)
-      Next
-      pMatchingGrid.Refresh()
-      pSelectedGrid.Refresh()
+          pMatchingGrid.ColumnWidth(iCriteria + 1) = perCriteriaWidth 'curLeft - pMatchingGrid.ColumnWidth(iCriteria)
+          pSelectedGrid.ColumnWidth(iCriteria + 1) = pMatchingGrid.ColumnWidth(iCriteria + 1)
+        Next
+        pMatchingGrid.Refresh()
+        pSelectedGrid.Refresh()
+      End If
     End If
   End Sub
 
@@ -555,6 +562,10 @@ End Class
 Friend Class GridSource
   Inherits atcControls.atcGridSource
 
+  ' 0 to label the columns in row 0
+  '-1 to not label columns
+  Private Const LabelRow As Integer = -1
+
   Private pDataManager As atcDataManager
   Private pTimeseriesGroup As atcTimeseriesGroup
 
@@ -574,7 +585,7 @@ Friend Class GridSource
 
   Public Overrides Property Rows() As Integer
     Get
-      Return pTimeseriesGroup.Count + 1
+      Return pTimeseriesGroup.Count + LabelRow + 1
     End Get
     Set(ByVal Value As Integer)
     End Set
@@ -582,16 +593,16 @@ Friend Class GridSource
 
   Public Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
-      If aRow = 0 Then
+      If aRow = LabelRow Then
         If aColumn = 0 Then
           Return ""
         Else
           Return pDataManager.SelectionAttributes(aColumn - 1)
         End If
       ElseIf aColumn = 0 Then
-        Return pTimeseriesGroup(aRow - 1).Serial()
+        Return pTimeseriesGroup(aRow - (LabelRow + 1)).Serial()
       Else
-        Return pTimeseriesGroup(aRow - 1).Attributes.GetValue(pDataManager.SelectionAttributes(aColumn - 1))
+        Return pTimeseriesGroup(aRow - (LabelRow + 1)).Attributes.GetValue(pDataManager.SelectionAttributes(aColumn - 1))
       End If
     End Get
     Set(ByVal Value As String)
@@ -603,7 +614,6 @@ Friend Class GridSource
       Return atcControls.atcAlignment.HAlignLeft
     End Get
     Set(ByVal Value As atcControls.atcAlignment)
-
     End Set
   End Property
 End Class

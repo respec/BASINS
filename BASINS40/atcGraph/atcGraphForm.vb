@@ -25,6 +25,8 @@ Public Class atcGraphForm
   'The group of atcTimeseries displayed
   Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
 
+  Private Shared SaveImageExtension As String = ".png"
+
   Private Sub InitMasterPane()
     pMaster = zgc.MasterPane
     pMaster.PaneList.Clear() 'remove default GraphPane
@@ -129,6 +131,7 @@ Public Class atcGraphForm
   Friend WithEvents zgc As ZedGraph.ZedGraphControl
   Friend WithEvents mnuEditY As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditX As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditY2 As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcGraphForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -139,6 +142,7 @@ Public Class atcGraphForm
     Me.mnuEdit = New System.Windows.Forms.MenuItem
     Me.mnuEditX = New System.Windows.Forms.MenuItem
     Me.mnuEditY = New System.Windows.Forms.MenuItem
+    Me.mnuEditY2 = New System.Windows.Forms.MenuItem
     Me.mnuEditTitles = New System.Windows.Forms.MenuItem
     Me.mnuEditCurves = New System.Windows.Forms.MenuItem
     Me.mnuEditFont = New System.Windows.Forms.MenuItem
@@ -174,7 +178,7 @@ Public Class atcGraphForm
     'mnuEdit
     '
     Me.mnuEdit.Index = 1
-    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditX, Me.mnuEditY, Me.mnuEditTitles, Me.mnuEditCurves, Me.mnuEditFont})
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditX, Me.mnuEditY, Me.mnuEditY2, Me.mnuEditTitles, Me.mnuEditCurves, Me.mnuEditFont})
     Me.mnuEdit.Text = "&Edit"
     '
     'mnuEditX
@@ -187,19 +191,24 @@ Public Class atcGraphForm
     Me.mnuEditY.Index = 1
     Me.mnuEditY.Text = "&Y Axis"
     '
+    'mnuEditY2
+    '
+    Me.mnuEditY2.Index = 2
+    Me.mnuEditY2.Text = "Y&2 Axis"
+    '
     'mnuEditTitles
     '
-    Me.mnuEditTitles.Index = 2
+    Me.mnuEditTitles.Index = 3
     Me.mnuEditTitles.Text = "&Titles"
     '
     'mnuEditCurves
     '
-    Me.mnuEditCurves.Index = 3
+    Me.mnuEditCurves.Index = 4
     Me.mnuEditCurves.Text = "&Curves"
     '
     'mnuEditFont
     '
-    Me.mnuEditFont.Index = 4
+    Me.mnuEditFont.Index = 5
     Me.mnuEditFont.Text = "&Font"
     '
     'mnuAnalysis
@@ -214,18 +223,26 @@ Public Class atcGraphForm
     Me.zgc.IsEnableVPan = True
     Me.zgc.IsEnableZoom = True
     Me.zgc.IsShowContextMenu = True
+    Me.zgc.IsShowHScrollBar = False
     Me.zgc.IsShowPointValues = False
+    Me.zgc.IsShowVScrollBar = False
+    Me.zgc.IsZoomOnMouseCenter = False
     Me.zgc.Location = New System.Drawing.Point(0, 0)
     Me.zgc.Name = "zgc"
     Me.zgc.PointDateFormat = "g"
     Me.zgc.PointValueFormat = "G"
-    Me.zgc.Size = New System.Drawing.Size(652, 573)
+    Me.zgc.ScrollMaxX = 0
+    Me.zgc.ScrollMaxY = 0
+    Me.zgc.ScrollMinX = 0
+    Me.zgc.ScrollMinY = 0
+    Me.zgc.Size = New System.Drawing.Size(543, 496)
     Me.zgc.TabIndex = 0
+    Me.zgc.ZoomStepFraction = 0.1
     '
     'atcGraphForm
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-    Me.ClientSize = New System.Drawing.Size(652, 573)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+    Me.ClientSize = New System.Drawing.Size(543, 496)
     Me.Controls.Add(Me.zgc)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
@@ -249,8 +266,11 @@ Public Class atcGraphForm
 
 
   Private Sub mnuFileSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
-    'TODO: add graph file save
-    MsgBox("File:Save not yet implemented", MsgBoxStyle.Exclamation)
+    Dim SavedAs As String
+    SavedAs = zgc.SaveAs(SaveImageExtension)
+    If SavedAs.Length > 0 Then
+      SaveImageExtension = System.IO.Path.GetExtension(SavedAs)
+    End If
   End Sub
 
   Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
@@ -316,6 +336,11 @@ Public Class atcGraphForm
   Private Sub mnuEditY_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY.Click
     pEditor = New atcGraphEdit
     pEditor.Edit(zgc.GraphPane.YAxis)
+  End Sub
+
+  Private Sub mnuEditY2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY2.Click
+    pEditor = New atcGraphEdit
+    pEditor.Edit(zgc.GraphPane.Y2Axis)
   End Sub
 
   Public Sub AddDatasetTimeseries(ByVal t As atcTimeseries, ByVal CurveLabel As String)
@@ -408,5 +433,6 @@ Public Class atcGraphForm
       End If
     Next
   End Sub
+
 
 End Class
