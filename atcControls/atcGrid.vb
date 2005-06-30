@@ -2,8 +2,11 @@ Public Class atcGrid
   Inherits System.Windows.Forms.UserControl
 
   Event MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+  Event UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer)
 
   Private WithEvents pSource As atcGridSource
+
+  Private Const COL_TOLERANCE As Integer = 2
 
   Private pFont As Font = New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point)
 
@@ -18,6 +21,8 @@ Public Class atcGrid
 
   Private pRowBottom As ArrayList
   Private pColRight As ArrayList
+
+  Private pColumnDragging As Integer = -1
 
 #Region " Windows Form Designer generated code "
 
@@ -126,6 +131,8 @@ Public Class atcGrid
     Else
       ColumnWidth(0) = Me.Width / 2
     End If
+
+    pColumnDragging = -1
   End Sub
 
   Public Sub Initialize(ByVal aSource As atcGridSource)
@@ -211,20 +218,18 @@ Public Class atcGrid
       Dim visibleHeight As Single = Me.Height
       Dim visibleWidth As Single = Me.Width
 
-      If pTopRow > 0 Then 'Scrolled down at least one row
+      If pTopRow > 0 Then        'Scrolled down at least one row
         If lRows < pTopRow Then  'Scrolled past last row
           pTopRow = 0            'Reset scrollbar to top row
           Me.VScroller.Value = 0
-        Else
-          'Check to see if all rows could fit
+        Else                     'Check to see if all rows could fit
           y = 0
           For iRow = 0 To lRows - 1
             y += RowHeight(iRow)
             If y > visibleHeight Then Exit For
           Next
-          'If all rows can fit
-          If y <= visibleHeight Or lRows < pTopRow Then
-            pTopRow = 0            'Reset scrollbar to top row
+          If y <= visibleHeight Then 'If all rows can fit
+            pTopRow = 0              'Reset scrollbar to top row
             Me.VScroller.Value = 0
           End If
         End If
@@ -344,6 +349,27 @@ Public Class atcGrid
     End If
   End Sub
 
+  Private Sub SizeColumnToContents(ByVal aColumn As Integer)
+    Dim lCellValue As String
+    Dim lCellWidth As Single
+    Dim lastRow As Integer = pTopRow + pRowBottom.Count - 1
+    Dim g As Graphics = Me.CreateGraphics
+
+    ColumnWidth(aColumn) = COL_TOLERANCE * 2
+
+    For iRow As Integer = pTopRow To lastRow
+      lCellValue = pSource.CellValue(iRow, aColumn)
+      If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
+        lCellWidth = g.MeasureString(lCellValue, pFont).Width + COL_TOLERANCE
+        If lCellWidth > ColumnWidth(aColumn) Then
+          ColumnWidth(aColumn) = lCellWidth
+        End If
+      End If
+    Next
+
+    g.Dispose()
+  End Sub
+
   Private Sub pSource_ChangedColumns(ByVal aColumns As Integer) Handles pSource.ChangedColumns
     Me.Refresh()
   End Sub
@@ -357,18 +383,69 @@ Public Class atcGrid
   End Sub
 
   Protected Overrides Sub OnMouseDown(ByVal e As System.Windows.Forms.MouseEventArgs)
-    Dim lRow As Integer = 0
-    Dim lColumn As Integer = 0
-    While lRow < pRowBottom.Count AndAlso e.Y > pRowBottom(lRow)
-      lRow += 1
-    End While
-    While lColumn < pColRight.Count AndAlso e.X > pColRight(lColumn)
-      lColumn += 1
-    End While
-    If lRow < pSource.Rows And lColumn < pSource.Columns Then
-      RaiseEvent MouseDownCell(lRow + pTopRow, lColumn + pLeftColumn)
+    Dim lRow As Integer
+    Dim lColumn As Integer = ColumnEdgeToDrag(e.X)
+    If lColumn >= 0 Then
+      pColumnDragging = lColumn
+    Else
+      lRow = 0
+      lColumn = 0
+      While lRow < pRowBottom.Count AndAlso e.Y > pRowBottom(lRow)
+        lRow += 1
+      End While
+      While lColumn < pColRight.Count AndAlso e.X > pColRight(lColumn)
+        lColumn += 1
+      End While
+      If lRow < pSource.Rows And lColumn < pSource.Columns Then
+        RaiseEvent MouseDownCell(lRow + pTopRow, lColumn + pLeftColumn)
+      End If
     End If
   End Sub
+
+  Protected Overrides Sub OnMouseMove(ByVal e As System.Windows.Forms.MouseEventArgs)
+    Dim newCursor As Windows.Forms.Cursor = Cursors.Default
+    Select Case e.Button
+      Case MouseButtons.None
+        If ColumnEdgeToDrag(e.X) >= 0 Then
+          newCursor = Cursors.SizeWE
+        End If
+        If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
+      Case MouseButtons.Left
+        If pColumnDragging >= 0 Then
+          ColumnWidth(pColumnDragging) += (e.X - pColRight(pColumnDragging - pLeftColumn))
+          If ColumnWidth(pColumnDragging) < COL_TOLERANCE * 2 Then 'it got too small
+            ColumnWidth(pColumnDragging) = COL_TOLERANCE * 2       'enforce small minimun size
+          End If
+          RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
+          Refresh()
+        End If
+    End Select
+  End Sub
+
+  Protected Overrides Sub OnDoubleClick(ByVal e As System.EventArgs)
+    If pColumnDragging >= 0 Then
+      Dim lOldWidth As Integer = ColumnWidth(pColumnDragging)
+      SizeColumnToContents(pColumnDragging)
+      If ColumnWidth(pColumnDragging) <> lOldWidth Then
+        Refresh()
+        RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
+      End If
+    End If
+  End Sub
+
+  Protected Overrides Sub OnMouseUp(ByVal e As System.Windows.Forms.MouseEventArgs)
+    pColumnDragging = -1
+  End Sub
+
+  Private Function ColumnEdgeToDrag(ByVal X As Integer) As Integer
+    For lColumn As Integer = 0 To pColRight.Count - 1
+      'If within tolerance of column edge and column is not being hidden by a zero width
+      If Math.Abs(X - pColRight(lColumn)) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
+        Return lColumn + pLeftColumn
+      End If
+    Next
+    Return -1
+  End Function
 
   Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
     If HScroller.Visible Then
