@@ -45,7 +45,17 @@ Friend Class frmSelectTimeseries
   Friend WithEvents lblMatching As System.Windows.Forms.Label
   Friend WithEvents pMatchingGrid As atcControls.atcGrid
   Friend WithEvents pSelectedGrid As atcControls.atcGrid
-  Friend WithEvents btnOpen As System.Windows.Forms.Button
+  Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
+  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuAttributes As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSelect As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuAttributesAdd As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuAttributesRemove As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuAttributesMove As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSelectAllMatching As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSelectClear As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSelectNoMatching As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileManage As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectTimeseries))
     Me.groupTop = New System.Windows.Forms.GroupBox
@@ -55,12 +65,22 @@ Friend Class frmSelectTimeseries
     Me.panelCriteria = New System.Windows.Forms.Panel
     Me.btnAddAttribute = New System.Windows.Forms.Button
     Me.pnlButtons = New System.Windows.Forms.Panel
-    Me.btnOpen = New System.Windows.Forms.Button
     Me.btnCancel = New System.Windows.Forms.Button
     Me.btnOk = New System.Windows.Forms.Button
     Me.splitAboveSelected = New System.Windows.Forms.Splitter
     Me.groupSelected = New System.Windows.Forms.GroupBox
     Me.pSelectedGrid = New atcControls.atcGrid
+    Me.MainMenu1 = New System.Windows.Forms.MainMenu
+    Me.MenuItem1 = New System.Windows.Forms.MenuItem
+    Me.mnuFileManage = New System.Windows.Forms.MenuItem
+    Me.mnuAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuAttributesAdd = New System.Windows.Forms.MenuItem
+    Me.mnuAttributesRemove = New System.Windows.Forms.MenuItem
+    Me.mnuAttributesMove = New System.Windows.Forms.MenuItem
+    Me.mnuSelect = New System.Windows.Forms.MenuItem
+    Me.mnuSelectAllMatching = New System.Windows.Forms.MenuItem
+    Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
+    Me.mnuSelectClear = New System.Windows.Forms.MenuItem
     Me.groupTop.SuspendLayout()
     Me.panelCriteria.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
@@ -129,7 +149,6 @@ Friend Class frmSelectTimeseries
     '
     'pnlButtons
     '
-    Me.pnlButtons.Controls.Add(Me.btnOpen)
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
@@ -137,14 +156,6 @@ Friend Class frmSelectTimeseries
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.Size = New System.Drawing.Size(528, 40)
     Me.pnlButtons.TabIndex = 12
-    '
-    'btnOpen
-    '
-    Me.btnOpen.Location = New System.Drawing.Point(200, 8)
-    Me.btnOpen.Name = "btnOpen"
-    Me.btnOpen.Size = New System.Drawing.Size(136, 24)
-    Me.btnOpen.TabIndex = 5
-    Me.btnOpen.Text = "Manage Data Sources"
     '
     'btnCancel
     '
@@ -192,6 +203,63 @@ Friend Class frmSelectTimeseries
     Me.pSelectedGrid.Size = New System.Drawing.Size(522, 106)
     Me.pSelectedGrid.TabIndex = 0
     '
+    'MainMenu1
+    '
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.MenuItem1, Me.mnuAttributes, Me.mnuSelect})
+    '
+    'MenuItem1
+    '
+    Me.MenuItem1.Index = 0
+    Me.MenuItem1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileManage})
+    Me.MenuItem1.Text = "&File"
+    '
+    'mnuFileManage
+    '
+    Me.mnuFileManage.Index = 0
+    Me.mnuFileManage.Text = "&Manage Data Sources"
+    '
+    'mnuAttributes
+    '
+    Me.mnuAttributes.Index = 1
+    Me.mnuAttributes.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributesAdd, Me.mnuAttributesRemove, Me.mnuAttributesMove})
+    Me.mnuAttributes.Text = "&Attributes"
+    '
+    'mnuAttributesAdd
+    '
+    Me.mnuAttributesAdd.Index = 0
+    Me.mnuAttributesAdd.Text = "A&dd"
+    '
+    'mnuAttributesRemove
+    '
+    Me.mnuAttributesRemove.Index = 1
+    Me.mnuAttributesRemove.Text = "&Remove"
+    '
+    'mnuAttributesMove
+    '
+    Me.mnuAttributesMove.Index = 2
+    Me.mnuAttributesMove.Text = "&Move"
+    '
+    'mnuSelect
+    '
+    Me.mnuSelect.Index = 2
+    Me.mnuSelect.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuSelectAllMatching, Me.mnuSelectNoMatching, Me.mnuSelectClear})
+    Me.mnuSelect.Text = "&Select"
+    '
+    'mnuSelectAllMatching
+    '
+    Me.mnuSelectAllMatching.Index = 0
+    Me.mnuSelectAllMatching.Text = "Select &Matching"
+    '
+    'mnuSelectNoMatching
+    '
+    Me.mnuSelectNoMatching.Index = 1
+    Me.mnuSelectNoMatching.Text = "&Un-select Matching"
+    '
+    'mnuSelectClear
+    '
+    Me.mnuSelectClear.Index = 2
+    Me.mnuSelectClear.Text = "&Clear"
+    '
     'frmSelectTimeseries
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -201,6 +269,7 @@ Friend Class frmSelectTimeseries
     Me.Controls.Add(Me.pnlButtons)
     Me.Controls.Add(Me.groupTop)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.Menu = Me.MainMenu1
     Me.Name = "frmSelectTimeseries"
     Me.Text = "Select Timeseries"
     Me.groupTop.ResumeLayout(False)
@@ -224,6 +293,7 @@ Friend Class frmSelectTimeseries
 
   Private pMatchingTS As atcTimeseriesGroup
   Private pSelectedTS As atcTimeseriesGroup
+  Private pSaveGroup As atcTimeseriesGroup = Nothing
 
   Private pMatchingSource As GridSource
   Private pSelectedSource As GridSource
@@ -233,8 +303,7 @@ Friend Class frmSelectTimeseries
 
   Private pTotalTS As Integer
 
-  Public Function AskUser(ByVal aDataManager As atcDataManager, Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
-    Dim pSaveGroup As atcTimeseriesGroup = Nothing
+  Public Function AskUser(ByVal aDataManager As atcDataManager, Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
     If aGroup Is Nothing Then
       pSelectedTS = New atcTimeseriesGroup
     Else
@@ -259,9 +328,13 @@ Friend Class frmSelectTimeseries
     pSelectedGrid.Initialize(pSelectedSource)
 
     Populate()
-    Me.ShowDialog()
-    If Not pSelectedOK Then 'User clicked Cancel or closed dialog
-      pSelectedTS.ChangeTo(pSaveGroup)
+    If aModal Then
+      Me.ShowDialog()
+      If Not pSelectedOK Then 'User clicked Cancel or closed dialog
+        pSelectedTS.ChangeTo(pSaveGroup)
+      End If
+    Else
+      Me.Show()
     End If
     Return pSelectedTS
   End Function
@@ -374,9 +447,32 @@ NextTS:
 
   Private Sub UpdatedCriteria()
     If Not pInitializing Then
+      Dim mnu As MenuItem
+      Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
+
       UpdateManagerSelectionAttributes()
       PopulateMatching()
-      pSelectedGrid.Refresh()
+      RefreshSelected()
+
+      For Each mnu In mnuAttributesRemove.MenuItems
+        RemoveHandler mnu.Click, AddressOf mnuRemove_Click
+      Next
+      For Each mnu In mnuAttributesMove.MenuItems
+        RemoveHandler mnu.Click, AddressOf mnuMove_Click
+      Next
+
+      mnuAttributesRemove.MenuItems.Clear()
+      mnuAttributesMove.MenuItems.Clear()
+
+      If iLastCriteria > 0 Then 'Only allow moving/removing if more than one exists
+        For iCriteria As Integer = 0 To iLastCriteria
+          mnu = mnuAttributesRemove.MenuItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem)
+          AddHandler mnu.Click, AddressOf mnuRemove_Click
+          mnu = mnuAttributesMove.MenuItems.Add("&" & iCriteria + 1 & " " & pcboCriteria(iCriteria).SelectedItem)
+          AddHandler mnu.Click, AddressOf mnuMove_Click
+        Next
+      End If
+
     End If
   End Sub
 
@@ -386,6 +482,7 @@ NextTS:
 
   Private Sub RemoveCriteria(ByVal cbo As Windows.Forms.ComboBox, ByVal lst As Windows.Forms.ListBox)
     Dim iRemoving As Integer = GetIndex(cbo.Name)
+    Dim mnu As MenuItem
     RemoveHandler cbo.SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
     RemoveHandler lst.SelectedValueChanged, AddressOf lstCriteria_SelectedIndexChanged
     panelCriteria.Controls.Remove(cbo)
@@ -396,6 +493,7 @@ NextTS:
       pcboCriteria(iMoving).Name = "cboCriteria#" & iMoving
       plstCriteria(iMoving).Name = "lstCriteria#" & iMoving
     Next
+
     ReDim Preserve pcboCriteria(pcboCriteria.GetUpperBound(0) - 1)
     ReDim Preserve plstCriteria(plstCriteria.GetUpperBound(0) - 1)
     If pcboCriteria.GetUpperBound(0) = 0 Then
@@ -525,6 +623,7 @@ NextName:
 
   Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
     pSelectedOK = False
+    pSelectedTS.ChangeTo(pSaveGroup)
     Me.Close()
   End Sub
 
@@ -552,8 +651,12 @@ NextName:
           pSelectedTS.Add(selTS)
         End If
       End If
-      pSelectedGrid.Refresh()
     End If
+    RefreshSelected()
+  End Sub
+
+  Private Sub RefreshSelected()
+    pSelectedGrid.Refresh()
     groupSelected.Text = "Selected Timeseries (" & pSelectedTS.Count & " of " & pTotalTS & ")"
   End Sub
 
@@ -563,16 +666,11 @@ NextName:
       Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
       If iTS >= 0 Then 'Found matching serial number in pSelectedTS
         pSelectedTS.Remove(iTS)
-        groupSelected.Text = "Selected Timeseries (" & pSelectedTS.Count & " of " & pTotalTS & ")"
-        pSelectedGrid.Refresh()
+        RefreshSelected
       Else
         'TODO: should never reach this line
       End If
     End If
-  End Sub
-
-  Private Sub btnOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOpen.Click
-    pDataManager.UserManage() ' .OpenData("")
   End Sub
 
   Private Sub pDataManager_OpenedData(ByVal aTimeseriesFile As atcDataSource) Handles pDataManager.OpenedData
@@ -591,6 +689,42 @@ NextName:
     ResizeOneCriteria(aColumn - 1, aWidth)
   End Sub
 
+  Private Sub mnuAttributesAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAttributesAdd.Click
+    AddCriteria()
+  End Sub
+
+  Private Sub mnuSelectClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectClear.Click
+    pSelectedTS.Clear()
+    RefreshSelected()
+  End Sub
+
+  Private Sub mnuSelectAllMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAllMatching.Click
+    For Each ts As atcTimeseries In pMatchingTS
+      If Not pSelectedTS.Contains(ts) Then pSelectedTS.Add(ts)
+    Next
+    RefreshSelected()
+  End Sub
+
+  Private Sub mnuSelectNoMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectNoMatching.Click
+    For Each ts As atcTimeseries In pMatchingTS
+      If pSelectedTS.Contains(ts) Then pSelectedTS.Remove(ts)
+    Next
+    RefreshSelected()
+  End Sub
+
+  Private Sub mnuFileManage_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileManage.Click
+    pDataManager.UserManage() ' .OpenData("")
+  End Sub
+
+  Private Sub mnuRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Dim mnu As MenuItem = sender
+    Dim index As Integer = mnu.Index
+    RemoveCriteria(pcboCriteria(index), plstCriteria(index))
+  End Sub
+
+  Private Sub mnuMove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+
+  End Sub
 End Class
 
 Friend Class GridSource

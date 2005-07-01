@@ -141,7 +141,7 @@ Public Class atcTimeseriesGroup
   'Remove a Timeseries from the group
   Public Sub Remove(ByVal aTS As atcTimeseries)
     Dim removeList As New ArrayList(1)
-    removeList.Remove(aTS)
+    removeList.Add(aTS)
     Remove(removeList)
   End Sub
 

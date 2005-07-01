@@ -111,7 +111,7 @@ Friend Class atcListForm
     Next
 
     If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
-      mnuFileAdd_Click(Nothing, Nothing)
+      pDataManager.UserSelectTimeseries(, pTimeseriesGroup, True)
     End If
 
     If pTimeseriesGroup.Count > 0 Then
@@ -148,7 +148,7 @@ Friend Class atcListForm
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    pDataManager.UserSelectTimeseries(, pTimeseriesGroup)
+    pDataManager.UserSelectTimeseries(, pTimeseriesGroup, False)
   End Sub
 
   Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pTimeseriesGroup.Added

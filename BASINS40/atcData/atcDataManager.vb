@@ -146,10 +146,10 @@ Public Class atcDataManager
     Return frmCompute.AskUser(Me, aGroup)
   End Function
 
-  Public Function UserSelectTimeseries(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseriesGroup
+  Public Function UserSelectTimeseries(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
     Dim frmSelect As New atcData.frmSelectTimeseries
     If aTitle.Length > 0 Then frmSelect.Text = aTitle
-    Return frmSelect.AskUser(Me, aGroup)
+    Return frmSelect.AskUser(Me, aGroup, aModal)
   End Function
 
   Public Sub UserManage(Optional ByVal aTitle As String = "")
