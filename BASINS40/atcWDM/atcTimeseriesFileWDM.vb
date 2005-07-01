@@ -66,11 +66,11 @@ Public Class atcDataSourceWDM
   '  End Get
   'End Property
 
-  'Private ReadOnly Property FileUnit() As Integer Implements ATCData.ATCclsTserFile.FileUnit
-  '  Get
-  '    Return pFileUnit
-  '  End Get
-  'End Property
+  Public ReadOnly Property FileUnit() As Integer
+    Get
+      Return pFileUnit
+    End Get
+  End Property
 
   'Private WriteOnly Property HelpFilename() As String Implements ATCData.ATCclsTserFile.HelpFilename
   '  Set(ByVal Value As String)
@@ -101,7 +101,6 @@ Public Class atcDataSourceWDM
           LogMsg("Could not find hspfmsg.wdm - " & hspfMsgFileName, "ATCdataWdm")
         Else
           pMsg = New atcMsgWDM
-          pMsg.MsgUnit = F90_WDBOPN(CInt(0), hspfMsgFileName, Len(hspfMsgFileName))
         End If
       End If
       Return pMsg.MsgUnit
@@ -1144,4 +1143,10 @@ Cntinu:
     Return Trim(s)
   End Function
 
+  Protected Overrides Sub Finalize()
+    If pFileUnit > 0 Then
+      Dim i As Integer = F90_WDMCLO(pFileUnit)
+    End If
+    MyBase.Finalize()
+  End Sub
 End Class

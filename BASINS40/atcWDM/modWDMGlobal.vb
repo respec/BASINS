@@ -6,42 +6,8 @@ Imports ATCutility
 
 Module WDMGlobal
 
-  Private pMsgUnit As Integer 'fortran unit number for hspfmsg.wdm; used by clsTserWDM
-  Private pMsg As atcMsgWDM      'see clsMsgWDM
-
   Private pUnitsDef As atcAttributeDefinition
   Private pUnitsDefEditable As atcAttributeDefinition
-
-  Friend Function gMsg() As atcMsgWDM
-    FindHSPFMsgWdm()
-    Return pMsg
-  End Function
-
-  Friend Function gMsgUnit() As Integer
-    FindHSPFMsgWdm()
-    gMsgUnit = pMsgUnit
-  End Function
-
-  Friend Sub SetMsgUnit(ByRef newValue As Integer)
-    If newValue > 0 Then
-      pMsgUnit = newValue
-      pMsg = New atcMsgWDM
-      pMsg.MsgUnit = pMsgUnit
-    End If
-  End Sub
-
-  Private Sub FindHSPFMsgWdm()
-    If pMsgUnit = 0 Then 'need to find, open and process HSPF message file
-      Dim hspfMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
-      If Not FileExists(hspfMsgFileName) Then
-        LogMsg("Could not find hspfmsg.wdm - " & hspfMsgFileName, "ATCTSfile")
-      Else
-        pMsgUnit = F90_WDBOPN(CInt(0), hspfMsgFileName, Len(hspfMsgFileName))
-        pMsg = New atcMsgWDM
-        pMsg.MsgUnit = pMsgUnit
-      End If
-    End If
-  End Sub
 
   ' used by clsTserWDM and clsTSerSWATDbf (in clsTSerDBF.cls)
   Public Function UnitsAttributeDefinition(Optional ByRef Editable As Boolean = False) As atcAttributeDefinition

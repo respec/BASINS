@@ -3,56 +3,70 @@ Option Explicit On
 'Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
 Imports NUnit.Framework
-Imports ATCUtility.modReflection
+Imports atcUtility.modReflection
+Imports atcUtility.modFile
+Imports atcData
+
+Friend Module dbg
+  Dim init As Boolean = False
+  Public Sub Msg(ByVal aMsg As String)
+    If Not init Then
+      ChDriveDir("c:\test\atcWDM\data")
+      SaveFileString("test.lis", "Begin atcWdm test" & vbCrLf)
+      Try
+        Kill("error.fil")
+      Catch
+      End Try
+      HassLibs.F90_MSG("WRITE", 5)
+      init = True
+    End If
+    AppendFileString("test.lis", aMsg & vbCrLf)
+  End Sub
+  Public Sub FileSetup()
+    Msg("dbg.FileSetup start")
+    Kill("shena.wdm")
+    FileCopy("save\shena.wdm", "shena.wdm")
+    Msg("dbg.FileSetup done")
+  End Sub
+End Module
 
 <TestFixture()> Public Class Test_Builder
   Public Sub TestsAllPresent()
-    Dim lTestBuildStatus as String
+    Dim lTestBuildStatus As String
     lTestBuildStatus = BuildMissingTests("c:\test\")
     Assert.AreEqual("All tests present.", lTestBuildStatus, lTestBuildStatus)
   End Sub
 End Class
 
-<TestFixture()> Public Class Test_atcMsgWDM
-
-  Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestEquals()
-    'Equals()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestToString()
-    'ToString()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub Testget_MsgUnit()
-    'get_MsgUnit()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub Testset_MsgUnit()
-    'set_MsgUnit()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub Testget_Attributes()
-    'get_Attributes()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'GetType()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-End Class
-
 <TestFixture()> Public Class Test_atcDataSourceWDM
+
+  <TestFixtureSetUp()> Public Sub init()
+    'MsgBox("Start test of atcDataSourceWDM")
+    dbg.FileSetup()
+  End Sub
+
+  Public Sub TestOpen()
+    Dim lWdm As New atcDataSourceWDM
+
+    dbg.Msg("atcDataSourceWdm:TestOpen")
+    Assert.IsTrue(lWdm.Open("C:\test\atcWDM\data\shena.wdm"))
+    dbg.Msg("                 Timeseries.Count:" & lWdm.Timeseries.Count)
+    dbg.Msg("                 Name:" & lWdm.Name)
+    dbg.Msg("                 FileName:" & lWdm.FileName)
+    dbg.Msg("                 FileUnit:" & lWdm.FileUnit)
+    lWdm = Nothing
+  End Sub
+
+  Public Sub TestAddTimeseries()
+    Dim lWdm As New atcDataSourceWDM
+    Dim lTimser As New atcTimeseries(lWdm)
+
+    dbg.Msg("atcDataSourceWdm:TestAddTimeseries")
+    lWdm.Open("C:\test\atcWDM\data\shena.wdm")
+    dbg.Msg("                 TestAddTimeseries" & lWdm.Timeseries.Count)
+    Assert.IsTrue(lWdm.AddTimeseries(lTimser))
+    lWdm = Nothing
+  End Sub
 
   Public Sub TestSave()
     'Save()
@@ -61,11 +75,6 @@ End Class
 
   Public Sub TestReadData()
     'ReadData()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestOpen()
-    'Open()
     Assert.Ignore("Test not yet written")
   End Sub
 
@@ -261,6 +270,47 @@ End Class
 
   Public Sub Testrefresh()
     'refresh()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestGetType()
+    'GetType()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+End Class
+
+<TestFixture()> Public Class Test_atcMsgWDM
+
+  Public Sub TestGetHashCode()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestEquals()
+    Assert.IsTrue(Equals(Me))
+  End Sub
+
+  Public Sub TestToString()
+    Assert.AreEqual(ToString(), "atcWDM.Test_atcMsgWDM")
+  End Sub
+
+  Public Sub Testget_MsgUnit()
+    Dim lmsgwdm As New atcMsgWDM
+    Dim i As Long
+    dbg.msg("Testget_MsgUnit")
+    i = lmsgwdm.MsgUnit()
+    dbg.msg("  MsgUnit=" & i)
+    Assert.AreEqual(11, i)
+    lmsgwdm = Nothing
+  End Sub
+
+  Public Sub Testset_MsgUnit()
+    'set_MsgUnit()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_Attributes()
+    'get_Attributes()
     Assert.Ignore("Test not yet written")
   End Sub
 
