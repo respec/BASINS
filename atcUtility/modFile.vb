@@ -191,7 +191,9 @@ FoundSameUntil:
     ' ##SUMMARY Makes the specified directory and any above it that are not yet there.
     ' ##SUMMARY   Example: MkDirPath("C:\foo\bar") creates the "C:\foo" and "C:\foo\bar" directories if they do not already exist.
     ' ##PARAM newPath I Path to specified directory
-    System.IO.Directory.CreateDirectory(newPath)
+    If Len(newPath) > 0 Then
+      System.IO.Directory.CreateDirectory(newPath)
+    End If
   End Sub
 
   Public Sub AddFilesInDir(ByRef aFilenames As NameValueCollection, ByRef aDirName As String, ByRef aSubdirs As Boolean, Optional ByRef aFileFilter As String = "*", Optional ByRef aAttributes As Integer = 0)
