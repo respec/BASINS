@@ -95,7 +95,7 @@ Public Class atcGraphForm
     Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
 
     If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
-      mnuFileAdd_Click(Nothing, Nothing)
+      pDataManager.UserSelectTimeseries(, pTimeseriesGroup, True)
     End If
 
     If pTimeseriesGroup.Count > 0 Then
@@ -261,7 +261,7 @@ Public Class atcGraphForm
   End Property
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    pDataManager.UserSelectTimeseries(, pTimeseriesGroup)
+    pDataManager.UserSelectTimeseries(, pTimeseriesGroup, False)
   End Sub
 
 
