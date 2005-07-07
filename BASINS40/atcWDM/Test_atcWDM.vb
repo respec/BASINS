@@ -39,6 +39,7 @@ End Module
 End Class
 
 <TestFixture()> Public Class Test_atcDataSourceWDM
+  Dim pWdmName As String = "C:\test\atcWDM\data\shena.wdm"
 
   <TestFixtureSetUp()> Public Sub init()
     'MsgBox("Start test of atcDataSourceWDM")
@@ -49,11 +50,10 @@ End Class
     Dim lWdm As New atcDataSourceWDM
 
     dbg.Msg("atcDataSourceWdm:TestOpen")
-    Assert.IsTrue(lWdm.Open("C:\test\atcWDM\data\shena.wdm"))
+    Assert.IsTrue(lWdm.Open(pWdmName))
     dbg.Msg("                 Timeseries.Count:" & lWdm.Timeseries.Count)
     dbg.Msg("                 Name:" & lWdm.Name)
     dbg.Msg("                 FileName:" & lWdm.FileName)
-    dbg.Msg("                 FileUnit:" & lWdm.FileUnit)
     lWdm = Nothing
   End Sub
 
@@ -62,8 +62,8 @@ End Class
     Dim lTimser As New atcTimeseries(lWdm)
 
     dbg.Msg("atcDataSourceWdm:TestAddTimeseries")
-    lWdm.Open("C:\test\atcWDM\data\shena.wdm")
-    dbg.Msg("                 TestAddTimeseries" & lWdm.Timeseries.Count)
+    lWdm.Open(pWdmName)
+    dbg.Msg("                 TestAddTimeseries:Count:" & lWdm.Timeseries.Count)
     Assert.IsTrue(lWdm.AddTimeseries(lTimser))
     lWdm = Nothing
   End Sub
@@ -295,13 +295,13 @@ End Class
   End Sub
 
   Public Sub Testget_MsgUnit()
-    Dim lmsgwdm As New atcMsgWDM
-    Dim i As Long
-    dbg.msg("Testget_MsgUnit")
-    i = lmsgwdm.MsgUnit()
-    dbg.msg("  MsgUnit=" & i)
-    Assert.AreEqual(11, i)
-    lmsgwdm = Nothing
+    'Dim lmsgwdm As New atcMsgWDM
+    'Dim i As Long
+    'dbg.msg("Testget_MsgUnit")
+    'i = lmsgwdm.MsgUnit()
+    'dbg.msg("  MsgUnit=" & i)
+    'Assert.AreEqual(11, i)
+    'lmsgwdm = Nothing
   End Sub
 
   Public Sub Testset_MsgUnit()
