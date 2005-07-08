@@ -112,7 +112,7 @@ Public Class atcDataSourceWDM
   Private Sub Clear()
     pErrorDescription = ""
     pMonitorSet = False
-    FileName = "<unknown>"
+    Specification = "<unknown>"
     pQuick = False
 
     pDates = Nothing
@@ -203,7 +203,7 @@ Public Class atcDataSourceWDM
     Dim dsn As Integer
     Dim lDsn As Integer
 
-    Timeseries.Clear()
+    DataSets.Clear()
 
     pDates = Nothing
     pDates = New ArrayList
@@ -212,7 +212,7 @@ Public Class atcDataSourceWDM
       pMonitor.SendMonitorMessage("(OPEN WDM File)")
       pMonitor.SendMonitorMessage("(BUTTOFF CANCEL)")
       pMonitor.SendMonitorMessage("(BUTTOFF PAUSE)")
-      pMonitor.SendMonitorMessage("(MSG1 " & FileName & ")")
+      pMonitor.SendMonitorMessage("(MSG1 " & Specification & ")")
     End If
 
     dsn = 1
@@ -245,7 +245,7 @@ Public Class atcDataSourceWDM
   End Sub
 
   Private Function GetDataSetFromDsn(ByRef lDsn As Integer) As atcTimeseries
-    For Each curDataset As atcTimeseries In Timeseries
+    For Each curDataset As atcTimeseries In DataSets
       If curDataset.Attributes.GetValue("id") = lDsn Then
         Return curDataset
       End If
@@ -266,8 +266,8 @@ Public Class atcDataSourceWDM
     End Select
   End Function
 
-  Public Overrides Function AddTimeseries(ByRef t As atcData.atcTimeseries, Optional ByRef ExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
-    MyBase.AddTimeseries(t, ExistAction)
+  Public Overrides Function AddDataset(ByRef aDataSet As atcData.atcDataSet, Optional ByRef ExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
+    MyBase.AddDataSet(aDataSet, ExistAction)
     'TODO: re-implement
     '    Dim retcod, dsn, i, lExAct, TsInd As Integer
     '    Dim S As String
@@ -449,7 +449,7 @@ Public Class atcDataSourceWDM
     Dim retval As Integer
 
     retval = dsn
-    For Each vData In Timeseries
+    For Each vData In DataSets
       If retval = vData.Header.id Then
         retval = findNextDsn(dsn + 1)
         Exit For
@@ -467,14 +467,15 @@ Public Class atcDataSourceWDM
     If retc = 0 Then
       RemoveTimSer = True
       searchSerial = t.Serial
-      For i = 1 To Timeseries.Count()
-        If Timeseries.Item(i).Serial = searchSerial Then Timeseries.Remove(i) : Exit For
+      For i = 1 To DataSets.Count()
+        If DataSets.Item(i).Serial = searchSerial Then DataSets.Remove(i) : Exit For
       Next
 
       removeDate = True
       searchSerial = t.Dates.Serial
-      For i = 1 To Timeseries.Count()
-        If Timeseries.Item(i).Dates.Serial = searchSerial Then removeDate = False : Exit For
+      For i = 1 To DataSets.Count()
+        Dim ts As atcTimeseries = DataSets.Item(i)
+        If ts.Dates.Serial = searchSerial Then removeDate = False : Exit For
       Next
 
       If removeDate Then
@@ -803,11 +804,11 @@ Public Class atcDataSourceWDM
     End Get
   End Property
 
-  Public Overrides ReadOnly Property FileFilter() As String
-    Get
-      Return pFileFilter
-    End Get
-  End Property
+  'Public Overrides ReadOnly Property FileFilter() As String
+  '  Get
+  '    Return pFileFilter
+  '  End Get
+  'End Property
 
   Public Overrides ReadOnly Property Name() As String
     Get
@@ -827,14 +828,17 @@ Public Class atcDataSourceWDM
     End Get
   End Property
 
-  Public Overrides Function Open(ByVal newFileName As String) As Boolean
-    If Not FileExists(newFileName) Then
-      pErrorDescription = "File '" & newFileName & "' not found"
+  Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+    If aFileName.Length = 0 Then
+      aFileName = FindFile("Select WDM file to open", , , pFileFilter, True, , 1)
+    End If
+    If Not FileExists(aFileName) Then
+      pErrorDescription = "File '" & aFileName & "' not found"
     Else
-      Dim lWdmHandle As New atcWdmHandle(0, newFileName)
+      Dim lWdmHandle As New atcWdmHandle(0, aFileName)
       'BasInfAvail = ReadBasInf()
       If lWdmHandle.Unit > 0 Then
-        FileName = newFileName
+        Specification = aFileName
         pQuick = True
         Refresh(lWdmHandle.Unit)
         pQuick = False
@@ -844,7 +848,7 @@ Public Class atcDataSourceWDM
     End If
   End Function
 
-  Public Overrides Sub ReadData(ByVal aReadMe As atcTimeseries)
+  Public Overrides Sub ReadData(ByVal aReadMe As atcDataSet)
     Dim v() As Single 'array of data values
     Dim dv() As Double 'array of data values
     Dim dd() As Double 'array of julian dates
@@ -856,11 +860,12 @@ Public Class atcDataSourceWDM
     Dim f() As Integer
     'Dim lWdmOpen As Integer
 
-    If Not Timeseries.Contains(aReadMe) Then
+    If Not DataSets.Contains(aReadMe) Then
       System.Diagnostics.Debug.WriteLine("WDM cannot read dataset not from this file")
     Else
+      Dim lReadTS As atcTimeseries = aReadMe
       'System.Diagnostics.Debug.WriteLine("WDM read data " & ReadDataset.Attributes.GetValue("Location"))
-      Dim lWdmHandle As New atcWdmHandle(0, FileName)
+      Dim lWdmHandle As New atcWdmHandle(0, Specification)
       'BasInfAvail = ReadBasInf()
       If lWdmHandle.Unit > 0 Then
         With aReadMe.Attributes
@@ -869,17 +874,17 @@ Public Class atcDataSourceWDM
           End If
 
           If Not CBool(.GetValue("HeaderOnly", False)) Then
-            aReadMe.ValuesNeedToBeRead = False
-            aReadMe.Dates.ValuesNeedToBeRead = False
+            lReadTS.ValuesNeedToBeRead = False
+            lReadTS.Dates.ValuesNeedToBeRead = False
 
             Dim lSJDay As Double = .GetValue("SJDay", 0)
             J2Date(lSJDay, sdat)
-            nVals = aReadMe.numValues
+            nVals = lReadTS.numValues
             If nVals = 0 Then 'constant inverval???
               Dim lEJDay As Double = .GetValue("EJDay", 0)
               J2Date(lEJDay, edat)
               timdif(sdat, edat, .GetValue("tu", 0), .GetValue("ts", 0), nVals)
-              aReadMe.numValues = nVals
+              lReadTS.numValues = nVals
             End If
             If nVals > 0 Then
               ReDim v(nVals)
@@ -917,8 +922,8 @@ Public Class atcDataSourceWDM
               ReDim dv(0)
               ReDim dd(0)
             End If
-            aReadMe.Values = dv
-            aReadMe.Dates.Values = dd
+            lReadTS.Values = dv
+            lReadTS.Dates.Values = dd
           End If
         End With
         lWdmHandle.Dispose()
@@ -953,7 +958,7 @@ Public Class atcDataSourceWDM
     lData.Attributes.SetValue("id", dsn)
     lData.ValuesNeedToBeRead = True
     lData.Dates.ValuesNeedToBeRead = True
-    Timeseries.Add(lData)
+    DataSets.Add(lData)
 
     'lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))
     Call DsnReadGeneral(aFileUnit, lData)

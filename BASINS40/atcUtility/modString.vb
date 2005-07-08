@@ -762,29 +762,29 @@ Public Module modString
   '    dy = tmp - (mo * 100)
   'End Sub
 
-  'Public Function CountString(ByRef Source As String, ByRef Find As String) As Integer
-  '    ' ##SUMMARY Searches for occurences of Find in Source.
-  '    ' ##SUMMARY   Example: CountString("The lead man was lead-footed", "lead") = 2
-  '    ' ##PARAM Source I Full string to be searched
-  '    ' ##PARAM Find I Substring to be searched for
-  '    ' ##RETURNS  Returns number of occurences of Find in Source.
-  '    Dim retval As Integer
-  '    Dim findPos As Integer
-  '    Dim findlen As Integer
-  '    ' ##LOCAL retval - string to be returned as CountString
-  '    ' ##LOCAL findpos - long position of Find in Source
-  '    ' ##LOCAL findlen - long length of Find
+  Public Function CountString(ByRef Source As String, ByRef Find As String) As Integer
+    ' ##SUMMARY Searches for occurences of Find in Source.
+    ' ##SUMMARY   Example: CountString("The lead man was lead-footed", "lead") = 2
+    ' ##PARAM Source I Full string to be searched
+    ' ##PARAM Find I Substring to be searched for
+    ' ##RETURNS  Returns number of occurences of Find in Source.
+    Dim retval As Integer
+    Dim findPos As Integer
+    Dim findlen As Integer
+    ' ##LOCAL retval - string to be returned as CountString
+    ' ##LOCAL findpos - long position of Find in Source
+    ' ##LOCAL findlen - long length of Find
 
-  '    findlen = Len(Find)
-  '    If findlen > 0 Then
-  '        findPos = InStr(Source, Find)
-  '        While findPos > 0
-  '            retval = retval + 1
-  '            findPos = InStr(findPos + findlen, Source, Find)
-  '        End While
-  '    End If
-  '    CountString = retval
-  'End Function
+    findlen = Len(Find)
+    If findlen > 0 Then
+      findPos = InStr(Source, Find)
+      While findPos > 0
+        retval = retval + 1
+        findPos = InStr(findPos + findlen, Source, Find)
+      End While
+    End If
+    CountString = retval
+  End Function
 
   Public Function ReplaceStringNoCase(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String) As String
     ' ##SUMMARY Replaces Find in Source with Replace (not case sensitive).

@@ -111,12 +111,12 @@ Public Class atcTimeseriesFileHspfBinOut
       pMonitor.SendMonitorMessage("(OPEN HSPF Binary Output File)")
       pMonitor.SendMonitorMessage("(BUTTOFF CANCEL)")
       pMonitor.SendMonitorMessage("(BUTTOFF PAUSE)")
-      pMonitor.SendMonitorMessage("(MSG1 " & FileName & ")")
+      pMonitor.SendMonitorMessage("(MSG1 " & Specification & ")")
     End If
 
     pBinFile = New clsHspfBinary
     pBinFile.Monitor = pMonitor
-    pBinFile.Filename = FileName
+    pBinFile.Filename = Specification
 
     i = 0
     For Each lBinHeader In pBinFile.Headers '.Values
@@ -180,7 +180,7 @@ Public Class atcTimeseriesFileHspfBinOut
           With lTSer
             .Attributes.SetValue("Operation", lBinHeader.id.OperationName)
             .Attributes.SetValue("Section", lBinHeader.id.SectionName)
-            .Attributes.SetValue("IDSCEN", FilenameOnly(FileName))
+            .Attributes.SetValue("IDSCEN", FilenameOnly(Specification))
             .Attributes.SetValue("IDLOCN", Left(lBinHeader.id.OperationName, 1) & ":" & (lBinHeader.id.OperationNumber))
             .Attributes.SetValue("IDCONS", lBinHeader.VarNames.ItemByIndex(j))
             If lBinHeader.VarNames.ItemByIndex(j) = "LZS" Then 'TODO: need better check here
@@ -188,7 +188,7 @@ Public Class atcTimeseriesFileHspfBinOut
             End If
             .ValuesNeedToBeRead = True
             .Dates = New atcTimeseries(Me)
-            AddTimeseries(lTSer)
+            AddDataSet(lTSer)
           End With
         Next j
       End With
@@ -207,7 +207,8 @@ Public Class atcTimeseriesFileHspfBinOut
 
   End Sub
 
-  Public Overrides Sub readData(ByVal t As atcTimeseries)
+  Public Overrides Sub readData(ByVal aDataSet As atcDataSet)
+    Dim lts As atcTimeseries = aDataSet
     Dim lVind As Integer, lOutLev As Integer
     Dim lBinHeader As clsHspfBinHeader
     Dim lBd As clsHspfBinData
@@ -218,9 +219,9 @@ Public Class atcTimeseriesFileHspfBinOut
     Dim v() As Double, i As Integer, j As Integer, f() As Integer
     Dim d() As Double
 
-    lKey = t.Attributes.GetValue("Operation") & ":" & _
-           Mid(t.Attributes.GetValue("IDLOCN"), 3) & ":" & _
-           t.Attributes.GetValue("Section")
+    lKey = lts.Attributes.GetValue("Operation") & ":" & _
+           Mid(lts.Attributes.GetValue("IDLOCN"), 3) & ":" & _
+           lts.Attributes.GetValue("Section")
 
     Try
       lBinHeader = pBinFile.Headers.ItemByKey(lKey)
@@ -229,7 +230,7 @@ Public Class atcTimeseriesFileHspfBinOut
         'i = 0
         'While lVind = -1 And i < .VarNames.Count
         'If .VarNames.ItemByIndex(i) = t.Attributes.GetValue("IDCONS") Then
-        lVind = .VarNames.IndexFromKey(t.Attributes.GetValue("IDCONS"))
+        lVind = .VarNames.IndexFromKey(lts.Attributes.GetValue("IDCONS"))
         'End I
         'i = i + 1
         'End While
@@ -237,8 +238,8 @@ Public Class atcTimeseriesFileHspfBinOut
           ReDim v(pNvals)
           ReDim f(pNvals)
           ReDim d(pNvals)
-          lSJday = t.Attributes.GetValue("SJDay")
-          lEJday = t.Attributes.GetValue("EJDay")
+          lSJday = lts.Attributes.GetValue("SJDay")
+          lEJday = lts.Attributes.GetValue("EJDay")
           lOutLev = .Data.ItemByIndex(0).OutLev
           d(0) = lSJday
           j = 1
@@ -254,13 +255,13 @@ Public Class atcTimeseriesFileHspfBinOut
               End If
             End If
           Next i
-          If (t.Attributes.GetValue("Point", False)) Then
+          If (lts.Attributes.GetValue("Point", False)) Then
             v(0) = Double.NaN
           Else
             v(0) = v(1)
           End If
         Else
-          pErrorDescription = "Could not retrieve HSPF Binary data values for variable: " & t.Attributes.GetValue("IDCONS")
+          pErrorDescription = "Could not retrieve HSPF Binary data values for variable: " & lts.Attributes.GetValue("IDCONS")
         End If
       End With
     Catch
@@ -271,13 +272,13 @@ Public Class atcTimeseriesFileHspfBinOut
       'End If
     End Try
     't.flags = f
-    t.Dates.Values = d
-    t.Values = v
+    lts.Dates.Values = d
+    lts.Values = v
     't.calcSummary()
     ' next 2 might be automatic
     ReDim v(0)
     ReDim f(0)
-    t.ValuesNeedToBeRead = False
+    lts.ValuesNeedToBeRead = False
   End Sub
 
   Public Sub Refresh()
@@ -303,11 +304,11 @@ Public Class atcTimeseriesFileHspfBinOut
     '  pHSPFOutput.Filter.ShowFilterEdit icon
   End Sub
 
-  Public Overrides ReadOnly Property FileFilter() As String
-    Get
-      Return pFileFilter
-    End Get
-  End Property
+  'Public Overrides ReadOnly Property FileFilter() As String
+  '  Get
+  '    Return pFileFilter
+  '  End Get
+  'End Property
 
   Public Overrides ReadOnly Property Name() As String
     Get
@@ -327,9 +328,12 @@ Public Class atcTimeseriesFileHspfBinOut
     End Get
   End Property
 
-  Public Overrides Function Open(ByVal newFileName As String) As Boolean
-    newFileName = AbsolutePath(newFileName, CurDir())
-    FileName = newFileName
+  Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+    If aFileName.Length = 0 Then
+      aFileName = FindFile("Select HSPF Bianry file to open", , , pFileFilter, True, , 1)
+    End If
+    aFileName = AbsolutePath(aFileName, CurDir())
+    Specification = aFileName
     BuildTSers()
     Return True
   End Function

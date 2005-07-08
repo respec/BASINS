@@ -1,8 +1,8 @@
 Public Class atcDataSource
   Inherits atcDataPlugin
 
-  Private pFileNameOrConnectString As String
-  Private pTimeseries As atcTimeseriesGroup
+  Private pSpecification As String
+  Private pData As atcDataGroup
 
   Public Enum EnumExistAction
     ExistNoAction = 0
@@ -14,27 +14,36 @@ Public Class atcDataSource
 
   'Filter for files that this class can read, formatted for common dialog.
   'Returns empty string if this atcDataSource does not use files.
-  Public Overridable ReadOnly Property FileFilter() As String
-    Get
-      Return "" '"All Files (*.*)|*.*"
-    End Get
-  End Property
+  'Public Overridable ReadOnly Property FileFilter() As String
+  '  Get
+  '    Return "" '"All Files (*.*)|*.*"
+  '  End Get
+  'End Property
 
   'Name of file we are reading and/or writing, including full path
   'Should only be set by inheriting class, only during Open or Save
-  Public Overridable Property FileName() As String
+  Public Overridable Property Specification() As String
     Get
-      Return pFileNameOrConnectString
+      Return pSpecification
     End Get
     Set(ByVal newValue As String)
-      pFileNameOrConnectString = newValue
+      pSpecification = newValue
     End Set
   End Property
 
-  'The atcTimeseries objects in this file
-  Public Overridable ReadOnly Property Timeseries() As atcTimeseriesGroup
+  Private pAttributes As atcDataAttributes
+
+  'Attributes associated with the whole Data (location, constituent, etc.)
+  Public ReadOnly Property Attributes() As atcDataAttributes
     Get
-      Return pTimeseries
+      Return pAttributes
+    End Get
+  End Property
+
+  'The atcDataSet objects in this file
+  Public Overridable ReadOnly Property DataSets() As atcDataGroup
+    Get
+      Return pData
     End Get
   End Property
 
@@ -53,14 +62,16 @@ Public Class atcDataSource
   End Property
 
   'Opens file or database and reads enough to determine whether it is correct type
+  'aSpecification = file name, connect string, or other string needed to open
+  'aAttributes = additional information which may be used for opening and will be saved as Attributes
   'Returns True if successfully opened
-  Public Overridable Function Open(ByVal aFileNameOrConnectString As String) As Boolean
+  Public Overridable Function Open(ByVal aSpecification As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
     Err.Raise(0, Me, "Open must be overridden to be used, atcDataSource does not implement.")
   End Function
 
-  'Read all the data into an atcTimeseries (which must be from this file)
-  'Called only from within atcTimeseries.EnsureValuesRead.
-  Public Overridable Sub ReadData(ByVal aTimeseries As atcTimeseries)
+  'Read all the data into an atcDataSet (which must be from this file)
+  'Called only from within atcData.EnsureValuesRead.
+  Public Overridable Sub ReadData(ByVal aData As atcDataSet)
     Err.Raise(0, Me, "ReadData must be overridden to be used, atcDataSource does not implement.")
   End Sub
 
@@ -72,17 +83,17 @@ Public Class atcDataSource
     Err.Raise(0, Me, "Save must be overridden to be used, atcDataSource does not implement.")
   End Function
 
-  Public Overridable Function AddTimeseries(ByRef t As atcTimeseries, _
+  Public Overridable Function AddDataSet(ByRef t As atcDataSet, _
          Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
-    If pTimeseries.Contains(t) Then
+    If pData.Contains(t) Then
       Return False 'can't add, already have it
     Else
-      pTimeseries.Add(t)
+      pData.Add(t)
       Return True
     End If
   End Function
 
   Public Sub New()
-    pTimeseries = New atcTimeseriesGroup
+    pData = New atcDataGroup
   End Sub
 End Class

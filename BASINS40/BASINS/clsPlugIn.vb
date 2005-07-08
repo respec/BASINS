@@ -31,7 +31,7 @@ Public Class PlugIn
 
   Private pNationalDataDir As String = ""
   Private pLogFilename As String = ""
-  Private WithEvents pTimeseriesManager As atcDataManager
+  Private WithEvents pDataManager As atcDataManager
 
   Private pBusy As Integer = 0 'Incremented by setting Busy = True, decremented by setting Busy = False
   Private pBeforeBusyCursor As MapWinGIS.tkCursor
@@ -85,7 +85,7 @@ Public Class PlugIn
 
     g_MapWin = aMapWin
 
-    pTimeseriesManager = New atcDataManager(g_MapWin, Me)
+    pDataManager = New atcDataManager(g_MapWin, Me)
     FindBasinsDrives()
 
     'g_MapWin.Menus.AddMenu(NewProjectMenuName, "mnuFile", Nothing, NewProjectMenuString, "mnuNew")
@@ -141,11 +141,11 @@ Public Class PlugIn
       mnu = .AddMenu(ToolsMenuName & "_OpenScript", ToolsMenuName, Nothing, "Edit Script")
       'mnu = .AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
 
-      Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
+      Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
       If DisplayPlugins.Count > 0 Then
         mnu = .AddMenu(ToolsMenuName & "_Separator1", ToolsMenuName, Nothing, "-")
       End If
-      For Each atf As atcTimeseriesDisplay In DisplayPlugins
+      For Each atf As atcDataDisplay In DisplayPlugins
         mnu = .AddMenu(ToolsMenuName & "_" & atf.Name, ToolsMenuName, Nothing, atf.Name)
       Next
     End With
@@ -307,11 +307,11 @@ Public Class PlugIn
             DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
           End If
           'Case "OpenTimeseries"
-          '  pTimeseriesManager.Open("")
+          '  pDataManager.Open("")
         Case "ComputeTimeseries"
-          pTimeseriesManager.UserCompute()
+          pDataManager.UserCompute()
         Case "ManageDataSources"
-          pTimeseriesManager.UserManage()
+          pDataManager.UserManage()
         Case Else : MsgBox("Data Tool " & ItemName)
       End Select
       Handled = True
@@ -343,7 +343,7 @@ Public Class PlugIn
     End Set
   End Property
 
-  Private Sub pTimeseriesManager_OpenedData(ByVal aFile As atcData.atcDataSource) Handles pTimeseriesManager.OpenedData
+  Private Sub pDataManager_OpenedData(ByVal aFile As atcData.atcDataSource) Handles pDataManager.OpenedData
     Dim s As String
     Dim i As Integer
     Dim lDebugFile As String = "c:\test\BASINS4\wdmFileDump.txt"
@@ -356,7 +356,7 @@ Public Class PlugIn
 
     g_MapWin.StatusBar.ProgressBarValue = 50
 
-    s = aFile.FileName & " contains " & aFile.Timeseries.Count() & " datasets" & vbCrLf & vbCrLf
+    s = aFile.Specification & " contains " & aFile.DataSets.Count() & " datasets" & vbCrLf & vbCrLf
     SaveFileString(lDebugFile, s)
 
     'lAttributeDetailsShow = True
@@ -407,17 +407,17 @@ Public Class PlugIn
         Return True
       Case Else 'Search for plugin to launch
         'Dim g As New atcGraphPlugin
-        'g.Show(pTimeseriesManager)
+        'g.Show(pDataManager)
         'Return True
 
-        Dim newDisplay As atcTimeseriesDisplay
-        Dim DisplayPlugins As ICollection = pTimeseriesManager.GetPlugins(GetType(atcTimeseriesDisplay))
-        For Each atf As atcTimeseriesDisplay In DisplayPlugins
+        Dim newDisplay As atcDataDisplay
+        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        For Each atf As atcDataDisplay In DisplayPlugins
           If atf.Name = ToolName Then
             Dim typ As System.Type = atf.GetType()
             Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
             newDisplay = asm.CreateInstance(typ.FullName)
-            newDisplay.Show(pTimeseriesManager)
+            newDisplay.Show(pDataManager)
             Return True
           End If
         Next
@@ -443,7 +443,7 @@ Public Class PlugIn
     For iArg As Integer = 0 To args.GetUpperBound(0)
       If args(iArg).GetType Is GetType(String) Then
         Select Case args(iArg).ToLower
-          Case "timeseriesmanager" : args(iArg) = pTimeseriesManager
+          Case "timeseriesmanager" : args(iArg) = pDataManager
           Case "basinsplugin" : args(iArg) = Me
           Case "mapwin" : args(iArg) = g_MapWin
         End Select
@@ -557,7 +557,7 @@ Public Class PlugIn
     'SettingsString of the project. 
     Dim newXML As New Chilkat.Xml
     newXML.LoadXml(SettingsString)
-    pTimeseriesManager.XML = newXML.FindChild("TimeseriesManager")
+    pDataManager.XML = newXML.FindChild("TimeseriesManager")
   End Sub
 
   Public Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
@@ -570,7 +570,7 @@ Public Class PlugIn
     'SettingsString of the project. 
     Dim saveXML As New Chilkat.Xml
     saveXML.Tag = "BASINS"
-    saveXML.AddChildTree(pTimeseriesManager.XML)
+    saveXML.AddChildTree(pDataManager.XML)
     SettingsString = saveXML.GetXml
   End Sub
 

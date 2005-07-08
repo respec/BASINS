@@ -8,29 +8,29 @@ Friend Class atcDebugTimserForm
 #Region " Windows Form Designer generated code "
 
   Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
-        Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
+        Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
     MyBase.New()
     pDataManager = aDataManager
-    If aTimeseriesGroup Is Nothing Then
-      pTimeseriesGroup = New atcTimeseriesGroup
+    If aDataGroup Is Nothing Then
+      pDataGroup = New atcDataGroup
     Else
-      pTimeseriesGroup = aTimeseriesGroup
+      pDataGroup = aDataGroup
     End If
     InitializeComponent() 'required by Windows Form Designer
 
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
-    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each atf As atcDataDisplay In DisplayPlugins
       mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
-    If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
+    If pDataGroup.Count = 0 Then 'ask user to specify some Data
       mnuFileAdd_Click(Nothing, Nothing)
     End If
 
-    If pTimeseriesGroup.Count > 0 Then
+    If pDataGroup.Count > 0 Then
       Me.Show()
       PopulateTree()
-    Else 'use declined to specify timeseries
+    Else 'use declined to specify Data
       Me.Close()
     End If
   End Sub
@@ -77,7 +77,7 @@ Friend Class atcDebugTimserForm
     'mnuFileAdd
     '
     Me.mnuFileAdd.Index = 0
-    Me.mnuFileAdd.Text = "Add Timeseries"
+    Me.mnuFileAdd.Text = "Add Data"
     '
     'mnuFileSave
     '
@@ -96,7 +96,7 @@ Friend Class atcDebugTimserForm
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "atcDebugTimserForm"
-    Me.Text = "Timeseries Debug"
+    Me.Text = "Data Debug"
 
   End Sub
 
@@ -107,8 +107,8 @@ Friend Class atcDebugTimserForm
   'The tree control
   Private WithEvents atrMain As TreeView
 
-  'The group of atcTimeseries displayed
-  Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
+  'The group of atcData displayed
+  Private WithEvents pDataGroup As atcDataGroup
 
   Private Sub PopulateTree()
     Dim lAttributeName As String
@@ -135,13 +135,13 @@ Friend Class atcDebugTimserForm
              Or AnchorStyles.Right
       Me.Controls.Add(atrMain)
       .Refresh()
-      For Each lTimeseries As atcTimeseries In pTimeseriesGroup
+      For Each lData As atcTimeseries In pDataGroup
         Dim lNode As New TreeNode
-        lNode = .Nodes.Add(lTimeseries.ToString)
+        lNode = .Nodes.Add(lData.ToString)
 
         Dim lAttributeNode As New TreeNode
         lAttributeNode = lNode.Nodes.Add("Attributes")
-        Dim lAttributes As SortedList = lTimeseries.Attributes.GetAll
+        Dim lAttributes As SortedList = lData.Attributes.GetAll
         For i As Integer = 0 To lAttributes.Count - 1
           lAttributeName = lAttributes.GetKey(i)
           If InStr(LCase(lAttributeName), "jday", CompareMethod.Text) Then
@@ -156,7 +156,7 @@ Friend Class atcDebugTimserForm
 
         Dim lInternalNode As New TreeNode
         lInternalNode = lNode.Nodes.Add("Internal")
-        lNumValues = lTimeseries.numValues
+        lNumValues = lData.numValues
         lInternalNode.Nodes.Add("NumValues :" & lNumValues)
         lInternalNode.ExpandAll()
         lInternalNode.EnsureVisible()
@@ -170,8 +170,8 @@ Friend Class atcDebugTimserForm
           lNumValuesNow = lNumValuesShow
         End If
         For j As Integer = 0 To lNumValuesNow - 1
-          lDataNode.Nodes.Add(DumpDate(lTimeseries.Dates.Value(j)) & " : " & _
-                              lTimeseries.Value(j))
+          lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j)) & " : " & _
+                              lData.Value(j))
         Next
         If lNumValues > lNumValuesShow Then  'some from end too
           If lNumValues - lNumValuesShow > lNumValuesShow Then
@@ -180,9 +180,9 @@ Friend Class atcDebugTimserForm
           Else
             lValueStart = lNumValuesNow
           End If
-          For j As Integer = lValueStart To lTimeseries.numValues
-            lDataNode.Nodes.Add(DumpDate(lTimeseries.Dates.Value(j)) & " : " & _
-                                lTimeseries.Value(j))
+          For j As Integer = lValueStart To lData.numValues
+            lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j)) & " : " & _
+                                lData.Value(j))
           Next
         End If
       Next
@@ -194,29 +194,29 @@ Friend Class atcDebugTimserForm
   End Function
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcTimeseriesDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
-    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+    Dim newDisplay As atcDataDisplay
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each atf As atcDataDisplay In DisplayPlugins
       If atf.Name = sender.Text Then
         Dim typ As System.Type = atf.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pTimeseriesGroup)
+        newDisplay.Show(pDataManager, pDataGroup)
         Exit Sub
       End If
     Next
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    pDataManager.UserSelectTimeseries(, pTimeseriesGroup)
+    pDataManager.UserSelectData(, pDataGroup)
   End Sub
 
-  Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pTimeseriesGroup.Added
+  Private Sub pDataGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pDataGroup.Added
     PopulateTree()
     'TODO: could efficiently insert newly added item(s)
   End Sub
 
-  Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pTimeseriesGroup.Removed
+  Private Sub pDataGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pDataGroup.Removed
     PopulateTree()
     'TODO: could efficiently remove by serial number
   End Sub

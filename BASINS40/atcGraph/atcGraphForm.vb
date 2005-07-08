@@ -22,8 +22,8 @@ Public Class atcGraphForm
   'Graph editing form
   Private WithEvents pEditor As atcGraphEdit
 
-  'The group of atcTimeseries displayed
-  Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
+  'The group of atcData displayed
+  Private WithEvents pDataGroup As atcDataGroup
 
   Private Shared SaveImageExtension As String = ".png"
 
@@ -66,7 +66,7 @@ Public Class atcGraphForm
     Dim g As Graphics = Me.CreateGraphics()
     pMaster.AutoPaneLayout(g, PaneLayout.SingleColumn)
 
-    For Each ts As atcTimeseries In pTimeseriesGroup
+    For Each ts As atcTimeseries In pDataGroup
       AddDatasetTimeseries(ts, ts.ToString)
       With Pane.XAxis
         If ts.Dates.Value(0) < .Min Then .Min = ts.Dates.Value(0)
@@ -82,32 +82,32 @@ Public Class atcGraphForm
 
 #Region " Windows Form Designer generated code "
 
-  Public Sub New(ByVal aTimeseriesManager As atcData.atcDataManager, _
-        Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
+  Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
+        Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
     MyBase.New()
-    pDataManager = aTimeseriesManager
-    If aTimeseriesGroup Is Nothing Then
-      pTimeseriesGroup = New atcTimeseriesGroup
+    pDataManager = aDataManager
+    If aDataGroup Is Nothing Then
+      pDataGroup = New atcDataGroup
     Else
-      pTimeseriesGroup = aTimeseriesGroup
+      pDataGroup = aDataGroup
     End If
     InitializeComponent() 'required by Windows Form Designer
     Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
 
-    If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
-      pDataManager.UserSelectTimeseries(, pTimeseriesGroup, True)
+    If pDataGroup.Count = 0 Then 'ask user to specify some Data
+      pDataManager.UserSelectData(, pDataGroup, True)
     End If
 
-    If pTimeseriesGroup.Count > 0 Then
+    If pDataGroup.Count > 0 Then
       Me.Show()
       InitMasterPane()
 
-      Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
-      For Each atf As atcTimeseriesDisplay In DisplayPlugins
+      Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+      For Each atf As atcDataDisplay In DisplayPlugins
         mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
       Next
 
-    Else 'use declined to specify timeseries
+    Else 'use declined to specify Data
       Me.Close()
     End If
   End Sub
@@ -163,7 +163,7 @@ Public Class atcGraphForm
     'mnuFileAdd
     '
     Me.mnuFileAdd.Index = 0
-    Me.mnuFileAdd.Text = "&Add Timeseries"
+    Me.mnuFileAdd.Text = "&Add Data"
     '
     'mnuFileSave
     '
@@ -261,7 +261,7 @@ Public Class atcGraphForm
   End Property
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    pDataManager.UserSelectTimeseries(, pTimeseriesGroup, False)
+    pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 
 
@@ -368,7 +368,7 @@ Public Class atcGraphForm
     'TODO: 3rd Y Axis above (for PREC)
 
     If Pane.CurveList.Count > 1 Then
-      For Each ts As atcTimeseries In pTimeseriesGroup
+      For Each ts As atcTimeseries In pDataGroup
         lOldCurve = Pane.CurveList.Item(ts.ToString)
         If Not lOldCurve Is Nothing Then
           lOldCons = ts.Attributes.GetValue("constituent")
@@ -402,7 +402,7 @@ Public Class atcGraphForm
 
   End Sub
 
-  Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pTimeseriesGroup.Added
+  Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pDataGroup.Added
     For Each ts As atcTimeseries In aAdded
       AddDatasetTimeseries(ts, ts.ToString)
     Next
@@ -411,7 +411,7 @@ Public Class atcGraphForm
     Me.Refresh()
   End Sub
 
-  Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pTimeseriesGroup.Removed
+  Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pDataGroup.Removed
     For Each ts As atcTimeseries In aRemoved
       Pane.CurveList.Remove(Pane.CurveList.Item(ts.ToString))
     Next
@@ -421,14 +421,14 @@ Public Class atcGraphForm
   End Sub
 
   Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcTimeseriesDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
-    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+    Dim newDisplay As atcDataDisplay
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each atf As atcDataDisplay In DisplayPlugins
       If atf.Name = sender.Text Then
         Dim typ As System.Type = atf.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pTimeseriesGroup)
+        newDisplay.Show(pDataManager, pDataGroup)
         Exit Sub
       End If
     Next

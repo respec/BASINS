@@ -8,7 +8,7 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("atcDebugTimser")> 
-<Assembly: AssemblyDescription("Timeseries Debug")> 
+<Assembly: AssemblyDescription("Data Debug")> 
 <Assembly: AssemblyCompany("AQUA TERRA Consultants")> 
 <Assembly: AssemblyProduct("")> 
 <Assembly: AssemblyCopyright("2005")> 

@@ -1,7 +1,7 @@
 Imports atcData
 
 Public Class atcListPlugin
-  Inherits atcTimeseriesDisplay
+  Inherits atcDataDisplay
   Public g_MapWin As MapWindow.Interfaces.IMapWin
 
   Public Overrides ReadOnly Property Name() As String
@@ -10,10 +10,10 @@ Public Class atcListPlugin
     End Get
   End Property
 
-  Public Overrides Sub Show(ByVal aTimeseriesManager As atcData.atcDataManager, _
-                   Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
+  Public Overrides Sub Show(ByVal aManager As atcData.atcDataManager, _
+                   Optional ByVal aGroup As atcData.atcDataGroup = Nothing)
     Dim lForm As New atcListForm
-    lForm.Initialize(aTimeseriesManager, aTimeseriesGroup)
+    lForm.Initialize(aManager, aGroup)
   End Sub
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
