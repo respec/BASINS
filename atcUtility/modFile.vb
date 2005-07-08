@@ -532,7 +532,7 @@ NoSuchFile:
   End Function
 
   'Given a set of file filters as used by common dialog, return the filter with the given index
-  ' FileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1) = "WDM Files (*.wdm)|*.wdm"
+  ' FindFileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1) = "WDM Files (*.wdm)|*.wdm"
   Public Function FindFileFilter(ByVal FileFilters As String, ByVal FileFilterIndex As Integer) As String
     Dim prevPipe As Integer = 0
     Dim pipePos As Integer
@@ -562,4 +562,19 @@ NoSuchFile:
     End Try
   End Function
 
+  'Given a set of file filters as used by common dialog, return the index of the given filter
+  ' FindFileFilterIndex("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", "All Files (*.*)|*.*") = 2
+  'Returns 1 if not found
+  Public Function FindFileFilterIndex(ByVal aAllFilters As String, ByVal aFindFilter As String) As String
+    Try
+      Dim filterPos As Integer = aAllFilters.IndexOf(aFindFilter)
+      If filterPos = 0 Then
+        Return 1
+      Else
+        Return CountString(Left(aAllFilters, filterPos - 1), "|") / 2 + 1
+      End If
+    Catch
+      Return 1
+    End Try
+  End Function
 End Module

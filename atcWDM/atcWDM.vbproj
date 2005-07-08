@@ -103,6 +103,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcWdmHandle.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "modHass_Ent.vb"
                     SubType = "Code"
                     BuildAction = "Compile"

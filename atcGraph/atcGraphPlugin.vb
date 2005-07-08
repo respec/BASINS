@@ -1,7 +1,7 @@
 Imports atcData
 
 Public Class atcGraphPlugin
-  Inherits atcTimeseriesDisplay
+  Inherits atcDataDisplay
   Public g_MapWin As MapWindow.Interfaces.IMapWin
 
   Public Overrides ReadOnly Property Name() As String
@@ -11,7 +11,7 @@ Public Class atcGraphPlugin
   End Property
 
   Public Overrides Sub Show(ByVal aTimeseriesManager As atcData.atcDataManager, _
-                   Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
+                   Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
     Dim gForm As New atcGraphForm(aTimeseriesManager, aTimeseriesGroup)
   End Sub
 

@@ -1,7 +1,7 @@
 Imports atcData
 
 Public Class atcDebugTimserPlugin
-  Inherits atcTimeseriesDisplay
+  Inherits atcDataDisplay
   Public g_MapWin As MapWindow.Interfaces.IMapWin
 
   Public Overrides ReadOnly Property Name() As String
@@ -10,9 +10,9 @@ Public Class atcDebugTimserPlugin
     End Get
   End Property
 
-  Public Overrides Sub Show(ByVal aTimeseriesManager As atcData.atcDataManager, _
-                   Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
-    Dim lForm As New atcDebugTimserForm(aTimeseriesManager, aTimeseriesGroup)
+  Public Overrides Sub Show(ByVal aDataManager As atcData.atcDataManager, _
+                   Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+    Dim lForm As New atcDebugTimserForm(aDataManager, aDataGroup)
   End Sub
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)

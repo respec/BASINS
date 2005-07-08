@@ -8,11 +8,11 @@ Imports System.Reflection
 Public Class atcDataManager
   Private pMapWin As MapWindow.Interfaces.IMapWin
   Private pBasins As Object
-  Private pDataSources As ArrayList 'of atcDataSource
+  Private pDataSources As ArrayList 'of atcDataSource, the currently open data sources
   Private pSelectionAttributes As ArrayList
   Private pDisplayAttributes As ArrayList
 
-  Event OpenedData(ByVal aTimeseriesFile As atcDataSource)
+  Event OpenedData(ByVal aDataSource As atcDataSource)
 
   Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aBasins As Object)
     pMapWin = aMapWin
@@ -23,7 +23,7 @@ Public Class atcDataManager
   Public Sub Clear()
     pDataSources = New ArrayList
     Dim lMemory As New atcDataSource
-    lMemory.FileName = "<in memory>"
+    lMemory.Specification = "<in memory>"
     pDataSources.Add(lMemory)
 
     pSelectionAttributes = New ArrayList
@@ -41,36 +41,19 @@ Public Class atcDataManager
     End Get
   End Property
 
-  'Names of attributes used for selection of Timeseries in UI
+  'Names of attributes used for selection of Data in UI
   Public ReadOnly Property SelectionAttributes() As ArrayList
     Get
       Return pSelectionAttributes
     End Get
   End Property
 
-  'Names of attributes used for listing of Timeseries in UI
+  'Names of attributes used for listing of Data in UI
   Public ReadOnly Property DisplayAttributes() As ArrayList
     Get
       Return pDisplayAttributes
     End Get
   End Property
-
-  ''The currently loaded plugins that inherit atcDataSource
-  ''All are empty atcDataSource objects.
-  'Public Function TimeseriesFilePlugins() As ICollection
-  '  Return GetPlugins(GetType(atcDataSource))
-  '  'Dim retval As New ArrayList
-  '  'Dim lastPlugIn As Integer = pMapWin.Plugins.Count() - 1
-  '  'For iPlugin As Integer = 0 To lastPlugIn
-  '  '  Dim curPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
-  '  '  If Not curPlugin Is Nothing Then
-  '  '    If CType(curPlugin, Object).GetType().IsSubclassOf(GetType(atcDataSource)) Then
-  '  '      retval.Add(curPlugin)
-  '  '    End If
-  '  '  End If
-  '  'Next
-  '  'Return retval
-  'End Function
 
   'The currently loaded plugins that inherit the specified class; returns empty objects
   Public Function GetPlugins(ByVal aBaseType As Type) As ICollection
@@ -87,67 +70,91 @@ Public Class atcDataManager
     Return retval
   End Function
 
+  Public Function UserAddDataSource() As atcDataSource
+
+  End Function
+
+  'aSpecification = file name, connection string, or other information needed to initialize aNewSource
+  Public Function AddDataSource(ByVal aNewSource As atcDataSource, ByVal aSpecification As String, ByVal aAttributes As atcDataAttributes) As Boolean
+    If aNewSource.Open(aSpecification, aAttributes) Then
+      pDataSources.Add(aNewSource)
+      RaiseEvent OpenedData(aNewSource)
+      Return True
+    Else
+      'TODO: LogError("Could not open '" & aSpecification & "' with '" & aNewSource.Name & "'")
+      Return False
+    End If
+  End Function
+
   'Open a data source and return the new atcDataSource object
   'aFileFilter: selected filter in Open dialog - used to determine which class can open file
   'if aFileFilter is omitted, Open tries searching for a class that supports the extension of aFileName
-  Public Function OpenData(ByVal aFileNameOrConnectString As String, Optional ByVal aFileFilter As String = "") As atcDataSource
-    Dim newSource As atcDataSource
+  'Public Function OpenData(ByVal aFileNameOrConnectString As String) As atcDataSource ', Optional ByVal aFileFilter As String = "") As atcDataSource
+  '  Dim newSource As atcDataSource
 
-    pBasins.Busy = True
-    If aFileNameOrConnectString.Length = 0 Then
-      Dim FileFilterIndex As Integer = 1
-      aFileNameOrConnectString = FindFile("Select data file to open", , , FileFilters, True, , FileFilterIndex)
-      aFileFilter = FindFileFilter(FileFilters, FileFilterIndex)
-    End If
+  '  pBasins.Busy = True
+  '  If aFileNameOrConnectString.Length = 0 Then
+  '    Dim allFileFilters As String = FileFilters()
+  '    If aFileFilter.Length = 0 Then
+  '      aFileFilter = GetSetting("atcData", "DataSource", "LastFileFilter")
+  '    End If
+  '    Dim FileFilterIndex As Integer = 1
+  '    If aFileFilter.Length > 0 Then
+  '      FileFilterIndex = FindFileFilterIndex(allFileFilters, aFileFilter)
+  '    End If
+  '    aFileNameOrConnectString = FindFile("Select data file to open", , , allFileFilters, True, , FileFilterIndex)
+  '    aFileFilter = FindFileFilter(allFileFilters, FileFilterIndex)
+  '    SaveSetting("atcData", "DataSource", "LastFileFilter", aFileFilter)
+  '  End If
 
-    If aFileNameOrConnectString.Length > 0 Then
-      If aFileFilter.Length = 0 Then aFileFilter = System.IO.Path.GetExtension(aFileNameOrConnectString)
-      aFileFilter = aFileFilter.ToLower
+  '  If aFileNameOrConnectString.Length > 0 Then
+  '    If aFileFilter.Length = 0 Then aFileFilter = System.IO.Path.GetExtension(aFileNameOrConnectString)
+  '    aFileFilter = aFileFilter.ToLower
 
-      Dim TimeseriesFilePlugins As ICollection = GetPlugins(GetType(atcDataSource))
-      For Each atf As atcDataSource In TimeseriesFilePlugins
-        'Might need a better test than this, or try more than one if multiple types open 
-        'files with the same extension or if filter is not set for a atcDataSource type
-        If atf.FileFilter.ToLower.IndexOf(aFileFilter) >= 0 Then
-          Dim typ As System.Type = atf.GetType()
-          Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-          newSource = asm.CreateInstance(typ.FullName)
-        End If
-      Next
-    End If
+  '    Dim DataSourcePlugins As ICollection = GetPlugins(GetType(atcDataSource))
+  '    For Each atf As atcDataSource In DataSourcePlugins
+  '      'Might need a better test than this, or try more than one if multiple types open 
+  '      'files with the same extension or if filter is not set for a atcDataSource type
+  '      If atf.FileFilter.ToLower.IndexOf(aFileFilter) >= 0 Then
+  '        Dim typ As System.Type = atf.GetType()
+  '        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+  '        newSource = asm.CreateInstance(typ.FullName)
+  '      End If
+  '    Next
+  '  End If
 
-    If newSource Is Nothing Then
-      'TODO: LogError("Could not find a loaded plugin that can open '" & aFileNameOrConnectString & "'")
-    Else
-      If newSource.Open(aFileNameOrConnectString) Then
-        pDataSources.Add(newSource)
-        RaiseEvent OpenedData(newSource)
-        OpenData = newSource
-      Else
-        'TODO: LogError("Could not open '" & aFileNameOrConnectString & "' with '" & newSource.Name & "'")
-      End If
-    End If
-    pBasins.Busy = False
-  End Function
+  '  If newSource Is Nothing Then
+  '    'TODO: LogError("Could not find a loaded plugin that can open '" & aFileNameOrConnectString & "'")
+  '  Else
+  '    If newSource.Open(aFileNameOrConnectString) Then
+  '      pDataSources.Add(newSource)
+  '      RaiseEvent OpenedData(newSource)
+  '      OpenData = newSource
+  '    Else
+  '      'TODO: LogError("Could not open '" & aFileNameOrConnectString & "' with '" & newSource.Name & "'")
+  '    End If
+  '  End If
+  '  pBasins.Busy = False
+  'End Function
 
   'Returns FileFilters of all loaded atcDataSource types, formatted for common dialog
-  Public Function FileFilters() As String
-    Dim retval As String = ""
-    Dim TimeseriesFilePlugins As ICollection = GetPlugins(GetType(atcDataSource))
-    For Each atf As atcDataSource In TimeseriesFilePlugins
-      If retval.Length > 0 Then retval += "|" 'separate with |
-      retval += atf.FileFilter
-    Next
-    Return retval
-  End Function
+  'Public Function FileFilters() As String
+  '  Dim retval As String = ""
+  '  Dim DataSourcePlugins As ICollection = GetPlugins(GetType(atcDataSource))
+  '  For Each atf As atcDataSource In DataSourcePlugins
+  '    If retval.Length > 0 And atf.FileFilter.Length > 0 Then retval += "|" 'separate with |
+  '    retval += atf.FileFilter
+  '  Next
+  '  Return retval
+  'End Function
 
-  Public Function UserCompute(Optional ByVal aGroup As atcTimeseriesGroup = Nothing) As atcTimeseries
-    Dim frmCompute As New atcData.frmComputeTimeseries
+  Public Function UserCompute(Optional ByVal aGroup As atcDataGroup = Nothing) As atcDataSet
+    Dim frmCompute As New atcData.frmComputeData
     Return frmCompute.AskUser(Me, aGroup)
   End Function
 
-  Public Function UserSelectTimeseries(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
-    Dim frmSelect As New atcData.frmSelectTimeseries
+  Public Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
+    Dim frmSelect As New atcData.frmSelectData
     If aTitle.Length > 0 Then frmSelect.Text = aTitle
     Return frmSelect.AskUser(Me, aGroup, aModal)
   End Function
@@ -162,17 +169,17 @@ Public Class atcDataManager
     Get
       Dim saveXML As New Chilkat.Xml
       Dim lchildXML As Chilkat.Xml
-      saveXML.Tag = "TimeseriesManager"
+      saveXML.Tag = "DataManager"
       For Each lName As String In pSelectionAttributes
         saveXML.NewChild("SelectionAttribute", lName)
       Next
       For Each lName As String In pDisplayAttributes
         saveXML.NewChild("DisplayAttribute", lName)
       Next
-      For Each lFile As atcDataSource In pDataSources
-        lchildXML = saveXML.NewChild("TimeseriesFile", "")
-        lchildXML.AddAttribute("FileName", lFile.FileName)
-        lchildXML.AddAttribute("Filter", lFile.FileFilter)
+      For Each lSource As atcDataSource In pDataSources
+        lchildXML = saveXML.NewChild("DataSource", "")
+        lchildXML.AddAttribute("Specification", lSource.Specification)
+        'lchildXML.AddAttribute("Filter", lSource.FileFilter)
       Next
       Return saveXML
     End Get
@@ -185,7 +192,7 @@ Public Class atcDataManager
 
       While Not lchildXML Is Nothing
         Select Case lchildXML.Tag
-          Case "TimeseriesFile"
+          Case "DataFile", "DataSource"
             OpenFile(lchildXML.GetAttrValue("FileName"), lchildXML.GetAttrValue("Filter"))
           Case "SelectionAttribute"
             If Not clearedSelectionAttributes Then

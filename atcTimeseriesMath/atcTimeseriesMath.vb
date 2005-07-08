@@ -172,9 +172,11 @@ Public Class atcHydroligicIndices
   'Compute a new atcTimeseries
   'Args are each usually either Double or atcTimeseries
   Public Overrides Function ComputeTimeseries(ByVal aOperationName As String, ByVal args As ArrayList) As atcTimeseries
+    Dim newDataSource As New atcDataSource
+    newDataSource.Specification = "Computed by " & pName
     Dim newVals() As Double
     Dim numberArg As Double = 0
-    Dim retval As New atcTimeseries(Nothing)
+    Dim retval As New atcTimeseries(newDataSource)
     Dim iTS As Integer
     Dim curTS As atcTimeseries
     Dim tsArgs As New ArrayList
@@ -230,7 +232,7 @@ Public Class atcHydroligicIndices
     cboTimeseries.Top = cboTimeseries.Height
     cboTimeseries.Left = cboTimeseries.Top
     For Each source As atcDataSource In pDataManager.DataSources
-      For Each ts As atcTimeseries In source.Timeseries
+      For Each ts As atcTimeseries In source.DataSets
         cboTimeseries.Items.Add(ts.ToString)
       Next
     Next
@@ -241,7 +243,7 @@ Public Class atcHydroligicIndices
   Public Overrides Function ExtractArgs() As ArrayList
     ExtractArgs = New ArrayList
     For Each source As atcDataSource In pDataManager.DataSources
-      For Each ts As atcTimeseries In source.Timeseries
+      For Each ts As atcTimeseries In source.DataSets
         If cboTimeseries.SelectedItem = ts.ToString Then
           ExtractArgs.Add(ts)
         End If

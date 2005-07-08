@@ -1,21 +1,21 @@
-'atcTimeseriesGroup is a group of atcTimeseries objects and associated selection information
+'atcDataGroup is a group of atcDataSet objects and associated selection information
 '
 'Sharable between different views of the same data
 'Events are defined to allow different views to remain synchronized
 
 Imports atcUtility
 
-Public Class atcTimeseriesGroup
+Public Class atcDataGroup
   Implements IEnumerable
 
-  Private pTS As ArrayList 'of atcTimeseries
+  Private pTS As ArrayList 'of atcDataSet
 
-  Private pSelectedTS As atcTimeseriesGroup 'tracks currently selected group within this group
+  Private pSelectedTS As atcDataGroup 'tracks currently selected group within this group
 
-  'One or more atcTimeseries were just added to the group
+  'One or more atcDataSet were just added to the group
   Public Event Added(ByVal aAdded As ArrayList)
 
-  'One or more atcTimeseries were just removed from the group
+  'One or more atcDataSet were just removed from the group
   Public Event Removed(ByVal aRemoved As ArrayList)
 
   Public Sub New()
@@ -31,30 +31,30 @@ Public Class atcTimeseriesGroup
     End Set
   End Property
 
-  'Get a Timeseries by index
-  Default Public Property Item(ByVal index As Integer) As atcTimeseries
+  'Get a atcDataSet by index
+  Default Public Property Item(ByVal index As Integer) As atcDataSet
     Get
       Return pTS.Item(index)
     End Get
-    Set(ByVal newValue As atcTimeseries)
+    Set(ByVal newValue As atcDataSet)
       pTS.Item(index) = newValue
     End Set
   End Property
 
-  'Add a Timeseries to the group
-  Public Sub Add(ByVal aTS As atcTimeseries)
+  'Add a atcDataSet to the group
+  Public Sub Add(ByVal aTS As atcDataSet)
     Dim addList As New ArrayList(1)
     addList.Add(aTS)
     Add(addList)
   End Sub
 
-  'Add a list of atcTimeseries to the group
+  'Add a list of atcDataSet to the group
   Public Sub Add(ByVal aList As ArrayList)
     pTS.AddRange(aList)
     RaiseEvent Added(aList) 'Insert is the other place where items are added
   End Sub
 
-  'Remove all Timeseries and selection
+  'Remove all atcDataSets and selection
   Public Sub Clear()
     If pTS.Count > 0 Then
       Dim lRemoved As ArrayList = pTS
@@ -64,27 +64,27 @@ Public Class atcTimeseriesGroup
     If Not pSelectedTS Is Nothing Then pSelectedTS.Clear()
   End Sub
 
-  Public Function Clone() As atcTimeseriesGroup
-    Dim newGroup As New atcTimeseriesGroup
+  Public Function Clone() As atcDataGroup
+    Dim newGroup As New atcDataGroup
     newGroup.Add(pTS)
     Return newGroup
   End Function
 
   'Change this group to match the new group and raise the appropriate events
-  Public Sub ChangeTo(ByVal aNewGroup As atcTimeseriesGroup)
+  Public Sub ChangeTo(ByVal aNewGroup As atcDataGroup)
     If aNewGroup Is Nothing Then
       Clear()
     Else
 
       Dim RemoveList As New ArrayList
-      For Each oldTS As atcTimeseries In pTS
+      For Each oldTS As atcDataSet In pTS
         If Not aNewGroup.Contains(oldTS) Then
           RemoveList.Add(oldTS)
         End If
       Next
 
       Dim AddList As New ArrayList
-      For Each savedTS As atcTimeseries In aNewGroup
+      For Each savedTS As atcDataSet In aNewGroup
         If Not pTS.Contains(savedTS) Then
           AddList.Add(savedTS)
         End If
@@ -97,7 +97,7 @@ Public Class atcTimeseriesGroup
     End If
   End Sub
 
-  Public Function Contains(ByVal aTS As atcTimeseries) As Boolean
+  Public Function Contains(ByVal aTS As atcDataSet) As Boolean
     Return pTS.Contains(aTS)
   End Function
 
@@ -112,14 +112,14 @@ Public Class atcTimeseriesGroup
     Return pTS.GetEnumerator
   End Function
 
-  'Find the index of the specified Timeseries
-  Public Function IndexOf(ByVal aTS As atcTimeseries) As Integer
-    Return pTS.IndexOf(aTS)
+  'Find the index of the specified atcDataSet
+  Public Function IndexOf(ByVal aDataSet As atcDataSet) As Integer
+    Return pTS.IndexOf(aDataset)
   End Function
 
-  'Find the index of the specified Timeseries given that it is at or after aStartIndex
-  Public Function IndexOf(ByVal aTS As atcTimeseries, ByVal aStartIndex As Integer) As Integer
-    Return pTS.IndexOf(aTS, aStartIndex)
+  'Find the index of the specified DataSet given that it is at or after aStartIndex
+  Public Function IndexOf(ByVal aDataSet As atcDataSet, ByVal aStartIndex As Integer) As Integer
+    Return pTS.IndexOf(aDataSet, aStartIndex)
   End Function
 
   Public Function IndexOfSerial(ByVal aSerial As Integer) As Integer
@@ -130,18 +130,18 @@ Public Class atcTimeseriesGroup
   End Function
 
   'Insert a new Timeseries at the specified index
-  Public Sub Insert(ByVal aIndex As Integer, ByVal aTS As atcTimeseries)
-    pTS.Insert(aIndex, aTS)
+  Public Sub Insert(ByVal aIndex As Integer, ByVal aDataSet As atcDataSet)
+    pTS.Insert(aIndex, aDataSet)
 
     Dim addList As New ArrayList(1)
-    addList.Add(aTS)
+    addList.Add(aDataSet)
     RaiseEvent Added(addList)
   End Sub
 
   'Remove a Timeseries from the group
-  Public Sub Remove(ByVal aTS As atcTimeseries)
+  Public Sub Remove(ByVal aDataSet As atcDataSet)
     Dim removeList As New ArrayList(1)
-    removeList.Add(aTS)
+    removeList.Add(aDataSet)
     Remove(removeList)
   End Sub
 
@@ -164,21 +164,21 @@ Public Class atcTimeseriesGroup
     Remove(removeList)
   End Sub
 
-  Public Property SelectedTimeseries() As atcTimeseriesGroup
+  Public Property SelectedTimeseries() As atcDataGroup
     Get
       If pSelectedTS Is Nothing Then 'Initialize now if not already done
-        pSelectedTS = New atcTimeseriesGroup
+        pSelectedTS = New atcDataGroup
       End If
       Return pSelectedTS
     End Get
-    Set(ByVal newValue As atcTimeseriesGroup)
+    Set(ByVal newValue As atcDataGroup)
       pSelectedTS = newValue
     End Set
   End Property
 
   Public Overrides Function ToString() As String
-    ToString = pTS.Count & " Timeseries:"
-    For Each lts As atcTimeseries In pTS
+    ToString = pTS.Count & " Data:"
+    For Each lts As atcDataSet In pTS
       ToString &= vbCrLf & "  " & lts.ToString
     Next
   End Function

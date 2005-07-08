@@ -90,31 +90,31 @@ Friend Class atcListForm
   Private pDataManager As atcDataManager
 
   'The group of atcTimeseries displayed
-  Private WithEvents pTimeseriesGroup As atcTimeseriesGroup
+  Private WithEvents pDataGroup As atcDataGroup
 
-  'Translator class between pTimeseriesGroup and agdMain
+  'Translator class between pDataGroup and agdMain
   Private pSource As ListGridSource
 
   Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
-               Optional ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup = Nothing)
+               Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
     pDataManager = aDataManager
     If aTimeseriesGroup Is Nothing Then
-      pTimeseriesGroup = New atcTimeseriesGroup
+      pDataGroup = New atcDataGroup
     Else
-      pTimeseriesGroup = aTimeseriesGroup
+      pDataGroup = aTimeseriesGroup
     End If
 
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
     mnuAnalysis.MenuItems.Clear()
-    For Each atf As atcTimeseriesDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    For Each displayer As atcDataDisplay In DisplayPlugins
+      mnuAnalysis.MenuItems.Add(displayer.Name, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
-    If pTimeseriesGroup.Count = 0 Then 'ask user to specify some timeseries
-      pDataManager.UserSelectTimeseries(, pTimeseriesGroup, True)
+    If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
+      pDataManager.UserSelectData(, pDataGroup, True)
     End If
 
-    If pTimeseriesGroup.Count > 0 Then
+    If pDataGroup.Count > 0 Then
       Me.Show()
       PopulateGrid()
     Else 'user declined to specify timeseries
@@ -124,7 +124,7 @@ Friend Class atcListForm
   End Sub
 
   Private Sub PopulateGrid()
-    pSource = New ListGridSource(pDataManager, pTimeseriesGroup)
+    pSource = New ListGridSource(pDataManager, pDataGroup)
     agdMain.Initialize(pSource)
     agdMain.Refresh()
   End Sub
@@ -134,29 +134,29 @@ Friend Class atcListForm
   End Function
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcTimeseriesDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcTimeseriesDisplay))
-    For Each atf As atcTimeseriesDisplay In DisplayPlugins
+    Dim newDisplay As atcDataDisplay
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each atf As atcDataDisplay In DisplayPlugins
       If atf.Name = sender.Text Then
         Dim typ As System.Type = atf.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pTimeseriesGroup)
+        newDisplay.Show(pDataManager, pDataGroup)
         Exit Sub
       End If
     Next
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    pDataManager.UserSelectTimeseries(, pTimeseriesGroup, False)
+    pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 
-  Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pTimeseriesGroup.Added
+  Private Sub pDataGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pDataGroup.Added
     PopulateGrid()
     'TODO: could efficiently insert newly added item(s)
   End Sub
 
-  Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pTimeseriesGroup.Removed
+  Private Sub pDataGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pDataGroup.Removed
     PopulateGrid()
     'TODO: could efficiently remove by serial number
   End Sub
@@ -166,17 +166,17 @@ Friend Class ListGridSource
   Inherits atcControls.atcGridSource
 
   Private pDataManager As atcDataManager
-  Private pTimeseriesGroup As atcTimeseriesGroup
+  Private pDataGroup As atcDataGroup
 
   Sub New(ByVal aDataManager As atcData.atcDataManager, _
-          ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup)
+          ByVal aDataGroup As atcData.atcDataGroup)
     pDataManager = aDataManager
-    pTimeseriesGroup = aTimeseriesGroup
+    pDataGroup = aDataGroup
   End Sub
 
   Public Overrides Property Columns() As Integer
     Get
-      Return pTimeseriesGroup.Count + 1
+      Return pDataGroup.Count + 1
     End Get
     Set(ByVal Value As Integer)
     End Set
@@ -195,7 +195,7 @@ Friend Class ListGridSource
       If aColumn = 0 Then
         Return pDataManager.DisplayAttributes(aRow)
       Else
-        Return pTimeseriesGroup(aColumn - 1).Attributes.GetValue(pDataManager.DisplayAttributes(aRow))
+        Return pDataGroup(aColumn - 1).Attributes.GetValue(pDataManager.DisplayAttributes(aRow))
       End If
     End Get
     Set(ByVal Value As String)

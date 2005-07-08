@@ -2,7 +2,7 @@ Imports atcData
 
 Imports System.Windows.Forms
 
-Friend Class frmSelectTimeseries
+Friend Class frmSelectData
   Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -40,7 +40,6 @@ Friend Class frmSelectTimeseries
   Friend WithEvents splitAboveSelected As System.Windows.Forms.Splitter
   Friend WithEvents groupSelected As System.Windows.Forms.GroupBox
   Friend WithEvents panelCriteria As System.Windows.Forms.Panel
-  Friend WithEvents btnAddAttribute As System.Windows.Forms.Button
   Friend WithEvents splitAboveMatching As System.Windows.Forms.Splitter
   Friend WithEvents lblMatching As System.Windows.Forms.Label
   Friend WithEvents pMatchingGrid As atcControls.atcGrid
@@ -57,13 +56,12 @@ Friend Class frmSelectTimeseries
   Friend WithEvents mnuSelectNoMatching As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileManage As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectTimeseries))
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectData))
     Me.groupTop = New System.Windows.Forms.GroupBox
     Me.pMatchingGrid = New atcControls.atcGrid
     Me.lblMatching = New System.Windows.Forms.Label
     Me.splitAboveMatching = New System.Windows.Forms.Splitter
     Me.panelCriteria = New System.Windows.Forms.Panel
-    Me.btnAddAttribute = New System.Windows.Forms.Button
     Me.pnlButtons = New System.Windows.Forms.Panel
     Me.btnCancel = New System.Windows.Forms.Button
     Me.btnOk = New System.Windows.Forms.Button
@@ -82,7 +80,6 @@ Friend Class frmSelectTimeseries
     Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
     Me.mnuSelectClear = New System.Windows.Forms.MenuItem
     Me.groupTop.SuspendLayout()
-    Me.panelCriteria.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     Me.groupSelected.SuspendLayout()
     Me.SuspendLayout()
@@ -118,7 +115,7 @@ Friend Class frmSelectTimeseries
     Me.lblMatching.Name = "lblMatching"
     Me.lblMatching.Size = New System.Drawing.Size(522, 16)
     Me.lblMatching.TabIndex = 14
-    Me.lblMatching.Text = "Matching Timeseries (click to select)"
+    Me.lblMatching.Text = "Matching Data (click to select)"
     '
     'splitAboveMatching
     '
@@ -131,21 +128,11 @@ Friend Class frmSelectTimeseries
     '
     'panelCriteria
     '
-    Me.panelCriteria.Controls.Add(Me.btnAddAttribute)
     Me.panelCriteria.Dock = System.Windows.Forms.DockStyle.Top
     Me.panelCriteria.Location = New System.Drawing.Point(3, 16)
     Me.panelCriteria.Name = "panelCriteria"
     Me.panelCriteria.Size = New System.Drawing.Size(522, 144)
     Me.panelCriteria.TabIndex = 11
-    '
-    'btnAddAttribute
-    '
-    Me.btnAddAttribute.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnAddAttribute.Location = New System.Drawing.Point(496, 8)
-    Me.btnAddAttribute.Name = "btnAddAttribute"
-    Me.btnAddAttribute.Size = New System.Drawing.Size(16, 16)
-    Me.btnAddAttribute.TabIndex = 2
-    Me.btnAddAttribute.Text = "+"
     '
     'pnlButtons
     '
@@ -191,7 +178,7 @@ Friend Class frmSelectTimeseries
     Me.groupSelected.Size = New System.Drawing.Size(528, 125)
     Me.groupSelected.TabIndex = 14
     Me.groupSelected.TabStop = False
-    Me.groupSelected.Text = "Selected Timeseries"
+    Me.groupSelected.Text = "Selected Data"
     '
     'pSelectedGrid
     '
@@ -260,7 +247,7 @@ Friend Class frmSelectTimeseries
     Me.mnuSelectClear.Index = 2
     Me.mnuSelectClear.Text = "&Clear"
     '
-    'frmSelectTimeseries
+    'frmSelectData
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(528, 525)
@@ -270,10 +257,9 @@ Friend Class frmSelectTimeseries
     Me.Controls.Add(Me.groupTop)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
-    Me.Name = "frmSelectTimeseries"
-    Me.Text = "Select Timeseries"
+    Me.Name = "frmSelectData"
+    Me.Text = "Select Data"
     Me.groupTop.ResumeLayout(False)
-    Me.panelCriteria.ResumeLayout(False)
     Me.pnlButtons.ResumeLayout(False)
     Me.groupSelected.ResumeLayout(False)
     Me.ResumeLayout(False)
@@ -283,17 +269,18 @@ Friend Class frmSelectTimeseries
 #End Region
 
   Private Const PADDING As Integer = 5
-  Private Const REMOVE_VALUE = "~Remove~"
+  'Private Const REMOVE_VALUE = "~Remove~"
   Private Const NOTHING_VALUE = "~Missing~"
 
   Private pcboCriteria() As Windows.Forms.ComboBox
   Private plstCriteria() As Windows.Forms.ListBox
+  Private pCriteriaFraction() As Single
 
   Private WithEvents pDataManager As atcDataManager
 
-  Private pMatchingTS As atcTimeseriesGroup
-  Private pSelectedTS As atcTimeseriesGroup
-  Private pSaveGroup As atcTimeseriesGroup = Nothing
+  Private pMatchingTS As atcDataGroup
+  Private pSelectedTS As atcDataGroup
+  Private pSaveGroup As atcDataGroup = Nothing
 
   Private pMatchingSource As GridSource
   Private pSelectedSource As GridSource
@@ -303,9 +290,9 @@ Friend Class frmSelectTimeseries
 
   Private pTotalTS As Integer
 
-  Public Function AskUser(ByVal aDataManager As atcDataManager, Optional ByVal aGroup As atcTimeseriesGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcTimeseriesGroup
+  Public Function AskUser(ByVal aDataManager As atcDataManager, Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
     If aGroup Is Nothing Then
-      pSelectedTS = New atcTimeseriesGroup
+      pSelectedTS = New atcDataGroup
     Else
       pSaveGroup = aGroup.Clone
       pSelectedTS = aGroup
@@ -320,7 +307,7 @@ Friend Class frmSelectTimeseries
     '  End While
     'End If
 
-    pMatchingTS = New atcTimeseriesGroup
+    pMatchingTS = New atcDataGroup
     pMatchingSource = New GridSource(pDataManager, pMatchingTS)
     pSelectedSource = New GridSource(pDataManager, pSelectedTS)
 
@@ -352,6 +339,7 @@ Friend Class frmSelectTimeseries
 
     ReDim pcboCriteria(0)
     ReDim plstCriteria(0)
+    ReDim pCriteriaFraction(0)
 
     For Each lAttribName As String In pDataManager.SelectionAttributes
       AddCriteria(lAttribName)
@@ -365,12 +353,12 @@ Friend Class frmSelectTimeseries
     Dim i As Integer
     For i = 0 To pcboCriteria.GetUpperBound(0)
       pcboCriteria(i).Items.Clear()
-      If pcboCriteria.GetUpperBound(0) > 0 Then
-        pcboCriteria(i).Items.Add(REMOVE_VALUE)
-      End If
+      'If pcboCriteria.GetUpperBound(0) > 0 Then
+      '  pcboCriteria(i).Items.Add(REMOVE_VALUE)
+      'End If
     Next
     For Each source As atcDataSource In pDataManager.DataSources
-      For Each ts As atcTimeseries In source.Timeseries
+      For Each ts As atcDataSet In source.DataSets
         For Each de As DictionaryEntry In ts.Attributes.GetAll
           If Not pcboCriteria(0).Items.Contains(de.Key) Then
             For i = 0 To pcboCriteria.GetUpperBound(0)
@@ -385,7 +373,7 @@ Friend Class frmSelectTimeseries
   Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As Windows.Forms.ListBox)
     aList.Items.Clear()
     For Each source As atcDataSource In pDataManager.DataSources
-      For Each ts As atcTimeseries In source.Timeseries
+      For Each ts As atcDataSet In source.DataSets
         Dim val As Object = ts.Attributes.GetValue(aAttributeName, Nothing)
         If val Is Nothing Then val = NOTHING_VALUE
         If Not aList.Items.Contains(val) Then
@@ -400,7 +388,7 @@ Friend Class frmSelectTimeseries
     pMatchingTS.Clear()
     pTotalTS = 0
     For Each source As atcDataSource In pDataManager.DataSources
-      For Each ts As atcTimeseries In source.Timeseries
+      For Each ts As atcDataSet In source.DataSets
         pTotalTS += 1
         For iCriteria As Integer = 0 To iLastCriteria
           Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
@@ -420,7 +408,7 @@ Friend Class frmSelectTimeseries
 NextTS:
       Next
     Next
-    lblMatching.Text = "Matching Timeseries (" & pMatchingTS.Count & " of " & pTotalTS & ")"
+    lblMatching.Text = "Matching Data (" & pMatchingTS.Count & " of " & pTotalTS & ")"
     pMatchingGrid.Refresh()
   End Sub
 
@@ -430,14 +418,14 @@ NextTS:
 
   Private Sub cboCriteria_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
     If Not sender.SelectedItem Is Nothing Then
-      If sender.SelectedItem = REMOVE_VALUE Then
-        If plstCriteria.GetUpperBound(0) > 0 Then
-          RemoveCriteria(sender, plstCriteria(GetIndex(sender.name)))
-        End If
-      Else
-        PopulateCriteriaList(sender.SelectedItem, plstCriteria(GetIndex(sender.name)))
-        UpdatedCriteria()
-      End If
+      'If sender.SelectedItem = REMOVE_VALUE Then
+      '  If plstCriteria.GetUpperBound(0) > 0 Then
+      '    RemoveCriteria(sender, plstCriteria(GetIndex(sender.name)))
+      '  End If
+      'Else
+      PopulateCriteriaList(sender.SelectedItem, plstCriteria(GetIndex(sender.name)))
+      UpdatedCriteria()
+      'End If
     End If
   End Sub
 
@@ -476,29 +464,40 @@ NextTS:
     End If
   End Sub
 
-  Private Sub btnAddAttribute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddAttribute.Click
+  Private Sub btnAddAttribute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     AddCriteria()
   End Sub
 
   Private Sub RemoveCriteria(ByVal cbo As Windows.Forms.ComboBox, ByVal lst As Windows.Forms.ListBox)
     Dim iRemoving As Integer = GetIndex(cbo.Name)
+    Dim newLastCriteria As Integer = pcboCriteria.GetUpperBound(0) - 1
+    Dim OldToNew As Single = 1 / (1 - pCriteriaFraction(iRemoving))
     Dim mnu As MenuItem
     RemoveHandler cbo.SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
     RemoveHandler lst.SelectedValueChanged, AddressOf lstCriteria_SelectedIndexChanged
     panelCriteria.Controls.Remove(cbo)
     panelCriteria.Controls.Remove(lst)
+
     For iMoving As Integer = iRemoving To pcboCriteria.GetUpperBound(0) - 1
       pcboCriteria(iMoving) = pcboCriteria(iMoving + 1)
       plstCriteria(iMoving) = plstCriteria(iMoving + 1)
       pcboCriteria(iMoving).Name = "cboCriteria#" & iMoving
       plstCriteria(iMoving).Name = "lstCriteria#" & iMoving
+      pCriteriaFraction(iMoving) = pCriteriaFraction(iMoving + 1)
     Next
 
-    ReDim Preserve pcboCriteria(pcboCriteria.GetUpperBound(0) - 1)
-    ReDim Preserve plstCriteria(plstCriteria.GetUpperBound(0) - 1)
-    If pcboCriteria.GetUpperBound(0) = 0 Then
-      pcboCriteria(0).Items.Remove(REMOVE_VALUE)
-    End If
+    ReDim Preserve pcboCriteria(newLastCriteria)
+    ReDim Preserve plstCriteria(newLastCriteria)
+    ReDim Preserve pCriteriaFraction(newLastCriteria)
+
+    'Expand remaining criteria proportionally to fill space
+    For iScanCriteria As Integer = 0 To newLastCriteria
+      pCriteriaFraction(iScanCriteria) *= OldToNew
+    Next
+
+    'If pcboCriteria.GetUpperBound(0) = 0 Then
+    '  pcboCriteria(0).Items.Remove(REMOVE_VALUE)
+    'End If
 
     SizeCriteria()
     UpdatedCriteria()
@@ -511,7 +510,27 @@ NextTS:
       iCriteria += 1                               'This happens every time except for the first one
       ReDim Preserve pcboCriteria(iCriteria)
       ReDim Preserve plstCriteria(iCriteria)
+      ReDim Preserve pCriteriaFraction(iCriteria)
     End If
+
+    Dim fractionInUse As Single = 0
+    For iScanCriteria As Integer = 0 To iCriteria - 1
+      fractionInUse += pCriteriaFraction(iScanCriteria)
+    Next
+
+    Dim newEqualPortion As Single = 1 / (iCriteria + 1)
+    Dim totalShrinkingNeeded As Single = fractionInUse + newEqualPortion - 1
+
+    'Default to give new one an equal portion of the width
+    pCriteriaFraction(iCriteria) = newEqualPortion
+
+    If totalShrinkingNeeded > 0 Then 'Not enough extra unused space
+      'Shrink existing criteria proportionally to fit the new one in
+      For iScanCriteria As Integer = 0 To iCriteria - 1
+        pCriteriaFraction(iScanCriteria) *= (1 - totalShrinkingNeeded)
+      Next
+    End If
+
     pcboCriteria(iCriteria) = New Windows.Forms.ComboBox
     plstCriteria(iCriteria) = New Windows.Forms.ListBox
 
@@ -536,12 +555,14 @@ NextTS:
       '.Dock = Windows.Forms.DockStyle.Left
     End With
 
+    SizeCriteria()
+
     If iCriteria = 0 Then
       PopulateCriteriaCombos()
     Else 'populate from first combo box
-      If Not pcboCriteria(0).Items.Contains(REMOVE_VALUE) Then
-        pcboCriteria(0).Items.Add(REMOVE_VALUE)
-      End If
+      'If Not pcboCriteria(0).Items.Contains(REMOVE_VALUE) Then
+      '  pcboCriteria(0).Items.Add(REMOVE_VALUE)
+      'End If
 
       For iItem As Integer = 0 To pcboCriteria(0).Items.Count - 1
         pcboCriteria(iCriteria).Items.Add(pcboCriteria(0).Items.Item(iItem))
@@ -551,23 +572,18 @@ NextTS:
       pcboCriteria(iCriteria).Text = aText
     Else 'Find next criteria that is not yet in use
       For Each curName As String In pcboCriteria(iCriteria).Items
-        If curName <> REMOVE_VALUE Then
-          For iOtherCriteria As Integer = 0 To iCriteria - 1
-            If curName.Equals(pcboCriteria(iOtherCriteria).SelectedItem) Then GoTo NextName
-          Next
-          pcboCriteria(iCriteria).Text = curName
-          Exit For
-        End If
+        'If curName <> REMOVE_VALUE Then
+        For iOtherCriteria As Integer = 0 To iCriteria - 1
+          If curName.Equals(pcboCriteria(iOtherCriteria).SelectedItem) Then GoTo NextName
+        Next
+        pcboCriteria(iCriteria).Text = curName
+        Exit For
+        'End If
 NextName:
       Next
     End If
 
-    SizeCriteria()
     UpdatedCriteria()
-  End Sub
-
-  Private Sub frmSelectTimeseries_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-    SizeCriteria()
   End Sub
 
   Private Sub panelCriteria_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles panelCriteria.SizeChanged
@@ -577,6 +593,7 @@ NextName:
   Private Sub ResizeOneCriteria(ByVal aCriteria As Integer, ByVal aWidth As Integer)
     Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
     pcboCriteria(aCriteria).Width = aWidth - PADDING
+    pCriteriaFraction(aCriteria) = pcboCriteria(aCriteria).Width / (panelCriteria.Width - PADDING)
     plstCriteria(aCriteria).Width = pcboCriteria(aCriteria).Width
     While aCriteria < iLastCriteria
       aCriteria += 1
@@ -589,25 +606,28 @@ NextName:
     If Not pcboCriteria Is Nothing Then
       Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
       If iLastCriteria >= 0 Then
-        Dim perCriteriaWidth As Integer = (btnAddAttribute.Left - PADDING) / (iLastCriteria + 1)
-        Dim curLeft As Integer = 3
+        Dim eachCriteriaPortion() As Integer
+        Dim availableWidth As Integer = panelCriteria.Width - PADDING
+        'Dim perCriteriaWidth As Integer = (panelCriteria.Width - PADDING) / (iLastCriteria + 1)
+        Dim curLeft As Integer = PADDING
 
         pMatchingGrid.ColumnWidth(0) = 0
         pSelectedGrid.ColumnWidth(0) = 0
 
         For iCriteria As Integer = 0 To iLastCriteria
-          pcboCriteria(iCriteria).Top = btnAddAttribute.Top
+          pcboCriteria(iCriteria).Top = PADDING
           pcboCriteria(iCriteria).Left = curLeft
-          pcboCriteria(iCriteria).Width = perCriteriaWidth - PADDING
+          pcboCriteria(iCriteria).Width = availableWidth * pCriteriaFraction(iCriteria)
+          If pcboCriteria(iCriteria).Width > PADDING Then pcboCriteria(iCriteria).Width -= PADDING
 
           plstCriteria(iCriteria).Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING
           plstCriteria(iCriteria).Left = curLeft
           plstCriteria(iCriteria).Width = pcboCriteria(iCriteria).Width
           plstCriteria(iCriteria).Height = panelCriteria.Height - plstCriteria(iCriteria).Top - PADDING
 
-          curLeft += perCriteriaWidth
+          curLeft = pcboCriteria(iCriteria).Left + pcboCriteria(iCriteria).Width + PADDING
 
-          pMatchingGrid.ColumnWidth(iCriteria + 1) = perCriteriaWidth 'curLeft - pMatchingGrid.ColumnWidth(iCriteria)
+          pMatchingGrid.ColumnWidth(iCriteria + 1) = pcboCriteria(iCriteria).Width + PADDING
           pSelectedGrid.ColumnWidth(iCriteria + 1) = pMatchingGrid.ColumnWidth(iCriteria + 1)
         Next
         pMatchingGrid.Refresh()
@@ -629,13 +649,17 @@ NextName:
 
   'Update SelectionAttributes from current set of pcboCriteria
   Private Sub UpdateManagerSelectionAttributes()
-    pDataManager.SelectionAttributes.Clear()
+    Dim curAttributes As New ArrayList
     For iCriteria As Integer = 0 To pcboCriteria.GetUpperBound(0)
       Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
       If Not attrName Is Nothing Then
-        pDataManager.SelectionAttributes.Add(attrName)
+        curAttributes.Add(attrName)
       End If
     Next
+    If curAttributes.Count > 0 Then
+      pDataManager.SelectionAttributes.Clear()
+      pDataManager.SelectionAttributes.AddRange(curAttributes)
+    End If
   End Sub
 
   Private Sub pMatchingGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles pMatchingGrid.MouseDownCell
@@ -647,7 +671,7 @@ NextName:
       Else 'Not already selected, select it now
         iTS = pMatchingTS.IndexOfSerial(lSerial)
         If iTS >= 0 Then 'Found matching serial number in pMatchingTS
-          Dim selTS As atcData.atcTimeseries = pMatchingTS(iTS)
+          Dim selTS As atcData.atcDataSet = pMatchingTS(iTS)
           pSelectedTS.Add(selTS)
         End If
       End If
@@ -657,7 +681,7 @@ NextName:
 
   Private Sub RefreshSelected()
     pSelectedGrid.Refresh()
-    groupSelected.Text = "Selected Timeseries (" & pSelectedTS.Count & " of " & pTotalTS & ")"
+    groupSelected.Text = "Selected Data (" & pSelectedTS.Count & " of " & pTotalTS & ")"
   End Sub
 
   Private Sub pSelectedGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles pSelectedGrid.MouseDownCell
@@ -666,14 +690,14 @@ NextName:
       Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
       If iTS >= 0 Then 'Found matching serial number in pSelectedTS
         pSelectedTS.Remove(iTS)
-        RefreshSelected
+        RefreshSelected()
       Else
         'TODO: should never reach this line
       End If
     End If
   End Sub
 
-  Private Sub pDataManager_OpenedData(ByVal aTimeseriesFile As atcDataSource) Handles pDataManager.OpenedData
+  Private Sub pDataManager_OpenedData(ByVal aDataSource As atcDataSource) Handles pDataManager.OpenedData
     Populate()
   End Sub
 
@@ -699,14 +723,14 @@ NextName:
   End Sub
 
   Private Sub mnuSelectAllMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAllMatching.Click
-    For Each ts As atcTimeseries In pMatchingTS
+    For Each ts As atcDataSet In pMatchingTS
       If Not pSelectedTS.Contains(ts) Then pSelectedTS.Add(ts)
     Next
     RefreshSelected()
   End Sub
 
   Private Sub mnuSelectNoMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectNoMatching.Click
-    For Each ts As atcTimeseries In pMatchingTS
+    For Each ts As atcDataSet In pMatchingTS
       If pSelectedTS.Contains(ts) Then pSelectedTS.Remove(ts)
     Next
     RefreshSelected()
@@ -735,12 +759,12 @@ Friend Class GridSource
   Private Const LabelRow As Integer = -1
 
   Private pDataManager As atcDataManager
-  Private pTimeseriesGroup As atcTimeseriesGroup
+  Private pDataGroup As atcDataGroup
 
   Sub New(ByVal aDataManager As atcData.atcDataManager, _
-          ByVal aTimeseriesGroup As atcData.atcTimeseriesGroup)
+          ByVal aDataGroup As atcData.atcDataGroup)
     pDataManager = aDataManager
-    pTimeseriesGroup = aTimeseriesGroup
+    pDataGroup = aDataGroup
   End Sub
 
   Public Overrides Property Columns() As Integer
@@ -753,7 +777,7 @@ Friend Class GridSource
 
   Public Overrides Property Rows() As Integer
     Get
-      Return pTimeseriesGroup.Count + LabelRow + 1
+      Return pDataGroup.Count + LabelRow + 1
     End Get
     Set(ByVal Value As Integer)
     End Set
@@ -768,9 +792,9 @@ Friend Class GridSource
           Return pDataManager.SelectionAttributes(aColumn - 1)
         End If
       ElseIf aColumn = 0 Then
-        Return pTimeseriesGroup(aRow - (LabelRow + 1)).Serial()
+        Return pDataGroup(aRow - (LabelRow + 1)).Serial()
       Else
-        Return pTimeseriesGroup(aRow - (LabelRow + 1)).Attributes.GetValue(pDataManager.SelectionAttributes(aColumn - 1))
+        Return pDataGroup(aRow - (LabelRow + 1)).Attributes.GetValue(pDataManager.SelectionAttributes(aColumn - 1))
       End If
     End Get
     Set(ByVal Value As String)

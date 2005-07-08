@@ -41,7 +41,10 @@ Friend Class frmManager
   Friend WithEvents toolbarTop As System.Windows.Forms.ToolBar
   Friend WithEvents lstFiles As System.Windows.Forms.ListBox
   Friend WithEvents panelOpening As System.Windows.Forms.Panel
-  Friend WithEvents lblOpening As System.Windows.Forms.Label
+  Friend WithEvents lstDataSourceType As System.Windows.Forms.ListBox
+  Friend WithEvents lblDataSourceType As System.Windows.Forms.Label
+  Friend WithEvents btnOpen As System.Windows.Forms.Button
+  Friend WithEvents btnCancel As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmManager))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -50,7 +53,10 @@ Friend Class frmManager
     Me.txtDetails = New System.Windows.Forms.TextBox
     Me.lstFiles = New System.Windows.Forms.ListBox
     Me.panelOpening = New System.Windows.Forms.Panel
-    Me.lblOpening = New System.Windows.Forms.Label
+    Me.btnCancel = New System.Windows.Forms.Button
+    Me.btnOpen = New System.Windows.Forms.Button
+    Me.lblDataSourceType = New System.Windows.Forms.Label
+    Me.lstDataSourceType = New System.Windows.Forms.ListBox
     Me.panelOpening.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -97,20 +103,52 @@ Friend Class frmManager
     Me.panelOpening.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.panelOpening.Controls.Add(Me.lblOpening)
+    Me.panelOpening.Controls.Add(Me.btnCancel)
+    Me.panelOpening.Controls.Add(Me.btnOpen)
+    Me.panelOpening.Controls.Add(Me.lblDataSourceType)
+    Me.panelOpening.Controls.Add(Me.lstDataSourceType)
     Me.panelOpening.Location = New System.Drawing.Point(0, 0)
     Me.panelOpening.Name = "panelOpening"
     Me.panelOpening.Size = New System.Drawing.Size(504, 312)
     Me.panelOpening.TabIndex = 4
     Me.panelOpening.Visible = False
     '
-    'lblOpening
+    'btnCancel
     '
-    Me.lblOpening.Location = New System.Drawing.Point(16, 40)
-    Me.lblOpening.Name = "lblOpening"
-    Me.lblOpening.Size = New System.Drawing.Size(480, 64)
-    Me.lblOpening.TabIndex = 0
-    Me.lblOpening.Text = "Opening..."
+    Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.btnCancel.Location = New System.Drawing.Point(104, 280)
+    Me.btnCancel.Name = "btnCancel"
+    Me.btnCancel.Size = New System.Drawing.Size(80, 24)
+    Me.btnCancel.TabIndex = 3
+    Me.btnCancel.Text = "Cancel"
+    '
+    'btnOpen
+    '
+    Me.btnOpen.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.btnOpen.Location = New System.Drawing.Point(8, 280)
+    Me.btnOpen.Name = "btnOpen"
+    Me.btnOpen.Size = New System.Drawing.Size(80, 24)
+    Me.btnOpen.TabIndex = 2
+    Me.btnOpen.Text = "Open"
+    '
+    'lblDataSourceType
+    '
+    Me.lblDataSourceType.Location = New System.Drawing.Point(8, 16)
+    Me.lblDataSourceType.Name = "lblDataSourceType"
+    Me.lblDataSourceType.Size = New System.Drawing.Size(344, 24)
+    Me.lblDataSourceType.TabIndex = 1
+    Me.lblDataSourceType.Text = "Select kind of data source to open:"
+    '
+    'lstDataSourceType
+    '
+    Me.lstDataSourceType.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lstDataSourceType.IntegralHeight = False
+    Me.lstDataSourceType.Location = New System.Drawing.Point(8, 40)
+    Me.lstDataSourceType.Name = "lstDataSourceType"
+    Me.lstDataSourceType.Size = New System.Drawing.Size(488, 224)
+    Me.lstDataSourceType.TabIndex = 0
     '
     'frmManager
     '
@@ -134,7 +172,7 @@ Friend Class frmManager
     pManager = aManager
     lstFiles.Items.Clear()
     For Each source As atcDataSource In pManager.DataSources
-      lstFiles.Items.Add(source.Name & " " & source.FileName & " (" & source.Timeseries.Count & ")")
+      lstFiles.Items.Add(source.Name & " " & source.Specification & " (" & source.DataSets.Count & ")")
     Next
     Me.Show()
   End Sub
@@ -142,10 +180,9 @@ Friend Class frmManager
   Private Sub toolbarTop_ButtonClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.ToolBarButtonClickEventArgs) Handles toolbarTop.ButtonClick
     Select Case e.Button.Text
       Case "Open"
+        PopulateDataSourceTypes()
         panelOpening.Visible = True
         panelOpening.BringToFront()
-        pManager.OpenData("")
-        panelOpening.Visible = False
       Case "Close"
         'TODO: how do we remove a file from pManager.Files?
     End Select
@@ -159,15 +196,15 @@ Friend Class frmManager
     Dim selectedItem As String = lstFiles.SelectedItem
 
     For Each source As atcDataSource In pManager.DataSources
-      If selectedItem = source.Name & " " & source.FileName & " (" & source.Timeseries.Count & ")" Then
+      If selectedItem = source.Name & " " & source.Specification & " (" & source.DataSets.Count & ")" Then
         txtDetails.Text = source.Name
-        If source.FileName.Length > 0 Then txtDetails.Text &= vbCrLf & "File '" & source.FileName & "'"
-        If source.Timeseries.Count > 0 Then
-          txtDetails.Text &= vbCrLf & Format(source.Timeseries.Count, "#,###") & " Timeseries"
+        If source.Specification.Length > 0 Then txtDetails.Text &= vbCrLf & source.Specification
+        If source.DataSets.Count > 0 Then
+          txtDetails.Text &= vbCrLf & Format(source.DataSets.Count, "#,###") & " Timeseries"
         End If
-        If FileExists(source.FileName) Then
-          txtDetails.Text &= vbCrLf & Format(FileLen(source.FileName), "#,###") & " bytes"
-          txtDetails.Text &= vbCrLf & "Modified " & System.IO.File.GetLastWriteTime(source.FileName)
+        If FileExists(source.Specification) Then
+          txtDetails.Text &= vbCrLf & Format(FileLen(source.Specification), "#,###") & " bytes"
+          txtDetails.Text &= vbCrLf & "Modified " & System.IO.File.GetLastWriteTime(source.Specification)
         End If
         Exit For
       End If
@@ -177,5 +214,41 @@ Friend Class frmManager
   Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
     Debug.Write("Closing frmManager")
     pManager = Nothing
+  End Sub
+
+  Private Sub PopulateDataSourceTypes()
+    Dim lastDataSourceType As String = GetSetting("atcData", "DataSource", "LastType")
+    Dim DataSourcePlugins As ICollection = pManager.GetPlugins(GetType(atcDataSource))
+    lstDataSourceType.Items.Clear()
+    For Each ds As atcDataSource In DataSourcePlugins
+      lstDataSourceType.Items.Add(ds.Name)
+      If ds.Name = lastDataSourceType Then lstDataSourceType.SelectedItem = ds.Name
+    Next
+  End Sub
+
+  Private Sub btnOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOpen.Click
+    Dim DataSourceName As String = lstDataSourceType.SelectedItem
+    If DataSourceName.Length = 0 Then
+      MsgBox("Select a data type to open")
+    Else
+      SaveSetting("atcData", "DataSource", "LastType", DataSourceName)
+      Me.Cursor = Cursors.WaitCursor 'TODO: make this take effect immediately
+      Dim DataSourcePlugins As ICollection = pManager.GetPlugins(GetType(atcDataSource))
+      For Each ds As atcDataSource In DataSourcePlugins
+        If ds.Name = DataSourceName Then
+          Dim typ As System.Type = ds.GetType()
+          Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+          Dim newSource As atcDataSource = asm.CreateInstance(typ.FullName)
+          If pManager.AddDataSource(newSource, "", Nothing) Then
+            panelOpening.Visible = False
+          End If
+        End If
+      Next
+      Me.Cursor = Cursors.Default
+    End If
+  End Sub
+
+  Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+    panelOpening.Visible = False
   End Sub
 End Class

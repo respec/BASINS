@@ -136,12 +136,27 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcDataDisplay.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "atcDataGroup.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "atcDataManager.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
                     RelPath = "atcDataPlugin.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "atcDataSet.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -161,23 +176,13 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcTimeseriesDisplay.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcTimeseriesGroup.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmComputeTimeseries.vb"
+                    RelPath = "frmComputeData.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "frmComputeTimeseries.resx"
-                    DependentUpon = "frmComputeTimeseries.vb"
+                    RelPath = "frmComputeData.resx"
+                    DependentUpon = "frmComputeData.vb"
                     BuildAction = "EmbeddedResource"
                 />
                 <File
@@ -191,13 +196,13 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
-                    RelPath = "frmSelectTimeseries.vb"
+                    RelPath = "frmSelectData.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "frmSelectTimeseries.resx"
-                    DependentUpon = "frmSelectTimeseries.vb"
+                    RelPath = "frmSelectData.resx"
+                    DependentUpon = "frmSelectData.vb"
                     BuildAction = "EmbeddedResource"
                 />
             </Include>

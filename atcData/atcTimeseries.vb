@@ -1,25 +1,23 @@
 Public Class atcTimeseries
-  Private Shared pNextSerial As Integer = 0
+  Inherits atcDataset
 
   Private pDates As atcTimeseries
   'Private pDateLengths As atcTimeseries
 
-  Private pFile As atcDataSource
+  Private pDataSource As atcDataSource
   Private pValuesNeedToBeRead As Boolean
 
-  Private pSerial As Integer
   Private pNumValues As Integer
   Private pValues() As Double
-  Private pAttributes As atcDataAttributes
   Private pValueAttributes() As atcDataAttributes
 
   Public Overrides Function ToString() As String
-    Dim id As String = pAttributes.GetValue("id")
+    Dim id As String = Attributes.GetValue("id")
     'If id.Length = 0 Then id = "# " & CStr(pSerial)
 
-    Return pAttributes.GetValue("Scenario") & " " _
-         & pAttributes.GetValue("Location") & " " _
-         & pAttributes.GetValue("Constituent") & " " & id & " # " & CStr(pSerial)
+    Return Attributes.GetValue("Scenario") & " " _
+         & Attributes.GetValue("Location") & " " _
+         & Attributes.GetValue("Constituent") & " " & id & " # " & CStr(Serial)
   End Function
 
   'Set or get an individual value
@@ -52,13 +50,6 @@ Public Class atcTimeseries
       pValues = newValues
       pNumValues = newValues.GetUpperBound(0)
     End Set
-  End Property
-
-  'Attributes associated with the whole Timeseries (location, constituent, etc.)
-  Public ReadOnly Property Attributes() As atcDataAttributes
-    Get
-      Return pAttributes
-    End Get
   End Property
 
   'Attributes associated with individual values (quality flags)
@@ -120,10 +111,10 @@ Public Class atcTimeseries
   'End Property
 
   'Clear all values and attributes, but not Dates
-  Public Sub Clear()
+  Public Overrides Sub Clear()
+    MyBase.Clear()
     ReDim pValues(0)
     numValues = 0
-    pAttributes = New atcDataAttributes(Me)
     If Not pValueAttributes Is Nothing Then
       ReDim pValueAttributes(pNumValues)
     End If
@@ -131,11 +122,10 @@ Public Class atcTimeseries
   End Sub
 
   'Create a new Timeseries and reference the file it came from
-  Public Sub New(ByVal aFile As atcDataSource)
+  Public Sub New(ByVal aDataSource As atcDataSource)
     Clear()
-    pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
-    pFile = aFile
-    Me.Attributes.SetValue("File", aFile.FileName)
+    pDataSource = aDataSource
+    Me.Attributes.SetValue("Data Source", aDataSource.Specification)
   End Sub
 
   'Get or set the number of values
@@ -152,23 +142,16 @@ Public Class atcTimeseries
     End Set
   End Property
 
-  'Unique serial number assigned when object is created
-  Public ReadOnly Property Serial() As Integer
-    Get
-      Return pSerial
-    End Get
-  End Property
-
   'Make sure values have been read from the file
   Public Sub EnsureValuesRead()
     If pValuesNeedToBeRead Then
       'just header information was read at first, delaying using the time/space to read all the data
-      pFile.ReadData(Me) 'ValuesNeedToBeRead = False should happen in pFile.ReadData            
+      pDataSource.ReadData(Me) 'ValuesNeedToBeRead = False should happen in pFile.ReadData            
     End If
   End Sub
 
   'True if we have read the header and not all the values to save time and memory
-  'Should only be changed by the TimeseriesFile that reads this Timeseries (aFile from New)
+  'Should only be changed by the atcDataSource that reads this Timeseries (aFile from New)
   Public Property ValuesNeedToBeRead() As Boolean
     Get
       Return pValuesNeedToBeRead
