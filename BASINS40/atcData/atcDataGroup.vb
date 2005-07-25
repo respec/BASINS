@@ -10,7 +10,7 @@ Public Class atcDataGroup
 
   Private pTS As ArrayList 'of atcDataSet
 
-  Private pSelectedTS As atcDataGroup 'tracks currently selected group within this group
+  Private pSelectedData As atcDataGroup 'tracks currently selected group within this group
 
   'One or more atcDataSet were just added to the group
   Public Event Added(ByVal aAdded As ArrayList)
@@ -61,7 +61,7 @@ Public Class atcDataGroup
       pTS = New ArrayList
       RaiseEvent Removed(lRemoved)
     End If
-    If Not pSelectedTS Is Nothing Then pSelectedTS.Clear()
+    If Not pSelectedData Is Nothing Then pSelectedData.Clear()
   End Sub
 
   Public Function Clone() As atcDataGroup
@@ -164,15 +164,15 @@ Public Class atcDataGroup
     Remove(removeList)
   End Sub
 
-  Public Property SelectedTimeseries() As atcDataGroup
+  Public Property SelectedData() As atcDataGroup
     Get
-      If pSelectedTS Is Nothing Then 'Initialize now if not already done
-        pSelectedTS = New atcDataGroup
+      If pSelectedData Is Nothing Then 'Initialize now if not already done
+        pSelectedData = New atcDataGroup
       End If
-      Return pSelectedTS
+      Return pSelectedData
     End Get
     Set(ByVal newValue As atcDataGroup)
-      pSelectedTS = newValue
+      pSelectedData = newValue
     End Set
   End Property
 

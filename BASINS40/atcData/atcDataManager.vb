@@ -23,6 +23,7 @@ Public Class atcDataManager
   Public Sub Clear()
     pDataSources = New ArrayList
     Dim lMemory As New atcDataSource
+    lMemory.DataManager = Me
     lMemory.Specification = "<in memory>"
     pDataSources.Add(lMemory)
 
@@ -70,12 +71,9 @@ Public Class atcDataManager
     Return retval
   End Function
 
-  Public Function UserAddDataSource() As atcDataSource
-
-  End Function
-
   'aSpecification = file name, connection string, or other information needed to initialize aNewSource
-  Public Function AddDataSource(ByVal aNewSource As atcDataSource, ByVal aSpecification As String, ByVal aAttributes As atcDataAttributes) As Boolean
+  Public Function OpenDataSource(ByVal aNewSource As atcDataSource, ByVal aSpecification As String, ByVal aAttributes As atcDataAttributes) As Boolean
+    aNewSource.DataManager = Me
     If aNewSource.Open(aSpecification, aAttributes) Then
       pDataSources.Add(aNewSource)
       RaiseEvent OpenedData(aNewSource)
@@ -86,71 +84,14 @@ Public Class atcDataManager
     End If
   End Function
 
-  'Open a data source and return the new atcDataSource object
-  'aFileFilter: selected filter in Open dialog - used to determine which class can open file
-  'if aFileFilter is omitted, Open tries searching for a class that supports the extension of aFileName
-  'Public Function OpenData(ByVal aFileNameOrConnectString As String) As atcDataSource ', Optional ByVal aFileFilter As String = "") As atcDataSource
-  '  Dim newSource As atcDataSource
-
-  '  pBasins.Busy = True
-  '  If aFileNameOrConnectString.Length = 0 Then
-  '    Dim allFileFilters As String = FileFilters()
-  '    If aFileFilter.Length = 0 Then
-  '      aFileFilter = GetSetting("atcData", "DataSource", "LastFileFilter")
-  '    End If
-  '    Dim FileFilterIndex As Integer = 1
-  '    If aFileFilter.Length > 0 Then
-  '      FileFilterIndex = FindFileFilterIndex(allFileFilters, aFileFilter)
-  '    End If
-  '    aFileNameOrConnectString = FindFile("Select data file to open", , , allFileFilters, True, , FileFilterIndex)
-  '    aFileFilter = FindFileFilter(allFileFilters, FileFilterIndex)
-  '    SaveSetting("atcData", "DataSource", "LastFileFilter", aFileFilter)
-  '  End If
-
-  '  If aFileNameOrConnectString.Length > 0 Then
-  '    If aFileFilter.Length = 0 Then aFileFilter = System.IO.Path.GetExtension(aFileNameOrConnectString)
-  '    aFileFilter = aFileFilter.ToLower
-
-  '    Dim DataSourcePlugins As ICollection = GetPlugins(GetType(atcDataSource))
-  '    For Each atf As atcDataSource In DataSourcePlugins
-  '      'Might need a better test than this, or try more than one if multiple types open 
-  '      'files with the same extension or if filter is not set for a atcDataSource type
-  '      If atf.FileFilter.ToLower.IndexOf(aFileFilter) >= 0 Then
-  '        Dim typ As System.Type = atf.GetType()
-  '        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-  '        newSource = asm.CreateInstance(typ.FullName)
-  '      End If
-  '    Next
-  '  End If
-
-  '  If newSource Is Nothing Then
-  '    'TODO: LogError("Could not find a loaded plugin that can open '" & aFileNameOrConnectString & "'")
-  '  Else
-  '    If newSource.Open(aFileNameOrConnectString) Then
-  '      pDataSources.Add(newSource)
-  '      RaiseEvent OpenedData(newSource)
-  '      OpenData = newSource
-  '    Else
-  '      'TODO: LogError("Could not open '" & aFileNameOrConnectString & "' with '" & newSource.Name & "'")
-  '    End If
-  '  End If
-  '  pBasins.Busy = False
-  'End Function
-
-  'Returns FileFilters of all loaded atcDataSource types, formatted for common dialog
-  'Public Function FileFilters() As String
-  '  Dim retval As String = ""
-  '  Dim DataSourcePlugins As ICollection = GetPlugins(GetType(atcDataSource))
-  '  For Each atf As atcDataSource In DataSourcePlugins
-  '    If retval.Length > 0 And atf.FileFilter.Length > 0 Then retval += "|" 'separate with |
-  '    retval += atf.FileFilter
-  '  Next
-  '  Return retval
-  'End Function
-
-  Public Function UserCompute(Optional ByVal aGroup As atcDataGroup = Nothing) As atcDataSet
-    Dim frmCompute As New atcData.frmComputeData
-    Return frmCompute.AskUser(Me, aGroup)
+  Public Function UserOpenDataSource(Optional ByVal aCategories As ArrayList = Nothing, Optional ByVal aGroup As atcDataGroup = Nothing) As atcDataSource
+    Dim frmDS As New frmDataSource
+    Dim lSpecification As String = ""
+    Dim lSelectedDataSource As atcDataSource
+    frmDS.AskUser(Me, lSelectedDataSource, lSpecification, True, False, aCategories)
+    If Not lSelectedDataSource Is Nothing Then
+      OpenDataSource(lSelectedDataSource, lSpecification, Nothing)
+    End If
   End Function
 
   Public Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup

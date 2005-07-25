@@ -61,7 +61,7 @@ Public Class atcTimeseries
           ReDim pValueAttributes(pNumValues)
         End If
         If pValueAttributes(index) Is Nothing Then 'Create new atcDataAttributes for this value
-          pValueAttributes(index) = New atcDataAttributes(Nothing)
+          pValueAttributes(index) = New atcDataAttributes
         End If
         Return pValueAttributes(index)
       Else

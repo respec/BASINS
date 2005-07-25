@@ -28,6 +28,34 @@ Public Class atcAttributeDefinition
     End Set
   End Property
 
+  Public Function Clone(Optional ByVal aNewName As String = Nothing, _
+                        Optional ByVal aNewDescription As String = Nothing) As atcAttributeDefinition
+    Dim myClone As New atcAttributeDefinition
+    With myClone
+      If aNewName Is Nothing Then
+        .Name = Me.Name
+      Else
+        .Name = aNewName
+      End If
+      If aNewDescription Is Nothing Then
+        .Description = Me.Description
+      Else
+        .Description = aNewDescription
+      End If
+      .DefaultValue = Me.DefaultValue
+      .Editable = Me.Editable
+      .Help = Me.Help
+      .ID = Me.ID
+      .Max = Me.Max
+      .Min = Me.Min
+      .TypeString = Me.TypeString
+      If Not Me.ValidList Is Nothing Then
+        .ValidList = Me.ValidList.Clone
+      End If
+    End With
+    Return myClone
+  End Function
+
   Public Property Description() As String
     Get
       Return pDescription

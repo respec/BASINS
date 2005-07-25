@@ -14,7 +14,7 @@ Public Class atcDataSet
   End Property
 
   Public Overridable Sub Clear()
-    pAttributes = New atcDataAttributes(Me)
+    pAttributes = New atcDataAttributes
   End Sub
 
   Public Sub New()

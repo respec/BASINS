@@ -22,6 +22,14 @@ Public Class atcDataPlugin
     End Get
   End Property
 
+  'Useful for organizing sets of plugins that should be grouped together in the UI
+  'Suggested categories include "File" and "Computation" for atcDataSource
+  Public Overridable ReadOnly Property Category() As String
+    Get
+      Return ""
+    End Get
+  End Property
+
   'Longer version of Name with room to expand acronyms
   'Appears in the plug-ins dialog box when a user selects this plug-in.  
   Public Overridable ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description

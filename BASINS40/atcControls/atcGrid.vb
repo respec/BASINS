@@ -13,14 +13,14 @@ Public Class atcGrid
   Private pLineColor As Color
   Private pLineWidth As Single
   Private pCellBackColor As Color
-  Private pRowHeight As ArrayList   'of Single
-  Private pColumnWidth As ArrayList 'of Single
+  Private pRowHeight As ArrayList = New ArrayList   'of Single
+  Private pColumnWidth As ArrayList = New ArrayList 'of Single
 
   Private pTopRow As Integer
   Private pLeftColumn As Integer
 
-  Private pRowBottom As ArrayList
-  Private pColRight As ArrayList
+  Private pRowBottom As ArrayList = New ArrayList
+  Private pColRight As ArrayList = New ArrayList
 
   Private pColumnDragging As Integer = -1
 
@@ -438,12 +438,14 @@ Public Class atcGrid
   End Sub
 
   Private Function ColumnEdgeToDrag(ByVal X As Integer) As Integer
-    For lColumn As Integer = 0 To pColRight.Count - 1
+    Dim lColumn As Integer = 0
+    While lColumn < pColRight.Count
       'If within tolerance of column edge and column is not being hidden by a zero width
       If Math.Abs(X - pColRight(lColumn)) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
         Return lColumn + pLeftColumn
       End If
-    Next
+      lColumn += 1
+    End While
     Return -1
   End Function
 

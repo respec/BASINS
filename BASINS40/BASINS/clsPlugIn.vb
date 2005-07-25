@@ -133,6 +133,7 @@ Public Class PlugIn
       .Remove(ToolsMenuString)
       .AddMenu(ToolsMenuName, "", Nothing, ToolsMenuString, DataMenuName)
 
+      'mnu = .AddMenu(ToolsMenuName & "_TestDBF", ToolsMenuName, Nothing, "Test DBF")
       mnu = .AddMenu(ToolsMenuName & "_ArcView3", ToolsMenuName, Nothing, "ArcView &3")
       mnu = .AddMenu(ToolsMenuName & "_ArcGIS", ToolsMenuName, Nothing, "&ArcGIS")
       mnu = .AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
@@ -158,9 +159,8 @@ Public Class PlugIn
       .Remove(DataMenuString)
       .AddMenu(DataMenuName, "", Nothing, DataMenuString, "mnuFile")
       mnu = .AddMenu(DataMenuName & "_Download", DataMenuName, Nothing, "&Download")
-
-      mnu = .AddMenu(DataMenuName & "_ComputeTimeseries", DataMenuName, Nothing, "Compute Timeseries")
-      mnu = .AddMenu(DataMenuName & "_ManageDataSources", DataMenuName, Nothing, "Manage Data Sources")
+      mnu = .AddMenu(DataMenuName & "_AddData", DataMenuName, Nothing, "&Add Data")
+      mnu = .AddMenu(DataMenuName & "_ManageDataSources", DataMenuName, Nothing, "&Manage Sources")
 
       'With g_MapWin.Plugins
       '  For iPlugin = 0 To .Count - 1
@@ -182,12 +182,13 @@ Public Class PlugIn
     'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
 
     g_MapWin.Menus.Remove(DataMenuName & "_Download")
-    g_MapWin.Menus.Remove(DataMenuName & "_ComputeTimeseries")
+    g_MapWin.Menus.Remove(DataMenuName & "_AddData")
     g_MapWin.Menus.Remove(DataMenuName & "_ManageDataSources")
     g_MapWin.Menus.Remove(DataMenuName)
 
     'TODO: remove DisplayPlugins menu items
     g_MapWin.Menus.Remove(ToolsMenuName & "_Separator1")
+    'g_MapWin.Menus.Remove(ToolsMenuName & "_TestDBF")
     g_MapWin.Menus.Remove(ToolsMenuName & "_ArcView3")
     g_MapWin.Menus.Remove(ToolsMenuName & "_ArcGIS")
     g_MapWin.Menus.Remove(ToolsMenuName & "_GenScn")
@@ -306,10 +307,10 @@ Public Class PlugIn
           Else
             DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
           End If
-          'Case "OpenTimeseries"
-          '  pDataManager.Open("")
-        Case "ComputeTimeseries"
-          pDataManager.UserCompute()
+        Case "AddData"
+          'Dim pCategories As New ArrayList
+          'Dim pGroup As New atcDataGroup
+          pDataManager.UserOpenDataSource() 'pCategories, pGroup)
         Case "ManageDataSources"
           pDataManager.UserManage()
         Case Else : MsgBox("Data Tool " & ItemName)
@@ -381,9 +382,53 @@ Public Class PlugIn
     g_MapWin.StatusBar.ShowProgressBar = False
   End Sub
 
+  'Private Sub TestDBF()
+  '  Dim dbfname As String = "C:\test\atcUtility\test.dbf"
+  '  Dim tmpDbf As IATCTable
+  '  Dim i As Long, j As Long
+  '  Dim baserow As Long
+
+  '  'does this dbf already exist?
+  '  If FileExists(dbfname) Then
+  '    'delete this file first
+  '    System.IO.File.Delete(dbfname)
+  '  End If
+  '  tmpDbf = atcUtility.TableOpener.OpenAnyTable(dbfname)
+  '  tmpDbf.NumFields = 5
+  '  tmpDbf.FieldName(1) = "Value"
+  '  tmpDbf.FieldType(1) = "N"
+  '  tmpDbf.FieldLength(1) = 10
+  '  tmpDbf.FieldName(2) = "Landuse"
+  '  tmpDbf.FieldType(2) = "C"
+  '  tmpDbf.FieldLength(2) = 30
+  '  tmpDbf.FieldName(3) = "Pervious"
+  '  tmpDbf.FieldType(3) = "C"
+  '  tmpDbf.FieldLength(3) = 10
+  '  tmpDbf.FieldName(4) = "Multiplier"
+  '  tmpDbf.FieldType(4) = "C"
+  '  tmpDbf.FieldLength(4) = 10
+  '  tmpDbf.FieldName(5) = "Subbasin"
+  '  tmpDbf.FieldType(5) = "C"
+  '  tmpDbf.FieldLength(5) = 10
+
+  '  For i = 1 To 10
+  '    tmpDbf.CurrentRecord = i
+  '    tmpDbf.Value(1) = i & ",1"
+  '    tmpDbf.Value(2) = i & ",2"
+  '    tmpDbf.Value(3) = i & ",3"
+  '    tmpDbf.Value(4) = i & ",4"
+  '    tmpDbf.Value(5) = i & ",5"
+  '  Next i
+  '  Debug.WriteLine("Before write: " & tmpDbf.Summary)
+  '  tmpDbf.WriteFile(dbfname)
+  '  Debug.WriteLine("After write: " & tmpDbf.Summary)
+  'End Sub
+
   Private Function LaunchTool(ByVal ToolName As String, Optional ByVal cmdLine As String = "") As Boolean
     Dim exename As String
     Select Case ToolName
+      'Case "TestDBF"
+      '  TestDBF()
       Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
       Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
       Case "HSPF"

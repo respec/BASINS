@@ -31,10 +31,6 @@ Public Class atcTimeseriesFileHspfBinOut
     TUCentury = 7
   End Enum
 
-  Public Sub New()
-    MyBase.New()
-  End Sub
-
   Public ReadOnly Property AvailableAttributes() As Collection
     Get
       Dim retval As Collection
@@ -57,9 +53,15 @@ Public Class atcTimeseriesFileHspfBinOut
     End Get
   End Property
 
+  Public Overrides ReadOnly Property Category() As String
+    Get
+      Return "File"
+    End Get
+  End Property
+
   Public Overrides ReadOnly Property Description() As String
     Get
-      Return "HSPF Binary Time Series Data Type"
+      Return "HSPF Binary Output"
     End Get
   End Property
 
@@ -140,7 +142,7 @@ Public Class atcTimeseriesFileHspfBinOut
         End If
         'lDates = New ATCclsTserDate
         lBaseTSer = New atcTimeseries(Me)
-        lBaseAttributes = New atcDataAttributes(lBaseTSer)
+        lBaseAttributes = New atcDataAttributes
         With lBaseAttributes
           .SetValue("CIntvl", True)
           Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(pBinFile.Filename)
@@ -329,13 +331,15 @@ Public Class atcTimeseriesFileHspfBinOut
   End Property
 
   Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
-    If aFileName.Length = 0 Then
+    If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
       aFileName = FindFile("Select HSPF Bianry file to open", , , pFileFilter, True, , 1)
     End If
-    aFileName = AbsolutePath(aFileName, CurDir())
-    Specification = aFileName
-    BuildTSers()
-    Return True
+    If FileExists(aFileName) Then
+      aFileName = AbsolutePath(aFileName, CurDir())
+      Specification = aFileName
+      BuildTSers()
+      Return True
+    End If
   End Function
 
 End Class

@@ -1,6 +1,9 @@
 Public Class atcDataSource
   Inherits atcDataPlugin
 
+  Private pDataManager As atcDataManager
+
+  Private pAttributes As atcDataAttributes
   Private pSpecification As String
   Private pData As atcDataGroup
 
@@ -12,31 +15,17 @@ Public Class atcDataSource
     ExistAskUser = 8
   End Enum
 
-  'Filter for files that this class can read, formatted for common dialog.
-  'Returns empty string if this atcDataSource does not use files.
-  'Public Overridable ReadOnly Property FileFilter() As String
-  '  Get
-  '    Return "" '"All Files (*.*)|*.*"
-  '  End Get
-  'End Property
-
-  'Name of file we are reading and/or writing, including full path
-  'Should only be set by inheriting class, only during Open or Save
-  Public Overridable Property Specification() As String
-    Get
-      Return pSpecification
-    End Get
-    Set(ByVal newValue As String)
-      pSpecification = newValue
-    End Set
-  End Property
-
-  Private pAttributes As atcDataAttributes
-
   'Attributes associated with the whole Data (location, constituent, etc.)
   Public ReadOnly Property Attributes() As atcDataAttributes
     Get
       Return pAttributes
+    End Get
+  End Property
+
+  'atcAttributeDefinitions representing operations supported by ComputeTimeseries
+  Public Overridable ReadOnly Property AvailableOperations() As atcDataGroup
+    Get
+      Return New atcDataGroup 'default to an empty list with nothing available
     End Get
   End Property
 
@@ -83,6 +72,19 @@ Public Class atcDataSource
     Err.Raise(0, Me, "Save must be overridden to be used, atcDataSource does not implement.")
   End Function
 
+  'Name of file we are reading and/or writing, including full path
+  'Or connection string for database
+  'Or which computation is being performed
+  'Should only be set by inheriting class, only during Open or Save
+  Public Overridable Property Specification() As String
+    Get
+      Return pSpecification
+    End Get
+    Set(ByVal newValue As String)
+      pSpecification = newValue
+    End Set
+  End Property
+
   Public Overridable Function AddDataSet(ByRef t As atcDataSet, _
          Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
     If pData.Contains(t) Then
@@ -93,7 +95,24 @@ Public Class atcDataSource
     End If
   End Function
 
+  Public Property DataManager() As atcDataManager
+    Get
+      Return pDataManager
+    End Get
+    Set(ByVal newValue As atcDataManager)
+      pDataManager = newValue
+    End Set
+  End Property
+
   Public Sub New()
     pData = New atcDataGroup
   End Sub
+
+  'Filter for files that this class can read, formatted for common dialog.
+  'Returns empty string if this atcDataSource does not use files.
+  'Public Overridable ReadOnly Property FileFilter() As String
+  '  Get
+  '    Return "" '"All Files (*.*)|*.*"
+  '  End Get
+  'End Property
 End Class
