@@ -193,9 +193,7 @@ Public Class atcDataSourceWDM
         pMsg = New atcMsgWDM
       End If
     End If
-
     Clear()
-
   End Sub
 
   Private Sub Refresh(ByVal aWdmUnit As Integer)
@@ -798,6 +796,12 @@ Public Class atcDataSourceWDM
 
   'End Sub
 
+  Public Overrides ReadOnly Property Category() As String
+    Get
+      Return "File"
+    End Get
+  End Property
+
   Public Overrides ReadOnly Property Description() As String
     Get
       Return "WDM Time Series"
@@ -829,12 +833,10 @@ Public Class atcDataSourceWDM
   End Property
 
   Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
-    If aFileName.Length = 0 Then
+    If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
       aFileName = FindFile("Select WDM file to open", , , pFileFilter, True, , 1)
     End If
-    If Not FileExists(aFileName) Then
-      pErrorDescription = "File '" & aFileName & "' not found"
-    Else
+    If FileExists(aFileName) Then
       Dim lWdmHandle As New atcWdmHandle(0, aFileName)
       'BasInfAvail = ReadBasInf()
       If lWdmHandle.Unit > 0 Then
@@ -956,6 +958,8 @@ Public Class atcDataSourceWDM
     lData = New atcTimeseries(Me)
     lData.Dates = lDates
     lData.Attributes.SetValue("id", dsn)
+    lData.Attributes.SetValue("History 1", "Read from " & Specification)
+
     lData.ValuesNeedToBeRead = True
     lData.Dates.ValuesNeedToBeRead = True
     DataSets.Add(lData)
@@ -1120,4 +1124,5 @@ Public Class atcDataSourceWDM
     'End If
     MyBase.Finalize()
   End Sub
+
 End Class

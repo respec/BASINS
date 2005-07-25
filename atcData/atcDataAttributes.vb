@@ -1,6 +1,8 @@
 'Store attributes (and calculate some attributes if given an atcTimeseries)
 Public Class atcDataAttributes
-  Private pOwner As atcTimeseries
+  Implements IEnumerable
+
+  'Private pOwner As atcTimeseries
   Private pAttributes As Hashtable         'of atcDefinedValue
   Private Shared pAliases As Hashtable     'of String, so more than one AttributeName can map to the same attribute
   Private Shared pDefinitions As Hashtable 'of atcAttributeDefinition
@@ -16,17 +18,42 @@ Public Class atcDataAttributes
     Return lAll
   End Function
 
+  'Change to match argument
+  Public Sub ChangeTo(ByVal aCopyThese As atcDataAttributes)
+    pAttributes.Clear()
+    If Not aCopyThese Is Nothing Then
+      For Each de As DictionaryEntry In aCopyThese
+        Dim defval As atcDefinedValue = de.Value
+        Me.SetValue(defval.Definition, defval.Value)
+      Next
+    End If
+  End Sub
+
+  Public Function Clone() As atcDataAttributes
+    Dim myClone As New atcDataAttributes
+    For Each lEntry As DictionaryEntry In pAttributes
+      myClone.SetValue(lEntry.Value.Definition, lEntry.Value.Value)
+    Next
+    Return myClone
+  End Function
+
+  Public ReadOnly Property Count() As Integer
+    Get
+      Return pAttributes.Count
+    End Get
+  End Property
+
   'True if aAttributeName has been set
   Public Function ContainsAttribute(ByVal aAttributeName As String) As Boolean
     Return pAttributes.ContainsKey(aAttributeName.ToLower)
   End Function
 
-  'True if aAttributeName can be calculated
-  Public Function canCalculate(ByVal aAttributeName As String) As Boolean
-    If pOwner Is Nothing Then Return False 'Can't calculate any without a atcTimeseries
-    'TODO: insert code for evaluating whether a value for attributeName can be calculated
-    Return False
-  End Function
+  ''True if aAttributeName can be calculated
+  'Public Function canCalculate(ByVal aAttributeName As String) As Boolean
+  '  If pOwner Is Nothing Then Return False 'Can't calculate any without a atcTimeseries
+  '  'TODO: insert code for evaluating whether a value for attributeName can be calculated
+  '  Return False
+  'End Function
 
   'Retrieve the atcAttributeDefinition for aAttributeName
   'returns aDefault if attribute has not been set and cannot calculate
@@ -95,8 +122,8 @@ Public Class atcDataAttributes
     SetValue(lTmpAttrDef, aValue)
   End Sub
 
-  Public Sub New(ByVal aTimeseries As atcTimeseries)
-    pOwner = aTimeseries
+  Public Sub New() 'ByVal aTimeseries As atcTimeseries)
+    'pOwner = aTimeseries
     pAttributes = New Hashtable
 
     If pDefinitions Is Nothing Then
@@ -150,6 +177,16 @@ Public Class atcDataAttributes
     '  Case "VARIANCE" : Attrib = Variance
   End Sub
 
+  Public Function GetDefinedValue(ByVal aIndex As Integer) As atcDefinedValue
+    For Each lVal As DictionaryEntry In pAttributes
+      If aIndex = 0 Then
+        Return lVal.Value
+      Else
+        aIndex -= 1
+      End If
+    Next
+  End Function
+
   Public Function GetDefinedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As atcDefinedValue
     Dim key As String = aAttributeName.ToLower
     Dim tmpAttribute As atcDefinedValue
@@ -164,5 +201,9 @@ Public Class atcDataAttributes
         Return GetDefinedValue(key, aDefault)
       End If
     End If
+  End Function
+
+  Public Function GetEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
+    Return pAttributes.GetEnumerator
   End Function
 End Class

@@ -81,11 +81,13 @@
                     Name = "atcData"
                     Project = "{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
                 <Reference
                     Name = "atcUtility"
                     Project = "{67027820-9036-481E-80F6-077E5085F59D}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
                 <Reference
                     Name = "System.Data"
@@ -102,6 +104,7 @@
                     Name = "atcControls"
                     Project = "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
                 <Reference
                     Name = "System.Xml"
@@ -132,6 +135,11 @@
                     RelPath = "atcListForm.resx"
                     DependentUpon = "atcListForm.vb"
                     BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "atcListGridSource.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
                 />
                 <File
                     RelPath = "atcListPlugin.vb"

@@ -104,6 +104,7 @@
                     Name = "atcControls"
                     Project = "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
                 <Reference
                     Name = "System.Xml"
@@ -171,18 +172,13 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcTimeseriesCompute.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmComputeData.vb"
+                    RelPath = "frmDataSource.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "frmComputeData.resx"
-                    DependentUpon = "frmComputeData.vb"
+                    RelPath = "frmDataSource.resx"
+                    DependentUpon = "frmDataSource.vb"
                     BuildAction = "EmbeddedResource"
                 />
                 <File
