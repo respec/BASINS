@@ -53,7 +53,7 @@ End Class
     Assert.IsTrue(lWdm.Open(pWdmName))
     dbg.Msg("                 Timeseries.Count:" & lWdm.DataSets.Count)
     dbg.Msg("                 Name:" & lWdm.Name)
-    dbg.Msg("                 FileName:" & lWdm.FileName)
+    dbg.Msg("                 FileName:" & lWdm.Specification)
     lWdm = Nothing
   End Sub
 
@@ -322,6 +322,11 @@ End Class
 End Class
 
 <TestFixture()> Public Class Test_HassLibs
+
+  Public Sub TestF90_MSG()
+    'F90_MSG()
+    Assert.Ignore("Test not yet written")
+  End Sub
 
   Public Sub TestF90_W99OPN()
     'F90_W99OPN()
@@ -1164,6 +1169,74 @@ End Class
 
   Public Sub TestUnitsAttributeDefinition()
     'UnitsAttributeDefinition()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestGetHashCode()
+    'GetHashCode()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestEquals()
+    'Equals()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestToString()
+    'ToString()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestGetType()
+    'GetType()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+End Class
+
+<TestFixture()> Public Class Test_atcWdmHandle
+
+  Public Sub TestDispose()
+    'Dispose()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestGetHashCode()
+    'GetHashCode()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestEquals()
+    'Equals()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestToString()
+    'ToString()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_Unit()
+    'get_Unit()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestGetType()
+    'GetType()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+End Class
+
+<TestFixture()> Public Class Test_dbg
+
+  Public Sub TestMsg()
+    'Msg()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestFileSetup()
+    'FileSetup()
     Assert.Ignore("Test not yet written")
   End Sub
 
