@@ -9,7 +9,7 @@
             <Settings
                 ApplicationIcon = ""
                 AssemblyKeyContainerName = ""
-                AssemblyName = "atcHydrologicIndices"
+                AssemblyName = "atcTimeseriesMath"
                 AssemblyOriginatorKeyFile = ""
                 AssemblyOriginatorKeyMode = "None"
                 DefaultClientScript = "JScript"
@@ -20,8 +20,8 @@
                 OptionCompare = "Binary"
                 OptionExplicit = "On"
                 OptionStrict = "Off"
-                RootNamespace = "atcHydrologicIndices"
-                StartupObject = ""
+                RootNamespace = "atcTimeseriesMath"
+                StartupObject = "atcTimeseriesMath.(None)"
             >
                 <Config
                     Name = "Debug"

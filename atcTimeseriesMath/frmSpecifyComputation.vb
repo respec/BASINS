@@ -165,9 +165,9 @@ Public Class frmSpecifyComputation
         pArgLabel(iArg) = New Windows.Forms.Label
         With pArgLabel(iArg)
           If iArg = 0 Then
-            .Top = lblDescription.Top + lblDescription.Height * 2
+            .Top = lblDescription.Top + lblDescription.Height * 1.5
           Else
-            .Top = pArgLabel(iArg - 1).Top + pArgLabel(iArg - 1).Height * 2
+            .Top = pArgLabel(iArg - 1).Top + pArgLabel(iArg - 1).Height * 1.5
           End If
           .Left = lblDescription.Left
           .Text = aDefVal.Definition.Name
@@ -180,6 +180,8 @@ Public Class frmSpecifyComputation
           .Top = pArgLabel(iArg).Top
           .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + PADDING
           .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - PADDING * 2
+          .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left
+
           .Tag = iArg
           If aDefVal.Value Is Nothing Then
             .Text = ""
@@ -199,12 +201,13 @@ Public Class frmSpecifyComputation
 
           .Tag = iArg
           .Text = "Select"
+          .Anchor = Windows.Forms.AnchorStyles.Right
 
-          If aDefVal.Definition.TypeString = "atcDataGroup" Then
-            .Visible = True
-          Else
-            .Visible = False
-          End If
+          Select Case aDefVal.Definition.TypeString
+            Case "atcDataGroup" : .Visible = True
+            Case "atcTimeseries" : .Visible = True
+            Case Else : .Visible = False
+          End Select
           AddHandler pArgButton(iArg).Click, AddressOf ArgButton_Click
         End With
         Controls.Add(pArgButton(iArg))
@@ -223,6 +226,7 @@ Public Class frmSpecifyComputation
 
   Private Sub ArgButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     Dim iArg As Integer = CInt(sender.tag)
+    'TODO: ask UserSelectData to only allow one selection if only one is wanted (atcTimeseries rather than atcDataGroup)
     Dim lSelected As atcDataGroup = pDataManager.UserSelectData("Select " _
                                                                & pArgLabel(iArg).Text _
                                                                & " for " & lblName.Text)

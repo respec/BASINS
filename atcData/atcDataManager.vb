@@ -90,7 +90,13 @@ Public Class atcDataManager
     Dim lSelectedDataSource As atcDataSource
     frmDS.AskUser(Me, lSelectedDataSource, lSpecification, True, False, aCategories)
     If Not lSelectedDataSource Is Nothing Then
-      OpenDataSource(lSelectedDataSource, lSpecification, Nothing)
+      If OpenDataSource(lSelectedDataSource, lSpecification, Nothing) Then
+        If Not aGroup Is Nothing Then
+          For Each lDataSet As atcDataSet In lSelectedDataSource.DataSets
+            aGroup.Add(lDataSet)
+          Next
+        End If
+      End If
     End If
   End Function
 

@@ -55,6 +55,7 @@ Friend Class frmSelectData
   Friend WithEvents mnuSelectClear As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSelectNoMatching As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileManage As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuAddData As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectData))
     Me.groupTop = New System.Windows.Forms.GroupBox
@@ -70,6 +71,7 @@ Friend Class frmSelectData
     Me.pSelectedGrid = New atcControls.atcGrid
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.MenuItem1 = New System.Windows.Forms.MenuItem
+    Me.mnuAddData = New System.Windows.Forms.MenuItem
     Me.mnuFileManage = New System.Windows.Forms.MenuItem
     Me.mnuAttributes = New System.Windows.Forms.MenuItem
     Me.mnuAttributesAdd = New System.Windows.Forms.MenuItem
@@ -197,12 +199,17 @@ Friend Class frmSelectData
     'MenuItem1
     '
     Me.MenuItem1.Index = 0
-    Me.MenuItem1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileManage})
+    Me.MenuItem1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAddData, Me.mnuFileManage})
     Me.MenuItem1.Text = "&File"
+    '
+    'mnuAddData
+    '
+    Me.mnuAddData.Index = 0
+    Me.mnuAddData.Text = "&Add Data"
     '
     'mnuFileManage
     '
-    Me.mnuFileManage.Index = 0
+    Me.mnuFileManage.Index = 1
     Me.mnuFileManage.Text = "&Manage Data Sources"
     '
     'mnuAttributes
@@ -748,6 +755,10 @@ NextName:
 
   Private Sub mnuMove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
 
+  End Sub
+
+  Private Sub mnuAddData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddData.Click
+    pDataManager.UserOpenDataSource(Nothing, pSelectedTS)
   End Sub
 End Class
 

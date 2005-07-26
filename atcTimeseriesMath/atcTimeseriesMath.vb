@@ -17,6 +17,12 @@ Public Class atcTimeseriesMath
     End Get
   End Property
 
+  Public Overrides ReadOnly Property Category() As String
+    Get
+      Return "Computation"
+    End Get
+  End Property
+
   Public Overrides ReadOnly Property Description() As String
     Get
 
@@ -143,13 +149,7 @@ Public Class atcTimeseriesMath
   '  End If
   'End Sub
 
-  'Set the named Double attribute in aTimeseries using the definition from pAvailableStatistics
-  'Private Sub SetAttribute(ByVal aTimeseries As atcTimeseries, ByVal aName As String, ByVal aValue As Double)
-  '  Dim def As atcAttributeDefinition = pAvailableStatistics.Item(aName)
-  '  aTimeseries.Attributes.SetValue(def, aValue)
-  'End Sub
-
-  'Operations supported by ComputeTimeseries
+  'Operations supported
   Public Overrides ReadOnly Property AvailableOperations() As atcDataGroup
     Get
       If pAvailableTimeseriesOperations Is Nothing Then
@@ -166,6 +166,14 @@ Public Class atcTimeseriesMath
         Dim defDesc As New atcAttributeDefinition
         With defDesc
           .Name = "Description"
+          .Description = ""
+          .Editable = False
+          .TypeString = "String"
+        End With
+
+        Dim defCategory As New atcAttributeDefinition
+        With defCategory
+          .Name = "Category"
           .Description = ""
           .Editable = False
           .TypeString = "String"
@@ -191,7 +199,7 @@ Public Class atcTimeseriesMath
         With defDouble
           .Name = "Number"
           .Description = "Integer or Double Value"
-          .DefaultValue = CDbl(0)
+          .DefaultValue = ""
           .Editable = True
           .TypeString = "Double"
         End With
@@ -209,37 +217,104 @@ Public Class atcTimeseriesMath
 
         lData = New atcDataSet
         lData.Attributes.SetValue(defName, "Add")
-        lData.Attributes.SetValue(defDesc, "Add to each value of a timeseries")
+        lData.Attributes.SetValue(defDesc, "Add to each value")
         lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defDouble, Nothing)
+        lData.Attributes.SetValue(defDouble, 0)
+        'lData.Attributes.SetValue(defBeforeAfter, Nothing)
         pAvailableTimeseriesOperations.Add(lData)
 
         lData = New atcDataSet
         lData.Attributes.SetValue(defName, "Subtract")
-        lData.Attributes.SetValue(defDesc, "Subtract from each value of a timeseries")
+        lData.Attributes.SetValue(defDesc, "Subtract from each value of first timeseries")
         lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        lData.Attributes.SetValue(defDouble, Nothing)
+        lData.Attributes.SetValue(defDouble, 0)
         pAvailableTimeseriesOperations.Add(lData)
 
         lData = New atcDataSet
         lData.Attributes.SetValue(defName, "Multiply")
-        lData.Attributes.SetValue(defDesc, "Multiply each value of a timeseries")
+        lData.Attributes.SetValue(defDesc, "Multiply each value")
         lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defDouble, Nothing)
+        lData.Attributes.SetValue(defDouble, 1)
         pAvailableTimeseriesOperations.Add(lData)
 
         lData = New atcDataSet
         lData.Attributes.SetValue(defName, "Divide")
-        lData.Attributes.SetValue(defDesc, "Divide each value of a timeseries")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        lData.Attributes.SetValue(defDouble, Nothing)
+        lData.Attributes.SetValue(defDesc, "Divide each value of first timeseries")
+        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
+        lData.Attributes.SetValue(defDouble, 1)
         pAvailableTimeseriesOperations.Add(lData)
 
         lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "N-day Mean")
-        lData.Attributes.SetValue(defDesc, "Mean of values within N-day range")
+        lData.Attributes.SetValue(defName, "Mean")
+        lData.Attributes.SetValue(defDesc, "Arithmetic Mean of values for each date")
         lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defNumDays, defNumDays.DefaultValue)
+        'lData.Attributes.SetValue(defBeforeAfter, Nothing)
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Geometric Mean")
+        lData.Attributes.SetValue(defDesc, "Geometric Mean of values for each date")
+        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
+        'lData.Attributes.SetValue(defBeforeAfter, Nothing)
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Max")
+        lData.Attributes.SetValue(defDesc, "Maximum value for each date")
+        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
+        lData.Attributes.SetValue(defDouble, "")
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Min")
+        lData.Attributes.SetValue(defDesc, "Minimum value for each date")
+        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
+        lData.Attributes.SetValue(defDouble, "")
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Exponent")
+        lData.Attributes.SetValue(defDesc, "Raise each value of first timeseries to a power")
+        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
+        lData.Attributes.SetValue(defDouble, "")
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "e ^ x")
+        lData.Attributes.SetValue(defDesc, "e raised to the power of each value")
+        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Log e")
+        lData.Attributes.SetValue(defDesc, "The log base e of each value")
+        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Log 10")
+        lData.Attributes.SetValue(defDesc, "The log base 10 of each value")
+        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Absolute Value")
+        lData.Attributes.SetValue(defDesc, "Change negative values to positive")
+        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Celsius to F")
+        lData.Attributes.SetValue(defDesc, "Celsius to Fahrenheit")
+        lData.Attributes.SetValue(defCategory, "Unit Conversion")
+        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "F to Celsius")
+        lData.Attributes.SetValue(defDesc, "Fahrenheit to Celsius")
+        lData.Attributes.SetValue(defCategory, "Unit Conversion")
+        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
         pAvailableTimeseriesOperations.Add(lData)
 
       End If
@@ -260,12 +335,20 @@ Public Class atcTimeseriesMath
     Dim needToAsk As Boolean = False
     Dim lSelectedOperation As atcDataSet
     Dim lNewTS As atcTimeseries
+    Dim lNumber As Double
+    Dim lHaveNumber As Boolean = False
+    Dim nArgs As Integer = 0
+    Dim lastValueIndex As Integer = -1
+    Dim iValue As Integer
+
+    ReDim newVals(-1) ' If this gets populated, it will be turned into an atcTimeseries at the end
 
     If aOperationName Is Nothing OrElse aOperationName.Length = 0 Then
       'TODO: ask user which operation to perform
       aOperationName = "Add"
     End If
     Specification = aOperationName
+
     If aArgs Is Nothing Then
       needToAsk = True
       For Each lOperation As atcDataSet In AvailableOperations
@@ -282,86 +365,219 @@ Public Class atcTimeseriesMath
         Return False 'User cancelled
       End If
     End If
-    'If firstTS Is Nothing Then
-    '  Err.Raise("At least one Timeseries was required but none were passed to atcTimeseriesMath.Open")
-    'Else
-    Dim lTSgroup As atcDataGroup = aArgs.GetValue("Timeseries", Nothing)
-    Dim lNumber As Double = CDbl(aArgs.GetValue("Number", 0))
-    If lNumber <> 0 Then Specification &= " " & lNumber
-    If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
-      Err.Raise(aOperationName & " did not get a Timeseries argument")
-    Else
-      firstTS = lTSgroup.Item(0)
+
+    If aArgs.ContainsAttribute("Number") AndAlso Not aArgs.GetValue("Number") Is Nothing Then
+      lHaveNumber = True
+      nArgs += 1
+      lNumber = CDbl(aArgs.GetValue("Number", 0))
+      Specification &= " " & lNumber
     End If
+
+    Dim lTSgroup As atcDataGroup = aArgs.GetValue("Timeseries", Nothing)
+    If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
+      Err.Raise(vbObjectError + 512, Me, aOperationName & " did not get a Timeseries argument")
+    End If
+
+    firstTS = lTSgroup.Item(0)
+    If lTSgroup.Count > 1 Then
+      curTS = lTSgroup.Item(1) 'default the current ts to the one after the first
+    End If
+
+    lastValueIndex = firstTS.numValues
+    ReDim newVals(lastValueIndex)
+    Array.Copy(firstTS.Values, newVals, lastValueIndex + 1) 'copy values from firstTS
+    nArgs += lTSgroup.Count
+
+    'TODO: check here for number of arguments instead of in each case?
 
     Select Case aOperationName.ToLower
       Case "add", "+"
-        ReDim newVals(firstTS.numValues)
-        Array.Copy(firstTS.Values, newVals, firstTS.numValues + 1) 'copy values from firstTS
-        For iValue As Integer = 0 To firstTS.numValues - 1
-          newVals(iValue) += lNumber
+        For iValue = 0 To lastValueIndex
+          If lHaveNumber Then newVals(iValue) += lNumber
           For iTS = 1 To lTSgroup.Count - 1
             curTS = lTSgroup.Item(iTS)
             newVals(iValue) += curTS.Value(iValue)
           Next
         Next
-        lNewTS = New atcTimeseries(Me)
-        lNewTS.Values = newVals
-        lNewTS.Dates = firstTS.Dates
-        lNewTS.Attributes.ChangeTo(firstTS.Attributes)
-        AddDataSet(lNewTS)
 
       Case "subtract", "-"
-        If lTSgroup.Count <> 1 Then
-          Err.Raise(aOperationName & " required one timeseries but got " & lTSgroup.Count)
-        Else
-          ReDim newVals(firstTS.numValues)
-          For iValue As Integer = 0 To firstTS.numValues - 1
-            newVals(iValue) = firstTS.Value(iValue) - lNumber
+        If nArgs <> 2 Then
+          Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & nArgs)
+        ElseIf lHaveNumber Then
+          For iValue = 0 To lastValueIndex
+            newVals(iValue) -= lNumber
           Next
-          lNewTS = New atcTimeseries(Me)
-          lNewTS.Values = newVals
-          lNewTS.Dates = firstTS.Dates
-          lNewTS.Attributes.ChangeTo(firstTS.Attributes)
-          AddDataSet(lNewTS)
+        Else
+          For iValue = 0 To lastValueIndex
+            newVals(iValue) -= curTS.Value(iValue)
+          Next
         End If
 
       Case "multiply", "*"
-        ReDim newVals(firstTS.numValues)
-        Array.Copy(firstTS.Values, newVals, firstTS.numValues + 1) 'copy values from firstTS
-        For iValue As Integer = 0 To firstTS.numValues - 1
-          newVals(iValue) *= lNumber
+        For iValue = 0 To lastValueIndex
+          If lHaveNumber Then newVals(iValue) *= lNumber
           For iTS = 1 To lTSgroup.Count - 1
             curTS = lTSgroup.Item(iTS)
             newVals(iValue) *= curTS.Value(iValue)
           Next
         Next
-        lNewTS = New atcTimeseries(Me)
-        lNewTS.Values = newVals
-        lNewTS.Dates = firstTS.Dates
-        lNewTS.Attributes.ChangeTo(firstTS.Attributes)
-        AddDataSet(lNewTS)
 
       Case "divide", "/"
-        If lTSgroup.Count <> 1 Then
-          Err.Raise(aOperationName & " required one timeseries but got " & lTSgroup.Count)
-        ElseIf Math.Abs(lNumber) < 0.000001 Then
-          Err.Raise(aOperationName & " got a divisor too close to zero (" & lNumber & ")")
+        If nArgs <> 2 Then
+          Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & nArgs)
+        ElseIf lHaveNumber Then
+          If Math.Abs(lNumber) < 0.000001 Then
+            Err.Raise(vbObjectError + 512, Me, aOperationName & " got a divisor too close to zero (" & lNumber & ")")
+          Else
+            For iValue = 0 To lastValueIndex
+              newVals(iValue) /= lNumber
+            Next
+          End If
         Else
-          ReDim newVals(firstTS.numValues)
-          For iValue As Integer = 0 To firstTS.numValues - 1
-            newVals(iValue) = firstTS.Value(iValue) / lNumber
+          For iValue = 0 To lastValueIndex
+            newVals(iValue) /= curTS.Value(iValue)
           Next
-          lNewTS = New atcTimeseries(Me)
-          lNewTS.Values = newVals
-          lNewTS.Dates = firstTS.Dates
-          lNewTS.Attributes.ChangeTo(firstTS.Attributes)
-          AddDataSet(lNewTS)
         End If
 
+      Case "mean"
+        For iValue = 0 To lastValueIndex
+          If lHaveNumber Then newVals(iValue) += lNumber
+          For iTS = 1 To lTSgroup.Count - 1
+            curTS = lTSgroup.Item(iTS)
+            newVals(iValue) += curTS.Value(iValue)
+          Next
+          newVals(iValue) /= nArgs
+        Next
+
+      Case "geometric mean"
+        For iValue = 0 To lastValueIndex
+          newVals(iValue) = Math.Log10(newVals(iValue))
+          If lHaveNumber Then newVals(iValue) += Math.Log10(lNumber)
+          For iTS = 1 To lTSgroup.Count - 1
+            curTS = lTSgroup.Item(iTS)
+            newVals(iValue) += Math.Log10(curTS.Value(iValue))
+          Next
+          newVals(iValue) = 10 ^ (newVals(iValue) / nArgs)
+        Next
+
+      Case "min"
+        For iValue = 0 To lastValueIndex
+          If lHaveNumber Then
+            If lNumber < newVals(iValue) Then newVals(iValue) = lNumber
+          End If
+          For iTS = 1 To lTSgroup.Count - 1
+            curTS = lTSgroup.Item(iTS)
+            If curTS.Value(iValue) < newVals(iValue) Then
+              newVals(iValue) = curTS.Value(iValue)
+            End If
+          Next
+        Next
+      Case "max"
+        For iValue = 0 To lastValueIndex
+          If lHaveNumber Then
+            If lNumber > newVals(iValue) Then newVals(iValue) = lNumber
+          End If
+          For iTS = 1 To lTSgroup.Count - 1
+            curTS = lTSgroup.Item(iTS)
+            If curTS.Value(iValue) > newVals(iValue) Then
+              newVals(iValue) = curTS.Value(iValue)
+            End If
+          Next
+        Next
+      Case "exponent", "exp", "^", "**"
+        If nArgs <> 2 Then
+          Err.Raise(vbObjectError + 512, Me, aOperationName & " required two arguments but got " & nArgs)
+        ElseIf lHaveNumber Then
+          For iValue = 0 To lastValueIndex
+            newVals(iValue) ^= lNumber
+          Next
+        Else
+          For iValue = 0 To lastValueIndex
+            newVals(iValue) ^= curTS.Value(iValue)
+          Next
+        End If
+      Case "e**", "e ^ x"
+        For iValue = 0 To lastValueIndex
+          newVals(iValue) = Math.Exp(newVals(iValue))
+        Next
+      Case "log 10"
+        For iValue = 0 To lastValueIndex
+          newVals(iValue) = Math.Log10(newVals(iValue))
+        Next
+      Case "log e"
+        For iValue = 0 To lastValueIndex
+          newVals(iValue) = Math.Log(newVals(iValue))
+        Next
+        'Case "line"
+        '  For valNum = 1 To NVALS
+        '    argNum = 1
+        '    GoSub SetCurArgVal
+        '    dataval(valNum) = curArgVal
+        '    argNum = 2
+        '    GoSub SetCurArgVal
+        '    dataval(valNum) = dataval(valNum) * curArgVal
+        '    argNum = 3
+        '    GoSub SetCurArgVal
+        '    dataval(valNum) = dataval(valNum) + curArgVal
+        '  Next
+      Case "abs", "absolute value"
+        For iValue = 0 To lastValueIndex
+          newVals(iValue) = Math.Abs(newVals(iValue))
+        Next
+      Case "ctof", "celsiustofahrenheit", "celsius to fahrenheit", "celsius to f"
+        For iValue = 0 To lastValueIndex
+          newVals(iValue) = newVals(iValue) * 9 / 5 + 32
+        Next
+      Case "ftoc", "fahrenheittocelsius", "fahrenheit to celsius", "f to celsius"
+        For iValue = 0 To lastValueIndex
+          newVals(iValue) = (newVals(iValue) - 32) * 5 / 9
+        Next
+        '  '      Case "running sum"
+        '  '        valNum = 1
+        '  '        GoSub SetCurArgVal
+        '  '        dataval(valNum) = curArgVal
+        '  '        For valNum = 2 To NVALS
+        '  '          GoSub SetCurArgVal
+        '  '          dataval(valNum) = dataval(valNum - 1) + curArgVal
+        '  '        Next
+        'Case "weight"
+        '  For valNum = 1 To NVALS
+        '    dataval(valNum) = 0
+        '    argNum = 1
+        '    While argNum < Nargs
+        '      GoSub SetCurArgVal
+        '      weightVal = curArgVal
+        '      argNum = argNum + 1
+        '      GoSub SetCurArgVal
+        '      dataval(valNum) = dataval(valNum) + curArgVal * weightVal
+        '      argNum = argNum + 1
+        '    End While
+        '  Next
+        'Case "interpolate"
+
       Case Else
-        Err.Raise(aOperationName & " not yet implemented")
+        ReDim newVals(-1) 'Don't create new timeseries
+        Err.Raise(vbObjectError + 512, Me, aOperationName & " not implemented")
     End Select
+
+    If newVals.GetUpperBound(0) >= 0 Then
+      lNewTS = New atcTimeseries(Me)
+      lNewTS.Values = newVals
+
+      If Not firstTS Is Nothing Then
+        lNewTS.Dates = firstTS.Dates
+      Else
+        Err.Raise(vbObjectError + 512, Me, "Did not get dates for new computed timeseries " & aOperationName)
+      End If
+
+      If Not lTSgroup Is Nothing AndAlso lTSgroup.Count > 0 Then
+        lNewTS.Attributes.SetValue("Parent Timeseries", lTSgroup)
+      End If
+      If lHaveNumber Then
+        lNewTS.Attributes.SetValue("Parent Constant", lNumber)
+      End If
+      AddDataSet(lNewTS)
+    End If
     If Me.DataSets.Count > 0 Then Return True
   End Function
 
