@@ -53,7 +53,7 @@ Public Class frmDataSource
     Me.treeSources.Location = New System.Drawing.Point(0, 0)
     Me.treeSources.Name = "treeSources"
     Me.treeSources.SelectedImageIndex = -1
-    Me.treeSources.Size = New System.Drawing.Size(296, 240)
+    Me.treeSources.Size = New System.Drawing.Size(296, 500)
     Me.treeSources.TabIndex = 0
     '
     'pnlButtons
@@ -61,7 +61,7 @@ Public Class frmDataSource
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.pnlButtons.Location = New System.Drawing.Point(0, 233)
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 493)
     Me.pnlButtons.Name = "pnlButtons"
     Me.pnlButtons.Size = New System.Drawing.Size(296, 40)
     Me.pnlButtons.TabIndex = 13
@@ -85,7 +85,7 @@ Public Class frmDataSource
     'frmDataSource
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(296, 273)
+    Me.ClientSize = New System.Drawing.Size(296, 533)
     Me.Controls.Add(Me.pnlButtons)
     Me.Controls.Add(Me.treeSources)
     Me.Name = "frmDataSource"
@@ -132,22 +132,20 @@ Public Class frmDataSource
         'If either no category was specified or
         'this DataSource has one of the specified categories
         If pCategories Is Nothing OrElse pCategories.Contains(lCategory) Then
-          Dim lCategoryNode As TreeNode
-          For Each lCategoryNode In treeSources.Nodes
-            If lCategoryNode.Text = lCategory Then
-              Exit For
-            End If
-            lCategoryNode = Nothing
-          Next
-          If lCategoryNode Is Nothing Then
-            lCategoryNode = New TreeNode
-            lCategoryNode.Text = lCategory
-            treeSources.Nodes.Add(lCategoryNode)
-          End If
+          Dim lCategoryNode As TreeNode = FindOrCreateNode(treeSources.Nodes, lCategory)
           lCategoryNode.ExpandAll()
           If lOperations.Count > 0 Then
             For Each lOperation As atcDataSet In lOperations
-              lNode = lCategoryNode.Nodes.Add(lOperation.Attributes.GetValue("Name"))
+              'Operations might have categories to further divide them
+              Dim lSubCategory As String = lOperation.Attributes.GetValue("Category")
+              If lSubCategory.Length > 0 Then
+                Dim lSubCategoryNode As TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lSubCategory)
+                lSubCategoryNode.ExpandAll()
+                lNode = lSubCategoryNode.Nodes.Add(lOperation.Attributes.GetValue("Name"))
+              Else
+                lNode = lCategoryNode.Nodes.Add(lOperation.Attributes.GetValue("Name"))
+              End If
+
               If ds.Equals(pSelectedSource) AndAlso lNode.Text = pSpecification Then
                 treeSources.SelectedNode = lNode
               End If
@@ -166,21 +164,39 @@ Public Class frmDataSource
     pSpecification = ""
   End Sub
 
+  Private Function FindOrCreateNode(ByVal aNodes As TreeNodeCollection, ByVal aNodeText As String) As TreeNode
+    Dim newNode As TreeNode
+    For Each newNode In aNodes
+      If newNode.Text = aNodeText Then
+        Exit For
+      End If
+      newNode = Nothing
+    Next
+    If newNode Is Nothing Then
+      newNode = New TreeNode
+      newNode.Text = aNodeText
+      aNodes.Add(newNode)
+    End If
+    Return newNode
+  End Function
+
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
     Me.Close()
   End Sub
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
+    Dim lSelectedOperationName As String = treeSources.SelectedNode.Text
+    'TODO: if operations in different categories/datasets might have the same name, need new method to find operation
     For Each ds As atcDataSource In pDataManager.GetPlugins(GetType(atcDataSource))
       Dim lOperations As atcDataGroup = ds.AvailableOperations
       If lOperations.Count > 0 Then
         For Each lOperation As atcDataSet In lOperations
-          If lOperation.Attributes.GetValue("Name") = treeSources.SelectedNode.Text Then
+          If lOperation.Attributes.GetValue("Name") = lSelectedOperationName Then
             pSelectedSource = ds
             pSpecification = lOperation.Attributes.GetValue("Name")
           End If
         Next
-      ElseIf ds.Description = treeSources.SelectedNode.Text Then
+      ElseIf ds.Description = lSelectedOperationName Then
         pSelectedSource = ds
       End If
     Next
