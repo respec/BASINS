@@ -51,7 +51,7 @@ End Class
 
     dbg.Msg("atcDataSourceWdm:TestOpen")
     Assert.IsTrue(lWdm.Open(pWdmName))
-    dbg.Msg("                 Timeseries.Count:" & lWdm.Timeseries.Count)
+    dbg.Msg("                 Timeseries.Count:" & lWdm.DataSets.Count)
     dbg.Msg("                 Name:" & lWdm.Name)
     dbg.Msg("                 FileName:" & lWdm.FileName)
     lWdm = Nothing
@@ -63,8 +63,8 @@ End Class
 
     dbg.Msg("atcDataSourceWdm:TestAddTimeseries")
     lWdm.Open(pWdmName)
-    dbg.Msg("                 TestAddTimeseries:Count:" & lWdm.Timeseries.Count)
-    Assert.IsTrue(lWdm.AddTimeseries(lTimser))
+    dbg.Msg("                 TestAddTimeseries:Count:" & lWdm.DataSets.Count)
+    Assert.IsTrue(lWdm.AddDataSet(lTimser))
     lWdm = Nothing
   End Sub
 
