@@ -10,6 +10,7 @@ Public Class atcGrid
 
   Private pFont As Font = New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point)
 
+  Private pAllowHorizontalScrolling As Boolean = True
   Private pLineColor As Color
   Private pLineWidth As Single
   Private pCellBackColor As Color
@@ -182,6 +183,18 @@ Public Class atcGrid
     End Set
   End Property
 
+  Public Property AllowHorizontalScrolling() As Boolean
+    Get
+      Return pAllowHorizontalScrolling
+    End Get
+    Set(ByVal newValue As Boolean)
+      If newValue <> pAllowHorizontalScrolling Then
+        pAllowHorizontalScrolling = newValue
+        Me.Refresh()
+      End If
+    End Set
+  End Property
+
   Public Property LineColor() As Color
     Get
       Return pLineColor
@@ -275,28 +288,43 @@ Public Class atcGrid
       'Draw Column Lines
       pColRight = New ArrayList
       x = 0
-      If pLeftColumn = 0 Then HScroller.Visible = False
+      If pLeftColumn = 0 Then
+        HScroller.Visible = False
+      ElseIf Not AllowHorizontalScrolling Then
+        pLeftColumn = 0
+      End If
       For iColumn = pLeftColumn To lColumns - 1
         x += ColumnWidth(iColumn)
+        If iColumn = lColumns - 1 AndAlso Not AllowHorizontalScrolling AndAlso x <> visibleWidth Then
+          ColumnWidth(iColumn) += visibleWidth - x
+          x = visibleWidth
+          'RaiseEvent UserResizedColumn(iColumn, ColumnWidth(iColumn))
+        End If
+        If x > visibleWidth Then
+          If AllowHorizontalScrolling Then
+            visibleHeight -= HScroller.Height
+            If Not VScroller.Visible AndAlso y > visibleHeight Then
+              'TODO: add VScroll because last line got hidden by HScroll
+            End If
+            HScroller.Visible = True
+            If iColumn - pLeftColumn > 2 Then
+              HScroller.LargeChange = iColumn - pLeftColumn - 1
+            Else
+              HScroller.LargeChange = 1
+            End If
+            HScroller.Maximum = pSource.Columns '- HScroller.LargeChange + 1
+            Exit For
+          Else
+            x = visibleWidth
+          End If
+        End If
         g.DrawLine(lLinePen, x, 0, x, visibleHeight)
         pColRight.Add(x)
-        If x > visibleWidth Then
-          visibleHeight -= HScroller.Height
-          If Not VScroller.Visible AndAlso y > visibleHeight Then
-            'TODO: add VScroll because last line got hidden by HScroll
-          End If
-          HScroller.Visible = True
-          If iColumn - pLeftColumn > 2 Then
-            HScroller.LargeChange = iColumn - pLeftColumn - 1
-          Else
-            HScroller.LargeChange = 1
-          End If
-          HScroller.Maximum = pSource.Columns '- HScroller.LargeChange + 1
-          Exit For
-        End If
       Next
-      'Fill unused space right of rightmost column
-      g.FillRectangle(lOutsideBrush, x, 0, visibleWidth - x, visibleHeight)
+      If AllowHorizontalScrolling Then
+        'Fill unused space right of rightmost column
+        g.FillRectangle(lOutsideBrush, x, 0, visibleWidth - x, visibleHeight)
+      End If
 
       Dim lCellLeft As Single
       Dim lCellTop As Single = 0
@@ -411,14 +439,14 @@ Public Class atcGrid
         End If
         If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
       Case MouseButtons.Left
-        If pColumnDragging >= 0 Then
-          ColumnWidth(pColumnDragging) += (e.X - pColRight(pColumnDragging - pLeftColumn))
-          If ColumnWidth(pColumnDragging) < COL_TOLERANCE * 2 Then 'it got too small
-            ColumnWidth(pColumnDragging) = COL_TOLERANCE * 2       'enforce small minimun size
+          If pColumnDragging >= 0 Then
+            ColumnWidth(pColumnDragging) += (e.X - pColRight(pColumnDragging - pLeftColumn))
+            If ColumnWidth(pColumnDragging) < COL_TOLERANCE * 2 Then 'it got too small
+              ColumnWidth(pColumnDragging) = COL_TOLERANCE * 2       'enforce small minimun size
+            End If
+            RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
+            Refresh()
           End If
-          RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
-          Refresh()
-        End If
     End Select
   End Sub
 
@@ -442,7 +470,10 @@ Public Class atcGrid
     While lColumn < pColRight.Count
       'If within tolerance of column edge and column is not being hidden by a zero width
       If Math.Abs(X - pColRight(lColumn)) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
-        Return lColumn + pLeftColumn
+        'If we are not allowing horizontal scrolling, last column is not resizable
+        If AllowHorizontalScrolling OrElse lColumn < pColRight.Count - 1 Then
+          Return lColumn + pLeftColumn
+        End If
       End If
       lColumn += 1
     End While
