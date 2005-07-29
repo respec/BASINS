@@ -10,10 +10,10 @@ Friend Class frmSelectData
   Public Sub New()
     MyBase.New()
 
-    'This call is required by the Windows Form Designer.
     InitializeComponent()
 
-    'Add any initialization after the InitializeComponent() call
+    pMatchingGrid.AllowHorizontalScrolling = False
+    pSelectedGrid.AllowHorizontalScrolling = False
 
   End Sub
 
@@ -354,6 +354,7 @@ Friend Class frmSelectData
 
     PopulateMatching()
     pInitializing = False
+    UpdatedCriteria()
   End Sub
 
   Private Sub PopulateCriteriaCombos()
@@ -471,10 +472,6 @@ NextTS:
     End If
   End Sub
 
-  Private Sub btnAddAttribute_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-    AddCriteria()
-  End Sub
-
   Private Sub RemoveCriteria(ByVal cbo As Windows.Forms.ComboBox, ByVal lst As Windows.Forms.ListBox)
     Dim iRemoving As Integer = GetIndex(cbo.Name)
     Dim newLastCriteria As Integer = pcboCriteria.GetUpperBound(0) - 1
@@ -562,8 +559,6 @@ NextTS:
       '.Dock = Windows.Forms.DockStyle.Left
     End With
 
-    SizeCriteria()
-
     If iCriteria = 0 Then
       PopulateCriteriaCombos()
     Else 'populate from first combo box
@@ -591,6 +586,7 @@ NextName:
     End If
 
     UpdatedCriteria()
+    SizeCriteria()
   End Sub
 
   Private Sub panelCriteria_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles panelCriteria.SizeChanged
@@ -607,6 +603,13 @@ NextName:
       pcboCriteria(aCriteria).Left = pcboCriteria(aCriteria - 1).Left + pcboCriteria(aCriteria - 1).Width + PADDING
       plstCriteria(aCriteria).Left = pcboCriteria(aCriteria).Left
     End While
+
+    'Fit rightmost criteria to fill remaining space
+    Dim availableWidth As Integer = panelCriteria.Width - PADDING * 2
+    If pcboCriteria(iLastCriteria).Left < availableWidth Then
+      pcboCriteria(iLastCriteria).Width = availableWidth - pcboCriteria(iLastCriteria).Left
+      plstCriteria(iLastCriteria).Width = pcboCriteria(iLastCriteria).Width
+    End If
   End Sub
 
   Private Sub SizeCriteria()
@@ -624,7 +627,11 @@ NextName:
         For iCriteria As Integer = 0 To iLastCriteria
           pcboCriteria(iCriteria).Top = PADDING
           pcboCriteria(iCriteria).Left = curLeft
-          pcboCriteria(iCriteria).Width = availableWidth * pCriteriaFraction(iCriteria)
+          If iCriteria = iLastCriteria AndAlso curLeft < availableWidth Then 'Fit rightmost criteria to fill remaining space
+            pcboCriteria(iCriteria).Width = availableWidth - curLeft
+          Else
+            pcboCriteria(iCriteria).Width = availableWidth * pCriteriaFraction(iCriteria)
+          End If
           If pcboCriteria(iCriteria).Width > PADDING Then pcboCriteria(iCriteria).Width -= PADDING
 
           plstCriteria(iCriteria).Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING

@@ -35,13 +35,10 @@ Public Module modScript
 
   'refs() As String = {"System.dll", "Microsoft.VisualBasic.dll"}
   Public Function CompileScript(ByVal code As String, ByRef errors As String, ByVal refs() As String, Optional ByVal OutputFilename As String = "") As System.Reflection.Assembly
-    'Dim compiler As ICodeCompiler
-    'Dim params As CompilerParameters
-    'Dim results As CompilerResults
     Dim provider As Microsoft.VisualBasic.VBCodeProvider
-    Dim compiler As System.CodeDom.Compiler.ICodeCompiler
-    Dim params As System.CodeDom.Compiler.CompilerParameters
-    Dim results As System.CodeDom.Compiler.CompilerResults
+    Dim compiler As ICodeCompiler
+    Dim params As CompilerParameters
+    Dim results As CompilerResults
 
     params = New System.CodeDom.Compiler.CompilerParameters
     If OutputFilename.Length = 0 Then

@@ -134,7 +134,7 @@ Public Class frmDataSource
         If pCategories Is Nothing OrElse pCategories.Contains(lCategory) Then
           Dim lCategoryNode As TreeNode = FindOrCreateNode(treeSources.Nodes, lCategory)
           lCategoryNode.ExpandAll()
-          If lOperations.Count > 0 Then
+          If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
             For Each lOperation As atcDataSet In lOperations
               'Operations might have categories to further divide them
               Dim lSubCategory As String = lOperation.Attributes.GetValue("Category")
