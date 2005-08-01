@@ -10,10 +10,10 @@ Public Class atcGraphPlugin
     End Get
   End Property
 
-  Public Overrides Sub Show(ByVal aTimeseriesManager As atcData.atcDataManager, _
+  Public Overrides function Show(ByVal aTimeseriesManager As atcData.atcDataManager, _
                    Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
-    Dim gForm As New atcGraphForm(aTimeseriesManager, aTimeseriesGroup)
-  End Sub
+    Return New atcGraphForm(aTimeseriesManager, aTimeseriesGroup)
+  End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
     g_MapWin = MapWin

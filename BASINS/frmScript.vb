@@ -149,8 +149,8 @@ Public Class frmScript
 
       Case "Run"
         Dim args(0) As Object
-        args(0) = "Test Argument"
-        pBasinsPlugin.RunBasinsScript(txtScript.Text, args)
+        args(0) = "DataManager"
+        pBasinsPlugin.RunBasinsScript("vb", txtScript.Text, args) 'TODO: add UI to select language vb or cs
 
       Case "Plugin"
         Dim cdSave As New Windows.Forms.SaveFileDialog
@@ -169,7 +169,6 @@ Public Class frmScript
           End If
           assy = CompileScript(txtScript.Text, _
                         errors, _
-                        Split("System.dll,Microsoft.VisualBasic.dll,atcData.dll,atcUtility.dll,MapWinInterfaces.dll", ","), _
                         cdSave.FileName)
           If errors.Length = 0 Then
             'TODO: g_MapWin.Plugins.LoadFromObject() instead of AddFromFile

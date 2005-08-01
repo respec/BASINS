@@ -10,10 +10,10 @@ Public Class atcDebugTimserPlugin
     End Get
   End Property
 
-  Public Overrides Sub Show(ByVal aDataManager As atcData.atcDataManager, _
-                   Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
-    Dim lForm As New atcDebugTimserForm(aDataManager, aDataGroup)
-  End Sub
+  Public Overrides Function Show(ByVal aDataManager As atcData.atcDataManager, _
+                   Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
+    Return New atcDebugTimserForm(aDataManager, aDataGroup)
+  End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
     g_MapWin = MapWin

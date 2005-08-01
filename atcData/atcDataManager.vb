@@ -42,6 +42,16 @@ Public Class atcDataManager
     End Get
   End Property
 
+  Public Function DataSets() As ArrayList
+    Dim lAllData As New ArrayList
+    For Each source As atcDataSource In DataSources
+      For Each ts As atcDataSet In source.DataSets
+        lAllData.Add(ts)
+      Next
+    Next
+    Return lAllData
+  End Function
+
   'Names of attributes used for selection of Data in UI
   Public ReadOnly Property SelectionAttributes() As ArrayList
     Get
@@ -57,14 +67,14 @@ Public Class atcDataManager
   End Property
 
   'The currently loaded plugins that inherit the specified class; returns empty objects
-  Public Function GetPlugins(ByVal aBaseType As Type) As ICollection
-    Dim retval As New ArrayList
+  Public Function GetPlugins(ByVal aBaseType As Type) As atcCollection
+    Dim retval As New atcCollection
     Dim lastPlugIn As Integer = pMapWin.Plugins.Count() - 1
     For iPlugin As Integer = 0 To lastPlugIn
       Dim curPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
       If Not curPlugin Is Nothing Then
         If CType(curPlugin, Object).GetType().IsSubclassOf(aBaseType) Then
-          retval.Add(curPlugin)
+          retval.Add(curPlugin.Name, curPlugin)
         End If
       End If
     Next

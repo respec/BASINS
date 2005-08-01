@@ -10,11 +10,12 @@ Public Class atcListPlugin
     End Get
   End Property
 
-  Public Overrides Sub Show(ByVal aManager As atcData.atcDataManager, _
+  Public Overrides Function Show(ByVal aManager As atcData.atcDataManager, _
                    Optional ByVal aGroup As atcData.atcDataGroup = Nothing)
     Dim lForm As New atcListForm
     lForm.Initialize(aManager, aGroup)
-  End Sub
+    Return lForm
+  End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
     g_MapWin = MapWin
