@@ -103,8 +103,8 @@ Public Class atcGraphForm
       InitMasterPane()
 
       Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-      For Each atf As atcDataDisplay In DisplayPlugins
-        mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+      For Each lDisp As atcDataDisplay In DisplayPlugins
+        mnuAnalysis.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
       Next
 
     Else 'use declined to specify Data
@@ -128,7 +128,7 @@ Public Class atcGraphForm
   Friend WithEvents mnuEditCurves As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditFont As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
-  Friend WithEvents zgc As ZedGraph.ZedGraphControl
+  Public WithEvents zgc As ZedGraph.ZedGraphControl
   Friend WithEvents mnuEditY As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditX As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditY2 As System.Windows.Forms.MenuItem
@@ -423,9 +423,9 @@ Public Class atcGraphForm
   Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
     Dim newDisplay As atcDataDisplay
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each atf As atcDataDisplay In DisplayPlugins
-      If atf.Name = sender.Text Then
-        Dim typ As System.Type = atf.GetType()
+    For Each lDisp As atcDataDisplay In DisplayPlugins
+      If lDisp.Name = sender.Text Then
+        Dim typ As System.Type = lDisp.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         newDisplay = asm.CreateInstance(typ.FullName)
         newDisplay.Show(pDataManager, pDataGroup)

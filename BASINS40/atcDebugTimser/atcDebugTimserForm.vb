@@ -19,8 +19,8 @@ Friend Class atcDebugTimserForm
     InitializeComponent() 'required by Windows Form Designer
 
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each atf As atcDataDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(atf.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    For Each ldisp As atcDataDisplay In DisplayPlugins
+      mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some Data
@@ -196,9 +196,9 @@ Friend Class atcDebugTimserForm
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
     Dim newDisplay As atcDataDisplay
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each atf As atcDataDisplay In DisplayPlugins
-      If atf.Name = sender.Text Then
-        Dim typ As System.Type = atf.GetType()
+    For Each ldisp As atcDataDisplay In DisplayPlugins
+      If ldisp.Name = sender.Text Then
+        Dim typ As System.Type = ldisp.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         newDisplay = asm.CreateInstance(typ.FullName)
         newDisplay.Show(pDataManager, pDataGroup)

@@ -204,6 +204,19 @@ Public Class atcTimeseriesMath
           .TypeString = "Double"
         End With
 
+        Dim defDate As New atcAttributeDefinition
+        With defDate
+          .Name = "Date"
+          .Description = "Date"
+          .DefaultValue = ""
+          .Editable = True
+          .TypeString = "Date"
+        End With
+        Dim defStartDate As atcAttributeDefinition = defDate.Clone
+        Dim defEndDate As atcAttributeDefinition = defDate.Clone
+        defStartDate.Name = "Start Date"
+        defEndDate.Name = "End Date"
+
         Dim defNumDays As New atcAttributeDefinition
         With defNumDays
           .Name = "Number of Days"
@@ -315,6 +328,15 @@ Public Class atcTimeseriesMath
         lData.Attributes.SetValue(defDesc, "Fahrenheit to Celsius")
         lData.Attributes.SetValue(defCategory, "Unit Conversion")
         lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
+        pAvailableTimeseriesOperations.Add(lData)
+
+        lData = New atcDataSet
+        lData.Attributes.SetValue(defName, "Subset by date")
+        lData.Attributes.SetValue(defDesc, "Choose start and end dates")
+        lData.Attributes.SetValue(defCategory, "Date")
+        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
+        lData.Attributes.SetValue(defStartDate, "")
+        lData.Attributes.SetValue(defEndDate, "")
         pAvailableTimeseriesOperations.Add(lData)
 
       End If
@@ -532,6 +554,15 @@ Public Class atcTimeseriesMath
         For iValue = 0 To lastValueIndex
           newVals(iValue) = (newVals(iValue) - 32) * 5 / 9
         Next
+      Case "subset by date"
+        If aArgs.ContainsAttribute("Start Date") AndAlso Not aArgs.GetValue("Start Date") Is Nothing _
+        AndAlso aArgs.ContainsAttribute("End Date") AndAlso Not aArgs.GetValue("End Date") Is Nothing Then
+          Dim StartDate As Double = aArgs.GetValue("Start Date")
+          Dim EndDate As Double = aArgs.GetValue("End Date")
+          AddDataSet(SubsetByDate(firstTS, StartDate, EndDate))
+        End If
+        ReDim newVals(-1) 'Don't create new timeseries below
+
         '  '      Case "running sum"
         '  '        valNum = 1
         '  '        GoSub SetCurArgVal
@@ -593,6 +624,42 @@ Public Class atcTimeseriesMath
     t.Attributes.SetValue("Data Source", Specification)
     t.Attributes.SetValue("History " & iHistory, Specification)
     MyBase.AddDataSet(t)
+  End Function
+
+  Private Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
+                                ByVal aStartDate As Double, _
+                                ByVal aEndDate As Double) As atcTimeseries
+    'TODO: boundary conditions...
+    Dim iStart As Integer = 0
+    Dim iEnd As Integer = aTimeseries.numValues
+    Dim numNewValues As Integer = iEnd + 1
+
+    While iStart < iEnd AndAlso aTimeseries.Dates.Value(iStart) < aStartDate
+      iStart += 1
+    End While
+
+    While iEnd > iStart AndAlso aTimeseries.Dates.Value(iEnd) > aEndDate
+      iEnd -= 1
+    End While
+
+    numNewValues = iEnd - iStart + 1
+    Dim newValues() As Double
+    ReDim newValues(numNewValues)
+    System.Array.Copy(aTimeseries.Values, iStart, newValues, 0, numNewValues + 1)
+
+    Dim newDates() As Double
+    ReDim newDates(numNewValues)
+    System.Array.Copy(aTimeseries.Dates.Values, iStart, newDates, 0, numNewValues + 1)
+    Dim lnewTS As New atcTimeseries(Me)
+    lnewTS.Dates = New atcTimeseries(Me)
+    lnewTS.Values = newValues
+    lnewTS.Dates.Values = newDates
+
+    lnewTS.Attributes.ChangeTo(aTimeseries.Attributes)
+    'TODO: recalculate computed attributes
+
+    lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
+    Return lnewTS
   End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)

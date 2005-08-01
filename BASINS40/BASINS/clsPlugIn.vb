@@ -146,8 +146,8 @@ Public Class PlugIn
       If DisplayPlugins.Count > 0 Then
         mnu = .AddMenu(ToolsMenuName & "_Separator1", ToolsMenuName, Nothing, "-")
       End If
-      For Each atf As atcDataDisplay In DisplayPlugins
-        mnu = .AddMenu(ToolsMenuName & "_" & atf.Name, ToolsMenuName, Nothing, atf.Name)
+      For Each lDisp As atcDataDisplay In DisplayPlugins
+        mnu = .AddMenu(ToolsMenuName & "_" & lDisp.Name, ToolsMenuName, Nothing, lDisp.Name)
       Next
     End With
   End Sub
@@ -429,7 +429,7 @@ Public Class PlugIn
     Select Case ToolName
       'Case "TestDBF"
       '  TestDBF()
-      Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
+    Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
       Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
       Case "HSPF"
         'If g_MapWin.Plugins.PluginIsLoaded("atcModelSetup_PlugIn") Then 'defer to other plugin
@@ -437,35 +437,43 @@ Public Class PlugIn
         'End If
         'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
       Case "RunScript"
+        atcScriptTest.Main(pDataManager)
         exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
         If FileExists(exename) Then
-          RunBasinsScript(WholeFileString(exename), cmdLine.Split(","))
+          Dim args() As Object
+          If cmdLine.Length > 0 Then
+            args = cmdLine.Split(",")
+          Else
+            ReDim args(0)
+            args(0) = "DataManager"
+          End If
+          RunBasinsScript(FileExt(exename), WholeFileString(exename), args)
           Return True
         Else
           LogMsg("Unable to find script " & exename, "Launch")
           Return False
         End If
       Case "OpenScript"
-        Dim lfrm As New frmScript
-        lfrm.BasinsPlugin = Me
-        lfrm.Show()
-        Return True
+          Dim lfrm As New frmScript
+          lfrm.BasinsPlugin = Me
+          lfrm.Show()
+          Return True
       Case Else 'Search for plugin to launch
-        'Dim g As New atcGraphPlugin
-        'g.Show(pDataManager)
-        'Return True
+          'Dim g As New atcGraphPlugin
+          'g.Show(pDataManager)
+          'Return True
 
-        Dim newDisplay As atcDataDisplay
-        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-        For Each atf As atcDataDisplay In DisplayPlugins
-          If atf.Name = ToolName Then
-            Dim typ As System.Type = atf.GetType()
-            Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-            newDisplay = asm.CreateInstance(typ.FullName)
-            newDisplay.Show(pDataManager)
-            Return True
-          End If
-        Next
+          Dim newDisplay As atcDataDisplay
+          Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+          For Each lDisp As atcDataDisplay In DisplayPlugins
+            If lDisp.Name = ToolName Then
+              Dim typ As System.Type = lDisp.GetType()
+              Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+              newDisplay = asm.CreateInstance(typ.FullName)
+              newDisplay.Show(pDataManager)
+              Return True
+            End If
+          Next
     End Select
 
     If FileExists(exename) Then
@@ -480,24 +488,40 @@ Public Class PlugIn
     End If
   End Function
 
-  Public Function RunBasinsScript(ByVal aScript As String, _
-                                  ByVal args() As Object, _
-                         Optional ByVal refs As String = "System.dll,Microsoft.VisualBasic.dll,atcData.dll") As Object
+  Public Function RunBasinsScript(ByVal aLanguage As String, _
+                                  ByVal aScript As String, _
+                                  ByVal args() As Object) As Object
+    '                         Optional ByVal refs As String = "System.dll,Microsoft.VisualBasic.dll,atcData.dll"
 
     'Replace some text arguments with objects
-    For iArg As Integer = 0 To args.GetUpperBound(0)
-      If args(iArg).GetType Is GetType(String) Then
-        Select Case args(iArg).ToLower
-          Case "timeseriesmanager" : args(iArg) = pDataManager
-          Case "basinsplugin" : args(iArg) = Me
-          Case "mapwin" : args(iArg) = g_MapWin
-        End Select
-      End If
-    Next
-
-    RunScript(aScript, refs.Split(","), args)
+    If Not args Is Nothing Then
+      For iArg As Integer = 0 To args.GetUpperBound(0)
+        If args(iArg).GetType Is GetType(String) Then
+          Select Case args(iArg).ToLower
+            Case "datamanager" : args(iArg) = pDataManager
+            Case "basinsplugin" : args(iArg) = Me
+            Case "mapwin" : args(iArg) = g_MapWin
+          End Select
+        End If
+      Next
+    End If
+    'RunScript(aScript, refs.Split(","), args)
+    RunScript(aLanguage, aScript, args, MakeScriptName)
 
   End Function
+
+  Private Function MakeScriptName() As String
+    Dim tryName As String
+    Dim iTry As Integer = 0
+
+    Do
+      tryName = g_MapWin.Plugins.PluginFolder & System.IO.Path.DirectorySeparatorChar _
+                          & "RemoveMe-Script-" & iTry & ".dll"
+      iTry += 1
+    Loop While FileExists(tryName)
+    Return tryName
+  End Function
+
 
   'Public Sub CompilePlugin(ByVal aScript As String, _
   '                         ByRef aErrors As String, _

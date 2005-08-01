@@ -2,29 +2,30 @@ Imports System.CodeDom.Compiler
 Imports System.Reflection
 
 Public Module modScript
-
-  Public Function RunScript(ByVal code As String, ByVal refs() As String, ByVal args() As Object) As Object
+  ', ByVal refs() As String
+  Public Function RunScript(ByVal language As String, ByVal code As String, ByVal args() As Object, ByVal aFilename As String) As Object
     Dim errors As String
     Dim assy As System.Reflection.Assembly
     Dim instance As Object
     Dim assyTypes As Type() 'list of items within the assembly
 
-    Dim ClassName As String = "Sample"      'TODO: get by reflection?
-    Dim MethodName As String = "ScriptMain" 'TODO: decide on entry point name
+    Dim MethodName As String = "Main" 'TODO: decide on entry point name
 
     'First compile the code into an assembly
-    assy = CompileScript(code, errors, refs)
+    assy = CompileScript(language, code, errors, aFilename)
 
     If errors Is Nothing Then
       assyTypes = assy.GetTypes()
       For Each typ As Type In assyTypes
         Dim scriptMethodInfo As MethodInfo = typ.GetMethod(MethodName)
         If Not scriptMethodInfo Is Nothing Then
-          Return typ.InvokeMember(MethodName, _
-             BindingFlags.InvokeMethod Or _
-             BindingFlags.Public Or _
-             BindingFlags.Static, _
-             Nothing, Nothing, args)
+          Return scriptMethodInfo.Invoke(Nothing, args) 'assy.CreateInstance(typ.Name)
+
+          'Return typ.InvokeMember(MethodName, _
+          '   BindingFlags.InvokeMethod Or _
+          '   BindingFlags.Public Or _
+          '   BindingFlags.Static, _
+          '   Nothing, Nothing, args)
         End If
       Next
       Return "RunScript: '" & MethodName & "' not found"
@@ -34,11 +35,23 @@ Public Module modScript
   End Function
 
   'refs() As String = {"System.dll", "Microsoft.VisualBasic.dll"}
-  Public Function CompileScript(ByVal code As String, ByRef errors As String, ByVal refs() As String, Optional ByVal OutputFilename As String = "") As System.Reflection.Assembly
-    Dim provider As Microsoft.VisualBasic.VBCodeProvider
+  ', ByVal refs() As String
+
+  'language = "vb" or "cs" or "js"
+  Public Function CompileScript(ByVal language As String, _
+                                ByVal code As String, _
+                                ByRef errors As String, _
+                       Optional ByVal OutputFilename As String = "") As System.Reflection.Assembly
     Dim compiler As ICodeCompiler
     Dim params As CompilerParameters
     Dim results As CompilerResults
+    Dim provider As CodeDomProvider
+    Select Case (language)
+      Case "cs" : provider = New Microsoft.CSharp.CSharpCodeProvider
+      Case "js" : provider = Activator.CreateInstance("Microsoft.JScript", "Microsoft.JScript.JScriptCodeProvider").Unwrap()
+      Case "vb" : provider = New Microsoft.VisualBasic.VBCodeProvider
+      Case Else : provider = New Microsoft.VisualBasic.VBCodeProvider
+    End Select
 
     params = New System.CodeDom.Compiler.CompilerParameters
     If OutputFilename.Length = 0 Then
@@ -48,7 +61,11 @@ Public Module modScript
     End If
     params.TreatWarningsAsErrors = False
     params.WarningLevel = 4
-    params.ReferencedAssemblies.AddRange(refs)
+    'params.ReferencedAssemblies.AddRange(refs)
+
+    For Each refAssy As System.Reflection.Assembly In AppDomain.CurrentDomain.GetAssemblies()
+      params.ReferencedAssemblies.Add(refAssy.Location)
+    Next
 
     Try
       provider = New Microsoft.VisualBasic.VBCodeProvider

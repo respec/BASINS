@@ -120,9 +120,8 @@ Public Class frmDataSource
 
   Private Sub Populate(ByRef aNeedToOpen As Boolean, _
                        ByRef aNeedToSave As Boolean)
-    Dim lDataSources As ICollection = pDataManager.GetPlugins(GetType(atcDataSource))
     Dim lNode As TreeNode
-
+    Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
     For Each ds As atcDataSource In lDataSources
       If (Not aNeedToOpen OrElse ds.CanOpen) AndAlso _
          (Not aNeedToSave OrElse ds.CanSave) Then

@@ -104,10 +104,10 @@ Friend Class atcListForm
       pDataGroup = aTimeseriesGroup
     End If
 
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
     mnuAnalysis.MenuItems.Clear()
-    For Each displayer As atcDataDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(displayer.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each lDisp As atcDataDisplay In DisplayPlugins
+      mnuAnalysis.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
