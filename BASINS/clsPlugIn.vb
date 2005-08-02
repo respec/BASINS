@@ -74,7 +74,7 @@ Public Class PlugIn
     End Get
   End Property
 
-  Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+  Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
     'fired when the user loads plug-in through plug-in dialog 
     'or by checkmarking it in the plug-ins menu.
     'This is where buttons or menu items are added.
@@ -84,6 +84,7 @@ Public Class PlugIn
     Dim mnu As MapWindow.Interfaces.MenuItem
 
     g_MapWin = aMapWin
+    g_MapWinWindowHandle = aParentHandle
 
     pDataManager = New atcDataManager(g_MapWin, Me)
     FindBasinsDrives()
@@ -437,7 +438,6 @@ Public Class PlugIn
         'End If
         'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
       Case "RunScript"
-        atcScriptTest.Main(pDataManager)
         exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
         If FileExists(exename) Then
           Dim args() As Object
@@ -454,26 +454,22 @@ Public Class PlugIn
           Return False
         End If
       Case "OpenScript"
-          Dim lfrm As New frmScript
-          lfrm.BasinsPlugin = Me
-          lfrm.Show()
-          Return True
+        Dim lfrm As New frmScript
+        lfrm.BasinsPlugin = Me
+        lfrm.Show()
+        Return True
       Case Else 'Search for plugin to launch
-          'Dim g As New atcGraphPlugin
-          'g.Show(pDataManager)
-          'Return True
-
-          Dim newDisplay As atcDataDisplay
-          Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-          For Each lDisp As atcDataDisplay In DisplayPlugins
-            If lDisp.Name = ToolName Then
-              Dim typ As System.Type = lDisp.GetType()
-              Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-              newDisplay = asm.CreateInstance(typ.FullName)
-              newDisplay.Show(pDataManager)
-              Return True
-            End If
-          Next
+        Dim newDisplay As atcDataDisplay
+        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        For Each lDisp As atcDataDisplay In DisplayPlugins
+          If lDisp.Name = ToolName Then
+            Dim typ As System.Type = lDisp.GetType()
+            Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+            newDisplay = asm.CreateInstance(typ.FullName)
+            newDisplay.Show(pDataManager)
+            Return True
+          End If
+        Next
     End Select
 
     If FileExists(exename) Then
