@@ -346,9 +346,9 @@ Public Class PlugIn
   End Property
 
   Private Sub pDataManager_OpenedData(ByVal aFile As atcData.atcDataSource) Handles pDataManager.OpenedData
-    Dim s As String
+    'Dim s As String
     Dim i As Integer
-    Dim lDebugFile As String = "c:\test\BASINS4\wdmFileDump.txt"
+    'Dim lDebugFile As String = "c:\test\BASINS4\wdmFileDump.txt"
     Dim lAttributeDetailsShow As Boolean
     Dim lNvals As Integer
     Dim lDataset As atcTimeseries
@@ -358,8 +358,8 @@ Public Class PlugIn
 
     g_MapWin.StatusBar.ProgressBarValue = 50
 
-    s = aFile.Specification & " contains " & aFile.DataSets.Count() & " datasets" & vbCrLf & vbCrLf
-    SaveFileString(lDebugFile, s)
+    's = aFile.Specification & " contains " & aFile.DataSets.Count() & " datasets" & vbCrLf & vbCrLf
+    'SaveFileString(lDebugFile, s)
 
     'lAttributeDetailsShow = True
     'For Each lDataset In aFile.Timeseries
@@ -518,8 +518,8 @@ Public Class PlugIn
     Dim iTry As Integer = 0
 
     Do
-      tryName = g_MapWin.Plugins.PluginFolder & System.IO.Path.DirectorySeparatorChar _
-                          & "RemoveMe-Script-" & iTry & ".dll"
+      tryName = g_MapWin.Plugins.PluginFolder & _
+                "\Basins\RemoveMe-Script-" & iTry & ".dll"
       iTry += 1
     Loop While FileExists(tryName)
     Return tryName
@@ -619,6 +619,7 @@ Public Class PlugIn
       'End If
     ElseIf msg.StartsWith("basins") Then
       If msg.Substring(7).StartsWith("script") Then
+        ChDriveDir(PathNameOnly(msg.Substring(14))) 'start where script is
         Dim errors As String
         Dim args() As Object = {"dataManager", "basinsplugin"}
         RunBasinsScript("vb", WholeFileString(msg.Substring(14)), errors, args)
