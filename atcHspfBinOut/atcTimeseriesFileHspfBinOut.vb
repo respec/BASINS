@@ -9,7 +9,7 @@ Public Class atcTimeseriesFileHspfBinOut
   '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
   Private pFileFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
-  Private pName As String = "HSPF Binary Output"
+  Private pName As String = "Timeseries::HSPF Binary Output"
   Private pErrorDescription As String
   Private pMonitor As Object
   Private pMonitorSet As Boolean = False

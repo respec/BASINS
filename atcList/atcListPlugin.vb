@@ -6,7 +6,7 @@ Public Class atcListPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "List"
+      Return "Tools::List"
     End Get
   End Property
 

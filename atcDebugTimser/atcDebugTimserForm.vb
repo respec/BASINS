@@ -2,7 +2,7 @@ Imports System.Windows.Forms
 Imports atcData
 Imports atcUtility
 
-Friend Class atcDebugTimserForm
+Public Class atcDebugTimserForm
   Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -51,50 +51,79 @@ Friend Class atcDebugTimserForm
   'NOTE: The following procedure is required by the Windows Form Designer
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
-  Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
-  Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuView As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuExpand As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuCollapse As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuDefault As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuMain As System.Windows.Forms.MainMenu
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDebugTimserForm))
-    Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
+    Me.mnuView = New System.Windows.Forms.MenuItem
+    Me.mnuExpand = New System.Windows.Forms.MenuItem
+    Me.mnuCollapse = New System.Windows.Forms.MenuItem
+    Me.mnuDefault = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-    '
-    'MainMenu1
-    '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAnalysis})
+    Me.mnuMain = New System.Windows.Forms.MainMenu
     '
     'mnuFile
     '
     Me.mnuFile.Index = 0
     Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuFileSave})
-    Me.mnuFile.Text = "File"
+    Me.mnuFile.Text = "&File"
     '
     'mnuFileAdd
     '
     Me.mnuFileAdd.Index = 0
-    Me.mnuFileAdd.Text = "Add Data"
+    Me.mnuFileAdd.Text = "&Add Data"
     '
     'mnuFileSave
     '
     Me.mnuFileSave.Index = 1
-    Me.mnuFileSave.Text = "Save"
+    Me.mnuFileSave.Text = "&Save"
+    '
+    'mnuView
+    '
+    Me.mnuView.Index = 1
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuExpand, Me.mnuCollapse, Me.mnuDefault})
+    Me.mnuView.Text = "&View"
+    '
+    'mnuExpand
+    '
+    Me.mnuExpand.Index = 0
+    Me.mnuExpand.Text = "&Expand"
+    '
+    'mnuCollapse
+    '
+    Me.mnuCollapse.Index = 1
+    Me.mnuCollapse.Text = "&Collapse"
+    '
+    'mnuDefault
+    '
+    Me.mnuDefault.Index = 2
+    Me.mnuDefault.Text = "&Default"
     '
     'mnuAnalysis
     '
-    Me.mnuAnalysis.Index = 1
-    Me.mnuAnalysis.Text = "Analysis"
+    Me.mnuAnalysis.Index = 2
+    Me.mnuAnalysis.Text = "&Analysis"
+    '
+    'mnuMain
+    '
+    Me.mnuMain.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
     '
     'atcDebugTimserForm
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
     Me.ClientSize = New System.Drawing.Size(633, 628)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-    Me.Menu = Me.MainMenu1
+    Me.Menu = Me.mnuMain
     Me.Name = "atcDebugTimserForm"
     Me.Text = "Data Debug"
 
@@ -103,12 +132,8 @@ Friend Class atcDebugTimserForm
 #End Region
 
   Private pDataManager As atcDataManager
-
-  'The tree control
-  Private WithEvents atrMain As TreeView
-
-  'The group of atcData displayed
-  Private WithEvents pDataGroup As atcDataGroup
+  Private WithEvents atrMain As TreeView   'tree control
+  Private WithEvents pDataGroup As atcDataGroup   'group of atcData displayed
 
   Private Sub PopulateTree()
     Dim lAttributeName As String
@@ -122,7 +147,6 @@ Friend Class atcDebugTimserForm
       Me.Controls.Remove(atrMain)
     End If
 
-    'memory leak if we don't clean out old tree?
     atrMain = New TreeView
     With atrMain
       .Location = New System.Drawing.Point(0, 0)
@@ -189,6 +213,61 @@ Friend Class atcDebugTimserForm
     End With
   End Sub
 
+  Public Sub Save(ByVal aFileName As String)
+    Dim lFileName As String = aFileName
+
+    If Len(lFileName) = 0 Then 'prompt user
+      Dim cdlg As New Windows.Forms.SaveFileDialog
+      With cdlg
+        .Title = "Select File to Save Into"
+        .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
+        .FilterIndex = 1
+        .DefaultExt = "txt"
+        If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+          lFileName = AbsolutePath(.FileName, CurDir)
+        Else 'Return empty string if user clicked Cancel
+          lFileName = ""
+        End If
+      End With
+    End If
+
+    If Len(lFileName) > 0 Then
+      Dim s As String
+      For i As Integer = 0 To atrMain.GetNodeCount(False) - 1
+        With atrMain.Nodes(i)
+          s &= .Text
+          If Not .IsExpanded And .GetNodeCount(False) > 0 Then
+            s &= " ..." & vbCrLf
+          Else
+            s &= vbCrLf
+            For j As Integer = 0 To .GetNodeCount(False) - 1
+              With .Nodes(j)
+                s &= vbTab & .Text
+                If Not .IsExpanded And .GetNodeCount(False) > 0 Then
+                  s &= " ..." & vbCrLf
+                Else
+                  s &= vbCrLf
+                  For k As Integer = 0 To .GetNodeCount(False) - 1
+                    s &= vbTab & vbTab & .Nodes(k).Text & vbCrLf
+                  Next
+                End If
+              End With
+            Next
+          End If
+        End With
+      Next
+      SaveFileString(lFileName, s)
+    End If
+  End Sub
+
+  Public Sub TreeAction(ByVal aAction As String)
+    Select Case aAction
+      Case "Expand" : atrMain.ExpandAll()
+      Case "Collapse" : atrMain.CollapseAll()
+      Case "Default" : PopulateTree()
+    End Select
+  End Sub
+
   Private Function GetIndex(ByVal aName As String) As Integer
     Return CInt(Mid(aName, InStr(aName, "#") + 1))
   End Function
@@ -196,6 +275,7 @@ Friend Class atcDebugTimserForm
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
     Dim newDisplay As atcDataDisplay
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+
     For Each ldisp As atcDataDisplay In DisplayPlugins
       If ldisp.Name = sender.Text Then
         Dim typ As System.Type = ldisp.GetType()
@@ -222,36 +302,18 @@ Friend Class atcDebugTimserForm
   End Sub
 
   Private Sub mnuFileSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
-    Dim lFileName As String
-    Dim cdlg As New Windows.Forms.SaveFileDialog
-    With cdlg
-      .Title = "Select File to Save Into"
-      .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
-      .FilterIndex = 1
-      .DefaultExt = "txt"
-      If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-        lFileName = AbsolutePath(.FileName, CurDir)
-      Else 'Return empty string if user clicked Cancel
-        lFileName = ""
-      End If
-    End With
+    Save("")
+  End Sub
 
-    If Len(lFileName) > 0 Then
-      Dim s As String
-      For i As Integer = 0 To atrMain.GetNodeCount(False) - 1
-        With atrMain.Nodes(i)
-          s = s & .Text & vbCrLf
-          For j As Integer = 0 To .GetNodeCount(False) - 1
-            With .Nodes(j)
-              s = s & vbTab & .Text & vbCrLf
-              For k As Integer = 0 To .GetNodeCount(False) - 1
-                s = s & vbTab & vbTab & .Nodes(k).Text & vbCrLf
-              Next
-            End With
-          Next
-        End With
-      Next
-      SaveFileString(lFileName, s)
-    End If
+  Private Sub mnuCollapse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCollapse.Click
+    TreeAction("Collapse")
+  End Sub
+
+  Private Sub mnuExpand_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuExpand.Click
+    TreeAction("Expand")
+  End Sub
+
+  Private Sub mnuDefault_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuDefault.Click
+    TreeAction("Default")
   End Sub
 End Class

@@ -6,7 +6,7 @@ Public Class atcTimeseriesMath
   Inherits atcDataSource
   Private pAvailableStatistics As Hashtable
   Private pAvailableTimeseriesOperations As atcDataGroup
-  Private Const pName As String = "Timeseries Math"
+  Private Const pName As String = "Timeseries::Math"
 
   Private pControls As Control.ControlCollection
   Private cboTimeseries As System.Windows.Forms.ComboBox

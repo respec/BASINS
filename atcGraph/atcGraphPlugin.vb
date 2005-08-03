@@ -6,7 +6,7 @@ Public Class atcGraphPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Graph"
+      Return "Tools::Graph"
     End Get
   End Property
 
