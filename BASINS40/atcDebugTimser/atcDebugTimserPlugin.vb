@@ -6,7 +6,7 @@ Public Class atcDebugTimserPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "DebugTimser"
+      Return "Tools::DebugTimser"
     End Get
   End Property
 

@@ -816,7 +816,7 @@ Public Class atcDataSourceWDM
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "WDM"
+      Return "Timeseries::WDM"
     End Get
   End Property
 

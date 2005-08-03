@@ -37,6 +37,7 @@ Public Class frmDataSource
   Friend WithEvents btnCancel As System.Windows.Forms.Button
   Friend WithEvents btnOk As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDataSource))
     Me.treeSources = New System.Windows.Forms.TreeView
     Me.pnlButtons = New System.Windows.Forms.Panel
     Me.btnCancel = New System.Windows.Forms.Button
@@ -53,7 +54,7 @@ Public Class frmDataSource
     Me.treeSources.Location = New System.Drawing.Point(0, 0)
     Me.treeSources.Name = "treeSources"
     Me.treeSources.SelectedImageIndex = -1
-    Me.treeSources.Size = New System.Drawing.Size(296, 500)
+    Me.treeSources.Size = New System.Drawing.Size(355, 577)
     Me.treeSources.TabIndex = 0
     '
     'pnlButtons
@@ -61,33 +62,34 @@ Public Class frmDataSource
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.pnlButtons.Location = New System.Drawing.Point(0, 493)
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 568)
     Me.pnlButtons.Name = "pnlButtons"
-    Me.pnlButtons.Size = New System.Drawing.Size(296, 40)
+    Me.pnlButtons.Size = New System.Drawing.Size(355, 46)
     Me.pnlButtons.TabIndex = 13
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(104, 8)
+    Me.btnCancel.Location = New System.Drawing.Point(125, 9)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(80, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(96, 28)
     Me.btnCancel.TabIndex = 4
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(8, 8)
+    Me.btnOk.Location = New System.Drawing.Point(10, 9)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(80, 24)
+    Me.btnOk.Size = New System.Drawing.Size(96, 28)
     Me.btnOk.TabIndex = 3
     Me.btnOk.Text = "Ok"
     '
     'frmDataSource
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(296, 533)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(355, 614)
     Me.Controls.Add(Me.pnlButtons)
     Me.Controls.Add(Me.treeSources)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDataSource"
     Me.Text = "Select a Data Source"
     Me.pnlButtons.ResumeLayout(False)

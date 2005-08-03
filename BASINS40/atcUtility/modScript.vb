@@ -2,9 +2,11 @@ Imports System.CodeDom.Compiler
 Imports System.Reflection
 
 Public Module modScript
-  ', ByVal refs() As String
-  Public Function RunScript(ByVal language As String, ByVal code As String, ByVal args() As Object, ByVal aFilename As String) As Object
-    Dim errors As String
+  Public Function RunScript(ByVal language As String, _
+                            ByVal code As String, _
+                            ByRef errors As String, _
+                            ByVal args() As Object, _
+                            ByVal aFilename As String) As Object
     Dim assy As System.Reflection.Assembly
     Dim instance As Object
     Dim assyTypes As Type() 'list of items within the assembly
@@ -20,22 +22,11 @@ Public Module modScript
         Dim scriptMethodInfo As MethodInfo = typ.GetMethod(MethodName)
         If Not scriptMethodInfo Is Nothing Then
           Return scriptMethodInfo.Invoke(Nothing, args) 'assy.CreateInstance(typ.Name)
-
-          'Return typ.InvokeMember(MethodName, _
-          '   BindingFlags.InvokeMethod Or _
-          '   BindingFlags.Public Or _
-          '   BindingFlags.Static, _
-          '   Nothing, Nothing, args)
         End If
       Next
-      Return "RunScript: '" & MethodName & "' not found"
-    Else
-      Debug.WriteLine("Compile errors: " & vbCr & errors)
+      errors = "RunScript: '" & MethodName & "' not found"
     End If
   End Function
-
-  'refs() As String = {"System.dll", "Microsoft.VisualBasic.dll"}
-  ', ByVal refs() As String
 
   'language = "vb" or "cs" or "js"
   Public Function CompileScript(ByVal language As String, _
@@ -77,7 +68,7 @@ Public Module modScript
         For Each err As CompilerError In results.Errors
           errors &= (String.Format( _
               "Line {0}, Col {1}: Error {2} - {3}", _
-              err.Line, err.Column, err.ErrorNumber, err.ErrorText))
+              err.Line, err.Column, err.ErrorNumber, err.ErrorText)) & vbCrLf
         Next
       End If
     Catch ex As Exception

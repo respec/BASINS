@@ -4,13 +4,15 @@ Public Class frmScript
   Inherits System.Windows.Forms.Form
 
   Private pBasinsPlugin As PlugIn
-  Private pDefaultScript = "Imports Microsoft.VisualBasic" & vbCrLf _
-                       & "Public Class Sample" & vbCrLf _
-                       & "  Public Shared Function ScriptMain(ByVal Arg As String) As String" & vbCrLf _
-                       & "    MsgBox(""Hello!"", MsgBoxStyle.Exclamation, ""Message Title"")" & vbCrLf _
-                       & "    Return Arg.ToUpper()" & vbCrLf _
-                       & "  End Function" & vbCrLf _
-                       & "End Class"
+  Private pDefaultScript = "Imports atcData" & vbCrLf _
+                         & "Imports System.Windows.Forms" & vbCrLf _
+                         & "Imports Microsoft.VisualBasic" & vbCrLf _
+                         & vbCrLf _
+                         & "Public Module Dummy" & vbCrLf _
+                         & "  Public Sub Main(ByVal aDataManager As atcDataManager, ByVal aBasinsPlugIn As Object)" & vbCrLf _
+                         & "    MsgBox(""Running Script"")" & vbCrLf _
+                         & "  End Sub" & vbCrLf _
+                         & "End Module"
   Private pFilter As String = "VB.net (*.vb)|*.vb|All files|*.*"
   Private pFileName As String = ""
 
@@ -51,6 +53,7 @@ Public Class frmScript
   Friend WithEvents tbbNew As System.Windows.Forms.ToolBarButton
   Friend WithEvents tbbCompile As System.Windows.Forms.ToolBarButton
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmScript))
     Me.txtScript = New System.Windows.Forms.RichTextBox
     Me.tools = New System.Windows.Forms.ToolBar
     Me.tbbNew = New System.Windows.Forms.ToolBarButton
@@ -67,9 +70,9 @@ Public Class frmScript
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtScript.Font = New System.Drawing.Font("Courier New", 10.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtScript.Location = New System.Drawing.Point(8, 48)
+    Me.txtScript.Location = New System.Drawing.Point(10, 55)
     Me.txtScript.Name = "txtScript"
-    Me.txtScript.Size = New System.Drawing.Size(400, 280)
+    Me.txtScript.Size = New System.Drawing.Size(480, 323)
     Me.txtScript.TabIndex = 0
     Me.txtScript.Text = "RichTextBox1"
     '
@@ -83,7 +86,7 @@ Public Class frmScript
     Me.tools.Location = New System.Drawing.Point(0, 0)
     Me.tools.Name = "tools"
     Me.tools.ShowToolTips = True
-    Me.tools.Size = New System.Drawing.Size(412, 42)
+    Me.tools.Size = New System.Drawing.Size(494, 45)
     Me.tools.TabIndex = 1
     '
     'tbbNew
@@ -113,10 +116,11 @@ Public Class frmScript
     '
     'frmScript
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(416, 333)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(499, 384)
     Me.Controls.Add(Me.tools)
     Me.Controls.Add(Me.txtScript)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmScript"
     Me.Text = "frmScript"
     Me.ResumeLayout(False)
@@ -129,6 +133,7 @@ Public Class frmScript
     Select Case e.Button.Text
       Case "New"
         txtScript.Text = pDefaultScript
+
       Case "Open"
         Dim cdOpen As New Windows.Forms.OpenFileDialog
         cdOpen.Filter = pFilter
@@ -148,10 +153,14 @@ Public Class frmScript
         End If
 
       Case "Run"
-        Dim args(0) As Object
+        Dim errors As String
+        Dim args(1) As Object
         args(0) = "DataManager"
-        pBasinsPlugin.RunBasinsScript("vb", txtScript.Text, args) 'TODO: add UI to select language vb or cs
-
+        args(1) = "BasinsPlugIn"
+        pBasinsPlugin.RunBasinsScript("vb", txtScript.Text, errors, args) 'TODO: add UI to select language vb or cs
+        If Not errors Is Nothing Then
+          MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+        End If
       Case "Plugin"
         Dim cdSave As New Windows.Forms.SaveFileDialog
         Dim pluginName As String = System.IO.Path.GetFileNameWithoutExtension(pFileName)
@@ -181,7 +190,7 @@ Public Class frmScript
               End If
             End If
           Else
-            MsgBox(errors, , "Compile errors")
+            MsgBox(errors, MsgBoxStyle.Exclamation, "Script error")
           End If
         End If
     End Select

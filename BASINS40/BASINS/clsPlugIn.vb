@@ -1,12 +1,10 @@
 Imports System.Collections.Specialized
 Imports System.Windows.Forms.Application
 Imports atcGraph
-'Imports atcGraphWindow
 Imports atcUtility
 Imports atcData
 
 Public Class PlugIn
-  'Inherits MapWindow.basicPlugin
   Implements MapWindow.Interfaces.IPlugin
 
   Private Const NationalProjectFilename = "national.mwprj"
@@ -87,11 +85,13 @@ Public Class PlugIn
     g_MapWinWindowHandle = aParentHandle
 
     pDataManager = New atcDataManager(g_MapWin, Me)
+
     FindBasinsDrives()
 
     'g_MapWin.Menus.AddMenu(NewProjectMenuName, "mnuFile", Nothing, NewProjectMenuString, "mnuNew")
     'g_MapWin.Menus.Remove("New")
     g_MapWin.Menus.AddMenu(ProjectsMenuName, "mnuFile", Nothing, ProjectsMenuString, "mnuRecentProjects")
+
     For iDrive = 0 To g_BasinsDrives.Length - 1
       DriveLetter = g_BasinsDrives.Substring(iDrive, 1)
       'Scan folder for project data, and populate menu
@@ -438,16 +438,23 @@ Public Class PlugIn
         'End If
         'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
       Case "RunScript"
+        'atcScriptTest.Main(pDataManager, Me)
+        'Exit Function
         exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
         If FileExists(exename) Then
+          Dim errors As String
           Dim args() As Object
           If cmdLine.Length > 0 Then
             args = cmdLine.Split(",")
           Else
-            ReDim args(0)
+            ReDim args(1)
             args(0) = "DataManager"
+            args(1) = "BasinsPlugIn"
           End If
-          RunBasinsScript(FileExt(exename), WholeFileString(exename), args)
+          RunBasinsScript(FileExt(exename), WholeFileString(exename), errors, args)
+          If Not errors Is Nothing Then
+            MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+          End If
           Return True
         Else
           LogMsg("Unable to find script " & exename, "Launch")
@@ -486,11 +493,11 @@ Public Class PlugIn
 
   Public Function RunBasinsScript(ByVal aLanguage As String, _
                                   ByVal aScript As String, _
-                                  ByVal args() As Object) As Object
-    '                         Optional ByVal refs As String = "System.dll,Microsoft.VisualBasic.dll,atcData.dll"
+                                  ByRef errors As String, _
+                                  ByVal args() As Object) _
+                                  As Object
 
-    'Replace some text arguments with objects
-    If Not args Is Nothing Then
+    If Not args Is Nothing Then 'replace some text arguments with objects
       For iArg As Integer = 0 To args.GetUpperBound(0)
         If args(iArg).GetType Is GetType(String) Then
           Select Case args(iArg).ToLower
@@ -501,8 +508,8 @@ Public Class PlugIn
         End If
       Next
     End If
-    'RunScript(aScript, refs.Split(","), args)
-    RunScript(aLanguage, aScript, args, MakeScriptName)
+
+    RunScript(aLanguage, aScript, errors, args, MakeScriptName)
 
   End Function
 
@@ -604,11 +611,21 @@ Public Class PlugIn
     'Plug-ins can communicate with eachother using Messages.  If a message is sent then this event fires.
     'If you know the message is "for you" then you can set Handled=True and then it will not be sent to any
     'other plug-ins.
+
     If msg.StartsWith("atcDataPlugin") Then
       Me.RefreshToolsMenu()
       'If msg.Substring(15).StartsWith("loading") Then
 
       'End If
+    ElseIf msg.StartsWith("basins") Then
+      If msg.Substring(7).StartsWith("script") Then
+        Dim errors As String
+        Dim args() As Object = {"dataManager", "basinsplugin"}
+        RunBasinsScript("vb", WholeFileString(msg.Substring(14)), errors, args)
+        If Not errors Is Nothing Then
+          MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+        End If
+      End If
     End If
   End Sub
 
@@ -677,5 +694,4 @@ Public Class PlugIn
     Next
     Return retval
   End Function
-
 End Class
