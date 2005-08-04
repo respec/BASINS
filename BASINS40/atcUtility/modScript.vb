@@ -13,6 +13,10 @@ Public Module modScript
 
     Dim MethodName As String = "Main" 'TODO: decide on entry point name
 
+    If code.IndexOfAny(vbCr & vbLf) < 0 Then
+      code = WholeFileString(code)
+    End If
+
     'First compile the code into an assembly
     assy = CompileScript(language, code, errors, aDLLfilename)
 
