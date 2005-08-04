@@ -3,10 +3,10 @@ Imports System.Reflection
 
 Public Module modScript
   Public Function RunScript(ByVal language As String, _
+                            ByVal aDLLfilename As String, _
                             ByVal code As String, _
                             ByRef errors As String, _
-                            ByVal args() As Object, _
-                            ByVal aFilename As String) As Object
+                            ByVal ParamArray args() As Object) As Object
     Dim assy As System.Reflection.Assembly
     Dim instance As Object
     Dim assyTypes As Type() 'list of items within the assembly
@@ -14,7 +14,7 @@ Public Module modScript
     Dim MethodName As String = "Main" 'TODO: decide on entry point name
 
     'First compile the code into an assembly
-    assy = CompileScript(language, code, errors, aFilename)
+    assy = CompileScript(language, code, errors, aDLLfilename)
 
     If errors Is Nothing Then
       assyTypes = assy.GetTypes()

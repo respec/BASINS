@@ -154,10 +154,7 @@ Public Class frmScript
 
       Case "Run"
         Dim errors As String
-        Dim args(1) As Object
-        args(0) = "DataManager"
-        args(1) = "BasinsPlugIn"
-        pBasinsPlugin.RunBasinsScript("vb", txtScript.Text, errors, args) 'TODO: add UI to select language vb or cs
+        pBasinsPlugin.RunBasinsScript("vb", txtScript.Text, errors, "dataManager", "basinsplugin") 'TODO: add UI to select language vb or cs
         If Not errors Is Nothing Then
           MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
         End If
