@@ -525,7 +525,7 @@ Public Class PlugIn
       Next
     End If
 
-    RunScript(aLanguage, MakeScriptName, aScript, errors, args)
+    Return RunScript(aLanguage, MakeScriptName, aScript, errors, args)
 
   End Function
 
