@@ -42,8 +42,8 @@ Public Class atcDataManager
     End Get
   End Property
 
-  Public Function DataSets() As ArrayList
-    Dim lAllData As New ArrayList
+  Public Function DataSets() As atcDataGroup
+    Dim lAllData As New atcDataGroup
     For Each source As atcDataSource In DataSources
       For Each ts As atcDataSet In source.DataSets
         lAllData.Add(ts)
