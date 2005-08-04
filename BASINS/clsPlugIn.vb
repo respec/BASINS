@@ -187,9 +187,10 @@ Public Class PlugIn
     g_MapWin.Menus.Remove(DataMenuName & "_ManageDataSources")
     g_MapWin.Menus.Remove(DataMenuName)
 
+    'g_MapWin.Menus.Remove(DisplayMenuName)
     'TODO: remove DisplayPlugins menu items
+
     g_MapWin.Menus.Remove(ToolsMenuName & "_Separator1")
-    'g_MapWin.Menus.Remove(ToolsMenuName & "_TestDBF")
     g_MapWin.Menus.Remove(ToolsMenuName & "_ArcView3")
     g_MapWin.Menus.Remove(ToolsMenuName & "_ArcGIS")
     g_MapWin.Menus.Remove(ToolsMenuName & "_GenScn")
@@ -425,9 +426,9 @@ Public Class PlugIn
   '  Debug.WriteLine("After write: " & tmpDbf.Summary)
   'End Sub
 
-  Private Function LaunchTool(ByVal ToolName As String, Optional ByVal cmdLine As String = "") As Boolean
+  Private Function LaunchTool(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
     Dim exename As String
-    Select Case ToolName
+    Select Case aToolName
       'Case "TestDBF"
       '  TestDBF()
     Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
@@ -437,65 +438,80 @@ Public Class PlugIn
         Return False
         'End If
         'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
-      Case "RunScript"
-        'atcScriptTest.Main(pDataManager, Me)
-        'Exit Function
-        exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
-        If FileExists(exename) Then
-          Dim errors As String
-          Dim args() As Object
-          If cmdLine.Length > 0 Then
-            args = cmdLine.Split(",")
-          Else
-            ReDim args(1)
-            args(0) = "DataManager"
-            args(1) = "BasinsPlugIn"
-          End If
-          RunBasinsScript(FileExt(exename), WholeFileString(exename), errors, args)
-          If Not errors Is Nothing Then
-            MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
-          End If
-          Return True
-        Else
-          LogMsg("Unable to find script " & exename, "Launch")
-          Return False
-        End If
       Case "OpenScript"
         Dim lfrm As New frmScript
         lfrm.BasinsPlugin = Me
         lfrm.Show()
         Return True
-      Case Else 'Search for plugin to launch
-        Dim newDisplay As atcDataDisplay
-        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-        For Each lDisp As atcDataDisplay In DisplayPlugins
-          If lDisp.Name = ToolName Then
-            Dim typ As System.Type = lDisp.GetType()
-            Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-            newDisplay = asm.CreateInstance(typ.FullName)
-            newDisplay.Show(pDataManager)
-            Return True
+      Case Else
+        If aToolName.StartsWith("RunScript") Then
+          'atcScriptTest.Main(pDataManager, Me)
+          'Exit Function
+          Dim args() As Object = aCmdLine.Split(",")
+          Dim errors As String
+          If aToolName.Length > 10 Then
+            exename = aToolName.Substring(11)
+          Else
+            exename = aCmdLine
           End If
-        Next
+          If Not FileExists(exename) Then
+            exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+            args = New Object() {"DataManager", "BasinsPlugIn"}
+          End If
+          If FileExists(exename) Then
+            RunBasinsScript(FileExt(exename), WholeFileString(exename), errors, args)
+            If Not errors Is Nothing Then
+              MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+            End If
+            Return True
+          Else
+            LogMsg("Unable to find script " & exename, "LaunchTool")
+            Return False
+          End If
+        Else 'Search for DisplayPlugin to launch
+          Return LaunchDisplay(aToolName, aCmdLine)
+        End If
     End Select
 
     If FileExists(exename) Then
       'Ensure space between exename and cmdline if needed
-      If cmdLine.Length > 0 AndAlso Not cmdLine.StartsWith(" ") Then cmdLine = " " & cmdLine
+      If aCmdLine.Length > 0 AndAlso Not aCmdLine.StartsWith(" ") Then aCmdLine = " " & aCmdLine
 
-      Shell("""" & exename & """" & cmdLine, AppWinStyle.NormalFocus, False)
+      Shell("""" & exename & """" & aCmdLine, AppWinStyle.NormalFocus, False)
       Return True
     Else
-      LogMsg("Unable to launch " & ToolName, "Launch")
+      LogMsg("Unable to launch " & aToolName, "Launch")
       Return False
     End If
+  End Function
+
+  Private Function LaunchDisplay(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
+    Dim searchForName As String = aToolName.ToLower
+    Dim ColonPos As Integer = searchForName.LastIndexOf(":")
+    If ColonPos > 0 Then
+      searchForName = searchForName.Substring(ColonPos + 1)
+    End If
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each lDisp As atcDataDisplay In DisplayPlugins
+      Dim foundName As String = lDisp.Name.ToLower
+      ColonPos = foundName.LastIndexOf(":")
+      If ColonPos > 0 Then
+        foundName = foundName.Substring(ColonPos + 1)
+      End If
+      If foundName = searchForName Then
+        Dim typ As System.Type = lDisp.GetType()
+        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+        Dim newDisplay As atcDataDisplay = asm.CreateInstance(typ.FullName)
+        newDisplay.Show(pDataManager)
+        Return True
+      End If
+    Next
   End Function
 
   Public Function RunBasinsScript(ByVal aLanguage As String, _
                                   ByVal aScript As String, _
                                   ByRef errors As String, _
-                                  ByVal args() As Object) _
-                                  As Object
+                                  ByVal ParamArray args() As Object) As Object
 
     If Not args Is Nothing Then 'replace some text arguments with objects
       For iArg As Integer = 0 To args.GetUpperBound(0)
@@ -509,7 +525,7 @@ Public Class PlugIn
       Next
     End If
 
-    RunScript(aLanguage, aScript, errors, args, MakeScriptName)
+    RunScript(aLanguage, MakeScriptName, aScript, errors, args)
 
   End Function
 
@@ -613,7 +629,8 @@ Public Class PlugIn
     'other plug-ins.
 
     If msg.StartsWith("atcDataPlugin") Then
-      Me.RefreshToolsMenu()
+      'RefreshDisplayMenu()
+      RefreshToolsMenu()
       'If msg.Substring(15).StartsWith("loading") Then
 
       'End If
@@ -621,8 +638,7 @@ Public Class PlugIn
       If msg.Substring(7).StartsWith("script") Then
         ChDriveDir(PathNameOnly(msg.Substring(14))) 'start where script is
         Dim errors As String
-        Dim args() As Object = {"dataManager", "basinsplugin"}
-        RunBasinsScript("vb", WholeFileString(msg.Substring(14)), errors, args)
+        RunBasinsScript("vb", WholeFileString(msg.Substring(14)), errors, "dataManager", "basinsplugin")
         If Not errors Is Nothing Then
           MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
         End If
