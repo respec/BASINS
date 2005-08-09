@@ -2,6 +2,7 @@
 Public Class atcDefinedValue
   Public Definition As atcAttributeDefinition
   Public Value As Object
+  Public Arguments As atcDataAttributes 'Arguments used for calculating Value, if any, or Nothing
 End Class
 
 'atcAttributeDefinition contains metadata about a value.
@@ -19,12 +20,33 @@ Public Class atcAttributeDefinition
   Dim pMax As Double          'Maximum acceptable value (NaN if not set)
   Dim pValidList As ArrayList 'List of acceptable values
 
+  Dim pCalculator As atcDataSource 'The source responsible for calculating this attribute or Nothing
+
   Public Property Name() As String
     Get
       Return pName
     End Get
     Set(ByVal newValue As String)
       pName = newValue
+    End Set
+  End Property
+
+  Public ReadOnly Property Calculated() As Boolean
+    Get
+      If pCalculator Is Nothing Then
+        Return False
+      Else
+        Return True
+      End If
+    End Get
+  End Property
+
+  Public Property Calculator() As atcDataSource
+    Get
+      Return pCalculator
+    End Get
+    Set(ByVal newValue As atcDataSource)
+      pCalculator = newValue
     End Set
   End Property
 
