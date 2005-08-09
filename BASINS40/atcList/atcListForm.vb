@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 
 Imports System.Windows.Forms
 
@@ -151,12 +152,12 @@ Friend Class atcListForm
     pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 
-  Private Sub pDataGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pDataGroup.Added
+  Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
     PopulateGrid()
     'TODO: could efficiently insert newly added item(s)
   End Sub
 
-  Private Sub pDataGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pDataGroup.Removed
+  Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
     PopulateGrid()
     'TODO: could efficiently remove by serial number
   End Sub

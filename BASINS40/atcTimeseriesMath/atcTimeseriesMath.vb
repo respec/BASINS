@@ -4,7 +4,6 @@ Imports System.Windows.Forms
 
 Public Class atcTimeseriesMath
   Inherits atcDataSource
-  Private pAvailableStatistics As Hashtable
   Private pAvailableTimeseriesOperations As atcDataGroup
   Private Const pName As String = "Timeseries::Math"
 
@@ -19,7 +18,7 @@ Public Class atcTimeseriesMath
 
   Public Overrides ReadOnly Property Category() As String
     Get
-      Return "Computation"
+      Return "Generate Timeseries"
     End Get
   End Property
 
@@ -44,110 +43,6 @@ Public Class atcTimeseriesMath
       Return True
     End Get
   End Property
-
-  'Definitions of statistics supported by ComputeStatistics
-  'Public Overrides ReadOnly Property AvailableStatistics() As Hashtable
-  '  Get
-  '    If pAvailableStatistics Is Nothing Then
-  '      pAvailableStatistics = New Hashtable
-  '      Dim def As atcAttributeDefinition
-
-  '      def = New atcAttributeDefinition
-  '      def.Name = "Mean"
-  '      def.Description = "Sum of all values divided by number of values"
-  '      def.Editable = False
-  '      pAvailableStatistics.Add(def.Name, def)
-
-  '      def = New atcAttributeDefinition
-  '      def.Name = "Max"
-  '      def.Description = "Maximum value"
-  '      def.Editable = False
-  '      pAvailableStatistics.Add(def.Name, def)
-
-  '      def = New atcAttributeDefinition
-  '      def.Name = "Min"
-  '      def.Description = "Minimum value"
-  '      def.Editable = False
-  '      pAvailableStatistics.Add(def.Name, def)
-
-  '      def = New atcAttributeDefinition
-  '      def.Name = "GeometricMean"
-  '      def.Description = "10 ^ Mean of log(each value)"
-  '      def.Editable = False
-  '      pAvailableStatistics.Add(def.Name, def)
-
-  '      def = New atcAttributeDefinition
-  '      def.Name = "Variance"
-  '      def.Description = "Variance"
-  '      def.Editable = False
-  '      pAvailableStatistics.Add(def.Name, def)
-
-  '      def = New atcAttributeDefinition
-  '      def.Name = "StandardDeviation"
-  '      def.Description = "Standard deviation"
-  '      def.Editable = False
-  '      pAvailableStatistics.Add(def.Name, def)
-
-  '      def = New atcAttributeDefinition
-  '      def.Name = "7Q10"
-  '      def.Description = "Seven year 10-day low flow"
-  '      def.Editable = False
-  '      pAvailableStatistics.Add(def.Name, def)
-  '    End If
-  '    Return pAvailableStatistics
-  '  End Get
-  'End Property
-
-  ''Compute all available statistics for aTimeseries and add them as attributes
-  'Public Overrides Sub ComputeStatistics(ByVal aTimeseries As atcTimeseries)
-  '  'TODO: SetAttribute(aTimeseries, "7Q10", "7Q10 can not yet be calculated")
-  '  Dim iLastValue As Integer = aTimeseries.numValues - 1
-  '  If iLastValue >= 0 Then
-  '    Dim iValue As Integer
-  '    Dim val As Double
-
-  '    Dim lMax As Double = -1.0E+30
-  '    Dim lMin As Double = 1.0E+30
-
-  '    Dim lGeometricMean As Double = 0
-  '    Dim lStandardDeviation As Double = 0
-  '    Dim lMean As Double = 0
-  '    Dim lSum As Double = 0
-  '    Dim lSumSquares As Double = 0
-  '    Dim lVariance As Double = 0
-
-  '    For iValue = 0 To iLastValue
-  '      val = aTimeseries.Value(iValue)
-  '      If val > lMax Then lMax = val
-  '      If val < lMin Then lMin = val
-  '      lSum += val
-  '      lSumSquares += val * val
-  '      If lMin > 0 Then lGeometricMean += Math.Log(val)
-  '    Next
-
-  '    SetAttribute(aTimeseries, "Max", lMax)
-  '    SetAttribute(aTimeseries, "Min", lMin)
-  '    SetAttribute(aTimeseries, "Sum", lSum)
-
-  '    iValue = aTimeseries.numValues
-  '    lMean = lSum / iValue
-  '    SetAttribute(aTimeseries, "Mean", lMean)
-
-  '    If lMin > 0 Then
-  '      lGeometricMean = Math.Exp(lGeometricMean / iValue)
-  '      SetAttribute(aTimeseries, "GeometricMean", lGeometricMean)
-  '    End If
-
-  '    If iValue > 1 Then
-  '      lVariance = (lSumSquares - (lSum * lSum) / iValue) / (iValue - 1)
-  '      SetAttribute(aTimeseries, "Variance", lVariance)
-  '      If lVariance > 0 Then
-  '        lStandardDeviation = Math.Sqrt(lVariance)
-  '        SetAttribute(aTimeseries, "StandardDeviation", lStandardDeviation)
-  '      End If
-  '    End If
-  '  End If
-  'End Sub
 
   'Operations supported
   Public Overrides ReadOnly Property AvailableOperations() As atcDataGroup
@@ -661,37 +556,5 @@ Public Class atcTimeseriesMath
     lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
     Return lnewTS
   End Function
-
-  Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
-  End Sub
-
-  'Public Overrides Sub PopulateInterface(ByVal aOperationName As String, _
-  '                             ByVal aControls As Control.ControlCollection, _
-  '                             ByVal aDataManager As atcDataManager)
-  '  pControls = aControls
-  '  pControls.Clear()
-  '  pDataManager = aDataManager
-  '  cboTimeseries = New System.Windows.Forms.ComboBox
-  '  cboTimeseries.Top = cboTimeseries.Height
-  '  cboTimeseries.Left = cboTimeseries.Top
-  '  For Each source As atcDataSource In pDataManager.DataSources
-  '    For Each ts As atcTimeseries In source.DataSets
-  '      cboTimeseries.Items.Add(ts.ToString)
-  '    Next
-  '  Next
-  '  cboTimeseries.Anchor = AnchorStyles.Left + AnchorStyles.Right + AnchorStyles.Top
-  '  pControls.Add(cboTimeseries)
-  'End Sub
-
-  'Public Overrides Function ExtractArgs() As ArrayList
-  '  ExtractArgs = New ArrayList
-  '  For Each source As atcDataSource In pDataManager.DataSources
-  '    For Each ts As atcTimeseries In source.DataSets
-  '      If cboTimeseries.SelectedItem = ts.ToString Then
-  '        ExtractArgs.Add(ts)
-  '      End If
-  '    Next
-  '  Next
-  'End Function
 
 End Class

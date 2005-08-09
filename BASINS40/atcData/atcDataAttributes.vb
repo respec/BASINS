@@ -1,51 +1,27 @@
 'Store attributes (and calculate some attributes if given an atcTimeseries)
+'Attributes are stored as a collection of atcDefinedValue
+
+Imports atcUtility
+
 Public Class atcDataAttributes
-  Implements IEnumerable
+  Inherits atcCollection
 
   'Private pOwner As atcTimeseries
-  Private pAttributes As Hashtable         'of atcDefinedValue
-  Private Shared pAliases As Hashtable     'of String, so more than one AttributeName can map to the same attribute
-  Private Shared pDefinitions As Hashtable 'of atcAttributeDefinition
+  Private Shared pAllAliases As atcCollection     'of String, so more than one AttributeName can map to the same attribute
+  Private Shared pAllDefinitions As atcCollection 'of atcAttributeDefinition
 
   'Returns the names (as keys) and values of all attributes that are set. (sorted by name)
-  Public Function GetAll() As SortedList
+  Public Function ValuesSortedByName() As SortedList
     Dim lAll As New SortedList(New CaseInsensitiveComparer)
-    Dim lAdv As atcDefinedValue
-    For Each lKey As String In pAttributes.Keys
-      lAdv = pAttributes.Item(lKey)
+    For Each lAdv As atcDefinedValue In Me
       lAll.Add(lAdv.Definition.Name, lAdv.Value)
     Next
     Return lAll
   End Function
 
-  'Change to match argument
-  Public Sub ChangeTo(ByVal aCopyThese As atcDataAttributes)
-    pAttributes.Clear()
-    If Not aCopyThese Is Nothing Then
-      For Each de As DictionaryEntry In aCopyThese
-        Dim defval As atcDefinedValue = de.Value
-        Me.SetValue(defval.Definition, defval.Value)
-      Next
-    End If
-  End Sub
-
-  Public Function Clone() As atcDataAttributes
-    Dim myClone As New atcDataAttributes
-    For Each lEntry As DictionaryEntry In pAttributes
-      myClone.SetValue(lEntry.Value.Definition, lEntry.Value.Value)
-    Next
-    Return myClone
-  End Function
-
-  Public ReadOnly Property Count() As Integer
-    Get
-      Return pAttributes.Count
-    End Get
-  End Property
-
   'True if aAttributeName has been set
   Public Function ContainsAttribute(ByVal aAttributeName As String) As Boolean
-    Return pAttributes.ContainsKey(aAttributeName.ToLower)
+    Return Keys.Contains(aAttributeName.ToLower)
   End Function
 
   ''True if aAttributeName can be calculated
@@ -61,10 +37,13 @@ Public Class atcDataAttributes
     Dim tmpAttribute As atcDefinedValue
     Try
       tmpAttribute = GetDefinedValue(aAttributeName)
-      Return tmpAttribute.Definition
+      If Not tmpAttribute Is Nothing Then
+        Return tmpAttribute.Definition
+      End If
     Catch
-      Return Nothing 'Not found
+      'Not found
     End Try
+    Return Nothing 'Not found or no definition found
   End Function
 
   'Retrieve or calculate the value for aAttributeName
@@ -84,9 +63,9 @@ Public Class atcDataAttributes
   End Function
 
   'Set attribute with definition aAttrDefinition to value aValue
-  Public Sub SetValue(ByVal aAttrDefinition As atcAttributeDefinition, ByVal aValue As Object)
+  Public Function SetValue(ByVal aAttrDefinition As atcAttributeDefinition, ByVal aValue As Object, Optional ByVal aArguments As atcDataAttributes = Nothing) As Integer
     Dim key As String = aAttrDefinition.Name.ToLower
-    Dim lAlias As String = pAliases.Item(key)
+    Dim lAlias As String = pAllAliases.ItemByKey(key)
 
     Dim tmpAttrDefVal As atcDefinedValue
 
@@ -95,50 +74,66 @@ Public Class atcDataAttributes
       aAttrDefinition.Name = lAlias
     End If
 
-    tmpAttrDefVal = pAttributes.Item(key)
-    If tmpAttrDefVal Is Nothing Then
+    Dim index As Integer = MyBase.Keys.IndexOf(key)
+    If index = -1 Then
       Try
-        pDefinitions.Add(key, aAttrDefinition)
+        pAllDefinitions.Add(key, aAttrDefinition)
       Catch
         'already present, no problem
       End Try
       tmpAttrDefVal = New atcDefinedValue
       tmpAttrDefVal.Definition = aAttrDefinition
       tmpAttrDefVal.Value = aValue
-      pAttributes.Add(key, tmpAttrDefVal)
+      If Not aArguments Is Nothing Then tmpAttrDefVal.Arguments = aArguments
+      index = MyBase.Add(key, tmpAttrDefVal)
     Else  'Update existing attribute value
+      tmpAttrDefVal = ItemByIndex(index)
       tmpAttrDefVal.Value = aValue
+      If Not aArguments Is Nothing Then tmpAttrDefVal.Arguments = aArguments
     End If
+    Return index
+  End Function
+
+  Public Sub SetValue(ByVal aAttributeName As String, ByVal aAttributeValue As Object)
+    Add(aAttributeName, aAttributeValue)
   End Sub
 
   'Set attribute with name aAttributeName to value aValue
-  Public Sub SetValue(ByVal aAttributeName As String, ByVal aValue As Object)
+  Public Overloads Overrides Function Add(ByVal aAttributeName As Object, ByVal aAttributeValue As Object) As Integer
     Dim lTmpAttrDef As New atcAttributeDefinition
-    lTmpAttrDef = pDefinitions.Item(aAttributeName.ToLower)
+    lTmpAttrDef = pAllDefinitions.ItemByKey(aAttributeName.ToLower)
     If lTmpAttrDef Is Nothing Then
       lTmpAttrDef = New atcAttributeDefinition
       lTmpAttrDef.Name = aAttributeName
     End If
-    SetValue(lTmpAttrDef, aValue)
-  End Sub
+    SetValue(lTmpAttrDef, aAttributeValue)
+  End Function
+
+  Public Overloads Overrides Function Add(ByVal aDefinedValue As Object) As Integer
+    If aDefinedValue Is Nothing Then
+      Return -1
+    Else
+      Return SetValue(aDefinedValue.Definition, aDefinedValue.Value, aDefinedValue.Arguments)
+    End If
+  End Function
 
   Public Sub New() 'ByVal aTimeseries As atcTimeseries)
     'pOwner = aTimeseries
-    pAttributes = New Hashtable
+    MyBase.Clear()
 
-    If pDefinitions Is Nothing Then
-      pDefinitions = New Hashtable
+    If pAllDefinitions Is Nothing Then
+      pAllDefinitions = New atcCollection
       Dim lUnitsDef = New atcAttributeDefinition
       lUnitsDef.Name = "Units"
       lUnitsDef.TypeString = "String"
       lUnitsDef.Editable = True
       'lUnitsDef.ValidList = GetAllUnitsInCategory("all")
-      pDefinitions.Add("units", lUnitsDef)
+      pAllDefinitions.Add("units", lUnitsDef)
     End If
 
-    If pAliases Is Nothing Then
-      pAliases = New Hashtable 'of alias and internal name
-      With pAliases
+    If pAllAliases Is Nothing Then
+      pAllAliases = New atcCollection 'of alias and internal name
+      With pAllAliases
         .Add("sen", "Scenario")
         .Add("scen", "Scenario")
         .Add("idscen", "Scenario")
@@ -177,33 +172,29 @@ Public Class atcDataAttributes
     '  Case "VARIANCE" : Attrib = Variance
   End Sub
 
-  Public Function GetDefinedValue(ByVal aIndex As Integer) As atcDefinedValue
-    For Each lVal As DictionaryEntry In pAttributes
-      If aIndex = 0 Then
-        Return lVal.Value
-      Else
-        aIndex -= 1
-      End If
-    Next
-  End Function
+  'Public Function GetDefinedValue(ByVal aIndex As Integer) As atcDefinedValue
+  '  Return ItemByIndex(aIndex)
+  'End Function
 
-  Public Function GetDefinedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As atcDefinedValue
+  Public Function GetDefinedValue(ByVal aAttributeName As String) As atcDefinedValue
     Dim key As String = aAttributeName.ToLower
-    Dim tmpAttribute As atcDefinedValue
-    tmpAttribute = pAttributes.Item(key)
+    Dim tmpAttribute As atcDefinedValue = ItemByKey(key)
     If Not tmpAttribute Is Nothing Then
       Return tmpAttribute
     Else
-      key = pAliases.Item(key).ToString.ToLower
-      If key Is Nothing OrElse key.Equals(aAttributeName.ToLower) Then
-        Return aDefault 'Not found and could not calculate
+      key = pAllAliases.ItemByKey(key)
+      If key Is Nothing Then
+        Return Nothing
       Else
-        Return GetDefinedValue(key, aDefault)
+        key = key.ToString.ToLower
+      End If
+
+      If key.Equals(aAttributeName.ToLower) Then
+        Return Nothing 'Not found and could not calculate
+      Else
+        Return GetDefinedValue(key)
       End If
     End If
   End Function
 
-  Public Function GetEnumerator() As System.Collections.IEnumerator Implements System.Collections.IEnumerable.GetEnumerator
-    Return pAttributes.GetEnumerator
-  End Function
 End Class

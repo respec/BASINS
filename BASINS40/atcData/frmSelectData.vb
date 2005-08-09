@@ -367,7 +367,7 @@ Friend Class frmSelectData
     Next
     For Each source As atcDataSource In pDataManager.DataSources
       For Each ts As atcDataSet In source.DataSets
-        For Each de As DictionaryEntry In ts.Attributes.GetAll
+        For Each de As DictionaryEntry In ts.Attributes.ValuesSortedByName
           If Not pcboCriteria(0).Items.Contains(de.Key) Then
             For i = 0 To pcboCriteria.GetUpperBound(0)
               pcboCriteria(i).Items.Add(de.Key)
@@ -681,7 +681,7 @@ NextName:
       Dim lSerial As Integer = CInt(pMatchingSource.CellValue(aRow, 0)) 'Serial number in clicked row
       Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
       If iTS >= 0 Then 'Already selected, unselect
-        pSelectedTS.Remove(iTS)
+        pSelectedTS.RemoveAt(iTS)
       Else 'Not already selected, select it now
         iTS = pMatchingTS.IndexOfSerial(lSerial)
         If iTS >= 0 Then 'Found matching serial number in pMatchingTS
@@ -703,7 +703,7 @@ NextName:
       Dim lSerial As Integer = CInt(pSelectedSource.CellValue(aRow, 0)) 'Serial number in row to be removed
       Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
       If iTS >= 0 Then 'Found matching serial number in pSelectedTS
-        pSelectedTS.Remove(iTS)
+        pSelectedTS.RemoveAt(iTS)
         RefreshSelected()
       Else
         'TODO: should never reach this line
@@ -761,7 +761,7 @@ NextName:
   End Sub
 
   Private Sub mnuMove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-
+    'TODO: re-order criteria
   End Sub
 
   Private Sub mnuAddData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddData.Click

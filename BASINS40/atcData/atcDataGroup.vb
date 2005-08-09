@@ -6,162 +6,161 @@
 Imports atcUtility
 
 Public Class atcDataGroup
-  Implements IEnumerable
-
-  Private pTS As ArrayList 'of atcDataSet
+  Inherits atcCollection
 
   Private pSelectedData As atcDataGroup 'tracks currently selected group within this group
 
   'One or more atcDataSet were just added to the group
-  Public Event Added(ByVal aAdded As ArrayList)
+  Public Event Added(ByVal aAdded As atcCollection)
 
   'One or more atcDataSet were just removed from the group
-  Public Event Removed(ByVal aRemoved As ArrayList)
+  Public Event Removed(ByVal aRemoved As atcCollection)
 
-  Public Sub New()
-    pTS = New ArrayList
+  Private Sub RaiseAddedOne(ByVal aDataSet As atcDataSet)
+    Dim lDataSets As New atcCollection
+    lDataSets.Add(aDataSet)
+    RaiseEvent Added(lDataSets)
   End Sub
 
-  Private Property PrivateList() As ArrayList
-    Get
-      Return pTS
-    End Get
-    Set(ByVal newValue As ArrayList)
-      pTS = newValue
-    End Set
-  End Property
+  Private Sub RaiseRemovedOne(ByVal aDataSet As atcDataSet)
+    Dim lDataSets As New atcCollection
+    lDataSets.Add(aDataSet)
+    RaiseEvent Removed(lDataSets)
+  End Sub
 
-  'Get a atcDataSet by index
-  Default Public Property Item(ByVal index As Integer) As atcDataSet
+  'Get atcDataSet by index
+  Default Public Shadows Property Item(ByVal index As Integer) As atcDataSet
     Get
-      Return pTS.Item(index)
+      Return MyBase.Item(index)
     End Get
     Set(ByVal newValue As atcDataSet)
-      pTS.Item(index) = newValue
+      MyBase.Item(index) = newValue
     End Set
   End Property
 
-  'Add a atcDataSet to the group
-  Public Sub Add(ByVal aTS As atcDataSet)
-    Dim addList As New ArrayList(1)
-    addList.Add(aTS)
-    Add(addList)
-  End Sub
+  Public Shadows Property ItemByIndex(ByVal index As Integer) As atcDataSet
+    Get
+      Return MyBase.Item(index)
+    End Get
+    Set(ByVal newValue As atcDataSet)
+      MyBase.Item(index) = newValue
+    End Set
+  End Property
 
-  'Add a list of atcDataSet to the group
-  Public Sub Add(ByVal aList As ArrayList)
-    pTS.AddRange(aList)
-    RaiseEvent Added(aList) 'Insert is the other place where items are added
+  Public Shadows Property ItemByKey(ByVal key As Object) As atcDataSet
+    Get
+      Return MyBase.ItemByKey(key)
+    End Get
+    Set(ByVal newValue As atcDataSet)
+      MyBase.ItemByKey(key) = newValue
+    End Set
+  End Property
+
+  'Add one atcDataSet to the group with the default key of its serial number
+  Public Overloads Overrides Function Add(ByVal aDataSet As Object) As Integer
+    Add(aDataSet.Serial, aDataSet)
+  End Function
+
+  'Add one atcDataSet to the group with a custom key
+  Public Overloads Overrides Function Add(ByVal key As Object, ByVal aDataSet As Object) As Integer
+    MyBase.Add(key, aDataSet)
+    RaiseAddedOne(aDataSet)
+  End Function
+
+  'Add an atcCollection or atcDataGroup of atcDataSet to the group
+  Public Overloads Sub Add(ByVal aAddThese As atcCollection)
+    MyBase.AddRange(aAddThese)
+    RaiseEvent Added(aAddThese)
   End Sub
 
   'Remove all atcDataSets and selection
-  Public Sub Clear()
-    If pTS.Count > 0 Then
-      Dim lRemoved As ArrayList = pTS
-      pTS = New ArrayList
+  Public Overrides Sub Clear()
+    If Not pSelectedData Is Nothing Then pSelectedData.Clear()
+    If Count > 0 Then
+      Dim lRemoved As atcDataGroup = Me.Clone
+      MyBase.Clear()
       RaiseEvent Removed(lRemoved)
     End If
-    If Not pSelectedData Is Nothing Then pSelectedData.Clear()
   End Sub
 
-  Public Function Clone() As atcDataGroup
-    Dim newGroup As New atcDataGroup
-    newGroup.Add(pTS)
-    Return newGroup
+  Public Overrides Function Clone() As Object
+    Dim newClone As New atcDataGroup
+    For index As Integer = 0 To MyBase.Count - 1
+      newClone.Add(MyBase.Keys(index), MyBase.Item(index))
+    Next
+    Return newClone
   End Function
 
   'Change this group to match the new group and raise the appropriate events
-  Public Sub ChangeTo(ByVal aNewGroup As atcDataGroup)
+  Public Shadows Sub ChangeTo(ByVal aNewGroup As atcDataGroup)
     If aNewGroup Is Nothing Then
       Clear()
     Else
 
-      Dim RemoveList As New ArrayList
-      For Each oldTS As atcDataSet In pTS
+      Dim RemoveList As New atcCollection
+      For Each oldTS As atcDataSet In Me
         If Not aNewGroup.Contains(oldTS) Then
           RemoveList.Add(oldTS)
         End If
       Next
 
-      Dim AddList As New ArrayList
+      Dim AddList As New atcCollection
       For Each savedTS As atcDataSet In aNewGroup
-        If Not pTS.Contains(savedTS) Then
+        If Not Contains(savedTS) Then
           AddList.Add(savedTS)
         End If
       Next
 
-      pTS = aNewGroup.PrivateList.Clone
-      RaiseEvent Added(AddList)
-      RaiseEvent Removed(RemoveList)
-
+      MyBase.ChangeTo(aNewGroup)
+      If RemoveList.Count > 0 Then RaiseEvent Removed(RemoveList)
+      If AddList.Count > 0 Then RaiseEvent Added(AddList)
     End If
   End Sub
 
-  Public Function Contains(ByVal aTS As atcDataSet) As Boolean
-    Return pTS.Contains(aTS)
-  End Function
-
-  Public ReadOnly Property Count() As Integer
-    Get
-      Return pTS.Count
-    End Get
-  End Property
-
-  'Allow use of "For Each" on the group
-  Public Function GetEnumerator() As Collections.IEnumerator Implements Collections.IEnumerable.GetEnumerator
-    Return pTS.GetEnumerator
-  End Function
-
-  'Find the index of the specified atcDataSet
-  Public Function IndexOf(ByVal aDataSet As atcDataSet) As Integer
-    Return pTS.IndexOf(aDataset)
-  End Function
-
-  'Find the index of the specified DataSet given that it is at or after aStartIndex
-  Public Function IndexOf(ByVal aDataSet As atcDataSet, ByVal aStartIndex As Integer) As Integer
-    Return pTS.IndexOf(aDataSet, aStartIndex)
-  End Function
-
   Public Function IndexOfSerial(ByVal aSerial As Integer) As Integer
-    For iTS As Integer = 0 To pTS.Count - 1
-      If pTS(iTS).Serial = aSerial Then Return iTS
+    For iTS As Integer = 0 To Count - 1
+      If Item(iTS).Serial = aSerial Then Return iTS
     Next
     Return -1
   End Function
 
-  'Insert a new Timeseries at the specified index
-  Public Sub Insert(ByVal aIndex As Integer, ByVal aDataSet As atcDataSet)
-    pTS.Insert(aIndex, aDataSet)
-
-    Dim addList As New ArrayList(1)
-    addList.Add(aDataSet)
-    RaiseEvent Added(addList)
+  'Insert a new DataSet at the specified index
+  Public Overloads Overrides Sub Insert(ByVal aIndex As Integer, ByVal aDataSet As Object)
+    MyBase.Insert(aIndex, aDataSet)
+    RaiseAddedOne(aDataSet)
   End Sub
 
-  'Remove a Timeseries from the group
-  Public Sub Remove(ByVal aDataSet As atcDataSet)
-    Dim removeList As New ArrayList(1)
-    removeList.Add(aDataSet)
-    Remove(removeList)
+  Public Overrides Sub RemoveAt(ByVal index As Integer)
+    'Cannot just do: Remove(ItemByIndex(index))
+    'because this overriding RemoveAt is called by MyBase.Remove--infinite loop
+    Dim lDataSet As atcDataSet = ItemByIndex(index)
+    MyBase.RemoveAt(index)
+    RaiseRemovedOne(lDataSet)
   End Sub
 
-  'Remove a list of atcTimeseries from the group
-  Public Sub Remove(ByVal aList As ArrayList)
-    If aList.Count > 0 Then
-      For Each ts As atcTimeseries In aList
-        pTS.Remove(ts)
+  'Remove aDataSet from the group
+  Public Overloads Overrides Sub Remove(ByVal aDataSet As Object)
+    MyBase.Remove(aDataSet)
+    RaiseRemovedOne(aDataSet)
+  End Sub
+
+  'Remove a list of atcDataSet from the group, can be atcCollection or atcDataGroup
+  Public Overloads Sub Remove(ByVal aRemoveThese As atcCollection)
+    If Not aRemoveThese Is Nothing AndAlso aRemoveThese.Count > 0 Then
+      For Each ts As atcDataSet In aRemoveThese
+        MyBase.Remove(ts)
       Next
-      RaiseEvent Removed(aList)
+      RaiseEvent Removed(aRemoveThese)
     End If
   End Sub
 
-  'Remove a span of one or more Timeseries from the group by index
-  Public Sub Remove(ByVal aIndex As Integer, Optional ByVal aNumber As Integer = 1)
-    Dim removeList As New ArrayList(aNumber)
+  'Remove a span of one or more DataSets from the group by index
+  Public Overrides Sub RemoveRange(ByVal aIndex As Integer, ByVal aNumber As Integer)
+    Dim lRemoveThese As New atcCollection
     For index As Integer = aIndex To aIndex + aNumber - 1
-      removeList.Add(pTS.Item(index))
+      lRemoveThese.Add(Item(index))
     Next
-    Remove(removeList)
+    Remove(lRemoveThese)
   End Sub
 
   Public Property SelectedData() As atcDataGroup
@@ -177,8 +176,8 @@ Public Class atcDataGroup
   End Property
 
   Public Overrides Function ToString() As String
-    ToString = pTS.Count & " Data:"
-    For Each lts As atcDataSet In pTS
+    ToString = Count & " Data:"
+    For Each lts As atcDataSet In Me
       ToString &= vbCrLf & "  " & lts.ToString
     Next
   End Function

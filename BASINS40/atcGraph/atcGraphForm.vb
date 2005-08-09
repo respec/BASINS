@@ -402,7 +402,7 @@ Public Class atcGraphForm
 
   End Sub
 
-  Private Sub pTimeseriesGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pDataGroup.Added
+  Private Sub pTimeseriesGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
     For Each ts As atcTimeseries In aAdded
       AddDatasetTimeseries(ts, ts.ToString)
     Next
@@ -411,7 +411,7 @@ Public Class atcGraphForm
     Me.Refresh()
   End Sub
 
-  Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pDataGroup.Removed
+  Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
     For Each ts As atcTimeseries In aRemoved
       Pane.CurveList.Remove(Pane.CurveList.Item(ts.ToString))
     Next
