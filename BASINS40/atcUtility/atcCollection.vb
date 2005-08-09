@@ -12,20 +12,20 @@ Public Class atcCollection
     End Set
   End Property
 
-  Public Overloads Overrides Function Add(ByVal Value As Object) As Integer
+  Public Shadows Function Add(ByVal Value As Object) As Integer
     Return Add(Value, Value)
   End Function
-  Public Overridable Overloads Function Add(ByVal key As Object, ByVal value As Object) As Integer
+  Public Shadows Function Add(ByVal key As Object, ByVal value As Object) As Integer
     pKeys.Add(key)
     Return MyBase.Add(value)
   End Function
 
-  Public Overrides Sub AddRange(ByVal c As System.Collections.ICollection)
+  Public Shadows Sub AddRange(ByVal c As System.Collections.ICollection)
     pKeys.AddRange(c)
     MyBase.AddRange(c)
   End Sub
 
-  Public Overrides Property Capacity() As Integer
+  Public Shadows Property Capacity() As Integer
     Get
       Return MyBase.Capacity
     End Get
@@ -35,12 +35,12 @@ Public Class atcCollection
     End Set
   End Property
 
-  Public Overrides Sub Clear()
+  Public Shadows Sub Clear()
     pKeys.Clear()
     MyBase.Clear()
   End Sub
 
-  Public Overrides Function Clone() As Object
+  Public Shadows Function Clone() As Object
     Dim newClone As New atcCollection
     For index As Integer = 0 To MyBase.Count - 1
       newClone.Add(pKeys.Item(index), MyBase.Item(index))
@@ -48,23 +48,23 @@ Public Class atcCollection
     Return newClone
   End Function
 
-  Public Overloads Overrides Sub Insert(ByVal index As Integer, ByVal value As Object)
+  Public Shadows Sub Insert(ByVal index As Integer, ByVal value As Object)
     Insert(index, value, value)
   End Sub
-  Public Overloads Sub Insert(ByVal index As Integer, ByVal key As Object, ByVal value As Object)
+  Public Shadows Sub Insert(ByVal index As Integer, ByVal key As Object, ByVal value As Object)
     pKeys.Insert(index, key)
     MyBase.Insert(index, value)
   End Sub
 
-  Public Overloads Overrides Sub InsertRange(ByVal index As Integer, ByVal collValues As ICollection)
+  Public Shadows Sub InsertRange(ByVal index As Integer, ByVal collValues As ICollection)
     InsertRange(index, collValues, collValues)
   End Sub
-  Public Overloads Sub InsertRange(ByVal index As Integer, ByVal collKeys As ICollection, ByVal collValues As ICollection)
+  Public Shadows Sub InsertRange(ByVal index As Integer, ByVal collKeys As ICollection, ByVal collValues As ICollection)
     pKeys.InsertRange(index, collKeys)
     MyBase.InsertRange(index, collValues)
   End Sub
 
-  Public Overrides Sub Remove(ByVal value As Object)
+  Public Shadows Sub Remove(ByVal value As Object)
     Try
       Dim index As Integer = MyBase.IndexOf(value)
       If index >= 0 Then RemoveAt(index)
@@ -79,47 +79,47 @@ Public Class atcCollection
     End Try
   End Sub
 
-  Public Overrides Sub RemoveAt(ByVal index As Integer)
+  Public Shadows Sub RemoveAt(ByVal index As Integer)
     pKeys.RemoveAt(index)
     MyBase.RemoveAt(index)
   End Sub
 
-  Public Overrides Sub RemoveRange(ByVal index As Integer, ByVal count As Integer)
+  Public Shadows Sub RemoveRange(ByVal index As Integer, ByVal count As Integer)
     pKeys.RemoveRange(index, count)
     MyBase.RemoveRange(index, count)
   End Sub
 
-  Public Overloads Overrides Sub Reverse()
+  Public Shadows Sub Reverse()
     pKeys.Reverse()
     MyBase.Reverse()
   End Sub
 
-  Public Overloads Overrides Sub Reverse(ByVal index As Integer, ByVal count As Integer)
+  Public Shadows Sub Reverse(ByVal index As Integer, ByVal count As Integer)
     pKeys.Reverse(index, count)
     MyBase.Reverse(index, count)
   End Sub
 
-  Public Overloads Overrides Sub SetRange(ByVal index As Integer, ByVal values As ICollection)
+  Public Shadows Sub SetRange(ByVal index As Integer, ByVal values As ICollection)
     SetRange(index, values, values)
   End Sub
-  Public Overloads Sub SetRange(ByVal index As Integer, ByVal keys As ICollection, ByVal values As ICollection)
+  Public Shadows Sub SetRange(ByVal index As Integer, ByVal keys As ICollection, ByVal values As ICollection)
     pKeys.SetRange(index, keys)
     MyBase.SetRange(index, keys)
   End Sub
 
-  Public Overloads Overrides Sub Sort()
+  Public Shadows Sub Sort()
     Sort(New Comparer(New System.Globalization.CultureInfo("")))
   End Sub
 
-  Public Overloads Overrides Sub Sort(ByVal comparer As System.Collections.IComparer)
+  Public Shadows Sub Sort(ByVal comparer As System.Collections.IComparer)
     Sort(1, MyBase.Count, comparer)
   End Sub
 
-  Public Overloads Overrides Sub Sort(ByVal index As Integer, ByVal count As Integer, ByVal comparer As System.Collections.IComparer)
+  Public Shadows Sub Sort(ByVal index As Integer, ByVal count As Integer, ByVal comparer As System.Collections.IComparer)
     Err.Raise(1000, Me, "Sort not implemented")
   End Sub
 
-  Public Overrides Sub TrimToSize()
+  Public Shadows Sub TrimToSize()
     pKeys.TrimToSize()
     MyBase.TrimToSize()
   End Sub

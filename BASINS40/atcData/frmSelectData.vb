@@ -1,4 +1,4 @@
-Imports atcData
+Imports atcUtility
 
 Imports System.Windows.Forms
 
@@ -56,6 +56,7 @@ Friend Class frmSelectData
   Friend WithEvents mnuSelectNoMatching As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileManage As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAddData As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSelectAll As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectData))
     Me.groupTop = New System.Windows.Forms.GroupBox
@@ -78,9 +79,10 @@ Friend Class frmSelectData
     Me.mnuAttributesRemove = New System.Windows.Forms.MenuItem
     Me.mnuAttributesMove = New System.Windows.Forms.MenuItem
     Me.mnuSelect = New System.Windows.Forms.MenuItem
+    Me.mnuSelectAll = New System.Windows.Forms.MenuItem
+    Me.mnuSelectClear = New System.Windows.Forms.MenuItem
     Me.mnuSelectAllMatching = New System.Windows.Forms.MenuItem
     Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
-    Me.mnuSelectClear = New System.Windows.Forms.MenuItem
     Me.groupTop.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     Me.groupSelected.SuspendLayout()
@@ -95,45 +97,46 @@ Friend Class frmSelectData
     Me.groupTop.Dock = System.Windows.Forms.DockStyle.Top
     Me.groupTop.Location = New System.Drawing.Point(0, 0)
     Me.groupTop.Name = "groupTop"
-    Me.groupTop.Size = New System.Drawing.Size(528, 352)
+    Me.groupTop.Size = New System.Drawing.Size(633, 406)
     Me.groupTop.TabIndex = 10
     Me.groupTop.TabStop = False
     Me.groupTop.Text = "Select Attribute Values to Filter Available Data"
     '
     'pMatchingGrid
     '
+    Me.pMatchingGrid.AllowHorizontalScrolling = True
     Me.pMatchingGrid.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pMatchingGrid.LineColor = System.Drawing.Color.Empty
     Me.pMatchingGrid.LineWidth = 0.0!
-    Me.pMatchingGrid.Location = New System.Drawing.Point(3, 184)
+    Me.pMatchingGrid.Location = New System.Drawing.Point(3, 212)
     Me.pMatchingGrid.Name = "pMatchingGrid"
-    Me.pMatchingGrid.Size = New System.Drawing.Size(522, 165)
+    Me.pMatchingGrid.Size = New System.Drawing.Size(627, 191)
     Me.pMatchingGrid.TabIndex = 15
     '
     'lblMatching
     '
     Me.lblMatching.Dock = System.Windows.Forms.DockStyle.Top
-    Me.lblMatching.Location = New System.Drawing.Point(3, 168)
+    Me.lblMatching.Location = New System.Drawing.Point(3, 194)
     Me.lblMatching.Name = "lblMatching"
-    Me.lblMatching.Size = New System.Drawing.Size(522, 16)
+    Me.lblMatching.Size = New System.Drawing.Size(627, 18)
     Me.lblMatching.TabIndex = 14
     Me.lblMatching.Text = "Matching Data (click to select)"
     '
     'splitAboveMatching
     '
     Me.splitAboveMatching.Dock = System.Windows.Forms.DockStyle.Top
-    Me.splitAboveMatching.Location = New System.Drawing.Point(3, 160)
+    Me.splitAboveMatching.Location = New System.Drawing.Point(3, 185)
     Me.splitAboveMatching.Name = "splitAboveMatching"
-    Me.splitAboveMatching.Size = New System.Drawing.Size(522, 8)
+    Me.splitAboveMatching.Size = New System.Drawing.Size(627, 9)
     Me.splitAboveMatching.TabIndex = 12
     Me.splitAboveMatching.TabStop = False
     '
     'panelCriteria
     '
     Me.panelCriteria.Dock = System.Windows.Forms.DockStyle.Top
-    Me.panelCriteria.Location = New System.Drawing.Point(3, 16)
+    Me.panelCriteria.Location = New System.Drawing.Point(3, 18)
     Me.panelCriteria.Name = "panelCriteria"
-    Me.panelCriteria.Size = New System.Drawing.Size(522, 144)
+    Me.panelCriteria.Size = New System.Drawing.Size(627, 167)
     Me.panelCriteria.TabIndex = 11
     '
     'pnlButtons
@@ -141,33 +144,33 @@ Friend Class frmSelectData
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.pnlButtons.Location = New System.Drawing.Point(0, 485)
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 559)
     Me.pnlButtons.Name = "pnlButtons"
-    Me.pnlButtons.Size = New System.Drawing.Size(528, 40)
+    Me.pnlButtons.Size = New System.Drawing.Size(633, 46)
     Me.pnlButtons.TabIndex = 12
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(104, 8)
+    Me.btnCancel.Location = New System.Drawing.Point(125, 9)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(80, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(96, 28)
     Me.btnCancel.TabIndex = 4
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(8, 8)
+    Me.btnOk.Location = New System.Drawing.Point(10, 9)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(80, 24)
+    Me.btnOk.Size = New System.Drawing.Size(96, 28)
     Me.btnOk.TabIndex = 3
     Me.btnOk.Text = "Ok"
     '
     'splitAboveSelected
     '
     Me.splitAboveSelected.Dock = System.Windows.Forms.DockStyle.Top
-    Me.splitAboveSelected.Location = New System.Drawing.Point(0, 352)
+    Me.splitAboveSelected.Location = New System.Drawing.Point(0, 406)
     Me.splitAboveSelected.Name = "splitAboveSelected"
-    Me.splitAboveSelected.Size = New System.Drawing.Size(528, 8)
+    Me.splitAboveSelected.Size = New System.Drawing.Size(633, 9)
     Me.splitAboveSelected.TabIndex = 11
     Me.splitAboveSelected.TabStop = False
     '
@@ -175,21 +178,22 @@ Friend Class frmSelectData
     '
     Me.groupSelected.Controls.Add(Me.pSelectedGrid)
     Me.groupSelected.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.groupSelected.Location = New System.Drawing.Point(0, 360)
+    Me.groupSelected.Location = New System.Drawing.Point(0, 415)
     Me.groupSelected.Name = "groupSelected"
-    Me.groupSelected.Size = New System.Drawing.Size(528, 125)
+    Me.groupSelected.Size = New System.Drawing.Size(633, 144)
     Me.groupSelected.TabIndex = 14
     Me.groupSelected.TabStop = False
     Me.groupSelected.Text = "Selected Data"
     '
     'pSelectedGrid
     '
+    Me.pSelectedGrid.AllowHorizontalScrolling = True
     Me.pSelectedGrid.Dock = System.Windows.Forms.DockStyle.Fill
     Me.pSelectedGrid.LineColor = System.Drawing.Color.Empty
     Me.pSelectedGrid.LineWidth = 0.0!
-    Me.pSelectedGrid.Location = New System.Drawing.Point(3, 16)
+    Me.pSelectedGrid.Location = New System.Drawing.Point(3, 18)
     Me.pSelectedGrid.Name = "pSelectedGrid"
-    Me.pSelectedGrid.Size = New System.Drawing.Size(522, 106)
+    Me.pSelectedGrid.Size = New System.Drawing.Size(627, 123)
     Me.pSelectedGrid.TabIndex = 0
     '
     'MainMenu1
@@ -236,28 +240,33 @@ Friend Class frmSelectData
     'mnuSelect
     '
     Me.mnuSelect.Index = 2
-    Me.mnuSelect.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuSelectAllMatching, Me.mnuSelectNoMatching, Me.mnuSelectClear})
+    Me.mnuSelect.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuSelectAll, Me.mnuSelectClear, Me.mnuSelectAllMatching, Me.mnuSelectNoMatching})
     Me.mnuSelect.Text = "&Select"
+    '
+    'mnuSelectAll
+    '
+    Me.mnuSelectAll.Index = 0
+    Me.mnuSelectAll.Text = "Select &All"
+    '
+    'mnuSelectClear
+    '
+    Me.mnuSelectClear.Index = 1
+    Me.mnuSelectClear.Text = "&Un-select All"
     '
     'mnuSelectAllMatching
     '
-    Me.mnuSelectAllMatching.Index = 0
+    Me.mnuSelectAllMatching.Index = 2
     Me.mnuSelectAllMatching.Text = "Select &Matching"
     '
     'mnuSelectNoMatching
     '
-    Me.mnuSelectNoMatching.Index = 1
+    Me.mnuSelectNoMatching.Index = 3
     Me.mnuSelectNoMatching.Text = "&Un-select Matching"
-    '
-    'mnuSelectClear
-    '
-    Me.mnuSelectClear.Index = 2
-    Me.mnuSelectClear.Text = "&Clear"
     '
     'frmSelectData
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(528, 525)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(633, 605)
     Me.Controls.Add(Me.groupSelected)
     Me.Controls.Add(Me.splitAboveSelected)
     Me.Controls.Add(Me.pnlButtons)
@@ -285,8 +294,8 @@ Friend Class frmSelectData
 
   Private WithEvents pDataManager As atcDataManager
 
-  Private pMatchingTS As atcDataGroup
-  Private pSelectedTS As atcDataGroup
+  Private pMatchingGroup As atcDataGroup
+  Private pSelectedGroup As atcDataGroup
   Private pSaveGroup As atcDataGroup = Nothing
 
   Private pMatchingSource As GridSource
@@ -299,10 +308,10 @@ Friend Class frmSelectData
 
   Public Function AskUser(ByVal aDataManager As atcDataManager, Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
     If aGroup Is Nothing Then
-      pSelectedTS = New atcDataGroup
+      pSelectedGroup = New atcDataGroup
     Else
       pSaveGroup = aGroup.Clone
-      pSelectedTS = aGroup
+      pSelectedGroup = aGroup
     End If
 
     pDataManager = aDataManager
@@ -314,9 +323,9 @@ Friend Class frmSelectData
     '  End While
     'End If
 
-    pMatchingTS = New atcDataGroup
-    pMatchingSource = New GridSource(pDataManager, pMatchingTS)
-    pSelectedSource = New GridSource(pDataManager, pSelectedTS)
+    pMatchingGroup = New atcDataGroup
+    pMatchingSource = New GridSource(pDataManager, pMatchingGroup)
+    pSelectedSource = New GridSource(pDataManager, pSelectedGroup)
 
     pMatchingGrid.Initialize(pMatchingSource)
     pSelectedGrid.Initialize(pSelectedSource)
@@ -325,12 +334,12 @@ Friend Class frmSelectData
     If aModal Then
       Me.ShowDialog()
       If Not pSelectedOK Then 'User clicked Cancel or closed dialog
-        pSelectedTS.ChangeTo(pSaveGroup)
+        pSelectedGroup.ChangeTo(pSaveGroup)
       End If
     Else
       Me.Show()
     End If
-    Return pSelectedTS
+    Return pSelectedGroup
   End Function
 
   Private Sub Populate()
@@ -393,30 +402,28 @@ Friend Class frmSelectData
 
   Private Sub PopulateMatching()
     Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
-    pMatchingTS.Clear()
+    pMatchingGroup.Clear()
     pTotalTS = 0
-    For Each source As atcDataSource In pDataManager.DataSources
-      For Each ts As atcDataSet In source.DataSets
-        pTotalTS += 1
-        For iCriteria As Integer = 0 To iLastCriteria
-          Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
-          If Not attrName Is Nothing Then
-            Dim selectedValues As Windows.Forms.ListBox.SelectedObjectCollection = plstCriteria(iCriteria).SelectedItems
-            If selectedValues.Count > 0 Then 'none selected = all selected
-              Dim attrValue As Object = ts.Attributes.GetValue(attrName, Nothing)
-              If attrValue Is Nothing Then attrValue = NOTHING_VALUE
-              If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
-                GoTo NextTS
-              End If
+    For Each ts As atcDataSet In pDataManager.DataSets
+      pTotalTS += 1
+      For iCriteria As Integer = 0 To iLastCriteria
+        Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
+        If Not attrName Is Nothing Then
+          Dim selectedValues As Windows.Forms.ListBox.SelectedObjectCollection = plstCriteria(iCriteria).SelectedItems
+          If selectedValues.Count > 0 Then 'none selected = all selected
+            Dim attrValue As Object = ts.Attributes.GetValue(attrName, Nothing)
+            If attrValue Is Nothing Then attrValue = NOTHING_VALUE
+            If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
+              GoTo NextTS
             End If
           End If
-        Next
-        'Matched all criteria, add to matching table
-        pMatchingTS.Add(ts)
-NextTS:
+        End If
       Next
+      'Matched all criteria, add to matching table
+      pMatchingGroup.Add(ts)
+NextTS:
     Next
-    lblMatching.Text = "Matching Data (" & pMatchingTS.Count & " of " & pTotalTS & ")"
+    lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
     pMatchingGrid.Refresh()
   End Sub
 
@@ -657,7 +664,7 @@ NextName:
 
   Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
     pSelectedOK = False
-    pSelectedTS.ChangeTo(pSaveGroup)
+    pSelectedGroup.ChangeTo(pSaveGroup)
     Me.Close()
   End Sub
 
@@ -679,14 +686,14 @@ NextName:
   Private Sub pMatchingGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles pMatchingGrid.MouseDownCell
     If IsNumeric(pMatchingSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
       Dim lSerial As Integer = CInt(pMatchingSource.CellValue(aRow, 0)) 'Serial number in clicked row
-      Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
+      Dim iTS As Integer = pSelectedGroup.IndexOfSerial(lSerial)
       If iTS >= 0 Then 'Already selected, unselect
-        pSelectedTS.RemoveAt(iTS)
+        pSelectedGroup.RemoveAt(iTS)
       Else 'Not already selected, select it now
-        iTS = pMatchingTS.IndexOfSerial(lSerial)
-        If iTS >= 0 Then 'Found matching serial number in pMatchingTS
-          Dim selTS As atcData.atcDataSet = pMatchingTS(iTS)
-          pSelectedTS.Add(selTS)
+        iTS = pMatchingGroup.IndexOfSerial(lSerial)
+        If iTS >= 0 Then 'Found matching serial number in pMatchingGroup
+          Dim selTS As atcData.atcDataSet = pMatchingGroup(iTS)
+          pSelectedGroup.Add(selTS)
         End If
       End If
     End If
@@ -695,15 +702,15 @@ NextName:
 
   Private Sub RefreshSelected()
     pSelectedGrid.Refresh()
-    groupSelected.Text = "Selected Data (" & pSelectedTS.Count & " of " & pTotalTS & ")"
+    groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & " of " & pTotalTS & ")"
   End Sub
 
   Private Sub pSelectedGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles pSelectedGrid.MouseDownCell
     If IsNumeric(pSelectedSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
       Dim lSerial As Integer = CInt(pSelectedSource.CellValue(aRow, 0)) 'Serial number in row to be removed
-      Dim iTS As Integer = pSelectedTS.IndexOfSerial(lSerial)
-      If iTS >= 0 Then 'Found matching serial number in pSelectedTS
-        pSelectedTS.RemoveAt(iTS)
+      Dim iTS As Integer = pSelectedGroup.IndexOfSerial(lSerial)
+      If iTS >= 0 Then 'Found matching serial number in pSelectedGroup
+        pSelectedGroup.RemoveAt(iTS)
         RefreshSelected()
       Else
         'TODO: should never reach this line
@@ -732,22 +739,32 @@ NextName:
   End Sub
 
   Private Sub mnuSelectClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectClear.Click
-    pSelectedTS.Clear()
-    RefreshSelected()
+    If pSelectedGroup.Count > 0 Then
+      pSelectedGroup.Clear()
+      RefreshSelected()
+    End If
   End Sub
 
   Private Sub mnuSelectAllMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAllMatching.Click
-    For Each ts As atcDataSet In pMatchingTS
-      If Not pSelectedTS.Contains(ts) Then pSelectedTS.Add(ts)
+    Dim lAdd As New atcCollection
+    For Each ts As atcDataSet In pMatchingGroup
+      If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
     Next
-    RefreshSelected()
+    If lAdd.Count > 0 Then
+      pSelectedGroup.Add(lAdd)
+      RefreshSelected()
+    End If
   End Sub
 
   Private Sub mnuSelectNoMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectNoMatching.Click
-    For Each ts As atcDataSet In pMatchingTS
-      If pSelectedTS.Contains(ts) Then pSelectedTS.Remove(ts)
+    Dim lRemove As New atcCollection
+    For Each ts As atcDataSet In pMatchingGroup
+      If pSelectedGroup.Contains(ts) Then lRemove.Add(ts)
     Next
-    RefreshSelected()
+    If lRemove.Count > 0 Then
+      pSelectedGroup.Remove(lRemove)
+      RefreshSelected()
+    End If
   End Sub
 
   Private Sub mnuFileManage_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileManage.Click
@@ -765,7 +782,18 @@ NextName:
   End Sub
 
   Private Sub mnuAddData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddData.Click
-    pDataManager.UserOpenDataSource(Nothing, pSelectedTS)
+    pDataManager.UserOpenDataSource(Nothing, pSelectedGroup)
+  End Sub
+
+  Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click
+    Dim lAdd As New atcCollection
+    For Each ts As atcDataSet In pDataManager.DataSets
+      If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
+    Next
+    If lAdd.Count > 0 Then
+      pSelectedGroup.Add(lAdd)
+      RefreshSelected()
+    End If
   End Sub
 End Class
 

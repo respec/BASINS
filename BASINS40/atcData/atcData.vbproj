@@ -73,12 +73,6 @@
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Drawing.dll"
                 />
                 <Reference
-                    Name = "MapWinInterfaces"
-                    AssemblyName = "MapWinInterfaces"
-                    HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
-                    Private = "False"
-                />
-                <Reference
                     Name = "System.Windows.Forms"
                     AssemblyName = "System.Windows.Forms"
                     HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
@@ -110,6 +104,12 @@
                     Name = "System.Xml"
                     AssemblyName = "System.Xml"
                     HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Xml.dll"
+                />
+                <Reference
+                    Name = "MapWinInterfaces"
+                    AssemblyName = "MapWinInterfaces"
+                    HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>

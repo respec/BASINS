@@ -163,8 +163,8 @@ Public Class atcDebugTimserForm
         Dim lNode As New TreeNode
         lNode = .Nodes.Add(lData.ToString)
 
-        Dim lAttributeNode As New TreeNode
-        lAttributeNode = lNode.Nodes.Add("Attributes")
+        Dim lAttributeNode As TreeNode = lNode.Nodes.Add("Attributes")
+        Dim lComputedNode As TreeNode = lNode.Nodes.Add("Computed")
         Dim lAttributes As SortedList = lData.Attributes.ValuesSortedByName
         For i As Integer = 0 To lAttributes.Count - 1
           lAttributeName = lAttributes.GetKey(i)
@@ -173,10 +173,15 @@ Public Class atcDebugTimserForm
           Else
             lAttributeValue = lAttributes.GetByIndex(i)
           End If
-          lAttributeNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
+          If lData.Attributes.GetDefinition(lAttributeName).Calculated Then
+            lComputedNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
+          Else
+            lAttributeNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
+          End If
         Next
         lAttributeNode.ExpandAll()
         lAttributeNode.EnsureVisible()
+        lComputedNode.ExpandAll()
 
         Dim lInternalNode As New TreeNode
         lInternalNode = lNode.Nodes.Add("Internal")
@@ -185,13 +190,12 @@ Public Class atcDebugTimserForm
         lInternalNode.ExpandAll()
         lInternalNode.EnsureVisible()
 
-        lNode.Nodes.Add("Computed")
-        'all computed attributes here?
-
         Dim lDataNode As New TreeNode
         lDataNode = lNode.Nodes.Add("Data")
         If lNumValues > lNumValuesShow Then
           lNumValuesNow = lNumValuesShow
+        Else
+          lNumValuesNow = lNumValues
         End If
         For j As Integer = 0 To lNumValuesNow - 1
           lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j)) & " : " & _

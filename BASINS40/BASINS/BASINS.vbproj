@@ -80,12 +80,6 @@
                     HintPath = "C:\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Drawing.dll"
                 />
                 <Reference
-                    Name = "atcGraph"
-                    Project = "{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                    Private = "False"
-                />
-                <Reference
                     Name = "atcUtility"
                     Project = "{67027820-9036-481E-80F6-077E5085F59D}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
@@ -104,24 +98,9 @@
                     Private = "False"
                 />
                 <Reference
-                    Name = "MapWinGIS"
-                    Guid = "{C368D713-CC5F-40ED-9F53-F84FE197B96A}"
-                    VersionMajor = "3"
-                    VersionMinor = "0"
-                    Lcid = "0"
-                    WrapperTool = "tlbimp"
-                    Private = "False"
-                />
-                <Reference
                     Name = "System.Data"
                     AssemblyName = "System.Data"
                     HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Data.dll"
-                />
-                <Reference
-                    Name = "ZedGraph"
-                    AssemblyName = "ZedGraph"
-                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ZedGraph.dll"
-                    Private = "False"
                 />
                 <Reference
                     Name = "ChilkatDotNet"
@@ -134,6 +113,11 @@
                     Project = "{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
                     Private = "False"
+                />
+                <Reference
+                    Name = "Interop.MapWinGIS"
+                    AssemblyName = "Interop.MapWinGIS"
+                    HintPath = "..\..\MapWindow40\Bin\Interop.MapWinGIS.dll"
                 />
             </References>
             <Imports>
