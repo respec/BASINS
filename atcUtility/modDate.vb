@@ -126,7 +126,12 @@ Public Module modDate
     '##LOCAL jd - date portion of date to convert
     '##LOCAL jhms - time portion of date to convert
     '##LOCAL f - fraction of a second resulting from conversion
-    jd = Fix(j)
+    Try
+      jd = Fix(j)
+    Catch 'TODO: what should this be, probable cause is NaN (which does not convert to integer)
+      jd = 0
+    End Try
+
     Call INVMJD(jd, d(0), d(1), d(2))
     jhms = j - jd
     Call J2HMS(jhms, d(3), d(4), d(5), f)

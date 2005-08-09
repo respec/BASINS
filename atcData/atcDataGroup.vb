@@ -57,24 +57,24 @@ Public Class atcDataGroup
   End Property
 
   'Add one atcDataSet to the group with the default key of its serial number
-  Public Overloads Overrides Function Add(ByVal aDataSet As Object) As Integer
+  Public Shadows Function Add(ByVal aDataSet As Object) As Integer
     Add(aDataSet.Serial, aDataSet)
   End Function
 
   'Add one atcDataSet to the group with a custom key
-  Public Overloads Overrides Function Add(ByVal key As Object, ByVal aDataSet As Object) As Integer
+  Public Shadows Function Add(ByVal key As Object, ByVal aDataSet As Object) As Integer
     MyBase.Add(key, aDataSet)
     RaiseAddedOne(aDataSet)
   End Function
 
   'Add an atcCollection or atcDataGroup of atcDataSet to the group
-  Public Overloads Sub Add(ByVal aAddThese As atcCollection)
+  Public Shadows Sub Add(ByVal aAddThese As atcCollection)
     MyBase.AddRange(aAddThese)
     RaiseEvent Added(aAddThese)
   End Sub
 
   'Remove all atcDataSets and selection
-  Public Overrides Sub Clear()
+  Public Shadows Sub Clear()
     If Not pSelectedData Is Nothing Then pSelectedData.Clear()
     If Count > 0 Then
       Dim lRemoved As atcDataGroup = Me.Clone
@@ -83,7 +83,7 @@ Public Class atcDataGroup
     End If
   End Sub
 
-  Public Overrides Function Clone() As Object
+  Public Shadows Function Clone() As Object
     Dim newClone As New atcDataGroup
     For index As Integer = 0 To MyBase.Count - 1
       newClone.Add(MyBase.Keys(index), MyBase.Item(index))
@@ -125,12 +125,12 @@ Public Class atcDataGroup
   End Function
 
   'Insert a new DataSet at the specified index
-  Public Overloads Overrides Sub Insert(ByVal aIndex As Integer, ByVal aDataSet As Object)
+  Public Shadows Sub Insert(ByVal aIndex As Integer, ByVal aDataSet As Object)
     MyBase.Insert(aIndex, aDataSet)
     RaiseAddedOne(aDataSet)
   End Sub
 
-  Public Overrides Sub RemoveAt(ByVal index As Integer)
+  Public Shadows Sub RemoveAt(ByVal index As Integer)
     'Cannot just do: Remove(ItemByIndex(index))
     'because this overriding RemoveAt is called by MyBase.Remove--infinite loop
     Dim lDataSet As atcDataSet = ItemByIndex(index)
@@ -139,13 +139,13 @@ Public Class atcDataGroup
   End Sub
 
   'Remove aDataSet from the group
-  Public Overloads Overrides Sub Remove(ByVal aDataSet As Object)
+  Public Shadows Sub Remove(ByVal aDataSet As Object)
     MyBase.Remove(aDataSet)
     RaiseRemovedOne(aDataSet)
   End Sub
 
   'Remove a list of atcDataSet from the group, can be atcCollection or atcDataGroup
-  Public Overloads Sub Remove(ByVal aRemoveThese As atcCollection)
+  Public Shadows Sub Remove(ByVal aRemoveThese As atcCollection)
     If Not aRemoveThese Is Nothing AndAlso aRemoveThese.Count > 0 Then
       For Each ts As atcDataSet In aRemoveThese
         MyBase.Remove(ts)
@@ -155,7 +155,7 @@ Public Class atcDataGroup
   End Sub
 
   'Remove a span of one or more DataSets from the group by index
-  Public Overrides Sub RemoveRange(ByVal aIndex As Integer, ByVal aNumber As Integer)
+  Public Shadows Sub RemoveRange(ByVal aIndex As Integer, ByVal aNumber As Integer)
     Dim lRemoveThese As New atcCollection
     For index As Integer = aIndex To aIndex + aNumber - 1
       lRemoveThese.Add(Item(index))
@@ -175,7 +175,7 @@ Public Class atcDataGroup
     End Set
   End Property
 
-  Public Overrides Function ToString() As String
+  Public Shadows Function ToString() As String
     ToString = Count & " Data:"
     For Each lts As atcDataSet In Me
       ToString &= vbCrLf & "  " & lts.ToString

@@ -99,7 +99,7 @@ Public Class atcDataAttributes
   End Sub
 
   'Set attribute with name aAttributeName to value aValue
-  Public Overloads Overrides Function Add(ByVal aAttributeName As Object, ByVal aAttributeValue As Object) As Integer
+  Public Shadows Function Add(ByVal aAttributeName As Object, ByVal aAttributeValue As Object) As Integer
     Dim lTmpAttrDef As New atcAttributeDefinition
     lTmpAttrDef = pAllDefinitions.ItemByKey(aAttributeName.ToLower)
     If lTmpAttrDef Is Nothing Then
@@ -109,7 +109,7 @@ Public Class atcDataAttributes
     SetValue(lTmpAttrDef, aAttributeValue)
   End Function
 
-  Public Overloads Overrides Function Add(ByVal aDefinedValue As Object) As Integer
+  Public Shadows Function Add(ByVal aDefinedValue As Object) As Integer
     If aDefinedValue Is Nothing Then
       Return -1
     Else
