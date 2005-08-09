@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic LastOpenVersion = "7.10.3077" >
         <Build>
-            <Settings ReferencePath = "C:\dev\MapWindow40\Bin\Plugins\BASINS\;C:\dev\MapWindow40\Bin\;C:\dev\MapWindow40\Bin\Plugins\;C:\dev\jts\lib\;C:\Program Files\IKVM\" >
+            <Settings ReferencePath = "C:\dev\MapWindow40\Bin\;C:\dev\MapWindow40\Bin\Plugins\BASINS\;C:\dev\MapWindow40\Bin\Plugins\;C:\dev\jts\lib\;C:\Program Files\IKVM\" >
                 <Config
                     Name = "Debug"
                     EnableASPDebugging = "false"
@@ -15,7 +15,7 @@
                     StartPage = ""
                     StartProgram = "C:\dev\MapWindow40\Bin\Basins4.exe"
                     StartURL = ""
-                    StartWorkingDirectory = ""
+                    StartWorkingDirectory = "C:\test\BASINS4\scripts\"
                     StartWithIE = "true"
                 />
                 <Config
