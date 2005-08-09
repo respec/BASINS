@@ -165,7 +165,7 @@ Public Class atcDebugTimserForm
 
         Dim lAttributeNode As New TreeNode
         lAttributeNode = lNode.Nodes.Add("Attributes")
-        Dim lAttributes As SortedList = lData.Attributes.GetAll
+        Dim lAttributes As SortedList = lData.Attributes.ValuesSortedByName
         For i As Integer = 0 To lAttributes.Count - 1
           lAttributeName = lAttributes.GetKey(i)
           If InStr(LCase(lAttributeName), "jday", CompareMethod.Text) Then
@@ -291,12 +291,12 @@ Public Class atcDebugTimserForm
     pDataManager.UserSelectData(, pDataGroup)
   End Sub
 
-  Private Sub pDataGroup_Added(ByVal aAdded As Collections.ArrayList) Handles pDataGroup.Added
+  Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
     PopulateTree()
     'TODO: could efficiently insert newly added item(s)
   End Sub
 
-  Private Sub pDataGroup_Removed(ByVal aRemoved As System.Collections.ArrayList) Handles pDataGroup.Removed
+  Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
     PopulateTree()
     'TODO: could efficiently remove by serial number
   End Sub

@@ -1,4 +1,5 @@
 Imports System.Windows.Forms
+Imports atcUtility
 
 Public Class frmDataSource
   Inherits System.Windows.Forms.Form
@@ -137,22 +138,29 @@ Public Class frmDataSource
           lCategoryNode.ExpandAll()
           If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
             For Each lOperation As atcDataSet In lOperations
+              Dim lName As String = lOperation.Attributes.GetValue("Name")
+              If lName.Length = 0 Then
+                lName = lOperation.Attributes.ItemByIndex(0).Definition.Name
+              End If
+
               'Operations might have categories to further divide them
               Dim lSubCategory As String = lOperation.Attributes.GetValue("Category")
               If lSubCategory.Length > 0 Then
                 Dim lSubCategoryNode As TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lSubCategory)
+                lNode = lSubCategoryNode.Nodes.Add(lName)
                 lSubCategoryNode.ExpandAll()
-                lNode = lSubCategoryNode.Nodes.Add(lOperation.Attributes.GetValue("Name"))
               Else
-                lNode = lCategoryNode.Nodes.Add(lOperation.Attributes.GetValue("Name"))
+                lNode = lCategoryNode.Nodes.Add(lName)
               End If
 
+              lNode.Tag = ds.Name
               If ds.Equals(pSelectedSource) AndAlso lNode.Text = pSpecification Then
                 treeSources.SelectedNode = lNode
               End If
             Next
           Else
             lNode = lCategoryNode.Nodes.Add(ds.Description)
+            lNode.Tag = ds.Name
             If ds.Equals(pSelectedSource) Then
               treeSources.SelectedNode = lNode
             End If
@@ -186,22 +194,26 @@ Public Class frmDataSource
   End Sub
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    Dim lSelectedOperationName As String = treeSources.SelectedNode.Text
-    'TODO: if operations in different categories/datasets might have the same name, need new method to find operation
+    Dim lSourceName As String = treeSources.SelectedNode.Tag
+    Dim lOperationName As String = treeSources.SelectedNode.Text
     For Each ds As atcDataSource In pDataManager.GetPlugins(GetType(atcDataSource))
-      Dim lOperations As atcDataGroup = ds.AvailableOperations
-      If lOperations.Count > 0 Then
-        For Each lOperation As atcDataSet In lOperations
-          If lOperation.Attributes.GetValue("Name") = lSelectedOperationName Then
-            pSelectedSource = ds
-            pSpecification = lOperation.Attributes.GetValue("Name")
-          End If
-        Next
-      ElseIf ds.Description = lSelectedOperationName Then
-        pSelectedSource = ds
+      If ds.Name = lSourceName Then
+        Dim lOperations As atcDataGroup = ds.AvailableOperations
+        If lOperations.Count > 0 Then
+          For Each lOperation As atcDataSet In lOperations
+            If lOperation.Attributes.GetValue("Name") = lOperationName OrElse _
+               lOperation.Attributes.ItemByIndex(0).Definition.Name = lOperationName Then
+              pSelectedSource = ds
+              pSpecification = lOperationName
+              Me.Close()
+            End If
+          Next
+        ElseIf ds.Description = lOperationName Then
+          pSelectedSource = ds
+          Me.Close()
+        End If
       End If
     Next
-    Me.Close()
   End Sub
 
   Private Sub treeSources_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles treeSources.DoubleClick
