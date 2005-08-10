@@ -62,6 +62,7 @@ Public Class atcTimeseries
         End If
         If pValueAttributes(index) Is Nothing Then 'Create new atcDataAttributes for this value
           pValueAttributes(index) = New atcDataAttributes
+          pValueAttributes(index).Owner = Me
         End If
         Return pValueAttributes(index)
       Else

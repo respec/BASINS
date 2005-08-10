@@ -64,9 +64,6 @@ Public Class atcTimeseriesStatistics
         AddOperation("Standard deviation", "Standard deviation", _
                      defTimeSeriesOne, defCategory)
 
-        'AddOperation("7Q10", "Seven day ten year low flow", _
-        '             defTimeSeriesOne, defCategory)
-
       End If
       Return pAvailableOperations
     End Get
@@ -90,13 +87,12 @@ Public Class atcTimeseriesStatistics
     Dim lData As New atcDataSet
     lData.Attributes.SetValue(lResult, Nothing, lArguments)
     'lData.Attributes.SetValue(aCategory, Category)
-    pAvailableOperations.Add(lResult.Name, lData)
+    pAvailableOperations.Add(lResult.Name.ToLower, lData)
 
   End Sub
 
   'Compute all available statistics for aTimeseries and add them as attributes
   Private Sub ComputeStatistics(ByVal aTimeseries As atcTimeseries)
-    'TODO: SetAttribute(aTimeseries, "7Q10", "7Q10 can not yet be calculated")
     Dim iLastValue As Integer = aTimeseries.numValues - 1
     If iLastValue >= 0 Then
       Dim iValue As Integer
@@ -147,7 +143,7 @@ Public Class atcTimeseriesStatistics
 
   'Set the named attribute in aTimeseries using the definition from pAvailableStatistics
   Private Sub SetAttribute(ByVal aTimeseries As atcTimeseries, ByVal aName As String, ByVal aValue As Double)
-    Dim ds As atcDataSet = pAvailableOperations.ItemByKey(aName)
+    Dim ds As atcDataSet = pAvailableOperations.ItemByKey(aName.ToLower)
     If Not ds Is Nothing Then
       Dim def As atcAttributeDefinition = ds.Attributes.GetDefinition(aName)
       If Not def Is Nothing Then
@@ -166,15 +162,20 @@ Public Class atcTimeseriesStatistics
   'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
   'remaining aArgs are expected to follow the args required for the specified operation
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-    Dim ltsGroup As atcDataGroup
     If aArgs Is Nothing Then
-      ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
+      Dim ltsGroup As atcDataGroup = DataManager.UserSelectData("Select data to compute statistics for")
+      For Each lts As atcTimeseries In ltsGroup
+        ComputeStatistics(lts)
+      Next
     Else
-      ltsGroup = aArgs.GetValue("Timeseries")
+      ComputeStatistics(aArgs.GetValue("Timeseries"))
     End If
-    For Each lts As atcTimeseries In ltsGroup
-      ComputeStatistics(lts)
-    Next
   End Function
+
+  Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
+    For Each operation As atcDataSet In AvailableOperations
+      atcDataAttributes.AddDefinition(operation.Attributes(0).Definition)
+    Next
+  End Sub
 
 End Class
