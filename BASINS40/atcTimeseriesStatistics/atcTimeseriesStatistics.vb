@@ -127,7 +127,7 @@ Public Class atcTimeseriesStatistics
 
       If lMin > 0 Then
         lGeometricMean = Math.Exp(lGeometricMean / iValue)
-        SetAttribute(aTimeseries, "GeometricMean", lGeometricMean)
+        SetAttribute(aTimeseries, "Geometric Mean", lGeometricMean)
       End If
 
       If iValue > 1 Then
@@ -135,7 +135,7 @@ Public Class atcTimeseriesStatistics
         SetAttribute(aTimeseries, "Variance", lVariance)
         If lVariance > 0 Then
           lStandardDeviation = Math.Sqrt(lVariance)
-          SetAttribute(aTimeseries, "StandardDeviation", lStandardDeviation)
+          SetAttribute(aTimeseries, "Standard Deviation", lStandardDeviation)
         End If
       End If
     End If
