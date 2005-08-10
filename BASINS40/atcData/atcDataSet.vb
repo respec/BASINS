@@ -15,6 +15,7 @@ Public Class atcDataSet
 
   Public Overridable Sub Clear()
     pAttributes = New atcDataAttributes
+    pAttributes.Owner = Me
   End Sub
 
   Public Sub New()

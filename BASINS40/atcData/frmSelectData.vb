@@ -370,20 +370,13 @@ Friend Class frmSelectData
     Dim i As Integer
     For i = 0 To pcboCriteria.GetUpperBound(0)
       pcboCriteria(i).Items.Clear()
-      'If pcboCriteria.GetUpperBound(0) > 0 Then
-      '  pcboCriteria(i).Items.Add(REMOVE_VALUE)
-      'End If
     Next
-    For Each source As atcDataSource In pDataManager.DataSources
-      For Each ts As atcDataSet In source.DataSets
-        For Each de As DictionaryEntry In ts.Attributes.ValuesSortedByName
-          If Not pcboCriteria(0).Items.Contains(de.Key) Then
-            For i = 0 To pcboCriteria.GetUpperBound(0)
-              pcboCriteria(i).Items.Add(de.Key)
-            Next
-          End If
+    For Each def As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+      If Not pcboCriteria(0).Items.Contains(def.Name) Then
+        For i = 0 To pcboCriteria.GetUpperBound(0)
+          pcboCriteria(i).Items.Add(def.Name)
         Next
-      Next
+      End If
     Next
   End Sub
 
@@ -840,7 +833,12 @@ Friend Class GridSource
       ElseIf aColumn = 0 Then
         Return pDataGroup(aRow - (LabelRow + 1)).Serial()
       Else
-        Return pDataGroup(aRow - (LabelRow + 1)).Attributes.GetValue(pDataManager.SelectionAttributes(aColumn - 1))
+        Dim val As Object = pDataGroup(aRow - (LabelRow + 1)).Attributes.GetValue(pDataManager.SelectionAttributes(aColumn - 1))
+        If TypeOf (val) Is Double Then
+          Return Format(val, "#,##0.#####")
+        Else
+          Return val
+        End If
       End If
     End Get
     Set(ByVal Value As String)

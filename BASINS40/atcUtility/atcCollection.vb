@@ -40,7 +40,7 @@ Public Class atcCollection
     MyBase.Clear()
   End Sub
 
-  Public Shadows Function Clone() As Object
+  Public Shadows Function Clone() As atcCollection
     Dim newClone As New atcCollection
     For index As Integer = 0 To MyBase.Count - 1
       newClone.Add(pKeys.Item(index), MyBase.Item(index))
@@ -125,7 +125,7 @@ Public Class atcCollection
   End Sub
 
   'Exactly the same as Item. Added for clarity as a parallel to ItemByKey.
-  Public Property ItemByIndex(ByVal index As Integer) As Object
+  Public Overridable Property ItemByIndex(ByVal index As Integer) As Object
     Get
       Return MyBase.Item(index)
     End Get

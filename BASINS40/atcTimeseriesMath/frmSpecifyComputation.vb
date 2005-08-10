@@ -144,9 +144,8 @@ Public Class frmSpecifyComputation
     ReDim pArgText(-1)
     ReDim pArgButton(-1)
 
-    For Each lArg As DictionaryEntry In pAttributes
-      Dim lDef As atcDefinedValue = lArg.Value
-      AddArg(lDef)
+    For Each lArg As atcDefinedValue In pAttributes
+      AddArg(lArg)
     Next
   End Sub
 
