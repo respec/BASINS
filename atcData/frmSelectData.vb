@@ -382,14 +382,11 @@ Friend Class frmSelectData
 
   Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As Windows.Forms.ListBox)
     aList.Items.Clear()
-    For Each source As atcDataSource In pDataManager.DataSources
-      For Each ts As atcDataSet In source.DataSets
-        Dim val As Object = ts.Attributes.GetValue(aAttributeName, Nothing)
-        If val Is Nothing Then val = NOTHING_VALUE
-        If Not aList.Items.Contains(val) Then
-          aList.Items.Add(val)
-        End If
-      Next
+    For Each ts As atcDataSet In pDataManager.DataSets
+      Dim val As String = ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE)
+      If Not aList.Items.Contains(val) Then
+        aList.Items.Add(val)
+      End If
     Next
   End Sub
 
@@ -404,8 +401,7 @@ Friend Class frmSelectData
         If Not attrName Is Nothing Then
           Dim selectedValues As Windows.Forms.ListBox.SelectedObjectCollection = plstCriteria(iCriteria).SelectedItems
           If selectedValues.Count > 0 Then 'none selected = all selected
-            Dim attrValue As Object = ts.Attributes.GetValue(attrName, Nothing)
-            If attrValue Is Nothing Then attrValue = NOTHING_VALUE
+            Dim attrValue As String = ts.Attributes.GetFormattedValue(attrName, NOTHING_VALUE)
             If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
               GoTo NextTS
             End If
@@ -833,12 +829,7 @@ Friend Class GridSource
       ElseIf aColumn = 0 Then
         Return pDataGroup(aRow - (LabelRow + 1)).Serial()
       Else
-        Dim val As Object = pDataGroup(aRow - (LabelRow + 1)).Attributes.GetValue(pDataManager.SelectionAttributes(aColumn - 1))
-        If TypeOf (val) Is Double Then
-          Return Format(val, "#,##0.#####")
-        Else
-          Return val
-        End If
+        Return pDataGroup(aRow - (LabelRow + 1)).Attributes.GetFormattedValue(pDataManager.SelectionAttributes(aColumn - 1))
       End If
     End Get
     Set(ByVal Value As String)

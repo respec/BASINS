@@ -62,6 +62,16 @@ Public Class atcDataAttributes
     Return Keys.Contains(aAttributeName.ToLower)
   End Function
 
+
+  Public Function GetFormattedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As String
+    Dim lValue As Object = GetValue(aAttributeName, aDefault)
+
+    If TypeOf (lValue) Is Double Then Return Format(lValue, "#,##0.#####")
+
+    Return CStr(lValue)
+
+  End Function
+
   'Retrieve or calculate the value for aAttributeName
   'returns aDefault if attribute has not been set and cannot be calculated
   Public Function GetValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As Object
@@ -192,11 +202,9 @@ Public Class atcDataAttributes
   'End Function
 
   Public Function GetDefinedValue(ByVal aAttributeName As String) As atcDefinedValue
-    Dim key As String = aAttributeName.ToLower
+    Dim key As String = AttributeNameToKey(aAttributeName)
     Dim tmpAttribute As atcDefinedValue = ItemByKey(key)
-    If Not tmpAttribute Is Nothing Then 'Found the named attribute
-      Return tmpAttribute
-    Else
+    If tmpAttribute Is Nothing Then  'Did not find the named attribute
       If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
         Try
           Dim lOwnerTS As atcTimeseries = Owner
@@ -213,6 +221,7 @@ Public Class atcDataAttributes
                       Dim tmpArgs As atcDataAttributes = lCalculation.Arguments.Clone
                       tmpArgs.SetValue(lArg.Definition, lOwnerTS)
                       tmpDef.Calculator.Open(tmpDef.Name, tmpArgs)
+                      tmpAttribute = ItemByKey(key)
                     End If
                   End If
                 End If
@@ -222,19 +231,8 @@ Public Class atcDataAttributes
         Catch CalcExcep As Exception
         End Try
       End If
-
-      key = pAllAliases.ItemByKey(key)
-      If key Is Nothing Then
-        Return Nothing
-      Else
-        key = key.ToString.ToLower
-        If key.Equals(aAttributeName.ToLower) Then
-          Return Nothing 'Not found and could not calculate
-        Else
-          Return GetDefinedValue(key)
-        End If
-      End If
     End If
+    Return tmpAttribute
   End Function
 
   Public Shadows Property ItemByIndex(ByVal index As Integer) As atcDefinedValue
