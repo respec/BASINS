@@ -168,11 +168,7 @@ Public Class atcDebugTimserForm
         Dim lAttributes As SortedList = lData.Attributes.ValuesSortedByName
         For i As Integer = 0 To lAttributes.Count - 1
           lAttributeName = lAttributes.GetKey(i)
-          If InStr(LCase(lAttributeName), "jday", CompareMethod.Text) Then
-            lAttributeValue = DumpDate(lAttributes.GetByIndex(i))
-          Else
-            lAttributeValue = lAttributes.GetByIndex(i)
-          End If
+          lAttributeValue = lData.Attributes.GetFormattedValue(lAttributeName)
           If lData.Attributes.GetDefinition(lAttributeName).Calculated Then
             lComputedNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
           Else
