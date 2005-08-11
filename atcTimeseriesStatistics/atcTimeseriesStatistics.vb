@@ -173,13 +173,6 @@ Public Class atcTimeseriesStatistics
     End If
   End Sub
 
-  'Opening computes statistics rather than opening a file
-  'Public Overrides ReadOnly Property CanOpen() As Boolean
-  '  Get
-  '    Return True
-  '  End Get
-  'End Property
-
   'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
   'remaining aArgs are expected to follow the args required for the specified operation
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean

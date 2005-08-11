@@ -521,6 +521,7 @@ Public Class atcTimeseriesMath
     MyBase.AddDataSet(t)
   End Function
 
+  'WARNING: cousin copy in atcTimeseriesNdayHighLow
   Private Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
                                 ByVal aStartDate As Double, _
                                 ByVal aEndDate As Double) As atcTimeseries
@@ -551,7 +552,12 @@ Public Class atcTimeseriesMath
     lnewTS.Dates.Values = newDates
 
     lnewTS.Attributes.ChangeTo(aTimeseries.Attributes)
-    'TODO: recalculate computed attributes
+
+    For Each lAttribute As atcDefinedValue In lnewTS.Attributes
+      If lAttribute.Definition.Calculated Then
+        lnewTS.Attributes.Remove(lAttribute)
+      End If
+    Next
 
     lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
     Return lnewTS
