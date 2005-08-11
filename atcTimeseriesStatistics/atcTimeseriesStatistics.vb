@@ -48,6 +48,8 @@ Public Class atcTimeseriesStatistics
           .TypeString = "atcTimeseries"
         End With
 
+        AddOperation("Count", "Count of non missing values", defTimeSeriesOne, defCategory)
+
         AddOperation("Max", "Maximum value", defTimeSeriesOne, defCategory)
 
         AddOperation("Min", "Minimum value", defTimeSeriesOne, defCategory)
@@ -61,7 +63,13 @@ Public Class atcTimeseriesStatistics
         AddOperation("Variance", "Statistical variance", _
                      defTimeSeriesOne, defCategory)
 
+        AddOperation("VarianceA193", "Statistical variance calc from A193", _
+                     defTimeSeriesOne, defCategory)
+
         AddOperation("Standard deviation", "Standard deviation", _
+                     defTimeSeriesOne, defCategory)
+
+        AddOperation("Skew", "Skewness", _
                      defTimeSeriesOne, defCategory)
 
       End If
@@ -93,49 +101,62 @@ Public Class atcTimeseriesStatistics
 
   'Compute all available statistics for aTimeseries and add them as attributes
   Private Sub ComputeStatistics(ByVal aTimeseries As atcTimeseries)
-    Dim iLastValue As Integer = aTimeseries.numValues - 1
-    If iLastValue >= 0 Then
-      Dim iValue As Integer
-      Dim val As Double
+    Dim lLastValueIndex As Integer = aTimeseries.numValues - 1
+
+    If lLastValueIndex >= 0 Then
+      Dim lIndex As Integer
+      Dim lVal As Double
 
       Dim lMax As Double = -1.0E+30
       Dim lMin As Double = 1.0E+30
 
       Dim lGeometricMean As Double = 0
-      Dim lStandardDeviation As Double = 0
+      Dim lStdDev As Double = 0
+      Dim lCount As Double = 0
       Dim lMean As Double = 0
       Dim lSum As Double = 0
       Dim lSumSquares As Double = 0
+      Dim lSumCubes As Double = 0
       Dim lVariance As Double = 0
+      Dim lVarianceA193 As Double = 0
+      Dim lSkew As Double = 0
 
-      For iValue = 0 To iLastValue
-        val = aTimeseries.Value(iValue)
-        If val > lMax Then lMax = val
-        If val < lMin Then lMin = val
-        lSum += val
-        lSumSquares += val * val
-        If lMin > 0 Then lGeometricMean += Math.Log(val)
+      For lIndex = 0 To lLastValueIndex
+        lVal = aTimeseries.Value(lIndex)
+        If Not aTimeseries.ValueMissing(lVal) Then
+          lCount += 1
+          If lVal > lMax Then lMax = lVal
+          If lVal < lMin Then lMin = lVal
+          lSum += lVal
+          lSumSquares += lVal * lVal
+          lSumCubes += lVal * lVal * lVal
+          If lMin > 0 Then lGeometricMean += Math.Log(lVal)
+        End If
       Next
 
       SetAttribute(aTimeseries, "Max", lMax)
       SetAttribute(aTimeseries, "Min", lMin)
       SetAttribute(aTimeseries, "Sum", lSum)
+      SetAttribute(aTimeseries, "Count", lCount)
 
-      iValue = aTimeseries.numValues
-      lMean = lSum / iValue
+      lMean = lSum / lCount
       SetAttribute(aTimeseries, "Mean", lMean)
 
       If lMin > 0 Then
-        lGeometricMean = Math.Exp(lGeometricMean / iValue)
+        lGeometricMean = Math.Exp(lGeometricMean / lCount)
         SetAttribute(aTimeseries, "Geometric Mean", lGeometricMean)
       End If
 
-      If iValue > 1 Then
-        lVariance = (lSumSquares - (lSum * lSum) / iValue) / (iValue - 1)
+      If lCount > 1 Then
+        lVarianceA193 = lSumSquares / (lCount - 1)
+        SetAttribute(aTimeseries, "VarianceA193", lVarianceA193)
+        lVariance = (lSumSquares - (lSum * lSum) / lCount) / (lCount - 1)
         SetAttribute(aTimeseries, "Variance", lVariance)
         If lVariance > 0 Then
-          lStandardDeviation = Math.Sqrt(lVariance)
-          SetAttribute(aTimeseries, "Standard Deviation", lStandardDeviation)
+          lStdDev = Math.Sqrt(lVariance)
+          SetAttribute(aTimeseries, "Standard Deviation", lStdDev)
+          lSkew = (lCount * lSumCubes) / ((lCount - 1.0) * (lCount * 2.0) * lStdDev * lStdDev * lStdDev)
+          SetAttribute(aTimeseries, "Skew", lSkew)
         End If
       End If
     End If

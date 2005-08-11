@@ -1,5 +1,7 @@
+Imports System.Math
+
 Public Class atcTimeseries
-  Inherits atcDataset
+  Inherits atcDataSet
 
   Private pDates As atcTimeseries
   'Private pDateLengths As atcTimeseries
@@ -10,6 +12,7 @@ Public Class atcTimeseries
   Private pNumValues As Integer
   Private pValues() As Double
   Private pValueAttributes() As atcDataAttributes
+  Private pMissingValue As Object
 
   Public Overrides Function ToString() As String
     Dim id As String = Attributes.GetValue("id")
@@ -21,7 +24,7 @@ Public Class atcTimeseries
   End Function
 
   'Set or get an individual value
-  Public Property Value(ByVal index As Long) As Double
+  Public Property Value(ByVal index As Integer) As Double
     Get
       EnsureValuesRead()
       If index >= 0 And index <= pNumValues Then
@@ -40,6 +43,22 @@ Public Class atcTimeseries
     End Set
   End Property
 
+  Public ReadOnly Property ValueMissing(ByVal index As Integer) As Boolean
+    Get
+      EnsureValuesRead()
+      If index >= 0 And index <= pNumValues Then
+        If pMissingValue Is Nothing Then 'no fill value attribute, assume ok
+          Return False
+        ElseIf Abs(pValues(index) - pMissingValue) < Double.Epsilon Then
+          Return True
+        End If
+      Else 'missing for sure
+        Return True
+      End If
+      Return False
+    End Get
+  End Property
+
   'Set or get the entire array of values
   Public Property Values() As Double()
     Get
@@ -53,7 +72,7 @@ Public Class atcTimeseries
   End Property
 
   'Attributes associated with individual values (quality flags)
-  Public Property ValueAttributes(ByVal index As Long) As atcDataAttributes
+  Public Property ValueAttributes(ByVal index As Integer) As atcDataAttributes
     Get
       EnsureValuesRead()
       If index >= 0 And index <= pNumValues Then
@@ -148,6 +167,7 @@ Public Class atcTimeseries
     If pValuesNeedToBeRead Then
       'just header information was read at first, delaying using the time/space to read all the data
       pDataSource.ReadData(Me) 'ValuesNeedToBeRead = False should happen in pFile.ReadData            
+      pMissingValue = Me.Attributes.GetValue("TSFILL", Nothing)
     End If
   End Sub
 
