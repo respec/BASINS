@@ -381,13 +381,17 @@ Friend Class frmSelectData
   End Sub
 
   Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As Windows.Forms.ListBox)
-    aList.Items.Clear()
-    For Each ts As atcDataSet In pDataManager.DataSets
-      Dim val As String = ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE)
-      If Not aList.Items.Contains(val) Then
-        aList.Items.Add(val)
-      End If
-    Next
+    With aList
+      .Items.Clear()
+      .Visible = False
+      For Each ts As atcDataSet In pDataManager.DataSets
+        Dim val As String = ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE)
+        If Not .Items.Contains(val) Then
+          .Items.Add(val)
+        End If
+      Next
+      .Visible = True
+    End With
   End Sub
 
   Private Sub PopulateMatching()

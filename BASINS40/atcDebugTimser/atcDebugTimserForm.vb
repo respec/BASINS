@@ -149,6 +149,7 @@ Public Class atcDebugTimserForm
 
     atrMain = New TreeView
     With atrMain
+      .Visible = False
       .Location = New System.Drawing.Point(0, 0)
       .Name = "atrMain"
       .Size = Me.ClientSize
@@ -195,7 +196,7 @@ Public Class atcDebugTimserForm
         End If
         For j As Integer = 0 To lNumValuesNow - 1
           lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j)) & " : " & _
-                              lData.Value(j))
+                              Format(lData.Value(j), "#,##0.#####"))
         Next
         If lNumValues > lNumValuesShow Then  'some from end too
           If lNumValues - lNumValuesShow > lNumValuesShow Then
@@ -206,10 +207,11 @@ Public Class atcDebugTimserForm
           End If
           For j As Integer = lValueStart To lData.numValues
             lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j)) & " : " & _
-                                lData.Value(j))
+                                Format(lData.Value(j), "#,##0.#####"))
           Next
         End If
       Next
+      .Visible = True
     End With
   End Sub
 
@@ -262,8 +264,18 @@ Public Class atcDebugTimserForm
 
   Public Sub TreeAction(ByVal aAction As String)
     Select Case aAction
-      Case "Expand" : atrMain.ExpandAll()
-      Case "Collapse" : atrMain.CollapseAll()
+      Case "Expand"
+        With atrMain
+          .Visible = False
+          .ExpandAll()
+          .Visible = True
+        End With
+      Case "Collapse"
+        With atrMain
+          .Visible = False
+          .CollapseAll()
+          .Visible = True
+        End With
       Case "Default" : PopulateTree()
     End Select
   End Sub
