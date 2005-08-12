@@ -11,6 +11,7 @@ End Class
 Public Class atcAttributeDefinition
   Dim pName As String         'Short name (used for labeling in UI)
   Dim pDescription As String  'Something longer than Name but still short
+  Dim pCategory As String     'Optional, used for grouping similar attributes in UI
   Dim pHelp As String         'Longer, more detailed than Description
   Dim pEditable As Boolean    'True if the attribute value can be edited by the user
   Dim pDefaultValue As Object 'Of type named by TypeString, or Nothing if not set
@@ -50,6 +51,15 @@ Public Class atcAttributeDefinition
     End Set
   End Property
 
+  Public Property Category() As String
+    Get
+      Return pCategory
+    End Get
+    Set(ByVal newValue As String)
+      pCategory = newValue
+    End Set
+  End Property
+
   Public Function Clone(Optional ByVal aNewName As String = Nothing, _
                         Optional ByVal aNewDescription As String = Nothing) As atcAttributeDefinition
     Dim myClone As New atcAttributeDefinition
@@ -64,6 +74,7 @@ Public Class atcAttributeDefinition
       Else
         .Description = aNewDescription
       End If
+      .Category = Me.Category
       .DefaultValue = Me.DefaultValue
       .Editable = Me.Editable
       .Help = Me.Help
@@ -162,6 +173,7 @@ Public Class atcAttributeDefinition
   Public Sub Clear()
     Name = ""
     Description = ""
+    Category = ""
     Help = ""
     TypeString = "String"
     DefaultValue = ""
