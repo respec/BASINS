@@ -452,8 +452,17 @@ Public Class atcTimeseriesMath
       Case "subset by date"
         If aArgs.ContainsAttribute("Start Date") AndAlso Not aArgs.GetValue("Start Date") Is Nothing _
         AndAlso aArgs.ContainsAttribute("End Date") AndAlso Not aArgs.GetValue("End Date") Is Nothing Then
-          Dim StartDate As Double = aArgs.GetValue("Start Date")
-          Dim EndDate As Double = aArgs.GetValue("End Date")
+          Dim lArg As Object
+          lArg = aArgs.GetValue("Start Date")
+          If TypeOf (lArg) Is String Then
+            lArg = System.DateTime.Parse(lArg).ToOADate
+          End If
+          Dim StartDate As Double = CDbl(lArg)
+          lArg = aArgs.GetValue("End Date")
+          If TypeOf (lArg) Is String Then
+            lArg = System.DateTime.Parse(lArg).ToOADate
+          End If
+          Dim EndDate As Double = CDbl(lArg)
           AddDataSet(SubsetByDate(firstTS, StartDate, EndDate))
         End If
         ReDim newVals(-1) 'Don't create new timeseries below
@@ -482,8 +491,8 @@ Public Class atcTimeseriesMath
         'Case "interpolate"
 
       Case Else
-        ReDim newVals(-1) 'Don't create new timeseries
-        Err.Raise(vbObjectError + 512, Me, aOperationName & " not implemented")
+          ReDim newVals(-1) 'Don't create new timeseries
+          Err.Raise(vbObjectError + 512, Me, aOperationName & " not implemented")
     End Select
 
     If newVals.GetUpperBound(0) >= 0 Then
@@ -523,13 +532,14 @@ Public Class atcTimeseriesMath
 
   'WARNING: cousin copy in atcTimeseriesNdayHighLow
   Private Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
-                                ByVal aStartDate As Double, _
-                                ByVal aEndDate As Double) As atcTimeseries
+                              ByVal aStartDate As Double, _
+                              ByVal aEndDate As Double) As atcTimeseries
     'TODO: boundary conditions...
     Dim iStart As Integer = 0
     Dim iEnd As Integer = aTimeseries.numValues
     Dim numNewValues As Integer = iEnd + 1
 
+    'TODO: binary search for iStart and iEnd could be faster
     While iStart < iEnd AndAlso aTimeseries.Dates.Value(iStart) < aStartDate
       iStart += 1
     End While
@@ -539,13 +549,16 @@ Public Class atcTimeseriesMath
     End While
 
     numNewValues = iEnd - iStart + 1
-    Dim newValues() As Double
-    ReDim newValues(numNewValues)
-    System.Array.Copy(aTimeseries.Values, iStart, newValues, 0, numNewValues + 1)
+    Dim newValues(numNewValues) As Double
+    Dim newDates(numNewValues) As Double
 
-    Dim newDates() As Double
-    ReDim newDates(numNewValues)
-    System.Array.Copy(aTimeseries.Dates.Values, iStart, newDates, 0, numNewValues + 1)
+    If iStart > 0 Then
+      System.Array.Copy(aTimeseries.Values, iStart - 1, newValues, 0, numNewValues + 1)
+      System.Array.Copy(aTimeseries.Dates.Values, iStart - 1, newDates, 0, numNewValues + 1)
+    Else
+      System.Array.Copy(aTimeseries.Values, iStart, newValues, 0, numNewValues)
+      System.Array.Copy(aTimeseries.Dates.Values, iStart, newDates, 0, numNewValues)
+    End If
     Dim lnewTS As New atcTimeseries(Me)
     lnewTS.Dates = New atcTimeseries(Me)
     lnewTS.Values = newValues
@@ -553,14 +566,14 @@ Public Class atcTimeseriesMath
 
     lnewTS.Attributes.ChangeTo(aTimeseries.Attributes)
 
-    For Each lAttribute As atcDefinedValue In lnewTS.Attributes
-      If lAttribute.Definition.Calculated Then
-        lnewTS.Attributes.Remove(lAttribute)
-      End If
-    Next
+    'TODO: fix me
+    'For Each lAttribute As atcDefinedValue In lnewTS.Attributes
+    'If lAttribute.Definition.Calculated Then
+    'lnewTS.Attributes.Remove(lAttribute)
+    'End If
+    'Next
 
     lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
     Return lnewTS
   End Function
-
 End Class

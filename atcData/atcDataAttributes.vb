@@ -73,6 +73,8 @@ Public Class atcDataAttributes
       Else
         Return Format(lValue, "#,##0.#####")
       End If
+    ElseIf TypeOf (lValue) Is atcTimeseries Then
+      Return lValue.ToString
     Else
       Return CStr(lValue)
     End If

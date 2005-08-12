@@ -154,63 +154,64 @@ Public Class frmSpecifyComputation
       Case "Name" : lblName.Text = aDefVal.Value
       Case "Description" : lblDescription.Text = aDefVal.Value
       Case Else
-        Dim iArg As Integer = pArgLabel.GetUpperBound(0)
-        iArg += 1
+        If aDefVal.Definition.Editable Then
+          Dim iArg As Integer = pArgLabel.GetUpperBound(0)
+          iArg += 1
 
-        ReDim Preserve pArgDefVal(iArg)
-        pArgDefVal(iArg) = aDefVal
+          ReDim Preserve pArgDefVal(iArg)
+          pArgDefVal(iArg) = aDefVal
 
-        ReDim Preserve pArgLabel(iArg)
-        pArgLabel(iArg) = New Windows.Forms.Label
-        With pArgLabel(iArg)
-          If iArg = 0 Then
-            .Top = lblDescription.Top + lblDescription.Height * 1.5
-          Else
-            .Top = pArgLabel(iArg - 1).Top + pArgLabel(iArg - 1).Height * 1.5
-          End If
-          .Left = lblDescription.Left
-          .Text = aDefVal.Definition.Name
-        End With
-        Controls.Add(pArgLabel(iArg))
+          ReDim Preserve pArgLabel(iArg)
+          pArgLabel(iArg) = New Windows.Forms.Label
+          With pArgLabel(iArg)
+            If iArg = 0 Then
+              .Top = lblDescription.Top + lblDescription.Height * 1.5
+            Else
+              .Top = pArgLabel(iArg - 1).Top + pArgLabel(iArg - 1).Height * 1.5
+            End If
+            .Left = lblDescription.Left
+            .Text = aDefVal.Definition.Name
+          End With
+          Controls.Add(pArgLabel(iArg))
 
-        ReDim Preserve pArgText(iArg)
-        pArgText(iArg) = New Windows.Forms.TextBox
-        With pArgText(iArg)
-          .Top = pArgLabel(iArg).Top
-          .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + PADDING
-          .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - PADDING * 2
-          .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left
+          ReDim Preserve pArgText(iArg)
+          pArgText(iArg) = New Windows.Forms.TextBox
+          With pArgText(iArg)
+            .Top = pArgLabel(iArg).Top
+            .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + PADDING
+            .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - PADDING * 2
+            .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left
 
-          .Tag = iArg
-          If aDefVal.Value Is Nothing Then
-            .Text = ""
-          Else
-            .Text = ""
-          End If
-          AddHandler pArgText(iArg).TextChanged, AddressOf ArgText_TextChanged
-        End With
-        Controls.Add(pArgText(iArg))
+            .Tag = iArg
+            If aDefVal.Value Is Nothing Then
+              .Text = ""
+            Else
+              .Text = ""
+            End If
+            AddHandler pArgText(iArg).TextChanged, AddressOf ArgText_TextChanged
+          End With
+          Controls.Add(pArgText(iArg))
 
-        ReDim Preserve pArgButton(iArg)
-        pArgButton(iArg) = New Windows.Forms.Button
-        With pArgButton(iArg)
-          .Top = pArgLabel(iArg).Top
-          .Width = ARG_BUTTON_WIDTH
-          .Left = ClientRectangle.Width - pArgButton(iArg).Width - PADDING
+          ReDim Preserve pArgButton(iArg)
+          pArgButton(iArg) = New Windows.Forms.Button
+          With pArgButton(iArg)
+            .Top = pArgLabel(iArg).Top
+            .Width = ARG_BUTTON_WIDTH
+            .Left = ClientRectangle.Width - pArgButton(iArg).Width - PADDING
 
-          .Tag = iArg
-          .Text = "Select"
-          .Anchor = Windows.Forms.AnchorStyles.Right
+            .Tag = iArg
+            .Text = "Select"
+            .Anchor = Windows.Forms.AnchorStyles.Right
 
-          Select Case aDefVal.Definition.TypeString
-            Case "atcDataGroup" : .Visible = True
-            Case "atcTimeseries" : .Visible = True
-            Case Else : .Visible = False
-          End Select
-          AddHandler pArgButton(iArg).Click, AddressOf ArgButton_Click
-        End With
-        Controls.Add(pArgButton(iArg))
-
+            Select Case aDefVal.Definition.TypeString
+              Case "atcDataGroup" : .Visible = True
+              Case "atcTimeseries" : .Visible = True
+              Case Else : .Visible = False
+            End Select
+            AddHandler pArgButton(iArg).Click, AddressOf ArgButton_Click
+          End With
+          Controls.Add(pArgButton(iArg))
+        End If
     End Select
   End Sub
 
