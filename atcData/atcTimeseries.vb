@@ -140,7 +140,11 @@ Public Class atcTimeseries
   Public Sub New(ByVal aDataSource As atcDataSource)
     Clear()
     pDataSource = aDataSource
-    Me.Attributes.SetValue("Data Source", aDataSource.Specification)
+    Try
+      Me.Attributes.SetValue("Data Source", aDataSource.Specification)
+    Catch ex As Exception
+      'atcDataSource is Nothing or is not really an atcDataSource
+    End Try
   End Sub
 
   'Get or set the number of values
