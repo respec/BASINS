@@ -23,9 +23,9 @@ Public Class atcDataSource
   End Property
 
   'atcAttributeDefinitions representing operations supported by ComputeTimeseries
-  Public Overridable ReadOnly Property AvailableOperations() As atcDataGroup
+  Public Overridable ReadOnly Property AvailableOperations() As atcDataAttributes
     Get
-      Return New atcDataGroup 'default to an empty list with nothing available
+      Return New atcDataAttributes 'default to an empty list with nothing available
     End Get
   End Property
 

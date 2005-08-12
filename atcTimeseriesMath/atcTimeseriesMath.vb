@@ -4,7 +4,7 @@ Imports System.Windows.Forms
 
 Public Class atcTimeseriesMath
   Inherits atcDataSource
-  Private pAvailableTimeseriesOperations As atcDataGroup
+  Private pAvailableOperations As atcDataAttributes
   Private Const pName As String = "Timeseries::Math"
 
   Private pControls As Control.ControlCollection
@@ -45,34 +45,10 @@ Public Class atcTimeseriesMath
   End Property
 
   'Operations supported
-  Public Overrides ReadOnly Property AvailableOperations() As atcDataGroup
+  Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
     Get
-      If pAvailableTimeseriesOperations Is Nothing Then
-        pAvailableTimeseriesOperations = New atcDataGroup
-        Dim lData As atcDataSet
-        Dim defName As New atcAttributeDefinition
-        With defName
-          .Name = "Name"
-          .Description = ""
-          .Editable = False
-          .TypeString = "String"
-        End With
-
-        Dim defDesc As New atcAttributeDefinition
-        With defDesc
-          .Name = "Description"
-          .Description = ""
-          .Editable = False
-          .TypeString = "String"
-        End With
-
-        Dim defCategory As New atcAttributeDefinition
-        With defCategory
-          .Name = "Category"
-          .Description = ""
-          .Editable = False
-          .TypeString = "String"
-        End With
+      If pAvailableOperations Is Nothing Then
+        pAvailableOperations = New atcDataAttributes
 
         Dim defTimeSeriesOne As New atcAttributeDefinition
         With defTimeSeriesOne
@@ -123,121 +99,66 @@ Public Class atcTimeseriesMath
           .Max = Double.PositiveInfinity
         End With
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Add")
-        lData.Attributes.SetValue(defDesc, "Add to each value")
-        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defDouble, 0)
-        'lData.Attributes.SetValue(defBeforeAfter, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Add", "Add to each value", defTimeSeriesGroup, defDouble)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Subtract")
-        lData.Attributes.SetValue(defDesc, "Subtract from each value of first timeseries")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        lData.Attributes.SetValue(defDouble, 0)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Subtract", "Subtract from each value of first timeseries", defTimeSeriesOne, defDouble)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Multiply")
-        lData.Attributes.SetValue(defDesc, "Multiply each value")
-        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defDouble, 1)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Multiply", "Multiply each value", defTimeSeriesGroup, defDouble)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Divide")
-        lData.Attributes.SetValue(defDesc, "Divide each value of first timeseries")
-        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defDouble, 1)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Divide", "Divide each value of first timeseries", defTimeSeriesGroup, defDouble)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Mean")
-        lData.Attributes.SetValue(defDesc, "Arithmetic Mean of values for each date")
-        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        'lData.Attributes.SetValue(defBeforeAfter, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Mean", "Arithmetic Mean of values for each date", defTimeSeriesGroup)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Geometric Mean")
-        lData.Attributes.SetValue(defDesc, "Geometric Mean of values for each date")
-        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        'lData.Attributes.SetValue(defBeforeAfter, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Geometric Mean", "Geometric Mean of values for each date", defTimeSeriesGroup)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Max")
-        lData.Attributes.SetValue(defDesc, "Maximum value for each date")
-        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defDouble, "")
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Max", "Maximum value for each date", defTimeSeriesGroup, defDouble)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Min")
-        lData.Attributes.SetValue(defDesc, "Minimum value for each date")
-        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defDouble, "")
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Min", "Minimum value for each date", defTimeSeriesGroup, defDouble)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Exponent")
-        lData.Attributes.SetValue(defDesc, "Raise each value of first timeseries to a power")
-        lData.Attributes.SetValue(defTimeSeriesGroup, Nothing)
-        lData.Attributes.SetValue(defDouble, "")
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Exponent", "Raise each value of first timeseries to a power", defTimeSeriesGroup, defDouble)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "e ^ x")
-        lData.Attributes.SetValue(defDesc, "e raised to the power of each value")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("e ^ x", "e raised to the power of each value", defTimeSeriesOne)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Log e")
-        lData.Attributes.SetValue(defDesc, "The log base e of each value")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Log e", "The log base e of each value", defTimeSeriesOne)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Log 10")
-        lData.Attributes.SetValue(defDesc, "The log base 10 of each value")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Log 10", "The log base 10 of each value", defTimeSeriesOne)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Absolute Value")
-        lData.Attributes.SetValue(defDesc, "Change negative values to positive")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Absolute Value", "Change negative values to positive", defTimeSeriesOne)
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Celsius to F")
-        lData.Attributes.SetValue(defDesc, "Celsius to Fahrenheit")
-        lData.Attributes.SetValue(defCategory, "Unit Conversion")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Celsius to F", "Celsius to Fahrenheit", defTimeSeriesOne)
+        pAvailableOperations.GetDefinition("Celsius to F").Category = "Unit Conversion"
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "F to Celsius")
-        lData.Attributes.SetValue(defDesc, "Fahrenheit to Celsius")
-        lData.Attributes.SetValue(defCategory, "Unit Conversion")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("F to Celsius", "Fahrenheit to Celsius", defTimeSeriesOne)
+        pAvailableOperations.GetDefinition("F to Celsius").Category = "Unit Conversion"
 
-        lData = New atcDataSet
-        lData.Attributes.SetValue(defName, "Subset by date")
-        lData.Attributes.SetValue(defDesc, "Choose start and end dates")
-        lData.Attributes.SetValue(defCategory, "Date")
-        lData.Attributes.SetValue(defTimeSeriesOne, Nothing)
-        lData.Attributes.SetValue(defStartDate, "")
-        lData.Attributes.SetValue(defEndDate, "")
-        pAvailableTimeseriesOperations.Add(lData)
+        AddOperation("Subset by date", "Choose start and end dates", defTimeSeriesOne, defStartDate, defEndDate)
+        pAvailableOperations.GetDefinition("F to Celsius").Category = "Date"
 
       End If
-      Return pAvailableTimeseriesOperations
+      Return pAvailableOperations
     End Get
   End Property
+
+  Private Function AddOperation(ByVal aName As String, _
+                              ByVal aDescription As String, _
+                              ByVal ParamArray aArgs() As atcAttributeDefinition)
+    Dim lResult As New atcAttributeDefinition
+    With lResult
+      .Name = aName
+      .Description = aDescription
+      .DefaultValue = ""
+      .Editable = False
+      .TypeString = "Double"
+      .Calculator = Me
+      .Category = Category
+    End With
+    Dim lArguments As atcDataAttributes = New atcDataAttributes
+    For Each lArg As atcAttributeDefinition In aArgs
+      lArguments.SetValue(lArg, Nothing)
+    Next
+    pAvailableOperations.SetValue(lResult, Nothing, lArguments)
+
+  End Function
 
   'Args are each usually either Double or atcTimeseries
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
@@ -268,11 +189,10 @@ Public Class atcTimeseriesMath
 
     If aArgs Is Nothing Then
       needToAsk = True
-      For Each lOperation As atcDataSet In AvailableOperations
-        If lOperation.Attributes.GetValue("Name").ToString.ToLower = aOperationName.ToLower() Then
-          aArgs = lOperation.Attributes.Clone
-        End If
-      Next
+      Dim lOperation As atcDefinedValue = AvailableOperations.GetDefinedValue(aOperationName)
+      If Not lOperation Is Nothing Then
+        aArgs = lOperation.Arguments.Clone
+      End If
     End If
 
     If needToAsk Then
@@ -491,8 +411,8 @@ Public Class atcTimeseriesMath
         'Case "interpolate"
 
       Case Else
-          ReDim newVals(-1) 'Don't create new timeseries
-          Err.Raise(vbObjectError + 512, Me, aOperationName & " not implemented")
+        ReDim newVals(-1) 'Don't create new timeseries
+        Err.Raise(vbObjectError + 512, Me, aOperationName & " not implemented")
     End Select
 
     If newVals.GetUpperBound(0) >= 0 Then

@@ -128,7 +128,7 @@ Public Class frmDataSource
     For Each ds As atcDataSource In lDataSources
       If (Not aNeedToOpen OrElse ds.CanOpen) AndAlso _
          (Not aNeedToSave OrElse ds.CanSave) Then
-        Dim lOperations As atcDataGroup = ds.AvailableOperations
+        Dim lOperations As atcDataAttributes = ds.AvailableOperations
         Dim lCategory As String = ds.Category
         If lCategory.Length = 0 Then lCategory = ds.Description
         'If either no category was specified or
@@ -137,20 +137,14 @@ Public Class frmDataSource
           Dim lCategoryNode As TreeNode = FindOrCreateNode(treeSources.Nodes, lCategory)
           lCategoryNode.ExpandAll()
           If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
-            For Each lOperation As atcDataSet In lOperations
-              Dim lName As String = lOperation.Attributes.GetValue("Name")
-              If lName.Length = 0 Then
-                lName = lOperation.Attributes.ItemByIndex(0).Definition.Name
-              End If
-
+            For Each lOperation As atcDefinedValue In lOperations
               'Operations might have categories to further divide them
-              Dim lSubCategory As String = lOperation.Attributes.GetValue("Category")
-              If lSubCategory.Length > 0 Then
-                Dim lSubCategoryNode As TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lSubCategory)
-                lNode = lSubCategoryNode.Nodes.Add(lName)
+              If lOperation.Definition.Category.Length > 0 Then
+                Dim lSubCategoryNode As TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lOperation.Definition.Category)
+                lNode = lSubCategoryNode.Nodes.Add(lOperation.Definition.Name)
                 lSubCategoryNode.ExpandAll()
               Else
-                lNode = lCategoryNode.Nodes.Add(lName)
+                lNode = lCategoryNode.Nodes.Add(lOperation.Definition.Name)
               End If
 
               lNode.Tag = ds.Name
@@ -198,11 +192,10 @@ Public Class frmDataSource
     Dim lOperationName As String = treeSources.SelectedNode.Text
     For Each ds As atcDataSource In pDataManager.GetPlugins(GetType(atcDataSource))
       If ds.Name = lSourceName Then
-        Dim lOperations As atcDataGroup = ds.AvailableOperations
+        Dim lOperations As atcDataAttributes = ds.AvailableOperations
         If lOperations.Count > 0 Then
-          For Each lOperation As atcDataSet In lOperations
-            If lOperation.Attributes.GetValue("Name") = lOperationName OrElse _
-               lOperation.Attributes.ItemByIndex(0).Definition.Name = lOperationName Then
+          For Each lOperation As atcDefinedValue In lOperations
+            If lOperation.Definition.Name = lOperationName Then
               pSelectedSource = ds
               pSpecification = lOperationName
               Me.Close()

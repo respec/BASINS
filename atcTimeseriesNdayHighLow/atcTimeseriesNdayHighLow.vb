@@ -5,7 +5,7 @@ Imports System.Windows.Forms
 
 Public Class atcTimeseriesNdayHighLow
   Inherits atcDataSource
-  Private pAvailableOperations As atcDataGroup
+  Private pAvailableOperations As atcDataAttributes
   Private Const pName As String = "Timeseries::n-day high/low"
 
   Public Overrides ReadOnly Property Name() As String
@@ -34,18 +34,10 @@ Public Class atcTimeseriesNdayHighLow
   End Property
 
   'Definitions of statistics supported by ComputeStatistics
-  Public Overrides ReadOnly Property AvailableOperations() As atcDataGroup
+  Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
     Get
       If pAvailableOperations Is Nothing Then
-        pAvailableOperations = New atcDataGroup
-
-        Dim defCategory As New atcAttributeDefinition
-        With defCategory
-          .Name = "Category"
-          .Description = ""
-          .Editable = False
-          .TypeString = "String"
-        End With
+        pAvailableOperations = New atcDataAttributes
 
         Dim defDays As New atcAttributeDefinition
         With defDays
@@ -73,8 +65,7 @@ Public Class atcTimeseriesNdayHighLow
           .TypeString = "atcTimeseries"
         End With
 
-        AddOperation("7Q10", "Seven day low flow 10-year return period", _
-                     defCategory, defTimeSeriesOne)
+        AddOperation("7Q10", "Seven day low flow 10-year return period", defTimeSeriesOne)
 
         'AddOperation("n-day low value", "n-day low value for a return period", _
         '             defCategory, defTimeSeriesOne, defDays, defReturnPeriod)
@@ -89,7 +80,6 @@ Public Class atcTimeseriesNdayHighLow
 
   Private Function AddOperation(ByVal aName As String, _
                                 ByVal aDescription As String, _
-                                ByVal aCategory As atcAttributeDefinition, _
                                 ByVal ParamArray aArgs() As atcAttributeDefinition)
     Dim lResult As New atcAttributeDefinition
     With lResult
@@ -99,15 +89,13 @@ Public Class atcTimeseriesNdayHighLow
       .Editable = False
       .TypeString = "Double"
       .Calculator = Me
+      .Category = Category
     End With
     Dim lArguments As atcDataAttributes = New atcDataAttributes
     For Each lArg As atcAttributeDefinition In aArgs
       lArguments.SetValue(lArg, Nothing)
     Next
-    Dim lData As New atcDataSet
-    lData.Attributes.SetValue(lResult, Nothing, lArguments)
-    'lData.Attributes.SetValue(aCategory, Category)
-    pAvailableOperations.Add(lResult.Name.ToLower, lData)
+    pAvailableOperations.SetValue(lResult, Nothing, lArguments)
 
   End Function
 
@@ -179,17 +167,6 @@ Public Class atcTimeseriesNdayHighLow
     End Try
   End Function
 
-  'Set the named attribute in aTimeseries using the definition from pAvailableStatistics
-  Private Sub SetAttribute(ByVal aTimeseries As atcTimeseries, ByVal aName As String, ByVal aValue As Double)
-    Dim ds As atcDataSet = pAvailableOperations.ItemByKey(aName)
-    If Not ds Is Nothing Then
-      Dim def As atcAttributeDefinition = ds.Attributes.GetDefinition(aName)
-      If Not def Is Nothing Then
-        aTimeseries.Attributes.SetValue(def, aValue)
-      End If
-    End If
-  End Sub
-
   Private Sub Compute7q10(ByVal aTimeseries As atcTimeseries)
     Dim lLowTS As atcTimeseries = HighOrLowTimeseries(aTimeseries, 7, False)
     Me.AddDataSet(lLowTS)
@@ -216,9 +193,8 @@ Public Class atcTimeseriesNdayHighLow
   End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
-    MapWin.Plugins.BroadcastMessage("Loading atcDataSource atcTimeseriesNdayHighLow")
-    For Each operation As atcDataSet In AvailableOperations
-      atcDataAttributes.AddDefinition(operation.Attributes(0).Definition)
+    For Each lOperation As atcDefinedValue In AvailableOperations
+      atcDataAttributes.AddDefinition(lOperation.Definition)
     Next
   End Sub
 

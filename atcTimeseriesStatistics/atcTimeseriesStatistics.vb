@@ -5,7 +5,7 @@ Imports System.Windows.Forms
 
 Public Class atcTimeseriesStatistics
   Inherits atcDataSource
-  Private pAvailableOperations As atcDataGroup
+  Private pAvailableOperations As atcDataAttributes ' atcDataGroup
   Private Const pName As String = "Timeseries::Statistics"
 
   Public Overrides ReadOnly Property Name() As String
@@ -27,10 +27,10 @@ Public Class atcTimeseriesStatistics
   End Property
 
   'Definitions of statistics supported by ComputeStatistics
-  Public Overrides ReadOnly Property AvailableOperations() As atcDataGroup
+  Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
     Get
       If pAvailableOperations Is Nothing Then
-        pAvailableOperations = New atcDataGroup
+        pAvailableOperations = New atcDataAttributes
 
         Dim defCategory As New atcAttributeDefinition
         With defCategory
@@ -89,10 +89,7 @@ Public Class atcTimeseriesStatistics
     End With
     Dim lArguments As atcDataAttributes = New atcDataAttributes
     lArguments.SetValue(aArg, Nothing)
-    Dim lData As New atcDataSet
-    lData.Attributes.SetValue(lResult, Nothing, lArguments)
-    'lData.Attributes.SetValue(aCategory, Category)
-    pAvailableOperations.Add(lResult.Name.ToLower, lData)
+    pAvailableOperations.SetValue(lResult, Nothing, lArguments)
 
   End Sub
 
@@ -130,17 +127,17 @@ Public Class atcTimeseriesStatistics
       Next
 
       If lCount > 0 Then
-        SetAttribute(aTimeseries, "Max", lMax)
-        SetAttribute(aTimeseries, "Min", lMin)
-        SetAttribute(aTimeseries, "Sum", lSum)
-        SetAttribute(aTimeseries, "Count", lCount)
+        aTimeseries.Attributes.SetValue("Max", lMax)
+        aTimeseries.Attributes.SetValue("Min", lMin)
+        aTimeseries.Attributes.SetValue("Sum", lSum)
+        aTimeseries.Attributes.SetValue("Count", lCount)
         lMean = lSum / lCount
-        SetAttribute(aTimeseries, "Mean", lMean)
+        aTimeseries.Attributes.SetValue("Mean", lMean)
       End If
 
       If lMin > 0 Then
         lGeometricMean = Math.Exp(lGeometricMean / lCount)
-        SetAttribute(aTimeseries, "Geometric Mean", lGeometricMean)
+        aTimeseries.Attributes.SetValue("Geometric Mean", lGeometricMean)
       End If
 
       If lCount > 1 Then
@@ -153,25 +150,14 @@ Public Class atcTimeseriesStatistics
           End If
         Next
         lVariance = lSumDevSquares / (lCount - 1)
-        SetAttribute(aTimeseries, "Variance", lVariance)
+        aTimeseries.Attributes.SetValue("Variance", lVariance)
 
         If lVariance > 0 Then
           lStdDev = Math.Sqrt(lVariance)
-          SetAttribute(aTimeseries, "Standard Deviation", lStdDev)
+          aTimeseries.Attributes.SetValue("Standard Deviation", lStdDev)
           lSkew = (lCount * lSumDevCubes) / ((lCount - 1.0) * (lCount * 2.0) * lStdDev * lStdDev * lStdDev)
-          SetAttribute(aTimeseries, "Skew", lSkew)
+          aTimeseries.Attributes.SetValue("Skew", lSkew)
         End If
-      End If
-    End If
-  End Sub
-
-  'Set the named attribute in aTimeseries using the definition from pAvailableStatistics
-  Private Sub SetAttribute(ByVal aTimeseries As atcTimeseries, ByVal aName As String, ByVal aValue As Double)
-    Dim ds As atcDataSet = pAvailableOperations.ItemByKey(aName.ToLower)
-    If Not ds Is Nothing Then
-      Dim def As atcAttributeDefinition = ds.Attributes.GetDefinition(aName)
-      If Not def Is Nothing Then
-        aTimeseries.Attributes.SetValue(def, aValue)
       End If
     End If
   End Sub
@@ -190,8 +176,8 @@ Public Class atcTimeseriesStatistics
   End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
-    For Each operation As atcDataSet In AvailableOperations
-      atcDataAttributes.AddDefinition(operation.Attributes(0).Definition)
+    For Each lOperation As atcDefinedValue In AvailableOperations
+      atcDataAttributes.AddDefinition(lOperation.Definition)
     Next
   End Sub
 

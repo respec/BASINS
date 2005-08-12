@@ -219,18 +219,15 @@ Public Class atcDataAttributes
           Dim tmpDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(key)
           If Not tmpDef Is Nothing Then 'We have a definition for this attribute but no value
             If tmpDef.Calculated Then   'Maybe we can go ahead and calculate it now...
-              Dim lOperation As atcDataSet = tmpDef.Calculator.AvailableOperations.ItemByKey(aAttributeName.ToLower)
-              If Not lOperation Is Nothing Then
-                If lOperation.Attributes.Count = 1 Then 'Calculation should have just result as an attribute
-                  Dim lCalculation As atcDefinedValue = lOperation.Attributes.ItemByIndex(0)
-                  If lCalculation.Arguments.Count = 1 Then 'Simple calculation has only one argument
-                    Dim lArg As atcDefinedValue = lCalculation.Arguments.ItemByIndex(0)
+              Dim lOperation As atcDefinedValue = tmpDef.Calculator.AvailableOperations.GetDefinedValue(key)
+              If Not lOperation Is Nothing AndAlso Not lOperation.Arguments Is Nothing Then
+                If lOperation.Arguments.Count = 1 Then 'Simple calculation has only one argument
+                  Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
                     If lArg.Definition.TypeString = "atcTimeseries" Then 'Only argument must be atcTimeseries
-                      Dim tmpArgs As atcDataAttributes = lCalculation.Arguments.Clone
+                    Dim tmpArgs As atcDataAttributes = lOperation.Arguments.Clone
                       tmpArgs.SetValue(lArg.Definition, lOwnerTS)
                       tmpDef.Calculator.Open(tmpDef.Name, tmpArgs)
                       tmpAttribute = ItemByKey(key)
-                    End If
                   End If
                 End If
               End If
