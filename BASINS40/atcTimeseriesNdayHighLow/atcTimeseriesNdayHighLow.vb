@@ -129,7 +129,7 @@ Public Class atcTimeseriesNdayHighLow
         lBestSoFar = Double.MaxValue
       End If
 
-      For lTimeIndex = aNumValues To aTS.numValues
+      While lTimeIndex <= aTS.numValues
         lRunningSum += aTS.Value(lTimeIndex)
 
         If aHigh Then
@@ -138,29 +138,30 @@ Public Class atcTimeseriesNdayHighLow
           If lRunningSum < lBestSoFar Then lBestSoFar = lRunningSum
         End If
 
-        lRunningSum -= aTS.Value(lTimeIndex - aNumValues)
         lTimeIndex += 1
-      Next
-      Return lBestSoFar / aNumValues
+        lRunningSum -= aTS.Value(lTimeIndex - aNumValues)
+      End While
+      Return (lBestSoFar / aNumValues)
     Else 'Cannot compute a value because fewer than aNumValues values are present 
       Return Double.NaN
     End If
   End Function
 
-  Public Function HighOrLowTimeseries(ByVal aTS As atcTimeseries, ByVal aNumValues As Integer, ByVal aHigh As Boolean) As atcTimeseries
+  Private Function HighOrLowTimeseries(ByVal aTS As atcTimeseries, ByVal aNumValues As Integer, ByVal aHigh As Boolean) As atcTimeseries
     Try
+      Dim lTimeCode As Integer = 6 '4=day, 5=month, 6=year
       aTS.EnsureValuesRead()
       Dim sjday As Double = aTS.Dates.Value(0)
       Dim ejday As Double = aTS.Dates.Value(aTS.Dates.numValues)
       'Dim indexOld As Integer = 1
       Dim indexNew As Integer = 1
-      Dim nYears As Integer = timdifJ(sjday, ejday, 6, 1)
+      Dim nYears As Integer = timdifJ(sjday, ejday, lTimeCode, 1)
       Dim newValues(nYears) As Double
       Dim newDates(nYears) As Double
       newDates(0) = sjday
 
       For indexNew = 1 To nYears
-        Dim nextSJday As Double = TimAddJ(sjday, 6, 1, 1)
+        Dim nextSJday As Double = TimAddJ(sjday, lTimeCode, 1, 1)
         Dim oneYear As atcTimeseries = SubsetByDate(aTS, sjday, nextSJday, Me)
         newDates(indexNew) = nextSJday
         newValues(indexNew) = HighOrLowValue(oneYear, aNumValues, aHigh)
