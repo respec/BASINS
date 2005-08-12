@@ -463,7 +463,7 @@ Public Class atcTimeseriesMath
             lArg = System.DateTime.Parse(lArg).ToOADate
           End If
           Dim EndDate As Double = CDbl(lArg)
-          AddDataSet(SubsetByDate(firstTS, StartDate, EndDate))
+          AddDataSet(SubsetByDate(firstTS, StartDate, EndDate, Me))
         End If
         ReDim newVals(-1) 'Don't create new timeseries below
 
@@ -530,43 +530,4 @@ Public Class atcTimeseriesMath
     MyBase.AddDataSet(t)
   End Function
 
-  'WARNING: cousin copy in atcTimeseriesNdayHighLow
-  Private Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
-                              ByVal aStartDate As Double, _
-                              ByVal aEndDate As Double) As atcTimeseries
-    'TODO: boundary conditions...
-    Dim iStart As Integer = 1
-    Dim iEnd As Integer = aTimeseries.numValues
-    Dim numNewValues As Integer = iEnd + 1
-
-    'TODO: binary search for iStart and iEnd could be faster
-    While iStart < iEnd AndAlso aTimeseries.Dates.Value(iStart) <= aStartDate
-      iStart += 1
-    End While
-
-    While iEnd > iStart AndAlso aTimeseries.Dates.Value(iEnd) > aEndDate
-      iEnd -= 1
-    End While
-
-    numNewValues = iEnd - iStart + 1
-    Dim newValues(numNewValues) As Double
-    Dim newDates(numNewValues) As Double
-
-    System.Array.Copy(aTimeseries.Dates.Values, iStart - 1, newDates, 0, numNewValues + 1)
-    System.Array.Copy(aTimeseries.Values, iStart, newValues, 1, numNewValues)
-
-    Dim lnewTS As New atcTimeseries(Me)
-    lnewTS.Dates = New atcTimeseries(Me)
-    lnewTS.Values = newValues
-    lnewTS.Dates.Values = newDates
-
-    For Each lAttribute As atcDefinedValue In aTimeseries.Attributes
-      If Not (lAttribute.Definition.Calculated) Then
-        lnewTS.Attributes.Add(lAttribute)
-      End If
-    Next
-
-    lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
-    Return lnewTS
-  End Function
 End Class
