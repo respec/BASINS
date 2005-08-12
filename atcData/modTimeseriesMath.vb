@@ -6,7 +6,7 @@ Public Module modTimeseriesMath
                                ByVal aDataSource As atcDataSource) As atcTimeseries
     'TODO: boundary conditions...
     Dim iStart As Integer = 1
-    Dim iEnd As Integer = aTimeseries.numValues
+    Dim iEnd As Integer = aTimeseries.numValues - 1
 
     'TODO: binary search for iStart and iEnd could be faster
     While iStart < iEnd AndAlso aTimeseries.Dates.Value(iStart) < aStartDate
