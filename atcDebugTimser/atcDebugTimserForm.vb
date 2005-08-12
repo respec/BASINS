@@ -194,8 +194,9 @@ Public Class atcDebugTimserForm
         Else
           lNumValuesNow = lNumValues + 1
         End If
-        For j As Integer = 0 To lNumValuesNow - 1
-          lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j)) & " : " & _
+        For j As Integer = 1 To lNumValuesNow - 1
+          'data starts at 1, date display is from prev value which is start of interval
+          lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j - 1)) & " : " & _
                               Format(lData.Value(j), "#,##0.#####"))
         Next
         If lNumValues > lNumValuesShow Then  'some from end too
@@ -206,7 +207,7 @@ Public Class atcDebugTimserForm
             lValueStart = lNumValuesNow
           End If
           For j As Integer = lValueStart To lData.numValues
-            lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j)) & " : " & _
+            lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j - 1)) & " : " & _
                                 Format(lData.Value(j), "#,##0.#####"))
           Next
         End If
