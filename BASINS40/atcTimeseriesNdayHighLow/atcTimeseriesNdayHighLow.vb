@@ -113,7 +113,7 @@ Public Class atcTimeseriesNdayHighLow
 
   'Take care of missing values before calling this function
   Private Function HighOrLowValue(ByVal aTS As atcTimeseries, ByVal aNumValues As Integer, ByVal aHigh As Boolean) As Double
-    If aTS.numValues >= aNumValues Then
+    If aNumValues > 0 And aTS.numValues >= aNumValues Then
       Dim lBestSoFar As Double
       Dim lTimeIndex As Integer
       Dim lRunningSum As Double = 0
@@ -141,13 +141,13 @@ Public Class atcTimeseriesNdayHighLow
         lRunningSum -= aTS.Value(lTimeIndex - aNumValues)
         lTimeIndex += 1
       Next
-      Return lBestSoFar
+      Return lBestSoFar / aNumValues
     Else 'Cannot compute a value because fewer than aNumValues values are present 
       Return Double.NaN
     End If
   End Function
 
-  Private Function HighOrLowTimeseries(ByVal aTS As atcTimeseries, ByVal aNumValues As Integer, ByVal aHigh As Boolean) As atcTimeseries
+  Public Function HighOrLowTimeseries(ByVal aTS As atcTimeseries, ByVal aNumValues As Integer, ByVal aHigh As Boolean) As atcTimeseries
     Try
       aTS.EnsureValuesRead()
       Dim sjday As Double = aTS.Dates.Value(0)
@@ -161,7 +161,7 @@ Public Class atcTimeseriesNdayHighLow
 
       For indexNew = 1 To nYears
         Dim nextSJday As Double = TimAddJ(sjday, 6, 1, 1)
-        Dim oneYear As atcTimeseries = SubsetByDate(aTS, sjday, nextSJday)
+        Dim oneYear As atcTimeseries = SubsetByDate(aTS, sjday, nextSJday, Me)
         newDates(indexNew) = nextSJday
         newValues(indexNew) = HighOrLowValue(oneYear, aNumValues, aHigh)
         sjday = nextSJday
@@ -220,51 +220,5 @@ Public Class atcTimeseriesNdayHighLow
       atcDataAttributes.AddDefinition(operation.Attributes(0).Definition)
     Next
   End Sub
-
-  'WARNING: cousin copy in atcTimeseriesMath
-  Private Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
-                              ByVal aStartDate As Double, _
-                              ByVal aEndDate As Double) As atcTimeseries
-    'TODO: boundary conditions...
-    Dim iStart As Integer = 0
-    Dim iEnd As Integer = aTimeseries.numValues
-    Dim numNewValues As Integer = iEnd + 1
-
-    'TODO: binary search for iStart and iEnd could be faster
-    While iStart < iEnd AndAlso aTimeseries.Dates.Value(iStart) < aStartDate
-      iStart += 1
-    End While
-
-    While iEnd > iStart AndAlso aTimeseries.Dates.Value(iEnd) > aEndDate
-      iEnd -= 1
-    End While
-
-    numNewValues = iEnd - iStart + 1
-    Dim newValues(numNewValues) As Double
-    Dim newDates(numNewValues) As Double
-
-    If iStart > 0 Then
-      System.Array.Copy(aTimeseries.Values, iStart - 1, newValues, 0, numNewValues + 1)
-      System.Array.Copy(aTimeseries.Dates.Values, iStart - 1, newDates, 0, numNewValues + 1)
-    Else
-      System.Array.Copy(aTimeseries.Values, iStart, newValues, 0, numNewValues)
-      System.Array.Copy(aTimeseries.Dates.Values, iStart, newDates, 0, numNewValues)
-    End If
-    Dim lnewTS As New atcTimeseries(Me)
-    lnewTS.Dates = New atcTimeseries(Me)
-    lnewTS.Values = newValues
-    lnewTS.Dates.Values = newDates
-
-    lnewTS.Attributes.ChangeTo(aTimeseries.Attributes)
-
-    For Each lAttribute As atcDefinedValue In lnewTS.Attributes
-      If lAttribute.Definition.Calculated Then
-        lnewTS.Attributes.Remove(lAttribute)
-      End If
-    Next
-
-    lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
-    Return lnewTS
-  End Function
 
 End Class

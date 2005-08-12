@@ -424,7 +424,7 @@ Public Class atcGrid
       While lColumn < pColRight.Count AndAlso e.X > pColRight(lColumn)
         lColumn += 1
       End While
-      If lRow < pSource.Rows And lColumn < pSource.Columns Then
+      If lRow + pTopRow < pSource.Rows And lColumn + pLeftColumn < pSource.Columns Then
         RaiseEvent MouseDownCell(lRow + pTopRow, lColumn + pLeftColumn)
       End If
     End If
