@@ -129,11 +129,11 @@ Public Class atcTimeseriesStatistics
         End If
       Next
 
-      SetAttribute(aTimeseries, "Max", lMax)
-      SetAttribute(aTimeseries, "Min", lMin)
-      SetAttribute(aTimeseries, "Sum", lSum)
-      SetAttribute(aTimeseries, "Count", lCount)
       If lCount > 0 Then
+        SetAttribute(aTimeseries, "Max", lMax)
+        SetAttribute(aTimeseries, "Min", lMin)
+        SetAttribute(aTimeseries, "Sum", lSum)
+        SetAttribute(aTimeseries, "Count", lCount)
         lMean = lSum / lCount
         SetAttribute(aTimeseries, "Mean", lMean)
       End If
