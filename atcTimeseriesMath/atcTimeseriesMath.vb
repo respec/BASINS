@@ -535,12 +535,12 @@ Public Class atcTimeseriesMath
                               ByVal aStartDate As Double, _
                               ByVal aEndDate As Double) As atcTimeseries
     'TODO: boundary conditions...
-    Dim iStart As Integer = 0
+    Dim iStart As Integer = 1
     Dim iEnd As Integer = aTimeseries.numValues
     Dim numNewValues As Integer = iEnd + 1
 
     'TODO: binary search for iStart and iEnd could be faster
-    While iStart < iEnd AndAlso aTimeseries.Dates.Value(iStart) < aStartDate
+    While iStart < iEnd AndAlso aTimeseries.Dates.Value(iStart) <= aStartDate
       iStart += 1
     End While
 
@@ -552,26 +552,19 @@ Public Class atcTimeseriesMath
     Dim newValues(numNewValues) As Double
     Dim newDates(numNewValues) As Double
 
-    If iStart > 0 Then
-      System.Array.Copy(aTimeseries.Values, iStart - 1, newValues, 0, numNewValues + 1)
-      System.Array.Copy(aTimeseries.Dates.Values, iStart - 1, newDates, 0, numNewValues + 1)
-    Else
-      System.Array.Copy(aTimeseries.Values, iStart, newValues, 0, numNewValues)
-      System.Array.Copy(aTimeseries.Dates.Values, iStart, newDates, 0, numNewValues)
-    End If
+    System.Array.Copy(aTimeseries.Dates.Values, iStart - 1, newDates, 0, numNewValues + 1)
+    System.Array.Copy(aTimeseries.Values, iStart, newValues, 1, numNewValues)
+
     Dim lnewTS As New atcTimeseries(Me)
     lnewTS.Dates = New atcTimeseries(Me)
     lnewTS.Values = newValues
     lnewTS.Dates.Values = newDates
 
-    lnewTS.Attributes.ChangeTo(aTimeseries.Attributes)
-
-    'TODO: fix me
-    'For Each lAttribute As atcDefinedValue In lnewTS.Attributes
-    'If lAttribute.Definition.Calculated Then
-    'lnewTS.Attributes.Remove(lAttribute)
-    'End If
-    'Next
+    For Each lAttribute As atcDefinedValue In aTimeseries.Attributes
+      If Not (lAttribute.Definition.Calculated) Then
+        lnewTS.Attributes.Add(lAttribute)
+      End If
+    Next
 
     lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
     Return lnewTS
