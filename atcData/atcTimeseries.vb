@@ -43,16 +43,11 @@ Public Class atcTimeseries
     End Set
   End Property
 
-  Public ReadOnly Property ValueMissing(ByVal index As Integer) As Boolean
+  Public ReadOnly Property ValueMissing(ByVal aValue As Double) As Boolean
     Get
-      EnsureValuesRead()
-      If index >= 0 And index <= pNumValues Then
-        If pMissingValue Is Nothing Then 'no fill value attribute, assume ok
-          Return False
-        ElseIf Abs(pValues(index) - pMissingValue) < Double.Epsilon Then
-          Return True
-        End If
-      Else 'missing for sure
+      If pMissingValue Is Nothing Then 'no fill value attribute, assume ok
+        Return False
+      ElseIf (aValue - pMissingValue) < Double.Epsilon Then
         Return True
       End If
       Return False
