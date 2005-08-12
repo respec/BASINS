@@ -900,13 +900,8 @@ Public Class atcDataSourceWDM
 
               ReDim dd(nVals)
               dd(0) = lSJDay
-
               ReDim dv(nVals)
-              If .GetValue("Point", False) Then
-                dv(0) = Double.NaN
-              Else
-                dv(0) = v(1)
-              End If
+              dv(0) = Double.NaN
 
               Dim lInterval As Double = .GetValue("interval", 0)
               Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
