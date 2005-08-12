@@ -192,7 +192,7 @@ Public Class atcDebugTimserForm
         If lNumValues > lNumValuesShow Then
           lNumValuesNow = lNumValuesShow
         Else
-          lNumValuesNow = lNumValues
+          lNumValuesNow = lNumValues + 1
         End If
         For j As Integer = 0 To lNumValuesNow - 1
           lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j)) & " : " & _
