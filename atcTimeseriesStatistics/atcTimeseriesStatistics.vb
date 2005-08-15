@@ -54,6 +54,8 @@ Public Class atcTimeseriesStatistics
 
         AddOperation("Min", "Minimum value", defTimeSeriesOne, defCategory)
 
+        AddOperation("Sum", "Summation of all values", defTimeSeriesOne, defCategory)
+
         AddOperation("Mean", "Sum of all values divided by number of values", _
                      defTimeSeriesOne, defCategory)
 
@@ -95,9 +97,9 @@ Public Class atcTimeseriesStatistics
 
   'Compute all available statistics for aTimeseries and add them as attributes
   Private Sub ComputeStatistics(ByVal aTimeseries As atcTimeseries)
-    Dim lLastValueIndex As Integer = aTimeseries.numValues - 1
+    Dim lLastValueIndex As Integer = aTimeseries.numValues
 
-    If lLastValueIndex >= 0 Then
+    If lLastValueIndex > 0 Then
       Dim lIndex As Integer
       Dim lVal As Double
       Dim lDev As Double
@@ -115,7 +117,7 @@ Public Class atcTimeseriesStatistics
       Dim lVariance As Double = 0
       Dim lSkew As Double = 0
 
-      For lIndex = 0 To lLastValueIndex
+      For lIndex = 1 To lLastValueIndex
         lVal = aTimeseries.Value(lIndex)
         If Not aTimeseries.ValueMissing(lVal) Then
           lCount += 1
@@ -141,7 +143,7 @@ Public Class atcTimeseriesStatistics
       End If
 
       If lCount > 1 Then
-        For lIndex = 0 To lLastValueIndex
+        For lIndex = 1 To lLastValueIndex
           lVal = aTimeseries.Value(lIndex)
           If Not aTimeseries.ValueMissing(lVal) Then
             lDev = lVal - lMean

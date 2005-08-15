@@ -65,19 +65,27 @@ Public Class atcDataAttributes
 
   Public Function GetFormattedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As String
     'TODO: use definition for formatting 
-    Dim lValue As Object = GetValue(aAttributeName, aDefault)
+    Try
+      Dim lValue As Object = GetValue(aAttributeName, aDefault)
 
-    If TypeOf (lValue) Is Double Then
-      If InStr(LCase(aAttributeName), "jday", CompareMethod.Text) Then
-        Return DumpDate(lValue)
-      Else
-        Return Format(lValue, "#,##0.#####")
-      End If
-    ElseIf TypeOf (lValue) Is atcTimeseries Then
-      Return lValue.ToString
-    Else
-      Return CStr(lValue)
-    End If
+      Try
+        If TypeOf (lValue) Is Double Then
+          If InStr(LCase(aAttributeName), "jday", CompareMethod.Text) Then
+            Return DumpDate(lValue)
+          Else
+            Return Format(lValue, "#,##0.#####")
+          End If
+        ElseIf TypeOf (lValue) Is atcTimeseries Then
+          Return lValue.ToString
+        Else
+          Return lValue.ToString
+        End If
+      Catch
+        Return "<" & lValue.GetType.Name & ">"
+      End Try
+    Catch
+      Return "<nothing>"
+    End Try
   End Function
 
   'Retrieve or calculate the value for aAttributeName
