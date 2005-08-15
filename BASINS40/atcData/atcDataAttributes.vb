@@ -215,13 +215,19 @@ Public Class atcDataAttributes
 
   'Calculate all the known attributes that can be calculated with no additional arguments
   Public Sub CalculateAll()
-    For Each tmpDef As atcAttributeDefinition In pAllDefinitions 'For each kind of attribute we know about
-      If tmpDef.Calculated Then                                  'This attribute can be calculated
-        Dim key As String = AttributeNameToKey(tmpDef.Name)
-        If ItemByKey(key) Is Nothing Then                        'We do not have a value yet for this attribute
-          GetDefinedValue(key)                                   'GetDefinedValue will try to calculate
+    Dim lCalculateThese As New ArrayList
+    For Each lDef As atcAttributeDefinition In pAllDefinitions 'For each kind of attribute we know about
+      If lDef.Calculated Then                                  'This attribute can be calculated
+        Dim key As String = AttributeNameToKey(lDef.Name)
+        If ItemByKey(key) Is Nothing Then                      'We do not yet have a value for this attribute
+          lCalculateThese.Add(key)
         End If
       End If
+    Next
+
+    'Had to separate calculation from enumerating pAllDefinitions since definitions may get added
+    For Each lAttributeKey As String In lCalculateThese
+      GetDefinedValue(lAttributeKey)                               'GetDefinedValue will try to calculate
     Next
   End Sub
 
