@@ -160,6 +160,7 @@ Public Class atcTimeseriesNdayHighLow
       newTS.Values = newValues
       newTS.Dates = New atcTimeseries(Me)
       newTS.Dates.Values = newDates
+      newTS.Attributes.SetValue("TSFill", aTS.Attributes.GetValue("TSFill"))
 
       Return newTS
     Catch ex As Exception

@@ -45,7 +45,9 @@ Public Class atcTimeseries
 
   Public ReadOnly Property ValueMissing(ByVal aValue As Double) As Boolean
     Get
-      If pMissingValue Is Nothing Then 'no fill value attribute, assume ok
+      If Double.IsNaN(aValue) Then 'not a number is always missing
+        Return True
+      ElseIf pMissingValue Is Nothing Then 'no fill value attribute, assume ok
         Return False
       ElseIf (aValue - pMissingValue) < Double.Epsilon Then
         Return True
@@ -166,8 +168,8 @@ Public Class atcTimeseries
     If pValuesNeedToBeRead Then
       'just header information was read at first, delaying using the time/space to read all the data
       pDataSource.ReadData(Me) 'ValuesNeedToBeRead = False should happen in pFile.ReadData            
-      pMissingValue = Me.Attributes.GetValue("TSFILL", Nothing)
     End If
+    pMissingValue = Me.Attributes.GetValue("TSFILL", Nothing)
   End Sub
 
   'True if we have read the header and not all the values to save time and memory
