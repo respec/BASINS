@@ -12,7 +12,12 @@ Public Class atcDebugTimserPlugin
 
   Public Overrides Function Show(ByVal aDataManager As atcData.atcDataManager, _
                    Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
-    Return New atcDebugTimserForm(aDataManager, aDataGroup)
+    Dim lDataGroup As atcDataGroup = aDataGroup
+    If lDataGroup Is Nothing Then lDataGroup = New atcDataGroup
+    Dim lDebugTimserForm As New atcDebugTimserForm(aDataManager, lDataGroup)
+
+    If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then lDebugTimserForm.Show()
+    Return lDebugTimserForm
   End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
@@ -22,5 +27,16 @@ Public Class atcDebugTimserPlugin
 
   Public Overrides Sub Terminate()
     g_MapWin.Plugins.BroadcastMessage("atcDataPlugin unloading atcDebugTimserPlugin")
+  End Sub
+
+  Public Sub Save(ByVal aDataManager As atcData.atcDataManager, _
+                  ByVal aDataGroup As atcData.atcDataGroup, _
+                  ByVal aFileName As String, _
+                  ByVal ParamArray aOption() As String)
+    Dim lDebugTimserForm As New atcDebugTimserForm(aDataManager, aDataGroup)
+    With lDebugTimserForm
+      .TreeAction(aOption)
+      .Save(aFileName)
+    End With
   End Sub
 End Class

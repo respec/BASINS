@@ -28,9 +28,8 @@ Public Class atcDebugTimserForm
     End If
 
     If pDataGroup.Count > 0 Then
-      Me.Show()
       PopulateTree()
-    Else 'use declined to specify Data
+    Else 'user declined to specify Data
       Me.Close()
     End If
   End Sub
@@ -134,12 +133,12 @@ Public Class atcDebugTimserForm
   Private pDataManager As atcDataManager
   Private WithEvents atrMain As TreeView   'tree control
   Private WithEvents pDataGroup As atcDataGroup   'group of atcData displayed
+  Private pNumValuesShow As Integer = 8 'make number of values to display editable
 
   Private Sub PopulateTree()
     Dim lAttributeName As String
     Dim lAttributeValue As String
     Dim lNumValues As Integer
-    Dim lNumValuesShow As Integer = 8 'make number of values to display editable
     Dim lNumValuesNow As Integer
     Dim lValueStart As Integer
 
@@ -189,8 +188,8 @@ Public Class atcDebugTimserForm
 
         Dim lDataNode As New TreeNode
         lDataNode = lNode.Nodes.Add("Data")
-        If lNumValues > lNumValuesShow Then
-          lNumValuesNow = lNumValuesShow
+        If lNumValues > pNumValuesShow Then
+          lNumValuesNow = pNumValuesShow
         Else
           lNumValuesNow = lNumValues + 1
         End If
@@ -199,10 +198,10 @@ Public Class atcDebugTimserForm
           lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j - 1)) & " : " & _
                               Format(lData.Value(j), "#,##0.#####"))
         Next
-        If lNumValues > lNumValuesShow Then  'some from end too
-          If lNumValues - lNumValuesShow > lNumValuesShow Then
-            lDataNode.Nodes.Add("  <" & lNumValues - (2 * lNumValuesShow) & " values skipped>")
-            lValueStart = lNumValues - lNumValuesShow
+        If lNumValues > pNumValuesShow Then  'some from end too
+          If lNumValues - pNumValuesShow > pNumValuesShow Then
+            lDataNode.Nodes.Add("  <" & lNumValues - (2 * pNumValuesShow) & " values skipped>")
+            lValueStart = lNumValues - pNumValuesShow
           Else
             lValueStart = lNumValuesNow
           End If
@@ -263,22 +262,30 @@ Public Class atcDebugTimserForm
     End If
   End Sub
 
-  Public Sub TreeAction(ByVal aAction As String)
-    Select Case aAction
-      Case "Expand"
-        With atrMain
-          .Visible = False
-          .ExpandAll()
-          .Visible = True
-        End With
-      Case "Collapse"
-        With atrMain
-          .Visible = False
-          .CollapseAll()
-          .Visible = True
-        End With
-      Case "Default" : PopulateTree()
-    End Select
+  Public Sub TreeAction(ByVal ParamArray aAction() As String)
+    For Each lAction As String In aAction
+      Dim lCurAction() As String = lAction.Split(" ")
+      Select Case lCurAction(0)
+        Case "Expand"
+          With atrMain
+            .Visible = False
+            .ExpandAll()
+            .Visible = True
+          End With
+        Case "Collapse"
+          With atrMain
+            .Visible = False
+            .CollapseAll()
+            .Visible = True
+          End With
+        Case "Default" : PopulateTree()
+        Case "Display"
+          If IsNumeric(lCurAction(1)) Then
+            pNumValuesShow = lCurAction(1)
+            PopulateTree()
+          End If
+      End Select
+    Next
   End Sub
 
   Private Function GetIndex(ByVal aName As String) As Integer
