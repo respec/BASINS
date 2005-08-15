@@ -213,9 +213,17 @@ Public Class atcDataAttributes
     Return newClone
   End Function
 
-  'Public Function GetDefinedValue(ByVal aIndex As Integer) As atcDefinedValue
-  '  Return ItemByIndex(aIndex)
-  'End Function
+  'Calculate all the known attributes that can be calculated with no additional arguments
+  Public Sub CalculateAll()
+    For Each tmpDef As atcAttributeDefinition In pAllDefinitions 'For each kind of attribute we know about
+      If tmpDef.Calculated Then                                  'This attribute can be calculated
+        Dim key As String = AttributeNameToKey(tmpDef.Name)
+        If ItemByKey(key) Is Nothing Then                        'We do not have a value yet for this attribute
+          GetDefinedValue(key)                                   'GetDefinedValue will try to calculate
+        End If
+      End If
+    Next
+  End Sub
 
   Public Function GetDefinedValue(ByVal aAttributeName As String) As atcDefinedValue
     Dim key As String = AttributeNameToKey(aAttributeName)
@@ -231,11 +239,11 @@ Public Class atcDataAttributes
               If Not lOperation Is Nothing AndAlso Not lOperation.Arguments Is Nothing Then
                 If lOperation.Arguments.Count = 1 Then 'Simple calculation has only one argument
                   Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
-                    If lArg.Definition.TypeString = "atcTimeseries" Then 'Only argument must be atcTimeseries
+                  If lArg.Definition.TypeString = "atcTimeseries" Then 'Only argument must be atcTimeseries
                     Dim tmpArgs As atcDataAttributes = lOperation.Arguments.Clone
-                      tmpArgs.SetValue(lArg.Definition, lOwnerTS)
-                      tmpDef.Calculator.Open(tmpDef.Name, tmpArgs)
-                      tmpAttribute = ItemByKey(key)
+                    tmpArgs.SetValue(lArg.Definition, lOwnerTS)
+                    tmpDef.Calculator.Open(tmpDef.Name, tmpArgs)
+                    tmpAttribute = ItemByKey(key)
                   End If
                 End If
               End If
