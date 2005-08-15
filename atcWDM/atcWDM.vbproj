@@ -95,12 +95,12 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcMsgWDM.vb"
+                    RelPath = "atcDataSourceWDM.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcTimeseriesFileWDM.vb"
+                    RelPath = "atcMsgWDM.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
