@@ -39,4 +39,14 @@ Public Class atcDebugTimserPlugin
       .Save(aFileName)
     End With
   End Sub
+
+  Public Sub Save(ByVal aDataManager As atcData.atcDataManager, _
+                  ByVal aDataSet As atcData.atcDataSet, _
+                  ByVal aFileName As String, _
+                  ByVal ParamArray aOption() As String)
+    Dim lDataGroup As New atcDataGroup
+    lDataGroup.Add(aDataSet)
+    Save(aDataManager, lDataGroup, aFileName, aOption)
+  End Sub
+
 End Class

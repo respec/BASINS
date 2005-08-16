@@ -56,13 +56,22 @@ Public Class atcDataGroup
     End Set
   End Property
 
+  Public Sub New()
+    MyBase.New()
+  End Sub
+
+  Public Sub New(ByVal aDataSet As atcDataSet)
+    MyBase.New()
+    Add(aDataSet.Serial, aDataSet)
+  End Sub
+
   'Add one atcDataSet to the group with the default key of its serial number
-  Public Shadows Function Add(ByVal aDataSet As Object) As Integer
+  Public Shadows Function Add(ByVal aDataSet As atcDataSet) As Integer
     Add(aDataSet.Serial, aDataSet)
   End Function
 
   'Add one atcDataSet to the group with a custom key
-  Public Shadows Function Add(ByVal key As Object, ByVal aDataSet As Object) As Integer
+  Public Shadows Function Add(ByVal key As Object, ByVal aDataSet As atcDataSet) As Integer
     MyBase.Add(key, aDataSet)
     RaiseAddedOne(aDataSet)
   End Function
@@ -83,7 +92,7 @@ Public Class atcDataGroup
     End If
   End Sub
 
-  Public Shadows Function Clone() As Object
+  Public Shadows Function Clone() As atcDataGroup
     Dim newClone As New atcDataGroup
     For index As Integer = 0 To MyBase.Count - 1
       newClone.Add(MyBase.Keys(index), MyBase.Item(index))
@@ -125,7 +134,7 @@ Public Class atcDataGroup
   End Function
 
   'Insert a new DataSet at the specified index
-  Public Shadows Sub Insert(ByVal aIndex As Integer, ByVal aDataSet As Object)
+  Public Shadows Sub Insert(ByVal aIndex As Integer, ByVal aDataSet As atcDataSet)
     MyBase.Insert(aIndex, aDataSet)
     RaiseAddedOne(aDataSet)
   End Sub
@@ -139,7 +148,7 @@ Public Class atcDataGroup
   End Sub
 
   'Remove aDataSet from the group
-  Public Shadows Sub Remove(ByVal aDataSet As Object)
+  Public Shadows Sub Remove(ByVal aDataSet As atcDataSet)
     MyBase.Remove(aDataSet)
     RaiseRemovedOne(aDataSet)
   End Sub

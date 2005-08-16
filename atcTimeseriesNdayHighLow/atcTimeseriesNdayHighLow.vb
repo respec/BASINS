@@ -197,17 +197,22 @@ Public Class atcTimeseriesNdayHighLow
   'remaining aArgs are expected to follow the args required for the specified operation
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
     Dim ltsGroup As atcDataGroup
+    Dim lTs As atcTimeseries
+
     If aArgs Is Nothing Then
       ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
-      If aOperationName.ToLower = "7q10" Then
-        For Each lts As atcTimeseries In ltsGroup
-          Compute7q10(lts)
-        Next
-      End If
     Else
-      If aOperationName.ToLower = "7q10" Then
-        Compute7q10(aArgs.GetValue("Timeseries"))
-      End If
+      ltsGroup = aArgs.GetValue("Timeseries")
+    End If
+
+    If ltsGroup Is Nothing Then
+      ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
+    End If
+
+    If aOperationName.ToLower = "7q10" Then
+      For Each lTs In ltsGroup
+        Compute7q10(lTs)
+      Next
     End If
   End Function
 
