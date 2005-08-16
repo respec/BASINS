@@ -141,6 +141,7 @@ Public Class atcDebugTimserForm
     Dim lNumValues As Integer
     Dim lNumValuesNow As Integer
     Dim lValueStart As Integer
+    Dim lDateString(3) As String
 
     If Not atrMain Is Nothing Then
       Me.Controls.Remove(atrMain)
@@ -196,8 +197,10 @@ Public Class atcDebugTimserForm
         End If
         For j As Integer = 1 To lNumValuesNow - 1
           'data starts at 1, date display is from prev value which is start of interval
-          lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j - 1)) & " : " & _
-                              Format(lData.Value(j), "#,##0.#####"))
+          lDateString = DumpDate(lData.Dates.Value(j - 1)).Split(" ")
+          lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
+                              Format(lData.Value(j), "#,##0.#####") & " : " & _
+                              lDateString(0))
         Next
         If lNumValues > pNumValuesShow Then  'some from end too
           If lNumValues - pNumValuesShow > pNumValuesShow Then
@@ -207,8 +210,10 @@ Public Class atcDebugTimserForm
             lValueStart = lNumValuesNow
           End If
           For j As Integer = lValueStart To lData.numValues
-            lDataNode.Nodes.Add(DumpDate(lData.Dates.Value(j - 1)) & " : " & _
-                                Format(lData.Value(j), "#,##0.#####"))
+            lDateString = DumpDate(lData.Dates.Value(j - 1)).Split(" ")
+            lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
+                                Format(lData.Value(j), "#,##0.#####") & " : " & _
+                                lDateString(0))
           Next
         End If
       Next
@@ -251,7 +256,7 @@ Public Class atcDebugTimserForm
                 Else
                   s &= vbCrLf
                   For k As Integer = 0 To .GetNodeCount(False) - 1
-                    s &= vbTab & vbTab & .Nodes(k).Text & vbCrLf
+                    s &= vbTab & vbTab & .Nodes(k).Text.Replace(" : ", vbTab) & vbCrLf
                   Next
                 End If
               End With
