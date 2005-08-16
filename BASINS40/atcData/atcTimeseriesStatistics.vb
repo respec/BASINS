@@ -67,16 +67,19 @@ Public Class atcTimeseriesStatistics
         AddOperation("Mean", "Sum of all values divided by number of values", _
                      defTimeSeriesOne, defCategory)
 
-        AddOperation("Geometric Mean", "10 ^ Mean of log(each value)", _
+        AddOperation("GeoMean", "10 ^ Mean of log(each value)", _
                      defTimeSeriesOne, defCategory)
 
         AddOperation("Variance", "Statistical variance", _
                      defTimeSeriesOne, defCategory)
 
-        AddOperation("Standard deviation", "Standard deviation", _
+        AddOperation("StdDev", "Standard deviation", _
                      defTimeSeriesOne, defCategory)
 
         AddOperation("Skew", "Skewness", _
+                     defTimeSeriesOne, defCategory)
+
+        AddOperation("StErSkew", "Standard Error of Skewness", _
                      defTimeSeriesOne, defCategory)
 
       End If
@@ -115,7 +118,7 @@ Public Class atcTimeseriesStatistics
       Dim lMax As Double = -1.0E+30
       Dim lMin As Double = 1.0E+30
 
-      Dim lGeometricMean As Double = 0
+      Dim lGeoMean As Double = 0
       Dim lStdDev As Double = 0
       Dim lCount As Double = 0
       Dim lMean As Double = 0
@@ -124,6 +127,7 @@ Public Class atcTimeseriesStatistics
       Dim lSumDevCubes As Double = 0
       Dim lVariance As Double = 0
       Dim lSkew As Double = 0
+      Dim lStErSkew As Double = 0
 
       For lIndex = 1 To lLastValueIndex
         lVal = aTimeseries.Value(lIndex)
@@ -132,7 +136,7 @@ Public Class atcTimeseriesStatistics
           If lVal > lMax Then lMax = lVal
           If lVal < lMin Then lMin = lVal
           lSum += lVal
-          If lMin > 0 Then lGeometricMean += Math.Log(lVal)
+          If lMin > 0 Then lGeoMean += Math.Log(lVal)
         End If
       Next
 
@@ -148,8 +152,8 @@ Public Class atcTimeseriesStatistics
       End If
 
       If lMin > 0 Then
-        lGeometricMean = Math.Exp(lGeometricMean / lCount)
-        aTimeseries.Attributes.SetValue("Geometric Mean", lGeometricMean)
+        lGeoMean = Math.Exp(lGeoMean / lCount)
+        aTimeseries.Attributes.SetValue("GeoMean", lGeoMean)
       End If
 
       If lCount > 1 Then
@@ -166,9 +170,11 @@ Public Class atcTimeseriesStatistics
 
         If lVariance > 0 Then
           lStdDev = Math.Sqrt(lVariance)
-          aTimeseries.Attributes.SetValue("Standard Deviation", lStdDev)
-          lSkew = (lCount * lSumDevCubes) / ((lCount - 1.0) * (lCount * 2.0) * lStdDev * lStdDev * lStdDev)
+          aTimeseries.Attributes.SetValue("StdDev", lStdDev)
+          lSkew = (lCount * lSumDevCubes) / ((lCount - 1.0) * (lCount - 2.0) * lStdDev * lStdDev * lStdDev)
           aTimeseries.Attributes.SetValue("Skew", lSkew)
+          lStErSkew = Math.Sqrt((6.0 * lCount * (lCount - 1)) / ((lCount - 2) * (lCount + 1) * (lCount + 3)))
+          aTimeseries.Attributes.SetValue("StErSkew", lStErSkew)
         End If
       End If
     End If
