@@ -105,10 +105,17 @@ Public Class atcTimeseriesNdayHighLow
       Dim lBestSoFar As Double
       Dim lTimeIndex As Integer
       Dim lRunningSum As Double = 0
+      Dim lCurrentValue As Double
 
       'Add up the first N values without checking for a limit
       For lTimeIndex = 1 To aNumValues - 1
-        lRunningSum += aTS.Value(lTimeIndex)
+        lCurrentValue = aTS.Value(lTimeIndex)
+
+        'Can't calculate high or low value if any values in the period are missing
+        If aTS.ValueMissing(lCurrentValue) Then
+          Return Double.NaN
+        End If
+        lRunningSum += lCurrentValue
       Next
 
       If aHigh Then
@@ -118,7 +125,14 @@ Public Class atcTimeseriesNdayHighLow
       End If
 
       While lTimeIndex <= aTS.numValues
-        lRunningSum += aTS.Value(lTimeIndex)
+        lCurrentValue = aTS.Value(lTimeIndex)
+
+        'Can't calculate high or low value if any values in the period are missing
+        If aTS.ValueMissing(lCurrentValue) Then
+          Return Double.NaN
+        End If
+
+        lRunningSum += lCurrentValue
 
         If aHigh Then
           If lRunningSum > lBestSoFar Then lBestSoFar = lRunningSum
