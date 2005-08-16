@@ -172,6 +172,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcTimeseriesStatistics.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "frmDataSource.vb"
                     SubType = "Form"
                     BuildAction = "Compile"

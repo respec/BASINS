@@ -358,9 +358,12 @@ Public Class atcGraphForm
       curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.Star)
       curve.Line.IsVisible = False
     Else
-      curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
-      curve.Line.Width = 1
-      curve.Line.StepType = StepType.RearwardStep
+      If UBound(y) > 0 Then
+        y(0) = y(1)
+        curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
+        curve.Line.Width = 1
+        curve.Line.StepType = StepType.RearwardStep
+      End If
     End If
 
     'TODO: label Y Axis
@@ -433,6 +436,4 @@ Public Class atcGraphForm
       End If
     Next
   End Sub
-
-
 End Class

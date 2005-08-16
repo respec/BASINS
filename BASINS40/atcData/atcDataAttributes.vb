@@ -77,6 +77,8 @@ Public Class atcDataAttributes
           End If
         ElseIf TypeOf (lValue) Is atcTimeseries Then
           Return lValue.ToString
+        ElseIf TypeOf (lValue) Is atcDataGroup Then
+          Return lValue.ToString
         Else
           Return lValue.ToString
         End If

@@ -43,18 +43,18 @@ Public Class atcTimeseries
     End Set
   End Property
 
-  Public ReadOnly Property ValueMissing(ByVal aValue As Double) As Boolean
-    Get
-      If Double.IsNaN(aValue) Then 'not a number is always missing
-        Return True
-      ElseIf pMissingValue Is Nothing Then 'no fill value attribute, assume ok
-        Return False
-      ElseIf (aValue - pMissingValue) < Double.Epsilon Then
-        Return True
-      End If
-      Return False
-    End Get
-  End Property
+  'Public ReadOnly Property ValueMissing(ByVal aValue As Double) As Boolean
+  '  Get
+  '    If Double.IsNaN(aValue) Then 'not a number is always missing
+  '      Return True
+  '    ElseIf pMissingValue Is Nothing Then 'no fill value attribute, assume ok
+  '      Return False
+  '    ElseIf (aValue - pMissingValue) < Double.Epsilon Then
+  '      Return True
+  '    End If
+  '    Return False
+  '  End Get
+  'End Property
 
   'Set or get the entire array of values
   Public Property Values() As Double()

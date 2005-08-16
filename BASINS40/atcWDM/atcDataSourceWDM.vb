@@ -860,6 +860,7 @@ Public Class atcDataSourceWDM
     Dim sdat(6) As Integer 'starting date
     Dim edat(6) As Integer 'ending (or current) date
     Dim f() As Integer
+    Dim lTsFill As Double
     'Dim lWdmOpen As Integer
 
     If Not DataSets.Contains(aReadMe) Then
@@ -903,10 +904,19 @@ Public Class atcDataSourceWDM
               ReDim dv(nVals)
               dv(0) = Double.NaN
 
+              lTsFill = .GetValue("TSFill", -999)
+              If lTsFill >= 0 Then 'WDM convention - fill value, not undefined,
+                lTsFill = Double.NaN
+              End If
+
               Dim lInterval As Double = .GetValue("interval", 0)
               Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
               For iVal = 1 To nVals
-                dv(iVal) = v(iVal) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
+                If (v(iVal) - lTsFill) < Double.Epsilon Then
+                  dv(iVal) = Double.NaN
+                Else
+                  dv(iVal) = v(iVal) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
+                End If
                 If lConstInterval Then
                   dd(iVal) = lSJDay + iVal * lInterval
                 Else

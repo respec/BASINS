@@ -132,7 +132,7 @@ Public Class atcTimeseriesMath
         pAvailableOperations.GetDefinition("F to Celsius").Category = "Unit Conversion"
 
         AddOperation("Subset by date", "Choose start and end dates", defTimeSeriesOne, defStartDate, defEndDate)
-        pAvailableOperations.GetDefinition("F to Celsius").Category = "Date"
+        pAvailableOperations.GetDefinition("Subset by date").Category = "Date"
 
       End If
       Return pAvailableOperations
@@ -426,11 +426,20 @@ Public Class atcTimeseriesMath
       End If
 
       If Not lTSgroup Is Nothing AndAlso lTSgroup.Count > 0 Then
-        lNewTS.Attributes.SetValue("Parent Timeseries", lTSgroup)
+        If lTSgroup.Count = 1 Then
+          lNewTS.Attributes.SetValue("Parent Timeseries", lTSgroup.Item(0))
+        Else
+          lNewTS.Attributes.SetValue("Parent Timeseries Group", lTSgroup)
+        End If
       End If
       If lHaveNumber Then
         lNewTS.Attributes.SetValue("Parent Constant", lNumber)
       End If
+
+      Dim lDateNow As Date = Now
+      lNewTS.Attributes.SetValue("Date Created", lDateNow)
+      lNewTS.Attributes.SetValue("Date Modified", lDateNow)
+
       AddDataSet(lNewTS)
     End If
     If Me.DataSets.Count > 0 Then Return True

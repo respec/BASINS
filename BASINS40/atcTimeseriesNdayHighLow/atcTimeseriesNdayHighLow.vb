@@ -112,7 +112,7 @@ Public Class atcTimeseriesNdayHighLow
         lCurrentValue = aTS.Value(lTimeIndex)
 
         'Can't calculate high or low value if any values in the period are missing
-        If aTS.ValueMissing(lCurrentValue) Then
+        If Double.IsNaN(lCurrentValue) Then
           Return Double.NaN
         End If
         lRunningSum += lCurrentValue
@@ -128,7 +128,7 @@ Public Class atcTimeseriesNdayHighLow
         lCurrentValue = aTS.Value(lTimeIndex)
 
         'Can't calculate high or low value if any values in the period are missing
-        If aTS.ValueMissing(lCurrentValue) Then
+        If Double.IsNaN(lCurrentValue) Then
           Return Double.NaN
         End If
 
@@ -174,9 +174,13 @@ Public Class atcTimeseriesNdayHighLow
       newTS.Values = newValues
       newTS.Dates = New atcTimeseries(Me)
       newTS.Dates.Values = newDates
-      newTS.Attributes.SetValue("TSFill", aTS.Attributes.GetValue("TSFill"))
+      newTS.Attributes.SetValue("Parent Timeseries", aTS)
+      Dim lDateNow As Date = Now
+      newTS.Attributes.SetValue("Date Created", lDateNow)
+      newTS.Attributes.SetValue("Date Modified", lDateNow)
 
       Return newTS
+
     Catch ex As Exception
       Stop
     End Try
