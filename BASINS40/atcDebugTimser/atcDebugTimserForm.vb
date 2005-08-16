@@ -160,6 +160,7 @@ Public Class atcDebugTimserForm
       Me.Controls.Add(atrMain)
       .Refresh()
       For Each lData As atcTimeseries In pDataGroup
+        lData.Attributes.CalculateAll() 'be sure to get everything
         Dim lNode As New TreeNode
         lNode = .Nodes.Add(lData.ToString)
 
@@ -182,7 +183,7 @@ Public Class atcDebugTimserForm
         Dim lInternalNode As New TreeNode
         lInternalNode = lNode.Nodes.Add("Internal")
         lNumValues = lData.numValues
-        lInternalNode.Nodes.Add("NumValues :" & lNumValues)
+        lInternalNode.Nodes.Add("NumValues : " & lNumValues)
         lInternalNode.ExpandAll()
         lInternalNode.EnsureVisible()
 

@@ -466,7 +466,7 @@ Public Class atcDataSourceWDM
       RemoveTimSer = True
       searchSerial = t.Serial
       For i = 1 To DataSets.Count()
-        If DataSets.Item(i).Serial = searchSerial Then DataSets.Remove(i) : Exit For
+        If DataSets.Item(i).Serial = searchSerial Then DataSets.RemoveAt(i) : Exit For
       Next
 
       removeDate = True
