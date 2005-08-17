@@ -117,6 +117,17 @@ Public Module modDate
     HMS2J = CDbl(h / 24) + CDbl(m / 1440) + CDbl(s / 86400)
   End Function
 
+  Sub J2DateRoundup(ByVal aJDate As Double, ByVal aTU As Long, ByVal aDate() As Integer)
+    'round up dates for wdm datasets
+    'TODO: needs unit tests!
+    J2Date(aJDate, aDate)
+    Dim lInd As Integer = 7 - aTU
+    If aDate(lInd) > 1 Then
+      aDate(lInd - 1) += 1
+      aDate(lInd) = 1
+    End If
+  End Sub
+
   Sub J2Date(ByVal j As Double, ByRef d() As Integer)
     '##SUMMARY J2Date - convert a modified Julian date (MJD) to a long array
     '##PARM j - modfied Julian date to convert
@@ -938,4 +949,13 @@ Public Module modDate
     Loop
     pTimDif = NVALS
   End Function
+
+  Public Sub CalcTimeUnitStep(ByVal aSJDate As Double, ByVal aEJDate As Double, ByRef aTu As Integer, ByRef aTs As Integer)
+    aTu = 6
+    aTs = 1
+    While aTs < 1
+      aTs = timdifJ(aSJDate, aEJDate, aTu, aTs)
+      If aTs = 0 Then aTu = aTu - 1
+    End While
+  End Sub
 End Module
