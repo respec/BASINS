@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On 
 
 Imports atcData
+Imports atcData.atcDataSource.EnumExistAction
 Imports atcUtility
 
 Public Class atcDataSourceWDM
@@ -264,196 +265,215 @@ Public Class atcDataSourceWDM
     End Select
   End Function
 
-  Public Overrides Function AddDataset(ByRef aDataSet As atcData.atcDataSet, Optional ByRef ExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
-    MyBase.AddDataSet(aDataSet, ExistAction)
-    'TODO: re-implement
-    '    Dim retcod, dsn, i, lExAct, TsInd As Integer
-    '    Dim S As String
-    '    Dim BtnName() As Object
-    '    Dim nBtns As Integer
-    '    Dim AppendFg, OvwrtFg As Boolean
-    '    Dim myMsgBox As ATCoCtl.ATCoMessage
-    '    Dim UsrExAct As Integer
-    '    Dim vData As Object
-    '    Dim lData As atcTimeseries
-    '    Dim bldOk As Boolean
-    '    Dim lWdmOpen As Integer
-    '    Dim checklastval As Single
+  Public Overrides Function AddDataset(ByRef aDataSet As atcData.atcDataSet, Optional ByRef aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
 
-    '    On Error Resume Next
-    '    checklastval = t.Value(t.Dates.Summary.NVALS) 'make sure data has been read
-    '    On Error GoTo ErrHandler
+    Dim lTimser As atcTimeseries
+    If aDataSet.GetType.FullName <> "atcData.atcTimeseries" Then  'not a timeseries
+      Return False
+    Else
+      lTimser = aDataSet
+    End If
 
-    '    lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))
+    aDataSet.Attributes.CalculateAll()
 
-    '    AddTimSer = False 'assume we will fail
-    '    lExAct = ExistAction 'use local copy of what to do if DSN exists
-    '    AppendFg = False
-    '    OvwrtFg = False
+    Dim lDsn As Integer = 1
+    If aDataSet.Attributes.ItemByKey("Id") > 0 Then
+      lDsn = aDataSet.Attributes.GetDefinedValue("ID").Value()
+    End If
 
-    '    dsn = t.Header.id
-    '    i = 1
-    '    For Each vData In pData
-    '      lData = vData
-    '      If dsn = lData.Header.id Then
-    '        If lData.serial = t.serial Then 'exists already
-    '          AddTimSer = RewriteTimSer(t)
-    '          Exit Function
-    '        End If
-    '        dsn = findNextDsn(dsn + 1) 'find next dsn
-    '        If lExAct = ATCData.ATCTsIdExistAction.TsIdNoAction Then 'just report the problem
-    '          pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & " Exists:Next Available is " & dsn
-    '          Exit Function
-    '        ElseIf lExAct > ATCData.ATCTsIdExistAction.TsIdRenum Then  'ask user what to do
-    '          nBtns = 0
-    '          If lExAct And ATCData.ATCTsIdExistAction.TsIdReplAsk Then 'overwrite is an option
-    '            ReDim Preserve BtnName(nBtns)
-    '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName(nBtns)
-    '            BtnName(nBtns) = "&Overwrite"
-    '            nBtns = nBtns + 1
-    '          End If
-    '          If lExAct And ATCData.ATCTsIdExistAction.TsIdAppendAsk Then 'append is an option
-    '            ReDim Preserve BtnName(nBtns)
-    '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName(nBtns)
-    '            BtnName(nBtns) = "&Append"
-    '            nBtns = nBtns + 1
-    '          End If
-    '          If lExAct And ATCData.ATCTsIdExistAction.TsIdRenumAsk Then 'renumber is an option
-    '            ReDim Preserve BtnName(nBtns)
-    '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName(nBtns)
-    '            BtnName(nBtns) = "&Renumber"
-    '            nBtns = nBtns + 1
-    '          End If
-    '          'always have Cancel as last button (and default)
-    '          ReDim Preserve BtnName(nBtns)
-    '          'UPGRADE_WARNING: Couldn't resolve default property of object BtnName(nBtns)
-    '          BtnName(nBtns) = "+-&Cancel"
-    '          myMsgBox = New ATCoCtl.ATCoMessage
-    '          UsrExAct = myMsgBox.Showarray("WDM data-set number " & t.Header.id & " already exists." & vbCrLf & "Next available data-set number is " & dsn & vbCrLf & "What should be done to it?", "WDM Data-set Number Problem", BtnName)
-    '          'UPGRADE_WARNING: Couldn't resolve default property of object BtnName()
-    '          If InStr(BtnName(UsrExAct - 1), "Overwrite") > 0 Then
-    '            lExAct = ATCData.ATCTsIdExistAction.TsIdRepl 'set to overwrite
-    '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName()
-    '          ElseIf InStr(BtnName(UsrExAct - 1), "Append") > 0 Then
-    '            lExAct = ATCData.ATCTsIdExistAction.TsIdAppend 'set to append
-    '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName()
-    '          ElseIf InStr(BtnName(UsrExAct - 1), "Renumber") > 0 Then
-    '            lExAct = ATCData.ATCTsIdExistAction.TsIdRenum 'set to renumber
-    '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName()
-    '          ElseIf InStr(BtnName(UsrExAct - 1), "Cancel") > 0 Then
-    '            pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & ".  User Cancelled on message box to resolve."
-    '            Exit Function
-    '          End If
-    '        End If
-    '        If lExAct = ATCData.ATCTsIdExistAction.TsIdRepl Then 'overwrite the data set
-    '          Call F90_WDDSDL(pFileUnit, t.Header.id, retcod)
-    '          If retcod = 0 Then 'deleted ok
-    '            'Set values in replaced time series
-    '            'lData.Dtran = t.Dtran
-    '            'lData.flags = VB6.CopyArray(t.flags)
-    '            'lData.Max = t.Max
-    '            'lData.Min = t.Min
-    '            'lData.Values = VB6.CopyArray(t.Values)
-    '            'lData.Dates = t.Dates
-    '            'lData.Header = t.Header
-    '            'lData.Attribs = t.Attribs
+    If Not aExistAction = ExistReplace Then
+      lDsn = findNextDsn(lDsn)
+      aDataSet.Attributes.SetValue("Id", lDsn)
+    End If
+    Dim lWdmHandle As New atcWdmHandle(0, Specification)
 
-    '            'remove replaced timeseries from collections
-    '            pDates.Remove((i))
-    '            pData.Remove((i))
-    '            OvwrtFg = True
-    '          Else 'problem deleting
-    '            If ExistAction > ATCData.ATCTsIdExistAction.TsIdRenum Then 'report problem to user
-    '              MsgBox("Could not overwrite data-set number " & t.Header.id & " on WDM file " & pFileName & ".", MsgBoxStyle.Exclamation, "WDM Data Set Problem")
-    '            End If
-    '            pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & " could not be deleted during data-set Overwrite."
-    '            Exit Function
-    '          End If
-    '        ElseIf lExAct = ATCData.ATCTsIdExistAction.TsIdAppend Then  'append to data set
-    '          If t.Dates.Summary.SJDay >= lData.Dates.Summary.EJDay Then
-    '            'start of new data follows end of existing, ok to append
-    '            AppendFg = True
-    '            TsInd = i
-    '          Else 'can't append, new and existing data spans overlap
-    '            If ExistAction > ATCData.ATCTsIdExistAction.TsIdRenum Then 'report problem to user
-    '              MsgBox("Time span of new data and existing data overlap." & vbCrLf & "Unable to append data to data-set number " & t.Header.id & " on WDM file " & pFileName & ".", MsgBoxStyle.Exclamation, "WDM Data Set Problem")
-    '            End If
-    '            pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & " could not have new data appended to it."
-    '            Exit Function
-    '          End If
-    '        ElseIf lExAct = ATCData.ATCTsIdExistAction.TsIdRenum Then  'renumber data set
-    '          t.Header.id = dsn 'assign to next available data-set number
-    '        End If
-    '      End If
-    '      i = i + 1
-    '    Next vData
+    If DsnBld(lWdmHandle.Unit, lTimser) Then
+      Dim lSDat(5) As Integer
+      Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
+      Dim lTu As Integer = lTimser.Attributes.GetValue("tu")
+      Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
+      Dim lNvals As Integer = lTimser.numValues
+      Dim lValue As Double
+      Dim lV(lNvals) As Single
+      Dim lRetc As Integer
+      For i As Integer = 1 To lNvals
+        lValue = lTimser.Value(i)
+        If Double.IsNaN(lValue) Then lValue = lTSFill
+        lV(i) = lValue
+      Next
 
-    '    If Not AppendFg Then
-    '      pData.Add(t) 'add to internal collection
-    '      pDates.Add(t.Dates)
-    '      t.File = Me
-    '    End If
+      J2DateRoundUp(lTimser.Dates.Value(0), lTu, lSDat)
+      Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRetc)
 
-    '    If pFileUnit > 0 Then 'save on wdm
-    '      'i = F90_WDCKDT(pFileUnit, dsn)
-    '      'If i = 0 Then 'dateset does not exist
-    '      If Not AppendFg Then
-    '        'create and add attributes
-    '        bldOk = DsnBld(t)
-    '      Else
-    '        bldOk = True
-    '      End If
-    '      If bldOk Then
-    '        'add data
-    '        AddTimSer = RewriteTimSer(t)
-    '        If AddTimSer And AppendFg Then
-    '          'update end date
-    '          pDates.Remove((TsInd))
-    '          pData.Remove((TsInd))
-    '          RefreshDsn((t.Header.id))
-    '        End If
-    '      Else
-    '        AddTimSer = bldOk
-    '      End If
+    End If
 
-    '      If ExistAction > ATCData.ATCTsIdExistAction.TsIdRenum Then 'report status
-    '        If AddTimSer Then 'write succeeded
-    '          If OvwrtFg Then
-    '            S = "Successfully overwrote existing data-set number " & t.Header.id & " on WDM file " & pFileName & "."
-    '          ElseIf AppendFg Then
-    '            S = "Successfully appended data to existing data-set number " & t.Header.id & " on WDM file" & pFileName & "."
-    '          Else 'new data set
-    '            S = "New data-set number " & t.Header.id & " successfully stored on WDM file" & pFileName & "."
-    '          End If
-    '          MsgBox(S, MsgBoxStyle.Information + MsgBoxStyle.OKOnly, "WDM Data Set Add")
-    '        Else 'problem
-    '          If AppendFg Then
-    '            S = "Problem appending data to data-set number " & t.Header.id & " on WDM file " & pFileName & "." & vbCr & ErrorDescription
-    '          Else
-    '            S = "Problem adding data-set number " & t.Header.id & " to WDM file " & pFileName & "." & vbCr & ErrorDescription
-    '          End If
-    '          MsgBox(S, MsgBoxStyle.Information + MsgBoxStyle.OKOnly, "WDM Data Set Problem")
-    '        End If
-    '      End If
-    '    End If
-    '    If lWdmOpen <> 1 Then i = F90_WDMCLO(pFileUnit)
-    '    Exit Function
-    'ErrHandler:
-    '    MsgBox("Error adding timser" & vbCr & Err.Description, MsgBoxStyle.Critical, Label)
+    lWdmHandle.Dispose()
   End Function
 
-  Private Function findNextDsn(ByRef dsn As Integer) As Integer
-    Dim vData As Object
-    Dim retval As Integer
+  '    dsn = t.Header.id
+  '    i = 1
+  '    For Each vData In pData
+  '      lData = vData
+  '      If dsn = lData.Header.id Then
+  '        If lData.serial = t.serial Then 'exists already
+  '          AddTimSer = RewriteTimSer(t)
+  '          Exit Function
+  '        End If
+  '        dsn = findNextDsn(dsn + 1) 'find next dsn
+  '        If lExAct = ATCData.ATCTsIdExistAction.TsIdNoAction Then 'just report the problem
+  '          pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & " Exists:Next Available is " & dsn
+  '          Exit Function
+  '        ElseIf lExAct > ATCData.ATCTsIdExistAction.TsIdRenum Then  'ask user what to do
+  '          nBtns = 0
+  '          If lExAct And ATCData.ATCTsIdExistAction.TsIdReplAsk Then 'overwrite is an option
+  '            ReDim Preserve BtnName(nBtns)
+  '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName(nBtns)
+  '            BtnName(nBtns) = "&Overwrite"
+  '            nBtns = nBtns + 1
+  '          End If
+  '          If lExAct And ATCData.ATCTsIdExistAction.TsIdAppendAsk Then 'append is an option
+  '            ReDim Preserve BtnName(nBtns)
+  '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName(nBtns)
+  '            BtnName(nBtns) = "&Append"
+  '            nBtns = nBtns + 1
+  '          End If
+  '          If lExAct And ATCData.ATCTsIdExistAction.TsIdRenumAsk Then 'renumber is an option
+  '            ReDim Preserve BtnName(nBtns)
+  '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName(nBtns)
+  '            BtnName(nBtns) = "&Renumber"
+  '            nBtns = nBtns + 1
+  '          End If
+  '          'always have Cancel as last button (and default)
+  '          ReDim Preserve BtnName(nBtns)
+  '          'UPGRADE_WARNING: Couldn't resolve default property of object BtnName(nBtns)
+  '          BtnName(nBtns) = "+-&Cancel"
+  '          myMsgBox = New ATCoCtl.ATCoMessage
+  '          UsrExAct = myMsgBox.Showarray("WDM data-set number " & t.Header.id & " already exists." & vbCrLf & "Next available data-set number is " & dsn & vbCrLf & "What should be done to it?", "WDM Data-set Number Problem", BtnName)
+  '          'UPGRADE_WARNING: Couldn't resolve default property of object BtnName()
+  '          If InStr(BtnName(UsrExAct - 1), "Overwrite") > 0 Then
+  '            lExAct = ATCData.ATCTsIdExistAction.TsIdRepl 'set to overwrite
+  '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName()
+  '          ElseIf InStr(BtnName(UsrExAct - 1), "Append") > 0 Then
+  '            lExAct = ATCData.ATCTsIdExistAction.TsIdAppend 'set to append
+  '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName()
+  '          ElseIf InStr(BtnName(UsrExAct - 1), "Renumber") > 0 Then
+  '            lExAct = ATCData.ATCTsIdExistAction.TsIdRenum 'set to renumber
+  '            'UPGRADE_WARNING: Couldn't resolve default property of object BtnName()
+  '          ElseIf InStr(BtnName(UsrExAct - 1), "Cancel") > 0 Then
+  '            pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & ".  User Cancelled on message box to resolve."
+  '            Exit Function
+  '          End If
+  '        End If
+  '        If lExAct = ATCData.ATCTsIdExistAction.TsIdRepl Then 'overwrite the data set
+  '          Call F90_WDDSDL(pFileUnit, t.Header.id, retcod)
+  '          If retcod = 0 Then 'deleted ok
+  '            'Set values in replaced time series
+  '            'lData.Dtran = t.Dtran
+  '            'lData.flags = VB6.CopyArray(t.flags)
+  '            'lData.Max = t.Max
+  '            'lData.Min = t.Min
+  '            'lData.Values = VB6.CopyArray(t.Values)
+  '            'lData.Dates = t.Dates
+  '            'lData.Header = t.Header
+  '            'lData.Attribs = t.Attribs
 
-    retval = dsn
-    For Each vData In DataSets
-      If retval = vData.Header.id Then
-        retval = findNextDsn(dsn + 1)
-        Exit For
+  '            'remove replaced timeseries from collections
+  '            pDates.Remove((i))
+  '            pData.Remove((i))
+  '            OvwrtFg = True
+  '          Else 'problem deleting
+  '            If ExistAction > ATCData.ATCTsIdExistAction.TsIdRenum Then 'report problem to user
+  '              MsgBox("Could not overwrite data-set number " & t.Header.id & " on WDM file " & pFileName & ".", MsgBoxStyle.Exclamation, "WDM Data Set Problem")
+  '            End If
+  '            pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & " could not be deleted during data-set Overwrite."
+  '            Exit Function
+  '          End If
+  '        ElseIf lExAct = ATCData.ATCTsIdExistAction.TsIdAppend Then  'append to data set
+  '          If t.Dates.Summary.SJDay >= lData.Dates.Summary.EJDay Then
+  '            'start of new data follows end of existing, ok to append
+  '            AppendFg = True
+  '            TsInd = i
+  '          Else 'can't append, new and existing data spans overlap
+  '            If ExistAction > ATCData.ATCTsIdExistAction.TsIdRenum Then 'report problem to user
+  '              MsgBox("Time span of new data and existing data overlap." & vbCrLf & "Unable to append data to data-set number " & t.Header.id & " on WDM file " & pFileName & ".", MsgBoxStyle.Exclamation, "WDM Data Set Problem")
+  '            End If
+  '            pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & " could not have new data appended to it."
+  '            Exit Function
+  '          End If
+  '        ElseIf lExAct = ATCData.ATCTsIdExistAction.TsIdRenum Then  'renumber data set
+  '          t.Header.id = dsn 'assign to next available data-set number
+  '        End If
+  '      End If
+  '      i = i + 1
+  '    Next vData
+
+  '    If Not AppendFg Then
+  '      pData.Add(t) 'add to internal collection
+  '      pDates.Add(t.Dates)
+  '      t.File = Me
+  '    End If
+
+  '    If pFileUnit > 0 Then 'save on wdm
+  '      'i = F90_WDCKDT(pFileUnit, dsn)
+  '      'If i = 0 Then 'dateset does not exist
+  '      If Not AppendFg Then
+  '        'create and add attributes
+  '        bldOk = DsnBld(t)
+  '      Else
+  '        bldOk = True
+  '      End If
+  '      If bldOk Then
+  '        'add data
+  '        AddTimSer = RewriteTimSer(t)
+  '        If AddTimSer And AppendFg Then
+  '          'update end date
+  '          pDates.Remove((TsInd))
+  '          pData.Remove((TsInd))
+  '          RefreshDsn((t.Header.id))
+  '        End If
+  '      Else
+  '        AddTimSer = bldOk
+  '      End If
+
+  '      If ExistAction > ATCData.ATCTsIdExistAction.TsIdRenum Then 'report status
+  '        If AddTimSer Then 'write succeeded
+  '          If OvwrtFg Then
+  '            S = "Successfully overwrote existing data-set number " & t.Header.id & " on WDM file " & pFileName & "."
+  '          ElseIf AppendFg Then
+  '            S = "Successfully appended data to existing data-set number " & t.Header.id & " on WDM file" & pFileName & "."
+  '          Else 'new data set
+  '            S = "New data-set number " & t.Header.id & " successfully stored on WDM file" & pFileName & "."
+  '          End If
+  '          MsgBox(S, MsgBoxStyle.Information + MsgBoxStyle.OKOnly, "WDM Data Set Add")
+  '        Else 'problem
+  '          If AppendFg Then
+  '            S = "Problem appending data to data-set number " & t.Header.id & " on WDM file " & pFileName & "." & vbCr & ErrorDescription
+  '          Else
+  '            S = "Problem adding data-set number " & t.Header.id & " to WDM file " & pFileName & "." & vbCr & ErrorDescription
+  '          End If
+  '          MsgBox(S, MsgBoxStyle.Information + MsgBoxStyle.OKOnly, "WDM Data Set Problem")
+  '        End If
+  '      End If
+  '    End If
+  '    If lWdmOpen <> 1 Then i = F90_WDMCLO(pFileUnit)
+  '    Exit Function
+  'ErrHandler:
+  '    MsgBox("Error adding timser" & vbCr & Err.Description, MsgBoxStyle.Critical, Label)
+
+  Private Function findNextDsn(ByRef aDsn As Integer) As Integer
+    Dim lDataset As atcDataSet
+    Dim lRetval As Integer
+
+    lRetval = aDsn
+    For Each lDataset In DataSets
+      If lDataset.GetType.FullName = "atcData.atcTimeseries" Then
+        If lRetval = lDataset.Attributes.GetValue("Id", lRetval) Then
+          lRetval = findNextDsn(aDsn + 1)
+          Exit For
+        End If
       End If
-    Next vData
-    findNextDsn = retval
+    Next lDataset
+    findNextDsn = lRetval
   End Function
 
   Private Function RemoveTimSer(ByVal aFileUnit As Integer, ByRef t As atcTimeseries) As Boolean
@@ -521,6 +541,9 @@ Public Class atcDataSourceWDM
     Dim salen, psa, iVal, saind, retcod As Integer
     Dim ostr As String
     Dim CSDat(6) As Integer
+    Dim lS As String
+    Dim lTs As Integer
+    Dim lTu As Integer
 
     Dim lMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
     Dim lMsgHandle As New atcWdmHandle(1, lMsgFileName)
@@ -552,14 +575,23 @@ Public Class atcDataSourceWDM
       iVal = t.Attributes.GetValue("TSFORM", 1)
       Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
       saind = 17 'tcode
-      iVal = t.Dates.Attributes.GetValue("tu")
-      Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
+      lS = t.Attributes.GetValue("tu")
+      If lS.Length = 0 Then
+        CalcTimeUnitStep(t.Dates.Value(0), t.Dates.Value(1), lTu, lTs)
+        t.Attributes.SetValue("tu", lTu)
+        t.Attributes.SetValue("ts", lTs)
+      Else
+        lTu = lS
+        saind = 33 'tsstep
+        lTs = t.Attributes.GetValue("ts")
+      End If
+      saind = 17 'tcode
+      Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, lTu, retcod)
       saind = 33 'tsstep
-      iVal = t.Dates.Attributes.GetValue("ts")
-      Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
+      Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, lTs, retcod)
       saind = 85 'vbtime
       iVal = t.Attributes.GetValue("VBTIME", 1)
-      If t.Dates.Attributes.GetValue("ts") > 1 Then iVal = 2 'timestep > 1 vbtime must vary
+      If lTs > 1 Then iVal = 2 'timestep > 1 vbtime must vary
       Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
       Call J2Date(t.Dates.Value(0), CSDat)
       i = CSDat(0) Mod 10
@@ -587,7 +619,7 @@ Public Class atcDataSourceWDM
 
       'others (from attrib)
       DsnBld = DsnWriteAttributes(t)
-      lmsgHandle.Dispose()
+      lMsgHandle.Dispose()
     End If
   End Function
 
@@ -636,51 +668,50 @@ Public Class atcDataSourceWDM
   End Function
 
   Private Function DsnWriteAttributes(ByRef t As atcTimeseries) As Boolean
-    'TODO: rewrite not using ATCData.ATTimSerAttribute
-    'Dim vAttr As Object
-    'Dim lAttr As ATCData.ATTimSerAttribute
-    'Dim lWAttr As clsAttributeWDM
-    'Dim retc As Integer
+    Dim lName As String
+    Dim lValue As Object
 
-    'DsnWriteAttributes = True
-    'For Each vAttr In t.Attribs
-    '  lAttr = vAttr
-    '  If lAttr.Name = "Units" Then 'store Units ID as DCODE in WDM
-    '    lAttr.Name = "DCODE"
-    '    lAttr.Value = CStr(GetUnitID(lAttr.Value))
-    '  End If
-    '  lWAttr = gMsg.Attrib(lAttr.Name)
-    '  If Not (lWAttr Is Nothing) Then
-    '    With lWAttr
-    '      Select Case .DataType
-    '        Case "Integer"
-    '          If IsNumeric(lAttr.Value) Then
-    '            F90_WDBSAI(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, CInt(lAttr.Value), retc)
-    '          End If
-    '        Case "Single"
-    '          If IsNumeric(lAttr.Value) Then
-    '            F90_WDBSAR(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, CSng(lAttr.Value), retc)
-    '          End If
-    '        Case Else 'character
-    '          F90_WDBSAC(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, retc, lAttr.Value, Len(lAttr.Value))
-    '      End Select
-    '    End With
-    '    If retc <> 0 Then
-    '      If Math.Abs(retc) = 104 Then 'cant update if data already present
-    '        'Debug.Print "Skip:" & lAttr.Name & ", data present"
-    '      Else
-    '        If Len(pErrorDescription) = 0 Then
-    '          pErrorDescription = "Unable to Write Data Attributes for Class WDM"
-    '        End If
-    '        pErrorDescription = pErrorDescription & vbCrLf & "  Attribute:" & lAttr.Name & ", Value:" & lAttr.Value & ", Retcod:" & retc
-    '        DsnWriteAttributes = False
-    '      End If
-    '    End If
-    '  End If
-    'Next vAttr
-    'If Len(pErrorDescription) > 0 Then
-    '  System.Diagnostics.Debug.WriteLine(pErrorDescription)
-    'End If
+    DsnWriteAttributes = True
+    For i As Integer = 0 To t.Attributes.Count - 1
+      lName = t.Attributes(i).Definition.Name
+      lValue = t.Attributes(i).Value
+      If lName.ToLower = "units" Then  'store Units ID as DCODE in WDM
+        lName = "DCODE"
+        lValue = CStr(GetUnitID(lValue))
+      End If
+      'TODO: rewrite not using ATCData.ATTimSerAttribute
+      '  lWAttr = gMsg.Attrib(lAttr.Name)
+      '  If Not (lWAttr Is Nothing) Then
+      '    With lWAttr
+      '      Select Case .DataType
+      '        Case "Integer"
+      '          If IsNumeric(lAttr.Value) Then
+      '            F90_WDBSAI(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, CInt(lAttr.Value), retc)
+      '          End If
+      '        Case "Single"
+      '          If IsNumeric(lAttr.Value) Then
+      '            F90_WDBSAR(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, CSng(lAttr.Value), retc)
+      '          End If
+      '        Case Else 'character
+      '          F90_WDBSAC(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, retc, lAttr.Value, Len(lAttr.Value))
+      '      End Select
+      '    End With
+      '    If retc <> 0 Then
+      '      If Math.Abs(retc) = 104 Then 'cant update if data already present
+      '        'Debug.Print "Skip:" & lAttr.Name & ", data present"
+      '      Else
+      '        If Len(pErrorDescription) = 0 Then
+      '          pErrorDescription = "Unable to Write Data Attributes for Class WDM"
+      '        End If
+      '        pErrorDescription = pErrorDescription & vbCrLf & "  Attribute:" & lAttr.Name & ", Value:" & lAttr.Value & ", Retcod:" & retc
+      '        DsnWriteAttributes = False
+      '      End If
+      '    End If
+      '  End If
+    Next
+    If Len(pErrorDescription) > 0 Then
+      System.Diagnostics.Debug.WriteLine(pErrorDescription)
+    End If
   End Function
 
   '  Public Function ReadBasInf() As Boolean
