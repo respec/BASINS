@@ -59,6 +59,7 @@ Public Class atcDebugTimserForm
   Friend WithEvents mnuDefault As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuMain As System.Windows.Forms.MainMenu
+  Friend WithEvents mnuCopyClipboard As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDebugTimserForm))
     Me.mnuFile = New System.Windows.Forms.MenuItem
@@ -70,11 +71,12 @@ Public Class atcDebugTimserForm
     Me.mnuDefault = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.mnuMain = New System.Windows.Forms.MainMenu
+    Me.mnuCopyClipboard = New System.Windows.Forms.MenuItem
     '
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuFileSave})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuCopyClipboard, Me.mnuFileSave})
     Me.mnuFile.Text = "&File"
     '
     'mnuFileAdd
@@ -84,7 +86,7 @@ Public Class atcDebugTimserForm
     '
     'mnuFileSave
     '
-    Me.mnuFileSave.Index = 1
+    Me.mnuFileSave.Index = 2
     Me.mnuFileSave.Text = "&Save"
     '
     'mnuView
@@ -116,6 +118,11 @@ Public Class atcDebugTimserForm
     'mnuMain
     '
     Me.mnuMain.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
+    '
+    'mnuCopyClipboard
+    '
+    Me.mnuCopyClipboard.Index = 1
+    Me.mnuCopyClipboard.Text = "Copy to Clipboard"
     '
     'atcDebugTimserForm
     '
@@ -150,6 +157,7 @@ Public Class atcDebugTimserForm
     atrMain = New TreeView
     With atrMain
       .Visible = False
+      '.Font = System.Drawing.Font.  try for courier or other not proportional font here
       .Location = New System.Drawing.Point(0, 0)
       .Name = "atrMain"
       .Size = Me.ClientSize
@@ -240,33 +248,47 @@ Public Class atcDebugTimserForm
     End If
 
     If Len(lFileName) > 0 Then
-      Dim s As String
-      For i As Integer = 0 To atrMain.GetNodeCount(False) - 1
-        With atrMain.Nodes(i)
-          s &= .Text
-          If Not .IsExpanded And .GetNodeCount(False) > 0 Then
-            s &= " ..." & vbCrLf
-          Else
-            s &= vbCrLf
-            For j As Integer = 0 To .GetNodeCount(False) - 1
-              With .Nodes(j)
-                s &= vbTab & .Text
-                If Not .IsExpanded And .GetNodeCount(False) > 0 Then
-                  s &= " ..." & vbCrLf
-                Else
-                  s &= vbCrLf
-                  For k As Integer = 0 To .GetNodeCount(False) - 1
-                    s &= vbTab & vbTab & .Nodes(k).Text.Replace(" : ", vbTab) & vbCrLf
-                  Next
-                End If
-              End With
-            Next
-          End If
-        End With
-      Next
-      SaveFileString(lFileName, s)
+      SaveFileString(lFileName, TreeAsString)
     End If
   End Sub
+
+  Private Function TreeAsString() As String
+    Dim s As String
+    Dim t As String
+    Dim ta(3) As String
+    For i As Integer = 0 To atrMain.GetNodeCount(False) - 1
+      With atrMain.Nodes(i)
+        s &= .Text
+        If Not .IsExpanded And .GetNodeCount(False) > 0 Then
+          s &= " ..." & vbCrLf
+        Else
+          s &= vbCrLf
+          For j As Integer = 0 To .GetNodeCount(False) - 1
+            With .Nodes(j)
+              s &= vbTab & .Text
+              If Not .IsExpanded And .GetNodeCount(False) > 0 Then
+                s &= " ..." & vbCrLf
+              Else
+                s &= vbCrLf
+                For k As Integer = 0 To .GetNodeCount(False) - 1
+                  t = .Nodes(k).Text.Replace(" : ", vbTab)
+                  If t.IndexOf(vbTab) > 0 Then
+                    ta = t.Split(vbTab)
+                    s &= vbTab & vbTab & ta(0).PadRight(24) & vbTab & ta(1).PadRight(16)
+                    If UBound(ta) > 1 Then s &= vbTab & ta(2)
+                    s &= vbCrLf
+                  Else
+                    s &= vbTab & vbTab & .Nodes(k).Text & vbCrLf
+                  End If
+                Next
+              End If
+            End With
+          Next
+        End If
+      End With
+    Next
+    Return s
+  End Function
 
   Public Sub TreeAction(ByVal ParamArray aAction() As String)
     For Each lAction As String In aAction
@@ -341,5 +363,9 @@ Public Class atcDebugTimserForm
 
   Private Sub mnuDefault_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuDefault.Click
     TreeAction("Default")
+  End Sub
+
+  Private Sub mnuCopyClipboard_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyClipboard.Click
+    Clipboard.SetDataObject(TreeAsString)
   End Sub
 End Class
