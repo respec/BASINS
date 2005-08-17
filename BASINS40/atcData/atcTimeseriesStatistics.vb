@@ -67,21 +67,26 @@ Public Class atcTimeseriesStatistics
         AddOperation("Mean", "Sum of all values divided by number of values", _
                      defTimeSeriesOne, defCategory)
 
-        AddOperation("GeoMean", "10 ^ Mean of log(each value)", _
+        AddOperation("Geometric Mean", "10 ^ Mean of log(each value)", _
                      defTimeSeriesOne, defCategory)
 
         AddOperation("Variance", "Statistical variance", _
                      defTimeSeriesOne, defCategory)
 
-        AddOperation("StdDev", "Standard deviation", _
+        AddOperation("Standard Deviation", "Standard deviation", _
                      defTimeSeriesOne, defCategory)
 
         AddOperation("Skew", "Skewness", _
                      defTimeSeriesOne, defCategory)
 
-        AddOperation("StErSkew", "Standard Error of Skewness", _
+        AddOperation("Standard Error of Skew", "Standard Error of Skewness", _
                      defTimeSeriesOne, defCategory)
 
+        AddOperation("Serial Correlation Coefficient", "Serial Correlation Coefficient", _
+                     defTimeSeriesOne, defCategory)
+
+        AddOperation("Coefficient of Variation", "Coefficient of Variation", _
+                     defTimeSeriesOne, defCategory)
       End If
       Return pAvailableOperations
     End Get
@@ -115,19 +120,21 @@ Public Class atcTimeseriesStatistics
       Dim lVal As Double
       Dim lDev As Double
 
-      Dim lMax As Double = -1.0E+30
-      Dim lMin As Double = 1.0E+30
+      Dim lMax As Double = Double.MinValue
+      Dim lMin As Double = Double.MaxValue
 
       Dim lGeoMean As Double = 0
-      Dim lStdDev As Double = 0
+      Dim lStdDev As Double = Double.NaN
       Dim lCount As Double = 0
-      Dim lMean As Double = 0
+      Dim lMean As Double = Double.NaN
       Dim lSum As Double = 0
       Dim lSumDevSquares As Double = 0
       Dim lSumDevCubes As Double = 0
-      Dim lVariance As Double = 0
-      Dim lSkew As Double = 0
-      Dim lStErSkew As Double = 0
+      Dim lVariance As Double = Double.NaN
+      Dim lSkew As Double = Double.NaN
+      Dim lStErSkew As Double = Double.NaN
+      Dim lScc As Double = Double.NaN
+      Dim lCvr As Double = Double.NaN
 
       For lIndex = 1 To lLastValueIndex
         lVal = aTimeseries.Value(lIndex)
@@ -153,7 +160,7 @@ Public Class atcTimeseriesStatistics
 
       If lMin > 0 Then
         lGeoMean = Math.Exp(lGeoMean / lCount)
-        aTimeseries.Attributes.SetValue("GeoMean", lGeoMean)
+        aTimeseries.Attributes.SetValue("Geometric Mean", lGeoMean)
       End If
 
       If lCount > 1 Then
@@ -170,11 +177,54 @@ Public Class atcTimeseriesStatistics
 
         If lVariance > 0 Then
           lStdDev = Math.Sqrt(lVariance)
-          aTimeseries.Attributes.SetValue("StdDev", lStdDev)
+          aTimeseries.Attributes.SetValue("Standard Deviation", lStdDev)
           lSkew = (lCount * lSumDevCubes) / ((lCount - 1.0) * (lCount - 2.0) * lStdDev * lStdDev * lStdDev)
           aTimeseries.Attributes.SetValue("Skew", lSkew)
           lStErSkew = Math.Sqrt((6.0 * lCount * (lCount - 1)) / ((lCount - 2) * (lCount + 1) * (lCount + 3)))
-          aTimeseries.Attributes.SetValue("StErSkew", lStErSkew)
+          aTimeseries.Attributes.SetValue("Standard Error of Skew", lStErSkew)
+          lCvr = lStdDev / lMean
+          aTimeseries.Attributes.SetValue("Coefficient of Variation", lCvr)
+
+          Dim lSum1 As Double = 0
+          Dim lSum2 As Double = 0
+          Dim lSum3 As Double = 0
+          Dim lSum4 As Double = 0
+          Dim lValPl1 As Double
+          Dim lFirst As Integer = 1
+          Dim lX(lLastValueIndex) As Double
+
+          While Double.IsNaN(aTimeseries.Value(lFirst))
+            lFirst = +1
+          End While
+          lVal = aTimeseries.Value(lFirst)
+          For lIndex = lFirst + 1 To lLastValueIndex
+            lValPl1 = aTimeseries.Value(lIndex)
+            If Not Double.IsNaN(lValPl1) Then
+              lX(lIndex) = lVal * lValPl1
+              lSum3 += lX(lIndex)
+              lVal = lValPl1
+            End If
+          Next
+          lScc = (lSum - aTimeseries.Value(lLastValueIndex)) * (lSum - aTimeseries.Value(1))
+          lScc = ((lCount - 1) * lSum3) - lScc
+          lSum3 = 0
+          For lIndex = 1 To lLastValueIndex
+            lVal = aTimeseries.Value(lIndex)
+            If Not Double.IsNaN(lVal) Then
+              lX(lIndex) = lVal * lVal
+              lSum3 += lX(lIndex)
+            End If
+          Next
+          lSum4 = (lSum3 - (aTimeseries.Value(1) * aTimeseries.Value(1))) * (lCount - 1)
+          lSum3 = (lSum3 - (aTimeseries.Value(lLastValueIndex) * aTimeseries.Value(lLastValueIndex))) * (lCount - 1)
+          lSum2 = lSum - aTimeseries.Value(1)
+          lSum1 = lSum - aTimeseries.Value(lLastValueIndex)
+          lSum1 = lSum1 * lSum1
+          lSum2 = lSum2 * lSum2
+          lSum3 = (lSum3 - lSum1) * (lSum4 - lSum2)
+          lSum3 = Math.Sqrt(lSum3)
+          lScc = lScc / lSum3
+          aTimeseries.Attributes.SetValue("Serial Correlation Coefficient", lScc)
         End If
       End If
     End If

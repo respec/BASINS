@@ -71,7 +71,9 @@ Public Class atcDataAttributes
       Try
         If TypeOf (lValue) Is Double Then
           If InStr(LCase(aAttributeName), "jday", CompareMethod.Text) Then
-            Return DumpDate(lValue)
+            Dim lDate(3) As String
+            lDate = DumpDate(lValue).Split(" ")
+            Return lDate(2) & " " & lDate(3) & " : " & lDate(0)
           Else
             Return Format(lValue, "#,##0.#####")
           End If
