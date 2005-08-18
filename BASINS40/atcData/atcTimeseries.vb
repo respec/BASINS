@@ -140,6 +140,7 @@ Public Class atcTimeseries
 
   'Create a new Timeseries and reference the file it came from
   Public Sub New(ByVal aDataSource As atcDataSource)
+    MyBase.New()
     Clear()
     pDataSource = aDataSource
     Try

@@ -249,4 +249,7 @@ Public Class atcTimeseriesStatistics
     Next
   End Sub
 
+  Public Overrides Function NewOne() As atcDataPlugin
+    Return New atcTimeseriesStatistics
+  End Function
 End Class

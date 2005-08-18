@@ -94,20 +94,12 @@ Public Class atcDataManager
     End If
   End Function
 
-  Public Function UserOpenDataSource(Optional ByVal aCategories As ArrayList = Nothing, Optional ByVal aGroup As atcDataGroup = Nothing) As atcDataSource
-    Dim frmDS As New frmDataSource
+  Public Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing) As atcDataSource
     Dim lSpecification As String = ""
+    Dim frmDS As New frmDataSource
     Dim lSelectedDataSource As atcDataSource
-    frmDS.AskUser(Me, lSelectedDataSource, lSpecification, True, False, aCategories)
-    If Not lSelectedDataSource Is Nothing Then
-      If OpenDataSource(lSelectedDataSource, lSpecification, Nothing) Then
-        If Not aGroup Is Nothing Then
-          For Each lDataSet As atcDataSet In lSelectedDataSource.DataSets
-            aGroup.Add(lDataSet)
-          Next
-        End If
-      End If
-    End If
+    frmDS.AskUser(Me, lSelectedDataSource, True, False, aCategories)
+    Return lSelectedDataSource
   End Function
 
   Public Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup

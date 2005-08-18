@@ -651,6 +651,13 @@ NextName:
   End Sub
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
+    'If user didn't select anything, 
+    ' but either narrowed the matching group or there are not more than 10 datasets,
+    ' assume they meant to select the matching ones
+    If pSelectedGroup.Count = 0 AndAlso _
+      (pMatchingGroup.Count < pDataManager.DataSets.Count OrElse pMatchingGroup.Count < 11) Then
+      pSelectedGroup.ChangeTo(pMatchingGroup)
+    End If
     pSelectedOK = True
     Me.Close()
   End Sub
@@ -775,7 +782,9 @@ NextName:
   End Sub
 
   Private Sub mnuAddData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddData.Click
-    pDataManager.UserOpenDataSource(Nothing, pSelectedGroup)
+    Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
+    pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+    pSelectedGroup.AddRange(lNewSource.DataSets)
   End Sub
 
   Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click

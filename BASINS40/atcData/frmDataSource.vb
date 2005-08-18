@@ -107,18 +107,17 @@ Public Class frmDataSource
 
   Public Sub AskUser(ByVal aDataManager As atcDataManager, _
                      ByRef aSelectedSource As atcDataSource, _
-                     ByRef aSpecification As String, _
                      ByRef aNeedToOpen As Boolean, _
                      ByRef aNeedToSave As Boolean, _
             Optional ByVal aCategories As ArrayList = Nothing)
     pDataManager = aDataManager
     pSelectedSource = aSelectedSource
-    pSpecification = aSpecification
+    if not aSelectedSource Is Nothing Then pSpecification = aSelectedSource.Specification
     pCategories = aCategories
     Populate(aNeedToOpen, aNeedToSave)
     Me.ShowDialog() 'Block until form closes
     aSelectedSource = pSelectedSource
-    aSpecification = pSpecification
+    aSelectedSource.Specification = pSpecification
   End Sub
 
   Private Sub Populate(ByRef aNeedToOpen As Boolean, _
@@ -196,7 +195,7 @@ Public Class frmDataSource
         If lOperations.Count > 0 Then
           For Each lOperation As atcDefinedValue In lOperations
             If lOperation.Definition.Name = lOperationName Then
-              pSelectedSource = ds
+              pSelectedSource = ds.NewOne
               pSpecification = lOperationName
               Me.Close()
             End If

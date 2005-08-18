@@ -309,9 +309,8 @@ Public Class PlugIn
             DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
           End If
         Case "AddData"
-          'Dim pCategories As New ArrayList
-          'Dim pGroup As New atcDataGroup
-          pDataManager.UserOpenDataSource() 'pCategories, pGroup)
+          Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
+          pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
         Case "ManageDataSources"
           pDataManager.UserManage()
         Case Else : MsgBox("Data Tool " & ItemName)

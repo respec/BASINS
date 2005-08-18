@@ -178,6 +178,7 @@ Public Class atcTimeseriesMath
     Dim nArgs As Integer = 0
     Dim lastValueIndex As Integer = -1
     Dim iValue As Integer
+    Dim lTSgroup As atcDataGroup
 
     ReDim newVals(-1) ' If this gets populated, it will be turned into an atcTimeseries at the end
 
@@ -187,13 +188,26 @@ Public Class atcTimeseriesMath
     End If
     Specification = aOperationName
 
-    If aArgs Is Nothing Then
-      needToAsk = True
-      Dim lOperation As atcDefinedValue = AvailableOperations.GetDefinedValue(aOperationName)
-      If Not lOperation Is Nothing Then
+    Dim lOperation As atcDefinedValue = AvailableOperations.GetDefinedValue(aOperationName)
+    If Not lOperation Is Nothing Then
+      If aArgs Is Nothing Then
+        needToAsk = True
         aArgs = lOperation.Arguments.Clone
+      Else
+        For Each lArg As atcDefinedValue In aArgs
+          lOperation.Arguments.SetValue(larg.Definition.Name, larg.Value)
+        Next
+        aArgs = lOperation.Arguments
       End If
     End If
+
+    For Each lArg As atcDefinedValue In aArgs
+      If larg.Value Is Nothing Then
+        needToAsk = True
+      ElseIf larg.Definition.Name = "Timeseries" AndAlso larg.Value.Count < 1 Then
+        needToAsk = True
+      End If
+    Next
 
     If needToAsk Then
       'Ask user what to do
@@ -210,7 +224,7 @@ Public Class atcTimeseriesMath
       Specification &= " " & lNumber
     End If
 
-    Dim lTSgroup As atcDataGroup = aArgs.GetValue("Timeseries", Nothing)
+    lTSgroup = aArgs.GetValue("Timeseries", Nothing)
     If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
       Err.Raise(vbObjectError + 512, Me, aOperationName & " did not get a Timeseries argument")
     End If
@@ -460,6 +474,10 @@ Public Class atcTimeseriesMath
     t.Attributes.SetValue("Data Source", Specification)
     t.Attributes.SetValue("History " & iHistory, Specification)
     MyBase.AddDataSet(t)
+  End Function
+
+  Public Overrides Function NewOne() As atcDataPlugin
+    Return New atcTimeseriesMath
   End Function
 
 End Class
