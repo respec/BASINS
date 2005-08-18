@@ -436,12 +436,15 @@ Public Class atcTimeseriesMath
         lNewTS.Attributes.SetValue("Parent Constant", lNumber)
       End If
 
+      CopyBaseAttributes(firstTS, lNewTS)
+
       Dim lDateNow As Date = Now
       lNewTS.Attributes.SetValue("Date Created", lDateNow)
       lNewTS.Attributes.SetValue("Date Modified", lDateNow)
 
       AddDataSet(lNewTS)
     End If
+
     If Me.DataSets.Count > 0 Then Return True
   End Function
 

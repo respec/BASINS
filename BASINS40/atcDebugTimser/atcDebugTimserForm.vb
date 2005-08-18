@@ -60,18 +60,20 @@ Public Class atcDebugTimserForm
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuMain As System.Windows.Forms.MainMenu
   Friend WithEvents mnuCopyClipboard As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuDataCount As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDebugTimserForm))
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
+    Me.mnuCopyClipboard = New System.Windows.Forms.MenuItem
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuExpand = New System.Windows.Forms.MenuItem
     Me.mnuCollapse = New System.Windows.Forms.MenuItem
     Me.mnuDefault = New System.Windows.Forms.MenuItem
+    Me.mnuDataCount = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.mnuMain = New System.Windows.Forms.MainMenu
-    Me.mnuCopyClipboard = New System.Windows.Forms.MenuItem
     '
     'mnuFile
     '
@@ -84,6 +86,11 @@ Public Class atcDebugTimserForm
     Me.mnuFileAdd.Index = 0
     Me.mnuFileAdd.Text = "&Add Data"
     '
+    'mnuCopyClipboard
+    '
+    Me.mnuCopyClipboard.Index = 1
+    Me.mnuCopyClipboard.Text = "Copy to Clipboard"
+    '
     'mnuFileSave
     '
     Me.mnuFileSave.Index = 2
@@ -92,7 +99,7 @@ Public Class atcDebugTimserForm
     'mnuView
     '
     Me.mnuView.Index = 1
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuExpand, Me.mnuCollapse, Me.mnuDefault})
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuExpand, Me.mnuCollapse, Me.mnuDefault, Me.mnuDataCount})
     Me.mnuView.Text = "&View"
     '
     'mnuExpand
@@ -110,6 +117,11 @@ Public Class atcDebugTimserForm
     Me.mnuDefault.Index = 2
     Me.mnuDefault.Text = "&Default"
     '
+    'mnuDataCount
+    '
+    Me.mnuDataCount.Index = 3
+    Me.mnuDataCount.Text = "Data to Show " & pNumValuesShow
+    '
     'mnuAnalysis
     '
     Me.mnuAnalysis.Index = 2
@@ -118,11 +130,6 @@ Public Class atcDebugTimserForm
     'mnuMain
     '
     Me.mnuMain.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
-    '
-    'mnuCopyClipboard
-    '
-    Me.mnuCopyClipboard.Index = 1
-    Me.mnuCopyClipboard.Text = "Copy to Clipboard"
     '
     'atcDebugTimserForm
     '
@@ -367,5 +374,11 @@ Public Class atcDebugTimserForm
 
   Private Sub mnuCopyClipboard_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyClipboard.Click
     Clipboard.SetDataObject(TreeAsString)
+  End Sub
+
+  Private Sub mnuDataCount_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuDataCount.Click
+    pNumValuesShow *= 3
+    PopulateTree()
+    mnuDataCount.Text = "Data to Show " & pNumValuesShow
   End Sub
 End Class

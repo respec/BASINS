@@ -179,6 +179,16 @@ Public Class atcTimeseriesNdayHighLow
       newTS.Attributes.SetValue("Date Created", lDateNow)
       newTS.Attributes.SetValue("Date Modified", lDateNow)
 
+      CopyBaseAttributes(aTS, newTS)
+
+      Dim lDescription As String = aNumValues & " day annual "  'TODO: fill in day and annual
+      If aHigh Then
+        lDescription &= "high values "
+      Else
+        lDescription &= "low values "
+      End If
+      newTS.Attributes.SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
+
       Return newTS
 
     Catch ex As Exception
@@ -214,6 +224,7 @@ Public Class atcTimeseriesNdayHighLow
         Compute7q10(lTs)
       Next
     End If
+    Return True 'todo: error checks
   End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
