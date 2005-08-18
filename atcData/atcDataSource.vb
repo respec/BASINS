@@ -108,11 +108,4 @@ Public Class atcDataSource
     pData = New atcDataGroup
   End Sub
 
-  'Filter for files that this class can read, formatted for common dialog.
-  'Returns empty string if this atcDataSource does not use files.
-  'Public Overridable ReadOnly Property FileFilter() As String
-  '  Get
-  '    Return "" '"All Files (*.*)|*.*"
-  '  End Get
-  'End Property
 End Class

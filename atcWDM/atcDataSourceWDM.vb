@@ -1161,4 +1161,8 @@ Public Class atcDataSourceWDM
     MyBase.Finalize()
   End Sub
 
+  Public Overrides Function NewOne() As atcDataPlugin
+    Return New atcDataSourceWDM
+  End Function
+
 End Class

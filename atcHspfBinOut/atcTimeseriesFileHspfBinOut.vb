@@ -342,4 +342,8 @@ Public Class atcTimeseriesFileHspfBinOut
     End If
   End Function
 
+  Public Overrides Function NewOne() As atcDataPlugin
+    Return New atcTimeseriesFileHspfBinOut
+  End Function
+
 End Class

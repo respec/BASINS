@@ -183,11 +183,26 @@ Public Class frmSpecifyComputation
             .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left
 
             .Tag = iArg
-            If aDefVal.Value Is Nothing Then
-              .Text = ""
-            Else
-              .Text = ""
+            .Text = ""
+            If Not aDefVal.Value Is Nothing Then
+              Select Case aDefVal.Definition.TypeString
+                Case "atcDataGroup", "atcTimeseries"
+                  Try
+                    Dim lSelected As atcDataGroup = aDefVal.Value
+                    If lSelected.Count = 1 Then
+                      .Text = lSelected.Item(0).ToString
+                    ElseIf lSelected.Count > 1 Then
+                      .Text = lSelected.Count & " data sets"
+                    End If
+                  Catch
+                    .Text = CType(aDefVal.Value, atcTimeseries).ToString
+                  End Try
+                  .Enabled = False
+                Case Else
+                  .Text = aDefVal.Value.ToString
+              End Select
             End If
+
             AddHandler pArgText(iArg).TextChanged, AddressOf ArgText_TextChanged
           End With
           Controls.Add(pArgText(iArg))

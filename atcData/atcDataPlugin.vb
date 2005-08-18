@@ -7,6 +7,13 @@
 Public Class atcDataPlugin
   Implements MapWindow.Interfaces.IPlugin
 
+  Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
+  Private pSerial As Integer 'Serial number of this object
+
+  Public Sub New()
+    pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
+  End Sub
+
   'The name that appears in the Plug-ins menu to identify this plug-in.
   'Must be overridden in inheriting class to return something unique or plugin will not load.
   Public Overridable ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
@@ -159,8 +166,13 @@ Public Class atcDataPlugin
   'Leftover part of IPlugin interface no longer in use
   Public Overridable ReadOnly Property SerialNumber() As String Implements MapWindow.Interfaces.IPlugin.SerialNumber
     Get
-      Return ""
+      Return pSerial.ToString
     End Get
   End Property
+
+  Public Overridable Function NewOne() As atcDataPlugin
+    MsgBox("Need to override or shadow NewOne." & vbCrLf & "Base version in atcDataPlugin is not useful.", MsgBoxStyle.Critical, "atcDataPlugin")
+    Return New atcDataPlugin
+  End Function
 
 End Class
