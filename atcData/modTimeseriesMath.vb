@@ -29,11 +29,7 @@ Public Module modTimeseriesMath
     lnewTS.Values = newValues
     lnewTS.Dates.Values = newDates
 
-    For Each lAttribute As atcDefinedValue In aTimeseries.Attributes
-      If Not (lAttribute.Definition.Calculated) Then
-        lnewTS.Attributes.Add(lAttribute)
-      End If
-    Next
+    CopyBaseAttributes(aTimeseries, lnewTS)
 
     lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
 
@@ -41,4 +37,11 @@ Public Module modTimeseriesMath
 
   End Function
 
+  Public Sub CopyBaseAttributes(ByVal aFromDataset As atcDataSet, ByVal aToDataSet As atcDataSet)
+    For Each lAttribute As atcDefinedValue In aFromDataset.Attributes
+      If Not (lAttribute.Definition.Calculated) Then
+        aToDataSet.Attributes.Add(lAttribute)
+      End If
+    Next
+  End Sub
 End Module
