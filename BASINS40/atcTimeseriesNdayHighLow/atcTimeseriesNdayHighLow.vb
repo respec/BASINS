@@ -181,6 +181,9 @@ Public Class atcTimeseriesNdayHighLow
 
       CopyBaseAttributes(aTS, newTS)
 
+      newTS.Attributes.SetValue("Tu", 6)
+      newTS.Attributes.SetValue("Ts", 1)
+
       Dim lDescription As String = aNumValues & " day annual "  'TODO: fill in day and annual
       If aHigh Then
         lDescription &= "high values "

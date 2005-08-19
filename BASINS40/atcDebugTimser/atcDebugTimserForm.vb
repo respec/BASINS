@@ -380,5 +380,6 @@ Public Class atcDebugTimserForm
     pNumValuesShow *= 3
     PopulateTree()
     mnuDataCount.Text = "Data to Show " & pNumValuesShow
+    TreeAction("Expand")
   End Sub
 End Class
