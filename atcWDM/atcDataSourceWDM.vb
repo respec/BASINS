@@ -268,11 +268,14 @@ Public Class atcDataSourceWDM
   Public Overrides Function AddDataset(ByRef aDataSet As atcData.atcDataSet, Optional ByRef aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
 
     Dim lTimser As atcTimeseries
+
     If aDataSet.GetType.FullName <> "atcData.atcTimeseries" Then  'not a timeseries
       Return False
     Else
       lTimser = aDataSet
     End If
+
+    LogDbg("atcDataSourceWdm:AddDataset:entry")
 
     aDataSet.Attributes.CalculateAll()
 
@@ -285,7 +288,9 @@ Public Class atcDataSourceWDM
       lDsn = findNextDsn(lDsn)
       aDataSet.Attributes.SetValue("Id", lDsn)
     End If
+
     Dim lWdmHandle As New atcWdmHandle(0, Specification)
+    LogDbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
 
     If DsnBld(lWdmHandle.Unit, lTimser) Then
       Dim lSDat(5) As Integer
@@ -295,19 +300,21 @@ Public Class atcDataSourceWDM
       Dim lNvals As Integer = lTimser.numValues
       Dim lValue As Double
       Dim lV(lNvals) As Single
-      Dim lRetc As Integer
+      Dim lRet As Integer
       For i As Integer = 1 To lNvals
         lValue = lTimser.Value(i)
         If Double.IsNaN(lValue) Then lValue = lTSFill
         lV(i) = lValue
       Next
 
-      J2DateRoundUp(lTimser.Dates.Value(0), lTu, lSDat)
-      Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRetc)
+      J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
+      Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
+
+      LogDbg("atcDataSourceWdm:AddDataset:WDTPUT:retcod:" & lRet)
+      lWdmHandle.Dispose()
 
     End If
 
-    lWdmHandle.Dispose()
   End Function
 
   '    dsn = t.Header.id
@@ -619,7 +626,8 @@ Public Class atcDataSourceWDM
 
       'others (from attrib)
       DsnBld = DsnWriteAttributes(t)
-      lMsgHandle.Dispose()
+
+      'lMsgHandle.Dispose()  'TODO:make this work, it should?
     End If
   End Function
 

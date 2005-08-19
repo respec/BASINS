@@ -29,6 +29,7 @@ Friend Class atcWdmHandle
     If Not FileExists(lFileName) Then
       LogMsg("Could not find " & aFileName, "atcWdmHandle")
     Else
+      LogDbg("atcWdmHandle:New:Open:" & lFileName)
       If aRWCFlg = 0 Then
         lAttr = GetAttr(lFileName) 'if read only, change to not read only
         If (lAttr And FileAttribute.ReadOnly) <> 0 Then
@@ -41,17 +42,22 @@ Friend Class atcWdmHandle
       'lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))
       If pUnit = 0 Then
         pWasOpen = False
-        F90_WDBOPNR(aRWCFlg, aFileName, pUnit, lRetcod, CShort(Len(lFileName)))
+        F90_WDBOPNR(aRWCFlg, lFileName, pUnit, lRetcod, CShort(Len(lFileName)))
+        If lRetcod <> 0 Then
+          MsgBox("Problem " & lRetcod & " opening " & lFileName & " on " & pUnit)
+        End If
         'pUnit = F90_WDBOPN(aRWCFlg, aFileName, Len(aFileName))
+        LogDbg("atcWdmHandle:New:Reopen:" & lFileName & ":" & pUnit)
       Else
         pWasOpen = True
+        LogDbg("atcWdmHandle:New:WasOpen:" & lFileName & ":" & pUnit)
       End If
 
       If lRetcod <> 0 Then
         If lRetcod = 159 Then
-          LogMsg("WDM file " & aFileName & " is in use by another application, retcod 159", "atcWdmHandle")
+          LogMsg("WDM file " & lFileName & " is in use by another application, retcod 159", "atcWdmHandle")
         Else
-          LogMsg("WDM file " & aFileName & " open failed, retcod " & lRetcod, "atcWdmHandle")
+          LogMsg("WDM file " & lFileName & " open failed, retcod " & lRetcod, "atcWdmHandle")
         End If
         pUnit = 0
       End If
@@ -61,9 +67,18 @@ Friend Class atcWdmHandle
   Public Sub Dispose() Implements System.IDisposable.Dispose
     Dim lRetcod As Integer
 
-    If pUnit > 0 And Not pWasOpen Then
+    LogDbg("atcWdmHandle:Dispose:" & pUnit & ":" & pWasOpen)
+
+    'If pUnit > 0 And Not pWasOpen Then
+    If pUnit > 0 Then
       lRetcod = F90_WDFLCL(pUnit)
-      If lRetcod = 0 Then pUnit = 0
+      If lRetcod = 0 Then
+        pUnit = 0
+      ElseIf lRetcod = -255 Then
+        LogDbg("atcWdmHandle:WDFLCL:retcod:" & lRetcod)
+      Else
+        LogMsg(":retcod:" & lRetcod, "atcWdmHandle:WDFLCL")
+      End If
     End If
     GC.SuppressFinalize(Me)
   End Sub

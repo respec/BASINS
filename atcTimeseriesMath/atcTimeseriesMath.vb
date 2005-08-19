@@ -119,6 +119,8 @@ Public Class atcTimeseriesMath
 
         AddOperation("e ^ x", "e raised to the power of each value", defTimeSeriesOne)
 
+        AddOperation("10 ^ x", "10 raised to the power of each value", defTimeSeriesOne)
+
         AddOperation("Log e", "The log base e of each value", defTimeSeriesOne)
 
         AddOperation("Log 10", "The log base 10 of each value", defTimeSeriesOne)
@@ -350,6 +352,10 @@ Public Class atcTimeseriesMath
       Case "e**", "e ^ x"
         For iValue = 0 To lastValueIndex
           newVals(iValue) = Math.Exp(newVals(iValue))
+        Next
+      Case "10**", "10 ^ x"
+        For iValue = 0 To lastValueIndex
+          newVals(iValue) = 10 ^ (newVals(iValue))
         Next
       Case "log 10"
         For iValue = 0 To lastValueIndex
