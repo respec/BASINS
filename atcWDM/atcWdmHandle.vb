@@ -8,7 +8,6 @@ Friend Class atcWdmHandle
   Implements IDisposable
 
   Dim pUnit As Integer 'fortran unit number of wdm file
-  Dim pWasOpen As Boolean
 
   Public ReadOnly Property Unit() As Integer
     Get
@@ -24,6 +23,8 @@ Friend Class atcWdmHandle
     Dim lAttr As FileAttribute
     Dim lRetcod As Integer
 
+    pUnit = 0
+
     lFileName = AbsolutePath(aFileName, CurDir())
 
     If Not FileExists(lFileName) Then
@@ -38,20 +39,9 @@ Friend Class atcWdmHandle
         End If
       End If
 
-      pUnit = F90_INQNAM(lFileName, CShort(Len(lFileName)))
-      'lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))
-      If pUnit = 0 Then
-        pWasOpen = False
-        F90_WDBOPNR(aRWCFlg, lFileName, pUnit, lRetcod, CShort(Len(lFileName)))
-        If lRetcod <> 0 Then
-          MsgBox("Problem " & lRetcod & " opening " & lFileName & " on " & pUnit)
-        End If
-        'pUnit = F90_WDBOPN(aRWCFlg, aFileName, Len(aFileName))
-        LogDbg("atcWdmHandle:New:Reopen:" & lFileName & ":" & pUnit)
-      Else
-        pWasOpen = True
-        LogDbg("atcWdmHandle:New:WasOpen:" & lFileName & ":" & pUnit)
-      End If
+      F90_WDBOPNR(aRWCFlg, lFileName, pUnit, lRetcod, CShort(Len(lFileName)))
+
+      LogDbg("atcWdmHandle:New:Open:" & lFileName & ":" & pUnit)
 
       If lRetcod <> 0 Then
         If lRetcod = 159 Then
@@ -67,9 +57,8 @@ Friend Class atcWdmHandle
   Public Sub Dispose() Implements System.IDisposable.Dispose
     Dim lRetcod As Integer
 
-    LogDbg("atcWdmHandle:Dispose:" & pUnit & ":" & pWasOpen)
+    LogDbg("atcWdmHandle:Dispose:" & pUnit)
 
-    'If pUnit > 0 And Not pWasOpen Then
     If pUnit > 0 Then
       lRetcod = F90_WDFLCL(pUnit)
       If lRetcod = 0 Then
@@ -77,7 +66,7 @@ Friend Class atcWdmHandle
       ElseIf lRetcod = -255 Then
         LogDbg("atcWdmHandle:WDFLCL:retcod:" & lRetcod)
       Else
-        LogMsg(":retcod:" & lRetcod, "atcWdmHandle:WDFLCL")
+        LogMsg("retcod:" & lRetcod, "atcWdmHandle:WDFLCL")
       End If
     End If
     GC.SuppressFinalize(Me)

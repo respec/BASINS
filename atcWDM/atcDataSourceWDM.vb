@@ -627,7 +627,7 @@ Public Class atcDataSourceWDM
       'others (from attrib)
       DsnBld = DsnWriteAttributes(t)
 
-      'lMsgHandle.Dispose()  'TODO:make this work, it should?
+      lMsgHandle.Dispose()
     End If
   End Function
 

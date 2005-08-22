@@ -11,17 +11,21 @@ Public Module modLog
 
     'MsgBox(CurDir() & vbCrLf & msg)
 
-    'try to use f90_msg here???
-
     Dim lT As String
     Dim lW As StreamWriter = File.AppendText("c:\test\errorVb.fil") 'todo:don't hard code this!
     With Now
-      lT = Format(.Hour, "00") & ":" & Format(.Minute, "00") & ":" & Format(.Second, "00") & "." & .Millisecond & " : "
+      lT = Format(.Hour, "00") & ":" & _
+           Format(.Minute, "00") & ":" & _
+           Format(.Second, "00") & "." & _
+           Format(.Millisecond, "000") & " : "
     End With
     lW.WriteLine(lT & msg)
     lW.Close()
 
+    'F90_MSG(msg, Len(msg)) 'dont leave this in production version, remove modHass_Ent.vb
+
     'If Not (gIPC Is Nothing) Then gIPC.dbg(msg)
+
     'If LCase(Left(msg, 6)) = "status" Then frmMain.DefInstance.Status = Trim(Mid(msg, 8))
   End Sub
 
