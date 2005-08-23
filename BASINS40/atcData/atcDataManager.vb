@@ -32,7 +32,11 @@ Public Class atcDataManager
     pSelectionAttributes.Add("Location")
     pSelectionAttributes.Add("Constituent")
 
-    pDisplayAttributes = pSelectionAttributes.Clone()
+    pDisplayAttributes = New ArrayList
+    pDisplayAttributes.Add("History 1")
+    pDisplayAttributes.Add("Min")
+    pDisplayAttributes.Add("Max")
+    pDisplayAttributes.Add("Mean")
   End Sub
 
   'The set of atcDataSource objects representing currently open DataSources

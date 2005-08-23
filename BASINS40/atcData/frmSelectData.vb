@@ -372,7 +372,8 @@ Friend Class frmSelectData
       pcboCriteria(i).Items.Clear()
     Next
     For Each def As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-      If Not pcboCriteria(0).Items.Contains(def.Name) Then
+      If Not pcboCriteria(0).Items.Contains(def.Name) _
+       AndAlso def.TypeString <> "atcTimeseries" Then
         For i = 0 To pcboCriteria.GetUpperBound(0)
           pcboCriteria(i).Items.Add(def.Name)
         Next

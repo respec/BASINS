@@ -39,6 +39,14 @@ Public Class atcDataAttributes
     Return pAllDefinitions
   End Function
 
+  Public Sub AddHistory(ByVal aNewEvent As String, Optional ByVal aInsertAt As Integer = 1)
+    Dim prevHistory As String = GetValue("History " & aInsertAt, Nothing)
+    If Not prevHistory Is Nothing Then
+      AddHistory(prevHistory, aInsertAt + 1)
+    End If
+    SetValue("History " & aInsertAt, aNewEvent)
+  End Sub
+
   Public Property Owner() As Object
     Get
       Return pOwner

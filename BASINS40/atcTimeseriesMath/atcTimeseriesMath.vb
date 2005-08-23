@@ -150,7 +150,7 @@ Public Class atcTimeseriesMath
       .Description = aDescription
       .DefaultValue = ""
       .Editable = False
-      .TypeString = "Double"
+      .TypeString = "atcTimeseries"
       .Calculator = Me
       .Category = Category
     End With
@@ -471,14 +471,8 @@ Public Class atcTimeseriesMath
   'Should only be used within Open routine since results of computations are all that should get added
   'Appends a new history entry to track this computation
   Public Overrides Function AddDataSet(ByRef t As atcData.atcDataSet, Optional ByRef ExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
-    Dim prevHistory As String
-    Dim iHistory As Integer = 0
-    Do
-      iHistory += 1
-      prevHistory = t.Attributes.GetValue("History " & iHistory, Nothing)
-    Loop While Not prevHistory Is Nothing
     t.Attributes.SetValue("Data Source", Specification)
-    t.Attributes.SetValue("History " & iHistory, Specification)
+    t.Attributes.AddHistory(Specification)
     MyBase.AddDataSet(t)
   End Function
 
