@@ -604,8 +604,19 @@ Friend Class GridSource
                 'If aColumn Mod 2 = 1 Then 'odd columns contain relationships
                 'Return lModifiedData.Attributes.GetValue("History 1")
                 'Else 'Even columns contain values
-                Return lModifiedData.Attributes.GetFormattedValue(pDataManager.DisplayAttributes(lAttributeIndex))
-                'End If
+                Dim lAttributeName As String = pDataManager.DisplayAttributes(lAttributeIndex)
+                Dim lNewValue As Object = lModifiedData.Attributes.GetValue(lAttributeName)
+                If IsNumeric(lNewValue) Then
+                  Dim lOldValue As Object = pBaseScenario(lDataIndex).Attributes.GetValue(lAttributeName)
+                  If IsNumeric(lOldValue) Then
+                    Dim lPercentDifference As Double = (lNewValue - lOldValue) / lOldValue
+                    If Not Double.IsNaN(lPercentDifference) AndAlso Math.Abs(lPercentDifference) > 0.005 Then
+                      Return Format(lNewValue, "#,##0.#####") & " (" _
+                           & Format(lPercentDifference, "+#,##0.##%;-#,##0.##%") & ")"
+                    End If
+                  End If
+                End If
+                Return lNewValue
               End If
             Next
             'No modified dataset matching that ID yet
