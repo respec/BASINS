@@ -194,7 +194,7 @@ Public Class atcTimeseriesStatistics
           Dim lX(lLastValueIndex) As Double
 
           While Double.IsNaN(aTimeseries.Value(lFirst))
-            lFirst = +1
+            lFirst += 1
           End While
           lVal = aTimeseries.Value(lFirst)
           For lIndex = lFirst + 1 To lLastValueIndex
