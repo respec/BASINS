@@ -191,6 +191,7 @@ Public Class atcTimeseriesNdayHighLow
         lDescription &= "low values "
       End If
       newTS.Attributes.SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
+      newTS.Attributes.AddHistory(lDescription)
 
       Return newTS
 

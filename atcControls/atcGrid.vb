@@ -287,12 +287,25 @@ Public Class atcGrid
 
       'Draw Column Lines
       pColRight = New ArrayList
-      x = 0
       If pLeftColumn = 0 Then
         HScroller.Visible = False
       ElseIf Not AllowHorizontalScrolling Then
         pLeftColumn = 0
       End If
+      'If Not AllowHorizontalScrolling Then
+      '  x = 0
+      '  For iColumn = pLeftColumn To lColumns - 1
+      '    x += ColumnWidth(iColumn)
+      '  Next
+      '  If x > visibleWidth Then
+      '    For iColumn = pLeftColumn To lColumns - 1
+      '      If ColumnWidth(iColumn) > -1 Then
+      '      End If
+      '      ColumnWidth(iColumn) *= visibleWidth / x
+      '    Next
+      '  End If
+      'End If
+      x = 0
       For iColumn = pLeftColumn To lColumns - 1
         x += ColumnWidth(iColumn)
         If iColumn = lColumns - 1 AndAlso Not AllowHorizontalScrolling AndAlso x <> visibleWidth Then
@@ -377,7 +390,7 @@ Public Class atcGrid
     End If
   End Sub
 
-  Private Sub SizeColumnToContents(ByVal aColumn As Integer)
+  public Sub SizeColumnToContents(ByVal aColumn As Integer)
     Dim lCellValue As String
     Dim lCellWidth As Single
     Dim lastRow As Integer = pTopRow + pRowBottom.Count - 1
