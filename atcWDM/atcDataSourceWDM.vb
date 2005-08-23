@@ -280,8 +280,9 @@ Public Class atcDataSourceWDM
     aDataSet.Attributes.CalculateAll()
 
     Dim lDsn As Integer = 1
-    If aDataSet.Attributes.ItemByKey("Id") > 0 Then
-      lDsn = aDataSet.Attributes.GetDefinedValue("ID").Value()
+    Dim lDsnAttribute As atcDefinedValue = aDataSet.Attributes.ItemByKey("id")
+    If lDsnAttribute.Value > 0 Then
+      lDsn = lDsnAttribute.Value
     End If
 
     If Not aExistAction = ExistReplace Then
@@ -611,17 +612,17 @@ Public Class atcDataSourceWDM
       Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
       salen = 8
       saind = 288 'scenario
-      ostr = UCase(Left(t.Dates.Attributes.GetValue("scen"), salen))
+      ostr = UCase(Left(t.Attributes.GetValue("scen"), salen))
       Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
       saind = 289 'constituent
-      ostr = UCase(Left(t.Dates.Attributes.GetValue("cons"), salen))
+      ostr = UCase(Left(t.Attributes.GetValue("cons"), salen))
       Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
       saind = 290 'location
-      ostr = UCase(Left(t.Dates.Attributes.GetValue("locn"), salen))
+      ostr = UCase(Left(t.Attributes.GetValue("locn"), salen))
       Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
       salen = 48
       saind = 45 'description
-      ostr = Left(t.Dates.Attributes.GetValue("desc"), 48)
+      ostr = Left(t.Attributes.GetValue("desc"), 48)
       Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
 
       'others (from attrib)
