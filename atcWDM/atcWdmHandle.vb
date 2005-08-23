@@ -39,6 +39,7 @@ Friend Class atcWdmHandle
         End If
       End If
 
+      pUnit = -2 'code to try to use existing unit number from INQUIRE_NAME
       F90_WDBOPNR(aRWCFlg, lFileName, pUnit, lRetcod, CShort(Len(lFileName)))
 
       LogDbg("atcWdmHandle:New:Open:" & lFileName & ":" & pUnit)

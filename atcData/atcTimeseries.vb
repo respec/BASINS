@@ -12,7 +12,6 @@ Public Class atcTimeseries
   Private pNumValues As Integer
   Private pValues() As Double
   Private pValueAttributes() As atcDataAttributes
-  Private pMissingValue As Object
 
   Public Overrides Function ToString() As String
     Dim id As String = Attributes.GetValue("id")
@@ -42,19 +41,6 @@ Public Class atcTimeseries
       End If
     End Set
   End Property
-
-  'Public ReadOnly Property ValueMissing(ByVal aValue As Double) As Boolean
-  '  Get
-  '    If Double.IsNaN(aValue) Then 'not a number is always missing
-  '      Return True
-  '    ElseIf pMissingValue Is Nothing Then 'no fill value attribute, assume ok
-  '      Return False
-  '    ElseIf (aValue - pMissingValue) < Double.Epsilon Then
-  '      Return True
-  '    End If
-  '    Return False
-  '  End Get
-  'End Property
 
   'Set or get the entire array of values
   Public Property Values() As Double()
@@ -170,7 +156,6 @@ Public Class atcTimeseries
       'just header information was read at first, delaying using the time/space to read all the data
       pDataSource.ReadData(Me) 'ValuesNeedToBeRead = False should happen in pFile.ReadData            
     End If
-    pMissingValue = Me.Attributes.GetValue("TSFILL", Nothing)
   End Sub
 
   'True if we have read the header and not all the values to save time and memory
