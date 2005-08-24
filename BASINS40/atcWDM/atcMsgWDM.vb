@@ -6,9 +6,9 @@ Imports atcUtility
 
 Friend Class atcMsgWDM
   'Copyright 2005 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
-  Dim pAttributes As Collection 'of clsAttributeDefinition
+  Dim pAttributes As atcCollection 'of clsAttributeDefinition
 
-  Public ReadOnly Property Attributes() As Collection
+  Public ReadOnly Property Attributes() As atcCollection
     Get
       Attributes = pAttributes
     End Get
@@ -31,12 +31,12 @@ Friend Class atcMsgWDM
 
     Dim lAttr As atcAttributeDefinition
 
-    pAttributes = New Collection
+    pAttributes = New atcCollection
+    pAttributes.Add("<dummy>")
 
     F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
 
-    Dim lMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
-    Dim lMsgHandle As New atcWdmHandle(1, lMsgFileName)
+    Dim lMsgHandle As atcWdmHandle = MsgHandle()
     Dim lMsgUnit As Integer = lMsgHandle.Unit
 
     If lMsgUnit > 0 Then
@@ -78,9 +78,18 @@ Friend Class atcMsgWDM
           '(missing entry point to WDGCVL in hass_ent?)
           lAttr.Help = ""
 
-          pAttributes.Add(lAttr, lName)
+          pAttributes.Add(lName.ToLower, lAttr)
         End If
       Next lIndex
     End If
+    lMsgHandle.Dispose()
   End Sub
+
+  Public Function MsgHandle() As atcWdmHandle
+    Dim lMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
+    Dim lMsgHandle As New atcWdmHandle(1, lMsgFileName)
+
+    Return lMsgHandle
+  End Function
+
 End Class
