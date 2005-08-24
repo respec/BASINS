@@ -14,12 +14,8 @@ Public Class atcDataSourceWDM
   Private pMonitor As Object
   Private pMonitorSet As Boolean
   Private pDates As ArrayList 'of atcTimeseries
-  'Private pFileUnit As Integer
   Private pQuick As Boolean
   Private Shared pMsg As atcMsgWDM
-
-  Dim DsnDescs() As String
-  Dim nDD As Integer
 
   'Private Structure BasinsInfo
   '  Dim desc As String
@@ -161,7 +157,7 @@ Public Class atcDataSourceWDM
               salen = 48
               d = lAttribs.GetValue("desc")
               If Len(d) > salen Then
-                MsgBox("Description: '" & d & vbCr & "truncated to: " & Left(d, salen), MsgBoxStyle.Exclamation, "WDM Write Data Header")
+                LogMsg("Description: '" & d & vbCr & "truncated to: " & Left(d, salen), "WDM Write Data Header", MsgBoxStyle.Exclamation)
               End If
               i = 4
               Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, d, Len(d))
@@ -172,7 +168,7 @@ Public Class atcDataSourceWDM
       End If
 
       If lRetcod = 0 Then
-        writeDataHeader = DsnWriteAttributes(dataObject)
+        writeDataHeader = DsnWriteAttributes(aFileUnit, dataObject)
       Else
         If Math.Abs(lRetcod) = 73 Then
           pErrorDescription = "Unable to renumber Dataset " & oldID & " to " & dsn
@@ -310,11 +306,10 @@ Public Class atcDataSourceWDM
 
       J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
       Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
-
       LogDbg("atcDataSourceWdm:AddDataset:WDTPUT:retcod:" & lRet)
-      lWdmHandle.Dispose()
-
     End If
+
+    lWdmHandle.Dispose()
 
   End Function
 
@@ -622,105 +617,68 @@ Public Class atcDataSourceWDM
       Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
       salen = 48
       saind = 45 'description
-      ostr = Left(t.Attributes.GetValue("desc"), 48)
+      ostr = Left(t.Attributes.GetValue("desc"), salen)
       Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
 
       'others (from attrib)
-      DsnBld = DsnWriteAttributes(t)
+      DsnBld = DsnWriteAttributes(aFileUnit, t)
 
       lMsgHandle.Dispose()
     End If
   End Function
 
-  Private Function RewriteTimSer(ByRef t As atcTimeseries) As Boolean
-    Dim v() As Single
-    Dim retc As Integer
-    Dim sdat(6) As Integer
-    Dim edat(6) As Integer
-    'TODO: rewrite not using ATCData.ATTimSerDateSummary
-    'Dim lDateSummary As ATCData.ATTimSerDateSummary
-    'Dim i, lWdmOpen As Integer
-
-    'lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))
-
-    'RewriteTimSer = False 'assume the worst
-    'lDateSummary = t.Dates.Summary
-    'With lDateSummary
-    '  If .CIntvl Then
-    '    Call J2Date(.SJDay, sdat)
-    '    If .NVALS = 0 Then
-    '      'nothing to write
-    '      pErrorDescription = "WDM:AddTimSer:Id(DSN) Problem - No data to write in " & t.Header.id
-    '      '????? t.AttribSet "headercomplete", vbFalse
-    '    Else
-    '      ReDim v(.NVALS)
-    '      v = VB6.CopyArray(t.Values)
-    '      Call F90_WDTPUT(pFileUnit, CInt(t.Header.id), .ts, sdat(0), .NVALS, CInt(1), CInt(0), .Tu, v(1), retc)
-    '      If retc = 0 Then 'no problem
-    '        RewriteTimSer = True
-    '      Else
-    '        pErrorDescription = "WDM:AddTimSer:Id(DSN) Write in " & t.Header.id & " Problem " & retc
-    '      End If
-    '    End If
-    '  Else
-    '    pErrorDescription = "WDM:AddTimSer:Id(DSN) " & t.Header.id & " data is not constant interval"
-    '  End If
-    'End With
-
-    ''does this need to be here?
-    'If RewriteTimSer Then
-    '  RewriteTimSer = DsnWriteAttributes(t)
-    'End If
-
-    'If lWdmOpen <> 1 Then i = F90_WDMCLO(pFileUnit)
-
-  End Function
-
-  Private Function DsnWriteAttributes(ByRef t As atcTimeseries) As Boolean
+  Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, ByRef t As atcTimeseries) As Boolean
     Dim lName As String
     Dim lValue As Object
+    Dim lDefinition As atcAttributeDefinition
+    Dim lMsgDefinition As atcAttributeDefinition
+    Dim lRetcod As Integer
+    Dim lMsg As atcWdmHandle = pMsg.MsgHandle
+    Dim lMsgUnit As Integer = lMsg.Unit
+    Dim lDsn As Integer = t.Attributes.GetValue("id", 0)
 
     DsnWriteAttributes = True
     For i As Integer = 0 To t.Attributes.Count - 1
-      lName = t.Attributes(i).Definition.Name
+      lDefinition = t.Attributes(i).Definition
+      lName = lDefinition.Name
       lValue = t.Attributes(i).Value
       If lName.ToLower = "units" Then  'store Units ID as DCODE in WDM
         lName = "DCODE"
         lValue = CStr(GetUnitID(lValue))
       End If
-      'TODO: rewrite not using ATCData.ATTimSerAttribute
-      '  lWAttr = gMsg.Attrib(lAttr.Name)
-      '  If Not (lWAttr Is Nothing) Then
-      '    With lWAttr
-      '      Select Case .DataType
-      '        Case "Integer"
-      '          If IsNumeric(lAttr.Value) Then
-      '            F90_WDBSAI(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, CInt(lAttr.Value), retc)
-      '          End If
-      '        Case "Single"
-      '          If IsNumeric(lAttr.Value) Then
-      '            F90_WDBSAR(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, CSng(lAttr.Value), retc)
-      '          End If
-      '        Case Else 'character
-      '          F90_WDBSAC(pFileUnit, CInt(t.Header.id), gMsgUnit, .Ind, .ilen, retc, lAttr.Value, Len(lAttr.Value))
-      '      End Select
-      '    End With
-      '    If retc <> 0 Then
-      '      If Math.Abs(retc) = 104 Then 'cant update if data already present
-      '        'Debug.Print "Skip:" & lAttr.Name & ", data present"
-      '      Else
-      '        If Len(pErrorDescription) = 0 Then
-      '          pErrorDescription = "Unable to Write Data Attributes for Class WDM"
-      '        End If
-      '        pErrorDescription = pErrorDescription & vbCrLf & "  Attribute:" & lAttr.Name & ", Value:" & lAttr.Value & ", Retcod:" & retc
-      '        DsnWriteAttributes = False
-      '      End If
-      '    End If
-      '  End If
+      lMsgDefinition = pMsg.Attributes.ItemByKey(lName.ToLower)
+      If Not lMsgDefinition Is Nothing Then
+        Select Case lDefinition.TypeString
+          Case "Integer"
+            If IsNumeric(lValue) Then
+              F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, 1, CInt(lValue), lRetcod)
+            End If
+          Case "Single"
+            If IsNumeric(lValue) Then
+              F90_WDBSAR(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, 1, CSng(lValue), lRetcod)
+            End If
+          Case Else 'character
+            F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, lMsgDefinition.Max, lRetcod, lValue, Len(lValue))
+        End Select
+        If lRetcod <> 0 Then
+          If Math.Abs(lRetcod) = 104 Then 'cant update if data already present
+            LogDbg("Skip:" & lName & ", data present")
+          Else
+            If Len(pErrorDescription) = 0 Then
+              pErrorDescription = "Unable to Write Data Attributes for Class WDM"
+            End If
+            pErrorDescription &= vbCrLf & "  Attribute:" & lName & ", Value:" & lValue & ", Retcod:" & lRetcod
+            DsnWriteAttributes = False
+          End If
+        End If
+      End If
     Next
+
     If Len(pErrorDescription) > 0 Then
-      System.Diagnostics.Debug.WriteLine(pErrorDescription)
+      LogDbg(pErrorDescription)
     End If
+
+    lMsg.Dispose()
   End Function
 
   '  Public Function ReadBasInf() As Boolean
@@ -848,12 +806,6 @@ Public Class atcDataSourceWDM
     End Get
   End Property
 
-  'Public Overrides ReadOnly Property FileFilter() As String
-  '  Get
-  '    Return pFileFilter
-  '  End Get
-  'End Property
-
   Public Overrides ReadOnly Property Name() As String
     Get
       Return "Timeseries::WDM"
@@ -868,7 +820,7 @@ Public Class atcDataSourceWDM
 
   Public Overrides ReadOnly Property CanSave() As Boolean
     Get
-      Return False 'TODO: change this when we can
+      Return False 'TODO: change this when we can, we can save a dataset, is this enough?
     End Get
   End Property
 
@@ -904,7 +856,7 @@ Public Class atcDataSourceWDM
     'Dim lWdmOpen As Integer
 
     If Not DataSets.Contains(aReadMe) Then
-      System.Diagnostics.Debug.WriteLine("WDM cannot read dataset not from this file")
+      LogDbg("WDM cannot read dataset not from this file")
     Else
       Dim lReadTS As atcTimeseries = aReadMe
       'System.Diagnostics.Debug.WriteLine("WDM read data " & ReadDataset.Attributes.GetValue("Location"))
@@ -978,61 +930,60 @@ Public Class atcDataSourceWDM
     End If
   End Sub
 
-  Private Sub RefreshDsn(ByVal aFileUnit As Integer, ByRef dsn As Integer)
+  Private Sub RefreshDsn(ByVal aFileUnit As Integer, ByRef aDsn As Integer)
     Dim lData As atcTimeseries
     Dim lDates As atcTimeseries
     Dim lDate As Date
-    'Dim lDataHeader As ATCData.ATTimSerDataHeader
-    'Dim lDateSum As ATCData.ATTimSerDateSummary
-    'Dim lAttr As ATCData.ATTimSerAttribute
-    Dim sdat(6) As Integer
-    Dim edat(6) As Integer
-    Dim GRPSIZ As Integer
-    Dim hdrLoc, hdrSen, hdrCon As String
-    Dim s As String
+
+    Dim lAttributeDefinition As atcAttributeDefinition
+
+    Dim lS As String
     Dim lName As String
-    Dim Init As Integer
-    Dim saind As Integer
-    Dim saval(256) As Integer
-    'Dim lWdmOpen As Integer
-    Dim i As Integer
+    Dim lInit As Integer
+    Dim lSaind As Integer
+    Dim lSaval(256) As Integer
+
+    'Dim i As Integer
 
     lDates = New atcTimeseries(Me)
     pDates.Add(lDates)
 
     lData = New atcTimeseries(Me)
     lData.Dates = lDates
-    lData.Attributes.SetValue("id", dsn)
+    lData.Attributes.SetValue("id", aDsn)
     lData.Attributes.SetValue("History 1", "Read from " & Specification)
 
     lData.ValuesNeedToBeRead = True
     lData.Dates.ValuesNeedToBeRead = True
     DataSets.Add(lData)
 
-    'lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))
     Call DsnReadGeneral(aFileUnit, lData)
 
-    Init = 1
+    lInit = 1
     Do
-      F90_GETATT(aFileUnit, dsn, Init, saind, saval(0))
-      If saind > 0 Then 'process attribute
-        If Not (AttrStored(saind)) Then
-          lName = pMsg.Attributes.Item(saind).Name
-          s = AttrVal2String(saind, saval)
-          Select Case UCase(lName)
-            Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
-              lDate = New Date(CInt(s.Substring(0, 4)), _
-                               CInt(s.Substring(4, 2)), _
-                               CInt(s.Substring(6, 2)), _
-                               CInt(s.Substring(8, 2)), _
-                               CInt(s.Substring(10, 2)), _
-                               CInt(s.Substring(12, 2)))
-              lData.Attributes.SetValue(pMsg.Attributes.Item(saind), lDate)
-            Case "DCODE"
-              'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
-            Case Else
-              lData.Attributes.SetValue(pMsg.Attributes.Item(saind), s)
-          End Select
+      F90_GETATT(aFileUnit, aDsn, lInit, lSaind, lSaval(0))
+      If lSaind > 0 Then 'process attribute
+        If Not (AttrStored(lSaind)) Then
+          Try
+            lAttributeDefinition = pMsg.Attributes.ItemByIndex(lSaind)
+            lName = lAttributeDefinition.Name
+            lS = AttrVal2String(lSaind, lSaval)
+            Select Case UCase(lName)
+              Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
+                lDate = New Date(CInt(lS.Substring(0, 4)), _
+                                 CInt(lS.Substring(4, 2)), _
+                                 CInt(lS.Substring(6, 2)), _
+                                 CInt(lS.Substring(8, 2)), _
+                                 CInt(lS.Substring(10, 2)), _
+                                 CInt(lS.Substring(12, 2)))
+                lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lDate)
+              Case "DCODE"
+                'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
+              Case Else
+                lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lS)
+            End Select
+          Catch
+          End Try
         End If
       Else 'all done
         Exit Do
@@ -1051,9 +1002,6 @@ Public Class atcDataSourceWDM
     'Call HeaderFromBasinsInf(lData)
     'End If
 
-    'If lWdmOpen <> 1 Then 'close the wdm file to prevent conflicts with fortran
-    '  i = F90_WDMCLO(pFileUnit)
-    'End If
   End Sub
 
   'Before calling, make sure id property of aDataset has been set to dsn -- aDataset.Attributes.SetValue("id", dsn)
@@ -1142,25 +1090,25 @@ Public Class atcDataSourceWDM
   End Sub
 
   Private Function AttrVal2String(ByRef saind As Integer, ByRef saval() As Integer) As String
-    Dim s As String
-    Dim i As Integer
+    Dim lS As String
+    Dim lI As Integer
     Dim lAttr As atcAttributeDefinition
 
     lAttr = pMsg.Attributes(saind)
 
     With lAttr
-      s = ""
+      lS = ""
       Select Case .TypeString
         Case "String"
-          For i = 0 To (lAttr.Max / 4) - 1
-            s &= Long2String(saval(i))
+          For lI = 0 To (lAttr.Max / 4) - 1
+            lS &= Long2String(saval(lI))
           Next
-        Case "Single" : s &= CStr(System.BitConverter.ToSingle(System.BitConverter.GetBytes((saval(i))), 0))
-        Case Else : s &= CStr(saval(i))
+        Case "Single" : lS &= CStr(System.BitConverter.ToSingle(System.BitConverter.GetBytes((saval(lI))), 0))
+        Case Else : lS &= CStr(saval(lI))
       End Select
     End With
 
-    Return Trim(s)
+    Return Trim(lS)
   End Function
 
   Protected Overrides Sub Finalize()

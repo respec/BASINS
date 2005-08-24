@@ -89,6 +89,14 @@ Public Class atcDataAttributes
           Return lValue.ToString
         ElseIf TypeOf (lValue) Is atcDataGroup Then
           Return lValue.ToString
+        ElseIf InStr(aAttributeName.ToLower, "history") > 0 Then
+          If InStr(lValue.ToString.ToLower, "read from") Then 'make value shorter by removing path and "read "
+            Dim lString() As String = lValue.ToString.Split(" ")
+            lString(0) = "from " & modFile.FilenameNoPath(lString(2))
+            Return lString(0)
+          Else
+            Return lValue.ToString
+          End If
         Else
           Return lValue.ToString
         End If
