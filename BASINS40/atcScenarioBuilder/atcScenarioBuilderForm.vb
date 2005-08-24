@@ -42,7 +42,6 @@ Friend Class atcScenarioBuilderForm
   Friend WithEvents mnuAttributes As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAttributesAdd As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAttributesRemove As System.Windows.Forms.MenuItem
-  Friend WithEvents btnRun As System.Windows.Forms.Button
   Friend WithEvents agdResults As atcControls.atcGrid
   Friend WithEvents splitHoriz As System.Windows.Forms.Splitter
   Friend WithEvents panelMiddle As System.Windows.Forms.Panel
@@ -57,14 +56,12 @@ Friend Class atcScenarioBuilderForm
     Me.mnuAttributesAdd = New System.Windows.Forms.MenuItem
     Me.mnuAttributesRemove = New System.Windows.Forms.MenuItem
     Me.mnuDisplay = New System.Windows.Forms.MenuItem
+    Me.mnuScenarios = New System.Windows.Forms.MenuItem
+    Me.mnuScenariosAdd = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
     Me.splitHoriz = New System.Windows.Forms.Splitter
     Me.panelMiddle = New System.Windows.Forms.Panel
-    Me.btnRun = New System.Windows.Forms.Button
     Me.agdResults = New atcControls.atcGrid
-    Me.mnuScenarios = New System.Windows.Forms.MenuItem
-    Me.mnuScenariosAdd = New System.Windows.Forms.MenuItem
-    Me.panelMiddle.SuspendLayout()
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -103,6 +100,17 @@ Friend Class atcScenarioBuilderForm
     Me.mnuDisplay.Index = 2
     Me.mnuDisplay.Text = "&Display"
     '
+    'mnuScenarios
+    '
+    Me.mnuScenarios.Index = 3
+    Me.mnuScenarios.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuScenariosAdd})
+    Me.mnuScenarios.Text = "&Scenarios"
+    '
+    'mnuScenariosAdd
+    '
+    Me.mnuScenariosAdd.Index = 0
+    Me.mnuScenariosAdd.Text = "&Add"
+    '
     'agdMain
     '
     Me.agdMain.AllowHorizontalScrolling = True
@@ -125,20 +133,11 @@ Friend Class atcScenarioBuilderForm
     '
     'panelMiddle
     '
-    Me.panelMiddle.Controls.Add(Me.btnRun)
     Me.panelMiddle.Dock = System.Windows.Forms.DockStyle.Top
     Me.panelMiddle.Location = New System.Drawing.Point(0, 257)
     Me.panelMiddle.Name = "panelMiddle"
     Me.panelMiddle.Size = New System.Drawing.Size(536, 47)
     Me.panelMiddle.TabIndex = 2
-    '
-    'btnRun
-    '
-    Me.btnRun.Location = New System.Drawing.Point(16, 8)
-    Me.btnRun.Name = "btnRun"
-    Me.btnRun.Size = New System.Drawing.Size(96, 24)
-    Me.btnRun.TabIndex = 0
-    Me.btnRun.Text = "Run Model"
     '
     'agdResults
     '
@@ -150,17 +149,6 @@ Friend Class atcScenarioBuilderForm
     Me.agdResults.Name = "agdResults"
     Me.agdResults.Size = New System.Drawing.Size(536, 201)
     Me.agdResults.TabIndex = 3
-    '
-    'mnuScenarios
-    '
-    Me.mnuScenarios.Index = 3
-    Me.mnuScenarios.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuScenariosAdd})
-    Me.mnuScenarios.Text = "&Scenarios"
-    '
-    'mnuScenariosAdd
-    '
-    Me.mnuScenariosAdd.Index = 0
-    Me.mnuScenariosAdd.Text = "&Add"
     '
     'atcScenarioBuilderForm
     '
@@ -174,7 +162,6 @@ Friend Class atcScenarioBuilderForm
     Me.Menu = Me.MainMenu1
     Me.Name = "atcScenarioBuilderForm"
     Me.Text = "Climate Change Scenario Builder"
-    Me.panelMiddle.ResumeLayout(False)
     Me.ResumeLayout(False)
 
   End Sub
@@ -201,6 +188,8 @@ Friend Class atcScenarioBuilderForm
 
   'Translator class between pBaseResults and agdMain
   Private pResultSource As atcGridSource
+
+  Private pRunButton() As Windows.Forms.Button
 
   Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
                Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
@@ -255,10 +244,23 @@ Friend Class atcScenarioBuilderForm
 
       pModifiedResults = New atcCollection
 
+      ReDim pRunButton(0)
+      pRunButton(0) = New Windows.Forms.Button
+      panelMiddle.Controls.Add(pRunButton(0))
+      AddHandler pRunButton(0).Click, AddressOf RunButton_Click
+      With pRunButton(0)
+        .Name = "Run-1"
+        .Tag = -1
+        .Text = "Run"
+        .Width = 55
+      End With
+
       Me.Show()
       PopulateGrid()
       pInitializing = False
       UpdatedAttributes()
+      Application.DoEvents()
+      AddScenario()
     Else 'user declined to specify timeseries
       Me.Close()
     End If
@@ -431,7 +433,7 @@ Friend Class atcScenarioBuilderForm
 
   End Sub
 
-  Private Sub btnRun_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRun.Click
+  Private Sub RunButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     'Copy base UCI and change scenario name within it
     'Copy WDM
     'Change data to be modified in new WDM
@@ -439,50 +441,91 @@ Friend Class atcScenarioBuilderForm
     'Run WinHSPFlt with the new UCI
     'Reload datasets in Results grid
 
-    Dim lModifiedIndex As Integer = 0 'TODO: use a selected modified version, not just the first one
-    Dim lNewScenarioName As String = "modified"
+    Dim btn As Windows.Forms.Button = sender
+
+    Dim lModifiedIndex As Integer = 0
+    Dim lNewScenarioName As String
+    Dim lNewFilename As String
+    Dim lNewWDM As atcWDM.atcDataSourceWDM
+    Dim lOldWDM As atcWDM.atcDataSourceWDM
     Dim lCurrentWDMfilename As String
+    Dim lNewResults As atcDataGroup
+
     For Each lDataSource As atcDataSource In pDataManager.DataSources
       If lDataSource.DataSets.Contains(pBaseScenario.ItemByIndex(0)) Then
+        lOldWDM = lDataSource
         lCurrentWDMfilename = lDataSource.Specification
       End If
     Next
     If FileExists(lCurrentWDMfilename) Then
-      Dim lNewFilename As String = PathNameOnly(lCurrentWDMfilename) & "\" & lNewScenarioName & "."
-      'Copy base UCI and change scenario name within it
-      ReplaceStringToFile(WholeFileString(FilenameSetExt(lCurrentWDMfilename, "uci")), "base.", lNewScenarioName & ".", lNewFilename & "uci")
+      If IsNumeric(btn.Tag) Then lModifiedIndex = btn.Tag
 
-      'Copy base WDM to new WDM
-      FileCopy(lCurrentWDMfilename, lNewFilename & "wdm")
-      Dim lNewWDM As New atcWDM.atcDataSourceWDM
-      If lNewWDM.Open(lNewFilename & "wdm") Then
+      If lModifiedIndex = -1 Then 'Run base scenario
+        lNewFilename = FilenameNoExt(lCurrentWDMfilename) & "."
+        lNewWDM = lOldWDM
+      Else 'Run a modified scenario
+        lNewScenarioName = "modified"
+        If lModifiedIndex > 0 Then lNewScenarioName &= (lModifiedIndex + 1)
+        lNewFilename = PathNameOnly(lCurrentWDMfilename) & "\" & lNewScenarioName & "."
+        'Copy base UCI and change scenario name within it
+        ReplaceStringToFile(WholeFileString(FilenameSetExt(lCurrentWDMfilename, "uci")), "base.", lNewScenarioName & ".", lNewFilename & "uci")
+
+        'Copy base WDM to new WDM
+        FileCopy(lCurrentWDMfilename, lNewFilename & "wdm")
+        lNewWDM = New atcWDM.atcDataSourceWDM
+        If Not lNewWDM.Open(lNewFilename & "wdm") Then
+          MsgBox("Could not open new scenario WDM file '" & lNewFilename & "wdm'", MsgBoxStyle.Critical, "Could not run model")
+          Exit Sub
+        End If
         Dim lCurrentTimeseries As atcTimeseries
         For Each lCurrentTimeseries In pModifiedScenarios.ItemByIndex(lModifiedIndex)
-          lCurrentTimeseries.Attributes.SetValue("Scenario", lNewScenarioName)
+          lCurrentTimeseries.Attributes.SetValue("scenario", lNewScenarioName)
           lNewWDM.AddDataSet(lCurrentTimeseries)
         Next
 
         For Each lCurrentTimeseries In lNewWDM.DataSets
-          If lCurrentTimeseries.Attributes.GetValue("Scenario") = "BASE" Then
-            lCurrentTimeseries.Attributes.SetValue("Scenario", lNewScenarioName)
+          If lCurrentTimeseries.Attributes.GetValue("scenario").ToLower = "base" Then
+            lCurrentTimeseries.Attributes.SetValue("scenario", lNewScenarioName)
             lNewWDM.AddDataSet(lCurrentTimeseries) 'TODO: Would be nice to just update this attribute, not rewrite all data values
           End If
         Next
-
-        Shell("D:\BASINS\models\hspf\bin\WinHspfLt.exe " & lNewFilename & "uci", AppWinStyle.NormalNoFocus, True)
-
-        Dim lModifiedResults As atcDataGroup = pModifiedResults.ItemByIndex(lModifiedIndex)
-        lModifiedResults.Clear()
-        For Each lModifiedData As atcDataSet In lNewWDM.DataSets
-          If pBaseResults.Keys.Contains(lModifiedData.Attributes.GetValue("id")) Then
-            'Found data matching one of the base results
-            lModifiedResults.Add(lModifiedData)
-          End If
-        Next
-        agdResults.Refresh()
-      Else
-        MsgBox("Could not open new scenario WDM file '" & lNewFilename & "wdm'", MsgBoxStyle.Critical, "Could not run model")
       End If
+
+      Shell("D:\BASINS\models\hspf\bin\WinHspfLt.exe " & lNewFilename & "uci", AppWinStyle.NormalFocus, True)
+
+      If lModifiedIndex >= 0 Then 'ran modified scenario
+        lNewResults = pModifiedResults.ItemByIndex(lModifiedIndex)
+        lNewResults.Clear()
+      Else 'ran base scenario, can't clear so just use new group
+        lNewResults = New atcDataGroup
+      End If
+
+      For Each lModifiedData As atcDataSet In lNewWDM.DataSets
+        If pBaseResults.Keys.Contains(lModifiedData.Attributes.GetValue("id")) Then
+          'Found data matching one of the base results
+          'Re-read this dataset since it has just been written by HSPF
+
+          'First, discard any calculated attributes
+          Dim lRemoveThese As New ArrayList
+          'Step in reverse so we can remove by index in next loop without high indexes changing before they are removed
+          For iAttribute As Integer = lModifiedData.Attributes.Count - 1 To 0 Step -1
+            If lModifiedData.Attributes.ItemByIndex(iAttribute).Definition.Calculated Then
+              lRemoveThese.Add(iAttribute)
+            End If
+          Next
+          For Each iAttribute As Integer In lRemoveThese
+            lModifiedData.Attributes.RemoveAt(iAttribute)
+          Next
+          lModifiedData.Attributes.SetValue("HeaderComplete", False)
+          lModifiedData.Attributes.SetValue("HeaderOnly", False)
+          lNewWDM.ReadData(lModifiedData)
+
+          lNewResults.Add(lModifiedData)
+        End If
+      Next
+      agdResults.Refresh()
+    Else
+        MsgBox("Could not find base WDM file '" & lCurrentWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
     End If
     Dim lNewWDMfile As atcDataSource
 
@@ -491,14 +534,45 @@ Friend Class atcScenarioBuilderForm
   Private Sub agdMain_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles agdMain.UserResizedColumn
     agdResults.ColumnWidth(aColumn) = aWidth
     agdResults.Refresh()
+    PositionRunButtons()
   End Sub
 
   Private Sub agdResults_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles agdResults.UserResizedColumn
     agdMain.ColumnWidth(aColumn) = aWidth
     agdMain.Refresh()
+    PositionRunButtons()
+  End Sub
+
+  Private Sub PositionRunButtons()
+    Dim iLastButton As Integer = pRunButton.GetUpperBound(0)
+    Dim iButton As Integer
+
+    For iButton = 0 To iLastButton
+      With pRunButton(iButton)
+        .Visible = False
+        .Top = (panelMiddle.Height - .Height) / 2
+        .Left = 0
+      End With
+    Next
+
+    For iColumn As Integer = 0 To pSource.Columns - 2
+      For iButton = 0 To iLastButton
+        If iButton > iColumn - 2 Then
+          pRunButton(iButton).Left += agdResults.ColumnWidth(iColumn)
+        End If
+      Next
+    Next
+
+    For iButton = 0 To iLastButton
+      pRunButton(iButton).Visible = True
+    Next
   End Sub
 
   Private Sub mnuScenariosAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAdd.Click
+    AddScenario()
+  End Sub
+
+  Private Sub AddScenario()
     Dim lNewModified As New atcDataGroup
     Dim lNewResults As New atcDataGroup
 
@@ -516,6 +590,19 @@ Friend Class atcScenarioBuilderForm
     Next
     agdMain.Refresh()
     agdResults.Refresh()
+
+    Dim lNewButtonIndex As Integer = pRunButton.GetUpperBound(0) + 1
+    ReDim Preserve pRunButton(lNewButtonIndex)
+    pRunButton(lNewButtonIndex) = New Windows.Forms.Button
+    panelMiddle.Controls.Add(pRunButton(lNewButtonIndex))
+    AddHandler pRunButton(lNewButtonIndex).Click, AddressOf RunButton_Click
+    With pRunButton(lNewButtonIndex)
+      .Tag = lNewButtonIndex - 1
+      .Name = "Run" & .Tag
+      .Text = "Run" ' & .Tag
+      .Width = pRunButton(0).Width
+    End With
+    PositionRunButtons()
   End Sub
 End Class
 
@@ -606,17 +693,19 @@ Friend Class GridSource
                 'Else 'Even columns contain values
                 Dim lAttributeName As String = pDataManager.DisplayAttributes(lAttributeIndex)
                 Dim lNewValue As Object = lModifiedData.Attributes.GetValue(lAttributeName)
-                If IsNumeric(lNewValue) Then
+                If IsNumeric(lNewValue) Then 'See if we can provide %difference from base
                   Dim lOldValue As Object = pBaseScenario(lDataIndex).Attributes.GetValue(lAttributeName)
                   If IsNumeric(lOldValue) Then
                     Dim lPercentDifference As Double = (lNewValue - lOldValue) / lOldValue
-                    If Not Double.IsNaN(lPercentDifference) AndAlso Math.Abs(lPercentDifference) > 0.005 Then
-                      Return Format(lNewValue, "#,##0.#####") & " (" _
+                    If Not Double.IsNaN(lPercentDifference) AndAlso _
+                       Not Double.IsInfinity(lPercentDifference) AndAlso _
+                       Math.Abs(lPercentDifference) > 0.005 Then
+                      Return lModifiedData.Attributes.GetFormattedValue(lAttributeName) & " (" _
                            & Format(lPercentDifference, "+#,##0.##%;-#,##0.##%") & ")"
                     End If
                   End If
                 End If
-                Return lNewValue
+                Return lModifiedData.Attributes.GetFormattedValue(lAttributeName)
               End If
             Next
             'No modified dataset matching that ID yet
