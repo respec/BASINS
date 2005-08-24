@@ -117,7 +117,7 @@ Public Class frmDataSource
     Populate(aNeedToOpen, aNeedToSave)
     Me.ShowDialog() 'Block until form closes
     aSelectedSource = pSelectedSource
-    aSelectedSource.Specification = pSpecification
+    If Not aSelectedSource Is Nothing Then aSelectedSource.Specification = pSpecification
   End Sub
 
   Private Sub Populate(ByRef aNeedToOpen As Boolean, _
