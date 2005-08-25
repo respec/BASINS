@@ -15,7 +15,7 @@ Public Class atcDataSource
     ExistAskUser = 8
   End Enum
 
-  'Attributes associated with the whole Data (location, constituent, etc.)
+  'Attributes associated with all the DataSets (location, constituent, etc.)
   Public ReadOnly Property Attributes() As atcDataAttributes
     Get
       Return pAttributes

@@ -169,16 +169,15 @@ Friend Class atcScenarioBuilderForm
 #End Region
 
   Private pDataManager As atcDataManager
-  Public Const ModifiedAttrName As String = "Modified Version"
 
   'The group of atcTimeseries containing base conditions
-  Private WithEvents pBaseScenario As atcDataGroup
+  Private pBaseScenario As atcDataSource
 
   'a collection of atcDataGroups, one for each modified scenario
   Private pModifiedScenarios As atcCollection
 
   'The group of atcTimeseries containing model output from base conditions
-  Private WithEvents pBaseResults As atcDataGroup
+  Private pBaseResults As atcDataSource
 
   'a collection of atcDataGroups, one for each modified scenario
   Private pModifiedResults As atcCollection
@@ -196,10 +195,9 @@ Friend Class atcScenarioBuilderForm
     pInitializing = True
 
     pDataManager = aDataManager
-    If aTimeseriesGroup Is Nothing Then
-      pBaseScenario = New atcDataGroup
-    Else
-      pBaseScenario = aTimeseriesGroup
+    pBaseScenario = New atcDataSource
+    If Not aTimeseriesGroup Is Nothing Then
+      pBaseScenario.DataSets.AddRange(aTimeseriesGroup) 'TODO: want to share events with aTimeseriesGroup
     End If
 
     mnuDisplay.MenuItems.Clear()
@@ -208,37 +206,27 @@ Friend Class atcScenarioBuilderForm
       mnuDisplay.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuDisplay_Click))
     Next
 
-    If pBaseScenario.Count = 0 Then
+    If pBaseScenario.DataSets.Count = 0 Then
       'By default add EVAP and PREC if none were given
       For Each lDataSet As atcDataSet In pDataManager.DataSets
         Select Case lDataSet.Attributes.GetValue("Constituent")
-          Case "PET", "HPRECIP" : pBaseScenario.Add(lDataSet)
+          Case "PET", "HPRECIP" : pBaseScenario.DataSets.Add(lDataSet)
         End Select
       Next
       'If we didn't find any to add, ask user to select some data
-      If pBaseScenario.Count = 0 Then
-        pDataManager.UserSelectData(, pBaseScenario, True)
+      If pBaseScenario.DataSets.Count = 0 Then
+        pDataManager.UserSelectData(, pBaseScenario.DataSets, True)
       End If
     End If
 
-    If pBaseScenario.Count > 0 Then
+    If pBaseScenario.DataSets.Count > 0 Then
       pModifiedScenarios = New atcCollection
-      'Dim lExistingModified As New atcDataGroup
-      'For Each lDataSet As atcDataSet In pBaseScenario
-      '  Dim lModifiedDataSet As atcDataSet = lDataSet.Attributes.GetValue(ModifiedAttrName, Nothing)
-      '  If Not lModifiedDataSet Is Nothing Then
-      '    lExistingModified.Add(lModifiedDataSet)
-      '  End If
-      'Next
-      'If lExistingModified.Count > 0 Then
-      '  pModifiedScenarios.Add(lExistingModified)
-      'End If
 
-      pBaseResults = New atcDataGroup
+      pBaseResults = New atcDataSource
       For Each lDataSet As atcDataSet In pDataManager.DataSets
         If lDataSet.Attributes.GetValue("Constituent").ToLower = "flow" _
          AndAlso lDataSet.Attributes.GetValue("Scenario").ToLower = "base" Then
-          pBaseResults.Add(lDataSet.Attributes.GetValue("id"), lDataSet)
+          pBaseResults.DataSets.Add(lDataSet.Attributes.GetValue("id"), lDataSet)
         End If
       Next
 
@@ -268,8 +256,8 @@ Friend Class atcScenarioBuilderForm
   End Sub
 
   Private Sub PopulateGrid()
-    pSource = New GridSource(pDataManager, pBaseScenario, pModifiedScenarios)
-    pResultSource = New GridSource(pDataManager, pBaseResults, pModifiedResults)
+    pSource = New GridSource(pBaseScenario, pModifiedScenarios)
+    pResultSource = New GridSource(pBaseResults, pModifiedResults)
 
     agdMain.Initialize(pSource)
     agdResults.Initialize(pResultSource)
@@ -290,22 +278,23 @@ Friend Class atcScenarioBuilderForm
     Dim lShowThese As New atcDataGroup
     For Each atf As atcDataDisplay In lDisplayPlugins
       If atf.Name = sender.Text Then
+
         Dim typ As System.Type = atf.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         lNewDisplay = asm.CreateInstance(typ.FullName)
-        For Each lDataSet As atcDataSet In pBaseScenario
+
+        For Each lDataSet As atcDataSet In pBaseScenario.DataSets
           lShowThese.Add(lDataSet)
-          'lDataSet = lDataSet.Attributes.GetValue(ModifiedAttrName, Nothing)
-          'If Not lDataSet Is Nothing Then lShowThese.Add(lDataSet)
         Next
         lNewDisplay.Show(pDataManager, lShowThese)
         Exit Sub
+
       End If
     Next
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    pDataManager.UserSelectData(, pBaseScenario, False)
+    pDataManager.UserSelectData(, pBaseScenario.DataSets, False)
   End Sub
 
   Private Sub mnuAttributesAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -322,22 +311,22 @@ Friend Class atcScenarioBuilderForm
     UpdatedAttributes()
   End Sub
 
-  Private Sub pBaseScenario_Added(ByVal aAdded As atcCollection) Handles pBaseScenario.Added
-    If Not pInitializing Then agdMain.Refresh()
-    'PopulateGrid()
-    'TODO: could efficiently insert newly added item(s)
-  End Sub
+  'Private Sub pBaseScenario_Added(ByVal aAdded As atcCollection) Handles pBaseScenario.Added
+  '  If Not pInitializing Then agdMain.Refresh()
+  '  'PopulateGrid()
+  '  'TODO: could efficiently insert newly added item(s)
+  'End Sub
 
-  Private Sub pBaseScenario_Removed(ByVal aRemoved As atcCollection) Handles pBaseScenario.Removed
-    If Not pInitializing Then agdMain.Refresh()
-    'PopulateGrid()
-    'TODO: could efficiently remove by serial number
-  End Sub
+  'Private Sub pBaseScenario_Removed(ByVal aRemoved As atcCollection) Handles pBaseScenario.Removed
+  '  If Not pInitializing Then agdMain.Refresh()
+  '  'PopulateGrid()
+  '  'TODO: could efficiently remove by serial number
+  'End Sub
 
   Private Sub agdMain_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMain.MouseDownCell
     If aColumn > 2 Then
       Dim lDataIndex As Integer = (aRow - 1) \ pDataManager.DisplayAttributes.Count
-      UserModify(pBaseScenario.ItemByIndex(lDataIndex), pModifiedScenarios.ItemByIndex(aColumn - 3))
+      UserModify(pBaseScenario.DataSets.ItemByIndex(lDataIndex), pModifiedScenarios.ItemByIndex(aColumn - 3))
     End If
   End Sub
 
@@ -417,16 +406,6 @@ Friend Class atcScenarioBuilderForm
         aModifiedScenario.RemoveByKey(lID)
         aModifiedScenario.Add(lID, lNewTimeseries)
       Next
-      'Select Case lNewDataSource.DataSets.Count
-      '  Case 0 'didn't acutally compute anything, ignore
-      '  Case 1
-      '    lNewTimeseries = lNewDataSource.DataSets.ItemByIndex(0)
-
-      '    'aBaseTimeseries.Attributes.SetValue(ModifiedAttrName, lNewTimeseries)
-      '    'pSource.CellValue(aRow, pSource.Columns - 1) = lNewDataSource.Specification
-      '  Case Else
-      '    MsgBox("Need to deal with multiple results in scenario builder", MsgBoxStyle.Critical, "UserModify")
-      'End Select
     End If
     agdMain.Refresh()
     agdResults.Refresh()
@@ -452,7 +431,7 @@ Friend Class atcScenarioBuilderForm
     Dim lNewResults As atcDataGroup
 
     For Each lDataSource As atcDataSource In pDataManager.DataSources
-      If lDataSource.DataSets.Contains(pBaseScenario.ItemByIndex(0)) Then
+      If lDataSource.DataSets.Contains(pBaseScenario.DataSets.ItemByIndex(0)) Then
         lOldWDM = lDataSource
         lCurrentWDMfilename = lDataSource.Specification
       End If
@@ -478,7 +457,7 @@ Friend Class atcScenarioBuilderForm
           Exit Sub
         End If
         Dim lCurrentTimeseries As atcTimeseries
-        For Each lCurrentTimeseries In pModifiedScenarios.ItemByIndex(lModifiedIndex)
+        For Each lCurrentTimeseries In pModifiedScenarios.ItemByIndex(lModifiedIndex).DataSets
           lCurrentTimeseries.Attributes.SetValue("scenario", lNewScenarioName)
           lNewWDM.AddDataSet(lCurrentTimeseries)
         Next
@@ -501,7 +480,7 @@ Friend Class atcScenarioBuilderForm
       End If
 
       For Each lModifiedData As atcDataSet In lNewWDM.DataSets
-        If pBaseResults.Keys.Contains(lModifiedData.Attributes.GetValue("id")) Then
+        If pBaseResults.DataSets.Keys.Contains(lModifiedData.Attributes.GetValue("id")) Then
           'Found data matching one of the base results
           'Re-read this dataset since it has just been written by HSPF
 
@@ -573,11 +552,14 @@ Friend Class atcScenarioBuilderForm
   End Sub
 
   Private Sub AddScenario()
-    Dim lNewModified As New atcDataGroup
-    Dim lNewResults As New atcDataGroup
+    Dim lNewModified As New atcDataSource
+    Dim lNewResults As New atcDataSource
 
     pModifiedScenarios.Add(lNewModified)
     pModifiedResults.Add(lNewResults)
+
+    lNewModified.Specification = "Modified_" & pModifiedScenarios.Count
+    lNewResults.Specification = "Results_" & pModifiedResults.Count
 
     For iColumn As Integer = 0 To pSource.Columns - 1
       agdMain.SizeColumnToContents(iColumn)
@@ -613,14 +595,11 @@ Friend Class GridSource
   '-1 to not label columns
   Private Const pLabelRow As Integer = 0
 
-  Private pDataManager As atcDataManager
-  Private pBaseScenario As atcDataGroup
+  Private pBaseScenario As atcDataSource
   Private pModifiedScenarios As atcCollection
 
-  Sub New(ByVal aDataManager As atcData.atcDataManager, _
-          ByVal aBaseScenario As atcData.atcDataGroup, _
+  Sub New(ByVal aBaseScenario As atcDataSource, _
           ByVal aModifiedScenarios As atcCollection)
-    pDataManager = aDataManager
     pBaseScenario = aBaseScenario
     pModifiedScenarios = aModifiedScenarios
   End Sub
@@ -640,10 +619,19 @@ Friend Class GridSource
 
   Public Overrides Property Rows() As Integer
     Get
-      If pBaseScenario Is Nothing OrElse pDataManager Is Nothing Then
+      If pBaseScenario Is Nothing Then
         Return pLabelRow + 1
       Else
-        Return pBaseScenario.Count * pDataManager.DisplayAttributes.Count + pLabelRow + 1
+        Dim lRows As Integer = pLabelRow + 1
+        For Each lDataSet As atcDataSet In pBaseScenario.DataSets
+          Dim lScenarioAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes", Nothing)
+          If lScenarioAttributes Is Nothing Then
+            lRows += 3
+          Else
+            lRows += lScenarioAttributes.Count
+          End If
+        Next
+        Return lRows
       End If
     End Get
     Set(ByVal Value As Integer)
@@ -660,73 +648,69 @@ Friend Class GridSource
             Return "Attribute"
           Case 2
             Return "Original"
-          Case 3
-            Return "Modification "
-          Case Is > 3
-            'If aColumn Mod 2 = 1 Then 'odd columns contain relationships
-            Return "Modification #" & (aColumn - 2)
-            'Else
-            '  Return "New Value #" & (aColumn - 2) / 2
-            'End If
+          Case Is > 2
+            Dim lModifiedSource As atcDataSource = pModifiedScenarios.ItemByIndex(aColumn - 3)
+            Return lModifiedSource.Specification
         End Select
       Else
-        Dim lDataIndex As Integer = (aRow - pLabelRow - 1) \ pDataManager.DisplayAttributes.Count
-        Dim lAttributeIndex As Integer = (aRow - pLabelRow - 1) Mod pDataManager.DisplayAttributes.Count
-        Select Case aColumn
-          Case 0
-            If lAttributeIndex = 0 Then
-              Return pBaseScenario(lDataIndex).Attributes.GetFormattedValue("Constituent")
-            Else
-              Return """"
-            End If
-          Case 1
-            Return pDataManager.DisplayAttributes(lAttributeIndex)
-          Case 2
-            Return pBaseScenario(lDataIndex).Attributes.GetFormattedValue(pDataManager.DisplayAttributes(lAttributeIndex))
-          Case Is > 2
-            Dim lModifiedGroup As atcDataGroup = pModifiedScenarios.ItemByIndex(aColumn - 3) 'lDataSet.Attributes.GetValue(atcScenarioBuilderForm.ModifiedAttrName, Nothing)
-            Dim lBaseID As String = pBaseScenario(lDataIndex).Attributes.GetValue("id")
-            For Each lModifiedData As atcDataSet In lModifiedGroup
-              If lModifiedData.Attributes.GetValue("id") = lBaseID Then 'Found modified dataset for this cell
-                'If aColumn Mod 2 = 1 Then 'odd columns contain relationships
-                'Return lModifiedData.Attributes.GetValue("History 1")
-                'Else 'Even columns contain values
-                Dim lAttributeName As String = pDataManager.DisplayAttributes(lAttributeIndex)
-                Dim lNewValue As Object = lModifiedData.Attributes.GetValue(lAttributeName)
-                If IsNumeric(lNewValue) Then 'See if we can provide %difference from base
-                  Dim lOldValue As Object = pBaseScenario(lDataIndex).Attributes.GetValue(lAttributeName)
-                  If IsNumeric(lOldValue) Then
-                    Dim lPercentDifference As Double = (lNewValue - lOldValue) / lOldValue
-                    If Not Double.IsNaN(lPercentDifference) AndAlso _
-                       Not Double.IsInfinity(lPercentDifference) AndAlso _
-                       Math.Abs(lPercentDifference) > 0.005 Then
-                      Return lModifiedData.Attributes.GetFormattedValue(lAttributeName) & " (" _
-                           & Format(lPercentDifference, "+#,##0.##%;-#,##0.##%") & ")"
-                    End If
-                  End If
+        Dim lRow As Integer = pLabelRow + 1
+        For Each lDataSet As atcDataSet In pBaseScenario.DataSets
+          Dim lScenarioAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes", Nothing)
+          If lScenarioAttributes Is Nothing Then
+            lScenarioAttributes = New atcDataAttributes
+            lScenarioAttributes.Add("Min", "")
+            lScenarioAttributes.Add("Max", "")
+            lScenarioAttributes.Add("Mean", "")
+            lDataSet.Attributes.SetValue("Scenario Attributes", lScenarioAttributes)
+          End If
+          If lRow + lScenarioAttributes.Count > aRow Then
+            Dim lAttributeIndex As Integer = aRow - lRow '= (aRow - pLabelRow - 1) Mod pDisplayAttributes.Count
+            Dim lAttributeName As String = ""
+            Try 'If we fail to find a name, it will stay blank as assigned above
+              lAttributeName = lScenarioAttributes.ItemByIndex(lAttributeIndex).Definition.Name()
+            Catch
+            End Try
+            Select Case aColumn
+              Case 0
+                If lAttributeIndex = 0 Then
+                  Return lDataSet.Attributes.GetFormattedValue("Constituent")
+                Else
+                  Return """"
                 End If
-                Return lModifiedData.Attributes.GetFormattedValue(lAttributeName)
-              End If
-            Next
-            'No modified dataset matching that ID yet
+              Case 1
+                Return lAttributeName
+              Case 2
+                Return lDataSet.Attributes.GetFormattedValue(lAttributeName)
+              Case Is > 2
+                Dim lModifiedSource As atcDataSource = pModifiedScenarios.ItemByIndex(aColumn - 3)
+                Dim lModifiedGroup As atcDataGroup = lModifiedSource.DataSets
+                Dim lBaseID As String = lDataSet.Attributes.GetValue("id")
+                For Each lModifiedData As atcDataSet In lModifiedGroup
+                  If lModifiedData.Attributes.GetValue("id") = lBaseID Then 'Found modified dataset for this cell
+                    'If aColumn Mod 2 = 1 Then 'odd columns contain relationships
+                    'Return lModifiedData.Attributes.GetValue("History 1")
+                    'Else 'Even columns contain values
+                    Dim lNewValue As Object = lModifiedData.Attributes.GetValue(lAttributeName)
+                    If IsNumeric(lNewValue) Then 'See if we can provide %difference from base
+                      Dim lOldValue As Object = lDataSet.Attributes.GetValue(lAttributeName)
+                      If IsNumeric(lOldValue) Then
+                        Dim lPercentDifference As Double = (lNewValue - lOldValue) / lOldValue
+                        If Not Double.IsNaN(lPercentDifference) AndAlso _
+                           Not Double.IsInfinity(lPercentDifference) AndAlso _
+                           Math.Abs(lPercentDifference) > 0.005 Then
+                          Return lModifiedData.Attributes.GetFormattedValue(lAttributeName) & " (" _
+                               & Format(lPercentDifference, "+#,##0.##%;-#,##0.##%") & ")"
+                        End If
+                      End If
+                    End If
+                    Return lModifiedData.Attributes.GetFormattedValue(lAttributeName)
+                  End If
+                Next
+            End Select
             Return "" '    "(click to modify)"
-
-        End Select
-        'Select Case aColumn
-        '  Case Is < 0
-        '    Return ""
-        '  Case Is > pDataManager.DisplayAttributes.Count
-        '    Return ""
-        '  Case pDataManager.DisplayAttributes.Count
-        '    Dim lDataset As atcDataSet = pBaseScenario(aRow - (pLabelRow + 1)).Attributes.GetValue(atcScenarioBuilderForm.ModifiedAttrName, Nothing)
-        '    If lDataset Is Nothing Then
-        '      Return "(click to modify)"
-        '    Else
-        '      Return lDataset.Attributes.GetValue("Data Source", lDataset.ToString)
-        '    End If
-        '  Case Else
-        '    Return pBaseScenario(aRow - (pLabelRow + 1)).Attributes.GetFormattedValue(pDataManager.DisplayAttributes(aColumn))
-        'End Select
+          End If
+          lRow += lScenarioAttributes.Count
+        Next
       End If
     End Get
     Set(ByVal newValue As String)
