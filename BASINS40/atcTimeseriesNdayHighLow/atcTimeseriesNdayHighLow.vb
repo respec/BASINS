@@ -201,10 +201,35 @@ Public Class atcTimeseriesNdayHighLow
   End Function
 
   Private Sub Compute7q10(ByVal aTimeseries As atcTimeseries)
+
+    'calculate the 7 day low annual timeseries
     Dim lLowTS As atcTimeseries = HighOrLowTimeseries(aTimeseries, 7, False)
+
+    'save 7 day low annual timeseries
     Me.AddDataSet(lLowTS)
     If Not DataManager.DataSources.Contains(Me) Then DataManager.DataSources.Add(Me)
-    'TODO: Compute 
+
+    'calc log10 of 7 day low annual series
+    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+    Dim lArgsMath As New atcDataAttributes
+    lArgsMath.SetValue("timeseries", New atcDataGroup(lLowTS))
+    DataManager.OpenDataSource(lTsMath, "log 10", lArgsMath)
+
+    Dim lLowTsLog As atcTimeseries = lTsMath.DataSets(0)
+    Dim lN As Integer = lLowTsLog.Attributes.GetValue("Count")
+    Dim lNzi As Integer = lLowTsLog.numValues - lN
+    Dim lMean As Double = lLowTsLog.Attributes.GetValue("Mean")
+    Dim lStd As Double = lLowTsLog.Attributes.GetValue("Standard Deviation")
+    Dim lSkew As Double = lLowTsLog.Attributes.GetValue("Skew")
+    Dim lRecurOrProb As Double = 10.0
+    Dim lQ As Double
+
+    PearsonType3(lN, lNzi, lMean, lStd, lSkew, lRecurOrProb, lQ)
+
+    Dim lQ10 As Double = 10 ^ lQ  'remove log10 transform, lSe was reversed due to low
+    aTimeseries.Attributes.SetValue("7Q10", lQ10)
+    lLowTS.Attributes.SetValue("7Q10", lQ10)
+
   End Sub
 
   'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
@@ -236,5 +261,9 @@ Public Class atcTimeseriesNdayHighLow
       atcDataAttributes.AddDefinition(lOperation.Definition)
     Next
   End Sub
+
+  Public Overrides Function NewOne() As atcDataPlugin
+    Return New atcTimeseriesNdayHighLow
+  End Function
 
 End Class

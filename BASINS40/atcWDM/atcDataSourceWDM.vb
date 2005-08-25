@@ -849,17 +849,15 @@ Public Class atcDataSourceWDM
     Dim nVals As Integer
     Dim iVal As Integer
     Dim lRetcod As Integer
-    Dim sdat(6) As Integer 'starting date
-    Dim edat(6) As Integer 'ending (or current) date
-    Dim f() As Integer
+    Dim lSdat(6) As Integer 'starting date
+    Dim lEdat(6) As Integer 'ending (or current) date
     Dim lTsFill As Double
-    'Dim lWdmOpen As Integer
 
     If Not DataSets.Contains(aReadMe) Then
       LogDbg("WDM cannot read dataset not from this file")
     Else
       Dim lReadTS As atcTimeseries = aReadMe
-      'System.Diagnostics.Debug.WriteLine("WDM read data " & ReadDataset.Attributes.GetValue("Location"))
+      'LogDbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))
       Dim lWdmHandle As New atcWdmHandle(0, Specification)
       'BasInfAvail = ReadBasInf()
       If lWdmHandle.Unit > 0 Then
@@ -873,12 +871,12 @@ Public Class atcDataSourceWDM
             lReadTS.Dates.ValuesNeedToBeRead = False
 
             Dim lSJDay As Double = .GetValue("SJDay", 0)
-            J2Date(lSJDay, sdat)
+            J2Date(lSJDay, lSdat)
             nVals = lReadTS.numValues
             If nVals = 0 Then 'constant inverval???
               Dim lEJDay As Double = .GetValue("EJDay", 0)
-              J2Date(lEJDay, edat)
-              timdif(sdat, edat, .GetValue("tu", 0), .GetValue("ts", 0), nVals)
+              J2Date(lEJDay, lEdat)
+              timdif(lSdat, lEdat, .GetValue("tu", 0), .GetValue("ts", 0), nVals)
               lReadTS.numValues = nVals
             End If
             If nVals > 0 Then
@@ -888,7 +886,7 @@ Public Class atcDataSourceWDM
               Dim lTimeUnits As Integer = CInt(.GetValue("tu", 0))
               Dim lTran As Integer = 0 'transformation = aver,same
               Dim lQual As Integer = 31 'allowed quality code
-              F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, sdat(0), nVals, _
+              F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat(0), nVals, _
                          lTran, lQual, lTimeUnits, v(1), lRetcod)
 
               ReDim dd(nVals)
@@ -912,8 +910,8 @@ Public Class atcDataSourceWDM
                 If lConstInterval Then
                   dd(iVal) = lSJDay + iVal * lInterval
                 Else
-                  TIMADD(sdat, lTimeUnits, lTimeStep, iVal, edat)
-                  dd(iVal) = Date2J(edat)
+                  TIMADD(lSdat, lTimeUnits, lTimeStep, iVal, lEdat)
+                  dd(iVal) = Date2J(lEdat)
                 End If
               Next
             Else
