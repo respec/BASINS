@@ -257,6 +257,7 @@ Public Class atcGrid
       Dim lCellValue As String
       Dim lCellAlignment As Integer
       Dim lCellValueSize As SizeF
+      Dim lCellValueLeftSize As SizeF
 
       'Clear whole area to default cell background color
       g.FillRectangle(lCellBrush, 0, 0, visibleWidth, visibleHeight)
@@ -361,14 +362,35 @@ Public Class atcGrid
                 End Select
                 lCellValueSize = g.MeasureString(lCellValue, pFont)
               End While
+
+              Dim lTabPos As Integer = lCellValue.IndexOf(vbTab)
+              Dim lMainValue As String
+              If lTabPos >= 0 Then
+                lMainValue = lCellValue.Substring(0, lTabPos)
+              Else
+                lMainValue = lCellValue
+              End If
+
               Select Case lCellAlignment And atcAlignment.HAlign
                 Case atcAlignment.HAlignLeft
                   x = lCellLeft
                 Case atcAlignment.HAlignRight
                   x = pColRight(iColumn - pLeftColumn) - lCellValueSize.Width
                 Case atcAlignment.HAlignCenter
+                  lCellValueSize = g.MeasureString(lMainValue, pFont)
                   x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft - lCellValueSize.Width) / 2
-                  'Case atcAlignment.HAlignDecimal 'TODO: implement decimal alignment
+                Case atcAlignment.HAlignDecimal
+                  If IsNumeric(lMainValue) Then
+                    Dim lDecimalPos As Integer = lMainValue.IndexOf(".")
+                    If lDecimalPos = -1 Then
+                      lCellValueLeftSize = g.MeasureString(lMainValue, pFont)
+                    Else
+                      lCellValueLeftSize = g.MeasureString(lMainValue.Substring(0, lDecimalPos), pFont)
+                    End If
+                    x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft) / 2 - lCellValueLeftSize.Width
+                  Else 'Left-align non-numeric values
+                    x = lCellLeft
+                  End If
                 Case Else 'Default to left alignment 
                   x = lCellLeft
               End Select
@@ -380,7 +402,13 @@ Public Class atcGrid
                 Case Else 'atcAlignment.VAlignCenter 'Default to centering vertically 
                   y = lCellTop + (pRowBottom(iRow - pTopRow) - lCellTop - lCellValueSize.Height) / 2
               End Select
-              g.DrawString(lCellValue, pFont, Brushes.Black, x, y) 'TODO: allow flexibility of brush
+              If lTabPos >= 0 Then 'Right-align part of text after tab
+                g.DrawString(lMainValue, pFont, Brushes.Black, x, y)
+                x = pColRight(iColumn - pLeftColumn) - g.MeasureString(lCellValue.Substring(lTabPos + 1), pFont).Width
+                g.DrawString(lCellValue.Substring(lTabPos + 1), pFont, Brushes.Black, x, y)
+              Else
+                g.DrawString(lCellValue, pFont, Brushes.Black, x, y) 'TODO: allow flexibility of brush
+              End If
             End If
             If iColumn < lColumns - 1 Then lCellLeft = pColRight(iColumn - pLeftColumn)
           End If
@@ -401,7 +429,21 @@ Public Class atcGrid
     For iRow As Integer = pTopRow To lastRow
       lCellValue = pSource.CellValue(iRow, aColumn)
       If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
-        lCellWidth = g.MeasureString(lCellValue, pFont).Width + COL_TOLERANCE
+        If pSource.Alignment(iRow, aColumn) And atcAlignment.HAlign = atcAlignment.HAlignDecimal Then
+          If IsNumeric(lCellValue) Then
+            Dim lDecimalPos As Integer = lCellValue.IndexOf(".")
+            If lDecimalPos = -1 Then
+              lCellWidth = (g.MeasureString(lCellValue, pFont).Width + COL_TOLERANCE) * 2
+            Else
+              lCellWidth = Math.Max(g.MeasureString(lCellValue.Substring(0, lDecimalPos), pFont).Width, _
+                                    g.MeasureString(lCellValue.Substring(lDecimalPos), pFont).Width) * 2 + COL_TOLERANCE
+            End If
+          Else
+            lCellWidth = g.MeasureString(lCellValue, pFont).Width + COL_TOLERANCE
+          End If
+        Else
+          lCellWidth = g.MeasureString(lCellValue, pFont).Width + COL_TOLERANCE
+        End If
         If lCellWidth > ColumnWidth(aColumn) Then
           ColumnWidth(aColumn) = lCellWidth
         End If
@@ -449,6 +491,8 @@ Public Class atcGrid
       Case MouseButtons.None
         If ColumnEdgeToDrag(e.X) >= 0 Then
           newCursor = Cursors.SizeWE
+        ElseIf ColumnDecimalToDrag(e.X, e.Y) >= 0 Then
+          newCursor = Cursors.SizeWE
         End If
         If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
       Case MouseButtons.Left
@@ -490,6 +534,27 @@ Public Class atcGrid
       End If
       lColumn += 1
     End While
+    Return -1
+  End Function
+
+  Private Function ColumnDecimalToDrag(ByVal X As Integer, ByVal Y As Integer) As Integer
+    Dim lRow As Integer = 0
+    Dim lColumn As Integer = pLeftColumn
+    Dim lColLeft As Integer = 0
+    While lRow < pRowBottom.Count AndAlso Y > pRowBottom(lRow)
+      lRow += 1
+    End While
+    While lColumn < pColRight.Count AndAlso X > pColRight(lColumn)
+      lColLeft = pColRight(lColumn)
+      lColumn += 1
+    End While
+
+    If pSource.Alignment(lRow, lColumn) = atcAlignment.HAlignDecimal Then
+      'If within tolerance of column edge and column is not being hidden by a zero width
+      If Math.Abs(X - (pColRight(lColumn) + lColLeft) / 2) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
+        Return lColumn + pLeftColumn
+      End If
+    End If
     Return -1
   End Function
 
