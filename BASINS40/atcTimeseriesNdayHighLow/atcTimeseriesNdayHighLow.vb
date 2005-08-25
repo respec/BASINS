@@ -66,12 +66,13 @@ Public Class atcTimeseriesNdayHighLow
         End With
 
         AddOperation("7Q10", "Seven day low flow 10-year return period", defTimeSeriesOne)
+        AddOperation("1Hi100", "One day high 100-year return period", defTimeSeriesOne)
 
-        'AddOperation("n-day low value", "n-day low value for a return period", _
-        '             defCategory, defTimeSeriesOne, defDays, defReturnPeriod)
+        AddOperation("n-day low value", "n-day low value for a return period", _
+                     defTimeSeriesOne, defDays, defReturnPeriod)
 
-        'AddOperation("n-day high value", "n-day high value for a return period", _
-        '             defCategory, defTimeSeriesOne, defDays, defReturnPeriod)
+        AddOperation("n-day high value", "n-day high value for a return period", _
+                     defTimeSeriesOne, defDays, defReturnPeriod)
 
       End If
       Return pAvailableOperations
@@ -99,7 +100,7 @@ Public Class atcTimeseriesNdayHighLow
 
   End Function
 
-  'Take care of missing values before calling this function
+  'Take care of missing values by setting to NaN before calling this function
   Private Function HighOrLowValue(ByVal aTS As atcTimeseries, ByVal aNumValues As Integer, ByVal aHigh As Boolean) As Double
     If aNumValues > 0 And aTS.numValues >= aNumValues Then
       Dim lBestSoFar As Double
@@ -200,35 +201,42 @@ Public Class atcTimeseriesNdayHighLow
     End Try
   End Function
 
-  Private Sub Compute7q10(ByVal aTimeseries As atcTimeseries)
+  Private Sub ComputeFreq(ByVal aTimeseries As atcTimeseries, _
+                          ByVal aNDay As Integer, _
+                          ByVal aHigh As Boolean, _
+                          ByVal aRecurOrProb As Double, _
+                          ByVal aLogFg As Boolean)
 
-    'calculate the 7 day low annual timeseries
-    Dim lLowTS As atcTimeseries = HighOrLowTimeseries(aTimeseries, 7, False)
+    'calculate the n day annual timeseries
+    Dim lNdayTs As atcTimeseries = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
 
-    'save 7 day low annual timeseries
-    Me.AddDataSet(lLowTS)
-    If Not DataManager.DataSources.Contains(Me) Then DataManager.DataSources.Add(Me)
+    'save n day annual timeseries
+    'Me.AddDataSet(lNdayTs)
+    'If Not DataManager.DataSources.Contains(Me) Then DataManager.DataSources.Add(Me)
 
-    'calc log10 of 7 day low annual series
-    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-    Dim lArgsMath As New atcDataAttributes
-    lArgsMath.SetValue("timeseries", New atcDataGroup(lLowTS))
-    DataManager.OpenDataSource(lTsMath, "log 10", lArgsMath)
+    If aLogFg Then 'calc log10 of n day annual series
+      Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+      Dim lArgsMath As New atcDataAttributes
+      lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
+      DataManager.OpenDataSource(lTsMath, "log 10", lArgsMath)
+      lNdayTs = lTsMath.DataSets(0)
+    End If
 
-    Dim lLowTsLog As atcTimeseries = lTsMath.DataSets(0)
-    Dim lN As Integer = lLowTsLog.Attributes.GetValue("Count")
-    Dim lNzi As Integer = lLowTsLog.numValues - lN
-    Dim lMean As Double = lLowTsLog.Attributes.GetValue("Mean")
-    Dim lStd As Double = lLowTsLog.Attributes.GetValue("Standard Deviation")
-    Dim lSkew As Double = lLowTsLog.Attributes.GetValue("Skew")
-    Dim lRecurOrProb As Double = 10.0
-    Dim lQ As Double
+    Dim lQ As Double = PearsonType3(lNdayTs, aRecurOrProb, aHigh)
 
-    PearsonType3(lN, lNzi, lMean, lStd, lSkew, lRecurOrProb, lQ)
+    If aLogFg Then 'remove log10 transform 
+      lQ = 10 ^ lQ
+    End If
 
-    Dim lQ10 As Double = 10 ^ lQ  'remove log10 transform, lSe was reversed due to low
-    aTimeseries.Attributes.SetValue("7Q10", lQ10)
-    lLowTS.Attributes.SetValue("7Q10", lQ10)
+    Dim lS As String
+    If aNDay = 7 And Not aHigh Then
+      lS = "Q"
+    ElseIf aHigh Then
+      lS = "Hi"
+    Else
+      lS = "Low"
+    End If
+    aTimeseries.Attributes.SetValue(aNDay & lS & aRecurOrProb, lQ)
 
   End Sub
 
@@ -248,11 +256,26 @@ Public Class atcTimeseriesNdayHighLow
       ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
     End If
 
-    If aOperationName.ToLower = "7q10" Then
-      For Each lTs In ltsGroup
-        Compute7q10(lTs)
-      Next
-    End If
+    For Each lTs In ltsGroup
+      Select Case aOperationName.ToLower
+        Case "7q10" : ComputeFreq(lTs, 7, False, 10.0, True)
+        Case "1hi100" : ComputeFreq(lTs, 1, True, 100.0, True)
+        Case "n-day low value"
+          Dim lNDay As Integer = 7
+          If Not aArgs Is Nothing Then
+            lNday = aArgs.GetValue("NDay")
+          End If
+          Dim lNdayTs As atcTimeseries = HighOrLowTimeseries(lTs, lNDay, False)
+          Me.DataSets.Add(lNdayTs)
+        Case "n-day high value"
+          Dim lNDay As Integer = 1
+          If Not aArgs Is Nothing Then
+            lNday = aArgs.GetValue("NDay")
+          End If
+          Dim lNdayTs As atcTimeseries = HighOrLowTimeseries(lTs, lNDay, True)
+          Me.DataSets.Add(lNdayTs)
+      End Select
+    Next
     Return True 'todo: error checks
   End Function
 
