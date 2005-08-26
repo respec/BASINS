@@ -176,7 +176,7 @@ Public Class atcAttributeDefinition
     Category = ""
     Help = ""
     TypeString = "String"
-    DefaultValue = ""
+    DefaultValue = Nothing
     ID = 0
     Editable = True
     Min = Double.NaN
