@@ -151,6 +151,7 @@ Friend Class frmSelectData
     '
     'btnCancel
     '
+    Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
     Me.btnCancel.Location = New System.Drawing.Point(125, 9)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(96, 28)
@@ -265,7 +266,9 @@ Friend Class frmSelectData
     '
     'frmSelectData
     '
+    Me.AcceptButton = Me.btnOk
     Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.CancelButton = Me.btnCancel
     Me.ClientSize = New System.Drawing.Size(633, 605)
     Me.Controls.Add(Me.groupSelected)
     Me.Controls.Add(Me.splitAboveSelected)

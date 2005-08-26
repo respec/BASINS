@@ -310,7 +310,9 @@ Public Class PlugIn
           End If
         Case "AddData"
           Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
-          pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+          If Not lNewSource Is Nothing Then 'user did not cancel
+            pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+          End If
         Case "ManageDataSources"
           pDataManager.UserManage()
         Case Else : MsgBox("Data Tool " & ItemName)

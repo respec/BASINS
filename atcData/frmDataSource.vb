@@ -70,6 +70,7 @@ Public Class frmDataSource
     '
     'btnCancel
     '
+    Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
     Me.btnCancel.Location = New System.Drawing.Point(125, 9)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(96, 28)
@@ -86,7 +87,9 @@ Public Class frmDataSource
     '
     'frmDataSource
     '
+    Me.AcceptButton = Me.btnOk
     Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.CancelButton = Me.btnCancel
     Me.ClientSize = New System.Drawing.Size(355, 614)
     Me.Controls.Add(Me.pnlButtons)
     Me.Controls.Add(Me.treeSources)
