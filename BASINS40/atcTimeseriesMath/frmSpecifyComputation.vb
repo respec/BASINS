@@ -51,24 +51,25 @@ Public Class frmSpecifyComputation
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.pnlButtons.Location = New System.Drawing.Point(0, 205)
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 236)
     Me.pnlButtons.Name = "pnlButtons"
-    Me.pnlButtons.Size = New System.Drawing.Size(520, 40)
+    Me.pnlButtons.Size = New System.Drawing.Size(624, 46)
     Me.pnlButtons.TabIndex = 13
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(104, 8)
+    Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+    Me.btnCancel.Location = New System.Drawing.Point(125, 9)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(80, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(96, 28)
     Me.btnCancel.TabIndex = 4
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(8, 8)
+    Me.btnOk.Location = New System.Drawing.Point(10, 9)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(80, 24)
+    Me.btnOk.Size = New System.Drawing.Size(96, 28)
     Me.btnOk.TabIndex = 3
     Me.btnOk.Text = "Ok"
     '
@@ -76,24 +77,26 @@ Public Class frmSpecifyComputation
     '
     Me.lblName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblName.Location = New System.Drawing.Point(8, 8)
+    Me.lblName.Location = New System.Drawing.Point(10, 9)
     Me.lblName.Name = "lblName"
-    Me.lblName.Size = New System.Drawing.Size(504, 16)
+    Me.lblName.Size = New System.Drawing.Size(604, 19)
     Me.lblName.TabIndex = 14
     '
     'lblDescription
     '
     Me.lblDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblDescription.Location = New System.Drawing.Point(8, 32)
+    Me.lblDescription.Location = New System.Drawing.Point(10, 37)
     Me.lblDescription.Name = "lblDescription"
-    Me.lblDescription.Size = New System.Drawing.Size(504, 16)
+    Me.lblDescription.Size = New System.Drawing.Size(604, 18)
     Me.lblDescription.TabIndex = 15
     '
     'frmSpecifyComputation
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(520, 245)
+    Me.AcceptButton = Me.btnOk
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.CancelButton = Me.btnCancel
+    Me.ClientSize = New System.Drawing.Size(624, 282)
     Me.Controls.Add(Me.lblDescription)
     Me.Controls.Add(Me.lblName)
     Me.Controls.Add(Me.pnlButtons)
