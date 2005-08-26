@@ -1,7 +1,7 @@
 Public Class atcDataSource
   Inherits atcDataPlugin
 
-  Private pDataManager As atcDataManager
+  Private Shared pDataManager As atcDataManager
 
   Private pAttributes As atcDataAttributes
   Private pSpecification As String

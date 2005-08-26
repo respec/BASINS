@@ -110,7 +110,7 @@ Public Class atcDataAttributes
 
   'Retrieve or calculate the value for aAttributeName
   'returns aDefault if attribute has not been set and cannot be calculated
-  Public Function GetValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As Object
+  Public Function GetValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = Nothing) As Object
     Dim key As String = aAttributeName.ToLower
     Dim tmpAttribute As atcDefinedValue
     Try
@@ -121,8 +121,18 @@ Public Class atcDataAttributes
 
       Return aDefault 'Not found and could not calculate
     End Try
+
     If tmpAttribute Is Nothing Then
-      Return aDefault
+      If aDefault Is Nothing Then
+        Dim lDef As atcAttributeDefinition = GetDefinition(aAttributeName)
+        If lDef Is Nothing Then
+          Return aDefault
+        Else
+          Return lDef.DefaultValue
+        End If
+      Else
+        Return aDefault
+      End If
     Else
       Return tmpAttribute.Value
     End If
@@ -260,20 +270,23 @@ Public Class atcDataAttributes
           Dim lOwnerTS As atcTimeseries = Owner
           Dim tmpDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(key)
           If Not tmpDef Is Nothing Then 'We have a definition for this attribute but no value
-            If tmpDef.Calculated Then   'Maybe we can go ahead and calculate it now...
-              Dim lOperation As atcDefinedValue = tmpDef.Calculator.AvailableOperations.GetDefinedValue(key)
-              If Not lOperation Is Nothing AndAlso Not lOperation.Arguments Is Nothing Then
-                If lOperation.Arguments.Count = 1 Then 'Simple calculation has only one argument
-                  Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
-                  If lArg.Definition.TypeString = "atcTimeseries" Then 'Only argument must be atcTimeseries
-                    Dim tmpArgs As atcDataAttributes = lOperation.Arguments.Clone
-                    tmpArgs.SetValue(lArg.Definition, lOwnerTS)
-                    tmpDef.Calculator.Open(tmpDef.Name, tmpArgs)
-                    tmpAttribute = ItemByKey(key)
+            Select Case tmpDef.TypeString.ToLower
+              Case "double", "integer", "boolean", "string"
+                If tmpDef.Calculated Then   'Maybe we can go ahead and calculate it now...
+                  Dim lOperation As atcDefinedValue = tmpDef.Calculator.AvailableOperations.GetDefinedValue(key)
+                  If Not lOperation Is Nothing AndAlso Not lOperation.Arguments Is Nothing Then
+                    If lOperation.Arguments.Count = 1 Then 'Simple calculation has only one argument
+                      Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
+                      If lArg.Definition.TypeString = "atcTimeseries" Then 'Only argument must be atcTimeseries
+                        Dim tmpArgs As atcDataAttributes = lOperation.Arguments.Clone
+                        tmpArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
+                        tmpDef.Calculator.Open(tmpDef.Name, tmpArgs)
+                        tmpAttribute = ItemByKey(key)
+                      End If
+                    End If
                   End If
                 End If
-              End If
-            End If
+            End Select
           End If
         Catch CalcExcep As Exception
         End Try

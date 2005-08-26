@@ -100,7 +100,7 @@ Public Class atcTimeseriesStatistics
     With lResult
       .Name = aName
       .Description = aDescription
-      .DefaultValue = ""
+      .DefaultValue = Double.NaN
       .Editable = False
       .TypeString = "Double"
       .Calculator = Me
@@ -115,7 +115,9 @@ Public Class atcTimeseriesStatistics
   Private Sub ComputeStatistics(ByVal aTimeseries As atcTimeseries)
     Dim lLastValueIndex As Integer = aTimeseries.numValues
 
-    If lLastValueIndex > 0 Then
+    If lLastValueIndex = 0 Then
+      aTimeseries.Attributes.SetValue("Count", 0)
+    ElseIf lLastValueIndex > 0 Then
       Dim lIndex As Integer
       Dim lVal As Double
       Dim lDev As Double
@@ -233,14 +235,15 @@ Public Class atcTimeseriesStatistics
   'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
   'remaining aArgs are expected to follow the args required for the specified operation
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
+    Dim ltsGroup As atcDataGroup
     If aArgs Is Nothing Then
-      Dim ltsGroup As atcDataGroup = DataManager.UserSelectData("Select data to compute statistics for")
-      For Each lts As atcTimeseries In ltsGroup
-        ComputeStatistics(lts)
-      Next
+      ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
     Else
-      ComputeStatistics(aArgs.GetValue("Timeseries"))
+      ltsGroup = aArgs.GetValue("Timeseries")
     End If
+    For Each lts As atcTimeseries In ltsGroup
+      ComputeStatistics(lts)
+    Next
   End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)

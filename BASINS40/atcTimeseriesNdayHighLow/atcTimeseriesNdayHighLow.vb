@@ -190,6 +190,8 @@ Public Class atcTimeseriesNdayHighLow
 
       newTS.Attributes.SetValue("Tu", 6)
       newTS.Attributes.SetValue("Ts", 1)
+      newTS.Attributes.SetValue("HighFlag", aHigh)
+      newTS.Attributes.SetValue("NDay", aNumValues)
 
       Dim lDescription As String = aNumValues & " day annual "  'TODO: fill in day and annual
       If aHigh Then
@@ -214,47 +216,61 @@ Public Class atcTimeseriesNdayHighLow
                           ByVal aLogFg As Boolean)
 
     Dim lNdayTs As atcTimeseries
+    Dim lTsMath As atcDataSource
 
     If aTimeseries.Attributes.GetValue("Tu", 1) <> 6 Then
       'calculate the n day annual timeseries
       lNdayTs = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
     Else 'already an annual timeseries
-      lNdayTs = aTimeseries
+      If (aHigh = aTimeseries.Attributes.GetValue("HighFlag") And _
+         aNDay = aTimeseries.Attributes.GetValue("NDay")) Then
+        lNdayTs = aTimeseries
+      End If
     End If
 
-    If aLogFg Then 'calc log10 of n day annual series
-      Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-      Dim lArgsMath As New atcDataAttributes
-      lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
-      DataManager.OpenDataSource(lTsMath, "log 10", lArgsMath)
-      lNdayTs = lTsMath.DataSets(0)
-    End If
+    If Not lNdayTs Is Nothing Then
+      If aLogFg Then 'calc log10 of n day annual series
+        Dim lArgsMath As New atcDataAttributes
+        lTsMath = New atcTimeseriesMath.atcTimeseriesMath
+        lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
+        'DataManager.OpenDataSource(lTsMath, "log 10", lArgsMath)
+        lTsMath.Open("log 10", lArgsMath)
+        lNdayTs = lTsMath.DataSets(0)
+      End If
 
-    Dim lQ As Double = PearsonType3(lNdayTs, aRecurOrProb, aHigh)
+      Dim lQ As Double = PearsonType3(lNdayTs, aRecurOrProb, aHigh)
 
-    If aLogFg Then 'remove log10 transform 
-      lQ = 10 ^ lQ
-    End If
+      If aLogFg Then 'remove log10 transform 
+        lQ = 10 ^ lQ
+        DataManager.DataSources.Remove(lTsMath)
+        lTsMath = Nothing
+      End If
 
-    Dim lS As String
-    If aNDay = 7 And aRecurOrProb = 10 And Not aHigh Then
-      lS = aNDay & "Q" & aRecurOrProb
-    ElseIf aHigh Then
-      lS = aNDay & "Hi" & aRecurOrProb
-    Else
-      lS = aNDay & "Low" & aRecurOrProb
+      Dim lS As String
+      If aNDay = 7 And aRecurOrProb = 10 And Not aHigh Then
+        lS = aNDay & "Q" & aRecurOrProb
+      ElseIf aHigh Then
+        lS = aNDay & "Hi" & aRecurOrProb
+      Else
+        lS = aNDay & "Low" & aRecurOrProb
+      End If
+      Dim lNewAttribute As New atcAttributeDefinition
+      With lNewAttribute
+        .Name = lS
+        .Description = lS
+        .DefaultValue = ""
+        .Editable = False
+        .TypeString = "Double"
+        .Calculator = Me
+        .Category = "nDay & Frequency"
+      End With
+      aTimeseries.Attributes.SetValue(lNewAttribute, lQ)
+
+      If Not (aTimeseries Is lNdayTs) Then 'get rid of intermediate timeseries
+        lNdayTs = Nothing
+        Me.DataSets.Clear()
+      End If
     End If
-    Dim lNewAttribute As New atcAttributeDefinition
-    With lNewAttribute
-      .Name = lS
-      .Description = lS
-      .DefaultValue = ""
-      .Editable = False
-      .TypeString = "Double"
-      .Calculator = Me
-      .Category = "nDay & Frequency"
-    End With
-    aTimeseries.Attributes.SetValue(lNewAttribute, lQ)
 
   End Sub
 
@@ -302,7 +318,12 @@ Public Class atcTimeseriesNdayHighLow
           Me.DataSets.Add(lNDayTs)
       End Select
     Next
-    Return True 'todo: error checks
+
+    If Me.DataSets.Count > 0 Then
+      Return True 'todo: error checks
+    Else
+      Return False 'no datasets added, not a data source
+    End If
   End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
