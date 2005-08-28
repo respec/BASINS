@@ -47,10 +47,6 @@ Friend Class atcScenarioBuilderForm
   Friend WithEvents panelMiddle As System.Windows.Forms.Panel
   Friend WithEvents mnuScenarios As System.Windows.Forms.MenuItem
   Friend WithEvents mnuScenariosAdd As System.Windows.Forms.MenuItem
-  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
-  Friend WithEvents MenuItem2 As System.Windows.Forms.MenuItem
-  Friend WithEvents MenuItem3 As System.Windows.Forms.MenuItem
-  Friend WithEvents MenuItem4 As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcScenarioBuilderForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -66,10 +62,6 @@ Friend Class atcScenarioBuilderForm
     Me.splitHoriz = New System.Windows.Forms.Splitter
     Me.panelMiddle = New System.Windows.Forms.Panel
     Me.agdResults = New atcControls.atcGrid
-    Me.MenuItem1 = New System.Windows.Forms.MenuItem
-    Me.MenuItem2 = New System.Windows.Forms.MenuItem
-    Me.MenuItem3 = New System.Windows.Forms.MenuItem
-    Me.MenuItem4 = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -96,13 +88,11 @@ Friend Class atcScenarioBuilderForm
     'mnuAttributesAdd
     '
     Me.mnuAttributesAdd.Index = 0
-    Me.mnuAttributesAdd.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.MenuItem1, Me.MenuItem2})
     Me.mnuAttributesAdd.Text = "A&dd"
     '
     'mnuAttributesRemove
     '
     Me.mnuAttributesRemove.Index = 1
-    Me.mnuAttributesRemove.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.MenuItem3, Me.MenuItem4})
     Me.mnuAttributesRemove.Text = "&Remove"
     '
     'mnuDisplay
@@ -160,26 +150,6 @@ Friend Class atcScenarioBuilderForm
     Me.agdResults.Size = New System.Drawing.Size(536, 201)
     Me.agdResults.TabIndex = 3
     '
-    'MenuItem1
-    '
-    Me.MenuItem1.Index = 0
-    Me.MenuItem1.Text = "All Input"
-    '
-    'MenuItem2
-    '
-    Me.MenuItem2.Index = 1
-    Me.MenuItem2.Text = "All Results"
-    '
-    'MenuItem3
-    '
-    Me.MenuItem3.Index = 0
-    Me.MenuItem3.Text = "All Input"
-    '
-    'MenuItem4
-    '
-    Me.MenuItem4.Index = 1
-    Me.MenuItem4.Text = "All Results"
-    '
     'atcScenarioBuilderForm
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -197,6 +167,9 @@ Friend Class atcScenarioBuilderForm
   End Sub
 
 #End Region
+
+  Private Const MenuText_AllInputs = "All Input"
+  Private Const MenuText_AllResults = "All Results"
 
   Private pDataManager As atcDataManager
 
@@ -330,41 +303,61 @@ Friend Class atcScenarioBuilderForm
   Private Sub mnuAttributesAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     Dim mnuAttribute As MenuItem = sender
     Dim mnuConstituent As MenuItem = mnuAttribute.Parent
+    Dim allInputs As Boolean = mnuConstituent.Text.Equals(MenuText_AllInputs)
+    Dim allResults As Boolean = mnuConstituent.Text.Equals(MenuText_AllResults)
+    Dim lNeedMainRefresh As Boolean = False
+    Dim lNeedResultsRefresh As Boolean = False
     'MsgBox("Add " & mnuConstituent.Text, MsgBoxStyle.Information, mnuAttribute.Text)
 
     For Each lDataSet As atcDataSet In pBaseScenario.DataSets
-      If lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
-        Dim lAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes")
-        If lAttributes Is Nothing Then
-          lAttributes = New atcDataAttributes
-          lDataSet.Attributes.SetValue("Scenario Attributes", lAttributes)
-        End If
+      If allInputs OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
+        Dim lAttributes As atcDataAttributes = GetScenarioAttributes(lDataSet)
         lAttributes.SetValue(mnuAttribute.Text, "")
-        agdMain.Refresh()
+        lNeedMainRefresh = True
       End If
     Next
-    'pDataManager.DisplayAttributes.Add(mnu.Text.Substring(mnu.Text.IndexOf(" ") + 1))
-    'pDataManager.DisplayAttributes.Add(mnu.Text)
+    For Each lDataSet As atcDataSet In pBaseResults.DataSets
+      If allResults OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
+        Dim lAttributes As atcDataAttributes = GetScenarioAttributes(lDataSet)
+        lAttributes.SetValue(mnuAttribute.Text, "")
+        lNeedResultsRefresh = True
+      End If
+    Next
+    If lNeedMainRefresh Then agdMain.Refresh()
+    If lNeedResultsRefresh Then agdResults.Refresh()
     UpdatedAttributes()
   End Sub
 
   Private Sub mnuAttributesRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     Dim mnuAttribute As MenuItem = sender
     Dim mnuConstituent As MenuItem = mnuAttribute.Parent
+    Dim allInputs As Boolean = mnuConstituent.Text.Equals(MenuText_AllInputs)
+    Dim allResults As Boolean = mnuConstituent.Text.Equals(MenuText_AllResults)
+    Dim lNeedMainRefresh As Boolean = False
+    Dim lNeedResultsRefresh As Boolean = False
     'MsgBox("Remove " & mnuConstituent.Text, MsgBoxStyle.Information, mnuAttribute.Text)
 
     For Each lDataSet As atcDataSet In pBaseScenario.DataSets
-      If lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
+      If allInputs OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
         Dim lAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes")
         If Not lAttributes Is Nothing Then
           lAttributes.RemoveByKey(mnuAttribute.Text.ToLower)
-          agdMain.Refresh()
+          lNeedMainRefresh = True
         End If
       End If
     Next
-    'Dim mnu As MenuItem = sender
-    'Dim index As Integer = mnu.Index
-    'pDataManager.DisplayAttributes.RemoveAt(index)
+
+    For Each lDataSet As atcDataSet In pBaseResults.DataSets
+      If allResults OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
+        Dim lAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes")
+        If Not lAttributes Is Nothing Then
+          lAttributes.RemoveByKey(mnuAttribute.Text.ToLower)
+          lNeedResultsRefresh = True
+        End If
+      End If
+    Next
+    If lNeedMainRefresh Then agdMain.Refresh()
+    If lNeedResultsRefresh Then agdResults.Refresh()
     UpdatedAttributes()
   End Sub
 
@@ -388,25 +381,69 @@ Friend Class atcScenarioBuilderForm
     End If
   End Sub
 
-  Private Sub UpdatedAttributes()
-    'If Not pInitializing Then
+  Private Function GetScenarioAttributes(ByVal aDataSet As atcDataSet) As atcDataAttributes
+    Dim lAttributes As atcDataAttributes = aDataSet.Attributes.GetValue("Scenario Attributes")
+    If lAttributes Is Nothing Then
+      lAttributes = New atcDataAttributes
+      lAttributes.Add("Min", "")
+      lAttributes.Add("Max", "")
+      lAttributes.Add("Mean", "")
+      aDataSet.Attributes.SetValue("Scenario Attributes", lAttributes)
+    End If
+    Return lAttributes
+  End Function
+
+  Private Sub PopulateAddRemoveAttributesMenus(ByVal aDataSet As atcDataSet, ByRef aAddedConstituents As String, ByRef lAttributeRemovable As String)
     Dim lConstituent As String
-    Dim lAddedConstituents As String = "++"
     Dim mnuConstituentAdd As MenuItem
     Dim mnuConstituentRemove As MenuItem
+    Dim mnuAttribute As MenuItem
+    lConstituent = aDataSet.Attributes.GetValue("constituent")
+    If lConstituent.Length > 0 AndAlso aAddedConstituents.IndexOf("++" & lConstituent & "++") = -1 Then
+      Dim lAddedAttributes As String = "++"
+      aAddedConstituents &= lConstituent & "++"
+      mnuConstituentAdd = mnuAttributesAdd.MenuItems.Add(lConstituent)
+      mnuConstituentRemove = mnuAttributesRemove.MenuItems.Add(lConstituent)
+      'AddHandler mnu.Click, AddressOf mnuAttributesRemove_Click
+      Dim lAttributes As atcDataAttributes = GetScenarioAttributes(aDataSet)
+      For Each lAttribute As atcDefinedValue In lAttributes
+        lAddedAttributes &= lAttribute.Definition.Name & "++"
+        mnuAttribute = mnuConstituentRemove.MenuItems.Add(lAttribute.Definition.Name)
+        AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
+      Next
+      Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
+      For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
+        If lAddedAttributes.IndexOf("++" & lAttributeDef.Name & "++") = -1 Then
+          mnuAttribute = mnuConstituentAdd.MenuItems.Add(lAttributeDef.Name)
+          AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+        End If
+      Next
+      lAttributeRemovable &= lAddedAttributes
+    End If
+
+  End Sub
+
+  Private Sub UpdatedAttributes()
+    'If Not pInitializing Then
+    Dim lAddedConstituents As String = "++"
+    Dim lAttributeRemovable As String = "++"
+    Dim mnuConstituentAddInputs As MenuItem
+    Dim mnuConstituentRemoveInputs As MenuItem
+    Dim mnuConstituentAddResults As MenuItem
+    Dim mnuConstituentRemoveResults As MenuItem
     Dim mnuAttribute As MenuItem
     Dim iLastAttribute As Integer
     Dim iAttribute As Integer
     Dim lDataSet As atcDataSet
 
-    For Each mnuConstituentAdd In mnuAttributesAdd.MenuItems
+    For Each mnuConstituentAdd As MenuItem In mnuAttributesAdd.MenuItems
       For Each mnuAttribute In mnuConstituentAdd.MenuItems
         RemoveHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
       Next
       'RemoveHandler mnuConstituentAdd.Click, AddressOf mnuAttributesAdd_Click
     Next
 
-    For Each mnuConstituentRemove In mnuAttributesRemove.MenuItems
+    For Each mnuConstituentRemove As MenuItem In mnuAttributesRemove.MenuItems
       For Each mnuAttribute In mnuConstituentRemove.MenuItems
         RemoveHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
       Next
@@ -416,69 +453,42 @@ Friend Class atcScenarioBuilderForm
     mnuAttributesRemove.MenuItems.Clear()
     mnuAttributesAdd.MenuItems.Clear()
 
-    mnuConstituentAdd = mnuAttributesRemove.MenuItems.Add("All Input")
-    'AddHandler mnuConstituentAdd.Click, AddressOf mnuAttributesRemove_Click
-    mnuConstituentAdd = mnuAttributesRemove.MenuItems.Add("All Results")
-    'AddHandler mnuConstituentAdd.Click, AddressOf mnuAttributesRemove_Click
+    mnuConstituentAddInputs = mnuAttributesAdd.MenuItems.Add(MenuText_AllInputs)
+    'AddHandler mnuAttributesAdd.Click, AddressOf mnuAttributesRemove_Click
+    mnuConstituentAddResults = mnuAttributesAdd.MenuItems.Add(MenuText_AllResults)
+    'AddHandler mnuAttributesAdd.Click, AddressOf mnuAttributesRemove_Click
 
-    mnuConstituentRemove = mnuAttributesRemove.MenuItems.Add("All Input")
-    'AddHandler mnuConstituentRemove.Click, AddressOf mnuAttributesRemove_Click
-    mnuConstituentRemove = mnuAttributesRemove.MenuItems.Add("All Results")
-    'AddHandler mnuConstituentRemove.Click, AddressOf mnuAttributesRemove_Click
+    mnuConstituentRemoveInputs = mnuAttributesRemove.MenuItems.Add(MenuText_AllInputs)
+    'AddHandler mnuAttributesAdd.Click, AddressOf mnuAttributesRemove_Click
+    mnuConstituentRemoveResults = mnuAttributesRemove.MenuItems.Add(MenuText_AllResults)
+    'AddHandler mnuAttributesAdd.Click, AddressOf mnuAttributesRemove_Click
 
     For Each lDataSet In pBaseScenario.DataSets
-      lConstituent = lDataSet.Attributes.GetValue("constituent")
-      If lConstituent.Length > 0 AndAlso lAddedConstituents.IndexOf("++" & lConstituent & "++") = -1 Then
-        Dim lAddedAttributes As String = "++"
-        lAddedConstituents &= lConstituent & "++"
-        mnuConstituentAdd = mnuAttributesAdd.MenuItems.Add(lConstituent)
-        mnuConstituentRemove = mnuAttributesRemove.MenuItems.Add(lConstituent)
-        'AddHandler mnu.Click, AddressOf mnuAttributesRemove_Click
-        Dim lAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes")
-        If lAttributes Is Nothing Then
-          lAttributes = New atcDataAttributes
-          lAttributes.Add("Min", "")
-          lAttributes.Add("Max", "")
-          lAttributes.Add("Mean", "")
-          lDataSet.Attributes.SetValue("Scenario Attributes", lAttributes)
-        End If
-        For Each lAttribute As atcDefinedValue In lAttributes
-          lAddedAttributes &= lAttribute.Definition.Name & "++"
-          mnuAttribute = mnuConstituentRemove.MenuItems.Add(lAttribute.Definition.Name)
-          AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
-        Next
-        Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
-      For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
-        If lAddedAttributes.IndexOf("++" & lAttributeDef.Name & "++") = -1 Then
-          mnuAttribute = mnuConstituentAdd.MenuItems.Add(lAttributeDef.Name)
-          AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
-        End If
-      Next
-      End If
+      PopulateAddRemoveAttributesMenus(lDataSet, lAddedConstituents, lAttributeRemovable)
     Next
 
-    'Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
-    'iLastAttribute = lAllDefinitions.Count - 1
-    'For iAttribute = 0 To iLastAttribute
-    '  Dim def As atcAttributeDefinition = lAllDefinitions.ItemByIndex(iAttribute)
-    '  If Not pDataManager.DisplayAttributes.Contains(def.Name) _
-    '   AndAlso def.TypeString <> "atcTimeseries" Then
-    '    'mnu = mnuAttributesAdd.MenuItems.Add("&" & iAttribute + 1 & " " & def.Name)
-    '    mnu = mnuAttributesAdd.MenuItems.Add(def.Name)
-    '    AddHandler mnu.Click, AddressOf mnuAttributesAdd_Click
-    '  End If
-    'Next
+    For Each lDataSet In pBaseResults.DataSets
+      PopulateAddRemoveAttributesMenus(lDataSet, lAddedConstituents, lAttributeRemovable)
+    Next
 
-    'iLastAttribute = pDataManager.DisplayAttributes.Count - 1
-    'If iLastAttribute > 0 Then 'Only allow moving/removing if more than one exists
-    '  For iAttribute = 0 To iLastAttribute
-    '    mnu = mnuAttributesRemove.MenuItems.Add("&" & iAttribute + 1 & " " & pDataManager.DisplayAttributes.Item(iAttribute))
-    '    AddHandler mnu.Click, AddressOf mnuAttributesRemove_Click
-    '    'mnu = mnuAttributesMove.MenuItems.Add("&" & iAttribute + 1 & " " & pcboAttribute(iAttribute).SelectedItem)
-    '    'AddHandler mnu.Click, AddressOf mnuMove_Click
-    '  Next
-    'End If
+    Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
+    For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
+      'TODO: any items that are already on for all constituents don't need to be addable
+      mnuAttribute = mnuConstituentAddInputs.MenuItems.Add(lAttributeDef.Name)
+      AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
 
+      mnuAttribute = mnuConstituentAddResults.MenuItems.Add(lAttributeDef.Name)
+      AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+
+      'offer removal of attributes currently in use by any constituent
+      If lAttributeRemovable.IndexOf("++" & lAttributeDef.Name & "++") > -1 Then
+        mnuAttribute = mnuConstituentRemoveInputs.MenuItems.Add(lAttributeDef.Name)
+        AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
+
+        mnuAttribute = mnuConstituentRemoveResults.MenuItems.Add(lAttributeDef.Name)
+        AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
+      End If
+    Next
 
     If Not pInitializing Then
       agdMain.Refresh()
@@ -791,7 +801,7 @@ Friend Class GridSource
             If lAttributeIndex = 0 Then
               Return lDataSet.Attributes.GetFormattedValue("Constituent")
             Else
-              Return """"
+              Return ""
             End If
           Case 1
             Return lAttributeName
