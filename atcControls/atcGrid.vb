@@ -403,13 +403,16 @@ Public Class atcGrid
                 Case Else 'atcAlignment.VAlignCenter 'Default to centering vertically 
                   y = lCellTop + (pRowBottom(iRow - pTopRow) - lCellTop - lCellValueSize.Height) / 2
               End Select
-              If lTabPos >= 0 Then 'Right-align part of text after tab
-                g.DrawString(lMainValue, pFont, Brushes.Black, x, y)
-                x = pColRight(iColumn - pLeftColumn) - g.MeasureString(lCellValue.Substring(lTabPos + 1), pFont).Width
-                g.DrawString(lCellValue.Substring(lTabPos + 1), pFont, Brushes.Black, x, y)
-              Else
-                g.DrawString(lCellValue, pFont, Brushes.Black, x, y) 'TODO: allow flexibility of brush
-              End If
+              Try
+                If lTabPos >= 0 Then 'Right-align part of text after tab
+                  g.DrawString(lMainValue, pFont, Brushes.Black, x, y)
+                  x = pColRight(iColumn - pLeftColumn) - g.MeasureString(lCellValue.Substring(lTabPos + 1), pFont).Width
+                  g.DrawString(lCellValue.Substring(lTabPos + 1), pFont, Brushes.Black, x, y)
+                Else
+                  g.DrawString(lCellValue, pFont, Brushes.Black, x, y) 'TODO: allow flexibility of brush
+                End If
+              Catch winErr As Exception
+              End Try
             End If
             If iColumn < lColumns - 1 Then lCellLeft = pColRight(iColumn - pLeftColumn)
           End If

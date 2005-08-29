@@ -697,7 +697,7 @@ NextName:
         iTS = pMatchingGroup.IndexOfSerial(lSerial)
         If iTS >= 0 Then 'Found matching serial number in pMatchingGroup
           Dim selTS As atcData.atcDataSet = pMatchingGroup(iTS)
-          pSelectedGroup.Add(selTS)
+          pSelectedGroup.Add(selTS.Attributes.GetValue("id"), selTS)
         End If
       End If
     End If
@@ -750,14 +750,18 @@ NextName:
   End Sub
 
   Private Sub mnuSelectAllMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAllMatching.Click
-    Dim lAdd As New atcCollection
     For Each ts As atcDataSet In pMatchingGroup
-      If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
+      If Not pSelectedGroup.Contains(ts) Then pSelectedGroup.Add(ts.Attributes.GetValue("id"), ts)
     Next
-    If lAdd.Count > 0 Then
-      pSelectedGroup.Add(lAdd)
-      RefreshSelected()
-    End If
+    RefreshSelected()
+    'Dim lAdd As New atcCollection
+    'For Each ts As atcDataSet In pMatchingGroup
+    '  If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
+    'Next
+    'If lAdd.Count > 0 Then
+    '  pSelectedGroup.Add(lAdd)
+    '  RefreshSelected()
+    'End If
   End Sub
 
   Private Sub mnuSelectNoMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectNoMatching.Click
@@ -788,7 +792,7 @@ NextName:
   Private Sub mnuAddData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddData.Click
     Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
     pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
-    pSelectedGroup.AddRange(lNewSource.DataSets)
+    pSelectedGroup.AddRange(lNewSource.DataSets) 'TODO: add with IDs as keys
   End Sub
 
   Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click
@@ -797,7 +801,7 @@ NextName:
       If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
     Next
     If lAdd.Count > 0 Then
-      pSelectedGroup.Add(lAdd)
+      pSelectedGroup.Add(lAdd) 'TODO: add with IDs as keys
       RefreshSelected()
     End If
   End Sub
