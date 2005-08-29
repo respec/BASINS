@@ -38,6 +38,7 @@ Public Class frmSpecifyComputation
   Friend WithEvents lblName As System.Windows.Forms.Label
   Friend WithEvents lblDescription As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSpecifyComputation))
     Me.pnlButtons = New System.Windows.Forms.Panel
     Me.btnCancel = New System.Windows.Forms.Button
     Me.btnOk = New System.Windows.Forms.Button
@@ -100,6 +101,7 @@ Public Class frmSpecifyComputation
     Me.Controls.Add(Me.lblDescription)
     Me.Controls.Add(Me.lblName)
     Me.Controls.Add(Me.pnlButtons)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmSpecifyComputation"
     Me.Text = "Specify Computation"
     Me.pnlButtons.ResumeLayout(False)
