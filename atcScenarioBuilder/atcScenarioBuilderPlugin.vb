@@ -6,7 +6,7 @@ Public Class atcScenarioBuilderPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::Scenario"
+      Return "Tools::ClimateChangeScenario"
     End Get
   End Property
 
