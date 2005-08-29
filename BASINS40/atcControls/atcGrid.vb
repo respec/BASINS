@@ -388,8 +388,9 @@ Public Class atcGrid
                       lCellValueLeftSize = g.MeasureString(lMainValue.Substring(0, lDecimalPos), pFont)
                     End If
                     x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft) / 2 - lCellValueLeftSize.Width
-                  Else 'Left-align non-numeric values
-                    x = lCellLeft
+                  Else 'Center non-numeric values
+                    lCellValueSize = g.MeasureString(lMainValue, pFont)
+                    x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft - lCellValueSize.Width) / 2
                   End If
                 Case Else 'Default to left alignment 
                   x = lCellLeft

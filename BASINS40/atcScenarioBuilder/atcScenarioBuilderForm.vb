@@ -47,6 +47,7 @@ Friend Class atcScenarioBuilderForm
   Friend WithEvents panelMiddle As System.Windows.Forms.Panel
   Friend WithEvents mnuScenarios As System.Windows.Forms.MenuItem
   Friend WithEvents mnuScenariosAdd As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileAddResults As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcScenarioBuilderForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -62,6 +63,7 @@ Friend Class atcScenarioBuilderForm
     Me.splitHoriz = New System.Windows.Forms.Splitter
     Me.panelMiddle = New System.Windows.Forms.Panel
     Me.agdResults = New atcControls.atcGrid
+    Me.mnuFileAddResults = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -71,13 +73,13 @@ Friend Class atcScenarioBuilderForm
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuFileAddResults})
     Me.mnuFile.Text = "File"
     '
     'mnuFileAdd
     '
     Me.mnuFileAdd.Index = 0
-    Me.mnuFileAdd.Text = "Add Timeseries"
+    Me.mnuFileAdd.Text = "Add Input"
     '
     'mnuAttributes
     '
@@ -119,24 +121,24 @@ Friend Class atcScenarioBuilderForm
     Me.agdMain.LineWidth = 0.0!
     Me.agdMain.Location = New System.Drawing.Point(0, 0)
     Me.agdMain.Name = "agdMain"
-    Me.agdMain.Size = New System.Drawing.Size(536, 249)
+    Me.agdMain.Size = New System.Drawing.Size(643, 287)
     Me.agdMain.TabIndex = 0
     '
     'splitHoriz
     '
     Me.splitHoriz.Dock = System.Windows.Forms.DockStyle.Top
-    Me.splitHoriz.Location = New System.Drawing.Point(0, 249)
+    Me.splitHoriz.Location = New System.Drawing.Point(0, 287)
     Me.splitHoriz.Name = "splitHoriz"
-    Me.splitHoriz.Size = New System.Drawing.Size(536, 8)
+    Me.splitHoriz.Size = New System.Drawing.Size(643, 10)
     Me.splitHoriz.TabIndex = 1
     Me.splitHoriz.TabStop = False
     '
     'panelMiddle
     '
     Me.panelMiddle.Dock = System.Windows.Forms.DockStyle.Top
-    Me.panelMiddle.Location = New System.Drawing.Point(0, 257)
+    Me.panelMiddle.Location = New System.Drawing.Point(0, 297)
     Me.panelMiddle.Name = "panelMiddle"
-    Me.panelMiddle.Size = New System.Drawing.Size(536, 47)
+    Me.panelMiddle.Size = New System.Drawing.Size(643, 54)
     Me.panelMiddle.TabIndex = 2
     '
     'agdResults
@@ -145,15 +147,20 @@ Friend Class atcScenarioBuilderForm
     Me.agdResults.Dock = System.Windows.Forms.DockStyle.Fill
     Me.agdResults.LineColor = System.Drawing.Color.Empty
     Me.agdResults.LineWidth = 0.0!
-    Me.agdResults.Location = New System.Drawing.Point(0, 304)
+    Me.agdResults.Location = New System.Drawing.Point(0, 351)
     Me.agdResults.Name = "agdResults"
-    Me.agdResults.Size = New System.Drawing.Size(536, 201)
+    Me.agdResults.Size = New System.Drawing.Size(643, 231)
     Me.agdResults.TabIndex = 3
+    '
+    'mnuFileAddResults
+    '
+    Me.mnuFileAddResults.Index = 1
+    Me.mnuFileAddResults.Text = "Add Results"
     '
     'atcScenarioBuilderForm
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(536, 505)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(643, 582)
     Me.Controls.Add(Me.agdResults)
     Me.Controls.Add(Me.panelMiddle)
     Me.Controls.Add(Me.splitHoriz)
@@ -300,6 +307,10 @@ Friend Class atcScenarioBuilderForm
     pDataManager.UserSelectData(, pBaseScenario.DataSets, False)
   End Sub
 
+  Private Sub mnuFileAddResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAddResults.Click
+    pDataManager.UserSelectData(, pBaseResults.DataSets, False)
+  End Sub
+
   Private Sub mnuAttributesAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     Dim mnuAttribute As MenuItem = sender
     Dim mnuConstituent As MenuItem = mnuAttribute.Parent
@@ -382,12 +393,19 @@ Friend Class atcScenarioBuilderForm
   End Sub
 
   Private Function GetScenarioAttributes(ByVal aDataSet As atcDataSet) As atcDataAttributes
+    Dim lConstituent As String
     Dim lAttributes As atcDataAttributes = aDataSet.Attributes.GetValue("Scenario Attributes")
+
     If lAttributes Is Nothing Then
       lAttributes = New atcDataAttributes
       lAttributes.Add("Min", "")
       lAttributes.Add("Max", "")
       lAttributes.Add("Mean", "")
+      lConstituent = aDataSet.Attributes.GetValue("constituent")
+      If lConstituent.ToLower = "flow" Then
+        lAttributes.Add("7Q10", "")
+        lAttributes.Add("1Hi100", "")
+      End If
       aDataSet.Attributes.SetValue("Scenario Attributes", lAttributes)
     End If
     Return lAttributes
@@ -675,7 +693,7 @@ Friend Class atcScenarioBuilderForm
     pModifiedResults.Add(lNewResults)
 
     lNewModified.Specification = "Modified_" & pModifiedScenarios.Count
-    lNewResults.Specification = "Results_" & pModifiedResults.Count
+    lNewResults.Specification = "Modified_" & pModifiedResults.Count
 
     For iColumn As Integer = 0 To pSource.Columns - 1
       agdMain.SizeColumnToContents(iColumn)
@@ -783,7 +801,7 @@ Friend Class GridSource
           Case 1
             Return "Attribute"
           Case 2
-            Return "Original"
+            Return "Base"
           Case Is > 2
             Dim lModifiedSource As atcDataSource = pModifiedScenarios.ItemByIndex(aColumn - 3)
             Return lModifiedSource.Specification
@@ -842,18 +860,18 @@ Friend Class GridSource
 
   Public Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
-      If aRow = pLabelRow Then
-        Return atcControls.atcAlignment.HAlignLeft
-      Else
-        Select Case aColumn
-          Case 0
-            Return atcControls.atcAlignment.HAlignLeft
-          Case 1
-            Return atcControls.atcAlignment.HAlignLeft
-          Case Else
-            Return atcControls.atcAlignment.HAlignDecimal
-        End Select
-      End If
+      '      If aRow = pLabelRow Then
+      'Return atcControls.atcAlignment.HAlignLeft
+      '     Else
+      Select Case aColumn
+        Case 0
+          Return atcControls.atcAlignment.HAlignLeft
+        Case 1
+          Return atcControls.atcAlignment.HAlignLeft
+        Case Else
+          Return atcControls.atcAlignment.HAlignDecimal
+      End Select
+      '      End If
     End Get
     Set(ByVal Value As atcControls.atcAlignment)
     End Set
