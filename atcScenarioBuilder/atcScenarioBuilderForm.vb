@@ -405,7 +405,7 @@ Friend Class atcScenarioBuilderForm
     End If
   End Sub
 
-  Private Function GetScenarioAttributes(ByVal aDataSet As atcDataSet) As atcDataAttributes
+  Public Shared Function GetScenarioAttributes(ByVal aDataSet As atcDataSet) As atcDataAttributes
     Dim lConstituent As String
     Dim lAttributes As atcDataAttributes = aDataSet.Attributes.GetValue("Scenario Attributes")
 
@@ -797,14 +797,7 @@ Friend Class GridSource
   Public Function BaseDataSetInRow(ByVal aRow As Integer, ByRef aAttributeIndex As Integer) As atcDataSet
     Dim lRow As Integer = pLabelRow + 1
     For Each lDataSet As atcDataSet In pBaseScenario.DataSets
-      Dim lScenarioAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes", Nothing)
-      If lScenarioAttributes Is Nothing Then
-        lScenarioAttributes = New atcDataAttributes
-        lScenarioAttributes.Add("Min", "")
-        lScenarioAttributes.Add("Max", "")
-        lScenarioAttributes.Add("Mean", "")
-        lDataSet.Attributes.SetValue("Scenario Attributes", lScenarioAttributes)
-      End If
+      Dim lScenarioAttributes As atcDataAttributes = atcScenarioBuilderForm.GetScenarioAttributes(lDataSet)
       If lRow + lScenarioAttributes.Count > aRow Then
         aAttributeIndex = aRow - lRow
         Return lDataSet
