@@ -48,22 +48,24 @@ Friend Class atcScenarioBuilderForm
   Friend WithEvents mnuScenarios As System.Windows.Forms.MenuItem
   Friend WithEvents mnuScenariosAdd As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileAddResults As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuScenariosAddFromScript As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcScenarioBuilderForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
+    Me.mnuFileAddResults = New System.Windows.Forms.MenuItem
     Me.mnuAttributes = New System.Windows.Forms.MenuItem
     Me.mnuAttributesAdd = New System.Windows.Forms.MenuItem
     Me.mnuAttributesRemove = New System.Windows.Forms.MenuItem
     Me.mnuDisplay = New System.Windows.Forms.MenuItem
     Me.mnuScenarios = New System.Windows.Forms.MenuItem
     Me.mnuScenariosAdd = New System.Windows.Forms.MenuItem
+    Me.mnuScenariosAddFromScript = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
     Me.splitHoriz = New System.Windows.Forms.Splitter
     Me.panelMiddle = New System.Windows.Forms.Panel
     Me.agdResults = New atcControls.atcGrid
-    Me.mnuFileAddResults = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -80,6 +82,11 @@ Friend Class atcScenarioBuilderForm
     '
     Me.mnuFileAdd.Index = 0
     Me.mnuFileAdd.Text = "Add Input"
+    '
+    'mnuFileAddResults
+    '
+    Me.mnuFileAddResults.Index = 1
+    Me.mnuFileAddResults.Text = "Add Results"
     '
     'mnuAttributes
     '
@@ -105,13 +112,18 @@ Friend Class atcScenarioBuilderForm
     'mnuScenarios
     '
     Me.mnuScenarios.Index = 3
-    Me.mnuScenarios.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuScenariosAdd})
+    Me.mnuScenarios.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuScenariosAdd, Me.mnuScenariosAddFromScript})
     Me.mnuScenarios.Text = "&Scenarios"
     '
     'mnuScenariosAdd
     '
     Me.mnuScenariosAdd.Index = 0
     Me.mnuScenariosAdd.Text = "&Add"
+    '
+    'mnuScenariosAddFromScript
+    '
+    Me.mnuScenariosAddFromScript.Index = 1
+    Me.mnuScenariosAddFromScript.Text = "Add From Script"
     '
     'agdMain
     '
@@ -121,24 +133,24 @@ Friend Class atcScenarioBuilderForm
     Me.agdMain.LineWidth = 0.0!
     Me.agdMain.Location = New System.Drawing.Point(0, 0)
     Me.agdMain.Name = "agdMain"
-    Me.agdMain.Size = New System.Drawing.Size(643, 287)
+    Me.agdMain.Size = New System.Drawing.Size(535, 249)
     Me.agdMain.TabIndex = 0
     '
     'splitHoriz
     '
     Me.splitHoriz.Dock = System.Windows.Forms.DockStyle.Top
-    Me.splitHoriz.Location = New System.Drawing.Point(0, 287)
+    Me.splitHoriz.Location = New System.Drawing.Point(0, 249)
     Me.splitHoriz.Name = "splitHoriz"
-    Me.splitHoriz.Size = New System.Drawing.Size(643, 10)
+    Me.splitHoriz.Size = New System.Drawing.Size(535, 8)
     Me.splitHoriz.TabIndex = 1
     Me.splitHoriz.TabStop = False
     '
     'panelMiddle
     '
     Me.panelMiddle.Dock = System.Windows.Forms.DockStyle.Top
-    Me.panelMiddle.Location = New System.Drawing.Point(0, 297)
+    Me.panelMiddle.Location = New System.Drawing.Point(0, 257)
     Me.panelMiddle.Name = "panelMiddle"
-    Me.panelMiddle.Size = New System.Drawing.Size(643, 54)
+    Me.panelMiddle.Size = New System.Drawing.Size(535, 47)
     Me.panelMiddle.TabIndex = 2
     '
     'agdResults
@@ -147,20 +159,15 @@ Friend Class atcScenarioBuilderForm
     Me.agdResults.Dock = System.Windows.Forms.DockStyle.Fill
     Me.agdResults.LineColor = System.Drawing.Color.Empty
     Me.agdResults.LineWidth = 0.0!
-    Me.agdResults.Location = New System.Drawing.Point(0, 351)
+    Me.agdResults.Location = New System.Drawing.Point(0, 304)
     Me.agdResults.Name = "agdResults"
-    Me.agdResults.Size = New System.Drawing.Size(643, 231)
+    Me.agdResults.Size = New System.Drawing.Size(535, 200)
     Me.agdResults.TabIndex = 3
-    '
-    'mnuFileAddResults
-    '
-    Me.mnuFileAddResults.Index = 1
-    Me.mnuFileAddResults.Text = "Add Results"
     '
     'atcScenarioBuilderForm
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-    Me.ClientSize = New System.Drawing.Size(643, 582)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+    Me.ClientSize = New System.Drawing.Size(535, 504)
     Me.Controls.Add(Me.agdResults)
     Me.Controls.Add(Me.panelMiddle)
     Me.Controls.Add(Me.splitHoriz)
@@ -707,6 +714,16 @@ Friend Class atcScenarioBuilderForm
     AddScenario()
   End Sub
 
+  Private Sub mnuScenariosAddFromScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromScript.Click
+    Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+    If lNewScenario.DataSets.Count > 0 Then
+      AddScenario()
+      lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+    End If
+    ScriptScenario(pBaseScenario, pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1))
+    agdMain.Refresh()
+  End Sub
+
   Private Sub AddScenario()
     Dim lNewModified As New atcDataSource
     Dim lNewResults As New atcDataSource
@@ -742,6 +759,30 @@ Friend Class atcScenarioBuilderForm
     End With
     PositionRunButtons()
   End Sub
+
+  Private Sub ScriptScenario(ByVal aBaseScenario As atcDataSource, ByVal aModifiedScenario As atcDataSource)
+    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+    Dim lArgsMath As New atcDataAttributes
+
+    For Each lDataSet As atcTimeseries In aBaseScenario.DataSets
+      lTsMath.DataSets.Clear()
+      lArgsMath.Clear()
+      lArgsMath.SetValue("timeseries", New atcDataGroup(lDataSet))
+      lArgsMath.SetValue("Number", "1.0")
+      pDataManager.OpenDataSource(lTsMath, "multiply", lArgsMath)
+
+      Dim lNewTS As atcTimeseries = lTsMath.DataSets(0)
+      For iValue As Integer = 1 To lNewTS.numValues
+        Dim lDate As Date = Date.FromOADate(lNewTS.Dates.Value(iValue))
+        Select Case lDate.Month
+          Case 8, 9 : lNewTS.Value(iValue) *= 1.25
+        End Select
+      Next
+      lNewTS.Attributes.CalculateAll()
+      aModifiedScenario.AddDataSet(lNewTS)
+    Next
+  End Sub
+
 End Class
 
 Friend Class GridSource
