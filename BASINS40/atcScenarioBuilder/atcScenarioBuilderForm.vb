@@ -772,24 +772,37 @@ Friend Class atcScenarioBuilderForm
       Next
     Next
 
-
     For iButton = 0 To iLastButton
       pRunButton(iButton).Visible = True
     Next
   End Sub
 
-  Private Sub mnuScenariosAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAdd.Click
-    AddScenario()
+  Private Sub mnuScenariosAddFromScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromScript.Click
+    Dim lScriptFileName As String = FindFile("Please locate scenario builder script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+    If FileExists(lScriptFileName) Then
+      Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+      If lNewScenario.DataSets.Count > 0 Then 'This scenario is already in use
+        AddScenario()                         'Create a new scenario to populate
+        lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+      End If
+      Dim args() As Object = New Object() {"DataManager", pBaseScenario, lNewScenario}
+      Dim errors As String
+      Dim lBasinsPlugin As BASINS.PlugIn = pDataManager.Basins
+      lBasinsPlugin.RunBasinsScript(FileExt(lScriptFileName), WholeFileString(lScriptFileName), errors, args)
+      If Not errors Is Nothing Then
+        LogMsg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
+      End If
+    Else
+      LogMsg("Unable to find script " & lScriptFileName, "Scenario Script")
+    End If
+
+    'pDataManager.Basins.ItemClicked("BasinsTools_RunScript FindFile ", New Boolean = False)
+    'ScriptScenario(pBaseScenario, lNewScenario)
+    agdMain.Refresh()
   End Sub
 
-  Private Sub mnuScenariosAddFromScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromScript.Click
-    Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
-    If lNewScenario.DataSets.Count > 0 Then
-      AddScenario()
-      lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
-    End If
-    ScriptScenario(pBaseScenario, pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1))
-    agdMain.Refresh()
+  Private Sub mnuScenariosAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAdd.Click
+    AddScenario()
   End Sub
 
   Private Sub AddScenario()
@@ -828,31 +841,6 @@ Friend Class atcScenarioBuilderForm
     PositionRunButtons()
   End Sub
 
-  Private Sub ScriptScenario(ByVal aBaseScenario As atcDataSource, ByVal aModifiedScenario As atcDataSource)
-    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-    Dim lArgsMath As New atcDataAttributes
-
-    For Each lDataSet As atcTimeseries In aBaseScenario.DataSets
-      lTsMath.DataSets.Clear()
-      lArgsMath.Clear()
-      lArgsMath.SetValue("timeseries", New atcDataGroup(lDataSet))
-      lArgsMath.SetValue("Number", "1.0") 'Adjust to change all values
-      pDataManager.OpenDataSource(lTsMath, "multiply", lArgsMath)
-
-      Dim lNewTS As atcTimeseries = lTsMath.DataSets(0)
-      Select Case lNewTS.Attributes.GetValue("constituent", "").tolower
-        Case "hprecip" 'Increase precipitation by 25% for August and September
-          For iValue As Integer = 1 To lNewTS.numValues
-            Dim lDate As Date = Date.FromOADate(lNewTS.Dates.Value(iValue))
-            Select Case lDate.Month
-              Case 8, 9 : lNewTS.Value(iValue) *= 1.25
-            End Select
-          Next
-          lNewTS.Attributes.CalculateAll()
-      End Select
-      aModifiedScenario.AddDataSet(lNewTS)
-    Next
-  End Sub
 
 End Class
 
