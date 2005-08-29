@@ -272,7 +272,18 @@ Friend Class atcScenarioBuilderForm
     agdMain.Initialize(pSource)
     agdResults.Initialize(pResultSource)
 
-    If Not pInitializing Then
+    If pInitializing Then
+      Dim lMaxGridHeight As Integer
+      lMaxGridHeight = (pSource.Rows + 1) * agdMain.RowHeight(0)
+      If lMaxGridHeight < agdMain.Height Then
+        agdMain.Height = lMaxGridHeight
+        'splitHoriz.Top = agdMain.Top + lMaxGridHeight
+      End If
+      lMaxGridHeight = (pResultSource.Rows + 3) * agdResults.RowHeight(0)
+      If lMaxGridHeight < agdResults.Height Then
+        Me.Height = agdResults.Top + lMaxGridHeight
+      End If
+    Else
       agdMain.Refresh()
       agdResults.Refresh()
     End If
@@ -305,10 +316,12 @@ Friend Class atcScenarioBuilderForm
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
     pDataManager.UserSelectData(, pBaseScenario.DataSets, False)
+    UpdatedAttributes()
   End Sub
 
   Private Sub mnuFileAddResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAddResults.Click
     pDataManager.UserSelectData(, pBaseResults.DataSets, False)
+    UpdatedAttributes()
   End Sub
 
   Private Sub mnuAttributesAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -385,7 +398,7 @@ Friend Class atcScenarioBuilderForm
   'End Sub
 
   Private Sub agdMain_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMain.MouseDownCell
-    If aColumn > 2 Then
+    If aRow > 0 AndAlso aColumn > 2 Then
       Dim pAttributeIndex As Integer
       Dim lBaseDataSet As atcDataSet = pSource.BaseDataSetInRow(aRow, pAttributeIndex) '(aRow - 1) \ pDataManager.DisplayAttributes.Count
       UserModify(lBaseDataSet, pModifiedScenarios.ItemByIndex(aColumn - 3))
@@ -432,8 +445,11 @@ Friend Class atcScenarioBuilderForm
       Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
       For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
         If lAddedAttributes.IndexOf("++" & lAttributeDef.Name & "++") = -1 Then
-          mnuAttribute = mnuConstituentAdd.MenuItems.Add(lAttributeDef.Name)
-          AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+          Select Case lAttributeDef.TypeString
+            Case "Double", "Integer", "String", "Boolean"
+              mnuAttribute = mnuConstituentAdd.MenuItems.Add(lAttributeDef.Name)
+              AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+          End Select
         End If
       Next
       lAttributeRemovable &= lAddedAttributes
@@ -492,11 +508,14 @@ Friend Class atcScenarioBuilderForm
     Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
     For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
       'TODO: any items that are already on for all constituents don't need to be addable
-      mnuAttribute = mnuConstituentAddInputs.MenuItems.Add(lAttributeDef.Name)
-      AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+      Select Case lAttributeDef.TypeString
+        Case "Double", "Integer", "String", "Boolean"
+          mnuAttribute = mnuConstituentAddInputs.MenuItems.Add(lAttributeDef.Name)
+          AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
 
-      mnuAttribute = mnuConstituentAddResults.MenuItems.Add(lAttributeDef.Name)
-      AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+          mnuAttribute = mnuConstituentAddResults.MenuItems.Add(lAttributeDef.Name)
+          AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+      End Select
 
       'offer removal of attributes currently in use by any constituent
       If lAttributeRemovable.IndexOf("++" & lAttributeDef.Name & "++") > -1 Then
@@ -668,13 +687,16 @@ Friend Class atcScenarioBuilderForm
       End With
     Next
 
-    For iColumn As Integer = 0 To pSource.Columns - 2
+    For iColumn As Integer = 0 To pSource.Columns - 1
       For iButton = 0 To iLastButton
         If iButton > iColumn - 2 Then
           pRunButton(iButton).Left += agdResults.ColumnWidth(iColumn)
+        ElseIf iButton = iColumn - 2 Then
+          pRunButton(iButton).Left += (agdResults.ColumnWidth(iColumn) - pRunButton(iButton).Width) / 2
         End If
       Next
     Next
+
 
     For iButton = 0 To iLastButton
       pRunButton(iButton).Visible = True
