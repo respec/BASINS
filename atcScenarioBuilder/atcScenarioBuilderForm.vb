@@ -220,7 +220,16 @@ Friend Class atcScenarioBuilderForm
     mnuDisplay.MenuItems.Clear()
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
     For Each lDisp As atcDataDisplay In DisplayPlugins
-      mnuDisplay.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuDisplay_Click))
+      Dim lMenuDispType As MenuItem = mnuDisplay.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuDisplay_Click))
+      lMenuDispType.MenuItems.Add("All Inputs", New EventHandler(AddressOf mnuDisplay_Click))
+      lMenuDispType.MenuItems.Add("Base Inputs", New EventHandler(AddressOf mnuDisplay_Click))
+      lMenuDispType.MenuItems.Add("Modified Inputs", New EventHandler(AddressOf mnuDisplay_Click))
+
+      lMenuDispType.MenuItems.Add("-")
+
+      lMenuDispType.MenuItems.Add("All Results", New EventHandler(AddressOf mnuDisplay_Click))
+      lMenuDispType.MenuItems.Add("Base Results", New EventHandler(AddressOf mnuDisplay_Click))
+      lMenuDispType.MenuItems.Add("Modified Results", New EventHandler(AddressOf mnuDisplay_Click))
     Next
 
     If pBaseScenario.DataSets.Count = 0 Then
@@ -301,24 +310,83 @@ Friend Class atcScenarioBuilderForm
   End Function
 
   Private Sub mnuDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuDisplay.Click
+    Dim lMenuClicked As MenuItem = sender
     Dim lNewDisplay As atcDataDisplay
     Dim lDisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    Dim lShowBaseInputs As Boolean = False
+    Dim lShowModifiedInputs As Boolean = False
+    Dim lShowBaseResults As Boolean = False
+    Dim lShowModifiedResults As Boolean = False
     Dim lShowThese As New atcDataGroup
-    For Each atf As atcDataDisplay In lDisplayPlugins
-      If atf.Name = sender.Text Then
+    Dim lScenario As atcDataSource
+    Dim lDataSet As atcDataSet
 
-        Dim typ As System.Type = atf.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        lNewDisplay = asm.CreateInstance(typ.FullName)
+    Select Case lMenuClicked.Text
+      Case "All Inputs"
+        lShowBaseInputs = True
+        lShowModifiedInputs = True
+      Case "Base Inputs" : lShowBaseInputs = True
+      Case "Modified Inputs" : lShowModifiedInputs = True
+      Case "All Results"
+        lShowBaseResults = True
+        lShowModifiedResults = True
+      Case "Base Results" : lShowBaseResults = True
+      Case "Modified Results" : lShowModifiedResults = True
+      Case Else
+        lShowBaseInputs = True
+        lShowModifiedInputs = True
+        lShowBaseResults = True
+        lShowModifiedResults = True
+        For Each atf As atcDataDisplay In lDisplayPlugins
+          If atf.Name = lMenuClicked.Text Then
+            Dim typ As System.Type = atf.GetType()
+            Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+            lNewDisplay = asm.CreateInstance(typ.FullName)
+          End If
+        Next
+    End Select
 
-        For Each lDataSet As atcDataSet In pBaseScenario.DataSets
+    If lNewDisplay Is Nothing Then
+      Dim mnuDisplayType As MenuItem = lMenuClicked.Parent
+      For Each atf As atcDataDisplay In lDisplayPlugins
+        If atf.Name = mnuDisplayType.Text Then
+          Dim typ As System.Type = atf.GetType()
+          Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+          lNewDisplay = asm.CreateInstance(typ.FullName)
+        End If
+      Next
+    End If
+
+    If Not lNewDisplay Is Nothing Then
+      If lShowBaseInputs Then
+        For Each lDataSet In pBaseScenario.DataSets
           lShowThese.Add(lDataSet)
         Next
-        lNewDisplay.Show(pDataManager, lShowThese)
-        Exit Sub
-
       End If
-    Next
+      If lShowModifiedInputs Then
+        For Each lScenario In pModifiedScenarios
+          For Each lDataSet In lScenario.DataSets
+            lShowThese.Add(lDataSet)
+          Next
+        Next
+      End If
+
+      If lShowBaseResults Then
+        For Each lDataSet In pBaseResults.DataSets
+          lShowThese.Add(lDataSet)
+        Next
+      End If
+
+      If lShowModifiedResults Then
+        For Each lScenario In pModifiedResults
+          For Each lDataSet In lScenario.DataSets
+            lShowThese.Add(lDataSet)
+          Next
+        Next
+      End If
+
+      lNewDisplay.Show(pDataManager, lShowThese)
+    End If
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
@@ -768,17 +836,20 @@ Friend Class atcScenarioBuilderForm
       lTsMath.DataSets.Clear()
       lArgsMath.Clear()
       lArgsMath.SetValue("timeseries", New atcDataGroup(lDataSet))
-      lArgsMath.SetValue("Number", "1.0")
+      lArgsMath.SetValue("Number", "1.0") 'Adjust to change all values
       pDataManager.OpenDataSource(lTsMath, "multiply", lArgsMath)
 
       Dim lNewTS As atcTimeseries = lTsMath.DataSets(0)
-      For iValue As Integer = 1 To lNewTS.numValues
-        Dim lDate As Date = Date.FromOADate(lNewTS.Dates.Value(iValue))
-        Select Case lDate.Month
-          Case 8, 9 : lNewTS.Value(iValue) *= 1.25
-        End Select
-      Next
-      lNewTS.Attributes.CalculateAll()
+      Select Case lNewTS.Attributes.GetValue("constituent", "").tolower
+        Case "hprecip" 'Increase precipitation by 25% for August and September
+          For iValue As Integer = 1 To lNewTS.numValues
+            Dim lDate As Date = Date.FromOADate(lNewTS.Dates.Value(iValue))
+            Select Case lDate.Month
+              Case 8, 9 : lNewTS.Value(iValue) *= 1.25
+            End Select
+          Next
+          lNewTS.Attributes.CalculateAll()
+      End Select
       aModifiedScenario.AddDataSet(lNewTS)
     Next
   End Sub
