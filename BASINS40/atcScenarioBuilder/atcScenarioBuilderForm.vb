@@ -408,25 +408,79 @@ Friend Class atcScenarioBuilderForm
     Dim allResults As Boolean = mnuConstituent.Text.Equals(MenuText_AllResults)
     Dim lNeedMainRefresh As Boolean = False
     Dim lNeedResultsRefresh As Boolean = False
+    Dim lFromScript As Boolean = mnuText.Equals("From Script...")
     'MsgBox("Add " & mnuConstituent.Text, MsgBoxStyle.Information, mnuAttribute.Text)
 
-    For Each lDataSet As atcDataSet In pBaseScenario.DataSets
-      If allInputs OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
-        Dim lAttributes As atcDataAttributes = GetScenarioAttributes(lDataSet)
-        lAttributes.SetValue(mnuText, "")
-        lNeedMainRefresh = True
+    If lFromScript Then 'Add attribute(s) from a script
+      Dim lScriptFileName As String = FindFile("Please locate attribute script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+
+      'Save the set of all known attribute definitions before running the script
+      Dim lOldAttributes As atcCollection = atcDataAttributes.AllDefinitions.Clone
+      If allInputs Then
+        AddAttributeFromScript(pBaseScenario.DataSets, lScriptFileName)
+        For Each lModifiedScenario As atcDataSource In pModifiedScenarios
+          AddAttributeFromScript(lModifiedScenario.DataSets, lScriptFileName)
+        Next
+
+        For Each lNewAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+          'Add newly created attributes to the list to display in the top grid
+          If Not lOldAttributes.Contains(lNewAttribute) Then
+            For Each lDataSet As atcDataSet In pBaseScenario.DataSets
+              GetScenarioAttributes(lDataSet).SetValue(lNewAttribute.Name, "")
+            Next
+            lNeedMainRefresh = True
+          End If
+        Next
       End If
-    Next
-    For Each lDataSet As atcDataSet In pBaseResults.DataSets
-      If allResults OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
-        Dim lAttributes As atcDataAttributes = GetScenarioAttributes(lDataSet)
-        lAttributes.SetValue(mnuText, "")
-        lNeedResultsRefresh = True
+
+      If allResults Then
+        AddAttributeFromScript(pBaseResults.DataSets, lScriptFileName)
+        For Each lModifiedScenario As atcDataSource In pModifiedResults
+          AddAttributeFromScript(lModifiedScenario.DataSets, lScriptFileName)
+        Next
+        For Each lNewAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+          'Add newly created attributes to the list to display in the bottom grid
+          If Not lOldAttributes.Contains(lNewAttribute) Then
+            For Each lDataSet As atcDataSet In pBaseResults.DataSets
+              GetScenarioAttributes(lDataSet).SetValue(lNewAttribute.Name, "")
+              lNeedResultsRefresh = True
+            Next
+          End If
+        Next
       End If
-    Next
+
+    Else 'Add a regular attribute
+
+      For Each lDataSet As atcDataSet In pBaseScenario.DataSets
+        If allInputs OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
+          GetScenarioAttributes(lDataSet).SetValue(mnuText, "")
+          lNeedMainRefresh = True
+        End If
+      Next
+      For Each lDataSet As atcDataSet In pBaseResults.DataSets
+        If allResults OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
+          GetScenarioAttributes(lDataSet).SetValue(mnuText, "")
+          lNeedResultsRefresh = True
+        End If
+      Next
+    End If
     If lNeedMainRefresh Then agdMain.Refresh()
     If lNeedResultsRefresh Then agdResults.Refresh()
     UpdatedAttributes()
+  End Sub
+
+  Private Sub AddAttributeFromScript(ByVal aDatasets As atcDataGroup, ByVal aScriptFileName As String)
+    If FileExists(aScriptFileName) Then
+      Dim args() As Object = New Object() {aDatasets}
+      Dim errors As String
+      Dim lBasinsPlugin As BASINS.PlugIn = pDataManager.Basins
+      lBasinsPlugin.RunBasinsScript(FileExt(aScriptFileName), WholeFileString(aScriptFileName), errors, args)
+      If Not errors Is Nothing Then
+        LogMsg(aScriptFileName & vbCrLf & vbCrLf & errors, "Attribute Script Error")
+      End If
+    Else
+      LogMsg("Unable to find script " & aScriptFileName, "Attribute Script")
+    End If
   End Sub
 
   Private Sub mnuAttributesRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -648,6 +702,12 @@ Friend Class atcScenarioBuilderForm
       Next
     Next
 
+    mnuAttribute = mnuConstituentAddInputs.MenuItems.Add("From Script...")
+    AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+
+    mnuAttribute = mnuConstituentAddResults.MenuItems.Add("From Script...")
+    AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+
     For Each lAttributeEntry In lAddToRemove
       mnuAttribute = mnuConstituentRemoveInputs.MenuItems.Add(lAttributeEntry.Value)
       AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
@@ -676,15 +736,6 @@ Friend Class atcScenarioBuilderForm
     If Not lNewDataSource Is Nothing Then
       pDataManager.OpenDataSource(lNewDataSource, lNewDataSource.Specification, lGenerateArguments)
       For Each lNewTimeseries In lNewDataSource.DataSets
-        'For Each lAttribute As atcDefinedValue In aBaseTimeseries.Attributes
-        '  If Not (lAttribute.Definition.Calculated) Then
-        '    Select Case lAttribute.Definition.Name.ToLower
-        '      Case "data source" ', "id"
-        '      Case Else
-        '        lNewTimeseries.Attributes.Add(lAttribute)
-        '    End Select
-        '  End If
-        'Next
         Dim lID As String = lNewTimeseries.Attributes.GetValue("id")
         aModifiedScenario.DataSets.RemoveByKey(lID)
         aModifiedScenario.DataSets.Add(lID, lNewTimeseries)
@@ -706,7 +757,6 @@ Friend Class atcScenarioBuilderForm
     Dim btn As Windows.Forms.Button = sender
 
     Dim lModifiedIndex As Integer = 0
-    Dim lNewScenarioName As String
     Dim lNewWDM As atcWDM.atcDataSourceWDM
     Dim lOldWDM As atcWDM.atcDataSourceWDM
     Dim lCurrentWDMfilename As String
@@ -723,16 +773,15 @@ Friend Class atcScenarioBuilderForm
       If IsNumeric(btn.Tag) Then lModifiedIndex = btn.Tag
 
       If lModifiedIndex = -1 Then 'Run base scenario
-        lNewScenarioName = "base"
         lNewWDM = lOldWDM
+        ScenarioRun(lCurrentWDMfilename, "base", Nothing)
       Else 'Run a modified scenario
-        lNewScenarioName = "modified"
+        Dim lNewScenarioName As String = "modified"
         If lModifiedIndex > 0 Then lNewScenarioName &= (lModifiedIndex + 1)
+        lNewWDM = ScenarioRun(lCurrentWDMfilename, _
+                              lNewScenarioName, _
+                              pModifiedScenarios.ItemByIndex(lModifiedIndex).DataSets)
       End If
-
-      lNewWDM = ScenarioRun(lCurrentWDMfilename, _
-                            lNewScenarioName, _
-                            pModifiedScenarios.ItemByIndex(lModifiedIndex).DataSets)
 
       If lModifiedIndex >= 0 Then 'ran modified scenario
         lNewResults = pModifiedResults.ItemByIndex(lModifiedIndex)
