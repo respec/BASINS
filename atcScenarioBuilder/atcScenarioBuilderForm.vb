@@ -402,6 +402,7 @@ Friend Class atcScenarioBuilderForm
 
   Private Sub mnuAttributesAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     Dim mnuAttribute As MenuItem = sender
+    Dim mnuText As String = mnuAttribute.Text.Trim
     Dim mnuConstituent As MenuItem = mnuAttribute.Parent
     Dim allInputs As Boolean = mnuConstituent.Text.Equals(MenuText_AllInputs)
     Dim allResults As Boolean = mnuConstituent.Text.Equals(MenuText_AllResults)
@@ -412,14 +413,14 @@ Friend Class atcScenarioBuilderForm
     For Each lDataSet As atcDataSet In pBaseScenario.DataSets
       If allInputs OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
         Dim lAttributes As atcDataAttributes = GetScenarioAttributes(lDataSet)
-        lAttributes.SetValue(mnuAttribute.Text, "")
+        lAttributes.SetValue(mnuText, "")
         lNeedMainRefresh = True
       End If
     Next
     For Each lDataSet As atcDataSet In pBaseResults.DataSets
       If allResults OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
         Dim lAttributes As atcDataAttributes = GetScenarioAttributes(lDataSet)
-        lAttributes.SetValue(mnuAttribute.Text, "")
+        lAttributes.SetValue(mnuText, "")
         lNeedResultsRefresh = True
       End If
     Next
@@ -430,6 +431,7 @@ Friend Class atcScenarioBuilderForm
 
   Private Sub mnuAttributesRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     Dim mnuAttribute As MenuItem = sender
+    Dim mnuText As String = mnuAttribute.Text.Trim
     Dim mnuConstituent As MenuItem = mnuAttribute.Parent
     Dim allInputs As Boolean = mnuConstituent.Text.Equals(MenuText_AllInputs)
     Dim allResults As Boolean = mnuConstituent.Text.Equals(MenuText_AllResults)
@@ -441,7 +443,7 @@ Friend Class atcScenarioBuilderForm
       If allInputs OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
         Dim lAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes")
         If Not lAttributes Is Nothing Then
-          lAttributes.RemoveByKey(mnuAttribute.Text.ToLower)
+          lAttributes.RemoveByKey(mnuText.ToLower)
           lNeedMainRefresh = True
         End If
       End If
@@ -451,7 +453,7 @@ Friend Class atcScenarioBuilderForm
       If allResults OrElse lDataSet.Attributes.GetValue("constituent") = mnuConstituent.Text Then
         Dim lAttributes As atcDataAttributes = lDataSet.Attributes.GetValue("Scenario Attributes")
         If Not lAttributes Is Nothing Then
-          lAttributes.RemoveByKey(mnuAttribute.Text.ToLower)
+          lAttributes.RemoveByKey(mnuText.ToLower)
           lNeedResultsRefresh = True
         End If
       End If
@@ -500,7 +502,9 @@ Friend Class atcScenarioBuilderForm
     Return lAttributes
   End Function
 
-  Private Sub PopulateAddRemoveAttributesMenus(ByVal aDataSet As atcDataSet, ByRef aAddedConstituents As String, ByRef lAttributeRemovable As String)
+  Private Sub PopulateAddRemoveAttributesMenus(ByVal aDataSet As atcDataSet, _
+                                               ByRef aAddedConstituents As String, _
+                                               ByRef lAttributeRemovable As String)
     Dim lConstituent As String
     Dim mnuConstituentAdd As MenuItem
     Dim mnuConstituentRemove As MenuItem
@@ -519,19 +523,35 @@ Friend Class atcScenarioBuilderForm
         AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
       Next
 
-      'Add items available to add to a sorted list
+      'Add items available to add to a sorted, categorized list
       Dim lAddToAdd As New SortedList
       Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
       For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
         If lAddedAttributes.IndexOf("++" & lAttributeDef.Name & "++") = -1 AndAlso _
           atcDataAttributes.IsSimple(lAttributeDef) Then
-          lAddToAdd.Add(lAttributeDef.Name, lAttributeDef.Name)
+          Dim lCategory As SortedList
+          If lAddToAdd.ContainsKey(lAttributeDef.Category) Then
+            lCategory = lAddToAdd.Item(lAttributeDef.Category)
+          Else
+            lCategory = New SortedList
+            lAddToAdd.Add(lAttributeDef.Category, lCategory)
+          End If
+          lCategory.Add(lAttributeDef.Name, lAttributeDef.Name)
         End If
       Next
       'Add sorted items to menu
-      For Each lAttributeEntry As DictionaryEntry In lAddToAdd
-        mnuAttribute = mnuConstituentAdd.MenuItems.Add(lAttributeEntry.Value)
-        AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+      For Each lCategoryEntry As DictionaryEntry In lAddToAdd
+        If mnuConstituentAdd.MenuItems.Count > 0 Then
+          mnuConstituentAdd.MenuItems.Add("-")
+        End If
+        If Len(lCategoryEntry.Key) > 0 Then
+          mnuConstituentAdd.MenuItems.Add(lCategoryEntry.Key)
+        End If
+        Dim lCategory As SortedList = lCategoryEntry.Value
+        For Each lAttributeEntry As DictionaryEntry In lCategory
+          mnuAttribute = mnuConstituentAdd.MenuItems.Add("  " & lAttributeEntry.Value)
+          AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+        Next
       Next
       lAttributeRemovable &= lAddedAttributes
     End If
@@ -592,9 +612,15 @@ Friend Class atcScenarioBuilderForm
 
     Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
     For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
-      'TODO: any items that are already on for all constituents don't need to be addable
       If atcDataAttributes.IsSimple(lAttributeDef) Then
-        lAddToAdd.Add(lAttributeDef.Name, lAttributeDef.Name)
+        Dim lCategory As SortedList
+        If lAddToAdd.ContainsKey(lAttributeDef.Category) Then
+          lCategory = lAddToAdd.Item(lAttributeDef.Category)
+        Else
+          lCategory = New SortedList
+          lAddToAdd.Add(lAttributeDef.Category, lCategory)
+        End If
+        lCategory.Add(lAttributeDef.Name, lAttributeDef.Name)
       End If
 
       'offer removal of attributes currently in use by any constituent
@@ -603,12 +629,23 @@ Friend Class atcScenarioBuilderForm
       End If
     Next
 
-    For Each lAttributeEntry In lAddToAdd
-      mnuAttribute = mnuConstituentAddInputs.MenuItems.Add(lAttributeEntry.Value)
-      AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+    For Each lCategoryEntry As DictionaryEntry In lAddToAdd
+      If mnuConstituentAddInputs.MenuItems.Count > 0 Then
+        mnuConstituentAddInputs.MenuItems.Add("-")
+        mnuConstituentAddResults.MenuItems.Add("-")
+      End If
+      If Len(lCategoryEntry.Key) > 0 Then
+        mnuConstituentAddInputs.MenuItems.Add(lCategoryEntry.Key)
+        mnuConstituentAddResults.MenuItems.Add(lCategoryEntry.Key)
+      End If
+      Dim lCategory As SortedList = lCategoryEntry.Value
+      For Each lAttributeEntry In lCategory
+        mnuAttribute = mnuConstituentAddInputs.MenuItems.Add("  " & lAttributeEntry.Value)
+        AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
 
-      mnuAttribute = mnuConstituentAddResults.MenuItems.Add(lAttributeEntry.Value)
-      AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+        mnuAttribute = mnuConstituentAddResults.MenuItems.Add("  " & lAttributeEntry.Value)
+        AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+      Next
     Next
 
     For Each lAttributeEntry In lAddToRemove

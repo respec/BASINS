@@ -43,6 +43,7 @@ Friend Class atcMsgWDM
       For lIndex = 1 To 500 'loop thru all possible attributes 
         'get info about attribute from message file
         lAttr = New atcAttributeDefinition
+        lAttr.Category = "WDM"
         Call F90_WDSAGY(lMsgUnit, lIndex, lLen, lType, lRMin, lRMax, lRDef, lHlpLen, lHlpRec, lHlpPos, lValidLen, lName, lDesc, lValid)
         If lLen = 0 Then 'dummy
           lAttr.Name = "Dummy" & lIndex

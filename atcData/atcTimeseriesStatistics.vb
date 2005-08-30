@@ -32,13 +32,7 @@ Public Class atcTimeseriesStatistics
       If pAvailableOperations Is Nothing Then
         pAvailableOperations = New atcDataAttributes
 
-        Dim defCategory As New atcAttributeDefinition
-        With defCategory
-          .Name = "Category"
-          .Description = ""
-          .Editable = False
-          .TypeString = "String"
-        End With
+        Dim lCategory As String = "Statistics"
 
         Dim defTimeSeriesOne As New atcAttributeDefinition
         With defTimeSeriesOne
@@ -48,45 +42,45 @@ Public Class atcTimeseriesStatistics
           .TypeString = "atcTimeseries"
         End With
 
-        AddOperation("Date Created", "Date Timeseries Created", defTimeSeriesOne, defCategory)
+        AddOperation("Date Created", "Date Timeseries Created", defTimeSeriesOne, lCategory)
 
-        AddOperation("Date Modified", "Date Timeseries Last Modified", defTimeSeriesOne, defCategory)
+        AddOperation("Date Modified", "Date Timeseries Last Modified", defTimeSeriesOne, lCategory)
 
-        AddOperation("Count", "Count of non missing values", defTimeSeriesOne, defCategory)
+        AddOperation("Count", "Count of non missing values", defTimeSeriesOne, lCategory)
 
-        AddOperation("SJDay", "Starting Julian Date", defTimeSeriesOne, defCategory)
+        AddOperation("SJDay", "Starting Julian Date", defTimeSeriesOne, lCategory)
 
-        AddOperation("EJDay", "Ending Julian Date", defTimeSeriesOne, defCategory)
+        AddOperation("EJDay", "Ending Julian Date", defTimeSeriesOne, lCategory)
 
-        AddOperation("Max", "Maximum value", defTimeSeriesOne, defCategory)
+        AddOperation("Max", "Maximum value", defTimeSeriesOne, lCategory)
 
-        AddOperation("Min", "Minimum value", defTimeSeriesOne, defCategory)
+        AddOperation("Min", "Minimum value", defTimeSeriesOne, lCategory)
 
-        AddOperation("Sum", "Summation of all values", defTimeSeriesOne, defCategory)
+        AddOperation("Sum", "Summation of all values", defTimeSeriesOne, lCategory)
 
         AddOperation("Mean", "Sum of all values divided by number of values", _
-                     defTimeSeriesOne, defCategory)
+                     defTimeSeriesOne, lCategory)
 
         AddOperation("Geometric Mean", "10 ^ Mean of log(each value)", _
-                     defTimeSeriesOne, defCategory)
+                     defTimeSeriesOne, lCategory)
 
         AddOperation("Variance", "Statistical variance", _
-                     defTimeSeriesOne, defCategory)
+                     defTimeSeriesOne, lCategory)
 
         AddOperation("Standard Deviation", "Standard deviation", _
-                     defTimeSeriesOne, defCategory)
+                     defTimeSeriesOne, lCategory)
 
         AddOperation("Skew", "Skewness", _
-                     defTimeSeriesOne, defCategory)
+                     defTimeSeriesOne, lCategory)
 
         AddOperation("Standard Error of Skew", "Standard Error of Skewness", _
-                     defTimeSeriesOne, defCategory)
+                     defTimeSeriesOne, lCategory)
 
         AddOperation("Serial Correlation Coefficient", "Serial Correlation Coefficient", _
-                     defTimeSeriesOne, defCategory)
+                     defTimeSeriesOne, lCategory)
 
         AddOperation("Coefficient of Variation", "Coefficient of Variation", _
-                     defTimeSeriesOne, defCategory)
+                     defTimeSeriesOne, lCategory)
       End If
       Return pAvailableOperations
     End Get
@@ -95,10 +89,11 @@ Public Class atcTimeseriesStatistics
   Private Sub AddOperation(ByVal aName As String, _
                            ByVal aDescription As String, _
                            ByVal aArg As atcAttributeDefinition, _
-                           ByVal aCategory As atcAttributeDefinition)
+                           ByVal aCategory As String)
     Dim lResult As New atcAttributeDefinition
     With lResult
       .Name = aName
+      .Category = aCategory
       .Description = aDescription
       .DefaultValue = Double.NaN
       .Editable = False
