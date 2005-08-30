@@ -262,37 +262,53 @@ Public Class atcDataAttributes
   End Sub
 
   Public Function GetDefinedValue(ByVal aAttributeName As String) As atcDefinedValue
-    Dim key As String = AttributeNameToKey(aAttributeName)
-    Dim tmpAttribute As atcDefinedValue = ItemByKey(key)
-    If tmpAttribute Is Nothing Then  'Did not find the named attribute
+    Dim lKey As String = AttributeNameToKey(aAttributeName)
+    Dim lAttribute As atcDefinedValue = ItemByKey(lKey)
+    If lAttribute Is Nothing Then  'Did not find the named attribute
       If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
         Try
           Dim lOwnerTS As atcTimeseries = Owner
-          Dim tmpDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(key)
-          If Not tmpDef Is Nothing Then 'We have a definition for this attribute but no value
-            Select Case tmpDef.TypeString.ToLower
-              Case "double", "integer", "boolean", "string"
-                If tmpDef.Calculated Then   'Maybe we can go ahead and calculate it now...
-                  Dim lOperation As atcDefinedValue = tmpDef.Calculator.AvailableOperations.GetDefinedValue(key)
-                  If Not lOperation Is Nothing AndAlso Not lOperation.Arguments Is Nothing Then
-                    If lOperation.Arguments.Count = 1 Then 'Simple calculation has only one argument
-                      Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
-                      If lArg.Definition.TypeString = "atcTimeseries" Then 'Only argument must be atcTimeseries
-                        Dim tmpArgs As atcDataAttributes = lOperation.Arguments.Clone
-                        tmpArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
-                        tmpDef.Calculator.Open(tmpDef.Name, tmpArgs)
-                        tmpAttribute = ItemByKey(key)
-                      End If
-                    End If
-                  End If
-                End If
-            End Select
+          Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
+          Dim lOperation As atcDefinedValue
+          If lDef.Calculated AndAlso IsSimple(lDef, lKey, lOperation) Then
+            Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
+            Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
+            lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
+            lDef.Calculator.Open(lDef.Name, lArgs)
+            lAttribute = ItemByKey(lKey)
           End If
         Catch CalcExcep As Exception
         End Try
       End If
     End If
-    Return tmpAttribute
+    Return lAttribute
+  End Function
+
+  'True if the attribute defined by aDef is of a simple type (Double, Integer, Boolean, String)
+  'and is not calculated or can be calculated from just one atcTimeseries
+  'Optional aKey is the attribute key, passing it is allowed for performance
+  'Optional aOperation will be set to the operation definition that calculates the attribute
+  Public Shared Function IsSimple(ByVal aDef As atcAttributeDefinition, _
+                  Optional ByVal aKey As String = Nothing, _
+                  Optional ByRef aOperation As atcDefinedValue = Nothing) As Boolean
+    Select Case aDef.TypeString.ToLower
+      Case "double", "integer", "boolean", "string"
+        If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...
+          If aKey Is Nothing Then aKey = AttributeNameToKey(aDef.Name)
+          aOperation = aDef.Calculator.AvailableOperations.GetDefinedValue(aKey)
+          If Not aOperation Is Nothing AndAlso Not aOperation.Arguments Is Nothing Then
+            If aOperation.Arguments.Count = 1 Then 'Simple calculation has only one argument
+              Dim lArg As atcDefinedValue = aOperation.Arguments.ItemByIndex(0)
+              If lArg.Definition.TypeString = "atcTimeseries" Then 'Only argument must be atcTimeseries
+                Return True
+              End If
+            End If
+          End If
+        Else
+          Return True
+        End If
+    End Select
+    Return False
   End Function
 
   Public Shadows Property ItemByIndex(ByVal index As Integer) As atcDefinedValue

@@ -138,6 +138,7 @@ Friend Class atcScenarioBuilderForm
     '
     'splitHoriz
     '
+    Me.splitHoriz.BackColor = System.Drawing.SystemColors.ControlDark
     Me.splitHoriz.Dock = System.Windows.Forms.DockStyle.Top
     Me.splitHoriz.Location = New System.Drawing.Point(0, 249)
     Me.splitHoriz.Name = "splitHoriz"
@@ -517,15 +518,20 @@ Friend Class atcScenarioBuilderForm
         mnuAttribute = mnuConstituentRemove.MenuItems.Add(lAttribute.Definition.Name)
         AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
       Next
+
+      'Add items available to add to a sorted list
+      Dim lAddToAdd As New SortedList
       Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
       For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
-        If lAddedAttributes.IndexOf("++" & lAttributeDef.Name & "++") = -1 Then
-          Select Case lAttributeDef.TypeString
-            Case "Double", "Integer", "String", "Boolean"
-              mnuAttribute = mnuConstituentAdd.MenuItems.Add(lAttributeDef.Name)
-              AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
-          End Select
+        If lAddedAttributes.IndexOf("++" & lAttributeDef.Name & "++") = -1 AndAlso _
+          atcDataAttributes.IsSimple(lAttributeDef) Then
+          lAddToAdd.Add(lAttributeDef.Name, lAttributeDef.Name)
         End If
+      Next
+      'Add sorted items to menu
+      For Each lAttributeEntry As DictionaryEntry In lAddToAdd
+        mnuAttribute = mnuConstituentAdd.MenuItems.Add(lAttributeEntry.Value)
+        AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
       Next
       lAttributeRemovable &= lAddedAttributes
     End If
@@ -536,6 +542,7 @@ Friend Class atcScenarioBuilderForm
     'If Not pInitializing Then
     Dim lAddedConstituents As String = "++"
     Dim lAttributeRemovable As String = "++"
+    Dim lAttributeEntry As DictionaryEntry
     Dim mnuConstituentAddInputs As MenuItem
     Dim mnuConstituentRemoveInputs As MenuItem
     Dim mnuConstituentAddResults As MenuItem
@@ -580,27 +587,38 @@ Friend Class atcScenarioBuilderForm
       PopulateAddRemoveAttributesMenus(lDataSet, lAddedConstituents, lAttributeRemovable)
     Next
 
+    Dim lAddToAdd As New SortedList
+    Dim lAddToRemove As New SortedList
+
     Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
     For Each lAttributeDef As atcAttributeDefinition In lAllDefinitions
       'TODO: any items that are already on for all constituents don't need to be addable
-      Select Case lAttributeDef.TypeString
-        Case "Double", "Integer", "String", "Boolean"
-          mnuAttribute = mnuConstituentAddInputs.MenuItems.Add(lAttributeDef.Name)
-          AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
-
-          mnuAttribute = mnuConstituentAddResults.MenuItems.Add(lAttributeDef.Name)
-          AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
-      End Select
+      If atcDataAttributes.IsSimple(lAttributeDef) Then
+        lAddToAdd.Add(lAttributeDef.Name, lAttributeDef.Name)
+      End If
 
       'offer removal of attributes currently in use by any constituent
       If lAttributeRemovable.IndexOf("++" & lAttributeDef.Name & "++") > -1 Then
-        mnuAttribute = mnuConstituentRemoveInputs.MenuItems.Add(lAttributeDef.Name)
-        AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
-
-        mnuAttribute = mnuConstituentRemoveResults.MenuItems.Add(lAttributeDef.Name)
-        AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
+        lAddToRemove.Add(lAttributeDef.Name, lAttributeDef.Name)
       End If
     Next
+
+    For Each lAttributeEntry In lAddToAdd
+      mnuAttribute = mnuConstituentAddInputs.MenuItems.Add(lAttributeEntry.Value)
+      AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+
+      mnuAttribute = mnuConstituentAddResults.MenuItems.Add(lAttributeEntry.Value)
+      AddHandler mnuAttribute.Click, AddressOf mnuAttributesAdd_Click
+    Next
+
+    For Each lAttributeEntry In lAddToRemove
+      mnuAttribute = mnuConstituentRemoveInputs.MenuItems.Add(lAttributeEntry.Value)
+      AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
+
+      mnuAttribute = mnuConstituentRemoveResults.MenuItems.Add(lAttributeEntry.Value)
+      AddHandler mnuAttribute.Click, AddressOf mnuAttributesRemove_Click
+    Next
+
 
     If Not pInitializing Then
       agdMain.Refresh()
@@ -728,30 +746,33 @@ Friend Class atcScenarioBuilderForm
   End Sub
 
   Private Sub PositionRunButtons()
-    Dim iLastButton As Integer = pRunButton.GetUpperBound(0)
-    Dim iButton As Integer
+    Try
+      Dim iLastButton As Integer = pRunButton.GetUpperBound(0)
+      Dim iButton As Integer
 
-    For iButton = 0 To iLastButton
-      With pRunButton(iButton)
-        .Visible = False
-        .Top = (panelMiddle.Height - .Height) / 2
-        .Left = 0
-      End With
-    Next
-
-    For iColumn As Integer = 0 To pSource.Columns - 1
       For iButton = 0 To iLastButton
-        If iButton > iColumn - 2 Then
-          pRunButton(iButton).Left += agdResults.ColumnWidth(iColumn)
-        ElseIf iButton = iColumn - 2 Then
-          pRunButton(iButton).Left += (agdResults.ColumnWidth(iColumn) - pRunButton(iButton).Width) / 2
-        End If
+        With pRunButton(iButton)
+          .Visible = False
+          .Top = (panelMiddle.Height - .Height) / 2
+          .Left = 0
+        End With
       Next
-    Next
 
-    For iButton = 0 To iLastButton
-      pRunButton(iButton).Visible = True
-    Next
+      For iColumn As Integer = 0 To pSource.Columns - 1
+        For iButton = 0 To iLastButton
+          If iButton > iColumn - 2 Then
+            pRunButton(iButton).Left += agdResults.ColumnWidth(iColumn)
+          ElseIf iButton = iColumn - 2 Then
+            pRunButton(iButton).Left += (agdResults.ColumnWidth(iColumn) - pRunButton(iButton).Width) / 2
+          End If
+        Next
+      Next
+
+      For iButton = 0 To iLastButton
+        pRunButton(iButton).Visible = True
+      Next
+    Catch 'quietly skip repositioning the buttons if there is a problem (e.g. can't do before buttons are created)
+    End Try
   End Sub
 
   Private Sub mnuScenariosAddFromScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromScript.Click
@@ -818,7 +839,10 @@ Friend Class atcScenarioBuilderForm
     PositionRunButtons()
   End Sub
 
-
+  Protected Overrides Sub OnResize(ByVal e As System.EventArgs)
+    MyBase.OnResize(e)
+    PositionRunButtons()
+  End Sub
 End Class
 
 Friend Class GridSource
