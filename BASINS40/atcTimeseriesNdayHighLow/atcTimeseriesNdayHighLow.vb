@@ -65,20 +65,20 @@ Public Class atcTimeseriesNdayHighLow
           .TypeString = "atcTimeseries"
         End With
 
-        AddOperation("7Q10", "Seven day low flow 10-year return period", defTimeSeriesOne)
-        AddOperation("1Hi100", "One day high 100-year return period", defTimeSeriesOne)
+        AddOperation("7Q10", "Seven day low flow 10-year return period", _
+                     "Double", defTimeSeriesOne)
+        AddOperation("1Hi100", "One day high 100-year return period", _
+                     "Double", defTimeSeriesOne)
 
         AddOperation("n-day low timeseries", "n-day low value annual timeseries", _
-                     defTimeSeriesOne, defDays)
-
+                     "atcTimeseries", defTimeSeriesOne, defDays, defReturnPeriod)
         AddOperation("n-day high timeseries", "n-day high value annual timeseries", _
-                     defTimeSeriesOne, defDays, defReturnPeriod)
+                     "atcTimeseries", defTimeSeriesOne, defDays, defReturnPeriod)
 
         AddOperation("n-day low value", "n-day low value for a return period", _
-                     defTimeSeriesOne, defDays, defReturnPeriod)
-
+                     "Double", defTimeSeriesOne, defDays, defReturnPeriod)
         AddOperation("n-day high value", "n-day high value for a return period", _
-                     defTimeSeriesOne, defDays, defReturnPeriod)
+                     "Double", defTimeSeriesOne, defDays, defReturnPeriod)
 
       End If
       Return pAvailableOperations
@@ -87,6 +87,7 @@ Public Class atcTimeseriesNdayHighLow
 
   Private Function AddOperation(ByVal aName As String, _
                                 ByVal aDescription As String, _
+                                ByVal aTypeString As String, _
                                 ByVal ParamArray aArgs() As atcAttributeDefinition)
     Dim lResult As New atcAttributeDefinition
     With lResult
@@ -94,7 +95,7 @@ Public Class atcTimeseriesNdayHighLow
       .Description = aDescription
       .DefaultValue = ""
       .Editable = False
-      .TypeString = "Double"
+      .TypeString = aTypeString
       .Calculator = Me
       .Category = "nDay & Frequency"
     End With

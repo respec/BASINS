@@ -26,13 +26,14 @@ Module modFreq
   Function PearsonType3(ByVal aTs As atcTimeseries, ByVal aRecurOrProb As Double, ByVal aHigh As Boolean) As Double
 
     Dim lN As Integer = aTs.Attributes.GetValue("Count")
-    If lN = 0 Then 'no data
+    Dim lMean As Double = aTs.Attributes.GetValue("Mean")
+    Dim lStd As Double = aTs.Attributes.GetValue("Standard Deviation")
+    Dim lSkew As Double = aTs.Attributes.GetValue("Skew")
+
+    If lN = 0 Or lMean <= 0 Then 'no data or problem data
       Return Double.NaN
     Else
       Dim lNzi As Integer = aTs.numValues - lN
-      Dim lMean As Double = aTs.Attributes.GetValue("Mean")
-      Dim lStd As Double = aTs.Attributes.GetValue("Standard Deviation")
-      Dim lSkew As Double = aTs.Attributes.GetValue("Skew")
 
       Dim lNumons As Integer = 1
       Dim lLogarh As Integer = 2 'log trans flag 1-yes,2-no (handle earlier)

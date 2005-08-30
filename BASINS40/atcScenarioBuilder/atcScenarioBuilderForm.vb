@@ -652,7 +652,6 @@ Friend Class atcScenarioBuilderForm
 
     Dim lModifiedIndex As Integer = 0
     Dim lNewScenarioName As String
-    Dim lNewFilename As String
     Dim lNewWDM As atcWDM.atcDataSourceWDM
     Dim lOldWDM As atcWDM.atcDataSourceWDM
     Dim lCurrentWDMfilename As String
@@ -664,41 +663,21 @@ Friend Class atcScenarioBuilderForm
         lCurrentWDMfilename = lDataSource.Specification
       End If
     Next
+
     If FileExists(lCurrentWDMfilename) Then
       If IsNumeric(btn.Tag) Then lModifiedIndex = btn.Tag
 
       If lModifiedIndex = -1 Then 'Run base scenario
-        lNewFilename = FilenameNoExt(lCurrentWDMfilename) & "."
+        lNewScenarioName = "base"
         lNewWDM = lOldWDM
       Else 'Run a modified scenario
         lNewScenarioName = "modified"
         If lModifiedIndex > 0 Then lNewScenarioName &= (lModifiedIndex + 1)
-        lNewFilename = PathNameOnly(lCurrentWDMfilename) & "\" & lNewScenarioName & "."
-        'Copy base UCI and change scenario name within it
-        ReplaceStringToFile(WholeFileString(FilenameSetExt(lCurrentWDMfilename, "uci")), "base.", lNewScenarioName & ".", lNewFilename & "uci")
-
-        'Copy base WDM to new WDM
-        FileCopy(lCurrentWDMfilename, lNewFilename & "wdm")
-        lNewWDM = New atcWDM.atcDataSourceWDM
-        If Not lNewWDM.Open(lNewFilename & "wdm") Then
-          MsgBox("Could not open new scenario WDM file '" & lNewFilename & "wdm'", MsgBoxStyle.Critical, "Could not run model")
-          Exit Sub
-        End If
-        Dim lCurrentTimeseries As atcTimeseries
-        For Each lCurrentTimeseries In pModifiedScenarios.ItemByIndex(lModifiedIndex).DataSets
-          lCurrentTimeseries.Attributes.SetValue("scenario", lNewScenarioName)
-          lNewWDM.AddDataSet(lCurrentTimeseries)
-        Next
-
-        For Each lCurrentTimeseries In lNewWDM.DataSets
-          If lCurrentTimeseries.Attributes.GetValue("scenario").ToLower = "base" Then
-            lCurrentTimeseries.Attributes.SetValue("scenario", lNewScenarioName)
-            lNewWDM.AddDataSet(lCurrentTimeseries) 'TODO: Would be nice to just update this attribute, not rewrite all data values
-          End If
-        Next
       End If
 
-      Shell("D:\BASINS\models\hspf\bin\WinHspfLt.exe " & lNewFilename & "uci", AppWinStyle.NormalFocus, True)
+      lNewWDM = ScenarioRun(lCurrentWDMfilename, _
+                            lNewScenarioName, _
+                            pModifiedScenarios.ItemByIndex(lModifiedIndex).DataSets)
 
       If lModifiedIndex >= 0 Then 'ran modified scenario
         lNewResults = pModifiedResults.ItemByIndex(lModifiedIndex)
@@ -734,8 +713,6 @@ Friend Class atcScenarioBuilderForm
     Else
       MsgBox("Could not find base WDM file '" & lCurrentWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
     End If
-    Dim lNewWDMfile As atcDataSource
-
   End Sub
 
   Private Sub agdMain_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles agdMain.UserResizedColumn
