@@ -204,7 +204,7 @@ Public Class frmDataSource
             End If
           Next
         ElseIf ds.Description = lOperationName Then
-          pSelectedSource = ds
+          pSelectedSource = ds.NewOne
           Me.Close()
         End If
       End If

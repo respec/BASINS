@@ -67,7 +67,7 @@ Public Class atcDataAttributes
 
   'True if aAttributeName has been set
   Public Function ContainsAttribute(ByVal aAttributeName As String) As Boolean
-    Return Keys.Contains(aAttributeName.ToLower)
+    Return Keys.Contains(AttributeNameToKey(aAttributeName))
   End Function
 
 
@@ -111,7 +111,7 @@ Public Class atcDataAttributes
   'Retrieve or calculate the value for aAttributeName
   'returns aDefault if attribute has not been set and cannot be calculated
   Public Function GetValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = Nothing) As Object
-    Dim key As String = aAttributeName.ToLower
+    Dim key As String = AttributeNameToKey(aAttributeName)
     Dim tmpAttribute As atcDefinedValue
     Try
       tmpAttribute = GetDefinedValue(aAttributeName)
@@ -165,7 +165,7 @@ Public Class atcDataAttributes
   'Set attribute with name aAttributeName to value aValue
   Public Shadows Function Add(ByVal aAttributeName As String, ByVal aAttributeValue As Object) As Integer
     Dim lTmpAttrDef As New atcAttributeDefinition
-    lTmpAttrDef = pAllDefinitions.ItemByKey(aAttributeName.ToLower)
+    lTmpAttrDef = pAllDefinitions.ItemByKey(AttributeNameToKey(aAttributeName))
     If lTmpAttrDef Is Nothing Then
       lTmpAttrDef = New atcAttributeDefinition
       lTmpAttrDef.Name = aAttributeName
@@ -261,9 +261,20 @@ Public Class atcDataAttributes
     Next
   End Sub
 
+  Public Sub DiscardCalculated()
+    'discard any calculated attributes
+    'Step in reverse so we can remove by index without high indexes changing before they are removed
+    For iAttribute As Integer = Count - 1 To 0 Step -1
+      If ItemByIndex(iAttribute).Definition.Calculated Then
+        RemoveAt(iAttribute)
+      End If
+    Next
+  End Sub
+
   Public Function GetDefinedValue(ByVal aAttributeName As String) As atcDefinedValue
     Dim lKey As String = AttributeNameToKey(aAttributeName)
     Dim lAttribute As atcDefinedValue = ItemByKey(lKey)
+
     If lAttribute Is Nothing Then  'Did not find the named attribute
       If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
         Try

@@ -1,7 +1,7 @@
 Imports atcData
 Imports atcUtility
 
-Module modScenarioBuild
+Public Module modScenarioBuild
   Public Function ScenarioRun(ByVal aCurrentWDMfilename As String, _
                               ByVal aNewScenarioName As String, _
                               ByVal aModifiedData As atcDataGroup) As atcDataSource
@@ -16,7 +16,8 @@ Module modScenarioBuild
     Dim lNewResults As atcDataSource
 
     If FileExists(aCurrentWDMfilename) Then
-      lNewFilename = PathNameOnly(aCurrentWDMfilename) & "\" & aNewScenarioName & "."
+      lNewFilename = AbsolutePath(aCurrentWDMfilename, CurDir)
+      lNewFilename = PathNameOnly(lNewFilename) & "\" & aNewScenarioName & "."
 
       If aNewScenarioName.ToLower <> "base" Then
         'Copy base UCI and change scenario name within it
@@ -38,8 +39,11 @@ Module modScenarioBuild
         Next
         For Each lCurrentTimeseries In lNewWDM.DataSets
           If lCurrentTimeseries.Attributes.GetValue("scenario").ToLower = "base" Then
+            lCurrentTimeseries.EnsureValuesRead()
             lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
             lNewWDM.AddDataSet(lCurrentTimeseries) 'TODO: Would be nice to just update this attribute, not rewrite all data values
+            lCurrentTimeseries.ValuesNeedToBeRead = True
+            lCurrentTimeseries.Attributes.DiscardCalculated()
           End If
         Next
       End If
