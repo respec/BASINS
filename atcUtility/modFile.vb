@@ -534,7 +534,7 @@ NoSuchFile:
   'Given a set of file filters as used by common dialog, return the filter with the given index
   ' FindFileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1) = "WDM Files (*.wdm)|*.wdm"
   Public Function FindFileFilter(ByVal FileFilters As String, ByVal FileFilterIndex As Integer) As String
-    Dim prevPipe As Integer = 0
+    Dim prevPipe As Integer = -1
     Dim pipePos As Integer
 
     Try
@@ -554,9 +554,9 @@ NoSuchFile:
       'Find pipe symbol after desired filter, or end of string
       pipePos = FileFilters.IndexOf("|", prevPipe + 1)
       If pipePos > 0 Then pipePos = FileFilters.IndexOf("|", pipePos + 1)
-      If pipePos < 0 Then pipePos = FileFilters.Length + 1
+      If pipePos < 0 Then pipePos = FileFilters.Length
 
-      FindFileFilter = FileFilters.Substring(prevPipe + 1, pipePos - prevPipe - 2)
+      FindFileFilter = FileFilters.Substring(prevPipe + 1, pipePos - prevPipe - 1)
     Catch
       Return ""
     End Try
