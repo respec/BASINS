@@ -974,6 +974,8 @@ End Class
 
   Public Sub TestFindFileFilter()
     Assert.AreEqual("WDM Files (*.wdm)|*.wdm", FindFileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1))
+    Assert.AreEqual("All Files (*.*)|*.*", FindFileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 2))
+    Assert.AreEqual("Mid Files (*.mid)|*.mid", FindFileFilter("WDM Files (*.wdm)|*.wdm|Mid Files (*.mid)|*.mid|All Files (*.*)|*.*", 2))
   End Sub
 
   Public Sub TestAbsolutePath()
