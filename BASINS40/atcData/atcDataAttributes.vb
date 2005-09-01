@@ -83,7 +83,7 @@ Public Class atcDataAttributes
             lDate = DumpDate(lValue).Split(" ")
             Return lDate(2) & " " & lDate(3) & " : " & lDate(0)
           Else
-            Return Format(lValue, "#,##0.#####")
+            Return DoubleToString(lValue)
           End If
         ElseIf TypeOf (lValue) Is atcTimeseries Then
           Return lValue.ToString
