@@ -158,8 +158,8 @@ Public Module modString
       Value = -Value
     End If
 
-    CurPower = Fix(Log10(Value))
-    If CurPower >= 0 Then CurPower = CurPower + 1
+    CurPower = Int(Log10(Value))
+    If Value >= 1 Then      CurPower += 1
     ShiftPower = 10 ^ (digits - CurPower)
     Value = Value * ShiftPower 'Shift val so number of digits before decimal = significant digits
     Value = Fix(Value + 0.5) 'Round up if needed

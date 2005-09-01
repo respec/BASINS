@@ -49,6 +49,10 @@ Friend Class atcScenarioBuilderForm
   Friend WithEvents mnuScenariosAdd As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileAddResults As System.Windows.Forms.MenuItem
   Friend WithEvents mnuScenariosAddFromScript As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditCopyInputs As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditCopyResults As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditCopyBoth As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcScenarioBuilderForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -62,6 +66,10 @@ Friend Class atcScenarioBuilderForm
     Me.mnuScenarios = New System.Windows.Forms.MenuItem
     Me.mnuScenariosAdd = New System.Windows.Forms.MenuItem
     Me.mnuScenariosAddFromScript = New System.Windows.Forms.MenuItem
+    Me.mnuEdit = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopyBoth = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopyInputs = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopyResults = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
     Me.splitHoriz = New System.Windows.Forms.Splitter
     Me.panelMiddle = New System.Windows.Forms.Panel
@@ -70,7 +78,7 @@ Friend Class atcScenarioBuilderForm
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAttributes, Me.mnuDisplay, Me.mnuScenarios})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuAttributes, Me.mnuDisplay, Me.mnuScenarios})
     '
     'mnuFile
     '
@@ -90,7 +98,7 @@ Friend Class atcScenarioBuilderForm
     '
     'mnuAttributes
     '
-    Me.mnuAttributes.Index = 1
+    Me.mnuAttributes.Index = 2
     Me.mnuAttributes.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributesAdd, Me.mnuAttributesRemove})
     Me.mnuAttributes.Text = "&Attributes"
     '
@@ -106,12 +114,12 @@ Friend Class atcScenarioBuilderForm
     '
     'mnuDisplay
     '
-    Me.mnuDisplay.Index = 2
+    Me.mnuDisplay.Index = 3
     Me.mnuDisplay.Text = "&Display"
     '
     'mnuScenarios
     '
-    Me.mnuScenarios.Index = 3
+    Me.mnuScenarios.Index = 4
     Me.mnuScenarios.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuScenariosAdd, Me.mnuScenariosAddFromScript})
     Me.mnuScenarios.Text = "&Scenarios"
     '
@@ -124,6 +132,27 @@ Friend Class atcScenarioBuilderForm
     '
     Me.mnuScenariosAddFromScript.Index = 1
     Me.mnuScenariosAddFromScript.Text = "Add From Script"
+    '
+    'mnuEdit
+    '
+    Me.mnuEdit.Index = 1
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopyBoth, Me.mnuEditCopyInputs, Me.mnuEditCopyResults})
+    Me.mnuEdit.Text = "&Edit"
+    '
+    'mnuEditCopyBoth
+    '
+    Me.mnuEditCopyBoth.Index = 0
+    Me.mnuEditCopyBoth.Text = "&Copy Both"
+    '
+    'mnuEditCopyInputs
+    '
+    Me.mnuEditCopyInputs.Index = 1
+    Me.mnuEditCopyInputs.Text = "Copy Inputs"
+    '
+    'mnuEditCopyResults
+    '
+    Me.mnuEditCopyResults.Index = 2
+    Me.mnuEditCopyResults.Text = "Copy Results"
     '
     'agdMain
     '
@@ -306,9 +335,30 @@ Friend Class atcScenarioBuilderForm
     End If
   End Sub
 
-  Private Function GetIndex(ByVal aName As String) As Integer
-    Return CInt(Mid(aName, InStr(aName, "#") + 1))
+  Private Function GridAsString(ByVal aSource As GridSource) As String
+    Dim lCellValue As String
+    For iRow As Integer = 0 To aSource.Rows - 1
+      For iCol As Integer = 0 To aSource.Columns - 1
+        lCellValue = aSource.CellValue(iRow, iCol)
+        GridAsString &= lCellValue & vbTab
+        'Some modified values contain vbTab(+10%), add a tab to those that don't
+        If iCol > 2 AndAlso lCellValue.IndexOf(vbTab) < 0 Then GridAsString &= vbTab
+      Next
+      GridAsString &= vbCrLf
+    Next
   End Function
+
+  Private Sub mnuEditCopyBoth_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopyBoth.Click
+    Clipboard.SetDataObject(GridAsString(pSource) & vbCrLf & GridAsString(pResultSource))
+  End Sub
+
+  Private Sub mnuEditCopyInputs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopyInputs.Click
+    Clipboard.SetDataObject(GridAsString(pSource))
+  End Sub
+
+  Private Sub mnuEditCopyResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopyResults.Click
+    Clipboard.SetDataObject(GridAsString(pResultSource))
+  End Sub
 
   Private Sub mnuDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuDisplay.Click
     Dim lMenuClicked As MenuItem = sender
@@ -929,6 +979,7 @@ Friend Class atcScenarioBuilderForm
     MyBase.OnResize(e)
     PositionRunButtons()
   End Sub
+
 End Class
 
 Friend Class GridSource
@@ -996,65 +1047,77 @@ Friend Class GridSource
 
   Public Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
-      If aRow = pLabelRow Then
-        Select Case aColumn
-          Case 0
-            Return "Constituent"
-          Case 1
-            Return "Attribute"
-          Case 2
-            Return "Base"
-          Case Is > 2
-            Dim lModifiedSource As atcDataSource = pModifiedScenarios.ItemByIndex(aColumn - 3)
-            Return lModifiedSource.Specification
-        End Select
-      Else
-        Dim lAttributeIndex As Integer
-        Dim lDataSet As atcDataSet = BaseDataSetInRow(aRow, lAttributeIndex)
-        Dim lAttributeName As String = ""
-        Try 'If we fail to find a name, it will stay blank as assigned above
-          lAttributeName = lDataSet.Attributes.GetValue("Scenario Attributes").ItemByIndex(lAttributeIndex).Definition.Name()
-        Catch
-        End Try
-        Select Case aColumn
-          Case 0
-            If lAttributeIndex = 0 Then
-              Return lDataSet.Attributes.GetFormattedValue("Constituent")
-            Else
+      Select Case aRow
+        Case Is >= Rows
+          Return ""
+        Case pLabelRow
+          Select Case aColumn
+            Case 0
+              Return "Constituent"
+            Case 1
+              Return "Attribute"
+            Case 2
+              Return "Base"
+            Case Is >= Columns
               Return ""
-            End If
-          Case 1
-            Return lAttributeName
-          Case 2
-            Return lDataSet.Attributes.GetFormattedValue(lAttributeName)
-          Case Is > 2
-            Dim lModifiedSource As atcDataSource = pModifiedScenarios.ItemByIndex(aColumn - 3)
-            Dim lModifiedGroup As atcDataGroup = lModifiedSource.DataSets
-            Dim lBaseID As String = lDataSet.Attributes.GetValue("id")
-            For Each lModifiedData As atcDataSet In lModifiedGroup
-              If lModifiedData.Attributes.GetValue("id") = lBaseID Then 'Found modified dataset for this cell
-                'If aColumn Mod 2 = 1 Then 'odd columns contain relationships
-                'Return lModifiedData.Attributes.GetValue("History 1")
-                'Else 'Even columns contain values
-                Dim lNewValue As Object = lModifiedData.Attributes.GetValue(lAttributeName)
-                If IsNumeric(lNewValue) Then 'See if we can provide %difference from base
-                  Dim lOldValue As Object = lDataSet.Attributes.GetValue(lAttributeName)
-                  If IsNumeric(lOldValue) Then
-                    Dim lPercentDifference As Double = (lNewValue - lOldValue) / lOldValue
-                    If Not Double.IsNaN(lPercentDifference) AndAlso _
-                       Not Double.IsInfinity(lPercentDifference) AndAlso _
-                       Math.Abs(lPercentDifference) > 0.005 Then
-                      Return lModifiedData.Attributes.GetFormattedValue(lAttributeName) & vbTab & " (" _
-                           & Format(lPercentDifference, "+#,##0.##%;-#,##0.##%") & ")"
+            Case Is > 2
+              Dim lModifiedSource As atcDataSource = pModifiedScenarios.ItemByIndex(aColumn - 3)
+              Return lModifiedSource.Specification
+          End Select
+        Case Is > 0
+          Dim lAttributeIndex As Integer
+          Dim lDataSet As atcDataSet = BaseDataSetInRow(aRow, lAttributeIndex)
+          Dim lAttributeName As String = ""
+          Try 'If we fail to find a name, it will stay blank as assigned above
+            lAttributeName = lDataSet.Attributes.GetValue("Scenario Attributes").ItemByIndex(lAttributeIndex).Definition.Name()
+          Catch
+          End Try
+          Select Case aColumn
+            Case 0
+              If lAttributeIndex = 0 Then
+                Return lDataSet.Attributes.GetFormattedValue("Constituent")
+              Else
+                Return ""
+              End If
+            Case 1
+              Return lAttributeName
+            Case 2
+              Return lDataSet.Attributes.GetFormattedValue(lAttributeName)
+            Case Is >= Columns
+              Return ""
+            Case Is > 2
+              Dim lModifiedSource As atcDataSource = pModifiedScenarios.ItemByIndex(aColumn - 3)
+              Dim lModifiedGroup As atcDataGroup = lModifiedSource.DataSets
+              Dim lBaseID As String = lDataSet.Attributes.GetValue("id")
+              For Each lModifiedData As atcDataSet In lModifiedGroup
+                If lModifiedData.Attributes.GetValue("id") = lBaseID Then 'Found modified dataset for this cell
+                  'If aColumn Mod 2 = 1 Then 'odd columns contain relationships
+                  'Return lModifiedData.Attributes.GetValue("History 1")
+                  'Else 'Even columns contain values
+                  Dim lNewValue As Object = lModifiedData.Attributes.GetValue(lAttributeName)
+                  If IsNumeric(lNewValue) Then 'See if we can provide %difference from base
+                    Dim lOldValue As Object = lDataSet.Attributes.GetValue(lAttributeName)
+                    If IsNumeric(lOldValue) Then
+                      Dim lPercentDifference As Double = (lNewValue - lOldValue) * 100 / lOldValue
+                      If Not Double.IsNaN(lPercentDifference) AndAlso _
+                         Not Double.IsInfinity(lPercentDifference) AndAlso _
+                         Math.Abs(lPercentDifference) > 0.005 Then
+                        Dim lPercentDifferenceString As String = DoubleToString(lPercentDifference, 5, "+#,##0.##;-#,##0.##", , "", 2)
+                        If lPercentDifferenceString.Length > 0 Then
+                          Return lModifiedData.Attributes.GetFormattedValue(lAttributeName) & vbTab & " (" _
+                              & lPercentDifferenceString & "%)"
+                        Else
+                          Return lModifiedData.Attributes.GetFormattedValue(lAttributeName)
+                        End If
+                      End If
                     End If
                   End If
+                  Return lModifiedData.Attributes.GetFormattedValue(lAttributeName)
                 End If
-                Return lModifiedData.Attributes.GetFormattedValue(lAttributeName)
-              End If
-            Next
-        End Select
-        Return "" '    "(click to modify)"
-      End If
+              Next
+          End Select
+          Return "" '    "(click to modify)"
+      End Select
     End Get
     Set(ByVal newValue As String)
     End Set
