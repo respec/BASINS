@@ -143,175 +143,210 @@ Public Module modString
 
     '    End Function
 
-    '    Function SignificantDigits(ByVal Value As Double, ByVal digits As Integer) As Double
-    '        ' ##SUMMARY Rounds double-precision number to specified number of significant digits.
-    '        ' ##SUMMARY   Example: Signif(1.23456, 3) =  1.23
-    '        ' ##PARAM val I Double-precision number to be formatted
-    '        ' ##PARAM digits I Number of significant digits
-    '        ' ##RETURNS Input parameter val rounded to specified number of significant digits.
-    '        Dim CurPower As Integer 'order of magnitude of val
-    '        Dim Negative As Boolean 'true if incoming number is negative
-    '        Dim ShiftPower As Double 'magnitude by which val is temporarily shifted
+  Function SignificantDigits(ByVal Value As Double, ByVal digits As Integer) As Double
+    ' ##SUMMARY Rounds double-precision number to specified number of significant digits.
+    ' ##SUMMARY   Example: Signif(1.23456, 3) =  1.23
+    ' ##PARAM val I Double-precision number to be formatted
+    ' ##PARAM digits I Number of significant digits
+    ' ##RETURNS Input parameter val rounded to specified number of significant digits.
+    Dim CurPower As Integer 'order of magnitude of val
+    Dim Negative As Boolean 'true if incoming number is negative
+    Dim ShiftPower As Double 'magnitude by which val is temporarily shifted
 
-    '        If Value < 0 Then 'Have to use a positive number with Log10 below
-    '            Negative = True
-    '            Value = -Value
-    '        End If
+    If Value < 0 Then 'Have to use a positive number with Log10 below
+      Negative = True
+      Value = -Value
+    End If
 
-    '        CurPower = Fix(Log10(Value))
-    '        If CurPower >= 0 Then CurPower = CurPower + 1
-    '        ShiftPower = 10 ^ (digits - CurPower)
-    '        Value = Value * ShiftPower 'Shift val so number of digits before decimal = significant digits
-    '        Value = Fix(Value + 0.5) 'Round up if needed
-    '        Value = Value / ShiftPower 'Shift val back to where it belongs
+    CurPower = Fix(Log10(Value))
+    If CurPower >= 0 Then CurPower = CurPower + 1
+    ShiftPower = 10 ^ (digits - CurPower)
+    Value = Value * ShiftPower 'Shift val so number of digits before decimal = significant digits
+    Value = Fix(Value + 0.5) 'Round up if needed
+    Value = Value / ShiftPower 'Shift val back to where it belongs
 
-    '        If Negative Then Value = -Value
+    If Negative Then Value = -Value
 
-    '        SignificantDigits = Value
-    '    End Function
+    SignificantDigits = Value
+  End Function
 
-    '    Function Str_Read() As String
-    '        ' ##SUMMARY Reads a string from a binary database of open file.
-    '        ' ##SUMMARY Assumes open file # is '1'.
-    '        ' ##RETURNS String from a binary file.
-    '        ' ##LOCAL tmp - string used to read binary input one character at a time
-    '        ' ##LOCAL stmp - string used as antecedent to Str_Read
-    '        Dim tmp As String
-    '        Dim stmp As String
+  Function DoubleToString(ByVal aValue As Double, _
+                 Optional ByVal aMaxWidth As Integer = 10, _
+                 Optional ByVal aFormat As String = "#,##0.########", _
+                 Optional ByVal aExpFormat As String = "#.#e#", _
+                 Optional ByVal aCantFit As String = "#", _
+                 Optional ByVal aSignificantDigits As Integer = 5) As String
+    Dim lValue As Double
+    If aSignificantDigits > 0 Then
+      lValue = SignificantDigits(aValue, aSignificantDigits)
+    Else
+      lValue = aValue
+    End If
 
-    '        stmp = ""
-    '        Do
-    '            tmp = InputString(1, 1)
-    '            If Asc(tmp) = 0 Then
-    '                Exit Do
-    '            Else
-    '                stmp = stmp & tmp
-    '            End If
-    '        Loop
-    '        Str_Read = stmp
+    Dim lString As String = Format(lValue, aFormat)
+    If lString.Length <= aMaxWidth Then
+      Return lString
+    Else
+      Dim lDecimalPos As Integer = InStr(lString, ".")
+      Select Case lDecimalPos
+        Case Is < 1 'string does not contain a decimal or it is the first character
+        Case aMaxWidth - 1
+          Return Left(lString, lDecimalPos) 'Truncate at decimal and remove trailing decimal
+        Case Is < aMaxWidth
+          Return Left(lString, aMaxWidth) 'Truncate at least one digit after decimal
+      End Select
+      'At this point we know string is too long and cannot simply be truncated at or after decimal point
+      lString = Format(lValue, aExpFormat)
+      If lString.Length <= aMaxWidth Then
+        Return lString
+      Else
+        Return aCantFit 'Placeholder for number that does not fit even in exponential notation
+      End If
+    End If
+  End Function
 
-    '    End Function
+  '    Function Str_Read() As String
+  '        ' ##SUMMARY Reads a string from a binary database of open file.
+  '        ' ##SUMMARY Assumes open file # is '1'.
+  '        ' ##RETURNS String from a binary file.
+  '        ' ##LOCAL tmp - string used to read binary input one character at a time
+  '        ' ##LOCAL stmp - string used as antecedent to Str_Read
+  '        Dim tmp As String
+  '        Dim stmp As String
 
-    Public Function IsInteger(ByRef istr As String) As Boolean
-        ' ##SUMMARY Checks to see whether incoming string is an integer or not.
-        ' ##SUMMARY Returns true if each character in string is in range [0-9].
-        ' ##SUMMARY   Example: IsInteger(12345) = True
-        ' ##SUMMARY   Example: IsInteger(123.45) = False
-        ' ##PARAM istr I String to be checked for integer status
-        ' ##RETURNS True if input parameter istr is an integer.
-        ' ##LOCAL a - long number set to ascii code of each successive character in istr
-        ' ##LOCAL Length - long length of istr
-        ' ##LOCAL pos - long position of character in istr being checked
-        Dim a As Integer
-        Dim Length As Integer
-        Dim pos As Integer
+  '        stmp = ""
+  '        Do
+  '            tmp = InputString(1, 1)
+  '            If Asc(tmp) = 0 Then
+  '                Exit Do
+  '            Else
+  '                stmp = stmp & tmp
+  '            End If
+  '        Loop
+  '        Str_Read = stmp
 
-        IsInteger = False
-        Length = Len(istr)
-        For pos = 1 To Length
-            a = Asc(Mid(istr, pos, 1))
-            If a < 48 Then Exit Function
-            If a > 57 Then Exit Function
-        Next pos
-        IsInteger = True
-    End Function
+  '    End Function
 
-    Public Function IsAlpha(ByRef istr As String) As Boolean
-        ' ##SUMMARY Checks to see whether incoming string is entirely alphabetic.
-        ' ##SUMMARY   Example: IsAlpha(abcde) = True
-        ' ##SUMMARY   Example: IsAlpha(abc123) = False
-        ' ##PARAM istr I String to be checked for alphabetic status  ' ##LOCAL a - long number set to ascii code of each successive character in istr
-        ' ##RETURNS True if input parameter istr contains only [A-Z] or [a-z].
-        Dim a As Integer
-        Dim Length As Integer
-        Dim pos As Integer
-        ' ##LOCAL a - position of character in istr
-        ' ##LOCAL Length - length of istr
-        ' ##LOCAL pos - position of character in istr being checked
+  Public Function IsInteger(ByRef istr As String) As Boolean
+    ' ##SUMMARY Checks to see whether incoming string is an integer or not.
+    ' ##SUMMARY Returns true if each character in string is in range [0-9].
+    ' ##SUMMARY   Example: IsInteger(12345) = True
+    ' ##SUMMARY   Example: IsInteger(123.45) = False
+    ' ##PARAM istr I String to be checked for integer status
+    ' ##RETURNS True if input parameter istr is an integer.
+    ' ##LOCAL a - long number set to ascii code of each successive character in istr
+    ' ##LOCAL Length - long length of istr
+    ' ##LOCAL pos - long position of character in istr being checked
+    Dim a As Integer
+    Dim Length As Integer
+    Dim pos As Integer
 
-        IsAlpha = False
-        Length = Len(istr)
-        For pos = 1 To Length
-            a = Asc(Mid(istr, pos, 1))
-            If a < 65 Then Exit Function
-            If a > 90 And a < 97 Then Exit Function
-            If a > 122 Then Exit Function
-        Next pos
-        IsAlpha = True
-    End Function
+    IsInteger = False
+    Length = Len(istr)
+    For pos = 1 To Length
+      a = Asc(Mid(istr, pos, 1))
+      If a < 48 Then Exit Function
+      If a > 57 Then Exit Function
+    Next pos
+    IsInteger = True
+  End Function
 
-    Public Function IsAlphaNumeric(ByRef istr As String) As Boolean
-        ' ##SUMMARY Checks to see whether incoming string is entirely alphanumeric.
-        ' ##SUMMARY   Example: IsAlphaNumeric(abc123) = True
-        ' ##SUMMARY   Example: IsAlphaNumeric(#$*&!) = False
-        ' ##PARAM istr I String to be checked for alphanumeric status
-        ' ##RETURNS True if input parameter istr contains only [A-Z], [a-z], or [0-9].
-        Dim a As Integer
-        Dim Length As Integer
-        Dim pos As Integer
-        ' ##LOCAL a - long number set to ascii code of each successive character in istr
-        ' ##LOCAL Length - length of istr
-        ' ##LOCAL pos - position of character in istr being checked
+  Public Function IsAlpha(ByRef istr As String) As Boolean
+    ' ##SUMMARY Checks to see whether incoming string is entirely alphabetic.
+    ' ##SUMMARY   Example: IsAlpha(abcde) = True
+    ' ##SUMMARY   Example: IsAlpha(abc123) = False
+    ' ##PARAM istr I String to be checked for alphabetic status  ' ##LOCAL a - long number set to ascii code of each successive character in istr
+    ' ##RETURNS True if input parameter istr contains only [A-Z] or [a-z].
+    Dim a As Integer
+    Dim Length As Integer
+    Dim pos As Integer
+    ' ##LOCAL a - position of character in istr
+    ' ##LOCAL Length - length of istr
+    ' ##LOCAL pos - position of character in istr being checked
 
-        IsAlphaNumeric = False
-        Length = Len(istr)
-        For pos = 1 To Length
-            a = Asc(Mid(istr, pos, 1))
-            If a < 48 Then Exit Function
-            If a > 57 And a < 65 Then Exit Function
-            If a > 90 And a < 97 Then Exit Function
-            If a > 122 Then Exit Function
-        Next pos
-        IsAlphaNumeric = True
-    End Function
+    IsAlpha = False
+    Length = Len(istr)
+    For pos = 1 To Length
+      a = Asc(Mid(istr, pos, 1))
+      If a < 65 Then Exit Function
+      If a > 90 And a < 97 Then Exit Function
+      If a > 122 Then Exit Function
+    Next pos
+    IsAlpha = True
+  End Function
 
-    Public Function ByteIsPrintable(ByRef b As Byte) As Boolean
-        ' ##SUMMARY Checks to see whether incoming byte is printable.
-        ' ##SUMMARY   Example: ByteIsPrintable(44) = True
-        ' ##SUMMARY   Example: IsAlphaNumeric(7) = False
-        ' ##PARAM b I Byte to be checked for printable status
-        ' ##RETURNS True if input parameter b is ASCII code 9, 10, 12, 13, 32 - 126.
-        Select Case b
-            Case 9, 10, 12, 13 : ByteIsPrintable = True
-            Case Is < 32 : ByteIsPrintable = False
-            Case Is < 127 : ByteIsPrintable = True
-        End Select
-    End Function
+  Public Function IsAlphaNumeric(ByRef istr As String) As Boolean
+    ' ##SUMMARY Checks to see whether incoming string is entirely alphanumeric.
+    ' ##SUMMARY   Example: IsAlphaNumeric(abc123) = True
+    ' ##SUMMARY   Example: IsAlphaNumeric(#$*&!) = False
+    ' ##PARAM istr I String to be checked for alphanumeric status
+    ' ##RETURNS True if input parameter istr contains only [A-Z], [a-z], or [0-9].
+    Dim a As Integer
+    Dim Length As Integer
+    Dim pos As Integer
+    ' ##LOCAL a - long number set to ascii code of each successive character in istr
+    ' ##LOCAL Length - length of istr
+    ' ##LOCAL pos - position of character in istr being checked
 
-    'Public Sub NumChr(ByRef ilen As Integer, ByRef inam() As Integer, ByRef outstr As String)
-    '    ' ##SUMMARY Returns String of characters associated with specified ascii _
-    '    'character codes in inam().
-    '    ' ##PARAM ilen I Upper bound of inam() dimension
-    '    ' ##PARAM inam I Array of long ascii character codes
-    '    ' ##PARAM outstr O String of converted ascii codes
-    '    Dim i As Integer
-    '    ' ##LOCAL i - long number used as index for member of inam()
+    IsAlphaNumeric = False
+    Length = Len(istr)
+    For pos = 1 To Length
+      a = Asc(Mid(istr, pos, 1))
+      If a < 48 Then Exit Function
+      If a > 57 And a < 65 Then Exit Function
+      If a > 90 And a < 97 Then Exit Function
+      If a > 122 Then Exit Function
+    Next pos
+    IsAlphaNumeric = True
+  End Function
 
-    '    outstr = ""
-    '    For i = 0 To ilen
-    '        outstr = outstr & Chr(inam(i))
-    '    Next i
+  Public Function ByteIsPrintable(ByRef b As Byte) As Boolean
+    ' ##SUMMARY Checks to see whether incoming byte is printable.
+    ' ##SUMMARY   Example: ByteIsPrintable(44) = True
+    ' ##SUMMARY   Example: IsAlphaNumeric(7) = False
+    ' ##PARAM b I Byte to be checked for printable status
+    ' ##RETURNS True if input parameter b is ASCII code 9, 10, 12, 13, 32 - 126.
+    Select Case b
+      Case 9, 10, 12, 13 : ByteIsPrintable = True
+      Case Is < 32 : ByteIsPrintable = False
+      Case Is < 127 : ByteIsPrintable = True
+    End Select
+  End Function
 
-    'End Sub
+  'Public Sub NumChr(ByRef ilen As Integer, ByRef inam() As Integer, ByRef outstr As String)
+  '    ' ##SUMMARY Returns String of characters associated with specified ascii _
+  '    'character codes in inam().
+  '    ' ##PARAM ilen I Upper bound of inam() dimension
+  '    ' ##PARAM inam I Array of long ascii character codes
+  '    ' ##PARAM outstr O String of converted ascii codes
+  '    Dim i As Integer
+  '    ' ##LOCAL i - long number used as index for member of inam()
 
-    'Function StrAdd(ByRef o As Object, ByRef old As String, ByRef Add As String, ByRef mwid As String) As String
-    '    ' ##SUMMARY Concatenates given string plus addendum, up to maximum length _
-    '    'allowed by object (padded right).
-    '    ' ##PARAM o I Object containing text
-    '    ' ##PARAM old I Existing string
-    '    ' ##PARAM Add I New string to addend to existing string
-    '    ' ##PARAM mwid I MAXimum length of addendum
-    '    ' ##RETURNS Concatenated input parameters, old and Add, plus right padding _
-    '    'if necessary to extend string to specified width.
-    '    Dim nst As String
-    '    ' ##LOCAL nst - new string built with Add plus trailing blanks
+  '    outstr = ""
+  '    For i = 0 To ilen
+  '        outstr = outstr & Chr(inam(i))
+  '    Next i
 
-    '    nst = Add
-    '    Do While o.TextWidth(nst) < o.TextWidth(mwid)
-    '        nst = nst & " "
-    '    Loop
-    '    StrAdd = old & nst
-    'End Function
+  'End Sub
+
+  'Function StrAdd(ByRef o As Object, ByRef old As String, ByRef Add As String, ByRef mwid As String) As String
+  '    ' ##SUMMARY Concatenates given string plus addendum, up to maximum length _
+  '    'allowed by object (padded right).
+  '    ' ##PARAM o I Object containing text
+  '    ' ##PARAM old I Existing string
+  '    ' ##PARAM Add I New string to addend to existing string
+  '    ' ##PARAM mwid I MAXimum length of addendum
+  '    ' ##RETURNS Concatenated input parameters, old and Add, plus right padding _
+  '    'if necessary to extend string to specified width.
+  '    Dim nst As String
+  '    ' ##LOCAL nst - new string built with Add plus trailing blanks
+
+  '    nst = Add
+  '    Do While o.TextWidth(nst) < o.TextWidth(mwid)
+  '        nst = nst & " "
+  '    Loop
+  '    StrAdd = old & nst
+  'End Function
 
   Public Sub Scalit(ByVal itype As Short, ByVal mMin As Single, ByVal mMax As Single, _
                     ByRef plmn As Single, ByRef plmx As Single)
