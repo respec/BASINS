@@ -733,6 +733,16 @@ End Class
     dVB = New Date(d(0), d(1), d(2), d(3), d(4), d(5))
   End Sub
 
+  Public Sub TestJ2DateRoundup()
+    'J2DateRoundup()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestCalcTimeUnitStep()
+    'CalcTimeUnitStep()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
   Public Sub TestVBdate2MJD()
     Assert.AreEqual(dJ, VBdate2MJD(dVB), dX)
   End Sub
@@ -896,6 +906,11 @@ End Class
     'TODO - save results here?
   End Sub
 
+  Public Sub TestFindFileFilterIndex()
+    'FindFileFilterIndex()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
   Public Sub TestChDriveDir()
     For Each lTest As TestData In myTest
       With lTest
@@ -958,7 +973,7 @@ End Class
   End Sub
 
   Public Sub TestFindFileFilter()
-    Assert.AreEqual(FindFileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1), "WDM Files (*.wdm)|*.wdm")
+    Assert.AreEqual("WDM Files (*.wdm)|*.wdm", FindFileFilter("WDM Files (*.wdm)|*.wdm|All Files (*.*)|*.*", 1))
   End Sub
 
   Public Sub TestAbsolutePath()
@@ -1135,6 +1150,26 @@ End Class
 
   <TestFixtureTearDown()> Public Sub dispose()
     'MsgBox("End stest of modString")
+  End Sub
+
+  Public Sub TestSignificantDigits()
+    Assert.AreEqual(220, SignificantDigits(224, 2))
+    Assert.AreEqual(230, SignificantDigits(225, 2))
+    Assert.AreEqual(225, SignificantDigits(225.4, 3))
+    Assert.AreEqual(226, SignificantDigits(225.5, 3))
+    Assert.AreEqual(34.542, SignificantDigits(34.542493456, 5))
+    Assert.AreEqual(3.4542, SignificantDigits(3.4542493456, 5))
+    Assert.AreEqual(-3.4542, SignificantDigits(-3.4542493456, 5))
+    Assert.AreEqual(0.34542, SignificantDigits(0.34542493456, 5))
+    Assert.AreEqual(0.034542, SignificantDigits(0.034542493456, 5))
+  End Sub
+
+  Public Sub TestDoubleToString()
+    Assert.AreEqual("220", DoubleToString(224, 4, , , , 2))
+  End Sub
+
+  Public Sub TestCountString()
+    Assert.AreEqual(2, CountString("HiHixx", "Hi"))
   End Sub
 
   Public Sub TestLog10()
@@ -1588,6 +1623,171 @@ End Class
 
   Public Sub TestGetType()
     'GetType()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testset_ItemByIndex()
+    'set_ItemByIndex()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_ItemByIndex()
+    'get_ItemByIndex()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestClone()
+    'Clone()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_IsSynchronized()
+    'get_IsSynchronized()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_SyncRoot()
+    'get_SyncRoot()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestCopyTo()
+    'CopyTo()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestRemoveAt()
+    'RemoveAt()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestRemove()
+    'Remove()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestInsert()
+    'Insert()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestIndexOf()
+    'IndexOf()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_IsFixedSize()
+    'get_IsFixedSize()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_IsReadOnly()
+    'get_IsReadOnly()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestContains()
+    'Contains()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testset_Item()
+    'set_Item()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_Item()
+    'get_Item()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestTrimToSize()
+    'TrimToSize()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestToArray()
+    'ToArray()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestSort()
+    'Sort()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestGetRange()
+    'GetRange()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestSetRange()
+    'SetRange()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestReverse()
+    'Reverse()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestRemoveRange()
+    'RemoveRange()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestLastIndexOf()
+    'LastIndexOf()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestInsertRange()
+    'InsertRange()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestBinarySearch()
+    'BinarySearch()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestAddRange()
+    'AddRange()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testset_Capacity()
+    'set_Capacity()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_Capacity()
+    'get_Capacity()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_Keys()
+    'get_Keys()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testset_Keys()
+    'set_Keys()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testget_ItemByKey()
+    'get_ItemByKey()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub Testset_ItemByKey()
+    'set_ItemByKey()
+    Assert.Ignore("Test not yet written")
+  End Sub
+
+  Public Sub TestChangeTo()
+    'ChangeTo()
     Assert.Ignore("Test not yet written")
   End Sub
 
