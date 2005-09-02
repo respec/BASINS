@@ -214,7 +214,7 @@ Public Class atcDebugTimserForm
           'data starts at 1, date display is from prev value which is start of interval
           lDateString = DumpDate(lData.Dates.Value(j - 1)).Split(" ")
           lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
-                              Format(lData.Value(j), "#,##0.#####") & " : " & _
+                              DoubleToString(lData.Value(j)) & " : " & _
                               lDateString(0))
         Next
         If lNumValues > pNumValuesShow Then  'some from end too
@@ -227,7 +227,7 @@ Public Class atcDebugTimserForm
           For j As Integer = lValueStart To lData.numValues
             lDateString = DumpDate(lData.Dates.Value(j - 1)).Split(" ")
             lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
-                                Format(lData.Value(j), "#,##0.#####") & " : " & _
+                                DoubleToString(lData.Value(j)) & " : " & _
                                 lDateString(0))
           Next
         End If
@@ -237,9 +237,7 @@ Public Class atcDebugTimserForm
   End Sub
 
   Public Sub Save(ByVal aFileName As String)
-    Dim lFileName As String = aFileName
-
-    If Len(lFileName) = 0 Then 'prompt user
+    If Len(aFileName) = 0 Then 'prompt user
       Dim cdlg As New Windows.Forms.SaveFileDialog
       With cdlg
         .Title = "Select File to Save Into"
@@ -247,22 +245,23 @@ Public Class atcDebugTimserForm
         .FilterIndex = 1
         .DefaultExt = "txt"
         If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-          lFileName = AbsolutePath(.FileName, CurDir)
+          aFileName = AbsolutePath(.FileName, CurDir)
         Else 'Return empty string if user clicked Cancel
-          lFileName = ""
+          aFileName = ""
         End If
       End With
     End If
 
-    If Len(lFileName) > 0 Then
-      SaveFileString(lFileName, TreeAsString)
+    If Len(aFileName) > 0 Then
+      SaveFileString(aFileName, ToString)
     End If
   End Sub
 
-  Private Function TreeAsString() As String
+  Public Overrides Function ToString() As String
     Dim s As String
     Dim t As String
     Dim ta(3) As String
+
     For i As Integer = 0 To atrMain.GetNodeCount(False) - 1
       With atrMain.Nodes(i)
         s &= .Text
@@ -373,7 +372,7 @@ Public Class atcDebugTimserForm
   End Sub
 
   Private Sub mnuCopyClipboard_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyClipboard.Click
-    Clipboard.SetDataObject(TreeAsString)
+    Clipboard.SetDataObject(ToString)
   End Sub
 
   Private Sub mnuDataCount_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuDataCount.Click

@@ -1168,6 +1168,9 @@ End Class
 
   Public Sub TestDoubleToString()
     Assert.AreEqual("220", DoubleToString(224, 4, , , , 2))
+    Assert.AreEqual("##", DoubleToString(224, 2, "##0.00", , , 2))
+    Assert.AreEqual("####", DoubleToString(224, 4, "##0.00", , , 2))
+    Assert.AreEqual("220.00", DoubleToString(224, 6, "##0.00", , , 2))
   End Sub
 
   Public Sub TestCountString()
