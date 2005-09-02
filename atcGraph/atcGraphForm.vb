@@ -6,12 +6,14 @@ Imports ZedGraph
 Imports System
 Imports System.Drawing
 Imports System.Drawing.Drawing2D
+Imports System.Drawing.Imaging
 Imports System.Collections
 Imports System.ComponentModel
+Imports System.IO
 Imports System.Windows.Forms
 
 Public Class atcGraphForm
-  Inherits System.Windows.Forms.Form
+  Inherits Form
 
   'Form object that contains graph(s)
   Private pMaster As ZedGraph.MasterPane
@@ -99,16 +101,12 @@ Public Class atcGraphForm
     End If
 
     If pDataGroup.Count > 0 Then
-      Me.Show()
       InitMasterPane()
 
       Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
       For Each lDisp As atcDataDisplay In DisplayPlugins
         mnuAnalysis.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
       Next
-
-    Else 'use declined to specify Data
-      Me.Close()
     End If
   End Sub
 
@@ -264,12 +262,35 @@ Public Class atcGraphForm
     pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 
-
   Private Sub mnuFileSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
-    Dim SavedAs As String
-    SavedAs = zgc.SaveAs(SaveImageExtension)
-    If SavedAs.Length > 0 Then
-      SaveImageExtension = System.IO.Path.GetExtension(SavedAs)
+    SaveBitmapToFile()
+  End Sub
+
+  Public Sub SaveBitmapToFile(Optional ByVal aFileName As String = "")
+    If aFileName.Length = 0 Then 'No file name specified - ask user
+      Dim lSavedAs As String
+      lSavedAs = zgc.SaveAs(SaveImageExtension)
+      If lSavedAs.Length > 0 Then
+        SaveImageExtension = System.IO.Path.GetExtension(lSavedAs)
+      End If
+    Else
+      Dim lFormat As ImageFormat
+      Select Case FileExt(aFileName).ToLower
+        Case "bmp" : lFormat = ImageFormat.Bmp
+        Case "png" : lFormat = ImageFormat.Png
+        Case "gif" : lFormat = ImageFormat.Gif
+        Case "jpg", _
+            "jpeg" : lFormat = ImageFormat.Jpeg
+        Case "tif", _
+            "tiff" : lFormat = ImageFormat.Tiff
+        Case Else : lFormat = ImageFormat.Png
+      End Select
+
+      MkDirPath(PathNameOnly(aFileName))
+      Dim lStream As New StreamWriter(aFileName)
+      zgc.MasterPane.Image.Save(lStream.BaseStream, lFormat)
+      lStream.Close()
+
     End If
   End Sub
 
