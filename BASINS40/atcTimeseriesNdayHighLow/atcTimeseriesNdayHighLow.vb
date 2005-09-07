@@ -107,8 +107,12 @@ Public Class atcTimeseriesNdayHighLow
 
   End Function
 
-  'Take care of missing values by setting to NaN before calling this function
-  Private Function HighOrLowValue(ByVal aTS As atcTimeseries, ByVal aNumValues As Integer, ByVal aHigh As Boolean) As Double
+  Private Function HighOrLowValue(ByVal aTS As atcTimeseries, _
+                   ByVal aNumValues As Integer, _
+                   ByVal aHigh As Boolean, _
+                   ByVal aSeasonDefinition As atcSeasons, _
+                   ByVal aSeasonIndex As Integer) As Double
+
     If aNumValues > 0 And aTS.numValues >= aNumValues Then
       Dim lBestSoFar As Double
       Dim lTimeIndex As Integer
@@ -120,7 +124,7 @@ Public Class atcTimeseriesNdayHighLow
         lCurrentValue = aTS.Value(lTimeIndex)
 
         'Can't calculate high or low value if any values in the period are missing
-        If Double.IsNaN(lCurrentValue) Then
+        If Double.IsNaN(lCurrentValue) Then 'TODO: check season here too!
           Return Double.NaN
         End If
         lRunningSum += lCurrentValue
@@ -137,21 +141,32 @@ Public Class atcTimeseriesNdayHighLow
 
         'Can't calculate high or low value if any values in the period are missing
         If Double.IsNaN(lCurrentValue) Then
-          Return Double.NaN
-        End If
-
-        lRunningSum += lCurrentValue
-
-        If aHigh Then
-          If lRunningSum > lBestSoFar Then lBestSoFar = lRunningSum
+          If aSeasonIndex = -1 OrElse aSeasonDefinition Is Nothing Then 'no season info
+            Return Double.NaN
+          Else
+            If aSeasonDefinition.SeasonIndex(aTS.Dates.Values(lTimeIndex - 1)) = aSeasonIndex Then
+              'missing withn current season
+              Return Double.NaN
+            End If
+          End If
+          lTimeIndex += 1
+          'TODO: clear out running sum, break in data!
         Else
-          If lRunningSum < lBestSoFar Then lBestSoFar = lRunningSum
-        End If
+          lRunningSum += lCurrentValue
 
-        lTimeIndex += 1
-        lRunningSum -= aTS.Value(lTimeIndex - aNumValues)
+          If aHigh Then
+            If lRunningSum > lBestSoFar Then lBestSoFar = lRunningSum
+          Else
+            If lRunningSum < lBestSoFar Then lBestSoFar = lRunningSum
+          End If
+
+          lTimeIndex += 1
+          lRunningSum -= aTS.Value(lTimeIndex - aNumValues)
+        End If
       End While
+
       Return (lBestSoFar / aNumValues)
+
     Else 'Cannot compute a value because fewer than aNumValues values are present 
       Return Double.NaN
     End If
@@ -169,12 +184,14 @@ Public Class atcTimeseriesNdayHighLow
       Dim newValues(nYears) As Double
       Dim newDates(nYears) As Double
       newDates(0) = sjday
+      Dim lSeasonDefinition As atcSeasons = aTS.Attributes.GetValue("SeasonDefinition")
+      Dim lSeasonIndex As Integer = aTS.Attributes.GetValue("SeasonIndex", -1)
 
       For indexNew = 1 To nYears
         Dim nextSJday As Double = TimAddJ(sjday, lTimeCode, 1, 1)
         Dim oneYear As atcTimeseries = SubsetByDate(aTS, sjday, nextSJday, Me)
         newDates(indexNew) = nextSJday
-        newValues(indexNew) = HighOrLowValue(oneYear, aNumValues, aHigh)
+        newValues(indexNew) = HighOrLowValue(oneYear, aNumValues, aHigh, lseasonDefinition, lSeasonIndex)
         sjday = nextSJday
       Next
 

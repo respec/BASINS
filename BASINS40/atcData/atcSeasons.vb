@@ -1,3 +1,5 @@
+Imports atcUtility
+
 Public Class atcSeasons
 
   'Divide the data in aTS into a group of TS, one per season
@@ -11,7 +13,11 @@ Public Class atcSeasons
 
     For iValue As Integer = 1 To aTS.numValues
       lPrevSeasonIndex = lSeasonIndex
-      lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue))
+      If lPoint Then
+        lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue))
+      Else '
+        lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue - 1))
+      End If
       lNewTS = lNewGroup.ItemByKey(lSeasonIndex)
       If lNewTS Is Nothing Then
         lNewTS = New atcTimeseries(Nothing)
@@ -19,9 +25,12 @@ Public Class atcSeasons
         lNewTS.Dates = New atcTimeseries(Nothing)
         lNewTS.numValues = aTS.numValues
         lNewTS.Dates.numValues = aTS.numValues
-        lNewTS.Attributes.AddHistory("Split by " & Label() & " " & SeasonName(lSeasonIndex))
+        lNewTS.Attributes.AddHistory("Split by " & ToString() & " " & SeasonName(lSeasonIndex))
+        lNewTS.Attributes.Add("SeasonDefinition", Me)
+        lNewTS.Attributes.Add("SeasonIndex", lSeasonIndex)
         lNewGroup.Add(lSeasonIndex, lNewTS)
       End If
+
       If lPoint Then
         lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1)
       Else
@@ -43,7 +52,6 @@ Public Class atcSeasons
       lNewTS.Dates.numValues = lNewTSvalueIndex
       lNewTS.Attributes.RemoveByKey("nextindex")
     Next
-
     Return lNewGroup
   End Function
 
@@ -59,10 +67,9 @@ Public Class atcSeasons
     Return CStr(aIndex)
   End Function
 
-  Public Overridable Function Label() As String
+  Public Overrides Function ToString() As String
     Return "<none>"
   End Function
-
 End Class
 
 Public Class atcSeasonsAMPM
@@ -80,7 +87,7 @@ Public Class atcSeasonsAMPM
     If aIndex = 0 Then Return "AM" Else Return "PM"
   End Function
 
-  Public Overrides Function Label() As String
+  Public Overrides Function ToString() As String
     Return "AM or PM"
   End Function
 End Class
@@ -92,7 +99,7 @@ Public Class atcSeasonsHour
     Return Date.FromOADate(aDate).Hour
   End Function
 
-  Public Overrides Function Label() As String
+  Public Overrides Function ToString() As String
     Return "Hour"
   End Function
 End Class
@@ -104,7 +111,7 @@ Public Class atcSeasonsDayOfMonth
     Return Date.FromOADate(aDate).Day
   End Function
 
-  Public Overrides Function Label() As String
+  Public Overrides Function ToString() As String
     Return "Day"
   End Function
 End Class
@@ -122,7 +129,7 @@ Public Class atcSeasonsDayOfWeek
     Return pDayName(aIndex)
   End Function
 
-  Public Overrides Function Label() As String
+  Public Overrides Function ToString() As String
     Return "Day of Week"
   End Function
 End Class
@@ -134,7 +141,7 @@ Public Class atcSeasonsDayOfYear
     Return Date.FromOADate(aDate).DayOfYear
   End Function
 
-  Public Overrides Function Label() As String
+  Public Overrides Function ToString() As String
     Return "Day of Year"
   End Function
 
@@ -153,7 +160,7 @@ Public Class atcSeasonsMonth
     Return pMonthName(aIndex)
   End Function
 
-  Public Overrides Function Label() As String
+  Public Overrides Function ToString() As String
     Return "Month"
   End Function
 
@@ -166,7 +173,7 @@ Public Class atcSeasonsYear
     Return Date.FromOADate(aDate).Year
   End Function
 
-  Public Overrides Function Label() As String
+  Public Overrides Function ToString() As String
     Return "Year"
   End Function
 
@@ -198,4 +205,38 @@ Public Class atcSeasonsThresholdTS
       End If
     Next
   End Function
+End Class
+
+Public Class atcSeasonsYearSubset
+  Inherits atcSeasons
+
+  Private pTS As atcTimeseries
+  Private pStartDate As Double
+  Private pEndDate As Double
+
+  'Season 0 will be when values are out of range  
+  'Season 1 will be when values are in range  
+  Public Sub New(ByVal aStartDate As Double, ByVal aEndDate As Double)
+    pStartDate = aStartDate
+    pEndDate = aEndDate
+  End Sub
+
+  Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
+    Dim lYears As Integer = timdifJ(pStartDate, aDate, 6, 1)
+    Dim lStartdate As Double = TimAddJ(pStartDate, 6, 1, lYears)
+    lYears = timdifJ(pEndDate, aDate, 6, 1)
+    Dim lEnddate As Double = TimAddJ(pEndDate, 6, 1, lYears)
+
+    If aDate > lStartdate AndAlso aDate < lEnddate Then
+      Return 1
+    Else
+      Return 0
+    End If
+
+  End Function
+
+  Public Overrides Function ToString() As String
+    Return "YearSubset"
+  End Function
+
 End Class
