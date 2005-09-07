@@ -112,7 +112,7 @@ Public Class atcSeasonsDayOfMonth
   End Function
 
   Public Overrides Function ToString() As String
-    Return "Day"
+    Return "Day of Month"
   End Function
 End Class
 
@@ -174,7 +174,25 @@ Public Class atcSeasonsYear
   End Function
 
   Public Overrides Function ToString() As String
-    Return "Year"
+    Return "Calendar Year"
+  End Function
+
+End Class
+
+Public Class atcSeasonsWaterYear
+  Inherits atcSeasons
+
+  Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
+    Dim lDate As Date = Date.FromOADate(aDate)
+    If lDate.Month < 10 Then
+      Return lDate.Year
+    Else
+      Return lDate.Year + 1
+    End If
+  End Function
+
+  Public Overrides Function ToString() As String
+    Return "Water Year Oct-Sep"
   End Function
 
 End Class
@@ -204,6 +222,10 @@ Public Class atcSeasonsThresholdTS
         If pTS.Value(iValue) >= pThreshold Then Return 1 Else Return 0
       End If
     Next
+  End Function
+
+  Public Overrides Function ToString() As String
+    Return "Threshold"
   End Function
 End Class
 

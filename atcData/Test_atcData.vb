@@ -1,13 +1,13 @@
 Option Strict Off
-Option Explicit On
+Option Explicit On 
 'Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
 Imports NUnit.Framework
-Imports ATCUtility.modReflection
+Imports atcUtility.modReflection
 
 <TestFixture()> Public Class Test_Builder
   Public Sub TestsAllPresent()
-    Dim lTestBuildStatus as String
+    Dim lTestBuildStatus As String
     lTestBuildStatus = BuildMissingTests("c:\test\")
     Assert.AreEqual("All tests present.", lTestBuildStatus, lTestBuildStatus)
   End Sub
@@ -26,8 +26,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -315,8 +314,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -1984,8 +1982,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -2303,8 +2300,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -4197,8 +4193,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6011,8 +6006,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6055,8 +6049,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6169,8 +6162,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6208,8 +6200,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6247,8 +6238,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6286,8 +6276,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6325,8 +6314,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6364,8 +6352,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6403,8 +6390,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6442,8 +6428,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6481,8 +6466,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6520,8 +6504,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6729,8 +6712,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -6766,35 +6748,35 @@ End Class
 End Class
 
 <TestFixture()> Public Class Test_EnumExistAction
-
+  'Public Enum EnumExistAction
+  '  ExistNoAction = 0
+  '  ExistReplace = 1
+  '  ExistAppend = 2
+  '  ExistRenumber = 4
+  '  ExistAskUser = 8
+  'End Enum
   Public Sub TestToString()
-    'ToString()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestGetTypeCode()
-    'GetTypeCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestCompareTo()
-    'CompareTo()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
-    'Equals()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestGetType()
-    'GetType()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
 End Class
@@ -6807,33 +6789,37 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
-    'Equals()
-    Assert.Ignore("Test not yet written")
+    Dim lData1 As New atcDataSet
+    Dim lData2 As New atcDataSet
+    Assert.IsTrue(lData1.Equals(lData1))
+    Assert.IsFalse(lData1.Equals(lData2))
   End Sub
 
   Public Sub TestToString()
-    'ToString()
-    Assert.Ignore("Test not yet written")
+    Dim lData1 As New atcDataSet
+    Dim lDataToString As String = lData1.ToString
+    Assert.IsTrue(lDataToString.StartsWith("atcDataSet #"))
+    Assert.IsTrue(lDataToString.IndexOf("attributes") > 0)
   End Sub
 
   Public Sub Testget_Attributes()
-    'get_Attributes()
-    Assert.Ignore("Test not yet written")
+    Dim lData1 As New atcDataSet
+    lData1.Attributes.SetValue("testkey", "testvalue")
+    Assert.IsTrue(lData1.Attributes.GetValue("testkey", "").Equals("testvalue"))
   End Sub
 
   Public Sub Testget_Serial()
-    'get_Serial()
-    Assert.Ignore("Test not yet written")
+    Dim lData1 As New atcDataSet
+    Dim lData2 As New atcDataSet
+    Assert.IsTrue(lData2.Serial > lData1.Serial)
   End Sub
 
   Public Sub TestGetType()
-    'GetType()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
 End Class
@@ -6976,8 +6962,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -7000,8 +6985,7 @@ End Class
 <TestFixture()> Public Class Test_atcDataManager
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -7129,8 +7113,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -7328,8 +7311,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -7452,8 +7434,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -7521,8 +7502,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -7700,8 +7680,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -7904,8 +7883,7 @@ End Class
   End Sub
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -8018,8 +7996,7 @@ End Class
 <TestFixture()> Public Class Test_atcDefinedValue
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()
@@ -8042,8 +8019,7 @@ End Class
 <TestFixture()> Public Class Test_atcAttributeDefinition
 
   Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
+    'No test needed
   End Sub
 
   Public Sub TestEquals()

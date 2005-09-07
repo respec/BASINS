@@ -30,4 +30,9 @@ Public Class atcDataSet
     End Get
   End Property
 
+  Public Overrides Function ToString() As String
+    Return "atcDataSet #" & pSerial & " has " & pAttributes.Count & " attributes"
+  End Function
+
+
 End Class
