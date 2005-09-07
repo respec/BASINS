@@ -1,33 +1,49 @@
 Public Class atcSeasons
 
   'Divide the data in aTS into a group of TS, one per season
-  Public Overridable Function Divide(ByVal aTS As atcTimeseries) As atcDataGroup
+  Public Overridable Function Split(ByVal aTS As atcTimeseries) As atcDataGroup
     Dim lNewGroup As New atcDataGroup
-    Dim lSeasonIndex As Integer
+    Dim lSeasonIndex As Integer = -1
+    Dim lPrevSeasonIndex As Integer
     Dim lNewTS As atcTimeseries
     Dim lNewTSvalueIndex As Integer
+    Dim lPoint As Boolean = aTS.Attributes.GetValue("point", False)
+
     For iValue As Integer = 1 To aTS.numValues
+      lPrevSeasonIndex = lSeasonIndex
       lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue))
       lNewTS = lNewGroup.ItemByKey(lSeasonIndex)
       If lNewTS Is Nothing Then
         lNewTS = New atcTimeseries(Nothing)
+        CopyBaseAttributes(aTS, lNewTS)
         lNewTS.Dates = New atcTimeseries(Nothing)
         lNewTS.numValues = aTS.numValues
         lNewTS.Dates.numValues = aTS.numValues
-        lNewTS.Attributes.AddHistory("Divide by date " & lSeasonIndex)
+        lNewTS.Attributes.AddHistory("Split by " & Label() & " " & SeasonName(lSeasonIndex))
         lNewGroup.Add(lSeasonIndex, lNewTS)
       End If
-      lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1)
+      If lPoint Then
+        lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1)
+      Else
+        lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 0)
+        If lPrevSeasonIndex <> lSeasonIndex Then
+          lNewTS.Values(lNewTSvalueIndex) = Double.NaN
+          lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue - 1)
+          lNewTSvalueIndex += 1
+        End If
+      End If
       lNewTS.Value(lNewTSvalueIndex) = aTS.Value(iValue)
       lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue)
       lNewTS.Attributes.SetValue("NextIndex", lNewTSvalueIndex + 1)
     Next
+
     For Each lNewTS In lNewGroup
       lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1) - 1
       lNewTS.numValues = lNewTSvalueIndex
       lNewTS.Dates.numValues = lNewTSvalueIndex
       lNewTS.Attributes.RemoveByKey("nextindex")
     Next
+
     Return lNewGroup
   End Function
 
@@ -41,6 +57,10 @@ Public Class atcSeasons
 
   Public Overridable Function SeasonName(ByVal aIndex As Integer) As String
     Return CStr(aIndex)
+  End Function
+
+  Public Overridable Function Label() As String
+    Return "<none>"
   End Function
 
 End Class
@@ -59,6 +79,10 @@ Public Class atcSeasonsAMPM
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
     If aIndex = 0 Then Return "AM" Else Return "PM"
   End Function
+
+  Public Overrides Function Label() As String
+    Return "AM or PM"
+  End Function
 End Class
 
 Public Class atcSeasonsHour
@@ -67,6 +91,10 @@ Public Class atcSeasonsHour
   Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
     Return Date.FromOADate(aDate).Hour
   End Function
+
+  Public Overrides Function Label() As String
+    Return "Hour"
+  End Function
 End Class
 
 Public Class atcSeasonsDayOfMonth
@@ -74,6 +102,10 @@ Public Class atcSeasonsDayOfMonth
 
   Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
     Return Date.FromOADate(aDate).Day
+  End Function
+
+  Public Overrides Function Label() As String
+    Return "Day"
   End Function
 End Class
 
@@ -89,6 +121,10 @@ Public Class atcSeasonsDayOfWeek
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
     Return pDayName(aIndex)
   End Function
+
+  Public Overrides Function Label() As String
+    Return "Day of Week"
+  End Function
 End Class
 
 Public Class atcSeasonsDayOfYear
@@ -97,6 +133,11 @@ Public Class atcSeasonsDayOfYear
   Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
     Return Date.FromOADate(aDate).DayOfYear
   End Function
+
+  Public Overrides Function Label() As String
+    Return "Day of Year"
+  End Function
+
 End Class
 
 Public Class atcSeasonsMonth
@@ -111,6 +152,11 @@ Public Class atcSeasonsMonth
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
     Return pMonthName(aIndex)
   End Function
+
+  Public Overrides Function Label() As String
+    Return "Month"
+  End Function
+
 End Class
 
 Public Class atcSeasonsYear
@@ -119,6 +165,11 @@ Public Class atcSeasonsYear
   Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
     Return Date.FromOADate(aDate).Year
   End Function
+
+  Public Overrides Function Label() As String
+    Return "Year"
+  End Function
+
 End Class
 
 Public Class atcSeasonsThresholdTS
