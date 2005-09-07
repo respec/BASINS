@@ -167,6 +167,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcSeasons.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "atcTimeseries.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
