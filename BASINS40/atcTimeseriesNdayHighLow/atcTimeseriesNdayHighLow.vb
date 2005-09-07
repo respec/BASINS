@@ -291,13 +291,15 @@ Public Class atcTimeseriesNdayHighLow
       lReturn = 100
     Else
       ltsGroup = aArgs.GetValue("Timeseries")
-      Dim lsNDay = aArgs.GetValue("NDay")
-      If IsNumeric(lsNDay) Then
-        lNDay = lsNDay
+
+      Dim lobjNDay As Object = aArgs.GetValue("NDay")
+      If IsNumeric(lobjNDay) Then
+        lNDay = lobjNDay
       End If
-      Dim lsReturn = aArgs.GetValue("Return Period")
-      If IsNumeric(lsReturn) Then
-        lReturn = lsReturn
+
+      Dim lobjReturn As Object = aArgs.GetValue("Return Period")
+      If IsNumeric(lobjReturn) Then
+        lReturn = lobjReturn
       End If
     End If
 
