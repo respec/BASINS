@@ -55,6 +55,17 @@ Public Class atcSeasons
     Return lNewGroup
   End Function
 
+  Public Overridable Sub SetSeasonalAttributes(ByVal aTS As atcTimeseries, ByVal aAttributes As atcDataAttributes)
+    Dim lSplit As atcDataGroup = Me.Split(aTS)
+    For Each lSeasonalTS As atcTimeseries In lSplit
+      Dim lSeasonName As String = SeasonName(lSeasonalTS.Attributes.GetValue("SeasonIndex", 0))
+      For Each lAttribute As atcDefinedValue In aAttributes
+        Dim lNewAttrName As String = lSeasonName & " " & lAttribute.Definition.Name
+        aTS.Attributes.SetValue(lNewAttrName, lSeasonalTS.Attributes.GetValue(lAttribute.Definition.Name))
+      Next
+    Next
+  End Sub
+
   Public Overridable Function SeasonIndex(ByVal aDate As Double) As Integer
 
   End Function
