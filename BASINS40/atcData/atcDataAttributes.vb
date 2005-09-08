@@ -144,11 +144,14 @@ Public Class atcDataAttributes
     Dim tmpAttrDefVal As atcDefinedValue
     Dim index As Integer = MyBase.Keys.IndexOf(key)
     If index = -1 Then
-      AddDefinition(aAttrDefinition)
       tmpAttrDefVal = New atcDefinedValue
       tmpAttrDefVal.Definition = aAttrDefinition
       tmpAttrDefVal.Value = aValue
-      If Not aArguments Is Nothing Then tmpAttrDefVal.Arguments = aArguments
+      If aArguments Is Nothing Then
+        AddDefinition(aAttrDefinition) 'Only add definition for attributes without arguments
+      Else
+        tmpAttrDefVal.Arguments = aArguments
+      End If
       index = MyBase.Add(key, tmpAttrDefVal)
     Else  'Update existing attribute value
       tmpAttrDefVal = ItemByIndex(index)
