@@ -3,7 +3,7 @@ Imports atcUtility
 Public Class atcSeasons
 
   'Divide the data in aTS into a group of TS, one per season
-  Public Overridable Function Split(ByVal aTS As atcTimeseries) As atcDataGroup
+  Public Function Split(ByVal aTS As atcTimeseries) As atcDataGroup
     Dim lNewGroup As New atcDataGroup
     Dim lSeasonIndex As Integer = -1
     Dim lPrevSeasonIndex As Integer
@@ -55,19 +55,27 @@ Public Class atcSeasons
     Return lNewGroup
   End Function
 
-  Public Overridable Sub SetSeasonalAttributes(ByVal aTS As atcTimeseries, ByVal aAttributes As atcDataAttributes)
+  Public Sub SetSeasonalAttributes(ByVal aTS As atcTimeseries, ByVal aAttributes As atcDataAttributes)
     Dim lSplit As atcDataGroup = Me.Split(aTS)
+
+    Dim lFormat As String = ""
+    lFormat = lFormat.PadRight(Int(Log10(lSplit.Count)) + 1, "0")
+
     For Each lSeasonalTS As atcTimeseries In lSplit
-      Dim lSeasonName As String = SeasonName(lSeasonalTS.Attributes.GetValue("SeasonIndex", 0))
+      Dim lSeasonIndex As Integer = lSeasonalTS.Attributes.GetValue("SeasonIndex", 0)
+      Dim lSeasonName As String = SeasonName(lSeasonIndex)
       For Each lAttribute As atcDefinedValue In aAttributes
-        Dim lNewAttrName As String = lSeasonName & " " & lAttribute.Definition.Name
-        aTS.Attributes.SetValue(lNewAttrName, lSeasonalTS.Attributes.GetValue(lAttribute.Definition.Name))
+        Dim lNewAttrDefinition As atcAttributeDefinition = lAttribute.Definition.Clone _
+           (lAttribute.Definition.Name & " " & Me.ToString & " " & Format(lSeasonIndex, lFormat) & " " & lSeasonName, _
+            Me.ToString & " " & lAttribute.Definition.Description)
+        lNewAttrDefinition.Calculator = lAttribute.Definition.Calculator
+        aTS.Attributes.SetValue(lNewAttrDefinition, lSeasonalTS.Attributes.GetValue(lAttribute.Definition.Name))
       Next
     Next
   End Sub
 
   Public Overridable Function SeasonIndex(ByVal aDate As Double) As Integer
-
+    Return -1
   End Function
 
   Public Overridable Function SeasonName(ByVal aDate As Double) As String
@@ -79,7 +87,7 @@ Public Class atcSeasons
   End Function
 
   Public Overrides Function ToString() As String
-    Return "<none>"
+    Return Me.GetType.Name
   End Function
 End Class
 
