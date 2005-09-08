@@ -147,8 +147,8 @@ Public Class atcDataAttributes
       tmpAttrDefVal = New atcDefinedValue
       tmpAttrDefVal.Definition = aAttrDefinition
       tmpAttrDefVal.Value = aValue
+      AddDefinition(aAttrDefinition) 'Only add definition for attributes without arguments
       If aArguments Is Nothing Then
-        AddDefinition(aAttrDefinition) 'Only add definition for attributes without arguments
       Else
         tmpAttrDefVal.Arguments = aArguments
       End If
