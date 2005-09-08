@@ -186,7 +186,7 @@ Public Class atcDebugTimserForm
         For i As Integer = 0 To lAttributes.Count - 1
           lAttributeName = lAttributes.GetKey(i)
           lAttributeValue = lData.Attributes.GetFormattedValue(lAttributeName)
-          If lData.Attributes.GetDefinition(lAttributeName).Calculated Then
+          If lData.Attributes.GetDefinedValue(lAttributeName).Definition.Calculated Then
             lComputedNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
           Else
             lAttributeNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
