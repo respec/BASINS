@@ -9,9 +9,7 @@ Imports System.Drawing
 
 <TestFixture()> Public Class Test_Builder
   Public Sub TestsAllPresent()
-    Dim lTestBuildStatus As String
-
-    lTestBuildStatus = BuildMissingTests("c:\test\")
+    Dim lTestBuildStatus As String = BuildMissingTests("c:\test\")
     Assert.AreEqual("All tests present.", lTestBuildStatus, lTestBuildStatus)
   End Sub
 End Class
@@ -203,22 +201,12 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
   Public Sub TestEquals()
     'not applicable?
   End Sub
 
   Public Sub TestToString()
     'ToString()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'GetType()
     Assert.Ignore("Test not yet written")
   End Sub
 
@@ -411,11 +399,6 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
   Public Sub TestEquals()
     'not applicable?
   End Sub
@@ -450,19 +433,9 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetType()
-    'GetType()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
 End Class
 
 <TestFixture()> Public Class Test_clsFieldDescriptor
-
-  Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
-  End Sub
 
   Public Sub TestEquals()
     'Equals()
@@ -481,11 +454,6 @@ End Class
 
   Public Sub TestWriteToFile()
     'WriteToFile()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'GetType()
     Assert.Ignore("Test not yet written")
   End Sub
 
@@ -497,11 +465,6 @@ End Class
 
 <TestFixture()> Public Class Test_clsHeader
 
-  Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
   Public Sub TestEquals()
     'Equals()
     Assert.Ignore("Test not yet written")
@@ -519,11 +482,6 @@ End Class
 
   Public Sub TestWriteToFile()
     'WriteToFile()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'GetType()
     Assert.Ignore("Test not yet written")
   End Sub
 
@@ -858,10 +816,6 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    Assert.AreEqual(GetHashCode, GetHashCode)  'dummy test
-  End Sub
-
   Public Sub TestEquals()
     'not applicable for module, dummy follows
     Assert.AreEqual(True, Equals(Me))
@@ -872,14 +826,10 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetType()
-    'not applicable
-  End Sub
-
 End Class
 
 <TestFixture()> Public Class Test_modFile
-  Private Structure TestData
+  Private Structure Test_Data_Struct
     Dim strDrive As String
     Dim strPath As String
     Dim strName As String
@@ -887,7 +837,7 @@ End Class
     Dim strFile As String
     Dim strFull As String
   End Structure
-  Private myTest(0) As TestData
+  Private myTest(0) As Test_Data_Struct
 
   <TestFixtureSetUp()> Public Sub init()
     With myTest(0)
@@ -912,7 +862,7 @@ End Class
   End Sub
 
   Public Sub TestChDriveDir()
-    For Each lTest As TestData In myTest
+    For Each lTest As Test_Data_Struct In myTest
       With lTest
         Assert.IsTrue(ChDriveDir(.strDrive & "\"))
         Assert.AreEqual(CurDir, .strDrive & "\")
@@ -923,7 +873,7 @@ End Class
   End Sub
 
   Public Sub TestFilenameOnly()
-    For Each lTest As TestData In myTest
+    For Each lTest As Test_Data_Struct In myTest
       With lTest
         Assert.AreEqual(FilenameOnly(.strFull), .strName)
       End With
@@ -931,7 +881,7 @@ End Class
   End Sub
 
   Public Sub TestFilenameNoPath()
-    For Each lTest As TestData In myTest
+    For Each lTest As Test_Data_Struct In myTest
       With lTest
         Assert.AreEqual(FilenameNoPath(.strFull), .strFile)
       End With
@@ -939,7 +889,7 @@ End Class
   End Sub
 
   Public Sub TestFilenameNoExt()
-    For Each lTest As TestData In myTest
+    For Each lTest As Test_Data_Struct In myTest
       With lTest
         Assert.AreEqual(FilenameNoExt(.strFull), .strPath & "\" & .strName)
       End With
@@ -947,7 +897,7 @@ End Class
   End Sub
 
   Public Sub TestFileExt()
-    For Each lTest As TestData In myTest
+    For Each lTest As Test_Data_Struct In myTest
       With lTest
         Assert.AreEqual(FileExt(.strFull), .strExt)
       End With
@@ -955,7 +905,7 @@ End Class
   End Sub
 
   Public Sub TestPathNameOnly()
-    For Each lTest As TestData In myTest
+    For Each lTest As Test_Data_Struct In myTest
       With lTest
         Assert.AreEqual(PathNameOnly(.strFull), .strPath)
       End With
@@ -963,7 +913,7 @@ End Class
   End Sub
 
   Public Sub TestFilenameSetExt()
-    For Each lTest As TestData In myTest
+    For Each lTest As Test_Data_Struct In myTest
       With lTest
         Assert.AreEqual(FilenameSetExt(.strFull, "png"), .strPath & "\" & .strName & ".png")
         'TODO - improve next test.
@@ -1051,10 +1001,6 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    Assert.AreEqual(GetHashCode, GetHashCode)  'dummy test
-  End Sub
-
   Public Sub TestEquals()
     'not applicable for module, dummy follows
     Assert.AreEqual(True, Equals(Me))
@@ -1063,10 +1009,6 @@ End Class
   Public Sub TestToString()
     'ToString()
     Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'not applicable
   End Sub
 
 End Class
@@ -1094,10 +1036,6 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    Assert.AreEqual(GetHashCode, GetHashCode)  'dummy test
-  End Sub
-
   Public Sub TestEquals()
     'not applicable for module, dummy follows
     Assert.AreEqual(True, Equals(Me))
@@ -1106,10 +1044,6 @@ End Class
   Public Sub TestToString()
     'ToString()
     Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'not applicable
   End Sub
 
 End Class
@@ -1125,10 +1059,6 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    Assert.AreEqual(GetHashCode, GetHashCode)  'dummy test
-  End Sub
-
   Public Sub TestEquals()
     'not applicable for module, dummy follows
     Assert.AreEqual(True, Equals(Me))
@@ -1137,10 +1067,6 @@ End Class
   Public Sub TestToString()
     'ToString()
     Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'not applicable
   End Sub
 
 End Class
@@ -1168,8 +1094,10 @@ End Class
 
   Public Sub TestDoubleToString()
     Assert.AreEqual("220", DoubleToString(224, 4, , , , 2))
-    Assert.AreEqual("##", DoubleToString(224, 2, "##0.00", , , 2))
-    Assert.AreEqual("####", DoubleToString(224, 4, "##0.00", , , 2))
+    Assert.AreEqual("#", DoubleToString(224, 2, "##0.00", , , 2))
+    Assert.AreEqual("220", DoubleToString(224, 3, "##0.00", , , 2))
+    Assert.AreEqual("220", DoubleToString(224, 4, "##0.00", , , 2))
+    Assert.AreEqual("220.0", DoubleToString(224, 5, "##0.00", , , 2))
     Assert.AreEqual("220.00", DoubleToString(224, 6, "##0.00", , , 2))
   End Sub
 
@@ -1392,10 +1320,6 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    Assert.AreEqual(GetHashCode, GetHashCode)  'dummy test
-  End Sub
-
   Public Sub TestEquals()
     'not applicable for module, dummy follows
     Assert.AreEqual(True, Equals(Me))
@@ -1404,10 +1328,6 @@ End Class
   Public Sub TestToString()
     'ToString()
     Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'not applicable
   End Sub
 
 End Class
@@ -1454,10 +1374,6 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    Assert.AreEqual(GetHashCode, GetHashCode)  'dummy test
-  End Sub
-
   Public Sub TestEquals()
     'not applicable for module, dummy follows
     Assert.AreEqual(True, Equals(Me))
@@ -1466,10 +1382,6 @@ End Class
   Public Sub TestToString()
     'ToString()
     Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'not applicable
   End Sub
 
 End Class
@@ -1481,11 +1393,6 @@ End Class
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestGetHashCode()
-    'GetHashCode()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
   Public Sub TestEquals()
     'Equals()
     Assert.Ignore("Test not yet written")
@@ -1493,10 +1400,6 @@ End Class
 
   Public Sub TestToString()
     Assert.AreEqual(ToString().ToLower, "atcutility.test_tableopener")
-  End Sub
-
-  Public Sub TestGetType()
-    'not applicable
   End Sub
 
 End Class
@@ -1534,10 +1437,6 @@ End Class
     Assert.AreEqual("cyan", colorName(Color.Cyan).ToLower, "Fail to Match Cyan")
   End Sub
 
-  Public Sub TestGetHashCode()
-    Assert.AreEqual(GetHashCode, GetHashCode)  'dummy test
-  End Sub
-
   Public Sub TestEquals()
     'not applicable for module, dummy follows
     Assert.AreEqual(True, Equals(Me))
@@ -1548,21 +1447,12 @@ End Class
     Assert.AreEqual("atcutility.test_utilcolor", ToString().ToLower)
   End Sub
 
-  Public Sub TestGetType()
-    'not applicable
-  End Sub
-
 End Class
 
 <TestFixture()> Public Class Test_atcCollection
 
   Public Sub TestGetEnumerator()
     'GetEnumerator()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetHashCode()
-    'GetHashCode()
     Assert.Ignore("Test not yet written")
   End Sub
 
@@ -1623,11 +1513,6 @@ End Class
 
   Public Sub TestRemoveByValue()
     'RemoveByValue()
-    Assert.Ignore("Test not yet written")
-  End Sub
-
-  Public Sub TestGetType()
-    'GetType()
     Assert.Ignore("Test not yet written")
   End Sub
 
