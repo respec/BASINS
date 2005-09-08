@@ -178,20 +178,25 @@ Public Class atcTimeseriesNdayHighLow
       aTS.EnsureValuesRead()
       Dim sjday As Double = aTS.Dates.Value(0)
       Dim ejday As Double = aTS.Dates.Value(aTS.Dates.numValues)
+      Dim lSeasonDefinition As atcSeasons = aTS.Attributes.GetValue("SeasonDefinition")
+      Dim lSeasonIndex As Integer = aTS.Attributes.GetValue("SeasonIndex", -1)
       'Dim indexOld As Integer = 1
       Dim indexNew As Integer = 1
       Dim nYears As Integer = timdifJ(sjday, ejday, lTimeCode, 1)
+      If Not lSeasonDefinition Is Nothing Then 'be sure to get last year 
+        If TimAddJ(sjday, lTimeCode, 1, nYears) < ejday Then
+          nYears += 1
+        End If
+      End If
       Dim newValues(nYears) As Double
       Dim newDates(nYears) As Double
       newDates(0) = sjday
-      Dim lSeasonDefinition As atcSeasons = aTS.Attributes.GetValue("SeasonDefinition")
-      Dim lSeasonIndex As Integer = aTS.Attributes.GetValue("SeasonIndex", -1)
 
       For indexNew = 1 To nYears
         Dim nextSJday As Double = TimAddJ(sjday, lTimeCode, 1, 1)
         Dim oneYear As atcTimeseries = SubsetByDate(aTS, sjday, nextSJday, Me)
         newDates(indexNew) = nextSJday
-        newValues(indexNew) = HighOrLowValue(oneYear, aNumValues, aHigh, lseasonDefinition, lSeasonIndex)
+        newValues(indexNew) = HighOrLowValue(oneYear, aNumValues, aHigh, lSeasonDefinition, lSeasonIndex)
         sjday = nextSJday
       Next
 
