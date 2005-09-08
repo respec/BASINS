@@ -55,8 +55,15 @@ Public Class atcSeasons
     Return lNewGroup
   End Function
 
-  Public Sub SetSeasonalAttributes(ByVal aTS As atcTimeseries, ByVal aAttributes As atcDataAttributes)
+  Public Sub SetSeasonalAttributes(ByVal aTS As atcTimeseries, _
+                                   ByVal aAttributes As atcDataAttributes, _
+                          Optional ByVal aCalculatedAttributes As atcDataAttributes = Nothing)
+
     Dim lSplit As atcDataGroup = Me.Split(aTS)
+
+    If aCalculatedAttributes Is Nothing Then
+      aCalculatedAttributes = aTS.Attributes
+    End If
 
     Dim lFormat As String = ""
     lFormat = lFormat.PadRight(Int(Log10(lSplit.Count)) + 1, "0")
@@ -69,7 +76,7 @@ Public Class atcSeasons
            (lAttribute.Definition.Name & " " & Me.ToString & " " & Format(lSeasonIndex, lFormat) & " " & lSeasonName, _
             Me.ToString & " " & lAttribute.Definition.Description)
         lNewAttrDefinition.Calculator = lAttribute.Definition.Calculator
-        aTS.Attributes.SetValue(lNewAttrDefinition, lSeasonalTS.Attributes.GetValue(lAttribute.Definition.Name))
+        aCalculatedAttributes.SetValue(lNewAttrDefinition, lSeasonalTS.Attributes.GetValue(lAttribute.Definition.Name))
       Next
     Next
   End Sub
@@ -107,7 +114,7 @@ Public Class atcSeasonsAMPM
   End Function
 
   Public Overrides Function ToString() As String
-    Return "AM or PM"
+    Return "AM/PM"
   End Function
 End Class
 
@@ -131,7 +138,7 @@ Public Class atcSeasonsDayOfMonth
   End Function
 
   Public Overrides Function ToString() As String
-    Return "Day of Month"
+    Return "DayOfMonth"
   End Function
 End Class
 
@@ -149,7 +156,7 @@ Public Class atcSeasonsDayOfWeek
   End Function
 
   Public Overrides Function ToString() As String
-    Return "Day of Week"
+    Return "Weekday"
   End Function
 End Class
 
@@ -161,7 +168,7 @@ Public Class atcSeasonsDayOfYear
   End Function
 
   Public Overrides Function ToString() As String
-    Return "Day of Year"
+    Return "DayOfYear"
   End Function
 
 End Class
@@ -193,7 +200,7 @@ Public Class atcSeasonsYear
   End Function
 
   Public Overrides Function ToString() As String
-    Return "Calendar Year"
+    Return "CalendarYear"
   End Function
 
 End Class
@@ -211,7 +218,7 @@ Public Class atcSeasonsWaterYear
   End Function
 
   Public Overrides Function ToString() As String
-    Return "Water Year Oct-Sep"
+    Return "WaterYear"
   End Function
 
 End Class
