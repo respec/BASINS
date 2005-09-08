@@ -187,10 +187,10 @@ Public Module modString
     If lString.Length <= aMaxWidth Then
       Return lString
     Else
-      Dim lDecimalPos As Integer = InStr(lString, ".")
+      Dim lDecimalPos As Integer = lString.IndexOf(".")
       Select Case lDecimalPos
         Case Is < 1 'string does not contain a decimal or it is the first character
-        Case aMaxWidth - 1
+        Case aMaxWidth, aMaxWidth - 1
           Return Left(lString, lDecimalPos) 'Truncate at decimal and remove trailing decimal
         Case Is < aMaxWidth
           Return Left(lString, aMaxWidth) 'Truncate at least one digit after decimal
