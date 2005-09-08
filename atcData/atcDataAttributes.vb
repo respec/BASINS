@@ -342,10 +342,10 @@ Public Class atcDataAttributes
 
   Public Overrides Function ToString() As String
     Dim lAttributes As SortedList = ValuesSortedByName()
-    Dim lS As String
+    Dim lS As String = ""
     For i As Integer = 0 To lAttributes.Count - 1
       Dim lAttributeName = lAttributes.GetKey(i)
-      lS &= lAttributeName & vbTab & pOwner.Attributes.GetFormattedValue(lAttributeName) & vbCrLf
+      lS &= lAttributeName & vbTab & GetFormattedValue(lAttributeName) & vbCrLf
     Next
     Return lS
   End Function
