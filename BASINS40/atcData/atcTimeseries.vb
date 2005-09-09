@@ -13,6 +13,86 @@ Public Class atcTimeseries
   Private pValues() As Double
   Private pValueAttributes() As atcDataAttributes
 
+  Public Shared Function Merge(ByVal aGroup As atcDataGroup) As atcTimeseries
+    Dim lNewTS As New atcTimeseries(Nothing)
+    Dim lNewIndex As Integer
+    Dim lTotalNumValues As Integer = 0
+    Dim lOldTS As atcTimeseries
+    Dim lMinDate As Double = Double.MaxValue
+    Dim lMaxGroupIndex As Integer = aGroup.Count - 1
+    Dim lIndex As Integer
+    Dim lMinIndex As Integer
+    Dim lNextIndex() As Integer
+    Dim lNextDate() As Double
+
+    ReDim lNextIndex(aGroup.Count - 1)
+    ReDim lNextDate(aGroup.Count - 1)
+
+    lNewTS.Dates = New atcTimeseries(Nothing)
+
+    'Count total number of values and set up 
+    For lIndex = 0 To lMaxGroupIndex
+      lOldTS = aGroup.ItemByIndex(lIndex)
+      Try
+        lTotalNumValues += lOldTS.numValues
+        lNextIndex(lIndex) = 1
+        lNextDate(lIndex) = lOldTS.Dates.Value(1)
+        'Find minimum starting date and take date 0 from that TS
+        If lNextDate(lIndex) < lMinDate Then
+          lMinDate = lOldTS.Dates.Value(0)
+        End If
+      Catch 'Can't get dates values from this TS
+        lNextIndex(lIndex) = -1
+      End Try
+    Next
+
+    If lTotalNumValues > 0 Then
+      lNewTS.numValues = lTotalNumValues
+      lNewTS.Dates.numValues = lTotalNumValues
+      If lMinDate < Double.MaxValue Then
+        lNewTS.Dates.Value(0) = lMinDate
+      Else
+        lNewTS.Dates.Value(0) = Double.NaN
+      End If
+      lNewTS.Value(0) = Double.NaN
+
+      For lNewIndex = 1 To lTotalNumValues
+        'Find earliest date not yet used
+        lMinIndex = -1
+        lMinDate = Double.MaxValue
+        For lIndex = 0 To lMaxGroupIndex
+          If lNextIndex(lIndex) > 0 Then
+            If lNextDate(lIndex) < lMinDate Then
+              lMinIndex = lIndex
+              lMinDate = lNextDate(lIndex)
+            End If
+          End If
+        Next
+
+        'Add earliest date/value to new TS
+        If lMinIndex >= 0 Then
+          lOldTS = aGroup.ItemByIndex(lMinIndex)
+          lNewTS.Dates.Value(lNewIndex) = lMinDate
+          lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lMinIndex))
+          lNextIndex(lMinIndex) += 1
+          If lNextIndex(lMinIndex) <= lOldTS.numValues Then
+            lNextDate(lIndex) = lOldTS.Dates.Value(lNextIndex(lMinIndex))
+          Else
+            lNextDate(lIndex) = -1
+          End If
+        Else
+          'Should never get here 
+          If lNewTS.numValues >= lNewIndex Then
+            atcUtility.LogMsg("Ran out of values after finding " & lNewIndex - 1 & " but expected " & lTotalNumValues, "Timeseries Merge")
+            lNewTS.numValues = lNewIndex - 1
+            Exit For
+          End If
+        End If
+      Next
+    End If
+      Return lNewTS
+  End Function
+
   Public Overrides Function ToString() As String
     Dim id As String = Attributes.GetValue("id")
     'If id.Length = 0 Then id = "# " & CStr(pSerial)
