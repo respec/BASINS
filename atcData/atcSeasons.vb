@@ -78,7 +78,7 @@ Public Class atcSeasons
         Dim lNewArguments As New atcDataAttributes
         lNewArguments.SetValue("SeasonDefinition", Me)
         lNewArguments.SetValue("SeasonIndex", lSeasonIndex)
-        lNewArguments.SetValue("lSeasonName", lSeasonName)
+        lNewArguments.SetValue("SeasonName", lSeasonName)
         lNewAttrDefinition.Calculator = lAttribute.Definition.Calculator
         aCalculatedAttributes.SetValue(lNewAttrDefinition, lSeasonalTS.Attributes.GetValue(lAttribute.Definition.Name), lNewArguments)
       Next
