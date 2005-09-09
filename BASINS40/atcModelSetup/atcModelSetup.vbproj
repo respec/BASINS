@@ -1,0 +1,168 @@
+<VisualStudioProject>
+    <VisualBasic
+        ProjectType = "Local"
+        ProductVersion = "7.10.3077"
+        SchemaVersion = "2.0"
+        ProjectGuid = "{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}"
+    >
+        <Build>
+            <Settings
+                ApplicationIcon = ""
+                AssemblyKeyContainerName = ""
+                AssemblyName = "atcModelSetup"
+                AssemblyOriginatorKeyFile = ""
+                AssemblyOriginatorKeyMode = "None"
+                DefaultClientScript = "JScript"
+                DefaultHTMLPageLayout = "Grid"
+                DefaultTargetSchema = "IE50"
+                DelaySign = "false"
+                OutputType = "Library"
+                OptionCompare = "Binary"
+                OptionExplicit = "On"
+                OptionStrict = "Off"
+                RootNamespace = "atcModelSetup"
+                StartupObject = "atcModelSetup.(None)"
+            >
+                <Config
+                    Name = "Debug"
+                    BaseAddress = "285212672"
+                    ConfigurationOverrideFile = ""
+                    DefineConstants = ""
+                    DefineDebug = "true"
+                    DefineTrace = "true"
+                    DebugSymbols = "true"
+                    IncrementalBuild = "true"
+                    Optimize = "false"
+                    OutputPath = "..\..\MapWindow40\Bin\Plugins\"
+                    RegisterForComInterop = "false"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "1"
+                />
+                <Config
+                    Name = "Release"
+                    BaseAddress = "285212672"
+                    ConfigurationOverrideFile = ""
+                    DefineConstants = ""
+                    DefineDebug = "false"
+                    DefineTrace = "true"
+                    DebugSymbols = "false"
+                    IncrementalBuild = "false"
+                    Optimize = "true"
+                    OutputPath = "..\Bin\Plugins\"
+                    RegisterForComInterop = "false"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "1"
+                />
+            </Settings>
+            <References>
+                <Reference
+                    Name = "System"
+                    AssemblyName = "System"
+                />
+                <Reference
+                    Name = "System.Data"
+                    AssemblyName = "System.Data"
+                />
+                <Reference
+                    Name = "System.Drawing"
+                    AssemblyName = "System.Drawing"
+                    HintPath = "..\..\..\..\WINDOWS\Microsoft.NET\Framework\v1.0.3705\System.Drawing.dll"
+                />
+                <Reference
+                    Name = "stdole"
+                    Guid = "{00020430-0000-0000-C000-000000000046}"
+                    VersionMajor = "2"
+                    VersionMinor = "0"
+                    Lcid = "0"
+                    WrapperTool = "primary"
+                />
+                <Reference
+                    Name = "Interop.MapWinGIS"
+                    AssemblyName = "Interop.MapWinGIS"
+                    HintPath = "..\MapWindowGUI\MapWinInterfaces\obj\Interop.MapWinGIS.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "System.Windows.Forms"
+                    AssemblyName = "System.Windows.Forms"
+                    HintPath = "..\..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
+                />
+                <Reference
+                    Name = "MapWinInterfaces"
+                    AssemblyName = "MapWinInterfaces"
+                    HintPath = "..\Bin\MapWinInterfaces.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "ATCoCtl"
+                    Guid = "{872F11D5-3322-11D4-9D23-00A0C9768F70}"
+                    VersionMajor = "1"
+                    VersionMinor = "10"
+                    Lcid = "0"
+                    WrapperTool = "tlbimp"
+                />
+                <Reference
+                    Name = "AxATCoCtl"
+                    Guid = "{872F11D5-3322-11D4-9D23-00A0C9768F70}"
+                    VersionMajor = "1"
+                    VersionMinor = "10"
+                    Lcid = "0"
+                    WrapperTool = "aximp"
+                />
+                <Reference
+                    Name = "MapWinGIS"
+                    Guid = "{C368D713-CC5F-40ED-9F53-F84FE197B96A}"
+                    VersionMajor = "3"
+                    VersionMinor = "0"
+                    Lcid = "0"
+                    WrapperTool = "tlbimp"
+                />
+                <Reference
+                    Name = "atcUtility"
+                    AssemblyName = "atcUtility"
+                    HintPath = "..\atcUtility\obj\Debug\atcUtility.dll"
+                />
+            </References>
+            <Imports>
+                <Import Namespace = "Microsoft.VisualBasic" />
+                <Import Namespace = "System" />
+                <Import Namespace = "System.Collections" />
+                <Import Namespace = "System.Data" />
+                <Import Namespace = "System.Diagnostics" />
+            </Imports>
+        </Build>
+        <Files>
+            <Include>
+                <File
+                    RelPath = "AssemblyInfo.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "clsPlugin.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmModelSetup.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmModelSetup.resx"
+                    DependentUpon = "frmModelSetup.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "GisUtils.vb"
+                    Link = "..\atcMwGisUtils\GisUtils.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+            </Include>
+        </Files>
+    </VisualBasic>
+</VisualStudioProject>
+
