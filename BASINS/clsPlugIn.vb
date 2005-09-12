@@ -445,8 +445,11 @@ Public Class PlugIn
         Return True
       Case Else
         If aToolName.StartsWith("RunScript") Then
-          'atcScriptTest.Main(pDataManager, Me)
-          'Exit Function
+          Try
+            RunDefaultScript()
+            Exit Function
+          Catch
+          End Try
           Dim args() As Object = aCmdLine.Split(",")
           Dim errors As String
           If aToolName.Length > 10 Then
@@ -469,7 +472,7 @@ Public Class PlugIn
             Return False
           End If
         Else 'Search for DisplayPlugin to launch
-          Return LaunchDisplay(aToolName, aCmdLine)
+            Return LaunchDisplay(aToolName, aCmdLine)
         End If
     End Select
 
@@ -484,6 +487,11 @@ Public Class PlugIn
       Return False
     End If
   End Function
+
+  Private Sub RunDefaultScript()
+    atcScriptTest.Main(pDataManager, Me)
+  End Sub
+
 
   Private Function LaunchDisplay(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
     Dim searchForName As String = aToolName.ToLower
