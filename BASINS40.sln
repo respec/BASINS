@@ -51,6 +51,10 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimeseriesNdayHighLow", 
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcScriptTest", "atcScriptTest\atcScriptTest.vbproj", "{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -108,6 +112,10 @@ Global
 		{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}.Debug.Build.0 = Debug|.NET
 		{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}.Release.ActiveCfg = Release|.NET
 		{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}.Release.Build.0 = Release|.NET
+		{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}.Debug.ActiveCfg = Debug|.NET
+		{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}.Debug.Build.0 = Debug|.NET
+		{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}.Release.ActiveCfg = Release|.NET
+		{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}.Release.Build.0 = Release|.NET
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
