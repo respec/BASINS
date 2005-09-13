@@ -8,12 +8,15 @@
     </SplashPicture>
   </AppInfo>
   <RecentProjects />
-  <View WindowWidth="966" WindowHeight="835" LocationX="58" LocationY="449" WindowState="0" ViewBackColor="16777215" CanUndockPreviewMap="False" CanUndockLegend="False" CanHidePreviewMap="False" CanHideLegend="False" ShowCustomizeContextMenu="" CanPreviewMapDockLeft="False" CanLegendDockLeft="False" CanPreviewMapDockRight="False" CanLegendDockRight="False" />
+  <View WindowWidth="966" WindowHeight="835" LocationX="87" LocationY="31" WindowState="0" ViewBackColor="16777215" CanUndockPreviewMap="False" CanUndockLegend="False" CanHidePreviewMap="False" CanHideLegend="False" ShowCustomizeContextMenu="" CanPreviewMapDockLeft="False" CanLegendDockLeft="False" CanPreviewMapDockRight="False" CanLegendDockRight="False" />
   <Plugins>
     <Plugin SettingsString="" Key="atcHspfBinOut_atcTimeseriesFileHspfBinOut" />
+    <Plugin SettingsString="" Key="atcData_atcTimeseriesStatistics" />
     <Plugin SettingsString="" Key="BASINS_PlugIn" />
+    <Plugin SettingsString="" Key="atcWDM_atcDataSourceWDM" />
     <Plugin SettingsString="" Key="atcList_atcListPlugin" />
     <Plugin SettingsString="" Key="atcTimeseriesMath_atcTimeseriesMath" />
+    <Plugin SettingsString="" Key="atcScenarioBuilder_atcScenarioBuilderPlugin" />
     <Plugin SettingsString="" Key="atcTimeseriesNdayHighLow_atcTimeseriesNdayHighLow" />
     <Plugin SettingsString="" Key="atcDebugTimser_atcDebugTimserPlugin" />
     <Plugin SettingsString="" Key="atcGraph_atcGraphPlugin" />

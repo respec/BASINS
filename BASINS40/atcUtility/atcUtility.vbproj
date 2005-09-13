@@ -80,7 +80,8 @@
                 <Reference
                     Name = "ChilkatDotNet"
                     AssemblyName = "ChilkatDotNet"
-                    HintPath = "..\Bin\Plugins\BASINS\ChilkatDotNet.dll"
+                    HintPath = "..\Bin\ChilkatDotNet.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>
