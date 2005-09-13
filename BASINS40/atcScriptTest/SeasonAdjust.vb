@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcSeasons
 Imports atcUtility
 
 Imports Microsoft.VisualBasic
@@ -40,9 +41,7 @@ Public Module ScriptSeasonAdjust
     lSummary.Save(aDataManager, lMatch, "ListOrig.txt", "Expand")
 
     Dim lSeasonsMonth As New atcSeasonsMonth
-    lMonthData = lSeasonsMonth.Split(lMatch.ItemByIndex(0))
-    aDataManager.DataSources(0).DataSets.AddRange(lMonthData)
-
+    lMonthData = lSeasonsMonth.Split(lMatch.ItemByIndex(0), aDataManager.DataSources(0))
     AppendFileString(lOutFile, "   MonthCount:" & lMonthData.Count & vbCrLf)
     lSummary.Save(aDataManager, lMonthData, "ListMonth.txt", "Expand")
 

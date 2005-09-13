@@ -55,6 +55,14 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcScriptTest", "atcScriptT
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSeasons", "atcSeasons\atcSeasons.vbproj", "{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSeasonalAttributes", "atcSeasonalAttributes\atcSeasonalAttributes.vbproj", "{50FEF6BE-F961-4949-8658-2948DE7B777B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -116,6 +124,14 @@ Global
 		{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}.Debug.Build.0 = Debug|.NET
 		{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}.Release.ActiveCfg = Release|.NET
 		{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}.Release.Build.0 = Release|.NET
+		{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}.Debug.ActiveCfg = Debug|.NET
+		{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}.Debug.Build.0 = Debug|.NET
+		{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}.Release.ActiveCfg = Release|.NET
+		{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}.Release.Build.0 = Release|.NET
+		{50FEF6BE-F961-4949-8658-2948DE7B777B}.Debug.ActiveCfg = Debug|.NET
+		{50FEF6BE-F961-4949-8658-2948DE7B777B}.Debug.Build.0 = Debug|.NET
+		{50FEF6BE-F961-4949-8658-2948DE7B777B}.Release.ActiveCfg = Release|.NET
+		{50FEF6BE-F961-4949-8658-2948DE7B777B}.Release.Build.0 = Release|.NET
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
