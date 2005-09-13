@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcSeasons
 Imports atcUtility
 
 Imports System.Windows.Forms
@@ -110,7 +111,7 @@ Public Class atcTimeseriesNdayHighLow
   Private Function HighOrLowValue(ByVal aTS As atcTimeseries, _
                    ByVal aNumValues As Integer, _
                    ByVal aHigh As Boolean, _
-                   ByVal aSeasonDefinition As atcSeasons, _
+                   ByVal aSeasonDefinition As atcSeasonBase, _
                    ByVal aSeasonIndex As Integer) As Double
 
     If aNumValues > 0 And aTS.numValues >= aNumValues Then
@@ -178,7 +179,7 @@ Public Class atcTimeseriesNdayHighLow
       aTS.EnsureValuesRead()
       Dim sjday As Double = aTS.Dates.Value(0)
       Dim ejday As Double = aTS.Dates.Value(aTS.Dates.numValues)
-      Dim lSeasonDefinition As atcSeasons = aTS.Attributes.GetValue("SeasonDefinition")
+      Dim lSeasonDefinition As atcSeasonBase = aTS.Attributes.GetValue("SeasonDefinition")
       Dim lSeasonIndex As Integer = aTS.Attributes.GetValue("SeasonIndex", -1)
       'Dim indexOld As Integer = 1
       Dim indexNew As Integer = 1
@@ -356,9 +357,5 @@ Public Class atcTimeseriesNdayHighLow
       atcDataAttributes.AddDefinition(lOperation.Definition)
     Next
   End Sub
-
-  Public Overrides Function NewOne() As atcDataPlugin
-    Return New atcTimeseriesNdayHighLow
-  End Function
 
 End Class

@@ -171,8 +171,9 @@ Public Class atcDataPlugin
   End Property
 
   Public Overridable Function NewOne() As atcDataPlugin
-    MsgBox("Need to override or shadow NewOne." & vbCrLf & "Base version in atcDataPlugin is not useful.", MsgBoxStyle.Critical, "atcDataPlugin")
-    Return New atcDataPlugin
+    'This calls the version of New with no arguments. 
+    'Inheriting classes that have no New w/o arguments must override NewOne
+    Return Me.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
   End Function
 
 End Class
