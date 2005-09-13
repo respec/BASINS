@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic LastOpenVersion = "7.10.3077" >
         <Build>
-            <Settings ReferencePath = "C:\Program Files\Chilkat Software Inc\Chilkat.NET\" >
+            <Settings ReferencePath = "C:\Dev\BASINS40\Bin\Plugins\BASINS\;C:\Program Files\Chilkat Software Inc\Chilkat.NET\" >
                 <Config
                     Name = "Debug"
                     EnableASPDebugging = "false"
