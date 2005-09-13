@@ -33,7 +33,7 @@
                     DebugSymbols = "true"
                     IncrementalBuild = "true"
                     Optimize = "false"
-                    OutputPath = "..\..\MapWindow40\Bin\Plugins\BASINS\"
+                    OutputPath = "..\Bin\Plugins\BASINS\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -80,8 +80,7 @@
                 <Reference
                     Name = "ChilkatDotNet"
                     AssemblyName = "ChilkatDotNet"
-                    HintPath = "C:\Program Files\Chilkat Software Inc\Chilkat.NET\ChilkatDotNet.dll"
-                    Private = "False"
+                    HintPath = "..\Bin\Plugins\BASINS\ChilkatDotNet.dll"
                 />
             </References>
             <Imports>
