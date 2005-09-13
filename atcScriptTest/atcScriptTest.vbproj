@@ -1,0 +1,172 @@
+<VisualStudioProject>
+    <VisualBasic
+        ProjectType = "Local"
+        ProductVersion = "7.10.3077"
+        SchemaVersion = "2.0"
+        ProjectGuid = "{899CDB52-27DF-42FA-82B4-1E3E59B52DEC}"
+    >
+        <Build>
+            <Settings
+                ApplicationIcon = ""
+                AssemblyKeyContainerName = ""
+                AssemblyName = "atcScriptTest"
+                AssemblyOriginatorKeyFile = ""
+                AssemblyOriginatorKeyMode = "None"
+                DefaultClientScript = "JScript"
+                DefaultHTMLPageLayout = "Grid"
+                DefaultTargetSchema = "IE50"
+                DelaySign = "false"
+                OutputType = "Library"
+                OptionCompare = "Binary"
+                OptionExplicit = "On"
+                OptionStrict = "Off"
+                RootNamespace = "atcScriptTest"
+                StartupObject = "atcScriptTest.(None)"
+            >
+                <Config
+                    Name = "Debug"
+                    BaseAddress = "285212672"
+                    ConfigurationOverrideFile = ""
+                    DefineConstants = ""
+                    DefineDebug = "true"
+                    DefineTrace = "true"
+                    DebugSymbols = "true"
+                    IncrementalBuild = "true"
+                    Optimize = "false"
+                    OutputPath = "..\..\MapWindow40\Bin\Plugins\basins\"
+                    RegisterForComInterop = "false"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "1"
+                />
+                <Config
+                    Name = "Release"
+                    BaseAddress = "285212672"
+                    ConfigurationOverrideFile = ""
+                    DefineConstants = ""
+                    DefineDebug = "false"
+                    DefineTrace = "true"
+                    DebugSymbols = "false"
+                    IncrementalBuild = "false"
+                    Optimize = "true"
+                    OutputPath = "bin\"
+                    RegisterForComInterop = "false"
+                    RemoveIntegerChecks = "false"
+                    TreatWarningsAsErrors = "false"
+                    WarningLevel = "1"
+                />
+            </Settings>
+            <References>
+                <Reference
+                    Name = "System"
+                    AssemblyName = "System"
+                />
+                <Reference
+                    Name = "stdole"
+                    Guid = "{00020430-0000-0000-C000-000000000046}"
+                    VersionMajor = "2"
+                    VersionMinor = "0"
+                    Lcid = "0"
+                    WrapperTool = "primary"
+                />
+                <Reference
+                    Name = "ATCutility"
+                    Project = "{67027820-9036-481E-80F6-077E5085F59D}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "atcData"
+                    Project = "{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "nunit.framework"
+                    AssemblyName = "nunit.framework"
+                    HintPath = "..\..\..\Program Files\NUnit 2.2\bin\nunit.framework.dll"
+                    AssemblyFolderKey = "hklm\dn\nunit.framework"
+                />
+                <Reference
+                    Name = "atcGraph"
+                    Project = "{D52E1A9C-E219-4DF7-9CA8-B4FD1B28CEC9}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "ZedGraph"
+                    AssemblyName = "ZedGraph"
+                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ZedGraph.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "System.Drawing"
+                    AssemblyName = "System.Drawing"
+                    HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Drawing.dll"
+                />
+                <Reference
+                    Name = "atcDebugTimser"
+                    Project = "{F4EF0925-945B-418C-9A81-8490D89985DB}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "System.Windows.Forms"
+                    AssemblyName = "System.Windows.Forms"
+                    HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
+                />
+                <Reference
+                    Name = "MapWinInterfaces"
+                    AssemblyName = "MapWinInterfaces"
+                    HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "atcWDM"
+                    Project = "{F0F41E48-35ED-43F4-AB00-30252B0E5690}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "atcTimeseriesMath"
+                    Project = "{BD299EB7-7A62-4EF9-8806-86E9288C498F}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "atcTimeseriesNdayHighLow"
+                    Project = "{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "atcScenarioBuilder"
+                    Project = "{F40002FE-5698-4767-8198-997EE31A96A0}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
+                />
+            </References>
+            <Imports>
+                <Import Namespace = "Microsoft.VisualBasic" />
+                <Import Namespace = "System" />
+                <Import Namespace = "System.Collections" />
+                <Import Namespace = "System.Diagnostics" />
+            </Imports>
+        </Build>
+        <Files>
+            <Include>
+                <File
+                    RelPath = "AssemblyInfo.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "SeasonAdjust.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+            </Include>
+        </Files>
+    </VisualBasic>
+</VisualStudioProject>
+
