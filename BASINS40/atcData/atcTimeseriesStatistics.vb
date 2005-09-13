@@ -227,18 +227,33 @@ Public Class atcTimeseriesStatistics
     End If
   End Sub
 
-  'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
-  'remaining aArgs are expected to follow the args required for the specified operation
+  'The only element of aArgs is an atcDataGroup or atcTimeseries
+  'The attribute(s) will be set to the result(s) of calculation(s)
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
     Dim ltsGroup As atcDataGroup
     If aArgs Is Nothing Then
       ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
     Else
-      ltsGroup = aArgs.GetValue("Timeseries")
+      Try
+        ltsGroup = aArgs.GetValue("Timeseries")
+      Catch
+      End Try
+      If ltsGroup Is Nothing Then
+        Dim lts As atcTimeseries
+        Try
+          lts = aArgs.GetValue("Timeseries")
+          If Not lts Is Nothing Then
+            ltsGroup = New atcDataGroup(lts)
+          End If
+        Catch
+        End Try
+      End If
     End If
-    For Each lts As atcTimeseries In ltsGroup
-      ComputeStatistics(lts)
-    Next
+    If Not ltsGroup Is Nothing Then
+      For Each lts As atcTimeseries In ltsGroup
+        ComputeStatistics(lts)
+      Next
+    End If
   End Function
 
   Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
@@ -247,7 +262,4 @@ Public Class atcTimeseriesStatistics
     Next
   End Sub
 
-  Public Overrides Function NewOne() As atcDataPlugin
-    Return New atcTimeseriesStatistics
-  End Function
 End Class

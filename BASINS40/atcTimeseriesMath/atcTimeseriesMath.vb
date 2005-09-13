@@ -136,6 +136,8 @@ Public Class atcTimeseriesMath
         AddOperation("Subset by date", "Choose start and end dates", defTimeSeriesOne, defStartDate, defEndDate)
         pAvailableOperations.GetDefinition("Subset by date").Category = "Date"
 
+        AddOperation("Merge", "Choose data to merge", defTimeSeriesGroup)
+        pAvailableOperations.GetDefinition("Merge").Category = "Date"
       End If
       Return pAvailableOperations
     End Get
@@ -407,6 +409,9 @@ Public Class atcTimeseriesMath
         End If
         ReDim newVals(-1) 'Don't create new timeseries below
 
+      Case "merge"
+        AddDataSet(MergeTimeseries(lTSgroup))
+        ReDim newVals(-1) 'Don't create new timeseries below
         '  '      Case "running sum"
         '  '        valNum = 1
         '  '        GoSub SetCurArgVal
@@ -474,10 +479,6 @@ Public Class atcTimeseriesMath
     t.Attributes.SetValue("Data Source", Specification)
     t.Attributes.AddHistory(Specification)
     MyBase.AddDataSet(t)
-  End Function
-
-  Public Overrides Function NewOne() As atcDataPlugin
-    Return New atcTimeseriesMath
   End Function
 
 End Class

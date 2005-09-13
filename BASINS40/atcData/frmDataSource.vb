@@ -55,7 +55,7 @@ Public Class frmDataSource
     Me.treeSources.Location = New System.Drawing.Point(0, 0)
     Me.treeSources.Name = "treeSources"
     Me.treeSources.SelectedImageIndex = -1
-    Me.treeSources.Size = New System.Drawing.Size(355, 577)
+    Me.treeSources.Size = New System.Drawing.Size(296, 496)
     Me.treeSources.TabIndex = 0
     '
     'pnlButtons
@@ -63,36 +63,36 @@ Public Class frmDataSource
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.pnlButtons.Location = New System.Drawing.Point(0, 568)
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 492)
     Me.pnlButtons.Name = "pnlButtons"
-    Me.pnlButtons.Size = New System.Drawing.Size(355, 46)
+    Me.pnlButtons.Size = New System.Drawing.Size(295, 40)
     Me.pnlButtons.TabIndex = 13
     '
     'btnCancel
     '
     Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-    Me.btnCancel.Location = New System.Drawing.Point(125, 9)
+    Me.btnCancel.Location = New System.Drawing.Point(104, 8)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(96, 28)
+    Me.btnCancel.Size = New System.Drawing.Size(80, 24)
     Me.btnCancel.TabIndex = 4
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(10, 9)
+    Me.btnOk.Location = New System.Drawing.Point(8, 8)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(96, 28)
+    Me.btnOk.Size = New System.Drawing.Size(80, 24)
     Me.btnOk.TabIndex = 3
     Me.btnOk.Text = "Ok"
     '
     'frmDataSource
     '
     Me.AcceptButton = Me.btnOk
-    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.CancelButton = Me.btnCancel
-    Me.ClientSize = New System.Drawing.Size(355, 614)
-    Me.Controls.Add(Me.pnlButtons)
+    Me.ClientSize = New System.Drawing.Size(295, 532)
     Me.Controls.Add(Me.treeSources)
+    Me.Controls.Add(Me.pnlButtons)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDataSource"
     Me.Text = "Select a Data Source"
@@ -164,10 +164,24 @@ Public Class frmDataSource
         End If
       End If
     Next
+    treeSources.Nodes(0).EnsureVisible()
+
+    Dim lBottomNode As TreeNode = BottomNode(treeSources.Nodes(treeSources.Nodes.Count - 1))
+    Me.Top = 0
+    Me.Height = lBottomNode.Bounds.Top + lBottomNode.Bounds.Height * 2 + treeSources.Top + pnlButtons.Height + 15
+
     'These were only set for use during Populate and should not still be set if user closes window
     pSelectedSource = Nothing
     pSpecification = ""
   End Sub
+
+  Private Function BottomNode(ByVal aParent As TreeNode) As TreeNode
+    If aParent.Nodes.Count = 0 Then
+      Return aParent
+    Else
+      Return BottomNode(aParent.Nodes(aParent.Nodes.Count - 1))
+    End If
+  End Function
 
   Private Function FindOrCreateNode(ByVal aNodes As TreeNodeCollection, ByVal aNodeText As String) As TreeNode
     Dim newNode As TreeNode
@@ -213,5 +227,12 @@ Public Class frmDataSource
 
   Private Sub treeSources_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles treeSources.DoubleClick
     btnOk_Click(sender, e)
+  End Sub
+
+  Protected Overrides Sub OnLoad(ByVal e As System.EventArgs)
+    Dim lHeight As Integer = Me.Height
+    MyBase.OnLoad(e)
+    Me.Top = 0
+    Me.Height = lHeight
   End Sub
 End Class
