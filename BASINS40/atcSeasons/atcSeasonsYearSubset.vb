@@ -1,5 +1,7 @@
+Imports atcData
+
 Public Class atcSeasonsYearSubset
-  Inherits atcSeasons
+  Inherits atcSeasonBase
 
   Private pTS As atcTimeseries
   Private pStartDate As Date

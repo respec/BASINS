@@ -448,7 +448,8 @@ Public Class PlugIn
           Try
             RunDefaultScript()
             Exit Function
-          Catch
+          Catch e As Exception
+            LogDbg(e.ToString)
           End Try
           Dim args() As Object = aCmdLine.Split(",")
           Dim errors As String
