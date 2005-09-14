@@ -28,8 +28,7 @@ Public Module modTimeseriesMath
     lnewTS.Dates = New atcTimeseries(aDataSource)
     lnewTS.Values = newValues
     lnewTS.Dates.Values = newDates
-
-    CopyBaseAttributes(aTimeseries, lnewTS)
+    CopyBaseAttributes(aTimeseries, lnewTS, numNewValues, iStart + 1, 1)
 
     lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
 
@@ -37,14 +36,35 @@ Public Module modTimeseriesMath
 
   End Function
 
-  Public Sub CopyBaseAttributes(ByVal aFromDataset As atcDataSet, ByVal aToDataSet As atcDataSet)
+  'Public Sub CopyBaseAttributes(ByVal aFromDataset As atcDataSet, ByVal aToDataSet As atcDataSet)
+  '  For Each lAttribute As atcDefinedValue In aFromDataset.Attributes
+  '    If Not (lAttribute.Definition.Calculated) Then
+  '      aToDataSet.Attributes.SetValue(lAttribute.Definition, lAttribute.Value)
+  '    End If
+  '  Next
+  'End Sub
+
+  Public Sub CopyBaseAttributes(ByVal aFromDataset As atcTimeseries, ByVal aToDataSet As atcTimeseries, _
+                                Optional ByVal aNumValues As Integer = 0, _
+                                Optional ByVal aStartFrom As Integer = 0, _
+                                Optional ByVal aStartTo As Integer = 0)
+
     For Each lAttribute As atcDefinedValue In aFromDataset.Attributes
       If Not (lAttribute.Definition.Calculated) Then
-        aToDataSet.Attributes.Add(lAttribute)
+        aToDataSet.Attributes.SetValue(lAttribute.Definition, lAttribute.Value)
+      End If
+    Next
+
+    For lIndex As Integer = 0 To aNumValues - 1
+      If aFromDataset.ValueAttributesExist(lIndex + aStartFrom) Then
+        For Each lAttribute As atcDefinedValue In aFromDataset.ValueAttributes(lIndex + aStartFrom)
+          If Not (lAttribute.Definition.Calculated) Then
+            aToDataSet.ValueAttributes(lIndex + aStartTo).SetValue(lAttribute.Definition, lAttribute.Value)
+          End If
+        Next
       End If
     Next
   End Sub
-
   'Merge a group of atcTimeseries
   'Each atcTimeseries is assumed to be in order by date within itself
   'Resulting atcTimeseries will contain all dates and values from the group, sorted by date

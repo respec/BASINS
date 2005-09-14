@@ -63,6 +63,15 @@ Public Class atcTimeseries
     End If
   End Function
 
+  'Get whether a ValueAttribute exists for a Value without creating pValueAttributes or pValueAttributes(index)
+  Public Function ValueAttributesExist(ByVal index As Integer) As Boolean
+    If pValueAttributes Is Nothing OrElse pValueAttributes(index) Is Nothing Then
+      Return False
+    Else
+      Return True
+    End If
+  End Function
+
   'Attributes associated with individual values (quality flags)
   Public Property ValueAttributes(ByVal index As Integer) As atcDataAttributes
     Get

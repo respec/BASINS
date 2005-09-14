@@ -461,7 +461,7 @@ Public Class atcTimeseriesMath
         lNewTS.Attributes.SetValue("Parent Constant", lNumber)
       End If
 
-      CopyBaseAttributes(firstTS, lNewTS)
+      CopyBaseAttributes(firstTS, lNewTS, lNewTS.numValues + 1, 0, 0)
 
       Dim lDateNow As Date = Now
       lNewTS.Attributes.SetValue("Date Created", lDateNow)

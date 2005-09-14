@@ -21,10 +21,14 @@ Public Module ScriptSeasonAdjust
     Dim lMonthData As New atcDataGroup
     Dim lDataAdj As New atcDataGroup
 
-    ChDriveDir("C:\test\Seasons\current")
-    Dim lS As String = "subFindMatch.vb"
-    If Not FileExists(lS) Then
-      FileCopy("..\scripts\" & lS, lS)
+    Dim lAllowExit As Boolean = False
+
+    Dim lTestDir As String = "c:\test"
+    If CurDir.ToLower.StartsWith(lTestDir) Then
+      lAllowExit = True
+      ChDriveDir(lTestDir & "\Seasons\")
+    Else
+      ChDriveDir(lTestDir & "\Seasons\current")
     End If
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
@@ -67,6 +71,8 @@ Public Module ScriptSeasonAdjust
     lSummary.Save(aDataManager, lTsMath.DataSets, "ListMonthAfterAdd.txt", "Expand")
 
     AppendFileString(lOutFile, " Done" & vbCrLf)
-    Application.Exit()
+    If lAllowExit Then
+      Application.Exit()
+    End If
   End Sub
 End Module
