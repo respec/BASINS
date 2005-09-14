@@ -18,11 +18,12 @@ Public Module ScriptStatTest
     Dim lMatch As New atcDataGroup
     Dim lErr As String
     Dim lArgsMath As New atcDataAttributes
+    Dim lDebug As Boolean = False
 
-    ChDriveDir("C:\test\StatsAndNDay\current")
-    Dim lS As String = "subFindMatch.vb"
-    If Not FileExists(lS) Then
-      FileCopy("..\scripts\" & lS, lS)
+    Dim lTestDataDir = "C:\test\StatsAndNDay\current"
+    If Application.StartupPath.IndexOf(lTestDataDir) = -1 Then
+      ChDriveDir(lTestDataDir)
+      lDebug = True
     End If
 
     aDataManager.OpenDataSource(lWDMfile, "jack.wdm", Nothing)
@@ -48,7 +49,7 @@ Public Module ScriptStatTest
     lArgsMath.SetValue("Timeseries", lMatch)
     lArgsMath.SetValue("NDay", 1)
     aDataManager.OpenDataSource(lHighLowSource, "n-day high timeseries", lArgsMath)
-    lSummary.Save(aDataManager, lHighLowSource.DataSets(0), "Shasta1DyHigh.txt", "Display 40", "Expand")
+    lSummary.Save(aDataManager, lHighLowSource.DataSets, "Shasta1DyHigh.txt", "Display 40", "Expand")
     '1Hi100 from 1day high ts
     Dim lAnnualTimeseries As atcTimeseries = lHighLowSource.DataSets(0)
     lArgsMath.Clear()
@@ -56,7 +57,7 @@ Public Module ScriptStatTest
     lArgsMath.SetValue("NDay", 1)
     lArgsMath.SetValue("Return Period", 100)
     aDataManager.OpenDataSource(lHighLowSource, "n-day high value", lArgsMath)
-    lSummary.Save(aDataManager, lAnnualTimeseries, "Shasta1DyHigh100yr.txt", "Display 40", "Expand")
+    lSummary.Save(aDataManager, New atcDataGroup(lAnnualTimeseries), "Shasta1DyHigh100yr.txt", "Display 40", "Expand")
 
     'subset to WaterYear Apr-Mar 
     lTsMath.DataSets.Clear()
@@ -81,8 +82,10 @@ Public Module ScriptStatTest
     lArgsMath.SetValue("Timeseries", lTsMath.DataSets)
     lArgsMath.SetValue("NDay", 7)
     aDataManager.OpenDataSource(lHighLowSource, "n-day low timeseries", lArgsMath)
-    lSummary.Save(aDataManager, lHighLowSource.DataSets(0), "ShastaWyAprMar7DyLow.txt", "Display 40", "Expand")
+    lSummary.Save(aDataManager, lHighLowSource.DataSets, "ShastaWyAprMar7DyLow.txt", "Display 40", "Expand")
 
-    'Application.Exit()
+    If Not lDebug Then
+      Application.Exit()
+    End If
   End Sub
 End Module

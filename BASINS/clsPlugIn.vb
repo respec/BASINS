@@ -530,6 +530,15 @@ Public Class PlugIn
       Next
     End If
 
+    If aScript.IndexOfAny(vbCr & vbLf) < 0 Then
+      If Not FileExists(aScript) Then
+        Dim lScriptFileName As String = PathNameOnly(g_MapWin.Plugins.PluginFolder) & "\script\" & aScript
+        If FileExists(lScriptFileName) Then
+          aScript = lScriptFileName
+        End If
+      End If
+    End If
+
     Return RunScript(aLanguage, MakeScriptName, aScript, errors, args)
 
   End Function
