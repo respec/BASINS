@@ -18,13 +18,13 @@ Public Module ScriptStatTest
     Dim lMatch As New atcDataGroup
     Dim lErr As String
     Dim lArgsMath As New atcDataAttributes
-    Dim lDebug As Boolean = False
+    Dim lAllowExit As Boolean = False
 
-    Dim lTestDataDir = "C:\test\StatsAndNDay\current"
-    If Application.StartupPath.IndexOf(lTestDataDir) = -1 Then
-      ChDriveDir(lTestDataDir)
-      lDebug = True
+    Dim lTestDir as string = "c:\test"
+    If Curdir.ToLower.StartsWith(lTestDir) Then
+      lAllowExit = True
     End If
+    ChDriveDir(lTestDir & "\StatsAndNDay\")
 
     aDataManager.OpenDataSource(lWDMfile, "jack.wdm", Nothing)
 
@@ -84,7 +84,7 @@ Public Module ScriptStatTest
     aDataManager.OpenDataSource(lHighLowSource, "n-day low timeseries", lArgsMath)
     lSummary.Save(aDataManager, lHighLowSource.DataSets, "ShastaWyAprMar7DyLow.txt", "Display 40", "Expand")
 
-    If Not lDebug Then
+    If lAllowExit Then
       Application.Exit()
     End If
   End Sub
