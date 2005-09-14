@@ -1,5 +1,6 @@
 Imports atcData
 Imports atcUtility
+Imports atcSeasons
 
 Imports Microsoft.VisualBasic
 Imports System.Collections
@@ -18,11 +19,11 @@ Public Module ScriptSeasonAttributes
     Dim lMatch As New atcDataGroup
     Dim lMonthData As New atcDataGroup
 
-    ChDriveDir("C:\test\Seasons\current")
-    Dim lS As String = "subFindMatch.vb"
-    If Not FileExists(lS) Then
-      FileCopy("..\scripts\" & lS, lS)
-    End If
+    'ChDriveDir("C:\test\Seasons\current")
+    'Dim lS As String = "subFindMatch.vb"
+    'If Not FileExists(lS) Then
+    '  FileCopy("..\scripts\" & lS, lS)
+    'End If
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
 
@@ -50,11 +51,11 @@ Public Module ScriptSeasonAttributes
     SaveFileString("ListDayOfWeekAttributes.txt", lAttributesTemp.ToString)
 
     lAttributesTemp.Clear()
-    Dim lSeasonsCalendarYear As New atcSeasonsYear
+    Dim lSeasonsCalendarYear As New atcSeasonsCalendarYear
     lSeasonsCalendarYear.SetSeasonalAttributes(lMatch.ItemByIndex(0), lAttributes, lAttributesTemp)
     SaveFileString("ListCalendarYearAttributes.txt", lAttributesTemp.ToString)
 
     AppendFileString(lOutFile, " Done" & vbCrLf)
-    'Application.Exit()
+    Application.Exit()
   End Sub
 End Module

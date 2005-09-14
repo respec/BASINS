@@ -1,5 +1,6 @@
 Imports atcData
 Imports atcUtility
+Imports atcSeasons
 
 Imports Microsoft.VisualBasic
 Imports System.Collections
@@ -21,11 +22,11 @@ Public Module ScriptSeasons
     Dim lMatch As New atcDataGroup
     Dim lSummerData As New atcDataGroup
 
-    ChDriveDir("C:\test\Seasons\current")
-    Dim lS As String = "subFindMatch.vb"
-    If Not FileExists(lS) Then
-      FileCopy("..\scripts\" & lS, lS)
-    End If
+    'ChDriveDir("C:\test\Seasons\current")
+    'Dim lS As String = "subFindMatch.vb"
+    'If Not FileExists(lS) Then
+    '  FileCopy("..\scripts\" & lS, lS)
+    'End If
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
 
@@ -62,6 +63,6 @@ Public Module ScriptSeasons
     lSummary.Save(aDataManager, lHighLowSource.DataSets, "List7Low.txt", "Expand")
 
     AppendFileString(lOutFile, " Done" & vbCrLf)
-    'Application.Exit()
+    Application.Exit()
   End Sub
 End Module

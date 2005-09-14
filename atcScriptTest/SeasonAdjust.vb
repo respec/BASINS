@@ -42,6 +42,7 @@ Public Module ScriptSeasonAdjust
 
     Dim lSeasonsMonth As New atcSeasonsMonth
     lMonthData = lSeasonsMonth.Split(lMatch.ItemByIndex(0), aDataManager.DataSources(0))
+
     AppendFileString(lOutFile, "   MonthCount:" & lMonthData.Count & vbCrLf)
     lSummary.Save(aDataManager, lMonthData, "ListMonth.txt", "Expand")
 
@@ -61,11 +62,11 @@ Public Module ScriptSeasonAdjust
 
     lArgsMath.Clear()
     lArgsMath.SetValue("timeseries", lMonthData)
-    aDataManager.OpenDataSource(lTsMath, "add", lArgsMath)
+    aDataManager.OpenDataSource(lTsMath, "merge", lArgsMath)
     AppendFileString(lOutFile, "   MathAddCount:" & lTsMath.DataSets.Count & vbCrLf)
     lSummary.Save(aDataManager, lTsMath.DataSets, "ListMonthAfterAdd.txt", "Expand")
 
     AppendFileString(lOutFile, " Done" & vbCrLf)
-    'Application.Exit()
+    Application.Exit()
   End Sub
 End Module

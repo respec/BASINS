@@ -33,7 +33,7 @@
                     DebugSymbols = "true"
                     IncrementalBuild = "true"
                     Optimize = "false"
-                    OutputPath = "..\..\MapWindow40\Bin\Plugins\basins\"
+                    OutputPath = "..\Bin\Plugins\basins\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -94,12 +94,6 @@
                     Private = "False"
                 />
                 <Reference
-                    Name = "ZedGraph"
-                    AssemblyName = "ZedGraph"
-                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ZedGraph.dll"
-                    Private = "False"
-                />
-                <Reference
                     Name = "System.Drawing"
                     AssemblyName = "System.Drawing"
                     HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Drawing.dll"
@@ -114,12 +108,6 @@
                     Name = "System.Windows.Forms"
                     AssemblyName = "System.Windows.Forms"
                     HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
-                />
-                <Reference
-                    Name = "MapWinInterfaces"
-                    AssemblyName = "MapWinInterfaces"
-                    HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
-                    Private = "False"
                 />
                 <Reference
                     Name = "atcWDM"
@@ -149,6 +137,7 @@
                     Name = "atcSeasons"
                     Project = "{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
             </References>
             <Imports>
