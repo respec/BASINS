@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic LastOpenVersion = "7.10.3077" >
         <Build>
-            <Settings ReferencePath = "C:\dev\MapWinX\bin\Release\;C:\dev\MapWinX\obj\Debug\;C:\dev\MapWindow40\Bin\;C:\dev\BASINS40\atcUtility\obj\Debug\;C:\temp\mapwinx\;C:\dev\MapWindow40\Bin\Plugins\BASINS\" >
+            <Settings ReferencePath = "C:\dev\MapWinX\bin\Release\;C:\dev\MapWinX\obj\Debug\;C:\dev\Basins40\Bin\;C:\dev\BASINS40\atcUtility\obj\Debug\;C:\temp\mapwinx\;C:\dev\Basins40\Bin\Plugins\BASINS\" >
                 <Config
                     Name = "Debug"
                     EnableASPDebugging = "false"
@@ -13,7 +13,7 @@
                     StartAction = "Program"
                     StartArguments = ""
                     StartPage = ""
-                    StartProgram = "C:\dev\MapWindow40\Bin\Basins4.exe"
+                    StartProgram = "C:\dev\Basins40\Bin\Basins4.exe"
                     StartURL = ""
                     StartWorkingDirectory = ""
                     StartWithIE = "false"
@@ -29,7 +29,6 @@
                     StartAction = "Program"
                     StartArguments = ""
                     StartPage = ""
-                    StartProgram = "C:\MapWindow\MapWindow40.3\Bin\MapWindow.exe"
                     StartURL = ""
                     StartWorkingDirectory = ""
                     StartWithIE = "false"

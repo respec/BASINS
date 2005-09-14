@@ -97,7 +97,7 @@
                 <Reference
                     Name = "MapWinInterfaces"
                     AssemblyName = "MapWinInterfaces"
-                    HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
+                    HintPath = "..\Bin\MapWinInterfaces.dll"
                     Private = "False"
                 />
                 <Reference
@@ -152,6 +152,16 @@
                     RelPath = "atcScenarioBuilderPlugin.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmNewScenario.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmNewScenario.resx"
+                    DependentUpon = "frmNewScenario.vb"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "modScenarioBuild.vb"

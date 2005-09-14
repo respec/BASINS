@@ -135,13 +135,8 @@ Public Module modTimeseriesMath
             lNextIndex(lMinIndex) = -1
           End If
 
-        Else
-          'Should never get here 
-          If lNewTS.numValues >= lNewIndex Then
-            atcUtility.LogMsg("Ran out of values after finding " & lNewIndex - 1 & " but expected " & lTotalNumValues, "Timeseries Merge")
-            lNewTS.numValues = lNewIndex - 1
-            Exit For
-          End If
+        Else 'ran out of values in all the datasets
+          Exit For
         End If
       Next
       If lTotalNumValues < lNewTS.numValues Then

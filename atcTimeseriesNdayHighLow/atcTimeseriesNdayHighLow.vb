@@ -115,7 +115,7 @@ Public Class atcTimeseriesNdayHighLow
 
     If aNumValues > 0 And aTS.numValues >= aNumValues Then
       Dim lBestSoFar As Double
-      Dim lTimeIndex As Integer
+      Dim lTimeIndex As Integer = 1
       Dim lNumSummed As Integer = 1
       Dim lRunningSum As Double = 0
       Dim lCurrentValue As Double
