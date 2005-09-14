@@ -108,6 +108,7 @@
                     Name = "MapWinInterfaces"
                     AssemblyName = "MapWinInterfaces"
                     HintPath = "..\Bin\MapWinInterfaces.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>
