@@ -94,7 +94,7 @@
                 <Reference
                     Name = "MapWinInterfaces"
                     AssemblyName = "MapWinInterfaces"
-                    HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
+                    HintPath = "..\Bin\MapWinInterfaces.dll"
                     Private = "False"
                 />
                 <Reference
@@ -105,7 +105,7 @@
                 <Reference
                     Name = "ChilkatDotNet"
                     AssemblyName = "ChilkatDotNet"
-                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ChilkatDotNet.dll"
+                    HintPath = "..\Bin\ChilkatDotNet.dll"
                     Private = "False"
                 />
                 <Reference
@@ -117,7 +117,7 @@
                 <Reference
                     Name = "Interop.MapWinGIS"
                     AssemblyName = "Interop.MapWinGIS"
-                    HintPath = "..\..\MapWindow40\Bin\Interop.MapWinGIS.dll"
+                    HintPath = "..\Bin\Interop.MapWinGIS.dll"
                     Private = "False"
                 />
                 <Reference

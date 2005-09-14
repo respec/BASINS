@@ -426,7 +426,7 @@ Public Class PlugIn
   '  Debug.WriteLine("After write: " & tmpDbf.Summary)
   'End Sub
 
-  Private Function LaunchTool(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
+  Private Function LaunchTool(ByVal aToolName As String) As Boolean ', Optional ByVal aCmdLine As String = "") As Boolean
     Dim exename As String
     Select Case aToolName
       'Case "TestDBF"
@@ -451,16 +451,14 @@ Public Class PlugIn
           Catch e As Exception
             LogDbg(e.ToString)
           End Try
-          Dim args() As Object = aCmdLine.Split(",")
+          aToolName = aToolName.Substring(11)
+          exename = StrSplit(aToolName, " ", """")
+          Dim args() As Object = aToolName.Split(",")
           Dim errors As String
-          If aToolName.Length > 10 Then
-            exename = aToolName.Substring(11)
-          Else
-            exename = aCmdLine
-          End If
-          If Not FileExists(exename) Then
+
+          If exename.ToLower = "findfile" OrElse Not FileExists(exename) Then
             exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
-            args = New Object() {"DataManager", "BasinsPlugIn"}
+            If Len(args(0)) = 0 Then args = New Object() {"DataManager", "BasinsPlugIn"}
           End If
           If FileExists(exename) Then
             RunBasinsScript(FileExt(exename), WholeFileString(exename), errors, args)
@@ -473,15 +471,13 @@ Public Class PlugIn
             Return False
           End If
         Else 'Search for DisplayPlugin to launch
-            Return LaunchDisplay(aToolName, aCmdLine)
+          Return LaunchDisplay(aToolName)
         End If
     End Select
 
     If FileExists(exename) Then
-      'Ensure space between exename and cmdline if needed
-      If aCmdLine.Length > 0 AndAlso Not aCmdLine.StartsWith(" ") Then aCmdLine = " " & aCmdLine
 
-      Shell("""" & exename & """" & aCmdLine, AppWinStyle.NormalFocus, False)
+      Shell("""" & exename & """", AppWinStyle.NormalFocus, False)
       Return True
     Else
       LogMsg("Unable to launch " & aToolName, "Launch")

@@ -33,7 +33,7 @@
                     DebugSymbols = "true"
                     IncrementalBuild = "true"
                     Optimize = "false"
-                    OutputPath = "..\..\MapWindow40\Bin\Plugins\"
+                    OutputPath = "..\..\Basins40\Bin\Plugins\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -102,7 +102,7 @@
                 <Reference
                     Name = "MapWinInterfaces"
                     AssemblyName = "MapWinInterfaces"
-                    HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
+                    HintPath = "..\..\Basins40\Bin\MapWinInterfaces.dll"
                 />
                 <Reference
                     Name = "atcUtility"
@@ -112,7 +112,7 @@
                 <Reference
                     Name = "ChilkatDotNet"
                     AssemblyName = "ChilkatDotNet"
-                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ChilkatDotNet.dll"
+                    HintPath = "..\..\Basins40\Bin\ChilkatDotNet.dll"
                 />
                 <Reference
                     Name = "MapWinX"

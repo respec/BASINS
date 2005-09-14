@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic LastOpenVersion = "7.10.3077" >
         <Build>
-            <Settings ReferencePath = "C:\MapWindow\MapWin40PubDomAmesUpdate\MapWindow40.3\Bin\;D:\MapWindow\MapWindow40.3\Bin\;C:\Dev\MapWindow4.0\Bin\;D:\MapWindow\MapWindow40.5.2003\Bin\" >
+            <Settings ReferencePath = "C:\Dev\Basins40\Bin\" >
                 <Config
                     Name = "Debug"
                     EnableASPDebugging = "false"

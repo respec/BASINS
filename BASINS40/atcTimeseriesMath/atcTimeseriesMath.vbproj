@@ -70,7 +70,7 @@
                 <Reference
                     Name = "MapWinInterfaces"
                     AssemblyName = "MapWinInterfaces"
-                    HintPath = "..\..\MapWindow40\Bin\MapWinInterfaces.dll"
+                    HintPath = "..\Bin\MapWinInterfaces.dll"
                     Private = "False"
                 />
                 <Reference

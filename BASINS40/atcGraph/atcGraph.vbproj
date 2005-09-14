@@ -97,7 +97,7 @@
                 <Reference
                     Name = "ZedGraph"
                     AssemblyName = "ZedGraph"
-                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ZedGraph.dll"
+                    HintPath = "..\Bin\ZedGraph.dll"
                     Private = "False"
                 />
                 <Reference
