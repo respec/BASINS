@@ -158,7 +158,7 @@ Public Class atcTimeseriesNdayHighLow
             Else
               If lRunningSum < lBestSoFar Then lBestSoFar = lRunningSum
             End If
-            lRunningSum -= aTS.Value(lTimeIndex - 1 - aNumValues)
+            lRunningSum -= aTS.Value(lTimeIndex - aNumValues + 1)
           End If
         End If
         lTimeIndex += 1
