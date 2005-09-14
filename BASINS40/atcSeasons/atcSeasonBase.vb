@@ -61,6 +61,9 @@ Public Class atcSeasonBase
         lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1)
       Else
         lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 0)
+        If aTS.ValueAttributesExist(lNewTSvalueIndex) Then 'TODO:finish this!
+          'lnewts.ValueAttributes(lnewtsvalueindex).SetRange(
+        End If
         If lPrevSeasonIndex <> lSeasonIndex Then
           'Insert dummy value for start of interval after skipping dates outside season
           lNewTS.Values(lNewTSvalueIndex) = Double.NaN

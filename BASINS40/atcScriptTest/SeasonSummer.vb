@@ -22,11 +22,15 @@ Public Module ScriptSeasons
     Dim lMatch As New atcDataGroup
     Dim lSummerData As New atcDataGroup
 
-    'ChDriveDir("C:\test\Seasons\current")
-    'Dim lS As String = "subFindMatch.vb"
-    'If Not FileExists(lS) Then
-    '  FileCopy("..\scripts\" & lS, lS)
-    'End If
+    Dim lAllowExit As Boolean = False
+
+    Dim lTestDir as string = "c:\test"
+    If Curdir.ToLower.StartsWith(lTestDir) Then
+      lAllowExit = True
+      ChDriveDir(lTestDir & "\Seasons\")
+    Else
+      ChDriveDir(lTestDir & "\Seasons\current")
+    End If
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
 
@@ -49,8 +53,7 @@ Public Module ScriptSeasons
     lSummary.Save(aDataManager, lTsMath.DataSets, "List1960to1970.txt", "Expand")
 
     Dim lSeasonsSummer As New atcSeasonsYearSubset("1900/6/15", "1900/9/15")
-    lSummerData = lSeasonsSummer.Split(lTsMath.DataSets(0))
-    aDataManager.DataSources(0).DataSets.AddRange(lSummerData)
+    lSummerData = lSeasonsSummer.Split(lTsMath.DataSets(0), aDataManager.DataSources(0))
     AppendFileString(lOutFile, "   SummerDataCount:" & lSummerData.Count & vbCrLf)
     lSummary.Save(aDataManager, lSummerData, "ListSummer.txt", "Expand")
 
@@ -63,6 +66,8 @@ Public Module ScriptSeasons
     lSummary.Save(aDataManager, lHighLowSource.DataSets, "List7Low.txt", "Expand")
 
     AppendFileString(lOutFile, " Done" & vbCrLf)
-    Application.Exit()
+    If lAllowExit Then
+      Application.Exit()
+    End If
   End Sub
 End Module
