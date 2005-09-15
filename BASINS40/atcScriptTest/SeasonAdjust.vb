@@ -68,7 +68,7 @@ Public Module ScriptSeasonAdjust
     lArgsMath.SetValue("timeseries", lMonthData)
     aDataManager.OpenDataSource(lTsMath, "merge", lArgsMath)
     AppendFileString(lOutFile, "   MathAddCount:" & lTsMath.DataSets.Count & vbCrLf)
-    lSummary.Save(aDataManager, lTsMath.DataSets, "ListMonthAfterAdd.txt", "Expand")
+    lSummary.Save(aDataManager, lTsMath.DataSets, "ListMonthAfterMerge.txt", "Expand")
 
     AppendFileString(lOutFile, " Done" & vbCrLf)
     If lAllowExit Then

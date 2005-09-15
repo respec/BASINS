@@ -84,7 +84,11 @@ Friend Class atcSeasonalAttributesGridSource
 
   Public Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
-      Return atcControls.atcAlignment.HAlignDecimal
+      If aColumn > 1 Then
+        Return atcControls.atcAlignment.HAlignDecimal
+      Else
+        Return atcControls.atcAlignment.HAlignLeft
+      End If
     End Get
     Set(ByVal Value As atcControls.atcAlignment)
     End Set

@@ -95,4 +95,29 @@ Public Class atcGridSource
 
     End Set
   End Property
+
+  Public Overrides Function ToString() As String
+    Dim lCellValue As String
+    Dim lAddTabs() As Boolean
+    ReDim lAddTabs(Me.Columns)
+
+    For iCol As Integer = 0 To Me.Columns - 1
+      For iRow As Integer = 0 To Me.Rows - 1
+        If Me.CellValue(iRow, iCol).IndexOf(vbTab) > -1 Then
+          lAddTabs(iCol) = True
+          Exit For
+        End If
+      Next
+    Next
+
+    For iRow As Integer = 0 To Me.Rows - 1
+      For iCol As Integer = 0 To Me.Columns - 1
+        lCellValue = Me.CellValue(iRow, iCol)
+        ToString &= lCellValue & vbTab
+        'Some modified values contain vbTab(+10%), add a tab to those that don't
+        If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then ToString &= vbTab
+      Next
+      ToString &= vbCrLf
+    Next
+  End Function
 End Class

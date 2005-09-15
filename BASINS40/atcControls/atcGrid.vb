@@ -141,6 +141,10 @@ Public Class atcGrid
     Clear()
   End Sub
 
+  Public Overrides Function ToString() As String
+    Return pSource.ToString
+  End Function
+
   Public Property ColumnWidth(ByVal iColumn) As Integer
     Get
       If pColumnWidth.Count = 0 Then
@@ -439,10 +443,17 @@ Public Class atcGrid
     End If
   End Function
 
+  Public Sub SizeAllColumnsToContents()
+    Dim lMaxColumn = pSource.Columns - 1
+    For lCol As Integer = 0 To lMaxColumn
+      SizeColumnToContents(lCol)
+    Next
+  End Sub
+
   Public Sub SizeColumnToContents(ByVal aColumn As Integer)
     Dim lCellValue As String
     Dim lCellWidth As Single
-    Dim lastRow As Integer = pTopRow + pRowBottom.Count - 1
+    Dim lastRow As Integer = pSource.Rows - 1 'pTopRow + pRowBottom.Count - 1
     Dim g As Graphics = Me.CreateGraphics
     Dim lDecimalWidth As Single = g.MeasureString(".", pFont).Width
     Dim lMaxWidth As Integer = 0

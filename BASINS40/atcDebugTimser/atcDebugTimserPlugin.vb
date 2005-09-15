@@ -2,7 +2,6 @@ Imports atcData
 
 Public Class atcDebugTimserPlugin
   Inherits atcDataDisplay
-  Private pMapWin As MapWindow.Interfaces.IMapWin
 
   Public Overrides ReadOnly Property Name() As String
     Get
@@ -25,16 +24,12 @@ Public Class atcDebugTimserPlugin
     Return lDebugTimserForm
   End Function
 
-  Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
-    pMapWin = MapWin
-    pMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcDebugTimserPlugin")
+  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
+                                  ByVal aParentHandle As Integer)
+    aMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcDebugTimserPlugin")
   End Sub
 
-  Public Overrides Sub Terminate()
-    pMapWin.Plugins.BroadcastMessage("atcDataPlugin unloading atcDebugTimserPlugin")
-  End Sub
-
-  Public Sub Save(ByVal aDataManager As atcDataManager, _
+  Public Overrides Sub Save(ByVal aDataManager As atcDataManager, _
                   ByVal aDataGroup As atcDataGroup, _
                   ByVal aFileName As String, _
                   ByVal ParamArray aOption() As String)

@@ -335,29 +335,16 @@ Friend Class atcScenarioBuilderForm
     End If
   End Sub
 
-  Private Function GridAsString(ByVal aSource As GridSource) As String
-    Dim lCellValue As String
-    For iRow As Integer = 0 To aSource.Rows - 1
-      For iCol As Integer = 0 To aSource.Columns - 1
-        lCellValue = aSource.CellValue(iRow, iCol)
-        GridAsString &= lCellValue & vbTab
-        'Some modified values contain vbTab(+10%), add a tab to those that don't
-        If iCol > 2 AndAlso lCellValue.IndexOf(vbTab) < 0 Then GridAsString &= vbTab
-      Next
-      GridAsString &= vbCrLf
-    Next
-  End Function
-
   Private Sub mnuEditCopyBoth_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopyBoth.Click
-    Clipboard.SetDataObject(GridAsString(pSource) & vbCrLf & GridAsString(pResultSource))
+    Clipboard.SetDataObject(pSource.ToString & vbCrLf & pResultSource.ToString)
   End Sub
 
   Private Sub mnuEditCopyInputs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopyInputs.Click
-    Clipboard.SetDataObject(GridAsString(pSource))
+    Clipboard.SetDataObject(pSource.ToString)
   End Sub
 
   Private Sub mnuEditCopyResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopyResults.Click
-    Clipboard.SetDataObject(GridAsString(pResultSource))
+    Clipboard.SetDataObject(pResultSource.ToString)
   End Sub
 
   Private Sub mnuDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuDisplay.Click

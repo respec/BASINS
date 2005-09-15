@@ -6,4 +6,10 @@ Public Class atcDataDisplay
                      Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
   End Function
 
+  'not ToString because the display may have graphics that don't convert well to a string
+  Public Overridable Sub Save(ByVal aDataManager As atcData.atcDataManager, _
+                              ByVal aDataGroup As atcDataGroup, _
+                              ByVal aFileName As String, _
+                              ByVal ParamArray aOption() As String)
+  End Sub
 End Class
