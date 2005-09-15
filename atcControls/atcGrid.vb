@@ -380,18 +380,7 @@ Public Class atcGrid
                   lCellValueSize = g.MeasureString(lMainValue, pFont)
                   x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft - lCellValueSize.Width) / 2
                 Case atcAlignment.HAlignDecimal
-                  If IsNumeric(lMainValue) Then
-                    Dim lDecimalPos As Integer = lMainValue.IndexOf(".")
-                    If lDecimalPos = -1 Then
-                      lCellValueLeftSize = g.MeasureString(lMainValue, pFont)
-                    Else
-                      lCellValueLeftSize = g.MeasureString(lMainValue.Substring(0, lDecimalPos), pFont)
-                    End If
-                    x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft) / 2 - lCellValueLeftSize.Width
-                  Else 'Center non-numeric values
-                    lCellValueSize = g.MeasureString(lMainValue, pFont)
-                    x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft - lCellValueSize.Width) / 2
-                  End If
+                  x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft) / 2 - WidthLeftOfDecimal(lMainValue, g)
                 Case Else 'Default to left alignment 
                   x = lCellLeft
               End Select
@@ -422,39 +411,56 @@ Public Class atcGrid
     End If
   End Sub
 
-  public Sub SizeColumnToContents(ByVal aColumn As Integer)
+  Private Function WidthLeftOfDecimal(ByVal aCellValue As String, ByVal g As Graphics) As Single
+    Dim lCellValueSize As SizeF
+    If IsNumeric(aCellValue) Then
+      Dim lDecimalPos As Integer = aCellValue.IndexOf(".")
+      If lDecimalPos = -1 Then
+        lCellValueSize = g.MeasureString(aCellValue, pFont)
+      Else
+        lCellValueSize = g.MeasureString(aCellValue.Substring(0, lDecimalPos), pFont)
+      End If
+      Return lCellValueSize.Width
+    Else 'Center non-numeric values
+      Return g.MeasureString(aCellValue, pFont).Width / 2
+    End If
+  End Function
+
+  Private Function WidthRightOfDecimal(ByVal aCellValue As String, ByVal g As Graphics) As Single
+    If IsNumeric(aCellValue) Then
+      Dim lDecimalPos As Integer = aCellValue.IndexOf(".")
+      If lDecimalPos = -1 Then
+        Return 0
+      Else
+        Return g.MeasureString(aCellValue.Substring(lDecimalPos + 1), pFont).Width
+      End If
+    Else 'Center non-numeric values
+      Return g.MeasureString(aCellValue, pFont).Width / 2
+    End If
+  End Function
+
+  Public Sub SizeColumnToContents(ByVal aColumn As Integer)
     Dim lCellValue As String
     Dim lCellWidth As Single
-    Dim lCellWidthAfterDecimal As Single
     Dim lastRow As Integer = pTopRow + pRowBottom.Count - 1
     Dim g As Graphics = Me.CreateGraphics
-
-    ColumnWidth(aColumn) = COL_TOLERANCE * 2
+    Dim lDecimalWidth As Single = g.MeasureString(".", pFont).Width
+    Dim lMaxWidth As Integer = 0
 
     For iRow As Integer = pTopRow To lastRow
       lCellValue = pSource.CellValue(iRow, aColumn)
       If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
-        If pSource.Alignment(iRow, aColumn) And atcAlignment.HAlign = atcAlignment.HAlignDecimal Then
-          If IsNumeric(lCellValue) Then
-            Dim lDecimalPos As Integer = lCellValue.IndexOf(".")
-            If lDecimalPos = -1 Then
-              lCellWidth = (g.MeasureString(lCellValue, pFont).Width + COL_TOLERANCE) * 2
-            Else
-              lCellWidth = Math.Max(g.MeasureString(lCellValue.Substring(0, lDecimalPos), pFont).Width, _
-                                    g.MeasureString(lCellValue.Substring(lDecimalPos), pFont).Width) * 2 + COL_TOLERANCE
-            End If
-          Else
-            lCellWidth = g.MeasureString(lCellValue, pFont).Width + COL_TOLERANCE
-          End If
+        If (pSource.Alignment(iRow, aColumn) And atcAlignment.HAlign) = atcAlignment.HAlignDecimal Then
+          lCellWidth = lDecimalWidth + 2 * Math.Max(WidthLeftOfDecimal(lCellValue, g), WidthRightOfDecimal(lCellValue, g))
         Else
-          lCellWidth = g.MeasureString(lCellValue, pFont).Width + COL_TOLERANCE
+          lCellWidth = g.MeasureString(lCellValue, pFont).Width
         End If
-        If lCellWidth > ColumnWidth(aColumn) Then
-          ColumnWidth(aColumn) = lCellWidth
+        If lCellWidth > lMaxWidth Then
+          lMaxWidth = lCellWidth
         End If
       End If
     Next
-
+    ColumnWidth(aColumn) = lMaxWidth + COL_TOLERANCE * 2
     g.Dispose()
   End Sub
 
@@ -501,14 +507,14 @@ Public Class atcGrid
         End If
         If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
       Case MouseButtons.Left
-          If pColumnDragging >= 0 Then
-            ColumnWidth(pColumnDragging) += (e.X - pColRight(pColumnDragging - pLeftColumn))
-            If ColumnWidth(pColumnDragging) < COL_TOLERANCE * 2 Then 'it got too small
-              ColumnWidth(pColumnDragging) = COL_TOLERANCE * 2       'enforce small minimun size
-            End If
-            RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
-            Refresh()
+        If pColumnDragging >= 0 Then
+          ColumnWidth(pColumnDragging) += (e.X - pColRight(pColumnDragging - pLeftColumn))
+          If ColumnWidth(pColumnDragging) < COL_TOLERANCE * 2 Then 'it got too small
+            ColumnWidth(pColumnDragging) = COL_TOLERANCE * 2       'enforce small minimun size
           End If
+          RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
+          Refresh()
+        End If
     End Select
   End Sub
 
