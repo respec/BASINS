@@ -18,12 +18,13 @@ Public Module ScriptSeasonAttributes
     Dim lArgs() As Object 
     Dim lMatch As New atcDataGroup
     Dim lMonthData As New atcDataGroup
+    Dim lAllowExit As Boolean = False
 
-    'ChDriveDir("C:\test\Seasons\current")
-    'Dim lS As String = "subFindMatch.vb"
-    'If Not FileExists(lS) Then
-    '  FileCopy("..\scripts\" & lS, lS)
-    'End If
+    Dim lTestDir As String = "c:\test"
+    If CurDir.ToLower.StartsWith(lTestDir) Then
+      lAllowExit = True
+    End If
+    ChDriveDir(lTestDir & "\StatsAndNDay\")
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
 
@@ -45,6 +46,9 @@ Public Module ScriptSeasonAttributes
     lSeasonsMonth.SetSeasonalAttributes(lMatch.ItemByIndex(0), lAttributes)
     lSummary.Save(aDataManager, lMatch, "ListMonthAttributes.txt", "Expand")
 
+    Dim lDisp As atcDataDisplay = New atcSeasonalAttributes.atcSeasonalAttributesPlugin
+    lDisp.Show(aDataManager, lMatch)
+
     Dim lSeasonsDayOfWeek As New atcSeasonsDayOfWeek
     Dim lAttributesTemp As New atcDataAttributes
     lSeasonsDayOfWeek.SetSeasonalAttributes(lMatch.ItemByIndex(0), lAttributes, lAttributesTemp)
@@ -56,6 +60,8 @@ Public Module ScriptSeasonAttributes
     SaveFileString("ListCalendarYearAttributes.txt", lAttributesTemp.ToString)
 
     AppendFileString(lOutFile, " Done" & vbCrLf)
-    Application.Exit()
+    If lAllowExit Then
+      Application.Exit()
+    End If
   End Sub
 End Module
