@@ -172,7 +172,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "SeasonAttributes.vb"
+                    RelPath = "SeasonAdjust.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

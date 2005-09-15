@@ -22,15 +22,7 @@ Public Module ScriptSeasons
     Dim lMatch As New atcDataGroup
     Dim lSummerData As New atcDataGroup
 
-    Dim lAllowExit As Boolean = False
-
-    Dim lTestDir as string = "c:\test"
-    If Curdir.ToLower.StartsWith(lTestDir) Then
-      lAllowExit = True
-      ChDriveDir(lTestDir & "\Seasons\")
-    Else
-      ChDriveDir(lTestDir & "\Seasons\current")
-    End If
+    Dim lAllowExit As Boolean = aBasinsPlugIn.RunBasinsScript("vb", "subSetBaseDir.vb", lErr, New Object() {"Seasons",""})
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
 

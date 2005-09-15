@@ -21,15 +21,7 @@ Public Module ScriptSeasonAdjust
     Dim lMonthData As New atcDataGroup
     Dim lDataAdj As New atcDataGroup
 
-    Dim lAllowExit As Boolean = False
-
-    Dim lTestDir As String = "c:\test"
-    If CurDir.ToLower.StartsWith(lTestDir) Then
-      lAllowExit = True
-      ChDriveDir(lTestDir & "\Seasons\")
-    Else
-      ChDriveDir(lTestDir & "\Seasons\current")
-    End If
+    Dim lAllowExit As Boolean = aBasinsPlugIn.RunBasinsScript("vb", "subSetBaseDir.vb", lErr, New Object() {"Seasons",""})
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
 
