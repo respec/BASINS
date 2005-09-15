@@ -20,11 +20,7 @@ Public Module IncreasePrecip
     Dim lArgs as Object()
     Dim lErr As String
 
-    ChDriveDir("C:\test\Climate\current")
-    Dim lS As String = "subFindMatch.vb"
-    If Not FileExists(lS) Then
-      FileCopy("..\scripts\" & lS, lS)
-    End If
+    Dim lAllowExit As Boolean = aBasinsPlugIn.RunBasinsScript("vb", "subSetBaseDir.vb", lErr, New Object() {"Climate", ""})
 
     Dim lWDMfile As atcDataSource = New atcWDM.atcDataSourceWDM
     Dim lWDMFileName As String = "base.wdm"
@@ -49,7 +45,7 @@ Public Module IncreasePrecip
     lNewTS.Attributes.CalculateAll()
 
     lSummary.Save(aDataManager, lMatch, "DebugTimser_OrigTS.txt")
-    lSummary.Save(aDataManager, New atcDataGroup(lNewTS), "DebugTimser_NewTS.txt")
+    lSummary.Save(aDataManager, new atcDataGroup(lNewTS), "DebugTimser_NewTS.txt")
 
     Dim lScenarioResults = New atcDataSource
     lScenarioResults = ScenarioRun(lWDMFileName, "modified", New atcDataGroup(lNewTS))
@@ -60,7 +56,9 @@ Public Module IncreasePrecip
 
     lSummary.Save(aDataManager, lMatch, "DebugTimser_FlowB&M.txt")
 
-    'Application.Exit()
+    If lAllowExit Then
+      Application.Exit()
+    End If
     
   End Sub
 End Module

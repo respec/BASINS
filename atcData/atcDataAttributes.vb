@@ -355,4 +355,8 @@ Public Class atcDataAttributes
     Next
     Return lS
   End Function
+
+  Public Shadows Sub RemoveByKey(ByVal key As Object)
+    MyBase.RemoveByKey(AttributeNameToKey(key))
+  End Sub
 End Class

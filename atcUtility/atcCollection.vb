@@ -71,7 +71,8 @@ Public Class atcCollection
     Catch e As Exception
     End Try
   End Sub
-  Public Sub RemoveByKey(ByVal key As Object)
+
+  Public Overridable Sub RemoveByKey(ByVal key As Object)
     Try
       Dim index As Integer = pKeys.IndexOf(key)
       If index >= 0 Then RemoveAt(index)

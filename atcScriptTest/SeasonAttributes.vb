@@ -18,15 +18,8 @@ Public Module ScriptSeasonAttributes
     Dim lArgs() As Object 
     Dim lMatch As New atcDataGroup
     Dim lMonthData As New atcDataGroup
-    Dim lAllowExit As Boolean = False
 
-    Dim lTestDir As String = "c:\test"
-    If Curdir.ToLower.StartsWith(lTestDir) Then
-      lAllowExit = True
-      ChDriveDir(lTestDir & "\Seasons\")
-    Else
-      ChDriveDir(lTestDir & "\Seasons\current")
-    End If
+    Dim lAllowExit As Boolean = aBasinsPlugIn.RunBasinsScript("vb", "subSetBaseDir.vb", lErr, New Object() {"Seasons",""})
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
 
@@ -39,10 +32,7 @@ Public Module ScriptSeasonAttributes
     lArgs = New Object() {aDataManager.DataSets, "ID", "3", 0}
     lMatch = aBasinsPlugIn.RunBasinsScript("vb", "subFindMatch.vb", lErr, lArgs)
 
-    Dim lAttributes As New atcDataAttributes 'last attribute comes up first in grid
-    lAttributes.SetValue("7Q10", 0)
-    lAttributes.SetValue("1Hi100", 0)
-    lAttributes.SetValue("Geometric Mean", 0)
+    Dim lAttributes As New atcDataAttributes
     lAttributes.SetValue("Mean", 0)
     lAttributes.SetValue("Max", 0)
     lAttributes.SetValue("Min", 0)
@@ -50,10 +40,6 @@ Public Module ScriptSeasonAttributes
     Dim lSeasonsMonth As New atcSeasonsMonth
     lSeasonsMonth.SetSeasonalAttributes(lMatch.ItemByIndex(0), lAttributes)
     lSummary.Save(aDataManager, lMatch, "ListMonthAttributes.txt", "Expand")
-
-    Dim lDisp As atcDataDisplay = New atcSeasonalAttributes.atcSeasonalAttributesPlugin
-    lDisp.Show(aDataManager, lMatch)
-    lDisp.Save(aDataManager, lMatch, "ListSeasonalAttributesFromGrid.txt", Nothing)
 
     Dim lSeasonsDayOfWeek As New atcSeasonsDayOfWeek
     Dim lAttributesTemp As New atcDataAttributes
