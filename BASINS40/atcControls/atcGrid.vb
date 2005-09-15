@@ -425,6 +425,7 @@ Public Class atcGrid
   public Sub SizeColumnToContents(ByVal aColumn As Integer)
     Dim lCellValue As String
     Dim lCellWidth As Single
+    Dim lCellWidthAfterDecimal As Single
     Dim lastRow As Integer = pTopRow + pRowBottom.Count - 1
     Dim g As Graphics = Me.CreateGraphics
 
@@ -553,7 +554,7 @@ Public Class atcGrid
       lColumn += 1
     End While
 
-    If pSource.Alignment(lRow, lColumn) = atcAlignment.HAlignDecimal Then
+    If lColumn < pColRight.Count AndAlso pSource.Alignment(lRow, lColumn) = atcAlignment.HAlignDecimal Then
       'If within tolerance of column edge and column is not being hidden by a zero width
       If Math.Abs(X - (pColRight(lColumn) + lColLeft) / 2) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
         Return lColumn + pLeftColumn
