@@ -8,9 +8,32 @@ Friend Class frmDisplaySeasonalAttributes
 
 #Region " Windows Form Designer generated code "
 
-  Public Sub New()
+  Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
+        Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
     MyBase.New()
+    pDataManager = aDataManager
+    If aDataGroup Is Nothing Then
+      pDataGroup = New atcDataGroup
+    Else
+      pDataGroup = aDataGroup
+    End If
     InitializeComponent() 'required by Windows Form Designer
+
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each ldisp As atcDataDisplay In DisplayPlugins
+      mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    Next
+
+    If pDataGroup.Count = 0 Then 'ask user to specify some Data
+      mnuFileAdd_Click(Nothing, Nothing)
+    End If
+
+    If pDataGroup.Count > 0 Then
+      PopulateGrid()
+    Else 'user declined to specify Data
+      Me.Close()
+    End If
+    'agdMain.AllowHorizontalScrolling = False
   End Sub
 
   'Form overrides dispose to clean up the component list.
@@ -96,37 +119,11 @@ Friend Class frmDisplaySeasonalAttributes
   'Translator class between pDataGroup and agdMain
   Private pSource As atcSeasonalAttributesGridSource
 
-  Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
-               Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
-    pDataManager = aDataManager
-    If aTimeseriesGroup Is Nothing Then
-      pDataGroup = New atcDataGroup
-    Else
-      pDataGroup = aTimeseriesGroup
-    End If
-
-    mnuAnalysis.MenuItems.Clear()
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each lDisp As atcDataDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
-    Next
-
-    If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-      pDataManager.UserSelectData(, pDataGroup, True)
-    End If
-
-    If pDataGroup.Count > 0 Then
-      Me.Show()
-      PopulateGrid()
-    Else 'user declined to specify timeseries
-      Me.Close()
-    End If
-
-  End Sub
-
   Private Sub PopulateGrid()
     pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
     agdMain.Initialize(pSource)
+    agdMain.Refresh()
+    agdMain.SizeAllColumnsToContents()
     agdMain.Refresh()
   End Sub
 
