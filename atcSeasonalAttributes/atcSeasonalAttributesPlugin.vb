@@ -26,9 +26,18 @@ Public Class atcSeasonalAttributesPlugin
   Public Overrides Sub Save(ByVal aDataManager As atcDataManager, _
                             ByVal aDataGroup As atcDataGroup, _
                             ByVal aFileName As String, _
-                            ByVal ParamArray aOption() As String)
+                            ByVal ParamArray aOptions() As String)
+
     Dim lForm As New frmDisplaySeasonalAttributes(aDataManager, aDataGroup)
-    SaveFileString(aFileName, lForm.agdMain.ToString)
+
+    For Each lOption As String In aOptions
+      Select Case lOption
+        Case "SwapRowsColumns"
+          lForm.pSource.SwapRowsColumns = True
+      End Select
+    Next
+
+    SaveFileString(aFileName, lForm.pSource.ToString)
   End Sub
 
   Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _

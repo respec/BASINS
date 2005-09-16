@@ -15,6 +15,7 @@ Public Class atcGridSource
   Private pRows As Integer = 0
   Private pColumns As Integer = 0
   Private pValues(,) As String
+  Private pSwapRowsColumns As Boolean = False
 
   Public Event ChangedRows(ByVal aRows As Integer) 'Number of Rows changed
   Public Event ChangedColumns(ByVal aColumns As Integer) 'Number of Columns changed
@@ -22,9 +23,85 @@ Public Class atcGridSource
   'Value at the given row and column was changed
   Event ChangedValue(ByVal aRow As Integer, ByVal aColumn As Integer)
 
-  'Value in each cell
-  Overridable Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+  'Value in each cell (not overridable to hide row/column swapping from inheritors)
+  Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
+      If pSwapRowsColumns Then
+        Return ProtectedCellValue(aColumn, aRow)
+      Else
+        Return ProtectedCellValue(aRow, aColumn)
+      End If
+    End Get
+    Set(ByVal newValue As String)
+      If pSwapRowsColumns Then
+        ProtectedCellValue(aColumn, aRow) = newValue
+      Else
+        ProtectedCellValue(aRow, aColumn) = newValue
+      End If
+      RaiseEvent ChangedValue(aRow, aColumn)
+    End Set
+  End Property
+
+  'Number of rows (not overridable to hide row/column swapping from inheritors)
+  Property Rows() As Integer
+    Get
+      If pSwapRowsColumns Then
+        Return ProtectedColumns
+      Else
+        Return ProtectedRows
+      End If
+    End Get
+    Set(ByVal newValue As Integer)
+      If pSwapRowsColumns Then
+        ProtectedColumns = newValue
+      Else
+        ProtectedRows = newValue
+      End If
+      RaiseEvent ChangedRows(newValue)
+    End Set
+  End Property
+
+  'Number of columns (not overridable to hide row/column swapping from inheritors)
+  Property Columns() As Integer
+    Get
+      If pSwapRowsColumns Then
+        Return ProtectedRows
+      Else
+        Return ProtectedColumns
+      End If
+    End Get
+    Set(ByVal newValue As Integer)
+      If pSwapRowsColumns Then
+        ProtectedRows = newValue
+      Else
+        ProtectedColumns = newValue
+      End If
+      RaiseEvent ChangedColumns(newValue)
+    End Set
+  End Property
+
+  'Alignment of the contents of each cell (not overridable to hide row/column swapping from inheritors)
+  Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcAlignment
+    Get
+      If pSwapRowsColumns Then
+        Return ProtectedAlignment(aColumn, aRow)
+      Else
+        Return ProtectedAlignment(aRow, aColumn)
+      End If
+    End Get
+    Set(ByVal newValue As atcAlignment)
+      If pSwapRowsColumns Then
+        ProtectedAlignment(aColumn, aRow) = newValue
+      Else
+        ProtectedAlignment(aRow, aColumn) = newValue
+      End If
+    End Set
+  End Property
+
+  'Override this instead of CellValue
+  Protected Overridable Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+    Get
+      Dim lRow As Integer
       If pValues Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
         Return ""
       Else
@@ -39,60 +116,64 @@ Public Class atcGridSource
       If aColumn > Columns + 1 Then Columns = aRow + 1
       If pValues(aRow, aColumn) <> newValue Then
         pValues(aRow, aColumn) = newValue
-        RaiseEvent ChangedValue(aRow, aColumn)
       End If
     End Set
   End Property
 
-  'Number of rows
-  Overridable Property Rows() As Integer
+  'Override this instead of Columns
+  Protected Overridable Property ProtectedColumns() As Integer
+    Get
+      Return pColumns
+    End Get
+    Set(ByVal newValue As Integer)
+      pColumns = newValue
+      ReDim Preserve pValues(Rows, pColumns)
+    End Set
+  End Property
+
+  'Override this instead of Rows
+  Protected Overridable Property ProtectedRows() As Integer
     Get
       Return pRows
     End Get
-    Set(ByVal newRows As Integer)
-      If newRows <> pRows Then
+    Set(ByVal aNewRows As Integer)
+      If aNewRows <> pRows Then
         Dim lastRowCopied As Integer
-        If pRows > newRows Then
-          lastRowCopied = newRows
+        If pRows > aNewRows Then
+          lastRowCopied = aNewRows
         Else
           lastRowCopied = pRows
         End If
 
-        Dim newValues(newRows, Columns) As String
+        Dim newValues(aNewRows, Columns) As String
         For iRow As Integer = 0 To lastRowCopied
-          pRows = newRows
+          pRows = aNewRows
           For iColumn As Integer = 0 To pColumns
             newValues(iRow, iColumn) = pValues(iRow, iColumn)
           Next
         Next
-        pRows = newRows
+        pRows = aNewRows
         pValues = newValues
-        RaiseEvent ChangedRows(newRows)
       End If
     End Set
   End Property
 
-  'Number of columns
-  Overridable Property Columns() As Integer
-    Get
-      Return pColumns
-    End Get
-    Set(ByVal newColumns As Integer)
-      If newColumns <> pColumns Then
-        pColumns = newColumns
-        ReDim Preserve pValues(Rows, pColumns)
-        RaiseEvent ChangedColumns(newColumns)
-      End If
-    End Set
-  End Property
-
-  'Alignment of the contents of each cell
-  Overridable Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcAlignment
+  'Override this instead of Alignment
+  Protected Overridable Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcAlignment
     Get
       Return atcAlignment.HAlignLeft + atcAlignment.VAlignCenter
     End Get
-    Set(ByVal Value As atcAlignment)
+    Set(ByVal newValue As atcAlignment)
+    End Set
+  End Property
 
+  'True for rows and columns to be swapped, false for normal orientation
+  Public Property SwapRowsColumns() As Boolean
+    Get
+      Return pSwapRowsColumns
+    End Get
+    Set(ByVal newValue As Boolean)
+      pSwapRowsColumns = newValue
     End Set
   End Property
 
@@ -100,19 +181,21 @@ Public Class atcGridSource
     Dim lCellValue As String
     Dim lAddTabs() As Boolean
     ReDim lAddTabs(Me.Columns)
+    Dim lMaxCol As Integer = Columns - 1
+    Dim lMaxRow As Integer = Rows - 1
 
-    For iCol As Integer = 0 To Me.Columns - 1
-      For iRow As Integer = 0 To Me.Rows - 1
-        If Me.CellValue(iRow, iCol).IndexOf(vbTab) > -1 Then
+    For iCol As Integer = 0 To lMaxCol
+      For iRow As Integer = 0 To lMaxRow
+        If CellValue(iRow, iCol).IndexOf(vbTab) > -1 Then
           lAddTabs(iCol) = True
           Exit For
         End If
       Next
     Next
 
-    For iRow As Integer = 0 To Me.Rows - 1
-      For iCol As Integer = 0 To Me.Columns - 1
-        lCellValue = Me.CellValue(iRow, iCol)
+    For iRow As Integer = 0 To lMaxRow
+      For iCol As Integer = 0 To lMaxCol
+        lCellValue = CellValue(iRow, iCol)
         ToString &= lCellValue & vbTab
         'Some modified values contain vbTab(+10%), add a tab to those that don't
         If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then ToString &= vbTab

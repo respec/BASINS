@@ -282,7 +282,7 @@ Public Class atcGrid
           Else
             VScroller.LargeChange = 1
           End If
-          VScroller.Maximum = pSource.Rows '- VScroller.LargeChange + 2
+          VScroller.Maximum = lRows '- VScroller.LargeChange + 2
           'Debug.WriteLine("Rows = " & lRows & ", TopRow = " & pTopRow & ", LargeChange = " & VScroller.LargeChange & ", Maximum = " & VScroller.Maximum)
           Exit For
         End If
@@ -330,7 +330,7 @@ Public Class atcGrid
             Else
               HScroller.LargeChange = 1
             End If
-            HScroller.Maximum = pSource.Columns '- HScroller.LargeChange + 1
+            HScroller.Maximum = lColumns '- HScroller.LargeChange + 1
             Exit For
           Else
             x = visibleWidth
@@ -458,6 +458,8 @@ Public Class atcGrid
     Dim lDecimalWidth As Single = g.MeasureString(".", pFont).Width
     Dim lMaxWidth As Integer = 0
 
+    'TODO: would be faster to check just length of string [before/after decimal] then do width of "XXXXwidthXXXX"
+    If lastRow > 150 then lastRow = 100 'Limit how much time we spend finding the widest cell
     For iRow As Integer = pTopRow To lastRow
       lCellValue = pSource.CellValue(iRow, aColumn)
       If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then

@@ -57,6 +57,9 @@ Friend Class frmDisplaySeasonalAttributes
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
   Friend WithEvents agdMain As atcControls.atcGrid
+  Friend WithEvents mnuView As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuViewSeasonColumns As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuViewSeasonRows As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySeasonalAttributes))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -64,11 +67,14 @@ Friend Class frmDisplaySeasonalAttributes
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
+    Me.mnuView = New System.Windows.Forms.MenuItem
+    Me.mnuViewSeasonColumns = New System.Windows.Forms.MenuItem
+    Me.mnuViewSeasonRows = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAnalysis})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
     '
     'mnuFile
     '
@@ -83,11 +89,12 @@ Friend Class frmDisplaySeasonalAttributes
     '
     'mnuAnalysis
     '
-    Me.mnuAnalysis.Index = 1
+    Me.mnuAnalysis.Index = 2
     Me.mnuAnalysis.Text = "Analysis"
     '
     'agdMain
     '
+    Me.agdMain.AllowHorizontalScrolling = True
     Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
     Me.agdMain.LineColor = System.Drawing.Color.Empty
     Me.agdMain.LineWidth = 0.0!
@@ -96,14 +103,30 @@ Friend Class frmDisplaySeasonalAttributes
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
     Me.agdMain.TabIndex = 0
     '
-    'atcSeasonalAttributesForm
+    'mnuView
+    '
+    Me.mnuView.Index = 1
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewSeasonColumns, Me.mnuViewSeasonRows})
+    Me.mnuView.Text = "&View"
+    '
+    'mnuViewSeasonColumns
+    '
+    Me.mnuViewSeasonColumns.Index = 0
+    Me.mnuViewSeasonColumns.Text = "Season Columns"
+    '
+    'mnuViewSeasonRows
+    '
+    Me.mnuViewSeasonRows.Index = 1
+    Me.mnuViewSeasonRows.Text = "Season Rows"
+    '
+    'frmDisplaySeasonalAttributes
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(528, 545)
     Me.Controls.Add(Me.agdMain)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
-    Me.Name = "atcSeasonalAttributesForm"
+    Me.Name = "frmDisplaySeasonalAttributes"
     Me.Text = "Seasonal Attributes"
     Me.ResumeLayout(False)
 
@@ -117,12 +140,13 @@ Friend Class frmDisplaySeasonalAttributes
   Private WithEvents pDataGroup As atcDataGroup
 
   'Translator class between pDataGroup and agdMain
-  Private pSource As atcSeasonalAttributesGridSource
+  Public pSource As atcSeasonalAttributesGridSource
 
   Private Sub PopulateGrid()
+    Dim lWasSwapped As Boolean = Not pSource Is Nothing AndAlso pSource.SwapRowsColumns
     pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
+    If lWasSwapped Then pSource.SwapRowsColumns = True
     agdMain.Initialize(pSource)
-    agdMain.Refresh()
     agdMain.SizeAllColumnsToContents()
     agdMain.Refresh()
   End Sub
@@ -157,5 +181,19 @@ Friend Class frmDisplaySeasonalAttributes
   Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
     PopulateGrid()
     'TODO: could efficiently remove by serial number
+  End Sub
+
+  Private Sub mnuViewSeasonColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewSeasonColumns.Click
+    If pSource.SwapRowsColumns Then
+      pSource.SwapRowsColumns = False
+      agdMain.Refresh()
+    End If
+  End Sub
+
+  Private Sub mnuViewSeasonRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewSeasonRows.Click
+    If Not pSource.SwapRowsColumns Then
+      pSource.SwapRowsColumns = True
+      agdMain.Refresh()
+    End If
   End Sub
 End Class

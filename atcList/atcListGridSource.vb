@@ -12,7 +12,7 @@ Friend Class atcListGridSource
     pDataGroup = aDataGroup
   End Sub
 
-  Public Overrides Property Columns() As Integer
+  Protected Overrides Property ProtectedColumns() As Integer
     Get
       Return pDataGroup.Count + 1
     End Get
@@ -20,7 +20,7 @@ Friend Class atcListGridSource
     End Set
   End Property
 
-  Public Overrides Property Rows() As Integer
+  Protected Overrides Property ProtectedRows() As Integer
     Get
       Return pDataManager.DisplayAttributes.Count()
     End Get
@@ -28,7 +28,7 @@ Friend Class atcListGridSource
     End Set
   End Property
 
-  Public Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+  Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
       If aColumn = 0 Then
         Return pDataManager.DisplayAttributes(aRow)
@@ -40,7 +40,7 @@ Friend Class atcListGridSource
     End Set
   End Property
 
-  Public Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+  Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
       Return atcControls.atcAlignment.HAlignLeft
     End Get
