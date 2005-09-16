@@ -162,6 +162,16 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "frmWelcomeScreenBasins.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmWelcomeScreenBasins.resx"
+                    DependentUpon = "frmWelcomeScreenBasins.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "Globals.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
