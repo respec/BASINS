@@ -46,8 +46,9 @@ Public Module ScriptSeasonAttributes
     Dim lSeasonsMonth As New atcSeasonsMonth
     lSeasonsMonth.SetSeasonalAttributes(lMatch.ItemByIndex(0), lAttributes)
     lSummary.Save(aDataManager, lMatch, "ListMonthAttributes.txt", "Expand")
-    lSeasonalAttributes.Save(aDataManager, lMatch, "GridMonthAttributes.txt")
-    lSeasonalAttributes.Show(aDataManager, lMatch)
+    lSeasonalAttributes.Save(aDataManager, lMatch, "GridMonthColumns.txt")
+    lSeasonalAttributes.Save(aDataManager, lMatch, "GridMonthRows.txt", "SwapRowsColumns")
+    'lSeasonalAttributes.Show(aDataManager, lMatch)
 
     lAttributes.RemoveByKey("7Q10")
     lAttributes.RemoveByKey("1Hi100")
