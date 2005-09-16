@@ -8,14 +8,28 @@ Imports System.Windows.Forms
 Public Module ScriptSetBaseDir
   Public Function Main(ByVal aTestSet As String, _
                        ByVal aTestDir As String) As Boolean
-    If aTestDir.Length = 0 Then aTestDir = "C:\Test"
+    Dim lBaseDir as String
+
+    If aTestDir.Length = 0 Then 'default directory
+      aTestDir = "C:\Test"
+    End If
+
     Dim lAllowExit as Boolean = False
     If CurDir.ToLower.StartsWith(aTestDir.ToLower) Then
       lAllowExit = True
-      ChDriveDir(aTestDir & "\" & aTestSet & "\")
+      lBaseDir = aTestDir & "\" & aTestSet & "\"
     Else
-      ChDriveDir(aTestDir & "\" & aTestSet & "\current")
+      lAllowExit = False
+      lBaseDir = aTestDir & "\" & aTestSet & "\current\"
     End If
+
+    If FileExists(lBaseDir,True,False) Then
+      ChDriveDir(lBaseDir)
+    Else
+      MsgBox ("Cannot File Directory " & lBaseDir)
+    End If
+
     Return lAllowExit
+
   End Function
 End Module
