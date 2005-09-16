@@ -1,5 +1,4 @@
 Imports atcData
-Imports atcSeasons
 Imports atcUtility
 
 Imports System.Windows.Forms
@@ -109,27 +108,15 @@ Public Class atcTimeseriesNdayHighLow
   End Function
 
   Private Function HighOrLowValue(ByVal aTS As atcTimeseries, _
-                   ByVal aNumValues As Integer, _
-                   ByVal aHigh As Boolean, _
-                   ByVal aSeasonIndex As Integer) As Double
+                   ByVal aNDay As Integer, _
+                   ByVal aHigh As Boolean) As Double
 
-    If aNumValues > 0 And aTS.numValues >= aNumValues Then
+    If aNDay > 0 And aTS.numValues >= aNDay Then
       Dim lBestSoFar As Double
       Dim lTimeIndex As Integer = 1
       Dim lNumSummed As Integer = 1
       Dim lRunningSum As Double = 0
       Dim lCurrentValue As Double
-
-      ''Add up the first N values without checking for a limit
-      'For lTimeIndex = 1 To aNumValues - 1
-      '  lCurrentValue = aTS.Value(lTimeIndex)
-
-      '  'Can't calculate high or low value if any values in the period are missing
-      '  If Double.IsNaN(lCurrentValue) Then 'TODO: check season here too!
-      '    Return Double.NaN
-      '  End If
-      '  lRunningSum += lCurrentValue
-      'Next
 
       If aHigh Then
         lBestSoFar = Double.MinValue
@@ -150,7 +137,7 @@ Public Class atcTimeseriesNdayHighLow
           End If
         Else
           lRunningSum += lCurrentValue
-          If lNumSummed < aNumValues Then
+          If lNumSummed < aNDay Then
             lNumSummed += 1
           Else
             If aHigh Then
@@ -158,73 +145,79 @@ Public Class atcTimeseriesNdayHighLow
             Else
               If lRunningSum < lBestSoFar Then lBestSoFar = lRunningSum
             End If
-            lRunningSum -= aTS.Value(lTimeIndex - aNumValues + 1)
+            lRunningSum -= aTS.Value(lTimeIndex - aNDay + 1)
           End If
         End If
         lTimeIndex += 1
       End While
 
-      Return (lBestSoFar / aNumValues)
+      Return (lBestSoFar / aNDay)
 
-    Else 'Cannot compute a value because fewer than aNumValues values are present 
+    Else 'Cannot compute a value because fewer than aNDay values are present 
       Return Double.NaN
     End If
   End Function
 
-  Private Function HighOrLowTimeseries(ByVal aTS As atcTimeseries, ByVal aNumValues As Integer, ByVal aHigh As Boolean) As atcTimeseries
+  Private Function HighOrLowTimeseries(ByVal aTS As atcTimeseries, ByVal aNDay As Object, ByVal aHigh As Boolean) As atcDataGroup 'atcTimeseries
     Try
+      Dim lNDay() As Double = Obj2Array(aNDay)
+
       Dim lTimeCode As Integer = 6 '4=day, 5=month, 6=year
+
       aTS.EnsureValuesRead()
       Dim sjday As Double = aTS.Dates.Value(0)
       Dim ejday As Double = aTS.Dates.Value(aTS.Dates.numValues)
-      Dim lSeasonDefinition As atcSeasonBase = aTS.Attributes.GetValue("SeasonDefinition")
-      Dim lSeasonIndex As Integer = aTS.Attributes.GetValue("SeasonIndex", -1)
       'Dim indexOld As Integer = 1
       Dim indexNew As Integer = 1
       Dim nYears As Integer = timdifJ(sjday, ejday, lTimeCode, 1)
-      If Not lSeasonDefinition Is Nothing Then 'be sure to get last year 
-        If TimAddJ(sjday, lTimeCode, 1, nYears) < ejday Then
-          nYears += 1
-        End If
+
+      If TimAddJ(sjday, lTimeCode, 1, nYears) < ejday Then
+        nYears += 1
       End If
+
       Dim newValues(nYears) As Double
       Dim newDates(nYears) As Double
       newDates(0) = sjday
 
-      For indexNew = 1 To nYears
-        Dim nextSJday As Double = TimAddJ(sjday, lTimeCode, 1, 1)
-        Dim oneYear As atcTimeseries = SubsetByDate(aTS, sjday, nextSJday, Me)
-        newDates(indexNew) = nextSJday
-        newValues(indexNew) = HighOrLowValue(oneYear, aNumValues, aHigh, lSeasonIndex)
-        sjday = nextSJday
+      Dim newTsGroup As New atcDataGroup
+
+      For Each lNDayNow As Integer In lNDay
+        For indexNew = 1 To nYears
+          Dim nextSJday As Double = TimAddJ(sjday, lTimeCode, 1, 1)
+          Dim oneYear As atcTimeseries = SubsetByDate(aTS, sjday, nextSJday, Me)
+          newDates(indexNew) = nextSJday
+          newValues(indexNew) = HighOrLowValue(oneYear, lNDayNow, aHigh)
+          sjday = nextSJday
+        Next
+
+        Dim newTS As New atcTimeseries(Me)
+        newTS.Values = newValues
+        newTS.Dates = New atcTimeseries(Me)
+        newTS.Dates.Values = newDates
+        newTS.Attributes.SetValue("Parent Timeseries", aTS)
+        Dim lDateNow As Date = Now
+        newTS.Attributes.SetValue("Date Created", lDateNow)
+        newTS.Attributes.SetValue("Date Modified", lDateNow)
+
+        CopyBaseAttributes(aTS, newTS)
+
+        newTS.Attributes.SetValue("Tu", 6)
+        newTS.Attributes.SetValue("Ts", 1)
+        newTS.Attributes.SetValue("HighFlag", aHigh)
+        newTS.Attributes.SetValue("NDay", lNDayNow)
+
+        Dim lDescription As String = lNDayNow & " day annual "  'TODO: fill in day and annual
+        If aHigh Then
+          lDescription &= "high values "
+        Else
+          lDescription &= "low values "
+        End If
+        newTS.Attributes.SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
+        newTS.Attributes.AddHistory(lDescription)
+        newTsGroup.Add(newTS)
       Next
 
-      Dim newTS As New atcTimeseries(Me)
-      newTS.Values = newValues
-      newTS.Dates = New atcTimeseries(Me)
-      newTS.Dates.Values = newDates
-      newTS.Attributes.SetValue("Parent Timeseries", aTS)
-      Dim lDateNow As Date = Now
-      newTS.Attributes.SetValue("Date Created", lDateNow)
-      newTS.Attributes.SetValue("Date Modified", lDateNow)
-
-      CopyBaseAttributes(aTS, newTS)
-
-      newTS.Attributes.SetValue("Tu", 6)
-      newTS.Attributes.SetValue("Ts", 1)
-      newTS.Attributes.SetValue("HighFlag", aHigh)
-      newTS.Attributes.SetValue("NDay", aNumValues)
-
-      Dim lDescription As String = aNumValues & " day annual "  'TODO: fill in day and annual
-      If aHigh Then
-        lDescription &= "high values "
-      Else
-        lDescription &= "low values "
-      End If
-      newTS.Attributes.SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
-      newTS.Attributes.AddHistory(lDescription)
-
-      Return newTS
+      Return newTsGroup
 
     Catch ex As Exception
       Stop
@@ -232,114 +225,137 @@ Public Class atcTimeseriesNdayHighLow
   End Function
 
   Private Sub ComputeFreq(ByRef aTimeseries As atcTimeseries, _
-                          ByVal aNDay As Integer, _
+                          ByVal aNDay As Object, _
                           ByVal aHigh As Boolean, _
-                          ByVal aRecurOrProb As Double, _
+                          ByVal aRecurOrProb As Object, _
                           ByVal aLogFg As Boolean)
 
-    Dim lNdayTs As atcTimeseries
+    Dim lNdayTsGroup As atcDataGroup
+    'Dim lNdayTs As atcTimeseries
     Dim lTsMath As atcDataSource
+
+    Dim lRecurOrProb() As Double = Obj2Array(aRecurOrProb)
 
     If aTimeseries.Attributes.GetValue("Tu", 1) <> 6 Then
       'calculate the n day annual timeseries
-      lNdayTs = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
+      lNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
     Else 'already an annual timeseries
       If (aHigh = aTimeseries.Attributes.GetValue("HighFlag") And _
          aNDay = aTimeseries.Attributes.GetValue("NDay")) Then
-        lNdayTs = aTimeseries
+        lNdayTsGroup = New atcDataGroup(aTimeseries)
       End If
     End If
 
-    If Not lNdayTs Is Nothing Then
-      If aLogFg Then 'calc log10 of n day annual series
-        Dim lArgsMath As New atcDataAttributes
-        lTsMath = New atcTimeseriesMath.atcTimeseriesMath
-        lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
-        'DataManager.OpenDataSource(lTsMath, "log 10", lArgsMath)
-        lTsMath.Open("log 10", lArgsMath)
-        lNdayTs = lTsMath.DataSets(0)
+    For Each lNdayTs As atcTimeseries In lNdayTsGroup
+      If Not lNdayTs Is Nothing Then
+        If aLogFg Then 'calc log10 of n day annual series
+          Dim lArgsMath As New atcDataAttributes
+          lTsMath = New atcTimeseriesMath.atcTimeseriesMath
+          lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
+          'DataManager.OpenDataSource(lTsMath, "log 10", lArgsMath)
+          lTsMath.Open("log 10", lArgsMath)
+          lNdayTs = lTsMath.DataSets(0)
+        End If
+
+        Dim lQ As Double = PearsonType3(lNdayTs, aRecurOrProb, aHigh)
+
+        If aLogFg Then 'remove log10 transform 
+          lQ = 10 ^ lQ
+          DataManager.DataSources.Remove(lTsMath)
+          lTsMath = Nothing
+        End If
+
+        Dim lS As String
+        If aNDay = 7 And aRecurOrProb = 10 And Not aHigh Then
+          lS = aNDay & "Q" & aRecurOrProb
+        ElseIf aHigh Then
+          lS = aNDay & "Hi" & aRecurOrProb
+        Else
+          lS = aNDay & "Low" & aRecurOrProb
+        End If
+        Dim lNewAttribute As New atcAttributeDefinition
+        With lNewAttribute
+          .Name = lS
+          .Description = lS
+          .DefaultValue = ""
+          .Editable = False
+          .TypeString = "Double"
+          .Calculator = Me
+          .Category = "nDay & Frequency"
+        End With
+        aTimeseries.Attributes.SetValue(lNewAttribute, lQ)
+
+        If Not (aTimeseries Is lNdayTs) Then 'get rid of intermediate timeseries
+          lNdayTs = Nothing
+          Me.DataSets.Clear()
+        End If
       End If
-
-      Dim lQ As Double = PearsonType3(lNdayTs, aRecurOrProb, aHigh)
-
-      If aLogFg Then 'remove log10 transform 
-        lQ = 10 ^ lQ
-        DataManager.DataSources.Remove(lTsMath)
-        lTsMath = Nothing
-      End If
-
-      Dim lS As String
-      If aNDay = 7 And aRecurOrProb = 10 And Not aHigh Then
-        lS = aNDay & "Q" & aRecurOrProb
-      ElseIf aHigh Then
-        lS = aNDay & "Hi" & aRecurOrProb
-      Else
-        lS = aNDay & "Low" & aRecurOrProb
-      End If
-      Dim lNewAttribute As New atcAttributeDefinition
-      With lNewAttribute
-        .Name = lS
-        .Description = lS
-        .DefaultValue = ""
-        .Editable = False
-        .TypeString = "Double"
-        .Calculator = Me
-        .Category = "nDay & Frequency"
-      End With
-      aTimeseries.Attributes.SetValue(lNewAttribute, lQ)
-
-      If Not (aTimeseries Is lNdayTs) Then 'get rid of intermediate timeseries
-        lNdayTs = Nothing
-        Me.DataSets.Clear()
-      End If
-    End If
-
+    Next
   End Sub
+
+  Private Function Obj2Array(ByVal aObj As Object) As Array
+    Dim lArray() As Double
+    If IsNumeric(aObj) Then
+      ReDim lArray(0)
+      lArray(0) = aObj
+    Else 'TODO: check to be sure array
+      lArray = aObj
+    End If
+    Return lArray
+  End Function
 
   'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
   'remaining aArgs are expected to follow the args required for the specified operation
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
     Dim ltsGroup As atcDataGroup
     Dim lTs As atcTimeseries
-    Dim lNDayTs As atcTimeseries
-    Dim lNDay As Integer
-    Dim lReturn As Double
+    Dim lNDayTsGroup As atcDataGroup 'atcTimeseries
+    Dim lLogFlg As Boolean
+    Dim lOperationName As String = aOperationName.ToLower
+    Dim lNDay As Object
+    Dim lReturn As Object
+    Dim lHigh As Boolean
 
     If aArgs Is Nothing Then
-      'TODO: need something like specify computation (atcTimseriesMath) here
-      ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
+      'TODO: need something like specify computation (atcTimseriesMath) here, defaults for now
+      'ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
       lNDay = 1
       lReturn = 100
+      lLogFlg = True
     Else
       ltsGroup = aArgs.GetValue("Timeseries")
-
-      Dim lobjNDay As Object = aArgs.GetValue("NDay")
-      If IsNumeric(lobjNDay) Then
-        lNDay = lobjNDay
-      End If
-
-      Dim lobjReturn As Object = aArgs.GetValue("Return Period")
-      If IsNumeric(lobjReturn) Then
-        lReturn = lobjReturn
-      End If
+      lLogFlg = aArgs.GetValue("LogFlg", True)
+      lNDay = aArgs.GetValue("NDay", 1)
+      lReturn = aArgs.GetValue("Return Period", 100)
     End If
+
+    Select Case lOperationName
+      Case "7q10"
+        lNDay = 7
+        lReturn = 10
+        lOperationName = "n-day low value"
+      Case "1hi100"
+        lNDay = 1
+        lReturn = 100
+        lOperationName = "n-day high value"
+    End Select
+
+    Select Case lOperationName
+      Case "n-day low value", "n-day low timeseries" : lHigh = False
+      Case "n-day high value", "n-day high timeseries" : lHigh = True
+    End Select
 
     If ltsGroup Is Nothing Then
       ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
     End If
 
     For Each lTs In ltsGroup
-      Select Case aOperationName.ToLower
-        Case "7q10" : ComputeFreq(lTs, 7, False, 10.0, True)
-        Case "1hi100" : ComputeFreq(lTs, 1, True, 100.0, True)
-        Case "n-day low value" : ComputeFreq(lTs, lNDay, False, lReturn, True)
-        Case "n-day high value" : ComputeFreq(lTs, lNDay, True, lReturn, True)
-        Case "n-day low timeseries"
-          lNDayTs = HighOrLowTimeseries(lTs, lNDay, False)
-          Me.DataSets.Add(lNDayTs)
-        Case "n-day high timeseries"
-          lNDayTs = HighOrLowTimeseries(lTs, lNDay, True)
-          Me.DataSets.Add(lNDayTs)
+      Select Case lOperationName
+        Case "n-day low value", "n-day high value"
+          ComputeFreq(lTs, lNDay, lHigh, lReturn, lLogFlg)
+        Case "n-day low timeseries", "n-day high timeseries"
+          lNDayTsGroup = HighOrLowTimeseries(lTs, lNDay, lHigh)
+          Me.DataSets.AddRange(lNDayTsGroup)
       End Select
     Next
 
