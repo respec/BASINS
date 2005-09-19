@@ -60,16 +60,18 @@ Friend Class frmDisplaySeasonalAttributes
   Friend WithEvents mnuView As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewSeasonColumns As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewSeasonRows As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuAddAttributes As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySeasonalAttributes))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
-    Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-    Me.agdMain = New atcControls.atcGrid
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonColumns = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonRows = New System.Windows.Forms.MenuItem
+    Me.mnuAnalysis = New System.Windows.Forms.MenuItem
+    Me.agdMain = New atcControls.atcGrid
+    Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -79,13 +81,29 @@ Friend Class frmDisplaySeasonalAttributes
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes})
     Me.mnuFile.Text = "File"
     '
     'mnuFileAdd
     '
     Me.mnuFileAdd.Index = 0
     Me.mnuFileAdd.Text = "Add Timeseries"
+    '
+    'mnuView
+    '
+    Me.mnuView.Index = 1
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewSeasonColumns, Me.mnuViewSeasonRows})
+    Me.mnuView.Text = "&View"
+    '
+    'mnuViewSeasonColumns
+    '
+    Me.mnuViewSeasonColumns.Index = 0
+    Me.mnuViewSeasonColumns.Text = "Season Columns"
+    '
+    'mnuViewSeasonRows
+    '
+    Me.mnuViewSeasonRows.Index = 1
+    Me.mnuViewSeasonRows.Text = "Season Rows"
     '
     'mnuAnalysis
     '
@@ -103,21 +121,10 @@ Friend Class frmDisplaySeasonalAttributes
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
     Me.agdMain.TabIndex = 0
     '
-    'mnuView
+    'mnuAddAttributes
     '
-    Me.mnuView.Index = 1
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewSeasonColumns, Me.mnuViewSeasonRows})
-    Me.mnuView.Text = "&View"
-    '
-    'mnuViewSeasonColumns
-    '
-    Me.mnuViewSeasonColumns.Index = 0
-    Me.mnuViewSeasonColumns.Text = "Season Columns"
-    '
-    'mnuViewSeasonRows
-    '
-    Me.mnuViewSeasonRows.Index = 1
-    Me.mnuViewSeasonRows.Text = "Season Rows"
+    Me.mnuAddAttributes.Index = 1
+    Me.mnuAddAttributes.Text = "Add Attributes"
     '
     'frmDisplaySeasonalAttributes
     '
@@ -140,11 +147,15 @@ Friend Class frmDisplaySeasonalAttributes
   Private WithEvents pDataGroup As atcDataGroup
 
   'Translator class between pDataGroup and agdMain
-  Public pSource As atcSeasonalAttributesGridSource
+  Private pSource As atcSeasonalAttributesGridSource
 
   Private Sub PopulateGrid()
     Dim lWasSwapped As Boolean = Not pSource Is Nothing AndAlso pSource.SwapRowsColumns
     pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
+    If pSource.Columns < 3 Then
+      UserSpecifyAttributes()
+      pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
+    End If
     If lWasSwapped Then pSource.SwapRowsColumns = True
     agdMain.Initialize(pSource)
     agdMain.SizeAllColumnsToContents()
@@ -195,5 +206,23 @@ Friend Class frmDisplaySeasonalAttributes
       pSource.SwapRowsColumns = True
       agdMain.Refresh()
     End If
+  End Sub
+
+  Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
+    UserSpecifyAttributes()
+  End Sub
+
+  Private Sub UserSpecifyAttributes()
+    For Each lPlugin As atcDataPlugin In pDataManager.GetPlugins(GetType(atcDataSource))
+      If (lPlugin.Name = "Timeseries::Seasonal") Then
+        Dim typ As System.Type = lPlugin.GetType()
+        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+        Dim newSource As atcDataSource = asm.CreateInstance(typ.FullName)
+        Dim newArguments As New atcDataAttributes
+        newArguments.SetValue("Timeseries", pDataGroup)
+        newSource.Open("SeasonalAttributes", newArguments)
+        Exit Sub
+      End If
+    Next
   End Sub
 End Class

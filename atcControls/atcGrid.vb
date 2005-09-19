@@ -136,6 +136,15 @@ Public Class atcGrid
     pColumnDragging = -1
   End Sub
 
+  Public Property Source() As atcGridSource
+    Get
+      Return pSource
+    End Get
+    Set(ByVal newValue As atcGridSource)
+      pSource = newValue
+    End Set
+  End Property
+
   Public Sub Initialize(ByVal aSource As atcGridSource)
     pSource = aSource
     Clear()
@@ -459,7 +468,7 @@ Public Class atcGrid
     Dim lMaxWidth As Integer = 0
 
     'TODO: would be faster to check just length of string [before/after decimal] then do width of "XXXXwidthXXXX"
-    If lastRow > 150 then lastRow = 100 'Limit how much time we spend finding the widest cell
+    If lastRow > 150 Then lastRow = 100 'Limit how much time we spend finding the widest cell
     For iRow As Integer = pTopRow To lastRow
       lCellValue = pSource.CellValue(iRow, aColumn)
       If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then

@@ -33,11 +33,11 @@ Public Class atcSeasonalAttributesPlugin
     For Each lOption As String In aOptions
       Select Case lOption
         Case "SwapRowsColumns"
-          lForm.pSource.SwapRowsColumns = True
+          lForm.agdMain.Source.SwapRowsColumns = True
       End Select
     Next
 
-    SaveFileString(aFileName, lForm.pSource.ToString)
+    SaveFileString(aFileName, lForm.ToString)
   End Sub
 
   Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
