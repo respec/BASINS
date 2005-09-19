@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic LastOpenVersion = "7.10.3077" >
         <Build>
-            <Settings ReferencePath = "C:\dev\BASINS40\Bin\;C:\Dev\BASINS40\Bin\Plugins\BASINS\" >
+            <Settings ReferencePath = "C:\dev\BASINS40\Bin\;C:\Dev\BASINS40\Bin\Plugins\BASINS\;C:\dev\BASINS\Bin\" >
                 <Config
                     Name = "Debug"
                     EnableASPDebugging = "false"
