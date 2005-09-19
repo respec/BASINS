@@ -19,11 +19,12 @@
 '2/3/2005 - made spacing of text relative if no recent projexts, added TODOs (jlk)
 '3/16/2005 - adapted for BASINS welcome
 '********************************************************************************************************
+Imports System.Windows.Forms
 Imports System.Windows.Forms.SendKeys
-Imports ATCutility
+Imports atcUtility
 
 Public Class frmWelcomeScreenBasins
-    Inherits System.Windows.Forms.Form
+  Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
 
@@ -239,103 +240,103 @@ Public Class frmWelcomeScreenBasins
 
 #End Region
 
-    Private Sub lbBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbBuildNew.LinkClicked
-        'TODO - don't hard code path
-        frmMain.Project.Load("d:\basins\data\national\national.mwprj")
-        Me.Close()
-    End Sub
+  Private Sub lbBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbBuildNew.LinkClicked
+    'TODO - don't hard code path
+    g_MapWin.Project.Load("d:\basins\data\national\national.mwprj")
+    Me.Close()
+  End Sub
 
-    Private Sub lbOpenProject_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbOpenProject.LinkClicked
-        Dim dlg As New OpenFileDialog
+  Private Sub lbOpenProject_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbOpenProject.LinkClicked
+    Dim dlg As New OpenFileDialog
 
-        dlg.Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
-        dlg.CheckFileExists = True
-        dlg.InitialDirectory = AppInfo.DefaultDir
-        If dlg.ShowDialog(Me) = DialogResult.OK Then
-            frmMain.Project.Load(dlg.FileName)
-            Me.DialogResult = DialogResult.OK
-            Me.Close()
+    dlg.Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
+    dlg.CheckFileExists = True
+    dlg.InitialDirectory = "\basins\data" 'appinfo.DefaultDir
+    If dlg.ShowDialog(Me) = DialogResult.OK Then
+      g_MapWin.Project.Load(dlg.FileName)
+      Me.DialogResult = DialogResult.OK
+      Me.Close()
+    End If
+  End Sub
+
+  Private Sub cbShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbShowDlg.CheckedChanged
+    AppInfo.ShowWelcomeScreen = cbShowDlg.Checked
+  End Sub
+
+  Private Sub lbProject_LinkClicked(ByVal sender As System.Object, _
+      ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) _
+      Handles lbProject1.LinkClicked, lbProject2.LinkClicked, lbProject3.LinkClicked, lbProject4.LinkClicked
+
+    Dim fileName As String = CStr(CType(sender, Label).Tag)
+    If (System.IO.File.Exists(fileName)) Then
+      g_MapWin.Project.Load(fileName)
+      Me.DialogResult = DialogResult.OK
+      Me.Close()
+    Else
+      'TODO - 2/3/2005 - jlk - need a findFile here 
+      MsgBox("Could not find " & fileName, MsgBoxStyle.Exclamation)
+    End If
+  End Sub
+
+  Private Sub frmWelcomeScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+    cbShowDlg.Checked = AppInfo.ShowWelcomeScreen
+
+    'assume no recent projects
+    lbProject1.Visible = False
+    lbProject2.Visible = False
+    lbProject3.Visible = False
+    lbProject4.Visible = False
+
+    'check to see if there were any recent projects
+    Dim lRecentCount As Integer = 0
+    Dim lCurrent As Integer = 0
+    Dim lProjectName As String
+    Dim lProjectId As String
+    Dim lbProject As Label
+    While lRecentCount < 4 And lCurrent < ProjInfo.RecentProjects.Count
+      lProjectName = CType(ProjInfo.RecentProjects(lCurrent), String)
+      lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
+      If LCase(lProjectId) <> "national" Then
+        If lRecentCount = 0 Then
+          lbProject = lbProject1
+        ElseIf lRecentCount = 1 Then
+          lbProject = lbProject2
+        ElseIf lRecentCount = 2 Then
+          lbProject = lbProject3
+        ElseIf lRecentCount = 3 Then
+          lbProject = lbProject4
         End If
-    End Sub
+        lbProject.Text = lProjectId
+        lbProject.Tag = lProjectName
+        lbProject.Visible = True
+        lRecentCount += 1
+      End If
+      lCurrent += 1
+    End While
+  End Sub
 
-    Private Sub cbShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbShowDlg.CheckedChanged
-        AppInfo.ShowWelcomeScreen = cbShowDlg.Checked
-    End Sub
+  Private Sub btnClose_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnClose.Click
+    Me.Close()
+  End Sub
 
-    Private Sub lbProject_LinkClicked(ByVal sender As System.Object, _
-        ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) _
-        Handles lbProject1.LinkClicked, lbProject2.LinkClicked, lbProject3.LinkClicked, lbProject4.LinkClicked
+  Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbConvert.LinkClicked
+    MsgBox("Select the BASINS Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OKOnly, "BASINS 4")
+    Me.Close()
+    SendKeys.Send("%FB")
+  End Sub
 
-        Dim fileName As String = CStr(CType(sender, Label).Tag)
-        If (System.IO.File.Exists(fileName)) Then
-            frmMain.Project.Load(fileName)
-            Me.DialogResult = DialogResult.OK
-            Me.Close()
-        Else
-            'TODO - 2/3/2005 - jlk - need a findFile here 
-            MsgBox("Could not find " & fileName, MsgBoxStyle.Exclamation)
-        End If
-    End Sub
-
-    Private Sub frmWelcomeScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
-        cbShowDlg.Checked = AppInfo.ShowWelcomeScreen
-
-        'assume no recent projects
-        lbProject1.Visible = False
-        lbProject2.Visible = False
-        lbProject3.Visible = False
-        lbProject4.Visible = False
-
-        'check to see if there were any recent projects
-        Dim lRecentCount As Integer = 0
-        Dim lCurrent As Integer = 0
-        Dim lProjectName As String
-        Dim lProjectId As String
-        Dim lbProject As Label
-        While lRecentCount < 4 And lCurrent < ProjInfo.RecentProjects.Count
-            lProjectName = CType(ProjInfo.RecentProjects(lCurrent), String)
-            lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
-            If LCase(lProjectId) <> "national" Then
-                If lRecentCount = 0 Then
-                    lbProject = lbProject1
-                ElseIf lRecentCount = 1 Then
-                    lbProject = lbProject2
-                ElseIf lRecentCount = 2 Then
-                    lbProject = lbProject3
-                ElseIf lRecentCount = 3 Then
-                    lbProject = lbProject4
-                End If
-                lbProject.Text = lProjectId
-                lbProject.Tag = lProjectName
-                lbProject.Visible = True
-                lRecentCount += 1
-            End If
-            lCurrent += 1
-        End While
-    End Sub
-
-    Private Sub btnClose_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnClose.Click
-        Me.Close()
-    End Sub
-
-    Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbConvert.LinkClicked
-        MsgBox("Select the BASINS Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OKOnly, "BASINS 4")
-        Me.Close()
-        SendKeys.Send("%FB")
-    End Sub
-
-    Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbBasinsHelp.Click
-        Dim lFileName As String = FindFile("Find BASINS Help File", _
-                                            App.Path() & "\Help\Basins4.chm", _
-                                            ".chm", , , True)
-        If Len(lFileName) > 0 Then
-            Try
-                System.Diagnostics.Process.Start(lFileName)
-            Catch ex As Exception
-                ShowError(ex)
-            End Try
-        End If
-    End Sub
+  Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbBasinsHelp.Click
+    Dim lFileName As String = FindFile("Find BASINS Help File", _
+                                        Application.ExecutablePath & "\Help\Basins4.chm", _
+                                        ".chm", , , True) 'was app.path
+    If Len(lFileName) > 0 Then
+      Try
+        System.Diagnostics.Process.Start(lFileName)
+      Catch ex As Exception
+        g_MapWin.ShowErrorDialog(ex)
+      End Try
+    End If
+  End Sub
 End Class
 

@@ -20,7 +20,7 @@ Public Module ScriptSeasonAttributes
     Dim lMatch As New atcDataGroup
     Dim lMonthData As New atcDataGroup
 
-    Dim lAllowExit As Boolean = aBasinsPlugIn.RunBasinsScript("vb", "subSetBaseDir.vb", lErr, New Object() {"Seasons",""})
+    Dim lAllowExit As Boolean = aBasinsPlugIn.RunBasinsScript("vb", "subSetBaseDir.vb", lErr, New Object() {"Seasons", ""})
 
     SaveFileString(lOutFile, "Entry" & vbCrLf)
 
