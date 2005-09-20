@@ -17,37 +17,86 @@ Module GISUtils
 
     Dim lLayer1 As MapWindow.Interfaces.Layer
     Dim sf1 As New MapWinGIS.Shapefile
+    Dim sf1shape As New MapWinGIS.Shape
     Dim lLayer2 As MapWindow.Interfaces.Layer
     Dim sf2 As New MapWinGIS.Shapefile
+    Dim sf2shape As New MapWinGIS.Shape
 
     lLayer1 = pMapWin.Layers(layerindex1)
     sf1 = lLayer1.GetObject
+    sf1shape = sf1.Shape(nthfeature1)
     lLayer2 = pMapWin.Layers(layerindex2)
     sf2 = lLayer2.GetObject
+    sf2shape = sf2.Shape(nthfeature2)
 
     GisUtil_OverlappingPolygons = False
-    'check if one inside the other
-    For k = 1 To sf1.Shape(nthfeature1).numPoints
-      x = sf1.Shape(nthfeature1).Point(k - 1).x
-      y = sf1.Shape(nthfeature1).Point(k - 1).y
-      GisUtil_OverlappingPolygons = sf2.PointInShape(nthfeature2, x, y)
-      If GisUtil_OverlappingPolygons Then
-        'quit if we've found they overlap
-        Exit For
-      End If
-    Next k
-    If Not GisUtil_OverlappingPolygons Then
-      'now check the opposite
-      For k = 1 To sf2.Shape(nthfeature2).numPoints
-        x = sf2.Shape(nthfeature2).Point(k - 1).x
-        y = sf2.Shape(nthfeature2).Point(k - 1).y
-        GisUtil_OverlappingPolygons = sf1.PointInShape(nthfeature1, x, y)
+    If Not (sf1.Extents.xMin > sf2.Extents.xMax Or sf1.Extents.xMax < sf2.Extents.xMin Or sf1.Extents.yMin > sf2.Extents.yMax Or sf1.Extents.yMax < sf2.Extents.yMin) Then
+      'check if one inside the other
+      For k = 1 To sf1shape.numPoints
+        x = sf1shape.Point(k - 1).x
+        y = sf1shape.Point(k - 1).y
+        GisUtil_OverlappingPolygons = sf2.PointInShape(nthfeature2, x, y)
         If GisUtil_OverlappingPolygons Then
           'quit if we've found they overlap
           Exit For
         End If
       Next k
+      If Not GisUtil_OverlappingPolygons Then
+        'now check the opposite
+        For k = 1 To sf2shape.numPoints
+          x = sf2shape.Point(k - 1).x
+          y = sf2shape.Point(k - 1).y
+          GisUtil_OverlappingPolygons = sf1.PointInShape(nthfeature1, x, y)
+          If GisUtil_OverlappingPolygons Then
+            'quit if we've found they overlap
+            Exit For
+          End If
+        Next k
+      End If
     End If
+  End Function
+
+  Public Function GisUtil_AssignContainingPolygons(ByVal layerindex As Long, _
+    ByVal layerindexcontaining As Long, ByVal aIndex() As Long)
+    'given a polygon layer (like dem shape) and a containing layer (like subbasins),
+    'return which polygon in the containing layer each polygon lies within
+
+    Dim k As Long
+    Dim i As Long
+    Dim x As Double, y As Double
+    Dim lLayer1 As MapWindow.Interfaces.Layer
+    Dim sf1 As New MapWinGIS.Shapefile
+    Dim sf1shape As New MapWinGIS.Shape
+    Dim lLayer2 As MapWindow.Interfaces.Layer
+    Dim sf2 As New MapWinGIS.Shapefile
+    Dim assigned As Boolean
+    Dim nth As Integer
+
+    lLayer1 = pMapWin.Layers(layerindex)
+    sf1 = lLayer1.GetObject
+    lLayer2 = pMapWin.Layers(layerindexcontaining)
+    sf2 = lLayer2.GetObject
+
+    sf2.BeginPointInShapefile()
+    For i = 1 To sf1.NumShapes
+      assigned = False
+      sf1shape = sf1.Shape(i - 1)
+      For k = 2 To sf1shape.numPoints
+        x = sf1shape.Point(k - 1).x
+        y = sf1shape.Point(k - 1).y
+        nth = sf2.PointInShapefile(x, y)
+        If nth > -1 Then
+          aIndex(i) = nth
+          assigned = True
+          Exit For
+        End If
+      Next k
+      If Not assigned Then
+        aIndex(i) = -1
+      End If
+    Next i
+    sf2.EndPointInShapefile()
+
   End Function
 
   Public Function GisUtil_NumFieldsInLayer(ByVal layerindex As Long) As Long
@@ -96,6 +145,36 @@ Module GISUtils
         Exit For
       End If
     Next
+  End Function
+
+  Public Function GisUtil_AddField(ByVal layerindex As Long, ByVal fieldname As String, ByVal fieldtype As Integer, ByVal fieldwidth As Integer) As Long
+    Dim i As Long, findex As Long, lLayer As MapWindow.Interfaces.Layer
+    Dim bsuc As Boolean
+
+    GisUtil_AddField = -1
+    lLayer = pMapWin.Layers(layerindex)
+    Dim sf As New MapWinGIS.Shapefile
+    sf = lLayer.GetObject
+    Dim of As New MapWinGIS.Field
+    of.Name = fieldname
+    of.Type = fieldtype
+    of.Width = fieldwidth
+    sf.StartEditingTable()
+    bsuc = sf.EditInsertField(of, sf.NumFields)
+    sf.StopEditingTable()
+    GisUtil_AddField = sf.NumFields - 1
+  End Function
+
+  Public Function GisUtil_RemoveField(ByVal layerindex As Long, ByVal fieldindex As Long)
+    Dim lLayer As MapWindow.Interfaces.Layer
+    Dim bsuc As Boolean
+
+    lLayer = pMapWin.Layers(layerindex)
+    Dim sf As New MapWinGIS.Shapefile
+    sf = lLayer.GetObject
+    sf.StartEditingTable()
+    bsuc = sf.EditDeleteField(fieldindex)
+    sf.StopEditingTable()
   End Function
 
   Public Function GisUtil_NumLayers() As Long
@@ -160,6 +239,81 @@ Module GISUtils
     sf = lLayer.GetObject
     GisUtil_CellValueNthFeatureInLayer = sf.CellValue(fieldindex, featureindex)
   End Function
+
+  Public Function GisUtil_AreaNthFeatureInLayer(ByVal layerindex As Long, ByVal featureindex As Long) As Double
+    Dim lLayer As MapWindow.Interfaces.Layer
+
+    lLayer = pMapWin.Layers(layerindex)
+    Dim sf As New MapWinGIS.Shapefile
+    sf = lLayer.GetObject
+    Dim sfshape As New MapWinGIS.Shape
+    sfshape = sf.Shape(featureindex)
+    Dim utilArea As New MapWinGIS.Utils
+    GisUtil_AreaNthFeatureInLayer = utilArea.Area(sfshape)
+  End Function
+
+  Public Function GisUtil_LengthNthFeatureInLayer(ByVal layerindex As Long, ByVal featureindex As Long) As Double
+    Dim lLayer As MapWindow.Interfaces.Layer
+
+    lLayer = pMapWin.Layers(layerindex)
+    Dim sf As New MapWinGIS.Shapefile
+    sf = lLayer.GetObject
+    Dim sfshape As New MapWinGIS.Shape
+    sfshape = sf.Shape(featureindex)
+    Dim utilLength As New MapWinGIS.Utils
+    GisUtil_LengthNthFeatureInLayer = utilLength.Length(sfshape)
+  End Function
+
+  Public Sub GisUtil_EndPointsOfLine(ByVal layerindex As Long, ByVal featureindex As Long, ByRef x1 As Double, ByRef y1 As Double, ByRef x2 As Double, ByRef y2 As Double)
+    Dim lLayer As MapWindow.Interfaces.Layer
+
+    lLayer = pMapWin.Layers(layerindex)
+    Dim sf As New MapWinGIS.Shapefile
+    sf = lLayer.GetObject
+    Dim sfshape As New MapWinGIS.Shape
+    sfshape = sf.Shape(featureindex)
+    x1 = sfshape.Point(0).x
+    y1 = sfshape.Point(0).y
+    x2 = sfshape.Point(sfshape.numPoints - 1).x
+    y2 = sfshape.Point(sfshape.numPoints - 1).y
+  End Sub
+
+  Public Sub GisUtil_PointXY(ByVal layerindex As Long, ByVal featureindex As Long, ByRef x As Double, ByRef y As Double)
+    Dim lLayer As MapWindow.Interfaces.Layer
+
+    lLayer = pMapWin.Layers(layerindex)
+    Dim sf As New MapWinGIS.Shapefile
+    sf = lLayer.GetObject
+    Dim sfshape As New MapWinGIS.Shape
+    sfshape = sf.Shape(featureindex)
+    x = sfshape.Point(0).x
+    y = sfshape.Point(0).y
+  End Sub
+
+  Public Function GisUtil_RemoveFeatureFromLayer(ByVal layerindex As Long, ByVal featureindex As Long) As Double
+    Dim lLayer As MapWindow.Interfaces.Layer
+    Dim bsuc As Boolean
+
+    lLayer = pMapWin.Layers(layerindex)
+    Dim sf As New MapWinGIS.Shapefile
+    sf = lLayer.GetObject
+    sf.StartEditingShapes(True)
+    bsuc = sf.EditDeleteShape(featureindex)
+    sf.StopEditingShapes(True, True)
+  End Function
+
+  Public Sub GisUtil_SetValueNthFeatureInLayer(ByVal layerindex As Long, ByVal fieldindex As Long, ByVal featureindex As Long, ByVal value As Object)
+    Dim lLayer As MapWindow.Interfaces.Layer
+    Dim bsuc As Boolean
+
+    lLayer = pMapWin.Layers(layerindex)
+    Dim sf As MapWinGIS.Shapefile
+    sf = lLayer.GetObject
+
+    bsuc = sf.StartEditingTable()
+    bsuc = sf.EditCellValue(fieldindex, featureindex, value)
+    bsuc = sf.StopEditingTable()
+  End Sub
 
   Public Function GisUtil_NumSelectedFeaturesInLayer(ByVal layerindex As Long) As Long
     Dim lLayer As MapWindow.Interfaces.Layer
@@ -227,6 +381,19 @@ Module GISUtils
     polygonsf.EndPointInShapefile()
   End Function
 
+  Public Function GisUtil_PointInPolygonXY(ByVal x As Double, ByVal y As Double, ByVal PolygonLayerIndex As Long) As Long
+    'given a point xy and a polygon layer, return the polygon this point is in
+    Dim lLayer As MapWindow.Interfaces.Layer
+    Dim polygonsf As New MapWinGIS.Shapefile
+
+    lLayer = pMapWin.Layers(PolygonLayerIndex)
+    polygonsf = lLayer.GetObject
+
+    polygonsf.BeginPointInShapefile()
+    GisUtil_PointInPolygonXY = polygonsf.PointInShapefile(x, y)
+    polygonsf.EndPointInShapefile()
+  End Function
+
   Public Function GisUtil_AddLayerToMap(ByVal newfilename As String, ByVal layername As String) As Boolean
     'given a shape file name, add it to the map.
     'return true if the layer is already there or successfully added.
@@ -244,6 +411,12 @@ Module GISUtils
         GisUtil_AddLayerToMap = True
       End If
     End If
+  End Function
+
+  Public Function GisUtil_SetLayerVisible(ByVal layerindex As Integer, ByVal vis As Boolean)
+    'given a shape file name, add it to the map.
+    'return true if the layer is already there or successfully added.
+    pMapWin.Layers(layerindex).Visible = vis
   End Function
 
   Public Function GisUtil_RemoveLayerFromMap(ByVal layerindex As Long) As Boolean
@@ -319,6 +492,76 @@ Module GISUtils
     Next ic
     polygonsf.EndPointInShapefile()
   End Sub
+
+  Public Sub GisUtil_GridMinMaxInPolygon(ByVal gridLayerIndex As Long, ByVal polygonLayerIndex As Long, _
+    ByVal polygonfeatureindex As Long, ByVal Min As Double, ByVal Max As Double)
+    'Given a grid and a polygon layer, find the min and max grid value within the feature.
+
+    Dim ic As Long
+    Dim ir As Long
+    Dim xpos As Double
+    Dim ypos As Double
+    Dim subid As Integer
+    Dim startingcolumn As Long
+    Dim endingcolumn As Long
+    Dim startingrow As Long
+    Dim endingrow As Long
+    Dim gridLayer As MapWindow.Interfaces.Layer
+    Dim polygonLayer As MapWindow.Interfaces.Layer
+    Dim val As Integer
+
+    'set input grid
+    gridLayer = pMapWin.Layers(gridLayerIndex)
+    Dim InputGrid As New MapWinGIS.Grid
+    InputGrid = gridLayer.GetGridObject
+
+    'set input polygon layer
+    polygonLayer = pMapWin.Layers(polygonLayerIndex)
+    Dim polygonsf As New MapWinGIS.Shapefile
+    polygonsf = polygonLayer.GetObject
+    Dim pshape As New MapWinGIS.Shape
+    pshape = polygonsf.Shape(polygonfeatureindex)
+
+    'figure out what part of the grid overlays this polygon
+    InputGrid.ProjToCell(pshape.Extents.xMin, pshape.Extents.yMin, startingcolumn, endingrow)
+    InputGrid.ProjToCell(pshape.Extents.xMax, pshape.Extents.yMax, endingcolumn, startingrow)
+
+    Min = 99999999
+    Max = -99999999
+    polygonsf.BeginPointInShapefile()
+    For ic = startingcolumn To endingcolumn
+      For ir = startingrow To endingrow
+        InputGrid.CellToProj(ic, ir, xpos, ypos)
+        subid = polygonsf.PointInShapefile(xpos, ypos)
+        If subid = polygonfeatureindex Then
+          'this is in the polygon we want
+          val = InputGrid.Value(ic, ir)
+          If val > Max Then
+            Max = val
+          End If
+          If val < Min Then
+            Min = val
+          End If
+        End If
+      Next ir
+    Next ic
+    polygonsf.EndPointInShapefile()
+  End Sub
+
+  Public Function GisUtil_GridValueAtPoint(ByVal GridLayerIndex As Integer, ByVal x As Double, ByVal y As Double) As Integer
+    Dim column As Long
+    Dim row As Long
+    Dim endingrow As Long
+    Dim gridLayer As MapWindow.Interfaces.Layer
+
+    'set input grid
+    gridLayer = pMapWin.Layers(GridLayerIndex)
+    Dim InputGrid As New MapWinGIS.Grid
+    InputGrid = gridLayer.GetGridObject
+
+    InputGrid.ProjToCell(x, y, column, row)
+    GisUtil_GridValueAtPoint = InputGrid.Value(column, row)
+  End Function
 
   Public Sub GisUtil_Overlay(ByVal Layer1Name As String, ByVal Layer1FieldName As String, _
                              ByVal Layer2Name As String, ByVal Layer2FieldName As String, _
@@ -457,6 +700,209 @@ Module GISUtils
     osf.StopEditingShapes()
     osf.Close()
 
+  End Sub
+
+  Public Function GisUtil_ClipShapesWithPolygon(ByVal inputlayerindex As Integer, ByVal clipperlayerindex As Integer) As String
+    'returns output shape file name as string 
+    Dim mx As MapWinX.SpatialOperations
+    Dim i As Integer
+    Dim j As Integer
+    Dim k As Integer
+    Dim bsuc As Boolean
+    Dim newname As String
+
+    GisUtil_ClipShapesWithPolygon = ""
+    'set input layer (reaches for instance)
+    Dim lLayer As MapWindow.Interfaces.Layer
+    lLayer = pMapWin.Layers(inputlayerindex)
+    Dim isf As New MapWinGIS.Shapefile
+    isf = lLayer.GetObject
+
+    'set clipper layer (subbasins for instance)
+    Dim sLayer As MapWindow.Interfaces.Layer
+    sLayer = pMapWin.Layers(clipperlayerindex)
+    Dim ssf As New MapWinGIS.Shapefile
+    ssf = sLayer.GetObject
+    Dim sshape As MapWinGIS.Shape
+    Dim clipperpath As String
+    clipperpath = PathNameOnly(GisUtil_LayerFileName(clipperlayerindex))
+
+    'create results shapefile
+    i = 1
+    newname = clipperpath & "\stream" & i & ".shp"
+    Do While FileExists(newname)
+      i = i + 1
+      newname = clipperpath & "\stream" & i & ".shp"
+    Loop
+    Dim orsf As New MapWinGIS.Shapefile
+    Dim rsf As New MapWinGIS.Shapefile
+    orsf.CreateNew(newname, MapWinGIS.ShpfileType.SHP_POLYLINE)
+    For i = 1 To isf.NumFields
+      bsuc = orsf.EditInsertField(isf.Field(i - 1), i - 1)
+    Next i
+
+    For i = 1 To ssf.NumShapes
+      sshape = ssf.Shape(i - 1)
+      bsuc = mx.ClipShapesWithPolygon(isf, sshape, rsf)
+      For j = 1 To rsf.NumShapes
+        bsuc = orsf.EditInsertShape(rsf.Shape(j - 1), j - 1)
+      Next j
+    Next i
+
+    'populate attributes of output shapes
+    For i = 1 To orsf.NumShapes
+      For j = 1 To isf.NumShapes
+        If GisUtil_IsThisShapeTheSameAsOrPartOfAnotherShape(orsf.Shape(i - 1), isf.Shape(j - 1)) Then
+          'found matching shape, copy attributes
+          For k = 1 To isf.NumFields
+            bsuc = orsf.EditCellValue(k - 1, i - 1, isf.CellValue(k - 1, j - 1))
+          Next k
+        End If
+      Next j
+    Next i
+
+    bsuc = orsf.SaveAs(newname)
+    GisUtil_ClipShapesWithPolygon = newname
+
+  End Function
+
+  Private Function GisUtil_IsThisShapeTheSameAsOrPartOfAnotherShape(ByVal sf1shape As MapWinGIS.Shape, ByVal sf2shape As MapWinGIS.Shape) As Boolean
+    'given one shape and another which may be a piece of the first shape,
+    'determine if the second shape is equivalent or part of the first shape
+    '(after a reach segment has been clipped to a polygon boundary, we still need 
+    'to identify which original reach it was a part of)
+    Dim i As Integer
+    Dim j As Integer
+    Dim foundpoint As Boolean
+
+    GisUtil_IsThisShapeTheSameAsOrPartOfAnotherShape = True
+
+    For j = 2 To sf1shape.numPoints - 1
+      foundpoint = False
+      For i = 1 To sf2shape.numPoints
+        If sf1shape.Point(j - 1).x = sf2shape.Point(i - 1).x And sf1shape.Point(j - 1).y = sf2shape.Point(i - 1).y Then
+          foundpoint = True
+          Exit For
+        End If
+      Next i
+      If foundpoint = False Then
+        GisUtil_IsThisShapeTheSameAsOrPartOfAnotherShape = False
+        Exit Function
+      End If
+    Next j
+
+  End Function
+
+  Public Sub GisUtil_MergeFeaturesBasedOnAttribute(ByVal LayerIndex, ByVal FieldIndex)
+    Dim i As Integer
+    Dim j As Integer
+    Dim k As Integer
+    Dim bsuc As Boolean
+    Dim thisval As Integer
+    Dim targetval As Integer
+    Dim shape1 As MapWinGIS.Shape
+    Dim shape2 As MapWinGIS.Shape
+    Dim endx As Double
+    Dim endy As Double
+    Dim found As Boolean
+
+    Dim lLayer As MapWindow.Interfaces.Layer
+    lLayer = pMapWin.Layers(LayerIndex)
+    Dim isf As New MapWinGIS.Shapefile
+    isf = lLayer.GetObject
+
+    isf.StartEditingShapes(True)
+    'merge together based on common endpoints
+    i = 0
+    Do While i < isf.NumShapes
+      found = False
+      shape1 = isf.Shape(i)
+      targetval = GisUtil_CellValueNthFeatureInLayer(LayerIndex, FieldIndex, i)
+      endx = shape1.Point(shape1.numPoints - 1).x
+      endy = shape1.Point(shape1.numPoints - 1).y
+      j = 0
+      Do While j < isf.NumShapes
+        If i <> j Then
+          shape2 = isf.Shape(j)
+          thisval = GisUtil_CellValueNthFeatureInLayer(LayerIndex, FieldIndex, j)
+          If thisval = targetval Then
+            'see if these have common start/end 
+            If endx = shape2.Point(0).x And endy = shape2.Point(0).y Then
+              'end of shape 1 is start of shape2
+              For k = 1 To shape2.numPoints
+                bsuc = shape1.InsertPoint(shape2.Point(k), shape1.numPoints)
+              Next k
+              'remove shape2
+              isf.EditDeleteShape(j)
+              found = True
+              Exit Do
+            End If
+          End If
+        End If
+        j = j + 1
+      Loop
+      If Not found Then
+        i = i + 1
+      End If
+    Loop
+
+    'merge together based on endpoint proximity
+    Dim startx1 As Double
+    Dim starty1 As Double
+    Dim endx1 As Double
+    Dim endy1 As Double
+    Dim startx2 As Double
+    Dim starty2 As Double
+    Dim endx2 As Double
+    Dim endy2 As Double
+    i = 0
+    Do While i < isf.NumShapes
+      found = False
+      shape1 = isf.Shape(i)
+      targetval = GisUtil_CellValueNthFeatureInLayer(LayerIndex, FieldIndex, i)
+      startx1 = shape1.Point(0).x
+      starty1 = shape1.Point(0).y
+      endx1 = shape1.Point(shape1.numPoints - 1).x
+      endy1 = shape1.Point(shape1.numPoints - 1).y
+      j = 0
+      Do While j < isf.NumShapes
+        If i <> j Then
+          shape2 = isf.Shape(j)
+          thisval = GisUtil_CellValueNthFeatureInLayer(LayerIndex, FieldIndex, j)
+          If thisval = targetval Then
+            startx2 = shape2.Point(0).x
+            starty2 = shape2.Point(0).y
+            endx2 = shape2.Point(shape2.numPoints - 1).x
+            endy2 = shape2.Point(shape2.numPoints - 1).y
+            If (startx1 - endx2) ^ 2 + (starty1 - endy2) ^ 2 < (startx2 - endx1) ^ 2 + (starty2 - endy1) ^ 2 Then
+              'add shape 1 to the end of shape 2
+              For k = 1 To shape1.numPoints
+                bsuc = shape2.InsertPoint(shape1.Point(k), shape2.numPoints)
+              Next k
+              'remove shape1
+              isf.EditDeleteShape(i)
+              found = True
+              Exit Do
+            Else
+              'add shape 2 to the end of shape 1
+              For k = 1 To shape2.numPoints
+                bsuc = shape1.InsertPoint(shape2.Point(k), shape1.numPoints)
+              Next k
+              'remove shape2
+              isf.EditDeleteShape(j)
+              found = True
+              Exit Do
+            End If
+          End If
+        End If
+        j = j + 1
+      Loop
+      If Not found Then
+        i = i + 1
+      End If
+    Loop
+
+    isf.StopEditingShapes(True)
   End Sub
 
 End Module
