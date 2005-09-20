@@ -46,7 +46,7 @@ Public Class atcTimeseriesStatistics
 
         AddOperation("Date Modified", "Date Timeseries Last Modified", defTimeSeriesOne, lCategory)
 
-        AddOperation("Count", "Count of non missing values", defTimeSeriesOne, lCategory)
+        AddOperation("Count", "Count of non missing values", defTimeSeriesOne, lCategory, "Integer", 0)
 
         AddOperation("SJDay", "Starting Julian Date", defTimeSeriesOne, lCategory)
 
@@ -89,15 +89,17 @@ Public Class atcTimeseriesStatistics
   Private Sub AddOperation(ByVal aName As String, _
                            ByVal aDescription As String, _
                            ByVal aArg As atcAttributeDefinition, _
-                           ByVal aCategory As String)
+                           ByVal aCategory As String, _
+                  Optional ByVal aTypeString As String = "Double", _
+                  Optional ByVal aDefaultValue As Object = Double.NaN)
     Dim lResult As New atcAttributeDefinition
     With lResult
       .Name = aName
       .Category = aCategory
       .Description = aDescription
-      .DefaultValue = Double.NaN
+      .DefaultValue = aDefaultValue
       .Editable = False
-      .TypeString = "Double"
+      .TypeString = aTypeString
       .Calculator = Me
     End With
     Dim lArguments As atcDataAttributes = New atcDataAttributes
@@ -122,7 +124,7 @@ Public Class atcTimeseriesStatistics
 
       Dim lGeoMean As Double = 0
       Dim lStdDev As Double = Double.NaN
-      Dim lCount As Double = 0
+      Dim lCount As Integer = 0
       Dim lMean As Double = Double.NaN
       Dim lSum As Double = 0
       Dim lSumDevSquares As Double = 0
@@ -153,11 +155,12 @@ Public Class atcTimeseriesStatistics
         aTimeseries.Attributes.SetValue("Count", lCount)
         lMean = lSum / lCount
         aTimeseries.Attributes.SetValue("Mean", lMean)
-      End If
-
-      If lMin > 0 Then
-        lGeoMean = Math.Exp(lGeoMean / lCount)
-        aTimeseries.Attributes.SetValue("Geometric Mean", lGeoMean)
+        If lMin > 0 Then
+          lGeoMean = Math.Exp(lGeoMean / lCount)
+          aTimeseries.Attributes.SetValue("Geometric Mean", lGeoMean)
+        End If
+      Else
+        aTimeseries.Attributes.SetValue("Count", 0)
       End If
 
       If lCount > 1 Then
@@ -175,7 +178,7 @@ Public Class atcTimeseriesStatistics
         If lVariance > 0 Then
           lStdDev = Math.Sqrt(lVariance)
           aTimeseries.Attributes.SetValue("Standard Deviation", lStdDev)
-          lSkew = (lCount * lSumDevCubes) / ((lCount - 1.0) * (lCount - 2.0) * lStdDev * lStdDev * lStdDev)
+          lSkew = (lCount * lSumDevCubes) / ((lCount - 1) * (lCount - 2) * lStdDev * lStdDev * lStdDev)
           aTimeseries.Attributes.SetValue("Skew", lSkew)
           lStErSkew = Math.Sqrt((6.0 * lCount * (lCount - 1)) / ((lCount - 2) * (lCount + 1) * (lCount + 3)))
           aTimeseries.Attributes.SetValue("Standard Error of Skew", lStErSkew)
