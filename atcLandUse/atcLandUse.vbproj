@@ -102,6 +102,7 @@
                     VersionMinor = "10"
                     Lcid = "0"
                     WrapperTool = "tlbimp"
+                    Private = "False"
                 />
                 <Reference
                     Name = "AxATCoCtl"
@@ -110,6 +111,7 @@
                     VersionMinor = "10"
                     Lcid = "0"
                     WrapperTool = "aximp"
+                    Private = "False"
                 />
                 <Reference
                     Name = "MapWinGIS"
@@ -118,16 +120,25 @@
                     VersionMinor = "0"
                     Lcid = "0"
                     WrapperTool = "tlbimp"
+                    Private = "False"
                 />
                 <Reference
                     Name = "atcUtility"
                     AssemblyName = "atcUtility"
                     HintPath = "..\atcUtility\obj\Debug\atcUtility.dll"
+                    Private = "False"
                 />
                 <Reference
                     Name = "ChilkatDotNet"
                     AssemblyName = "ChilkatDotNet"
                     HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ChilkatDotNet.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "MapWinX"
+                    AssemblyName = "MapWinX"
+                    HintPath = "..\Bin\MapWinX.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>
