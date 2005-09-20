@@ -33,7 +33,7 @@
                     DebugSymbols = "true"
                     IncrementalBuild = "true"
                     Optimize = "false"
-                    OutputPath = "..\..\Basins40\Bin\Plugins\"
+                    OutputPath = "..\Bin\Plugins\BASINS\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -90,6 +90,7 @@
                     VersionMinor = "10"
                     Lcid = "0"
                     WrapperTool = "tlbimp"
+                    Private = "False"
                 />
                 <Reference
                     Name = "AxATCoCtl"
@@ -98,26 +99,31 @@
                     VersionMinor = "10"
                     Lcid = "0"
                     WrapperTool = "aximp"
+                    Private = "False"
                 />
                 <Reference
                     Name = "MapWinInterfaces"
                     AssemblyName = "MapWinInterfaces"
                     HintPath = "..\..\Basins40\Bin\MapWinInterfaces.dll"
+                    Private = "False"
                 />
                 <Reference
                     Name = "atcUtility"
                     AssemblyName = "atcUtility"
                     HintPath = "..\atcUtility\obj\Debug\atcUtility.dll"
+                    Private = "False"
                 />
                 <Reference
                     Name = "ChilkatDotNet"
                     AssemblyName = "ChilkatDotNet"
                     HintPath = "..\..\Basins40\Bin\ChilkatDotNet.dll"
+                    Private = "False"
                 />
                 <Reference
                     Name = "MapWinX"
                     AssemblyName = "MapWinX"
                     HintPath = "..\..\MapWinX\bin\Release\MapWinX.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>

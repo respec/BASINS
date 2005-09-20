@@ -33,7 +33,7 @@
                     DebugSymbols = "true"
                     IncrementalBuild = "true"
                     Optimize = "false"
-                    OutputPath = "..\..\MapWindow40\Bin\Plugins\"
+                    OutputPath = "..\Bin\Plugins\BASINS\"
                     RegisterForComInterop = "false"
                     RemoveIntegerChecks = "false"
                     TreatWarningsAsErrors = "false"
@@ -123,6 +123,11 @@
                     Name = "atcUtility"
                     AssemblyName = "atcUtility"
                     HintPath = "..\atcUtility\obj\Debug\atcUtility.dll"
+                />
+                <Reference
+                    Name = "MapWinX"
+                    AssemblyName = "MapWinX"
+                    HintPath = "..\Bin\MapWinX.dll"
                 />
             </References>
             <Imports>

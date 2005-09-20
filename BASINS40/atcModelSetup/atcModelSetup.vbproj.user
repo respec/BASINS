@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic LastOpenVersion = "7.10.3077" >
         <Build>
-            <Settings ReferencePath = "C:\dev\MapWindow40\Bin\;C:\dev\BASINS40\atcUtility\obj\Debug\" >
+            <Settings ReferencePath = "C:\dev\MapWindow40\Bin\;C:\dev\BASINS40\atcUtility\obj\Debug\;C:\dev\BASINS40\Bin\" >
                 <Config
                     Name = "Debug"
                     EnableASPDebugging = "false"
@@ -13,7 +13,7 @@
                     StartAction = "Program"
                     StartArguments = ""
                     StartPage = ""
-                    StartProgram = "C:\dev\MapWindow40\Bin\Basins4.exe"
+                    StartProgram = "C:\dev\BASINS40\Bin\MapWindow.exe"
                     StartURL = ""
                     StartWorkingDirectory = ""
                     StartWithIE = "false"
