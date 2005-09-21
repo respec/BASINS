@@ -5,12 +5,14 @@ Imports System.Windows.Forms
 
 Friend Class frmDisplaySeasonalAttributes
   Inherits System.Windows.Forms.Form
+  Private pInitializing As Boolean
 
 #Region " Windows Form Designer generated code "
 
   Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
         Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
     MyBase.New()
+    pInitializing = True
     pDataManager = aDataManager
     If aDataGroup Is Nothing Then
       pDataGroup = New atcDataGroup
@@ -25,9 +27,10 @@ Friend Class frmDisplaySeasonalAttributes
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some Data
-      mnuFileAdd_Click(Nothing, Nothing)
+      pDataManager.UserSelectData(, pDataGroup, True)
     End If
 
+    pInitializing = False
     If pDataGroup.Count > 0 Then
       PopulateGrid()
     Else 'user declined to specify Data
@@ -185,12 +188,12 @@ Friend Class frmDisplaySeasonalAttributes
   End Sub
 
   Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
-    PopulateGrid()
+    If Not pInitializing Then PopulateGrid()
     'TODO: could efficiently insert newly added item(s)
   End Sub
 
   Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
-    PopulateGrid()
+    If Not pInitializing Then PopulateGrid()
     'TODO: could efficiently remove by serial number
   End Sub
 
@@ -221,9 +224,10 @@ Friend Class frmDisplaySeasonalAttributes
         Dim newArguments As New atcDataAttributes
         newArguments.SetValue("Timeseries", pDataGroup)
         newSource.Open("SeasonalAttributes", newArguments)
-        Exit Sub
+        Exit For
       End If
     Next
+    PopulateGrid()
   End Sub
 
   Public Overrides Function ToString() As String
