@@ -181,13 +181,14 @@ Public Class atcTimeseriesNdayHighLow
 
       Dim newTsGroup As New atcDataGroup
 
-      For Each lNDayNow As Integer In lNDay
+      For Each lNDayNow As Double In lNDay
+        Dim lsjday = sjday
         For indexNew = 1 To nYears
-          Dim nextSJday As Double = TimAddJ(sjday, lTimeCode, 1, 1)
-          Dim oneYear As atcTimeseries = SubsetByDate(aTS, sjday, nextSJday, Me)
+          Dim nextSJday As Double = TimAddJ(lsjday, lTimeCode, 1, 1)
+          Dim oneYear As atcTimeseries = SubsetByDate(aTS, lsjday, nextSJday, Me)
           newDates(indexNew) = nextSJday
-          newValues(indexNew) = HighOrLowValue(oneYear, lNDayNow, aHigh)
-          sjday = nextSJday
+          newValues(indexNew) = HighOrLowValue(oneYear, CInt(lNDayNow), aHigh)
+          lsjday = nextSJday
         Next
 
         Dim newTS As New atcTimeseries(Me)
@@ -220,7 +221,7 @@ Public Class atcTimeseriesNdayHighLow
       Return newTsGroup
 
     Catch ex As Exception
-      Stop
+      LogDbg(ex.ToString)
     End Try
   End Function
 
@@ -252,38 +253,43 @@ Public Class atcTimeseriesNdayHighLow
           Dim lArgsMath As New atcDataAttributes
           lTsMath = New atcTimeseriesMath.atcTimeseriesMath
           lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
-          'DataManager.OpenDataSource(lTsMath, "log 10", lArgsMath)
           lTsMath.Open("log 10", lArgsMath)
           lNdayTs = lTsMath.DataSets(0)
         End If
+        Dim lNday As Integer = lNdayTs.Attributes.GetValue("NDay")
 
-        Dim lQ As Double = PearsonType3(lNdayTs, aRecurOrProb, aHigh)
+        For Each lRecurOrProbNow As Double In lRecurOrProb
+          Dim lQ As Double = PearsonType3(lNdayTs, lRecurOrProbNow, aHigh)
 
-        If aLogFg Then 'remove log10 transform 
-          lQ = 10 ^ lQ
+          If aLogFg Then 'remove log10 transform 
+            lQ = 10 ^ lQ
+          End If
+
+          Dim lS As String
+          If lNday = 7 And lRecurOrProbNow = 10 And Not aHigh Then
+            lS = lNday & "Q" & lRecurOrProbNow
+          ElseIf aHigh Then
+            lS = lNday & "Hi" & lRecurOrProbNow
+          Else
+            lS = lNday & "Low" & lRecurOrProbNow
+          End If
+          Dim lNewAttribute As New atcAttributeDefinition
+          With lNewAttribute
+            .Name = lS
+            .Description = lS
+            .DefaultValue = ""
+            .Editable = False
+            .TypeString = "Double"
+            .Calculator = Me
+            .Category = "nDay & Frequency"
+          End With
+          aTimeseries.Attributes.SetValue(lNewAttribute, lQ)
+        Next
+
+        If aLogFg Then 'remove log10 transform timser
           DataManager.DataSources.Remove(lTsMath)
           lTsMath = Nothing
         End If
-
-        Dim lS As String
-        If aNDay = 7 And aRecurOrProb = 10 And Not aHigh Then
-          lS = aNDay & "Q" & aRecurOrProb
-        ElseIf aHigh Then
-          lS = aNDay & "Hi" & aRecurOrProb
-        Else
-          lS = aNDay & "Low" & aRecurOrProb
-        End If
-        Dim lNewAttribute As New atcAttributeDefinition
-        With lNewAttribute
-          .Name = lS
-          .Description = lS
-          .DefaultValue = ""
-          .Editable = False
-          .TypeString = "Double"
-          .Calculator = Me
-          .Category = "nDay & Frequency"
-        End With
-        aTimeseries.Attributes.SetValue(lNewAttribute, lQ)
 
         If Not (aTimeseries Is lNdayTs) Then 'get rid of intermediate timeseries
           lNdayTs = Nothing

@@ -124,7 +124,7 @@ Public Class atcTimeseriesStatistics
 
       Dim lGeoMean As Double = 0
       Dim lStdDev As Double = Double.NaN
-      Dim lCount As Integer = 0
+      Dim lCount As Double = 0
       Dim lMean As Double = Double.NaN
       Dim lSum As Double = 0
       Dim lSumDevSquares As Double = 0
@@ -146,21 +146,19 @@ Public Class atcTimeseriesStatistics
         End If
       Next
 
+      aTimeseries.Attributes.SetValue("Count", CInt(lCount))
       If lCount > 0 Then
         aTimeseries.Attributes.SetValue("SJDay", aTimeseries.Dates.Value(0))
         aTimeseries.Attributes.SetValue("EJDay", aTimeseries.Dates.Value(lLastValueIndex))
         aTimeseries.Attributes.SetValue("Max", lMax)
         aTimeseries.Attributes.SetValue("Min", lMin)
         aTimeseries.Attributes.SetValue("Sum", lSum)
-        aTimeseries.Attributes.SetValue("Count", lCount)
         lMean = lSum / lCount
         aTimeseries.Attributes.SetValue("Mean", lMean)
         If lMin > 0 Then
           lGeoMean = Math.Exp(lGeoMean / lCount)
           aTimeseries.Attributes.SetValue("Geometric Mean", lGeoMean)
         End If
-      Else
-        aTimeseries.Attributes.SetValue("Count", 0)
       End If
 
       If lCount > 1 Then
