@@ -86,7 +86,7 @@ Public Class atcDataAttributes
             Return DoubleToString(lValue)
           End If
         ElseIf TypeOf (lValue) Is Integer Then
-          Return Format(lValue, "#,###")
+          Return Format(lValue, "#,###;-#,###;0")
         ElseIf TypeOf (lValue) Is atcTimeseries Then
           Return lValue.ToString
         ElseIf TypeOf (lValue) Is atcDataGroup Then
