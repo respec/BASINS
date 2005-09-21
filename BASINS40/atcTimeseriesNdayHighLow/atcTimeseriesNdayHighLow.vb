@@ -175,13 +175,13 @@ Public Class atcTimeseriesNdayHighLow
         nYears += 1
       End If
 
-      Dim newValues(nYears) As Double
-      Dim newDates(nYears) As Double
-      newDates(0) = sjday
-
       Dim newTsGroup As New atcDataGroup
 
       For Each lNDayNow As Double In lNDay
+        Dim newValues(nYears) As Double
+        Dim newDates(nYears) As Double
+        newDates(0) = sjday
+
         Dim lsjday = sjday
         For indexNew = 1 To nYears
           Dim nextSJday As Double = TimAddJ(lsjday, lTimeCode, 1, 1)
