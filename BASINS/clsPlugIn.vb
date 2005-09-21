@@ -535,6 +535,8 @@ Public Class PlugIn
         Dim lScriptFileName As String = PathNameOnly(g_MapWin.Plugins.PluginFolder) & "\script\" & aScript
         If FileExists(lScriptFileName) Then
           aScript = lScriptFileName
+        Else
+          MsgBox("Can't find " & lScriptFileName)
         End If
       End If
     End If
