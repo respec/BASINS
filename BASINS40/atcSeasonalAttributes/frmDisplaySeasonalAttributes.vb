@@ -225,4 +225,20 @@ Friend Class frmDisplaySeasonalAttributes
       End If
     Next
   End Sub
+
+  Public Overrides Function ToString() As String
+    Return agdMain.ToString
+  End Function
+
+  'True for rows and columns to be swapped, false for normal orientation
+  Public Property SwapRowsColumns() As Boolean
+    Get
+      Return pSource.SwapRowsColumns
+    End Get
+    Set(ByVal newValue As Boolean)
+      pSource.SwapRowsColumns = newValue
+    End Set
+  End Property
+
+
 End Class
