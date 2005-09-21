@@ -33,7 +33,7 @@ Friend Class atcListGridSource
       If aColumn = 0 Then
         Return pDataManager.DisplayAttributes(aRow)
       Else
-        Return pDataGroup(aColumn - 1).Attributes.GetValue(pDataManager.DisplayAttributes(aRow))
+        Return pDataGroup(aColumn - 1).Attributes.GetFormattedValue(pDataManager.DisplayAttributes(aRow))
       End If
     End Get
     Set(ByVal Value As String)

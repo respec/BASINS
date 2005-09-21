@@ -95,12 +95,9 @@ Public Class atcSeasonPlugin
         Case "seasonalattributes"
           Dim lAttributes As atcDataAttributes = aArgs.GetValue("Attributes")
           Dim lCalculatedAttributes As atcDataAttributes = aArgs.GetValue("CalculatedAttributes")
-          If lAttributes Is Nothing Then
+          If lAttributes Is Nothing OrElse lAttributes.Count = 0 Then
             Dim lForm As New frmSpecifySeasonalAttributes
-            lAttributes = lForm.AskUser(ltsGroup, AvailableOperations(False, True))
-          End If
-          If lAttributes Is Nothing Then
-            LogDbg("No seasonal attributes found to calculate")
+            lForm.AskUser(ltsGroup, AvailableOperations(False, True))
           Else
             For Each lts As atcTimeseries In ltsGroup
               pSeasons.SetSeasonalAttributes(lts, lAttributes, lCalculatedAttributes)
