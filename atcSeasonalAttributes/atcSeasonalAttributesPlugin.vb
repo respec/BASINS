@@ -33,7 +33,7 @@ Public Class atcSeasonalAttributesPlugin
     For Each lOption As String In aOptions
       Select Case lOption
         Case "SwapRowsColumns"
-          lForm.agdMain.Source.SwapRowsColumns = True
+          lForm.SwapRowsColumns = True
       End Select
     Next
 
