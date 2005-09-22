@@ -39,8 +39,10 @@ Module modFreq
       Dim lLogarh As Integer = 2 'log trans flag 1-yes,2-no (handle earlier)
 
       'be sure aRecurOrProb is available in lSe
-      Dim lSe() As Single = {0.005, 0.01, 0.02, 0.04, 0.05, 0.1, 0.2, 0.3333, 0.5, _
-                             0.6667, 0.8, 0.9, 0.95, 0.96, 0.98, 0.99, 0.995}
+      Dim lSe() As Single = {0.9999, 0.9995, 0.999, 0.998, 0.995, 0.99, 0.98, 0.975, _
+                             0.96, 0.95, 0.9, 0.8, 0.7, 0.6667, 0.6, 0.5704, _
+                             0.5, 0.4292, 0.4, 0.3333, 0.3, 0.2, 0.1, 0.05, 0.04, _
+                             0.025, 0.02, 0.01, 0.005, 0.002, 0.001, 0.0005, 0.0001}
       Dim lI As Integer = UBound(lSe)  'number of recurrence intervals to calculate-1
 
       Dim lC(lI) As Single

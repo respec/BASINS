@@ -48,20 +48,7 @@ Public Class atcSeasonPlugin
     If aArgs Is Nothing Then
       ltsGroup = DataManager.UserSelectData("Select data for " & aOperationName)
     Else
-      Try
-        ltsGroup = aArgs.GetValue("Timeseries")
-      Catch
-      End Try
-      If ltsGroup Is Nothing Then
-        Dim lts As atcTimeseries
-        Try
-          lts = aArgs.GetValue("Timeseries")
-          If Not lts Is Nothing Then
-            ltsGroup = New atcDataGroup(lts)
-          End If
-        Catch
-        End Try
-      End If
+      ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
     End If
     If Not ltsGroup Is Nothing Then
       If aOperationName.IndexOf("::") > 0 Then
