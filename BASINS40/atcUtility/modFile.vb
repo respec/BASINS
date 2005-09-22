@@ -467,6 +467,12 @@ NoSuchFile:
       End If
       If Len(baseFileName) > 0 Then
         lFileName = aDefaultFileName
+        If Not FileExists(lFileName, True) Then 'Look in directory containing current .exe
+          lFileName = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\" & baseFileName
+        End If
+        If Not FileExists(lFileName, True) Then 'Look in directory containing current plugin
+          lFileName = PathNameOnly(System.Reflection.Assembly.GetExecutingAssembly.Location) & "\" & baseFileName
+        End If
         If Not FileExists(lFileName, True) Then lFileName = "c:\" & baseFileName
         If Not FileExists(lFileName, True) Then lFileName = "c:\winnt\" & baseFileName
         If Not FileExists(lFileName, True) Then lFileName = "c:\winnt\system\" & baseFileName
@@ -481,9 +487,6 @@ NoSuchFile:
         If Not FileExists(lFileName, True) Then lFileName = "d:\BASINS\models\HSPF\bin\" & baseFileName
         If Not FileExists(lFileName, True) Then lFileName = "d:\BASINS\models\HSPF\WDMUtil\" & baseFileName
         If Not FileExists(lFileName, True) Then lFileName = "d:\BASINS\etc\" & baseFileName
-        If Not FileExists(lFileName, True) Then 'Look in directory containing current .exe
-          lFileName = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\" & baseFileName
-        End If
         If FileExists(lFileName, True) Then
           aDefaultFileName = lFileName
         Else
