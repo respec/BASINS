@@ -2,6 +2,8 @@ Option Strict Off
 Option Explicit On 
 
 Imports System.IO
+Imports System.Windows.Forms
+
 
 Public Module modLog
 
@@ -11,8 +13,10 @@ Public Module modLog
 
     'MsgBox(CurDir() & vbCrLf & msg)
 
+    Dim lLogFileName As String = PathNameOnly(Application.ExecutablePath) & "\Basins.Log"
+
     Dim lT As String
-    Dim lW As StreamWriter = File.AppendText("c:\test\errorVb.fil") 'todo:don't hard code this!
+    Dim lW As StreamWriter = File.AppendText(lLogFileName) 'todo:don't hard code this!
     With Now
       lT = Format(.Hour, "00") & ":" & _
            Format(.Minute, "00") & ":" & _
