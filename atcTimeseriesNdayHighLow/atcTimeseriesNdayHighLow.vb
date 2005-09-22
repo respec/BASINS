@@ -276,6 +276,7 @@ Public Class atcTimeseriesNdayHighLow
           Else
             lS = lNday & "Low" & DoubleToString(lRecurOrProbNow, , "#0.####")
           End If
+
           Dim lNewAttribute As New atcAttributeDefinition
           With lNewAttribute
             .Name = lS
@@ -286,7 +287,12 @@ Public Class atcTimeseriesNdayHighLow
             .Calculator = Me
             .Category = "nDay & Frequency"
           End With
-          aTimeseries.Attributes.SetValue(lNewAttribute, lQ)
+
+          Dim lArguments As New atcDataAttributes
+          lArguments.SetValue("Nday", lNday)
+          lArguments.SetValue("Return Period", lRecurOrProbNow)
+
+          aTimeseries.Attributes.SetValue(lNewAttribute, lQ, lArguments)
         Next
 
         If aLogFg Then 'remove log10 transform timser

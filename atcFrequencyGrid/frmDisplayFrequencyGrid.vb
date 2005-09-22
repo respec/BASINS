@@ -3,7 +3,7 @@ Imports atcUtility
 
 Imports System.Windows.Forms
 
-Friend Class frmDisplaySeasonalAttributes
+Friend Class frmDisplayFrequencyGrid
   Inherits System.Windows.Forms.Form
   Private pInitializing As Boolean
 
@@ -61,17 +61,17 @@ Friend Class frmDisplaySeasonalAttributes
   Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
   Friend WithEvents agdMain As atcControls.atcGrid
   Friend WithEvents mnuView As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuViewSeasonColumns As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuViewSeasonRows As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuViewColumns As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuViewRows As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAddAttributes As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySeasonalAttributes))
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplayFrequencyGrid))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
     Me.mnuView = New System.Windows.Forms.MenuItem
-    Me.mnuViewSeasonColumns = New System.Windows.Forms.MenuItem
-    Me.mnuViewSeasonRows = New System.Windows.Forms.MenuItem
+    Me.mnuViewColumns = New System.Windows.Forms.MenuItem
+    Me.mnuViewRows = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
     Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
@@ -95,18 +95,18 @@ Friend Class frmDisplaySeasonalAttributes
     'mnuView
     '
     Me.mnuView.Index = 1
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewSeasonColumns, Me.mnuViewSeasonRows})
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewColumns, Me.mnuViewRows})
     Me.mnuView.Text = "&View"
     '
-    'mnuViewSeasonColumns
+    'mnuViewColumns
     '
-    Me.mnuViewSeasonColumns.Index = 0
-    Me.mnuViewSeasonColumns.Text = "Season Columns"
+    Me.mnuViewColumns.Index = 0
+    Me.mnuViewColumns.Text = "Season Columns"
     '
-    'mnuViewSeasonRows
+    'mnuViewRows
     '
-    Me.mnuViewSeasonRows.Index = 1
-    Me.mnuViewSeasonRows.Text = "Season Rows"
+    Me.mnuViewRows.Index = 1
+    Me.mnuViewRows.Text = "Season Rows"
     '
     'mnuAnalysis
     '
@@ -129,14 +129,14 @@ Friend Class frmDisplaySeasonalAttributes
     Me.mnuAddAttributes.Index = 1
     Me.mnuAddAttributes.Text = "Add Attributes"
     '
-    'frmDisplaySeasonalAttributes
+    'frmDisplayFrequencyGrid
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(528, 545)
     Me.Controls.Add(Me.agdMain)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
-    Me.Name = "frmDisplaySeasonalAttributes"
+    Me.Name = "frmDisplayFrequencyGrid"
     Me.Text = "Seasonal Attributes"
     Me.ResumeLayout(False)
 
@@ -150,14 +150,14 @@ Friend Class frmDisplaySeasonalAttributes
   Private WithEvents pDataGroup As atcDataGroup
 
   'Translator class between pDataGroup and agdMain
-  Private pSource As atcSeasonalAttributesGridSource
+  Private pSource As atcFrequencyGridSource
 
   Private Sub PopulateGrid()
     Dim lWasSwapped As Boolean = Not pSource Is Nothing AndAlso pSource.SwapRowsColumns
-    pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
+    pSource = New atcFrequencyGridSource(pDataManager, pDataGroup)
     If pSource.Columns < 3 Then
       UserSpecifyAttributes()
-      pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
+      pSource = New atcFrequencyGridSource(pDataManager, pDataGroup)
     End If
     If lWasSwapped Then pSource.SwapRowsColumns = True
     agdMain.Initialize(pSource)
@@ -193,14 +193,14 @@ Friend Class frmDisplaySeasonalAttributes
     'TODO: could efficiently remove by serial number
   End Sub
 
-  Private Sub mnuViewSeasonColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewSeasonColumns.Click
+  Private Sub mnuViewColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewColumns.Click
     If pSource.SwapRowsColumns Then
       pSource.SwapRowsColumns = False
       agdMain.Refresh()
     End If
   End Sub
 
-  Private Sub mnuViewSeasonRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewSeasonRows.Click
+  Private Sub mnuViewRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewRows.Click
     If Not pSource.SwapRowsColumns Then
       pSource.SwapRowsColumns = True
       agdMain.Refresh()
@@ -213,17 +213,19 @@ Friend Class frmDisplaySeasonalAttributes
   End Sub
 
   Private Sub UserSpecifyAttributes()
-    For Each lPlugin As atcDataPlugin In pDataManager.GetPlugins(GetType(atcDataSource))
-      If (lPlugin.Name = "Timeseries::Seasonal") Then
-        Dim typ As System.Type = lPlugin.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        Dim newSource As atcDataSource = asm.CreateInstance(typ.FullName)
-        Dim newArguments As New atcDataAttributes
-        newArguments.SetValue("Timeseries", pDataGroup)
-        newSource.Open("SeasonalAttributes", newArguments)
-        Exit For
-      End If
-    Next
+    Dim lForm As New frmSpecifyFrequency
+    lForm.AskUser(pDataGroup)
+    'For Each lPlugin As atcDataPlugin In pDataManager.GetPlugins(GetType(atcDataSource))
+    '  If (lPlugin.Name = "Timeseries::Seasonal") Then
+    '    Dim typ As System.Type = lPlugin.GetType()
+    '    Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+    '    Dim newSource As atcDataSource = asm.CreateInstance(typ.FullName)
+    '    Dim newArguments As New atcDataAttributes
+    '    newArguments.SetValue("Timeseries", pDataGroup)
+    '    newSource.Open("FrequencyGrid", newArguments)
+    '    Exit For
+    '  End If
+    'Next
   End Sub
 
   Public Overrides Function ToString() As String
