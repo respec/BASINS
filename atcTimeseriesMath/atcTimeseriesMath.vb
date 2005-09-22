@@ -99,6 +99,28 @@ Public Class atcTimeseriesMath
           .Max = Double.PositiveInfinity
         End With
 
+        Dim defBoundaryMonth As New atcAttributeDefinition
+        With defBoundaryMonth
+          .Name = "Boundary Month"
+          .Description = "Integer"
+          .DefaultValue = 10
+          .Editable = True
+          .TypeString = "Integer"
+          .Min = 1
+          .Max = 12
+        End With
+
+        Dim defBoundaryDay As New atcAttributeDefinition
+        With defBoundaryDay
+          .Name = "Boundary Day"
+          .Description = "Integer"
+          .DefaultValue = 1
+          .Editable = True
+          .TypeString = "Integer"
+          .Min = 1
+          .Max = 31
+        End With
+
         AddOperation("Add", "Add to each value", defTimeSeriesGroup, defDouble)
 
         AddOperation("Subtract", "Subtract from each value of first timeseries", defTimeSeriesOne, defDouble)
@@ -135,6 +157,9 @@ Public Class atcTimeseriesMath
 
         AddOperation("Subset by date", "Choose start and end dates", defTimeSeriesOne, defStartDate, defEndDate)
         pAvailableOperations.GetDefinition("Subset by date").Category = "Date"
+
+        AddOperation("Subset by date boundary", "Choose boundary month and day", defTimeSeriesOne, defBoundaryMonth, defBoundaryDay)
+        pAvailableOperations.GetDefinition("Subset by date boundary").Category = "Date"
 
         AddOperation("Merge", "Choose data to merge", defTimeSeriesGroup)
         pAvailableOperations.GetDefinition("Merge").Category = "Date"
@@ -407,6 +432,12 @@ Public Class atcTimeseriesMath
           Dim EndDate As Double = CDbl(lArg)
           AddDataSet(SubsetByDate(firstTS, StartDate, EndDate, Me))
         End If
+        ReDim newVals(-1) 'Don't create new timeseries below
+
+      Case "subset by date boundary"
+        Dim lBoundaryMonth As Integer = aArgs.GetValue("Boundary Month")
+        Dim lBoundaryDay As Integer = aArgs.GetValue("Boundary Day")
+        AddDataSet(SubsetByDateBoundary(firstTS, lBoundaryMonth, lBoundaryDay, Me))
         ReDim newVals(-1) 'Don't create new timeseries below
 
       Case "merge"

@@ -6,27 +6,31 @@ Imports System.Windows.Forms
 
 
 Public Module modLog
+  Private pLogFileName As String = PathNameOnly(Application.ExecutablePath) & "\Basins.Log"
+  Private pLogTimeStamp As Boolean = True
 
-    'Log a debugging trace message
-  Public Sub LogDbg(ByRef msg As String)
-    'System.Diagnostics.Debug.WriteLine(msg)
+  Public Sub SetLogFileName(ByVal aLogFileName As String, Optional ByVal aAppend As Boolean = False)
+    If Not aAppend AndAlso FileExists(aLogFileName) Then Kill(aLogFileName)
+    pLogFileName = aLogFileName
+  End Sub
 
-    'MsgBox(CurDir() & vbCrLf & msg)
+  Public Sub SetLogTimeStamp(ByVal aLogTimeStamp As Boolean)
+    pLogTimeStamp = aLogTimeStamp
+  End Sub
 
-    Dim lLogFileName As String = PathNameOnly(Application.ExecutablePath) & "\Basins.Log"
-
+  Public Sub LogDbg(ByRef aMsg As String)  'Log a debugging trace message
     Dim lT As String
-    Dim lW As StreamWriter = File.AppendText(lLogFileName) 'todo:don't hard code this!
-    With Now
-      lT = Format(.Hour, "00") & ":" & _
-           Format(.Minute, "00") & ":" & _
-           Format(.Second, "00") & "." & _
-           Format(.Millisecond, "000") & " : "
-    End With
-    lW.WriteLine(lT & msg)
+    If pLogTimeStamp Then
+      With Now
+        lT = Format(.Hour, "00") & ":" & _
+             Format(.Minute, "00") & ":" & _
+             Format(.Second, "00") & "." & _
+             Format(.Millisecond, "000") & " : "
+      End With
+    End If
+    Dim lW As StreamWriter = File.AppendText(pLogFileName)
+    lW.WriteLine(lT & aMsg)
     lW.Close()
-
-    'F90_MSG(msg, Len(msg)) 'dont leave this in production version, remove modHass_Ent.vb
 
     'If Not (gIPC Is Nothing) Then gIPC.dbg(msg)
 

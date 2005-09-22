@@ -43,7 +43,7 @@ Public Class atcTimeseriesNdayHighLow
         With defDays
           .Name = "NDay"
           .Description = "Number of days"
-          .DefaultValue = ""
+          .DefaultValue = New Double() {1, 2, 3, 7, 10, 30, 60, 90, 183, 365}
           .Editable = True
           .TypeString = "Double"
         End With
@@ -52,7 +52,10 @@ Public Class atcTimeseriesNdayHighLow
         With defReturnPeriod
           .Name = "Return Period"
           .Description = "Number of years"
-          .DefaultValue = ""
+          .DefaultValue = New Double() {1 / 0.9999, 1 / 0.9995, 1 / 0.999, 1 / 0.998, 1 / 0.995, _
+                                        1 / 0.99, 1 / 0.98, 1 / 0.975, 1 / 0.96, 1 / 0.95, 1 / 0.9, _
+                                        1.25, 1.5, 2, 3, 3.333, 5, 10, 20, 25, 40, 50, 100, _
+                                        200, 500, 1000, 2000, 10000}
           .Editable = True
           .TypeString = "Double"
         End With
@@ -269,9 +272,9 @@ Public Class atcTimeseriesNdayHighLow
           If lNday = 7 And lRecurOrProbNow = 10 And Not aHigh Then
             lS = lNday & "Q" & lRecurOrProbNow
           ElseIf aHigh Then
-            lS = lNday & "Hi" & lRecurOrProbNow
+            lS = lNday & "Hi" & DoubleToString(lRecurOrProbNow, , "#0.####")
           Else
-            lS = lNday & "Low" & lRecurOrProbNow
+            lS = lNday & "Low" & DoubleToString(lRecurOrProbNow, , "#0.####")
           End If
           Dim lNewAttribute As New atcAttributeDefinition
           With lNewAttribute
@@ -329,10 +332,10 @@ Public Class atcTimeseriesNdayHighLow
       lReturn = 100
       lLogFlg = True
     Else
-      ltsGroup = aArgs.GetValue("Timeseries")
+      ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
       lLogFlg = aArgs.GetValue("LogFlg", True)
-      lNDay = aArgs.GetValue("NDay", 1)
-      lReturn = aArgs.GetValue("Return Period", 100)
+      lNDay = aArgs.GetValue("NDay")
+      lReturn = aArgs.GetValue("Return Period")
     End If
 
     Select Case lOperationName

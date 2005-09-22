@@ -1,3 +1,5 @@
+Imports atcUtility
+
 Public Module modTimeseriesMath
 
   Public Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
@@ -36,13 +38,46 @@ Public Module modTimeseriesMath
 
   End Function
 
-  'Public Sub CopyBaseAttributes(ByVal aFromDataset As atcDataSet, ByVal aToDataSet As atcDataSet)
-  '  For Each lAttribute As atcDefinedValue In aFromDataset.Attributes
-  '    If Not (lAttribute.Definition.Calculated) Then
-  '      aToDataSet.Attributes.SetValue(lAttribute.Definition, lAttribute.Value)
-  '    End If
-  '  Next
-  'End Sub
+  Public Function SubsetByDateBoundary(ByVal aTimeseries As atcTimeseries, _
+                                       ByVal aBoundaryMonth As Integer, _
+                                       ByVal aBoundaryDay As Integer, _
+                                       ByVal aDataSource As atcDataSource) As atcTimeseries
+    Dim lStartDate As Double
+    Dim lEndDate As Double
+    Dim lStartTimeseriesDate As Date
+    Dim lEndTimeseriesDate As Date
+    Dim lStartYear As Integer
+    Dim lEndYear As Integer
+
+    'TODO: boundary conditions...
+    lStartTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(0))
+    With lStartTimeseriesDate
+      lStartYear = .Year
+      If .Month > aBoundaryMonth Then
+        lStartYear += 1
+      ElseIf .Month = aBoundaryMonth Then
+        If .Day > aBoundaryDay Then
+          lStartYear += 1
+        End If
+      End If
+      lStartDate = Jday(lStartYear, aBoundaryMonth, aBoundaryDay, 0, 0, 0)
+    End With
+
+    lEndTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(aTimeseries.Dates.numValues))
+    With lEndTimeseriesDate
+      lEndYear = .Year
+      If .Month < aBoundaryMonth Then
+        lEndYear -= 1
+      ElseIf .Month = aBoundaryMonth Then
+        If .Day < aBoundaryDay Then
+          lEndYear -= 1
+        End If
+      End If
+      lEndDate = Jday(lEndYear, aBoundaryMonth, aBoundaryDay, 0, 0, 0)
+    End With
+
+    Return SubsetByDate(aTimeseries, lStartDate, lEndDate, aDataSource)
+  End Function
 
   Public Sub CopyBaseAttributes(ByVal aFromDataset As atcTimeseries, ByVal aToDataSet As atcTimeseries, _
                                 Optional ByVal aNumValues As Integer = 0, _
@@ -187,5 +222,15 @@ Public Module modTimeseriesMath
     Next
   End Sub
 
+  Public Function DatasetOrGroupToGroup(ByVal aObj As Object) As atcDataGroup
+    Try
+      Return aObj
+    Catch
+    End Try
+    Try
+      Return New atcDataGroup(aObj)
+    Catch
+    End Try
 
+  End Function
 End Module
