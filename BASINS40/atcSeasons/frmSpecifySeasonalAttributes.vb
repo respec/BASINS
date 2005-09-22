@@ -48,7 +48,6 @@ Public Class frmSpecifySeasonalAttributes
   Friend WithEvents btnCancel As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Me.panelTop = New System.Windows.Forms.Panel
-    Me.panelBottom = New System.Windows.Forms.Panel
     Me.grpSeasons = New System.Windows.Forms.GroupBox
     Me.btnSeasonsNone = New System.Windows.Forms.Button
     Me.btnSeasonsAll = New System.Windows.Forms.Button
@@ -59,12 +58,13 @@ Public Class frmSpecifySeasonalAttributes
     Me.btnAttributesNone = New System.Windows.Forms.Button
     Me.btnAttributesAll = New System.Windows.Forms.Button
     Me.lstAttributes = New System.Windows.Forms.ListBox
-    Me.btnOk = New System.Windows.Forms.Button
+    Me.panelBottom = New System.Windows.Forms.Panel
     Me.btnCancel = New System.Windows.Forms.Button
+    Me.btnOk = New System.Windows.Forms.Button
     Me.panelTop.SuspendLayout()
-    Me.panelBottom.SuspendLayout()
     Me.grpSeasons.SuspendLayout()
     Me.grpAttributes.SuspendLayout()
+    Me.panelBottom.SuspendLayout()
     Me.SuspendLayout()
     '
     'panelTop
@@ -77,18 +77,8 @@ Public Class frmSpecifySeasonalAttributes
     Me.panelTop.Controls.Add(Me.grpAttributes)
     Me.panelTop.Location = New System.Drawing.Point(0, 0)
     Me.panelTop.Name = "panelTop"
-    Me.panelTop.Size = New System.Drawing.Size(400, 344)
+    Me.panelTop.Size = New System.Drawing.Size(408, 328)
     Me.panelTop.TabIndex = 14
-    '
-    'panelBottom
-    '
-    Me.panelBottom.Controls.Add(Me.btnCancel)
-    Me.panelBottom.Controls.Add(Me.btnOk)
-    Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.panelBottom.Location = New System.Drawing.Point(0, 357)
-    Me.panelBottom.Name = "panelBottom"
-    Me.panelBottom.Size = New System.Drawing.Size(400, 32)
-    Me.panelBottom.TabIndex = 15
     '
     'grpSeasons
     '
@@ -99,7 +89,7 @@ Public Class frmSpecifySeasonalAttributes
     Me.grpSeasons.Dock = System.Windows.Forms.DockStyle.Fill
     Me.grpSeasons.Location = New System.Drawing.Point(208, 0)
     Me.grpSeasons.Name = "grpSeasons"
-    Me.grpSeasons.Size = New System.Drawing.Size(192, 344)
+    Me.grpSeasons.Size = New System.Drawing.Size(200, 328)
     Me.grpSeasons.TabIndex = 14
     Me.grpSeasons.TabStop = False
     Me.grpSeasons.Text = "Seasons"
@@ -107,7 +97,7 @@ Public Class frmSpecifySeasonalAttributes
     'btnSeasonsNone
     '
     Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnSeasonsNone.Location = New System.Drawing.Point(120, 307)
+    Me.btnSeasonsNone.Location = New System.Drawing.Point(128, 291)
     Me.btnSeasonsNone.Name = "btnSeasonsNone"
     Me.btnSeasonsNone.Size = New System.Drawing.Size(64, 23)
     Me.btnSeasonsNone.TabIndex = 12
@@ -116,7 +106,7 @@ Public Class frmSpecifySeasonalAttributes
     'btnSeasonsAll
     '
     Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnSeasonsAll.Location = New System.Drawing.Point(8, 307)
+    Me.btnSeasonsAll.Location = New System.Drawing.Point(8, 291)
     Me.btnSeasonsAll.Name = "btnSeasonsAll"
     Me.btnSeasonsAll.Size = New System.Drawing.Size(64, 24)
     Me.btnSeasonsAll.TabIndex = 11
@@ -130,8 +120,8 @@ Public Class frmSpecifySeasonalAttributes
     Me.lstSeasons.IntegralHeight = False
     Me.lstSeasons.Location = New System.Drawing.Point(8, 40)
     Me.lstSeasons.Name = "lstSeasons"
-    Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-    Me.lstSeasons.Size = New System.Drawing.Size(176, 259)
+    Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+    Me.lstSeasons.Size = New System.Drawing.Size(184, 243)
     Me.lstSeasons.TabIndex = 7
     '
     'cboSeasons
@@ -141,14 +131,14 @@ Public Class frmSpecifySeasonalAttributes
     Me.cboSeasons.Enabled = False
     Me.cboSeasons.Location = New System.Drawing.Point(8, 16)
     Me.cboSeasons.Name = "cboSeasons"
-    Me.cboSeasons.Size = New System.Drawing.Size(176, 21)
+    Me.cboSeasons.Size = New System.Drawing.Size(184, 21)
     Me.cboSeasons.TabIndex = 6
     '
     'Splitter1
     '
     Me.Splitter1.Location = New System.Drawing.Point(200, 0)
     Me.Splitter1.Name = "Splitter1"
-    Me.Splitter1.Size = New System.Drawing.Size(8, 344)
+    Me.Splitter1.Size = New System.Drawing.Size(8, 328)
     Me.Splitter1.TabIndex = 13
     Me.Splitter1.TabStop = False
     '
@@ -160,7 +150,7 @@ Public Class frmSpecifySeasonalAttributes
     Me.grpAttributes.Dock = System.Windows.Forms.DockStyle.Left
     Me.grpAttributes.Location = New System.Drawing.Point(0, 0)
     Me.grpAttributes.Name = "grpAttributes"
-    Me.grpAttributes.Size = New System.Drawing.Size(200, 344)
+    Me.grpAttributes.Size = New System.Drawing.Size(200, 328)
     Me.grpAttributes.TabIndex = 12
     Me.grpAttributes.TabStop = False
     Me.grpAttributes.Text = "Attributes"
@@ -168,7 +158,7 @@ Public Class frmSpecifySeasonalAttributes
     'btnAttributesNone
     '
     Me.btnAttributesNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnAttributesNone.Location = New System.Drawing.Point(128, 307)
+    Me.btnAttributesNone.Location = New System.Drawing.Point(128, 291)
     Me.btnAttributesNone.Name = "btnAttributesNone"
     Me.btnAttributesNone.Size = New System.Drawing.Size(64, 23)
     Me.btnAttributesNone.TabIndex = 10
@@ -177,7 +167,7 @@ Public Class frmSpecifySeasonalAttributes
     'btnAttributesAll
     '
     Me.btnAttributesAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnAttributesAll.Location = New System.Drawing.Point(8, 307)
+    Me.btnAttributesAll.Location = New System.Drawing.Point(8, 291)
     Me.btnAttributesAll.Name = "btnAttributesAll"
     Me.btnAttributesAll.Size = New System.Drawing.Size(64, 24)
     Me.btnAttributesAll.TabIndex = 9
@@ -191,17 +181,19 @@ Public Class frmSpecifySeasonalAttributes
     Me.lstAttributes.IntegralHeight = False
     Me.lstAttributes.Location = New System.Drawing.Point(8, 16)
     Me.lstAttributes.Name = "lstAttributes"
-    Me.lstAttributes.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-    Me.lstAttributes.Size = New System.Drawing.Size(184, 283)
+    Me.lstAttributes.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+    Me.lstAttributes.Size = New System.Drawing.Size(184, 267)
     Me.lstAttributes.TabIndex = 7
     '
-    'btnOk
+    'panelBottom
     '
-    Me.btnOk.Location = New System.Drawing.Point(128, 0)
-    Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(64, 24)
-    Me.btnOk.TabIndex = 0
-    Me.btnOk.Text = "Ok"
+    Me.panelBottom.Controls.Add(Me.btnCancel)
+    Me.panelBottom.Controls.Add(Me.btnOk)
+    Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
+    Me.panelBottom.Location = New System.Drawing.Point(0, 341)
+    Me.panelBottom.Name = "panelBottom"
+    Me.panelBottom.Size = New System.Drawing.Size(408, 32)
+    Me.panelBottom.TabIndex = 15
     '
     'btnCancel
     '
@@ -211,18 +203,26 @@ Public Class frmSpecifySeasonalAttributes
     Me.btnCancel.TabIndex = 1
     Me.btnCancel.Text = "Cancel"
     '
+    'btnOk
+    '
+    Me.btnOk.Location = New System.Drawing.Point(128, 0)
+    Me.btnOk.Name = "btnOk"
+    Me.btnOk.Size = New System.Drawing.Size(64, 24)
+    Me.btnOk.TabIndex = 0
+    Me.btnOk.Text = "Ok"
+    '
     'frmSpecifySeasonalAttributes
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(400, 389)
+    Me.ClientSize = New System.Drawing.Size(408, 373)
     Me.Controls.Add(Me.panelTop)
     Me.Controls.Add(Me.panelBottom)
     Me.Name = "frmSpecifySeasonalAttributes"
     Me.Text = "Seasonal Attributes"
     Me.panelTop.ResumeLayout(False)
-    Me.panelBottom.ResumeLayout(False)
     Me.grpSeasons.ResumeLayout(False)
     Me.grpAttributes.ResumeLayout(False)
+    Me.panelBottom.ResumeLayout(False)
     Me.ResumeLayout(False)
 
   End Sub
