@@ -6,13 +6,14 @@ Friend Class atcFrequencyGridSource
   Private pDataGroup As atcDataGroup
   Private pNdays As SortedList
   Private pRecurrence As SortedList
+  Private pHigh As Boolean
 
-  Sub New(ByVal aDataManager As atcData.atcDataManager, _
-          ByVal aDataGroup As atcData.atcDataGroup)
+  Sub New(ByVal aDataGroup As atcData.atcDataGroup)
     pDataGroup = aDataGroup
     pRecurrence = New SortedList
     pNdays = New SortedList
     Dim lKey As String
+    MyBase.ColorCells = True
     For Each lData As atcDataSet In pDataGroup
       For Each lAttribute As atcDefinedValue In lData.Attributes
         If Not lAttribute.Arguments Is Nothing Then
@@ -34,6 +35,15 @@ Friend Class atcFrequencyGridSource
       Next
     Next
   End Sub
+
+  Public Property High() As Boolean
+    Get
+      Return pHigh
+    End Get
+    Set(ByVal newValue As Boolean)
+      pHigh = newValue
+    End Set
+  End Property
 
   Protected Overrides Property ProtectedColumns() As Integer
     Get
@@ -59,22 +69,36 @@ Friend Class atcFrequencyGridSource
     End Set
   End Property
 
+  Public Function DataSetAt(ByVal aRow As Integer) As atcDataSet
+    Return pDataGroup((aRow - 1) \ pRecurrence.Count)
+  End Function
+
+  Public Function NdaysAt(ByVal aColumn) As String
+    Return pNdays.GetByIndex(aColumn - 2)
+  End Function
+
+  Public Function RecurrenceAt(ByVal aRow) As String
+    Return atcUtility.ReplaceString(pRecurrence.GetByIndex((aRow - 1) Mod pRecurrence.Count), ",", "")
+  End Function
+
   Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
       If aRow = 0 Then
         Select Case aColumn
           Case 0 : Return "Data Set"
           Case 1 : Return "Return Period"
-          Case Else : Return pNdays.GetByIndex(aColumn - 2)
+          Case Else : Return NdaysAt(aColumn)
         End Select
       Else
-        Dim lAttributeIndex As Integer = (aRow - 1) Mod pRecurrence.Count
         Select Case aColumn
-          Case 0 : Return pDataGroup((aRow - 1) \ pRecurrence.Count).ToString
-          Case 1 : Return pRecurrence.GetByIndex(lAttributeIndex)
+          Case 0 : Return DataSetAt(aRow).ToString
+          Case 1 : Return RecurrenceAt(aRow)
           Case Else
-            Dim lAttrName As String = pNdays.GetByIndex(aColumn - 2) & "Hi" & pRecurrence.GetByIndex(lAttributeIndex)
-            Return pDataGroup((aRow - 1) \ pRecurrence.Count).Attributes.GetFormattedValue(lAttrName)
+            Dim lAttrName As String = NdaysAt(aColumn)
+            If pHigh Then lAttrName &= "Hi" Else lAttrName &= "Low"
+            'remove any thousands commas in return period
+            lAttrName &= RecurrenceAt(aRow)
+            Return DataSetAt(aRow).Attributes.GetFormattedValue(lAttrName)
         End Select
       End If
     End Get
@@ -91,6 +115,18 @@ Friend Class atcFrequencyGridSource
       End If
     End Get
     Set(ByVal Value As atcControls.atcAlignment)
+    End Set
+  End Property
+
+  Protected Overrides Property ProtectedCellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
+    Get
+      If aColumn > 1 AndAlso aRow > 0 Then
+        Return System.Drawing.SystemColors.Window
+      Else
+        Return System.Drawing.SystemColors.Control
+      End If
+    End Get
+    Set(ByVal Value As System.Drawing.Color)
     End Set
   End Property
 End Class

@@ -64,22 +64,32 @@ Friend Class frmDisplayFrequencyGrid
   Friend WithEvents mnuViewColumns As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewRows As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAddAttributes As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuViewHigh As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuViewLow As System.Windows.Forms.MenuItem
+  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplayFrequencyGrid))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
+    Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuEdit = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuViewColumns = New System.Windows.Forms.MenuItem
     Me.mnuViewRows = New System.Windows.Forms.MenuItem
+    Me.MenuItem1 = New System.Windows.Forms.MenuItem
+    Me.mnuViewHigh = New System.Windows.Forms.MenuItem
+    Me.mnuViewLow = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
-    Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis})
     '
     'mnuFile
     '
@@ -92,25 +102,58 @@ Friend Class frmDisplayFrequencyGrid
     Me.mnuFileAdd.Index = 0
     Me.mnuFileAdd.Text = "Add Timeseries"
     '
+    'mnuAddAttributes
+    '
+    Me.mnuAddAttributes.Index = 1
+    Me.mnuAddAttributes.Text = "Add Attributes"
+    '
+    'mnuEdit
+    '
+    Me.mnuEdit.Index = 1
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
+    Me.mnuEdit.Text = "&Edit"
+    '
+    'mnuEditCopy
+    '
+    Me.mnuEditCopy.Index = 0
+    Me.mnuEditCopy.Text = "Copy"
+    '
     'mnuView
     '
-    Me.mnuView.Index = 1
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewColumns, Me.mnuViewRows})
+    Me.mnuView.Index = 2
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewColumns, Me.mnuViewRows, Me.MenuItem1, Me.mnuViewHigh, Me.mnuViewLow})
     Me.mnuView.Text = "&View"
     '
     'mnuViewColumns
     '
+    Me.mnuViewColumns.Checked = True
     Me.mnuViewColumns.Index = 0
-    Me.mnuViewColumns.Text = "Season Columns"
+    Me.mnuViewColumns.Text = "Columns"
     '
     'mnuViewRows
     '
     Me.mnuViewRows.Index = 1
-    Me.mnuViewRows.Text = "Season Rows"
+    Me.mnuViewRows.Text = "Rows"
+    '
+    'MenuItem1
+    '
+    Me.MenuItem1.Index = 2
+    Me.MenuItem1.Text = "-"
+    '
+    'mnuViewHigh
+    '
+    Me.mnuViewHigh.Checked = True
+    Me.mnuViewHigh.Index = 3
+    Me.mnuViewHigh.Text = "High"
+    '
+    'mnuViewLow
+    '
+    Me.mnuViewLow.Index = 4
+    Me.mnuViewLow.Text = "Low"
     '
     'mnuAnalysis
     '
-    Me.mnuAnalysis.Index = 2
+    Me.mnuAnalysis.Index = 3
     Me.mnuAnalysis.Text = "Analysis"
     '
     'agdMain
@@ -122,12 +165,8 @@ Friend Class frmDisplayFrequencyGrid
     Me.agdMain.Location = New System.Drawing.Point(0, 0)
     Me.agdMain.Name = "agdMain"
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
+    Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
-    '
-    'mnuAddAttributes
-    '
-    Me.mnuAddAttributes.Index = 1
-    Me.mnuAddAttributes.Text = "Add Attributes"
     '
     'frmDisplayFrequencyGrid
     '
@@ -137,7 +176,7 @@ Friend Class frmDisplayFrequencyGrid
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "frmDisplayFrequencyGrid"
-    Me.Text = "Seasonal Attributes"
+    Me.Text = "High Values"
     Me.ResumeLayout(False)
 
   End Sub
@@ -153,13 +192,14 @@ Friend Class frmDisplayFrequencyGrid
   Private pSource As atcFrequencyGridSource
 
   Private Sub PopulateGrid()
-    Dim lWasSwapped As Boolean = Not pSource Is Nothing AndAlso pSource.SwapRowsColumns
-    pSource = New atcFrequencyGridSource(pDataManager, pDataGroup)
+    'Dim lWasSwapped As Boolean = Not pSource Is Nothing AndAlso pSource.SwapRowsColumns
+    pSource = New atcFrequencyGridSource(pDataGroup)
     If pSource.Columns < 3 Then
       UserSpecifyAttributes()
-      pSource = New atcFrequencyGridSource(pDataManager, pDataGroup)
+      pSource = New atcFrequencyGridSource(pDataGroup)
     End If
-    If lWasSwapped Then pSource.SwapRowsColumns = True
+    pSource.SwapRowsColumns = mnuViewRows.Checked
+    pSource.High = mnuViewHigh.Checked
     agdMain.Initialize(pSource)
     agdMain.SizeAllColumnsToContents()
     agdMain.Refresh()
@@ -194,17 +234,33 @@ Friend Class frmDisplayFrequencyGrid
   End Sub
 
   Private Sub mnuViewColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewColumns.Click
-    If pSource.SwapRowsColumns Then
-      pSource.SwapRowsColumns = False
-      agdMain.Refresh()
-    End If
+    mnuViewColumns.Checked = True
+    mnuViewRows.Checked = False
+    pSource.SwapRowsColumns = False
+    agdMain.Refresh()
   End Sub
 
   Private Sub mnuViewRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewRows.Click
-    If Not pSource.SwapRowsColumns Then
-      pSource.SwapRowsColumns = True
-      agdMain.Refresh()
-    End If
+    mnuViewColumns.Checked = False
+    mnuViewRows.Checked = True
+    pSource.SwapRowsColumns = True
+    agdMain.Refresh()
+  End Sub
+
+  Private Sub mnuViewHigh_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewHigh.Click
+    mnuViewHigh.Checked = True
+    mnuViewLow.Checked = False
+    pSource.High = True
+    Me.Text = "High Values"
+    agdMain.Refresh()
+  End Sub
+
+  Private Sub mnuViewLow_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewLow.Click
+    mnuViewHigh.Checked = False
+    mnuViewLow.Checked = True
+    pSource.High = False
+    Me.Text = "Low Values"
+    agdMain.Refresh()
   End Sub
 
   Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
@@ -241,6 +297,38 @@ Friend Class frmDisplayFrequencyGrid
       pSource.SwapRowsColumns = newValue
     End Set
   End Property
+
+  Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
+    Clipboard.SetDataObject(agdMain.ToString)
+  End Sub
+
+  Private Sub agdMain_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMain.MouseDownCell
+    Try
+      Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+      Dim lArgs As New atcDataAttributes
+      Dim lOperationName As String
+
+      If mnuViewHigh.Checked Then
+        lOperationName = "n-day high value"
+      Else
+        lOperationName = "n-day low value"
+      End If
+
+      If pSource.SwapRowsColumns Then
+        lArgs.SetValue("Timeseries", pSource.DataSetAt(aColumn))
+        lArgs.SetValue("NDay", pSource.NdaysAt(aRow))
+        lArgs.SetValue("Return Period", pSource.RecurrenceAt(aColumn))
+      Else
+        lArgs.SetValue("Timeseries", pSource.DataSetAt(aRow))
+        lArgs.SetValue("NDay", pSource.NdaysAt(aColumn))
+        lArgs.SetValue("Return Period", pSource.RecurrenceAt(aRow))
+      End If
+      lCalculator.Open(lOperationName, lArgs)
+      agdMain.Refresh()
+    Catch e As Exception
+      LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
+    End Try
+  End Sub
 
 
 End Class

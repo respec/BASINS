@@ -15,6 +15,8 @@ Public Class atcGridSource
   Private pRows As Integer = 0
   Private pColumns As Integer = 0
   Private pValues(,) As String
+  Private pColors(,) As Color
+  Private pColorCells As Boolean = False
   Private pSwapRowsColumns As Boolean = False
 
   Public Event ChangedRows(ByVal aRows As Integer) 'Number of Rows changed
@@ -39,6 +41,35 @@ Public Class atcGridSource
         ProtectedCellValue(aRow, aColumn) = newValue
       End If
       RaiseEvent ChangedValue(aRow, aColumn)
+    End Set
+  End Property
+
+  'True to use CellColor, False to not color individual cells
+  Property ColorCells() As Boolean
+    Get
+      Return pColorCells
+    End Get
+    Set(ByVal newValue As Boolean)
+      pColorCells = newValue
+    End Set
+  End Property
+
+  'Background color of each cell (not overridable to hide row/column swapping from inheritors)
+  Property CellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As Color
+    Get
+      If pSwapRowsColumns Then
+        Return ProtectedCellColor(aColumn, aRow)
+      Else
+        Return ProtectedCellColor(aRow, aColumn)
+      End If
+    End Get
+    Set(ByVal newValue As Color)
+      If pSwapRowsColumns Then
+        ProtectedCellColor(aColumn, aRow) = newValue
+      Else
+        ProtectedCellColor(aRow, aColumn) = newValue
+      End If
+      'RaiseEvent ChangedValue(aRow, aColumn)
     End Set
   End Property
 
@@ -101,7 +132,6 @@ Public Class atcGridSource
   'Override this instead of CellValue
   Protected Overridable Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
-      Dim lRow As Integer
       If pValues Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
         Return ""
       Else
@@ -117,6 +147,25 @@ Public Class atcGridSource
       If pValues(aRow, aColumn) <> newValue Then
         pValues(aRow, aColumn) = newValue
       End If
+    End Set
+  End Property
+
+  'Override this instead of CellColor
+  Protected Overridable Property ProtectedCellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As Color
+    Get
+      If pColors Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
+        Return Color.White
+      Else
+        Return pColors(aRow, aColumn)
+      End If
+    End Get
+    Set(ByVal newValue As Color)
+      If pColors Is Nothing Then
+        ReDim pColors(Rows, Columns)
+      End If
+      If aRow > Rows + 1 Then Rows = aRow + 1
+      If aColumn > Columns + 1 Then Columns = aRow + 1
+      pColors(aRow, aColumn) = newValue
     End Set
   End Property
 
