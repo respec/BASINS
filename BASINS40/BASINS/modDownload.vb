@@ -183,6 +183,10 @@ StartOver:
     Dim curFilename As String
     Dim project_dir As String
     Dim defaultsXML As Chilkat.Xml
+    Dim success As Boolean
+    Dim iproj As String
+    Dim oproj As String
+    Dim layername As String
 
     If Not FileExists(aProjectorFilename) Then
       LogDbg("No new ATCProjector.xml to process")
@@ -199,6 +203,20 @@ StartOver:
           theOutputFileName = Trim(StrSplit(newstrline, "<", ""))
           If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
           AddShapeToMW(theOutputFileName, GetDefaultsFor(theOutputFileName, project_dir, defaultsXML))
+        ElseIf LCase(Left(newstrline, 9)) = "<add_grid" Then
+          StrSplit(newstrline, ">", "")
+          theOutputFileName = Trim(StrSplit(newstrline, "<", ""))
+          If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
+          Dim g As New MapWinGIS.Grid
+          g.Open(theOutputFileName)
+          If InStr(theOutputFileName, "\demg\") > 0 Then
+            layername = FilenameOnly(theOutputFileName) & " DEMG"
+          ElseIf InStr(theOutputFileName, "\ned\") > 0 Then
+            layername = FilenameOnly(theOutputFileName) & " NED"
+          Else
+            layername = FilenameOnly(theOutputFileName)
+          End If
+          g_MapWin.Layers.Add(g, layername) 'to do add color scheme?
         Else
           Select Case LCase(Left(newstrline, 12))
             Case "<add_allshap"
@@ -224,47 +242,81 @@ StartOver:
                   End If
                 End If
               End If
-            Case "<convert_cov"
-              LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
             Case "<convert_gri"
-              LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
-            Case "<convert_dir"
-              'loop through a directory, projecting all files in it
-              StrSplit(newstrline, " ", "")
-              ichars = Len(newstrline)
-              ctemp = newstrline
-              iname = CStr(InStr(1, ctemp, ">"))
-              firstpart = Mid(ctemp, 1, CInt(iname))
-              theInputDirName = Mid(ctemp, CDbl(iname) + 1, Len(ctemp) - CDbl(iname) - 14)
-              equalpos = InStr(1, firstpart, "=")
+              equalpos = InStr(newstrline, "output=""")
               If (equalpos > 0) Then
-                theOutputDirName = Mid(firstpart, equalpos + 2, CDbl(iname) - equalpos - 3)
-              Else
-                theOutputDirName = theInputDirName
-              End If
-              If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
-
-              InputFileList.Clear()
-
-              AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
-
-              For Each vFilename In InputFileList
-                curFilename = vFilename
-                ilen = Len(curFilename)
-                If (FileExt(curFilename) = "shp") Then
-                  'this is a shapefile
-                  theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
-                  'change projection and merge
-                  If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
-                    'if the output file exists and it is a landuse shape, dont bother
-                  Else
-                    ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
+                theOutputFileName = Mid(newstrline, equalpos + 8)
+                iname = CStr(InStr(theOutputFileName, """>"))
+                If CDbl(iname) > 0 Then
+                  curFilename = Mid(theOutputFileName, CDbl(iname) + 2)
+                  theOutputFileName = Left(theOutputFileName, CDbl(iname) - 1)
+                  iname = CStr(InStr(curFilename, "<"))
+                  If CDbl(iname) > 0 Then
+                    curFilename = Left(curFilename, CDbl(iname) - 1)
+                    If FileExists(theOutputFileName) Then
+                      'remove output file
+                      System.IO.File.Delete(theOutputFileName)
+                    End If
+                    If InStr(theOutputFileName, "\nlcd\") > 0 Then
+                      'exception for nlcd data, already in albers
+                      iproj = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+                    Else
+                      iproj = "+proj=longlat +datum=NAD83"
+                    End If
+                    oproj = WholeFileString(project_dir & "prj.proj")
+                    oproj = CleanUpUserProjString(oproj)
+                    If iproj = oproj Then
+                      System.IO.File.Copy(curFilename, theOutputFileName)
+                    Else
+                      'project it
+                      success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
+                      If Not success Then
+                        LogMsg("Failed to project grid", "ProcessProjectorFile")
+                        System.IO.File.Copy(curFilename, theOutputFileName)
+                      End If
+                    End If
                   End If
                 End If
-              Next vFilename
+              End If
+            Case "<convert_cov"
+                LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
+            Case "<convert_dir"
+                'loop through a directory, projecting all files in it
+                StrSplit(newstrline, " ", "")
+                ichars = Len(newstrline)
+                ctemp = newstrline
+                iname = CStr(InStr(1, ctemp, ">"))
+                firstpart = Mid(ctemp, 1, CInt(iname))
+                theInputDirName = Mid(ctemp, CDbl(iname) + 1, Len(ctemp) - CDbl(iname) - 14)
+                equalpos = InStr(1, firstpart, "=")
+                If (equalpos > 0) Then
+                  theOutputDirName = Mid(firstpart, equalpos + 2, CDbl(iname) - equalpos - 3)
+                Else
+                  theOutputDirName = theInputDirName
+                End If
+                If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
+
+                InputFileList.Clear()
+
+                AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
+
+                For Each vFilename In InputFileList
+                  curFilename = vFilename
+                  ilen = Len(curFilename)
+                  If (FileExt(curFilename) = "shp") Then
+                    'this is a shapefile
+                    theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
+                    'change projection and merge
+                    If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
+                      'if the output file exists and it is a landuse shape, dont bother
+                    Else
+                      ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
+                    End If
+                  End If
+                Next vFilename
 
             Case Else
-              LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
+                LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
           End Select
         End If
 NextLine:
@@ -272,6 +324,42 @@ NextLine:
       FileClose(fu)
     End If
   End Sub
+
+  Private Function CleanUpUserProjString(ByVal ctemp As String) As String
+    Dim ipos As Integer
+    Dim first As Boolean
+
+    Do While Mid(ctemp, 1, 1) = "#"
+      'eliminate comment lines at beginning
+      ipos = InStr(ctemp, vbCrLf)
+      ctemp = Mid(ctemp, ipos + 2)
+    Loop
+    first = True
+    Do While InStr(ctemp, vbCrLf) > 0
+      'strip out unneeded stuff
+      ipos = InStr(ctemp, vbCrLf)
+      If first Then
+        ctemp = Mid(ctemp, ipos + 2)
+        first = False
+      Else
+        ctemp = Mid(ctemp, 1, ipos - 1) & " " & Mid(ctemp, ipos + 2)
+      End If
+    Loop
+    If InStr(ctemp, " end ") > 0 Then
+      ctemp = Mid(ctemp, 1, InStr(ctemp, " end ") - 1)
+    End If
+    If Len(ctemp) > 0 Then
+      If Mid(ctemp, 1, 9) = "+proj=dd " Then
+        ctemp = "+proj=longlat " & Mid(ctemp, 10)
+        ctemp = ctemp & " +datum=NAD83"
+      Else
+        ctemp = ctemp & " +datum=NAD83 +units=m"
+      End If
+    Else
+      ctemp = "<none>"
+    End If
+    CleanUpUserProjString = ctemp
+  End Function
 
   Private Sub ShapeUtilMerge(ByVal aCurFilename As String, ByVal aOutputFilename As String, ByVal aProjectionFilename As String)
     Dim exe As String = FindFile("Please locate ShapeUtil.exe", "\basins\etc\datadownload\ShapeUtil.exe")
