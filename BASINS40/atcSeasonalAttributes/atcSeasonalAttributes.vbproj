@@ -109,6 +109,7 @@
                     Name = "MapWinInterfaces"
                     AssemblyName = "MapWinInterfaces"
                     HintPath = "..\Bin\MapWinInterfaces.dll"
+                    Private = "False"
                 />
                 <Reference
                     Name = "atcSeasons"

@@ -103,9 +103,9 @@ Public Class atcGrid
     Dim lRows As Integer
     Dim lColumns As Integer
 
-    pCellBackColor = Color.White
+    pCellBackColor = System.Drawing.SystemColors.Window
 
-    pLineColor = Color.FromKnownColor(KnownColor.ControlLight)
+    pLineColor = System.Drawing.SystemColors.Control
     pLineWidth = 1
     pLineWidth = 1
 
@@ -266,6 +266,8 @@ Public Class atcGrid
       Dim lLinePen As New Pen(pLineColor, pLineWidth)
       Dim lOutsideBrush As New SolidBrush(pLineColor)
       Dim lCellBrush As New SolidBrush(pCellBackColor)
+      Dim lEachCellBrush As New SolidBrush(pCellBackColor)
+      Dim lDarkPen As New Pen(system.Drawing.SystemColors.ControlDarkDark, pLineWidth)
 
       Dim lCellValue As String
       Dim lCellAlignment As Integer
@@ -278,7 +280,7 @@ Public Class atcGrid
       'Draw Row Lines
       pRowBottom = New ArrayList
       If pTopRow = 0 Then VScroller.Visible = False
-      y = 0
+      y = -1
       For iRow = pTopRow To lRows - 1
         y += RowHeight(iRow)
         g.DrawLine(lLinePen, 0, y, visibleWidth, y)
@@ -319,7 +321,7 @@ Public Class atcGrid
       '    Next
       '  End If
       'End If
-      x = 0
+      x = -1
       For iColumn = pLeftColumn To lColumns - 1
         x += ColumnWidth(iColumn)
         If iColumn = lColumns - 1 AndAlso Not AllowHorizontalScrolling AndAlso x <> visibleWidth Then
@@ -340,6 +342,7 @@ Public Class atcGrid
               HScroller.LargeChange = 1
             End If
             HScroller.Maximum = lColumns '- HScroller.LargeChange + 1
+            pColRight.Add(x)
             Exit For
           Else
             x = visibleWidth
@@ -362,6 +365,14 @@ Public Class atcGrid
         lCellLeft = 0
         For iColumn = pLeftColumn To lastColDrawn
           If ColumnWidth(iColumn) > 0 Then
+            If pSource.ColorCells Then
+              Dim lEachCellColor As Color = pSource.CellColor(iRow, iColumn)
+              If Not lEachCellColor.Equals(pCellBackColor) Then
+                lEachCellBrush.Color = lEachCellColor
+                g.FillRectangle(lEachCellBrush, lCellLeft, lCellTop, pColRight(iColumn - pLeftColumn) - lCellLeft, pRowBottom(iRow - pTopRow) - lCellTop)
+                g.DrawRectangle(lDarkPen, lCellLeft - 1, lCellTop - 1, pColRight(iColumn - pLeftColumn) - lCellLeft + 1, pRowBottom(iRow - pTopRow) - lCellTop + 1)
+              End If
+            End If
             lCellValue = pSource.CellValue(iRow, iColumn)
             If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
               lCellAlignment = pSource.Alignment(iRow, iColumn)
@@ -416,10 +427,10 @@ Public Class atcGrid
               Catch winErr As Exception
               End Try
             End If
-            If iColumn < lColumns - 1 Then lCellLeft = pColRight(iColumn - pLeftColumn)
+            If iColumn < lColumns - 1 Then lCellLeft = pColRight(iColumn - pLeftColumn) + 1
           End If
         Next
-        If iRow < lRows - 1 Then lCellTop = pRowBottom(iRow - pTopRow) 'Top of next row is bottom of this one
+        If iRow < lRows - 1 Then lCellTop = pRowBottom(iRow - pTopRow) + 1 'Top of next row is bottom of this one
       Next
     End If
   End Sub
@@ -570,24 +581,25 @@ Public Class atcGrid
     Return -1
   End Function
 
+  'This routine works, but is not in use until we decide to allow dragging the decimal position
   Private Function ColumnDecimalToDrag(ByVal X As Integer, ByVal Y As Integer) As Integer
-    Dim lRow As Integer = 0
-    Dim lColumn As Integer = pLeftColumn
-    Dim lColLeft As Integer = 0
-    While lRow < pRowBottom.Count AndAlso Y > pRowBottom(lRow)
-      lRow += 1
-    End While
-    While lColumn < pColRight.Count AndAlso X > pColRight(lColumn)
-      lColLeft = pColRight(lColumn)
-      lColumn += 1
-    End While
+    'Dim lRow As Integer = 0
+    'Dim lColumn As Integer = pLeftColumn
+    'Dim lColLeft As Integer = 0
+    'While lRow < pRowBottom.Count AndAlso Y > pRowBottom(lRow)
+    '  lRow += 1
+    'End While
+    'While lColumn < pColRight.Count AndAlso X > pColRight(lColumn)
+    '  lColLeft = pColRight(lColumn)
+    '  lColumn += 1
+    'End While
 
-    If lColumn < pColRight.Count AndAlso pSource.Alignment(lRow, lColumn) = atcAlignment.HAlignDecimal Then
-      'If within tolerance of column edge and column is not being hidden by a zero width
-      If Math.Abs(X - (pColRight(lColumn) + lColLeft) / 2) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
-        Return lColumn + pLeftColumn
-      End If
-    End If
+    'If lColumn < pColRight.Count AndAlso pSource.Alignment(lRow, lColumn) = atcAlignment.HAlignDecimal Then
+    '  'If within tolerance of column edge and column is not being hidden by a zero width
+    '  If Math.Abs(X - (pColRight(lColumn) + lColLeft) / 2) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
+    '    Return lColumn + pLeftColumn
+    '  End If
+    'End If
     Return -1
   End Function
 

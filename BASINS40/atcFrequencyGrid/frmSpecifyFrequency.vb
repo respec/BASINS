@@ -47,6 +47,10 @@ Public Class frmSpecifyFrequency
   Friend WithEvents lstNday As System.Windows.Forms.ListBox
   Friend WithEvents btnOkLow As System.Windows.Forms.Button
   Friend WithEvents btnOkHigh As System.Windows.Forms.Button
+  Friend WithEvents txtNdayAdd As System.Windows.Forms.TextBox
+  Friend WithEvents btnNdayAdd As System.Windows.Forms.Button
+  Friend WithEvents btnRecurrenceAdd As System.Windows.Forms.Button
+  Friend WithEvents txtRecurrenceAdd As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Me.panelTop = New System.Windows.Forms.Panel
     Me.grpRecurrence = New System.Windows.Forms.GroupBox
@@ -55,13 +59,17 @@ Public Class frmSpecifyFrequency
     Me.lstRecurrence = New System.Windows.Forms.ListBox
     Me.Splitter1 = New System.Windows.Forms.Splitter
     Me.grpNday = New System.Windows.Forms.GroupBox
+    Me.btnNdayAdd = New System.Windows.Forms.Button
+    Me.txtNdayAdd = New System.Windows.Forms.TextBox
     Me.btnNdayNone = New System.Windows.Forms.Button
     Me.btnNdayAll = New System.Windows.Forms.Button
     Me.lstNday = New System.Windows.Forms.ListBox
     Me.panelBottom = New System.Windows.Forms.Panel
+    Me.btnOkHigh = New System.Windows.Forms.Button
     Me.btnCancel = New System.Windows.Forms.Button
     Me.btnOkLow = New System.Windows.Forms.Button
-    Me.btnOkHigh = New System.Windows.Forms.Button
+    Me.btnRecurrenceAdd = New System.Windows.Forms.Button
+    Me.txtRecurrenceAdd = New System.Windows.Forms.TextBox
     Me.panelTop.SuspendLayout()
     Me.grpRecurrence.SuspendLayout()
     Me.grpNday.SuspendLayout()
@@ -83,9 +91,11 @@ Public Class frmSpecifyFrequency
     '
     'grpRecurrence
     '
+    Me.grpRecurrence.Controls.Add(Me.lstRecurrence)
+    Me.grpRecurrence.Controls.Add(Me.btnRecurrenceAdd)
+    Me.grpRecurrence.Controls.Add(Me.txtRecurrenceAdd)
     Me.grpRecurrence.Controls.Add(Me.btnRecurrenceNone)
     Me.grpRecurrence.Controls.Add(Me.btnRecurrenceAll)
-    Me.grpRecurrence.Controls.Add(Me.lstRecurrence)
     Me.grpRecurrence.Dock = System.Windows.Forms.DockStyle.Fill
     Me.grpRecurrence.Location = New System.Drawing.Point(208, 0)
     Me.grpRecurrence.Name = "grpRecurrence"
@@ -134,6 +144,8 @@ Public Class frmSpecifyFrequency
     '
     'grpNday
     '
+    Me.grpNday.Controls.Add(Me.btnNdayAdd)
+    Me.grpNday.Controls.Add(Me.txtNdayAdd)
     Me.grpNday.Controls.Add(Me.btnNdayNone)
     Me.grpNday.Controls.Add(Me.btnNdayAll)
     Me.grpNday.Controls.Add(Me.lstNday)
@@ -144,6 +156,25 @@ Public Class frmSpecifyFrequency
     Me.grpNday.TabIndex = 12
     Me.grpNday.TabStop = False
     Me.grpNday.Text = "Number of Days"
+    '
+    'btnNdayAdd
+    '
+    Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnNdayAdd.Location = New System.Drawing.Point(128, 256)
+    Me.btnNdayAdd.Name = "btnNdayAdd"
+    Me.btnNdayAdd.Size = New System.Drawing.Size(64, 24)
+    Me.btnNdayAdd.TabIndex = 12
+    Me.btnNdayAdd.Text = "Add"
+    '
+    'txtNdayAdd
+    '
+    Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtNdayAdd.Location = New System.Drawing.Point(8, 256)
+    Me.txtNdayAdd.Name = "txtNdayAdd"
+    Me.txtNdayAdd.Size = New System.Drawing.Size(112, 20)
+    Me.txtNdayAdd.TabIndex = 11
+    Me.txtNdayAdd.Text = ""
     '
     'btnNdayNone
     '
@@ -172,7 +203,7 @@ Public Class frmSpecifyFrequency
     Me.lstNday.Location = New System.Drawing.Point(8, 16)
     Me.lstNday.Name = "lstNday"
     Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-    Me.lstNday.Size = New System.Drawing.Size(184, 267)
+    Me.lstNday.Size = New System.Drawing.Size(184, 232)
     Me.lstNday.TabIndex = 7
     '
     'panelBottom
@@ -185,6 +216,14 @@ Public Class frmSpecifyFrequency
     Me.panelBottom.Name = "panelBottom"
     Me.panelBottom.Size = New System.Drawing.Size(408, 32)
     Me.panelBottom.TabIndex = 15
+    '
+    'btnOkHigh
+    '
+    Me.btnOkHigh.Location = New System.Drawing.Point(8, 0)
+    Me.btnOkHigh.Name = "btnOkHigh"
+    Me.btnOkHigh.Size = New System.Drawing.Size(96, 24)
+    Me.btnOkHigh.TabIndex = 2
+    Me.btnOkHigh.Text = "Compute High"
     '
     'btnCancel
     '
@@ -202,13 +241,26 @@ Public Class frmSpecifyFrequency
     Me.btnOkLow.TabIndex = 0
     Me.btnOkLow.Text = "Compute Low"
     '
-    'btnOkHigh
+    'btnRecurrenceAdd
     '
-    Me.btnOkHigh.Location = New System.Drawing.Point(8, 0)
-    Me.btnOkHigh.Name = "btnOkHigh"
-    Me.btnOkHigh.Size = New System.Drawing.Size(96, 24)
-    Me.btnOkHigh.TabIndex = 2
-    Me.btnOkHigh.Text = "Compute High"
+    Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnRecurrenceAdd.Enabled = False
+    Me.btnRecurrenceAdd.Location = New System.Drawing.Point(128, 256)
+    Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
+    Me.btnRecurrenceAdd.Size = New System.Drawing.Size(64, 24)
+    Me.btnRecurrenceAdd.TabIndex = 14
+    Me.btnRecurrenceAdd.Text = "Add"
+    '
+    'txtRecurrenceAdd
+    '
+    Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtRecurrenceAdd.Enabled = False
+    Me.txtRecurrenceAdd.Location = New System.Drawing.Point(8, 256)
+    Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
+    Me.txtRecurrenceAdd.Size = New System.Drawing.Size(112, 20)
+    Me.txtRecurrenceAdd.TabIndex = 13
+    Me.txtRecurrenceAdd.Text = ""
     '
     'frmSpecifyFrequency
     '
@@ -273,13 +325,32 @@ Public Class frmSpecifyFrequency
     lCalculator.Open(aOperationName, lArgs)
   End Sub
 
+  'Return all selected items, or if none are selected then all items
   Private Function ListToArray(ByVal aList As System.Windows.Forms.ListBox) As Double()
-    Dim lArray(aList.SelectedItems.Count - 1) As Double
-    For lIndex As Integer = 0 To aList.SelectedItems.Count - 1
-      lArray(lIndex) = CDbl(aList.SelectedItems(lIndex))
-    Next
+    Dim lArray() As Double
+    If aList.SelectedItems.Count > 0 Then
+      ReDim lArray(aList.SelectedItems.Count - 1)
+      For lIndex As Integer = 0 To aList.SelectedItems.Count - 1
+        lArray(lIndex) = CDbl(aList.SelectedItems(lIndex))
+      Next
+    Else
+      ReDim lArray(aList.Items.Count - 1)
+      For lIndex As Integer = 0 To aList.Items.Count - 1
+        lArray(lIndex) = CDbl(aList.Items(lIndex))
+      Next
+    End If
     Return lArray
   End Function
+
+  Private Sub btnNdayAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNdayAdd.Click
+    lstNday.Items.Add(txtNdayAdd.Text)
+    lstNday.SetSelected(lstNday.Items.Count - 1, True)
+  End Sub
+
+  Private Sub btnRecurrenceAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRecurrenceAdd.Click
+    lstRecurrence.Items.Add(txtRecurrenceAdd.Text)
+    lstRecurrence.SetSelected(lstRecurrence.Items.Count - 1, True)
+  End Sub
 
   Private Sub btnNdayAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNdayAll.Click
     For index As Integer = 0 To lstNday.Items.Count - 1
