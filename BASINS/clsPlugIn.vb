@@ -644,22 +644,27 @@ Public Class PlugIn
     'If you know the message is "for you" then you can set Handled=True and then it will not be sent to any
     'other plug-ins.
 
-    If msg.StartsWith("atcDataPlugin") Then
-      'RefreshDisplayMenu()
-      RefreshToolsMenu()
-      'If msg.Substring(15).StartsWith("loading") Then
-
-      'End If
-    ElseIf msg.StartsWith("basins") Then
-      If msg.Substring(7).StartsWith("script") Then
-        ChDriveDir(PathNameOnly(msg.Substring(14))) 'start where script is
-        Dim errors As String
-        RunBasinsScript("vb", WholeFileString(msg.Substring(14)), errors, "dataManager", "basinsplugin")
-        If Not errors Is Nothing Then
-          MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+        If msg.StartsWith("WELCOME_SCREEN") Then
+            Dim frmWelBsn As frmWelcomeScreenBasins = New frmWelcomeScreenBasins
+            frmWelBsn.ShowDialog()
         End If
-      End If
-    End If
+
+        If msg.StartsWith("atcDataPlugin") Then
+            'RefreshDisplayMenu()
+            RefreshToolsMenu()
+            'If msg.Substring(15).StartsWith("loading") Then
+
+            'End If
+        ElseIf msg.StartsWith("basins") Then
+            If msg.Substring(7).StartsWith("script") Then
+                ChDriveDir(PathNameOnly(msg.Substring(14))) 'start where script is
+                Dim errors As String
+                RunBasinsScript("vb", WholeFileString(msg.Substring(14)), errors, "dataManager", "basinsplugin")
+                If Not errors Is Nothing Then
+                    MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+                End If
+            End If
+        End If
   End Sub
 
   Public Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
