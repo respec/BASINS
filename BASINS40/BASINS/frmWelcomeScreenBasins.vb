@@ -260,7 +260,7 @@ Public Class frmWelcomeScreenBasins
   End Sub
 
   Private Sub cbShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbShowDlg.CheckedChanged
-    AppInfo.ShowWelcomeScreen = cbShowDlg.Checked
+        'AppInfo.ShowWelcomeScreen = cbShowDlg.Checked
   End Sub
 
   Private Sub lbProject_LinkClicked(ByVal sender As System.Object, _
@@ -280,7 +280,7 @@ Public Class frmWelcomeScreenBasins
 
   Private Sub frmWelcomeScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-    cbShowDlg.Checked = AppInfo.ShowWelcomeScreen
+        'cbShowDlg.Checked = AppInfo.ShowWelcomeScreen
 
     'assume no recent projects
     lbProject1.Visible = False
@@ -288,36 +288,36 @@ Public Class frmWelcomeScreenBasins
     lbProject3.Visible = False
     lbProject4.Visible = False
 
-    'check to see if there were any recent projects
-    Dim lRecentCount As Integer = 0
-    Dim lCurrent As Integer = 0
-    Dim lProjectName As String
-    Dim lProjectId As String
-    Dim lbProject As Label
-    While lRecentCount < 4 And lCurrent < ProjInfo.RecentProjects.Count
-      lProjectName = CType(ProjInfo.RecentProjects(lCurrent), String)
-      lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
-      If LCase(lProjectId) <> "national" Then
-        If lRecentCount = 0 Then
-          lbProject = lbProject1
-        ElseIf lRecentCount = 1 Then
-          lbProject = lbProject2
-        ElseIf lRecentCount = 2 Then
-          lbProject = lbProject3
-        ElseIf lRecentCount = 3 Then
-          lbProject = lbProject4
-        End If
-        lbProject.Text = lProjectId
-        lbProject.Tag = lProjectName
-        lbProject.Visible = True
-        lRecentCount += 1
-      End If
-      lCurrent += 1
-    End While
-  End Sub
+        '  'check to see if there were any recent projects
+        '  Dim lRecentCount As Integer = 0
+        '  Dim lCurrent As Integer = 0
+        '  Dim lProjectName As String
+        '  Dim lProjectId As String
+        '  Dim lbProject As Label
+        '  While lRecentCount < 4 And lCurrent < ProjInfo.RecentProjects.Count
+        '    lProjectName = CType(ProjInfo.RecentProjects(lCurrent), String)
+        '    lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
+        '    If LCase(lProjectId) <> "national" Then
+        '      If lRecentCount = 0 Then
+        '        lbProject = lbProject1
+        '      ElseIf lRecentCount = 1 Then
+        '        lbProject = lbProject2
+        '      ElseIf lRecentCount = 2 Then
+        '        lbProject = lbProject3
+        '      ElseIf lRecentCount = 3 Then
+        '        lbProject = lbProject4
+        '      End If
+        '      lbProject.Text = lProjectId
+        '      lbProject.Tag = lProjectName
+        '      lbProject.Visible = True
+        '      lRecentCount += 1
+        '    End If
+        '    lCurrent += 1
+        '  End While
+        'End Sub
 
-  Private Sub btnClose_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnClose.Click
-    Me.Close()
+        'Private Sub btnClose_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnClose.Click
+        '  Me.Close()
   End Sub
 
   Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbConvert.LinkClicked
@@ -337,6 +337,6 @@ Public Class frmWelcomeScreenBasins
         g_MapWin.ShowErrorDialog(ex)
       End Try
     End If
-  End Sub
+    End Sub
 End Class
 
