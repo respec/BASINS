@@ -8,6 +8,9 @@ Friend Class atcFrequencyGridSource
   Private pRecurrence As SortedList
   Private pHigh As Boolean
 
+  Private pCalculatedNdays As New ArrayList
+  Private pCalculatedRecurrence As New ArrayList
+
   Sub New(ByVal aDataGroup As atcData.atcDataGroup)
     pDataGroup = aDataGroup
     pRecurrence = New SortedList
@@ -105,6 +108,11 @@ Friend Class atcFrequencyGridSource
                 Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
                 Dim lArgs As New atcDataAttributes
                 Dim lOperationName As String
+                Dim lNdays(pNdays.Count) As Double
+                Dim lNextNdays As Integer = 1
+                Dim lReturns(pRecurrence.Count) As Double
+                Dim lNextReturns As Double = 1
+                Dim lValue As Double
 
                 If pHigh Then
                   lOperationName = "n-day high value"
@@ -113,8 +121,32 @@ Friend Class atcFrequencyGridSource
                 End If
 
                 lArgs.SetValue("Timeseries", lDataSet)
-                lArgs.SetValue("NDay", NdaysAt(aColumn))
-                lArgs.SetValue("Return Period", RecurrenceAt(aRow))
+
+                lNdays(0) = NdaysAt(aColumn)
+                For Each lNday As DictionaryEntry In pNdays
+                  lValue = CDbl(lNday.Value)
+                  If lValue <> lNdays(0) AndAlso Not pCalculatedNdays.Contains(lValue) Then
+                    pCalculatedNdays.Add(lValue)
+                    lNdays(lNextNdays) = lValue
+                    lNextNdays += 1
+                  End If
+                Next
+
+                lReturns(0) = RecurrenceAt(aColumn)
+                For Each lReturn As DictionaryEntry In pRecurrence
+                  lValue = CDbl(atcUtility.ReplaceString(lReturn.Value, ",", ""))
+                  If lValue <> lReturns(0) AndAlso Not pCalculatedRecurrence.Contains(lValue) Then
+                    pCalculatedRecurrence.Add(lValue)
+                    lReturns(lNextReturns) = lValue
+                    lNextReturns += 1
+                  End If
+                Next
+
+                ReDim Preserve lNdays(lNextNdays - 1)
+                ReDim Preserve lReturns(lNextReturns - 1)
+
+                lArgs.SetValue("NDay", lNdays)
+                lArgs.SetValue("Return Period", lReturns)
 
                 lCalculator.Open(lOperationName, lArgs)
               Catch e As Exception

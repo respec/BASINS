@@ -172,14 +172,14 @@ Friend Class frmDisplayFrequencyGrid
     Me.agdMain.LineWidth = 0.0!
     Me.agdMain.Location = New System.Drawing.Point(0, 0)
     Me.agdMain.Name = "agdMain"
-    Me.agdMain.Size = New System.Drawing.Size(528, 545)
+    Me.agdMain.Size = New System.Drawing.Size(720, 545)
     Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
     '
     'frmDisplayFrequencyGrid
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(528, 545)
+    Me.ClientSize = New System.Drawing.Size(720, 545)
     Me.Controls.Add(Me.agdMain)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
@@ -200,16 +200,24 @@ Friend Class frmDisplayFrequencyGrid
   Private pSource As atcFrequencyGridSource
 
   Private Sub PopulateGrid()
-    'Dim lWasSwapped As Boolean = Not pSource Is Nothing AndAlso pSource.SwapRowsColumns
     pSource = New atcFrequencyGridSource(pDataGroup)
     If pSource.Columns < 3 Then
       UserSpecifyAttributes()
       pSource = New atcFrequencyGridSource(pDataGroup)
     End If
+
     pSource.SwapRowsColumns = mnuViewRows.Checked
     pSource.High = mnuViewHigh.Checked
     agdMain.Initialize(pSource)
     agdMain.SizeAllColumnsToContents()
+
+    Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSource.Rows * agdMain.RowHeight(0)
+    Dim lRequestedWidth As Single = Me.Width - agdMain.Left - agdMain.Width
+    For lColumn As Integer = 0 To pSource.Columns - 1
+      lRequestedWidth += agdMain.ColumnWidth(lColumn)
+    Next
+    Me.Height = lRequestedHeight
+    Me.Width = lRequestedWidth
     agdMain.Refresh()
   End Sub
 

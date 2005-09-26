@@ -231,16 +231,10 @@ Public Class atcDataAttributes
 
         .Add("datcre", "Date Created")
         .Add("datmod", "Date Modified")
+
+        .Add("7low10", "7Q10")
       End With
     End If
-
-    '  Case "MAX" : Attrib = Max
-    '  Case "MIN" : Attrib = Min
-    '  Case "MEAN" : Attrib = Mean
-    '  Case "GEOMETRIC MEAN" : Attrib = GeometricMean
-    '  Case "SUM" : Attrib = Sum
-    '  Case "STDDEVIATION" : Attrib = StdDeviation
-    '  Case "VARIANCE" : Attrib = Variance
   End Sub
 
   Public Shadows Function Clone() As atcDataAttributes
