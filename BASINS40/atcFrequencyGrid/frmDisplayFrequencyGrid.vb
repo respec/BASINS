@@ -69,12 +69,14 @@ Friend Class frmDisplayFrequencyGrid
   Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplayFrequencyGrid))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
     Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuFileSave = New System.Windows.Forms.MenuItem
     Me.mnuEdit = New System.Windows.Forms.MenuItem
     Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.mnuView = New System.Windows.Forms.MenuItem
@@ -94,7 +96,7 @@ Friend Class frmDisplayFrequencyGrid
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes, Me.mnuFileSave})
     Me.mnuFile.Text = "File"
     '
     'mnuFileAdd
@@ -107,6 +109,11 @@ Friend Class frmDisplayFrequencyGrid
     Me.mnuAddAttributes.Index = 1
     Me.mnuAddAttributes.Text = "Add Attributes"
     '
+    'mnuFileSave
+    '
+    Me.mnuFileSave.Index = 2
+    Me.mnuFileSave.Text = "Save"
+    '
     'mnuEdit
     '
     Me.mnuEdit.Index = 1
@@ -116,6 +123,7 @@ Friend Class frmDisplayFrequencyGrid
     'mnuEditCopy
     '
     Me.mnuEditCopy.Index = 0
+    Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
     Me.mnuEditCopy.Text = "Copy"
     '
     'mnuView
@@ -270,22 +278,18 @@ Friend Class frmDisplayFrequencyGrid
 
   Private Sub UserSpecifyAttributes()
     Dim lForm As New frmSpecifyFrequency
-    lForm.AskUser(pDataGroup)
-    'For Each lPlugin As atcDataPlugin In pDataManager.GetPlugins(GetType(atcDataSource))
-    '  If (lPlugin.Name = "Timeseries::Seasonal") Then
-    '    Dim typ As System.Type = lPlugin.GetType()
-    '    Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-    '    Dim newSource As atcDataSource = asm.CreateInstance(typ.FullName)
-    '    Dim newArguments As New atcDataAttributes
-    '    newArguments.SetValue("Timeseries", pDataGroup)
-    '    newSource.Open("FrequencyGrid", newArguments)
-    '    Exit For
-    '  End If
-    'Next
+    Dim lChoseHigh As Boolean
+    If lForm.AskUser(pDataGroup, lChoseHigh) Then
+      If lChoseHigh Then
+        mnuViewHigh_Click(Nothing, Nothing)
+      Else
+        mnuViewLow_Click(Nothing, Nothing)
+      End If
+    End If
   End Sub
 
   Public Overrides Function ToString() As String
-    Return agdMain.ToString
+    Return Me.Text & vbCrLf & agdMain.ToString
   End Function
 
   'True for rows and columns to be swapped, false for normal orientation
@@ -299,36 +303,18 @@ Friend Class frmDisplayFrequencyGrid
   End Property
 
   Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
-    Clipboard.SetDataObject(agdMain.ToString)
+    Clipboard.SetDataObject(Me.ToString)
   End Sub
 
-  Private Sub agdMain_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMain.MouseDownCell
-    Try
-      Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-      Dim lArgs As New atcDataAttributes
-      Dim lOperationName As String
-
-      If mnuViewHigh.Checked Then
-        lOperationName = "n-day high value"
-      Else
-        lOperationName = "n-day low value"
+  Private Sub mnuFileSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
+    Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+    With lSaveDialog
+      .Title = "Save Grid As"
+      .DefaultExt = ".txt"
+      .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
+      If .ShowDialog(Me) = DialogResult.OK Then
+        SaveFileString(.FileName, Me.ToString)
       End If
-
-      If pSource.SwapRowsColumns Then
-        lArgs.SetValue("Timeseries", pSource.DataSetAt(aColumn))
-        lArgs.SetValue("NDay", pSource.NdaysAt(aRow))
-        lArgs.SetValue("Return Period", pSource.RecurrenceAt(aColumn))
-      Else
-        lArgs.SetValue("Timeseries", pSource.DataSetAt(aRow))
-        lArgs.SetValue("NDay", pSource.NdaysAt(aColumn))
-        lArgs.SetValue("Return Period", pSource.RecurrenceAt(aRow))
-      End If
-      lCalculator.Open(lOperationName, lArgs)
-      agdMain.Refresh()
-    Catch e As Exception
-      LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
-    End Try
+    End With
   End Sub
-
-
 End Class

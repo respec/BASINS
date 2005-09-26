@@ -78,6 +78,7 @@ Friend Class atcFrequencyGridSource
   End Function
 
   Public Function RecurrenceAt(ByVal aRow) As String
+    'remove any thousands commas in return period
     Return atcUtility.ReplaceString(pRecurrence.GetByIndex((aRow - 1) Mod pRecurrence.Count), ",", "")
   End Function
 
@@ -94,11 +95,35 @@ Friend Class atcFrequencyGridSource
           Case 0 : Return DataSetAt(aRow).ToString
           Case 1 : Return RecurrenceAt(aRow)
           Case Else
+            Dim lDataSet As atcDataSet = DataSetAt(aRow)
             Dim lAttrName As String = NdaysAt(aColumn)
             If pHigh Then lAttrName &= "Hi" Else lAttrName &= "Low"
-            'remove any thousands commas in return period
             lAttrName &= RecurrenceAt(aRow)
-            Return DataSetAt(aRow).Attributes.GetFormattedValue(lAttrName)
+
+            If Not lDataSet.Attributes.ContainsAttribute(lAttrName) Then
+              Try
+                Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+                Dim lArgs As New atcDataAttributes
+                Dim lOperationName As String
+
+                If pHigh Then
+                  lOperationName = "n-day high value"
+                Else
+                  lOperationName = "n-day low value"
+                End If
+
+                lArgs.SetValue("Timeseries", lDataSet)
+                lArgs.SetValue("NDay", NdaysAt(aColumn))
+                lArgs.SetValue("Return Period", RecurrenceAt(aRow))
+
+                lCalculator.Open(lOperationName, lArgs)
+              Catch e As Exception
+                'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
+              End Try
+            End If
+
+            Return lDataSet.Attributes.GetFormattedValue(lAttrName)
+
         End Select
       End If
     End Get
