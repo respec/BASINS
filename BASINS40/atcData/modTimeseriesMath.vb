@@ -49,6 +49,8 @@ Public Module modTimeseriesMath
     Dim lStartYear As Integer
     Dim lEndYear As Integer
 
+    aTimeseries.EnsureValuesRead()
+
     'TODO: boundary conditions...
     lStartTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(0))
     With lStartTimeseriesDate
