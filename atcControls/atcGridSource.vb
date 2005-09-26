@@ -245,9 +245,10 @@ Public Class atcGridSource
     For iRow As Integer = 0 To lMaxRow
       For iCol As Integer = 0 To lMaxCol
         lCellValue = CellValue(iRow, iCol)
-        ToString &= lCellValue & vbTab
-        'Some modified values contain vbTab(+10%), add a tab to those that don't
+        ToString &= lCellValue
+        'Some modified values contain "<tab>(+10%)", add a tab to those that don't
         If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then ToString &= vbTab
+        If iCol < lMaxCol Then ToString &= vbTab 'Add tab afer each column except for last 
       Next
       ToString &= vbCrLf
     Next

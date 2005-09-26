@@ -282,11 +282,13 @@ Public Class frmSpecifyFrequency
 
   Private WithEvents pGroup As atcDataGroup
   Private pOk As Boolean
+  Private pChoseHigh As Boolean
 
-  Public Function AskUser(ByVal aGroup As atcDataGroup) As Boolean
+  Public Function AskUser(ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
     pGroup = aGroup
     Clear()
     Me.ShowDialog()
+    aChoseHigh = pChoseHigh
     Return pOk
   End Function
 
@@ -380,6 +382,7 @@ Public Class frmSpecifyFrequency
     Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
     Calculate("n-day low value")
     pOk = True
+    pChoseHigh = False
     Close()
   End Sub
 
@@ -387,6 +390,7 @@ Public Class frmSpecifyFrequency
     Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
     Calculate("n-day high value")
     pOk = True
+    pChoseHigh = True
     Close()
   End Sub
 

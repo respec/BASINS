@@ -64,37 +64,48 @@ Friend Class frmDisplaySeasonalAttributes
   Friend WithEvents mnuViewSeasonColumns As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewSeasonRows As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAddAttributes As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySeasonalAttributes))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
+    Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonColumns = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonRows = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
-    Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuFileSave = New System.Windows.Forms.MenuItem
+    Me.mnuEdit = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.MenuItem1, Me.mnuView, Me.mnuAnalysis})
     '
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes})
-    Me.mnuFile.Text = "File"
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes, Me.mnuFileSave})
+    Me.mnuFile.Text = "&File"
     '
     'mnuFileAdd
     '
     Me.mnuFileAdd.Index = 0
     Me.mnuFileAdd.Text = "Add Timeseries"
     '
+    'mnuAddAttributes
+    '
+    Me.mnuAddAttributes.Index = 1
+    Me.mnuAddAttributes.Text = "Add Attributes"
+    '
     'mnuView
     '
-    Me.mnuView.Index = 1
+    Me.mnuView.Index = 2
     Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewSeasonColumns, Me.mnuViewSeasonRows})
     Me.mnuView.Text = "&View"
     '
@@ -110,8 +121,8 @@ Friend Class frmDisplaySeasonalAttributes
     '
     'mnuAnalysis
     '
-    Me.mnuAnalysis.Index = 2
-    Me.mnuAnalysis.Text = "Analysis"
+    Me.mnuAnalysis.Index = 3
+    Me.mnuAnalysis.Text = "&Analysis"
     '
     'agdMain
     '
@@ -122,12 +133,26 @@ Friend Class frmDisplaySeasonalAttributes
     Me.agdMain.Location = New System.Drawing.Point(0, 0)
     Me.agdMain.Name = "agdMain"
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
+    Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
     '
-    'mnuAddAttributes
+    'mnuFileSave
     '
-    Me.mnuAddAttributes.Index = 1
-    Me.mnuAddAttributes.Text = "Add Attributes"
+    Me.mnuFileSave.Index = 2
+    Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
+    Me.mnuFileSave.Text = "Save"
+    '
+    'mnuEdit
+    '
+    Me.mnuEdit.Index = 1
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
+    Me.mnuEdit.Text = "&Edit"
+    '
+    'mnuEditCopy
+    '
+    Me.mnuEditCopy.Index = 0
+    Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
+    Me.mnuEditCopy.Text = "Copy"
     '
     'frmDisplaySeasonalAttributes
     '
@@ -212,6 +237,22 @@ Friend Class frmDisplaySeasonalAttributes
     PopulateGrid()
   End Sub
 
+  Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
+    Clipboard.SetDataObject(Me.ToString)
+  End Sub
+
+  Private Sub mnuFileSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
+    Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+    With lSaveDialog
+      .Title = "Save Grid As"
+      .DefaultExt = ".txt"
+      .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
+      If .ShowDialog(Me) = DialogResult.OK Then
+        SaveFileString(.FileName, Me.ToString)
+      End If
+    End With
+  End Sub
+
   Private Sub UserSpecifyAttributes()
     For Each lPlugin As atcDataPlugin In pDataManager.GetPlugins(GetType(atcDataSource))
       If (lPlugin.Name = "Timeseries::Seasonal") Then
@@ -227,7 +268,7 @@ Friend Class frmDisplaySeasonalAttributes
   End Sub
 
   Public Overrides Function ToString() As String
-    Return agdMain.ToString
+    Return Me.Text & vbCrLf & agdMain.ToString
   End Function
 
   'True for rows and columns to be swapped, false for normal orientation
@@ -239,6 +280,5 @@ Friend Class frmDisplaySeasonalAttributes
       pSource.SwapRowsColumns = newValue
     End Set
   End Property
-
 
 End Class
