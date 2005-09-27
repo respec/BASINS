@@ -372,7 +372,7 @@ Module GISUtils
     lLayer = pMapWin.Layers(PointLayerIndex)
     pointsf = lLayer.GetObject
     lLayer2 = pMapWin.Layers(PolygonLayerIndex)
-    polygonsf = lLayer.GetObject
+    polygonsf = lLayer2.GetObject
 
     polygonsf.BeginPointInShapefile()
     x = pointsf.Shape(nthPoint - 1).Point(0).x
@@ -606,7 +606,7 @@ Module GISUtils
     'if any of layer 2 is selected, use only those
     Dim cSelectedSubbasins As New Collection
     For i = 1 To GisUtil_NumSelectedFeaturesInLayer(Layer2Index)
-      cSelectedSubbasins.Add(GisUtil_IndexOfNthSelectedFeatureInLayer(i, Layer2Index))
+      cSelectedSubbasins.Add(GisUtil_IndexOfNthSelectedFeatureInLayer(i - 1, Layer2Index))
     Next
     If cSelectedSubbasins.Count = 0 Then
       'no subbasins selected, act as if all are selected
@@ -647,9 +647,11 @@ Module GISUtils
     Dim lusfshape As MapWinGIS.Shape
 
     '********** do overlay ***********
+    pMapWin.StatusBar.ShowProgressBar = True
     totalpolygoncount = lusf.NumShapes * cSelectedSubbasins.Count
     polygoncount = 0
     lastdisplayed = 0
+    pMapWin.StatusBar.ProgressBarValue = 0
     For i = 1 To lusf.NumShapes
       'loop through each shape of the land use layer
       lusfshape = lusf.Shape(i - 1)
@@ -681,8 +683,10 @@ Module GISUtils
         'lblStatus.Text = "Overlaying Land Use and Subbasins (" & Int(polygoncount / totalpolygoncount * 100) & "%)"
         'Me.Refresh()
         lastdisplayed = Int(polygoncount / totalpolygoncount * 100)
+        pMapWin.StatusBar.ProgressBarValue = Int(polygoncount / totalpolygoncount * 100)
       End If
     Next i
+    pMapWin.StatusBar.ShowProgressBar = False
 
     If CreateNew Then
       'delete old version of this file if it exists
@@ -741,13 +745,16 @@ Module GISUtils
       bsuc = orsf.EditInsertField(isf.Field(i - 1), i - 1)
     Next i
 
+    pMapWin.StatusBar.ShowProgressBar = True
     For i = 1 To ssf.NumShapes
+      pMapWin.StatusBar.ProgressBarValue = Int(i / ssf.NumShapes * 100)
       sshape = ssf.Shape(i - 1)
       bsuc = mx.ClipShapesWithPolygon(isf, sshape, rsf)
       For j = 1 To rsf.NumShapes
         bsuc = orsf.EditInsertShape(rsf.Shape(j - 1), j - 1)
       Next j
     Next i
+    pMapWin.StatusBar.ShowProgressBar = False
 
     'populate attributes of output shapes
     For i = 1 To orsf.NumShapes
