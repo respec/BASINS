@@ -232,7 +232,8 @@ Public Class atcTimeseriesNdayHighLow
                           ByVal aNDay As Object, _
                           ByVal aHigh As Boolean, _
                           ByVal aRecurOrProb As Object, _
-                          ByVal aLogFg As Boolean)
+                          ByVal aLogFg As Boolean, _
+                          ByVal aAttributesStorage As atcDataAttributes)
 
     Dim lNdayTsGroup As atcDataGroup
     'Dim lNdayTs As atcTimeseries
@@ -292,7 +293,7 @@ Public Class atcTimeseriesNdayHighLow
           lArguments.SetValue("Nday", lNday)
           lArguments.SetValue("Return Period", lRecurOrProbNow)
 
-          aTimeseries.Attributes.SetValue(lNewAttribute, lQ, lArguments)
+          aAttributesStorage.SetValue(lNewAttribute, lQ, lArguments)
         Next
 
         If aLogFg Then 'remove log10 transform timser
@@ -324,12 +325,15 @@ Public Class atcTimeseriesNdayHighLow
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
     Dim ltsGroup As atcDataGroup
     Dim lTs As atcTimeseries
+    Dim lTsB As atcTimeseries
     Dim lNDayTsGroup As atcDataGroup 'atcTimeseries
     Dim lLogFlg As Boolean
     Dim lOperationName As String = aOperationName.ToLower
     Dim lNDay As Object
     Dim lReturn As Object
     Dim lHigh As Boolean
+    Dim lBoundaryMonth As Integer
+    Dim lBoundaryDay As Integer
 
     If aArgs Is Nothing Then
       'TODO: need something like specify computation (atcTimseriesMath) here, defaults for now
@@ -356,20 +360,29 @@ Public Class atcTimeseriesNdayHighLow
     End Select
 
     Select Case lOperationName
-      Case "n-day low value", "n-day low timeseries" : lHigh = False
-      Case "n-day high value", "n-day high timeseries" : lHigh = True
+      Case "n-day low value", "n-day low timeseries"
+        lHigh = False
+        lBoundaryMonth = 4
+      Case "n-day high value", "n-day high timeseries"
+        lHigh = True
+        lBoundaryMonth = 10
     End Select
+
+    'allow override of default boundary month/day
+    lBoundaryMonth = aArgs.GetValue("Boundary Month", lBoundaryMonth)
+    lBoundaryDay = aArgs.GetValue("Boundary Day", 1)
 
     If ltsGroup Is Nothing Then
       ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
     End If
 
     For Each lTs In ltsGroup
+      lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing)
       Select Case lOperationName
         Case "n-day low value", "n-day high value"
-          ComputeFreq(lTs, lNDay, lHigh, lReturn, lLogFlg)
+          ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes)
         Case "n-day low timeseries", "n-day high timeseries"
-          lNDayTsGroup = HighOrLowTimeseries(lTs, lNDay, lHigh)
+          lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh)
           Me.DataSets.AddRange(lNDayTsGroup)
       End Select
     Next

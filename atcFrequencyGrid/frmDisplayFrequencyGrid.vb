@@ -264,19 +264,11 @@ Friend Class frmDisplayFrequencyGrid
   End Sub
 
   Private Sub mnuViewHigh_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewHigh.Click
-    mnuViewHigh.Checked = True
-    mnuViewLow.Checked = False
-    pSource.High = True
-    Me.Text = "High Values"
-    agdMain.Refresh()
+    Me.HighDisplay = True
   End Sub
 
   Private Sub mnuViewLow_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewLow.Click
-    mnuViewHigh.Checked = False
-    mnuViewLow.Checked = True
-    pSource.High = False
-    Me.Text = "Low Values"
-    agdMain.Refresh()
+    Me.HighDisplay = False
   End Sub
 
   Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
@@ -288,11 +280,7 @@ Friend Class frmDisplayFrequencyGrid
     Dim lForm As New frmSpecifyFrequency
     Dim lChoseHigh As Boolean
     If lForm.AskUser(pDataGroup, lChoseHigh) Then
-      If lChoseHigh Then
-        mnuViewHigh_Click(Nothing, Nothing)
-      Else
-        mnuViewLow_Click(Nothing, Nothing)
-      End If
+      Me.HighDisplay = lChoseHigh
     End If
   End Sub
 
@@ -307,6 +295,25 @@ Friend Class frmDisplayFrequencyGrid
     End Get
     Set(ByVal newValue As Boolean)
       pSource.SwapRowsColumns = newValue
+    End Set
+  End Property
+
+  Public Property HighDisplay() As Boolean
+    Get
+      Return pSource.High
+    End Get
+    Set(ByVal newValue As Boolean)
+      pSource.High = newValue
+      If newValue Then
+        Me.Text = "High Values"
+        mnuViewHigh.Checked = True
+        mnuViewLow.Checked = False
+      Else
+        Me.Text = "Low Values"
+        mnuViewHigh.Checked = False
+        mnuViewLow.Checked = True
+      End If
+      agdMain.Refresh()
     End Set
   End Property
 

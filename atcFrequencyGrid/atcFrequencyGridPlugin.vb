@@ -34,6 +34,10 @@ Public Class atcFrequencyGridPlugin
       Select Case lOption
         Case "SwapRowsColumns"
           lForm.SwapRowsColumns = True
+        Case "Low"
+          lForm.HighDisplay = False
+        Case "High"
+          lForm.HighDisplay = True
       End Select
     Next
 
