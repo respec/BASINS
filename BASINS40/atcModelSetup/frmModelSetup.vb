@@ -866,13 +866,13 @@ Public Class frmModelSetup
         cboSub1.Items.Add(ctemp)
         cboSub2.Items.Add(ctemp)
         cboSub3.Items.Add(ctemp)
-        If UCase(ctemp) = "SUBBASIN" Then
+        If UCase(ctemp) = "SUBBASIN" Or UCase(ctemp) = "STREAMLINK" Then
           cboSub1.SelectedIndex = i
         End If
-        If UCase(ctemp) = "SLO1" Or UCase(ctemp) = "SLOPE" Then
+        If UCase(ctemp) = "SLO1" Or UCase(ctemp) = "SLOPE" Or UCase(ctemp) = "AVESLOPE" Then
           cboSub2.SelectedIndex = i
         End If
-        If UCase(ctemp) = "LEN1" Or UCase(ctemp) = "LENGTH" Then
+        If UCase(ctemp) = "LEN1" Or UCase(ctemp) = "LENGTH" Or UCase(ctemp) = "STREAMLEN" Then
           cboSub3.SelectedIndex = i
         End If
       Next
@@ -916,10 +916,10 @@ Public Class frmModelSetup
         cboStream7.Items.Add(ctemp)
         cboStream8.Items.Add(ctemp)
         cboStream9.Items.Add(ctemp)
-        If UCase(ctemp) = "SUBBASIN" Then
+        If UCase(ctemp) = "SUBBASIN" Or UCase(ctemp) = "LINKNO" Then
           cboStream1.SelectedIndex = i
         End If
-        If UCase(ctemp) = "SUBBASINR" Then
+        If UCase(ctemp) = "SUBBASINR" Or UCase(ctemp) = "DSLINKNO" Then
           cboStream2.SelectedIndex = i
         End If
         If UCase(ctemp) = "LEN2" Or UCase(ctemp) = "LENGTH" Then
@@ -928,16 +928,16 @@ Public Class frmModelSetup
         If UCase(ctemp) = "SLO2" Or UCase(ctemp) = "SLOPE" Then
           cboStream4.SelectedIndex = i
         End If
-        If UCase(ctemp) = "WID2" Or UCase(ctemp) = "WIDTH" Then
+        If UCase(ctemp) = "WID2" Or UCase(ctemp) = "WIDTH" Or UCase(ctemp) = "MEANWIDTH" Then
           cboStream5.SelectedIndex = i
         End If
-        If UCase(ctemp) = "DEP2" Or UCase(ctemp) = "DEPTH" Then
+        If UCase(ctemp) = "DEP2" Or UCase(ctemp) = "DEPTH" Or UCase(ctemp) = "MEANDEPTH" Then
           cboStream6.SelectedIndex = i
         End If
-        If UCase(ctemp) = "MINEL" Then
+        If UCase(ctemp) = "MINEL" Or UCase(ctemp) = "ELEVHIGH" Then
           cboStream7.SelectedIndex = i
         End If
-        If UCase(ctemp) = "MAXEL" Then
+        If UCase(ctemp) = "MAXEL" Or UCase(ctemp) = "ELEVLOW" Then
           cboStream8.SelectedIndex = i
         End If
         If UCase(ctemp) = "SNAME" Then
@@ -1373,7 +1373,7 @@ Public Class frmModelSetup
     'are any subbasins selected?
     Dim cSelectedSubbasins As New Collection
     For i = 1 To GisUtil_NumSelectedFeaturesInLayer(SubbasinLayerIndex)
-      cSelectedSubbasins.Add(GisUtil_IndexOfNthSelectedFeatureInLayer(i, SubbasinLayerIndex))
+      cSelectedSubbasins.Add(GisUtil_IndexOfNthSelectedFeatureInLayer(i - 1, SubbasinLayerIndex))
     Next
     If cSelectedSubbasins.Count = 0 Then
       'no subbasins selected, act as if all are selected
@@ -2486,13 +2486,13 @@ ErrHand:
       If GisUtil_LayerType(lyr) = 3 Then
         'PolygonShapefile 
         cboSubbasins.Items.Add(ctemp)
-        If UCase(ctemp) = "SUBBASINS" Then
+        If UCase(ctemp) = "SUBBASINS" Or InStr(ctemp, "Watershed Shapefile") > 0 Then
           cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
         End If
       ElseIf GisUtil_LayerType(lyr) = 2 Then
         'LineShapefile 
         cboStreams.Items.Add(ctemp)
-        If UCase(ctemp) = "STREAMS" Then
+        If UCase(ctemp) = "STREAMS" Or InStr(ctemp, "Stream Reach Shapefile") > 0 Then
           cboStreams.SelectedIndex = cboStreams.Items.Count - 1
         End If
       ElseIf GisUtil_LayerType(lyr) = 1 Then
