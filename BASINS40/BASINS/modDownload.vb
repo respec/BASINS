@@ -15,7 +15,7 @@ Module modDownload
     Dim dataPath As String
     Dim DefaultProjectFileName As String
     Dim ProjectFileName As String
-    Dim NoData As Boolean
+    Dim NoData As Boolean = False
     Dim defDirName As String
     Dim newDataDir As String
     Dim aprStr As String
@@ -24,13 +24,10 @@ Module modDownload
     Dim iSuffix As Integer
     Dim myProjection As String
     Dim cdlg As Windows.Forms.SaveFileDialog
-    Dim numFiles As Long
 
 StartOver:
 
     dataPath = g_BasinsDrives.Chars(0) & ":\Basins\data\"
-
-    'NoData = False
 
     Select Case aSelectedFeatures.Count
       Case 0
@@ -46,8 +43,8 @@ StartOver:
       Case Else : defDirName = "Multiple"
     End Select
 
-    If FileExists(dataPath & defDirName, True) Then 'First one will not have -0
-      iSuffix = 0
+    If FileExists(dataPath & defDirName, True) Then 'Find a suffix that will make name unique
+      iSuffix = 1
       Do
         iSuffix = iSuffix + 1
       Loop While FileExists(dataPath & defDirName & "-" & iSuffix, True)
@@ -82,21 +79,16 @@ StartOver:
         Catch ex As Exception
           LogDbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
         End Try
-        'Check to see if chosen data dir already contains any files
-        numFiles = System.IO.Directory.GetFiles(newDataDir).LongLength
-        If numFiles > 0 Then
-          If MsgBox("The directory '" & newDataDir & "'" & vbCr _
-                  & "already contains " & numFiles & " files. Delete all files and subdirectories?", _
-                  MsgBoxStyle.YesNo, "BASINS Build New") = MsgBoxResult.No Then
-            GoTo StartOver
-          Else
-            Try
-              System.IO.Directory.Delete(newDataDir, True)
-            Catch ex As Exception
-              LogDbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & newDataDir & vbCrLf & ex.Message)
-            End Try
-          End If
-        End If
+      End If
+
+      'Check to see if chosen data dir already contains any files
+      Dim numFiles As Long = System.IO.Directory.GetFiles(newDataDir).LongLength
+      Dim numDirs As Long = System.IO.Directory.GetDirectories(newDataDir).LongLength
+      If numFiles + numDirs > 0 Then
+        LogMsg("The folder '" & newDataDir & "'" & vbCr _
+               & "already contains " & numFiles & " files and " & numDirs & " folders." & vbCr _
+               & "The folder must be empty before a new project can be created here.", "BASINS Build New")
+        GoTo StartOver
       End If
 
       myProjection = atcProjector.Methods.AskUser
@@ -166,18 +158,11 @@ StartOver:
   End Sub
 
   Private Sub ProcessProjectorFile(ByVal aProjectorFilename As String)
-    Dim i As Integer
-    Dim fu As Short
-    Dim ichars As Short
-    Dim ilen As Integer
-    Dim newstrline As String
-    Dim ctemp As String
-    Dim iname As String
-    Dim firstpart As String
+    Dim lProjectorXML As New Chilkat.Xml
+    Dim lProjectorNode As Chilkat.Xml
     Dim theInputDirName As String
     Dim theOutputDirName As String
     Dim theOutputFileName As String
-    Dim equalpos As Integer
     Dim InputFileList As New NameValueCollection
     Dim vFilename As Object
     Dim curFilename As String
@@ -191,137 +176,108 @@ StartOver:
     If Not FileExists(aProjectorFilename) Then
       LogDbg("No new ATCProjector.xml to process")
     Else
-      fu = FreeFile()
-      FileOpen(fu, aProjectorFilename, OpenMode.Input)
+      lProjectorXML.LoadXml(WholeFileString(aProjectorFilename))
+      lProjectorNode = lProjectorXML.FirstChild
+      While Not lProjectorNode Is Nothing
+        LogDbg("Processing XML: " & lProjectorNode.GetXml)
+        Select Case LCase(lProjectorNode.Tag.ToLower)
+          Case "add_shape"
+            theOutputFileName = lProjectorNode.Content
+            If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
+            AddShapeToMW(theOutputFileName, GetDefaultsFor(theOutputFileName, project_dir, defaultsXML))
+          Case "add_grid"
+            theOutputFileName = lProjectorNode.Content
+            If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
+            Dim g As New MapWinGIS.Grid
+            g.Open(theOutputFileName)
+            If InStr(theOutputFileName, "\demg\") > 0 Then
+              layername = FilenameOnly(theOutputFileName) & " DEMG"
+            ElseIf InStr(theOutputFileName, "\ned\") > 0 Then
+              layername = FilenameOnly(theOutputFileName) & " NED"
+            Else
+              layername = FilenameOnly(theOutputFileName)
+            End If
+            g_MapWin.Layers.Add(g, layername) 'to do add color scheme?
+          Case "add_allshape"
+            theOutputFileName = lProjectorNode.Content
+            AddAllShapesInDir(theOutputFileName, project_dir)
+          Case "project_dir"
+            project_dir = lProjectorNode.Content
+            If Right(project_dir, 1) <> "\" Then project_dir &= "\"
+          Case "convert_shape"
+            theOutputFileName = lProjectorNode.GetAttrValue("output")
+            curFilename = lProjectorNode.Content
+            ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
+            'TODO: rewrite and test convert_grid
+            'Case "convert_grid"
+            '  equalpos = InStr(newstrline, "output=""")
+            '  If (equalpos > 0) Then
+            '    theOutputFileName = Mid(newstrline, equalpos + 8)
+            '    iname = CStr(InStr(theOutputFileName, """>"))
+            '    If CDbl(iname) > 0 Then
+            '      curFilename = Mid(theOutputFileName, CDbl(iname) + 2)
+            '      theOutputFileName = Left(theOutputFileName, CDbl(iname) - 1)
+            '      iname = CStr(InStr(curFilename, "<"))
+            '      If CDbl(iname) > 0 Then
+            '        curFilename = Left(curFilename, CDbl(iname) - 1)
+            '        If FileExists(theOutputFileName) Then
+            '          'remove output file
+            '          System.IO.File.Delete(theOutputFileName)
+            '        End If
+            '        If InStr(theOutputFileName, "\nlcd\") > 0 Then
+            '          'exception for nlcd data, already in albers
+            '          iproj = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+            '        Else
+            '          iproj = "+proj=longlat +datum=NAD83"
+            '        End If
+            '        oproj = WholeFileString(project_dir & "prj.proj")
+            '        oproj = CleanUpUserProjString(oproj)
+            '        If iproj = oproj Then
+            '          System.IO.File.Copy(curFilename, theOutputFileName)
+            '        Else
+            '          'project it
+            '          success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
+            '          If Not success Then
+            '            LogMsg("Failed to project grid", "ProcessProjectorFile")
+            '            System.IO.File.Copy(curFilename, theOutputFileName)
+            '          End If
+            '        End If
+            '      End If
+            '    End If
+            '  End If
+          Case "convert_dir"
+            'loop through a directory, projecting all files in it
+            theInputDirName = lProjectorNode.Content
+            theOutputDirName = lProjectorNode.GetAttrValue("output")
+            If theOutputDirName Is Nothing OrElse theOutputDirName.Length = 0 Then
+              theOutputDirName = theInputDirName
+            End If
+            If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
 
-      Do Until EOF(fu)
-        newstrline = LineInput(fu)
-        newstrline = Trim(newstrline)
-        LogDbg("Processing line: " & newstrline)
-        If LCase(Left(newstrline, 10)) = "<add_shape" Then
-          StrSplit(newstrline, ">", "")
-          theOutputFileName = Trim(StrSplit(newstrline, "<", ""))
-          If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
-          AddShapeToMW(theOutputFileName, GetDefaultsFor(theOutputFileName, project_dir, defaultsXML))
-        ElseIf LCase(Left(newstrline, 9)) = "<add_grid" Then
-          StrSplit(newstrline, ">", "")
-          theOutputFileName = Trim(StrSplit(newstrline, "<", ""))
-          If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
-          Dim g As New MapWinGIS.Grid
-          g.Open(theOutputFileName)
-          If InStr(theOutputFileName, "\demg\") > 0 Then
-            layername = FilenameOnly(theOutputFileName) & " DEMG"
-          ElseIf InStr(theOutputFileName, "\ned\") > 0 Then
-            layername = FilenameOnly(theOutputFileName) & " NED"
-          Else
-            layername = FilenameOnly(theOutputFileName)
-          End If
-          g_MapWin.Layers.Add(g, layername) 'to do add color scheme?
-        Else
-          Select Case LCase(Left(newstrline, 12))
-            Case "<add_allshap"
-              StrSplit(newstrline, ">", "")
-              theOutputFileName = Trim(StrSplit(newstrline, "<", ""))
-              AddAllShapesInDir(theOutputFileName, project_dir)
-            Case "<projector>", "</projector>"
-            Case "<project_dir" : StrSplit(newstrline, ">", "")
-              project_dir = StrSplit(newstrline, "<", "")
-              If Right(project_dir, 1) <> "\" Then project_dir = project_dir & "\"
-            Case "<convert_sha"
-              equalpos = InStr(newstrline, "output=""")
-              If (equalpos > 0) Then
-                theOutputFileName = Mid(newstrline, equalpos + 8)
-                iname = CStr(InStr(theOutputFileName, """>"))
-                If CDbl(iname) > 0 Then
-                  curFilename = Mid(theOutputFileName, CDbl(iname) + 2)
-                  theOutputFileName = Left(theOutputFileName, CDbl(iname) - 1)
-                  iname = CStr(InStr(curFilename, "<"))
-                  If CDbl(iname) > 0 Then
-                    curFilename = Left(curFilename, CDbl(iname) - 1)
-                    ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
-                  End If
-                End If
-              End If
-            Case "<convert_gri"
-              equalpos = InStr(newstrline, "output=""")
-              If (equalpos > 0) Then
-                theOutputFileName = Mid(newstrline, equalpos + 8)
-                iname = CStr(InStr(theOutputFileName, """>"))
-                If CDbl(iname) > 0 Then
-                  curFilename = Mid(theOutputFileName, CDbl(iname) + 2)
-                  theOutputFileName = Left(theOutputFileName, CDbl(iname) - 1)
-                  iname = CStr(InStr(curFilename, "<"))
-                  If CDbl(iname) > 0 Then
-                    curFilename = Left(curFilename, CDbl(iname) - 1)
-                    If FileExists(theOutputFileName) Then
-                      'remove output file
-                      System.IO.File.Delete(theOutputFileName)
-                    End If
-                    If InStr(theOutputFileName, "\nlcd\") > 0 Then
-                      'exception for nlcd data, already in albers
-                      iproj = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
-                    Else
-                      iproj = "+proj=longlat +datum=NAD83"
-                    End If
-                    oproj = WholeFileString(project_dir & "prj.proj")
-                    oproj = CleanUpUserProjString(oproj)
-                    If iproj = oproj Then
-                      System.IO.File.Copy(curFilename, theOutputFileName)
-                    Else
-                      'project it
-                      success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
-                      If Not success Then
-                        LogMsg("Failed to project grid", "ProcessProjectorFile")
-                        System.IO.File.Copy(curFilename, theOutputFileName)
-                      End If
-                    End If
-                  End If
-                End If
-              End If
-            Case "<convert_cov"
-                LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
-            Case "<convert_dir"
-                'loop through a directory, projecting all files in it
-                StrSplit(newstrline, " ", "")
-                ichars = Len(newstrline)
-                ctemp = newstrline
-                iname = CStr(InStr(1, ctemp, ">"))
-                firstpart = Mid(ctemp, 1, CInt(iname))
-                theInputDirName = Mid(ctemp, CDbl(iname) + 1, Len(ctemp) - CDbl(iname) - 14)
-                equalpos = InStr(1, firstpart, "=")
-                If (equalpos > 0) Then
-                  theOutputDirName = Mid(firstpart, equalpos + 2, CDbl(iname) - equalpos - 3)
+            InputFileList.Clear()
+
+            AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
+
+            For Each vFilename In InputFileList
+              curFilename = vFilename
+              If (FileExt(curFilename) = "shp") Then
+                'this is a shapefile
+                theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
+                'change projection and merge
+                If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
+                  'if the output file exists and it is a landuse shape, dont bother
                 Else
-                  theOutputDirName = theInputDirName
+                  ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
                 End If
-                If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
+              End If
+            Next vFilename
 
-                InputFileList.Clear()
+          Case Else
+            LogMsg("Cannot yet follow directive:" & vbCr & lProjectorNode.Tag, "ProcessProjectorFile")
+        End Select
 
-                AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
-
-                For Each vFilename In InputFileList
-                  curFilename = vFilename
-                  ilen = Len(curFilename)
-                  If (FileExt(curFilename) = "shp") Then
-                    'this is a shapefile
-                    theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
-                    'change projection and merge
-                    If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
-                      'if the output file exists and it is a landuse shape, dont bother
-                    Else
-                      ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
-                    End If
-                  End If
-                Next vFilename
-
-            Case Else
-                LogMsg("Cannot yet follow directive:" & vbCr & newstrline, "ProcessProjectorFile")
-          End Select
-        End If
-NextLine:
-      Loop
-      FileClose(fu)
+        If Not lProjectorNode.NextSibling2 Then lProjectorNode = Nothing
+      End While
     End If
   End Sub
 
@@ -459,7 +415,7 @@ NextLine:
   End Sub
 
   'Given a file name and the XML describing how to render it, add a shape layer to MapWindow
-  Private Function AddShapeToMW(ByVal Filename As String, _
+  Private Function AddShapeToMW(ByVal aFilename As String, _
                                 ByRef layerXml As Chilkat.Xml) As MapWindow.Interfaces.Layer
     Dim LayerName As String
     Dim Group As String
@@ -474,7 +430,7 @@ NextLine:
     'Don't add layer again if we already have it
     For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
       MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer))
-      If MWlay.FileName().ToLower = Filename.ToLower Then
+      If MWlay.FileName.ToLower = aFilename.ToLower Then
         Return MWlay
       End If
     Next
@@ -482,7 +438,7 @@ NextLine:
 
     Try
       If layerXml Is Nothing Then
-        LayerName = FilenameOnly(Filename)
+        LayerName = FilenameOnly(aFilename)
         Visible = False 'True
         Group = "Other"
       Else
@@ -497,9 +453,9 @@ NextLine:
         End Select
       End If
 
-      g_MapWin.StatusBar.Item(1).Text = "Opening " & Filename
+      g_MapWin.StatusBar.Item(1).Text = "Opening " & aFilename
       shpFile = New MapWinGIS.Shapefile
-      shpFile.Open(Filename)
+      shpFile.Open(aFilename)
       Select Case shpFile.ShapefileType
         Case MapWinGIS.ShpfileType.SHP_POINT, _
                 MapWinGIS.ShpfileType.SHP_POINTM, _
@@ -562,13 +518,13 @@ NextLine:
       MWlay.Visible = Visible
 
       'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
-      If LCase(Filename).IndexOf("\landuse\") > 0 Then
+      If LCase(aFilename).IndexOf("\landuse\") > 0 Then
         SetLandUseColors(MWlay, shpFile)
-      ElseIf LCase(Filename).IndexOf("\nhd\") > 0 Then
+      ElseIf LCase(aFilename).IndexOf("\nhd\") > 0 Then
         MWlay.Name &= " " & FilenameOnly(shpFile.Filename)
-      ElseIf LCase(Filename).IndexOf("\census\") > 0 Then
+      ElseIf LCase(aFilename).IndexOf("\census\") > 0 Then
         SetCensusColors(MWlay, shpFile)
-      ElseIf LCase(Filename).EndsWith("cat.shp") Then
+      ElseIf LCase(aFilename).EndsWith("cat.shp") Then
         MWlay.ZoomTo()
       End If
       If Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
@@ -579,8 +535,9 @@ NextLine:
       End If
       g_MapWin.Project.Modified = True
     Catch ex As Exception
-      LogMsg("Could not add '" & Filename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Shape")
+      LogMsg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Shape")
     End Try
+    g_MapWin.StatusBar.Item(1).Text = ""
 
     Return MWlay
   End Function

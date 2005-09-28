@@ -144,32 +144,33 @@ Public Class atcDataManager
       Return saveXML
     End Get
     Set(ByVal newValue As Chilkat.Xml)
-      Dim clearedSelectionAttributes As Boolean = False
-      Dim clearedDisplayAttributes As Boolean = False
-      Dim lchildXML As Chilkat.Xml
       Me.Clear()
-      lchildXML = newValue.FirstChild
+      If Not newValue Is Nothing Then
+        Dim clearedSelectionAttributes As Boolean = False
+        Dim clearedDisplayAttributes As Boolean = False
+        Dim lchildXML As Chilkat.Xml
+        lchildXML = newValue.FirstChild
 
-      While Not lchildXML Is Nothing
-        Select Case lchildXML.Tag
-          Case "DataFile", "DataSource"
-            OpenFile(lchildXML.GetAttrValue("FileName"), lchildXML.GetAttrValue("Filter"))
-          Case "SelectionAttribute"
-            If Not clearedSelectionAttributes Then
-              clearedSelectionAttributes = True
-              pSelectionAttributes.Clear()
-            End If
-            pSelectionAttributes.Add(lchildXML.Content)
-          Case "DisplayAttribute"
-            If Not clearedDisplayAttributes Then
-              pDisplayAttributes.Clear()
-              clearedDisplayAttributes = True
-            End If
-            pDisplayAttributes.Add(lchildXML.Content)
-        End Select
-        If Not lchildXML.NextSibling2 Then lchildXML = Nothing
-      End While
-
+        While Not lchildXML Is Nothing
+          Select Case lchildXML.Tag
+            Case "DataFile", "DataSource"
+              OpenFile(lchildXML.GetAttrValue("FileName"), lchildXML.GetAttrValue("Filter"))
+            Case "SelectionAttribute"
+              If Not clearedSelectionAttributes Then
+                clearedSelectionAttributes = True
+                pSelectionAttributes.Clear()
+              End If
+              pSelectionAttributes.Add(lchildXML.Content)
+            Case "DisplayAttribute"
+              If Not clearedDisplayAttributes Then
+                pDisplayAttributes.Clear()
+                clearedDisplayAttributes = True
+              End If
+              pDisplayAttributes.Add(lchildXML.Content)
+          End Select
+          If Not lchildXML.NextSibling2 Then lchildXML = Nothing
+        End While
+      End If
     End Set
   End Property
 End Class
