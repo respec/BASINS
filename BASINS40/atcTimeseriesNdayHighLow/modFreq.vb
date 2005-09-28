@@ -21,6 +21,28 @@ Module modFreq
                                              ByRef RI As Single, _
                                              ByRef RSOUT As Single, _
                                              ByRef RETCOD As Integer)
+  Declare Sub KENT Lib "usgs_swstats.dll" (ByRef X As Single, _
+                                            ByRef N As Integer, _
+                                            ByRef TAU As Single, _
+                                            ByRef PLEVEL As Single, _
+                                            ByRef SLOPE As Single)
+
+  'Kendall Tau Calculation
+  Sub KendallTau(ByVal aTs As atcTimeseries, ByRef aTau As Double, ByRef aLevel As Double, ByRef aSlope As Double)
+    Dim lQ() As Single
+    Dim lN As Integer = aTs.numValues
+    Dim lTau As Single
+    Dim lLevel As Single
+    Dim lSlope As Single
+    ReDim lQ(lN - 1)
+    For i As Integer = 1 To aTs.numValues
+      lQ(i - 1) = aTs.Values(i)
+    Next
+    KENT(lQ(0), lN, lTau, lLevel, lSlope)
+    aTau = lTau
+    aLevel = lLevel
+    aSlope = lSlope
+  End Sub
 
   'frequency analysis for specified recurrence interval or probability
   Function PearsonType3(ByVal aTs As atcTimeseries, ByVal aRecurOrProb As Double, ByVal aHigh As Boolean) As Double

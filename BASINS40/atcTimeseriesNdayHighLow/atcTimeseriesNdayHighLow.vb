@@ -68,6 +68,14 @@ Public Class atcTimeseriesNdayHighLow
           .TypeString = "atcTimeseries"
         End With
 
+        Dim defHigh As New atcAttributeDefinition
+        With defHigh
+          .Name = "HighFlag"
+          .Description = "High Flag"
+          .Editable = True
+          .TypeString = "Boolean"
+        End With
+
         AddOperation("7Q10", "Seven day low flow 10-year return period", _
                      "Double", defTimeSeriesOne)
         AddOperation("1Hi100", "One day high 100-year return period", _
@@ -83,6 +91,8 @@ Public Class atcTimeseriesNdayHighLow
         AddOperation("n-day high value", "n-day high value for a return period", _
                      "Double", defTimeSeriesOne, defDays, defReturnPeriod)
 
+        AddOperation("Kendall Tau", "Kendall Tau Statistics", _
+                     "Double", defTimeSeriesOne, defDays, defHigh)
       End If
       Return pAvailableOperations
     End Get
@@ -228,6 +238,68 @@ Public Class atcTimeseriesNdayHighLow
     End Try
   End Function
 
+  Private Sub ComputeTau(ByRef aTimeseries As atcTimeseries, _
+                         ByVal aNDay As Object, _
+                         ByVal aHigh As Boolean, _
+                         ByVal aAttributesStorage As atcDataAttributes)
+    Dim lNdayTsGroup As atcDataGroup
+
+    If aTimeseries.Attributes.GetValue("Tu", 1) <> 6 Then
+      'calculate the n day annual timeseries
+      lNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
+    Else 'already an annual timeseries
+      If (aHigh = aTimeseries.Attributes.GetValue("HighFlag") And _
+         aNDay = aTimeseries.Attributes.GetValue("NDay")) Then
+        lNdayTsGroup = New atcDataGroup(aTimeseries)
+      End If
+    End If
+
+    For Each lNdayTs As atcTimeseries In lNdayTsGroup
+      If Not lNdayTs Is Nothing Then
+        Dim lNday As Integer = lNdayTs.Attributes.GetValue("NDay")
+        Dim lTau As Double
+        Dim lLevel As Double
+        Dim lSlope As Double
+        KendallTau(lNdayTs, lTau, lLevel, lSlope)
+
+        Dim lS As String
+        If aHigh Then
+          lS = lNday & "Hi"
+        Else
+          lS = lNday & "Low"
+        End If
+        Dim lNewAttribute As New atcAttributeDefinition
+        With lNewAttribute
+          .Name = lS & "KT"
+          .Description = lS & " Kendall Tau "
+          .DefaultValue = ""
+          .Editable = False
+          .TypeString = "Double"
+          .Calculator = Me
+          .Category = "nDay & Frequency"
+        End With
+        Dim lKenTauValue As atcAttributeDefinition = lNewAttribute.Clone
+        lKenTauValue.Description = lKenTauValue.Description & "Value"
+        lKenTauValue.Name = lKenTauValue.Name & "Value"
+        Dim lKenTauProbLevel As atcAttributeDefinition = lNewAttribute.Clone
+        lKenTauProbLevel.Name = lKenTauProbLevel.Name & "ProbLevel"
+        lKenTauProbLevel.Description = lKenTauProbLevel.Description & "Probability Level"
+        Dim lKenTauSlope As atcAttributeDefinition = lNewAttribute.Clone
+        lKenTauSlope.Name = lKenTauSlope.Name & "Slope"
+        lKenTauSlope.Description = lKenTauSlope.Description & "Slope"
+
+        Dim lArguments As New atcDataAttributes
+        lArguments.SetValue("Nday", lNday)
+        lArguments.SetValue("HighFlag", aHigh)
+
+        aAttributesStorage.SetValue(lKenTauValue, lTau, lArguments)
+        aAttributesStorage.SetValue(lKenTauProbLevel, lLevel, lArguments)
+        aAttributesStorage.SetValue(lKenTauSlope, lSlope, lArguments)
+      End If
+    Next
+
+  End Sub
+
   Private Sub ComputeFreq(ByRef aTimeseries As atcTimeseries, _
                           ByVal aNDay As Object, _
                           ByVal aHigh As Boolean, _
@@ -236,7 +308,6 @@ Public Class atcTimeseriesNdayHighLow
                           ByVal aAttributesStorage As atcDataAttributes)
 
     Dim lNdayTsGroup As atcDataGroup
-    'Dim lNdayTs As atcTimeseries
     Dim lTsMath As atcDataSource
 
     Dim lRecurOrProb() As Double = Obj2Array(aRecurOrProb)
@@ -341,11 +412,15 @@ Public Class atcTimeseriesNdayHighLow
       lNDay = 1
       lReturn = 100
       lLogFlg = True
+      lHigh = True
+      lBoundaryMonth = 10
+      lBoundaryDay = 1
     Else
       ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
       lLogFlg = aArgs.GetValue("LogFlg", True)
       lNDay = aArgs.GetValue("NDay")
       lReturn = aArgs.GetValue("Return Period")
+      lHigh = aArgs.GetValue("HighFlag", True)
     End If
 
     Select Case lOperationName
@@ -362,15 +437,20 @@ Public Class atcTimeseriesNdayHighLow
     Select Case lOperationName
       Case "n-day low value", "n-day low timeseries"
         lHigh = False
-        lBoundaryMonth = 4
       Case "n-day high value", "n-day high timeseries"
         lHigh = True
-        lBoundaryMonth = 10
     End Select
 
-    'allow override of default boundary month/day
-    lBoundaryMonth = aArgs.GetValue("Boundary Month", lBoundaryMonth)
-    lBoundaryDay = aArgs.GetValue("Boundary Day", 1)
+    If lHigh Then
+      lBoundaryMonth = 10
+    Else
+      lBoundaryMonth = 4
+    End If
+    If Not aArgs Is Nothing Then
+      'allow override of default boundary month/day
+      lBoundaryMonth = aArgs.GetValue("Boundary Month", lBoundaryMonth)
+      lBoundaryDay = aArgs.GetValue("Boundary Day", 1)
+    End If
 
     If ltsGroup Is Nothing Then
       ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
@@ -384,6 +464,8 @@ Public Class atcTimeseriesNdayHighLow
         Case "n-day low timeseries", "n-day high timeseries"
           lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh)
           Me.DataSets.AddRange(lNDayTsGroup)
+        Case "kendall tau"
+          ComputeTau(lTsB, lNDay, lHigh, lTs.Attributes)
       End Select
     Next
 

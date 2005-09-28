@@ -82,6 +82,7 @@ Public Class atcAttributeDefinition
       .Max = Me.Max
       .Min = Me.Min
       .TypeString = Me.TypeString
+      .Calculator = Me.Calculator
       If Not Me.ValidList Is Nothing Then
         .ValidList = Me.ValidList.Clone
       End If
