@@ -41,6 +41,7 @@ Friend Class frmManager
   'Friend WithEvents lblDataSourceType As System.Windows.Forms.Label
   'Friend WithEvents btnOpen As System.Windows.Forms.Button
   'Friend WithEvents btnCancel As System.Windows.Forms.Button
+  Friend WithEvents tbbClose As System.Windows.Forms.ToolBarButton
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmManager))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -48,17 +49,12 @@ Friend Class frmManager
     Me.tbbOpen = New System.Windows.Forms.ToolBarButton
     Me.txtDetails = New System.Windows.Forms.TextBox
     Me.lstFiles = New System.Windows.Forms.ListBox
-    'Me.panelOpening = New System.Windows.Forms.Panel
-    'Me.btnCancel = New System.Windows.Forms.Button
-    'Me.btnOpen = New System.Windows.Forms.Button
-    'Me.lblDataSourceType = New System.Windows.Forms.Label
-    'Me.lstDataSourceType = New System.Windows.Forms.ListBox
-    'Me.panelOpening.SuspendLayout()
+    Me.tbbClose = New System.Windows.Forms.ToolBarButton
     Me.SuspendLayout()
     '
     'toolbarTop
     '
-    Me.toolbarTop.Buttons.AddRange(New System.Windows.Forms.ToolBarButton() {Me.tbbOpen})
+    Me.toolbarTop.Buttons.AddRange(New System.Windows.Forms.ToolBarButton() {Me.tbbOpen, Me.tbbClose})
     Me.toolbarTop.DropDownArrows = True
     Me.toolbarTop.Location = New System.Drawing.Point(0, 0)
     Me.toolbarTop.Name = "toolbarTop"
@@ -94,57 +90,10 @@ Friend Class frmManager
     Me.lstFiles.Size = New System.Drawing.Size(504, 192)
     Me.lstFiles.TabIndex = 3
     '
-    'panelOpening
+    'tbbClose
     '
-    'Me.panelOpening.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-    '            Or System.Windows.Forms.AnchorStyles.Left) _
-    '            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    'Me.panelOpening.Controls.Add(Me.btnCancel)
-    'Me.panelOpening.Controls.Add(Me.btnOpen)
-    'Me.panelOpening.Controls.Add(Me.lblDataSourceType)
-    'Me.panelOpening.Controls.Add(Me.lstDataSourceType)
-    'Me.panelOpening.Location = New System.Drawing.Point(0, 0)
-    'Me.panelOpening.Name = "panelOpening"
-    'Me.panelOpening.Size = New System.Drawing.Size(504, 312)
-    'Me.panelOpening.TabIndex = 4
-    'Me.panelOpening.Visible = False
-    ''
-    ''btnCancel
-    ''
-    'Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    'Me.btnCancel.Location = New System.Drawing.Point(104, 280)
-    'Me.btnCancel.Name = "btnCancel"
-    'Me.btnCancel.Size = New System.Drawing.Size(80, 24)
-    'Me.btnCancel.TabIndex = 3
-    'Me.btnCancel.Text = "Cancel"
-    ''
-    ''btnOpen
-    ''
-    'Me.btnOpen.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    'Me.btnOpen.Location = New System.Drawing.Point(8, 280)
-    'Me.btnOpen.Name = "btnOpen"
-    'Me.btnOpen.Size = New System.Drawing.Size(80, 24)
-    'Me.btnOpen.TabIndex = 2
-    'Me.btnOpen.Text = "Open"
-    ''
-    ''lblDataSourceType
-    ''
-    'Me.lblDataSourceType.Location = New System.Drawing.Point(8, 16)
-    'Me.lblDataSourceType.Name = "lblDataSourceType"
-    'Me.lblDataSourceType.Size = New System.Drawing.Size(344, 24)
-    'Me.lblDataSourceType.TabIndex = 1
-    'Me.lblDataSourceType.Text = "Select kind of data source to open:"
-    ''
-    ''lstDataSourceType
-    ''
-    'Me.lstDataSourceType.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-    '            Or System.Windows.Forms.AnchorStyles.Left) _
-    '            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    'Me.lstDataSourceType.IntegralHeight = False
-    'Me.lstDataSourceType.Location = New System.Drawing.Point(8, 40)
-    'Me.lstDataSourceType.Name = "lstDataSourceType"
-    'Me.lstDataSourceType.Size = New System.Drawing.Size(488, 224)
-    'Me.lstDataSourceType.TabIndex = 0
+    Me.tbbClose.Text = "Close"
+    Me.tbbClose.ToolTipText = "Unload selected data"
     '
     'frmManager
     '
@@ -153,11 +102,9 @@ Friend Class frmManager
     Me.Controls.Add(Me.lstFiles)
     Me.Controls.Add(Me.txtDetails)
     Me.Controls.Add(Me.toolbarTop)
-    'Me.Controls.Add(Me.panelOpening)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmManager"
     Me.Text = "Data Sources"
-    'Me.panelOpening.ResumeLayout(False)
     Me.ResumeLayout(False)
 
   End Sub
@@ -179,7 +126,13 @@ Friend Class frmManager
         Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
         pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
       Case "Close"
-        'TODO: how do we remove a file from pDataManager.Files?
+        'Skip In Memory data source at index zero
+        For iSource As Integer = pDataManager.DataSources.Count - 1 To 1 Step -1
+          If lstFiles.SelectedIndices.Contains(iSource) Then
+            pDataManager.DataSources.RemoveAt(iSource)
+            lstFiles.Items.RemoveAt(iSource)
+          End If
+        Next
     End Select
   End Sub
 

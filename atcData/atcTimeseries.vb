@@ -13,15 +13,6 @@ Public Class atcTimeseries
   Private pValues() As Double
   Private pValueAttributes() As atcDataAttributes
 
-  Public Overrides Function ToString() As String
-    Dim id As String = Attributes.GetValue("id")
-    'If id.Length = 0 Then id = "# " & CStr(pSerial)
-
-    Return Attributes.GetValue("Scenario") & " " _
-         & Attributes.GetValue("Location") & " " _
-         & Attributes.GetValue("Constituent") & " " & id & " # " & CStr(Serial)
-  End Function
-
   'Set or get an individual value
   Public Property Value(ByVal index As Integer) As Double
     Get
