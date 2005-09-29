@@ -302,7 +302,7 @@ Public Class PlugIn
                 FieldName = "FIPS"
               Case "st"
                 themeTag = "state_abbrev"
-                FieldName = "FIPS"
+                FieldName = "ST"
               Case Else
                 LogMsg("Unknown layer for selection, using first field", "Area Selection")
                 themeTag = "huc_cd"

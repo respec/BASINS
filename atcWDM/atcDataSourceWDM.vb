@@ -820,7 +820,7 @@ Public Class atcDataSourceWDM
 
   Public Overrides ReadOnly Property CanSave() As Boolean
     Get
-      Return False 'TODO: change this when we can, we can save a dataset, is this enough?
+      Return True
     End Get
   End Property
 
