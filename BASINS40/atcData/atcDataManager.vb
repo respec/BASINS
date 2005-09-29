@@ -12,6 +12,8 @@ Public Class atcDataManager
   Private pSelectionAttributes As ArrayList
   Private pDisplayAttributes As ArrayList
 
+  Private Const pInMemorySpecification As String = "<in memory>"
+
   Event OpenedData(ByVal aDataSource As atcDataSource)
 
   Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aBasins As Object)
@@ -24,7 +26,7 @@ Public Class atcDataManager
     pDataSources = New ArrayList
     Dim lMemory As New atcDataSource
     lMemory.DataManager = Me
-    lMemory.Specification = "<in memory>"
+    lMemory.Specification = pInMemorySpecification
     pDataSources.Add(lMemory)
 
     pSelectionAttributes = New ArrayList
@@ -98,11 +100,20 @@ Public Class atcDataManager
     If aNewSource.Open(aSpecification, aAttributes) Then
       pDataSources.Add(aNewSource)
       RaiseEvent OpenedData(aNewSource)
+      pMapWin.Project.Modified = True
       Return True
     Else
-      'TODO: LogError("Could not open '" & aSpecification & "' with '" & aNewSource.Name & "'")
+      LogDbg("Could not open '" & aSpecification & "' with '" & aNewSource.Name & "'")
       Return False
     End If
+  End Function
+
+  Public Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
+    For Each ds As atcDataSource In GetPlugins(GetType(atcDataSource))
+      If ds.Name = aDataSourceName Then
+        Return ds.NewOne
+      End If
+    Next
   End Function
 
   Public Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing) As atcDataSource
@@ -137,9 +148,12 @@ Public Class atcDataManager
         saveXML.NewChild("DisplayAttribute", lName)
       Next
       For Each lSource As atcDataSource In pDataSources
-        lchildXML = saveXML.NewChild("DataSource", "")
-        lchildXML.AddAttribute("Specification", lSource.Specification)
-        'lchildXML.AddAttribute("Filter", lSource.FileFilter)
+        If lSource.CanSave Then 'TODO: better test to pass only types that just need a Specification string to open
+          If Not lSource.Specification.Equals(pInMemorySpecification) Then
+            lchildXML = saveXML.NewChild("DataSource", lSource.Name)
+            lchildXML.AddAttribute("Specification", lSource.Specification)
+          End If
+        End If
       Next
       Return saveXML
     End Get
@@ -154,7 +168,18 @@ Public Class atcDataManager
         While Not lchildXML Is Nothing
           Select Case lchildXML.Tag
             Case "DataFile", "DataSource"
-              OpenFile(lchildXML.GetAttrValue("FileName"), lchildXML.GetAttrValue("Filter"))
+              Dim lDataSourceType As String = lchildXML.Content
+              Dim lSpecification As String = lchildXML.GetAttrValue("Specification")
+              If lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
+                LogMsg("No data source type found for '" & lSpecification & "'", "Data type not specified")
+              Else
+                Dim lNewDataSource As atcDataSource = DataSourceByName(lchildXML.Content)
+                If lNewDataSource Is Nothing Then
+                  LogMsg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
+                Else
+                  OpenDataSource(lNewDataSource, lSpecification, Nothing)
+                End If
+              End If
             Case "SelectionAttribute"
               If Not clearedSelectionAttributes Then
                 clearedSelectionAttributes = True
