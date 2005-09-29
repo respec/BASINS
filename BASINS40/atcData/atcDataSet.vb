@@ -1,6 +1,8 @@
 Public Class atcDataSet
 
   Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
+  Private Shared pStringFormat As String = "{0} {1} {2} # {3}"
+  Private Shared pStringAttributeNames() As String = {"Scenario", "Location", "Constituent", "id"}
 
   Private pSerial As Integer 'Serial number of this object
 
@@ -31,8 +33,23 @@ Public Class atcDataSet
   End Property
 
   Public Overrides Function ToString() As String
-    Return "atcDataSet #" & pSerial & " has " & pAttributes.Count & " attributes"
+    Dim lLastAttribute As Integer = pStringAttributeNames.GetUpperBound(0)
+    Dim lAttrValues(lLastAttribute) As String
+    For iArg As Integer = 0 To lLastAttribute
+      lAttrValues(iArg) = pAttributes.GetFormattedValue(pStringAttributeNames(iArg), "-")
+    Next
+    Return String.Format(pStringFormat, lAttrValues)
   End Function
 
+  Public Shared Sub SetStringFormat(ByVal aAttributeNames() As String, Optional ByVal aFormat As String = "")
+    If aFormat.Length = 0 Then 'Build a default format string with all arguments separated by spaces
+      For iArg As Integer = 0 To aAttributeNames.GetUpperBound(0)
+        aFormat &= "{" & iArg & "} "
+      Next
+      aFormat = RTrim(aFormat) 'remove trailing space
+    End If
+    pStringFormat = aFormat
+    pStringAttributeNames = aAttributeNames
+  End Sub
 
 End Class
