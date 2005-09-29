@@ -242,11 +242,17 @@ Public Class PlugIn
         Dim allFiles As NameValueCollection
         Dim iDrive As Integer
         Dim sDrive As String
+        Dim lFileName As String = PathNameOnly(PathNameOnly(g_MapWin.Plugins.PluginFolder)) & "\Data\national\" & NationalProjectFilename
         allFiles = New NameValueCollection
-        For iDrive = 0 To g_BasinsDrives.Length - 1
-          sDrive = UCase(g_BasinsDrives.Chars(iDrive))
-          AddFilesInDir(allFiles, sDrive & ":\BASINS\Data\national\", True, NationalProjectFilename)
-        Next
+
+        If FileExists(lFileName) Then
+          allFiles.Add(lFileName.ToLower, lFileName)
+        Else
+          For iDrive = 0 To g_BasinsDrives.Length - 1
+            sDrive = UCase(g_BasinsDrives.Chars(iDrive))
+            AddFilesInDir(allFiles, sDrive & ":\BASINS\Data\national\", True, NationalProjectFilename)
+          Next
+        End If
         If allFiles.Count > 0 Then
           g_MapWin.Project.Load(allFiles.Item(0))
         Else
@@ -684,9 +690,9 @@ Public Class PlugIn
     'separate database for each project (i.e. one database for the upper Missouri River Basin, a different 
     'one for the Lower Colorado Basin.) In this case, the plug-in would store the database name in the 
     'SettingsString of the project. 
-    Dim newXML As New Chilkat.Xml
-    newXML.LoadXml(SettingsString)
-    pDataManager.XML = newXML.FindChild("TimeseriesManager")
+    Dim lXML As New Chilkat.Xml
+    lXML.LoadXml(SettingsString)
+    pDataManager.XML = lXML.FindChild("DataManager")
   End Sub
 
   Public Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
