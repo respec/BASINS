@@ -232,9 +232,8 @@ Public Class PlugIn
     Dim DataDirName As String
     Dim PrjFileName As String
 
-    Debug.WriteLine("BASINS4:clsPlugIn:ItemClicked: " & ItemName)
+    LogDbg("BASINS4:clsPlugIn:ItemClicked: " & ItemName)
     If ItemName.Equals("mnuNew") Then 'Override File/New menu item behavior
-      Debug.WriteLine(g_MapWin.PreviewMap.BackColor)
       If NationalProjectIsOpen() Then
         MsgBox("Select the area of interest, " & vbCr & "then Download from the Data menu" & vbCr _
              & "to create a new BASINS project", , "New Project")
@@ -435,9 +434,9 @@ Public Class PlugIn
   '    tmpDbf.Value(4) = i & ",4"
   '    tmpDbf.Value(5) = i & ",5"
   '  Next i
-  '  Debug.WriteLine("Before write: " & tmpDbf.Summary)
+  '  LogDbg("Before write: " & tmpDbf.Summary)
   '  tmpDbf.WriteFile(dbfname)
-  '  Debug.WriteLine("After write: " & tmpDbf.Summary)
+  '  LogDbg("After write: " & tmpDbf.Summary)
   'End Sub
 
   Private Function LaunchTool(ByVal aToolName As String) As Boolean ', Optional ByVal aCmdLine As String = "") As Boolean
@@ -659,26 +658,38 @@ Public Class PlugIn
     'other plug-ins.
 
     If msg.StartsWith("WELCOME_SCREEN") Then
+      LogDbg("BASINS:Message:Welcomme:CommandLineScript:" & pCommandLineScript)
       If Not pCommandLineScript = True Then
-        Dim frmWelBsn As frmWelcomeScreenBasins = New frmWelcomeScreenBasins
-        frmWelBsn.ShowDialog()
-      End If
-    End If
-
-    If msg.StartsWith("atcDataPlugin") Then
-      RefreshToolsMenu()
-      'COMMAND_LINE:broadcast:basins:script:c:\test\BASINS4\scripts\dummy.vb
-    ElseIf msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
-      Dim s As String = msg.Substring(23)
-      If s.Substring(7).StartsWith("script") Then
-        ChDriveDir(PathNameOnly(s.Substring(14))) 'start where script is
-        Dim errors As String
-        RunBasinsScript("vb", WholeFileString(s.Substring(14)), errors, "dataManager", "basinsplugin")
-        If Not errors Is Nothing Then
-          MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+        If g_MapWin.Project.FileName Is Nothing Then
+          Dim frmWelBsn As frmWelcomeScreenBasins = New frmWelcomeScreenBasins
+          frmWelBsn.ShowDialog()
+        Else
+          LogDbg("BASINS:Message:Welcomme:SkipBecauseProjectOpen:" & g_MapWin.Project.FileName)
         End If
-        pCommandLineScript = True
       End If
+    ElseIf msg.StartsWith("atcDataPlugin") Then
+      LogDbg("BASINS:Message:RefreshToolsMenuMsg:" & msg)
+      RefreshToolsMenu()
+    ElseIf msg.StartsWith("COMMAND_LINE") Then
+      'COMMAND_LINE:broadcast:basins:script:c:\test\BASINS4\scripts\dummy.vb
+      LogDbg("BASINS:Message:" & msg)
+      If msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
+        Dim s As String = msg.Substring(23)
+        If s.Substring(7).StartsWith("script") Then
+          ChDriveDir(PathNameOnly(s.Substring(14))) 'start where script is
+          Dim errors As String
+          RunBasinsScript("vb", WholeFileString(s.Substring(14)), errors, "dataManager", "basinsplugin")
+          If Not errors Is Nothing Then
+            MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+          End If
+          pCommandLineScript = True
+        End If
+      End If
+    ElseIf msg.IndexOf(".mwprj") > 0 Then 'will try to open a project later
+      LogDbg("BASINS:Message:Project:" & msg)
+      pCommandLineScript = True
+    Else
+      LogDbg("BASINS:Message:Ignore:" & msg)
     End If
   End Sub
 
