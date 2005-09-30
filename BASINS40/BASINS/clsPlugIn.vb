@@ -30,6 +30,7 @@ Public Class PlugIn
   Private pLogFilename As String = ""
   Private WithEvents pDataManager As atcDataManager
 
+  Private pWelcomeScreenShow As Boolean = False
   Private pCommandLineScript As Boolean = False
 
   Private pBusy As Integer = 0 'Incremented by setting Busy = True, decremented by setting Busy = False
@@ -658,14 +659,13 @@ Public Class PlugIn
     'other plug-ins.
 
     If msg.StartsWith("WELCOME_SCREEN") Then
-      LogDbg("BASINS:Message:Welcomme:CommandLineScript:" & pCommandLineScript)
-      If Not pCommandLineScript = True Then
-        If g_MapWin.Project.FileName Is Nothing Then
-          Dim frmWelBsn As frmWelcomeScreenBasins = New frmWelcomeScreenBasins
-          frmWelBsn.ShowDialog()
-        Else
-          LogDbg("BASINS:Message:Welcomme:SkipBecauseProjectOpen:" & g_MapWin.Project.FileName)
-        End If
+      LogDbg("BASINS:Message:Welcomme:WelcomeScreenShow:" & pWelcomeScreenShow)
+      If pWelcomeScreenShow OrElse (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) Then
+        Dim frmWelBsn As frmWelcomeScreenBasins = New frmWelcomeScreenBasins
+        frmWelBsn.ShowDialog()
+      Else 'do it next time
+        pWelcomeScreenShow = True
+        LogDbg("BASINS:Message:Welcomme:Skip")
       End If
     ElseIf msg.StartsWith("atcDataPlugin") Then
       LogDbg("BASINS:Message:RefreshToolsMenuMsg:" & msg)
@@ -685,9 +685,6 @@ Public Class PlugIn
           pCommandLineScript = True
         End If
       End If
-    ElseIf msg.IndexOf(".mwprj") > 0 Then 'will try to open a project later
-      LogDbg("BASINS:Message:Project:" & msg)
-      pCommandLineScript = True
     Else
       LogDbg("BASINS:Message:Ignore:" & msg)
     End If
