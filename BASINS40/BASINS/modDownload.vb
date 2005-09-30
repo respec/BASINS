@@ -198,7 +198,7 @@ StartOver:
               layername = FilenameOnly(theOutputFileName)
             End If
             g_MapWin.Layers.Add(g, layername) 'to do add color scheme?
-          Case "add_allshape"
+          Case "add_allshapes"
             theOutputFileName = lProjectorNode.Content
             AddAllShapesInDir(theOutputFileName, project_dir)
           Case "project_dir"
@@ -208,72 +208,60 @@ StartOver:
             theOutputFileName = lProjectorNode.GetAttrValue("output")
             curFilename = lProjectorNode.Content
             ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
-            'TODO: rewrite and test convert_grid
-            'Case "convert_grid"
-            '  equalpos = InStr(newstrline, "output=""")
-            '  If (equalpos > 0) Then
-            '    theOutputFileName = Mid(newstrline, equalpos + 8)
-            '    iname = CStr(InStr(theOutputFileName, """>"))
-            '    If CDbl(iname) > 0 Then
-            '      curFilename = Mid(theOutputFileName, CDbl(iname) + 2)
-            '      theOutputFileName = Left(theOutputFileName, CDbl(iname) - 1)
-            '      iname = CStr(InStr(curFilename, "<"))
-            '      If CDbl(iname) > 0 Then
-            '        curFilename = Left(curFilename, CDbl(iname) - 1)
-            '        If FileExists(theOutputFileName) Then
-            '          'remove output file
-            '          System.IO.File.Delete(theOutputFileName)
-            '        End If
-            '        If InStr(theOutputFileName, "\nlcd\") > 0 Then
-            '          'exception for nlcd data, already in albers
-            '          iproj = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
-            '        Else
-            '          iproj = "+proj=longlat +datum=NAD83"
-            '        End If
-            '        oproj = WholeFileString(project_dir & "prj.proj")
-            '        oproj = CleanUpUserProjString(oproj)
-            '        If iproj = oproj Then
-            '          System.IO.File.Copy(curFilename, theOutputFileName)
-            '        Else
-            '          'project it
-            '          success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
-            '          If Not success Then
-            '            LogMsg("Failed to project grid", "ProcessProjectorFile")
-            '            System.IO.File.Copy(curFilename, theOutputFileName)
-            '          End If
-            '        End If
-            '      End If
-            '    End If
-            '  End If
-          Case "convert_dir"
-            'loop through a directory, projecting all files in it
-            theInputDirName = lProjectorNode.Content
-            theOutputDirName = lProjectorNode.GetAttrValue("output")
-            If theOutputDirName Is Nothing OrElse theOutputDirName.Length = 0 Then
-              theOutputDirName = theInputDirName
+          Case "convert_grid"
+            theOutputFileName = lProjectorNode.GetAttrValue("output")
+            curFilename = lProjectorNode.Content
+            If FileExists(theOutputFileName) Then
+              'remove output file
+              System.IO.File.Delete(theOutputFileName)
             End If
-            If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
-
-            InputFileList.Clear()
-
-            AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
-
-            For Each vFilename In InputFileList
-              curFilename = vFilename
-              If (FileExt(curFilename) = "shp") Then
-                'this is a shapefile
-                theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
-                'change projection and merge
-                If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
-                  'if the output file exists and it is a landuse shape, dont bother
-                Else
-                  ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
-                End If
+            If InStr(theOutputFileName, "\nlcd\") > 0 Then
+              'exception for nlcd data, already in albers
+              iproj = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+            Else
+              iproj = "+proj=longlat +datum=NAD83"
+            End If
+            oproj = WholeFileString(project_dir & "prj.proj")
+            oproj = CleanUpUserProjString(oproj)
+            If iproj = oproj Then
+              System.IO.File.Copy(curFilename, theOutputFileName)
+            Else
+              'project it
+              success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
+              If Not success Then
+                LogMsg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
+                System.IO.File.Copy(curFilename, theOutputFileName)
               End If
-            Next vFilename
+            End If
+          Case "convert_dir"
+              'loop through a directory, projecting all files in it
+              theInputDirName = lProjectorNode.Content
+              theOutputDirName = lProjectorNode.GetAttrValue("output")
+              If theOutputDirName Is Nothing OrElse theOutputDirName.Length = 0 Then
+                theOutputDirName = theInputDirName
+              End If
+              If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
+
+              InputFileList.Clear()
+
+              AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
+
+              For Each vFilename In InputFileList
+                curFilename = vFilename
+                If (FileExt(curFilename) = "shp") Then
+                  'this is a shapefile
+                  theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
+                  'change projection and merge
+                  If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
+                    'if the output file exists and it is a landuse shape, dont bother
+                  Else
+                    ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
+                  End If
+                End If
+              Next vFilename
 
           Case Else
-            LogMsg("Cannot yet follow directive:" & vbCr & lProjectorNode.Tag, "ProcessProjectorFile")
+              LogMsg("Cannot yet follow directive:" & vbCr & lProjectorNode.Tag, "ProcessProjectorFile")
         End Select
 
         If Not lProjectorNode.NextSibling2 Then lProjectorNode = Nothing
