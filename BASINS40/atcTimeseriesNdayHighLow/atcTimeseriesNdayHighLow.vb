@@ -260,7 +260,17 @@ Public Class atcTimeseriesNdayHighLow
         Dim lTau As Double
         Dim lLevel As Double
         Dim lSlope As Double
-        KendallTau(lNdayTs, lTau, lLevel, lSlope)
+        Dim lMsg As String = ""
+
+        Try
+          KendallTau(lNdayTs, lTau, lLevel, lSlope)
+        Catch ex As Exception
+          lMsg = "ComputeFreq:Exception:" & ex.ToString & ":" & lNdayTs.ToString
+          LogDbg(lMsg)
+          lTau = Double.NaN
+          lLevel = Double.NaN
+          lSlope = Double.NaN
+        End Try
 
         Dim lS As String
         If aHigh Then
@@ -309,6 +319,8 @@ Public Class atcTimeseriesNdayHighLow
 
     Dim lNdayTsGroup As atcDataGroup
     Dim lTsMath As atcDataSource
+    Dim lQ As Double
+    Dim lMsg As String = ""
 
     Dim lRecurOrProb() As Double = Obj2Array(aRecurOrProb)
 
@@ -334,7 +346,23 @@ Public Class atcTimeseriesNdayHighLow
         Dim lNday As Integer = lNdayTs.Attributes.GetValue("NDay")
 
         For Each lRecurOrProbNow As Double In lRecurOrProb
-          Dim lQ As Double = PearsonType3(lNdayTs, lRecurOrProbNow, aHigh)
+          Try
+            lQ = PearsonType3(lNdayTs, lRecurOrProbNow, aHigh)
+          Catch ex As Exception
+            lMsg = "ComputeFreq:Exception:" & ex.ToString & ":"
+            lQ = Double.NaN
+          End Try
+
+          If lQ = 0 Or Double.IsNaN(lQ) Then
+            If lMsg.Length = 0 Then
+              lMsg = "ComputeFreq:ZeroOrNan:" & lQ & ":"
+              lQ = Double.NaN
+            End If
+
+            lMsg &= lNday & ":" & lRecurOrProbNow & ":" & aHigh & ":" & lNdayTs.Attributes.GetValue("Count")
+            LogDbg(lMsg)
+            lMsg = ""
+          End If
 
           If aLogFg Then 'remove log10 transform 
             lQ = 10 ^ lQ
