@@ -148,6 +148,8 @@ Public Class PlugIn
       mnu = .AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
       mnu = .AddMenu(ToolsMenuName & "_WDMUtil", ToolsMenuName, Nothing, "&WDMUtil")
       mnu = .AddMenu(ToolsMenuName & "_RunScript", ToolsMenuName, Nothing, "Run Script")
+      .AddMenu(ToolsMenuName & "_RunBuiltInScript", ToolsMenuName & "_RunScript", Nothing, "Run Built In Script")
+      .AddMenu(ToolsMenuName & "_RunSelectScript", ToolsMenuName & "_RunScript", Nothing, "SelectScript to Run")
       mnu = .AddMenu(ToolsMenuName & "_OpenScript", ToolsMenuName, Nothing, "Edit Script")
       'mnu = .AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
 
