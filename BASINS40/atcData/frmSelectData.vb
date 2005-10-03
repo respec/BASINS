@@ -376,7 +376,7 @@ Friend Class frmSelectData
     Next
     For Each def As atcAttributeDefinition In atcDataAttributes.AllDefinitions
       If Not pcboCriteria(0).Items.Contains(def.Name) _
-       AndAlso def.TypeString <> "atcTimeseries" Then
+       AndAlso atcDataAttributes.IsSimple(def) Then
         For i = 0 To pcboCriteria.GetUpperBound(0)
           pcboCriteria(i).Items.Add(def.Name)
         Next
@@ -385,15 +385,44 @@ Friend Class frmSelectData
   End Sub
 
   Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As Windows.Forms.ListBox)
+    Dim lNumeric As Boolean = False
+    Dim lSortedItems As atcCollection
+    Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
+
+    If Not lAttributeDef Is Nothing Then
+      Select Case lAttributeDef.TypeString.ToLower
+        Case "integer", "single", "double"
+          lNumeric = True
+          lSortedItems = New atcCollection
+      End Select
+    End If
+
     With aList
       .Items.Clear()
       .Visible = False
+      .Sorted = Not lNumeric 'control can't sort numeric items
       For Each ts As atcDataSet In pDataManager.DataSets
-        Dim val As String = ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE)
-        If Not .Items.Contains(val) Then
-          .Items.Add(val)
+        Dim lVal As String = ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE)
+        If lNumeric Then
+          If Not lSortedItems.Contains(lVal) Then
+            Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
+            Dim lIndex As Integer = 0
+            While lIndex < lSortedItems.Count AndAlso CDbl(lSortedItems.Keys(lIndex)) < lKey
+              lIndex += 1
+            End While
+            lSortedItems.Insert(lIndex, lKey, lVal)
+          End If
+        Else
+          If Not .Items.Contains(lVal) Then
+            .Items.Add(lVal)
+          End If
         End If
       Next
+      If lNumeric Then
+        For Each lVal As String In lSortedItems
+          .Items.Add(lVal)
+        Next
+      End If
       .Visible = True
     End With
   End Sub
