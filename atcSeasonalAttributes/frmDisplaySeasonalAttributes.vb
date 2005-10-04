@@ -281,4 +281,10 @@ Friend Class frmDisplaySeasonalAttributes
     End Set
   End Property
 
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    pDataManager = Nothing
+    pDataGroup = Nothing
+    pSource = Nothing
+  End Sub
+
 End Class

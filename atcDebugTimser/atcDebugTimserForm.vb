@@ -381,4 +381,11 @@ Public Class atcDebugTimserForm
     mnuDataCount.Text = "Data to Show " & pNumValuesShow
     TreeAction("Expand")
   End Sub
+
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    pDataManager = Nothing
+    pDataGroup = Nothing
+    atrMain = Nothing
+  End Sub
+
 End Class

@@ -16,6 +16,7 @@ Public Class PlugIn
 
   Private Const DataMenuName As String = "BasinsData"
   Private Const DataMenuString As String = "&Data"
+  Private pLoadedDataMenu As Boolean = False
 
   Private Const ToolsMenuName As String = "BasinsTools"
   Private Const ToolsMenuString As String = "&Tools"
@@ -76,11 +77,6 @@ Public Class PlugIn
 
   Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
 
-    'Pass project information to welcome screen first
-
-    frmWelcomeScreenBasins.prj = aMapWin.Project
-    frmWelcomeScreenBasins.app = aMapWin.ApplicationInfo
-
     'fired when the user loads plug-in through plug-in dialog 
     'or by checkmarking it in the plug-ins menu.
     'This is where buttons or menu items are added.
@@ -138,41 +134,45 @@ Public Class PlugIn
   Private Sub RefreshToolsMenu()
     Dim mnu As MapWindow.Interfaces.MenuItem
     Dim iPlugin As Integer
-    With g_MapWin.Menus
-      .Remove(ToolsMenuString)
-      .AddMenu(ToolsMenuName, "", Nothing, ToolsMenuString, DataMenuName)
+    If pLoadedDataMenu Then
+      With g_MapWin.Menus
+        .Remove(ToolsMenuName)
+        .AddMenu(ToolsMenuName, "", Nothing, ToolsMenuString, DataMenuName)
 
-      'mnu = .AddMenu(ToolsMenuName & "_TestDBF", ToolsMenuName, Nothing, "Test DBF")
-      mnu = .AddMenu(ToolsMenuName & "_ArcView3", ToolsMenuName, Nothing, "ArcView &3")
-      mnu = .AddMenu(ToolsMenuName & "_ArcGIS", ToolsMenuName, Nothing, "&ArcGIS")
-      mnu = .AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
-      mnu = .AddMenu(ToolsMenuName & "_WDMUtil", ToolsMenuName, Nothing, "&WDMUtil")
-      mnu = .AddMenu(ToolsMenuName & "_RunScript", ToolsMenuName, Nothing, "Run Script")
-      .AddMenu(ToolsMenuName & "_RunBuiltInScript", ToolsMenuName & "_RunScript", Nothing, "Run Built In Script")
-      .AddMenu(ToolsMenuName & "_RunSelectScript", ToolsMenuName & "_RunScript", Nothing, "SelectScript to Run")
-      mnu = .AddMenu(ToolsMenuName & "_OpenScript", ToolsMenuName, Nothing, "Edit Script")
-      'mnu = .AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
+        'mnu = .AddMenu(ToolsMenuName & "_TestDBF", ToolsMenuName, Nothing, "Test DBF")
+        mnu = .AddMenu(ToolsMenuName & "_ArcView3", ToolsMenuName, Nothing, "ArcView &3")
+        mnu = .AddMenu(ToolsMenuName & "_ArcGIS", ToolsMenuName, Nothing, "&ArcGIS")
+        mnu = .AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
+        mnu = .AddMenu(ToolsMenuName & "_WDMUtil", ToolsMenuName, Nothing, "&WDMUtil")
+        mnu = .AddMenu(ToolsMenuName & "_Scripting", ToolsMenuName, Nothing, "Scripting")
+        If BuiltInScriptExists() Then
+          .AddMenu(ToolsMenuName & "_RunBuiltInScript", mnu.Name, Nothing, "Run Built In Script")
+        End If
+        .AddMenu(ToolsMenuName & "_ScriptEditor", mnu.Name, Nothing, "Script Editor")
+        .AddMenu(ToolsMenuName & "_RunScript", mnu.Name, Nothing, "Select Script to Run")
+        'mnu = .AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
 
-      Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-      If DisplayPlugins.Count > 0 Then
-        mnu = .AddMenu(ToolsMenuName & "_Separator1", ToolsMenuName, Nothing, "-")
-      End If
-      For Each lDisp As atcDataDisplay In DisplayPlugins
-        mnu = .AddMenu(ToolsMenuName & "_" & lDisp.Name, ToolsMenuName, Nothing, lDisp.Name)
-      Next
-    End With
+        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        If DisplayPlugins.Count > 0 Then
+          mnu = .AddMenu(ToolsMenuName & "_Separator1", ToolsMenuName, Nothing, "-")
+        End If
+        For Each lDisp As atcDataDisplay In DisplayPlugins
+          mnu = .AddMenu(ToolsMenuName & "_" & lDisp.Name, ToolsMenuName, Nothing, lDisp.Name)
+        Next
+      End With
+    End If
   End Sub
 
   Private Sub RefreshDataMenu()
     Dim mnu As MapWindow.Interfaces.MenuItem
     Dim iPlugin As Integer
     With g_MapWin.Menus
-      .Remove(DataMenuString)
+      .Remove(DataMenuName)
       .AddMenu(DataMenuName, "", Nothing, DataMenuString, "mnuFile")
       mnu = .AddMenu(DataMenuName & "_Download", DataMenuName, Nothing, "&Download")
       mnu = .AddMenu(DataMenuName & "_AddData", DataMenuName, Nothing, "&Add Data")
       mnu = .AddMenu(DataMenuName & "_ManageDataSources", DataMenuName, Nothing, "&Manage Sources")
-
+      pLoadedDataMenu = True
       'With g_MapWin.Plugins
       '  For iPlugin = 0 To .Count - 1
       '    If Not .Item(iPlugin) Is Nothing Then
@@ -192,31 +192,11 @@ Public Class PlugIn
     'buttons from the tool bar tool bar or menu items from the menu that you may have added.
     'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
 
-    g_MapWin.Menus.Remove(DataMenuName & "_Download")
-    g_MapWin.Menus.Remove(DataMenuName & "_AddData")
-    g_MapWin.Menus.Remove(DataMenuName & "_ManageDataSources")
     g_MapWin.Menus.Remove(DataMenuName)
-
-    'g_MapWin.Menus.Remove(DisplayMenuName)
-    'TODO: remove DisplayPlugins menu items
-
-    g_MapWin.Menus.Remove(ToolsMenuName & "_Separator1")
-    g_MapWin.Menus.Remove(ToolsMenuName & "_ArcView3")
-    g_MapWin.Menus.Remove(ToolsMenuName & "_ArcGIS")
-    g_MapWin.Menus.Remove(ToolsMenuName & "_GenScn")
-    g_MapWin.Menus.Remove(ToolsMenuName & "_WDMUtil")
-    g_MapWin.Menus.Remove(ToolsMenuName & "_RunScript")
-    g_MapWin.Menus.Remove(ToolsMenuName & "_OpenScript")
+    pLoadedDataMenu = False
     g_MapWin.Menus.Remove(ToolsMenuName)
-
-    g_MapWin.Menus.Remove(ModelsMenuName & "_SWAT")
-    g_MapWin.Menus.Remove(ModelsMenuName & "_PLOAD")
-    g_MapWin.Menus.Remove(ModelsMenuName & "_AGWA")
-    g_MapWin.Menus.Remove(ModelsMenuName & "_AQUATOX")
     g_MapWin.Menus.Remove(ModelsMenuName) 'TODO: don't unload if another plugin is still using it
-
     g_MapWin.Menus.Remove(ProjectsMenuName)
-
   End Sub
 
   Public Function NationalProjectIsOpen() As Boolean
@@ -362,112 +342,32 @@ Public Class PlugIn
     End Set
   End Property
 
-  Private Sub pDataManager_OpenedData(ByVal aFile As atcData.atcDataSource) Handles pDataManager.OpenedData
-    'Dim s As String
-    Dim i As Integer
-    'Dim lDebugFile As String = "c:\test\BASINS4\wdmFileDump.txt"
-    Dim lAttributeDetailsShow As Boolean
-    Dim lNvals As Integer
-    Dim lDataset As atcTimeseries
-
-    g_MapWin.StatusBar.ProgressBarValue = 5
-    g_MapWin.StatusBar.ShowProgressBar = True
-
-    g_MapWin.StatusBar.ProgressBarValue = 50
-
-    's = aFile.Specification & " contains " & aFile.DataSets.Count() & " datasets" & vbCrLf & vbCrLf
-    'SaveFileString(lDebugFile, s)
-
-    'lAttributeDetailsShow = True
-    'For Each lDataset In aFile.Timeseries
-    '  lNvals = lDataset.numValues
-    '  s = "DSN " & lDataset.Attributes.GetValue("id") & " contains " & lNvals & " values" & vbCrLf
-    '  For Each lAttribute As DictionaryEntry In lDataset.Attributes.GetAll
-    '    s &= "  " & lAttribute.Key & " '" & lAttribute.Value & "'"
-    '    If lAttributeDetailsShow Then
-    '      s &= " (" & Trim(lDataset.Attributes.GetDefinition(lAttribute.Key).Description)
-    '    End If
-    '    s &= vbCrLf
-    '  Next
-    '  For i = 0 To 3
-    '    s &= "  Value(" & i & ") = " & lDataset.Dates.Value(i) & " " & lDataset.Value(i) & vbCrLf
-    '  Next
-    '  AppendFileString(lDebugFile, s)
-    'Next
-
-    g_MapWin.StatusBar.ProgressBarValue = 75
-    g_MapWin.StatusBar.ProgressBarValue = 100
-    g_MapWin.StatusBar.ShowProgressBar = False
-  End Sub
-
-  'Private Sub TestDBF()
-  '  Dim dbfname As String = "C:\test\atcUtility\test.dbf"
-  '  Dim tmpDbf As IATCTable
-  '  Dim i As Long, j As Long
-  '  Dim baserow As Long
-
-  '  'does this dbf already exist?
-  '  If FileExists(dbfname) Then
-  '    'delete this file first
-  '    System.IO.File.Delete(dbfname)
-  '  End If
-  '  tmpDbf = atcUtility.TableOpener.OpenAnyTable(dbfname)
-  '  tmpDbf.NumFields = 5
-  '  tmpDbf.FieldName(1) = "Value"
-  '  tmpDbf.FieldType(1) = "N"
-  '  tmpDbf.FieldLength(1) = 10
-  '  tmpDbf.FieldName(2) = "Landuse"
-  '  tmpDbf.FieldType(2) = "C"
-  '  tmpDbf.FieldLength(2) = 30
-  '  tmpDbf.FieldName(3) = "Pervious"
-  '  tmpDbf.FieldType(3) = "C"
-  '  tmpDbf.FieldLength(3) = 10
-  '  tmpDbf.FieldName(4) = "Multiplier"
-  '  tmpDbf.FieldType(4) = "C"
-  '  tmpDbf.FieldLength(4) = 10
-  '  tmpDbf.FieldName(5) = "Subbasin"
-  '  tmpDbf.FieldType(5) = "C"
-  '  tmpDbf.FieldLength(5) = 10
-
-  '  For i = 1 To 10
-  '    tmpDbf.CurrentRecord = i
-  '    tmpDbf.Value(1) = i & ",1"
-  '    tmpDbf.Value(2) = i & ",2"
-  '    tmpDbf.Value(3) = i & ",3"
-  '    tmpDbf.Value(4) = i & ",4"
-  '    tmpDbf.Value(5) = i & ",5"
-  '  Next i
-  '  LogDbg("Before write: " & tmpDbf.Summary)
-  '  tmpDbf.WriteFile(dbfname)
-  '  LogDbg("After write: " & tmpDbf.Summary)
-  'End Sub
-
   Private Function LaunchTool(ByVal aToolName As String) As Boolean ', Optional ByVal aCmdLine As String = "") As Boolean
     Dim exename As String
     Select Case aToolName
-      'Case "TestDBF"
-      '  TestDBF()
-    Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
+      Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
       Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
       Case "HSPF"
         'If g_MapWin.Plugins.PluginIsLoaded("atcModelSetup_PlugIn") Then 'defer to other plugin
         Return False
         'End If
         'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
-      Case "OpenScript"
+      Case "ScriptEditor"
         Dim lfrm As New frmScript
         lfrm.BasinsPlugin = Me
         lfrm.Show()
         Return True
       Case Else
-        If aToolName.StartsWith("RunScript") Then
+        If aToolName.StartsWith("RunBuiltInScript") Then
           Try
-            RunDefaultScript()
-            Exit Function
+            RunBuiltInScript()
           Catch e As Exception
-            LogDbg(e.ToString)
+            LogMsg(e.ToString, "Error Running Built-in Script")
           End Try
-          aToolName = aToolName.Substring(11)
+          Return True
+
+        ElseIf aToolName.StartsWith("RunScript") Then
+          aToolName = aToolName.Substring(9)
           exename = StrSplit(aToolName, " ", """")
           Dim args() As Object = aToolName.Split(",")
           Dim errors As String
@@ -487,12 +387,15 @@ Public Class PlugIn
             Return False
           End If
         Else 'Search for DisplayPlugin to launch
-          Return LaunchDisplay(aToolName)
+          If LaunchDisplay(aToolName) Then
+            Return True
+          Else
+            LogMsg("Not yet able to launch " & aToolName, "Option not yet functional")
+          End If
         End If
     End Select
 
     If FileExists(exename) Then
-
       Shell("""" & exename & """", AppWinStyle.NormalFocus, False)
       Return True
     Else
@@ -501,10 +404,27 @@ Public Class PlugIn
     End If
   End Function
 
-  Private Sub RunDefaultScript()
-    atcScriptTest.Main(pDataManager, Me)
+  Private Function BuiltInScriptExists() As Boolean
+    Try
+      ErrorIfNoBuiltInScript()
+      Return True
+    Catch ex As Exception
+      Return False
+    End Try
+  End Function
+
+  Private Sub ErrorIfNoBuiltInScript()
+    Try
+      'TODO: find better test that doesn't risk running part of script
+      atcScriptTest.Main(Nothing, Nothing)
+    Catch e As Exception
+      'Expect e.Message = "Object variable or With block variable not set." if script uses one of the args
+    End Try
   End Sub
 
+  Private Sub RunBuiltInScript()
+    atcScriptTest.Main(pDataManager, Me)
+  End Sub
 
   Private Function LaunchDisplay(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
     Dim searchForName As String = aToolName.ToLower
@@ -531,16 +451,16 @@ Public Class PlugIn
 
   Public Function RunBasinsScript(ByVal aLanguage As String, _
                                     ByVal aScript As String, _
-                                    ByRef errors As String, _
-                                    ByVal ParamArray args() As Object) As Object
+                                    ByRef aErrors As String, _
+                                    ByVal ParamArray aArgs() As Object) As Object
 
-    If Not args Is Nothing Then 'replace some text arguments with objects
-      For iArg As Integer = 0 To args.GetUpperBound(0)
-        If args(iArg).GetType Is GetType(String) Then
-          Select Case args(iArg).ToLower
-            Case "datamanager" : args(iArg) = pDataManager
-            Case "basinsplugin" : args(iArg) = Me
-            Case "mapwin" : args(iArg) = g_MapWin
+    If Not aArgs Is Nothing Then 'replace some text arguments with objects
+      For iArg As Integer = 0 To aArgs.GetUpperBound(0)
+        If aArgs(iArg).GetType Is GetType(String) Then
+          Select Case aArgs(iArg).ToLower
+            Case "datamanager" : aArgs(iArg) = pDataManager
+            Case "basinsplugin" : aArgs(iArg) = Me
+            Case "mapwin" : aArgs(iArg) = g_MapWin
           End Select
         End If
       Next
@@ -557,7 +477,7 @@ Public Class PlugIn
       End If
     End If
 
-    Return RunScript(aLanguage, MakeScriptName, aScript, errors, args)
+    Return RunScript(aLanguage, MakeScriptName, aScript, aErrors, aArgs)
 
   End Function
 
@@ -572,7 +492,6 @@ Public Class PlugIn
     Loop While FileExists(tryName)
     Return tryName
   End Function
-
 
   'Public Sub CompilePlugin(ByVal aScript As String, _
   '                         ByRef aErrors As String, _
@@ -663,6 +582,8 @@ Public Class PlugIn
     If msg.StartsWith("WELCOME_SCREEN") Then
       LogDbg("BASINS:Message:Welcomme:WelcomeScreenShow:" & pWelcomeScreenShow)
       If pWelcomeScreenShow OrElse (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) Then
+        frmWelcomeScreenBasins.prj = g_MapWin.Project
+        frmWelcomeScreenBasins.app = g_MapWin.ApplicationInfo
         Dim frmWelBsn As frmWelcomeScreenBasins = New frmWelcomeScreenBasins
         frmWelBsn.ShowDialog()
       Else 'do it next time

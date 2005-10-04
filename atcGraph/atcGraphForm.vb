@@ -457,4 +457,14 @@ Public Class atcGraphForm
       End If
     Next
   End Sub
+
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    If Not pEditor Is Nothing Then
+      pEditor.Close()
+      pEditor = Nothing
+    End If
+    pMaster = Nothing
+    pDataManager = Nothing
+    pDataGroup = Nothing
+  End Sub
 End Class

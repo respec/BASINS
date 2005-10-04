@@ -332,4 +332,9 @@ Friend Class frmDisplaySWStats
       End If
     End With
   End Sub
+
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    pDataManager = Nothing
+    pDataGroup = Nothing
+  End Sub
 End Class

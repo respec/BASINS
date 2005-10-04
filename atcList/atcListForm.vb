@@ -161,4 +161,11 @@ Friend Class atcListForm
     PopulateGrid()
     'TODO: could efficiently remove by serial number
   End Sub
+
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    pDataManager = Nothing
+    pDataGroup = Nothing
+    pSource = Nothing
+  End Sub
+
 End Class
