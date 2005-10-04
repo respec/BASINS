@@ -2,46 +2,53 @@ Imports System.CodeDom.Compiler
 Imports System.Reflection
 
 Public Module modScript
-  Public Function RunScript(ByVal language As String, _
+  Public Function RunScript(ByVal aLanguage As String, _
                             ByVal aDLLfilename As String, _
-                            ByVal code As String, _
-                            ByRef errors As String, _
-                            ByVal ParamArray args() As Object) As Object
+                            ByVal aCode As String, _
+                            ByRef aErrors As String, _
+                            ByVal ParamArray aArgs() As Object) As Object
     Dim assy As System.Reflection.Assembly
     Dim instance As Object
     Dim assyTypes As Type() 'list of items within the assembly
 
     Dim MethodName As String = "Main" 'TODO: decide on entry point name
 
-    If code.IndexOfAny(vbCr & vbLf) < 0 Then
-      code = WholeFileString(code)
-    End If
+    Try
+      If FileExists(aCode) Then aCode = WholeFileString(aCode)
+    Catch ex As Exception
+      'Treat as code, not as file name
+    End Try
 
     'First compile the code into an assembly
-    assy = CompileScript(language, code, errors, aDLLfilename)
+    assy = CompileScript(aLanguage, aCode, aErrors, aDLLfilename)
 
-    If errors Is Nothing Then
+    If aErrors Is Nothing Then
       assyTypes = assy.GetTypes()
       For Each typ As Type In assyTypes
         Dim scriptMethodInfo As MethodInfo = typ.GetMethod(MethodName)
         If Not scriptMethodInfo Is Nothing Then
-          Return scriptMethodInfo.Invoke(Nothing, args) 'assy.CreateInstance(typ.Name)
+          Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
         End If
       Next
-      errors = "RunScript: '" & MethodName & "' not found"
+      aErrors = "RunScript: '" & MethodName & "' not found"
     End If
   End Function
 
   'language = "vb" or "cs" or "js"
-  Public Function CompileScript(ByVal language As String, _
-                                ByVal code As String, _
-                                ByRef errors As String, _
-                       Optional ByVal OutputFilename As String = "") As System.Reflection.Assembly
+  Public Function CompileScript(ByVal aLanguage As String, _
+                                ByVal aCode As String, _
+                                ByRef aErrors As String, _
+                       Optional ByVal aOutputFilename As String = "") As System.Reflection.Assembly
     Dim compiler As ICodeCompiler
     Dim params As CompilerParameters
     Dim results As CompilerResults
     Dim provider As CodeDomProvider
-    Select Case (language)
+    Dim needSupportCode As Boolean = False
+    Dim lSupportCode As String = ""
+
+    If aCode.IndexOf("Public ") < 0 Then needSupportCode = True
+
+    Select Case (aLanguage)
       Case "cs" : provider = New Microsoft.CSharp.CSharpCodeProvider
       Case "js" : provider = Activator.CreateInstance("Microsoft.JScript", "Microsoft.JScript.JScriptCodeProvider").Unwrap()
       Case "vb" : provider = New Microsoft.VisualBasic.VBCodeProvider
@@ -49,10 +56,10 @@ Public Module modScript
     End Select
 
     params = New System.CodeDom.Compiler.CompilerParameters
-    If OutputFilename.Length = 0 Then
+    If aOutputFilename.Length = 0 Then
       params.GenerateInMemory = True      'Assembly is created in memory
     Else
-      params.OutputAssembly = OutputFilename
+      params.OutputAssembly = aOutputFilename
     End If
     params.TreatWarningsAsErrors = False
     params.WarningLevel = 4
@@ -60,24 +67,55 @@ Public Module modScript
 
     For Each refAssy As System.Reflection.Assembly In AppDomain.CurrentDomain.GetAssemblies()
       params.ReferencedAssemblies.Add(refAssy.Location)
+      If needSupportCode Then
+        Dim lAssyName As String = StrSplit(refAssy.FullName, ",", "")
+        Select Case lAssyName
+          Case "mscorlib", _
+               "MapWinInterfaces", _
+               "AxInterop.MapWinGIS", _
+               "Interop.MapWinGIS", _
+               "mwIdentifier", _
+               "TableEditor.mw", _
+               "ChilkatDotNet", _
+               "MapWinX"
+            'Skip trying these for now, causing errors
+          Case Else
+            If lAssyName.StartsWith("RemoveMe") Then
+              'Don't add temporary assemblies
+            Else
+              lSupportCode &= "Imports " & lAssyName & vbCrLf
+            End If
+        End Select
+      End If
     Next
+
+    If needSupportCode Then
+      aCode = lSupportCode & vbCrLf _
+                           & "Public Module ScriptModule" & vbCrLf _
+                           & "  Public Sub Main(ByVal aDataManager As atcDataManager, ByVal aBasinsPlugIn As Object)" & vbCrLf _
+                           & aCode & vbCrLf _
+                           & "  End Sub" & vbCrLf _
+                           & "End Module"
+    End If
+
+    'MsgBox(aCode)
 
     Try
       provider = New Microsoft.VisualBasic.VBCodeProvider
       compiler = provider.CreateCompiler
-      results = compiler.CompileAssemblyFromSource(params, code)
+      results = compiler.CompileAssemblyFromSource(params, aCode)
       If results.Errors.Count = 0 Then        'No compile errors or warnings
         Return results.CompiledAssembly
       Else
         For Each err As CompilerError In results.Errors
-          errors &= (String.Format( _
+          aErrors &= (String.Format( _
               "Line {0}, Col {1}: Error {2} - {3}", _
               err.Line, err.Column, err.ErrorNumber, err.ErrorText)) & vbCrLf
         Next
       End If
     Catch ex As Exception
-      'Compile errors don't throw exceptions; you've got some deeper problem
-      errors = ex.Message
+      'Compile errors don't throw exceptions. This is a deeper problem
+      aErrors = ex.Message
     End Try
 
     Return Nothing

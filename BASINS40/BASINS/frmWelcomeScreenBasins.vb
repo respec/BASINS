@@ -26,18 +26,19 @@ Imports System.Windows.Forms
 Public Class frmWelcomeScreenBasins
   Inherits System.Windows.Forms.Form
 
-  Public Shared prj As Project
-  Public Shared app As AppInfo
+  Private prj As Project
+  Private app As AppInfo
 
 #Region " Windows Form Designer generated code "
 
-  Public Sub New()
+  Public Sub New(ByVal aProject As Project, ByVal aAppInfo As AppInfo)
     MyBase.New()
 
     'This call is required by the Windows Form Designer.
     InitializeComponent()
 
-    'Add any initialization after the InitializeComponent() call
+    prj = aProject
+    app = aAppInfo
   End Sub
 
   'Form overrides dispose to clean up the component list.

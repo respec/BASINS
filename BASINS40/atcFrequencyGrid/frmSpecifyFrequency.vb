@@ -288,7 +288,8 @@ Public Class frmSpecifyFrequency
     pGroup = aGroup
     Clear()
     Me.ShowDialog()
-    aChoseHigh = pChoseHigh
+    If pOk Then aChoseHigh = pChoseHigh
+    pGroup = Nothing
     Return pOk
   End Function
 

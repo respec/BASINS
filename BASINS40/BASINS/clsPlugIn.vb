@@ -131,6 +131,10 @@ Public Class PlugIn
 
   End Sub
 
+  Private Function ScriptFolder() As String
+    Return PathNameOnly(g_MapWin.Plugins.PluginFolder) & "\script"
+  End Function
+
   Private Sub RefreshToolsMenu()
     Dim mnu As MapWindow.Interfaces.MenuItem
     Dim iPlugin As Integer
@@ -150,6 +154,14 @@ Public Class PlugIn
         End If
         .AddMenu(ToolsMenuName & "_ScriptEditor", mnu.Name, Nothing, "Script Editor")
         .AddMenu(ToolsMenuName & "_RunScript", mnu.Name, Nothing, "Select Script to Run")
+
+        For Each lScriptFilename As String In System.IO.Directory.GetFiles(ScriptFolder, "*.vb")
+          Dim lMenuLabel As String = FilenameOnly(lScriptFilename)
+          If Not lMenuLabel.ToLower.StartsWith("sub") AndAlso Not lMenuLabel.ToLower.StartsWith("fun") Then
+            .AddMenu(ToolsMenuName & "_RunScript" & FilenameNoPath(lScriptFilename), mnu.Name, Nothing, "Run " & lMenuLabel)
+          End If
+        Next
+
         'mnu = .AddMenu(ToolsMenuName & "_ChangeProjection", ToolsMenuName, Nothing, "Change &Projection")
 
         Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
@@ -373,7 +385,12 @@ Public Class PlugIn
           Dim errors As String
 
           If exename.ToLower = "findfile" OrElse Not FileExists(exename) Then
-            exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+            Dim lScriptFileName As String = ScriptFolder() & "\" & exename
+            If FileExists(lScriptFileName) Then
+              exename = lScriptFileName
+            Else
+              exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+            End If
             If Len(args(0)) = 0 Then args = New Object() {"DataManager", "BasinsPlugIn"}
           End If
           If FileExists(exename) Then
@@ -466,14 +483,10 @@ Public Class PlugIn
       Next
     End If
 
-    If aScript.IndexOfAny(vbCr & vbLf) < 0 Then
-      If Not FileExists(aScript) Then
-        Dim lScriptFileName As String = PathNameOnly(g_MapWin.Plugins.PluginFolder) & "\script\" & aScript
-        If FileExists(lScriptFileName) Then
-          aScript = lScriptFileName
-        Else
-          MsgBox("Can't find " & lScriptFileName)
-        End If
+    If Not FileExists(aScript) Then
+      Dim lScriptFileName As String = ScriptFolder() & "\" & aScript
+      If FileExists(lScriptFileName) Then
+        aScript = lScriptFileName
       End If
     End If
 
@@ -483,7 +496,7 @@ Public Class PlugIn
 
   Private Function MakeScriptName() As String
     Dim tryName As String
-    Dim iTry As Integer = 0
+    Dim iTry As Integer = 1
 
     Do
       tryName = g_MapWin.Plugins.PluginFolder & _
@@ -575,21 +588,29 @@ Public Class PlugIn
   End Sub
 
   Public Sub Message(ByVal msg As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
-    'Plug-ins can communicate with eachother using Messages.  If a message is sent then this event fires.
-    'If you know the message is "for you" then you can set Handled=True and then it will not be sent to any
-    'other plug-ins.
-
     If msg.StartsWith("WELCOME_SCREEN") Then
-      LogDbg("BASINS:Message:Welcomme:WelcomeScreenShow:" & pWelcomeScreenShow)
-      If pWelcomeScreenShow OrElse (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) Then
-        frmWelcomeScreenBasins.prj = g_MapWin.Project
-        frmWelcomeScreenBasins.app = g_MapWin.ApplicationInfo
-        Dim frmWelBsn As frmWelcomeScreenBasins = New frmWelcomeScreenBasins
+      'We always show the welcome screen when requested EXCEPT we skip it when:
+      'it is the initial welcome screen AND we have loaded a project or script on the command line.
+
+      'If pWelcomeScreenShow is True, then 
+      'it is not the initial welcome screen because it is not the first time we got this message
+
+      'If Not g_MapWin.ApplicationInfo.ShowWelcomeScreen Then 
+      'it is not the initial welcome screen because MapWindow does not have given us the message in that case
+
+      'If (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) then 
+      'we did not load a project or run a script on the command line
+
+      If pWelcomeScreenShow _
+         OrElse Not g_MapWin.ApplicationInfo.ShowWelcomeScreen _
+         OrElse (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) Then
+        LogDbg("BASINS:Message:Welcome:Show")
+        Dim frmWelBsn As New frmWelcomeScreenBasins(g_MapWin.Project, g_MapWin.ApplicationInfo)
         frmWelBsn.ShowDialog()
-      Else 'do it next time
-        pWelcomeScreenShow = True
-        LogDbg("BASINS:Message:Welcomme:Skip")
+      Else 'Skip displaying welcome on launch
+        LogDbg("BASINS:Message:Welcome:Skip")
       End If
+      pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
     ElseIf msg.StartsWith("atcDataPlugin") Then
       LogDbg("BASINS:Message:RefreshToolsMenuMsg:" & msg)
       RefreshToolsMenu()

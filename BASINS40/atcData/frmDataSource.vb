@@ -121,6 +121,9 @@ Public Class frmDataSource
     Me.ShowDialog() 'Block until form closes
     aSelectedSource = pSelectedSource
     If Not aSelectedSource Is Nothing Then aSelectedSource.Specification = pSpecification
+    pDataManager = Nothing
+    pCategories = Nothing
+    pSelectedSource = Nothing
   End Sub
 
   Private Sub Populate(ByRef aNeedToOpen As Boolean, _
