@@ -136,6 +136,8 @@ Public Class frmSpecifyComputation
     'agdArguments.Initialize(pArgSource)
 
     Me.ShowDialog()
+    pDataManager = Nothing
+
     If pSelectedOK Then
       aArgs = pAttributes
       Return True

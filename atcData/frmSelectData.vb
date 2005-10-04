@@ -342,6 +342,12 @@ Friend Class frmSelectData
     Else
       Me.Show()
     End If
+
+    pDataManager = Nothing
+    pMatchingGroup = Nothing
+    pSaveGroup = Nothing
+    pMatchingSource = Nothing
+    pSelectedSource = Nothing
     Return pSelectedGroup
   End Function
 
@@ -833,15 +839,6 @@ NextName:
       pSelectedGroup.Add(lAdd) 'TODO: add with IDs as keys
       RefreshSelected()
     End If
-  End Sub
-
-  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-    pDataManager = Nothing
-    pMatchingGroup = Nothing
-    pSelectedGroup = Nothing
-    pSaveGroup = Nothing
-    pMatchingSource = Nothing
-    pSelectedSource = Nothing
   End Sub
 
 End Class
