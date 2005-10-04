@@ -967,6 +967,16 @@ Friend Class atcScenarioBuilderForm
     PositionRunButtons()
   End Sub
 
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    pDataManager = Nothing
+    pBaseScenario = Nothing
+    pModifiedScenarios = Nothing
+    pBaseResults = Nothing
+    pModifiedResults = Nothing
+    pSource = Nothing
+    pResultSource = Nothing
+  End Sub
+
 End Class
 
 Friend Class GridSource

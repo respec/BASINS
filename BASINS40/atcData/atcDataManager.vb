@@ -170,7 +170,9 @@ Public Class atcDataManager
             Case "DataFile", "DataSource"
               Dim lDataSourceType As String = lchildXML.Content
               Dim lSpecification As String = lchildXML.GetAttrValue("Specification")
-              If lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
+              If lSpecification.Equals(pInMemorySpecification) Then
+                'Ignore, we do not save this but we used to
+              ElseIf lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
                 LogMsg("No data source type found for '" & lSpecification & "'", "Data type not specified")
               Else
                 Dim lNewDataSource As atcDataSource = DataSourceByName(lchildXML.Content)

@@ -834,6 +834,16 @@ NextName:
       RefreshSelected()
     End If
   End Sub
+
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    pDataManager = Nothing
+    pMatchingGroup = Nothing
+    pSelectedGroup = Nothing
+    pSaveGroup = Nothing
+    pMatchingSource = Nothing
+    pSelectedSource = Nothing
+  End Sub
+
 End Class
 
 Friend Class GridSource

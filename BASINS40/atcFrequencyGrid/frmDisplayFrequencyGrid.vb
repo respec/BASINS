@@ -332,4 +332,11 @@ Friend Class frmDisplayFrequencyGrid
       End If
     End With
   End Sub
+
+  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+    pDataManager = Nothing
+    pDataGroup = Nothing
+    pSource = Nothing
+  End Sub
+
 End Class
