@@ -16,6 +16,7 @@ Public Class atcGridSource
   Private pColumns As Integer = 0
   Private pValues(,) As String
   Private pColors(,) As Color
+  Private pSelected(,) As Boolean
   Private pColorCells As Boolean = False
   Private pSwapRowsColumns As Boolean = False
 
@@ -68,6 +69,25 @@ Public Class atcGridSource
         ProtectedCellColor(aColumn, aRow) = newValue
       Else
         ProtectedCellColor(aRow, aColumn) = newValue
+      End If
+      'RaiseEvent ChangedValue(aRow, aColumn)
+    End Set
+  End Property
+
+  'True if cell is currently selected (not overridable to hide row/column swapping from inheritors)
+  Property CellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+    Get
+      If pSwapRowsColumns Then
+        Return ProtectedCellSelected(aColumn, aRow)
+      Else
+        Return ProtectedCellSelected(aRow, aColumn)
+      End If
+    End Get
+    Set(ByVal newValue As Boolean)
+      If pSwapRowsColumns Then
+        ProtectedCellSelected(aColumn, aRow) = newValue
+      Else
+        ProtectedCellSelected(aRow, aColumn) = newValue
       End If
       'RaiseEvent ChangedValue(aRow, aColumn)
     End Set
@@ -154,7 +174,7 @@ Public Class atcGridSource
   Protected Overridable Property ProtectedCellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As Color
     Get
       If pColors Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
-        Return Color.White
+        Return System.Drawing.SystemColors.Window
       Else
         Return pColors(aRow, aColumn)
       End If
@@ -166,6 +186,25 @@ Public Class atcGridSource
       If aRow > Rows + 1 Then Rows = aRow + 1
       If aColumn > Columns + 1 Then Columns = aRow + 1
       pColors(aRow, aColumn) = newValue
+    End Set
+  End Property
+
+  'Override this instead of CellSelected
+  Protected Overridable Property ProtectedCellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+    Get
+      If pSelected Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
+        Return False
+      Else
+        Return pSelected(aRow, aColumn)
+      End If
+    End Get
+    Set(ByVal newValue As Boolean)
+      If aRow > Rows + 1 Then Rows = aRow + 1
+      If aColumn > Columns + 1 Then Columns = aRow + 1
+      If pSelected Is Nothing Then
+        ReDim pSelected(Rows, Columns)
+      End If
+      pSelected(aRow, aColumn) = newValue
     End Set
   End Property
 

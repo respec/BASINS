@@ -1,7 +1,7 @@
 Public Class atcGrid
   Inherits System.Windows.Forms.UserControl
 
-  Event MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+  Event MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
   Event UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer)
 
   Private WithEvents pSource As atcGridSource
@@ -14,6 +14,7 @@ Public Class atcGrid
   Private pLineColor As Color
   Private pLineWidth As Single
   Private pCellBackColor As Color
+  Private pCellTextColor As Color
   Private pRowHeight As ArrayList = New ArrayList   'of Single
   Private pColumnWidth As ArrayList = New ArrayList 'of Single
 
@@ -103,9 +104,10 @@ Public Class atcGrid
     Dim lRows As Integer
     Dim lColumns As Integer
 
-    pCellBackColor = System.Drawing.SystemColors.Window
+    pCellBackColor = SystemColors.Window
+    pCellTextColor = SystemColors.WindowText
 
-    pLineColor = System.Drawing.SystemColors.Control
+    pLineColor = SystemColors.Control
     pLineWidth = 1
     pLineWidth = 1
 
@@ -266,8 +268,11 @@ Public Class atcGrid
       Dim lLinePen As New Pen(pLineColor, pLineWidth)
       Dim lOutsideBrush As New SolidBrush(pLineColor)
       Dim lCellBrush As New SolidBrush(pCellBackColor)
-      Dim lEachCellBrush As New SolidBrush(pCellBackColor)
-      Dim lDarkPen As New Pen(system.Drawing.SystemColors.ControlDarkDark, pLineWidth)
+
+      Dim lEachCellBackColor As Color = pCellBackColor
+      Dim lEachCellBackBrush As New SolidBrush(lEachCellBackColor)
+      Dim lEachCellTextBrush As New SolidBrush(SystemColors.WindowText)
+      'Dim lDarkPen As New Pen(system.Drawing.SystemColors.ControlDarkDark, pLineWidth)
 
       Dim lCellValue As String
       Dim lCellAlignment As Integer
@@ -360,18 +365,26 @@ Public Class atcGrid
       Dim lCellTop As Single = 0
       Dim lastRowDrawn As Integer = pTopRow + pRowBottom.Count - 1
       Dim lastColDrawn As Integer = pLeftColumn + pColRight.Count - 1
+      Dim ColorCells As Boolean = pSource.ColorCells
 
       For iRow = pTopRow To lastRowDrawn
         lCellLeft = 0
         For iColumn = pLeftColumn To lastColDrawn
           If ColumnWidth(iColumn) > 0 Then
-            If pSource.ColorCells Then
-              Dim lEachCellColor As Color = pSource.CellColor(iRow, iColumn)
-              If Not lEachCellColor.Equals(pCellBackColor) Then
-                lEachCellBrush.Color = lEachCellColor
-                g.FillRectangle(lEachCellBrush, lCellLeft, lCellTop, pColRight(iColumn - pLeftColumn) - lCellLeft, pRowBottom(iRow - pTopRow) - lCellTop)
-                g.DrawRectangle(lDarkPen, lCellLeft - 1, lCellTop - 1, pColRight(iColumn - pLeftColumn) - lCellLeft + 1, pRowBottom(iRow - pTopRow) - lCellTop + 1)
-              End If
+            If pSource.CellSelected(iRow, iColumn) Then
+              lEachCellBackColor = SystemColors.Highlight
+              lEachCellTextBrush.Color = SystemColors.HighlightText
+            ElseIf ColorCells Then
+              lEachCellBackColor = pSource.CellColor(iRow, iColumn)
+              lEachCellTextBrush.Color = SystemColors.WindowText
+            Else
+              lEachCellBackColor = pCellBackColor
+              lEachCellTextBrush.Color = SystemColors.WindowText
+            End If
+            If Not lEachCellBackColor.Equals(pCellBackColor) Then
+              lEachCellBackBrush.Color = lEachCellBackColor
+              g.FillRectangle(lEachCellBackBrush, lCellLeft, lCellTop, pColRight(iColumn - pLeftColumn) - lCellLeft, pRowBottom(iRow - pTopRow) - lCellTop)
+              g.DrawRectangle(lLinePen, lCellLeft - 1, lCellTop - 1, pColRight(iColumn - pLeftColumn) - lCellLeft + 1, pRowBottom(iRow - pTopRow) - lCellTop + 1)
             End If
             lCellValue = pSource.CellValue(iRow, iColumn)
             If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
@@ -418,11 +431,11 @@ Public Class atcGrid
               End Select
               Try
                 If lTabPos >= 0 Then 'Right-align part of text after tab
-                  g.DrawString(lMainValue, pFont, Brushes.Black, x, y)
+                  g.DrawString(lMainValue, pFont, lEachCellTextBrush, x, y)
                   x = pColRight(iColumn - pLeftColumn) - g.MeasureString(lCellValue.Substring(lTabPos + 1), pFont).Width
-                  g.DrawString(lCellValue.Substring(lTabPos + 1), pFont, Brushes.Black, x, y)
+                  g.DrawString(lCellValue.Substring(lTabPos + 1), pFont, lEachCellTextBrush, x, y)
                 Else
-                  g.DrawString(lCellValue, pFont, Brushes.Black, x, y) 'TODO: allow flexibility of brush
+                  g.DrawString(lCellValue, pFont, lEachCellTextBrush, x, y) 'TODO: allow flexibility of brush
                 End If
               Catch winErr As Exception
               End Try
@@ -524,7 +537,7 @@ Public Class atcGrid
         lColumn += 1
       End While
       If lRow + pTopRow < pSource.Rows And lColumn + pLeftColumn < pSource.Columns Then
-        RaiseEvent MouseDownCell(lRow + pTopRow, lColumn + pLeftColumn)
+        RaiseEvent MouseDownCell(Me, lRow + pTopRow, lColumn + pLeftColumn)
       End If
     End If
   End Sub

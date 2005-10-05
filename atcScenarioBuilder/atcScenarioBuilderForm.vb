@@ -566,7 +566,7 @@ Friend Class atcScenarioBuilderForm
   '  'TODO: could efficiently remove by serial number
   'End Sub
 
-  Private Sub agdMain_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMain.MouseDownCell
+  Private Sub agdMain_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMain.MouseDownCell
     If aRow > 0 AndAlso aColumn > 2 Then
       Dim pAttributeIndex As Integer
       Dim lBaseDataSet As atcDataSet = pSource.BaseDataSetInRow(aRow, pAttributeIndex) '(aRow - 1) \ pDataManager.DisplayAttributes.Count

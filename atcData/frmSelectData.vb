@@ -1,3 +1,4 @@
+Imports atcControls
 Imports atcUtility
 
 Imports System.Windows.Forms
@@ -292,7 +293,7 @@ Friend Class frmSelectData
   Private Const NOTHING_VALUE = "~Missing~"
 
   Private pcboCriteria() As Windows.Forms.ComboBox
-  Private plstCriteria() As Windows.Forms.ListBox
+  Private plstCriteria() As atcGrid
   Private pCriteriaFraction() As Single
 
   Private WithEvents pDataManager As atcDataManager
@@ -328,6 +329,7 @@ Friend Class frmSelectData
 
     pMatchingGroup = New atcDataGroup
     pMatchingSource = New GridSource(pDataManager, pMatchingGroup)
+    pMatchingSource.SelectedItems = pSelectedGroup
     pSelectedSource = New GridSource(pDataManager, pSelectedGroup)
 
     pMatchingGrid.Initialize(pMatchingSource)
@@ -390,23 +392,20 @@ Friend Class frmSelectData
     Next
   End Sub
 
-  Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As Windows.Forms.ListBox)
+  Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As atcGrid)
     Dim lNumeric As Boolean = False
-    Dim lSortedItems As atcCollection
+    Dim lSortedItems As New atcCollection
     Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
 
     If Not lAttributeDef Is Nothing Then
       Select Case lAttributeDef.TypeString.ToLower
         Case "integer", "single", "double"
           lNumeric = True
-          lSortedItems = New atcCollection
       End Select
     End If
 
     With aList
-      .Items.Clear()
       .Visible = False
-      .Sorted = Not lNumeric 'control can't sort numeric items
       For Each ts As atcDataSet In pDataManager.DataSets
         Dim lVal As String = ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE)
         If lNumeric Then
@@ -419,17 +418,22 @@ Friend Class frmSelectData
             lSortedItems.Insert(lIndex, lKey, lVal)
           End If
         Else
-          If Not .Items.Contains(lVal) Then
-            .Items.Add(lVal)
+          If Not lSortedItems.Contains(lVal) Then
+            Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
+            Dim lIndex As Integer = 0
+            While lIndex < lSortedItems.Count AndAlso lSortedItems.Keys(lIndex) < lKey
+              lIndex += 1
+            End While
+            lSortedItems.Insert(lIndex, lKey, lVal)
           End If
         End If
       Next
+      .Initialize(New ListSource(lSortedItems))
       If lNumeric Then
-        For Each lVal As String In lSortedItems
-          .Items.Add(lVal)
-        Next
+        .Source.Alignment(0, 0) = atcAlignment.HAlignDecimal
+      Else
+        .Source.Alignment(0, 0) = atcAlignment.HAlignLeft
       End If
-      .Visible = True
     End With
   End Sub
 
@@ -442,7 +446,7 @@ Friend Class frmSelectData
       For iCriteria As Integer = 0 To iLastCriteria
         Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
         If Not attrName Is Nothing Then
-          Dim selectedValues As Windows.Forms.ListBox.SelectedObjectCollection = plstCriteria(iCriteria).SelectedItems
+          Dim selectedValues As atcCollection = CType(plstCriteria(iCriteria).Source, ListSource).SelectedItems
           If selectedValues.Count > 0 Then 'none selected = all selected
             Dim attrValue As String = ts.Attributes.GetFormattedValue(attrName, NOTHING_VALUE)
             If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
@@ -453,6 +457,7 @@ Friend Class frmSelectData
       Next
       'Matched all criteria, add to matching table
       pMatchingGroup.Add(ts)
+      SelectMatchingRow(pMatchingGroup.Count, pSelectedGroup.Contains(ts))
 NextTS:
     Next
     lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
@@ -476,8 +481,16 @@ NextTS:
     End If
   End Sub
 
-  Private Sub lstCriteria_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
-    UpdatedCriteria()
+  Private Sub lstCriteria_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
+    Dim lSource As ListSource = aGrid.Source
+    Dim lIndex As Integer = lSource.SelectedItems.IndexFromKey(aRow)
+    If lIndex >= 0 Then
+      lSource.SelectedItems.RemoveAt(lIndex)
+    Else
+      lSource.SelectedItems.Add(aRow, lSource.CellValue(aRow, aColumn))
+    End If
+    aGrid.Refresh()
+    PopulateMatching()
   End Sub
 
   Private Sub UpdatedCriteria()
@@ -511,13 +524,13 @@ NextTS:
     End If
   End Sub
 
-  Private Sub RemoveCriteria(ByVal cbo As Windows.Forms.ComboBox, ByVal lst As Windows.Forms.ListBox)
+  Private Sub RemoveCriteria(ByVal cbo As Windows.Forms.ComboBox, ByVal lst As atcGrid)
     Dim iRemoving As Integer = GetIndex(cbo.Name)
     Dim newLastCriteria As Integer = pcboCriteria.GetUpperBound(0) - 1
     Dim OldToNew As Single = 1 / (1 - pCriteriaFraction(iRemoving))
     Dim mnu As MenuItem
     RemoveHandler cbo.SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
-    RemoveHandler lst.SelectedValueChanged, AddressOf lstCriteria_SelectedIndexChanged
+    RemoveHandler lst.MouseDownCell, AddressOf lstCriteria_MouseDownCell
     panelCriteria.Controls.Remove(cbo)
     panelCriteria.Controls.Remove(lst)
 
@@ -575,13 +588,13 @@ NextTS:
     End If
 
     pcboCriteria(iCriteria) = New Windows.Forms.ComboBox
-    plstCriteria(iCriteria) = New Windows.Forms.ListBox
+    plstCriteria(iCriteria) = New atcGrid
 
     panelCriteria.Controls.Add(pcboCriteria(iCriteria))
     panelCriteria.Controls.Add(plstCriteria(iCriteria))
 
     AddHandler pcboCriteria(iCriteria).SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
-    AddHandler plstCriteria(iCriteria).SelectedValueChanged, AddressOf lstCriteria_SelectedIndexChanged
+    AddHandler plstCriteria(iCriteria).MouseDownCell, AddressOf lstCriteria_MouseDownCell
 
     With pcboCriteria(iCriteria)
       .Name = "cboCriteria#" & iCriteria
@@ -592,10 +605,7 @@ NextTS:
 
     With plstCriteria(iCriteria)
       .Name = "lstCriteria#" & iCriteria
-      .IntegralHeight = False
-      .SelectionMode = Windows.Forms.SelectionMode.MultiSimple
-      .Sorted = True
-      '.Dock = Windows.Forms.DockStyle.Left
+      .AllowHorizontalScrolling = False
     End With
 
     If iCriteria = 0 Then
@@ -634,9 +644,11 @@ NextName:
 
   Private Sub ResizeOneCriteria(ByVal aCriteria As Integer, ByVal aWidth As Integer)
     Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
-    pcboCriteria(aCriteria).Width = aWidth - PADDING
-    pCriteriaFraction(aCriteria) = pcboCriteria(aCriteria).Width / (panelCriteria.Width - PADDING)
-    plstCriteria(aCriteria).Width = pcboCriteria(aCriteria).Width
+    Dim lWidth As Integer = aWidth - PADDING
+    pcboCriteria(aCriteria).Width = lWidth
+    pCriteriaFraction(aCriteria) = lWidth / (panelCriteria.Width - PADDING)
+    plstCriteria(aCriteria).Width = lWidth
+    plstCriteria(aCriteria).ColumnWidth(0) = lWidth
     While aCriteria < iLastCriteria
       aCriteria += 1
       pcboCriteria(aCriteria).Left = pcboCriteria(aCriteria - 1).Left + pcboCriteria(aCriteria - 1).Width + PADDING
@@ -646,8 +658,10 @@ NextName:
     'Fit rightmost criteria to fill remaining space
     Dim availableWidth As Integer = panelCriteria.Width - PADDING * 2
     If pcboCriteria(iLastCriteria).Left < availableWidth Then
-      pcboCriteria(iLastCriteria).Width = availableWidth - pcboCriteria(iLastCriteria).Left
-      plstCriteria(iLastCriteria).Width = pcboCriteria(iLastCriteria).Width
+      lWidth = availableWidth - pcboCriteria(iLastCriteria).Left
+      pcboCriteria(iLastCriteria).Width = lWidth
+      plstCriteria(iLastCriteria).Width = lWidth
+      plstCriteria(iLastCriteria).ColumnWidth(0) = lWidth
     End If
   End Sub
 
@@ -673,10 +687,16 @@ NextName:
           End If
           If pcboCriteria(iCriteria).Width > PADDING Then pcboCriteria(iCriteria).Width -= PADDING
 
-          plstCriteria(iCriteria).Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING
-          plstCriteria(iCriteria).Left = curLeft
-          plstCriteria(iCriteria).Width = pcboCriteria(iCriteria).Width
-          plstCriteria(iCriteria).Height = panelCriteria.Height - plstCriteria(iCriteria).Top - PADDING
+          With plstCriteria(iCriteria)
+            .Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING
+            .Left = curLeft
+            .Width = pcboCriteria(iCriteria).Width
+            .ColumnWidth(0) = .Width
+            .Height = panelCriteria.Height - .Top - PADDING
+            .Visible = True
+            .BringToFront()
+            .Refresh()
+          End With
 
           curLeft = pcboCriteria(iCriteria).Left + pcboCriteria(iCriteria).Width + PADDING
 
@@ -722,17 +742,25 @@ NextName:
     End If
   End Sub
 
-  Private Sub pMatchingGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles pMatchingGrid.MouseDownCell
+  Private Sub SelectMatchingRow(ByVal aRow As Integer, ByVal aSelect As Boolean)
+    For iColumn As Integer = 0 To pMatchingSource.Columns - 1
+      pMatchingSource.CellSelected(aRow, iColumn) = aSelect
+    Next
+  End Sub
+
+  Private Sub pMatchingGrid_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles pMatchingGrid.MouseDownCell
     If IsNumeric(pMatchingSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
       Dim lSerial As Integer = CInt(pMatchingSource.CellValue(aRow, 0)) 'Serial number in clicked row
       Dim iTS As Integer = pSelectedGroup.IndexOfSerial(lSerial)
       If iTS >= 0 Then 'Already selected, unselect
         pSelectedGroup.RemoveAt(iTS)
+        SelectMatchingRow(aRow, False)
       Else 'Not already selected, select it now
         iTS = pMatchingGroup.IndexOfSerial(lSerial)
         If iTS >= 0 Then 'Found matching serial number in pMatchingGroup
           Dim selTS As atcData.atcDataSet = pMatchingGroup(iTS)
           pSelectedGroup.Add(selTS.Attributes.GetValue("id"), selTS)
+          SelectMatchingRow(aRow, True)
         End If
       End If
     End If
@@ -740,11 +768,12 @@ NextName:
   End Sub
 
   Private Sub RefreshSelected()
+    pMatchingGrid.Refresh()
     pSelectedGrid.Refresh()
     groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & " of " & pTotalTS & ")"
   End Sub
 
-  Private Sub pSelectedGrid_MouseDownCell(ByVal aRow As Integer, ByVal aColumn As Integer) Handles pSelectedGrid.MouseDownCell
+  Private Sub pSelectedGrid_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles pSelectedGrid.MouseDownCell
     If IsNumeric(pSelectedSource.CellValue(aRow, 0)) Then 'clicked a row containing a serial number
       Dim lSerial As Integer = CInt(pSelectedSource.CellValue(aRow, 0)) 'Serial number in row to be removed
       Dim iTS As Integer = pSelectedGroup.IndexOfSerial(lSerial)
@@ -852,6 +881,16 @@ Friend Class GridSource
 
   Private pDataManager As atcDataManager
   Private pDataGroup As atcDataGroup
+  Private pSelected As atcCollection
+
+  Public Property SelectedItems() As atcCollection
+    Get
+      Return pSelected
+    End Get
+    Set(ByVal newValue As atcCollection)
+      pSelected = newValue
+    End Set
+  End Property
 
   Sub New(ByVal aDataManager As atcData.atcDataManager, _
           ByVal aDataGroup As atcData.atcDataGroup)
@@ -895,9 +934,125 @@ Friend Class GridSource
 
   Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
+      If aRow > LabelRow AndAlso aColumn > 0 Then
+        Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(pDataManager.SelectionAttributes(aColumn - 1))
+        If Not lAttributeDef Is Nothing Then
+          Select Case lAttributeDef.TypeString.ToLower
+            Case "integer", "single", "double"
+              Return atcAlignment.HAlignDecimal
+          End Select
+        End If
+      End If
       Return atcControls.atcAlignment.HAlignLeft
     End Get
     Set(ByVal Value As atcControls.atcAlignment)
+    End Set
+  End Property
+
+  Protected Overrides Property ProtectedCellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+    Get
+      If Not pSelected Is Nothing Then
+        If aRow = LabelRow Then
+          Return False
+        Else
+          Return pSelected.Contains(pDataGroup(aRow - (LabelRow + 1)))
+        End If
+      End If
+      Return False
+    End Get
+    Set(ByVal newValue As Boolean)
+    End Set
+  End Property
+
+End Class
+
+Friend Class ListSource
+  Inherits atcControls.atcGridSource
+
+  Private pAlignment As atcAlignment = atcAlignment.HAlignDecimal
+  Private pValues As atcCollection
+  Private pSelected As atcCollection
+
+  Public Property SelectedItems() As atcCollection
+    Get
+      Return pSelected
+    End Get
+    Set(ByVal newValue As atcCollection)
+      pSelected = newValue
+    End Set
+  End Property
+
+  Sub New(ByVal aValues As atcCollection, Optional ByVal aSelected As atcCollection = Nothing)
+    pValues = aValues
+    If aSelected Is Nothing Then
+      pSelected = New atcCollection
+    Else
+      pSelected = aSelected
+    End If
+  End Sub
+
+  Protected Overrides Property ProtectedColumns() As Integer
+    Get
+      Return 1
+    End Get
+    Set(ByVal Value As Integer)
+    End Set
+  End Property
+
+  Protected Overrides Property ProtectedRows() As Integer
+    Get
+      If pValues Is Nothing Then Return 1
+      Return pValues.Count
+    End Get
+    Set(ByVal Value As Integer)
+    End Set
+  End Property
+
+  Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+    Get
+      Try
+        Return pValues.ItemByIndex(aRow)
+      Catch
+        Return ""
+      End Try
+    End Get
+    Set(ByVal Value As String)
+    End Set
+  End Property
+
+  Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+    Get
+      Return pAlignment
+    End Get
+    Set(ByVal newValue As atcControls.atcAlignment)
+      pAlignment = newValue
+    End Set
+  End Property
+
+  'Protected Overrides Property ProtectedCellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
+  '  Get
+  '    If pSelected.Contains(ProtectedCellValue(aRow, aColumn)) Then
+  '      Return System.Drawing.SystemColors.Highlight
+  '    Else
+  '      Return System.Drawing.SystemColors.Window 'TODO: use grid's CellBackColor
+  '    End If
+  '  End Get
+  '  Set(ByVal Value As System.Drawing.Color)
+  '  End Set
+  'End Property
+
+  Protected Overrides Property ProtectedCellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+    Get
+      Return pSelected.Keys.Contains(aRow) ' & "," & aColumn)
+    End Get
+    Set(ByVal newValue As Boolean)
+      If newValue Then
+        If Not pSelected.Keys.Contains(aRow) Then
+          pSelected.Add(aRow, ProtectedCellValue(aRow, aColumn))
+        End If
+      Else
+        pSelected.RemoveByKey(aRow)
+      End If
     End Set
   End Property
 End Class
