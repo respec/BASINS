@@ -3,7 +3,7 @@
         ProjectType = "Local"
         ProductVersion = "7.10.3077"
         SchemaVersion = "2.0"
-        ProjectGuid = "{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}"
+        ProjectGuid = "{AF800243-4EC0-4ABA-A722-85872F7BD308}"
     >
         <Build>
             <Settings
@@ -120,14 +120,21 @@
                     WrapperTool = "tlbimp"
                 />
                 <Reference
-                    Name = "atcUtility"
-                    AssemblyName = "atcUtility"
-                    HintPath = "..\atcUtility\obj\Debug\atcUtility.dll"
-                />
-                <Reference
                     Name = "MapWinX"
                     AssemblyName = "MapWinX"
                     HintPath = "..\Bin\MapWinX.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "atcMwGisUtils"
+                    AssemblyName = "atcMwGisUtils"
+                    HintPath = "..\Bin\Plugins\BASINS\atcMwGisUtils.dll"
+                />
+                <Reference
+                    Name = "atcUtility"
+                    AssemblyName = "atcUtility"
+                    HintPath = "..\Bin\Plugins\BASINS\atcUtility.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>
@@ -159,12 +166,6 @@
                     RelPath = "frmModelSetup.resx"
                     DependentUpon = "frmModelSetup.vb"
                     BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "GisUtils.vb"
-                    Link = "..\atcMwGisUtils\GisUtils.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
                 />
             </Include>
         </Files>

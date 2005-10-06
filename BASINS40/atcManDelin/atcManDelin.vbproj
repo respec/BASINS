@@ -3,7 +3,7 @@
         ProjectType = "Local"
         ProductVersion = "7.10.3077"
         SchemaVersion = "2.0"
-        ProjectGuid = "{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}"
+        ProjectGuid = "{21CF6B20-3932-46DF-A8C1-0ADCCC61328F}"
     >
         <Build>
             <Settings
@@ -134,6 +134,11 @@
                     HintPath = "..\Bin\Plugins\BASINS\atcUtility.dll"
                     Private = "False"
                 />
+                <Reference
+                    Name = "atcMwGisUtils"
+                    AssemblyName = "atcMwGisUtils"
+                    HintPath = "..\Bin\Plugins\BASINS\atcMwGisUtils.dll"
+                />
             </References>
             <Imports>
                 <Import Namespace = "Microsoft.VisualBasic" />
@@ -164,12 +169,6 @@
                     RelPath = "frmManDelin.resx"
                     DependentUpon = "frmManDelin.vb"
                     BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "GisUtils.vb"
-                    Link = "..\atcMwGisUtils\GisUtils.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
                 />
             </Include>
         </Files>

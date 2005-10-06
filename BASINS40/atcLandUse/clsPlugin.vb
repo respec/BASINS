@@ -1,3 +1,5 @@
+Imports atcMwGisUtils
+
 Public Class PlugIn
   Implements MapWindow.Interfaces.IPlugin
 
@@ -68,7 +70,7 @@ Public Class PlugIn
 
     pMapWin.Menus.AddMenu(UtilitiesMenuName, "", Nothing, UtilitiesMenuString)
     mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_LandUse", UtilitiesMenuName, Nothing, "&Reclassify Land Use")
-    
+
   End Sub
 
   Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
@@ -87,7 +89,7 @@ Public Class PlugIn
     If ItemName = "BasinsUtilities_LandUse" Then
       SetGisUtilsMappingObject(pMapWin)
       Dim main As New frmLandUse
-      main.initializeUI()
+      main.InitializeUI()
       main.Show()
       Handled = True
     End If
