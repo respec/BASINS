@@ -510,8 +510,8 @@ Friend Class atcScenarioBuilderForm
     If FileExists(aScriptFileName) Then
       Dim args() As Object = New Object() {aDatasets}
       Dim errors As String
-      Dim lBasinsPlugin As Object = pDataManager.Basins
-      lBasinsPlugin.RunBasinsScript(FileExt(aScriptFileName), WholeFileString(aScriptFileName), errors, args)
+      'Dim lBasinsPlugin As Object = pDataManager.Basins
+      'lBasinsPlugin.RunBasinsScript(FileExt(aScriptFileName), WholeFileString(aScriptFileName), errors, args)
       If Not errors Is Nothing Then
         LogMsg(aScriptFileName & vbCrLf & vbCrLf & errors, "Attribute Script Error")
       End If
@@ -908,8 +908,8 @@ Friend Class atcScenarioBuilderForm
       End If
       Dim args() As Object = New Object() {"DataManager", pBaseScenario, lNewScenario}
       Dim errors As String
-      Dim lBasinsPlugin As Object = pDataManager.Basins
-      lBasinsPlugin.RunBasinsScript(FileExt(lScriptFileName), WholeFileString(lScriptFileName), errors, args)
+      'Dim lBasinsPlugin As Object = pDataManager.Basins
+      'lBasinsPlugin.RunBasinsScript(FileExt(lScriptFileName), WholeFileString(lScriptFileName), errors, args)
       If Not errors Is Nothing Then
         LogMsg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
       End If
