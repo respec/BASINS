@@ -1,5 +1,6 @@
 Imports System.Collections.Specialized
 Imports System.Windows.Forms.Application
+Imports System.Reflection
 Imports atcUtility
 Imports atcData
 
@@ -33,6 +34,7 @@ Public Class PlugIn
 
   Private pWelcomeScreenShow As Boolean = False
   Private pCommandLineScript As Boolean = False
+  Private pBuiltInScriptExists As Boolean = False
 
   Private pBusy As Integer = 0 'Incremented by setting Busy = True, decremented by setting Busy = False
   Private pBeforeBusyCursor As MapWinGIS.tkCursor
@@ -84,6 +86,8 @@ Public Class PlugIn
     Dim iDrive As Integer
     Dim iDirectory As Integer
     Dim mnu As MapWindow.Interfaces.MenuItem
+
+    BuiltInScript(False)
 
     g_MapWin = aMapWin
     g_MapWinWindowHandle = aParentHandle
@@ -149,7 +153,7 @@ Public Class PlugIn
         mnu = .AddMenu(ToolsMenuName & "_GenScn", ToolsMenuName, Nothing, "&GenScn")
         mnu = .AddMenu(ToolsMenuName & "_WDMUtil", ToolsMenuName, Nothing, "&WDMUtil")
         mnu = .AddMenu(ToolsMenuName & "_Scripting", ToolsMenuName, Nothing, "Scripting")
-        If BuiltInScriptExists() Then
+        If pBuiltInScriptExists Then
           .AddMenu(ToolsMenuName & "_RunBuiltInScript", mnu.Name, Nothing, "Run Built In Script")
         End If
         .AddMenu(ToolsMenuName & "_ScriptEditor", mnu.Name, Nothing, "Script Editor")
@@ -372,7 +376,7 @@ Public Class PlugIn
       Case Else
         If aToolName.StartsWith("RunBuiltInScript") Then
           Try
-            RunBuiltInScript()
+            BuiltInScript(True)
           Catch e As Exception
             LogMsg(e.ToString, "Error Running Built-in Script")
           End Try
@@ -421,26 +425,27 @@ Public Class PlugIn
     End If
   End Function
 
-  Private Function BuiltInScriptExists() As Boolean
+  Private Sub BuiltInScript(ByVal aRun As Boolean)
     Try
-      ErrorIfNoBuiltInScript()
-      Return True
+      Dim lFlags As BindingFlags = BindingFlags.NonPublic Or BindingFlags.Public Or _
+                                   BindingFlags.Static Or BindingFlags.Instance Or _
+                                   BindingFlags.DeclaredOnly
+      Dim lAssembly As [Assembly] = [Assembly].Load("atcScriptTest")
+      Dim lTypes As Type() = lAssembly.GetTypes
+      For Each lType As Type In lTypes
+        Dim lMethods As MethodInfo() = lType.GetMethods(lFlags)
+        For Each lMethod As MethodInfo In lMethods
+          If lMethod.Name.ToLower = "main" Then 'found built in script!
+            pBuiltInScriptExists = True
+            If aRun Then
+              Dim lParameters() = {pDataManager, Me}
+              lMethod.Invoke(Nothing, lParameters)
+            End If
+          End If
+        Next
+      Next
     Catch ex As Exception
-      Return False
     End Try
-  End Function
-
-  Private Sub ErrorIfNoBuiltInScript()
-    Try
-      'TODO: find better test that doesn't risk running part of script
-      atcScriptTest.Main(Nothing, Nothing)
-    Catch e As Exception
-      'Expect e.Message = "Object variable or With block variable not set." if script uses one of the args
-    End Try
-  End Sub
-
-  Private Sub RunBuiltInScript()
-    atcScriptTest.Main(pDataManager, Me)
   End Sub
 
   Private Function LaunchDisplay(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
