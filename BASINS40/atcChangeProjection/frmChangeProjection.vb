@@ -230,7 +230,7 @@ Public Class frmChangeProjection
         If Not success Then
           MsgBox("Unsuccessful projection attempt", MsgBoxStyle.OKOnly, "Change Projection Problem")
         End If
-      ElseIf Microsoft.VisualBasic.Right(lblILayer.Text, 4) = ".bgd" Then
+      ElseIf Microsoft.VisualBasic.Right(lblILayer.Text, 4) = ".bgd" Or Microsoft.VisualBasic.Right(lblILayer.Text, 4) = ".tif" Then
         'grid case
         If FileExists(lblOLayer.Text) Then
           'remove output file
@@ -240,6 +240,8 @@ Public Class frmChangeProjection
         If Not success Then
           MsgBox("Unsuccessful projection attempt", MsgBoxStyle.OKOnly, "Change Projection Problem")
         End If
+      Else
+        MsgBox("This file format is not supported in the Change Projection Utility tool.", MsgBoxStyle.OKOnly, "Change Projection Problem")
       End If
     End If
     If success Then
