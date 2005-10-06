@@ -9,9 +9,9 @@ Global
 		Release = Release
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
-		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Debug.ActiveCfg = Debug|.NET
-		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Debug.Build.0 = Debug|.NET
-		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Release.ActiveCfg = Debug|.NET
+		{3C0464B6-F995-4138-8DE3-DBB682F06FB5}.Debug.ActiveCfg = Debug|.NET
+		{3C0464B6-F995-4138-8DE3-DBB682F06FB5}.Debug.Build.0 = Debug|.NET
+		{3C0464B6-F995-4138-8DE3-DBB682F06FB5}.Release.ActiveCfg = Debug|.NET
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

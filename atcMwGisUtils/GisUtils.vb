@@ -1,6 +1,6 @@
 Imports atcUtility
 
-Module GISUtils
+Public Module GISUtils
 
   'GIS Utilities Implemented thru MapWindow
   Public pMapWin As MapWindow.Interfaces.IMapWin
