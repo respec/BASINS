@@ -42,11 +42,11 @@ Public Class atcDataManager
   End Sub
 
   'The BASINS plugin
-  Public ReadOnly Property Basins() As MapWindow.Interfaces.IPlugin
-    Get
-      Return pBasins
-    End Get
-  End Property
+  'Public ReadOnly Property Basins() As MapWindow.Interfaces.IPlugin
+  '  Get
+  '    Return pBasins
+  '  End Get
+  'End Property
 
   'The set of atcDataSource objects representing currently open DataSources
   Public ReadOnly Property DataSources() As ArrayList

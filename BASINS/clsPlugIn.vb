@@ -77,6 +77,12 @@ Public Class PlugIn
     End Get
   End Property
 
+  Public ReadOnly Property MapWin() As MapWindow.Interfaces.IMapWin
+    Get
+      Return g_MapWin
+    End Get
+  End Property
+
   Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
 
     'fired when the user loads plug-in through plug-in dialog 
