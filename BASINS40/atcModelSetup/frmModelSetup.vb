@@ -1313,15 +1313,27 @@ Public Class frmModelSetup
   End Sub
 
   Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+    Dim OutputPath As String
+    Dim BaseOutputName As String
+    Dim DriveLetter As String
+
+    DriveLetter = Mid(CurDir(), 1, 1)
+    OutputPath = DriveLetter & ":\BASINS\modelout\" & tbxName.Text
+    BaseOutputName = tbxName.Text
+
     If pModelName = "AQUATOX" Then
-      SetupAQUATOX()
+      If SetupAQUATOX(OutputPath, BaseOutputName) Then
+        StartAQUATOX(" UNKNOWN " & OutputPath)
+      End If
     Else
-      SetupHSPF()
+      If SetupHSPF(OutputPath, BaseOutputName) Then
+        StartWinHSPF(OutputPath & "\" & BaseOutputName & ".wsd")
+      End If
     End If
   End Sub
 
-  Private Sub SetupHSPF()
-    Dim DriveLetter As String
+  Public Function SetupHSPF(ByVal OutputPath As String, ByVal BaseOutputName As String)
+    Dim luDriveLetter As String
     Dim BaseFileName As String
     Dim SubbasinThemeName As String
     Dim SubbasinLayerIndex As Long
@@ -1333,7 +1345,7 @@ Public Class frmModelSetup
     Dim LandUseThemeName As String
     Dim OutletsThemeName As String
     Dim LanduseLayerIndex As Long
-    Dim PathName As String
+    Dim luPathName As String
     Dim NewFileName As String
     Dim ReclassifyFile As String
     Dim i As Long
@@ -1359,9 +1371,9 @@ Public Class frmModelSetup
     Me.Refresh()
     EnableControls(False)
 
-    If Not PreProcessChecking() Then
+    If Not PreProcessChecking(OutputPath, BaseOutputName) Then
       'failed on one of the early checks, exit sub
-      Exit Sub
+      Exit Function
     End If
     Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
@@ -1383,9 +1395,6 @@ Public Class frmModelSetup
         cSelectedSubbasins.Add(i - 1)
       Next
     End If
-
-    PathName = PathNameOnly(GisUtil_LayerFileName(SubbasinLayerIndex))
-    DriveLetter = Mid(PathName, 1, 1)
 
     'set landuse layer
     If cboLandUseLayer.SelectedIndex > -1 Then
@@ -1412,10 +1421,10 @@ Public Class frmModelSetup
       'set land use index layer
       LanduseLayerIndex = GisUtil_FindLayerIndexByName(LandUseThemeName)
       LandUseFieldIndex = GisUtil_FindFieldIndexByName(LanduseLayerIndex, LanduseFieldName)
-      PathName = PathNameOnly(GisUtil_LayerFileName(LanduseLayerIndex))
-      PathName = PathName & "\landuse"
-      DriveLetter = Mid(PathName, 1, 1)
-      ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
+      luPathName = PathNameOnly(GisUtil_LayerFileName(LanduseLayerIndex))
+      luPathName = luPathName & "\landuse"
+      luDriveLetter = Mid(luPathName, 1, 1)
+      ReclassifyFile = luDriveLetter & ":\basins\etc\giras.dbf"
 
       'figure out which land use tiles to overlay
       Dim cluTiles As New Collection
@@ -1444,12 +1453,12 @@ Public Class frmModelSetup
       totalpolygoncount = 0
       For j = 1 To cluTiles.Count
         'loop thru each land use tile
-        NewFileName = PathName & "\" & cluTiles(j) & ".shp"
+        NewFileName = luPathName & "\" & cluTiles(j) & ".shp"
         If Not GisUtil_AddLayerToMap(NewFileName, cluTiles(j)) Then
           MsgBox("The GIRAS Landuse Shapefile " & NewFileName & "does not exist." & _
                  vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "HSPF Problem")
           EnableControls(True)
-          Exit Sub
+          Exit Function
         End If
         totalpolygoncount = totalpolygoncount + GisUtil_NumFeaturesInLayer(GisUtil_FindLayerIndexByName(cluTiles(j)))
       Next j
@@ -1471,14 +1480,14 @@ Public Class frmModelSetup
 
         'do overlay
         GisUtil_Overlay(cluTiles(j), LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
-                        PathName & "\overlay.shp", bfirst)
+                        luPathName & "\overlay.shp", bfirst)
       Next j
 
       'compile areas, slopes and lengths
       lblStatus.Text = "Compiling Overlay Results"
       Me.Refresh()
 
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(PathName & "\overlay.dbf")
+      tmpDbf = atcUtility.TableOpener.OpenAnyTable(luPathName & "\overlay.dbf")
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
         lucode = tmpDbf.Value(1)
@@ -1544,13 +1553,13 @@ Public Class frmModelSetup
 
       'do overlay
       GisUtil_Overlay(LandUseThemeName, LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
-                      PathName & "\overlay.shp", True)
+                      luPathName & "\overlay.shp", True)
 
       'compile areas, slopes and lengths
       lblStatus.Text = "Compiling Overlay Results"
       Me.Refresh()
 
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(PathName & "\overlay.dbf")
+      tmpDbf = atcUtility.TableOpener.OpenAnyTable(luPathName & "\overlay.dbf")
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
         lucode = tmpDbf.Value(1)
@@ -1609,10 +1618,8 @@ Public Class frmModelSetup
 
 
     'make output folder
-    PathName = DriveLetter & ":\BASINS\modelout\" & tbxName.Text
-    'TODO: dont require basins to be at the root
-    MkDirPath(PathName)
-    BaseFileName = PathName & "\" & tbxName.Text
+    MkDirPath(OutputPath)
+    BaseFileName = OutputPath & "\" & BaseOutputName
 
     'write wsd file
     lblStatus.Text = "Writing WSD file"
@@ -1632,22 +1639,21 @@ Public Class frmModelSetup
     'start winhspf
     lblStatus.Text = "Starting WinHSPF"
     Me.Refresh()
-    StartWinHSPF(BaseFileName & ".wsd")
     Me.Dispose()
     Me.Close()
+    SetupHSPF = True
 
-    Exit Sub
+    Exit Function
 
 ErrHand:
     MsgBox("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
     Me.Dispose()
     Me.Close()
-  End Sub
+    SetupHSPF = False
+  End Function
 
-  Private Sub SetupAQUATOX()
-    Dim DriveLetter As String
+  Private Function SetupAQUATOX(ByVal OutputPath As String, ByVal BaseOutputName As String)
     Dim BaseFileName As String
-    Dim PathName As String
     Dim i As Long
     Dim StreamsThemeName As String
     Dim StreamsFieldName As String
@@ -1660,9 +1666,9 @@ ErrHand:
     Me.Refresh()
     EnableControls(False)
 
-    If Not PreProcessChecking() Then
+    If Not PreProcessChecking(OutputPath, BaseOutputName) Then
       'failed on one of the early checks, exit sub
-      Exit Sub
+      Exit Function
     End If
     Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
@@ -1678,7 +1684,7 @@ ErrHand:
     If cSelectedStreams.Count <> 1 Then
       MsgBox("BASINS AQUATOX requires one and only one selected stream segment.", vbOKCancel, "BASINS AQUATOX Problem")
       EnableControls(True)
-      Exit Sub
+      Exit Function
     End If
 
     'get the id of the selected stream
@@ -1686,12 +1692,8 @@ ErrHand:
     cUniqueStreamIds.Add(GisUtil_CellValueNthFeatureInLayer(StreamsLayerIndex, StreamsFieldIndex, cSelectedStreams(1)))
 
     'make output folder
-    PathName = PathNameOnly(GisUtil_LayerFileName(StreamsLayerIndex))
-    DriveLetter = Mid(PathName, 1, 1)
-    PathName = DriveLetter & ":\BASINS\modelout\" & tbxName.Text
-    'TODO: dont require basins to be at the root
-    MkDirPath(PathName)
-    BaseFileName = PathName & "\" & tbxName.Text
+    MkDirPath(OutputPath)
+    BaseFileName = OutputPath & "\" & BaseOutputName
 
     'write rch file (and ptf)
     lblStatus.Text = "Writing RCH and PTF files"
@@ -1707,17 +1709,18 @@ ErrHand:
     'start aquatox
     lblStatus.Text = "Starting AQUATOX"
     Me.Refresh()
-    StartAQUATOX(" UNKNOWN " & PathName)
     Me.Dispose()
     Me.Close()
+    SetupAQUATOX = True
 
-    Exit Sub
+    Exit Function
 
 ErrHand:
     MsgBox("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
     Me.Dispose()
     Me.Close()
-  End Sub
+    SetupAQUATOX = False
+  End Function
 
   Private Sub EnableControls(ByVal b As Boolean)
     cmdOK.Enabled = b
@@ -1728,10 +1731,8 @@ ErrHand:
     TabControl1.Enabled = b
   End Sub
 
-  Private Function PreProcessChecking() As Boolean
+  Private Function PreProcessChecking(ByVal OutputPath As String, ByVal BaseOutputName As String) As Boolean
     Dim i As Long
-    Dim PathName As String
-    Dim DriveLetter As String
     Dim wsdFileName As String
     Dim rchFileName As String
 
@@ -1748,20 +1749,6 @@ ErrHand:
         End If
       End If
 
-      i = GisUtil_FindLayerIndexByName("Cataloging Unit Boundaries")
-      If i = -1 Then
-        i = GisUtil_FindLayerIndexByName("cat")
-      End If
-      If i = -1 Then
-        'no cat layer, cant continue
-        MsgBox("The 'Cataloging Unit Boundaries' layer must exist and be named as such.", vbOKOnly, pModelName & " Problem")
-        EnableControls(True)
-        PreProcessChecking = False
-        Exit Function
-      End If
-      PathName = PathNameOnly(GisUtil_LayerFileName(i))
-      DriveLetter = Mid(PathName, 1, 1)
-
       If cboLanduse.SelectedIndex <> 0 Then
         'not giras, make sure subbasins and land use layers aren't the same
         If cboSubbasins.Items(cboSubbasins.SelectedIndex) = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex) Then
@@ -1774,11 +1761,10 @@ ErrHand:
       End If
 
       'see if these files already exist
-      PathName = DriveLetter & ":\BASINS\modelout\" & tbxName.Text
-      wsdFileName = PathName & "\" & tbxName.Text & ".wsd"
+      wsdFileName = OutputPath & "\" & BaseOutputName & ".wsd"
       If Len(Dir(wsdFileName)) > 0 Then
         'already exists
-        i = MsgBox("HSPF Project '" & tbxName.Text & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?")
+        i = MsgBox("HSPF Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?")
         If i = 2 Then
           EnableControls(True)
           PreProcessChecking = False
@@ -1787,12 +1773,10 @@ ErrHand:
       End If
     Else
       'in AQUATOX, see if these files already exist
-      DriveLetter = Mid(CurDir(), 1, 1)
-      PathName = DriveLetter & ":\BASINS\modelout\" & tbxName.Text
-      rchFileName = PathName & "\" & tbxName.Text & ".rch"
+      rchFileName = OutputPath & "\" & BaseOutputName & ".rch"
       If Len(Dir(rchFileName)) > 0 Then
         'already exists
-        i = MsgBox("AQUATOX Project '" & tbxName.Text & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?")
+        i = MsgBox("AQUATOX Project '" & BaseOutputName & "' already exists.  Do you want to overwrite it?", vbOKCancel, "Overwrite?")
         If i = 2 Then
           EnableControls(True)
           PreProcessChecking = False
@@ -2277,7 +2261,7 @@ ErrHand:
         Else
           'no pcs layer, clear out
           Do While cNPDES.Count > 0
-            cNPDES.Remove(0)
+            cNPDES.Remove(1)
           Loop
         End If
 
