@@ -9,7 +9,7 @@
             <Settings
                 ApplicationIcon = ""
                 AssemblyKeyContainerName = ""
-                AssemblyName = "atcMwGisUtils"
+                AssemblyName = "atcMwGisUtility"
                 AssemblyOriginatorKeyFile = ""
                 AssemblyOriginatorKeyMode = "None"
                 DefaultClientScript = "JScript"
@@ -20,8 +20,8 @@
                 OptionCompare = "Binary"
                 OptionExplicit = "On"
                 OptionStrict = "Off"
-                RootNamespace = "atcMwGisUtils"
-                StartupObject = "atcMwGisUtils.(None)"
+                RootNamespace = "atcMwGisUtility"
+                StartupObject = "atcMwGisUtility.(None)"
             >
                 <Config
                     Name = "Debug"
@@ -102,11 +102,18 @@
                     VersionMinor = "0"
                     Lcid = "0"
                     WrapperTool = "tlbimp"
+                    Private = "False"
                 />
                 <Reference
                     Name = "atcUtility"
                     AssemblyName = "atcUtility"
                     HintPath = "..\..\BASINS\Bin\Plugins\BASINS\atcUtility.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "Interop.MapWinGIS"
+                    AssemblyName = "Interop.MapWinGIS"
+                    HintPath = "..\Bin\Interop.MapWinGIS.dll"
                 />
             </References>
             <Imports>
@@ -121,6 +128,11 @@
             <Include>
                 <File
                     RelPath = "AssemblyInfo.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "GisUtil.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
