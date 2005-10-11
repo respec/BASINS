@@ -375,6 +375,7 @@ Friend Class frmSelectData
     PopulateMatching()
     pInitializing = False
     UpdatedCriteria()
+    SizeCriteria()
   End Sub
 
   Private Sub PopulateCriteriaCombos()
@@ -396,6 +397,10 @@ Friend Class frmSelectData
     Dim lNumeric As Boolean = False
     Dim lSortedItems As New atcCollection
     Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
+    Dim lTsIndex As Integer = 0
+    Dim lTsLastIndex As Integer = pDataManager.DataSets.Count - 1
+
+    LogDbg("Start PopulateCriteriaList(" & aAttributeName & ")")
 
     If Not lAttributeDef Is Nothing Then
       Select Case lAttributeDef.TypeString.ToLower
@@ -408,25 +413,20 @@ Friend Class frmSelectData
       .Visible = False
       For Each ts As atcDataSet In pDataManager.DataSets
         Dim lVal As String = ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE)
-        If lNumeric Then
-          If Not lSortedItems.Contains(lVal) Then
+        Dim lIndex As Integer = 0
+        If Not lSortedItems.Contains(lVal) Then
+          If lNumeric Then
             Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
-            Dim lIndex As Integer = 0
-            While lIndex < lSortedItems.Count AndAlso CDbl(lSortedItems.Keys(lIndex)) < lKey
-              lIndex += 1
-            End While
+            lIndex = BinarySearchNumeric(lKey, lSortedItems)
             lSortedItems.Insert(lIndex, lKey, lVal)
-          End If
-        Else
-          If Not lSortedItems.Contains(lVal) Then
+          Else
             Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
-            Dim lIndex As Integer = 0
-            While lIndex < lSortedItems.Count AndAlso lSortedItems.Keys(lIndex) < lKey
-              lIndex += 1
-            End While
+            lIndex = BinarySearchString(lKey, lSortedItems)
             lSortedItems.Insert(lIndex, lKey, lVal)
           End If
         End If
+        lTsIndex += 1
+        LogProgress("PopulateCriteriaList ", lTsIndex, lTsLastIndex)
       Next
       .Initialize(New ListSource(lSortedItems))
       If lNumeric Then
@@ -434,8 +434,44 @@ Friend Class frmSelectData
       Else
         .Source.Alignment(0, 0) = atcAlignment.HAlignLeft
       End If
+      .Visible = True
+      .Refresh()
     End With
+
+    LogDbg("Finished PopulateCriteriaList(" & aAttributeName & ")")
   End Sub
+
+  'Returns first index of a key equal to or higher than aKey
+  Private Function BinarySearchString(ByVal aKey As String, ByVal aKeys As atcCollection) As Integer
+    Dim lHigher As Integer = aKeys.Count
+    Dim lLower As Integer = -1
+    Dim lProbe As Integer
+    While (lHigher - lLower > 1)
+      lProbe = (lHigher + lLower) / 2
+      If (aKeys.Item(lProbe) < aKey) Then
+        lLower = lProbe
+      Else
+        lHigher = lProbe
+      End If
+    End While
+    Return lHigher
+  End Function
+
+  'Returns first index of a key equal to or higher than aKey
+  Private Function BinarySearchNumeric(ByVal aKey As Double, ByVal aKeys As ArrayList) As Integer
+    Dim lHigher As Integer = aKeys.Count
+    Dim lLower As Integer = -1
+    Dim lProbe As Integer
+    While (lHigher - lLower > 1)
+      lProbe = (lHigher + lLower) / 2
+      If (CDbl(aKeys.Item(lProbe)) < aKey) Then
+        lLower = lProbe
+      Else
+        lHigher = lProbe
+      End If
+    End While
+    Return lHigher
+  End Function
 
   Private Sub PopulateMatching()
     Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
@@ -520,7 +556,6 @@ NextTS:
           AddHandler mnu.Click, AddressOf mnuMove_Click
         Next
       End If
-
     End If
   End Sub
 
@@ -633,9 +668,6 @@ NextTS:
 NextName:
       Next
     End If
-
-    UpdatedCriteria()
-    SizeCriteria()
   End Sub
 
   Private Sub panelCriteria_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles panelCriteria.SizeChanged
@@ -804,6 +836,8 @@ NextName:
 
   Private Sub mnuAttributesAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAttributesAdd.Click
     AddCriteria()
+    UpdatedCriteria()
+    SizeCriteria()
   End Sub
 
   Private Sub mnuSelectClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectClear.Click

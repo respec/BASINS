@@ -321,8 +321,8 @@ StartOver:
       Else
         LogDbg("Found " & layersDBF)
       End If
-      LogCmd("MSG2 Merging " & aCurFilename)
-      LogCmd("MSG6 into " & aOutputFilename)
+      'LogCmd("MSG2 Merging " & aCurFilename)
+      'LogCmd("MSG6 into " & aOutputFilename)
       Shell(exe & " """ & aOutputFilename & """ """ & aCurFilename & """ """ & aProjectionFilename & """", AppWinStyle.NormalNoFocus, True)
     Else
       LogDbg("Failed to find ShapeUtil.exe for merging " & aCurFilename & " into " & aOutputFilename)
