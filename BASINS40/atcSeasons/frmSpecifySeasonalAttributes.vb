@@ -130,6 +130,7 @@ Public Class frmSpecifySeasonalAttributes
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboSeasons.Enabled = False
     Me.cboSeasons.Location = New System.Drawing.Point(8, 16)
+    Me.cboSeasons.MaxDropDownItems = 20
     Me.cboSeasons.Name = "cboSeasons"
     Me.cboSeasons.Size = New System.Drawing.Size(184, 21)
     Me.cboSeasons.TabIndex = 6

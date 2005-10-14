@@ -1,5 +1,6 @@
 Imports atcData
 Imports atcSeasons
+Imports atcUtility
 
 Friend Class atcSeasonalAttributesGridSource
   Inherits atcControls.atcGridSource
@@ -18,15 +19,14 @@ Friend Class atcSeasonalAttributesGridSource
         If Not lAttribute.Arguments Is Nothing AndAlso lAttribute.Arguments.ContainsAttribute("SeasonIndex") Then
           Dim lSeasonDefinition As atcSeasonBase = lAttribute.Arguments.GetValue("SeasonDefinition")
           Dim lSeasonName As String = lAttribute.Arguments.GetValue("SeasonName", "")
-          'TODO: Format will have to change 00 to 0 for some seasons
           Dim lSeasonKey As String = lSeasonDefinition.ToString & " " _
-                                   & Format(lAttribute.Arguments.GetValue("SeasonIndex", ""), "00 ") _
+                                   & Format(lAttribute.Arguments.GetValue("SeasonIndex", ""), "000 ") _
                                    & lSeasonName
           If lSeasonKey.Length > 0 AndAlso Not pSeasons.Contains(lSeasonKey) Then
             pSeasons.Add(lSeasonKey, lSeasonName)
           End If
 
-          Dim lAttributeName As String = Left(lAttribute.Definition.Name, Len(lAttribute.Definition.Name) - Len(lSeasonKey))
+          Dim lAttributeName As String = Left(lAttribute.Definition.Name, lAttribute.Definition.Name.IndexOf(lSeasonDefinition.ToString) - 1)
           If Not pAttributes.Contains(lAttributeName) Then
             pAttributes.Add(lAttributeName, lAttributeName)
           End If
@@ -73,8 +73,16 @@ Friend Class atcSeasonalAttributesGridSource
           Case 0 : Return pDataGroup((aRow - 1) \ pAttributes.Count).ToString
           Case 1 : Return pAttributes.GetByIndex(lAttributeIndex)
           Case Else
-            Dim lSeasonalAttrName As String = pAttributes.GetByIndex(lAttributeIndex) & pSeasons.GetKey(aColumn - 2)
-            Return pDataGroup((aRow - 1) \ pAttributes.Count).Attributes.GetFormattedValue(lSeasonalAttrName)
+            With pDataGroup((aRow - 1) \ pAttributes.Count).Attributes
+              Dim lSeasonalAttrName As String = pAttributes.GetByIndex(lAttributeIndex) & " " & pSeasons.GetKey(aColumn - 2)
+              ProtectedCellValue = .GetFormattedValue(lSeasonalAttrName, "<nothing>") 'works first try only for 3-digit seasons
+              If ProtectedCellValue.Equals("<nothing>") Then 'work around formatting issue for 2 digit season index
+                ProtectedCellValue = .GetFormattedValue(ReplaceString(lSeasonalAttrName, " 0", " "), "<nothing>")
+                If ProtectedCellValue.Equals("<nothing>") Then 'work around formatting issue for 1 digit season index
+                  ProtectedCellValue = .GetFormattedValue(ReplaceString(lSeasonalAttrName, " 00", " "))
+                End If
+              End If
+            End With
         End Select
       End If
     End Get
