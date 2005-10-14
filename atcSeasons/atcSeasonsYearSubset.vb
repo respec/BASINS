@@ -20,11 +20,9 @@ Public Class atcSeasonsYearSubset
 
   Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
     Dim lDate As Date = Date.FromOADate(aDate)
-    Dim lDay As Integer
-    If lDate.Month = 2 And lDate.Day = 29 Then
-      lDay = 28
-    Else
-      lDay = lDate.Day
+    Dim lDay As Integer = lDate.Day
+    If lDay = 29 AndAlso lDate.Month = 2 Then
+      lDay = 28  'place leap day in same season as the 28th
     End If
     Dim lDateNoYear As Date = New Date(pStartDate.Year, lDate.Month, lDay, _
                                        lDate.Hour, lDate.Minute, lDate.Second, _
