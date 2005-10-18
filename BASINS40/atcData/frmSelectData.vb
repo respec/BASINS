@@ -662,6 +662,7 @@ NextTS:
         For iOtherCriteria As Integer = 0 To iCriteria - 1
           If curName.Equals(pcboCriteria(iOtherCriteria).SelectedItem) Then GoTo NextName
         Next
+        If atcDataAttributes.GetDefinition(curName).Calculated Then GoTo NextName
         pcboCriteria(iCriteria).Text = curName
         Exit For
         'End If
