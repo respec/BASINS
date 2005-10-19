@@ -34,7 +34,14 @@ Public Class atcEventBase
     Dim lSPos As Integer
     Dim lEPos As Integer
     Dim iValue As Integer = 1
+    Dim lEDate As Double = aTS.Dates.Value(1)
+    Dim lSinceLast As Double
 
+    If lPoint Then
+      lEDate = aTS.Dates.Value(1)
+    Else
+      lEDate = aTS.Dates.Value(0)
+    End If
     While iValue <= aTS.numValues
 
       If lInEvent Then
@@ -53,6 +60,7 @@ Public Class atcEventBase
           Else
             Array.Copy(aTS.Dates.Values, lSPos - 1, lNewTS.Dates.Values, 0, lNewTS.numValues + 1)
           End If
+          lEDate = lNewTS.Dates.Value(lNewTS.numValues)
           If aHigh Then
             lNewTS.Attributes.AddHistory("Event above " & aThresh)
           Else
@@ -60,15 +68,21 @@ Public Class atcEventBase
           End If
           lNewTS.Attributes.Add("EventIndex", lEventIndex)
           lNewTS.Attributes.Add("EventThreshold", aThresh)
+          lNewTS.Attributes.Add("EventTimeSincePrevious", lSinceLast)
           lNewGroup.Add(lEventIndex, lNewTS)
           lInEvent = False
         End If
-        ElseIf (aHigh And aTS.Value(iValue) > aThresh) Or _
-               (Not aHigh And aTS.Value(iValue) < aThresh) Then
+      ElseIf (aHigh And aTS.Value(iValue) > aThresh) Or _
+             (Not aHigh And aTS.Value(iValue) < aThresh) Then
         'new event
         lEventIndex += 1
         lSPos = iValue
         lInEvent = True
+        If lPoint Then
+          lSinceLast = aTS.Dates.Value(lSPos) - lEDate
+        Else
+          lSinceLast = aTS.Dates.Value(lSPos - 1) - lEDate
+        End If
       End If
 
       iValue += 1
