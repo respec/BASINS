@@ -64,7 +64,8 @@ Public Class atcEventPlugin
       For Each lts As atcTimeseries In ltsGroup
         Dim lEvents As atcDataGroup = pEvents.Split(lts, Me, lThresh, lHigh)
         Select Case aOperationName
-          Case "Split" : MyBase.DataSets.AddRange(lEvents)
+          Case "Split"
+            MyBase.DataSets.AddRange(lEvents)
           Case "Event Attributes"
             lts.Attributes.SetValue(EventAttDef(lThresh, lHigh, "Count"), lEvents.Count, aArgs)
             Dim lDurCnt As Integer = 0
