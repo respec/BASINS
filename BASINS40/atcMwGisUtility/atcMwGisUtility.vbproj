@@ -114,6 +114,13 @@
                     Name = "Interop.MapWinGIS"
                     AssemblyName = "Interop.MapWinGIS"
                     HintPath = "..\Bin\Interop.MapWinGIS.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "nunit.framework"
+                    AssemblyName = "nunit.framework"
+                    HintPath = "..\..\..\Program Files\NUnit 2.2\bin\nunit.framework.dll"
+                    AssemblyFolderKey = "hklm\dn\nunit.framework"
                 />
             </References>
             <Imports>
@@ -137,7 +144,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "GisUtils.vb"
+                    RelPath = "Test_atcMwGisUtility.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
