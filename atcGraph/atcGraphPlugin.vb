@@ -27,7 +27,7 @@ Public Class atcGraphPlugin
     If lDataGroup Is Nothing Then lDataGroup = New atcDataGroup
 
     Dim lForm As New atcGraphForm(aDataManager, lDataGroup)
-    If lDataGroup.Count > 0 Then
+    If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
       lForm.Show()
       Return lForm
     Else 'No data to display, don't show or return the form
