@@ -75,13 +75,11 @@ Public Class atcDataAttributes
     'TODO: use definition for formatting 
     Try
       Dim lValue As Object = GetValue(aAttributeName, aDefault)
-
       Try
         If TypeOf (lValue) Is Double Then
           If InStr(LCase(aAttributeName), "jday", CompareMethod.Text) Then
-            Dim lDate(3) As String
-            lDate = DumpDate(lValue).Split(" ")
-            Return lDate(2) & " " & lDate(3) & " : " & lDate(0)
+            Dim lDate() As String = DumpDate(lValue).Split(" ")
+            Return lDate(2) & " " & lDate(3)
           Else
             Return DoubleToString(lValue)
           End If
