@@ -5,11 +5,13 @@ Option Explicit On
 Imports System.Collections.Specialized
 Imports NUnit.Framework
 Imports atcUtility
-Imports ATCUtility.modReflection
+Imports atcUtility.modReflection
 
 Friend Module dbg
   Private pInit As Boolean = False
-  Private pBaseDir As String = "c:\test\atcMwGisUtility\temp"
+  Private pBaseDir As String = "c:\test\atcMwGisUtility\temp\"
+  Private pArchiveDir As String = "c:\test\atcMwGisUtility\data\"
+  Private pFileName As String = "test.lis"
   Friend ReadOnly Property BaseDir()
     Get
       BaseDir = pBaseDir
@@ -18,31 +20,24 @@ Friend Module dbg
   Friend Sub Msg(ByVal aMsg As String)
     If Not pInit Then
       ChDriveDir(pBaseDir)
-      SaveFileString("test.lis", "Begin atcMwGisUtility test" & vbCrLf)
+      SaveFileString(pFileName, "Begin atcMwGisUtility test" & vbCrLf)
       Try
         Kill("error.fil")
       Catch
       End Try
-    End If
-
-    AppendFileString("test.lis", aMsg & vbCrLf)
-
-    If Not pInit Then
       pInit = True
       dbg.FileSetup()
     End If
+    AppendFileString(pFileName, aMsg & vbCrLf)
   End Sub
   Private Sub FileSetup()
     Msg("dbg.FileSetup start")
     Dim lFileNames As New NameValueCollection
-    AddFilesInDir(lFileNames, "*", False)
+    AddFilesInDir(lFileNames, pArchiveDir, False)
     For Each lFile As String In lFileNames
-      If lFile <> "test.lis" Then
-        Kill(lFile)
-        FileCopy("..\data\" & lFile, lFile)
-      End If
+      FileCopy(lFile, pBaseDir & FilenameNoPath(lFile))
     Next
-    Msg("dbg.FileSetup done")
+    Msg("dbg.FileSetup done:" & lFileNames.Count)
   End Sub
 End Module
 
@@ -258,20 +253,19 @@ End Class
 End Class
 
 <TestFixture()> Public Class Test_GisUtil
-
-  'Dim pMapWin As MapWindow.Interfaces.IMapWin
-  Dim pProjectName As String = dbg.BaseDir & "\patuxa.mwprj"
+  Dim pProjectName As String = dbg.BaseDir & "patuxa.mwprj"
   Dim pGisUtil As GisUtil
 
   <TestFixtureSetUp()> Public Sub init()
+    dbg.Msg("Test_GisUtil:Init")
   End Sub
 
-  Private Function DumpLayerDescription(ByVal aLayerIndex As Integer) As String
-    Dim lRet As String = aLayerIndex & ":"
+  Private Function LayerDescription(ByVal aLayerIndex As Integer) As String
+    Dim lRet As String = "<" & aLayerIndex & ":"
     If aLayerIndex >= 0 And aLayerIndex < GisUtil.NumLayers Then
-      lRet &= GisUtil.LayerName(aLayerIndex) & ":" & GisUtil.LayerType(aLayerIndex) & ":"
+      lRet &= GisUtil.LayerName(aLayerIndex) & ":" & GisUtil.LayerType(aLayerIndex) & ">"
     Else
-      lRet &= "<OutOfRange>"
+      lRet &= "<Layer Index Out Of Range>"
     End If
     Return lRet
   End Function
@@ -288,9 +282,7 @@ End Class
     GisUtil.LoadProject(pProjectName)
     dbg.Msg("TestLoadProject:" & GisUtil.ProjectFileName)
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      dbg.Msg(" Layer:" & lLayerIndex & ":" & _
-              GisUtil.LayerName(lLayerIndex) & ":" & _
-              GisUtil.LayerType(lLayerIndex))
+      dbg.Msg("  Layer:" & LayerDescription(lLayerIndex))
     Next
   End Sub
 
@@ -328,30 +320,32 @@ End Class
   End Sub
 
   Public Sub TestNumFields()
-    Dim lLayerIndex As Integer = 1
-    Dim lNumFields As Integer = GisUtil.NumFields(lLayerIndex)
-    dbg.Msg("TestNumFields:" & lNumFields & ":" & lLayerIndex)
+    Dim lNumFields As Integer
+    For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
+      lNumFields = GisUtil.NumFields(lLayerIndex)
+      dbg.Msg("TestNumFields:" & lNumFields & ":" & LayerDescription(lLayerIndex))
+    Next
     lNumFields = GisUtil.NumFields  'current layer
-    dbg.Msg("TestNumFields:CurrentLayer:" & lNumFields & ":" & GisUtil.CurrentLayer)
+    dbg.Msg("TestNumFields:CurrentLayer:" & lNumFields & ":" & LayerDescription(GisUtil.CurrentLayer))
   End Sub
 
   Public Sub TestFieldName()
     Dim lLayerIndex As Integer = 1
     Dim lFieldIndex As Integer = 2
     Dim lFieldName As String = GisUtil.FieldName(lFieldIndex, lLayerIndex)
-    dbg.Msg("TestFieldName:" & lFieldName & ":" & lFieldIndex & ":" & lLayerIndex)
+    dbg.Msg("TestFieldName:" & lFieldName & ":" & lFieldIndex & ":" & LayerDescription(lLayerIndex))
   End Sub
 
   Public Sub TestLayerIndex()
     Dim lLayerIndex = GisUtil.LayerIndex("st")
-    dbg.Msg("TestFindLayerIndex:" & lLayerIndex)
+    dbg.Msg("TestFindLayerIndex:" & LayerDescription(lLayerIndex))
   End Sub
 
   Public Sub TestFieldIndex()
     Dim lLayerIndex As Integer = 1
     Dim lFieldName As String = "CNTYNAME"
     Dim lFieldIndex As String = GisUtil.FieldIndex(lLayerIndex, lFieldName)
-    dbg.Msg("TestFieldIndex:" & lFieldName & ":" & lFieldIndex & ":" & lLayerIndex)
+    dbg.Msg("TestFieldIndex:" & lFieldName & ":" & lFieldIndex & ":" & LayerDescription(lLayerIndex))
   End Sub
 
   Public Sub TestFieldValue()
@@ -419,21 +413,21 @@ End Class
 
   Public Sub TestNumFeatures()
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      dbg.Msg("TestNumFeatures:" & DumpLayerDescription(lLayerIndex) & GisUtil.NumFeatures(lLayerIndex))
+      dbg.Msg("TestNumFeatures:" & GisUtil.NumFeatures(lLayerIndex) & ":" & LayerDescription(lLayerIndex))
     Next
   End Sub
 
   Public Sub TestFeatureArea()
-    Dim lFeaturnIndex As Integer = 0
+    Dim lFeatureIndex As Integer = 0
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      dbg.Msg("TestLayerArea:" & DumpLayerDescription(lLayerIndex) & GisUtil.FeatureArea(lLayerIndex, lFeaturnIndex))
+      dbg.Msg("TestLayerArea:" & GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) & ":" & LayerDescription(lLayerIndex))
     Next
   End Sub
 
   Public Sub TestFeatureLength()
     Dim lFeaturnIndex As Integer = 0
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      dbg.Msg("TestLayerLength:" & lLayerIndex & ":" & GisUtil.LayerType(lLayerIndex) & ":" & GisUtil.FeatureLength(lLayerIndex, lFeaturnIndex))
+      dbg.Msg("TestLayerLength:" & GisUtil.FeatureLength(lLayerIndex, lFeaturnIndex) & ":" & LayerDescription(lLayerIndex))
     Next
   End Sub
 
