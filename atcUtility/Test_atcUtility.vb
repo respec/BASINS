@@ -1235,8 +1235,8 @@ End Class
   End Sub
 
   Public Sub TestStrSafeFilename()
-    Assert.AreEqual("filename", StrSafeFilename("file" & Chr(1) & "name", ""))
-    Assert.AreEqual("file", StrSafeFilename("file" & Chr(0) & "name", ""))
+    Assert.AreEqual("filename", SafeFilename("file" & Chr(1) & "name", ""))
+    Assert.AreEqual("file", SafeFilename("file" & Chr(0) & "name", ""))
   End Sub
 
   Public Sub TestSwapBytes()

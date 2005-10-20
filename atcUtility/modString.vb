@@ -517,30 +517,31 @@ Public Module modString
     FirstStringPos = foundPos
   End Function
 
-  Public Function FirstCharPos(ByVal start As Integer, ByVal Source As String, ByVal chars As String) As Integer
-    ' ##SUMMARY Searches str for each character in chars.
-    ' ##PARAM start I Position in str to start search
-    ' ##PARAM str I String to be searched
-    ' ##PARAM chars I String of characters to be individually searched for
-    ' ##RETURNS  Position of first occurrence of chars character in Source. _
-    'Returns len(str) + 1 if no characters from chars were found in Source.
-    Dim retval As Integer
-    Dim curval As Integer
-    Dim CharPos As Integer
-    Dim LenChars As Integer
-    ' ##LOCAL retval - long return value for FirstCharPos
-    ' ##LOCAL curval - long position of currently first-occurring character
-    ' ##LOCAL CharPos - long length of chars
-    ' ##LOCAL LenChars - long length of subString
+  'Use String.IndexOfAny instead of this
+  'Public Function FirstCharPos(ByVal start As Integer, ByVal Source As String, ByVal chars As String) As Integer
+  '  ' ##SUMMARY Searches str for each character in chars.
+  '  ' ##PARAM start I Position in str to start search
+  '  ' ##PARAM str I String to be searched
+  '  ' ##PARAM chars I String of characters to be individually searched for
+  '  ' ##RETURNS  Position of first occurrence of chars character in Source. _
+  '  'Returns len(str) + 1 if no characters from chars were found in Source.
+  '  Dim retval As Integer
+  '  Dim curval As Integer
+  '  Dim CharPos As Integer
+  '  Dim LenChars As Integer
+  '  ' ##LOCAL retval - long return value for FirstCharPos
+  '  ' ##LOCAL curval - long position of currently first-occurring character
+  '  ' ##LOCAL CharPos - long length of chars
+  '  ' ##LOCAL LenChars - long length of subString
 
-    retval = Len(Source) + 1
-    LenChars = Len(chars)
-    For CharPos = 1 To LenChars
-      curval = InStr(start, Source, Mid(chars, CharPos, 1))
-      If curval > 0 And curval < retval Then retval = curval
-    Next CharPos
-    FirstCharPos = retval
-  End Function
+  '  retval = Len(Source) + 1
+  '  LenChars = Len(chars)
+  '  For CharPos = 1 To LenChars
+  '    curval = InStr(start, Source, Mid(chars, CharPos, 1))
+  '    If curval > 0 And curval < retval Then retval = curval
+  '  Next CharPos
+  '  FirstCharPos = retval
+  'End Function
 
   Public Function StrNoNull(ByVal S As String) As String
     ' ##SUMMARY Replaces null string with blank character.
@@ -714,29 +715,28 @@ Public Module modString
   '    StrRepeat = retval
   'End Function
 
-  'Function StrFirstInt(ByRef Source As String) As Integer
-  '    ' ##SUMMARY Divides alpha numeric sequence into leading numbers and trailing characters.
-  '    ' ##SUMMARY   Example: StrFirstInt("123Go!) = "123", and returns "Go!" as Source
-  '    ' ##PARAM Source M String to be analyzed
-  '    ' ##RETURNS  Returns leading numbers in Source, and returns Source without those numbers.
-  '    Dim retval As Integer
-  '    Dim pos As Integer
-  '    ' ##LOCAL retval - number found at beginning of Source
-  '    ' ##LOCAL pos - long character position in search through Source
+  Function StrFirstInt(ByRef Source As String) As Integer
+    ' ##SUMMARY Divides alpha numeric sequence into leading numbers and trailing characters.
+    ' ##SUMMARY   Example: StrFirstInt("123Go!) = "123", and changes Source to "Go!"
+    ' ##PARAM Source M String to be analyzed
+    ' ##RETURNS  Returns leading numbers in Source, and returns Source without those numbers.
+    Dim retval As Integer = 0
+    Dim pos As Integer = 1
+    ' ##LOCAL retval - number found at beginning of Source
+    ' ##LOCAL pos - long character position in search through Source
 
-  '    pos = 1
-  '    If IsNumeric(Left(Source, 2)) Then pos = 3 'account for negative number - sign
-  '    While IsNumeric(Mid(Source, pos, 1))
-  '        pos = pos + 1
-  '    End While
-  '    If pos < 2 Then
-  '        retval = 0
-  '    Else
-  '        retval = CInt(Left(Source, pos - 1))
-  '        Source = LTrim(Mid(Source, pos))
-  '    End If
-  '    StrFirstInt = retval
-  'End Function
+    If IsNumeric(Left(Source, 2)) Then pos = 3 'account for negative number - sign
+    While IsNumeric(Mid(Source, pos, 1))
+      pos += 1
+    End While
+
+    If pos >= 2 Then
+      retval = CInt(Left(Source, pos - 1))
+      Source = LTrim(Mid(Source, pos))
+    End If
+
+    Return retval
+  End Function
 
   'Sub StrToDate(ByRef txt As String, ByRef datevar As Object)
   '    ' ##SUMMARY Converts yyyy/mm/dd date string to date variant.
@@ -942,31 +942,6 @@ EndFound:
     StrPrintable = retval
   End Function
 
-  Public Function StrSafeFilename(ByRef S As String, Optional ByRef ReplaceWith As String = "_") As String
-    ' ##SUMMARY Converts, if necessary, non-printable characters in filename to printable _
-    'alternative.
-    ' ##PARAM S I Filename to be converted, if necessary.
-    ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="").
-    ' ##RETURNS Input parameter S with non-printable characters replaced with specific _
-    'printable character (default="").
-    Dim retval As String 'return string
-    Dim i As Short 'loop counter
-    Dim strLen As Short 'length of string
-    Dim ch As String 'individual character in filename
-
-    strLen = Len(S)
-    For i = 1 To strLen
-      ch = Mid(S, i, 1)
-      Select Case Asc(ch)
-        Case 0 : GoTo EndFound
-        Case Is < 32, 34, 42, 47, 58, 60, 62, 63, 92, 124, Is > 126 : retval = retval & ReplaceWith
-        Case Else : retval = retval & ch
-      End Select
-    Next
-EndFound:
-    StrSafeFilename = retval
-  End Function
-
   Public Function StrPad(ByRef S As String, ByVal NewLength As Short, Optional ByRef PadWith As String = " ", Optional ByRef PadLeft As Boolean = True) As String
     ' ##SUMMARY Pads a string with specific character to achieve a specified length.
     ' ##PARAM S M String to be padded.
@@ -1030,45 +1005,6 @@ EndFound:
   '    Next
 
   'End Sub
-
-  Public Function SwapBytes(ByRef n As Integer) As Integer
-    ' ##SUMMARY Swaps between big and little endian 32-bit integers.
-    ' ##SUMMARY   Example: SwapBytes(1) = 16777216
-    ' ##PARAM N I Any long integer
-    ' ##RETURNS Modified input parameter N.
-    Dim OrigBytes As Byte()
-    Dim NewBytes As Byte()
-    ' ##LOCAL OrigBytes - stores original bytes
-    ' ##LOCAL NewBytes - stores new bytes
-
-    OrigBytes = System.BitConverter.GetBytes(n)
-    ReDim NewBytes(3)
-    NewBytes(0) = OrigBytes(3)
-    NewBytes(1) = OrigBytes(2)
-    NewBytes(2) = OrigBytes(1)
-    NewBytes(3) = OrigBytes(0)
-    Return System.BitConverter.ToInt32(NewBytes, 0)
-  End Function
-
-  Public Function ReadBigInt(ByRef InFile As Short) As Integer
-    ' ##SUMMARY Reads big-endian integer from file number and converts to _
-    'Intel little-endian value.
-    ' ##SUMMARY   Example: ReadBigInt(1) = 1398893856
-    ' ##PARAM InFile I Open file number
-    ' ##RETURNS Input parameter InFile converted to Intel little-endian value.
-    Dim n As Integer
-    ' ##LOCAL n - variable into which data is read
-
-    FileGet(InFile, n)
-    Return SwapBytes(n)
-  End Function
-
-  Public Sub WriteBigInt(ByRef OutFile As Short, ByRef Value As Integer)
-    ' ##SUMMARY Writes 32-bit integer as big endian to specified disk file.
-    ' ##PARAM OutFile I File number
-    ' ##PARAM Value I 32-bit integer
-    FilePut(OutFile, SwapBytes(Value))
-  End Sub
 
   'Public Sub DispError(ByRef SubID As String, ByRef e As Object)
   '    ' ##SUMMARY Displays error in message box for up to first 4 errors from same module.
@@ -1297,129 +1233,6 @@ EndFound:
     Return S
   End Function
 
-  Public Function WholeFileString(ByRef filename As String) As String
-    ' ##SUMMARY Converts specified text file to a string.
-    ' ##PARAM FileName I Name of text file
-    ' ##RETURNS Returns contents of specified text file as string.
-    Dim InFile As Short
-    Dim FileLength As Integer
-    ' ##LOCAL InFile - long filenumber of text file
-    ' ##LOCAL FileLength - long length of text file contents
-
-    On Error GoTo ErrorReading
-
-    InFile = FreeFile()
-    FileOpen(InFile, filename, OpenMode.Input)
-    FileLength = LOF(InFile)
-    WholeFileString = InputString(InFile, FileLength)
-    FileClose(InFile)
-    Exit Function
-
-ErrorReading:
-    MsgBox("Error reading '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "WholeFileString")
-  End Function
-
-
-  Public Function WholeFileBytes(ByRef filename As String) As Byte()
-    ' ##SUMMARY Converts specified text file to Byte array
-    ' ##PARAM FileName I Name of text file
-    ' ##RETURNS Returns contents of specified text file in Byte array.
-    Dim InFile As Short
-    Dim FileLength As Integer
-    Dim retval() As Byte
-    ' ##LOCAL InFile - long filenumber of text file
-    ' ##LOCAL retval() - byte array containing return values
-
-    On Error GoTo ErrorReading
-
-    InFile = FreeFile()
-    FileOpen(InFile, filename, OpenMode.Binary)
-    FileLength = LOF(InFile)
-    ReDim retval(FileLength - 1)
-    FileGet(InFile, retval)
-    FileClose(InFile)
-    Return retval
-
-ErrorReading:
-    MsgBox("Error reading '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "WholeFileBytes")
-  End Function
-
-  Public Function FirstMismatch(ByRef filename1 As String, ByRef filename2 As String) As Integer
-    ' ##SUMMARY Compares 2 files and locates first sequential byte that is different between files.
-    ' ##PARAM filename1 I Name of first file
-    ' ##PARAM filename2 I Name of second file
-    ' ##RETURNS Returns byte position of first non-matching byte between two files: _
-    'zero if they match, -1 if there was an error.
-    Dim InFile1 As Short
-    Dim FileLength1 As Integer
-    Dim InFile2 As Short
-    Dim FileLength2 As Integer
-    Dim minLength As Integer
-    Dim longBytes As Integer
-    Dim testL1, testL2 As Integer
-    Dim testB1, testB2 As Byte
-    Dim i As Integer
-    ' ##LOCAL InFile1 - file handle of first file
-    ' ##LOCAL InFile2 - file handle of second file
-    ' ##LOCAL FileLength1 - length of first file in bytes
-    ' ##LOCAL FileLength2 - length of first file in bytes
-    ' ##LOCAL i - byte index in files
-
-    On Error GoTo ErrorReading
-
-    If Not FileExists(filename1) Or Not FileExists(filename2) Then
-      FirstMismatch = -1
-    Else
-      InFile1 = FreeFile()
-      FileOpen(InFile1, filename1, OpenMode.Binary)
-      FileLength1 = LOF(InFile1)
-
-      InFile2 = FreeFile()
-      FileOpen(InFile2, filename2, OpenMode.Binary)
-      FileLength2 = LOF(InFile2)
-
-      If FileLength1 < FileLength2 Then
-        minLength = FileLength1
-      Else
-        minLength = FileLength2
-      End If
-
-      longBytes = minLength - minLength Mod 4
-
-      For i = 1 To longBytes Step 4
-        FileGet(InFile1, testL1)
-        FileGet(InFile2, testL2)
-        If testL1 <> testL2 Then Exit For
-      Next
-
-      Do While i <= minLength
-        FileGet(InFile1, testB1, i)
-        FileGet(InFile2, testB2, i)
-        If testB1 <> testB2 Then Exit Do
-        i = i + 1
-      Loop
-
-      If i <= minLength Then 'Found a mismatch before the shorter file ended
-        FirstMismatch = i
-      ElseIf FileLength1 <> FileLength2 Then  'Longer file matched shorter one while it lasted
-        FirstMismatch = i
-      Else
-        FirstMismatch = 0
-      End If
-
-      FileClose(InFile1)
-      FileClose(InFile2)
-    End If
-    Exit Function
-
-ErrorReading:
-    MsgBox("Error reading '" & filename1 & "'" & vbCr & "or '" & filename2 & "'" & vbCr & Err.Description, MsgBoxStyle.OKOnly, "WholeFileBytes")
-    On Error Resume Next
-    FileClose(InFile1)
-    FileClose(InFile2)
-  End Function
-
-
   '    Public Sub SortIntegerArray(ByRef opt As Integer, ByRef cnt As Integer, ByRef iVal() As Integer, ByRef pos() As Integer)
   '        ' ##SUMMARY Sorts integers in array into ascending order.
   '        ' ##PARAM opt I Sort option (0 = sort in place, 1 = move values in array to sorted position)
@@ -1612,20 +1425,6 @@ MatchStar:
     If strPos > Len(Source) Then PatternMatch = True
 NoMatch:
   End Function
-
-  Public Sub FileToBase64(ByVal InputFilePath As String, ByVal OutputFilePath As String)
-
-    'initialize the reader to read binary
-    Dim inStream As IO.Stream = IO.File.OpenRead(InputFilePath)
-    Dim reader As New System.IO.BinaryReader(inStream)
-
-    'read in each byte and convert it to a char
-    Dim numbytes = reader.BaseStream.Length
-    SaveFileString(OutputFilePath, System.Convert.ToBase64String(reader.ReadBytes(numbytes)))
-
-    reader.Close()
-
-  End Sub
 
   Function StrRetRem(ByRef S As String) As String
     ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of comma or space.

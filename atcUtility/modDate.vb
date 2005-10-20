@@ -62,7 +62,7 @@ Public Module modDate
     NumericVal = IsNumeric(aString)
     If NumericVal Then
       retval = LCase(Trim(aFormat))
-      If Len(retval) > 0 And FirstCharPos(1, aFormat, "ymdhs") <= LenFormat Then
+      If Len(retval) > 0 And aFormat.IndexOfAny("ymdhs") >= 0 Then
         aString = CStr(MJD2VBdate(CDbl(aString)))
       End If
     End If

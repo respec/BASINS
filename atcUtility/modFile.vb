@@ -21,6 +21,29 @@ Public Module modFile
     End Try
   End Function
 
+  Public Function SafeFilename(ByRef S As String, Optional ByRef ReplaceWith As String = "_") As String
+    ' ##SUMMARY Converts, if necessary, non-printable characters in filename to printable alternative.
+    ' ##PARAM S I Filename to be converted, if necessary.
+    ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="_").
+    ' ##RETURNS Input parameter S with non-printable characters replaced with specific printable character (default="_").
+    Dim retval As String 'return string
+    Dim i As Short 'loop counter
+    Dim strLen As Short 'length of string
+    Dim ch As String 'individual character in filename
+
+    strLen = Len(S)
+    For i = 1 To strLen
+      ch = Mid(S, i, 1)
+      Select Case Asc(ch)
+        Case 0 : GoTo EndFound
+        Case Is < 32, 34, 42, 47, 58, 60, 62, 63, 92, 124, Is > 126 : retval &= ReplaceWith
+        Case Else : retval &= ch
+      End Select
+    Next
+EndFound:
+    Return retval
+  End Function
+
   Public Function FilenameOnly(ByRef istr As String) As String
     ' ##SUMMARY Converts full path, filename, and extension to filename only.
     ' ##SUMMARY   Example: FilenameOnly("C:\foo\bar.txt") = "bar"
@@ -271,18 +294,15 @@ FoundSameUntil:
     Dim OutFile As Short
     ' ##LOCAL OutFile - integer filenumber of output text file
 
-    On Error GoTo ErrorWriting
-
-    MkDirPath(PathNameOnly(filename))
-
-    OutFile = FreeFile()
-    FileOpen(OutFile, filename, OpenMode.Output)
-    Print(OutFile, FileContents)
-    FileClose(OutFile)
-    Exit Sub
-
-ErrorWriting:
-    MsgBox("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "SaveFileString")
+    Try
+      MkDirPath(PathNameOnly(filename))
+      OutFile = FreeFile()
+      FileOpen(OutFile, filename, OpenMode.Output, OpenAccess.Write, OpenShare.LockWrite)
+      Print(OutFile, FileContents)
+      FileClose(OutFile)
+    Catch ex As Exception
+      LogMsg("Error writing '" & filename & "'" & vbCr & vbCr & Ex.Message, "SaveFileString")
+    End Try
   End Sub
 
   Public Sub SaveFileBytes(ByRef filename As String, ByRef FileContents() As Byte)
@@ -297,7 +317,7 @@ ErrorWriting:
     MkDirPath(PathNameOnly(filename))
 
     OutFile = FreeFile()
-    FileOpen(OutFile, filename, OpenMode.Binary)
+    FileOpen(OutFile, filename, OpenMode.Binary, OpenAccess.Write, OpenShare.LockWrite)
     FilePut(OutFile, FileContents)
     FileClose(OutFile)
     Exit Sub
@@ -306,26 +326,28 @@ ErrorWriting:
     MsgBox("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "SaveFileBytes")
   End Sub
 
-  Public Sub AppendFileString(ByRef filename As String, ByRef appendString As String)
+  Public Function AppendFileString(ByRef filename As String, ByRef appendString As String) As Boolean
     ' ##SUMMARY Appends incoming string to existing text file.
     ' ##PARAM FileName I Name of existing text file
     ' ##PARAM appendString I Incoming string to be appended
-    Dim OutFile As Short
     ' ##LOCAL OutFile - integer filenumber of existing text file
 
-    On Error GoTo ErrorWriting
+    Try
+      MkDirPath(PathNameOnly(filename))
 
-    MkDirPath(PathNameOnly(filename))
+      Dim OutFile As Short
+      OutFile = FreeFile()
+      FileOpen(OutFile, filename, OpenMode.Append, OpenAccess.Write, OpenShare.LockWrite)
+      Print(OutFile, appendString)
+      FileClose(OutFile)
+      Return True
+    Catch ex As Exception
+      'LogMsg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, "AppendFileString")
+      Return False
+    End Try
 
-    OutFile = FreeFile()
-    FileOpen(OutFile, filename, OpenMode.Append)
-    Print(OutFile, appendString)
-    FileClose(OutFile)
-    Exit Sub
+  End Function
 
-ErrorWriting:
-    MsgBox("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "AppendFileString")
-  End Sub
   Public Sub ReplaceStringToFile(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String, ByRef filename As String)
     ' ##SUMMARY Saves new string like Source to Filename with _
     'occurences of Find in Source replaced with Replace.
@@ -353,7 +375,7 @@ ErrorWriting:
         lastFindEnd = 1
         On Error GoTo ErrorWriting
         OutFile = FreeFile()
-        FileOpen(OutFile, filename, OpenMode.Output)
+        FileOpen(OutFile, filename, OpenMode.Output, OpenAccess.Write, OpenShare.LockWrite)
         While findPos > 0
           Print(OutFile, Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith)
           lastFindEnd = findPos + findlen
@@ -372,6 +394,7 @@ ErrorWriting:
 ErrorWriting:
     MsgBox("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "ReplaceStringToFile")
   End Sub
+
   Public Function FileExists(ByVal PathName As String, Optional ByRef AcceptDirectories As Boolean = False, Optional ByRef AcceptFiles As Boolean = True) As Boolean
     ' ##SUMMARY Checks to see if specified file exists.
     ' ##PARAM PathName I Full path and filename.
@@ -580,4 +603,186 @@ NoSuchFile:
       Return 1
     End Try
   End Function
+
+  Public Function WholeFileString(ByRef aFilename As String, Optional ByVal aTimeoutMilliseconds As Integer = 1000) As String
+    ' ##SUMMARY Converts specified text file to a string.
+    ' ##PARAM FileName I Name of text file
+    ' ##RETURNS Returns contents of specified text file as string.
+    Dim InFile As Integer
+    Dim FileLength As Integer
+    Dim TryUntil As Date = Now.AddMilliseconds(aTimeoutMilliseconds)
+    ' ##LOCAL InFile - filenumber of text file
+    ' ##LOCAL FileLength - length of text file contents
+
+    InFile = FreeFile()
+TryAgain:
+    Try
+      FileOpen(InFile, aFilename, OpenMode.Input, OpenAccess.Read, OpenShare.Shared)
+      FileLength = LOF(InFile)
+      WholeFileString = InputString(InFile, FileLength)
+      FileClose(InFile)
+    Catch ex As Exception
+      If Now > TryUntil Then
+        LogMsg("Error reading '" & aFilename & "'" & vbCr & vbCr & ex.Message, "WholeFileString - " & ex.GetType.Name)
+      Else
+        'MsgBox("WholeFileString error, trying again (" & ex.GetType.Name & ": " & ex.Message & ")")
+        System.Threading.Thread.Sleep(50)
+        GoTo TryAgain
+      End If
+    End Try
+  End Function
+
+
+  Public Function WholeFileBytes(ByRef filename As String) As Byte()
+    ' ##SUMMARY Converts specified text file to Byte array
+    ' ##PARAM FileName I Name of text file
+    ' ##RETURNS Returns contents of specified text file in Byte array.
+    Dim InFile As Short
+    Dim FileLength As Integer
+    Dim retval() As Byte
+    ' ##LOCAL InFile - long filenumber of text file
+    ' ##LOCAL retval() - byte array containing return values
+
+    On Error GoTo ErrorReading
+
+    InFile = FreeFile()
+    FileOpen(InFile, filename, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
+    FileLength = LOF(InFile)
+    ReDim retval(FileLength - 1)
+    FileGet(InFile, retval)
+    FileClose(InFile)
+    Return retval
+
+ErrorReading:
+    MsgBox("Error reading '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "WholeFileBytes")
+  End Function
+
+  Public Function FirstMismatch(ByRef filename1 As String, ByRef filename2 As String) As Integer
+    ' ##SUMMARY Compares 2 files and locates first sequential byte that is different between files.
+    ' ##PARAM filename1 I Name of first file
+    ' ##PARAM filename2 I Name of second file
+    ' ##RETURNS Returns byte position of first non-matching byte between two files: _
+    'zero if they match, -1 if there was an error.
+    Dim InFile1 As Short
+    Dim FileLength1 As Integer
+    Dim InFile2 As Short
+    Dim FileLength2 As Integer
+    Dim minLength As Integer
+    Dim longBytes As Integer
+    Dim testL1, testL2 As Integer
+    Dim testB1, testB2 As Byte
+    Dim i As Integer
+    ' ##LOCAL InFile1 - file handle of first file
+    ' ##LOCAL InFile2 - file handle of second file
+    ' ##LOCAL FileLength1 - length of first file in bytes
+    ' ##LOCAL FileLength2 - length of first file in bytes
+    ' ##LOCAL i - byte index in files
+
+    On Error GoTo ErrorReading
+
+    If Not FileExists(filename1) Or Not FileExists(filename2) Then
+      FirstMismatch = -1
+    Else
+      InFile1 = FreeFile()
+      FileOpen(InFile1, filename1, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
+      FileLength1 = LOF(InFile1)
+
+      InFile2 = FreeFile()
+      FileOpen(InFile2, filename2, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
+      FileLength2 = LOF(InFile2)
+
+      If FileLength1 < FileLength2 Then
+        minLength = FileLength1
+      Else
+        minLength = FileLength2
+      End If
+
+      longBytes = minLength - minLength Mod 4
+
+      For i = 1 To longBytes Step 4
+        FileGet(InFile1, testL1)
+        FileGet(InFile2, testL2)
+        If testL1 <> testL2 Then Exit For
+      Next
+
+      Do While i <= minLength
+        FileGet(InFile1, testB1, i)
+        FileGet(InFile2, testB2, i)
+        If testB1 <> testB2 Then Exit Do
+        i = i + 1
+      Loop
+
+      If i <= minLength Then 'Found a mismatch before the shorter file ended
+        FirstMismatch = i
+      ElseIf FileLength1 <> FileLength2 Then  'Longer file matched shorter one while it lasted
+        FirstMismatch = i
+      Else
+        FirstMismatch = 0
+      End If
+
+      FileClose(InFile1)
+      FileClose(InFile2)
+    End If
+    Exit Function
+
+ErrorReading:
+    MsgBox("Error reading '" & filename1 & "'" & vbCr & "or '" & filename2 & "'" & vbCr & Err.Description, MsgBoxStyle.OKOnly, "WholeFileBytes")
+    On Error Resume Next
+    FileClose(InFile1)
+    FileClose(InFile2)
+  End Function
+
+  Public Function SwapBytes(ByRef n As Integer) As Integer
+    ' ##SUMMARY Swaps between big and little endian 32-bit integers.
+    ' ##SUMMARY   Example: SwapBytes(1) = 16777216
+    ' ##PARAM N I Any long integer
+    ' ##RETURNS Modified input parameter N.
+    Dim OrigBytes As Byte()
+    Dim NewBytes As Byte()
+    ' ##LOCAL OrigBytes - stores original bytes
+    ' ##LOCAL NewBytes - stores new bytes
+
+    OrigBytes = System.BitConverter.GetBytes(n)
+    ReDim NewBytes(3)
+    NewBytes(0) = OrigBytes(3)
+    NewBytes(1) = OrigBytes(2)
+    NewBytes(2) = OrigBytes(1)
+    NewBytes(3) = OrigBytes(0)
+    Return System.BitConverter.ToInt32(NewBytes, 0)
+  End Function
+
+  Public Function ReadBigInt(ByRef InFile As Short) As Integer
+    ' ##SUMMARY Reads big-endian integer from file number and converts to _
+    'Intel little-endian value.
+    ' ##SUMMARY   Example: ReadBigInt(1) = 1398893856
+    ' ##PARAM InFile I Open file number
+    ' ##RETURNS Input parameter InFile converted to Intel little-endian value.
+    Dim n As Integer
+    ' ##LOCAL n - variable into which data is read
+
+    FileGet(InFile, n)
+    Return SwapBytes(n)
+  End Function
+
+  Public Sub WriteBigInt(ByRef OutFile As Short, ByRef Value As Integer)
+    ' ##SUMMARY Writes 32-bit integer as big endian to specified disk file.
+    ' ##PARAM OutFile I File number
+    ' ##PARAM Value I 32-bit integer
+    FilePut(OutFile, SwapBytes(Value))
+  End Sub
+
+  Public Sub FileToBase64(ByVal InputFilePath As String, ByVal OutputFilePath As String)
+
+    'initialize the reader to read binary
+    Dim inStream As IO.Stream = IO.File.OpenRead(InputFilePath)
+    Dim reader As New System.IO.BinaryReader(inStream)
+
+    'read in each byte and convert it to a char
+    Dim numbytes = reader.BaseStream.Length
+    SaveFileString(OutputFilePath, System.Convert.ToBase64String(reader.ReadBytes(numbytes)))
+
+    reader.Close()
+
+  End Sub
+
 End Module

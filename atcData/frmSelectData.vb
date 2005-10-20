@@ -289,7 +289,6 @@ Friend Class frmSelectData
 #End Region
 
   Private Const PADDING As Integer = 5
-  'Private Const REMOVE_VALUE = "~Remove~"
   Private Const NOTHING_VALUE = "~Missing~"
 
   Private pcboCriteria() As Windows.Forms.ComboBox
@@ -417,11 +416,11 @@ Friend Class frmSelectData
         If Not lSortedItems.Contains(lVal) Then
           If lNumeric Then
             Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
-            lIndex = BinarySearchNumeric(lKey, lSortedItems)
+            lIndex = BinarySearchNumeric(lKey, lSortedItems.Keys)
             lSortedItems.Insert(lIndex, lKey, lVal)
           Else
             Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
-            lIndex = BinarySearchString(lKey, lSortedItems)
+            lIndex = BinarySearchString(lKey, lSortedItems.Keys)
             lSortedItems.Insert(lIndex, lKey, lVal)
           End If
         End If
@@ -442,7 +441,7 @@ Friend Class frmSelectData
   End Sub
 
   'Returns first index of a key equal to or higher than aKey
-  Private Function BinarySearchString(ByVal aKey As String, ByVal aKeys As atcCollection) As Integer
+  Private Function BinarySearchString(ByVal aKey As String, ByVal aKeys As ArrayList) As Integer
     Dim lHigher As Integer = aKeys.Count
     Dim lLower As Integer = -1
     Dim lProbe As Integer
@@ -506,14 +505,8 @@ NextTS:
 
   Private Sub cboCriteria_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
     If Not sender.SelectedItem Is Nothing Then
-      'If sender.SelectedItem = REMOVE_VALUE Then
-      '  If plstCriteria.GetUpperBound(0) > 0 Then
-      '    RemoveCriteria(sender, plstCriteria(GetIndex(sender.name)))
-      '  End If
-      'Else
       PopulateCriteriaList(sender.SelectedItem, plstCriteria(GetIndex(sender.name)))
       UpdatedCriteria()
-      'End If
     End If
   End Sub
 
@@ -586,10 +579,6 @@ NextTS:
       pCriteriaFraction(iScanCriteria) *= OldToNew
     Next
 
-    'If pcboCriteria.GetUpperBound(0) = 0 Then
-    '  pcboCriteria(0).Items.Remove(REMOVE_VALUE)
-    'End If
-
     SizeCriteria()
     UpdatedCriteria()
   End Sub
@@ -646,10 +635,6 @@ NextTS:
     If iCriteria = 0 Then
       PopulateCriteriaCombos()
     Else 'populate from first combo box
-      'If Not pcboCriteria(0).Items.Contains(REMOVE_VALUE) Then
-      '  pcboCriteria(0).Items.Add(REMOVE_VALUE)
-      'End If
-
       For iItem As Integer = 0 To pcboCriteria(0).Items.Count - 1
         pcboCriteria(iCriteria).Items.Add(pcboCriteria(0).Items.Item(iItem))
       Next
@@ -658,14 +643,12 @@ NextTS:
       pcboCriteria(iCriteria).Text = aText
     Else 'Find next criteria that is not yet in use
       For Each curName As String In pcboCriteria(iCriteria).Items
-        'If curName <> REMOVE_VALUE Then
         For iOtherCriteria As Integer = 0 To iCriteria - 1
           If curName.Equals(pcboCriteria(iOtherCriteria).SelectedItem) Then GoTo NextName
         Next
         If atcDataAttributes.GetDefinition(curName).Calculated Then GoTo NextName
         pcboCriteria(iCriteria).Text = curName
         Exit For
-        'End If
 NextName:
       Next
     End If
