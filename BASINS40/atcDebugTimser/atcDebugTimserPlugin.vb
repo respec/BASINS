@@ -10,18 +10,18 @@ Public Class atcDebugTimserPlugin
   End Property
 
   Public Overrides Function Show(ByVal aDataManager As atcDataManager, _
-                   Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
+                   Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object 'System.Windows.Forms.Form
     Dim lDataGroup As atcDataGroup = aDataGroup
-    If lDataGroup Is Nothing Then
-      lDataGroup = New atcDataGroup
-    End If
+    If lDataGroup Is Nothing Then lDataGroup = New atcDataGroup
 
-    Dim lDebugTimserForm As New atcDebugTimserForm(aDataManager, lDataGroup)
+    Dim lForm As New atcDebugTimserForm(aDataManager, lDataGroup)
     If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
-      lDebugTimserForm.Show()
+      lForm.Show()
+      Return lForm
+    Else 'No data to display, don't show or return the form
+      lForm.Dispose()
+      Return Nothing
     End If
-
-    Return lDebugTimserForm
   End Function
 
   Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
@@ -33,8 +33,8 @@ Public Class atcDebugTimserPlugin
                   ByVal aDataGroup As atcDataGroup, _
                   ByVal aFileName As String, _
                   ByVal ParamArray aOption() As String)
-    Dim lDebugTimserForm As New atcDebugTimserForm(aDataManager, aDataGroup)
-    With lDebugTimserForm
+    Dim lForm As New atcDebugTimserForm(aDataManager, aDataGroup)
+    With lForm
       .TreeAction(aOption)
       .Save(aFileName)
     End With

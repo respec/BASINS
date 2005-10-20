@@ -10,25 +10,25 @@ Public Class atcDebugTimserForm
   Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
         Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
     MyBase.New()
-    pDataManager = aDataManager
-    If aDataGroup Is Nothing Then
-      pDataGroup = New atcDataGroup
-    Else
-      pDataGroup = aDataGroup
-    End If
     InitializeComponent() 'required by Windows Form Designer
 
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each ldisp As atcDataDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
-    Next
+    pDataManager = aDataManager
 
-    If pDataGroup.Count = 0 Then 'ask user to specify some Data
-      mnuFileAdd_Click(Nothing, Nothing)
+    Dim lTempDataGroup As atcDataGroup = aDataGroup
+    If aDataGroup Is Nothing Then lTempDataGroup = New atcDataGroup
+
+    If lTempDataGroup.Count = 0 Then 'ask user to specify some Data
+      pDataManager.UserSelectData(, lTempDataGroup, True)
     End If
 
-    If pDataGroup.Count > 0 Then
+    If lTempDataGroup.Count > 0 Then
+      pDataGroup = lTempDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
       PopulateTree()
+
+      Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+      For Each ldisp As atcDataDisplay In DisplayPlugins
+        mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+      Next
     Else 'user declined to specify Data
       Me.Close()
     End If

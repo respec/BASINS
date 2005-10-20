@@ -682,13 +682,12 @@ NextName:
   End Sub
 
   Private Sub SizeCriteria()
-    If Not pcboCriteria Is Nothing Then
+    If Visible AndAlso Not pcboCriteria Is Nothing Then
       Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
       If iLastCriteria >= 0 Then
-        Dim eachCriteriaPortion() As Integer
-        Dim availableWidth As Integer = panelCriteria.Width - PADDING
+        Dim availableWidth As Integer = panelCriteria.Width
         'Dim perCriteriaWidth As Integer = (panelCriteria.Width - PADDING) / (iLastCriteria + 1)
-        Dim curLeft As Integer = PADDING
+        Dim curLeft As Integer = 0
 
         pMatchingGrid.ColumnWidth(0) = 0
         pSelectedGrid.ColumnWidth(0) = 0
@@ -696,12 +695,15 @@ NextName:
         For iCriteria As Integer = 0 To iLastCriteria
           pcboCriteria(iCriteria).Top = PADDING
           pcboCriteria(iCriteria).Left = curLeft
-          If iCriteria = iLastCriteria AndAlso curLeft < availableWidth Then 'Fit rightmost criteria to fill remaining space
-            pcboCriteria(iCriteria).Width = availableWidth - curLeft
+          If iCriteria = iLastCriteria AndAlso curLeft < availableWidth Then
+            pcboCriteria(iCriteria).Width = availableWidth - curLeft 'Rightmost criteria fills remaining space
           Else
-            pcboCriteria(iCriteria).Width = availableWidth * pCriteriaFraction(iCriteria)
+            If availableWidth * pCriteriaFraction(iCriteria) > PADDING * 2 Then
+              pcboCriteria(iCriteria).Width = availableWidth * pCriteriaFraction(iCriteria) - PADDING
+            Else
+              pcboCriteria(iCriteria).Width = PADDING
+            End If
           End If
-          If pcboCriteria(iCriteria).Width > PADDING Then pcboCriteria(iCriteria).Width -= PADDING
 
           With plstCriteria(iCriteria)
             .Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING
@@ -775,7 +777,7 @@ NextName:
         iTS = pMatchingGroup.IndexOfSerial(lSerial)
         If iTS >= 0 Then 'Found matching serial number in pMatchingGroup
           Dim selTS As atcData.atcDataSet = pMatchingGroup(iTS)
-          pSelectedGroup.Add(selTS.Attributes.GetValue("id"), selTS)
+          pSelectedGroup.Add(selTS)
           SelectMatchingRow(aRow, True)
         End If
       End If
@@ -832,18 +834,18 @@ NextName:
   End Sub
 
   Private Sub mnuSelectAllMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAllMatching.Click
-    For Each ts As atcDataSet In pMatchingGroup
-      If Not pSelectedGroup.Contains(ts) Then pSelectedGroup.Add(ts.Attributes.GetValue("id"), ts)
-    Next
-    RefreshSelected()
-    'Dim lAdd As New atcCollection
     'For Each ts As atcDataSet In pMatchingGroup
-    '  If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
+    '  If Not pSelectedGroup.Contains(ts) Then pSelectedGroup.Add(ts)
     'Next
-    'If lAdd.Count > 0 Then
-    '  pSelectedGroup.Add(lAdd)
-    '  RefreshSelected()
-    'End If
+    'RefreshSelected()
+    Dim lAdd As New atcCollection
+    For Each ts As atcDataSet In pMatchingGroup
+      If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
+    Next
+    If lAdd.Count > 0 Then
+      pSelectedGroup.Add(lAdd)
+      RefreshSelected()
+    End If
   End Sub
 
   Private Sub mnuSelectNoMatching_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectNoMatching.Click
@@ -888,6 +890,9 @@ NextName:
     End If
   End Sub
 
+  Private Sub frmSelectData_VisibleChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.VisibleChanged
+    If Visible Then SizeCriteria()
+  End Sub
 End Class
 
 Friend Class GridSource

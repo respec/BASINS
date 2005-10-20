@@ -87,20 +87,21 @@ Public Class atcGraphForm
   Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
         Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
     MyBase.New()
-    pDataManager = aDataManager
-    If aDataGroup Is Nothing Then
-      pDataGroup = New atcDataGroup
-    Else
-      pDataGroup = aDataGroup
-    End If
     InitializeComponent() 'required by Windows Form Designer
-    Me.SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
 
-    If pDataGroup.Count = 0 Then 'ask user to specify some Data
-      pDataManager.UserSelectData(, pDataGroup, True)
+    SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
+
+    pDataManager = aDataManager
+
+    Dim lTempDataGroup As atcDataGroup = aDataGroup
+    If aDataGroup Is Nothing Then lTempDataGroup = New atcDataGroup
+
+    If lTempDataGroup.Count = 0 Then 'ask user to specify some Data
+      pDataManager.UserSelectData(, lTempDataGroup, True)
     End If
 
-    If pDataGroup.Count > 0 Then
+    If lTempDataGroup.Count > 0 Then
+      pDataGroup = lTempDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
       InitMasterPane()
 
       Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
