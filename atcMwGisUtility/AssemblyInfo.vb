@@ -7,10 +7,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("")> 
+<Assembly: AssemblyTitle("atcMwGisUtility")> 
+<Assembly: AssemblyDescription("GIS Utilities Implemented thru MapWindow")> 
+<Assembly: AssemblyCompany("Aqua Terra Consultants")> 
+<Assembly: AssemblyProduct("atcMwGisUtility")> 
 <Assembly: AssemblyCopyright("")> 
 <Assembly: AssemblyTrademark("")> 
 <Assembly: CLSCompliant(True)> 
