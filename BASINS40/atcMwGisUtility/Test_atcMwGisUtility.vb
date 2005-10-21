@@ -293,6 +293,11 @@ End Class
   Public Sub Testset_CurrentLayer()
     GisUtil.CurrentLayer = 2
     dbg.Msg("Testset_CurrentLayer:" & GisUtil.CurrentLayer)
+    Try
+      GisUtil.CurrentLayer = GisUtil.NumLayers + 1
+    Catch ex As Exception
+      dbg.Msg("Testset_CurrentLayer:Exception:" & ex.ToString)
+    End Try
   End Sub
 
   Public Sub TestOverlappingPolygons()
@@ -321,12 +326,21 @@ End Class
 
   Public Sub TestNumFields()
     Dim lNumFields As Integer
+
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      lNumFields = GisUtil.NumFields(lLayerIndex)
-      dbg.Msg("TestNumFields:" & lNumFields & ":" & LayerDescription(lLayerIndex))
+      Try
+        lNumFields = GisUtil.NumFields(lLayerIndex)
+        dbg.Msg("TestNumFields:" & lNumFields & ":" & LayerDescription(lLayerIndex))
+      Catch ex As Exception
+        dbg.Msg("TestNumFields:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
+      End Try
     Next
-    lNumFields = GisUtil.NumFields  'current layer
-    dbg.Msg("TestNumFields:CurrentLayer:" & lNumFields & ":" & LayerDescription(GisUtil.CurrentLayer))
+
+    Try
+      lNumFields = GisUtil.NumFields  'current layer
+      dbg.Msg("TestNumFields:CurrentLayer:" & lNumFields & ":" & LayerDescription(GisUtil.CurrentLayer))
+    Catch
+    End Try
   End Sub
 
   Public Sub TestFieldName()
@@ -413,21 +427,33 @@ End Class
 
   Public Sub TestNumFeatures()
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      dbg.Msg("TestNumFeatures:" & GisUtil.NumFeatures(lLayerIndex) & ":" & LayerDescription(lLayerIndex))
+      Try
+        dbg.Msg("TestNumFeatures:" & GisUtil.NumFeatures(lLayerIndex) & ":" & LayerDescription(lLayerIndex))
+      Catch ex As Exception
+        dbg.Msg("TestNumFeatures:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
+      End Try
     Next
   End Sub
 
   Public Sub TestFeatureArea()
     Dim lFeatureIndex As Integer = 0
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      dbg.Msg("TestLayerArea:" & GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) & ":" & LayerDescription(lLayerIndex))
+      Try
+        dbg.Msg("TestLayerArea:" & GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) & ":" & LayerDescription(lLayerIndex))
+      Catch ex As Exception
+        dbg.Msg("TestLayerArea:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
+      End Try
     Next
   End Sub
 
   Public Sub TestFeatureLength()
     Dim lFeaturnIndex As Integer = 0
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      dbg.Msg("TestLayerLength:" & GisUtil.FeatureLength(lLayerIndex, lFeaturnIndex) & ":" & LayerDescription(lLayerIndex))
+      Try
+        dbg.Msg("TestLayerLength:" & GisUtil.FeatureLength(lLayerIndex, lFeaturnIndex) & ":" & LayerDescription(lLayerIndex))
+      Catch ex As Exception
+        dbg.Msg("TestLayerLength:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
+      End Try
     Next
   End Sub
 

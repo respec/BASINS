@@ -451,6 +451,7 @@ Public Class PlugIn
         Next
       Next
     Catch ex As Exception
+      LogMsg("Exception:" & ex.ToString, "clsPlugIn:BuiltInScript")
     End Try
   End Sub
 

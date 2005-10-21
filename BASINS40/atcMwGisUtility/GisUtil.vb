@@ -1,19 +1,17 @@
 Imports atcUtility
 
+''' <remarks>Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
+''' <summary>GIS Utilities implemented thru MapWindow</summary>
 Public Class GisUtil
 
-  '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
-  ' ##MODULE_NAME GisUtil
-  ' ##MODULE_DATE October 30, 2005
-  ' ##MODULE_AUTHOR Paul Duda, Mark Gray and Jack Kittle of AQUA TERRA CONSULTANTS
-  ' ##MODULE_DESCRIPTION  GIS Utilities Implemented thru MapWindow
   Private Shared pMapWin As MapWindow.Interfaces.IMapWin
   Private Const UseCurrent As Integer = -1
 
+  ''' <summary>Run all tests</summary>
+  ''' <returns>Results of testing</returns>
+  ''' <requirements>Test data in 
+  ''' <strong>c:\test\atcMwGisUtility\data</strong></requirements>
   Public Shared Function RunAllTests() As Boolean
-    ' ##SUMMARY Run all tests
-    ' ##RETURNS Results of Testing
     Dim lTests As New Test_GisUtil
     lTests.init()
     lTests.TestLoadProject()
@@ -43,58 +41,74 @@ Public Class GisUtil
     Return True
   End Function
 
+  ''' <summary>Map Window Object</summary>
+  ''' <exception caption="GisUtil">Mapping Object Not Set</exception>
   Public Shared Property MappingObject() As MapWindow.Interfaces.IMapWin
-    ' ##SUMMARY Map Window Object
     Get
-      Return pMapWin
+      If pMapWin Is Nothing Then
+        Throw New Exception("GisUtil:Mapping Object Not Set")
+      Else
+        Return pMapWin
+      End If
     End Get
     Set(ByVal aNewValue As MapWindow.Interfaces.IMapWin)
-      Try
-        pMapWin = aNewValue
-      Catch e As Exception
-        LogDbg("GisUtil:SetGisUtilsMappingObject:Error:" & e.Message)
-      End Try
+      pMapWin = aNewValue
     End Set
   End Property
 
+  ''' <summary>Load MapWindow project</summary>
+  ''' <param name="aProjectName">
+  '''     <para>Filename of project to load</para>
+  ''' </param>
+  ''' <remarks>Current directory not changed</remarks>
+  ''' <exception caption="GisUtil:LoadProject:LoadFailure">Failure to Load Project</exception>
+  ''' <exception caption="GisUtil:LoadProject:FileNotFound">File Not Found</exception>
   Public Shared Sub LoadProject(ByVal aProjectName As String)
-    ' ##SUMMARY Load Map Window project
-    ' ##PARAM aProjectName I Filename of project to load
     If FileExists(aProjectName) Then
       Dim lBaseDir As String = CurDir()  'dont want to change curdir, save original
-      Dim lRet As Boolean = pMapWin.Project.Load(aProjectName)
+      Dim lRet As Boolean = MappingObject.Project.Load(aProjectName)
+      If Not lRet Then
+        Throw New Exception("GisUtil:LoadProject:LoadFailure:" & aProjectName)
+      End If
       ChDriveDir(lBaseDir)
+    Else
+      Throw New Exception("GisUtil:LoadProject:FileNotFound:" & aProjectName)
     End If
-    'TODO: error return?
   End Sub
 
+  ''' <summary>Current Layer Index (Handle)</summary>
+  ''' <exception caption="GisUtil:SetCurrentLayer:Error">Layer number does not exist</exception>
   Public Shared Property CurrentLayer() As Integer
-    ' ##SUMMARY Gets or sets the current layer handle. 
     Get
-      Return pMapWin.Layers.CurrentLayer
+      Return MappingObject.Layers.CurrentLayer
     End Get
     Set(ByVal aNewValue As Integer)
-      If aNewValue < pMapWin.Layers.NumLayers And aNewValue >= 0 Then
+      If aNewValue < MappingObject.Layers.NumLayers And aNewValue >= 0 Then
         pMapWin.Layers.CurrentLayer = aNewValue
       Else
-        'TODO: need an error here
+        Throw New Exception("GisUtil:SetCurrentLayer:Error:LayerIndex:" & aNewValue & ":OutOfRange:0:" & MappingObject.Layers.NumLayers)
       End If
     End Set
   End Property
 
+  ''' <summary>Obtain pointer to a shape file from a LayerIndex</summary>
+  ''' <exception caption="GisUtil:ShapeFileFromIndex:Error">Layer specified by LayerIndex is not a ShapeFile</exception>
+  ''' <exception caption="GisUtil:ShapeFileFromIndex:Error">Layer specified by LayerIndex does not exist</exception>
   Private Shared Function ShapeFileFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Shapefile
     If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
 
-    If aLayerIndex >= 0 And aLayerIndex < pMapWin.Layers.NumLayers Then
-      Dim lLayer As MapWindow.Interfaces.Layer = pMapWin.Layers(aLayerIndex)
+    If aLayerIndex >= 0 And aLayerIndex < MappingObject.Layers.NumLayers Then
+      Dim lLayer As MapWindow.Interfaces.Layer = MappingObject.Layers(aLayerIndex)
       If lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile OrElse _
          lLayer.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile OrElse _
          lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
         Dim lShape As MapWinGIS.Shapefile = (lLayer.GetObject)
         Return lShape
+      Else
+        Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & MappingObject.Layers(aLayerIndex).LayerType & ":IsNotShapefile")
       End If
     Else
-      'TODO: need an error here
+      Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & MappingObject.Layers.NumLayers)
     End If
     Return Nothing
   End Function
@@ -102,10 +116,10 @@ Public Class GisUtil
   Private Shared Function LayerFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWindow.Interfaces.Layer
     If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
 
-    If aLayerIndex >= 0 And aLayerIndex < pMapWin.Layers.NumLayers Then
+    If aLayerIndex >= 0 And aLayerIndex < MappingObject.Layers.NumLayers Then
       Return (pMapWin.Layers(aLayerIndex))
     Else
-      'TODO: need an error here
+      Throw New Exception("GisUtil:LayerFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & MappingObject.Layers.NumLayers)
     End If
   End Function
 
