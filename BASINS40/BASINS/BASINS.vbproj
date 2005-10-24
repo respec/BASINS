@@ -124,6 +124,7 @@
                     Name = "MapWinX"
                     AssemblyName = "MapWinX"
                     HintPath = "..\Bin\MapWinX.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>
