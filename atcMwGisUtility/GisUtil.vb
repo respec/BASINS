@@ -92,33 +92,53 @@ Public Class GisUtil
   End Property
 
   ''' <summary>Obtain pointer to a shape file from a LayerIndex</summary>
-  ''' <exception caption="GisUtil:ShapeFileFromIndex:Error">Layer specified by LayerIndex is not a ShapeFile</exception>
-  ''' <exception caption="GisUtil:ShapeFileFromIndex:Error">Layer specified by LayerIndex does not exist</exception>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of Layer containing ShapeFile</para>
+  ''' </param>
+  ''' <exception caption="GisUtil:ShapeFileFromIndex:Error">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception caption="GisUtil:ShapeFileFromIndex:Error">Layer specified by aLayerIndex does not exist</exception>
   Private Shared Function ShapeFileFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Shapefile
     If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
 
-    If aLayerIndex >= 0 And aLayerIndex < MappingObject.Layers.NumLayers Then
-      Dim lLayer As MapWindow.Interfaces.Layer = MappingObject.Layers(aLayerIndex)
-      If lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile OrElse _
-         lLayer.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile OrElse _
-         lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
-        Return lLayer.GetObject
-      Else
-        Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & MappingObject.Layers(aLayerIndex).LayerType & ":IsNotShapeFile")
-      End If
+    Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
+    If lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile OrElse _
+      lLayer.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile OrElse _
+      lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+      Return lLayer.GetObject
     Else
-      Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & MappingObject.Layers.NumLayers - 1)
+      Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & MappingObject.Layers(aLayerIndex).LayerType & ":IsNotShapeFile")
     End If
-    Return Nothing
   End Function
 
+  ''' <summary>Obtain pointer to a grid from a LayerIndex</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of desired layer containing grid (defaults to Current Layer)</para>
+  ''' </param>
+  ''' <exception caption="GisUtil:GridFromIndex:Error">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception caption="GisUtil:GridFromIndex:Error">Layer specified by aLayerIndex is not a Grid</exception>
+  Private Shared Function GridFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Grid
+    If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
+
+    Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
+    If lLayer.LayerType = MapWindow.Interfaces.eLayerType.Grid Then
+      Return lLayer.GetGridObject
+    Else
+      Throw New Exception("GisUtil:GridFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & MappingObject.Layers(aLayerIndex).LayerType & ":IsNotGrid")
+    End If
+  End Function
+
+  ''' <summary>Obtain pointer to a layer from a LayerIndex</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of desired layer (defaults to Current Layer)</para>
+  ''' </param>
+  ''' <exception caption="GisUtil:LayerFromIndex:Error">Layer specified by aLayerIndex does not exist</exception>
   Private Shared Function LayerFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWindow.Interfaces.Layer
     If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
 
     If aLayerIndex >= 0 And aLayerIndex < MappingObject.Layers.NumLayers Then
       Return (pMapWin.Layers(aLayerIndex))
     Else
-      Throw New Exception("GisUtil:LayerFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & MappingObject.Layers.NumLayers)
+      Throw New Exception("GisUtil:LayerFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & MappingObject.Layers.NumLayers - 1)
     End If
   End Function
 
@@ -126,42 +146,40 @@ Public Class GisUtil
     ByVal aLayerIndex1 As Integer, ByVal aFeatureIndex1 As Integer, _
     ByVal aLayerIndex2 As Integer, ByVal aFeatureIndex2 As Integer) As Boolean
 
+    OverlappingPolygons = False
+
+    Dim lSf1 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex1)
+    Dim lSf1Shape As MapWinGIS.Shape = lSf1.Shape(aFeatureIndex1)
+
+    Dim lSf2 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex2)
+    Dim lSf2Shape As MapWinGIS.Shape = lSf2.Shape(aFeatureIndex2)
+
     Dim lIndex As Integer
     Dim lX As Double, lY As Double
 
-    Dim lSf1 As MapWinGIS.Shapefile = LayerFromIndex(aLayerIndex1).GetObject
-    Dim lSf1Shape As MapWinGIS.Shape = lSf1.Shape(aFeatureIndex1)
+    If Not (lSf1.Extents.xMin > lSf2.Extents.xMax OrElse _
+            lSf1.Extents.xMax < lSf2.Extents.xMin OrElse _
+            lSf1.Extents.yMin > lSf2.Extents.yMax OrElse _
+            lSf1.Extents.yMax < lSf2.Extents.yMin) Then
+      'might be within, check in detail
+      For lIndex = 1 To lSf1Shape.numPoints
+        lX = lSf1Shape.Point(lIndex - 1).x
+        lY = lSf1Shape.Point(lIndex - 1).y
+        OverlappingPolygons = lSf2.PointInShape(aFeatureIndex2, lX, lY)
+        If OverlappingPolygons Then 'quit loop, we've found they overlap
+          Exit For
+        End If
+      Next lIndex
 
-    Dim lSf2 As MapWinGIS.Shapefile = LayerFromIndex(aLayerIndex2).GetObject
-    Dim lSf2Shape As MapWinGIS.Shape = lSf2.Shape(aFeatureIndex2)
-
-    OverlappingPolygons = False
-    If lSf1Shape Is Nothing OrElse lSf2Shape Is Nothing Then 'shape undefined, no overlap
-    Else 'quick - check extents
-      If Not (lSf1.Extents.xMin > lSf2.Extents.xMax OrElse _
-              lSf1.Extents.xMax < lSf2.Extents.xMin OrElse _
-              lSf1.Extents.yMin > lSf2.Extents.yMax OrElse _
-              lSf1.Extents.yMax < lSf2.Extents.yMin) Then
-        'might be within, check in detail
-        For lIndex = 1 To lSf1Shape.numPoints
-          lX = lSf1Shape.Point(lIndex - 1).x
-          lY = lSf1Shape.Point(lIndex - 1).y
-          OverlappingPolygons = lSf2.PointInShape(aFeatureIndex2, lX, lY)
+      If Not OverlappingPolygons Then 'now check the opposite
+        For lIndex = 1 To lSf2Shape.numPoints
+          lX = lSf2Shape.Point(lIndex - 1).x
+          lY = lSf2Shape.Point(lIndex - 1).y
+          OverlappingPolygons = lSf1.PointInShape(aFeatureIndex1, lX, lY)
           If OverlappingPolygons Then 'quit loop, we've found they overlap
             Exit For
           End If
         Next lIndex
-
-        If Not OverlappingPolygons Then 'now check the opposite
-          For lIndex = 1 To lSf2Shape.numPoints
-            lX = lSf2Shape.Point(lIndex - 1).x
-            lY = lSf2Shape.Point(lIndex - 1).y
-            OverlappingPolygons = lSf1.PointInShape(aFeatureIndex1, lX, lY)
-            If OverlappingPolygons Then 'quit loop, we've found they overlap
-              Exit For
-            End If
-          Next lIndex
-        End If
       End If
     End If
   End Function
@@ -176,82 +194,82 @@ Public Class GisUtil
     Dim lSf1 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
     Dim lSf2 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndexContaining)
 
-    If Not lSf1 Is Nothing AndAlso Not lSf2 Is Nothing Then
-      Dim lPointIndex As Integer
-      Dim lShapeIndex As Integer
-      Dim lX As Double, lY As Double
-      Dim lSf1Shape As New MapWinGIS.Shape
-      Dim lNth As Integer
+    Dim lPointIndex As Integer
+    Dim lShapeIndex As Integer
+    Dim lX As Double, lY As Double
+    Dim lSf1Shape As New MapWinGIS.Shape
+    Dim lNth As Integer
 
-      ReDim aIndex(lSf1.NumShapes)
+    ReDim aIndex(lSf1.NumShapes)
 
-      lSf2.BeginPointInShapefile()
-      For lShapeIndex = 1 To lSf1.NumShapes
-        aIndex(lShapeIndex) = -1
-        lSf1Shape = lSf1.Shape(lShapeIndex - 1)
-        For lPointIndex = 2 To lSf1Shape.numPoints
-          lX = lSf1Shape.Point(lPointIndex - 1).x
-          lY = lSf1Shape.Point(lPointIndex - 1).y
-          lNth = lSf2.PointInShapefile(lX, lY)
-          If lNth > -1 Then
-            aIndex(lShapeIndex) = lNth
-            Exit For
-          End If
-        Next lPointIndex
-      Next lShapeIndex
-      lSf2.EndPointInShapefile()
-    Else
-      'TODO: need an error here
-    End If
+    lSf2.BeginPointInShapefile()
+    For lShapeIndex = 1 To lSf1.NumShapes
+      aIndex(lShapeIndex) = -1
+      lSf1Shape = lSf1.Shape(lShapeIndex - 1)
+      For lPointIndex = 2 To lSf1Shape.numPoints
+        lX = lSf1Shape.Point(lPointIndex - 1).x
+        lY = lSf1Shape.Point(lPointIndex - 1).y
+        lNth = lSf2.PointInShapefile(lX, lY)
+        If lNth > -1 Then 'add to index aray
+          aIndex(lShapeIndex) = lNth
+          Exit For
+        End If
+      Next lPointIndex
+    Next lShapeIndex
+    lSf2.EndPointInShapefile()
   End Sub
 
+  ''' <summary>Obtain number of fields in a shape file from a LayerIndex</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of Layer containing ShapeFile</para>
+  ''' </param>
+  ''' <exception caption="GisUtil:NumFields:Error">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception caption="GisUtil:NumFields:Error">Layer specified by aLayerIndex does not exist</exception>
   Public Shared Function NumFields(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
-    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    If Not lSf Is Nothing Then
-      Return lSf.NumFields
-    Else
-      Return 0
-    End If
+    Return ShapeFileFromIndex(aLayerIndex).NumFields
   End Function
 
+  ''' <summary>Obtain name of a Field in a shape file from a LayerIndex and a FieldIndex</summary>
+  ''' <param name="aFieldIndex">
+  '''     <para>Index of Field to obtain name of</para>
+  ''' </param>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of Layer containing ShapeFile</para>
+  ''' </param>
+  ''' <exception caption="GisUtil:FieldName:Error">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception caption="GisUtil:FieldName:Error">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception caption="GisUtil:FieldName:Error">Field specified by aFieldIndex does not exist</exception>
   Public Shared Function FieldName(ByVal aFieldIndex As Integer, ByVal aLayerIndex As Integer) As String
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    If Not lSf Is Nothing Then
-      If aFieldIndex < lSf.NumFields AndAlso aFieldIndex >= 0 Then
-        Return lSf.Field(aFieldIndex).Name
-      Else
-        Return ""
-      End If
+    If aFieldIndex < lSf.NumFields AndAlso aFieldIndex >= 0 Then
+      Return lSf.Field(aFieldIndex).Name
     Else
-      Return ""
+      Throw New Exception("GisUtil:FieldName:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
     End If
   End Function
 
   Public Shared Function LayerIndex(ByVal aLayerName As String) As Integer
-    Dim lLayerIndex As Integer, lLayer As MapWindow.Interfaces.Layer
+    Dim lLayerIndex As Integer
+    Dim lLayer As MapWindow.Interfaces.Layer
 
-    LayerIndex = -1
     For lLayerIndex = 0 To pMapWin.Layers.NumLayers - 1
       lLayer = pMapWin.Layers(lLayerIndex)
       If UCase(lLayer.Name) = UCase(aLayerName) Then
-        LayerIndex = lLayerIndex
-        Exit For
+        Return lLayerIndex
       End If
     Next
+    Throw New Exception("GisUtil:LayerIndex:Error:LayerName:" & aLayerName & ":IsNotRecognized")
   End Function
 
   Public Shared Function FieldIndex(ByVal aLayerIndex As Integer, ByVal aFieldName As String) As Integer
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
-    FieldIndex = -1
-    If Not lSf Is Nothing Then
-      For iFieldIndex As Integer = 0 To lSf.NumFields - 1
-        If UCase(lSf.Field(iFieldIndex).Name) = UCase(aFieldName) Then 'this is the field we want
-          FieldIndex = iFieldIndex
-          Exit For
-        End If
-      Next
-    End If
+    For iFieldIndex As Integer = 0 To lSf.NumFields - 1
+      If UCase(lSf.Field(iFieldIndex).Name) = UCase(aFieldName) Then 'this is the field we want
+        Return iFieldIndex
+      End If
+    Next
+    Throw New Exception("GisUtil:FieldIndex:Error:FieldName:" & aFieldName & ":IsNotRecognized")
   End Function
 
   Public Shared Function AddField(ByVal aLayerIndex As Integer, ByVal aFieldName As String, _
@@ -302,74 +320,79 @@ Public Class GisUtil
     Return ShapeFileFromIndex(aLayerIndex).NumShapes
   End Function
 
-  Public Shared Function FieldType(ByVal aFieldIndex As Integer, ByVal aLayerIndex As Integer) As Integer
+  Public Shared Function FieldType(ByVal aFieldIndex As Integer, Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    Return lSf.Field(aFieldIndex).Type
+    If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
+      Throw New Exception("GisUtil:FieldType:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
+    Else
+      Return lSf.Field(aFieldIndex).Type
+    End If
   End Function
 
   Public Shared Function FieldValue(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByVal aFieldIndex As Integer) As String
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    Dim lFieldValue As String = lSf.CellValue(aFieldIndex, aFeatureIndex)
-    Return lFieldValue
+    If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
+      Throw New Exception("GisUtil:FieldValue:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
+    ElseIf aFeatureIndex < 0 Or aFeatureIndex >= lSf.NumShapes Then
+      Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aFeatureIndex & ":OutOfRange:0:" & lSf.NumShapes - 1)
+    Else
+      Return lSf.CellValue(aFieldIndex, aFeatureIndex)
+    End If
   End Function
 
   Public Shared Function GridLayerMinimum(ByVal aLayerIndex As Integer) As Object
-    Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
-    Dim lUgrid As New MapWinGIS.Grid
-    lUgrid = lLayer.GetGridObject
-    Return lUgrid.Minimum
+    Return GridFromIndex(aLayerIndex).Minimum
   End Function
 
   Public Shared Function GridLayerMaximum(ByVal aLayerIndex As Integer) As Object
-    Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
-    Dim lUgrid As New MapWinGIS.Grid
-    lUgrid = lLayer.GetGridObject
-    Return lUgrid.Maximum
+    Return GridFromIndex(aLayerIndex).Maximum
   End Function
 
   Public Shared Function FeatureArea(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
     Dim lArea As Double
-    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
-    If Not lSf Is Nothing Then
-      Dim lShape As New MapWinGIS.Shape
-      lShape = lSf.Shape(aFeatureIndex)
-      Dim lUtils As New MapWinGIS.Utils
+    Try
+      Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+      Dim lShape As MapWinGIS.Shape = lSf.Shape(aFeatureIndex)
+      Dim lUtils As MapWinGIS.Utils
       lArea = lUtils.Area(lShape)
       If lArea < 0.000001 Then 'could it be undefined?
-        Dim lShapeFileType = lSf.ShapefileType
-        If lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYGON AndAlso _
-           lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYGONM AndAlso _
-           lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYGONZ Then
+        If lSf.ShapefileType <> MapWinGIS.ShpfileType.SHP_POLYGON AndAlso _
+           lSf.ShapefileType <> MapWinGIS.ShpfileType.SHP_POLYGONM AndAlso _
+           lSf.ShapefileType <> MapWinGIS.ShpfileType.SHP_POLYGONZ Then
           lArea = Double.NaN
+          LogDbg("GisUtil:FeatureArea:AreaUndefinedForShapeType:" & lSf.ShapefileType)
         End If
       End If
-    Else
+    Catch ex As Exception
+      LogDbg("GisUtil:FeatureArea:Exception:" & ex.Message)
       lArea = Double.NaN
-    End If
+    End Try
     Return lArea
+
   End Function
 
   Public Shared Function FeatureLength(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
     Dim lLength As Double
-    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
-    If Not lSf Is Nothing Then
-      Dim lShape As New MapWinGIS.Shape
-      lShape = lSf.Shape(aFeatureIndex)
-      Dim lUtils As New MapWinGIS.Utils
+    Try
+      Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+      Dim lShape As MapWinGIS.Shape = lSf.Shape(aFeatureIndex)
+      Dim lUtils As MapWinGIS.Utils
       lLength = lUtils.Length(lShape)
       If lLength < 0.000001 Then 'could it be undefined
         Dim lShapeFileType = lSf.ShapefileType
         If lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINE AndAlso _
            lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINEM AndAlso _
            lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINEZ Then
+          LogDbg("GisUtil:FeatureLength:LengthUndefinedForShapeType:" & lSf.ShapefileType)
           lLength = Double.NaN
         End If
       End If
-    Else
+    Catch ex As Exception
+      LogDbg("GisUtil:FeatureLength:Exception:" & ex.Message)
       lLength = Double.NaN
-    End If
+    End Try
     Return lLength
   End Function
 
