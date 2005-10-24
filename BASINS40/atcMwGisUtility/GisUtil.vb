@@ -102,13 +102,12 @@ Public Class GisUtil
       If lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile OrElse _
          lLayer.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile OrElse _
          lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
-        Dim lShape As MapWinGIS.Shapefile = (lLayer.GetObject)
-        Return lShape
+        Return lLayer.GetObject
       Else
-        Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & MappingObject.Layers(aLayerIndex).LayerType & ":IsNotShapefile")
+        Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & MappingObject.Layers(aLayerIndex).LayerType & ":IsNotShapeFile")
       End If
     Else
-      Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & MappingObject.Layers.NumLayers)
+      Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & MappingObject.Layers.NumLayers - 1)
     End If
     Return Nothing
   End Function
@@ -300,12 +299,7 @@ Public Class GisUtil
   End Function
 
   Public Shared Function NumFeatures(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
-    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    If lSf Is Nothing Then
-      Return 0
-    Else
-      Return lSf.NumShapes
-    End If
+    Return ShapeFileFromIndex(aLayerIndex).NumShapes
   End Function
 
   Public Shared Function FieldType(ByVal aFieldIndex As Integer, ByVal aLayerIndex As Integer) As Integer

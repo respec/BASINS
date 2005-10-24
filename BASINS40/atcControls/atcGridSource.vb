@@ -17,6 +17,7 @@ Public Class atcGridSource
   Private pValues(,) As String
   Private pColors(,) As Color
   Private pSelected(,) As Boolean
+  Private pAlignment(,) As atcAlignment
   Private pColorCells As Boolean = False
   Private pSwapRowsColumns As Boolean = False
 
@@ -249,9 +250,19 @@ Public Class atcGridSource
   'Override this instead of Alignment
   Protected Overridable Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcAlignment
     Get
-      Return atcAlignment.HAlignLeft + atcAlignment.VAlignCenter
+      If pAlignment Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
+        Return atcAlignment.HAlignLeft + atcAlignment.VAlignCenter
+      Else
+        Return pAlignment(aRow, aColumn)
+      End If
     End Get
     Set(ByVal newValue As atcAlignment)
+      If pAlignment Is Nothing Then
+        ReDim pAlignment(Rows, Columns)
+      End If
+      If aRow > Rows + 1 Then Rows = aRow + 1
+      If aColumn > Columns + 1 Then Columns = aRow + 1
+      pAlignment(aRow, aColumn) = newValue
     End Set
   End Property
 

@@ -265,7 +265,7 @@ End Class
     If aLayerIndex >= 0 And aLayerIndex < GisUtil.NumLayers Then
       lRet &= GisUtil.LayerName(aLayerIndex) & ":" & GisUtil.LayerType(aLayerIndex) & ">"
     Else
-      lRet &= "<Layer Index Out Of Range>"
+      lRet &= "<Layer Index Out Of Range>>"
     End If
     Return lRet
   End Function
@@ -426,7 +426,7 @@ End Class
   End Sub
 
   Public Sub TestNumFeatures()
-    For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
+    For lLayerIndex As Integer = 0 To GisUtil.NumLayers
       Try
         dbg.Msg("TestNumFeatures:" & GisUtil.NumFeatures(lLayerIndex) & ":" & LayerDescription(lLayerIndex))
       Catch ex As Exception
