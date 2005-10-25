@@ -114,11 +114,6 @@
                     DependentUpon = "frmStatus.vb"
                     BuildAction = "EmbeddedResource"
                 />
-                <File
-                    RelPath = "Unused.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
             </Include>
         </Files>
     </VisualBasic>
