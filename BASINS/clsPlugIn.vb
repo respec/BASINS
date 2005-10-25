@@ -93,14 +93,10 @@ Public Class PlugIn
     Dim iDirectory As Integer
     Dim mnu As MapWindow.Interfaces.MenuItem
 
+    BuiltInScript(False)
+
     g_MapWin = aMapWin
     g_MapWinWindowHandle = aParentHandle
-    Dim lLogFileName As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\Basins.Log"
-    LogSetFileName(lLogFileName)
-    LogStartMonitor()
-    LogSetMapWin(g_MapWin)
-
-    BuiltInScript(False)
 
     pDataManager = New atcDataManager(g_MapWin, Me)
 
@@ -223,8 +219,6 @@ Public Class PlugIn
     g_MapWin.Menus.Remove(ToolsMenuName)
     g_MapWin.Menus.Remove(ModelsMenuName) 'TODO: don't unload if another plugin is still using it
     g_MapWin.Menus.Remove(ProjectsMenuName)
-    LogStopMonitor()
-
   End Sub
 
   Public Function NationalProjectIsOpen() As Boolean
@@ -286,6 +280,8 @@ Public Class PlugIn
           g_MapWin.Project.Save(PrjFileName)
           g_MapWin.Project.Modified = False
         End If
+      Else
+        MsgBox("Tool tip was not perserved - cannot open " & ItemName, , ProjectsMenuString)
       End If
       Handled = True
     ElseIf ItemName.StartsWith(DataMenuName & "_") Then
