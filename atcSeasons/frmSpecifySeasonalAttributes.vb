@@ -47,6 +47,7 @@ Public Class frmSpecifySeasonalAttributes
   Friend WithEvents btnOk As System.Windows.Forms.Button
   Friend WithEvents btnCancel As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSpecifySeasonalAttributes))
     Me.panelTop = New System.Windows.Forms.Panel
     Me.grpSeasons = New System.Windows.Forms.GroupBox
     Me.btnSeasonsNone = New System.Windows.Forms.Button
@@ -218,6 +219,7 @@ Public Class frmSpecifySeasonalAttributes
     Me.ClientSize = New System.Drawing.Size(408, 373)
     Me.Controls.Add(Me.panelTop)
     Me.Controls.Add(Me.panelBottom)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmSpecifySeasonalAttributes"
     Me.Text = "Seasonal Attributes"
     Me.panelTop.ResumeLayout(False)
