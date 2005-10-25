@@ -8,15 +8,10 @@ Public Class atcEventPlugin
 
   Private pAvailableOperations As atcDataAttributes ' atcDataGroup
   Private pName As String = "Timeseries::Events"
-  Private pEvents As atcEventBase
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      If pEvents Is Nothing Then
-        Return "Timeseries::Event"
-      Else
-        Return pEvents.Name
-      End If
+      Return "Timeseries::Event"
     End Get
   End Property
 
@@ -60,9 +55,8 @@ Public Class atcEventPlugin
       lOk = True
     End If
     If Not ltsGroup Is Nothing And lOk Then
-      Dim pEvents As New atcEventBase
       For Each lts As atcTimeseries In ltsGroup
-        Dim lEvents As atcDataGroup = pEvents.Split(lts, Me, lThresh, lHigh)
+        Dim lEvents As atcDataGroup = EventSplit(lts, Me, lThresh, lHigh)
         Select Case aOperationName
           Case "Split"
             MyBase.DataSets.AddRange(lEvents)

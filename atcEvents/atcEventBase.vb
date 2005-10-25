@@ -1,30 +1,9 @@
 Imports atcData
 Imports atcUtility
 
-Public Class atcEventBase
-
-  Private pAvailableOperations As atcDataAttributes ' atcDataGroup
-
-  Public ReadOnly Property Name() As String
-    Get
-      Return "Timeseries::Events"
-    End Get
-  End Property
-
-  Public ReadOnly Property Category() As String
-    Get
-      Return "Events"
-    End Get
-  End Property
-
-  Public ReadOnly Property Description() As String
-    Get
-      Return Name
-    End Get
-  End Property
-
+Public Module atcEventBase
   'Divide the data in aTS into a group of TS, one per season
-  Public Function Split(ByVal aTS As atcTimeseries, ByVal aSource As atcDataSource, ByVal aThresh As Double, ByVal aHigh As Boolean) As atcDataGroup
+  Public Function EventSplit(ByVal aTS As atcTimeseries, ByVal aSource As atcDataSource, ByVal aThresh As Double, ByVal aHigh As Boolean) As atcDataGroup
     Dim lNewGroup As New atcDataGroup
     Dim lEventIndex As Integer = 0
     Dim lNewTS As atcTimeseries
@@ -90,9 +69,4 @@ Public Class atcEventBase
 
     Return lNewGroup
   End Function
-
-  Public Overrides Function ToString() As String
-    Return Name.Substring(12) 'Skip first part of Name which is "Timeseries::"
-  End Function
-
-End Class
+End Module
