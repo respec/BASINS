@@ -117,6 +117,16 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcSelectList.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "atcSelectList.resx"
+                    DependentUpon = "atcSelectList.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "atcText.vb"
                     SubType = "UserControl"
                     BuildAction = "Compile"

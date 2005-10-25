@@ -631,7 +631,7 @@ Public Class atcGrid
 
     scrollCorner.Visible = VScroller.Visible And HScroller.Visible
 
-    Me.Refresh()
+    Refresh()
   End Sub
 
   Private Sub VScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles VScroller.ValueChanged
@@ -643,5 +643,4 @@ Public Class atcGrid
     pLeftColumn = HScroller.Value
     Refresh()
   End Sub
-
 End Class

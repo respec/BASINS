@@ -73,14 +73,14 @@ Friend Class frmDisplaySeasonalAttributes
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
     Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuFileSave = New System.Windows.Forms.MenuItem
+    Me.mnuEdit = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonColumns = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonRows = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
-    Me.mnuFileSave = New System.Windows.Forms.MenuItem
-    Me.mnuEdit = New System.Windows.Forms.MenuItem
-    Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -103,6 +103,24 @@ Friend Class frmDisplaySeasonalAttributes
     Me.mnuAddAttributes.Index = 1
     Me.mnuAddAttributes.Text = "Add Attributes"
     '
+    'mnuFileSave
+    '
+    Me.mnuFileSave.Index = 2
+    Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
+    Me.mnuFileSave.Text = "Save"
+    '
+    'mnuEdit
+    '
+    Me.mnuEdit.Index = 1
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
+    Me.mnuEdit.Text = "&Edit"
+    '
+    'mnuEditCopy
+    '
+    Me.mnuEditCopy.Index = 0
+    Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
+    Me.mnuEditCopy.Text = "Copy"
+    '
     'mnuView
     '
     Me.mnuView.Index = 2
@@ -111,6 +129,7 @@ Friend Class frmDisplaySeasonalAttributes
     '
     'mnuViewSeasonColumns
     '
+    Me.mnuViewSeasonColumns.Checked = True
     Me.mnuViewSeasonColumns.Index = 0
     Me.mnuViewSeasonColumns.Text = "Season Columns"
     '
@@ -135,24 +154,6 @@ Friend Class frmDisplaySeasonalAttributes
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
     Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
-    '
-    'mnuFileSave
-    '
-    Me.mnuFileSave.Index = 2
-    Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
-    Me.mnuFileSave.Text = "Save"
-    '
-    'mnuEdit
-    '
-    Me.mnuEdit.Index = 1
-    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
-    Me.mnuEdit.Text = "&Edit"
-    '
-    'mnuEditCopy
-    '
-    Me.mnuEditCopy.Index = 0
-    Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
-    Me.mnuEditCopy.Text = "Copy"
     '
     'frmDisplaySeasonalAttributes
     '
@@ -219,17 +220,11 @@ Friend Class frmDisplaySeasonalAttributes
   End Sub
 
   Private Sub mnuViewSeasonColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewSeasonColumns.Click
-    If pSource.SwapRowsColumns Then
-      pSource.SwapRowsColumns = False
-      agdMain.Refresh()
-    End If
+    SwapRowsColumns = False
   End Sub
 
   Private Sub mnuViewSeasonRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewSeasonRows.Click
-    If Not pSource.SwapRowsColumns Then
-      pSource.SwapRowsColumns = True
-      agdMain.Refresh()
-    End If
+    SwapRowsColumns = True
   End Sub
 
   Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
@@ -277,7 +272,12 @@ Friend Class frmDisplaySeasonalAttributes
       Return pSource.SwapRowsColumns
     End Get
     Set(ByVal newValue As Boolean)
-      pSource.SwapRowsColumns = newValue
+      If pSource.SwapRowsColumns <> newValue Then
+        pSource.SwapRowsColumns = newValue
+        agdMain.Refresh()
+      End If
+      mnuViewSeasonRows.Checked = newValue
+      mnuViewSeasonColumns.Checked = Not newValue
     End Set
   End Property
 
