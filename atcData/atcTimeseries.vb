@@ -133,6 +133,22 @@ Public Class atcTimeseries
     'pDates = New atcTimeseries(aFile)
   End Sub
 
+  Public Overrides Function Clone() As atcDataSet
+    EnsureValuesRead()
+    Dim lClone As New atcTimeseries(pDataSource)
+    With lClone
+      .Attributes.ChangeTo(Attributes)
+      If Not pDates Is Nothing Then .Dates = pDates.Clone
+      If Not pValues Is Nothing Then .Values = pValues.Clone
+      If Not pValueAttributes Is Nothing Then
+        For lValueAttIndex As Integer = 0 To pNumValues
+          .ValueAttributes(lValueAttIndex) = pValueAttributes(lValueAttIndex).Clone
+        Next
+      End If
+    End With
+    Return lClone
+  End Function
+
   'Create a new Timeseries and reference the file it came from
   Public Sub New(ByVal aDataSource As atcDataSource)
     MyBase.New()

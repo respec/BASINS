@@ -203,8 +203,11 @@ Friend Class atcListForm
   Private Sub mnuSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAttributes.Click
     Dim lst As New atcControls.atcSelectList
     Dim lAvailable As New ArrayList
-    For Each lAttrDef as atcAttributeDefinition In atcDataAttributes.AllDefinitions
-      lAvailable.Add(lAttrDef.Name)
+    For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+      Select Case lAttrDef.TypeString.ToLower
+        Case "double", "integer", "boolean", "string"
+          lAvailable.Add(lAttrDef.Name)
+      End Select
     Next
     lAvailable.Sort()
     If lst.AskUser(lAvailable, pDataManager.DisplayAttributes) Then

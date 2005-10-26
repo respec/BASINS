@@ -216,6 +216,7 @@ Friend Class atcScenarioBuilderForm
   Private Const MenuText_AllResults = "All Results"
 
   Private pDataManager As atcDataManager
+  Private pMapWin As MapWindow.Interfaces.IMapWin
 
   'The group of atcTimeseries containing base conditions
   Private pBaseScenario As atcDataSource
@@ -238,10 +239,11 @@ Friend Class atcScenarioBuilderForm
   Private pRunButton() As Windows.Forms.Button
 
   Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
+                        ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
     pInitializing = True
-
     pDataManager = aDataManager
+    pMapWin = aMapWin
     pBaseScenario = New atcDataSource
     If Not aTimeseriesGroup Is Nothing Then
       pBaseScenario.DataSets.AddRange(aTimeseriesGroup) 'TODO: want to share events with aTimeseriesGroup
@@ -906,10 +908,12 @@ Friend Class atcScenarioBuilderForm
         AddScenario()                         'Create a new scenario to populate
         lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
       End If
-      Dim args() As Object = New Object() {"DataManager", pBaseScenario, lNewScenario}
       Dim errors As String
-      'Dim lBasinsPlugin As Object = pDataManager.Basins
-      'lBasinsPlugin.RunBasinsScript(FileExt(lScriptFileName), WholeFileString(lScriptFileName), errors, args)
+
+      'atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
+
+      RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
+                pBaseScenario, lNewScenario)
       If Not errors Is Nothing Then
         LogMsg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
       End If
@@ -917,10 +921,20 @@ Friend Class atcScenarioBuilderForm
       LogMsg("Unable to find script " & lScriptFileName, "Scenario Script")
     End If
 
-    'pDataManager.Basins.ItemClicked("BasinsTools_RunScript FindFile ", New Boolean = False)
-    'ScriptScenario(pBaseScenario, lNewScenario)
     agdMain.Refresh()
   End Sub
+
+  Private Function MakeScriptName() As String
+    Dim tryName As String
+    Dim iTry As Integer = 1
+
+    Do
+      tryName = pMapWin.Plugins.PluginFolder & _
+                "\Basins\RemoveMe-Script-" & iTry & ".dll"
+      iTry += 1
+    Loop While FileExists(tryName)
+    Return tryName
+  End Function
 
   Private Sub mnuScenariosAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAdd.Click
     AddScenario()
