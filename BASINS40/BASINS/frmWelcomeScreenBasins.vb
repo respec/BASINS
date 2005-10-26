@@ -439,7 +439,7 @@ Public Class frmWelcomeScreenBasins
 
   Private Sub lbBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbBuildNew.LinkClicked
     'TODO: don't hard code path
-    prj.Load("d:\basins\data\national\national.mwprj")
+    prj.Load("\basins\data\national\national.mwprj")
     Me.Close()
   End Sub
 
