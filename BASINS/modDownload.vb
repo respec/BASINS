@@ -198,6 +198,7 @@ StartOver:
               layername = FilenameOnly(theOutputFileName)
             End If
             g_MapWin.Layers.Add(g, layername) 'to do add color scheme?
+            g_MapWin.Layers(g_MapWin.Layers.NumLayers - 1).UseTransparentColor = True
           Case "add_allshapes"
             theOutputFileName = lProjectorNode.Content
             AddAllShapesInDir(theOutputFileName, project_dir)
