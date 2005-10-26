@@ -104,8 +104,8 @@ Public Module modTimeseriesMath
   End Sub
   'Merge a group of atcTimeseries
   'Each atcTimeseries is assumed to be in order by date within itself
-  'Resulting atcTimeseries will contain all dates and values from the group, sorted by date
-  'If overlapping dates exist, duplicate dates will occur in the result
+  'Resulting atcTimeseries will contain all unique dates from the group, sorted by date
+  'If duplicate dates exist, values from atcTimeseries later in aGroup will be left out of result
   Public Function MergeTimeseries(ByVal aGroup As atcDataGroup) As atcTimeseries
     Dim lNewTS As New atcTimeseries(Nothing)
     Dim lNewIndex As Integer
@@ -113,6 +113,7 @@ Public Module modTimeseriesMath
     Dim lOldTS As atcTimeseries
     Dim lMinDate As Double = Double.MaxValue
     Dim lMaxGroupIndex As Integer = aGroup.Count - 1
+    Dim lMaxCheckForDuplicate As Integer
     Dim lIndex As Integer
     Dim lMinIndex As Integer
     Dim lNextIndex() As Integer
@@ -180,18 +181,29 @@ Public Module modTimeseriesMath
             'This value was inserted during splitting and will now be removed
             lNewIndex -= 1
             lTotalNumValues -= 1
+            lMaxCheckForDuplicate = lMinIndex 'Don't remove duplicate since we aren't using this one
           Else
             lNewTS.Dates.Value(lNewIndex) = lMinDate
             lNewTS.Value(lNewIndex) = lOldValue
+            lMaxCheckForDuplicate = lMaxGroupIndex
           End If
 
-          lNextIndex(lMinIndex) += 1
-          If lNextIndex(lMinIndex) <= lOldTS.numValues Then
-            lNextDate(lMinIndex) = lOldTS.Dates.Value(lNextIndex(lMinIndex))
-          Else
-            lNextIndex(lMinIndex) = -1
-          End If
-
+          For lIndex = lMinIndex To lMaxCheckForDuplicate
+            If lNextIndex(lIndex) > 0 Then
+              If Math.Abs(lNextDate(lIndex) - lMinDate) < Double.Epsilon Then
+                If lIndex > lMinIndex Then
+                  lOldTS = aGroup.ItemByIndex(lIndex)
+                  LogDbg("MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " using " & lOldValue)
+                End If
+                lNextIndex(lIndex) += 1
+                If lNextIndex(lIndex) <= lOldTS.numValues Then
+                  lNextDate(lIndex) = lOldTS.Dates.Value(lNextIndex(lIndex))
+                Else
+                  lNextIndex(lIndex) = -1
+                End If
+              End If
+            End If
+          Next
         Else 'ran out of values in all the datasets
           Exit For
         End If
