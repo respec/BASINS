@@ -20,6 +20,12 @@ Public Class atcDataSet
     pAttributes.Owner = Me
   End Sub
 
+  Public Overridable Function Clone() As atcDataSet
+    Dim lClone As New atcDataSet
+    lClone.Attributes.ChangeTo(pAttributes)
+    Return lClone
+  End Function
+
   Public Sub New()
     pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
     Clear()

@@ -54,6 +54,7 @@ Public Class atcSeasonBase
         lNewTS.Attributes.AddHistory("Split by " & ToString() & " " & SeasonName(lSeasonIndex))
         lNewTS.Attributes.Add("SeasonDefinition", Me)
         lNewTS.Attributes.Add("SeasonIndex", lSeasonIndex)
+        lNewTS.Attributes.Add("SeasonName", SeasonName(lSeasonIndex))
         lNewGroup.Add(lSeasonIndex, lNewTS)
       End If
 

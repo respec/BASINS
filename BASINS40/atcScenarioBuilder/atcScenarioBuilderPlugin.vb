@@ -2,7 +2,7 @@ Imports atcData
 
 Public Class atcScenarioBuilderPlugin
   Inherits atcDataDisplay
-  Friend pMapWin As MapWindow.Interfaces.IMapWin
+  Private pMapWin As MapWindow.Interfaces.IMapWin
 
   Public Overrides ReadOnly Property Name() As String
     Get
@@ -13,13 +13,13 @@ Public Class atcScenarioBuilderPlugin
   Public Overrides Function Show(ByVal aManager As atcDataManager, _
                    Optional ByVal aGroup As atcDataGroup = Nothing)
     Dim lForm As New atcScenarioBuilderForm
-    lForm.Initialize(aManager, aGroup)
+    lForm.Initialize(aManager, pMapWin, aGroup)
     Return lForm
   End Function
 
-  Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, _
-                                  ByVal ParentHandle As Integer)
-    pMapWin = MapWin
+  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
+                                  ByVal aParentHandle As Integer)
+    pMapWin = aMapWin
     pMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcScenarioBuilderPlugin")
   End Sub
 
