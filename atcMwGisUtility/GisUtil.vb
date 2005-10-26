@@ -43,7 +43,15 @@ Public Class GisUtil
 
   ''' <summary>Map Window Object</summary>
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
-  Public Shared Property MappingObject() As MapWindow.Interfaces.IMapWin
+  Public Shared WriteOnly Property MappingObject() As MapWindow.Interfaces.IMapWin
+    Set(ByVal aNewValue As MapWindow.Interfaces.IMapWin)
+      pMapWin = aNewValue
+    End Set
+  End Property
+
+  ''' <summary>Map Window Object</summary>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Private Shared ReadOnly Property GetMappingObject() As MapWindow.Interfaces.IMapWin
     Get
       If pMapWin Is Nothing Then
         Throw New Exception("GisUtil:Mapping Object Not Set")
@@ -51,10 +59,17 @@ Public Class GisUtil
         Return pMapWin
       End If
     End Get
-    Set(ByVal aNewValue As MapWindow.Interfaces.IMapWin)
-      pMapWin = aNewValue
-    End Set
+
   End Property
+
+  ''' <summary>Layers on map</summary>
+  Private Shared Function MapLayers() As ArrayList
+    MapLayers = New ArrayList
+    Dim lLastLayerIndex As Integer = GetMappingObject.Layers.NumLayers - 1
+    For lLayerIndex As Integer = 0 To lLastLayerIndex
+      MapLayers.Add(GetMappingObject.Layers(lLayerIndex))
+    Next
+  End Function
 
   ''' <summary>Load MapWindow project</summary>
   ''' <param name="aProjectName">
@@ -63,10 +78,11 @@ Public Class GisUtil
   ''' <remarks>Current directory not changed</remarks>
   ''' <exception cref="Exception.html#LoadFailure" caption="LoadFailure">Failure to Load Project</exception>
   ''' <exception cref="Exception.html#FileNotFound" caption="FileNotFound">File Not Found</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Sub LoadProject(ByVal aProjectName As String)
     If FileExists(aProjectName) Then
       Dim lBaseDir As String = CurDir()  'dont want to change curdir, save original
-      Dim lRet As Boolean = MappingObject.Project.Load(aProjectName)
+      Dim lRet As Boolean = GetMappingObject.Project.Load(aProjectName)
       If Not lRet Then
         Throw New Exception("GisUtil:LoadProject:LoadFailure:" & aProjectName)
       End If
@@ -78,13 +94,14 @@ Public Class GisUtil
 
   ''' <summary>Current Layer Index (Handle)</summary>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Property CurrentLayer() As Integer
     Get
-      Return MappingObject.Layers.CurrentLayer
+      Return GetMappingObject.Layers.CurrentLayer
     End Get
     Set(ByVal aLayerIndex As Integer)
       If Not LayerFromIndex(aLayerIndex) Is Nothing Then
-        MappingObject.Layers.CurrentLayer = aLayerIndex
+        GetMappingObject.Layers.CurrentLayer = aLayerIndex
       End If
     End Set
   End Property
@@ -95,6 +112,7 @@ Public Class GisUtil
   ''' </param>
   ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared ReadOnly Property ShapeFileFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Shapefile
     Get
       If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
@@ -105,7 +123,7 @@ Public Class GisUtil
         lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
         Return lLayer.GetObject
       Else
-        Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & MappingObject.Layers(aLayerIndex).LayerType & ":IsNotShapeFile")
+        Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & GetMappingObject.Layers(aLayerIndex).LayerType & ":IsNotShapeFile")
       End If
     End Get
   End Property
@@ -116,6 +134,7 @@ Public Class GisUtil
   ''' </param>
   ''' <exception cref="Exception.html#LayerNotGrid" caption="LayerNotGrid">Layer specified by aLayerIndex is not a Grid</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared ReadOnly Property GridFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Grid
     Get
       If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
@@ -124,7 +143,7 @@ Public Class GisUtil
       If lLayer.LayerType = MapWindow.Interfaces.eLayerType.Grid Then
         Return lLayer.GetGridObject
       Else
-        Throw New Exception("GisUtil:GridFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & MappingObject.Layers(aLayerIndex).LayerType & ":IsNotGrid")
+        Throw New Exception("GisUtil:GridFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & GetMappingObject.Layers(aLayerIndex).LayerType & ":IsNotGrid")
       End If
     End Get
   End Property
@@ -134,16 +153,16 @@ Public Class GisUtil
   '''     <para>Index of desired layer (defaults to Current Layer)</para>
   ''' </param>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared ReadOnly Property LayerFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWindow.Interfaces.Layer
     Get
       If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
 
-      If aLayerIndex >= 0 And aLayerIndex < MappingObject.Layers.NumLayers Then
-        Return (MappingObject.Layers(aLayerIndex))
+      If aLayerIndex >= 0 And aLayerIndex < GetMappingObject.Layers.NumLayers Then
+        Return (GetMappingObject.Layers(aLayerIndex))
       Else
-        Throw New Exception("GisUtil:LayerFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & MappingObject.Layers.NumLayers - 1)
+        Throw New Exception("GisUtil:LayerFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & GetMappingObject.Layers.NumLayers - 1)
       End If
-
     End Get
   End Property
 
@@ -325,52 +344,115 @@ Public Class GisUtil
   ''' <summary>Returns the number of layers loaded in the MapWindow. Drawing layers are not counted. </summary>
   Public Shared ReadOnly Property NumLayers() As Integer
     Get
-      Return MappingObject.Layers.NumLayers()
+      Return GetMappingObject.Layers.NumLayers()
     End Get
   End Property
 
-  Public Shared Function LayerType(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
-    Return LayerFromIndex(aLayerIndex).LayerType
-  End Function
+  ''' <summary>Layer type from a layer index</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer<br>(Defaults to current layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared ReadOnly Property LayerType(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
+    Get
+      Return LayerFromIndex(aLayerIndex).LayerType
+    End Get
+  End Property
 
-  Public Shared Function LayerName(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
-    Return LayerFromIndex(aLayerIndex).Name
-  End Function
+  ''' <summary>Layer name from a layer index</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer<br>(Defaults to current layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared ReadOnly Property LayerName(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
+    Get
+      Return LayerFromIndex(aLayerIndex).Name
+    End Get
+  End Property
 
-  ''' <summary>Obtain index of a layer from a name</summary>
+  ''' <summary>Index of a layer from a name</summary>
   ''' <param name="aLayerName">
   '''     <para>Name of layer to obtain index for</para>
   ''' </param>
+  ''' <exception cref="Exception.html#LayerNameNameNotRecognized" caption="LayerNameNameNotRecognized">Layer specified by aLayerName does not exist</exception>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function LayerIndex(ByVal aLayerName As String) As Integer
-    Dim lLayerIndex As Integer
-    Dim lLayer As MapWindow.Interfaces.Layer
+    LayerIndex = 0
 
-    For lLayerIndex = 0 To pMapWin.Layers.NumLayers - 1
-      lLayer = pMapWin.Layers(lLayerIndex)
-      If UCase(lLayer.Name) = UCase(aLayerName) Then
-        Return lLayerIndex
+    For Each llayer As MapWindow.Interfaces.Layer In MapLayers()
+      If UCase(llayer.Name) = UCase(aLayerName) Then
+        Return LayerIndex
       End If
+      LayerIndex += 1
     Next
+
     Throw New Exception("GisUtil:LayerIndex:Error:LayerName:" & aLayerName & ":IsNotRecognized")
   End Function
 
-  Public Shared Function LayerFileName(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
-    Return LayerFromIndex(aLayerIndex).FileName
-  End Function
+  ''' <summary>Layer file name from a layer index</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer<br>(Defaults to current layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared ReadOnly Property LayerFileName(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
+    Get
+      Return LayerFromIndex(aLayerIndex).FileName
+    End Get
+  End Property
 
-  Public Shared Function NumFeatures(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
-    Return ShapeFileFromIndex(aLayerIndex).NumShapes
-  End Function
+  ''' <summary>Number of features from a layer index</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer<br>(Defaults to current layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared ReadOnly Property NumFeatures(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
+    Get
+      Return ShapeFileFromIndex(aLayerIndex).NumShapes
+    End Get
+  End Property
 
-  Public Shared Function FieldType(ByVal aFieldIndex As Integer, Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
-    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
-      Throw New Exception("GisUtil:FieldType:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
-    Else
-      Return lSf.Field(aFieldIndex).Type
-    End If
-  End Function
+  ''' <summary>Type of a field from a field index and a layer index</summary>
+  ''' <param name="aFieldIndex">
+  '''     <para>Index of field</para>
+  ''' </param>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer<br>(Defaults to current layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
+  ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared ReadOnly Property FieldType(ByVal aFieldIndex As Integer, Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
+    Get
+      Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+      If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
+        Throw New Exception("GisUtil:FieldType:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
+      Else
+        Return lSf.Field(aFieldIndex).Type
+      End If
+    End Get
+  End Property
 
+  ''' <summary>Value of a field from a field index, a feature index and a layer index</summary>
+  ''' <param name="aFieldIndex">
+  '''     <para>Index of field</para>
+  ''' </param>
+  ''' <param name="aFeatureIndex">
+  '''     <para>Index of feature</para>
+  ''' </param>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer<br>(Defaults to current layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
+  ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function FieldValue(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByVal aFieldIndex As Integer) As String
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
     If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
@@ -382,13 +464,31 @@ Public Class GisUtil
     End If
   End Function
 
-  Public Shared Function GridLayerMinimum(ByVal aLayerIndex As Integer) As Object
-    Return GridFromIndex(aLayerIndex).Minimum
-  End Function
+  ''' <summary>Minimum value in a grid from a LayerIndex</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of desired layer containing grid (defaults to Current Layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotGrid" caption="LayerNotGrid">Layer specified by aLayerIndex is not a Grid</exception>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared ReadOnly Property GridLayerMinimum(Optional ByVal aLayerIndex As Integer = UseCurrent) As Object
+    Get
+      Return GridFromIndex(aLayerIndex).Minimum
+    End Get
+  End Property
 
-  Public Shared Function GridLayerMaximum(ByVal aLayerIndex As Integer) As Object
-    Return GridFromIndex(aLayerIndex).Maximum
-  End Function
+  ''' <summary>Maximum value in a grid from a LayerIndex</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of desired layer containing grid (defaults to Current Layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotGrid" caption="LayerNotGrid">Layer specified by aLayerIndex is not a Grid</exception>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared ReadOnly Property GridLayerMaximum(Optional ByVal aLayerIndex As Integer = UseCurrent) As Object
+    Get
+      Return GridFromIndex(aLayerIndex).Maximum
+    End Get
+  End Property
 
   Public Shared Function FeatureArea(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
     Dim lArea As Double
@@ -519,9 +619,11 @@ Public Class GisUtil
   '  osf.CreateNew(basename, type)
   'End Function
 
+  ''' <summary>Obtain file name of currently loaded project</summary>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared ReadOnly Property ProjectFileName() As String
     Get
-      Return MappingObject.Project.FileName
+      Return GetMappingObject.Project.FileName
     End Get
   End Property
 
@@ -554,7 +656,7 @@ Public Class GisUtil
     If LayerIndex(aLayerName) > -1 Then 'already on map 
       AddLayerToMap = True
     Else
-      Dim lLayer As MapWindow.Interfaces.Layer = MappingObject.Layers.Add(aFileName, aLayerName)
+      Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers.Add(aFileName, aLayerName)
       If lLayer Is Nothing Then
         AddLayerToMap = False
       Else
@@ -564,18 +666,33 @@ Public Class GisUtil
     End If
   End Function
 
-  Public Shared Property LayerVisible(ByVal aLayerIndex As Integer) As Boolean
+  ''' <summary>Layer visible flag</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer<br>(Defaults to current layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared Property LayerVisible(Optional ByVal aLayerIndex As Integer = UseCurrent) As Boolean
     Get
-      Return MappingObject.Layers(aLayerIndex).Visible
+      If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
+      Return LayerFromIndex(aLayerIndex).Visible
     End Get
-    Set(ByVal aNewValue As Boolean)
-      MappingObject.Layers(aLayerIndex).Visible = aNewValue
+    Set(ByVal aVisible As Boolean)
+      If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
+      LayerFromIndex(aLayerIndex).Visible = aVisible
     End Set
   End Property
 
-  Public Shared Function RemoveLayerFromMap(ByVal aLayerIndex As Integer) As Boolean
-    'given a layer index, remove it from the map.
-    MappingObject.Layers.Remove(aLayerIndex)
+  ''' <summary>Remove layer</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer<br>(Defaults to current layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared Function RemoveLayerFromMap(Optional ByVal aLayerIndex As Integer = UseCurrent) As Boolean
+    If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
+    Dim lLayerName As String = LayerName(aLayerIndex) 'forces check of index
+    GetMappingObject.Layers.Remove(aLayerIndex)
   End Function
 
   Public Shared Sub TabulateAreas(ByVal gridLayerIndex As Integer, _
@@ -609,12 +726,12 @@ Public Class GisUtil
     Dim polygonLayer As MapWindow.Interfaces.Layer
 
     'set input grid
-    gridLayer = MappingObject.Layers(gridLayerIndex)
+    gridLayer = GetMappingObject.Layers(gridLayerIndex)
     Dim InputGrid As New MapWinGIS.Grid
     InputGrid = gridLayer.GetGridObject
 
     'set input polygon layer
-    polygonLayer = MappingObject.Layers(polygonLayerIndex)
+    polygonLayer = GetMappingObject.Layers(polygonLayerIndex)
     Dim polygonsf As New MapWinGIS.Shapefile
     polygonsf = polygonLayer.GetObject
 
@@ -666,12 +783,12 @@ Public Class GisUtil
     Dim val As Integer
 
     'set input grid
-    gridLayer = MappingObject.Layers(gridLayerIndex)
+    gridLayer = GetMappingObject.Layers(gridLayerIndex)
     Dim InputGrid As New MapWinGIS.Grid
     InputGrid = gridLayer.GetGridObject
 
     'set input polygon layer
-    polygonLayer = MappingObject.Layers(polygonLayerIndex)
+    polygonLayer = GetMappingObject.Layers(polygonLayerIndex)
     Dim polygonsf As New MapWinGIS.Shapefile
     polygonsf = polygonLayer.GetObject
     Dim pshape As New MapWinGIS.Shape
@@ -710,7 +827,7 @@ Public Class GisUtil
     Dim gridLayer As MapWindow.Interfaces.Layer
 
     'set input grid
-    gridLayer = MappingObject.Layers(GridLayerIndex)
+    gridLayer = GetMappingObject.Layers(GridLayerIndex)
     Dim InputGrid As New MapWinGIS.Grid
     InputGrid = gridLayer.GetGridObject
 
@@ -745,7 +862,7 @@ Public Class GisUtil
     Layer1Index = LayerIndex(Layer1Name)
     Layer1FieldIndex = FieldIndex(Layer1Index, Layer1FieldName)
     Dim lLayer As MapWindow.Interfaces.Layer
-    lLayer = MappingObject.Layers(Layer1Index)
+    lLayer = GetMappingObject.Layers(Layer1Index)
     Dim lusf As New MapWinGIS.Shapefile
     lusf = lLayer.GetObject
 
@@ -753,7 +870,7 @@ Public Class GisUtil
     Layer2Index = LayerIndex(Layer2Name)
     Layer2FieldIndex = FieldIndex(Layer2Index, Layer2FieldName)
     Dim sLayer As MapWindow.Interfaces.Layer
-    sLayer = MappingObject.Layers(Layer2Index)
+    sLayer = GetMappingObject.Layers(Layer2Index)
     Dim ssf As New MapWinGIS.Shapefile
     ssf = sLayer.GetObject
     SSFext = ssf.Extents
@@ -802,11 +919,11 @@ Public Class GisUtil
     Dim lusfshape As MapWinGIS.Shape
 
     '********** do overlay ***********
-    MappingObject.StatusBar.ShowProgressBar = True
+    GetMappingObject.StatusBar.ShowProgressBar = True
     totalpolygoncount = lusf.NumShapes * cSelectedSubbasins.Count
     polygoncount = 0
     lastdisplayed = 0
-    MappingObject.StatusBar.ProgressBarValue = 0
+    GetMappingObject.StatusBar.ProgressBarValue = 0
     For i = 1 To lusf.NumShapes
       'loop through each shape of the land use layer
       lusfshape = lusf.Shape(i - 1)
@@ -838,10 +955,10 @@ Public Class GisUtil
         'lblStatus.Text = "Overlaying Land Use and Subbasins (" & Int(polygoncount / totalpolygoncount * 100) & "%)"
         'Me.Refresh()
         lastdisplayed = Int(polygoncount / totalpolygoncount * 100)
-        MappingObject.StatusBar.ProgressBarValue = Int(polygoncount / totalpolygoncount * 100)
+        GetMappingObject.StatusBar.ProgressBarValue = Int(polygoncount / totalpolygoncount * 100)
       End If
     Next i
-    MappingObject.StatusBar.ShowProgressBar = False
+    GetMappingObject.StatusBar.ShowProgressBar = False
 
     If CreateNew Then
       'delete old version of this file if it exists
@@ -873,13 +990,13 @@ Public Class GisUtil
     ClipShapesWithPolygon = ""
     'set input layer (reaches for instance)
     Dim lLayer As MapWindow.Interfaces.Layer
-    lLayer = MappingObject.Layers(inputlayerindex)
+    lLayer = GetMappingObject.Layers(inputlayerindex)
     Dim isf As New MapWinGIS.Shapefile
     isf = lLayer.GetObject
 
     'set clipper layer (subbasins for instance)
     Dim sLayer As MapWindow.Interfaces.Layer
-    sLayer = MappingObject.Layers(clipperlayerindex)
+    sLayer = GetMappingObject.Layers(clipperlayerindex)
     Dim ssf As New MapWinGIS.Shapefile
     ssf = sLayer.GetObject
     Dim sshape As MapWinGIS.Shape
@@ -900,16 +1017,16 @@ Public Class GisUtil
       bsuc = orsf.EditInsertField(isf.Field(i - 1), i - 1)
     Next i
 
-    MappingObject.StatusBar.ShowProgressBar = True
+    GetMappingObject.StatusBar.ShowProgressBar = True
     For i = 1 To ssf.NumShapes
-      MappingObject.StatusBar.ProgressBarValue = Int(i / ssf.NumShapes * 100)
+      GetMappingObject.StatusBar.ProgressBarValue = Int(i / ssf.NumShapes * 100)
       sshape = ssf.Shape(i - 1)
       bsuc = mx.ClipShapesWithPolygon(isf, sshape, rsf)
       For j = 1 To rsf.NumShapes
         bsuc = orsf.EditInsertShape(rsf.Shape(j - 1), j - 1)
       Next j
     Next i
-    MappingObject.StatusBar.ShowProgressBar = False
+    GetMappingObject.StatusBar.ShowProgressBar = False
 
     'populate attributes of output shapes
     For i = 1 To orsf.NumShapes
@@ -969,7 +1086,7 @@ Public Class GisUtil
     Dim found As Boolean
 
     Dim lLayer As MapWindow.Interfaces.Layer
-    lLayer = MappingObject.Layers(LayerIndex)
+    lLayer = GetMappingObject.Layers(LayerIndex)
     Dim isf As New MapWinGIS.Shapefile
     isf = lLayer.GetObject
 
