@@ -190,13 +190,7 @@ StartOver:
             If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
             Dim g As New MapWinGIS.Grid
             g.Open(theOutputFileName)
-            If InStr(theOutputFileName, "\demg\") > 0 Then
-              layername = FilenameOnly(theOutputFileName) & " DEMG"
-            ElseIf InStr(theOutputFileName, "\ned\") > 0 Then
-              layername = FilenameOnly(theOutputFileName) & " NED"
-            Else
-              layername = FilenameOnly(theOutputFileName)
-            End If
+            layername = FilenameOnly(theOutputFileName)
             g_MapWin.Layers.Add(g, layername) 'to do add color scheme?
             g_MapWin.Layers(g_MapWin.Layers.NumLayers - 1).UseTransparentColor = True
           Case "add_allshapes"
@@ -228,11 +222,17 @@ StartOver:
               System.IO.File.Copy(curFilename, theOutputFileName)
             Else
               'project it
+              g_MapWin.StatusBar(1).Text = "Projecting Grid..."
+              g_MapWin.View.MapCursor = tkCursor.crsrWait
+              g_MapWin.Refresh()
+              DoEvents()
               success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
+              g_MapWin.StatusBar(1).Text = ""
               If Not success Then
                 LogMsg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
                 System.IO.File.Copy(curFilename, theOutputFileName)
               End If
+              g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
             End If
           Case "convert_dir"
               'loop through a directory, projecting all files in it
