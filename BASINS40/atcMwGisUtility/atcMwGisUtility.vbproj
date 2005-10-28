@@ -105,12 +105,6 @@
                     Private = "False"
                 />
                 <Reference
-                    Name = "atcUtility"
-                    AssemblyName = "atcUtility"
-                    HintPath = "..\..\BASINS\Bin\Plugins\BASINS\atcUtility.dll"
-                    Private = "False"
-                />
-                <Reference
                     Name = "Interop.MapWinGIS"
                     AssemblyName = "Interop.MapWinGIS"
                     HintPath = "..\Bin\Interop.MapWinGIS.dll"
@@ -121,6 +115,12 @@
                     AssemblyName = "nunit.framework"
                     HintPath = "..\..\..\Program Files\NUnit 2.2\bin\nunit.framework.dll"
                     AssemblyFolderKey = "hklm\dn\nunit.framework"
+                />
+                <Reference
+                    Name = "atcUtility"
+                    Project = "{67027820-9036-481E-80F6-077E5085F59D}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
             </References>
             <Imports>

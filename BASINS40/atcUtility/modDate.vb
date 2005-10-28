@@ -27,6 +27,8 @@ Public Module modDate
   'This is the offset we actually use
   Public Const JulianModification As Integer = JulianModification1899
 
+  Public ReadOnly MonthName3 As String() = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+
   Public Function VBdate2MJD(ByVal d As Date) As Double
     '##SUMMARY VBdate2MJD - convert a VB date to a modfied Julian date(MJD), _
     'VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858

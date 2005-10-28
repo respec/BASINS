@@ -3,7 +3,10 @@ Imports atcUtility
 
 Public Module atcEventBase
   'Divide the data in aTS into a group of TS, one per season
-  Public Function EventSplit(ByVal aTS As atcTimeseries, ByVal aSource As atcDataSource, ByVal aThresh As Double, ByVal aHigh As Boolean) As atcDataGroup
+  Public Function EventSplit(ByVal aTS As atcTimeseries, _
+                             ByVal aSource As atcDataSource, _
+                             ByVal aThresh As Double, _
+                             ByVal aHigh As Boolean) As atcDataGroup
     Dim lNewGroup As New atcDataGroup
     Dim lEventIndex As Integer = 0
     Dim lNewTS As atcTimeseries

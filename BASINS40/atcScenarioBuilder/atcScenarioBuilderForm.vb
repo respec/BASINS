@@ -910,10 +910,10 @@ Friend Class atcScenarioBuilderForm
       End If
       Dim errors As String
 
-      'atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
+      atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
 
-      RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
-                pBaseScenario, lNewScenario)
+      'RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
+      '          pBaseScenario, lNewScenario)
       If Not errors Is Nothing Then
         LogMsg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
       End If

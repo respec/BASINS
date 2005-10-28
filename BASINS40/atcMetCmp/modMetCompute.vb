@@ -2,11 +2,11 @@ Option Strict Off
 Option Explicit On 
 Imports atcData
 Imports atcUtility
-Module modMetCompute
+Public Module modMetCompute
   'Copyright 2005 by AQUA TERRA Consultants
-  Dim X1() As Double = {0, 10.00028, 41.0003, 69.22113, 100.5259, 130.8852, 161.2853, _
+  Private X1() As Double = {0, 10.00028, 41.0003, 69.22113, 100.5259, 130.8852, 161.2853, _
                         191.7178, 222.1775, 253.66, 281.1629, 309.6838, 341.221}
-  Dim c(,) As Double = { _
+  Private c(,) As Double = { _
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
     {0, 4.0, 2.0, -1.5, -3.0, -2.0, 1.0, 3.0, 2.5, 1.0, 1.0, 2.0, 1.0}, _
     {0, 3.0, 4.0, 0.0, -3.0, -2.5, 0.0, 2.0, 3.0, 2.0, 1.5, 2.0, 1.0}, _
@@ -18,19 +18,7 @@ Module modMetCompute
     {0, -4.0, -4.5, -1.0, 2.5, 3.0, 1.0, 0.0, 0.0, 1.5, 2.0, 2.0, 1.0}, _
     {0, -2.0, -4.0, -3.0, 1.0, 3.0, 2.0, 0.5, 0.0, 1.5, 2.0, 1.0, 1.0}, _
     {0, 0.0, -3.5, -4.0, -0.5, 3.0, 3.0, 1.5, 1.0, 1.0, 2.0, 1.0, 1.0}}
-   '{0, 4, 3, 0, -2, -4, -5, -5, -4, -2, 0}, _
-  '{0, 2, 4, 3.5, 2.5, 0.5, -1.5, -3.5, -4.5, -4, -3.5}, _
-  '{0, -1.5, 0, 1.5, 3.5, 3, 2, 1, -1, -3, -4}, _
-  '{0, -3, -3, -1, 0, 1, 3, 3, 2.5, 1, -0.5}, _
-  '{0, -2, -2.5, -2, -2, -0.5, 0.5, 1.5, 3, 3, 3}, _
-  '{0, 1, 0, -1, -1, -1, -1, 0, 1, 2, 3}, _
-  '{0, 3, 2, 1.5, 0.5, 0, -0.5, -0.5, 0, 0.5, 1.5}, _
-  '{0, 2.5, 3, 3, 3, 2, 1, 1, 0, 0, 1}, _
-  '{0, 1, 2, 3, 3, 2.5, 2.5, 2, 1.5, 1.5, 1}, _
-  '{0, 1, 1.5, 1.5, 2, 2.5, 2.5, 2, 2, 2, 2}, _
-  '{0, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1}, _
-  '{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}}
-  Dim XLax(,) As Double = { _
+  Private XLax(,) As Double = { _
     {-9, -9, -9, -9, -9, -9, -9}, {-9, -9, -9, -9, -9, -9, -9}, {-9, -9, -9, -9, -9, -9, -9}, _
     {-9, -9, -9, -9, -9, -9, -9}, {-9, -9, -9, -9, -9, -9, -9}, {-9, -9, -9, -9, -9, -9, -9}, _
     {-9, -9, -9, -9, -9, -9, -9}, {-9, -9, -9, -9, -9, -9, -9}, {-9, -9, -9, -9, -9, -9, -9}, _
@@ -67,31 +55,6 @@ Module modMetCompute
     {-9, 440.14, -298.68, -1.51, -2.01, 13.0#, -3.3}, _
     {-9, 431.55, -304.32, 1.08, -2.13, 12.92, -3.17}, _
     {-9, 431.55, -304.32, 1.08, -2.13, 12.92, -3.17}}
-  '{-9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, _
-  '616.17, 609.97, 603.69, 597.29, 590.81, 584.21, 577.53, 570.73, 563.85, _
-  '556.85, 549.77, 542.57, 535.3, 527.9, 520.44, 512.84, 505.19, 497.4, _
-  '489.52, 481.53, 473.45, 465.27, 456.99, 448.61, 440.14, 431.55, 431.55}, _
-  '{-9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, _
-  '-147.83, -154.71, -161.55, -168.33, -175.05, -181.72, -188.34, -194.91, -201.42, _
-  '-207.29, -214.29, -220.65, -226.96, -233.22, -239.43, -245.59, -251.69, -257.74, _
-  '-263.74, -269.7, -275.6, -281.45, -287.25, -292.99, -298.68, -304.32, -304.32}, _
-  '{-9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, _
-  '-27.17, -27.49, -27.69, -27.78, -27.74, -27.57, -27.29, -26.89, -26.37, _
-  '-25.72, -24.96, -24.07, -23.07, -21.95, -20.7, -19.33, -17.83, -16.22, _
-  '-14.49, -12.63, -10.65, -8.55, -6.33, -3.98, -1.51, 1.08, 1.08}, _
-  '{-9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, _
-  '-3.17, -2.97, -2.78, -2.6, -2.43, -2.28, -2.14, -2.02, -1.91, _
-  '-1.81, -1.72, -1.64, -1.59, -1.55, -1.52, -1.51, -1.51, -1.52, _
-  '-1.54, -1.57, -1.63, -1.71, -1.8, -1.9, -2.01, -2.13, -2.13}, _
-  '{-9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, _
-  '11.84, 12.04, 12.22, 12.38, 12.53, 12.67, 12.8, 12.92, 13.03, _
-  '13.13, 13.22, 13.3, 13.36, 13.4, 13.42, 13.42, 13.41, 13.39, _
-  '13.36, 13.32, 13.27, 13.21, 13.14, 13.07, 13.0, 12.92, 12.92}, _
-  '{-9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, -9, _
-  '2.02, 1.3, 0.64, 0.02, -0.56, -1.1, -1.6, -2.05, -2.45, _
-  '-2.8, -3.1, -3.35, -3.58, -3.77, -3.92, -4.03, -4.1, -4.13, _
-  '-4.12, -4.07, -3.98, -3.85, -3.68, -3.47, -3.3, -3.17, -3.17}}
-
 
   Public Function CmpSol(ByVal aCldTSer As atcTimeseries, ByVal aSource As atcDataSource, ByVal aLatDeg As Double) As atcTimeseries
     'compute daily solar radiation based on daily cloud cover
@@ -830,7 +793,7 @@ Module modMetCompute
 
   'End Sub
 
-  Public Sub RadClc(ByRef aDegLat As Double, ByRef aCloud As Double, ByRef aMon As Integer, ByRef aDay As Integer, ByRef aDayRad As Double)
+  Private Sub RadClc(ByRef aDegLat As Double, ByRef aCloud As Double, ByRef aMon As Integer, ByRef aDay As Integer, ByRef aDayRad As Double)
 
     'This routine computes the total daily solar radiation based on
     'the HSPII (Hydrocomp, 1978) RADIATION procedure, which is based
@@ -908,7 +871,7 @@ Module modMetCompute
 
   End Sub
 
-  Public Function CEIL(ByRef x As Double) As Integer
+  Private Function CEIL(ByRef x As Double) As Integer
 
     'This routine returns the next higher integer
     'from the input double precision argument X.
@@ -920,7 +883,8 @@ Module modMetCompute
     End If
 
   End Function
-  Public Sub Jensen(ByVal aMon As Integer, ByVal aCTS() As Double, ByVal aAirTmp As Double, ByVal aDegF As Boolean, ByVal aCTX As Double, ByVal aSolRad As Double, ByRef aPanEvp As Double, ByRef aRetCod As Integer)
+
+  Private Sub Jensen(ByVal aMon As Integer, ByVal aCTS() As Double, ByVal aAirTmp As Double, ByVal aDegF As Boolean, ByVal aCTX As Double, ByVal aSolRad As Double, ByRef aPanEvp As Double, ByRef aRetCod As Integer)
 
     'Generates daily pan evaporation (inches)
     'using a coefficient for the month, the daily average air
@@ -966,7 +930,7 @@ Module modMetCompute
 
   End Sub
 
-  Public Sub Hamon(ByVal aMonth As Integer, ByVal aDay As Integer, ByVal aCTS() As Double, ByVal aLatDeg As Double, ByVal aTAVC As Double, ByVal aDegF As Boolean, ByRef PanEvp As Single, ByVal aRetCod As Integer)
+  Private Sub Hamon(ByVal aMonth As Integer, ByVal aDay As Integer, ByVal aCTS() As Double, ByVal aLatDeg As Double, ByVal aTAVC As Double, ByVal aDegF As Boolean, ByRef PanEvp As Single, ByVal aRetCod As Integer)
 
     'Generates daily pan evaporation (inches)
     'using a coefficient for the month, the possible hours of
@@ -1021,7 +985,7 @@ Module modMetCompute
 
   End Sub
 
-  Public Sub PNEVAP(ByRef MinTmp As Single, ByRef MaxTmp As Single, ByRef DewTmp As Single, ByRef WindSp As Single, ByRef SolRad As Single, ByRef PanEvp As Single)
+  Private Sub PNEVAP(ByRef MinTmp As Single, ByRef MaxTmp As Single, ByRef DewTmp As Single, ByRef WindSp As Single, ByRef SolRad As Single, ByRef PanEvp As Single)
 
     'Generates daily pan evaporation (inches) using
     'daily minimum air temperature (F), daily maximum air
@@ -1073,7 +1037,7 @@ Module modMetCompute
 
   End Sub
 
-  Public Sub InitRadclcConsts(ByRef X1() As Double, ByRef ac(,) As Double, ByRef aXLax(,) As Double)
+  Private Sub InitRadclcConsts(ByRef X1() As Double, ByRef ac(,) As Double, ByRef aXLax(,) As Double)
 
     Dim i, j As Integer
 

@@ -194,4 +194,27 @@ Public Class atcTimeseries
     End Set
   End Property
 
+  'Return index of aValue or -1 if not found
+  Public Function IndexOfValue(ByVal aValue As Double, ByVal aAssumeSorted As Boolean) As Integer
+    If aAssumeSorted Then 'do a binary search, find wanted value in log2(pNumValues) steps
+      Dim lHigher As Integer = pNumValues
+      Dim lLower As Integer = 0 'Note: this starts one *lower than* start of where to search in array
+      Dim lProbe As Integer
+      While (lHigher - lLower > 1)
+        lProbe = (lHigher + lLower) / 2
+        If pValues(lProbe) < aValue Then
+          lLower = lProbe
+        Else
+          lHigher = lProbe
+        End If
+      End While
+      If Math.Abs(pValues(lHigher) - aValue) < Double.Epsilon Then Return lHigher
+      If lLower > 0 AndAlso Math.Abs(pValues(lLower) - aValue) < Double.Epsilon Then Return lLower
+    Else 'do a linear search, find wanted value in up to pNumValues steps
+      For lProbe As Integer = 1 To pNumValues
+        If Math.Abs(pValues(lProbe) - aValue) < Double.Epsilon Then Return lprobe
+      Next
+    End If
+    Return -1
+  End Function
 End Class

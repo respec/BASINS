@@ -168,11 +168,26 @@ Public Class atcGrid
     End Get
     Set(ByVal newValue As Integer)
       If iColumn < pColumnWidth.Count Then 'Change existing width of this column
+        If iColumn = pColumnWidth.Count - 1 AndAlso _
+          pSource.Columns > pColumnWidth.Count Then 'Preserve implied width of later columns
+          pColumnWidth.Add(pColumnWidth(iColumn))
+        End If
         pColumnWidth(iColumn) = newValue
       Else 'Need to add one or more column widths to include this one
-        For newColumn As Integer = pColumnWidth.Count To iColumn
-          pColumnWidth.Add(newValue)
-        Next
+
+        If iColumn > pColumnWidth.Count Then 'Preserve implied width of earlier columns
+          Dim lOldWidth As Integer
+          If pColumnWidth.Count > 0 Then
+            lOldWidth = pColumnWidth(pColumnWidth.Count - 1)
+          Else
+            lOldWidth = newValue
+          End If
+          For newColumn As Integer = pColumnWidth.Count To iColumn - 1
+            pColumnWidth.Add(lOldWidth)
+          Next
+        End If
+
+        pColumnWidth.Add(newValue)
       End If
     End Set
   End Property
@@ -265,6 +280,7 @@ Public Class atcGrid
       If lColumns < pLeftColumn Then 'Scrolled past rightmost column
         Me.HScroller.Value = 0       'Reset scrollbar to leftmost column
       End If
+
       Dim lLinePen As New Pen(pLineColor, pLineWidth)
       Dim lOutsideBrush As New SolidBrush(pLineColor)
       Dim lCellBrush As New SolidBrush(pCellBackColor)
@@ -339,6 +355,7 @@ Public Class atcGrid
             visibleHeight -= HScroller.Height
             If Not VScroller.Visible AndAlso y > visibleHeight Then
               'TODO: add VScroll because last line got hidden by HScroll
+              VScroller.Visible = True
             End If
             HScroller.Visible = True
             If iColumn - pLeftColumn > 2 Then
@@ -356,6 +373,9 @@ Public Class atcGrid
         g.DrawLine(lLinePen, x, 0, x, visibleHeight)
         pColRight.Add(x)
       Next
+
+      SizeScrollers()
+
       If AllowHorizontalScrolling Then
         'Fill unused space right of rightmost column
         g.FillRectangle(lOutsideBrush, x, 0, visibleWidth - x, visibleHeight)
@@ -492,7 +512,7 @@ Public Class atcGrid
     Dim lMaxWidth As Integer = 0
 
     'TODO: would be faster to check just length of string [before/after decimal] then do width of "XXXXwidthXXXX"
-    If lastRow > 150 Then lastRow = 100 'Limit how much time we spend finding the widest cell
+    If lastRow > pTopRow + 150 Then lastRow = pTopRow + 100 'Limit how much time we spend finding the widest cell
     For iRow As Integer = pTopRow To lastRow
       lCellValue = pSource.CellValue(iRow, aColumn)
       If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
@@ -617,6 +637,11 @@ Public Class atcGrid
   End Function
 
   Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+    SizeScrollers()
+    Refresh()
+  End Sub
+
+  Private Sub SizeScrollers()
     If HScroller.Visible Then
       VScroller.Height = Me.Height - HScroller.Height
     Else
@@ -630,8 +655,6 @@ Public Class atcGrid
     End If
 
     scrollCorner.Visible = VScroller.Visible And HScroller.Visible
-
-    Refresh()
   End Sub
 
   Private Sub VScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles VScroller.ValueChanged
