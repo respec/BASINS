@@ -110,8 +110,8 @@ Public Module modMetCompute
     Dim lPoint As Boolean = aTMinTS.Attributes.GetValue("point", False)
 
     CopyBaseAttributes(aTMinTS, lCmpTs)
-    lCmpTs.Attributes.SetValue("Constituent", "DPET")
-    lCmpTs.Attributes.SetValue("TSTYPE", "DPET")
+    lCmpTs.Attributes.SetValue("Constituent", "PET")
+    lCmpTs.Attributes.SetValue("TSTYPE", "EVAP")
     lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
     lCmpTs.Attributes.SetValue("Description", "Daily Potential ET (in) computed using Jensen algorithm")
     lCmpTs.Attributes.AddHistory("Daily Potential ET using Jensen - inputs: TMIN, TMAX, SRAD, Degrees F, Constant Coefficient, Monthly Coefficient")
@@ -171,8 +171,8 @@ Public Module modMetCompute
     Dim lPoint As Boolean = aTMinTS.Attributes.GetValue("point", False)
 
     CopyBaseAttributes(aTMinTS, lCmpTs)
-    lCmpTs.Attributes.SetValue("Constituent", "DPET")
-    lCmpTs.Attributes.SetValue("TSTYPE", "DPET")
+    lCmpTs.Attributes.SetValue("Constituent", "PET")
+    lCmpTs.Attributes.SetValue("TSTYPE", "EVAP")
     lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
     lCmpTs.Attributes.SetValue("Description", "Daily Potential ET (in) computed using Hamon algorithm")
     lCmpTs.Attributes.AddHistory("Computed Daily Potential ET using Hamon - inputs: TMIN, TMAX, Degrees F, Latitude, Monthly Coefficients")

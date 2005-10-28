@@ -62,6 +62,7 @@ Public Class GisUtil
   End Property
 
   ''' <summary>Layers on map</summary>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared Function MapLayers() As ArrayList
     MapLayers = New ArrayList
     Dim lLastLayerIndex As Integer = GetMappingObject.Layers.NumLayers - 1
@@ -70,9 +71,13 @@ Public Class GisUtil
     Next
   End Function
 
-  Private Shared Function FeatureIndexValid(ByVal aFeatureIndex As Integer, ByVal aShape As MapWinGIS.Shapefile) As Boolean
-    If aFeatureIndex < 0 Or aFeatureIndex >= aShape.NumShapes Then
-      Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aFeatureIndex & ":OutOfRange:0:" & aShape.NumShapes - 1)
+
+  ''' <summary>Check to see if feature index is valid</summary>
+  ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Private Shared Function FeatureIndexValid(ByVal aFeatureIndex As Integer, ByVal aSf As MapWinGIS.Shapefile) As Boolean
+    If aFeatureIndex < 0 Or aFeatureIndex >= aSf.NumShapes Then
+      Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aFeatureIndex & ":OutOfRange:0:" & aSf.NumShapes - 1)
     Else
       Return True
     End If
@@ -135,6 +140,12 @@ Public Class GisUtil
     End Get
   End Property
 
+  ''' <summary>Obtain pointer to a polygon shape file from a LayerIndex</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of Layer containing ShapeFile</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared ReadOnly Property PolygonShapeFileFromIndex(ByVal aLayerIndex As Integer) As MapWinGIS.Shapefile
     Get
       Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
@@ -187,17 +198,39 @@ Public Class GisUtil
     End Get
   End Property
 
+  ''' <summary>Determine if polygons overlap</summary>
+  ''' <param name="aLayerIndex1">
+  '''     <para>Index of first Layer containing ShapeFile</para>
+  ''' </param>
+  ''' <param name="aFeatureIndex1">
+  '''     <para>Index of first feature</para>
+  ''' </param>
+  ''' <param name="aLayerIndex2">
+  '''     <para>Index of second Layer containing ShapeFile</para>
+  ''' </param>
+  ''' <param name="aFeatureIndex2">
+  '''     <para>Index of second feature</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
+  ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function OverlappingPolygons( _
     ByVal aLayerIndex1 As Integer, ByVal aFeatureIndex1 As Integer, _
     ByVal aLayerIndex2 As Integer, ByVal aFeatureIndex2 As Integer) As Boolean
 
     OverlappingPolygons = False
 
-    Dim lSf1 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex1)
-    Dim lSf1Shape As MapWinGIS.Shape = lSf1.Shape(aFeatureIndex1)
+    Dim lSf1 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex1)
+    Dim lSf1Shape As MapWinGIS.Shape
+    If FeatureIndexValid(aFeatureIndex1, lSf1) Then
+      lSf1Shape = lSf1.Shape(aFeatureIndex1)
+    End If
 
-    Dim lSf2 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex2)
-    Dim lSf2Shape As MapWinGIS.Shape = lSf2.Shape(aFeatureIndex2)
+    Dim lSf2 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex2)
+    Dim lSf2Shape As MapWinGIS.Shape
+    If FeatureIndexValid(aFeatureIndex2, lSf2) Then
+      lSf2Shape = lSf2.Shape(aFeatureIndex2)
+    End If
 
     Dim lIndex As Integer
     Dim lX As Double, lY As Double
@@ -229,15 +262,25 @@ Public Class GisUtil
     End If
   End Function
 
+  ''' <summary>given a polygon layer (like dem shape) and a containing layer (like subbasins), return which polygon in the containing layer each polygon lies within, determine if polygons overlap</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of Layer containing polygon ShapeFile</para>
+  ''' </param>
+  ''' <param name="aLayerIndexContaining">
+  '''     <para>Index of Layer containing polygon ShapeFile</para>
+  ''' </param>
+  ''' <param name="aIndex">
+  '''     <para>Index of polygons from contained</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Sub AssignContainingPolygons( _
     ByVal aLayerIndex As Integer, _
     ByVal aLayerIndexContaining As Integer, _
     ByRef aIndex() As Integer)
-    'given a polygon layer (like dem shape) and a containing layer (like subbasins),
-    'return which polygon in the containing layer each polygon lies within
 
-    Dim lSf1 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    Dim lSf2 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndexContaining)
+    Dim lSf1 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex)
+    Dim lSf2 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndexContaining)
 
     Dim lPointIndex As Integer
     Dim lShapeIndex As Integer
@@ -270,9 +313,29 @@ Public Class GisUtil
   ''' </param>
   ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared ReadOnly Property NumFields(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
     Get
       Return ShapeFileFromIndex(aLayerIndex).NumFields
+    End Get
+  End Property
+
+  ''' <summary>Obtain name of a field in a shape file from a layer index and a field index</summary>
+  ''' <param name="aFieldIndex">
+  '''     <para>Index of field to obtain name for</para>
+  ''' </param>
+  ''' <param name="aSf">
+  '''     <para>ShapeFile containing filed</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Private Shared ReadOnly Property FieldIndexValid(ByVal aFieldIndex As Integer, ByVal aSf As MapWinGIS.Shapefile) As Boolean
+    Get
+      If aFieldIndex < aSf.NumFields AndAlso aFieldIndex >= 0 Then
+        Return True
+      Else
+        Throw New Exception("GisUtil:FieldName:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & aSf.NumFields - 1)
+      End If
     End Get
   End Property
 
@@ -286,10 +349,11 @@ Public Class GisUtil
   ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
   ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared ReadOnly Property FieldName(ByVal aFieldIndex As Integer, ByVal aLayerIndex As Integer) As String
     Get
       Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-      If aFieldIndex < lSf.NumFields AndAlso aFieldIndex >= 0 Then
+      If FieldIndexValid(aFieldIndex, lSf) Then
         Return lSf.Field(aFieldIndex).Name
       Else
         Throw New Exception("GisUtil:FieldName:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
@@ -307,6 +371,7 @@ Public Class GisUtil
   ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
   ''' <exception cref="Exception.html#FieldNameNotRecognized" caption="FieldNameNotRecognized">Field specified by aFieldName is not recognized</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function FieldIndex(ByVal aLayerIndex As Integer, ByVal aFieldName As String) As Integer
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
@@ -327,6 +392,7 @@ Public Class GisUtil
   ''' </param>
   ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function AddField(ByVal aLayerIndex As Integer, ByVal aFieldName As String, _
                                   ByVal aFieldType As Integer, ByVal aFieldWidth As Integer) As Integer
     Dim lField As New MapWinGIS.Field
@@ -344,25 +410,30 @@ Public Class GisUtil
     Return lSf.NumFields - 1
   End Function
 
-  ''' <summary>Add a field in a shape file from a layer index and a field name</summary>
+  ''' <summary>Remove a field in a shape file from a layer index and a field name</summary>
   ''' <param name="aLayerIndex">
   '''     <para>Index of layer containing shape file</para>
   ''' </param>
   ''' <param name="aFieldIndex">
   '''     <para>Index of field to remove</para>
   ''' </param>
+  ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
   ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function RemoveField(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer)
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
-    lSf.StartEditingTable()
-    'TODO: error handling
-    Dim lBsuc As Boolean = lSf.EditDeleteField(aFieldIndex)
-    lSf.StopEditingTable()
+    If FieldIndexValid(aFieldIndex, lSf) Then
+      lSf.StartEditingTable()
+      'TODO: error handling
+      Dim lBsuc As Boolean = lSf.EditDeleteField(aFieldIndex)
+      lSf.StopEditingTable()
+    End If
   End Function
 
   ''' <summary>Returns the number of layers loaded in the MapWindow. Drawing layers are not counted. </summary>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared ReadOnly Property NumLayers() As Integer
     Get
       Return GetMappingObject.Layers.NumLayers()
@@ -510,28 +581,29 @@ Public Class GisUtil
     End Get
   End Property
 
+  ''' <summary>Area of a polygon from a LayerIndex and a FeatureIndex</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of desired layer containing grid (defaults to Current Layer)</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
+  ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function FeatureArea(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
     Dim lArea As Double
 
-    Try
-      Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-      If FeatureIndexValid(aFeatureIndex, lSf) Then
-        Dim lShape As MapWinGIS.Shape = lSf.Shape(aFeatureIndex)
-        Dim lUtils As MapWinGIS.Utils
-        lArea = lUtils.Area(lShape)
-        If lArea < 0.000001 Then 'could it be undefined?
-          If lSf.ShapefileType <> MapWinGIS.ShpfileType.SHP_POLYGON AndAlso _
-             lSf.ShapefileType <> MapWinGIS.ShpfileType.SHP_POLYGONM AndAlso _
-             lSf.ShapefileType <> MapWinGIS.ShpfileType.SHP_POLYGONZ Then
-            lArea = Double.NaN
-            LogDbg("GisUtil:FeatureArea:AreaUndefinedForShapeType:" & lSf.ShapefileType)
-          End If
+    Dim lSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex)
+    If FeatureIndexValid(aFeatureIndex, lSf) Then
+      Dim lUtils As New MapWinGIS.Utils
+      Try
+        lArea = lUtils.Area(lSf.Shape(aFeatureIndex))
+        If lArea < 0.000001 Then 'TODO: try to calculate?
+          lArea = Double.NaN
         End If
-      End If
-    Catch ex As Exception
-      LogDbg("GisUtil:FeatureArea:Exception:" & ex.Message)
-      lArea = Double.NaN
-    End Try
+      Catch ex As Exception
+        LogDbg("GisUtil:FeatureArea:Exception:" & ex.Message)
+        lArea = Double.NaN
+      End Try
+    End If
     Return lArea
 
   End Function
@@ -542,9 +614,8 @@ Public Class GisUtil
     Try
       Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
       If FeatureIndexValid(aFeatureIndex, lSf) Then
-        Dim lShape As MapWinGIS.Shape = lSf.Shape(aFeatureIndex)
-        Dim lUtils As MapWinGIS.Utils
-        lLength = lUtils.Length(lShape)
+        Dim lUtils As New MapWinGIS.Utils
+        lLength = lUtils.Length(lSf.Shape(aFeatureIndex))
         If lLength < 0.000001 Then 'could it be undefined
           Dim lShapeFileType = lSf.ShapefileType
           If lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINE AndAlso _
@@ -562,6 +633,16 @@ Public Class GisUtil
     Return lLength
   End Function
 
+  ''' <summary>Determine end points of a shape</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer containing ShapeFile</para>
+  ''' </param>
+  ''' <param name="aFeatureIndex">
+  '''     <para>Index of feature</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Sub EndPointsOfLine(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, _
                                     ByRef aX1 As Double, ByRef aY1 As Double, ByRef aX2 As Double, ByRef aY2 As Double)
     Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
@@ -574,17 +655,36 @@ Public Class GisUtil
     End If
   End Sub
 
+  ''' <summary>Determine first point of a shape</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer containing ShapeFile</para>
+  ''' </param>
+  ''' <param name="aFeatureIndex">
+  '''     <para>Index of feature</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Sub PointXY(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, _
                             ByRef aX As Double, ByRef aY As Double)
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
     If FeatureIndexValid(aFeatureIndex, lSf) Then
-      Dim lShape As New MapWinGIS.Shape
-      lShape = lSf.Shape(aFeatureIndex)
+      Dim lShape As MapWinGIS.Shape = lSf.Shape(aFeatureIndex)
       aX = lShape.Point(0).x
       aY = lShape.Point(0).y
     End If
   End Sub
 
+  ''' <summary>Remove feature from a ShapeFile</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer containing ShapeFile</para>
+  ''' </param>
+  ''' <param name="aFeatureIndex">
+  '''     <para>Index of feature to be removed</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function RemoveFeature(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
     Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
@@ -596,14 +696,33 @@ Public Class GisUtil
     End If
   End Function
 
+  ''' <summary>Set value of a field in a feature in a ShapeFile</summary>
+  ''' <param name="aLayerIndex">
+  '''     <para>Index of layer containing ShapeFile</para>
+  ''' </param>
+  ''' <param name="aFieldIndex">
+  '''     <para>Index of field to change</para>
+  ''' </param>
+  ''' <param name="aFeatureIndex">
+  '''     <para>Index of feature containing field to change</para> 
+  ''' </param>
+  ''' <param name="aValue">
+  '''     <para>New value for field</para> 
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
+  ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
+  ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Sub SetFeatureValue(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, ByVal aFeatureIndex As Integer, ByVal aValue As Object)
     Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
     If FeatureIndexValid(aFeatureIndex, lsf) Then
-      Dim bsuc As Boolean
-      'TODO: error checking
-      bsuc = lsf.StartEditingTable()
-      bsuc = lsf.EditCellValue(aFieldIndex, aFeatureIndex, aValue)
-      bsuc = lsf.StopEditingTable()
+      If FieldIndexValid(aFieldIndex, lsf) Then
+        Dim bsuc As Boolean
+        'TODO: error checks
+        bsuc = lsf.StartEditingTable()
+        bsuc = lsf.EditCellValue(aFieldIndex, aFeatureIndex, aValue)
+        bsuc = lsf.StopEditingTable()
+      End If
     End If
   End Sub
 
@@ -620,13 +739,10 @@ Public Class GisUtil
     End If
   End Function
 
-  Public Shared Function IndexOfNthSelectedFeatureInLayer(ByVal nth As Integer, ByVal layerindex As Integer) As Integer
-    Dim lLayer As MapWindow.Interfaces.Layer
-    Dim lsi As MapWindow.Interfaces.SelectInfo
-
-    lsi = pMapWin.View.SelectedShapes
-    lLayer = pMapWin.Layers(layerindex)
-    If lsi.LayerHandle = layerindex Then
+  Public Shared Function IndexOfNthSelectedFeatureInLayer(ByVal nth As Integer, ByVal aLayerIndex As Integer) As Integer
+    Dim lsi As MapWindow.Interfaces.SelectInfo = GetMappingObject.View.SelectedShapes
+    Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
+    If lsi.LayerHandle = aLayerIndex Then
       IndexOfNthSelectedFeatureInLayer = lsi.Item(nth).ShapeIndex
     End If
   End Function
@@ -783,59 +899,55 @@ Public Class GisUtil
     lPolygonSf.EndPointInShapefile()
   End Sub
 
-  Public Shared Sub GridMinMaxInPolygon(ByVal gridLayerIndex As Integer, ByVal polygonLayerIndex As Integer, _
-    ByVal polygonfeatureindex As Integer, ByVal Min As Double, ByVal Max As Double)
+  Public Shared Sub GridMinMaxInPolygon(ByVal aGridLayerIndex As Integer, ByVal aPolygonLayerIndex As Integer, _
+                                        ByVal aPolygonFeatureIndex As Integer, _
+                                        ByVal aMin As Double, ByVal aMax As Double)
     'Given a grid and a polygon layer, find the min and max grid value within the feature.
 
-    Dim ic As Integer
-    Dim ir As Integer
-    Dim xpos As Double
-    Dim ypos As Double
-    Dim subid As Integer
-    Dim startingcolumn As Integer
-    Dim endingcolumn As Integer
-    Dim startingrow As Integer
-    Dim endingrow As Integer
-    Dim gridLayer As MapWindow.Interfaces.Layer
-    Dim polygonLayer As MapWindow.Interfaces.Layer
-    Dim val As Integer
+    Dim lCol As Integer
+    Dim lRow As Integer
+    Dim lXPos As Double
+    Dim lYPos As Double
+    Dim lSubId As Integer
+    Dim lStartCol As Integer
+    Dim lEndCol As Integer
+    Dim lStartRow As Integer
+    Dim lEndRow As Integer
+    Dim lVal As Integer
 
     'set input grid
-    gridLayer = GetMappingObject.Layers(gridLayerIndex)
-    Dim InputGrid As New MapWinGIS.Grid
-    InputGrid = gridLayer.GetGridObject
+    Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
 
     'set input polygon layer
-    polygonLayer = GetMappingObject.Layers(polygonLayerIndex)
-    Dim polygonsf As New MapWinGIS.Shapefile
-    polygonsf = polygonLayer.GetObject
-    Dim pshape As New MapWinGIS.Shape
-    pshape = polygonsf.Shape(polygonfeatureindex)
+    Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
+    Dim lShape As New MapWinGIS.Shape
+    If FeatureIndexValid(aPolygonFeatureIndex, lPolygonsf) Then
+      lShape = lPolygonSf.Shape(aPolygonFeatureIndex)
 
-    'figure out what part of the grid overlays this polygon
-    InputGrid.ProjToCell(pshape.Extents.xMin, pshape.Extents.yMin, startingcolumn, endingrow)
-    InputGrid.ProjToCell(pshape.Extents.xMax, pshape.Extents.yMax, endingcolumn, startingrow)
+      'figure out what part of the grid overlays this polygon
+      lInputGrid.ProjToCell(lShape.Extents.xMin, lShape.Extents.yMin, lStartCol, lEndRow)
+      lInputGrid.ProjToCell(lShape.Extents.xMax, lShape.Extents.yMax, lEndCol, lStartRow)
 
-    Min = 99999999
-    Max = -99999999
-    polygonsf.BeginPointInShapefile()
-    For ic = startingcolumn To endingcolumn
-      For ir = startingrow To endingrow
-        InputGrid.CellToProj(ic, ir, xpos, ypos)
-        subid = polygonsf.PointInShapefile(xpos, ypos)
-        If subid = polygonfeatureindex Then
-          'this is in the polygon we want
-          val = InputGrid.Value(ic, ir)
-          If val > Max Then
-            Max = val
+      aMin = 99999999
+      aMax = -99999999
+      lPolygonSf.BeginPointInShapefile()
+      For lCol = lStartCol To lEndCol
+        For lRow = lStartRow To lEndRow
+          lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
+          lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+          If lSubId = aPolygonFeatureIndex Then 'this is in the polygon we want
+            lVal = lInputGrid.Value(lCol, lRow)
+            If lVal > aMax Then
+              aMax = lVal
+            End If
+            If lVal < aMin Then
+              aMin = lVal
+            End If
           End If
-          If val < Min Then
-            Min = val
-          End If
-        End If
-      Next ir
-    Next ic
-    polygonsf.EndPointInShapefile()
+        Next lRow
+      Next lCol
+      lPolygonSf.EndPointInShapefile()
+    End If
   End Sub
 
   Public Shared Function GridValueAtPoint(ByVal GridLayerIndex As Integer, ByVal x As Double, ByVal y As Double) As Integer
