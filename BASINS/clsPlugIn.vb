@@ -93,10 +93,14 @@ Public Class PlugIn
     Dim iDirectory As Integer
     Dim mnu As MapWindow.Interfaces.MenuItem
 
-    BuiltInScript(False)
-
     g_MapWin = aMapWin
     g_MapWinWindowHandle = aParentHandle
+    Dim lLogFileName As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\Basins.Log"
+    LogSetFileName(lLogFileName)
+    'LogStartMonitor()
+    LogSetMapWin(g_MapWin)
+
+    BuiltInScript(False)
 
     pDataManager = New atcDataManager(g_MapWin, Me)
 
@@ -219,6 +223,8 @@ Public Class PlugIn
     g_MapWin.Menus.Remove(ToolsMenuName)
     g_MapWin.Menus.Remove(ModelsMenuName) 'TODO: don't unload if another plugin is still using it
     g_MapWin.Menus.Remove(ProjectsMenuName)
+    'LogStopMonitor()
+
   End Sub
 
   Public Function NationalProjectIsOpen() As Boolean
@@ -280,8 +286,6 @@ Public Class PlugIn
           g_MapWin.Project.Save(PrjFileName)
           g_MapWin.Project.Modified = False
         End If
-      Else
-        MsgBox("Tool tip was not perserved - cannot open " & ItemName, , ProjectsMenuString)
       End If
       Handled = True
     ElseIf ItemName.StartsWith(DataMenuName & "_") Then
@@ -601,6 +605,7 @@ Public Class PlugIn
   End Sub
 
   Public Sub Message(ByVal msg As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
+    Dim errors As String
     If msg.StartsWith("WELCOME_SCREEN") Then
       'We always show the welcome screen when requested EXCEPT we skip it when:
       'it is the initial welcome screen AND we have loaded a project or script on the command line.
@@ -625,22 +630,24 @@ Public Class PlugIn
       End If
       pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
     ElseIf msg.StartsWith("atcDataPlugin") Then
-      LogDbg("BASINS:Message:RefreshToolsMenuMsg:" & msg)
+      LogDbg("BASINS:Message:RefreshToolsMenu:" & msg)
       RefreshToolsMenu()
-    ElseIf msg.StartsWith("COMMAND_LINE") Then
+    ElseIf msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
       'COMMAND_LINE:broadcast:basins:script:c:\test\BASINS4\scripts\dummy.vb
       LogDbg("BASINS:Message:" & msg)
-      If msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
-        Dim s As String = msg.Substring(23)
-        If s.Substring(7).StartsWith("script") Then
-          ChDriveDir(PathNameOnly(s.Substring(14))) 'start where script is
-          Dim errors As String
-          RunBasinsScript("vb", WholeFileString(s.Substring(14)), errors, "dataManager", "basinsplugin")
-          If Not errors Is Nothing Then
-            MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
-          End If
-          pCommandLineScript = True
+      Dim s As String = msg.Substring(23)
+      If s.Substring(7).StartsWith("script") Then
+        ChDriveDir(PathNameOnly(s.Substring(14))) 'start where script is
+        RunBasinsScript("vb", WholeFileString(s.Substring(14)), errors, "dataManager", "basinsplugin")
+        If Not errors Is Nothing Then
+          MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
         End If
+        pCommandLineScript = True
+      End If
+    ElseIf msg.StartsWith("RUN_BASINS_SCRIPT:") Then
+      RunBasinsScript("vb", WholeFileString(msg.Substring(18).Trim), errors, "dataManager", "basinsplugin")
+      If Not errors Is Nothing Then
+        LogMsg(errors, "Script Error")
       End If
     Else
       LogDbg("BASINS:Message:Ignore:" & msg)
