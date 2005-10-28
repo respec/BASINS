@@ -305,7 +305,9 @@ Public Class atcDataSourceWDM
       Next
 
       J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
-      Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
+      If lNvals > 0 Then
+        Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
+      End If
       LogDbg("atcDataSourceWdm:AddDataset:WDTPUT:retcod:" & lRet)
     End If
 

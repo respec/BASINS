@@ -472,6 +472,7 @@ Public Class PlugIn
         Dim typ As System.Type = lDisp.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         Dim newDisplay As atcDataDisplay = asm.CreateInstance(typ.FullName)
+        newDisplay.Initialize(g_MapWin, g_MapWinWindowHandle)
         newDisplay.Show(pDataManager)
         Return True
       End If

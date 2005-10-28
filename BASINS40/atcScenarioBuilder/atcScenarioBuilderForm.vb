@@ -268,7 +268,7 @@ Friend Class atcScenarioBuilderForm
       'By default add EVAP and PREC if none were given
       For Each lDataSet As atcDataSet In pDataManager.DataSets
         Select Case lDataSet.Attributes.GetValue("Constituent")
-          Case "EVAP", "PREC", "PET", "HPRECIP" : pBaseScenario.DataSets.Add(lDataSet)
+          Case "EVAP", "PREC", "TMIN", "TMAX", "PET", "HPRECIP" : pBaseScenario.DataSets.Add(lDataSet)
         End Select
       Next
       'If we didn't find any to add, ask user to select some data
