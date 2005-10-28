@@ -9,6 +9,7 @@ Public Class atcDataAttributes
   Private pOwner As Object 'atcTimeseries
   Private Shared pAllAliases As atcCollection     'of String, so more than one AttributeName can map to the same attribute
   Private Shared pAllDefinitions As atcCollection 'of atcAttributeDefinition
+  Private Shared pDateFormat As New atcDateFormat
 
   'Returns lowercase key for use in Me and pAllDefinitions
   'Warning: modifies argument aAttributeName if a preferred alias is found
@@ -70,7 +71,6 @@ Public Class atcDataAttributes
     Return Keys.Contains(AttributeNameToKey(aAttributeName))
   End Function
 
-
   Public Function GetFormattedValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = "") As String
     'TODO: use definition for formatting 
     Try
@@ -78,8 +78,7 @@ Public Class atcDataAttributes
       Try
         If TypeOf (lValue) Is Double Then
           If InStr(LCase(aAttributeName), "jday", CompareMethod.Text) Then
-            Dim lDate() As String = DumpDate(lValue).Split(" ")
-            Return lDate(2) & " " & lDate(3)
+            Return pDateFormat.JDateToString(lValue)
           Else
             Return DoubleToString(lValue)
           End If
