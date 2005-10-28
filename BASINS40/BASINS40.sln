@@ -75,6 +75,14 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcMwGisUtility", "atcMwGis
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcEvents", "atcEvents\atcEvents.vbproj", "{9F469FD8-4A92-4C1F-901C-93D84D457D8F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcMetCmp", "atcMetCmp\atcMetCmp.vbproj", "{72264BDC-23F5-4A55-B53D-0752099CB263}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -156,6 +164,14 @@ Global
 		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Debug.Build.0 = Debug|.NET
 		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Release.ActiveCfg = Release|.NET
 		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Release.Build.0 = Release|.NET
+		{9F469FD8-4A92-4C1F-901C-93D84D457D8F}.Debug.ActiveCfg = Debug|.NET
+		{9F469FD8-4A92-4C1F-901C-93D84D457D8F}.Debug.Build.0 = Debug|.NET
+		{9F469FD8-4A92-4C1F-901C-93D84D457D8F}.Release.ActiveCfg = Release|.NET
+		{9F469FD8-4A92-4C1F-901C-93D84D457D8F}.Release.Build.0 = Release|.NET
+		{72264BDC-23F5-4A55-B53D-0752099CB263}.Debug.ActiveCfg = Debug|.NET
+		{72264BDC-23F5-4A55-B53D-0752099CB263}.Debug.Build.0 = Debug|.NET
+		{72264BDC-23F5-4A55-B53D-0752099CB263}.Release.ActiveCfg = Release|.NET
+		{72264BDC-23F5-4A55-B53D-0752099CB263}.Release.Build.0 = Release|.NET
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
