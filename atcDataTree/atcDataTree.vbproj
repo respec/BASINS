@@ -9,7 +9,7 @@
             <Settings
                 ApplicationIcon = ""
                 AssemblyKeyContainerName = ""
-                AssemblyName = "atcDebugTimser"
+                AssemblyName = "atcDataTree"
                 AssemblyOriginatorKeyFile = ""
                 AssemblyOriginatorKeyMode = "None"
                 DefaultClientScript = "JScript"
@@ -20,8 +20,8 @@
                 OptionCompare = "Binary"
                 OptionExplicit = "On"
                 OptionStrict = "Off"
-                RootNamespace = "atcDebugTimser"
-                StartupObject = "atcDebugTimser.(None)"
+                RootNamespace = "atcDataTree"
+                StartupObject = "atcDataTree.(None)"
             >
                 <Config
                     Name = "Debug"
@@ -127,16 +127,16 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcDebugTimserForm.resx"
+                    RelPath = "atcDataTreeForm.resx"
                     BuildAction = "EmbeddedResource"
                 />
                 <File
-                    RelPath = "atcDebugTimserForm.vb"
+                    RelPath = "atcDataTreeForm.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcDebugTimserPlugin.vb"
+                    RelPath = "atcDataTreePlugin.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

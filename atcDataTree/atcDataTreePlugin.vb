@@ -1,11 +1,11 @@
 Imports atcData
 
-Public Class atcDebugTimserPlugin
+Public Class atcDataTreePlugin
   Inherits atcDataDisplay
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::DebugTimser"
+      Return "Tools::DataTree"
     End Get
   End Property
 
@@ -14,7 +14,7 @@ Public Class atcDebugTimserPlugin
     Dim lDataGroup As atcDataGroup = aDataGroup
     If lDataGroup Is Nothing Then lDataGroup = New atcDataGroup
 
-    Dim lForm As New atcDebugTimserForm(aDataManager, lDataGroup)
+    Dim lForm As New atcDataTreeForm(aDataManager, lDataGroup)
     If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
       lForm.Show()
       Return lForm
@@ -26,14 +26,14 @@ Public Class atcDebugTimserPlugin
 
   Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                   ByVal aParentHandle As Integer)
-    aMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcDebugTimserPlugin")
+    aMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcDataTreePlugin")
   End Sub
 
   Public Overrides Sub Save(ByVal aDataManager As atcDataManager, _
                   ByVal aDataGroup As atcDataGroup, _
                   ByVal aFileName As String, _
                   ByVal ParamArray aOption() As String)
-    Dim lForm As New atcDebugTimserForm(aDataManager, aDataGroup)
+    Dim lForm As New atcDataTreeForm(aDataManager, aDataGroup)
     With lForm
       .TreeAction(aOption)
       .Save(aFileName)
