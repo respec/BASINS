@@ -2,7 +2,7 @@ Imports System.Windows.Forms
 Imports atcData
 Imports atcUtility
 
-Public Class atcDebugTimserForm
+Public Class atcDataTreeForm
   Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -62,7 +62,7 @@ Public Class atcDebugTimserForm
   Friend WithEvents mnuCopyClipboard As System.Windows.Forms.MenuItem
   Friend WithEvents mnuDataCount As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDebugTimserForm))
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDataTreeForm))
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
     Me.mnuCopyClipboard = New System.Windows.Forms.MenuItem
@@ -131,14 +131,14 @@ Public Class atcDebugTimserForm
     '
     Me.mnuMain.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
     '
-    'atcDebugTimserForm
+    'atcDataTreeForm
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
     Me.ClientSize = New System.Drawing.Size(633, 628)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.mnuMain
-    Me.Name = "atcDebugTimserForm"
-    Me.Text = "Data Debug"
+    Me.Name = "atcDataTreeForm"
+    Me.Text = "Data Tree"
 
   End Sub
 
