@@ -15,47 +15,48 @@ Public Class atcDataSource
     ExistAskUser = 8
   End Enum
 
-  'Attributes associated with all the DataSets (location, constituent, etc.)
+  ''' <summary>Attributes associated with all the DataSets (location, constituent, etc.)</summary>
   Public ReadOnly Property Attributes() As atcDataAttributes
     Get
       Return pAttributes
     End Get
   End Property
 
-  'atcAttributeDefinitions representing operations supported by ComputeTimeseries
+  ''' <summary>atcAttributeDefinitions representing operations supported by ComputeTimeseries</summary
   Public Overridable ReadOnly Property AvailableOperations() As atcDataAttributes
     Get
       Return New atcDataAttributes 'default to an empty list with nothing available
     End Get
   End Property
 
-  'The atcDataSet objects in this file
+  ''' <summary>The atcDataSet objects in this file</summary>
   Public Overridable ReadOnly Property DataSets() As atcDataGroup
     Get
       Return pData
     End Get
   End Property
 
-  'True if OpenFile is implemented - files can be read
+  ''' <summary>True if Open is implemented - files can be read</summary>
   Public Overridable ReadOnly Property CanOpen() As Boolean
     Get
       Return False
     End Get
   End Property
 
-  'True if Save is implemented - files can be saved
+  ''' <summary>True if Save is implemented - files can be saved</summary>
   Public Overridable ReadOnly Property CanSave() As Boolean
     Get
       Return False
     End Get
   End Property
 
-  'Opens file or database and reads enough to determine whether it is correct type
-  'aSpecification = file name, connect string, or other string needed to open
-  'aAttributes = additional information which may be used for opening and will be saved as Attributes
-  'Returns True if successfully opened
+  ''' <summary>Opens file or database and reads enough to determine whether it is correct type. Returns True if successfully opened.</summary>
+  ''' aSpecification = file name, connect string, or other string needed to open
+  ''' <param name="aAttributes">
+  '''     <para>additional information which may be used for opening and will be saved as Attributes</para>
+  ''' </param>   
   Public Overridable Function Open(ByVal aSpecification As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
-    Err.Raise(0, Me, "Open must be overridden to be used, atcDataSource does not implement.")
+    Throw New Exception("Open must be overridden to be used, atcDataSource does not implement.")
   End Function
 
   'Read all the data into an atcDataSet (which must be from this file)
