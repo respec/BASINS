@@ -1,10 +1,9 @@
-'Manages a set of currently open DataSources
-'Uses the set of plugins currently loaded to find ones that inherit atcDataSource
-
 Imports atcUtility
-
 Imports System.Reflection
 
+''' <summary>Manages a set of currently open DataSources. 
+'''          Uses the set of plugins currently loaded to find ones that inherit atcDataSource
+''' </summary>
 Public Class atcDataManager
   Private pMapWin As MapWindow.Interfaces.IMapWin
   Private pBasins As Object
@@ -48,7 +47,7 @@ Public Class atcDataManager
   '  End Get
   'End Property
 
-  'The set of atcDataSource objects representing currently open DataSources
+  ''' <summary>Set of atcDataSource objects representing currently open DataSources</summary>
   Public ReadOnly Property DataSources() As ArrayList
     Get
       Return pDataSources
@@ -65,21 +64,21 @@ Public Class atcDataManager
     Return lAllData
   End Function
 
-  'Names of attributes used for selection of Data in UI
+  ''' <summary>Names of attributes used for selection of Data in UI</summary)
   Public ReadOnly Property SelectionAttributes() As ArrayList
     Get
       Return pSelectionAttributes
     End Get
   End Property
 
-  'Names of attributes used for listing of Data in UI
+  ''' <summary>Names of attributes used for listing of Data in UI</summary>
   Public ReadOnly Property DisplayAttributes() As ArrayList
     Get
       Return pDisplayAttributes
     End Get
   End Property
 
-  'The currently loaded plugins that inherit the specified class; returns empty objects
+  ''' <summary>Currently loaded plugins that inherit the specified class; returns empty objects</summary>
   Public Function GetPlugins(ByVal aBaseType As Type) As atcCollection
     Dim retval As New atcCollection
     Dim lastPlugIn As Integer = pMapWin.Plugins.Count() - 1
@@ -94,7 +93,13 @@ Public Class atcDataManager
     Return retval
   End Function
 
-  'aSpecification = file name, connection string, or other information needed to initialize aNewSource
+  ''' <summary>Open BASINS data source</summary>
+  ''' <param name="aNewSource">
+  '''     <para>object containing instance of new data source</para>
+  ''' </param>  
+  ''' <param name="aSpecification">
+  '''     <para>file name, connection string, or other information needed to initialize aNewSource</para>
+  ''' </param>
   Public Function OpenDataSource(ByVal aNewSource As atcDataSource, ByVal aSpecification As String, ByVal aAttributes As atcDataAttributes) As Boolean
     aNewSource.DataManager = Me
     If aNewSource.Open(aSpecification, aAttributes) Then
