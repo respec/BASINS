@@ -1,5 +1,5 @@
 Imports atcUtility
-Imports atcMwGisUtils
+'Imports atcMwGisUtils
 
 Public Class frmModelSetup
   Inherits System.Windows.Forms.Form
@@ -1391,6 +1391,17 @@ Public Class frmModelSetup
     Next
     If cSelectedSubbasins.Count = 0 Then
       'no subbasins selected, act as if all are selected
+      For i = 1 To GisUtil_NumFeaturesInLayer(SubbasinLayerIndex)
+        cSelectedSubbasins.Add(i - 1)
+      Next
+    Else
+      'some subbasins are selected, save selected as new shapefile
+      GisUtil_SaveSelectedFeatures(SubbasinThemeName, "Selected" & FilenameNoPath(GisUtil_LayerFileName(SubbasinLayerIndex)))
+      SubbasinThemeName = "Selected" & FilenameNoPath(GisUtil_LayerFileName(SubbasinLayerIndex))
+      SubbasinLayerIndex = GisUtil_FindLayerIndexByName(SubbasinThemeName)
+      Do While cSelectedSubbasins.Count > 0
+        cSelectedSubbasins.Remove(1)
+      Loop
       For i = 1 To GisUtil_NumFeaturesInLayer(SubbasinLayerIndex)
         cSelectedSubbasins.Add(i - 1)
       Next
