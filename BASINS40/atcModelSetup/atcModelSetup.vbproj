@@ -126,11 +126,6 @@
                     Private = "False"
                 />
                 <Reference
-                    Name = "atcMwGisUtils"
-                    AssemblyName = "atcMwGisUtils"
-                    HintPath = "..\Bin\Plugins\BASINS\atcMwGisUtils.dll"
-                />
-                <Reference
                     Name = "atcUtility"
                     AssemblyName = "atcUtility"
                     HintPath = "..\Bin\Plugins\BASINS\atcUtility.dll"
@@ -166,6 +161,12 @@
                     RelPath = "frmModelSetup.resx"
                     DependentUpon = "frmModelSetup.vb"
                     BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "GisUtils.vb"
+                    Link = "..\atcMwGisUtils\GisUtils.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
                 />
             </Include>
         </Files>
