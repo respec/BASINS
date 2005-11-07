@@ -1,6 +1,6 @@
 Imports atcUtility
 
-Public Module GISUtils
+Module GISUtils
 
   'GIS Utilities Implemented thru MapWindow
   Public pMapWin As MapWindow.Interfaces.IMapWin
@@ -339,6 +339,59 @@ Public Module GISUtils
     End If
   End Function
 
+  Public Sub GisUtil_SaveSelectedFeatures(ByVal InputLayerName As String, ByVal OutputLayerName As String)
+    'save the selected features of a layer as a new shapefile
+    Dim i As Integer
+    Dim j As Integer
+    Dim k As Integer
+    Dim InputLayerIndex As Integer
+    Dim bsuc As Boolean
+
+    InputLayerIndex = GisUtil_FindLayerIndexByName(InputLayerName)
+    Dim lLayer As MapWindow.Interfaces.Layer
+    lLayer = pMapWin.Layers(InputLayerIndex)
+    Dim lsf As New MapWinGIS.Shapefile
+    lsf = lLayer.GetObject
+
+    Dim osf As New MapWinGIS.Shapefile
+    'create new shapefile
+    osf.CreateNew(OutputLayerName, lsf.ShapefileType)
+    For i = 1 To lsf.NumFields
+      Dim of As New MapWinGIS.Field
+      of.Name = lsf.Field(i - 1).Name
+      of.Type = lsf.Field(i - 1).Type
+      of.Width = lsf.Field(i - 1).Width
+      of.Precision = lsf.Field(i - 1).Precision
+      bsuc = osf.EditInsertField(of, osf.NumFields)
+      of = Nothing
+    Next i
+    osf.StartEditingShapes(True)
+
+    Dim lsi As MapWindow.Interfaces.SelectInfo
+    lsi = pMapWin.View.SelectedShapes
+    If lsi.LayerHandle = InputLayerIndex Then
+      For i = 1 To lsf.NumShapes
+        'loop through each shape of the layer
+        For j = 1 To lsi.NumSelected
+          'loop through selected shapes
+          If i - 1 = lsi.Item(j - 1).ShapeIndex Then
+            osf.EditInsertShape(lsf.Shape(i - 1), osf.NumShapes)
+            For k = 1 To osf.NumFields
+              bsuc = osf.EditCellValue(k - 1, osf.NumShapes - 1, lsf.CellValue(k - 1, i - 1))
+            Next k
+          End If
+        Next j
+      Next i
+    End If
+
+    bsuc = osf.SaveAs(OutputLayerName)
+    osf.StopEditingShapes()
+    osf.Close()
+
+    GisUtil_AddLayerToMap(OutputLayerName, OutputLayerName)
+
+  End Sub
+
   'Public Sub GisUtil_ExtentsOfLayer(ByVal layerindex As Long, ByVal xmax As Double, ByVal xmin As Double, ByVal ymax As Double, ByVal ymin As Double)
   '  Dim lLayer As MapWindow.Interfaces.Layer
 
@@ -645,6 +698,8 @@ Public Module GISUtils
     Dim utilArea As New MapWinGIS.Utils
     Dim newshape As MapWinGIS.Shape
     Dim lusfshape As MapWinGIS.Shape
+    Dim ssfshape As MapWinGIS.Shape
+    Dim ssfshapeext As MapWinGIS.Extents
 
     '********** do overlay ***********
     pMapWin.StatusBar.ShowProgressBar = True
@@ -662,19 +717,25 @@ Public Module GISUtils
           'loop thru each selected subbasin (or all if none selected)
           shapeindex = cSelectedSubbasins(k)
           polygoncount = polygoncount + 1
-          'look for intersection from overlay of these shapes
-          newshape = utilClip.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, lusfshape, ssf.Shape(shapeindex))
-          If newshape.numPoints > 0 Then
-            'Insert the shape into the shapefile 
-            osf.EditInsertShape(newshape, osf.NumShapes)
-            area = Math.Abs(utilArea.Area(newshape))
-            'keep track of which subbasin and land use class
-            Feature1Id = lusf.CellValue(Layer1FieldIndex, i - 1)
-            Feature2Id = ssf.CellValue(Layer2FieldIndex, shapeindex)
-            bsuc = osf.EditCellValue(0, osf.NumShapes - 1, Feature1Id)
-            bsuc = osf.EditCellValue(1, osf.NumShapes - 1, Feature2Id)
-            bsuc = osf.EditCellValue(2, osf.NumShapes - 1, area)
+          ssfshape = ssf.Shape(shapeindex)
+          ssfshapeext = ssfshape.Extents
+          If Not (LUext.xMin > ssfshapeext.xMax Or LUext.xMax < ssfshapeext.xMin Or LUext.yMin > ssfshapeext.yMax Or LUext.yMax < ssfshapeext.yMin) Then
+            'look for intersection from overlay of these shapes
+            newshape = utilClip.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, lusfshape, ssfshape)
+            If newshape.numPoints > 0 Then
+              'Insert the shape into the shapefile 
+              osf.EditInsertShape(newshape, osf.NumShapes)
+              area = Math.Abs(utilArea.Area(newshape))
+              'keep track of which subbasin and land use class
+              Feature1Id = lusf.CellValue(Layer1FieldIndex, i - 1)
+              Feature2Id = ssf.CellValue(Layer2FieldIndex, shapeindex)
+              bsuc = osf.EditCellValue(0, osf.NumShapes - 1, Feature1Id)
+              bsuc = osf.EditCellValue(1, osf.NumShapes - 1, Feature2Id)
+              bsuc = osf.EditCellValue(2, osf.NumShapes - 1, area)
+            End If
           End If
+          ssfshape = Nothing
+          ssfshapeext = Nothing
         Next k
       Else
         polygoncount = polygoncount + cSelectedSubbasins.Count
