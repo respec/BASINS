@@ -1,7 +1,7 @@
 Imports System.Windows.Forms
 Imports atcUtility
 
-Public Class frmDataSource
+Friend Class frmDataSource
   Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -115,7 +115,7 @@ Public Class frmDataSource
             Optional ByVal aCategories As ArrayList = Nothing)
     pDataManager = aDataManager
     pSelectedSource = aSelectedSource
-    if not aSelectedSource Is Nothing Then pSpecification = aSelectedSource.Specification
+    If Not aSelectedSource Is Nothing Then pSpecification = aSelectedSource.Specification
     pCategories = aCategories
     Populate(aNeedToOpen, aNeedToSave)
     Me.ShowDialog() 'Block until form closes
