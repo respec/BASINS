@@ -13,14 +13,19 @@ Public Class atcDataManager
 
   Private Const pInMemorySpecification As String = "<in memory>"
 
+  ''' <summary>Event raised when a data source is opened</summary>
   Event OpenedData(ByVal aDataSource As atcDataSource)
 
+  ''' <summary>Create a new instance of atcDataManager</summary>
   Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aBasins As Object)
     pMapWin = aMapWin
     pBasins = aBasins
     Me.Clear()
   End Sub
 
+  ''' <summary>Sets data manager to its initial state.
+  '''          Defaults Datasources, Selection Attributes and Display Attributes.
+  ''' </summary>
   Public Sub Clear()
     pDataSources = New ArrayList
     Dim lMemory As New atcDataSource
@@ -54,24 +59,25 @@ Public Class atcDataManager
     End Get
   End Property
 
+  ''' <summary>Set of atcDataSets found in currently open DataSources</summary>
   Public Function DataSets() As atcDataGroup
     Dim lAllData As New atcDataGroup
-    For Each source As atcDataSource In DataSources
-      For Each ts As atcDataSet In source.DataSets
-        lAllData.Add(ts)
+    For Each lSource As atcDataSource In DataSources
+      For Each lTs As atcDataSet In lSource.DataSets
+        lAllData.Add(lTs)
       Next
     Next
     Return lAllData
   End Function
 
-  ''' <summary>Names of attributes used for selection of Data in UI</summary)
+  ''' <summary>Names of attributes used for selection of data in UI</summary)
   Public ReadOnly Property SelectionAttributes() As ArrayList
     Get
       Return pSelectionAttributes
     End Get
   End Property
 
-  ''' <summary>Names of attributes used for listing of Data in UI</summary>
+  ''' <summary>Names of attributes used for listing of data in UI</summary>
   Public ReadOnly Property DisplayAttributes() As ArrayList
     Get
       Return pDisplayAttributes
@@ -79,26 +85,29 @@ Public Class atcDataManager
   End Property
 
   ''' <summary>Currently loaded plugins that inherit the specified class; returns empty objects</summary>
+  ''' <param name="aBaseType">
+  '''     <para>Type of plugin to match and return</para>
+  ''' </param>  
   Public Function GetPlugins(ByVal aBaseType As Type) As atcCollection
-    Dim retval As New atcCollection
-    Dim lastPlugIn As Integer = pMapWin.Plugins.Count() - 1
-    For iPlugin As Integer = 0 To lastPlugIn
-      Dim curPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
-      If Not curPlugin Is Nothing Then
-        If CType(curPlugin, Object).GetType().IsSubclassOf(aBaseType) Then
-          retval.Add(curPlugin.Name, curPlugin)
+    Dim lMatchingPlugIns As New atcCollection
+    Dim lLastPlugIn As Integer = pMapWin.Plugins.Count() - 1
+    For iPlugin As Integer = 0 To lLastPlugIn
+      Dim lCurPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
+      If Not lCurPlugin Is Nothing Then
+        If CType(lCurPlugin, Object).GetType().IsSubclassOf(aBaseType) Then
+          lMatchingPlugIns.Add(lCurPlugin.Name, lCurPlugin)
         End If
       End If
     Next
-    Return retval
+    Return lMatchingPlugIns
   End Function
 
   ''' <summary>Open BASINS data source</summary>
   ''' <param name="aNewSource">
-  '''     <para>object containing instance of new data source</para>
+  '''     <para>Object containing instance of new data source</para>
   ''' </param>  
   ''' <param name="aSpecification">
-  '''     <para>file name, connection string, or other information needed to initialize aNewSource</para>
+  '''     <para>File name, connection string, or other information needed to initialize aNewSource</para>
   ''' </param>
   Public Function OpenDataSource(ByVal aNewSource As atcDataSource, ByVal aSpecification As String, ByVal aAttributes As atcDataAttributes) As Boolean
     aNewSource.DataManager = Me
@@ -113,54 +122,76 @@ Public Class atcDataManager
     End If
   End Function
 
+  ''' <summary>Creates and returns an instance of a data source by name</summary>
+  ''' <param name="aDataSourceName">
+  '''     <para>Name of data source to create and return</para>
+  ''' </param>  
   Public Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
-    For Each ds As atcDataSource In GetPlugins(GetType(atcDataSource))
-      If ds.Name = aDataSourceName Then
-        Return ds.NewOne
+    For Each lDs As atcDataSource In GetPlugins(GetType(atcDataSource))
+      If lDs.Name = aDataSourceName Then
+        Return lDs.NewOne
       End If
     Next
   End Function
 
+  ''' <summary>Ask user to select a data source</summary>
+  ''' <param name="aCategories">
+  '''     <para>Filter to limit user choices</para>
+  ''' </param>  
   Public Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing) As atcDataSource
-    Dim lSpecification As String = ""
-    Dim frmDS As New frmDataSource
+    Dim lForm As New frmDataSource
     Dim lSelectedDataSource As atcDataSource
-    frmDS.AskUser(Me, lSelectedDataSource, True, False, aCategories)
+    lForm.AskUser(Me, lSelectedDataSource, True, False, aCategories)
     Return lSelectedDataSource
   End Function
 
+  ''' <summary>Ask user to select data</summary>
+  ''' <param name="aTitle">
+  '''     <para>Optional title for dialog window, default is 'Select Data'</para>
+  ''' </param>  
+  ''' <param name="aGroup">
+  '''     <para>Optional group to select data from, default is all available data</para>
+  ''' </param>  
+  ''' <param name="aModal">
+  '''     <para>Optional modality specification for window, default is true</para>
+  ''' </param>  
   Public Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
-    Dim frmSelect As New atcData.frmSelectData
-    If aTitle.Length > 0 Then frmSelect.Text = aTitle
-    Return frmSelect.AskUser(Me, aGroup, aModal)
+    Dim lForm As New frmSelectData
+    If aTitle.Length > 0 Then lForm.Text = aTitle
+    Return lForm.AskUser(Me, aGroup, aModal)
   End Function
 
+  ''' <summary>Ask user to manage data sources</summary>
+  ''' <param name="aTitle">
+  '''     <para>Optional title for dialog window, default is 'Data Sources'</para>
+  ''' </param> 
   Public Sub UserManage(Optional ByVal aTitle As String = "")
-    Dim frmManage As New frmManager
-    If aTitle.Length > 0 Then frmManage.Text = aTitle
-    frmManage.Edit(Me)
+    Dim lForm As New frmManager
+    If aTitle.Length > 0 Then lForm.Text = aTitle
+    lForm.Edit(Me)
   End Sub
 
+  ''' <summary>State of data manager in XML format</summary>
   Public Property XML() As Chilkat.Xml
     Get
-      Dim saveXML As New Chilkat.Xml
-      Dim lchildXML As Chilkat.Xml
-      saveXML.Tag = "DataManager"
+      Dim lSaveXML As New Chilkat.Xml
+      Dim lChildXML As Chilkat.Xml
+      lSaveXML.Tag = "DataManager"
       For Each lName As String In pSelectionAttributes
-        saveXML.NewChild("SelectionAttribute", lName)
+        lSaveXML.NewChild("SelectionAttribute", lName)
       Next
       For Each lName As String In pDisplayAttributes
-        saveXML.NewChild("DisplayAttribute", lName)
+        lSaveXML.NewChild("DisplayAttribute", lName)
       Next
       For Each lSource As atcDataSource In pDataSources
         If lSource.CanSave Then 'TODO: better test to pass only types that just need a Specification string to open
           If Not lSource.Specification.Equals(pInMemorySpecification) Then
-            lchildXML = saveXML.NewChild("DataSource", lSource.Name)
-            lchildXML.AddAttribute("Specification", lSource.Specification)
+            lChildXML = lSaveXML.NewChild("DataSource", lSource.Name)
+            lChildXML.AddAttribute("Specification", lSource.Specification)
           End If
         End If
       Next
-      Return saveXML
+      Return lSaveXML
     End Get
     Set(ByVal newValue As Chilkat.Xml)
       Me.Clear()
