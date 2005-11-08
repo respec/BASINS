@@ -213,339 +213,356 @@ Public Module modMetCompute
 
   End Function
 
-  'Public Function CmpPen(ByRef InTs As Collection) As atcData.ATCclsTserData
-  '  'compute PENMAN - PET
-  '  'InTS - input timeseries (1/2 - Min/Max Temp,
-  '  '3 - Dewpoint Temp, 4 - Wind Movement, 5 - Solar Radiation)
+  Public Function CmpPen(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSRadTS As atcTimeseries, ByVal aDewPTS As atcTimeseries, ByVal aWindTS As atcTimeseries, ByVal aSource As atcDataSource) As atcTimeseries
+    'compute PENMAN - PET
+    'input timeseries are Min/Max Temp, Dewpoint Temp, Solar Radiation, Wind Movement
 
-  '  Dim j, i, lret As Integer
-  '  Dim PanEvp() As Single
-  '  Dim lCmpTs As atcData.ATCclsTserData
-  '  Dim tsfil(5) As Single
+    Dim i As Integer
+    Dim lPanEvp(aTMinTS.numValues) As Double
+    Dim tsfil(5) As Double
+    Dim lCmpTs As New atcTimeseries(aSource)
 
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object InTs(). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  Call InitCmpTs(InTs.Item(1), atcData.ATCTimeUnit.TUDay, 1, 1, lCmpTs)
+    CopyBaseAttributes(aTMinTS, lCmpTs)
+    lCmpTs.Attributes.SetValue("Constituent", "DEVP")
+    lCmpTs.Attributes.SetValue("TSTYPE", "EVAP")
+    lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lCmpTs.Attributes.SetValue("Description", "Daily Pan Evaporation (in) computed using Penman algorithm")
+    lCmpTs.Attributes.AddHistory("Computed Daily Pan Evaporation using Penman - inputs: TMIN, TMAX, SRAD, DEWP, WIND")
+    lCmpTs.Attributes.Add("TMIN", aTMinTS.ToString)
+    lCmpTs.Attributes.Add("TMAX", aTMaxTS.ToString)
+    lCmpTs.Attributes.Add("SRAD", aSRadTS.ToString)
+    lCmpTs.Attributes.Add("DEWP", aDewPTS.ToString)
+    lCmpTs.Attributes.Add("WIND", aWindTS.ToString)
+    lCmpTs.Dates = aTMinTS.Dates
+    lCmpTs.numValues = aTMinTS.numValues
 
-  '  For i = 1 To InTs.Count()
-  '    'get fill value for input dsn
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object InTs().AttribNumeric. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    tsfil(i) = InTs.Item(i).AttribNumeric("TSFILL", -999)
-  '  Next i
+    tsfil(1) = aTMinTS.Attributes.GetValue("TSFILL", -999)
+    tsfil(2) = aTMaxTS.Attributes.GetValue("TSFILL", -999)
+    tsfil(3) = aSRadTS.Attributes.GetValue("TSFILL", -999)
+    tsfil(4) = aDewPTS.Attributes.GetValue("TSFILL", -999)
+    tsfil(5) = aWindTS.Attributes.GetValue("TSFILL", -999)
 
-  '  ReDim PanEvp(lCmpTs.dates.Summary.NVALS)
-  '  For i = 1 To lCmpTs.dates.Summary.NVALS
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object InTs().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    If System.Math.Abs(InTs.Item(1).Value(i) - tsfil(1)) < 0.000001 Or System.Math.Abs(InTs.Item(2).Value(i) - tsfil(2)) < 0.000001 Or System.Math.Abs(InTs.Item(3).Value(i) - tsfil(3)) < 0.000001 Or System.Math.Abs(InTs.Item(4).Value(i) - tsfil(4)) < 0.000001 Or System.Math.Abs(InTs.Item(5).Value(i) - tsfil(5)) < 0.000001 Then
-  '      'missing data
-  '      PanEvp(i) = tsfil(1)
-  '    Else 'compute pet
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object InTs().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      Call PNEVAP(InTs.Item(1).Value(i), InTs.Item(2).Value(i), InTs.Item(3).Value(i), InTs.Item(4).Value(i), InTs.Item(5).Value(i), PanEvp(i))
-  '    End If
-  '  Next i
-  '  lCmpTs.Values = VB6.CopyArray(PanEvp)
-  '  CmpPen = lCmpTs
+    For i = 1 To lCmpTs.numValues
+      If Math.Abs(aTMinTS.Value(i) - tsfil(1)) < 0.000001 Or _
+         Math.Abs(aTMaxTS.Value(i) - tsfil(2)) < 0.000001 Or _
+         Math.Abs(aSRadTS.Value(i) - tsfil(3)) < 0.000001 Or _
+         Math.Abs(aDewPTS.Value(i) - tsfil(4)) < 0.000001 Or _
+         Math.Abs(aWindTS.Value(i) - tsfil(5)) < 0.000001 Then
+        'missing data
+        lPanEvp(i) = tsfil(1)
+      Else 'compute pet
+        Call PNEVAP(aTMinTS.Value(i), aTMaxTS.Value(i), aDewPTS.Value(i), aWindTS.Value(i), aSRadTS.Value(i), lPanEvp(i))
+      End If
+    Next i
+    Array.Copy(lPanEvp, 1, lCmpTs.Values, 1, lCmpTs.numValues)
+    Return lCmpTs
 
-  'End Function
+  End Function
 
-  'Public Function CmpCld(ByRef PctSun As Collection) As atcData.ATCclsTserData
-  '  'compute %cloud cover from %sunshine
+  Public Function CmpCld(ByVal aPctSun As atcTimeseries, ByVal aSource As atcDataSource) As atcTimeseries
+    'compute %cloud cover from %sunshine
 
-  '  Dim i, j As Integer
-  '  Dim SSSum, SSDiv As Single
-  '  Dim CldCov() As Single
-  '  Dim SunVals() As Single
-  '  Dim lCmpTs As atcData.ATCclsTserData
+    Dim i, j As Integer
+    Dim lSSSum, lSSDiv As Double
+    Dim lCldCov(aPctSun.numValues) As Double
+    Dim lSunVals() As Double
+    Dim lCmpTs As New atcTimeseries(aSource)
 
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object PctSun(). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  Call InitCmpTs(PctSun.Item(1), atcData.ATCTimeUnit.TUDay, 1, 1, lCmpTs)
+    CopyBaseAttributes(aPctSun, lCmpTs)
+    lCmpTs.Attributes.SetValue("Constituent", "CCOV")
+    lCmpTs.Attributes.SetValue("TSTYPE", "CCOV")
+    lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lCmpTs.Attributes.SetValue("Description", "Daily Cloud Cover (%) computed using Daily Percent Sun data")
+    lCmpTs.Attributes.AddHistory("Computed Daily Cloud Cover using Daily Percent Sun - inputs: PSUN")
+    lCmpTs.Attributes.Add("PSUN", aPctSun.ToString)
+    lCmpTs.Dates = aPctSun.Dates
+    lCmpTs.numValues = aPctSun.numValues
 
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object PctSun().Values. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  SunVals = PctSun.Item(1).Values
-  '  'see if sunshine values are percent or fraction
-  '  i = 1
-  '  j = 0
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object PctSun(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  Do While j < 5 And i <= PctSun.Item(1).dates.Summary.NVALS
-  '    If SunVals(i) > 0 Then
-  '      SSSum = SSSum + SunVals(i)
-  '      j = j + 1
-  '    End If
-  '    i = i + 1
-  '  Loop
-  '  'see what the sum of these values is
-  '  If SSSum > j Then 'must be percentages
-  '    SSDiv = 100
-  '  Else 'must be fractions
-  '    SSDiv = 1
-  '  End If
-  '  ReDim CldCov(lCmpTs.dates.Summary.NVALS)
-  '  For i = 1 To lCmpTs.dates.Summary.NVALS
-  '    If SunVals(i) < 0.0# Then SunVals(i) = 0.0#
-  '    CldCov(i) = 10 * ((1 - SunVals(i) / SSDiv) ^ (3 / 5))
-  '    If CldCov(i) < 0.0# Then CldCov(i) = 0.0#
-  '  Next i
-  '  lCmpTs.Values = VB6.CopyArray(CldCov)
-  '  CmpCld = lCmpTs
+    lSunVals = aPctSun.Values
+      'see if sunshine values are percent or fraction
+    i = 1
+    j = 0
+    Do While j < 5 And i <= aPctSun.numValues
+      If lSunVals(i) > 0 Then
+        lSSSum = lSSSum + lSunVals(i)
+        j = j + 1
+      End If
+      i = i + 1
+    Loop
+    'see what the sum of these values is
+    If lSSSum > j Then 'must be percentages
+      lSSDiv = 100
+    Else 'must be fractions
+      lSSDiv = 1
+    End If
+    For i = 1 To lCmpTs.numValues
+      If lSunVals(i) < 0.0# Then lSunVals(i) = 0.0#
+      lCldCov(i) = 10 * ((1 - lSunVals(i) / lSSDiv) ^ (3 / 5))
+      If lCldCov(i) < 0.0# Then lCldCov(i) = 0.0#
+    Next i
+    Array.Copy(lCldCov, 1, lCmpTs.Values, 1, lCmpTs.numValues)
+    Return lCmpTs
 
-  'End Function
+  End Function
 
-  'Public Function CmpWnd(ByRef WndSpd As Collection) As atcData.ATCclsTserData
-  '  'compute daily total wind travel (mi) from
-  '  'average daily wind speed (mph)
+  Public Function CmpWnd(ByVal aWndSpd As atcTimeseries, ByVal aSource As atcDataSource) As atcTimeseries
+    'compute daily total wind travel (mi) from
+    'average daily wind speed (mph)
 
-  '  Dim i As Integer
-  '  Dim dtold(5) As Integer
-  '  Dim dtnew(5) As Integer
-  '  Dim TotWnd() As Single
-  '  Dim lCmpTs As atcData.ATCclsTserData
+    Dim i As Integer
+    Dim lTotWnd(aWndSpd.numValues) As Double
+    Dim lCmpTs As New atcTimeseries(aSource)
 
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object WndSpd(). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  Call InitCmpTs(WndSpd.Item(1), atcData.ATCTimeUnit.TUDay, 1, 1, lCmpTs)
+    CopyBaseAttributes(aWndSpd, lCmpTs)
+    lCmpTs.Attributes.SetValue("Constituent", "TWND")
+    lCmpTs.Attributes.SetValue("TSTYPE", "TWND")
+    lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lCmpTs.Attributes.SetValue("Description", "Daily Total Wind (mi) computed using Average Daily Wind Speed (mph)")
+    lCmpTs.Attributes.AddHistory("Computed Daily Total Wind using Daily Wind Speed - inputs: WIND")
+    lCmpTs.Attributes.Add("WIND", aWndSpd.ToString)
+    lCmpTs.Dates = aWndSpd.Dates
+    lCmpTs.numValues = aWndSpd.numValues
 
-  '  ReDim TotWnd(lCmpTs.dates.Summary.NVALS)
-  '  For i = 1 To lCmpTs.dates.Summary.NVALS
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object WndSpd().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    If WndSpd.Item(1).Value(i) <= 0.0# Then 'not valid wind speed value
-  '      TotWnd(i) = 0
-  '    Else
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object WndSpd().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      TotWnd(i) = 24 * WndSpd.Item(1).Value(i)
-  '    End If
-  '  Next i
-  '  lCmpTs.Values = VB6.CopyArray(TotWnd)
-  '  CmpWnd = lCmpTs
+    For i = 1 To lCmpTs.numValues
+      If aWndSpd.Value(i) <= 0.0# Then 'not valid wind speed value
+        lTotWnd(i) = 0
+      Else
+        lTotWnd(i) = 24 * aWndSpd.Value(i)
+      End If
+    Next i
+    Array.Copy(lTotWnd, 1, lCmpTs.Values, 1, lCmpTs.numValues)
+    Return lCmpTs
 
-  'End Function
+  End Function
 
-  'Public Function DisTemp(ByRef MnMxTmp As Collection, ByRef ObsTime As Integer, ByRef SJDt As Double, ByRef EJDt As Double) As atcData.ATCclsTserData
-  '  'Disaggregate daily min/max temperature to hourly temperature
-  '  'MnMxTmp - input daily min/max temp values, since disagg
-  '  '          method uses either previous or ensuing days values,
-  '  '          these arrays contain two more days of values
-  '  '          than the period being disaggregated
-  '  '  For Min Temp (index 1 of collection), the two extra
-  '  '    values are at the end
-  '  '  For Max Temp (index 2 of collection), there is one extra
-  '  '    value at each end of the data set
-  '  'SJDt - actual start date for output time series
-  '  'EJDt - actual end date for output time series
+  Public Function DisTemp(ByVal aMnTmpTS As atcTimeseries, ByVal aMxTmpTS As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aObsTime As Integer) As atcTimeseries ', ByRef SJDt As Double, ByRef EJDt As Double
+    'Disaggregate daily min/max temperature to hourly temperature
+    'Mn/MxTmpTS - input daily min/max temp values, 
+    '             since disagg method uses either previous or ensuing 
+    '             days values, these arrays contain two more days of 
+    '             values than the period being disaggregated
+    '  For Min Temp, the two extra values are at the end
+    '  For Max Temp , there is one extra value at each end of the data set
+    'aObsTime - hour of observation for the TMin/TMax values
 
-  '  Dim HrPos, ioff, j, i, opt, joff, lnval As Integer
-  '  Dim dtnew(5) As Integer
-  '  'UPGRADE_WARNING: Lower bound of array HrVals was changed from 1 to 0. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1033"'
-  '  Dim HrVals(24) As Single
-  '  Dim HRTemp() As Single
-  '  Dim tsfil(3) As Single
-  '  Dim MinTmp() As Single
-  '  Dim MaxTmp() As Single
-  '  Dim lDisTs As atcData.ATCclsTserData
-  '  Dim lDateSum As atcData.ATTimSerDateSummary
+    '*** Note:  SJDt/EJDt no longer in use, time of output TSer assumed same as input
+    'SJDt - actual start date for output time series
+    'EJDt - actual end date for output time series
 
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  Call InitCmpTs(MnMxTmp.Item(1), atcData.ATCTimeUnit.TUHour, 1, 24, lDisTs)
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object lDateSum. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  lDateSum = lDisTs.dates.Summary
-  '  'since lDisTs was built based on min temp TSer (which contains
-  '  '2 extra values), need to adjust number of values and end date
-  '  lDateSum.NVALS = 24 * (EJDt - SJDt)
-  '  lDateSum.EJDay = EJDt
-  '  lDisTs.dates.Summary = lDateSum
+    Dim lHrPos, ioff, j, i, lOpt, joff As Integer
+    Dim lDate(5) As Integer
+    Dim lHrVals(24) As Double
+    Dim tsfil(1) As Single
+    Dim lDisTs As New atcTimeseries(aDataSource)
 
-  '  For i = 1 To MnMxTmp.Count() 'get fill value for input dsns
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp().AttribNumeric. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    tsfil(i) = MnMxTmp.Item(i).AttribNumeric("TSFILL", -999)
-  '  Next i
+    CopyBaseAttributes(aMnTmpTS, lDisTs)
+    lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lDisTs.Attributes.SetValue("Constituent", "TEMP")
+    lDisTs.Attributes.SetValue("TSTYPE", "TEMP")
+    lDisTs.Attributes.SetValue("Description", "Hourly Temperature disaggregated from Daily TMin/TMax")
+    lDisTs.Attributes.AddHistory("Disaggregated Temperature - inputs: TMIN, TMAX, Observation Time")
+    lDisTs.Attributes.Add("TMIN", aMnTmpTS.ToString)
+    lDisTs.Attributes.Add("TMAX", aMxTmpTS.ToString)
+    lDisTs.Attributes.Add("Observation Time", aObsTime)
 
-  '  If ObsTime > 0 And ObsTime <= 6 Then
-  '    'option 1 is early morning observations,
-  '    'use max and min temp from previous calendar day
-  '    opt = 1
-  '  ElseIf ObsTime > 6 And ObsTime <= 16 Then
-  '    'option 2 is mid day observations,
-  '    'use max temp from previous day and min temp of current day
-  '    opt = 2
-  '  ElseIf ObsTime > 16 And ObsTime <= 24 Then
-  '    'option 3 is evening observations,
-  '    'use max and min temp from current day
-  '    opt = 3
-  '  End If
+    lDisTs.Dates = DisaggDates(aMnTmpTS, aDataSource)
+    lDisTs.numValues = lDisTs.Dates.numValues
 
-  '  ReDim HRTemp(lDisTs.dates.Summary.NVALS)
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  ReDim MinTmp(MnMxTmp.Item(1).dates.Summary.NVALS + 2)
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(2).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  ReDim MaxTmp(MnMxTmp.Item(2).dates.Summary.NVALS + 1)
+    tsfil(0) = aMnTmpTS.Attributes.GetValue("TSFILL", -999)
+    tsfil(1) = aMxTmpTS.Attributes.GetValue("TSFILL", -999)
 
-  '  'get max temp data
-  '  joff = 0
-  '  If opt = 3 Then 'back up one day (try to use 1st array element)
-  '    ioff = 0
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(2).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    If MnMxTmp.Item(2).dates.Summary.SJDay >= SJDt Then
-  '      'no data available prior to start date
-  '      joff = 1
-  '      'fill first max value with first available max value
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      MaxTmp(1) = MnMxTmp.Item(2).Value(1)
-  '    End If
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(2).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  ElseIf MnMxTmp.Item(2).dates.Summary.SJDay < SJDt Then
-  '    '1st element preceeds start date, don't need it
-  '    ioff = 1
-  '  Else '1st element is at start date, need it
-  '    ioff = 0
-  '  End If
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(2).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  For i = 1 To MnMxTmp.Item(2).dates.Summary.NVALS - ioff
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    MaxTmp(i + joff) = MnMxTmp.Item(2).Value(i + ioff)
-  '  Next i
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(2).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  If opt <> 3 And MnMxTmp.Item(2).dates.Summary.EJDay <= EJDt Then
-  '    'extra value needed, but not available, fill with previous
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(2).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp().dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    MaxTmp(MnMxTmp.Item(2).dates.Summary.NVALS + 1) = MaxTmp(MnMxTmp.Item(2).dates.Summary.NVALS)
-  '  End If
-  '  '  'check end points
-  '  '  If opt = 3 And Abs(MaxTmp(1) - tsfil(2)) < 0.000001 Then
-  '  '    'first value absent - fill with following day
-  '  '    MaxTmp(1) = MaxTmp(2)
-  '  '  End If
-  '  '  If opt <> 3 And Abs(MaxTmp(MnMxTmp(2).dates.summary.NVals - 1) - tsfil(2)) < 0.000001 Then
-  '  '    'last value was absent - fill with previous day
-  '  '    MaxTmp(MnMxTmp(2).dates.summary.NVals - 1) = MaxTmp(MnMxTmp(2).dates.summary.NVals - 2)
-  '  '  End If
+    If aObsTime > 0 And aObsTime <= 6 Then
+      'option 1 is early morning observations,
+      'use max and min temp from previous calendar day
+      lOpt = 1
+    ElseIf aObsTime > 6 And aObsTime <= 16 Then
+      'option 2 is mid day observations,
+      'use max temp from previous day and min temp of current day
+      lOpt = 2
+    ElseIf aObsTime > 16 And aObsTime <= 24 Then
+      'option 3 is evening observations,
+      'use max and min temp from current day
+      lOpt = 3
+    End If
 
-  '  'get min temp data
-  '  If opt = 1 Then 'move up one day for min temp values
-  '    ioff = 1
-  '  Else
-  '    ioff = 0
-  '  End If
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  For i = 1 To MnMxTmp.Item(1).dates.Summary.NVALS - ioff
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    MinTmp(i) = MnMxTmp.Item(1).Value(i + ioff)
-  '  Next i
-  '  'check end points
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  If MnMxTmp.Item(1).dates.Summary.EJDay <= EJDt Then
-  '    If opt = 1 Then 'need 2 extra values at end, fill with last good one
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp().dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      MinTmp(MnMxTmp.Item(1).dates.Summary.NVALS + 1) = MinTmp(MnMxTmp.Item(1).dates.Summary.NVALS - 1)
-  '    End If
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object MnMxTmp().dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    MinTmp(MnMxTmp.Item(1).dates.Summary.NVALS + 1 - ioff) = MinTmp(MnMxTmp.Item(1).dates.Summary.NVALS - ioff)
-  '  End If
-  '  '  If opt = 1 And Abs(MinTmp(MnMxTmp(1).dates.summary.NVals - 2) - tsfil(0)) < 0.000001 Then
-  '  '    'next to last value was absent - fill with previous day
-  '  '    MinTmp(MnMxTmp(1).dates.summary.NVals - 2) = MinTmp(MnMxTmp(1).dates.summary.NVals - 3)
-  '  '  End If
-  '  '  If Abs(MinTmp(MnMxTmp(1).dates.summary.NVals - 1) - tsfil(0)) < 0.000001 Then
-  '  '    'last value was absent - fill with previous day
-  '  '    MinTmp(MnMxTmp(1).dates.summary.NVals - 1) = MinTmp(MnMxTmp(1).dates.summary.NVals - 2)
-  '  '  End If
+    Dim lHRTemp(lDisTs.numValues)
+    Dim lMinTmp(aMnTmpTS.numValues + 2)
+    Dim lMaxTmp(aMxTmpTS.numValues + 1)
 
-  '  'get TSFILL value from output DSN
-  '  tsfil(3) = lDisTs.AttribNumeric("TSFILL", -999)
+    'get max temp data
+    joff = 0
+    If lOpt = 3 Then 'back up one day (try to use 1st array element)
+      ioff = 0
+      'used to look for values prior to start date, but now just do whole available time span
+      'If aMxTmpTS.Item(2).dates.Summary.SJDay >= SJDt Then
+      'no data available prior to start date
+      joff = 1
+      'fill first max value with first available max value
+      lMaxTmp(1) = aMxTmpTS.Value(1)
+      'ElseIf aMxTmpTS.Item(2).dates.Summary.SJDay < SJDt Then
+      '1st element preceeds start date, don't need it
+      'ioff = 1
+    Else '1st element is at start date, need it
+      ioff = 0
+    End If
+    For i = 1 To aMxTmpTS.numValues - ioff
+      lMaxTmp(i + joff) = aMxTmpTS.Value(i + ioff)
+    Next i
+    'If lOpt <> 3 And aMxTmpTS.Item(2).dates.Summary.EJDay <= EJDt Then
+    'extra value needed, but not available, fill with previous
+    lMaxTmp(aMxTmpTS.numValues + 1) = lMaxTmp(aMxTmpTS.numValues)
+    'End If
 
-  '  HrPos = 0
-  '  For i = 1 To (EJDt - SJDt)
-  '    If (System.Math.Abs(MaxTmp(i) - tsfil(2)) > 0.000001) Or (System.Math.Abs(MinTmp(i) - tsfil(1)) > 0.000001) Then
-  '      'value is not missing, so distribute
-  '      Call DISTRB(MaxTmp(i), MinTmp(i), MaxTmp(i + 1), MinTmp(i + 1), HrVals)
-  '      For j = 1 To 24
-  '        HRTemp(HrPos + j) = HrVals(j)
-  '      Next j
-  '    Else 'value is missing, so leave hourlies missing
-  '      For j = 1 To 24
-  '        HRTemp(HrPos + j) = tsfil(2)
-  '      Next j
-  '    End If
-  '    HrPos = HrPos + 24
-  '  Next i
-  '  lDisTs.Values = VB6.CopyArray(HRTemp)
-  '  DisTemp = lDisTs
+    'get min temp data
+    If lOpt = 1 Then 'move up one day for min temp values
+      ioff = 1
+    Else
+      ioff = 0
+    End If
+    For i = 1 To aMnTmpTS.numValues - ioff
+      lMinTmp(i) = aMnTmpTS.Value(i + ioff)
+    Next i
+    'check end points
+    'If MnMxTmp.Item(1).dates.Summary.EJDay <= EJDt Then
+    If lOpt = 1 Then 'need 2 extra values at end, fill with last good one
+      lMinTmp(aMnTmpTS.numValues + 1) = lMinTmp(aMnTmpTS.numValues - 1)
+    End If
+    lMinTmp(aMnTmpTS.numValues + 1 - ioff) = lMinTmp(aMnTmpTS.numValues - ioff)
+    'End If
 
-  'End Function
+    lHrPos = 0
+    For i = 1 To aMnTmpTS.numValues
+      If (Math.Abs(lMaxTmp(i) - tsfil(1)) > 0.000001) Or (Math.Abs(lMinTmp(i) - tsfil(0)) > 0.000001) Then
+        'value is not missing, so distribute
+        Call DISTRB(lMaxTmp(i), lMinTmp(i), lMaxTmp(i + 1), lMinTmp(i + 1), lHrVals)
+        For j = 1 To 24
+          lHRTemp(lHrPos + j) = lHrVals(j)
+        Next j
+      Else 'value is missing, so leave hourlies missing
+        For j = 1 To 24
+          lHRTemp(lHrPos + j) = tsfil(1)
+        Next j
+      End If
+      lHrPos = lHrPos + 24
+    Next i
+    Array.Copy(lHRTemp, 1, lDisTs.Values, 1, lDisTs.numValues)
+    Return lDisTs
 
-  'Public Function DisSolPet(ByRef InTs As Collection, ByRef DisOpt As Integer, ByRef LatDeg As Single) As atcData.ATCclsTserData
-  '  'disaggregate daily SOLAR or PET to hourly
-  '  'InTs - input timeseries to be disaggregated
-  '  'DisOpt = 1 does Solar, DisOpt = 2 does PET
-  '  'LatDeg - latitude, in degrees
+  End Function
 
-  '  Dim HrPos, i, j, retcod As Integer
-  '  Dim dtnew(5) As Integer
-  '  Dim dtold(5) As Integer
-  '  'UPGRADE_WARNING: Lower bound of array HrVals was changed from 1 to 0. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1033"'
-  '  Dim lDisTs As atcData.ATCclsTserData
-  '  Dim OutTs() As Single
-  '  Dim HrVals(24) As Single
+  Public Function DisSolPet(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aDisOpt As Integer, ByVal aLatDeg As Double) As atcTimeseries
+    'disaggregate daily SOLAR or PET to hourly
+    'aInTs   - input timeseries to be disaggregated
+    'aDisOpt = 1 does Solar, DisOpt = 2 does PET
+    'aLatDeg - latitude, in degrees
 
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object InTs(). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  Call InitCmpTs(InTs.Item(1), atcData.ATCTimeUnit.TUHour, 1, 24, lDisTs)
+    Dim lHrPos, i, j, retcod As Integer
+    Dim lDate(5) As Integer
+    Dim lDisTs As New atcTimeseries(aDataSource)
+    Dim lPoint As Boolean = aInTs.Attributes.GetValue("point", False)
+    Dim lHrVals(24) As Double
 
-  '  ReDim OutTs(lDisTs.dates.Summary.NVALS)
-  '  Call J2Date(lDisTs.dates.Summary.SJDay, dtold)
-  '  HrPos = 0
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object InTs(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  For i = 1 To InTs.Item(1).dates.Summary.NVALS
-  '    If DisOpt = 1 Then 'solar
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object InTs().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      Call RADDST(LatDeg, dtold(1), dtold(2), InTs.Item(1).Value(i), HrVals, retcod)
-  '    ElseIf DisOpt = 2 Then  'pet
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object InTs().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      Call PETDST(LatDeg, dtold(1), dtold(2), InTs.Item(1).Value(i), HrVals, retcod)
-  '    End If
-  '    For j = 1 To 24
-  '      OutTs(HrPos + j) = HrVals(j)
-  '    Next j
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object InTs(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    Call F90_TIMADD(dtold(0), InTs.Item(1).dates.Summary.Tu, InTs.Item(1).dates.Summary.ts, 1, dtnew(0))
-  '    Call CopyI(6, dtnew, dtold)
-  '    'increment to next 24 hour period
-  '    HrPos = HrPos + 24
-  '  Next i
-  '  lDisTs.Values = VB6.CopyArray(OutTs)
-  '  DisSolPet = lDisTs
+    CopyBaseAttributes(aInTs, lDisTs)
+    lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
+    If aDisOpt = 1 Then 'solar disaggregation
+      lDisTs.Attributes.SetValue("Constituent", "SOLR")
+      lDisTs.Attributes.SetValue("TSTYPE", "SOLR")
+      lDisTs.Attributes.SetValue("Description", "Hourly Solar Radiation (Langleys) disaggregated from Daily")
+      lDisTs.Attributes.AddHistory("Disaggregated Solar Radiation - inputs: SRAD, Latitude")
+      lDisTs.Attributes.Add("SRAD", aInTs.ToString)
+    Else 'ET disaggregation
+      lDisTs.Attributes.SetValue("Constituent", "EVAP")
+      lDisTs.Attributes.SetValue("TSTYPE", "EVAP")
+      lDisTs.Attributes.SetValue("Description", "Hourly Evapotranspiration disaggregated from Daily")
+      lDisTs.Attributes.AddHistory("Disaggregated Evapotranspiration - inputs: DEVT, Latitude")
+      lDisTs.Attributes.Add("DEVT", aInTs.ToString)
+    End If
+    lDisTs.Attributes.Add("Latitude", aLatDeg)
 
-  'End Function
+    lDisTs.Dates = DisaggDates(aInTs, aDataSource)
+    lDisTs.numValues = lDisTs.Dates.numValues
 
-  'Public Function DisWnd(ByRef InTs As Collection, ByRef DCurve() As Single) As atcData.ATCclsTserData
-  '  'Disaggregate daily wind to hourly
-  '  'InTs - input daily wind timeseries
-  '  'DCurve - hourly diurnal curve for wind disaggregation
+    Dim lOutTs(lDisTs.numValues) As Double
+    lHrPos = 0
+    For i = 1 To aInTs.numValues
+      If lPoint Then
+        Call J2Date(aInTs.Dates.Value(i), lDate)
+      Else
+        Call J2Date(aInTs.Dates.Value(i - 1), lDate)
+      End If
+      If aDisOpt = 1 Then 'solar
+        Call RADDST(aLatDeg, lDate(1), lDate(2), aInTs.Value(i), lHrVals, retcod)
+      ElseIf aDisOpt = 2 Then  'pet
+        Call PETDST(aLatDeg, lDate(1), lDate(2), aInTs.Value(i), lHrVals, retcod)
+      End If
+      For j = 1 To 24
+        lOutTs(lHrPos + j) = lHrVals(j)
+      Next j
+      'increment to next 24 hour period
+      lHrPos = lHrPos + 24
+    Next i
+    Array.Copy(lOutTs, 1, lDisTs.Values, 1, lDisTs.numValues)
+    Return lDisTs
 
-  '  Dim k, i, j, lnval As Integer
-  '  'UPGRADE_WARNING: Lower bound of array HrVals was changed from 1 to 0. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1033"'
-  '  Dim lDisTs As atcData.ATCclsTserData
-  '  Dim OutTs() As Single
-  '  Dim HrVals(24) As Single
+  End Function
 
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object InTs(). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  Call InitCmpTs(InTs.Item(1), atcData.ATCTimeUnit.TUHour, 1, 24, lDisTs)
+  Public Function DisWnd(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aDCurve() As Double) As atcTimeseries
+    'Disaggregate daily wind to hourly
+    'InTs - input daily wind timeseries
+    'DCurve - hourly diurnal curve for wind disaggregation
 
-  '  ReDim OutTs(lDisTs.dates.Summary.NVALS)
-  '  k = 0
-  '  'UPGRADE_WARNING: Couldn't resolve default property of object InTs(1).dates. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '  For i = 1 To InTs.Item(1).dates.Summary.NVALS
-  '    For j = 1 To 24
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object InTs().Value. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      OutTs(k + j) = InTs.Item(1).Value(i) * DCurve(j)
-  '    Next j
-  '    'increment to next 24 hour period
-  '    k = k + 24
-  '  Next i
-  '  lDisTs.Values = VB6.CopyArray(OutTs)
-  '  DisWnd = lDisTs
+    Dim k, i, j, lnval As Integer
+    Dim lDisTs As New atcTimeseries(aDataSource)
+    Dim lHrVals(24) As Double
 
-  'End Function
+    CopyBaseAttributes(aInTs, lDisTs)
+    lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lDisTs.Attributes.SetValue("Constituent", "WIND")
+    lDisTs.Attributes.SetValue("TSTYPE", "WIND")
+    lDisTs.Attributes.SetValue("Description", "Hourly Wind Travel disaggregated from Daily")
+    lDisTs.Attributes.AddHistory("Disaggregated Wind Travel - inputs: TWND, Hourly Distribution")
+    lDisTs.Attributes.Add("TWND", aInTs.ToString)
+    lDisTs.Attributes.Add("Hourly Distribution", aDCurve)
 
+    'build new date array for hourly TSer
+    lDisTs.Dates = DisaggDates(aInTs, aDataSource)
+    lDisTs.numValues = lDisTs.Dates.numValues
+
+    Dim lOutTs(lDisTs.numValues) As Double
+    k = 0
+    For i = 1 To aInTs.numValues
+      For j = 1 To 24
+        lOutTs(k + j) = aInTs.Value(i) * aDCurve(j)
+      Next j
+      'increment to next 24 hour period
+      k = k + 24
+    Next i
+    Array.Copy(lOutTs, 1, lDisTs.Values, 1, lDisTs.numValues)
+    Return lDisTs
+
+  End Function
+
+  Private Function DisaggDates(ByVal aInTS As atcTimeseries, ByVal aDataSource As atcDataSource) As atcTimeseries
+    'build new date array for hourly TSer based on daily TSer (aInTS)
+    Dim lHrInc As Double = 1 / 24
+    Dim lJDay As Double
+    Dim lPoint As Boolean = aInTS.Attributes.GetValue("point", False)
+
+    Dim lDates = New atcTimeseries(aDataSource)
+    lDates.numValues = aInTS.numValues * 24
+    lJDay = aInTS.Attributes.GetValue("SJDAY")
+    If lPoint Then
+      lDates.Value(0) = Double.NaN
+    Else
+      lDates.Value(0) = lJDay
+      lJDay += lHrInc
+    End If
+    For i As Integer = 1 To lDates.numValues
+      lDates.Value(i) = lJDay
+      lJDay += lHrInc
+    Next i
+    Return lDates
+  End Function
   'Public Function DisDwpnt(ByRef InTs As Collection) As atcData.ATCclsTserData
   '  'Disaggregate dewpoint temperature from daily to hourly
   '  'assuming daily average is constant for 24 hours
@@ -572,226 +589,197 @@ Public Module modMetCompute
   '  DisDwpnt = lDisTs
 
   'End Function
-  'Public Sub InitCmpTs(ByRef InTs As atcData.ATCclsTserData, ByRef NTu As Integer, ByRef NTs As Integer, ByRef NewIntvls As Integer, ByRef NewTs As atcData.ATCclsTserData)
-  '  'InTs - input TSer upon which new TSer is based
-  '  'NTu/NTs - new TSer's time units and time step
-  '  'NewIntvls - number of new time intervals between InTs and NewTs
-  '  '           (e.g. 24 if going from daily to hourly,
-  '  '                 15 if going from hourly to 15-minute)
-  '  'NewTs - new TSer being built
 
-  '  Dim lTserSum As atcData.ATTimSerDateSummary
+  Public Sub DISTRB(ByVal PreMax As Double, ByVal CurMin As Double, ByVal CurMax As Double, ByVal NxtMin As Double, ByRef HRTemp() As Double)
 
-  '  NewTs = New atcData.ATCclsTserData
-  '  NewTs.dates = New atcData.ATCclsTserDate
-  '  With lTserSum
-  '    .CIntvl = True
-  '    .Intvl = InTs.dates.Summary.Intvl / NewIntvls
-  '    .NVALS = InTs.dates.Summary.NVALS * NewIntvls
-  '    .SJDay = InTs.dates.Summary.SJDay
-  '    .EJDay = InTs.dates.Summary.EJDay
-  '    .ts = NTs
-  '    .Tu = NTu
-  '  End With
-  '  NewTs.dates.Summary = lTserSum
-  '  'Set NewTs.File = TserMemory
-  '  'TserMemory.addtimser NewTs
+    'Distribute daily max-min temperatures to hourly values
 
-  'End Sub
-  'Public Sub DISTRB(ByRef PreMax As Single, ByRef CurMin As Single, ByRef CurMax As Single, ByRef NxtMin As Single, ByRef HRTemp() As Single)
+    'PREMAX - previous max temperature
+    'CURMIN - current min temperature
+    'CURMAX - current max temperature
+    'NXTMIN - next min temperature
+    'HRTEMP - array of hourly values
 
-  '  'Distribute daily max-min temperatures to hourly values
+    Dim lDif2, lDif1, lDif3 As Double
 
-  '  'PREMAX - previous max temperature
-  '  'CURMIN - current min temperature
-  '  'CURMAX - current max temperature
-  '  'NXTMIN - next min temperature
-  '  'HRTEMP - array of hourly values
+    lDif1 = PreMax - CurMin
+    lDif2 = CurMin - CurMax
+    lDif3 = CurMax - NxtMin
 
-  '  Dim Dif2, Dif1, Dif3 As Single
+    HRTemp(1) = CurMin + lDif1 * 0.15
+    HRTemp(2) = CurMin + lDif1 * 0.1
+    HRTemp(3) = CurMin + lDif1 * 0.06
+    HRTemp(4) = CurMin + lDif1 * 0.03
+    HRTemp(5) = CurMin + lDif1 * 0.01
+    HRTemp(6) = CurMin
+    HRTemp(7) = CurMin - lDif2 * 0.16
+    HRTemp(8) = CurMin - lDif2 * 0.31
+    HRTemp(9) = CurMin - lDif2 * 0.45
+    HRTemp(10) = CurMin - lDif2 * 0.59
+    HRTemp(11) = CurMin - lDif2 * 0.71
+    HRTemp(12) = CurMin - lDif2 * 0.81
+    HRTemp(13) = CurMin - lDif2 * 0.89
+    HRTemp(14) = CurMin - lDif2 * 0.95
+    HRTemp(15) = CurMin - lDif2 * 0.99
+    HRTemp(16) = CurMax
+    HRTemp(17) = NxtMin + lDif3 * 0.89
+    HRTemp(18) = NxtMin + lDif3 * 0.78
+    HRTemp(19) = NxtMin + lDif3 * 0.67
+    HRTemp(20) = NxtMin + lDif3 * 0.57
+    HRTemp(21) = NxtMin + lDif3 * 0.47
+    HRTemp(22) = NxtMin + lDif3 * 0.38
+    HRTemp(23) = NxtMin + lDif3 * 0.29
+    HRTemp(24) = NxtMin + lDif3 * 0.22
 
-  '  Dif1 = PreMax - CurMin
-  '  Dif2 = CurMin - CurMax
-  '  Dif3 = CurMax - NxtMin
+  End Sub
 
-  '  HRTemp(1) = CurMin + Dif1 * 0.15
-  '  HRTemp(2) = CurMin + Dif1 * 0.1
-  '  HRTemp(3) = CurMin + Dif1 * 0.06
-  '  HRTemp(4) = CurMin + Dif1 * 0.03
-  '  HRTemp(5) = CurMin + Dif1 * 0.01
-  '  HRTemp(6) = CurMin
-  '  HRTemp(7) = CurMin - Dif2 * 0.16
-  '  HRTemp(8) = CurMin - Dif2 * 0.31
-  '  HRTemp(9) = CurMin - Dif2 * 0.45
-  '  HRTemp(10) = CurMin - Dif2 * 0.59
-  '  HRTemp(11) = CurMin - Dif2 * 0.71
-  '  HRTemp(12) = CurMin - Dif2 * 0.81
-  '  HRTemp(13) = CurMin - Dif2 * 0.89
-  '  HRTemp(14) = CurMin - Dif2 * 0.95
-  '  HRTemp(15) = CurMin - Dif2 * 0.99
-  '  HRTemp(16) = CurMax
-  '  HRTemp(17) = NxtMin + Dif3 * 0.89
-  '  HRTemp(18) = NxtMin + Dif3 * 0.78
-  '  HRTemp(19) = NxtMin + Dif3 * 0.67
-  '  HRTemp(20) = NxtMin + Dif3 * 0.57
-  '  HRTemp(21) = NxtMin + Dif3 * 0.47
-  '  HRTemp(22) = NxtMin + Dif3 * 0.38
-  '  HRTemp(23) = NxtMin + Dif3 * 0.29
-  '  HRTemp(24) = NxtMin + Dif3 * 0.22
+  Private Sub RADDST(ByVal aLatDeg As Double, ByVal aMonth As Integer, ByVal aDay As Integer, ByVal aDayRad As Double, ByRef aHrRad() As Double, ByRef aRetCod As Integer)
+    'Distributes daily solar radiation to hourly
+    'values, based on a method used in HSP (Hydrocomp, 1976).
+    'It uses the latitude, month, day, and daily radiation.
 
-  'End Sub
+    'aLatDeg - latitude(degrees)
+    'aMONTH  - month of the year (1-12)
+    'aDAY    - day of the month (1-31)
+    'aDAYRAD - input daily radiation (langleys)
+    'aHRRAD  - output array of hourly radiation (langleys)
+    'aRETCOD - return code (0 = ok, -1 = bad latitude)
 
-  ''UPGRADE_NOTE: Day was upgraded to Day_Renamed. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1061"'
-  ''UPGRADE_NOTE: Month was upgraded to Month_Renamed. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1061"'
-  'Private Sub RADDST(ByRef LatDeg As Single, ByRef Month_Renamed As Integer, ByRef Day_Renamed As Integer, ByRef DayRad As Single, ByRef HrRad() As Single, ByRef retcod As Integer)
-  '  'Distributes daily solar radiation to hourly
-  '  'values, based on a method used in HSP (Hydrocomp, 1976).
-  '  'It uses the latitude, month, day, and daily radiation.
+    Dim IK As Integer
+    Dim TR3, TRise, CRAD, DTR2, Delt, CS, AD, JulDay, RK, LatRdn, Phi, SS, X2, SunR, DTR4, SL, TR2, TR4 As Double
 
-  '  'LatDeg - latitude(degrees)
-  '  'MONTH  - month of the year (1-12)
-  '  'DAY    - day of the month (1-31)
-  '  'DAYRAD - input daily radiation (langleys)
-  '  'HRRAD  - output array of hourly radiation (langleys)
-  '  'RETCOD - return code (0 = ok, -1 = bad latitude)
+    'julian date
+    JulDay = 30.5 * (aMonth - 1) + aDay
 
-  '  Dim IK As Integer
-  '  Dim TR3, TRise, CRAD, DTR2, Delt, CS, AD, JulDay, RK, LatRdn, Phi, SS, X2, SunR, DTR4, SL, TR2, TR4 As Single
+    'check latitude
+    If aLatDeg < -66.5 Or aLatDeg > 66.5 Then 'invalid latitude, return
+      aRetCod = -1
+    Else 'latitude ok
+      'convert to radians
+      LatRdn = aLatDeg * 0.0174582
 
-  '  'julian date
-  '  JulDay = 30.5 * (Month_Renamed - 1) + Day_Renamed
+      Phi = LatRdn
+      AD = 0.40928 * System.Math.Cos(0.0172141 * (172.0# - JulDay))
+      SS = Math.Sin(Phi) * Math.Sin(AD)
+      CS = Math.Cos(Phi) * Math.Cos(AD)
+      X2 = -SS / CS
+      Delt = 7.6394 * (1.5708 - Math.Atan(X2 / Math.Sqrt(1.0# - X2 ^ 2)))
+      SunR = 12.0# - Delt / 2.0#
 
-  '  'check latitude
-  '  If LatDeg < -66.5 Or LatDeg > 66.5 Then 'invalid latitude, return
-  '    retcod = -1
-  '  Else 'latitude ok
-  '    'convert to radians
-  '    LatRdn = LatDeg * 0.0174582
+      'develop hourly distribution given sunrise,
+      'sunset and length of day (DELT)
+      DTR2 = Delt / 2.0#
+      DTR4 = Delt / 4.0#
+      CRAD = 0.66666667 / DTR2
+      SL = CRAD / DTR4
+      TRise = SunR
+      TR2 = TRise + DTR4
+      TR3 = TR2 + DTR2
+      TR4 = TR3 + DTR4
 
-  '    Phi = LatRdn
-  '    AD = 0.40928 * System.Math.Cos(0.0172141 * (172.0# - JulDay))
-  '    SS = System.Math.Sin(Phi) * System.Math.Sin(AD)
-  '    CS = System.Math.Cos(Phi) * System.Math.Cos(AD)
-  '    X2 = -SS / CS
-  '    Delt = 7.6394 * (1.5708 - System.Math.Atan(X2 / System.Math.Sqrt(1.0# - X2 ^ 2)))
-  '    SunR = 12.0# - Delt / 2.0#
+      'hourly loop
+      For IK = 1 To 24
+        RK = IK
+        If RK > TRise Then
+          If RK > TR2 Then
+            If RK > TR3 Then
+              If RK > TR4 Then
+                aHrRad(IK) = 0.0#
+              Else
+                aHrRad(IK) = (CRAD - (RK - TR3) * SL) * aDayRad
+              End If
+            Else
+              aHrRad(IK) = CRAD * aDayRad
+            End If
+          Else
+            aHrRad(IK) = (RK - TRise) * SL * aDayRad
+          End If
+        Else
+          aHrRad(IK) = 0.0#
+        End If
+      Next IK
+      aRetCod = 0
+    End If
 
-  '    'develop hourly distribution given sunrise,
-  '    'sunset and length of day (DELT)
-  '    DTR2 = Delt / 2.0#
-  '    DTR4 = Delt / 4.0#
-  '    CRAD = 0.66666667 / DTR2
-  '    SL = CRAD / DTR4
-  '    TRise = SunR
-  '    TR2 = TRise + DTR4
-  '    TR3 = TR2 + DTR2
-  '    TR4 = TR3 + DTR4
+  End Sub
 
-  '    'hourly loop
-  '    For IK = 1 To 24
-  '      RK = IK
-  '      If RK > TRise Then
-  '        If RK > TR2 Then
-  '          If RK > TR3 Then
-  '            If RK > TR4 Then
-  '              HrRad(IK) = 0.0#
-  '            Else
-  '              HrRad(IK) = (CRAD - (RK - TR3) * SL) * DayRad
-  '            End If
-  '          Else
-  '            HrRad(IK) = CRAD * DayRad
-  '          End If
-  '        Else
-  '          HrRad(IK) = (RK - TRise) * SL * DayRad
-  '        End If
-  '      Else
-  '        HrRad(IK) = 0.0#
-  '      End If
-  '    Next IK
-  '    retcod = 0
-  '  End If
+  Public Sub PETDST(ByVal aLatDeg As Double, ByVal aMonth As Integer, ByVal aDay As Integer, ByVal aDayPet As Double, ByRef aHrPet() As Double, ByRef aRetCod As Integer)
 
-  'End Sub
+    'Distributes daily PET to hourly values,
+    'based on a method used to disaggregate solar radiation
+    'in HSP (Hydrocomp, 1976) using latitude, month, day,
+    'and daily PET.
 
-  ''UPGRADE_NOTE: Day was upgraded to Day_Renamed. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1061"'
-  ''UPGRADE_NOTE: Month was upgraded to Month_Renamed. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1061"'
-  'Public Sub PETDST(ByRef LatDeg As Single, ByRef Month_Renamed As Integer, ByRef Day_Renamed As Integer, ByRef DayPet As Single, ByRef HrPet() As Single, ByRef retcod As Integer)
+    'aLatDeg - latitude(degrees)
+    'aMONTH  - month of the year (1-12)
+    'aDAY    - day of the month (1-31)
+    'aDAYPET - input daily PET (inches)
+    'aHRPET  - output array of hourly PET (inches)
+    'aRETCOD - return code (0 = ok, -1 = bad latitude)
 
-  '  'Distributes daily PET to hourly values,
-  '  'based on a method used to disaggregate solar radiation
-  '  'in HSP (Hydrocomp, 1976) using latitude, month, day,
-  '  'and daily PET.
+    Dim IK As Integer
+    Dim TR3, TRise, CRAD, DTR2, Delt, CS, AD, JulDay, RK, LatRdn, Phi, SS, X2, SunR, DTR4, SL, TR2, TR4 As Double
+    Dim CURVE(24) As Double
 
-  '  'LatDeg - latitude(degrees)
-  '  'MONTH  - month of the year (1-12)
-  '  'DAY    - day of the month (1-31)
-  '  'DAYPET - input daily PET (inches)
-  '  'HRPET  - output array of hourly PET (inches)
-  '  'RETCOD - return code (0 = ok, -1 = bad latitude)
+    'julian date
+    JulDay = 30.5 * (aMonth - 1) + aDay
 
-  '  Dim IK As Integer
-  '  Dim TR3, TRise, CRAD, DTR2, Delt, CS, AD, JulDay, RK, LatRdn, Phi, SS, X2, SunR, DTR4, SL, TR2, TR4 As Single
-  '  Dim CURVE(24) As Single
+    'check latitude
+    If aLatDeg < -66.5 Or aLatDeg > 66.5 Then 'invalid latitude, return
+      aRetCod = -1
+    Else 'latitude ok
+      'convert to radians
+      LatRdn = aLatDeg * 0.0174582
 
-  '  'julian date
-  '  JulDay = 30.5 * (Month_Renamed - 1) + Day_Renamed
+      Phi = LatRdn
+      AD = 0.40928 * Math.Cos(0.0172141 * (172.0# - JulDay))
+      SS = Math.Sin(Phi) * Math.Sin(AD)
+      CS = Math.Cos(Phi) * Math.Cos(AD)
+      X2 = -SS / CS
+      Delt = 7.6394 * (1.5708 - Math.Atan(X2 / Math.Sqrt(1.0# - X2 ^ 2)))
+      SunR = 12.0# - Delt / 2.0#
 
-  '  'check latitude
-  '  If LatDeg < -66.5 Or LatDeg > 66.5 Then 'invalid latitude, return
-  '    retcod = -1
-  '  Else 'latitude ok
-  '    'convert to radians
-  '    LatRdn = LatDeg * 0.0174582
+      'develop hourly distribution given sunrise,
+      'sunset and length of day (DELT)
+      DTR2 = Delt / 2.0#
+      DTR4 = Delt / 4.0#
+      CRAD = 0.66666667 / DTR2
+      SL = CRAD / DTR4
+      TRise = SunR
+      TR2 = TRise + DTR4
+      TR3 = TR2 + DTR2
+      TR4 = TR3 + DTR4
 
-  '    Phi = LatRdn
-  '    AD = 0.40928 * System.Math.Cos(0.0172141 * (172.0# - JulDay))
-  '    SS = System.Math.Sin(Phi) * System.Math.Sin(AD)
-  '    CS = System.Math.Cos(Phi) * System.Math.Cos(AD)
-  '    X2 = -SS / CS
-  '    Delt = 7.6394 * (1.5708 - System.Math.Atan(X2 / System.Math.Sqrt(1.0# - X2 ^ 2)))
-  '    SunR = 12.0# - Delt / 2.0#
+      'calculate hourly distribution curve
+      For IK = 1 To 24
+        RK = IK
+        If RK > TRise Then
+          If RK > TR2 Then
+            If RK > TR3 Then
+              If RK > TR4 Then
+                CURVE(IK) = 0.0#
+                aHrPet(IK) = CURVE(IK)
+              Else
+                CURVE(IK) = (CRAD - (RK - TR3) * SL)
+                aHrPet(IK) = CURVE(IK) * aDayPet
+              End If
+            Else
+              CURVE(IK) = CRAD
+              aHrPet(IK) = CURVE(IK) * aDayPet
+            End If
+          Else
+            CURVE(IK) = (RK - TRise) * SL
+            aHrPet(IK) = CURVE(IK) * aDayPet
+          End If
+        Else
+          CURVE(IK) = 0.0#
+          aHrPet(IK) = CURVE(IK)
+        End If
+      Next IK
+      aRetCod = 0
+    End If
 
-  '    'develop hourly distribution given sunrise,
-  '    'sunset and length of day (DELT)
-  '    DTR2 = Delt / 2.0#
-  '    DTR4 = Delt / 4.0#
-  '    CRAD = 0.66666667 / DTR2
-  '    SL = CRAD / DTR4
-  '    TRise = SunR
-  '    TR2 = TRise + DTR4
-  '    TR3 = TR2 + DTR2
-  '    TR4 = TR3 + DTR4
-
-  '    'calculate hourly distribution curve
-  '    For IK = 1 To 24
-  '      RK = IK
-  '      If RK > TRise Then
-  '        If RK > TR2 Then
-  '          If RK > TR3 Then
-  '            If RK > TR4 Then
-  '              CURVE(IK) = 0.0#
-  '              HrPet(IK) = CURVE(IK)
-  '            Else
-  '              CURVE(IK) = (CRAD - (RK - TR3) * SL)
-  '              HrPet(IK) = CURVE(IK) * DayPet
-  '            End If
-  '          Else
-  '            CURVE(IK) = CRAD
-  '            HrPet(IK) = CURVE(IK) * DayPet
-  '          End If
-  '        Else
-  '          CURVE(IK) = (RK - TRise) * SL
-  '          HrPet(IK) = CURVE(IK) * DayPet
-  '        End If
-  '      Else
-  '        CURVE(IK) = 0.0#
-  '        HrPet(IK) = CURVE(IK)
-  '      End If
-  '    Next IK
-  '    retcod = 0
-  '  End If
-
-  'End Sub
+  End Sub
 
   Private Sub RadClc(ByRef aDegLat As Double, ByRef aCloud As Double, ByRef aMon As Integer, ByRef aDay As Integer, ByRef aDayRad As Double)
 
@@ -985,7 +973,7 @@ Public Module modMetCompute
 
   End Sub
 
-  Private Sub PNEVAP(ByRef MinTmp As Single, ByRef MaxTmp As Single, ByRef DewTmp As Single, ByRef WindSp As Single, ByRef SolRad As Single, ByRef PanEvp As Single)
+  Private Sub PNEVAP(ByVal aMinTmp As Double, ByVal aMaxTmp As Double, ByVal aDewTmp As Double, ByVal aWindSp As Double, ByVal aSolRad As Double, ByRef aPanEvp As Double)
 
     'Generates daily pan evaporation (inches) using
     'daily minimum air temperature (F), daily maximum air
@@ -993,46 +981,46 @@ Public Module modMetCompute
     'radiation (langleys/day). The computations are based on the Penman
     '(1948) formula and the method of Kohler, Nordensen, and Fox (1955).
 
-    'MinTmp - daily minimum air temperature (F)
-    'MaxTmp - daily maximum air temperature (F)
-    'DewTmp - dewpoint(F)
-    'WindSp - wind movement (miles/day)
-    'SolRad - solar radiation (langleys/day)
-    'PanEvp - daily pan evaporation (inches)
+    'aMinTmp - daily minimum air temperature (F)
+    'aMaxTmp - daily maximum air temperature (F)
+    'aDewTmp - dewpoint(F)
+    'aWindSp - wind movement (miles/day)
+    'aSolRad - solar radiation (langleys/day)
+    'aPanEvp - daily pan evaporation (inches)
 
-    Dim QNDelt, EsMiEa, Delta, EaGama, AirTmp As Double
+    Dim lQNDelt, lEsMiEa, lDelta, lEaGama, lAirTmp As Double
 
     'compute average daily air temperature
-    AirTmp = (MinTmp + MaxTmp) / 2.0#
+    lAirTmp = (aMinTmp + aMaxTmp) / 2.0#
 
     'net radiation exchange * delta
-    If SolRad <= 0.0# Then SolRad = 0.00001
-    QNDelt = System.Math.Exp((AirTmp - 212.0#) * (0.1024 - 0.01066 * System.Math.Log(SolRad))) - 0.0001
+    If aSolRad <= 0.0# Then aSolRad = 0.00001
+    lQNDelt = Math.Exp((lAirTmp - 212.0#) * (0.1024 - 0.01066 * Math.Log(aSolRad))) - 0.0001
 
     'Vapor pressure deficit between surface and
     'dewpoint temps(Es-Ea) IN of Hg
-    EsMiEa = (6413252.0# * System.Math.Exp(-7482.6 / (AirTmp + 398.36))) - (6413252.0# * System.Math.Exp(-7482.6 / (DewTmp + 398.36)))
+    lEsMiEa = (6413252.0# * System.Math.Exp(-7482.6 / (lAirTmp + 398.36))) - (6413252.0# * Math.Exp(-7482.6 / (aDewTmp + 398.36)))
 
     'pan evaporation assuming air temp equals water surface temp.
 
     'when vapor pressure deficit turns negative it is set equal to zero
-    If EsMiEa < 0.0# Then
-      EsMiEa = 0.0#
+    If lEsMiEa < 0.0# Then
+      lEsMiEa = 0.0#
     End If
 
     'pan evap * GAMMA, GAMMA = 0.0105 inch Hg/F
-    EaGama = 0.0105 * (EsMiEa ^ 0.88) * (0.37 + 0.0041 * WindSp)
+    lEaGama = 0.0105 * (lEsMiEa ^ 0.88) * (0.37 + 0.0041 * aWindSp)
 
     'Delta = slope of saturation vapor pressure curve at air temperature
-    Delta = 47987800000.0# * System.Math.Exp(-7482.6 / (AirTmp + 398.36)) / ((AirTmp + 398.36) ^ 2)
+    lDelta = 47987800000.0# * Math.Exp(-7482.6 / (lAirTmp + 398.36)) / ((lAirTmp + 398.36) ^ 2)
 
     'pan evaporation rate in inches per day
-    PanEvp = (QNDelt + EaGama) / (Delta + 0.0105)
+    aPanEvp = (lQNDelt + lEaGama) / (lDelta + 0.0105)
 
     'when the estimated pan evaporation is negative
     'the value is set to zero
-    If PanEvp < 0.0# Then
-      PanEvp = 0.0#
+    If aPanEvp < 0.0# Then
+      aPanEvp = 0.0#
     End If
 
   End Sub

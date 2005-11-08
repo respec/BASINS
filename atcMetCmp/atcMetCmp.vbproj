@@ -146,6 +146,16 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "frmCmpPenman.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmCmpPenman.resx"
+                    DependentUpon = "frmCmpPenman.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "frmCmpSol.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
@@ -153,6 +163,36 @@
                 <File
                     RelPath = "frmCmpSol.resx"
                     DependentUpon = "frmCmpSol.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "frmDisSol.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmDisSol.resx"
+                    DependentUpon = "frmDisSol.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "frmDisTemp.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmDisTemp.resx"
+                    DependentUpon = "frmDisTemp.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "frmDisWind.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmDisWind.resx"
+                    DependentUpon = "frmDisWind.vb"
                     BuildAction = "EmbeddedResource"
                 />
                 <File
