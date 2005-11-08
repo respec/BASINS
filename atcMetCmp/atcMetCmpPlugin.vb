@@ -78,10 +78,10 @@ Public Class atcMetCmpPlugin
           lSRadTSer = aArgs.GetValue("SRAD")
           lDegF = aArgs.GetValue("Degrees F")
           lCTX = aArgs.GetValue("Constant Coefficient")
-          lCTS = aArgs.GetValue("Monthly Coefficients")
+          lCTS = aArgs.GetValue("Jensen Monthly Coefficients")
           lOk = True
         End If
-        lAttDef = atcDataAttributes.GetDefinition("Monthly Coefficients")
+        lAttDef = atcDataAttributes.GetDefinition("Jensen Monthly Coefficients")
         For i As Integer = 1 To 12
           If lCTS(i) > lAttDef.Max Or lCTS(i) < lAttDef.Min Then
             lOk = False
@@ -103,10 +103,10 @@ Public Class atcMetCmpPlugin
           lTMaxTSer = aArgs.GetValue("TMAX")
           lDegF = aArgs.GetValue("Degrees F")
           lLatitude = aArgs.GetValue("Latitude")
-          lCTS = aArgs.GetValue("Monthly Coefficients")
+          lCTS = aArgs.GetValue("Hamon Monthly Coefficients")
           lOk = True
         End If
-        lAttDef = atcDataAttributes.GetDefinition("Monthly Coefficients")
+        lAttDef = atcDataAttributes.GetDefinition("Hamon Monthly Coefficients")
         For i As Integer = 1 To 12
           If lCTS(i) > lAttDef.Max Or lCTS(i) < lAttDef.Min Then
             lOk = False
@@ -306,7 +306,7 @@ Public Class atcMetCmpPlugin
 
         Dim defHMonCoeff As New atcAttributeDefinition
         With defHMonCoeff
-          .Name = "Monthly Coefficients"
+          .Name = "Hamon Monthly Coefficients"
           .Description = "Coefficients for Hamon PET computation"
           .DefaultValue = New Double() {0, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055, 0.0055}
           .Max = 1
@@ -336,7 +336,7 @@ Public Class atcMetCmpPlugin
 
         Dim defJMonCoeff As New atcAttributeDefinition
         With defJMonCoeff
-          .Name = "Monthly Coefficients"
+          .Name = "Jensen Monthly Coefficients"
           .Description = "Coefficients for Jensen PET computation"
           .DefaultValue = New Double() {0, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012, 0.012}
           .Max = 1

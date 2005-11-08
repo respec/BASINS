@@ -1,0 +1,479 @@
+Imports atcData
+
+Public Class frmDisWind
+  Inherits System.Windows.Forms.Form
+
+  Private pOk As Boolean
+  Private pWindTS As atcTimeseries
+  Private pDataManager As atcDataManager
+
+#Region " Windows Form Designer generated code "
+
+  Public Sub New()
+    MyBase.New()
+
+    'This call is required by the Windows Form Designer.
+    InitializeComponent()
+
+    'Add any initialization after the InitializeComponent() call
+
+  End Sub
+
+  'Form overrides dispose to clean up the component list.
+  Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+    If disposing Then
+      If Not (components Is Nothing) Then
+        components.Dispose()
+      End If
+    End If
+    MyBase.Dispose(disposing)
+  End Sub
+
+  'Required by the Windows Form Designer
+  Private components As System.ComponentModel.IContainer
+
+  'NOTE: The following procedure is required by the Windows Form Designer
+  'It can be modified using the Windows Form Designer.  
+  'Do not modify it using the code editor.
+  Friend WithEvents panelBottom As System.Windows.Forms.Panel
+  Friend WithEvents btnCancel As System.Windows.Forms.Button
+  Friend WithEvents btnOk As System.Windows.Forms.Button
+  Friend WithEvents lblCloudCover As System.Windows.Forms.Label
+  Friend WithEvents btnWind As System.Windows.Forms.Button
+  Friend WithEvents txtWind As System.Windows.Forms.TextBox
+  Friend WithEvents lblWind As System.Windows.Forms.Label
+  Friend WithEvents lblHrDist As System.Windows.Forms.Label
+  Friend WithEvents txtHr1 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr2 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr3 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr4 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr5 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr6 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr7 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr8 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr9 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr10 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr11 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr12 As System.Windows.Forms.TextBox
+  Friend WithEvents lbl1To12 As System.Windows.Forms.Label
+  Friend WithEvents Label1 As System.Windows.Forms.Label
+  Friend WithEvents txtHr24 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr23 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr22 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr21 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr20 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr19 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr18 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr17 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr16 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr15 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr14 As System.Windows.Forms.TextBox
+  Friend WithEvents txtHr13 As System.Windows.Forms.TextBox
+  <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Me.lblCloudCover = New System.Windows.Forms.Label
+    Me.panelBottom = New System.Windows.Forms.Panel
+    Me.btnCancel = New System.Windows.Forms.Button
+    Me.btnOk = New System.Windows.Forms.Button
+    Me.btnWind = New System.Windows.Forms.Button
+    Me.txtWind = New System.Windows.Forms.TextBox
+    Me.lblWind = New System.Windows.Forms.Label
+    Me.lblHrDist = New System.Windows.Forms.Label
+    Me.txtHr1 = New System.Windows.Forms.TextBox
+    Me.txtHr2 = New System.Windows.Forms.TextBox
+    Me.txtHr3 = New System.Windows.Forms.TextBox
+    Me.txtHr4 = New System.Windows.Forms.TextBox
+    Me.txtHr5 = New System.Windows.Forms.TextBox
+    Me.txtHr6 = New System.Windows.Forms.TextBox
+    Me.txtHr7 = New System.Windows.Forms.TextBox
+    Me.txtHr8 = New System.Windows.Forms.TextBox
+    Me.txtHr9 = New System.Windows.Forms.TextBox
+    Me.txtHr10 = New System.Windows.Forms.TextBox
+    Me.txtHr11 = New System.Windows.Forms.TextBox
+    Me.txtHr12 = New System.Windows.Forms.TextBox
+    Me.lbl1To12 = New System.Windows.Forms.Label
+    Me.Label1 = New System.Windows.Forms.Label
+    Me.txtHr24 = New System.Windows.Forms.TextBox
+    Me.txtHr23 = New System.Windows.Forms.TextBox
+    Me.txtHr22 = New System.Windows.Forms.TextBox
+    Me.txtHr21 = New System.Windows.Forms.TextBox
+    Me.txtHr20 = New System.Windows.Forms.TextBox
+    Me.txtHr19 = New System.Windows.Forms.TextBox
+    Me.txtHr18 = New System.Windows.Forms.TextBox
+    Me.txtHr17 = New System.Windows.Forms.TextBox
+    Me.txtHr16 = New System.Windows.Forms.TextBox
+    Me.txtHr15 = New System.Windows.Forms.TextBox
+    Me.txtHr14 = New System.Windows.Forms.TextBox
+    Me.txtHr13 = New System.Windows.Forms.TextBox
+    Me.panelBottom.SuspendLayout()
+    Me.SuspendLayout()
+    '
+    'lblCloudCover
+    '
+    Me.lblCloudCover.Location = New System.Drawing.Point(16, 16)
+    Me.lblCloudCover.Name = "lblCloudCover"
+    Me.lblCloudCover.Size = New System.Drawing.Size(168, 16)
+    Me.lblCloudCover.TabIndex = 2
+    Me.lblCloudCover.Text = "Specify Daily Wind Timeseries"
+    '
+    'panelBottom
+    '
+    Me.panelBottom.Controls.Add(Me.btnCancel)
+    Me.panelBottom.Controls.Add(Me.btnOk)
+    Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
+    Me.panelBottom.Location = New System.Drawing.Point(0, 165)
+    Me.panelBottom.Name = "panelBottom"
+    Me.panelBottom.Size = New System.Drawing.Size(520, 32)
+    Me.panelBottom.TabIndex = 16
+    '
+    'btnCancel
+    '
+    Me.btnCancel.Location = New System.Drawing.Point(240, 0)
+    Me.btnCancel.Name = "btnCancel"
+    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+    Me.btnCancel.TabIndex = 1
+    Me.btnCancel.Text = "Cancel"
+    '
+    'btnOk
+    '
+    Me.btnOk.Location = New System.Drawing.Point(152, 0)
+    Me.btnOk.Name = "btnOk"
+    Me.btnOk.Size = New System.Drawing.Size(64, 24)
+    Me.btnOk.TabIndex = 0
+    Me.btnOk.Text = "Ok"
+    '
+    'btnWind
+    '
+    Me.btnWind.Location = New System.Drawing.Point(72, 40)
+    Me.btnWind.Name = "btnWind"
+    Me.btnWind.Size = New System.Drawing.Size(48, 24)
+    Me.btnWind.TabIndex = 18
+    Me.btnWind.Text = "Select"
+    '
+    'txtWind
+    '
+    Me.txtWind.Location = New System.Drawing.Point(128, 40)
+    Me.txtWind.Name = "txtWind"
+    Me.txtWind.ReadOnly = True
+    Me.txtWind.Size = New System.Drawing.Size(384, 20)
+    Me.txtWind.TabIndex = 19
+    Me.txtWind.Text = ""
+    '
+    'lblWind
+    '
+    Me.lblWind.Location = New System.Drawing.Point(16, 40)
+    Me.lblWind.Name = "lblWind"
+    Me.lblWind.Size = New System.Drawing.Size(40, 16)
+    Me.lblWind.TabIndex = 20
+    Me.lblWind.Text = "Wind:"
+    '
+    'lblHrDist
+    '
+    Me.lblHrDist.Location = New System.Drawing.Point(8, 80)
+    Me.lblHrDist.Name = "lblHrDist"
+    Me.lblHrDist.Size = New System.Drawing.Size(160, 16)
+    Me.lblHrDist.TabIndex = 26
+    Me.lblHrDist.Text = "Specify Hourly Distribution"
+    '
+    'txtHr1
+    '
+    Me.txtHr1.Location = New System.Drawing.Point(40, 104)
+    Me.txtHr1.Name = "txtHr1"
+    Me.txtHr1.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr1.TabIndex = 39
+    Me.txtHr1.Text = "0.034"
+    '
+    'txtHr2
+    '
+    Me.txtHr2.Location = New System.Drawing.Point(80, 104)
+    Me.txtHr2.Name = "txtHr2"
+    Me.txtHr2.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr2.TabIndex = 40
+    Me.txtHr2.Text = "0.034"
+    '
+    'txtHr3
+    '
+    Me.txtHr3.Location = New System.Drawing.Point(120, 104)
+    Me.txtHr3.Name = "txtHr3"
+    Me.txtHr3.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr3.TabIndex = 41
+    Me.txtHr3.Text = "0.034"
+    '
+    'txtHr4
+    '
+    Me.txtHr4.Location = New System.Drawing.Point(160, 104)
+    Me.txtHr4.Name = "txtHr4"
+    Me.txtHr4.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr4.TabIndex = 42
+    Me.txtHr4.Text = "0.034"
+    '
+    'txtHr5
+    '
+    Me.txtHr5.Location = New System.Drawing.Point(200, 104)
+    Me.txtHr5.Name = "txtHr5"
+    Me.txtHr5.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr5.TabIndex = 43
+    Me.txtHr5.Text = "0.034"
+    '
+    'txtHr6
+    '
+    Me.txtHr6.Location = New System.Drawing.Point(240, 104)
+    Me.txtHr6.Name = "txtHr6"
+    Me.txtHr6.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr6.TabIndex = 44
+    Me.txtHr6.Text = "0.034"
+    '
+    'txtHr7
+    '
+    Me.txtHr7.Location = New System.Drawing.Point(280, 104)
+    Me.txtHr7.Name = "txtHr7"
+    Me.txtHr7.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr7.TabIndex = 45
+    Me.txtHr7.Text = "0.034"
+    '
+    'txtHr8
+    '
+    Me.txtHr8.Location = New System.Drawing.Point(320, 104)
+    Me.txtHr8.Name = "txtHr8"
+    Me.txtHr8.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr8.TabIndex = 46
+    Me.txtHr8.Text = "0.035"
+    '
+    'txtHr9
+    '
+    Me.txtHr9.Location = New System.Drawing.Point(360, 104)
+    Me.txtHr9.Name = "txtHr9"
+    Me.txtHr9.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr9.TabIndex = 47
+    Me.txtHr9.Text = "0.037"
+    '
+    'txtHr10
+    '
+    Me.txtHr10.Location = New System.Drawing.Point(400, 104)
+    Me.txtHr10.Name = "txtHr10"
+    Me.txtHr10.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr10.TabIndex = 48
+    Me.txtHr10.Text = "0.041"
+    '
+    'txtHr11
+    '
+    Me.txtHr11.Location = New System.Drawing.Point(440, 104)
+    Me.txtHr11.Name = "txtHr11"
+    Me.txtHr11.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr11.TabIndex = 49
+    Me.txtHr11.Text = "0.046"
+    '
+    'txtHr12
+    '
+    Me.txtHr12.Location = New System.Drawing.Point(480, 104)
+    Me.txtHr12.Name = "txtHr12"
+    Me.txtHr12.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr12.TabIndex = 50
+    Me.txtHr12.Text = "0.05"
+    '
+    'lbl1To12
+    '
+    Me.lbl1To12.Location = New System.Drawing.Point(8, 104)
+    Me.lbl1To12.Name = "lbl1To12"
+    Me.lbl1To12.Size = New System.Drawing.Size(32, 16)
+    Me.lbl1To12.TabIndex = 51
+    Me.lbl1To12.Text = "1-12:"
+    '
+    'Label1
+    '
+    Me.Label1.Location = New System.Drawing.Point(8, 128)
+    Me.Label1.Name = "Label1"
+    Me.Label1.Size = New System.Drawing.Size(40, 16)
+    Me.Label1.TabIndex = 52
+    Me.Label1.Text = "12-24:"
+    '
+    'txtHr24
+    '
+    Me.txtHr24.Location = New System.Drawing.Point(480, 128)
+    Me.txtHr24.Name = "txtHr24"
+    Me.txtHr24.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr24.TabIndex = 64
+    Me.txtHr24.Text = "0.034"
+    '
+    'txtHr23
+    '
+    Me.txtHr23.Location = New System.Drawing.Point(440, 128)
+    Me.txtHr23.Name = "txtHr23"
+    Me.txtHr23.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr23.TabIndex = 63
+    Me.txtHr23.Text = "0.035"
+    '
+    'txtHr22
+    '
+    Me.txtHr22.Location = New System.Drawing.Point(400, 128)
+    Me.txtHr22.Name = "txtHr22"
+    Me.txtHr22.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr22.TabIndex = 62
+    Me.txtHr22.Text = "0.035"
+    '
+    'txtHr21
+    '
+    Me.txtHr21.Location = New System.Drawing.Point(360, 128)
+    Me.txtHr21.Name = "txtHr21"
+    Me.txtHr21.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr21.TabIndex = 61
+    Me.txtHr21.Text = "0.038"
+    '
+    'txtHr20
+    '
+    Me.txtHr20.Location = New System.Drawing.Point(320, 128)
+    Me.txtHr20.Name = "txtHr20"
+    Me.txtHr20.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr20.TabIndex = 60
+    Me.txtHr20.Text = "0.04"
+    '
+    'txtHr19
+    '
+    Me.txtHr19.Location = New System.Drawing.Point(280, 128)
+    Me.txtHr19.Name = "txtHr19"
+    Me.txtHr19.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr19.TabIndex = 59
+    Me.txtHr19.Text = "0.043"
+    '
+    'txtHr18
+    '
+    Me.txtHr18.Location = New System.Drawing.Point(240, 128)
+    Me.txtHr18.Name = "txtHr18"
+    Me.txtHr18.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr18.TabIndex = 58
+    Me.txtHr18.Text = "0.05"
+    '
+    'txtHr17
+    '
+    Me.txtHr17.Location = New System.Drawing.Point(200, 128)
+    Me.txtHr17.Name = "txtHr17"
+    Me.txtHr17.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr17.TabIndex = 57
+    Me.txtHr17.Text = "0.056"
+    '
+    'txtHr16
+    '
+    Me.txtHr16.Location = New System.Drawing.Point(160, 128)
+    Me.txtHr16.Name = "txtHr16"
+    Me.txtHr16.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr16.TabIndex = 56
+    Me.txtHr16.Text = "0.057"
+    '
+    'txtHr15
+    '
+    Me.txtHr15.Location = New System.Drawing.Point(120, 128)
+    Me.txtHr15.Name = "txtHr15"
+    Me.txtHr15.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr15.TabIndex = 55
+    Me.txtHr15.Text = "0.058"
+    '
+    'txtHr14
+    '
+    Me.txtHr14.Location = New System.Drawing.Point(80, 128)
+    Me.txtHr14.Name = "txtHr14"
+    Me.txtHr14.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr14.TabIndex = 54
+    Me.txtHr14.Text = "0.054"
+    '
+    'txtHr13
+    '
+    Me.txtHr13.Location = New System.Drawing.Point(40, 128)
+    Me.txtHr13.Name = "txtHr13"
+    Me.txtHr13.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr13.TabIndex = 53
+    Me.txtHr13.Text = "0.053"
+    '
+    'frmDisWind
+    '
+    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+    Me.ClientSize = New System.Drawing.Size(520, 197)
+    Me.Controls.Add(Me.txtHr24)
+    Me.Controls.Add(Me.txtHr23)
+    Me.Controls.Add(Me.txtHr22)
+    Me.Controls.Add(Me.txtHr21)
+    Me.Controls.Add(Me.txtHr20)
+    Me.Controls.Add(Me.txtHr19)
+    Me.Controls.Add(Me.txtHr18)
+    Me.Controls.Add(Me.txtHr17)
+    Me.Controls.Add(Me.txtHr16)
+    Me.Controls.Add(Me.txtHr15)
+    Me.Controls.Add(Me.txtHr14)
+    Me.Controls.Add(Me.txtHr13)
+    Me.Controls.Add(Me.Label1)
+    Me.Controls.Add(Me.lbl1To12)
+    Me.Controls.Add(Me.txtHr12)
+    Me.Controls.Add(Me.txtHr11)
+    Me.Controls.Add(Me.txtHr10)
+    Me.Controls.Add(Me.txtHr9)
+    Me.Controls.Add(Me.txtHr8)
+    Me.Controls.Add(Me.txtHr7)
+    Me.Controls.Add(Me.txtHr6)
+    Me.Controls.Add(Me.txtHr5)
+    Me.Controls.Add(Me.txtHr4)
+    Me.Controls.Add(Me.txtHr3)
+    Me.Controls.Add(Me.txtHr2)
+    Me.Controls.Add(Me.txtHr1)
+    Me.Controls.Add(Me.lblHrDist)
+    Me.Controls.Add(Me.lblWind)
+    Me.Controls.Add(Me.txtWind)
+    Me.Controls.Add(Me.btnWind)
+    Me.Controls.Add(Me.panelBottom)
+    Me.Controls.Add(Me.lblCloudCover)
+    Me.Name = "frmDisWind"
+    Me.Text = "Specify Wind Disaggregation Inputs"
+    Me.panelBottom.ResumeLayout(False)
+    Me.ResumeLayout(False)
+
+  End Sub
+
+#End Region
+  Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aWindTS As atcTimeseries, ByRef aHrDist() As Double) As Boolean
+    pDataManager = aDataManager
+    Me.ShowDialog()
+    If pOk Then
+      aWindTS = pWindTS
+      aHrDist(1) = CDbl(txtHr1.Text)
+      aHrDist(2) = CDbl(txtHr2.Text)
+      aHrDist(3) = CDbl(txtHr3.Text)
+      aHrDist(4) = CDbl(txtHr4.Text)
+      aHrDist(5) = CDbl(txtHr5.Text)
+      aHrDist(6) = CDbl(txtHr6.Text)
+      aHrDist(7) = CDbl(txtHr7.Text)
+      aHrDist(8) = CDbl(txtHr8.Text)
+      aHrDist(9) = CDbl(txtHr9.Text)
+      aHrDist(10) = CDbl(txtHr10.Text)
+      aHrDist(11) = CDbl(txtHr11.Text)
+      aHrDist(12) = CDbl(txtHr12.Text)
+      aHrDist(13) = CDbl(txtHr13.Text)
+      aHrDist(14) = CDbl(txtHr14.Text)
+      aHrDist(15) = CDbl(txtHr15.Text)
+      aHrDist(16) = CDbl(txtHr16.Text)
+      aHrDist(17) = CDbl(txtHr17.Text)
+      aHrDist(18) = CDbl(txtHr18.Text)
+      aHrDist(19) = CDbl(txtHr19.Text)
+      aHrDist(20) = CDbl(txtHr20.Text)
+      aHrDist(21) = CDbl(txtHr21.Text)
+      aHrDist(22) = CDbl(txtHr22.Text)
+      aHrDist(23) = CDbl(txtHr23.Text)
+      aHrDist(24) = CDbl(txtHr24.Text)
+    End If
+    Return pOk
+  End Function
+
+  Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
+    pOk = True
+    Close()
+  End Sub
+
+  Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+    Close()
+  End Sub
+
+  Private Sub btnWind_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWind.Click
+    Dim lTSGroup As atcDataGroup = pDataManager.UserSelectData("Select data for Daily Min Temperature")
+    If lTSGroup.Count > 0 Then
+      pWindTS = lTSGroup(0)
+      txtWind.Text = pWindTS.ToString
+    End If
+  End Sub
+
+End Class
