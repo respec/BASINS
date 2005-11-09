@@ -1,3 +1,4 @@
+''' <summary>Base class for data sources</summary>
 Public Class atcDataSource
   Inherits atcDataPlugin
 
@@ -22,14 +23,19 @@ Public Class atcDataSource
     End Get
   End Property
 
-  ''' <summary>atcAttributeDefinitions representing operations supported by ComputeTimeseries</summary
+  ''' <summary>
+  '''     <see cref="atcData~atcData.atcDataAttributes">atcDataAttributes</see>
+  '''     representing operations supported by ComputeTimeseries
+  ''' </summary>
+  ''' <remarks>defaults to an empty list (nothing available)</remarks>
   Public Overridable ReadOnly Property AvailableOperations() As atcDataAttributes
     Get
-      Return New atcDataAttributes 'default to an empty list with nothing available
+      Return New atcDataAttributes
     End Get
   End Property
 
-  ''' <summary>The atcDataSet objects in this file</summary>
+  ''' <summary>atcDataSet objects currently in this source</summary>
+  ''' <value>atcDataGroup</value>
   Public Overridable ReadOnly Property DataSets() As atcDataGroup
     Get
       Return pData
@@ -50,33 +56,46 @@ Public Class atcDataSource
     End Get
   End Property
 
-  ''' <summary>Opens file or database and reads enough to determine whether it is correct type. Returns True if successfully opened.</summary>
-  ''' aSpecification = file name, connect string, or other string needed to open
-  ''' <param name="aAttributes">
-  '''     <para>additional information which may be used for opening and will be saved as Attributes</para>
+  ''' <summary>
+  ''' Opens file or database and reads enough to determine whether it is correct
+  ''' type.
+  ''' </summary>
+  ''' <param name="aSpecification"> 
+  '''     file name, connect string, or other string needed to open
   ''' </param>   
-  Public Overridable Function Open(ByVal aSpecification As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+  ''' <param name="aAttributes">
+  '''     additional information which may be used for opening and will be saved as Attributes
+  ''' </param>   
+  ''' <returns>Boolean - True if successfully opened.</returns>
+  Public Overridable Function Open(ByVal aSpecification As String, _
+                          Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
     Throw New Exception("Open must be overridden to be used, atcDataSource does not implement.")
   End Function
 
   'Read all the data into an atcDataSet (which must be from this file)
   'Called only from within atcData.EnsureValuesRead.
+  ''' <summary>Read all the data into an atcDataSet (which must be from this 
+  ''' file).</summary>
+  ''' <remarks>Called only from within atcData.EnsureValuesRead.</remarks>
   Public Overridable Sub ReadData(ByVal aData As atcDataSet)
-    Err.Raise(0, Me, "ReadData must be overridden to be used, atcDataSource does not implement.")
+    Throw New Exception("ReadData must be overridden to be used, atcDataSource does not implement.")
   End Sub
 
-  'Save all current data to a new file
-  'Or save recently updated data to current file if SaveFileName = Me.FileName
-  'Returns True if successful
-  Public Overridable Function Save(ByVal SaveFileName As String, _
-         Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
-    Err.Raise(0, Me, "Save must be overridden to be used, atcDataSource does not implement.")
+  ''' <summary>Save all current data to a new file or save recently updated data to current file if SaveFileName = Me.FileName</summary>
+  ''' <returns>Boolean - True if successful</returns>
+  ''' <param name="aSaveFileName">Name of file to save data into</param>
+  ''' <param name="aExistAction">Action to take if data already present in file</param>
+  ''' <remarks>Save must be overridden to be used, atcDataSource does not implement.</remarks>
+  Public Overridable Function Save(ByVal aSaveFileName As String, _
+                          Optional ByRef aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+    Throw New Exception("Save must be overridden to be used, atcDataSource does not implement.")
   End Function
 
-  'Name of file we are reading and/or writing, including full path
-  'Or connection string for database
-  'Or which computation is being performed
-  'Should only be set by inheriting class, only during Open or Save
+  ''' <summary>
+  ''' Name of file we are reading and/or writing, including full path or connection
+  ''' string for database or which computation is being performed
+  ''' </summary>
+  ''' <remarks>Should only be set by inheriting class, only during Open or Save</remarks>
   Public Overridable Property Specification() As String
     Get
       Return pSpecification
@@ -86,16 +105,22 @@ Public Class atcDataSource
     End Set
   End Property
 
-  Public Overridable Function AddDataSet(ByRef t As atcDataSet, _
-         Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
-    If pData.Contains(t) Then
+  ''' <returns>Boolean - True if dataset added, False otherwise</returns>
+  ''' <param name="aDs">dataset to add to data source</param>
+  ''' <param name="aExistAction">action to take if dataset already exists in data 
+  ''' source</param>
+  ''' <summary>Add a dataset to this data source</summary>
+  Public Overridable Function AddDataSet(ByRef aDs As atcDataSet, _
+                        Optional ByRef aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+    If pData.Contains(aDs) Then
       Return False 'can't add, already have it
     Else
-      pData.Add(t)
+      pData.Add(aDs)
       Return True
     End If
   End Function
 
+  ''' <summary>Data manager object</summary>
   Public Property DataManager() As atcDataManager
     Get
       Return pDataManager
@@ -105,6 +130,7 @@ Public Class atcDataSource
     End Set
   End Property
 
+  ''' <summary>Create a new data source</summary>
   Public Sub New()
     pData = New atcDataGroup
   End Sub
