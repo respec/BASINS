@@ -27,7 +27,9 @@ Public Class atcDataTreeForm
 
       Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
       For Each ldisp As atcDataDisplay In DisplayPlugins
-        mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+        Dim lMenuText As String = ldisp.Name
+        If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
+        mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
       Next
     Else 'user declined to specify Data
       Me.Close()
@@ -327,18 +329,7 @@ Public Class atcDataTreeForm
   End Function
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcDataDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-
-    For Each ldisp As atcDataDisplay In DisplayPlugins
-      If ldisp.Name = sender.Text Then
-        Dim typ As System.Type = ldisp.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pDataGroup)
-        Exit Sub
-      End If
-    Next
+    pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click

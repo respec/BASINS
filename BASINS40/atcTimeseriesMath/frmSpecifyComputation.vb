@@ -187,7 +187,7 @@ Public Class frmSpecifyComputation
             .Top = pArgLabel(iArg).Top
             .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + PADDING
             .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - PADDING * 2
-            .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left
+            .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Top
 
             .Tag = iArg
             .Text = ""
@@ -223,7 +223,7 @@ Public Class frmSpecifyComputation
 
             .Tag = iArg
             .Text = "Select"
-            .Anchor = Windows.Forms.AnchorStyles.Right
+            .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Top
 
             Select Case aDefVal.Definition.TypeString
               Case "atcDataGroup" : .Visible = True

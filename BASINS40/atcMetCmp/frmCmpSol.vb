@@ -44,6 +44,7 @@ Public Class frmCmpSol
   Friend WithEvents btnCloudCover As System.Windows.Forms.Button
   Friend WithEvents txtCloudCover As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCmpSol))
     Me.lblCloudCover = New System.Windows.Forms.Label
     Me.lblLatitude = New System.Windows.Forms.Label
     Me.txtLatitude = New System.Windows.Forms.TextBox
@@ -132,6 +133,7 @@ Public Class frmCmpSol
     Me.Controls.Add(Me.txtLatitude)
     Me.Controls.Add(Me.lblLatitude)
     Me.Controls.Add(Me.lblCloudCover)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmCmpSol"
     Me.Text = "Specify Solar Radiation Inputs"
     Me.panelBottom.ResumeLayout(False)

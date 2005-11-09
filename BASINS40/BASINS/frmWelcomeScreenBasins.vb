@@ -22,6 +22,7 @@
 Imports System.Windows.Forms.SendKeys
 Imports MapWindow.Interfaces
 Imports System.Windows.Forms
+Imports atcUtility
 
 Public Class frmWelcomeScreenBasins
   Inherits System.Windows.Forms.Form
@@ -58,8 +59,6 @@ Public Class frmWelcomeScreenBasins
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
   Friend WithEvents lbOpenProject As System.Windows.Forms.LinkLabel
-  Friend WithEvents PictureBox2 As System.Windows.Forms.PictureBox
-  Friend WithEvents PictureBox3 As System.Windows.Forms.PictureBox
   Friend WithEvents btnClose As System.Windows.Forms.Button
   Friend WithEvents cbShowDlg As System.Windows.Forms.CheckBox
   Friend WithEvents lbProject1 As System.Windows.Forms.LinkLabel
@@ -74,8 +73,6 @@ Public Class frmWelcomeScreenBasins
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmWelcomeScreenBasins))
     Me.lbBuildNew = New System.Windows.Forms.LinkLabel
     Me.lbOpenProject = New System.Windows.Forms.LinkLabel
-    Me.PictureBox2 = New System.Windows.Forms.PictureBox
-    Me.PictureBox3 = New System.Windows.Forms.PictureBox
     Me.cbShowDlg = New System.Windows.Forms.CheckBox
     Me.btnClose = New System.Windows.Forms.Button
     Me.lbProject1 = New System.Windows.Forms.LinkLabel
@@ -134,48 +131,6 @@ Public Class frmWelcomeScreenBasins
     Me.lbOpenProject.Text = resources.GetString("lbOpenProject.Text")
     Me.lbOpenProject.TextAlign = CType(resources.GetObject("lbOpenProject.TextAlign"), System.Drawing.ContentAlignment)
     Me.lbOpenProject.Visible = CType(resources.GetObject("lbOpenProject.Visible"), Boolean)
-    '
-    'PictureBox2
-    '
-    Me.PictureBox2.AccessibleDescription = resources.GetString("PictureBox2.AccessibleDescription")
-    Me.PictureBox2.AccessibleName = resources.GetString("PictureBox2.AccessibleName")
-    Me.PictureBox2.Anchor = CType(resources.GetObject("PictureBox2.Anchor"), System.Windows.Forms.AnchorStyles)
-    Me.PictureBox2.BackgroundImage = CType(resources.GetObject("PictureBox2.BackgroundImage"), System.Drawing.Image)
-    Me.PictureBox2.Dock = CType(resources.GetObject("PictureBox2.Dock"), System.Windows.Forms.DockStyle)
-    Me.PictureBox2.Enabled = CType(resources.GetObject("PictureBox2.Enabled"), Boolean)
-    Me.PictureBox2.Font = CType(resources.GetObject("PictureBox2.Font"), System.Drawing.Font)
-    Me.PictureBox2.Image = CType(resources.GetObject("PictureBox2.Image"), System.Drawing.Image)
-    Me.PictureBox2.ImeMode = CType(resources.GetObject("PictureBox2.ImeMode"), System.Windows.Forms.ImeMode)
-    Me.PictureBox2.Location = CType(resources.GetObject("PictureBox2.Location"), System.Drawing.Point)
-    Me.PictureBox2.Name = "PictureBox2"
-    Me.PictureBox2.RightToLeft = CType(resources.GetObject("PictureBox2.RightToLeft"), System.Windows.Forms.RightToLeft)
-    Me.PictureBox2.Size = CType(resources.GetObject("PictureBox2.Size"), System.Drawing.Size)
-    Me.PictureBox2.SizeMode = CType(resources.GetObject("PictureBox2.SizeMode"), System.Windows.Forms.PictureBoxSizeMode)
-    Me.PictureBox2.TabIndex = CType(resources.GetObject("PictureBox2.TabIndex"), Integer)
-    Me.PictureBox2.TabStop = False
-    Me.PictureBox2.Text = resources.GetString("PictureBox2.Text")
-    Me.PictureBox2.Visible = CType(resources.GetObject("PictureBox2.Visible"), Boolean)
-    '
-    'PictureBox3
-    '
-    Me.PictureBox3.AccessibleDescription = resources.GetString("PictureBox3.AccessibleDescription")
-    Me.PictureBox3.AccessibleName = resources.GetString("PictureBox3.AccessibleName")
-    Me.PictureBox3.Anchor = CType(resources.GetObject("PictureBox3.Anchor"), System.Windows.Forms.AnchorStyles)
-    Me.PictureBox3.BackgroundImage = CType(resources.GetObject("PictureBox3.BackgroundImage"), System.Drawing.Image)
-    Me.PictureBox3.Dock = CType(resources.GetObject("PictureBox3.Dock"), System.Windows.Forms.DockStyle)
-    Me.PictureBox3.Enabled = CType(resources.GetObject("PictureBox3.Enabled"), Boolean)
-    Me.PictureBox3.Font = CType(resources.GetObject("PictureBox3.Font"), System.Drawing.Font)
-    Me.PictureBox3.Image = CType(resources.GetObject("PictureBox3.Image"), System.Drawing.Image)
-    Me.PictureBox3.ImeMode = CType(resources.GetObject("PictureBox3.ImeMode"), System.Windows.Forms.ImeMode)
-    Me.PictureBox3.Location = CType(resources.GetObject("PictureBox3.Location"), System.Drawing.Point)
-    Me.PictureBox3.Name = "PictureBox3"
-    Me.PictureBox3.RightToLeft = CType(resources.GetObject("PictureBox3.RightToLeft"), System.Windows.Forms.RightToLeft)
-    Me.PictureBox3.Size = CType(resources.GetObject("PictureBox3.Size"), System.Drawing.Size)
-    Me.PictureBox3.SizeMode = CType(resources.GetObject("PictureBox3.SizeMode"), System.Windows.Forms.PictureBoxSizeMode)
-    Me.PictureBox3.TabIndex = CType(resources.GetObject("PictureBox3.TabIndex"), Integer)
-    Me.PictureBox3.TabStop = False
-    Me.PictureBox3.Text = resources.GetString("PictureBox3.Text")
-    Me.PictureBox3.Visible = CType(resources.GetObject("PictureBox3.Visible"), Boolean)
     '
     'cbShowDlg
     '
@@ -413,8 +368,6 @@ Public Class frmWelcomeScreenBasins
     Me.Controls.Add(Me.lbProject1)
     Me.Controls.Add(Me.btnClose)
     Me.Controls.Add(Me.cbShowDlg)
-    Me.Controls.Add(Me.PictureBox3)
-    Me.Controls.Add(Me.PictureBox2)
     Me.Controls.Add(Me.lbOpenProject)
     Me.Controls.Add(Me.lbBuildNew)
     Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
@@ -524,6 +477,7 @@ Public Class frmWelcomeScreenBasins
   End Sub
 
   Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbBasinsHelp.Click
-    System.Diagnostics.Process.Start(app.DefaultDir & "\Help\Basins4.chm")
+    Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", app.DefaultDir & "\docs\Basins4.chm")
+    If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
   End Sub
 End Class

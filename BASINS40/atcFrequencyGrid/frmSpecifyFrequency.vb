@@ -52,11 +52,14 @@ Public Class frmSpecifyFrequency
   Friend WithEvents btnRecurrenceAdd As System.Windows.Forms.Button
   Friend WithEvents txtRecurrenceAdd As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSpecifyFrequency))
     Me.panelTop = New System.Windows.Forms.Panel
     Me.grpRecurrence = New System.Windows.Forms.GroupBox
+    Me.lstRecurrence = New System.Windows.Forms.ListBox
+    Me.btnRecurrenceAdd = New System.Windows.Forms.Button
+    Me.txtRecurrenceAdd = New System.Windows.Forms.TextBox
     Me.btnRecurrenceNone = New System.Windows.Forms.Button
     Me.btnRecurrenceAll = New System.Windows.Forms.Button
-    Me.lstRecurrence = New System.Windows.Forms.ListBox
     Me.Splitter1 = New System.Windows.Forms.Splitter
     Me.grpNday = New System.Windows.Forms.GroupBox
     Me.btnNdayAdd = New System.Windows.Forms.Button
@@ -68,8 +71,6 @@ Public Class frmSpecifyFrequency
     Me.btnOkHigh = New System.Windows.Forms.Button
     Me.btnCancel = New System.Windows.Forms.Button
     Me.btnOkLow = New System.Windows.Forms.Button
-    Me.btnRecurrenceAdd = New System.Windows.Forms.Button
-    Me.txtRecurrenceAdd = New System.Windows.Forms.TextBox
     Me.panelTop.SuspendLayout()
     Me.grpRecurrence.SuspendLayout()
     Me.grpNday.SuspendLayout()
@@ -104,6 +105,39 @@ Public Class frmSpecifyFrequency
     Me.grpRecurrence.TabStop = False
     Me.grpRecurrence.Text = "Recurrence Interval"
     '
+    'lstRecurrence
+    '
+    Me.lstRecurrence.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lstRecurrence.IntegralHeight = False
+    Me.lstRecurrence.Location = New System.Drawing.Point(8, 16)
+    Me.lstRecurrence.Name = "lstRecurrence"
+    Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+    Me.lstRecurrence.Size = New System.Drawing.Size(184, 264)
+    Me.lstRecurrence.TabIndex = 7
+    '
+    'btnRecurrenceAdd
+    '
+    Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnRecurrenceAdd.Enabled = False
+    Me.btnRecurrenceAdd.Location = New System.Drawing.Point(128, 256)
+    Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
+    Me.btnRecurrenceAdd.Size = New System.Drawing.Size(64, 24)
+    Me.btnRecurrenceAdd.TabIndex = 14
+    Me.btnRecurrenceAdd.Text = "Add"
+    '
+    'txtRecurrenceAdd
+    '
+    Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtRecurrenceAdd.Enabled = False
+    Me.txtRecurrenceAdd.Location = New System.Drawing.Point(8, 256)
+    Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
+    Me.txtRecurrenceAdd.Size = New System.Drawing.Size(112, 20)
+    Me.txtRecurrenceAdd.TabIndex = 13
+    Me.txtRecurrenceAdd.Text = ""
+    '
     'btnRecurrenceNone
     '
     Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -121,18 +155,6 @@ Public Class frmSpecifyFrequency
     Me.btnRecurrenceAll.Size = New System.Drawing.Size(64, 24)
     Me.btnRecurrenceAll.TabIndex = 11
     Me.btnRecurrenceAll.Text = "All"
-    '
-    'lstRecurrence
-    '
-    Me.lstRecurrence.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lstRecurrence.IntegralHeight = False
-    Me.lstRecurrence.Location = New System.Drawing.Point(8, 16)
-    Me.lstRecurrence.Name = "lstRecurrence"
-    Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-    Me.lstRecurrence.Size = New System.Drawing.Size(184, 264)
-    Me.lstRecurrence.TabIndex = 7
     '
     'Splitter1
     '
@@ -241,33 +263,13 @@ Public Class frmSpecifyFrequency
     Me.btnOkLow.TabIndex = 0
     Me.btnOkLow.Text = "Compute Low"
     '
-    'btnRecurrenceAdd
-    '
-    Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnRecurrenceAdd.Enabled = False
-    Me.btnRecurrenceAdd.Location = New System.Drawing.Point(128, 256)
-    Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
-    Me.btnRecurrenceAdd.Size = New System.Drawing.Size(64, 24)
-    Me.btnRecurrenceAdd.TabIndex = 14
-    Me.btnRecurrenceAdd.Text = "Add"
-    '
-    'txtRecurrenceAdd
-    '
-    Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtRecurrenceAdd.Enabled = False
-    Me.txtRecurrenceAdd.Location = New System.Drawing.Point(8, 256)
-    Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
-    Me.txtRecurrenceAdd.Size = New System.Drawing.Size(112, 20)
-    Me.txtRecurrenceAdd.TabIndex = 13
-    Me.txtRecurrenceAdd.Text = ""
-    '
     'frmSpecifyFrequency
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(408, 373)
     Me.Controls.Add(Me.panelTop)
     Me.Controls.Add(Me.panelBottom)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmSpecifyFrequency"
     Me.Text = "Select Numbers of Days and Recurrence Intervals"
     Me.panelTop.ResumeLayout(False)

@@ -76,6 +76,7 @@ Public Class frmCmpHPET
   Friend WithEvents txtNov As System.Windows.Forms.TextBox
   Friend WithEvents txtDec As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCmpHPET))
     Me.lblCloudCover = New System.Windows.Forms.Label
     Me.lblLatitude = New System.Windows.Forms.Label
     Me.txtLatitude = New System.Windows.Forms.TextBox
@@ -477,6 +478,7 @@ Public Class frmCmpHPET
     Me.Controls.Add(Me.txtLatitude)
     Me.Controls.Add(Me.lblLatitude)
     Me.Controls.Add(Me.lblCloudCover)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmCmpHPET"
     Me.Text = "Specify Hamon PET Inputs"
     Me.panelBottom.ResumeLayout(False)

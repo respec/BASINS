@@ -22,8 +22,10 @@ Friend Class frmDisplaySWStats
     InitializeComponent() 'required by Windows Form Designer
 
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each ldisp As atcDataDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    For Each lDisp As atcDataDisplay In DisplayPlugins
+      Dim lMenuText As String = lDisp.Name
+      If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
+      mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some Data
@@ -222,17 +224,7 @@ Friend Class frmDisplaySWStats
   End Sub
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcDataDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each atf As atcDataDisplay In DisplayPlugins
-      If atf.Name = sender.Text Then
-        Dim typ As System.Type = atf.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pDataGroup)
-        Exit Sub
-      End If
-    Next
+    pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click

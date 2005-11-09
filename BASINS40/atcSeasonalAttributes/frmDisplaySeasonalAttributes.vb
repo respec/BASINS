@@ -23,7 +23,9 @@ Friend Class frmDisplaySeasonalAttributes
 
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
     For Each ldisp As atcDataDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+      Dim lMenuText As String = ldisp.Name
+      If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
+      mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some Data
@@ -67,6 +69,8 @@ Friend Class frmDisplaySeasonalAttributes
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSizeColumnsToContents As System.Windows.Forms.MenuItem
+  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySeasonalAttributes))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -79,8 +83,10 @@ Friend Class frmDisplaySeasonalAttributes
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonColumns = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonRows = New System.Windows.Forms.MenuItem
+    Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
+    Me.MenuItem1 = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -124,7 +130,7 @@ Friend Class frmDisplaySeasonalAttributes
     'mnuView
     '
     Me.mnuView.Index = 2
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewSeasonColumns, Me.mnuViewSeasonRows})
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewSeasonColumns, Me.mnuViewSeasonRows, Me.MenuItem1, Me.mnuSizeColumnsToContents})
     Me.mnuView.Text = "&View"
     '
     'mnuViewSeasonColumns
@@ -137,6 +143,11 @@ Friend Class frmDisplaySeasonalAttributes
     '
     Me.mnuViewSeasonRows.Index = 1
     Me.mnuViewSeasonRows.Text = "Season Rows"
+    '
+    'mnuSizeColumnsToContents
+    '
+    Me.mnuSizeColumnsToContents.Index = 3
+    Me.mnuSizeColumnsToContents.Text = "Size ColumnsTo Contents"
     '
     'mnuAnalysis
     '
@@ -154,6 +165,11 @@ Friend Class frmDisplaySeasonalAttributes
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
     Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
+    '
+    'MenuItem1
+    '
+    Me.MenuItem1.Index = 2
+    Me.MenuItem1.Text = "-"
     '
     'frmDisplaySeasonalAttributes
     '
@@ -192,17 +208,7 @@ Friend Class frmDisplaySeasonalAttributes
   End Sub
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcDataDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each atf As atcDataDisplay In DisplayPlugins
-      If atf.Name = sender.Text Then
-        Dim typ As System.Type = atf.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pDataGroup)
-        Exit Sub
-      End If
-    Next
+    pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
@@ -287,4 +293,8 @@ Friend Class frmDisplaySeasonalAttributes
     pSource = Nothing
   End Sub
 
+  Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
+    agdMain.SizeAllColumnsToContents()
+    agdMain.Refresh()
+  End Sub
 End Class

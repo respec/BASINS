@@ -47,6 +47,7 @@ Public Class atcGraphEdit
   Friend WithEvents txtProperty As System.Windows.Forms.TextBox
   Friend WithEvents lblProperty As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcGraphEdit))
     Me.treeProperties = New System.Windows.Forms.TreeView
     Me.grpEdit = New System.Windows.Forms.GroupBox
     Me.chkProperty = New System.Windows.Forms.CheckBox
@@ -141,6 +142,7 @@ Public Class atcGraphEdit
     Me.Controls.Add(Me.grpEdit)
     Me.Controls.Add(Me.Splitter1)
     Me.Controls.Add(Me.treeProperties)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "atcGraphEdit"
     Me.Text = "Edit Graph"
     Me.grpEdit.ResumeLayout(False)

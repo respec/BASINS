@@ -123,8 +123,12 @@ Friend Class frmManager
   Private Sub toolbarTop_ButtonClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.ToolBarButtonClickEventArgs) Handles toolbarTop.ButtonClick
     Select Case e.Button.Text
       Case "Open"
-        Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
-        pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+        Dim lCollection As New ArrayList
+        lCollection.Add("File")
+        Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lCollection)
+        If Not lNewSource Is Nothing Then
+          pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+        End If
       Case "Close"
         'Skip In Memory data source at index zero
         For iSource As Integer = pDataManager.DataSources.Count - 1 To 1 Step -1

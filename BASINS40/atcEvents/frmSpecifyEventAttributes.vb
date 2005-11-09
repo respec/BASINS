@@ -41,6 +41,7 @@ Public Class frmSpecifyEventAttributes
   Friend WithEvents btnOk As System.Windows.Forms.Button
   Friend WithEvents lblMinMax As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSpecifyEventAttributes))
     Me.rdoHigh = New System.Windows.Forms.RadioButton
     Me.rdoLow = New System.Windows.Forms.RadioButton
     Me.lblHighLow = New System.Windows.Forms.Label
@@ -139,6 +140,7 @@ Public Class frmSpecifyEventAttributes
     Me.Controls.Add(Me.lblHighLow)
     Me.Controls.Add(Me.rdoLow)
     Me.Controls.Add(Me.rdoHigh)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmSpecifyEventAttributes"
     Me.Text = "Specify Event Attributes"
     Me.panelBottom.ResumeLayout(False)

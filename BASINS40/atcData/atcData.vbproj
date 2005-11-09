@@ -207,6 +207,16 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "frmSelectDisplay.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmSelectDisplay.resx"
+                    DependentUpon = "frmSelectDisplay.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "modTimeseriesMath.vb"
                     SubType = "Code"
                     BuildAction = "Compile"

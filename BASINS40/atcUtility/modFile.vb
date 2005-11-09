@@ -440,7 +440,8 @@ NoSuchFile:
     Dim lFileName As String
     Dim lRegistryFileName As String
     Dim lFileNameFoundInRegistry As Boolean
-    Dim LookingForDir As Boolean
+    Dim lExePath As String
+    Dim lDLLpath As String
 
     If (Len(aDefaultExt)) = 0 Then 'try to get from default name
       aDefaultExt = FileExt(aDefaultFileName)
@@ -456,105 +457,136 @@ NoSuchFile:
     lDir = CurDir()
     lFileName = Trim(aDefaultFileName)
 
-    On Error Resume Next
+    'On Error Resume Next
 
     If Right(lFileName, 1) = "\" Then
-      LookingForDir = True
-      If Len(lFileName) = 1 Then lFileName = ""
-    End If
-
-    If Not FileExists(lFileName, True) Then 'don't already know where it is, first look in registry
-      'If Len(pRegistrySection) > 0 Then
-      'lRegistryFileName = GetSetting(pAppName, pRegistrySection, pRegistryKey, "")
-      'If Not FileExists(lRegistryFileName, True) Then
-      'lRegistryFileName = pRegistry.RegGetString(HKEY_LOCAL_MACHINE, pLocalMachinePrefix & pAppName & "\" & pRegistrySection, pRegistryKey)
-      'End If
-      'End If
-      If Len(lRegistryFileName) > 0 Then
-        If FileExists(lRegistryFileName, True) Then 'got from registry
-          lFileName = lRegistryFileName
-          lFileNameFoundInRegistry = True
-          If aChDir2FileDir Then
-            ChDriveDir(System.IO.Path.GetFileName(lRegistryFileName))
-          End If
-        Else 'bad name in registry, message to user needed?
-        End If
-      End If
-    End If
-
-    If Not FileExists(lFileName, True) Then 'try some default locations if filename was specified, but not path
-      If LookingForDir Then
-        baseFileName = System.IO.Path.GetFileName(Left(lFileName, Len(lFileName) - 1))
-      Else
-        baseFileName = System.IO.Path.GetFileName(lFileName)
-      End If
-      If Len(baseFileName) > 0 Then
-        lFileName = aDefaultFileName
-        If Not FileExists(lFileName, True) Then 'Look in directory containing current .exe
-          lFileName = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\" & baseFileName
-        End If
-        If Not FileExists(lFileName, True) Then 'Look in directory containing current plugin
-          lFileName = PathNameOnly(System.Reflection.Assembly.GetExecutingAssembly.Location) & "\" & baseFileName
-        End If
-        If Not FileExists(lFileName, True) Then lFileName = "c:\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\winnt\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\winnt\system\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\winnt\system32\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\windows\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\windows\system\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\windows\system32\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\BASINS\models\HSPF\bin\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\BASINS\models\HSPF\WDMUtil\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "c:\BASINS\etc\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "d:\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "d:\BASINS\models\HSPF\bin\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "d:\BASINS\models\HSPF\WDMUtil\" & baseFileName
-        If Not FileExists(lFileName, True) Then lFileName = "d:\BASINS\etc\" & baseFileName
-        If FileExists(lFileName, True) Then
-          aDefaultFileName = lFileName
-        Else
-          lFileName = ""
-        End If
-      End If
-    End If
-
-    If Not FileExists(lFileName, True) Or aUserVerifyFileName Then 'ask the user
-      Dim cdlg As New Windows.Forms.OpenFileDialog
-      With cdlg
-        .Title = aFileDialogTitle
-        lFileName = AbsolutePath(lFileName, CurDir)
-        .FileName = aDefaultFileName
-        .Filter = aFileFilter
-        .FilterIndex = aFilterIndex
-        .DefaultExt = aDefaultExt
-        If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-          lFileName = AbsolutePath(.FileName, CurDir)
-          aFilterIndex = .FilterIndex
-          'If lFileName <> lRegistryFileName Then 'try to force registry update
-          '    lFileNameFoundInRegistry = False
-          'End If
-        Else 'Return empty string if user clicked Cancel
-          lFileName = ""
-        End If
-      End With
-
-      If LookingForDir Then
-        lFileName = PathNameOnly(lFileName)
-      End If
-
-      'If Not lFileNameFoundInRegistry Then 'try to add the key to the registry
-      '    If Len(pRegistrySection) > 0 Then
-      '        SaveSetting(pAppName, pRegistrySection, pRegistryKey, lFileName)
+      Return ""
+      'TODO: Implement FindFolder
+      'Return FindFolder(aFileDialogTitle, _
+      '            aDefaultFileName, _
+      '            aDefaultExt, _
+      '            aFileFilter, _
+      '            aUserVerifyFileName, _
+      '            aChDir2FileDir, _
+      '            aFilterIndex)
+    Else
+      'If Not FileExists(lFileName, True) Then 'don't already know where it is, first look in registry
+      '  If Len(pRegistrySection) > 0 Then
+      '    lRegistryFileName = GetSetting(pAppName, pRegistrySection, pRegistryKey, "")
+      '    If Not FileExists(lRegistryFileName, True) Then
+      '      lRegistryFileName = pRegistry.RegGetString(HKEY_LOCAL_MACHINE, pLocalMachinePrefix & pAppName & "\" & pRegistrySection, pRegistryKey)
       '    End If
+      '  End If
+      '  If Len(lRegistryFileName) > 0 Then
+      '    If FileExists(lRegistryFileName, True) Then 'got from registry
+      '      lFileName = lRegistryFileName
+      '      lFileNameFoundInRegistry = True
+      '      If aChDir2FileDir Then
+      '        ChDriveDir(System.IO.Path.GetFileName(lRegistryFileName))
+      '      End If
+      '    Else 'bad name in registry, message to user needed?
+      '    End If
+      '  End If
       'End If
+
+      If Not FileExists(lFileName) Then 'try some default locations if filename was specified, but not path
+        baseFileName = System.IO.Path.GetFileName(lFileName)
+        If baseFileName.Length > 0 Then
+          lFileName = aDefaultFileName
+          If Not FileExists(lFileName) Then
+            lExePath = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location).ToLower & "\"
+            lDLLpath = PathNameOnly(System.Reflection.Assembly.GetExecutingAssembly.Location).ToLower & "\"
+
+            'First check in same folder or subfolder containing current .exe or .dll
+            lFileName = FindRecursive(baseFileName, lDLLpath, lExePath)
+
+            'If we are in BASINS bin, also look in some other BASINS folders
+            If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
+              lFileName = FindRecursive(baseFileName, _
+                                        ReplaceString(lExePath, "\bin\", "\etc\"), _
+                                        ReplaceString(lExePath, "\bin\", "\models\"), _
+                                        ReplaceString(lExePath, "\bin\", "\docs\"), _
+                                        ReplaceString(lExePath, "\bin\", "\apr\"))
+            End If
+
+            'Finally, check in the Windows system folders
+            If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
+              lFileName = FindRecursive(baseFileName, "c:\winnt\", "c:\windows\")
+            End If
+
+            If FileExists(lFileName) Then
+              aDefaultFileName = lFileName
+            Else
+              lFileName = ""
+            End If
+          End If
+        End If
+      End If
+      If aUserVerifyFileName OrElse Not FileExists(lFileName) Then 'ask the user
+        Dim cdlg As New Windows.Forms.OpenFileDialog
+        With cdlg
+          .Title = aFileDialogTitle
+          lFileName = AbsolutePath(lFileName, CurDir)
+          .FileName = aDefaultFileName
+          .Filter = aFileFilter
+          .FilterIndex = aFilterIndex
+          .DefaultExt = aDefaultExt
+          If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+            lFileName = AbsolutePath(.FileName, CurDir)
+            aFilterIndex = .FilterIndex
+            'If lFileName <> lRegistryFileName Then 'try to force registry update
+            '    lFileNameFoundInRegistry = False
+            'End If
+          Else 'Return empty string if user clicked Cancel
+            lFileName = ""
+          End If
+        End With
+
+        'If LookingForDir Then
+        '  lFileName = PathNameOnly(lFileName)
+        'End If
+
+        'If Not lFileNameFoundInRegistry Then 'try to add the key to the registry
+        '    If Len(pRegistrySection) > 0 Then
+        'SaveSetting(pAppName, pRegistrySection, pRegistryKey, lFileName)
+        '    End If
+        'End If
+      End If
+
+      If aChDir2FileDir AndAlso lFileName.Length > 0 Then
+        ChDriveDir(lDir)
+      End If
+
+      Return lFileName
     End If
 
-    If Not aChDir2FileDir Or Len(lFileName) = 0 Then
-      ChDriveDir(lDir)
-    End If
+  End Function
 
-    Return lFileName
+  'Private Function FindRecursiveArray(ByVal aFilename As String, ByVal aStartDirs() As String) As String
+  '  Dim lFoundPath As String = ""
+  '  For Each lStartDir As String In aStartDirs
+  '    lFoundPath = FindRecursive(aFilename, lStartDir)
+  '    If lFoundPath.Length > 0 Then Exit For
+  '  Next
+  '  Return lFoundPath
+  'End Function
 
+  'Returns full path of file found in any directory in aStartDirs or any subdirectory 
+  'Returns empty string if not found
+  Private Function FindRecursive(ByVal aFilename As String, ByVal ParamArray aStartDirs() As String) As String
+    Dim lFoundPath As String = ""
+    For Each lStartDir As String In aStartDirs
+      If lStartDir.Length > 0 AndAlso Not lStartDir.EndsWith("\") Then lStartDir &= "\"
+      If FileExists(lStartDir & aFilename) Then
+        Return lStartDir & aFilename
+      ElseIf FileExists(lStartDir, True, False) Then
+        For Each lSubDir As String In System.IO.Directory.GetDirectories(lStartDir)
+          lFoundPath = FindRecursive(aFilename, lSubDir)
+          If lFoundPath.Length > 0 Then Exit For
+        Next
+      End If
+    Next
+    Return lFoundPath
   End Function
 
   'Given a set of file filters as used by common dialog, return the filter with the given index

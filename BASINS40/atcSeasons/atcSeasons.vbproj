@@ -196,6 +196,16 @@
                     DependentUpon = "frmSpecifySeasonalAttributes.vb"
                     BuildAction = "EmbeddedResource"
                 />
+                <File
+                    RelPath = "frmSpecifyYearSubset.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmSpecifyYearSubset.resx"
+                    DependentUpon = "frmSpecifyYearSubset.vb"
+                    BuildAction = "EmbeddedResource"
+                />
             </Include>
         </Files>
     </VisualBasic>
