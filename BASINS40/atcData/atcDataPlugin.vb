@@ -1,9 +1,14 @@
-'atcDataPlugin is a base class for plugins that can
-'read, write, manipulate, or display atcTimeseries
-'This class implements MapWindow.Interfaces.IPlugin so it can be loaded by the MapWindow plugin code
-'Name and Description need to be overridden/shadowed by inheritors. Others may be overridden if desired.
-'Additionally, data-related methods are available for inheritors.
-
+''' <summary>
+'''     <para>Base class for plugins that can'read, write, manipulate, or display
+'''     atcTimeseries</para>
+'''     <para>This class implements MapWindow.Interfaces.IPlugin so it can be loaded by the
+'''     MapWindow plugin code</para>
+''' </summary>
+''' <remarks>
+'''     <para>Name and Description need to be overridden/shadowed by inheritors. Others may
+'''     be overridden if desired.</para>
+'''     <para>Additionally, data-related methods are available for inheritors.</para>
+''' </remarks>
 Public Class atcDataPlugin
   Implements MapWindow.Interfaces.IPlugin
 
@@ -14,165 +19,267 @@ Public Class atcDataPlugin
     pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
   End Sub
 
-  'The name that appears in the Plug-ins menu to identify this plug-in.
-  'Must be overridden in inheriting class to return something unique or plugin will not load.
+  ''' <summary>The name that appears in the Plug-ins menu to identify this 
+  ''' plug-in.</summary>
+  ''' <requirements>
+  ''' Must be overridden in inheriting class to return something unique or plugin will
+  ''' not load.
+  ''' </requirements>
   Public Overridable ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
     Get
       Return ""
     End Get
   End Property
 
-  'A company name, individual, or organization name.
+  ''' <summary>A company name, individual, or organization name.</summary>
   Public Overridable ReadOnly Property Author() As String Implements MapWindow.Interfaces.IPlugin.Author
     Get
       Return "AQUA TERRA Consultants"
     End Get
   End Property
 
-  'Useful for organizing sets of plugins that should be grouped together in the UI
-  'Suggested categories include "File" and "Computation" for atcDataSource
+  ''' <summary>
+  ''' Useful for organizing sets of plugins that should be grouped together in the
+  ''' UI
+  ''' </summary>
+  ''' <remarks>Suggested categories include "File" and "Computation" for 
+  ''' atcDataSource</remarks>
   Public Overridable ReadOnly Property Category() As String
     Get
       Return ""
     End Get
   End Property
 
-  'Longer version of Name with room to expand acronyms
-  'Appears in the plug-ins dialog box when a user selects this plug-in.  
+  ''' <summary>Longer version of Name with room to expand acronyms</summary>
+  ''' <remarks>Appears in the plug-ins dialog box when a user selects this 
+  ''' plug-in.</remarks>
   Public Overridable ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
     Get
       Return ""
     End Get
   End Property
 
-  'This is the Build Date for the plug-in.  You can either return a string of a hard-coded date
-  'such as "January 1, 2003" or you can use the .NET function below to dynamically obtain the build
-  'date of the assembly.
+  ''' <summary>Date plug-in built.</summary>
+  ''' <remarks>
+  ''' You can either return a string of a hard-coded date such as "January 1, 2003" or
+  ''' you can use this property to dynamically obtain the build date of the assembly.
+  ''' </remarks>
   Public Overridable ReadOnly Property BuildDate() As String Implements MapWindow.Interfaces.IPlugin.BuildDate
     Get
-      Return System.IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToString
+      Return System.IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToString()
     End Get
   End Property
 
-  'Can either return a hard-coded string such as "1.0.0.1" or use  
-  'GetVersionInfo to dynamically return the version number from the assembly itself.
+  ''' <remarks>
+  ''' Can either return a hard-coded string such as "1.0.0.1" or use<br />
+  ''' GetVersionInfo to dynamically return the version number from the assembly
+  ''' itself.
+  ''' </remarks>
+  ''' <summary>Version number of the plug-in</summary>
   Public Overridable ReadOnly Property Version() As String Implements MapWindow.Interfaces.IPlugin.Version
     Get
       Return System.Diagnostics.FileVersionInfo.GetVersionInfo(Me.GetType().Assembly.Location).FileVersion
     End Get
   End Property
 
-  'Fired when the plugin is loaded (by the plug-in dialog, the plugins menu, or at program start).
-  'A good time to add buttons to the tool bar or menu items to the menu.  
-  'Save a reference to the IMapWin that is passed for later access to MapWindow.
-  Public Overridable Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+  ''' <summary>
+  ''' Fired when the plugin is loaded (by the plug-in dialog, the plugins menu, or at
+  ''' program start).
+  ''' </summary>
+  ''' <remarks>
+  ''' A good time to add buttons to the tool bar or menu items to the menu.<br />
+  ''' Save a reference to the IMapWin that is passed for later access to MapWindow.
+  ''' </remarks>
+  Public Overridable Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
+                                    ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
   End Sub
 
-  'Fired when the plugin is unloaded (by the plugin dialog, the plugins menu, or on program exit).
-  'Remove any buttons from the tool bar or menu items from the menu that this plugin added.
-  'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
-  Public Overridable Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
+  ''' <summary>
+  ''' Fired when the plugin is unloaded (by the plugin dialog, the plugins menu, or on
+  ''' program exit).
+  ''' </summary>
+  ''' <remarks>
+  ''' Remove any buttons from the tool bar or menu items from the menu that this plugin
+  ''' added.<br />
+  ''' If you don't do this, then you will leave dangling menus and buttons that don't do
+  ''' anything.
+  ''' </remarks>
+  Public Overridable Sub Terminate() _
+                            Implements MapWindow.Interfaces.IPlugin.Terminate
   End Sub
 
-  'Fires when a menu item or toolbar button is clicked.  If this plugin added a button or menu
-  'on the Initialize event, this is where those events are handled.
-  Public Overridable Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
+  ''' <summary>
+  ''' Fires when a menu item or toolbar button is clicked. If this plugin added a
+  ''' button or menu on the Initialize event, this is where those events are handled.
+  ''' </summary>
+  Public Overridable Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) _
+                            Implements MapWindow.Interfaces.IPlugin.ItemClicked
   End Sub
 
-  'Fires when the user removes a layer from MapWindow.  
-  'Useful if this plug-in depends on a particular layer being present,
-  'or if it keeps an internal list of layers. 
-  Public Overridable Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
+  ''' <summary>
+  ''' Fires when the user removes a layer from MapWindow.<br />
+  ''' Useful if this plug-in depends on a particular layer being present,<br />
+  ''' or if it keeps an internal list of layers.
+  ''' </summary>
+  Public Overridable Sub LayerRemoved(ByVal aHandle As Integer) _
+                            Implements MapWindow.Interfaces.IPlugin.LayerRemoved
   End Sub
 
-  'Fires when the user adds a layer to MapWindow.  
-  'Useful in the same cases as LayerRemoved
-  Public Overridable Sub LayersAdded(ByVal Layers() As MapWindow.Interfaces.Layer) Implements MapWindow.Interfaces.IPlugin.LayersAdded
+  ''' <summary>
+  ''' Fires when the user adds a layer to MapWindow.<br />
+  ''' Useful in the same cases as <see cref="LayerRemoved">LayerRemoved</see>
+  ''' </summary>
+  Public Overridable Sub LayersAdded(ByVal aLayers() As MapWindow.Interfaces.Layer) _
+                            Implements MapWindow.Interfaces.IPlugin.LayersAdded
   End Sub
 
-  'Fires when the user clears all of the layers from MapWindow.
-  'Useful in the same cases as LayerRemoved
-  Public Overridable Sub LayersCleared() Implements MapWindow.Interfaces.IPlugin.LayersCleared
+  ''' <summary>Fires when the user clears all of the layers from MapWindow.</summary>
+  ''' <remarks>Useful in the same cases as <see 
+  ''' cref="LayerRemoved">LayerRemoved</see></remarks>
+  Public Overridable Sub LayersCleared() _
+                            Implements MapWindow.Interfaces.IPlugin.LayersCleared
   End Sub
 
-  'Fires when a user selects a layer in the legend. 
-  Public Overridable Sub LayerSelected(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerSelected
+  ''' <summary>Fires when a user selects a layer in the legend.</summary>
+  Public Overridable Sub LayerSelected(ByVal aHandle As Integer) _
+                            Implements MapWindow.Interfaces.IPlugin.LayerSelected
   End Sub
 
-  'Fires when a user double-clicks a layer in the legend.
-  Public Overridable Sub LegendDoubleClick(ByVal Handle As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendDoubleClick
+  ''' <summary>Fires when a user double-clicks a layer in the legend.</summary>
+  Public Overridable Sub LegendDoubleClick(ByVal aHandle As Integer, _
+                                           ByVal aLocation As MapWindow.Interfaces.ClickLocation, _
+                                           ByRef aHandled As Boolean) _
+                            Implements MapWindow.Interfaces.IPlugin.LegendDoubleClick
   End Sub
 
-  'Fires when a user holds a mouse button down in the legend.
-  Public Overridable Sub LegendMouseDown(ByVal Handle As Integer, ByVal Button As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendMouseDown
+  ''' <summary>Fires when a user holds a mouse button down in the legend.</summary>
+  Public Overridable Sub LegendMouseDown(ByVal aHandle As Integer, _
+                                         ByVal aButton As Integer, _
+                                         ByVal aLocation As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) _
+                            Implements MapWindow.Interfaces.IPlugin.LegendMouseDown
   End Sub
 
-  'Fires when a user releases a mouse button in the legend.
-  Public Overridable Sub LegendMouseUp(ByVal Handle As Integer, ByVal Button As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendMouseUp
+  ''' <summary>Fires when a user releases a mouse button in the legend.</summary>
+  Public Overridable Sub LegendMouseUp(ByVal aHandle As Integer, _
+                                       ByVal aButton As Integer, _
+                                       ByVal aLocation As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) _
+                            Implements MapWindow.Interfaces.IPlugin.LegendMouseUp
   End Sub
 
-  'Fires after a user drags (ie draws a box) with the mouse on the map, at completion of the drag.
-  'Bounds specifies the box that was "drawn"
-  Public Overridable Sub MapDragFinished(ByVal Bounds As System.Drawing.Rectangle, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapDragFinished
+  ''' <summary>
+  ''' Fires after a user drags (ie draws a box) with the mouse on the map, at
+  ''' completion of the drag.
+  ''' </summary>
+  ''' <remarks>Bounds specifies the box that was "drawn"</remarks>
+  Public Overridable Sub MapDragFinished(ByVal aBounds As System.Drawing.Rectangle, _
+                                         ByRef Handled As Boolean) _
+                            Implements MapWindow.Interfaces.IPlugin.MapDragFinished
   End Sub
 
-  'Fires any time there is a zoom or pan that changes the extents of the map.
-  Public Overridable Sub MapExtentsChanged() Implements MapWindow.Interfaces.IPlugin.MapExtentsChanged
+  ''' <summary>Fires any time there is a zoom or pan that changes the extents of the 
+  ''' map.</summary>
+  Public Overridable Sub MapExtentsChanged() _
+                            Implements MapWindow.Interfaces.IPlugin.MapExtentsChanged
   End Sub
 
-  'Fires when the user presses a mouse button on the map. Note that x and y are returned
-  'as screen coordinates (in pixels), not map coordinates.  If map coordinates are needed,
-  'use g_MapWin.View.PixelToProj() where g_MapWin is a saved reference to MapWin from Initialize
-  Public Overridable Sub MapMouseDown(ByVal Button As Integer, ByVal Shift As Integer, _
-                          ByVal ScreenX As Integer, ByVal ScreenY As Integer, _
-                          ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseDown
+  ''' <summary>
+  ''' Fires when the user presses a mouse button on the map. Note that x and y are
+  ''' returned as screen coordinates (in pixels).
+  ''' </summary>
+  ''' <remarks>
+  ''' If map coordinates are needed, use g_MapWin.View.PixelToProj() where g_MapWin is
+  ''' a saved reference to MapWin from Initialize
+  ''' </remarks>
+  Public Overridable Sub MapMouseDown(ByVal aButton As Integer, _
+                              ByVal aShift As Integer, _
+                              ByVal aScreenX As Integer, _
+                              ByVal aScreenY As Integer, _
+                              ByRef Handled As Boolean) _
+                    Implements MapWindow.Interfaces.IPlugin.MapMouseDown
   End Sub
 
-  'Fires when the user moves the mouse over the map. See MapMouseDown.
-  Public Overridable Sub MapMouseMove(ByVal ScreenX As Integer, ByVal ScreenY As Integer, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseMove
+  ''' <summary>
+  '''     Fires when the user moves the mouse over the map. See
+  '''     <see cref="MapMouseDown">MapMouseDown</see>.
+  ''' </summary>
+  Public Overridable Sub MapMouseMove(ByVal aScreenX As Integer, _
+                                      ByVal aScreenY As Integer, _
+                                      ByRef aHandled As Boolean) _
+                    Implements MapWindow.Interfaces.IPlugin.MapMouseMove
   End Sub
 
-  'Fires when the user releases a mouse button over the map. See MapMouseDown.
-  Public Overridable Sub MapMouseUp(ByVal Button As Integer, ByVal Shift As Integer, _
-                        ByVal ScreenX As Integer, ByVal ScreenY As Integer, _
-                        ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseUp
+  ''' <summary>
+  '''     Fires when the user releases a mouse button over the map. See
+  '''     <see cref="MapMouseDown">MapMouseDown</see>.
+  ''' </summary>
+  Public Overridable Sub MapMouseUp(ByVal aButton As Integer, _
+                                    ByVal aShift As Integer, _
+                                    ByVal aScreenX As Integer, _
+                                    ByVal aScreenY As Integer, _
+                                    ByRef aHandled As Boolean) _
+                    Implements MapWindow.Interfaces.IPlugin.MapMouseUp
   End Sub
 
-  'Plugins can communicate with each other using Messages.  If a message is sent then this event fires.
-  'Set Handled=True to stop the message from being sent to any more plugins.
-  Public Overridable Sub Message(ByVal msg As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
+  ''' <summary>
+  ''' Plugins can communicate with each other using Messages. If a message is sent then
+  ''' this event fires.
+  ''' </summary>
+  ''' <remarks>Set Handled=True to stop the message from being sent to any more 
+  ''' plugins.</remarks>
+  Public Overridable Sub Message(ByVal aMsg As String, _
+                                 ByRef aHandled As Boolean) _
+                    Implements MapWindow.Interfaces.IPlugin.Message
   End Sub
 
-  'Fires when a project is opened in MapWindow.
-  'ProjectFile is the file name including path of the project that was opened.
-  'SettingsString contains the string of data that is connected to this plugin and was 
-  'stored in the project in a ProjectSaving event.
-  Public Overridable Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
+  ''' <summary>Fires when a project is opened in MapWindow.</summary>
+  ''' <param name="aProjectFile">file name including path of the project that was 
+  ''' opened.</param>
+  ''' <param name="aSettingsString">
+  ''' contains the string of data that is connected to this plugin and was stored in
+  ''' the project in a ProjectSaving event.
+  ''' </param>
+  Public Overridable Sub ProjectLoading(ByVal aProjectFile As String, _
+                              ByVal aSettingsString As String) _
+                         Implements MapWindow.Interfaces.IPlugin.ProjectLoading
   End Sub
 
-  'Fires when a project is saved in MapWindow.
-  'ProjectFile is the file name including path of the project that is being saved.
-  'SettingsString can be set to any string of data that is connected to this plugin
-  'which should be stored in the project file.
-  Public Overridable Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
+  ''' <summary>Fires when a project is saved in MapWindow.</summary>
+  ''' <param name="aProjectFile">file name including path of the project that is being 
+  ''' saved.</param>
+  ''' <param name="aSettingsString">
+  ''' be set to any string of data that is connected to this plugin<br />
+  ''' which should be stored in the project file.
+  ''' </param>
+  Public Overridable Sub ProjectSaving(ByVal aProjectFile As String, _
+                                       ByRef aSettingsString As String) _
+                         Implements MapWindow.Interfaces.IPlugin.ProjectSaving
   End Sub
 
-  'Fires when the user selects one or more shapes using the select tool in MapWindow.
-  'Handle is the Layer handle for the shapefile on which shapes were selected. 
-  'SelectInfo holds information about the shapes that were selected. 
-  Public Overridable Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
+  ''' <summary>
+  '''     <para>Fires when the user selects one or more shapes using the select tool in
+  '''     MapWindow.</para>
+  ''' </summary>
+  ''' <param name="aHandle">Layer handle for the shapefile on which shapes were 
+  ''' selected.</param>
+  ''' <param name="aSelectInfo">holds information about the shapes that were 
+  ''' selected.</param>
+  Public Overridable Sub ShapesSelected(ByVal aHandle As Integer, _
+                                        ByVal aSelectInfo As MapWindow.Interfaces.SelectInfo) _
+                      Implements MapWindow.Interfaces.IPlugin.ShapesSelected
   End Sub
 
-  'Leftover part of IPlugin interface no longer in use
+  ''' <summary>Deprecated - do NOT use</summary>
+  ''' <remarks>Leftover part of IPlugin interface no longer in use</remarks>
   Public Overridable ReadOnly Property SerialNumber() As String Implements MapWindow.Interfaces.IPlugin.SerialNumber
     Get
       Return pSerial.ToString
     End Get
   End Property
 
+  ''' <summary>Calls the version of New with no arguments.</summary>
+  ''' <remarks>Inheriting classes that have no New w/o arguments must override 
+  ''' NewOne</remarks>
   Public Overridable Function NewOne() As atcDataPlugin
-    'This calls the version of New with no arguments. 
-    'Inheriting classes that have no New w/o arguments must override NewOne
     Return Me.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
   End Function
 

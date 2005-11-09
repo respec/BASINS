@@ -17,6 +17,12 @@ Public Class atcDataManager
   Event OpenedData(ByVal aDataSource As atcDataSource)
 
   ''' <summary>Create a new instance of atcDataManager</summary>
+  ''' <param name="aMapWin">
+  '''     <para>Pointer to the root interface for the MapWindow</para>
+  ''' </param>  
+  ''' <param name="aBasins">
+  '''     <para>Pointer to the Basins plugin (Deprecated - DO NOT USE - consult ATC for alternatives)</para>
+  ''' </param>  
   Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aBasins As Object)
     pMapWin = aMapWin
     pBasins = aBasins
@@ -70,7 +76,7 @@ Public Class atcDataManager
     Return lAllData
   End Function
 
-  ''' <summary>Names of attributes used for selection of data in UI</summary)
+  ''' <summary>Names of attributes used for selection of data in UI</summary>
   Public ReadOnly Property SelectionAttributes() As ArrayList
     Get
       Return pSelectionAttributes
@@ -109,17 +115,32 @@ Public Class atcDataManager
   ''' <param name="aSpecification">
   '''     <para>File name, connection string, or other information needed to initialize aNewSource</para>
   ''' </param>
-  Public Function OpenDataSource(ByVal aNewSource As atcDataSource, ByVal aSpecification As String, ByVal aAttributes As atcDataAttributes) As Boolean
+  ''' <param name="aAttributes">
+  '''     <para>Attributes associated with specification, may be NOTHING</para>
+  ''' </param>
+  ''' <returns>Boolean - True if source opened, False otherwise</returns>
+  Public Function OpenDataSource(ByVal aNewSource As atcDataSource, _
+                                 ByVal aSpecification As String, _
+                                 ByVal aAttributes As atcDataAttributes) As Boolean
     aNewSource.DataManager = Me
-    If aNewSource.Open(aSpecification, aAttributes) Then
-      pDataSources.Add(aNewSource)
-      RaiseEvent OpenedData(aNewSource)
-      pMapWin.Project.Modified = True
-      Return True
-    Else
-      LogDbg("Could not open '" & aSpecification & "' with '" & aNewSource.Name & "'")
+
+    Try
+      If aNewSource.Open(aSpecification, aAttributes) Then
+        pDataSources.Add(aNewSource)
+        RaiseEvent OpenedData(aNewSource)
+        pMapWin.Project.Modified = True
+        Return True
+      Else
+        LogDbg("OpenDataSource:OpenFailure:Specification:" & aSpecification & _
+               " Name:" & aNewSource.Name)
+        Return False
+      End If
+    Catch ex As Exception
+      LogDbg("OpenDataSource:Exception:" & ex.Message & vbCrLf & _
+             " Specification:" & aSpecification & _
+             " Name:" & aNewSource.Name)
       Return False
-    End If
+    End Try
   End Function
 
   ''' <summary>Creates and returns an instance of a data source by name</summary>
@@ -172,6 +193,11 @@ Public Class atcDataManager
   End Sub
 
   ''' <summary>State of data manager in XML format</summary>
+  ''' <value>Chilkat.Xml</value>
+  ''' <requirements>
+  ''' Chilkat Xml from
+  ''' <a href="http://www.xml-parser.com/downloads.htm">http://www.xml-parser.com/downloads.htm</a>
+  ''' </requirements>
   Public Property XML() As Chilkat.Xml
     Get
       Dim lSaveXML As New Chilkat.Xml
