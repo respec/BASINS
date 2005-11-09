@@ -45,10 +45,11 @@ Public Class atcSeasonPlugin
     Dim lSeasonName As String
     Dim ltsGroup As atcDataGroup
 
-    If aArgs Is Nothing Then
-      ltsGroup = DataManager.UserSelectData("Select data for " & aOperationName)
-    Else
+    If Not aArgs Is Nothing Then
       ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
+    End If
+    If ltsGroup Is Nothing Then
+      ltsGroup = DataManager.UserSelectData("Select data for " & aOperationName)
     End If
     If Not ltsGroup Is Nothing Then
       If aOperationName.IndexOf("::") > 0 Then
@@ -59,7 +60,8 @@ Public Class atcSeasonPlugin
           If SeasonClassNameToLabel(typ.Name).Equals(lSeasonName) Then
             Try
               pSeasons = typ.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
-            Catch 'Seasons that need arguments to New will fail for now
+            Catch e As Exception
+              LogDbg("Exception creating " & lSeasonName & ": " & e.Message)
             End Try
             Exit For
           End If
@@ -71,27 +73,26 @@ Public Class atcSeasonPlugin
       If pSeasons Is Nothing Then
         LogDbg("Could not create season of type '" & lSeasonName & "'")
       Else
-      End If
-
-      Select Case aOperationName.ToLower
-        Case "split"
-          For Each lts As atcTimeseries In ltsGroup
-            MyBase.DataSets.AddRange(pSeasons.Split(lts, Me))
-          Next
-          If MyBase.DataSets.Count > 0 Then Return True
-        Case "seasonalattributes"
-          Dim lAttributes As atcDataAttributes = aArgs.GetValue("Attributes")
-          Dim lCalculatedAttributes As atcDataAttributes = aArgs.GetValue("CalculatedAttributes")
-          If lAttributes Is Nothing OrElse lAttributes.Count = 0 Then
-            Dim lForm As New frmSpecifySeasonalAttributes
-            lForm.AskUser(ltsGroup, AvailableOperations(False, True))
-          Else
+        Select Case aOperationName.ToLower
+          Case "split"
             For Each lts As atcTimeseries In ltsGroup
-              pSeasons.SetSeasonalAttributes(lts, lAttributes, lCalculatedAttributes)
+              MyBase.DataSets.AddRange(pSeasons.Split(lts, Me))
             Next
-          End If
-          Return True
-      End Select
+            If MyBase.DataSets.Count > 0 Then Return True
+          Case "seasonalattributes"
+            Dim lAttributes As atcDataAttributes = aArgs.GetValue("Attributes")
+            Dim lCalculatedAttributes As atcDataAttributes = aArgs.GetValue("CalculatedAttributes")
+            If lAttributes Is Nothing OrElse lAttributes.Count = 0 Then
+              Dim lForm As New frmSpecifySeasonalAttributes
+              lForm.AskUser(ltsGroup, AvailableOperations(False, True))
+            Else
+              For Each lts As atcTimeseries In ltsGroup
+                pSeasons.SetSeasonalAttributes(lts, lAttributes, lCalculatedAttributes)
+              Next
+            End If
+            Return True
+        End Select
+      End If
     End If
 
   End Function
@@ -130,7 +131,7 @@ Public Class atcSeasonPlugin
               Dim lSeasonalAttributes As New atcAttributeDefinition
               With lSeasonalAttributes
                 .Name = SeasonClassNameToLabel(typ.Name) & "::SeasonalAttributes"
-                .Category = "" 'Me.ToString
+                .Category = "Attributes"
                 .Description = "Attribute values calculated per season"
                 .Editable = False
                 .TypeString = "atcDataAttributes"

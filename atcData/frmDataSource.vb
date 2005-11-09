@@ -130,56 +130,70 @@ Friend Class frmDataSource
                        ByRef aNeedToSave As Boolean)
     Dim lNode As TreeNode
     Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
-    For Each ds As atcDataSource In lDataSources
-      If (Not aNeedToOpen OrElse ds.CanOpen) AndAlso _
-         (Not aNeedToSave OrElse ds.CanSave) Then
-        Dim lOperations As atcDataAttributes = ds.AvailableOperations
-        Dim lCategory As String = ds.Category
-        If lCategory.Length = 0 Then lCategory = ds.Description
-        'If either no category was specified or
-        'this DataSource has one of the specified categories
-        If pCategories Is Nothing OrElse pCategories.Contains(lCategory) Then
-          Dim lCategoryNode As TreeNode = FindOrCreateNode(treeSources.Nodes, lCategory)
-          lCategoryNode.ExpandAll()
-          If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
-            For Each lOperation As atcDefinedValue In lOperations
-              'Operations might have categories to further divide them
-              If lOperation.Definition.Category.Length > 0 Then
-                Dim lSubCategoryNode As TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lOperation.Definition.Category)
-                lNode = lSubCategoryNode.Nodes.Add(lOperation.Definition.Name)
-                lSubCategoryNode.ExpandAll()
-              Else
-                lNode = lCategoryNode.Nodes.Add(lOperation.Definition.Name)
-              End If
+    If lDataSources.Count = 0 Then
+      treeSources.Nodes.Add("No data source plugins are loaded")
+    Else
+      For Each ds As atcDataSource In lDataSources
+        If (Not aNeedToOpen OrElse ds.CanOpen) AndAlso _
+           (Not aNeedToSave OrElse ds.CanSave) Then
+          Dim lOperations As atcDataAttributes = ds.AvailableOperations
+          Dim lCategory As String = ds.Category
+          If lCategory.Length = 0 Then lCategory = ds.Description
+          'If either no category was specified or
+          'this DataSource has one of the specified categories
+          If pCategories Is Nothing OrElse pCategories.Contains(lCategory) Then
+            Dim lCategoryNode As TreeNode = FindOrCreateNode(treeSources.Nodes, lCategory)
+            If lCategory.Equals("File") OrElse GetSetting("BASINS4", "Data Source Categories", lCategory, "Closed") = "Expanded" Then
+              lCategoryNode.ExpandAll()
+            End If
+            If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
+              For Each lOperation As atcDefinedValue In lOperations
+                Select Case lOperation.Definition.TypeString
+                  Case "atcTimeseries", "atcDataGroup"
+                    'Operations might have categories to further divide them
+                    If lOperation.Definition.Category.Length > 0 Then
+                      Dim lSubCategoryNode As TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lOperation.Definition.Category)
+                      lNode = lSubCategoryNode.Nodes.Add(lOperation.Definition.Name)
+                      lSubCategoryNode.ExpandAll()
+                    Else
+                      lNode = lCategoryNode.Nodes.Add(lOperation.Definition.Name)
+                    End If
 
+                    lNode.Tag = ds.Name
+                    If ds.Equals(pSelectedSource) AndAlso lNode.Text = pSpecification Then
+                      treeSources.SelectedNode = lNode
+                    End If
+                End Select
+              Next
+            Else
+              lNode = lCategoryNode.Nodes.Add(ds.Description)
               lNode.Tag = ds.Name
-              If ds.Equals(pSelectedSource) AndAlso lNode.Text = pSpecification Then
+              If ds.Equals(pSelectedSource) Then
                 treeSources.SelectedNode = lNode
               End If
-            Next
-          Else
-            lNode = lCategoryNode.Nodes.Add(ds.Description)
-            lNode.Tag = ds.Name
-            If ds.Equals(pSelectedSource) Then
-              treeSources.SelectedNode = lNode
             End If
           End If
         End If
+      Next
+      If treeSources.Nodes.Count = 0 Then
+        treeSources.Nodes.Add("No appropriate plugins are loaded")
       End If
-    Next
+    End If
     treeSources.Nodes(0).EnsureVisible()
-
-    Dim lBottomNode As TreeNode = BottomNode(treeSources.Nodes(treeSources.Nodes.Count - 1))
-    Me.Top = 0
-    Me.Height = lBottomNode.Bounds.Top + lBottomNode.Bounds.Height * 2 + treeSources.Top + pnlButtons.Height + 15
-
+    ResizeToShowBottomNode()
     'These were only set for use during Populate and should not still be set if user closes window
     pSelectedSource = Nothing
     pSpecification = ""
   End Sub
 
+  Private Sub ResizeToShowBottomNode()
+    Dim lBottomNode As TreeNode = BottomNode(treeSources.Nodes(treeSources.Nodes.Count - 1))
+    Me.Top = 0
+    Me.Height = lBottomNode.Bounds.Top + lBottomNode.Bounds.Height * 2 + treeSources.Top + pnlButtons.Height + 15
+  End Sub
+
   Private Function BottomNode(ByVal aParent As TreeNode) As TreeNode
-    If aParent.Nodes.Count = 0 Then
+    If aParent.Nodes.Count = 0 OrElse Not aParent.IsExpanded Then
       Return aParent
     Else
       Return BottomNode(aParent.Nodes(aParent.Nodes.Count - 1))
@@ -237,5 +251,18 @@ Friend Class frmDataSource
     MyBase.OnLoad(e)
     Me.Top = 0
     Me.Height = lHeight
+  End Sub
+
+  Private Sub treeSources_AfterCollapse(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles treeSources.AfterCollapse
+    If Not e.Node Is Nothing AndAlso e.Node.Parent Is Nothing Then
+      SaveSetting("BASINS4", "Data Source Categories", e.Node.Text, "Closed")
+    End If
+  End Sub
+
+  Private Sub treeSources_AfterExpand(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles treeSources.AfterExpand
+    If Not e.Node Is Nothing AndAlso e.Node.Parent Is Nothing Then
+      SaveSetting("BASINS4", "Data Source Categories", e.Node.Text, "Expanded")
+      ResizeToShowBottomNode()
+    End If
   End Sub
 End Class

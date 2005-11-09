@@ -143,6 +143,20 @@ Public Class atcDataManager
     End Try
   End Function
 
+  Public Sub ShowDisplay(ByVal aDisplayName As String, ByVal aDataGroup As atcDataGroup)
+    Dim newDisplay As atcDataDisplay
+    Dim DisplayPlugins As ICollection = GetPlugins(GetType(atcDataDisplay))
+    For Each lDisp As atcDataDisplay In DisplayPlugins
+      If lDisp.Name = aDisplayName OrElse lDisp.Name = "Tools::" & aDisplayName Then
+        Dim typ As System.Type = lDisp.GetType()
+        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+        newDisplay = asm.CreateInstance(typ.FullName)
+        newDisplay.Show(Me, aDataGroup)
+        Exit Sub
+      End If
+    Next
+  End Sub
+
   ''' <summary>Creates and returns an instance of a data source by name</summary>
   ''' <param name="aDataSourceName">
   '''     <para>Name of data source to create and return</para>
@@ -159,9 +173,10 @@ Public Class atcDataManager
   ''' <param name="aCategories">
   '''     <para>Filter to limit user choices</para>
   ''' </param>  
-  Public Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing) As atcDataSource
+  Public Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing, Optional ByVal aTitle As String = "Select a Data Source") As atcDataSource
     Dim lForm As New frmDataSource
     Dim lSelectedDataSource As atcDataSource
+    lForm.Text = aTitle
     lForm.AskUser(Me, lSelectedDataSource, True, False, aCategories)
     Return lSelectedDataSource
   End Function

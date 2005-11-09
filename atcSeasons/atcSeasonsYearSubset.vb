@@ -18,6 +18,25 @@ Public Class atcSeasonsYearSubset
     End If
   End Sub
 
+  Public Sub New()
+    Dim lStartMonth As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetStartMonth", "1"))
+    Dim lStartDay As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetStartDay", "1"))
+    Dim lEndMonth As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetEndMonth", "12"))
+    Dim lEndDay As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetEndDay", "31"))
+    Dim lForm As New frmSpecifyYearSubset
+    If lForm.AskUser(lStartMonth, lStartDay, lEndMonth, lEndDay) Then
+      pStartDate = New Date(1900, lStartMonth, lStartDay, 0, 0, 0, 0)
+      pEndDate = New Date(1900, lEndMonth, lEndDay, 0, 0, 0, 0)
+
+      SaveSetting("BASINS4", "Seasons", "YearSubsetStartMonth", lStartMonth)
+      SaveSetting("BASINS4", "Seasons", "YearSubsetStartDay", lStartDay)
+      SaveSetting("BASINS4", "Seasons", "YearSubsetEndMonth", lEndMonth)
+      SaveSetting("BASINS4", "Seasons", "YearSubsetEndDay", lEndDay)
+    Else
+      Throw New Exception("User cancelled")
+    End If
+  End Sub
+
   Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
     Dim lDate As Date = Date.FromOADate(aDate)
     Dim lDay As Integer = lDate.Day

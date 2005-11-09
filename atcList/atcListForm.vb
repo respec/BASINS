@@ -38,6 +38,8 @@ Friend Class atcListForm
   Friend WithEvents mnuAttributeRows As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAttributeColumns As System.Windows.Forms.MenuItem
   Friend WithEvents mnuView As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSizeColumnsToContents As System.Windows.Forms.MenuItem
+  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcListForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -47,8 +49,10 @@ Friend Class atcListForm
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuAttributeRows = New System.Windows.Forms.MenuItem
     Me.mnuAttributeColumns = New System.Windows.Forms.MenuItem
+    Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
+    Me.MenuItem1 = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -74,7 +78,7 @@ Friend Class atcListForm
     'mnuView
     '
     Me.mnuView.Index = 1
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns})
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.MenuItem1, Me.mnuSizeColumnsToContents})
     Me.mnuView.Text = "View"
     '
     'mnuAttributeRows
@@ -87,6 +91,11 @@ Friend Class atcListForm
     '
     Me.mnuAttributeColumns.Index = 1
     Me.mnuAttributeColumns.Text = "Attribute Columns"
+    '
+    'mnuSizeColumnsToContents
+    '
+    Me.mnuSizeColumnsToContents.Index = 3
+    Me.mnuSizeColumnsToContents.Text = "Size Columns To Contents"
     '
     'mnuAnalysis
     '
@@ -104,6 +113,11 @@ Friend Class atcListForm
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
     Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
+    '
+    'MenuItem1
+    '
+    Me.MenuItem1.Index = 2
+    Me.MenuItem1.Text = "-"
     '
     'atcListForm
     '
@@ -137,10 +151,11 @@ Friend Class atcListForm
       pDataGroup = aTimeseriesGroup
     End If
 
-    mnuAnalysis.MenuItems.Clear()
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
     For Each lDisp As atcDataDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+      Dim lMenuText As String = lDisp.Name
+      If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
+      mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
@@ -157,8 +172,19 @@ Friend Class atcListForm
   End Sub
 
   Private Sub PopulateGrid()
+    Dim lTotalWidth As Integer = 10
     pSource = New atcListGridSource(pDataManager, pDataGroup)
     agdMain.Initialize(pSource)
+    agdMain.SizeAllColumnsToContents()
+    For iColumn As Integer = 0 To pSource.Columns
+      lTotalWidth += agdMain.ColumnWidth(iColumn)
+    Next
+    Try
+      If lTotalWidth < Screen.PrimaryScreen.Bounds.Width Then
+        Me.Width = lTotalWidth
+      End If
+    Catch 'Ignore error if we can't tell how large to make it, or can't rezise
+    End Try
     agdMain.Refresh()
   End Sub
 
@@ -167,17 +193,7 @@ Friend Class atcListForm
   End Function
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcDataDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each atf As atcDataDisplay In DisplayPlugins
-      If atf.Name = sender.Text Then
-        Dim typ As System.Type = atf.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pDataGroup)
-        Exit Sub
-      End If
-    Next
+    pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
   Private Sub mnuSelectTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectTimeseries.Click
@@ -237,4 +253,9 @@ Friend Class atcListForm
       mnuAttributeRows.Checked = Not newValue
     End Set
   End Property
+
+  Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
+    agdMain.SizeAllColumnsToContents()
+    agdMain.Refresh()
+  End Sub
 End Class

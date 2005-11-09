@@ -22,8 +22,10 @@ Friend Class frmDisplayFrequencyGrid
     InitializeComponent() 'required by Windows Form Designer
 
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each ldisp As atcDataDisplay In DisplayPlugins
-      mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+    For Each lDisp As atcDataDisplay In DisplayPlugins
+      Dim lMenuText As String = lDisp.Name
+      If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
+      mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some Data
@@ -70,6 +72,8 @@ Friend Class frmDisplayFrequencyGrid
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
+  Friend WithEvents MenuItem2 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSizeColumnsToContents As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplayFrequencyGrid))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -87,6 +91,8 @@ Friend Class frmDisplayFrequencyGrid
     Me.mnuViewLow = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
+    Me.MenuItem2 = New System.Windows.Forms.MenuItem
+    Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -129,7 +135,7 @@ Friend Class frmDisplayFrequencyGrid
     'mnuView
     '
     Me.mnuView.Index = 2
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewColumns, Me.mnuViewRows, Me.MenuItem1, Me.mnuViewHigh, Me.mnuViewLow})
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewColumns, Me.mnuViewRows, Me.MenuItem1, Me.mnuViewHigh, Me.mnuViewLow, Me.MenuItem2, Me.mnuSizeColumnsToContents})
     Me.mnuView.Text = "&View"
     '
     'mnuViewColumns
@@ -175,6 +181,16 @@ Friend Class frmDisplayFrequencyGrid
     Me.agdMain.Size = New System.Drawing.Size(720, 545)
     Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
+    '
+    'MenuItem2
+    '
+    Me.MenuItem2.Index = 5
+    Me.MenuItem2.Text = "-"
+    '
+    'mnuSizeColumnsToContents
+    '
+    Me.mnuSizeColumnsToContents.Index = 6
+    Me.mnuSizeColumnsToContents.Text = "Size Columns To Contents"
     '
     'frmDisplayFrequencyGrid
     '
@@ -222,17 +238,7 @@ Friend Class frmDisplayFrequencyGrid
   End Sub
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcDataDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each atf As atcDataDisplay In DisplayPlugins
-      If atf.Name = sender.Text Then
-        Dim typ As System.Type = atf.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pDataGroup)
-        Exit Sub
-      End If
-    Next
+    pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
@@ -339,4 +345,8 @@ Friend Class frmDisplayFrequencyGrid
     pSource = Nothing
   End Sub
 
+  Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
+    agdMain.SizeAllColumnsToContents()
+    agdMain.Refresh()
+  End Sub
 End Class

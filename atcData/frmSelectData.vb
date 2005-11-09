@@ -1069,7 +1069,9 @@ NextName:
 
   Private Sub mnuAddData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddData.Click
     Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
-    pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+    If Not lNewSource Is Nothing Then
+      pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+    End If
   End Sub
 
   Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click

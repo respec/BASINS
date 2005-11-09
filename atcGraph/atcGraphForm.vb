@@ -74,7 +74,6 @@ Public Class atcGraphForm
         If ts.Dates.Value(0) < .Min Then .Min = ts.Dates.Value(0)
         If ts.Dates.Value(ts.Dates.numValues) > .Max Then .Max = ts.Dates.Value(ts.Dates.numValues)
       End With
-
     Next
 
     pMaster.AxisChange(g)
@@ -106,7 +105,9 @@ Public Class atcGraphForm
 
       Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
       For Each lDisp As atcDataDisplay In DisplayPlugins
-        mnuAnalysis.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
+        Dim lMenuText As String = lDisp.Name
+        If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
+        mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
       Next
     End If
   End Sub
@@ -446,17 +447,7 @@ Public Class atcGraphForm
   End Sub
 
   Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    Dim newDisplay As atcDataDisplay
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each lDisp As atcDataDisplay In DisplayPlugins
-      If lDisp.Name = sender.Text Then
-        Dim typ As System.Type = lDisp.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(pDataManager, pDataGroup)
-        Exit Sub
-      End If
-    Next
+    pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
   Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)

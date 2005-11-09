@@ -81,6 +81,7 @@ Public Class frmCmpJPET
   Friend WithEvents txtSRad As System.Windows.Forms.TextBox
   Friend WithEvents lblTempUnits As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCmpJPET))
     Me.lblJensenPET = New System.Windows.Forms.Label
     Me.lblConstant = New System.Windows.Forms.Label
     Me.txtConstant = New System.Windows.Forms.TextBox
@@ -523,6 +524,7 @@ Public Class frmCmpJPET
     Me.Controls.Add(Me.txtConstant)
     Me.Controls.Add(Me.lblConstant)
     Me.Controls.Add(Me.lblJensenPET)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmCmpJPET"
     Me.Text = "Specify Jensen PET Inputs"
     Me.panelBottom.ResumeLayout(False)

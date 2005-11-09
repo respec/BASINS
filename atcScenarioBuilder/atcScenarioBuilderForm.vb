@@ -53,12 +53,17 @@ Friend Class atcScenarioBuilderForm
   Friend WithEvents mnuEditCopyInputs As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopyResults As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopyBoth As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuScenariosAddFromBuiltInScript As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcScenarioBuilderForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileAdd = New System.Windows.Forms.MenuItem
     Me.mnuFileAddResults = New System.Windows.Forms.MenuItem
+    Me.mnuEdit = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopyBoth = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopyInputs = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopyResults = New System.Windows.Forms.MenuItem
     Me.mnuAttributes = New System.Windows.Forms.MenuItem
     Me.mnuAttributesAdd = New System.Windows.Forms.MenuItem
     Me.mnuAttributesRemove = New System.Windows.Forms.MenuItem
@@ -66,14 +71,11 @@ Friend Class atcScenarioBuilderForm
     Me.mnuScenarios = New System.Windows.Forms.MenuItem
     Me.mnuScenariosAdd = New System.Windows.Forms.MenuItem
     Me.mnuScenariosAddFromScript = New System.Windows.Forms.MenuItem
-    Me.mnuEdit = New System.Windows.Forms.MenuItem
-    Me.mnuEditCopyBoth = New System.Windows.Forms.MenuItem
-    Me.mnuEditCopyInputs = New System.Windows.Forms.MenuItem
-    Me.mnuEditCopyResults = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
     Me.splitHoriz = New System.Windows.Forms.Splitter
     Me.panelMiddle = New System.Windows.Forms.Panel
     Me.agdResults = New atcControls.atcGrid
+    Me.mnuScenariosAddFromBuiltInScript = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -95,6 +97,27 @@ Friend Class atcScenarioBuilderForm
     '
     Me.mnuFileAddResults.Index = 1
     Me.mnuFileAddResults.Text = "Add Results"
+    '
+    'mnuEdit
+    '
+    Me.mnuEdit.Index = 1
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopyBoth, Me.mnuEditCopyInputs, Me.mnuEditCopyResults})
+    Me.mnuEdit.Text = "&Edit"
+    '
+    'mnuEditCopyBoth
+    '
+    Me.mnuEditCopyBoth.Index = 0
+    Me.mnuEditCopyBoth.Text = "&Copy Both"
+    '
+    'mnuEditCopyInputs
+    '
+    Me.mnuEditCopyInputs.Index = 1
+    Me.mnuEditCopyInputs.Text = "Copy Inputs"
+    '
+    'mnuEditCopyResults
+    '
+    Me.mnuEditCopyResults.Index = 2
+    Me.mnuEditCopyResults.Text = "Copy Results"
     '
     'mnuAttributes
     '
@@ -120,7 +143,7 @@ Friend Class atcScenarioBuilderForm
     'mnuScenarios
     '
     Me.mnuScenarios.Index = 4
-    Me.mnuScenarios.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuScenariosAdd, Me.mnuScenariosAddFromScript})
+    Me.mnuScenarios.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuScenariosAdd, Me.mnuScenariosAddFromScript, Me.mnuScenariosAddFromBuiltInScript})
     Me.mnuScenarios.Text = "&Scenarios"
     '
     'mnuScenariosAdd
@@ -133,27 +156,6 @@ Friend Class atcScenarioBuilderForm
     Me.mnuScenariosAddFromScript.Index = 1
     Me.mnuScenariosAddFromScript.Text = "Add From Script"
     '
-    'mnuEdit
-    '
-    Me.mnuEdit.Index = 1
-    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopyBoth, Me.mnuEditCopyInputs, Me.mnuEditCopyResults})
-    Me.mnuEdit.Text = "&Edit"
-    '
-    'mnuEditCopyBoth
-    '
-    Me.mnuEditCopyBoth.Index = 0
-    Me.mnuEditCopyBoth.Text = "&Copy Both"
-    '
-    'mnuEditCopyInputs
-    '
-    Me.mnuEditCopyInputs.Index = 1
-    Me.mnuEditCopyInputs.Text = "Copy Inputs"
-    '
-    'mnuEditCopyResults
-    '
-    Me.mnuEditCopyResults.Index = 2
-    Me.mnuEditCopyResults.Text = "Copy Results"
-    '
     'agdMain
     '
     Me.agdMain.AllowHorizontalScrolling = True
@@ -163,6 +165,7 @@ Friend Class atcScenarioBuilderForm
     Me.agdMain.Location = New System.Drawing.Point(0, 0)
     Me.agdMain.Name = "agdMain"
     Me.agdMain.Size = New System.Drawing.Size(535, 249)
+    Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
     '
     'splitHoriz
@@ -192,7 +195,13 @@ Friend Class atcScenarioBuilderForm
     Me.agdResults.Location = New System.Drawing.Point(0, 304)
     Me.agdResults.Name = "agdResults"
     Me.agdResults.Size = New System.Drawing.Size(535, 200)
+    Me.agdResults.Source = Nothing
     Me.agdResults.TabIndex = 3
+    '
+    'mnuScenariosAddFromBuiltInScript
+    '
+    Me.mnuScenariosAddFromBuiltInScript.Index = 2
+    Me.mnuScenariosAddFromBuiltInScript.Text = "Add From Built-In Script"
     '
     'atcScenarioBuilderForm
     '
@@ -282,6 +291,19 @@ Friend Class atcScenarioBuilderForm
 
       pBaseResults = New atcDataSource
       For Each lDataSet As atcDataSet In pDataManager.DataSets
+        Dim lScenario As atcDataSource
+        Dim lScenarioName As String = lDataSet.Attributes.GetValue("Scenario")
+        If lScenarioName.StartsWith("Modified") Then
+          If pModifiedScenarios.Keys.Contains(lScenarioName) Then
+            lScenario = pModifiedScenarios.ItemByKey(lScenarioName)
+          Else
+            AddScenario(lScenarioName)
+            lScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+          End If
+          If Not lScenario Is Nothing AndAlso Not lScenario.DataSets.Contains(lDataSet) Then
+            lScenario.AddDataSet(lDataSet)
+          End If
+        End If
         If lDataSet.Attributes.GetValue("Constituent").ToLower = "flow" _
          AndAlso lDataSet.Attributes.GetValue("Scenario").ToLower = "base" Then
           pBaseResults.DataSets.Add(lDataSet.Attributes.GetValue("id"), lDataSet)
@@ -815,11 +837,10 @@ Friend Class atcScenarioBuilderForm
         lNewWDM = lOldWDM
         ScenarioRun(lCurrentWDMfilename, "base", Nothing)
       Else 'Run a modified scenario
-        Dim lNewScenarioName As String = "modified"
-        If lModifiedIndex > 0 Then lNewScenarioName &= (lModifiedIndex + 1)
+        Dim lModifiedScenario As atcDataSource = pModifiedScenarios.ItemByIndex(lModifiedIndex)
         lNewWDM = ScenarioRun(lCurrentWDMfilename, _
-                              lNewScenarioName, _
-                              pModifiedScenarios.ItemByIndex(lModifiedIndex).DataSets)
+                              lModifiedScenario.Specification, _
+                              lModifiedScenario.DataSets)
       End If
 
       If lModifiedIndex >= 0 Then 'ran modified scenario
@@ -909,18 +930,24 @@ Friend Class atcScenarioBuilderForm
         lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
       End If
       Dim errors As String
-
-      atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
-
-      'RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
-      '          pBaseScenario, lNewScenario)
+      RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
+                pBaseScenario, lNewScenario)
       If Not errors Is Nothing Then
         LogMsg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
       End If
     Else
       LogMsg("Unable to find script " & lScriptFileName, "Scenario Script")
     End If
+    agdMain.Refresh()
+  End Sub
 
+  Private Sub mnuScenariosAddFromBuiltInScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromBuiltInScript.Click
+    Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+    If lNewScenario.DataSets.Count > 0 Then 'This scenario is already in use
+      AddScenario()                         'Create a new scenario to populate
+      lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+    End If
+    atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
     agdMain.Refresh()
   End Sub
 
@@ -940,15 +967,17 @@ Friend Class atcScenarioBuilderForm
     AddScenario()
   End Sub
 
-  Private Sub AddScenario()
+  Private Sub AddScenario(Optional ByVal aScenarioName As String = "")
     Dim lNewModified As New atcDataSource
     Dim lNewResults As New atcDataSource
 
-    pModifiedScenarios.Add(lNewModified)
-    pModifiedResults.Add(lNewResults)
+    If aScenarioName.Length = 0 Then aScenarioName = "Modified_" & pModifiedScenarios.Count
 
-    lNewModified.Specification = "Modified_" & pModifiedScenarios.Count
-    lNewResults.Specification = "Modified_" & pModifiedResults.Count
+    pModifiedScenarios.Add(aScenarioName, lNewModified)
+    pModifiedResults.Add(aScenarioName, lNewResults)
+
+    lNewModified.Specification = aScenarioName
+    lNewResults.Specification = aScenarioName
 
     For iColumn As Integer = 0 To pSource.Columns - 1
       agdMain.SizeColumnToContents(iColumn)
