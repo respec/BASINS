@@ -67,4 +67,27 @@ Public Class atcSeasonsYearSubset
       End If
     End If
   End Function
+
+  Public Overrides Function Split(ByVal aTS As atcData.atcTimeseries, ByVal aSource As atcData.atcDataSource) As atcData.atcDataGroup
+    'Do the split
+    Dim lSplit As atcDataGroup = MyBase.Split(aTS, aSource)
+
+    'Set attributes specifying when season begins and ends
+    For Each lDataSet As atcDataSet In lSplit
+      With lDataSet.Attributes
+        If .GetValue("SeasonIndex", 0) = 1 Then 'In specified season
+          .SetValue("seasbg", pStartDate.Month)
+          .SetValue("seadbg", pStartDate.Date)
+          .SetValue("seasnd", pEndDate.Month)
+          .SetValue("seadnd", pEndDate.Date)
+        Else 'Out-of-season has opposite start/end
+          .SetValue("seasbg", pEndDate.Month)
+          .SetValue("seadbg", pEndDate.Date)
+          .SetValue("seasnd", pStartDate.Month)
+          .SetValue("seadnd", pStartDate.Date)
+        End If
+      End With
+    Next
+    Return lSplit
+  End Function
 End Class

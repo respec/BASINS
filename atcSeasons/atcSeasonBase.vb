@@ -29,7 +29,7 @@ Public Class atcSeasonBase
   End Property
 
   'Divide the data in aTS into a group of TS, one per season
-  Public Function Split(ByVal aTS As atcTimeseries, ByVal aSource As atcDataSource) As atcDataGroup
+  Public Overridable Function Split(ByVal aTS As atcTimeseries, ByVal aSource As atcDataSource) As atcDataGroup
     Dim lNewGroup As New atcDataGroup
     Dim lSeasonIndex As Integer = -1
     Dim lPrevSeasonIndex As Integer
@@ -87,7 +87,7 @@ Public Class atcSeasonBase
     Return lNewGroup
   End Function
 
-  Public Sub SetSeasonalAttributes(ByVal aTS As atcTimeseries, _
+  Public Overridable Sub SetSeasonalAttributes(ByVal aTS As atcTimeseries, _
                                    ByVal aAttributes As atcDataAttributes, _
                           Optional ByVal aCalculatedAttributes As atcDataAttributes = Nothing)
 

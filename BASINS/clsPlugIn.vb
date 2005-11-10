@@ -19,7 +19,7 @@ Public Class PlugIn
   Private Const OpenDataMenuString As String = "Open Data"
 
   Private Const SaveDataMenuName As String = "BasinsSaveData"
-  Private Const SaveDataMenuString As String = "Save Data"
+  Private Const SaveDataMenuString As String = "Save Data In..."
 
   Private Const DataMenuName As String = "BasinsData"
   Private Const DataMenuString As String = "&Data"
@@ -289,13 +289,27 @@ Public Class PlugIn
         End If
       End If
       Handled = True
-    ElseIf ItemName.Equals(SaveDataMenuName) Then
+    ElseIf ItemName.StartsWith(SaveDataMenuName & "_") Then
+      Dim lSaveIn As atcDataSource
       Dim lSaveGroup As atcDataGroup = pDataManager.UserSelectData("Select Data to Save")
       If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
-        Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
+        If ItemName.Length > SaveDataMenuName.Length Then
+          Dim lSpecification As String = ItemName.Substring(SaveDataMenuName.Length + 1)
+          For Each lDataSource As atcDataSource In pDataManager.DataSources
+            If lDataSource.Specification = lSpecification Then
+              lSaveIn = lDataSource
+              Exit For
+            End If
+          Next
+        End If
+
+        If lSaveIn Is Nothing Then
+          lSaveIn = UserOpenDataFile(False, True)
+        End If
+
         If Not lSaveIn Is Nothing And lSaveIn.Specification.Length > 0 Then
           For Each lDataSet As atcDataSet In lSaveGroup
-            lSaveIn.AddDataSet(lDataSet,atcdata.atcDataSource.EnumExistAction.ExistRenumber)
+            lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
           Next
           lSaveIn.Save(lSaveIn.Specification)
         End If
@@ -782,4 +796,19 @@ Public Class PlugIn
     Next
     Return retval
   End Function
+
+  Private Sub pDataManager_OpenedData(ByVal aDataSource As atcData.atcDataSource) Handles pDataManager.OpenedData
+    RefreshSaveDataMenu()
+  End Sub
+
+  Private Sub RefreshSaveDataMenu()
+    g_MapWin.Menus.Remove(SaveDataMenuName)
+    AddMenuIfMissing(SaveDataMenuName, "mnuFile", SaveDataMenuString, "mnuSaveAs")
+    For Each lDataSource As atcDataSource In pDataManager.DataSources
+      If lDataSource.CanSave Then
+        AddMenuIfMissing(SaveDataMenuName & "_" & lDataSource.Specification, SaveDataMenuName, lDataSource.Specification)
+      End If
+    Next
+  End Sub
+
 End Class
