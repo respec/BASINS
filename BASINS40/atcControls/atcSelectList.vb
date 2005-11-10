@@ -165,11 +165,17 @@ Public Class atcSelectList
   End Function
 
   Private Sub Clear()
+    Dim lIndex As Integer = 0
     pOk = False
     lstAvailable.Items.Clear()
     For Each lAttrName As String In pAvailable
       lstAvailable.Items.Add(lAttrName)
-      If pSelected.Contains(lAttrName) Then lstAvailable.SetSelected(lstAvailable.Items.Count - 1, True)
+      If pSelected.Contains(lAttrName) Then
+        lstAvailable.SetSelected(lIndex, True)
+        'Checking GetSelected seems to be needed to actually make the above SetSelected work
+        LogDbg("atcSelectList: Selected(" & lIndex & ") = " & lstAvailable.GetSelected(lIndex) & " """ & lAttrName & """")
+      End If
+      lIndex += 1
     Next
     lstAvailable.Refresh()
   End Sub
