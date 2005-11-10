@@ -215,10 +215,16 @@ Public Class atcTimeseriesNdayHighLow
 
         CopyBaseAttributes(aTS, newTS)
 
-        newTS.Attributes.SetValue("Tu", 6)
-        newTS.Attributes.SetValue("Ts", 1)
-        newTS.Attributes.SetValue("HighFlag", aHigh)
-        newTS.Attributes.SetValue("NDay", lNDayNow)
+        With newTS.Attributes
+          .SetValue("Tu", 6)
+          .SetValue("Ts", 1)
+          .SetValue("HighFlag", aHigh)
+          .SetValue("NDay", lNDayNow)
+          Dim ltstype As String
+          If aHigh Then ltstype = "H" Else ltstype = "L"
+          ltstype &= Format(lNDayNow, "000")
+          .SetValue("tstype", ltstype)
+        End With
 
         Dim lDescription As String = lNDayNow & " day annual "  'TODO: fill in day and annual
         If aHigh Then
