@@ -433,31 +433,26 @@ NoSuchFile:
                   Optional ByVal aDefaultExt As String = "", _
                   Optional ByVal aFileFilter As String = "", _
                   Optional ByVal aUserVerifyFileName As Boolean = False, _
-                  Optional ByVal aChDir2FileDir As Boolean = False, _
+                  Optional ByVal aChangeIntoDir As Boolean = False, _
                   Optional ByRef aFilterIndex As Integer = 1) As String
-    Dim lDir As String
-    Dim baseFileName As String 'file name (with no path) of file we are looking for
-    Dim lFileName As String
-    Dim lRegistryFileName As String
-    Dim lFileNameFoundInRegistry As Boolean
+    Dim lDir As String = CurDir()
+    Dim lFileName As String = Trim(aDefaultFileName)
+    Dim lBaseFileName As String = System.IO.Path.GetFileName(lFileName) 'file name (with no path) of file we are looking for
     Dim lExePath As String
     Dim lDLLpath As String
 
-    If (Len(aDefaultExt)) = 0 Then 'try to get from default name
+    If (Len(aDefaultExt)) = 0 Then 'get extension from default name
       aDefaultExt = FileExt(aDefaultFileName)
     End If
 
-    If (Len(aFileFilter)) = 0 Then 'try to get from default ext
+    If (Len(aFileFilter)) = 0 Then 'get filter from default ext
       If Len(aDefaultExt) > 0 Then
         aFileFilter &= aDefaultExt & " Files (*." & aDefaultExt & ")|*." & aDefaultExt & "|"
       End If
       aFileFilter &= "All files (*.*)|*.*"
     End If
 
-    lDir = CurDir()
-    lFileName = Trim(aDefaultFileName)
-
-    'On Error Resume Next
+    On Error Resume Next
 
     If Right(lFileName, 1) = "\" Then
       Return ""
@@ -470,55 +465,46 @@ NoSuchFile:
       '            aChDir2FileDir, _
       '            aFilterIndex)
     Else
-      'If Not FileExists(lFileName, True) Then 'don't already know where it is, first look in registry
-      '  If Len(pRegistrySection) > 0 Then
-      '    lRegistryFileName = GetSetting(pAppName, pRegistrySection, pRegistryKey, "")
-      '    If Not FileExists(lRegistryFileName, True) Then
-      '      lRegistryFileName = pRegistry.RegGetString(HKEY_LOCAL_MACHINE, pLocalMachinePrefix & pAppName & "\" & pRegistrySection, pRegistryKey)
-      '    End If
-      '  End If
-      '  If Len(lRegistryFileName) > 0 Then
-      '    If FileExists(lRegistryFileName, True) Then 'got from registry
-      '      lFileName = lRegistryFileName
-      '      lFileNameFoundInRegistry = True
-      '      If aChDir2FileDir Then
-      '        ChDriveDir(System.IO.Path.GetFileName(lRegistryFileName))
-      '      End If
-      '    Else 'bad name in registry, message to user needed?
-      '    End If
-      '  End If
-      'End If
+      If Not FileExists(lFileName, True) Then 'don't already know where it is, first look in registry
+        lFileName = GetSetting("FindFile", "FoundFiles", lBaseFileName.ToLower, "")
+        If lFileName.Length > 0 Then
+          If Not FileExists(lFileName) Then 'delete bad name in registry
+            DeleteSetting("FindFile", "FoundFiles", lBaseFileName.ToLower)
+          End If
+        End If
+        'Look in another part of registry
+        'If Not FileExists(lFileName) Then
+        '  lRegistryFileName = pRegistry.RegGetString(HKEY_LOCAL_MACHINE, pLocalMachinePrefix & pAppName & "\" & pRegistrySection, pRegistryKey)
+        'End If
+      End If
 
-      If Not FileExists(lFileName) Then 'try some default locations if filename was specified, but not path
-        baseFileName = System.IO.Path.GetFileName(lFileName)
-        If baseFileName.Length > 0 Then
-          lFileName = aDefaultFileName
-          If Not FileExists(lFileName) Then
-            lExePath = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location).ToLower & "\"
-            lDLLpath = PathNameOnly(System.Reflection.Assembly.GetExecutingAssembly.Location).ToLower & "\"
+      If Not FileExists(lFileName) AndAlso lBaseFileName.Length > 0 Then 'try some default locations if filename was specified, path was wrong or missing
+        lFileName = aDefaultFileName
+        If Not FileExists(lFileName) Then
+          lExePath = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location).ToLower & "\"
+          lDLLpath = PathNameOnly(System.Reflection.Assembly.GetExecutingAssembly.Location).ToLower & "\"
 
-            'First check in same folder or subfolder containing current .exe or .dll
-            lFileName = FindRecursive(baseFileName, lDLLpath, lExePath)
+          'First check in same folder or subfolder containing current .exe or .dll
+          lFileName = FindRecursive(lBaseFileName, lDLLpath, lExePath)
 
-            'If we are in BASINS bin, also look in some other BASINS folders
-            If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
-              lFileName = FindRecursive(baseFileName, _
-                                        ReplaceString(lExePath, "\bin\", "\etc\"), _
-                                        ReplaceString(lExePath, "\bin\", "\models\"), _
-                                        ReplaceString(lExePath, "\bin\", "\docs\"), _
-                                        ReplaceString(lExePath, "\bin\", "\apr\"))
-            End If
+          'If we are in bin directory, also look in some other BASINS folders
+          If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
+            lFileName = FindRecursive(lBaseFileName, _
+                                      ReplaceString(lExePath, "\bin\", "\etc\"), _
+                                      ReplaceString(lExePath, "\bin\", "\models\"), _
+                                      ReplaceString(lExePath, "\bin\", "\docs\"), _
+                                      ReplaceString(lExePath, "\bin\", "\apr\"))
+          End If
 
-            'Finally, check in the Windows system folders
-            If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
-              lFileName = FindRecursive(baseFileName, "c:\winnt\", "c:\windows\")
-            End If
+          'Finally, check in the Windows system folders
+          If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
+            lFileName = FindRecursive(lBaseFileName, "c:\winnt\", "c:\windows\")
+          End If
 
-            If FileExists(lFileName) Then
-              aDefaultFileName = lFileName
-            Else
-              lFileName = ""
-            End If
+          If FileExists(lFileName) Then
+            aDefaultFileName = lFileName
+          Else
+            lFileName = ""
           End If
         End If
       End If
@@ -534,32 +520,25 @@ NoSuchFile:
           If .ShowDialog() = Windows.Forms.DialogResult.OK Then
             lFileName = AbsolutePath(.FileName, CurDir)
             aFilterIndex = .FilterIndex
-            'If lFileName <> lRegistryFileName Then 'try to force registry update
-            '    lFileNameFoundInRegistry = False
-            'End If
           Else 'Return empty string if user clicked Cancel
             lFileName = ""
           End If
         End With
 
-        'If LookingForDir Then
-        '  lFileName = PathNameOnly(lFileName)
-        'End If
-
-        'If Not lFileNameFoundInRegistry Then 'try to add the key to the registry
-        '    If Len(pRegistrySection) > 0 Then
-        'SaveSetting(pAppName, pRegistrySection, pRegistryKey, lFileName)
-        '    End If
-        'End If
+        If FileExists(lFileName) Then
+          SaveSetting("FindFile", "FoundFiles", lBaseFileName.ToLower, lFileName)
+        End If
       End If
 
-      If aChDir2FileDir AndAlso lFileName.Length > 0 Then
+      If aChangeIntoDir Then
+        lDir = System.IO.Path.GetDirectoryName(lFileName)
+        If FileExists(lDir, True, False) Then ChDriveDir(lDir)
+      ElseIf Not lDir.Equals(CurDir) Then 'Change back to dir where we started
         ChDriveDir(lDir)
       End If
 
       Return lFileName
     End If
-
   End Function
 
   'Private Function FindRecursiveArray(ByVal aFilename As String, ByVal aStartDirs() As String) As String

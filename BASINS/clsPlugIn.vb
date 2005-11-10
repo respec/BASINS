@@ -16,7 +16,7 @@ Public Class PlugIn
   Private Const ProjectsMenuString As String = "Open &BASINS Project"
 
   Private Const OpenDataMenuName As String = "BasinsOpenData"
-  Private Const OpenDataMenuString As String = "Open &BASINS Data"
+  Private Const OpenDataMenuString As String = "Open Data"
 
   Private Const DataMenuName As String = "BasinsData"
   Private Const DataMenuString As String = "&Data"
