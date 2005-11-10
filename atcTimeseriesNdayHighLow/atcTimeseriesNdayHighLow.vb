@@ -4,7 +4,7 @@ Imports atcUtility
 Imports System.Windows.Forms
 
 Public Class atcTimeseriesNdayHighLow
-  Inherits atcDataSource
+  Inherits atcData.atcDataSource
   Private pAvailableOperations As atcDataAttributes
   Private Const pName As String = "Timeseries::n-day high/low"
 

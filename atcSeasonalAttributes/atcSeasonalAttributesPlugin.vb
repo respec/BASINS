@@ -2,7 +2,7 @@ Imports atcUtility
 Imports atcData
 
 Public Class atcSeasonalAttributesPlugin
-  Inherits atcDataDisplay
+  Inherits atcData.atcDataDisplay
 
   Public Overrides ReadOnly Property Name() As String
     Get
