@@ -1,8 +1,12 @@
-'Store attributes (and calculate some attributes if given an atcTimeseries)
-'Attributes are stored as a collection of atcDefinedValue
-
 Imports atcUtility
 
+''' <summary>
+'''     <para>
+'''         Store attributes (and calculate some attributes if given an
+'''         <see cref="atcData~atcData.atcTimeseries">atcTimeseries</see>)
+'''     </para>
+''' </summary>
+''' <remarks>Attributes are stored as a collection of atcDefinedValue</remarks>
 Public Class atcDataAttributes
   Inherits atcCollection
 

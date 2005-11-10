@@ -1,11 +1,13 @@
 ''' <summary>
 '''     <para>Base class for plugins that can'read, write, manipulate, or display
-'''     atcTimeseries</para>
-'''     <para>This class implements MapWindow.Interfaces.IPlugin so it can be loaded by the
-'''     MapWindow plugin code</para>
+'''     atcData</para>
 ''' </summary>
 ''' <remarks>
-'''     <para>Name and Description need to be overridden/shadowed by inheritors. Others may
+'''     <para>This class implements MapWindow.Interfaces.IPlugin so it can be loaded by 
+''' the
+'''     MapWindow plugin code</para>
+'''     <para>Name and Description need to be overridden/shadowed by inheritors. Others 
+''' may
 '''     be overridden if desired.</para>
 '''     <para>Additionally, data-related methods are available for inheritors.</para>
 ''' </remarks>
@@ -15,12 +17,15 @@ Public Class atcDataPlugin
   Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
   Private pSerial As Integer 'Serial number of this object
 
+  ''' <summary>create a new atcDataPlugin</summary>
   Public Sub New()
     pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
   End Sub
 
-  ''' <summary>The name that appears in the Plug-ins menu to identify this 
-  ''' plug-in.</summary>
+  ''' <summary>
+  ''' String that appears in the MapWindow Plug-ins menu to identify this
+  ''' plug-in.
+  ''' </summary>
   ''' <requirements>
   ''' Must be overridden in inheriting class to return something unique or plugin will
   ''' not load.
@@ -50,7 +55,8 @@ Public Class atcDataPlugin
     End Get
   End Property
 
-  ''' <summary>Longer version of Name with room to expand acronyms</summary>
+  ''' <summary>Longer version of <see cref="Name">Name</see> with room to expand 
+  ''' acronyms</summary>
   ''' <remarks>Appears in the plug-ins dialog box when a user selects this 
   ''' plug-in.</remarks>
   Public Overridable ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description

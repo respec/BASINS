@@ -1,13 +1,17 @@
-'A value and its definition 
+''' <summary>A value and its definition</summary>
 Public Class atcDefinedValue
   Public Definition As atcAttributeDefinition
   Public Value As Object
   Public Arguments As atcDataAttributes 'Arguments used for calculating Value, if any, or Nothing
 End Class
 
-'atcAttributeDefinition contains metadata about a value.
-'These metadata can be thought of as a more detailed "type" of a value.
-'Does not include the value itself, so many values can share the same definition
+''' <summary><para>Contains metadata about a value or data set.</para></summary>
+''' <remarks>
+'''     <para>These metadata can be thought of as a more detailed "type" of a 
+''' value.</para>
+'''     <para>Does not include the value itself, so many values can share the same
+'''     definition</para>
+''' </remarks>
 Public Class atcAttributeDefinition
   Dim pName As String         'Short name (used for labeling in UI)
   Dim pDescription As String  'Something longer than Name but still short
