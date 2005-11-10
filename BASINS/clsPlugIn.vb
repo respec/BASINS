@@ -18,6 +18,9 @@ Public Class PlugIn
   Private Const OpenDataMenuName As String = "BasinsOpenData"
   Private Const OpenDataMenuString As String = "Open Data"
 
+  Private Const SaveDataMenuName As String = "BasinsSaveData"
+  Private Const SaveDataMenuString As String = "Save Data"
+
   Private Const DataMenuName As String = "BasinsData"
   Private Const DataMenuString As String = "&Data"
   Private pLoadedDataMenu As Boolean = False
@@ -112,6 +115,7 @@ Public Class PlugIn
     'AddMenuIfMissing(NewProjectMenuName, "mnuFile", NewProjectMenuString, "mnuNew")
     'g_MapWin.Menus.Remove("New")
     AddMenuIfMissing(OpenDataMenuName, "mnuFile", OpenDataMenuString, "mnuOpen")
+    AddMenuIfMissing(SaveDataMenuName, "mnuFile", SaveDataMenuString, "mnuSaveAs")
     AddMenuIfMissing(ProjectsMenuName, "mnuFile", ProjectsMenuString, "mnuRecentProjects")
 
     For iDrive = 0 To g_BasinsDrives.Length - 1
@@ -236,6 +240,8 @@ Public Class PlugIn
     g_MapWin.Menus.Remove(ModelsMenuName) 'TODO: don't unload if another plugin is still using it
     g_MapWin.Menus.Remove(ProjectsMenuName)
     g_MapWin.Menus.Remove(OpenDataMenuName)
+    g_MapWin.Menus.Remove(SaveDataMenuName)
+
     'LogStopMonitor()
 
   End Sub
@@ -283,13 +289,19 @@ Public Class PlugIn
         End If
       End If
       Handled = True
-    ElseIf ItemName.Equals(OpenDataMenuName) Then
-      Dim lFilesOnly As New ArrayList(1)
-      lFilesOnly.Add("File")
-      Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type")
-      If Not lNewSource Is Nothing Then 'user did not cancel
-        pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+    ElseIf ItemName.Equals(SaveDataMenuName) Then
+      Dim lSaveGroup As atcDataGroup = pDataManager.UserSelectData("Select Data to Save")
+      If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
+        Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
+        If Not lSaveIn Is Nothing Then
+          For Each lDataSet As atcDataSet In lSaveGroup
+            lSaveIn.AddDataSet(lDataSet)
+          Next
+          lSaveIn.Save(lSaveIn.Specification)
+        End If
       End If
+    ElseIf ItemName.Equals(OpenDataMenuName) Then
+      UserOpenDataFile()
     ElseIf ItemName.StartsWith(ProjectsMenuName & "_") Then
       DataDirName = g_MapWin.Menus(ItemName).Text ' g_MapWin.Menus(ItemName).Tooltip
       If FileExists(DataDirName, True, False) Then
@@ -381,6 +393,17 @@ Public Class PlugIn
       'MsgBox("Other button: " & ItemName)
     End If
   End Sub
+
+  Private Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
+                                    Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
+    Dim lFilesOnly As New ArrayList(1)
+    lFilesOnly.Add("File")
+    Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
+    If Not lNewSource Is Nothing Then 'user did not cancel
+      pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+    End If
+    Return lNewSource
+  End Function
 
   Public Property Busy() As Boolean
     Get
