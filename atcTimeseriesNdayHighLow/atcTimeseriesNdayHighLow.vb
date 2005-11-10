@@ -328,8 +328,8 @@ Public Class atcTimeseriesNdayHighLow
       'calculate the n day annual timeseries
       lNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
     Else 'already an annual timeseries
-      If (aHigh = aTimeseries.Attributes.GetValue("HighFlag") And _
-         aNDay = aTimeseries.Attributes.GetValue("NDay")) Then
+      If (aHigh = aTimeseries.Attributes.GetValue("HighFlag", True) And _
+         aNDay = aTimeseries.Attributes.GetValue("NDay", 1)) Then
         lNdayTsGroup = New atcDataGroup(aTimeseries)
       End If
     End If

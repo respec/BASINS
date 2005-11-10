@@ -1,3 +1,4 @@
+'Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On 
 
@@ -7,7 +8,6 @@ Imports atcUtility
 
 Public Class atcDataSourceWDM
   Inherits atcData.atcDataSource
-  '##MODULE_REMARKS Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
   Private Shared pFileFilter As String = "WDM Files (*.wdm)|*.wdm"
   Private pErrorDescription As String
@@ -261,26 +261,21 @@ Public Class atcDataSourceWDM
     End Select
   End Function
 
-  Public Overrides Function AddDataset(ByRef aDataSet As atcData.atcDataSet, Optional ByRef aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
-
-    Dim lTimser As atcTimeseries
-
-    If aDataSet.GetType.FullName <> "atcData.atcTimeseries" Then  'not a timeseries
-      Return False
-    Else
-      lTimser = aDataSet
-    End If
-
+  Public Overrides Function AddDataset(ByRef aDataSet As atcData.atcDataSet, _
+                                       Optional ByRef aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
+                                       As Boolean
     LogDbg("atcDataSourceWdm:AddDataset:entry")
+    Dim lTimser As atcTimeseries
+    Try
+      lTimser = aDataSet
+    Catch ex As Exception
+      LogDbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
+      Return False
+    End Try
 
     aDataSet.Attributes.CalculateAll()
 
-    Dim lDsn As Integer = 1
-    Dim lDsnAttribute As atcDefinedValue = aDataSet.Attributes.ItemByKey("id")
-    If lDsnAttribute.Value > 0 Then
-      lDsn = lDsnAttribute.Value
-    End If
-
+    Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
     If Not aExistAction = ExistReplace Then
       lDsn = findNextDsn(lDsn)
       aDataSet.Attributes.SetValue("Id", lDsn)
@@ -290,6 +285,7 @@ Public Class atcDataSourceWDM
     LogDbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
 
     If DsnBld(lWdmHandle.Unit, lTimser) Then
+      MyBase.AddDataSet(lTimser)
       Dim lSDat(5) As Integer
       Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
       Dim lTu As Integer = lTimser.Attributes.GetValue("tu")
