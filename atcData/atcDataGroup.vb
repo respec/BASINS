@@ -16,7 +16,6 @@ Public Class atcDataGroup
   Private pSelectedData As atcDataGroup 'tracks currently selected group within this group
 
   ''' <summary>
-  '''     <br />
   '''     One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just 
   ''' added
   '''     to the group
@@ -51,6 +50,7 @@ Public Class atcDataGroup
     End Set
   End Property
 
+  ''' <summary>atcDataSet by index</summary>
   Public Shadows Property ItemByIndex(ByVal aIndex As Integer) As atcDataSet
     Get
       Return MyBase.Item(aIndex)
@@ -60,6 +60,7 @@ Public Class atcDataGroup
     End Set
   End Property
 
+  ''' <summary>atcDataSet by key</summary>
   Public Shadows Property ItemByKey(ByVal aKey As Object) As atcDataSet
     Get
       Return MyBase.ItemByKey(aKey)
@@ -69,34 +70,40 @@ Public Class atcDataGroup
     End Set
   End Property
 
+  ''' <summary>Create a new data group</summary>
   Public Sub New()
     MyBase.New()
   End Sub
 
+  ''' <summary>Create a new data group and add a dataset to the group with the default key of its serial 
+  ''' number</summary>
   Public Sub New(ByVal aDataSet As atcDataSet)
     MyBase.New()
     Add(aDataSet.Serial, aDataSet)
   End Sub
 
+  ''' <summary>
+  '''     Add an <see cref="atcData~atcData.atcDataSet">atcDataSet</see> to the group with
+  '''     the default key of its serial number
+  ''' </summary>
   Public Shadows Function Add(ByVal aDataSet As atcDataSet) As Integer
     Add(aDataSet.Serial, aDataSet)
   End Function
 
-  'Add one atcDataSet to the group with a custom key
-  ''' <summary>Add one atcDataSet to the group with the default key of its serial 
-  ''' number</summary>
-  Public Shadows Function Add(ByVal aKey As Object, ByVal aDataSet As atcDataSet) As Integer
+  ''' <summary>Add a dataset to the group with the key specified</summary>
+  Public Shadows Function Add(ByVal aKey As Object, _
+                              ByVal aDataSet As atcDataSet) As Integer
     MyBase.Add(aKey, aDataSet)
     RaiseAddedOne(aDataSet)
   End Function
 
-  'Add an atcCollection or atcDataGroup of atcDataSet to the group
+  ''' <summary>Add an atcCollection or atcDataGroup of atcDataSet to the group.</summary>
   Public Shadows Sub Add(ByVal aAddThese As atcCollection)
     MyBase.AddRange(aAddThese)
     RaiseEvent Added(aAddThese)
   End Sub
 
-  'Remove all atcDataSets and selection
+  ''' <summary>Remove all datasets and selections from this data group.</summary>
   Public Shadows Sub Clear()
     If Not pSelectedData Is Nothing Then pSelectedData.Clear()
     If Count > 0 Then
@@ -106,6 +113,7 @@ Public Class atcDataGroup
     End If
   End Sub
 
+  ''' <summary>Create a copy of this data group</summary>
   Public Shadows Function Clone() As atcDataGroup
     Dim newClone As New atcDataGroup
     For index As Integer = 0 To MyBase.Count - 1
@@ -114,12 +122,14 @@ Public Class atcDataGroup
     Return newClone
   End Function
 
-  'Change this group to match the new group and raise the appropriate events
+  ''' <summary>
+  '''     <para>Change this group to match the new group and raise the appropriate
+  '''     events.</para>
+  ''' </summary>
   Public Shadows Sub ChangeTo(ByVal aNewGroup As atcDataGroup)
     If aNewGroup Is Nothing Then
       Clear()
     Else
-
       Dim RemoveList As New atcCollection
       For Each oldTS As atcDataSet In Me
         If Not aNewGroup.Contains(oldTS) Then
@@ -140,6 +150,7 @@ Public Class atcDataGroup
     End If
   End Sub
 
+  ''' <summary>Determines index of dataset specified by aSerial</summary>
   Public Function IndexOfSerial(ByVal aSerial As Integer) As Integer
     For iTS As Integer = 0 To Count - 1
       If Item(iTS).Serial = aSerial Then Return iTS
@@ -147,27 +158,33 @@ Public Class atcDataGroup
     Return -1
   End Function
 
-  'Insert a new DataSet at the specified index
-  Public Shadows Sub Insert(ByVal aIndex As Integer, ByVal aDataSet As atcDataSet)
+  ''' <summary>Insert a new dataset at the specified index</summary>
+  Public Shadows Sub Insert(ByVal aIndex As Integer, _
+                            ByVal aDataSet As atcDataSet)
     MyBase.Insert(aIndex, aDataSet)
     RaiseAddedOne(aDataSet)
   End Sub
 
-  Public Shadows Sub RemoveAt(ByVal index As Integer)
-    'Cannot just do: Remove(ItemByIndex(index))
-    'because this overriding RemoveAt is called by MyBase.Remove--infinite loop
-    Dim lDataSet As atcDataSet = ItemByIndex(index)
-    MyBase.RemoveAt(index)
+  ''' <remarks>
+  '''     Cannot just do: <see cref="Remove(atcDataSet)">Remove(ItemByIndex(index))</see>
+  '''     because this overriding RemoveAt is called by MyBase.Remove--infinite loop
+  ''' </remarks>
+  ''' <summary>Remove dataset specified by aIndex from this group.</summary>
+  Public Shadows Sub RemoveAt(ByVal aIndex As Integer)
+    Dim lDataSet As atcDataSet = ItemByIndex(aIndex)
+    MyBase.RemoveAt(aIndex)
     RaiseRemovedOne(lDataSet)
   End Sub
 
   'Remove aDataSet from the group
+  ''' <summary>Remove an <see cref="atcData~atcData.atcDataSet">atcDataSet</see> from this 
+  ''' group.</summary>
   Public Shadows Sub Remove(ByVal aDataSet As atcDataSet)
     MyBase.Remove(aDataSet)
     RaiseRemovedOne(aDataSet)
   End Sub
 
-  'Remove a list of atcDataSet from the group, can be atcCollection or atcDataGroup
+  ''' <summary>Remove a set of datasets from this group.</summary>
   Public Shadows Sub Remove(ByVal aRemoveThese As atcCollection)
     If Not aRemoveThese Is Nothing AndAlso aRemoveThese.Count > 0 Then
       For Each ts As atcDataSet In aRemoveThese
@@ -177,7 +194,7 @@ Public Class atcDataGroup
     End If
   End Sub
 
-  'Remove a span of one or more DataSets from the group by index
+  ''' <summary>Remove a span of one or more DataSets from the group by index.</summary>
   Public Shadows Sub RemoveRange(ByVal aIndex As Integer, ByVal aNumber As Integer)
     Dim lRemoveThese As New atcCollection
     For index As Integer = aIndex To aIndex + aNumber - 1
@@ -198,6 +215,7 @@ Public Class atcDataGroup
     End Set
   End Property
 
+  ''' <summary>Contents of this class expressed as a string.</summary>
   Public Shadows Function ToString() As String
     ToString = Count & " Data:"
     For Each lts As atcDataSet In Me

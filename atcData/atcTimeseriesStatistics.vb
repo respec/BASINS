@@ -3,30 +3,33 @@ Imports atcUtility
 
 Imports System.Windows.Forms
 
+''' <summary>Computes statistics of a timeseries</summary>
 Public Class atcTimeseriesStatistics
   Inherits atcDataSource
   Private pAvailableOperations As atcDataAttributes ' atcDataGroup
-  Private Const pName As String = "Timeseries::Statistics"
 
+  ''' <summary>returns 'Timeseries::Statistics'</summary>
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return pName
+      Return "Timeseries::Statistics"
     End Get
   End Property
 
+  ''' <summary>Returns 'Compute Statistics'</summary>
   Public Overrides ReadOnly Property Category() As String
     Get
       Return "Compute Statistics"
     End Get
   End Property
 
+  ''' <summary>Returns 'Computes statistics of a timeseries and stores them as attributes'</summary>
   Public Overrides ReadOnly Property Description() As String
     Get
-      Return Name
+      Return "Computes statistics of a timeseries and stores them as attributes"
     End Get
   End Property
 
-  'Definitions of statistics supported by ComputeStatistics
+  ''' <summary>Definitions of statistics supported by this class.</summary>
   Public Overrides ReadOnly Property AvailableOperations() As atcDataAttributes
     Get
       If pAvailableOperations Is Nothing Then
