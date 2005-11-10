@@ -1,3 +1,4 @@
+''' <summary>Base class for data.</summary>
 Public Class atcDataSet
 
   Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
@@ -8,36 +9,41 @@ Public Class atcDataSet
 
   Private pAttributes As atcDataAttributes
 
-  'Attributes associated with the whole Data (location, constituent, etc.)
+  ''' <summary>Attributes associated with the whole data set(location, constituent, 
+  ''' etc.)</summary>
   Public ReadOnly Property Attributes() As atcDataAttributes
     Get
       Return pAttributes
     End Get
   End Property
 
+  ''' <summary>Reset data attributes to an empty collection</summary>
   Public Overridable Sub Clear()
     pAttributes = New atcDataAttributes
     pAttributes.Owner = Me
   End Sub
 
+  ''' <summary>Create a new data set with identical attributes to current one</summary>
   Public Overridable Function Clone() As atcDataSet
     Dim lClone As New atcDataSet
     lClone.Attributes.ChangeTo(pAttributes)
     Return lClone
   End Function
 
+  ''' <summary>Create a new data set with a unique serial number</summary>
   Public Sub New()
-    pSerial = System.Threading.Interlocked.Increment(pNextSerial) 'Safely increment pNextSerial
+    pSerial = System.Threading.Interlocked.Increment(pNextSerial)
     Clear()
   End Sub
 
-  'Unique serial number assigned when object is created
+  ''' <summary>Unique serial number assigned when data object is created</summary>
   Public ReadOnly Property Serial() As Integer
     Get
       Return pSerial
     End Get
   End Property
 
+  ''' <summary>Formated string containing all attributes of data set.</summary>
   Public Overrides Function ToString() As String
     Dim lLastAttribute As Integer = pStringAttributeNames.GetUpperBound(0)
     Dim lAttrValues(lLastAttribute) As String
@@ -47,8 +53,11 @@ Public Class atcDataSet
     Return String.Format(pStringFormat, lAttrValues)
   End Function
 
-  Public Shared Sub SetStringFormat(ByVal aAttributeNames() As String, Optional ByVal aFormat As String = "")
-    If aFormat.Length = 0 Then 'Build a default format string with all arguments separated by spaces
+  ''' <summary>Build a default format string with all arguments separated by 
+  ''' spaces</summary>
+  Public Shared Sub SetStringFormat(ByVal aAttributeNames() As String, _
+                                  Optional ByVal aFormat As String = "")
+    If aFormat.Length = 0 Then
       For iArg As Integer = 0 To aAttributeNames.GetUpperBound(0)
         aFormat &= "{" & iArg & "} "
       Next

@@ -1,19 +1,32 @@
-'atcDataGroup is a group of atcDataSet objects and associated selection information
-'
-'Sharable between different views of the same data
-'Events are defined to allow different views to remain synchronized
-
 Imports atcUtility
 
+''' <summary>Group of atcDataSet objects and associated selection information</summary>
+''' <remarks>
+'''     <para>Sharable between different views of the same data.</para>
+'''     <para>
+'''         <br />
+'''         Events are defined to allow different
+'''         <see cref="atcData~atcData.atcDataDisplay">displays</see> to remain
+'''         synchronized
+'''     </para>
+''' </remarks>
 Public Class atcDataGroup
   Inherits atcCollection
 
   Private pSelectedData As atcDataGroup 'tracks currently selected group within this group
 
-  'One or more atcDataSet were just added to the group
+  ''' <summary>
+  '''     <br />
+  '''     One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just 
+  ''' added
+  '''     to the group
+  ''' </summary>
   Public Event Added(ByVal aAdded As atcCollection)
 
-  'One or more atcDataSet were just removed from the group
+  ''' <summary>
+  '''     One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just
+  '''     removed from the group
+  ''' </summary>
   Public Event Removed(ByVal aRemoved As atcCollection)
 
   Private Sub RaiseAddedOne(ByVal aDataSet As atcDataSet)
@@ -28,31 +41,31 @@ Public Class atcDataGroup
     RaiseEvent Removed(lDataSets)
   End Sub
 
-  'Get atcDataSet by index
-  Default Public Shadows Property Item(ByVal index As Integer) As atcDataSet
+  ''' <summary>atcDataSet by index</summary>
+  Default Public Shadows Property Item(ByVal aIndex As Integer) As atcDataSet
     Get
-      Return MyBase.Item(index)
+      Return MyBase.Item(aIndex)
     End Get
     Set(ByVal newValue As atcDataSet)
-      MyBase.Item(index) = newValue
+      MyBase.Item(aIndex) = newValue
     End Set
   End Property
 
-  Public Shadows Property ItemByIndex(ByVal index As Integer) As atcDataSet
+  Public Shadows Property ItemByIndex(ByVal aIndex As Integer) As atcDataSet
     Get
-      Return MyBase.Item(index)
+      Return MyBase.Item(aIndex)
     End Get
     Set(ByVal newValue As atcDataSet)
-      MyBase.Item(index) = newValue
+      MyBase.Item(aIndex) = newValue
     End Set
   End Property
 
-  Public Shadows Property ItemByKey(ByVal key As Object) As atcDataSet
+  Public Shadows Property ItemByKey(ByVal aKey As Object) As atcDataSet
     Get
-      Return MyBase.ItemByKey(key)
+      Return MyBase.ItemByKey(aKey)
     End Get
     Set(ByVal newValue As atcDataSet)
-      MyBase.ItemByKey(key) = newValue
+      MyBase.ItemByKey(aKey) = newValue
     End Set
   End Property
 
@@ -65,14 +78,15 @@ Public Class atcDataGroup
     Add(aDataSet.Serial, aDataSet)
   End Sub
 
-  'Add one atcDataSet to the group with the default key of its serial number
   Public Shadows Function Add(ByVal aDataSet As atcDataSet) As Integer
     Add(aDataSet.Serial, aDataSet)
   End Function
 
   'Add one atcDataSet to the group with a custom key
-  Public Shadows Function Add(ByVal key As Object, ByVal aDataSet As atcDataSet) As Integer
-    MyBase.Add(key, aDataSet)
+  ''' <summary>Add one atcDataSet to the group with the default key of its serial 
+  ''' number</summary>
+  Public Shadows Function Add(ByVal aKey As Object, ByVal aDataSet As atcDataSet) As Integer
+    MyBase.Add(aKey, aDataSet)
     RaiseAddedOne(aDataSet)
   End Function
 
