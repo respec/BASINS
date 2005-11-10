@@ -1,5 +1,6 @@
 Imports System.Math
 
+''' <summary>Base class for timeseries data</summary>
 Public Class atcTimeseries
   Inherits atcDataSet
 
@@ -13,27 +14,27 @@ Public Class atcTimeseries
   Private pValues() As Double
   Private pValueAttributes() As atcDataAttributes
 
-  'Set or get an individual value
-  Public Property Value(ByVal index As Integer) As Double
+  ''' <summary>Set or get an individual value</summary>
+  Public Property Value(ByVal aIndex As Integer) As Double
     Get
       EnsureValuesRead()
-      If index >= 0 And index <= pNumValues Then
-        Return pValues(index)
+      If aIndex >= 0 And aIndex <= pNumValues Then
+        Return pValues(aIndex)
       Else
         'TODO: handle request for value outside range as error?
         Return Double.NaN
       End If
     End Get
     Set(ByVal newValue As Double)
-      If index >= 0 And index <= pNumValues Then
-        pValues(index) = newValue
+      If aIndex >= 0 And aIndex <= pNumValues Then
+        pValues(aIndex) = newValue
       Else
         'TODO: handle setting value outside range as error? Expand as needed?
       End If
     End Set
   End Property
 
-  'Set or get the entire array of values
+  ''' <summary>Set or get the entire array of values</summary>
   Public Property Values() As Double()
     Get
       EnsureValuesRead()
@@ -45,37 +46,44 @@ Public Class atcTimeseries
     End Set
   End Property
 
-  'Get an attribute of a value without creating pValueAttributes or pValueAttributes(index)
-  Public Function ValueAttributesGetValue(ByVal index As Integer, ByVal aAttributeName As String, ByVal aDefault As Object) As Object
-    If pValueAttributes Is Nothing OrElse pValueAttributes(index) Is Nothing Then
+  ''' <summary>
+  ''' Get an attribute of a value without creating pValueAttributes or
+  ''' pValueAttributes(index)
+  ''' </summary>
+  Public Function ValueAttributesGetValue(ByVal aIndex As Integer, ByVal aAttributeName As String, ByVal aDefault As Object) As Object
+    If pValueAttributes Is Nothing OrElse pValueAttributes(aIndex) Is Nothing Then
       Return aDefault
     Else
-      Return pValueAttributes(index).GetValue(aAttributeName, aDefault)
+      Return pValueAttributes(aIndex).GetValue(aAttributeName, aDefault)
     End If
   End Function
 
-  'Get whether a ValueAttribute exists for a Value without creating pValueAttributes or pValueAttributes(index)
-  Public Function ValueAttributesExist(ByVal index As Integer) As Boolean
-    If pValueAttributes Is Nothing OrElse pValueAttributes(index) Is Nothing Then
+  ''' <summary>
+  ''' Get whether a ValueAttribute exists for a Value without creating pValueAttributes
+  ''' or pValueAttributes(index)
+  ''' </summary>
+  Public Function ValueAttributesExist(ByVal aIndex As Integer) As Boolean
+    If pValueAttributes Is Nothing OrElse pValueAttributes(aIndex) Is Nothing Then
       Return False
     Else
       Return True
     End If
   End Function
 
-  'Attributes associated with individual values (quality flags)
-  Public Property ValueAttributes(ByVal index As Integer) As atcDataAttributes
+  ''' <summary>Attributes associated with individual data values</summary>
+  ''' <remarks>May be used to store data quality flags or other metadata.</remarks>
+  Public Property ValueAttributes(ByVal aIndex As Integer) As atcDataAttributes
     Get
       EnsureValuesRead()
-      If index >= 0 And index <= pNumValues Then
+      If aIndex >= 0 And aIndex <= pNumValues Then
         If pValueAttributes Is Nothing Then 'Need to allocate pValueAttributes
           ReDim pValueAttributes(pNumValues)
         End If
-        If pValueAttributes(index) Is Nothing Then 'Create new atcDataAttributes for this value
-          pValueAttributes(index) = New atcDataAttributes
-          pValueAttributes(index).Owner = Me
+        If pValueAttributes(aIndex) Is Nothing Then 'Create new atcDataAttributes for this value
+          pValueAttributes(aIndex) = New atcDataAttributes
+          pValueAttributes(aIndex).Owner = Me
         End If
-        Return pValueAttributes(index)
+        Return pValueAttributes(aIndex)
       Else
         'TODO: handle request for value outside range as error?
         Return Nothing
@@ -83,19 +91,24 @@ Public Class atcTimeseries
     End Get
     Set(ByVal newValue As atcDataAttributes)
       EnsureValuesRead()
-      If index >= 0 And index <= pNumValues Then
+      If aIndex >= 0 And aIndex <= pNumValues Then
         If pValueAttributes Is Nothing Then 'Need to allocate pValueAttributes
           ReDim pValueAttributes(pNumValues)
         End If
-        pValueAttributes(index) = newValue
+        pValueAttributes(aIndex) = newValue
       Else
         'TODO: handle setting value outside range as error?
       End If
     End Set
   End Property
 
-  'Each value in Dates is the instant of measurement or the start of the interval
-  '(Julian days since the start of 1900)
+  ''' <summary>
+  ''' Each value in Dates is the instant of measurement or the start of the interval
+  ''' </summary>
+  ''' <remarks>
+  ''' Dates are julian days since the start of 1900. Fractional part of a date is time
+  ''' of day.
+  ''' </remarks>
   Public Property Dates() As atcTimeseries
     Get
       Return pDates
@@ -122,7 +135,7 @@ Public Class atcTimeseries
   '    End Set
   'End Property
 
-  'Clear all values and attributes, but not Dates
+  ''' <summary>Clear all values and attributes, but not dates.</summary>
   Public Overrides Sub Clear()
     MyBase.Clear()
     ReDim pValues(0)
@@ -133,6 +146,7 @@ Public Class atcTimeseries
     'pDates = New atcTimeseries(aFile)
   End Sub
 
+  ''' <summary>Make a copy of the current dataset and return it</summary>
   Public Overrides Function Clone() As atcDataSet
     EnsureValuesRead()
     Dim lClone As New atcTimeseries(pDataSource)
@@ -149,7 +163,7 @@ Public Class atcTimeseries
     Return lClone
   End Function
 
-  'Create a new Timeseries and reference the file it came from
+  ''' <summary>Create a new timeseries and reference the source that it came from</summary>
   Public Sub New(ByVal aDataSource As atcDataSource)
     MyBase.New()
     Clear()
@@ -161,7 +175,7 @@ Public Class atcTimeseries
     End Try
   End Sub
 
-  'Get or set the number of values
+  ''' <summary>Number of data values in data set</summary>
   Public Property numValues() As Long
     Get
       If pValuesNeedToBeRead Then 'might have only read header
@@ -175,7 +189,7 @@ Public Class atcTimeseries
     End Set
   End Property
 
-  'Make sure values have been read from the file
+  ''' <summary>Make sure values have been read from the source.</summary>
   Public Sub EnsureValuesRead()
     If pValuesNeedToBeRead Then
       'just header information was read at first, delaying using the time/space to read all the data
@@ -183,8 +197,15 @@ Public Class atcTimeseries
     End If
   End Sub
 
-  'True if we have read the header and not all the values to save time and memory
-  'Should only be changed by the atcDataSource that reads this Timeseries (aFile from New)
+  ''' <summary>
+  '''     <para>True if we have read the header and not all the values to save time and
+  '''     memory</para>
+  ''' </summary>
+  ''' <remarks>
+  '''     Should only be changed by the
+  '''     <see cref="atcData~atcData.atcDataSource">atcDataSource</see> that reads this
+  '''     timeseries (aFile from New)
+  ''' </remarks>
   Public Property ValuesNeedToBeRead() As Boolean
     Get
       Return pValuesNeedToBeRead
@@ -194,8 +215,9 @@ Public Class atcTimeseries
     End Set
   End Property
 
-  'Return index of aValue or -1 if not found
-  Public Function IndexOfValue(ByVal aValue As Double, ByVal aAssumeSorted As Boolean) As Integer
+  ''' <summary>Return index of aValue or -1 if not found</summary>
+  Public Function IndexOfValue(ByVal aValue As Double, _
+                             ByVal aAssumeSorted As Boolean) As Integer
     If aAssumeSorted Then 'do a binary search, find wanted value in log2(pNumValues) steps
       Dim lHigher As Integer = pNumValues
       Dim lLower As Integer = 0 'Note: this starts one *lower than* start of where to search in array

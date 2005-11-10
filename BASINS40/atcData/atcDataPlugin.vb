@@ -4,11 +4,9 @@
 ''' </summary>
 ''' <remarks>
 '''     <para>This class implements MapWindow.Interfaces.IPlugin so it can be loaded by 
-''' the
-'''     MapWindow plugin code</para>
+'''     the MapWindow plugin code</para>
 '''     <para>Name and Description need to be overridden/shadowed by inheritors. Others 
-''' may
-'''     be overridden if desired.</para>
+'''     may be overridden if desired.</para>
 '''     <para>Additionally, data-related methods are available for inheritors.</para>
 ''' </remarks>
 Public Class atcDataPlugin
@@ -124,7 +122,7 @@ Public Class atcDataPlugin
 
   ''' <summary>
   ''' Fires when the user removes a layer from MapWindow.<br />
-  ''' Useful if this plug-in depends on a particular layer being present,<br />
+  ''' Useful if this plug-in depends on a particular layer being present, 
   ''' or if it keeps an internal list of layers.
   ''' </summary>
   Public Overridable Sub LayerRemoved(ByVal aHandle As Integer) _
@@ -132,7 +130,7 @@ Public Class atcDataPlugin
   End Sub
 
   ''' <summary>
-  ''' Fires when the user adds a layer to MapWindow.<br />
+  ''' Fires when the user adds a layer to MapWindow. 
   ''' Useful in the same cases as <see cref="LayerRemoved">LayerRemoved</see>
   ''' </summary>
   Public Overridable Sub LayersAdded(ByVal aLayers() As MapWindow.Interfaces.Layer) _
