@@ -173,11 +173,23 @@ Public Class atcDataManager
   ''' <param name="aCategories">
   '''     <para>Filter to limit user choices</para>
   ''' </param>  
-  Public Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing, Optional ByVal aTitle As String = "Select a Data Source") As atcDataSource
+  ''' <param name="aTitle">
+  '''     <para>Title of window</para>
+  ''' </param>  
+  ''' <param name="aNeedToOpen">
+  '''     <para>True to only include data sources that can open</para>
+  ''' </param>  
+  ''' <param name="aNeedToSave">
+  '''     <para>True to only include data sources that can save</para>
+  ''' </param>  
+  Public Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing, _
+                                       Optional ByVal aTitle As String = "Select a Data Source", _
+                                       Optional ByVal aNeedToOpen As Boolean = True, _
+                                       Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
     Dim lForm As New frmDataSource
     Dim lSelectedDataSource As atcDataSource
     lForm.Text = aTitle
-    lForm.AskUser(Me, lSelectedDataSource, True, False, aCategories)
+    lForm.AskUser(Me, lSelectedDataSource, aNeedToOpen, aNeedToSave, aCategories)
     Return lSelectedDataSource
   End Function
 
