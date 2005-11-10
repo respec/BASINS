@@ -6,7 +6,7 @@ Imports atcData.atcDataSource.EnumExistAction
 Imports atcUtility
 
 Public Class atcDataSourceWDM
-  Inherits atcDataSource
+  Inherits atcData.atcDataSource
   '##MODULE_REMARKS Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
   Private Shared pFileFilter As String = "WDM Files (*.wdm)|*.wdm"
