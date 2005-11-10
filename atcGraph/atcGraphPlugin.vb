@@ -1,7 +1,7 @@
 Imports atcData
 
 Public Class atcGraphPlugin
-  Inherits atcDataDisplay
+  Inherits atcData.atcDataDisplay
 
   Dim pMapWin As MapWindow.Interfaces.IMapWin
 

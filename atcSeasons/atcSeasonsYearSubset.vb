@@ -77,14 +77,14 @@ Public Class atcSeasonsYearSubset
       With lDataSet.Attributes
         If .GetValue("SeasonIndex", 0) = 1 Then 'In specified season
           .SetValue("seasbg", pStartDate.Month)
-          .SetValue("seadbg", pStartDate.Date)
+          .SetValue("seadbg", pStartDate.Day)
           .SetValue("seasnd", pEndDate.Month)
-          .SetValue("seadnd", pEndDate.Date)
+          .SetValue("seadnd", pEndDate.Day)
         Else 'Out-of-season has opposite start/end
           .SetValue("seasbg", pEndDate.Month)
-          .SetValue("seadbg", pEndDate.Date)
+          .SetValue("seadbg", pEndDate.Day)
           .SetValue("seasnd", pStartDate.Month)
-          .SetValue("seadnd", pStartDate.Date)
+          .SetValue("seadnd", pStartDate.Day)
         End If
       End With
     Next
