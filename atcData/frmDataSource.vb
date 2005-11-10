@@ -55,7 +55,7 @@ Friend Class frmDataSource
     Me.treeSources.Location = New System.Drawing.Point(0, 0)
     Me.treeSources.Name = "treeSources"
     Me.treeSources.SelectedImageIndex = -1
-    Me.treeSources.Size = New System.Drawing.Size(296, 496)
+    Me.treeSources.Size = New System.Drawing.Size(289, 389)
     Me.treeSources.TabIndex = 0
     '
     'pnlButtons
@@ -63,15 +63,16 @@ Friend Class frmDataSource
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.pnlButtons.Location = New System.Drawing.Point(0, 492)
+    Me.pnlButtons.Location = New System.Drawing.Point(0, 389)
     Me.pnlButtons.Name = "pnlButtons"
-    Me.pnlButtons.Size = New System.Drawing.Size(295, 40)
+    Me.pnlButtons.Size = New System.Drawing.Size(288, 40)
     Me.pnlButtons.TabIndex = 13
     '
     'btnCancel
     '
+    Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Top
     Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-    Me.btnCancel.Location = New System.Drawing.Point(104, 8)
+    Me.btnCancel.Location = New System.Drawing.Point(152, 8)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(80, 24)
     Me.btnCancel.TabIndex = 4
@@ -79,7 +80,8 @@ Friend Class frmDataSource
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(8, 8)
+    Me.btnOk.Anchor = System.Windows.Forms.AnchorStyles.Top
+    Me.btnOk.Location = New System.Drawing.Point(56, 8)
     Me.btnOk.Name = "btnOk"
     Me.btnOk.Size = New System.Drawing.Size(80, 24)
     Me.btnOk.TabIndex = 3
@@ -90,7 +92,7 @@ Friend Class frmDataSource
     Me.AcceptButton = Me.btnOk
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.CancelButton = Me.btnCancel
-    Me.ClientSize = New System.Drawing.Size(295, 532)
+    Me.ClientSize = New System.Drawing.Size(288, 429)
     Me.Controls.Add(Me.treeSources)
     Me.Controls.Add(Me.pnlButtons)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -187,16 +189,24 @@ Friend Class frmDataSource
   End Sub
 
   Private Sub ResizeToShowBottomNode()
-    Dim lBottomNode As TreeNode = BottomNode(treeSources.Nodes(treeSources.Nodes.Count - 1))
+    Dim lTotalHeight As Integer = treeSources.Top + pnlButtons.Height + Me.Height - Me.ClientSize.Height + 10
+
+    For Each lNode As TreeNode In treeSources.Nodes
+      lTotalHeight += NodeHeight(lNode)
+    Next
+
+    'Dim lBottomNode As TreeNode = BottomNode(treeSources.Nodes(treeSources.Nodes.Count - 1))
     Me.Top = 0
-    Me.Height = lBottomNode.Bounds.Top + lBottomNode.Bounds.Height * 2 + treeSources.Top + pnlButtons.Height + 15
+    'Me.Height = lBottomNode.Bounds.Top + lBottomNode.Bounds.Height
+    Me.Height = lTotalHeight
   End Sub
 
-  Private Function BottomNode(ByVal aParent As TreeNode) As TreeNode
-    If aParent.Nodes.Count = 0 OrElse Not aParent.IsExpanded Then
-      Return aParent
-    Else
-      Return BottomNode(aParent.Nodes(aParent.Nodes.Count - 1))
+  Private Function NodeHeight(ByVal aNode As TreeNode) As Integer
+    NodeHeight = aNode.Bounds.Height
+    If aNode.IsExpanded Then
+      For Each lNode As TreeNode In aNode.Nodes
+        NodeHeight += NodeHeight(lNode)
+      Next
     End If
   End Function
 
