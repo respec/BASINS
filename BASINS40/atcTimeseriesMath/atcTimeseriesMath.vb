@@ -3,7 +3,7 @@ Imports atcData
 Imports System.Windows.Forms
 
 Public Class atcTimeseriesMath
-  Inherits atcDataSource
+  Inherits atcData.atcDataSource
   Private pAvailableOperations As atcDataAttributes
   Private Const pName As String = "Timeseries::Math"
 
