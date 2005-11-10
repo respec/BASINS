@@ -293,9 +293,9 @@ Public Class PlugIn
       Dim lSaveGroup As atcDataGroup = pDataManager.UserSelectData("Select Data to Save")
       If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
         Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
-        If Not lSaveIn Is Nothing Then
+        If Not lSaveIn Is Nothing And lSaveIn.Specification.Length > 0 Then
           For Each lDataSet As atcDataSet In lSaveGroup
-            lSaveIn.AddDataSet(lDataSet)
+            lSaveIn.AddDataSet(lDataSet,atcdata.atcDataSource.EnumExistAction.ExistRenumber)
           Next
           lSaveIn.Save(lSaveIn.Specification)
         End If
