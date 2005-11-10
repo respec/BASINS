@@ -265,49 +265,58 @@ Public Class atcDataSourceWDM
                                        Optional ByRef aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                        As Boolean
     LogDbg("atcDataSourceWdm:AddDataset:entry")
-    Dim lTimser As atcTimeseries
     Try
-      lTimser = aDataSet
+      Dim lTimser As atcTimeseries = aDataSet
+      Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
+      Dim lTu As Integer = lTimser.Attributes.GetValue("tu")
+      Dim lNvals As Integer = lTimser.numValues
+      Dim lSJDay As Double = lTimser.Attributes.GetValue("SJDay", 0)
+      Dim lSDat(5) As Integer
+      J2Date(lSJDay, lSDat)
+      Dim lEJDay As Double = lTimser.Attributes.GetValue("EJDay", 0)
+      Dim lEDat(5) As Integer
+      J2Date(lEJDay, lEDat)
+      Dim lNValsExpected As Integer
+      timdif(lSDat, lEDat, lTu, lTs, lNValsExpected)
+      If lNvals <> lNValsExpected Then
+        Throw New Exception("NVals:" & lNvals & ":" & lNValsExpected)
+      End If
+
+      aDataSet.Attributes.CalculateAll()
+
+      Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
+      If Not aExistAction = ExistReplace Then
+        lDsn = findNextDsn(lDsn)
+        aDataSet.Attributes.SetValue("Id", lDsn)
+      End If
+
+      Dim lWdmHandle As New atcWdmHandle(0, Specification)
+      LogDbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
+
+      If DsnBld(lWdmHandle.Unit, lTimser) Then
+        MyBase.AddDataSet(lTimser)
+        Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
+        Dim lValue As Double
+        Dim lV(lNvals) As Single
+        Dim lRet As Integer
+        For i As Integer = 1 To lNvals
+          lValue = lTimser.Value(i)
+          If Double.IsNaN(lValue) Then lValue = lTSFill
+          lV(i) = lValue
+        Next
+
+        J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
+        If lNvals > 0 Then
+          Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
+        End If
+        LogDbg("atcDataSourceWdm:AddDataset:WDTPUT:retcod:" & lRet)
+      End If
+
+      lWdmHandle.Dispose()
     Catch ex As Exception
       LogDbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
       Return False
     End Try
-
-    aDataSet.Attributes.CalculateAll()
-
-    Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
-    If Not aExistAction = ExistReplace Then
-      lDsn = findNextDsn(lDsn)
-      aDataSet.Attributes.SetValue("Id", lDsn)
-    End If
-
-    Dim lWdmHandle As New atcWdmHandle(0, Specification)
-    LogDbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
-
-    If DsnBld(lWdmHandle.Unit, lTimser) Then
-      MyBase.AddDataSet(lTimser)
-      Dim lSDat(5) As Integer
-      Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
-      Dim lTu As Integer = lTimser.Attributes.GetValue("tu")
-      Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
-      Dim lNvals As Integer = lTimser.numValues
-      Dim lValue As Double
-      Dim lV(lNvals) As Single
-      Dim lRet As Integer
-      For i As Integer = 1 To lNvals
-        lValue = lTimser.Value(i)
-        If Double.IsNaN(lValue) Then lValue = lTSFill
-        lV(i) = lValue
-      Next
-
-      J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
-      If lNvals > 0 Then
-        Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
-      End If
-      LogDbg("atcDataSourceWdm:AddDataset:WDTPUT:retcod:" & lRet)
-    End If
-
-    lWdmHandle.Dispose()
 
   End Function
 
@@ -646,7 +655,7 @@ Public Class atcDataSourceWDM
       End If
       lMsgDefinition = pMsg.Attributes.ItemByKey(lName.ToLower)
       If Not lMsgDefinition Is Nothing Then
-        Select Case lDefinition.TypeString
+        Select Case lMsgDefinition.TypeString
           Case "Integer"
             If IsNumeric(lValue) Then
               F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, 1, CInt(lValue), lRetcod)
