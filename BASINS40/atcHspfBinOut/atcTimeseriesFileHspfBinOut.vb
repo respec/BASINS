@@ -5,7 +5,7 @@ Imports atcData
 Imports atcUtility
 
 Public Class atcTimeseriesFileHspfBinOut
-  Inherits atcDataSource
+  Inherits atcData.atcDataSource
   '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
   Private pFileFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"

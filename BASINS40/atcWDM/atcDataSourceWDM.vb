@@ -279,6 +279,7 @@ Public Class atcDataSourceWDM
       Dim lNValsExpected As Integer
       timdif(lSDat, lEDat, lTu, lTs, lNValsExpected)
       If lNvals <> lNValsExpected Then
+        'TODO:  make writing data smarter to deal with big gaps of missing, etc
         Throw New Exception("NVals:" & lNvals & ":" & lNValsExpected)
       End If
 
