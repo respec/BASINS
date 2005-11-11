@@ -166,6 +166,16 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "frmDisPrec.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmDisPrec.resx"
+                    DependentUpon = "frmDisPrec.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "frmDisSol.vb"
                     SubType = "Form"
                     BuildAction = "Compile"

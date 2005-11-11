@@ -232,6 +232,28 @@ Public Class atcMetCmpPlugin
           Dim lMetCmpTS As atcTimeseries = DisWnd(lWindTSer, Me, lHrDist)
           MyBase.DataSets.Add(lMetCmpTS)
         End If
+      Case "Precipitation"
+        Dim lHrTSers As atcDataGroup
+        Dim lTol As Double
+        Dim lAttDef2 As atcAttributeDefinition
+        If aArgs Is Nothing Then
+          Dim lForm As New frmDisPrec
+          lOk = lForm.AskUser(DataManager, lDlyTSer, lHrTSers, lObsTime, lTol)
+        Else
+          lDlyTSer = aArgs.GetValue("DPRC")
+          lHrTSers = aArgs.GetValue("HPCP")
+          lObsTime = aArgs.GetValue("Observation Hour")
+          lTol = aArgs.GetValue("Data Tolerance")
+          lOk = True
+        End If
+        lAttDef = atcDataAttributes.GetDefinition("Observation Hour")
+        lAttDef2 = atcDataAttributes.GetDefinition("Data Tolerance")
+        If lOk And Not lHrTSers Is Nothing And _
+          lObsTime >= lAttDef.Min And lObsTime <= lAttDef.Max And _
+          lTol >= lAttDef2.Min And lTol <= lAttDef2.Max Then
+          Dim lMetCmpTS As atcTimeseries = DisPrecip(lDlyTSer, Me, lHrTSers, lObsTime, lTol)
+          MyBase.DataSets.Add(lMetCmpTS)
+        End If
     End Select
 
     If MyBase.DataSets.Count > 0 Then Return True
@@ -522,6 +544,45 @@ Public Class atcMetCmpPlugin
         lArguments.SetValue(defTWindTS, Nothing)
         lArguments.SetValue(defHrDist, Nothing)
         lOperations.SetValue(lDisWind, Nothing, lArguments)
+
+        Dim lDisPrec As New atcAttributeDefinition
+        With lDisPrec
+          .Name = "Precipitation"
+          .Category = "Meteorologic Disaggregations"
+          .Description = "Disaggregate Daily Precip to Hourly based on nearby Hourly data"
+          .Editable = False
+          .TypeString = "atcTimeseries"
+          .Calculator = Me
+        End With
+
+        Dim defDPrecTS As New atcAttributeDefinition
+        defDPrecTS = defTimeSeriesOne.Clone("DPRC", "Daily Precipitation")
+
+        Dim defHrPrec As New atcAttributeDefinition
+        With defHrPrec
+          .Name = "HPCP"
+          .Description = "Hourly Precipitation stations to use for Disaggregating Daily Precip"
+          .Editable = True
+          .TypeString = "atcDataGroup"
+        End With
+
+        Dim defTolerance As New atcAttributeDefinition
+        With defTolerance
+          .Name = "Data Tolerance"
+          .Description = "Allowable ratio (as %) between Daily and Hourly values to use Hourly values for disaggregation"
+          .DefaultValue = 90
+          .Max = 100
+          .Min = 0
+          .Editable = True
+          .TypeString = "Double"
+        End With
+
+        lArguments = New atcDataAttributes
+        lArguments.SetValue(defDPrecTS, Nothing)
+        lArguments.SetValue(defHrPrec, Nothing)
+        lArguments.SetValue(defObsTime.Clone("Observation Hour", "Hour (1 - 24) that Daily Precipitation was recorded"), Nothing)
+        lArguments.SetValue(defTolerance, Nothing)
+        lOperations.SetValue(lDisPrec, Nothing, lArguments)
       End If
 
       Return lOperations

@@ -55,6 +55,33 @@ Public Module modMetCompute
     {-9, 440.14, -298.68, -1.51, -2.01, 13.0#, -3.3}, _
     {-9, 431.55, -304.32, 1.08, -2.13, 12.92, -3.17}, _
     {-9, 431.55, -304.32, 1.08, -2.13, 12.92, -3.17}}
+  Private Triang(,) As Double = { _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.1, 0.11}, _
+    {0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.08, 0.09, 0.45, 0.55}, _
+    {0, 0, 0, 0, 0, 0.01, 0.01, 0.06, 0.07, 0.28, 0.36, 1.2, 1.65}, _
+    {0, 0, 0, 0.01, 0.01, 0.04, 0.05, 0.15, 0.21, 0.56, 0.84, 2.1, 3.3}, _
+    {0, 0.01, 0.01, 0.02, 0.03, 0.06, 0.1, 0.2, 0.35, 0.7, 1.26, 2.52, 4.62}, _
+    {0, 0, 0.01, 0.01, 0.03, 0.04, 0.1, 0.15, 0.35, 0.56, 1.26, 2.1, 4.62}, _
+    {0, 0, 0, 0, 0.01, 0.01, 0.05, 0.06, 0.21, 0.28, 0.84, 1.2, 3.3}, _
+    {0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.07, 0.08, 0.36, 0.45, 1.65}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.09, 0.1, 0.55}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01, 0.01, 0.11}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.01}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, _
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
+  Private Sums() As Double = {0, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24, 20.48}
 
   Public Function CmpSol(ByVal aCldTSer As atcTimeseries, ByVal aSource As atcDataSource, ByVal aLatDeg As Double) As atcTimeseries
     'compute daily solar radiation based on daily cloud cover
@@ -408,10 +435,10 @@ Public Module modMetCompute
     For i = 1 To aMxTmpTS.numValues - ioff
       lMaxTmp(i + joff) = aMxTmpTS.Value(i + ioff)
     Next i
-    'If lOpt <> 3 And aMxTmpTS.Item(2).dates.Summary.EJDay <= EJDt Then
-    'extra value needed, but not available, fill with previous
-    lMaxTmp(aMxTmpTS.numValues + 1) = lMaxTmp(aMxTmpTS.numValues)
-    'End If
+    If lOpt <> 3 Then ' And aMxTmpTS.Item(2).dates.Summary.EJDay <= EJDt Then
+      'extra value needed, but not available, fill with previous
+      lMaxTmp(aMxTmpTS.numValues + 1) = lMaxTmp(aMxTmpTS.numValues)
+    End If
 
     'get min temp data
     If lOpt = 1 Then 'move up one day for min temp values
@@ -793,16 +820,8 @@ Public Module modMetCompute
     Dim Lat3, Lat1, Lat2, Lat4 As Double
     Dim A1, b, Exp2, Exp1, a, A0, A2 As Double
     Dim b2, A3, b1, Frac As Double
-    Dim lXLax(51, 6) As Double
-    Dim lc(10, 12) As Double
     Dim SS, x As Double
-    Dim lX1(12) As Double
     Dim Y100, YRD, y As Double
-
-    If inifg = 0 Then 'init constant arrays
-      Call InitRadclcConsts(lX1, lc, lXLax)
-      inifg = 1
-    End If
 
     'integer part of latitude
     ILat = Int(aDegLat)
@@ -837,7 +856,7 @@ Public Module modMetCompute
     'convert to radians
     x = x * 2.0# * 3.14159 / 360.0#
 
-    Y100 = A0 + A1 * System.Math.Cos(x) + A2 * System.Math.Cos(2 * x) + A3 * System.Math.Cos(3 * x) + b1 * System.Math.Sin(x) + b2 * System.Math.Sin(2 * x)
+    Y100 = A0 + A1 * Math.Cos(x) + A2 * Math.Cos(2 * x) + A3 * Math.Cos(3 * x) + b1 * Math.Sin(x) + b2 * Math.Sin(2 * x)
 
     ii = CEIL((SS + 10.0#) / 10.0#)
 
@@ -1322,258 +1341,234 @@ Public Module modMetCompute
 
   End Sub
 
-  '  Public Function DisPrecip(ByRef DyTSer As atcData.ATCclsTserData, ByRef HrTSer As Collection, ByRef ObsTime As Integer, ByRef Tolerance As Single, Optional ByRef SumFile As String = "") As atcData.ATCclsTserData
-  '    'DyTSer - daily time series being disaggregated
-  '    'HrTser - collection of hourly timeseries used to disaggregate daily
-  '    'ObsTime - observation time of daily precip (1 - 24)
-  '    'Tolerance - tolerance for comparison of hourly daily sums to daily value (0.01 - 1.0)
-  '    'SumFile - name of file for output summary info
+  Public Function DisPrecip(ByVal aDyTSer As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aHrTSer As atcDataGroup, ByVal aObsTime As Integer, ByVal aTolerance As Double, Optional ByVal aSumFile As String = "") As atcTimeseries
+    'aDyTSer - daily time series being disaggregated
+    'aHrTser - collection of hourly timeseries used to disaggregate daily
+    'aObsTime - observation time of daily precip (1 - 24)
+    'aTolerance - tolerance for comparison of hourly daily sums to daily value (%)
+    'aSumFile - name of file for output summary info
 
-  '    Dim HrPos, i, MaxHrInd As Integer
-  '    Dim HrVals() As Single
-  '    Dim RndOff, CARRY, MaxHrVal As Single
-  '    Dim DyInd, HrInd As Integer
-  '    Dim Ratio, DaySum, ClosestDaySum, ClosestRatio As Single
-  '    Dim sdt, edt As Double
-  '    Dim tmpdate(5) As Integer
-  '    Dim OutSumm As Boolean
-  '    Dim OutFil As Integer
-  '    Dim s As String
-  '    Dim lHrVals(24) As Single
-  '    Dim rsp, retcod, UsedTriang As Integer
-  '    Dim ClosestHrTser As atcData.ATCclsTserData
-  '    Dim vHrTser As Object
-  '    Dim lHrTser As atcData.ATCclsTserData
-  '    Dim DaySumHrTser As atcData.ATCclsTserData
-  '    Dim lDisTs As atcData.ATCclsTserData
-  '    Dim lDateSum As atcData.ATTimSerDateSummary
+    Dim lHrPos, i, lMaxHrInd As Integer
+    Dim lRndOff, lCarry, lMaxHrVal As Double
+    Dim lTmpHrVals(24) As Double
+    Dim lDyInd, lHrInd As Integer
+    Dim lRatio, lDaySum, lClosestDaySum, lClosestRatio As Double
+    Dim lSDt, lEDt As Double
+    Dim lTolerance As Double
+    Dim lDate(5) As Integer
+    Dim lOutSumm As Boolean
+    Dim lOutFil As Integer
+    Dim s As String
+    Dim rsp, retcod, lUsedTriang As Integer
+    Dim lClosestHrTser As atcTimeseries
+    Dim lDaySumHrTser As atcTimeseries
+    Dim lDisTs As New atcTimeseries(aDataSource)
 
-  '    On Error GoTo DisPrecipErrHnd
-  '    UsedTriang = 0
-  '    RndOff = 0.001
-  '    If Len(SumFile) > 0 Then
-  '      OutSumm = True
-  '      OutFil = FreeFile()
-  '      FileOpen(OutFil, SumFile, OpenMode.Output)
-  '    Else
-  '      OutSumm = False
-  '    End If
-  '    Call InitCmpTs(DyTSer, atcData.ATCTimeUnit.TUHour, 1, 24, lDisTs)
-  '    'adjust start/end date based on Obstime
-  '    'UPGRADE_WARNING: Couldn't resolve default property of object lDateSum. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '    lDateSum = lDisTs.dates.Summary
-  '    Call J2Date(lDateSum.SJDay, tmpdate)
-  '    tmpdate(3) = ObsTime
-  '    'back up exactly one day for start date
-  '    'replace following code with sdt=edt-1
-  '    '      For i = 1 To 23
-  '    '        Call F90_TIMBAK(3, tmpdate(0))
-  '    '      Next i
-  '    '      lDisTs.dates.summary.SJDay = Date2J(tmpdate)
-  '    lDateSum.SJDay = Date2J(tmpdate) - 1
-  '    Call J2Date(lDateSum.EJDay, tmpdate)
-  '    tmpdate(3) = ObsTime
-  '    lDateSum.EJDay = Date2J(tmpdate) - 1
-  '    lDisTs.dates.Summary = lDateSum
-  '    ReDim HrVals(lDisTs.dates.Summary.NVALS)
-  '    HrPos = 0
-  '    For DyInd = 1 To DyTSer.dates.Summary.NVALS
-  '      If OutSumm Then 'output summary message to file
-  '        Call J2Date(DyTSer.dates.Value(DyInd) - 1, tmpdate)
-  '        WriteLine(OutFil, "Distributing Daily Data for " & tmpdate(0) & "/" & tmpdate(1) & "/" & tmpdate(2) & ":  Value is " & DyTSer.Value(DyInd))
-  '      End If
-  '      If DyTSer.Value(DyInd) > 0 Then 'something to disaggregate
-  '        'back up a day, then add obs hour to get actual end of period
-  '        edt = DyTSer.dates.Value(DyInd) - 1
-  '        Call J2Date(edt, tmpdate)
-  '        tmpdate(3) = ObsTime
-  '        edt = Date2J(tmpdate)
-  '        'replace following code with sdt=edt-1
-  '        '      For i = 1 To 23
-  '        '        Call F90_TIMBAK(3, tmpdate(0))
-  '        '      Next i
-  '        '      sdt = Date2J(tmpdate)
-  '        sdt = edt - 1
-  '        ClosestRatio = 0
-  '        For Each vHrTser In HrTSer
-  '          lHrTser = vHrTser
-  '          DaySumHrTser = lHrTser.SubSetByDate(sdt, edt)
-  '          DaySum = 0
-  '          For HrInd = 1 To DaySumHrTser.dates.Summary.NVALS
-  '            DaySum = DaySum + DaySumHrTser.Value(HrInd)
-  '          Next HrInd
-  '          If DaySum > 0 Then
-  '            Ratio = DyTSer.Value(DyInd) / DaySum
-  '            If Ratio > 1 Then Ratio = 1 / Ratio
-  '            If Ratio > ClosestRatio Then
-  '              ClosestRatio = Ratio
-  '              ClosestHrTser = DaySumHrTser
-  '              ClosestDaySum = DaySum
-  '            End If
-  '          End If
-  '        Next vHrTser
-  '        If ClosestRatio >= 1 - Tolerance Then 'hourly data found to do disaggregation
-  '          Ratio = DyTSer.Value(DyInd) / ClosestDaySum
-  '          MaxHrVal = 0
-  '          DaySum = 0
-  '          CARRY = 0
-  '          For HrInd = 1 To ClosestHrTser.dates.Summary.NVALS
-  '            i = HrPos + HrInd
-  '            HrVals(i) = Ratio * ClosestHrTser.Value(HrInd) + CARRY
-  '            If HrVals(i) > 0.00001 Then
-  '              CARRY = HrVals(i) - (System.Math.Round(HrVals(i) / RndOff) * RndOff)
-  '              HrVals(i) = HrVals(i) - CARRY
-  '            Else
-  '              HrVals(i) = 0.0#
-  '            End If
-  '            If HrVals(i) > MaxHrVal Then
-  '              MaxHrVal = HrVals(i)
-  '              MaxHrInd = i
-  '            End If
-  '            DaySum = DaySum + HrVals(i)
-  '          Next HrInd
-  '          If CARRY > 0 Then 'add remainder to max hourly value
-  '            DaySum = DaySum - HrVals(MaxHrInd)
-  '            HrVals(MaxHrInd) = HrVals(MaxHrInd) + CARRY
-  '            DaySum = DaySum + HrVals(MaxHrInd)
-  '          End If
-  '          If OutSumm Then
-  '            WriteLine(OutFil, "  Using Data-set Number:  " & ClosestHrTser.Header.id & ", daily sum = " & ClosestDaySum)
-  '          End If
-  '          If System.Math.Abs(DaySum - DyTSer.Value(DyInd)) > RndOff Then
-  '            'values not distributed properly
-  '            s = "Problem distributing " & DyTSer.Value(DyInd) & " on " & tmpdate(1) & "/" & tmpdate(2) & "/" & tmpdate(0)
-  '            If OutSumm Then
-  '              WriteLine(OutFil, "  *** " & s & "  ***")
-  '            End If
-  '            rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OKCancel, "Precipitation Disaggregation Problem")
-  '            If rsp = MsgBoxResult.Cancel Then
-  '              lDisTs.errordescription = s
-  '              Err.Raise(vbObjectError + 513)
-  '            End If
-  '          End If
-  '        Else 'no data available at hourly stations,
-  '          'distribute using triangular distribution
-  '          Call DistTriang(DyTSer.Value(DyInd), lHrVals, retcod)
-  '          UsedTriang = UsedTriang + 1
-  '          For HrInd = 1 To 24
-  '            HrVals(HrPos + HrInd) = lHrVals(HrInd)
-  '          Next HrInd
-  '          If retcod = -1 Then
-  '            s = "Unable to distribute this much rain (" & DaySum & ") using triangular distribution." & "Hourly values will be set to -9.98"
-  '            rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OKCancel, "Precipitation Disaggregation Problem")
-  '          ElseIf retcod = -2 Then
-  '            s = "Problem distributing " & DyTSer.Value(DyInd) & " using triangular distribution on " & tmpdate(1) & "/" & tmpdate(2) & "/" & tmpdate(0)
-  '            rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OKCancel, "Precipitation Disaggregation Problem")
-  '          End If
-  '          If OutSumm Then
-  '            WriteLine(OutFil, "  *** No hourly total within tolerance - " & DyTSer.Value(DyInd) & "  distributed using triangular distribution ***")
-  '            If retcod <> 0 Then
-  '              WriteLine(OutFil, "  *** " & s & " ***")
-  '            End If
-  '          End If
-  '          If rsp = MsgBoxResult.Cancel Then
-  '            lDisTs.errordescription = s
-  '            Err.Raise(vbObjectError + 513 + System.Math.Abs(retcod))
-  '          End If
-  '        End If
-  '      Else 'no daily value to distribute, fill hourly
-  '        For HrInd = HrPos + 1 To HrPos + 24
-  '          HrVals(HrInd) = 0
-  '        Next HrInd
-  '      End If
-  '      HrPos = HrPos + 24
-  '    Next DyInd
+    On Error GoTo DisPrecipErrHnd
+    lUsedTriang = 0
+    lRndOff = 0.001
+    If Len(aSumFile) > 0 Then
+      lOutSumm = True
+      lOutFil = FreeFile()
+      FileOpen(lOutFil, aSumFile, OpenMode.Output)
+    Else
+      lOutSumm = False
+    End If
+    If aTolerance > 1.0 Then 'assume tolerance passed as percentage if greater than 1
+      lTolerance = aTolerance / 100
+    Else 'assume tolerance passed as fraction
+      lTolerance = aTolerance
+    End If
 
-  'DisPrecipErrHnd:
-  '    On Error GoTo OuttaHere 'in case there's an error in these statements
-  '    If OutSumm Then FileClose(OutFil)
-  '    lDisTs.Values = VB6.CopyArray(HrVals)
+    CopyBaseAttributes(aDyTSer, lDisTs)
+    lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lDisTs.Attributes.SetValue("Constituent", "PREC")
+    lDisTs.Attributes.SetValue("TSTYPE", "PREC")
+    lDisTs.Attributes.SetValue("Description", "Hourly Precipitation disaggregated from Daily")
+    lDisTs.Attributes.AddHistory("Disaggregated Precipitation - inputs: DPRC, HPCP, Observation Hour, Data Tolerance")
+    lDisTs.Attributes.Add("DPRC", aDyTSer.ToString)
+    lDisTs.Attributes.Add("HPCP", aHrTSer.ToString)
+    lDisTs.Attributes.Add("Observation Hour", aObsTime)
+    lDisTs.Attributes.Add("Data Tolerance", aTolerance)
 
-  'OuttaHere:
-  '    If UsedTriang > 0 Then
-  '      'inform calling routine that automatic triangular distribution was used
-  '      s = "WARNING:  Automatic Triangular Distribution was used " & UsedTriang & " times." & vbCrLf
-  '      If OutSumm Then
-  '        s = s & "Check summary output file (" & SumFile & ") for details of when Triangular Distribution was used"
-  '      End If
-  '      lDisTs.errordescription = s
-  '    End If
-  '    DisPrecip = lDisTs
+    'build new date array for hourly TSer, set start date to previous day's Obs Time
+    lSDt = aDyTSer.Attributes.GetValue("SJDAY") - 1
+    Call J2Date(lSDt, lDate)
+    lDate(3) = aObsTime
+    aDyTSer.Attributes.SetValue("SJDAY", Date2J(lDate))
+    lDisTs.Dates = DisaggDates(aDyTSer, aDataSource)
+    lDisTs.numValues = lDisTs.Dates.numValues
 
-  '  End Function
+    Dim lHrVals(lDisTs.numValues) As Double
+    lHrPos = 0
+    For lDyInd = 1 To aDyTSer.numValues
+      If lOutSumm Then 'output summary message to file
+        Call J2Date(aDyTSer.Dates.Value(lDyInd) - 1, lDate)
+        WriteLine(lOutFil, "Distributing Daily Data for " & lDate(0) & "/" & lDate(1) & "/" & lDate(2) & ":  Value is " & aDyTSer.Value(lDyInd))
+      End If
+      If aDyTSer.Value(lDyInd) > 0 Then 'something to disaggregate
+        'back up a day, then add obs hour to get actual end of period
+        lEDt = aDyTSer.Dates.Value(lDyInd) - 1
+        Call J2Date(lEDt, lDate)
+        lDate(3) = aObsTime
+        lEDt = Date2J(lDate)
+        lSDt = lEDt - 1
+        lClosestRatio = 0
+        For Each lHrTSer As atcTimeseries In aHrTSer
+          lDaySumHrTser = SubsetByDate(lHrTSer, lSDt, lEDt, Nothing)
+          lDaySum = 0
+          For lHrInd = 1 To lDaySumHrTser.numValues
+            lDaySum = lDaySum + lDaySumHrTser.Value(lHrInd)
+          Next lHrInd
+          If lDaySum > 0 Then
+            lRatio = aDyTSer.Value(lDyInd) / lDaySum
+            If lRatio > 1 Then lRatio = 1 / lRatio
+            If lRatio > lClosestRatio Then
+              lClosestRatio = lRatio
+              lClosestHrTser = lDaySumHrTser
+              lClosestDaySum = lDaySum
+            End If
+          End If
+        Next
+        If lClosestRatio >= 1 - lTolerance Then 'hourly data found to do disaggregation
+          lRatio = aDyTSer.Value(lDyInd) / lClosestDaySum
+          lMaxHrVal = 0
+          lDaySum = 0
+          lCarry = 0
+          For lHrInd = 1 To lClosestHrTser.numValues
+            i = lHrPos + lHrInd
+            lHrVals(i) = lRatio * lClosestHrTser.Value(lHrInd) + lCarry
+            If lHrVals(i) > 0.00001 Then
+              lCarry = lHrVals(i) - (Math.Round(lHrVals(i) / lRndOff) * lRndOff)
+              lHrVals(i) = lHrVals(i) - lCarry
+            Else
+              lHrVals(i) = 0.0#
+            End If
+            If lHrVals(i) > lMaxHrVal Then
+              lMaxHrVal = lHrVals(i)
+              lMaxHrInd = i
+            End If
+            lDaySum = lDaySum + lHrVals(i)
+          Next lHrInd
+          If lCarry > 0 Then 'add remainder to max hourly value
+            lDaySum = lDaySum - lHrVals(lMaxHrInd)
+            lHrVals(lMaxHrInd) = lHrVals(lMaxHrInd) + lCarry
+            lDaySum = lDaySum + lHrVals(lMaxHrInd)
+          End If
+          If lOutSumm Then
+            WriteLine(lOutFil, "  Using Data-set Number:  " & lClosestHrTser.Attributes.GetValue("ID") & ", daily sum = " & lClosestDaySum)
+          End If
+          If Math.Abs(lDaySum - aDyTSer.Value(lDyInd)) > lRndOff Then
+            'values not distributed properly
+            s = "Problem distributing " & aDyTSer.Value(lDyInd) & " on " & lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+            If lOutSumm Then
+              WriteLine(lOutFil, "  *** " & s & "  ***")
+            End If
+            rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OKCancel, "Precipitation Disaggregation Problem")
+            If rsp = MsgBoxResult.Cancel Then
+              'lDisTs.errordescription = s
+              Err.Raise(vbObjectError + 513)
+            End If
+          End If
+        Else 'no data available at hourly stations,
+          'distribute using triangular distribution
+          Call DistTriang(aDyTSer.Value(lDyInd), lTmpHrVals, retcod)
+          lUsedTriang = lUsedTriang + 1
+          For lHrInd = 1 To 24
+            lHrVals(lHrPos + lHrInd) = lTmpHrVals(lHrInd)
+          Next lHrInd
+          If retcod = -1 Then
+            s = "Unable to distribute this much rain (" & lDaySum & ") using triangular distribution." & "Hourly values will be set to -9.98"
+            rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OKCancel, "Precipitation Disaggregation Problem")
+          ElseIf retcod = -2 Then
+            s = "Problem distributing " & aDyTSer.Value(lDyInd) & " using triangular distribution on " & lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+            rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OKCancel, "Precipitation Disaggregation Problem")
+          End If
+          If lOutSumm Then
+            WriteLine(lOutFil, "  *** No hourly total within tolerance - " & aDyTSer.Value(lDyInd) & "  distributed using triangular distribution ***")
+            If retcod <> 0 Then
+              WriteLine(lOutFil, "  *** " & s & " ***")
+            End If
+          End If
+          If rsp = MsgBoxResult.Cancel Then
+            'lDisTs.errordescription = s
+            Err.Raise(vbObjectError + 513 + System.Math.Abs(retcod))
+          End If
+        End If
+      Else 'no daily value to distribute, fill hourly
+        For lHrInd = lHrPos + 1 To lHrPos + 24
+          lHrVals(lHrInd) = 0
+        Next lHrInd
+      End If
+      lHrPos = lHrPos + 24
+    Next lDyInd
 
-  '  Private Sub DistTriang(ByRef DaySum As Single, ByRef HrVals() As Single, ByRef retcod As Integer)
-  '    'Distribute a daily value to 24 hourly values using a triangular distribution
-  '    'DaySum - daily value
-  '    'HrVals - array of hourly values
-  '    'Retcod - 0 - OK, -1 - DaySum too big,
-  '    '        -2 - sum of hourly values does not match daily value (likely a round off problem)
+DisPrecipErrHnd:
+    On Error GoTo OuttaHere 'in case there's an error in these statements
+    If lOutSumm Then FileClose(lOutFil)
+    Array.Copy(lHrVals, 1, lDisTs.Values, 1, lDisTs.numValues)
 
-  '    Dim i, j As Integer
-  '    Dim VTriang, VSum As Object
-  '    Dim RndOff, Ratio, CARRY, lDaySum As Single
-  '    Static initfg As Integer
-  '    Static Sums(12) As Single
-  '    Static Triang(24, 12) As Single
+OuttaHere:
+    If lUsedTriang > 0 Then
+      'inform calling routine that automatic triangular distribution was used
+      s = "WARNING:  Automatic Triangular Distribution was used " & lUsedTriang & " times." & vbCrLf
+      If lOutSumm Then
+        s = s & "Check summary output file (" & aSumFile & ") for details of when Triangular Distribution was used"
+      End If
+      'lDisTs.errordescription = s
+    End If
+    Return lDisTs
 
-  '    If initfg = 0 Then
-  '      'UPGRADE_WARNING: Array has a new behavior. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1041"'
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object VTriang. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      VTriang = New Object() {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 6, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 10, 10, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 15, 20, 15, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 21, 35, 35, 21, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 28, 56, 70, 56, 28, 8, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 36, 84, 126, 126, 84, 36, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 11, 55, 165, 330, 462, 462, 330, 165, 55, 11, 1, 0, 0, 0, 0, 0, 0}
-  '      'UPGRADE_WARNING: Array has a new behavior. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1041"'
-  '      'UPGRADE_WARNING: Couldn't resolve default property of object VSum. Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '      VSum = New Object() {0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048}
+  End Function
 
-  '      For j = 1 To 12
-  '        For i = 1 To 24
-  '          'UPGRADE_WARNING: Couldn't resolve default property of object VTriang(). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '          Triang(i, j) = CSng(VTriang((j - 1) * 24 + i) / 100)
-  '        Next i
-  '        'UPGRADE_WARNING: Couldn't resolve default property of object VSum(). Click for more: 'ms-help://MS.VSCC.2003/commoner/redir/redirect.htm?keyword="vbup1037"'
-  '        Sums(j) = CSng(VSum(j) / 100)
-  '      Next j
-  '      initfg = 1
-  '    End If
+  Private Sub DistTriang(ByVal aDaySum As Double, ByRef aHrVals() As Double, ByRef aRetCod As Integer)
+    'Distribute a daily value to 24 hourly values using a triangular distribution
+    'DaySum - daily value
+    'HrVals - array of hourly values
+    'Retcod - 0 - OK, -1 - DaySum too big,
+    '        -2 - sum of hourly values does not match daily value (likely a round off problem)
 
-  '    retcod = 0
-  '    i = 1
-  '    Do While DaySum > Sums(i)
-  '      i = i + 1
-  '      If i > 12 Then
-  '        retcod = -1
-  '      End If
-  '    Loop
+    Dim i, j As Integer
+    Dim lRndOff, lRatio, lCarry, lDaySum As Single
 
-  '    RndOff = 0.001
-  '    CARRY = 0
-  '    Ratio = DaySum / Sums(i)
-  '    lDaySum = 0
-  '    For j = 1 To 24
-  '      HrVals(j) = Ratio * Triang(j, i) + CARRY
-  '      If HrVals(j) > 0.00001 Then
-  '        CARRY = HrVals(j) - (System.Math.Round(HrVals(j) / RndOff) * RndOff)
-  '        HrVals(j) = HrVals(j) - CARRY
-  '      Else
-  '        HrVals(j) = 0.0#
-  '      End If
-  '      lDaySum = lDaySum + HrVals(j)
-  '    Next j
-  '    If CARRY > 0.00001 Then
-  '      lDaySum = lDaySum - HrVals(12)
-  '      HrVals(12) = HrVals(12) + CARRY
-  '      lDaySum = lDaySum + HrVals(12)
-  '    End If
-  '    If System.Math.Abs(DaySum - lDaySum) > RndOff Then
-  '      'values not distributed properly
-  '      retcod = -2
-  '    End If
-  '    If retcod <> 0 Then 'set to accumulated, with daily value at end
-  '      For i = 1 To 23
-  '        HrVals(i) = -9.98
-  '      Next i
-  '      HrVals(24) = DaySum
-  '    End If
+    aRetCod = 0
+    i = 1
+    Do While aDaySum > Sums(i)
+      i = i + 1
+      If i > 12 Then
+        aRetCod = -1
+      End If
+    Loop
 
-  '  End Sub
+    lRndOff = 0.001
+    lCarry = 0
+    lRatio = aDaySum / Sums(i)
+    lDaySum = 0
+    For j = 1 To 24
+      aHrVals(j) = lRatio * Triang(j, i) + lCarry
+      If aHrVals(j) > 0.00001 Then
+        lCarry = aHrVals(j) - (Math.Round(aHrVals(j) / lRndOff) * lRndOff)
+        aHrVals(j) = aHrVals(j) - lCarry
+      Else
+        aHrVals(j) = 0.0#
+      End If
+      lDaySum = lDaySum + aHrVals(j)
+    Next j
+    If lCarry > 0.00001 Then
+      lDaySum = lDaySum - aHrVals(12)
+      aHrVals(12) = aHrVals(12) + lCarry
+      lDaySum = lDaySum + aHrVals(12)
+    End If
+    If Math.Abs(aDaySum - lDaySum) > lRndOff Then
+      'values not distributed properly
+      aRetCod = -2
+    End If
+    If aRetCod <> 0 Then 'set to accumulated, with daily value at end
+      For i = 1 To 23
+        aHrVals(i) = -9.98
+      Next i
+      aHrVals(24) = aDaySum
+    End If
+
+  End Sub
 End Module
