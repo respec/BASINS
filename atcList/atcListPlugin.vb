@@ -1,7 +1,7 @@
 Imports atcData
 
 Public Class atcListPlugin
-  Inherits atcDataDisplay
+  Inherits atcData.atcDataDisplay
 
   Public Overrides ReadOnly Property Name() As String
     Get

@@ -1,10 +1,10 @@
-Imports atcdata
+Imports atcData
 Imports atcUtility
 
 Imports System.Reflection
 
 Public Class atcEventPlugin
-  Inherits atcDataSource
+  Inherits atcData.atcDataSource
 
   Private pAvailableOperations As atcDataAttributes ' atcDataGroup
   Private pName As String = "Timeseries::Events"

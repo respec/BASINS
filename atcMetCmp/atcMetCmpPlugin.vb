@@ -4,7 +4,7 @@ Imports atcUtility
 Imports System.Reflection
 
 Public Class atcMetCmpPlugin
-  Inherits atcDataSource
+  Inherits atcData.atcDataSource
 
   Private pAvailableOperations As atcDataAttributes ' atcDataGroup
   Private pName As String = "Timeseries::Meteorologic Generation"
