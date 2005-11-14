@@ -515,10 +515,10 @@ Public Class frmProjection
     Private Sub btnAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAdd.Click
         Dim id As Integer
         If Len(txtName.Text) = 0 Then
-            LogMsg("Enter a new name for this projection in the Name field above before adding.", "Projection")
+      'LogMsg("Enter a new name for this projection in the Name field above before adding.", "Projection")
         Else
             'TODO: fix adding custom projections to table
-            LogMsg("Adding projection to database not yet supported.", "Projection")
+      'LogMsg("Adding projection to database not yet supported.", "Projection")
             'ElseIf Not pCurProjection Is Nothing Then
             '    If Not pDB Is Nothing Then
             '        pDB.AddCustomProjection((txtName.Text), _
@@ -558,6 +558,7 @@ Public Class frmProjection
 
     Private Sub SetControlsFromDB()
         Dim prj As Projection
+        Dim addit As Boolean
 
         If pDB.StandardProjections.Count > 0 Then
             For Each prj In pDB.StandardProjections
@@ -566,13 +567,25 @@ Public Class frmProjection
                 End If
             Next
 
+            addit = True  'add only every other one
             For Each lprj As Projection In pDB.BaseProjections
-                cboProjection.Items.Add(lprj.Name)
+                If addit Then
+                    cboProjection.Items.Add(lprj.Name)
+                    addit = False
+                Else
+                    addit = True
+                End If
             Next
             cboProjection.Visible = False
 
+            addit = True  'add only every other one
             For Each prj In pDB.Ellipsoids
-                cboSpheroid.Items.Add(prj.Ellipsoid)
+                If addit Then
+                    cboSpheroid.Items.Add(prj.Ellipsoid)
+                    addit = False
+                Else
+                    addit = True
+                End If
             Next
             radioStandard.Checked = True
 
@@ -643,9 +656,11 @@ Public Class frmProjection
             End If
 
             For Each curProjection In pDB.BaseProjections
-                If curProjection.ProjectionClass = lClass Then
+                If curProjection.ProjectionClass = lClass Then 'And curProjection.Name = lName Then
+                    defaultsFlag = False
                     cboProjection.SelectedIndex = cboProjection.FindStringExact(curProjection.Name, 0)
-                    txtSpheroid.Text = curProjection.Ellipsoid
+                    defaultsFlag = True
+                    'txtSpheroid.Text = curProjection.Ellipsoid
                     Exit For
                 End If
             Next
