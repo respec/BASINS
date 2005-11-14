@@ -22,10 +22,8 @@ Friend Class frmDisplaySWStats
     InitializeComponent() 'required by Windows Form Designer
 
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each lDisp As atcDataDisplay In DisplayPlugins
-      Dim lMenuText As String = lDisp.Name
-      If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
-      mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
+    For Each ldisp As atcDataDisplay In DisplayPlugins
+      mnuAnalysis.MenuItems.Add(ldisp.Name, New EventHandler(AddressOf mnuAnalysis_Click))
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some Data
@@ -61,7 +59,6 @@ Friend Class frmDisplaySWStats
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
-  Friend WithEvents agdMain As atcControls.atcGrid
   Friend WithEvents mnuView As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewColumns As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewRows As System.Windows.Forms.MenuItem
@@ -72,6 +69,11 @@ Friend Class frmDisplaySWStats
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuReport As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuRptFreq As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuRptNDay As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuRptTrend As System.Windows.Forms.MenuItem
+  Friend WithEvents txtReport As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySWStats))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -88,12 +90,16 @@ Friend Class frmDisplaySWStats
     Me.mnuViewHigh = New System.Windows.Forms.MenuItem
     Me.mnuViewLow = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-    Me.agdMain = New atcControls.atcGrid
+    Me.mnuReport = New System.Windows.Forms.MenuItem
+    Me.mnuRptFreq = New System.Windows.Forms.MenuItem
+    Me.mnuRptNDay = New System.Windows.Forms.MenuItem
+    Me.mnuRptTrend = New System.Windows.Forms.MenuItem
+    Me.txtReport = New System.Windows.Forms.TextBox
     Me.SuspendLayout()
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuReport})
     '
     'mnuFile
     '
@@ -166,23 +172,42 @@ Friend Class frmDisplaySWStats
     Me.mnuAnalysis.Index = 3
     Me.mnuAnalysis.Text = "Analysis"
     '
-    'agdMain
+    'mnuReport
     '
-    Me.agdMain.AllowHorizontalScrolling = True
-    Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.agdMain.LineColor = System.Drawing.Color.Empty
-    Me.agdMain.LineWidth = 0.0!
-    Me.agdMain.Location = New System.Drawing.Point(0, 0)
-    Me.agdMain.Name = "agdMain"
-    Me.agdMain.Size = New System.Drawing.Size(720, 545)
-    Me.agdMain.Source = Nothing
-    Me.agdMain.TabIndex = 0
+    Me.mnuReport.Index = 4
+    Me.mnuReport.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuRptFreq, Me.mnuRptNDay, Me.mnuRptTrend})
+    Me.mnuReport.Text = "Report"
+    '
+    'mnuRptFreq
+    '
+    Me.mnuRptFreq.Index = 0
+    Me.mnuRptFreq.Text = "Frequency"
+    '
+    'mnuRptNDay
+    '
+    Me.mnuRptNDay.Index = 1
+    Me.mnuRptNDay.Text = "N-Day"
+    '
+    'mnuRptTrend
+    '
+    Me.mnuRptTrend.Index = 2
+    Me.mnuRptTrend.Text = "Trend"
+    '
+    'txtReport
+    '
+    Me.txtReport.Dock = System.Windows.Forms.DockStyle.Fill
+    Me.txtReport.Location = New System.Drawing.Point(0, 0)
+    Me.txtReport.Multiline = True
+    Me.txtReport.Name = "txtReport"
+    Me.txtReport.Size = New System.Drawing.Size(720, 545)
+    Me.txtReport.TabIndex = 0
+    Me.txtReport.Text = ""
     '
     'frmDisplaySWStats
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(720, 545)
-    Me.Controls.Add(Me.agdMain)
+    Me.Controls.Add(Me.txtReport)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "frmDisplaySWStats"
@@ -202,29 +227,20 @@ Friend Class frmDisplaySWStats
   Private pSource As atcSWStatsSource
 
   Private Sub PopulateGrid()
-    pSource = New atcSWStatsSource(pDataGroup)
-    If pSource.Columns < 3 Then
-      UserSpecifyAttributes()
-      pSource = New atcSWStatsSource(pDataGroup)
-    End If
-
-    pSource.SwapRowsColumns = mnuViewRows.Checked
-    pSource.High = mnuViewHigh.Checked
-    agdMain.Initialize(pSource)
-    agdMain.SizeAllColumnsToContents()
-
-    Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSource.Rows * agdMain.RowHeight(0)
-    Dim lRequestedWidth As Single = Me.Width - agdMain.Left - agdMain.Width
-    For lColumn As Integer = 0 To pSource.Columns - 1
-      lRequestedWidth += agdMain.ColumnWidth(lColumn)
-    Next
-    Me.Height = lRequestedHeight
-    Me.Width = lRequestedWidth
-    agdMain.Refresh()
   End Sub
 
   Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-    pDataManager.ShowDisplay(sender.Text, pDataGroup)
+    Dim newDisplay As atcDataDisplay
+    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each atf As atcDataDisplay In DisplayPlugins
+      If atf.Name = sender.Text Then
+        Dim typ As System.Type = atf.GetType()
+        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+        newDisplay = asm.CreateInstance(typ.FullName)
+        newDisplay.Show(pDataManager, pDataGroup)
+        Exit Sub
+      End If
+    Next
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
@@ -245,22 +261,14 @@ Friend Class frmDisplaySWStats
     mnuViewColumns.Checked = True
     mnuViewRows.Checked = False
     pSource.SwapRowsColumns = False
-    agdMain.Refresh()
+    '    agdMain.Refresh()
   End Sub
 
   Private Sub mnuViewRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewRows.Click
     mnuViewColumns.Checked = False
     mnuViewRows.Checked = True
     pSource.SwapRowsColumns = True
-    agdMain.Refresh()
-  End Sub
-
-  Private Sub mnuViewHigh_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewHigh.Click
-    Me.HighDisplay = True
-  End Sub
-
-  Private Sub mnuViewLow_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewLow.Click
-    Me.HighDisplay = False
+    '    agdMain.Refresh()
   End Sub
 
   Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
@@ -272,12 +280,12 @@ Friend Class frmDisplaySWStats
     Dim lForm As New frmSpecifyFrequency
     Dim lChoseHigh As Boolean
     If lForm.AskUser(pDataGroup, lChoseHigh) Then
-      Me.HighDisplay = lChoseHigh
+      '      Me.HighDisplay = lChoseHigh
     End If
   End Sub
 
   Public Overrides Function ToString() As String
-    Return Me.Text & vbCrLf & agdMain.ToString
+    Return Me.Text & vbCrLf & txtReport.Text
   End Function
 
   'True for rows and columns to be swapped, false for normal orientation
@@ -287,25 +295,6 @@ Friend Class frmDisplaySWStats
     End Get
     Set(ByVal newValue As Boolean)
       pSource.SwapRowsColumns = newValue
-    End Set
-  End Property
-
-  Public Property HighDisplay() As Boolean
-    Get
-      Return pSource.High
-    End Get
-    Set(ByVal newValue As Boolean)
-      pSource.High = newValue
-      If newValue Then
-        Me.Text = "High Values"
-        mnuViewHigh.Checked = True
-        mnuViewLow.Checked = False
-      Else
-        Me.Text = "Low Values"
-        mnuViewHigh.Checked = False
-        mnuViewLow.Checked = True
-      End If
-      agdMain.Refresh()
     End Set
   End Property
 
@@ -325,8 +314,50 @@ Friend Class frmDisplaySWStats
     End With
   End Sub
 
-  Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-    pDataManager = Nothing
-    pDataGroup = Nothing
+  Private Sub mnuRptFreq_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuRptFreq.Click
+    mnuRptFreq.Checked = True
+    mnuRptNDay.Checked = False
+    mnuRptTrend.Checked = False
+    txtReport.Text = GenFreqReport()
   End Sub
+
+  Private Sub mnuRptNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuRptNDay.Click
+    mnuRptNDay.Checked = True
+    mnuRptFreq.Checked = False
+    mnuRptTrend.Checked = False
+    txtReport.Text = GenNDayReport()
+
+  End Sub
+
+  Private Sub mnuRptTrend_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuRptTrend.Click
+    mnuRptTrend.Checked = True
+    mnuRptFreq.Checked = False
+    mnuRptNDay.Checked = False
+    txtReport.Text = GenTrendReport()
+  End Sub
+
+  Private Function GenFreqReport() As String
+    Dim ls As String
+    ls = "Pearson Type III Statistics" & vbCrLf & _
+         "SWSTAT(4.1)" & vbCrLf & _
+         "(based on USGS Program A193)" & vbCrLf & vbCrLf & _
+         "Notice -- Use of Pearson Type III distribution is for" & vbCrLf & _
+         "preliminary(computations.User Is responsible)" & vbCrLf & _
+         "for assessment and interpretation." & vbCrLf
+    ls &= "The following 7 statistics are based on non-zero values:"
+
+    Return ls
+  End Function
+  Private Function GenNDayReport() As String
+    Dim ls As String
+    ls = "Station Number " & vbCrLf
+
+    Return ls
+  End Function
+  Private Function GenTrendReport() As String
+    Dim ls As String
+    ls = "Data-set number " & vbCrLf
+
+    Return ls
+  End Function
 End Class
