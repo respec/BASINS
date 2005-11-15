@@ -106,9 +106,9 @@ Public Class PlugIn
     'LogStartMonitor()
     LogSetMapWin(g_MapWin)
 
-    BuiltInScript(False)
-
     pDataManager = New atcDataManager(g_MapWin, Me)
+
+    BuiltInScript(False)
 
     FindBasinsDrives()
 

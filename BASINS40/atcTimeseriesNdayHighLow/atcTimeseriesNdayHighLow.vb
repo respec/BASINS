@@ -316,14 +316,14 @@ Public Class atcTimeseriesNdayHighLow
 
   End Sub
 
-  Private Sub ComputeFreq(ByRef aTimeseries As atcTimeseries, _
-                          ByVal aNDay As Object, _
-                          ByVal aHigh As Boolean, _
-                          ByVal aRecurOrProb As Object, _
-                          ByVal aLogFg As Boolean, _
-                          ByVal aAttributesStorage As atcDataAttributes)
+  Public Sub ComputeFreq(ByRef aTimeseries As atcTimeseries, _
+                         ByVal aNDay As Object, _
+                         ByVal aHigh As Boolean, _
+                         ByVal aRecurOrProb As Object, _
+                         ByVal aLogFg As Boolean, _
+                         ByVal aAttributesStorage As atcDataAttributes, _
+                Optional ByRef aNdayTsGroup As atcDataGroup = Nothing)
 
-    Dim lNdayTsGroup As atcDataGroup
     Dim lTsMath As atcDataSource
     Dim lQ As Double
     Dim lMsg As String = ""
@@ -332,15 +332,15 @@ Public Class atcTimeseriesNdayHighLow
 
     If aTimeseries.Attributes.GetValue("Tu", 1) <> 6 Then
       'calculate the n day annual timeseries
-      lNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
+      aNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
     Else 'already an annual timeseries
       If (aHigh = aTimeseries.Attributes.GetValue("HighFlag", True) And _
          aNDay = aTimeseries.Attributes.GetValue("NDay", 1)) Then
-        lNdayTsGroup = New atcDataGroup(aTimeseries)
+        aNdayTsGroup = New atcDataGroup(aTimeseries)
       End If
     End If
 
-    For Each lNdayTs As atcTimeseries In lNdayTsGroup
+    For Each lNdayTs As atcTimeseries In aNdayTsGroup
       If Not lNdayTs Is Nothing Then
         If aLogFg Then 'calc log10 of n day annual series
           Dim lArgsMath As New atcDataAttributes
