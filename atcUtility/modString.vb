@@ -97,11 +97,12 @@ Public Module modString
 
     '    End Function
 
-  Function RightJustify(ByVal aStr As String, ByVal aWidth As Integer) As String
-    If aStr.Length >= aWidth Then
-      Return aStr
+  Function RightJustify(ByVal aValue As Object, ByVal aWidth As Integer) As String
+    Dim lStr As String = CStr(aValue)
+    If lStr.Length >= aWidth Then
+      Return lStr
     Else
-      Return Space(aWidth - aStr.Length) & aStr
+      Return Space(aWidth - lStr.Length) & lStr
     End If
   End Function
 
