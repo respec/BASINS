@@ -97,51 +97,58 @@ Public Module modString
 
     '    End Function
 
-    '    Function NumFmtI(ByRef itmp As Integer, ByRef wid As Integer) As String
-    '        ' ##SUMMARY Converts an integer to string of specified length, padded with leading zeros.
-    '        ' ##SUMMARY Specified length must equal or exceed length of integer.
-    '        ' ##SUMMARY   Example: NumFmtI(1234, 6) = "001234"
-    '        ' ##PARAM itmp I Long integer to be formatted
-    '        ' ##PARAM wid I Width of formatted integer
-    '        ' ##RETURNS Input parameter itmp formatted to specified width.
-    '        ' ##LOCAL fmt - string representation of generic format (i.e., "#####0")
-    '        ' ##LOCAL stmp - string used to build formatted number
-    '        Dim fmt As String
-    '        Dim stmp As String
+  Function RightJustify(ByVal aStr As String, ByVal aWidth As Integer) As String
+    If aStr.Length >= aWidth Then
+      Return aStr
+    Else
+      Return Space(aWidth - aStr.Length) & aStr
+    End If
+  End Function
 
-    '        If wid > 1 Then
-    '            fmt = New String("#", wid - 1)
-    '        End If
-    '        'assure at least one digit is output
-    '        fmt = fmt & "0"
-    '        stmp = String.Format(fmt, itmp)
-    '        'add leading blanks
-    '        NumFmtI = Space(wid - Len(stmp)) & stmp
+  '    Function NumFmtI(ByRef itmp As Integer, ByRef wid As Integer) As String
+  '        ' ##SUMMARY Converts an integer to string of specified length, padded with leading zeros.
+  '        ' ##SUMMARY Specified length must equal or exceed length of integer.
+  '        ' ##SUMMARY   Example: NumFmtI(1234, 6) = "001234"
+  '        ' ##PARAM itmp I Long integer to be formatted
+  '        ' ##PARAM wid I Width of formatted integer
+  '        ' ##RETURNS Input parameter itmp formatted to specified width.
+  '        ' ##LOCAL fmt - string representation of generic format (i.e., "#####0")
+  '        ' ##LOCAL stmp - string used to build formatted number
+  '        Dim fmt As String
+  '        Dim stmp As String
 
-    '    End Function
+  '        If wid > 1 Then
+  '            fmt = New String("#", wid - 1)
+  '        End If
+  '        'assure at least one digit is output
+  '        fmt = fmt & "0"
+  '        stmp = String.Format(fmt, itmp)
+  '        'add leading blanks
+  '        NumFmtI = Space(wid - Len(stmp)) & stmp
+  '    End Function
 
-    '    Function Signif(ByRef fvalue As Double, ByRef Metric As Boolean) As Double
-    '        '##SUMMARY Converts double-precision number to three significant digits
-    '        '##SUMMARY   Example: Signif(1.23456, True) =  1.23000001907349
-    '        '##PARAM fvalue - double-precision number to be formatted
-    '        '##PARAM metric - Boolean whether metric or not
-    '        '##LOCAL tmp - Double-precision number used as antecedent to Signif
-    '        Dim tmp As Double
+  '    Function Signif(ByRef fvalue As Double, ByRef Metric As Boolean) As Double
+  '        '##SUMMARY Converts double-precision number to three significant digits
+  '        '##SUMMARY   Example: Signif(1.23456, True) =  1.23000001907349
+  '        '##PARAM fvalue - double-precision number to be formatted
+  '        '##PARAM metric - Boolean whether metric or not
+  '        '##LOCAL tmp - Double-precision number used as antecedent to Signif
+  '        Dim tmp As Double
 
-    '        If Metric And fvalue < 10 Then
-    '            fvalue = Fix(fvalue * 100 + 0.5)
-    '            Signif = fvalue / 100
-    '        ElseIf Metric And fvalue < 100 Then
-    '            fvalue = Fix(fvalue * 10 + 0.5)
-    '            Signif = fvalue / 10
-    '        ElseIf fvalue < 100.0# Then
-    '            Signif = Fix(fvalue + 0.5)
-    '        Else
-    '            tmp = 10.0# ^ Fix(Log10(fvalue)) / 100.0#
-    '            Signif = Fix(fvalue / tmp + 0.5) * tmp
-    '        End If
+  '        If Metric And fvalue < 10 Then
+  '            fvalue = Fix(fvalue * 100 + 0.5)
+  '            Signif = fvalue / 100
+  '        ElseIf Metric And fvalue < 100 Then
+  '            fvalue = Fix(fvalue * 10 + 0.5)
+  '            Signif = fvalue / 10
+  '        ElseIf fvalue < 100.0# Then
+  '            Signif = Fix(fvalue + 0.5)
+  '        Else
+  '            tmp = 10.0# ^ Fix(Log10(fvalue)) / 100.0#
+  '            Signif = Fix(fvalue / tmp + 0.5) * tmp
+  '        End If
 
-    '    End Function
+  '    End Function
 
   Function SignificantDigits(ByVal Value As Double, ByVal digits As Integer) As Double
     ' ##SUMMARY Rounds double-precision number to specified number of significant digits.
@@ -159,7 +166,7 @@ Public Module modString
     End If
 
     CurPower = Fix(Log10(Value))
-    If Value >= 1 Then      CurPower += 1
+    If Value >= 1 Then CurPower += 1
     ShiftPower = 10 ^ (digits - CurPower)
     Value = Value * ShiftPower 'Shift val so number of digits before decimal = significant digits
     Value = Fix(Value + 0.5) 'Round up if needed
