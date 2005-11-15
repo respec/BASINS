@@ -6,7 +6,7 @@ Public Class atcFrequencyGridPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::SWStats"
+      Return "Tools::SWSTAT"
     End Get
   End Property
 
@@ -31,14 +31,6 @@ Public Class atcFrequencyGridPlugin
     Dim lForm As New frmDisplaySWStats(aDataManager, aDataGroup)
 
     For Each lOption As String In aOptions
-      Select Case lOption
-        Case "SwapRowsColumns"
-          lForm.SwapRowsColumns = True
-        Case "Low"
-          lForm.HighDisplay = False
-        Case "High"
-          lForm.HighDisplay = True
-      End Select
     Next
 
     SaveFileString(aFileName, lForm.ToString)
