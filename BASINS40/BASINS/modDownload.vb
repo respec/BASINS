@@ -188,11 +188,7 @@ StartOver:
           Case "add_grid"
             theOutputFileName = lProjectorNode.Content
             If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
-            Dim g As New MapWinGIS.Grid
-            g.Open(theOutputFileName)
-            layername = FilenameOnly(theOutputFileName)
-            g_MapWin.Layers.Add(g, layername) 'to do add color scheme?
-            g_MapWin.Layers(g_MapWin.Layers.NumLayers - 1).UseTransparentColor = True
+            AddGridToMW(theOutputFileName, GetDefaultsFor(theOutputFileName, project_dir, defaultsXML))
           Case "add_allshapes"
             theOutputFileName = lProjectorNode.Content
             AddAllShapesInDir(theOutputFileName, project_dir)
@@ -531,6 +527,78 @@ StartOver:
     Return MWlay
   End Function
 
+  'Given a file name and the XML describing how to render it, add a grid layer to MapWindow
+  Private Function AddGridToMW(ByVal aFilename As String, _
+                               ByRef layerXml As Chilkat.Xml) As MapWindow.Interfaces.Layer
+    Dim LayerName As String
+    Dim Group As String
+    Dim Visible As Boolean
+    Dim Style As atcRenderStyle = New atcRenderStyle
+
+    Dim MWlay As MapWindow.Interfaces.Layer
+    Dim g As MapWinGIS.Grid
+    Dim RGBcolor As Int32
+    Dim RGBoutline As Int32
+
+    'Don't add layer again if we already have it
+    For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
+      MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer))
+      If MWlay.FileName.ToLower = aFilename.ToLower Then
+        Return MWlay
+      End If
+    Next
+    MWlay = Nothing
+
+    Try
+      If layerXml Is Nothing Then
+        LayerName = FilenameOnly(aFilename)
+        Visible = False 'True
+        Group = "Other"
+      Else
+        LayerName = layerXml.GetAttrValue("Name")
+        Style.xml = layerXml.FirstChild
+        Group = layerXml.GetAttrValue("Group")
+        If Group Is Nothing Then Group = "Other"
+        Select Case layerXml.GetAttrValue("Visible").ToLower
+          Case "yes" : Visible = True
+          Case "no" : Visible = False
+          Case Else : Visible = False
+        End Select
+      End If
+      If LayerName = "" Then LayerName = FilenameOnly(aFilename)
+
+      g_MapWin.StatusBar.Item(1).Text = "Opening " & aFilename
+      g = New MapWinGIS.Grid
+      g.Open(aFilename)
+
+      MWlay = g_MapWin.Layers.Add(g, LayerName)
+      MWlay.UseTransparentColor = True
+
+      MWlay.Visible = Visible
+
+      'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
+      If LCase(aFilename).IndexOf("\demg\") > 0 Then
+        'SetDEMGColors(MWlay, g)
+      ElseIf LCase(aFilename).IndexOf("\ned\") > 0 Then
+        'SetNEDColors(MWlay, g)
+      ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
+        SetLandUseColorsGrid(MWlay, g)
+      End If
+      If Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
+
+      If MWlay.Visible Then
+        g_MapWin.View.Redraw()
+        DoEvents()
+      End If
+      g_MapWin.Project.Modified = True
+    Catch ex As Exception
+      LogMsg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Grid")
+    End Try
+    g_MapWin.StatusBar.Item(1).Text = ""
+
+    Return MWlay
+  End Function
+
   Private Sub AddLayerToGroup(ByVal aLay As MapWindow.Interfaces.Layer, ByVal aGroupName As String)
     Dim GroupHandle As Object
     Dim iExistingGroup As Integer = 0
@@ -661,6 +729,112 @@ StartOver:
       MWlay.LineOrPointSize = 0
       MWlay.OutlineColor = System.Drawing.Color.Black
     End If
+  End Sub
+
+  Private Sub SetLandUseColorsGrid(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
+    Dim colorBreak As MapWinGIS.GridColorBreak
+    Dim colorScheme As MapWinGIS.GridColorScheme
+
+    colorScheme = New MapWinGIS.GridColorScheme
+    
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Water"
+    colorBreak.LowValue = 10
+    colorBreak.HighValue = 12
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 0, 255))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Urban"
+    colorBreak.LowValue = 20
+    colorBreak.HighValue = 23
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 0, 255))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Barren or Mining"
+    colorBreak.LowValue = 30
+    colorBreak.HighValue = 32
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 0, 0))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Transitional"
+    colorBreak.LowValue = 33
+    colorBreak.HighValue = 33
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 128, 128))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Forest"
+    colorBreak.LowValue = 40
+    colorBreak.HighValue = 43
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 128, 0))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Upland Shrub Land"
+    colorBreak.LowValue = 50
+    colorBreak.HighValue = 53
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 255, 0))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Agriculture - Cropland"
+    colorBreak.LowValue = 60
+    colorBreak.HighValue = 61
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Grass Land"
+    colorBreak.LowValue = 70
+    colorBreak.HighValue = 71
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(128, 255, 128))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Agriculture - Cropland"
+    colorBreak.LowValue = 80
+    colorBreak.HighValue = 80
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Agriculture - Pasture"
+    colorBreak.LowValue = 81
+    colorBreak.HighValue = 81
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 128, 0))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Agriculture - Cropland"
+    colorBreak.LowValue = 82
+    colorBreak.HighValue = 85
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    colorBreak = New MapWinGIS.GridColorBreak
+    colorBreak.Caption = "Wetlands"
+    colorBreak.LowValue = 90
+    colorBreak.HighValue = 92
+    colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 255, 255))
+    colorBreak.HighColor = colorBreak.LowColor
+    colorScheme.InsertBreak(colorBreak)
+
+    MWlay.ColoringScheme = colorScheme
+
   End Sub
 
   Public Sub SetCensusRenderer(ByVal MWlay As MapWindow.Interfaces.Layer, Optional ByVal shpFile As MapWinGIS.Shapefile = Nothing)
