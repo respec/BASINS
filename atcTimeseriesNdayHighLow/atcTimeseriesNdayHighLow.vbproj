@@ -144,6 +144,16 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "frmSpecifyNdayHighLow.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmSpecifyNdayHighLow.resx"
+                    DependentUpon = "frmSpecifyNdayHighLow.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "modFreq.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
