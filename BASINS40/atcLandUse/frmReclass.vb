@@ -1,5 +1,5 @@
 Imports atcUtility
-Imports atcMwGisUtils
+Imports atcMwGisUtility.GISUtils
 
 Public Class frmReclass
   Inherits System.Windows.Forms.Form

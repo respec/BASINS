@@ -144,6 +144,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "GisUtils.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "Test_atcMwGisUtility.vb"
                     SubType = "Code"
                     BuildAction = "Compile"

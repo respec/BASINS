@@ -1,4 +1,4 @@
-Imports atcMwGisUtils
+Imports atcMwGisUtility.GISUtils
 
 Public Class frmLandUse
   Inherits System.Windows.Forms.Form

@@ -1,5 +1,5 @@
 Imports atcUtility
-Imports atcMwGisUtils
+Imports atcMwGisUtility.GISUtils
 
 Public Class frmManDelin
   Inherits System.Windows.Forms.Form
@@ -267,7 +267,7 @@ Public Class frmManDelin
     Dim i As Integer
 
     pMapWin = m
-    GISUtils.SetGisUtilsMappingObject(m)
+    SetGisUtilsMappingObject(m)
 
     'set delineation layer
     For lyr = 0 To pMapWin.Layers.NumLayers - 1

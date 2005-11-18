@@ -1,4 +1,4 @@
-Imports atcMwGisUtils
+Imports atcMwGisUtility.GisUtils
 
 Public Class PlugIn
   Implements MapWindow.Interfaces.IPlugin
