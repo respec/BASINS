@@ -32,8 +32,6 @@ Public Class frmSpecifyNdayHighLow
   Friend WithEvents btnOk As System.Windows.Forms.Button
   Friend WithEvents Label1 As System.Windows.Forms.Label
   Friend WithEvents txtNDays As System.Windows.Forms.TextBox
-  Friend WithEvents radioHigh As System.Windows.Forms.RadioButton
-  Friend WithEvents radioLow As System.Windows.Forms.RadioButton
   Friend WithEvents txtStartDay As System.Windows.Forms.TextBox
   Friend WithEvents cboStartMonth As System.Windows.Forms.ComboBox
   Friend WithEvents Label2 As System.Windows.Forms.Label
@@ -42,8 +40,6 @@ Public Class frmSpecifyNdayHighLow
     Me.btnOk = New System.Windows.Forms.Button
     Me.txtNDays = New System.Windows.Forms.TextBox
     Me.Label1 = New System.Windows.Forms.Label
-    Me.radioHigh = New System.Windows.Forms.RadioButton
-    Me.radioLow = New System.Windows.Forms.RadioButton
     Me.txtStartDay = New System.Windows.Forms.TextBox
     Me.cboStartMonth = New System.Windows.Forms.ComboBox
     Me.Label2 = New System.Windows.Forms.Label
@@ -51,7 +47,7 @@ Public Class frmSpecifyNdayHighLow
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(104, 184)
+    Me.btnOk.Location = New System.Drawing.Point(112, 88)
     Me.btnOk.Name = "btnOk"
     Me.btnOk.Size = New System.Drawing.Size(80, 24)
     Me.btnOk.TabIndex = 7
@@ -68,33 +64,15 @@ Public Class frmSpecifyNdayHighLow
     '
     'Label1
     '
-    Me.Label1.Location = New System.Drawing.Point(8, 16)
+    Me.Label1.Location = New System.Drawing.Point(16, 16)
     Me.Label1.Name = "Label1"
     Me.Label1.Size = New System.Drawing.Size(88, 16)
     Me.Label1.TabIndex = 8
     Me.Label1.Text = "Number of Days"
     '
-    'radioHigh
-    '
-    Me.radioHigh.Checked = True
-    Me.radioHigh.Location = New System.Drawing.Point(112, 56)
-    Me.radioHigh.Name = "radioHigh"
-    Me.radioHigh.Size = New System.Drawing.Size(64, 24)
-    Me.radioHigh.TabIndex = 10
-    Me.radioHigh.TabStop = True
-    Me.radioHigh.Text = "High"
-    '
-    'radioLow
-    '
-    Me.radioLow.Location = New System.Drawing.Point(112, 88)
-    Me.radioLow.Name = "radioLow"
-    Me.radioLow.Size = New System.Drawing.Size(64, 24)
-    Me.radioLow.TabIndex = 11
-    Me.radioLow.Text = "Low"
-    '
     'txtStartDay
     '
-    Me.txtStartDay.Location = New System.Drawing.Point(184, 136)
+    Me.txtStartDay.Location = New System.Drawing.Point(200, 48)
     Me.txtStartDay.Name = "txtStartDay"
     Me.txtStartDay.Size = New System.Drawing.Size(40, 20)
     Me.txtStartDay.TabIndex = 14
@@ -104,7 +82,7 @@ Public Class frmSpecifyNdayHighLow
     'cboStartMonth
     '
     Me.cboStartMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-    Me.cboStartMonth.Location = New System.Drawing.Point(96, 136)
+    Me.cboStartMonth.Location = New System.Drawing.Point(112, 48)
     Me.cboStartMonth.Name = "cboStartMonth"
     Me.cboStartMonth.Size = New System.Drawing.Size(80, 21)
     Me.cboStartMonth.TabIndex = 13
@@ -112,7 +90,7 @@ Public Class frmSpecifyNdayHighLow
     '
     'Label2
     '
-    Me.Label2.Location = New System.Drawing.Point(8, 136)
+    Me.Label2.Location = New System.Drawing.Point(16, 48)
     Me.Label2.Name = "Label2"
     Me.Label2.Size = New System.Drawing.Size(72, 16)
     Me.Label2.TabIndex = 12
@@ -121,18 +99,16 @@ Public Class frmSpecifyNdayHighLow
     'frmSpecifyNdayHighLow
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(296, 229)
+    Me.ClientSize = New System.Drawing.Size(256, 125)
     Me.Controls.Add(Me.txtStartDay)
+    Me.Controls.Add(Me.txtNDays)
     Me.Controls.Add(Me.cboStartMonth)
     Me.Controls.Add(Me.Label2)
-    Me.Controls.Add(Me.radioLow)
-    Me.Controls.Add(Me.radioHigh)
-    Me.Controls.Add(Me.txtNDays)
     Me.Controls.Add(Me.Label1)
     Me.Controls.Add(Me.btnOk)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmSpecifyNdayHighLow"
-    Me.Text = "Specify N-day High/Low"
+    Me.Text = "Specify N-day"
     Me.ResumeLayout(False)
 
   End Sub
@@ -142,7 +118,7 @@ Public Class frmSpecifyNdayHighLow
   Private pOk As Boolean = False
 
   Public Function AskUser(ByRef aStartMonth As Integer, ByRef aStartDay As Integer, _
-                          ByRef aNumDays As Integer, ByRef aHigh As Boolean) As Boolean
+                          ByRef aNumDays As Integer) As Boolean
     If aStartMonth >= 1 And aStartMonth <= 12 Then
       cboStartMonth.Text = cboStartMonth.Items.Item(aStartMonth - 1)
     End If
@@ -154,17 +130,19 @@ Public Class frmSpecifyNdayHighLow
       txtNDays.Text = CStr(aNumDays)
     End If
 
-    If aHigh Then
-      radioHigh.Checked = True
-    Else
-      radioLow.Checked = True
-    End If
+    'If aHigh Then
+    '  radioHigh.Checked = True
+    'Else
+    '  radioLow.Checked = True
+    'End If
 
     Me.ShowDialog()
 
     If pOk Then
+      aStartMonth = cboStartMonth.SelectedIndex + 1
+      aStartDay = CInt(txtStartDay.Text)
       aNumDays = CInt(txtNDays.Text)
-      aHigh = radioHigh.Checked
+      'aHigh = radioHigh.Checked
     End If
     Return pOk
   End Function

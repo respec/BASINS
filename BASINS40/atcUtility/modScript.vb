@@ -66,27 +66,29 @@ Public Module modScript
     'params.ReferencedAssemblies.AddRange(refs)
 
     For Each refAssy As System.Reflection.Assembly In AppDomain.CurrentDomain.GetAssemblies()
-      params.ReferencedAssemblies.Add(refAssy.Location)
-      If needSupportCode Then
-        Dim lAssyName As String = StrSplit(refAssy.FullName, ",", "")
-        Select Case lAssyName
-          Case "mscorlib", _
-               "MapWinInterfaces", _
-               "AxInterop.MapWinGIS", _
-               "Interop.MapWinGIS", _
-               "mwIdentifier", _
-               "TableEditor.mw", _
-               "ChilkatDotNet", _
-               "MapWinX"
-            'Skip trying these for now, causing errors
-          Case Else
-            If lAssyName.StartsWith("RemoveMe") Then
-              'Don't add temporary assemblies
-            Else
-              lSupportCode &= "Imports " & lAssyName & vbCrLf
-            End If
-        End Select
-      End If
+
+      Dim lAssyName As String = StrSplit(refAssy.FullName, ",", "")
+      Select Case lAssyName
+        Case "mscorlib", _
+             "mwIdentifier", _
+             "TableEditor.mw", _
+             "ChilkatDotNet", _
+             "MapWindow.resources", _
+             "MapWinX"
+          'Skip trying these for now, causing errors
+
+          '"MapWinInterfaces", _
+          '"AxInterop.MapWinGIS", _
+          '"Interop.MapWinGIS", _
+
+        Case Else
+          If lAssyName.StartsWith("RemoveMe") Then
+            'Don't add temporary assemblies
+          Else
+            If needSupportCode Then lSupportCode &= "Imports " & lAssyName & vbCrLf
+            params.ReferencedAssemblies.Add(refAssy.Location)
+          End If
+      End Select
     Next
 
     If needSupportCode Then
