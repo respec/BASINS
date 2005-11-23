@@ -330,14 +330,19 @@ Public Class atcTimeseriesNdayHighLow
 
     Dim lRecurOrProb() As Double = Obj2Array(aRecurOrProb)
 
-    If aTimeseries.Attributes.GetValue("Tu", 1) <> 6 Then
-      'calculate the n day annual timeseries
-      aNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
-    Else 'already an annual timeseries
-      If (aHigh = aTimeseries.Attributes.GetValue("HighFlag", True) And _
-         aNDay = aTimeseries.Attributes.GetValue("NDay", 1)) Then
+    Try
+      If aTimeseries.Attributes.GetValue("Tu", 1) = 6 andalso _
+         aHigh = aTimeseries.Attributes.GetValue("HighFlag", True) AndAlso _
+         aNDay = aTimeseries.Attributes.GetValue("NDay", Double.NaN) Then
         aNdayTsGroup = New atcDataGroup(aTimeseries)
       End If
+    Catch ex As Exception
+
+    End Try
+
+    If aNdayTsGroup Is Nothing Then
+      'calculate the n day annual timeseries
+      aNdayTsGroup = HighOrLowTimeseries(aTimeseries, aNDay, aHigh)
     End If
 
     For Each lNdayTs As atcTimeseries In aNdayTsGroup
@@ -459,7 +464,12 @@ Public Class atcTimeseriesNdayHighLow
 
     If aArgs Is Nothing Then      
       Dim lForm As New frmSpecifyNdayHighLow
-      If Not lForm.AskUser(lBoundaryMonth, lBoundaryDay, lNDay, lHigh) Then
+      If lHigh Then
+        lBoundaryMonth = 10
+      Else
+        lBoundaryMonth = 4
+      End If
+      If Not lForm.AskUser(lBoundaryMonth, lBoundaryDay, lNDay) Then
         Return False
       End If
     Else
