@@ -78,7 +78,10 @@ Public Module modTimeseriesMath
       lEndDate = Jday(lEndYear, aBoundaryMonth, aBoundaryDay, 0, 0, 0)
     End With
 
-    Return SubsetByDate(aTimeseries, lStartDate, lEndDate, aDataSource)
+    SubsetByDateBoundary = SubsetByDate(aTimeseries, lStartDate, lEndDate, aDataSource)
+    SubsetByDateBoundary.Attributes.Add("seasbg", aBoundaryMonth)
+    SubsetByDateBoundary.Attributes.Add("seadbg", aBoundaryDay)
+
   End Function
 
   Public Sub CopyBaseAttributes(ByVal aFromDataset As atcTimeseries, ByVal aToDataSet As atcTimeseries, _
@@ -246,6 +249,5 @@ Public Module modTimeseriesMath
       Return New atcDataGroup(aObj)
     Catch
     End Try
-
   End Function
 End Module

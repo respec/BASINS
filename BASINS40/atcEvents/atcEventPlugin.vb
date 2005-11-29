@@ -38,23 +38,24 @@ Public Class atcEventPlugin
   Public Overrides Function Open(ByVal aOperationName As String, _
                         Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
     Dim ltsGroup As atcDataGroup
-    Dim lThresh As Double
+    Dim lThresh As Double = Double.NaN
     Dim lHigh As Boolean
     Dim lOk As Boolean
     Dim lExtreme As Double
 
-    If aArgs Is Nothing Then
+    If Not aArgs Is Nothing Then
+      ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
+      lThresh = aArgs.GetValue("Threshold", Double.NaN)
+      lHigh = aArgs.GetValue("High", True)
+    End If
+    If ltsGroup Is Nothing OrElse ltsGroup.Count = 0 Then
       ltsGroup = DataManager.UserSelectData("Select data for " & aOperationName)
-
+    End If
+    If ltsGroup.Count > 0 AndAlso Double.IsNaN(lThresh) Then
       Dim lForm As New frmSpecifyEventAttributes
       lOk = lForm.AskUser(lHigh, lThresh, MinMaxLabel(ltsGroup))
-    Else
-      ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
-      lThresh = aArgs.GetValue("Threshold")
-      lHigh = aArgs.GetValue("High", True)
-      lOk = True
     End If
-    If Not ltsGroup Is Nothing And lOk Then
+    If lOk Then
       For Each lts As atcTimeseries In ltsGroup
         Dim lEvents As atcDataGroup = EventSplit(lts, Me, lThresh, lHigh)
         Select Case aOperationName
@@ -183,7 +184,7 @@ Public Class atcEventPlugin
           Dim lSplit As New atcAttributeDefinition
           With lSplit
             .Name = "Split"
-            .Category = "Split"
+            .Category = "" '"Split"
             .Description = "Split a timeseries into events"
             .Editable = False
             .TypeString = "atcDataGroup"
