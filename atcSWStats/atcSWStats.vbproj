@@ -1,7 +1,7 @@
 <VisualStudioProject>
     <VisualBasic
         ProjectType = "Local"
-        ProductVersion = "1.0.0"
+        ProductVersion = "7.10.3077"
         SchemaVersion = "2.0"
         ProjectGuid = "{A97E6257-FB07-4850-922F-B7DF66F558B0}"
     >
@@ -161,6 +161,11 @@
                     RelPath = "frmSpecifyFrequency.resx"
                     DependentUpon = "frmSpecifyFrequency.vb"
                     BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "modSWSTATRpt.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
                 />
             </Include>
         </Files>

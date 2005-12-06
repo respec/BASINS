@@ -332,7 +332,7 @@ Public Class atcTimeseriesFileHspfBinOut
 
   Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
     If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-      aFileName = FindFile("Select HSPF Bianry file to open", , , pFileFilter, True, , 1)
+      aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
     End If
     If FileExists(aFileName) Then
       aFileName = AbsolutePath(aFileName, CurDir())
