@@ -532,7 +532,11 @@ Public Module GISUtils
         subid = polygonsf.PointInShapefile(xpos, ypos)
         If subid > -1 Then
           'this is in a subbasin
-          luid = InputGrid.Value(ic, ir)
+          If InputGrid.Value(ic, ir).GetType.Name = "SByte" Then
+            luid = Convert.ToInt32(InputGrid.Value(ic, ir))
+          Else
+            luid = InputGrid.Value(ic, ir)
+          End If
           aAreaGridPoly(luid, subid) = aAreaGridPoly(luid, subid) + lcellarea
         End If
         'cellcount = cellcount + 1
@@ -701,6 +705,24 @@ Public Module GISUtils
     Dim ssfshape As MapWinGIS.Shape
     Dim ssfshapeext As MapWinGIS.Extents
 
+    'set up collections of subbasin shapes and extents to save computation time later
+    Dim cSsfShape As New Collection
+    Dim cSsfShapeExtXmax As New Collection
+    Dim cSsfShapeExtXmin As New Collection
+    Dim cSsfShapeExtYmax As New Collection
+    Dim cSsfShapeExtYmin As New Collection
+    For k = 1 To cSelectedSubbasins.Count
+      'loop thru each selected subbasin (or all if none selected)
+      shapeindex = cSelectedSubbasins(k)
+      ssfshape = ssf.Shape(shapeindex)
+      ssfshapeext = ssfshape.Extents
+      cSsfShape.Add(ssfshape)
+      cSsfShapeExtXmax.Add(ssfshapeext.xMax)
+      cSsfShapeExtXmin.Add(ssfshapeext.xMin)
+      cSsfShapeExtYmax.Add(ssfshapeext.yMax)
+      cSsfShapeExtYmin.Add(ssfshapeext.yMin)
+    Next k
+
     '********** do overlay ***********
     pMapWin.StatusBar.ShowProgressBar = True
     totalpolygoncount = lusf.NumShapes * cSelectedSubbasins.Count
@@ -717,9 +739,7 @@ Public Module GISUtils
           'loop thru each selected subbasin (or all if none selected)
           shapeindex = cSelectedSubbasins(k)
           polygoncount = polygoncount + 1
-          ssfshape = ssf.Shape(shapeindex)
-          ssfshapeext = ssfshape.Extents
-          If Not (LUext.xMin > ssfshapeext.xMax Or LUext.xMax < ssfshapeext.xMin Or LUext.yMin > ssfshapeext.yMax Or LUext.yMax < ssfshapeext.yMin) Then
+          If Not (LUext.xMin > cSsfShapeExtXmax(k) Or LUext.xMax < cSsfShapeExtXmin(k) Or LUext.yMin > cSsfShapeExtYmax(k) Or LUext.yMax < cSsfShapeExtYmin(k)) Then
             'look for intersection from overlay of these shapes
             newshape = utilClip.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, lusfshape, ssfshape)
             If newshape.numPoints > 0 Then
@@ -733,19 +753,20 @@ Public Module GISUtils
               bsuc = osf.EditCellValue(1, osf.NumShapes - 1, Feature2Id)
               bsuc = osf.EditCellValue(2, osf.NumShapes - 1, area)
             End If
+            newshape = Nothing
           End If
-          ssfshape = Nothing
-          ssfshapeext = Nothing
         Next k
       Else
         polygoncount = polygoncount + cSelectedSubbasins.Count
       End If
+      LUext = Nothing
       If Int(polygoncount / totalpolygoncount * 100) > lastdisplayed Then
         'lblStatus.Text = "Overlaying Land Use and Subbasins (" & Int(polygoncount / totalpolygoncount * 100) & "%)"
         'Me.Refresh()
         lastdisplayed = Int(polygoncount / totalpolygoncount * 100)
         pMapWin.StatusBar.ProgressBarValue = Int(polygoncount / totalpolygoncount * 100)
       End If
+      lusfshape = Nothing
     Next i
     pMapWin.StatusBar.ShowProgressBar = False
 
