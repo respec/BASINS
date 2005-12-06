@@ -71,7 +71,11 @@ Public Class atcGraphForm
     For Each ts As atcTimeseries In pDataGroup
       AddDatasetTimeseries(ts, ts.ToString)
       With Pane.XAxis
-        If ts.Dates.Value(0) < .Min Then .Min = ts.Dates.Value(0)
+        If ts.Attributes.GetValue("point", False) Then
+          If ts.Dates.Value(1) < .Min Then .Min = ts.Dates.Value(1)
+        Else
+          If ts.Dates.Value(0) < .Min Then .Min = ts.Dates.Value(0)
+        End If
         If ts.Dates.Value(ts.Dates.numValues) > .Max Then .Max = ts.Dates.Value(ts.Dates.numValues)
       End With
     Next

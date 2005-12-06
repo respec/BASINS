@@ -27,7 +27,7 @@ Friend Class frmDisplaySWStats
     Next
 
     If pDataGroup.Count = 0 Then 'ask user to specify some Data
-      pDataManager.UserSelectData(, pDataGroup, True)
+      pDataManager.UserSelectData("Select Timeseries for SWSTAT Reports", pDataGroup, True)
     End If
 
     pInitializing = False
@@ -205,9 +205,10 @@ Friend Class frmDisplaySWStats
     '
     'frmDisplaySWStats
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(7, 13)
     Me.ClientSize = New System.Drawing.Size(720, 545)
     Me.Controls.Add(Me.txtReport)
+    Me.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "frmDisplaySWStats"
@@ -315,10 +316,16 @@ Friend Class frmDisplaySWStats
   End Sub
 
   Private Sub mnuRptFreq_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuRptFreq.Click
+    Dim lForm As New frmSpecifyFrequency
+    'lform.AskUser(pdatagroup,
     mnuRptFreq.Checked = True
     mnuRptNDay.Checked = False
     mnuRptTrend.Checked = False
-    txtReport.Text = GenFreqReport()
+    txtReport.Text = ""
+    'loop through timeseries in group
+    For Each lts As atcTimeseries In pDataGroup
+      'txtReport.Text &= GenFreqReport(lts, )
+    Next
   End Sub
 
   Private Sub mnuRptNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuRptNDay.Click
@@ -333,31 +340,10 @@ Friend Class frmDisplaySWStats
     mnuRptTrend.Checked = True
     mnuRptFreq.Checked = False
     mnuRptNDay.Checked = False
-    txtReport.Text = GenTrendReport()
+    txtReport.Text = ""
+    For Each lts As atcTimeseries In pDataGroup
+      txtReport.Text &= GenTrendReport(lts)
+    Next
   End Sub
 
-  Private Function GenFreqReport() As String
-    Dim ls As String
-    ls = "Pearson Type III Statistics" & vbCrLf & _
-         "SWSTAT(4.1)" & vbCrLf & _
-         "(based on USGS Program A193)" & vbCrLf & vbCrLf & _
-         "Notice -- Use of Pearson Type III distribution is for" & vbCrLf & _
-         "preliminary(computations.User Is responsible)" & vbCrLf & _
-         "for assessment and interpretation." & vbCrLf
-    ls &= "The following 7 statistics are based on non-zero values:"
-
-    Return ls
-  End Function
-  Private Function GenNDayReport() As String
-    Dim ls As String
-    ls = "Station Number " & vbCrLf
-
-    Return ls
-  End Function
-  Private Function GenTrendReport() As String
-    Dim ls As String
-    ls = "Data-set number " & vbCrLf
-
-    Return ls
-  End Function
 End Class

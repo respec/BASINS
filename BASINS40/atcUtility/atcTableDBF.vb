@@ -1,6 +1,6 @@
 Option Strict Off
 Option Explicit On 
-Friend Class clsATCTableDBF
+Public Class clsATCTableDBF
   Inherits clsATCTable
 
   'UPGRADE_ISSUE: Declaring a parameter 'As Any' is not supported. Click for more: 'ms-help://MS.VSCC/commoner/redir/redirect.htm?keyword="vbup1016"'
