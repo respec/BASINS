@@ -69,8 +69,10 @@ Public Class atcDataSourceBasinsObsWQ
         Dim lValCol As Integer = -1
         Dim lTSKey As String
         Dim lTSIndex As Integer
+        Dim lLocation As String = ""
+        Dim lConstituentCode As Integer = -1
         Dim s As String
-        lDBF = New clsATCTableDBF
+        lDBF = New atcTableDBF
         lDBF.OpenFile(aFileName)
         For i As Integer = 1 To lDBF.NumFields
           s = UCase(lDBF.FieldName(i))
@@ -92,24 +94,27 @@ Public Class atcDataSourceBasinsObsWQ
         If lDateCol > 0 AndAlso lTimeCol > 0 AndAlso lLocnCol > 0 AndAlso _
            lConsCol > 0 AndAlso lValCol > 0 Then
           While Not lDBF.atEOF
-            lTSKey = lDBF.Value(lLocnCol) & ":" & lDBF.Value(lConsCol)
+            lLocation = lDBF.Value(lLocnCol)
+            lConstituentCode = lDBF.Value(lConsCol)
+            lTSKey = lLocation & ":" & lConstituentCode
             lData = DataSets.ItemByKey(lTSKey)
             If lData Is Nothing Then
               lData = New atcTimeseries(Me)
               lData.Dates = New atcTimeseries(Me)
-              lData.numValues = lDBF.NumRecords
-              lData.Dates.numValues = lData.numValues
+              lData.numValues = lDBF.NumRecords - lDBF.CurrentRecord + 1
+              lData.Value(0) = Double.NaN
+              lData.Dates.Value(0) = Double.NaN
               lData.Attributes.SetValue("Count", 0)
               lData.Attributes.SetValue("Scenario", "OBSERVED")
-              lData.Attributes.SetValue("Location", lDBF.Value(lLocnCol))
-              lData.Attributes.SetValue("Constituent", CInt(lDBF.Value(lConsCol)))
-              lData.Attributes.SetValue("point", True)
+              lData.Attributes.SetValue("Location", lLocation)
+              lData.Attributes.SetValue("Constituent", lConstituentCode)
+              lData.Attributes.SetValue("Point", True)
               DataSets.Add(lTSKey, lData)
             End If
             lTSIndex = lData.Attributes.GetValue("Count") + 1
             lData.Value(lTSIndex) = lDBF.Value(lValCol)
-            lData.Attributes.SetValue("Count", lTSIndex)
             lData.Dates.Value(lTSIndex) = parseWQObsDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
+            lData.Attributes.SetValue("Count", lTSIndex)
             lDBF.MoveNext()
           End While
           For Each lData In DataSets

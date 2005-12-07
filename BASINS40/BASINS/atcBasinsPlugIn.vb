@@ -4,7 +4,7 @@ Imports System.Reflection
 Imports atcUtility
 Imports atcData
 
-Public Class PlugIn
+Public Class atcBasinsPlugIn
   Implements MapWindow.Interfaces.IPlugin
 
   Private Const NationalProjectFilename = "national.mwprj"

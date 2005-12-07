@@ -186,6 +186,7 @@ Public Class atcTimeseries
     Set(ByVal newValue As Long)
       pNumValues = newValue
       ReDim Preserve pValues(pNumValues)
+      If Not pDates Is Nothing Then pDates.numValues = newValue
     End Set
   End Property
 

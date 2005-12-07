@@ -142,12 +142,12 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcRenderStyle.vb"
+                    RelPath = "atcBasinsPlugIn.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "clsPlugIn.vb"
+                    RelPath = "atcRenderStyle.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
