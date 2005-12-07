@@ -948,7 +948,7 @@ ErrHand:
     pFilename = Filename
 
     inFile = FreeFile()
-    FileOpen(inFile, Filename, OpenMode.Binary)
+    FileOpen(inFile, Filename, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
     pHeader.ReadFromFile(inFile)
     Select Case pHeader.version 'Be sure we're using a dBASE III file
       Case 3 'Normal dBASEIII file

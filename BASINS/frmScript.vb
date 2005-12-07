@@ -3,7 +3,7 @@ Imports atcUtility
 Public Class frmScript
   Inherits System.Windows.Forms.Form
 
-  Private pBasinsPlugin As PlugIn
+  Private pBasinsPlugin As atcBasinsPlugIn
   Private pDefaultScript = "Imports atcData" & vbCrLf _
                          & "Imports System.Windows.Forms" & vbCrLf _
                          & "Imports Microsoft.VisualBasic" & vbCrLf _
@@ -193,8 +193,8 @@ Public Class frmScript
     End Select
   End Sub
 
-  Public WriteOnly Property BasinsPlugin() As PlugIn
-    Set(ByVal newValue As PlugIn)
+  Public WriteOnly Property BasinsPlugin() As atcBasinsPlugIn
+    Set(ByVal newValue As atcBasinsPlugIn)
       pBasinsPlugin = newValue
     End Set
   End Property
