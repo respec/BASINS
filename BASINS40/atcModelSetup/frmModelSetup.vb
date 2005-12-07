@@ -1,5 +1,5 @@
 Imports atcUtility
-'Imports atcMwGisUtils
+Imports atcMwGisUtility
 
 Public Class frmModelSetup
   Inherits System.Windows.Forms.Form
@@ -860,11 +860,11 @@ Public Class frmModelSetup
     cboSub1.Items.Clear()
     cboSub2.Items.Clear()
     cboSub3.Items.Clear()
-    lyr = GisUtil_FindLayerIndexByName(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+    lyr = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
     If lyr > -1 Then
       'fill in fields 
-      For i = 0 To GisUtil_NumFieldsInLayer(lyr) - 1
-        ctemp = GisUtil_NthFieldNameInLayer(i, lyr)
+      For i = 0 To GisUtil.NumFields(lyr) - 1
+        ctemp = GisUtil.FieldName(i, lyr)
         cboSub1.Items.Add(ctemp)
         cboSub2.Items.Add(ctemp)
         cboSub3.Items.Add(ctemp)
@@ -904,11 +904,11 @@ Public Class frmModelSetup
     cboStream7.Items.Clear()
     cboStream8.Items.Clear()
     cboStream9.Items.Clear()
-    lyr = GisUtil_FindLayerIndexByName(cboStreams.Items(cboStreams.SelectedIndex))
+    lyr = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
     If lyr > -1 Then
       'fill in fields 
-      For i = 0 To GisUtil_NumFieldsInLayer(lyr) - 1
-        ctemp = GisUtil_NthFieldNameInLayer(i, lyr)
+      For i = 0 To GisUtil.NumFields(lyr) - 1
+        ctemp = GisUtil.FieldName(i, lyr)
         cboStream1.Items.Add(ctemp)
         cboStream2.Items.Add(ctemp)
         cboStream3.Items.Add(ctemp)
@@ -982,11 +982,11 @@ Public Class frmModelSetup
     Dim ctemp As String
 
     cboPoint.Items.Clear()
-    lyr = GisUtil_FindLayerIndexByName(cboOutlets.Items(cboOutlets.SelectedIndex))
-    If lyr > -1 Then
+    If cboOutlets.Items(cboOutlets.SelectedIndex) <> "<none>" Then
+      lyr = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
       'fill in fields 
-      For i = 0 To GisUtil_NumFieldsInLayer(lyr) - 1
-        ctemp = GisUtil_NthFieldNameInLayer(i, lyr)
+      For i = 0 To GisUtil.NumFields(lyr) - 1
+        ctemp = GisUtil.FieldName(i, lyr)
         cboPoint.Items.Add(ctemp)
         If UCase(ctemp) = "PCSID" Then
           cboPoint.SelectedIndex = i
@@ -1010,10 +1010,10 @@ Public Class frmModelSetup
       SetPerviousGrid()
     ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
       cboLandUseLayer.Items.Clear()
-      For lyr = 0 To GisUtil_NumLayers() - 1
-        If GisUtil_LayerType(lyr) = 3 Then
+      For lyr = 0 To GisUtil.NumLayers() - 1
+        If GisUtil.LayerType(lyr) = 3 Then
           'PolygonShapefile
-          cboLandUseLayer.Items.Add(GisUtil_LayerName(lyr))
+          cboLandUseLayer.Items.Add(GisUtil.LayerName(lyr))
         End If
       Next
       If cboLandUseLayer.Items.Count > 0 And cboLandUseLayer.SelectedIndex < 0 Then
@@ -1027,11 +1027,11 @@ Public Class frmModelSetup
       SetPerviousGrid()
     ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
       cboLandUseLayer.Items.Clear()
-      For lyr = 0 To GisUtil_NumLayers() - 1
-        If GisUtil_LayerType(lyr) = 4 Then
+      For lyr = 0 To GisUtil.NumLayers() - 1
+        If GisUtil.LayerType(lyr) = 4 Then
           'Grid 
-          If InStr(GisUtil_LayerFileName(lyr), "\nlcd\") > 0 Then
-            cboLandUseLayer.Items.Add(GisUtil_LayerName(lyr))
+          If InStr(GisUtil.LayerFileName(lyr), "\nlcd\") > 0 Then
+            cboLandUseLayer.Items.Add(GisUtil.LayerName(lyr))
           End If
         End If
       Next
@@ -1046,10 +1046,10 @@ Public Class frmModelSetup
       SetPerviousGrid()
     Else 'grid
       cboLandUseLayer.Items.Clear()
-      For lyr = 0 To GisUtil_NumLayers() - 1
-        If GisUtil_LayerType(lyr) = 4 Then
+      For lyr = 0 To GisUtil.NumLayers() - 1
+        If GisUtil.LayerType(lyr) = 4 Then
           'Grid
-          cboLandUseLayer.Items.Add(GisUtil_LayerName(lyr))
+          cboLandUseLayer.Items.Add(GisUtil.LayerName(lyr))
         End If
       Next
       If cboLandUseLayer.Items.Count > 0 And cboLandUseLayer.SelectedIndex < 0 Then
@@ -1068,22 +1068,22 @@ Public Class frmModelSetup
     Dim i As Long, lyr As Long
 
     cboDescription.Items.Clear()
-    lyr = GisUtil_FindLayerIndexByName(cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex))
+    lyr = GisUtil.LayerIndex(cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex))
     If lyr > -1 Then
       If cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Grid" Then
         'make sure this is a grid layer
-        If GisUtil_LayerType(lyr) = 4 Then
+        If GisUtil.LayerType(lyr) = 4 Then
           'todo: fill in description fields for selected grid layer if possible
         End If
       Else
         'make sure this is a shape layer
-        If GisUtil_LayerType(lyr) = 3 Then
+        If GisUtil.LayerType(lyr) = 3 Then
           'PolygonShapefile
           'this is the layer, fill in fields 
-          For i = 0 To GisUtil_NumFieldsInLayer(lyr) - 1
+          For i = 0 To GisUtil.NumFields(lyr) - 1
             'MsgBox(sf.Field(i).Name)
-            cboDescription.Items.Add(GisUtil_NthFieldNameInLayer(i, lyr))
-            If GisUtil_NthFieldTypeInLayer(i, lyr) = 0 Then
+            cboDescription.Items.Add(GisUtil.FieldName(i, lyr))
+            If GisUtil.FieldType(i, lyr) = 0 Then
               'string
               cboDescription.SelectedIndex = i
             End If
@@ -1199,7 +1199,7 @@ Public Class frmModelSetup
         LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
         LandUseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
         'no reclass file, get unique landuse names
-        lyr = GisUtil_FindLayerIndexByName(LandUseLayerName)
+        lyr = GisUtil.LayerIndex(LandUseLayerName)
         If lyr > -1 Then
           FillListUniqueLandUses(lyr, LandUseFieldName)
         End If
@@ -1210,10 +1210,10 @@ Public Class frmModelSetup
       If cboLandUseLayer.SelectedIndex > -1 Then
         LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
         'get unique landuse names
-        lyr = GisUtil_FindLayerIndexByName(LandUseLayerName)
-        If GisUtil_LayerType(lyr) = 4 Then
+        lyr = GisUtil.LayerIndex(LandUseLayerName)
+        If GisUtil.LayerType(lyr) = 4 Then
           'Grid
-          For i = GisUtil_GridLayerMinimum(lyr) To GisUtil_GridLayerMaximum(lyr)
+          For i = GisUtil.GridLayerMinimum(lyr) To GisUtil.GridLayerMaximum(lyr)
             grdPervious.rows = grdPervious.rows + 1
             grdPervious.set_TextMatrix(grdPervious.rows, 1, i)
             grdPervious.set_TextMatrix(grdPervious.rows, 2, 100)
@@ -1287,21 +1287,21 @@ Public Class frmModelSetup
     Dim i As Long, j As Long, k As Long
     Dim alreadyinlist As Boolean
 
-    i = GisUtil_FindFieldIndexByName(layerindex, fieldname)
+    i = GisUtil.FieldIndex(layerindex, fieldname)
     If i > -1 Then
       'this is the field we want, get land use types
-      For j = 0 To GisUtil_NumFeaturesInLayer(layerindex) - 1
+      For j = 0 To GisUtil.NumFeatures(layerindex) - 1
         alreadyinlist = False
         For k = 1 To grdPervious.rows
-          If grdPervious.get_TextMatrix(k, 1) = GisUtil_CellValueNthFeatureInLayer(layerindex, i, j) Then
+          If grdPervious.get_TextMatrix(k, 1) = GisUtil.FieldValue(layerindex, j, i) Then
             alreadyinlist = True
           End If
         Next
         If Not alreadyinlist Then
           With grdPervious
             .rows = .rows + 1
-            .set_TextMatrix(grdPervious.rows, 1, GisUtil_CellValueNthFeatureInLayer(layerindex, i, j))
-            If UCase(Microsoft.VisualBasic.Left(GisUtil_CellValueNthFeatureInLayer(layerindex, i, j), 5)) = "URBAN" Then
+            .set_TextMatrix(grdPervious.rows, 1, GisUtil.FieldValue(layerindex, j, i))
+            If UCase(Microsoft.VisualBasic.Left(GisUtil.FieldValue(layerindex, j, i), 5)) = "URBAN" Then
               .set_TextMatrix(.rows, 2, "50")
             Else
               .set_TextMatrix(.rows, 2, "100")
@@ -1380,29 +1380,29 @@ Public Class frmModelSetup
     'set subbasin indexes
     SubbasinThemeName = cboSubbasins.Items(cboSubbasins.SelectedIndex)
     SubbasinFieldName = cboSub1.Items(cboSub1.SelectedIndex)
-    SubbasinLayerIndex = GisUtil_FindLayerIndexByName(SubbasinThemeName)
-    SubbasinFieldIndex = GisUtil_FindFieldIndexByName(SubbasinLayerIndex, SubbasinFieldName)
-    SubbasinLengthIndex = GisUtil_FindFieldIndexByName(SubbasinLayerIndex, cboSub3.Items(cboSub3.SelectedIndex))
-    SubbasinSlopeIndex = GisUtil_FindFieldIndexByName(SubbasinLayerIndex, cboSub2.Items(cboSub2.SelectedIndex))
+    SubbasinLayerIndex = GisUtil.LayerIndex(SubbasinThemeName)
+    SubbasinFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, SubbasinFieldName)
+    SubbasinLengthIndex = GisUtil.FieldIndex(SubbasinLayerIndex, cboSub3.Items(cboSub3.SelectedIndex))
+    SubbasinSlopeIndex = GisUtil.FieldIndex(SubbasinLayerIndex, cboSub2.Items(cboSub2.SelectedIndex))
     'are any subbasins selected?
     Dim cSelectedSubbasins As New Collection
-    For i = 1 To GisUtil_NumSelectedFeaturesInLayer(SubbasinLayerIndex)
-      cSelectedSubbasins.Add(GisUtil_IndexOfNthSelectedFeatureInLayer(i - 1, SubbasinLayerIndex))
+    For i = 1 To GisUtil.NumSelectedFeatures(SubbasinLayerIndex)
+      cSelectedSubbasins.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, SubbasinLayerIndex))
     Next
     If cSelectedSubbasins.Count = 0 Then
       'no subbasins selected, act as if all are selected
-      For i = 1 To GisUtil_NumFeaturesInLayer(SubbasinLayerIndex)
+      For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
         cSelectedSubbasins.Add(i - 1)
       Next
     Else
       'some subbasins are selected, save selected as new shapefile
-      GisUtil_SaveSelectedFeatures(SubbasinThemeName, "Selected" & FilenameNoPath(GisUtil_LayerFileName(SubbasinLayerIndex)))
-      SubbasinThemeName = "Selected" & FilenameNoPath(GisUtil_LayerFileName(SubbasinLayerIndex))
-      SubbasinLayerIndex = GisUtil_FindLayerIndexByName(SubbasinThemeName)
+      GisUtil.SaveSelectedFeatures(SubbasinThemeName, "Selected" & FilenameNoPath(GisUtil.LayerFileName(SubbasinLayerIndex)))
+      SubbasinThemeName = "Selected" & FilenameNoPath(GisUtil.LayerFileName(SubbasinLayerIndex))
+      SubbasinLayerIndex = GisUtil.LayerIndex(SubbasinThemeName)
       Do While cSelectedSubbasins.Count > 0
         cSelectedSubbasins.Remove(1)
       Loop
-      For i = 1 To GisUtil_NumFeaturesInLayer(SubbasinLayerIndex)
+      For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
         cSelectedSubbasins.Add(i - 1)
       Next
     End If
@@ -1430,30 +1430,30 @@ Public Class frmModelSetup
       Me.Refresh()
 
       'set land use index layer
-      LanduseLayerIndex = GisUtil_FindLayerIndexByName(LandUseThemeName)
-      LandUseFieldIndex = GisUtil_FindFieldIndexByName(LanduseLayerIndex, LanduseFieldName)
-      luPathName = PathNameOnly(GisUtil_LayerFileName(LanduseLayerIndex))
+      LanduseLayerIndex = GisUtil.LayerIndex(LandUseThemeName)
+      LandUseFieldIndex = GisUtil.FieldIndex(LanduseLayerIndex, LanduseFieldName)
+      luPathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
       luPathName = luPathName & "\landuse"
       luDriveLetter = Mid(luPathName, 1, 1)
       ReclassifyFile = luDriveLetter & ":\basins\etc\giras.dbf"
 
       'figure out which land use tiles to overlay
       Dim cluTiles As New Collection
-      For i = 1 To GisUtil_NumFeaturesInLayer(LanduseLayerIndex)
+      For i = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
         'loop thru each shape of land use index shapefile
         For j = 1 To cSelectedSubbasins.Count
           'loop thru each selected subbasin (or all if none selected)
           shapeindex = cSelectedSubbasins(j)
-          If GisUtil_OverlappingPolygons(LanduseLayerIndex, i - 1, SubbasinLayerIndex, shapeindex) Then
+          If GisUtil.OverlappingPolygons(LanduseLayerIndex, i - 1, SubbasinLayerIndex, shapeindex) Then
             'add this to collection of tiles we'll need
             incollection = False
             For Each s In cluTiles
-              If s = GisUtil_CellValueNthFeatureInLayer(LanduseLayerIndex, LandUseFieldIndex, i - 1) Then
+              If s = GisUtil.FieldValue(LanduseLayerIndex, i - 1, LandUseFieldIndex) Then
                 incollection = True
               End If
             Next
             If Not incollection Then
-              cluTiles.Add(GisUtil_CellValueNthFeatureInLayer(LanduseLayerIndex, LandUseFieldIndex, i - 1))
+              cluTiles.Add(GisUtil.FieldValue(LanduseLayerIndex, i - 1, LandUseFieldIndex))
             End If
           End If
         Next j
@@ -1465,13 +1465,13 @@ Public Class frmModelSetup
       For j = 1 To cluTiles.Count
         'loop thru each land use tile
         NewFileName = luPathName & "\" & cluTiles(j) & ".shp"
-        If Not GisUtil_AddLayerToMap(NewFileName, cluTiles(j)) Then
+        If Not GisUtil.AddLayer(NewFileName, cluTiles(j)) Then
           MsgBox("The GIRAS Landuse Shapefile " & NewFileName & "does not exist." & _
                  vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "HSPF Problem")
           EnableControls(True)
           Exit Function
         End If
-        totalpolygoncount = totalpolygoncount + GisUtil_NumFeaturesInLayer(GisUtil_FindLayerIndexByName(cluTiles(j)))
+        totalpolygoncount = totalpolygoncount + GisUtil.NumFeatures(GisUtil.LayerIndex(cluTiles(j)))
       Next j
       totalpolygoncount = totalpolygoncount * cSelectedSubbasins.Count
 
@@ -1490,7 +1490,7 @@ Public Class frmModelSetup
         Me.Refresh()
 
         'do overlay
-        GisUtil_Overlay(cluTiles(j), LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
+        GisUtil.Overlay(cluTiles(j), LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
                         luPathName & "\overlay.shp", bfirst)
       Next j
 
@@ -1507,11 +1507,11 @@ Public Class frmModelSetup
         cLucode.Add(lucode)
         cSubid.Add(subid)
         cArea.Add(area)
-        For j = 1 To GisUtil_NumFeaturesInLayer(SubbasinLayerIndex)
-          k = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinFieldIndex, j - 1)
+        For j = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+          k = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinFieldIndex)
           If k = subid Then
-            sublength = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinLengthIndex, j - 1)
-            subslope = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinSlopeIndex, j - 1)
+            sublength = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinLengthIndex)
+            subslope = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinSlopeIndex)
             cSubLength.Add(sublength)
             cSubSlope.Add(subslope)
             Exit For
@@ -1532,21 +1532,22 @@ Public Class frmModelSetup
       lblStatus.Text = "Overlaying Land Use and Subbasins"
       Me.Refresh()
 
-      LanduseLayerIndex = GisUtil_FindLayerIndexByName(LandUseThemeName)
-      If GisUtil_LayerType(LanduseLayerIndex) = 4 Then
+      LanduseLayerIndex = GisUtil.LayerIndex(LandUseThemeName)
+      If GisUtil.LayerType(LanduseLayerIndex) = 4 Then
         'the landuse layer is a grid
 
-        ReDim aAreaLS(GisUtil_GridLayerMaximum(LanduseLayerIndex), GisUtil_NumFeaturesInLayer(SubbasinLayerIndex))
-        GisUtil_TabulateAreas(LanduseLayerIndex, SubbasinLayerIndex, aAreaLS)
+        k = Convert.ToInt32(GisUtil.GridLayerMaximum(LanduseLayerIndex))
+        ReDim aAreaLS(k, GisUtil.NumFeatures(SubbasinLayerIndex))
+        GisUtil.TabulateAreas(LanduseLayerIndex, SubbasinLayerIndex, aAreaLS)
 
         For k = 1 To cSelectedSubbasins.Count
           'loop thru each selected subbasin (or all if none selected)
           shapeindex = cSelectedSubbasins(k)
-          subid = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinFieldIndex, shapeindex)
-          For i = 1 To GisUtil_GridLayerMaximum(LanduseLayerIndex)
+          subid = GisUtil.FieldValue(SubbasinLayerIndex, shapeindex, SubbasinFieldIndex)
+          For i = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(LanduseLayerIndex))
             If aAreaLS(i, subid - 1) > 0 Then
-              sublength = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinLengthIndex, shapeindex)
-              subslope = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinSlopeIndex, shapeindex)
+              sublength = GisUtil.FieldValue(SubbasinLayerIndex, shapeindex, SubbasinLengthIndex)
+              subslope = GisUtil.FieldValue(SubbasinLayerIndex, shapeindex, SubbasinSlopeIndex)
               cLucode.Add(i)
               cArea.Add(aAreaLS(i, subid - 1))
               cSubid.Add(subid)
@@ -1563,7 +1564,7 @@ Public Class frmModelSetup
       Me.Refresh()
 
       'do overlay
-      GisUtil_Overlay(LandUseThemeName, LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
+      GisUtil.Overlay(LandUseThemeName, LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
                       luPathName & "\overlay.shp", True)
 
       'compile areas, slopes and lengths
@@ -1579,11 +1580,11 @@ Public Class frmModelSetup
         cLucode.Add(lucode)
         cSubid.Add(subid)
         cArea.Add(area)
-        For j = 1 To GisUtil_NumFeaturesInLayer(SubbasinLayerIndex)
-          k = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinFieldIndex, j - 1)
+        For j = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+          k = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinFieldIndex)
           If k = subid Then
-            sublength = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinLengthIndex, j - 1)
-            subslope = GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinSlopeIndex, j - 1)
+            sublength = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinLengthIndex)
+            subslope = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinSlopeIndex)
             cSubLength.Add(sublength)
             cSubSlope.Add(subslope)
             Exit For
@@ -1601,11 +1602,11 @@ Public Class frmModelSetup
     If OutletsThemeName <> "<none>" Then
       lblStatus.Text = "Joining outlets to subbasins"
       Me.Refresh()
-      i = GisUtil_FindLayerIndexByName(OutletsThemeName)
-      For j = 1 To GisUtil_NumFeaturesInLayer(i)
-        k = GisUtil_PointInPolygon(i, j, SubbasinLayerIndex)
+      i = GisUtil.LayerIndex(OutletsThemeName)
+      For j = 1 To GisUtil.NumFeatures(i)
+        k = GisUtil.PointInPolygon(i, j, SubbasinLayerIndex)
         If k > -1 Then
-          cOutSubs.Add(GisUtil_CellValueNthFeatureInLayer(SubbasinLayerIndex, SubbasinFieldIndex, k))
+          cOutSubs.Add(GisUtil.FieldValue(SubbasinLayerIndex, SubbasinFieldIndex, k))
         Else
           cOutSubs.Add(-1)
         End If
@@ -1686,11 +1687,11 @@ ErrHand:
     'are any streams selected?
     StreamsThemeName = cboStreams.Items(cboStreams.SelectedIndex)
     StreamsFieldName = cboSub1.Items(cboStream1.SelectedIndex)
-    StreamsLayerIndex = GisUtil_FindLayerIndexByName(StreamsThemeName)
-    StreamsFieldIndex = GisUtil_FindFieldIndexByName(StreamsLayerIndex, StreamsFieldName)
+    StreamsLayerIndex = GisUtil.LayerIndex(StreamsThemeName)
+    StreamsFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, StreamsFieldName)
     Dim cSelectedStreams As New Collection
-    For i = 1 To GisUtil_NumSelectedFeaturesInLayer(StreamsLayerIndex)
-      cSelectedStreams.Add(GisUtil_IndexOfNthSelectedFeatureInLayer(i, StreamsLayerIndex))
+    For i = 1 To GisUtil.NumSelectedFeatures(StreamsLayerIndex)
+      cSelectedStreams.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i, StreamsLayerIndex))
     Next
     If cSelectedStreams.Count <> 1 Then
       MsgBox("BASINS AQUATOX requires one and only one selected stream segment.", vbOKCancel, "BASINS AQUATOX Problem")
@@ -1700,7 +1701,7 @@ ErrHand:
 
     'get the id of the selected stream
     Dim cUniqueStreamIds As New Collection
-    cUniqueStreamIds.Add(GisUtil_CellValueNthFeatureInLayer(StreamsLayerIndex, StreamsFieldIndex, cSelectedStreams(1)))
+    cUniqueStreamIds.Add(GisUtil.FieldValue(StreamsLayerIndex, cSelectedStreams(1), StreamsFieldIndex))
 
     'make output folder
     MkDirPath(OutputPath)
@@ -1750,7 +1751,7 @@ ErrHand:
     PreProcessChecking = True
     If pModelName <> "AQUATOX" Then
       If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-        i = GisUtil_FindLayerIndexByName("Land Use Index")
+        i = GisUtil.LayerIndex("Land Use Index")
         If i = -1 Then
           'cant do giras without land use index layer
           MsgBox("When using GIRAS Landuse, the 'Land Use Index' layer must exist and be named as such.", vbOKOnly, "HSPF GIRAS Problem")
@@ -2064,55 +2065,55 @@ ErrHand:
         "Fraction of flow through exit 4", "Fraction of flow through exit 5")
 
     'set field indexes
-    LayerIndex = GisUtil_FindLayerIndexByName(cboStreams.Items(cboStreams.SelectedIndex))
-    StreamsIndex = GisUtil_FindFieldIndexByName(LayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
-    StreamsRIndex = GisUtil_FindFieldIndexByName(LayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
-    Len2Index = GisUtil_FindFieldIndexByName(LayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
-    Slo2Index = GisUtil_FindFieldIndexByName(LayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
-    Wid2Index = GisUtil_FindFieldIndexByName(LayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
-    Dep2Index = GisUtil_FindFieldIndexByName(LayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
-    MinelIndex = GisUtil_FindFieldIndexByName(LayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
-    MaxelIndex = GisUtil_FindFieldIndexByName(LayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
-    SnameIndex = GisUtil_FindFieldIndexByName(LayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
+    LayerIndex = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+    StreamsIndex = GisUtil.FieldIndex(LayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
+    StreamsRIndex = GisUtil.FieldIndex(LayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
+    Len2Index = GisUtil.FieldIndex(LayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
+    Slo2Index = GisUtil.FieldIndex(LayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
+    Wid2Index = GisUtil.FieldIndex(LayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
+    Dep2Index = GisUtil.FieldIndex(LayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
+    MinelIndex = GisUtil.FieldIndex(LayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
+    MaxelIndex = GisUtil.FieldIndex(LayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
+    SnameIndex = GisUtil.FieldIndex(LayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
 
-    For i = 1 To GisUtil_NumFeaturesInLayer(LayerIndex)
+    For i = 1 To GisUtil.NumFeatures(LayerIndex)
       'is this subbasin in the list?
       For j = 1 To cUniqueSubids.Count
-        GisUtil_CellValueNthFeatureInLayer(LayerIndex, StreamsIndex, i - 1)
-        If cUniqueSubids(j) = GisUtil_CellValueNthFeatureInLayer(LayerIndex, StreamsIndex, i - 1) Then
+        GisUtil.FieldValue(LayerIndex, i - 1, StreamsIndex)
+        If cUniqueSubids(j) = GisUtil.FieldValue(LayerIndex, i - 1, StreamsIndex) Then
           'in list, output it
-          sname = GisUtil_CellValueNthFeatureInLayer(LayerIndex, SnameIndex, i - 1)
+          sname = GisUtil.FieldValue(LayerIndex, i - 1, SnameIndex)
           If Len(Trim(sname)) = 0 Then
             sname = "STREAM " + cUniqueSubids(j)
           End If
-          cDOWN = GisUtil_CellValueNthFeatureInLayer(LayerIndex, StreamsRIndex, i - 1)
-          If IsNumeric(GisUtil_CellValueNthFeatureInLayer(LayerIndex, Len2Index, i - 1)) Then
-            cLENGTH = (CSng(GisUtil_CellValueNthFeatureInLayer(LayerIndex, Len2Index, i - 1)) * 3.28) / 5280
+          cDOWN = GisUtil.FieldValue(LayerIndex, i - 1, StreamsRIndex)
+          If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, Len2Index)) Then
+            cLENGTH = (CSng(GisUtil.FieldValue(LayerIndex, i - 1, Len2Index)) * 3.28) / 5280
           Else
             cLENGTH = 0.0#
           End If
-          If IsNumeric(GisUtil_CellValueNthFeatureInLayer(LayerIndex, Slo2Index, i - 1)) Then
-            cSLOPE = CSng(GisUtil_CellValueNthFeatureInLayer(LayerIndex, Slo2Index, i - 1)) / 100
+          If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, Slo2Index)) Then
+            cSLOPE = CSng(GisUtil.FieldValue(LayerIndex, i - 1, Slo2Index)) / 100
           Else
             cSLOPE = 0.0#
           End If
-          If IsNumeric(GisUtil_CellValueNthFeatureInLayer(LayerIndex, Wid2Index, i - 1)) Then
-            cWIDTH = CSng(GisUtil_CellValueNthFeatureInLayer(LayerIndex, Wid2Index, i - 1)) * 3.28
+          If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, Wid2Index)) Then
+            cWIDTH = CSng(GisUtil.FieldValue(LayerIndex, i - 1, Wid2Index)) * 3.28
           Else
             cWIDTH = 0.0#
           End If
-          If IsNumeric(GisUtil_CellValueNthFeatureInLayer(LayerIndex, Dep2Index, i - 1)) Then
-            cDEPTH = CSng(GisUtil_CellValueNthFeatureInLayer(LayerIndex, Dep2Index, i - 1)) * 3.28
+          If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, Dep2Index)) Then
+            cDEPTH = CSng(GisUtil.FieldValue(LayerIndex, i - 1, Dep2Index)) * 3.28
           Else
             cDEPTH = 0.0#
           End If
-          If IsNumeric(GisUtil_CellValueNthFeatureInLayer(LayerIndex, MinelIndex, i - 1)) Then
-            cMINEL = CSng(GisUtil_CellValueNthFeatureInLayer(LayerIndex, MinelIndex, i - 1)) * 3.28
+          If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, MinelIndex)) Then
+            cMINEL = CSng(GisUtil.FieldValue(LayerIndex, i - 1, MinelIndex)) * 3.28
           Else
             cMINEL = 0.0#
           End If
-          If IsNumeric(GisUtil_CellValueNthFeatureInLayer(LayerIndex, MaxelIndex, i - 1)) Then
-            cMAXEL = CSng(GisUtil_CellValueNthFeatureInLayer(LayerIndex, MaxelIndex, i - 1)) * 3.28
+          If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, MaxelIndex)) Then
+            cMAXEL = CSng(GisUtil.FieldValue(LayerIndex, i - 1, MaxelIndex)) * 3.28
           Else
             cMAXEL = 0.0#
           End If
@@ -2185,17 +2186,17 @@ ErrHand:
     If cOutSubs.Count > 0 Then
 
       'set field indexes
-      LayerIndex = GisUtil_FindLayerIndexByName(cboOutlets.Items(cboOutlets.SelectedIndex))
-      PointIndex = GisUtil_FindFieldIndexByName(LayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
+      LayerIndex = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+      PointIndex = GisUtil.FieldIndex(LayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
 
       'build collection of npdes sites to output
       For i = 1 To cOutSubs.Count
         For j = 1 To cUniqueSubids.Count
           If cOutSubs(i) = cUniqueSubids(j) Then
             'found this subbasin in selected list
-            GisUtil_CellValueNthFeatureInLayer(LayerIndex, PointIndex, i - 1)
-            If Len(GisUtil_CellValueNthFeatureInLayer(LayerIndex, PointIndex, i - 1)) > 0 Then
-              cNPDES.Add(GisUtil_CellValueNthFeatureInLayer(LayerIndex, PointIndex, i - 1))
+            GisUtil.FieldValue(LayerIndex, i - 1, PointIndex)
+            If Len(GisUtil.FieldValue(LayerIndex, PointIndex, i - 1)) > 0 Then
+              cNPDES.Add(GisUtil.FieldValue(LayerIndex, i - 1, PointIndex))
               cSubbasin.Add(cOutSubs(i))
             End If
           End If
@@ -2210,13 +2211,13 @@ ErrHand:
 
       If Not chkCustom.Checked Then
         'use pcs data
-        pcsLayerIndex = GisUtil_FindLayerIndexByName("Permit Compliance System")
+        pcsLayerIndex = GisUtil.LayerIndex("Permit Compliance System")
         If pcsLayerIndex > -1 Then
           'set pcs shape file
-          npdesIndex = GisUtil_FindFieldIndexByName(pcsLayerIndex, "NPDES")
-          flowIndex = GisUtil_FindFieldIndexByName(pcsLayerIndex, "FLOW_RATE")
-          facIndex = GisUtil_FindFieldIndexByName(pcsLayerIndex, "FAC_NAME")
-          cuIndex = GisUtil_FindFieldIndexByName(pcsLayerIndex, "BCU")
+          npdesIndex = GisUtil.FieldIndex(pcsLayerIndex, "NPDES")
+          flowIndex = GisUtil.FieldIndex(pcsLayerIndex, "FLOW_RATE")
+          facIndex = GisUtil.FieldIndex(pcsLayerIndex, "FAC_NAME")
+          cuIndex = GisUtil.FieldIndex(pcsLayerIndex, "BCU")
           If npdesIndex > -1 Then
             For i = 1 To cNPDES.Count
               flow = 0.0#
@@ -2224,15 +2225,15 @@ ErrHand:
               huc = ""
               mipt = 0.0#
               If Len(Trim(cNPDES(i))) > 0 Then
-                For j = 1 To GisUtil_NumFeaturesInLayer(pcsLayerIndex)
-                  If GisUtil_CellValueNthFeatureInLayer(pcsLayerIndex, npdesIndex, j - 1) = cNPDES(i) Then
+                For j = 1 To GisUtil.NumFeatures(pcsLayerIndex)
+                  If GisUtil.FieldValue(pcsLayerIndex, j - 1, npdesIndex) = cNPDES(i) Then
                     'this is the one
-                    If IsNumeric(GisUtil_CellValueNthFeatureInLayer(pcsLayerIndex, flowIndex, j - 1)) Then
-                      flow = GisUtil_CellValueNthFeatureInLayer(pcsLayerIndex, flowIndex, j - 1) * 1.55
+                    If IsNumeric(GisUtil.FieldValue(pcsLayerIndex, j - 1, flowIndex)) Then
+                      flow = GisUtil.FieldValue(pcsLayerIndex, j - 1, flowIndex) * 1.55
                     Else
                       flow = 0.0
                     End If
-                    facname = GisUtil_CellValueNthFeatureInLayer(pcsLayerIndex, facIndex, j - 1)
+                    facname = GisUtil.FieldValue(pcsLayerIndex, j - 1, facIndex)
                     If chkCalculate.Checked Then
                       'calculate mile point on stream
                       'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), FilenameOnly(OutletsJoinThemeName), PCSIdField, pNPDES(j))
@@ -2240,7 +2241,7 @@ ErrHand:
                     Else
                       mipt = 0.0#
                     End If
-                    huc = GisUtil_CellValueNthFeatureInLayer(pcsLayerIndex, cuIndex, j - 1)
+                    huc = GisUtil.FieldValue(pcsLayerIndex, j - 1, cuIndex)
                     Exit For
                   End If
                 Next j
@@ -2253,7 +2254,7 @@ ErrHand:
           End If
           'check for dbf associated with each npdes point
           i = 1
-          dbname = PathNameOnly(GisUtil_LayerFileName(pcsLayerIndex)) & "\pcs\"
+          dbname = PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs\"
           For Each lnpdes In cNPDES
             dbffilename = Trim(cHuc(i)) & ".dbf"
             If Len(Dir(dbname & dbffilename)) > 0 And Len(Trim(lnpdes)) > 0 Then
@@ -2328,7 +2329,7 @@ ErrHand:
       'read in Permitted Discharges Parameter Table
       If cNPDES.Count > 0 Then
         'open dbf file
-        tmpDbf = atcUtility.TableOpener.OpenAnyTable(PathNameOnly(GisUtil_LayerFileName(pcsLayerIndex)) & "\pcs3_prm.dbf")
+        tmpDbf = atcUtility.TableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs3_prm.dbf")
         RowCount = tmpDbf.NumRecords
         ReDim ParmCode(RowCount)
         ReDim ParmName(RowCount)
@@ -2478,21 +2479,21 @@ ErrHand:
     cboOutlets.Items.Add("<none>")
 
     Dim lyr As Long
-    For lyr = 0 To GisUtil_NumLayers() - 1
-      ctemp = GisUtil_LayerName(lyr)
-      If GisUtil_LayerType(lyr) = 3 Then
+    For lyr = 0 To GisUtil.NumLayers() - 1
+      ctemp = GisUtil.LayerName(lyr)
+      If GisUtil.LayerType(lyr) = 3 Then
         'PolygonShapefile 
         cboSubbasins.Items.Add(ctemp)
         If UCase(ctemp) = "SUBBASINS" Or InStr(ctemp, "Watershed Shapefile") > 0 Then
           cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
         End If
-      ElseIf GisUtil_LayerType(lyr) = 2 Then
+      ElseIf GisUtil.LayerType(lyr) = 2 Then
         'LineShapefile 
         cboStreams.Items.Add(ctemp)
         If UCase(ctemp) = "STREAMS" Or InStr(ctemp, "Stream Reach Shapefile") > 0 Then
           cboStreams.SelectedIndex = cboStreams.Items.Count - 1
         End If
-      ElseIf GisUtil_LayerType(lyr) = 1 Then
+      ElseIf GisUtil.LayerType(lyr) = 1 Then
         'PointShapefile
         cboOutlets.Items.Add(ctemp)
         If UCase(ctemp) = "OUTLETS" Then
@@ -2510,7 +2511,7 @@ ErrHand:
       cboOutlets.SelectedIndex = 0
     End If
 
-    tbxName.Text = FilenameOnly(GisUtil_ProjectFileName)
+    tbxName.Text = FilenameOnly(GisUtil.ProjectFileName)
 
     grdPervious.set_header("")
     grdPervious.set_gridFontBold(True)
