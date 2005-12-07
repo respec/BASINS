@@ -143,7 +143,6 @@ Public Class atcTimeseries
     If Not pValueAttributes Is Nothing Then
       ReDim pValueAttributes(pNumValues)
     End If
-    'pDates = New atcTimeseries(aFile)
   End Sub
 
   ''' <summary>Make a copy of the current dataset and return it</summary>
@@ -169,7 +168,7 @@ Public Class atcTimeseries
     Clear()
     pDataSource = aDataSource
     Try
-      Me.Attributes.SetValue("Data Source", aDataSource.Specification)
+      Attributes.SetValue("Data Source", aDataSource.Specification)
     Catch ex As Exception
       'atcDataSource is Nothing or is not really an atcDataSource
     End Try
@@ -184,9 +183,13 @@ Public Class atcTimeseries
       Return pNumValues
     End Get
     Set(ByVal newValue As Long)
-      pNumValues = newValue
-      ReDim Preserve pValues(pNumValues)
-      If Not pDates Is Nothing Then pDates.numValues = newValue
+      If pNumValues <> newValue Then
+        pNumValues = newValue
+        ReDim Preserve pValues(pNumValues)
+      End If
+      If Not pDates Is Nothing AndAlso pDates.numValues <> newValue Then
+        pDates.numValues = newValue
+      End If
     End Set
   End Property
 
