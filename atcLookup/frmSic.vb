@@ -158,7 +158,7 @@ Public Class frmSic
 
     If FileExists(SicFile) Then
       Dim tmpDbf As IATCTable
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(SicFile)
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(SicFile)
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
         cSic.Add(tmpDbf.Value(1))

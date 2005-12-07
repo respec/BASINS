@@ -24,7 +24,7 @@ Public Module modDemGTest
   Dim pBoundDir As String = pBaseDir & "boundary\"
   Dim pCheckDir As String = pBaseDir & pDataType & "Check\"
 
-  Public Sub Main(ByVal aDataManager As atcDataManager, ByVal aBasinsPlugIn As PlugIn)
+  Public Sub Main(ByVal aDataManager As atcDataManager, ByVal aBasinsPlugIn As atcBasinsPlugIn)
     ChDriveDir(pBaseDir)
     If FileExists(pStatusFile) Then Kill(pStatusFile)
     LogSetFileName(pDebugFile, True)
@@ -106,7 +106,7 @@ Public Module modDemGTest
     Application.Exit()
   End Sub
 
-  Private Function ProcessMatchFiles(ByRef aBasinsPlugIn As PlugIn, ByVal aHucStr As String, ByVal aAllFiles As NameValueCollection) As Integer
+  Private Function ProcessMatchFiles(ByRef aBasinsPlugIn As atcBasinsPlugIn, ByVal aHucStr As String, ByVal aAllFiles As NameValueCollection) As Integer
     Dim lCurFiles As New NameValueCollection
     Dim lCnt As Integer = 0
     Dim lStr As String = ""
@@ -191,7 +191,7 @@ Public Module modDemGTest
     Return lWriteCnt
   End Function
 
-  Private Sub AddStCoBoundaryLayers(ByVal aBasinsPlugIn As PlugIn)
+  Private Sub AddStCoBoundaryLayers(ByVal aBasinsPlugIn As atcBasinsPlugIn)
     With aBasinsPlugIn.MapWin
       .Layers.Add(pBoundDir & "st.shp")
       With .Layers.Item(.Layers.NumLayers - 1)
@@ -208,7 +208,7 @@ Public Module modDemGTest
     End With
   End Sub
 
-  Private Sub AddHucBoundaryLayers(ByVal aBasinsPlugIn As PlugIn, ByVal aHucLen As Integer)
+  Private Sub AddHucBoundaryLayers(ByVal aBasinsPlugIn As atcBasinsPlugIn, ByVal aHucLen As Integer)
     With aBasinsPlugIn.MapWin
       .Layers.Add(pBoundDir & "huc" & aHucLen & ".shp")
       With .Layers.Item(.Layers.NumLayers - 1)

@@ -102,27 +102,22 @@
                     Private = "False"
                 />
                 <Reference
-                    Name = "Interop.MapWinGIS"
-                    AssemblyName = "Interop.MapWinGIS"
-                    HintPath = "..\..\BASINS\Bin\Interop.MapWinGIS.dll"
-                />
-                <Reference
                     Name = "AxInterop.MapWinGIS"
                     AssemblyName = "AxInterop.MapWinGIS"
                     HintPath = "..\..\BASINS\Bin\AxInterop.MapWinGIS.dll"
-                />
-                <Reference
-                    Name = "MapWinGIS"
-                    Guid = "{C368D713-CC5F-40ED-9F53-F84FE197B96A}"
-                    VersionMajor = "3"
-                    VersionMinor = "0"
-                    Lcid = "0"
-                    WrapperTool = "tlbimp"
+                    Private = "False"
                 />
                 <Reference
                     Name = "atcUtility"
                     AssemblyName = "atcUtility"
                     HintPath = "..\..\BASINS\Bin\Plugins\BASINS\atcUtility.dll"
+                    Private = "False"
+                />
+                <Reference
+                    Name = "Interop.MapWinGIS"
+                    AssemblyName = "Interop.MapWinGIS"
+                    HintPath = "..\Bin\Interop.MapWinGIS.dll"
+                    Private = "False"
                 />
             </References>
             <Imports>

@@ -397,7 +397,7 @@ Public Class frmReclass
                       PathName & "\overlay.shp", True)
 
           'now populate grid with results
-          tmpDbf = atcUtility.TableOpener.OpenAnyTable(PathName & "\overlay.dbf")
+          tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(PathName & "\overlay.dbf")
 
           For i = 1 To tmpDbf.NumRecords
             tmpDbf.CurrentRecord = i
@@ -554,7 +554,7 @@ Public Class frmReclass
         'add mrlc classifications
         ReclassifyFile = "\BASINS\etc\mrlc.dbf"
         Dim tmpDbf As IATCTable
-        tmpDbf = atcUtility.TableOpener.OpenAnyTable(ReclassifyFile)
+        tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
         For k = 1 To agdLanduse.rows
           For i = 1 To tmpDbf.NumRecords
             tmpDbf.CurrentRecord = i
@@ -740,7 +740,7 @@ Public Class frmReclass
         'delete this file first
         System.IO.File.Delete(dbfname)
       End If
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(dbfname)
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(dbfname)
       tmpDbf.NumFields = 5
       tmpDbf.FieldName(1) = "Value"
       tmpDbf.FieldType(1) = "N"
@@ -841,7 +841,7 @@ Public Class frmReclass
     Dim irow As Long
     Dim j As Long
 
-    tmpDbf = atcUtility.TableOpener.OpenAnyTable(ReclassifyFile)
+    tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
     k = 1
     Do While k <= agdLanduse.rows
       'For k = 1 To agdLanduse.rows
