@@ -88,12 +88,6 @@
                     AssemblyFolderKey = "hklm\dn\nunit.framework"
                 />
                 <Reference
-                    Name = "atcDebugTimser"
-                    Project = "{F4EF0925-945B-418C-9A81-8490D89985DB}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                    Private = "False"
-                />
-                <Reference
                     Name = "System.Windows.Forms"
                     AssemblyName = "System.Windows.Forms"
                     HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
@@ -145,6 +139,26 @@
                     Project = "{72264BDC-23F5-4A55-B53D-0752099CB263}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
                 />
+                <Reference
+                    Name = "BASINS"
+                    Project = "{FE50F2FD-56E7-421E-A85D-A1F2DDCD5D9A}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
+                <Reference
+                    Name = "System.Drawing"
+                    AssemblyName = "System.Drawing"
+                    HintPath = "..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Drawing.dll"
+                />
+                <Reference
+                    Name = "Interop.MapWinGIS"
+                    AssemblyName = "Interop.MapWinGIS"
+                    HintPath = "..\Bin\Interop.MapWinGIS.dll"
+                />
+                <Reference
+                    Name = "AxInterop.MapWinGIS"
+                    AssemblyName = "AxInterop.MapWinGIS"
+                    HintPath = "..\Bin\AxInterop.MapWinGIS.dll"
+                />
             </References>
             <Imports>
                 <Import Namespace = "Microsoft.VisualBasic" />
@@ -161,7 +175,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "ClimateScenario.vb"
+                    RelPath = "modDemGTest.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

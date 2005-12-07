@@ -180,7 +180,7 @@ Public Class frmStoret
 
     If FileExists(StoretFile) Then
       Dim tmpDbf As IATCTable
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(StoretFile)
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(StoretFile)
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
         lbxAgency.Items.Add(tmpDbf.Value(1))

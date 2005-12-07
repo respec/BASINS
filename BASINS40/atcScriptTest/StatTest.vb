@@ -18,13 +18,14 @@ Public Module ScriptStatTest
     Dim lMatch As New atcDataGroup
     Dim lErr As String
     Dim lArgsMath As New atcDataAttributes
-    Dim lAllowExit As Boolean = False
+    Dim lReturnPeriod() As Double = {1.25, 2, 3, 5, 10, 20, 25, 100}
+    Dim lNDays() As Double = {1, 2, 4, 7, 15, 30}
 
-    Dim lTestDir as string = "c:\test"
-    If Curdir.ToLower.StartsWith(lTestDir) Then
-      lAllowExit = True
-    End If
-    ChDriveDir(lTestDir & "\StatsAndNDay\")
+    Dim lAllowExit As Boolean = aBasinsPlugIn.RunBasinsScript("vb", "subSetBaseDir.vb", lErr, New Object() {"StatsAndNDay",""})
+
+    SetLogFileName("StatTest.log")
+    SetLogTimeStamp(False)
+    LogDbg("Entry")
 
     aDataManager.OpenDataSource(lWDMfile, "jack.wdm", Nothing)
 
@@ -33,7 +34,7 @@ Public Module ScriptStatTest
     lMatch = aBasinsPlugIn.RunBasinsScript("vb", "subFindMatch.vb", lErr, lArgs)
 
     'Summarize original data
-    lSummary.Save(aDataManager, lMatch, "Shasta.txt", "Expand")
+    lSummary.Save(aDataManager, lMatch, "ShastaOrig.txt", "Expand")
 
     '7Q10 & 1Hi100 of original data
     lHighLowSource.DataSets.Clear()
@@ -43,7 +44,14 @@ Public Module ScriptStatTest
     aDataManager.OpenDataSource(lHighLowSource, "1Hi100", lArgsMath)
     lSummary.Save(aDataManager, lMatch, "ShastaFreq.txt", "Expand")
 
-    '1day high ts
+    '1Hi(lots) of original data
+    lArgsMath.Clear()
+    lArgsMath.SetValue("Timeseries", lMatch)
+    lArgsMath.SetValue("Return Period", lReturnPeriod)
+    aDataManager.OpenDataSource(lHighLowSource, "n-day high value", lArgsMath)
+    lSummary.Save(aDataManager, lMatch, "ShastaFreqLots.txt", "Expand")
+
+    '1day high ts 
     lHighLowSource.DataSets.Clear()
     lArgsMath.Clear()
     lArgsMath.SetValue("Timeseries", lMatch)
@@ -59,7 +67,7 @@ Public Module ScriptStatTest
     aDataManager.OpenDataSource(lHighLowSource, "n-day high value", lArgsMath)
     lSummary.Save(aDataManager, New atcDataGroup(lAnnualTimeseries), "Shasta1DyHigh100yr.txt", "Display 40", "Expand")
 
-    'subset to WaterYear Apr-Mar 
+    'subset to year Apr-Mar 
     lTsMath.DataSets.Clear()
     lArgsMath.Clear()
     lArgsMath.SetValue("timeseries", lMatch)
@@ -68,13 +76,22 @@ Public Module ScriptStatTest
     aDataManager.OpenDataSource(lTsMath, "subset by date", lArgsMath)
     lSummary.Save(aDataManager, lTsMath.DataSets, "ShastaWyAprMar.txt", "Expand")
 
-    '7Q10 & 1Hi100 of Water Year subset
+    '7Q10 & 1Hi100 of drought year subset
     lHighLowSource.DataSets.Clear()
     lArgsMath.Clear()
     lArgsMath.SetValue("Timeseries", lTsMath.DataSets)
     aDataManager.OpenDataSource(lHighLowSource, "7Q10", lArgsMath)
     aDataManager.OpenDataSource(lHighLowSource, "1Hi100", lArgsMath)
     lSummary.Save(aDataManager, lTsMath.DataSets, "ShastaWyAprMarFreq.txt", "Expand")
+
+    'more return periods of drought year subset
+    lHighLowSource.DataSets.Clear()
+    lArgsMath.Clear()
+    lArgsMath.SetValue("Return Period", lReturnPeriod)
+    lArgsMath.SetValue("NDay", lNDays)
+    lArgsMath.SetValue("Timeseries", lTsMath.DataSets)
+    aDataManager.OpenDataSource(lHighLowSource, "n-day low value", lArgsMath)
+    lSummary.Save(aDataManager, lTsMath.DataSets, "ShastaWyAprMarFreqLots.txt", "Expand")
 
     '7day low ts
     lHighLowSource.DataSets.Clear()

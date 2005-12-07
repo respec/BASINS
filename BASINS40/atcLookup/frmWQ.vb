@@ -194,7 +194,7 @@ Public Class frmWQ
 
     If FileExists(wqFile) Then
       Dim tmpDbf As IATCTable
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(wqFile)
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(wqFile)
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
         lbxWQ.Items.Add(tmpDbf.Value(3))
