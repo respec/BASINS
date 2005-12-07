@@ -114,7 +114,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "IatcTable.vb"
+                    RelPath = "atcTable.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

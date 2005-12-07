@@ -1,7 +1,7 @@
 Option Strict Off
 Option Explicit On 
-Public Interface IATCTable
-  Function Cousin() As IATCTable
+Public Interface IatcTable
+  Function Cousin() As IatcTable
   Function CreationCode() As String
 
   Function OpenFile(ByVal filename As String) As Boolean
@@ -38,9 +38,9 @@ Public Interface IATCTable
 End Interface
 
 Public Class TableOpener
-  Public Shared Function OpenAnyTable(ByVal filename As String) As IATCTable
+  Public Shared Function OpenAnyTable(ByVal filename As String) As IatcTable
     Select Case LCase(System.IO.Path.GetExtension(filename))
-      Case ".dbf" : OpenAnyTable = New clsATCTableDBF
+      Case ".dbf" : OpenAnyTable = New atcTableDBF
         'Case "abt": Set OpenFile = New clsATCTableBin
     End Select
     If OpenAnyTable Is Nothing Then
@@ -51,25 +51,25 @@ Public Class TableOpener
   End Function
 End Class
 
-Public MustInherit Class clsATCTable
-  Implements IATCTable
+Public MustInherit Class atcTable
+  Implements IatcTable
 
   Private pFilename As String
 
   'Returns a new table with the same fields as this one, but no data
-  Public MustOverride Function Cousin() As IATCTable Implements IATCTable.Cousin
+  Public MustOverride Function Cousin() As IatcTable Implements IatcTable.Cousin
 
   'Returns VB source code to create this table
-  Public MustOverride Function CreationCode() As String Implements IATCTable.CreationCode
+  Public MustOverride Function CreationCode() As String Implements IatcTable.CreationCode
 
   'Open the specified file, probably read at least the metadata about fields
-  Public MustOverride Function OpenFile(ByVal filename As String) As Boolean Implements IATCTable.OpenFile
+  Public MustOverride Function OpenFile(ByVal filename As String) As Boolean Implements IatcTable.OpenFile
 
   'Write the current table to the specified file
-  Public MustOverride Function WriteFile(ByVal filename As String) As Boolean Implements IATCTable.WriteFile
+  Public MustOverride Function WriteFile(ByVal filename As String) As Boolean Implements IatcTable.WriteFile
 
   'True if CurrentRecord is at beginning of table
-  Public Overridable Property atBOF() As Boolean Implements IATCTable.atBOF
+  Public Overridable Property atBOF() As Boolean Implements IatcTable.atBOF
     Get
       If Me.CurrentRecord <= 1 Then Return True Else Return False
     End Get
@@ -79,7 +79,7 @@ Public MustInherit Class clsATCTable
   End Property
 
   'True if CurrentRecord is at end of table
-  Public Overridable Property atEOF() As Boolean Implements IATCTable.atEOF
+  Public Overridable Property atEOF() As Boolean Implements IatcTable.atEOF
     Get
       If Me.CurrentRecord >= Me.NumRecords Then Return True Else Return False
     End Get
@@ -89,31 +89,31 @@ Public MustInherit Class clsATCTable
   End Property
 
   'The number of records (rows) in the table
-  Public MustOverride Property NumRecords() As Integer Implements IATCTable.NumRecords
+  Public MustOverride Property NumRecords() As Integer Implements IatcTable.NumRecords
 
   'The number of fields (columns) in the table
-  Public MustOverride Property NumFields() As Integer Implements IATCTable.NumFields
+  Public MustOverride Property NumFields() As Integer Implements IatcTable.NumFields
 
   'The current record index [1..NumRecords]
-  Public MustOverride Property CurrentRecord() As Integer Implements IATCTable.CurrentRecord
+  Public MustOverride Property CurrentRecord() As Integer Implements IatcTable.CurrentRecord
 
   'The value of the specified field in the current record
   'aFieldNumber [1..NumFields]
-  Public MustOverride Property Value(ByVal aFieldNumber As Integer) As String Implements IATCTable.Value
+  Public MustOverride Property Value(ByVal aFieldNumber As Integer) As String Implements IatcTable.Value
 
   'Returns the name of the specified field, aFieldNumber should be in [1..numFields]
-  Public MustOverride Property FieldName(ByVal aFieldNumber As Integer) As String Implements IATCTable.FieldName
+  Public MustOverride Property FieldName(ByVal aFieldNumber As Integer) As String Implements IatcTable.FieldName
 
   'Returns the width of the specified field
-  Public MustOverride Property FieldLength(ByVal aFieldNumber As Integer) As Integer Implements IATCTable.FieldLength
+  Public MustOverride Property FieldLength(ByVal aFieldNumber As Integer) As Integer Implements IatcTable.FieldLength
 
   'Returns the type of the specified field
   'C = Character, D = Date, N = Numeric, L = Logical, M = Memo
-  Public MustOverride Property FieldType(ByVal aFieldNumber As Integer) As String Implements IATCTable.FieldType
+  Public MustOverride Property FieldType(ByVal aFieldNumber As Integer) As String Implements IatcTable.FieldType
 
   'The name of the file used to populate the table
   'File is read by OpenFile and written by WriteFile
-  Public Overridable Property FileName() As String Implements IATCTable.FileName
+  Public Overridable Property FileName() As String Implements IatcTable.FileName
     Get
       Return pFilename
     End Get
@@ -123,38 +123,38 @@ Public MustInherit Class clsATCTable
   End Property
 
   'Forget the current contents of the table
-  Public MustOverride Sub ClearData() Implements IATCTable.ClearData
+  Public MustOverride Sub ClearData() Implements IatcTable.ClearData
 
   'Forget the current contents of the table and the fields
-  Public MustOverride Sub Clear() Implements IATCTable.Clear
+  Public MustOverride Sub Clear() Implements IatcTable.Clear
 
   'Moves CurrentRecord to the beginning of the table
-  Public Overridable Sub MoveFirst() Implements IATCTable.MoveFirst
+  Public Overridable Sub MoveFirst() Implements IatcTable.MoveFirst
     Me.CurrentRecord = 1
   End Sub
 
   'Moves CurrentRecord to the end of the table
-  Public Overridable Sub MoveLast() Implements IATCTable.MoveLast
+  Public Overridable Sub MoveLast() Implements IatcTable.MoveLast
     Me.CurrentRecord = Me.NumRecords
   End Sub
 
   'Moves CurrentRecord to the next record
-  Public Overridable Sub MoveNext() Implements IATCTable.MoveNext
+  Public Overridable Sub MoveNext() Implements IatcTable.MoveNext
     Me.CurrentRecord = Me.CurrentRecord + 1
   End Sub
 
   'Moves CurrentRecord to the previous record
-  Public Overridable Sub MovePrevious() Implements IATCTable.MovePrevious
+  Public Overridable Sub MovePrevious() Implements IatcTable.MovePrevious
     Me.CurrentRecord = Me.CurrentRecord - 1
   End Sub
 
   'Returns a text description of the table
-  Public Overridable Function Summary(Optional ByRef aFormat As String = "tab,headers,expandtype") As String Implements IATCTable.Summary
+  Public Overridable Function Summary(Optional ByRef aFormat As String = "tab,headers,expandtype") As String Implements IatcTable.Summary
     Return SummaryFile(aFormat) & vbCrLf & SummaryFields(aFormat)
   End Function
 
   'A summary of the file
-  Public Overridable Function SummaryFile(Optional ByRef aFormat As String = "tab,headers") As String Implements IATCTable.SummaryFile
+  Public Overridable Function SummaryFile(Optional ByRef aFormat As String = "tab,headers") As String Implements IatcTable.SummaryFile
     Dim retval As String
     Dim iTrash As Short
     Dim ShowTrash As Boolean
@@ -172,7 +172,7 @@ Public MustInherit Class clsATCTable
   End Function
 
   'A summary of the fields (names, types, lengths)
-  Public Overridable Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String Implements IATCTable.SummaryFields
+  Public Overridable Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String Implements IatcTable.SummaryFields
     Dim retval As String
     Dim iTrash As Short
     Dim iField As Short
@@ -231,7 +231,7 @@ Public MustInherit Class clsATCTable
 
   'Returns the number of the field with the specified name
   'Returns zero if the named field does not appear in this file
-  Public Overridable Function FieldNumber(ByVal aFieldName As String) As Integer Implements IATCTable.FieldNumber
+  Public Overridable Function FieldNumber(ByVal aFieldName As String) As Integer Implements IatcTable.FieldNumber
   End Function
 
   'Returns a string version of the current record
@@ -242,7 +242,7 @@ Public MustInherit Class clsATCTable
   'If not found, returns False and moves CurrentRecord to aStartRecord
   'If aStartRecord is specified, searching starts there instead of at first record
   'If aEndRecord is specified, search stops at aEndRecord
-  Public Overridable Function FindFirst(ByVal aFieldNumber As Integer, ByRef aFindValue As String, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean Implements IATCTable.FindFirst
+  Public Overridable Function FindFirst(ByVal aFieldNumber As Integer, ByRef aFindValue As String, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean Implements IatcTable.FindFirst
     If aEndRecord < 1 Then aEndRecord = NumRecords
     CurrentRecord = aStartRecord
     While CurrentRecord <= aEndRecord
@@ -257,7 +257,7 @@ Public MustInherit Class clsATCTable
 
   'Returns True if found, moves CurrentRecord to next record with .Value(FieldNumber) = FindValue
   'If not found, returns False and moves CurrentRecord to 1
-  Public Overridable Function FindNext(ByVal aFieldNumber As Integer, ByRef aFindValue As String) As Boolean Implements IATCTable.FindNext
+  Public Overridable Function FindNext(ByVal aFieldNumber As Integer, ByRef aFindValue As String) As Boolean Implements IatcTable.FindNext
     Return FindFirst(aFieldNumber, aFindValue, Me.CurrentRecord + 1)
   End Function
 

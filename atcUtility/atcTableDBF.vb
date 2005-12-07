@@ -1,7 +1,7 @@
 Option Strict Off
 Option Explicit On 
-Public Class clsATCTableDBF
-  Inherits clsATCTable
+Public Class atcTableDBF
+  Inherits atcTable
 
   'UPGRADE_ISSUE: Declaring a parameter 'As Any' is not supported. Click for more: 'ms-help://MS.VSCC/commoner/redir/redirect.htm?keyword="vbup1016"'
   'Private Declare Sub CopyMemory Lib "Kernel32"  Alias "RtlMoveMemory"(ByRef Destination As Any, ByRef Source As Any, ByVal Length As Integer)
@@ -110,33 +110,37 @@ Public Class clsATCTableDBF
   Private pDataBytes As Integer
   Private pCurrentRecord As Integer
   Private pCurrentRecordStart As Integer
-  Private pLogger As Object
 
   'Capacity in pData for records. Set to pHeader.NumRecs when data is read from a file
   'and in InitData when creating a new DBF from scratch. May increase in Let Value.
   Private pNumRecsCapacity As Integer
 
-  'Public Property Get Year() As Byte
-  '  Year = pHeader.Year
-  'End Property
-  'Public Property Let Year(ByVal newValue As Byte)
-  '  pHeader.Year = newValue
-  'End Property
-  '
-  'Public Property Get Month() As Byte
-  '  Month = pHeader.Month
-  'End Property
-  'Public Property Let Month(ByVal newValue As Byte)
-  '  pHeader.Month = newValue
-  'End Property
-  '
-  'Public Property Get Day() As Byte
-  '  Day = pHeader.Day
-  'End Property
-  'Public Property Let Day(ByVal newValue As Byte)
-  '  pHeader.Day = newValue
-  'End Property
+  Public Property Year() As Byte
+    Get
+      Return pHeader.dbfYear
+    End Get
+    Set(ByVal newValue As Byte)
+      pHeader.dbfYear = newValue
+    End Set
+  End Property
 
+  Public Property Month() As Byte
+    Get
+      Return pHeader.dbfMonth
+    End Get
+    Set(ByVal newValue As Byte)
+      pHeader.dbfMonth = newValue
+    End Set
+  End Property
+
+  Public Property Day() As Byte
+    Get
+      Return pHeader.dbfDay
+    End Get
+    Set(ByVal newValue As Byte)
+      pHeader.dbfDay = newValue
+    End Set
+  End Property
 
   Public Property FieldDecimalCount(ByVal aFieldNumber As Integer) As Byte
     Get
@@ -186,7 +190,7 @@ Public Class clsATCTableDBF
   ' 1 - keep existing instance of duplicates and discard duplicates from dbf being added
   ' 2 - replace existing instance of duplicates with duplicates from dbf being added
   ' 3 - ask user what to do (not currently implemented)
-  'Public Sub Merge(dbf2Add As clsATCTable, keyFieldNames() As String, DuplicateAction As Long)
+  'Public Sub Merge(dbf2Add As atcTable, keyFieldNames() As String, DuplicateAction As Long)
   '  Dim addRecordNum As Long
   '  Dim fieldNum As Long
   '  Dim keyField() As Long
@@ -346,12 +350,6 @@ Public Class clsATCTableDBF
   '  End If
   '  Return
   'End Sub
-
-  Public WriteOnly Property Logger() As Object
-    Set(ByVal Value As Object)
-      pLogger = Value
-    End Set
-  End Property
 
   Public Overrides Property CurrentRecord() As Integer
     Get
@@ -838,30 +836,6 @@ ErrHand:
     Clear()
   End Sub
 
-  Private Sub Log(ByVal message As String)
-    If pLogger Is Nothing Then
-      System.Diagnostics.Debug.WriteLine("  clsDBF " & message)
-    Else
-      pLogger.Log("  clsDBF " & message)
-    End If
-  End Sub
-
-  Private Function LogMsg(ByVal message As String, ByRef title As String, Optional ByRef AskYesNo As Boolean = False) As Boolean
-    If pLogger Is Nothing Then
-      If AskYesNo Then
-        If MsgBox(message, MsgBoxStyle.YesNo, title & " (clsDBF)") = MsgBoxResult.Yes Then LogMsg = True
-      Else
-        MsgBox(message, MsgBoxStyle.OKOnly, title & " (clsDBF)")
-      End If
-    Else
-      If AskYesNo Then
-        If pLogger.LogMsg(message, title & " (clsDBF)", "Yes", "No") = 1 Then LogMsg = True
-      Else
-        pLogger.LogMsg(message, title & " (clsDBF)")
-      End If
-    End If
-  End Function
-
   'Private Sub StartUsingCompareLongs()
   '    ' Force pCompareLongs to use pLongHeader as its own header
   '    'UPGRADE_ISSUE: VarPtr function is not supported. Click for more: 'ms-help://MS.VSCC/commoner/redir/redirect.htm?keyword="vbup1040"'
@@ -898,24 +872,24 @@ ErrHand:
     ReDim pData(0)
   End Sub
 
-  Public Overrides Function Cousin() As IATCTable
+  Public Overrides Function Cousin() As IatcTable
     Dim iTrash As Short
     Dim iField As Short
-
-    Cousin = New clsATCTableDBF
-    With Cousin
-      '    .Year = CInt(Format(Now, "yyyy")) - 1900
-      '    .Month = CByte(Format(Now, "mm"))
-      '    .Day = CByte(Format(Now, "dd"))
+    Dim newDBF As New atcTableDBF
+    With newDBF
+      .Year = CInt(Format(Now, "yyyy")) - 1900
+      .Month = CByte(Format(Now, "mm"))
+      .Day = CByte(Format(Now, "dd"))
       .NumFields = pNumFields
 
       For iField = 1 To pNumFields
         .FieldName(iField) = FieldName(iField)
         .FieldType(iField) = FieldType(iField)
         .FieldLength(iField) = FieldLength(iField)
-        'FIXME      .FieldDecimalCount(iField) = FieldDecimalCount(iField)
+        .FieldDecimalCount(iField) = FieldDecimalCount(iField)
       Next
     End With
+    Return newDBF
   End Function
 
   Public Overrides Function CreationCode() As String
@@ -960,18 +934,6 @@ ErrHand:
     Next
   End Function
 
-  'Public Function FindFirst(ByVal aFieldNumber As Integer, ByRef aFindValue As String, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
-  '    If aEndRecord < 1 Then aEndRecord = pHeader.NumRecs
-  '    For pCurrentRecord = aStartRecord To aEndRecord
-  '        pCurrentRecordStart = pHeader.NumBytesRec * (pCurrentRecord - 1) + 1
-  '        If Value(aFieldNumber) = aFindValue Then
-  '            FindFirst = True
-  '            Exit Function
-  '        End If
-  '    Next
-  '    CurrentRecord = aStartRecord
-  'End Function
-
   Public Overrides Function OpenFile(ByVal Filename As String) As Boolean
     'Dim header As clsHeader, FieldDes As clsFieldDescriptor    'Creating variables for user-defined types
     'Dim memo As String * 512                               'Create a 512 byte fixed string variable
@@ -999,7 +961,6 @@ ErrHand:
 
     NumFields = pHeader.NumBytesHeader \ 32 - 1 'Calculate the number of fields
 
-    'frm.fa.TextMatrix(frm.fa.Rows - 1, 0) = "Field  Field Name     Type   Width  Dec"
     For I = 1 To pNumFields
       pFields(I).ReadFromFile(inFile) 'Looping through NumFields by reading in 32 byte records
     Next I
@@ -1199,8 +1160,7 @@ TryAgain:
 
 ErrHand:
     Resume Next
-    Log("Error saving " & Filename & vbCr & Err.Description)
-    If MsgBox("Error saving " & Filename & vbCr & Err.Description, MsgBoxStyle.AbortRetryIgnore, "Write DBF") = MsgBoxResult.Retry Then
+    If LogMsg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", "Retry", "Abort") = 1 Then
       On Error Resume Next
       FileClose(OutFile)
       GoTo TryAgain
