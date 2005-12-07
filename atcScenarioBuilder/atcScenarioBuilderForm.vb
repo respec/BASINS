@@ -534,6 +534,7 @@ Friend Class atcScenarioBuilderForm
     If FileExists(aScriptFileName) Then
       Dim args() As Object = New Object() {aDatasets}
       Dim errors As String
+      MsgBox("Running scenario scripts is temporarily disabled.", MsgBoxStyle.OKOnly, "Scenario Script")
       'Dim lBasinsPlugin As Object = pDataManager.Basins
       'lBasinsPlugin.RunBasinsScript(FileExt(aScriptFileName), WholeFileString(aScriptFileName), errors, args)
       If Not errors Is Nothing Then
@@ -947,7 +948,7 @@ Friend Class atcScenarioBuilderForm
       AddScenario()                         'Create a new scenario to populate
       lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
     End If
-    atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
+    'TODO: add this back in: atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
     agdMain.Refresh()
   End Sub
 
