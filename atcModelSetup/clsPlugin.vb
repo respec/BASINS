@@ -1,4 +1,4 @@
-'Imports atcMwGisUtils
+Imports atcMwGisUtility
 
 Public Class PlugIn
   Implements MapWindow.Interfaces.IPlugin
@@ -97,14 +97,14 @@ Public Class PlugIn
     'on the Initialize event, then this is where you would handle it.
     If ItemName = "BasinsModels_HSPF" Then
       Dim main As New frmModelSetup
-      SetGisUtilsMappingObject(pMapWin)
+      GisUtil.MappingObject = pMapWin
       main.SetModelName("HSPF")
       main.initializeUI()
       main.Show()
       Handled = True
     ElseIf ItemName = "BasinsModels_AQUATOX" Then
       Dim main As New frmModelSetup
-      SetGisUtilsMappingObject(pMapWin)
+      GisUtil.MappingObject = pMapWin
       main.SetModelName("AQUATOX")
       main.InitializeUI()
       main.Show()

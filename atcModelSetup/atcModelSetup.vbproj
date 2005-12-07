@@ -90,12 +90,6 @@
                     HintPath = "..\..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
                 />
                 <Reference
-                    Name = "MapWinInterfaces"
-                    AssemblyName = "MapWinInterfaces"
-                    HintPath = "..\Bin\MapWinInterfaces.dll"
-                    Private = "False"
-                />
-                <Reference
                     Name = "ATCoCtl"
                     Guid = "{872F11D5-3322-11D4-9D23-00A0C9768F70}"
                     VersionMajor = "1"
@@ -131,6 +125,17 @@
                     HintPath = "..\Bin\Plugins\BASINS\atcUtility.dll"
                     Private = "False"
                 />
+                <Reference
+                    Name = "atcMwGisUtility"
+                    Project = "{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
+                <Reference
+                    Name = "MapWinInterfaces"
+                    AssemblyName = "MapWinInterfaces"
+                    HintPath = "..\..\BASINS\Bin\MapWinInterfaces.dll"
+                    Private = "False"
+                />
             </References>
             <Imports>
                 <Import Namespace = "Microsoft.VisualBasic" />
@@ -161,12 +166,6 @@
                     RelPath = "frmModelSetup.resx"
                     DependentUpon = "frmModelSetup.vb"
                     BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "GisUtils.vb"
-                    Link = "..\atcMwGisUtils\GisUtils.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
                 />
             </Include>
         </Files>
