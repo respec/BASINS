@@ -1,5 +1,5 @@
 Imports atcUtility
-Imports atcMwGisUtility.GISUtils
+Imports atcMwGisUtility
 
 Public Class frmReclass
   Inherits System.Windows.Forms.Form
@@ -307,27 +307,27 @@ Public Class frmReclass
     Me.Refresh()
     'set subbasin layer
     If pSubbasinsLayer <> "<none>" Then
-      SubbasinLayerIndex = GisUtil_FindLayerIndexByName(pSubbasinsLayer)
+      SubbasinLayerIndex = GisUtil.LayerIndex(pSubbasinsLayer)
     End If
 
     Dim cluTiles As New Collection
     If lutype = "GIRAS" Then
       'set land use index layer
-      LanduseLayerIndex = GisUtil_FindLayerIndexByName("Land Use Index")
-      LandUseFieldIndex = GisUtil_FindFieldIndexByName(LanduseLayerIndex, "COVNAME")
-      PathName = PathNameOnly(GisUtil_LayerFileName(LanduseLayerIndex))
+      LanduseLayerIndex = GisUtil.LayerIndex("Land Use Index")
+      LandUseFieldIndex = GisUtil.FieldIndex(LanduseLayerIndex, "COVNAME")
+      PathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
       PathName = PathName & "\landuse"
       DriveLetter = Mid(PathName, 1, 1)
       ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
 
       'figure out which land use tiles to list
-      For i = 1 To GisUtil_NumFeaturesInLayer(LanduseLayerIndex)
+      For i = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
         'loop thru each shape of land use index shapefile
-        NewFileName = GisUtil_CellValueNthFeatureInLayer(LanduseLayerIndex, LandUseFieldIndex, i - 1)
+        NewFileName = GisUtil.FieldValue(LanduseLayerIndex, i - 1, LandUseFieldIndex)
         If pSubbasinsLayer <> "<none>" Then
           'does this overlap any of our subbasins?
-          For j = 1 To GisUtil_NumFeaturesInLayer(SubbasinLayerIndex)
-            If GisUtil_OverlappingPolygons(LanduseLayerIndex, i - 1, SubbasinLayerIndex, j - 1) Then
+          For j = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+            If GisUtil.OverlappingPolygons(LanduseLayerIndex, i - 1, SubbasinLayerIndex, j - 1) Then
               'yes, add it
               cluTiles.Add(NewFileName)
               Exit For
@@ -344,26 +344,26 @@ Public Class frmReclass
       For j = 1 To cluTiles.Count
         'loop thru each land use tile
         NewFileName = PathName & "\" & cluTiles(j) & ".shp"
-        If Not GisUtil_AddLayerToMap(NewFileName, cluTiles(j)) Then
+        If Not GisUtil.AddLayer(NewFileName, cluTiles(j)) Then
           MsgBox("The GIRAS Landuse Shapefile " & NewFileName & "does not exist." & _
                  vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "Reclassify Problem")
           Exit Sub
         End If
-        totalpolygoncount = totalpolygoncount + GisUtil_NumFeaturesInLayer(GisUtil_FindLayerIndexByName(cluTiles(j)))
+        totalpolygoncount = totalpolygoncount + GisUtil.NumFeatures(GisUtil.LayerIndex(cluTiles(j)))
       Next j
 
     Else
       'not giras, ie other shape type
-      LanduseLayerIndex = GisUtil_FindLayerIndexByName(pLULayer)
+      LanduseLayerIndex = GisUtil.LayerIndex(pLULayer)
       cluTiles.Add(pLULayer)
-      PathName = PathNameOnly(GisUtil_LayerFileName(LanduseLayerIndex))
+      PathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
       DriveLetter = Mid(PathName, 1, 1)
       ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
-      totalpolygoncount = GisUtil_NumFeaturesInLayer(LanduseLayerIndex)
+      totalpolygoncount = GisUtil.NumFeatures(LanduseLayerIndex)
     End If
 
     If pSubbasinsLayer <> "<none>" Then
-      totalpolygoncount = totalpolygoncount * GisUtil_NumFeaturesInLayer(SubbasinLayerIndex)
+      totalpolygoncount = totalpolygoncount * GisUtil.NumFeatures(SubbasinLayerIndex)
     End If
 
     agdLanduse.rows = 0
@@ -371,7 +371,7 @@ Public Class frmReclass
     lastdisplayed = 0
     For j = 1 To cluTiles.Count
       'loop thru each land use tile
-      LanduseLayerIndex = GisUtil_FindLayerIndexByName(cluTiles(j))
+      LanduseLayerIndex = GisUtil.LayerIndex(cluTiles(j))
 
       If lutype = "GIRAS" Then
         'find giras field index
@@ -381,8 +381,8 @@ Public Class frmReclass
         LandUseFieldName = pLanduseIDFieldName
         DescriptionFieldName = pLanduseDescFieldName
       End If
-      LandUseFieldIndex = GisUtil_FindFieldIndexByName(LanduseLayerIndex, LandUseFieldName)
-      DescriptionIndex = GisUtil_FindFieldIndexByName(LanduseLayerIndex, DescriptionFieldName)
+      LandUseFieldIndex = GisUtil.FieldIndex(LanduseLayerIndex, LandUseFieldName)
+      DescriptionIndex = GisUtil.FieldIndex(LanduseLayerIndex, DescriptionFieldName)
 
       If cluTiles.Count > 1 Then
         lblProgress.Text = "Processing Data for Land Use Layer " & j & " of " & cluTiles.Count
@@ -393,7 +393,7 @@ Public Class frmReclass
         If pSubbasinsLayer <> "<none>" Then
           'do overlay
 
-          GisUtil_Overlay(cluTiles(j), LandUseFieldName, pSubbasinsLayer, pSubbasinsIDFieldName, _
+          GisUtil.Overlay(cluTiles(j), LandUseFieldName, pSubbasinsLayer, pSubbasinsIDFieldName, _
                       PathName & "\overlay.shp", True)
 
           'now populate grid with results
@@ -418,9 +418,9 @@ Public Class frmReclass
                 .rows = .rows + 1
                 'find corresponding description from land use layer
                 desc = ""
-                For k = 1 To GisUtil_NumFeaturesInLayer(LanduseLayerIndex)
-                  If lucode = GisUtil_CellValueNthFeatureInLayer(LanduseLayerIndex, LandUseFieldIndex, k - 1) Then
-                    desc = GisUtil_CellValueNthFeatureInLayer(LanduseLayerIndex, DescriptionIndex, k - 1)
+                For k = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
+                  If lucode = GisUtil.FieldValue(LanduseLayerIndex, k - 1, LandUseFieldIndex) Then
+                    desc = GisUtil.FieldValue(LanduseLayerIndex, k - 1, DescriptionIndex)
                     Exit For
                   End If
                 Next k
@@ -434,9 +434,9 @@ Public Class frmReclass
         Else
           'no subbasin layer, include all land use codes
           .set_ColTitle(2, "HIDE")
-          For i = 1 To GisUtil_NumFeaturesInLayer(LanduseLayerIndex)
-            lucode = GisUtil_CellValueNthFeatureInLayer(LanduseLayerIndex, LandUseFieldIndex, i - 1)
-            desc = GisUtil_CellValueNthFeatureInLayer(LanduseLayerIndex, DescriptionIndex, i - 1)
+          For i = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
+            lucode = GisUtil.FieldValue(LanduseLayerIndex, i - 1, LandUseFieldIndex)
+            desc = GisUtil.FieldValue(LanduseLayerIndex, i - 1, DescriptionIndex)
             If Len(lucode) > 0 Then
               'see if this type is already listed
               inlist = False
@@ -493,29 +493,29 @@ Public Class frmReclass
     Me.Refresh()
     'set subbasin shape file
     If pSubbasinsLayer <> "<none>" Then
-      SubbasinsLayerIndex = GisUtil_FindLayerIndexByName(pSubbasinsLayer)
+      SubbasinsLayerIndex = GisUtil.LayerIndex(pSubbasinsLayer)
     End If
 
     ReclassifyFile = "\BASINS\etc\nlcd.dbf"
 
     agdLanduse.rows = 0
-    LanduseGridLayerIndex = GisUtil_FindLayerIndexByName(pLULayer)
-    If GisUtil_LayerType(LanduseGridLayerIndex) = 4 Then
+    LanduseGridLayerIndex = GisUtil.LayerIndex(pLULayer)
+    If GisUtil.LayerType(LanduseGridLayerIndex) = 4 Then
       'Grid
 
       If pSubbasinsLayer <> "<none>" Then
         'have subbasins specified
-        numSubbasins = GisUtil_NumFeaturesInLayer(SubbasinsLayerIndex)
-        ReDim aAreaLS(GisUtil_GridLayerMaximum(LanduseGridLayerIndex), numSubbasins)
-        GisUtil_TabulateAreas(LanduseGridLayerIndex, SubbasinsLayerIndex, aAreaLS)
+        numSubbasins = GisUtil.NumFeatures(SubbasinsLayerIndex)
+        ReDim aAreaLS(GisUtil.GridLayerMaximum(LanduseGridLayerIndex), numSubbasins)
+        GisUtil.TabulateAreas(LanduseGridLayerIndex, SubbasinsLayerIndex, aAreaLS)
       Else
         numSubbasins = 1
       End If
 
-      For i = GisUtil_GridLayerMinimum(LanduseGridLayerIndex) To GisUtil_GridLayerMaximum(LanduseGridLayerIndex)
+      For i = GisUtil.GridLayerMinimum(LanduseGridLayerIndex) To GisUtil.GridLayerMaximum(LanduseGridLayerIndex)
         area = 0
         If pSubbasinsLayer <> "<none>" Then
-          For k = 1 To GisUtil_NumFeaturesInLayer(SubbasinsLayerIndex)
+          For k = 1 To GisUtil.NumFeatures(SubbasinsLayerIndex)
             'loop thru subbasins
             If aAreaLS(i, k - 1) > 0 Then
               area = area + aAreaLS(i, k - 1)

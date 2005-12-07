@@ -1,4 +1,4 @@
-Imports atcMwGisUtility.GisUtils
+Imports atcMwGisUtility
 
 Public Class PlugIn
   Implements MapWindow.Interfaces.IPlugin
@@ -87,7 +87,7 @@ Public Class PlugIn
     'This event fires when a menu item or toolbar button is clicked.  So if you added a button or menu
     'on the Initialize event, then this is where you would handle it.
     If ItemName = "BasinsUtilities_LandUse" Then
-      SetGisUtilsMappingObject(pMapWin)
+      GisUtil.MappingObject = pMapWin
       Dim main As New frmLandUse
       main.InitializeUI()
       main.Show()
