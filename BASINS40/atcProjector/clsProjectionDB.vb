@@ -1,56 +1,56 @@
 Imports System.Collections.Specialized
-Imports ATCutility
+Imports atcUtility
 
 Public Class ProjectionDB
-    Private pBaseProjections As ProjectionCollection
-    Private pEllipsoids As ProjectionCollection
-    Private pStandardProjections As ProjectionCollection
+  Private pBaseProjections As ProjectionCollection
+  Private pEllipsoids As ProjectionCollection
+  Private pStandardProjections As ProjectionCollection
 
-    Public ReadOnly Property BaseProjections() As ProjectionCollection
-        Get
-            If pBaseProjections Is Nothing Then ReadProjectionDatabase()
-            Return pBaseProjections
-        End Get
-    End Property
+  Public ReadOnly Property BaseProjections() As ProjectionCollection
+    Get
+      If pBaseProjections Is Nothing Then ReadProjectionDatabase()
+      Return pBaseProjections
+    End Get
+  End Property
 
-    Public ReadOnly Property Ellipsoids() As ProjectionCollection
-        Get
-            If pEllipsoids Is Nothing Then ReadProjectionDatabase()
-            Return pEllipsoids
-        End Get
-    End Property
+  Public ReadOnly Property Ellipsoids() As ProjectionCollection
+    Get
+      If pEllipsoids Is Nothing Then ReadProjectionDatabase()
+      Return pEllipsoids
+    End Get
+  End Property
 
-    Public ReadOnly Property StandardProjections() As ProjectionCollection
-        Get
-            If pStandardProjections Is Nothing Then ReadProjectionDatabase()
-            Return pStandardProjections
-        End Get
-    End Property
+  Public ReadOnly Property StandardProjections() As ProjectionCollection
+    Get
+      If pStandardProjections Is Nothing Then ReadProjectionDatabase()
+      Return pStandardProjections
+    End Get
+  End Property
 
-    Private Function OpenProjectionDatabase() As IATCTable
-        Dim dbFilename As String
+  Private Function OpenProjectionDatabase() As IatcTable
+    Dim dbFilename As String
 
-        dbFilename = FindFile("Please locate table of projections atcprj.dbf", "\BASINS\etc\atcprj.dbf")
+    dbFilename = FindFile("Please locate table of projections atcprj.dbf", "\BASINS\etc\atcprj.dbf")
 
-        If dbFilename.Length = 0 Then
-            LogDbg("Could not find table of projections atcprj.dbf")
-        Else
-            OpenProjectionDatabase = TableOpener.OpenAnyTable(dbFilename)
-            If OpenProjectionDatabase Is Nothing Then
-                LogDbg("Could not open table of projections atcprj.dbf")
-            End If
-        End If
-    End Function
+    If dbFilename.Length = 0 Then
+      LogDbg("Could not find table of projections atcprj.dbf")
+    Else
+      OpenProjectionDatabase = atcTableOpener.OpenAnyTable(dbFilename)
+      If OpenProjectionDatabase Is Nothing Then
+        LogDbg("Could not open table of projections atcprj.dbf")
+      End If
+    End If
+  End Function
 
-    Private Sub ReadProjectionDatabase()
-        Dim iRecord As Integer
-        Dim id As Integer
-        Dim curProjection As Projection
-        Dim prevProjection As Projection
+  Private Sub ReadProjectionDatabase()
+    Dim iRecord As Integer
+    Dim id As Integer
+    Dim curProjection As Projection
+    Dim prevProjection As Projection
 
-        pBaseProjections = New ProjectionCollection
-        pEllipsoids = New ProjectionCollection
-        pStandardProjections = New ProjectionCollection
+    pBaseProjections = New ProjectionCollection
+    pEllipsoids = New ProjectionCollection
+    pStandardProjections = New ProjectionCollection
 
     Dim tmpDBF As atcTable
     tmpDBF = OpenProjectionDatabase()

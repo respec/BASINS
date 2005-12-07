@@ -37,7 +37,7 @@ Public Interface IatcTable
   Sub MovePrevious()
 End Interface
 
-Public Class TableOpener
+Public Class atcTableOpener
   Public Shared Function OpenAnyTable(ByVal filename As String) As IatcTable
     Select Case LCase(System.IO.Path.GetExtension(filename))
       Case ".dbf" : OpenAnyTable = New atcTableDBF
