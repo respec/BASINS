@@ -1,4 +1,4 @@
-Imports atcMwGisUtility.GISUtils
+Imports atcMwGisUtility
 
 Public Class frmLandUse
   Inherits System.Windows.Forms.Form
@@ -275,10 +275,10 @@ Public Class frmLandUse
       FullClassFile = "<none>"
     ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
       cboLandUseLayer.Items.Clear()
-      For lyr = 0 To GisUtil_NumLayers() - 1
-        If GisUtil_LayerType(lyr) = 3 Then
+      For lyr = 0 To GisUtil.NumLayers() - 1
+        If GisUtil.LayerType(lyr) = 3 Then
           'PolygonShapefile
-          cboLandUseLayer.Items.Add(GisUtil_LayerName(lyr))
+          cboLandUseLayer.Items.Add(GisUtil.LayerName(lyr))
         End If
       Next
       If cboLandUseLayer.Items.Count > 0 And cboLandUseLayer.SelectedIndex < 0 Then
@@ -294,11 +294,11 @@ Public Class frmLandUse
       FullClassFile = "<none>"
     ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
       cboLandUseLayer.Items.Clear()
-      For lyr = 0 To GisUtil_NumLayers() - 1
-        If GisUtil_LayerType(lyr) = 4 Then
+      For lyr = 0 To GisUtil.NumLayers() - 1
+        If GisUtil.LayerType(lyr) = 4 Then
           'Grid 
-          If InStr(GisUtil_LayerFileName(lyr), "\nlcd\") > 0 Then
-            cboLandUseLayer.Items.Add(GisUtil_LayerName(lyr))
+          If InStr(GisUtil.LayerFileName(lyr), "\nlcd\") > 0 Then
+            cboLandUseLayer.Items.Add(GisUtil.LayerName(lyr))
           End If
         End If
       Next
@@ -315,10 +315,10 @@ Public Class frmLandUse
       FullClassFile = "/BASINS/etc/mlrc.dbf"
     Else 'grid
       cboLandUseLayer.Items.Clear()
-      For lyr = 0 To GisUtil_NumLayers() - 1
-        If GisUtil_LayerType(lyr) = 4 Then
+      For lyr = 0 To GisUtil.NumLayers() - 1
+        If GisUtil.LayerType(lyr) = 4 Then
           'Grid
-          cboLandUseLayer.Items.Add(GisUtil_LayerName(lyr))
+          cboLandUseLayer.Items.Add(GisUtil.LayerName(lyr))
         End If
       Next
       If cboLandUseLayer.Items.Count > 0 And cboLandUseLayer.SelectedIndex < 0 Then
@@ -352,10 +352,10 @@ Public Class frmLandUse
       cboSub2.Visible = True
       lblSubid.Visible = True
       lblSubname.Visible = True
-      lyr = GisUtil_FindLayerIndexByName(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+      lyr = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
       If lyr > -1 Then
-        For i = 0 To GisUtil_NumFieldsInLayer(lyr) - 1
-          ctemp = GisUtil_NthFieldNameInLayer(i, lyr)
+        For i = 0 To GisUtil.NumFields(lyr) - 1
+          ctemp = GisUtil.FieldName(i, lyr)
           cboSub1.Items.Add(ctemp)
           cboSub2.Items.Add(ctemp)
           If UCase(ctemp) = "SUBBASIN" Then
@@ -381,27 +381,27 @@ Public Class frmLandUse
 
     cboDescription.Items.Clear()
     cboLUID.Items.Clear()
-    lyr = GisUtil_FindLayerIndexByName(cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex))
+    lyr = GisUtil.LayerIndex(cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex))
     If lyr > -1 Then
       If cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Grid" Then
         'make sure this is a grid layer
-        If GisUtil_LayerType(lyr) = 4 Then
+        If GisUtil.LayerType(lyr) = 4 Then
           'todo: fill in description fields for selected grid layer if possible
         End If
       Else
         'make sure this is a shape layer
-        If GisUtil_LayerType(lyr) = 3 Then
+        If GisUtil.LayerType(lyr) = 3 Then
           'PolygonShapefile
           'this is the layer, fill in fields 
-          For i = 0 To GisUtil_NumFieldsInLayer(lyr) - 1
-            ctemp = GisUtil_NthFieldNameInLayer(i, lyr)
+          For i = 0 To GisUtil.NumFields(lyr) - 1
+            ctemp = GisUtil.FieldName(i, lyr)
             cboDescription.Items.Add(ctemp)
-            If GisUtil_NthFieldTypeInLayer(i, lyr) = 0 Then
+            If GisUtil.FieldType(i, lyr) = 0 Then
               'string
               cboDescription.SelectedIndex = i
             End If
             cboLUID.Items.Add(ctemp)
-            If GisUtil_NthFieldTypeInLayer(i, lyr) = 1 Then
+            If GisUtil.FieldType(i, lyr) = 1 Then
               'integer
               cboLUID.SelectedIndex = i
             End If
@@ -428,7 +428,7 @@ Public Class frmLandUse
     Dim i As Long
 
     If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-      i = GisUtil_FindLayerIndexByName("Land Use Index")
+      i = GisUtil.LayerIndex("Land Use Index")
       If i = -1 Then
         'cant do giras without land use index layer
         MsgBox("When using GIRAS Landuse, the 'Land Use Index' layer must exist and be named as such.", vbOKOnly, "Reclass GIRAS Problem")
@@ -491,9 +491,9 @@ Public Class frmLandUse
 
     Dim lyr As Long
 
-    For lyr = 0 To GisUtil_NumLayers() - 1
-      ctemp = GisUtil_LayerName(lyr)
-      If GisUtil_LayerType(lyr) = 3 Then
+    For lyr = 0 To GisUtil.NumLayers() - 1
+      ctemp = GisUtil.LayerName(lyr)
+      If GisUtil.LayerType(lyr) = 3 Then
         'PolygonShapefile 
         cboSubbasins.Items.Add(ctemp)
         If UCase(ctemp) = "SUBBASINS" Then
