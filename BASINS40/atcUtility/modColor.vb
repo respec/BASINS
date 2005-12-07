@@ -6,7 +6,7 @@ Imports System.Drawing
 Public Module UtilColor
   '##MODULE_REMARKS Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-  Private colorDatabase As clsATCTable
+  Private colorDatabase As atcTable
   Private Const grayBasename As String = "gray" 'base name for shades of gray (gray0..gray255)
   Private Const grayNameNumStart As Short = 5 'len(grayBasename) + 1 = where the number starts
   Private Const forceKnownColor As Boolean = True
@@ -105,7 +105,7 @@ FoundColor:
 
   End Function
 
-  Private Function colorDB() As clsATCTable 'clsDBF
+  Private Function colorDB() As atcTable 'clsDBF
     Static AlreadyReportedErrOpen As Boolean
     Static openedDB As Boolean
     Dim DBpath As String
@@ -123,7 +123,7 @@ FoundColor:
       End If
 
       If FileExists(DBpath) Then
-        colorDatabase = New clsATCTableDBF
+        colorDatabase = New atcTableDBF
         colorDatabase.OpenFile(DBpath)
         openedDB = True
       End If
@@ -157,7 +157,7 @@ erropen:
         If IsNumeric(r) Then TextOrNumericColor = Color.FromArgb(255, CInt(r), CInt(r), CInt(r))
       End If
       If TextOrNumericColor.Equals(Color.Empty) Then
-        Dim db As clsATCTable = colorDB()
+        Dim db As atcTable = colorDB()
         If Not db Is Nothing Then
           If db.FindFirst(1, c) Then
             TextOrNumericColor = ColorTranslator.FromOle(CInt(db.Value(2)))
@@ -196,7 +196,7 @@ erropen:
       End If
     End If
 
-    Dim db As clsATCTable = colorDB()
+    Dim db As atcTable = colorDB()
     If db Is Nothing Then GoTo SetHexValue
 
     Dim b1, r1, g1 As Integer
@@ -281,7 +281,7 @@ SetHexValue:
   '        End If
   '      End If
   '      If nextColor.Equals(Color.FromArgb(-1)) Then
-  '        Dim db As clsATCTableDBF
+  '        Dim db As atcTableDBF
   '        db = colorDB()
   '        If Not db Is Nothing Then
   '          If db.FindFirst(1, c) Then

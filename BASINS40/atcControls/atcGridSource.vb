@@ -17,6 +17,7 @@ Public Class atcGridSource
   Private pValues(,) As String
   Private pColors(,) As Color
   Private pSelected(,) As Boolean
+  Private pEditable(,) As Boolean
   Private pAlignment(,) As atcAlignment
   Private pColorCells As Boolean = False
   Private pSwapRowsColumns As Boolean = False
@@ -94,6 +95,25 @@ Public Class atcGridSource
     End Set
   End Property
 
+  'True if cell is user-editable (not overridable to hide row/column swapping from inheritors)
+  Property CellEditable(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+    Get
+      If pSwapRowsColumns Then
+        Return ProtectedCellEditable(aColumn, aRow)
+      Else
+        Return ProtectedCellEditable(aRow, aColumn)
+      End If
+    End Get
+    Set(ByVal newValue As Boolean)
+      If pSwapRowsColumns Then
+        ProtectedCellEditable(aColumn, aRow) = newValue
+      Else
+        ProtectedCellEditable(aRow, aColumn) = newValue
+      End If
+      'RaiseEvent ChangedValue(aRow, aColumn)
+    End Set
+  End Property
+
   'Number of rows (not overridable to hide row/column swapping from inheritors)
   Property Rows() As Integer
     Get
@@ -150,10 +170,24 @@ Public Class atcGridSource
     End Set
   End Property
 
+  'True if aRow or aColumn does not exist
+  Protected Function InvalidRowOrColumn(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+    Return (aRow >= Rows _
+     OrElse aColumn >= Columns _
+     OrElse aRow < 0 _
+     OrElse aColumn < 0)
+  End Function
+
+  'Expands Rows and/or Columns if needed to reach from 0,0 to aRow, aColumn
+  Protected Sub ExpandRowsColumns(ByVal aRow As Integer, ByVal aColumn As Integer)
+    If aRow > Rows + 1 Then Rows = aRow + 1
+    If aColumn > Columns + 1 Then Columns = aColumn + 1
+  End Sub
+
   'Override this instead of CellValue
   Protected Overridable Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
-      If pValues Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
+      If pValues Is Nothing OrElse InvalidRowOrColumn(aRow, aColumn) Then
         Return ""
       Else
         Return pValues(aRow, aColumn)
@@ -161,10 +195,9 @@ Public Class atcGridSource
     End Get
     Set(ByVal newValue As String)
       If pValues Is Nothing Then
-        ReDim pValues(Rows, Columns)
+        ReDim pValues(pRows, pColumns)
       End If
-      If aRow > Rows + 1 Then Rows = aRow + 1
-      If aColumn > Columns + 1 Then Columns = aRow + 1
+      ExpandRowsColumns(aRow, aColumn)
       If pValues(aRow, aColumn) <> newValue Then
         pValues(aRow, aColumn) = newValue
       End If
@@ -174,7 +207,7 @@ Public Class atcGridSource
   'Override this instead of CellColor
   Protected Overridable Property ProtectedCellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As Color
     Get
-      If pColors Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
+      If pColors Is Nothing OrElse InvalidRowOrColumn(aRow, aColumn) Then
         Return System.Drawing.SystemColors.Window
       Else
         Return pColors(aRow, aColumn)
@@ -182,10 +215,9 @@ Public Class atcGridSource
     End Get
     Set(ByVal newValue As Color)
       If pColors Is Nothing Then
-        ReDim pColors(Rows, Columns)
+        ReDim pColors(pRows, pColumns)
       End If
-      If aRow > Rows + 1 Then Rows = aRow + 1
-      If aColumn > Columns + 1 Then Columns = aRow + 1
+      ExpandRowsColumns(aRow, aColumn)
       pColors(aRow, aColumn) = newValue
     End Set
   End Property
@@ -193,19 +225,38 @@ Public Class atcGridSource
   'Override this instead of CellSelected
   Protected Overridable Property ProtectedCellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
     Get
-      If pSelected Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
+      If pSelected Is Nothing OrElse InvalidRowOrColumn(aRow, aColumn) Then
         Return False
       Else
         Return pSelected(aRow, aColumn)
       End If
     End Get
     Set(ByVal newValue As Boolean)
-      If aRow > Rows + 1 Then Rows = aRow + 1
-      If aColumn > Columns + 1 Then Columns = aRow + 1
+      ExpandRowsColumns(aRow, aColumn)
       If pSelected Is Nothing Then
-        ReDim pSelected(Rows, Columns)
+        ReDim pSelected(pRows, pColumns)
       End If
       pSelected(aRow, aColumn) = newValue
+    End Set
+  End Property
+
+  'Override this instead of CellEditable
+  Protected Overridable Property ProtectedCellEditable(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+    Get
+      If pEditable Is Nothing OrElse InvalidRowOrColumn(aRow, aColumn) Then
+        Return False
+      Else
+        Return pEditable(aRow, aColumn)
+      End If
+    End Get
+    Set(ByVal newValue As Boolean)
+      If newValue <> ProtectedCellEditable(aRow, aColumn) Then
+        ExpandRowsColumns(aRow, aColumn)
+        If pEditable Is Nothing Then
+          ReDim pEditable(pRows, pColumns)
+        End If
+        pEditable(aRow, aColumn) = newValue
+      End If
     End Set
   End Property
 
@@ -216,7 +267,11 @@ Public Class atcGridSource
     End Get
     Set(ByVal newValue As Integer)
       pColumns = newValue
-      ReDim Preserve pValues(Rows, pColumns)
+      ReDim Preserve pValues(pRows, pColumns)
+      If Not pColors Is Nothing Then ReDim Preserve pColors(pRows, pColumns)
+      If Not pSelected Is Nothing Then ReDim Preserve pSelected(pRows, pColumns)
+      If Not pEditable Is Nothing Then ReDim Preserve pEditable(pRows, pColumns)
+      If Not pAlignment Is Nothing Then ReDim Preserve pAlignment(pRows, pColumns)
     End Set
   End Property
 
@@ -243,6 +298,11 @@ Public Class atcGridSource
         Next
         pRows = aNewRows
         pValues = newValues
+        'TODO: copy these arrays, currently they all end up full of Nothing
+        If Not pColors Is Nothing Then ReDim pColors(pRows, pColumns)
+        If Not pSelected Is Nothing Then ReDim pSelected(pRows, pColumns)
+        If Not pEditable Is Nothing Then ReDim pEditable(pRows, pColumns)
+        If Not pAlignment Is Nothing Then ReDim pAlignment(pRows, pColumns)
       End If
     End Set
   End Property
@@ -250,7 +310,7 @@ Public Class atcGridSource
   'Override this instead of Alignment
   Protected Overridable Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcAlignment
     Get
-      If pAlignment Is Nothing OrElse aRow >= Rows OrElse aColumn >= Columns Then
+      If pAlignment Is Nothing OrElse InvalidRowOrColumn(aRow, aColumn) Then
         Return atcAlignment.HAlignLeft + atcAlignment.VAlignCenter
       Else
         Return pAlignment(aRow, aColumn)
@@ -258,10 +318,9 @@ Public Class atcGridSource
     End Get
     Set(ByVal newValue As atcAlignment)
       If pAlignment Is Nothing Then
-        ReDim pAlignment(Rows, Columns)
+        ReDim pAlignment(pRows, pColumns)
       End If
-      If aRow > Rows + 1 Then Rows = aRow + 1
-      If aColumn > Columns + 1 Then Columns = aRow + 1
+      ExpandRowsColumns(aRow, aColumn)
       pAlignment(aRow, aColumn) = newValue
     End Set
   End Property
