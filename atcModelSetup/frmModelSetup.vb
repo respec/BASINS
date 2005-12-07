@@ -1112,7 +1112,7 @@ Public Class frmModelSetup
       (cboLandUseLayer.Visible And cboLandUseLayer.SelectedIndex > -1)) Then
       'giras, nlcd, or other with reclass file set
 
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(lblClass.Text)
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lblClass.Text)
       'do pre-scan to set up grid
       prevcode = -1
       showmults = False
@@ -1498,7 +1498,7 @@ Public Class frmModelSetup
       lblStatus.Text = "Compiling Overlay Results"
       Me.Refresh()
 
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(luPathName & "\overlay.dbf")
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(luPathName & "\overlay.dbf")
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
         lucode = tmpDbf.Value(1)
@@ -1571,7 +1571,7 @@ Public Class frmModelSetup
       lblStatus.Text = "Compiling Overlay Results"
       Me.Refresh()
 
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(luPathName & "\overlay.dbf")
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(luPathName & "\overlay.dbf")
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
         lucode = tmpDbf.Value(1)
@@ -1827,7 +1827,7 @@ ErrHand:
       'lucodes correspond to which lugroups
       UseSimpleGrid = True
       'open dbf file
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(ReclassifyFile)
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
         cRcode.Add(tmpDbf.Value(1))
@@ -2284,7 +2284,7 @@ ErrHand:
         'facname
         'load (flow or other value) lbs/yr or cfs
         'parm (flow or other name)
-        tmpDbf = atcUtility.TableOpener.OpenAnyTable(lblCustom.Text)
+        tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lblCustom.Text)
 
         i = 1
         Do While i <= cNPDES.Count
@@ -2329,7 +2329,7 @@ ErrHand:
       'read in Permitted Discharges Parameter Table
       If cNPDES.Count > 0 Then
         'open dbf file
-        tmpDbf = atcUtility.TableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs3_prm.dbf")
+        tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs3_prm.dbf")
         RowCount = tmpDbf.NumRecords
         ReDim ParmCode(RowCount)
         ReDim ParmName(RowCount)
@@ -2351,7 +2351,7 @@ ErrHand:
         dbffilename = dbname & Trim(cHuc(j)) & ".dbf"
         If Len(Dir(dbffilename)) > 0 Then
           If dbffilename <> prevdbf Then
-            tmpDbf = atcUtility.TableOpener.OpenAnyTable(dbffilename)
+            tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(dbffilename)
             prevdbf = dbffilename
             For k = 1 To tmpDbf.NumFields
               If UCase(tmpDbf.FieldName(k)) = "YEAR" Then
@@ -2404,7 +2404,7 @@ ErrHand:
       Next j
     Else
       'using custom data
-      tmpDbf = atcUtility.TableOpener.OpenAnyTable(lblCustom.Text)
+      tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lblCustom.Text)
       For i = 1 To cNPDES.Count
         For j = 1 To tmpDbf.NumRecords
           tmpDbf.CurrentRecord = j
