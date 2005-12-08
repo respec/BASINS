@@ -173,9 +173,9 @@ Public Class frmWQ
       .set_ColEditable(1, False)
       .set_ColEditable(2, False)
       .set_TextMatrix(1, 0, "Freshwater Acute")
-      .set_TextMatrix(2, 0, "Freshwater Cronic")
+      .set_TextMatrix(2, 0, "Freshwater Chronic")
       .set_TextMatrix(3, 0, "Marine Acute")
-      .set_TextMatrix(4, 0, "Marine Cronic")
+      .set_TextMatrix(4, 0, "Marine Chronic")
       .set_TextMatrix(5, 0, "HHRV Water")
       .set_TextMatrix(6, 0, "HHRV Organ")
     End With
