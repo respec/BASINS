@@ -739,6 +739,14 @@ Public Class GisUtil
     End If
   End Function
 
+  Public Shared Function SetSelectedFeature(ByVal aLayerIndex As Integer, ByVal aShapeIndex As Integer)
+    Dim lSelectColor As System.Drawing.Color
+
+    pMapWin.Layers.CurrentLayer = aLayerIndex
+    lSelectColor = pMapWin.View.SelectColor
+    pMapWin.View.SelectedShapes.AddByIndex(aShapeIndex, lSelectColor)
+  End Function
+
   Public Shared Function IndexOfNthSelectedFeatureInLayer(ByVal nth As Integer, ByVal aLayerIndex As Integer) As Integer
     Dim lsi As MapWindow.Interfaces.SelectInfo = GetMappingObject.View.SelectedShapes
     Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
@@ -747,7 +755,7 @@ Public Class GisUtil
     End If
   End Function
 
-  Public shared Sub SaveSelectedFeatures(ByVal aInputLayerName As String, ByVal aOutputLayerName As String)
+  Public Shared Sub SaveSelectedFeatures(ByVal aInputLayerName As String, ByVal aOutputLayerName As String)
     'save the selected features of a layer as a new shapefile
     Dim i As Integer
     Dim j As Integer
@@ -757,10 +765,10 @@ Public Class GisUtil
 
     InputLayerIndex = LayerIndex(aInputLayerName)
     Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(InputLayerIndex)
-    
+
     Dim osf As New MapWinGIS.Shapefile
     'create new shapefile
-    osf.CreateNew(aOutputLayerName, lsf.ShapefileType)
+    bsuc = osf.CreateNew(aOutputLayerName, lsf.ShapefileType)
     For i = 1 To lsf.NumFields
       Dim of As New MapWinGIS.Field
       of.Name = lsf.Field(i - 1).Name
@@ -845,7 +853,7 @@ Public Class GisUtil
   Public Shared Function AddLayer(ByVal aFileName As String, ByVal aLayerName As String) As Boolean
     'given a shape file name, add it to the map.
     'return true if the layer is already there or successfully added.
-    If LayerIndex(aLayerName) > -1 Then 'already on map 
+    If IsLayer(aLayerName) Then  'already on map 
       AddLayer = True
     Else
       Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers.Add(aFileName, aLayerName)
@@ -856,6 +864,17 @@ Public Class GisUtil
         AddLayer = True
       End If
     End If
+  End Function
+
+  Public Shared Function IsLayer(ByVal aLayerName As String) As Boolean
+    Dim i As Integer
+    IsLayer = False
+    For i = 1 To GetMappingObject.Layers.NumLayers
+      If aLayerName = GetMappingObject.Layers(i).Name Then
+        IsLayer = True
+        Exit For
+      End If
+    Next i
   End Function
 
   ''' <summary>Layer visible flag</summary>
@@ -907,26 +926,63 @@ Public Class GisUtil
     Dim subid As Integer
     Dim luid As Integer
     Dim lcellarea As Double
-    'Dim totalcellcount As Integer
-    'Dim cellcount As Integer
-    'Dim lastdisplayed As Integer
+    Dim totalcellcount As Integer
+    Dim cellcount As Integer
+    Dim lastdisplayed As Integer
     Dim startingcolumn As Integer
     Dim endingcolumn As Integer
     Dim startingrow As Integer
     Dim endingrow As Integer
+    Dim lminx As Double
+    Dim lmaxx As Double
+    Dim lminy As Double
+    Dim lmaxy As Double
+    Dim i As Integer
+    Dim j As Integer
 
     'set input grid
     Dim InputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
     'set input polygon layer
     Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
     'figure out what part of the grid overlays these polygons
-    InputGrid.ProjToCell(lPolygonSf.Extents.xMin, lPolygonSf.Extents.yMin, startingcolumn, endingrow)
-    InputGrid.ProjToCell(lPolygonSf.Extents.xMax, lPolygonSf.Extents.yMax, endingcolumn, startingrow)
+    If NumSelectedFeatures(aPolygonLayerIndex) = 0 Then
+      'use whole extent of shapefile
+      lminx = lPolygonSf.Extents.xMin
+      lmaxx = lPolygonSf.Extents.xMax
+      lminy = lPolygonSf.Extents.yMin
+      lmaxy = lPolygonSf.Extents.yMax
+    Else
+      'use only extent of selected features
+      j = IndexOfNthSelectedFeatureInLayer(0, aPolygonLayerIndex)
+      lminx = lPolygonSf.Shape(j).Extents.xMin
+      lmaxx = lPolygonSf.Shape(j).Extents.xMax
+      lminy = lPolygonSf.Shape(j).Extents.yMin
+      lmaxy = lPolygonSf.Shape(j).Extents.yMax
+      For i = 1 To NumSelectedFeatures(aPolygonLayerIndex) - 1
+        j = IndexOfNthSelectedFeatureInLayer(i, aPolygonLayerIndex)
+        If lPolygonSf.Shape(j).Extents.xMin < lminx Then
+          lminx = lPolygonSf.Shape(j).Extents.xMin
+        End If
+        If lPolygonSf.Shape(j).Extents.yMin < lminy Then
+          lminy = lPolygonSf.Shape(j).Extents.yMin
+        End If
+        If lPolygonSf.Shape(j).Extents.xMax > lmaxx Then
+          lmaxx = lPolygonSf.Shape(j).Extents.xMax
+        End If
+        If lPolygonSf.Shape(j).Extents.yMax > lmaxy Then
+          lmaxy = lPolygonSf.Shape(j).Extents.yMax
+        End If
+      Next
+    End If
+    InputGrid.ProjToCell(lminx, lminy, startingcolumn, endingrow)
+    InputGrid.ProjToCell(lmaxx, lmaxy, endingcolumn, startingrow)
 
     lcellarea = InputGrid.Header.dX * InputGrid.Header.dY
-    'totalcellcount = (endingcolumn - startingcolumn) * (endingrow - startingrow)
-    'cellcount = 0
-    'lastdisplayed = 0
+    totalcellcount = (endingcolumn - startingcolumn) * (endingrow - startingrow)
+    cellcount = 0
+    lastdisplayed = 0
+    GetMappingObject.StatusBar.ShowProgressBar = True
+    GetMappingObject.StatusBar.ProgressBarValue = 0
 
     lPolygonSf.BeginPointInShapefile()
     For ic = startingcolumn To endingcolumn
@@ -942,14 +998,14 @@ Public Class GisUtil
           End If
           aAreaGridPoly(luid, subid) = aAreaGridPoly(luid, subid) + lcellarea
         End If
-        'cellcount = cellcount + 1
+        cellcount = cellcount + 1
+        If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
+          lastdisplayed = Int(cellcount / totalcellcount * 100)
+          GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
+        End If
       Next ir
-      'If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
-      '  lblStatus.Text = "Overlaying Land Use and Subbasins (" & Int(cellcount / totalcellcount * 100) & "%)"
-      '  Me.Refresh()
-      '  lastdisplayed = Int(cellcount / totalcellcount * 100)
-      'End If
     Next ic
+    GetMappingObject.StatusBar.ShowProgressBar = False
     lPolygonSf.EndPointInShapefile()
   End Sub
 
@@ -975,7 +1031,7 @@ Public Class GisUtil
     'set input polygon layer
     Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
     Dim lShape As New MapWinGIS.Shape
-    If FeatureIndexValid(aPolygonFeatureIndex, lPolygonsf) Then
+    If FeatureIndexValid(aPolygonFeatureIndex, lPolygonSf) Then
       lShape = lPolygonSf.Shape(aPolygonFeatureIndex)
 
       'figure out what part of the grid overlays this polygon
