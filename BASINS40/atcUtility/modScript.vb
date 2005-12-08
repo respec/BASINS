@@ -13,14 +13,18 @@ Public Module modScript
 
     Dim MethodName As String = "Main" 'TODO: decide on entry point name
 
-    Try
-      If FileExists(aCode) Then aCode = WholeFileString(aCode)
-    Catch ex As Exception
-      'Treat as code, not as file name
-    End Try
+    If aLanguage.ToLower = "dll" Then
+      assy = System.Reflection.Assembly.LoadFrom(aCode)
+    Else 'compile the code into an assembly
+      Try
+        If FileExists(aCode) Then aCode = WholeFileString(aCode)
+      Catch ex As Exception
+        'Treat as code, not as file name
+      End Try
 
-    'First compile the code into an assembly
-    assy = CompileScript(aLanguage, aCode, aErrors, aDLLfilename)
+      assy = CompileScript(aLanguage, aCode, aErrors, aDLLfilename)
+
+    End If
 
     If aErrors Is Nothing Then
       assyTypes = assy.GetTypes()
@@ -48,7 +52,7 @@ Public Module modScript
 
     If aCode.IndexOf("Public ") < 0 Then needSupportCode = True
 
-    Select Case (aLanguage)
+    Select Case aLanguage.ToLower
       Case "cs" : provider = New Microsoft.CSharp.CSharpCodeProvider
       Case "js" : provider = Activator.CreateInstance("Microsoft.JScript", "Microsoft.JScript.JScriptCodeProvider").Unwrap()
       Case "vb" : provider = New Microsoft.VisualBasic.VBCodeProvider

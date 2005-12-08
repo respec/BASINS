@@ -21,10 +21,6 @@ Public Class atcBasinsPlugIn
   Private Const SaveDataMenuName As String = "BasinsSaveData"
   Private Const SaveDataMenuString As String = "Save Data In..."
 
-  Private Const DataMenuName As String = "BasinsData"
-  Private Const DataMenuString As String = "&Data"
-  Private pLoadedDataMenu As Boolean = False
-
   Private Const ToolsMenuName As String = "BasinsTools"
   Private Const ToolsMenuString As String = "&Tools"
 
@@ -33,6 +29,10 @@ Public Class atcBasinsPlugIn
 
   Private Const BasinsProjectPath As String = "\Basins\apr\"
   Private Const BasinsDataPath As String = "\Basins\data\"
+
+  Private Const DataMenuName As String = "BasinsData"
+  Private Const DataMenuString As String = "&Data"
+  Private pLoadedDataMenu As Boolean = False
 
   Private pNationalDataDir As String = ""
   Private pLogFilename As String = ""
@@ -63,6 +63,12 @@ Public Class atcBasinsPlugIn
       Return "G14R/KCU1FOWVVI"
     End Get
   End Property
+
+'  Public ReadOnly Property DataManager() As atcDataManager
+'    Get
+'      Return pDataManager
+'    End Get
+'  End Property
 
   Public ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
     'Appears in the plug-ins dialog box when a user selects the plug-in.  
@@ -106,7 +112,7 @@ Public Class atcBasinsPlugIn
     'LogStartMonitor()
     LogSetMapWin(g_MapWin)
 
-    pDataManager = New atcDataManager(g_MapWin, Me)
+    pDataManager = New atcDataManager(g_MapWin) ', Me)
 
     BuiltInScript(False)
 
@@ -478,7 +484,7 @@ Public Class atcBasinsPlugIn
             If Len(args(0)) = 0 Then args = New Object() {"DataManager", "BasinsPlugIn"}
           End If
           If FileExists(exename) Then
-            RunBasinsScript(FileExt(exename), WholeFileString(exename), errors, args)
+            RunBasinsScript(FileExt(exename), exename, errors, args)
             If Not errors Is Nothing Then
               MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
             End If
@@ -517,8 +523,10 @@ Public Class atcBasinsPlugIn
         For Each lMethod As MethodInfo In lMethods
           If lMethod.Name.ToLower = "main" AndAlso _
              lMethod.GetParameters.Length = 2 AndAlso _
-             lMethod.GetParameters(0).ParameterType Is pDataManager.GetType AndAlso _
-             lMethod.GetParameters(1).ParameterType Is Me.GetType Then 'found built in script
+             (lMethod.GetParameters(0).ParameterType Is pDataManager.GetType _
+              OrElse lMethod.GetParameters(0).ParameterType.Name = "Object") AndAlso _
+             (lMethod.GetParameters(1).ParameterType Is Me.GetType _
+              OrElse lMethod.GetParameters(1).ParameterType.Name = "Object") Then 'found built in script
 
             pBuiltInScriptExists = True
             If aRun Then

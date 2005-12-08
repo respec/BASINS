@@ -99,6 +99,14 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcModelSetup", "atcModelSe
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcBasinsObsWQ", "atcBasinsObsWQ\atcBasinsObsWQ.vbproj", "{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSWATDBF", "atcSWATDBF\atcSWATDBF.vbproj", "{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -204,6 +212,14 @@ Global
 		{AF800243-4EC0-4ABA-A722-85872F7BD308}.Debug.Build.0 = Debug|.NET
 		{AF800243-4EC0-4ABA-A722-85872F7BD308}.Release.ActiveCfg = Release|.NET
 		{AF800243-4EC0-4ABA-A722-85872F7BD308}.Release.Build.0 = Release|.NET
+		{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}.Debug.ActiveCfg = Debug|.NET
+		{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}.Debug.Build.0 = Debug|.NET
+		{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}.Release.ActiveCfg = Release|.NET
+		{7DCB47A0-7B03-4B7C-BC42-B8D920D46604}.Release.Build.0 = Release|.NET
+		{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}.Debug.ActiveCfg = Debug|.NET
+		{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}.Debug.Build.0 = Debug|.NET
+		{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}.Release.ActiveCfg = Release|.NET
+		{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}.Release.Build.0 = Release|.NET
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
