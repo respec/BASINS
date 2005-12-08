@@ -158,6 +158,7 @@ Public Class atcDataTreeForm
     Dim lNumValuesNow As Integer
     Dim lValueStart As Integer
     Dim lDateString(3) As String
+    Dim lDateOffset As Integer 'Mean data is labeled with previous date value (lDateOffset = -1)
 
     If Not atrMain Is Nothing Then
       Me.Controls.Remove(atrMain)
@@ -212,9 +213,14 @@ Public Class atcDataTreeForm
         Else
           lNumValuesNow = lNumValues + 1
         End If
+        If lData.Attributes.GetValue("Point", False) Then
+          lDateOffset = 0
+        Else
+          lDateOffset = -1
+        End If
         For j As Integer = 1 To lNumValuesNow - 1
           'data starts at 1, date display is from prev value which is start of interval
-          lDateString = DumpDate(lData.Dates.Value(j - 1)).Split(" ")
+          lDateString = DumpDate(lData.Dates.Value(j + lDateOffset)).Split(" ")
           lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
                               DoubleToString(lData.Value(j)) & " : " & _
                               lDateString(0))
@@ -227,7 +233,7 @@ Public Class atcDataTreeForm
             lValueStart = lNumValuesNow
           End If
           For j As Integer = lValueStart To lData.numValues
-            lDateString = DumpDate(lData.Dates.Value(j - 1)).Split(" ")
+            lDateString = DumpDate(lData.Dates.Value(j + lDateOffset)).Split(" ")
             lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
                                 DoubleToString(lData.Value(j)) & " : " & _
                                 lDateString(0))
