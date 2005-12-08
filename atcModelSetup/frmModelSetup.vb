@@ -1394,17 +1394,6 @@ Public Class frmModelSetup
       For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
         cSelectedSubbasins.Add(i - 1)
       Next
-    Else
-      'some subbasins are selected, save selected as new shapefile
-      GisUtil.SaveSelectedFeatures(SubbasinThemeName, "Selected" & FilenameNoPath(GisUtil.LayerFileName(SubbasinLayerIndex)))
-      SubbasinThemeName = "Selected" & FilenameNoPath(GisUtil.LayerFileName(SubbasinLayerIndex))
-      SubbasinLayerIndex = GisUtil.LayerIndex(SubbasinThemeName)
-      Do While cSelectedSubbasins.Count > 0
-        cSelectedSubbasins.Remove(1)
-      Loop
-      For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
-        cSelectedSubbasins.Add(i - 1)
-      Next
     End If
 
     'set landuse layer
@@ -1474,6 +1463,13 @@ Public Class frmModelSetup
         totalpolygoncount = totalpolygoncount + GisUtil.NumFeatures(GisUtil.LayerIndex(cluTiles(j)))
       Next j
       totalpolygoncount = totalpolygoncount * cSelectedSubbasins.Count
+
+      'reset selected features since they may have become unselected
+      If cSelectedSubbasins.Count < GisUtil.NumFeatures(SubbasinLayerIndex) Then
+        For i = 1 To cSelectedSubbasins.Count
+          GisUtil.SetSelectedFeature(SubbasinLayerIndex, cSelectedSubbasins(i))
+        Next i
+      End If
 
       polygoncount = 0
       lastdisplayed = 0
