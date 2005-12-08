@@ -71,8 +71,10 @@ Public Class atcDataSourceSWATDBF
         Dim lTSIndex As Integer
         Dim lNCons As Integer = 0
         Dim lConsName As String
+        Dim lDate As Double = 0
         Dim s As String
-        lDBF = New clsATCTableDBF
+
+        lDBF = New atcTableDBF
         lDBF.OpenFile(aFileName)
         Dim lConsFields(lDBF.NumFields) As Integer
         Dim lConsNames(lDBF.NumFields) As String
@@ -101,7 +103,8 @@ Public Class atcDataSourceSWATDBF
                 lData = New atcTimeseries(Me)
                 lData.Dates = New atcTimeseries(Me)
                 lData.numValues = lDBF.NumRecords
-                lData.Dates.numValues = lData.numValues
+                lData.Value(0) = Double.NaN
+                lData.Dates.Value(0) = Double.NaN
                 lData.Attributes.SetValue("Count", 0)
                 lData.Attributes.SetValue("Scenario", "OBSERVED")
                 lData.Attributes.SetValue("Location", lDBF.Value(lLocnCol))
@@ -109,13 +112,16 @@ Public Class atcDataSourceSWATDBF
                 lData.Attributes.SetValue("point", False)
                 DataSets.Add(lTSKey, lData)
               End If
-              lTSIndex = lData.Attributes.GetValue("Count") + 1
-              lData.Value(lTSIndex) = lDBF.Value(lConsFields(i))
-              lData.Attributes.SetValue("Count", lTSIndex)
-              If lTSIndex = 1 Then 'put start date in 0th position of date array
-                lData.Dates.Value(0) = parseTAMUDate(lDBF.Value(lDateCol), True)
+              lDate = parseTAMUDate(lDBF.Value(lDateCol), False)
+              If lDate <> 0 Then
+                lTSIndex = lData.Attributes.GetValue("Count") + 1
+                lData.Value(lTSIndex) = lDBF.Value(lConsFields(i))
+                lData.Dates.Value(lTSIndex) = lDate
+                lData.Attributes.SetValue("Count", lTSIndex)
+                If lTSIndex = 1 Then 'put start date in 0th position of date array
+                  lData.Dates.Value(0) = parseTAMUDate(lDBF.Value(lDateCol), True)
+                End If
               End If
-              lData.Dates.Value(lTSIndex) = parseTAMUDate(lDBF.Value(lDateCol), False)
             Next i
             lDBF.MoveNext()
           End While
@@ -132,7 +138,7 @@ Public Class atcDataSourceSWATDBF
 
   Private Function parseTAMUDate(ByVal s As String, ByVal StartOfInterval As Boolean) As Double
     'assume mean values at end of interval
-    Dim lDate As Double
+    Dim lDate As Double = 0
     Dim lYr As Integer
     Dim lMn As Integer
     Dim lDy As Integer
@@ -163,8 +169,6 @@ Public Class atcDataSourceSWATDBF
           lDate = Jday(lYr, 12, 31, 24, 0, 0)
         End If
       End If
-    Else
-      lDate = 0
     End If
 
     Return lDate
