@@ -6,7 +6,7 @@ Public Class atcGrid
 
   Private WithEvents pSource As atcGridSource
 
-  Private Const COL_TOLERANCE As Integer = 2
+  Private Const DRAG_TOLERANCE As Integer = 2
 
   Private pFont As Font = New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point)
 
@@ -15,16 +15,21 @@ Public Class atcGrid
   Private pLineWidth As Single
   Private pCellBackColor As Color
   Private pCellTextColor As Color
-  Private pRowHeight As ArrayList = New ArrayList   'of Single
-  Private pColumnWidth As ArrayList = New ArrayList 'of Single
+  Private pRowHeight As ArrayList = New ArrayList   'of Integer
+  Private pColumnWidth As ArrayList = New ArrayList 'of Integer
 
   Private pTopRow As Integer
   Private pLeftColumn As Integer
 
   Private pRowBottom As ArrayList = New ArrayList
-  Private pColRight As ArrayList = New ArrayList
+  Private pColumnRight As ArrayList = New ArrayList
 
   Private pColumnDragging As Integer = -1
+
+  Private pColumnEditing As Integer = -1
+  Private pRowEditing As Integer = -1
+
+  Private WithEvents pCellTextbox As TextBox
 
 #Region " Windows Form Designer generated code "
 
@@ -118,7 +123,7 @@ Public Class atcGrid
     pColumnWidth = New ArrayList
 
     pRowBottom = New ArrayList
-    pColRight = New ArrayList
+    pColumnRight = New ArrayList
 
     If pSource Is Nothing Then
       lRows = 0
@@ -169,7 +174,8 @@ Public Class atcGrid
     Set(ByVal newValue As Integer)
       If iColumn < pColumnWidth.Count Then 'Change existing width of this column
         If iColumn = pColumnWidth.Count - 1 AndAlso _
-          pSource.Columns > pColumnWidth.Count Then 'Preserve implied width of later columns
+              Not pSource Is Nothing AndAlso _
+              pSource.Columns > pColumnWidth.Count Then 'Preserve implied width of later columns
           pColumnWidth.Add(pColumnWidth(iColumn))
         End If
         pColumnWidth(iColumn) = newValue
@@ -192,7 +198,7 @@ Public Class atcGrid
     End Set
   End Property
 
-  Public Property RowHeight(ByVal iRow) As Single
+  Public Property RowHeight(ByVal iRow) As Integer
     Get
       If pRowHeight.Count = 0 Then
         Return 0 'should not happen
@@ -202,7 +208,7 @@ Public Class atcGrid
         Return pRowHeight(iRow)
       End If
     End Get
-    Set(ByVal newValue As Single)
+    Set(ByVal newValue As Integer)
       If iRow < pRowHeight.Count Then 'Change existing width of this column
         pRowHeight(iRow) = newValue
       Else 'Need to add one or more row heights to include this one
@@ -249,8 +255,8 @@ Public Class atcGrid
 
   Private Sub Render(ByVal g As Graphics)
     If Me.Visible And Not pSource Is Nothing Then
-      Dim x As Single = 0
-      Dim y As Single = 0
+      Dim x As Integer = 0
+      Dim y As Integer = 0
 
       Dim lRows As Integer = pSource.Rows
       Dim lColumns As Integer = pSource.Columns
@@ -258,8 +264,8 @@ Public Class atcGrid
       Dim iRow As Integer
       Dim iColumn As Integer
 
-      Dim visibleHeight As Single = Me.Height
-      Dim visibleWidth As Single = Me.Width
+      Dim visibleHeight As Integer = Me.Height
+      Dim visibleWidth As Integer = Me.Width
 
       If pTopRow > 0 Then        'Scrolled down at least one row
         If lRows < pTopRow Then  'Scrolled past last row
@@ -323,7 +329,7 @@ Public Class atcGrid
       g.FillRectangle(lOutsideBrush, 0, y, visibleWidth, visibleHeight - y)
 
       'Draw Column Lines
-      pColRight = New ArrayList
+      pColumnRight = New ArrayList
       If pLeftColumn = 0 Then
         HScroller.Visible = False
       ElseIf Not AllowHorizontalScrolling Then
@@ -364,14 +370,14 @@ Public Class atcGrid
               HScroller.LargeChange = 1
             End If
             HScroller.Maximum = lColumns '- HScroller.LargeChange + 1
-            pColRight.Add(x)
+            pColumnRight.Add(x)
             Exit For
           Else
             x = visibleWidth
           End If
         End If
         g.DrawLine(lLinePen, x, 0, x, visibleHeight)
-        pColRight.Add(x)
+        pColumnRight.Add(x)
       Next
 
       SizeScrollers()
@@ -381,10 +387,10 @@ Public Class atcGrid
         g.FillRectangle(lOutsideBrush, x, 0, visibleWidth - x, visibleHeight)
       End If
 
-      Dim lCellLeft As Single
-      Dim lCellTop As Single = 0
+      Dim lCellLeft As Integer
+      Dim lCellTop As Integer = 0
       Dim lastRowDrawn As Integer = pTopRow + pRowBottom.Count - 1
-      Dim lastColDrawn As Integer = pLeftColumn + pColRight.Count - 1
+      Dim lastColDrawn As Integer = pLeftColumn + pColumnRight.Count - 1
       Dim ColorCells As Boolean = pSource.ColorCells
 
       For iRow = pTopRow To lastRowDrawn
@@ -403,8 +409,8 @@ Public Class atcGrid
             End If
             If Not lEachCellBackColor.Equals(pCellBackColor) Then
               lEachCellBackBrush.Color = lEachCellBackColor
-              g.FillRectangle(lEachCellBackBrush, lCellLeft, lCellTop, pColRight(iColumn - pLeftColumn) - lCellLeft, pRowBottom(iRow - pTopRow) - lCellTop)
-              g.DrawRectangle(lLinePen, lCellLeft - 1, lCellTop - 1, pColRight(iColumn - pLeftColumn) - lCellLeft + 1, pRowBottom(iRow - pTopRow) - lCellTop + 1)
+              g.FillRectangle(lEachCellBackBrush, lCellLeft, lCellTop, pColumnRight(iColumn - pLeftColumn) - lCellLeft, pRowBottom(iRow - pTopRow) - lCellTop)
+              g.DrawRectangle(lLinePen, lCellLeft - 1, lCellTop - 1, pColumnRight(iColumn - pLeftColumn) - lCellLeft + 1, pRowBottom(iRow - pTopRow) - lCellTop + 1)
             End If
             lCellValue = pSource.CellValue(iRow, iColumn)
             If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
@@ -432,12 +438,12 @@ Public Class atcGrid
                 Case atcAlignment.HAlignLeft
                   x = lCellLeft
                 Case atcAlignment.HAlignRight
-                  x = pColRight(iColumn - pLeftColumn) - lCellValueSize.Width
+                  x = pColumnRight(iColumn - pLeftColumn) - lCellValueSize.Width
                 Case atcAlignment.HAlignCenter
                   lCellValueSize = g.MeasureString(lMainValue, pFont)
-                  x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft - lCellValueSize.Width) / 2
+                  x = lCellLeft + (pColumnRight(iColumn - pLeftColumn) - lCellLeft - lCellValueSize.Width) / 2
                 Case atcAlignment.HAlignDecimal
-                  x = lCellLeft + (pColRight(iColumn - pLeftColumn) - lCellLeft) / 2 - WidthLeftOfDecimal(lMainValue, g)
+                  x = lCellLeft + (pColumnRight(iColumn - pLeftColumn) - lCellLeft) / 2 - WidthLeftOfDecimal(lMainValue, g)
                 Case Else 'Default to left alignment 
                   x = lCellLeft
               End Select
@@ -452,7 +458,7 @@ Public Class atcGrid
               Try
                 If lTabPos >= 0 Then 'Right-align part of text after tab
                   g.DrawString(lMainValue, pFont, lEachCellTextBrush, x, y)
-                  x = pColRight(iColumn - pLeftColumn) - g.MeasureString(lCellValue.Substring(lTabPos + 1), pFont).Width
+                  x = pColumnRight(iColumn - pLeftColumn) - g.MeasureString(lCellValue.Substring(lTabPos + 1), pFont).Width
                   g.DrawString(lCellValue.Substring(lTabPos + 1), pFont, lEachCellTextBrush, x, y)
                 Else
                   g.DrawString(lCellValue, pFont, lEachCellTextBrush, x, y) 'TODO: allow flexibility of brush
@@ -460,7 +466,7 @@ Public Class atcGrid
               Catch winErr As Exception
               End Try
             End If
-            If iColumn < lColumns - 1 Then lCellLeft = pColRight(iColumn - pLeftColumn) + 1
+            If iColumn < lColumns - 1 Then lCellLeft = pColumnRight(iColumn - pLeftColumn) + 1
           End If
         Next
         If iRow < lRows - 1 Then lCellTop = pRowBottom(iRow - pTopRow) + 1 'Top of next row is bottom of this one
@@ -468,7 +474,7 @@ Public Class atcGrid
     End If
   End Sub
 
-  Private Function WidthLeftOfDecimal(ByVal aCellValue As String, ByVal g As Graphics) As Single
+  Private Function WidthLeftOfDecimal(ByVal aCellValue As String, ByVal g As Graphics) As Integer
     Dim lCellValueSize As SizeF
     If IsNumeric(aCellValue) Then
       Dim lDecimalPos As Integer = aCellValue.IndexOf(".")
@@ -483,7 +489,7 @@ Public Class atcGrid
     End If
   End Function
 
-  Private Function WidthRightOfDecimal(ByVal aCellValue As String, ByVal g As Graphics) As Single
+  Private Function WidthRightOfDecimal(ByVal aCellValue As String, ByVal g As Graphics) As Integer
     If IsNumeric(aCellValue) Then
       Dim lDecimalPos As Integer = aCellValue.IndexOf(".")
       If lDecimalPos = -1 Then
@@ -505,10 +511,10 @@ Public Class atcGrid
 
   Public Sub SizeColumnToContents(ByVal aColumn As Integer)
     Dim lCellValue As String
-    Dim lCellWidth As Single
+    Dim lCellWidth As Integer
     Dim lastRow As Integer = pSource.Rows - 1 'pTopRow + pRowBottom.Count - 1
     Dim g As Graphics = Me.CreateGraphics
-    Dim lDecimalWidth As Single = g.MeasureString(".", pFont).Width
+    Dim lDecimalWidth As Integer = g.MeasureString(".", pFont).Width
     Dim lMaxWidth As Integer = 0
 
     'TODO: would be faster to check just length of string [before/after decimal] then do width of "XXXXwidthXXXX"
@@ -526,7 +532,7 @@ Public Class atcGrid
         End If
       End If
     Next
-    ColumnWidth(aColumn) = lMaxWidth + COL_TOLERANCE * 2
+    ColumnWidth(aColumn) = lMaxWidth + DRAG_TOLERANCE * 2
     g.Dispose()
   End Sub
 
@@ -542,6 +548,43 @@ Public Class atcGrid
     Me.Refresh()
   End Sub
 
+  Private Function CellBounds(ByVal aRow As Integer, ByVal aColumn As Integer) As Rectangle
+    Dim lX As Integer = 0
+    Dim lY As Integer = 0
+
+    For lRow As Integer = pTopRow To aRow - 1
+      lY += RowHeight(lRow)
+    Next
+    For lColumn As Integer = pLeftColumn To aColumn - 1
+      lX += ColumnWidth(lColumn)
+    Next
+    Return New Rectangle(lX, lY, ColumnWidth(aColumn), RowHeight(aRow))
+  End Function
+
+  Public Sub EditCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+    EditCellFinished()
+    Dim EditCellBounds As Rectangle = CellBounds(aRow, aColumn)
+    pColumnEditing = aColumn
+    pRowEditing = aRow
+    pCellTextbox = New TextBox
+    pCellTextbox.Text = pSource.CellValue(aRow, aColumn)
+    Me.Controls.Add(pCellTextbox)
+    pCellTextbox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)
+    pCellTextbox.Visible = True
+  End Sub
+
+  Public Sub EditCellFinished()
+    If Not pCellTextbox Is Nothing Then
+      If pCellTextbox.Visible Then ChangeSelectedValues(pCellTextbox.Text)
+      Me.Controls.Remove(pCellTextbox)
+      pCellTextbox = Nothing
+    End If
+  End Sub
+
+  Private Sub ChangeSelectedValues(ByVal aNewValue As String)
+    pSource.CellValue(pRowEditing, pColumnEditing) = aNewValue
+  End Sub
+
   Protected Overrides Sub OnMouseDown(ByVal e As System.Windows.Forms.MouseEventArgs)
     Dim lRow As Integer
     Dim lColumn As Integer = ColumnEdgeToDrag(e.X)
@@ -553,11 +596,16 @@ Public Class atcGrid
       While lRow < pRowBottom.Count AndAlso e.Y > pRowBottom(lRow)
         lRow += 1
       End While
-      While lColumn < pColRight.Count AndAlso e.X > pColRight(lColumn)
+      While lColumn < pColumnRight.Count AndAlso e.X > pColumnRight(lColumn)
         lColumn += 1
       End While
-      If lRow + pTopRow < pSource.Rows And lColumn + pLeftColumn < pSource.Columns Then
-        RaiseEvent MouseDownCell(Me, lRow + pTopRow, lColumn + pLeftColumn)
+      Dim lRowAbsolute As Integer = lRow + pTopRow
+      Dim lColumnAbsolute As Integer = lColumn + pLeftColumn
+      If lRowAbsolute < pSource.Rows And lColumnAbsolute < pSource.Columns Then
+        If pSource.CellEditable(lRowAbsolute, lColumn) Then
+          EditCell(lRowAbsolute, lColumnAbsolute)
+        End If
+        RaiseEvent MouseDownCell(Me, lRowAbsolute, lColumnAbsolute)
       End If
     End If
   End Sub
@@ -574,9 +622,9 @@ Public Class atcGrid
         If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
       Case MouseButtons.Left
         If pColumnDragging >= 0 Then
-          ColumnWidth(pColumnDragging) += (e.X - pColRight(pColumnDragging - pLeftColumn))
-          If ColumnWidth(pColumnDragging) < COL_TOLERANCE * 2 Then 'it got too small
-            ColumnWidth(pColumnDragging) = COL_TOLERANCE * 2       'enforce small minimun size
+          ColumnWidth(pColumnDragging) += (e.X - pColumnRight(pColumnDragging - pLeftColumn))
+          If ColumnWidth(pColumnDragging) < DRAG_TOLERANCE * 2 Then 'it got too small
+            ColumnWidth(pColumnDragging) = DRAG_TOLERANCE * 2       'enforce small minimun size
           End If
           RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
           Refresh()
@@ -601,11 +649,11 @@ Public Class atcGrid
 
   Private Function ColumnEdgeToDrag(ByVal X As Integer) As Integer
     Dim lColumn As Integer = 0
-    While lColumn < pColRight.Count
+    While lColumn < pColumnRight.Count
       'If within tolerance of column edge and column is not being hidden by a zero width
-      If Math.Abs(X - pColRight(lColumn)) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
+      If Math.Abs(X - pColumnRight(lColumn)) <= DRAG_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
         'If we are not allowing horizontal scrolling, last column is not resizable
-        If AllowHorizontalScrolling OrElse lColumn < pColRight.Count - 1 Then
+        If AllowHorizontalScrolling OrElse lColumn < pColumnRight.Count - 1 Then
           Return lColumn + pLeftColumn
         End If
       End If
@@ -622,14 +670,14 @@ Public Class atcGrid
     'While lRow < pRowBottom.Count AndAlso Y > pRowBottom(lRow)
     '  lRow += 1
     'End While
-    'While lColumn < pColRight.Count AndAlso X > pColRight(lColumn)
-    '  lColLeft = pColRight(lColumn)
+    'While lColumn < pColumnRight.Count AndAlso X > pColumnRight(lColumn)
+    '  lColLeft = pColumnRight(lColumn)
     '  lColumn += 1
     'End While
 
-    'If lColumn < pColRight.Count AndAlso pSource.Alignment(lRow, lColumn) = atcAlignment.HAlignDecimal Then
+    'If lColumn < pColumnRight.Count AndAlso pSource.Alignment(lRow, lColumn) = atcAlignment.HAlignDecimal Then
     '  'If within tolerance of column edge and column is not being hidden by a zero width
-    '  If Math.Abs(X - (pColRight(lColumn) + lColLeft) / 2) <= COL_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
+    '  If Math.Abs(X - (pColumnRight(lColumn) + lColLeft) / 2) <= DRAG_TOLERANCE AndAlso ColumnWidth(lColumn + pLeftColumn) > 0 Then
     '    Return lColumn + pLeftColumn
     '  End If
     'End If
@@ -665,5 +713,15 @@ Public Class atcGrid
   Private Sub HScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HScroller.ValueChanged
     pLeftColumn = HScroller.Value
     Refresh()
+  End Sub
+
+  Private Sub pCellTextbox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles pCellTextbox.KeyDown
+    Select Case e.KeyCode
+      Case Keys.Escape : pCellTextbox.Visible = False : EditCellFinished()
+      Case Keys.Enter : EditCellFinished()
+      Case Keys.Tab : EditCellFinished() 'TODO: shift editing right one column
+      Case Keys.Up : EditCellFinished() 'TODO: shift editing 
+      Case Keys.Down : EditCellFinished() 'TODO: shift editing 
+    End Select
   End Sub
 End Class

@@ -421,6 +421,10 @@ Public Class atcBasinsPlugIn
     Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
     If Not lNewSource Is Nothing Then 'user did not cancel
       pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+      If Not lNewSource.DataSets Is Nothing AndAlso lNewSource.DataSets.Count > 0 Then
+        Dim lForm As New frmSelectDisplay
+        lForm.AskUser(pDataManager, lNewSource.DataSets)
+      End If
     End If
     Return lNewSource
   End Function
