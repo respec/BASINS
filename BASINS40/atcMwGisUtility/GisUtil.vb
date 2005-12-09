@@ -279,7 +279,7 @@ Public Class GisUtil
     ByVal aLayerIndexContaining As Integer, _
     ByRef aIndex() As Integer)
 
-    Dim lSf1 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex)
+    Dim lSf1 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
     Dim lSf2 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndexContaining)
 
     Dim lPointIndex As Integer
@@ -381,6 +381,18 @@ Public Class GisUtil
       End If
     Next
     Throw New Exception("GisUtil:FieldIndex:Error:FieldName:" & aFieldName & ":IsNotRecognized")
+  End Function
+
+  Public Shared Function IsField(ByVal aLayerIndex As Integer, ByVal aFieldName As String) As Boolean
+    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+
+    Dim i As Integer
+    IsField = False
+    For iFieldIndex As Integer = 0 To lSf.NumFields - 1
+      If UCase(lSf.Field(iFieldIndex).Name) = UCase(aFieldName) Then 'this is the field we want
+        IsField = True
+      End If
+    Next
   End Function
 
   ''' <summary>Add a field in a shape file from a layer index and a field name</summary>
@@ -1011,7 +1023,7 @@ Public Class GisUtil
 
   Public Shared Sub GridMinMaxInPolygon(ByVal aGridLayerIndex As Integer, ByVal aPolygonLayerIndex As Integer, _
                                         ByVal aPolygonFeatureIndex As Integer, _
-                                        ByVal aMin As Double, ByVal aMax As Double)
+                                        ByRef aMin As Double, ByRef aMax As Double)
     'Given a grid and a polygon layer, find the min and max grid value within the feature.
 
     Dim lCol As Integer
@@ -1024,6 +1036,9 @@ Public Class GisUtil
     Dim lStartRow As Integer
     Dim lEndRow As Integer
     Dim lVal As Integer
+    Dim totalcellcount As Integer
+    Dim cellcount As Integer
+    Dim lastdisplayed As Integer
 
     'set input grid
     Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
@@ -1037,6 +1052,12 @@ Public Class GisUtil
       'figure out what part of the grid overlays this polygon
       lInputGrid.ProjToCell(lShape.Extents.xMin, lShape.Extents.yMin, lStartCol, lEndRow)
       lInputGrid.ProjToCell(lShape.Extents.xMax, lShape.Extents.yMax, lEndCol, lStartRow)
+
+      totalcellcount = (lEndCol - lStartCol) * (lEndRow - lStartRow)
+      cellcount = 0
+      lastdisplayed = 0
+      GetMappingObject.StatusBar.ShowProgressBar = True
+      GetMappingObject.StatusBar.ProgressBarValue = 0
 
       aMin = 99999999
       aMax = -99999999
@@ -1054,8 +1075,14 @@ Public Class GisUtil
               aMin = lVal
             End If
           End If
+          cellcount = cellcount + 1
+          If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
+            lastdisplayed = Int(cellcount / totalcellcount * 100)
+            GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
+          End If
         Next lRow
       Next lCol
+      GetMappingObject.StatusBar.ShowProgressBar = False
       lPolygonSf.EndPointInShapefile()
     End If
   End Sub
