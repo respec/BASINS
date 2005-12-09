@@ -640,8 +640,9 @@ Public Class frmManDelin
       'End If
 
       'assign subbasin numbers
-      SubbasinFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "SUBBASIN")
-      If SubbasinFieldIndex = -1 Then
+      If GisUtil.IsField(SubbasinLayerIndex, "SUBBASIN") Then
+        SubbasinFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "SUBBASIN")
+      Else
         'need to add it
         SubbasinFieldIndex = GisUtil.AddField(SubbasinLayerIndex, "SUBBASIN", 0, 10)
         For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
@@ -655,8 +656,9 @@ Public Class frmManDelin
       Dim elev As Single
       Dim slope As Single
       Dim aIndex() As Integer
-      SlopeFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "SLO1")
-      If SlopeFieldIndex = -1 Then
+      If GisUtil.IsField(SubbasinLayerIndex, "SLO1") Then
+        SlopeFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "SLO1")
+      Else
         'need to add it
         SlopeFieldIndex = GisUtil.AddField(SubbasinLayerIndex, "SLO1", 2, 10)
       End If
@@ -704,8 +706,10 @@ Public Class frmManDelin
 
       'calculate length of overland flow plane
       Dim sl As Single
-      LengthFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "LEN1")
-      If LengthFieldIndex = -1 Then
+
+      If GisUtil.IsField(SubbasinLayerIndex, "LEN1") Then
+        LengthFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "LEN1")
+      Else
         'need to add it
         LengthFieldIndex = GisUtil.AddField(SubbasinLayerIndex, "LEN1", 2, 10)
       End If
@@ -740,8 +744,8 @@ Public Class frmManDelin
       Me.Refresh()
 
     Else
-      'cant do if we don't have a subbasin layer
-    End If
+    'cant do if we don't have a subbasin layer
+      End If
   End Sub
 
   Private Sub cmdDefine_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDefine.Click
@@ -765,10 +769,15 @@ Public Class frmManDelin
     'find the level field
     ReachThemeName = cboReach.Items(cboReach.SelectedIndex)
     ReachLayerIndex = GisUtil.LayerIndex(ReachThemeName)
+    LevelFieldIndex = -1
     If Microsoft.VisualBasic.Right(GisUtil.LayerFileName(ReachLayerIndex), 7) = "rf1.shp" Then
-      LevelFieldIndex = GisUtil.FieldIndex(ReachLayerIndex, "LEV")
+      If GisUtil.IsField(ReachLayerIndex, "LEV") Then
+        LevelFieldIndex = GisUtil.FieldIndex(ReachLayerIndex, "LEV")
+      End If
     Else
-      LevelFieldIndex = GisUtil.FieldIndex(ReachLayerIndex, "LEVEL")
+      If GisUtil.IsField(ReachLayerIndex, "LEVEL") Then
+        LevelFieldIndex = GisUtil.FieldIndex(ReachLayerIndex, "LEVEL")
+      End If
     End If
     If LevelFieldIndex = -1 Then
       MsgBox("Cannot find field 'Level' in the streams layer", MsgBoxStyle.OKOnly, "Stream Network Problem")
@@ -821,8 +830,9 @@ Public Class frmManDelin
     Dim ReachSubbasinFieldIndex As Integer
     Dim SubbasinFieldIndex As Integer
     SubbasinFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "SUBBASIN")
-    ReachSubbasinFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "SUBBASIN")
-    If ReachSubbasinFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "SUBBASIN") Then
+      ReachSubbasinFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "SUBBASIN")
+    Else
       'need to add it
       ReachSubbasinFieldIndex = GisUtil.AddField(StreamsLayerIndex, "SUBBASIN", 1, 10)
     End If
@@ -834,20 +844,23 @@ Public Class frmManDelin
 
     'add downstream subbasin ids
     Dim DownstreamFieldIndex As Integer
-    DownstreamFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "SUBBASINR")
-    If DownstreamFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "SUBBASINR") Then
+      DownstreamFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "SUBBASINR")
+    Else
       'need to add it
       DownstreamFieldIndex = GisUtil.AddField(StreamsLayerIndex, "SUBBASINR", 1, 10)
     End If
     If DownstreamFieldIndex < minfield Then minfield = DownstreamFieldIndex
     Dim rfield As Integer
     Dim dfield As Integer
-    rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RIVRCH")
-    If rfield < 0 Then
+    If GisUtil.IsField(StreamsLayerIndex, "RIVRCH") Then
+      rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RIVRCH")
+    Else
       rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RCHID")
     End If
-    dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSCSM")
-    If dfield < 0 Then
+    If GisUtil.IsField(StreamsLayerIndex, "DSCSM") Then
+      dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSCSM")
+    Else
       dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSRCHID")
     End If
     Dim rval As String
@@ -894,8 +907,9 @@ Public Class frmManDelin
 
     'set length of stream reach
     Dim LengthFieldIndex As Integer
-    LengthFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "LEN2")
-    If LengthFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "LEN2") Then
+      LengthFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "LEN2")
+    Else
       'need to add it
       LengthFieldIndex = GisUtil.AddField(StreamsLayerIndex, "LEN2", 2, 10)
     End If
@@ -908,8 +922,9 @@ Public Class frmManDelin
 
     'set local contributing area of stream reach
     Dim AreaFieldIndex As Integer
-    AreaFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "LAREA")
-    If AreaFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "LAREA") Then
+      AreaFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "LAREA")
+    Else
       'need to add it
       AreaFieldIndex = GisUtil.AddField(StreamsLayerIndex, "LAREA", 2, 10)
     End If
@@ -930,8 +945,9 @@ Public Class frmManDelin
     Dim bfound As Boolean
     Dim r2 As Double
     Dim tAreaFieldIndex As Integer
-    tAreaFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "TAREA")
-    If tAreaFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "TAREA") Then
+      tAreaFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "TAREA")
+    Else
       'need to add it
       tAreaFieldIndex = GisUtil.AddField(StreamsLayerIndex, "TAREA", 2, 10)
     End If
@@ -964,8 +980,9 @@ Public Class frmManDelin
     Next i
 
     'set stream width based on upstream area
-    TempFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "WID2")
-    If TempFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "WID2") Then
+      TempFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "WID2")
+    Else
       'need to add it
       TempFieldIndex = GisUtil.AddField(StreamsLayerIndex, "WID2", 2, 10)
     End If
@@ -977,8 +994,9 @@ Public Class frmManDelin
     Next i
 
     'set depth based on upstream area
-    TempFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "DEP2")
-    If TempFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "DEP2") Then
+      TempFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "DEP2")
+    Else
       'need to add it
       TempFieldIndex = GisUtil.AddField(StreamsLayerIndex, "DEP2", 2, 10)
     End If
@@ -991,16 +1009,18 @@ Public Class frmManDelin
 
     'set min elev
     Dim MinFieldIndex As Integer
-    MinFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "MINEL")
-    If MinFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "MINEL") Then
+      MinFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "MINEL")
+    Else
       'need to add it
       MinFieldIndex = GisUtil.AddField(StreamsLayerIndex, "MINEL", 1, 10)
     End If
     If MinFieldIndex < minfield Then minfield = MinFieldIndex
     'set max elev
     Dim MaxFieldIndex As Integer
-    MaxFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "MAXEL")
-    If MaxFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "MAXEL") Then
+      MaxFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "MAXEL")
+    Else
       'need to add it
       MaxFieldIndex = GisUtil.AddField(StreamsLayerIndex, "MAXEL", 1, 10)
     End If
@@ -1042,8 +1062,9 @@ Public Class frmManDelin
     Next i
 
     'set slope of stream reach
-    TempFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "SLO2")
-    If TempFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "SLO2") Then
+      TempFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "SLO2")
+    Else
       'need to add it
       TempFieldIndex = GisUtil.AddField(StreamsLayerIndex, "SLO2", 2, 10)
     End If
@@ -1056,16 +1077,18 @@ Public Class frmManDelin
     Next i
 
     'set name of each stream reach
-    TempFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "SNAME")
-    If TempFieldIndex = -1 Then
+    If GisUtil.IsField(StreamsLayerIndex, "SNAME") Then
+      TempFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "SNAME")
+    Else
       'need to add it
       TempFieldIndex = GisUtil.AddField(StreamsLayerIndex, "SNAME", 0, 20)
     End If
     If TempFieldIndex < minfield Then minfield = TempFieldIndex
     Dim NameFieldIndex As Integer
     Dim Name As String
-    NameFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "PNAME")
-    If NameFieldIndex < 0 Then
+    If GisUtil.IsField(StreamsLayerIndex, "PNAME") Then
+      NameFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "PNAME")
+    ElseIf GisUtil.IsField(StreamsLayerIndex, "NAME") Then
       NameFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "NAME")
     End If
     If NameFieldIndex > -1 Then
