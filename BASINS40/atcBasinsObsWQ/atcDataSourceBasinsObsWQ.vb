@@ -121,6 +121,21 @@ Public Class atcDataSourceBasinsObsWQ
             lData.numValues = lData.Attributes.GetValue("Count")
           Next
           Open = True
+        ElseIf lDateCol < 0 Then
+          Open = False
+          LogMsg("Unable to identify Date column in BASINS Observed Water Quality file " & aFileName, "SWAT DBF Open", )
+        ElseIf lTimeCol < 0 Then
+          Open = False
+          LogMsg("Unable to identify Time column in BASINS Observed Water Quality file " & aFileName, "SWAT DBF Open", )
+        ElseIf lLocnCol < 0 Then
+          Open = False
+          LogMsg("Unable to identify ID column in BASINS Observed Water Quality file " & aFileName, "SWAT DBF Open", )
+        ElseIf lConsCol < 0 Then
+          Open = False
+          LogMsg("Unable to identify Parm column in BASINS Observed Water Quality file " & aFileName, "SWAT DBF Open", )
+        ElseIf lValCol < 0 Then
+          Open = False
+          LogMsg("Unable to identify Value column in BASINS Observed Water Quality file " & aFileName, "SWAT DBF Open", )
         End If
       Catch endEx As EndOfStreamException
         Open = False
