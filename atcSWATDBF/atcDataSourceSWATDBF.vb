@@ -131,7 +131,7 @@ Public Class atcDataSourceSWATDBF
           Open = True
         ElseIf lDateCol < 0 Then
           Open = False
-          LogMsg("Unable to identify Date column in SWAT DBF file " & aFileName, "SWAT DBF Open", )
+          LogMsg("Unable to identify Date column in SWAT DBF file " & aFileName, "SWAT DBF Open")
         ElseIf lLocnCol < 0 Then
           Open = False
           LogMsg("Unable to identify Subbasin or HUC column in SWAT DBF file " & aFileName, "SWAT DBF Open")
