@@ -14,6 +14,8 @@ Public Class atcGridSource
 
   Private pRows As Integer = 0
   Private pColumns As Integer = 0
+  Private pFixedRows As Integer = 0
+  Private pFixedColumns As Integer = 0
   Private pValues(,) As String
   Private pColors(,) As Color
   Private pSelected(,) As Boolean
@@ -152,6 +154,42 @@ Public Class atcGridSource
     End Set
   End Property
 
+  'Number of header rows that do not scroll (not overridable to hide row/column swapping from inheritors)
+  Property FixedRows() As Integer
+    Get
+      If pSwapRowsColumns Then
+        Return ProtectedFixedColumns
+      Else
+        Return ProtectedFixedRows
+      End If
+    End Get
+    Set(ByVal newValue As Integer)
+      If pSwapRowsColumns Then
+        ProtectedFixedColumns = newValue
+      Else
+        ProtectedFixedRows = newValue
+      End If
+    End Set
+  End Property
+
+  'Number of columns that do not scroll (not overridable to hide row/column swapping from inheritors)
+  Property FixedColumns() As Integer
+    Get
+      If pSwapRowsColumns Then
+        Return ProtectedFixedRows
+      Else
+        Return ProtectedFixedColumns
+      End If
+    End Get
+    Set(ByVal newValue As Integer)
+      If pSwapRowsColumns Then
+        ProtectedFixedRows = newValue
+      Else
+        ProtectedFixedColumns = newValue
+      End If
+    End Set
+  End Property
+
   'Alignment of the contents of each cell (not overridable to hide row/column swapping from inheritors)
   Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcAlignment
     Get
@@ -272,6 +310,26 @@ Public Class atcGridSource
       If Not pSelected Is Nothing Then ReDim Preserve pSelected(pRows, pColumns)
       If Not pEditable Is Nothing Then ReDim Preserve pEditable(pRows, pColumns)
       If Not pAlignment Is Nothing Then ReDim Preserve pAlignment(pRows, pColumns)
+    End Set
+  End Property
+
+  'Override this instead of FixedColumns
+  Protected Overridable Property ProtectedFixedColumns() As Integer
+    Get
+      Return pFixedColumns
+    End Get
+    Set(ByVal newValue As Integer)
+      pFixedColumns = newValue
+    End Set
+  End Property
+
+  'Override this instead of FixedRows
+  Protected Overridable Property ProtectedFixedRows() As Integer
+    Get
+      Return pFixedRows
+    End Get
+    Set(ByVal newValue As Integer)
+      pFixedRows = newValue
     End Set
   End Property
 
