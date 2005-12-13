@@ -193,16 +193,18 @@ Friend Class frmDisplaySeasonalAttributes
 
   'Translator class between pDataGroup and agdMain
   Private pSource As atcSeasonalAttributesGridSource
+  Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
   Private Sub PopulateGrid()
-    Dim lWasSwapped As Boolean = Not pSource Is Nothing AndAlso pSource.SwapRowsColumns
+    Dim lWasSwapped As Boolean = Not pSwapperSource Is Nothing AndAlso pSwapperSource.SwapRowsColumns
     pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
     If pSource.Columns < 3 Then
       UserSpecifyAttributes()
       pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
     End If
-    If lWasSwapped Then pSource.SwapRowsColumns = True
-    agdMain.Initialize(pSource)
+    pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
+    If lWasSwapped Then pSwapperSource.SwapRowsColumns = True
+    agdMain.Initialize(pSwapperSource)
     agdMain.SizeAllColumnsToContents()
     agdMain.Refresh()
   End Sub
@@ -275,11 +277,11 @@ Friend Class frmDisplaySeasonalAttributes
   'True for rows and columns to be swapped, false for normal orientation
   Public Property SwapRowsColumns() As Boolean
     Get
-      Return pSource.SwapRowsColumns
+      Return pSwapperSource.SwapRowsColumns
     End Get
     Set(ByVal newValue As Boolean)
-      If pSource.SwapRowsColumns <> newValue Then
-        pSource.SwapRowsColumns = newValue
+      If pSwapperSource.SwapRowsColumns <> newValue Then
+        pSwapperSource.SwapRowsColumns = newValue
         agdMain.Refresh()
       End If
       mnuViewSeasonRows.Checked = newValue

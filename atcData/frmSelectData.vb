@@ -1124,7 +1124,7 @@ Friend Class GridSource
     pDataGroup = aDataGroup
   End Sub
 
-  Protected Overrides Property ProtectedColumns() As Integer
+  Overrides Property Columns() As Integer
     Get
       Return pDataManager.SelectionAttributes.Count() + 1
     End Get
@@ -1132,7 +1132,7 @@ Friend Class GridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedRows() As Integer
+  Overrides Property Rows() As Integer
     Get
       Return pDataGroup.Count + LabelRow + 1
     End Get
@@ -1140,7 +1140,7 @@ Friend Class GridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+  Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
       If aRow = LabelRow Then
         If aColumn = 0 Then
@@ -1158,7 +1158,7 @@ Friend Class GridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+  Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
       If aRow > LabelRow AndAlso aColumn > 0 Then
         Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(pDataManager.SelectionAttributes(aColumn - 1))
@@ -1175,7 +1175,7 @@ Friend Class GridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedCellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+  Overrides Property CellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
     Get
       If Not pSelected Is Nothing Then
         If aRow = LabelRow Then
@@ -1217,7 +1217,7 @@ Friend Class ListSource
     End If
   End Sub
 
-  Protected Overrides Property ProtectedColumns() As Integer
+  Overrides Property Columns() As Integer
     Get
       Return 1
     End Get
@@ -1225,7 +1225,7 @@ Friend Class ListSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedRows() As Integer
+  Overrides Property Rows() As Integer
     Get
       If pValues Is Nothing Then Return 1
       Return pValues.Count
@@ -1234,7 +1234,7 @@ Friend Class ListSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+  Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
       Try
         Return pValues.ItemByIndex(aRow)
@@ -1246,7 +1246,7 @@ Friend Class ListSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+  Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
       Return pAlignment
     End Get
@@ -1255,9 +1255,9 @@ Friend Class ListSource
     End Set
   End Property
 
-  'Protected Overrides Property ProtectedCellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
+  'Overrides Property CellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
   '  Get
-  '    If pSelected.Contains(ProtectedCellValue(aRow, aColumn)) Then
+  '    If pSelected.Contains(CellValue(aRow, aColumn)) Then
   '      Return System.Drawing.SystemColors.Highlight
   '    Else
   '      Return System.Drawing.SystemColors.Window 'TODO: use grid's CellBackColor
@@ -1267,14 +1267,14 @@ Friend Class ListSource
   '  End Set
   'End Property
 
-  Protected Overrides Property ProtectedCellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+  Overrides Property CellSelected(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
     Get
       Return pSelected.Keys.Contains(aRow) ' & "," & aColumn)
     End Get
     Set(ByVal newValue As Boolean)
       If newValue Then
         If Not pSelected.Keys.Contains(aRow) Then
-          pSelected.Add(aRow, ProtectedCellValue(aRow, aColumn))
+          pSelected.Add(aRow, CellValue(aRow, aColumn))
         End If
       Else
         pSelected.RemoveByKey(aRow)

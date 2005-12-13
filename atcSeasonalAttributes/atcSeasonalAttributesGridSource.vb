@@ -35,7 +35,7 @@ Friend Class atcSeasonalAttributesGridSource
     Next
   End Sub
 
-  Protected Overrides Property ProtectedColumns() As Integer
+  Overrides Property Columns() As Integer
     Get
       If pSeasons Is Nothing Then
         Return 3
@@ -47,7 +47,7 @@ Friend Class atcSeasonalAttributesGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedRows() As Integer
+  Overrides Property Rows() As Integer
     Get
       Try
         Return pDataGroup.Count * pAttributes.Count + 1
@@ -59,7 +59,7 @@ Friend Class atcSeasonalAttributesGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+  Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
       If aRow = 0 Then
         Select Case aColumn
@@ -75,11 +75,11 @@ Friend Class atcSeasonalAttributesGridSource
           Case Else
             With pDataGroup((aRow - 1) \ pAttributes.Count).Attributes
               Dim lSeasonalAttrName As String = pAttributes.GetByIndex(lAttributeIndex) & " " & pSeasons.GetKey(aColumn - 2)
-              ProtectedCellValue = .GetFormattedValue(lSeasonalAttrName, "<nothing>") 'works first try only for 3-digit seasons
-              If ProtectedCellValue.Equals("<nothing>") Then 'work around formatting issue for 2 digit season index
-                ProtectedCellValue = .GetFormattedValue(ReplaceString(lSeasonalAttrName, " 0", " "), "<nothing>")
-                If ProtectedCellValue.Equals("<nothing>") Then 'work around formatting issue for 1 digit season index
-                  ProtectedCellValue = .GetFormattedValue(ReplaceString(lSeasonalAttrName, " 00", " "))
+              CellValue = .GetFormattedValue(lSeasonalAttrName, "<nothing>") 'works first try only for 3-digit seasons
+              If CellValue.Equals("<nothing>") Then 'work around formatting issue for 2 digit season index
+                CellValue = .GetFormattedValue(ReplaceString(lSeasonalAttrName, " 0", " "), "<nothing>")
+                If CellValue.Equals("<nothing>") Then 'work around formatting issue for 1 digit season index
+                  CellValue = .GetFormattedValue(ReplaceString(lSeasonalAttrName, " 00", " "))
                 End If
               End If
             End With
@@ -90,7 +90,7 @@ Friend Class atcSeasonalAttributesGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+  Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
       If aColumn > 1 Then
         Return atcControls.atcAlignment.HAlignDecimal

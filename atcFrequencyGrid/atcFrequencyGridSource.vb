@@ -48,7 +48,7 @@ Friend Class atcFrequencyGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedColumns() As Integer
+  Overrides Property Columns() As Integer
     Get
       If pNdays Is Nothing Then
         Return 3
@@ -60,7 +60,7 @@ Friend Class atcFrequencyGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedRows() As Integer
+  Overrides Property Rows() As Integer
     Get
       Try
         Return pDataGroup.Count * pRecurrence.Count + 1
@@ -85,7 +85,7 @@ Friend Class atcFrequencyGridSource
     Return atcUtility.ReplaceString(pRecurrence.GetByIndex((aRow - 1) Mod pRecurrence.Count), ",", "")
   End Function
 
-  Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+  Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
       If aRow = 0 Then
         Select Case aColumn
@@ -163,7 +163,7 @@ Friend Class atcFrequencyGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+  Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
       If aColumn > 0 Then
         Return atcControls.atcAlignment.HAlignDecimal
@@ -175,7 +175,7 @@ Friend Class atcFrequencyGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedCellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
+  Overrides Property CellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
     Get
       If aColumn > 1 AndAlso aRow > 0 Then
         Return System.Drawing.SystemColors.Window

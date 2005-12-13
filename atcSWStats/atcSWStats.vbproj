@@ -138,11 +138,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcSWStatsSource.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "frmDisplaySWStats.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
