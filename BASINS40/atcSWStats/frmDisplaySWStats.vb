@@ -59,13 +59,7 @@ Friend Class frmDisplaySWStats
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuView As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuViewColumns As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuViewRows As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAddAttributes As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuViewHigh As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuViewLow As System.Windows.Forms.MenuItem
-  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
@@ -83,12 +77,6 @@ Friend Class frmDisplaySWStats
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
     Me.mnuEdit = New System.Windows.Forms.MenuItem
     Me.mnuEditCopy = New System.Windows.Forms.MenuItem
-    Me.mnuView = New System.Windows.Forms.MenuItem
-    Me.mnuViewColumns = New System.Windows.Forms.MenuItem
-    Me.mnuViewRows = New System.Windows.Forms.MenuItem
-    Me.MenuItem1 = New System.Windows.Forms.MenuItem
-    Me.mnuViewHigh = New System.Windows.Forms.MenuItem
-    Me.mnuViewLow = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.mnuReport = New System.Windows.Forms.MenuItem
     Me.mnuRptFreq = New System.Windows.Forms.MenuItem
@@ -99,7 +87,7 @@ Friend Class frmDisplaySWStats
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuReport})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuAnalysis, Me.mnuReport})
     '
     'mnuFile
     '
@@ -133,39 +121,6 @@ Friend Class frmDisplaySWStats
     Me.mnuEditCopy.Index = 0
     Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
     Me.mnuEditCopy.Text = "Copy"
-    '
-    'mnuView
-    '
-    Me.mnuView.Index = 2
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewColumns, Me.mnuViewRows, Me.MenuItem1, Me.mnuViewHigh, Me.mnuViewLow})
-    Me.mnuView.Text = "&View"
-    '
-    'mnuViewColumns
-    '
-    Me.mnuViewColumns.Checked = True
-    Me.mnuViewColumns.Index = 0
-    Me.mnuViewColumns.Text = "Columns"
-    '
-    'mnuViewRows
-    '
-    Me.mnuViewRows.Index = 1
-    Me.mnuViewRows.Text = "Rows"
-    '
-    'MenuItem1
-    '
-    Me.MenuItem1.Index = 2
-    Me.MenuItem1.Text = "-"
-    '
-    'mnuViewHigh
-    '
-    Me.mnuViewHigh.Checked = True
-    Me.mnuViewHigh.Index = 3
-    Me.mnuViewHigh.Text = "High"
-    '
-    'mnuViewLow
-    '
-    Me.mnuViewLow.Index = 4
-    Me.mnuViewLow.Text = "Low"
     '
     'mnuAnalysis
     '
@@ -224,9 +179,6 @@ Friend Class frmDisplaySWStats
   'The group of atcTimeseries displayed
   Private WithEvents pDataGroup As atcDataGroup
 
-  'Translator class between pDataGroup and agdMain
-  Private pSource As atcSWStatsSource
-
   Private Sub PopulateGrid()
   End Sub
 
@@ -258,20 +210,6 @@ Friend Class frmDisplaySWStats
     'TODO: could efficiently remove by serial number
   End Sub
 
-  Private Sub mnuViewColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewColumns.Click
-    mnuViewColumns.Checked = True
-    mnuViewRows.Checked = False
-    pSource.SwapRowsColumns = False
-    '    agdMain.Refresh()
-  End Sub
-
-  Private Sub mnuViewRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewRows.Click
-    mnuViewColumns.Checked = False
-    mnuViewRows.Checked = True
-    pSource.SwapRowsColumns = True
-    '    agdMain.Refresh()
-  End Sub
-
   Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
     UserSpecifyAttributes()
     PopulateGrid()
@@ -281,23 +219,12 @@ Friend Class frmDisplaySWStats
     Dim lForm As New frmSpecifyFrequency
     Dim lChoseHigh As Boolean
     If lForm.AskUser(pDataGroup, lChoseHigh) Then
-      '      Me.HighDisplay = lChoseHigh
     End If
   End Sub
 
   Public Overrides Function ToString() As String
     Return Me.Text & vbCrLf & txtReport.Text
   End Function
-
-  'True for rows and columns to be swapped, false for normal orientation
-  Public Property SwapRowsColumns() As Boolean
-    Get
-      Return pSource.SwapRowsColumns
-    End Get
-    Set(ByVal newValue As Boolean)
-      pSource.SwapRowsColumns = newValue
-    End Set
-  End Property
 
   Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
     Clipboard.SetDataObject(Me.ToString)

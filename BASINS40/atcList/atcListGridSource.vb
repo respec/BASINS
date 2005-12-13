@@ -31,7 +31,7 @@ Friend Class atcListGridSource
     RefreshAllDates()
   End Sub
 
-  Protected Overrides Property ProtectedColumns() As Integer
+  Overrides Property Columns() As Integer
     Get
       Return pDataGroup.Count + 1
     End Get
@@ -39,16 +39,19 @@ Friend Class atcListGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedRows() As Integer
+  Overrides Property Rows() As Integer
     Get
-      ProtectedRows = pDataManager.DisplayAttributes.Count()
-      If Not pAllDates Is Nothing Then ProtectedRows += pAllDates.numValues
+      If pAllDates Is Nothing Then
+        Return pDataManager.DisplayAttributes.Count
+      Else
+        Return pDataManager.DisplayAttributes.Count + pAllDates.numValues
+      End If
     End Get
     Set(ByVal Value As Integer)
     End Set
   End Property
 
-  Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+  Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
       Dim lAttributeRows As Integer = pDataManager.DisplayAttributes.Count
       Select Case aColumn
@@ -82,7 +85,7 @@ Friend Class atcListGridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+  Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
       If aColumn = 0 Then
         Return atcControls.atcAlignment.HAlignLeft

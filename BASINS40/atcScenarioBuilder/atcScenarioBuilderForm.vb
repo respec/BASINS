@@ -1039,7 +1039,7 @@ Friend Class GridSource
     pModifiedScenarios = aModifiedScenarios
   End Sub
 
-  Protected Overrides Property ProtectedColumns() As Integer
+  Overrides Property Columns() As Integer
     Get
       If pModifiedScenarios Is Nothing Then
         Return 3
@@ -1052,7 +1052,7 @@ Friend Class GridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedRows() As Integer
+  Overrides Property Rows() As Integer
     Get
       If pBaseScenario Is Nothing Then
         Return pLabelRow + 1
@@ -1086,7 +1086,7 @@ Friend Class GridSource
     Return Nothing
   End Function
 
-  Protected Overrides Property ProtectedCellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
+  Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
     Get
       Select Case aRow
         Case Is >= Rows
@@ -1164,7 +1164,7 @@ Friend Class GridSource
     End Set
   End Property
 
-  Protected Overrides Property ProtectedAlignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
+  Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
     Get
       '      If aRow = pLabelRow Then
       'Return atcControls.atcAlignment.HAlignLeft

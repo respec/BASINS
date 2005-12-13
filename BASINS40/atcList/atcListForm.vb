@@ -141,6 +141,7 @@ Friend Class atcListForm
 
   'Translator class between pDataGroup and agdMain
   Private pSource As atcListGridSource
+  Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
   Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
                Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
@@ -174,7 +175,9 @@ Friend Class atcListForm
   Private Sub PopulateGrid()
     Dim lTotalWidth As Integer = 10
     pSource = New atcListGridSource(pDataManager, pDataGroup)
-    agdMain.Initialize(pSource)
+    pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
+    pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
+    agdMain.Initialize(pSwapperSource)
     agdMain.SizeAllColumnsToContents()
     For iColumn As Integer = 0 To pSource.Columns
       lTotalWidth += agdMain.ColumnWidth(iColumn)
@@ -201,12 +204,12 @@ Friend Class atcListForm
   End Sub
 
   Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
-    PopulateGrid()
+    If Me.Visible Then PopulateGrid()
     'TODO: could efficiently insert newly added item(s)
   End Sub
 
   Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
-    PopulateGrid()
+    If Me.Visible Then PopulateGrid()
     'TODO: could efficiently remove by serial number
   End Sub
 
@@ -232,21 +235,21 @@ Friend Class atcListForm
   End Sub
 
   Private Sub mnuAttributeRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAttributeRows.Click
-    RowsOrColumns = False
+    SwapRowsColumns = False
   End Sub
 
   Private Sub mnuAttributeColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAttributeColumns.Click
-    RowsOrColumns = True
+    SwapRowsColumns = True
   End Sub
 
   'True for attributes in columns, False for attributes in rows
-  Public Property RowsOrColumns() As Boolean
+  Public Property SwapRowsColumns() As Boolean
     Get
-      Return pSource.SwapRowsColumns
+      Return pSwapperSource.SwapRowsColumns
     End Get
     Set(ByVal newValue As Boolean)
-      If pSource.SwapRowsColumns <> newValue Then
-        pSource.SwapRowsColumns = newValue
+      If pSwapperSource.SwapRowsColumns <> newValue Then
+        pSwapperSource.SwapRowsColumns = newValue
         agdMain.Refresh()
       End If
       mnuAttributeColumns.Checked = newValue

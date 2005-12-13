@@ -212,8 +212,8 @@ Friend Class frmDisplayFrequencyGrid
   'The group of atcTimeseries displayed
   Private WithEvents pDataGroup As atcDataGroup
 
-  'Translator class between pDataGroup and agdMain
   Private pSource As atcFrequencyGridSource
+  Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
   Private Sub PopulateGrid()
     pSource = New atcFrequencyGridSource(pDataGroup)
@@ -221,10 +221,12 @@ Friend Class frmDisplayFrequencyGrid
       UserSpecifyAttributes()
       pSource = New atcFrequencyGridSource(pDataGroup)
     End If
-
-    pSource.SwapRowsColumns = mnuViewRows.Checked
     pSource.High = mnuViewHigh.Checked
-    agdMain.Initialize(pSource)
+
+    pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
+    pSwapperSource.SwapRowsColumns = mnuViewRows.Checked
+
+    agdMain.Initialize(pSwapperSource)
     agdMain.SizeAllColumnsToContents()
 
     Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSource.Rows * agdMain.RowHeight(0)
@@ -256,25 +258,19 @@ Friend Class frmDisplayFrequencyGrid
   End Sub
 
   Private Sub mnuViewColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewColumns.Click
-    mnuViewColumns.Checked = True
-    mnuViewRows.Checked = False
-    pSource.SwapRowsColumns = False
-    agdMain.Refresh()
+    SwapRowsColumns = False
   End Sub
 
   Private Sub mnuViewRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewRows.Click
-    mnuViewColumns.Checked = False
-    mnuViewRows.Checked = True
-    pSource.SwapRowsColumns = True
-    agdMain.Refresh()
+    SwapRowsColumns = True
   End Sub
 
   Private Sub mnuViewHigh_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewHigh.Click
-    Me.HighDisplay = True
+    HighDisplay = True
   End Sub
 
   Private Sub mnuViewLow_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewLow.Click
-    Me.HighDisplay = False
+    HighDisplay = False
   End Sub
 
   Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
@@ -297,10 +293,15 @@ Friend Class frmDisplayFrequencyGrid
   'True for rows and columns to be swapped, false for normal orientation
   Public Property SwapRowsColumns() As Boolean
     Get
-      Return pSource.SwapRowsColumns
+      Return pSwapperSource.SwapRowsColumns
     End Get
     Set(ByVal newValue As Boolean)
-      pSource.SwapRowsColumns = newValue
+      If pSwapperSource.SwapRowsColumns <> newValue Then
+        pSwapperSource.SwapRowsColumns = newValue
+        agdMain.Refresh()
+      End If
+      mnuViewRows.Checked = newValue
+      mnuViewColumns.Checked = Not newValue
     End Set
   End Property
 
