@@ -31,8 +31,6 @@ Public Class atcGrid
   Private pColumnEditing As Integer = -1
   Private pRowEditing As Integer = -1
 
-  Private WithEvents pCellTextbox As TextBox
-
 #Region " Windows Form Designer generated code "
 
   Public Sub New()
@@ -61,10 +59,12 @@ Public Class atcGrid
   Friend WithEvents scrollCorner As System.Windows.Forms.Panel
   Friend WithEvents VScroller As System.Windows.Forms.VScrollBar
   Friend WithEvents HScroller As System.Windows.Forms.HScrollBar
+  Friend WithEvents CellEditBox As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Me.VScroller = New System.Windows.Forms.VScrollBar
     Me.HScroller = New System.Windows.Forms.HScrollBar
     Me.scrollCorner = New System.Windows.Forms.Panel
+    Me.CellEditBox = New System.Windows.Forms.TextBox
     Me.SuspendLayout()
     '
     'VScroller
@@ -94,8 +94,18 @@ Public Class atcGrid
     Me.scrollCorner.TabIndex = 3
     Me.scrollCorner.Visible = False
     '
+    'CellEditBox
+    '
+    Me.CellEditBox.Location = New System.Drawing.Point(32, 96)
+    Me.CellEditBox.Name = "CellEditBox"
+    Me.CellEditBox.Size = New System.Drawing.Size(104, 20)
+    Me.CellEditBox.TabIndex = 4
+    Me.CellEditBox.Text = ""
+    Me.CellEditBox.Visible = False
+    '
     'atcGrid
     '
+    Me.Controls.Add(Me.CellEditBox)
     Me.Controls.Add(Me.scrollCorner)
     Me.Controls.Add(Me.HScroller)
     Me.Controls.Add(Me.VScroller)
@@ -564,37 +574,46 @@ Public Class atcGrid
   Private Function CellBounds(ByVal aRow As Integer, ByVal aColumn As Integer) As Rectangle
     Dim lX As Integer = 0
     Dim lY As Integer = 0
+    Dim lFixedRows As Integer = pSource.FixedRows
+    Dim lFixedColumns As Integer = pSource.FixedColumns
 
-    For lRow As Integer = pTopRow To aRow - 1
-      lY += RowHeight(lRow)
+    For lRow As Integer = 0 To aRow - 1
+      If lRow < lFixedRows OrElse lRow >= pTopRow Then
+        lY += RowHeight(lRow)
+      ElseIf lRow < pTopRow - 1 Then 'skip rows we can't see
+        lRow = pTopRow - 1
+      End If
     Next
     For lColumn As Integer = pLeftColumn To aColumn - 1
-      lX += ColumnWidth(lColumn)
+      If lColumn < lFixedColumns OrElse lColumn >= pLeftColumn Then
+        lX += ColumnWidth(lColumn)
+      Else
+        lColumn = pLeftColumn - 1
+      End If
     Next
     Return New Rectangle(lX, lY, ColumnWidth(aColumn), RowHeight(aRow))
   End Function
 
-  Public Sub EditCell(ByVal aRow As Integer, ByVal aColumn As Integer)
+  Public Sub EditCell(ByVal aRow As Integer, ByVal aColumn As Integer, Optional ByVal aOverrideEditable As Boolean = False)
     EditCellFinished()
-    Dim EditCellBounds As Rectangle = CellBounds(aRow, aColumn)
-    pColumnEditing = aColumn
-    pRowEditing = aRow
-    pCellTextbox = New TextBox
-    pCellTextbox.Text = pSource.CellValue(aRow, aColumn)
-    Me.Controls.Add(pCellTextbox)
-    pCellTextbox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)
-    pCellTextbox.Visible = True
-  End Sub
-
-  Public Sub EditCellFinished()
-    If Not pCellTextbox Is Nothing Then
-      If pCellTextbox.Visible Then ChangeSelectedValues(pCellTextbox.Text)
-      Me.Controls.Remove(pCellTextbox)
-      pCellTextbox = Nothing
+    If aOverrideEditable OrElse pSource.CellEditable(aRow, aColumn) Then
+      Dim EditCellBounds As Rectangle = CellBounds(aRow, aColumn)
+      pColumnEditing = aColumn
+      pRowEditing = aRow
+      CellEditBox.Text = pSource.CellValue(aRow, aColumn)
+      CellEditBox.BackColor = pSource.CellColor(aRow, aColumn)
+      CellEditBox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)
+      CellEditBox.Visible = True
+      CellEditBox.Focus()
     End If
   End Sub
 
-  Private Sub ChangeSelectedValues(ByVal aNewValue As String)
+  Public Sub EditCellFinished()
+    If CellEditBox.Visible Then ChangeEditingValues(CellEditBox.Text)
+    CellEditBox.Visible = False
+  End Sub
+
+  Private Sub ChangeEditingValues(ByVal aNewValue As String)
     pSource.CellValue(pRowEditing, pColumnEditing) = aNewValue
   End Sub
 
@@ -670,13 +689,13 @@ Public Class atcGrid
       'If within tolerance of column edge
       If Math.Abs(X - pColumnRight.ItemByIndex(lColumnIndex)) <= DRAG_TOLERANCE Then
         lColumn = pColumnRight.Keys(lColumnIndex)
-        'If ColumnWidth(lColumn) > 0 Then
-        'ColumnWidth of zero means we are not displaying this column, so it is not resizable
-        'ElseIf Not AllowHorizontalScrolling AndAlso Not pSource Is Nothing AndAlso lColumn >= pSource.Columns - 1 Then
-        'If we are not allowing horizontal scrolling, last column is not resizable
-        'Else
-        Return lColumn
-        'End If
+        If ColumnWidth(lColumn) <= 0 Then
+          'ColumnWidth of zero means we are not displaying this column, so it is not resizable
+        ElseIf Not AllowHorizontalScrolling AndAlso Not pSource Is Nothing AndAlso lColumn >= pSource.Columns - 1 Then
+          'If we are not allowing horizontal scrolling, last column is not resizable
+        Else
+          Return lColumn
+        End If
       End If
       lColumnIndex += 1
     End While
@@ -727,22 +746,28 @@ Public Class atcGrid
   End Sub
 
   Private Sub VScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles VScroller.ValueChanged
+    VScroller.Focus()
     pTopRow = VScroller.Value
     Refresh()
   End Sub
 
   Private Sub HScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HScroller.ValueChanged
+    HScroller.Focus()
     pLeftColumn = HScroller.Value
     Refresh()
   End Sub
 
-  Private Sub pCellTextbox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles pCellTextbox.KeyDown
+  Private Sub CellEditBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles CellEditBox.KeyDown
     Select Case e.KeyCode
-      Case Keys.Escape : pCellTextbox.Visible = False : EditCellFinished()
+      Case Keys.Escape : CellEditBox.Visible = False : EditCellFinished()
       Case Keys.Enter : EditCellFinished()
       Case Keys.Tab : EditCellFinished() 'TODO: shift editing right one column
       Case Keys.Up : EditCellFinished() 'TODO: shift editing 
       Case Keys.Down : EditCellFinished() 'TODO: shift editing 
     End Select
+  End Sub
+
+  Private Sub CellEditBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles CellEditBox.LostFocus
+    EditCellFinished()
   End Sub
 End Class
