@@ -130,19 +130,33 @@ Public Class atcGridSource
         End If
 
         Dim newValues(aNewRows, Columns) As String
+        Dim newColors(,) As Color
+        Dim newSelected(,) As Boolean
+        Dim newEditable(,) As Boolean
+        Dim newAlignment(,) As atcAlignment
+
+        If Not pColors Is Nothing Then ReDim newColors(pRows, pColumns)
+        If Not pSelected Is Nothing Then ReDim newSelected(pRows, pColumns)
+        If Not pEditable Is Nothing Then ReDim newEditable(pRows, pColumns)
+        If Not pAlignment Is Nothing Then ReDim newAlignment(pRows, pColumns)
+
         For iRow As Integer = 0 To lastRowCopied
           pRows = aNewRows
           For iColumn As Integer = 0 To pColumns
             newValues(iRow, iColumn) = pValues(iRow, iColumn)
+            If Not pColors Is Nothing Then newColors(iRow, iColumn) = pColors(iRow, iColumn)
+            If Not pSelected Is Nothing Then newSelected(iRow, iColumn) = pSelected(iRow, iColumn)
+            If Not pEditable Is Nothing Then newEditable(iRow, iColumn) = pEditable(iRow, iColumn)
+            If Not pAlignment Is Nothing Then newAlignment(iRow, iColumn) = pAlignment(iRow, iColumn)
           Next
         Next
-        pRows = aNewRows
         pValues = newValues
-        'TODO: copy these arrays, currently they all end up full of Nothing
-        If Not pColors Is Nothing Then ReDim pColors(pRows, pColumns)
-        If Not pSelected Is Nothing Then ReDim pSelected(pRows, pColumns)
-        If Not pEditable Is Nothing Then ReDim pEditable(pRows, pColumns)
-        If Not pAlignment Is Nothing Then ReDim pAlignment(pRows, pColumns)
+        If Not pColors Is Nothing Then pColors = newColors
+        If Not pSelected Is Nothing Then pSelected = newSelected
+        If Not pEditable Is Nothing Then pEditable = newEditable
+        If Not pAlignment Is Nothing Then pAlignment = newAlignment
+
+        pRows = aNewRows
         RaiseEvent ChangedRows(aNewRows)
       End If
     End Set
