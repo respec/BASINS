@@ -67,7 +67,7 @@ Public Class PlugIn
     Dim mnu As MapWindow.Interfaces.MenuItem
 
     pMapWin = MapWin
-    pMapWin.Menus.AddMenu(DelineateMenuName, "", Nothing, DelineateMenuString)
+    pMapWin.Menus.AddMenu(DelineateMenuName, "", Nothing, DelineateMenuString, "mnuFile")
     mnu = pMapWin.Menus.AddMenu(DelineateMenuName & "_ManDelin", DelineateMenuName, Nothing, "&Manual")
     pInitialized = False
     
