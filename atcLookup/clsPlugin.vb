@@ -4,7 +4,6 @@ Public Class PlugIn
   Public pMapWin As MapWindow.Interfaces.IMapWin
 
   'TODO: get these 3 from BASINS4 or plugInManager?
-  Private Const ToolsMenuName As String = "BasinsTools"
   Private Const UtilitiesMenuName As String = "BasinsUtilities"
   Private Const UtilitiesMenuString As String = "&Utilities"
 
@@ -66,7 +65,7 @@ Public Class PlugIn
 
     pMapWin = MapWin
 
-    pMapWin.Menus.AddMenu(UtilitiesMenuName, "", Nothing, UtilitiesMenuString)
+    pMapWin.Menus.AddMenu(UtilitiesMenuName, "", Nothing, UtilitiesMenuString, "mnuFile")
     mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_Projection", UtilitiesMenuName, Nothing, "&Projection Parameters")
     mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_Storet", UtilitiesMenuName, Nothing, "STORET &Agency Codes")
     mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_Sic", UtilitiesMenuName, Nothing, "Standard &Industrial Classifcation Codes")

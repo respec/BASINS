@@ -68,7 +68,7 @@ Public Class PlugIn
 
     pMapWin = MapWin
 
-    pMapWin.Menus.AddMenu(UtilitiesMenuName, "", Nothing, UtilitiesMenuString)
+    pMapWin.Menus.AddMenu(UtilitiesMenuName, "", Nothing, UtilitiesMenuString, "mnuFile")
     mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_LandUse", UtilitiesMenuName, Nothing, "&Reclassify Land Use")
 
   End Sub
