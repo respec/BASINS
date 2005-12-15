@@ -997,8 +997,8 @@ Public Class GisUtil
     GetMappingObject.StatusBar.ProgressBarValue = 0
 
     lPolygonSf.BeginPointInShapefile()
-    For ic = startingcolumn To endingcolumn
-      For ir = startingrow To endingrow
+    For ir = startingrow To endingrow
+      For ic = startingcolumn To endingcolumn
         InputGrid.CellToProj(ic, ir, xpos, ypos)
         subid = lPolygonSf.PointInShapefile(xpos, ypos)
         If subid > -1 Then
@@ -1015,8 +1015,8 @@ Public Class GisUtil
           lastdisplayed = Int(cellcount / totalcellcount * 100)
           GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
         End If
-      Next ir
-    Next ic
+      Next ic
+    Next ir
     GetMappingObject.StatusBar.ShowProgressBar = False
     lPolygonSf.EndPointInShapefile()
   End Sub
@@ -1124,6 +1124,7 @@ Public Class GisUtil
     Dim Feature1Id As String
     Dim Feature2Id As String
     Dim bsuc As Boolean
+    Dim lnumshapes As Integer
 
     'set layer 1 (landuse)
     Layer1Index = LayerIndex(Layer1Name)
@@ -1211,7 +1212,8 @@ Public Class GisUtil
     polygoncount = 0
     lastdisplayed = 0
     GetMappingObject.StatusBar.ProgressBarValue = 0
-    For i = 1 To lusf.NumShapes
+    lnumshapes = lusf.NumShapes
+    For i = 1 To lnumshapes
       'loop through each shape of the land use layer
       lusfshape = lusf.Shape(i - 1)
       LUext = lusfshape.Extents
