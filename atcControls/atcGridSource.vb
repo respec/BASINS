@@ -124,9 +124,9 @@ Public Class atcGridSource
       If aNewRows <> pRows Then
         Dim lastRowCopied As Integer
         If pRows > aNewRows Then
-          lastRowCopied = aNewRows
+          lastRowCopied = aNewRows - 1
         Else
-          lastRowCopied = pRows
+          lastRowCopied = pRows - 1
         End If
 
         Dim newValues(aNewRows, Columns) As String
@@ -142,7 +142,7 @@ Public Class atcGridSource
 
         For iRow As Integer = 0 To lastRowCopied
           pRows = aNewRows
-          For iColumn As Integer = 0 To pColumns
+          For iColumn As Integer = 0 To pColumns - 1
             newValues(iRow, iColumn) = pValues(iRow, iColumn)
             If Not pColors Is Nothing Then newColors(iRow, iColumn) = pColors(iRow, iColumn)
             If Not pSelected Is Nothing Then newSelected(iRow, iColumn) = pSelected(iRow, iColumn)
