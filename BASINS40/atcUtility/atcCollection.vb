@@ -117,7 +117,17 @@ Public Class atcCollection
   End Sub
 
   Public Shadows Sub Sort(ByVal index As Integer, ByVal count As Integer, ByVal comparer As System.Collections.IComparer)
-    Err.Raise(1000, Me, "Sort not implemented")
+    Dim lNewKeys As ArrayList = New ArrayList(pKeys)
+    Dim lNewValues As New ArrayList
+    Dim lOldIndex As Integer
+    lNewKeys.Sort(index, count, comparer)
+    For Each lNewKey As Object In lNewKeys
+      lOldIndex = pKeys.IndexOf(lNewKey)
+      lNewValues.Add(MyBase.Item(lOldIndex))
+      pKeys.Item(lOldIndex) = Nothing
+    Next
+    MyBase.Clear()
+    MyBase.AddRange(lNewValues)
   End Sub
 
   Public Shadows Sub TrimToSize()
