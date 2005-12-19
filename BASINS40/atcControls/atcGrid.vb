@@ -3,8 +3,9 @@ Imports atcUtility
 Public Class atcGrid
   Inherits System.Windows.Forms.UserControl
 
+  Event CellEdited(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
   Event MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer)
-  Event UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer)
+  Event UserResizedColumn(ByVal aGrid As atcGrid, ByVal aColumn As Integer, ByVal aWidth As Integer)
 
   Private WithEvents pSource As atcGridSource
 
@@ -241,6 +242,15 @@ Public Class atcGrid
         pAllowHorizontalScrolling = newValue
         Me.Refresh()
       End If
+    End Set
+  End Property
+
+  Public Overrides Property Font() As Font
+    Get
+      Return pFont
+    End Get
+    Set(ByVal newValue As Font)
+      pFont = newValue
     End Set
   End Property
 
@@ -614,7 +624,10 @@ Public Class atcGrid
   End Sub
 
   Private Sub ChangeEditingValues(ByVal aNewValue As String)
-    pSource.CellValue(pRowEditing, pColumnEditing) = aNewValue
+    If aNewValue <> pSource.CellValue(pRowEditing, pColumnEditing) Then
+      pSource.CellValue(pRowEditing, pColumnEditing) = aNewValue
+      RaiseEvent CellEdited(Me, pRowEditing, pColumnEditing)
+    End If
   End Sub
 
   Protected Overrides Sub OnMouseDown(ByVal e As System.Windows.Forms.MouseEventArgs)
@@ -661,7 +674,7 @@ Public Class atcGrid
           If ColumnWidth(pColumnDragging) < DRAG_TOLERANCE * 2 Then 'it got too small
             ColumnWidth(pColumnDragging) = DRAG_TOLERANCE * 2       'enforce small minimun size
           End If
-          RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
+          RaiseEvent UserResizedColumn(Me, pColumnDragging, ColumnWidth(pColumnDragging))
           Refresh()
         End If
     End Select
@@ -673,7 +686,7 @@ Public Class atcGrid
       SizeColumnToContents(pColumnDragging)
       If ColumnWidth(pColumnDragging) <> lOldWidth Then
         Refresh()
-        RaiseEvent UserResizedColumn(pColumnDragging, ColumnWidth(pColumnDragging))
+        RaiseEvent UserResizedColumn(Me, pColumnDragging, ColumnWidth(pColumnDragging))
       End If
     End If
   End Sub

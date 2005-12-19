@@ -1002,13 +1002,13 @@ NextName:
     Populate()
   End Sub
 
-  Private Sub pMatchingGrid_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles pMatchingGrid.UserResizedColumn
+  Private Sub pMatchingGrid_UserResizedColumn(ByVal aGrid As atcGrid, ByVal aColumn As Integer, ByVal aWidth As Integer) Handles pMatchingGrid.UserResizedColumn
     pSelectedGrid.ColumnWidth(aColumn) = aWidth
     pSelectedGrid.Refresh()
     ResizeOneCriteria(aColumn - 1, aWidth)
   End Sub
 
-  Private Sub pSelectedGrid_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles pSelectedGrid.UserResizedColumn
+  Private Sub pSelectedGrid_UserResizedColumn(ByVal aGrid As atcGrid, ByVal aColumn As Integer, ByVal aWidth As Integer) Handles pSelectedGrid.UserResizedColumn
     pMatchingGrid.ColumnWidth(aColumn) = aWidth
     pMatchingGrid.Refresh()
     ResizeOneCriteria(aColumn - 1, aWidth)

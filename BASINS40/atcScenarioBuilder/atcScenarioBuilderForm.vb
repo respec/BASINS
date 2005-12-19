@@ -880,13 +880,13 @@ Friend Class atcScenarioBuilderForm
     End If
   End Sub
 
-  Private Sub agdMain_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles agdMain.UserResizedColumn
+  Private Sub agdMain_UserResizedColumn(ByVal aGrid As atcGrid, ByVal aColumn As Integer, ByVal aWidth As Integer) Handles agdMain.UserResizedColumn
     agdResults.ColumnWidth(aColumn) = aWidth
     agdResults.Refresh()
     PositionRunButtons()
   End Sub
 
-  Private Sub agdResults_UserResizedColumn(ByVal aColumn As Integer, ByVal aWidth As Integer) Handles agdResults.UserResizedColumn
+  Private Sub agdResults_UserResizedColumn(ByVal aGrid As atcGrid, ByVal aColumn As Integer, ByVal aWidth As Integer) Handles agdResults.UserResizedColumn
     agdMain.ColumnWidth(aColumn) = aWidth
     agdMain.Refresh()
     PositionRunButtons()
