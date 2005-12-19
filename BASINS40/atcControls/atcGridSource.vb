@@ -135,13 +135,12 @@ Public Class atcGridSource
         Dim newEditable(,) As Boolean
         Dim newAlignment(,) As atcAlignment
 
-        If Not pColors Is Nothing Then ReDim newColors(pRows, pColumns)
-        If Not pSelected Is Nothing Then ReDim newSelected(pRows, pColumns)
-        If Not pEditable Is Nothing Then ReDim newEditable(pRows, pColumns)
-        If Not pAlignment Is Nothing Then ReDim newAlignment(pRows, pColumns)
+        If Not pColors Is Nothing Then ReDim newColors(aNewRows, pColumns)
+        If Not pSelected Is Nothing Then ReDim newSelected(aNewRows, pColumns)
+        If Not pEditable Is Nothing Then ReDim newEditable(aNewRows, pColumns)
+        If Not pAlignment Is Nothing Then ReDim newAlignment(aNewRows, pColumns)
 
         For iRow As Integer = 0 To lastRowCopied
-          pRows = aNewRows
           For iColumn As Integer = 0 To pColumns - 1
             newValues(iRow, iColumn) = pValues(iRow, iColumn)
             If Not pColors Is Nothing Then newColors(iRow, iColumn) = pColors(iRow, iColumn)
