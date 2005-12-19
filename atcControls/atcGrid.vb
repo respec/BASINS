@@ -11,7 +11,7 @@ Public Class atcGrid
 
   Private Const DRAG_TOLERANCE As Integer = 2
 
-  Private pFont As Font = New Font("Microsoft Sans Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point)
+  Private pFont As Font = MyBase.Font
 
   Private pAllowHorizontalScrolling As Boolean = True
   Private pLineColor As Color
@@ -251,6 +251,7 @@ Public Class atcGrid
     End Get
     Set(ByVal newValue As Font)
       pFont = newValue
+      MyBase.Font = pFont
     End Set
   End Property
 
@@ -610,6 +611,7 @@ Public Class atcGrid
       Dim EditCellBounds As Rectangle = CellBounds(aRow, aColumn)
       pColumnEditing = aColumn
       pRowEditing = aRow
+      CellEditBox.Font = pFont
       CellEditBox.Text = pSource.CellValue(aRow, aColumn)
       CellEditBox.BackColor = pSource.CellColor(aRow, aColumn)
       CellEditBox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)

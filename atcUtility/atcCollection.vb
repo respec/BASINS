@@ -113,7 +113,7 @@ Public Class atcCollection
   End Sub
 
   Public Shadows Sub Sort(ByVal comparer As System.Collections.IComparer)
-    Sort(1, MyBase.Count, comparer)
+    Sort(0, MyBase.Count, comparer)
   End Sub
 
   Public Shadows Sub Sort(ByVal index As Integer, ByVal count As Integer, ByVal comparer As System.Collections.IComparer)
