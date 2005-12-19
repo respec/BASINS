@@ -93,15 +93,6 @@
                     Private = "False"
                 />
                 <Reference
-                    Name = "AxATCoCtl"
-                    Guid = "{872F11D5-3322-11D4-9D23-00A0C9768F70}"
-                    VersionMajor = "1"
-                    VersionMinor = "10"
-                    Lcid = "0"
-                    WrapperTool = "aximp"
-                    Private = "False"
-                />
-                <Reference
                     Name = "ChilkatDotNet"
                     AssemblyName = "ChilkatDotNet"
                     HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ChilkatDotNet.dll"
