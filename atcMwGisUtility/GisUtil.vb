@@ -1225,10 +1225,13 @@ Public Class GisUtil
           polygoncount = polygoncount + 1
           If Not (LUext.xMin > cSsfShapeExtXmax(k) Or LUext.xMax < cSsfShapeExtXmin(k) Or LUext.yMin > cSsfShapeExtYmax(k) Or LUext.yMax < cSsfShapeExtYmin(k)) Then
             'look for intersection from overlay of these shapes
-            newshape = utilClip.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, lusfshape, ssfshape)
+            newshape = utilClip.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, lusfshape, cSsfShape(k))
             If newshape.numPoints > 0 Then
               'Insert the shape into the shapefile 
-              osf.EditInsertShape(newshape, osf.NumShapes)
+              bsuc = osf.EditInsertShape(newshape, osf.NumShapes)
+              If Not bsuc Then
+                'MsgBox("problem adding shape in overlay")
+              End If
               area = Math.Abs(utilArea.Area(newshape))
               'keep track of which subbasin and land use class
               Feature1Id = lusf.CellValue(Layer1FieldIndex, i - 1)
