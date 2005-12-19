@@ -40,7 +40,7 @@ Public Class atcGridSource
     End Get
     Set(ByVal newValue As String)
       If pValues Is Nothing Then
-        ReDim pValues(pRows, pColumns)
+        ReDim pValues(pRows - 1, pColumns - 1)
       End If
       ExpandRowsColumns(aRow, aColumn)
       If pValues(aRow, aColumn) <> newValue Then
@@ -70,7 +70,7 @@ Public Class atcGridSource
     End Get
     Set(ByVal newValue As Color)
       If pColors Is Nothing Then
-        ReDim pColors(pRows, pColumns)
+        ReDim pColors(pRows - 1, pColumns - 1)
       End If
       ExpandRowsColumns(aRow, aColumn)
       pColors(aRow, aColumn) = newValue
@@ -89,7 +89,7 @@ Public Class atcGridSource
     Set(ByVal newValue As Boolean)
       ExpandRowsColumns(aRow, aColumn)
       If pSelected Is Nothing Then
-        ReDim pSelected(pRows, pColumns)
+        ReDim pSelected(pRows - 1, pColumns - 1)
       End If
       pSelected(aRow, aColumn) = newValue
     End Set
@@ -108,7 +108,7 @@ Public Class atcGridSource
       If newValue <> CellEditable(aRow, aColumn) Then
         ExpandRowsColumns(aRow, aColumn)
         If pEditable Is Nothing Then
-          ReDim pEditable(pRows, pColumns)
+          ReDim pEditable(pRows - 1, pColumns - 1)
         End If
         pEditable(aRow, aColumn) = newValue
       End If
@@ -135,10 +135,10 @@ Public Class atcGridSource
         Dim newEditable(,) As Boolean
         Dim newAlignment(,) As atcAlignment
 
-        If Not pColors Is Nothing Then ReDim newColors(aNewRows, pColumns)
-        If Not pSelected Is Nothing Then ReDim newSelected(aNewRows, pColumns)
-        If Not pEditable Is Nothing Then ReDim newEditable(aNewRows, pColumns)
-        If Not pAlignment Is Nothing Then ReDim newAlignment(aNewRows, pColumns)
+        If Not pColors Is Nothing Then ReDim newColors(aNewRows - 1, pColumns - 1)
+        If Not pSelected Is Nothing Then ReDim newSelected(aNewRows - 1, pColumns - 1)
+        If Not pEditable Is Nothing Then ReDim newEditable(aNewRows - 1, pColumns - 1)
+        If Not pAlignment Is Nothing Then ReDim newAlignment(aNewRows - 1, pColumns - 1)
 
         For iRow As Integer = 0 To lastRowCopied
           For iColumn As Integer = 0 To pColumns - 1
@@ -166,13 +166,15 @@ Public Class atcGridSource
     Get
       Return pColumns
     End Get
-    Set(ByVal newValue As Integer)
-      pColumns = newValue
-      ReDim Preserve pValues(pRows, pColumns)
-      If Not pColors Is Nothing Then ReDim Preserve pColors(pRows, pColumns)
-      If Not pSelected Is Nothing Then ReDim Preserve pSelected(pRows, pColumns)
-      If Not pEditable Is Nothing Then ReDim Preserve pEditable(pRows, pColumns)
-      If Not pAlignment Is Nothing Then ReDim Preserve pAlignment(pRows, pColumns)
+    Set(ByVal aNewColumns As Integer)
+      If aNewColumns <> pColumns Then
+        pColumns = aNewColumns
+        ReDim Preserve pValues(pRows - 1, pColumns - 1)
+        If Not pColors Is Nothing Then ReDim Preserve pColors(pRows - 1, pColumns - 1)
+        If Not pSelected Is Nothing Then ReDim Preserve pSelected(pRows - 1, pColumns - 1)
+        If Not pEditable Is Nothing Then ReDim Preserve pEditable(pRows - 1, pColumns - 1)
+        If Not pAlignment Is Nothing Then ReDim Preserve pAlignment(pRows - 1, pColumns - 1)
+      End If
     End Set
   End Property
 
@@ -207,7 +209,7 @@ Public Class atcGridSource
     End Get
     Set(ByVal newValue As atcAlignment)
       If pAlignment Is Nothing Then
-        ReDim pAlignment(pRows, pColumns)
+        ReDim pAlignment(pRows - 1, pColumns - 1)
       End If
       ExpandRowsColumns(aRow, aColumn)
       pAlignment(aRow, aColumn) = newValue
@@ -224,14 +226,14 @@ Public Class atcGridSource
 
   'Expands Rows and/or Columns if needed to reach from 0,0 to aRow, aColumn
   Protected Sub ExpandRowsColumns(ByVal aRow As Integer, ByVal aColumn As Integer)
-    If aRow > Rows + 1 Then Rows = aRow + 1
-    If aColumn > Columns + 1 Then Columns = aColumn + 1
+    If aRow >= Rows Then Rows = aRow + 1
+    If aColumn >= Columns Then Columns = aColumn + 1
   End Sub
 
   Public Overrides Function ToString() As String
     Dim lCellValue As String
     Dim lAddTabs() As Boolean
-    ReDim lAddTabs(Me.Columns)
+    ReDim lAddTabs(Me.Columns - 1)
     Dim lMaxCol As Integer = Columns - 1
     Dim lMaxRow As Integer = Rows - 1
 
