@@ -212,6 +212,15 @@ Public Class atcGrid
     End Set
   End Property
 
+  Public Property CellBackColor() As Color
+    Get
+      Return pCellBackColor
+    End Get
+    Set(ByVal newValue As Color)
+      pCellBackColor = newValue
+    End Set
+  End Property
+
   Public Property RowHeight(ByVal iRow) As Integer
     Get
       If pRowHeight.Count = 0 Then
@@ -362,8 +371,11 @@ Public Class atcGrid
           lRow = pTopRow - 1
         End If
       Next
+
       'Fill unused space below bottom line
-      g.FillRectangle(lOutsideBrush, 0, y, visibleWidth, visibleHeight - y)
+      If y < visibleHeight Then
+        g.FillRectangle(lOutsideBrush, 0, y, visibleWidth, visibleHeight - y)
+      End If
 
       'Draw Column Lines
       pColumnRight = New atcCollection
@@ -379,10 +391,16 @@ Public Class atcGrid
           lColumnWidth = ColumnWidth(lColumn)
           If lColumnWidth > 0 Then
             x += lColumnWidth
-            If lColumn = lColumns - 1 AndAlso Not AllowHorizontalScrolling AndAlso x <> visibleWidth Then
-              ColumnWidth(lColumn) += visibleWidth - x
-              x = visibleWidth
-              'RaiseEvent UserResizedColumn(lColumn, ColumnWidth(lColumn))
+            If Not AllowHorizontalScrolling AndAlso x < visibleWidth Then
+              'See if this is the last non-hidden column to expand to fit the available width
+              Dim lScanHiddenColumns As Integer = lColumn + 1
+              While lScanHiddenColumns < lColumns AndAlso ColumnWidth(lScanHiddenColumns) = 0
+                lScanHiddenColumns += 1
+              End While
+              If lScanHiddenColumns = lColumns Then 'Any columns right of this one are hidden
+                ColumnWidth(lColumn) += visibleWidth - x 'Expand this one
+                x = visibleWidth
+              End If
             End If
             If x > visibleWidth Then
               If AllowHorizontalScrolling Then
@@ -396,7 +414,7 @@ Public Class atcGrid
                 Else
                   HScroller.LargeChange = 1
                 End If
-                HScroller.Maximum = lColumns '- HScroller.LargeChange + 1
+                HScroller.Maximum = lColumns
                 pColumnRight.Add(lColumn, x)
                 Exit For
               Else
@@ -413,8 +431,8 @@ Public Class atcGrid
 
       SizeScrollers()
 
-      If AllowHorizontalScrolling Then
-        'Fill unused space right of rightmost column
+      'Fill unused space right of rightmost column
+      If x < visibleWidth Then
         g.FillRectangle(lOutsideBrush, x, 0, visibleWidth - x, visibleHeight)
       End If
 
@@ -791,7 +809,8 @@ Public Class atcGrid
   End Sub
 
   Private Sub VScroller_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles VScroller.MouseWheel
-    Dim lNewValue As Integer = VScroller.Value - VScroller.SmallChange * e.Delta / 120
+    Dim lNewValue As Integer = VScroller.Value
+    If e.Delta > 0 Then lNewValue -= 1 Else lNewValue += 1
     If lNewValue < VScroller.Minimum Then
       VScroller.Value = VScroller.Minimum
     ElseIf lNewValue > VScroller.Maximum Then

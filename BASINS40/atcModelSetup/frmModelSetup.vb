@@ -1,5 +1,6 @@
 Imports atcUtility
 Imports atcMwGisUtility
+Imports System.Drawing
 
 Public Class frmModelSetup
   Inherits System.Windows.Forms.Form
@@ -1257,17 +1258,17 @@ Public Class frmModelSetup
     End If
 
     With AtcGridPervious.Source
-      .CellColor(0, 0) = System.Drawing.SystemColors.ControlDark
-      .CellColor(0, 1) = System.Drawing.SystemColors.ControlDark
-      .CellColor(0, 2) = System.Drawing.SystemColors.ControlDark
-      .CellColor(0, 3) = System.Drawing.SystemColors.ControlDark
-      .CellColor(0, 4) = System.Drawing.SystemColors.ControlDark
+      .CellColor(0, 0) = SystemColors.ControlDark
+      .CellColor(0, 1) = SystemColors.ControlDark
+      .CellColor(0, 2) = SystemColors.ControlDark
+      .CellColor(0, 3) = SystemColors.ControlDark
+      .CellColor(0, 4) = SystemColors.ControlDark
       For i = 1 To .Rows - 1
         .CellEditable(i, 2) = True
         .CellEditable(i, 3) = True
         .CellEditable(i, 4) = True
-        .CellColor(i, 0) = System.Drawing.SystemColors.ControlDark
-        .CellColor(i, 1) = System.Drawing.SystemColors.ControlDark
+        .CellColor(i, 0) = SystemColors.ControlDark
+        .CellColor(i, 1) = SystemColors.ControlDark
       Next i
     End With
     AtcGridPervious.Refresh()
@@ -2573,7 +2574,7 @@ ErrHand:
 
     With AtcGridPervious
       .Source = New atcControls.atcGridSource
-      .Font = New Drawing.Font(.Font, Drawing.FontStyle.Bold)
+      .Font = New Font(.Font, FontStyle.Bold)
       .AllowHorizontalScrolling = False
     End With
 
@@ -2585,6 +2586,27 @@ ErrHand:
     If ofdClass.ShowDialog() = DialogResult.OK Then
       lblClass.Text = ofdClass.FileName
       SetPerviousGrid()
+    End If
+  End Sub
+
+  Private Sub AtcGridPervious_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridPervious.CellEdited
+    Dim lNewValue As String = aGrid.Source.CellValue(aRow, aColumn)
+    Dim lNewColor As Color = aGrid.Source.CellColor(aRow, aColumn)
+    Dim lNewValueNumeric As Double = Double.NaN
+
+    If IsNumeric(lNewValue) Then lNewValueNumeric = CDbl(lNewValue)
+
+    Select Case aColumn
+      Case 2 'Percent should be between 0 and 100
+        If lNewValueNumeric >= 0 AndAlso lNewValueNumeric <= 100 Then
+          lNewColor = aGrid.CellBackColor
+        Else
+          lNewColor = Color.Pink
+        End If
+    End Select
+
+    If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
+      aGrid.Source.CellColor(aRow, aColumn) = lNewColor
     End If
   End Sub
 End Class
