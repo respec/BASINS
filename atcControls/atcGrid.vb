@@ -747,14 +747,18 @@ Public Class atcGrid
 
   Private Sub VScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles VScroller.ValueChanged
     VScroller.Focus()
-    pTopRow = VScroller.Value
-    Refresh()
+    If pTopRow <> VScroller.Value Then
+      pTopRow = VScroller.Value
+      Refresh()
+    End If
   End Sub
 
   Private Sub HScroll_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HScroller.ValueChanged
     HScroller.Focus()
-    pLeftColumn = HScroller.Value
-    Refresh()
+    If pLeftColumn <> HScroller.Value Then
+      pLeftColumn = HScroller.Value
+      Refresh()
+    End If
   End Sub
 
   Private Sub CellEditBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles CellEditBox.KeyDown
@@ -769,5 +773,20 @@ Public Class atcGrid
 
   Private Sub CellEditBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles CellEditBox.LostFocus
     EditCellFinished()
+  End Sub
+
+  Private Sub VScroller_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles VScroller.MouseWheel
+    Dim lNewValue As Integer = VScroller.Value - VScroller.SmallChange * e.Delta / 120
+    If lNewValue < VScroller.Minimum Then
+      VScroller.Value = VScroller.Minimum
+    ElseIf lNewValue > VScroller.Maximum Then
+      VScroller.Value = VScroller.Maximum
+    Else
+      VScroller.Value = lNewValue
+    End If
+  End Sub
+
+  Protected Overrides Sub OnMouseWheel(ByVal e As System.Windows.Forms.MouseEventArgs)
+    VScroller_MouseWheel(Me, e)
   End Sub
 End Class
