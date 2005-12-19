@@ -91,13 +91,13 @@ Public Class frmModelSetup
   Friend WithEvents cmdHelp As System.Windows.Forms.Button
   Friend WithEvents cmdAbout As System.Windows.Forms.Button
   Friend WithEvents ofdExisting As System.Windows.Forms.OpenFileDialog
-  Friend WithEvents grdPervious As AxATCoCtl.AxATCoGrid
   Friend WithEvents ofdCustom As System.Windows.Forms.OpenFileDialog
   Friend WithEvents lblCustom As System.Windows.Forms.Label
   Friend WithEvents Label20 As System.Windows.Forms.Label
   Friend WithEvents lblClass As System.Windows.Forms.Label
   Friend WithEvents cmdChange As System.Windows.Forms.Button
   Friend WithEvents ofdClass As System.Windows.Forms.OpenFileDialog
+  Friend WithEvents AtcGridPervious As atcControls.atcGrid
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmModelSetup))
     Me.TabControl1 = New System.Windows.Forms.TabControl
@@ -113,10 +113,10 @@ Public Class frmModelSetup
     Me.Label2 = New System.Windows.Forms.Label
     Me.Label1 = New System.Windows.Forms.Label
     Me.TabPage2 = New System.Windows.Forms.TabPage
+    Me.AtcGridPervious = New atcControls.atcGrid
     Me.cmdChange = New System.Windows.Forms.Button
     Me.lblClass = New System.Windows.Forms.Label
     Me.Label20 = New System.Windows.Forms.Label
-    Me.grdPervious = New AxATCoCtl.AxATCoGrid
     Me.cboDescription = New System.Windows.Forms.ComboBox
     Me.lblDescription = New System.Windows.Forms.Label
     Me.cboLandUseLayer = New System.Windows.Forms.ComboBox
@@ -168,7 +168,6 @@ Public Class frmModelSetup
     Me.TabControl1.SuspendLayout()
     Me.TabPage1.SuspendLayout()
     Me.TabPage2.SuspendLayout()
-    CType(Me.grdPervious, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.TabPage4.SuspendLayout()
     Me.TabPage3.SuspendLayout()
     Me.TabPage5.SuspendLayout()
@@ -196,6 +195,7 @@ Public Class frmModelSetup
     '
     'TabPage1
     '
+    Me.TabPage1.BackColor = System.Drawing.SystemColors.Control
     Me.TabPage1.Controls.Add(Me.cboOutlets)
     Me.TabPage1.Controls.Add(Me.cboStreams)
     Me.TabPage1.Controls.Add(Me.cboSubbasins)
@@ -306,10 +306,10 @@ Public Class frmModelSetup
     '
     'TabPage2
     '
+    Me.TabPage2.Controls.Add(Me.AtcGridPervious)
     Me.TabPage2.Controls.Add(Me.cmdChange)
     Me.TabPage2.Controls.Add(Me.lblClass)
     Me.TabPage2.Controls.Add(Me.Label20)
-    Me.TabPage2.Controls.Add(Me.grdPervious)
     Me.TabPage2.Controls.Add(Me.cboDescription)
     Me.TabPage2.Controls.Add(Me.lblDescription)
     Me.TabPage2.Controls.Add(Me.cboLandUseLayer)
@@ -319,6 +319,20 @@ Public Class frmModelSetup
     Me.TabPage2.Size = New System.Drawing.Size(520, 355)
     Me.TabPage2.TabIndex = 1
     Me.TabPage2.Text = "Land Use"
+    '
+    'AtcGridPervious
+    '
+    Me.AtcGridPervious.AllowHorizontalScrolling = True
+    Me.AtcGridPervious.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.AtcGridPervious.LineColor = System.Drawing.Color.Empty
+    Me.AtcGridPervious.LineWidth = 0.0!
+    Me.AtcGridPervious.Location = New System.Drawing.Point(24, 152)
+    Me.AtcGridPervious.Name = "AtcGridPervious"
+    Me.AtcGridPervious.Size = New System.Drawing.Size(480, 184)
+    Me.AtcGridPervious.Source = Nothing
+    Me.AtcGridPervious.TabIndex = 18
     '
     'cmdChange
     '
@@ -348,19 +362,6 @@ Public Class frmModelSetup
     Me.Label20.TabIndex = 15
     Me.Label20.Text = "Classification File:"
     Me.Label20.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-    '
-    'grdPervious
-    '
-    Me.grdPervious.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.grdPervious.ContainingControl = Me
-    Me.grdPervious.Enabled = True
-    Me.grdPervious.Location = New System.Drawing.Point(32, 152)
-    Me.grdPervious.Name = "grdPervious"
-    Me.grdPervious.OcxState = CType(resources.GetObject("grdPervious.OcxState"), System.Windows.Forms.AxHost.State)
-    Me.grdPervious.Size = New System.Drawing.Size(464, 176)
-    Me.grdPervious.TabIndex = 14
     '
     'cboDescription
     '
@@ -606,7 +607,7 @@ Public Class frmModelSetup
     Me.cboSub3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboSub3.Location = New System.Drawing.Point(240, 136)
     Me.cboSub3.Name = "cboSub3"
-    Me.cboSub3.Size = New System.Drawing.Size(168, 24)
+    Me.cboSub3.Size = New System.Drawing.Size(168, 22)
     Me.cboSub3.TabIndex = 5
     '
     'cboSub2
@@ -616,7 +617,7 @@ Public Class frmModelSetup
     Me.cboSub2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboSub2.Location = New System.Drawing.Point(240, 104)
     Me.cboSub2.Name = "cboSub2"
-    Me.cboSub2.Size = New System.Drawing.Size(168, 24)
+    Me.cboSub2.Size = New System.Drawing.Size(168, 22)
     Me.cboSub2.TabIndex = 4
     '
     'cboSub1
@@ -626,7 +627,7 @@ Public Class frmModelSetup
     Me.cboSub1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboSub1.Location = New System.Drawing.Point(240, 72)
     Me.cboSub1.Name = "cboSub1"
-    Me.cboSub1.Size = New System.Drawing.Size(168, 24)
+    Me.cboSub1.Size = New System.Drawing.Size(168, 22)
     Me.cboSub1.TabIndex = 3
     '
     'Label9
@@ -837,7 +838,6 @@ Public Class frmModelSetup
     Me.TabControl1.ResumeLayout(False)
     Me.TabPage1.ResumeLayout(False)
     Me.TabPage2.ResumeLayout(False)
-    CType(Me.grdPervious, System.ComponentModel.ISupportInitialize).EndInit()
     Me.TabPage4.ResumeLayout(False)
     Me.TabPage3.ResumeLayout(False)
     Me.TabPage5.ResumeLayout(False)
@@ -1000,6 +1000,7 @@ Public Class frmModelSetup
 
   Private Sub cboLanduse_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLanduse.SelectedIndexChanged
     Dim lyr As Long
+    Dim ldef As Integer
 
     If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
       cboLandUseLayer.Visible = False
@@ -1010,14 +1011,19 @@ Public Class frmModelSetup
       SetPerviousGrid()
     ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
       cboLandUseLayer.Items.Clear()
+      ldef = 0
       For lyr = 0 To GisUtil.NumLayers() - 1
         If GisUtil.LayerType(lyr) = 3 Then
           'PolygonShapefile
           cboLandUseLayer.Items.Add(GisUtil.LayerName(lyr))
+          If GisUtil.NumFeatures(lyr) < 1000 And ldef = 0 Then
+            ldef = cboLandUseLayer.Items.Count
+          End If
         End If
       Next
       If cboLandUseLayer.Items.Count > 0 And cboLandUseLayer.SelectedIndex < 0 Then
-        cboLandUseLayer.SelectedIndex = 0
+        'pick one without too many polygons for efficiency
+        cboLandUseLayer.SelectedIndex = ldef - 1
       End If
       cboLandUseLayer.Visible = True
       lblLandUseLayer.Visible = True
@@ -1103,9 +1109,24 @@ Public Class frmModelSetup
     Dim tmpDbf As IATCTable
     Dim tcode As Long, prevcode As Long
     Dim showmults As Boolean, showcodes As Boolean
+    Dim lSorted As New atcCollection
 
-    grdPervious.ClearValues()
-    grdPervious.rows = 0
+    If AtcGridPervious.Source Is Nothing Then Exit Sub
+
+    AtcGridPervious.Clear()
+    With AtcGridPervious.Source
+      .Rows = 0
+      .Columns = 5
+      .CellValue(0, 0) = "Code"
+      .CellValue(0, 1) = "Group Description"
+      .CellValue(0, 2) = "Percent Pervious"
+      .CellValue(0, 3) = "Multiplier"
+      .CellValue(0, 4) = "Subbasin"
+      .ColorCells = True
+      .FixedRows = 1
+      .FixedColumns = 2
+      .Rows = 1
+    End With
 
     If lblClass.Text <> "<none>" And _
       (cboLandUseLayer.Visible = False Or _
@@ -1148,79 +1169,109 @@ Public Class frmModelSetup
 
       If showmults Then
         showcodes = True
-        grdPervious.set_ColTitle(3, "Multiplier")
-        grdPervious.set_ColTitle(4, "Subbasin")
-      Else
-        grdPervious.set_ColTitle(3, "HIDE")
-        grdPervious.set_ColTitle(4, "HIDE")
-      End If
-      If showcodes Then
-        grdPervious.set_ColTitle(0, "Code")
-      Else
-        grdPervious.set_ColTitle(0, "HIDE")
       End If
 
-      'now populate grid
+      'sort list items
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
-        If Not showcodes Then
-          'just show group desc and percent perv
-          alreadyinlist = False
-          For k = 1 To grdPervious.rows
-            If grdPervious.get_TextMatrix(k, 1) = tmpDbf.Value(2) Then
-              alreadyinlist = True
-            End If
-          Next
-          If Not alreadyinlist Then
-            grdPervious.rows = grdPervious.rows + 1
-            grdPervious.set_TextMatrix(grdPervious.rows, 1, tmpDbf.Value(2))
-            grdPervious.set_TextMatrix(grdPervious.rows, 2, tmpDbf.Value(3))
-          End If
-        Else
-          'need to show whole table
-          grdPervious.rows = grdPervious.rows + 1
-          grdPervious.set_TextMatrix(grdPervious.rows, 0, tmpDbf.Value(1))
-          grdPervious.set_TextMatrix(grdPervious.rows, 1, tmpDbf.Value(2))
-          grdPervious.set_TextMatrix(grdPervious.rows, 2, tmpDbf.Value(3))
-          grdPervious.set_TextMatrix(grdPervious.rows, 3, tmpDbf.Value(4))
-          grdPervious.set_TextMatrix(grdPervious.rows, 4, tmpDbf.Value(5))
-        End If
+        lSorted.Add(tmpDbf.Value(1), i)
       Next i
-      If showcodes Then
-        'sort based on codes
-        grdPervious.Sort(0, True)
-      End If
+      lSorted.Sort()
+
+      'now populate grid
+      With AtcGridPervious.Source
+        For Each i In lSorted
+          tmpDbf.CurrentRecord = i
+          If Not showcodes Then
+            'just show group desc and percent perv
+            alreadyinlist = False
+            For k = 1 To .Rows
+              If .CellValue(k - 1, 1) = tmpDbf.Value(2) Then
+                alreadyinlist = True
+              End If
+            Next
+            If Not alreadyinlist Then
+              .Rows = .Rows + 1
+              .CellValue(.Rows - 1, 1) = tmpDbf.Value(2)
+              .CellValue(.Rows - 1, 2) = tmpDbf.Value(3)
+              .CellEditable(.Rows - 1, 2) = True
+              .CellColor(.Rows - 1, 1) = Me.BackColor
+            End If
+          Else
+            'need to show whole table
+            .Rows = .Rows + 1
+            .CellValue(.Rows - 1, 0) = tmpDbf.Value(1)
+            .CellValue(.Rows - 1, 1) = tmpDbf.Value(2)
+            .CellValue(.Rows - 1, 2) = tmpDbf.Value(3)
+            .CellValue(.Rows - 1, 3) = tmpDbf.Value(4)
+            .CellValue(.Rows - 1, 4) = tmpDbf.Value(5)
+          End If
+        Next
+      End With
+
+      AtcGridPervious.SizeAllColumnsToContents()
       If showmults Then
-        grdPervious.ColsSizeByContents()
+        showcodes = True
+      Else
+        AtcGridPervious.ColumnWidth(3) = 0
+        AtcGridPervious.ColumnWidth(4) = 0
+      End If
+      If Not showcodes Then
+        AtcGridPervious.ColumnWidth(0) = 0
       End If
 
     ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-      If cboLandUseLayer.SelectedIndex > -1 And cboDescription.SelectedIndex > -1 Then
-        LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-        LandUseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
-        'no reclass file, get unique landuse names
-        lyr = GisUtil.LayerIndex(LandUseLayerName)
-        If lyr > -1 Then
-          FillListUniqueLandUses(lyr, LandUseFieldName)
+        If cboLandUseLayer.SelectedIndex > -1 And cboDescription.SelectedIndex > -1 Then
+          LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+          LandUseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
+          'no reclass file, get unique landuse names
+          lyr = GisUtil.LayerIndex(LandUseLayerName)
+          If lyr > -1 Then
+            Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+            FillListUniqueLandUses(lyr, LandUseFieldName)
+            Cursor.Current = System.Windows.Forms.Cursors.Default
+          End If
         End If
-      End If
 
     Else
-      'other grid types with no reclass file set
-      If cboLandUseLayer.SelectedIndex > -1 Then
-        LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-        'get unique landuse names
-        lyr = GisUtil.LayerIndex(LandUseLayerName)
-        If GisUtil.LayerType(lyr) = 4 Then
-          'Grid
-          For i = GisUtil.GridLayerMinimum(lyr) To GisUtil.GridLayerMaximum(lyr)
-            grdPervious.rows = grdPervious.rows + 1
-            grdPervious.set_TextMatrix(grdPervious.rows, 1, i)
-            grdPervious.set_TextMatrix(grdPervious.rows, 2, 100)
-          Next i
+        'other grid types with no reclass file set
+        If cboLandUseLayer.SelectedIndex > -1 Then
+          LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+          'get unique landuse names
+          lyr = GisUtil.LayerIndex(LandUseLayerName)
+          If GisUtil.LayerType(lyr) = 4 Then
+            'Grid
+            Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+            For i = Convert.ToInt32(GisUtil.GridLayerMinimum(lyr)) To Convert.ToInt32(GisUtil.GridLayerMaximum(lyr))
+              AtcGridPervious.Source.Rows = AtcGridPervious.Source.Rows + 1
+              AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 1) = i
+              AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 2) = 100
+            Next i
+            Cursor.Current = System.Windows.Forms.Cursors.Default
+          End If
         End If
-      End If
+        AtcGridPervious.SizeAllColumnsToContents()
+        AtcGridPervious.ColumnWidth(0) = 0
+        AtcGridPervious.ColumnWidth(3) = 0
+        AtcGridPervious.ColumnWidth(4) = 0
     End If
+
+    With AtcGridPervious.Source
+      .CellColor(0, 0) = System.Drawing.SystemColors.ControlDark
+      .CellColor(0, 1) = System.Drawing.SystemColors.ControlDark
+      .CellColor(0, 2) = System.Drawing.SystemColors.ControlDark
+      .CellColor(0, 3) = System.Drawing.SystemColors.ControlDark
+      .CellColor(0, 4) = System.Drawing.SystemColors.ControlDark
+      For i = 1 To .Rows - 1
+        .CellEditable(i, 2) = True
+        .CellEditable(i, 3) = True
+        .CellEditable(i, 4) = True
+        .CellColor(i, 0) = System.Drawing.SystemColors.ControlDark
+        .CellColor(i, 1) = System.Drawing.SystemColors.ControlDark
+      Next i
+    End With
+    AtcGridPervious.Refresh()
+
   End Sub
 
   Private Sub cboDescription_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboDescription.SelectedIndexChanged
@@ -1286,29 +1337,40 @@ Public Class frmModelSetup
   Private Sub FillListUniqueLandUses(ByVal layerindex As Long, ByVal fieldname As String)
     Dim i As Long, j As Long, k As Long
     Dim alreadyinlist As Boolean
+    Dim lstr As String
 
     i = GisUtil.FieldIndex(layerindex, fieldname)
     If i > -1 Then
       'this is the field we want, get land use types
+      Dim cUnique As New Collection
       For j = 0 To GisUtil.NumFeatures(layerindex) - 1
         alreadyinlist = False
-        For k = 1 To grdPervious.rows
-          If grdPervious.get_TextMatrix(k, 1) = GisUtil.FieldValue(layerindex, j, i) Then
+        lstr = GisUtil.FieldValue(layerindex, j, i)
+        For k = 1 To cUnique.Count
+          If cUnique(k) = lstr Then
             alreadyinlist = True
           End If
         Next
         If Not alreadyinlist Then
-          With grdPervious
-            .rows = .rows + 1
-            .set_TextMatrix(grdPervious.rows, 1, GisUtil.FieldValue(layerindex, j, i))
+          With AtcGridPervious.Source
+            .Rows = AtcGridPervious.Source.Rows + 1
+            .CellValue(.Rows - 1, 1) = GisUtil.FieldValue(layerindex, j, i)
             If UCase(Microsoft.VisualBasic.Left(GisUtil.FieldValue(layerindex, j, i), 5)) = "URBAN" Then
-              .set_TextMatrix(.rows, 2, "50")
+              .CellValue(.Rows - 1, 2) = 50
             Else
-              .set_TextMatrix(.rows, 2, "100")
+              .CellValue(.Rows - 1, 2) = 100
             End If
+            .CellEditable(.Rows - 1, 2) = True
+            cUnique.Add(GisUtil.FieldValue(layerindex, j, i))
           End With
         End If
       Next j
+      With AtcGridPervious
+        .SizeAllColumnsToContents()
+        .ColumnWidth(0) = 0
+        .ColumnWidth(3) = 0
+        .ColumnWidth(4) = 0
+      End With
     End If
   End Sub
 
@@ -1363,7 +1425,7 @@ Public Class frmModelSetup
     Dim lastdisplayed As Long
     Dim aAreaLS(,) As Double
     Dim bfirst As Boolean
-    Dim tmpDbf As IATCTable
+    Dim tmpDbf As IatcTable
 
     On Error GoTo ErrHand
 
@@ -1801,7 +1863,7 @@ ErrHand:
     Dim incollection As Boolean
     Dim percentperv As Double
     Dim tarea As Double, stype As String
-    Dim tmpDbf As IATCTable
+    Dim tmpDbf As IatcTable
     Dim PerArea(,) As Single
     Dim ImpArea(,) As Single
     Dim length() As Single
@@ -1818,7 +1880,7 @@ ErrHand:
     Dim cRcode As New Collection
     Dim cRname As New Collection
     UseSimpleGrid = False
-    If Len(ReclassifyFile) > 0 And grdPervious.get_ColTitle(0) = "HIDE" Then
+    If Len(ReclassifyFile) > 0 And AtcGridPervious.ColumnWidth(0) = 0 Then
       'have the simple percent pervious grid, need to know which 
       'lucodes correspond to which lugroups
       UseSimpleGrid = True
@@ -1851,16 +1913,16 @@ ErrHand:
 
     'build collection of unique landuse groups
     Dim cUniqueLugroups As New Collection
-    For i = 1 To grdPervious.rows
+    For i = 1 To AtcGridPervious.Source.Rows
       incollection = False
       For j = 1 To cUniqueLugroups.Count
-        If cUniqueLugroups(j) = grdPervious.get_TextMatrix(i, 1) Then
+        If cUniqueLugroups(j) = AtcGridPervious.Source.CellValue(i, 1) Then
           incollection = True
           Exit For
         End If
       Next j
       If Not incollection Then
-        cUniqueLugroups.Add(grdPervious.get_TextMatrix(i, 1))
+        cUniqueLugroups.Add(AtcGridPervious.Source.CellValue(i, 1))
       End If
     Next i
 
@@ -1889,9 +1951,9 @@ ErrHand:
           End If
         Next j
         'find percent perv that corresponds to this lugroup
-        For j = 1 To grdPervious.rows
-          If luname = grdPervious.get_TextMatrix(j, 1) Then
-            percentperv = grdPervious.get_TextMatrix(j, 2)
+        For j = 1 To AtcGridPervious.Source.Rows
+          If luname = AtcGridPervious.Source.CellValue(j, 1) Then
+            percentperv = AtcGridPervious.Source.CellValue(j, 2)
             Exit For
           End If
         Next j
@@ -1924,36 +1986,36 @@ ErrHand:
         Next j
 
         'find lugroup that corresponds to this lucode, could be multiple matches
-        For j = 1 To grdPervious.rows
+        For j = 1 To AtcGridPervious.Source.Rows
           luname = ""
           lpos = -1
-          If cLucode(i) = grdPervious.get_TextMatrix(j, 0) Then
+          If cLucode(i) = AtcGridPervious.Source.CellValue(j, 0) Then
             'see if any of these are subbasin-specific
-            percentperv = grdPervious.get_TextMatrix(j, 2)
-            If IsNumeric(grdPervious.get_TextMatrix(j, 3)) Then
-              multiplier = CSng(grdPervious.get_TextMatrix(j, 3))
+            percentperv = AtcGridPervious.Source.CellValue(j, 2)
+            If IsNumeric(AtcGridPervious.Source.CellValue(j, 3)) Then
+              multiplier = CSng(AtcGridPervious.Source.CellValue(j, 3))
             Else
               multiplier = 1.0
             End If
-            subbasin = grdPervious.get_TextMatrix(j, 4)
+            subbasin = AtcGridPervious.Source.CellValue(j, 4)
             If Len(subbasin) > 0 Then
               'this row is subbasin-specific
               If subbasin = cSubid(i) Then
                 'we want this one now
-                luname = grdPervious.get_TextMatrix(j, 1)
+                luname = AtcGridPervious.Source.CellValue(j, 1)
               End If
             Else
               'make sure that no other rows of this lucode are 
               'subbasin-specific for this subbasin and that we 
               'should therefore not use this row
               useit = True
-              For k = 1 To grdPervious.rows
+              For k = 1 To AtcGridPervious.Source.Rows
                 If k <> j Then
-                  If grdPervious.get_TextMatrix(k, 0) = grdPervious.get_TextMatrix(j, 0) Then
+                  If AtcGridPervious.Source.CellValue(k, 0) = AtcGridPervious.Source.CellValue(j, 0) Then
                     'this other row has same lucode
-                    If grdPervious.get_TextMatrix(k, 1) = grdPervious.get_TextMatrix(j, 1) Then
+                    If AtcGridPervious.Source.CellValue(k, 1) = AtcGridPervious.Source.CellValue(j, 1) Then
                       'and the same group name
-                      subbasin = grdPervious.get_TextMatrix(k, 4)
+                      subbasin = AtcGridPervious.Source.CellValue(k, 4)
                       If Len(subbasin) > 0 Then
                         'and its subbasin-specific
                         If subbasin = cSubid(i) Then
@@ -1967,7 +2029,7 @@ ErrHand:
               Next k
               If useit Then
                 'we want this one now
-                luname = grdPervious.get_TextMatrix(j, 1)
+                luname = AtcGridPervious.Source.CellValue(j, 1)
               End If
             End If
 
@@ -2154,7 +2216,7 @@ ErrHand:
     Dim dbname As String
     Dim lnpdes As Object
     Dim ctemp As String
-    Dim tmpDbf As IATCTable
+    Dim tmpDbf As IatcTable
     Dim ParmCode() As String, ParmName() As String
     Dim RowCount As Long
     Dim prevdbf As String
@@ -2509,25 +2571,10 @@ ErrHand:
 
     tbxName.Text = FilenameOnly(GisUtil.ProjectFileName)
 
-    grdPervious.set_header("")
-    grdPervious.set_gridFontBold(True)
-    With grdPervious
-      .set_ColTitle(0, "HIDE")
-      '.set_ColTitle(0, "Code")
-      .set_ColTitle(1, "Group Description")
-      .set_ColTitle(2, "Percent Pervious")
-      .set_ColTitle(3, "HIDE")
-      .set_ColTitle(4, "HIDE")
-      '.set_ColTitle(4, "Multiplier")
-      '.set_ColTitle(5, "Subbasin")
-      .FixedCols = 2
-      .set_ColEditable(2, True)
-      .set_ColType(2, 1)
-      .set_ColMax(2, 100)
-      .set_ColMin(2, 0)
-      .set_ColType(3, 2)
-      .set_ColEditable(3, False)
-      .set_ColEditable(4, False)
+    With AtcGridPervious
+      .Source = New atcControls.atcGridSource
+      .Font = New Drawing.Font(.Font, Drawing.FontStyle.Bold)
+      .AllowHorizontalScrolling = False
     End With
 
     cboLanduse.SelectedIndex = 1
