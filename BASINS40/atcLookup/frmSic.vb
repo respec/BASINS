@@ -1,4 +1,6 @@
+Imports atcControls
 Imports atcUtility
+Imports System.Drawing
 
 Public Class frmSic
   Inherits System.Windows.Forms.Form
@@ -45,8 +47,8 @@ Public Class frmSic
   Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
   Friend WithEvents rbtNumber As System.Windows.Forms.RadioButton
   Friend WithEvents rbtName As System.Windows.Forms.RadioButton
-  Friend WithEvents agdSic As AxATCoCtl.AxATCoGrid
   Friend WithEvents lblSic As System.Windows.Forms.Label
+  Friend WithEvents agdSic As atcControls.atcGrid
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSic))
     Me.lbxSic = New System.Windows.Forms.ListBox
@@ -54,19 +56,17 @@ Public Class frmSic
     Me.lblSic = New System.Windows.Forms.Label
     Me.rbtName = New System.Windows.Forms.RadioButton
     Me.rbtNumber = New System.Windows.Forms.RadioButton
-    Me.agdSic = New AxATCoCtl.AxATCoGrid
+    Me.agdSic = New atcControls.atcGrid
     Me.GroupBox1.SuspendLayout()
-    CType(Me.agdSic, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'lbxSic
     '
     Me.lbxSic.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lbxSic.ItemHeight = 16
-    Me.lbxSic.Location = New System.Drawing.Point(16, 16)
+    Me.lbxSic.Location = New System.Drawing.Point(13, 14)
     Me.lbxSic.Name = "lbxSic"
-    Me.lbxSic.Size = New System.Drawing.Size(288, 148)
+    Me.lbxSic.Size = New System.Drawing.Size(240, 121)
     Me.lbxSic.TabIndex = 0
     '
     'GroupBox1
@@ -75,54 +75,57 @@ Public Class frmSic
     Me.GroupBox1.Controls.Add(Me.lblSic)
     Me.GroupBox1.Controls.Add(Me.rbtName)
     Me.GroupBox1.Controls.Add(Me.rbtNumber)
-    Me.GroupBox1.Location = New System.Drawing.Point(320, 8)
+    Me.GroupBox1.Location = New System.Drawing.Point(267, 7)
     Me.GroupBox1.Name = "GroupBox1"
-    Me.GroupBox1.Size = New System.Drawing.Size(232, 160)
+    Me.GroupBox1.Size = New System.Drawing.Size(193, 139)
     Me.GroupBox1.TabIndex = 1
     Me.GroupBox1.TabStop = False
     Me.GroupBox1.Text = "Search by:"
     '
     'lblSic
     '
-    Me.lblSic.Location = New System.Drawing.Point(16, 88)
+    Me.lblSic.Location = New System.Drawing.Point(13, 76)
     Me.lblSic.Name = "lblSic"
-    Me.lblSic.Size = New System.Drawing.Size(208, 64)
+    Me.lblSic.Size = New System.Drawing.Size(174, 56)
     Me.lblSic.TabIndex = 2
     '
     'rbtName
     '
-    Me.rbtName.Location = New System.Drawing.Point(16, 56)
+    Me.rbtName.Location = New System.Drawing.Point(13, 49)
     Me.rbtName.Name = "rbtName"
-    Me.rbtName.Size = New System.Drawing.Size(192, 16)
+    Me.rbtName.Size = New System.Drawing.Size(160, 13)
     Me.rbtName.TabIndex = 1
     Me.rbtName.Text = "SIC Name"
     '
     'rbtNumber
     '
     Me.rbtNumber.Checked = True
-    Me.rbtNumber.Location = New System.Drawing.Point(16, 32)
+    Me.rbtNumber.Location = New System.Drawing.Point(13, 28)
     Me.rbtNumber.Name = "rbtNumber"
-    Me.rbtNumber.Size = New System.Drawing.Size(192, 16)
+    Me.rbtNumber.Size = New System.Drawing.Size(160, 14)
     Me.rbtNumber.TabIndex = 0
     Me.rbtNumber.TabStop = True
     Me.rbtNumber.Text = "SIC Number"
     '
     'agdSic
     '
+    Me.agdSic.AllowHorizontalScrolling = True
     Me.agdSic.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.agdSic.Enabled = True
-    Me.agdSic.Location = New System.Drawing.Point(16, 184)
+    Me.agdSic.CellBackColor = System.Drawing.Color.Empty
+    Me.agdSic.LineColor = System.Drawing.Color.Empty
+    Me.agdSic.LineWidth = 0.0!
+    Me.agdSic.Location = New System.Drawing.Point(16, 160)
     Me.agdSic.Name = "agdSic"
-    Me.agdSic.OcxState = CType(resources.GetObject("agdSic.OcxState"), System.Windows.Forms.AxHost.State)
-    Me.agdSic.Size = New System.Drawing.Size(536, 142)
-    Me.agdSic.TabIndex = 11
+    Me.agdSic.Size = New System.Drawing.Size(448, 120)
+    Me.agdSic.Source = Nothing
+    Me.agdSic.TabIndex = 2
     '
     'frmSic
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-    Me.ClientSize = New System.Drawing.Size(568, 338)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+    Me.ClientSize = New System.Drawing.Size(473, 292)
     Me.Controls.Add(Me.agdSic)
     Me.Controls.Add(Me.GroupBox1)
     Me.Controls.Add(Me.lbxSic)
@@ -130,7 +133,6 @@ Public Class frmSic
     Me.Name = "frmSic"
     Me.Text = "Standard Industrial Classification Codes (SIC) Lookup Table"
     Me.GroupBox1.ResumeLayout(False)
-    CType(Me.agdSic, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
   End Sub
@@ -147,7 +149,8 @@ Public Class frmSic
 
     Me.Refresh()
     Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-    SicFile = PathNameOnly(pProjectFileName) & "\sic.dbf"
+    If pProjectFileName Is Nothing Then pProjectFileName = "\BASINS\data\national\national.mwprj"
+    SicFile = FindFile("SIC Database", PathNameOnly(PathNameOnly(pProjectFileName)) & "\national\sic.dbf")
 
     cSic = New Collection
     cSicName = New Collection
@@ -157,7 +160,7 @@ Public Class frmSic
     cUSicName = New Collection
 
     If FileExists(SicFile) Then
-      Dim tmpDbf As IATCTable
+      Dim tmpDbf As IatcTable
       tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(SicFile)
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
@@ -188,80 +191,73 @@ Public Class frmSic
 
   Private Sub frmSic_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-    With agdSic
-      .set_header("")
-      .rows = 0
-      .set_ColTitle(0, "SIC 1987")
-      .set_ColTitle(1, "SIC Name")
-      .set_ColTitle(2, "NAICS 1997")
-      .set_ColTitle(3, "NAICS Name")
-      .set_ColEditable(0, False)
-      .set_ColEditable(1, False)
-      .set_ColEditable(2, False)
-      .set_ColEditable(3, False)
+    agdSic.Source = New atcGridSource
+    agdSic.Clear()
+    With agdSic.Source
+      .Rows = 3
+      .Columns = 4
+      .FixedRows = 1
+      .ColorCells = True
+      .CellColor(0, 0) = SystemColors.ControlDark
+      .CellColor(0, 1) = SystemColors.ControlDark
+      .CellColor(0, 2) = SystemColors.ControlDark
+      .CellColor(0, 3) = SystemColors.ControlDark
+      .CellValue(0, 0) = "SIC 1987"
+      .CellValue(0, 1) = "SIC Name"
+      .CellValue(0, 2) = "NAICS 1997"
+      .CellValue(0, 3) = "NAICS Name"
     End With
     lblSic.Text = "Reading Database ..."
     Me.Refresh()
-
   End Sub
 
   Private Sub rbtName_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbtName.CheckedChanged
-    Dim i As Integer
-    Dim j As Integer
-    Dim inlist As Boolean
-
     If Not initializing And rbtName.Checked Then
-      agdSic.rows = 0
+      agdSic.Source.Rows = 1
       lbxSic.Items.Clear()
-      For i = 1 To cUSicName.Count
+      For i As Integer = 1 To cUSicName.Count
         lbxSic.Items.Add(cUSicName(i))
-      Next i
+      Next
+      If lbxSic.Items.Count > 0 Then lbxSic.SelectedIndex = 0
     End If
   End Sub
 
   Private Sub rbtNumber_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbtNumber.CheckedChanged
-    Dim i As Integer
-    Dim j As Integer
-    Dim inlist As Boolean
-
     If Not initializing And rbtNumber.Checked Then
-      agdSic.rows = 0
+      agdSic.Source.Rows = 1
       lbxSic.Items.Clear()
-      For i = 1 To cUSic.Count
+      For i As Integer = 1 To cUSic.Count
         lbxSic.Items.Add(cUSic(i))
-      Next i
+      Next
+      If lbxSic.Items.Count > 0 Then lbxSic.SelectedIndex = 0
     End If
   End Sub
 
   Private Sub lbxSic_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbxSic.SelectedIndexChanged
     'look through each database record for a match
     Dim i As Integer
+    Dim lNextRow As Integer
+    Dim lCurrentSic As String
+    Dim lCompareName As Boolean = rbtName.Checked
+    Dim lCompareCode As Boolean = Not lCompareName
+    lCurrentSic = lbxSic.SelectedItem
 
-    With agdSic
-      .rows = 0
+    With agdSic.Source
+      .Rows = 1
       For i = 1 To cSic.Count
-        If rbtName.Checked Then
-          If lbxSic.SelectedItem = cSicName(i) Then
-            'found one
-            .rows = .rows + 1
-            .set_TextMatrix(.rows, 0, cSic(i))
-            .set_TextMatrix(.rows, 1, cSicName(i))
-            .set_TextMatrix(.rows, 2, cNaics(i))
-            .set_TextMatrix(.rows, 3, cNaicsName(i))
-          End If
-        Else
-          If lbxSic.SelectedItem = cSic(i) Then
-            'found one
-            .rows = .rows + 1
-            .set_TextMatrix(.rows, 0, cSic(i))
-            .set_TextMatrix(.rows, 1, cSicName(i))
-            .set_TextMatrix(.rows, 2, cNaics(i))
-            .set_TextMatrix(.rows, 3, cNaicsName(i))
-          End If
+        lNextRow = .Rows
+        If (lCompareName AndAlso lCurrentSic = cSicName(i)) OrElse _
+           (lCompareCode AndAlso lCurrentSic = cSic(i)) Then
+          'found one
+          .Rows = lNextRow + 1
+          .CellValue(lNextRow, 0) = cSic(i)
+          .CellValue(lNextRow, 1) = cSicName(i)
+          .CellValue(lNextRow, 2) = cNaics(i)
+          .CellValue(lNextRow, 3) = cNaicsName(i)
         End If
       Next
-      .ColsSizeByContents()
     End With
-
+    agdSic.SizeAllColumnsToContents()
+    agdSic.Refresh()
   End Sub
 End Class

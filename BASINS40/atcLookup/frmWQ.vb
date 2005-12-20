@@ -1,4 +1,6 @@
+Imports atcControls
 Imports atcUtility
+Imports System.Drawing
 
 Public Class frmWQ
   Inherits System.Windows.Forms.Form
@@ -49,7 +51,7 @@ Public Class frmWQ
   Friend WithEvents Label2 As System.Windows.Forms.Label
   Friend WithEvents lblCas As System.Windows.Forms.Label
   Friend WithEvents lblParm As System.Windows.Forms.Label
-  Friend WithEvents agdWQ As AxATCoCtl.AxATCoGrid
+  Friend WithEvents agdWQ As atcControls.atcGrid
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmWQ))
     Me.lblSelect = New System.Windows.Forms.Label
@@ -59,16 +61,15 @@ Public Class frmWQ
     Me.lblCas = New System.Windows.Forms.Label
     Me.Label2 = New System.Windows.Forms.Label
     Me.Label1 = New System.Windows.Forms.Label
-    Me.agdWQ = New AxATCoCtl.AxATCoGrid
+    Me.agdWQ = New atcControls.atcGrid
     Me.GroupBox1.SuspendLayout()
-    CType(Me.agdWQ, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'lblSelect
     '
-    Me.lblSelect.Location = New System.Drawing.Point(16, 16)
+    Me.lblSelect.Location = New System.Drawing.Point(13, 14)
     Me.lblSelect.Name = "lblSelect"
-    Me.lblSelect.Size = New System.Drawing.Size(240, 16)
+    Me.lblSelect.Size = New System.Drawing.Size(200, 14)
     Me.lblSelect.TabIndex = 0
     Me.lblSelect.Text = "Select a monitoring parameter:"
     '
@@ -76,10 +77,9 @@ Public Class frmWQ
     '
     Me.lbxWQ.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lbxWQ.ItemHeight = 16
-    Me.lbxWQ.Location = New System.Drawing.Point(16, 40)
+    Me.lbxWQ.Location = New System.Drawing.Point(13, 35)
     Me.lbxWQ.Name = "lbxWQ"
-    Me.lbxWQ.Size = New System.Drawing.Size(232, 148)
+    Me.lbxWQ.Size = New System.Drawing.Size(194, 121)
     Me.lbxWQ.TabIndex = 1
     '
     'GroupBox1
@@ -89,61 +89,63 @@ Public Class frmWQ
     Me.GroupBox1.Controls.Add(Me.lblCas)
     Me.GroupBox1.Controls.Add(Me.Label2)
     Me.GroupBox1.Controls.Add(Me.Label1)
-    Me.GroupBox1.Location = New System.Drawing.Point(264, 16)
+    Me.GroupBox1.Location = New System.Drawing.Point(220, 14)
     Me.GroupBox1.Name = "GroupBox1"
-    Me.GroupBox1.Size = New System.Drawing.Size(232, 176)
+    Me.GroupBox1.Size = New System.Drawing.Size(193, 152)
     Me.GroupBox1.TabIndex = 2
     Me.GroupBox1.TabStop = False
     Me.GroupBox1.Text = "Parameter Information:"
     '
     'lblParm
     '
-    Me.lblParm.Location = New System.Drawing.Point(136, 96)
+    Me.lblParm.Location = New System.Drawing.Point(113, 83)
     Me.lblParm.Name = "lblParm"
-    Me.lblParm.Size = New System.Drawing.Size(88, 16)
+    Me.lblParm.Size = New System.Drawing.Size(74, 14)
     Me.lblParm.TabIndex = 3
     '
     'lblCas
     '
-    Me.lblCas.Location = New System.Drawing.Point(136, 64)
+    Me.lblCas.Location = New System.Drawing.Point(113, 55)
     Me.lblCas.Name = "lblCas"
-    Me.lblCas.Size = New System.Drawing.Size(80, 16)
+    Me.lblCas.Size = New System.Drawing.Size(67, 14)
     Me.lblCas.TabIndex = 2
     '
     'Label2
     '
-    Me.Label2.Location = New System.Drawing.Point(8, 96)
+    Me.Label2.Location = New System.Drawing.Point(7, 83)
     Me.Label2.Name = "Label2"
-    Me.Label2.Size = New System.Drawing.Size(120, 16)
+    Me.Label2.Size = New System.Drawing.Size(100, 14)
     Me.Label2.TabIndex = 1
     Me.Label2.Text = "Parameter Code:"
     Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'Label1
     '
-    Me.Label1.Location = New System.Drawing.Point(16, 64)
+    Me.Label1.Location = New System.Drawing.Point(13, 55)
     Me.Label1.Name = "Label1"
-    Me.Label1.Size = New System.Drawing.Size(112, 16)
+    Me.Label1.Size = New System.Drawing.Size(94, 14)
     Me.Label1.TabIndex = 0
     Me.Label1.Text = "CAS Number:"
     Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'agdWQ
     '
+    Me.agdWQ.AllowHorizontalScrolling = True
     Me.agdWQ.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.agdWQ.Enabled = True
-    Me.agdWQ.Location = New System.Drawing.Point(16, 208)
+    Me.agdWQ.LineColor = System.Drawing.Color.Empty
+    Me.agdWQ.LineWidth = 0.0!
+    Me.agdWQ.Location = New System.Drawing.Point(16, 176)
     Me.agdWQ.Name = "agdWQ"
-    Me.agdWQ.OcxState = CType(resources.GetObject("agdWQ.OcxState"), System.Windows.Forms.AxHost.State)
-    Me.agdWQ.Size = New System.Drawing.Size(480, 144)
-    Me.agdWQ.TabIndex = 12
+    Me.agdWQ.Size = New System.Drawing.Size(400, 144)
+    Me.agdWQ.Source = Nothing
+    Me.agdWQ.TabIndex = 3
     '
     'frmWQ
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-    Me.ClientSize = New System.Drawing.Size(514, 378)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+    Me.ClientSize = New System.Drawing.Size(428, 327)
     Me.Controls.Add(Me.agdWQ)
     Me.Controls.Add(Me.GroupBox1)
     Me.Controls.Add(Me.lbxWQ)
@@ -152,7 +154,6 @@ Public Class frmWQ
     Me.Name = "frmWQ"
     Me.Text = "Water Quality Lookup Table"
     Me.GroupBox1.ResumeLayout(False)
-    CType(Me.agdWQ, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
   End Sub
@@ -163,24 +164,39 @@ Public Class frmWQ
     Dim wqFile As String
     Dim i As Integer
 
-    With agdWQ
-      .set_header("")
-      .rows = 6
-      .set_ColTitle(0, "Name")
-      .set_ColTitle(1, "Value")
-      .set_ColTitle(2, "Units")
-      .set_ColEditable(0, False)
-      .set_ColEditable(1, False)
-      .set_ColEditable(2, False)
-      .set_TextMatrix(1, 0, "Freshwater Acute")
-      .set_TextMatrix(2, 0, "Freshwater Chronic")
-      .set_TextMatrix(3, 0, "Marine Acute")
-      .set_TextMatrix(4, 0, "Marine Chronic")
-      .set_TextMatrix(5, 0, "HHRV Water")
-      .set_TextMatrix(6, 0, "HHRV Organ")
+    agdWQ.Source = New atcGridSource
+    agdWQ.Clear()
+    With agdWQ.Source
+      .Rows = 7
+      .Columns = 3
+      .FixedRows = 1
+      .FixedColumns = 1
+      .ColorCells = True
+      .CellColor(0, 0) = SystemColors.ControlDark
+      .CellColor(0, 1) = SystemColors.ControlDark
+      .CellColor(0, 2) = SystemColors.ControlDark
+
+      .CellColor(1, 0) = SystemColors.ControlDark
+      .CellColor(2, 0) = SystemColors.ControlDark
+      .CellColor(3, 0) = SystemColors.ControlDark
+      .CellColor(4, 0) = SystemColors.ControlDark
+      .CellColor(5, 0) = SystemColors.ControlDark
+      .CellColor(6, 0) = SystemColors.ControlDark
+
+      .CellValue(0, 0) = "Name"
+      .CellValue(0, 1) = "Value"
+      .CellValue(0, 2) = "Units"
+
+      .CellValue(1, 0) = "Freshwater Acute"
+      .CellValue(2, 0) = "Freshwater Chronic"
+      .CellValue(3, 0) = "Marine Acute"
+      .CellValue(4, 0) = "Marine Chronic"
+      .CellValue(5, 0) = "HHRV Water"
+      .CellValue(6, 0) = "HHRV Organ"
     End With
 
-    wqFile = PathNameOnly(pProjectFileName) & "\wqcriter.dbf"
+    If pProjectFileName Is Nothing Then pProjectFileName = "\BASINS\data\national\national.mwprj"
+    wqFile = FindFile("WQ Database", PathNameOnly(PathNameOnly(pProjectFileName)) & "\national\wqcriter.dbf")
 
     cCasNumber = New Collection
     cParmCode = New Collection
@@ -193,7 +209,7 @@ Public Class frmWQ
     cUnits = New Collection
 
     If FileExists(wqFile) Then
-      Dim tmpDbf As IATCTable
+      Dim tmpDbf As IatcTable
       tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(wqFile)
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
@@ -243,21 +259,24 @@ Public Class frmWQ
   End Sub
 
   Private Sub lbxWQ_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbxWQ.SelectedIndexChanged
-    lblParm.Text = cParmCode(lbxWQ.SelectedIndex + 1)
-    lblCas.Text = cCasNumber(lbxWQ.SelectedIndex + 1)
-    With agdWQ
-      .set_TextMatrix(1, 1, cFAcute(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(2, 1, cFCronic(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(3, 1, cMAcute(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(4, 1, cMCronic(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(5, 1, cWater(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(6, 1, cOrgan(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(1, 2, cUnits(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(2, 2, cUnits(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(3, 2, cUnits(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(4, 2, cUnits(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(5, 2, cUnits(lbxWQ.SelectedIndex + 1))
-      .set_TextMatrix(6, 2, cUnits(lbxWQ.SelectedIndex + 1))
+    Dim lIndex As Integer = lbxWQ.SelectedIndex + 1
+    lblParm.Text = cParmCode(lIndex)
+    lblCas.Text = cCasNumber(lIndex)
+    With agdWQ.Source
+      .CellValue(1, 1) = cFAcute(lIndex)
+      .CellValue(2, 1) = cFCronic(lIndex)
+      .CellValue(3, 1) = cMAcute(lIndex)
+      .CellValue(4, 1) = cMCronic(lIndex)
+      .CellValue(5, 1) = cWater(lIndex)
+      .CellValue(6, 1) = cOrgan(lIndex)
+      .CellValue(1, 2) = cUnits(lIndex)
+      .CellValue(2, 2) = cUnits(lIndex)
+      .CellValue(3, 2) = cUnits(lIndex)
+      .CellValue(4, 2) = cUnits(lIndex)
+      .CellValue(5, 2) = cUnits(lIndex)
+      .CellValue(6, 2) = cUnits(lIndex)
     End With
+    agdWQ.SizeAllColumnsToContents()
+    agdWQ.Refresh()
   End Sub
 End Class
