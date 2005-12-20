@@ -43,7 +43,9 @@ Public Class atcGridSource
         ReDim pValues(pRows - 1, pColumns - 1)
       End If
       ExpandRowsColumns(aRow, aColumn)
-      If pValues(aRow, aColumn) <> newValue Then
+      If InvalidRowOrColumn(aRow, aColumn) Then
+        'LogDbg("Could not set CellValue(" & aRow & ", " & aColumn & ") to " & newValue)
+      ElseIf pValues(aRow, aColumn) <> newValue Then
         pValues(aRow, aColumn) = newValue
       End If
     End Set
@@ -129,7 +131,7 @@ Public Class atcGridSource
           lastRowCopied = pRows - 1
         End If
 
-        Dim newValues(aNewRows, Columns) As String
+        Dim newValues(aNewRows - 1, pColumns - 1) As String
         Dim newColors(,) As Color
         Dim newSelected(,) As Boolean
         Dim newEditable(,) As Boolean
