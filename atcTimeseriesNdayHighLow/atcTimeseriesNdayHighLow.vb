@@ -98,7 +98,7 @@ Public Class atcTimeseriesNdayHighLow
     End Get
   End Property
 
-  Private Function AddOperation(ByVal aName As String, _
+  Private Sub AddOperation(ByVal aName As String, _
                                 ByVal aDescription As String, _
                                 ByVal aTypeString As String, _
                                 ByVal ParamArray aArgs() As atcAttributeDefinition)
@@ -118,7 +118,7 @@ Public Class atcTimeseriesNdayHighLow
     Next
     pAvailableOperations.SetValue(lResult, Nothing, lArguments)
 
-  End Function
+  End Sub
 
   Private Function HighOrLowValue(ByVal aTS As atcTimeseries, _
                    ByVal aNDay As Integer, _
@@ -172,6 +172,7 @@ Public Class atcTimeseriesNdayHighLow
   End Function
 
   Private Function HighOrLowTimeseries(ByVal aTS As atcTimeseries, ByVal aNDay As Object, ByVal aHigh As Boolean) As atcDataGroup 'atcTimeseries
+    Dim newTsGroup As New atcDataGroup
     Try
       Dim lNDay() As Double = Obj2Array(aNDay)
 
@@ -188,14 +189,12 @@ Public Class atcTimeseriesNdayHighLow
         nYears += 1
       End If
 
-      Dim newTsGroup As New atcDataGroup
-
       For Each lNDayNow As Double In lNDay
         Dim newValues(nYears) As Double
         Dim newDates(nYears) As Double
         newDates(0) = sjday
 
-        Dim lsjday = sjday
+        Dim lsjday As Double = sjday
         For indexNew = 1 To nYears
           Dim nextSJday As Double = TimAddJ(lsjday, lTimeCode, 1, 1)
           Dim oneYear As atcTimeseries = SubsetByDate(aTS, lsjday, nextSJday, Me)
@@ -236,12 +235,12 @@ Public Class atcTimeseriesNdayHighLow
         newTS.Attributes.AddHistory(lDescription)
         newTsGroup.Add(newTS)
       Next
-
-      Return newTsGroup
-
     Catch ex As Exception
       LogDbg(ex.ToString)
     End Try
+
+    Return newTsGroup
+
   End Function
 
   Private Sub ComputeTau(ByRef aTimeseries As atcTimeseries, _

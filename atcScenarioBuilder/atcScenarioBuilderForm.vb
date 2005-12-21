@@ -221,8 +221,8 @@ Friend Class atcScenarioBuilderForm
 
 #End Region
 
-  Private Const MenuText_AllInputs = "All Input"
-  Private Const MenuText_AllResults = "All Results"
+  Private Const MenuText_AllInputs As String = "All Input"
+  Private Const MenuText_AllResults As String = "All Results"
 
   Private pDataManager As atcDataManager
   Private pMapWin As MapWindow.Interfaces.IMapWin
@@ -276,7 +276,7 @@ Friend Class atcScenarioBuilderForm
     If pBaseScenario.DataSets.Count = 0 Then
       'By default add EVAP and PREC if none were given
       For Each lDataSet As atcDataSet In pDataManager.DataSets
-        Select Case lDataSet.Attributes.GetValue("Constituent")
+        Select Case CStr(lDataSet.Attributes.GetValue("Constituent"))
           Case "EVAP", "PREC", "TMIN", "TMAX", "PET", "HPRECIP" : pBaseScenario.DataSets.Add(lDataSet)
         End Select
       Next
@@ -684,8 +684,6 @@ Friend Class atcScenarioBuilderForm
     Dim mnuConstituentAddResults As MenuItem
     Dim mnuConstituentRemoveResults As MenuItem
     Dim mnuAttribute As MenuItem
-    Dim iLastAttribute As Integer
-    Dim iAttribute As Integer
     Dim lDataSet As atcDataSet
 
     For Each mnuConstituentAdd As MenuItem In mnuAttributesAdd.MenuItems
@@ -821,7 +819,7 @@ Friend Class atcScenarioBuilderForm
     Dim lModifiedIndex As Integer = 0
     Dim lNewWDM As atcWDM.atcDataSourceWDM
     Dim lOldWDM As atcWDM.atcDataSourceWDM
-    Dim lCurrentWDMfilename As String
+    Dim lCurrentWDMfilename As String = ""
     Dim lNewResults As atcDataSource
 
     For Each lDataSource As atcDataSource In pDataManager.DataSources
@@ -1157,8 +1155,8 @@ Friend Class GridSource
                 End If
               Next
           End Select
-          Return "" '    "(click to modify)"
       End Select
+      Return ""
     End Get
     Set(ByVal newValue As String)
     End Set

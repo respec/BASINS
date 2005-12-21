@@ -249,5 +249,6 @@ Public Module modTimeseriesMath
       Return New atcDataGroup(aObj)
     Catch
     End Try
+    Return Nothing
   End Function
 End Module

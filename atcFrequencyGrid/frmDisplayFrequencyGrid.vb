@@ -334,7 +334,7 @@ Friend Class frmDisplayFrequencyGrid
       .Title = "Save Grid As"
       .DefaultExt = ".txt"
       .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
-      If .ShowDialog(Me) = DialogResult.OK Then
+      If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
         SaveFileString(.FileName, Me.ToString)
       End If
     End With

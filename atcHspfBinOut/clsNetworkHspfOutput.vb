@@ -23,15 +23,15 @@ Friend Class clsNetworkHspfOutput
     End Set
   End Property
 
-  Friend WriteOnly Property UCIFile()
-    Set(ByVal Value)
+  Friend WriteOnly Property UCIFile() As String
+    Set(ByVal newValue As String)
       Dim s As String, d As String
 
-      If Len(Dir(Value)) = 0 Then
-        pErrorDescription = "UCI File Name '" & Value & "' not found"
+      If Len(Dir(newValue)) = 0 Then
+        pErrorDescription = "UCI File Name '" & newValue & "' not found"
       Else
         'Screen.MousePointer = vbHourglass
-        pUCIFileName = Value
+        pUCIFileName = newValue
         d = PathNameOnly(pUCIFileName)
         ChDriveDir(d)
         s = WholeFileString(FilenameNoPath(pUCIFileName))
@@ -137,7 +137,7 @@ Friend Class clsNetworkHspfOutput
 
   End Sub
 
-  Friend ReadOnly Property ErrorDescription()
+  Friend ReadOnly Property ErrorDescription() As String
     Get
       ErrorDescription = pErrorDescription
       pErrorDescription = ""

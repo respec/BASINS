@@ -246,6 +246,7 @@ Public Class atcDataSourceWDM
       End If
     Next
     LogMsg("DSN " & lDsn & " does not exist.", "DataFileWDM.GetDataSetFromDsn")
+    Return Nothing
   End Function
 
   Private Function AttrStored(ByRef saind As Integer) As Boolean 'somewhere else
@@ -520,8 +521,8 @@ Public Class atcDataSourceWDM
 
   Public Overrides Function Save(ByVal SaveFileName As String, _
                         Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
-    Dim i, lFileUnit As Integer
-    Dim lWdmOpen As Integer
+    'Dim i, lFileUnit As Integer
+    'Dim lWdmOpen As Integer
 
     'TODO: check FileName and SaveFileName, use value of ExistAction
 

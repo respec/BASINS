@@ -11,7 +11,7 @@ Public Class atcScenarioBuilderPlugin
   End Property
 
   Public Overrides Function Show(ByVal aManager As atcDataManager, _
-                   Optional ByVal aGroup As atcDataGroup = Nothing)
+                   Optional ByVal aGroup As atcDataGroup = Nothing) As Object
     Dim lForm As New atcScenarioBuilderForm
     lForm.Initialize(aManager, pMapWin, aGroup)
     Return lForm

@@ -174,35 +174,35 @@ Public Class atcGrid
     Return pSource.ToString
   End Function
 
-  Public Property ColumnWidth(ByVal iColumn) As Integer
+  Public Property ColumnWidth(ByVal aColumn As Integer) As Integer
     Get
       If pColumnWidth.Count = 0 Then
         atcUtility.LogDbg("atcGrid:ColumnWidth:Get: Unexpected pColumnWidth.Count = 0")
         Return 0
-      ElseIf iColumn < pColumnWidth.Count Then 'Return last defined width
-        Return pColumnWidth(iColumn)
+      ElseIf aColumn < pColumnWidth.Count Then 'Return last defined width
+        Return pColumnWidth(aColumn)
       Else
         Return pColumnWidth(pColumnWidth.Count - 1)
       End If
     End Get
     Set(ByVal newValue As Integer)
-      If iColumn < pColumnWidth.Count Then 'Change existing width of this column
-        If iColumn = pColumnWidth.Count - 1 AndAlso _
+      If aColumn < pColumnWidth.Count Then 'Change existing width of this column
+        If aColumn = pColumnWidth.Count - 1 AndAlso _
               Not pSource Is Nothing AndAlso _
               pSource.Columns > pColumnWidth.Count Then 'Preserve implied width of later columns
-          pColumnWidth.Add(pColumnWidth(iColumn))
+          pColumnWidth.Add(pColumnWidth(aColumn))
         End If
-        pColumnWidth(iColumn) = newValue
+        pColumnWidth(aColumn) = newValue
       Else 'Need to add one or more column widths to include this one
 
-        If iColumn > pColumnWidth.Count Then 'Preserve implied width of earlier columns
+        If aColumn > pColumnWidth.Count Then 'Preserve implied width of earlier columns
           Dim lOldWidth As Integer
           If pColumnWidth.Count > 0 Then
             lOldWidth = pColumnWidth(pColumnWidth.Count - 1)
           Else
             lOldWidth = newValue
           End If
-          For newColumn As Integer = pColumnWidth.Count To iColumn - 1
+          For newColumn As Integer = pColumnWidth.Count To aColumn - 1
             pColumnWidth.Add(lOldWidth)
           Next
         End If
@@ -221,21 +221,21 @@ Public Class atcGrid
     End Set
   End Property
 
-  Public Property RowHeight(ByVal iRow) As Integer
+  Public Property RowHeight(ByVal aRow As Integer) As Integer
     Get
       If pRowHeight.Count = 0 Then
         Return 0 'should not happen
-      ElseIf iRow >= pRowHeight.Count Then 'Return last defined height
+      ElseIf aRow >= pRowHeight.Count Then 'Return last defined height
         Return pRowHeight(pRowHeight.Count - 1)
       Else
-        Return pRowHeight(iRow)
+        Return pRowHeight(aRow)
       End If
     End Get
     Set(ByVal newValue As Integer)
-      If iRow < pRowHeight.Count Then 'Change existing width of this column
-        pRowHeight(iRow) = newValue
+      If aRow < pRowHeight.Count Then 'Change existing width of this column
+        pRowHeight(aRow) = newValue
       Else 'Need to add one or more row heights to include this one
-        For newRow As Integer = pRowHeight.Count To iRow
+        For newRow As Integer = pRowHeight.Count To aRow
           pRowHeight.Add(newValue)
         Next
       End If
@@ -555,7 +555,7 @@ Public Class atcGrid
   End Function
 
   Public Sub SizeAllColumnsToContents()
-    Dim lMaxColumn = pSource.Columns - 1
+    Dim lMaxColumn As Integer = pSource.Columns - 1
     For lCol As Integer = 0 To lMaxColumn
       SizeColumnToContents(lCol)
     Next
@@ -681,14 +681,14 @@ Public Class atcGrid
   Protected Overrides Sub OnMouseMove(ByVal e As System.Windows.Forms.MouseEventArgs)
     Dim newCursor As Windows.Forms.Cursor = Cursors.Default
     Select Case e.Button
-      Case MouseButtons.None
+      Case Windows.Forms.MouseButtons.None
         If ColumnEdgeToDrag(e.X) >= 0 Then
           newCursor = Cursors.SizeWE
         ElseIf ColumnDecimalToDrag(e.X, e.Y) >= 0 Then
           newCursor = Cursors.SizeWE
         End If
         If Not Me.Cursor Is newCursor Then Me.Cursor = newCursor
-      Case MouseButtons.Left
+      Case Windows.Forms.MouseButtons.Left
         If pColumnDragging >= 0 Then
           ColumnWidth(pColumnDragging) += (e.X - pColumnRight.ItemByKey(pColumnDragging))
           If ColumnWidth(pColumnDragging) < DRAG_TOLERANCE * 2 Then 'it got too small

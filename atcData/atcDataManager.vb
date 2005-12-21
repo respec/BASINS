@@ -167,6 +167,7 @@ Public Class atcDataManager
         Return lDs.NewOne
       End If
     Next
+    Return Nothing
   End Function
 
   ''' <summary>Ask user to select a data source</summary>

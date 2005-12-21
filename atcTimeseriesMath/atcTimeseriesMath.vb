@@ -150,25 +150,25 @@ Public Class atcTimeseriesMath
         AddOperation("Absolute Value", "Change negative values to positive", defTimeSeriesOne)
 
         AddOperation("Celsius to F", "Celsius to Fahrenheit", defTimeSeriesOne)
-        pAvailableOperations.GetDefinition("Celsius to F").Category = "Unit Conversion"
+        atcDataAttributes.GetDefinition("Celsius to F").Category = "Unit Conversion"
 
         AddOperation("F to Celsius", "Fahrenheit to Celsius", defTimeSeriesOne)
-        pAvailableOperations.GetDefinition("F to Celsius").Category = "Unit Conversion"
+        atcDataAttributes.GetDefinition("F to Celsius").Category = "Unit Conversion"
 
         AddOperation("Subset by date", "Choose start and end dates", defTimeSeriesOne, defStartDate, defEndDate)
-        pAvailableOperations.GetDefinition("Subset by date").Category = "Date"
+        atcDataAttributes.GetDefinition("Subset by date").Category = "Date"
 
         AddOperation("Subset by date boundary", "Choose boundary month and day", defTimeSeriesOne, defBoundaryMonth, defBoundaryDay)
-        pAvailableOperations.GetDefinition("Subset by date boundary").Category = "Date"
+        atcDataAttributes.GetDefinition("Subset by date boundary").Category = "Date"
 
         AddOperation("Merge", "Choose data to merge", defTimeSeriesGroup)
-        pAvailableOperations.GetDefinition("Merge").Category = "Date"
+        atcDataAttributes.GetDefinition("Merge").Category = "Date"
       End If
       Return pAvailableOperations
     End Get
   End Property
 
-  Private Function AddOperation(ByVal aName As String, _
+  Private Sub AddOperation(ByVal aName As String, _
                               ByVal aDescription As String, _
                               ByVal ParamArray aArgs() As atcAttributeDefinition)
     Dim lResult As New atcAttributeDefinition
@@ -187,7 +187,7 @@ Public Class atcTimeseriesMath
     Next
     pAvailableOperations.SetValue(lResult, Nothing, lArguments)
 
-  End Function
+  End Sub
 
   'Args are each usually either Double or atcTimeseries
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
@@ -200,7 +200,7 @@ Public Class atcTimeseriesMath
     Dim curTS As atcTimeseries
     Dim firstTS As atcTimeseries
     Dim needToAsk As Boolean = False
-    Dim lSelectedOperation As atcDataSet
+    'Dim lSelectedOperation As atcDataSet
     Dim lNewTS As atcTimeseries
     Dim lNumber As Double
     Dim lHaveNumber As Boolean = False
@@ -287,6 +287,8 @@ Public Class atcTimeseriesMath
           For iValue = 0 To lastValueIndex
             newVals(iValue) -= lNumber
           Next
+        ElseIf curTS Is Nothing Then
+          Err.Raise(vbObjectError + 512, Me, aOperationName & " no current Timeseries")
         Else
           For iValue = 0 To lastValueIndex
             newVals(iValue) -= curTS.Value(iValue)

@@ -402,9 +402,9 @@ Public Class frmWelcomeScreenBasins
     dlg.Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
     dlg.CheckFileExists = True
     dlg.InitialDirectory = app.DefaultDir
-    If dlg.ShowDialog(Me) = DialogResult.OK Then
+    If dlg.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
       prj.Load(dlg.FileName)
-      Me.DialogResult = DialogResult.OK
+      Me.DialogResult = Windows.Forms.DialogResult.OK
       Me.Close()
     End If
   End Sub
@@ -420,7 +420,7 @@ Public Class frmWelcomeScreenBasins
     Dim fileName As String = CStr(CType(sender, Label).Tag)
     If (System.IO.File.Exists(fileName)) Then
       prj.Load(fileName)
-      Me.DialogResult = DialogResult.OK
+      Me.DialogResult = Windows.Forms.DialogResult.OK
       Me.Close()
     Else
       'TODO - 2/3/2005 - jlk - need a findFile here 

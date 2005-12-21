@@ -293,21 +293,22 @@ Public Class frmSpecifySeasonalAttributes
         Return lSeason.Definition.Calculator
       End If
     Next
+    Return Nothing
   End Function
 
   Private Function CalculateAttributes(ByVal aAttributes As atcDataAttributes, _
                                        ByVal aSetInTimeseries As Boolean) As atcDataAttributes
     Dim lSeasonSource As atcDataSource = CurrentSeason()
+    Dim lCalculatedAttributes As New atcDataAttributes
+    Dim lAllCalculatedAttributes As atcDataAttributes
+
+    If aSetInTimeseries Then
+      lAllCalculatedAttributes = New atcDataAttributes
+    Else
+      lAllCalculatedAttributes = lCalculatedAttributes
+    End If
     If Not lSeasonSource Is Nothing Then
       Dim lArguments As New atcDataAttributes
-      Dim lCalculatedAttributes As New atcDataAttributes
-      Dim lAllCalculatedAttributes As atcDataAttributes
-
-      If aSetInTimeseries Then
-        lAllCalculatedAttributes = New atcDataAttributes
-      Else
-        lAllCalculatedAttributes = lCalculatedAttributes
-      End If
 
       lArguments.SetValue("Attributes", aAttributes)
       lArguments.SetValue("CalculatedAttributes", lCalculatedAttributes)
@@ -326,8 +327,8 @@ Public Class frmSpecifySeasonalAttributes
           lCalculatedAttributes.Clear()
         End If
       Next
-      Return lAllCalculatedAttributes
     End If
+    Return lAllCalculatedAttributes
 
   End Function
 

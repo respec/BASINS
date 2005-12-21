@@ -99,7 +99,6 @@ Public Class PlugIn
   End Sub
 
   Public Sub TestClip()
-    Dim mx As MapWinX.SpatialOperations
     Dim lineShapefile As New MapWinGIS.Shapefile
     Dim lineShape As New MapWinGIS.Shape
     Dim polyShapefile As New MapWinGIS.Shapefile
@@ -112,7 +111,7 @@ Public Class PlugIn
     success = polyShapefile.Open("c:\temp\temp2.shp")
     polyShape = polyShapefile.Shape(0)
 
-    success = mx.ClipPolygonWithLine(polyShape, lineShape, "c:\temp\temp.shp")
+    success = MapWinX.SpatialOperations.ClipPolygonWithLine(polyShape, lineShape, "c:\temp\temp.shp")
 
   End Sub
 

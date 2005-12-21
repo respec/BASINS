@@ -148,7 +148,7 @@ Public Class frmSic
     Dim i As Integer
 
     Me.Refresh()
-    Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
     If pProjectFileName Is Nothing Then pProjectFileName = "\BASINS\data\national\national.mwprj"
     SicFile = FindFile("SIC Database", PathNameOnly(PathNameOnly(pProjectFileName)) & "\national\sic.dbf")
 
@@ -185,7 +185,7 @@ Public Class frmSic
     Next i
 
     rbtName.Checked = True
-    Cursor.Current = System.Windows.Forms.Cursors.Default
+    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
     lblSic.Text = "SIC search will also return the corresponding 1997 North American Industry Classification System (NAICS) code."
   End Sub
 

@@ -37,22 +37,21 @@ Public Class atcMetCmpPlugin
   'The attribute(s) will be set to the result(s) of calculation(s)
   Public Overrides Function Open(ByVal aOperationName As String, _
                         Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-    Dim lTMinTSer As atcTimeseries
-    Dim lTMaxTSer As atcTimeseries
-    Dim lSRadTSer As atcTimeseries
-    Dim lWindTSer As atcTimeseries
-    Dim lDlyTSer As atcTimeseries
+    Dim lTMinTSer As atcTimeseries = Nothing
+    Dim lTMaxTSer As atcTimeseries = Nothing
+    Dim lSRadTSer As atcTimeseries = Nothing
+    Dim lWindTSer As atcTimeseries = Nothing
+    Dim lDlyTSer As atcTimeseries = Nothing
     Dim lLatitude As Double
     Dim lCTS(12) As Double
     Dim lDegF As Boolean
     Dim lObsTime As Integer
     Dim lAttDef As atcAttributeDefinition
     Dim lOk As Boolean
-    Dim lExtreme As Double
 
     Select Case aOperationName
       Case "Solar Radiation"
-        Dim lCldTSer As atcTimeseries
+        Dim lCldTSer As atcTimeseries = Nothing
         If aArgs Is Nothing Then
           Dim lForm As New frmCmpSol
           lOk = lForm.AskUser(DataManager, lCldTSer, lLatitude)

@@ -310,7 +310,7 @@ Public Class atcGraphForm
     printdlg.ShowHelp = True
 
     ' If the result is OK then print the document.
-    If (printdlg.ShowDialog = DialogResult.OK) Then
+    If (printdlg.ShowDialog = Windows.Forms.DialogResult.OK) Then
       Dim saveRect As RectangleF = Pane.PaneRect
       printdoc.Print()
       ' Restore graph size to fit form's bounds. 
@@ -397,7 +397,7 @@ Public Class atcGraphForm
 
     'TODO: 3rd Y Axis above (for PREC)
 
-    If Pane.CurveList.Count > 1 Then
+    If Pane.CurveList.Count > 1 AndAlso Not curve Is Nothing Then
       For Each ts As atcTimeseries In pDataGroup
         lOldCurve = Pane.CurveList.Item(ts.ToString)
         If Not lOldCurve Is Nothing Then

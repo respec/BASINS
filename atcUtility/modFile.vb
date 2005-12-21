@@ -635,6 +635,7 @@ TryAgain:
     Catch ex As Exception
       If Now > TryUntil Then
         LogMsg("Error reading '" & aFilename & "'" & vbCr & vbCr & ex.Message, "WholeFileString - " & ex.GetType.Name)
+        Return ""
       Else
         'MsgBox("WholeFileString error, trying again (" & ex.GetType.Name & ": " & ex.Message & ")")
         System.Threading.Thread.Sleep(50)
@@ -789,7 +790,7 @@ ErrorReading:
     Dim reader As New System.IO.BinaryReader(inStream)
 
     'read in each byte and convert it to a char
-    Dim numbytes = reader.BaseStream.Length
+    Dim numbytes As Integer = reader.BaseStream.Length
     SaveFileString(OutputFilePath, System.Convert.ToBase64String(reader.ReadBytes(numbytes)))
 
     reader.Close()

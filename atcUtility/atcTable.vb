@@ -174,8 +174,7 @@ Public MustInherit Class atcTable
   'A summary of the fields (names, types, lengths)
   Public Overridable Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String Implements IatcTable.SummaryFields
     Dim retval As String
-    Dim iTrash As Short
-    Dim iField As Short
+    Dim iField As Integer
     Dim ShowTrash As Boolean
     Dim ShowHeaders As Boolean
     Dim ExpandType As Boolean
@@ -236,6 +235,13 @@ Public MustInherit Class atcTable
 
   'Returns a string version of the current record
   Public Overridable Function CurrentRecordAsDelimitedString(Optional ByRef aDelimiter As String = ",", Optional ByRef aQuote As String = "") As String
+    CurrentRecordAsDelimitedString = ""
+    If NumFields > 0 Then
+      For iField As Integer = 1 To NumFields - 1
+        CurrentRecordAsDelimitedString &= aQuote & Value(iField) & aQuote & aDelimiter
+      Next
+      CurrentRecordAsDelimitedString &= aQuote & Value(NumFields) & aQuote
+    End If
   End Function
 
   'Returns True if found, moves CurrentRecord to first record with .Value(aFieldNumber) = aFindValue

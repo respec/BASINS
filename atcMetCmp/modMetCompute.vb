@@ -412,9 +412,9 @@ Public Module modMetCompute
       lOpt = 3
     End If
 
-    Dim lHRTemp(lDisTs.numValues)
-    Dim lMinTmp(aMnTmpTS.numValues + 2)
-    Dim lMaxTmp(aMxTmpTS.numValues + 1)
+    Dim lHRTemp(lDisTs.numValues) As Double
+    Dim lMinTmp(aMnTmpTS.numValues + 2) As Double
+    Dim lMaxTmp(aMxTmpTS.numValues + 1) As Double
 
     'get max temp data
     joff = 0
@@ -575,7 +575,7 @@ Public Module modMetCompute
     Dim lJDay As Double
     Dim lPoint As Boolean = aInTS.Attributes.GetValue("point", False)
 
-    Dim lDates = New atcTimeseries(aDataSource)
+    Dim lDates As New atcTimeseries(aDataSource)
     lDates.numValues = aInTS.numValues * 24
     lJDay = aInTS.Attributes.GetValue("SJDAY")
     If lPoint Then
@@ -815,13 +815,12 @@ Public Module modMetCompute
     'on empirical curves of radiation as a function of latitude
     '(Hamon et al, 1954, Monthly Weather Review 82(6):141-146.
 
-    Dim i, ILat, ii, j As Integer
-    Dim inifg As Short
+    Dim ILat, ii As Integer
     Dim Lat3, Lat1, Lat2, Lat4 As Double
     Dim A1, b, Exp2, Exp1, a, A0, A2 As Double
     Dim b2, A3, b1, Frac As Double
     Dim SS, x As Double
-    Dim Y100, YRD, y As Double
+    Dim Y100, YRD As Double
 
     'integer part of latitude
     ILat = Int(aDegLat)

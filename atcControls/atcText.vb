@@ -82,7 +82,7 @@ Public Class atcText
   Private OutsideSoftBg As System.Drawing.Color
   Private OutsideHardBg As System.Drawing.Color
 
-  Private Const slop = 1.0001 'real numbers are screwy, so this is the slop factor
+  Private Const slop As Double = 1.0001 'real numbers are screwy, so this is the slop factor
 
   Private Sub dbgMsg(ByVal msg As String, _
                      Optional ByVal len As Integer = 10, _
@@ -133,7 +133,8 @@ Public Class atcText
       dbgMsg("HardMin:Let:" & NewValue, 8, "ATCoText", "p")
       'If we store a more precise value for HardMin than we
       'allow to be typed, it causes problems.
-      Dim FormattedNewValue$, ch&, chind&, DecimalPlace&
+      Dim FormattedNewValue As String
+      Dim DecimalPlace As Integer
 
       FormattedNewValue = FormatValue(NewValue)
       privHardMin = CSng(FormattedNewValue)
@@ -489,8 +490,7 @@ LeaveSub:
   Private Sub Text1_LostFocus()
     dbgMsg("Text1:LostFocus:" & text1.Text & " " & DefVal, 8, "ATCoText", "f")
 
-    Dim newValue
-    newValue = Valid(text1.Text)
+    Dim newValue As Object = Valid(text1.Text)
     DefVal = newValue
     text1.Text = FormatValue(newValue)
     RaiseEvent CommitChange()
@@ -510,7 +510,7 @@ LeaveSub:
   End Sub
 
   Private Sub Text1_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
-    If Button = MouseButtons.Right Then
+    If Button = Windows.Forms.MouseButtons.Right Then
       ShowRange()
     End If
   End Sub
@@ -579,22 +579,23 @@ LeaveSub:
   '    PropBag.WriteProperty("Enabled", (text1.Enabled))
   'End Sub
 
-  Private Function Valid(ByVal newValue)
-    Dim msgtext As String, sVal As Double
+  Private Function Valid(ByVal newValue As Object) As Object
+    Dim msgtext As String
+    Dim sVal As Double
 
     msgtext = ""
     Valid = newValue
 
     If DataType = ATCoDataType.ATCoTxt Then
       If HardMax <> ATCoDataType.NONE And Len(newValue) > HardMax Then
-        'Valid = Left(newValue, HardMax)
+        Valid = CStr(newValue).Substring(0, HardMax)
         msgtext = "The value '" & newValue & "' was too long." & vbCr
         msgtext = msgtext & "Values can be at most " & HardMax & " characters long."
       End If
     ElseIf DataType = ATCoDataType.ATCoInt Or _
            DataType = ATCoDataType.ATCoSng Then
       If IsNumeric(newValue) Then
-        sVal = CSng(newValue)
+        sVal = CDbl(newValue)
         newValue = sVal 'We don't want to compare 0.1 with .1 and think they are different
       Else
         msgtext = "The value '" & newValue & "' is not numeric." & vbCr

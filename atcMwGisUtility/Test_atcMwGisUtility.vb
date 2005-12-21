@@ -331,7 +331,7 @@ End Class
     Dim lLayerNames() As String = {"st", "cnty", "huc"}
     For Each lLayerName As String In lLayerNames
       Try
-        Dim lLayerIndex = GisUtil.LayerIndex(lLayerName)
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(lLayerName)
         LogDbg("TestFindLayerIndex:" & LayerDescription(lLayerIndex))
       Catch ex As Exception
         LogDbg("TestFindLayerIndex:Exception:" & ex.Message)
@@ -359,14 +359,14 @@ End Class
     Dim lFieldName As String = "dummy"
     Dim lFieldWidth As Integer = 5
     Dim lFieldType As Integer = 1
-    Dim lResult = GisUtil.AddField(lLayerIndex, lFieldName, 1, 5)
+    Dim lResult As Integer = GisUtil.AddField(lLayerIndex, lFieldName, 1, 5)
     LogDbg("TestAddField:" & lResult & ":" & lFieldName & ":" & lFieldType & ":" & lFieldWidth & ":" & lLayerIndex)
   End Sub
 
   Public Sub TestRemoveField()
     Dim lLayerIndex As Integer = 1
     Dim lFieldName As String = "dummy"
-    Dim lResult = GisUtil.RemoveField(lLayerIndex, lFieldName)
+    Dim lResult As Boolean = GisUtil.RemoveField(lLayerIndex, lFieldName)
     LogDbg("TestRemoveField:" & lResult & ":" & lFieldName & ":" & lLayerIndex)
   End Sub
 

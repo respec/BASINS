@@ -224,40 +224,40 @@ Public Class GisUtil
     Dim lSf1Shape As MapWinGIS.Shape
     If FeatureIndexValid(aFeatureIndex1, lSf1) Then
       lSf1Shape = lSf1.Shape(aFeatureIndex1)
-    End If
 
-    Dim lSf2 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex2)
-    Dim lSf2Shape As MapWinGIS.Shape
-    If FeatureIndexValid(aFeatureIndex2, lSf2) Then
-      lSf2Shape = lSf2.Shape(aFeatureIndex2)
-    End If
+      Dim lSf2 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex2)
+      Dim lSf2Shape As MapWinGIS.Shape
+      If FeatureIndexValid(aFeatureIndex2, lSf2) Then
+        lSf2Shape = lSf2.Shape(aFeatureIndex2)
 
-    Dim lIndex As Integer
-    Dim lX As Double, lY As Double
+        Dim lIndex As Integer
+        Dim lX As Double, lY As Double
 
-    If Not (lSf1.Extents.xMin > lSf2.Extents.xMax OrElse _
-            lSf1.Extents.xMax < lSf2.Extents.xMin OrElse _
-            lSf1.Extents.yMin > lSf2.Extents.yMax OrElse _
-            lSf1.Extents.yMax < lSf2.Extents.yMin) Then
-      'might be within, check in detail
-      For lIndex = 1 To lSf1Shape.numPoints
-        lX = lSf1Shape.Point(lIndex - 1).x
-        lY = lSf1Shape.Point(lIndex - 1).y
-        OverlappingPolygons = lSf2.PointInShape(aFeatureIndex2, lX, lY)
-        If OverlappingPolygons Then 'quit loop, we've found they overlap
-          Exit For
-        End If
-      Next lIndex
+        If Not (lSf1.Extents.xMin > lSf2.Extents.xMax OrElse _
+                lSf1.Extents.xMax < lSf2.Extents.xMin OrElse _
+                lSf1.Extents.yMin > lSf2.Extents.yMax OrElse _
+                lSf1.Extents.yMax < lSf2.Extents.yMin) Then
+          'might be within, check in detail
+          For lIndex = 1 To lSf1Shape.numPoints
+            lX = lSf1Shape.Point(lIndex - 1).x
+            lY = lSf1Shape.Point(lIndex - 1).y
+            OverlappingPolygons = lSf2.PointInShape(aFeatureIndex2, lX, lY)
+            If OverlappingPolygons Then 'quit loop, we've found they overlap
+              Exit For
+            End If
+          Next lIndex
 
-      If Not OverlappingPolygons Then 'now check the opposite
-        For lIndex = 1 To lSf2Shape.numPoints
-          lX = lSf2Shape.Point(lIndex - 1).x
-          lY = lSf2Shape.Point(lIndex - 1).y
-          OverlappingPolygons = lSf1.PointInShape(aFeatureIndex1, lX, lY)
-          If OverlappingPolygons Then 'quit loop, we've found they overlap
-            Exit For
+          If Not OverlappingPolygons Then 'now check the opposite
+            For lIndex = 1 To lSf2Shape.numPoints
+              lX = lSf2Shape.Point(lIndex - 1).x
+              lY = lSf2Shape.Point(lIndex - 1).y
+              OverlappingPolygons = lSf1.PointInShape(aFeatureIndex1, lX, lY)
+              If OverlappingPolygons Then 'quit loop, we've found they overlap
+                Exit For
+              End If
+            Next lIndex
           End If
-        Next lIndex
+        End If
       End If
     End If
   End Function
@@ -385,8 +385,6 @@ Public Class GisUtil
 
   Public Shared Function IsField(ByVal aLayerIndex As Integer, ByVal aFieldName As String) As Boolean
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-
-    Dim i As Integer
     IsField = False
     For iFieldIndex As Integer = 0 To lSf.NumFields - 1
       If UCase(lSf.Field(iFieldIndex).Name) = UCase(aFieldName) Then 'this is the field we want
@@ -433,14 +431,16 @@ Public Class GisUtil
   ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
-  Public Shared Function RemoveField(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer)
+  Public Shared Function RemoveField(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer) As Boolean
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
     If FieldIndexValid(aFieldIndex, lSf) Then
       lSf.StartEditingTable()
       'TODO: error handling
-      Dim lBsuc As Boolean = lSf.EditDeleteField(aFieldIndex)
+      RemoveField = lSf.EditDeleteField(aFieldIndex)
       lSf.StopEditingTable()
+    Else
+      RemoveField = False
     End If
   End Function
 
@@ -629,7 +629,7 @@ Public Class GisUtil
         Dim lUtils As New MapWinGIS.Utils
         lLength = lUtils.Length(lSf.Shape(aFeatureIndex))
         If lLength < 0.000001 Then 'could it be undefined
-          Dim lShapeFileType = lSf.ShapefileType
+          Dim lShapeFileType As MapWinGIS.ShpfileType = lSf.ShapefileType
           If lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINE AndAlso _
              lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINEM AndAlso _
              lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINEZ Then
@@ -751,12 +751,13 @@ Public Class GisUtil
     End If
   End Function
 
-  Public Shared Function SetSelectedFeature(ByVal aLayerIndex As Integer, ByVal aShapeIndex As Integer)
+  Public Shared Function SetSelectedFeature(ByVal aLayerIndex As Integer, ByVal aShapeIndex As Integer) As Boolean
     Dim lSelectColor As System.Drawing.Color
 
     pMapWin.Layers.CurrentLayer = aLayerIndex
     lSelectColor = pMapWin.View.SelectColor
     pMapWin.View.SelectedShapes.AddByIndex(aShapeIndex, lSelectColor)
+    Return True
   End Function
 
   Public Shared Function IndexOfNthSelectedFeatureInLayer(ByVal nth As Integer, ByVal aLayerIndex As Integer) As Integer
@@ -782,13 +783,13 @@ Public Class GisUtil
     'create new shapefile
     bsuc = osf.CreateNew(aOutputLayerName, lsf.ShapefileType)
     For i = 1 To lsf.NumFields
-      Dim of As New MapWinGIS.Field
-      of.Name = lsf.Field(i - 1).Name
-      of.Type = lsf.Field(i - 1).Type
-      of.Width = lsf.Field(i - 1).Width
-      of.Precision = lsf.Field(i - 1).Precision
-      bsuc = osf.EditInsertField(of, osf.NumFields)
-      of = Nothing
+      Dim [of] As New MapWinGIS.Field
+      [of].Name = lsf.Field(i - 1).Name
+      [of].Type = lsf.Field(i - 1).Type
+      [of].Width = lsf.Field(i - 1).Width
+      [of].Precision = lsf.Field(i - 1).Precision
+      bsuc = osf.EditInsertField([of], osf.NumFields)
+      [of] = Nothing
     Next i
     osf.StartEditingShapes(True)
 
@@ -1090,7 +1091,6 @@ Public Class GisUtil
   Public Shared Function GridValueAtPoint(ByVal GridLayerIndex As Integer, ByVal x As Double, ByVal y As Double) As Integer
     Dim column As Integer
     Dim row As Integer
-    Dim endingrow As Integer
     Dim gridLayer As MapWindow.Interfaces.Layer
 
     'set input grid
@@ -1159,11 +1159,11 @@ Public Class GisUtil
     If CreateNew Then
       'create new overlay shapefile
       osf.CreateNew("overlay", MapWinGIS.ShpfileType.SHP_POLYGON)
-      Dim of As New MapWinGIS.Field
-      of.Name = Layer1FieldName
-      of.Type = MapWinGIS.FieldType.INTEGER_FIELD
-      of.Width = 10
-      bsuc = osf.EditInsertField(of, 0)
+      Dim [of] As New MapWinGIS.Field
+      [of].Name = Layer1FieldName
+      [of].Type = MapWinGIS.FieldType.INTEGER_FIELD
+      [of].Width = 10
+      bsuc = osf.EditInsertField([of], 0)
       Dim of2 As New MapWinGIS.Field
       of2.Name = Layer2FieldName
       of2.Type = MapWinGIS.FieldType.INTEGER_FIELD
@@ -1277,7 +1277,6 @@ Public Class GisUtil
 
   Public Shared Function ClipShapesWithPolygon(ByVal inputlayerindex As Integer, ByVal clipperlayerindex As Integer) As String
     'returns output shape file name as string 
-    Dim mx As MapWinX.SpatialOperations
     Dim i As Integer
     Dim j As Integer
     Dim k As Integer
@@ -1312,7 +1311,7 @@ Public Class GisUtil
     For i = 1 To ssf.NumShapes
       GetMappingObject.StatusBar.ProgressBarValue = Int(i / ssf.NumShapes * 100)
       sshape = ssf.Shape(i - 1)
-      bsuc = mx.ClipShapesWithPolygon(isf, sshape, rsf)
+      bsuc = MapWinX.SpatialOperations.ClipShapesWithPolygon(isf, sshape, rsf)
       For j = 1 To rsf.NumShapes
         bsuc = orsf.EditInsertShape(rsf.Shape(j - 1), j - 1)
       Next j
@@ -1363,7 +1362,7 @@ Public Class GisUtil
 
   End Function
 
-  Public Shared Sub MergeFeaturesBasedOnAttribute(ByVal aLayerIndex, ByVal FieldIndex)
+  Public Shared Sub MergeFeaturesBasedOnAttribute(ByVal aLayerIndex As Integer, ByVal FieldIndex As Integer)
     Dim i As Integer
     Dim j As Integer
     Dim k As Integer
