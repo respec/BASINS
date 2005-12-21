@@ -1104,8 +1104,8 @@ Public Class frmModelSetup
   End Sub
 
   Private Sub SetPerviousGrid()
-    Dim LandUseLayerName As String, LandUseFieldName As String, LandUses As Collection
-    Dim i As Long, j As Long, k As Long, lyr As Long
+    Dim LandUseLayerName As String, LandUseFieldName As String
+    Dim i As Long, k As Long, lyr As Long
     Dim alreadyinlist As Boolean
     Dim tmpDbf As IATCTable
     Dim tcode As Long, prevcode As Long
@@ -1116,7 +1116,7 @@ Public Class frmModelSetup
 
     AtcGridPervious.Clear()
     With AtcGridPervious.Source
-      .Rows = 0
+      .Rows = 1
       .Columns = 5
       .CellValue(0, 0) = "Code"
       .CellValue(0, 1) = "Group Description"
@@ -1126,7 +1126,6 @@ Public Class frmModelSetup
       .ColorCells = True
       .FixedRows = 1
       .FixedColumns = 2
-      .Rows = 1
     End With
 
     If lblClass.Text <> "<none>" And _
@@ -1222,39 +1221,39 @@ Public Class frmModelSetup
       End If
 
     ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-        If cboLandUseLayer.SelectedIndex > -1 And cboDescription.SelectedIndex > -1 Then
-          LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-          LandUseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
-          'no reclass file, get unique landuse names
-          lyr = GisUtil.LayerIndex(LandUseLayerName)
-          If lyr > -1 Then
-            Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-            FillListUniqueLandUses(lyr, LandUseFieldName)
-            Cursor.Current = System.Windows.Forms.Cursors.Default
-          End If
+      If cboLandUseLayer.SelectedIndex > -1 And cboDescription.SelectedIndex > -1 Then
+        LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+        LandUseFieldName = cboDescription.Items(cboDescription.SelectedIndex)
+        'no reclass file, get unique landuse names
+        lyr = GisUtil.LayerIndex(LandUseLayerName)
+        If lyr > -1 Then
+          Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+          FillListUniqueLandUses(lyr, LandUseFieldName)
+          Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         End If
+      End If
 
     Else
-        'other grid types with no reclass file set
-        If cboLandUseLayer.SelectedIndex > -1 Then
-          LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
-          'get unique landuse names
-          lyr = GisUtil.LayerIndex(LandUseLayerName)
-          If GisUtil.LayerType(lyr) = 4 Then
-            'Grid
-            Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-            For i = Convert.ToInt32(GisUtil.GridLayerMinimum(lyr)) To Convert.ToInt32(GisUtil.GridLayerMaximum(lyr))
-              AtcGridPervious.Source.Rows = AtcGridPervious.Source.Rows + 1
-              AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 1) = i
-              AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 2) = 100
-            Next i
-            Cursor.Current = System.Windows.Forms.Cursors.Default
-          End If
+      'other grid types with no reclass file set
+      If cboLandUseLayer.SelectedIndex > -1 Then
+        LandUseLayerName = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+        'get unique landuse names
+        lyr = GisUtil.LayerIndex(LandUseLayerName)
+        If GisUtil.LayerType(lyr) = 4 Then
+          'Grid
+          Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+          For i = Convert.ToInt32(GisUtil.GridLayerMinimum(lyr)) To Convert.ToInt32(GisUtil.GridLayerMaximum(lyr))
+            AtcGridPervious.Source.Rows = AtcGridPervious.Source.Rows + 1
+            AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 1) = i
+            AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 2) = 100
+          Next i
+          Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         End If
-        AtcGridPervious.SizeAllColumnsToContents()
-        AtcGridPervious.ColumnWidth(0) = 0
-        AtcGridPervious.ColumnWidth(3) = 0
-        AtcGridPervious.ColumnWidth(4) = 0
+      End If
+      AtcGridPervious.SizeAllColumnsToContents()
+      AtcGridPervious.ColumnWidth(0) = 0
+      AtcGridPervious.ColumnWidth(3) = 0
+      AtcGridPervious.ColumnWidth(4) = 0
     End If
 
     With AtcGridPervious.Source
@@ -1289,7 +1288,7 @@ Public Class frmModelSetup
     If pModelName = "AQUATOX" Then
       StartAQUATOX("")
     Else
-      If ofdExisting.ShowDialog() = DialogResult.OK Then
+      If ofdExisting.ShowDialog() = Windows.Forms.DialogResult.OK Then
         uciname = ofdExisting.FileName
         StartWinHSPF(uciname)
       End If
@@ -1298,7 +1297,6 @@ Public Class frmModelSetup
 
   Private Sub StartWinHSPF(ByVal ucommand As String)
     Dim WinHSPFexe As String
-    Dim myProcess As New Process
 
     'todo:  get this from the registry
     WinHSPFexe = "c:\basins\models\hspf\bin\winhspf.exe"
@@ -1309,7 +1307,7 @@ Public Class frmModelSetup
       WinHSPFexe = "e:\basins\models\hspf\bin\winhspf.exe"
     End If
     If FileExists(WinHSPFexe) Then
-      myProcess.Start(WinHSPFexe, ucommand)
+      Process.Start(WinHSPFexe, ucommand)
     Else
       MsgBox("Cannot find WinHSPF.exe", MsgBoxStyle.Critical, "BASINS HSPF Problem")
     End If
@@ -1317,7 +1315,6 @@ Public Class frmModelSetup
 
   Public Sub StartAQUATOX(ByVal ucommand$)
     Dim AQUATOXexe$
-    Dim myProcess As New Process
     'Dim reg As New ATCoRegistry
 
     'todo:  get this from the registry
@@ -1325,7 +1322,7 @@ Public Class frmModelSetup
     AQUATOXexe = "\basins\models\AQUATOX\AQUATOX.exe"
 
     If FileExists(AQUATOXexe) Then
-      myProcess.Start(AQUATOXexe, ucommand)
+      Process.Start(AQUATOXexe, ucommand)
     Else
       MsgBox("Cannot find AQUATOX.exe", MsgBoxStyle.Critical, "BASINS AQUATOX Problem")
     End If
@@ -1395,7 +1392,7 @@ Public Class frmModelSetup
     End If
   End Sub
 
-  Public Function SetupHSPF(ByVal OutputPath As String, ByVal BaseOutputName As String)
+  Public Function SetupHSPF(ByVal OutputPath As String, ByVal BaseOutputName As String) As Boolean
     Dim luDriveLetter As String
     Dim BaseFileName As String
     Dim SubbasinThemeName As String
@@ -1404,13 +1401,13 @@ Public Class frmModelSetup
     Dim SubbasinFieldIndex As Long
     Dim SubbasinLengthIndex As Long
     Dim SubbasinSlopeIndex As Long
-    Dim LanduseFieldName As String
-    Dim LandUseThemeName As String
+    Dim LanduseFieldName As String = ""
+    Dim LandUseThemeName As String = ""
     Dim OutletsThemeName As String
     Dim LanduseLayerIndex As Long
     Dim luPathName As String
     Dim NewFileName As String
-    Dim ReclassifyFile As String
+    Dim ReclassifyFile As String = ""
     Dim i As Long
     Dim j As Long
     Dim k As Long
@@ -1438,7 +1435,7 @@ Public Class frmModelSetup
       'failed on one of the early checks, exit sub
       Exit Function
     End If
-    Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
     'set subbasin indexes
     SubbasinThemeName = cboSubbasins.Items(cboSubbasins.SelectedIndex)
@@ -1485,7 +1482,7 @@ Public Class frmModelSetup
       LanduseLayerIndex = GisUtil.LayerIndex(LandUseThemeName)
       LandUseFieldIndex = GisUtil.FieldIndex(LanduseLayerIndex, LanduseFieldName)
       luPathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
-      luPathName = luPathName & "\landuse"
+      luPathName &= "\landuse"
       luDriveLetter = Mid(luPathName, 1, 1)
       ReclassifyFile = luDriveLetter & ":\basins\etc\giras.dbf"
 
@@ -1583,9 +1580,6 @@ Public Class frmModelSetup
       If cboLanduse.SelectedIndex = 1 Then
         'nlcd grid
         ReclassifyFile = "\BASINS\etc\nlcd.dbf"
-      Else
-        'other grid
-        ReclassifyFile = ""
       End If
 
       lblStatus.Text = "Overlaying Land Use and Subbasins"
@@ -1621,6 +1615,9 @@ Public Class frmModelSetup
       'other shape
       lblStatus.Text = "Overlaying Land Use and Subbasins"
       Me.Refresh()
+
+      LanduseLayerIndex = GisUtil.LayerIndex(LandUseThemeName)
+      luPathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
 
       'do overlay
       GisUtil.Overlay(LandUseThemeName, LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
@@ -1712,18 +1709,18 @@ Public Class frmModelSetup
     Me.Refresh()
     Me.Dispose()
     Me.Close()
-    SetupHSPF = True
 
-    Exit Function
+    Return True
 
 ErrHand:
     MsgBox("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
     Me.Dispose()
     Me.Close()
-    SetupHSPF = False
+    Return False
+
   End Function
 
-  Private Function SetupAQUATOX(ByVal OutputPath As String, ByVal BaseOutputName As String)
+  Private Function SetupAQUATOX(ByVal OutputPath As String, ByVal BaseOutputName As String) As Boolean
     Dim BaseFileName As String
     Dim i As Long
     Dim StreamsThemeName As String
@@ -1739,9 +1736,9 @@ ErrHand:
 
     If Not PreProcessChecking(OutputPath, BaseOutputName) Then
       'failed on one of the early checks, exit sub
-      Exit Function
+      Return False
     End If
-    Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
     'are any streams selected?
     StreamsThemeName = cboStreams.Items(cboStreams.SelectedIndex)
@@ -1753,9 +1750,9 @@ ErrHand:
       cSelectedStreams.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i, StreamsLayerIndex))
     Next
     If cSelectedStreams.Count <> 1 Then
-      MsgBox("BASINS AQUATOX requires one and only one selected stream segment.", vbOKCancel, "BASINS AQUATOX Problem")
+      MsgBox("BASINS AQUATOX requires one and only one selected stream segment.", MsgBoxStyle.Critical, "BASINS AQUATOX Problem")
       EnableControls(True)
-      Exit Function
+      Return False
     End If
 
     'get the id of the selected stream
@@ -1782,15 +1779,15 @@ ErrHand:
     Me.Refresh()
     Me.Dispose()
     Me.Close()
-    SetupAQUATOX = True
 
-    Exit Function
+    Return True
 
 ErrHand:
     MsgBox("An error occurred: " & Err.Description, vbOKOnly, "BASINS " & pModelName & " Error")
     Me.Dispose()
     Me.Close()
-    SetupAQUATOX = False
+    Return False
+
   End Function
 
   Private Sub EnableControls(ByVal b As Boolean)
@@ -1860,7 +1857,7 @@ ErrHand:
   Private Sub WriteWSDFile(ByVal WsdFileName As String, ByVal cArea As Collection, ByVal cLucode As Collection, ByVal cSubid As Collection, _
                            ByVal cSublength As Collection, ByVal cSubslope As Collection, ByVal ReclassifyFile As String)
     Dim OutFile As Integer
-    Dim i As Integer, s As String, j As Integer, k As Integer
+    Dim i As Integer, j As Integer, k As Integer
     Dim incollection As Boolean
     Dim percentperv As Double
     Dim tarea As Double, stype As String
@@ -1872,7 +1869,7 @@ ErrHand:
     Dim UseSimpleGrid As Boolean
     Dim spos As Long
     Dim lpos As Long
-    Dim luname As String
+    Dim luname As String = ""
     Dim multiplier As Single
     Dim subbasin As String
     Dim useit As Boolean
@@ -2485,7 +2482,7 @@ ErrHand:
 
   Private Sub chkCustom_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkCustom.CheckedChanged
     If chkCustom.Checked Then
-      If ofdCustom.ShowDialog() = DialogResult.OK Then
+      If ofdCustom.ShowDialog() = Windows.Forms.DialogResult.OK Then
         lblCustom.Text = ofdCustom.FileName
         lblCustom.Visible = True
       Else
@@ -2583,7 +2580,7 @@ ErrHand:
   End Sub
 
   Private Sub cmdChange_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdChange.Click
-    If ofdClass.ShowDialog() = DialogResult.OK Then
+    If ofdClass.ShowDialog() = Windows.Forms.DialogResult.OK Then
       lblClass.Text = ofdClass.FileName
       SetPerviousGrid()
     End If

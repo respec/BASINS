@@ -486,8 +486,8 @@ Friend Class frmSelectData
 
 #End Region
 
-  Private Const PADDING As Integer = 5
-  Private Const NOTHING_VALUE = "~Missing~"
+  Private Const LAYOUT_PADDING As Integer = 5
+  Private Const NOTHING_VALUE As String = "~Missing~"
 
   Private pcboCriteria() As Windows.Forms.ComboBox
   Private plstCriteria() As atcGrid
@@ -542,6 +542,7 @@ Friend Class frmSelectData
       Return pSelectedGroup
     Else
       Me.Show()
+      Return Nothing
     End If
   End Function
 
@@ -853,19 +854,19 @@ NextName:
 
   Private Sub ResizeOneCriteria(ByVal aCriteria As Integer, ByVal aWidth As Integer)
     Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
-    Dim lWidth As Integer = aWidth - PADDING
+    Dim lWidth As Integer = aWidth - LAYOUT_PADDING
     pcboCriteria(aCriteria).Width = lWidth
-    pCriteriaFraction(aCriteria) = lWidth / (panelCriteria.Width - PADDING)
+    pCriteriaFraction(aCriteria) = lWidth / (panelCriteria.Width - LAYOUT_PADDING)
     plstCriteria(aCriteria).Width = lWidth
     plstCriteria(aCriteria).ColumnWidth(0) = lWidth
     While aCriteria < iLastCriteria
       aCriteria += 1
-      pcboCriteria(aCriteria).Left = pcboCriteria(aCriteria - 1).Left + pcboCriteria(aCriteria - 1).Width + PADDING
+      pcboCriteria(aCriteria).Left = pcboCriteria(aCriteria - 1).Left + pcboCriteria(aCriteria - 1).Width + LAYOUT_PADDING
       plstCriteria(aCriteria).Left = pcboCriteria(aCriteria).Left
     End While
 
     'Fit rightmost criteria to fill remaining space
-    Dim availableWidth As Integer = panelCriteria.Width - PADDING * 2
+    Dim availableWidth As Integer = panelCriteria.Width - LAYOUT_PADDING * 2
     If pcboCriteria(iLastCriteria).Left < availableWidth Then
       lWidth = availableWidth - pcboCriteria(iLastCriteria).Left
       pcboCriteria(iLastCriteria).Width = lWidth
@@ -879,39 +880,39 @@ NextName:
       Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
       If iLastCriteria >= 0 Then
         Dim availableWidth As Integer = panelCriteria.Width
-        'Dim perCriteriaWidth As Integer = (panelCriteria.Width - PADDING) / (iLastCriteria + 1)
+        'Dim perCriteriaWidth As Integer = (panelCriteria.Width - LAYOUT_PADDING) / (iLastCriteria + 1)
         Dim curLeft As Integer = 0
 
         pMatchingGrid.ColumnWidth(0) = 0
         pSelectedGrid.ColumnWidth(0) = 0
 
         For iCriteria As Integer = 0 To iLastCriteria
-          pcboCriteria(iCriteria).Top = PADDING
+          pcboCriteria(iCriteria).Top = LAYOUT_PADDING
           pcboCriteria(iCriteria).Left = curLeft
           If iCriteria = iLastCriteria AndAlso curLeft < availableWidth Then
             pcboCriteria(iCriteria).Width = availableWidth - curLeft 'Rightmost criteria fills remaining space
           Else
-            If availableWidth * pCriteriaFraction(iCriteria) > PADDING * 2 Then
-              pcboCriteria(iCriteria).Width = availableWidth * pCriteriaFraction(iCriteria) - PADDING
+            If availableWidth * pCriteriaFraction(iCriteria) > LAYOUT_PADDING * 2 Then
+              pcboCriteria(iCriteria).Width = availableWidth * pCriteriaFraction(iCriteria) - LAYOUT_PADDING
             Else
-              pcboCriteria(iCriteria).Width = PADDING
+              pcboCriteria(iCriteria).Width = LAYOUT_PADDING
             End If
           End If
 
           With plstCriteria(iCriteria)
-            .Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + PADDING
+            .Top = pcboCriteria(iCriteria).Top + pcboCriteria(iCriteria).Height + LAYOUT_PADDING
             .Left = curLeft
             .Width = pcboCriteria(iCriteria).Width
             .ColumnWidth(0) = .Width
-            .Height = panelCriteria.Height - .Top - PADDING
+            .Height = panelCriteria.Height - .Top - LAYOUT_PADDING
             .Visible = True
             .BringToFront()
             .Refresh()
           End With
 
-          curLeft = pcboCriteria(iCriteria).Left + pcboCriteria(iCriteria).Width + PADDING
+          curLeft = pcboCriteria(iCriteria).Left + pcboCriteria(iCriteria).Width + LAYOUT_PADDING
 
-          pMatchingGrid.ColumnWidth(iCriteria + 1) = pcboCriteria(iCriteria).Width + PADDING
+          pMatchingGrid.ColumnWidth(iCriteria + 1) = pcboCriteria(iCriteria).Width + LAYOUT_PADDING
           pSelectedGrid.ColumnWidth(iCriteria + 1) = pMatchingGrid.ColumnWidth(iCriteria + 1)
         Next
         pMatchingGrid.Refresh()

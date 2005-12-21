@@ -388,7 +388,6 @@ Public Class frmManDelin
 
   Public Sub MouseButtonClickUp(ByVal x As Double, ByVal y As Double, ByVal button As Integer)
     Dim draw_hndl As Integer
-    Dim Map1 As MapWinGIS.Map
 
     If startdrawing Then
       xpts.Add(x)
@@ -409,8 +408,6 @@ Public Class frmManDelin
 
   Public Sub MouseDrawingMove(ByVal x As Double, ByVal y As Double)
     Dim draw_hndl As Integer
-    Dim Map1 As MapWinGIS.Map
-
     If startdrawing Then
       If xpts.Count > 0 Then
         pMapWin.View.Draw.ClearDrawing(prevHandle)
@@ -444,12 +441,9 @@ Public Class frmManDelin
   End Sub
 
   Private Sub CommitLine()
-    Dim mx As MapWinX.SpatialOperations
     Dim j As Integer
     Dim k As Integer
     Dim ltempfile As String
-    Dim icnt As Integer
-    Dim ipos As Integer
 
     startdrawing = False
     cmdDelineate.Enabled = True
@@ -487,7 +481,7 @@ Public Class frmManDelin
         ltempfile = PathNameOnly(OperatingShapefile) & "\temp" & k & ".shp"
       Loop
 
-      success = mx.ClipPolygonWithLine(lShapefile.Shape(i - 1), clipshape, ltempfile)
+      success = MapWinX.SpatialOperations.ClipPolygonWithLine(lShapefile.Shape(i - 1), clipshape, ltempfile)
       If success Then
         lOutputShapefile.Open(ltempfile)
         If lOutputShapefile.NumShapes > 0 Then
@@ -540,11 +534,11 @@ Public Class frmManDelin
       success = lShapefile.EditInsertShape(csh, 0)
     Next csh
     'Add ID Field 
-    Dim of As New MapWinGIS.Field
-    of.Name = "SUBBASIN"
-    of.Type = MapWinGIS.FieldType.INTEGER_FIELD
-    of.Width = 10
-    success = lShapefile.EditInsertField(of, lShapefile.NumFields)
+    Dim [of] As New MapWinGIS.Field
+    [of].Name = "SUBBASIN"
+    [of].Type = MapWinGIS.FieldType.INTEGER_FIELD
+    [of].Width = 10
+    success = lShapefile.EditInsertField([of], lShapefile.NumFields)
     For i = 1 To lShapefile.NumShapes
       success = lShapefile.EditCellValue(0, i - 1, i)
     Next i
@@ -585,24 +579,18 @@ Public Class frmManDelin
     Dim ElevationThemeName As String
     Dim ElevationLayerIndex As Integer
     Dim ElevationFieldIndex As Integer
-    Dim MeanElevationFieldIndex As Integer
     Dim i As Integer
     Dim j As Integer
-    Dim subbasinArea As Double
-    Dim weightedElev As Single
     Dim SlopeFieldIndex As Integer
     Dim SubbasinFieldIndex As Integer
     Dim LengthFieldIndex As Integer
     Dim nsub As Integer
     Dim nelev As Integer
-    Dim ntot As Integer
-    Dim npercent As Integer
-    Dim lastpercent As Integer
 
     If cboLayer.SelectedIndex > -1 Then
 
       'change to hourglass cursor
-      Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+      Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
       lblCalc.Visible = True
       lblCalc.Text = "Calculating..."
       Me.Refresh()
@@ -651,10 +639,10 @@ Public Class frmManDelin
       End If
 
       'calculate slope
-      Dim minelev As Single
-      Dim maxelev As Single
-      Dim elev As Single
-      Dim slope As Single
+      Dim minelev As Double
+      Dim maxelev As Double
+      Dim elev As Double
+      Dim slope As Double
       Dim aIndex() As Integer
       If GisUtil.IsField(SubbasinLayerIndex, "SLO1") Then
         SlopeFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "SLO1")
@@ -705,7 +693,7 @@ Public Class frmManDelin
       End If
 
       'calculate length of overland flow plane
-      Dim sl As Single
+      Dim sl As Double
 
       If GisUtil.IsField(SubbasinLayerIndex, "LEN1") Then
         LengthFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "LEN1")
@@ -738,7 +726,7 @@ Public Class frmManDelin
         GisUtil.SetFeatureValue(SubbasinLayerIndex, LengthFieldIndex, i - 1, sl)
       Next i
 
-      Cursor.Current = System.Windows.Forms.Cursors.Default
+      Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
       lblCalc.Text = ""
       lblCalc.Visible = False
       Me.Refresh()
@@ -761,7 +749,7 @@ Public Class frmManDelin
     Dim StreamsLayerIndex As Integer
 
     'change to hourglass cursor
-    Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
     lblDefine.Visible = True
     lblDefine.Text = "Calculating..."
     Me.Refresh()
@@ -1133,15 +1121,15 @@ Public Class frmManDelin
       lShape = Nothing
     Next i
     'Add ID Field 
-    Dim of As New MapWinGIS.Field
-    of.Name = "ID"
-    of.Type = MapWinGIS.FieldType.INTEGER_FIELD
-    of.Width = 10
-    success = lShapefile.EditInsertField(of, lShapefile.NumFields)
+    Dim [of] As New MapWinGIS.Field
+    [of].Name = "ID"
+    [of].Type = MapWinGIS.FieldType.INTEGER_FIELD
+    [of].Width = 10
+    success = lShapefile.EditInsertField([of], lShapefile.NumFields)
     For i = 1 To lShapefile.NumShapes
       success = lShapefile.EditCellValue(0, i - 1, i)
     Next i
-    of = Nothing
+    [of] = Nothing
     Dim of2 As New MapWinGIS.Field
     'Add PCSID Field 
     of2.Name = "PCSID"
@@ -1179,7 +1167,7 @@ Public Class frmManDelin
     pMapWin.Layers(pMapWin.Layers.NumLayers - 1).OutlineColor = System.Drawing.Color.Cyan
     pMapWin.Layers(pMapWin.Layers.NumLayers - 1).LineOrPointSize = 5
 
-    Cursor.Current = System.Windows.Forms.Cursors.Default
+    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
     lblDefine.Text = ""
     lblDefine.Visible = False
     Me.Refresh()

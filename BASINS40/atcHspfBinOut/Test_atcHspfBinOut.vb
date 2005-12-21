@@ -222,7 +222,7 @@ End Class
   End Sub
 
   Public Sub TestOpen()
-    Dim lFile = New atcTimeseriesFileHspfBinOut
+    Dim lFile As New atcTimeseriesFileHspfBinOut
     Dim lName As String = "\test\C:\test\atcHspfBinOut\data\test15p.hbn"
     lFile.Open(lName)
   End Sub

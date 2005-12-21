@@ -195,7 +195,7 @@ Public Class atcDataAttributes
 
     If pAllDefinitions Is Nothing Then
       pAllDefinitions = New atcCollection
-      Dim lUnitsDef = New atcAttributeDefinition
+      Dim lUnitsDef As New atcAttributeDefinition
       lUnitsDef.Name = "Units"
       lUnitsDef.TypeString = "String"
       lUnitsDef.Editable = True
@@ -347,7 +347,7 @@ Public Class atcDataAttributes
     Dim lAttributes As SortedList = ValuesSortedByName()
     Dim lS As String = ""
     For i As Integer = 0 To lAttributes.Count - 1
-      Dim lAttributeName = lAttributes.GetKey(i)
+      Dim lAttributeName As String = lAttributes.GetKey(i)
       lS &= lAttributeName & vbTab & GetFormattedValue(lAttributeName) & vbCrLf
     Next
     Return lS

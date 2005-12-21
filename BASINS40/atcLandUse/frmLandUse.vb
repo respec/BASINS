@@ -468,7 +468,7 @@ Public Class frmLandUse
       SubbasinsNameFieldName = ""
     End If
 
-    Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+    Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
     newFrm.initialize(cboLanduse.SelectedIndex, LanduseLayerName, _
       LanduseIDFieldName, LanduseDescFieldName, SubbasinLayerName, _
       SubbasinsIDFieldName, SubbasinsNameFieldName)

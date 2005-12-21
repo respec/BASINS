@@ -69,7 +69,7 @@ Friend Class clsHspfBinary
     End Get
   End Property
 
-  Friend WriteOnly Property Monitor()
+  Friend WriteOnly Property Monitor() As Object
     Set(ByVal o As Object)
       pMonitor = o
       pMonitorSet = True

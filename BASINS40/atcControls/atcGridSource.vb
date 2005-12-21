@@ -248,6 +248,7 @@ Public Class atcGridSource
       Next
     Next
 
+    ToString = ""
     For iRow As Integer = 0 To lMaxRow
       For iCol As Integer = 0 To lMaxCol
         lCellValue = CellValue(iRow, iCol)

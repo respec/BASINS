@@ -111,8 +111,8 @@ Public Class frmSpecifyComputation
 
 #End Region
 
-  Private Const ARG_BUTTON_WIDTH = 80
-  Private Const PADDING As Integer = 5
+  Private Const ARG_BUTTON_WIDTH As Integer = 80
+  Private Const LAYOUT_PADDING As Integer = 5
 
   Private pSelectedOK As Boolean
   Private pAttributes As atcData.atcDataAttributes
@@ -185,8 +185,8 @@ Public Class frmSpecifyComputation
           pArgText(iArg) = New Windows.Forms.TextBox
           With pArgText(iArg)
             .Top = pArgLabel(iArg).Top
-            .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + PADDING
-            .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - PADDING * 2
+            .Left = pArgLabel(iArg).Left + pArgLabel(iArg).Width + LAYOUT_PADDING
+            .Width = ClientRectangle.Width - pArgText(iArg).Left - ARG_BUTTON_WIDTH - LAYOUT_PADDING * 2
             .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Top
 
             .Tag = iArg
@@ -219,7 +219,7 @@ Public Class frmSpecifyComputation
           With pArgButton(iArg)
             .Top = pArgLabel(iArg).Top
             .Width = ARG_BUTTON_WIDTH
-            .Left = ClientRectangle.Width - pArgButton(iArg).Width - PADDING
+            .Left = ClientRectangle.Width - pArgButton(iArg).Width - LAYOUT_PADDING
 
             .Tag = iArg
             .Text = "Select"

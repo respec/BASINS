@@ -4,15 +4,16 @@ Public Class frmScript
   Inherits System.Windows.Forms.Form
 
   Private pBasinsPlugin As atcBasinsPlugIn
-  Private pDefaultScript = "Imports atcData" & vbCrLf _
-                         & "Imports System.Windows.Forms" & vbCrLf _
-                         & "Imports Microsoft.VisualBasic" & vbCrLf _
-                         & vbCrLf _
-                         & "Public Module Dummy" & vbCrLf _
-                         & "  Public Sub Main(ByVal aDataManager As atcDataManager, ByVal aBasinsPlugIn As Object)" & vbCrLf _
-                         & "    MsgBox(""Running Script"")" & vbCrLf _
-                         & "  End Sub" & vbCrLf _
-                         & "End Module"
+  Private pDefaultScript As String = _
+          "Imports atcData" & vbCrLf _
+        & "Imports System.Windows.Forms" & vbCrLf _
+        & "Imports Microsoft.VisualBasic" & vbCrLf _
+        & vbCrLf _
+        & "Public Module Dummy" & vbCrLf _
+        & "  Public Sub Main(ByVal aDataManager As atcDataManager, ByVal aBasinsPlugIn As Object)" & vbCrLf _
+        & "    MsgBox(""Running Script"")" & vbCrLf _
+        & "  End Sub" & vbCrLf _
+        & "End Module"
   Private pFilter As String = "VB.net (*.vb)|*.vb|All files|*.*"
   Private pFileName As String = ""
 

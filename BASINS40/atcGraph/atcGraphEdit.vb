@@ -245,7 +245,7 @@ Public Class atcGraphEdit
     cDlg.Color = pnlProperty.BackColor
     cDlg.AnyColor = True
     cDlg.FullOpen = True
-    If (cDlg.ShowDialog() = DialogResult.OK) Then
+    If (cDlg.ShowDialog() = Windows.Forms.DialogResult.OK) Then
       pnlProperty.BackColor = cDlg.Color
     End If
   End Sub
@@ -270,11 +270,11 @@ Public Class atcGraphEdit
     RaiseEvent Apply()
   End Sub
 
-  Private Function SetValueOfNode(ByVal aNode As TreeNode, ByVal aValue As Object) As Object
+  Private Sub SetValueOfNode(ByVal aNode As TreeNode, ByVal aValue As Object)
     Dim lObj As Object = GetObjectForNode(aNode.Parent)
     GetPropInfoForNode(aNode, lObj).SetValue(lObj, aValue, Nothing)
     aNode.Text = aNode.Text.Substring(0, aNode.Text.IndexOf(" = ") + 3) & aValue.ToString
-  End Function
+  End Sub
 
   Private Function GetObjectForNode(ByVal aNode As TreeNode) As Object
     If aNode Is Nothing Then 'at top of tree
@@ -296,6 +296,7 @@ Public Class atcGraphEdit
         Return lPropInfo(i)
       End If
     Next
+    Return Nothing
   End Function
 
 End Class

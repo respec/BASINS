@@ -103,7 +103,7 @@ Public Class atcDateFormat
   End Property
 
   Public Function JDateToString(ByVal aJulianDate As Double) As String
-    Dim retval As String
+    Dim retval As String = ""
     Dim curDate(5) As Integer
 
     J2Date(aJulianDate, curDate)

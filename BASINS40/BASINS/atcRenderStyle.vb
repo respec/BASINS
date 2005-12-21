@@ -60,14 +60,15 @@ Public Class atcRenderStyle
     End Set
   End Property
 
-  Public Property operator() As String
+  Public Property [operator]() As String
     Get
       Select Case pOperator
-        Case -2 : operator = "<"
-        Case -1 : operator = "<="
-        Case 0 : operator = "="
-        Case 1 : operator = ">="
-        Case 2 : operator = ">"
+        Case -2 : [operator] = "<"
+        Case -1 : [operator] = "<="
+        Case 0 : [operator] = "="
+        Case 1 : [operator] = ">="
+        Case 2 : [operator] = ">"
+        Case Else : [operator] = ""
       End Select
     End Get
     Set(ByVal Value As String)
@@ -388,7 +389,7 @@ Public Class atcRenderStyle
         .Content = pName
 
         If Len(Value) > 0 Then .AddAttribute("Value", Value)
-        If operator <> "=" Then .AddAttribute("Operator", operator)
+        If [operator] <> "=" Then .AddAttribute("Operator", [operator])
 
         If Not FillColor.IsEmpty Then .AddAttribute("FillColor", FillColor.Name)
         If Len(FillStyle) > 0 Then .AddAttribute("FillStyle", FillStyle)
@@ -437,7 +438,7 @@ Public Class atcRenderStyle
         attValue = Value.GetAttributeValue(iAttribute)
         Select Case LCase(Value.GetAttributeName(iAttribute))
           Case "value" : Me.Value = attValue
-          Case "operator" : operator = attValue
+          Case "operator" : [operator] = attValue
 
           Case "fillcolor" : FillColor = ColorFromName(attValue) : fillColorFound = True
           Case "fillstyle" : FillStyle = attValue : fillStyleFound = True
@@ -476,7 +477,7 @@ Public Class atcRenderStyle
   End Property
 
   Public Sub SetMarkBits(ByVal aBits As String, Optional ByRef aWidth As Integer = 0, Optional ByRef aHeight As Integer = 0)
-    Dim bitsToUse As String
+    Dim bitsToUse As String = ""
     Dim iChar As Integer
     Dim hexit As String
     Dim byteValue As Integer
@@ -491,7 +492,7 @@ Public Class atcRenderStyle
       hexit = UCase(Mid(aBits, iChar, 1))
       Select Case Asc(hexit)
         '48 to 57 = digits, 65 to 70 = ABCDEF
-      Case 48 To 57, 65 To 70 : bitsToUse = bitsToUse & hexit
+        Case 48 To 57, 65 To 70 : bitsToUse &= hexit
       End Select
     Next
 
@@ -594,7 +595,7 @@ Public Class atcRenderStyle
     copy = New atcRenderStyle
 
     copy.Value = pValue
-    copy.operator = operator
+    copy.[operator] = [operator]
 
     copy.FillColor = pFillColor
     copy.FillStyle = CStr(pFillStyle)
@@ -647,7 +648,7 @@ Public Class atcRenderStyle
       .Tag = "RenderStyle"
       .Content = pName
       If Value <> aDefault.Value Then .AddAttribute("Value", Value)
-      If operator <> aDefault.operator Then .AddAttribute("Operator", operator)
+      If [operator] <> aDefault.[operator] Then .AddAttribute("Operator", [operator])
       If Not FillColor.Equals(aDefault.FillColor) Then .AddAttribute("FillColor", ColorName(FillColor))
       If FillStyle <> aDefault.FillStyle Then .AddAttribute("FillStyle", FillStyle)
       If Not LabelColor.Equals(aDefault.LabelColor) Then .AddAttribute("LabelColor", ColorName(LabelColor))

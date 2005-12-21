@@ -873,8 +873,7 @@ ErrHand:
   End Sub
 
   Public Overrides Function Cousin() As IatcTable
-    Dim iTrash As Short
-    Dim iField As Short
+    Dim iField As Integer
     Dim newDBF As New atcTableDBF
     With newDBF
       .Year = CInt(Format(Now, "yyyy")) - 1900
@@ -894,8 +893,8 @@ ErrHand:
 
   Public Overrides Function CreationCode() As String
     Dim retval As String
-    Dim iTrash As Short
-    Dim iField As Short
+    Dim iTrash As Integer
+    Dim iField As Integer
 
     retval = "Dim newDBF as clsDBF"
     retval = retval & vbCrLf & "set newDBF = new clsDBF"
@@ -939,7 +938,7 @@ ErrHand:
     'Dim memo As String * 512                               'Create a 512 byte fixed string variable
     ' to read memo fields
     Dim inFile As Short
-    Dim I As Short
+    Dim I As Integer
 
     If Not FileExists(Filename) Then
       Return False 'can't open a file that doesn't exist
@@ -982,8 +981,8 @@ ErrHand:
 
   Public Overrides Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String
     Dim retval As String
-    Dim iTrash As Short
-    Dim iField As Short
+    Dim iTrash As Integer
+    Dim iField As Integer
     Dim ShowTrash As Boolean
     Dim ShowHeaders As Boolean
     Dim ExpandType As Boolean
@@ -1065,7 +1064,7 @@ ErrHand:
 
   Public Overrides Function SummaryFile(Optional ByRef aFormat As String = "tab,headers") As String
     Dim retval As String
-    Dim iTrash As Short
+    Dim iTrash As Integer
     Dim ShowTrash As Boolean
     Dim ShowHeaders As Boolean
 
@@ -1126,7 +1125,7 @@ ErrHand:
 
   Public Overrides Function WriteFile(ByVal Filename As String) As Boolean
     Dim OutFile As Short
-    Dim j, I, dot As Short
+    Dim lField As Integer
     Dim s As String
 TryAgain:
     On Error GoTo ErrHand
@@ -1141,9 +1140,9 @@ TryAgain:
     FileOpen(OutFile, Filename, OpenMode.Binary)
     pHeader.WriteToFile(OutFile)
 
-    For I = 1 To pNumFields
-      pFields(I).WriteToFile(OutFile) 'FilePutObject(OutFile, pFields(I), (32 * I) + 1)
-    Next I
+    For lField = 1 To pNumFields
+      pFields(lField).WriteToFile(OutFile) 'FilePutObject(OutFile, pFields(I), (32 * I) + 1)
+    Next
 
     'If we have over-allocated for adding more records, trim unused records
     If pNumRecsCapacity > pHeader.NumRecs Then

@@ -176,7 +176,7 @@ Public Class atcTimeseriesFileHspfBinOut
           lTSer = New atcTimeseries(Me)
           For Each lAttributeName As DictionaryEntry In lBaseAttributes.ValuesSortedByName
             With lBaseAttributes
-              lTSer.Attributes.SetValue(.GetDefinition(lAttributeName.Key), lAttributeName.Value)
+              lTSer.Attributes.SetValue(atcDataAttributes.GetDefinition(lAttributeName.Key), lAttributeName.Value)
             End With
           Next
           With lTSer

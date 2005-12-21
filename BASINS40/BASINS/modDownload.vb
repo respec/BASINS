@@ -18,9 +18,9 @@ Module modDownload
     Dim NoData As Boolean = False
     Dim defDirName As String
     Dim newDataDir As String
-    Dim aprStr As String
-    Dim wholeaprStr As String
-    Dim fdn As String
+    'Dim aprStr As String
+    'Dim wholeaprStr As String
+    'Dim fdn As String
     Dim iSuffix As Integer
     Dim myProjection As String
     Dim cdlg As Windows.Forms.SaveFileDialog
@@ -35,7 +35,9 @@ StartOver:
           'Already came through here, don't ask again
         Else
           NoData = True
-          If MsgBox("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "BASINS Data Extraction") = MsgBoxResult.No Then Exit Function
+          If MsgBox("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "BASINS Data Extraction") = MsgBoxResult.No Then
+            Return ""
+          End If
         End If
         defDirName = "NewProject"
       Case 1
@@ -376,7 +378,7 @@ StartOver:
   Public Sub AddAllShapesInDir(ByVal aPath As String, ByVal project_dir As String)
     Dim iLayer As Integer
     Dim Filename As String
-    Dim allFiles As NameValueCollection
+    Dim allFiles As New NameValueCollection
     Dim defaultsXML As Chilkat.Xml = GetDefaultsXML()
 
     LogDbg("AddAllShapesInDir: '" & aPath & "'")

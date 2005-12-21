@@ -460,50 +460,48 @@ Public Class frmProjection
     End Function
 
     'Examines the controls of the form and returns the projection string
-    Public Overrides Function toString() As String
-        Dim theProjFile As String
-        Dim fu As Short
-        Dim id As Integer
-        Dim ProjObj As Projection
-        Dim ProjObjC As Projection
+  Public Overrides Function toString() As String
+    Dim id As Integer
+    Dim ProjObj As Projection
+    Dim ProjObjC As Projection
 
-        toString = "proj" & vbCrLf
+    toString = "proj" & vbCrLf
 
-        If radioStandard.Checked Then 'standard, not custom
-            ProjObj = pDB.StandardProjections.Item(cboCategory.Text & cboName.Text)
-            toString += "+proj=" & Trim(ProjObj.ProjectionClass) & vbCrLf
-            For Each ProjObjC In pDB.BaseProjections
-                If ProjObj.ProjectionClass = ProjObjC.ProjectionClass Or (ProjObj.ProjectionClass = "utm" And ProjObjC.ProjectionClass = "tmerc") Then
-                    If ProjObj.ProjectionClass = "utm" Then
-                        toString += "+zone=" & ProjObj.Zone & vbCrLf
-                    End If
-                    Exit For
-                End If
-            Next
-        Else 'custom, not standard
-            ProjObjC = pDB.BaseProjections(cboProjection.Text)
-            If Not ProjObjC Is Nothing Then
-                toString += "+proj=" & Trim(ProjObjC.ProjectionClass) & vbCrLf
-            End If
+    If radioStandard.Checked Then 'standard, not custom
+      ProjObj = pDB.StandardProjections.Item(cboCategory.Text & cboName.Text)
+      toString += "+proj=" & Trim(ProjObj.ProjectionClass) & vbCrLf
+      For Each ProjObjC In pDB.BaseProjections
+        If ProjObj.ProjectionClass = ProjObjC.ProjectionClass Or (ProjObj.ProjectionClass = "utm" And ProjObjC.ProjectionClass = "tmerc") Then
+          If ProjObj.ProjectionClass = "utm" Then
+            toString += "+zone=" & ProjObj.Zone & vbCrLf
+          End If
+          Exit For
         End If
+      Next
+    Else 'custom, not standard
+      ProjObjC = pDB.BaseProjections(cboProjection.Text)
+      If Not ProjObjC Is Nothing Then
+        toString += "+proj=" & Trim(ProjObjC.ProjectionClass) & vbCrLf
+      End If
+    End If
 
-        ProjObj = pDB.Ellipsoids(Trim(txtSpheroid.Text))
-        If Not ProjObj Is Nothing Then
-            toString += "+ellps=" & Trim(ProjObj.ProjectionClass) & vbCrLf
+    ProjObj = pDB.Ellipsoids(Trim(txtSpheroid.Text))
+    If Not ProjObj Is Nothing Then
+      toString += "+ellps=" & Trim(ProjObj.ProjectionClass) & vbCrLf
+    End If
+
+    If Not ProjObjC Is Nothing Then
+      Dim paramName As String
+      For id = 1 To 6
+        paramName = Trim(ProjObjC.d(id))
+        If paramName.Length > 0 Then
+          toString += "+" & paramName & "=" & Trim(txtD(id).Text) & vbCrLf
         End If
+      Next
+    End If
 
-        If Not ProjObjC Is Nothing Then
-            Dim paramName As String
-            For id = 1 To 6
-                paramName = Trim(ProjObjC.d(id))
-                If paramName.Length > 0 Then
-                    toString += "+" & paramName & "=" & Trim(txtD(id).Text) & vbCrLf
-                End If
-            Next
-        End If
-
-        toString += "end" & vbCrLf
-    End Function
+    toString += "end" & vbCrLf
+  End Function
 
     Private Sub txtD_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtD1.TextChanged, txtD2.TextChanged, txtD3.TextChanged, txtD4.TextChanged, txtD5.TextChanged, txtD6.TextChanged
         btnAdd.Enabled = True
@@ -667,64 +665,62 @@ Public Class frmProjection
         End If
     End Sub
 
-    Private Function lblD(ByVal index As Integer) As Windows.forms.Label
-        Select Case index
-            Case 1 : Return lblD1
-            Case 2 : Return lblD2
-            Case 3 : Return lblD3
-            Case 4 : Return lblD4
-            Case 5 : Return lblD5
-            Case 6 : Return lblD6
-        End Select
-    End Function
+  Private Function lblD(ByVal index As Integer) As Windows.Forms.Label
+    Select Case index
+      Case 1 : Return lblD1
+      Case 2 : Return lblD2
+      Case 3 : Return lblD3
+      Case 4 : Return lblD4
+      Case 5 : Return lblD5
+      Case 6 : Return lblD6
+      Case Else : Return Nothing
+    End Select
+  End Function
 
-    Private Function txtD(ByVal index As Integer) As Windows.forms.TextBox
-        Select Case index
-            Case 1 : Return txtD1
-            Case 2 : Return txtD2
-            Case 3 : Return txtD3
-            Case 4 : Return txtD4
-            Case 5 : Return txtD5
-            Case 6 : Return txtD6
-        End Select
-    End Function
+  Private Function txtD(ByVal index As Integer) As Windows.Forms.TextBox
+    Select Case index
+      Case 1 : Return txtD1
+      Case 2 : Return txtD2
+      Case 3 : Return txtD3
+      Case 4 : Return txtD4
+      Case 5 : Return txtD5
+      Case 6 : Return txtD6
+      Case Else : Return Nothing
+    End Select
+  End Function
 
-    Private Sub cboProjection_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboProjection.SelectedIndexChanged
-        Dim i As Long
-        Dim j As Long
-        Dim id As Long
-        Dim AlreadyInList As Boolean
-        Dim CurProjection As Projection
-        Dim BaseProjection As Projection
+  Private Sub cboProjection_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboProjection.SelectedIndexChanged
+    Dim id As Long
+    Dim CurProjection As Projection
 
-        If defaultsFlag Then
-            CurProjection = pDB.BaseProjections(cboProjection.Text)
-            If InStr(1, CurProjection.Ellipsoid, "=") > 0 Then
-                'case where projection determines ellipsoid
-                cboSpheroid.Visible = False
-                txtSpheroid.Text = Mid(CurProjection.Ellipsoid, InStr(1, CurProjection.Ellipsoid, "=") + 1)
-                txtSpheroid.Visible = True
-            Else
-                'user can select ellipsoid
-                cboSpheroid.Text = CurProjection.Ellipsoid
-                cboSpheroid.Visible = True
-                txtSpheroid.Visible = False
-            End If
-            For id = 1 To 6
-                If Len(CurProjection.d(id)) > 0 Then
-                    txtD(id).Text = CurProjection.Defaults.d(id)
-                    lblD(id).Text = CurProjection.Fieldnames.d(id) & ":"
-                    txtD(id).Visible = True
-                    lblD(id).Visible = True
-                Else
-                    txtD(id).Text = ""
-                    lblD(id).Visible = False
-                    txtD(id).Visible = False
-                End If
-            Next
+    If defaultsFlag Then
+      CurProjection = pDB.BaseProjections(cboProjection.Text)
+      If InStr(1, CurProjection.Ellipsoid, "=") > 0 Then
+        'case where projection determines ellipsoid
+        cboSpheroid.Visible = False
+        txtSpheroid.Text = Mid(CurProjection.Ellipsoid, InStr(1, CurProjection.Ellipsoid, "=") + 1)
+        txtSpheroid.Visible = True
+      Else
+        'user can select ellipsoid
+        cboSpheroid.Text = CurProjection.Ellipsoid
+        cboSpheroid.Visible = True
+        txtSpheroid.Visible = False
+      End If
+      For id = 1 To 6
+        If Len(CurProjection.d(id)) > 0 Then
+          txtD(id).Text = CurProjection.Defaults.d(id)
+          lblD(id).Text = CurProjection.Fieldnames.d(id) & ":"
+          txtD(id).Visible = True
+          lblD(id).Visible = True
+        Else
+          txtD(id).Text = ""
+          lblD(id).Visible = False
+          txtD(id).Visible = False
         End If
-        btnAdd.Enabled = False
-    End Sub
+      Next
+    End If
+    btnAdd.Enabled = False
+  End Sub
 
     Private Sub cboName_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboName.SelectedIndexChanged
         Dim id As Long

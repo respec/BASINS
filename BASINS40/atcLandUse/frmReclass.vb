@@ -510,11 +510,9 @@ Public Class frmReclass
 
   Private Sub SetGridTable(ByVal lutype As String)
     Dim i As Long
-    Dim j As Long
     Dim k As Long
     Dim ReclassifyFile As String
     Dim aAreaLS(,) As Double
-    Dim subid As Long
     Dim area As Single
     Dim tarea As Single
     Dim numSubbasins As Long
@@ -633,36 +631,36 @@ Public Class frmReclass
     AtcGridLanduse.Refresh()
   End Sub
 
-  Private Sub agdLanduse_RowColChange(ByVal sender As System.Object, ByVal e As System.EventArgs)
-    Dim i As Long, j As Long
-    Dim cVals As Collection
-    Dim inlist As Boolean
+  'Private Sub agdLanduse_RowColChange(ByVal sender As System.Object, ByVal e As System.EventArgs)
+  '  Dim i As Long, j As Long
+  '  Dim cVals As Collection
+  '  Dim inlist As Boolean
 
-    'todo:  implement dropdown list for strings
-    'With agdLanduse
-    '  If .col = 3 Then
-    '    .ClearValues()
-    '    cVals = New Collection
-    '    For i = 1 To .rows
-    '      inlist = False
-    '      For j = 1 To cVals.Count
-    '        If cVals(j) = .get_TextMatrix(i, 3) Then
-    '          inlist = True
-    '          Exit For
-    '        End If
-    '      Next j
-    '      If Not inlist Then
-    '        cVals.Add(.get_TextMatrix(i, 3))
-    '      End If
-    '    Next i
-    '    For i = 1 To cVals.Count
-    '      .addValue(cVals(i))
-    '    Next i
-    '  Else
-    '    .ClearValues()
-    '  End If
-    'End With
-  End Sub
+  'todo:  implement dropdown list for strings
+  'With agdLanduse
+  '  If .col = 3 Then
+  '    .ClearValues()
+  '    cVals = New Collection
+  '    For i = 1 To .rows
+  '      inlist = False
+  '      For j = 1 To cVals.Count
+  '        If cVals(j) = .get_TextMatrix(i, 3) Then
+  '          inlist = True
+  '          Exit For
+  '        End If
+  '      Next j
+  '      If Not inlist Then
+  '        cVals.Add(.get_TextMatrix(i, 3))
+  '      End If
+  '    Next i
+  '    For i = 1 To cVals.Count
+  '      .addValue(cVals(i))
+  '    Next i
+  '  Else
+  '    .ClearValues()
+  '  End If
+  'End With
+  'End Sub
 
   Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
     Me.Close()
@@ -711,10 +709,10 @@ Public Class frmReclass
   Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
     Dim dbfname As String
     Dim tmpDbf As IatcTable
-    Dim i As Long, j As Long
+    Dim i As Long
     Dim baserow As Long
 
-    If sfdSave.ShowDialog() = DialogResult.OK Then
+    If sfdSave.ShowDialog() = Windows.Forms.DialogResult.OK Then
       dbfname = sfdSave.FileName
       'does this dbf already exist?
       If FileExists(dbfname) Then
@@ -817,12 +815,9 @@ Public Class frmReclass
   Private Sub AddGroupedClassifications(ByVal ReclassifyFile As String, ByVal lutype As String)
     Dim i As Long, k As Long
     Dim tmpDbf As IatcTable
-    Dim ctmp As String
     Dim tmult As Single
     Dim tint As Long
     Dim foundvalue As Boolean
-    Dim irow As Long
-    Dim j As Long
 
     tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
 
@@ -928,7 +923,7 @@ Public Class frmReclass
     Else
       lutype = "User"
     End If
-    If ofdLoad.ShowDialog() = DialogResult.OK Then
+    If ofdLoad.ShowDialog() = Windows.Forms.DialogResult.OK Then
       dbfname = ofdLoad.FileName
       AddGroupedClassifications(dbfname, lutype)
       AtcGridLanduse.Refresh()

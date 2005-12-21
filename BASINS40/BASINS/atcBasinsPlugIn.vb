@@ -7,7 +7,7 @@ Imports atcData
 Public Class atcBasinsPlugIn
   Implements MapWindow.Interfaces.IPlugin
 
-  Private Const NationalProjectFilename = "national.mwprj"
+  Private Const NationalProjectFilename As String = "national.mwprj"
 
   'Private Const NewProjectMenuName As String = "BasinsNewProject"
   'Private Const NewProjectMenuString As String = "&New Project"
@@ -573,7 +573,7 @@ Public Class atcBasinsPlugIn
 
             pBuiltInScriptExists = True
             If aRun Then
-              Dim lParameters() = {pDataManager, Me}
+              Dim lParameters() As Object = {pDataManager, Me}
               lMethod.Invoke(Nothing, lParameters)
             End If
           End If
@@ -613,10 +613,11 @@ Public Class atcBasinsPlugIn
                                     ByRef aErrors As String, _
                                     ByVal ParamArray aArgs() As Object) As Object
 
+    LogMsg(aLanguage & vbCr & aScript, "atcBasinsPlugIn:RunBasinsScript")
     If Not aArgs Is Nothing Then 'replace some text arguments with objects
       For iArg As Integer = 0 To aArgs.GetUpperBound(0)
         If aArgs(iArg).GetType Is GetType(String) Then
-          Select Case aArgs(iArg).ToLower
+          Select Case CStr(aArgs(iArg)).ToLower
             Case "datamanager" : aArgs(iArg) = pDataManager
             Case "basinsplugin" : aArgs(iArg) = Me
             Case "mapwin" : aArgs(iArg) = g_MapWin
@@ -730,7 +731,9 @@ Public Class atcBasinsPlugIn
   End Sub
 
   Public Sub Message(ByVal msg As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
-    Dim errors As String
+    Dim errors As String = ""
+    Dim lScriptFileName As String = ""
+
     If msg.StartsWith("WELCOME_SCREEN") Then
       'We always show the welcome screen when requested EXCEPT we skip it when:
       'it is the initial welcome screen AND we have loaded a project or script on the command line.
@@ -765,15 +768,17 @@ Public Class atcBasinsPlugIn
       LogDbg("BASINS:Message:" & msg)
       Dim s As String = msg.Substring(23)
       If s.Substring(7).StartsWith("script") Then
-        ChDriveDir(PathNameOnly(s.Substring(14))) 'start where script is
-        RunBasinsScript("vb", WholeFileString(s.Substring(14)), errors, "dataManager", "basinsplugin")
+        lScriptFileName = s.Substring(14)
+        ChDriveDir(PathNameOnly(lScriptFileName)) 'start where script is
+        RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, errors, "dataManager", "basinsplugin")
         If Not errors Is Nothing Then
           LogMsg(errors, "Command Line Script Error", "OK")
         End If
         pCommandLineScript = True
       End If
     ElseIf msg.StartsWith("RUN_BASINS_SCRIPT:") Then
-      RunBasinsScript("vb", WholeFileString(msg.Substring(18).Trim), errors, "dataManager", "basinsplugin")
+      lScriptFileName = msg.Substring(18).Trim
+      RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, errors, "dataManager", "basinsplugin")
       If Not errors Is Nothing Then
         LogMsg(errors, "Script Error")
       End If

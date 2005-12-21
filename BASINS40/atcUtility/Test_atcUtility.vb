@@ -1425,7 +1425,6 @@ End Class
 
   Public Sub TestTextOrNumericColor()
     Dim lRed As Color = Color.Red
-    Dim lGot As Color
     Assert.AreEqual(lRed.ToArgb, TextOrNumericColor("red").ToArgb, "Fail to Match Red")
     Assert.AreEqual(lRed.ToArgb, TextOrNumericColor(lRed.ToArgb).ToArgb, "Fail to Match Red as ARGB")
     Assert.AreEqual(Color.Green.ToArgb, TextOrNumericColor("green").ToArgb, "Fail to Match Green")

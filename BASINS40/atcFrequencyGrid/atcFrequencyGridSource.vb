@@ -76,11 +76,11 @@ Friend Class atcFrequencyGridSource
     Return pDataGroup((aRow - 1) \ pRecurrence.Count)
   End Function
 
-  Public Function NdaysAt(ByVal aColumn) As String
+  Public Function NdaysAt(ByVal aColumn As Integer) As String
     Return pNdays.GetByIndex(aColumn - 2)
   End Function
 
-  Public Function RecurrenceAt(ByVal aRow) As String
+  Public Function RecurrenceAt(ByVal aRow As Integer) As String
     'remove any thousands commas in return period
     Return atcUtility.ReplaceString(pRecurrence.GetByIndex((aRow - 1) Mod pRecurrence.Count), ",", "")
   End Function

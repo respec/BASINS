@@ -11,7 +11,7 @@ Public Class atcFrequencyGridPlugin
   End Property
 
   Public Overrides Function Show(ByVal aDataManager As atcData.atcDataManager, _
-                   Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+                   Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
     Dim lDataGroup As atcDataGroup = aDataGroup
     If lDataGroup Is Nothing Then
       lDataGroup = New atcDataGroup
@@ -20,6 +20,9 @@ Public Class atcFrequencyGridPlugin
     Dim lForm As New frmDisplaySWStats(aDataManager, lDataGroup)
     If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
       lForm.Show()
+      Return lForm
+    Else
+      Return Nothing
     End If
   End Function
 

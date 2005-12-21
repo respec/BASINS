@@ -183,6 +183,7 @@ errHand:
     If Not db Is Nothing Then
       Return db.ExtractChildByName("Table", "Name", aTableName)
     End If
+    Return Nothing
   End Function
 
   Private Function unitsDB() As Chilkat.Xml
