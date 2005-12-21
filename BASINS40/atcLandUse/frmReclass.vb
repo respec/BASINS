@@ -1,5 +1,7 @@
+Imports atcControls
 Imports atcUtility
 Imports atcMwGisUtility
+Imports System.Drawing
 
 Public Class frmReclass
   Inherits System.Windows.Forms.Form
@@ -11,6 +13,12 @@ Public Class frmReclass
   Dim pSubbasinsLayer As String
   Dim pSubbasinsIDFieldName As String
   Dim pSubbasinsNameFieldName As String
+  Dim pLastClickedRow As Integer
+  Dim cUnusedCode As Collection
+  Dim cUnusedGroup As Collection
+  Dim cUnusedPercentPervious As Collection
+  Dim cUnusedMultiplier As Collection
+  Dim cUnusedSubbasin As Collection
 
 #Region " Windows Form Designer generated code "
 
@@ -39,7 +47,6 @@ Public Class frmReclass
   'NOTE: The following procedure is required by the Windows Form Designer
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
-  Friend WithEvents agdLanduse As AxATCoCtl.AxATCoGrid
   Friend WithEvents Panel1 As System.Windows.Forms.Panel
   Friend WithEvents RadioButton2 As System.Windows.Forms.RadioButton
   Friend WithEvents RadioButton1 As System.Windows.Forms.RadioButton
@@ -49,12 +56,12 @@ Public Class frmReclass
   Friend WithEvents cmdDelete As System.Windows.Forms.Button
   Friend WithEvents cmdClose As System.Windows.Forms.Button
   Friend WithEvents sfdSave As System.Windows.Forms.SaveFileDialog
-  Friend WithEvents agdHidden As AxATCoCtl.AxATCoGrid
   Friend WithEvents ofdLoad As System.Windows.Forms.OpenFileDialog
   Friend WithEvents lblProgress As System.Windows.Forms.Label
+  Friend WithEvents AtcGridLanduse As atcControls.atcGrid
+  Friend WithEvents lblHeader As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmReclass))
-    Me.agdLanduse = New AxATCoCtl.AxATCoGrid
     Me.Panel1 = New System.Windows.Forms.Panel
     Me.RadioButton2 = New System.Windows.Forms.RadioButton
     Me.RadioButton1 = New System.Windows.Forms.RadioButton
@@ -64,25 +71,12 @@ Public Class frmReclass
     Me.cmdDelete = New System.Windows.Forms.Button
     Me.cmdClose = New System.Windows.Forms.Button
     Me.sfdSave = New System.Windows.Forms.SaveFileDialog
-    Me.agdHidden = New AxATCoCtl.AxATCoGrid
     Me.ofdLoad = New System.Windows.Forms.OpenFileDialog
     Me.lblProgress = New System.Windows.Forms.Label
-    CType(Me.agdLanduse, System.ComponentModel.ISupportInitialize).BeginInit()
+    Me.AtcGridLanduse = New atcControls.atcGrid
+    Me.lblHeader = New System.Windows.Forms.Label
     Me.Panel1.SuspendLayout()
-    CType(Me.agdHidden, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
-    '
-    'agdLanduse
-    '
-    Me.agdLanduse.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.agdLanduse.Enabled = True
-    Me.agdLanduse.Location = New System.Drawing.Point(24, 24)
-    Me.agdLanduse.Name = "agdLanduse"
-    Me.agdLanduse.OcxState = CType(resources.GetObject("agdLanduse.OcxState"), System.Windows.Forms.AxHost.State)
-    Me.agdLanduse.Size = New System.Drawing.Size(704, 432)
-    Me.agdLanduse.TabIndex = 0
     '
     'Panel1
     '
@@ -153,6 +147,7 @@ Public Class frmReclass
     '
     'cmdClose
     '
+    Me.cmdClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
     Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdClose.Location = New System.Drawing.Point(248, 464)
     Me.cmdClose.Name = "cmdClose"
@@ -165,19 +160,6 @@ Public Class frmReclass
     Me.sfdSave.DefaultExt = "dbf"
     Me.sfdSave.Filter = "DBF files (*.dbf)|*.dbf"
     Me.sfdSave.Title = "Save Reclassification File"
-    '
-    'agdHidden
-    '
-    Me.agdHidden.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.agdHidden.Enabled = True
-    Me.agdHidden.Location = New System.Drawing.Point(136, 136)
-    Me.agdHidden.Name = "agdHidden"
-    Me.agdHidden.OcxState = CType(resources.GetObject("agdHidden.OcxState"), System.Windows.Forms.AxHost.State)
-    Me.agdHidden.Size = New System.Drawing.Size(512, 248)
-    Me.agdHidden.TabIndex = 10
-    Me.agdHidden.Visible = False
     '
     'ofdLoad
     '
@@ -194,25 +176,49 @@ Public Class frmReclass
     Me.lblProgress.TabIndex = 11
     Me.lblProgress.Text = "Processing Data ..."
     '
+    'AtcGridLanduse
+    '
+    Me.AtcGridLanduse.AllowHorizontalScrolling = True
+    Me.AtcGridLanduse.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.AtcGridLanduse.CellBackColor = System.Drawing.Color.Empty
+    Me.AtcGridLanduse.LineColor = System.Drawing.Color.Empty
+    Me.AtcGridLanduse.LineWidth = 0.0!
+    Me.AtcGridLanduse.Location = New System.Drawing.Point(24, 56)
+    Me.AtcGridLanduse.Name = "AtcGridLanduse"
+    Me.AtcGridLanduse.Size = New System.Drawing.Size(704, 400)
+    Me.AtcGridLanduse.Source = Nothing
+    Me.AtcGridLanduse.TabIndex = 12
+    '
+    'lblHeader
+    '
+    Me.lblHeader.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lblHeader.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.lblHeader.Location = New System.Drawing.Point(24, 32)
+    Me.lblHeader.Name = "lblHeader"
+    Me.lblHeader.Size = New System.Drawing.Size(704, 16)
+    Me.lblHeader.TabIndex = 13
+    Me.lblHeader.Text = "lblHeader"
+    '
     'frmReclass
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
     Me.ClientSize = New System.Drawing.Size(744, 496)
+    Me.Controls.Add(Me.lblHeader)
+    Me.Controls.Add(Me.AtcGridLanduse)
     Me.Controls.Add(Me.lblProgress)
-    Me.Controls.Add(Me.agdHidden)
     Me.Controls.Add(Me.cmdClose)
     Me.Controls.Add(Me.cmdDelete)
     Me.Controls.Add(Me.cmdAdd)
     Me.Controls.Add(Me.cmdSave)
     Me.Controls.Add(Me.cmdLoad)
     Me.Controls.Add(Me.Panel1)
-    Me.Controls.Add(Me.agdLanduse)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmReclass"
     Me.Text = "BASINS LandUse Reclassification"
-    CType(Me.agdLanduse, System.ComponentModel.ISupportInitialize).EndInit()
     Me.Panel1.ResumeLayout(False)
-    CType(Me.agdHidden, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
   End Sub
@@ -229,41 +235,40 @@ Public Class frmReclass
     pSubbasinsIDFieldName = SubbasinsIDFieldName
     pSubbasinsNameFieldName = SubbasinsNameFieldName
 
-    agdLanduse.Visible = False
     Panel1.Visible = False
     cmdAdd.Visible = False
     cmdDelete.Visible = False
     cmdLoad.Visible = False
     cmdSave.Visible = False
-    With agdLanduse
-      .set_ColTitle(0, "Code")
-      .set_ColTitle(1, "Description")
-      .set_ColTitle(2, "Area Percent")
-      .set_ColTitle(3, "Group")
-      .set_ColTitle(4, "% Pervious")
-      .set_ColTitle(5, "Multiplier")
-      .set_ColTitle(6, "Subbasin")
-      .FixedCols = 3
-      .set_ColEditable(3, True)
-      .set_ColType(4, 2)
-      .set_ColEditable(4, True)
-      .set_ColMax(4, 100)
-      .set_ColMin(4, 0)
-      .set_ColType(5, 2)
-      .set_ColEditable(5, True)
-      .set_ColEditable(6, True)
+    With AtcGridLanduse
+      .Source = New atcControls.atcGridSource
+      .Clear()
+      .AllowHorizontalScrolling = False
+      .Visible = False
     End With
-    With agdHidden
-      .set_ColTitle(0, "Code")
-      .set_ColTitle(1, "Group")
-      .set_ColTitle(2, "% Pervious")
-      .set_ColTitle(3, "Multiplier")
-      .set_ColTitle(4, "Subbasin")
+    With AtcGridLanduse.Source
+      .Rows = 0
+      .Columns = 7
+      .CellValue(0, 0) = "Code"
+      .CellValue(0, 1) = "Description"
+      .CellValue(0, 2) = "Area Percent"
+      .CellValue(0, 3) = "Group"
+      .CellValue(0, 4) = "% Pervious"
+      .CellValue(0, 5) = "Multiplier"
+      .CellValue(0, 6) = "Subbasin"
+      .ColorCells = True
+      .FixedRows = 1
+      .FixedColumns = 3
+      .Rows = 1
     End With
+    lblHeader.Visible = False
+
     RadioButton1.Checked = True
   End Sub
 
   Public Sub FillTable()
+    Dim i As Integer
+
     If pLanduseType = 0 Then
       SetShapefileTable("GIRAS")
     ElseIf pLanduseType = 1 Then
@@ -273,7 +278,34 @@ Public Class frmReclass
     ElseIf pLanduseType = 3 Then
       SetGridTable("User")
     End If
-    agdLanduse.Visible = True
+
+    AtcGridLanduse.SizeAllColumnsToContents()
+    With AtcGridLanduse.Source
+      .CellColor(0, 0) = SystemColors.ControlDark
+      .CellColor(0, 1) = SystemColors.ControlDark
+      .CellColor(0, 2) = SystemColors.ControlDark
+      .CellColor(0, 3) = SystemColors.ControlDark
+      .CellColor(0, 4) = SystemColors.ControlDark
+      .CellColor(0, 5) = SystemColors.ControlDark
+      .CellColor(0, 6) = SystemColors.ControlDark
+      For i = 1 To .Rows - 1
+        .CellColor(i, 0) = SystemColors.ControlDark
+        .CellColor(i, 1) = SystemColors.ControlDark
+        .CellColor(i, 2) = SystemColors.ControlDark
+        .CellEditable(i, 3) = True
+        .CellEditable(i, 4) = True
+        .CellEditable(i, 5) = True
+        .CellEditable(i, 6) = True
+      Next i
+    End With
+    AtcGridLanduse.Visible = True
+    If pSubbasinsLayer = "<none>" Then
+      AtcGridLanduse.ColumnWidth(2) = 0
+    End If
+    AtcGridLanduse.ColumnWidth(5) = 0
+    AtcGridLanduse.ColumnWidth(6) = 0
+    AtcGridLanduse.Refresh()
+
     Panel1.Visible = True
     cmdLoad.Visible = True
     cmdSave.Visible = True
@@ -302,7 +334,7 @@ Public Class frmReclass
     Dim DescriptionFieldName As String
     Dim lucode As String
     Dim desc As String
-    Dim tmpDbf As IATCTable
+    Dim tmpDbf As IatcTable
 
     Me.Refresh()
     'set subbasin layer
@@ -366,7 +398,6 @@ Public Class frmReclass
       totalpolygoncount = totalpolygoncount * GisUtil.NumFeatures(SubbasinLayerIndex)
     End If
 
-    agdLanduse.rows = 0
     polygoncount = 0
     lastdisplayed = 0
     For j = 1 To cluTiles.Count
@@ -389,92 +420,92 @@ Public Class frmReclass
       End If
       Me.Refresh()
 
-      With agdLanduse
-        If pSubbasinsLayer <> "<none>" Then
-          'do overlay
+      If pSubbasinsLayer <> "<none>" Then
+        'do overlay
 
-          GisUtil.Overlay(cluTiles(j), LandUseFieldName, pSubbasinsLayer, pSubbasinsIDFieldName, _
-                      PathName & "\overlay.shp", True)
+        GisUtil.Overlay(cluTiles(j), LandUseFieldName, pSubbasinsLayer, pSubbasinsIDFieldName, _
+                    PathName & "\overlay.shp", True)
 
-          'now populate grid with results
-          tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(PathName & "\overlay.dbf")
+        'now populate grid with results
+        tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(PathName & "\overlay.dbf")
 
-          For i = 1 To tmpDbf.NumRecords
-            tmpDbf.CurrentRecord = i
-            lucode = tmpDbf.Value(1)
-            area = tmpDbf.Value(3)
-            If Len(lucode) > 0 Then
-              'see if this type is already listed
-              inlist = False
-              For irow = 1 To agdLanduse.rows
-                If .get_TextMatrix(irow, 0) = lucode Then
-                  inlist = True
-                  area = area + .get_TextMatrix(irow, 2)
-                  .set_TextMatrix(irow, 2, area)
+        For i = 1 To tmpDbf.NumRecords
+          tmpDbf.CurrentRecord = i
+          lucode = tmpDbf.Value(1)
+          area = tmpDbf.Value(3)
+          If Len(lucode) > 0 Then
+            'see if this type is already listed
+            inlist = False
+            For irow = 1 To AtcGridLanduse.Source.Rows
+              If AtcGridLanduse.Source.CellValue(irow, 0) = lucode Then
+                inlist = True
+                area = area + AtcGridLanduse.Source.CellValue(irow, 2)
+                AtcGridLanduse.Source.CellValue(irow, 2) = area
+                Exit For
+              End If
+            Next
+            If Not inlist Then
+              AtcGridLanduse.Source.Rows = AtcGridLanduse.Source.Rows + 1
+              'find corresponding description from land use layer
+              desc = ""
+              For k = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
+                If lucode = GisUtil.FieldValue(LanduseLayerIndex, k - 1, LandUseFieldIndex) Then
+                  desc = GisUtil.FieldValue(LanduseLayerIndex, k - 1, DescriptionIndex)
                   Exit For
                 End If
-              Next
-              If Not inlist Then
-                .rows = .rows + 1
-                'find corresponding description from land use layer
-                desc = ""
-                For k = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
-                  If lucode = GisUtil.FieldValue(LanduseLayerIndex, k - 1, LandUseFieldIndex) Then
-                    desc = GisUtil.FieldValue(LanduseLayerIndex, k - 1, DescriptionIndex)
-                    Exit For
-                  End If
-                Next k
-                'now put in grid
-                .set_TextMatrix(.rows, 0, lucode)
-                .set_TextMatrix(.rows, 1, desc)
-                .set_TextMatrix(.rows, 2, area)
-              End If
+              Next k
+              'now put in grid
+              AtcGridLanduse.Source.CellValue(AtcGridLanduse.Source.Rows - 1, 0) = lucode
+              AtcGridLanduse.Source.CellValue(AtcGridLanduse.Source.Rows - 1, 1) = desc
+              AtcGridLanduse.Source.CellValue(AtcGridLanduse.Source.Rows - 1, 2) = area
             End If
-          Next i
-        Else
-          'no subbasin layer, include all land use codes
-          .set_ColTitle(2, "HIDE")
-          For i = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
-            lucode = GisUtil.FieldValue(LanduseLayerIndex, i - 1, LandUseFieldIndex)
-            desc = GisUtil.FieldValue(LanduseLayerIndex, i - 1, DescriptionIndex)
-            If Len(lucode) > 0 Then
-              'see if this type is already listed
-              inlist = False
-              For irow = 1 To agdLanduse.rows
-                If .get_TextMatrix(irow, 0) = lucode Then
-                  inlist = True
-                  Exit For
-                End If
-              Next
-              If Not inlist Then
-                .rows = .rows + 1
-                .set_TextMatrix(.rows, 0, lucode)
-                .set_TextMatrix(.rows, 1, desc)
-              End If
-            End If
-          Next i
-        End If
 
-      End With
+          End If
+        Next i
+      Else
+        'no subbasin layer, include all land use codes
+        For i = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
+          lucode = GisUtil.FieldValue(LanduseLayerIndex, i - 1, LandUseFieldIndex)
+          desc = GisUtil.FieldValue(LanduseLayerIndex, i - 1, DescriptionIndex)
+          If Len(lucode) > 0 Then
+            'see if this type is already listed
+            inlist = False
+            For irow = 1 To AtcGridLanduse.Source.Rows
+              If AtcGridLanduse.Source.CellValue(irow, 0) = lucode Then
+                inlist = True
+                Exit For
+              End If
+            Next
+            If Not inlist Then
+              AtcGridLanduse.Source.Rows = AtcGridLanduse.Source.Rows + 1
+              AtcGridLanduse.Source.CellValue(AtcGridLanduse.Source.Rows - 1, 0) = lucode
+              AtcGridLanduse.Source.CellValue(AtcGridLanduse.Source.Rows - 1, 1) = desc
+            End If
+          End If
+        Next i
+      End If
+
     Next j
 
     If pSubbasinsLayer <> "<none>" Then
       'go thru area column and convert to percents
       tarea = 0
-      For i = 1 To agdLanduse.rows
-        tarea = tarea + agdLanduse.get_TextMatrix(i, 2)
+      For i = 2 To AtcGridLanduse.Source.Rows
+        If Len(AtcGridLanduse.Source.CellValue(i - 1, 2)) = 0 Then
+          AtcGridLanduse.Source.CellValue(i - 1, 2) = 0
+        End If
+        tarea = tarea + AtcGridLanduse.Source.CellValue(i - 1, 2)
       Next
-      For i = 1 To agdLanduse.rows
-        agdLanduse.set_TextMatrix(i, 2, (CInt(agdLanduse.get_TextMatrix(i, 2) / tarea * 10000) / 100))
+      For i = 2 To AtcGridLanduse.Source.Rows
+        AtcGridLanduse.Source.CellValue(i - 1, 2) = (CInt(AtcGridLanduse.Source.CellValue(i - 1, 2) / tarea * 10000) / 100)
       Next
     End If
 
     AddGroupedClassifications(ReclassifyFile, lutype)
 
-    agdLanduse.Sort(0, True)
-    agdLanduse.ColsSizeByContents()
-    lblProgress.Visible = False
+    AtcGridLanduse.Source = SortSourceByIntegerColumn(AtcGridLanduse.Source, 0)
 
+    lblProgress.Visible = False
   End Sub
 
   Private Sub SetGridTable(ByVal lutype As String)
@@ -498,7 +529,7 @@ Public Class frmReclass
 
     ReclassifyFile = "\BASINS\etc\nlcd.dbf"
 
-    agdLanduse.rows = 0
+    AtcGridLanduse.Source.Rows = 1
     LanduseGridLayerIndex = GisUtil.LayerIndex(pLULayer)
     If GisUtil.LayerType(LanduseGridLayerIndex) = 4 Then
       'Grid
@@ -506,13 +537,13 @@ Public Class frmReclass
       If pSubbasinsLayer <> "<none>" Then
         'have subbasins specified
         numSubbasins = GisUtil.NumFeatures(SubbasinsLayerIndex)
-        ReDim aAreaLS(GisUtil.GridLayerMaximum(LanduseGridLayerIndex), numSubbasins)
+        ReDim aAreaLS(Convert.ToInt32(GisUtil.GridLayerMaximum(LanduseGridLayerIndex)), numSubbasins)
         GisUtil.TabulateAreas(LanduseGridLayerIndex, SubbasinsLayerIndex, aAreaLS)
       Else
         numSubbasins = 1
       End If
 
-      For i = GisUtil.GridLayerMinimum(LanduseGridLayerIndex) To GisUtil.GridLayerMaximum(LanduseGridLayerIndex)
+      For i = Convert.ToInt32(GisUtil.GridLayerMinimum(LanduseGridLayerIndex)) To Convert.ToInt32(GisUtil.GridLayerMaximum(LanduseGridLayerIndex))
         area = 0
         If pSubbasinsLayer <> "<none>" Then
           For k = 1 To GisUtil.NumFeatures(SubbasinsLayerIndex)
@@ -522,17 +553,17 @@ Public Class frmReclass
             End If
           Next k
           If area > 0 Then
-            With agdLanduse
-              .rows = .rows + 1
-              .set_TextMatrix(.rows, 0, i)
-              .set_TextMatrix(.rows, 2, area)
+            With AtcGridLanduse.Source
+              .Rows = .Rows + 1
+              .CellValue(.Rows - 1, 0) = i
+              .CellValue(.Rows - 1, 2) = area
             End With
           End If
         Else
           'no subbasin layer, add all categories
-          With agdLanduse
-            .rows = .rows + 1
-            .set_TextMatrix(.rows, 0, i)
+          With AtcGridLanduse.Source
+            .Rows = .Rows + 1
+            .CellValue(.Rows - 1, 0) = i
           End With
         End If
       Next i
@@ -540,26 +571,29 @@ Public Class frmReclass
       If pSubbasinsLayer <> "<none>" Then
         'go thru area column and convert to percents
         tarea = 0
-        For i = 1 To agdLanduse.rows
-          tarea = tarea + agdLanduse.get_TextMatrix(i, 2)
+        For i = 2 To AtcGridLanduse.Source.Rows
+          If Len(AtcGridLanduse.Source.CellValue(i - 1, 2)) = 0 Then
+            AtcGridLanduse.Source.CellValue(i - 1, 2) = 0
+          End If
+          tarea = tarea + AtcGridLanduse.Source.CellValue(i - 1, 2)
         Next
-        For i = 1 To agdLanduse.rows
-          agdLanduse.set_TextMatrix(i, 2, (CInt(agdLanduse.get_TextMatrix(i, 2) / tarea * 10000) / 100))
+        For i = 2 To AtcGridLanduse.Source.Rows
+          AtcGridLanduse.Source.CellValue(i - 1, 2) = (CInt(AtcGridLanduse.Source.CellValue(i - 1, 2) / tarea * 10000) / 100)
         Next
       Else
-        agdLanduse.set_ColTitle(2, "HIDE")
+        AtcGridLanduse.ColumnWidth(2) = 0
       End If
 
       If lutype = "NLCD" Then
         'add mrlc classifications
         ReclassifyFile = "\BASINS\etc\mrlc.dbf"
-        Dim tmpDbf As IATCTable
+        Dim tmpDbf As IatcTable
         tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
-        For k = 1 To agdLanduse.rows
+        For k = 1 To AtcGridLanduse.Source.Rows
           For i = 1 To tmpDbf.NumRecords
             tmpDbf.CurrentRecord = i
-            If agdLanduse.get_TextMatrix(k, 0) = tmpDbf.Value(1) Then
-              agdLanduse.set_TextMatrix(k, 1, tmpDbf.Value(2))
+            If AtcGridLanduse.Source.CellValue(k, 0) = tmpDbf.Value(1) Then
+              AtcGridLanduse.Source.CellValue(k, 1) = tmpDbf.Value(2)
               Exit For
             End If
           Next i
@@ -573,54 +607,61 @@ Public Class frmReclass
       AddGroupedClassifications(ReclassifyFile, lutype)
     End If
 
-    agdLanduse.ColsSizeByContents()
     lblProgress.Visible = False
   End Sub
 
   Private Sub RadioButton1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RadioButton1.CheckedChanged
     If RadioButton1.Checked Then
-      agdLanduse.set_ColTitle(5, "HIDE")
-      agdLanduse.set_ColTitle(6, "HIDE")
-      agdLanduse.ColsSizeByContents()
+      AtcGridLanduse.SizeAllColumnsToContents()
+      If pSubbasinsLayer = "<none>" Then
+        AtcGridLanduse.ColumnWidth(2) = 0
+      End If
+      AtcGridLanduse.ColumnWidth(5) = 0
+      AtcGridLanduse.ColumnWidth(6) = 0
       cmdAdd.Visible = False
       cmdDelete.Visible = False
     Else
-      agdLanduse.set_ColTitle(5, "Multiplier")
-      agdLanduse.set_ColTitle(6, "Subbasin")
-      agdLanduse.ColsSizeByContents()
+      AtcGridLanduse.SizeAllColumnsToContents()
+      If pSubbasinsLayer = "<none>" Then
+        AtcGridLanduse.ColumnWidth(2) = 0
+      End If
+      AtcGridLanduse.ColumnWidth(5) = 10
+      AtcGridLanduse.ColumnWidth(6) = 10
       cmdAdd.Visible = True
       cmdDelete.Visible = True
     End If
+    AtcGridLanduse.Refresh()
   End Sub
 
-  Private Sub agdLanduse_RowColChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles agdLanduse.RowColChange
+  Private Sub agdLanduse_RowColChange(ByVal sender As System.Object, ByVal e As System.EventArgs)
     Dim i As Long, j As Long
     Dim cVals As Collection
     Dim inlist As Boolean
 
-    With agdLanduse
-      If .col = 3 Then
-        .ClearValues()
-        cVals = New Collection
-        For i = 1 To .rows
-          inlist = False
-          For j = 1 To cVals.Count
-            If cVals(j) = .get_TextMatrix(i, 3) Then
-              inlist = True
-              Exit For
-            End If
-          Next j
-          If Not inlist Then
-            cVals.Add(.get_TextMatrix(i, 3))
-          End If
-        Next i
-        For i = 1 To cVals.Count
-          .addValue(cVals(i))
-        Next i
-      Else
-        .ClearValues()
-      End If
-    End With
+    'todo:  implement dropdown list for strings
+    'With agdLanduse
+    '  If .col = 3 Then
+    '    .ClearValues()
+    '    cVals = New Collection
+    '    For i = 1 To .rows
+    '      inlist = False
+    '      For j = 1 To cVals.Count
+    '        If cVals(j) = .get_TextMatrix(i, 3) Then
+    '          inlist = True
+    '          Exit For
+    '        End If
+    '      Next j
+    '      If Not inlist Then
+    '        cVals.Add(.get_TextMatrix(i, 3))
+    '      End If
+    '    Next i
+    '    For i = 1 To cVals.Count
+    '      .addValue(cVals(i))
+    '    Next i
+    '  Else
+    '    .ClearValues()
+    '  End If
+    'End With
   End Sub
 
   Private Sub cmdClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdClose.Click
@@ -628,108 +669,48 @@ Public Class frmReclass
   End Sub
 
   Private Sub cmdAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAdd.Click
+    If pLastClickedRow > 0 Then
+      AddRowToGrid(pLastClickedRow)
+    End If
+  End Sub
+
+  Private Sub AddRowToGrid(ByVal aAddAfterRow As Integer)
     Dim i As Long, j As Long
 
-    agdLanduse.rows = agdLanduse.rows + 1
-    For i = agdLanduse.rows To agdLanduse.SelStartRow() + 1 Step -1
-      For j = 0 To agdLanduse.cols - 1
-        agdLanduse.set_TextMatrix(i, j, agdLanduse.get_TextMatrix(i - 1, j))
+    AtcGridLanduse.Source.Rows = AtcGridLanduse.Source.Rows + 1
+    For i = AtcGridLanduse.Source.Rows To aAddAfterRow + 2 Step -1
+      For j = 0 To AtcGridLanduse.Source.Columns - 1
+        AtcGridLanduse.Source.CellValue(i - 1, j) = AtcGridLanduse.Source.CellValue(i - 2, j)
+        AtcGridLanduse.Source.CellColor(i - 1, j) = AtcGridLanduse.Source.CellColor(i - 2, j)
+        AtcGridLanduse.Source.CellEditable(i - 1, j) = AtcGridLanduse.Source.CellEditable(i - 2, j)
       Next j
     Next i
+    AtcGridLanduse.Refresh()
   End Sub
 
   Private Sub cmdDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDelete.Click
-    agdLanduse.DeleteRow(agdLanduse.SelStartRow())
+    If pLastClickedRow > 0 Then
+      DeleteRowFromGrid(pLastClickedRow)
+    End If
   End Sub
 
-  'Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
-  '  Dim dbfname As String
-  '  Dim tmpDbf As MapWinGIS.Table
-  '  Dim tmpField As MapWinGIS.Field
-  '  Dim tmpField2 As MapWinGIS.Field
-  '  Dim tmpField3 As MapWinGIS.Field
-  '  Dim tmpField4 As MapWinGIS.Field
-  '  Dim tmpField5 As MapWinGIS.Field
-  '  Dim i As Long, j As Long
-  '  Dim baserow As Long
+  Private Sub DeleteRowFromGrid(ByVal aDeleteRow As Integer)
+    Dim i As Long, j As Long
 
-  '  If sfdSave.ShowDialog() = DialogResult.OK Then
-  '    dbfname = sfdSave.FileName
-  '    tmpDbf = New MapWinGIS.Table
-  '    'does this dbf already exist?
-  '    If FileExists(dbfname) Then
-  '      'delete this file first
-  '      System.IO.File.Delete(dbfname)
-  '    End If
-  '    tmpDbf.CreateNew(dbfname)
-  '    tmpDbf.StartEditingTable()
-  '    tmpField = New MapWinGIS.Field
-  '    tmpField.Name = "Value"
-  '    tmpField.Type = MapWinGIS.FieldType.INTEGER_FIELD
-  '    tmpField.Width = 10
-  '    tmpDbf.EditInsertField(tmpField, 1)
-  '    tmpField2 = New MapWinGIS.Field
-  '    tmpField2.Name = "Landuse"
-  '    tmpField2.Type = MapWinGIS.FieldType.STRING_FIELD
-  '    tmpField2.Width = 30
-  '    tmpDbf.EditInsertField(tmpField2, 2)
-  '    tmpField3 = New MapWinGIS.Field
-  '    tmpField3.Name = "Pervious"
-  '    tmpField3.Type = MapWinGIS.FieldType.STRING_FIELD
-  '    tmpField3.Width = 10
-  '    tmpDbf.EditInsertField(tmpField3, 3)
-  '    tmpField4 = New MapWinGIS.Field
-  '    tmpField4.Name = "Multiplier"
-  '    tmpField4.Type = MapWinGIS.FieldType.STRING_FIELD
-  '    tmpField4.Width = 10
-  '    tmpDbf.EditInsertField(tmpField4, 4)
-  '    tmpField5 = New MapWinGIS.Field
-  '    tmpField5.Name = "Subbasin"
-  '    tmpField5.Type = MapWinGIS.FieldType.STRING_FIELD
-  '    tmpField5.Width = 10
-  '    tmpDbf.EditInsertField(tmpField5, 5)
-  '    tmpDbf.EditInsertRow(0)
-  '    baserow = -1
-
-  '    'write out hidden portion for unused classifications
-  '    For i = 1 To agdHidden.rows
-  '      tmpDbf.EditCellValue(0, i - 1, agdHidden.get_TextMatrix(i, 0))
-  '      tmpDbf.EditCellValue(1, i - 1, agdHidden.get_TextMatrix(i, 1))
-  '      tmpDbf.EditCellValue(2, i - 1, agdHidden.get_TextMatrix(i, 2))
-  '      tmpDbf.EditCellValue(3, i - 1, agdHidden.get_TextMatrix(i, 3))
-  '      tmpDbf.EditCellValue(4, i - 1, agdHidden.get_TextMatrix(i, 4))
-  '      tmpDbf.EditInsertRow(i)
-  '      baserow = baserow + 1
-  '    Next i
-
-  '    'now write out main grid
-  '    For i = 1 To agdLanduse.rows
-  '      tmpDbf.EditCellValue(0, i + baserow, agdLanduse.get_TextMatrix(i, 0))
-  '      tmpDbf.EditCellValue(1, i + baserow, agdLanduse.get_TextMatrix(i, 3))
-  '      tmpDbf.EditCellValue(2, i + baserow, agdLanduse.get_TextMatrix(i, 4))
-  '      If agdLanduse.get_TextMatrix(i, 5) = 1 Then
-  '        'write blank instead
-  '        tmpDbf.EditCellValue(3, i + baserow, "")
-  '      Else
-  '        tmpDbf.EditCellValue(3, i + baserow, agdLanduse.get_TextMatrix(i, 5))
-  '      End If
-  '      If agdLanduse.get_TextMatrix(i, 6) = "<all>" Then
-  '        tmpDbf.EditCellValue(4, i + baserow, "")
-  '      Else
-  '        tmpDbf.EditCellValue(4, i + baserow, agdLanduse.get_TextMatrix(i, 6))
-  '      End If
-  '      If i < agdLanduse.rows Then
-  '        tmpDbf.EditInsertRow(i + baserow + 1)
-  '      End If
-  '    Next i
-  '    tmpDbf.StopEditingTable(True)
-  '    tmpDbf.Close()
-  '  End If
-  'End Sub
+    For i = aDeleteRow + 1 To AtcGridLanduse.Source.Rows
+      For j = 0 To AtcGridLanduse.Source.Columns - 1
+        AtcGridLanduse.Source.CellValue(i - 1, j) = AtcGridLanduse.Source.CellValue(i, j)
+        AtcGridLanduse.Source.CellColor(i - 1, j) = AtcGridLanduse.Source.CellColor(i, j)
+        AtcGridLanduse.Source.CellEditable(i - 1, j) = AtcGridLanduse.Source.CellEditable(i, j)
+      Next j
+    Next i
+    AtcGridLanduse.Source.Rows = AtcGridLanduse.Source.Rows - 1
+    AtcGridLanduse.Refresh()
+  End Sub
 
   Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
     Dim dbfname As String
-    Dim tmpDbf As IATCTable
+    Dim tmpDbf As IatcTable
     Dim i As Long, j As Long
     Dim baserow As Long
 
@@ -760,80 +741,82 @@ Public Class frmReclass
 
       baserow = 0
       'write out hidden portion for unused classifications
-      For i = 1 To agdHidden.rows
+      For i = 1 To cUnusedCode.Count
         tmpDbf.CurrentRecord = i
-        tmpDbf.Value(1) = agdHidden.get_TextMatrix(i, 0)
-        tmpDbf.Value(2) = agdHidden.get_TextMatrix(i, 1)
-        tmpDbf.Value(3) = agdHidden.get_TextMatrix(i, 2)
-        tmpDbf.Value(4) = agdHidden.get_TextMatrix(i, 3)
-        tmpDbf.Value(5) = agdHidden.get_TextMatrix(i, 4)
+        tmpDbf.Value(1) = cUnusedCode(i)
+        tmpDbf.Value(2) = cUnusedGroup(i)
+        tmpDbf.Value(3) = cUnusedPercentPervious(i)
+        tmpDbf.Value(4) = cUnusedMultiplier(i)
+        tmpDbf.Value(5) = cUnusedSubbasin(i)
         baserow = baserow + 1
       Next i
 
       'now write out main grid
-      For i = 1 To agdLanduse.rows
+      For i = 1 To AtcGridLanduse.Source.Rows - 1
         tmpDbf.CurrentRecord = i + baserow
-        tmpDbf.Value(1) = agdLanduse.get_TextMatrix(i, 0)
-        tmpDbf.Value(2) = agdLanduse.get_TextMatrix(i, 3)
-        tmpDbf.Value(3) = agdLanduse.get_TextMatrix(i, 4)
-        If agdLanduse.get_TextMatrix(i, 5) = 1 Then
+        tmpDbf.Value(1) = AtcGridLanduse.Source.CellValue(i, 0)
+        tmpDbf.Value(2) = AtcGridLanduse.Source.CellValue(i, 3)
+        tmpDbf.Value(3) = AtcGridLanduse.Source.CellValue(i, 4)
+        If Trim(AtcGridLanduse.Source.CellValue(i, 5)) = "1" Then
           'write blank instead
           tmpDbf.Value(4) = ""
         Else
-          tmpDbf.Value(4) = agdLanduse.get_TextMatrix(i, 5)
+          tmpDbf.Value(4) = AtcGridLanduse.Source.CellValue(i, 5)
         End If
-        If agdLanduse.get_TextMatrix(i, 6) = "<all>" Then
+        If AtcGridLanduse.Source.CellValue(i, 6) = "<all>" Then
           tmpDbf.Value(5) = ""
         Else
-          tmpDbf.Value(5) = agdLanduse.get_TextMatrix(i, 6)
+          tmpDbf.Value(5) = AtcGridLanduse.Source.CellValue(i, 6)
         End If
       Next i
+
       tmpDbf.WriteFile(dbfname)
 
     End If
   End Sub
 
-  Private Sub StoreUnusedClassifications(ByVal tmpDbf As IATCTable)
+  Private Sub StoreUnusedClassifications(ByVal tmpDbf As IatcTable)
     Dim i As Long, j As Long
     Dim inlist As Boolean
 
-    agdHidden.ClearValues()
-    agdHidden.rows = 0
+    cUnusedCode = New Collection
+    cUnusedGroup = New Collection
+    cUnusedPercentPervious = New Collection
+    cUnusedMultiplier = New Collection
+    cUnusedSubbasin = New Collection
+
     For i = 1 To tmpDbf.NumRecords
       tmpDbf.CurrentRecord = i
       'look for codes that did not get used
       inlist = False
-      For j = 1 To agdLanduse.rows
-        If tmpDbf.Value(1) = agdLanduse.get_TextMatrix(j, 0) Then
+      For j = 1 To AtcGridLanduse.Source.Rows - 1
+        If tmpDbf.Value(1) = AtcGridLanduse.Source.CellValue(j, 0) Then
           'this one was used
           inlist = True
           Exit For
         End If
       Next j
       If Not inlist Then
-        With agdHidden
-          .rows = .rows + 1
-          .set_TextMatrix(.rows, 0, tmpDbf.Value(1))
-          .set_TextMatrix(.rows, 1, tmpDbf.Value(2))
-          .set_TextMatrix(.rows, 2, tmpDbf.Value(3))
-          If tmpDbf.NumFields > 3 Then
-            .set_TextMatrix(.rows, 3, tmpDbf.Value(4))
-          Else
-            .set_TextMatrix(.rows, 3, "")
-          End If
-          If tmpDbf.NumFields > 4 Then
-            .set_TextMatrix(.rows, 4, tmpDbf.Value(5))
-          Else
-            .set_TextMatrix(.rows, 4, "")
-          End If
-        End With
+        cUnusedCode.Add(tmpDbf.Value(1))
+        cUnusedGroup.Add(tmpDbf.Value(2))
+        cUnusedPercentPervious.Add(tmpDbf.Value(3))
+        If tmpDbf.NumFields > 3 Then
+          cUnusedMultiplier.Add(tmpDbf.Value(4))
+        Else
+          cUnusedMultiplier.Add("")
+        End If
+        If tmpDbf.NumFields > 4 Then
+          cUnusedSubbasin.Add(tmpDbf.Value(5))
+        Else
+          cUnusedSubbasin.Add("")
+        End If
       End If
     Next i
   End Sub
 
   Private Sub AddGroupedClassifications(ByVal ReclassifyFile As String, ByVal lutype As String)
     Dim i As Long, k As Long
-    Dim tmpDbf As IATCTable
+    Dim tmpDbf As IatcTable
     Dim ctmp As String
     Dim tmult As Single
     Dim tint As Long
@@ -842,40 +825,38 @@ Public Class frmReclass
     Dim j As Long
 
     tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
+
     k = 1
-    Do While k <= agdLanduse.rows
+    Do While k <= AtcGridLanduse.Source.Rows
       'For k = 1 To agdLanduse.rows
       foundvalue = False
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
-        If agdLanduse.get_TextMatrix(k, 0) = tmpDbf.Value(1) Then
+        If AtcGridLanduse.Source.CellValue(k, 0) = tmpDbf.Value(1) Then
 
           If foundvalue Then
             'already found one of these, add a row to table
-            agdLanduse.rows = agdLanduse.rows + 1
-            For irow = agdLanduse.rows To k + 1 Step -1
-              For j = 0 To agdLanduse.cols - 1
-                agdLanduse.set_TextMatrix(irow, j, agdLanduse.get_TextMatrix(irow - 1, j))
-              Next j
-            Next irow
+            AddRowToGrid(k)
             k = k + 1
-            agdLanduse.set_TextMatrix(k, 4, "")
-            agdLanduse.set_TextMatrix(k, 5, "")
-            agdLanduse.set_TextMatrix(k, 6, "")
+            AtcGridLanduse.Source.CellValue(k, 4) = ""
+            AtcGridLanduse.Source.CellValue(k, 5) = ""
+            AtcGridLanduse.Source.CellValue(k, 6) = ""
           End If
 
-          agdLanduse.set_TextMatrix(k, 3, tmpDbf.Value(2))
+          AtcGridLanduse.Source.CellValue(k, 3) = tmpDbf.Value(2)
 
           If tmpDbf.NumFields > 2 Then
             'populate pervious field
-            agdLanduse.set_TextMatrix(k, 4, tmpDbf.Value(3))
+            AtcGridLanduse.Source.CellValue(k, 4) = tmpDbf.Value(3)
           End If
 
           If tmpDbf.NumFields > 3 Then
             If IsNumeric(tmpDbf.Value(4)) Then
               tmult = tmpDbf.Value(4)
               'use this as multiplier
-              agdLanduse.set_TextMatrix(k, 5, tmult)
+              AtcGridLanduse.Source.CellValue(k, 5) = tmult
+            Else
+              AtcGridLanduse.Source.CellValue(k, 5) = 1
             End If
           End If
 
@@ -883,7 +864,9 @@ Public Class frmReclass
             If IsNumeric(tmpDbf.Value(5)) Then
               tint = tmpDbf.Value(5)
               'use this as subbasin field
-              agdLanduse.set_TextMatrix(k, 6, tint)
+              AtcGridLanduse.Source.CellValue(k, 6) = tint
+            Else
+              AtcGridLanduse.Source.CellValue(k, 6) = "<all>"
             End If
           End If
 
@@ -893,26 +876,25 @@ Public Class frmReclass
 
       Next i
 
-      If Len(agdLanduse.get_TextMatrix(k, 5)) = 0 Then
+      If Len(AtcGridLanduse.Source.CellValue(k - 1, 5)) = 0 Then
         'populate multiplier
-        agdLanduse.set_TextMatrix(k, 5, 1)
+        AtcGridLanduse.Source.CellValue(k - 1, 5) = 1
       End If
 
-      If Len(agdLanduse.get_TextMatrix(k, 6)) = 0 Then
+      If Len(AtcGridLanduse.Source.CellValue(k - 1, 6)) = 0 Then
         'populate subbasin field
-        agdLanduse.set_TextMatrix(k, 6, "<all>")
+        AtcGridLanduse.Source.CellValue(k - 1, 6) = "<all>"
       End If
 
       k = k + 1
     Loop
-    'Next k
 
     If lutype = "NLCD" And pSubbasinsLayer = "<none>" Then
       'display only those known to be valid NLCD types
       k = 1
-      Do While k <= agdLanduse.rows
-        If Len(agdLanduse.get_TextMatrix(k, 1)) = 0 Then
-          agdLanduse.DeleteRow(k)
+      Do While k <= AtcGridLanduse.Source.Rows
+        If Len(AtcGridLanduse.Source.CellValue(k - 1, 1)) = 0 Then
+          DeleteRowFromGrid(k - 1)
         Else
           k = k + 1
         End If
@@ -921,20 +903,18 @@ Public Class frmReclass
 
     'set appropriate header 
     If pSubbasinsLayer <> "<none>" Then
-      agdLanduse.set_header(lutype & " classes within layer " & pSubbasinsLayer & " (grouped by " & FilenameNoPath(ReclassifyFile) & ")")
+      lblHeader.Text = lutype & " classes within layer " & pSubbasinsLayer & " (grouped by " & FilenameNoPath(ReclassifyFile) & ")"
     Else
       If pLanduseType = 0 Or pLanduseType = 2 Then
         'giras or other shape
-        agdLanduse.set_header(lutype & " classes in current project (grouped by " & FilenameNoPath(ReclassifyFile) & ")")
+        lblHeader.Text = lutype & " classes in current project (grouped by " & FilenameNoPath(ReclassifyFile) & ")"
       ElseIf pLanduseType = 1 Or pLanduseType = 3 Then
         'nlcd grid or other grid
-        agdLanduse.set_header("All " & lutype & " classes (grouped by " & FilenameNoPath(ReclassifyFile) & ")")
+        lblHeader.Text = "All " & lutype & " classes (grouped by " & FilenameNoPath(ReclassifyFile) & ")"
       End If
     End If
-    'agdLanduse.set_header(lutype & " Classifications (" & FilenameNoPath(ReclassifyFile) & ")")
+    lblHeader.Visible = True
     StoreUnusedClassifications(tmpDbf)
-
-    'tmpDbf.Close()
   End Sub
 
   Private Sub cmdLoad_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdLoad.Click
@@ -951,6 +931,51 @@ Public Class frmReclass
     If ofdLoad.ShowDialog() = DialogResult.OK Then
       dbfname = ofdLoad.FileName
       AddGroupedClassifications(dbfname, lutype)
+      AtcGridLanduse.Refresh()
     End If
+  End Sub
+
+  Private Function SortSourceByIntegerColumn(ByVal aSource As atcGridSource, ByVal aColumn As Integer) As atcGridSource
+    Dim lSortedRows As New atcCollection
+    Dim lOldRow As Integer
+    Dim lNewRow As Integer
+    Dim lColumns As Integer = aSource.Columns
+    Dim lRows As Integer = aSource.Rows
+    Dim lColorCells As Boolean = aSource.ColorCells
+
+    For lOldRow = aSource.FixedRows To aSource.Rows - 1
+      lSortedRows.Add(CInt(aSource.CellValue(lOldRow, aColumn)), lOldRow)
+    Next
+    lSortedRows.Sort()
+
+    SortSourceByIntegerColumn = New atcGridSource
+    With SortSourceByIntegerColumn
+      .Rows = lRows
+      .Columns = lColumns
+      .FixedRows = aSource.FixedRows
+      .FixedColumns = aSource.FixedColumns
+      .ColorCells = lColorCells
+
+      For lNewRow = 0 To lRows - 1
+        If lNewRow < .FixedRows Then
+          lOldRow = lNewRow
+        Else
+          lOldRow = lSortedRows.ItemByIndex(lNewRow - .FixedRows)
+        End If
+        For lColumn As Integer = 0 To lColumns - 1
+          .CellValue(lNewRow, lColumn) = aSource.CellValue(lOldRow, lColumn)
+          If lColorCells Then
+            .CellColor(lNewRow, lColumn) = aSource.CellColor(lOldRow, lColumn)
+          End If
+          .CellEditable(lNewRow, lColumn) = aSource.CellEditable(lOldRow, lColumn)
+          .Alignment(lNewRow, lColumn) = aSource.Alignment(lOldRow, lColumn)
+          .CellSelected(lNewRow, lColumn) = aSource.CellSelected(lOldRow, lColumn)
+        Next
+      Next
+    End With
+  End Function
+
+  Private Sub AtcGridLanduse_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridLanduse.MouseDownCell
+    pLastClickedRow = aRow
   End Sub
 End Class
