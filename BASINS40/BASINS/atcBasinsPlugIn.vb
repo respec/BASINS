@@ -27,6 +27,19 @@ Public Class atcBasinsPlugIn
   Private Const ModelsMenuName As String = "BasinsModels"
   Private Const ModelsMenuString As String = "&Models"
 
+  Private pWelcomeScreenShow As Boolean = False
+  Private Const WelcomeScreenShowMenuName As String = "ShowWelcome"
+  Private Const WelcomeScreenShowMenuString As String = "&Show Welcome Screen"
+
+  Private Const CheckForUpdatesMenuName As String = "CheckForUpdates"
+  Private Const CheckForUpdatesMenuString As String = "&Check For Updates"
+
+  Private Const BasinsWebPageMenuName As String = "BasinsWebPage"
+  Private Const BasinsWebPageMenuString As String = "&Basins Web Page"
+
+  Private Const SendFeedbackMenuName As String = "SendFeedback"
+  Private Const SendFeedbackMenuString As String = "Send &Feedback"
+
   Private Const BasinsProjectPath As String = "\Basins\apr\"
   Private Const BasinsDataPath As String = "\Basins\data\"
 
@@ -38,7 +51,6 @@ Public Class atcBasinsPlugIn
   Private pLogFilename As String = ""
   Private WithEvents pDataManager As atcDataManager
 
-  Private pWelcomeScreenShow As Boolean = False
   Private pCommandLineScript As Boolean = False
   Private pBuiltInScriptExists As Boolean = False
 
@@ -123,6 +135,13 @@ Public Class atcBasinsPlugIn
     AddMenuIfMissing(OpenDataMenuName, "mnuFile", OpenDataMenuString, "mnuOpen")
     AddMenuIfMissing(SaveDataMenuName, "mnuFile", SaveDataMenuString, "mnuSaveAs")
     AddMenuIfMissing(ProjectsMenuName, "mnuFile", ProjectsMenuString, "mnuRecentProjects")
+
+    AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
+    mnu = AddMenuIfMissing(WelcomeScreenShowMenuName, "mnuHelp", WelcomeScreenShowMenuString, "")
+    mnu = AddMenuIfMissing(BasinsWebPageMenuName, "mnuHelp", BasinsWebPageMenuString, "")
+    AddMenuIfMissing("BasinsHelp_Separator2", "mnuHelp", "-")
+    mnu = AddMenuIfMissing(CheckForUpdatesMenuName, "mnuHelp", CheckForUpdatesMenuString, "")
+    mnu = AddMenuIfMissing(SendFeedbackMenuName, "mnuHelp", SendFeedbackMenuString, "")
 
     For iDrive = 0 To g_BasinsDrives.Length - 1
       DriveLetter = g_BasinsDrives.Substring(iDrive, 1)
@@ -247,6 +266,14 @@ Public Class atcBasinsPlugIn
     g_MapWin.Menus.Remove(ProjectsMenuName)
     g_MapWin.Menus.Remove(OpenDataMenuName)
     g_MapWin.Menus.Remove(SaveDataMenuName)
+
+    g_MapWin.Menus.Remove("BasinsHelp_Separator1")
+    g_MapWin.Menus.Remove(WelcomeScreenShowMenuName)
+    g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
+    g_MapWin.Menus.Remove("BasinsHelp_Separator2")
+    g_MapWin.Menus.Remove(BasinsWebPageMenuName)
+    g_MapWin.Menus.Remove(SendFeedbackMenuName)
+
 
     'LogStopMonitor()
 
@@ -409,6 +436,18 @@ Public Class atcBasinsPlugIn
       Handled = LaunchTool(ItemName.Substring(ToolsMenuName.Length + 1))
     ElseIf ItemName.StartsWith(ModelsMenuName & "_") Then
       Handled = LaunchTool(ItemName.Substring(ModelsMenuName.Length + 1))
+    ElseIf ItemName.StartsWith(WelcomeScreenShowMenuName) Then
+      g_MapWin.Plugins.BroadcastMessage("WELCOME_SCREEN")
+      Handled = True
+    ElseIf ItemName.StartsWith(CheckForUpdatesMenuName) Then
+      OpenFile("http://hspf.com/pub/basins4/updates.html", True)
+      Handled = True
+    ElseIf ItemName.StartsWith(BasinsWebPageMenuName) Then
+      OpenFile("http://www.epa.gov/waterscience/basins/index.html")
+      Handled = True
+    ElseIf ItemName.StartsWith(SendFeedbackMenuName) Then
+      LogMsg("TODO:add code for send feedback", "Send Feedback", "OK")
+      Handled = True
     Else 'Not our item
       'MsgBox("Other button: " & ItemName)
     End If
@@ -490,7 +529,7 @@ Public Class atcBasinsPlugIn
           If FileExists(exename) Then
             RunBasinsScript(FileExt(exename), exename, errors, args)
             If Not errors Is Nothing Then
-              MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+              LogMsg(errors, "Run Script Error")
             End If
             Return True
           Else
@@ -729,7 +768,7 @@ Public Class atcBasinsPlugIn
         ChDriveDir(PathNameOnly(s.Substring(14))) 'start where script is
         RunBasinsScript("vb", WholeFileString(s.Substring(14)), errors, "dataManager", "basinsplugin")
         If Not errors Is Nothing Then
-          MsgBox(errors, MsgBoxStyle.Exclamation, "Script Error")
+          LogMsg(errors, "Command Line Script Error", "OK")
         End If
         pCommandLineScript = True
       End If
