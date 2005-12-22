@@ -30,7 +30,12 @@ Public Class ProjectionDB
   Private Function OpenProjectionDatabase() As IatcTable
     Dim dbFilename As String
 
-    dbFilename = FindFile("Please locate table of projections atcprj.dbf", "\BASINS\etc\atcprj.dbf")
+    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+    dbFilename = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\atcprj.dbf"
+    If Not FileExists(dbFilename) Then
+      dbFilename = "\BASINS\etc\atcprj.dbf"
+    End If
+    dbFilename = FindFile("Please locate table of projections atcprj.dbf", dbFilename)
 
     If dbFilename.Length = 0 Then
       LogDbg("Could not find table of projections atcprj.dbf")

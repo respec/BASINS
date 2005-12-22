@@ -172,14 +172,21 @@ Public Class frmStoret
   Private Sub frmStoret_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
     Dim StoretFile As String
     Dim i As Integer
-    StoretFile = PathNameOnly(pProjectFileName) & "\storetag.dbf"
+    Dim lBasinsBinLoc As String
+
+    If pProjectFileName Is Nothing Then pProjectFileName = "\BASINS\data\national\national.mwprj"
+    If Not FileExists(pProjectFileName) Then
+      lBasinsBinLoc = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+      pProjectFileName = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "data\national\national.mwprj"
+    End If
+    StoretFile = FindFile("Storet Database", PathNameOnly(PathNameOnly(pProjectFileName)) & "\national\storetag.dbf")
 
     cProgram = New Collection
     cContact = New Collection
     cPhone = New Collection
 
     If FileExists(StoretFile) Then
-      Dim tmpDbf As IATCTable
+      Dim tmpDbf As IatcTable
       tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(StoretFile)
       For i = 1 To tmpDbf.NumRecords
         tmpDbf.CurrentRecord = i
