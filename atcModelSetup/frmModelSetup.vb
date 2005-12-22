@@ -1306,6 +1306,10 @@ Public Class frmModelSetup
     If Not FileExists(WinHSPFexe) Then
       WinHSPFexe = "e:\basins\models\hspf\bin\winhspf.exe"
     End If
+    If Not FileExists(WinHSPFexe) Then
+      Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+      WinHSPFexe = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\winhspf.exe"
+    End If
     If FileExists(WinHSPFexe) Then
       Process.Start(WinHSPFexe, ucommand)
     Else
@@ -1377,8 +1381,14 @@ Public Class frmModelSetup
     Dim BaseOutputName As String
     Dim DriveLetter As String
 
-    DriveLetter = Mid(CurDir(), 1, 1)
-    OutputPath = DriveLetter & ":\BASINS\modelout\" & tbxName.Text
+    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+    OutputPath = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "modelout\"
+    If FileExists(OutputPath) Then
+      OutputPath = OutputPath & tbxName.Text
+    Else
+      DriveLetter = Mid(CurDir(), 1, 1)
+      OutputPath = DriveLetter & ":\BASINS\modelout\" & tbxName.Text
+    End If
     BaseOutputName = tbxName.Text
 
     If pModelName = "AQUATOX" Then
@@ -1484,7 +1494,13 @@ Public Class frmModelSetup
       luPathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
       luPathName &= "\landuse"
       luDriveLetter = Mid(luPathName, 1, 1)
-      ReclassifyFile = luDriveLetter & ":\basins\etc\giras.dbf"
+      Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+      ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+      If FileExists(ReclassifyFile) Then
+        ReclassifyFile = ReclassifyFile & "giras.dbf"
+      Else
+        ReclassifyFile = luDriveLetter & ":\basins\etc\giras.dbf"
+      End If
 
       'figure out which land use tiles to overlay
       Dim cluTiles As New Collection
@@ -1579,7 +1595,13 @@ Public Class frmModelSetup
       'nlcd grid or other grid
       If cboLanduse.SelectedIndex = 1 Then
         'nlcd grid
-        ReclassifyFile = "\BASINS\etc\nlcd.dbf"
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+        If FileExists(ReclassifyFile) Then
+          ReclassifyFile = ReclassifyFile & "nlcd.dbf"
+        Else
+          ReclassifyFile = "\BASINS\etc\nlcd.dbf"
+        End If
       End If
 
       lblStatus.Text = "Overlaying Land Use and Subbasins"

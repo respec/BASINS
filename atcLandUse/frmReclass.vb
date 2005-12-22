@@ -350,7 +350,14 @@ Public Class frmReclass
       PathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
       PathName = PathName & "\landuse"
       DriveLetter = Mid(PathName, 1, 1)
-      ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
+
+      Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+      ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+      If FileExists(ReclassifyFile) Then
+        ReclassifyFile = ReclassifyFile & "giras.dbf"
+      Else
+        ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
+      End If
 
       'figure out which land use tiles to list
       For i = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
@@ -390,7 +397,14 @@ Public Class frmReclass
       cluTiles.Add(pLULayer)
       PathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
       DriveLetter = Mid(PathName, 1, 1)
-      ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
+
+      Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+      ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+      If FileExists(ReclassifyFile) Then
+        ReclassifyFile = ReclassifyFile & "giras.dbf"
+      Else
+        ReclassifyFile = DriveLetter & ":\basins\etc\giras.dbf"
+      End If
       totalpolygoncount = GisUtil.NumFeatures(LanduseLayerIndex)
     End If
 
@@ -525,7 +539,13 @@ Public Class frmReclass
       SubbasinsLayerIndex = GisUtil.LayerIndex(pSubbasinsLayer)
     End If
 
-    ReclassifyFile = "\BASINS\etc\nlcd.dbf"
+    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+    ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+    If FileExists(ReclassifyFile) Then
+      ReclassifyFile = ReclassifyFile & "nlcd.dbf"
+    Else
+      ReclassifyFile = "\BASINS\etc\nlcd.dbf"
+    End If
 
     AtcGridLanduse.Source.Rows = 1
     LanduseGridLayerIndex = GisUtil.LayerIndex(pLULayer)
@@ -584,7 +604,15 @@ Public Class frmReclass
 
       If lutype = "NLCD" Then
         'add mrlc classifications
-        ReclassifyFile = "\BASINS\etc\mrlc.dbf"
+
+        lBasinsBinLoc = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+        If FileExists(ReclassifyFile) Then
+          ReclassifyFile = ReclassifyFile & "mrlc.dbf"
+        Else
+          ReclassifyFile = "\BASINS\etc\mrlc.dbf"
+        End If
+
         Dim tmpDbf As IatcTable
         tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
         For k = 1 To AtcGridLanduse.Source.Rows
@@ -601,7 +629,13 @@ Public Class frmReclass
       End If
 
       'add grouped classifications
-      ReclassifyFile = "\BASINS\etc\nlcd.dbf"
+      lBasinsBinLoc = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+      ReclassifyFile = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+      If FileExists(ReclassifyFile) Then
+        ReclassifyFile = ReclassifyFile & "nlcd.dbf"
+      Else
+        ReclassifyFile = "\BASINS\etc\nlcd.dbf"
+      End If
       AddGroupedClassifications(ReclassifyFile, lutype)
     End If
 
