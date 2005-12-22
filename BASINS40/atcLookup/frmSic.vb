@@ -146,10 +146,15 @@ Public Class frmSic
   Public Sub ReadDatabase()
     Dim SicFile As String
     Dim i As Integer
+    Dim lBasinsBinLoc As String
 
     Me.Refresh()
     Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
     If pProjectFileName Is Nothing Then pProjectFileName = "\BASINS\data\national\national.mwprj"
+    If Not FileExists(pProjectFileName) Then
+      lBasinsBinLoc = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+      pProjectFileName = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "data\national\national.mwprj"
+    End If
     SicFile = FindFile("SIC Database", PathNameOnly(PathNameOnly(pProjectFileName)) & "\national\sic.dbf")
 
     cSic = New Collection
