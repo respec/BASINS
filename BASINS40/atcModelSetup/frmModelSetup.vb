@@ -2272,8 +2272,7 @@ ErrHand:
         For j = 1 To cUniqueSubids.Count
           If cOutSubs(i) = cUniqueSubids(j) Then
             'found this subbasin in selected list
-            GisUtil.FieldValue(LayerIndex, i - 1, PointIndex)
-            If Len(GisUtil.FieldValue(LayerIndex, PointIndex, i - 1)) > 0 Then
+            If Len(GisUtil.FieldValue(LayerIndex, i - 1, PointIndex)) > 0 Then
               cNPDES.Add(GisUtil.FieldValue(LayerIndex, i - 1, PointIndex))
               cSubbasin.Add(cOutSubs(i))
             End If
