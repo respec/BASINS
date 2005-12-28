@@ -11,7 +11,7 @@ Public Class atcGrid
 
   Private Const DRAG_TOLERANCE As Integer = 2
 
-  Private pFont As Font = MyBase.Font
+  Private pFont As Font = New Font("Microsoft San Serif", 8.25, FontStyle.Regular, GraphicsUnit.Point) ' MyBase.Font
 
   Private pAllowHorizontalScrolling As Boolean = True
   Private pLineColor As Color
@@ -259,8 +259,10 @@ Public Class atcGrid
       Return pFont
     End Get
     Set(ByVal newValue As Font)
-      pFont = newValue
-      MyBase.Font = pFont
+      If Not newValue Is Nothing Then
+        pFont = newValue
+        MyBase.Font = pFont
+      End If
     End Set
   End Property
 
