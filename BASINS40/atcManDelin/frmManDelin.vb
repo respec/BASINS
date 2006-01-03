@@ -81,7 +81,7 @@ Public Class frmManDelin
     '
     Me.cmdClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
     Me.cmdClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
-    Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdClose.Location = New System.Drawing.Point(160, 326)
     Me.cmdClose.Name = "cmdClose"
     Me.cmdClose.Size = New System.Drawing.Size(96, 24)
@@ -90,7 +90,7 @@ Public Class frmManDelin
     '
     'cmdDelineate
     '
-    Me.cmdDelineate.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdDelineate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdDelineate.Location = New System.Drawing.Point(16, 56)
     Me.cmdDelineate.Name = "cmdDelineate"
     Me.cmdDelineate.Size = New System.Drawing.Size(152, 40)
@@ -99,7 +99,7 @@ Public Class frmManDelin
     '
     'Label1
     '
-    Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Label1.Location = New System.Drawing.Point(16, 16)
     Me.Label1.Name = "Label1"
     Me.Label1.Size = New System.Drawing.Size(152, 24)
@@ -120,7 +120,7 @@ Public Class frmManDelin
     'cmdCommit
     '
     Me.cmdCommit.Enabled = False
-    Me.cmdCommit.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdCommit.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdCommit.Location = New System.Drawing.Point(184, 64)
     Me.cmdCommit.Name = "cmdCommit"
     Me.cmdCommit.Size = New System.Drawing.Size(80, 24)
@@ -130,7 +130,7 @@ Public Class frmManDelin
     'cmdCancel
     '
     Me.cmdCancel.Enabled = False
-    Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdCancel.Location = New System.Drawing.Point(280, 64)
     Me.cmdCancel.Name = "cmdCancel"
     Me.cmdCancel.Size = New System.Drawing.Size(72, 24)
@@ -139,7 +139,7 @@ Public Class frmManDelin
     '
     'Label2
     '
-    Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Label2.Location = New System.Drawing.Point(16, 112)
     Me.Label2.Name = "Label2"
     Me.Label2.Size = New System.Drawing.Size(152, 24)
@@ -159,7 +159,7 @@ Public Class frmManDelin
     '
     'cmdCalculate
     '
-    Me.cmdCalculate.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdCalculate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdCalculate.Location = New System.Drawing.Point(16, 152)
     Me.cmdCalculate.Name = "cmdCalculate"
     Me.cmdCalculate.Size = New System.Drawing.Size(152, 40)
@@ -168,7 +168,7 @@ Public Class frmManDelin
     '
     'Label3
     '
-    Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Label3.Location = New System.Drawing.Point(16, 208)
     Me.Label3.Name = "Label3"
     Me.Label3.Size = New System.Drawing.Size(152, 24)
@@ -188,7 +188,7 @@ Public Class frmManDelin
     '
     'cmdDefine
     '
-    Me.cmdDefine.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdDefine.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdDefine.Location = New System.Drawing.Point(16, 248)
     Me.cmdDefine.Name = "cmdDefine"
     Me.cmdDefine.Size = New System.Drawing.Size(152, 40)
@@ -219,7 +219,7 @@ Public Class frmManDelin
     '
     'cbxPCS
     '
-    Me.cbxPCS.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cbxPCS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cbxPCS.Location = New System.Drawing.Point(40, 296)
     Me.cbxPCS.Name = "cbxPCS"
     Me.cbxPCS.Size = New System.Drawing.Size(216, 24)
