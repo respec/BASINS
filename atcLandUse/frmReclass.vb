@@ -108,7 +108,7 @@ Public Class frmReclass
     'cmdLoad
     '
     Me.cmdLoad.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.cmdLoad.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdLoad.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdLoad.Location = New System.Drawing.Point(16, 464)
     Me.cmdLoad.Name = "cmdLoad"
     Me.cmdLoad.Size = New System.Drawing.Size(64, 24)
@@ -118,7 +118,7 @@ Public Class frmReclass
     'cmdSave
     '
     Me.cmdSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.cmdSave.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdSave.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdSave.Location = New System.Drawing.Point(96, 464)
     Me.cmdSave.Name = "cmdSave"
     Me.cmdSave.Size = New System.Drawing.Size(64, 24)
@@ -128,7 +128,7 @@ Public Class frmReclass
     'cmdAdd
     '
     Me.cmdAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.cmdAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdAdd.Location = New System.Drawing.Point(584, 464)
     Me.cmdAdd.Name = "cmdAdd"
     Me.cmdAdd.Size = New System.Drawing.Size(64, 24)
@@ -138,7 +138,7 @@ Public Class frmReclass
     'cmdDelete
     '
     Me.cmdDelete.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.cmdDelete.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdDelete.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdDelete.Location = New System.Drawing.Point(664, 464)
     Me.cmdDelete.Name = "cmdDelete"
     Me.cmdDelete.Size = New System.Drawing.Size(64, 24)
@@ -148,7 +148,7 @@ Public Class frmReclass
     'cmdClose
     '
     Me.cmdClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdClose.Location = New System.Drawing.Point(248, 464)
     Me.cmdClose.Name = "cmdClose"
     Me.cmdClose.Size = New System.Drawing.Size(88, 24)
@@ -169,7 +169,7 @@ Public Class frmReclass
     '
     'lblProgress
     '
-    Me.lblProgress.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.lblProgress.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.lblProgress.Location = New System.Drawing.Point(144, 32)
     Me.lblProgress.Name = "lblProgress"
     Me.lblProgress.Size = New System.Drawing.Size(480, 24)
@@ -195,7 +195,7 @@ Public Class frmReclass
     '
     Me.lblHeader.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblHeader.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.lblHeader.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.lblHeader.Location = New System.Drawing.Point(24, 32)
     Me.lblHeader.Name = "lblHeader"
     Me.lblHeader.Size = New System.Drawing.Size(704, 16)

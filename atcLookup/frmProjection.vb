@@ -44,7 +44,7 @@ Public Class frmProjection
     '
     Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
     Me.cmdOK.DialogResult = System.Windows.Forms.DialogResult.Cancel
-    Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.cmdOK.Location = New System.Drawing.Point(128, 176)
     Me.cmdOK.Name = "cmdOK"
     Me.cmdOK.Size = New System.Drawing.Size(96, 24)
