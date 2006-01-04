@@ -1282,6 +1282,8 @@ Public Class GisUtil
     Dim k As Integer
     Dim bsuc As Boolean
     Dim newname As String
+    Dim icount As Integer
+    Dim itotal As Integer
 
     ClipShapesWithPolygon = ""
     'set input layer (reaches for instance)
@@ -1307,32 +1309,49 @@ Public Class GisUtil
       bsuc = orsf.EditInsertField(isf.Field(i - 1), i - 1)
     Next i
 
+    Dim issf As New MapWinGIS.Shapefile
+    issf.CreateNew("temp_clip.shp", MapWinGIS.ShpfileType.SHP_POLYLINE)
+
     GetMappingObject.StatusBar.ShowProgressBar = True
+    icount = 0
+    itotal = ssf.NumShapes * isf.NumShapes
     For i = 1 To ssf.NumShapes
-      GetMappingObject.StatusBar.ProgressBarValue = Int(i / ssf.NumShapes * 100)
       sshape = ssf.Shape(i - 1)
-      bsuc = MapWinX.SpatialOperations.ClipShapesWithPolygon(isf, sshape, rsf)
-      For j = 1 To rsf.NumShapes
-        bsuc = orsf.EditInsertShape(rsf.Shape(j - 1), j - 1)
+      For j = 1 To isf.NumShapes
+        icount = icount + 1
+        GetMappingObject.StatusBar.ProgressBarValue = Int(icount / itotal * 100)
+        If IsLineInPolygon(isf.Shape(j - 1), ssf, i - 1) Then
+
+          bsuc = issf.EditInsertShape(isf.Shape(j - 1), j - 1)
+          bsuc = MapWinX.SpatialOperations.ClipShapesWithPolygon(issf, sshape, rsf)
+          bsuc = issf.EditDeleteShape(0)
+          If rsf.NumShapes > 0 Then
+            bsuc = orsf.EditInsertShape(rsf.Shape(0), orsf.NumShapes)
+            'populate attributes of output shape
+            For k = 1 To isf.NumFields
+              bsuc = orsf.EditCellValue(k - 1, orsf.NumShapes - 1, isf.CellValue(k - 1, j - 1))
+            Next k
+          End If
+
+        End If
       Next j
     Next i
     GetMappingObject.StatusBar.ShowProgressBar = False
 
-    'populate attributes of output shapes
-    For i = 1 To orsf.NumShapes
-      For j = 1 To isf.NumShapes
-        If IsThisShapeTheSameAsOrPartOfAnotherShape(orsf.Shape(i - 1), isf.Shape(j - 1)) Then
-          'found matching shape, copy attributes
-          For k = 1 To isf.NumFields
-            bsuc = orsf.EditCellValue(k - 1, i - 1, isf.CellValue(k - 1, j - 1))
-          Next k
-        End If
-      Next j
-    Next i
-
     bsuc = orsf.SaveAs(newname)
     ClipShapesWithPolygon = newname
 
+  End Function
+
+  Private Shared Function IsLineInPolygon(ByVal lineshape As MapWinGIS.Shape, ByVal polyshapefile As MapWinGIS.Shapefile, ByVal aIndex As Integer) As Boolean
+    Dim i As Integer
+    IsLineInPolygon = False
+    For i = 0 To lineshape.numPoints - 1
+      If polyshapefile.PointInShape(aIndex, lineshape.Point(i).x, lineshape.Point(i).y) Then
+        IsLineInPolygon = True
+        Exit For
+      End If
+    Next i
   End Function
 
   Private Shared Function IsThisShapeTheSameAsOrPartOfAnotherShape(ByVal sf1shape As MapWinGIS.Shape, ByVal sf2shape As MapWinGIS.Shape) As Boolean

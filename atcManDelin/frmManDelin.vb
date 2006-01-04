@@ -790,7 +790,7 @@ Public Class frmManDelin
     lowestlevel = 999999
     For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
       j = GisUtil.FieldValue(StreamsLayerIndex, i - 1, LevelFieldIndex)
-      If j < lowestlevel And j <> 0 Then
+      If j < lowestlevel And j > 0 Then
         lowestlevel = j
       End If
     Next i
