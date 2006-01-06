@@ -14,31 +14,8 @@ Public Class atcTableFixed
   Private Class clsHeader
     Public Recs() As String
     Public Count As Integer
-    'Public Sub ReadFromFile(ByVal inFile As Short)
-    '  Dim buf As Byte() : ReDim buf(11)
-    '  FileGet(inFile, buf) 'Get field name plus type character
-    '  FieldName = System.Text.ASCIIEncoding.ASCII.GetString(buf, 0, 11)
-    '  FieldType = Chr(buf(11))
-    '  FileGet(inFile, DataAddress)
-    '  FileGet(inFile, FieldLength)
-    '  FileGet(inFile, DecimalCount)
-    '  FileGet(inFile, Trash)
-    'End Sub
-
-    'Public Sub WriteToFile(ByVal outFile As Short)
-    '  Dim buf As Byte() : ReDim buf(11)
-    '  buf = System.Text.ASCIIEncoding.ASCII.GetBytes(FieldName)
-    '  If buf.Length() <> 12 Then ReDim Preserve buf(11)
-    '  buf(10) = 0
-    '  buf(11) = Asc(FieldType)
-    '  FilePut(outFile, buf)
-    '  'FilePut(outFile, DataAddress)
-    '  FilePut(outFile, CInt(0)) 'DataAddress = 0 'Nobody seems to leave non-zero values in file
-    '  FilePut(outFile, FieldLength)
-    '  FilePut(outFile, DecimalCount)
-    '  FilePut(outFile, Trash)
-    'End Sub
   End Class
+
   Private pFilename As String
   Private pFields() As clsFieldDescriptor
   Private pHeaders As clsHeader
@@ -365,22 +342,12 @@ ErrHand:
     Next
   End Function
 
-  Public Overrides Function OpenFile(ByVal Filename As String) As Boolean
-    'Dim header As clsHeader, FieldDes As clsFieldDescriptor    'Creating variables for user-defined types
-    'Dim memo As String * 512                               'Create a 512 byte fixed string variable
-    ' to read memo fields
+  'Read a stream into the table
+  Public Function OpenStream(ByVal aStream As Stream) As Boolean
     Dim inFile As Short
     Dim iRec As Integer
     Dim curLine As String
-
-    If Not FileExists(Filename) Then
-      Return False 'can't open a file that doesn't exist
-    End If
-
-    pFilename = Filename
-    Dim inStream As New FileStream(pFilename, FileMode.Open, FileAccess.Read)
-    Dim inBuffer As New BufferedStream(inStream)
-    Dim inReader As New BinaryReader(inBuffer)
+    Dim inReader As New BinaryReader(aStream)
 
     Try
       For iRec = 1 To pHeaders.Count 'read header rows, ignore for now
@@ -404,6 +371,28 @@ ErrHand:
       Return True
     End Try
     Return False
+  End Function
+
+  'Read a string into the table
+  Public Function OpenString(ByVal aString As String) As Boolean
+    pFilename = ""
+    Dim encoding As New System.Text.ASCIIEncoding
+    Dim inBuffer As New MemoryStream(encoding.GetBytes(aString))
+    OpenString = OpenStream(inBuffer)
+    encoding = Nothing
+    inBuffer = Nothing
+  End Function
+
+  'Read a file into the table
+  Public Overrides Function OpenFile(ByVal Filename As String) As Boolean
+    If Not FileExists(Filename) Then
+      Return False 'can't open a file that doesn't exist
+    End If
+
+    pFilename = Filename
+    Dim inStream As New FileStream(pFilename, FileMode.Open, FileAccess.Read)
+    Dim inBuffer As New BufferedStream(inStream)
+    Return OpenStream(inBuffer)
   End Function
 
   'Public Overrides Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String
