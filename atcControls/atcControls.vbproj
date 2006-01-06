@@ -122,6 +122,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcGridSourceTable.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "atcSelectList.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
