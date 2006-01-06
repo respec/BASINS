@@ -9,6 +9,11 @@ Public Class atcTableFixed
     Public FieldLength As Integer 'length of field
     Public FieldStart As Integer  'column number in which field starts
 
+  End Class
+
+  Private Class clsHeader
+    Public Recs() As String
+    Public Count As Integer
     'Public Sub ReadFromFile(ByVal inFile As Short)
     '  Dim buf As Byte() : ReDim buf(11)
     '  FileGet(inFile, buf) 'Get field name plus type character
@@ -34,9 +39,9 @@ Public Class atcTableFixed
     '  FilePut(outFile, Trash)
     'End Sub
   End Class
-
   Private pFilename As String
   Private pFields() As clsFieldDescriptor
+  Private pHeaders As clsHeader
   Private pNumFields As Integer
   Private pNumHeaderRows As Integer
   Private pData() As String
@@ -147,10 +152,32 @@ ErrHand:
 
   Public Property NumHeaderRows() As Integer
     Get
-      NumHeaderRows = pNumHeaderRows
+      NumHeaderRows = pHeaders.Count
     End Get
     Set(ByVal Value As Integer)
-      pNumHeaderRows = Value
+      pHeaders.Count = Value
+      ReDim pHeaders.Recs(pHeaders.Count)
+    End Set
+  End Property
+
+  Public Property Header(ByVal aRec As Integer) As String
+    Get
+      If aRec < 1 Or aRec > pHeaders.Count Then
+        Header = "Invalid Current Record Number"
+      Else
+        Header = pHeaders.Recs(aRec)
+      End If
+    End Get
+    Set(ByVal Value As String)
+      On Error GoTo ErrHand
+      If aRec < 1 Or aRec > pHeaders.Count Then
+        'Value = "Invalid Field Number"
+      Else
+        pHeaders.Recs(aRec) = Value
+      End If
+      Exit Property
+ErrHand:
+      LogMsg("Cannot set header record #" & aRec & ".  Record number must be between 1 and " & pHeaders.Count & "." & vbCr & Err.Description, "Let Value")
     End Set
   End Property
 
@@ -356,7 +383,7 @@ ErrHand:
     Dim inReader As New BinaryReader(inBuffer)
 
     Try
-      For iRec = 1 To pNumHeaderRows 'read header rows, ignore for now
+      For iRec = 1 To pHeaders.Count 'read header rows, ignore for now
         curLine = NextLine(inReader)
       Next
 
@@ -614,4 +641,8 @@ ReadCharacter:
   Public Overrides Function WriteFile(ByVal filename As String) As Boolean
 
   End Function
+
+  Public Sub New()
+    pHeaders = New clsHeader
+  End Sub
 End Class

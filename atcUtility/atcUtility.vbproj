@@ -109,12 +109,17 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "atcTable.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "atcTableDBF.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcTable.vb"
+                    RelPath = "atcTableFixed.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
