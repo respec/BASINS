@@ -219,7 +219,7 @@ Public Class atcGridSource
   End Property
 
   'True if aRow or aColumn does not exist
-  Protected Function InvalidRowOrColumn(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+  Protected Overridable Function InvalidRowOrColumn(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
     Return (aRow >= Rows _
      OrElse aColumn >= Columns _
      OrElse aRow < 0 _
@@ -227,7 +227,7 @@ Public Class atcGridSource
   End Function
 
   'Expands Rows and/or Columns if needed to reach from 0,0 to aRow, aColumn
-  Protected Sub ExpandRowsColumns(ByVal aRow As Integer, ByVal aColumn As Integer)
+  Protected Overridable Sub ExpandRowsColumns(ByVal aRow As Integer, ByVal aColumn As Integer)
     If aRow >= Rows Then Rows = aRow + 1
     If aColumn >= Columns Then Columns = aColumn + 1
   End Sub
