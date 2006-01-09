@@ -173,7 +173,7 @@ Public Class atcSelectList
       If pSelected.Contains(lAttrName) Then
         lstAvailable.SetSelected(lIndex, True)
         'Checking GetSelected seems to be needed to actually make the above SetSelected work
-        LogDbg("atcSelectList: Selected(" & lIndex & ") = " & lstAvailable.GetSelected(lIndex) & " """ & lAttrName & """")
+        Logger.Dbg("atcSelectList: Selected(" & lIndex & ") = " & lstAvailable.GetSelected(lIndex) & " """ & lAttrName & """")
       End If
       lIndex += 1
     Next

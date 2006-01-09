@@ -1016,23 +1016,23 @@ End Class
 <TestFixture()> Public Class Test_modLog
   'TODO - write tests AFTER module completed, talk to Mark b4 any effort
 
-  Public Sub TestLogDbg()
-    'LogDbg()
+  Public Sub TestDbg()
+    'Logger.Dbg()
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestLogMsg()
-    'LogMsg()
+  Public Sub TestMsg()
+    'Logger.Msg()
     Assert.Ignore("Test not yet written")
   End Sub
 
-  Public Sub TestLogCmd()
-    'LogCmd()
+  Public Sub TestCmd()
+    'Logger.Cmd()
     Assert.Ignore("Test not yet written")
   End Sub
 
   Public Sub TestSendFeedback()
-    'SendFeedback()
+    'Logger.SendFeedback()
     Assert.Ignore("Test not yet written")
   End Sub
 

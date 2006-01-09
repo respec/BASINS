@@ -612,7 +612,7 @@ Public Class GisUtil
           lArea = Double.NaN
         End If
       Catch ex As Exception
-        LogDbg("GisUtil:FeatureArea:Exception:" & ex.Message)
+        Logger.Dbg("GisUtil:FeatureArea:Exception:" & ex.Message)
         lArea = Double.NaN
       End Try
     End If
@@ -633,13 +633,13 @@ Public Class GisUtil
           If lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINE AndAlso _
              lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINEM AndAlso _
              lShapeFileType <> MapWinGIS.ShpfileType.SHP_POLYLINEZ Then
-            LogDbg("GisUtil:FeatureLength:LengthUndefinedForShapeType:" & lSf.ShapefileType)
+            Logger.Dbg("GisUtil:FeatureLength:LengthUndefinedForShapeType:" & lSf.ShapefileType)
             lLength = Double.NaN
           End If
         End If
       End If
     Catch ex As Exception
-      LogDbg("GisUtil:FeatureLength:Exception:" & ex.Message)
+      Logger.Dbg("GisUtil:FeatureLength:Exception:" & ex.Message)
       lLength = Double.NaN
     End Try
     Return lLength

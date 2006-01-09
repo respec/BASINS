@@ -424,7 +424,7 @@ Public Class frmWelcomeScreenBasins
       Me.Close()
     Else
       'TODO - 2/3/2005 - jlk - need a findFile here 
-      LogMsg("Could not find " & fileName, "Open BASINS Project", "OK")
+      Logger.Msg("Could not find " & fileName, "Open BASINS Project", "OK")
     End If
   End Sub
 

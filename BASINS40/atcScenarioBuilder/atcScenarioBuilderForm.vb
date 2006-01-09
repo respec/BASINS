@@ -538,10 +538,10 @@ Friend Class atcScenarioBuilderForm
       'Dim lBasinsPlugin As Object = pDataManager.Basins
       'lBasinsPlugin.RunBasinsScript(FileExt(aScriptFileName), WholeFileString(aScriptFileName), errors, args)
       If Not errors Is Nothing Then
-        LogMsg(aScriptFileName & vbCrLf & vbCrLf & errors, "Attribute Script Error")
+        Logger.Msg(aScriptFileName & vbCrLf & vbCrLf & errors, "Attribute Script Error")
       End If
     Else
-      LogMsg("Unable to find script " & aScriptFileName, "Attribute Script")
+      Logger.Msg("Unable to find script " & aScriptFileName, "Attribute Script")
     End If
   End Sub
 
@@ -932,10 +932,10 @@ Friend Class atcScenarioBuilderForm
       RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
                 pBaseScenario, lNewScenario)
       If Not errors Is Nothing Then
-        LogMsg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
+        Logger.Msg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
       End If
     Else
-      LogMsg("Unable to find script " & lScriptFileName, "Scenario Script")
+      Logger.Msg("Unable to find script " & lScriptFileName, "Scenario Script")
     End If
     agdMain.Refresh()
   End Sub

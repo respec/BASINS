@@ -1,7 +1,7 @@
 Imports atcData
 
 Public Class atcScenarioBuilderPlugin
-  Inherits atcDataDisplay
+  Inherits atcData.atcDataDisplay
   Private pMapWin As MapWindow.Interfaces.IMapWin
 
   Public Overrides ReadOnly Property Name() As String

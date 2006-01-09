@@ -177,7 +177,7 @@ Public Class atcGrid
   Public Property ColumnWidth(ByVal aColumn As Integer) As Integer
     Get
       If pColumnWidth.Count = 0 Then
-        atcUtility.LogDbg("atcGrid:ColumnWidth:Get: Unexpected pColumnWidth.Count = 0")
+        Logger.Msg("atcGrid:ColumnWidth:Get: Unexpected pColumnWidth.Count = 0")
         Return 0
       ElseIf aColumn < pColumnWidth.Count Then 'Return last defined width
         Return pColumnWidth(aColumn)

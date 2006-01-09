@@ -1,5 +1,6 @@
 Imports System.CodeDom.Compiler
 Imports System.Reflection
+Imports atcUtility
 
 Public Module modScript
   Public Function RunScript(ByVal aLanguage As String, _
@@ -11,30 +12,55 @@ Public Module modScript
     Dim instance As Object
     Dim assyTypes As Type() 'list of items within the assembly
 
-    Dim MethodName As String = "Main" 'TODO: decide on entry point name
+    Dim MethodName As String = "ScriptMain" 'TODO: decide on entry point name
+
+    Logger.Dbg("RunScript:Language:" & aLanguage & ":DllFileName:" & aDLLfilename)
 
     If aLanguage.ToLower = "dll" Then
       assy = System.Reflection.Assembly.LoadFrom(aCode)
     Else 'compile the code into an assembly
       Try
-        If FileExists(aCode) Then aCode = WholeFileString(aCode)
+        If FileExists(aCode) Then
+          Logger.Dbg("RunScript:CodeFoundIn:" & aCode)
+          aCode = WholeFileString(aCode)
+        End If
       Catch ex As Exception
         'Treat as code, not as file name
+        Logger.Dbg("RunScript:CodeToCompile:" & vbCrLf & _
+               "==================" & vbCrLf & _
+               aCode & vbCrLf & _
+               "==================" & vbCrLf & _
+               "RunScript:EndCode")
       End Try
 
       assy = CompileScript(aLanguage, aCode, aErrors, aDLLfilename)
 
     End If
 
-    If aErrors Is Nothing Then
+    If aErrors Is Nothing OrElse aErrors.Length = 0 Then
       assyTypes = assy.GetTypes()
       For Each typ As Type In assyTypes
         Dim scriptMethodInfo As MethodInfo = typ.GetMethod(MethodName)
         If Not scriptMethodInfo Is Nothing Then
-          Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
+          Logger.Dbg("RunScript:Invoke:" & scriptMethodInfo.Name)
+          If aArgs Is Nothing Then
+            Logger.Dbg("RunScript:No Args")
+          Else
+            For Each lArg As Object In aArgs
+              Logger.Dbg("RunScript:Arg:" & lArg.GetType.ToString & ":<" & lArg.ToString & ">")
+            Next
+          End If
+          Try
+            Return scriptMethodInfo.Invoke(Nothing, aArgs) 'assy.CreateInstance(typ.Name)
+          Catch ex As Exception
+            Logger.Dbg("RunScript:Exception:" & ex.ToString)
+            Return False
+          End Try
         End If
       Next
       aErrors = "RunScript: '" & MethodName & "' not found"
+    Else
+      Logger.Dbg("RunScript:CompileErrors:" & aErrors)
     End If
   End Function
 
@@ -104,8 +130,6 @@ Public Module modScript
                            & "End Module"
     End If
 
-    'MsgBox(aCode)
-
     Try
       provider = New Microsoft.VisualBasic.VBCodeProvider
       compiler = provider.CreateCompiler
@@ -123,6 +147,11 @@ Public Module modScript
       'Compile errors don't throw exceptions. This is a deeper problem
       aErrors = ex.Message
     End Try
+
+    If Not IsNothing(aErrors) AndAlso aErrors.Length > 0 Then
+      Logger.Dbg("CompileScript:Code:" & aCode)
+      Logger.Dbg("CompileScript:Errors:" & aErrors)
+    End If
 
     Return Nothing
 

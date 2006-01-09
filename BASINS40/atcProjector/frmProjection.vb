@@ -513,10 +513,10 @@ Public Class frmProjection
     Private Sub btnAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAdd.Click
         Dim id As Integer
         If Len(txtName.Text) = 0 Then
-      'LogMsg("Enter a new name for this projection in the Name field above before adding.", "Projection")
+      'Logger.Msg("Enter a new name for this projection in the Name field above before adding.", "Projection")
         Else
             'TODO: fix adding custom projections to table
-      'LogMsg("Adding projection to database not yet supported.", "Projection")
+      'Logger.Msg("Adding projection to database not yet supported.", "Projection")
             'ElseIf Not pCurProjection Is Nothing Then
             '    If Not pDB Is Nothing Then
             '        pDB.AddCustomProjection((txtName.Text), _

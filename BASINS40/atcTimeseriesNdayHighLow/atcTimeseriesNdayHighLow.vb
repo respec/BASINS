@@ -236,7 +236,7 @@ Public Class atcTimeseriesNdayHighLow
         newTsGroup.Add(newTS)
       Next
     Catch ex As Exception
-      LogDbg(ex.ToString)
+      Logger.Dbg(ex.ToString)
     End Try
 
     Return newTsGroup
@@ -271,7 +271,7 @@ Public Class atcTimeseriesNdayHighLow
           KendallTau(lNdayTs, lTau, lLevel, lSlope)
         Catch ex As Exception
           lMsg = "ComputeFreq:Exception:" & ex.ToString & ":" & lNdayTs.ToString
-          LogDbg(lMsg)
+          Logger.Dbg(lMsg)
           lTau = Double.NaN
           lLevel = Double.NaN
           lSlope = Double.NaN
@@ -370,7 +370,7 @@ Public Class atcTimeseriesNdayHighLow
             End If
 
             lMsg &= lNday & ":" & lRecurOrProbNow & ":" & aHigh & ":" & lNdayTs.Attributes.GetValue("Count")
-            LogDbg(lMsg)
+            Logger.Dbg(lMsg)
             lMsg = ""
           End If
 

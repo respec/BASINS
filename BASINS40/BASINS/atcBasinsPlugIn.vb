@@ -120,9 +120,9 @@ Public Class atcBasinsPlugIn
     g_MapWin = aMapWin
     g_MapWinWindowHandle = aParentHandle
     Dim lLogFileName As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\Basins.Log"
-    LogSetFileName(lLogFileName)
+    Logger.StartToFile(lLogFileName)
     'LogStartMonitor()
-    LogSetMapWin(g_MapWin)
+    Logger.MapWin = g_MapWin
 
     pDataManager = New atcDataManager(g_MapWin) ', Me)
 
@@ -137,7 +137,7 @@ Public Class atcBasinsPlugIn
     AddMenuIfMissing(ProjectsMenuName, "mnuFile", ProjectsMenuString, "mnuRecentProjects")
 
     AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
-    mnu = AddMenuIfMissing(WelcomeScreenShowMenuName, "mnuHelp", WelcomeScreenShowMenuString, "")
+    'mnu = AddMenuIfMissing(WelcomeScreenShowMenuName, "mnuHelp", WelcomeScreenShowMenuString, "")
     mnu = AddMenuIfMissing(BasinsWebPageMenuName, "mnuHelp", BasinsWebPageMenuString, "")
     AddMenuIfMissing("BasinsHelp_Separator2", "mnuHelp", "-")
     mnu = AddMenuIfMissing(CheckForUpdatesMenuName, "mnuHelp", CheckForUpdatesMenuString, "")
@@ -295,7 +295,7 @@ Public Class atcBasinsPlugIn
     Dim DataDirName As String
     Dim PrjFileName As String
 
-    LogDbg("BASINS4:clsPlugIn:ItemClicked: " & ItemName)
+    Logger.Dbg("BASINS4:clsPlugIn:ItemClicked: " & ItemName)
     If ItemName.Equals("mnuNew") Then 'Override File/New menu item behavior
       If NationalProjectIsOpen() Then
         MsgBox("Select the area of interest, " & vbCr & "then Download from the Data menu" & vbCr _
@@ -318,7 +318,7 @@ Public Class atcBasinsPlugIn
         If allFiles.Count > 0 Then
           g_MapWin.Project.Load(allFiles.Item(0))
         Else
-          LogMsg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives & " in folder \BASINS\Data\national\", "Open National")
+          Logger.Msg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives & " in folder \BASINS\Data\national\", "Open National")
         End If
       End If
       Handled = True
@@ -354,11 +354,11 @@ Public Class atcBasinsPlugIn
       If FileExists(DataDirName, True, False) Then
         PrjFileName = DataDirName & "\" & FilenameOnly(DataDirName) & ".mwprj"
         If FileExists(PrjFileName) Then
-          LogDbg("Opening project " & PrjFileName)
+          Logger.Dbg("Opening project " & PrjFileName)
           g_MapWin.Project.Load(PrjFileName)
         Else
           'TODO: look for other *.mwprj before creating a new one?
-          LogDbg("Creating new project " & PrjFileName)
+          Logger.Dbg("Creating new project " & PrjFileName)
           g_MapWin.Layers.Clear()
           g_MapWin.Refresh()
           g_MapWin.PreviewMap.GetPictureFromMap()
@@ -393,7 +393,7 @@ Public Class atcBasinsPlugIn
                 themeTag = "state_abbrev"
                 FieldName = "ST"
               Case Else
-                LogMsg("Unknown layer for selection, using first field", "Area Selection")
+                Logger.Msg("Unknown layer for selection, using first field", "Area Selection")
                 themeTag = "huc_cd"
                 iFieldMatch = 1
             End Select
@@ -406,7 +406,7 @@ Public Class atcBasinsPlugIn
               g_MapWin.Project.Save(g_MapWin.Project.FileName)
               CreateNewProjectAndDownloadCoreDataInteractive(themeTag, GetSelected(iFieldMatch))
             Else
-              LogMsg("Could not find field " & FieldName & " in " & curLayer.Filename, "Could not create project")
+              Logger.Msg("Could not find field " & FieldName & " in " & curLayer.Filename, "Could not create project")
             End If
           Else
             DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
@@ -446,7 +446,7 @@ Public Class atcBasinsPlugIn
       OpenFile("http://www.epa.gov/waterscience/basins/index.html")
       Handled = True
     ElseIf ItemName.StartsWith(SendFeedbackMenuName) Then
-      LogMsg("TODO:add code for send feedback", "Send Feedback", "OK")
+      Logger.Msg("TODO:add code for send feedback", "Send Feedback", "OK")
       Handled = True
     Else 'Not our item
       'MsgBox("Other button: " & ItemName)
@@ -507,7 +507,7 @@ Public Class atcBasinsPlugIn
           Try
             BuiltInScript(True)
           Catch e As Exception
-            LogMsg(e.ToString, "Error Running Built-in Script")
+            Logger.Msg(e.ToString, "Error Running Built-in Script")
           End Try
           Return True
 
@@ -529,18 +529,18 @@ Public Class atcBasinsPlugIn
           If FileExists(exename) Then
             RunBasinsScript(FileExt(exename), exename, errors, args)
             If Not errors Is Nothing Then
-              LogMsg(errors, "Run Script Error")
+              Logger.Msg(errors, "Run Script Error")
             End If
             Return True
           Else
-            LogMsg("Unable to find script " & exename, "LaunchTool")
+            Logger.Msg("Unable to find script " & exename, "LaunchTool")
             Return False
           End If
         Else 'Search for DisplayPlugin to launch
           If LaunchDisplay(aToolName) Then
             Return True
           Else
-            LogMsg("Not yet able to launch " & aToolName, "Option not yet functional")
+            Logger.Msg("Not yet able to launch " & aToolName, "Option not yet functional")
           End If
         End If
     End Select
@@ -549,7 +549,7 @@ Public Class atcBasinsPlugIn
       Shell("""" & exename & """", AppWinStyle.NormalFocus, False)
       Return True
     Else
-      LogMsg("Unable to launch " & aToolName, "Launch")
+      Logger.Msg("Unable to launch " & aToolName, "Launch")
       Return False
     End If
   End Function
@@ -580,7 +580,7 @@ Public Class atcBasinsPlugIn
         Next
       Next
     Catch ex As Exception
-      LogMsg("Exception:" & ex.ToString, "clsPlugIn:BuiltInScript")
+      Logger.Msg("Exception:" & ex.ToString, "clsPlugIn:BuiltInScript")
     End Try
   End Sub
 
@@ -613,7 +613,7 @@ Public Class atcBasinsPlugIn
                                     ByRef aErrors As String, _
                                     ByVal ParamArray aArgs() As Object) As Object
 
-    LogMsg(aLanguage & vbCr & aScript, "atcBasinsPlugIn:RunBasinsScript")
+    Logger.Dbg(aLanguage & vbCr & aScript) ', "atcBasinsPlugIn:RunBasinsScript")
     If Not aArgs Is Nothing Then 'replace some text arguments with objects
       For iArg As Integer = 0 To aArgs.GetUpperBound(0)
         If aArgs(iArg).GetType Is GetType(String) Then
@@ -731,7 +731,7 @@ Public Class atcBasinsPlugIn
   End Sub
 
   Public Sub Message(ByVal msg As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.Message
-    Dim errors As String = ""
+    Dim lErrors As String = ""
     Dim lScriptFileName As String = ""
 
     If msg.StartsWith("WELCOME_SCREEN") Then
@@ -750,40 +750,40 @@ Public Class atcBasinsPlugIn
       If pWelcomeScreenShow _
          OrElse Not g_MapWin.ApplicationInfo.ShowWelcomeScreen _
          OrElse (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) Then
-        LogDbg("BASINS:Message:Welcome:Show")
+        Logger.Dbg("BASINS:Message:Welcome:Show")
         Dim frmWelBsn As New frmWelcomeScreenBasins(g_MapWin.Project, g_MapWin.ApplicationInfo)
         frmWelBsn.ShowDialog()
       Else 'Skip displaying welcome on launch
-        LogDbg("BASINS:Message:Welcome:Skip")
+        Logger.Dbg("BASINS:Message:Welcome:Skip")
       End If
       pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
     ElseIf msg.StartsWith("atcDataPlugin") Then
-      LogDbg("BASINS:Message:RefreshToolsMenu:" & msg)
+      Logger.Dbg("BASINS:Message:RefreshToolsMenu:" & msg)
       If msg.StartsWith("atcDataPlugin unloading") Then
         g_MapWin.Menus.Remove(ToolsMenuName)
       End If
       RefreshToolsMenu()
     ElseIf msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
       'COMMAND_LINE:broadcast:basins:script:c:\test\BASINS4\scripts\dummy.vb
-      LogDbg("BASINS:Message:" & msg)
+      Logger.Dbg("BASINS:Message:" & msg)
       Dim s As String = msg.Substring(23)
       If s.Substring(7).StartsWith("script") Then
         lScriptFileName = s.Substring(14)
         ChDriveDir(PathNameOnly(lScriptFileName)) 'start where script is
-        RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, errors, "dataManager", "basinsplugin")
-        If Not errors Is Nothing Then
-          LogMsg(errors, "Command Line Script Error", "OK")
+        RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, lErrors, "dataManager", "basinsplugin")
+        If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
+          Logger.Msg(lErrors, "Command Line Script Error", "OK")
         End If
         pCommandLineScript = True
       End If
     ElseIf msg.StartsWith("RUN_BASINS_SCRIPT:") Then
       lScriptFileName = msg.Substring(18).Trim
-      RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, errors, "dataManager", "basinsplugin")
-      If Not errors Is Nothing Then
-        LogMsg(errors, "Script Error")
+      RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, lErrors, "dataManager", "basinsplugin")
+      If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
+        Logger.Msg(lErrors, "Script Error")
       End If
     Else
-      LogDbg("BASINS:Message:Ignore:" & msg)
+      Logger.Dbg("BASINS:Message:Ignore:" & msg)
     End If
   End Sub
 
@@ -834,9 +834,9 @@ Public Class atcBasinsPlugIn
         End If
       Next
       If g_BasinsDrives.Length = 0 Then
-        LogMsg("No BASINS folders found on any drives on this computer", "FindBasinsDrives")
+        Logger.Msg("No BASINS folders found on any drives on this computer", "FindBasinsDrives")
       Else
-        LogDbg("Found BasinsDrives: " & g_BasinsDrives)
+        Logger.Dbg("Found BasinsDrives: " & g_BasinsDrives)
       End If
     End If
   End Sub

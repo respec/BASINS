@@ -79,7 +79,7 @@ StartOver:
         Try
           System.IO.Directory.Delete(PathNameOnly(DefaultProjectFileName), False) 'Cancelled save dialog
         Catch ex As Exception
-          LogDbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
+          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
         End Try
       End If
 
@@ -87,7 +87,7 @@ StartOver:
       Dim numFiles As Long = System.IO.Directory.GetFiles(newDataDir).LongLength
       Dim numDirs As Long = System.IO.Directory.GetDirectories(newDataDir).LongLength
       If numFiles + numDirs > 0 Then
-        LogMsg("The folder '" & newDataDir & "'" & vbCr _
+        Logger.Msg("The folder '" & newDataDir & "'" & vbCr _
                & "already contains " & numFiles & " files and " & numDirs & " folders." & vbCr _
                & "The folder must be empty before a new project can be created here.", "BASINS Build New")
         GoTo StartOver
@@ -98,7 +98,7 @@ StartOver:
         Try 'remove already created data directory
           System.IO.Directory.Delete(PathNameOnly(DefaultProjectFileName), False)
         Catch ex As Exception
-          LogDbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
+          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
         End Try
         Return ""
       Else
@@ -176,12 +176,12 @@ StartOver:
     Dim layername As String
 
     If Not FileExists(aProjectorFilename) Then
-      LogDbg("No new ATCProjector.xml to process")
+      Logger.Dbg("No new ATCProjector.xml to process")
     Else
       lProjectorXML.LoadXml(WholeFileString(aProjectorFilename))
       lProjectorNode = lProjectorXML.FirstChild
       While Not lProjectorNode Is Nothing
-        LogDbg("Processing XML: " & lProjectorNode.GetXml)
+        Logger.Dbg("Processing XML: " & lProjectorNode.GetXml)
         Select Case LCase(lProjectorNode.Tag.ToLower)
           Case "add_shape"
             theOutputFileName = lProjectorNode.Content
@@ -227,7 +227,7 @@ StartOver:
               success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
               g_MapWin.StatusBar(1).Text = ""
               If Not success Then
-                LogMsg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
+                Logger.Msg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
                 System.IO.File.Copy(curFilename, theOutputFileName)
               End If
               g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
@@ -260,7 +260,7 @@ StartOver:
               Next vFilename
 
           Case Else
-              LogMsg("Cannot yet follow directive:" & vbCr & lProjectorNode.Tag, "ProcessProjectorFile")
+            Logger.Msg("Cannot yet follow directive:" & vbCr & lProjectorNode.Tag, "ProcessProjectorFile")
         End Select
 
         If Not lProjectorNode.NextSibling2 Then lProjectorNode = Nothing
@@ -309,22 +309,22 @@ StartOver:
     If exe.Length > 0 Then
       Dim layersDBF As String = GetSetting("ShapeMerge", "files", "layers.dbf")
       If Not FileExists(layersDBF) Then
-        LogDbg("Did not find layers.dbf in registry " & layersDBF)
+        Logger.Dbg("Did not find layers.dbf in registry " & layersDBF)
         layersDBF = PathNameOnly(exe) & "\layers.dbf"
         If FileExists(layersDBF) Then
-          LogDbg("Saving layers.dbf location for ShapeUtil: " & layersDBF)
+          Logger.Dbg("Saving layers.dbf location for ShapeUtil: " & layersDBF)
           SaveSetting("ShapeMerge", "files", "layers.dbf", layersDBF)
         Else
-          LogDbg("Did not find layers.dbf in same path as ShapeUtil " & layersDBF)
+          Logger.Dbg("Did not find layers.dbf in same path as ShapeUtil " & layersDBF)
         End If
       Else
-        LogDbg("Found " & layersDBF)
+        Logger.Dbg("Found " & layersDBF)
       End If
       'LogCmd("MSG2 Merging " & aCurFilename)
       'LogCmd("MSG6 into " & aOutputFilename)
       Shell(exe & " """ & aOutputFilename & """ """ & aCurFilename & """ """ & aProjectionFilename & """", AppWinStyle.NormalNoFocus, True)
     Else
-      LogDbg("Failed to find ShapeUtil.exe for merging " & aCurFilename & " into " & aOutputFilename)
+      Logger.Dbg("Failed to find ShapeUtil.exe for merging " & aCurFilename & " into " & aOutputFilename)
     End If
   End Sub
 
@@ -381,7 +381,7 @@ StartOver:
     Dim allFiles As New NameValueCollection
     Dim defaultsXML As Chilkat.Xml = GetDefaultsXML()
 
-    LogDbg("AddAllShapesInDir: '" & aPath & "'")
+    Logger.Dbg("AddAllShapesInDir: '" & aPath & "'")
 
     If Right(aPath, 1) <> "\" Then aPath = aPath & "\"
     AddFilesInDir(allFiles, aPath, True, "*.shp")
@@ -522,7 +522,7 @@ StartOver:
       End If
       g_MapWin.Project.Modified = True
     Catch ex As Exception
-      LogMsg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Shape")
+      Logger.Msg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Shape")
     End Try
     g_MapWin.StatusBar.Item(1).Text = ""
 
@@ -594,7 +594,7 @@ StartOver:
       End If
       g_MapWin.Project.Modified = True
     Catch ex As Exception
-      LogMsg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Grid")
+      Logger.Msg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Grid")
     End Try
     g_MapWin.StatusBar.Item(1).Text = ""
 
@@ -641,7 +641,7 @@ StartOver:
       Case MapWindow.Interfaces.eLayerType.LineShapefile, MapWindow.Interfaces.eLayerType.PointShapefile
         aLay.MoveTo(99, GroupHandle) 'move line/point layer to top of group
       Case Else
-        LogDbg("AddLayerToGroup: Unexpected layer type: " & aLay.LayerType & " for layer " & aLay.Name)
+        Logger.Dbg("AddLayerToGroup: Unexpected layer type: " & aLay.LayerType & " for layer " & aLay.Name)
         aLay.MoveTo(0, GroupHandle)
     End Select
   End Sub
