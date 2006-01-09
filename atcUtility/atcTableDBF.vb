@@ -1,5 +1,7 @@
 Option Strict Off
 Option Explicit On 
+Imports atcUtility
+
 Public Class atcTableDBF
   Inherits atcTable
 
@@ -176,7 +178,7 @@ Public Class atcTableDBF
   '		If UBound(newValue) = pHeader.NumBytesRec - 1 Then
   '			CopyMemory(pData(pCurrentRecordStart), Value(0), pHeader.NumBytesRec)
   '		Else
-  '			LogMsg("Cannot Let record - wrong size newValue passed" & vbCr & "new record is " & UBound(newValue) + 1 & " bytes long" & vbCr & "but should be " & pHeader.NumBytesRec & " bytes long" & vbCr & Err.Description, "Let record")
+  '			Logger.Msg("Cannot Let record - wrong size newValue passed" & vbCr & "new record is " & UBound(newValue) + 1 & " bytes long" & vbCr & "but should be " & pHeader.NumBytesRec & " bytes long" & vbCr & Err.Description, "Let record")
   '		End If
   '	End Set
   'End Property
@@ -223,14 +225,14 @@ Public Class atcTableDBF
   '  If dbf2Add.NumRecords < 1 Then
   '    Log "No records to add from empty DBF:" & vbCr & dbf2Add.Filename
   '  ElseIf pNumFields <> dbf2Add.NumFields Then
-  '    LogMsg "Different number of fields:" & vbCr _
+  '    Logger.Msg "Different number of fields:" & vbCr _
   ''          & pFilename & " = " & pNumFields & vbCr _
   ''          & dbf2Add.Filename & " = " & dbf2Add.NumFields & vbCr & vbCr _
   ''          & "Cannot merge DBF files", "Merge"
   '  Else
   '    For fieldNum = 1 To pNumFields
   '      If UCase(Trim(FieldName(fieldNum))) <> UCase(Trim(dbf2Add.FieldName(fieldNum))) Then
-  '        If Not LogMsg("Field '" & FieldName(fieldNum) & "' does not appear to match '" _
+  '        If Not Logger.Msg("Field '" & FieldName(fieldNum) & "' does not appear to match '" _
   ''               & dbf2Add.FieldName(fieldNum) & "'" & vbCr _
   ''               & "Proceed with merge anyway, treating these fields as matching?", "Merge", True) Then
   '          Exit Sub
@@ -285,7 +287,7 @@ Public Class atcTableDBF
   '    If UBound(recordToCopy) + 1 = pHeader.NumBytesRec Then
   '      canCopyRecords = True
   '    Else
-  ''      LogMsg "Different number of bytes per record:" & vbCr _
+  ''      Logger.Msg "Different number of bytes per record:" & vbCr _
   '''            & Filename & " = " & pHeader.NumBytesRec & vbCr _
   '''            & dbf2Add.Filename & " = " & UBound(recordToCopy) + 1 & vbCr & vbCr _
   '''            & "Cannot merge DBF files", "Merge"
@@ -366,7 +368,7 @@ Public Class atcTableDBF
       pCurrentRecordStart = pHeader.NumBytesRec * (pCurrentRecord - 1) + 1
       Exit Property
 ErrHand:
-      LogMsg("Cannot set CurrentRecord to " & Value & vbCr & Err.Description, "Let CurrentRecord")
+      Logger.Msg("Cannot set CurrentRecord to " & Value & vbCr & Err.Description, "Let CurrentRecord")
     End Set
   End Property
 
@@ -534,7 +536,7 @@ ErrHand:
       End If
       Exit Property
 ErrHand:
-      LogMsg("Cannot set field #" & aFieldNumber & " = '" & Value & "' in record #" & pCurrentRecord & vbCr & Err.Description, "Let Value")
+      Logger.Msg("Cannot set field #" & aFieldNumber & " = '" & Value & "' in record #" & pCurrentRecord & vbCr & Err.Description, "Let Value")
     End Set
   End Property
 
@@ -953,7 +955,7 @@ ErrHand:
       Case 3 'Normal dBASEIII file
         '   Case &H83 'Open a .DBT file
       Case Else
-        LogMsg("This is not a dBASE III file: '" & Filename & "'", "OpenDBF")
+        Logger.Msg("This is not a dBASE III file: '" & Filename & "'", "OpenDBF")
         FileClose(inFile)
         Return False
     End Select
@@ -1159,7 +1161,7 @@ TryAgain:
 
 ErrHand:
     Resume Next
-    If LogMsg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", "Retry", "Abort") = 1 Then
+    If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", MsgBoxStyle.AbortRetryIgnore) = MsgBoxResult.Retry Then
       On Error Resume Next
       FileClose(OutFile)
       GoTo TryAgain

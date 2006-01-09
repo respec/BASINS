@@ -1,4 +1,4 @@
-Imports ATCutility
+Imports atcUtility
 
 Public Class PlugIn
     Implements MapWindow.Interfaces.IPlugin
@@ -103,39 +103,39 @@ Public Class PlugIn
                     NumShapes = NumShapes + 1
             End Select
         Next
-        If LogMsg("This action rewrites all the shape files in the current project." & vbCr _
-                & "Are you sure you want to do this?", "Change Projection", "Yes", "No") = 1 Then
-            Dim fp As New frmProjection
-            Dim projectionSource As String
-            Dim projectionDest As String
+    If Logger.Msg("This action rewrites all the shape files in the current project." & vbCr _
+            & "Are you sure you want to do this?", "Change Projection", MsgBoxStyle.YesNo) = MsgBoxResult.Yes Then
+      Dim fp As New frmProjection
+      Dim projectionSource As String
+      Dim projectionDest As String
 
-            'prompt for projection
-            projectionSource = System.IO.Path.GetDirectoryName(g_MapWin.Project.FileName) & "\prj.proj"
-            If Not FileExists(projectionSource) Then
-                fp.Text = "Specify Current Projection"
-                projectionSource = fp.AskUser()
-            End If
-            If projectionSource.Length > 0 Then
-                fp.Text = "Specify Desired Projection"
-                projectionDest = fp.AskUser()
-                If projectionDest.Length > 0 Then
-                    For iLayer = 0 To g_MapWin.Layers.NumLayers - 1
-                        hLayer = g_MapWin.Layers.GetHandle(iLayer)
-                        Select Case g_MapWin.Layers(hLayer).LayerType
-                            Case MapWindow.Interfaces.eLayerType.Grid, MapWindow.Interfaces.eLayerType.Image
-                                LogMsg("Projection of grid and image layers not yet available for " & g_MapWin.Layers(hLayer).Name, "Projection")
-                            Case MapWindow.Interfaces.eLayerType.LineShapefile, _
-                                 MapWindow.Interfaces.eLayerType.PointShapefile, _
-                                 MapWindow.Interfaces.eLayerType.PolygonShapefile
-                                ProjectShapefile(projectionSource, projectionDest, g_MapWin.Layers(hLayer).GetObject)
-                        End Select
-                    Next
-                    g_MapWin.View.ZoomToMaxExtents()
-                    g_MapWin.View.Redraw()
-                    SaveFileString(System.IO.Path.GetDirectoryName(g_MapWin.Project.FileName) & "\prj.proj", projectionDest)
-                End If
-            End If
+      'prompt for projection
+      projectionSource = System.IO.Path.GetDirectoryName(g_MapWin.Project.FileName) & "\prj.proj"
+      If Not FileExists(projectionSource) Then
+        fp.Text = "Specify Current Projection"
+        projectionSource = fp.AskUser()
+      End If
+      If projectionSource.Length > 0 Then
+        fp.Text = "Specify Desired Projection"
+        projectionDest = fp.AskUser()
+        If projectionDest.Length > 0 Then
+          For iLayer = 0 To g_MapWin.Layers.NumLayers - 1
+            hLayer = g_MapWin.Layers.GetHandle(iLayer)
+            Select Case g_MapWin.Layers(hLayer).LayerType
+              Case MapWindow.Interfaces.eLayerType.Grid, MapWindow.Interfaces.eLayerType.Image
+                Logger.Msg("Projection of grid and image layers not yet available for " & g_MapWin.Layers(hLayer).Name, "Projection")
+              Case MapWindow.Interfaces.eLayerType.LineShapefile, _
+                   MapWindow.Interfaces.eLayerType.PointShapefile, _
+                   MapWindow.Interfaces.eLayerType.PolygonShapefile
+                ProjectShapefile(projectionSource, projectionDest, g_MapWin.Layers(hLayer).GetObject)
+            End Select
+          Next
+          g_MapWin.View.ZoomToMaxExtents()
+          g_MapWin.View.Redraw()
+          SaveFileString(System.IO.Path.GetDirectoryName(g_MapWin.Project.FileName) & "\prj.proj", projectionDest)
         End If
+      End If
+    End If
     End Sub
 
     Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved

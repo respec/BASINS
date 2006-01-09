@@ -227,13 +227,13 @@ End Class
   Private pGisUtil As GisUtil
 
   <TestFixtureSetUp()> Public Sub init()
-    LogDbg("Test_GisUtil:Init")
+    Logger.Dbg("Test_GisUtil:Init")
     Dim lFileNames As New NameValueCollection
     AddFilesInDir(lFileNames, pArchiveDir, False)
     For Each lFile As String In lFileNames
       FileCopy(lFile, pBaseDir & FilenameNoPath(lFile))
     Next
-    LogDbg("Test_GisUtil:Init:Files:" & lFileNames.Count)
+    Logger.Dbg("Test_GisUtil:Init:Files:" & lFileNames.Count)
   End Sub
 
   Private Function LayerDescription(ByVal aLayerIndex As Integer) As String
@@ -256,23 +256,23 @@ End Class
 
   Public Sub TestLoadProject()
     GisUtil.LoadProject(pProjectName)
-    LogDbg("TestLoadProject:" & GisUtil.ProjectFileName)
+    Logger.Dbg("TestLoadProject:" & GisUtil.ProjectFileName)
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
-      LogDbg("  Layer:" & LayerDescription(lLayerIndex))
+      Logger.Dbg("  Layer:" & LayerDescription(lLayerIndex))
     Next
   End Sub
 
   Public Sub Testget_CurrentLayer()
-    LogDbg("Testget_CurrentLayer:" & GisUtil.CurrentLayer)
+    Logger.Dbg("Testget_CurrentLayer:" & GisUtil.CurrentLayer)
   End Sub
 
   Public Sub Testset_CurrentLayer()
     GisUtil.CurrentLayer = 2
-    LogDbg("Testset_CurrentLayer:" & GisUtil.CurrentLayer)
+    Logger.Dbg("Testset_CurrentLayer:" & GisUtil.CurrentLayer)
     Try
       GisUtil.CurrentLayer = GisUtil.NumLayers + 1
     Catch ex As Exception
-      LogDbg("Testset_CurrentLayer:Exception:" & ex.ToString)
+      Logger.Dbg("Testset_CurrentLayer:Exception:" & ex.ToString)
     End Try
   End Sub
 
@@ -285,14 +285,14 @@ End Class
     For lCurFeature As Integer = 0 To GisUtil.NumFeatures(lLayerIndex1) - 1
       lResult = GisUtil.OverlappingPolygons(lLayerIndex1, lCurFeature, lLayerIndex2, lFeatureIndex2)
       If lResult Then
-        LogDbg("TestOverlappingPolygons:" & lLayerIndex1 & ":" & lLayerIndex2 & ":" & lCurFeature & ":" & lFeatureIndex2)
-        LogDbg("TestOverlappingPolygons:" & _
+        Logger.Dbg("TestOverlappingPolygons:" & lLayerIndex1 & ":" & lLayerIndex2 & ":" & lCurFeature & ":" & lFeatureIndex2)
+        Logger.Dbg("TestOverlappingPolygons:" & _
           GisUtil.FieldValue(lLayerIndex1, lCurFeature, GisUtil.FieldIndex(lLayerIndex1, "CNTYNAME")) & ":" & _
           GisUtil.FieldValue(lLayerIndex2, lFeatureIndex2, GisUtil.FieldIndex(lLayerIndex2, "st")))
         Exit For
       End If
     Next
-    LogDbg("TestOverlappingPolygons:exit")
+    Logger.Dbg("TestOverlappingPolygons:exit")
   End Sub
 
   Public Sub TestAssignContainingPolygons()
@@ -306,17 +306,17 @@ End Class
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
       Try
         lNumFields = GisUtil.NumFields(lLayerIndex)
-        LogDbg("TestNumFields:" & lNumFields & ":" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestNumFields:" & lNumFields & ":" & LayerDescription(lLayerIndex))
       Catch ex As Exception
-        LogDbg("TestNumFields:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestNumFields:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
       End Try
     Next
 
     Try
       lNumFields = GisUtil.NumFields  'current layer
-      LogDbg("TestNumFields:CurrentLayer:" & lNumFields & ":" & LayerDescription(GisUtil.CurrentLayer))
+      Logger.Dbg("TestNumFields:CurrentLayer:" & lNumFields & ":" & LayerDescription(GisUtil.CurrentLayer))
     Catch ex As Exception
-      LogDbg("TestNumFields:Exception:" & ex.Message & ":" & LayerDescription(GisUtil.CurrentLayer))
+      Logger.Dbg("TestNumFields:Exception:" & ex.Message & ":" & LayerDescription(GisUtil.CurrentLayer))
     End Try
   End Sub
 
@@ -324,7 +324,7 @@ End Class
     Dim lLayerIndex As Integer = 1
     Dim lFieldIndex As Integer = 2
     Dim lFieldName As String = GisUtil.FieldName(lFieldIndex, lLayerIndex)
-    LogDbg("TestFieldName:" & lFieldName & ":" & lFieldIndex & ":" & LayerDescription(lLayerIndex))
+    Logger.Dbg("TestFieldName:" & lFieldName & ":" & lFieldIndex & ":" & LayerDescription(lLayerIndex))
   End Sub
 
   Public Sub TestLayerIndex()
@@ -332,9 +332,9 @@ End Class
     For Each lLayerName As String In lLayerNames
       Try
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(lLayerName)
-        LogDbg("TestFindLayerIndex:" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestFindLayerIndex:" & LayerDescription(lLayerIndex))
       Catch ex As Exception
-        LogDbg("TestFindLayerIndex:Exception:" & ex.Message)
+        Logger.Dbg("TestFindLayerIndex:Exception:" & ex.Message)
       End Try
     Next
   End Sub
@@ -343,7 +343,7 @@ End Class
     Dim lLayerIndex As Integer = 1
     Dim lFieldName As String = "CNTYNAME"
     Dim lFieldIndex As String = GisUtil.FieldIndex(lLayerIndex, lFieldName)
-    LogDbg("TestFieldIndex:" & lFieldName & ":" & lFieldIndex & ":" & LayerDescription(lLayerIndex))
+    Logger.Dbg("TestFieldIndex:" & lFieldName & ":" & lFieldIndex & ":" & LayerDescription(lLayerIndex))
   End Sub
 
   Public Sub TestFieldValue()
@@ -351,7 +351,7 @@ End Class
     Dim lFeatureIndex As Integer = 1
     Dim lFieldIndex As Integer = 1
     Dim lFieldValue As String = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lFieldIndex)
-    LogDbg("TestFieldValue:" & lFieldValue & ":" & lFeatureIndex & ":" & lFieldIndex & ":" & lLayerIndex)
+    Logger.Dbg("TestFieldValue:" & lFieldValue & ":" & lFeatureIndex & ":" & lFieldIndex & ":" & lLayerIndex)
   End Sub
 
   Public Sub TestAddField()
@@ -360,61 +360,61 @@ End Class
     Dim lFieldWidth As Integer = 5
     Dim lFieldType As Integer = 1
     Dim lResult As Integer = GisUtil.AddField(lLayerIndex, lFieldName, 1, 5)
-    LogDbg("TestAddField:" & lResult & ":" & lFieldName & ":" & lFieldType & ":" & lFieldWidth & ":" & lLayerIndex)
+    Logger.Dbg("TestAddField:" & lResult & ":" & lFieldName & ":" & lFieldType & ":" & lFieldWidth & ":" & lLayerIndex)
   End Sub
 
   Public Sub TestRemoveField()
     Dim lLayerIndex As Integer = 1
     Dim lFieldName As String = "dummy"
     Dim lResult As Boolean = GisUtil.RemoveField(lLayerIndex, lFieldName)
-    LogDbg("TestRemoveField:" & lResult & ":" & lFieldName & ":" & lLayerIndex)
+    Logger.Dbg("TestRemoveField:" & lResult & ":" & lFieldName & ":" & lLayerIndex)
   End Sub
 
   Public Sub TestNumLayers()
-    LogDbg("TestNumLayers:" & GisUtil.NumLayers)
+    Logger.Dbg("TestNumLayers:" & GisUtil.NumLayers)
   End Sub
 
   Public Sub TestLayerType()
     Dim lLayerIndex As Integer = 1
     Dim lLayerType As Integer = GisUtil.LayerType(lLayerIndex)
-    LogDbg("TestLayerType:" & lLayerType & ":" & lLayerIndex)
+    Logger.Dbg("TestLayerType:" & lLayerType & ":" & lLayerIndex)
   End Sub
 
   Public Sub TestLayerName()
     Dim lLayerIndex As Integer = 1
     Dim lLayerName As String = GisUtil.LayerName(lLayerIndex)
-    LogDbg("TestLayerName:" & lLayerName & ":" & lLayerIndex)
+    Logger.Dbg("TestLayerName:" & lLayerName & ":" & lLayerIndex)
   End Sub
 
   Public Sub TestLayerFileName()
     Dim lLayerIndex As Integer = 1
     Dim lLayerFileName As String = GisUtil.LayerFileName(lLayerIndex)
-    LogDbg("TestLayerName:" & lLayerFileName & ":" & lLayerIndex)
+    Logger.Dbg("TestLayerName:" & lLayerFileName & ":" & lLayerIndex)
   End Sub
 
   Public Sub TestFieldType()
     Dim lLayerIndex As Integer = 1
     Dim lFieldIndex As Integer = 2
     Dim lFieldType As String = GisUtil.FieldType(lFieldIndex, lLayerIndex)
-    LogDbg("TestFieldType:" & lFieldType & ":" & lFieldIndex & ":" & lLayerIndex)
+    Logger.Dbg("TestFieldType:" & lFieldType & ":" & lFieldIndex & ":" & lLayerIndex)
   End Sub
 
   Public Sub TestGridLayerMinimum()
     Dim lLayerIndex As Integer = 3
-    LogDbg("TestGridLayerMinimum:" & GisUtil.GridLayerMinimum(lLayerIndex))
+    Logger.Dbg("TestGridLayerMinimum:" & GisUtil.GridLayerMinimum(lLayerIndex))
   End Sub
 
   Public Sub TestGridLayerMaximum()
     Dim lLayerIndex As Integer = 3
-    LogDbg("TestGridLayerMaximum:" & GisUtil.GridLayerMaximum(lLayerIndex))
+    Logger.Dbg("TestGridLayerMaximum:" & GisUtil.GridLayerMaximum(lLayerIndex))
   End Sub
 
   Public Sub TestNumFeatures()
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers
       Try
-        LogDbg("TestNumFeatures:" & GisUtil.NumFeatures(lLayerIndex) & ":" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestNumFeatures:" & GisUtil.NumFeatures(lLayerIndex) & ":" & LayerDescription(lLayerIndex))
       Catch ex As Exception
-        LogDbg("TestNumFeatures:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestNumFeatures:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
       End Try
     Next
   End Sub
@@ -423,9 +423,9 @@ End Class
     Dim lFeatureIndex As Integer = 0
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
       Try
-        LogDbg("TestLayerArea:" & GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) & ":" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestLayerArea:" & GisUtil.FeatureArea(lLayerIndex, lFeatureIndex) & ":" & LayerDescription(lLayerIndex))
       Catch ex As Exception
-        LogDbg("TestLayerArea:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestLayerArea:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
       End Try
     Next
   End Sub
@@ -434,9 +434,9 @@ End Class
     Dim lFeaturnIndex As Integer = 0
     For lLayerIndex As Integer = 0 To GisUtil.NumLayers - 1
       Try
-        LogDbg("TestLayerLength:" & GisUtil.FeatureLength(lLayerIndex, lFeaturnIndex) & ":" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestLayerLength:" & GisUtil.FeatureLength(lLayerIndex, lFeaturnIndex) & ":" & LayerDescription(lLayerIndex))
       Catch ex As Exception
-        LogDbg("TestLayerLength:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
+        Logger.Dbg("TestLayerLength:Exception:" & ex.Message & ":" & LayerDescription(lLayerIndex))
       End Try
     Next
   End Sub

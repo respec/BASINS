@@ -94,7 +94,7 @@ Public Class atcDataSourceWDM
   '    If pMsg Is Nothing Then
   '      Dim hspfMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
   '      If Not FileExists(hspfMsgFileName) Then
-  '        LogMsg("Could not find hspfmsg.wdm - " & hspfMsgFileName, "ATCdataWdm")
+  '        Logger.Msg("Could not find hspfmsg.wdm - " & hspfMsgFileName, "ATCdataWdm")
   '      Else
   '        pMsg = New atcMsgWDM
   '      End If
@@ -157,7 +157,7 @@ Public Class atcDataSourceWDM
               salen = 48
               d = lAttribs.GetValue("desc")
               If Len(d) > salen Then
-                LogMsg("Description: '" & d & vbCr & "truncated to: " & Left(d, salen), "WDM Write Data Header", MsgBoxStyle.Exclamation)
+                Logger.Msg("Description: '" & d & vbCr & "truncated to: " & Left(d, salen), "WDM Write Data Header", MsgBoxStyle.Exclamation)
               End If
               i = 4
               Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, d, Len(d))
@@ -185,7 +185,7 @@ Public Class atcDataSourceWDM
     If pMsg Is Nothing Then
       Dim hspfMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
       If Not FileExists(hspfMsgFileName) Then
-        LogMsg("Could not find hspfmsg.wdm - " & hspfMsgFileName, "ATCdataWdm")
+        Logger.Msg("Could not find hspfmsg.wdm - " & hspfMsgFileName, "ATCdataWdm")
       Else
         pMsg = New atcMsgWDM
       End If
@@ -245,7 +245,7 @@ Public Class atcDataSourceWDM
         Return curDataset
       End If
     Next
-    LogMsg("DSN " & lDsn & " does not exist.", "DataFileWDM.GetDataSetFromDsn")
+    Logger.Msg("DSN " & lDsn & " does not exist.", "DataFileWDM.GetDataSetFromDsn")
     Return Nothing
   End Function
 
@@ -265,7 +265,7 @@ Public Class atcDataSourceWDM
   Public Overrides Function AddDataset(ByRef aDataSet As atcData.atcDataSet, _
                                        Optional ByRef aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                        As Boolean
-    LogDbg("atcDataSourceWdm:AddDataset:entry")
+    Logger.Dbg("atcDataSourceWdm:AddDataset:entry")
     Try
       Dim lTimser As atcTimeseries = aDataSet
       Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
@@ -293,7 +293,7 @@ Public Class atcDataSourceWDM
       End If
 
       Dim lWdmHandle As New atcWdmHandle(0, Specification)
-      LogDbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
+      Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
 
       If DsnBld(lWdmHandle.Unit, lTimser) Then
         MyBase.AddDataSet(lTimser)
@@ -311,12 +311,12 @@ Public Class atcDataSourceWDM
         If lNvals > 0 Then
           Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
         End If
-        LogDbg("atcDataSourceWdm:AddDataset:WDTPUT:retcod:" & lRet)
+        Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:retcod:" & lRet)
       End If
 
       lWdmHandle.Dispose()
     Catch ex As Exception
-      LogDbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
+      Logger.Dbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
       Return False
     End Try
 
@@ -671,7 +671,7 @@ Public Class atcDataSourceWDM
         End Select
         If lRetcod <> 0 Then
           If Math.Abs(lRetcod) = 104 Then 'cant update if data already present
-            LogDbg("Skip:" & lName & ", data present")
+            Logger.Dbg("Skip:" & lName & ", data present")
           Else
             If Len(pErrorDescription) = 0 Then
               pErrorDescription = "Unable to Write Data Attributes for Class WDM"
@@ -684,7 +684,7 @@ Public Class atcDataSourceWDM
     Next
 
     If Len(pErrorDescription) > 0 Then
-      LogDbg(pErrorDescription)
+      Logger.Dbg(pErrorDescription)
     End If
 
     lMsg.Dispose()
@@ -863,10 +863,10 @@ Public Class atcDataSourceWDM
     Dim lTsFill As Double
 
     If Not DataSets.Contains(aReadMe) Then
-      LogDbg("WDM cannot read dataset not from this file")
+      Logger.Dbg("WDM cannot read dataset not from this file")
     Else
       Dim lReadTS As atcTimeseries = aReadMe
-      'LogDbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))
+      'Logger.dbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))
       Dim lWdmHandle As New atcWdmHandle(0, Specification)
       'BasInfAvail = ReadBasInf()
       If lWdmHandle.Unit > 0 Then

@@ -122,7 +122,7 @@ Public Class atcDataSourceCligen
             Open = True
           Else
             Open = False
-            LogMsg("Unable to process Cligen file " & aFileName, "Cligen Open")
+            Logger.Msg("Unable to process Cligen file " & aFileName, "Cligen Open")
           End If
         End With
       Catch endEx As EndOfStreamException

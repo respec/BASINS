@@ -55,7 +55,7 @@ Public Module modScenarioBuild
       Return lNewWDM
 
     Else
-      LogMsg("Could not find base WDM file '" & aCurrentWDMfilename & "'" & vbCrLf & "Could not run model", "ScenarioBuild")
+      Logger.Msg("Could not find base WDM file '" & aCurrentWDMfilename & "'" & vbCrLf & "Could not run model", "ScenarioBuild")
     End If
   End Function
 End Module

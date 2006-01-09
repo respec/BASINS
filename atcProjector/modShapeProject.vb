@@ -26,15 +26,15 @@ Module modShapeProject
 
     Try
       projCmdLine = GetProjInitString(projectionDest)
-      LogDbg("projectionDest = " & projCmdLine)
+      Logger.Dbg("projectionDest = " & projCmdLine)
       If InStr(projCmdLine, "proj=dd ") > 0 Or InStr(projCmdLine, "proj=latlong ") > 0 Then
-        LogDbg("not projecting because destination is decimal degrees")
+        Logger.Dbg("not projecting because destination is decimal degrees")
         Exit Sub
       End If
 
       DestPrj = pj_init_plus(projCmdLine)
       'If DestPrj = 0 Then
-      '    gLogger.LogMsg("Could not initialize proj.dll, aborting projection" & vbCr & projCmdLine, "ShapeProject")
+      '    gLogger.Logger.Msg("Could not initialize proj.dll, aborting projection" & vbCr & projCmdLine, "ShapeProject")
       '    Exit Sub
       'End If
 
@@ -46,15 +46,15 @@ Module modShapeProject
       Else
         ConvertToRadians = False
       End If
-      LogDbg("projectionSource = " & projCmdLine)
+      Logger.Dbg("projectionSource = " & projCmdLine)
 
       SrcPrj = pj_init_plus(projCmdLine)
       If SrcPrj = 0 Then
-        LogMsg("Could not initialize proj.dll for output:" & vbCrLf & projCmdLine & vbCrLf & "aborting projection", "ShapeProject")
+        Logger.Msg("Could not initialize proj.dll for output:" & vbCrLf & projCmdLine & vbCrLf & "aborting projection", "ShapeProject")
         Exit Sub
       End If
 
-      LogDbg("ShapeProject Converting " & shpFile.NumShapes & " shapes in " & shpFile.Filename)
+      Logger.Dbg("ShapeProject Converting " & shpFile.NumShapes & " shapes in " & shpFile.Filename)
       If Not shpFile.StartEditingShapes(False) Then
         'Could not start editing shapes
       Else
@@ -69,13 +69,13 @@ Module modShapeProject
         Next
         shpFile.StopEditingShapes(True)
       End If
-      LogDbg("ShapeProject Finished with " & shpFile.Filename)
+      Logger.Dbg("ShapeProject Finished with " & shpFile.Filename)
 
     Catch e As Exception
       If e.Message = "latitude or longitude exceeded limits" Then
-        LogMsg("Could not project '" & shpFile.Filename & "'" & vbCr & "Perhaps it was already projected?", "Projection")
+        Logger.Msg("Could not project '" & shpFile.Filename & "'" & vbCr & "Perhaps it was already projected?", "Projection")
       Else
-        LogMsg(e.Message, "Projection")
+        Logger.Msg(e.Message, "Projection")
       End If
     End Try
     If SrcPrj <> 0 Then pj_free(SrcPrj) : SrcPrj = 0

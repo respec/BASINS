@@ -593,7 +593,7 @@ Friend Class frmSelectData
     Dim lTsIndex As Integer = 0
     Dim lTsLastIndex As Integer = pDataManager.DataSets.Count - 1
 
-    LogDbg("Start PopulateCriteriaList(" & aAttributeName & ")")
+    Logger.Dbg("Start PopulateCriteriaList(" & aAttributeName & ")")
 
     If Not lAttributeDef Is Nothing Then
       Select Case lAttributeDef.TypeString.ToLower
@@ -619,7 +619,7 @@ Friend Class frmSelectData
           End If
         End If
         lTsIndex += 1
-        LogProgress("PopulateCriteriaList ", lTsIndex, lTsLastIndex)
+        Logger.Progress("PopulateCriteriaList ", lTsIndex, lTsLastIndex)
       Next
       .Initialize(New ListSource(lSortedItems))
       If lNumeric Then
@@ -631,7 +631,7 @@ Friend Class frmSelectData
       .Refresh()
     End With
 
-    LogDbg("Finished PopulateCriteriaList(" & aAttributeName & ")")
+    Logger.Dbg("Finished PopulateCriteriaList(" & aAttributeName & ")")
   End Sub
 
   'Returns first index of a key equal to or higher than aKey

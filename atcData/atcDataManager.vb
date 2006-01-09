@@ -131,12 +131,12 @@ Public Class atcDataManager
         pMapWin.Project.Modified = True
         Return True
       Else
-        LogDbg("OpenDataSource:OpenFailure:Specification:" & aSpecification & _
+        Logger.Dbg("OpenDataSource:OpenFailure:Specification:" & aSpecification & _
                " Name:" & aNewSource.Name)
         Return False
       End If
     Catch ex As Exception
-      LogDbg("OpenDataSource:Exception:" & ex.Message & vbCrLf & _
+      Logger.Dbg("OpenDataSource:Exception:" & ex.Message & vbCrLf & _
              " Specification:" & aSpecification & _
              " Name:" & aNewSource.Name)
       Return False
@@ -263,11 +263,11 @@ Public Class atcDataManager
               If lSpecification.Equals(pInMemorySpecification) Then
                 'Ignore, we do not save this but we used to
               ElseIf lDataSourceType Is Nothing OrElse lDataSourceType.Length = 0 Then
-                LogMsg("No data source type found for '" & lSpecification & "'", "Data type not specified")
+                Logger.Msg("No data source type found for '" & lSpecification & "'", "Data type not specified")
               Else
                 Dim lNewDataSource As atcDataSource = DataSourceByName(lchildXML.Content)
                 If lNewDataSource Is Nothing Then
-                  LogMsg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
+                  Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
                 Else
                   OpenDataSource(lNewDataSource, lSpecification, Nothing)
                 End If

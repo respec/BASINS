@@ -197,7 +197,7 @@ Public Module modTimeseriesMath
                 If lIndex > lMinIndex Then
                   lOldTS = aGroup.ItemByIndex(lIndex)
                   lTotalNumValues -= 1
-                  'LogDbg("MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " using " & lOldValue)
+                  'Logger.dbg("MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " using " & lOldValue)
                 End If
                 lNextIndex(lIndex) += 1
                 If lNextIndex(lIndex) <= lOldTS.numValues Then

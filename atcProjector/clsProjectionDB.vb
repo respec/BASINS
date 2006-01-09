@@ -38,11 +38,11 @@ Public Class ProjectionDB
     dbFilename = FindFile("Please locate table of projections atcprj.dbf", dbFilename)
 
     If dbFilename.Length = 0 Then
-      LogDbg("Could not find table of projections atcprj.dbf")
+      Logger.Dbg("Could not find table of projections atcprj.dbf")
     Else
       OpenProjectionDatabase = atcTableOpener.OpenAnyTable(dbFilename)
       If OpenProjectionDatabase Is Nothing Then
-        LogDbg("Could not open table of projections atcprj.dbf")
+        Logger.Dbg("Could not open table of projections atcprj.dbf")
       End If
     End If
   End Function

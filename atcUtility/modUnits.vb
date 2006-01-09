@@ -1,5 +1,7 @@
 Option Strict Off
-Option Explicit On
+Option Explicit On 
+Imports atcUtility
+
 Public Module modUnits
   '##MODULE_REMARKS Copyright 2001-3 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
@@ -70,9 +72,9 @@ errHand:
 
 errHand:
     'If AlreadyReportedError Then
-    'LogDbg("Error in GetConversionFactor from: " & fromUnits & " to: " & toUnits & vbCr & Err.Description)
+    'Logger.dbg("Error in GetConversionFactor from: " & fromUnits & " to: " & toUnits & vbCr & Err.Description)
     'Else
-      LogMsg("Cound not find factor from: " & fromUnits & " to: " & toUnits & vbCr & Err.Description, "ATCutility.modUnits.GetConversionFactor")
+    Logger.Msg("Cound not find factor from: " & fromUnits & " to: " & toUnits & vbCr & Err.Description, "ATCutility.modUnits.GetConversionFactor")
     '  AlreadyReportedError = True
     'End If
 
@@ -115,7 +117,7 @@ errHand:
 
 errHand:
     'If Not AlreadyReportedError Then
-    LogMsg("Could not Get Unit Category for '" & unitsName & "'" & vbCr & Err.Description, "ATCutility.modUnits.GetUnitCategory")
+    Logger.Msg("Could not Get Unit Category for '" & unitsName & "'" & vbCr & Err.Description, "ATCutility.modUnits.GetUnitCategory")
     'AlreadyReportedError = True
     'End If
   End Function
@@ -151,7 +153,7 @@ errHand:
 
 errHand:
     'If Not AlreadyReportedError Then
-    LogMsg("Error in GetAllUnitsInCategory for: " & Category & vbCr & Err.Description, "ATCutility.modUnits.GetAllUnitsInCategory")
+    Logger.Msg("Error in GetAllUnitsInCategory for: " & Category & vbCr & Err.Description, "ATCutility.modUnits.GetAllUnitsInCategory")
     'AlreadyReportedError = True
     'End If
   End Function
@@ -198,7 +200,7 @@ errHand:
         DBpath = FindFile("Please locate ATCoUnits.xml", "ATCoUnits.xml")
         If FileExists(DBpath) Then
           If Not SaveUnitsDatabase.LoadXmlFile(DBpath) Then
-            LogMsg("Could not open units database '" & DBpath & "'" & vbCrLf & SaveUnitsDatabase.LastErrorText, "ATCutility.modUnits")
+            Logger.Msg("Could not open units database '" & DBpath & "'" & vbCrLf & SaveUnitsDatabase.LastErrorText, "ATCutility.modUnits")
           End If
         End If
       End If
@@ -206,7 +208,7 @@ errHand:
 
     Catch e As Exception
       'If Not AlreadyReportedErrOpen Then
-      LogMsg("Error opening units database '" & DBpath & "'" & vbCr & Err.Description, "ATCutility.modUnits")
+      Logger.Msg("Error opening units database '" & DBpath & "'" & vbCr & Err.Description, "ATCutility.modUnits")
       'AlreadyReportedErrOpen = True
       'End If
     End Try

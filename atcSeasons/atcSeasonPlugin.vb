@@ -61,7 +61,7 @@ Public Class atcSeasonPlugin
             Try
               pSeasons = typ.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
             Catch e As Exception
-              LogDbg("Exception creating " & lSeasonName & ": " & e.Message)
+              Logger.Dbg("Exception creating " & lSeasonName & ": " & e.Message)
             End Try
             Exit For
           End If
@@ -71,7 +71,7 @@ Public Class atcSeasonPlugin
         pSeasons = New atcSeasonsMonth
       End If
       If pSeasons Is Nothing Then
-        LogDbg("Could not create season of type '" & lSeasonName & "'")
+        Logger.Dbg("Could not create season of type '" & lSeasonName & "'")
       Else
         Select Case aOperationName.ToLower
           Case "split"

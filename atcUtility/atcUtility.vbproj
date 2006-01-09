@@ -124,6 +124,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "clsLogger.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "modColor.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -135,11 +140,6 @@
                 />
                 <File
                     RelPath = "modFile.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "modLog.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

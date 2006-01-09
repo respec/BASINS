@@ -1,6 +1,8 @@
 Option Strict Off
 Option Explicit On 
 Imports System.IO
+Imports atcUtility
+
 Public Class atcTableFixed
   Inherits atcTable
 
@@ -45,7 +47,7 @@ Public Class atcTableFixed
       Next
       Exit Property
 ErrHand:
-      LogMsg("Cannot set CurrentRecord to " & Value & vbCr & Err.Description, "Let CurrentRecord")
+      Logger.Msg("Cannot set CurrentRecord to " & Value & vbCr & Err.Description, "Let CurrentRecord")
     End Set
   End Property
 
@@ -154,7 +156,7 @@ ErrHand:
       End If
       Exit Property
 ErrHand:
-      LogMsg("Cannot set header record #" & aRec & ".  Record number must be between 1 and " & pHeaders.Count & "." & vbCr & Err.Description, "Let Value")
+      Logger.Msg("Cannot set header record #" & aRec & ".  Record number must be between 1 and " & pHeaders.Count & "." & vbCr & Err.Description, "Let Value")
     End Set
   End Property
 
@@ -197,7 +199,7 @@ ErrHand:
       End If
       Exit Property
 ErrHand:
-      LogMsg("Cannot set field #" & aFieldNumber & " = '" & Value & "' in record #" & pCurrentRecord & vbCr & Err.Description, "Let Value")
+      Logger.Msg("Cannot set field #" & aFieldNumber & " = '" & Value & "' in record #" & pCurrentRecord & vbCr & Err.Description, "Let Value")
     End Set
   End Property
 
@@ -575,7 +577,7 @@ ErrHand:
 
   'ErrHand:
   '    Resume Next
-  '    If LogMsg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", "Retry", "Abort") = 1 Then
+  '    If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", "Retry", "Abort") = 1 Then
   '      On Error Resume Next
   '      FileClose(OutFile)
   '      GoTo TryAgain

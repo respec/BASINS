@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On 
 
 Imports System.Collections.Specialized
+Imports atcUtility
 
 Public Module modFile
   Public Function ChDriveDir(ByVal newPath As String) As Boolean
@@ -301,7 +302,7 @@ FoundSameUntil:
       Print(OutFile, FileContents)
       FileClose(OutFile)
     Catch ex As Exception
-      LogMsg("Error writing '" & filename & "'" & vbCr & vbCr & Ex.Message, "SaveFileString")
+      Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, "SaveFileString")
     End Try
   End Sub
 
@@ -342,7 +343,7 @@ ErrorWriting:
       FileClose(OutFile)
       Return True
     Catch ex As Exception
-      'LogMsg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, "AppendFileString")
+      'Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & ex.Message, "AppendFileString")
       Return False
     End Try
 
@@ -634,7 +635,7 @@ TryAgain:
       FileClose(InFile)
     Catch ex As Exception
       If Now > TryUntil Then
-        LogMsg("Error reading '" & aFilename & "'" & vbCr & vbCr & ex.Message, "WholeFileString - " & ex.GetType.Name)
+        Logger.Msg("Error reading '" & aFilename & "'" & vbCr & vbCr & ex.Message, "WholeFileString - " & ex.GetType.Name)
         Return ""
       Else
         'MsgBox("WholeFileString error, trying again (" & ex.GetType.Name & ": " & ex.Message & ")")
