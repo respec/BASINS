@@ -511,6 +511,8 @@ StartOver:
         MWlay.Name &= " " & FilenameOnly(shpFile.Filename)
       ElseIf LCase(aFilename).IndexOf("\census\") > 0 Then
         SetCensusColors(MWlay, shpFile)
+      ElseIf LCase(aFilename).IndexOf("\dem\") > 0 Then
+        SetDemColors(MWlay, shpFile)
       ElseIf LCase(aFilename).EndsWith("cat.shp") Then
         MWlay.ZoomTo()
       End If
@@ -733,12 +735,122 @@ StartOver:
     End If
   End Sub
 
+  Private Sub SetDemColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal shpFile As MapWinGIS.Shapefile)
+    Dim colorBreak As MapWinGIS.ShapefileColorBreak
+    Dim colorScheme As MapWinGIS.ShapefileColorScheme
+    Dim minelev As Single
+    Dim maxelev As Single
+    Dim inc As Single
+    Dim i As Integer
+
+    colorScheme = New MapWinGIS.ShapefileColorScheme
+    colorScheme.FieldIndex = ShpFieldNumFromName(shpFile, "elev_m")
+    'determine min and max elevations
+    minelev = 9999999
+    maxelev = -9999999
+    For i = 1 To shpFile.NumShapes
+      If shpFile.CellValue(colorScheme.FieldIndex, i) > maxelev Then
+        maxelev = shpFile.CellValue(colorScheme.FieldIndex, i)
+      End If
+      If shpFile.CellValue(colorScheme.FieldIndex, i) < minelev Then
+        minelev = shpFile.CellValue(colorScheme.FieldIndex, i)
+      End If
+    Next i
+    inc = (maxelev - minelev) / 10
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev) & " - " & CStr(minelev + inc)
+    colorBreak.StartValue = minelev
+    colorBreak.EndValue = minelev + inc
+    colorBreak.StartColor = System.Convert.ToUInt32(32768)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + inc) & " - " & CStr(minelev + (2 * inc))
+    colorBreak.StartValue = minelev + inc
+    colorBreak.EndValue = minelev + (2 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(888090)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + (2 * inc)) & " - " & CStr(minelev + (3 * inc))
+    colorBreak.StartValue = minelev + (2 * inc)
+    colorBreak.EndValue = minelev + (3 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(1743412)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + (3 * inc)) & " - " & CStr(minelev + (4 * inc))
+    colorBreak.StartValue = minelev + (3 * inc)
+    colorBreak.EndValue = minelev + (4 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(2598734)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + (4 * inc)) & " - " & CStr(minelev + (5 * inc))
+    colorBreak.StartValue = minelev + (4 * inc)
+    colorBreak.EndValue = minelev + (5 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(3454056)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + (5 * inc)) & " - " & CStr(minelev + (6 * inc))
+    colorBreak.StartValue = minelev + (5 * inc)
+    colorBreak.EndValue = minelev + (6 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(4309378)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + (6 * inc)) & " - " & CStr(minelev + (7 * inc))
+    colorBreak.StartValue = minelev + (6 * inc)
+    colorBreak.EndValue = minelev + (7 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(5164700)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + (7 * inc)) & " - " & CStr(minelev + (8 * inc))
+    colorBreak.StartValue = minelev + (7 * inc)
+    colorBreak.EndValue = minelev + (8 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(6020022)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + (8 * inc)) & " - " & CStr(minelev + (9 * inc))
+    colorBreak.StartValue = minelev + (8 * inc)
+    colorBreak.EndValue = minelev + (9 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(6875344)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    colorBreak = New MapWinGIS.ShapefileColorBreak
+    colorBreak.Caption = CStr(minelev + (9 * inc)) & " - " & CStr(minelev + (10 * inc))
+    colorBreak.StartValue = minelev + (9 * inc)
+    colorBreak.EndValue = minelev + (10 * inc)
+    colorBreak.StartColor = System.Convert.ToUInt32(7730666)
+    colorBreak.EndColor = colorBreak.StartColor
+    colorScheme.Add(colorBreak)
+
+    MWlay.ColoringScheme = colorScheme
+    MWlay.DrawFill = True
+    MWlay.LineOrPointSize = 0
+    MWlay.OutlineColor = System.Drawing.Color.Black
+
+  End Sub
+
   Private Sub SetLandUseColorsGrid(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
     Dim colorBreak As MapWinGIS.GridColorBreak
     Dim colorScheme As MapWinGIS.GridColorScheme
 
     colorScheme = New MapWinGIS.GridColorScheme
-    
+
     colorBreak = New MapWinGIS.GridColorBreak
     colorBreak.Caption = "Water"
     colorBreak.LowValue = 10

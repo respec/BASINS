@@ -1321,16 +1321,27 @@ Public Class GisUtil
         icount = icount + 1
         GetMappingObject.StatusBar.ProgressBarValue = Int(icount / itotal * 100)
         If IsLineInPolygon(isf.Shape(j - 1), ssf, i - 1) Then
+          'at least one point of the line is in the polygon
 
-          bsuc = issf.EditInsertShape(isf.Shape(j - 1), j - 1)
-          bsuc = MapWinX.SpatialOperations.ClipShapesWithPolygon(issf, sshape, rsf)
-          bsuc = issf.EditDeleteShape(0)
-          If rsf.NumShapes > 0 Then
-            bsuc = orsf.EditInsertShape(rsf.Shape(0), orsf.NumShapes)
+          If IsLineEntirelyInPolygon(isf.Shape(j - 1), ssf, i - 1) Then
+            'just add to output shapefile
+            bsuc = orsf.EditInsertShape(isf.Shape(j - 1), orsf.NumShapes)
             'populate attributes of output shape
             For k = 1 To isf.NumFields
               bsuc = orsf.EditCellValue(k - 1, orsf.NumShapes - 1, isf.CellValue(k - 1, j - 1))
             Next k
+          Else
+            'need to clip
+            bsuc = issf.EditInsertShape(isf.Shape(j - 1), j - 1)
+            bsuc = MapWinX.SpatialOperations.ClipShapesWithPolygon(issf, sshape, rsf)
+            bsuc = issf.EditDeleteShape(0)
+            If rsf.NumShapes > 0 Then
+              bsuc = orsf.EditInsertShape(rsf.Shape(0), orsf.NumShapes)
+              'populate attributes of output shape
+              For k = 1 To isf.NumFields
+                bsuc = orsf.EditCellValue(k - 1, orsf.NumShapes - 1, isf.CellValue(k - 1, j - 1))
+              Next k
+            End If
           End If
 
         End If
@@ -1349,6 +1360,17 @@ Public Class GisUtil
     For i = 0 To lineshape.numPoints - 1
       If polyshapefile.PointInShape(aIndex, lineshape.Point(i).x, lineshape.Point(i).y) Then
         IsLineInPolygon = True
+        Exit For
+      End If
+    Next i
+  End Function
+
+  Private Shared Function IsLineEntirelyInPolygon(ByVal lineshape As MapWinGIS.Shape, ByVal polyshapefile As MapWinGIS.Shapefile, ByVal aIndex As Integer) As Boolean
+    Dim i As Integer
+    IsLineEntirelyInPolygon = True
+    For i = 0 To lineshape.numPoints - 1
+      If Not polyshapefile.PointInShape(aIndex, lineshape.Point(i).x, lineshape.Point(i).y) Then
+        IsLineEntirelyInPolygon = False
         Exit For
       End If
     Next i
