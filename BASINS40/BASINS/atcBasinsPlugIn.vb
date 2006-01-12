@@ -40,6 +40,9 @@ Public Class atcBasinsPlugIn
   Private Const SendFeedbackMenuName As String = "SendFeedback"
   Private Const SendFeedbackMenuString As String = "Send &Feedback"
 
+  Private Const BasinsHelpMenuName As String = "BASINS Help"
+  Private Const BasinsHelpMenuString As String = "BASINS Help"
+
   Private Const BasinsProjectPath As String = "\Basins\apr\"
   Private Const BasinsDataPath As String = "\Basins\data\"
 
@@ -47,7 +50,6 @@ Public Class atcBasinsPlugIn
   Private Const DataMenuString As String = "&Data"
   Private pLoadedDataMenu As Boolean = False
 
-  Private pNationalDataDir As String = ""
   Private pLogFilename As String = ""
   Private WithEvents pDataManager As atcDataManager
 
@@ -119,7 +121,10 @@ Public Class atcBasinsPlugIn
 
     g_MapWin = aMapWin
     g_MapWinWindowHandle = aParentHandle
-    Dim lLogFileName As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location) & "\Basins.Log"
+    Dim lLogFileName As String = PathNameOnly(PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)) _
+                               & "\logs\" _
+                               & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log"
+
     Logger.StartToFile(lLogFileName)
     'LogStartMonitor()
     Logger.MapWin = g_MapWin
@@ -142,6 +147,7 @@ Public Class atcBasinsPlugIn
     AddMenuIfMissing("BasinsHelp_Separator2", "mnuHelp", "-")
     mnu = AddMenuIfMissing(CheckForUpdatesMenuName, "mnuHelp", CheckForUpdatesMenuString, "")
     mnu = AddMenuIfMissing(SendFeedbackMenuName, "mnuHelp", SendFeedbackMenuString, "")
+    'AddMenuIfMissing(BasinsHelpMenuName, "mnuHelp", BasinsHelpMenuString, "")
 
     For iDrive = 0 To g_BasinsDrives.Length - 1
       DriveLetter = g_BasinsDrives.Substring(iDrive, 1)
@@ -446,8 +452,11 @@ Public Class atcBasinsPlugIn
       OpenFile("http://www.epa.gov/waterscience/basins/index.html")
       Handled = True
     ElseIf ItemName.StartsWith(SendFeedbackMenuName) Then
-      Logger.Msg("TODO:add code for send feedback", "Send Feedback", "OK")
+      SendFeedback()
       Handled = True
+    ElseIf ItemName.StartsWith(BasinsHelpMenuName) Then
+      Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_MapWin.ApplicationInfo.DefaultDir & "\docs\Basins4.chm")
+      If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
     Else 'Not our item
       'MsgBox("Other button: " & ItemName)
     End If
@@ -553,6 +562,32 @@ Public Class atcBasinsPlugIn
       Return False
     End If
   End Function
+
+  Private Sub SendFeedback()
+    Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
+    lFeedback &= "CommandLine: " & System.Environment.CommandLine & vbCrLf
+    lFeedback &= "User: " & System.Environment.UserName & vbCrLf
+    lFeedback &= "Machine: " & System.Environment.MachineName & vbCrLf
+    lFeedback &= "OSVersion: " & System.Environment.OSVersion.ToString & vbCrLf
+    lFeedback &= "CLRVersion: " & System.Environment.Version.ToString & vbCrLf
+
+    Dim lStartDir As String = PathNameOnly(PathNameOnly(g_MapWin.Plugins.PluginFolder))
+    Dim lSkipFilename As Integer = lStartDir.Length + 1
+    lFeedback &= vbCrLf & "Files in " & lStartDir & vbCrLf
+
+    Dim lallFiles As New NameValueCollection
+    AddFilesInDir(lallFiles, lstartdir, True)
+    lFeedback &= vbCrLf & "Filename" & vbTab & "Size" & vbTab & "Modified" & vbCrLf
+    For Each lFilename As String In lallFiles
+      lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & Format(FileLen(lFilename), "#,###") & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
+    Next
+
+    Dim client As New System.Net.WebClient
+    Dim lFeedbackCollection As New NameValueCollection
+    lFeedbackCollection.Add("sysinfo", lFeedback)
+    client.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
+    Logger.Msg("Feedback successfully sent", "Send Feedback")
+  End Sub
 
   Private Sub BuiltInScript(ByVal aRun As Boolean)
     Try
