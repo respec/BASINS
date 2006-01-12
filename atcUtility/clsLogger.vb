@@ -132,15 +132,27 @@ Public Class Logger
     End Try
   End Sub
 
-  ''' Log the use of a message box 
-  Public Shared Function Msg(ByVal aMessage As String, _
-                    Optional ByRef aMsgBoxStyle As MsgBoxStyle = MsgBoxStyle.OKOnly, _
-                    Optional ByVal aTitle As String = "") As MsgBoxResult
-    If aTitle.Length = 0 Then
-      If aMessage.IndexOf(":") > 0 Then
-        aTitle = StrSplit(aMessage, ":", "")
-      End If
+  Public Overloads Shared Function Msg(ByVal aMessage As String) As MsgBoxResult
+    Return Msg(aMessage, MsgBoxStyle.OKOnly)
+  End Function
+
+  Public Overloads Shared Function Msg(ByVal aMessage As String, _
+                                       ByVal aTitle As String) As MsgBoxResult
+    Return Msg(aMessage, MsgBoxStyle.OKOnly, aTitle)
+  End Function
+
+  Public Overloads Shared Function Msg(ByVal aMessage As String, _
+                                       ByVal aMsgBoxStyle As MsgBoxStyle) As MsgBoxResult
+    Dim lTitle As String = ""
+    If aMessage.IndexOf(":") > 0 Then
+      lTitle = StrSplit(aMessage, ":", "")
     End If
+    Return Msg(aMessage, aMsgBoxStyle, lTitle)
+  End Function
+  ''' Log the use of a message box 
+  Public Overloads Shared Function Msg(ByVal aMessage As String, _
+                                       ByVal aMsgBoxStyle As MsgBoxStyle, _
+                                       ByVal aTitle As String) As MsgBoxResult
 
     Dbg("Msg:" & aMessage & ":Title:" & aTitle & ":Style:" & aMsgBoxStyle)
     Flush()
