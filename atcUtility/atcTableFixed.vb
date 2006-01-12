@@ -16,6 +16,12 @@ Public Class atcTableFixed
   Private Class clsHeader
     Public Recs() As String
     Public Count As Integer
+
+    Public Sub WriteToFile(ByVal outFile As Short)
+      For i As Integer = 1 To Count
+        FilePut(outFile, Recs(i))
+      Next
+    End Sub
   End Class
 
   Private pFilename As String
@@ -185,7 +191,7 @@ ErrHand:
       ElseIf aFieldNumber < 1 Or aFieldNumber > pNumFields Then
         Value = "Invalid Field Number"
       Else
-        Value = Trim(pData(aFieldNumber))
+        Value = pData(aFieldNumber)
       End If
     End Get
     Set(ByVal Value As String)
@@ -353,7 +359,7 @@ ErrHand:
 
     Try
       For iRec = 1 To pHeaders.Count 'read header rows, ignore for now
-        curLine = NextLine(inReader)
+        pHeaders.Recs(iRec) = NextLine(inReader)
       Next
 
       ReDim pRecords(100) 'initial record buffer size
@@ -397,193 +403,45 @@ ErrHand:
     Return OpenStream(inBuffer)
   End Function
 
-  'Public Overrides Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String
-  '  Dim retval As String
-  '  Dim iTrash As Short
-  '  Dim iField As Short
-  '  Dim ShowTrash As Boolean
-  '  Dim ShowHeaders As Boolean
-  '  Dim ExpandType As Boolean
+  Public Overrides Function WriteFile(ByVal Filename As String) As Boolean
+    Dim OutFile As Short
+    Dim j, i, dot As Short
+    Dim s As String
+TryAgain:
+    On Error GoTo ErrHand
 
-  '  If InStr(LCase(aFormat), "trash") > 0 Then ShowTrash = True
-  '  If InStr(LCase(aFormat), "headers") > 0 Then ShowHeaders = True
-  '  If InStr(LCase(aFormat), "expandtype") > 0 Then ExpandType = True
+    If FileExists(Filename) Then
+      Kill(Filename)
+    Else
+      MkDirPath(System.IO.Path.GetDirectoryName(Filename))
+    End If
 
-  '  If InStr(LCase(aFormat), "text") > 0 Then 'text version
-  '    For iField = 1 To pNumFields
-  '      With pFields(iField)
-  '        retval = retval & vbCrLf & "Field " & iField & ": '" & TrimNull(.FieldName) & "'"
-  '        retval = retval & vbCrLf & "    Type: " & .FieldType & " "
-  '        If ExpandType Then
-  '          Select Case .FieldType
-  '            Case "C" : retval = retval & "Character"
-  '            Case "D" : retval = retval & "Date     "
-  '            Case "N" : retval = retval & "Numeric  "
-  '            Case "L" : retval = retval & "Logical  "
-  '            Case "M" : retval = retval & "Memo     "
-  '          End Select
-  '        Else
-  '          retval = retval & .FieldType
-  '        End If
-  '        retval = retval & vbCrLf & "    Length: " & .FieldLength & " "
-  '        retval = retval & vbCrLf & "    DecimalCount: " & .DecimalCount & " "
-  '        If ShowTrash Then
-  '          retval = retval & vbCrLf & "    Trash: "
-  '          For iTrash = 1 To 14
-  '            retval = retval & .Trash(iTrash) & " "
-  '          Next
-  '        End If
-  '      End With
-  '      retval = retval & vbCrLf
-  '    Next
-  '  Else 'table version
-  '    If ShowHeaders Then
-  '      retval = retval & "Field "
-  '      retval = retval & vbTab & "Name "
-  '      retval = retval & vbTab & "Type "
-  '      retval = retval & vbTab & "Length "
-  '      retval = retval & vbTab & "DecimalCount "
-  '      If ShowTrash Then
-  '        For iTrash = 1 To 14
-  '          retval = retval & vbTab & "Trash" & iTrash
-  '        Next
-  '      End If
-  '    End If
-  '    retval = retval & vbCrLf
-  '    'now field details
-  '    For iField = 1 To pNumFields
-  '      With pFields(iField)
-  '        retval = retval & iField & vbTab & "'" & TrimNull(.FieldName) & "' "
-  '        If ExpandType Then
-  '          Select Case .FieldType
-  '            Case "C" : retval = retval & vbTab & "Character"
-  '            Case "D" : retval = retval & vbTab & "Date     "
-  '            Case "N" : retval = retval & vbTab & "Numeric  "
-  '            Case "L" : retval = retval & vbTab & "Logical  "
-  '            Case "M" : retval = retval & vbTab & "Memo     "
-  '          End Select
-  '        Else
-  '          retval = retval & vbTab & .FieldType
-  '        End If
-  '        retval = retval & vbTab & .FieldLength
-  '        retval = retval & vbTab & .DecimalCount
-  '        If ShowTrash Then
-  '          retval = retval & vbCrLf & "    Trash: "
-  '          For iTrash = 1 To 14
-  '            retval = retval & vbTab & .Trash(iTrash)
-  '          Next
-  '        End If
-  '      End With
-  '      retval = retval & vbCrLf
-  '    Next
-  '  End If
-  '  Return retval
-  'End Function
+    OutFile = FreeFile()
+    FileOpen(OutFile, Filename, OpenMode.Input)
+    pHeaders.WriteToFile(OutFile)
 
-  'Public Overrides Function SummaryFile(Optional ByRef aFormat As String = "tab,headers") As String
-  '  Dim retval As String
-  '  Dim iTrash As Short
-  '  Dim ShowTrash As Boolean
-  '  Dim ShowHeaders As Boolean
+    MoveFirst()
+    For i = 1 To pNumRecords
+      s = CurrentRecordAsDelimitedString("") & vbCrLf
+      FilePut(OutFile, s)
+      MoveNext()
+    Next i
 
-  '  If InStr(LCase(aFormat), "trash") > 0 Then ShowTrash = True
-  '  If InStr(LCase(aFormat), "headers") > 0 Then ShowHeaders = True
+    FileClose(OutFile)
 
-  '  If LCase(aFormat) = "text" Then 'text version
-  '    With pHeader
-  '      retval = "DBF Header: "
-  '      retval = retval & vbCrLf & "    FileName: " & pFilename
-  '      retval = retval & vbCrLf & "    Version: " & .version
-  '      retval = retval & vbCrLf & "    Date: " & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
-  '      retval = retval & vbCrLf & "    NumRecs: " & .NumRecs
-  '      retval = retval & vbCrLf & "    NumBytesHeader: " & .NumBytesHeader
-  '      retval = retval & vbCrLf & "    NumBytesRec: " & .NumBytesRec
-  '      If ShowTrash Then
-  '        retval = retval & vbCrLf & "    Trash: "
-  '        For iTrash = 1 To 20
-  '          retval = retval & pHeader.Trash(iTrash) & " "
-  '        Next
-  '      End If
-  '    End With
-  '  Else 'table version
-  '    'build header header
-  '    If ShowHeaders Then
-  '      retval = "FileName "
-  '      retval = retval & vbTab & "Version "
-  '      retval = retval & vbTab & "Date "
-  '      retval = retval & vbTab & "NumFields "
-  '      retval = retval & vbTab & "NumRecs "
-  '      retval = retval & vbTab & "NumBytesHeader "
-  '      retval = retval & vbTab & "NumBytesRec "
-  '    End If
-  '    If ShowTrash Then
-  '      For iTrash = 0 To 19
-  '        retval = retval & vbTab & "Trash" & iTrash
-  '      Next
-  '    End If
-  '    retval = retval & vbCrLf
-  '    With pHeader 'now header data
-  '      retval = retval & pFilename
-  '      retval = retval & vbTab & .version
-  '      retval = retval & vbTab & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
-  '      retval = retval & vbTab & pNumFields
-  '      retval = retval & vbTab & .NumRecs
-  '      retval = retval & vbTab & .NumBytesHeader
-  '      retval = retval & vbTab & .NumBytesRec
-  '      If ShowTrash Then
-  '        For iTrash = 0 To 19
-  '          retval = retval & vbTab & pHeader.Trash(iTrash)
-  '        Next
-  '      End If
-  '      retval = retval & vbCrLf
-  '    End With
-  '  End If
-  '  SummaryFile = retval
-  'End Function
+    pFilename = Filename
 
-  '  Public Overrides Function WriteFile(ByVal Filename As String) As Boolean
-  '    Dim OutFile As Short
-  '    Dim j, I, dot As Short
-  '    Dim s As String
-  'TryAgain:
-  '    On Error GoTo ErrHand
+    Return True
 
-  '    If FileExists(Filename) Then
-  '      Kill(Filename)
-  '    Else
-  '      MkDirPath(System.IO.Path.GetDirectoryName(Filename))
-  '    End If
-
-  '    OutFile = FreeFile()
-  '    FileOpen(OutFile, Filename, OpenMode.Binary)
-  '    pHeader.WriteToFile(OutFile)
-
-  '    For I = 1 To pNumFields
-  '      pFields(I).WriteToFile(OutFile) 'FilePutObject(OutFile, pFields(I), (32 * I) + 1)
-  '    Next I
-
-  '    'If we have over-allocated for adding more records, trim unused records
-  '    If pNumRecsCapacity > pHeader.NumRecs Then
-  '      pNumRecsCapacity = pHeader.NumRecs
-  '      ReDim Preserve pData(pHeader.NumRecs * pHeader.NumBytesRec)
-  '    End If
-
-  '    FilePut(OutFile, pData)
-  '    FileClose(OutFile)
-
-  '    pFilename = Filename
-
-  '    Return True
-
-  'ErrHand:
-  '    Resume Next
-  '    If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", "Retry", "Abort") = 1 Then
-  '      On Error Resume Next
-  '      FileClose(OutFile)
-  '      GoTo TryAgain
-  '    End If
-  '    Return False
-  '  End Function
+ErrHand:
+    Resume Next
+    If LogMsg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", "Retry", "Abort") = 1 Then
+      On Error Resume Next
+      FileClose(OutFile)
+      GoTo TryAgain
+    End If
+    Return False
+  End Function
 
   'Reads the next line from a text file whose lines end with carriage return and/or linefeed
   'Advances the position of the stream to the beginning of the next line
@@ -628,10 +486,6 @@ ReadCharacter:
 
     End Set
   End Property
-
-  Public Overrides Function WriteFile(ByVal filename As String) As Boolean
-
-  End Function
 
   Public Sub New()
     pHeaders = New clsHeader
