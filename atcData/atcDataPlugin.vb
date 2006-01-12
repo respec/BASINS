@@ -1,19 +1,17 @@
 ''' <summary>
-'''     <para>Base class for plugins that can'read, write, manipulate, or display
-'''     atcData</para>
+'''     <para>Base class for plugins that can read, write, manipulate, or display atcData</para>
 ''' </summary>
 ''' <remarks>
 '''     <para>This class implements MapWindow.Interfaces.IPlugin so it can be loaded by 
 '''     the MapWindow plugin code</para>
-'''     <para>Name and Description need to be overridden/shadowed by inheritors. Others 
-'''     may be overridden if desired.</para>
-'''     <para>Additionally, data-related methods are available for inheritors.</para>
+'''     <para>Name must be overridden with a unique name for a child class to be loaded as a plugin. 
+'''     Others may be overridden if desired.</para>
 ''' </remarks>
 Public Class atcDataPlugin
   Implements MapWindow.Interfaces.IPlugin
 
   Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
-  Private pSerial As Integer 'Serial number of this object
+  Private pSerial As Integer 'Serial number of this object, assigned in order of creation at runtime
 
   ''' <summary>create a new atcDataPlugin</summary>
   Public Sub New()
@@ -21,8 +19,7 @@ Public Class atcDataPlugin
   End Sub
 
   ''' <summary>
-  ''' String that appears in the MapWindow Plug-ins menu to identify this
-  ''' plug-in.
+  ''' String that appears in the MapWindow Plug-ins menu to identify this plug-in.
   ''' </summary>
   ''' <requirements>
   ''' Must be overridden in inheriting class to return something unique or plugin will
@@ -41,32 +38,26 @@ Public Class atcDataPlugin
     End Get
   End Property
 
-  ''' <summary>
-  ''' Useful for organizing sets of plugins that should be grouped together in the
-  ''' UI
-  ''' </summary>
-  ''' <remarks>Suggested categories include "File" and "Computation" for 
-  ''' atcDataSource</remarks>
+  ''' <summary>Groups related of plugins together in the UI</summary>
+  ''' <remarks>Suggested categories include "File", "Computation", and "Download"</remarks>
   Public Overridable ReadOnly Property Category() As String
     Get
       Return ""
     End Get
   End Property
 
-  ''' <summary>Longer version of <see cref="Name">Name</see> with room to expand 
-  ''' acronyms</summary>
-  ''' <remarks>Appears in the plug-ins dialog box when a user selects this 
-  ''' plug-in.</remarks>
+  ''' <summary>Longer version of <see cref="Name">Name</see> with room to expand acronyms</summary>
+  ''' <remarks>Appears in the plug-ins dialog box when a user selects this plug-in.</remarks>
   Public Overridable ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
     Get
       Return ""
     End Get
   End Property
 
-  ''' <summary>Date plug-in built.</summary>
+  ''' <summary>Date plug-in was built.</summary>
   ''' <remarks>
-  ''' You can either return a string of a hard-coded date such as "January 1, 2003" or
-  ''' you can use this property to dynamically obtain the build date of the assembly.
+  ''' Either return a string of a hard-coded date such as "January 1, 2003" or
+  ''' dynamically obtain the build date of the assembly.
   ''' </remarks>
   Public Overridable ReadOnly Property BuildDate() As String Implements MapWindow.Interfaces.IPlugin.BuildDate
     Get
@@ -76,8 +67,7 @@ Public Class atcDataPlugin
 
   ''' <remarks>
   ''' Can either return a hard-coded string such as "1.0.0.1" or use<br />
-  ''' GetVersionInfo to dynamically return the version number from the assembly
-  ''' itself.
+  ''' GetVersionInfo to dynamically return the version number from the assembly itself.
   ''' </remarks>
   ''' <summary>Version number of the plug-in</summary>
   Public Overridable ReadOnly Property Version() As String Implements MapWindow.Interfaces.IPlugin.Version
@@ -281,8 +271,7 @@ Public Class atcDataPlugin
   End Property
 
   ''' <summary>Calls the version of New with no arguments.</summary>
-  ''' <remarks>Inheriting classes that have no New w/o arguments must override 
-  ''' NewOne</remarks>
+  ''' <remarks>Inheriting classes that have no New w/o arguments must override.</remarks>
   Public Overridable Function NewOne() As atcDataPlugin
     Return Me.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
   End Function

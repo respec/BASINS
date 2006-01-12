@@ -16,7 +16,7 @@ Public Class atcDataSource
     ExistAskUser = 8
   End Enum
 
-  ''' <summary>Attributes associated with all the DataSets (location, constituent, etc.)</summary>
+  ''' <summary>Attributes associated with all the DataSets from this instance of this source (location, constituent, etc.)</summary>
   Public ReadOnly Property Attributes() As atcDataAttributes
     Get
       Return pAttributes
@@ -25,7 +25,7 @@ Public Class atcDataSource
 
   ''' <summary>
   '''     <see cref="atcData~atcData.atcDataAttributes">atcDataAttributes</see>
-  '''     representing operations supported by ComputeTimeseries
+  '''     Operations supported by this source
   ''' </summary>
   ''' <remarks>defaults to an empty list (nothing available)</remarks>
   Public Overridable ReadOnly Property AvailableOperations() As atcDataAttributes
@@ -42,14 +42,14 @@ Public Class atcDataSource
     End Get
   End Property
 
-  ''' <summary>True if Open is implemented - files can be read</summary>
+  ''' <summary>True if Open is implemented (data can be read)</summary>
   Public Overridable ReadOnly Property CanOpen() As Boolean
     Get
       Return False
     End Get
   End Property
 
-  ''' <summary>True if Save is implemented - files can be saved</summary>
+  ''' <summary>True if Save is implemented (data can be saved)</summary>
   Public Overridable ReadOnly Property CanSave() As Boolean
     Get
       Return False
@@ -57,8 +57,7 @@ Public Class atcDataSource
   End Property
 
   ''' <summary>
-  ''' Opens file or database and reads enough to determine whether it is correct
-  ''' type.
+  ''' Opens source and reads enough to determine whether it is correct type.
   ''' </summary>
   ''' <param name="aSpecification"> 
   '''     file name, connect string, or other string needed to open
@@ -69,16 +68,14 @@ Public Class atcDataSource
   ''' <returns>Boolean - True if successfully opened.</returns>
   Public Overridable Function Open(ByVal aSpecification As String, _
                           Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
-    Throw New Exception("Open must be overridden to be used, atcDataSource does not implement.")
+    Throw New Exception("Open must be overridden to be used, atcDataSource base class does not implement.")
   End Function
 
-  'Read all the data into an atcDataSet (which must be from this file)
-  'Called only from within atcData.EnsureValuesRead.
-  ''' <summary>Read all the data into an atcDataSet (which must be from this 
-  ''' file).</summary>
+
+  ''' <summary>Read all the data into an atcDataSet (which must be from this source).</summary>
   ''' <remarks>Called only from within atcData.EnsureValuesRead.</remarks>
   Public Overridable Sub ReadData(ByVal aData As atcDataSet)
-    Throw New Exception("ReadData must be overridden to be used, atcDataSource does not implement.")
+    Throw New Exception("ReadData must be overridden to be used, atcDataSource base class does not implement.")
   End Sub
 
   ''' <summary>Save all current data to a new file or save recently updated data to current file if SaveFileName = Me.FileName</summary>
@@ -92,8 +89,9 @@ Public Class atcDataSource
   End Function
 
   ''' <summary>
-  ''' Name of file we are reading and/or writing, including full path or connection
-  ''' string for database or which computation is being performed
+  ''' For file data sources, Specification = file name including full path
+  ''' For database or web download, the query or URL used to get the data
+  ''' For computation, the name of the computation that is being performed
   ''' </summary>
   ''' <remarks>Should only be set by inheriting class, only during Open or Save</remarks>
   Public Overridable Property Specification() As String
@@ -107,11 +105,10 @@ Public Class atcDataSource
 
   ''' <returns>Boolean - True if dataset added, False otherwise</returns>
   ''' <param name="aDs">dataset to add to data source</param>
-  ''' <param name="aExistAction">action to take if dataset already exists in data 
-  ''' source</param>
+  ''' <param name="aExistAction">action to take if dataset already exists in data source</param>
   ''' <summary>Add a dataset to this data source</summary>
   Public Overridable Function AddDataSet(ByRef aDs As atcDataSet, _
-                        Optional ByRef aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+                                Optional ByRef aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
     If pData.Contains(aDs) Then
       Return False 'can't add, already have it
     Else

@@ -43,7 +43,7 @@ Public Class atcDataSet
     End Get
   End Property
 
-  ''' <summary>Formated string containing all attributes of data set.</summary>
+  ''' <summary>Formated string containing the attributes of data set in pStringAttributeNames.</summary>
   Public Overrides Function ToString() As String
     Dim lLastAttribute As Integer = pStringAttributeNames.GetUpperBound(0)
     Dim lAttrValues(lLastAttribute) As String
@@ -56,8 +56,9 @@ Public Class atcDataSet
   ''' <summary>Build a default format string with all arguments separated by 
   ''' spaces</summary>
   Public Shared Sub SetStringFormat(ByVal aAttributeNames() As String, _
-                                  Optional ByVal aFormat As String = "")
-    If aFormat.Length = 0 Then
+                           Optional ByVal aFormat As String = "")
+
+    If aFormat.Length = 0 Then 'Create a format containing all the named attributes
       For iArg As Integer = 0 To aAttributeNames.GetUpperBound(0)
         aFormat &= "{" & iArg & "} "
       Next
