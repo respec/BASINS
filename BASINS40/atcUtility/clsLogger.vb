@@ -14,7 +14,6 @@ Public Class Logger
   Private Shared pStatusMonitorPID As Integer = -1
   Private Shared pText As String = "" 'Buffer messages here if needed while log file is busy
   Private Shared pNumLogsQueued As Integer = 0 'count messages in Buffer
-  Private Shared pSaveLogFiles As Boolean = True
   Private Shared pFirstCall As Boolean = True
   Private Shared pFileName As String = "" 'file to write logs to 
 
@@ -23,45 +22,59 @@ Public Class Logger
                        Optional ByVal aRenameExisting As Boolean = True, _
                        Optional ByVal aForceNameChange As Boolean = False)
     If aForceNameChange OrElse pFile = -1 Then 'log file name change is allowed
-      If Not aLogFileName.Equals(pFileName) Then
-        If pFile >= 0 Then 'Close the already-open file
-          Try
-            FileClose(pFile)
-          Catch ex As Exception
-          End Try
-          pFile = -1
-        End If
+      If pFile >= 0 Then 'Close the already-open file
+        Try
+          FileClose(pFile)
+        Catch ex As Exception
+        End Try
+        pFile = -1
       End If
 
       pFileName = aLogFileName
 
-      If Not aAppend AndAlso FileExists(pFileName) Then
-        If pSaveLogFiles Then
-          Rename(pFileName, MakeLogName(pFileName))
+      If pFileName.Length > 0 Then
+        MkDirPath(PathNameOnly(pFileName))
+        pFile = FreeFile()
+
+        If FileExists(pFileName) Then
+          If aAppend Then
+            FileOpen(pFile, pFileName, OpenMode.Append, OpenAccess.Write, OpenShare.LockWrite)
+          Else
+            If aRenameExisting Then
+              Rename(pFileName, MakeLogName(pFileName))
+            Else
+              Kill(pFileName)
+            End If
+            FileOpen(pFile, pFileName, OpenMode.Output, OpenAccess.Write, OpenShare.LockWrite)
+          End If
         Else
-          Kill(pFileName)
+          FileOpen(pFile, pFileName, OpenMode.Output, OpenAccess.Write, OpenShare.LockWrite)
         End If
       End If
     End If
   End Sub
+
+  ''' File name being logged to
   Public Shared ReadOnly Property FileName() As String
     Get
       Return pFileName
     End Get
   End Property
 
+  ''' Append a number to a given file name if needed to make it unique
   Private Shared Function MakeLogName(ByVal aLogFileName As String) As String
     Dim lTryName As String
     Dim lTry As Integer = 1
 
     Do
-      lTryName = FilenameNoExt(pFileName) & "." & lTry & ".log"
+      lTryName = FilenameNoExt(pFileName) & "#" & lTry & ".log"
       lTry += 1
     Loop While FileExists(lTryName)
     Return lTryName
   End Function
 
-  Public Shared Property SetTimeStamp() As Boolean
+  ''' True to enable time stamping each log event
+  Public Shared Property TimeStamping() As Boolean
     Set(ByVal aLogTimeStamp As Boolean)
       pTimeStamp = aLogTimeStamp
     End Set
@@ -70,34 +83,25 @@ Public Class Logger
     End Get
   End Property
 
+  ''' If MapWin is set to a MapWindow.Interfaces.IMapWin object, progress messages will affect pMapWin.StatusBar 
   Public Shared WriteOnly Property MapWin() As Object
     Set(ByVal aMapWin As Object) 'MapWindow.Interfaces.IMapWin)
       pMapWin = aMapWin
     End Set
   End Property
 
+  ''' Write any pending log messages to the log file (if logging to a file)
   Public Shared Sub Flush()
-    If pFile = -1 AndAlso pFileName.Length > 0 Then
-      MkDirPath(PathNameOnly(pFileName))
-      pFile = FreeFile()
-      If pFirstCall Then
-        If pSaveLogFiles AndAlso FileExists(pFileName) Then
-          Rename(pFileName, MakeLogName(pFileName))
-        End If
-        FileOpen(pFile, pFileName, OpenMode.Output, OpenAccess.Write, OpenShare.LockWrite)
-        pFirstCall = False
-      Else
-        FileOpen(pFile, pFileName, OpenMode.Append, OpenAccess.Write, OpenShare.LockWrite)
-      End If
-    End If
-
     If pFile > 0 Then
       FileClose(pFile)
       FileOpen(pFile, pFileName, OpenMode.Append, OpenAccess.Write, OpenShare.LockWrite)
     End If
   End Sub
 
-  Public Shared Sub Dbg(ByRef aMessage As String)  'Log a debugging trace message
+  ''' Add a "debug" message to the log. 
+  ''' Debug messages are commonly used to indicate that execution has reached a certain line.
+  ''' Important values just computed or about to be used are often included.
+  Public Shared Sub Dbg(ByRef aMessage As String)
     Dim lText As String = pText
 
     If pTimeStamp Then
@@ -117,14 +121,8 @@ Public Class Logger
     End If
 
     Try
-      If pFileName.Length = 0 Then
-        Debug.WriteLine(lText)
-      Else
-        If pFile = -1 Then 'force open
-          Flush()
-        End If
-        PrintLine(pFile, lText)
-      End If
+      Debug.WriteLine(lText)
+      If pFile >= 0 Then PrintLine(pFile, lText)
       pText = ""
       pNumLogsQueued = 0
     Catch ex As Exception
@@ -134,18 +132,32 @@ Public Class Logger
     End Try
   End Sub
 
-  'Log the use of a message box 
+  ''' Log the use of a message box 
   Public Shared Function Msg(ByVal aMessage As String, _
-                         Optional ByVal aTitle As String = "", _
-                         Optional ByRef aMsgBoxStyle As MsgBoxStyle = MsgBoxStyle.OKOnly) As MsgBoxResult
+                    Optional ByRef aMsgBoxStyle As MsgBoxStyle = MsgBoxStyle.OKOnly, _
+                    Optional ByVal aTitle As String = "") As MsgBoxResult
     If aTitle.Length = 0 Then
       If aMessage.IndexOf(":") > 0 Then
         aTitle = StrSplit(aMessage, ":", "")
       End If
     End If
 
+    Dbg("Msg:" & aMessage & ":Title:" & aTitle & ":Style:" & aMsgBoxStyle)
+    Flush()
     Dim lResult As MsgBoxResult = MsgBox(aMessage, aMsgBoxStyle, aTitle)
-    Dbg("Msg:Title:<" & aTitle & ">:" & aMessage & ":Style:" & aMsgBoxStyle & ":Result:" & lResult)
+    Dim lResultString As String = ""
+    Select Case lResult
+      Case MsgBoxResult.Abort : lResultString = "Abort"
+      Case MsgBoxResult.Retry : lResultString = "Retry"
+      Case MsgBoxResult.Ignore : lResultString = "Ignore"
+
+      Case MsgBoxResult.Yes : lResultString = "Yes"
+      Case MsgBoxResult.No : lResultString = "No"
+
+      Case MsgBoxResult.OK : lResultString = "OK"
+      Case MsgBoxResult.Cancel : lResultString = "Cancel"
+    End Select
+    Dbg("MsgResult:" & lResult & ":" & lResultString)
     Return lResult
   End Function
 
@@ -244,7 +256,7 @@ Public Class Logger
   '    fileline = logtext(6).Split("\")
   '    Dim i As Integer = fileline.GetUpperBound(0)
   '    texttoadd = logtext(0) & ": " & _
-  '         fileline(i).Substring(0, fileline(i).Length - 2)
+  '    fileline(i).Substring(0, fileline(i).Length - 2)
   '    fs = File.AppendText(TRACE_LOG)
   '    fs.WriteLine(texttoadd)
   '    fs.Flush()
