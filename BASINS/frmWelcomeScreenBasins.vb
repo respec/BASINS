@@ -391,8 +391,18 @@ Public Class frmWelcomeScreenBasins
 #End Region
 
   Private Sub lbBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbBuildNew.LinkClicked
-    'TODO: don't hard code path
-    prj.Load("\basins\data\national\national.mwprj")
+    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+    Dim nationalprj As String = lBasinsBinLoc & "\..\data\national\national.mwprj"
+    If FileExists(nationalprj) Then
+      prj.Load(lBasinsBinLoc & "\..\data\national\national.mwprj")
+    Else
+      prj.Load("\basins\data\national\national.mwprj")
+    End If
+    'MsgBox("To Build a New BASINS Project: " & vbCr & vbCr & _
+    '       "Zoom/Pan to your geographic area of interest, select (highlight) your " & vbCr & _
+    '       "area of interest, and then choose Download from the Data menu." & vbCr & vbCr & _
+    '       "If your area is outside the US, then choose the Download" & vbCr & _
+    '       "menu now to create a project with no data.", MsgBoxStyle.OKOnly, "Build BASINS Project")
     Me.Close()
   End Sub
 

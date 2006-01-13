@@ -105,7 +105,13 @@ StartOver:
         SaveFileString(newDataDir & "prj.proj", myProjection) 'Side effect: makes data directory
 
         'TODO: test this with no area selected
-        If Not NoData Then
+        If NoData Then
+          g_MapWin.Layers.Clear()
+          g_MapWin.Project.Save(ProjectFileName)
+          g_MapWin.Project.Modified = True
+          g_MapWin.Project.Save(ProjectFileName)
+          g_MapWin.Project.Modified = False
+        Else
           'download and project core data
           CreateNewProjectAndDownloadCoreData(aThemeTag, aSelectedFeatures, dataPath, newDataDir, ProjectFileName)
         End If
@@ -221,7 +227,7 @@ StartOver:
             Else
               'project it
               g_MapWin.StatusBar(1).Text = "Projecting Grid..."
-              g_MapWin.View.MapCursor = tkCursor.crsrWait
+              'g_MapWin.View.MapCursor = tkCursor.crsrWait
               g_MapWin.Refresh()
               DoEvents()
               success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
@@ -230,7 +236,7 @@ StartOver:
                 Logger.Msg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
                 System.IO.File.Copy(curFilename, theOutputFileName)
               End If
-              g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
+              'g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
             End If
           Case "convert_dir"
               'loop through a directory, projecting all files in it
@@ -508,7 +514,11 @@ StartOver:
       If LCase(aFilename).IndexOf("\landuse\") > 0 Then
         SetLandUseColors(MWlay, shpFile)
       ElseIf LCase(aFilename).IndexOf("\nhd\") > 0 Then
-        MWlay.Name &= " " & FilenameOnly(shpFile.Filename)
+        If InStr(FilenameOnly(shpFile.Filename), "NHD") > 0 Then
+          MWlay.Name = FilenameOnly(shpFile.Filename)
+        Else
+          MWlay.Name &= " " & FilenameOnly(shpFile.Filename)
+        End If
       ElseIf LCase(aFilename).IndexOf("\census\") > 0 Then
         SetCensusColors(MWlay, shpFile)
       ElseIf LCase(aFilename).IndexOf("\dem\") > 0 Then
