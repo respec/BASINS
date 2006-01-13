@@ -435,7 +435,8 @@ TryAgain:
 
 ErrHand:
     Resume Next
-    If LogMsg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", "Retry", "Abort") = 1 Then
+    If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, _
+                  MsgBoxStyle.AbortRetryIgnore, "Write DBF") = MsgBoxResult.Retry Then
       On Error Resume Next
       FileClose(OutFile)
       GoTo TryAgain
