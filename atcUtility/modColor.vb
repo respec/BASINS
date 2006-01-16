@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On 
 
 Imports System.Drawing
+Imports MapWinUtility
 
 Public Module UtilColor
   '##MODULE_REMARKS Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license

@@ -1,8 +1,8 @@
 Option Strict Off
 Option Explicit On 
 
-Imports atcUtility.modFile
-Imports atcUtility.modString
+Imports MapWinUtility
+Imports atcUtility
 
 Friend Class clsNetworkHspfOutput
   '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license

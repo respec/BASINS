@@ -5,7 +5,7 @@ Option Explicit On
 Imports System.Collections.Specialized
 Imports NUnit.Framework
 Imports atcUtility
-Imports atcUtility.modReflection
+Imports MapWinUtility
 
 <TestFixture()> Public Class Test_Builder
   Public Sub TestsAllPresent()

@@ -3,6 +3,8 @@ Option Explicit On
 
 Imports atcData
 Imports atcUtility
+Imports MapWinUtility
+
 
 Public Class atcTimeseriesFileHspfBinOut
   Inherits atcData.atcDataSource

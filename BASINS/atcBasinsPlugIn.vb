@@ -3,6 +3,7 @@ Imports System.Windows.Forms.Application
 Imports System.Reflection
 Imports atcUtility
 Imports atcData
+Imports MapWinUtility
 
 Public Class atcBasinsPlugIn
   Implements MapWindow.Interfaces.IPlugin
@@ -78,11 +79,11 @@ Public Class atcBasinsPlugIn
     End Get
   End Property
 
-'  Public ReadOnly Property DataManager() As atcDataManager
-'    Get
-'      Return pDataManager
-'    End Get
-'  End Property
+  Public ReadOnly Property DataManager() As atcDataManager
+    Get
+      Return pDataManager
+    End Get
+  End Property
 
   Public ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
     'Appears in the plug-ins dialog box when a user selects the plug-in.  
@@ -184,9 +185,9 @@ Public Class atcBasinsPlugIn
 
   End Sub
 
-  Private Function ScriptFolder() As String
-    Return PathNameOnly(g_MapWin.Plugins.PluginFolder) & "\script"
-  End Function
+  'Private Function ScriptFolder() As String
+  '  Return PathNameOnly(g_MapWin.Plugins.PluginFolder) & "\script"
+  'End Function
 
   Private Function AddMenuIfMissing(ByVal aMenuName As String, _
                                     ByVal aParent As String, _
@@ -211,19 +212,19 @@ Public Class atcBasinsPlugIn
       AddMenuIfMissing(ToolsMenuName & "_ArcGIS", ToolsMenuName, "&ArcGIS")
       AddMenuIfMissing(ToolsMenuName & "_GenScn", ToolsMenuName, "&GenScn")
       AddMenuIfMissing(ToolsMenuName & "_WDMUtil", ToolsMenuName, "&WDMUtil")
-      AddMenuIfMissing(lScriptMenuName, ToolsMenuName, "Scripting")
-      If pBuiltInScriptExists Then
-        AddMenuIfMissing(ToolsMenuName & "_RunBuiltInScript", lScriptMenuName, "Run Built In Script")
-      End If
-      AddMenuIfMissing(ToolsMenuName & "_ScriptEditor", lScriptMenuName, "Script Editor")
-      AddMenuIfMissing(ToolsMenuName & "_RunScript", lScriptMenuName, "Select Script to Run")
+      'AddMenuIfMissing(lScriptMenuName, ToolsMenuName, "Scripting")
+      'If pBuiltInScriptExists Then
+      '  AddMenuIfMissing(ToolsMenuName & "_RunBuiltInScript", lScriptMenuName, "Run Built In Script")
+      'End If
+      'AddMenuIfMissing(ToolsMenuName & "_ScriptEditor", lScriptMenuName, "Script Editor")
+      'AddMenuIfMissing(ToolsMenuName & "_RunScript", lScriptMenuName, "Select Script to Run")
 
-      For Each lScriptFilename As String In System.IO.Directory.GetFiles(ScriptFolder, "*.vb")
-        Dim lMenuLabel As String = FilenameOnly(lScriptFilename)
-        If Not lMenuLabel.ToLower.StartsWith("sub") AndAlso Not lMenuLabel.ToLower.StartsWith("fun") Then
-          AddMenuIfMissing(ToolsMenuName & "_RunScript" & FilenameNoPath(lScriptFilename), lScriptMenuName, "Run " & lMenuLabel)
-        End If
-      Next
+      'For Each lScriptFilename As String In System.IO.Directory.GetFiles(ScriptFolder, "*.vb")
+      '  Dim lMenuLabel As String = FilenameOnly(lScriptFilename)
+      '  If Not lMenuLabel.ToLower.StartsWith("sub") AndAlso Not lMenuLabel.ToLower.StartsWith("fun") Then
+      '    AddMenuIfMissing(ToolsMenuName & "_RunScript" & FilenameNoPath(lScriptFilename), lScriptMenuName, "Run " & lMenuLabel)
+      '  End If
+      'Next
 
       'AddMenuIfMissing(ToolsMenuName & "_ChangeProjection", ToolsMenuName, "Change &Projection")
 
@@ -506,52 +507,47 @@ Public Class atcBasinsPlugIn
         Return False
         'End If
         'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
-      Case "ScriptEditor"
-        Dim lfrm As New frmScript
-        lfrm.BasinsPlugin = Me
-        lfrm.Show()
-        Return True
       Case Else
-        If aToolName.StartsWith("RunBuiltInScript") Then
-          Try
-            BuiltInScript(True)
-          Catch e As Exception
-            Logger.Msg(e.ToString, "Error Running Built-in Script")
-          End Try
-          Return True
+        'If aToolName.StartsWith("RunBuiltInScript") Then
+        '  Try
+        '    BuiltInScript(True)
+        '  Catch e As Exception
+        '    Logger.Msg(e.ToString, "Error Running Built-in Script")
+        '  End Try
+        '  Return True
 
-        ElseIf aToolName.StartsWith("RunScript") Then
-          aToolName = aToolName.Substring(9)
-          exename = StrSplit(aToolName, " ", """")
-          Dim args() As Object = aToolName.Split(",")
-          Dim errors As String
+        'ElseIf aToolName.StartsWith("RunScript") Then
+        '  aToolName = aToolName.Substring(9)
+        '  exename = StrSplit(aToolName, " ", """")
+        '  Dim args() As Object = aToolName.Split(",")
+        '  Dim errors As String
 
-          If exename.ToLower = "findfile" OrElse Not FileExists(exename) Then
-            Dim lScriptFileName As String = ScriptFolder() & "\" & exename
-            If FileExists(lScriptFileName) Then
-              exename = lScriptFileName
-            Else
-              exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
-            End If
-            If Len(args(0)) = 0 Then args = New Object() {"DataManager", "BasinsPlugIn"}
-          End If
-          If FileExists(exename) Then
-            RunBasinsScript(FileExt(exename), exename, errors, args)
-            If Not errors Is Nothing Then
-              Logger.Msg(errors, "Run Script Error")
-            End If
-            Return True
-          Else
-            Logger.Msg("Unable to find script " & exename, "LaunchTool")
-            Return False
-          End If
-        Else 'Search for DisplayPlugin to launch
+        '  If exename.ToLower = "findfile" OrElse Not FileExists(exename) Then
+        '    Dim lScriptFileName As String = ScriptFolder() & "\" & exename
+        '    If FileExists(lScriptFileName) Then
+        '      exename = lScriptFileName
+        '    Else
+        '      exename = FindFile("Please locate script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+        '    End If
+        '    If Len(args(0)) = 0 Then args = New Object() {"DataManager", "BasinsPlugIn"}
+        '  End If
+        '  If FileExists(exename) Then
+        '    RunBasinsScript(FileExt(exename), exename, errors, args)
+        '    If Not errors Is Nothing Then
+        '      Logger.Msg(errors, "Run Script Error")
+        '    End If
+        '    Return True
+        '  Else
+        '    Logger.Msg("Unable to find script " & exename, "LaunchTool")
+        '    Return False
+        '  End If
+        'Else 'Search for DisplayPlugin to launch
           If LaunchDisplay(aToolName) Then
             Return True
           Else
             Logger.Msg("Not yet able to launch " & aToolName, "Option not yet functional")
           End If
-        End If
+        'End If
     End Select
 
     If FileExists(exename) Then
@@ -576,7 +572,7 @@ Public Class atcBasinsPlugIn
     lFeedback &= vbCrLf & "Files in " & lStartDir & vbCrLf
 
     Dim lallFiles As New NameValueCollection
-    AddFilesInDir(lallFiles, lstartdir, True)
+    AddFilesInDir(lallFiles, lStartDir, True)
     lFeedback &= vbCrLf & "Filename" & vbTab & "Size" & vbTab & "Modified" & vbCrLf
     For Each lFilename As String In lallFiles
       lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & Format(FileLen(lFilename), "#,###") & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
@@ -643,46 +639,46 @@ Public Class atcBasinsPlugIn
     Next
   End Function
 
-  Public Function RunBasinsScript(ByVal aLanguage As String, _
-                                    ByVal aScript As String, _
-                                    ByRef aErrors As String, _
-                                    ByVal ParamArray aArgs() As Object) As Object
+  'Public Function RunBasinsScript(ByVal aLanguage As String, _
+  '                                  ByVal aScript As String, _
+  '                                  ByRef aErrors As String, _
+  '                                  ByVal ParamArray aArgs() As Object) As Object
 
-    Logger.Dbg(aLanguage & vbCr & aScript) ', "atcBasinsPlugIn:RunBasinsScript")
-    If Not aArgs Is Nothing Then 'replace some text arguments with objects
-      For iArg As Integer = 0 To aArgs.GetUpperBound(0)
-        If aArgs(iArg).GetType Is GetType(String) Then
-          Select Case CStr(aArgs(iArg)).ToLower
-            Case "datamanager" : aArgs(iArg) = pDataManager
-            Case "basinsplugin" : aArgs(iArg) = Me
-            Case "mapwin" : aArgs(iArg) = g_MapWin
-          End Select
-        End If
-      Next
-    End If
+  '  Logger.Dbg(aLanguage & vbCr & aScript) ', "atcBasinsPlugIn:RunBasinsScript")
+  '  If Not aArgs Is Nothing Then 'replace some text arguments with objects
+  '    For iArg As Integer = 0 To aArgs.GetUpperBound(0)
+  '      If aArgs(iArg).GetType Is GetType(String) Then
+  '        Select Case CStr(aArgs(iArg)).ToLower
+  '          Case "datamanager" : aArgs(iArg) = pDataManager
+  '          Case "basinsplugin" : aArgs(iArg) = Me
+  '          Case "mapwin" : aArgs(iArg) = g_MapWin
+  '        End Select
+  '      End If
+  '    Next
+  '  End If
 
-    If Not FileExists(aScript) Then
-      Dim lScriptFileName As String = ScriptFolder() & "\" & aScript
-      If FileExists(lScriptFileName) Then
-        aScript = lScriptFileName
-      End If
-    End If
+  '  If Not FileExists(aScript) Then
+  '    Dim lScriptFileName As String = ScriptFolder() & "\" & aScript
+  '    If FileExists(lScriptFileName) Then
+  '      aScript = lScriptFileName
+  '    End If
+  '  End If
 
-    Return RunScript(aLanguage, MakeScriptName, aScript, aErrors, aArgs)
+  '  Return RunScript(aLanguage, MakeScriptName, aScript, aErrors, aArgs)
 
-  End Function
+  'End Function
 
-  Private Function MakeScriptName() As String
-    Dim tryName As String
-    Dim iTry As Integer = 1
+  'Private Function MakeScriptName() As String
+  '  Dim tryName As String
+  '  Dim iTry As Integer = 1
 
-    Do
-      tryName = g_MapWin.Plugins.PluginFolder & _
-                "\Basins\RemoveMe-Script-" & iTry & ".dll"
-      iTry += 1
-    Loop While FileExists(tryName)
-    Return tryName
-  End Function
+  '  Do
+  '    tryName = g_MapWin.Plugins.PluginFolder & _
+  '              "\Basins\RemoveMe-Script-" & iTry & ".dll"
+  '    iTry += 1
+  '  Loop While FileExists(tryName)
+  '  Return tryName
+  'End Function
 
   'Public Sub CompilePlugin(ByVal aScript As String, _
   '                         ByRef aErrors As String, _
@@ -802,21 +798,21 @@ Public Class atcBasinsPlugIn
       'COMMAND_LINE:broadcast:basins:script:c:\test\BASINS4\scripts\dummy.vb
       Logger.Dbg("BASINS:Message:" & msg)
       Dim s As String = msg.Substring(23)
-      If s.Substring(7).StartsWith("script") Then
-        lScriptFileName = s.Substring(14)
-        ChDriveDir(PathNameOnly(lScriptFileName)) 'start where script is
-        RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, lErrors, "dataManager", "basinsplugin")
-        If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
-          Logger.Msg(lErrors, "Command Line Script Error", "OK")
-        End If
-        pCommandLineScript = True
-      End If
-    ElseIf msg.StartsWith("RUN_BASINS_SCRIPT:") Then
-      lScriptFileName = msg.Substring(18).Trim
-      RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, lErrors, "dataManager", "basinsplugin")
-      If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
-        Logger.Msg(lErrors, "Script Error")
-      End If
+      'If s.Substring(7).StartsWith("script") Then
+      '  lScriptFileName = s.Substring(14)
+      '  ChDriveDir(PathNameOnly(lScriptFileName)) 'start where script is
+      '  RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, lErrors, "dataManager", "basinsplugin")
+      '  If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
+      '    Logger.Msg(lErrors, "Command Line Script Error", "OK")
+      '  End If
+      '  pCommandLineScript = True
+      'End If
+      'ElseIf msg.StartsWith("RUN_BASINS_SCRIPT:") Then
+      '  lScriptFileName = msg.Substring(18).Trim
+      '  RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, lErrors, "dataManager", "basinsplugin")
+      '  If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
+      '    Logger.Msg(lErrors, "Script Error")
+      '  End If
     Else
       Logger.Dbg("BASINS:Message:Ignore:" & msg)
     End If

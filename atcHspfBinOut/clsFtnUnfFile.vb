@@ -2,7 +2,8 @@ Option Strict Off
 Option Explicit On 
 
 Imports Microsoft.VisualBasic.FileSystem
-Imports atcUtility.modFile
+Imports MapWinUtility
+Imports atcUtility
 
 Friend Class clsFtnUnfFile
   '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license

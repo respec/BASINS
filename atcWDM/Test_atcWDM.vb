@@ -4,8 +4,9 @@ Option Explicit On
 
 Imports NUnit.Framework
 Imports atcUtility.modReflection
-Imports atcUtility.modFile
 Imports atcData
+Imports MapWinUtility
+Imports atcUtility
 
 Friend Module dbg
   Dim init As Boolean = False

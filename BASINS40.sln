@@ -107,6 +107,10 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSWATDBF", "atcSWATDBF\at
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "MapWinUtility", "..\MapWinUtility\MapWinUtility.vbproj", "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -220,6 +224,10 @@ Global
 		{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}.Debug.Build.0 = Debug|.NET
 		{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}.Release.ActiveCfg = Release|.NET
 		{8DF179A4-2D5B-43B0-A78F-EF7B65F36AD5}.Release.Build.0 = Release|.NET
+		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Debug.ActiveCfg = Debug|.NET
+		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Debug.Build.0 = Debug|.NET
+		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Release.ActiveCfg = Release|.NET
+		{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}.Release.Build.0 = Release|.NET
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

@@ -3,6 +3,7 @@ Option Explicit On
 Imports System.Windows.Forms
 Imports System.Math
 Imports ATCutility
+Imports MapWinUtility
 
 Public Class atcText
   Inherits System.Windows.Forms.UserControl
@@ -680,7 +681,7 @@ LeaveSub:
             End If
           End If
           If Len(retval) > maxWidth Then
-            LogVal = Abs(Log(Abs(Val)) / Log(10))
+            LogVal = Abs(Math.Log(Abs(Val)) / Math.Log(10))
             If LogVal >= 100 Then
               expFormat = "e-###"
             ElseIf LogVal >= 10 Then

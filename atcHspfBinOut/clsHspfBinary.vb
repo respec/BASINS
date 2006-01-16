@@ -1,8 +1,7 @@
 Option Strict Off
 Option Explicit On 
 
-Imports atcUtility.modDate
-Imports atcUtility.modString
+Imports MapWinUtility
 Imports atcUtility
 
 Friend Class clsHspfBinId

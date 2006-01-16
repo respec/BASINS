@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On 
 
 Imports atcUtility
+Imports MapWinUtility
 
 Friend Class atcWdmHandle
   'Copyright 2005 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
