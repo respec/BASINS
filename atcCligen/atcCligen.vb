@@ -84,10 +84,17 @@ Public Class atcCligen
     lAttDef2 = atcDataAttributes.GetDefinition("Num Years")
     If lOk And lSYr >= lAttDef.Min And lSYr <= lAttDef.Max And _
        lNYrs >= lAttDef2.Min And lNYrs <= lAttDef2.Max Then 'run CliGen
-      RunCliGen(lParmFile, lOutFile, lSYr, lNYrs)
-      Dim lCliGenOut As New atcDataSourceCligen
-      If lCliGenOut.Open(lOutFile) Then 'add output datasets to this class' datasets
-        Me.DataSets.AddRange(lCliGenOut.DataSets)
+      If RunCliGen(lParmFile, lOutFile, lSYr, lNYrs) Then 'successful run
+        Dim lCliGenOut As New atcDataSourceCligen
+        If lCliGenOut.Open(lOutFile) Then 'add output datasets to this class' datasets
+          Me.DataSets.AddRange(lCliGenOut.DataSets)
+        End If
+      Else
+        Logger.Msg("CliGen run not successful using following inputs:" & vbCrLf & _
+                   "  Parameter file:  " & lParmFile & vbCrLf & _
+                   "  Output file:     " & lOutFile & vbCrLf & _
+                   "  Starting Year:   " & lSYr & vbCrLf & _
+                   "  Number of Years: " & lNYrs, "Run CliGen Problem")
       End If
     End If
     Return (Me.DataSets.Count > 0)
@@ -164,14 +171,22 @@ Public Class atcCligen
     End Get
   End Property
 
-  Private Sub RunCliGen(ByVal aParmFileName As String, ByVal aOutFileName As String, ByVal aStartYear As Integer, ByVal aNumYears As Integer)
+  Private Function RunCliGen(ByVal aParmFileName As String, ByVal aOutFileName As String, ByVal aStartYear As Integer, ByVal aNumYears As Integer) As Boolean
     Dim lStr As String
     Dim lExeName As String = FindFile("Please Locate CliGen Executable", "CliGen522564.exe", "*.exe", "Executable Files (*.exe)|*.exe")
+    If FileExists(aOutFileName) Then 'delete pre-existing output file
+      Kill(aOutFileName)
+    End If
     lStr = """" & lExeName & """" & " -b" & aStartYear & " -y" & aNumYears & " -i" & aParmFileName & _
            " -o" & aOutFileName & " -F -t5 >" & FilenameNoExt(aParmFileName) & ".out"
     Shell(lStr, AppWinStyle.Hide, True)
+    If FileExists(aOutFileName) Then
+      Return True
+    Else
+      Return False
+    End If
 
-  End Sub
+  End Function
 
   Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
     Dim lAvlOps As atcDataAttributes = AvailableOperations()
