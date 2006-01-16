@@ -382,12 +382,23 @@ Public Class frmCliGen
 
   Private Sub WriteParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As IatcTable, ByRef aFooter As String)
     Dim lStr As String
-    Dim lpos As Integer
+    Dim lPos As Integer
+    Dim lVal As Double
     lStr = aHeader
     cTable.MoveFirst()
     For i As Integer = 1 To cTable.NumRecords
-      For j As Integer = 1 To cTable.NumFields
-        cTable.Value(j) = agdMonParms.Source.CellValue(i, j - 1)
+      For j As Integer = 2 To cTable.NumFields
+        If IsNumeric(agdMonParms.Source.CellValue(i, j - 1)) Then
+          lVal = CDbl(agdMonParms.Source.CellValue(i, j - 1))
+          Select Case Trim(UCase(cTable.Value(1)))
+            Case "SOL.RAD", "SD SOL"
+              cTable.Value(j) = RightJustify(DoubleToString(lVal, , "####.0"), cTable.FieldLength(j))
+            Case "TIME PK"
+              cTable.Value(j) = RightJustify(DoubleToString(lVal, , "#.000"), cTable.FieldLength(j))
+            Case Else
+              cTable.Value(j) = RightJustify(DoubleToString(lVal, , "###.00"), cTable.FieldLength(j))
+          End Select
+        End If
       Next
       lStr += cTable.CurrentRecordAsDelimitedString("") & vbCrLf
       cTable.MoveNext()
