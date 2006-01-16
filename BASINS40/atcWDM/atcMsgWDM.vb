@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports atcData
 Imports atcUtility
+Imports MapWinUtility
 
 Friend Class atcMsgWDM
   'Copyright 2005 by AQUA TERRA Consultants - Royalty-free use permitted under open source license

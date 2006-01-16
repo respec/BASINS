@@ -1,6 +1,7 @@
 Option Strict Off
 Option Explicit On 
 Imports atcUtility
+Imports MapWinUtility
 
 Public Module modUnits
   '##MODULE_REMARKS Copyright 2001-3 AQUA TERRA Consultants - Royalty-free use permitted under open source license

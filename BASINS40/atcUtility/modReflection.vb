@@ -3,6 +3,7 @@ Option Explicit On
 'Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
 Imports System.Reflection
+Imports MapWinUtility
 
 Public Module modReflection
 

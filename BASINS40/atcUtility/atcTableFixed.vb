@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On 
 Imports System.IO
 Imports atcUtility
+Imports MapWinUtility
 
 Public Class atcTableFixed
   Inherits atcTable

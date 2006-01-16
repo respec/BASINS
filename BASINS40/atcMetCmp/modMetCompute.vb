@@ -2,6 +2,8 @@ Option Strict Off
 Option Explicit On 
 Imports atcData
 Imports atcUtility
+Imports MapWinUtility
+
 Public Module modMetCompute
   'Copyright 2005 by AQUA TERRA Consultants
   Private X1() As Double = {0, 10.00028, 41.0003, 69.22113, 100.5259, 130.8852, 161.2853, _

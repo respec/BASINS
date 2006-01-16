@@ -2,7 +2,7 @@ Option Strict Off
 Option Explicit On 
 
 Imports System.Collections.Specialized
-Imports atcUtility
+Imports MapWinUtility
 
 Public Module modFile
   Public Function ChDriveDir(ByVal newPath As String) As Boolean
@@ -61,35 +61,12 @@ EndFound:
     Return System.IO.Path.GetFileName(istr)
   End Function
 
-  Public Function FilenameNoExt(ByRef istr As String) As String
-    ' ##SUMMARY Converts full path, filename, and extension to only path and filename without extension.
-    ' ##SUMMARY   Example: FilenameNoExt ("C:\foo\bar.txt") = "C:\foo\bar"
-    ' ##PARAM istr I Filename with path and extension.
-    ' ##RETURNS Path and filename without extension.
-    Dim dirname As String
-    dirname = System.IO.Path.GetDirectoryName(istr)
-    If dirname.Length > 0 Then dirname = dirname & System.IO.Path.DirectorySeparatorChar
-    Return dirname & System.IO.Path.GetFileNameWithoutExtension(istr)
-  End Function
-
   Public Function FileExt(ByRef istr As String) As String
     ' ##SUMMARY Reduces full path, filename, and extension to only extension.
     ' ##SUMMARY   Example: FileExt ("C:\foo\bar.txt") = "txt"
     ' ##PARAM istr I Filename with path and extension.
     ' ##RETURNS Extension without path or filename.
     Return Mid(System.IO.Path.GetExtension(istr), 2)
-  End Function
-
-  Public Function PathNameOnly(ByRef istr As String) As String
-    ' ##SUMMARY Reduces full path, filename, and extension to only path.
-    ' ##SUMMARY   Example: PathNameOnly ("C:\foo\bar.txt") = "C:\foo"
-    ' ##PARAM istr I Filename with path and extension.
-    ' ##RETURNS Directory path without filename or extension.
-    Try
-      Return System.IO.Path.GetDirectoryName(istr)
-    Catch e As Exception
-      Return ""
-    End Try
   End Function
 
   Public Function FilenameSetExt(ByRef istr As String, ByRef newExt As String) As String
@@ -210,15 +187,6 @@ FoundSameUntil:
     End If
     Return filename
   End Function
-
-  Public Sub MkDirPath(ByVal newPath As String)
-    ' ##SUMMARY Makes the specified directory and any above it that are not yet there.
-    ' ##SUMMARY   Example: MkDirPath("C:\foo\bar") creates the "C:\foo" and "C:\foo\bar" directories if they do not already exist.
-    ' ##PARAM newPath I Path to specified directory
-    If Len(newPath) > 0 Then
-      System.IO.Directory.CreateDirectory(newPath)
-    End If
-  End Sub
 
   Public Sub AddFilesInDir(ByRef aFilenames As NameValueCollection, ByRef aDirName As String, ByRef aSubdirs As Boolean, Optional ByRef aFileFilter As String = "*", Optional ByRef aAttributes As Integer = 0)
     Dim dirsThisDir As NameValueCollection
@@ -395,21 +363,6 @@ ErrorWriting:
 ErrorWriting:
     MsgBox("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "ReplaceStringToFile")
   End Sub
-
-  Public Function FileExists(ByVal PathName As String, Optional ByRef AcceptDirectories As Boolean = False, Optional ByRef AcceptFiles As Boolean = True) As Boolean
-    ' ##SUMMARY Checks to see if specified file exists.
-    ' ##PARAM PathName I Full path and filename.
-    ' ##RETURNS True if file exists.
-
-    On Error GoTo NoSuchFile
-
-    If GetAttr(PathName) And FileAttribute.Directory Then
-      FileExists = AcceptDirectories
-    Else
-      FileExists = AcceptFiles
-    End If
-NoSuchFile:
-  End Function
 
   'Open a file using the default method the system would have used if it was double-clicked
   Public Sub OpenFile(ByVal FileOrURL As String, Optional ByVal Wait As Boolean = False)

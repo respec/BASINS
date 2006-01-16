@@ -4,6 +4,7 @@ Option Explicit On
 
 Imports NUnit.Framework
 Imports atcUtility.modReflection
+Imports MapWinUtility
 
 Imports System.Drawing
 

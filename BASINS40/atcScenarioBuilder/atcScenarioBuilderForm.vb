@@ -1,6 +1,7 @@
 Imports atcControls
 Imports atcData
 Imports atcUtility
+Imports MapWinUtility
 
 Imports System.Windows.Forms
 
@@ -921,23 +922,23 @@ Friend Class atcScenarioBuilderForm
   End Sub
 
   Private Sub mnuScenariosAddFromScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromScript.Click
-    Dim lScriptFileName As String = FindFile("Please locate scenario builder script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
-    If FileExists(lScriptFileName) Then
-      Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
-      If lNewScenario.DataSets.Count > 0 Then 'This scenario is already in use
-        AddScenario()                         'Create a new scenario to populate
-        lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
-      End If
-      Dim errors As String
-      RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
-                pBaseScenario, lNewScenario)
-      If Not errors Is Nothing Then
-        Logger.Msg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
-      End If
-    Else
-      Logger.Msg("Unable to find script " & lScriptFileName, "Scenario Script")
-    End If
-    agdMain.Refresh()
+    'Dim lScriptFileName As String = FindFile("Please locate scenario builder script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+    'If FileExists(lScriptFileName) Then
+    '  Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+    '  If lNewScenario.DataSets.Count > 0 Then 'This scenario is already in use
+    '    AddScenario()                         'Create a new scenario to populate
+    '    lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+    '  End If
+    '  Dim errors As String
+    '  RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
+    '            pBaseScenario, lNewScenario)
+    '  If Not errors Is Nothing Then
+    '    Logger.Msg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
+    '  End If
+    'Else
+    '  Logger.Msg("Unable to find script " & lScriptFileName, "Scenario Script")
+    'End If
+    'agdMain.Refresh()
   End Sub
 
   Private Sub mnuScenariosAddFromBuiltInScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromBuiltInScript.Click

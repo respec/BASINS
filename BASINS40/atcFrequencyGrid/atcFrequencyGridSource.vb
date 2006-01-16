@@ -1,4 +1,6 @@
 Imports atcData
+Imports atcUtility
+Imports MapWinUtility
 
 Friend Class atcFrequencyGridSource
   Inherits atcControls.atcGridSource
@@ -82,7 +84,7 @@ Friend Class atcFrequencyGridSource
 
   Public Function RecurrenceAt(ByVal aRow As Integer) As String
     'remove any thousands commas in return period
-    Return atcUtility.ReplaceString(pRecurrence.GetByIndex((aRow - 1) Mod pRecurrence.Count), ",", "")
+    Return ReplaceString(pRecurrence.GetByIndex((aRow - 1) Mod pRecurrence.Count), ",", "")
   End Function
 
   Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
@@ -134,7 +136,7 @@ Friend Class atcFrequencyGridSource
 
                 lReturns(0) = RecurrenceAt(aColumn)
                 For Each lReturn As DictionaryEntry In pRecurrence
-                  lValue = CDbl(atcUtility.ReplaceString(lReturn.Value, ",", ""))
+                  lValue = CDbl(ReplaceString(lReturn.Value, ",", ""))
                   If lValue <> lReturns(0) AndAlso Not pCalculatedRecurrence.Contains(lValue) Then
                     pCalculatedRecurrence.Add(lValue)
                     lReturns(lNextReturns) = lValue

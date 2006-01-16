@@ -4,6 +4,7 @@ Option Explicit On
 Imports MapWinGIS
 Imports System.Collections.Specialized
 Imports System.Windows.Forms.Application
+Imports MapWinUtility
 Imports atcUtility
 
 Module modDownload
