@@ -302,7 +302,7 @@ Public Class atcBasinsPlugIn
     Dim DataDirName As String
     Dim PrjFileName As String
 
-    Logger.Dbg("BASINS4:clsPlugIn:ItemClicked: " & ItemName)
+    Logger.Dbg(ItemName)
     If ItemName.Equals("mnuNew") Then 'Override File/New menu item behavior
       If NationalProjectIsOpen() Then
         MsgBox("Select the area of interest, " & vbCr & "then Download from the Data menu" & vbCr _
@@ -781,23 +781,23 @@ Public Class atcBasinsPlugIn
       If pWelcomeScreenShow _
          OrElse Not g_MapWin.ApplicationInfo.ShowWelcomeScreen _
          OrElse (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) Then
-        Logger.Dbg("BASINS:Message:Welcome:Show")
+        Logger.Dbg("Welcome:Show")
         Dim frmWelBsn As New frmWelcomeScreenBasins(g_MapWin.Project, g_MapWin.ApplicationInfo)
         frmWelBsn.ShowDialog()
       Else 'Skip displaying welcome on launch
-        Logger.Dbg("BASINS:Message:Welcome:Skip")
+        Logger.Dbg("Welcome:Skip")
       End If
       pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
     ElseIf msg.StartsWith("atcDataPlugin") Then
-      Logger.Dbg("BASINS:Message:RefreshToolsMenu:" & msg)
+      Logger.Dbg("RefreshToolsMenu:" & msg)
       If msg.StartsWith("atcDataPlugin unloading") Then
         g_MapWin.Menus.Remove(ToolsMenuName)
       End If
       RefreshToolsMenu()
-    ElseIf msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
+      'ElseIf msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
       'COMMAND_LINE:broadcast:basins:script:c:\test\BASINS4\scripts\dummy.vb
-      Logger.Dbg("BASINS:Message:" & msg)
-      Dim s As String = msg.Substring(23)
+      'Logger.Dbg("BASINS:Message:" & msg)
+      'Dim s As String = msg.Substring(23)
       'If s.Substring(7).StartsWith("script") Then
       '  lScriptFileName = s.Substring(14)
       '  ChDriveDir(PathNameOnly(lScriptFileName)) 'start where script is
@@ -814,7 +814,7 @@ Public Class atcBasinsPlugIn
       '    Logger.Msg(lErrors, "Script Error")
       '  End If
     Else
-      Logger.Dbg("BASINS:Message:Ignore:" & msg)
+      Logger.Dbg("Ignore:" & msg)
     End If
   End Sub
 
