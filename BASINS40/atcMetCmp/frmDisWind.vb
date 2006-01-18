@@ -70,6 +70,7 @@ Public Class frmDisWind
   Friend WithEvents txtHr14 As System.Windows.Forms.TextBox
   Friend WithEvents txtHr13 As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisWind))
     Me.lblCloudCover = New System.Windows.Forms.Label
     Me.panelBottom = New System.Windows.Forms.Panel
     Me.btnCancel = New System.Windows.Forms.Button
@@ -418,6 +419,7 @@ Public Class frmDisWind
     Me.Controls.Add(Me.btnWind)
     Me.Controls.Add(Me.panelBottom)
     Me.Controls.Add(Me.lblCloudCover)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDisWind"
     Me.Text = "Specify Wind Disaggregation Inputs"
     Me.panelBottom.ResumeLayout(False)

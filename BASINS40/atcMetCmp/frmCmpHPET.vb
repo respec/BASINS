@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class frmCmpHPET
   Inherits System.Windows.Forms.Form
@@ -7,6 +8,8 @@ Public Class frmCmpHPET
   Private pTMinTS As atcTimeseries
   Private pTMaxTS As atcTimeseries
   Private pDataManager As atcDataManager
+  Private cLat As Double
+  Private cCTS(12) As Double
 
 #Region " Windows Form Designer generated code "
 
@@ -173,7 +176,7 @@ Public Class frmCmpHPET
     '
     Me.btnTMin.Location = New System.Drawing.Point(72, 40)
     Me.btnTMin.Name = "btnTMin"
-    Me.btnTMin.Size = New System.Drawing.Size(48, 24)
+    Me.btnTMin.Size = New System.Drawing.Size(48, 20)
     Me.btnTMin.TabIndex = 18
     Me.btnTMin.Text = "Select"
     '
@@ -206,7 +209,7 @@ Public Class frmCmpHPET
     '
     Me.btnTMax.Location = New System.Drawing.Point(72, 71)
     Me.btnTMax.Name = "btnTMax"
-    Me.btnTMax.Size = New System.Drawing.Size(48, 23)
+    Me.btnTMax.Size = New System.Drawing.Size(48, 20)
     Me.btnTMax.TabIndex = 22
     Me.btnTMax.Text = "Select"
     '
@@ -453,6 +456,9 @@ Public Class frmCmpHPET
     Me.Controls.Add(Me.txtMar)
     Me.Controls.Add(Me.txtFeb)
     Me.Controls.Add(Me.txtJan)
+    Me.Controls.Add(Me.txtTMax)
+    Me.Controls.Add(Me.txtTMin)
+    Me.Controls.Add(Me.txtLatitude)
     Me.Controls.Add(Me.lblDec)
     Me.Controls.Add(Me.lblNov)
     Me.Controls.Add(Me.lblOct)
@@ -468,14 +474,11 @@ Public Class frmCmpHPET
     Me.Controls.Add(Me.lblMonCoeff)
     Me.Controls.Add(Me.rdoDegC)
     Me.Controls.Add(Me.rdoDegF)
-    Me.Controls.Add(Me.txtTMax)
     Me.Controls.Add(Me.btnTMax)
     Me.Controls.Add(Me.lblTMax)
     Me.Controls.Add(Me.lblTMin)
-    Me.Controls.Add(Me.txtTMin)
     Me.Controls.Add(Me.btnTMin)
     Me.Controls.Add(Me.panelBottom)
-    Me.Controls.Add(Me.txtLatitude)
     Me.Controls.Add(Me.lblLatitude)
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -494,26 +497,59 @@ Public Class frmCmpHPET
       aTMinTS = pTMinTS
       aTMaxTS = pTMaxTS
       aDegF = rdoDegF.Checked
-      aLatitude = CDbl(txtLatitude.Text)
-      aCTS(1) = CDbl(txtJan.Text)
-      aCTS(2) = CDbl(txtFeb.Text)
-      aCTS(3) = CDbl(txtMar.Text)
-      aCTS(4) = CDbl(txtApr.Text)
-      aCTS(5) = CDbl(txtMay.Text)
-      aCTS(6) = CDbl(txtJun.Text)
-      aCTS(7) = CDbl(txtJul.Text)
-      aCTS(8) = CDbl(txtAug.Text)
-      aCTS(9) = CDbl(txtSep.Text)
-      aCTS(10) = CDbl(txtOct.Text)
-      aCTS(11) = CDbl(txtNov.Text)
-      aCTS(12) = CDbl(txtDec.Text)
+      aLatitude = cLat
+      For i As Integer = 1 To 12
+        aCTS(i) = cCTS(i)
+      Next
     End If
     Return pOk
   End Function
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    pOk = True
-    Close()
+    If Not pTMinTS Is Nothing And Not pTMaxTS Is Nothing Then
+      If IsNumeric(txtLatitude.Text) Then
+        cLat = CDbl(txtLatitude.Text)
+        If cLat >= 25 And cLat <= 51 Then
+          On Error GoTo BadCoeff
+          cCTS(1) = CDbl(txtJan.Text)
+          cCTS(2) = CDbl(txtFeb.Text)
+          cCTS(3) = CDbl(txtMar.Text)
+          cCTS(4) = CDbl(txtApr.Text)
+          cCTS(5) = CDbl(txtMay.Text)
+          cCTS(6) = CDbl(txtJun.Text)
+          cCTS(7) = CDbl(txtJul.Text)
+          cCTS(8) = CDbl(txtAug.Text)
+          cCTS(9) = CDbl(txtSep.Text)
+          cCTS(10) = CDbl(txtOct.Text)
+          cCTS(11) = CDbl(txtNov.Text)
+          cCTS(12) = CDbl(txtDec.Text)
+          pOk = True
+          For i As Integer = 1 To 12
+            If cCTS(i) < 0 Or cCTS(i) > 1 Then
+              pOk = False
+              Logger.Msg("Values for 'Monthly Coefficients' must be between 0 and 1" & vbCrLf & _
+                         "Value for month " & i & " is '" & cCTS(i) & "'", "Hamon PET Problem")
+              Exit For
+            End If
+          Next
+          If pOk Then Close()
+        Else
+          Logger.Msg("Value for 'Latitude' must be between 25 and 51" & vbCrLf & _
+                     "Value specified is '" & cLat & "'", "Hamon PET Problem")
+        End If
+      Else
+        Logger.Msg("Value must be specified for 'Latitude'." & vbCrLf & _
+                   "This value is currently not numeric.", "Hamon PET Problem")
+      End If
+    Else
+      Logger.Msg("No Timeseries selected for 'Min Temp' or 'Max Temp'" & vbCrLf & _
+                   "Use 'Select' buttons to specify the timeseries", "Hamon PET Problem")
+    End If
+    Exit Sub
+BadCoeff:
+    Logger.Msg("Values must be specified for 'Monthly Coefficients'." & vbCrLf & _
+               "At least one value is currently not numeric.", "Hamon PET Problem")
+
   End Sub
 
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click

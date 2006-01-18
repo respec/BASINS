@@ -439,13 +439,16 @@ Public Class frmCliGen
                        "Value specified is '" & pNumYears & "'", "Run CliGen Problem")
           End If
         Else
-          MsgBox("Value for Start Year must be between 0 and 9999", , "Run CliGen Problem")
+          Logger.Msg("Value for 'Start Year' must be between 0 and 9999" & vbCrLf & _
+                     "Value specified is '" & pStartYear & "'", "Run CliGen Problem")
         End If
       Else
-        MsgBox("Values must be specified for both Start Year and Number of Years before running CliGen", , "Run CliGen Problem")
+        Logger.Msg("Values must be specified for both 'Start Year' and 'Number of Years' before running CliGen" & vbCrLf & _
+                   "At least one of these two values is currently not numeric.", "Run CliGen Problem")
       End If
     Else
-      MsgBox("Both Parameter and Output file names must be specified before running CliGen.", , "Run CliGen Problem")
+      Logger.Msg("Both 'Parameter' and 'Output' file names must be specified before running CliGen." & vbCrLf & _
+                 "Use the 'Select' buttons next to each file type to specify the file names.", "Run CliGen Problem")
     End If
   End Sub
 End Class

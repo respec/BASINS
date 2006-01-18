@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class frmCmpSol
   Inherits System.Windows.Forms.Form
@@ -6,6 +7,7 @@ Public Class frmCmpSol
   Private pOk As Boolean
   Private pTSGroup As atcDataGroup
   Private pDataManager As atcDataManager
+  Private cLat As Double
 
 #Region " Windows Form Designer generated code "
 
@@ -110,7 +112,7 @@ Public Class frmCmpSol
     '
     Me.btnCloudCover.Location = New System.Drawing.Point(16, 40)
     Me.btnCloudCover.Name = "btnCloudCover"
-    Me.btnCloudCover.Size = New System.Drawing.Size(48, 23)
+    Me.btnCloudCover.Size = New System.Drawing.Size(48, 20)
     Me.btnCloudCover.TabIndex = 18
     Me.btnCloudCover.Text = "Select"
     '
@@ -146,15 +148,31 @@ Public Class frmCmpSol
     pDataManager = aDataManager
     Me.ShowDialog()
     If pOk Then
-      aLatitude = CDbl(txtLatitude.Text)
+      aLatitude = cLat
       aCldTSer = pTSGroup(0)
     End If
     Return pOk
   End Function
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    pOk = True
-    Close()
+    If Not pTSGroup Is Nothing AndAlso pTSGroup.Count > 0 Then
+      If IsNumeric(txtLatitude.Text) Then
+        cLat = CDbl(txtLatitude.Text)
+        If cLat >= 25 And cLat <= 51 Then
+          pOk = True
+          Close()
+        Else
+          Logger.Msg("Value for 'Latitude' must be between 25 and 51" & vbCrLf & _
+                     "Value specified is '" & cLat & "'", "Solar Radiation Problem")
+        End If
+      Else
+        Logger.Msg("Value must be specified for 'Latitude'." & vbCrLf & _
+                   "This value is currently not numeric.", "Solar Radiation Problem")
+      End If
+    Else
+      Logger.Msg("No Timeseries selected for 'Cloud Cover'" & vbCrLf & _
+                 "Use 'Select' button to specify the timeseries", "Solar Radiation Problem")
+    End If
   End Sub
 
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click

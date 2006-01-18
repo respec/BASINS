@@ -95,7 +95,7 @@ Public Class atcDataSourceCligen
                   lData.Value(0) = Double.NaN
                   lData.Dates.Value(0) = Double.NaN
                   lData.Attributes.SetValue("Count", 0)
-                  lData.Attributes.SetValue("Scenario", "OBSERVED")
+                  lData.Attributes.SetValue("Scenario", "CLIGEN")
                   lData.Attributes.SetValue("Location", lLocation)
                   lData.Attributes.SetValue("Constituent", .FieldName(i))
                   lData.Attributes.SetValue("point", False)
