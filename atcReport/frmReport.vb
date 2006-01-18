@@ -37,7 +37,6 @@ Public Class frmReport
   'NOTE: The following procedure is required by the Windows Form Designer
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
-  Friend WithEvents cboSubbasins As System.Windows.Forms.ComboBox
   Friend WithEvents Label3 As System.Windows.Forms.Label
   Friend WithEvents cboSub1 As System.Windows.Forms.ComboBox
   Friend WithEvents cboSub2 As System.Windows.Forms.ComboBox
@@ -50,9 +49,10 @@ Public Class frmReport
   Friend WithEvents Label2 As System.Windows.Forms.Label
   Friend WithEvents lblFolder As System.Windows.Forms.Label
   Friend WithEvents fbdFolder As System.Windows.Forms.FolderBrowserDialog
+  Friend WithEvents cboAreas As System.Windows.Forms.ComboBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmReport))
-    Me.cboSubbasins = New System.Windows.Forms.ComboBox
+    Me.cboAreas = New System.Windows.Forms.ComboBox
     Me.Label3 = New System.Windows.Forms.Label
     Me.cboSub1 = New System.Windows.Forms.ComboBox
     Me.lblSubid = New System.Windows.Forms.Label
@@ -67,17 +67,17 @@ Public Class frmReport
     Me.fbdFolder = New System.Windows.Forms.FolderBrowserDialog
     Me.SuspendLayout()
     '
-    'cboSubbasins
+    'cboAreas
     '
-    Me.cboSubbasins.AllowDrop = True
-    Me.cboSubbasins.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+    Me.cboAreas.AllowDrop = True
+    Me.cboAreas.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.cboSubbasins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-    Me.cboSubbasins.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cboSubbasins.Location = New System.Drawing.Point(192, 16)
-    Me.cboSubbasins.Name = "cboSubbasins"
-    Me.cboSubbasins.Size = New System.Drawing.Size(224, 25)
-    Me.cboSubbasins.TabIndex = 12
+    Me.cboAreas.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+    Me.cboAreas.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cboAreas.Location = New System.Drawing.Point(192, 16)
+    Me.cboAreas.Name = "cboAreas"
+    Me.cboAreas.Size = New System.Drawing.Size(224, 25)
+    Me.cboAreas.TabIndex = 12
     '
     'Label3
     '
@@ -200,7 +200,7 @@ Public Class frmReport
     Me.Controls.Add(Me.lblSubname)
     Me.Controls.Add(Me.cboSub1)
     Me.Controls.Add(Me.lblSubid)
-    Me.Controls.Add(Me.cboSubbasins)
+    Me.Controls.Add(Me.cboAreas)
     Me.Controls.Add(Me.Label3)
     Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -216,14 +216,14 @@ Public Class frmReport
     Me.Close()
   End Sub
 
-  Private Sub cboSubbasins_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSubbasins.SelectedIndexChanged
+  Private Sub cboSubbasins_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboAreas.SelectedIndexChanged
     Dim lyr As Long
     Dim i As Long
     Dim ctemp As String
 
     cboSub1.Items.Clear()
     cboSub2.Items.Clear()
-    If cboSubbasins.Items(cboSubbasins.SelectedIndex) = "<none>" Then
+    If cboAreas.Items(cboAreas.SelectedIndex) = "<none>" Then
       cboSub1.Visible = False
       cboSub2.Visible = False
       lblSubid.Visible = False
@@ -233,7 +233,7 @@ Public Class frmReport
       cboSub2.Visible = True
       lblSubid.Visible = True
       lblSubname.Visible = True
-      lyr = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+      lyr = GisUtil.LayerIndex(cboAreas.Items(cboAreas.SelectedIndex))
       If lyr > -1 Then
         For i = 0 To GisUtil.NumFields(lyr) - 1
           ctemp = GisUtil.FieldName(i, lyr)
@@ -259,45 +259,60 @@ Public Class frmReport
   Private Sub cmdNext_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdNext.Click
     Dim i As Integer
     Dim cerror As String
-    Dim SubbasinLayerName As String
-    Dim SubbasinsIDFieldName As String
-    Dim SubbasinsNameFieldName As String
-    Dim aArgs(3) As String
+    Dim AreaLayerName As String
+    Dim AreaIDFieldName As String
+    Dim AreaNameFieldName As String
+    Dim aArgs(4) As Object
 
     If lbxReports.SelectedItems.Count = 0 Then
       MsgBox("At least one report must be selected to generate.", MsgBoxStyle.OKOnly, "BASINS Report Problem")
     Else
       'set arguments for scripting
-      If cboSubbasins.SelectedIndex > -1 Then
-        SubbasinLayerName = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+      If cboAreas.SelectedIndex > -1 Then
+        areaLayerName = cboAreas.Items(cboAreas.SelectedIndex)
       Else
-        SubbasinLayerName = "<none>"
+        areaLayerName = "<none>"
       End If
       If cboSub1.SelectedIndex > -1 Then
-        SubbasinsIDFieldName = cboSub1.Items(cboSub1.SelectedIndex)
+        AreaIDFieldName = cboSub1.Items(cboSub1.SelectedIndex)
       Else
-        SubbasinsIDFieldName = ""
+        AreaIDFieldName = ""
       End If
       If cboSub2.SelectedIndex > -1 Then
-        SubbasinsNameFieldName = cboSub2.Items(cboSub2.SelectedIndex)
+        AreaNameFieldName = cboSub2.Items(cboSub2.SelectedIndex)
       Else
-        SubbasinsNameFieldName = ""
+        AreaNameFieldName = ""
       End If
-      aArgs(0) = SubbasinLayerName
-      aArgs(1) = SubbasinsIDFieldName
-      aArgs(2) = SubbasinsNameFieldName
+      aArgs(0) = areaLayerName
+      aArgs(1) = AreaIDFieldName
+      aArgs(2) = AreaNameFieldName
+
+      Dim AreaLayerIndex As Integer = GisUtil.LayerIndex(areaLayerName)
+      'are any areas selected?
+      Dim cSelectedAreaIndexes As New Collection
+      For i = 1 To GisUtil.NumSelectedFeatures(AreaLayerIndex)
+        'add selected areas to the collection
+        cSelectedAreaIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, AreaLayerIndex))
+      Next
+      If cSelectedAreaIndexes.Count = 0 Then
+        'no areas selected, act as if all are selected
+        For i = 1 To GisUtil.NumFeatures(AreaLayerIndex)
+          cSelectedAreaIndexes.Add(i - 1)
+        Next
+      End If
+      aArgs(3) = cSelectedAreaIndexes
 
       'make sure output folder exists
       If Not FileExists(lblFolder.Text, True, False) Then
         MkDirPath(lblFolder.Text)
       End If
-      aArgs(3) = lblFolder.Text & "\"
+      aArgs(4) = lblFolder.Text & "\"
 
       'now run each script
       Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
       For i = 0 To lbxReports.SelectedItems.Count - 1
         'run each selected script
-        'GIRASLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3))
+        'GIRASLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4))
         Scripting.Run("vb", "", pReportsColl(lbxReports.SelectedIndices(i) + 1), cerror, False, pMappingObject, aArgs)
         If Len(cerror) > 0 Then
           MsgBox(cerror)
@@ -313,7 +328,7 @@ Public Class frmReport
 
     pMappingObject = aMappingObject
 
-    cboSubbasins.Items.Add("<none>")
+    cboAreas.Items.Add("<none>")
 
     Dim lyr As Long
 
@@ -321,26 +336,30 @@ Public Class frmReport
       ctemp = GisUtil.LayerName(lyr)
       If GisUtil.LayerType(lyr) = 3 Then
         'PolygonShapefile 
-        cboSubbasins.Items.Add(ctemp)
+        cboAreas.Items.Add(ctemp)
         If GisUtil.CurrentLayer = lyr Then
-          cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
+          cboAreas.SelectedIndex = cboAreas.Items.Count - 1
         End If
-        If UCase(ctemp) = "SUBBASINS" And cboSubbasins.SelectedIndex < 0 Then
-          cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
+        If UCase(ctemp) = "SUBBASINS" And cboAreas.SelectedIndex < 0 Then
+          cboAreas.SelectedIndex = cboAreas.Items.Count - 1
         End If
-        If UCase(ctemp) = "CATALOGING UNIT BOUNDARIES" And cboSubbasins.SelectedIndex < 0 Then
-          cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
+        If UCase(ctemp) = "CATALOGING UNIT BOUNDARIES" And cboAreas.SelectedIndex < 0 Then
+          cboAreas.SelectedIndex = cboAreas.Items.Count - 1
         End If
       End If
     Next
-    If cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
-      cboSubbasins.SelectedIndex = 0
+    If cboAreas.Items.Count > 0 And cboAreas.SelectedIndex < 0 Then
+      cboAreas.SelectedIndex = 0
     End If
 
     Dim allFiles As NameValueCollection
     allFiles = New NameValueCollection
     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
     pReportsDir = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\reports\"
+    If Mid(pReportsDir, 3, 5) = "\dev\" Then
+      'change loc if in devel envir
+      pReportsDir = "C:\dev\BASINS40\atcReport\scripts"
+    End If
     AddFilesInDir(allFiles, pReportsDir, True, "*.vb")
     Dim lReport As String
     pReportsColl = New Collection
