@@ -57,10 +57,8 @@ Public Class frmModelSetup
   Friend WithEvents Label6 As System.Windows.Forms.Label
   Friend WithEvents Label7 As System.Windows.Forms.Label
   Friend WithEvents Label8 As System.Windows.Forms.Label
-  Friend WithEvents Label9 As System.Windows.Forms.Label
   Friend WithEvents cboSub1 As System.Windows.Forms.ComboBox
   Friend WithEvents cboSub2 As System.Windows.Forms.ComboBox
-  Friend WithEvents cboSub3 As System.Windows.Forms.ComboBox
   Friend WithEvents cboStream3 As System.Windows.Forms.ComboBox
   Friend WithEvents cboStream2 As System.Windows.Forms.ComboBox
   Friend WithEvents cboStream1 As System.Windows.Forms.ComboBox
@@ -143,10 +141,8 @@ Public Class frmModelSetup
     Me.Label11 = New System.Windows.Forms.Label
     Me.Label12 = New System.Windows.Forms.Label
     Me.TabPage3 = New System.Windows.Forms.TabPage
-    Me.cboSub3 = New System.Windows.Forms.ComboBox
     Me.cboSub2 = New System.Windows.Forms.ComboBox
     Me.cboSub1 = New System.Windows.Forms.ComboBox
-    Me.Label9 = New System.Windows.Forms.Label
     Me.Label8 = New System.Windows.Forms.Label
     Me.Label7 = New System.Windows.Forms.Label
     Me.TabPage5 = New System.Windows.Forms.TabPage
@@ -390,7 +386,7 @@ Public Class frmModelSetup
     Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboLandUseLayer.Location = New System.Drawing.Point(200, 32)
     Me.cboLandUseLayer.Name = "cboLandUseLayer"
-    Me.cboLandUseLayer.Size = New System.Drawing.Size(240, 25)
+    Me.cboLandUseLayer.Size = New System.Drawing.Size(240, 23)
     Me.cboLandUseLayer.TabIndex = 10
     '
     'lblLandUseLayer
@@ -482,7 +478,7 @@ Public Class frmModelSetup
     Me.cboStream9.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream9.Location = New System.Drawing.Point(248, 288)
     Me.cboStream9.Name = "cboStream9"
-    Me.cboStream9.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream9.Size = New System.Drawing.Size(168, 23)
     Me.cboStream9.TabIndex = 17
     '
     'cboStream8
@@ -492,7 +488,7 @@ Public Class frmModelSetup
     Me.cboStream8.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream8.Location = New System.Drawing.Point(248, 256)
     Me.cboStream8.Name = "cboStream8"
-    Me.cboStream8.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream8.Size = New System.Drawing.Size(168, 23)
     Me.cboStream8.TabIndex = 16
     '
     'cboStream7
@@ -502,7 +498,7 @@ Public Class frmModelSetup
     Me.cboStream7.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream7.Location = New System.Drawing.Point(248, 224)
     Me.cboStream7.Name = "cboStream7"
-    Me.cboStream7.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream7.Size = New System.Drawing.Size(168, 23)
     Me.cboStream7.TabIndex = 15
     '
     'cboStream6
@@ -512,7 +508,7 @@ Public Class frmModelSetup
     Me.cboStream6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream6.Location = New System.Drawing.Point(248, 192)
     Me.cboStream6.Name = "cboStream6"
-    Me.cboStream6.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream6.Size = New System.Drawing.Size(168, 23)
     Me.cboStream6.TabIndex = 14
     '
     'cboStream5
@@ -522,7 +518,7 @@ Public Class frmModelSetup
     Me.cboStream5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream5.Location = New System.Drawing.Point(248, 160)
     Me.cboStream5.Name = "cboStream5"
-    Me.cboStream5.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream5.Size = New System.Drawing.Size(168, 23)
     Me.cboStream5.TabIndex = 13
     '
     'cboStream4
@@ -532,7 +528,7 @@ Public Class frmModelSetup
     Me.cboStream4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream4.Location = New System.Drawing.Point(248, 128)
     Me.cboStream4.Name = "cboStream4"
-    Me.cboStream4.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream4.Size = New System.Drawing.Size(168, 23)
     Me.cboStream4.TabIndex = 12
     '
     'cboStream3
@@ -542,7 +538,7 @@ Public Class frmModelSetup
     Me.cboStream3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream3.Location = New System.Drawing.Point(248, 96)
     Me.cboStream3.Name = "cboStream3"
-    Me.cboStream3.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream3.Size = New System.Drawing.Size(168, 23)
     Me.cboStream3.TabIndex = 11
     '
     'cboStream2
@@ -552,7 +548,7 @@ Public Class frmModelSetup
     Me.cboStream2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream2.Location = New System.Drawing.Point(248, 64)
     Me.cboStream2.Name = "cboStream2"
-    Me.cboStream2.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream2.Size = New System.Drawing.Size(168, 23)
     Me.cboStream2.TabIndex = 10
     '
     'cboStream1
@@ -562,7 +558,7 @@ Public Class frmModelSetup
     Me.cboStream1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream1.Location = New System.Drawing.Point(248, 32)
     Me.cboStream1.Name = "cboStream1"
-    Me.cboStream1.Size = New System.Drawing.Size(168, 25)
+    Me.cboStream1.Size = New System.Drawing.Size(168, 23)
     Me.cboStream1.TabIndex = 9
     '
     'Label10
@@ -591,10 +587,8 @@ Public Class frmModelSetup
     '
     'TabPage3
     '
-    Me.TabPage3.Controls.Add(Me.cboSub3)
     Me.TabPage3.Controls.Add(Me.cboSub2)
     Me.TabPage3.Controls.Add(Me.cboSub1)
-    Me.TabPage3.Controls.Add(Me.Label9)
     Me.TabPage3.Controls.Add(Me.Label8)
     Me.TabPage3.Controls.Add(Me.Label7)
     Me.TabPage3.Location = New System.Drawing.Point(4, 25)
@@ -602,16 +596,6 @@ Public Class frmModelSetup
     Me.TabPage3.Size = New System.Drawing.Size(520, 355)
     Me.TabPage3.TabIndex = 2
     Me.TabPage3.Text = "Subbasins"
-    '
-    'cboSub3
-    '
-    Me.cboSub3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.cboSub3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-    Me.cboSub3.Location = New System.Drawing.Point(248, 136)
-    Me.cboSub3.Name = "cboSub3"
-    Me.cboSub3.Size = New System.Drawing.Size(168, 25)
-    Me.cboSub3.TabIndex = 5
     '
     'cboSub2
     '
@@ -632,14 +616,6 @@ Public Class frmModelSetup
     Me.cboSub1.Name = "cboSub1"
     Me.cboSub1.Size = New System.Drawing.Size(168, 25)
     Me.cboSub1.TabIndex = 3
-    '
-    'Label9
-    '
-    Me.Label9.Location = New System.Drawing.Point(72, 136)
-    Me.Label9.Name = "Label9"
-    Me.Label9.Size = New System.Drawing.Size(152, 23)
-    Me.Label9.TabIndex = 2
-    Me.Label9.Text = "Length Field (meters):"
     '
     'Label8
     '
@@ -862,7 +838,6 @@ Public Class frmModelSetup
 
     cboSub1.Items.Clear()
     cboSub2.Items.Clear()
-    cboSub3.Items.Clear()
     lyr = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
     If lyr > -1 Then
       'fill in fields 
@@ -870,15 +845,11 @@ Public Class frmModelSetup
         ctemp = GisUtil.FieldName(i, lyr)
         cboSub1.Items.Add(ctemp)
         cboSub2.Items.Add(ctemp)
-        cboSub3.Items.Add(ctemp)
         If UCase(ctemp) = "SUBBASIN" Or UCase(ctemp) = "STREAMLINK" Then
           cboSub1.SelectedIndex = i
         End If
         If UCase(ctemp) = "SLO1" Or UCase(ctemp) = "SLOPE" Or UCase(ctemp) = "AVESLOPE" Then
           cboSub2.SelectedIndex = i
-        End If
-        If UCase(ctemp) = "LEN1" Or UCase(ctemp) = "LENGTH" Or UCase(ctemp) = "STREAMLEN" Then
-          cboSub3.SelectedIndex = i
         End If
       Next
     End If
@@ -887,9 +858,6 @@ Public Class frmModelSetup
     End If
     If cboSub2.Items.Count > 0 And cboSub2.SelectedIndex < 0 Then
       cboSub2.SelectedIndex = 0
-    End If
-    If cboSub3.Items.Count > 0 And cboSub3.SelectedIndex < 0 Then
-      cboSub3.SelectedIndex = 0
     End If
   End Sub
 
@@ -1411,7 +1379,6 @@ Public Class frmModelSetup
     Dim SubbasinLayerIndex As Long
     Dim SubbasinFieldName As String
     Dim SubbasinFieldIndex As Long
-    Dim SubbasinLengthIndex As Long
     Dim SubbasinSlopeIndex As Long
     Dim LanduseFieldName As String = ""
     Dim LandUseThemeName As String = ""
@@ -1428,7 +1395,6 @@ Public Class frmModelSetup
     Dim shapeindex As Long
     Dim s As String
     Dim area As Double
-    Dim sublength As Double
     Dim subslope As Double
     Dim lucode As String, subid As String
     Dim totalpolygoncount As Long, polygoncount As Long
@@ -1454,7 +1420,6 @@ Public Class frmModelSetup
     SubbasinFieldName = cboSub1.Items(cboSub1.SelectedIndex)
     SubbasinLayerIndex = GisUtil.LayerIndex(SubbasinThemeName)
     SubbasinFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, SubbasinFieldName)
-    SubbasinLengthIndex = GisUtil.FieldIndex(SubbasinLayerIndex, cboSub3.Items(cboSub3.SelectedIndex))
     SubbasinSlopeIndex = GisUtil.FieldIndex(SubbasinLayerIndex, cboSub2.Items(cboSub2.SelectedIndex))
     'are any subbasins selected?
     Dim cSelectedSubbasins As New Collection
@@ -1479,7 +1444,6 @@ Public Class frmModelSetup
     Dim cLucode As New Collection
     Dim cSubid As New Collection
     Dim cArea As New Collection
-    Dim cSubLength As New Collection
     Dim cSubSlope As New Collection
 
     If cboLanduse.SelectedIndex = 0 Then
@@ -1584,9 +1548,7 @@ Public Class frmModelSetup
         For j = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
           k = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinFieldIndex)
           If k = subid Then
-            sublength = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinLengthIndex)
             subslope = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinSlopeIndex)
-            cSubLength.Add(sublength)
             cSubSlope.Add(subslope)
             Exit For
           End If
@@ -1623,12 +1585,10 @@ Public Class frmModelSetup
           subid = GisUtil.FieldValue(SubbasinLayerIndex, shapeindex, SubbasinFieldIndex)
           For i = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(LanduseLayerIndex))
             If aAreaLS(i, subid - 1) > 0 Then
-              sublength = GisUtil.FieldValue(SubbasinLayerIndex, shapeindex, SubbasinLengthIndex)
               subslope = GisUtil.FieldValue(SubbasinLayerIndex, shapeindex, SubbasinSlopeIndex)
               cLucode.Add(i)
               cArea.Add(aAreaLS(i, subid - 1))
               cSubid.Add(subid)
-              cSubLength.Add(sublength)
               cSubSlope.Add(subslope)
             End If
           Next i
@@ -1647,7 +1607,7 @@ Public Class frmModelSetup
       GisUtil.Overlay(LandUseThemeName, LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
                       luPathName & "\overlay.shp", True)
 
-      'compile areas, slopes and lengths
+      'compile areas and slopes
       lblStatus.Text = "Compiling Overlay Results"
       Me.Refresh()
 
@@ -1663,9 +1623,7 @@ Public Class frmModelSetup
         For j = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
           k = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinFieldIndex)
           If k = subid Then
-            sublength = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinLengthIndex)
             subslope = GisUtil.FieldValue(SubbasinLayerIndex, j - 1, SubbasinSlopeIndex)
-            cSubLength.Add(sublength)
             cSubSlope.Add(subslope)
             Exit For
           End If
@@ -1716,7 +1674,7 @@ Public Class frmModelSetup
     'write wsd file
     lblStatus.Text = "Writing WSD file"
     Me.Refresh()
-    WriteWSDFile(BaseFileName & ".wsd", cArea, cLucode, cSubid, cSubLength, cSubSlope, ReclassifyFile)
+    WriteWSDFile(BaseFileName & ".wsd", cArea, cLucode, cSubid, cSubSlope, ReclassifyFile)
 
     'write rch file (and ptf)
     lblStatus.Text = "Writing RCH and PTF files"
@@ -1879,7 +1837,7 @@ ErrHand:
   End Function
 
   Private Sub WriteWSDFile(ByVal WsdFileName As String, ByVal cArea As Collection, ByVal cLucode As Collection, ByVal cSubid As Collection, _
-                           ByVal cSublength As Collection, ByVal cSubslope As Collection, ByVal ReclassifyFile As String)
+                           ByVal cSubslope As Collection, ByVal ReclassifyFile As String)
     Dim OutFile As Integer
     Dim i As Integer, j As Integer, k As Integer
     Dim incollection As Boolean
@@ -1989,7 +1947,7 @@ ErrHand:
 
         PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * percentperv / 100)
         ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * (100 - percentperv) / 100)
-        length(spos) = cSublength(i) / 3.28
+        length(spos) = 0.0
         slope(spos) = cSubslope(i) / 100.0
 
       Next i
@@ -2068,7 +2026,7 @@ ErrHand:
             If lpos > 0 Then
               PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * multiplier * percentperv / 100)
               ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * multiplier * (100 - percentperv) / 100)
-              length(spos) = cSublength(i) / 3.28
+              length(spos) = 0.0 'were not computing lsur since winhspf does that
               slope(spos) = cSubslope(i) / 100.0
             End If
 
