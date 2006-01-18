@@ -175,6 +175,7 @@ Public Class atcCligen
   Private Function RunCliGen(ByVal aParmFileName As String, ByVal aOutFileName As String, ByVal aStartYear As Integer, ByVal aNumYears As Integer) As Boolean
     Dim lStr As String
     Dim lExeName As String = FindFile("Please Locate CliGen Executable", "CliGen522564.exe", "*.exe", "Executable Files (*.exe)|*.exe")
+
     If FileExists(aOutFileName) Then 'delete pre-existing output file
       Kill(aOutFileName)
     End If

@@ -44,6 +44,7 @@ Public Class frmDisSol
   Friend WithEvents txtSolar As System.Windows.Forms.TextBox
   Friend WithEvents lblTSer As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisSol))
     Me.lblTSer = New System.Windows.Forms.Label
     Me.lblLatitude = New System.Windows.Forms.Label
     Me.txtLatitude = New System.Windows.Forms.TextBox
@@ -132,6 +133,7 @@ Public Class frmDisSol
     Me.Controls.Add(Me.txtLatitude)
     Me.Controls.Add(Me.lblLatitude)
     Me.Controls.Add(Me.lblTSer)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDisSol"
     Me.Text = "Disaggregate Solar Radiation"
     Me.panelBottom.ResumeLayout(False)

@@ -49,6 +49,7 @@ Public Class frmDisTemp
   Friend WithEvents lblObsTime As System.Windows.Forms.Label
   Friend WithEvents txtObsTime As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisTemp))
     Me.lblCloudCover = New System.Windows.Forms.Label
     Me.lblObsTime = New System.Windows.Forms.Label
     Me.txtObsTime = New System.Windows.Forms.TextBox
@@ -178,6 +179,7 @@ Public Class frmDisTemp
     Me.Controls.Add(Me.txtObsTime)
     Me.Controls.Add(Me.lblObsTime)
     Me.Controls.Add(Me.lblCloudCover)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDisTemp"
     Me.Text = "Specify Temperature Disaggregation Inputs"
     Me.panelBottom.ResumeLayout(False)

@@ -1405,7 +1405,7 @@ Public Module modMetCompute
     For lDyInd = 1 To aDyTSer.numValues
       If lOutSumm Then 'output summary message to file
         Call J2Date(aDyTSer.Dates.Value(lDyInd) - 1, lDate)
-        WriteLine(lOutFil, "Distributing Daily Data for " & lDate(0) & "/" & lDate(1) & "/" & lDate(2) & ":  Value is " & aDyTSer.Value(lDyInd))
+        WriteLine(lOutFil, "Distributing Daily Data for " & lDate(0) & "/" & lDate(1) & "/" & lDate(2) & ":  Value is " & SignificantDigits(aDyTSer.Value(lDyInd), 4))
       End If
       If aDyTSer.Value(lDyInd) > 0 Then 'something to disaggregate
         'back up a day, then add obs hour to get actual end of period
@@ -1457,7 +1457,7 @@ Public Module modMetCompute
             lDaySum = lDaySum + lHrVals(lMaxHrInd)
           End If
           If lOutSumm Then
-            WriteLine(lOutFil, "  Using Data-set Number:  " & lClosestHrTser.Attributes.GetValue("ID") & ", daily sum = " & lClosestDaySum)
+            WriteLine(lOutFil, "  Using Data-set Number:  " & lClosestHrTser.Attributes.GetValue("ID") & ", daily sum = " & SignificantDigits(lClosestDaySum, 4))
           End If
           If Math.Abs(lDaySum - aDyTSer.Value(lDyInd)) > lRndOff Then
             'values not distributed properly
@@ -1486,7 +1486,7 @@ Public Module modMetCompute
             rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OKCancel, "Precipitation Disaggregation Problem")
           End If
           If lOutSumm Then
-            WriteLine(lOutFil, "  *** No hourly total within tolerance - " & aDyTSer.Value(lDyInd) & "  distributed using triangular distribution ***")
+            WriteLine(lOutFil, "  *** No hourly total within tolerance - " & SignificantDigits(aDyTSer.Value(lDyInd), 4) & "  distributed using triangular distribution ***")
             If retcod <> 0 Then
               WriteLine(lOutFil, "  *** " & s & " ***")
             End If

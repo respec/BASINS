@@ -234,15 +234,17 @@ Public Class atcMetCmpPlugin
       Case "Precipitation"
         Dim lHrTSers As atcDataGroup
         Dim lTol As Double
+        Dim lSummFile As String
         Dim lAttDef2 As atcAttributeDefinition
         If aArgs Is Nothing Then
           Dim lForm As New frmDisPrec
-          lOk = lForm.AskUser(DataManager, lDlyTSer, lHrTSers, lObsTime, lTol)
+          lOk = lForm.AskUser(DataManager, lDlyTSer, lHrTSers, lObsTime, lTol, lSummFile)
         Else
           lDlyTSer = aArgs.GetValue("DPRC")
           lHrTSers = aArgs.GetValue("HPCP")
           lObsTime = aArgs.GetValue("Observation Hour")
           lTol = aArgs.GetValue("Data Tolerance")
+          lSummFile = aArgs.GetValue("Summary File")
           lOk = True
         End If
         lAttDef = atcDataAttributes.GetDefinition("Observation Hour")
@@ -250,7 +252,7 @@ Public Class atcMetCmpPlugin
         If lOk And Not lHrTSers Is Nothing And _
           lObsTime >= lAttDef.Min And lObsTime <= lAttDef.Max And _
           lTol >= lAttDef2.Min And lTol <= lAttDef2.Max Then
-          Dim lMetCmpTS As atcTimeseries = DisPrecip(lDlyTSer, Me, lHrTSers, lObsTime, lTol)
+          Dim lMetCmpTS As atcTimeseries = DisPrecip(lDlyTSer, Me, lHrTSers, lObsTime, lTol, lSummFile)
           MyBase.DataSets.Add(lMetCmpTS)
         End If
     End Select
@@ -576,11 +578,21 @@ Public Class atcMetCmpPlugin
           .TypeString = "Double"
         End With
 
+        Dim defSummFile As New atcAttributeDefinition
+        With defSummFile
+          .Name = "Summary File"
+          .Description = "MetCmp Precipitation Disaggregation Summary File"
+          .DefaultValue = "DisPrecip.sum"
+          .Editable = True
+          .TypeString = "String"
+        End With
+
         lArguments = New atcDataAttributes
         lArguments.SetValue(defDPrecTS, Nothing)
         lArguments.SetValue(defHrPrec, Nothing)
         lArguments.SetValue(defObsTime.Clone("Observation Hour", "Hour (1 - 24) that Daily Precipitation was recorded"), Nothing)
         lArguments.SetValue(defTolerance, Nothing)
+        lArguments.SetValue(defSummFile, Nothing)
         lOperations.SetValue(lDisPrec, Nothing, lArguments)
       End If
 

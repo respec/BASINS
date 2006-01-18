@@ -59,6 +59,7 @@ Public Class frmCmpPenman
   Friend WithEvents txtDewP As System.Windows.Forms.TextBox
   Friend WithEvents txtWind As System.Windows.Forms.TextBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCmpPenman))
     Me.lblJensenPET = New System.Windows.Forms.Label
     Me.panelBottom = New System.Windows.Forms.Panel
     Me.btnCancel = New System.Windows.Forms.Button
@@ -261,6 +262,7 @@ Public Class frmCmpPenman
     Me.Controls.Add(Me.btnTMin)
     Me.Controls.Add(Me.panelBottom)
     Me.Controls.Add(Me.lblJensenPET)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmCmpPenman"
     Me.Text = "Specify Penman Pan Evaporation Inputs"
     Me.panelBottom.ResumeLayout(False)

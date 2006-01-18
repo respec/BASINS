@@ -49,7 +49,11 @@ Public Class frmDisPrec
   Friend WithEvents lstHourlyPrec As System.Windows.Forms.ListBox
   Friend WithEvents lblDataTol As System.Windows.Forms.Label
   Friend WithEvents txtDataTol As System.Windows.Forms.TextBox
+  Friend WithEvents lblSummFile As System.Windows.Forms.Label
+  Friend WithEvents txtSummFile As System.Windows.Forms.TextBox
+  Friend WithEvents btnSummFile As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisPrec))
     Me.lblDailyPrec = New System.Windows.Forms.Label
     Me.lblObsTime = New System.Windows.Forms.Label
     Me.txtObsTime = New System.Windows.Forms.TextBox
@@ -63,6 +67,9 @@ Public Class frmDisPrec
     Me.lstHourlyPrec = New System.Windows.Forms.ListBox
     Me.lblDataTol = New System.Windows.Forms.Label
     Me.txtDataTol = New System.Windows.Forms.TextBox
+    Me.lblSummFile = New System.Windows.Forms.Label
+    Me.txtSummFile = New System.Windows.Forms.TextBox
+    Me.btnSummFile = New System.Windows.Forms.Button
     Me.panelBottom.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -84,7 +91,7 @@ Public Class frmDisPrec
     '
     'txtObsTime
     '
-    Me.txtObsTime.Location = New System.Drawing.Point(112, 192)
+    Me.txtObsTime.Location = New System.Drawing.Point(104, 192)
     Me.txtObsTime.Name = "txtObsTime"
     Me.txtObsTime.Size = New System.Drawing.Size(48, 20)
     Me.txtObsTime.TabIndex = 4
@@ -95,7 +102,7 @@ Public Class frmDisPrec
     Me.panelBottom.Controls.Add(Me.btnCancel)
     Me.panelBottom.Controls.Add(Me.btnOk)
     Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.panelBottom.Location = New System.Drawing.Point(0, 229)
+    Me.panelBottom.Location = New System.Drawing.Point(0, 285)
     Me.panelBottom.Name = "panelBottom"
     Me.panelBottom.Size = New System.Drawing.Size(464, 32)
     Me.panelBottom.TabIndex = 16
@@ -120,7 +127,7 @@ Public Class frmDisPrec
     '
     Me.btnDailyPrec.Location = New System.Drawing.Point(8, 40)
     Me.btnDailyPrec.Name = "btnDailyPrec"
-    Me.btnDailyPrec.Size = New System.Drawing.Size(56, 24)
+    Me.btnDailyPrec.Size = New System.Drawing.Size(56, 20)
     Me.btnDailyPrec.TabIndex = 18
     Me.btnDailyPrec.Text = "Select"
     '
@@ -173,10 +180,38 @@ Public Class frmDisPrec
     Me.txtDataTol.TabIndex = 26
     Me.txtDataTol.Text = ""
     '
+    'lblSummFile
+    '
+    Me.lblSummFile.Location = New System.Drawing.Point(8, 224)
+    Me.lblSummFile.Name = "lblSummFile"
+    Me.lblSummFile.Size = New System.Drawing.Size(128, 16)
+    Me.lblSummFile.TabIndex = 27
+    Me.lblSummFile.Text = "Summary File (optional):"
+    '
+    'txtSummFile
+    '
+    Me.txtSummFile.Location = New System.Drawing.Point(72, 248)
+    Me.txtSummFile.Name = "txtSummFile"
+    Me.txtSummFile.ReadOnly = True
+    Me.txtSummFile.Size = New System.Drawing.Size(384, 20)
+    Me.txtSummFile.TabIndex = 28
+    Me.txtSummFile.Text = ""
+    '
+    'btnSummFile
+    '
+    Me.btnSummFile.Location = New System.Drawing.Point(8, 248)
+    Me.btnSummFile.Name = "btnSummFile"
+    Me.btnSummFile.Size = New System.Drawing.Size(56, 20)
+    Me.btnSummFile.TabIndex = 29
+    Me.btnSummFile.Text = "Select"
+    '
     'frmDisPrec
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(464, 261)
+    Me.ClientSize = New System.Drawing.Size(464, 317)
+    Me.Controls.Add(Me.btnSummFile)
+    Me.Controls.Add(Me.txtSummFile)
+    Me.Controls.Add(Me.lblSummFile)
     Me.Controls.Add(Me.txtDataTol)
     Me.Controls.Add(Me.lblDataTol)
     Me.Controls.Add(Me.lstHourlyPrec)
@@ -188,6 +223,7 @@ Public Class frmDisPrec
     Me.Controls.Add(Me.txtObsTime)
     Me.Controls.Add(Me.lblObsTime)
     Me.Controls.Add(Me.lblDailyPrec)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDisPrec"
     Me.Text = "Disaggregate Daily Precipitation"
     Me.panelBottom.ResumeLayout(False)
@@ -196,14 +232,15 @@ Public Class frmDisPrec
   End Sub
 
 #End Region
-  Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aDPrecTS As atcTimeseries, ByRef aHPrecTS As atcDataGroup, ByRef aObsTime As Integer, ByRef aTolerance As Double) As Boolean
+  Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aDPrecTS As atcTimeseries, ByRef aHPrecTS As atcDataGroup, ByRef aObsTime As Integer, ByRef aTolerance As Double, ByRef aSummFile As String) As Boolean
     pDataManager = aDataManager
     Me.ShowDialog()
     If pOk Then
       aDPrecTS = pDPrecTS
-      aHPrecTS = phprecTS
+      aHPrecTS = pHPrecTS
       aObsTime = CInt(txtObsTime.Text)
       aTolerance = CDbl(txtDataTol.Text)
+      aSummFile = txtSummFile.Text
     End If
     Return pOk
   End Function
@@ -236,4 +273,17 @@ Public Class frmDisPrec
     End If
   End Sub
 
+  Private Sub btnSummFile_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSummFile.Click
+    Dim cdlg As New Windows.Forms.SaveFileDialog
+    With cdlg
+      .Title = "Summary Output File"
+      .FileName = ""
+      .Filter = "Summary Files (*.sum)|*.sum|All Files (*.*)|(*.*)"
+      .OverwritePrompt = True
+      If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        txtSummFile.Text = .FileName
+      End If
+    End With
+
+  End Sub
 End Class
