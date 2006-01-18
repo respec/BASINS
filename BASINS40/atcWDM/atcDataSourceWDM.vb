@@ -864,7 +864,8 @@ Public Class atcDataSourceWDM
     Dim lTsFill As Double
 
     If Not DataSets.Contains(aReadMe) Then
-      Logger.Dbg("WDM cannot read dataset not from this file")
+      Logger.Dbg("WDM cannot read dataset, not from this file" & vbCrLf & _
+                 "Details:" & aReadMe.ToString)
     Else
       Dim lReadTS As atcTimeseries = aReadMe
       'Logger.dbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))
