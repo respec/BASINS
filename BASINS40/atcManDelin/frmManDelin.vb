@@ -694,38 +694,39 @@ Public Class frmManDelin
       End If
 
       'calculate length of overland flow plane
-      Dim sl As Double
+      'this is computed in WinHSPF based on slope, no need to compute here
+      'Dim sl As Double
 
-      If GisUtil.IsField(SubbasinLayerIndex, "LEN1") Then
-        LengthFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "LEN1")
-      Else
-        'need to add it
-        LengthFieldIndex = GisUtil.AddField(SubbasinLayerIndex, "LEN1", 2, 10)
-      End If
-      For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
-        slope = GisUtil.FieldValue(SubbasinLayerIndex, i - 1, SlopeFieldIndex)
-        'Slope Length from old autodelin
-        If ((slope > 0) And (slope < 2.0)) Then
-          sl = 400 / 3.28
-        ElseIf ((slope >= 2.0) And (slope < 5.0)) Then
-          sl = 300 / 3.28
-        ElseIf ((slope >= 5.0) And (slope < 8.0)) Then
-          sl = 200 / 3.28
-        ElseIf ((slope >= 8) And (slope < 10.0)) Then
-          sl = 200 / 3.28
-        ElseIf ((slope >= 10) And (slope < 12.0)) Then
-          sl = 120.0 / 3.28
-        ElseIf ((slope >= 12) And (slope < 16.0)) Then
-          sl = 80.0 / 3.28
-        ElseIf ((slope >= 16) And (slope < 20.0)) Then
-          sl = 60.0 / 3.28
-        ElseIf ((slope >= 20) And (slope < 25.0)) Then
-          sl = 50.0 / 3.28
-        Else
-          sl = 0.05  '30.0/3.28      
-        End If
-        GisUtil.SetFeatureValue(SubbasinLayerIndex, LengthFieldIndex, i - 1, sl)
-      Next i
+      'If GisUtil.IsField(SubbasinLayerIndex, "LEN1") Then
+      '  LengthFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "LEN1")
+      'Else
+      '  'need to add it
+      '  LengthFieldIndex = GisUtil.AddField(SubbasinLayerIndex, "LEN1", 2, 10)
+      'End If
+      'For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+      '  slope = GisUtil.FieldValue(SubbasinLayerIndex, i - 1, SlopeFieldIndex)
+      '  'Slope Length from old autodelin
+      '  If ((slope > 0) And (slope < 2.0)) Then
+      '    sl = 400 / 3.28
+      '  ElseIf ((slope >= 2.0) And (slope < 5.0)) Then
+      '    sl = 300 / 3.28
+      '  ElseIf ((slope >= 5.0) And (slope < 8.0)) Then
+      '    sl = 200 / 3.28
+      '  ElseIf ((slope >= 8) And (slope < 10.0)) Then
+      '    sl = 200 / 3.28
+      '  ElseIf ((slope >= 10) And (slope < 12.0)) Then
+      '    sl = 120.0 / 3.28
+      '  ElseIf ((slope >= 12) And (slope < 16.0)) Then
+      '    sl = 80.0 / 3.28
+      '  ElseIf ((slope >= 16) And (slope < 20.0)) Then
+      '    sl = 60.0 / 3.28
+      '  ElseIf ((slope >= 20) And (slope < 25.0)) Then
+      '    sl = 50.0 / 3.28
+      '  Else
+      '    sl = 0.05  '30.0/3.28      
+      '  End If
+      '  GisUtil.SetFeatureValue(SubbasinLayerIndex, LengthFieldIndex, i - 1, sl)
+      'Next i
 
       Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
       lblCalc.Text = ""
