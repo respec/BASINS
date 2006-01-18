@@ -1,5 +1,6 @@
 Imports atcControls
 Imports atcUtility
+Imports MapWinUtility
 Imports System.Drawing
 
 Public Class frmCliGen
@@ -434,7 +435,8 @@ Public Class frmCliGen
             pOk = True
             Close()
           Else
-            MsgBox("Value for Number of Years must be between 1 and 9999", , "Run CliGen Problem")
+            Logger.Msg("'Number of Years' must be between 1 and 9999" & vbCrLf & _
+                       "Value specified is '" & pNumYears & "'", "Run CliGen Problem")
           End If
         Else
           MsgBox("Value for Start Year must be between 0 and 9999", , "Run CliGen Problem")
