@@ -1686,7 +1686,7 @@ Public Class frmModelSetup
       For j = 1 To GisUtil.NumFeatures(i)
         k = GisUtil.PointInPolygon(i, j, SubbasinLayerIndex)
         If k > -1 Then
-          cOutSubs.Add(GisUtil.FieldValue(SubbasinLayerIndex, SubbasinFieldIndex, k))
+          cOutSubs.Add(GisUtil.FieldValue(SubbasinLayerIndex, k, SubbasinFieldIndex))
         Else
           cOutSubs.Add(-1)
         End If
