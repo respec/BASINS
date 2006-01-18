@@ -140,8 +140,7 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
-                    RelPath = "GIRAS Landuse Table.vb"
-                    Link = "..\etc\Reports\GIRAS Landuse Table.vb"
+                    RelPath = "scripts\GIRAS Landuse Table.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
