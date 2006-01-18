@@ -106,14 +106,18 @@ Public Module GIRASLanduseTable
       Next j
       If incollection Then
         'find lugroup that corresponds to this lucode
-        Dim lugroup As String = tmpDbf.Value(1)
+        Dim lugroup As String = ""
         For j = 1 To cRcode.Count
           If tmpDbf.Value(1) = cRcode(j) Then
             lugroup = cRname(j)
             Exit For
           End If
         Next j
-        cLugroup.Add(lugroup)
+        If Len(lugroup) > 0 Then
+          cLugroup.Add(lugroup)
+        Else
+          cLugroup.Add("<No Data>")
+        End If
         cSubid.Add(tmpDbf.Value(2))
         cArea.Add(tmpDbf.Value(3))
       End If
@@ -135,10 +139,10 @@ Public Module GIRASLanduseTable
     Next i
 
     'build collection of unique landuse groups
-    Dim cUniqueLugroups As New Collection
+    Dim cUniqueLugroups As New atcCollection
     For i = 1 To cLugroup.Count
       incollection = False
-      For j = 1 To cUniqueLugroups.Count
+      For j = 0 To cUniqueLugroups.Count - 1
         If cUniqueLugroups(j) = cLugroup(i) Then
           incollection = True
           Exit For
@@ -148,6 +152,8 @@ Public Module GIRASLanduseTable
         cUniqueLugroups.Add(cLugroup(i))
       End If
     Next i
+    'sort landuse groups
+    cUniqueLugroups.Sort()
 
     'create summary array, area of each land use group in each subarea
     Dim lArea(cUniqueSubids.Count, cUniqueLugroups.Count) As Single
@@ -165,7 +171,7 @@ Public Module GIRASLanduseTable
       Next j
       'find lugroup that corresponds to this lucode
       For j = 1 To cUniqueLugroups.Count
-        If cLugroup(i) = cUniqueLugroups(j) Then
+        If cLugroup(i) = cUniqueLugroups(j - 1) Then
           lpos = j
           Exit For
         End If
@@ -173,15 +179,36 @@ Public Module GIRASLanduseTable
       lArea(spos, lpos) = lArea(spos, lpos) + cArea(i)
     Next i
 
+    'now write file
     Dim OutFile As Integer
+    Dim ctxt As String
     OutFile = FreeFile()
     FileOpen(OutFile, aOutputPath & "GIRAS Landuse Table.out", OpenMode.Output)
-    WriteLine(OutFile, "LU Name", "Type (1=Impervious, 2=Pervious)", "Watershd-ID", "Area", "Slope", "Distance")
-
-    'now write file
-    Dim ctxt As String
+    PrintLine(OutFile, "Watershed Characterization Report")
+    PrintLine(OutFile, "  GIRAS Landuse Distribution Within " & aAreaLayer)
+    PrintLine(OutFile, "  (Area in Acres)")
+    PrintLine(OutFile, "")
+    'write area ids
+    ctxt = ""
+    For i = 1 To cUniqueSubids.Count
+      ctxt = ctxt & vbTab & cUniqueSubids(i)
+    Next i
+    PrintLine(OutFile, ctxt)
+    'write associated descriptions
+    Dim aNameFieldIndex As Integer = GisUtil.FieldIndex(AreaLayerIndex, aNameField)
+    ctxt = ""
+    For i = 1 To cUniqueSubids.Count
+      For j = 1 To cSelectedAreaIndexes.Count
+        If cSelectedAreaIds(j) = cUniqueSubids(i) Then
+          ctxt = ctxt & vbTab & GisUtil.FieldValue(AreaLayerIndex, cSelectedAreaIndexes(j), aNameFieldIndex)
+          Exit For
+        End If
+      Next j
+    Next i
+    PrintLine(OutFile, ctxt)
+    'now write data
     For j = 1 To cUniqueLugroups.Count
-      ctxt = cUniqueLugroups(j)
+      ctxt = cUniqueLugroups(j - 1)
       For i = 1 To cUniqueSubids.Count
         ctxt = ctxt & vbTab & Format((lArea(i, j) / 4046.8564), "0.")
       Next i

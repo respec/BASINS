@@ -1167,7 +1167,7 @@ Public Class GisUtil
       bsuc = osf.EditInsertField([of], 0)
       Dim of2 As New MapWinGIS.Field
       of2.Name = Layer2FieldName
-      of2.Type = MapWinGIS.FieldType.INTEGER_FIELD
+      of2.Type = FieldType(Layer2FieldIndex, Layer2Index)
       of2.Width = 10
       bsuc = osf.EditInsertField(of2, 1)
       Dim of3 As New MapWinGIS.Field

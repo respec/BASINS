@@ -322,10 +322,13 @@ Public Class frmReport
       If GisUtil.LayerType(lyr) = 3 Then
         'PolygonShapefile 
         cboSubbasins.Items.Add(ctemp)
-        If UCase(ctemp) = "SUBBASINS" Then
+        If GisUtil.CurrentLayer = lyr Then
           cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
         End If
-        If UCase(ctemp) = "CATALOGING UNIT BOUNDARIES" Then
+        If UCase(ctemp) = "SUBBASINS" And cboSubbasins.SelectedIndex < 0 Then
+          cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
+        End If
+        If UCase(ctemp) = "CATALOGING UNIT BOUNDARIES" And cboSubbasins.SelectedIndex < 0 Then
           cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
         End If
       End If

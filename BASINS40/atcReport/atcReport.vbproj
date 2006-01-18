@@ -90,20 +90,21 @@
                     Private = "False"
                 />
                 <Reference
-                    Name = "atcUtility"
-                    Project = "{67027820-9036-481E-80F6-077E5085F59D}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                    Private = "False"
-                />
-                <Reference
                     Name = "MapWinUtility"
                     Project = "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
                 <Reference
                     Name = "atcModelSetup"
                     Project = "{AF800243-4EC0-4ABA-A722-85872F7BD308}"
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
+                <Reference
+                    Name = "atcUtility"
+                    Project = "{67027820-9036-481E-80F6-077E5085F59D}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                    Private = "False"
                 />
             </References>
             <Imports>
