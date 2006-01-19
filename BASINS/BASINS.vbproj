@@ -168,7 +168,7 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
-                    RelPath = "Globals.vb"
+                    RelPath = "modBasinsPlugin.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

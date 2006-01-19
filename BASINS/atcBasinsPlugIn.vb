@@ -1,61 +1,11 @@
 Imports System.Collections.Specialized
 Imports System.Windows.Forms.Application
-Imports System.Reflection
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
 
 Public Class atcBasinsPlugIn
   Implements MapWindow.Interfaces.IPlugin
-
-  Private Const NationalProjectFilename As String = "national.mwprj"
-
-  'Private Const NewProjectMenuName As String = "BasinsNewProject"
-  'Private Const NewProjectMenuString As String = "&New Project"
-
-  Private Const ProjectsMenuName As String = "BasinsProjects"
-  Private Const ProjectsMenuString As String = "Open &BASINS Project"
-
-  Private Const OpenDataMenuName As String = "BasinsOpenData"
-  Private Const OpenDataMenuString As String = "Open Data"
-
-  Private Const SaveDataMenuName As String = "BasinsSaveData"
-  Private Const SaveDataMenuString As String = "Save Data In..."
-
-  Private Const ToolsMenuName As String = "BasinsTools"
-  Private Const ToolsMenuString As String = "&Tools"
-
-  Private Const ModelsMenuName As String = "BasinsModels"
-  Private Const ModelsMenuString As String = "&Models"
-
-  Private pWelcomeScreenShow As Boolean = False
-  Private Const WelcomeScreenShowMenuName As String = "ShowWelcome"
-  Private Const WelcomeScreenShowMenuString As String = "&Show Welcome Screen"
-
-  Private Const CheckForUpdatesMenuName As String = "CheckForUpdates"
-  Private Const CheckForUpdatesMenuString As String = "&Check For Updates"
-
-  Private Const BasinsWebPageMenuName As String = "BasinsWebPage"
-  Private Const BasinsWebPageMenuString As String = "&Basins Web Page"
-
-  Private Const SendFeedbackMenuName As String = "SendFeedback"
-  Private Const SendFeedbackMenuString As String = "Send &Feedback"
-
-  Private Const BasinsHelpMenuName As String = "BASINS Help"
-  Private Const BasinsHelpMenuString As String = "BASINS Help"
-
-  Private Const BasinsProjectPath As String = "\Basins\apr\"
-  Private Const BasinsDataPath As String = "\Basins\data\"
-
-  Private Const DataMenuName As String = "BasinsData"
-  Private Const DataMenuString As String = "&Data"
-  Private pLoadedDataMenu As Boolean = False
-
-  Private pLogFilename As String = ""
-  Private WithEvents pDataManager As atcDataManager
-
-  Private pCommandLineScript As Boolean = False
-  Private pBuiltInScriptExists As Boolean = False
 
   Private pBusy As Integer = 0 'Incremented by setting Busy = True, decremented by setting Busy = False
   Private pBeforeBusyCursor As MapWinGIS.tkCursor
@@ -88,7 +38,7 @@ Public Class atcBasinsPlugIn
   Public ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
     'Appears in the plug-ins dialog box when a user selects the plug-in.  
     Get
-      Return "Open BASINS data in MapWindow"
+      Return "BASINS extension"
     End Get
   End Property
 
@@ -111,56 +61,50 @@ Public Class atcBasinsPlugIn
   End Property
 
   Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+    'fired when 
+    '   1) user loads plug-in through plug-in dialog or
+    '      by checkmarking it in the plug-ins menu.
+    '   2) project refererencing plug-in loads
 
-    'fired when the user loads plug-in through plug-in dialog 
-    'or by checkmarking it in the plug-ins menu.
     'This is where buttons or menu items are added.
-    Dim DriveLetter As String
-    Dim iDrive As Integer
-    Dim iDirectory As Integer
-    Dim mnu As MapWindow.Interfaces.MenuItem
-
     g_MapWin = aMapWin
     g_MapWinWindowHandle = aParentHandle
+
     Dim lLogFileName As String = PathNameOnly(PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)) _
                                & "\logs\" _
                                & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log"
-
     Logger.StartToFile(lLogFileName)
-    'LogStartMonitor()
     Logger.MapWin = g_MapWin
 
-    pDataManager = New atcDataManager(g_MapWin) ', Me)
+    pDataManager = New atcDataManager(g_MapWin)
 
-    BuiltInScript(False)
+    'BuiltInScript(False)
 
     FindBasinsDrives()
 
-    'AddMenuIfMissing(NewProjectMenuName, "mnuFile", NewProjectMenuString, "mnuNew")
-    'g_MapWin.Menus.Remove("New")
     AddMenuIfMissing(OpenDataMenuName, "mnuFile", OpenDataMenuString, "mnuOpen")
     AddMenuIfMissing(SaveDataMenuName, "mnuFile", SaveDataMenuString, "mnuSaveAs")
     AddMenuIfMissing(ProjectsMenuName, "mnuFile", ProjectsMenuString, "mnuRecentProjects")
 
     AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
-    'mnu = AddMenuIfMissing(WelcomeScreenShowMenuName, "mnuHelp", WelcomeScreenShowMenuString, "")
+
+    Dim mnu As MapWindow.Interfaces.MenuItem
     mnu = AddMenuIfMissing(BasinsWebPageMenuName, "mnuHelp", BasinsWebPageMenuString, "")
     AddMenuIfMissing("BasinsHelp_Separator2", "mnuHelp", "-")
     mnu = AddMenuIfMissing(CheckForUpdatesMenuName, "mnuHelp", CheckForUpdatesMenuString, "")
     mnu = AddMenuIfMissing(SendFeedbackMenuName, "mnuHelp", SendFeedbackMenuString, "")
-    'AddMenuIfMissing(BasinsHelpMenuName, "mnuHelp", BasinsHelpMenuString, "")
 
-    For iDrive = 0 To g_BasinsDrives.Length - 1
-      DriveLetter = g_BasinsDrives.Substring(iDrive, 1)
+    For lDrive As Integer = 0 To g_BasinsDrives.Length - 1
+      Dim DriveLetter As String = g_BasinsDrives.Substring(lDrive, 1)
       'Scan folder for project data, and populate menu
-      Dim DataDirs() As String = System.IO.Directory.GetDirectories( _
+      Dim lDataDirs() As String = System.IO.Directory.GetDirectories( _
                                         DriveLetter & ":\BASINS\data")
-      For iDirectory = 0 To DataDirs.GetUpperBound(0)
-        Dim DirShortName As String = System.IO.Path.GetFileName(DataDirs(iDirectory))
+      For lDirectory As Integer = 0 To lDataDirs.GetUpperBound(0)
+        Dim DirShortName As String = System.IO.Path.GetFileName(lDataDirs(lDirectory))
         If g_BasinsDrives.Length > 0 Then DirShortName = DriveLetter & ": " & DirShortName
         mnu = AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, _
-                               ProjectsMenuName, DataDirs(iDirectory))
-        mnu.Tooltip = DataDirs(iDirectory)
+                               ProjectsMenuName, lDataDirs(lDirectory))
+        mnu.Tooltip = lDataDirs(lDirectory)
       Next
     Next
 
@@ -185,81 +129,6 @@ Public Class atcBasinsPlugIn
 
   End Sub
 
-  'Private Function ScriptFolder() As String
-  '  Return PathNameOnly(g_MapWin.Plugins.PluginFolder) & "\script"
-  'End Function
-
-  Private Function AddMenuIfMissing(ByVal aMenuName As String, _
-                                    ByVal aParent As String, _
-                                    ByVal aMenuText As String, _
-                           Optional ByVal aAfter As String = "") As MapWindow.Interfaces.MenuItem
-    With g_MapWin.Menus
-      If .Item(aMenuName) Is Nothing Then
-        Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
-      Else
-        Return .Item(aMenuName)
-      End If
-    End With
-  End Function
-
-  Private Sub RefreshToolsMenu()
-    Dim lScriptMenuName As String = ToolsMenuName & "_Scripting"
-    Dim iPlugin As Integer
-    If pLoadedDataMenu Then
-      AddMenuIfMissing(ToolsMenuName, "", ToolsMenuString, DataMenuName)
-      'AddMenuIfMissing(ToolsMenuName & "_TestDBF", ToolsMenuName, "Test DBF")
-      AddMenuIfMissing(ToolsMenuName & "_ArcView3", ToolsMenuName, "ArcView &3")
-      AddMenuIfMissing(ToolsMenuName & "_ArcGIS", ToolsMenuName, "&ArcGIS")
-      AddMenuIfMissing(ToolsMenuName & "_GenScn", ToolsMenuName, "&GenScn")
-      AddMenuIfMissing(ToolsMenuName & "_WDMUtil", ToolsMenuName, "&WDMUtil")
-      'AddMenuIfMissing(lScriptMenuName, ToolsMenuName, "Scripting")
-      'If pBuiltInScriptExists Then
-      '  AddMenuIfMissing(ToolsMenuName & "_RunBuiltInScript", lScriptMenuName, "Run Built In Script")
-      'End If
-      'AddMenuIfMissing(ToolsMenuName & "_ScriptEditor", lScriptMenuName, "Script Editor")
-      'AddMenuIfMissing(ToolsMenuName & "_RunScript", lScriptMenuName, "Select Script to Run")
-
-      'For Each lScriptFilename As String In System.IO.Directory.GetFiles(ScriptFolder, "*.vb")
-      '  Dim lMenuLabel As String = FilenameOnly(lScriptFilename)
-      '  If Not lMenuLabel.ToLower.StartsWith("sub") AndAlso Not lMenuLabel.ToLower.StartsWith("fun") Then
-      '    AddMenuIfMissing(ToolsMenuName & "_RunScript" & FilenameNoPath(lScriptFilename), lScriptMenuName, "Run " & lMenuLabel)
-      '  End If
-      'Next
-
-      'AddMenuIfMissing(ToolsMenuName & "_ChangeProjection", ToolsMenuName, "Change &Projection")
-
-      Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-      If DisplayPlugins.Count > 0 Then
-        AddMenuIfMissing(ToolsMenuName & "_Separator1", ToolsMenuName, "-")
-      End If
-      For Each lDisp As atcDataDisplay In DisplayPlugins
-        Dim lMenuText As String = lDisp.Name
-        If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
-        AddMenuIfMissing(ToolsMenuName & "_" & lDisp.Name, ToolsMenuName, lMenuText)
-      Next
-    End If
-  End Sub
-
-  Private Sub RefreshDataMenu()
-    'Dim mnu As MapWindow.Interfaces.MenuItem
-    Dim iPlugin As Integer
-    AddMenuIfMissing(DataMenuName, "", DataMenuString, "mnuFile")
-    AddMenuIfMissing(DataMenuName & "_Download", DataMenuName, "&Download")
-    AddMenuIfMissing(DataMenuName & "_ComputeData", DataMenuName, "&Compute")
-    AddMenuIfMissing(DataMenuName & "_ManageDataSources", DataMenuName, "&Manage Sources")
-    pLoadedDataMenu = True
-    'With g_MapWin.Plugins
-    '  For iPlugin = 0 To .Count - 1
-    '    If Not .Item(iPlugin) Is Nothing Then
-    '      Dim pluginName As String = .Item(iPlugin).Name
-    '      If CType(.Item(iPlugin), Object).GetType().IsSubclassOf(GetType(atcDataPlugin)) Then
-    '        mnu = AddMenuIfMissing(DataMenuName & "_" & pluginName, DataMenuName, pluginName)
-    '      End If
-    '    End If
-    '  Next
-    'End With
-  End Sub
-
   Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
     'This event is fired when the user unloads your plug-in either through the plug-in dialog 
     'box, or by un-checkmarking it in the plug-ins menu.  This is where you would remove any
@@ -275,66 +144,28 @@ Public Class atcBasinsPlugIn
     g_MapWin.Menus.Remove(SaveDataMenuName)
 
     g_MapWin.Menus.Remove("BasinsHelp_Separator1")
-    g_MapWin.Menus.Remove(WelcomeScreenShowMenuName)
     g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
     g_MapWin.Menus.Remove("BasinsHelp_Separator2")
     g_MapWin.Menus.Remove(BasinsWebPageMenuName)
     g_MapWin.Menus.Remove(SendFeedbackMenuName)
 
+    g_MapWin.ApplicationInfo.WelcomePlugin = "WelcomeScreen"
 
     'LogStopMonitor()
-
   End Sub
 
-  Public Function NationalProjectIsOpen() As Boolean
-    If (Not g_MapWin.Project Is Nothing) _
-        AndAlso (Not g_MapWin.Project.FileName Is Nothing) _
-        AndAlso g_MapWin.Project.FileName.ToLower.EndsWith(NationalProjectFilename) Then
-
-      Return True
-    Else
-      Return False
-    End If
-  End Function
-
-  Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
+  Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
     'A menu item or toolbar button was clicked
-    Dim DataDirName As String
-    Dim PrjFileName As String
-
-    Logger.Dbg(ItemName)
-    If ItemName.Equals("mnuNew") Then 'Override File/New menu item behavior
-      If NationalProjectIsOpen() Then
-        MsgBox("Select the area of interest, " & vbCr & "then Download from the Data menu" & vbCr _
-             & "to create a new BASINS project", , "New Project")
-      Else
-        Dim allFiles As NameValueCollection
-        Dim iDrive As Integer
-        Dim sDrive As String
-        Dim lFileName As String = PathNameOnly(PathNameOnly(g_MapWin.Plugins.PluginFolder)) & "\Data\national\" & NationalProjectFilename
-        allFiles = New NameValueCollection
-
-        If FileExists(lFileName) Then
-          allFiles.Add(lFileName.ToLower, lFileName)
-        Else
-          For iDrive = 0 To g_BasinsDrives.Length - 1
-            sDrive = UCase(g_BasinsDrives.Chars(iDrive))
-            AddFilesInDir(allFiles, sDrive & ":\BASINS\Data\national\", True, NationalProjectFilename)
-          Next
-        End If
-        If allFiles.Count > 0 Then
-          g_MapWin.Project.Load(allFiles.Item(0))
-        Else
-          Logger.Msg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives & " in folder \BASINS\Data\national\", "Open National")
-        End If
-      End If
-      Handled = True
-    ElseIf ItemName.StartsWith(SaveDataMenuName & "_") Then
+    Logger.Dbg(aItemName)
+    If aItemName.Equals("mnuNew") Then 'Override File/New menu item behavior
+      LoadNationalProject()
+      aHandled = True
+    ElseIf aItemName.StartsWith(SaveDataMenuName & "_") Then
       Dim lSaveIn As atcDataSource
       Dim lSaveGroup As atcDataGroup = pDataManager.UserSelectData("Select Data to Save")
       If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
-        If ItemName.Length > SaveDataMenuName.Length Then
-          Dim lSpecification As String = ItemName.Substring(SaveDataMenuName.Length + 1)
+        If aItemName.Length > SaveDataMenuName.Length Then
+          Dim lSpecification As String = aItemName.Substring(SaveDataMenuName.Length + 1)
           For Each lDataSource As atcDataSource In pDataManager.DataSources
             If lDataSource.Specification = lSpecification Then
               lSaveIn = lDataSource
@@ -354,67 +185,38 @@ Public Class atcBasinsPlugIn
           lSaveIn.Save(lSaveIn.Specification)
         End If
       End If
-    ElseIf ItemName.Equals(OpenDataMenuName) Then
+    ElseIf aItemName.Equals(OpenDataMenuName) Then
       UserOpenDataFile()
-    ElseIf ItemName.StartsWith(ProjectsMenuName & "_") Then
-      DataDirName = g_MapWin.Menus(ItemName).Text ' g_MapWin.Menus(ItemName).Tooltip
-      If FileExists(DataDirName, True, False) Then
-        PrjFileName = DataDirName & "\" & FilenameOnly(DataDirName) & ".mwprj"
-        If FileExists(PrjFileName) Then
-          Logger.Dbg("Opening project " & PrjFileName)
-          g_MapWin.Project.Load(PrjFileName)
+    ElseIf aItemName.StartsWith(ProjectsMenuName & "_") Then
+      Dim lDataDirName As String
+      Dim lPrjFileName As String
+      lDataDirName = g_MapWin.Menus(aItemName).Text ' g_MapWin.Menus(ItemName).Tooltip
+      If FileExists(lDataDirName, True, False) Then
+        lPrjFileName = lDataDirName & "\" & FilenameOnly(lDataDirName) & ".mwprj"
+        If FileExists(lPrjFileName) Then
+          Logger.Dbg("Opening project " & lPrjFileName)
+          g_MapWin.Project.Load(lPrjFileName)
         Else
           'TODO: look for other *.mwprj before creating a new one?
-          Logger.Dbg("Creating new project " & PrjFileName)
+          Logger.Dbg("Creating new project " & lPrjFileName)
           g_MapWin.Layers.Clear()
           g_MapWin.Refresh()
           g_MapWin.PreviewMap.GetPictureFromMap()
           DoEvents()
-          AddAllShapesInDir(DataDirName, DataDirName)
-          g_MapWin.Project.Save(PrjFileName)
+          AddAllShapesInDir(lDataDirName, lDataDirName)
+          g_MapWin.Project.Save(lPrjFileName)
           g_MapWin.Project.Modified = False
         End If
       End If
-      Handled = True
-    ElseIf ItemName.StartsWith(DataMenuName & "_") Then
-      Select Case ItemName.Substring(DataMenuName.Length + 1)
+      aHandled = True
+    ElseIf aItemName.StartsWith(DataMenuName & "_") Then
+      Select Case aItemName.Substring(DataMenuName.Length + 1)
         'Case "DownloadTest"
         '  If FileExists("d:\temp\NHDM2003.zip") Then Kill("d:\temp\NHDM2003.zip")
         '  atcUtility.Downloader.DownloadURL("ftp://nhdftp.usgs.gov/SubRegions/Medium/NHDM2003.zip", "d:\temp\NHDM2003.zip")
       Case "Download"
           If NationalProjectIsOpen() Then
-            Dim themeTag As String
-            Dim FieldName As String
-            Dim iField As Integer
-            Dim iFieldMatch As Integer = -1
-            Dim curLayer As MapWinGIS.Shapefile
-            curLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
-            Select Case FilenameOnly(curLayer.Filename).ToLower
-              Case "cat", "huc", "huc250d3"
-                themeTag = "huc_cd"
-                FieldName = "CU"
-              Case "cnty"
-                themeTag = "county_cd"
-                FieldName = "FIPS"
-              Case "st"
-                themeTag = "state_abbrev"
-                FieldName = "ST"
-              Case Else
-                Logger.Msg("Unknown layer for selection, using first field", "Area Selection")
-                themeTag = "huc_cd"
-                iFieldMatch = 1
-            End Select
-            FieldName = FieldName.ToLower
-            For iField = 0 To curLayer.NumFields - 1
-              If curLayer.Field(iField).Name.ToLower = FieldName Then iFieldMatch = iField
-            Next
-            If iFieldMatch >= 0 Then
-              'Save national project as the user has zoomed it
-              g_MapWin.Project.Save(g_MapWin.Project.FileName)
-              CreateNewProjectAndDownloadCoreDataInteractive(themeTag, GetSelected(iFieldMatch))
-            Else
-              Logger.Msg("Could not find field " & FieldName & " in " & curLayer.Filename, "Could not create project")
-            End If
+            SpecifyAndCreateNewProject()
           Else
             DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
           End If
@@ -436,26 +238,24 @@ Public Class atcBasinsPlugIn
           End If
         Case "ManageDataSources"
           pDataManager.UserManage()
-        Case Else : MsgBox("Data Tool " & ItemName)
+        Case Else
+          Logger.Msg("Data Tool " & aItemName)
       End Select
-      Handled = True
-    ElseIf ItemName.StartsWith(ToolsMenuName & "_") Then
-      Handled = LaunchTool(ItemName.Substring(ToolsMenuName.Length + 1))
-    ElseIf ItemName.StartsWith(ModelsMenuName & "_") Then
-      Handled = LaunchTool(ItemName.Substring(ModelsMenuName.Length + 1))
-    ElseIf ItemName.StartsWith(WelcomeScreenShowMenuName) Then
-      g_MapWin.Plugins.BroadcastMessage("WELCOME_SCREEN")
-      Handled = True
-    ElseIf ItemName.StartsWith(CheckForUpdatesMenuName) Then
+      aHandled = True
+    ElseIf aItemName.StartsWith(ToolsMenuName & "_") Then
+      aHandled = LaunchTool(aItemName.Substring(ToolsMenuName.Length + 1))
+    ElseIf aItemName.StartsWith(ModelsMenuName & "_") Then
+      aHandled = LaunchTool(aItemName.Substring(ModelsMenuName.Length + 1))
+    ElseIf aItemName.StartsWith(CheckForUpdatesMenuName) Then
       OpenFile("http://hspf.com/pub/basins4/updates.html", True)
-      Handled = True
-    ElseIf ItemName.StartsWith(BasinsWebPageMenuName) Then
+      aHandled = True
+    ElseIf aItemName.StartsWith(BasinsWebPageMenuName) Then
       OpenFile("http://www.epa.gov/waterscience/basins/index.html")
-      Handled = True
-    ElseIf ItemName.StartsWith(SendFeedbackMenuName) Then
+      aHandled = True
+    ElseIf aItemName.StartsWith(SendFeedbackMenuName) Then
       SendFeedback()
-      Handled = True
-    ElseIf ItemName.StartsWith(BasinsHelpMenuName) Then
+      aHandled = True
+    ElseIf aItemName.StartsWith(BasinsHelpMenuName) Then
       Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_MapWin.ApplicationInfo.DefaultDir & "\docs\Basins4.chm")
       If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
     Else 'Not our item
@@ -542,11 +342,11 @@ Public Class atcBasinsPlugIn
         '    Return False
         '  End If
         'Else 'Search for DisplayPlugin to launch
-          If LaunchDisplay(aToolName) Then
-            Return True
-          Else
-            Logger.Msg("Not yet able to launch " & aToolName, "Option not yet functional")
-          End If
+        If LaunchDisplay(aToolName) Then
+          Return True
+        Else
+          Logger.Msg("Not yet able to launch " & aToolName, "Option not yet functional")
+        End If
         'End If
     End Select
 
@@ -585,35 +385,6 @@ Public Class atcBasinsPlugIn
     Logger.Msg("Feedback successfully sent", "Send Feedback")
   End Sub
 
-  Private Sub BuiltInScript(ByVal aRun As Boolean)
-    Try
-      Dim lFlags As BindingFlags = BindingFlags.NonPublic Or BindingFlags.Public Or _
-                                   BindingFlags.Static Or BindingFlags.Instance Or _
-                                   BindingFlags.DeclaredOnly
-      Dim lAssembly As [Assembly] = [Assembly].Load("atcScriptTest")
-      Dim lTypes As Type() = lAssembly.GetTypes
-      For Each lType As Type In lTypes
-        Dim lMethods As MethodInfo() = lType.GetMethods(lFlags)
-        For Each lMethod As MethodInfo In lMethods
-          If lMethod.Name.ToLower = "main" AndAlso _
-             lMethod.GetParameters.Length = 2 AndAlso _
-             (lMethod.GetParameters(0).ParameterType Is pDataManager.GetType _
-              OrElse lMethod.GetParameters(0).ParameterType.Name = "Object") AndAlso _
-             (lMethod.GetParameters(1).ParameterType Is Me.GetType _
-              OrElse lMethod.GetParameters(1).ParameterType.Name = "Object") Then 'found built in script
-
-            pBuiltInScriptExists = True
-            If aRun Then
-              Dim lParameters() As Object = {pDataManager, Me}
-              lMethod.Invoke(Nothing, lParameters)
-            End If
-          End If
-        Next
-      Next
-    Catch ex As Exception
-      Logger.Msg("Exception:" & ex.ToString, "clsPlugIn:BuiltInScript")
-    End Try
-  End Sub
 
   Private Function LaunchDisplay(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
     Dim searchForName As String = aToolName.ToLower
@@ -850,52 +621,4 @@ Public Class atcBasinsPlugIn
     'Layer handle for the shapefile on which shapes were selected. SelectInfo holds information abou the 
     'shapes that were selected. 
   End Sub
-
-  Private Sub FindBasinsDrives()
-    Dim i As Integer
-    Dim drv As String
-    If g_BasinsDrives.Length = 0 Then
-      Dim allDrives As String() = Environment.GetLogicalDrives
-      For i = 0 To allDrives.Length - 1
-        drv = UCase(allDrives(i).Chars(0))
-        If (Asc(drv) > Asc("B")) Then
-          If FileExists(drv & ":" & BasinsDataPath, True, False) Then
-            g_BasinsDrives = g_BasinsDrives & drv
-          End If
-        End If
-      Next
-      If g_BasinsDrives.Length = 0 Then
-        Logger.Msg("No BASINS folders found on any drives on this computer", "FindBasinsDrives")
-      Else
-        Logger.Dbg("Found BasinsDrives: " & g_BasinsDrives)
-      End If
-    End If
-  End Sub
-
-  Private Function GetSelected(ByVal iField As Integer) As ArrayList
-    Dim iSelected As Integer
-    Dim iShape As Integer
-    Dim sf As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
-    Dim retval As New ArrayList(g_MapWin.View.SelectedShapes().NumSelected)
-    For iSelected = 0 To g_MapWin.View.SelectedShapes.NumSelected - 1
-      iShape = g_MapWin.View.SelectedShapes.Item(iSelected).ShapeIndex()
-      retval.Add(sf.CellValue(iField, iShape))
-    Next
-    Return retval
-  End Function
-
-  Private Sub pDataManager_OpenedData(ByVal aDataSource As atcData.atcDataSource) Handles pDataManager.OpenedData
-    RefreshSaveDataMenu()
-  End Sub
-
-  Private Sub RefreshSaveDataMenu()
-    g_MapWin.Menus.Remove(SaveDataMenuName)
-    AddMenuIfMissing(SaveDataMenuName, "mnuFile", SaveDataMenuString, "mnuSaveAs")
-    For Each lDataSource As atcDataSource In pDataManager.DataSources
-      If lDataSource.CanSave Then
-        AddMenuIfMissing(SaveDataMenuName & "_" & lDataSource.Specification, SaveDataMenuName, lDataSource.Specification)
-      End If
-    Next
-  End Sub
-
 End Class

@@ -28,8 +28,8 @@ Imports atcUtility
 Public Class frmWelcomeScreenBasins
   Inherits System.Windows.Forms.Form
 
-  Private prj As Project
-  Private app As AppInfo
+  Private lProject As Project
+  Private lAppInfo As AppInfo
 
 #Region " Windows Form Designer generated code "
 
@@ -39,18 +39,18 @@ Public Class frmWelcomeScreenBasins
     'This call is required by the Windows Form Designer.
     InitializeComponent()
 
-    prj = aProject
-    app = aAppInfo
+    lProject = aProject
+    lAppInfo = aAppInfo
   End Sub
 
   'Form overrides dispose to clean up the component list.
-  Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
-    If disposing Then
+  Protected Overloads Overrides Sub Dispose(ByVal aDisposing As Boolean)
+    If aDisposing Then
       If Not (components Is Nothing) Then
         components.Dispose()
       End If
     End If
-    MyBase.Dispose(disposing)
+    MyBase.Dispose(aDisposing)
   End Sub
 
   'Required by the Windows Form Designer
@@ -392,36 +392,29 @@ Public Class frmWelcomeScreenBasins
 #End Region
 
   Private Sub lbBuildNew_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbBuildNew.LinkClicked
-    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-    Dim nationalprj As String = lBasinsBinLoc & "\..\data\national\national.mwprj"
-    If FileExists(nationalprj) Then
-      prj.Load(lBasinsBinLoc & "\..\data\national\national.mwprj")
-    Else
-      prj.Load("\basins\data\national\national.mwprj")
-    End If
-    'MsgBox("To Build a New BASINS Project: " & vbCr & vbCr & _
-    '       "Zoom/Pan to your geographic area of interest, select (highlight) your " & vbCr & _
-    '       "area of interest, and then choose Download from the Data menu." & vbCr & vbCr & _
-    '       "If your area is outside the US, then choose the Download" & vbCr & _
-    '       "menu now to create a project with no data.", MsgBoxStyle.OKOnly, "Build BASINS Project")
+    Me.Visible = False
+    Application.DoEvents()
+    LoadNationalProject()
     Me.Close()
   End Sub
 
   Private Sub lbOpenProject_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbOpenProject.LinkClicked
-    Dim dlg As New OpenFileDialog
+    Dim lOpenFileDialog As New OpenFileDialog
 
-    dlg.Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
-    dlg.CheckFileExists = True
-    dlg.InitialDirectory = app.DefaultDir
-    If dlg.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-      prj.Load(dlg.FileName)
-      Me.DialogResult = Windows.Forms.DialogResult.OK
-      Me.Close()
-    End If
+    With lOpenFileDialog
+      .Filter = "MapWindow Project Files (*.mwprj)|*.mwprj"
+      .CheckFileExists = True
+      .InitialDirectory = lAppInfo.DefaultDir
+      If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+        lProject.Load(.FileName)
+        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.Close()
+      End If
+    End With
   End Sub
 
   Private Sub cbShowDlg_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cbShowDlg.CheckedChanged
-    app.ShowWelcomeScreen = cbShowDlg.Checked
+    lAppInfo.ShowWelcomeScreen = cbShowDlg.Checked
   End Sub
 
   Private Sub lbProject_LinkClicked(ByVal sender As System.Object, _
@@ -430,7 +423,7 @@ Public Class frmWelcomeScreenBasins
 
     Dim fileName As String = CStr(CType(sender, Label).Tag)
     If (System.IO.File.Exists(fileName)) Then
-      prj.Load(fileName)
+      lProject.Load(fileName)
       Me.DialogResult = Windows.Forms.DialogResult.OK
       Me.Close()
     Else
@@ -441,7 +434,7 @@ Public Class frmWelcomeScreenBasins
 
   Private Sub frmWelcomeScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-    cbShowDlg.Checked = app.ShowWelcomeScreen
+    cbShowDlg.Checked = lAppInfo.ShowWelcomeScreen
 
     'assume no recent projects
     lbProject1.Visible = False
@@ -455,8 +448,8 @@ Public Class frmWelcomeScreenBasins
     Dim lProjectName As String
     Dim lProjectId As String
     Dim lbProject As Label
-    While lRecentCount < 4 And lCurrent < prj.RecentProjects.Count
-      lProjectName = CType(prj.RecentProjects(lCurrent), String)
+    While lRecentCount < 4 And lCurrent < lProject.RecentProjects.Count
+      lProjectName = CType(lProject.RecentProjects(lCurrent), String)
       lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
       If LCase(lProjectId) <> "national" Then
         If lRecentCount = 0 Then
@@ -488,7 +481,7 @@ Public Class frmWelcomeScreenBasins
   End Sub
 
   Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbBasinsHelp.Click
-    Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", app.DefaultDir & "\docs\Basins4.chm")
+    Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", lAppInfo.DefaultDir & "\docs\Basins4.chm")
     If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
   End Sub
 End Class

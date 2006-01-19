@@ -12,16 +12,13 @@ Module modDownload
   Private Const XMLappName As String = "BASINS System Application"
 
   'Returns file name of new project or "" if not built
-  Public Function CreateNewProjectAndDownloadCoreDataInteractive(ByVal aThemeTag As String, ByVal aSelectedFeatures As ArrayList) As String
+  Friend Function CreateNewProjectAndDownloadCoreDataInteractive(ByVal aThemeTag As String, ByVal aSelectedFeatures As ArrayList) As String
     Dim dataPath As String
     Dim DefaultProjectFileName As String
     Dim ProjectFileName As String
     Dim NoData As Boolean = False
     Dim defDirName As String
     Dim newDataDir As String
-    'Dim aprStr As String
-    'Dim wholeaprStr As String
-    'Dim fdn As String
     Dim iSuffix As Integer
     Dim myProjection As String
     Dim cdlg As Windows.Forms.SaveFileDialog
@@ -155,15 +152,23 @@ StartOver:
   End Sub
 
   'Download new data for an existing project
-  Public Sub DownloadNewData(ByRef project_dir As String)
-    Dim downloadFilename As String = project_dir & "download.xml"
-    Dim projectorFilename As String = PathNameOnly(project_dir.Substring(0, project_dir.Length - 1)) & "\ATCProjector.xml"
-    SaveFileString(downloadFilename, "<clsWebDataManager>" & vbCrLf & " <status_variables>" & vbCrLf & "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & "  <project_dir status=""set by " & XMLappName & """>" & project_dir & "</project_dir>" & vbCrLf & " </status_variables>" & vbCrLf & "</clsWebDataManager>")
-    If FileExists(projectorFilename) Then Kill(projectorFilename)
-    If DataDownload(downloadFilename) Then
-      ProcessProjectorFile(projectorFilename)
+  Friend Sub DownloadNewData(ByRef aProjectDir As String)
+    Dim lDownloadFilename As String = aProjectDir & "download.xml"
+    SaveFileString(lDownloadFilename, "<clsWebDataManager>" & vbCrLf & _
+                                      " <status_variables>" & vbCrLf & _
+                                      "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & _
+                                      "  <project_dir status=""set by " & XMLappName & """>" & aProjectDir & "</project_dir>" & vbCrLf & _
+                                      " </status_variables>" & vbCrLf & _
+                                      "</clsWebDataManager>")
+
+    Dim lProjectorFilename As String = PathNameOnly(aProjectDir.Substring(0, aProjectDir.Length - 1)) & "\ATCProjector.xml"
+    If FileExists(lProjectorFilename) Then
+      Kill(lProjectorFilename)
     End If
-    Kill(downloadFilename)
+    If DataDownload(lDownloadFilename) Then
+      ProcessProjectorFile(lProjectorFilename)
+    End If
+    Kill(lProjectorFilename)
   End Sub
 
   Private Sub ProcessProjectorFile(ByVal aProjectorFilename As String)
@@ -240,31 +245,31 @@ StartOver:
               'g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
             End If
           Case "convert_dir"
-              'loop through a directory, projecting all files in it
-              theInputDirName = lProjectorNode.Content
-              theOutputDirName = lProjectorNode.GetAttrValue("output")
-              If theOutputDirName Is Nothing OrElse theOutputDirName.Length = 0 Then
-                theOutputDirName = theInputDirName
-              End If
-              If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
+            'loop through a directory, projecting all files in it
+            theInputDirName = lProjectorNode.Content
+            theOutputDirName = lProjectorNode.GetAttrValue("output")
+            If theOutputDirName Is Nothing OrElse theOutputDirName.Length = 0 Then
+              theOutputDirName = theInputDirName
+            End If
+            If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
 
-              InputFileList.Clear()
+            InputFileList.Clear()
 
-              AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
+            AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
 
-              For Each vFilename In InputFileList
-                curFilename = vFilename
-                If (FileExt(curFilename) = "shp") Then
-                  'this is a shapefile
-                  theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
-                  'change projection and merge
-                  If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
-                    'if the output file exists and it is a landuse shape, dont bother
-                  Else
-                    ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
-                  End If
+            For Each vFilename In InputFileList
+              curFilename = vFilename
+              If (FileExt(curFilename) = "shp") Then
+                'this is a shapefile
+                theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
+                'change projection and merge
+                If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
+                  'if the output file exists and it is a landuse shape, dont bother
+                Else
+                  ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
                 End If
-              Next vFilename
+              End If
+            Next vFilename
 
           Case Else
             Logger.Msg("Cannot yet follow directive:" & vbCr & lProjectorNode.Tag, "ProcessProjectorFile")
