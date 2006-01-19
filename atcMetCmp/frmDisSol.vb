@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class frmDisSol
   Inherits System.Windows.Forms.Form
@@ -6,6 +7,7 @@ Public Class frmDisSol
   Private pOk As Boolean
   Private pTSGroup As atcDataGroup
   Private pDataManager As atcDataManager
+  Private cLat As Double
 
 #Region " Windows Form Designer generated code "
 
@@ -110,7 +112,7 @@ Public Class frmDisSol
     '
     Me.btnSolar.Location = New System.Drawing.Point(16, 40)
     Me.btnSolar.Name = "btnSolar"
-    Me.btnSolar.Size = New System.Drawing.Size(48, 23)
+    Me.btnSolar.Size = New System.Drawing.Size(48, 20)
     Me.btnSolar.TabIndex = 18
     Me.btnSolar.Text = "Select"
     '
@@ -128,9 +130,9 @@ Public Class frmDisSol
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(296, 157)
     Me.Controls.Add(Me.txtSolar)
+    Me.Controls.Add(Me.txtLatitude)
     Me.Controls.Add(Me.btnSolar)
     Me.Controls.Add(Me.panelBottom)
-    Me.Controls.Add(Me.txtLatitude)
     Me.Controls.Add(Me.lblLatitude)
     Me.Controls.Add(Me.lblTSer)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -146,15 +148,31 @@ Public Class frmDisSol
     pDataManager = aDataManager
     Me.ShowDialog()
     If pOk Then
-      aLatitude = CDbl(txtLatitude.Text)
+      aLatitude = cLat
       aSRadTSer = pTSGroup(0)
     End If
     Return pOk
   End Function
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    pOk = True
-    Close()
+    If Not pTSGroup Is Nothing AndAlso pTSGroup.Count > 0 Then
+      If IsNumeric(txtLatitude.Text) Then
+        cLat = CDbl(txtLatitude.Text)
+        If cLat >= 25 And cLat <= 51 Then
+          pOk = True
+          Close()
+        Else
+          Logger.Msg("Value for 'Latitude' must be between 25 and 51" & vbCrLf & _
+                     "Value specified is '" & cLat & "'", Me.Text & " Problem")
+        End If
+      Else
+        Logger.Msg("Value must be specified for 'Latitude'." & vbCrLf & _
+                   "This value is currently not numeric.", Me.Text & " Problem")
+      End If
+    Else
+      Logger.Msg("No 'Daily Solar Radiation Timeseries' selected." & vbCrLf & _
+                 "Use 'Select' buttons to specify the timeseries", Me.Text & " Problem")
+    End If
   End Sub
 
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click

@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class frmCmpJPET
   Inherits System.Windows.Forms.Form
@@ -8,6 +9,8 @@ Public Class frmCmpJPET
   Private pTMaxTS As atcTimeseries
   Private pSRadTS As atcTimeseries
   Private pDataManager As atcDataManager
+  Private cCTX As Double
+  Private cCTS(12) As Double
 
 #Region " Windows Form Designer generated code "
 
@@ -182,7 +185,7 @@ Public Class frmCmpJPET
     '
     Me.btnTMin.Location = New System.Drawing.Point(88, 40)
     Me.btnTMin.Name = "btnTMin"
-    Me.btnTMin.Size = New System.Drawing.Size(48, 24)
+    Me.btnTMin.Size = New System.Drawing.Size(48, 20)
     Me.btnTMin.TabIndex = 18
     Me.btnTMin.Text = "Select"
     '
@@ -215,7 +218,7 @@ Public Class frmCmpJPET
     '
     Me.btnTMax.Location = New System.Drawing.Point(88, 72)
     Me.btnTMax.Name = "btnTMax"
-    Me.btnTMax.Size = New System.Drawing.Size(48, 23)
+    Me.btnTMax.Size = New System.Drawing.Size(48, 20)
     Me.btnTMax.TabIndex = 22
     Me.btnTMax.Text = "Select"
     '
@@ -458,7 +461,7 @@ Public Class frmCmpJPET
     '
     Me.btnSRad.Location = New System.Drawing.Point(88, 104)
     Me.btnSRad.Name = "btnSRad"
-    Me.btnSRad.Size = New System.Drawing.Size(48, 23)
+    Me.btnSRad.Size = New System.Drawing.Size(48, 20)
     Me.btnSRad.TabIndex = 52
     Me.btnSRad.Text = "Select"
     '
@@ -485,8 +488,6 @@ Public Class frmCmpJPET
     Me.ClientSize = New System.Drawing.Size(496, 285)
     Me.Controls.Add(Me.lblTempUnits)
     Me.Controls.Add(Me.txtSRad)
-    Me.Controls.Add(Me.btnSRad)
-    Me.Controls.Add(Me.lblSRad)
     Me.Controls.Add(Me.txtDec)
     Me.Controls.Add(Me.txtNov)
     Me.Controls.Add(Me.txtOct)
@@ -499,6 +500,11 @@ Public Class frmCmpJPET
     Me.Controls.Add(Me.txtMar)
     Me.Controls.Add(Me.txtFeb)
     Me.Controls.Add(Me.txtJan)
+    Me.Controls.Add(Me.txtTMax)
+    Me.Controls.Add(Me.txtTMin)
+    Me.Controls.Add(Me.txtConstant)
+    Me.Controls.Add(Me.btnSRad)
+    Me.Controls.Add(Me.lblSRad)
     Me.Controls.Add(Me.lblDec)
     Me.Controls.Add(Me.lblNov)
     Me.Controls.Add(Me.lblOct)
@@ -514,14 +520,11 @@ Public Class frmCmpJPET
     Me.Controls.Add(Me.lblMonCoeff)
     Me.Controls.Add(Me.rdoDegC)
     Me.Controls.Add(Me.rdoDegF)
-    Me.Controls.Add(Me.txtTMax)
     Me.Controls.Add(Me.btnTMax)
     Me.Controls.Add(Me.lblTMax)
     Me.Controls.Add(Me.lblTMin)
-    Me.Controls.Add(Me.txtTMin)
     Me.Controls.Add(Me.btnTMin)
     Me.Controls.Add(Me.panelBottom)
-    Me.Controls.Add(Me.txtConstant)
     Me.Controls.Add(Me.lblConstant)
     Me.Controls.Add(Me.lblJensenPET)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -541,26 +544,59 @@ Public Class frmCmpJPET
       aTMaxTS = pTMaxTS
       aSRadTS = pSRadTS
       aDegF = rdoDegF.Checked
-      aCTX = CDbl(txtConstant.Text)
-      aCTS(1) = CDbl(txtJan.Text)
-      aCTS(2) = CDbl(txtFeb.Text)
-      aCTS(3) = CDbl(txtMar.Text)
-      aCTS(4) = CDbl(txtApr.Text)
-      aCTS(5) = CDbl(txtMay.Text)
-      aCTS(6) = CDbl(txtJun.Text)
-      aCTS(7) = CDbl(txtJul.Text)
-      aCTS(8) = CDbl(txtAug.Text)
-      aCTS(9) = CDbl(txtSep.Text)
-      aCTS(10) = CDbl(txtOct.Text)
-      aCTS(11) = CDbl(txtNov.Text)
-      aCTS(12) = CDbl(txtDec.Text)
+      aCTX = cCTX
+      For i As Integer = 1 To 12
+        aCTS(i) = cCTS(i)
+      Next
     End If
     Return pOk
   End Function
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    pOk = True
-    Close()
+    If Not pTMinTS Is Nothing And Not pTMaxTS Is Nothing And Not pSRadTS Is Nothing Then
+      If IsNumeric(txtConstant.Text) Then
+        cCTX = CDbl(txtConstant.Text)
+        If cCTX >= 10 And cCTX <= 27 Then
+          On Error GoTo BadCoeff
+          cCTS(1) = CDbl(txtJan.Text)
+          cCTS(2) = CDbl(txtFeb.Text)
+          cCTS(3) = CDbl(txtMar.Text)
+          cCTS(4) = CDbl(txtApr.Text)
+          cCTS(5) = CDbl(txtMay.Text)
+          cCTS(6) = CDbl(txtJun.Text)
+          cCTS(7) = CDbl(txtJul.Text)
+          cCTS(8) = CDbl(txtAug.Text)
+          cCTS(9) = CDbl(txtSep.Text)
+          cCTS(10) = CDbl(txtOct.Text)
+          cCTS(11) = CDbl(txtNov.Text)
+          cCTS(12) = CDbl(txtDec.Text)
+          pOk = True
+          For i As Integer = 1 To 12
+            If cCTS(i) < 0 Or cCTS(i) > 1 Then
+              pOk = False
+              Logger.Msg("Values for 'Monthly Coefficients' must be between 0 and 1" & vbCrLf & _
+                         "Value for month " & i & " is '" & cCTS(i) & "'", Me.Text & " Problem")
+              Exit For
+            End If
+          Next
+          If pOk Then Close()
+        Else
+          Logger.Msg("Value for 'Constant Coefficient' must be between 10 and 27" & vbCrLf & _
+                     "Value specified is '" & cCTX & "'", Me.Text & " Problem")
+        End If
+      Else
+        Logger.Msg("Value must be specified for 'Constant Coefficient'." & vbCrLf & _
+                   "This value is currently not numeric.", Me.Text & " Problem")
+      End If
+    Else
+      Logger.Msg("No Timeseries selected for 'Min Temp', 'Max Temp', or 'Solar Radiation'." & vbCrLf & _
+                 "Use 'Select' buttons to specify the timeseries", Me.Text & " Problem")
+    End If
+    Exit Sub
+BadCoeff:
+    Logger.Msg("Values must be specified for 'Monthly Coefficients'." & vbCrLf & _
+               "At least one value is currently not numeric.", Me.Text & " Problem")
+
   End Sub
 
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click

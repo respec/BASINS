@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class frmDisTemp
   Inherits System.Windows.Forms.Form
@@ -7,6 +8,7 @@ Public Class frmDisTemp
   Private pTMinTS As atcTimeseries
   Private pTMaxTS As atcTimeseries
   Private pDataManager As atcDataManager
+  Private cObsTime As Integer
 
 #Region " Windows Form Designer generated code "
 
@@ -119,7 +121,7 @@ Public Class frmDisTemp
     '
     Me.btnTMin.Location = New System.Drawing.Point(72, 40)
     Me.btnTMin.Name = "btnTMin"
-    Me.btnTMin.Size = New System.Drawing.Size(48, 24)
+    Me.btnTMin.Size = New System.Drawing.Size(48, 20)
     Me.btnTMin.TabIndex = 18
     Me.btnTMin.Text = "Select"
     '
@@ -152,7 +154,7 @@ Public Class frmDisTemp
     '
     Me.btnTMax.Location = New System.Drawing.Point(72, 71)
     Me.btnTMax.Name = "btnTMax"
-    Me.btnTMax.Size = New System.Drawing.Size(48, 23)
+    Me.btnTMax.Size = New System.Drawing.Size(48, 20)
     Me.btnTMax.TabIndex = 22
     Me.btnTMax.Text = "Select"
     '
@@ -170,13 +172,13 @@ Public Class frmDisTemp
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(464, 173)
     Me.Controls.Add(Me.txtTMax)
+    Me.Controls.Add(Me.txtTMin)
+    Me.Controls.Add(Me.txtObsTime)
     Me.Controls.Add(Me.btnTMax)
     Me.Controls.Add(Me.lblTMax)
     Me.Controls.Add(Me.lblTMin)
-    Me.Controls.Add(Me.txtTMin)
     Me.Controls.Add(Me.btnTMin)
     Me.Controls.Add(Me.panelBottom)
-    Me.Controls.Add(Me.txtObsTime)
     Me.Controls.Add(Me.lblObsTime)
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -194,14 +196,30 @@ Public Class frmDisTemp
     If pOk Then
       aTMinTS = pTMinTS
       aTMaxTS = pTMaxTS
-      aObsTime = CInt(txtObsTime.Text)
+      aObsTime = cObsTime
     End If
     Return pOk
   End Function
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    pOk = True
-    Close()
+    If Not pTMinTS Is Nothing And Not pTMaxTS Is Nothing Then
+      If IsNumeric(txtObsTime.Text) Then
+        cObsTime = CDbl(txtObsTime.Text)
+        If cObsTime >= 1 And cObsTime <= 24 Then
+          pOk = True
+          Close()
+        Else
+          Logger.Msg("Value for 'Observation Hour' must be between 1 and 24" & vbCrLf & _
+                     "Value specified is '" & cObsTime & "'", Me.Text & " Problem")
+        End If
+      Else
+        Logger.Msg("Value must be specified for 'Observation Hour'." & vbCrLf & _
+                   "This value is currently not numeric.", Me.Text & " Problem")
+      End If
+    Else
+      Logger.Msg("No Timeseries selected for 'Min Temp' or 'Max Temp'" & vbCrLf & _
+                 "Use 'Select' buttons to specify the timeseries", Me.Text & " Problem")
+    End If
   End Sub
 
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click

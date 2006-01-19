@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class frmCmpPenman
   Inherits System.Windows.Forms.Form
@@ -285,8 +286,15 @@ Public Class frmCmpPenman
   End Function
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    pOk = True
-    Close()
+    If Not pTMinTS Is Nothing And Not pTMaxTS Is Nothing And Not pSRadTS Is Nothing And _
+       Not pDewPTS Is Nothing And Not pWindTS Is Nothing Then
+      pOk = True
+      Close()
+    Else
+      Logger.Msg("No Timeseries selected for 'Min Temp', 'Max Temp'" & _
+                 "'Solar Radiation', 'Dewpoint Temp', or 'Wind Movement'." & vbCrLf & _
+                 "Use 'Select' buttons to specify the timeseries", "Penman Pan Evaporation Problem")
+    End If
   End Sub
 
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
