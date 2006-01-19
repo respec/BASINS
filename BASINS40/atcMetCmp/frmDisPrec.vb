@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class frmDisPrec
   Inherits System.Windows.Forms.Form
@@ -7,6 +8,8 @@ Public Class frmDisPrec
   Private pDPrecTS As atcTimeseries
   Private pHPrecTS As atcDataGroup
   Private pDataManager As atcDataManager
+  Private cObsTime As Integer
+  Private cDataTol As Double
 
 #Region " Windows Form Designer generated code "
 
@@ -152,7 +155,7 @@ Public Class frmDisPrec
     '
     Me.btnAddHourlyPrec.Location = New System.Drawing.Point(8, 120)
     Me.btnAddHourlyPrec.Name = "btnAddHourlyPrec"
-    Me.btnAddHourlyPrec.Size = New System.Drawing.Size(56, 23)
+    Me.btnAddHourlyPrec.Size = New System.Drawing.Size(56, 20)
     Me.btnAddHourlyPrec.TabIndex = 22
     Me.btnAddHourlyPrec.Text = "Select"
     '
@@ -211,16 +214,16 @@ Public Class frmDisPrec
     Me.ClientSize = New System.Drawing.Size(464, 317)
     Me.Controls.Add(Me.btnSummFile)
     Me.Controls.Add(Me.txtSummFile)
-    Me.Controls.Add(Me.lblSummFile)
     Me.Controls.Add(Me.txtDataTol)
+    Me.Controls.Add(Me.txtDailyPrec)
+    Me.Controls.Add(Me.txtObsTime)
+    Me.Controls.Add(Me.lblSummFile)
     Me.Controls.Add(Me.lblDataTol)
     Me.Controls.Add(Me.lstHourlyPrec)
     Me.Controls.Add(Me.btnAddHourlyPrec)
     Me.Controls.Add(Me.lblHourlyPrec)
-    Me.Controls.Add(Me.txtDailyPrec)
     Me.Controls.Add(Me.btnDailyPrec)
     Me.Controls.Add(Me.panelBottom)
-    Me.Controls.Add(Me.txtObsTime)
     Me.Controls.Add(Me.lblObsTime)
     Me.Controls.Add(Me.lblDailyPrec)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -232,22 +235,49 @@ Public Class frmDisPrec
   End Sub
 
 #End Region
-  Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aDPrecTS As atcTimeseries, ByRef aHPrecTS As atcDataGroup, ByRef aObsTime As Integer, ByRef aTolerance As Double, ByRef aSummFile As String) As Boolean
+  Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aDPrecTS As atcTimeseries, ByRef aHPrecTS As atcDataGroup, ByRef aObsTime As Integer, ByRef aDataTol As Double, ByRef aSummFile As String) As Boolean
     pDataManager = aDataManager
     Me.ShowDialog()
     If pOk Then
       aDPrecTS = pDPrecTS
       aHPrecTS = pHPrecTS
-      aObsTime = CInt(txtObsTime.Text)
-      aTolerance = CDbl(txtDataTol.Text)
+      aObsTime = cObsTime
+      aDataTol = cDataTol
       aSummFile = txtSummFile.Text
     End If
     Return pOk
   End Function
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    pOk = True
-    Close()
+    If Not pDPrecTS Is Nothing Then
+      If Not pHPrecTS Is Nothing AndAlso pHPrecTS.Count > 0 Then
+        If IsNumeric(txtObsTime.Text) And IsNumeric(txtDataTol.Text) Then
+          cObsTime = CInt(txtObsTime.Text)
+          cDataTol = CDbl(txtDataTol.Text)
+          If cObsTime >= 1 And cObsTime <= 24 Then
+            If cDataTol >= 0 And cDataTol <= 100 Then
+              pOk = True
+              Close()
+            Else
+              Logger.Msg("Value for 'Data Tolerance' must be between 0 and 100" & vbCrLf & _
+                         "Value specified is '" & cDataTol & "'", "Disaggregate Daily Precipitation Problem")
+            End If
+          Else
+            Logger.Msg("Value for 'Observation Hour' must be between 1 and 24" & vbCrLf & _
+                       "Value specified is '" & cObsTime & "'", "Disaggregate Daily Precipitation Problem")
+          End If
+        Else
+          Logger.Msg("Values must be specified for 'Observation Hour' and 'Data Tolerance'." & vbCrLf & _
+                     "At least one of these values is currently not numeric.", "Disaggregate Daily Precipitation Problem")
+        End If
+      Else
+        Logger.Msg("No 'Hourly Precipitation Timeseries' selected." & vbCrLf & _
+                   "Use 'Select' button to specify the timeseries.", "Disaggregate Daily Precipitation Problem")
+      End If
+    Else
+      Logger.Msg("No 'Daily Precipitation Timeseries to Disaggregate' selected." & vbCrLf & _
+                 "Use 'Select' button to specify the timeseries.", "Disaggregate Daily Precipitation Problem")
+    End If
   End Sub
 
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click

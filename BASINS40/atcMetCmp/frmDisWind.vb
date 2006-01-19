@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class frmDisWind
   Inherits System.Windows.Forms.Form
@@ -6,6 +7,7 @@ Public Class frmDisWind
   Private pOk As Boolean
   Private pWindTS As atcTimeseries
   Private pDataManager As atcDataManager
+  Private cHrDist(24) As Double
 
 #Region " Windows Form Designer generated code "
 
@@ -146,7 +148,7 @@ Public Class frmDisWind
     '
     Me.btnWind.Location = New System.Drawing.Point(72, 40)
     Me.btnWind.Name = "btnWind"
-    Me.btnWind.Size = New System.Drawing.Size(48, 24)
+    Me.btnWind.Size = New System.Drawing.Size(48, 20)
     Me.btnWind.TabIndex = 18
     Me.btnWind.Text = "Select"
     '
@@ -399,8 +401,6 @@ Public Class frmDisWind
     Me.Controls.Add(Me.txtHr15)
     Me.Controls.Add(Me.txtHr14)
     Me.Controls.Add(Me.txtHr13)
-    Me.Controls.Add(Me.Label1)
-    Me.Controls.Add(Me.lbl1To12)
     Me.Controls.Add(Me.txtHr12)
     Me.Controls.Add(Me.txtHr11)
     Me.Controls.Add(Me.txtHr10)
@@ -413,9 +413,11 @@ Public Class frmDisWind
     Me.Controls.Add(Me.txtHr3)
     Me.Controls.Add(Me.txtHr2)
     Me.Controls.Add(Me.txtHr1)
+    Me.Controls.Add(Me.txtWind)
+    Me.Controls.Add(Me.Label1)
+    Me.Controls.Add(Me.lbl1To12)
     Me.Controls.Add(Me.lblHrDist)
     Me.Controls.Add(Me.lblWind)
-    Me.Controls.Add(Me.txtWind)
     Me.Controls.Add(Me.btnWind)
     Me.Controls.Add(Me.panelBottom)
     Me.Controls.Add(Me.lblCloudCover)
@@ -433,37 +435,69 @@ Public Class frmDisWind
     Me.ShowDialog()
     If pOk Then
       aWindTS = pWindTS
-      aHrDist(1) = CDbl(txtHr1.Text)
-      aHrDist(2) = CDbl(txtHr2.Text)
-      aHrDist(3) = CDbl(txtHr3.Text)
-      aHrDist(4) = CDbl(txtHr4.Text)
-      aHrDist(5) = CDbl(txtHr5.Text)
-      aHrDist(6) = CDbl(txtHr6.Text)
-      aHrDist(7) = CDbl(txtHr7.Text)
-      aHrDist(8) = CDbl(txtHr8.Text)
-      aHrDist(9) = CDbl(txtHr9.Text)
-      aHrDist(10) = CDbl(txtHr10.Text)
-      aHrDist(11) = CDbl(txtHr11.Text)
-      aHrDist(12) = CDbl(txtHr12.Text)
-      aHrDist(13) = CDbl(txtHr13.Text)
-      aHrDist(14) = CDbl(txtHr14.Text)
-      aHrDist(15) = CDbl(txtHr15.Text)
-      aHrDist(16) = CDbl(txtHr16.Text)
-      aHrDist(17) = CDbl(txtHr17.Text)
-      aHrDist(18) = CDbl(txtHr18.Text)
-      aHrDist(19) = CDbl(txtHr19.Text)
-      aHrDist(20) = CDbl(txtHr20.Text)
-      aHrDist(21) = CDbl(txtHr21.Text)
-      aHrDist(22) = CDbl(txtHr22.Text)
-      aHrDist(23) = CDbl(txtHr23.Text)
-      aHrDist(24) = CDbl(txtHr24.Text)
+      For i As Integer = 1 To 24
+        aHrDist(i) = cHrDist(i)
+      Next
     End If
     Return pOk
   End Function
 
   Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-    pOk = True
-    Close()
+    If Not pWindTS Is Nothing Then
+      On Error GoTo BadHourDist
+      cHrDist(1) = CDbl(txtHr1.Text)
+      cHrDist(2) = CDbl(txtHr2.Text)
+      cHrDist(3) = CDbl(txtHr3.Text)
+      cHrDist(4) = CDbl(txtHr4.Text)
+      cHrDist(5) = CDbl(txtHr5.Text)
+      cHrDist(6) = CDbl(txtHr6.Text)
+      cHrDist(7) = CDbl(txtHr7.Text)
+      cHrDist(8) = CDbl(txtHr8.Text)
+      cHrDist(9) = CDbl(txtHr9.Text)
+      cHrDist(10) = CDbl(txtHr10.Text)
+      cHrDist(11) = CDbl(txtHr11.Text)
+      cHrDist(12) = CDbl(txtHr12.Text)
+      cHrDist(13) = CDbl(txtHr13.Text)
+      cHrDist(14) = CDbl(txtHr14.Text)
+      cHrDist(15) = CDbl(txtHr15.Text)
+      cHrDist(16) = CDbl(txtHr16.Text)
+      cHrDist(17) = CDbl(txtHr17.Text)
+      cHrDist(18) = CDbl(txtHr18.Text)
+      cHrDist(19) = CDbl(txtHr19.Text)
+      cHrDist(20) = CDbl(txtHr20.Text)
+      cHrDist(21) = CDbl(txtHr21.Text)
+      cHrDist(22) = CDbl(txtHr22.Text)
+      cHrDist(23) = CDbl(txtHr23.Text)
+      cHrDist(24) = CDbl(txtHr24.Text)
+      pOk = True
+      Dim lTotDist As Double = 0.0
+      For i As Integer = 1 To 24
+        If cHrDist(i) < 0 Or cHrDist(i) > 1 Then
+          pOk = False
+          Logger.Msg("Values for 'Hourly Distribution' must be between 0 and 1" & vbCrLf & _
+                     "Value for month " & i & " is '" & cHrDist(i) & "'", Me.Text & " Problem")
+          Exit For
+        Else
+          lTotDist += cHrDist(i)
+        End If
+      Next
+      If pOk Then 'make sure hourly distributions add up to 1
+        If Math.Abs(lTotDist) - 1 < 0.0001 Then
+          Close()
+        Else
+          pOk = False
+          Logger.Msg("The total for all 'Hourly Distribution' values must summ to 1." & vbCrLf & _
+                     "Currently all values sum to " & "'" & lTotDist & "'", Me.Text & " Problem")
+        End If
+      End If
+    Else
+      Logger.Msg("No 'Daily Wind Timeseries' selected." & vbCrLf & _
+                 "Use 'Select' buttons to specify the timeseries", Me.Text & " Problem")
+    End If
+    Exit Sub
+BadHourDist:
+    Logger.Msg("Values must be specified for 'Hourly Distribution'." & vbCrLf & _
+               "At least one value is currently not numeric.", Me.Text & " Problem")
   End Sub
 
   Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
