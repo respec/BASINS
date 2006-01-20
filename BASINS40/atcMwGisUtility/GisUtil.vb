@@ -263,6 +263,23 @@ Public Class GisUtil
     End If
   End Function
 
+  Public Shared Function LineInPolygon(ByVal aLineLayerIndex As Integer, ByVal aLineIndex As Integer, ByVal aPolygonLayerIndex As Integer, ByVal aPolygonIndex As Integer) As Integer
+    'given a line and a polygon, determine if any part of the line is in the polygon
+    Dim lLineSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLineLayerIndex)
+    Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
+    Dim lLineShape As MapWinGIS.Shape = lLineSf.Shape(aLineIndex - 1)
+    Dim lX As Double, lY As Double
+
+    Dim i As Integer
+    LineInPolygon = False
+    For i = 1 To lLineShape.numPoints
+      lX = lLineShape.Point(i - 1).x
+      lY = lLineShape.Point(i - 1).y
+      LineInPolygon = lPolygonSf.PointInShape(aPolygonIndex, lX, lY)
+      If LineInPolygon Then Exit For
+    Next i
+  End Function
+
   ''' <summary>given a polygon layer (like dem shape) and a containing layer (like subbasins), return which polygon in the containing layer each polygon lies within, determine if polygons overlap</summary>
   ''' <param name="aLayerIndex">
   '''     <para>Index of Layer containing polygon ShapeFile</para>
