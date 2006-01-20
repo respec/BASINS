@@ -305,7 +305,7 @@ Public Class atcMetCmpPlugin
         Dim lSolar As New atcAttributeDefinition
         With lSolar
           .Name = "Solar Radiation"
-          .Category = "Meteorologic Computations"
+          .Category = "Computations"
           .Description = "Generate Solar Radiation from Cloud Cover"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -341,7 +341,7 @@ Public Class atcMetCmpPlugin
         Dim lHamon As New atcAttributeDefinition
         With lHamon
           .Name = "Hamon PET"
-          .Category = "Meteorologic Computations"
+          .Category = "Computations"
           .Description = "Generate PET using Hamon's algorithm"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -371,7 +371,7 @@ Public Class atcMetCmpPlugin
         Dim lJensen As New atcAttributeDefinition
         With lJensen
           .Name = "Jensen PET"
-          .Category = "Meteorologic Computations"
+          .Category = "Computations"
           .Description = "Generate PET using Jensen's algorithm"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -405,7 +405,7 @@ Public Class atcMetCmpPlugin
         Dim lPenman As New atcAttributeDefinition
         With lPenman
           .Name = "Penman Pan Evaporation"
-          .Category = "Meteorologic Computations"
+          .Category = "Computations"
           .Description = "Generate Pan Evaporation using Penman's algorithm"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -429,7 +429,7 @@ Public Class atcMetCmpPlugin
         Dim lWind As New atcAttributeDefinition
         With lWind
           .Name = "Wind Travel"
-          .Category = "Meteorologic Computations"
+          .Category = "Computations"
           .Description = "Generate Daily Wind Travel using Average Daily Wind Speed"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -446,7 +446,7 @@ Public Class atcMetCmpPlugin
         Dim lCldCov As New atcAttributeDefinition
         With lCldCov
           .Name = "Cloud Cover"
-          .Category = "Meteorologic Computations"
+          .Category = "Computations"
           .Description = "Generate Daily Cloud Cover using Daily Percent Sunshine"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -463,7 +463,7 @@ Public Class atcMetCmpPlugin
         Dim lDisSolar As New atcAttributeDefinition
         With lDisSolar
           .Name = "Solar Radiation (Disaggregate)"
-          .Category = "Meteorologic Disaggregations"
+          .Category = "Disaggregations"
           .Description = "Disaggregate Daily Solar Radiation to Hourly"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -478,7 +478,7 @@ Public Class atcMetCmpPlugin
         Dim lDisEvap As New atcAttributeDefinition
         With lDisEvap
           .Name = "Evapotranspiration"
-          .Category = "Meteorologic Disaggregations"
+          .Category = "Disaggregations"
           .Description = "Disaggregate Daily Evapotranspiration to Hourly"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -496,7 +496,7 @@ Public Class atcMetCmpPlugin
         Dim lDisTemp As New atcAttributeDefinition
         With lDisTemp
           .Name = "Temperature"
-          .Category = "Meteorologic Disaggregations"
+          .Category = "Disaggregations"
           .Description = "Disaggregate Daily TMIN/TMAX to Hourly Temperature"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -523,7 +523,7 @@ Public Class atcMetCmpPlugin
         Dim lDisWind As New atcAttributeDefinition
         With lDisWind
           .Name = "Wind (Disaggregate)"
-          .Category = "Meteorologic Disaggregations"
+          .Category = "Disaggregations"
           .Description = "Disaggregate Daily Wind to Hourly"
           .Editable = False
           .TypeString = "atcTimeseries"
@@ -549,7 +549,7 @@ Public Class atcMetCmpPlugin
         Dim lDisPrec As New atcAttributeDefinition
         With lDisPrec
           .Name = "Precipitation"
-          .Category = "Meteorologic Disaggregations"
+          .Category = "Disaggregations"
           .Description = "Disaggregate Daily Precip to Hourly based on nearby Hourly data"
           .Editable = False
           .TypeString = "atcTimeseries"

@@ -137,7 +137,7 @@ Public Class frmCmpSol
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmCmpSol"
-    Me.Text = "Specify Solar Radiation Inputs"
+    Me.Text = "Compute Solar Radiation"
     Me.panelBottom.ResumeLayout(False)
     Me.ResumeLayout(False)
 
@@ -163,15 +163,15 @@ Public Class frmCmpSol
           Close()
         Else
           Logger.Msg("Value for 'Latitude' must be between 25 and 51" & vbCrLf & _
-                     "Value specified is '" & cLat & "'", "Solar Radiation Problem")
+                     "Value specified is '" & cLat & "'", Me.Text & " Problem")
         End If
       Else
         Logger.Msg("Value must be specified for 'Latitude'." & vbCrLf & _
-                   "This value is currently not numeric.", "Solar Radiation Problem")
+                   "This value is currently not numeric.", Me.Text & " Problem")
       End If
     Else
       Logger.Msg("No Timeseries selected for 'Cloud Cover'" & vbCrLf & _
-                 "Use 'Select' button to specify the timeseries", "Solar Radiation Problem")
+                 "Use 'Select' button to specify the timeseries", Me.Text & " Problem")
     End If
   End Sub
 

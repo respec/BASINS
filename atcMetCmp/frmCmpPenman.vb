@@ -121,7 +121,7 @@ Public Class frmCmpPenman
     '
     Me.btnTMin.Location = New System.Drawing.Point(104, 40)
     Me.btnTMin.Name = "btnTMin"
-    Me.btnTMin.Size = New System.Drawing.Size(48, 24)
+    Me.btnTMin.Size = New System.Drawing.Size(48, 20)
     Me.btnTMin.TabIndex = 18
     Me.btnTMin.Text = "Select"
     '
@@ -154,7 +154,7 @@ Public Class frmCmpPenman
     '
     Me.btnTMax.Location = New System.Drawing.Point(104, 72)
     Me.btnTMax.Name = "btnTMax"
-    Me.btnTMax.Size = New System.Drawing.Size(48, 23)
+    Me.btnTMax.Size = New System.Drawing.Size(48, 20)
     Me.btnTMax.TabIndex = 22
     Me.btnTMax.Text = "Select"
     '
@@ -179,7 +179,7 @@ Public Class frmCmpPenman
     '
     Me.btnSRad.Location = New System.Drawing.Point(104, 104)
     Me.btnSRad.Name = "btnSRad"
-    Me.btnSRad.Size = New System.Drawing.Size(48, 23)
+    Me.btnSRad.Size = New System.Drawing.Size(48, 20)
     Me.btnSRad.TabIndex = 52
     Me.btnSRad.Text = "Select"
     '
@@ -212,7 +212,7 @@ Public Class frmCmpPenman
     '
     Me.btnDewP.Location = New System.Drawing.Point(104, 136)
     Me.btnDewP.Name = "btnDewP"
-    Me.btnDewP.Size = New System.Drawing.Size(48, 23)
+    Me.btnDewP.Size = New System.Drawing.Size(48, 20)
     Me.btnDewP.TabIndex = 56
     Me.btnDewP.Text = "Select"
     '
@@ -220,7 +220,7 @@ Public Class frmCmpPenman
     '
     Me.btnWind.Location = New System.Drawing.Point(104, 168)
     Me.btnWind.Name = "btnWind"
-    Me.btnWind.Size = New System.Drawing.Size(48, 23)
+    Me.btnWind.Size = New System.Drawing.Size(48, 20)
     Me.btnWind.TabIndex = 57
     Me.btnWind.Text = "Select"
     '
@@ -265,7 +265,7 @@ Public Class frmCmpPenman
     Me.Controls.Add(Me.lblJensenPET)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmCmpPenman"
-    Me.Text = "Specify Penman Pan Evaporation Inputs"
+    Me.Text = "Compute Penman Pan Evaporation"
     Me.panelBottom.ResumeLayout(False)
     Me.ResumeLayout(False)
 
@@ -293,7 +293,7 @@ Public Class frmCmpPenman
     Else
       Logger.Msg("No Timeseries selected for 'Min Temp', 'Max Temp'" & _
                  "'Solar Radiation', 'Dewpoint Temp', or 'Wind Movement'." & vbCrLf & _
-                 "Use 'Select' buttons to specify the timeseries", "Penman Pan Evaporation Problem")
+                 "Use 'Select' buttons to specify the timeseries", Me.Text & " Problem")
     End If
   End Sub
 

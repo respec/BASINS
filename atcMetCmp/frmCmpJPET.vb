@@ -529,7 +529,7 @@ Public Class frmCmpJPET
     Me.Controls.Add(Me.lblJensenPET)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmCmpJPET"
-    Me.Text = "Specify Jensen PET Inputs"
+    Me.Text = "Compute Jensen PET"
     Me.panelBottom.ResumeLayout(False)
     Me.ResumeLayout(False)
 
