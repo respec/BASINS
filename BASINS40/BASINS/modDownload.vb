@@ -13,107 +13,107 @@ Module modDownload
 
   'Returns file name of new project or "" if not built
   Friend Function CreateNewProjectAndDownloadCoreDataInteractive(ByVal aThemeTag As String, ByVal aSelectedFeatures As ArrayList) As String
-    Dim dataPath As String
-    Dim DefaultProjectFileName As String
-    Dim ProjectFileName As String
-    Dim NoData As Boolean = False
-    Dim defDirName As String
-    Dim newDataDir As String
-    Dim iSuffix As Integer
-    Dim myProjection As String
-    Dim cdlg As Windows.Forms.SaveFileDialog
+    Dim lDataPath As String
+    Dim lDefaultProjectFileName As String
+    Dim lProjectFileName As String
+    Dim lNoData As Boolean = False
+    Dim lDefDirName As String
+    Dim lNewDataDir As String
+    Dim lSuffix As Integer
+    Dim lMyProjection As String
+    Dim lSaveDialog As Windows.Forms.SaveFileDialog
 
 StartOver:
 
-    dataPath = g_BasinsDrives.Chars(0) & ":\Basins\data\"
+    lDataPath = g_BasinsDrives.Chars(0) & ":\Basins\data\"
 
     Select Case aSelectedFeatures.Count
       Case 0
-        If NoData Then
+        If lNoData Then
           'Already came through here, don't ask again
         Else
-          NoData = True
-          If MsgBox("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "BASINS Data Extraction") = MsgBoxResult.No Then
+          lNoData = True
+          If Logger.Msg("No features have been selected.  Do you wish to create a project with no data?", MsgBoxStyle.YesNo, "BASINS Data Extraction") = MsgBoxResult.No Then
             Return ""
           End If
         End If
-        defDirName = "NewProject"
+        lDefDirName = "NewProject"
       Case 1
-        defDirName = aSelectedFeatures(0)
-      Case Else : defDirName = "Multiple"
+        lDefDirName = aSelectedFeatures(0)
+      Case Else : lDefDirName = "Multiple"
     End Select
 
-    If FileExists(dataPath & defDirName, True) Then 'Find a suffix that will make name unique
-      iSuffix = 1
+    If FileExists(lDataPath & lDefDirName, True) Then 'Find a suffix that will make name unique
+      lSuffix = 1
       Do
-        iSuffix = iSuffix + 1
-      Loop While FileExists(dataPath & defDirName & "-" & iSuffix, True)
-      defDirName = defDirName & "-" & iSuffix
+        lSuffix = lSuffix + 1
+      Loop While FileExists(lDataPath & lDefDirName & "-" & lSuffix, True)
+      lDefDirName = lDefDirName & "-" & lSuffix
     End If
 
-    DefaultProjectFileName = dataPath & defDirName & "\" & defDirName & ".mwprj"
-    System.IO.Directory.CreateDirectory(PathNameOnly(DefaultProjectFileName))
+    lDefaultProjectFileName = lDataPath & lDefDirName & "\" & lDefDirName & ".mwprj"
+    System.IO.Directory.CreateDirectory(PathNameOnly(lDefaultProjectFileName))
 
-    cdlg = New Windows.Forms.SaveFileDialog
-    cdlg.Title = "Save new project as..."
-    cdlg.CheckPathExists = False
-    cdlg.FileName = DefaultProjectFileName
-    If cdlg.ShowDialog() <> Windows.Forms.DialogResult.OK Then
-      cdlg.FileName = "\"
-      cdlg.Dispose()
-      System.IO.Directory.Delete(PathNameOnly(DefaultProjectFileName), False) 'Cancelled save dialog
+    lSaveDialog = New Windows.Forms.SaveFileDialog
+    lSaveDialog.Title = "Save new project as..."
+    lSaveDialog.CheckPathExists = False
+    lSaveDialog.FileName = lDefaultProjectFileName
+    If lSaveDialog.ShowDialog() <> Windows.Forms.DialogResult.OK Then
+      lSaveDialog.FileName = "\"
+      lSaveDialog.Dispose()
+      System.IO.Directory.Delete(PathNameOnly(lDefaultProjectFileName), False) 'Cancelled save dialog
       Return ""
     Else
-      ProjectFileName = cdlg.FileName
-      newDataDir = PathNameOnly(ProjectFileName) & "\"
+      lProjectFileName = lSaveDialog.FileName
+      lNewDataDir = PathNameOnly(lProjectFileName) & "\"
 
-      'Make sure cdlg is not holding a reference to the file so we can delete the dir if needed
-      cdlg.FileName = "\"
-      cdlg.Dispose()
+      'Make sure lSaveDialog is not holding a reference to the file so we can delete the dir if needed
+      lSaveDialog.FileName = "\"
+      lSaveDialog.Dispose()
 
       'If the user did not choose the default folder or a subfolder of it
-      If Not newDataDir.ToLower.StartsWith(PathNameOnly(DefaultProjectFileName).ToLower) Then
+      If Not lNewDataDir.ToLower.StartsWith(PathNameOnly(lDefaultProjectFileName).ToLower) Then
         'Remove speculatively created folder since they chose something else
         Try
-          System.IO.Directory.Delete(PathNameOnly(DefaultProjectFileName), False) 'Cancelled save dialog
+          System.IO.Directory.Delete(PathNameOnly(lDefaultProjectFileName), False) 'Cancelled save dialog
         Catch ex As Exception
-          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
+          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(lDefaultProjectFileName) & vbCr & ex.Message)
         End Try
       End If
 
       'Check to see if chosen data dir already contains any files
-      Dim numFiles As Long = System.IO.Directory.GetFiles(newDataDir).LongLength
-      Dim numDirs As Long = System.IO.Directory.GetDirectories(newDataDir).LongLength
-      If numFiles + numDirs > 0 Then
-        Logger.Msg("The folder '" & newDataDir & "'" & vbCr _
-               & "already contains " & numFiles & " files and " & numDirs & " folders." & vbCr _
+      Dim lNumFiles As Long = System.IO.Directory.GetFiles(lNewDataDir).LongLength
+      Dim lNumDirs As Long = System.IO.Directory.GetDirectories(lNewDataDir).LongLength
+      If lNumFiles + lNumDirs > 0 Then
+        Logger.Msg("The folder '" & lNewDataDir & "'" & vbCr _
+               & "already contains " & lNumFiles & " files and " & lNumDirs & " folders." & vbCr _
                & "The folder must be empty before a new project can be created here.", "BASINS Build New")
         GoTo StartOver
       End If
 
-      myProjection = atcProjector.Methods.AskUser
-      If myProjection.Length = 0 Then 'Cancelled projection specification dialog
+      lMyProjection = atcProjector.Methods.AskUser
+      If lMyProjection.Length = 0 Then 'Cancelled projection specification dialog
         Try 'remove already created data directory
-          System.IO.Directory.Delete(PathNameOnly(DefaultProjectFileName), False)
+          System.IO.Directory.Delete(PathNameOnly(lDefaultProjectFileName), False)
         Catch ex As Exception
-          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(DefaultProjectFileName) & vbCr & ex.Message)
+          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(lDefaultProjectFileName) & vbCr & ex.Message)
         End Try
         Return ""
       Else
-        SaveFileString(newDataDir & "prj.proj", myProjection) 'Side effect: makes data directory
+        SaveFileString(lNewDataDir & "prj.proj", lMyProjection) 'Side effect: makes data directory
 
         'TODO: test this with no area selected
-        If NoData Then
+        If lNoData Then
           g_MapWin.Layers.Clear()
-          g_MapWin.Project.Save(ProjectFileName)
+          g_MapWin.Project.Save(lProjectFileName)
           g_MapWin.Project.Modified = True
-          g_MapWin.Project.Save(ProjectFileName)
+          g_MapWin.Project.Save(lProjectFileName)
           g_MapWin.Project.Modified = False
         Else
           'download and project core data
-          CreateNewProjectAndDownloadCoreData(aThemeTag, aSelectedFeatures, dataPath, newDataDir, ProjectFileName)
+          CreateNewProjectAndDownloadCoreData(aThemeTag, aSelectedFeatures, lDataPath, lNewDataDir, lProjectFileName)
         End If
-        Return ProjectFileName
+        Return lProjectFileName
       End If
     End If
   End Function
@@ -124,29 +124,32 @@ StartOver:
                                                  ByVal aDataPath As String, _
                                                  ByVal aNewDataDir As String, _
                                                  ByVal aProjectFileName As String)
-    Dim downloadxml As String
-    Dim iFeature As Integer
-    Dim downloadFilename As String = aDataPath & "download.xml"
-    Dim projectorFilename As String = aDataPath & "ATCProjector.xml"
+    Dim lDownloadXml As String
+    Dim lFeature As Integer
+    Dim lDownloadFilename As String = aDataPath & "download.xml"
+    Dim lProjectorFilename As String = aDataPath & "ATCProjector.xml"
 
-    downloadxml = "<clsWebDataManager>" & vbCrLf & " <status_variables>" & vbCrLf & "  <download_type status=""set by " & XMLappName & """>BasinsInitialSetup</download_type>" & vbCrLf & "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & "  <project_dir status=""set by " & XMLappName & """>" & aNewDataDir & "</project_dir>" & vbCrLf
+    lDownloadXml = "<clsWebDataManager>" & vbCrLf & " <status_variables>" & vbCrLf & "  <download_type status=""set by " & XMLappName & """>BasinsInitialSetup</download_type>" & vbCrLf & "  <launched_by>" & XMLappName & "</launched_by>" & vbCrLf & "  <project_dir status=""set by " & XMLappName & """>" & aNewDataDir & "</project_dir>" & vbCrLf
 
-    For iFeature = 0 To aSelectedFeatures.Count - 1
-      downloadxml &= "  <" & aThemeTag & " status=""set by " & XMLappName & """>" & aSelectedFeatures(iFeature) & "</" & aThemeTag & ">" & vbCrLf
+    For lFeature = 0 To aSelectedFeatures.Count - 1
+      lDownloadXml &= "  <" & aThemeTag & " status=""set by " & XMLappName & """>" & aSelectedFeatures(lFeature) & "</" & aThemeTag & ">" & vbCrLf
     Next
 
-    downloadxml &= " </status_variables>" & vbCrLf & "</clsWebDataManager>" & vbCrLf
+    lDownloadXml &= " </status_variables>" & vbCrLf & "</clsWebDataManager>" & vbCrLf
 
-    If FileExists(projectorFilename) Then Kill(projectorFilename)
+    If FileExists(lProjectorFilename) Then
+      Kill(lProjectorFilename)
+    End If
 
-    SaveFileString(downloadFilename, downloadxml)
-    If DataDownload(downloadFilename) Then 'Succeeded, as far as we know
+    SaveFileString(lDownloadFilename, lDownloadXml)
+    If DataDownload(lDownloadFilename) Then 'Succeeded, as far as we know
       g_MapWin.Layers.Clear()
       g_MapWin.Project.Save(aProjectFileName)
       g_MapWin.Project.Modified = True
-      ProcessProjectorFile(projectorFilename)
+      ProcessProjectorFile(lProjectorFilename)
       AddAllShapesInDir(aNewDataDir, aNewDataDir)
       g_MapWin.Project.Save(aProjectFileName)
+      'TODO: should save set .Modified?
       g_MapWin.Project.Modified = False
     End If
   End Sub
@@ -165,27 +168,30 @@ StartOver:
     If FileExists(lProjectorFilename) Then
       Kill(lProjectorFilename)
     End If
+
     If DataDownload(lDownloadFilename) Then
       ProcessProjectorFile(lProjectorFilename)
     End If
-    Kill(lProjectorFilename)
+
+    If FileExists(lProjectorFilename) Then
+      Kill(lProjectorFilename)
+    End If
   End Sub
 
   Private Sub ProcessProjectorFile(ByVal aProjectorFilename As String)
     Dim lProjectorXML As New Chilkat.Xml
     Dim lProjectorNode As Chilkat.Xml
-    Dim theInputDirName As String
-    Dim theOutputDirName As String
-    Dim theOutputFileName As String
+    Dim lInputDirName As String
+    Dim lOutputDirName As String
+    Dim lOutputFileName As String
     Dim InputFileList As New NameValueCollection
-    Dim vFilename As Object
-    Dim curFilename As String
-    Dim project_dir As String
-    Dim defaultsXML As Chilkat.Xml
-    Dim success As Boolean
-    Dim iproj As String
-    Dim oproj As String
-    Dim layername As String
+    Dim lFileObject As Object
+    Dim lCurFilename As String
+    Dim lProjectDir As String
+    Dim lDefaultsXML As Chilkat.Xml
+    Dim lSuccess As Boolean
+    Dim lInputProjection As String
+    Dim lOutputProjection As String
 
     If Not FileExists(aProjectorFilename) Then
       Logger.Dbg("No new ATCProjector.xml to process")
@@ -196,154 +202,155 @@ StartOver:
         Logger.Dbg("Processing XML: " & lProjectorNode.GetXml)
         Select Case LCase(lProjectorNode.Tag.ToLower)
           Case "add_shape"
-            theOutputFileName = lProjectorNode.Content
-            If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
-            AddShapeToMW(theOutputFileName, GetDefaultsFor(theOutputFileName, project_dir, defaultsXML))
+            lOutputFileName = lProjectorNode.Content
+            If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
+            AddShapeToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
           Case "add_grid"
-            theOutputFileName = lProjectorNode.Content
-            If defaultsXML Is Nothing Then defaultsXML = GetDefaultsXML()
-            AddGridToMW(theOutputFileName, GetDefaultsFor(theOutputFileName, project_dir, defaultsXML))
+            lOutputFileName = lProjectorNode.Content
+            If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
+            AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
           Case "add_allshapes"
-            theOutputFileName = lProjectorNode.Content
-            AddAllShapesInDir(theOutputFileName, project_dir)
+            lOutputFileName = lProjectorNode.Content
+            AddAllShapesInDir(lOutputFileName, lProjectDir)
           Case "project_dir"
-            project_dir = lProjectorNode.Content
-            If Right(project_dir, 1) <> "\" Then project_dir &= "\"
+            lProjectDir = lProjectorNode.Content
+            If Right(lProjectDir, 1) <> "\" Then lProjectDir &= "\"
           Case "convert_shape"
-            theOutputFileName = lProjectorNode.GetAttrValue("output")
-            curFilename = lProjectorNode.Content
-            ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
+            lOutputFileName = lProjectorNode.GetAttrValue("output")
+            lCurFilename = lProjectorNode.Content
+            ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
           Case "convert_grid"
-            theOutputFileName = lProjectorNode.GetAttrValue("output")
-            curFilename = lProjectorNode.Content
-            If FileExists(theOutputFileName) Then
+            lOutputFileName = lProjectorNode.GetAttrValue("output")
+            lCurFilename = lProjectorNode.Content
+            If FileExists(lOutputFileName) Then
               'remove output file
-              System.IO.File.Delete(theOutputFileName)
+              System.IO.File.Delete(lOutputFileName)
             End If
-            If InStr(theOutputFileName, "\nlcd\") > 0 Then
+            If InStr(lOutputFileName, "\nlcd\") > 0 Then
               'exception for nlcd data, already in albers
-              iproj = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+              lInputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
             Else
-              iproj = "+proj=longlat +datum=NAD83"
+              lInputProjection = "+proj=longlat +datum=NAD83"
             End If
-            oproj = WholeFileString(project_dir & "prj.proj")
-            oproj = CleanUpUserProjString(oproj)
-            If iproj = oproj Then
-              System.IO.File.Copy(curFilename, theOutputFileName)
+            lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+            lOutputProjection = CleanUpUserProjString(lOutputProjection)
+            If lInputProjection = lOutputProjection Then
+              System.IO.File.Copy(lCurFilename, lOutputFileName)
             Else
               'project it
               g_MapWin.StatusBar(1).Text = "Projecting Grid..."
               'g_MapWin.View.MapCursor = tkCursor.crsrWait
               g_MapWin.Refresh()
               DoEvents()
-              success = MapWinX.SpatialReference.ProjectGrid(iproj, oproj, curFilename, theOutputFileName, True)
+              lSuccess = MapWinX.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
               g_MapWin.StatusBar(1).Text = ""
-              If Not success Then
+              If Not lSuccess Then
                 Logger.Msg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
-                System.IO.File.Copy(curFilename, theOutputFileName)
+                System.IO.File.Copy(lCurFilename, lOutputFileName)
               End If
               'g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
             End If
           Case "convert_dir"
             'loop through a directory, projecting all files in it
-            theInputDirName = lProjectorNode.Content
-            theOutputDirName = lProjectorNode.GetAttrValue("output")
-            If theOutputDirName Is Nothing OrElse theOutputDirName.Length = 0 Then
-              theOutputDirName = theInputDirName
+            lInputDirName = lProjectorNode.Content
+            lOutputDirName = lProjectorNode.GetAttrValue("output")
+            If lOutputDirName Is Nothing OrElse lOutputDirName.Length = 0 Then
+              lOutputDirName = lInputDirName
             End If
-            If Right(theOutputDirName, 1) <> "\" Then theOutputDirName &= "\"
+            If Right(lOutputDirName, 1) <> "\" Then lOutputDirName &= "\"
 
             InputFileList.Clear()
 
-            AddFilesInDir(InputFileList, theInputDirName, False, "*.shp")
+            AddFilesInDir(InputFileList, lInputDirName, False, "*.shp")
 
-            For Each vFilename In InputFileList
-              curFilename = vFilename
-              If (FileExt(curFilename) = "shp") Then
+            For Each lFileObject In InputFileList
+              lCurFilename = lFileObject
+              If (FileExt(lCurFilename) = "shp") Then
                 'this is a shapefile
-                theOutputFileName = theOutputDirName & FilenameNoPath(curFilename)
+                lOutputFileName = lOutputDirName & FilenameNoPath(lCurFilename)
                 'change projection and merge
-                If (FileExists(theOutputFileName) And (InStr(1, theOutputFileName, "\landuse\") > 0)) Then
+                If (FileExists(lOutputFileName) And (InStr(1, lOutputFileName, "\landuse\") > 0)) Then
                   'if the output file exists and it is a landuse shape, dont bother
                 Else
-                  ShapeUtilMerge(curFilename, theOutputFileName, project_dir & "prj.proj")
+                  ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
                 End If
               End If
-            Next vFilename
+            Next lFileObject
 
           Case Else
             Logger.Msg("Cannot yet follow directive:" & vbCr & lProjectorNode.Tag, "ProcessProjectorFile")
         End Select
 
         If Not lProjectorNode.NextSibling2 Then lProjectorNode = Nothing
+
       End While
     End If
   End Sub
 
-  Private Function CleanUpUserProjString(ByVal ctemp As String) As String
-    Dim ipos As Integer
-    Dim first As Boolean
+  Private Function CleanUpUserProjString(ByVal aProjString As String) As String
+    Dim lPos As Integer
+    Dim lFirst As Boolean
 
-    Do While Mid(ctemp, 1, 1) = "#"
+    Do While Mid(aProjString, 1, 1) = "#"
       'eliminate comment lines at beginning
-      ipos = InStr(ctemp, vbCrLf)
-      ctemp = Mid(ctemp, ipos + 2)
+      lPos = InStr(aProjString, vbCrLf)
+      aProjString = Mid(aProjString, lPos + 2)
     Loop
-    first = True
-    Do While InStr(ctemp, vbCrLf) > 0
+    lfirst = True
+    Do While InStr(aProjString, vbCrLf) > 0
       'strip out unneeded stuff
-      ipos = InStr(ctemp, vbCrLf)
-      If first Then
-        ctemp = Mid(ctemp, ipos + 2)
-        first = False
+      lPos = InStr(aProjString, vbCrLf)
+      If lfirst Then
+        aProjString = Mid(aProjString, lpos + 2)
+        lFirst = False
       Else
-        ctemp = Mid(ctemp, 1, ipos - 1) & " " & Mid(ctemp, ipos + 2)
+        aProjString = Mid(aProjString, 1, lPos - 1) & " " & Mid(aProjString, lPos + 2)
       End If
     Loop
-    If InStr(ctemp, " end ") > 0 Then
-      ctemp = Mid(ctemp, 1, InStr(ctemp, " end ") - 1)
+    If InStr(aProjString, " end ") > 0 Then
+      aProjString = Mid(aProjString, 1, InStr(aProjString, " end ") - 1)
     End If
-    If Len(ctemp) > 0 Then
-      If Mid(ctemp, 1, 9) = "+proj=dd " Then
-        ctemp = "+proj=longlat " & Mid(ctemp, 10)
-        ctemp = ctemp & " +datum=NAD83"
+    If Len(aProjString) > 0 Then
+      If Mid(aProjString, 1, 9) = "+proj=dd " Then
+        aProjString = "+proj=longlat " & Mid(aProjString, 10)
+        aProjString = aProjString & " +datum=NAD83"
       Else
-        ctemp = ctemp & " +datum=NAD83 +units=m"
+        aProjString = aProjString & " +datum=NAD83 +units=m"
       End If
     Else
-      ctemp = "<none>"
+      aProjString = "<none>"
     End If
-    CleanUpUserProjString = ctemp
+    CleanUpUserProjString = aProjString
   End Function
 
   Private Sub ShapeUtilMerge(ByVal aCurFilename As String, ByVal aOutputFilename As String, ByVal aProjectionFilename As String)
-    Dim exe As String = FindFile("Please locate ShapeUtil.exe", "\basins\etc\datadownload\ShapeUtil.exe")
-    If exe.Length > 0 Then
-      Dim layersDBF As String = GetSetting("ShapeMerge", "files", "layers.dbf")
-      If Not FileExists(layersDBF) Then
-        Logger.Dbg("Did not find layers.dbf in registry " & layersDBF)
-        layersDBF = PathNameOnly(exe) & "\layers.dbf"
-        If FileExists(layersDBF) Then
-          Logger.Dbg("Saving layers.dbf location for ShapeUtil: " & layersDBF)
-          SaveSetting("ShapeMerge", "files", "layers.dbf", layersDBF)
+    Dim lShapeUtilExe As String = FindFile("Please locate ShapeUtil.exe", "\basins\etc\datadownload\ShapeUtil.exe")
+    If lShapeUtilExe.Length > 0 Then
+      Dim lLayersDbf As String = GetSetting("ShapeMerge", "files", "layers.dbf")
+      If Not FileExists(lLayersDbf) Then
+        Logger.Dbg("Did not find layers.dbf in registry " & lLayersDbf)
+        lLayersDbf = PathNameOnly(lShapeUtilExe) & "\layers.dbf"
+        If FileExists(lLayersDbf) Then
+          Logger.Dbg("Saving layers.dbf location for ShapeUtil: " & lLayersDbf)
+          SaveSetting("ShapeMerge", "files", "layers.dbf", lLayersDbf)
         Else
-          Logger.Dbg("Did not find layers.dbf in same path as ShapeUtil " & layersDBF)
+          Logger.Dbg("Did not find layers.dbf in same path as ShapeUtil " & lLayersDbf)
         End If
       Else
-        Logger.Dbg("Found " & layersDBF)
+        Logger.Dbg("Found " & lLayersDbf)
       End If
-      'LogCmd("MSG2 Merging " & aCurFilename)
-      'LogCmd("MSG6 into " & aOutputFilename)
-      Shell(exe & " """ & aOutputFilename & """ """ & aCurFilename & """ """ & aProjectionFilename & """", AppWinStyle.NormalNoFocus, True)
+      'Logger.Msg("MSG2 Merging " & aCurFilename)
+      'Logger.Msg("MSG6 into " & aOutputFilename)
+      Shell(lShapeUtilExe & " """ & aOutputFilename & """ """ & aCurFilename & """ """ & aProjectionFilename & """", AppWinStyle.NormalNoFocus, True)
     Else
       Logger.Dbg("Failed to find ShapeUtil.exe for merging " & aCurFilename & " into " & aOutputFilename)
     End If
   End Sub
 
   Private Function DataDownload(ByRef aCommandLine As String) As Boolean
-    Dim exe As String = FindFile("Please locate DataDownload.exe", "\Basins\etc\DataDownload\DataDownload.exe")
-    If exe.Length > 0 Then
-      If Shell(exe & " " & aCommandLine, AppWinStyle.NormalFocus, True) = 0 Then
+    Dim lDataDownloadExe As String = FindFile("Please locate DataDownload.exe", "\Basins\etc\DataDownload\DataDownload.exe")
+    If lDataDownloadExe.Length > 0 Then
+      If Shell(lDataDownloadExe & " " & aCommandLine, AppWinStyle.NormalFocus, True) = 0 Then
         Return True
       Else
         Return False
@@ -375,32 +382,32 @@ StartOver:
   End Function
 
   Private Function GetDefaultsXML() As Chilkat.Xml
-    Dim defaultsXml As Chilkat.Xml
-    Dim defaultsPath As String 'full file name of defaults XML
-    defaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", "\basins\etc\BasinsDefaultLayers.xml")
-    'defaultsPath = "E:\BASINS\etc\BasinsDefaultRenderers.xml"
-    If FileExists(defaultsPath) Then
-      defaultsXml = New Chilkat.Xml
-      defaultsXml.LoadXmlFile(defaultsPath)
+    Dim lDefaultsXML As Chilkat.Xml
+    Dim lDefaultsPath As String 'full file name of defaults XML
+    lDefaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", "\basins\etc\BasinsDefaultLayers.xml")
+    'lDefaultsPath = "E:\BASINS\etc\BasinsDefaultRenderers.xml"
+    If FileExists(lDefaultsPath) Then
+      lDefaultsXML = New Chilkat.Xml
+      lDefaultsXML.LoadXmlFile(lDefaultsPath)
     End If
-    Return defaultsXml
+    Return lDefaultsXML
   End Function
 
   'Adds all shape files found in aPath to the current MapWindow project
-  Public Sub AddAllShapesInDir(ByVal aPath As String, ByVal project_dir As String)
-    Dim iLayer As Integer
+  Public Sub AddAllShapesInDir(ByVal aPath As String, ByVal aProjectDir As String)
+    Dim lLayer As Integer
     Dim Filename As String
     Dim allFiles As New NameValueCollection
-    Dim defaultsXML As Chilkat.Xml = GetDefaultsXML()
+    Dim lDefaultsXML As Chilkat.Xml = GetDefaultsXML()
 
     Logger.Dbg("AddAllShapesInDir: '" & aPath & "'")
 
     If Right(aPath, 1) <> "\" Then aPath = aPath & "\"
     AddFilesInDir(allFiles, aPath, True, "*.shp")
 
-    For iLayer = 0 To allFiles.Count - 1
-      Filename = allFiles.Item(iLayer)
-      AddShapeToMW(Filename, GetDefaultsFor(Filename, project_dir, defaultsXML))
+    For lLayer = 0 To allFiles.Count - 1
+      Filename = allFiles.Item(lLayer)
+      AddShapeToMW(Filename, GetDefaultsFor(Filename, aProjectDir, lDefaultsXML))
     Next
 
     'Remove any empty groups (for example, group "Data Layers" should be empty)
@@ -427,8 +434,8 @@ StartOver:
     Dim RGBoutline As Int32
 
     'Don't add layer again if we already have it
-    For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
-      MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer))
+    For lLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
+      MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(lLayer))
       If MWlay.FileName.ToLower = aFilename.ToLower Then
         Return MWlay
       End If
@@ -561,8 +568,8 @@ StartOver:
     Dim RGBoutline As Int32
 
     'Don't add layer again if we already have it
-    For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
-      MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer))
+    For lLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
+      MWlay = g_MapWin.Layers(g_MapWin.Layers.GetHandle(lLayer))
       If MWlay.FileName.ToLower = aFilename.ToLower Then
         Return MWlay
       End If
@@ -1113,16 +1120,16 @@ StartOver:
   End Function
 
   Private Function GetDefaultsFor(ByVal Filename As String, _
-                                  ByVal project_dir As String, _
+                                  ByVal aProjectDir As String, _
                                   ByRef aDefaultsXml As Chilkat.Xml) As Chilkat.Xml
     Dim lName As String
     Dim layerXml As Chilkat.Xml
 
-    lName = LCase(Filename.Substring(project_dir.Length))
+    lName = LCase(Filename.Substring(aProjectDir.Length))
 
     If Not aDefaultsXml Is Nothing Then
-      For iLayer As Integer = 0 To aDefaultsXml.NumChildren - 1
-        layerXml = aDefaultsXml.GetChild(iLayer)
+      For lLayer As Integer = 0 To aDefaultsXml.NumChildren - 1
+        layerXml = aDefaultsXml.GetChild(lLayer)
         If PatternMatch(lName, "*" & layerXml.GetAttrValue("Filename") & "*") Then
           Return layerXml
         End If
