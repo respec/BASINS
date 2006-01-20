@@ -228,7 +228,7 @@ Public Class frmDisPrec
     Me.Controls.Add(Me.lblDailyPrec)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDisPrec"
-    Me.Text = "Disaggregate Daily Precipitation"
+    Me.Text = "Disaggregate Precipitation"
     Me.panelBottom.ResumeLayout(False)
     Me.ResumeLayout(False)
 
@@ -264,19 +264,19 @@ Public Class frmDisPrec
             End If
           Else
             Logger.Msg("Value for 'Observation Hour' must be between 1 and 24" & vbCrLf & _
-                       "Value specified is '" & cObsTime & "'", "Disaggregate Daily Precipitation Problem")
+                       "Value specified is '" & cObsTime & "'", Me.Text & " Problem")
           End If
         Else
           Logger.Msg("Values must be specified for 'Observation Hour' and 'Data Tolerance'." & vbCrLf & _
-                     "At least one of these values is currently not numeric.", "Disaggregate Daily Precipitation Problem")
+                     "At least one of these values is currently not numeric.", Me.Text & " Problem")
         End If
       Else
         Logger.Msg("No 'Hourly Precipitation Timeseries' selected." & vbCrLf & _
-                   "Use 'Select' button to specify the timeseries.", "Disaggregate Daily Precipitation Problem")
+                   "Use 'Select' button to specify the timeseries.", Me.Text & " Problem")
       End If
     Else
       Logger.Msg("No 'Daily Precipitation Timeseries to Disaggregate' selected." & vbCrLf & _
-                 "Use 'Select' button to specify the timeseries.", "Disaggregate Daily Precipitation Problem")
+                 "Use 'Select' button to specify the timeseries.", Me.Text & " Problem")
     End If
   End Sub
 

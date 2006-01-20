@@ -183,7 +183,7 @@ Public Class frmDisTemp
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDisTemp"
-    Me.Text = "Specify Temperature Disaggregation Inputs"
+    Me.Text = "Disaggregate Temperature"
     Me.panelBottom.ResumeLayout(False)
     Me.ResumeLayout(False)
 

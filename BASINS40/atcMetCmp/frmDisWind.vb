@@ -423,7 +423,7 @@ Public Class frmDisWind
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmDisWind"
-    Me.Text = "Specify Wind Disaggregation Inputs"
+    Me.Text = "Disaggregate Wind"
     Me.panelBottom.ResumeLayout(False)
     Me.ResumeLayout(False)
 

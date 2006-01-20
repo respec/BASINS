@@ -483,7 +483,7 @@ Public Class frmCmpHPET
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmCmpHPET"
-    Me.Text = "Specify Hamon PET Inputs"
+    Me.Text = "Compute Hamon PET"
     Me.panelBottom.ResumeLayout(False)
     Me.ResumeLayout(False)
 
@@ -528,27 +528,27 @@ Public Class frmCmpHPET
             If cCTS(i) < 0 Or cCTS(i) > 1 Then
               pOk = False
               Logger.Msg("Values for 'Monthly Coefficients' must be between 0 and 1" & vbCrLf & _
-                         "Value for month " & i & " is '" & cCTS(i) & "'", "Hamon PET Problem")
+                         "Value for month " & i & " is '" & cCTS(i) & "'", Me.Text & " Problem")
               Exit For
             End If
           Next
           If pOk Then Close()
         Else
           Logger.Msg("Value for 'Latitude' must be between 25 and 51" & vbCrLf & _
-                     "Value specified is '" & cLat & "'", "Hamon PET Problem")
+                     "Value specified is '" & cLat & "'", Me.Text & " Problem")
         End If
       Else
         Logger.Msg("Value must be specified for 'Latitude'." & vbCrLf & _
-                   "This value is currently not numeric.", "Hamon PET Problem")
+                   "This value is currently not numeric.", Me.Text & " Problem")
       End If
     Else
       Logger.Msg("No Timeseries selected for 'Min Temp' or 'Max Temp'" & vbCrLf & _
-                   "Use 'Select' buttons to specify the timeseries", "Hamon PET Problem")
+                   "Use 'Select' buttons to specify the timeseries", Me.Text & " Problem")
     End If
     Exit Sub
 BadCoeff:
     Logger.Msg("Values must be specified for 'Monthly Coefficients'." & vbCrLf & _
-               "At least one value is currently not numeric.", "Hamon PET Problem")
+               "At least one value is currently not numeric.", Me.Text & " Problem")
 
   End Sub
 
