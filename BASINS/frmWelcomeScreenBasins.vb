@@ -475,13 +475,15 @@ Public Class frmWelcomeScreenBasins
   End Sub
 
   Private Sub lbConvert_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles lbConvert.LinkClicked
-    MsgBox("Select the BASINS Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OKOnly, "BASINS 4")
+    Logger.Msg("Select the BASINS Project to convert from the PullDown Menu that appears when you click OK", MsgBoxStyle.OKOnly, "BASINS 4")
     Me.Close()
     SendKeys.Send("%FB")
   End Sub
 
   Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbBasinsHelp.Click
     Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", lAppInfo.DefaultDir & "\docs\Basins4.chm")
-    If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
+    If FileExists(lHelpFilename) Then
+      System.Diagnostics.Process.Start(lHelpFilename)
+    End If
   End Sub
 End Class

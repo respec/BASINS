@@ -149,7 +149,7 @@ Friend Module modBasinsPlugin
         lThemeTag = "state_abbrev"
         lFieldName = "ST"
       Case Else
-        Logger.Msg("Unknown layer for selection, using first field", "Area Selection")
+        Logger.Msg("Unknown layer for selection, using lFirst field", "Area Selection")
         lThemeTag = "huc_cd"
         lFieldMatch = 1
     End Select
