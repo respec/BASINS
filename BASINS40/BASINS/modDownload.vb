@@ -193,6 +193,7 @@ StartOver:
     Dim lInputProjection As String
     Dim lOutputProjection As String
 
+    g_MapWin.View.MapCursor = tkCursor.crsrWait
     If Not FileExists(aProjectorFilename) Then
       Logger.Dbg("No new ATCProjector.xml to process")
     Else
@@ -239,7 +240,6 @@ StartOver:
             Else
               'project it
               g_MapWin.StatusBar(1).Text = "Projecting Grid..."
-              'g_MapWin.View.MapCursor = tkCursor.crsrWait
               g_MapWin.Refresh()
               DoEvents()
               lSuccess = MapWinX.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
@@ -248,7 +248,6 @@ StartOver:
                 Logger.Msg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
                 System.IO.File.Copy(lCurFilename, lOutputFileName)
               End If
-              'g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
             End If
           Case "convert_dir"
             'loop through a directory, projecting all files in it
@@ -285,6 +284,7 @@ StartOver:
 
       End While
     End If
+    g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
   End Sub
 
   Private Function CleanUpUserProjString(ByVal aProjString As String) As String
@@ -605,9 +605,9 @@ StartOver:
 
       'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
       If LCase(aFilename).IndexOf("\demg\") > 0 Then
-        'SetDEMGColors(MWlay, g)
+        SetElevationGridColors(MWlay, g)
       ElseIf LCase(aFilename).IndexOf("\ned\") > 0 Then
-        'SetNEDColors(MWlay, g)
+        SetElevationGridColors(MWlay, g)
       ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
         SetLandUseColorsGrid(MWlay, g)
       End If
@@ -972,6 +972,15 @@ StartOver:
 
     MWlay.ColoringScheme = colorScheme
 
+  End Sub
+
+  Private Sub SetElevationGridColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
+    Dim colorBreak As MapWinGIS.GridColorBreak
+    Dim colorScheme As MapWinGIS.GridColorScheme
+
+    colorScheme = New MapWinGIS.GridColorScheme
+    colorScheme.UsePredefined(g.Minimum, g.Maximum, PredefinedColorScheme.FallLeaves)
+    MWlay.ColoringScheme = colorScheme
   End Sub
 
   Public Sub SetCensusRenderer(ByVal MWlay As MapWindow.Interfaces.Layer, Optional ByVal shpFile As MapWinGIS.Shapefile = Nothing)
