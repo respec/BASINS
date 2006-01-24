@@ -24,9 +24,9 @@ Module modDownload
     Dim lSaveDialog As Windows.Forms.SaveFileDialog
 
 StartOver:
-
     lDataPath = g_BasinsDrives.Chars(0) & ":\Basins\data\"
 
+    Logger.Dbg("SelectedFeatures" & aSelectedFeatures.Count)
     Select Case aSelectedFeatures.Count
       Case 0
         If lNoData Then
@@ -40,19 +40,22 @@ StartOver:
         lDefDirName = "NewProject"
       Case 1
         lDefDirName = aSelectedFeatures(0)
-      Case Else : lDefDirName = "Multiple"
+      Case Else
+        lDefDirName = "Multiple"
     End Select
 
     If FileExists(lDataPath & lDefDirName, True) Then 'Find a suffix that will make name unique
-      lSuffix = 1
+      lSuffix = 0
       Do
-        lSuffix = lSuffix + 1
+        lSuffix += 1
       Loop While FileExists(lDataPath & lDefDirName & "-" & lSuffix, True)
       lDefDirName = lDefDirName & "-" & lSuffix
     End If
 
     lDefaultProjectFileName = lDataPath & lDefDirName & "\" & lDefDirName & ".mwprj"
-    System.IO.Directory.CreateDirectory(PathNameOnly(lDefaultProjectFileName))
+    lDefDirName = PathNameOnly(lDefaultProjectFileName)
+    Logger.Dbg("CreateNewProjectDirectory:" & lDefDirName)
+    System.IO.Directory.CreateDirectory(lDefDirName)
 
     lSaveDialog = New Windows.Forms.SaveFileDialog
     lSaveDialog.Title = "Save new project as..."
@@ -62,22 +65,26 @@ StartOver:
       lSaveDialog.FileName = "\"
       lSaveDialog.Dispose()
       System.IO.Directory.Delete(PathNameOnly(lDefaultProjectFileName), False) 'Cancelled save dialog
+      Logger.Dbg("CreateNewProject:CANCELLED")
       Return ""
     Else
       lProjectFileName = lSaveDialog.FileName
       lNewDataDir = PathNameOnly(lProjectFileName) & "\"
+      Logger.Dbg("CreateNewProjectDir:" & lNewDataDir)
+      Logger.Dbg("CreateNewProjectName:" & lProjectFileName)
 
       'Make sure lSaveDialog is not holding a reference to the file so we can delete the dir if needed
       lSaveDialog.FileName = "\"
       lSaveDialog.Dispose()
 
       'If the user did not choose the default folder or a subfolder of it
-      If Not lNewDataDir.ToLower.StartsWith(PathNameOnly(lDefaultProjectFileName).ToLower) Then
+      If Not lNewDataDir.ToLower.StartsWith(lDefDirName.ToLower) Then
         'Remove speculatively created folder since they chose something else
         Try
-          System.IO.Directory.Delete(PathNameOnly(lDefaultProjectFileName), False) 'Cancelled save dialog
+          System.IO.Directory.Delete(lDefDirName, False) 'Cancelled save dialog or changed directory
+          Logger.Dbg("RemoveSpeculativeProjectDir:" & lDefDirName)
         Catch ex As Exception
-          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(lDefaultProjectFileName) & vbCr & ex.Message)
+          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & lDefDirName & vbCr & ex.Message)
         End Try
       End If
 
@@ -94,23 +101,29 @@ StartOver:
       lMyProjection = atcProjector.Methods.AskUser
       If lMyProjection.Length = 0 Then 'Cancelled projection specification dialog
         Try 'remove already created data directory
-          System.IO.Directory.Delete(PathNameOnly(lDefaultProjectFileName), False)
+          System.IO.Directory.Delete(lNewDataDir, False)
+          Logger.Dbg("RemoveProjectDir:" & lNewDataDir & " dueToProjectionCancel")
         Catch ex As Exception
-          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & PathNameOnly(lDefaultProjectFileName) & vbCr & ex.Message)
+          Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & lNewDataDir & vbCr & ex.Message)
         End Try
         Return ""
       Else
+        Logger.Dbg("Projection:" & lMyProjection)
         SaveFileString(lNewDataDir & "prj.proj", lMyProjection) 'Side effect: makes data directory
 
-        'TODO: test this with no area selected
         If lNoData Then
-          g_MapWin.Layers.Clear()
-          g_MapWin.Project.Save(lProjectFileName)
-          g_MapWin.Project.Modified = True
-          g_MapWin.Project.Save(lProjectFileName)
-          g_MapWin.Project.Modified = False
+          Logger.Dbg("EmptyProjectCreated")
+          With g_MapWin
+            .Layers.Clear()
+            .PreviewMap.GetPictureFromMap()
+            .Project.Save(lProjectFileName)
+            .Project.Modified = True
+            .Project.Save(lProjectFileName)
+            .Project.Modified = False
+          End With
         Else
           'download and project core data
+          Logger.Dbg("DownloadData:" & aThemeTag)
           CreateNewProjectAndDownloadCoreData(aThemeTag, aSelectedFeatures, lDataPath, lNewDataDir, lProjectFileName)
         End If
         Return lProjectFileName
