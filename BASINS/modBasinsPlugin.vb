@@ -11,6 +11,7 @@ Friend Module modBasinsPlugin
   Public g_MapWinWindowHandle As Integer
   Public g_AppName As String = "BASINS4"
   Public g_BasinsDrives As String = ""
+  Public pBuildFrm As frmBuildNew
 
   Friend pCommandLineScript As Boolean = False
   Friend pBuiltInScriptExists As Boolean = False
@@ -90,6 +91,9 @@ Friend Module modBasinsPlugin
   End Sub
 
   Friend Sub LoadNationalProject()
+    Dim newFrm As New frmBuildNew
+    pBuildFrm = newFrm
+
     If Not NationalProjectIsOpen() Then
       Dim lDrive As Integer
       Dim lAllFiles As New NameValueCollection
@@ -112,9 +116,11 @@ Friend Module modBasinsPlugin
       End If
     End If
     If NationalProjectIsOpen() Then
-      Logger.Msg("Select the Area(s) of Interest by a Mouse Click, " & vbCr & _
-                 "then Download from the Data menu" & vbCr & _
-                 "to create a new BASINS project", "Build BASINS Project")
+      'Logger.Msg("Select the Area(s) of Interest by a Mouse Click, " & vbCr & _
+      '           "then Download from the Data menu" & vbCr & _
+      '           "to create a new BASINS project", "Build BASINS Project")
+      newFrm.Show()
+      UpdateSelectedFeatures()
       'TODO: default to Select
       'g_MapWin.Toolbar.ButtonItem("mwSelect").Pressed = True
     End If
@@ -285,5 +291,67 @@ Friend Module modBasinsPlugin
   '    Logger.Msg("Exception:" & ex.ToString, "clsPlugIn:BuiltInScript")
   '  End Try
   'End Sub
+
+  Friend Sub UpdateSelectedFeatures()
+    Dim lFieldName As String
+    Dim lFieldDesc As String
+    Dim lField As Integer
+    Dim lNameIndex As Integer = -1
+    Dim lDescIndex As Integer = -1
+    Dim lCurLayer As MapWinGIS.Shapefile
+    Dim ctext As String
+
+    g_MapWin.Refresh()
+    ctext = "Selected Features:" & vbCrLf & "  <none>"
+    If g_MapWin.Layers.CurrentLayer > -1 Then
+      lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+
+      If g_MapWin.View.SelectedShapes.NumSelected > 0 Then
+        ctext = "Selected Features:"
+        Select Case FilenameOnly(lCurLayer.Filename).ToLower
+          Case "cat", "huc", "huc250d3"
+            lFieldName = "CU"
+            lFieldDesc = "catname"
+          Case "cnty"
+            lFieldName = "FIPS"
+            lFieldDesc = "cntyname"
+          Case "st"
+            lFieldName = "ST"
+            lFieldDesc = "name"
+        End Select
+
+        lFieldName = lFieldName.ToLower
+        lFieldDesc = lFieldDesc.ToLower
+        For lField = 0 To lCurLayer.NumFields - 1
+          If lCurLayer.Field(lField).Name.ToLower = lFieldName Then
+            lNameIndex = lField
+          End If
+          If lCurLayer.Field(lField).Name.ToLower = lFieldDesc Then
+            lDescIndex = lField
+          End If
+        Next
+
+        Dim lSelected As Integer
+        Dim lShape As Integer
+        Dim lname As String
+        Dim ldesc As String
+        Dim lSf As MapWinGIS.Shapefile = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
+        For lSelected = 0 To g_MapWin.View.SelectedShapes.NumSelected - 1
+          lShape = g_MapWin.View.SelectedShapes.Item(lSelected).ShapeIndex()
+          lname = ""
+          ldesc = ""
+          If lNameIndex > -1 Then
+            lname = lSf.CellValue(lNameIndex, lShape)
+          End If
+          If lDescIndex > -1 Then
+            ldesc = lSf.CellValue(lDescIndex, lShape)
+          End If
+          ctext = ctext & vbCrLf & "  " & lname & " : " & ldesc
+        Next
+      End If
+    End If
+    pBuildFrm.txtSelected.Text = ctext
+
+  End Sub
 
 End Module

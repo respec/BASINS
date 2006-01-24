@@ -488,6 +488,9 @@ Public Class atcBasinsPlugIn
 
   Public Sub LayerSelected(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerSelected
     'This event fires when a user selects a layer in the legend. 
+    If NationalProjectIsOpen() Then
+      UpdateSelectedFeatures()
+    End If
   End Sub
 
   Public Sub LegendDoubleClick(ByVal Handle As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendDoubleClick
@@ -620,5 +623,8 @@ Public Class atcBasinsPlugIn
     'This event fires when the user selects one or more shapes using the select tool in MapWindow. Handle is the 
     'Layer handle for the shapefile on which shapes were selected. SelectInfo holds information abou the 
     'shapes that were selected. 
+    If NationalProjectIsOpen() Then
+      UpdateSelectedFeatures()
+    End If
   End Sub
 End Class
