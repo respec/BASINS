@@ -13,8 +13,13 @@ Public Class frmCliGen
   Dim cHeader As String
   Dim cFooter As String
   Dim cTable As atcTableFixed
+  Dim cParmStr As String 'string form of cTable
+  Dim cParms As New atcCollection 'of booleans indicating which parameters to edit
+  Dim cParmsFile As String 'file containing list of parameters to edit
   Dim cParmFileFilter As String = "Cligen Parameter Files (*.par)|*.par"
   Dim cOutFileFilter As String = "Cligen Output Files (*.dat)|*.dat"
+  Dim cParms2EditFilter As String = "Cligen Parameters to Edit Files (*.prm)|*.prm"
+  Dim cModByPercent As Boolean = False
 
 #Region " Windows Form Designer generated code "
 
@@ -62,9 +67,17 @@ Public Class frmCliGen
   Friend WithEvents txtOutFile As System.Windows.Forms.TextBox
   Friend WithEvents btnCancel As System.Windows.Forms.Button
   Friend WithEvents agdMonParms As atcControls.atcGrid
+  Friend WithEvents btnSelParms As System.Windows.Forms.Button
+  Friend WithEvents lblEditVals As System.Windows.Forms.Label
+  Friend WithEvents rdoAbs As System.Windows.Forms.RadioButton
+  Friend WithEvents rdoPct As System.Windows.Forms.RadioButton
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCliGen))
     Me.GroupBox1 = New System.Windows.Forms.GroupBox
+    Me.rdoPct = New System.Windows.Forms.RadioButton
+    Me.rdoAbs = New System.Windows.Forms.RadioButton
+    Me.lblEditVals = New System.Windows.Forms.Label
+    Me.btnSelParms = New System.Windows.Forms.Button
     Me.agdMonParms = New atcControls.atcGrid
     Me.lblStation = New System.Windows.Forms.Label
     Me.btnParmFile = New System.Windows.Forms.Button
@@ -89,14 +102,59 @@ Public Class frmCliGen
     Me.GroupBox1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.GroupBox1.Controls.Add(Me.rdoPct)
+    Me.GroupBox1.Controls.Add(Me.rdoAbs)
+    Me.GroupBox1.Controls.Add(Me.lblEditVals)
+    Me.GroupBox1.Controls.Add(Me.btnSelParms)
     Me.GroupBox1.Controls.Add(Me.agdMonParms)
     Me.GroupBox1.Controls.Add(Me.lblStation)
     Me.GroupBox1.Location = New System.Drawing.Point(8, 152)
     Me.GroupBox1.Name = "GroupBox1"
-    Me.GroupBox1.Size = New System.Drawing.Size(456, 256)
+    Me.GroupBox1.Size = New System.Drawing.Size(655, 248)
     Me.GroupBox1.TabIndex = 1
     Me.GroupBox1.TabStop = False
     Me.GroupBox1.Text = "Station Parameters"
+    '
+    'rdoPct
+    '
+    Me.rdoPct.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.rdoPct.Enabled = False
+    Me.rdoPct.Location = New System.Drawing.Point(576, 224)
+    Me.rdoPct.Name = "rdoPct"
+    Me.rdoPct.Size = New System.Drawing.Size(72, 16)
+    Me.rdoPct.TabIndex = 16
+    Me.rdoPct.Text = "Percent"
+    '
+    'rdoAbs
+    '
+    Me.rdoAbs.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.rdoAbs.Checked = True
+    Me.rdoAbs.Enabled = False
+    Me.rdoAbs.Location = New System.Drawing.Point(576, 208)
+    Me.rdoAbs.Name = "rdoAbs"
+    Me.rdoAbs.Size = New System.Drawing.Size(72, 16)
+    Me.rdoAbs.TabIndex = 15
+    Me.rdoAbs.TabStop = True
+    Me.rdoAbs.Text = "Absolute"
+    '
+    'lblEditVals
+    '
+    Me.lblEditVals.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lblEditVals.Location = New System.Drawing.Point(496, 216)
+    Me.lblEditVals.Name = "lblEditVals"
+    Me.lblEditVals.Size = New System.Drawing.Size(88, 16)
+    Me.lblEditVals.TabIndex = 14
+    Me.lblEditVals.Text = "Edit Values by:"
+    '
+    'btnSelParms
+    '
+    Me.btnSelParms.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.btnSelParms.Enabled = False
+    Me.btnSelParms.Location = New System.Drawing.Point(32, 212)
+    Me.btnSelParms.Name = "btnSelParms"
+    Me.btnSelParms.Size = New System.Drawing.Size(152, 20)
+    Me.btnSelParms.TabIndex = 11
+    Me.btnSelParms.Text = "Select Parms to View/Edit"
     '
     'agdMonParms
     '
@@ -109,7 +167,7 @@ Public Class frmCliGen
     Me.agdMonParms.LineWidth = 0.0!
     Me.agdMonParms.Location = New System.Drawing.Point(4, 88)
     Me.agdMonParms.Name = "agdMonParms"
-    Me.agdMonParms.Size = New System.Drawing.Size(448, 152)
+    Me.agdMonParms.Size = New System.Drawing.Size(647, 112)
     Me.agdMonParms.Source = Nothing
     Me.agdMonParms.TabIndex = 3
     '
@@ -119,7 +177,7 @@ Public Class frmCliGen
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblStation.Location = New System.Drawing.Point(8, 24)
     Me.lblStation.Name = "lblStation"
-    Me.lblStation.Size = New System.Drawing.Size(440, 56)
+    Me.lblStation.Size = New System.Drawing.Size(639, 56)
     Me.lblStation.TabIndex = 2
     Me.lblStation.Text = "Name:"
     '
@@ -134,7 +192,7 @@ Public Class frmCliGen
     'btnRun
     '
     Me.btnRun.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnRun.Location = New System.Drawing.Point(208, 424)
+    Me.btnRun.Location = New System.Drawing.Point(308, 416)
     Me.btnRun.Name = "btnRun"
     Me.btnRun.Size = New System.Drawing.Size(80, 24)
     Me.btnRun.TabIndex = 4
@@ -143,7 +201,7 @@ Public Class frmCliGen
     'btnSave
     '
     Me.btnSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnSave.Location = New System.Drawing.Point(112, 424)
+    Me.btnSave.Location = New System.Drawing.Point(212, 416)
     Me.btnSave.Name = "btnSave"
     Me.btnSave.Size = New System.Drawing.Size(80, 24)
     Me.btnSave.TabIndex = 5
@@ -152,7 +210,7 @@ Public Class frmCliGen
     'btnCancel
     '
     Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnCancel.Location = New System.Drawing.Point(304, 424)
+    Me.btnCancel.Location = New System.Drawing.Point(404, 416)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(56, 24)
     Me.btnCancel.TabIndex = 6
@@ -229,7 +287,7 @@ Public Class frmCliGen
     Me.txtParmFile.Location = New System.Drawing.Point(144, 40)
     Me.txtParmFile.Name = "txtParmFile"
     Me.txtParmFile.ReadOnly = True
-    Me.txtParmFile.Size = New System.Drawing.Size(320, 20)
+    Me.txtParmFile.Size = New System.Drawing.Size(519, 20)
     Me.txtParmFile.TabIndex = 16
     Me.txtParmFile.Text = ""
     '
@@ -240,14 +298,14 @@ Public Class frmCliGen
     Me.txtOutFile.Location = New System.Drawing.Point(144, 72)
     Me.txtOutFile.Name = "txtOutFile"
     Me.txtOutFile.ReadOnly = True
-    Me.txtOutFile.Size = New System.Drawing.Size(320, 20)
+    Me.txtOutFile.Size = New System.Drawing.Size(519, 20)
     Me.txtOutFile.TabIndex = 17
     Me.txtOutFile.Text = ""
     '
     'frmCliGen
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(473, 453)
+    Me.ClientSize = New System.Drawing.Size(672, 445)
     Me.Controls.Add(Me.txtOutFile)
     Me.Controls.Add(Me.txtParmFile)
     Me.Controls.Add(Me.txtStartYear)
@@ -289,12 +347,13 @@ Public Class frmCliGen
     agdMonParms.Source = New atcGridSource
     agdMonParms.Clear()
     With agdMonParms.Source
-      .Rows = 3
-      .Columns = 13
+      .Rows = 1
+      .Columns = 14
       .FixedRows = 1
       .ColorCells = True
       .CellColor(0, 0) = SystemColors.ControlDark
     End With
+    GetParmsToEdit() 'read file containing parameters to be edited
     Me.Refresh()
   End Sub
 
@@ -302,7 +361,11 @@ Public Class frmCliGen
     pParmFileName = FindFile("Select CliGen Parameter file to open", , , cParmFileFilter, True, , 1)
     If Len(pParmFileName) > 0 Then
       txtParmFile.Text = pParmFileName
-      ReadParmFile(pParmFileName, cHeader, cTable, cFooter)
+      If ReadParmFile(pParmFileName, cHeader, cTable, cFooter) Then
+        btnSelParms.Enabled = True
+        rdoAbs.Enabled = True
+        rdoPct.Enabled = True
+      End If
     End If
   End Sub
 
@@ -324,7 +387,7 @@ Public Class frmCliGen
     Close()
   End Sub
 
-  Private Sub ReadParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As atcTableFixed, ByRef aFooter As String)
+  Private Function ReadParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As atcTableFixed, ByRef aFooter As String) As Boolean
     Dim lStr As String
     Dim lpos As Integer
     lStr = WholeFileString(aFileName)
@@ -338,16 +401,25 @@ Public Class frmCliGen
         aFooter = Mid(lStr, lpos)
         lStr = Mid(lStr, 1, lpos - 1)
       End If
-      If Len(lStr) > 0 Then
+      If Len(lStr) > 0 Then 'only editable table parameters left
         aTable = New atcTableFixed
+        cParmStr = lStr
         If aTable.OpenString(lStr) Then 'load table into grid
-          ReadParmTable(lStr)
+          If ReadParmTable(lStr) Then
+            Return True
+          Else
+            Return False
+          End If
         End If
       End If
+    Else
+      Logger.Msg("CliGen parameters not found in file " & pParmFileName & vbCrLf & _
+                 "Expecting to find parameters starting with 'MEAN P'", "CliGen Problem")
+      Return False
     End If
-  End Sub
+  End Function
 
-  Private Sub ReadParmTable(ByVal aParmStr As String)
+  Private Function ReadParmTable(ByVal aParmStr As String) As Boolean
 
     Dim lSCol() As Integer = {0, 1, 9, 15, 21, 27, 33, 39, 45, 51, 57, 63, 69, 75, 81}
     Dim lFLen() As Integer = {0, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6}
@@ -365,21 +437,15 @@ Public Class frmCliGen
         .FieldStart(i) = lSCol(i)
         agdMonParms.Source.CellValue(0, i - 1) = lFldNames(i)
       Next
-      If cTable.OpenString(aParmStr) Then
-        While Not cTable.atEOF
-          lRow += 1
-          For i = 1 To .NumFields
-            agdMonParms.Source.CellValue(lRow, i - 1) = .Value(i)
-            If i > 1 Then agdMonParms.Source.CellEditable(lRow, i - 1) = True
-          Next i
-          .MoveNext()
-        End While
-        agdMonParms.SizeAllColumnsToContents()
-        agdMonParms.Refresh()
-      End If
     End With
+    agdMonParms.Source.CellValue(0, 13) = "Edit Row"
+    If LoadGrid(aParmStr) Then
+      Return True
+    Else
+      Return False
+    End If
 
-  End Sub
+  End Function
 
   Private Sub WriteParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As IatcTable, ByRef aFooter As String)
     Dim lStr As String
@@ -450,5 +516,124 @@ Public Class frmCliGen
       Logger.Msg("Both 'Parameter' and 'Output' file names must be specified before running CliGen." & vbCrLf & _
                  "Use the 'Select' buttons next to each file type to specify the file names.", "Run CliGen Problem")
     End If
+  End Sub
+
+  Private Function LoadGrid(ByVal aParmStr As String) As Boolean
+    Dim lRow As Integer
+    Dim lParm As String
+    Dim lWind As String = ""
+    With cTable
+      If .OpenString(aParmStr) Then
+        agdMonParms.Source.Rows = 1
+        While Not .atEOF
+          lParm = Trim(.Value(1))
+          If lParm.IndexOf("%") >= 0 Then lWind = lParm
+          If lWind.Length > 0 And (lParm.StartsWith("MEAN") Or lParm.StartsWith("STD DEV") Or lParm.StartsWith("SKEW")) Then
+            lParm = lWind & "-" & lParm
+          End If
+          If cParms.IndexFromKey(lParm) = -1 Then 'this parm not in collection, assume editing
+            cParms.Add(lParm, True)
+          End If
+          If cParms.ItemByKey(lParm) Then 'this parm selected for editing
+            lRow += 1
+            With agdMonParms.Source
+              For i As Integer = 1 To cTable.NumFields
+                .CellValue(lRow, i - 1) = cTable.Value(i)
+                If i > 1 Then .CellEditable(lRow, i - 1) = True
+              Next i
+              .CellValue(lRow, cTable.NumFields) = "0"
+              .CellEditable(lRow, cTable.NumFields) = True
+            End With
+          End If
+          .MoveNext()
+        End While
+        agdMonParms.SizeAllColumnsToContents()
+        agdMonParms.Refresh()
+        Return True
+      Else
+        Logger.Msg("Problem reading parameter table from Cligen file " & pParmFileName, "CliGen Problem")
+        Return False
+      End If
+    End With
+  End Function
+
+  Private Sub GetParmsToEdit()
+    cParmsFile = FindFile("Locate file containing CliGen parameters to be edited", "CliGenEdit.prm", "*.prm", cParms2EditFilter)
+    If cParmsFile.Length > 0 Then 'read parms 2 edit file
+      Dim lStr As String = WholeFileString(cParmsFile)
+      Dim lParm As String
+      cParms.Clear()
+      While lStr.Length > 0
+        lParm = StrSplit(lStr, vbCrLf, "")
+        If lParm.Chars(0) = "#" Then 'not currently editing this parm
+          cParms.Add(lParm.TrimStart("#"), False)
+        Else
+          cParms.Add(lParm, True)
+        End If
+      End While
+    End If
+  End Sub
+
+  Private Sub WriteParmsToEdit()
+    Dim lStr As String
+    If cParmsFile.Length = 0 Then
+      Dim cdlg As New Windows.Forms.SaveFileDialog
+      With cdlg
+        .Title = "Save File of CliGen Parameters to edit"
+        .FileName = cParmsFile
+        .Filter = cParms2EditFilter
+        .OverwritePrompt = True
+        If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+          cParmsFile = AbsolutePath(.FileName, CurDir)
+        End If
+      End With
+    End If
+    If cParmsFile.Length > 0 Then
+      For i As Integer = 0 To cParms.Count - 1
+        If cParms.ItemByIndex(i) Then
+          lStr += cParms.Keys.Item(i)
+        Else
+          lStr += "#" & cParms.Keys.Item(i)
+        End If
+        lStr += vbCrLf
+      Next
+      SaveFileString(cParmsFile, lStr)
+    End If
+  End Sub
+
+  Private Sub btnSelParms_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelParms.Click
+    Dim lform As New frmCliGenParmList
+    If lform.AskUser(cParms) Then
+      WriteParmsToEdit()
+      LoadGrid(cParmStr)
+    End If
+  End Sub
+
+  Private Sub agdMonParms_CellEdited(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMonParms.CellEdited
+    With agdMonParms
+      If aColumn = 13 AndAlso IsNumeric(.Source.CellValue(aRow, aColumn)) Then
+        Dim lModVal As Double = CDbl(.Source.CellValue(aRow, aColumn))
+        Dim lCurVal As Double
+        For i As Integer = 1 To 12
+          If IsNumeric(.Source.CellValue(aRow, aColumn)) Then
+            lCurVal = CDbl(.Source.CellValue(aRow, i))
+            If cModByPercent Then
+              lCurVal = lCurVal * (1 + lModVal / 100.0)
+            Else
+              lCurVal += lModVal
+            End If
+            .Source.CellValue(aRow, i) = lCurVal
+          Else
+            Logger.Msg("Value in Row '" & aRow & "' and Column '" & aColumn & "' is not numeric ('" & .Source.CellValue(aRow, aColumn) & "') and cannot be updated." & vbCrLf & _
+                       "Make sure all values are numeric before editing a row of values.", "CliGen Problem")
+          End If
+        Next
+        .Refresh()
+      End If
+    End With
+  End Sub
+
+  Private Sub rdoPct_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rdoPct.CheckedChanged
+    cModByPercent = rdoPct.Checked
   End Sub
 End Class

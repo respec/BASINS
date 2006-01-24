@@ -178,6 +178,16 @@
                     DependentUpon = "frmCliGen.vb"
                     BuildAction = "EmbeddedResource"
                 />
+                <File
+                    RelPath = "frmCligGenParmList.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmCligGenParmList.resx"
+                    DependentUpon = "frmCligGenParmList.vb"
+                    BuildAction = "EmbeddedResource"
+                />
             </Include>
         </Files>
     </VisualBasic>
