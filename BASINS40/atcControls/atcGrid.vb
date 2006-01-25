@@ -557,11 +557,21 @@ Public Class atcGrid
     End If
   End Function
 
-  Public Sub SizeAllColumnsToContents()
+  ' aTotalWidth = desired final total width of all columns
+  ' if aShrinkToTotalWidth is false, columns will not be resized smaller to match aTotalWidth
+  Public Sub SizeAllColumnsToContents(Optional ByVal aTotalWidth As Integer = 0, _
+                                      Optional ByVal aShrinkToTotalWidth As Boolean = False)
     Dim lMaxColumn As Integer = pSource.Columns - 1
+    Dim lContentsWidth As Integer = 0
     For lCol As Integer = 0 To lMaxColumn
       SizeColumnToContents(lCol)
+      lContentsWidth += ColumnWidth(lcol)
     Next
+    If aTotalWidth > 0 AndAlso (aShrinkToTotalWidth OrElse aTotalWidth > lContentsWidth) Then
+      For lCol As Integer = 0 To lMaxColumn
+        ColumnWidth(lcol) = ColumnWidth(lcol) * aTotalWidth / lContentsWidth
+      Next
+    End If
   End Sub
 
   Public Sub SizeColumnToContents(ByVal aColumn As Integer)
