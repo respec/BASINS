@@ -303,7 +303,7 @@ Friend Module modBasinsPlugin
 
     g_MapWin.Refresh()
     ctext = "Selected Features:" & vbCrLf & "  <none>"
-    If g_MapWin.Layers.CurrentLayer > -1 Then
+    If g_MapWin.Layers.NumLayers > 0 And g_MapWin.Layers.CurrentLayer > -1 Then
       lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
 
       If g_MapWin.View.SelectedShapes.NumSelected > 0 Then
