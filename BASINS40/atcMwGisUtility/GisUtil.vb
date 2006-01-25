@@ -1530,4 +1530,38 @@ Public Class GisUtil
     isf.StopEditingShapes(True)
   End Sub
 
+  Public Shared Function AreaOverlappingPolygons(ByVal Layer1index As Integer, ByVal Layer1FeatureIndex As Integer, _
+                             ByVal Layer2index As Integer, ByVal Layer2FeatureIndex As Integer) As Single
+    'overlay feature from layer1 with feature from layer2, 
+    'determining area of feature 1 in feature 2
+    AreaOverlappingPolygons = 0.0
+
+    'set layer 1 
+    Dim lLayer As MapWindow.Interfaces.Layer
+    lLayer = GetMappingObject.Layers(Layer1index)
+    Dim sf1 As MapWinGIS.Shapefile
+    sf1 = lLayer.GetObject
+    Dim shape1 As MapWinGIS.Shape
+    shape1 = sf1.Shape(Layer1FeatureIndex)
+
+    'set layer 2 
+    Dim lLayer2 As MapWindow.Interfaces.Layer
+    lLayer2 = GetMappingObject.Layers(layer2index)
+    Dim sf2 As MapWinGIS.Shapefile
+    sf2 = lLayer2.GetObject
+    Dim shape2 As MapWinGIS.Shape
+    shape2 = sf2.Shape(Layer2FeatureIndex)
+
+    Dim utilClip As New MapWinGIS.Utils
+    Dim utilArea As New MapWinGIS.Utils
+    Dim newshape As MapWinGIS.Shape
+
+    newshape = utilClip.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, shape1, shape2)
+    If newshape.numPoints > 0 Then
+      AreaOverlappingPolygons = Math.Abs(utilArea.Area(newshape))
+    End If
+    newshape = Nothing
+
+  End Function
+
 End Class
