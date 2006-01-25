@@ -183,6 +183,59 @@ Public Module modMetCompute
 
   End Function
 
+  Public Function CmpHamX(ByVal aTIntrvl As atcTimeseries, ByVal aSource As atcDataSource, ByVal aDegF As Boolean, ByVal aLatDeg As Double, ByVal aCTS() As Double) As atcTimeseries
+    'compute HAMON - PET from less than daily air temperature timeseries
+    Dim lMin As Double = 1.0E+30, lMax As Double = -1.0E+30
+    Dim lValue As Double, lDate As Double, lDateYesterday As Integer = 0
+    Dim lIndex As Integer
+    Dim lMinValues As New ArrayList
+    Dim lMaxValues As New ArrayList
+    Dim lDates As New ArrayList
+
+    For lIndex = 1 To aTIntrvl.numValues
+      lDate = aTIntrvl.Dates.Value(lIndex)
+      If lDateYesterday = 0 Then
+        lDateYesterday = CInt(lDate)
+      ElseIf CInt(lDate) <> lDateYesterday Then
+        lMinValues.Add(lMin)
+        lMaxValues.Add(lMax)
+        lDates.Add(CDbl(lDateYesterday))
+        lDateYesterday = CInt(lDate)
+        lMin = 1.0E+30
+        lMax = -1.0E+30
+      End If
+      lValue = aTIntrvl.Value(lIndex)
+      If lValue < lMin Then
+        lMin = lValue
+      End If
+      If lValue > lMax Then
+        lMax = lValue
+      End If
+    Next
+
+    Dim lDatesTS As New atcTimeseries(aSource)
+    lDatesTS.numValues = lDates.Count
+    Dim lTMinTS As New atcTimeseries(aSource)
+    Dim lTMaxTS As New atcTimeseries(aSource)
+    lTMinTS.Attributes.SetValue("TS", 1)
+    lTMaxTS.Attributes.SetValue("TS", 1)
+    lTMinTS.Attributes.SetValue("TU", 4)
+    lTMaxTS.Attributes.SetValue("TU", 4)
+    lTMinTS.Dates = lDatesTS
+    lTMaxTS.Dates = lDatesTS
+    lTMinTS.numValues = lMinValues.Count
+    lTMaxTS.numValues = lMaxValues.Count
+    lDatesTS.Value(0) = lDates(0)
+    For lIndex = 1 To lMaxValues.Count
+      lDatesTS.Value(lIndex) = lDates(lIndex - 1) + 1
+      lTMinTS.Value(lIndex) = lMinValues(lIndex - 1)
+      lTMaxTS.Value(lIndex) = lMaxValues(lIndex - 1)
+    Next
+    Logger.Dbg("CmpHamX:Count:" & lMaxValues.Count)
+
+    Return CmpHam(lTMinTS, lTMaxTS, aSource, aDegF, aLatDeg, aCTS)
+  End Function
+
   Public Function CmpHam(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSource As atcDataSource, ByVal aDegF As Boolean, ByVal aLatDeg As Double, ByVal aCTS() As Double) As atcTimeseries
     'compute HAMON - PET
     'aTminTS/aTMaxTS - min/max temp timeseries
@@ -308,7 +361,7 @@ Public Module modMetCompute
     lCmpTs.numValues = aPctSun.numValues
 
     lSunVals = aPctSun.Values
-      'see if sunshine values are percent or fraction
+    'see if sunshine values are percent or fraction
     i = 1
     j = 0
     Do While j < 5 And i <= aPctSun.numValues
