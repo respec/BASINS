@@ -15,6 +15,7 @@ Public Class frmCliGen
   Dim cTable As atcTableFixed
   Dim cParmStr As String 'string form of cTable
   Dim cParms As New atcCollection 'of booleans indicating which parameters to edit
+  Dim cParmDescs As New atcCollection 'of strings describing parameters to edit
   Dim cParmsFile As String 'file containing list of parameters to edit
   Dim cParmFileFilter As String = "Cligen Parameter Files (*.par)|*.par"
   Dim cOutFileFilter As String = "Cligen Output Files (*.dat)|*.dat"
@@ -71,9 +72,11 @@ Public Class frmCliGen
   Friend WithEvents rdoAbs As System.Windows.Forms.RadioButton
   Friend WithEvents rdoPct As System.Windows.Forms.RadioButton
   Friend WithEvents fraStaParms As System.Windows.Forms.GroupBox
+  Friend WithEvents btnReset As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCliGen))
     Me.fraStaParms = New System.Windows.Forms.GroupBox
+    Me.btnReset = New System.Windows.Forms.Button
     Me.rdoPct = New System.Windows.Forms.RadioButton
     Me.rdoAbs = New System.Windows.Forms.RadioButton
     Me.lblEditVals = New System.Windows.Forms.Label
@@ -102,6 +105,7 @@ Public Class frmCliGen
     Me.fraStaParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.fraStaParms.Controls.Add(Me.btnReset)
     Me.fraStaParms.Controls.Add(Me.rdoPct)
     Me.fraStaParms.Controls.Add(Me.rdoAbs)
     Me.fraStaParms.Controls.Add(Me.lblEditVals)
@@ -110,16 +114,26 @@ Public Class frmCliGen
     Me.fraStaParms.Controls.Add(Me.lblStation)
     Me.fraStaParms.Location = New System.Drawing.Point(8, 152)
     Me.fraStaParms.Name = "fraStaParms"
-    Me.fraStaParms.Size = New System.Drawing.Size(695, 248)
+    Me.fraStaParms.Size = New System.Drawing.Size(727, 296)
     Me.fraStaParms.TabIndex = 1
     Me.fraStaParms.TabStop = False
     Me.fraStaParms.Text = "Station Parameters"
     '
+    'btnReset
+    '
+    Me.btnReset.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnReset.Enabled = False
+    Me.btnReset.Location = New System.Drawing.Point(560, 256)
+    Me.btnReset.Name = "btnReset"
+    Me.btnReset.Size = New System.Drawing.Size(136, 20)
+    Me.btnReset.TabIndex = 17
+    Me.btnReset.Text = "Reset to Original Values"
+    '
     'rdoPct
     '
-    Me.rdoPct.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.rdoPct.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.rdoPct.Enabled = False
-    Me.rdoPct.Location = New System.Drawing.Point(616, 224)
+    Me.rdoPct.Location = New System.Drawing.Point(640, 56)
     Me.rdoPct.Name = "rdoPct"
     Me.rdoPct.Size = New System.Drawing.Size(72, 16)
     Me.rdoPct.TabIndex = 16
@@ -127,10 +141,10 @@ Public Class frmCliGen
     '
     'rdoAbs
     '
-    Me.rdoAbs.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.rdoAbs.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.rdoAbs.Checked = True
     Me.rdoAbs.Enabled = False
-    Me.rdoAbs.Location = New System.Drawing.Point(616, 208)
+    Me.rdoAbs.Location = New System.Drawing.Point(640, 40)
     Me.rdoAbs.Name = "rdoAbs"
     Me.rdoAbs.Size = New System.Drawing.Size(72, 16)
     Me.rdoAbs.TabIndex = 15
@@ -139,8 +153,8 @@ Public Class frmCliGen
     '
     'lblEditVals
     '
-    Me.lblEditVals.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblEditVals.Location = New System.Drawing.Point(536, 216)
+    Me.lblEditVals.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lblEditVals.Location = New System.Drawing.Point(624, 24)
     Me.lblEditVals.Name = "lblEditVals"
     Me.lblEditVals.Size = New System.Drawing.Size(88, 16)
     Me.lblEditVals.TabIndex = 14
@@ -150,7 +164,7 @@ Public Class frmCliGen
     '
     Me.btnSelParms.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
     Me.btnSelParms.Enabled = False
-    Me.btnSelParms.Location = New System.Drawing.Point(32, 212)
+    Me.btnSelParms.Location = New System.Drawing.Point(32, 256)
     Me.btnSelParms.Name = "btnSelParms"
     Me.btnSelParms.Size = New System.Drawing.Size(152, 20)
     Me.btnSelParms.TabIndex = 11
@@ -162,23 +176,22 @@ Public Class frmCliGen
     Me.agdMonParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.agdMonParms.BackColor = System.Drawing.SystemColors.Control
     Me.agdMonParms.CellBackColor = System.Drawing.Color.Empty
     Me.agdMonParms.Enabled = False
     Me.agdMonParms.LineColor = System.Drawing.Color.Empty
     Me.agdMonParms.LineWidth = 0.0!
-    Me.agdMonParms.Location = New System.Drawing.Point(4, 88)
+    Me.agdMonParms.Location = New System.Drawing.Point(4, 80)
     Me.agdMonParms.Name = "agdMonParms"
-    Me.agdMonParms.Size = New System.Drawing.Size(687, 112)
+    Me.agdMonParms.Size = New System.Drawing.Size(719, 160)
     Me.agdMonParms.Source = Nothing
     Me.agdMonParms.TabIndex = 3
     '
     'lblStation
     '
-    Me.lblStation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblStation.Location = New System.Drawing.Point(8, 24)
     Me.lblStation.Name = "lblStation"
-    Me.lblStation.Size = New System.Drawing.Size(679, 56)
+    Me.lblStation.Size = New System.Drawing.Size(400, 56)
     Me.lblStation.TabIndex = 2
     Me.lblStation.Text = "Name:"
     '
@@ -193,7 +206,7 @@ Public Class frmCliGen
     'btnRun
     '
     Me.btnRun.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnRun.Location = New System.Drawing.Point(328, 416)
+    Me.btnRun.Location = New System.Drawing.Point(344, 464)
     Me.btnRun.Name = "btnRun"
     Me.btnRun.Size = New System.Drawing.Size(80, 24)
     Me.btnRun.TabIndex = 4
@@ -202,7 +215,7 @@ Public Class frmCliGen
     'btnSave
     '
     Me.btnSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnSave.Location = New System.Drawing.Point(232, 416)
+    Me.btnSave.Location = New System.Drawing.Point(248, 464)
     Me.btnSave.Name = "btnSave"
     Me.btnSave.Size = New System.Drawing.Size(80, 24)
     Me.btnSave.TabIndex = 5
@@ -211,7 +224,7 @@ Public Class frmCliGen
     'btnCancel
     '
     Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnCancel.Location = New System.Drawing.Point(424, 416)
+    Me.btnCancel.Location = New System.Drawing.Point(440, 464)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(56, 24)
     Me.btnCancel.TabIndex = 6
@@ -288,7 +301,7 @@ Public Class frmCliGen
     Me.txtParmFile.Location = New System.Drawing.Point(144, 40)
     Me.txtParmFile.Name = "txtParmFile"
     Me.txtParmFile.ReadOnly = True
-    Me.txtParmFile.Size = New System.Drawing.Size(559, 20)
+    Me.txtParmFile.Size = New System.Drawing.Size(591, 20)
     Me.txtParmFile.TabIndex = 16
     Me.txtParmFile.Text = ""
     '
@@ -299,14 +312,14 @@ Public Class frmCliGen
     Me.txtOutFile.Location = New System.Drawing.Point(144, 72)
     Me.txtOutFile.Name = "txtOutFile"
     Me.txtOutFile.ReadOnly = True
-    Me.txtOutFile.Size = New System.Drawing.Size(559, 20)
+    Me.txtOutFile.Size = New System.Drawing.Size(591, 20)
     Me.txtOutFile.TabIndex = 17
     Me.txtOutFile.Text = ""
     '
     'frmCliGen
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(712, 445)
+    Me.ClientSize = New System.Drawing.Size(744, 493)
     Me.Controls.Add(Me.txtOutFile)
     Me.Controls.Add(Me.txtParmFile)
     Me.Controls.Add(Me.txtStartYear)
@@ -351,9 +364,12 @@ Public Class frmCliGen
       .Rows = 1
       .Columns = 15
       .FixedRows = 1
+      .FixedColumns = 1
       .ColorCells = True
-      .CellColor(0, 0) = SystemColors.ControlDark
-      .CellColor(0, 13) = SystemColors.ControlDark
+      For i As Integer = 0 To .Columns - 1
+        .CellColor(0, i) = SystemColors.ControlLight
+        If i > 0 Then .Alignment(0, i) = atcAlignment.HAlignCenter
+      Next
     End With
     GetParmsToEdit() 'read file containing parameters to be edited
     Me.Refresh()
@@ -368,6 +384,7 @@ Public Class frmCliGen
         btnSelParms.Enabled = True
         rdoAbs.Enabled = True
         rdoPct.Enabled = True
+        btnReset.Enabled = True
       End If
     End If
   End Sub
@@ -545,16 +562,23 @@ Public Class frmCliGen
             lRow += 1
             With agdMonParms.Source
               For i As Integer = 1 To cTable.NumFields
-                .CellValue(lRow, i - 1) = cTable.Value(i)
                 If i = 1 Then
-                  .CellColor(lRow, i - 1) = SystemColors.ControlDark
+                  If cParmDescs.IndexFromKey(lParm) = -1 Then 'no description, use label from parm file 
+                    .CellValue(lRow, i - 1) = Trim(cTable.Value(i))
+                  Else
+                    .CellValue(lRow, i - 1) = cParmDescs.ItemByKey(lParm)
+                  End If
+                  .CellColor(lRow, i - 1) = SystemColors.ControlLight
                 Else
-                  .CellEditable(lRow, i - 1) = True
-                End If
+                    .CellValue(lRow, i - 1) = Trim(cTable.Value(i))
+                    .CellEditable(lRow, i - 1) = True
+                    .Alignment(lRow, i - 1) = atcAlignment.HAlignCenter
+                  End If
               Next i
-              .CellColor(lRow, cTable.NumFields) = SystemColors.ControlDark
+              .CellColor(lRow, cTable.NumFields) = SystemColors.ControlLight
               .CellValue(lRow, cTable.NumFields + 1) = "0"
               .CellEditable(lRow, cTable.NumFields + 1) = True
+              .Alignment(lRow, cTable.NumFields + 1) = atcAlignment.HAlignCenter
             End With
           End If
           .MoveNext()
@@ -574,14 +598,22 @@ Public Class frmCliGen
     If cParmsFile.Length > 0 Then 'read parms 2 edit file
       Dim lStr As String = WholeFileString(cParmsFile)
       Dim lParm As String
+      Dim lDesc As String = ""
+      Dim lPos As Integer
       cParms.Clear()
       While lStr.Length > 0
         lParm = StrSplit(lStr, vbCrLf, "")
+        lPos = lParm.IndexOf("'")
+        If lPos > 0 Then 'description exists for this parm
+          lDesc = Trim(lParm.Substring(lPos + 1))
+          lParm = Trim(lParm.Substring(0, lPos))
+        End If
         If lParm.Chars(0) = "#" Then 'not currently editing this parm
           cParms.Add(lParm.TrimStart("#"), False)
         Else
           cParms.Add(lParm, True)
         End If
+        If lDesc.Length > 0 Then cParmDescs.Add(lParm, lDesc)
       End While
     End If
   End Sub
@@ -607,6 +639,9 @@ Public Class frmCliGen
         Else
           lStr += "#" & cParms.Keys.Item(i)
         End If
+        If cParmDescs.Count = cParms.Count Then 'include description
+          lStr += " '" & cParmDescs.ItemByIndex(i)
+        End If
         lStr += vbCrLf
       Next
       SaveFileString(cParmsFile, lStr)
@@ -615,7 +650,7 @@ Public Class frmCliGen
 
   Private Sub btnSelParms_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelParms.Click
     Dim lform As New frmCliGenParmList
-    If lform.AskUser(cParms) Then
+    If lform.AskUser(cParms, cParmDescs) Then
       WriteParmsToEdit()
       LoadGrid(cParmStr)
     End If
@@ -660,5 +695,9 @@ Public Class frmCliGen
       agdMonParms.SizeAllColumnsToContents(fraStaParms.Width - 30)
       agdMonParms.Refresh()
     End If
+  End Sub
+
+  Private Sub btnReset_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnReset.Click
+    LoadGrid(cParmStr)
   End Sub
 End Class
