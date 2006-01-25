@@ -109,24 +109,29 @@ Public Class frmCliGenParmList
   End Sub
 
 #End Region
-  Public Function AskUser(ByRef aParms As atcCollection) As Boolean
+  Public Function AskUser(ByRef aParms As atcCollection, ByVal aParmDescs As atcCollection) As Boolean
     Dim i As Integer
+    Dim lStr As String
     For i = 0 To aParms.Count - 1
-      If aParms.ItemByIndex(i) Then
-        chklstParms.Items.Add(aParms.Keys.Item(i), True)
+      If aParmDescs.Count = aParms.Count Then
+        lStr = aParmDescs.ItemByIndex(i)
       Else
-        chklstParms.Items.Add(aParms.Keys.Item(i), False)
+        lStr = aParms.Keys.Item(i)
+      End If
+      If aParms.ItemByIndex(i) Then
+        chklstParms.Items.Add(lStr, True)
+      Else
+        chklstParms.Items.Add(lStr, False)
       End If
     Next
     Me.ShowDialog()
     If pOk Then
-      aParms.Clear()
       With chklstParms
         For i = 0 To .Items.Count - 1
-          If .GetItemChecked(i) Then
-            aParms.Add(.GetItemText(.Items(i)), True)
-          Else
-            aParms.Add(.GetItemText(.Items(i)), False)
+          If .GetItemChecked(i) <> aParms.ItemByIndex(i) Then 'turned parm on/off
+            lStr = aParms.Keys.Item(i)
+            aParms.RemoveAt(i)
+            aParms.Insert(i, lStr, .GetItemChecked(i))
           End If
         Next
       End With
