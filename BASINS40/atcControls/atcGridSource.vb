@@ -241,10 +241,13 @@ Public Class atcGridSource
 
     For iCol As Integer = 0 To lMaxCol
       For iRow As Integer = 0 To lMaxRow
-        If CellValue(iRow, iCol).IndexOf(vbTab) > -1 Then
-          lAddTabs(iCol) = True
-          Exit For
-        End If
+        Try
+          If CellValue(iRow, iCol).IndexOf(vbTab) > -1 Then
+            lAddTabs(iCol) = True
+            Exit For
+          End If
+        Catch 'Ignore empty cells
+        End Try
       Next
     Next
 
@@ -252,6 +255,7 @@ Public Class atcGridSource
     For iRow As Integer = 0 To lMaxRow
       For iCol As Integer = 0 To lMaxCol
         lCellValue = CellValue(iRow, iCol)
+        If lCellValue Is Nothing Then lCellValue = ""
         ToString &= lCellValue
         'Some modified values contain "<tab>(+10%)", add a tab to those that don't
         If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then ToString &= vbTab

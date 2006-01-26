@@ -178,7 +178,7 @@ Public Class atcGrid
   Public Property ColumnWidth(ByVal aColumn As Integer) As Integer
     Get
       If pColumnWidth.Count = 0 Then
-        Logger.Msg("atcGrid:ColumnWidth:Get: Unexpected pColumnWidth.Count = 0")
+        'Logger.Msg("atcGrid:ColumnWidth:Get: Unexpected pColumnWidth.Count = 0")
         Return 0
       ElseIf aColumn < pColumnWidth.Count Then 'Return last defined width
         Return pColumnWidth(aColumn)
@@ -233,7 +233,7 @@ Public Class atcGrid
       End If
     End Get
     Set(ByVal newValue As Integer)
-      If aRow < pRowHeight.Count Then 'Change existing width of this column
+      If aRow < pRowHeight.Count Then 'Change existing width of this row
         pRowHeight(aRow) = newValue
       Else 'Need to add one or more row heights to include this one
         For newRow As Integer = pRowHeight.Count To aRow
