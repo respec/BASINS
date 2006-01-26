@@ -609,7 +609,8 @@ Public Class frmCliGen
           lParm = Trim(lParm.Substring(0, lPos))
         End If
         If lParm.Chars(0) = "#" Then 'not currently editing this parm
-          cParms.Add(lParm.TrimStart("#"), False)
+          lParm = lParm.TrimStart("#")
+          cParms.Add(lParm, False)
         Else
           cParms.Add(lParm, True)
         End If
