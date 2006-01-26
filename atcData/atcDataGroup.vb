@@ -203,6 +203,22 @@ Public Class atcDataGroup
     Remove(lRemoveThese)
   End Sub
 
+  Public Function FindData(ByVal aName As String, ByVal aValue As String, ByVal aLimit As Integer) As atcDataGroup
+    Dim lMatch As New atcDataGroup
+    Try
+      For Each lDataset As atcDataSet In Me
+        If CStr(lDataset.Attributes.GetValue(aName)).ToLower = aValue.ToLower Then
+          lMatch.Add(lDataset)
+          If lMatch.Count = aLimit Then 'note default limit is 0, never match
+            Exit For
+          End If
+        End If
+      Next
+    Catch
+    End Try
+    Return lMatch
+  End Function
+
   Public Property SelectedData() As atcDataGroup
     Get
       If pSelectedData Is Nothing Then 'Initialize now if not already done
