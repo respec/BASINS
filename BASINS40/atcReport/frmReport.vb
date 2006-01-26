@@ -145,7 +145,7 @@ Public Class frmReport
     Me.cmdCancel.Name = "cmdCancel"
     Me.cmdCancel.Size = New System.Drawing.Size(88, 34)
     Me.cmdCancel.TabIndex = 24
-    Me.cmdCancel.Text = "Cancel"
+    Me.cmdCancel.Text = "Close"
     '
     'lbxReports
     '
@@ -155,6 +155,7 @@ Public Class frmReport
     Me.lbxReports.ItemHeight = 17
     Me.lbxReports.Location = New System.Drawing.Point(40, 144)
     Me.lbxReports.Name = "lbxReports"
+    Me.lbxReports.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
     Me.lbxReports.Size = New System.Drawing.Size(384, 191)
     Me.lbxReports.TabIndex = 25
     '
@@ -262,7 +263,7 @@ Public Class frmReport
     Dim AreaLayerName As String
     Dim AreaIDFieldName As String
     Dim AreaNameFieldName As String
-    Dim aArgs(4) As Object
+    Dim aArgs(5) As Object
 
     If lbxReports.SelectedItems.Count = 0 Then
       MsgBox("At least one report must be selected to generate.", MsgBoxStyle.OKOnly, "BASINS Report Problem")
@@ -311,9 +312,15 @@ Public Class frmReport
       'now run each script
       Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
       For i = 0 To lbxReports.SelectedItems.Count - 1
+        'create form for output
+        Dim frmout As New frmResult
+        aArgs(5) = frmout
         'run each selected script
         'GIRASLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4))
-        Scripting.Run("vb", "", pReportsColl(lbxReports.SelectedIndices(i) + 1), cerror, False, pMappingObject, aArgs)
+        'NLCDLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4))
+        ListedSegmentsTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
+        'Population2000Table.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
+        'Scripting.Run("vb", "", pReportsColl(lbxReports.SelectedIndices(i) + 1), cerror, False, pMappingObject, aArgs)
         If Len(cerror) > 0 Then
           MsgBox(cerror)
         End If

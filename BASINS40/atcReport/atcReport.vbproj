@@ -106,6 +106,11 @@
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
                     Private = "False"
                 />
+                <Reference
+                    Name = "atcControls"
+                    Project = "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
             </References>
             <Imports>
                 <Import Namespace = "Microsoft.VisualBasic" />
@@ -140,7 +145,32 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "frmResult.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmResult.resx"
+                    DependentUpon = "frmResult.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "scripts\2000 Population by Census Tract Table.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "scripts\303d Listed Segments Table.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "scripts\GIRAS Landuse Table.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "scripts\NLCD Landuse Table.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

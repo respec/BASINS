@@ -10,7 +10,8 @@ Imports System.Windows.Forms
 Imports MapWindow.Interfaces
 
 Public Module GIRASLanduseTable
-  Public Sub ScriptMain(ByVal aAreaLayer As String, ByVal aIDField As String, ByVal aNameField As String, ByVal cSelectedAreaIndexes As Collection, ByVal aOutputPath As String)
+  Public Sub ScriptMain(ByVal aAreaLayer As String, ByVal aIDField As String, ByVal aNameField As String, _
+                        ByVal cSelectedAreaIndexes As Collection, ByVal aOutputPath As String, ByVal afrmOut As Object)
 
     Dim AreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayer)
     'set land use index layer
