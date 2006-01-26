@@ -50,13 +50,14 @@ Public Module modScenarioBuild
       End If
 
       'Run scenario
-      Dim lExename As String = FindFile("Please locate WinHspfLt.exe", "\BASINS\models\HSPF\bin\WinHspfLt.exe")
-      Shell(lExename & " " & lNewFilename & "uci", AppWinStyle.NormalFocus, True)
+      Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", "\BASINS\models\HSPF\bin\WinHspfLt.exe")
+      Shell(lWinHspfLtExeName & " -1 -1 " & lNewFilename & "uci", AppWinStyle.NormalFocus, True)
 
       Return lNewWDM
 
     Else
       Logger.Msg("Could not find base WDM file '" & aCurrentWDMfilename & "'" & vbCrLf & "Could not run model", "ScenarioBuild")
+      Return Nothing
     End If
   End Function
 End Module
