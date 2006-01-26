@@ -2,6 +2,7 @@ Imports atcMwGisUtility
 Imports atcModelSetup
 Imports MapWinUtility
 Imports atcUtility
+Imports atcControls
 
 Imports Microsoft.VisualBasic
 Imports System.Collections
@@ -10,72 +11,81 @@ Imports System.Windows.Forms
 Imports MapWindow.Interfaces
 
 Public Module Population2000Table
-  Public Sub ScriptMain(ByVal aAreaLayer As String, ByVal aIDField As String, ByVal aNameField As String, ByVal cSelectedAreaIndexes As Collection, ByVal aOutputPath As String)
+  Public Sub ScriptMain(ByVal aAreaLayer As String, ByVal aIDField As String, ByVal aNameField As String, _
+                        ByVal aSelectedAreaIndexes As Collection, ByVal aOutputPath As String, ByVal afrmOut As Object)
 
-    Dim AreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayer)
-    Dim AreaIdFieldIndex As Integer = GisUtil.FieldIndex(AreaLayerIndex, aIDField)
-    Dim AreaNameFieldIndex As Integer = GisUtil.FieldIndex(AreaLayerIndex, aNameField)
-
-    Dim i As Integer
-    Dim j As Integer
-    Dim cAreaIds As New Collection
-    Dim cAreaNames As New Collection
-    Dim cTractNames As New Collection
-    Dim cTractPopulation As New Collection
-    Dim cTractPercent As New Collection
-    Dim TractLayerIndex As Long
-    Dim TractNameFieldIndex As Integer
-    Dim TractPopulationFieldIndex As Integer
-    Dim larea As Double
-    Dim lareat As Double
+    'set area layer indexes
+    Dim lAreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayer)
+    Dim lAreaIdFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aIDField)
+    Dim lAreaNameFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aNameField)
 
     'find 2000 Census Tract layer
+    Dim i As Integer
+    Dim lTractLayerIndex As Long
+    Dim lTractNameFieldIndex As Integer
+    Dim lTractPopulationFieldIndex As Integer
     For i = 1 To GisUtil.NumLayers
       If Right(FilenameNoPath(GisUtil.LayerFileName(i - 1)), 9) = "_tr00.shp" Then
-        TractLayerIndex = i - 1
+        lTractLayerIndex = i - 1
       End If
     Next i
-    TractNameFieldIndex = GisUtil.FieldIndex(TractLayerIndex, "NAME")
-    TractPopulationFieldIndex = GisUtil.FieldIndex(TractLayerIndex, "population")
+    lTractNameFieldIndex = GisUtil.FieldIndex(lTractLayerIndex, "NAME")
+    lTractPopulationFieldIndex = GisUtil.FieldIndex(lTractLayerIndex, "population")
+
+    'build grid source for results
+    Dim lGridSource = New atcGridSource
+    Dim ltitle1 As String
+    Dim ltitle2 As String
+    ltitle1 = "Watershed Characterization Report"
+    ltitle2 = "2000 Population by Census Tract Within " & aAreaLayer
+    With lGridSource
+      .Rows = 1
+      .Columns = 5
+      .FixedRows = 1
+      .CellValue(0, 0) = "AreaID"
+      .CellValue(0, 1) = "AreaName"
+      .CellValue(0, 2) = "TractID"
+      .CellValue(0, 3) = "Population"
+      .CellValue(0, 4) = "%inArea"
+    End With
+
+    Dim larea As Double
+    Dim lareat As Double
+    Dim j As Integer
     'loop through each selected polygon and each census tract looking for overlap
-    For j = 1 To cSelectedAreaIndexes.Count
-      For i = 1 To GisUtil.NumFeatures(TractLayerIndex)
-        If GisUtil.OverlappingPolygons(TractLayerIndex, i - 1, AreaLayerIndex, cSelectedAreaIndexes(j)) Then
+    For j = 1 To aSelectedAreaIndexes.Count
+      For i = 1 To GisUtil.NumFeatures(lTractLayerIndex)
+        If GisUtil.OverlappingPolygons(lTractLayerIndex, i - 1, lAreaLayerIndex, aSelectedAreaIndexes(j)) Then
           'these overlap
-          cAreaIds.Add(GisUtil.FieldValue(AreaLayerIndex, cSelectedAreaIndexes(j), AreaIdFieldIndex))
-          cAreaNames.Add((GisUtil.FieldValue(AreaLayerIndex, cSelectedAreaIndexes(j), AreaNameFieldIndex)))
-          cTractNames.Add(GisUtil.FieldValue(TractLayerIndex, i - 1, TractNameFieldIndex))
-          cTractPopulation.Add(GisUtil.FieldValue(TractLayerIndex, i - 1, TractPopulationFieldIndex))
+          lGridSource.rows = lGridSource.rows + 1
+          lGridSource.CellValue(lGridSource.rows - 1, 0) = GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(j), lAreaIdFieldIndex)
+          lGridSource.CellValue(lGridSource.rows - 1, 1) = GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(j), lAreaNameFieldIndex)
+          lGridSource.CellValue(lGridSource.rows - 1, 2) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lTractNameFieldIndex)
+          lGridSource.CellValue(lGridSource.rows - 1, 3) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lTractPopulationFieldIndex)
           'what percent of this tract is in this area?
-          larea = GisUtil.AreaOverlappingPolygons(TractLayerIndex, i - 1, AreaLayerIndex, cSelectedAreaIndexes(j))
-          lareat = GisUtil.FeatureArea(TractLayerIndex, i - 1)
+          larea = GisUtil.AreaOverlappingPolygons(lTractLayerIndex, i - 1, lAreaLayerIndex, aSelectedAreaIndexes(j))
+          lareat = GisUtil.FeatureArea(lTractLayerIndex, i - 1)
           If lareat > 0 Then
             larea = (larea / lareat) * 100
           Else
             larea = 0.0
           End If
-          cTractPercent.Add(Format(larea, "0.0"))
+          lGridSource.CellValue(lGridSource.rows - 1, 4) = Format(larea, "0.0")
         End If
       Next i
     Next j
 
-    'now write file
-    Dim OutFile As Integer
-    Dim ctxt As String
-    OutFile = FreeFile()
-    FileOpen(OutFile, aOutputPath & "2000 Population by Census Tract Table.out", OpenMode.Output)
-    PrintLine(OutFile, "Watershed Characterization Report")
-    PrintLine(OutFile, "  2000 Population by Census Tract Within " & aAreaLayer)
-    PrintLine(OutFile, "")
-    PrintLine(OutFile, "AreaID" & vbTab & "AreaName" & vbTab & "TractID" & vbTab & "Population" & vbTab & "%inArea")
-    'write area ids and associated descriptions
-    For i = 1 To cAreaIds.Count
-      ctxt = cAreaIds(i) & vbTab & cAreaNames(i) & vbTab & _
-             cTractNames(i) & vbTab & cTractPopulation(i) & vbTab & cTractPercent(i)
-      PrintLine(OutFile, ctxt)
-    Next i
-    FileClose(OutFile)
+    'write file
+    SaveFileString(aOutputPath & "2000 Population by Census Tract Table.out", _
+       ltitle1 & vbCrLf & "  " & ltitle2 & vbCrLf & vbCrLf & lGridSource.ToString)
+
+    'produce result grid
+    If Not afrmOut Is Nothing Then
+      afrmOut.InitializeResults(ltitle1, ltitle2, lGridSource)
+      afrmOut.Show()
+    End If
 
   End Sub
+
 End Module
 
