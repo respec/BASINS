@@ -251,17 +251,19 @@ Friend Class atcScenarioBuilderForm
   Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
                         ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
+
     pInitializing = True
     pDataManager = aDataManager
     pMapWin = aMapWin
+
     pBaseScenario = New atcDataSource
     If Not aTimeseriesGroup Is Nothing Then
       pBaseScenario.DataSets.AddRange(aTimeseriesGroup) 'TODO: want to share events with aTimeseriesGroup
     End If
 
     mnuDisplay.MenuItems.Clear()
-    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    For Each lDisp As atcDataDisplay In DisplayPlugins
+    Dim lDisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    For Each lDisp As atcDataDisplay In lDisplayPlugins
       Dim lMenuDispType As MenuItem = mnuDisplay.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuDisplay_Click))
       lMenuDispType.MenuItems.Add("All Inputs", New EventHandler(AddressOf mnuDisplay_Click))
       lMenuDispType.MenuItems.Add("Base Inputs", New EventHandler(AddressOf mnuDisplay_Click))
@@ -807,7 +809,7 @@ Friend Class atcScenarioBuilderForm
 
   End Sub
 
-  Private Sub RunButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+  Private Sub RunButton_Click(ByVal aSender As System.Object, ByVal aE As System.EventArgs)
     'Copy base UCI and change scenario name within it
     'Copy WDM
     'Change data to be modified in new WDM
@@ -815,7 +817,7 @@ Friend Class atcScenarioBuilderForm
     'Run WinHSPFlt with the new UCI
     'Reload datasets in Results grid
 
-    Dim btn As Windows.Forms.Button = sender
+    Dim lBtn As Windows.Forms.Button = aSender
 
     Dim lModifiedIndex As Integer = 0
     Dim lNewWDM As atcWDM.atcDataSourceWDM
@@ -831,7 +833,7 @@ Friend Class atcScenarioBuilderForm
     Next
 
     If FileExists(lCurrentWDMfilename) Then
-      If IsNumeric(btn.Tag) Then lModifiedIndex = btn.Tag
+      If IsNumeric(lBtn.Tag) Then lModifiedIndex = lBtn.Tag
 
       If lModifiedIndex = -1 Then 'Run base scenario
         lNewWDM = lOldWDM
@@ -1047,7 +1049,8 @@ Friend Class GridSource
       End If
 
     End Get
-    Set(ByVal Value As Integer)
+    Set(ByVal aValue As Integer)
+      Logger.Dbg("Columns:SetValueTo:" & aValue & ":IGNORRED")
     End Set
   End Property
 
@@ -1068,7 +1071,8 @@ Friend Class GridSource
         Return lRows
       End If
     End Get
-    Set(ByVal Value As Integer)
+    Set(ByVal aValue As Integer)
+      Logger.Dbg("Rows:SetValueTo:" & aValue & ":IGNORRED")
     End Set
   End Property
 
@@ -1159,7 +1163,8 @@ Friend Class GridSource
       End Select
       Return ""
     End Get
-    Set(ByVal newValue As String)
+    Set(ByVal aValue As String)
+      Logger.Dbg("CellValue:SetValueTo:" & aValue & ":IGNORRED")
     End Set
   End Property
 
@@ -1178,7 +1183,8 @@ Friend Class GridSource
       End Select
       '      End If
     End Get
-    Set(ByVal Value As atcControls.atcAlignment)
+    Set(ByVal aValue As atcControls.atcAlignment)
+      Logger.Dbg("Alignment:SetValueTo:" & aValue & ":IGNORRED")
     End Set
   End Property
 
