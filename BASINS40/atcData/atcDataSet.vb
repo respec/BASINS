@@ -30,7 +30,7 @@ Public Class atcDataSet
     Return lClone
   End Function
 
-  ''' <summary>Create a new data set with a unique serial number</summary>
+  ''' <summary>Create a new data set</summary>
   Public Sub New()
     pSerial = System.Threading.Interlocked.Increment(pNextSerial)
     Clear()

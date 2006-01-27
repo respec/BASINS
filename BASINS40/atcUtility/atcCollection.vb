@@ -3,6 +3,11 @@ Public Class atcCollection
 
   Private pKeys As ArrayList = New ArrayList
 
+  Public Sub New(ByVal ParamArray aValuesToAdd() As Object)
+    MyBase.New()
+    AddRange(aValuesToAdd)
+  End Sub
+
   Public Property Keys() As ArrayList
     Get
       Return pKeys

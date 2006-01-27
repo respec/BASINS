@@ -8,9 +8,9 @@ Imports System.Windows.Forms
 Friend Class atcScenarioBuilderForm
   Inherits System.Windows.Forms.Form
 
-#Region " Windows Form Designer generated code "
-
   Private pInitializing As Boolean
+
+#Region " Windows Form Designer generated code "
 
   Public Sub New()
     MyBase.New()
@@ -226,7 +226,6 @@ Friend Class atcScenarioBuilderForm
   Private Const MenuText_AllResults As String = "All Results"
 
   Private pDataManager As atcDataManager
-  Private pMapWin As MapWindow.Interfaces.IMapWin
 
   'The group of atcTimeseries containing base conditions
   Private pBaseScenario As atcDataSource
@@ -249,12 +248,10 @@ Friend Class atcScenarioBuilderForm
   Private pRunButton() As Windows.Forms.Button
 
   Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
-                        ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
 
     pInitializing = True
     pDataManager = aDataManager
-    pMapWin = aMapWin
 
     pBaseScenario = New atcDataSource
     If Not aTimeseriesGroup Is Nothing Then
@@ -478,41 +475,44 @@ Friend Class atcScenarioBuilderForm
     If lFromScript Then 'Add attribute(s) from a script
       Dim lScriptFileName As String = FindFile("Please locate attribute script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
 
-      'Save the set of all known attribute definitions before running the script
-      Dim lOldAttributes As atcCollection = atcDataAttributes.AllDefinitions.Clone
-      If allInputs Then
-        AddAttributeFromScript(pBaseScenario.DataSets, lScriptFileName)
-        For Each lModifiedScenario As atcDataSource In pModifiedScenarios
-          AddAttributeFromScript(lModifiedScenario.DataSets, lScriptFileName)
-        Next
+      If FileExists(lScriptFileName) Then
+        'Save the set of all known attribute definitions before running the script
+        Dim lOldAttributes As atcCollection = atcDataAttributes.AllDefinitions.Clone
+        If allInputs Then
+          AddAttributeFromScript(pBaseScenario.DataSets, lScriptFileName)
+          For Each lModifiedScenario As atcDataSource In pModifiedScenarios
+            AddAttributeFromScript(lModifiedScenario.DataSets, lScriptFileName)
+          Next
 
-        For Each lNewAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-          'Add newly created attributes to the list to display in the top grid
-          If Not lOldAttributes.Contains(lNewAttribute) Then
-            For Each lDataSet As atcDataSet In pBaseScenario.DataSets
-              GetScenarioAttributes(lDataSet).SetValue(lNewAttribute.Name, "")
-            Next
-            lNeedMainRefresh = True
-          End If
-        Next
+          For Each lNewAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+            'Add newly created attributes to the list to display in the top grid
+            If Not lOldAttributes.Contains(lNewAttribute) Then
+              For Each lDataSet As atcDataSet In pBaseScenario.DataSets
+                GetScenarioAttributes(lDataSet).SetValue(lNewAttribute.Name, "")
+              Next
+              lNeedMainRefresh = True
+            End If
+          Next
+        End If
+
+        If allResults Then
+          AddAttributeFromScript(pBaseResults.DataSets, lScriptFileName)
+          For Each lModifiedScenario As atcDataSource In pModifiedResults
+            AddAttributeFromScript(lModifiedScenario.DataSets, lScriptFileName)
+          Next
+          For Each lNewAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+            'Add newly created attributes to the list to display in the bottom grid
+            If Not lOldAttributes.Contains(lNewAttribute) Then
+              For Each lDataSet As atcDataSet In pBaseResults.DataSets
+                GetScenarioAttributes(lDataSet).SetValue(lNewAttribute.Name, "")
+                lNeedResultsRefresh = True
+              Next
+            End If
+          Next
+        End If
+      Else
+        Logger.Dbg("Did not find script to run")
       End If
-
-      If allResults Then
-        AddAttributeFromScript(pBaseResults.DataSets, lScriptFileName)
-        For Each lModifiedScenario As atcDataSource In pModifiedResults
-          AddAttributeFromScript(lModifiedScenario.DataSets, lScriptFileName)
-        Next
-        For Each lNewAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-          'Add newly created attributes to the list to display in the bottom grid
-          If Not lOldAttributes.Contains(lNewAttribute) Then
-            For Each lDataSet As atcDataSet In pBaseResults.DataSets
-              GetScenarioAttributes(lDataSet).SetValue(lNewAttribute.Name, "")
-              lNeedResultsRefresh = True
-            Next
-          End If
-        Next
-      End If
-
     Else 'Add a regular attribute
 
       For Each lDataSet As atcDataSet In pBaseScenario.DataSets
@@ -535,11 +535,9 @@ Friend Class atcScenarioBuilderForm
 
   Private Sub AddAttributeFromScript(ByVal aDatasets As atcDataGroup, ByVal aScriptFileName As String)
     If FileExists(aScriptFileName) Then
-      Dim args() As Object = New Object() {aDatasets}
       Dim errors As String
       MsgBox("Running scenario scripts is temporarily disabled.", MsgBoxStyle.OKOnly, "Scenario Script")
-      'Dim lBasinsPlugin As Object = pDataManager.Basins
-      'lBasinsPlugin.RunBasinsScript(FileExt(aScriptFileName), WholeFileString(aScriptFileName), errors, args)
+      Scripting.Run(FileExt(aScriptFileName), "", WholeFileString(aScriptFileName), errors, False, g_MapWin, aDatasets)
       If Not errors Is Nothing Then
         Logger.Msg(aScriptFileName & vbCrLf & vbCrLf & errors, "Attribute Script Error")
       End If
@@ -924,46 +922,34 @@ Friend Class atcScenarioBuilderForm
   End Sub
 
   Private Sub mnuScenariosAddFromScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromScript.Click
-    'Dim lScriptFileName As String = FindFile("Please locate scenario builder script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
-    'If FileExists(lScriptFileName) Then
-    '  Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
-    '  If lNewScenario.DataSets.Count > 0 Then 'This scenario is already in use
-    '    AddScenario()                         'Create a new scenario to populate
-    '    lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
-    '  End If
-    '  Dim errors As String
-    '  RunScript(FileExt(lScriptFileName), MakeScriptName, lScriptFileName, errors, pDataManager, _
-    '            pBaseScenario, lNewScenario)
-    '  If Not errors Is Nothing Then
-    '    Logger.Msg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
-    '  End If
-    'Else
-    '  Logger.Msg("Unable to find script " & lScriptFileName, "Scenario Script")
-    'End If
-    'agdMain.Refresh()
-  End Sub
-
-  Private Sub mnuScenariosAddFromBuiltInScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromBuiltInScript.Click
-    Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
-    If lNewScenario.DataSets.Count > 0 Then 'This scenario is already in use
-      AddScenario()                         'Create a new scenario to populate
-      lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+    Dim lScriptFileName As String = FindFile("Please locate scenario builder script to run", "", "vb", "VB.net Files (*.vb)|*.vb|All files (*.*)|*.*", True)
+    If FileExists(lScriptFileName) Then
+      Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+      If lNewScenario.DataSets.Count > 0 Then 'This scenario is already in use
+        AddScenario()                         'Create a new scenario to populate
+        lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+      End If
+      Dim errors As String
+      Scripting.Run(FileExt(lScriptFileName), "", lScriptFileName, errors, False, pDataManager, _
+                pBaseScenario, lNewScenario)
+      If Not errors Is Nothing Then
+        Logger.Msg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
+      End If
+    Else
+      Logger.Dbg("Unable to find script " & lScriptFileName)
     End If
-    'TODO: add this back in: atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
     agdMain.Refresh()
   End Sub
 
-  Private Function MakeScriptName() As String
-    Dim tryName As String
-    Dim iTry As Integer = 1
-
-    Do
-      tryName = pMapWin.Plugins.PluginFolder & _
-                "\Basins\RemoveMe-Script-" & iTry & ".dll"
-      iTry += 1
-    Loop While FileExists(tryName)
-    Return tryName
-  End Function
+  'Private Sub mnuScenariosAddFromBuiltInScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAddFromBuiltInScript.Click
+  '  Dim lNewScenario As atcDataSource = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+  '  If lNewScenario.DataSets.Count > 0 Then 'This scenario is already in use
+  '    AddScenario()                         'Create a new scenario to populate
+  '    lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
+  '  End If
+  '  'TODO: add this back in: atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
+  '  agdMain.Refresh()
+  'End Sub
 
   Private Sub mnuScenariosAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuScenariosAdd.Click
     AddScenario()

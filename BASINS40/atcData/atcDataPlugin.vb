@@ -22,8 +22,7 @@ Public Class atcDataPlugin
   ''' String that appears in the MapWindow Plug-ins menu to identify this plug-in.
   ''' </summary>
   ''' <requirements>
-  ''' Must be overridden in inheriting class to return something unique or plugin will
-  ''' not load.
+  ''' Must be overridden in inheriting class to return something unique or plugin will not load.
   ''' </requirements>
   Public Overridable ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
     Get
@@ -76,9 +75,8 @@ Public Class atcDataPlugin
     End Get
   End Property
 
-  ''' <summary>
-  ''' Fired when the plugin is loaded (by the plug-in dialog, the plugins menu, or at
-  ''' program start).
+  ''' <summary>Fired when the plugin is loaded 
+  ''' (by the plug-in dialog, the plugins menu, or at program start).
   ''' </summary>
   ''' <remarks>
   ''' A good time to add buttons to the tool bar or menu items to the menu.<br />
@@ -88,9 +86,8 @@ Public Class atcDataPlugin
                                     ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
   End Sub
 
-  ''' <summary>
-  ''' Fired when the plugin is unloaded (by the plugin dialog, the plugins menu, or on
-  ''' program exit).
+  ''' <summary>Fired when the plugin is unloaded
+  ''' (by the plugin dialog, the plugins menu, or on program exit).
   ''' </summary>
   ''' <remarks>
   ''' Remove any buttons from the tool bar or menu items from the menu that this plugin
@@ -102,16 +99,15 @@ Public Class atcDataPlugin
                             Implements MapWindow.Interfaces.IPlugin.Terminate
   End Sub
 
-  ''' <summary>
-  ''' Fires when a menu item or toolbar button is clicked. If this plugin added a
-  ''' button or menu on the Initialize event, this is where those events are handled.
+  ''' <summary>Fires when a menu item or toolbar button is clicked.
+  ''' If this plugin added a button or menu on the Initialize event, 
+  ''' this is where those events are handled.
   ''' </summary>
   Public Overridable Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) _
                             Implements MapWindow.Interfaces.IPlugin.ItemClicked
   End Sub
 
-  ''' <summary>
-  ''' Fires when the user removes a layer from MapWindow.<br />
+  ''' <summary>Fires when the user removes a layer from MapWindow.<br />
   ''' Useful if this plug-in depends on a particular layer being present, 
   ''' or if it keeps an internal list of layers.
   ''' </summary>
@@ -119,8 +115,7 @@ Public Class atcDataPlugin
                             Implements MapWindow.Interfaces.IPlugin.LayerRemoved
   End Sub
 
-  ''' <summary>
-  ''' Fires when the user adds a layer to MapWindow. 
+  ''' <summary>Fires when the user adds a layer to MapWindow. 
   ''' Useful in the same cases as <see cref="LayerRemoved">LayerRemoved</see>
   ''' </summary>
   Public Overridable Sub LayersAdded(ByVal aLayers() As MapWindow.Interfaces.Layer) _
@@ -160,25 +155,20 @@ Public Class atcDataPlugin
                             Implements MapWindow.Interfaces.IPlugin.LegendMouseUp
   End Sub
 
-  ''' <summary>
-  ''' Fires after a user drags (ie draws a box) with the mouse on the map, at
-  ''' completion of the drag.
-  ''' </summary>
+  ''' <summary>Fires after a user draws a box with the mouse on the map</summary>
   ''' <remarks>Bounds specifies the box that was "drawn"</remarks>
   Public Overridable Sub MapDragFinished(ByVal aBounds As System.Drawing.Rectangle, _
                                          ByRef Handled As Boolean) _
                             Implements MapWindow.Interfaces.IPlugin.MapDragFinished
   End Sub
 
-  ''' <summary>Fires any time there is a zoom or pan that changes the extents of the 
-  ''' map.</summary>
+  ''' <summary>Fires any time there is a zoom or pan that changes the map extents.</summary>
   Public Overridable Sub MapExtentsChanged() _
                             Implements MapWindow.Interfaces.IPlugin.MapExtentsChanged
   End Sub
 
-  ''' <summary>
-  ''' Fires when the user presses a mouse button on the map. Note that x and y are
-  ''' returned as screen coordinates (in pixels).
+  ''' <summary>Fires when the user presses a mouse button on the map.
+  ''' The x and y are screen coordinates in pixels.
   ''' </summary>
   ''' <remarks>
   ''' If map coordinates are needed, use g_MapWin.View.PixelToProj() where g_MapWin is
@@ -192,9 +182,8 @@ Public Class atcDataPlugin
                     Implements MapWindow.Interfaces.IPlugin.MapMouseDown
   End Sub
 
-  ''' <summary>
-  '''     Fires when the user moves the mouse over the map. See
-  '''     <see cref="MapMouseDown">MapMouseDown</see>.
+  ''' <summary>Fires when the user moves the mouse over the map.
+  ''' See <see cref="MapMouseDown">MapMouseDown</see>.
   ''' </summary>
   Public Overridable Sub MapMouseMove(ByVal aScreenX As Integer, _
                                       ByVal aScreenY As Integer, _
@@ -202,9 +191,8 @@ Public Class atcDataPlugin
                     Implements MapWindow.Interfaces.IPlugin.MapMouseMove
   End Sub
 
-  ''' <summary>
-  '''     Fires when the user releases a mouse button over the map. See
-  '''     <see cref="MapMouseDown">MapMouseDown</see>.
+  ''' <summary>Fires when the user releases a mouse button over the map.
+  ''' See <see cref="MapMouseDown">MapMouseDown</see>.
   ''' </summary>
   Public Overridable Sub MapMouseUp(ByVal aButton As Integer, _
                                     ByVal aShift As Integer, _
@@ -214,9 +202,8 @@ Public Class atcDataPlugin
                     Implements MapWindow.Interfaces.IPlugin.MapMouseUp
   End Sub
 
-  ''' <summary>
-  ''' Plugins can communicate with each other using Messages. If a message is sent then
-  ''' this event fires.
+  ''' <summary>Plugins can communicate with each other using Messages.
+  ''' If a message is sent then this event fires.
   ''' </summary>
   ''' <remarks>Set Handled=True to stop the message from being sent to any more 
   ''' plugins.</remarks>
@@ -249,10 +236,8 @@ Public Class atcDataPlugin
                          Implements MapWindow.Interfaces.IPlugin.ProjectSaving
   End Sub
 
-  ''' <summary>
-  '''     <para>Fires when the user selects one or more shapes using the select tool in
-  '''     MapWindow.</para>
-  ''' </summary>
+  ''' <summary>Fires when the user selects one or more shapes
+  ''' using the select tool in MapWindow.</summary>
   ''' <param name="aHandle">Layer handle for the shapefile on which shapes were 
   ''' selected.</param>
   ''' <param name="aSelectInfo">holds information about the shapes that were 

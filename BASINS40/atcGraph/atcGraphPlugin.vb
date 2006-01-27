@@ -3,8 +3,6 @@ Imports atcData
 Public Class atcGraphPlugin
   Inherits atcData.atcDataDisplay
 
-  Dim pMapWin As MapWindow.Interfaces.IMapWin
-
   Public Overrides ReadOnly Property Name() As String
     Get
       Return "Tools::Graph"
@@ -24,7 +22,7 @@ Public Class atcGraphPlugin
   End Sub
 
   Public Overrides Function Show(ByVal aDataManager As atcDataManager, _
-                        Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object 'System.Windows.Forms.Form
+                        Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
     Dim lDataGroup As atcDataGroup = aDataGroup
     If lDataGroup Is Nothing Then lDataGroup = New atcDataGroup
 
@@ -38,13 +36,4 @@ Public Class atcGraphPlugin
     End If
   End Function
 
-  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
-                                  ByVal aParentHandle As Integer)
-    pMapWin = aMapWin
-    pMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcGraphPlugin")
-  End Sub
-
-  Public Overrides Sub Terminate()
-    pMapWin.Plugins.BroadcastMessage("atcDataPlugin unloading atcGraphPlugin")
-  End Sub
 End Class

@@ -7,7 +7,6 @@ Imports System.Reflection
 ''' </summary>
 Public Class atcDataManager
   Private pMapWin As MapWindow.Interfaces.IMapWin
-  'Private pBasins As Object
   Private pDataSources As ArrayList 'of atcDataSource, the currently open data sources
   Private pSelectionAttributes As ArrayList
   Private pDisplayAttributes As ArrayList
@@ -24,9 +23,8 @@ Public Class atcDataManager
   ''' <param name="aBasins">
   '''     <para>Pointer to the Basins plugin (Deprecated - DO NOT USE - consult ATC for alternatives)</para>
   ''' </param>  
-  Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin) ', ByVal aBasins As Object)
+  Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
     pMapWin = aMapWin
-    'pBasins = aBasins
     Me.Clear()
   End Sub
 
@@ -51,13 +49,6 @@ Public Class atcDataManager
     pDisplayAttributes.Add("Max")
     pDisplayAttributes.Add("Mean")
   End Sub
-
-  'The BASINS plugin
-  'Public ReadOnly Property Basins() As MapWindow.Interfaces.IPlugin
-  '  Get
-  '    Return pBasins
-  '  End Get
-  'End Property
 
   ''' <summary>Set of atcDataSource objects representing currently open DataSources</summary>
   Public ReadOnly Property DataSources() As ArrayList

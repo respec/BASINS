@@ -128,6 +128,16 @@
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
                     Private = "False"
                 />
+                <Reference
+                    Name = "atcTimeseriesMath"
+                    Project = "{BD299EB7-7A62-4EF9-8806-86E9288C498F}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
+                <Reference
+                    Name = "atcMetCmp"
+                    Project = "{72264BDC-23F5-4A55-B53D-0752099CB263}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
             </References>
             <Imports>
                 <Import Namespace = "Microsoft.VisualBasic" />
@@ -157,6 +167,16 @@
                     RelPath = "atcScenarioBuilderPlugin.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmMultipleResults.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmMultipleResults.resx"
+                    DependentUpon = "frmMultipleResults.vb"
+                    BuildAction = "EmbeddedResource"
                 />
                 <File
                     RelPath = "modScenarioBuild.vb"
