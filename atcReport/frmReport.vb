@@ -316,8 +316,8 @@ Public Class frmReport
         Dim frmout As New frmResult
         aArgs(5) = frmout
         'run each selected script
-        'GIRASLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4))
-        'NLCDLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4))
+        'GIRASLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
+        'NLCDLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
         'ListedSegmentsTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
         'Population2000Table.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
         Scripting.Run("vb", "", pReportsColl(lbxReports.SelectedIndices(i) + 1), cerror, False, pMappingObject, aArgs)
