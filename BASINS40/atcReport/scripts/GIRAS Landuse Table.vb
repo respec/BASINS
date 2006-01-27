@@ -2,6 +2,7 @@ Imports atcMwGisUtility
 Imports atcModelSetup
 Imports MapWinUtility
 Imports atcUtility
+Imports atcControls
 
 Imports Microsoft.VisualBasic
 Imports System.Collections
@@ -11,198 +12,205 @@ Imports MapWindow.Interfaces
 
 Public Module GIRASLanduseTable
   Public Sub ScriptMain(ByVal aAreaLayer As String, ByVal aIDField As String, ByVal aNameField As String, _
-                        ByVal cSelectedAreaIndexes As Collection, ByVal aOutputPath As String, ByVal afrmOut As Object)
+                        ByVal aSelectedAreaIndexes As Collection, ByVal aOutputPath As String, ByVal afrmOut As Object)
 
-    Dim AreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayer)
+    Dim lAreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayer)
     'set land use index layer
-    Dim LanduseLayerIndex As Long = GisUtil.LayerIndex("Land Use Index")
-    Dim LandUseFieldIndex As Long = GisUtil.FieldIndex(LanduseLayerIndex, "COVNAME")
-    Dim PathName As String = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex)) & "\landuse"
-
+    Dim lLanduseLayerIndex As Long = GisUtil.LayerIndex("Land Use Index")
+    Dim lLandUseFieldIndex As Long = GisUtil.FieldIndex(lLanduseLayerIndex, "COVNAME")
+    
     'figure out which land use tiles to list
-    Dim cluTiles As New Collection
-    Dim NewFileName As String
+    Dim lcluTiles As New Collection
+    Dim lNewFileName As String
     Dim j As Integer
     Dim i As Integer
-    For i = 1 To GisUtil.NumFeatures(LanduseLayerIndex)
+    For i = 1 To GisUtil.NumFeatures(lLanduseLayerIndex)
       'loop thru each shape of land use index shapefile
-      NewFileName = GisUtil.FieldValue(LanduseLayerIndex, i - 1, LandUseFieldIndex)
-      For j = 1 To cSelectedAreaIndexes.Count
-        If GisUtil.OverlappingPolygons(LanduseLayerIndex, i - 1, AreaLayerIndex, cSelectedAreaIndexes(j)) Then
+      lNewFileName = GisUtil.FieldValue(lLanduseLayerIndex, i - 1, lLandUseFieldIndex)
+      For j = 1 To aSelectedAreaIndexes.Count
+        If GisUtil.OverlappingPolygons(lLanduseLayerIndex, i - 1, lAreaLayerIndex, aSelectedAreaIndexes(j)) Then
           'yes, add it
-          cluTiles.Add(NewFileName)
+          lcluTiles.Add(lNewFileName)
           Exit For
         End If
       Next j
     Next i
 
-    Dim LandUseFieldName As String
-    Dim bfirst As Boolean = True
-    For j = 1 To cluTiles.Count
+    Dim lPathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex)) & "\landuse"
+    Dim lLandUseFieldName As String
+    Dim lbfirst As Boolean = True
+    For j = 1 To lcluTiles.Count
       'loop thru each land use tile
-      NewFileName = PathName & "\" & cluTiles(j) & ".shp"
-      GisUtil.AddLayer(NewFileName, cluTiles(j))
-      LandUseFieldName = "LUCODE"
+      lNewFileName = lPathName & "\" & lcluTiles(j) & ".shp"
+      GisUtil.AddLayer(lNewFileName, lcluTiles(j))
+      lLandUseFieldName = "LUCODE"
       If aAreaLayer <> "<none>" Then
         'do overlay
-        GisUtil.Overlay(cluTiles(j), LandUseFieldName, aAreaLayer, aIDField, _
-                    PathName & "\overlay.shp", bfirst)
-        bfirst = False
+        GisUtil.Overlay(lcluTiles(j), lLandUseFieldName, aAreaLayer, aIDField, _
+                    lPathName & "\overlay.shp", lbfirst)
+        lbfirst = False
       End If
     Next j
 
     'build collection of selected area ids
-    Dim cSelectedAreaIds As New Collection
-    Dim aIdFieldIndex As Integer = GisUtil.FieldIndex(AreaLayerIndex, aIDField)
-    For i = 1 To cSelectedAreaIndexes.Count
-      cSelectedAreaIds.Add(GisUtil.FieldValue(AreaLayerIndex, cSelectedAreaIndexes(i), aIdFieldIndex))
+    Dim lSelectedAreaIds As New Collection
+    Dim laIdFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aIDField)
+    For i = 1 To aSelectedAreaIndexes.Count
+      lSelectedAreaIds.Add(GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(i), laIdFieldIndex))
     Next i
 
     'if simple reclassifyfile exists, read it in
     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-    Dim ReclassifyFile As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
-    Dim tmpDbf As IatcTable
-    If FileExists(ReclassifyFile) Then
-      ReclassifyFile = ReclassifyFile & "giras.dbf"
+    Dim lReclassifyFile As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\"
+    Dim ltmpDbf As IatcTable
+    If FileExists(lReclassifyFile) Then
+      lReclassifyFile = lReclassifyFile & "giras.dbf"
     Else
-      ReclassifyFile = Mid(PathName, 1, 1) & ":\basins\etc\giras.dbf"
+      lReclassifyFile = Mid(lPathName, 1, 1) & ":\basins\etc\giras.dbf"
     End If
-    Dim cRcode As New Collection
-    Dim cRname As New Collection
+    Dim lcRcode As New Collection
+    Dim lcRname As New Collection
     'open dbf file
-    tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
-    For i = 1 To tmpDbf.NumRecords
-      tmpDbf.CurrentRecord = i
-      cRcode.Add(tmpDbf.Value(1))
-      cRname.Add(tmpDbf.Value(2))
+    ltmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lReclassifyFile)
+    For i = 1 To ltmpDbf.NumRecords
+      ltmpDbf.CurrentRecord = i
+      lcRcode.Add(ltmpDbf.Value(1))
+      lcRname.Add(ltmpDbf.Value(2))
     Next i
 
     'read landuse, subbasin (aoi), and area combinations for selected areas from overlay.dbf
-    Dim cLugroup As New Collection
-    Dim cSubid As New Collection
-    Dim cArea As New Collection
-    Dim incollection As Boolean
-    tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(PathName & "\overlay.dbf")
-    For i = 1 To tmpDbf.NumRecords
-      tmpDbf.CurrentRecord = i
-      incollection = False
-      For j = 1 To cSelectedAreaIds.Count
-        If tmpDbf.Value(2) = cSelectedAreaIds(j) Then
-          incollection = True
+    Dim lcLugroup As New Collection
+    Dim lcSubid As New Collection
+    Dim lcArea As New Collection
+    Dim lincollection As Boolean
+    ltmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lPathName & "\overlay.dbf")
+    For i = 1 To ltmpDbf.NumRecords
+      ltmpDbf.CurrentRecord = i
+      lincollection = False
+      For j = 1 To lSelectedAreaIds.Count
+        If ltmpDbf.Value(2) = lSelectedAreaIds(j) Then
+          lincollection = True
           Exit For
         End If
       Next j
-      If incollection Then
+      If lincollection Then
         'find lugroup that corresponds to this lucode
         Dim lugroup As String = ""
-        For j = 1 To cRcode.Count
-          If tmpDbf.Value(1) = cRcode(j) Then
-            lugroup = cRname(j)
+        For j = 1 To lcRcode.Count
+          If ltmpDbf.Value(1) = lcRcode(j) Then
+            lugroup = lcRname(j)
             Exit For
           End If
         Next j
         If Len(lugroup) > 0 Then
-          cLugroup.Add(lugroup)
+          lcLugroup.Add(lugroup)
         Else
-          cLugroup.Add("<No Data>")
+          lcLugroup.Add("<No Data>")
         End If
-        cSubid.Add(tmpDbf.Value(2))
-        cArea.Add(tmpDbf.Value(3))
+        lcSubid.Add(ltmpDbf.Value(2))
+        lcArea.Add(ltmpDbf.Value(3))
       End If
     Next i
 
     'build collection of unique subbasin ids
-    Dim cUniqueSubids As New Collection
-    For i = 1 To cSubid.Count
-      incollection = False
-      For j = 1 To cUniqueSubids.Count
-        If cUniqueSubids(j) = cSubid(i) Then
-          incollection = True
+    Dim lcUniqueSubids As New Collection
+    For i = 1 To lcSubid.Count
+      lincollection = False
+      For j = 1 To lcUniqueSubids.Count
+        If lcUniqueSubids(j) = lcSubid(i) Then
+          lincollection = True
           Exit For
         End If
       Next j
-      If Not incollection Then
-        cUniqueSubids.Add(cSubid(i))
+      If Not lincollection Then
+        lcUniqueSubids.Add(lcSubid(i))
       End If
     Next i
 
     'build collection of unique landuse groups
-    Dim cUniqueLugroups As New atcCollection
-    For i = 1 To cLugroup.Count
-      incollection = False
-      For j = 0 To cUniqueLugroups.Count - 1
-        If cUniqueLugroups(j) = cLugroup(i) Then
-          incollection = True
+    Dim lcUniqueLugroups As New atcCollection
+    For i = 1 To lcLugroup.Count
+      lincollection = False
+      For j = 0 To lcUniqueLugroups.Count - 1
+        If lcUniqueLugroups(j) = lcLugroup(i) Then
+          lincollection = True
           Exit For
         End If
       Next j
-      If Not incollection Then
-        cUniqueLugroups.Add(cLugroup(i))
+      If Not lincollection Then
+        lcUniqueLugroups.Add(lcLugroup(i))
       End If
     Next i
     'sort landuse groups
-    cUniqueLugroups.Sort()
+    lcUniqueLugroups.Sort()
 
     'create summary array, area of each land use group in each subarea
-    Dim lArea(cUniqueSubids.Count, cUniqueLugroups.Count) As Single
-    Dim spos As Integer
-    Dim lpos As Integer
+    Dim lArea(lcUniqueSubids.Count, lcUniqueLugroups.Count) As Single
+    Dim lspos As Integer
+    Dim llpos As Integer
     'loop through each polygon (or grid subid/lucode combination)
     'and populate array with area values
-    For i = 1 To cSubid.Count
+    For i = 1 To lcSubid.Count
       'find subbasin position in the area array
-      For j = 1 To cUniqueSubids.Count
-        If cSubid(i) = cUniqueSubids(j) Then
-          spos = j
+      For j = 1 To lcUniqueSubids.Count
+        If lcSubid(i) = lcUniqueSubids(j) Then
+          lspos = j
           Exit For
         End If
       Next j
       'find lugroup that corresponds to this lucode
-      For j = 1 To cUniqueLugroups.Count
-        If cLugroup(i) = cUniqueLugroups(j - 1) Then
-          lpos = j
+      For j = 1 To lcUniqueLugroups.Count
+        If lcLugroup(i) = lcUniqueLugroups(j - 1) Then
+          llpos = j
           Exit For
         End If
       Next j
-      lArea(spos, lpos) = lArea(spos, lpos) + cArea(i)
+      lArea(lspos, llpos) = lArea(lspos, llpos) + lcArea(i)
     Next i
 
-    'now write file
-    Dim OutFile As Integer
-    Dim ctxt As String
-    OutFile = FreeFile()
-    FileOpen(OutFile, aOutputPath & "GIRAS Landuse Table.out", OpenMode.Output)
-    PrintLine(OutFile, "Watershed Characterization Report")
-    PrintLine(OutFile, "  GIRAS Landuse Distribution Within " & aAreaLayer)
-    PrintLine(OutFile, "  (Area in Acres)")
-    PrintLine(OutFile, "")
-    'write area ids
-    ctxt = ""
-    For i = 1 To cUniqueSubids.Count
-      ctxt = ctxt & vbTab & cUniqueSubids(i)
-    Next i
-    PrintLine(OutFile, ctxt)
-    'write associated descriptions
-    Dim aNameFieldIndex As Integer = GisUtil.FieldIndex(AreaLayerIndex, aNameField)
-    ctxt = ""
-    For i = 1 To cUniqueSubids.Count
-      For j = 1 To cSelectedAreaIndexes.Count
-        If cSelectedAreaIds(j) = cUniqueSubids(i) Then
-          ctxt = ctxt & vbTab & GisUtil.FieldValue(AreaLayerIndex, cSelectedAreaIndexes(j), aNameFieldIndex)
-          Exit For
-        End If
-      Next j
-    Next i
-    PrintLine(OutFile, ctxt)
-    'now write data
-    For j = 1 To cUniqueLugroups.Count
-      ctxt = cUniqueLugroups(j - 1)
-      For i = 1 To cUniqueSubids.Count
-        ctxt = ctxt & vbTab & Format((lArea(i, j) / 4046.8564), "0.")
+    'build grid source for results
+    Dim lGridSource = New atcGridSource
+    Dim ltitle1 As String
+    Dim ltitle2 As String
+    ltitle1 = "Watershed Characterization Report"
+    ltitle2 = "GIRAS Landuse Distribution Within " & aAreaLayer & " (Area in Acres)"
+    With lGridSource
+      .Rows = 2
+      .Columns = lcUniqueSubids.Count + 1
+      .FixedRows = 1
+      'write area ids
+      For i = 1 To lcUniqueSubids.Count
+        .CellValue(0, i) = lcUniqueSubids(i)
       Next i
-      PrintLine(OutFile, ctxt)
-    Next j
-    FileClose(OutFile)
+      'write associated descriptions
+      Dim laNameFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aNameField)
+      For i = 1 To lcUniqueSubids.Count
+        For j = 1 To aSelectedAreaIndexes.Count
+          If lSelectedAreaIds(j) = lcUniqueSubids(i) Then
+            .CellValue(1, i) = GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(j), laNameFieldIndex)
+            Exit For
+          End If
+        Next j
+      Next i
+      'now write data
+      For j = 1 To lcUniqueLugroups.Count
+        .rows = .rows + 1
+        .CellValue(.rows - 1, 0) = lcUniqueLugroups(j - 1)
+        For i = 1 To lcUniqueSubids.Count
+          .CellValue(.rows - 1, i) = Format((lArea(i, j) / 4046.8564), "0.")
+        Next i
+      Next j
+    End With
+
+    'write file
+    SaveFileString(aOutputPath & "GIRAS Landuse Table.out", _
+       ltitle1 & vbCrLf & "  " & ltitle2 & vbCrLf & vbCrLf & lGridSource.ToString)
+
+    'produce result grid
+    If Not afrmOut Is Nothing Then
+      afrmOut.InitializeResults(ltitle1, ltitle2, lGridSource)
+      afrmOut.Show()
+    End If
 
   End Sub
 End Module
