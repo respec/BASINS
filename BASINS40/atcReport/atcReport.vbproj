@@ -155,6 +155,11 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "scripts\1990 Population and Sewerage by Census Tract Table.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "scripts\2000 Population by Census Tract Table.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
