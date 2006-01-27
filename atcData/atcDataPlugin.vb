@@ -261,4 +261,8 @@ Public Class atcDataPlugin
     Return Me.GetType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
   End Function
 
+  Public Overrides Function ToString() As String
+    Return Name & ":" & Version & ":" & SerialNumber
+  End Function
+
 End Class
