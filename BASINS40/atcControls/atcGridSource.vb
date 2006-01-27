@@ -1,3 +1,5 @@
+Imports atcUtility
+
 Public Enum atcAlignment
   HAlignLeft = 1
   HAlignRight = 2
@@ -230,6 +232,39 @@ Public Class atcGridSource
   Protected Overridable Sub ExpandRowsColumns(ByVal aRow As Integer, ByVal aColumn As Integer)
     If aRow >= Rows Then Rows = aRow + 1
     If aColumn >= Columns Then Columns = aColumn + 1
+  End Sub
+
+  Public Overridable Sub FromString(ByVal aString As String)
+    Dim lString As String = aString
+    Dim curLine As String
+    Dim curRow As Integer = -1
+    Dim curCol As Integer
+    Dim maxCol As Integer = 0
+    While lString.Length > 0
+      curRow += 1
+      curCol = -1
+      curLine = StrSplit(lString, vbCrLf, "")
+      While curLine.Length > 0
+        curCol += 1
+        StrSplit(curLine, vbTab, "")
+      End While
+      If curCol > maxCol Then maxCol = curCol
+    End While
+
+    Me.Rows = curRow + 1
+    Me.Columns = maxCol + 1
+    lString = aString
+    curRow = -1
+    While lString.Length > 0
+      curRow += 1
+      curCol = -1
+      curLine = StrSplit(lString, vbCrLf, "")
+      While curLine.Length > 0
+        curCol += 1
+        CellValue(curRow, curCol) = StrSplit(curLine, vbTab, "")
+      End While
+      If curCol > maxCol Then maxCol = curCol
+    End While
   End Sub
 
   Public Overrides Function ToString() As String
