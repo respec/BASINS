@@ -1,12 +1,8 @@
-Imports System.Math
-
 ''' <summary>Base class for timeseries data</summary>
 Public Class atcTimeseries
   Inherits atcDataSet
 
   Private pDates As atcTimeseries
-  'Private pDateLengths As atcTimeseries
-
   Private pDataSource As atcDataSource
   Private pValuesNeedToBeRead As Boolean
 
@@ -46,10 +42,8 @@ Public Class atcTimeseries
     End Set
   End Property
 
-  ''' <summary>
-  ''' Get an attribute of a value without creating pValueAttributes or
-  ''' pValueAttributes(index)
-  ''' </summary>
+  ''' <summary>Get the value of an attribute 
+  ''' without creating pValueAttributes or pValueAttributes(index)</summary>
   Public Function ValueAttributesGetValue(ByVal aIndex As Integer, ByVal aAttributeName As String, ByVal aDefault As Object) As Object
     If pValueAttributes Is Nothing OrElse pValueAttributes(aIndex) Is Nothing Then
       Return aDefault
@@ -58,10 +52,7 @@ Public Class atcTimeseries
     End If
   End Function
 
-  ''' <summary>
-  ''' Get whether a ValueAttribute exists for a Value without creating pValueAttributes
-  ''' or pValueAttributes(index)
-  ''' </summary>
+  ''' <summary>Get whether a ValueAttribute exists by index</summary>
   Public Function ValueAttributesExist(ByVal aIndex As Integer) As Boolean
     If pValueAttributes Is Nothing OrElse pValueAttributes(aIndex) Is Nothing Then
       Return False
@@ -102,12 +93,10 @@ Public Class atcTimeseries
     End Set
   End Property
 
-  ''' <summary>
-  ''' Each value in Dates is the instant of measurement or the start of the interval
-  ''' </summary>
+  ''' <summary>Each value in Dates is the instant of measurement or the start of the interval</summary>
   ''' <remarks>
-  ''' Dates are julian days since the start of 1900. Fractional part of a date is time
-  ''' of day.
+  ''' Dates are julian days since the start of 1900. 
+  ''' Fractional part of a date is time of day.
   ''' </remarks>
   Public Property Dates() As atcTimeseries
     Get
@@ -117,23 +106,6 @@ Public Class atcTimeseries
       pDates = newValue
     End Set
   End Property
-
-  ''True if we are representing intervals rather than instants
-  'Public ReadOnly Property HasDateLengths() As Boolean
-  '    Get
-  '        Return Not (pDateLengths Is Nothing)
-  '    End Get
-  'End Property
-
-  ''The length of each interval. Values should be greater than zero.
-  'Public Property DateLengths() As atcTimeseries
-  '    Get
-  '        Return pDateLengths
-  '    End Get
-  '    Set(ByVal newValue As atcTimeseries)
-  '        pDateLengths = newValue
-  '    End Set
-  'End Property
 
   ''' <summary>Clear all values and attributes, but not dates.</summary>
   Public Overrides Sub Clear()
@@ -201,10 +173,7 @@ Public Class atcTimeseries
     End If
   End Sub
 
-  ''' <summary>
-  '''     <para>True if we have read the header and not all the values to save time and
-  '''     memory</para>
-  ''' </summary>
+  ''' <summary>True if we have read the header and not all the values (to save time and memory)</summary>
   ''' <remarks>
   '''     Should only be changed by the
   '''     <see cref="atcData~atcData.atcDataSource">atcDataSource</see> that reads this
@@ -221,7 +190,7 @@ Public Class atcTimeseries
 
   ''' <summary>Return index of aValue or -1 if not found</summary>
   Public Function IndexOfValue(ByVal aValue As Double, _
-                             ByVal aAssumeSorted As Boolean) As Integer
+                               ByVal aAssumeSorted As Boolean) As Integer
     If aAssumeSorted Then 'do a binary search, find wanted value in log2(pNumValues) steps
       Dim lHigher As Integer = pNumValues
       Dim lLower As Integer = 0 'Note: this starts one *lower than* start of where to search in array

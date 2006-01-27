@@ -15,17 +15,10 @@ Public Class atcDataGroup
 
   Private pSelectedData As atcDataGroup 'tracks currently selected group within this group
 
-  ''' <summary>
-  '''     One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just 
-  ''' added
-  '''     to the group
-  ''' </summary>
+  ''' <summary>One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just added</summary>
   Public Event Added(ByVal aAdded As atcCollection)
 
-  ''' <summary>
-  '''     One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just
-  '''     removed from the group
-  ''' </summary>
+  ''' <summary>One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just removed</summary>
   Public Event Removed(ByVal aRemoved As atcCollection)
 
   Private Sub RaiseAddedOne(ByVal aDataSet As atcDataSet)
@@ -70,22 +63,20 @@ Public Class atcDataGroup
     End Set
   End Property
 
-  ''' <summary>Create a new data group</summary>
+  ''' <summary>Create a new empty data group</summary>
   Public Sub New()
     MyBase.New()
   End Sub
 
-  ''' <summary>Create a new data group and add a dataset to the group with the default key of its serial 
-  ''' number</summary>
+  ''' <summary>Create a new data group and add a dataset
+  ''' to the group with the default key of its serial number</summary>
   Public Sub New(ByVal aDataSet As atcDataSet)
     MyBase.New()
     Add(aDataSet.Serial, aDataSet)
   End Sub
 
-  ''' <summary>
-  '''     Add an <see cref="atcData~atcData.atcDataSet">atcDataSet</see> to the group with
-  '''     the default key of its serial number
-  ''' </summary>
+  ''' <summary>Add an <see cref="atcData~atcData.atcDataSet">atcDataSet</see> 
+  ''' to the group with the default key of its serial number </summary>
   Public Shadows Function Add(ByVal aDataSet As atcDataSet) As Integer
     Add(aDataSet.Serial, aDataSet)
   End Function
@@ -97,7 +88,7 @@ Public Class atcDataGroup
     RaiseAddedOne(aDataSet)
   End Function
 
-  ''' <summary>Add an atcCollection or atcDataGroup of atcDataSet to the group.</summary>
+  ''' <summary>Add items from an atcCollection or atcDataGroup to the group.</summary>
   Public Shadows Sub Add(ByVal aAddThese As atcCollection)
     MyBase.AddRange(aAddThese)
     RaiseEvent Added(aAddThese)
@@ -122,9 +113,8 @@ Public Class atcDataGroup
     Return newClone
   End Function
 
-  ''' <summary>
-  '''     <para>Change this group to match the new group and raise the appropriate
-  '''     events.</para>
+  ''' <summary>Change this group to match the new group
+  ''' and raise the appropriate events.
   ''' </summary>
   Public Shadows Sub ChangeTo(ByVal aNewGroup As atcDataGroup)
     If aNewGroup Is Nothing Then
@@ -165,18 +155,17 @@ Public Class atcDataGroup
     RaiseAddedOne(aDataSet)
   End Sub
 
+  ''' <summary>Remove dataset specified by aIndex from this group.</summary>
   ''' <remarks>
   '''     Cannot just do: <see cref="Remove(atcDataSet)">Remove(ItemByIndex(index))</see>
   '''     because this overriding RemoveAt is called by MyBase.Remove--infinite loop
   ''' </remarks>
-  ''' <summary>Remove dataset specified by aIndex from this group.</summary>
   Public Shadows Sub RemoveAt(ByVal aIndex As Integer)
     Dim lDataSet As atcDataSet = ItemByIndex(aIndex)
     MyBase.RemoveAt(aIndex)
     RaiseRemovedOne(lDataSet)
   End Sub
 
-  'Remove aDataSet from the group
   ''' <summary>Remove an <see cref="atcData~atcData.atcDataSet">atcDataSet</see> from this 
   ''' group.</summary>
   Public Shadows Sub Remove(ByVal aDataSet As atcDataSet)

@@ -3,6 +3,8 @@ Imports atcUtility
 Imports MapWinUtility
 
 Public Module modScenarioBuild
+  Public g_MapWin As MapWindow.Interfaces.IMapWin
+
   Public Function ScenarioRun(ByVal aCurrentWDMfilename As String, _
                               ByVal aNewScenarioName As String, _
                               ByVal aModifiedData As atcDataGroup) As atcDataSource
