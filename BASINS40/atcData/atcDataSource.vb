@@ -132,4 +132,11 @@ Public Class atcDataSource
     pData = New atcDataGroup
   End Sub
 
+  Public Overrides Function ToString() As String
+    Dim lName As String = Name
+    If lName.Length = 0 Then
+      lName = "atcDataSource"
+    End If
+    Return lName & ":" & Specification & ":" & DataSets.Count
+  End Function
 End Class

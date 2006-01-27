@@ -136,14 +136,15 @@ Public Class atcDataManager
   End Function
 
   Public Sub ShowDisplay(ByVal aDisplayName As String, ByVal aDataGroup As atcDataGroup)
-    Dim newDisplay As atcDataDisplay
-    Dim DisplayPlugins As ICollection = GetPlugins(GetType(atcDataDisplay))
-    For Each lDisp As atcDataDisplay In DisplayPlugins
+    Dim lNewDisplay As atcDataDisplay
+    Dim lDisplayPlugins As ICollection = GetPlugins(GetType(atcDataDisplay))
+
+    For Each lDisp As atcDataDisplay In lDisplayPlugins
       If lDisp.Name = aDisplayName OrElse lDisp.Name = "Tools::" & aDisplayName Then
-        Dim typ As System.Type = lDisp.GetType()
-        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-        newDisplay = asm.CreateInstance(typ.FullName)
-        newDisplay.Show(Me, aDataGroup)
+        Dim lType As System.Type = lDisp.GetType()
+        Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
+        lNewDisplay = lAssembly.CreateInstance(lType.FullName)
+        lNewDisplay.Show(Me, aDataGroup)
         Exit Sub
       End If
     Next
@@ -154,9 +155,9 @@ Public Class atcDataManager
   '''     <para>Name of data source to create and return</para>
   ''' </param>  
   Public Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
-    For Each lDs As atcDataSource In GetPlugins(GetType(atcDataSource))
-      If lDs.Name = aDataSourceName Then
-        Return lDs.NewOne
+    For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
+      If lDataSource.Name = aDataSourceName Then
+        Return lDataSource.NewOne
       End If
     Next
     Return Nothing
@@ -282,4 +283,12 @@ Public Class atcDataManager
       End If
     End Set
   End Property
+
+  Public Overrides Function ToString() As String
+    Dim lString As String = "atcDataManger:"
+    For Each lDataSource As atcDataSource In pDataSources
+      lString &= lDataSource.ToString & vbCrLf
+    Next lDataSource
+    Return lString.TrimEnd(New Char() {vbCr, vbLf})
+  End Function
 End Class
