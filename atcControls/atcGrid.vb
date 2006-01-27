@@ -172,7 +172,11 @@ Public Class atcGrid
   End Sub
 
   Public Overrides Function ToString() As String
-    Return pSource.ToString
+    If pSource Is Nothing Then
+      Return ""
+    Else
+      Return pSource.ToString
+    End If
   End Function
 
   Public Property ColumnWidth(ByVal aColumn As Integer) As Integer
@@ -561,44 +565,48 @@ Public Class atcGrid
   ' if aShrinkToTotalWidth is false, columns will not be resized smaller to match aTotalWidth
   Public Sub SizeAllColumnsToContents(Optional ByVal aTotalWidth As Integer = 0, _
                                       Optional ByVal aShrinkToTotalWidth As Boolean = False)
-    Dim lMaxColumn As Integer = pSource.Columns - 1
-    Dim lContentsWidth As Integer = 0
-    For lCol As Integer = 0 To lMaxColumn
-      SizeColumnToContents(lCol)
-      lContentsWidth += ColumnWidth(lcol)
-    Next
-    If aTotalWidth > 0 AndAlso (aShrinkToTotalWidth OrElse aTotalWidth > lContentsWidth) Then
+    If Not pSource Is Nothing Then
+      Dim lMaxColumn As Integer = pSource.Columns - 1
+      Dim lContentsWidth As Integer = 0
       For lCol As Integer = 0 To lMaxColumn
-        ColumnWidth(lcol) = ColumnWidth(lcol) * aTotalWidth / lContentsWidth
+        SizeColumnToContents(lCol)
+        lContentsWidth += ColumnWidth(lcol)
       Next
+      If aTotalWidth > 0 AndAlso (aShrinkToTotalWidth OrElse aTotalWidth > lContentsWidth) Then
+        For lCol As Integer = 0 To lMaxColumn
+          ColumnWidth(lcol) = ColumnWidth(lcol) * aTotalWidth / lContentsWidth
+        Next
+      End If
     End If
   End Sub
 
   Public Sub SizeColumnToContents(ByVal aColumn As Integer)
-    Dim lCellValue As String
-    Dim lCellWidth As Integer
-    Dim lastRow As Integer = pSource.Rows - 1
-    Dim g As Graphics = Me.CreateGraphics
-    Dim lDecimalWidth As Integer = g.MeasureString(".", pFont).Width
-    Dim lMaxWidth As Integer = 0
+    If Not pSource Is Nothing Then
+      Dim lCellValue As String
+      Dim lCellWidth As Integer
+      Dim lastRow As Integer = pSource.Rows - 1
+      Dim g As Graphics = Me.CreateGraphics
+      Dim lDecimalWidth As Integer = g.MeasureString(".", pFont).Width
+      Dim lMaxWidth As Integer = 0
 
-    'TODO: would be faster to check just length of string [before/after decimal] then do width of "XXXXwidthXXXX"
-    If lastRow > pTopRow + 150 Then lastRow = pTopRow + 100 'Limit how much time we spend finding the widest cell
-    For lRow As Integer = 0 To lastRow
-      lCellValue = pSource.CellValue(lRow, aColumn)
-      If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
-        If (pSource.Alignment(lRow, aColumn) And atcAlignment.HAlign) = atcAlignment.HAlignDecimal Then
-          lCellWidth = lDecimalWidth + 2 * Math.Max(WidthLeftOfDecimal(lCellValue, g), WidthRightOfDecimal(lCellValue, g))
-        Else
-          lCellWidth = g.MeasureString(lCellValue, pFont).Width
+      'TODO: would be faster to check just length of string [before/after decimal] then do width of "XXXXwidthXXXX"
+      If lastRow > pTopRow + 150 Then lastRow = pTopRow + 100 'Limit how much time we spend finding the widest cell
+      For lRow As Integer = 0 To lastRow
+        lCellValue = pSource.CellValue(lRow, aColumn)
+        If Not lCellValue Is Nothing AndAlso lCellValue.Length > 0 Then
+          If (pSource.Alignment(lRow, aColumn) And atcAlignment.HAlign) = atcAlignment.HAlignDecimal Then
+            lCellWidth = lDecimalWidth + 2 * Math.Max(WidthLeftOfDecimal(lCellValue, g), WidthRightOfDecimal(lCellValue, g))
+          Else
+            lCellWidth = g.MeasureString(lCellValue, pFont).Width
+          End If
+          If lCellWidth > lMaxWidth Then
+            lMaxWidth = lCellWidth
+          End If
         End If
-        If lCellWidth > lMaxWidth Then
-          lMaxWidth = lCellWidth
-        End If
-      End If
-    Next
-    ColumnWidth(aColumn) = lMaxWidth + DRAG_TOLERANCE * 2
-    g.Dispose()
+      Next
+      ColumnWidth(aColumn) = lMaxWidth + DRAG_TOLERANCE * 2
+      g.Dispose()
+    End If
   End Sub
 
   Private Sub pSource_ChangedColumns(ByVal aColumns As Integer) Handles pSource.ChangedColumns
@@ -637,17 +645,19 @@ Public Class atcGrid
   End Function
 
   Public Sub EditCell(ByVal aRow As Integer, ByVal aColumn As Integer, Optional ByVal aOverrideEditable As Boolean = False)
-    EditCellFinished()
-    If aOverrideEditable OrElse pSource.CellEditable(aRow, aColumn) Then
-      Dim EditCellBounds As Rectangle = CellBounds(aRow, aColumn)
-      pColumnEditing = aColumn
-      pRowEditing = aRow
-      CellEditBox.Font = pFont
-      CellEditBox.Text = pSource.CellValue(aRow, aColumn)
-      CellEditBox.BackColor = pSource.CellColor(aRow, aColumn)
-      CellEditBox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)
-      CellEditBox.Visible = True
-      CellEditBox.Focus()
+    If Not pSource Is Nothing Then
+      EditCellFinished()
+      If aOverrideEditable OrElse pSource.CellEditable(aRow, aColumn) Then
+        Dim EditCellBounds As Rectangle = CellBounds(aRow, aColumn)
+        pColumnEditing = aColumn
+        pRowEditing = aRow
+        CellEditBox.Font = pFont
+        CellEditBox.Text = pSource.CellValue(aRow, aColumn)
+        CellEditBox.BackColor = pSource.CellColor(aRow, aColumn)
+        CellEditBox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)
+        CellEditBox.Visible = True
+        CellEditBox.Focus()
+      End If
     End If
   End Sub
 

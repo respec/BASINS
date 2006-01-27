@@ -71,6 +71,16 @@ Public Class frmMultipleResults
   Friend WithEvents agdPivot As atcControls.atcGrid
   Friend WithEvents txtIncrement As System.Windows.Forms.TextBox
   Friend WithEvents lblIncrement As System.Windows.Forms.Label
+  Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
+  Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuOpenResults As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSaveResults As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSavePivot As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuCopyResults As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuCopyPivot As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuPasteResults As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmMultipleResults))
     Me.Tabs = New System.Windows.Forms.TabControl
@@ -105,6 +115,16 @@ Public Class frmMultipleResults
     Me.lblRows = New System.Windows.Forms.Label
     Me.cboRows = New System.Windows.Forms.ComboBox
     Me.agdPivot = New atcControls.atcGrid
+    Me.MainMenu1 = New System.Windows.Forms.MainMenu
+    Me.mnuFile = New System.Windows.Forms.MenuItem
+    Me.mnuOpenResults = New System.Windows.Forms.MenuItem
+    Me.mnuSaveResults = New System.Windows.Forms.MenuItem
+    Me.mnuSavePivot = New System.Windows.Forms.MenuItem
+    Me.mnuEdit = New System.Windows.Forms.MenuItem
+    Me.mnuCopyResults = New System.Windows.Forms.MenuItem
+    Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
+    Me.mnuPasteResults = New System.Windows.Forms.MenuItem
+    Me.mnuHelp = New System.Windows.Forms.MenuItem
     Me.Tabs.SuspendLayout()
     Me.tabSpecify.SuspendLayout()
     Me.grpParameter.SuspendLayout()
@@ -120,10 +140,10 @@ Public Class frmMultipleResults
     Me.Tabs.Controls.Add(Me.tabSpecify)
     Me.Tabs.Controls.Add(Me.tabRowPerRun)
     Me.Tabs.Controls.Add(Me.tabPivot)
-    Me.Tabs.Location = New System.Drawing.Point(8, 8)
+    Me.Tabs.Location = New System.Drawing.Point(10, 9)
     Me.Tabs.Name = "Tabs"
     Me.Tabs.SelectedIndex = 0
-    Me.Tabs.Size = New System.Drawing.Size(552, 472)
+    Me.Tabs.Size = New System.Drawing.Size(662, 545)
     Me.Tabs.TabIndex = 0
     '
     'tabSpecify
@@ -138,18 +158,18 @@ Public Class frmMultipleResults
     Me.tabSpecify.Controls.Add(Me.grpParameter)
     Me.tabSpecify.Controls.Add(Me.Label4)
     Me.tabSpecify.Controls.Add(Me.Label5)
-    Me.tabSpecify.Location = New System.Drawing.Point(4, 22)
+    Me.tabSpecify.Location = New System.Drawing.Point(4, 25)
     Me.tabSpecify.Name = "tabSpecify"
-    Me.tabSpecify.Size = New System.Drawing.Size(544, 446)
+    Me.tabSpecify.Size = New System.Drawing.Size(654, 516)
     Me.tabSpecify.TabIndex = 2
     Me.tabSpecify.Text = "Specify Runs"
     '
     'btnStart
     '
     Me.btnStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnStart.Location = New System.Drawing.Point(128, 280)
+    Me.btnStart.Location = New System.Drawing.Point(154, 404)
     Me.btnStart.Name = "btnStart"
-    Me.btnStart.Size = New System.Drawing.Size(88, 24)
+    Me.btnStart.Size = New System.Drawing.Size(105, 28)
     Me.btnStart.TabIndex = 26
     Me.btnStart.Text = "Start"
     '
@@ -157,18 +177,18 @@ Public Class frmMultipleResults
     '
     Me.txtResultAttribute.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtResultAttribute.Location = New System.Drawing.Point(128, 240)
+    Me.txtResultAttribute.Location = New System.Drawing.Point(154, 277)
     Me.txtResultAttribute.Name = "txtResultAttribute"
-    Me.txtResultAttribute.Size = New System.Drawing.Size(200, 20)
+    Me.txtResultAttribute.Size = New System.Drawing.Size(372, 22)
     Me.txtResultAttribute.TabIndex = 25
     Me.txtResultAttribute.Text = ""
     '
     'lblResultAttribute
     '
     Me.lblResultAttribute.BackColor = System.Drawing.Color.Transparent
-    Me.lblResultAttribute.Location = New System.Drawing.Point(16, 240)
+    Me.lblResultAttribute.Location = New System.Drawing.Point(19, 277)
     Me.lblResultAttribute.Name = "lblResultAttribute"
-    Me.lblResultAttribute.Size = New System.Drawing.Size(96, 18)
+    Me.lblResultAttribute.Size = New System.Drawing.Size(115, 21)
     Me.lblResultAttribute.TabIndex = 24
     Me.lblResultAttribute.Text = "Result Attribute:"
     '
@@ -176,18 +196,18 @@ Public Class frmMultipleResults
     '
     Me.txtResultData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtResultData.Location = New System.Drawing.Point(128, 208)
+    Me.txtResultData.Location = New System.Drawing.Point(154, 240)
     Me.txtResultData.Name = "txtResultData"
-    Me.txtResultData.Size = New System.Drawing.Size(200, 20)
+    Me.txtResultData.Size = New System.Drawing.Size(372, 22)
     Me.txtResultData.TabIndex = 23
     Me.txtResultData.Text = ""
     '
     'lblResultData
     '
     Me.lblResultData.BackColor = System.Drawing.Color.Transparent
-    Me.lblResultData.Location = New System.Drawing.Point(16, 216)
+    Me.lblResultData.Location = New System.Drawing.Point(19, 249)
     Me.lblResultData.Name = "lblResultData"
-    Me.lblResultData.Size = New System.Drawing.Size(96, 18)
+    Me.lblResultData.Size = New System.Drawing.Size(115, 21)
     Me.lblResultData.TabIndex = 22
     Me.lblResultData.Text = "Result Data:"
     '
@@ -195,9 +215,9 @@ Public Class frmMultipleResults
     '
     Me.txtFunction.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtFunction.Location = New System.Drawing.Point(128, 40)
+    Me.txtFunction.Location = New System.Drawing.Point(154, 46)
     Me.txtFunction.Name = "txtFunction"
-    Me.txtFunction.Size = New System.Drawing.Size(200, 20)
+    Me.txtFunction.Size = New System.Drawing.Size(372, 22)
     Me.txtFunction.TabIndex = 21
     Me.txtFunction.Text = "Multiply"
     '
@@ -205,9 +225,9 @@ Public Class frmMultipleResults
     '
     Me.txtVaryData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtVaryData.Location = New System.Drawing.Point(128, 8)
+    Me.txtVaryData.Location = New System.Drawing.Point(154, 9)
     Me.txtVaryData.Name = "txtVaryData"
-    Me.txtVaryData.Size = New System.Drawing.Size(200, 20)
+    Me.txtVaryData.Size = New System.Drawing.Size(372, 22)
     Me.txtVaryData.TabIndex = 20
     Me.txtVaryData.Text = ""
     '
@@ -225,43 +245,43 @@ Public Class frmMultipleResults
     Me.grpParameter.Controls.Add(Me.lblPattern)
     Me.grpParameter.Controls.Add(Me.lblMaximum)
     Me.grpParameter.Controls.Add(Me.lblMinimum)
-    Me.grpParameter.Location = New System.Drawing.Point(16, 64)
+    Me.grpParameter.Location = New System.Drawing.Point(19, 74)
     Me.grpParameter.Name = "grpParameter"
-    Me.grpParameter.Size = New System.Drawing.Size(312, 128)
+    Me.grpParameter.Size = New System.Drawing.Size(507, 148)
     Me.grpParameter.TabIndex = 19
     Me.grpParameter.TabStop = False
     Me.grpParameter.Text = "Variation Parameter"
     '
     'txtIncrement
     '
-    Me.txtIncrement.Location = New System.Drawing.Point(80, 72)
+    Me.txtIncrement.Location = New System.Drawing.Point(96, 83)
     Me.txtIncrement.Name = "txtIncrement"
-    Me.txtIncrement.Size = New System.Drawing.Size(72, 20)
+    Me.txtIncrement.Size = New System.Drawing.Size(86, 22)
     Me.txtIncrement.TabIndex = 17
     Me.txtIncrement.Text = "0.05"
     '
     'lblIncrement
     '
     Me.lblIncrement.BackColor = System.Drawing.Color.Transparent
-    Me.lblIncrement.Location = New System.Drawing.Point(16, 76)
+    Me.lblIncrement.Location = New System.Drawing.Point(19, 88)
     Me.lblIncrement.Name = "lblIncrement"
-    Me.lblIncrement.Size = New System.Drawing.Size(64, 18)
+    Me.lblIncrement.Size = New System.Drawing.Size(77, 20)
     Me.lblIncrement.TabIndex = 16
     Me.lblIncrement.Text = "Increment:"
     '
     'txtMax
     '
-    Me.txtMax.Location = New System.Drawing.Point(80, 48)
+    Me.txtMax.Location = New System.Drawing.Point(96, 55)
     Me.txtMax.Name = "txtMax"
-    Me.txtMax.Size = New System.Drawing.Size(72, 20)
+    Me.txtMax.Size = New System.Drawing.Size(86, 22)
     Me.txtMax.TabIndex = 15
     Me.txtMax.Text = "1.1"
     '
     'txtMin
     '
-    Me.txtMin.Location = New System.Drawing.Point(80, 24)
+    Me.txtMin.Location = New System.Drawing.Point(96, 28)
     Me.txtMin.Name = "txtMin"
-    Me.txtMin.Size = New System.Drawing.Size(72, 20)
+    Me.txtMin.Size = New System.Drawing.Size(86, 22)
     Me.txtMin.TabIndex = 14
     Me.txtMin.Text = "0.9"
     '
@@ -269,9 +289,9 @@ Public Class frmMultipleResults
     '
     Me.rdoRandom.BackColor = System.Drawing.Color.Transparent
     Me.rdoRandom.Enabled = False
-    Me.rdoRandom.Location = New System.Drawing.Point(232, 96)
+    Me.rdoRandom.Location = New System.Drawing.Point(278, 111)
     Me.rdoRandom.Name = "rdoRandom"
-    Me.rdoRandom.Size = New System.Drawing.Size(72, 16)
+    Me.rdoRandom.Size = New System.Drawing.Size(87, 18)
     Me.rdoRandom.TabIndex = 13
     Me.rdoRandom.Text = "Random"
     '
@@ -279,9 +299,9 @@ Public Class frmMultipleResults
     '
     Me.rdoLog.BackColor = System.Drawing.Color.Transparent
     Me.rdoLog.Enabled = False
-    Me.rdoLog.Location = New System.Drawing.Point(160, 96)
+    Me.rdoLog.Location = New System.Drawing.Point(192, 111)
     Me.rdoLog.Name = "rdoLog"
-    Me.rdoLog.Size = New System.Drawing.Size(56, 16)
+    Me.rdoLog.Size = New System.Drawing.Size(67, 18)
     Me.rdoLog.TabIndex = 12
     Me.rdoLog.Text = "Log"
     '
@@ -290,9 +310,9 @@ Public Class frmMultipleResults
     Me.rdoLinear.BackColor = System.Drawing.Color.Transparent
     Me.rdoLinear.Checked = True
     Me.rdoLinear.Enabled = False
-    Me.rdoLinear.Location = New System.Drawing.Point(88, 96)
+    Me.rdoLinear.Location = New System.Drawing.Point(106, 111)
     Me.rdoLinear.Name = "rdoLinear"
-    Me.rdoLinear.Size = New System.Drawing.Size(56, 16)
+    Me.rdoLinear.Size = New System.Drawing.Size(67, 18)
     Me.rdoLinear.TabIndex = 11
     Me.rdoLinear.TabStop = True
     Me.rdoLinear.Text = "Linear"
@@ -301,54 +321,54 @@ Public Class frmMultipleResults
     '
     Me.lblPattern.BackColor = System.Drawing.Color.Transparent
     Me.lblPattern.Enabled = False
-    Me.lblPattern.Location = New System.Drawing.Point(16, 100)
+    Me.lblPattern.Location = New System.Drawing.Point(19, 115)
     Me.lblPattern.Name = "lblPattern"
-    Me.lblPattern.Size = New System.Drawing.Size(64, 18)
+    Me.lblPattern.Size = New System.Drawing.Size(77, 21)
     Me.lblPattern.TabIndex = 10
     Me.lblPattern.Text = "Pattern:"
     '
     'lblMaximum
     '
     Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
-    Me.lblMaximum.Location = New System.Drawing.Point(16, 52)
+    Me.lblMaximum.Location = New System.Drawing.Point(19, 60)
     Me.lblMaximum.Name = "lblMaximum"
-    Me.lblMaximum.Size = New System.Drawing.Size(64, 18)
+    Me.lblMaximum.Size = New System.Drawing.Size(77, 21)
     Me.lblMaximum.TabIndex = 9
     Me.lblMaximum.Text = "Maximum:"
     '
     'lblMinimum
     '
     Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
-    Me.lblMinimum.Location = New System.Drawing.Point(16, 28)
+    Me.lblMinimum.Location = New System.Drawing.Point(19, 32)
     Me.lblMinimum.Name = "lblMinimum"
-    Me.lblMinimum.Size = New System.Drawing.Size(64, 18)
+    Me.lblMinimum.Size = New System.Drawing.Size(77, 21)
     Me.lblMinimum.TabIndex = 8
     Me.lblMinimum.Text = "Minimum:"
     '
     'Label4
     '
     Me.Label4.BackColor = System.Drawing.Color.Transparent
-    Me.Label4.Location = New System.Drawing.Point(16, 40)
+    Me.Label4.Location = New System.Drawing.Point(19, 46)
     Me.Label4.Name = "Label4"
-    Me.Label4.Size = New System.Drawing.Size(128, 18)
+    Me.Label4.Size = New System.Drawing.Size(154, 21)
     Me.Label4.TabIndex = 18
     Me.Label4.Text = "Variation Function:"
     '
     'Label5
     '
     Me.Label5.BackColor = System.Drawing.Color.Transparent
-    Me.Label5.Location = New System.Drawing.Point(16, 16)
+    Me.Label5.Location = New System.Drawing.Point(19, 18)
     Me.Label5.Name = "Label5"
-    Me.Label5.Size = New System.Drawing.Size(128, 18)
+    Me.Label5.Size = New System.Drawing.Size(154, 21)
     Me.Label5.TabIndex = 17
     Me.Label5.Text = "Data to Vary:"
     '
     'tabRowPerRun
     '
     Me.tabRowPerRun.Controls.Add(Me.agdRowPerRun)
-    Me.tabRowPerRun.Location = New System.Drawing.Point(4, 22)
+    Me.tabRowPerRun.Location = New System.Drawing.Point(4, 25)
     Me.tabRowPerRun.Name = "tabRowPerRun"
-    Me.tabRowPerRun.Size = New System.Drawing.Size(544, 446)
+    Me.tabRowPerRun.Size = New System.Drawing.Size(654, 516)
     Me.tabRowPerRun.TabIndex = 0
     Me.tabRowPerRun.Text = "Row Per Run"
     '
@@ -361,9 +381,9 @@ Public Class frmMultipleResults
     Me.agdRowPerRun.CellBackColor = System.Drawing.Color.Empty
     Me.agdRowPerRun.LineColor = System.Drawing.Color.Empty
     Me.agdRowPerRun.LineWidth = 0.0!
-    Me.agdRowPerRun.Location = New System.Drawing.Point(8, 8)
+    Me.agdRowPerRun.Location = New System.Drawing.Point(10, 9)
     Me.agdRowPerRun.Name = "agdRowPerRun"
-    Me.agdRowPerRun.Size = New System.Drawing.Size(528, 432)
+    Me.agdRowPerRun.Size = New System.Drawing.Size(633, 495)
     Me.agdRowPerRun.Source = Nothing
     Me.agdRowPerRun.TabIndex = 0
     '
@@ -376,78 +396,133 @@ Public Class frmMultipleResults
     Me.tabPivot.Controls.Add(Me.lblRows)
     Me.tabPivot.Controls.Add(Me.cboRows)
     Me.tabPivot.Controls.Add(Me.agdPivot)
-    Me.tabPivot.Location = New System.Drawing.Point(4, 22)
+    Me.tabPivot.Location = New System.Drawing.Point(4, 25)
     Me.tabPivot.Name = "tabPivot"
-    Me.tabPivot.Size = New System.Drawing.Size(544, 446)
+    Me.tabPivot.Size = New System.Drawing.Size(654, 516)
     Me.tabPivot.TabIndex = 1
     Me.tabPivot.Text = "Pivot"
     '
     'Label2
     '
-    Me.Label2.Location = New System.Drawing.Point(8, 68)
+    Me.Label2.Location = New System.Drawing.Point(10, 78)
     Me.Label2.Name = "Label2"
-    Me.Label2.Size = New System.Drawing.Size(56, 16)
+    Me.Label2.Size = New System.Drawing.Size(67, 19)
     Me.Label2.TabIndex = 6
     Me.Label2.Text = "Cells"
     Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'cboCells
     '
-    Me.cboCells.Location = New System.Drawing.Point(72, 64)
+    Me.cboCells.Location = New System.Drawing.Point(86, 74)
     Me.cboCells.Name = "cboCells"
-    Me.cboCells.Size = New System.Drawing.Size(112, 21)
+    Me.cboCells.Size = New System.Drawing.Size(135, 24)
     Me.cboCells.TabIndex = 5
     '
     'Label1
     '
-    Me.Label1.Location = New System.Drawing.Point(8, 44)
+    Me.Label1.Location = New System.Drawing.Point(10, 51)
     Me.Label1.Name = "Label1"
-    Me.Label1.Size = New System.Drawing.Size(56, 16)
+    Me.Label1.Size = New System.Drawing.Size(67, 18)
     Me.Label1.TabIndex = 4
     Me.Label1.Text = "Columns"
     Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'cboColumns
     '
-    Me.cboColumns.Location = New System.Drawing.Point(72, 40)
+    Me.cboColumns.Location = New System.Drawing.Point(86, 46)
     Me.cboColumns.Name = "cboColumns"
-    Me.cboColumns.Size = New System.Drawing.Size(112, 21)
+    Me.cboColumns.Size = New System.Drawing.Size(135, 24)
     Me.cboColumns.TabIndex = 3
     '
     'lblRows
     '
-    Me.lblRows.Location = New System.Drawing.Point(8, 20)
+    Me.lblRows.Location = New System.Drawing.Point(10, 23)
     Me.lblRows.Name = "lblRows"
-    Me.lblRows.Size = New System.Drawing.Size(56, 16)
+    Me.lblRows.Size = New System.Drawing.Size(67, 19)
     Me.lblRows.TabIndex = 2
     Me.lblRows.Text = "Rows"
     Me.lblRows.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'cboRows
     '
-    Me.cboRows.Location = New System.Drawing.Point(72, 16)
+    Me.cboRows.Location = New System.Drawing.Point(86, 18)
     Me.cboRows.Name = "cboRows"
-    Me.cboRows.Size = New System.Drawing.Size(112, 21)
+    Me.cboRows.Size = New System.Drawing.Size(135, 24)
     Me.cboRows.TabIndex = 1
     '
     'agdPivot
     '
     Me.agdPivot.AllowHorizontalScrolling = True
+    Me.agdPivot.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.agdPivot.CellBackColor = System.Drawing.Color.Empty
     Me.agdPivot.LineColor = System.Drawing.Color.Empty
     Me.agdPivot.LineWidth = 0.0!
-    Me.agdPivot.Location = New System.Drawing.Point(8, 112)
+    Me.agdPivot.Location = New System.Drawing.Point(10, 129)
     Me.agdPivot.Name = "agdPivot"
-    Me.agdPivot.Size = New System.Drawing.Size(528, 328)
+    Me.agdPivot.Size = New System.Drawing.Size(633, 379)
     Me.agdPivot.Source = Nothing
     Me.agdPivot.TabIndex = 0
     '
+    'MainMenu1
+    '
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuHelp})
+    '
+    'mnuFile
+    '
+    Me.mnuFile.Index = 0
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenResults, Me.mnuSaveResults, Me.mnuSavePivot})
+    Me.mnuFile.Text = "File"
+    '
+    'mnuOpenResults
+    '
+    Me.mnuOpenResults.Index = 0
+    Me.mnuOpenResults.Text = "Open Results"
+    '
+    'mnuSaveResults
+    '
+    Me.mnuSaveResults.Index = 1
+    Me.mnuSaveResults.Text = "Save Results"
+    '
+    'mnuSavePivot
+    '
+    Me.mnuSavePivot.Index = 2
+    Me.mnuSavePivot.Text = "Save Pivot"
+    '
+    'mnuEdit
+    '
+    Me.mnuEdit.Index = 1
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuCopyResults, Me.mnuCopyPivot, Me.mnuPasteResults})
+    Me.mnuEdit.Text = "Edit"
+    '
+    'mnuCopyResults
+    '
+    Me.mnuCopyResults.Index = 0
+    Me.mnuCopyResults.Text = "Copy Results"
+    '
+    'mnuCopyPivot
+    '
+    Me.mnuCopyPivot.Index = 1
+    Me.mnuCopyPivot.Text = "Copy Pivot"
+    '
+    'mnuPasteResults
+    '
+    Me.mnuPasteResults.Index = 2
+    Me.mnuPasteResults.Text = "Paste Results"
+    '
+    'mnuHelp
+    '
+    Me.mnuHelp.Index = 2
+    Me.mnuHelp.Text = "Help"
+    '
     'frmMultipleResults
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(568, 485)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(681, 559)
     Me.Controls.Add(Me.Tabs)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.Menu = Me.MainMenu1
     Me.Name = "frmMultipleResults"
     Me.Text = "Multiple Runs"
     Me.Tabs.ResumeLayout(False)
@@ -753,4 +828,46 @@ Public Class frmMultipleResults
     End If
   End Sub
 
+  Private Sub mnuOpenResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenResults.Click
+    Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+    With lOpenDialog
+      .FileName = "results.txt"
+      .Filter = "Text files (*.txt)|*.txt|All files|*.*"
+      .FilterIndex = 1
+      .Title = "Scenario Builder - Open Results"
+      If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        'read file into grid
+        If FileExists(.FileName) Then
+          With agdRowPerRun
+            .Source = New atcGridSource
+            .Initialize(agdRowPerRun.Source)
+            .Source.FromString(WholeFileString(lOpenDialog.FileName))
+            .SizeAllColumnsToContents(.Width, True)
+            .Refresh()
+            PopulatePivotCombos()
+          End With
+        End If
+      End If
+    End With
+  End Sub
+
+  Private Sub mnuSaveResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveResults.Click
+    Dim lSaveDialog As New Windows.Forms.SaveFileDialog
+    With lSaveDialog
+      .FileName = "results.txt"
+      .Filter = "Text files (*.txt)|*.txt|All files|*.*"
+      .FilterIndex = 1
+      .Title = "Scenario Builder - Save Results"
+      .OverwritePrompt = True
+      If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        'write file from grid contents
+        SaveFileString(.FileName, agdRowPerRun.Source.ToString)
+      End If
+    End With
+  End Sub
+
+  Private Sub frmMultipleResults_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+    agdRowPerRun.SizeAllColumnsToContents(agdRowPerRun.Width, True)
+    agdPivot.SizeAllColumnsToContents(agdPivot.Width, True)
+  End Sub
 End Class
