@@ -320,6 +320,7 @@ Public Class frmReport
         'NLCDLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
         'ListedSegmentsTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
         'Population2000Table.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
+        'PCSFacilityTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
         Scripting.Run("vb", "", pReportsColl(lbxReports.SelectedIndices(i) + 1), cerror, False, pMappingObject, aArgs)
         If Len(cerror) > 0 Then
           MsgBox(cerror)
