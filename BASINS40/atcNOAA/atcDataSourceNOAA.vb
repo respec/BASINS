@@ -60,6 +60,7 @@ Public Class atcDataSourceNOAA
   Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
     Dim lData As atcTimeseries
     Dim lDates As atcTimeseries
+    Dim lDataFilled As atcTimeseries
     Dim lTSKey As String
 
     If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
@@ -78,6 +79,8 @@ Public Class atcDataSourceNOAA
       Dim repeatOffset As Integer
       Dim repeatsThisLine As Integer
       Dim maxRepeat As Integer = 31
+      Dim MissingVal As Double = -999
+      Dim MissingAcc As Double = -998
 
       Dim lBufSiz As Integer = 100
       Dim vals(100) As Double 'array of data values
@@ -119,8 +122,6 @@ Public Class atcDataSourceNOAA
            ColDay(0).Value < 32 AndAlso _
            (ColHour(0).Value < 26 Or ColHour(0).Value = 99)) Then
 
-          Dim MissingVal As Double = -999
-          Dim MissingAcc As Double = -998
           Dim InMissing As Boolean = False
           Dim InAccum As Boolean = False
           Dim lJDate As Double
@@ -162,12 +163,12 @@ Public Class atcDataSourceNOAA
                   Case "TI" 'tenths of inches
                     lData.Value(lTSInd) = CDbl(ColValue(repeat).Value) / 10
                   Case Else
-                    lData.Value(lTSInd) = CDbl(ColValue(repeat).Value) / 10
+                    lData.Value(lTSInd) = CDbl(ColValue(repeat).Value)
                 End Select
                 lJDate = Jday(ColYear.Value, _
                               ColMonth.Value, _
                               ColDay(repeat).Value, _
-                              0, 0, 0)
+                              24, 0, 0)
                 lData.Dates.Value(lTSInd) = lJDate
                 Select Case ColFlag1(repeat).Value
                   Case " " 'Usually flag is blank
@@ -192,10 +193,21 @@ Public Class atcDataSourceNOAA
           Open = False
         End If
       Catch endEx As EndOfStreamException
+        Dim lCnt As Integer = DataSets.Count
+        Dim lDataSets As New atcDataGroup
         For Each lData In DataSets
           lData.numValues = lData.Attributes.GetValue("Count")
-          lData.ValuesNeedToBeRead = False
-          lData.Dates.ValuesNeedToBeRead = False
+          lData.Dates.Value(0) = lData.Dates.Value(1) - 1 'set 0th date to start of 1st interval
+          lDataFilled = FillValues(lData, 4, 1, MissingVal, MissingVal, MissingAcc)
+          If Not lDataFilled Is Nothing Then
+            lDataFilled.ValuesNeedToBeRead = False
+            lDataFilled.Dates.ValuesNeedToBeRead = False
+            lDataSets.Add(lDataFilled)
+          End If
+        Next
+        DataSets.Clear() 'get rid of initial "unfilled" data sets
+        For Each lData In lDataSets
+          DataSets.Add(lData)
         Next
         Open = True
       End Try
