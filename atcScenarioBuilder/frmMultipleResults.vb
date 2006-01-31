@@ -48,15 +48,12 @@ Public Class frmMultipleResults
   Friend WithEvents lblRows As System.Windows.Forms.Label
   Friend WithEvents cboColumns As System.Windows.Forms.ComboBox
   Friend WithEvents cboCells As System.Windows.Forms.ComboBox
-  Friend WithEvents txtFunction As System.Windows.Forms.TextBox
   Friend WithEvents txtVaryData As System.Windows.Forms.TextBox
   Friend WithEvents grpParameter As System.Windows.Forms.GroupBox
   Friend WithEvents txtMax As System.Windows.Forms.TextBox
   Friend WithEvents txtMin As System.Windows.Forms.TextBox
   Friend WithEvents lblMaximum As System.Windows.Forms.Label
   Friend WithEvents lblMinimum As System.Windows.Forms.Label
-  Friend WithEvents Label4 As System.Windows.Forms.Label
-  Friend WithEvents Label5 As System.Windows.Forms.Label
   Friend WithEvents btnStart As System.Windows.Forms.Button
   Friend WithEvents Tabs As System.Windows.Forms.TabControl
   Friend WithEvents agdPivot As atcControls.atcGrid
@@ -82,29 +79,36 @@ Public Class frmMultipleResults
   Friend WithEvents agdResults As atcControls.atcGrid
   Friend WithEvents tabSpecifications As System.Windows.Forms.TabPage
   Friend WithEvents tabResults As System.Windows.Forms.TabPage
-  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
-  Friend WithEvents MenuItem2 As System.Windows.Forms.MenuItem
+  Friend WithEvents grpSummary As System.Windows.Forms.GroupBox
+  Friend WithEvents agdSummary As atcControls.atcGrid
+  Friend WithEvents txtFunction As System.Windows.Forms.TextBox
+  Friend WithEvents lblFunction As System.Windows.Forms.Label
+  Friend WithEvents lblData As System.Windows.Forms.Label
+  Friend WithEvents mnuOpenSpecifications As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSaveSpecifications As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmMultipleResults))
     Me.Tabs = New System.Windows.Forms.TabControl
     Me.tabSpecifications = New System.Windows.Forms.TabPage
+    Me.grpSummary = New System.Windows.Forms.GroupBox
+    Me.agdSummary = New atcControls.atcGrid
     Me.grpSeasons = New System.Windows.Forms.GroupBox
     Me.btnSeasonsNone = New System.Windows.Forms.Button
     Me.btnSeasonsAll = New System.Windows.Forms.Button
     Me.lstSeasons = New System.Windows.Forms.ListBox
     Me.cboSeasons = New System.Windows.Forms.ComboBox
     Me.btnStart = New System.Windows.Forms.Button
-    Me.txtFunction = New System.Windows.Forms.TextBox
     Me.txtVaryData = New System.Windows.Forms.TextBox
     Me.grpParameter = New System.Windows.Forms.GroupBox
+    Me.lblFunction = New System.Windows.Forms.Label
+    Me.txtFunction = New System.Windows.Forms.TextBox
     Me.txtIncrement = New System.Windows.Forms.TextBox
     Me.lblIncrement = New System.Windows.Forms.Label
     Me.txtMax = New System.Windows.Forms.TextBox
     Me.txtMin = New System.Windows.Forms.TextBox
     Me.lblMaximum = New System.Windows.Forms.Label
     Me.lblMinimum = New System.Windows.Forms.Label
-    Me.Label4 = New System.Windows.Forms.Label
-    Me.Label5 = New System.Windows.Forms.Label
+    Me.lblData = New System.Windows.Forms.Label
     Me.tabResults = New System.Windows.Forms.TabPage
     Me.agdResults = New atcControls.atcGrid
     Me.tabPivot = New System.Windows.Forms.TabPage
@@ -117,7 +121,9 @@ Public Class frmMultipleResults
     Me.agdPivot = New atcControls.atcGrid
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
+    Me.mnuOpenSpecifications = New System.Windows.Forms.MenuItem
     Me.mnuOpenResults = New System.Windows.Forms.MenuItem
+    Me.mnuSaveSpecifications = New System.Windows.Forms.MenuItem
     Me.mnuSaveResults = New System.Windows.Forms.MenuItem
     Me.mnuSavePivot = New System.Windows.Forms.MenuItem
     Me.mnuEdit = New System.Windows.Forms.MenuItem
@@ -125,10 +131,9 @@ Public Class frmMultipleResults
     Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
     Me.mnuPasteResults = New System.Windows.Forms.MenuItem
     Me.mnuHelp = New System.Windows.Forms.MenuItem
-    Me.MenuItem1 = New System.Windows.Forms.MenuItem
-    Me.MenuItem2 = New System.Windows.Forms.MenuItem
     Me.Tabs.SuspendLayout()
     Me.tabSpecifications.SuspendLayout()
+    Me.grpSummary.SuspendLayout()
     Me.grpSeasons.SuspendLayout()
     Me.grpParameter.SuspendLayout()
     Me.tabResults.SuspendLayout()
@@ -151,18 +156,44 @@ Public Class frmMultipleResults
     '
     'tabSpecifications
     '
+    Me.tabSpecifications.Controls.Add(Me.grpSummary)
     Me.tabSpecifications.Controls.Add(Me.grpSeasons)
     Me.tabSpecifications.Controls.Add(Me.btnStart)
-    Me.tabSpecifications.Controls.Add(Me.txtFunction)
     Me.tabSpecifications.Controls.Add(Me.txtVaryData)
     Me.tabSpecifications.Controls.Add(Me.grpParameter)
-    Me.tabSpecifications.Controls.Add(Me.Label4)
-    Me.tabSpecifications.Controls.Add(Me.Label5)
+    Me.tabSpecifications.Controls.Add(Me.lblData)
     Me.tabSpecifications.Location = New System.Drawing.Point(4, 25)
     Me.tabSpecifications.Name = "tabSpecifications"
     Me.tabSpecifications.Size = New System.Drawing.Size(654, 516)
     Me.tabSpecifications.TabIndex = 2
     Me.tabSpecifications.Text = "Specifications"
+    '
+    'grpSummary
+    '
+    Me.grpSummary.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.grpSummary.Controls.Add(Me.agdSummary)
+    Me.grpSummary.Location = New System.Drawing.Point(8, 264)
+    Me.grpSummary.Name = "grpSummary"
+    Me.grpSummary.Size = New System.Drawing.Size(648, 192)
+    Me.grpSummary.TabIndex = 28
+    Me.grpSummary.TabStop = False
+    Me.grpSummary.Text = "Summary"
+    '
+    'agdSummary
+    '
+    Me.agdSummary.AllowHorizontalScrolling = True
+    Me.agdSummary.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.agdSummary.CellBackColor = System.Drawing.Color.Empty
+    Me.agdSummary.LineColor = System.Drawing.Color.Empty
+    Me.agdSummary.LineWidth = 0.0!
+    Me.agdSummary.Location = New System.Drawing.Point(16, 24)
+    Me.agdSummary.Name = "agdSummary"
+    Me.agdSummary.Size = New System.Drawing.Size(624, 152)
+    Me.agdSummary.Source = Nothing
+    Me.agdSummary.TabIndex = 1
     '
     'grpSeasons
     '
@@ -170,9 +201,9 @@ Public Class frmMultipleResults
     Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
     Me.grpSeasons.Controls.Add(Me.lstSeasons)
     Me.grpSeasons.Controls.Add(Me.cboSeasons)
-    Me.grpSeasons.Location = New System.Drawing.Point(288, 83)
+    Me.grpSeasons.Location = New System.Drawing.Point(232, 48)
     Me.grpSeasons.Name = "grpSeasons"
-    Me.grpSeasons.Size = New System.Drawing.Size(240, 205)
+    Me.grpSeasons.Size = New System.Drawing.Size(240, 160)
     Me.grpSeasons.TabIndex = 27
     Me.grpSeasons.TabStop = False
     Me.grpSeasons.Text = "Seasons"
@@ -180,7 +211,7 @@ Public Class frmMultipleResults
     'btnSeasonsNone
     '
     Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnSeasonsNone.Location = New System.Drawing.Point(154, 162)
+    Me.btnSeasonsNone.Location = New System.Drawing.Point(154, 117)
     Me.btnSeasonsNone.Name = "btnSeasonsNone"
     Me.btnSeasonsNone.Size = New System.Drawing.Size(76, 26)
     Me.btnSeasonsNone.TabIndex = 12
@@ -189,7 +220,7 @@ Public Class frmMultipleResults
     'btnSeasonsAll
     '
     Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnSeasonsAll.Location = New System.Drawing.Point(10, 162)
+    Me.btnSeasonsAll.Location = New System.Drawing.Point(10, 117)
     Me.btnSeasonsAll.Name = "btnSeasonsAll"
     Me.btnSeasonsAll.Size = New System.Drawing.Size(76, 27)
     Me.btnSeasonsAll.TabIndex = 11
@@ -205,7 +236,7 @@ Public Class frmMultipleResults
     Me.lstSeasons.Location = New System.Drawing.Point(10, 46)
     Me.lstSeasons.Name = "lstSeasons"
     Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-    Me.lstSeasons.Size = New System.Drawing.Size(220, 107)
+    Me.lstSeasons.Size = New System.Drawing.Size(220, 62)
     Me.lstSeasons.TabIndex = 7
     '
     'cboSeasons
@@ -221,27 +252,17 @@ Public Class frmMultipleResults
     'btnStart
     '
     Me.btnStart.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnStart.Location = New System.Drawing.Point(67, 435)
+    Me.btnStart.Location = New System.Drawing.Point(48, 472)
     Me.btnStart.Name = "btnStart"
     Me.btnStart.Size = New System.Drawing.Size(106, 28)
     Me.btnStart.TabIndex = 26
     Me.btnStart.Text = "Start"
     '
-    'txtFunction
-    '
-    Me.txtFunction.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtFunction.Location = New System.Drawing.Point(154, 46)
-    Me.txtFunction.Name = "txtFunction"
-    Me.txtFunction.Size = New System.Drawing.Size(490, 22)
-    Me.txtFunction.TabIndex = 21
-    Me.txtFunction.Text = "Multiply"
-    '
     'txtVaryData
     '
     Me.txtVaryData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtVaryData.Location = New System.Drawing.Point(154, 9)
+    Me.txtVaryData.Location = New System.Drawing.Point(120, 16)
     Me.txtVaryData.Name = "txtVaryData"
     Me.txtVaryData.Size = New System.Drawing.Size(490, 22)
     Me.txtVaryData.TabIndex = 20
@@ -249,22 +270,44 @@ Public Class frmMultipleResults
     '
     'grpParameter
     '
+    Me.grpParameter.Controls.Add(Me.lblFunction)
+    Me.grpParameter.Controls.Add(Me.txtFunction)
     Me.grpParameter.Controls.Add(Me.txtIncrement)
     Me.grpParameter.Controls.Add(Me.lblIncrement)
     Me.grpParameter.Controls.Add(Me.txtMax)
     Me.grpParameter.Controls.Add(Me.txtMin)
     Me.grpParameter.Controls.Add(Me.lblMaximum)
     Me.grpParameter.Controls.Add(Me.lblMinimum)
-    Me.grpParameter.Location = New System.Drawing.Point(58, 83)
+    Me.grpParameter.Location = New System.Drawing.Point(16, 48)
     Me.grpParameter.Name = "grpParameter"
-    Me.grpParameter.Size = New System.Drawing.Size(201, 120)
+    Me.grpParameter.Size = New System.Drawing.Size(201, 160)
     Me.grpParameter.TabIndex = 19
     Me.grpParameter.TabStop = False
-    Me.grpParameter.Text = "Variation Range"
+    Me.grpParameter.Text = "Variation"
+    '
+    'lblFunction
+    '
+    Me.lblFunction.BackColor = System.Drawing.Color.Transparent
+    Me.lblFunction.Location = New System.Drawing.Point(16, 24)
+    Me.lblFunction.Name = "lblFunction"
+    Me.lblFunction.Size = New System.Drawing.Size(72, 21)
+    Me.lblFunction.TabIndex = 23
+    Me.lblFunction.Text = "Function:"
+    Me.lblFunction.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'txtFunction
+    '
+    Me.txtFunction.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtFunction.Location = New System.Drawing.Point(96, 24)
+    Me.txtFunction.Name = "txtFunction"
+    Me.txtFunction.Size = New System.Drawing.Size(88, 22)
+    Me.txtFunction.TabIndex = 22
+    Me.txtFunction.Text = "Multiply"
     '
     'txtIncrement
     '
-    Me.txtIncrement.Location = New System.Drawing.Point(96, 83)
+    Me.txtIncrement.Location = New System.Drawing.Point(96, 120)
     Me.txtIncrement.Name = "txtIncrement"
     Me.txtIncrement.Size = New System.Drawing.Size(86, 22)
     Me.txtIncrement.TabIndex = 17
@@ -274,16 +317,16 @@ Public Class frmMultipleResults
     '
     Me.lblIncrement.BackColor = System.Drawing.Color.Transparent
     Me.lblIncrement.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-    Me.lblIncrement.Location = New System.Drawing.Point(10, 88)
+    Me.lblIncrement.Location = New System.Drawing.Point(8, 120)
     Me.lblIncrement.Name = "lblIncrement"
     Me.lblIncrement.Size = New System.Drawing.Size(76, 20)
     Me.lblIncrement.TabIndex = 16
     Me.lblIncrement.Text = "Increment:"
-    Me.lblIncrement.TextAlign = System.Drawing.ContentAlignment.TopRight
+    Me.lblIncrement.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'txtMax
     '
-    Me.txtMax.Location = New System.Drawing.Point(96, 55)
+    Me.txtMax.Location = New System.Drawing.Point(96, 88)
     Me.txtMax.Name = "txtMax"
     Me.txtMax.Size = New System.Drawing.Size(86, 22)
     Me.txtMax.TabIndex = 15
@@ -291,7 +334,7 @@ Public Class frmMultipleResults
     '
     'txtMin
     '
-    Me.txtMin.Location = New System.Drawing.Point(96, 28)
+    Me.txtMin.Location = New System.Drawing.Point(96, 56)
     Me.txtMin.Name = "txtMin"
     Me.txtMin.Size = New System.Drawing.Size(86, 22)
     Me.txtMin.TabIndex = 14
@@ -301,43 +344,33 @@ Public Class frmMultipleResults
     '
     Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
     Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-    Me.lblMaximum.Location = New System.Drawing.Point(10, 60)
+    Me.lblMaximum.Location = New System.Drawing.Point(8, 88)
     Me.lblMaximum.Name = "lblMaximum"
     Me.lblMaximum.Size = New System.Drawing.Size(76, 21)
     Me.lblMaximum.TabIndex = 9
     Me.lblMaximum.Text = "Maximum:"
-    Me.lblMaximum.TextAlign = System.Drawing.ContentAlignment.TopRight
+    Me.lblMaximum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'lblMinimum
     '
     Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
     Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-    Me.lblMinimum.Location = New System.Drawing.Point(10, 32)
+    Me.lblMinimum.Location = New System.Drawing.Point(8, 56)
     Me.lblMinimum.Name = "lblMinimum"
     Me.lblMinimum.Size = New System.Drawing.Size(76, 21)
     Me.lblMinimum.TabIndex = 8
     Me.lblMinimum.Text = "Minimum:"
-    Me.lblMinimum.TextAlign = System.Drawing.ContentAlignment.TopRight
+    Me.lblMinimum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
-    'Label4
+    'lblData
     '
-    Me.Label4.BackColor = System.Drawing.Color.Transparent
-    Me.Label4.Location = New System.Drawing.Point(19, 51)
-    Me.Label4.Name = "Label4"
-    Me.Label4.Size = New System.Drawing.Size(125, 21)
-    Me.Label4.TabIndex = 18
-    Me.Label4.Text = "Variation Function:"
-    Me.Label4.TextAlign = System.Drawing.ContentAlignment.TopRight
-    '
-    'Label5
-    '
-    Me.Label5.BackColor = System.Drawing.Color.Transparent
-    Me.Label5.Location = New System.Drawing.Point(19, 18)
-    Me.Label5.Name = "Label5"
-    Me.Label5.Size = New System.Drawing.Size(125, 21)
-    Me.Label5.TabIndex = 17
-    Me.Label5.Text = "Data to Vary:"
-    Me.Label5.TextAlign = System.Drawing.ContentAlignment.TopRight
+    Me.lblData.BackColor = System.Drawing.Color.Transparent
+    Me.lblData.Location = New System.Drawing.Point(16, 16)
+    Me.lblData.Name = "lblData"
+    Me.lblData.Size = New System.Drawing.Size(96, 21)
+    Me.lblData.TabIndex = 17
+    Me.lblData.Text = "Data to Vary:"
+    Me.lblData.TextAlign = System.Drawing.ContentAlignment.TopRight
     '
     'tabResults
     '
@@ -391,7 +424,7 @@ Public Class frmMultipleResults
     '
     Me.cboCells.Location = New System.Drawing.Point(86, 74)
     Me.cboCells.Name = "cboCells"
-    Me.cboCells.Size = New System.Drawing.Size(135, 22)
+    Me.cboCells.Size = New System.Drawing.Size(135, 24)
     Me.cboCells.TabIndex = 5
     '
     'lblColumns
@@ -407,7 +440,7 @@ Public Class frmMultipleResults
     '
     Me.cboColumns.Location = New System.Drawing.Point(86, 46)
     Me.cboColumns.Name = "cboColumns"
-    Me.cboColumns.Size = New System.Drawing.Size(135, 22)
+    Me.cboColumns.Size = New System.Drawing.Size(135, 24)
     Me.cboColumns.TabIndex = 3
     '
     'lblRows
@@ -423,7 +456,7 @@ Public Class frmMultipleResults
     '
     Me.cboRows.Location = New System.Drawing.Point(86, 18)
     Me.cboRows.Name = "cboRows"
-    Me.cboRows.Size = New System.Drawing.Size(135, 22)
+    Me.cboRows.Size = New System.Drawing.Size(135, 24)
     Me.cboRows.TabIndex = 1
     '
     'agdPivot
@@ -448,13 +481,23 @@ Public Class frmMultipleResults
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.MenuItem1, Me.mnuOpenResults, Me.MenuItem2, Me.mnuSaveResults, Me.mnuSavePivot})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenSpecifications, Me.mnuOpenResults, Me.mnuSaveSpecifications, Me.mnuSaveResults, Me.mnuSavePivot})
     Me.mnuFile.Text = "File"
+    '
+    'mnuOpenSpecifications
+    '
+    Me.mnuOpenSpecifications.Index = 0
+    Me.mnuOpenSpecifications.Text = "Open Specifications"
     '
     'mnuOpenResults
     '
     Me.mnuOpenResults.Index = 1
     Me.mnuOpenResults.Text = "Open Results"
+    '
+    'mnuSaveSpecifications
+    '
+    Me.mnuSaveSpecifications.Index = 2
+    Me.mnuSaveSpecifications.Text = "Save Specifications"
     '
     'mnuSaveResults
     '
@@ -492,16 +535,6 @@ Public Class frmMultipleResults
     Me.mnuHelp.Index = 2
     Me.mnuHelp.Text = "Help"
     '
-    'MenuItem1
-    '
-    Me.MenuItem1.Index = 0
-    Me.MenuItem1.Text = "Open Specifications"
-    '
-    'MenuItem2
-    '
-    Me.MenuItem2.Index = 2
-    Me.MenuItem2.Text = "Save Specifications"
-    '
     'frmMultipleResults
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
@@ -513,6 +546,7 @@ Public Class frmMultipleResults
     Me.Text = "Iterative Analysis"
     Me.Tabs.ResumeLayout(False)
     Me.tabSpecifications.ResumeLayout(False)
+    Me.grpSummary.ResumeLayout(False)
     Me.grpSeasons.ResumeLayout(False)
     Me.grpParameter.ResumeLayout(False)
     Me.tabResults.ResumeLayout(False)
@@ -544,7 +578,7 @@ Public Class frmMultipleResults
     UpdateDataText(txtVaryData, pDataToVary)
   End Sub
 
-  Private Sub txtFunction_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtFunction.Click
+  Private Sub txtFunction_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
     Dim aCategory As New ArrayList(1)
     aCategory.Add("Compute")
     pComputation = pDataManager.UserSelectDataSource(aCategory, "Select Function for Varying Input Data")
