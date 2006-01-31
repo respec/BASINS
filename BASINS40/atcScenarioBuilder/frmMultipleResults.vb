@@ -43,13 +43,11 @@ Public Class frmMultipleResults
   'NOTE: The following procedure is required by the Windows Form Designer
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
-  Friend WithEvents tabRowPerRun As System.Windows.Forms.TabPage
   Friend WithEvents tabPivot As System.Windows.Forms.TabPage
   Friend WithEvents cboRows As System.Windows.Forms.ComboBox
   Friend WithEvents lblRows As System.Windows.Forms.Label
   Friend WithEvents cboColumns As System.Windows.Forms.ComboBox
   Friend WithEvents cboCells As System.Windows.Forms.ComboBox
-  Friend WithEvents tabSpecify As System.Windows.Forms.TabPage
   Friend WithEvents txtFunction As System.Windows.Forms.TextBox
   Friend WithEvents txtVaryData As System.Windows.Forms.TextBox
   Friend WithEvents grpParameter As System.Windows.Forms.GroupBox
@@ -82,10 +80,14 @@ Public Class frmMultipleResults
   Friend WithEvents lblColumns As System.Windows.Forms.Label
   Friend WithEvents lblCells As System.Windows.Forms.Label
   Friend WithEvents agdResults As atcControls.atcGrid
+  Friend WithEvents tabSpecifications As System.Windows.Forms.TabPage
+  Friend WithEvents tabResults As System.Windows.Forms.TabPage
+  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
+  Friend WithEvents MenuItem2 As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmMultipleResults))
     Me.Tabs = New System.Windows.Forms.TabControl
-    Me.tabSpecify = New System.Windows.Forms.TabPage
+    Me.tabSpecifications = New System.Windows.Forms.TabPage
     Me.grpSeasons = New System.Windows.Forms.GroupBox
     Me.btnSeasonsNone = New System.Windows.Forms.Button
     Me.btnSeasonsAll = New System.Windows.Forms.Button
@@ -103,7 +105,7 @@ Public Class frmMultipleResults
     Me.lblMinimum = New System.Windows.Forms.Label
     Me.Label4 = New System.Windows.Forms.Label
     Me.Label5 = New System.Windows.Forms.Label
-    Me.tabRowPerRun = New System.Windows.Forms.TabPage
+    Me.tabResults = New System.Windows.Forms.TabPage
     Me.agdResults = New atcControls.atcGrid
     Me.tabPivot = New System.Windows.Forms.TabPage
     Me.lblCells = New System.Windows.Forms.Label
@@ -123,11 +125,13 @@ Public Class frmMultipleResults
     Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
     Me.mnuPasteResults = New System.Windows.Forms.MenuItem
     Me.mnuHelp = New System.Windows.Forms.MenuItem
+    Me.MenuItem1 = New System.Windows.Forms.MenuItem
+    Me.MenuItem2 = New System.Windows.Forms.MenuItem
     Me.Tabs.SuspendLayout()
-    Me.tabSpecify.SuspendLayout()
+    Me.tabSpecifications.SuspendLayout()
     Me.grpSeasons.SuspendLayout()
     Me.grpParameter.SuspendLayout()
-    Me.tabRowPerRun.SuspendLayout()
+    Me.tabResults.SuspendLayout()
     Me.tabPivot.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -136,8 +140,8 @@ Public Class frmMultipleResults
     Me.Tabs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.Tabs.Controls.Add(Me.tabSpecify)
-    Me.Tabs.Controls.Add(Me.tabRowPerRun)
+    Me.Tabs.Controls.Add(Me.tabSpecifications)
+    Me.Tabs.Controls.Add(Me.tabResults)
     Me.Tabs.Controls.Add(Me.tabPivot)
     Me.Tabs.Location = New System.Drawing.Point(10, 9)
     Me.Tabs.Name = "Tabs"
@@ -145,20 +149,20 @@ Public Class frmMultipleResults
     Me.Tabs.Size = New System.Drawing.Size(662, 545)
     Me.Tabs.TabIndex = 0
     '
-    'tabSpecify
+    'tabSpecifications
     '
-    Me.tabSpecify.Controls.Add(Me.grpSeasons)
-    Me.tabSpecify.Controls.Add(Me.btnStart)
-    Me.tabSpecify.Controls.Add(Me.txtFunction)
-    Me.tabSpecify.Controls.Add(Me.txtVaryData)
-    Me.tabSpecify.Controls.Add(Me.grpParameter)
-    Me.tabSpecify.Controls.Add(Me.Label4)
-    Me.tabSpecify.Controls.Add(Me.Label5)
-    Me.tabSpecify.Location = New System.Drawing.Point(4, 25)
-    Me.tabSpecify.Name = "tabSpecify"
-    Me.tabSpecify.Size = New System.Drawing.Size(654, 516)
-    Me.tabSpecify.TabIndex = 2
-    Me.tabSpecify.Text = "Specify Runs"
+    Me.tabSpecifications.Controls.Add(Me.grpSeasons)
+    Me.tabSpecifications.Controls.Add(Me.btnStart)
+    Me.tabSpecifications.Controls.Add(Me.txtFunction)
+    Me.tabSpecifications.Controls.Add(Me.txtVaryData)
+    Me.tabSpecifications.Controls.Add(Me.grpParameter)
+    Me.tabSpecifications.Controls.Add(Me.Label4)
+    Me.tabSpecifications.Controls.Add(Me.Label5)
+    Me.tabSpecifications.Location = New System.Drawing.Point(4, 25)
+    Me.tabSpecifications.Name = "tabSpecifications"
+    Me.tabSpecifications.Size = New System.Drawing.Size(654, 516)
+    Me.tabSpecifications.TabIndex = 2
+    Me.tabSpecifications.Text = "Specifications"
     '
     'grpSeasons
     '
@@ -168,7 +172,7 @@ Public Class frmMultipleResults
     Me.grpSeasons.Controls.Add(Me.cboSeasons)
     Me.grpSeasons.Location = New System.Drawing.Point(288, 83)
     Me.grpSeasons.Name = "grpSeasons"
-    Me.grpSeasons.Size = New System.Drawing.Size(240, 379)
+    Me.grpSeasons.Size = New System.Drawing.Size(240, 205)
     Me.grpSeasons.TabIndex = 27
     Me.grpSeasons.TabStop = False
     Me.grpSeasons.Text = "Seasons"
@@ -176,7 +180,7 @@ Public Class frmMultipleResults
     'btnSeasonsNone
     '
     Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnSeasonsNone.Location = New System.Drawing.Point(154, 336)
+    Me.btnSeasonsNone.Location = New System.Drawing.Point(154, 162)
     Me.btnSeasonsNone.Name = "btnSeasonsNone"
     Me.btnSeasonsNone.Size = New System.Drawing.Size(76, 26)
     Me.btnSeasonsNone.TabIndex = 12
@@ -185,7 +189,7 @@ Public Class frmMultipleResults
     'btnSeasonsAll
     '
     Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnSeasonsAll.Location = New System.Drawing.Point(10, 336)
+    Me.btnSeasonsAll.Location = New System.Drawing.Point(10, 162)
     Me.btnSeasonsAll.Name = "btnSeasonsAll"
     Me.btnSeasonsAll.Size = New System.Drawing.Size(76, 27)
     Me.btnSeasonsAll.TabIndex = 11
@@ -201,7 +205,7 @@ Public Class frmMultipleResults
     Me.lstSeasons.Location = New System.Drawing.Point(10, 46)
     Me.lstSeasons.Name = "lstSeasons"
     Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-    Me.lstSeasons.Size = New System.Drawing.Size(220, 281)
+    Me.lstSeasons.Size = New System.Drawing.Size(220, 107)
     Me.lstSeasons.TabIndex = 7
     '
     'cboSeasons
@@ -256,7 +260,7 @@ Public Class frmMultipleResults
     Me.grpParameter.Size = New System.Drawing.Size(201, 120)
     Me.grpParameter.TabIndex = 19
     Me.grpParameter.TabStop = False
-    Me.grpParameter.Text = "Variation Parameter"
+    Me.grpParameter.Text = "Variation Range"
     '
     'txtIncrement
     '
@@ -335,14 +339,14 @@ Public Class frmMultipleResults
     Me.Label5.Text = "Data to Vary:"
     Me.Label5.TextAlign = System.Drawing.ContentAlignment.TopRight
     '
-    'tabRowPerRun
+    'tabResults
     '
-    Me.tabRowPerRun.Controls.Add(Me.agdResults)
-    Me.tabRowPerRun.Location = New System.Drawing.Point(4, 25)
-    Me.tabRowPerRun.Name = "tabRowPerRun"
-    Me.tabRowPerRun.Size = New System.Drawing.Size(654, 516)
-    Me.tabRowPerRun.TabIndex = 0
-    Me.tabRowPerRun.Text = "Results"
+    Me.tabResults.Controls.Add(Me.agdResults)
+    Me.tabResults.Location = New System.Drawing.Point(4, 25)
+    Me.tabResults.Name = "tabResults"
+    Me.tabResults.Size = New System.Drawing.Size(654, 516)
+    Me.tabResults.TabIndex = 0
+    Me.tabResults.Text = "Results"
     '
     'agdResults
     '
@@ -444,22 +448,22 @@ Public Class frmMultipleResults
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenResults, Me.mnuSaveResults, Me.mnuSavePivot})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.MenuItem1, Me.mnuOpenResults, Me.MenuItem2, Me.mnuSaveResults, Me.mnuSavePivot})
     Me.mnuFile.Text = "File"
     '
     'mnuOpenResults
     '
-    Me.mnuOpenResults.Index = 0
+    Me.mnuOpenResults.Index = 1
     Me.mnuOpenResults.Text = "Open Results"
     '
     'mnuSaveResults
     '
-    Me.mnuSaveResults.Index = 1
+    Me.mnuSaveResults.Index = 3
     Me.mnuSaveResults.Text = "Save Results"
     '
     'mnuSavePivot
     '
-    Me.mnuSavePivot.Index = 2
+    Me.mnuSavePivot.Index = 4
     Me.mnuSavePivot.Text = "Save Pivot"
     '
     'mnuEdit
@@ -488,6 +492,16 @@ Public Class frmMultipleResults
     Me.mnuHelp.Index = 2
     Me.mnuHelp.Text = "Help"
     '
+    'MenuItem1
+    '
+    Me.MenuItem1.Index = 0
+    Me.MenuItem1.Text = "Open Specifications"
+    '
+    'MenuItem2
+    '
+    Me.MenuItem2.Index = 2
+    Me.MenuItem2.Text = "Save Specifications"
+    '
     'frmMultipleResults
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
@@ -496,12 +510,12 @@ Public Class frmMultipleResults
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "frmMultipleResults"
-    Me.Text = "Multiple Runs"
+    Me.Text = "Iterative Analysis"
     Me.Tabs.ResumeLayout(False)
-    Me.tabSpecify.ResumeLayout(False)
+    Me.tabSpecifications.ResumeLayout(False)
     Me.grpSeasons.ResumeLayout(False)
     Me.grpParameter.ResumeLayout(False)
-    Me.tabRowPerRun.ResumeLayout(False)
+    Me.tabResults.ResumeLayout(False)
     Me.tabPivot.ResumeLayout(False)
     Me.ResumeLayout(False)
 
@@ -712,6 +726,15 @@ Public Class frmMultipleResults
         cboRows.Items.Add(lColumnTitle)
         cboColumns.Items.Add(lColumnTitle)
         cboCells.Items.Add(lColumnTitle)
+        'default to last entry for a constituent 
+        'TODO: make smarter
+        If lColumnTitle.ToLower.StartsWith("prec") Then
+          cboColumns.Text = lColumnTitle
+        ElseIf lColumnTitle.ToLower.StartsWith("air") Then
+          cboRows.Text = lColumnTitle
+        ElseIf lColumnTitle.ToLower.StartsWith("flow") Then
+          cboCells.Text = lColumnTitle
+        End If
       Next
     End If
   End Sub
