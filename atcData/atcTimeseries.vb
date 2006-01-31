@@ -53,8 +53,8 @@ Public Class atcTimeseries
   End Function
 
   ''' <summary>Get whether a ValueAttribute exists by index</summary>
-  Public Function ValueAttributesExist(ByVal aIndex As Integer) As Boolean
-    If pValueAttributes Is Nothing OrElse pValueAttributes(aIndex) Is Nothing Then
+  Public Function ValueAttributesExist(Optional ByVal aIndex As Integer = -1) As Boolean
+    If pValueAttributes Is Nothing OrElse aIndex > 0 AndAlso pValueAttributes(aIndex) Is Nothing Then
       Return False
     Else
       Return True
