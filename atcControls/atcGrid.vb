@@ -674,29 +674,31 @@ Public Class atcGrid
   End Sub
 
   Protected Overrides Sub OnMouseDown(ByVal e As System.Windows.Forms.MouseEventArgs)
-    Dim lLastRowDisplayed As Integer = pRowBottom.Keys.Item(pRowBottom.Count - 1)
-    Dim lRowIndex As Integer = 0
-    Dim lRow As Integer = 0
-    Dim lColumn As Integer = ColumnEdgeToDrag(e.X)
-    Dim lColumnIndex As Integer = 0
-    If lColumn >= 0 Then
-      pColumnDragging = lColumn
-    Else
-      While lRowIndex < pRowBottom.Count AndAlso e.Y > pRowBottom.ItemByIndex(lRowIndex)
-        lRowIndex += 1
-      End While
+    If pRowBottom.Count > 0 Then
+      Dim lLastRowDisplayed As Integer = pRowBottom.Keys.Item(pRowBottom.Count - 1)
+      Dim lRowIndex As Integer = 0
+      Dim lRow As Integer = 0
+      Dim lColumn As Integer = ColumnEdgeToDrag(e.X)
+      Dim lColumnIndex As Integer = 0
+      If lColumn >= 0 Then
+        pColumnDragging = lColumn
+      Else
+        While lRowIndex < pRowBottom.Count AndAlso e.Y > pRowBottom.ItemByIndex(lRowIndex)
+          lRowIndex += 1
+        End While
 
-      While lColumnIndex < pColumnRight.Count AndAlso e.X > pColumnRight.ItemByIndex(lColumnIndex)
-        lColumnIndex += 1
-      End While
+        While lColumnIndex < pColumnRight.Count AndAlso e.X > pColumnRight.ItemByIndex(lColumnIndex)
+          lColumnIndex += 1
+        End While
 
-      If lRowIndex < pRowBottom.Count AndAlso lColumnIndex < pColumnRight.Count Then
-        lRow = pRowBottom.Keys(lRowIndex)
-        lColumn = pColumnRight.Keys(lColumnIndex)
-        If pSource.CellEditable(lRow, lColumn) Then
-          EditCell(lRow, lColumn)
+        If lRowIndex < pRowBottom.Count AndAlso lColumnIndex < pColumnRight.Count Then
+          lRow = pRowBottom.Keys(lRowIndex)
+          lColumn = pColumnRight.Keys(lColumnIndex)
+          If pSource.CellEditable(lRow, lColumn) Then
+            EditCell(lRow, lColumn)
+          End If
+          RaiseEvent MouseDownCell(Me, lRow, lColumn)
         End If
-        RaiseEvent MouseDownCell(Me, lRow, lColumn)
       End If
     End If
   End Sub
