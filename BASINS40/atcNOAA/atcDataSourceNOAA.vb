@@ -126,6 +126,7 @@ Public Class atcDataSourceNOAA
           Dim InAccum As Boolean = False
           Dim lJDate As Double
           Dim lTSInd As Integer
+          Dim lInd As Integer
           Do
             If repeatsThisLine > maxRepeat Then
               maxRepeat = repeatsThisLine
@@ -155,8 +156,8 @@ Public Class atcDataSourceNOAA
               lData.numValues += lBufSiz
             End If
             For repeat = 0 To repeatsThisLine - 1
+              lTSInd += 1
               If ColValue(repeat).Value.IndexOf("99999") = -1 Then 'make sure its not a missing value
-                lTSInd += 1
                 Select Case ColUnits.Value
                   Case "HI" 'hundredths of inches
                     lData.Value(lTSInd) = CDbl(ColValue(repeat).Value) / 100
@@ -165,22 +166,33 @@ Public Class atcDataSourceNOAA
                   Case Else
                     lData.Value(lTSInd) = CDbl(ColValue(repeat).Value)
                 End Select
-                lJDate = Jday(ColYear.Value, _
-                              ColMonth.Value, _
-                              ColDay(repeat).Value, _
-                              24, 0, 0)
-                lData.Dates.Value(lTSInd) = lJDate
-                Select Case ColFlag1(repeat).Value
-                  Case " " 'Usually flag is blank
-
-                  Case "S"
-                    InAccum = True
-                  Case "A"
-                    InAccum = False
-                End Select
-                If InAccum Then lData.Value(lTSInd) = MissingAcc
-                lData.Attributes.SetValue("Count", lTSInd)
               End If
+              lJDate = Jday(ColYear.Value, _
+                            ColMonth.Value, _
+                            ColDay(repeat).Value, _
+                            24, 0, 0)
+              lData.Dates.Value(lTSInd) = lJDate
+              Select Case ColFlag1(repeat).Value
+                Case " " 'Usually flag is blank
+                  If InAccum AndAlso lData.Value(lTSInd) > 0 Then
+                    'first positive value after start of accumulated end the accum period
+                    InAccum = False
+                  End If
+                Case "S"
+                  InAccum = True
+                Case "A"
+                  InAccum = False
+                  'look for preceeding missing values that should be accumulated
+                  lInd = lTSInd - 1
+                  While lInd > 0 AndAlso lData.Value(lInd) = MissingVal
+                    lData.Value(lInd) = MissingAcc
+                    lInd -= 1
+                  End While
+                Case "M"
+                  lData.Value(lTSInd) = MissingVal
+              End Select
+              If InAccum Then lData.Value(lTSInd) = MissingAcc
+              lData.Attributes.SetValue("Count", lTSInd)
             Next
             curLine = NextLine(inReader)
             PopulateColumns(curLine)

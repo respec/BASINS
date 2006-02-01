@@ -318,6 +318,7 @@ Public Module modTimeseriesMath
       lNewNumVals = (lEJDay - lSJDay) / lIntvl
       ReDim lNewVals(lNewNumVals)
       ReDim lNewDates(lNewNumVals)
+      lNewDates(0) = lSJDay
       lOldInd = 1
       lDateOld = aOldTSer.Dates.Value(lOldInd)
       lNewInd = 1
