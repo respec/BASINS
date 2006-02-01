@@ -88,13 +88,28 @@ Public Class frmMultipleResults
   Friend WithEvents lstSeasons As System.Windows.Forms.ListBox
   Friend WithEvents cboSeasons As System.Windows.Forms.ComboBox
   Friend WithEvents lblSeasons As System.Windows.Forms.Label
+  Friend WithEvents btnChangeAdd As System.Windows.Forms.Button
+  Friend WithEvents btnChangeModify As System.Windows.Forms.Button
+  Friend WithEvents btnAddIndex As System.Windows.Forms.Button
+  Friend WithEvents btnIndexRemove As System.Windows.Forms.Button
+  Friend WithEvents btnChangeRemove As System.Windows.Forms.Button
+  Friend WithEvents lblScenario As System.Windows.Forms.Label
+  Friend WithEvents txtOriginalName As System.Windows.Forms.TextBox
+  Friend WithEvents lblScenarioChanged As System.Windows.Forms.Label
+  Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
+  Friend WithEvents chkSaveAllResults As System.Windows.Forms.CheckBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmMultipleResults))
     Me.Tabs = New System.Windows.Forms.TabControl
     Me.tabSpecifications = New System.Windows.Forms.TabPage
     Me.grpIndices = New System.Windows.Forms.GroupBox
+    Me.btnIndexRemove = New System.Windows.Forms.Button
+    Me.btnAddIndex = New System.Windows.Forms.Button
     Me.grdIndices = New atcControls.atcGrid
     Me.grpChanges = New System.Windows.Forms.GroupBox
+    Me.btnChangeRemove = New System.Windows.Forms.Button
+    Me.btnChangeModify = New System.Windows.Forms.Button
+    Me.btnChangeAdd = New System.Windows.Forms.Button
     Me.agdChanges = New atcControls.atcGrid
     Me.btnStart = New System.Windows.Forms.Button
     Me.grpParameter = New System.Windows.Forms.GroupBox
@@ -135,6 +150,11 @@ Public Class frmMultipleResults
     Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
     Me.mnuPasteResults = New System.Windows.Forms.MenuItem
     Me.mnuHelp = New System.Windows.Forms.MenuItem
+    Me.lblScenario = New System.Windows.Forms.Label
+    Me.txtOriginalName = New System.Windows.Forms.TextBox
+    Me.lblScenarioChanged = New System.Windows.Forms.Label
+    Me.TextBox1 = New System.Windows.Forms.TextBox
+    Me.chkSaveAllResults = New System.Windows.Forms.CheckBox
     Me.Tabs.SuspendLayout()
     Me.tabSpecifications.SuspendLayout()
     Me.grpIndices.SuspendLayout()
@@ -160,6 +180,11 @@ Public Class frmMultipleResults
     '
     'tabSpecifications
     '
+    Me.tabSpecifications.Controls.Add(Me.chkSaveAllResults)
+    Me.tabSpecifications.Controls.Add(Me.lblScenarioChanged)
+    Me.tabSpecifications.Controls.Add(Me.TextBox1)
+    Me.tabSpecifications.Controls.Add(Me.lblScenario)
+    Me.tabSpecifications.Controls.Add(Me.txtOriginalName)
     Me.tabSpecifications.Controls.Add(Me.grpIndices)
     Me.tabSpecifications.Controls.Add(Me.grpChanges)
     Me.tabSpecifications.Controls.Add(Me.btnStart)
@@ -174,13 +199,31 @@ Public Class frmMultipleResults
     '
     Me.grpIndices.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.grpIndices.Controls.Add(Me.btnIndexRemove)
+    Me.grpIndices.Controls.Add(Me.btnAddIndex)
     Me.grpIndices.Controls.Add(Me.grdIndices)
-    Me.grpIndices.Location = New System.Drawing.Point(8, 328)
+    Me.grpIndices.Location = New System.Drawing.Point(8, 360)
     Me.grpIndices.Name = "grpIndices"
-    Me.grpIndices.Size = New System.Drawing.Size(658, 136)
+    Me.grpIndices.Size = New System.Drawing.Size(658, 104)
     Me.grpIndices.TabIndex = 29
     Me.grpIndices.TabStop = False
     Me.grpIndices.Text = "Indices"
+    '
+    'btnIndexRemove
+    '
+    Me.btnIndexRemove.Location = New System.Drawing.Point(16, 56)
+    Me.btnIndexRemove.Name = "btnIndexRemove"
+    Me.btnIndexRemove.Size = New System.Drawing.Size(64, 24)
+    Me.btnIndexRemove.TabIndex = 15
+    Me.btnIndexRemove.Text = "Remove"
+    '
+    'btnAddIndex
+    '
+    Me.btnAddIndex.Location = New System.Drawing.Point(16, 24)
+    Me.btnAddIndex.Name = "btnAddIndex"
+    Me.btnAddIndex.Size = New System.Drawing.Size(64, 24)
+    Me.btnAddIndex.TabIndex = 13
+    Me.btnAddIndex.Text = "Add"
     '
     'grdIndices
     '
@@ -193,7 +236,7 @@ Public Class frmMultipleResults
     Me.grdIndices.LineWidth = 0.0!
     Me.grdIndices.Location = New System.Drawing.Point(96, 24)
     Me.grdIndices.Name = "grdIndices"
-    Me.grdIndices.Size = New System.Drawing.Size(554, 104)
+    Me.grdIndices.Size = New System.Drawing.Size(554, 72)
     Me.grdIndices.Source = Nothing
     Me.grdIndices.TabIndex = 1
     '
@@ -201,13 +244,40 @@ Public Class frmMultipleResults
     '
     Me.grpChanges.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.grpChanges.Controls.Add(Me.btnChangeRemove)
+    Me.grpChanges.Controls.Add(Me.btnChangeModify)
+    Me.grpChanges.Controls.Add(Me.btnChangeAdd)
     Me.grpChanges.Controls.Add(Me.agdChanges)
     Me.grpChanges.Location = New System.Drawing.Point(8, 216)
     Me.grpChanges.Name = "grpChanges"
-    Me.grpChanges.Size = New System.Drawing.Size(658, 96)
+    Me.grpChanges.Size = New System.Drawing.Size(658, 136)
     Me.grpChanges.TabIndex = 28
     Me.grpChanges.TabStop = False
     Me.grpChanges.Text = "Changes"
+    '
+    'btnChangeRemove
+    '
+    Me.btnChangeRemove.Location = New System.Drawing.Point(16, 88)
+    Me.btnChangeRemove.Name = "btnChangeRemove"
+    Me.btnChangeRemove.Size = New System.Drawing.Size(64, 24)
+    Me.btnChangeRemove.TabIndex = 14
+    Me.btnChangeRemove.Text = "Remove"
+    '
+    'btnChangeModify
+    '
+    Me.btnChangeModify.Location = New System.Drawing.Point(16, 56)
+    Me.btnChangeModify.Name = "btnChangeModify"
+    Me.btnChangeModify.Size = New System.Drawing.Size(64, 24)
+    Me.btnChangeModify.TabIndex = 13
+    Me.btnChangeModify.Text = "Edit"
+    '
+    'btnChangeAdd
+    '
+    Me.btnChangeAdd.Location = New System.Drawing.Point(16, 24)
+    Me.btnChangeAdd.Name = "btnChangeAdd"
+    Me.btnChangeAdd.Size = New System.Drawing.Size(64, 24)
+    Me.btnChangeAdd.TabIndex = 12
+    Me.btnChangeAdd.Text = "Add"
     '
     'agdChanges
     '
@@ -220,7 +290,7 @@ Public Class frmMultipleResults
     Me.agdChanges.LineWidth = 0.0!
     Me.agdChanges.Location = New System.Drawing.Point(96, 24)
     Me.agdChanges.Name = "agdChanges"
-    Me.agdChanges.Size = New System.Drawing.Size(554, 64)
+    Me.agdChanges.Size = New System.Drawing.Size(554, 104)
     Me.agdChanges.Source = Nothing
     Me.agdChanges.TabIndex = 1
     '
@@ -231,7 +301,7 @@ Public Class frmMultipleResults
     Me.btnStart.Name = "btnStart"
     Me.btnStart.Size = New System.Drawing.Size(106, 28)
     Me.btnStart.TabIndex = 26
-    Me.btnStart.Text = "Start"
+    Me.btnStart.Text = "Start Analysis"
     '
     'grpParameter
     '
@@ -568,6 +638,51 @@ Public Class frmMultipleResults
     '
     Me.mnuHelp.Index = 2
     Me.mnuHelp.Text = "Help"
+    '
+    'lblScenario
+    '
+    Me.lblScenario.BackColor = System.Drawing.Color.Transparent
+    Me.lblScenario.Location = New System.Drawing.Point(152, 480)
+    Me.lblScenario.Name = "lblScenario"
+    Me.lblScenario.Size = New System.Drawing.Size(120, 21)
+    Me.lblScenario.TabIndex = 31
+    Me.lblScenario.Text = "Scenario - Original:"
+    Me.lblScenario.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'txtOriginalName
+    '
+    Me.txtOriginalName.Location = New System.Drawing.Point(280, 480)
+    Me.txtOriginalName.Name = "txtOriginalName"
+    Me.txtOriginalName.Size = New System.Drawing.Size(64, 22)
+    Me.txtOriginalName.TabIndex = 30
+    Me.txtOriginalName.Text = "Base"
+    '
+    'lblScenarioChanged
+    '
+    Me.lblScenarioChanged.BackColor = System.Drawing.Color.Transparent
+    Me.lblScenarioChanged.Location = New System.Drawing.Point(352, 480)
+    Me.lblScenarioChanged.Name = "lblScenarioChanged"
+    Me.lblScenarioChanged.Size = New System.Drawing.Size(80, 21)
+    Me.lblScenarioChanged.TabIndex = 33
+    Me.lblScenarioChanged.Text = "Changedl:"
+    Me.lblScenarioChanged.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'TextBox1
+    '
+    Me.TextBox1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.TextBox1.Location = New System.Drawing.Point(432, 480)
+    Me.TextBox1.Name = "TextBox1"
+    Me.TextBox1.Size = New System.Drawing.Size(88, 22)
+    Me.TextBox1.TabIndex = 32
+    Me.TextBox1.Text = "Modified"
+    '
+    'chkSaveAllResults
+    '
+    Me.chkSaveAllResults.Location = New System.Drawing.Point(528, 480)
+    Me.chkSaveAllResults.Name = "chkSaveAllResults"
+    Me.chkSaveAllResults.Size = New System.Drawing.Size(128, 16)
+    Me.chkSaveAllResults.TabIndex = 34
+    Me.chkSaveAllResults.Text = "Save All Results"
     '
     'frmMultipleResults
     '
