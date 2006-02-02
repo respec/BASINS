@@ -11,13 +11,10 @@ Imports System.Windows.Forms
 Imports MapWindow.Interfaces
 
 Public Module NLCDLanduseTable
-  Public Sub ScriptMain(ByVal aAreaLayer As String, ByVal aIDField As String, ByVal aNameField As String, _
-                        ByVal aSelectedAreaIndexes As Collection, ByVal aOutputPath As String, ByVal afrmOut As Object)
-
-    'set area layer indexes
-    Dim lAreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayer)
-    Dim laIdFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aIDField)
-
+  Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
+                             ByVal aAreaIDFieldIndex As Integer, _
+                             ByVal aAreaNameFieldIndex As Integer, _
+                             ByVal aSelectedAreaIndexes As Collection)
     'find appropriate lu grid layer
     Dim i As Integer
     Dim lLanduseLayerIndex As Integer
@@ -33,13 +30,13 @@ Public Module NLCDLanduseTable
 
     'tabulate the areas 
     Dim k As Integer = System.Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
-    Dim laAreaLS(k, GisUtil.NumFeatures(lAreaLayerIndex)) As Double
-    GisUtil.TabulateAreas(lLanduseLayerIndex, lAreaLayerIndex, laAreaLS)
+    Dim laAreaLS(k, GisUtil.NumFeatures(aAreaLayerIndex)) As Double
+    GisUtil.TabulateAreas(lLanduseLayerIndex, aAreaLayerIndex, laAreaLS)
 
     'build collection of selected area ids
     Dim lSelectedAreaIds As New Collection
     For i = 1 To aSelectedAreaIndexes.Count
-      lSelectedAreaIds.Add(GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(i), laIdFieldIndex))
+      lSelectedAreaIds.Add(GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(i), aAreaIDFieldIndex))
     Next i
 
     'if simple reclassifyfile exists, read it in
@@ -71,7 +68,7 @@ Public Module NLCDLanduseTable
     Dim j As Integer
     For k = 1 To aSelectedAreaIndexes.Count
       'loop thru each selected subbasin (or all if none selected)
-      lsubid = GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(k), laIdFieldIndex)
+      lsubid = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(k), aAreaIDFieldIndex)
       For i = 1 To System.Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
         If laAreaLS(i, aSelectedAreaIndexes(k)) > 0 Then
           'find lugroup that corresponds to code i
@@ -151,10 +148,6 @@ Public Module NLCDLanduseTable
 
     'build grid source for results
     Dim lGridSource = New atcGridSource
-    Dim ltitle1 As String
-    Dim ltitle2 As String
-    ltitle1 = "Watershed Characterization Report"
-    ltitle2 = "NLCD Landuse Distribution Within " & aAreaLayer & " (Area in Acres)"
     With lGridSource
       .Rows = 2
       .Columns = lcUniqueSubids.Count + 1
@@ -164,11 +157,10 @@ Public Module NLCDLanduseTable
         .CellValue(0, i) = lcUniqueSubids(i)
       Next i
       'write associated descriptions
-      Dim laNameFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aNameField)
       For i = 1 To lcUniqueSubids.Count
         For j = 1 To aSelectedAreaIndexes.Count
           If lSelectedAreaIds(j) = lcUniqueSubids(i) Then
-            .CellValue(1, i) = GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(j), laNameFieldIndex)
+            .CellValue(1, i) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaNameFieldIndex)
             Exit For
           End If
         Next j
@@ -182,16 +174,6 @@ Public Module NLCDLanduseTable
         Next i
       Next j
     End With
-
-    'write file
-    SaveFileString(aOutputPath & "NLCD Landuse Table.out", _
-       ltitle1 & vbCrLf & "  " & ltitle2 & vbCrLf & vbCrLf & lGridSource.ToString)
-
-    'produce result grid
-    If Not afrmOut Is Nothing Then
-      afrmOut.InitializeResults(ltitle1, ltitle2, lGridSource)
-      afrmOut.Show()
-    End If
-
-  End Sub
+    Return lGridSource
+  End Function
 End Module

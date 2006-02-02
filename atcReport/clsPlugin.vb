@@ -1,4 +1,4 @@
-Imports atcData
+Imports atcControls
 Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
@@ -8,8 +8,8 @@ Public Class PlugIn
   Inherits atcData.atcDataDisplay
 
   Friend pMapWin As MapWindow.Interfaces.IMapWin
-  Friend pReportsDir As String
-  Friend pReportsColl As Collection
+  Private pReportsDir As String
+  Private pReports As Collection
 
   'TODO: get these 3 from BASINS4 or plugInManager or Name?
   Private Const pReportsMenuName As String = "BasinsReports"
@@ -34,6 +34,7 @@ Public Class PlugIn
 
     pMapWin.Menus.AddMenu(pReportsMenuName, "", Nothing, pReportsMenuString, "mnuFile")
     lMenuItem = pMapWin.Menus.AddMenu(pReportsMenuName & "_Watershed", pReportsMenuName, Nothing, "Watershed Characterization Reports")
+
     Dim lAllFiles = New NameValueCollection
     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
     pReportsDir = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\reports\"
@@ -41,11 +42,11 @@ Public Class PlugIn
       'change loc if in devel envir
       pReportsDir = "C:\dev\BASINS40\atcReport\scripts"
     End If
+
     AddFilesInDir(lAllFiles, pReportsDir, True, "*.vb")
-    Dim lReport As String
-    pReportsColl = New Collection
-    For Each lReport In lAllFiles
-      pReportsColl.Add(lReport)
+    pReports = New Collection
+    For Each lReport As String In lAllFiles
+      pReports.Add(lReport)
     Next lReport
   End Sub
 
@@ -64,45 +65,42 @@ Public Class PlugIn
     End If
   End Sub
 
-  Public Sub BuildReport(ByVal aAreaLayerName As String, ByVal aAreaIDFieldName As String, _
-                         ByVal aAreaNameFieldName As String, _
-                         ByVal aOutputFolder As String, _
-                         ByVal aReportIndex As Integer)
+  Public Function BuildReport(ByVal aAreaLayerName As String, _
+                              ByVal aAreaIDFieldName As String, _
+                              ByVal aAreaNameFieldName As String, _
+                              ByVal aReportIndex As Integer) As atcGridSource
     Dim i As Integer
-    Dim lError As String
-    Dim lArgs(5) As Object
-    lArgs(0) = aAreaLayerName
-    lArgs(1) = aAreaIDFieldName
-    lArgs(2) = aAreaNameFieldName
 
-    Dim AreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayerName)
+    Dim lArgs(3) As Object
+    'set area layer indexes
+    Dim lAreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayerName)
+    lArgs(0) = lAreaLayerIndex
+    lArgs(1) = GisUtil.FieldIndex(lAreaLayerIndex, aAreaIDFieldName)
+    lArgs(2) = GisUtil.FieldIndex(lAreaLayerIndex, aAreaNameFieldName)
+
     'are any areas selected?
     Dim cSelectedAreaIndexes As New Collection
-    For i = 1 To GisUtil.NumSelectedFeatures(AreaLayerIndex)
+    For i = 1 To GisUtil.NumSelectedFeatures(lAreaLayerIndex)
       'add selected areas to the collection
-      cSelectedAreaIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, AreaLayerIndex))
+      cSelectedAreaIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lAreaLayerIndex))
     Next
     If cSelectedAreaIndexes.Count = 0 Then
       'no areas selected, act as if all are selected
-      For i = 1 To GisUtil.NumFeatures(AreaLayerIndex)
+      For i = 1 To GisUtil.NumFeatures(lAreaLayerIndex)
         cSelectedAreaIndexes.Add(i - 1)
       Next
     End If
     lArgs(3) = cSelectedAreaIndexes
 
-    'make sure output folder exists
-    If Not FileExists(aOutputFolder, True, False) Then
-      MkDirPath(aOutputFolder)
-    End If
-    lArgs(4) = aOutputFolder & "\"
-
-    'first create form for output
-    Dim lfrmResult As New frmResult
-    lArgs(5) = lfrmResult
     'now run script
-    Scripting.Run("vb", "", pReportsColl(aReportIndex), lError, False, pMapWin, lArgs)
-    If Len(lError) > 0 Then
-      Logger.Msg(lError)
-    End If
-  End Sub
+    Dim lError As String
+    Return Scripting.Run("vb", "", Reports(aReportIndex), lError, False, pMapWin, lArgs)
+
+  End Function
+
+  Public ReadOnly Property Reports() As Collection
+    Get
+      Return pReports
+    End Get
+  End Property
 End Class

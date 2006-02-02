@@ -11,14 +11,15 @@ Imports System.Windows.Forms
 Imports MapWindow.Interfaces
 
 Public Module GIRASLanduseTable
-  Public Sub ScriptMain(ByVal aAreaLayer As String, ByVal aIDField As String, ByVal aNameField As String, _
-                        ByVal aSelectedAreaIndexes As Collection, ByVal aOutputPath As String, ByVal afrmOut As Object)
+  Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
+                             ByVal aAreaIDFieldIndex As Integer, _
+                             ByVal aAreaNameFieldIndex As Integer, _
+                             ByVal aSelectedAreaIndexes As Collection)
 
-    Dim lAreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayer)
     'set land use index layer
     Dim lLanduseLayerIndex As Long = GisUtil.LayerIndex("Land Use Index")
     Dim lLandUseFieldIndex As Long = GisUtil.FieldIndex(lLanduseLayerIndex, "COVNAME")
-    
+
     'figure out which land use tiles to list
     Dim lcluTiles As New Collection
     Dim lNewFileName As String
@@ -28,7 +29,7 @@ Public Module GIRASLanduseTable
       'loop thru each shape of land use index shapefile
       lNewFileName = GisUtil.FieldValue(lLanduseLayerIndex, i - 1, lLandUseFieldIndex)
       For j = 1 To aSelectedAreaIndexes.Count
-        If GisUtil.OverlappingPolygons(lLanduseLayerIndex, i - 1, lAreaLayerIndex, aSelectedAreaIndexes(j)) Then
+        If GisUtil.OverlappingPolygons(lLanduseLayerIndex, i - 1, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
           'yes, add it
           lcluTiles.Add(lNewFileName)
           Exit For
@@ -44,19 +45,20 @@ Public Module GIRASLanduseTable
       lNewFileName = lPathName & "\" & lcluTiles(j) & ".shp"
       GisUtil.AddLayer(lNewFileName, lcluTiles(j))
       lLandUseFieldName = "LUCODE"
-      If aAreaLayer <> "<none>" Then
+      If GisUtil.LayerName(aAreaLayerIndex) <> "<none>" Then
         'do overlay
-        GisUtil.Overlay(lcluTiles(j), lLandUseFieldName, aAreaLayer, aIDField, _
-                    lPathName & "\overlay.shp", lbfirst)
+        GisUtil.Overlay(lcluTiles(j), lLandUseFieldName, _
+                        GisUtil.LayerName(aAreaLayerIndex), _
+                        GisUtil.FieldName(aAreaIDFieldIndex, aAreaLayerIndex), _
+                        lPathName & "\overlay.shp", lbfirst)
         lbfirst = False
       End If
     Next j
 
     'build collection of selected area ids
     Dim lSelectedAreaIds As New Collection
-    Dim laIdFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aIDField)
     For i = 1 To aSelectedAreaIndexes.Count
-      lSelectedAreaIds.Add(GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(i), laIdFieldIndex))
+      lSelectedAreaIds.Add(GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(i), aAreaIDFieldIndex))
     Next i
 
     'if simple reclassifyfile exists, read it in
@@ -170,10 +172,6 @@ Public Module GIRASLanduseTable
 
     'build grid source for results
     Dim lGridSource = New atcGridSource
-    Dim ltitle1 As String
-    Dim ltitle2 As String
-    ltitle1 = "Watershed Characterization Report"
-    ltitle2 = "GIRAS Landuse Distribution Within " & aAreaLayer & " (Area in Acres)"
     With lGridSource
       .Rows = 2
       .Columns = lcUniqueSubids.Count + 1
@@ -183,11 +181,10 @@ Public Module GIRASLanduseTable
         .CellValue(0, i) = lcUniqueSubids(i)
       Next i
       'write associated descriptions
-      Dim laNameFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aNameField)
       For i = 1 To lcUniqueSubids.Count
         For j = 1 To aSelectedAreaIndexes.Count
           If lSelectedAreaIds(j) = lcUniqueSubids(i) Then
-            .CellValue(1, i) = GisUtil.FieldValue(lAreaLayerIndex, aSelectedAreaIndexes(j), laNameFieldIndex)
+            .CellValue(1, i) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaNameFieldIndex)
             Exit For
           End If
         Next j
@@ -201,16 +198,6 @@ Public Module GIRASLanduseTable
         Next i
       Next j
     End With
-
-    'write file
-    SaveFileString(aOutputPath & "GIRAS Landuse Table.out", _
-       ltitle1 & vbCrLf & "  " & ltitle2 & vbCrLf & vbCrLf & lGridSource.ToString)
-
-    'produce result grid
-    If Not afrmOut Is Nothing Then
-      afrmOut.InitializeResults(ltitle1, ltitle2, lGridSource)
-      afrmOut.Show()
-    End If
-
-  End Sub
+    Return lGridSource
+  End Function
 End Module
