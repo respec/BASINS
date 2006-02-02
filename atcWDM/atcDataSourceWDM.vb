@@ -6,6 +6,7 @@ Imports atcData
 Imports atcData.atcDataSource.EnumExistAction
 Imports atcUtility
 Imports MapWinUtility
+Imports System.Collections.Specialized
 
 Public Class atcDataSourceWDM
   Inherits atcData.atcDataSource
@@ -836,19 +837,43 @@ Public Class atcDataSourceWDM
 
   Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
     If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-      aFileName = FindFile("Select WDM file to open", , , pFileFilter, True, , 1)
+      'aFileName = FindFile("Select WDM file to open", , , pFileFilter, True, , 1)
+      Dim cdlg As New Windows.Forms.OpenFileDialog
+      With cdlg
+        .Title = "Select WDM file to open"
+        .FileName = aFileName
+        .Filter = pFileFilter
+        .CheckFileExists = False
+        If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+          aFileName = AbsolutePath(.FileName, CurDir)
+        Else 'cancel
+          Logger.Dbg("atcDataSourceWDM:Open:User Cancelled File Dialogue for Open WDM file")
+          Return False
+        End If
+      End With
     End If
+    Dim lwdmhandle As atcWdmHandle
     If FileExists(aFileName) Then
-      Dim lWdmHandle As New atcWdmHandle(0, aFileName)
+      lWdmHandle = New atcWdmHandle(0, aFileName)
       'BasInfAvail = ReadBasInf()
-      If lWdmHandle.Unit > 0 Then
-        Specification = aFileName
-        pQuick = True
-        Refresh(lWdmHandle.Unit)
-        pQuick = False
-        lWdmHandle.Dispose()
-        Return True 'Successfully opened
-      End If
+    ElseIf FilenameNoPath(aFileName).Length > 0 Then
+      Logger.Dbg("atcDataSourceWDM:Open:WDM file " & aFileName & " does not exist - it will be created")
+      MkDirPath(PathNameOnly(aFileName))
+      lwdmhandle = New atcWdmHandle(2, aFileName)
+    Else
+      Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & aFileName & "'")
+      Return False
+    End If
+    If Not lwdmhandle Is Nothing AndAlso lwdmhandle.Unit > 0 Then
+      Specification = aFileName
+      pQuick = True
+      Refresh(lwdmhandle.Unit)
+      pQuick = False
+      lwdmhandle.Dispose()
+      Return True 'Successfully opened
+    Else
+      Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & aFileName & "'")
+      Return False
     End If
   End Function
 
