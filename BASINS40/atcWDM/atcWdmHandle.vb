@@ -28,7 +28,7 @@ Friend Class atcWdmHandle
 
     lFileName = AbsolutePath(aFileName, CurDir())
 
-    If Not FileExists(lFileName) Then
+    If Not FileExists(lFileName) AndAlso aRWCFlg <> 2 Then
       Logger.Msg("Could not find " & aFileName, "atcWdmHandle")
     Else
       Logger.Dbg("atcWdmHandle:New:Open:" & lFileName)

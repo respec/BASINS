@@ -195,6 +195,7 @@ Public Class atcDataSourceNOAA
               lData.Attributes.SetValue("Count", lTSInd)
             Next
             curLine = NextLine(inReader)
+            Logger.Progress("Processing NOAA SOD File", inStream.Position, inStream.Length)
             PopulateColumns(curLine)
             repeatsThisLine = daymon(ColYear.Value, ColMonth.Value)
           Loop

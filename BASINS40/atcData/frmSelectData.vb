@@ -592,7 +592,7 @@ Friend Class frmSelectData
     Dim lSortedItems As New atcCollection
     Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
     Dim lTsIndex As Integer = 0
-    Dim lTsLastIndex As Integer = pDataManager.DataSets.Count - 1
+    Dim lTsLastIndex As Integer = pDataManager.DataSets.Count
 
     Logger.Dbg("Start PopulateCriteriaList(" & aAttributeName & ")")
 
