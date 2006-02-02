@@ -1,16 +1,14 @@
-Imports atcMwGisUtility
 Imports atcUtility
-Imports System.Collections.Specialized
+Imports atcMwGisUtility
 Imports MapWinUtility
+Imports System.Collections.Specialized
 
 Public Class frmReport
   Inherits System.Windows.Forms.Form
 
-  Dim DefaultClassFile As String
-  Dim FullClassFile As String
-  Dim pReportsDir As String
-  Dim pReportsColl As Collection
-  Dim pMappingObject As Object
+  'Dim pDefaultClassFile As String
+  'Dim pFullClassFile As String
+  Dim pPlugIn As atcReport.PlugIn
 
 #Region " Windows Form Designer generated code "
 
@@ -258,83 +256,46 @@ Public Class frmReport
   End Sub
 
   Private Sub cmdNext_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdNext.Click
-    Dim i As Integer
-    Dim cerror As String
-    Dim AreaLayerName As String
-    Dim AreaIDFieldName As String
-    Dim AreaNameFieldName As String
-    Dim aArgs(5) As Object
+    Dim lAreaLayerName As String
+    Dim lAreaIDFieldName As String
+    Dim lAreaNameFieldName As String
 
     If lbxReports.SelectedItems.Count = 0 Then
-      MsgBox("At least one report must be selected to generate.", MsgBoxStyle.OKOnly, "BASINS Report Problem")
-    Else
-      'set arguments for scripting
+      Logger.Msg("At least one report must be selected to generate.", MsgBoxStyle.OKOnly, "BASINS Report Problem")
+    Else 'set arguments for scripting
       If cboAreas.SelectedIndex > -1 Then
-        areaLayerName = cboAreas.Items(cboAreas.SelectedIndex)
+        lAreaLayerName = cboAreas.Items(cboAreas.SelectedIndex)
       Else
-        areaLayerName = "<none>"
+        lAreaLayerName = "<none>"
       End If
       If cboSub1.SelectedIndex > -1 Then
-        AreaIDFieldName = cboSub1.Items(cboSub1.SelectedIndex)
+        lAreaIDFieldName = cboSub1.Items(cboSub1.SelectedIndex)
       Else
-        AreaIDFieldName = ""
+        lAreaIDFieldName = ""
       End If
       If cboSub2.SelectedIndex > -1 Then
-        AreaNameFieldName = cboSub2.Items(cboSub2.SelectedIndex)
+        lAreaNameFieldName = cboSub2.Items(cboSub2.SelectedIndex)
       Else
-        AreaNameFieldName = ""
+        lAreaNameFieldName = ""
       End If
-      aArgs(0) = areaLayerName
-      aArgs(1) = AreaIDFieldName
-      aArgs(2) = AreaNameFieldName
-
-      Dim AreaLayerIndex As Integer = GisUtil.LayerIndex(areaLayerName)
-      'are any areas selected?
-      Dim cSelectedAreaIndexes As New Collection
-      For i = 1 To GisUtil.NumSelectedFeatures(AreaLayerIndex)
-        'add selected areas to the collection
-        cSelectedAreaIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, AreaLayerIndex))
-      Next
-      If cSelectedAreaIndexes.Count = 0 Then
-        'no areas selected, act as if all are selected
-        For i = 1 To GisUtil.NumFeatures(AreaLayerIndex)
-          cSelectedAreaIndexes.Add(i - 1)
-        Next
-      End If
-      aArgs(3) = cSelectedAreaIndexes
-
-      'make sure output folder exists
-      If Not FileExists(lblFolder.Text, True, False) Then
-        MkDirPath(lblFolder.Text)
-      End If
-      aArgs(4) = lblFolder.Text & "\"
 
       'now run each script
       Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
-      For i = 0 To lbxReports.SelectedItems.Count - 1
-        'create form for output
-        Dim frmout As New frmResult
-        aArgs(5) = frmout
-        'run each selected script
-        'GIRASLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
-        'NLCDLanduseTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
-        'ListedSegmentsTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
-        'Population2000Table.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
-        'PCSFacilityTable.ScriptMain(aArgs(0), aArgs(1), aArgs(2), aArgs(3), aArgs(4), aArgs(5))
-        Scripting.Run("vb", "", pReportsColl(lbxReports.SelectedIndices(i) + 1), cerror, False, pMappingObject, aArgs)
-        If Len(cerror) > 0 Then
-          MsgBox(cerror)
-        End If
+      For i As Integer = 0 To lbxReports.SelectedItems.Count - 1
+        pPlugIn.BuildReport(lAreaLayerName, lAreaIDFieldName, _
+                            lAreaNameFieldName, lblFolder.Text, _
+                            lbxReports.SelectedIndices(i) + 1)
       Next i
       Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+
     End If
 
   End Sub
 
-  Public Sub InitializeUI(ByVal aMappingObject As Object)
+  Public Sub InitializeUI(ByVal aPlugIn As Object)
     Dim ctemp As String
 
-    pMappingObject = aMappingObject
+    pPlugIn = aPlugIn
 
     cboAreas.Items.Add("<none>")
 
@@ -360,20 +321,8 @@ Public Class frmReport
       cboAreas.SelectedIndex = 0
     End If
 
-    Dim allFiles As NameValueCollection
-    allFiles = New NameValueCollection
-    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-    pReportsDir = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\reports\"
-    If Mid(pReportsDir, 3, 5) = "\dev\" Then
-      'change loc if in devel envir
-      pReportsDir = "C:\dev\BASINS40\atcReport\scripts"
-    End If
-    AddFilesInDir(allFiles, pReportsDir, True, "*.vb")
-    Dim lReport As String
-    pReportsColl = New Collection
-    For Each lReport In allFiles
+    For Each lReport As String In pPlugIn.pReportsColl
       lbxReports.Items.Add(FilenameOnly(lReport))
-      pReportsColl.Add(lReport)
     Next lReport
 
   End Sub
