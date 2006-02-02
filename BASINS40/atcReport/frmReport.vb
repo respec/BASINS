@@ -1,13 +1,11 @@
 Imports atcUtility
+Imports atcControls
 Imports atcMwGisUtility
 Imports MapWinUtility
-Imports System.Collections.Specialized
 
 Public Class frmReport
   Inherits System.Windows.Forms.Form
 
-  'Dim pDefaultClassFile As String
-  'Dim pFullClassFile As String
   Dim pPlugIn As atcReport.PlugIn
 
 #Region " Windows Form Designer generated code "
@@ -216,9 +214,9 @@ Public Class frmReport
   End Sub
 
   Private Sub cboSubbasins_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboAreas.SelectedIndexChanged
-    Dim lyr As Long
+    Dim lLayer As Long
     Dim i As Long
-    Dim ctemp As String
+    Dim lString As String
 
     cboSub1.Items.Clear()
     cboSub2.Items.Clear()
@@ -232,16 +230,16 @@ Public Class frmReport
       cboSub2.Visible = True
       lblSubid.Visible = True
       lblSubname.Visible = True
-      lyr = GisUtil.LayerIndex(cboAreas.Items(cboAreas.SelectedIndex))
-      If lyr > -1 Then
-        For i = 0 To GisUtil.NumFields(lyr) - 1
-          ctemp = GisUtil.FieldName(i, lyr)
-          cboSub1.Items.Add(ctemp)
-          cboSub2.Items.Add(ctemp)
-          If UCase(ctemp) = "SUBBASIN" Or UCase(ctemp) = "CU" Then
+      lLayer = GisUtil.LayerIndex(cboAreas.Items(cboAreas.SelectedIndex))
+      If lLayer > -1 Then
+        For i = 0 To GisUtil.NumFields(lLayer) - 1
+          lString = GisUtil.FieldName(i, lLayer)
+          cboSub1.Items.Add(lString)
+          cboSub2.Items.Add(lString)
+          If UCase(lString) = "SUBBASIN" Or UCase(lString) = "CU" Then
             cboSub1.SelectedIndex = i
           End If
-          If UCase(ctemp) = "NAME" Or UCase(ctemp) = "BNAME" Then
+          If UCase(lString) = "NAME" Or UCase(lString) = "BNAME" Then
             cboSub2.SelectedIndex = i
           End If
         Next
@@ -279,40 +277,54 @@ Public Class frmReport
         lAreaNameFieldName = ""
       End If
 
+      'make sure output folder exists
+      If Not FileExists(lblFolder.Text, True, False) Then
+        MkDirPath(lblFolder.Text)
+      End If
+
       'now run each script
-      Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
       For i As Integer = 0 To lbxReports.SelectedItems.Count - 1
-        pPlugIn.BuildReport(lAreaLayerName, lAreaIDFieldName, _
-                            lAreaNameFieldName, lblFolder.Text, _
-                            lbxReports.SelectedIndices(i) + 1)
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Dim lOutputGridSource As New atcGridSource
+        lOutputGridSource = pPlugIn.BuildReport(lAreaLayerName, _
+                                                lAreaIDFieldName, _
+                                                lAreaNameFieldName, _
+                                                lbxReports.SelectedIndices(i) + 1)
+        Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        If Not lOutputGridSource Is Nothing Then
+          'write file
+          Dim lTitle1 As String = "Watershed Characterization Report"
+          Dim lTitle2 As String = FilenameOnly(pPlugIn.Reports(lbxReports.SelectedIndices(i) + 1))
+          SaveFileString(lblFolder.Text & lTitle2 & ".out", _
+             lTitle1 & vbCrLf & "  " & lTitle2 & vbCrLf & vbCrLf & lOutputGridSource.ToString)
+
+          'form showing output
+          Dim lfrmResult As New frmResult
+          lfrmResult.InitializeResults(lTitle1, lTitle2, lOutputGridSource)
+          lfrmResult.Show()
+        End If
       Next i
-      Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
 
     End If
 
   End Sub
 
   Public Sub InitializeUI(ByVal aPlugIn As Object)
-    Dim ctemp As String
-
     pPlugIn = aPlugIn
-
     cboAreas.Items.Add("<none>")
 
-    Dim lyr As Long
-
-    For lyr = 0 To GisUtil.NumLayers() - 1
-      ctemp = GisUtil.LayerName(lyr)
-      If GisUtil.LayerType(lyr) = 3 Then
+    For lLayer As Long = 0 To GisUtil.NumLayers() - 1
+      Dim lString As String = GisUtil.LayerName(lLayer)
+      If GisUtil.LayerType(lLayer) = 3 Then
         'PolygonShapefile 
-        cboAreas.Items.Add(ctemp)
-        If GisUtil.CurrentLayer = lyr Then
+        cboAreas.Items.Add(lString)
+        If GisUtil.CurrentLayer = lLayer Then
           cboAreas.SelectedIndex = cboAreas.Items.Count - 1
         End If
-        If UCase(ctemp) = "SUBBASINS" And cboAreas.SelectedIndex < 0 Then
+        If UCase(lString) = "SUBBASINS" And cboAreas.SelectedIndex < 0 Then
           cboAreas.SelectedIndex = cboAreas.Items.Count - 1
         End If
-        If UCase(ctemp) = "CATALOGING UNIT BOUNDARIES" And cboAreas.SelectedIndex < 0 Then
+        If UCase(lString) = "CATALOGING UNIT BOUNDARIES" And cboAreas.SelectedIndex < 0 Then
           cboAreas.SelectedIndex = cboAreas.Items.Count - 1
         End If
       End If
@@ -321,7 +333,7 @@ Public Class frmReport
       cboAreas.SelectedIndex = 0
     End If
 
-    For Each lReport As String In pPlugIn.pReportsColl
+    For Each lReport As String In pPlugIn.Reports
       lbxReports.Items.Add(FilenameOnly(lReport))
     Next lReport
 
