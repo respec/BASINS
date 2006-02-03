@@ -35,19 +35,14 @@ Public Class PlugIn
     pMapWin.Menus.AddMenu(pReportsMenuName, "", Nothing, pReportsMenuString, "mnuFile")
     lMenuItem = pMapWin.Menus.AddMenu(pReportsMenuName & "_Watershed", pReportsMenuName, Nothing, "Watershed Characterization Reports")
 
-    Dim lAllFiles = New NameValueCollection
+    'default reports directory 
     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-    pReportsDir = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\reports\"
-    If Mid(pReportsDir, 3, 5) = "\dev\" Then
+    Dim lReportsDir As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\reports\"
+    If Mid(lReportsDir, 3, 5) = "\dev\" Then
       'change loc if in devel envir
-      pReportsDir = "C:\dev\BASINS40\atcReport\scripts"
+      lReportsDir = "C:\dev\BASINS40\atcReport\scripts"
     End If
-
-    AddFilesInDir(lAllFiles, pReportsDir, True, "*.vb")
-    pReports = New Collection
-    For Each lReport As String In lAllFiles
-      pReports.Add(lReport)
-    Next lReport
+    ReportsDir = lReportsDir
   End Sub
 
   Public Overrides Sub Terminate()
@@ -100,7 +95,25 @@ Public Class PlugIn
 
   Public ReadOnly Property Reports() As Collection
     Get
+      If pReports Is Nothing Then 'fill in first time thru
+        Dim lAllFiles = New NameValueCollection
+        AddFilesInDir(lAllFiles, pReportsDir, True, "*.vb")
+        pReports = New Collection
+        For Each lReport As String In lAllFiles
+          pReports.Add(lReport)
+        Next lReport
+      End If
       Return pReports
     End Get
+  End Property
+
+  Public Property ReportsDir() As String
+    Get
+      Return pReportsDir
+    End Get
+    Set(ByVal aReportsDir As String)
+      pReportsDir = aReportsDir
+      pReports = Nothing 'forces read next time thru
+    End Set
   End Property
 End Class
