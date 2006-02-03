@@ -63,7 +63,7 @@ Public Class PlugIn
   Public Function BuildReport(ByVal aAreaLayerName As String, _
                               ByVal aAreaIDFieldName As String, _
                               ByVal aAreaNameFieldName As String, _
-                              ByVal aReportIndex As Integer) As atcGridSource
+                              ByVal aReportIndex As Integer) As Object
     Dim i As Integer
     Dim lAreaLayerIndex As Integer
     Dim lProblem As String = ""

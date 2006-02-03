@@ -1,13 +1,9 @@
 Imports atcMwGisUtility
 Imports MapWinUtility
-Imports atcUtility
 Imports atcControls
 
 Imports Microsoft.VisualBasic
 Imports System.Collections
-Imports System.IO
-Imports System.Windows.Forms
-Imports MapWindow.Interfaces
 
 Public Module ListedSegmentsTable
   Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
@@ -109,6 +105,10 @@ Public Module ListedSegmentsTable
       Next j
     End If
 
-    Return lGridSource
+    If Len(lProblem) = 0 Then
+      Return lGridSource
+    Else
+      Return lProblem
+    End If
   End Function
 End Module
