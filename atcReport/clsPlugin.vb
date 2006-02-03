@@ -65,31 +65,62 @@ Public Class PlugIn
                               ByVal aAreaNameFieldName As String, _
                               ByVal aReportIndex As Integer) As atcGridSource
     Dim i As Integer
+    Dim lAreaLayerIndex As Integer
+    Dim lProblem As String = ""
 
     Dim lArgs(3) As Object
     'set area layer indexes
-    Dim lAreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayerName)
-    lArgs(0) = lAreaLayerIndex
-    lArgs(1) = GisUtil.FieldIndex(lAreaLayerIndex, aAreaIDFieldName)
-    lArgs(2) = GisUtil.FieldIndex(lAreaLayerIndex, aAreaNameFieldName)
+    Try
+      lAreaLayerIndex = GisUtil.LayerIndex(aAreaLayerName)
+      lArgs(0) = lAreaLayerIndex
+      If Not GisUtil.LayerType(lAreaLayerIndex) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+        lProblem = "Layer '" & aAreaLayerName & "' is not a polygon shapefile."
+        Logger.Dbg(lProblem)
+      End If
+    Catch
+      lProblem = "Layer '" & aAreaLayerName & "' Not Found"
+      Logger.Dbg(lProblem)
+    End Try
 
-    'are any areas selected?
-    Dim cSelectedAreaIndexes As New Collection
-    For i = 1 To GisUtil.NumSelectedFeatures(lAreaLayerIndex)
-      'add selected areas to the collection
-      cSelectedAreaIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lAreaLayerIndex))
-    Next
-    If cSelectedAreaIndexes.Count = 0 Then
-      'no areas selected, act as if all are selected
-      For i = 1 To GisUtil.NumFeatures(lAreaLayerIndex)
-        cSelectedAreaIndexes.Add(i - 1)
-      Next
+    If Len(lProblem) = 0 Then
+      Try
+        lArgs(1) = GisUtil.FieldIndex(lAreaLayerIndex, aAreaIDFieldName)
+      Catch
+        lProblem = "Field '" & aAreaIDFieldName & "' Not Found in Layer '" & aAreaLayerName & "'"
+        Logger.Dbg(lProblem)
+      End Try
     End If
-    lArgs(3) = cSelectedAreaIndexes
 
-    'now run script
-    Dim lError As String
-    Return Scripting.Run("vb", "", Reports(aReportIndex), lError, False, pMapWin, lArgs)
+    If Len(lProblem) = 0 Then
+      Try
+        lArgs(2) = GisUtil.FieldIndex(lAreaLayerIndex, aAreaNameFieldName)
+      Catch
+        lProblem = "Field '" & aAreaNameFieldName & "' Not Found in Layer '" & aAreaLayerName & "'"
+        Logger.Dbg(lProblem)
+      End Try
+    End If
+
+    If Len(lProblem) = 0 Then
+      'are any areas selected?
+      Dim cSelectedAreaIndexes As New Collection
+      For i = 1 To GisUtil.NumSelectedFeatures(lAreaLayerIndex)
+        'add selected areas to the collection
+        cSelectedAreaIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lAreaLayerIndex))
+      Next
+      If cSelectedAreaIndexes.Count = 0 Then
+        'no areas selected, act as if all are selected
+        For i = 1 To GisUtil.NumFeatures(lAreaLayerIndex)
+          cSelectedAreaIndexes.Add(i - 1)
+        Next
+      End If
+      lArgs(3) = cSelectedAreaIndexes
+
+      'now run script
+      Dim lError As String
+      'Return ListedSegmentsTable.ScriptMain(lArgs(0), lArgs(1), lArgs(2), lArgs(3))
+      Return Scripting.Run("vb", "", Reports(aReportIndex), lError, False, pMapWin, lArgs)
+
+    End If
 
   End Function
 

@@ -12,25 +12,18 @@ Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 
 Public Module PCSDischargeTable
-  Public Sub ScriptMain(ByVal aAreaLayer As String, ByVal aIDField As String, ByVal aNameField As String, _
-                        ByVal aSelectedAreaIndexes As Collection, ByVal aOutputPath As String, ByVal afrmOut As Object)
-
-    'set area layer indexes
-    Dim lAreaLayerIndex As Integer = GisUtil.LayerIndex(aAreaLayer)
-    Dim lAreaIdFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aIDField)
-    Dim lAreaNameFieldIndex As Integer = GisUtil.FieldIndex(lAreaLayerIndex, aNameField)
+  Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
+                           ByVal aAreaIDFieldIndex As Integer, _
+                           ByVal aAreaNameFieldIndex As Integer, _
+                           ByVal aSelectedAreaIndexes As Collection)
 
     'find PCS layer and needed fields
     Dim lPCSLayerIndex As Integer = GisUtil.LayerIndex("Permit Compliance System")
     Dim lNPDESFieldIndex As Integer = GisUtil.FieldIndex(lPCSLayerIndex, "npdes")
     Dim lFacilityFieldIndex As Integer = GisUtil.FieldIndex(lPCSLayerIndex, "fac_name")
-      
+
     'build grid source for results
     Dim lGridSource = New atcGridSource
-    Dim ltitle1 As String
-    Dim ltitle2 As String
-    ltitle1 = "Watershed Characterization Report"
-    ltitle2 = "Point Source Discharge Concentrations and Loadings Within " & aAreaLayer
     With lGridSource
       .Rows = 1
       .Columns = 9
@@ -92,7 +85,7 @@ Public Module PCSDischargeTable
     Dim lnpdes As String
     'loop through each selected polygon and pcs point looking for overlap
     For i = 1 To GisUtil.NumFeatures(lPCSLayerIndex)
-      lPolygonIndex = GisUtil.PointInPolygon(lPCSLayerIndex, i, lAreaLayerIndex)
+      lPolygonIndex = GisUtil.PointInPolygon(lPCSLayerIndex, i, aAreaLayerIndex)
       If lPolygonIndex > -1 Then
         For j = 1 To aSelectedAreaIndexes.Count
           If aSelectedAreaIndexes(j) = lPolygonIndex Then
@@ -102,8 +95,8 @@ Public Module PCSDischargeTable
               If lnpdes = lcNpdes(k) Then
                 'want to add this record
                 lGridSource.rows = lGridSource.rows + 1
-                lGridSource.CellValue(lGridSource.rows - 1, 0) = GisUtil.FieldValue(lAreaLayerIndex, lPolygonIndex, lAreaIdFieldIndex)
-                lGridSource.CellValue(lGridSource.rows - 1, 1) = GisUtil.FieldValue(lAreaLayerIndex, lPolygonIndex, lAreaNameFieldIndex)
+                lGridSource.CellValue(lGridSource.rows - 1, 0) = GisUtil.FieldValue(aAreaLayerIndex, lPolygonIndex, aAreaIDFieldIndex)
+                lGridSource.CellValue(lGridSource.rows - 1, 1) = GisUtil.FieldValue(aAreaLayerIndex, lPolygonIndex, aAreaNameFieldIndex)
                 lGridSource.CellValue(lGridSource.rows - 1, 2) = lnpdes
                 lGridSource.CellValue(lGridSource.rows - 1, 3) = GisUtil.FieldValue(lPCSLayerIndex, i - 1, lFacilityFieldIndex)
                 lGridSource.CellValue(lGridSource.rows - 1, 4) = lcParm(k)
@@ -126,17 +119,8 @@ Public Module PCSDischargeTable
       End If
     Next i
 
-    'write file
-    SaveFileString(aOutputPath & "Point Source Discharge Concentration and Loading Table.out", _
-       ltitle1 & vbCrLf & "  " & ltitle2 & vbCrLf & vbCrLf & lGridSource.ToString)
-
-    'produce result grid
-    If Not afrmOut Is Nothing Then
-      afrmOut.InitializeResults(ltitle1, ltitle2, lGridSource)
-      afrmOut.Show()
-    End If
-
-  End Sub
+    Return lGridSource
+  End Function
 
 End Module
 
