@@ -190,6 +190,16 @@
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
+                <File
+                    RelPath = "scripts\Point Source Discharge Concentration and Loading Table.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "scripts\Water Quality Observation Stations Table.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
             </Include>
         </Files>
     </VisualBasic>

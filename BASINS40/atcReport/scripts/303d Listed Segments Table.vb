@@ -1,5 +1,4 @@
 Imports atcMwGisUtility
-Imports atcModelSetup
 Imports MapWinUtility
 Imports atcUtility
 Imports atcControls
@@ -15,32 +14,47 @@ Public Module ListedSegmentsTable
                              ByVal aAreaIDFieldIndex As Integer, _
                              ByVal aAreaNameFieldIndex As Integer, _
                              ByVal aSelectedAreaIndexes As Collection)
-    'find 303d line layer
-    Dim lImpairedLayerIndex As Long
+    Dim i As Integer
+    Dim j As Integer
+    Dim lImpairedLayerIndex As Integer
     Dim lImpairedIdFieldIndex As Integer
     Dim lImpairedNameFieldIndex As Integer
     Dim lImpairmentFieldIndex As Integer
-    lImpairedLayerIndex = GisUtil.LayerIndex("303d List - Lines")
-    If lImpairedLayerIndex > 0 Then
-      lImpairedIdFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "RCH_CODE")
-      lImpairedNameFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "WBODY_NAME")
-      lImpairmentFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "ST_IMPAIR")
+    Dim lProblem As String = ""
 
-      'build grid source for results
-      Dim lGridSource = New atcGridSource
-      With lGridSource
-        .Rows = 1
-        .Columns = 5
-        .FixedRows = 1
-        .CellValue(0, 0) = "AreaID"
-        .CellValue(0, 1) = "AreaName"
-        .CellValue(0, 2) = "SegmentID"
-        .CellValue(0, 3) = "Waterbody Name"
-        .CellValue(0, 4) = "Impairment"
-      End With
+    'build grid source for results
+    Dim lGridSource = New atcGridSource
+    With lGridSource
+      .Rows = 1
+      .Columns = 5
+      .FixedRows = 1
+      .CellValue(0, 0) = "AreaID"
+      .CellValue(0, 1) = "AreaName"
+      .CellValue(0, 2) = "SegmentID"
+      .CellValue(0, 3) = "Waterbody Name"
+      .CellValue(0, 4) = "Impairment"
+    End With
 
-      Dim i As Integer
-      Dim j As Integer
+    'find 303d line layer
+    Try
+      lImpairedLayerIndex = GisUtil.LayerIndex("303d List - Lines")
+    Catch
+      lProblem = "No 303d Line Layer Found"
+      Logger.Dbg(lProblem)
+    End Try
+
+    If Len(lProblem) = 0 Then
+      Try
+        lImpairedIdFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "RCH_CODE")
+        lImpairedNameFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "WBODY_NAME")
+        lImpairmentFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "ST_IMPAIR")
+      Catch
+        lProblem = "Expected field missing from 303d Line Layer"
+        Logger.Dbg(lProblem)
+      End Try
+    End If
+
+    If Len(lProblem) = 0 Then
       'loop through each selected polygon and each 303d feature looking for overlap
       For j = 1 To aSelectedAreaIndexes.Count
         For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
@@ -55,12 +69,30 @@ Public Module ListedSegmentsTable
           End If
         Next i
       Next j
+    End If
 
-      'now check 303d polygon layer
-      lImpairedLayerIndex = GisUtil.LayerIndex("303d List - Areas")
-      lImpairedIdFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "RCH_CODE")
-      lImpairedNameFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "WBODY_NAME")
-      lImpairmentFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "ST_IMPAIR")
+    'now check 303d polygon layer
+    If Len(lProblem) = 0 Then
+      Try
+        lImpairedLayerIndex = GisUtil.LayerIndex("303d List - Areas")
+      Catch
+        lProblem = "No 303d Area Layer Found"
+        Logger.Dbg(lProblem)
+      End Try
+    End If
+
+    If Len(lProblem) = 0 Then
+      Try
+        lImpairedIdFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "RCH_CODE")
+        lImpairedNameFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "WBODY_NAME")
+        lImpairmentFieldIndex = GisUtil.FieldIndex(lImpairedLayerIndex, "ST_IMPAIR")
+      Catch
+        lProblem = "Expected field missing from 303d Area Layer"
+        Logger.Dbg(lProblem)
+      End Try
+    End If
+
+    If Len(lProblem) = 0 Then
       'loop through each selected polygon and each 303d feature looking for overlap
       For j = 1 To aSelectedAreaIndexes.Count
         For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
@@ -75,9 +107,8 @@ Public Module ListedSegmentsTable
           End If
         Next i
       Next j
-      Return lGridSource
-    Else
-      Logger.Dbg("No 303d Layer Found")  'TODO:better checking
     End If
+
+    Return lGridSource
   End Function
 End Module
