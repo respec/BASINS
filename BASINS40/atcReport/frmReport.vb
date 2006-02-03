@@ -285,15 +285,22 @@ Public Class frmReport
       'now run each script
       For i As Integer = 0 To lbxReports.SelectedItems.Count - 1
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+        Dim lOutput As Object
+        Dim lProblem As String = ""
         Dim lOutputGridSource As New atcGridSource
-        lOutputGridSource = pPlugIn.BuildReport(lAreaLayerName, _
-                                                lAreaIDFieldName, _
-                                                lAreaNameFieldName, _
-                                                lbxReports.SelectedIndices(i) + 1)
+        lOutput = pPlugIn.BuildReport(lAreaLayerName, _
+                                      lAreaIDFieldName, _
+                                      lAreaNameFieldName, _
+                                      lbxReports.SelectedIndices(i) + 1)
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+        Try
+          lOutputGridSource = lOutput
+        Catch
+          lProblem = lOutput
+        End Try
         Dim lTitle1 As String = "Watershed Characterization Report"
         Dim lTitle2 As String = FilenameOnly(pPlugIn.Reports(lbxReports.SelectedIndices(i) + 1))
-        If Not lOutputGridSource Is Nothing Then
+        If Not lOutputGridSource Is Nothing And Len(lProblem) = 0 Then
           'write file
           SaveFileString(lblFolder.Text & lTitle2 & ".out", _
              lTitle1 & vbCrLf & "  " & lTitle2 & vbCrLf & vbCrLf & lOutputGridSource.ToString)
@@ -303,7 +310,7 @@ Public Class frmReport
           lfrmResult.InitializeResults(lTitle1, lTitle2, lOutputGridSource)
           lfrmResult.Show()
         Else
-          Logger.Msg("atcReport:" & lTitle2 & ":Problem, See Log of details")
+          Logger.Msg("atcReport:" & lTitle2 & vbCrLf & lProblem, "BASINS Report Problem")
         End If
       Next i
 
