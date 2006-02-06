@@ -1,13 +1,10 @@
 Imports atcMwGisUtility
-Imports atcModelSetup
 Imports MapWinUtility
 Imports atcUtility
 Imports atcControls
 
 Imports Microsoft.VisualBasic
 Imports System.Collections
-Imports System.IO
-Imports System.Windows.Forms
 Imports MapWindow.Interfaces
 
 Public Module NLCDLanduseTable
@@ -15,9 +12,13 @@ Public Module NLCDLanduseTable
                              ByVal aAreaIDFieldIndex As Integer, _
                              ByVal aAreaNameFieldIndex As Integer, _
                              ByVal aSelectedAreaIndexes As Collection)
-    'find appropriate lu grid layer
+
     Dim i As Integer
     Dim lLanduseLayerIndex As Integer
+    Dim lProblem As String = ""
+    Dim lGridSource = New atcGridSource
+
+    'find appropriate lu grid layer
     For i = 0 To GisUtil.NumLayers() - 1
       If GisUtil.LayerType(i) = 4 Then
         'this is a grid 
@@ -29,7 +30,7 @@ Public Module NLCDLanduseTable
     Next
     Logger.Dbg("NLCDLanduseTable:" & lLanduseLayerIndex & ":" & aAreaLayerIndex)
 
-    If lLanduseLayerIndex > 0 Then
+    If lLanduseLayerIndex > -1 Then
       'tabulate the areas 
       Dim k As Integer = System.Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
       Dim laAreaLS(k, GisUtil.NumFeatures(aAreaLayerIndex)) As Double
@@ -149,7 +150,6 @@ Public Module NLCDLanduseTable
       Next i
 
       'build grid source for results
-      Dim lGridSource = New atcGridSource
       With lGridSource
         .Rows = 2
         .Columns = lcUniqueSubids.Count + 1
@@ -176,9 +176,15 @@ Public Module NLCDLanduseTable
           Next i
         Next j
       End With
-      Return lGridSource
     Else
-      Logger.Dbg("NLCDLanduseTable:No NLDC LandUseGrid")
+      lProblem = "No NLCD Layer Found"
+      Logger.Dbg(lProblem)
+    End If
+
+    If Len(lProblem) > 0 Then
+      Return lProblem
+    Else
+      Return lGridSource
     End If
   End Function
 End Module
