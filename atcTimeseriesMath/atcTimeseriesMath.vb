@@ -253,17 +253,9 @@ Public Class atcTimeseriesMath
       Specification &= " " & lNumber
     End If
 
-    Dim lTimeseriesArg As Object = aArgs.GetValue("Timeseries", Nothing)
-    If lTimeseriesArg Is Nothing Then
+    lTSgroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries", Nothing))
+    If lTSgroup Is Nothing OrElse lTSgroup.Count < 1 Then
       Err.Raise(vbObjectError + 512, Me, aOperationName & " did not get a Timeseries argument")
-    ElseIf lTimeseriesArg.GetType.Name = "atcDataGroup" Then
-      lTSgroup = lTimeseriesArg
-    Else
-      lTSgroup = New atcDataGroup(lTimeseriesArg)
-    End If
-
-    If lTSgroup.Count < 1 Then
-      Err.Raise(vbObjectError + 512, Me, aOperationName & " empty Timeseries argument")
     End If
 
     firstTS = lTSgroup.Item(0)
