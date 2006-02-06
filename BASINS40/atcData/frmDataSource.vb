@@ -37,10 +37,14 @@ Friend Class frmDataSource
   Friend WithEvents pnlButtons As System.Windows.Forms.Panel
   Friend WithEvents btnCancel As System.Windows.Forms.Button
   Friend WithEvents btnOk As System.Windows.Forms.Button
+  Friend WithEvents cboDisplay As System.Windows.Forms.ComboBox
+  Friend WithEvents lblDisplay As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDataSource))
     Me.treeSources = New System.Windows.Forms.TreeView
     Me.pnlButtons = New System.Windows.Forms.Panel
+    Me.lblDisplay = New System.Windows.Forms.Label
+    Me.cboDisplay = New System.Windows.Forms.ComboBox
     Me.btnCancel = New System.Windows.Forms.Button
     Me.btnOk = New System.Windows.Forms.Button
     Me.pnlButtons.SuspendLayout()
@@ -55,24 +59,46 @@ Friend Class frmDataSource
     Me.treeSources.Location = New System.Drawing.Point(0, 0)
     Me.treeSources.Name = "treeSources"
     Me.treeSources.SelectedImageIndex = -1
-    Me.treeSources.Size = New System.Drawing.Size(289, 389)
+    Me.treeSources.Size = New System.Drawing.Size(369, 389)
     Me.treeSources.TabIndex = 0
     '
     'pnlButtons
     '
+    Me.pnlButtons.Controls.Add(Me.lblDisplay)
+    Me.pnlButtons.Controls.Add(Me.cboDisplay)
     Me.pnlButtons.Controls.Add(Me.btnCancel)
     Me.pnlButtons.Controls.Add(Me.btnOk)
     Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
     Me.pnlButtons.Location = New System.Drawing.Point(0, 389)
     Me.pnlButtons.Name = "pnlButtons"
-    Me.pnlButtons.Size = New System.Drawing.Size(288, 40)
+    Me.pnlButtons.Size = New System.Drawing.Size(368, 40)
     Me.pnlButtons.TabIndex = 13
+    '
+    'lblDisplay
+    '
+    Me.lblDisplay.Location = New System.Drawing.Point(8, 12)
+    Me.lblDisplay.Name = "lblDisplay"
+    Me.lblDisplay.Size = New System.Drawing.Size(72, 20)
+    Me.lblDisplay.TabIndex = 6
+    Me.lblDisplay.Text = "Display with:"
+    Me.lblDisplay.Visible = False
+    '
+    'cboDisplay
+    '
+    Me.cboDisplay.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.cboDisplay.Location = New System.Drawing.Point(88, 8)
+    Me.cboDisplay.Name = "cboDisplay"
+    Me.cboDisplay.Size = New System.Drawing.Size(96, 21)
+    Me.cboDisplay.TabIndex = 5
+    Me.cboDisplay.Text = "No Display"
+    Me.cboDisplay.Visible = False
     '
     'btnCancel
     '
-    Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Top
+    Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-    Me.btnCancel.Location = New System.Drawing.Point(152, 8)
+    Me.btnCancel.Location = New System.Drawing.Point(280, 8)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(80, 24)
     Me.btnCancel.TabIndex = 4
@@ -80,8 +106,8 @@ Friend Class frmDataSource
     '
     'btnOk
     '
-    Me.btnOk.Anchor = System.Windows.Forms.AnchorStyles.Top
-    Me.btnOk.Location = New System.Drawing.Point(56, 8)
+    Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnOk.Location = New System.Drawing.Point(192, 8)
     Me.btnOk.Name = "btnOk"
     Me.btnOk.Size = New System.Drawing.Size(80, 24)
     Me.btnOk.TabIndex = 3
@@ -92,7 +118,7 @@ Friend Class frmDataSource
     Me.AcceptButton = Me.btnOk
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.CancelButton = Me.btnCancel
-    Me.ClientSize = New System.Drawing.Size(288, 429)
+    Me.ClientSize = New System.Drawing.Size(368, 429)
     Me.Controls.Add(Me.treeSources)
     Me.Controls.Add(Me.pnlButtons)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -109,6 +135,8 @@ Friend Class frmDataSource
   Private pCategories As ArrayList
   Private pSelectedSource As atcDataSource
   Private pSpecification As String
+  'Private Const NO_DISPLAY As String = "No Display"
+  'Private pDisplayPlugins As ICollection
 
   Public Sub AskUser(ByVal aDataManager As atcDataManager, _
                      ByRef aSelectedSource As atcDataSource, _
@@ -119,14 +147,47 @@ Friend Class frmDataSource
     pSelectedSource = aSelectedSource
     If Not aSelectedSource Is Nothing Then pSpecification = aSelectedSource.Specification
     pCategories = aCategories
+    'PopulateDisplays()
     Populate(aNeedToOpen, aNeedToSave)
+    If treeSources.Nodes.Count = 1 AndAlso treeSources.Nodes(0).Nodes.Count = 1 Then
+      treeSources.SelectedNode = treeSources.Nodes(0).Nodes(0)
+      '  btnOk_Click(Nothing, Nothing)
+      'Else
+    End If
     Me.ShowDialog() 'Block until form closes
     aSelectedSource = pSelectedSource
-    If Not aSelectedSource Is Nothing Then aSelectedSource.Specification = pSpecification
+    If Not aSelectedSource Is Nothing Then
+      aSelectedSource.Specification = pSpecification
+      'If Not cboDisplay.Text.Equals(NO_DISPLAY) Then
+      '  For Each lDisp As atcDataDisplay In pDisplayPlugins
+      '    Dim lName As String = lDisp.Name
+      '    Dim iColon As Integer = lName.IndexOf("::")
+      '    If iColon > 0 Then lName = lName.Substring(iColon + 2)
+      '    If cboDisplay.Text.Equals(lName) Then
+      '      lDisp.Show(pDataManager, aSelectedSource.DataSets)
+      '    End If
+      '  Next
+      'End If
+    End If
     pDataManager = Nothing
     pCategories = Nothing
     pSelectedSource = Nothing
   End Sub
+
+  'Private Sub PopulateDisplays()
+  '  pDisplayPlugins = pDataManager.GetPlugins(GetType(atcDataDisplay))
+  '  cboDisplay.Items.Clear()
+  '  cboDisplay.Items.Add(NO_DISPLAY)
+  '  For Each lDisp As atcDataDisplay In pDisplayPlugins
+  '    Dim iColon As Integer = lDisp.Name.IndexOf("::")
+  '    If iColon > 0 Then
+  '      cboDisplay.Items.Add(lDisp.Name.Substring(iColon + 2))
+  '    Else
+  '      cboDisplay.Items.Add(lDisp.Name)
+  '    End If
+  '  Next
+  '  cboDisplay.Text = GetSetting("atcData", "DataSource", "Display", NO_DISPLAY)
+  'End Sub
 
   Private Sub Populate(ByRef aNeedToOpen As Boolean, _
                        ByRef aNeedToSave As Boolean)
@@ -275,4 +336,8 @@ Friend Class frmDataSource
       ResizeToShowBottomNode()
     End If
   End Sub
+
+  'Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
+  '  SaveSetting("atcData", "DataSource", "Display", cboDisplay.Text)
+  'End Sub
 End Class

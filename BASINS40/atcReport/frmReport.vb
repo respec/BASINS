@@ -352,4 +352,35 @@ Public Class frmReport
     fbdFolder.ShowDialog()
     lblFolder.Text = fbdFolder.SelectedPath
   End Sub
+
+  Public Overrides Function ToString() As String
+    Dim lAllReports As String = ""
+    For lReportIndex As Integer = 1 To pPlugIn.Reports.Count
+      Dim lReport As String = FilenameOnly(pPlugIn.Reports(lReportIndex))
+      lAllReports &= lReport & vbCrLf
+      'Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+      'Dim lOutput As Object
+      'Dim lProblem As String = ""
+      'Dim lOutputGridSource As New atcGridSource
+      'lOutput = pPlugIn.BuildReport(lAreaLayerName, _
+      '                              lAreaIDFieldName, _
+      '                              lAreaNameFieldName, lReportIndex)
+      'Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
+      'Try
+      '  lOutputGridSource = lOutput
+      'Catch
+      '  lProblem = lOutput
+      'End Try
+      'Dim lTitle1 As String = "Watershed Characterization Report"
+      'Dim lTitle2 As String = FilenameOnly(pPlugIn.Reports(lReportIndex))
+      'If Not lOutputGridSource Is Nothing And Len(lProblem) = 0 Then
+      '  'write file
+      '  lAllReports &= lTitle1 & vbCrLf & "  " _
+      '               & lTitle2 & vbCrLf & vbCrLf _
+      '               & lOutputGridSource.ToString)
+      'Else
+      '  Logger.Msg("atcReport:" & lTitle2 & vbCrLf & lProblem, "BASINS Report Problem")
+      'End If
+    Next
+  End Function
 End Class
