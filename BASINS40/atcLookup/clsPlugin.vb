@@ -1,3 +1,5 @@
+Imports atcUtility
+
 Public Class PlugIn
   Implements MapWindow.Interfaces.IPlugin
 
@@ -96,20 +98,23 @@ Public Class PlugIn
           main.Show()
           Handled = True
         Case "Storet"
-          Dim main As New frmStoret
-          main.initializeUI(pMapWin.Project.FileName)
-          main.Show()
+          'Dim main As New frmStoret
+          'main.initializeUI(pMapWin.Project.FileName)
+          'main.Show()
+          OpenFile("http://oaspub.epa.gov/stormoda/DW_stationcriteria_STN")
           Handled = True
         Case "Sic"
           Dim main As New frmSic
-          main.initializeUI(pMapWin.Project.FileName)
-          main.Show()
-          main.ReadDatabase()
+          'main.initializeUI(pMapWin.Project.FileName)
+          'main.Show()
+          'main.ReadDatabase()
+          OpenFile("http://www.epa.gov/enviro/html/sic_lkup2.html")
           Handled = True
         Case "WQ"
-          Dim main As New frmWQ
-          main.initializeUI(pMapWin.Project.FileName)
-          main.Show()
+          'Dim main As New frmWQ
+          'main.initializeUI(pMapWin.Project.FileName)
+          'main.Show()
+          OpenFile("http://www.epa.gov/waterscience/criteria/wqcriteria.html")
           Handled = True
       End Select
     End If
