@@ -38,7 +38,7 @@ Public Module Population2000Table
         lTractLayerIndex = i - 1
       End If
     Next i
-    If lTractLayerIndex > 0 Then
+    If lTractLayerIndex > -1 Then
       Try
         lTractNameFieldIndex = GisUtil.FieldIndex(lTractLayerIndex, "NAME")
         lTractPopulationFieldIndex = GisUtil.FieldIndex(lTractLayerIndex, "population")
