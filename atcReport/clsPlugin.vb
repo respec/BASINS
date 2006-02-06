@@ -11,29 +11,27 @@ Public Class PlugIn
   Private pReportsDir As String
   Private pReports As Collection
 
-  'TODO: get these 3 from BASINS4 or plugInManager or Name?
-  Private Const pReportsMenuName As String = "BasinsReports"
-  Private Const pReportsMenuString As String = "Reports"
+  'TODO: get these from BASINS4 or plugInManager or Name?
+  'Private Const pReportsMenuName As String = "BasinsAnalysis"
+  'Private Const pReportsMenuString As String = "&Analysis"
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Reports::Watershed Characterization Reports"
+      Return "Tools::Watershed Characterization Reports"
     End Get
   End Property
 
   Public Overrides ReadOnly Property Description() As String
     Get
-      Return "This plug-in provides an interface for generating watershed characterization reports."
+      Return "An interface for generating watershed characterization reports."
     End Get
   End Property
 
   Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
-    Dim lMenuItem As MapWindow.Interfaces.MenuItem
-
     pMapWin = aMapWin
 
-    pMapWin.Menus.AddMenu(pReportsMenuName, "", Nothing, pReportsMenuString, "mnuFile")
-    lMenuItem = pMapWin.Menus.AddMenu(pReportsMenuName & "_Watershed", pReportsMenuName, Nothing, "Watershed Characterization Reports")
+    'AddMenuIfMissing(pReportsMenuName, "", pReportsMenuString)
+    'AddMenuIfMissing(pReportsMenuName & "_Watershed", pReportsMenuName, "Watershed Characterization Reports")
 
     'default reports directory 
     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
@@ -46,18 +44,8 @@ Public Class PlugIn
   End Sub
 
   Public Overrides Sub Terminate()
-    pMapWin.Menus.Remove(pReportsMenuName)
-    pMapWin.Menus.Remove(pReportsMenuName & "_Watershed")
-  End Sub
-
-  Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
-    If aItemName = pReportsMenuName & "_Watershed" Then
-      GisUtil.MappingObject = pMapWin
-      Dim lFrmReport As New frmReport
-      lFrmReport.InitializeUI(Me)
-      lFrmReport.Show()
-      aHandled = True
-    End If
+    'pMapWin.Menus.Remove(pReportsMenuName)
+    'pMapWin.Menus.Remove(pReportsMenuName & "_Watershed")
   End Sub
 
   Public Function BuildReport(ByVal aAreaLayerName As String, _
@@ -147,4 +135,19 @@ Public Class PlugIn
       pReports = Nothing 'forces read next time thru
     End Set
   End Property
+
+  Public Overrides Function Show(ByVal aDataManager As atcData.atcDataManager, Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
+    GisUtil.MappingObject = pMapWin
+    Dim lFrmReport As New frmReport
+    lFrmReport.InitializeUI(Me)
+    lFrmReport.Show()
+    Return lFrmReport
+  End Function
+
+  Public Overrides Sub Save(ByVal aDataManager As atcData.atcDataManager, ByVal aDataGroup As atcData.atcDataGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
+    Dim lFrmReport As frmReport = Show(aDataManager, aDataGroup)
+    lFrmReport.InitializeUI(Me)
+    SaveFileString(aFileName, lFrmReport.ToString)
+    lFrmReport.Close()
+  End Sub
 End Class

@@ -19,20 +19,35 @@ Friend Module modBasinsPlugin
   'Private Const NewProjectMenuName As String = "BasinsNewProject"
   'Private Const NewProjectMenuString As String = "&New Project"
 
+  'File menu -- created by MapWindow
+  Friend Const FileMenuName As String = "mnuFile"
+
   Friend Const ProjectsMenuName As String = "BasinsProjects"
   Friend Const ProjectsMenuString As String = "Open &BASINS Project"
+
+  Friend Const NewDataMenuName As String = "BasinsNewData"
+  Friend Const NewDataMenuString As String = "New Data"
 
   Friend Const OpenDataMenuName As String = "BasinsOpenData"
   Friend Const OpenDataMenuString As String = "Open Data"
 
+  Friend Const DownloadMenuName As String = "BasinsDownloadData"
+  Friend Const DownloadMenuString As String = "&Download Data"
+
+  Friend Const ManageDataMenuName As String = "BasinsManageData"
+  Friend Const ManageDataMenuString As String = "&Manage Data"
+
   Friend Const SaveDataMenuName As String = "BasinsSaveData"
   Friend Const SaveDataMenuString As String = "Save Data In..."
 
-  Friend Const ToolsMenuName As String = "BasinsTools"
-  Friend Const ToolsMenuString As String = "&Tools"
+  Friend Const AnalysisMenuName As String = "BasinsAnalysis"
+  Friend Const AnalysisMenuString As String = "&Analysis"
 
   Friend Const ModelsMenuName As String = "BasinsModels"
   Friend Const ModelsMenuString As String = "&Models"
+
+  Friend Const ComputeMenuName As String = "BasinsCompute"
+  Friend Const ComputeMenuString As String = "&Compute"
 
   Friend pWelcomeScreenShow As Boolean = False
 
@@ -63,7 +78,7 @@ Friend Module modBasinsPlugin
 
   Friend Sub RefreshSaveDataMenu()
     g_MapWin.Menus.Remove(SaveDataMenuName)
-    AddMenuIfMissing(SaveDataMenuName, "mnuFile", SaveDataMenuString, "mnuSaveAs")
+    AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
     For Each lDataSource As atcDataSource In pDataManager.DataSources
       If lDataSource.CanSave Then
         AddMenuIfMissing(SaveDataMenuName & "_" & lDataSource.Specification, SaveDataMenuName, lDataSource.Specification)
@@ -202,65 +217,62 @@ Friend Module modBasinsPlugin
   End Function
 
   Friend Sub RefreshToolsMenu()
-    'Dim lScriptMenuName As String = ToolsMenuName & "_Scripting"
+    'Dim lScriptMenuName As String = AnalysisMenuName & "_Scripting"
     'Dim iPlugin As Integer
     If pLoadedDataMenu Then
-      AddMenuIfMissing(ToolsMenuName, "", ToolsMenuString, DataMenuName)
-      'AddMenuIfMissing(ToolsMenuName & "_TestDBF", ToolsMenuName, "Test DBF")
-      AddMenuIfMissing(ToolsMenuName & "_ArcView3", ToolsMenuName, "ArcView &3")
-      AddMenuIfMissing(ToolsMenuName & "_ArcGIS", ToolsMenuName, "&ArcGIS")
-      AddMenuIfMissing(ToolsMenuName & "_GenScn", ToolsMenuName, "&GenScn")
-      AddMenuIfMissing(ToolsMenuName & "_WDMUtil", ToolsMenuName, "&WDMUtil")
-      'AddMenuIfMissing(lScriptMenuName, ToolsMenuName, "Scripting")
+      AddMenuIfMissing(AnalysisMenuName, "", AnalysisMenuString, FileMenuName)
+      'AddMenuIfMissing(AnalysisMenuName & "_TestDBF", AnalysisMenuName, "Test DBF")
+      AddMenuIfMissing(AnalysisMenuName & "_ArcView3", AnalysisMenuName, "ArcView &3")
+      AddMenuIfMissing(AnalysisMenuName & "_ArcGIS", AnalysisMenuName, "&ArcGIS")
+      AddMenuIfMissing(AnalysisMenuName & "_GenScn", AnalysisMenuName, "&GenScn")
+      AddMenuIfMissing(AnalysisMenuName & "_WDMUtil", AnalysisMenuName, "&WDMUtil")
+      'AddMenuIfMissing(lScriptMenuName, AnalysisMenuName, "Scripting")
       'If pBuiltInScriptExists Then
-      '  AddMenuIfMissing(ToolsMenuName & "_RunBuiltInScript", lScriptMenuName, "Run Built In Script")
+      '  AddMenuIfMissing(AnalysisMenuName & "_RunBuiltInScript", lScriptMenuName, "Run Built In Script")
       'End If
-      'AddMenuIfMissing(ToolsMenuName & "_ScriptEditor", lScriptMenuName, "Script Editor")
-      'AddMenuIfMissing(ToolsMenuName & "_RunScript", lScriptMenuName, "Select Script to Run")
+      'AddMenuIfMissing(AnalysisMenuName & "_ScriptEditor", lScriptMenuName, "Script Editor")
+      'AddMenuIfMissing(AnalysisMenuName & "_RunScript", lScriptMenuName, "Select Script to Run")
 
       'For Each lScriptFilename As String In System.IO.Directory.GetFiles(ScriptFolder, "*.vb")
       '  Dim lMenuLabel As String = FilenameOnly(lScriptFilename)
       '  If Not lMenuLabel.ToLower.StartsWith("sub") AndAlso Not lMenuLabel.ToLower.StartsWith("fun") Then
-      '    AddMenuIfMissing(ToolsMenuName & "_RunScript" & FilenameNoPath(lScriptFilename), lScriptMenuName, "Run " & lMenuLabel)
+      '    AddMenuIfMissing(AnalysisMenuName & "_RunScript" & FilenameNoPath(lScriptFilename), lScriptMenuName, "Run " & lMenuLabel)
       '  End If
       'Next
 
-      'AddMenuIfMissing(ToolsMenuName & "_ChangeProjection", ToolsMenuName, "Change &Projection")
+      'AddMenuIfMissing(AnalysisMenuName & "_ChangeProjection", AnalysisMenuName, "Change &Projection")
 
       Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
       If DisplayPlugins.Count > 0 Then
-        AddMenuIfMissing(ToolsMenuName & "_Separator1", ToolsMenuName, "-")
+        AddMenuIfMissing(AnalysisMenuName & "_Separator1", AnalysisMenuName, "-")
         For Each lDisp As atcDataDisplay In DisplayPlugins
           Dim lMenuText As String = lDisp.Name
           If lMenuText.StartsWith("Tools::") Then
             lMenuText = lMenuText.Substring(7)
           End If
-          AddMenuIfMissing(ToolsMenuName & "_" & lDisp.Name, ToolsMenuName, lMenuText)
+          AddMenuIfMissing(AnalysisMenuName & "_" & lDisp.Name, AnalysisMenuName, lMenuText)
         Next
       End If
     End If
   End Sub
 
-  Friend Sub RefreshDataMenu()
-    AddMenuIfMissing(DataMenuName, "", DataMenuString, "mnuFile")
-    AddMenuIfMissing(DataMenuName & "_Download", DataMenuName, "&Download")
-    AddMenuIfMissing(DataMenuName & "_ComputeData", DataMenuName, "&Compute")
-    AddMenuIfMissing(DataMenuName & "_ManageDataSources", DataMenuName, "&Manage Sources")
-    pLoadedDataMenu = True
+  'Friend Sub RefreshDataMenu()
+  '  AddMenuIfMissing(DataMenuName, "", DataMenuString, FileMenuName)
+  '  pLoadedDataMenu = True
 
-    'Dim mnu As MapWindow.Interfaces.MenuItem
-    'Dim iPlugin As Integer
-    'With g_MapWin.Plugins
-    '  For iPlugin = 0 To .Count - 1
-    '    If Not .Item(iPlugin) Is Nothing Then
-    '      Dim pluginName As String = .Item(iPlugin).Name
-    '      If CType(.Item(iPlugin), Object).GetType().IsSubclassOf(GetType(atcDataPlugin)) Then
-    '        mnu = AddMenuIfMissing(DataMenuName & "_" & pluginName, DataMenuName, pluginName)
-    '      End If
-    '    End If
-    '  Next
-    'End With
-  End Sub
+  '  'Dim mnu As MapWindow.Interfaces.MenuItem
+  '  'Dim iPlugin As Integer
+  '  'With g_MapWin.Plugins
+  '  '  For iPlugin = 0 To .Count - 1
+  '  '    If Not .Item(iPlugin) Is Nothing Then
+  '  '      Dim pluginName As String = .Item(iPlugin).Name
+  '  '      If CType(.Item(iPlugin), Object).GetType().IsSubclassOf(GetType(atcDataPlugin)) Then
+  '  '        mnu = AddMenuIfMissing(DataMenuName & "_" & pluginName, DataMenuName, pluginName)
+  '  '      End If
+  '  '    End If
+  '  '  Next
+  '  'End With
+  'End Sub
 
   'Friend Sub BuiltInScript(ByVal aRun As Boolean)
   '  Try

@@ -82,9 +82,14 @@ Public Class atcBasinsPlugIn
 
     FindBasinsDrives()
 
-    AddMenuIfMissing(OpenDataMenuName, "mnuFile", OpenDataMenuString, "mnuOpen")
-    AddMenuIfMissing(SaveDataMenuName, "mnuFile", SaveDataMenuString, "mnuSaveAs")
-    AddMenuIfMissing(ProjectsMenuName, "mnuFile", ProjectsMenuString, "mnuRecentProjects")
+    AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, "mnuNew")
+    AddMenuIfMissing(OpenDataMenuName, FileMenuName, OpenDataMenuString, "mnuOpen")
+    AddMenuIfMissing(DownloadMenuName, FileMenuName, DownloadMenuString, OpenDataMenuName)
+    AddMenuIfMissing(ManageDataMenuName, FileMenuName, ManageDataMenuString, DownloadMenuName)
+    AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
+    AddMenuIfMissing(ProjectsMenuName, FileMenuName, ProjectsMenuString, "mnuRecentProjects")
+
+    AddMenuIfMissing(ComputeMenuName, "", ComputeMenuString, FileMenuName)
 
     AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
 
@@ -108,21 +113,24 @@ Public Class atcBasinsPlugIn
       Next
     Next
 
-    RefreshDataMenu()
+    'RefreshDataMenu()
+    pLoadedDataMenu = True
 
-    RefreshToolsMenu()
-
-    AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, ToolsMenuName)
+    AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, FileMenuName)
     'mnu = AddMenuIfMissing(ModelsMenuName & "_HSPF", ModelsMenuName, "&HSPF")
     'mnu.Tooltip = "Hydrological Simulation Program - Fortran"
     mnu = AddMenuIfMissing(ModelsMenuName & "_SWAT", ModelsMenuName, "&SWAT")
     mnu.Tooltip = "SWAT"
+    mnu.Enabled = False
     mnu = AddMenuIfMissing(ModelsMenuName & "_PLOAD", ModelsMenuName, "&PLOAD")
     mnu.Tooltip = "PLOAD"
+    mnu.Enabled = False
     mnu = AddMenuIfMissing(ModelsMenuName & "_AGWA", ModelsMenuName, "&AGWA")
     mnu.Tooltip = "AGWA"
-    mnu = AddMenuIfMissing(ModelsMenuName & "_AQUATOX", ModelsMenuName, "AQUA&TOX")
-    mnu.Tooltip = "AQUATOX"
+    mnu.Enabled = False
+    'AddMenuIfMissing(AnalysisMenuName & "_ModelsSeparator", AnalysisMenuName, "-")
+
+    RefreshToolsMenu()
 
     'load HSPF plugin (an integral part of BASINS)
     'g_MapWin.Plugins.StartPlugin("atcHSPF_PlugIn")
@@ -137,9 +145,9 @@ Public Class atcBasinsPlugIn
 
     g_MapWin.Menus.Remove(DataMenuName)
     pLoadedDataMenu = False
-    g_MapWin.Menus.Remove(ToolsMenuName)
-    g_MapWin.Menus.Remove(ModelsMenuName) 'TODO: don't unload if another plugin is still using it
+    g_MapWin.Menus.Remove(AnalysisMenuName) 'TODO: don't unload if another plugin is still using it
     g_MapWin.Menus.Remove(ProjectsMenuName)
+    g_MapWin.Menus.Remove(NewDataMenuName)
     g_MapWin.Menus.Remove(OpenDataMenuName)
     g_MapWin.Menus.Remove(SaveDataMenuName)
 
@@ -157,111 +165,110 @@ Public Class atcBasinsPlugIn
   Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
     'A menu item or toolbar button was clicked
     Logger.Dbg(aItemName)
-    If aItemName.Equals("mnuNew") Then 'Override File/New menu item behavior
-      LoadNationalProject()
-      aHandled = True
-    ElseIf aItemName.StartsWith(SaveDataMenuName & "_") Then
-      Dim lSaveIn As atcDataSource
-      Dim lSaveGroup As atcDataGroup = pDataManager.UserSelectData("Select Data to Save")
-      If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
-        If aItemName.Length > SaveDataMenuName.Length Then
-          Dim lSpecification As String = aItemName.Substring(SaveDataMenuName.Length + 1)
-          For Each lDataSource As atcDataSource In pDataManager.DataSources
-            If lDataSource.Specification = lSpecification Then
-              lSaveIn = lDataSource
-              Exit For
-            End If
-          Next
-        End If
-
-        If lSaveIn Is Nothing Then
-          lSaveIn = UserOpenDataFile(False, True)
-        End If
-
-        If Not lSaveIn Is Nothing And lSaveIn.Specification.Length > 0 Then
-          For Each lDataSet As atcDataSet In lSaveGroup
-            lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
-          Next
-          lSaveIn.Save(lSaveIn.Specification)
-        End If
-      End If
-    ElseIf aItemName.Equals(OpenDataMenuName) Then
-      UserOpenDataFile()
-    ElseIf aItemName.StartsWith(ProjectsMenuName & "_") Then
-      Dim lDataDirName As String
-      Dim lPrjFileName As String
-      lDataDirName = g_MapWin.Menus(aItemName).Text ' g_MapWin.Menus(ItemName).Tooltip
-      If FileExists(lDataDirName, True, False) Then
-        lPrjFileName = lDataDirName & "\" & FilenameOnly(lDataDirName) & ".mwprj"
-        If FileExists(lPrjFileName) Then
-          Logger.Dbg("Opening project " & lPrjFileName)
-          g_MapWin.Project.Load(lPrjFileName)
+    aHandled = True 'Assume we will handle it
+    Select Case aItemName
+      Case "mnuNew" 'Override File/New menu item behavior
+        LoadNationalProject()
+      Case NewDataMenuName
+        UserOpenDataFile(False, True)
+      Case OpenDataMenuName
+        UserOpenDataFile()
+      Case DownloadMenuName
+        If NationalProjectIsOpen() Then
+          SpecifyAndCreateNewProject()
         Else
-          'TODO: look for other *.mwprj before creating a new one?
-          Logger.Dbg("Creating new project " & lPrjFileName)
-          g_MapWin.Layers.Clear()
-          g_MapWin.Refresh()
-          g_MapWin.PreviewMap.GetPictureFromMap()
-          DoEvents()
-          AddAllShapesInDir(lDataDirName, lDataDirName)
-          g_MapWin.Project.Save(lPrjFileName)
-          g_MapWin.Project.Modified = False
+          DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
         End If
-      End If
-      aHandled = True
-    ElseIf aItemName.StartsWith(DataMenuName & "_") Then
-      Select Case aItemName.Substring(DataMenuName.Length + 1)
-        'Case "DownloadTest"
-        '  If FileExists("d:\temp\NHDM2003.zip") Then Kill("d:\temp\NHDM2003.zip")
-        '  atcUtility.Downloader.DownloadURL("ftp://nhdftp.usgs.gov/SubRegions/Medium/NHDM2003.zip", "d:\temp\NHDM2003.zip")
-      Case "Download"
-          If NationalProjectIsOpen() Then
-            SpecifyAndCreateNewProject()
-          Else
-            DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
+      Case ComputeMenuName
+        Dim lNotFiles As New ArrayList
+        Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
+        For Each ds As atcDataSource In lDataSources
+          If ds.Category <> "File" AndAlso Not lNotFiles.Contains(ds.Category) Then
+            lNotFiles.Add(ds.Category)
           End If
-        Case "ComputeData"
-          Dim lNotFiles As New ArrayList
-          Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
-          For Each ds As atcDataSource In lDataSources
-            If ds.Category <> "File" AndAlso Not lNotFiles.Contains(ds.Category) Then
-              lNotFiles.Add(ds.Category)
-            End If
-          Next
-          Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lNotFiles, "Select a Computation")
-          If Not lNewSource Is Nothing Then 'user did not cancel
-            pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
-            'If Not lNewSource.DataSets Is Nothing AndAlso lNewSource.DataSets.Count > 0 Then
-            'Dim lForm As New frmSelectDisplay
-            'lForm.AskUser(pDataManager, lNewSource.DataSets)
-            'End If
-          End If
-        Case "ManageDataSources"
-          pDataManager.UserManage()
-        Case Else
-          Logger.Msg("Data Tool " & aItemName)
-      End Select
-      aHandled = True
-    ElseIf aItemName.StartsWith(ToolsMenuName & "_") Then
-      aHandled = LaunchTool(aItemName.Substring(ToolsMenuName.Length + 1))
-    ElseIf aItemName.StartsWith(ModelsMenuName & "_") Then
-      aHandled = LaunchTool(aItemName.Substring(ModelsMenuName.Length + 1))
-    ElseIf aItemName.StartsWith(CheckForUpdatesMenuName) Then
-      OpenFile("http://hspf.com/pub/basins4/updates.html", True)
-      aHandled = True
-    ElseIf aItemName.StartsWith(BasinsWebPageMenuName) Then
-      OpenFile("http://www.epa.gov/waterscience/basins/index.html")
-      aHandled = True
-    ElseIf aItemName.StartsWith(SendFeedbackMenuName) Then
-      SendFeedback()
-      aHandled = True
-    ElseIf aItemName.StartsWith(BasinsHelpMenuName) Then
-      Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_MapWin.ApplicationInfo.DefaultDir & "\docs\Basins4.chm")
-      If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
-    Else 'Not our item
-      'MsgBox("Other button: " & ItemName)
-    End If
+        Next
+        Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lNotFiles, "Select a Computation")
+        If Not lNewSource Is Nothing Then 'user did not cancel
+          pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+          'If Not lNewSource.DataSets Is Nothing AndAlso lNewSource.DataSets.Count > 0 Then
+          'Dim lForm As New frmSelectDisplay
+          'lForm.AskUser(pDataManager, lNewSource.DataSets)
+          'End If
+        End If
+      Case ManageDataMenuName
+        pDataManager.UserManage()
+      Case CheckForUpdatesMenuName
+        OpenFile("http://hspf.com/pub/basins4/updates.html", True)
+      Case BasinsWebPageMenuName
+        OpenFile("http://www.epa.gov/waterscience/basins/index.html")
+      Case SendFeedbackMenuName
+        SendFeedback()
+      Case BasinsHelpMenuName
+        Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_MapWin.ApplicationInfo.DefaultDir & "\docs\Basins4.chm")
+        If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
+      Case Else
+        If aItemName.StartsWith(AnalysisMenuName & "_") Then
+          aHandled = LaunchTool(aItemName.Substring(AnalysisMenuName.Length + 1))
+        ElseIf aItemName.StartsWith(ModelsMenuName & "_") Then
+          aHandled = LaunchTool(aItemName.Substring(ModelsMenuName.Length + 1))
+        ElseIf aItemName.StartsWith(SaveDataMenuName & "_") Then
+          aHandled = UserSaveData(aItemName.Substring(SaveDataMenuName.Length + 1))
+        ElseIf aItemName.StartsWith(ProjectsMenuName & "_") Then
+          aHandled = UserOpenProject(g_MapWin.Menus(aItemName).Text)
+        Else
+          aHandled = False 'Not our item to handle
+        End If
+    End Select
   End Sub
+
+  Private Function UserSaveData(ByVal aSpecification As String) As Boolean
+    Dim lSaveIn As atcDataSource
+    Dim lSaveGroup As atcDataGroup = pDataManager.UserSelectData("Select Data to Save")
+    If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
+      For Each lDataSource As atcDataSource In pDataManager.DataSources
+        If lDataSource.Specification = aSpecification Then
+          lSaveIn = lDataSource
+          Exit For
+        End If
+      Next
+
+      If lSaveIn Is Nothing Then
+        lSaveIn = UserOpenDataFile(False, True)
+      End If
+
+      If Not lSaveIn Is Nothing And lSaveIn.Specification.Length > 0 Then
+        For Each lDataSet As atcDataSet In lSaveGroup
+          lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+        Next
+        Return lSaveIn.Save(lSaveIn.Specification)
+      End If
+    End If
+    Return False
+  End Function
+
+  Private Function UserOpenProject(ByVal aDataDirName As String) As Boolean
+    Dim lPrjFileName As String
+
+    If FileExists(aDataDirName, True, False) Then
+      lPrjFileName = aDataDirName & "\" & FilenameOnly(aDataDirName) & ".mwprj"
+      If FileExists(lPrjFileName) Then
+        Logger.Dbg("Opening project " & lPrjFileName)
+        Return g_MapWin.Project.Load(lPrjFileName)
+      Else
+        'TODO: look for other *.mwprj before creating a new one?
+        Logger.Dbg("Creating new project " & lPrjFileName)
+        g_MapWin.Layers.Clear()
+        g_MapWin.Refresh()
+        g_MapWin.PreviewMap.GetPictureFromMap()
+        DoEvents()
+        AddAllShapesInDir(aDataDirName, aDataDirName)
+        g_MapWin.Project.Save(lPrjFileName)
+        g_MapWin.Project.Modified = False
+        Return True
+      End If
+    End If
+    Return False
+  End Function
 
   Private Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
                                     Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
@@ -345,7 +352,7 @@ Public Class atcBasinsPlugIn
         If LaunchDisplay(aToolName) Then
           Return True
         Else
-          Logger.Msg("Not yet able to launch " & aToolName, "Option not yet functional")
+          Logger.Dbg("LaunchDisplay cannot launch " & aToolName, "Option not yet functional")
         End If
         'End If
     End Select
@@ -354,7 +361,7 @@ Public Class atcBasinsPlugIn
       Shell("""" & exename & """", AppWinStyle.NormalFocus, False)
       Return True
     Else
-      Logger.Msg("Unable to launch " & aToolName, "Launch")
+      Logger.Dbg("Unable to launch " & aToolName, "Launch")
       Return False
     End If
   End Function
@@ -392,6 +399,7 @@ Public Class atcBasinsPlugIn
     If ColonPos > 0 Then
       searchForName = searchForName.Substring(ColonPos + 1)
     End If
+    searchForName = ReplaceString(searchForName, " ", "")
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
     For Each lDisp As atcDataDisplay In DisplayPlugins
       Dim foundName As String = lDisp.Name.ToLower
@@ -399,7 +407,7 @@ Public Class atcBasinsPlugIn
       If ColonPos > 0 Then
         foundName = foundName.Substring(ColonPos + 1)
       End If
-      If foundName = searchForName Then
+      If ReplaceString(foundName, " ", "") = searchForName Then
         Dim typ As System.Type = lDisp.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         Dim newDisplay As atcDataDisplay = asm.CreateInstance(typ.FullName)
@@ -565,7 +573,7 @@ Public Class atcBasinsPlugIn
     ElseIf msg.StartsWith("atcDataPlugin") Then
       Logger.Dbg("RefreshToolsMenu:" & msg)
       If msg.StartsWith("atcDataPlugin unloading") Then
-        g_MapWin.Menus.Remove(ToolsMenuName)
+        g_MapWin.Menus.Remove(AnalysisMenuName)
       End If
       RefreshToolsMenu()
       'ElseIf msg.StartsWith("COMMAND_LINE:broadcast:basins") Then

@@ -4,8 +4,8 @@ Public Class PlugIn
   Public pMapWin As MapWindow.Interfaces.IMapWin
 
   'TODO: get these 3 from BASINS4 or plugInManager?
-  Private Const UtilitiesMenuName As String = "BasinsUtilities"
-  Private Const UtilitiesMenuString As String = "&Utilities"
+  Private Const ParentMenuName As String = "BasinsAnalysis"
+  Private Const ParentMenuString As String = "&Analysis"
 
   Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
     'This is one of the more important plug-in properties because if it is not set to something then
@@ -61,16 +61,15 @@ Public Class PlugIn
   End Property
 
   Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
-    Dim mnu As MapWindow.Interfaces.MenuItem
-
     pMapWin = MapWin
 
-    pMapWin.Menus.AddMenu(UtilitiesMenuName, "", Nothing, UtilitiesMenuString, "mnuFile")
-    mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_Projection", UtilitiesMenuName, Nothing, "&Projection Parameters")
-    mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_Storet", UtilitiesMenuName, Nothing, "STORET &Agency Codes")
-    mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_Sic", UtilitiesMenuName, Nothing, "Standard &Industrial Classifcation Codes")
-    mnu = pMapWin.Menus.AddMenu(UtilitiesMenuName & "_WQ", UtilitiesMenuName, Nothing, "304a &Water Quality Criteria")
-    
+    pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
+    pMapWin.Menus.AddMenu(ParentMenuName & "_Projection", ParentMenuName, Nothing, "&Projection Parameters")
+    pMapWin.Menus.AddMenu(ParentMenuName & "_Storet", ParentMenuName, Nothing, "STORET &Agency Codes")
+    pMapWin.Menus.AddMenu(ParentMenuName & "_Sic", ParentMenuName, Nothing, "Standard &Industrial Classifcation Codes")
+    pMapWin.Menus.AddMenu(ParentMenuName & "_WQ", ParentMenuName, Nothing, "304a &Water Quality Criteria")
+    pMapWin.Menus.AddMenu(ParentMenuName & "_LookupSeparator", ParentMenuName, Nothing, "-")
+
   End Sub
 
   Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
@@ -78,38 +77,41 @@ Public Class PlugIn
     'box, or by un-checkmarking it in the plug-ins menu.  This is where you would remove any
     'buttons from the tool bar tool bar or menu items from the menu that you may have added.
     'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
-    pMapWin.Menus.Remove(UtilitiesMenuName)
-    pMapWin.Menus.Remove(UtilitiesMenuName & "_Projection")
-    pMapWin.Menus.Remove(UtilitiesMenuName & "_Storet")
-    pMapWin.Menus.Remove(UtilitiesMenuName & "_Sic")
-    pMapWin.Menus.Remove(UtilitiesMenuName & "_WQ")
+    pMapWin.Menus.Remove(ParentMenuName)
+    pMapWin.Menus.Remove(ParentMenuName & "_Projection")
+    pMapWin.Menus.Remove(ParentMenuName & "_Storet")
+    pMapWin.Menus.Remove(ParentMenuName & "_Sic")
+    pMapWin.Menus.Remove(ParentMenuName & "_WQ")
 
   End Sub
 
   Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
     'This event fires when a menu item or toolbar button is clicked.  So if you added a button or menu
     'on the Initialize event, then this is where you would handle it.
-    If ItemName = "BasinsUtilities_Projection" Then
-      Dim main As New frmProjection
-      main.initializeUI(pMapWin.Project.FileName)
-      main.Show()
-      Handled = True
-    ElseIf ItemName = "BasinsUtilities_Storet" Then
-      Dim main As New frmStoret
-      main.initializeUI(pMapWin.Project.FileName)
-      main.Show()
-      Handled = True
-    ElseIf ItemName = "BasinsUtilities_Sic" Then
-      Dim main As New frmSic
-      main.initializeUI(pMapWin.Project.FileName)
-      main.Show()
-      main.ReadDatabase()
-      Handled = True
-    ElseIf ItemName = "BasinsUtilities_WQ" Then
-      Dim main As New frmWQ
-      main.initializeUI(pMapWin.Project.FileName)
-      main.Show()
-      Handled = True
+    If ItemName.StartsWith(ParentMenuName & "_") Then
+      Select Case ItemName.Substring(ParentMenuName.Length + 1)
+        Case "Projection"
+          Dim main As New frmProjection
+          main.initializeUI(pMapWin.Project.FileName)
+          main.Show()
+          Handled = True
+        Case "Storet"
+          Dim main As New frmStoret
+          main.initializeUI(pMapWin.Project.FileName)
+          main.Show()
+          Handled = True
+        Case "Sic"
+          Dim main As New frmSic
+          main.initializeUI(pMapWin.Project.FileName)
+          main.Show()
+          main.ReadDatabase()
+          Handled = True
+        Case "WQ"
+          Dim main As New frmWQ
+          main.initializeUI(pMapWin.Project.FileName)
+          main.Show()
+          Handled = True
+      End Select
     End If
   End Sub
 
