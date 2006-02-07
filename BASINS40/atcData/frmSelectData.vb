@@ -577,14 +577,17 @@ Friend Class frmSelectData
     For i = 0 To pcboCriteria.GetUpperBound(0)
       pcboCriteria(i).Items.Clear()
     Next
-    For Each def As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-      If Not pcboCriteria(0).Items.Contains(def.Name) _
-       AndAlso atcDataAttributes.IsSimple(def) Then
-        For i = 0 To pcboCriteria.GetUpperBound(0)
-          pcboCriteria(i).Items.Add(def.Name)
-        Next
-      End If
-    Next
+    Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
+    If Not lAllDefinitions Is Nothing Then
+      For Each def As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+        If Not pcboCriteria(0).Items.Contains(def.Name) _
+         AndAlso atcDataAttributes.IsSimple(def) Then
+          For i = 0 To pcboCriteria.GetUpperBound(0)
+            pcboCriteria(i).Items.Add(def.Name)
+          Next
+        End If
+      Next
+    End If
   End Sub
 
   Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As atcGrid)

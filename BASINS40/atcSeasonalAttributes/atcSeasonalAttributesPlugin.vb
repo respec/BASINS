@@ -7,7 +7,7 @@ Public Class atcSeasonalAttributesPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::SeasonalAttributes"
+      Return "Analysis::Seasonal Attributes"
     End Get
   End Property
 
@@ -44,8 +44,4 @@ Public Class atcSeasonalAttributesPlugin
     SaveFileString(aFileName, lForm.ToString)
   End Sub
 
-  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
-                                  ByVal aParentHandle As Integer)
-    aMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcSeasonalAttributesPlugin")
-  End Sub
 End Class

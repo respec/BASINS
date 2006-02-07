@@ -216,7 +216,7 @@ Friend Module modBasinsPlugin
     End With
   End Function
 
-  Friend Sub RefreshToolsMenu()
+  Friend Sub RefreshAnalysisMenu(Optional ByVal aIgnore As String = "")
     'Dim lScriptMenuName As String = AnalysisMenuName & "_Scripting"
     'Dim iPlugin As Integer
     If pLoadedDataMenu Then
@@ -242,15 +242,14 @@ Friend Module modBasinsPlugin
 
       'AddMenuIfMissing(AnalysisMenuName & "_ChangeProjection", AnalysisMenuName, "Change &Projection")
 
-      Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-      If DisplayPlugins.Count > 0 Then
+      Dim lPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+      If lPlugins.Count > 0 Then
         AddMenuIfMissing(AnalysisMenuName & "_Separator1", AnalysisMenuName, "-")
-        For Each lDisp As atcDataDisplay In DisplayPlugins
+        For Each lDisp As atcDataDisplay In lPlugins
           Dim lMenuText As String = lDisp.Name
-          If lMenuText.StartsWith("Tools::") Then
-            lMenuText = lMenuText.Substring(7)
+          If Not lMenuText.Equals(aIgnore) AndAlso lMenuText.StartsWith("Analysis::") Then
+            AddMenuIfMissing(AnalysisMenuName & "_" & lDisp.Name, AnalysisMenuName, lMenuText.Substring(10))
           End If
-          AddMenuIfMissing(AnalysisMenuName & "_" & lDisp.Name, AnalysisMenuName, lMenuText)
         Next
       End If
     End If

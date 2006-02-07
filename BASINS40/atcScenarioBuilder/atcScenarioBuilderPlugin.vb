@@ -5,7 +5,7 @@ Public Class atcScenarioBuilderPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::ClimateChangeScenario"
+      Return "Analysis::Climate Change Scenario"
     End Get
   End Property
 
@@ -18,11 +18,8 @@ Public Class atcScenarioBuilderPlugin
 
   Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                   ByVal aParentHandle As Integer)
+    MyBase.Initialize(aMapWin, aParentHandle)
     g_MapWin = aMapWin
-    g_MapWin.Plugins.BroadcastMessage("loading atcScenarioBuilderPlugin")
   End Sub
 
-  Public Overrides Sub Terminate()
-    g_MapWin.Plugins.BroadcastMessage("unloading atcScenarioBuilderPlugin")
-  End Sub
 End Class

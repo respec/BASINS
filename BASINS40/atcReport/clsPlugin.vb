@@ -17,7 +17,7 @@ Public Class PlugIn
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::Watershed Characterization Reports"
+      Return "Analysis::Watershed Characterization Reports"
     End Get
   End Property
 
@@ -27,7 +27,8 @@ Public Class PlugIn
     End Get
   End Property
 
-  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
+  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
+    MyBase.Initialize(aMapWin, aParentHandle)
     pMapWin = aMapWin
 
     'AddMenuIfMissing(pReportsMenuName, "", pReportsMenuString)
@@ -43,10 +44,10 @@ Public Class PlugIn
     ReportsDir = lReportsDir
   End Sub
 
-  Public Overrides Sub Terminate()
-    'pMapWin.Menus.Remove(pReportsMenuName)
-    'pMapWin.Menus.Remove(pReportsMenuName & "_Watershed")
-  End Sub
+  'Public Overrides Sub Terminate()
+  '  pMapWin.Menus.Remove(pReportsMenuName)
+  '  pMapWin.Menus.Remove(pReportsMenuName & "_Watershed")
+  'End Sub
 
   Public Function BuildReport(ByVal aAreaLayerName As String, _
                               ByVal aAreaIDFieldName As String, _
