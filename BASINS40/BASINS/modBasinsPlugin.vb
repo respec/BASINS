@@ -131,6 +131,7 @@ Friend Module modBasinsPlugin
       End If
     End If
     If NationalProjectIsOpen() Then
+      g_MapWin.Layers.CurrentLayer = 0 'HUC 8 layer in our national.mwprj
       'Logger.Msg("Select the Area(s) of Interest by a Mouse Click, " & vbCr & _
       '           "then Download from the Data menu" & vbCr & _
       '           "to create a new BASINS project", "Build BASINS Project")
