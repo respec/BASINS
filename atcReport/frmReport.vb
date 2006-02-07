@@ -302,7 +302,7 @@ Public Class frmReport
         Dim lTitle2 As String = FilenameOnly(pPlugIn.Reports(lbxReports.SelectedIndices(i) + 1))
         If Not lOutputGridSource Is Nothing And Len(lProblem) = 0 Then
           'write file
-          SaveFileString(lblFolder.Text & lTitle2 & ".out", _
+          SaveFileString(lblFolder.Text & lTitle2 & ".txt", _
              lTitle1 & vbCrLf & "  " & lTitle2 & vbCrLf & vbCrLf & lOutputGridSource.ToString)
 
           'form showing output
@@ -346,11 +346,18 @@ Public Class frmReport
       lbxReports.Items.Add(FilenameOnly(lReport))
     Next lReport
 
+    Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+    lblFolder.Text = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "Reports\"
+
   End Sub
 
   Private Sub lblFolder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lblFolder.Click
     fbdFolder.ShowDialog()
     lblFolder.Text = fbdFolder.SelectedPath
+    If Microsoft.VisualBasic.Right(lblFolder.Text, 1) <> "/" And _
+       Microsoft.VisualBasic.Right(lblFolder.Text, 1) <> "\" Then
+      lblFolder.Text = lblFolder.Text & "\"
+    End If
   End Sub
 
   Public Overrides Function ToString() As String
