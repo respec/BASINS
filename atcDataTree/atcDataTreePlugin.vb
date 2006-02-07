@@ -5,7 +5,7 @@ Public Class atcDataTreePlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::DataTree"
+      Return "Analysis::Data Tree"
     End Get
   End Property
 
@@ -23,11 +23,6 @@ Public Class atcDataTreePlugin
       Return Nothing
     End If
   End Function
-
-  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
-                                  ByVal aParentHandle As Integer)
-    aMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcDataTreePlugin")
-  End Sub
 
   Public Overrides Sub Save(ByVal aDataManager As atcDataManager, _
                   ByVal aDataGroup As atcDataGroup, _

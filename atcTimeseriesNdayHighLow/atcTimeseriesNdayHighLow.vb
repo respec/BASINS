@@ -512,7 +512,8 @@ Public Class atcTimeseriesNdayHighLow
     End If
   End Function
 
-  Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
+  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
+    MyBase.Initialize(aMapWin, aParentHandle)
     For Each lOperation As atcDefinedValue In AvailableOperations
       atcDataAttributes.AddDefinition(lOperation.Definition)
     Next

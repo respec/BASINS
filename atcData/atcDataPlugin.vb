@@ -12,6 +12,7 @@ Public Class atcDataPlugin
 
   Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
   Private pSerial As Integer 'Serial number of this object, assigned in order of creation at runtime
+  Private pMapWin As MapWindow.Interfaces.IMapWin
 
   ''' <summary>create a new atcDataPlugin</summary>
   Public Sub New()
@@ -83,7 +84,10 @@ Public Class atcDataPlugin
   ''' Save a reference to the IMapWin that is passed for later access to MapWindow.
   ''' </remarks>
   Public Overridable Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
-                                    ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+                                    ByVal aParentHandle As Integer) _
+                            Implements MapWindow.Interfaces.IPlugin.Initialize
+    pMapWin = aMapWin
+    pMapWin.Plugins.BroadcastMessage("atcDataPlugin loading " & Name)
   End Sub
 
   ''' <summary>Fired when the plugin is unloaded
@@ -97,6 +101,9 @@ Public Class atcDataPlugin
   ''' </remarks>
   Public Overridable Sub Terminate() _
                             Implements MapWindow.Interfaces.IPlugin.Terminate
+    If Not pMapWin Is Nothing Then
+      pMapWin.Plugins.BroadcastMessage("atcDataPlugin unloading " & Name)
+    End If
   End Sub
 
   ''' <summary>Fires when a menu item or toolbar button is clicked.

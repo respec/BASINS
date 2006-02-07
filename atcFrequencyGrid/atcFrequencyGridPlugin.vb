@@ -7,7 +7,7 @@ Public Class atcFrequencyGridPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::FrequencyGrid"
+      Return "Analysis::Frequency Grid"
     End Get
   End Property
 
@@ -48,8 +48,4 @@ Public Class atcFrequencyGridPlugin
     SaveFileString(aFileName, lForm.ToString)
   End Sub
 
-  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
-                                  ByVal aParentHandle As Integer)
-    aMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcFrequencyGridPlugin")
-  End Sub
 End Class

@@ -261,8 +261,9 @@ Public Class atcMetCmpPlugin
 
   End Function
 
-  Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, _
-                                  ByVal ParentHandle As Integer)
+  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
+                                  ByVal aParentHandle As Integer)
+    MyBase.Initialize(aMapWin, aParentHandle)
     Dim lAvlOps As atcDataAttributes = AvailableOperations()
   End Sub
 

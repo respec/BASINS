@@ -5,7 +5,7 @@ Public Class atcListPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::List"
+      Return "Analysis::List"
     End Get
   End Property
 
@@ -16,8 +16,4 @@ Public Class atcListPlugin
     Return lForm
   End Function
 
-  Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
-                                  ByVal ParentHandle As Integer)
-    aMapWin.Plugins.BroadcastMessage("atcDataPlugin loading atcListPlugin")
-  End Sub
 End Class

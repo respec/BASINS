@@ -10,7 +10,7 @@ Public Class PlugIn
 
   Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
     Get
-      Return "Analysis::Land Use Reclassification"
+      Return "Analysis::Reclassify Land Use"
     End Get
   End Property
 

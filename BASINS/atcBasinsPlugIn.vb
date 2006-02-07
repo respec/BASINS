@@ -130,7 +130,7 @@ Public Class atcBasinsPlugIn
     mnu.Enabled = False
     'AddMenuIfMissing(AnalysisMenuName & "_ModelsSeparator", AnalysisMenuName, "-")
 
-    RefreshToolsMenu()
+    RefreshAnalysisMenu()
 
     'load HSPF plugin (an integral part of BASINS)
     'g_MapWin.Plugins.StartPlugin("atcHSPF_PlugIn")
@@ -146,10 +146,12 @@ Public Class atcBasinsPlugIn
     g_MapWin.Menus.Remove(DataMenuName)
     pLoadedDataMenu = False
     g_MapWin.Menus.Remove(AnalysisMenuName) 'TODO: don't unload if another plugin is still using it
+    g_MapWin.Menus.Remove(ModelsMenuName)   'TODO: don't unload if another plugin is still using it
     g_MapWin.Menus.Remove(ProjectsMenuName)
     g_MapWin.Menus.Remove(NewDataMenuName)
     g_MapWin.Menus.Remove(OpenDataMenuName)
     g_MapWin.Menus.Remove(SaveDataMenuName)
+    g_MapWin.Menus.Remove(ComputeMenuName)
 
     g_MapWin.Menus.Remove("BasinsHelp_Separator1")
     g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
@@ -571,11 +573,15 @@ Public Class atcBasinsPlugIn
       End If
       pWelcomeScreenShow = True 'Be sure to do it next time (when requested from menu)
     ElseIf msg.StartsWith("atcDataPlugin") Then
-      Logger.Dbg("RefreshToolsMenu:" & msg)
-      If msg.StartsWith("atcDataPlugin unloading") Then
-        g_MapWin.Menus.Remove(AnalysisMenuName)
+      If msg.IndexOf("Analysis::") > 0 Then
+        Dim lUnloading As String = ""
+        Logger.Dbg(msg)
+        If msg.StartsWith("atcDataPlugin unloading") Then
+          lUnloading = msg.Substring(24)
+          g_MapWin.Menus.Remove(AnalysisMenuName)
+        End If
+        RefreshAnalysisMenu(lUnloading)
       End If
-      RefreshToolsMenu()
       'ElseIf msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
       'COMMAND_LINE:broadcast:basins:script:c:\test\BASINS4\scripts\dummy.vb
       'Logger.Dbg("BASINS:Message:" & msg)
@@ -595,9 +601,9 @@ Public Class atcBasinsPlugIn
       '  If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
       '    Logger.Msg(lErrors, "Script Error")
       '  End If
-    Else
-      Logger.Dbg("Ignore:" & msg)
-    End If
+      Else
+        Logger.Dbg("Ignore:" & msg)
+      End If
   End Sub
 
   Public Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
