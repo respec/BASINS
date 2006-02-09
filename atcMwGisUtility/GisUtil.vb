@@ -1106,6 +1106,98 @@ Public Class GisUtil
     End If
   End Sub
 
+  Public Shared Function GridSlopeInPolygon(ByVal aGridLayerIndex As Integer, ByVal aPolygonLayerIndex As Integer, _
+                                            ByVal aPolygonFeatureIndex As Integer) As Double
+    'Given an elevation grid and a polygon layer, find the average slope value within the feature.
+
+    Dim lCol As Integer
+    Dim lRow As Integer
+    Dim lXPos As Double
+    Dim lYPos As Double
+    Dim lSubId As Integer
+    Dim lStartCol As Integer
+    Dim lEndCol As Integer
+    Dim lStartRow As Integer
+    Dim lEndRow As Integer
+    Dim lVal As Integer
+    Dim totalcellcount As Integer
+    Dim cellcount As Integer
+    Dim lastdisplayed As Integer
+    Dim lNeighborVal As Integer
+    Dim lNeighborCount As Integer
+    Dim lSum As Integer
+    Dim lSubCellCount As Integer
+
+    'set input grid
+    Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
+
+    'set input polygon layer
+    Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
+    Dim lShape As New MapWinGIS.Shape
+    If FeatureIndexValid(aPolygonFeatureIndex, lPolygonSf) Then
+      lShape = lPolygonSf.Shape(aPolygonFeatureIndex)
+
+      'figure out what part of the grid overlays this polygon
+      lInputGrid.ProjToCell(lShape.Extents.xMin, lShape.Extents.yMin, lStartCol, lEndRow)
+      lInputGrid.ProjToCell(lShape.Extents.xMax, lShape.Extents.yMax, lEndCol, lStartRow)
+
+      totalcellcount = (lEndCol - lStartCol) * (lEndRow - lStartRow)
+      cellcount = 0
+      lastdisplayed = 0
+      GetMappingObject.StatusBar.ShowProgressBar = True
+      GetMappingObject.StatusBar.ProgressBarValue = 0
+
+      lPolygonSf.BeginPointInShapefile()
+      lSum = 0
+      lSubCellCount = 0
+      For lCol = lStartCol To lEndCol
+        For lRow = lStartRow To lEndRow
+          lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
+          lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+          If lSubId = aPolygonFeatureIndex Then 'this is in the polygon we want
+            lVal = lInputGrid.Value(lCol, lRow)
+            lNeighborCount = 0
+            lNeighborVal = 0
+            'find neighboring elevations
+            If lCol > 1 Then
+              lNeighborVal = lNeighborVal + Math.Abs(lInputGrid.Value(lCol - 1, lRow) - lVal)
+              lNeighborCount = lNeighborCount + 1
+            End If
+            If lCol < lInputGrid.Header.NumberCols Then
+              lNeighborVal = lNeighborVal + Math.Abs(lInputGrid.Value(lCol + 1, lRow) - lVal)
+              lNeighborCount = lNeighborCount + 1
+            End If
+            If lRow > 1 Then
+              lNeighborVal = lNeighborVal + Math.Abs(lInputGrid.Value(lCol, lRow - 1) - lVal)
+              lNeighborCount = lNeighborCount + 1
+            End If
+            If lRow < lInputGrid.Header.NumberRows Then
+              lNeighborVal = lNeighborVal + Math.Abs(lInputGrid.Value(lCol, lRow + 1) - lVal)
+              lNeighborCount = lNeighborCount + 1
+            End If
+            'find average difference in neighboring elevation
+            If lNeighborCount > 0 Then
+              lNeighborVal = lNeighborVal / lNeighborCount
+            Else
+              lNeighborVal = 0
+            End If
+            'sum the elev diff for each cell in polygon
+            lSum = lSum + lNeighborVal
+            lSubCellCount = lSubCellCount + 1
+          End If
+          cellcount = cellcount + 1
+          If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
+            lastdisplayed = Int(cellcount / totalcellcount * 100)
+            GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
+          End If
+        Next lRow
+      Next lCol
+      GridSlopeInPolygon = (lSum / lSubCellCount) / lInputGrid.Header.dX
+      GetMappingObject.StatusBar.ShowProgressBar = False
+      lPolygonSf.EndPointInShapefile()
+    End If
+  End Function
+
   Public Shared Function GridValueAtPoint(ByVal GridLayerIndex As Integer, ByVal x As Double, ByVal y As Double) As Integer
     Dim column As Integer
     Dim row As Integer
@@ -1546,7 +1638,7 @@ Public Class GisUtil
 
     'set layer 2 
     Dim lLayer2 As MapWindow.Interfaces.Layer
-    lLayer2 = GetMappingObject.Layers(layer2index)
+    lLayer2 = GetMappingObject.Layers(Layer2index)
     Dim sf2 As MapWinGIS.Shapefile
     sf2 = lLayer2.GetObject
     Dim shape2 As MapWinGIS.Shape
