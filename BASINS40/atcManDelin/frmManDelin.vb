@@ -686,9 +686,14 @@ Public Class frmManDelin
         'grid
         nsub = GisUtil.NumFeatures(SubbasinLayerIndex)
         For i = 1 To nsub
-          GisUtil.GridMinMaxInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1, minelev, maxelev)
+          'GisUtil.GridMinMaxInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1, minelev, maxelev)
           'store in slope field as percent
-          slope = 100 * (maxelev - minelev) / ((GisUtil.FeatureArea(SubbasinLayerIndex, i - 1)) ^ 0.5)
+          'slope = 100 * (maxelev - minelev) / ((GisUtil.FeatureArea(SubbasinLayerIndex, i - 1)) ^ 0.5)
+          If InStr(GisUtil.LayerFileName(ElevationLayerIndex), "\ned\") > 0 Then
+            slope = GisUtil.GridSlopeInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1)
+          Else
+            slope = 100 * GisUtil.GridSlopeInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1)
+          End If
           GisUtil.SetFeatureValue(SubbasinLayerIndex, SlopeFieldIndex, i - 1, slope)
         Next i
       End If
