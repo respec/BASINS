@@ -242,7 +242,7 @@ StartOver:
             End If
             If InStr(lOutputFileName, "\nlcd\") > 0 Then
               'exception for nlcd data, already in albers
-              lInputProjection = "+proj=aea +ellps=clrk66 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+              lInputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
             Else
               lInputProjection = "+proj=longlat +datum=NAD83"
             End If
