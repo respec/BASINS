@@ -8,6 +8,26 @@ Public Module modDate
 
   '##MODULE_DESCRIPTION General date utility subroutines and functions
 
+  '##GLOBAL atcTimeUnit - standard timeseries time units
+  Public Enum atcTimeUnit
+    TUSecond = 1
+    TUMinute = 2
+    TUHour = 3
+    TUDay = 4
+    TUMonth = 5
+    TUYear = 6
+    TUCentury = 7
+  End Enum
+
+  '##GLOBAL atcTran - standard timeseries transformations
+  Public Enum atcTran
+    TranAverSame = 0
+    TranSumDiv = 1
+    TranMax = 2
+    TranMin = 3
+    TranNative = 4
+  End Enum
+
   '##GLOBAL JulianHour - one hour as fraction of a day
   Public Const JulianHour As Double = 1 / 24
   '##GLOBAL JulianMinute - one minute as fraction of a day

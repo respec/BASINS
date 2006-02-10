@@ -99,6 +99,8 @@ Public Class atcDataSourceCligen
                   lData.Attributes.SetValue("Location", lLocation)
                   lData.Attributes.SetValue("Constituent", .FieldName(i))
                   lData.Attributes.SetValue("point", False)
+                  lData.Attributes.SetValue("tu", atcTimeUnit.TUDay)
+                  lData.Attributes.SetValue("ts", 1)
                   DataSets.Add(lTSKey, lData)
                 End If
                 lDate(0) = .Value(3)

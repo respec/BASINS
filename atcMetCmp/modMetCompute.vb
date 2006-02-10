@@ -438,6 +438,8 @@ Public Module modMetCompute
     Dim lDisTs As New atcTimeseries(aDataSource)
 
     CopyBaseAttributes(aMnTmpTS, lDisTs)
+    lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
+    lDisTs.Attributes.SetValue("ts", 1)
     lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
     lDisTs.Attributes.SetValue("Constituent", "TEMP")
     lDisTs.Attributes.SetValue("TSTYPE", "TEMP")
@@ -546,6 +548,8 @@ Public Module modMetCompute
 
     CopyBaseAttributes(aInTs, lDisTs)
     lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
+    lDisTs.Attributes.SetValue("ts", 1)
     If aDisOpt = 1 Then 'solar disaggregation
       lDisTs.Attributes.SetValue("Constituent", "SOLR")
       lDisTs.Attributes.SetValue("TSTYPE", "SOLR")
@@ -598,6 +602,8 @@ Public Module modMetCompute
     Dim lHrVals(24) As Double
 
     CopyBaseAttributes(aInTs, lDisTs)
+    lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
+    lDisTs.Attributes.SetValue("ts", 1)
     lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
     lDisTs.Attributes.SetValue("Constituent", "WIND")
     lDisTs.Attributes.SetValue("TSTYPE", "WIND")
@@ -1435,6 +1441,8 @@ Public Module modMetCompute
     End If
 
     CopyBaseAttributes(aDyTSer, lDisTs)
+    lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
+    lDisTs.Attributes.SetValue("ts", 1)
     lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
     lDisTs.Attributes.SetValue("Constituent", "PREC")
     lDisTs.Attributes.SetValue("TSTYPE", "PREC")
@@ -1625,4 +1633,66 @@ OuttaHere:
     End If
 
   End Sub
+
+  Public Function DisCliGenPrecip(ByVal aDPrecTSer As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aDurTSer As atcTimeseries, ByVal aTimePkTSer As atcTimeseries, ByVal aPeakTSer As atcTimeseries) As atcTimeseries
+    'aDPrecTSer - daily time series being disaggregated
+    'aDurTSer - storm duration timeseries (hrs)
+    'aTimePkTSer - time to peak timeseries (fraction of duration)
+    'aPeakTSer - peak intensity timeseries (normalized relative to average intensity)
+    Dim lDisTs As New atcTimeseries(aDataSource)
+    Dim lHrPos As Integer
+    Dim lDyInd As Integer
+    Dim lHrInd As Integer
+    Dim lEventDur As Integer
+    Dim lEventPkTime As Double
+    Dim lEventMaxVal As Double
+    Dim lEventStart As Integer
+    Dim lEventInd As Integer
+    Dim lPreSlope As Double
+    Dim lPostSlope As Double
+    Dim lPrevTotal As Double
+    Dim lCurrTotal As Double
+
+    CopyBaseAttributes(aDPrecTSer, lDisTs)
+    lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
+    lDisTs.Attributes.SetValue("ts", 1)
+    lDisTs.Attributes.SetValue("Scenario", "CLIGEN")
+    lDisTs.Attributes.SetValue("Constituent", "PREC")
+    lDisTs.Attributes.SetValue("TSTYPE", "PREC")
+    lDisTs.Attributes.SetValue("Description", "Hourly Precipitation disaggregated from Daily CliGen Precip")
+    lDisTs.Attributes.AddHistory("Disaggregated CliGen Precipitation - input: DPRC")
+    lDisTs.Attributes.Add("DPRC", aDPrecTSer.ToString)
+
+    'build new date array for hourly TSer, set start date to same as daily
+    Dim lSJDay As Double = aDPrecTSer.Attributes.GetValue("SJDAY", 0)
+    If lSJDay = 0 Then aDPrecTSer.Attributes.SetValue("SJDAY", aDPrecTSer.Dates.Value(0))
+    lDisTs.Dates = DisaggDates(aDPrecTSer, aDataSource)
+    lDisTs.numValues = lDisTs.Dates.numValues
+
+    Dim lHrVals(lDisTs.numValues) As Double
+    lHrPos = 0
+    For lDyInd = 1 To aDPrecTSer.numValues
+      For lHrInd = lHrPos + 1 To lHrPos + 24
+        lHrVals(lHrInd) = 0
+      Next lHrInd
+      If aDPrecTSer.Value(lDyInd) > 0 Then 'something to disaggregate
+        lEventDur = CInt(aDurTSer.Value(lDyInd) + 0.4999) 'always round up to next whole hour
+        lEventPkTime = aTimePkTSer.Value(lDyInd) * aDurTSer.Value(lDyInd)
+        lEventMaxVal = (aDPrecTSer.Value(lDyInd) / aDurTSer.Value(lDyInd)) * aPeakTSer.Value(lDyInd)
+        lPreSlope = lEventMaxVal / lEventPkTime
+
+        lEventStart = 13 - lEventDur / 2
+        lPrevTotal = 0
+        For lEventInd = 1 To Fix(lEventPkTime) 'on ascending slope of triangle
+          lHrInd = lHrPos + lEventStart + lEventInd
+          lCurrTotal = 0.5 * lEventInd * (lEventInd * lPreSlope)
+          lHrVals(lHrInd) = lCurrTotal - lPrevTotal
+          lPrevTotal = lCurrTotal
+        Next
+
+      End If
+      lHrPos = lHrPos + 24
+    Next
+  End Function
+
 End Module
