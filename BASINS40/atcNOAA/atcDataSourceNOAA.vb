@@ -146,6 +146,8 @@ Public Class atcDataSourceNOAA
               lData.Attributes.SetValue("Location", ColLocation.Value)
               lData.Attributes.SetValue("Constituent", ColElementType.Value)
               lData.Attributes.SetValue("Description", "Summary of the Day")
+              lData.Attributes.SetValue("tu", 4)
+              lData.Attributes.SetValue("ts", 1)
               lData.Attributes.SetValue("point", False)
               lData.Attributes.SetValue("MVal", MissingVal)
               lData.Attributes.SetValue("MAcc", MissingAcc)

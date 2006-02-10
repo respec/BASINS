@@ -257,11 +257,12 @@ Public Module modTimeseriesMath
   'Assumes dates are at the end of each value's interval and that the
   '0th position in the Dates array is the beginning of the first interval.
   Public Function FillValues(ByVal aOldTSer As atcTimeseries, _
-                             ByVal aTU As Long, _
+                             ByVal aTU As atcTimeUnit, _
                              Optional ByVal aTS As Long = 1, _
                              Optional ByVal aFillVal As Double = 0, _
                              Optional ByVal aMissVal As Double = -999, _
-                             Optional ByVal aAccumVal As Double = -999) As atcTimeseries
+                             Optional ByVal aAccumVal As Double = -999, _
+                             Optional ByVal aDataSource As atcDataSource = Nothing) As atcTimeseries
     'aTU - Time units (1-sec, 2-min, 3-hour, 4-day, 5-month, 6-year, 7-century).
     'aTS - Timestep in units of aTU.
     'aFillVal - Value to Fill data gaps with.
@@ -280,49 +281,51 @@ Public Module modTimeseriesMath
     Dim lDateOld As Double
     Dim lValOld As Double
     Dim lNewVals() As Double
-    Dim lNewDates() As Double
+    Dim lNewDates() As Double = NewDates(aOldTSer, aTU, aTS)
 
-    If aTU > 0 And aTU < 8 Then
-      Select Case aTU
-        Case 1 : lIntvl = aTS / 86400 : lVarLength = 0
-        Case 2 : lIntvl = aTS / 1440 : lVarLength = 0
-        Case 3 : lIntvl = aTS / 24 : lVarLength = 0
-        Case 4 : lIntvl = aTS : lVarLength = 0
-        Case 5 : lIntvl = aTS * 30.44 : lVarLength = 1
-        Case 6 : lIntvl = aTS * 365.25 : lVarLength = 2
-        Case 7 : lIntvl = aTS * 36525 : lVarLength = 3
-      End Select
+    If lNewDates.GetUpperBound(0) > 0 Then 'dates for new timeseries set
+      'Select Case aTU
+      '  Case atcTimeUnit.TUSecond : lIntvl = JulianSecond : lVarLength = 0
+      '  Case atcTimeUnit.TUMinute : lIntvl = JulianMinute : lVarLength = 0
+      '  Case atcTimeUnit.TUHour : lIntvl = JulianHour : lVarLength = 0
+      '  Case atcTimeUnit.TUDay : lIntvl = aTS : lVarLength = 0
+      '  Case atcTimeUnit.TUMonth : lIntvl = aTS * 30.44 : lVarLength = 1
+      '  Case atcTimeUnit.TUYear : lIntvl = aTS * 365.25 : lVarLength = 2
+      '  Case atcTimeUnit.TUCentury : lIntvl = aTS * 36525 : lVarLength = 3
+      'End Select
 
-      Dim lNewTSer As New atcTimeseries(Nothing)
+      Dim lNewTSer As New atcTimeseries(aDataSource)
       CopyBaseAttributes(aOldTSer, lNewTSer)
       lNewTSer.Attributes.SetValue("point", False)
       If aOldTSer.ValueAttributesExist Then 'TODO:: Something with value attributes
       End If
 
-      If aOldTSer.Dates.Value(0) <= 0 Then
-        If lVarLength > 0 Then
-          J2Date(aOldTSer.Dates.Value(1), lDate)
-          If lVarLength = 1 Then
-            lSJDay = aOldTSer.Dates.Value(1) - daymon(lDate(0), lDate(1))
-          ElseIf lVarLength = 2 Then
-            lSJDay = aOldTSer.Dates.Value(1) - 365 - (daymon(lDate(0), 2) - 28)
-          Else 'TODO::something for centuries
-          End If
-        Else
-          lSJDay = aOldTSer.Dates.Value(1) - lIntvl
-        End If
-      Else
-        lSJDay = aOldTSer.Dates.Value(0)
-      End If
-      lEJDay = aOldTSer.Dates.Value(aOldTSer.numValues)
-      lNewNumVals = (lEJDay - lSJDay) / lIntvl
+      'If aOldTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aOldTSer.Dates.Value(0)) Then
+      '  If lVarLength > 0 Then
+      '    J2Date(aOldTSer.Dates.Value(1), lDate)
+      '    If lVarLength = 1 Then
+      '      lSJDay = aOldTSer.Dates.Value(1) - daymon(lDate(0), lDate(1))
+      '    ElseIf lVarLength = 2 Then
+      '      lSJDay = aOldTSer.Dates.Value(1) - 365 - (daymon(lDate(0), 2) - 28)
+      '    Else 'TODO::something for centuries
+      '    End If
+      '  Else
+      '    lSJDay = aOldTSer.Dates.Value(1) - lIntvl
+      '  End If
+      'Else
+      '  lSJDay = aOldTSer.Dates.Value(0)
+      'End If
+      'lEJDay = aOldTSer.Dates.Value(aOldTSer.numValues)
+      'lNewNumVals = (lEJDay - lSJDay) / lIntvl
+      'ReDim lNewVals(lNewNumVals)
+      'ReDim lNewDates(lNewNumVals)
+      'lNewDates(0) = lSJDay
+      lNewNumVals = lNewDates.GetUpperBound(0)
       ReDim lNewVals(lNewNumVals)
-      ReDim lNewDates(lNewNumVals)
-      lNewDates(0) = lSJDay
       lOldInd = 1
       lDateOld = aOldTSer.Dates.Value(lOldInd)
       lNewInd = 1
-      lDateNew = lDateOld
+      lDateNew = lNewDates(lNewInd)
       While lNewInd <= lNewNumVals
         While lDateNew < lDateOld - JulianSecond 'Fill values not present in original data
           Select Case lValOld
@@ -335,35 +338,35 @@ Public Module modTimeseriesMath
             Case aAccumVal : lNewVals(lNewInd) = aAccumVal
             Case Else : lNewVals(lNewInd) = aFillVal
           End Select
-          lNewDates(lNewInd) = lDateNew
+          'lNewDates(lNewInd) = lDateNew
           lNewInd += 1
-          If lVarLength = 1 Then
-            Call J2Date(lDateNew, lDate)
-            lDateNew = lDateNew + daymon(lDate(0), lDate(1))
-          ElseIf lVarLength = 2 Then
-            Call J2Date(lDateNew, lDate)
-            lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
-          Else
-            lDateNew = lDateNew + lIntvl
-          End If
+          lDateNew = lNewDates(lNewInd)
+          'If lVarLength = 1 Then
+          '  Call J2Date(lDateNew, lDate)
+          '  lDateNew = lDateNew + daymon(lDate(0), lDate(1))
+          'ElseIf lVarLength = 2 Then
+          '  Call J2Date(lDateNew, lDate)
+          '  lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
+          'Else
+          '  lDateNew = lDateNew + lIntvl
+          'End If
         End While
         lValOld = aOldTSer.Value(lOldInd)
         lNewVals(lNewInd) = lValOld
-        lNewDates(lNewInd) = lDateNew
-        If lVarLength = 1 Then
-          Call J2Date(lDateNew, lDate)
-          lDateNew = lDateNew + daymon(lDate(0), lDate(1))
-        ElseIf lVarLength = 2 Then
-          Call J2Date(lDateNew, lDate)
-          lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
-        Else
-          lDateNew = lDateNew + lIntvl
-        End If
+        'lNewDates(lNewInd) = lDateNew
+        'If lVarLength = 1 Then 'monthly
+        '  Call J2Date(lDateNew, lDate)
+        '  lDateNew = lDateNew + daymon(lDate(0), lDate(1))
+        'ElseIf lVarLength = 2 Then 'yearly
+        '  Call J2Date(lDateNew, lDate)
+        '  lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
+        'Else
+        '  lDateNew = lDateNew + lIntvl
+        'End If
         lNewInd += 1
+        If lNewInd <= lNewNumVals Then lDateNew = lNewDates(lNewInd)
         lOldInd += 1
-        If lOldInd <= aOldTSer.numValues Then
-          lDateOld = aOldTSer.Dates.Value(lOldInd)
-        End If
+        If lOldInd <= aOldTSer.numValues Then lDateOld = aOldTSer.Dates.Value(lOldInd)
       End While
       lNewTSer.Dates = New atcTimeseries(Nothing)
       lNewTSer.Dates.Values = lNewDates
@@ -373,6 +376,185 @@ Public Module modTimeseriesMath
       Logger.Msg("Invalid value for time units ('" & aTU & "') in call to Timeseries FillValues module.", "Fill Values Problem")
       Return Nothing
     End If
+  End Function
+
+  Public Function Aggregate(ByVal aTimeseries As atcTimeseries, _
+                            ByVal aTU As atcTimeUnit, _
+                            ByVal aTS As Integer, _
+                            ByVal aTran As atcTran, _
+                            Optional ByVal aDataSource As atcDataSource = Nothing) As atcTimeseries
+
+    Dim lNewDates() As Double = NewDates(aTimeseries, aTU, aTS)
+    Dim lNumNewVals As Integer = lNewDates.GetUpperBound(0)
+    If lNumNewVals > 0 Then
+      Dim lNewTSer As New atcTimeseries(aDataSource)
+      lNewTSer.Dates = New atcTimeseries(aDataSource)
+      CopyBaseAttributes(aTimeseries, lNewTSer)
+      lNewTSer.Attributes.SetValue("point", False)
+      If aTimeseries.ValueAttributesExist Then 'TODO:: Something with value attributes
+      End If
+      lNewTSer.Dates.Values = lNewDates
+      Dim lNewIndex As Integer = 1
+      Dim lNewVals(lNumNewVals) As Double
+      Dim lDateNew As Double = lNewDates(1)
+      Dim lDateOld As Double
+      Dim lValOld As Double
+      Dim lOldIndex As Integer = 0
+      Dim lPrevDateOld As Double = lNewDates(0) 'old and new TSers should have same start date
+      Dim lPrevDateNew As Double = lNewDates(0)
+      Dim lOverlapStart As Double
+      Dim lOverlapEnd As Double
+      Dim lNumOldVals As Integer = aTimeseries.numValues
+      Dim lFraction As Double
+      Dim lCumuFrac As Double
+
+      If aTimeseries.numValues > 0 Then
+        lValOld = aTimeseries.Value(1)
+        lDateOld = aTimeseries.Dates.Value(1)
+      End If
+
+      Select Case aTran
+
+        Case atcTran.TranAverSame, atcTran.TranSumDiv
+          While lNewIndex <= lNumNewVals
+            lDateNew = lNewDates(lNewIndex)
+            lNewVals(lNewIndex) = 0
+            While lPrevDateOld < lDateNew And lOldIndex <= lNumOldVals
+              If lPrevDateOld > lPrevDateNew Then lOverlapStart = lPrevDateOld Else lOverlapStart = lPrevDateNew
+              If lDateNew > lDateOld Then lOverlapEnd = lDateOld Else lOverlapEnd = lDateNew
+              lFraction = (lOverlapEnd - lOverlapStart) / (lDateNew - lPrevDateNew)
+              lCumuFrac = lCumuFrac + lFraction
+              If aTran = atcTran.TranSumDiv Then
+                lFraction = (lOverlapEnd - lOverlapStart) / (lDateOld - lPrevDateOld)
+              End If
+              lNewVals(lNewIndex) = lNewVals(lNewIndex) + lFraction * lValOld
+              If lPrevDateOld < lDateNew Then
+                If lDateOld > lDateNew Then 'use remaining part of this old interval on next new interval
+                  lPrevDateOld = lDateNew
+                  If aTran = atcTran.TranSumDiv Then lValOld = lValOld - lValOld * lFraction
+                Else
+                  lPrevDateOld = lDateOld
+                  lOldIndex = lOldIndex + 1
+                  If lOldIndex <= lNumOldVals Then
+                    lDateOld = aTimeseries.Dates.Value(lOldIndex)
+                    lValOld = aTimeseries.Value(lOldIndex)
+                  End If
+                  lCumuFrac = 0
+                End If
+              End If
+            End While
+            lPrevDateNew = lDateNew
+            If aTran = atcTran.TranSumDiv AndAlso lCumuFrac > 0.01 AndAlso lCumuFrac < 0.999 Then
+              lNewVals(lNewIndex) = lNewVals(lNewIndex) / lCumuFrac
+            End If
+            lNewIndex = lNewIndex + 1
+          End While
+
+        Case atcTran.TranMax
+          While lNewIndex <= lNumNewVals
+            lDateNew = lNewDates(lNewIndex)
+            lNewVals(lNewIndex) = -1.0E+30
+            While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
+              If lNewVals(lNewIndex) < lValOld Then lNewVals(lNewIndex) = lValOld
+              lOldIndex = lOldIndex + 1
+              If lOldIndex <= lNumOldVals Then
+                lDateOld = aTimeseries.Dates.Value(lOldIndex)
+                lValOld = aTimeseries.Value(lOldIndex)
+              End If
+            End While
+            lNewIndex = lNewIndex + 1
+          End While
+
+        Case atcTran.TranMin
+          While lNewIndex <= lNumNewVals
+            lDateNew = lNewDates(lNewIndex)
+            lNewVals(lNewIndex) = 1.0E+30
+            While lDateOld <= lDateNew AndAlso lOldIndex <= lNumOldVals
+              If lNewVals(lNewIndex) > lValOld Then lNewVals(lNewIndex) = lValOld
+              lOldIndex = lOldIndex + 1
+              If lOldIndex <= lNumOldVals Then
+                lDateOld = aTimeseries.Dates.Value(lOldIndex)
+                lValOld = aTimeseries.Value(lOldIndex)
+              End If
+            End While
+            lNewIndex = lNewIndex + 1
+          End While
+
+      End Select
+      lNewTSer.Values = lNewVals
+      Return lNewTSer
+    Else
+      Return Nothing
+    End If
+  End Function
+
+  'Build Date array for a timeseries with start/end of aTSer and time units/step of aTU/aTS
+  Public Function NewDates(ByVal aTSer As atcTimeseries, ByVal aTU As atcTimeUnit, ByVal aTS As Integer) As Double()
+
+    Dim lNewDates() As Double
+    Dim lIntvl As Double
+    Dim lVarLength As Integer
+    Dim lSJDay As Double
+    Dim lEJDay As Double
+    Dim lNewNumDates As Integer
+    Dim lDate() As Integer
+    Dim lSDate() As Integer
+    Dim lTUnit As Integer
+    Dim lTStep As Integer
+
+    If aTU >= atcTimeUnit.TUSecond AndAlso aTU <= atcTimeUnit.TUCentury Then
+      'get start date/time for existing TSer
+      If aTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aTSer.Dates.Value(0)) Then
+        lTUnit = aTSer.Attributes.GetValue("Time Unit")
+        lTStep = aTSer.Attributes.GetValue("Time Step")
+        Select Case lTUnit
+          Case atcTimeUnit.TUSecond : lIntvl = lTStep * JulianSecond
+          Case atcTimeUnit.TUMinute : lIntvl = lTStep * JulianMinute
+          Case atcTimeUnit.TUHour : lIntvl = lTStep * JulianHour
+          Case atcTimeUnit.TUDay : lIntvl = lTStep
+          Case atcTimeUnit.TUMonth : lIntvl = lTStep * 30.44
+          Case atcTimeUnit.TUYear : lIntvl = lTStep * 365.25
+          Case atcTimeUnit.TUCentury : lIntvl = lTStep * 36525
+        End Select
+        If lIntvl > 28 Then
+          J2Date(aTSer.Dates.Value(1), lDate)
+          If lTUnit = atcTimeUnit.TUMonth Then 'monthly
+            lSJDay = aTSer.Dates.Value(1) - daymon(lDate(0), lDate(1))
+          ElseIf lTUnit = atcTimeUnit.TUYear Then 'yearly
+            lSJDay = aTSer.Dates.Value(1) - 365 - (daymon(lDate(0), 2) - 28)
+          Else 'TODO::something for centuries
+          End If
+        Else
+          lSJDay = aTSer.Dates.Value(1) - lIntvl
+        End If
+      Else
+        lSJDay = aTSer.Dates.Value(0)
+      End If
+      'get interval of new TSer
+      Select Case aTU
+        Case atcTimeUnit.TUSecond : lIntvl = aTS * JulianSecond
+        Case atcTimeUnit.TUMinute : lIntvl = aTS * JulianMinute
+        Case atcTimeUnit.TUHour : lIntvl = aTS * JulianHour
+        Case atcTimeUnit.TUDay : lIntvl = aTS
+        Case atcTimeUnit.TUMonth : lIntvl = aTS * 30.44
+        Case atcTimeUnit.TUYear : lIntvl = aTS * 365.25
+        Case atcTimeUnit.TUCentury : lIntvl = aTS * 36525
+      End Select
+      lEJDay = aTSer.Dates.Value(aTSer.numValues)
+      lNewNumDates = CInt((lEJDay - lSJDay) / lIntvl)
+      ReDim lNewDates(lNewNumDates)
+      lNewDates(0) = lSJDay 'new TSer start is same as existing TSer start
+      If aTU > modDate.atcTimeUnit.TUDay Then J2Date(lSJDay, lSDate) 'will need start date array
+      For i As Integer = 1 To lNewNumDates
+        If aTU < modDate.atcTimeUnit.TUMonth Then
+          lNewDates(i) = lSJDay + lIntvl * i
+        Else 'need to use special TIMADD function for long, varying length intervals
+          TIMADD(lSDate, aTU, aTS, i, lDate)
+          lNewDates(i) = Date2J(lDate)
+        End If
+      Next
+    End If
+    Return lNewDates
   End Function
 
 End Module
