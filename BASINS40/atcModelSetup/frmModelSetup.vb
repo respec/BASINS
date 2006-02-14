@@ -266,9 +266,9 @@ Public Class frmModelSetup
     '
     Me.Label5.Location = New System.Drawing.Point(24, 240)
     Me.Label5.Name = "Label5"
-    Me.Label5.Size = New System.Drawing.Size(136, 32)
+    Me.Label5.Size = New System.Drawing.Size(152, 24)
     Me.Label5.TabIndex = 4
-    Me.Label5.Text = "Outlets / Point Sources Layer:"
+    Me.Label5.Text = "Point Sources Layer:"
     '
     'Label4
     '
@@ -386,7 +386,7 @@ Public Class frmModelSetup
     Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboLandUseLayer.Location = New System.Drawing.Point(200, 32)
     Me.cboLandUseLayer.Name = "cboLandUseLayer"
-    Me.cboLandUseLayer.Size = New System.Drawing.Size(240, 23)
+    Me.cboLandUseLayer.Size = New System.Drawing.Size(240, 25)
     Me.cboLandUseLayer.TabIndex = 10
     '
     'lblLandUseLayer
@@ -478,7 +478,7 @@ Public Class frmModelSetup
     Me.cboStream9.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream9.Location = New System.Drawing.Point(248, 288)
     Me.cboStream9.Name = "cboStream9"
-    Me.cboStream9.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream9.Size = New System.Drawing.Size(168, 25)
     Me.cboStream9.TabIndex = 17
     '
     'cboStream8
@@ -488,7 +488,7 @@ Public Class frmModelSetup
     Me.cboStream8.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream8.Location = New System.Drawing.Point(248, 256)
     Me.cboStream8.Name = "cboStream8"
-    Me.cboStream8.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream8.Size = New System.Drawing.Size(168, 25)
     Me.cboStream8.TabIndex = 16
     '
     'cboStream7
@@ -498,7 +498,7 @@ Public Class frmModelSetup
     Me.cboStream7.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream7.Location = New System.Drawing.Point(248, 224)
     Me.cboStream7.Name = "cboStream7"
-    Me.cboStream7.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream7.Size = New System.Drawing.Size(168, 25)
     Me.cboStream7.TabIndex = 15
     '
     'cboStream6
@@ -508,7 +508,7 @@ Public Class frmModelSetup
     Me.cboStream6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream6.Location = New System.Drawing.Point(248, 192)
     Me.cboStream6.Name = "cboStream6"
-    Me.cboStream6.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream6.Size = New System.Drawing.Size(168, 25)
     Me.cboStream6.TabIndex = 14
     '
     'cboStream5
@@ -518,7 +518,7 @@ Public Class frmModelSetup
     Me.cboStream5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream5.Location = New System.Drawing.Point(248, 160)
     Me.cboStream5.Name = "cboStream5"
-    Me.cboStream5.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream5.Size = New System.Drawing.Size(168, 25)
     Me.cboStream5.TabIndex = 13
     '
     'cboStream4
@@ -528,7 +528,7 @@ Public Class frmModelSetup
     Me.cboStream4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream4.Location = New System.Drawing.Point(248, 128)
     Me.cboStream4.Name = "cboStream4"
-    Me.cboStream4.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream4.Size = New System.Drawing.Size(168, 25)
     Me.cboStream4.TabIndex = 12
     '
     'cboStream3
@@ -538,7 +538,7 @@ Public Class frmModelSetup
     Me.cboStream3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream3.Location = New System.Drawing.Point(248, 96)
     Me.cboStream3.Name = "cboStream3"
-    Me.cboStream3.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream3.Size = New System.Drawing.Size(168, 25)
     Me.cboStream3.TabIndex = 11
     '
     'cboStream2
@@ -548,7 +548,7 @@ Public Class frmModelSetup
     Me.cboStream2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream2.Location = New System.Drawing.Point(248, 64)
     Me.cboStream2.Name = "cboStream2"
-    Me.cboStream2.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream2.Size = New System.Drawing.Size(168, 25)
     Me.cboStream2.TabIndex = 10
     '
     'cboStream1
@@ -558,7 +558,7 @@ Public Class frmModelSetup
     Me.cboStream1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboStream1.Location = New System.Drawing.Point(248, 32)
     Me.cboStream1.Name = "cboStream1"
-    Me.cboStream1.Size = New System.Drawing.Size(168, 23)
+    Me.cboStream1.Size = New System.Drawing.Size(168, 25)
     Me.cboStream1.TabIndex = 9
     '
     'Label10
@@ -646,7 +646,7 @@ Public Class frmModelSetup
     Me.TabPage5.Name = "TabPage5"
     Me.TabPage5.Size = New System.Drawing.Size(520, 355)
     Me.TabPage5.TabIndex = 4
-    Me.TabPage5.Text = "Outlets"
+    Me.TabPage5.Text = "Point Sources"
     '
     'lblCustom
     '
@@ -1638,7 +1638,7 @@ Public Class frmModelSetup
     OutletsThemeName = cboOutlets.Items(cboOutlets.SelectedIndex)
     Dim cOutSubs As New Collection
     If OutletsThemeName <> "<none>" Then
-      lblStatus.Text = "Joining outlets to subbasins"
+      lblStatus.Text = "Joining point sources to subbasins"
       Me.Refresh()
       i = GisUtil.LayerIndex(OutletsThemeName)
       For j = 1 To GisUtil.NumFeatures(i)
