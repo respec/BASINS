@@ -1584,10 +1584,10 @@ Public Class frmModelSetup
           shapeindex = cSelectedSubbasins(k)
           subid = GisUtil.FieldValue(SubbasinLayerIndex, shapeindex, SubbasinFieldIndex)
           For i = 1 To Convert.ToInt32(GisUtil.GridLayerMaximum(LanduseLayerIndex))
-            If aAreaLS(i, subid - 1) > 0 Then
+            If aAreaLS(i, shapeindex) > 0 Then
               subslope = GisUtil.FieldValue(SubbasinLayerIndex, shapeindex, SubbasinSlopeIndex)
               cLucode.Add(i)
-              cArea.Add(aAreaLS(i, subid - 1))
+              cArea.Add(aAreaLS(i, shapeindex))
               cSubid.Add(subid)
               cSubSlope.Add(subslope)
             End If
