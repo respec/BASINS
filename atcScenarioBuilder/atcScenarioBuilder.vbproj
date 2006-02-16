@@ -174,13 +174,38 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "frmMultipleResults.vb"
+                    RelPath = "clsVariation.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmEndpoint.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "frmMultipleResults.resx"
-                    DependentUpon = "frmMultipleResults.vb"
+                    RelPath = "frmEndpoint.resx"
+                    DependentUpon = "frmEndpoint.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "frmIterative.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmIterative.resx"
+                    DependentUpon = "frmIterative.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "frmVariation.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmVariation.resx"
+                    DependentUpon = "frmVariation.vb"
                     BuildAction = "EmbeddedResource"
                 />
                 <File

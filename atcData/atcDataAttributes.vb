@@ -41,6 +41,7 @@ Public Class atcDataAttributes
     Return pAllDefinitions.ItemByKey(AttributeNameToKey(aAttributeName))
   End Function
 
+  'Returns collection of all known atcAttributeDefinition objects
   Public Shared Function AllDefinitions() As atcCollection
     Return pAllDefinitions
   End Function

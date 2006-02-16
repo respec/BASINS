@@ -4,6 +4,7 @@ Imports MapWinUtility
 
 Public Module modScenarioBuild
   Public g_MapWin As MapWindow.Interfaces.IMapWin
+  Public g_DataManager As atcDataManager
 
   Public Function ScenarioRun(ByVal aCurrentWDMfilename As String, _
                               ByVal aNewScenarioName As String, _
@@ -15,8 +16,7 @@ Public Module modScenarioBuild
     'Run WinHSPFlt with the new UCI
 
     Dim lNewFilename As String
-    Dim lNewWDM As atcWDM.atcDataSourceWDM
-    Dim lNewResults As atcDataSource
+    Dim lNewWDM As atcWDM.atcDataSourceWDM = Nothing
 
     If FileExists(aCurrentWDMfilename) Then
       lNewFilename = AbsolutePath(aCurrentWDMfilename, CurDir)
@@ -31,7 +31,7 @@ Public Module modScenarioBuild
         lNewWDM = New atcWDM.atcDataSourceWDM
         If Not lNewWDM.Open(lNewFilename & "wdm") Then
           MsgBox("Could not open new scenario WDM file '" & lNewFilename & "wdm'", MsgBoxStyle.Critical, "Could not run model")
-          Exit Function
+          Return Nothing
         End If
 
         'Update scenario name in new WDM
