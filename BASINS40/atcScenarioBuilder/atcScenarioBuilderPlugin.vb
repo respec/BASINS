@@ -11,8 +11,9 @@ Public Class atcScenarioBuilderPlugin
 
   Public Overrides Function Show(ByVal aManager As atcDataManager, _
                    Optional ByVal aGroup As atcDataGroup = Nothing) As Object
-    Dim lForm As New frmMultipleResults 'atcScenarioBuilderForm
-    lForm.Initialize(aManager, aGroup)
+    g_DataManager = aManager
+    Dim lForm As New frmIterative  'atcScenarioBuilderForm
+    lForm.Initialize(aGroup)
     Return lForm
   End Function
 

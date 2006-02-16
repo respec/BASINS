@@ -142,11 +142,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "clsPlugIn.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
                     RelPath = "clsProjection.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -165,16 +160,6 @@
                     RelPath = "frmProjection.resx"
                     DependentUpon = "frmProjection.vb"
                     BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "Globals.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "modShapeProject.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
                 />
             </Include>
         </Files>

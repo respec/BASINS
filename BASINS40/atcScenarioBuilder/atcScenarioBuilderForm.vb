@@ -159,7 +159,6 @@ Friend Class atcScenarioBuilderForm
     '
     'agdMain
     '
-    Me.agdMain.AllowHorizontalScrolling = True
     Me.agdMain.Dock = System.Windows.Forms.DockStyle.Top
     Me.agdMain.LineColor = System.Drawing.Color.Empty
     Me.agdMain.LineWidth = 0.0!
@@ -225,8 +224,6 @@ Friend Class atcScenarioBuilderForm
   Private Const MenuText_AllInputs As String = "All Input"
   Private Const MenuText_AllResults As String = "All Results"
 
-  Private pDataManager As atcDataManager
-
   'The group of atcTimeseries containing base conditions
   Private pBaseScenario As atcDataSource
 
@@ -247,11 +244,9 @@ Friend Class atcScenarioBuilderForm
 
   Private pRunButton() As Windows.Forms.Button
 
-  Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
-               Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
+  Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
 
     pInitializing = True
-    pDataManager = aDataManager
 
     pBaseScenario = New atcDataSource
     If Not aTimeseriesGroup Is Nothing Then
@@ -259,7 +254,7 @@ Friend Class atcScenarioBuilderForm
     End If
 
     mnuDisplay.MenuItems.Clear()
-    Dim lDisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    Dim lDisplayPlugins As ICollection = g_DataManager.GetPlugins(GetType(atcDataDisplay))
     For Each lDisp As atcDataDisplay In lDisplayPlugins
       Dim lMenuDispType As MenuItem = mnuDisplay.MenuItems.Add(lDisp.Name, New EventHandler(AddressOf mnuDisplay_Click))
       lMenuDispType.MenuItems.Add("All Inputs", New EventHandler(AddressOf mnuDisplay_Click))
@@ -275,14 +270,14 @@ Friend Class atcScenarioBuilderForm
 
     If pBaseScenario.DataSets.Count = 0 Then
       'By default add EVAP and PREC if none were given
-      For Each lDataSet As atcDataSet In pDataManager.DataSets
+      For Each lDataSet As atcDataSet In g_DataManager.DataSets
         Select Case CStr(lDataSet.Attributes.GetValue("Constituent"))
           Case "EVAP", "PREC", "TMIN", "TMAX", "PET", "HPRECIP" : pBaseScenario.DataSets.Add(lDataSet)
         End Select
       Next
       'If we didn't find any to add, ask user to select some data
       If pBaseScenario.DataSets.Count = 0 Then
-        pDataManager.UserSelectData(, pBaseScenario.DataSets, True)
+        g_DataManager.UserSelectData(, pBaseScenario.DataSets, True)
       End If
     End If
 
@@ -290,7 +285,7 @@ Friend Class atcScenarioBuilderForm
       pModifiedScenarios = New atcCollection
 
       pBaseResults = New atcDataSource
-      For Each lDataSet As atcDataSet In pDataManager.DataSets
+      For Each lDataSet As atcDataSet In g_DataManager.DataSets
         Dim lScenario As atcDataSource
         Dim lScenarioName As String = lDataSet.Attributes.GetValue("Scenario")
         If lScenarioName.StartsWith("Modified") Then
@@ -373,8 +368,8 @@ Friend Class atcScenarioBuilderForm
 
   Private Sub mnuDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuDisplay.Click
     Dim lMenuClicked As MenuItem = sender
-    Dim lNewDisplay As atcDataDisplay
-    Dim lDisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    Dim lNewDisplay As atcDataDisplay = Nothing
+    Dim lDisplayPlugins As ICollection = g_DataManager.GetPlugins(GetType(atcDataDisplay))
     Dim lShowBaseInputs As Boolean = False
     Dim lShowModifiedInputs As Boolean = False
     Dim lShowBaseResults As Boolean = False
@@ -447,17 +442,17 @@ Friend Class atcScenarioBuilderForm
         Next
       End If
 
-      lNewDisplay.Show(pDataManager, lShowThese)
+      lNewDisplay.Show(g_DataManager, lShowThese)
     End If
   End Sub
 
   Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
-    pDataManager.UserSelectData(, pBaseScenario.DataSets, False)
+    g_DataManager.UserSelectData(, pBaseScenario.DataSets, False)
     UpdatedAttributes()
   End Sub
 
   Private Sub mnuFileAddResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAddResults.Click
-    pDataManager.UserSelectData(, pBaseResults.DataSets, False)
+    g_DataManager.UserSelectData(, pBaseResults.DataSets, False)
     UpdatedAttributes()
   End Sub
 
@@ -535,7 +530,7 @@ Friend Class atcScenarioBuilderForm
 
   Private Sub AddAttributeFromScript(ByVal aDatasets As atcDataGroup, ByVal aScriptFileName As String)
     If FileExists(aScriptFileName) Then
-      Dim errors As String
+      Dim errors As String = ""
       MsgBox("Running scenario scripts is temporarily disabled.", MsgBoxStyle.OKOnly, "Scenario Script")
       Scripting.Run(FileExt(aScriptFileName), "", WholeFileString(aScriptFileName), errors, False, g_MapWin, aDatasets)
       If Not errors Is Nothing Then
@@ -595,7 +590,7 @@ Friend Class atcScenarioBuilderForm
   Private Sub agdMain_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles agdMain.MouseDownCell
     If aRow > 0 AndAlso aColumn > 2 Then
       Dim pAttributeIndex As Integer
-      Dim lBaseDataSet As atcDataSet = pSource.BaseDataSetInRow(aRow, pAttributeIndex) '(aRow - 1) \ pDataManager.DisplayAttributes.Count
+      Dim lBaseDataSet As atcDataSet = pSource.BaseDataSetInRow(aRow, pAttributeIndex) '(aRow - 1) \ g_DataManager.DisplayAttributes.Count
       UserModify(lBaseDataSet, pModifiedScenarios.ItemByIndex(aColumn - 3))
     End If
   End Sub
@@ -793,9 +788,9 @@ Friend Class atcScenarioBuilderForm
     lCategories.Add("Generate Timeseries")
 
     lGenerateArguments.SetValue("Timeseries", New atcDataGroup(aBaseTimeseries))
-    lNewDataSource = pDataManager.UserSelectDataSource(lCategories)
+    lNewDataSource = g_DataManager.UserSelectDataSource(lCategories)
     If Not lNewDataSource Is Nothing Then
-      pDataManager.OpenDataSource(lNewDataSource, lNewDataSource.Specification, lGenerateArguments)
+      g_DataManager.OpenDataSource(lNewDataSource, lNewDataSource.Specification, lGenerateArguments)
       For Each lNewTimeseries In lNewDataSource.DataSets
         Dim lID As String = lNewTimeseries.Attributes.GetValue("id")
         aModifiedScenario.DataSets.RemoveByKey(lID)
@@ -823,59 +818,61 @@ Friend Class atcScenarioBuilderForm
     Dim lCurrentWDMfilename As String = ""
     Dim lNewResults As atcDataSource
 
-    For Each lDataSource As atcDataSource In pDataManager.DataSources
+    For Each lDataSource As atcDataSource In g_DataManager.DataSources
       If lDataSource.DataSets.Contains(pBaseScenario.DataSets.ItemByIndex(0)) Then
         lOldWDM = lDataSource
         lCurrentWDMfilename = lDataSource.Specification
       End If
     Next
 
-    If FileExists(lCurrentWDMfilename) Then
-      If IsNumeric(lBtn.Tag) Then lModifiedIndex = lBtn.Tag
+    If Not lOldWDM Is Nothing Then
+      If FileExists(lCurrentWDMfilename) Then
+        If IsNumeric(lBtn.Tag) Then lModifiedIndex = lBtn.Tag
 
-      If lModifiedIndex = -1 Then 'Run base scenario
-        lNewWDM = lOldWDM
-        ScenarioRun(lCurrentWDMfilename, "base", Nothing)
-      Else 'Run a modified scenario
-        Dim lModifiedScenario As atcDataSource = pModifiedScenarios.ItemByIndex(lModifiedIndex)
-        lNewWDM = ScenarioRun(lCurrentWDMfilename, _
-                              lModifiedScenario.Specification, _
-                              lModifiedScenario.DataSets)
-      End If
-
-      If lModifiedIndex >= 0 Then 'ran modified scenario
-        lNewResults = pModifiedResults.ItemByIndex(lModifiedIndex)
-        lNewResults.DataSets.Clear()
-      Else 'ran base scenario, can't clear so just use new group
-        lNewResults = New atcDataSource
-      End If
-
-      For Each lModifiedData As atcDataSet In lNewWDM.DataSets
-        If pBaseResults.DataSets.Keys.Contains(lModifiedData.Attributes.GetValue("id")) Then
-          'Found data matching one of the base results
-          'Re-read this dataset since it has just been written by HSPF
-
-          'First, discard any calculated attributes
-          Dim lRemoveThese As New ArrayList
-          'Step in reverse so we can remove by index in next loop without high indexes changing before they are removed
-          For iAttribute As Integer = lModifiedData.Attributes.Count - 1 To 0 Step -1
-            If lModifiedData.Attributes.ItemByIndex(iAttribute).Definition.Calculated Then
-              lRemoveThese.Add(iAttribute)
-            End If
-          Next
-          For Each iAttribute As Integer In lRemoveThese
-            lModifiedData.Attributes.RemoveAt(iAttribute)
-          Next
-          lModifiedData.Attributes.SetValue("HeaderComplete", False)
-          lModifiedData.Attributes.SetValue("HeaderOnly", False)
-          lNewWDM.ReadData(lModifiedData)
-
-          lNewResults.DataSets.Add(lModifiedData)
+        If lModifiedIndex = -1 Then 'Run base scenario
+          lNewWDM = lOldWDM
+          ScenarioRun(lCurrentWDMfilename, "base", Nothing)
+        Else 'Run a modified scenario
+          Dim lModifiedScenario As atcDataSource = pModifiedScenarios.ItemByIndex(lModifiedIndex)
+          lNewWDM = ScenarioRun(lCurrentWDMfilename, _
+                                lModifiedScenario.Specification, _
+                                lModifiedScenario.DataSets)
         End If
-      Next
-      agdResults.Refresh()
-    Else
-      MsgBox("Could not find base WDM file '" & lCurrentWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
+
+        If lModifiedIndex >= 0 Then 'ran modified scenario
+          lNewResults = pModifiedResults.ItemByIndex(lModifiedIndex)
+          lNewResults.DataSets.Clear()
+        Else 'ran base scenario, can't clear so just use new group
+          lNewResults = New atcDataSource
+        End If
+
+        For Each lModifiedData As atcDataSet In lNewWDM.DataSets
+          If pBaseResults.DataSets.Keys.Contains(lModifiedData.Attributes.GetValue("id")) Then
+            'Found data matching one of the base results
+            'Re-read this dataset since it has just been written by HSPF
+
+            'First, discard any calculated attributes
+            Dim lRemoveThese As New ArrayList
+            'Step in reverse so we can remove by index in next loop without high indexes changing before they are removed
+            For iAttribute As Integer = lModifiedData.Attributes.Count - 1 To 0 Step -1
+              If lModifiedData.Attributes.ItemByIndex(iAttribute).Definition.Calculated Then
+                lRemoveThese.Add(iAttribute)
+              End If
+            Next
+            For Each iAttribute As Integer In lRemoveThese
+              lModifiedData.Attributes.RemoveAt(iAttribute)
+            Next
+            lModifiedData.Attributes.SetValue("HeaderComplete", False)
+            lModifiedData.Attributes.SetValue("HeaderOnly", False)
+            lNewWDM.ReadData(lModifiedData)
+
+            lNewResults.DataSets.Add(lModifiedData)
+          End If
+        Next
+        agdResults.Refresh()
+      Else
+        MsgBox("Could not find base WDM file '" & lCurrentWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
+      End If
     End If
   End Sub
 
@@ -929,8 +926,8 @@ Friend Class atcScenarioBuilderForm
         AddScenario()                         'Create a new scenario to populate
         lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
       End If
-      Dim errors As String
-      Scripting.Run(FileExt(lScriptFileName), "", lScriptFileName, errors, False, pDataManager, _
+      Dim errors As String = ""
+      Scripting.Run(FileExt(lScriptFileName), "", lScriptFileName, errors, False, g_DataManager, _
                 pBaseScenario, lNewScenario)
       If Not errors Is Nothing Then
         Logger.Msg(lScriptFileName & vbCrLf & vbCrLf & errors, "Scenario Script Error")
@@ -947,7 +944,7 @@ Friend Class atcScenarioBuilderForm
   '    AddScenario()                         'Create a new scenario to populate
   '    lNewScenario = pModifiedScenarios.ItemByIndex(pModifiedScenarios.Count - 1)
   '  End If
-  '  'TODO: add this back in: atcScriptTest.Main(pDataManager, pBaseScenario, lNewScenario)
+  '  'TODO: add this back in: atcScriptTest.Main(g_DataManager, pBaseScenario, lNewScenario)
   '  agdMain.Refresh()
   'End Sub
 
@@ -999,7 +996,6 @@ Friend Class atcScenarioBuilderForm
   End Sub
 
   Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-    pDataManager = Nothing
     pBaseScenario = Nothing
     pModifiedScenarios = Nothing
     pBaseResults = Nothing
