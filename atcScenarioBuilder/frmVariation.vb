@@ -4,8 +4,6 @@ Imports MapWinUtility
 Public Class frmVariation
   Inherits System.Windows.Forms.Form
 
-  Private pComputation As atcDataSource
-  Private pDataToVary As atcDataGroup
   Private pVariation As Variation
   Private pSeasonalPlugin As New atcSeasons.atcSeasonPlugin
   Private pSeasonsAvailable As atcDataAttributes
@@ -301,16 +299,17 @@ Public Class frmVariation
 #End Region
 
   Public Function AskUser(Optional ByVal aVariation As Variation = Nothing) As Variation
-    pVariation = aVariation
+    pVariation = aVariation.Clone
     If pVariation Is Nothing Then pVariation = New Variation
-    pDataToVary = pVariation.DataSets
-    If pDataToVary Is Nothing Then pDataToVary = New atcDataGroup
+    If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
     With pVariation
       txtName.Text = .Name
-      pComputation = .ComputationSource
       txtFunction.Text = .Operation
-      UpdateDataText(txtVaryData, pDataToVary)
+      If Not Double.IsNaN(.Min) Then txtMin.Text = .Min
+      If Not Double.IsNaN(.Max) Then txtMax.Text = .Max
+      If Not Double.IsNaN(.Increment) Then txtIncrement.Text = .Increment
+      UpdateDataText(txtVaryData, pVariation.DataSets)
     End With
 
     pSeasonsAvailable = pSeasonalPlugin.AvailableOperations(True, False)
@@ -326,18 +325,18 @@ Public Class frmVariation
   End Function
 
   Private Sub txtVaryData_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtVaryData.Click
-    pDataToVary = g_DataManager.UserSelectData("Select data to vary", pDataToVary)
-    UpdateDataText(txtVaryData, pDataToVary)
+    pVariation.DataSets = g_DataManager.UserSelectData("Select data to vary", pVariation.DataSets)
+    UpdateDataText(txtVaryData, pVariation.DataSets)
   End Sub
 
   Private Sub txtFunction_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtFunction.Click
     Dim aCategory As New ArrayList(1)
     aCategory.Add("Compute")
-    pComputation = g_DataManager.UserSelectDataSource(aCategory, "Select Function for Varying Input Data")
-    If pComputation Is Nothing Then
+    pVariation.ComputationSource = g_DataManager.UserSelectDataSource(aCategory, "Select Function for Varying Input Data")
+    If pVariation.ComputationSource Is Nothing Then
       txtFunction.Text = "<click to specify>"
     Else
-      txtFunction.Text = pComputation.ToString
+      txtFunction.Text = pVariation.ComputationSource.ToString
     End If
   End Sub
 
@@ -382,12 +381,25 @@ Public Class frmVariation
     Try
       With pVariation
         .Name = txtName.Text
-        .DataSets = pDataToVary
-        .ComputationSource = pComputation
         .Operation = txtFunction.Text
-        .Min = CDbl(txtMin.Text)
-        .Max = CDbl(txtMax.Text)
-        .Increment = CDbl(txtIncrement.Text)
+        Try
+          .Min = CDbl(txtMin.Text)
+        Catch
+          Logger.Msg("Minimum value must be a number", "Non-numeric value")
+          Exit Sub
+        End Try
+        Try
+          .Max = CDbl(txtMax.Text)
+        Catch
+          Logger.Msg("Maximum value must be a number", "Non-numeric value")
+          Exit Sub
+        End Try
+        Try
+          .Increment = CDbl(txtIncrement.Text)
+        Catch
+          Logger.Msg("Increment must be a number", "Non-numeric value")
+          Exit Sub
+        End Try
       End With
       Me.Close()
     Catch ex As Exception

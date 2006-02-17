@@ -4,7 +4,7 @@ Imports MapWinUtility
 Public Class frmEndpoint
   Inherits System.Windows.Forms.Form
 
-  Private pDataToVary As atcDataGroup
+  Private pNotNumberString As String = "<none>"
   Private pVariation As Variation
 
 #Region " Windows Form Designer generated code "
@@ -41,9 +41,7 @@ Public Class frmEndpoint
   Friend WithEvents lblAttribute As System.Windows.Forms.Label
   Friend WithEvents lblData As System.Windows.Forms.Label
   Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-  Friend WithEvents txtMax As System.Windows.Forms.TextBox
   Friend WithEvents txtMin As System.Windows.Forms.TextBox
-  Friend WithEvents lblMaximum As System.Windows.Forms.Label
   Friend WithEvents lblMinimum As System.Windows.Forms.Label
   Friend WithEvents txtLowColor As System.Windows.Forms.TextBox
   Friend WithEvents lblLowColor As System.Windows.Forms.Label
@@ -51,9 +49,11 @@ Public Class frmEndpoint
   Friend WithEvents lblName As System.Windows.Forms.Label
   Friend WithEvents txtData As System.Windows.Forms.TextBox
   Friend WithEvents lblHighColor As System.Windows.Forms.Label
-  Friend WithEvents txtWithinColor As System.Windows.Forms.TextBox
-  Friend WithEvents lblWithinColor As System.Windows.Forms.Label
   Friend WithEvents cboAttribute As System.Windows.Forms.ComboBox
+  Friend WithEvents txtMax As System.Windows.Forms.TextBox
+  Friend WithEvents lblMaximum As System.Windows.Forms.Label
+  Friend WithEvents txtDefaultColor As System.Windows.Forms.TextBox
+  Friend WithEvents lblDefaultColor As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmEndpoint))
     Me.lblName = New System.Windows.Forms.Label
@@ -66,14 +66,14 @@ Public Class frmEndpoint
     Me.GroupBox1 = New System.Windows.Forms.GroupBox
     Me.txtHighColor = New System.Windows.Forms.TextBox
     Me.lblHighColor = New System.Windows.Forms.Label
-    Me.txtWithinColor = New System.Windows.Forms.TextBox
     Me.txtLowColor = New System.Windows.Forms.TextBox
     Me.lblLowColor = New System.Windows.Forms.Label
-    Me.lblWithinColor = New System.Windows.Forms.Label
     Me.txtMax = New System.Windows.Forms.TextBox
     Me.txtMin = New System.Windows.Forms.TextBox
     Me.lblMaximum = New System.Windows.Forms.Label
     Me.lblMinimum = New System.Windows.Forms.Label
+    Me.txtDefaultColor = New System.Windows.Forms.TextBox
+    Me.lblDefaultColor = New System.Windows.Forms.Label
     Me.cboAttribute = New System.Windows.Forms.ComboBox
     Me.GroupBox1.SuspendLayout()
     Me.SuspendLayout()
@@ -94,7 +94,7 @@ Public Class frmEndpoint
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtName.Location = New System.Drawing.Point(112, 16)
     Me.txtName.Name = "txtName"
-    Me.txtName.Size = New System.Drawing.Size(153, 20)
+    Me.txtName.Size = New System.Drawing.Size(161, 20)
     Me.txtName.TabIndex = 2
     Me.txtName.Text = ""
     '
@@ -142,7 +142,7 @@ Public Class frmEndpoint
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtData.Location = New System.Drawing.Point(112, 40)
     Me.txtData.Name = "txtData"
-    Me.txtData.Size = New System.Drawing.Size(153, 20)
+    Me.txtData.Size = New System.Drawing.Size(161, 20)
     Me.txtData.TabIndex = 4
     Me.txtData.Text = ""
     '
@@ -152,17 +152,17 @@ Public Class frmEndpoint
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.GroupBox1.Controls.Add(Me.txtHighColor)
     Me.GroupBox1.Controls.Add(Me.lblHighColor)
-    Me.GroupBox1.Controls.Add(Me.txtWithinColor)
     Me.GroupBox1.Controls.Add(Me.txtLowColor)
     Me.GroupBox1.Controls.Add(Me.lblLowColor)
-    Me.GroupBox1.Controls.Add(Me.lblWithinColor)
     Me.GroupBox1.Controls.Add(Me.txtMax)
     Me.GroupBox1.Controls.Add(Me.txtMin)
     Me.GroupBox1.Controls.Add(Me.lblMaximum)
     Me.GroupBox1.Controls.Add(Me.lblMinimum)
+    Me.GroupBox1.Controls.Add(Me.txtDefaultColor)
+    Me.GroupBox1.Controls.Add(Me.lblDefaultColor)
     Me.GroupBox1.Location = New System.Drawing.Point(16, 96)
     Me.GroupBox1.Name = "GroupBox1"
-    Me.GroupBox1.Size = New System.Drawing.Size(248, 160)
+    Me.GroupBox1.Size = New System.Drawing.Size(256, 160)
     Me.GroupBox1.TabIndex = 7
     Me.GroupBox1.TabStop = False
     Me.GroupBox1.Text = "Highlight Values"
@@ -174,7 +174,7 @@ Public Class frmEndpoint
     Me.txtHighColor.BackColor = System.Drawing.Color.OrangeRed
     Me.txtHighColor.Location = New System.Drawing.Point(144, 120)
     Me.txtHighColor.Name = "txtHighColor"
-    Me.txtHighColor.Size = New System.Drawing.Size(80, 20)
+    Me.txtHighColor.Size = New System.Drawing.Size(96, 20)
     Me.txtHighColor.TabIndex = 17
     Me.txtHighColor.Text = ""
     '
@@ -186,19 +186,8 @@ Public Class frmEndpoint
     Me.lblHighColor.Name = "lblHighColor"
     Me.lblHighColor.Size = New System.Drawing.Size(120, 17)
     Me.lblHighColor.TabIndex = 16
-    Me.lblHighColor.Text = "Higher than Maximum:"
+    Me.lblHighColor.Text = "Color Higher Values:"
     Me.lblHighColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-    '
-    'txtWithinColor
-    '
-    Me.txtWithinColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtWithinColor.BackColor = System.Drawing.Color.White
-    Me.txtWithinColor.Location = New System.Drawing.Point(144, 96)
-    Me.txtWithinColor.Name = "txtWithinColor"
-    Me.txtWithinColor.Size = New System.Drawing.Size(80, 20)
-    Me.txtWithinColor.TabIndex = 15
-    Me.txtWithinColor.Text = ""
     '
     'txtLowColor
     '
@@ -207,7 +196,7 @@ Public Class frmEndpoint
     Me.txtLowColor.BackColor = System.Drawing.Color.DeepSkyBlue
     Me.txtLowColor.Location = New System.Drawing.Point(144, 72)
     Me.txtLowColor.Name = "txtLowColor"
-    Me.txtLowColor.Size = New System.Drawing.Size(80, 20)
+    Me.txtLowColor.Size = New System.Drawing.Size(96, 20)
     Me.txtLowColor.TabIndex = 13
     Me.txtLowColor.Text = ""
     '
@@ -219,27 +208,16 @@ Public Class frmEndpoint
     Me.lblLowColor.Name = "lblLowColor"
     Me.lblLowColor.Size = New System.Drawing.Size(120, 17)
     Me.lblLowColor.TabIndex = 12
-    Me.lblLowColor.Text = "Lower than Minimum:"
+    Me.lblLowColor.Text = "Color Lower Values:"
     Me.lblLowColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-    '
-    'lblWithinColor
-    '
-    Me.lblWithinColor.BackColor = System.Drawing.Color.Transparent
-    Me.lblWithinColor.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-    Me.lblWithinColor.Location = New System.Drawing.Point(16, 96)
-    Me.lblWithinColor.Name = "lblWithinColor"
-    Me.lblWithinColor.Size = New System.Drawing.Size(120, 17)
-    Me.lblWithinColor.TabIndex = 14
-    Me.lblWithinColor.Text = "Within Limits:"
-    Me.lblWithinColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'txtMax
     '
     Me.txtMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtMax.Location = New System.Drawing.Point(144, 48)
+    Me.txtMax.Location = New System.Drawing.Point(144, 96)
     Me.txtMax.Name = "txtMax"
-    Me.txtMax.Size = New System.Drawing.Size(80, 20)
+    Me.txtMax.Size = New System.Drawing.Size(96, 20)
     Me.txtMax.TabIndex = 11
     Me.txtMax.Text = "<none>"
     '
@@ -247,9 +225,9 @@ Public Class frmEndpoint
     '
     Me.txtMin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtMin.Location = New System.Drawing.Point(144, 24)
+    Me.txtMin.Location = New System.Drawing.Point(144, 48)
     Me.txtMin.Name = "txtMin"
-    Me.txtMin.Size = New System.Drawing.Size(80, 20)
+    Me.txtMin.Size = New System.Drawing.Size(96, 20)
     Me.txtMin.TabIndex = 9
     Me.txtMin.Text = "<none>"
     '
@@ -257,9 +235,9 @@ Public Class frmEndpoint
     '
     Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
     Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-    Me.lblMaximum.Location = New System.Drawing.Point(32, 48)
+    Me.lblMaximum.Location = New System.Drawing.Point(16, 96)
     Me.lblMaximum.Name = "lblMaximum"
-    Me.lblMaximum.Size = New System.Drawing.Size(104, 17)
+    Me.lblMaximum.Size = New System.Drawing.Size(120, 17)
     Me.lblMaximum.TabIndex = 10
     Me.lblMaximum.Text = "Maximum Value:"
     Me.lblMaximum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -268,12 +246,34 @@ Public Class frmEndpoint
     '
     Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
     Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-    Me.lblMinimum.Location = New System.Drawing.Point(32, 24)
+    Me.lblMinimum.Location = New System.Drawing.Point(16, 48)
     Me.lblMinimum.Name = "lblMinimum"
-    Me.lblMinimum.Size = New System.Drawing.Size(104, 17)
+    Me.lblMinimum.Size = New System.Drawing.Size(120, 17)
     Me.lblMinimum.TabIndex = 8
     Me.lblMinimum.Text = "Minimum Value:"
     Me.lblMinimum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'txtDefaultColor
+    '
+    Me.txtDefaultColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtDefaultColor.BackColor = System.Drawing.Color.White
+    Me.txtDefaultColor.Location = New System.Drawing.Point(144, 24)
+    Me.txtDefaultColor.Name = "txtDefaultColor"
+    Me.txtDefaultColor.Size = New System.Drawing.Size(96, 20)
+    Me.txtDefaultColor.TabIndex = 15
+    Me.txtDefaultColor.Text = ""
+    '
+    'lblDefaultColor
+    '
+    Me.lblDefaultColor.BackColor = System.Drawing.Color.Transparent
+    Me.lblDefaultColor.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+    Me.lblDefaultColor.Location = New System.Drawing.Point(16, 24)
+    Me.lblDefaultColor.Name = "lblDefaultColor"
+    Me.lblDefaultColor.Size = New System.Drawing.Size(120, 17)
+    Me.lblDefaultColor.TabIndex = 14
+    Me.lblDefaultColor.Text = "Default Color:"
+    Me.lblDefaultColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'cboAttribute
     '
@@ -282,23 +282,23 @@ Public Class frmEndpoint
     Me.cboAttribute.Location = New System.Drawing.Point(112, 64)
     Me.cboAttribute.MaxDropDownItems = 20
     Me.cboAttribute.Name = "cboAttribute"
-    Me.cboAttribute.Size = New System.Drawing.Size(153, 21)
+    Me.cboAttribute.Size = New System.Drawing.Size(161, 21)
     Me.cboAttribute.TabIndex = 6
     Me.cboAttribute.Text = "ComboBox1"
     '
     'frmEndpoint
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(288, 325)
+    Me.ClientSize = New System.Drawing.Size(296, 325)
     Me.Controls.Add(Me.cboAttribute)
     Me.Controls.Add(Me.GroupBox1)
     Me.Controls.Add(Me.lblName)
     Me.Controls.Add(Me.txtName)
+    Me.Controls.Add(Me.txtData)
     Me.Controls.Add(Me.btnCancel)
     Me.Controls.Add(Me.btnOk)
     Me.Controls.Add(Me.lblAttribute)
     Me.Controls.Add(Me.lblData)
-    Me.Controls.Add(Me.txtData)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmEndpoint"
     Me.Text = "Endpoint"
@@ -310,19 +310,40 @@ Public Class frmEndpoint
 #End Region
 
   Public Function AskUser(Optional ByVal aVariation As Variation = Nothing) As Variation
-    pVariation = aVariation
+    pVariation = aVariation.Clone
     If pVariation Is Nothing Then pVariation = New Variation
-    pDataToVary = pVariation.DataSets
-    If pDataToVary Is Nothing Then pDataToVary = New atcDataGroup
+    If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
     For Each lAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-      cboAttribute.Items.Add(lAttribute.Name)
+      If atcDataAttributes.IsSimple(lAttribute) Then
+        cboAttribute.Items.Add(lAttribute.Name)
+      End If
     Next
 
     With pVariation
       txtName.Text = .Name
+      UpdateDataText(txtData, pVariation.DataSets)
       cboAttribute.Text = .Operation
-      UpdateDataText(txtData, pDataToVary)
+
+      If Double.IsNaN(.Min) Then
+        txtMin.Text = pNotNumberString
+      Else
+        txtMin.Text = CStr(.Min)
+      End If
+      If Double.IsNaN(.Max) Then
+        txtMax.Text = pNotNumberString
+      Else
+        txtMax.Text = CStr(.Max)
+      End If
+
+      txtHighColor.BackColor = .ColorAboveMax
+      txtHighColor.Text = .ColorAboveMax.Name
+
+      txtLowColor.BackColor = .ColorBelowMin
+      txtLowColor.Text = .ColorBelowMin.Name
+
+      txtDefaultColor.BackColor = .ColorDefault
+      txtDefaultColor.Text = .ColorDefault.Name
     End With
 
     'pSeasonsAvailable = pSeasonalPlugin.AvailableOperations(True, False)
@@ -338,8 +359,19 @@ Public Class frmEndpoint
   End Function
 
   Private Sub txtData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtData.Click
-    pDataToVary = g_DataManager.UserSelectData("Select data to vary", pDataToVary)
-    UpdateDataText(txtData, pDataToVary)
+    UserSelectDataToVary()
+  End Sub
+
+  Private Sub txtData_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtData.KeyPress
+    UserSelectDataToVary()
+  End Sub
+
+  Private Sub UserSelectDataToVary()
+    Dim lData As atcDataGroup = g_DataManager.UserSelectData("Select data to vary", pVariation.DataSets)
+    If Not lData Is Nothing Then
+      pVariation.DataSets = lData
+      UpdateDataText(txtData, lData)
+    End If
   End Sub
 
   Private Sub UpdateDataText(ByVal aTextBox As Windows.Forms.TextBox, _
@@ -361,13 +393,20 @@ Public Class frmEndpoint
     Try
       With pVariation
         .Name = txtName.Text
-        .DataSets = pDataToVary
         .Operation = cboAttribute.Text
-        .Min = CDbl(txtMin.Text)
-        .Max = CDbl(txtMax.Text)
-        .ColorBelowMin = txtLowColor.BackColor
-        .ColorInRange = txtWithinColor.BackColor
+        Try
+          .Min = CDbl(txtMin.Text)
+        Catch
+          .Min = Double.NaN
+        End Try
+        Try
+          .Max = CDbl(txtMax.Text)
+        Catch
+          .Max = Double.NaN
+        End Try
         .ColorAboveMax = txtHighColor.BackColor
+        .ColorBelowMin = txtLowColor.BackColor
+        .ColorDefault = txtDefaultColor.BackColor
       End With
       Me.Close()
     Catch ex As Exception
@@ -375,4 +414,36 @@ Public Class frmEndpoint
     End Try
   End Sub
 
+  Private Sub UserSelectColor(ByVal txt As Windows.Forms.TextBox)
+    Dim cdlg As New Windows.Forms.ColorDialog
+    cdlg.Color = txt.BackColor
+    If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+      txt.BackColor = cdlg.Color
+      txt.Text = cdlg.Color.Name
+    End If
+  End Sub
+
+  Private Sub txtDefaultColor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtDefaultColor.Click
+    UserSelectColor(txtDefaultColor)
+  End Sub
+
+  Private Sub txtDefaultColor_KeyPress(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtDefaultColor.KeyPress
+    UserSelectColor(txtDefaultColor)
+  End Sub
+
+  Private Sub txtHighColor_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtHighColor.Click
+    UserSelectColor(txtHighColor)
+  End Sub
+
+  Private Sub txtHighColor_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtHighColor.KeyPress
+    UserSelectColor(txtHighColor)
+  End Sub
+
+  Private Sub txtLowColor_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtLowColor.Click
+    UserSelectColor(txtLowColor)
+  End Sub
+
+  Private Sub txtLowColor_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtLowColor.KeyPress
+    UserSelectColor(txtLowColor)
+  End Sub
 End Class
