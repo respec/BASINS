@@ -55,7 +55,6 @@ Public Class frmIterative
   Friend WithEvents btnStart As System.Windows.Forms.Button
   Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuOpenResults As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSaveResults As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSavePivot As System.Windows.Forms.MenuItem
   Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
@@ -75,7 +74,13 @@ Public Class frmIterative
   Friend WithEvents lblNewScenarioName As System.Windows.Forms.Label
   Friend WithEvents cboBaseScenarioName As System.Windows.Forms.ComboBox
   Friend WithEvents agdResults As atcControls.atcGrid
+  Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuLoadResults As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuLoadVariations As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuSaveVariations As System.Windows.Forms.MenuItem
+  Friend WithEvents lblTop As System.Windows.Forms.Label
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmIterative))
     Me.myTabs = New System.Windows.Forms.TabControl
     Me.tabInputs = New System.Windows.Forms.TabPage
     Me.lstInputs = New System.Windows.Forms.CheckedListBox
@@ -108,13 +113,17 @@ Public Class frmIterative
     Me.btnStart = New System.Windows.Forms.Button
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuOpenResults = New System.Windows.Forms.MenuItem
+    Me.mnuLoadResults = New System.Windows.Forms.MenuItem
     Me.mnuSaveResults = New System.Windows.Forms.MenuItem
     Me.mnuSavePivot = New System.Windows.Forms.MenuItem
+    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
+    Me.mnuLoadVariations = New System.Windows.Forms.MenuItem
+    Me.mnuSaveVariations = New System.Windows.Forms.MenuItem
     Me.MenuItem1 = New System.Windows.Forms.MenuItem
     Me.mnuCopyResults = New System.Windows.Forms.MenuItem
     Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
     Me.mnuPasteResults = New System.Windows.Forms.MenuItem
+    Me.lblTop = New System.Windows.Forms.Label
     Me.myTabs.SuspendLayout()
     Me.tabInputs.SuspendLayout()
     Me.tabEndpoints.SuspendLayout()
@@ -420,13 +429,13 @@ Public Class frmIterative
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenResults, Me.mnuSaveResults, Me.mnuSavePivot})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuSavePivot, Me.mnuFileSep1, Me.mnuLoadVariations, Me.mnuSaveVariations})
     Me.mnuFile.Text = "File"
     '
-    'mnuOpenResults
+    'mnuLoadResults
     '
-    Me.mnuOpenResults.Index = 0
-    Me.mnuOpenResults.Text = "Open Results"
+    Me.mnuLoadResults.Index = 0
+    Me.mnuLoadResults.Text = "Load Results"
     '
     'mnuSaveResults
     '
@@ -437,6 +446,21 @@ Public Class frmIterative
     '
     Me.mnuSavePivot.Index = 2
     Me.mnuSavePivot.Text = "Save Pivot"
+    '
+    'mnuFileSep1
+    '
+    Me.mnuFileSep1.Index = 3
+    Me.mnuFileSep1.Text = "-"
+    '
+    'mnuLoadVariations
+    '
+    Me.mnuLoadVariations.Index = 4
+    Me.mnuLoadVariations.Text = "Load Variations"
+    '
+    'mnuSaveVariations
+    '
+    Me.mnuSaveVariations.Index = 5
+    Me.mnuSaveVariations.Text = "Save Variations"
     '
     'MenuItem1
     '
@@ -459,12 +483,24 @@ Public Class frmIterative
     Me.mnuPasteResults.Index = 2
     Me.mnuPasteResults.Text = "Paste Results"
     '
+    'lblTop
+    '
+    Me.lblTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lblTop.Location = New System.Drawing.Point(72, 8)
+    Me.lblTop.Name = "lblTop"
+    Me.lblTop.Size = New System.Drawing.Size(216, 24)
+    Me.lblTop.TabIndex = 2
+    Me.lblTop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+    '
     'frmIterative
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(296, 301)
+    Me.Controls.Add(Me.lblTop)
     Me.Controls.Add(Me.btnStart)
     Me.Controls.Add(Me.myTabs)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "frmIterative"
     Me.Text = "Iterative Analysis"
@@ -485,12 +521,15 @@ Public Class frmIterative
   'all the endpoints listed in the Endpoints tab
   Private pEndpoints As atcCollection
 
+  Private InputArgumentPrefix As String = "Current Value for "
+  Private ResultsTabIndex As Integer = 2
+
   'Names of attributes to show in Results grid
   'Private pOutputAttributes As String() = {"Mean", "Mean", "Mean", "Min", "Max", "1Hi100", "7Q10"}
   'Names of constituents to show attributes of in Results grid
   'Private pOutputConsName() As String = {"ATMP", "HPREC", "Flow", "Flow", "Flow", "Flow", "Flow"}
 
-  'Parameters for Hammond TODO: don't hard code these
+  'Parameters for Hammond - TODO: don't hard code these
   Private pDegF As Boolean = True
   Private pLatDeg As Double = 39
   Private pCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
@@ -504,6 +543,9 @@ Public Class frmIterative
   Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
     Dim lWDMFileName As String = "base.wdm"
     Dim lVariations As atcCollection = New atcCollection
+    Dim lRuns As Integer = 0
+
+    UpdateTopLabel("Setting up to run")
 
     'group containing dsn 122 (hourly AirTemp) from base.wdm
     'Dim lOrigAirTmp As New atcDataGroup
@@ -527,25 +569,26 @@ Public Class frmIterative
       .Columns = pEndpoints.Count + 1
       .Rows = 2
       .CellValue(0, 0) = "Run"
-      .ColorCells = False
+      .CellColor(0, 0) = Drawing.SystemColors.Control
+      .ColorCells = True
       For lIndex As Integer = 0 To pEndpoints.Count - 1
         Dim lEndpoint As Variation = pEndpoints.ItemByIndex(lIndex)
         .CellValue(0, lIndex + 1) = lEndpoint.Name
-        If Not .ColorCells AndAlso (Not Double.IsNaN(lEndpoint.Min) OrElse Not Double.IsNaN(lEndpoint.Max)) Then
-          .ColorCells = True
-        End If
+        .CellColor(0, lIndex + 1) = Drawing.SystemColors.Control
       Next
     End With
     agdResults.Initialize(agdResults.Source)
     agdResults.Refresh()
     PopulatePivotCombos()
 
-    myTabs.SelectedIndex = 1
+    myTabs.SelectedIndex = ResultsTabIndex
 
     Run(txtModifiedScenarioName.Text, _
         lVariations, _
         lWDMFileName, _
-        0, 0, Nothing)
+        lRuns, 0, Nothing)
+
+    UpdateTopLabel("Finished with " & lRuns & " runs")
   End Sub
 
   Private Sub Run(ByVal aModifiedScenarioName As String, _
@@ -560,15 +603,13 @@ Public Class frmIterative
     Logger.Dbg(" CurDir:" & CurDir())
 
     Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-    'Dim lSummary As atcDataTreePlugin = New atcDataTree.atcDataTreePlugin
     Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
     Dim lArgsMath As New atcDataAttributes
 
     Dim lRow As Integer = 0
 
-    If aStartVariation >= aVariations.Count Then 'All variations have set values, do a model run
-      'UpdateResults(aIteration, aModifiedData)
-
+    If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
+      UpdateTopLabel(aIteration)
       Dim lScenarioResults As atcDataSource
       lScenarioResults = ScenarioRun(aBaseWDMFileName, aModifiedScenarioName, aModifiedData)
 
@@ -579,33 +620,34 @@ Public Class frmIterative
     Else 'Need to loop through values for next variation
       Dim lVariation As Variation = aVariations.ItemByIndex(aStartVariation)
       With lVariation
-        For lCurValue As Double = .Min To .Max Step .Increment
+        For .CurrentValue = .Min To .Max Step .Increment
           If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
           Dim lModifiedTS As atcTimeseries
-          Dim lIntermediateTS As atcTimeseries
-          'build new temp and evap
+          Dim lLocalModifiedTS As New atcDataGroup
           For Each lOriginalData As atcDataSet In .DataSets
             lTsMath.DataSets.Clear()
             lArgsMath.Clear()
-            lArgsMath.SetValue("timeseries", .DataSets.ItemByIndex(0))
-            lArgsMath.SetValue("Number", lCurValue)
+            lArgsMath.SetValue("timeseries", lOriginalData)
+            lArgsMath.SetValue("Number", .CurrentValue)
             g_DataManager.OpenDataSource(lTsMath, .Operation, lArgsMath)
 
             lModifiedTS = lTsMath.DataSets(0)
-            aModifiedData.Add(lModifiedTS)
+            lLocalModifiedTS.Add(lModifiedTS)
 
             Select Case .DataSets.ItemByIndex(0).Attributes.GetValue("Constituent").ToString.ToUpper
-              Case "ATMP" 'recompute PET when ATMP is changed
-                lIntermediateTS = lModifiedTS
-                lModifiedTS = atcMetCmp.CmpHamX(lIntermediateTS, Nothing, pDegF, pLatDeg, pCTS)
-                With lModifiedTS
-                  .Attributes.SetValue("Constituent", "PET")
-                  .Attributes.SetValue("Id", 111)
-                  .Attributes.SetValue("Scenario", aModifiedScenarioName)
-                  Dim lAirTmpMean As String = Format(lIntermediateTS.Attributes.GetValue("Mean"), "#.00")
-                  Dim lEvapMean As String = Format(.Attributes.GetValue("Mean") * 365.25, "#.00")
+              Case "ATMP", "AIRTMP", "AIRTEMP" 'recompute PET when ATMP is changed - TODO: don't hard code ATMP
+                'Dim lAirTmpMean As String = Format(lModifiedTS.Attributes.GetValue("Mean"), "#.00")
+                lModifiedTS = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
+                lLocalModifiedTS.Add(lModifiedTS)
+                'Dim lEvapMean As String = Format(lModifiedTS.Attributes.GetValue("Mean") * 365.25, "#.00")
+                With lModifiedTS.Attributes
+                  .SetValue("Constituent", "PET")
+                  .SetValue("Id", 111)
+                  .SetValue("Scenario", aModifiedScenarioName)
                 End With
             End Select
+
+            aModifiedData.Add(lLocalModifiedTS)
 
             'We have handled a variation, now handle more input variations or to run the model
             Run(aModifiedScenarioName, _
@@ -615,18 +657,8 @@ Public Class frmIterative
                 aStartVariation + 1, _
                 aModifiedData)
 
-            'For lCurValue1 As Double = aMin1 To aMax1 Step aIncrement1
-            '  Logger.Dbg(" Step:" & lCurValue2 & ":" & lCurValue1)
-            '  lRow += 1
-            '  With agdResults.Source
-            '    .CellValue(lRow, 0) = lCurValue2
-            '    .CellValue(lRow, 1) = lAirTmpMean
-            '    .CellValue(lRow, 2) = lEvapMean
-            '    .CellValue(lRow, 3) = lCurValue1
-            '  End With
-            '  agdResults.Refresh()
+            aModifiedData.Remove(lLocalModifiedTS)
 
-            '  lNewPrec = Nothing
             '  lNewPrec = aBase1.Clone
             '  For iValue As Integer = 1 To lNewPrec.numValues
             '    Dim lDate As Date = Date.FromOADate(lNewPrec.Dates.Value(iValue))
@@ -655,27 +687,36 @@ Public Class frmIterative
     With agdResults.Source
       Dim lRow As Integer = aIteration + .FixedRows
       Dim lColumn As Integer = .FixedRows
-      .CellValue(lRow, 0) = aIteration
+      .CellValue(lRow, 0) = aIteration + 1
       For Each lEndpoint As Variation In pEndpoints
-        For Each lOldData As atcDataSet In lEndpoint.DataSets
-          Dim lGroup As atcDataGroup = aData.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
-          If lGroup.Count > 0 Then
-            Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lEndpoint.Operation)
-            .CellValue(lRow, lColumn) = Format(lValue, "#.0")
-            If .ColorCells Then
-              If Not Double.IsNaN(lEndpoint.Min) AndAlso lValue < lEndpoint.Min Then
-                .CellColor(lRow, lColumn) = lEndpoint.ColorBelowMin
-              ElseIf Not Double.IsNaN(lEndpoint.Max) AndAlso lValue > lEndpoint.Max Then
-                .CellColor(lRow, lColumn) = lEndpoint.ColorAboveMax
-              Else
-                .CellColor(lRow, lColumn) = lEndpoint.ColorInRange
-              End If
-            End If
-          Else
-            .CellValue(lRow, lColumn) = ""
-          End If
+        If Not Double.IsNaN(lEndpoint.CurrentValue) Then 'This is an input variation, put current value in results
+          .CellValue(lRow, lColumn) = Format(lEndpoint.CurrentValue, "0.####")
           lColumn += 1
-        Next
+        Else
+          For Each lOldData As atcDataSet In lEndpoint.DataSets
+            Dim lGroup As atcDataGroup = aData.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
+            If lGroup.Count > 0 Then
+              .CellValue(lRow, lColumn) = lGroup.Item(0).Attributes.GetFormattedValue(lEndpoint.Operation)
+              If .ColorCells Then
+                If Not IsNumeric(.CellValue(lRow, lColumn)) Then
+                  .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
+                Else
+                  Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lEndpoint.Operation)
+                  If Not Double.IsNaN(lEndpoint.Min) AndAlso lValue < lEndpoint.Min Then
+                    .CellColor(lRow, lColumn) = lEndpoint.ColorBelowMin
+                  ElseIf Not Double.IsNaN(lEndpoint.Max) AndAlso lValue > lEndpoint.Max Then
+                    .CellColor(lRow, lColumn) = lEndpoint.ColorAboveMax
+                  Else
+                    .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
+                  End If
+                End If
+              End If
+            Else
+              .CellValue(lRow, lColumn) = ""
+            End If
+            lColumn += 1
+          Next
+        End If
       Next
     End With
     agdResults.Refresh()
@@ -780,7 +821,13 @@ Public Class frmIterative
         .Columns = lColumnValues.Count + 1
         .FixedRows = 1
         .FixedColumns = 1
-        .ColorCells = agdResults.Source.ColorCells
+        .ColorCells = True
+        For lRow = 0 To .Rows - 1
+          .CellColor(lRow, 0) = System.Drawing.SystemColors.Control
+        Next
+        For lColumn = 1 To .Columns - 1
+          .CellColor(0, lColumn) = System.Drawing.SystemColors.Control
+        Next
 
         For lRow = 1 To .Rows - 1
           lRowValue = lRowValues(lRow - 1)
@@ -818,17 +865,17 @@ Public Class frmIterative
     PopulatePivotCombos()
   End Sub
 
-  Private Sub mnuOpenResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenResults.Click
+  Private Sub mnuLoadResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLoadResults.Click
     Dim lOpenDialog As New Windows.Forms.OpenFileDialog
     With lOpenDialog
       .FileName = "results.txt"
       .Filter = "Text files (*.txt)|*.txt|All files|*.*"
       .FilterIndex = 1
-      .Title = "Scenario Builder - Open Results"
+      .Title = "Scenario Builder - Load Results"
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         If FileExists(.FileName) Then 'read file into grid
           PopulateResultsGrid(WholeFileString(.FileName))
-          myTabs.SelectedIndex = 1
+          myTabs.SelectedIndex = ResultsTabIndex
         End If
       End If
     End With
@@ -841,7 +888,7 @@ Public Class frmIterative
     Else
       Logger.Msg("No text on clipboard to paste into grid", "Paste")
     End If
-    myTabs.SelectedIndex = 1
+    myTabs.SelectedIndex = ResultsTabIndex
   End Sub
 
   Private Sub frmMultipleResults_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
@@ -890,6 +937,16 @@ Public Class frmIterative
     End With
   End Sub
 
+  Private Sub UpdateTopLabel(ByVal aIteration As Integer)
+    UpdateTopLabel("Run # " & aIteration + 1)
+  End Sub
+
+  Private Sub UpdateTopLabel(ByVal aText As String)
+    lblTop.Text = aText
+    lblTop.Refresh()
+    Application.DoEvents()
+  End Sub
+
   Private Sub btnInputAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputAdd.Click
     Dim frmVary As New frmVariation
     Dim lVariation As New Variation
@@ -906,6 +963,9 @@ Public Class frmIterative
       pInputs.Add(lVariation)
       lstInputs.Items.Add(lVariation.ToString)
       lstInputs.SetItemChecked(lstInputs.Items.Count - 1, True)
+
+      pEndpoints.Add(lVariation)
+      lstEndpoints.Items.Add(InputArgumentPrefix & lVariation.Name)
     End If
   End Sub
 
@@ -919,7 +979,7 @@ Public Class frmIterative
         pInputs.RemoveAt(lIndex)
         pInputs.Insert(lIndex, lVariation)
         lstInputs.Items.RemoveAt(lIndex)
-        pInputs.Insert(lIndex, lVariation.ToString)
+        lstInputs.Items.Insert(lIndex, lVariation.ToString)
       End If
     End If
   End Sub
@@ -959,7 +1019,7 @@ Public Class frmIterative
         pEndpoints.RemoveAt(lIndex)
         pEndpoints.Insert(lIndex, lVariation)
         lstEndpoints.Items.RemoveAt(lIndex)
-        pEndpoints.Insert(lIndex, lVariation.ToString)
+        lstEndpoints.Items.Insert(lIndex, lVariation.ToString)
       End If
     End If
   End Sub
@@ -976,6 +1036,78 @@ Public Class frmIterative
     For Each lVariation As Variation In aContents
       aList.Items.Add(lVariation.ToString)
     Next
+  End Sub
+
+  Private Sub mnuSaveVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSaveVariations.Click
+    Dim lSaveDialog As New Windows.Forms.SaveFileDialog
+    With lSaveDialog
+      .FileName = "Variations.txt"
+      .Filter = "Text files (*.txt)|*.txt|All files|*.*"
+      .FilterIndex = 1
+      .Title = "Save Variations as XML Text"
+      .OverwritePrompt = True
+      If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        'write file from grid contents
+        Dim lXML As String = "<Variations>" & vbCrLf
+        For Each lVariation As Variation In pInputs
+          lXML &= lVariation.XML
+        Next
+        lXML &= "</Variations>" & vbCrLf
+        SaveFileString(.FileName, lXML)
+      End If
+    End With
+  End Sub
+
+  Private Sub mnuLoadVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuLoadVariations.Click
+    Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+    With lOpenDialog
+      .FileName = "Variations.txt"
+      .Filter = "Text files (*.txt)|*.txt|All files|*.*"
+      .FilterIndex = 1
+      .Title = "Scenario Builder - Load Variations"
+      If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+        If FileExists(.FileName) Then
+          Dim lXML As New Chilkat.Xml
+          If lXML.LoadXml(WholeFileString(.FileName)) Then
+            If lXML.Tag.ToLower.Equals("variations") Then
+              If lXML.FirstChild2 Then
+                Dim lVariation As Variation
+                pInputs.Clear()
+                lstInputs.Items.Clear()
+                Do
+                  lVariation = New Variation
+                  lVariation.XML = lXML.GetXml
+                  pInputs.Add(lVariation)
+                  lstInputs.Items.Add(lVariation.ToString)
+                Loop While lXML.NextSibling2
+
+                'Remove endpoint references to old inputs
+                Dim iEndpoint As Integer = 0
+                While iEndpoint < lstEndpoints.Items.Count
+                  If lstEndpoints.Items(iEndpoint).ToString.StartsWith(InputArgumentPrefix) Then
+                    lstEndpoints.Items.RemoveAt(iEndpoint)
+                    pEndpoints.RemoveAt(iEndpoint)
+                  Else
+                    iEndpoint += 1
+                  End If
+                End While
+
+                'Add endpoint references to new inputs
+                For Each lVariation In pInputs
+                  pEndpoints.Add(lVariation)
+                  lstEndpoints.Items.Add(InputArgumentPrefix & lVariation.Name)
+                Next
+
+              End If
+            Else
+              Logger.Msg("Variations not found in '" & .FileName & "'" & vbCrLf & lXML.LastErrorText, "Load Variations")
+            End If
+          Else
+            Logger.Msg("Could not parse variations from '" & .FileName & "'" & vbCrLf & lXML.LastErrorText, "Load Variations")
+          End If
+        End If
+      End If
+    End With
   End Sub
 
 End Class

@@ -65,7 +65,7 @@ Public Class PlugIn
         'It is also standard to set a global reference to the IMapWin that is passed through here so that
         'you can access it elsewhere in your project to act on MapWindow.
         g_MapWin = MapWin
-        g_MapWin.Toolbar.AddButton("Re-Project")
+    'g_MapWin.Toolbar.AddButton("Re-Project")
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
@@ -73,7 +73,7 @@ Public Class PlugIn
         'box, or by un-checkmarking it in the plug-ins menu.  This is where you would remove any
         'buttons from the tool bar tool bar or menu items from the menu that you may have added.
         'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
-        g_MapWin.Toolbar.RemoveButton("Re-Project")
+    'g_MapWin.Toolbar.RemoveButton("Re-Project")
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked

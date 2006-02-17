@@ -11,9 +11,9 @@ Imports MapWinGIS
 Imports Microsoft.VisualBasic
 
 Public Module modDemGTest
-  'Dim pDataType As String = "DemG", pAggr As Integer = 4, pScale As Double = 1.0
+  Dim pDataType As String = "DemG", pAggr As Integer = 8, pScale As Double = 1.0
   'Dim pDataType As String = "Ned", pAggr As Integer = 6, pScale As Double = 100
-  Dim pDataType As String = "Ned", pAggr As Integer = 8, pScale As Double = 100
+  'Dim pDataType As String = "Ned", pAggr As Integer = 8, pScale As Double = 100
 
   Dim pStatusFile As String = "alldone.txt"
   Dim pStatus As String = "Start:" & pDataType & ":" & pAggr & ":" & pScale & vbCrLf
@@ -118,7 +118,7 @@ Public Module modDemGTest
     With aBasinsPlugIn.MapWin
       .Layers.Clear()
       If aHucStr.Length = 8 Then
-        lFile = PathNameOnly(aAllFiles.Item(0)) & "\" & aHucStr & "ned.tif"
+        lFile = PathNameOnly(aAllFiles.Item(0)) & "\" & aHucStr & "demg.tif"
         lCnt += 1
         Dim lGrid As New Grid
         LogDbg("Opening " & lFile)
