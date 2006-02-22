@@ -3,10 +3,11 @@ Imports MapWinUtility
 
 Public Class Variation
 
-  Public Name As String = "<untitled>"
-  Public DataSets As atcDataGroup
-  Public ComputationSource As atcDataSource
-  Public Operation As String = ""
+  Private pName As String = "<untitled>"
+  Private pDataSets As atcDataGroup
+  Private pComputationSource As atcDataSource
+  Private pOperation As String = ""
+  'TODO: make rest of public variables into peoperties
   Public Min As Double = Double.NaN
   Public Max As Double = Double.NaN
   Public Increment As Double = Double.NaN
@@ -15,6 +16,52 @@ Public Class Variation
   Public ColorAboveMax As System.Drawing.Color = System.Drawing.Color.OrangeRed
   Public ColorBelowMin As System.Drawing.Color = System.Drawing.Color.DeepSkyBlue
   Public ColorDefault As System.Drawing.Color = System.Drawing.Color.White
+
+  Public Property Name() As String
+    Get
+      Return pName
+    End Get
+    Set(ByVal newValue As String)
+      pName = newValue
+    End Set
+  End Property
+
+  Public Property DataSets() As atcDataGroup
+    Get
+      Return pDataSets
+    End Get
+    Set(ByVal newValue As atcDataGroup)
+      pDataSets = newValue
+    End Set
+  End Property
+
+  Public Property ComputationSource() As atcDataSource
+    Get
+      Return pComputationSource
+    End Get
+    Set(ByVal newValue As atcDataSource)
+      pComputationSource = newValue
+    End Set
+  End Property
+
+  Public Property Operation() As String
+    Get
+      Return pOperation
+    End Get
+    Set(ByVal newValue As String)
+      pOperation = newValue
+    End Set
+  End Property
+
+  Public ReadOnly Property Iterations() As Integer
+    Get
+      Try
+        Return (Max - Min) / Increment + 1
+      Catch ex As Exception
+        Return 1
+      End Try
+    End Get
+  End Property
 
   Public Function Clone() As Variation
     Dim newVariation As New Variation
@@ -45,7 +92,7 @@ Public Class Variation
           lXML &= " ID='" & lDataSet.Attributes.GetValue("ID") & "'"
           lXML &= " Location='" & lDataSet.Attributes.GetValue("Location") & "'"
           lXML &= " Constituent='" & lDataSet.Attributes.GetValue("Constituent") & "'"
-          lXML &= ">" & vbCrLf
+          lXML &= " />" & vbCrLf
         Next
         Return lXML & "  </DataSets>" & vbCrLf
       End If
@@ -106,7 +153,6 @@ Public Class Variation
           Loop While lXML.NextSibling2
         End If
       End If
-
     End Set
   End Property
 

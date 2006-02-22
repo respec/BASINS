@@ -18,7 +18,7 @@ Public Module UtilColor
   Private colorsUsed() As Color
   Private MatchingColorsFilename As String
 
-  Public Sub InitMatchingColors(ByRef Filename As String)
+  Public Sub InitMatchingColors(ByVal Filename As String)
     ReDim colorsUsed(0)
     On Error GoTo NeverMind
 

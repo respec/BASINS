@@ -210,7 +210,7 @@ ErrHand:
     End Set
   End Property
 
-  'Public Function FindMatch(ByRef aFieldNum() As Integer, ByRef aOperator() As String, ByRef aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
+  'Public Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperator() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
   '  Dim numRules As Integer
   '  Dim iRule As Integer
   '  Dim Value As Object

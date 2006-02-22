@@ -9,14 +9,14 @@ Public Interface IatcTable
 
   Function FieldNumber(ByVal aFieldName As String) As Integer
   Function FindFirst(ByVal aFieldNumber As Integer, _
-                     ByRef aFindValue As String, _
+                     ByVal aFindValue As String, _
             Optional ByVal aStartRecord As Integer = 1, _
             Optional ByVal aEndRecord As Integer = -1) As Boolean
   Function FindNext(ByVal aFieldNumber As Integer, _
-                    ByRef aFindValue As String) As Boolean
-  Function Summary(Optional ByRef aFormat As String = "tab,headers,expandtype") As String
-  Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String
-  Function SummaryFile(Optional ByRef aFormat As String = "tab,headers") As String
+                    ByVal aFindValue As String) As Boolean
+  Function Summary(Optional ByVal aFormat As String = "tab,headers,expandtype") As String
+  Function SummaryFields(Optional ByVal aFormat As String = "tab,headers,expandtype") As String
+  Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String
 
   Property atBOF() As Boolean
   Property atEOF() As Boolean
@@ -149,12 +149,12 @@ Public MustInherit Class atcTable
   End Sub
 
   'Returns a text description of the table
-  Public Overridable Function Summary(Optional ByRef aFormat As String = "tab,headers,expandtype") As String Implements IatcTable.Summary
+  Public Overridable Function Summary(Optional ByVal aFormat As String = "tab,headers,expandtype") As String Implements IatcTable.Summary
     Return SummaryFile(aFormat) & vbCrLf & SummaryFields(aFormat)
   End Function
 
   'A summary of the file
-  Public Overridable Function SummaryFile(Optional ByRef aFormat As String = "tab,headers") As String Implements IatcTable.SummaryFile
+  Public Overridable Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String Implements IatcTable.SummaryFile
     Dim retval As String
     Dim iTrash As Short
     Dim ShowTrash As Boolean
@@ -172,7 +172,7 @@ Public MustInherit Class atcTable
   End Function
 
   'A summary of the fields (names, types, lengths)
-  Public Overridable Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String Implements IatcTable.SummaryFields
+  Public Overridable Function SummaryFields(Optional ByVal aFormat As String = "tab,headers,expandtype") As String Implements IatcTable.SummaryFields
     Dim retval As String
     Dim iField As Integer
     Dim ShowTrash As Boolean
@@ -234,7 +234,7 @@ Public MustInherit Class atcTable
   End Function
 
   'Returns a string version of the current record
-  Public Overridable Function CurrentRecordAsDelimitedString(Optional ByRef aDelimiter As String = ",", Optional ByRef aQuote As String = "") As String
+  Public Overridable Function CurrentRecordAsDelimitedString(Optional ByVal aDelimiter As String = ",", Optional ByVal aQuote As String = "") As String
     CurrentRecordAsDelimitedString = ""
     If NumFields > 0 Then
       For iField As Integer = 1 To NumFields - 1
@@ -248,7 +248,7 @@ Public MustInherit Class atcTable
   'If not found, returns False and moves CurrentRecord to aStartRecord
   'If aStartRecord is specified, searching starts there instead of at first record
   'If aEndRecord is specified, search stops at aEndRecord
-  Public Overridable Function FindFirst(ByVal aFieldNumber As Integer, ByRef aFindValue As String, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean Implements IatcTable.FindFirst
+  Public Overridable Function FindFirst(ByVal aFieldNumber As Integer, ByVal aFindValue As String, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean Implements IatcTable.FindFirst
     If aEndRecord < 1 Then aEndRecord = NumRecords
     CurrentRecord = aStartRecord
     While CurrentRecord <= aEndRecord
@@ -263,7 +263,7 @@ Public MustInherit Class atcTable
 
   'Returns True if found, moves CurrentRecord to next record with .Value(FieldNumber) = FindValue
   'If not found, returns False and moves CurrentRecord to 1
-  Public Overridable Function FindNext(ByVal aFieldNumber As Integer, ByRef aFindValue As String) As Boolean Implements IatcTable.FindNext
+  Public Overridable Function FindNext(ByVal aFieldNumber As Integer, ByVal aFindValue As String) As Boolean Implements IatcTable.FindNext
     Return FindFirst(aFieldNumber, aFindValue, Me.CurrentRecord + 1)
   End Function
 
@@ -290,13 +290,13 @@ Public MustInherit Class atcTable
   '
   ''Returns True if found, moves CurrentRecord to first record with .Record = FindValue
   ''If not found, returns False and moves CurrentRecord to 1
-  'Public Function FindRecord(ByRef FindValue() As Byte, _
+  'Public Function FindRecord(ByVal FindValue() As Byte, _
   ''                          Optional ByVal aStartRecord As Long = 1, _
   ''                          Optional ByVal aEndRecord As Long = -1) As Boolean
   'End Function
   '
   ''Returns True if CurrentRecord matches FindValue
-  'Public Function MatchRecord(ByRef FindValue() As Byte) As Boolean
+  'Public Function MatchRecord(ByVal FindValue() As Byte) As Boolean
   'End Function
   '
   'Public Property Set Logger(ByVal newValue As Object)
