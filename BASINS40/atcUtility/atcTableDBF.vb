@@ -560,7 +560,7 @@ ErrHand:
 
   'Returns True if found, moves CurrentRecord to first record with .Record = FindValue
   'If not found, returns False and moves CurrentRecord to aStartRecord
-  '    Public Function FindRecord(ByRef FindValue() As Byte, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
+  '    Public Function FindRecord(ByVal FindValue() As Byte, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
   '        Dim I As Integer
   '        Dim firstByte As Integer
   '        Dim lastByte As Integer
@@ -626,7 +626,7 @@ ErrHand:
   '    End Function
 
   'Returns True if CurrentRecord matches FindValue
-  'Public Function MatchRecord(ByRef FindValue() As Byte) As Boolean
+  'Public Function MatchRecord(ByVal FindValue() As Byte) As Boolean
   '    Dim byt As Integer
   '    Dim lastbyt As Integer
   '    If UBound(FindValue) < pHeader.NumBytesRec Then
@@ -691,7 +691,7 @@ ErrHand:
   '  FindMatchPA = FindMatch(fieldNum, operator, fieldVal, aMatchAny, aStartRecord, aEndRecord)
   'End Function
 
-  Public Function FindMatch(ByRef aFieldNum() As Integer, ByRef aOperator() As String, ByRef aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
+  Public Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperator() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
     Dim numRules As Integer
     Dim iRule As Integer
     Dim Value As Object
@@ -815,7 +815,7 @@ ErrHand:
   '  Loop
   'End Sub
 
-  Private Function TrimNull(ByRef Value As String) As String
+  Private Function TrimNull(ByVal Value As String) As String
     Dim nullPos As Integer
     nullPos = InStr(Value, Chr(0))
     If nullPos = 0 Then
@@ -982,7 +982,7 @@ ErrHand:
     Return True
   End Function
 
-  Public Overrides Function SummaryFields(Optional ByRef aFormat As String = "tab,headers,expandtype") As String
+  Public Overrides Function SummaryFields(Optional ByVal aFormat As String = "tab,headers,expandtype") As String
     Dim retval As String
     Dim iTrash As Integer
     Dim iField As Integer
@@ -1065,7 +1065,7 @@ ErrHand:
     Return retval
   End Function
 
-  Public Overrides Function SummaryFile(Optional ByRef aFormat As String = "tab,headers") As String
+  Public Overrides Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String
     Dim retval As String
     Dim iTrash As Integer
     Dim ShowTrash As Boolean

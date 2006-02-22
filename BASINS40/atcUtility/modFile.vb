@@ -22,7 +22,7 @@ Public Module modFile
     End Try
   End Function
 
-  Public Function SafeFilename(ByRef S As String, Optional ByRef ReplaceWith As String = "_") As String
+  Public Function SafeFilename(ByVal S As String, Optional ByVal ReplaceWith As String = "_") As String
     ' ##SUMMARY Converts, if necessary, non-printable characters in filename to printable alternative.
     ' ##PARAM S I Filename to be converted, if necessary.
     ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="_").
@@ -45,7 +45,7 @@ EndFound:
     Return retval
   End Function
 
-  Public Function FilenameOnly(ByRef istr As String) As String
+  Public Function FilenameOnly(ByVal istr As String) As String
     ' ##SUMMARY Converts full path, filename, and extension to filename only.
     ' ##SUMMARY   Example: FilenameOnly("C:\foo\bar.txt") = "bar"
     ' ##PARAM istr I Filename with path and extension.
@@ -53,7 +53,7 @@ EndFound:
     Return System.IO.Path.GetFileNameWithoutExtension(istr)
   End Function
 
-  Public Function FilenameNoPath(ByRef istr As String) As String
+  Public Function FilenameNoPath(ByVal istr As String) As String
     ' ##SUMMARY Converts full path, filename, and extension to only filename with extension.
     ' ##SUMMARY   Example: FilenameNoPath ("C:\foo\bar.txt") = "bar.txt"
     ' ##PARAM istr I Filename with path and extension.
@@ -61,7 +61,7 @@ EndFound:
     Return System.IO.Path.GetFileName(istr)
   End Function
 
-  Public Function FileExt(ByRef istr As String) As String
+  Public Function FileExt(ByVal istr As String) As String
     ' ##SUMMARY Reduces full path, filename, and extension to only extension.
     ' ##SUMMARY   Example: FileExt ("C:\foo\bar.txt") = "txt"
     ' ##PARAM istr I Filename with path and extension.
@@ -69,7 +69,7 @@ EndFound:
     Return Mid(System.IO.Path.GetExtension(istr), 2)
   End Function
 
-  Public Function FilenameSetExt(ByRef istr As String, ByRef newExt As String) As String
+  Public Function FilenameSetExt(ByVal istr As String, ByVal newExt As String) As String
     ' ##SUMMARY Converts extension of filename from existing to specified.
     ' ##SUMMARY   Example: FilenameSetExt ("C:\foo\bar.txt", "png") = "C:\foo\bar.png"
     ' ##SUMMARY   Example: FilenameSetExt ("C:\foo\bardtxt", "png") = "C:\foo\bardtxt.png"
@@ -188,7 +188,7 @@ FoundSameUntil:
     Return filename
   End Function
 
-  Public Sub AddFilesInDir(ByRef aFilenames As NameValueCollection, ByRef aDirName As String, ByRef aSubdirs As Boolean, Optional ByRef aFileFilter As String = "*", Optional ByRef aAttributes As Integer = 0)
+  Public Sub AddFilesInDir(ByRef aFilenames As NameValueCollection, ByVal aDirName As String, ByVal aSubdirs As Boolean, Optional ByVal aFileFilter As String = "*", Optional ByVal aAttributes As Integer = 0)
     Dim dirsThisDir As NameValueCollection
     Dim fName As String
     Dim vName As Object
@@ -252,11 +252,11 @@ FoundSameUntil:
   End Sub
 
   'Recursively remove all files and directories in aDirName
-  Public Sub RemoveFilesInDir(ByRef aDirName As String)
+  Public Sub RemoveFilesInDir(ByVal aDirName As String)
     System.IO.Directory.Delete(aDirName, True)
   End Sub
 
-  Public Sub SaveFileString(ByRef filename As String, ByRef FileContents As String)
+  Public Sub SaveFileString(ByVal filename As String, ByVal FileContents As String)
     ' ##SUMMARY Saves incoming string to a text file.
     ' ##PARAM FileName I Name of output text file
     ' ##PARAM FileContents I Incoming string to be saved to file
@@ -274,7 +274,7 @@ FoundSameUntil:
     End Try
   End Sub
 
-  Public Sub SaveFileBytes(ByRef filename As String, ByRef FileContents() As Byte)
+  Public Sub SaveFileBytes(ByVal filename As String, ByVal FileContents() As Byte)
     ' ##SUMMARY Saves incoming Byte array to a text file.
     ' ##PARAM FileName I Name of output text file
     ' ##PARAM FileContents I Incoming Byte array to be saved to file
@@ -295,7 +295,7 @@ ErrorWriting:
     MsgBox("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "SaveFileBytes")
   End Sub
 
-  Public Function AppendFileString(ByRef filename As String, ByRef appendString As String) As Boolean
+  Public Function AppendFileString(ByVal filename As String, ByVal appendString As String) As Boolean
     ' ##SUMMARY Appends incoming string to existing text file.
     ' ##PARAM FileName I Name of existing text file
     ' ##PARAM appendString I Incoming string to be appended
@@ -317,7 +317,7 @@ ErrorWriting:
 
   End Function
 
-  Public Sub ReplaceStringToFile(ByRef Source As String, ByRef Find As String, ByRef ReplaceWith As String, ByRef filename As String)
+  Public Sub ReplaceStringToFile(ByVal Source As String, ByVal Find As String, ByVal ReplaceWith As String, ByVal filename As String)
     ' ##SUMMARY Saves new string like Source to Filename with _
     'occurences of Find in Source replaced with Replace.
     ' ##SUMMARY   Example: ReplaceString("He left", "He", "She") = "She left"
@@ -569,7 +569,7 @@ ErrorWriting:
     End Try
   End Function
 
-  Public Function WholeFileString(ByRef aFilename As String, Optional ByVal aTimeoutMilliseconds As Integer = 1000) As String
+  Public Function WholeFileString(ByVal aFilename As String, Optional ByVal aTimeoutMilliseconds As Integer = 1000) As String
     ' ##SUMMARY Converts specified text file to a string.
     ' ##PARAM FileName I Name of text file
     ' ##RETURNS Returns contents of specified text file as string.
@@ -599,7 +599,7 @@ TryAgain:
   End Function
 
 
-  Public Function WholeFileBytes(ByRef filename As String) As Byte()
+  Public Function WholeFileBytes(ByVal filename As String) As Byte()
     ' ##SUMMARY Converts specified text file to Byte array
     ' ##PARAM FileName I Name of text file
     ' ##RETURNS Returns contents of specified text file in Byte array.
@@ -623,7 +623,7 @@ ErrorReading:
     MsgBox("Error reading '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OKOnly, "WholeFileBytes")
   End Function
 
-  Public Function FirstMismatch(ByRef filename1 As String, ByRef filename2 As String) As Integer
+  Public Function FirstMismatch(ByVal filename1 As String, ByVal filename2 As String) As Integer
     ' ##SUMMARY Compares 2 files and locates first sequential byte that is different between files.
     ' ##PARAM filename1 I Name of first file
     ' ##PARAM filename2 I Name of second file
@@ -698,7 +698,7 @@ ErrorReading:
     FileClose(InFile2)
   End Function
 
-  Public Function SwapBytes(ByRef n As Integer) As Integer
+  Public Function SwapBytes(ByVal n As Integer) As Integer
     ' ##SUMMARY Swaps between big and little endian 32-bit integers.
     ' ##SUMMARY   Example: SwapBytes(1) = 16777216
     ' ##PARAM N I Any long integer
@@ -717,7 +717,7 @@ ErrorReading:
     Return System.BitConverter.ToInt32(NewBytes, 0)
   End Function
 
-  Public Function ReadBigInt(ByRef InFile As Short) As Integer
+  Public Function ReadBigInt(ByVal InFile As Short) As Integer
     ' ##SUMMARY Reads big-endian integer from file number and converts to _
     'Intel little-endian value.
     ' ##SUMMARY   Example: ReadBigInt(1) = 1398893856
@@ -730,7 +730,7 @@ ErrorReading:
     Return SwapBytes(n)
   End Function
 
-  Public Sub WriteBigInt(ByRef OutFile As Short, ByRef Value As Integer)
+  Public Sub WriteBigInt(ByVal OutFile As Short, ByVal Value As Integer)
     ' ##SUMMARY Writes 32-bit integer as big endian to specified disk file.
     ' ##PARAM OutFile I File number
     ' ##PARAM Value I 32-bit integer

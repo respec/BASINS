@@ -79,6 +79,7 @@ Public Class frmIterative
   Friend WithEvents mnuLoadVariations As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSaveVariations As System.Windows.Forms.MenuItem
   Friend WithEvents lblTop As System.Windows.Forms.Label
+  Friend WithEvents btnStop As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmIterative))
     Me.myTabs = New System.Windows.Forms.TabControl
@@ -124,6 +125,7 @@ Public Class frmIterative
     Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
     Me.mnuPasteResults = New System.Windows.Forms.MenuItem
     Me.lblTop = New System.Windows.Forms.Label
+    Me.btnStop = New System.Windows.Forms.Button
     Me.myTabs.SuspendLayout()
     Me.tabInputs.SuspendLayout()
     Me.tabEndpoints.SuspendLayout()
@@ -493,6 +495,15 @@ Public Class frmIterative
     Me.lblTop.TabIndex = 2
     Me.lblTop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
     '
+    'btnStop
+    '
+    Me.btnStop.Location = New System.Drawing.Point(8, 8)
+    Me.btnStop.Name = "btnStop"
+    Me.btnStop.Size = New System.Drawing.Size(56, 24)
+    Me.btnStop.TabIndex = 3
+    Me.btnStop.Text = "Stop"
+    Me.btnStop.Visible = False
+    '
     'frmIterative
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -500,6 +511,7 @@ Public Class frmIterative
     Me.Controls.Add(Me.lblTop)
     Me.Controls.Add(Me.btnStart)
     Me.Controls.Add(Me.myTabs)
+    Me.Controls.Add(Me.btnStop)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
     Me.Name = "frmIterative"
@@ -517,12 +529,15 @@ Public Class frmIterative
 
   'all the variations listed in the Input tab
   Private pInputs As atcCollection
+  Private pRunning As Boolean = False
 
   'all the endpoints listed in the Endpoints tab
   Private pEndpoints As atcCollection
 
   Private InputArgumentPrefix As String = "Current Value for "
   Private ResultsTabIndex As Integer = 2
+  Private TotalIterations As Integer = 0
+  Private TimePerRun As Double = 0 'Time each run takes in seconds
 
   'Names of attributes to show in Results grid
   'Private pOutputAttributes As String() = {"Mean", "Mean", "Mean", "Min", "Max", "1Hi100", "7Q10"}
@@ -535,15 +550,26 @@ Public Class frmIterative
   Private pCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
 
   Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcDataGroup = Nothing)
+    TimePerRun = CDbl(GetSetting("ScenarioBuilder", "Settings", "TimePerRun", "0"))
     pInputs = New atcCollection
     pEndpoints = New atcCollection
+    For Each lDataSource As atcDataSource In g_DataManager.DataSources
+      If lDataSource.Specification.EndsWith(".wdm") Then
+        cboBaseScenarioName.Items.Add(lDataSource.Specification)
+        cboBaseScenarioName.SelectedIndex = cboBaseScenarioName.Items.Count - 1
+      End If
+    Next
     Me.Show()
   End Sub
 
   Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
-    Dim lWDMFileName As String = "base.wdm"
+    Dim lWDMFileName As String = cboBaseScenarioName.Text
     Dim lVariations As atcCollection = New atcCollection
     Dim lRuns As Integer = 0
+
+    pRunning = True
+    btnStart.Visible = False
+    btnStop.Visible = True
 
     UpdateTopLabel("Setting up to run")
 
@@ -556,6 +582,8 @@ Public Class frmIterative
     '  lOrigAirTmp = lWDMfile.DataSets.FindData("ID", "122", 0)
     'End If
     'lSummary.Save(g_DataManager, lOrigAirTmp, "DataTree_OrigAirTmp.txt")
+
+    UpdateTotalIterations()
 
     'Make a collection of the variations that are selected/checked in lstInputs
     For Each iVariation As Integer In lstInputs.CheckedIndices
@@ -579,7 +607,6 @@ Public Class frmIterative
     End With
     agdResults.Initialize(agdResults.Source)
     agdResults.Refresh()
-    PopulatePivotCombos()
 
     myTabs.SelectedIndex = ResultsTabIndex
 
@@ -588,7 +615,13 @@ Public Class frmIterative
         lWDMFileName, _
         lRuns, 0, Nothing)
 
+    SaveSetting("ScenarioBuilder", "Settings", "TimePerRun", TimePerRun)
+
+    PopulatePivotCombos()
     UpdateTopLabel("Finished with " & lRuns & " runs")
+    pRunning = False
+    btnStart.Visible = True
+    btnStop.Visible = False
   End Sub
 
   Private Sub Run(ByVal aModifiedScenarioName As String, _
@@ -597,89 +630,97 @@ Public Class frmIterative
                   ByRef aIteration As Integer, _
                   ByRef aStartVariation As Integer, _
                   ByRef aModifiedData As atcDataGroup)
-    Dim pTestPath As String = "c:\test\climate\"
-    Logger.Dbg("Start")
-    ChDriveDir(pTestPath)
-    Logger.Dbg(" CurDir:" & CurDir())
+    If Not pRunning Then
+      UpdateTopLabel("Stopping Run")
+    Else
+      Logger.Dbg("Run")
+      ChDriveDir(PathNameOnly(aBaseWDMFileName))
 
-    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-    Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
-    Dim lArgsMath As New atcDataAttributes
+      Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+      Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
+      Dim lArgsMath As New atcDataAttributes
 
-    Dim lRow As Integer = 0
+      Dim lRow As Integer = 0
 
-    If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
-      UpdateTopLabel(aIteration)
-      Dim lScenarioResults As atcDataSource
-      lScenarioResults = ScenarioRun(aBaseWDMFileName, aModifiedScenarioName, aModifiedData)
+      If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
+        UpdateTopLabel(aIteration)
+        Dim lScenarioResults As atcDataSource
+        TimePerRun = Now.ToOADate
+        lScenarioResults = ScenarioRun(aBaseWDMFileName, aModifiedScenarioName, aModifiedData)
+        TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
 
-      UpdateResults(aIteration, lScenarioResults.DataSets)
+        UpdateResults(aIteration, lScenarioResults.DataSets)
 
-      aIteration += 1
+        aIteration += 1
 
-    Else 'Need to loop through values for next variation
-      Dim lVariation As Variation = aVariations.ItemByIndex(aStartVariation)
-      With lVariation
-        For .CurrentValue = .Min To .Max Step .Increment
-          If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
-          Dim lModifiedTS As atcTimeseries
-          Dim lLocalModifiedTS As New atcDataGroup
-          For Each lOriginalData As atcDataSet In .DataSets
-            lTsMath.DataSets.Clear()
-            lArgsMath.Clear()
-            lArgsMath.SetValue("timeseries", lOriginalData)
-            lArgsMath.SetValue("Number", .CurrentValue)
-            g_DataManager.OpenDataSource(lTsMath, .Operation, lArgsMath)
+      Else 'Need to loop through values for next variation
+        Dim lVariation As Variation = aVariations.ItemByIndex(aStartVariation)
+        With lVariation
+          For .CurrentValue = .Min To .Max Step .Increment
+            If Not pRunning Then
+              UpdateTopLabel("Stopping Run")
+            Else
+              If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
+              Dim lModifiedTS As atcTimeseries
+              Dim lLocalModifiedTS As New atcDataGroup
+              For Each lOriginalData As atcDataSet In .DataSets
+                lTsMath.DataSets.Clear()
+                lArgsMath.Clear()
+                lArgsMath.SetValue("timeseries", lOriginalData)
+                lArgsMath.SetValue("Number", .CurrentValue)
+                g_DataManager.OpenDataSource(lTsMath, .Operation, lArgsMath)
 
-            lModifiedTS = lTsMath.DataSets(0)
-            lLocalModifiedTS.Add(lModifiedTS)
-
-            Select Case .DataSets.ItemByIndex(0).Attributes.GetValue("Constituent").ToString.ToUpper
-              Case "ATMP", "AIRTMP", "AIRTEMP" 'recompute PET when ATMP is changed - TODO: don't hard code ATMP
-                'Dim lAirTmpMean As String = Format(lModifiedTS.Attributes.GetValue("Mean"), "#.00")
-                lModifiedTS = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
+                lModifiedTS = lTsMath.DataSets(0)
                 lLocalModifiedTS.Add(lModifiedTS)
-                'Dim lEvapMean As String = Format(lModifiedTS.Attributes.GetValue("Mean") * 365.25, "#.00")
-                With lModifiedTS.Attributes
-                  .SetValue("Constituent", "PET")
-                  .SetValue("Id", 111)
-                  .SetValue("Scenario", aModifiedScenarioName)
-                End With
-            End Select
 
-            aModifiedData.Add(lLocalModifiedTS)
+                Select Case .DataSets.ItemByIndex(0).Attributes.GetValue("Constituent").ToString.ToUpper
+                  Case "ATMP", "AIRTMP", "AIRTEMP" 'recompute PET when ATMP is changed - TODO: don't hard code ATMP
+                    'Dim lAirTmpMean As String = Format(lModifiedTS.Attributes.GetValue("Mean"), "#.00")
+                    lModifiedTS = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
+                    lLocalModifiedTS.Add(lModifiedTS)
+                    'Dim lEvapMean As String = Format(lModifiedTS.Attributes.GetValue("Mean") * 365.25, "#.00")
+                    With lModifiedTS.Attributes
+                      .SetValue("Constituent", "PET")
+                      .SetValue("Id", 111)
+                      .SetValue("Scenario", aModifiedScenarioName)
+                    End With
+                End Select
 
-            'We have handled a variation, now handle more input variations or to run the model
-            Run(aModifiedScenarioName, _
-                aVariations, _
-                aBaseWDMFileName, _
-                aIteration, _
-                aStartVariation + 1, _
-                aModifiedData)
+                aModifiedData.Add(lLocalModifiedTS)
 
-            aModifiedData.Remove(lLocalModifiedTS)
+                'We have handled a variation, now handle more input variations or to run the model
+                Run(aModifiedScenarioName, _
+                    aVariations, _
+                    aBaseWDMFileName, _
+                    aIteration, _
+                    aStartVariation + 1, _
+                    aModifiedData)
 
-            '  lNewPrec = aBase1.Clone
-            '  For iValue As Integer = 1 To lNewPrec.numValues
-            '    Dim lDate As Date = Date.FromOADate(lNewPrec.Dates.Value(iValue))
-            '    Select Case lDate.Month
-            '      Case 8, 9 : lNewPrec.Value(iValue) *= lCurValue1
-            '    End Select
-            '  Next
-            '  lNewPrec.Attributes.CalculateAll()
-            '  'TODO: REPLACE HARD CODED 10 YEARS WITH ACTUAL SPAN CALC!
-            '  agdResults.Source.CellValue(lRow, 4) = Format(lNewPrec.Attributes.GetValue("Sum") / 10, "#.00")
-            '  'lSummary.Save(g_DataManager, New atcDataGroup(lNewPrec), "DataTree_Precip" & lCurValue1 & ".txt")
+                aModifiedData.Remove(lLocalModifiedTS)
 
-            '  If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
-            '  aModifiedData.Add(lNewPrec)
-            '  lModifiedData.Add(lNewEvap)
-            '  Windows.Forms.Application.DoEvents()
-            'Next
+                '  lNewPrec = aBase1.Clone
+                '  For iValue As Integer = 1 To lNewPrec.numValues
+                '    Dim lDate As Date = Date.FromOADate(lNewPrec.Dates.Value(iValue))
+                '    Select Case lDate.Month
+                '      Case 8, 9 : lNewPrec.Value(iValue) *= lCurValue1
+                '    End Select
+                '  Next
+                '  lNewPrec.Attributes.CalculateAll()
+                '  'TODO: REPLACE HARD CODED 10 YEARS WITH ACTUAL SPAN CALC!
+                '  agdResults.Source.CellValue(lRow, 4) = Format(lNewPrec.Attributes.GetValue("Sum") / 10, "#.00")
+                '  'lSummary.Save(g_DataManager, New atcDataGroup(lNewPrec), "DataTree_Precip" & lCurValue1 & ".txt")
 
+                '  If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
+                '  aModifiedData.Add(lNewPrec)
+                '  lModifiedData.Add(lNewEvap)
+                '  Windows.Forms.Application.DoEvents()
+                'Next
+
+              Next
+            End If
           Next
-        Next
-      End With
+        End With
+      End If
     End If
   End Sub
 
@@ -937,14 +978,56 @@ Public Class frmIterative
     End With
   End Sub
 
-  Private Sub UpdateTopLabel(ByVal aIteration As Integer)
-    UpdateTopLabel("Run # " & aIteration + 1)
-  End Sub
-
   Private Sub UpdateTopLabel(ByVal aText As String)
+    Logger.Dbg(aText)
     lblTop.Text = aText
     lblTop.Refresh()
     Application.DoEvents()
+  End Sub
+
+  Private Sub UpdateTopLabel(ByVal aIteration As Integer)
+    Dim lLabelText As String = "Running # " & aIteration + 1 & " of " & TotalIterations
+    If TimePerRun > 0 Then
+      lLabelText &= " (" & FormatTime(TimePerRun * (TotalIterations - aIteration)) & " remaining)"
+    End If
+    UpdateTopLabel(lLabelText)
+  End Sub
+
+  Private Function FormatTime(ByVal aSeconds As Double) As String
+    Dim lFormat As String = "0"
+    Dim lFormatted As String = ""
+    Dim lDays As Integer = Int(aSeconds / 86400)
+    If lDays > 0 Then 'More than a day left
+      lFormatted &= Format(lDays, lFormat) & ":"
+      aSeconds -= 86400 * lDays
+      lFormat = "00"
+    End If
+    Dim lHours As Integer = Int(aSeconds / 3600)
+    If lHours > 0 OrElse lDays > 0 Then 'More than an hour left
+      lFormatted &= Format(lHours, lFormat) & ":"
+      aSeconds -= 3600 * lHours
+      lFormat = "00"
+    End If
+    'Always include minutes:
+    Dim lMinutes As Integer = Int(aSeconds / 60)
+    lFormatted &= Format(lMinutes, lFormat) & ":"
+    aSeconds -= 60 * lMinutes
+    lFormat = "00"
+    Return lFormatted & Format(aSeconds, lFormat)
+  End Function
+
+  Private Sub UpdateTotalIterations()
+    Dim lLabelText As String
+    TotalIterations = 1
+    'Make a collection of the variations that are selected/checked in lstInputs
+    For Each iVariation As Integer In lstInputs.CheckedIndices
+      TotalIterations *= pInputs.ItemByIndex(iVariation).Iterations
+    Next
+    lLabelText = "Total iterations selected = " & TotalIterations
+    If TimePerRun > 0 Then
+      lLabelText &= " (" & FormatTime(TimePerRun * TotalIterations) & ")"
+    End If
+    UpdateTopLabel(lLabelText)
   End Sub
 
   Private Sub btnInputAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputAdd.Click
@@ -966,6 +1049,7 @@ Public Class frmIterative
 
       pEndpoints.Add(lVariation)
       lstEndpoints.Items.Add(InputArgumentPrefix & lVariation.Name)
+      UpdateTotalIterations()
     End If
   End Sub
 
@@ -980,6 +1064,7 @@ Public Class frmIterative
         pInputs.Insert(lIndex, lVariation)
         lstInputs.Items.RemoveAt(lIndex)
         lstInputs.Items.Insert(lIndex, lVariation.ToString)
+        UpdateTotalIterations()
       End If
     End If
   End Sub
@@ -989,6 +1074,7 @@ Public Class frmIterative
       pInputs.RemoveAt(lIndex)
       lstInputs.Items.RemoveAt(lIndex)
     Next
+    UpdateTotalIterations()
   End Sub
 
   Private Sub btnEndpointAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointAdd.Click
@@ -1048,15 +1134,62 @@ Public Class frmIterative
       .OverwritePrompt = True
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         'write file from grid contents
-        Dim lXML As String = "<Variations>" & vbCrLf
-        For Each lVariation As Variation In pInputs
-          lXML &= lVariation.XML
-        Next
-        lXML &= "</Variations>" & vbCrLf
+        Dim lXML As String = VariationsXML
         SaveFileString(.FileName, lXML)
       End If
     End With
   End Sub
+
+  Public Property VariationsXML() As String
+    Get
+      Dim lXML As String = "<Variations>" & vbCrLf
+      For Each lVariation As Variation In pInputs
+        lXML &= lVariation.XML
+      Next
+      Return lXML & "</Variations>" & vbCrLf
+    End Get
+    Set(ByVal Value As String)
+      Dim lXML As New Chilkat.Xml
+      If lXML.LoadXml(Value) Then
+        If lXML.Tag.ToLower.Equals("variations") Then
+          If lXML.FirstChild2 Then
+            Dim lVariation As Variation
+            pInputs.Clear()
+            lstInputs.Items.Clear()
+            Do
+              lVariation = New Variation
+              lVariation.XML = lXML.GetXml
+              pInputs.Add(lVariation)
+              lstInputs.Items.Add(lVariation.ToString)
+            Loop While lXML.NextSibling2
+
+            'Remove endpoint references to old inputs
+            Dim iEndpoint As Integer = 0
+            While iEndpoint < lstEndpoints.Items.Count
+              If lstEndpoints.Items(iEndpoint).ToString.StartsWith(InputArgumentPrefix) Then
+                lstEndpoints.Items.RemoveAt(iEndpoint)
+                pEndpoints.RemoveAt(iEndpoint)
+              Else
+                iEndpoint += 1
+              End If
+            End While
+
+            'Add endpoint references to new inputs
+            For Each lVariation In pInputs
+              pEndpoints.Add(lVariation)
+              lstEndpoints.Items.Add(InputArgumentPrefix & lVariation.Name)
+            Next
+          End If
+          UpdateTotalIterations()
+        Else
+          Logger.Msg("Variations not found " & vbCrLf & lXML.LastErrorText, "Load Variations")
+        End If
+      Else
+        Logger.Msg("Could not parse variations " & vbCrLf & lXML.LastErrorText, "Load Variations")
+      End If
+
+    End Set
+  End Property
 
   Private Sub mnuLoadVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuLoadVariations.Click
     Dim lOpenDialog As New Windows.Forms.OpenFileDialog
@@ -1067,47 +1200,19 @@ Public Class frmIterative
       .Title = "Scenario Builder - Load Variations"
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         If FileExists(.FileName) Then
-          Dim lXML As New Chilkat.Xml
-          If lXML.LoadXml(WholeFileString(.FileName)) Then
-            If lXML.Tag.ToLower.Equals("variations") Then
-              If lXML.FirstChild2 Then
-                Dim lVariation As Variation
-                pInputs.Clear()
-                lstInputs.Items.Clear()
-                Do
-                  lVariation = New Variation
-                  lVariation.XML = lXML.GetXml
-                  pInputs.Add(lVariation)
-                  lstInputs.Items.Add(lVariation.ToString)
-                Loop While lXML.NextSibling2
-
-                'Remove endpoint references to old inputs
-                Dim iEndpoint As Integer = 0
-                While iEndpoint < lstEndpoints.Items.Count
-                  If lstEndpoints.Items(iEndpoint).ToString.StartsWith(InputArgumentPrefix) Then
-                    lstEndpoints.Items.RemoveAt(iEndpoint)
-                    pEndpoints.RemoveAt(iEndpoint)
-                  Else
-                    iEndpoint += 1
-                  End If
-                End While
-
-                'Add endpoint references to new inputs
-                For Each lVariation In pInputs
-                  pEndpoints.Add(lVariation)
-                  lstEndpoints.Items.Add(InputArgumentPrefix & lVariation.Name)
-                Next
-
-              End If
-            Else
-              Logger.Msg("Variations not found in '" & .FileName & "'" & vbCrLf & lXML.LastErrorText, "Load Variations")
-            End If
-          Else
-            Logger.Msg("Could not parse variations from '" & .FileName & "'" & vbCrLf & lXML.LastErrorText, "Load Variations")
-          End If
+          VariationsXML = WholeFileString(.FileName)
         End If
       End If
     End With
   End Sub
 
+  Private Sub btnStop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStop.Click
+    btnStart.Visible = True
+    btnStop.Visible = False
+    pRunning = False
+  End Sub
+
+  Private Sub lstInputs_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lstInputs.MouseUp
+    UpdateTotalIterations()
+  End Sub
 End Class

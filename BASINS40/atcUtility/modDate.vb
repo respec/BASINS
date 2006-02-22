@@ -176,6 +176,7 @@ Public Module modDate
     '##PARM h - hour portion of MJD
     '##PARM m - minute portion of MJD
     '##PARM s - second portion of MJD
+    '##PARM f - fraction of a second
     Dim t As Double
     '##LOCAL t - intermediate result, units change from hours to seconds
     t = 0.0000004 + ((j Mod 1) * 24)
