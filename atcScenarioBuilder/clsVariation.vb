@@ -3,6 +3,11 @@ Imports MapWinUtility
 
 Public Class Variation
 
+  'Parameters for Hammond - TODO: don't hard code these
+  Private pDegF As Boolean = True
+  Private pLatDeg As Double = 39
+  Private pCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
+
   Private pName As String = "<untitled>"
   Private pDataSets As atcDataGroup
   Private pComputationSource As atcDataSource
@@ -11,6 +16,7 @@ Public Class Variation
   Public Min As Double = Double.NaN
   Public Max As Double = Double.NaN
   Public Increment As Double = Double.NaN
+  Private pIncrementsSinceStart As Integer = 0
   Public CurrentValue As Double = Double.NaN
 
   Public ColorAboveMax As System.Drawing.Color = System.Drawing.Color.OrangeRed
@@ -62,6 +68,53 @@ Public Class Variation
       End Try
     End Get
   End Property
+
+  Public Function StartIteration() As atcDataGroup
+    Me.CurrentValue = Me.Min
+    pIncrementsSinceStart = 0
+    Return VaryData()
+  End Function
+
+  Public Function NextIteration() As atcDataGroup
+    pIncrementsSinceStart += 1
+    If pIncrementsSinceStart < Iterations Then
+      Me.CurrentValue = Me.Min + Me.Increment * pIncrementsSinceStart
+      Return VaryData()
+    Else
+      Return Nothing
+    End If
+  End Function
+
+  Private Function VaryData() As atcDataGroup
+    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+    Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
+    Dim lArgsMath As New atcDataAttributes
+    Dim lModifiedTS As atcTimeseries
+    Dim lModifiedGroup As New atcDataGroup
+    For Each lOriginalData As atcDataSet In DataSets
+      lTsMath.DataSets.Clear()
+      lArgsMath.Clear()
+      lArgsMath.SetValue("timeseries", lOriginalData)
+      lArgsMath.SetValue("Number", CurrentValue)
+      lTsMath.Open(Operation, lArgsMath)
+
+      lModifiedTS = lTsMath.DataSets(0)
+      lModifiedGroup.Add(lModifiedTS)
+
+      Select Case DataSets.ItemByIndex(0).Attributes.GetValue("Constituent").ToString.ToUpper
+        Case "ATMP", "AIRTMP", "AIRTEMP" 'recompute PET when ATMP is changed - TODO: don't hard code ATMP
+          'Dim lAirTmpMean As String = Format(lModifiedTS.Attributes.GetValue("Mean"), "#.00")
+          lModifiedTS = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
+          lModifiedGroup.Add(lModifiedTS)
+          'Dim lEvapMean As String = Format(lModifiedTS.Attributes.GetValue("Mean") * 365.25, "#.00")
+          With lModifiedTS.Attributes
+            .SetValue("Constituent", "PET")
+            .SetValue("Id", 111)
+          End With
+      End Select
+    Next
+    Return lModifiedGroup
+  End Function
 
   Public Function Clone() As Variation
     Dim newVariation As New Variation
