@@ -90,4 +90,14 @@ Public Class atcSeasonsYearSubset
     Next
     Return lSplit
   End Function
+
+  Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
+    Select Case aIndex
+      Case Is < 0 : Return Nothing
+      Case 0 : Return "Outside"
+      Case 1 : Return "Inside"
+      Case Else : Return Nothing
+    End Select
+  End Function
+
 End Class

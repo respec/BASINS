@@ -8,6 +8,11 @@ Public Class atcSeasonsMonth
   End Function
 
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
-    Return pMonthName(aIndex)
+    Select Case aIndex
+      Case Is < 1 : Return Nothing
+      Case Is < 13 : Return pMonthName(aIndex)
+      Case Else : Return Nothing
+    End Select
   End Function
+
 End Class

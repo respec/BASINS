@@ -8,6 +8,10 @@ Public Class atcSeasonsDayOfWeek
   End Function
 
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
-    Return pDayName(aIndex)
+    Select Case aIndex
+      Case Is < 0 : Return Nothing
+      Case Is < 7 : Return pDayName(aIndex)
+      Case Else : Return Nothing
+    End Select
   End Function
 End Class

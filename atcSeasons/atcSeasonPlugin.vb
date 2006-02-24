@@ -101,6 +101,20 @@ Public Class atcSeasonPlugin
     Return Name.Substring(23) 'Skip first part of Name which is "Timeseries::Seasonal - "
   End Function
 
+  Public Shared ReadOnly Property AllSeasonTypes() As atcCollection
+    Get
+      Dim lAllTypes As New atcCollection
+      Dim a As [Assembly] = Reflection.Assembly.GetExecutingAssembly
+      Dim lassyTypes As Type() = a.GetTypes()
+      For Each typ As Type In lassyTypes
+        If typ.Name.StartsWith("atcSeasons") Then
+          lAllTypes.Add(typ)
+        End If
+      Next
+      Return lAllTypes
+    End Get
+  End Property
+
   Public Overloads ReadOnly Property AvailableOperations(ByVal aIncludeSplits As Boolean, _
                                                          ByVal aIncludeSeasonalAttributes As Boolean) As atcDataAttributes
     Get
@@ -118,44 +132,39 @@ Public Class atcSeasonPlugin
           .TypeString = "atcTimeseries"
         End With
 
-        Dim a As [Assembly] = Reflection.Assembly.GetExecutingAssembly
-        Dim lassyTypes As Type() = a.GetTypes()
-        For Each typ As Type In lassyTypes
-          If typ.Name.StartsWith("atcSeasons") Then
+        For Each typ As Type In AllSeasonTypes
+          If aIncludeSeasonalAttributes Then
+            Dim lSeasonalAttributes As New atcAttributeDefinition
+            With lSeasonalAttributes
+              .Name = SeasonClassNameToLabel(typ.Name) & "::SeasonalAttributes"
+              .Category = "Attributes"
+              .Description = "Attribute values calculated per season"
+              .Editable = False
+              .TypeString = "atcDataAttributes"
+              .Calculator = Me
+            End With
+            lArguments = New atcDataAttributes
+            lArguments.SetValue(defTimeSeriesOne, Nothing)
+            lArguments.SetValue("Attributes", Nothing)
 
-            If aIncludeSeasonalAttributes Then
-              Dim lSeasonalAttributes As New atcAttributeDefinition
-              With lSeasonalAttributes
-                .Name = SeasonClassNameToLabel(typ.Name) & "::SeasonalAttributes"
-                .Category = "Attributes"
-                .Description = "Attribute values calculated per season"
-                .Editable = False
-                .TypeString = "atcDataAttributes"
-                .Calculator = Me
-              End With
-              lArguments = New atcDataAttributes
-              lArguments.SetValue(defTimeSeriesOne, Nothing)
-              lArguments.SetValue("Attributes", Nothing)
+            lOperations.SetValue(lSeasonalAttributes, Nothing, lArguments)
+          End If
 
-              lOperations.SetValue(lSeasonalAttributes, Nothing, lArguments)
-            End If
+          If aIncludeSplits Then
+            Dim lSeasonalSplit As New atcAttributeDefinition
+            With lSeasonalSplit
+              .Name = SeasonClassNameToLabel(typ.Name) & "::Split"
+              .Category = "Split"
+              .Description = "Split a timeseries by season"
+              .Editable = False
+              .TypeString = "atcDataGroup"
+              .Calculator = Me
+            End With
 
-            If aIncludeSplits Then
-              Dim lSeasonalSplit As New atcAttributeDefinition
-              With lSeasonalSplit
-                .Name = SeasonClassNameToLabel(typ.Name) & "::Split"
-                .Category = "Split"
-                .Description = "Split a timeseries by season"
-                .Editable = False
-                .TypeString = "atcDataGroup"
-                .Calculator = Me
-              End With
+            lArguments = New atcDataAttributes
+            lArguments.SetValue(defTimeSeriesOne, Nothing)
 
-              lArguments = New atcDataAttributes
-              lArguments.SetValue(defTimeSeriesOne, Nothing)
-
-              lOperations.SetValue(lSeasonalSplit, Nothing, lArguments)
-            End If
+            lOperations.SetValue(lSeasonalSplit, Nothing, lArguments)
           End If
         Next
 
@@ -168,7 +177,7 @@ Public Class atcSeasonPlugin
     End Get
   End Property
 
-  Private Function SeasonClassNameToLabel(ByVal aName As String) As String
+  Public Shared Function SeasonClassNameToLabel(ByVal aName As String) As String
     If aName.StartsWith("atc") Then
       Dim lCamelCase As String = aName.Substring(10)
       If lCamelCase.Equals("AMorPM") Then
