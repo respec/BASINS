@@ -10,6 +10,10 @@ Public Class atcSeasonsAMorPM
   End Function
 
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
-    If aIndex = 0 Then Return "AM" Else Return "PM"
+    Select Case aIndex
+      Case 0 : Return "AM"
+      Case 1 : Return "PM"
+      Case Else : Return Nothing
+    End Select
   End Function
 End Class

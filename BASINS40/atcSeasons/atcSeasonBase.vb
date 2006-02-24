@@ -5,6 +5,7 @@ Imports MapWinUtility
 Public Class atcSeasonBase
 
   Private pAvailableOperations As atcDataAttributes ' atcDataGroup
+  Private pSeasonsSelected As New BitArray(0)
 
   Public ReadOnly Property Name() As String
     Get
@@ -118,15 +119,60 @@ Public Class atcSeasonBase
     Next
   End Sub
 
+  'Seasons that have been selected are set to True
+  Public Overridable Property SeasonSelected(ByVal aSeasonIndex) As Boolean
+    Get
+      If aSeasonIndex >= 0 AndAlso aSeasonIndex < pSeasonsSelected.Count Then
+        Return pSeasonsSelected(aSeasonIndex)
+      Else
+        Return False
+      End If
+    End Get
+    Set(ByVal newValue As Boolean)
+      If pSeasonsSelected.Length < aSeasonIndex + 1 Then
+        pSeasonsSelected.Length = aSeasonIndex + 1
+      End If
+      pSeasonsSelected(aSeasonIndex) = newValue
+    End Set
+  End Property
+
+  Public Overridable Property SeasonsSelectedXML() As String
+    Get
+      Dim lXML As String = ""
+      Dim lastSeason As Integer = pSeasonsSelected.Count - 1
+      For lSeasonIndex As Integer = 0 To lastSeason
+        If pSeasonsSelected(lSeasonIndex) Then
+          lXML &= "  <Selected Name='" & SeasonName(lSeasonIndex) & "'>" & lSeasonIndex & "</Selected>" & vbCrLf
+        End If
+      Next
+      If lXML.Length > 0 Then lXML = "<SeasonsSelected>" & lXML & "</SeasonsSelected>" & vbCrLf
+      Return lXML
+    End Get
+    Set(ByVal newValue As String)
+      Try
+        pSeasonsSelected.SetAll(False)
+        Dim lNextSelected As Integer = newValue.IndexOf("<Selected")
+        While lNextSelected > -1
+          lNextSelected = newValue.IndexOf(">", lNextSelected + 10) + 1
+          Dim lEndSelected As Integer = newValue.IndexOf("</Selected>", lNextSelected)
+          SeasonSelected(CInt(newValue.Substring(lNextSelected, lEndSelected - lNextSelected))) = True
+          lNextSelected = newValue.IndexOf("<Selected", lNextSelected)
+        End While
+      Catch ex As Exception
+        Logger.Dbg("Unable to read SeasonsSelectedXML" & vbCrLf & newValue)
+      End Try
+    End Set
+  End Property
+
   Public Overridable Function SeasonIndex(ByVal aDate As Double) As Integer
     Return -1
   End Function
 
-  Public Overridable Function SeasonName(ByVal aDate As Double) As String
+  Public Overridable Overloads Function SeasonName(ByVal aDate As Double) As String
     Return SeasonName(SeasonIndex(aDate))
   End Function
 
-  Public Overridable Function SeasonName(ByVal aIndex As Integer) As String
+  Public Overridable Overloads Function SeasonName(ByVal aIndex As Integer) As String
     Return CStr(aIndex)
   End Function
 

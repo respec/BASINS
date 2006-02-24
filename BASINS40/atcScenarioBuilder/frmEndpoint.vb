@@ -346,12 +346,6 @@ Public Class frmEndpoint
       txtDefaultColor.Text = .ColorDefault.Name
     End With
 
-    'pSeasonsAvailable = pSeasonalPlugin.AvailableOperations(True, False)
-    'cboSeasons.Items.Add("No seasons")
-    'For Each lSeason As atcDefinedValue In pSeasonsAvailable
-    '  cboSeasons.Items.Add(lSeason.Definition.Name.Substring(0, lSeason.Definition.Name.IndexOf("::")))
-    'Next
-
     Me.ShowDialog()
 
     Return pVariation

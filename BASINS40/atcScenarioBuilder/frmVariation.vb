@@ -1,12 +1,14 @@
 Imports atcData
+Imports atcSeasons
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmVariation
   Inherits System.Windows.Forms.Form
 
   Private pVariation As Variation
-  Private pSeasonalPlugin As New atcSeasons.atcSeasonPlugin
-  Private pSeasonsAvailable As atcDataAttributes
+  Private pSeasonsAvailable As New atcCollection
+  Private pSeasons As atcSeasonBase
 
 #Region " Windows Form Designer generated code "
 
@@ -188,7 +190,7 @@ Public Class frmVariation
     Me.grpSeasons.Size = New System.Drawing.Size(179, 188)
     Me.grpSeasons.TabIndex = 39
     Me.grpSeasons.TabStop = False
-    Me.grpSeasons.Text = "Seasons"
+    Me.grpSeasons.Text = "Vary Seasonally"
     '
     'cboSeasons
     '
@@ -312,10 +314,18 @@ Public Class frmVariation
       UpdateDataText(txtVaryData, pVariation.DataSets)
     End With
 
-    pSeasonsAvailable = pSeasonalPlugin.AvailableOperations(True, False)
-    cboSeasons.Items.Add("No seasons")
-    For Each lSeason As atcDefinedValue In pSeasonsAvailable
-      cboSeasons.Items.Add(lSeason.Definition.Name.Substring(0, lSeason.Definition.Name.IndexOf("::")))
+    cboSeasons.Items.Add("All Seasons")
+    cboSeasons.SelectedIndex = 0
+    pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
+    For Each lSeasonType As Type In pSeasonsAvailable
+      Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
+      Select Case lSeasonTypeShortName 'TODO: handle difficult seasons
+        Case "Calendar Year"
+        Case "Water Year"
+        Case "Year Subset"
+        Case Else
+          cboSeasons.Items.Add(lSeasonTypeShortName)
+      End Select
     Next
 
     Me.ShowDialog()
@@ -351,22 +361,33 @@ Public Class frmVariation
   End Sub
 
   Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
-    'lstSeasons.Items.Clear()
-    'Dim lSeasonSource As atcSeasons.atcSeasonBase = CurrentSeason()
-    'If Not lSeasonSource Is Nothing Then
-    '  Dim lSeasonName As String = SeasonIndex lSeasonalAttribute.Arguments.GetValue("SeasonName") 'Definition.Name
-    '    If Not lstSeasons.Items.Contains(lSeasonName) Then
-    '      lstSeasons.Items.Add(lSeasonName)
-    '      lstSeasons.SetSelected(lstSeasons.Items.Count - 1, True)
-    '    End If
-    '  Next
-    'End If
+    pSeasons = Nothing
+    lstSeasons.Items.Clear()
+    Try
+      Dim lSeasonType As Type = SelectedSeasonType()
+      pSeasons = lSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+      If pSeasons.SeasonName(1990) Is Nothing Then
+        For lSeasonIndex As Integer = 0 To 357
+          Dim lSeasonName As String = pSeasons.SeasonName(lSeasonIndex)
+          If lSeasonName Is Nothing Then
+            If lSeasonIndex > 0 Then Exit For
+          Else
+            lstSeasons.Items.Add(lSeasonName)
+            lstSeasons.SetSelected(lstSeasons.Items.Count - 1, True)
+          End If
+        Next
+        lstSeasons.TopIndex = 0
+      End If
+    Catch ex As Exception
+      Logger.Dbg("Could not populate season list:" & ex.ToString)
+    End Try
   End Sub
 
-  Private Function CurrentSeason() As atcDataSource
-    For Each lSeason As atcDefinedValue In pSeasonsAvailable
-      If lSeason.Definition.Name.Equals(cboSeasons.Text & "::SeasonalAttributes") Then
-        Return lSeason.Definition.Calculator
+  Private Function SelectedSeasonType() As Type
+    Dim lSeasonPlugin As New atcSeasonPlugin
+    For Each lSeasonType As Type In pSeasonsAvailable
+      If atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name).Equals(cboSeasons.Text) Then
+        Return lSeasonType
       End If
     Next
     Return Nothing
@@ -382,6 +403,22 @@ Public Class frmVariation
       With pVariation
         .Name = txtName.Text
         .Operation = txtFunction.Text
+        .Seasons = pSeasons
+        If Not pSeasons Is Nothing Then
+          Dim lstIndex As Integer = 0
+          For lSeasonIndex As Integer = 0 To 357
+            Dim lSeasonName As String = pSeasons.SeasonName(lSeasonIndex)
+            If lSeasonName Is Nothing Then
+              If lSeasonIndex > 0 Then Exit For
+            Else
+              If lstSeasons.SelectedIndices.Contains(lstIndex) Then
+                pSeasons.SeasonSelected(lSeasonIndex) = True
+              End If
+              lstIndex += 1
+            End If
+          Next
+        End If
+
         Try
           .Min = CDbl(txtMin.Text)
         Catch

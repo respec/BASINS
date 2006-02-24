@@ -560,7 +560,7 @@ Public Class frmIterative
   'all the endpoints listed in the Endpoints tab
   Private pEndpoints As atcCollection
 
-  Private InputArgumentPrefix As String = "Current Value for "
+  Private InputArgumentPrefix As String = "Current Modifier for "
   Private ResultsTabIndex As Integer = 2
   Private TotalIterations As Integer = 0
   Private TimePerRun As Double = 0 'Time each run takes in seconds
@@ -622,8 +622,13 @@ Public Class frmIterative
       .ColorCells = True
       For lIndex As Integer = 0 To pEndpoints.Count - 1
         Dim lEndpoint As Variation = pEndpoints.ItemByIndex(lIndex)
-        .CellValue(0, lIndex + 1) = lEndpoint.Name
+        If lEndpoint.Operation Is Nothing Then
+          .CellValue(0, lIndex + 1) = lEndpoint.Name
+        Else
+          .CellValue(0, lIndex + 1) = lEndpoint.Name & " " & lEndpoint.Operation
+        End If
         .CellColor(0, lIndex + 1) = Drawing.SystemColors.Control
+
       Next
     End With
     agdResults.Initialize(agdResults.Source)
@@ -797,12 +802,14 @@ Public Class frmIterative
     Dim lMatch As Boolean
     For lrow As Integer = 1 To lRows
       Dim lValue As String = aSource.CellValue(lrow, aColumn)
-      lMatch = False
-      For Each lCheckValue In lValues
-        If lCheckValue.Equals(lValue) Then lMatch = True : Exit For
-      Next
-      If Not lMatch Then
-        lValues.Add(lValue)
+      If Not lValue Is Nothing Then
+        lMatch = False
+        For Each lCheckValue In lValues
+          If lCheckValue.Equals(lValue) Then lMatch = True : Exit For
+        Next
+        If Not lMatch Then
+          lValues.Add(lValue)
+        End If
       End If
     Next
     Return lValues

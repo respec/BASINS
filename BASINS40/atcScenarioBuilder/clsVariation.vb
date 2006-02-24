@@ -13,6 +13,7 @@ Public Class Variation
   Private pComputationSource As atcDataSource
   Private pOperation As String = ""
   'TODO: make rest of public variables into peoperties
+  Public Seasons As atcSeasons.atcSeasonBase
   Public Min As Double = Double.NaN
   Public Max As Double = Double.NaN
   Public Increment As Double = Double.NaN
@@ -92,13 +93,32 @@ Public Class Variation
     Dim lModifiedTS As atcTimeseries
     Dim lModifiedGroup As New atcDataGroup
     For Each lOriginalData As atcDataSet In DataSets
-      lTsMath.DataSets.Clear()
-      lArgsMath.Clear()
-      lArgsMath.SetValue("timeseries", lOriginalData)
-      lArgsMath.SetValue("Number", CurrentValue)
-      lTsMath.Open(Operation, lArgsMath)
+      If Seasons Is Nothing Then
+        lTsMath.DataSets.Clear()
+        lArgsMath.Clear()
+        lArgsMath.SetValue("timeseries", lOriginalData)
+        lArgsMath.SetValue("Number", CurrentValue)
+        lTsMath.Open(Operation, lArgsMath)
+        lModifiedTS = lTsMath.DataSets(0)
+      Else
+        Dim lSplitData As atcDataGroup = Seasons.Split(lOriginalData, Nothing)
+        Dim lModifiedSplit As New atcDataGroup
+        For Each lSplitTS As atcTimeseries In lSplitData
+          If Seasons.SeasonSelected(lSplitTS.Attributes.GetValue("SeasonIndex")) Then
+            'modify data from this season
+            lTsMath.DataSets.Clear()
+            lArgsMath.Clear()
+            lArgsMath.SetValue("timeseries", lSplitTS)
+            lArgsMath.SetValue("Number", CurrentValue)
+            lTsMath.Open(Operation, lArgsMath)
+            lModifiedSplit.Add(lTsMath.DataSets(0))
+          Else 'Add unmodified data from this season that was not selected
+            lModifiedSplit.Add(lSplitTS)
+          End If
+        Next
+        lModifiedTS = MergeTimeseries(lModifiedSplit)
+      End If
 
-      lModifiedTS = lTsMath.DataSets(0)
       lModifiedGroup.Add(lModifiedTS)
 
       Select Case DataSets.ItemByIndex(0).Attributes.GetValue("Constituent").ToString.ToUpper

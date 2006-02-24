@@ -22,6 +22,10 @@ Public Class atcSeasonsTraditional
   End Function
 
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
-    Return pSeasonName(aIndex)
+    Select Case aIndex
+      Case Is < 0 : Return Nothing
+      Case Is < 4 : Return pSeasonName(aIndex)
+      Case Else : Return Nothing
+    End Select
   End Function
 End Class
