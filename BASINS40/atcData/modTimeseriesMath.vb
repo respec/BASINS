@@ -390,6 +390,8 @@ Public Module modTimeseriesMath
       Dim lNewTSer As New atcTimeseries(aDataSource)
       lNewTSer.Dates = New atcTimeseries(aDataSource)
       CopyBaseAttributes(aTimeseries, lNewTSer)
+      lNewTSer.Attributes.SetValue("TU", aTU)
+      lNewTSer.Attributes.SetValue("TS", aTS)
       lNewTSer.Attributes.SetValue("point", False)
       If aTimeseries.ValueAttributesExist Then 'TODO:: Something with value attributes
       End If

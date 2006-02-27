@@ -193,4 +193,6 @@ Public Class atcCligen
   Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
     Dim lAvlOps As atcDataAttributes = AvailableOperations()
   End Sub
+
+
 End Class
