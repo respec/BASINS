@@ -630,6 +630,78 @@ Public Module modMetCompute
 
   End Function
 
+  Public Function DisDewPoint(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aAirTemp As atcTimeseries) As atcTimeseries
+    'disaggregate daily Dewpoint Temp to hourly, adjust using min temp as needed
+    'aInTs   - input timeseries to be disaggregated
+    'aMinTemp - hourly min temp timeseries to make sure disaggregated Dewpoint doesn't exceed
+
+    Dim lAirPos As Integer
+    Dim lDewPos As Integer
+    Dim lDisTs As atcTimeseries = Aggregate(aInTs, modDate.atcTimeUnit.TUHour, 1, modDate.atcTran.TranAverSame, aDataSource)
+
+    lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lDisTs.Attributes.SetValue("Constituent", "DEWP")
+    lDisTs.Attributes.SetValue("TSTYPE", "DEWP")
+    lDisTs.Attributes.SetValue("Description", "Hourly Dewpoint Temp disaggregated from Daily")
+    lDisTs.Attributes.AddHistory("Disaggregated Dewpoint - inputs: DDPT, ATMP")
+    lDisTs.Attributes.Add("DDPT", aInTs.ToString)
+    lDisTs.Attributes.Add("ATMP", aAirTemp.ToString)
+
+    If aAirTemp.Attributes.GetValue("TU") = modDate.atcTimeUnit.TUHour Then
+      'check air temp values to make sure dewpoint doesn't exceed it
+      Dim lAirSJD As Double = aAirTemp.Dates.Value(1)
+      Dim lAirEJD As Double = aAirTemp.Dates.Value(lDisTs.numValues)
+      Dim lDewSJD As Double = lDisTs.Dates.Value(1)
+      Dim lDewEJD As Double = lDisTs.Dates.Value(lDisTs.numValues)
+      If lAirEJD < lDewSJD Or lAirSJD > lDewEJD Then 'no overlap
+        Logger.Dbg("WARNING: Temperature Timeseries period does not overlap Dewpoint Timeseries period." & vbCrLf & _
+                   "The Dewpoint data have been disaggregated, but not checked" & vbCrLf & _
+                   "to see that they don't fall below the current temperature." & vbCrLf & _
+                   "Julian Start/End of Temperature: " & lAirSJD & " : " & lAirEJD & vbCrLf & _
+                   "Julian Start/End of Dewpoint: " & lDewSJD & " : " & lDewEJD)
+      Else
+        If lAirSJD <= lDewSJD Then 'move up in airtemp TSer
+          If lAirEJD > lDewSJD Then 'the two timeseries overlap beginning at start of dewpoint
+            lAirPos = (lDewSJD - lAirSJD) / JulianHour
+            lDewPos = 1
+          End If
+          If lAirEJD < lDewEJD Then 'not a full overlap
+            Logger.Dbg("WARNING: Temperature Timeseries period does not completely overlap Dewpoint Timeseries period." & vbCrLf & _
+                       "The Dewpoint data have been disaggregated, but portions have not been" & vbCrLf & _
+                       "checked to see that they don't fall below the current temperature." & vbCrLf & _
+                       "Julian Start/End of Temperature: " & lAirSJD & " : " & lAirEJD & vbCrLf & _
+                       "Julian Start/End of Dewpoint: " & lDewSJD & " : " & lDewEJD)
+          End If
+        ElseIf lAirSJD < lDewEJD Then 'overlap begins at start of airtemp, not a full overlap
+          lAirPos = 0
+          lDewPos = (lAirSJD - lDewSJD) / JulianHour + 1
+          Logger.Dbg("WARNING: Temperature Timeseries period does not completely overlap Dewpoint Timeseries period." & vbCrLf & _
+                     "The Dewpoint data have been disaggregated, but portions have not been" & vbCrLf & _
+                     "checked to see that they don't fall below the current temperature." & vbCrLf & _
+                     "Julian Start/End of Temperature: " & lAirSJD & " : " & lAirEJD & vbCrLf & _
+                     "Julian Start/End of Dewpoint: " & lDewSJD & " : " & lDewEJD)
+        End If
+        For i As Integer = lDewPos To lDisTs.numValues
+          lAirPos += 1
+          If lAirPos <= aAirTemp.numValues Then
+            If lDisTs.Value(i) > aAirTemp.Value(lAirPos) Then
+              lDisTs.Value(i) = aAirTemp.Value(i)
+            End If
+          Else
+            Exit For
+          End If
+        Next i
+      End If
+    Else
+      Logger.Dbg("WARNING: Temperature Timeseries for Dewpoint Disaggregation is not Hourly." & vbCrLf & _
+                 "The Dewpoint data have been disaggregated, but not checked" & vbCrLf & _
+                 "to see that they don't fall below the current temperature." & vbCrLf & _
+                 "Temperature Time Units should be '3', but are " & aAirTemp.Attributes.GetValue("TU"))
+    End If
+    Return lDisTs
+
+  End Function
+
   Private Function DisaggDates(ByVal aInTS As atcTimeseries, ByVal aDataSource As atcDataSource) As atcTimeseries
     'build new date array for hourly TSer based on daily TSer (aInTS)
     Dim lHrInc As Double = 1 / 24
@@ -1634,7 +1706,7 @@ OuttaHere:
 
   End Sub
 
-  Public Function DisCliGenPrecip(ByVal aDPrecTSer As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aDurTSer As atcTimeseries, ByVal aTimePkTSer As atcTimeseries, ByVal aPeakTSer As atcTimeseries) As atcTimeseries
+  Public Function DisCliGenPrecip(ByVal aDPrecTSer As atcTimeseries, ByVal aDurTSer As atcTimeseries, ByVal aTimePkTSer As atcTimeseries, ByVal aPeakTSer As atcTimeseries, Optional ByVal aDataSource As atcDataSource = Nothing) As atcTimeseries
     'aDPrecTSer - daily time series being disaggregated
     'aDurTSer - storm duration timeseries (hrs)
     'aTimePkTSer - time to peak timeseries (fraction of duration)
@@ -1652,6 +1724,8 @@ OuttaHere:
     Dim lPostSlope As Double
     Dim lPrevTotal As Double
     Dim lCurrTotal As Double
+    Dim lHrDay(23) As Double
+    Dim i As Integer
 
     CopyBaseAttributes(aDPrecTSer, lDisTs)
     lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
@@ -1676,23 +1750,265 @@ OuttaHere:
         lHrVals(lHrInd) = 0
       Next lHrInd
       If aDPrecTSer.Value(lDyInd) > 0 Then 'something to disaggregate
-        lEventDur = CInt(aDurTSer.Value(lDyInd) + 0.4999) 'always round up to next whole hour
-        lEventPkTime = aTimePkTSer.Value(lDyInd) * aDurTSer.Value(lDyInd)
-        lEventMaxVal = (aDPrecTSer.Value(lDyInd) / aDurTSer.Value(lDyInd)) * aPeakTSer.Value(lDyInd)
-        lPreSlope = lEventMaxVal / lEventPkTime
-
-        lEventStart = 13 - lEventDur / 2
-        lPrevTotal = 0
-        For lEventInd = 1 To Fix(lEventPkTime) 'on ascending slope of triangle
-          lHrInd = lHrPos + lEventStart + lEventInd
-          lCurrTotal = 0.5 * lEventInd * (lEventInd * lPreSlope)
-          lHrVals(lHrInd) = lCurrTotal - lPrevTotal
-          lPrevTotal = lCurrTotal
+        lHrDay = DisCliGenPrecDay(aDPrecTSer.Value(lDyInd), aDurTSer.Value(lDyInd), aTimePkTSer.Value(lDyInd), aPeakTSer.Value(lDyInd))
+        If Math.Abs(lHrDay(0) - aDPrecTSer.Value(lDyInd)) > 0.0001 Then
+          Logger.Dbg("Daily CliGen precip value not properly disaggregated." & vbCrLf & _
+                     "Daily value: " & aDPrecTSer.Value(lDyInd) & vbCrLf & _
+                     "Sum of Hourly values: " & lHrDay(0))
+        End If
+        lEventDur = Int(aDurTSer.Value(lDyInd)) + 1
+        lEventStart = 12 - lEventDur / 2
+        For i = 1 To lEventDur
+          lHrInd = lHrPos + lEventStart + i
+          lHrVals(lHrInd) = lHrDay(i)
         Next
-
       End If
       lHrPos = lHrPos + 24
     Next
+    lDisTs.Values = lHrVals
+    Return lDisTs
   End Function
 
+  'DisagCliGenPrec uses double exponential function to disaggregate
+  'CliGen daily precip data (precip, duration, time to peak, peak intensity)
+  'into hourly values - assumes 1 storm per day
+  'borrowed from WEPP code
+  'Note: Sum of distributed hourly values is placed in 0th position of returning array
+  Public Function DisCliGenPrecDay(ByVal aPrec As Double, ByVal aDur As Double, _
+                                   ByVal aPkTime As Double, ByVal aPkIntensity As Double) As Double()
+    Dim lNInt As Integer = 11
+    Dim lDeltFq As Double = 1 / (lNInt - 1)
+    Dim lFq As Double
+    Dim lTimeDl(20) As Double
+    Dim lIntDl(20) As Double
+    Dim lIntPrcp(20) As Double
+    Dim lLoopFg As Integer
+    Dim lInt As Integer
+    Dim lFirstTime As Double
+    Dim lSecTime As Double
+    Dim lDurSeconds As Double = aDur * 3600
+    Dim lHrVals(24) As Double
+    Dim lHrInd As Integer
+    Dim lNumHrs As Integer
+    Dim lCurTime As Double
+    Dim lCurSpan As Double
+    Dim lSTime As Double
+    Dim lETime As Double
+    Dim lNextHr As Integer
+
+    If aPkIntensity < 1 Then aPkIntensity = 1
+    If aPkTime > 1 Or aPkIntensity = 1 Then
+      aPkTime = 1
+    ElseIf aPkTime < 0 Then
+      aPkTime = 0.01
+    End If
+    Do
+      lLoopFg = 0
+      If aPkTime >= 1 And aPkIntensity <= 1 Then
+        ConstInt(lNInt, lDeltFq, lTimeDl, lIntDl)
+      Else
+        DblEx(aPkIntensity, aPkTime, lNInt, lDeltFq, lTimeDl, lIntDl)
+      End If
+      lFirstTime = lTimeDl(1) * lDurSeconds
+      lInt = 1
+      Do
+        lInt += 1
+        lSecTime = lTimeDl(lInt) * lDurSeconds
+        If lSecTime - lFirstTime < 300 Then
+          'Time step is less than 5 minutes.  Decrease the number
+          'of dimensionless steps and try again.
+          lNInt -= 1
+          If lNInt < 2 Then
+            'Disaggregated rainfall distribution is set to
+            'constant intensity with 2 time steps.
+            lTimeDl(2) = 1
+            lIntDl(1) = 1
+            lIntDl(2) = 1
+            lNInt = 2
+          Else 'Re-initialize for decreased step.
+            lDeltFq = 1.0 / (lNInt - 1)
+            lFq = 0.0
+            lTimeDl(1) = 0.0
+            lIntDl(lNInt) = 0.0
+            lLoopFg = 2
+          End If
+        Else
+          lFirstTime = lSecTime
+        End If
+
+      Loop While (lInt < lNInt And lLoopFg = 0)
+    Loop While lLoopFg = 2
+    lIntDl(lNInt) = 0 'last intensity value is always 0
+    'calculate actual time and intensity values
+    For lInt = 1 To lNInt
+      lTimeDl(lInt) = lTimeDl(lInt) * aDur 'calculate time in hours
+      lIntDl(lInt) = lIntDl(lInt) * aPrec / aDur 'intensity in mm/hr
+      If lInt > 1 Then 'calculate total precip for this interval
+        lSTime = lTimeDl(lInt - 1)
+        lETime = lTimeDl(lInt)
+        lCurSpan = lETime - lSTime
+        lIntPrcp(lInt - 1) = (lTimeDl(lInt) - lTimeDl(lInt - 1)) * lIntDl(lInt - 1)
+        'distribute precip to hourly intervals
+        lCurTime = lSTime
+        While lCurTime < lETime
+          lNextHr = Int(lCurTime) + 1
+          If lNextHr < lETime Then
+            lHrVals(lNextHr) += ((lNextHr - lCurTime) / lCurSpan) * lIntPrcp(lInt - 1)
+            lCurTime = lNextHr
+          Else
+            lHrVals(lNextHr) += ((lETime - lCurTime) / lCurSpan) * lIntPrcp(lInt - 1)
+            lCurTime = lETime
+          End If
+        End While
+      End If
+    Next
+    'put sum of distributed values in 0th position for QA check
+    For lInt = 1 To 24
+      lHrVals(0) += lHrVals(lInt)
+    Next
+    Return lHrVals
+  End Function
+
+  Private Sub ConstInt(ByVal aNint As Integer, ByVal aDeltFq As Double, _
+                       ByRef aTimeDl() As Double, ByRef aIntDl() As Double)
+    Dim lFqx As Double '- temporarily holds DELTFQ*I.
+    Dim i As Integer
+
+    lFqx = 0.0
+
+    For i = 1 To aNint - 1
+      lFqx += aDeltFq
+      aTimeDl(i + 1) = lFqx
+      aIntDl(i) = 1.0
+    Next
+
+  End Sub
+  Private Sub DblEx(ByVal aPkIntensity As Double, ByVal aPkTime As Double, _
+                    ByVal aNInt As Integer, ByVal aDeltFq As Double, _
+                    ByRef aTimeDl As Double(), ByRef aIntDl As Double())
+    Dim lErr As Integer '0 - equation solved; 1 - no solution for given A
+    Dim i As Integer
+    Dim i1 As Integer
+    Dim lA As Double 'constant in the equation: 1 - exp(-U) = A*U. (in this routine, A = 1/Ip.)
+    Dim lU As Double
+    Dim lB As Double 'coefficient in double exponential
+    Dim lD As Double 'coefficient in double exponential
+    Dim lFqx As Double 'for idntermediate calcs. Starts with the value of 0.
+
+    'Check to make sure Peak Intensity is in range so machine can make the
+    'calculations without a machine overflow, make sure Peak Intensity <= 60.0
+    If aPkIntensity > 60 Then aPkIntensity = 60
+    If aPkTime > 0.99 Then aPkTime = 0.99
+
+    'Newton's method for B and then A in i(t)=a*exp(b*t)
+    EqRoot(1.0 / aPkIntensity, lErr, lU)
+    lB = lU / aPkTime
+    lA = aPkIntensity * Math.Exp(-lU)
+    'The formulas for dissagregation give u=btp=d(1-tp).
+    lD = lU / (1 - aPkTime)
+    'aTimeDl(1) and aIntDl(aNint) are initialized in DISAG.
+    aTimeDl(aNInt) = 1.0
+    lFqx = 0.0
+    For i = 1 To aNInt - 1
+      i1 = i + 1
+      If i < aNInt - 1 Then
+        lFqx = lFqx + aDeltFq
+        If lFqx < aPkTime Then
+          aTimeDl(i1) = (1.0 / lB) * Math.Log(1.0 + (lB / lA) * lFqx)
+        Else
+          aTimeDl(i1) = aPkTime - (1.0 / lD) * Math.Log(1.0 - (lD / aPkIntensity) * (lFqx - aPkTime))
+        End If
+      End If
+      aIntDl(i) = aDeltFq / (aTimeDl(i1) - aTimeDl(i))
+    Next
+  End Sub
+
+  'EqRoot Solves the following equation for U: 1 - exp(-u) = a*u, for
+  'positive values of A less than 1, and positive values of U.
+  '(If A=1, U=0).  Newton's method is used, with special
+  'approximations for small values of A (A <= 0.06),  and large
+  'values of A (A >= 0.999).
+  Private Sub EqRoot(ByVal aA As Double, ByVal aErr As Double, ByRef aEqrt As Double)
+    'aA    - constant A in the equation:  1 - exp(-u) = a*u.
+    '        (In this routine, A = 1/ip.)
+    'aErr  - flag. 0: equation solved.
+    '              1: no solution for given A.
+    'aEqrt - solution returned for U in the equation:
+    '        1 - exp(-u) = a*u.
+
+    Dim lD As Double ' - A - F
+    Dim lE As Double ' - exp(-U)
+    Dim lF As Double ' - (1 - E) / U
+    Dim lR As Double ' - A / TMPVR1
+    Dim lS As Double ' - abs(D / A) Or abs(D / TMPVR1)
+    Dim lU As Double ' - See definition of A
+    Dim lTmpVr1 As Double
+    Static lEqRtx As Double ' - saved value of EQRT from prev. call
+    Static lAx As Double ' - saved value of A from prev. call
+    Dim lLoopFg As Integer ' - Flag.  Set to exit loop.
+
+    'See if value of A has changed since last call to EQROOT.
+    If aA <> lAx Then
+      'Verify that A is within the valid range of values; ie, 0.0 < A <= 1.0.
+      If aA > 0.0 AndAlso aA <= 1.0 Then
+        If aA <= 0.06 Then
+          'Small A:  0 < A <= 0.06.  (Answer good to machine precision).
+          aErr = 0
+          aEqrt = 1.0 / aA
+        ElseIf aA < 0.999 Then
+          'Usual Case:  0.06 < A < 0.999.
+          'Estimate starting value for U.
+          If aA <= 0.2 Then
+            lU = 1.0 / aA
+          ElseIf aA <= 0.5 Then
+            lU = 0.968732 / aA - 1.55098 * aA + 0.431653
+          ElseIf aA <= 0.94 Then
+            lU = 1.13243 / aA - 0.92824 * aA - 0.207111
+          Else
+            lU = (3.0 / 2.0) - Math.Sqrt(6.0 * aA - (15.0 / 4.0))
+          End If
+          'Iterate.
+          lLoopFg = 0
+          Do
+            lE = Math.Exp(-lU)
+            lF = (1.0 - lE) / lU
+            lD = aA - lF
+            lTmpVr1 = ((lU + 1.0) * lF - 1.0)
+            lR = aA / lTmpVr1
+            If lR <= 1.0 Then
+              lS = Math.Abs(lD / aA)
+            Else
+              lS = Math.Abs(lD / lTmpVr1)
+            End If
+            If lS >= 0.00000059 Then
+              lU = lU * (1.0 + lD / (lE - lF))
+            Else
+              lLoopFg = 1
+            End If
+          Loop While lLoopFg = 0
+          'Exit with solution.
+          aErr = 0
+          aEqrt = lU
+        ElseIf aA < 1.0 Then
+          'Large A: 0.999 <= A < 1. (Answer good to about 10 places).
+          aErr = 0
+          aEqrt = (3.0 / 2.0) - Math.Sqrt(6.0 * aA - (15.0 / 4.0))
+        Else
+          'Special Case: A=1 (exact limiting solution).
+          aErr = 0
+          aEqrt = 0.0
+        End If
+        'Save values of A & EQRT.
+        lEqRtx = aEqrt
+        lAx = aA
+      Else
+        'Error: A outside range.  A <= 0  or  A > 1.
+        aErr = 1
+      End If
+    Else
+      'Value of 'A' same as last time EQROOT was called.
+      aEqrt = lEqRtx
+    End If
+
+  End Sub
 End Module

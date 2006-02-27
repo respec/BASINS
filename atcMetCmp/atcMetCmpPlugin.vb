@@ -255,6 +255,21 @@ Public Class atcMetCmpPlugin
           Dim lMetCmpTS As atcTimeseries = DisPrecip(lDlyTSer, Me, lHrTSers, lObsTime, lTol, lSummFile)
           MyBase.DataSets.Add(lMetCmpTS)
         End If
+      Case "Dewpoint"
+        Dim lDewPTSer As atcTimeseries
+        Dim lATmpTSer As atcTimeseries
+        If aArgs Is Nothing Then
+          '          Dim lForm As New frmDisTemp
+          '         lOk = lForm.AskUser(DataManager, lTMinTSer, lTMaxTSer, lObsTime)
+        Else
+          lDewPTSer = aArgs.GetValue("Dewpoint")
+          lATmpTSer = aArgs.GetValue("ATMP")
+          lOk = True
+        End If
+        If lOk And Not ldewpTSer Is Nothing And Not lATmpTSer Is Nothing Then
+          Dim lMetCmpTS As atcTimeseries = DisDewPoint(ldewpTSer, Me, lATmpTSer)
+          MyBase.DataSets.Add(lMetCmpTS)
+        End If
     End Select
 
     If MyBase.DataSets.Count > 0 Then Return True
@@ -595,6 +610,24 @@ Public Class atcMetCmpPlugin
         lArguments.SetValue(defTolerance, Nothing)
         lArguments.SetValue(defSummFile, Nothing)
         lOperations.SetValue(lDisPrec, Nothing, lArguments)
+
+        Dim lDisDewPoint As New atcAttributeDefinition
+        With lDisDewPoint
+          .Name = "Dewpoint"
+          .Category = "Disaggregations"
+          .Description = "Disaggregate Daily Dewpoint Temp to Hourly"
+          .Editable = False
+          .TypeString = "atcTimeseries"
+          .Calculator = Me
+        End With
+
+        Dim defATmpTS As New atcAttributeDefinition
+        defATmpTS = defTimeSeriesOne.Clone("ATMP", "Hourly Air Temperature")
+
+        lArguments = New atcDataAttributes
+        lArguments.SetValue(defDewPTS, Nothing)
+        lArguments.SetValue(defATmpTS, Nothing)
+        lOperations.SetValue(lDisDewPoint, Nothing, lArguments)
       End If
 
       Return lOperations

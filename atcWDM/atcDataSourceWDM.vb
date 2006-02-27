@@ -317,6 +317,7 @@ Public Class atcDataSourceWDM
       End If
 
       lWdmHandle.Dispose()
+      Return True
     Catch ex As Exception
       Logger.Dbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
       Return False
