@@ -12,6 +12,7 @@ Public Class Variation
   Private pDataSets As atcDataGroup
   Private pComputationSource As atcDataSource
   Private pOperation As String = ""
+  Private pSelected As Boolean = False
   'TODO: make rest of public variables into peoperties
   Public Seasons As atcSeasons.atcSeasonBase
   Public Min As Double = Double.NaN
@@ -60,6 +61,14 @@ Public Class Variation
     End Set
   End Property
 
+  Public Property Selected() As Boolean
+    Get
+      Return pSelected
+    End Get
+    Set(ByVal newValue As Boolean)
+      pSelected = newValue
+    End Set
+  End Property
   Public ReadOnly Property Iterations() As Integer
     Get
       Try
@@ -140,9 +149,11 @@ Public Class Variation
     Dim newVariation As New Variation
     With newVariation
       .Name = Name
-      .DataSets = DataSets
+      If Not DataSets Is Nothing Then .DataSets = DataSets.Clone()
       .ComputationSource = ComputationSource
-      .Operation = Operation.Clone
+      .Operation = Operation.Clone()
+      .Seasons = Seasons 'TODO: clone Seasons of not Nothing
+      .Selected = Selected
       .Min = Min
       .Max = Max
       .Increment = Increment
@@ -153,6 +164,33 @@ Public Class Variation
     End With
     Return newVariation
   End Function
+
+  Private Property SeasonsXML() As String
+    Get
+      If Seasons Is Nothing Then
+        Return ""
+      Else
+        Return "  <Seasons Type='" & Seasons.GetType.Name & "'>" & vbCrLf _
+             & "  " & Seasons.SeasonsSelectedXML & "  </Seasons>" & vbCrLf
+      End If
+    End Get
+    Set(ByVal newValue As String)
+      Dim lXML As New Chilkat.Xml
+      If lXML.LoadXml(newValue) Then
+        If lXML.Tag.ToLower.Equals("seasons") Then
+          Dim lSeasonTypeName As String = lXML.GetAttrValue("Type")
+          For Each lSeasonType As Type In atcSeasons.atcSeasonPlugin.AllSeasonTypes
+            If lSeasonType.Name.Equals(lSeasonTypeName) Then
+              Seasons = lSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+              If lXML.FirstChild2 Then
+                Seasons.SeasonsSelectedXML = lXML.GetXml
+              End If
+            End If
+          Next
+        End If
+      End If
+    End Set
+  End Property
 
   Private Property DataSetsXML() As String
     Get
@@ -171,9 +209,9 @@ Public Class Variation
       End If
 
     End Get
-    Set(ByVal Value As String)
+    Set(ByVal newValue As String)
       Dim lXML As New Chilkat.Xml
-      If lXML.LoadXml(Value) Then
+      If lXML.LoadXml(newValue) Then
         DataSets = New atcDataGroup
         If lXML.FirstChild2() Then
           Do
@@ -196,15 +234,26 @@ Public Class Variation
 
   Public Property XML() As String
     Get
-      Return "<Variation>" & vbCrLf _
-           & "  <Name>" & Name & "</Name>" & vbCrLf _
-           & "  <Min>" & Min & "</Min>" & vbCrLf _
-           & "  <Max>" & Max & "</Max>" & vbCrLf _
-           & "  <Increment>" & Increment & "</Increment>" & vbCrLf _
-           & "  <Operation>" & Operation & "</operation>" & vbCrLf _
-           & "  <ComputationSource>" & ComputationSource.Name & "</ComputationSource>" & vbCrLf _
+      Dim lXML As String = "<Variation>" & vbCrLf _
+           & "  <Name>" & Name & "</Name>" & vbCrLf
+      If Not Double.IsNaN(Min) Then
+        lXML &= "  <Min>" & Min & "</Min>" & vbCrLf
+      End If
+      If Not Double.IsNaN(Max) Then
+        lXML &= "  <Max>" & Max & "</Max>" & vbCrLf
+      End If
+      If Not Double.IsNaN(Increment) Then
+        lXML &= "  <Increment>" & Increment & "</Increment>" & vbCrLf
+      End If
+      lXML &= "  <Operation>" & Operation & "</Operation>" & vbCrLf
+      If Not ComputationSource Is Nothing Then
+        lXML &= "  <ComputationSource>" & ComputationSource.Name & "</ComputationSource>" & vbCrLf
+      End If
+      lXML &= "  <Selected>" & Selected & "</Selected>" & vbCrLf _
            & DataSetsXML _
+           & SeasonsXML _
            & "</Variation>" & vbCrLf
+      Return lXML
     End Get
     Set(ByVal Value As String)
       Dim lXML As New Chilkat.Xml
@@ -221,6 +270,8 @@ Public Class Variation
                 Case "computationsource"
                   ComputationSource = g_DataManager.DataSourceByName(.Content)
                 Case "datasets" : DataSetsXML = .GetXml
+                Case "selected" : Selected = .Content.ToLower.Equals("true")
+                Case "seasons" : SeasonsXML = .GetXml
               End Select
             End With
           Loop While lXML.NextSibling2
@@ -234,6 +285,10 @@ Public Class Variation
     If Not Double.IsNaN(Min) Then retStr &= " from " & Format(Min, "0.0")
     If Not Double.IsNaN(Max) Then retStr &= " to " & Format(Max, "0.0")
     If Not Double.IsNaN(Increment) Then retStr &= " step " & Format(Increment, "0.0")
+    If Not Seasons Is Nothing Then
+      retStr &= " " & atcSeasons.atcSeasonPlugin.SeasonClassNameToLabel(Seasons.GetType.Name) _
+             & ": " & Seasons.SeasonsSelectedString
+    End If
     Return retStr
   End Function
 End Class

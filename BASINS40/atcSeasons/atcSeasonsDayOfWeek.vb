@@ -1,7 +1,8 @@
 Public Class atcSeasonsDayOfWeek
   Inherits atcSeasonBase
 
-  Private pDayName() As String = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+  Private pAllSeasons As Integer() = {1, 2, 3, 4, 5, 6, 7}
+  Private pDayNames() As String = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
 
   Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
     Return Date.FromOADate(aDate).DayOfWeek
@@ -9,9 +10,17 @@ Public Class atcSeasonsDayOfWeek
 
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
     Select Case aIndex
-      Case Is < 0 : Return Nothing
-      Case Is < 7 : Return pDayName(aIndex)
+      Case Is < 1 : Return Nothing
+      Case Is < 8 : Return pDayNames(aIndex - 1)
       Case Else : Return Nothing
     End Select
+  End Function
+
+  Public Overrides Function AllSeasons() As Integer()
+    Return pAllSeasons
+  End Function
+
+  Public Overrides Function AllSeasonNames() As String()
+    Return pDayNames
   End Function
 End Class

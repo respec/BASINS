@@ -96,15 +96,17 @@ Public Class frmIterative
     Me.cboBaseScenarioName = New System.Windows.Forms.ComboBox
     Me.lblBaseScenarioName = New System.Windows.Forms.Label
     Me.lblNewScenarioName = New System.Windows.Forms.Label
-    Me.tabResults = New System.Windows.Forms.TabPage
-    Me.agdResults = New atcControls.atcGrid
     Me.tabEndpoints = New System.Windows.Forms.TabPage
+    Me.lblAllResults = New System.Windows.Forms.Label
+    Me.chkSaveAll = New System.Windows.Forms.CheckBox
     Me.lstEndpoints = New System.Windows.Forms.CheckedListBox
     Me.btnEndpointDown = New System.Windows.Forms.Button
     Me.btnEndpointUp = New System.Windows.Forms.Button
     Me.btnEndpointRemove = New System.Windows.Forms.Button
     Me.btnEndpointModify = New System.Windows.Forms.Button
     Me.btnEndpointAdd = New System.Windows.Forms.Button
+    Me.tabResults = New System.Windows.Forms.TabPage
+    Me.agdResults = New atcControls.atcGrid
     Me.tabPivot = New System.Windows.Forms.TabPage
     Me.agdPivot = New atcControls.atcGrid
     Me.lblPivotColumns = New System.Windows.Forms.Label
@@ -128,12 +130,10 @@ Public Class frmIterative
     Me.mnuPasteResults = New System.Windows.Forms.MenuItem
     Me.lblTop = New System.Windows.Forms.Label
     Me.btnStop = New System.Windows.Forms.Button
-    Me.lblAllResults = New System.Windows.Forms.Label
-    Me.chkSaveAll = New System.Windows.Forms.CheckBox
     Me.myTabs.SuspendLayout()
     Me.tabInputs.SuspendLayout()
-    Me.tabResults.SuspendLayout()
     Me.tabEndpoints.SuspendLayout()
+    Me.tabResults.SuspendLayout()
     Me.tabPivot.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -175,7 +175,6 @@ Public Class frmIterative
     Me.lstInputs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lstInputs.CheckOnClick = True
     Me.lstInputs.Location = New System.Drawing.Point(8, 96)
     Me.lstInputs.Name = "lstInputs"
     Me.lstInputs.Size = New System.Drawing.Size(272, 139)
@@ -202,7 +201,7 @@ Public Class frmIterative
     Me.btnInputRemove.Location = New System.Drawing.Point(80, 64)
     Me.btnInputRemove.Name = "btnInputRemove"
     Me.btnInputRemove.Size = New System.Drawing.Size(56, 24)
-    Me.btnInputRemove.TabIndex = 7
+    Me.btnInputRemove.TabIndex = 6
     Me.btnInputRemove.Text = "Remove"
     '
     'btnInputModify
@@ -210,7 +209,7 @@ Public Class frmIterative
     Me.btnInputModify.Location = New System.Drawing.Point(152, 64)
     Me.btnInputModify.Name = "btnInputModify"
     Me.btnInputModify.Size = New System.Drawing.Size(48, 24)
-    Me.btnInputModify.TabIndex = 6
+    Me.btnInputModify.TabIndex = 7
     Me.btnInputModify.Text = "Edit"
     '
     'btnInputAdd
@@ -228,7 +227,7 @@ Public Class frmIterative
     Me.txtModifiedScenarioName.Location = New System.Drawing.Point(96, 32)
     Me.txtModifiedScenarioName.Name = "txtModifiedScenarioName"
     Me.txtModifiedScenarioName.Size = New System.Drawing.Size(184, 20)
-    Me.txtModifiedScenarioName.TabIndex = 3
+    Me.txtModifiedScenarioName.TabIndex = 4
     Me.txtModifiedScenarioName.Text = "Modified"
     '
     'cboBaseScenarioName
@@ -253,8 +252,91 @@ Public Class frmIterative
     Me.lblNewScenarioName.Location = New System.Drawing.Point(8, 32)
     Me.lblNewScenarioName.Name = "lblNewScenarioName"
     Me.lblNewScenarioName.Size = New System.Drawing.Size(80, 16)
-    Me.lblNewScenarioName.TabIndex = 11
+    Me.lblNewScenarioName.TabIndex = 3
     Me.lblNewScenarioName.Text = "New Scenario"
+    '
+    'tabEndpoints
+    '
+    Me.tabEndpoints.Controls.Add(Me.lblAllResults)
+    Me.tabEndpoints.Controls.Add(Me.chkSaveAll)
+    Me.tabEndpoints.Controls.Add(Me.lstEndpoints)
+    Me.tabEndpoints.Controls.Add(Me.btnEndpointDown)
+    Me.tabEndpoints.Controls.Add(Me.btnEndpointUp)
+    Me.tabEndpoints.Controls.Add(Me.btnEndpointRemove)
+    Me.tabEndpoints.Controls.Add(Me.btnEndpointModify)
+    Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
+    Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
+    Me.tabEndpoints.Name = "tabEndpoints"
+    Me.tabEndpoints.Size = New System.Drawing.Size(288, 238)
+    Me.tabEndpoints.TabIndex = 1
+    Me.tabEndpoints.Text = "Endpoints"
+    '
+    'lblAllResults
+    '
+    Me.lblAllResults.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lblAllResults.Location = New System.Drawing.Point(128, 16)
+    Me.lblAllResults.Name = "lblAllResults"
+    Me.lblAllResults.Size = New System.Drawing.Size(144, 16)
+    Me.lblAllResults.TabIndex = 18
+    '
+    'chkSaveAll
+    '
+    Me.chkSaveAll.Location = New System.Drawing.Point(16, 16)
+    Me.chkSaveAll.Name = "chkSaveAll"
+    Me.chkSaveAll.Size = New System.Drawing.Size(112, 16)
+    Me.chkSaveAll.TabIndex = 11
+    Me.chkSaveAll.Text = "Save All Results"
+    '
+    'lstEndpoints
+    '
+    Me.lstEndpoints.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lstEndpoints.Location = New System.Drawing.Point(8, 96)
+    Me.lstEndpoints.Name = "lstEndpoints"
+    Me.lstEndpoints.Size = New System.Drawing.Size(272, 139)
+    Me.lstEndpoints.TabIndex = 17
+    '
+    'btnEndpointDown
+    '
+    Me.btnEndpointDown.Location = New System.Drawing.Point(248, 64)
+    Me.btnEndpointDown.Name = "btnEndpointDown"
+    Me.btnEndpointDown.Size = New System.Drawing.Size(24, 24)
+    Me.btnEndpointDown.TabIndex = 16
+    Me.btnEndpointDown.Text = "v"
+    '
+    'btnEndpointUp
+    '
+    Me.btnEndpointUp.Location = New System.Drawing.Point(216, 64)
+    Me.btnEndpointUp.Name = "btnEndpointUp"
+    Me.btnEndpointUp.Size = New System.Drawing.Size(24, 24)
+    Me.btnEndpointUp.TabIndex = 15
+    Me.btnEndpointUp.Text = "^"
+    '
+    'btnEndpointRemove
+    '
+    Me.btnEndpointRemove.Location = New System.Drawing.Point(80, 64)
+    Me.btnEndpointRemove.Name = "btnEndpointRemove"
+    Me.btnEndpointRemove.Size = New System.Drawing.Size(56, 24)
+    Me.btnEndpointRemove.TabIndex = 13
+    Me.btnEndpointRemove.Text = "Remove"
+    '
+    'btnEndpointModify
+    '
+    Me.btnEndpointModify.Location = New System.Drawing.Point(152, 64)
+    Me.btnEndpointModify.Name = "btnEndpointModify"
+    Me.btnEndpointModify.Size = New System.Drawing.Size(48, 24)
+    Me.btnEndpointModify.TabIndex = 14
+    Me.btnEndpointModify.Text = "Edit"
+    '
+    'btnEndpointAdd
+    '
+    Me.btnEndpointAdd.Location = New System.Drawing.Point(16, 64)
+    Me.btnEndpointAdd.Name = "btnEndpointAdd"
+    Me.btnEndpointAdd.Size = New System.Drawing.Size(48, 24)
+    Me.btnEndpointAdd.TabIndex = 12
+    Me.btnEndpointAdd.Text = "Add"
     '
     'tabResults
     '
@@ -278,74 +360,7 @@ Public Class frmIterative
     Me.agdResults.Name = "agdResults"
     Me.agdResults.Size = New System.Drawing.Size(272, 224)
     Me.agdResults.Source = Nothing
-    Me.agdResults.TabIndex = 8
-    '
-    'tabEndpoints
-    '
-    Me.tabEndpoints.Controls.Add(Me.lblAllResults)
-    Me.tabEndpoints.Controls.Add(Me.chkSaveAll)
-    Me.tabEndpoints.Controls.Add(Me.lstEndpoints)
-    Me.tabEndpoints.Controls.Add(Me.btnEndpointDown)
-    Me.tabEndpoints.Controls.Add(Me.btnEndpointUp)
-    Me.tabEndpoints.Controls.Add(Me.btnEndpointRemove)
-    Me.tabEndpoints.Controls.Add(Me.btnEndpointModify)
-    Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
-    Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
-    Me.tabEndpoints.Name = "tabEndpoints"
-    Me.tabEndpoints.Size = New System.Drawing.Size(288, 238)
-    Me.tabEndpoints.TabIndex = 1
-    Me.tabEndpoints.Text = "Endpoints"
-    '
-    'lstEndpoints
-    '
-    Me.lstEndpoints.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lstEndpoints.CheckOnClick = True
-    Me.lstEndpoints.Location = New System.Drawing.Point(8, 96)
-    Me.lstEndpoints.Name = "lstEndpoints"
-    Me.lstEndpoints.Size = New System.Drawing.Size(272, 139)
-    Me.lstEndpoints.TabIndex = 16
-    '
-    'btnEndpointDown
-    '
-    Me.btnEndpointDown.Location = New System.Drawing.Point(248, 64)
-    Me.btnEndpointDown.Name = "btnEndpointDown"
-    Me.btnEndpointDown.Size = New System.Drawing.Size(24, 24)
-    Me.btnEndpointDown.TabIndex = 15
-    Me.btnEndpointDown.Text = "v"
-    '
-    'btnEndpointUp
-    '
-    Me.btnEndpointUp.Location = New System.Drawing.Point(216, 64)
-    Me.btnEndpointUp.Name = "btnEndpointUp"
-    Me.btnEndpointUp.Size = New System.Drawing.Size(24, 24)
-    Me.btnEndpointUp.TabIndex = 14
-    Me.btnEndpointUp.Text = "^"
-    '
-    'btnEndpointRemove
-    '
-    Me.btnEndpointRemove.Location = New System.Drawing.Point(80, 64)
-    Me.btnEndpointRemove.Name = "btnEndpointRemove"
-    Me.btnEndpointRemove.Size = New System.Drawing.Size(56, 24)
-    Me.btnEndpointRemove.TabIndex = 13
-    Me.btnEndpointRemove.Text = "Remove"
-    '
-    'btnEndpointModify
-    '
-    Me.btnEndpointModify.Location = New System.Drawing.Point(152, 64)
-    Me.btnEndpointModify.Name = "btnEndpointModify"
-    Me.btnEndpointModify.Size = New System.Drawing.Size(48, 24)
-    Me.btnEndpointModify.TabIndex = 12
-    Me.btnEndpointModify.Text = "Edit"
-    '
-    'btnEndpointAdd
-    '
-    Me.btnEndpointAdd.Location = New System.Drawing.Point(16, 64)
-    Me.btnEndpointAdd.Name = "btnEndpointAdd"
-    Me.btnEndpointAdd.Size = New System.Drawing.Size(48, 24)
-    Me.btnEndpointAdd.TabIndex = 11
-    Me.btnEndpointAdd.Text = "Add"
+    Me.agdResults.TabIndex = 18
     '
     'tabPivot
     '
@@ -375,14 +390,14 @@ Public Class frmIterative
     Me.agdPivot.Name = "agdPivot"
     Me.agdPivot.Size = New System.Drawing.Size(272, 152)
     Me.agdPivot.Source = Nothing
-    Me.agdPivot.TabIndex = 7
+    Me.agdPivot.TabIndex = 25
     '
     'lblPivotColumns
     '
     Me.lblPivotColumns.Location = New System.Drawing.Point(8, 32)
     Me.lblPivotColumns.Name = "lblPivotColumns"
     Me.lblPivotColumns.Size = New System.Drawing.Size(64, 16)
-    Me.lblPivotColumns.TabIndex = 6
+    Me.lblPivotColumns.TabIndex = 21
     Me.lblPivotColumns.Text = "Columns"
     Me.lblPivotColumns.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
@@ -391,7 +406,7 @@ Public Class frmIterative
     Me.lblPivotCells.Location = New System.Drawing.Point(8, 56)
     Me.lblPivotCells.Name = "lblPivotCells"
     Me.lblPivotCells.Size = New System.Drawing.Size(64, 16)
-    Me.lblPivotCells.TabIndex = 5
+    Me.lblPivotCells.TabIndex = 23
     Me.lblPivotCells.Text = "Cells"
     Me.lblPivotCells.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
@@ -400,7 +415,7 @@ Public Class frmIterative
     Me.lblPivotRows.Location = New System.Drawing.Point(8, 8)
     Me.lblPivotRows.Name = "lblPivotRows"
     Me.lblPivotRows.Size = New System.Drawing.Size(64, 16)
-    Me.lblPivotRows.TabIndex = 4
+    Me.lblPivotRows.TabIndex = 19
     Me.lblPivotRows.Text = "Rows"
     Me.lblPivotRows.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
@@ -409,21 +424,21 @@ Public Class frmIterative
     Me.cboPivotCells.Location = New System.Drawing.Point(80, 56)
     Me.cboPivotCells.Name = "cboPivotCells"
     Me.cboPivotCells.Size = New System.Drawing.Size(128, 21)
-    Me.cboPivotCells.TabIndex = 3
+    Me.cboPivotCells.TabIndex = 24
     '
     'cboPivotColumns
     '
     Me.cboPivotColumns.Location = New System.Drawing.Point(80, 32)
     Me.cboPivotColumns.Name = "cboPivotColumns"
     Me.cboPivotColumns.Size = New System.Drawing.Size(128, 21)
-    Me.cboPivotColumns.TabIndex = 2
+    Me.cboPivotColumns.TabIndex = 22
     '
     'cboPivotRows
     '
     Me.cboPivotRows.Location = New System.Drawing.Point(80, 8)
     Me.cboPivotRows.Name = "cboPivotRows"
     Me.cboPivotRows.Size = New System.Drawing.Size(128, 21)
-    Me.cboPivotRows.TabIndex = 1
+    Me.cboPivotRows.TabIndex = 20
     '
     'btnStart
     '
@@ -513,23 +528,6 @@ Public Class frmIterative
     Me.btnStop.Text = "Stop"
     Me.btnStop.Visible = False
     '
-    'lblAllResults
-    '
-    Me.lblAllResults.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblAllResults.Location = New System.Drawing.Point(128, 16)
-    Me.lblAllResults.Name = "lblAllResults"
-    Me.lblAllResults.Size = New System.Drawing.Size(144, 16)
-    Me.lblAllResults.TabIndex = 18
-    '
-    'chkSaveAll
-    '
-    Me.chkSaveAll.Location = New System.Drawing.Point(16, 16)
-    Me.chkSaveAll.Name = "chkSaveAll"
-    Me.chkSaveAll.Size = New System.Drawing.Size(112, 16)
-    Me.chkSaveAll.TabIndex = 17
-    Me.chkSaveAll.Text = "Save All Results"
-    '
     'frmIterative
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -544,8 +542,8 @@ Public Class frmIterative
     Me.Text = "Iterative Analysis"
     Me.myTabs.ResumeLayout(False)
     Me.tabInputs.ResumeLayout(False)
-    Me.tabResults.ResumeLayout(False)
     Me.tabEndpoints.ResumeLayout(False)
+    Me.tabResults.ResumeLayout(False)
     Me.tabPivot.ResumeLayout(False)
     Me.ResumeLayout(False)
 
@@ -564,11 +562,6 @@ Public Class frmIterative
   Private ResultsTabIndex As Integer = 2
   Private TotalIterations As Integer = 0
   Private TimePerRun As Double = 0 'Time each run takes in seconds
-
-  'Names of attributes to show in Results grid
-  'Private pOutputAttributes As String() = {"Mean", "Mean", "Mean", "Min", "Max", "1Hi100", "7Q10"}
-  'Names of constituents to show attributes of in Results grid
-  'Private pOutputConsName() As String = {"ATMP", "HPREC", "Flow", "Flow", "Flow", "Flow", "Flow"}
 
   Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcDataGroup = Nothing)
     TimePerRun = CDbl(GetSetting("ScenarioBuilder", "Settings", "TimePerRun", "0"))
@@ -594,41 +587,41 @@ Public Class frmIterative
 
     UpdateTopLabel("Setting up to run")
 
-    'group containing dsn 122 (hourly AirTemp) from base.wdm
-    'Dim lOrigAirTmp As New atcDataGroup
-    'lOrigAirTmp = g_DataManager.DataSets.FindData("ID", "122", 0)
-    'If lOrigAirTmp.Count = 0 Then
-    '  Dim lWDMfile As atcDataSource = New atcWDM.atcDataSourceWDM
-    '  g_DataManager.OpenDataSource(lWDMfile, lWDMFileName, Nothing)
-    '  lOrigAirTmp = lWDMfile.DataSets.FindData("ID", "122", 0)
-    'End If
-    'lSummary.Save(g_DataManager, lOrigAirTmp, "DataTree_OrigAirTmp.txt")
-
-    UpdateTotalIterations()
+    RefreshTotalIterations()
 
     'Make a collection of the variations that are selected/checked in lstInputs
-    For Each iVariation As Integer In lstInputs.CheckedIndices
-      lVariations.Add(pInputs.ItemByIndex(iVariation))
+    For Each lVariation As Variation In pInputs
+      If lVariation.Selected Then lVariations.Add(lVariation)
     Next
 
     'header for attributes
     agdResults.Source = New atcGridSource
     With agdResults.Source
+      Dim lColumn As Integer = 1
       .FixedRows = 1
-      .Columns = pEndpoints.Count + 1
+      .FixedColumns = 1
+      .Columns = pEndpoints.Count + pInputs.Count + 1
       .Rows = 2
       .CellValue(0, 0) = "Run"
       .CellColor(0, 0) = Drawing.SystemColors.Control
       .ColorCells = True
-      For lIndex As Integer = 0 To pEndpoints.Count - 1
-        Dim lEndpoint As Variation = pEndpoints.ItemByIndex(lIndex)
+      For Each lEndpoint As Variation In pInputs        
         If lEndpoint.Operation Is Nothing Then
-          .CellValue(0, lIndex + 1) = lEndpoint.Name
+          .CellValue(0, lColumn) = lEndpoint.Name
         Else
-          .CellValue(0, lIndex + 1) = lEndpoint.Name & " " & lEndpoint.Operation
+          .CellValue(0, lColumn) = lEndpoint.Name & " " & lEndpoint.Operation
         End If
-        .CellColor(0, lIndex + 1) = Drawing.SystemColors.Control
-
+        .CellColor(0, lColumn) = Drawing.SystemColors.Control
+        lColumn += 1
+      Next
+      For Each lEndpoint As Variation In pEndpoints
+        If lEndpoint.Operation Is Nothing Then
+          .CellValue(0, lColumn) = lEndpoint.Name
+        Else
+          .CellValue(0, lColumn) = lEndpoint.Name & " " & lEndpoint.Operation
+        End If
+        .CellColor(0, lColumn) = Drawing.SystemColors.Control
+        lColumn += 1
       Next
     End With
     agdResults.Initialize(agdResults.Source)
@@ -695,24 +688,6 @@ Public Class frmIterative
             aModifiedData.Remove(lModifiedGroup)
 
             lModifiedGroup = .NextIteration
-            '  lNewPrec = aBase1.Clone
-            '  For iValue As Integer = 1 To lNewPrec.numValues
-            '    Dim lDate As Date = Date.FromOADate(lNewPrec.Dates.Value(iValue))
-            '    Select Case lDate.Month
-            '      Case 8, 9 : lNewPrec.Value(iValue) *= lCurValue1
-            '    End Select
-            '  Next
-            '  lNewPrec.Attributes.CalculateAll()
-            '  'TODO: REPLACE HARD CODED 10 YEARS WITH ACTUAL SPAN CALC!
-            '  agdResults.Source.CellValue(lRow, 4) = Format(lNewPrec.Attributes.GetValue("Sum") / 10, "#.00")
-            '  'lSummary.Save(g_DataManager, New atcDataGroup(lNewPrec), "DataTree_Precip" & lCurValue1 & ".txt")
-
-            '  If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
-            '  aModifiedData.Add(lNewPrec)
-            '  lModifiedData.Add(lNewEvap)
-            '  Windows.Forms.Application.DoEvents()
-            'Next
-
           End While
         End With
       End If
@@ -722,37 +697,41 @@ Public Class frmIterative
   Private Sub UpdateResults(ByVal aIteration As Integer, ByVal aData As atcDataGroup)
     With agdResults.Source
       Dim lRow As Integer = aIteration + .FixedRows
-      Dim lColumn As Integer = .FixedRows
+      Dim lColumn As Integer = .FixedColumns
+      Dim lEndpoint As Variation
       .CellValue(lRow, 0) = aIteration + 1
-      For Each lEndpoint As Variation In pEndpoints
-        If Not Double.IsNaN(lEndpoint.CurrentValue) Then 'This is an input variation, put current value in results
-          .CellValue(lRow, lColumn) = Format(lEndpoint.CurrentValue, "0.####")
-          lColumn += 1
-        Else
-          For Each lOldData As atcDataSet In lEndpoint.DataSets
-            Dim lGroup As atcDataGroup = aData.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
-            If lGroup.Count > 0 Then
-              .CellValue(lRow, lColumn) = lGroup.Item(0).Attributes.GetFormattedValue(lEndpoint.Operation)
-              If .ColorCells Then
-                If Not IsNumeric(.CellValue(lRow, lColumn)) Then
-                  .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
+      For Each lEndpoint In pInputs
+        .CellValue(lRow, lColumn) = Format(lEndpoint.CurrentValue, "0.####")
+        lColumn += 1
+      Next
+      For Each lEndpoint In pEndpoints
+        For Each lOldData As atcDataSet In lEndpoint.DataSets
+          Dim lGroup As atcDataGroup = aData.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
+          If lGroup.Count > 0 Then
+            Dim lData As atcTimeseries = lGroup.Item(0)
+            If Not lEndpoint.Seasons Is Nothing Then
+              lData = lEndpoint.Seasons.SplitBySelected(lData, Nothing).Item(0)
+            End If
+            .CellValue(lRow, lColumn) = lData.Attributes.GetFormattedValue(lEndpoint.Operation)
+            If .ColorCells Then
+              If Not IsNumeric(.CellValue(lRow, lColumn)) Then
+                .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
+              Else
+                Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lEndpoint.Operation)
+                If Not Double.IsNaN(lEndpoint.Min) AndAlso lValue < lEndpoint.Min Then
+                  .CellColor(lRow, lColumn) = lEndpoint.ColorBelowMin
+                ElseIf Not Double.IsNaN(lEndpoint.Max) AndAlso lValue > lEndpoint.Max Then
+                  .CellColor(lRow, lColumn) = lEndpoint.ColorAboveMax
                 Else
-                  Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lEndpoint.Operation)
-                  If Not Double.IsNaN(lEndpoint.Min) AndAlso lValue < lEndpoint.Min Then
-                    .CellColor(lRow, lColumn) = lEndpoint.ColorBelowMin
-                  ElseIf Not Double.IsNaN(lEndpoint.Max) AndAlso lValue > lEndpoint.Max Then
-                    .CellColor(lRow, lColumn) = lEndpoint.ColorAboveMax
-                  Else
-                    .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
-                  End If
+                  .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
                 End If
               End If
-            Else
-              .CellValue(lRow, lColumn) = ""
             End If
-            lColumn += 1
-          Next
-        End If
+          Else
+            .CellValue(lRow, lColumn) = ""
+          End If
+          lColumn += 1
+        Next
       Next
     End With
     agdResults.Refresh()
@@ -906,7 +885,7 @@ Public Class frmIterative
   Private Sub mnuLoadResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLoadResults.Click
     Dim lOpenDialog As New Windows.Forms.OpenFileDialog
     With lOpenDialog
-      .FileName = "results.txt"
+      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastResults", "Results.txt")
       .Filter = "Text files (*.txt)|*.txt|All files|*.*"
       .FilterIndex = 1
       .Title = "Scenario Builder - Load Results"
@@ -914,6 +893,7 @@ Public Class frmIterative
         If FileExists(.FileName) Then 'read file into grid
           PopulateResultsGrid(WholeFileString(.FileName))
           myTabs.SelectedIndex = ResultsTabIndex
+          SaveSetting("ScenarioBuilder", "Settings", "LastResults", .FileName)
         End If
       End If
     End With
@@ -943,24 +923,29 @@ Public Class frmIterative
   End Sub
 
   Private Sub mnuSaveResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveResults.Click
-    Dim lSaveDialog As New Windows.Forms.SaveFileDialog
-    With lSaveDialog
-      .FileName = "results.txt"
-      .Filter = "Text files (*.txt)|*.txt|All files|*.*"
-      .FilterIndex = 1
-      .Title = "Save Results as Tab-Delimited Text"
-      .OverwritePrompt = True
-      If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-        'write file from grid contents
-        SaveFileString(.FileName, agdResults.Source.ToString)
-      End If
-    End With
+    If agdResults.Source Is Nothing Then
+      Logger.Msg("No results are available yet to save", "Save Results")
+    Else
+      Dim lSaveDialog As New Windows.Forms.SaveFileDialog
+      With lSaveDialog
+        .FileName = GetSetting("ScenarioBuilder", "Settings", "LastResults", "Results.txt")
+        .Filter = "Text files (*.txt)|*.txt|All files|*.*"
+        .FilterIndex = 1
+        .Title = "Save Results as Tab-Delimited Text"
+        .OverwritePrompt = True
+        If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+          'write file from grid contents
+          SaveFileString(.FileName, agdResults.Source.ToString)
+          SaveSetting("ScenarioBuilder", "Settings", "LastResults", .FileName)
+        End If
+      End With
+    End If
   End Sub
 
   Private Sub mnuSavePivot_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSavePivot.Click
     Dim lSaveDialog As New Windows.Forms.SaveFileDialog
     With lSaveDialog
-      .FileName = "pivot.txt"
+      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastPivot", "Pivot.txt")
       .Filter = "Text files (*.txt)|*.txt|All files|*.*"
       .FilterIndex = 1
       .Title = "Save Pivot Table as Tab-Delimited Text"
@@ -971,6 +956,7 @@ Public Class frmIterative
                                 & lblPivotColumns.Text & vbTab & cboPivotColumns.Text & vbCrLf _
                                 & lblPivotCells.Text & vbTab & cboPivotCells.Text & vbCrLf _
                                 & agdPivot.Source.ToString)
+        SaveSetting("ScenarioBuilder", "Settings", "LastPivot", .FileName)
       End If
     End With
   End Sub
@@ -1013,25 +999,6 @@ Public Class frmIterative
     Return lFormatted & Format(aSeconds, lFormat)
   End Function
 
-  Private Sub UpdateTotalIterations()
-    Dim lLabelText As String
-    TotalIterations = 1
-    'Make a collection of the variations that are selected/checked in lstInputs
-    For Each iVariation As Integer In lstInputs.CheckedIndices
-      TotalIterations *= pInputs.ItemByIndex(iVariation).Iterations
-    Next
-    lLabelText = "Total iterations selected = " & TotalIterations
-    If TimePerRun > 0 Then
-      lLabelText &= " (" & FormatTime(TimePerRun * TotalIterations) & ")"
-    End If
-    UpdateTopLabel(lLabelText)
-    Try
-      lblAllResults.Text = "(" & Format((FileLen(cboBaseScenarioName.Text) * TotalIterations) / 1048576, "#,##0.#") & " Meg)"
-    Catch
-      lblAllResults.Text = ""
-    End Try
-  End Sub
-
   Private Sub btnInputAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputAdd.Click
     Dim frmVary As New frmVariation
     Dim lVariation As New Variation
@@ -1045,13 +1012,11 @@ Public Class frmIterative
     End With
     lVariation = frmVary.AskUser(lVariation)
     If Not lVariation Is Nothing Then
+      lVariation.Selected = True
+      lVariation.CurrentValue = lVariation.Min
       pInputs.Add(lVariation)
-      lstInputs.Items.Add(lVariation.ToString)
-      lstInputs.SetItemChecked(lstInputs.Items.Count - 1, True)
-
-      pEndpoints.Add(lVariation)
-      lstEndpoints.Items.Add(InputArgumentPrefix & lVariation.Name)
-      UpdateTotalIterations()
+      RefreshInputList()
+      RefreshTotalIterations()
     End If
   End Sub
 
@@ -1064,9 +1029,8 @@ Public Class frmIterative
       If Not lVariation Is Nothing Then
         pInputs.RemoveAt(lIndex)
         pInputs.Insert(lIndex, lVariation)
-        lstInputs.Items.RemoveAt(lIndex)
-        lstInputs.Items.Insert(lIndex, lVariation.ToString)
-        UpdateTotalIterations()
+        RefreshInputList()
+        RefreshTotalIterations()
       End If
     End If
   End Sub
@@ -1074,9 +1038,9 @@ Public Class frmIterative
   Private Sub btnInputRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputRemove.Click
     For Each lIndex As Integer In lstInputs.SelectedIndices
       pInputs.RemoveAt(lIndex)
-      lstInputs.Items.RemoveAt(lIndex)
+      RefreshInputList()
     Next
-    UpdateTotalIterations()
+    RefreshTotalIterations()
   End Sub
 
   Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aMoveFrom As Integer, ByVal aMoveTo As Integer)
@@ -1120,14 +1084,72 @@ Public Class frmIterative
     End With
     lVariation = frmEnd.AskUser(lVariation)
     If Not lVariation Is Nothing Then
+      lVariation.Selected = True
       pEndpoints.Add(lVariation)
-      lstEndpoints.Items.Add(lVariation.ToString)
-      lstEndpoints.SetItemChecked(lstEndpoints.Items.Count - 1, True)
+      RefreshEndpointList()
     End If
   End Sub
 
+  Private Sub RefreshTotalIterations()
+    Dim lLabelText As String
+    Dim iVariation As Integer = 0
+    TotalIterations = 1
+    'Make a collection of the variations that are selected/checked in lstInputs
+    For Each lVariation As Variation In pInputs
+      lVariation.Selected = lstInputs.CheckedIndices.Contains(iVariation)
+      If lVariation.Selected Then
+        TotalIterations *= lVariation.Iterations
+      End If
+      iVariation += 1
+    Next
+    lLabelText = "Total iterations selected = " & TotalIterations
+    If TimePerRun > 0 Then
+      lLabelText &= " (" & FormatTime(TimePerRun * TotalIterations) & ")"
+    End If
+    UpdateTopLabel(lLabelText)
+    Try
+      lblAllResults.Text = "(" & Format((FileLen(cboBaseScenarioName.Text) * TotalIterations) / 1048576, "#,##0.#") & " Meg)"
+    Catch
+      lblAllResults.Text = ""
+    End Try
+  End Sub
+
+  Private Sub RefreshInputList()
+    lstInputs.Items.Clear()
+    For Each lVariation As Variation In pInputs
+      lstInputs.Items.Add(lVariation.ToString)
+      lstInputs.SetItemChecked(lstInputs.Items.Count - 1, lVariation.Selected)
+    Next
+    RefreshEndpointList()
+  End Sub
+
+  Private Sub RefreshEndpointList()
+    Dim lVariation As Variation
+    lstEndpoints.Items.Clear()
+
+    'Add endpoint references to inputs
+    For Each lVariation In pInputs
+      lstEndpoints.Items.Add(InputArgumentPrefix & lVariation.Name)
+      lstEndpoints.SetItemChecked(lstEndpoints.Items.Count - 1, lVariation.Selected)
+    Next
+
+    For Each lVariation In pEndpoints
+      lstEndpoints.Items.Add(lVariation.ToString)
+      lstEndpoints.SetItemChecked(lstEndpoints.Items.Count - 1, lVariation.Selected)
+    Next
+
+  End Sub
+
+  Private Sub EndpointSelectionFromList()
+    Dim lListIndex As Integer = pInputs.Count
+    For Each lVariation As Variation In pEndpoints
+      lVariation.Selected = lstEndpoints.GetItemChecked(lListIndex)
+      lListIndex += 1
+    Next
+  End Sub
+
   Private Sub btnEndpointModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointModify.Click
-    Dim lIndex As Integer = lstEndpoints.SelectedIndex
+    Dim lIndex As Integer = lstEndpoints.SelectedIndex - pInputs.Count
     If lIndex >= 0 And lIndex < pEndpoints.Count Then
       Dim lVariation As Variation = pEndpoints.ItemByIndex(lIndex)
       Dim frmEnd As New frmEndpoint
@@ -1135,8 +1157,7 @@ Public Class frmIterative
       If Not lVariation Is Nothing Then
         pEndpoints.RemoveAt(lIndex)
         pEndpoints.Insert(lIndex, lVariation)
-        lstEndpoints.Items.RemoveAt(lIndex)
-        lstEndpoints.Items.Insert(lIndex, lVariation.ToString)
+        RefreshEndpointList()
       End If
     End If
   End Sub
@@ -1148,90 +1169,107 @@ Public Class frmIterative
     Next
   End Sub
 
-  Private Sub UpdateList(ByVal aContents As atcCollection, ByVal aList As Windows.Forms.ListBox)
-    aList.Items.Clear()
-    For Each lVariation As Variation In aContents
-      aList.Items.Add(lVariation.ToString)
-    Next
-  End Sub
-
   Private Sub mnuSaveVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSaveVariations.Click
     Dim lSaveDialog As New Windows.Forms.SaveFileDialog
     With lSaveDialog
-      .FileName = "Variations.txt"
-      .Filter = "Text files (*.txt)|*.txt|All files|*.*"
+      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastVariations", "Variations.xml")
+      .Filter = "XML files (*.xml)|*.xml|All files|*.*"
       .FilterIndex = 1
       .Title = "Save Variations as XML Text"
       .OverwritePrompt = True
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-        'write file from grid contents
-        Dim lXML As String = VariationsXML
-        SaveFileString(.FileName, lXML)
+        'write file from form contents
+        SaveFileString(.FileName, (XML))
+        SaveSetting("ScenarioBuilder", "Settings", "LastVariations", .FileName)
       End If
     End With
   End Sub
 
-  Public Property VariationsXML() As String
+  Public Property XML() As String
     Get
-      Dim lXML As String = "<Variations>" & vbCrLf
-      For Each lVariation As Variation In pInputs
+      Dim lXML As String = "<Iterative>" & vbCrLf
+      Dim lVariation As Variation
+      Dim lVariationIndex As Integer = 0
+
+      lXML &= "<Variations>" & vbCrLf
+      For Each lVariation In pInputs
         lXML &= lVariation.XML
+        lVariationIndex += 1
       Next
-      Return lXML & "</Variations>" & vbCrLf
+      lXML &= "</Variations>" & vbCrLf
+      lXML &= "<Endpoints>" & vbCrLf
+      lVariationIndex = 0
+      For Each lVariation In pEndpoints
+        If Double.IsNaN(lVariation.CurrentValue) Then
+          Dim lOneXML As New Chilkat.Xml
+          lOneXML.LoadXml(lVariation.XML)
+          If lstInputs.SelectedIndices.Contains(lVariationIndex) Then
+            lOneXML.AddAttribute("Selected", "True")
+          End If
+          lXML &= lOneXML.GetXml
+        End If
+        lVariationIndex += 1
+      Next
+      lXML &= "</Endpoints>" & vbCrLf
+
+      lXML &= "</Iterative>" & vbCrLf
+
+      'Dim lCXML As New Chilkat.Xml
+      'If lCXML.LoadXml(lXML) Then
+      '  Return lCXML.GetXml
+      'Else
+      '  Logger.Dbg("Could not parse new XML")
+      Return lXML
+      'End If
     End Get
     Set(ByVal Value As String)
       Dim lXML As New Chilkat.Xml
-      If lXML.LoadXml(Value) Then
-        If lXML.Tag.ToLower.Equals("variations") Then
-          If lXML.FirstChild2 Then
-            Dim lVariation As Variation
-            pInputs.Clear()
-            lstInputs.Items.Clear()
-            Do
-              lVariation = New Variation
-              lVariation.XML = lXML.GetXml
-              pInputs.Add(lVariation)
-              lstInputs.Items.Add(lVariation.ToString)
-            Loop While lXML.NextSibling2
-
-            'Remove endpoint references to old inputs
-            Dim iEndpoint As Integer = 0
-            While iEndpoint < lstEndpoints.Items.Count
-              If lstEndpoints.Items(iEndpoint).ToString.StartsWith(InputArgumentPrefix) Then
-                lstEndpoints.Items.RemoveAt(iEndpoint)
-                pEndpoints.RemoveAt(iEndpoint)
-              Else
-                iEndpoint += 1
+      If lXML.LoadXml(Value) AndAlso lXML.Tag.ToLower.Equals("iterative") AndAlso lXML.FirstChild2 Then
+        Do
+          Dim lVariation As Variation
+          Dim lChild As Chilkat.Xml = lXML.FirstChild
+          Select Case lXML.Tag.ToLower
+            Case "variations"
+              pInputs.Clear()
+              If Not lChild Is Nothing Then
+                Do
+                  lVariation = New Variation
+                  lVariation.XML = lChild.GetXml
+                  pInputs.Add(lVariation)
+                Loop While lChild.NextSibling2
               End If
-            End While
+              RefreshTotalIterations()
 
-            'Add endpoint references to new inputs
-            For Each lVariation In pInputs
-              pEndpoints.Add(lVariation)
-              lstEndpoints.Items.Add(InputArgumentPrefix & lVariation.Name)
-            Next
-          End If
-          UpdateTotalIterations()
-        Else
-          Logger.Msg("Variations not found " & vbCrLf & lXML.LastErrorText, "Load Variations")
-        End If
+            Case "endpoints"
+              pEndpoints.Clear()
+              If Not lChild Is Nothing Then
+                Do
+                  lVariation = New Variation
+                  lVariation.XML = lChild.GetXml
+                  pEndpoints.Add(lVariation)
+                Loop While lChild.NextSibling2
+              End If
+              RefreshEndpointList()
+          End Select
+        Loop While lXML.NextSibling2
+        RefreshInputList()
       Else
         Logger.Msg("Could not parse variations " & vbCrLf & lXML.LastErrorText, "Load Variations")
       End If
-
     End Set
   End Property
 
   Private Sub mnuLoadVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuLoadVariations.Click
     Dim lOpenDialog As New Windows.Forms.OpenFileDialog
     With lOpenDialog
-      .FileName = "Variations.txt"
-      .Filter = "Text files (*.txt)|*.txt|All files|*.*"
+      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastVariations", "Variations.xml")
+      .Filter = "XML files (*.xml)|*.xml|All files|*.*"
       .FilterIndex = 1
       .Title = "Scenario Builder - Load Variations"
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         If FileExists(.FileName) Then
-          VariationsXML = WholeFileString(.FileName)
+          XML = WholeFileString(.FileName)
+          SaveSetting("ScenarioBuilder", "Settings", "LastVariations", .FileName)
         End If
       End If
     End With
@@ -1241,10 +1279,15 @@ Public Class frmIterative
     btnStart.Visible = True
     btnStop.Visible = False
     pRunning = False
+    UpdateTopLabel("Stopping")
   End Sub
 
   Private Sub lstInputs_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lstInputs.MouseUp
-    UpdateTotalIterations()
+    RefreshTotalIterations()
+  End Sub
+
+  Private Sub lstEndpoints_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lstEndpoints.MouseUp
+    EndpointSelectionFromList()
   End Sub
 
 End Class

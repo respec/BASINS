@@ -13,4 +13,13 @@ Public Class atcSeasonsDayOfYear
     End Select
   End Function
 
+  Public Overrides Function AllSeasons() As Integer()
+    Dim lAllSeasons As Integer()
+    ReDim lAllSeasons(365)
+    For lSeasonIndex As Integer = 0 To 365
+      lAllSeasons(lSeasonIndex) = lSeasonIndex - 1
+    Next
+    Return lAllSeasons
+  End Function
+
 End Class

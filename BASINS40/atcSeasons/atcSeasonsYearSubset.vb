@@ -3,6 +3,7 @@ Imports atcData
 Public Class atcSeasonsYearSubset
   Inherits atcSeasonBase
 
+  Private pAllSeasons As Integer() = {0, 1}
   Private pTS As atcTimeseries
   Private pStartDate As Date
   Private pEndDate As Date
@@ -98,6 +99,10 @@ Public Class atcSeasonsYearSubset
       Case 1 : Return "Inside"
       Case Else : Return Nothing
     End Select
+  End Function
+
+  Public Overrides Function AllSeasons() As Integer()
+    Return pAllSeasons
   End Function
 
 End Class
