@@ -380,6 +380,7 @@ Public Class frmCliGen
     If Len(pParmFileName) > 0 Then
       txtParmFile.Text = pParmFileName
       If ReadParmFile(pParmFileName, cHeader, cTable, cFooter) Then
+        LoadGrid()
         agdMonParms.Enabled = True
         btnSelParms.Enabled = True
         rdoAbs.Enabled = True
@@ -407,96 +408,96 @@ Public Class frmCliGen
     Close()
   End Sub
 
-  Private Function ReadParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As atcTableFixed, ByRef aFooter As String) As Boolean
-    Dim lStr As String
-    Dim lpos As Integer
-    lStr = WholeFileString(aFileName)
-    lpos = InStr(lStr, " MEAN P ")
-    If lpos > 0 Then 'start of monthly data found, save headers
-      aHeader = Mid(lStr, 1, lpos - 1)
-      lblStation.Text = aHeader
-      lStr = Mid(lStr, lpos)
-      lpos = InStr(lStr, "INTERPOLATED")
-      If lpos > 0 Then 'start of footer found
-        aFooter = Mid(lStr, lpos)
-        lStr = Mid(lStr, 1, lpos - 1)
-      End If
-      If Len(lStr) > 0 Then 'only editable table parameters left
-        aTable = New atcTableFixed
-        cParmStr = lStr
-        If aTable.OpenString(lStr) Then 'load table into grid
-          If ReadParmTable(lStr) Then
-            Return True
-          Else
-            Return False
-          End If
-        End If
-      End If
-    Else
-      Logger.Msg("CliGen parameters not found in file " & pParmFileName & vbCrLf & _
-                 "Expecting to find parameters starting with 'MEAN P'", "CliGen Problem")
-      Return False
-    End If
-  End Function
+  'Private Function ReadParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As atcTableFixed, ByRef aFooter As String) As Boolean
+  '  Dim lStr As String
+  '  Dim lpos As Integer
+  '  lStr = WholeFileString(aFileName)
+  '  lpos = InStr(lStr, " MEAN P ")
+  '  If lpos > 0 Then 'start of monthly data found, save headers
+  '    aHeader = Mid(lStr, 1, lpos - 1)
+  '    lblStation.Text = aHeader
+  '    lStr = Mid(lStr, lpos)
+  '    lpos = InStr(lStr, "INTERPOLATED")
+  '    If lpos > 0 Then 'start of footer found
+  '      aFooter = Mid(lStr, lpos)
+  '      lStr = Mid(lStr, 1, lpos - 1)
+  '    End If
+  '    If Len(lStr) > 0 Then 'only editable table parameters left
+  '      aTable = New atcTableFixed
+  '      cParmStr = lStr
+  '      If aTable.OpenString(lStr) Then 'load table into grid
+  '        If ReadParmTable(lStr) Then
+  '          Return True
+  '        Else
+  '          Return False
+  '        End If
+  '      End If
+  '    End If
+  '  Else
+  '    Logger.Msg("CliGen parameters not found in file " & pParmFileName & vbCrLf & _
+  '               "Expecting to find parameters starting with 'MEAN P'", "CliGen Problem")
+  '    Return False
+  '  End If
+  'End Function
 
-  Private Function ReadParmTable(ByVal aParmStr As String) As Boolean
+  'Private Function ReadParmTable(ByVal aParmStr As String) As Boolean
 
-    Dim lSCol() As Integer = {0, 1, 9, 15, 21, 27, 33, 39, 45, 51, 57, 63, 69, 75, 81}
-    Dim lFLen() As Integer = {0, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6}
-    Dim lFldNames() As String = {"", "Cons", "Jan", "Feb", "Mar", "Apr", "May", _
-                                 "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"}
-    Dim i As Integer
-    Dim lRow As Integer = 0
-    Dim s As String
-    cTable = New atcTableFixed
-    With cTable
-      .NumFields = 13
-      For i = 1 To .NumFields
-        .FieldName(i) = lFldNames(i)
-        .FieldLength(i) = lFLen(i)
-        .FieldStart(i) = lSCol(i)
-        agdMonParms.Source.CellValue(0, i - 1) = lFldNames(i)
-      Next
-    End With
-    If cModByPercent Then
-      agdMonParms.Source.CellValue(0, 14) = "Edit Row, Percent"
-    Else
-      agdMonParms.Source.CellValue(0, 14) = "Edit Row, Absolute"
-    End If
-    If LoadGrid(aParmStr) Then
-      Return True
-    Else
-      Return False
-    End If
+  '  Dim lSCol() As Integer = {0, 1, 9, 15, 21, 27, 33, 39, 45, 51, 57, 63, 69, 75, 81}
+  '  Dim lFLen() As Integer = {0, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6}
+  '  Dim lFldNames() As String = {"", "Cons", "Jan", "Feb", "Mar", "Apr", "May", _
+  '                               "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"}
+  '  Dim i As Integer
+  '  Dim lRow As Integer = 0
+  '  Dim s As String
+  '  cTable = New atcTableFixed
+  '  With cTable
+  '    .NumFields = 13
+  '    For i = 1 To .NumFields
+  '      .FieldName(i) = lFldNames(i)
+  '      .FieldLength(i) = lFLen(i)
+  '      .FieldStart(i) = lSCol(i)
+  '      agdMonParms.Source.CellValue(0, i - 1) = lFldNames(i)
+  '    Next
+  '  End With
+  '  If cModByPercent Then
+  '    agdMonParms.Source.CellValue(0, 14) = "Edit Row, Percent"
+  '  Else
+  '    agdMonParms.Source.CellValue(0, 14) = "Edit Row, Absolute"
+  '  End If
+  '  If LoadGrid(aParmStr) Then
+  '    Return True
+  '  Else
+  '    Return False
+  '  End If
 
-  End Function
+  'End Function
 
-  Private Sub WriteParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As IatcTable, ByRef aFooter As String)
-    Dim lStr As String
-    Dim lPos As Integer
-    Dim lVal As Double
-    lStr = aHeader
-    cTable.MoveFirst()
-    For i As Integer = 1 To cTable.NumRecords
-      For j As Integer = 2 To cTable.NumFields
-        If IsNumeric(agdMonParms.Source.CellValue(i, j - 1)) Then
-          lVal = CDbl(agdMonParms.Source.CellValue(i, j - 1))
-          Select Case Trim(UCase(cTable.Value(1)))
-            Case "SOL.RAD", "SD SOL"
-              cTable.Value(j) = RightJustify(DoubleToString(lVal, , "####.0"), cTable.FieldLength(j))
-            Case "TIME PK"
-              cTable.Value(j) = RightJustify(DoubleToString(lVal, , "#.000"), cTable.FieldLength(j))
-            Case Else
-              cTable.Value(j) = RightJustify(DoubleToString(lVal, , "###.00"), cTable.FieldLength(j))
-          End Select
-        End If
-      Next
-      lStr += cTable.CurrentRecordAsDelimitedString("") & vbCrLf
-      cTable.MoveNext()
-    Next i
-    lStr += aFooter
-    SaveFileString(aFileName, lStr)
-  End Sub
+  'Private Sub WriteParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As IatcTable, ByRef aFooter As String)
+  '  Dim lStr As String
+  '  Dim lPos As Integer
+  '  Dim lVal As Double
+  '  lStr = aHeader
+  '  cTable.MoveFirst()
+  '  For i As Integer = 1 To cTable.NumRecords
+  '    For j As Integer = 2 To cTable.NumFields
+  '      If IsNumeric(agdMonParms.Source.CellValue(i, j - 1)) Then
+  '        lVal = CDbl(agdMonParms.Source.CellValue(i, j - 1))
+  '        Select Case Trim(UCase(cTable.Value(1)))
+  '          Case "SOL.RAD", "SD SOL"
+  '            cTable.Value(j) = RightJustify(DoubleToString(lVal, , "####.0"), cTable.FieldLength(j))
+  '          Case "TIME PK"
+  '            cTable.Value(j) = RightJustify(DoubleToString(lVal, , "#.000"), cTable.FieldLength(j))
+  '          Case Else
+  '            cTable.Value(j) = RightJustify(DoubleToString(lVal, , "###.00"), cTable.FieldLength(j))
+  '        End Select
+  '      End If
+  '    Next
+  '    lStr += cTable.CurrentRecordAsDelimitedString("") & vbCrLf
+  '    cTable.MoveNext()
+  '  Next i
+  '  lStr += aFooter
+  '  SaveFileString(aFileName, lStr)
+  'End Sub
 
   Private Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click
 
@@ -508,6 +509,7 @@ Public Class frmCliGen
       .OverwritePrompt = True
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         pParmFileName = AbsolutePath(.FileName, CurDir)
+        SaveGridToTable()
         WriteParmFile(pParmFileName, cHeader, cTable, cFooter)
         txtParmFile.Text = pParmFileName
       End If
@@ -542,56 +544,93 @@ Public Class frmCliGen
     End If
   End Sub
 
-  Private Function LoadGrid(ByVal aParmStr As String) As Boolean
+  Private Sub LoadGrid()
+    Dim i As Integer
     Dim lRow As Integer
     Dim lParm As String
     Dim lWind As String = ""
     With cTable
-      If .OpenString(aParmStr) Then
-        agdMonParms.Source.Rows = 1
-        While Not .atEOF
-          lParm = Trim(.Value(1))
-          If lParm.IndexOf("%") >= 0 Then lWind = lParm
-          If lWind.Length > 0 And (lParm.StartsWith("MEAN") Or lParm.StartsWith("STD DEV") Or lParm.StartsWith("SKEW")) Then
-            lParm = lWind & "-" & lParm
-          End If
-          If cParms.IndexFromKey(lParm) = -1 Then 'this parm not in collection, assume editing
-            cParms.Add(lParm, True)
-          End If
-          If cParms.ItemByKey(lParm) Then 'this parm selected for editing
-            lRow += 1
-            With agdMonParms.Source
-              For i As Integer = 1 To cTable.NumFields
-                If i = 1 Then
-                  If cParmDescs.IndexFromKey(lParm) = -1 Then 'no description, use label from parm file 
-                    .CellValue(lRow, i - 1) = Trim(cTable.Value(i))
-                  Else
-                    .CellValue(lRow, i - 1) = cParmDescs.ItemByKey(lParm)
-                  End If
-                  .CellColor(lRow, i - 1) = SystemColors.ControlLight
-                Else
-                    .CellValue(lRow, i - 1) = Trim(cTable.Value(i))
-                    .CellEditable(lRow, i - 1) = True
-                    .Alignment(lRow, i - 1) = atcAlignment.HAlignCenter
-                  End If
-              Next i
-              .CellColor(lRow, cTable.NumFields) = SystemColors.ControlLight
-              .CellValue(lRow, cTable.NumFields + 1) = "0"
-              .CellEditable(lRow, cTable.NumFields + 1) = True
-              .Alignment(lRow, cTable.NumFields + 1) = atcAlignment.HAlignCenter
-            End With
-          End If
-          .MoveNext()
-        End While
-        agdMonParms.SizeAllColumnsToContents(fraStaParms.Width - 30)
-        agdMonParms.Refresh()
-        Return True
+      For i = 1 To .NumFields
+        agdMonParms.Source.CellValue(0, i - 1) = .FieldName(i)
+      Next
+      If cModByPercent Then
+        agdMonParms.Source.CellValue(0, 14) = "Edit Row, Percent"
       Else
-        Logger.Msg("Problem reading parameter table from Cligen file " & pParmFileName, "CliGen Problem")
-        Return False
+        agdMonParms.Source.CellValue(0, 14) = "Edit Row, Absolute"
       End If
+      .MoveFirst()
+      agdMonParms.Source.Rows = 1
+      While Not .atEOF
+        lParm = Trim(.Value(1))
+        If lParm.IndexOf("%") >= 0 Then lWind = lParm
+        If lWind.Length > 0 And (lParm.StartsWith("MEAN") Or lParm.StartsWith("STD DEV") Or lParm.StartsWith("SKEW")) Then
+          lParm = lWind & "-" & lParm
+        End If
+        If cParms.IndexFromKey(lParm) = -1 Then 'this parm not in collection, assume editing
+          cParms.Add(lParm, True)
+        End If
+        If cParms.ItemByKey(lParm) Then 'this parm selected for editing
+          lRow += 1
+          With agdMonParms.Source
+            For i = 1 To cTable.NumFields
+              If i = 1 Then
+                If cParmDescs.IndexFromKey(lParm) = -1 Then 'no description, use label from parm file 
+                  .CellValue(lRow, i - 1) = Trim(cTable.Value(i))
+                Else
+                  .CellValue(lRow, i - 1) = cParmDescs.ItemByKey(lParm)
+                End If
+                .CellColor(lRow, i - 1) = SystemColors.ControlLight
+              Else
+                .CellValue(lRow, i - 1) = Trim(cTable.Value(i))
+                .CellEditable(lRow, i - 1) = True
+                .Alignment(lRow, i - 1) = atcAlignment.HAlignCenter
+              End If
+            Next i
+            .CellColor(lRow, cTable.NumFields) = SystemColors.ControlLight
+            .CellValue(lRow, cTable.NumFields + 1) = "0"
+            .CellEditable(lRow, cTable.NumFields + 1) = True
+            .Alignment(lRow, cTable.NumFields + 1) = atcAlignment.HAlignCenter
+          End With
+        End If
+        .MoveNext()
+      End While
+      agdMonParms.SizeAllColumnsToContents(fraStaParms.Width - 30)
+      agdMonParms.Refresh()
     End With
-  End Function
+  End Sub
+
+  Private Sub SaveGridToTable()
+    Dim lInd As Integer
+    Dim lParm As String
+    Dim lNewVal As Double
+    For i As Integer = 1 To agdMonParms.Source.Rows - 1
+      lParm = agdMonParms.Source.CellValue(i, 0)
+      lInd = cParmDescs.IndexOf(lParm)
+      If lInd >= 0 Then 'get parameter name from same index as description
+        lParm = cParms.Keys(lInd)
+      End If
+      For iMon As Integer = 2 To 13
+        lNewVal = agdMonParms.Source.CellValue(i, iMon - 1)
+        UpdateParmTable(cTable, lParm, iMon, lNewVal)
+      Next
+      'With cTable
+      '  If .FindFirst(1, lParm) Then
+      '    For iMon As Integer = 2 To 13
+      '      lNewVal = agdMonParms.Source.CellValue(i, iMon - 1)
+      '      Select Case lParm
+      '        Case "SOL.RAD", "SD SOL"
+      '          .Value(iMon) = RightJustify(DoubleToString(lNewVal, , "####.0"), .FieldLength(iMon))
+      '        Case "TIME PK"
+      '          .Value(iMon) = RightJustify(DoubleToString(lNewVal, , "#.000"), .FieldLength(iMon))
+      '        Case Else
+      '          .Value(iMon) = RightJustify(DoubleToString(lNewVal, , "###.00"), .FieldLength(iMon))
+      '      End Select
+      '    Next
+      '    .Update()
+      '  End If
+      'End With
+    Next
+  End Sub
 
   Private Sub GetParmsToEdit()
     cParmsFile = FindFile("Locate file containing CliGen parameters to be edited", "CliGenEdit.prm", "*.prm", cParms2EditFilter)
@@ -653,7 +692,7 @@ Public Class frmCliGen
     Dim lform As New frmCliGenParmList
     If lform.AskUser(cParms, cParmDescs) Then
       WriteParmsToEdit()
-      LoadGrid(cParmStr)
+      LoadGrid()
     End If
   End Sub
 
@@ -699,6 +738,6 @@ Public Class frmCliGen
   End Sub
 
   Private Sub btnReset_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnReset.Click
-    LoadGrid(cParmStr)
+    LoadGrid()
   End Sub
 End Class

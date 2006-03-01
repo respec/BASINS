@@ -492,4 +492,10 @@ ReadCharacter:
   Public Sub New()
     pHeaders = New clsHeader
   End Sub
+
+  'rewrites the current record with the values in pData
+  Public Sub Update()
+    pRecords(pCurrentRecord) = CurrentRecordAsDelimitedString("") & vbCrLf
+  End Sub
+
 End Class

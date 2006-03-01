@@ -188,6 +188,11 @@
                     DependentUpon = "frmCligGenParmList.vb"
                     BuildAction = "EmbeddedResource"
                 />
+                <File
+                    RelPath = "modCliGen.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
             </Include>
         </Files>
     </VisualBasic>

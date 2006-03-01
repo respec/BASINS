@@ -30,7 +30,7 @@ Public Class atcCligen
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Tools::Cligen"
+      Return "Analysis::Cligen"
     End Get
   End Property
 

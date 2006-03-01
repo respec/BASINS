@@ -252,10 +252,14 @@ Public MustInherit Class atcTable
     If aEndRecord < 1 Then aEndRecord = NumRecords
     CurrentRecord = aStartRecord
     While CurrentRecord <= aEndRecord
-      If Value(aFieldNumber) = aFindValue Then
+      If Trim(Value(aFieldNumber)) = Trim(aFindValue) Then
         Return True
       End If
-      CurrentRecord += 1
+      If CurrentRecord < aEndRecord Then
+        CurrentRecord += 1
+      Else 'force exit since attempting to set CurrentRecord beyond NumRecords sets it back to 1
+        Exit While
+      End If
     End While
     CurrentRecord = aStartRecord
     Return False
