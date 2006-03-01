@@ -581,7 +581,12 @@ Public Class GisUtil
     If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
       Throw New Exception("GisUtil:FieldValue:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
     ElseIf FeatureIndexValid(aFeatureIndex, lSf) Then
-      Return lSf.CellValue(aFieldIndex, aFeatureIndex)
+      Dim lCellValue As Object = lSf.CellValue(aFieldIndex, aFeatureIndex)
+      If lCellValue.GetType.Name = "DBNull" Then
+        Return Nothing
+      Else
+        Return lCellValue
+      End If
     End If
   End Function
 
@@ -1276,7 +1281,7 @@ Public Class GisUtil
       lBsuc = lSfOut.EditInsertField([lOf], 0)
       Dim lof2 As New MapWinGIS.Field
       lof2.Name = aLayer2FieldName
-      lof2.Type = FieldType(lLayer2FieldIndex, lLayer2Index)
+      lof2.Type = MapWinGIS.FieldType.INTEGER_FIELD
       lof2.Width = 10
       lBsuc = lSfOut.EditInsertField(lof2, 1)
       Dim lof3 As New MapWinGIS.Field
