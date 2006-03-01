@@ -937,107 +937,110 @@ Public Class GisUtil
     GetMappingObject.Layers.Remove(aLayerIndex)
   End Function
 
+  ''' <summary>Given a grid and a polygon layer, calculate the area of each grid category 
+  '''          within each polygon.  Output array contains area of each grid category
+  '''          and polygon combination.</summary>
+  ''' <remark>This function can be accomplished in MapWindow by 
+  '''         looping through each grid cell and counting the 
+  '''         number of cells of each grid category within each 
+  '''         feature. The MapWinGIS calls to use include the Grid 
+  '''         Property Value, the GridHeader Properties dX, dY, XllCenter, 
+  '''         and YllCenter, and the Shapefile Function PointInShapefile. 
+  ''' <param name="aGridLayerIndex">
+  '''     <para>Index of grid layer containing values</para>
+  ''' </param>
+  ''' <param name="aPolygonLayerIndex">
+  '''     <para>Index of polgon layer to calculate areas for</para>
+  ''' </param>
+  ''' <param name="aAreaGridPoly(,)">
+  '''     <para>Array used to store output areas</para>
+  ''' </param>
   Public Shared Sub TabulateAreas(ByVal aGridLayerIndex As Integer, _
                                   ByVal aPolygonLayerIndex As Integer, _
-                                  ByVal aAreaGridPoly(,) As Double)
-    'Given a grid and a polygon layer, calculate the area of each grid category 
-    'within each polygon.  Output array contains area of each grid category
-    'and polygon combination.
-
-    'This function can be accomplished in MapWindow by 
-    'looping through each grid cell and counting the 
-    'number of cells of each grid category within each 
-    'feature. The MapWinGIS calls to use include the Grid 
-    'Property Value, the GridHeader Properties dX, dY, XllCenter, 
-    'and YllCenter, and the Shapefile Function PointInShapefile. 
-    Dim ic As Integer
-    Dim ir As Integer
-    Dim xpos As Double
-    Dim ypos As Double
-    Dim subid As Integer
-    Dim luid As Integer
-    Dim lcellarea As Double
-    Dim totalcellcount As Integer
-    Dim cellcount As Integer
-    Dim lastdisplayed As Integer
-    Dim startingcolumn As Integer
-    Dim endingcolumn As Integer
-    Dim startingrow As Integer
-    Dim endingrow As Integer
-    Dim lminx As Double
-    Dim lmaxx As Double
-    Dim lminy As Double
-    Dim lmaxy As Double
-    Dim i As Integer
-    Dim j As Integer
-
+                                  ByRef aAreaGridPoly(,) As Double)
     'set input grid
-    Dim InputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
+    Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
     'set input polygon layer
     Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
+
+    Dim lMinX As Double
+    Dim lMaxX As Double
+    Dim lMinY As Double
+    Dim lMaxY As Double
     'figure out what part of the grid overlays these polygons
     If NumSelectedFeatures(aPolygonLayerIndex) = 0 Then
       'use whole extent of shapefile
-      lminx = lPolygonSf.Extents.xMin
-      lmaxx = lPolygonSf.Extents.xMax
-      lminy = lPolygonSf.Extents.yMin
-      lmaxy = lPolygonSf.Extents.yMax
-    Else
-      'use only extent of selected features
-      j = IndexOfNthSelectedFeatureInLayer(0, aPolygonLayerIndex)
-      lminx = lPolygonSf.Shape(j).Extents.xMin
-      lmaxx = lPolygonSf.Shape(j).Extents.xMax
-      lminy = lPolygonSf.Shape(j).Extents.yMin
-      lmaxy = lPolygonSf.Shape(j).Extents.yMax
-      For i = 1 To NumSelectedFeatures(aPolygonLayerIndex) - 1
-        j = IndexOfNthSelectedFeatureInLayer(i, aPolygonLayerIndex)
-        If lPolygonSf.Shape(j).Extents.xMin < lminx Then
-          lminx = lPolygonSf.Shape(j).Extents.xMin
+      lMinX = lPolygonSf.Extents.xMin
+      lMaxX = lPolygonSf.Extents.xMax
+      lMinY = lPolygonSf.Extents.yMin
+      lMaxY = lPolygonSf.Extents.yMax
+    Else 'use only extent of selected features
+      Dim lShapeIndex As Integer = IndexOfNthSelectedFeatureInLayer(0, aPolygonLayerIndex)
+      lMinX = 1.0E+30
+      lMaxX = -1.0E+30
+      lMinY = 1.0E+30
+      lMaxY = -1.0E+30
+      For lSelectedIndex As Integer = 0 To NumSelectedFeatures(aPolygonLayerIndex) - 1
+        Dim lPolyIndex As Integer = IndexOfNthSelectedFeatureInLayer(lSelectedIndex, aPolygonLayerIndex)
+        If lPolygonSf.Shape(lPolyIndex).Extents.xMin < lMinX Then
+          lMinX = lPolygonSf.Shape(lPolyIndex).Extents.xMin
         End If
-        If lPolygonSf.Shape(j).Extents.yMin < lminy Then
-          lminy = lPolygonSf.Shape(j).Extents.yMin
+        If lPolygonSf.Shape(lPolyIndex).Extents.yMin < lMinY Then
+          lMinY = lPolygonSf.Shape(lPolyIndex).Extents.yMin
         End If
-        If lPolygonSf.Shape(j).Extents.xMax > lmaxx Then
-          lmaxx = lPolygonSf.Shape(j).Extents.xMax
+        If lPolygonSf.Shape(lPolyIndex).Extents.xMax > lMaxX Then
+          lMaxX = lPolygonSf.Shape(lPolyIndex).Extents.xMax
         End If
-        If lPolygonSf.Shape(j).Extents.yMax > lmaxy Then
-          lmaxy = lPolygonSf.Shape(j).Extents.yMax
+        If lPolygonSf.Shape(lPolyIndex).Extents.yMax > lMaxY Then
+          lMaxY = lPolygonSf.Shape(lPolyIndex).Extents.yMax
         End If
       Next
     End If
-    InputGrid.ProjToCell(lminx, lminy, startingcolumn, endingrow)
-    InputGrid.ProjToCell(lmaxx, lmaxy, endingcolumn, startingrow)
 
-    lcellarea = InputGrid.Header.dX * InputGrid.Header.dY
-    totalcellcount = (endingcolumn - startingcolumn) * (endingrow - startingrow)
-    cellcount = 0
-    lastdisplayed = 0
+    Dim lStartingColumn As Integer
+    Dim lEndingColumn As Integer
+    Dim lStartingRow As Integer
+    Dim lEndingRow As Integer
+    lInputGrid.ProjToCell(lMinX, lMinY, lStartingColumn, lEndingRow)
+    lInputGrid.ProjToCell(lMaxX, lMaxY, lEndingColumn, lStartingRow)
+
+    Dim lCellArea As Double = lInputGrid.Header.dX * lInputGrid.Header.dY
+    Dim lTotalCellCount As Integer = (lEndingColumn - lStartingColumn) * (lEndingRow - lStartingRow)
+    Dim lCellCount As Integer = 0
+    Dim lLastdisplayed As Integer = 0
     GetMappingObject.StatusBar.ShowProgressBar = True
     GetMappingObject.StatusBar.ProgressBarValue = 0
 
     lPolygonSf.BeginPointInShapefile()
-    For ir = startingrow To endingrow
-      For ic = startingcolumn To endingcolumn
-        InputGrid.CellToProj(ic, ir, xpos, ypos)
-        subid = lPolygonSf.PointInShapefile(xpos, ypos)
-        If subid > -1 Then
-          'this is in a subbasin
-          If InputGrid.Value(ic, ir).GetType.Name = "SByte" Then
-            luid = Convert.ToInt32(InputGrid.Value(ic, ir))
+    Dim lXPos As Double
+    Dim lYPos As Double
+    Dim lInsideId As Integer
+    Dim lGridValue As Integer
+
+    For lRow As Integer = lStartingRow To lEndingRow
+      For lCol As Integer = lStartingColumn To lEndingColumn
+        lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
+        lInsideId = lPolygonSf.PointInShapefile(lXPos, lYPos)
+        If lInsideId > -1 Then 'this is in a subbasin
+          If lInputGrid.Value(lCol, lRow).GetType.Name = "SByte" Then
+            lGridValue = Convert.ToInt32(lInputGrid.Value(lCol, lRow))
           Else
-            luid = InputGrid.Value(ic, ir)
+            lGridValue = lInputGrid.Value(lCol, lRow)
           End If
-          aAreaGridPoly(luid, subid) = aAreaGridPoly(luid, subid) + lcellarea
+          aAreaGridPoly(lGridValue, lInsideId) += lCellArea
         End If
-        cellcount = cellcount + 1
-        If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
-          lastdisplayed = Int(cellcount / totalcellcount * 100)
-          GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
+        lCellCount += 1
+        Dim lCurrentDisplay As Integer = Int(lCellCount / lTotalCellCount * 100)
+        If lCurrentDisplay > lLastdisplayed Then
+          lLastdisplayed = lCurrentDisplay
+          GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
         End If
-      Next ic
-    Next ir
+      Next lCol
+    Next lRow
+
     GetMappingObject.StatusBar.ShowProgressBar = False
     lPolygonSf.EndPointInShapefile()
+
   End Sub
 
   Public Shared Sub GridMinMaxInPolygon(ByVal aGridLayerIndex As Integer, ByVal aPolygonLayerIndex As Integer, _
@@ -1212,177 +1215,176 @@ Public Class GisUtil
     GridValueAtPoint = InputGrid.Value(column, row)
   End Function
 
-  Public Shared Sub Overlay(ByVal Layer1Name As String, ByVal Layer1FieldName As String, _
-                             ByVal Layer2Name As String, ByVal Layer2FieldName As String, _
-                             ByVal OutputLayerName As String, ByVal CreateNew As Boolean)
-    'overlay layer1 and layer2 (eg landuse and subbasins), creating a polygon layer 
-    'containing features from both layers
+  ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
+  ''' <param name="aLayer1Name">
+  '''     <para>Name of first layer to overlay</para>
+  ''' </param>
+  ''' <param name="aLayer1FieldName">
+  '''     <para>Name of field in first layer to overlay</para>
+  ''' </param>
+  ''' <param name="aLayer2Name">
+  '''     <para>Name of second layer to overlay</para>
+  ''' </param>
+  ''' <param name="aLayer1FieldName">
+  '''     <para>Name of field in second layer to overlay</para>
+  ''' </param>
+  ''' <param name="aOutputLayerName">
+  '''     <para>Name of output layer</para>
+  ''' </param>
+  ''' <param name="aCreateNew">
+  '''     <para>Flag, true if a new output shape file is desired, false if append existing file is desired</para>
+  ''' </param>
+  Public Shared Sub Overlay(ByVal aLayer1Name As String, ByVal aLayer1FieldName As String, _
+                            ByVal aLayer2Name As String, ByVal aLayer2FieldName As String, _
+                            ByVal aOutputLayerName As String, ByVal aCreateNew As Boolean)
+    Dim MapWinGISUtils As New MapWinGIS.Utils
 
-    Dim i As Integer
-    Dim k As Integer
-    Dim shapeindex As Integer
-    Dim Layer1Index As Integer
-    Dim Layer1FieldIndex As Integer
-    Dim Layer2Index As Integer
-    Dim Layer2FieldIndex As Integer
-    Dim totalpolygoncount As Integer
-    Dim polygoncount As Integer
-    Dim lastdisplayed As Integer
-    Dim SSFext As MapWinGIS.Extents
-    Dim LUext As MapWinGIS.Extents
-    Dim area As Double
-    Dim Feature1Id As String
-    Dim Feature2Id As String
-    Dim bsuc As Boolean
-    Dim lnumshapes As Integer
-
-    'set layer 1 (landuse)
-    Layer1Index = LayerIndex(Layer1Name)
-    Layer1FieldIndex = FieldIndex(Layer1Index, Layer1FieldName)
-    Dim lLayer As MapWindow.Interfaces.Layer
-    lLayer = GetMappingObject.Layers(Layer1Index)
-    Dim lusf As New MapWinGIS.Shapefile
-    lusf = lLayer.GetObject
+    'obtain handle to layer 1  
+    Dim lLayer1Index As Integer = LayerIndex(aLayer1Name)
+    Dim lLayer1FieldIndex As Integer = FieldIndex(lLayer1Index, aLayer1FieldName)
+    Dim lLayer1 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(lLayer1Index)
+    Dim lSf1 As New MapWinGIS.Shapefile
+    lSf1 = lLayer1.GetObject
 
     'set layer 2 (subbasins)
-    Layer2Index = LayerIndex(Layer2Name)
-    Layer2FieldIndex = FieldIndex(Layer2Index, Layer2FieldName)
-    Dim sLayer As MapWindow.Interfaces.Layer
-    sLayer = GetMappingObject.Layers(Layer2Index)
-    Dim ssf As New MapWinGIS.Shapefile
-    ssf = sLayer.GetObject
-    SSFext = ssf.Extents
+    Dim lLayer2Index As Integer = LayerIndex(aLayer2Name)
+    Dim lLayer2FieldIndex As Integer = FieldIndex(lLayer2Index, aLayer2FieldName)
+    Dim lLayer2 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(lLayer2Index)
+    Dim lSf2 As New MapWinGIS.Shapefile
+    lSf2 = lLayer2.GetObject
+    Dim lSf2Ext As MapWinGIS.Extents = lSf2.Extents
 
     'if any of layer 2 is selected, use only those
-    Dim cSelectedSubbasins As New Collection
-    For i = 1 To NumSelectedFeatures(Layer2Index)
-      cSelectedSubbasins.Add(IndexOfNthSelectedFeatureInLayer(i - 1, Layer2Index))
+    Dim lLayer2Selected As New Collection
+    For i As Integer = 1 To NumSelectedFeatures(lLayer2Index)
+      lLayer2Selected.Add(IndexOfNthSelectedFeatureInLayer(i - 1, lLayer2Index))
     Next
-    If cSelectedSubbasins.Count = 0 Then
-      'no subbasins selected, act as if all are selected
-      For i = 1 To NumFeatures(Layer2Index)
-        cSelectedSubbasins.Add(i - 1)
+    If lLayer2Selected.Count = 0 Then 'no subbasins selected, act as if all are selected
+      For i As Integer = 1 To NumFeatures(lLayer2Index)
+        lLayer2Selected.Add(i - 1)
       Next
     End If
 
-    Dim osf As New MapWinGIS.Shapefile
-    If CreateNew Then
-      'create new overlay shapefile
-      osf.CreateNew("overlay", MapWinGIS.ShpfileType.SHP_POLYGON)
-      Dim [of] As New MapWinGIS.Field
-      [of].Name = Layer1FieldName
-      [of].Type = MapWinGIS.FieldType.INTEGER_FIELD
-      [of].Width = 10
-      bsuc = osf.EditInsertField([of], 0)
-      Dim of2 As New MapWinGIS.Field
-      of2.Name = Layer2FieldName
-      of2.Type = FieldType(Layer2FieldIndex, Layer2Index)
-      of2.Width = 10
-      bsuc = osf.EditInsertField(of2, 1)
-      Dim of3 As New MapWinGIS.Field
-      of3.Name = "Area"
-      of3.Type = MapWinGIS.FieldType.DOUBLE_FIELD
-      of3.Width = 10
-      of3.Precision = 3
-      bsuc = osf.EditInsertField(of3, 2)
-    Else
-      'open existing
-      bsuc = osf.Open(OutputLayerName)
+    Dim lBsuc As Boolean
+    Dim lSfOut As New MapWinGIS.Shapefile
+    If aCreateNew Then 'create new output overlay shapefile
+      lSfOut.CreateNew("overlay", MapWinGIS.ShpfileType.SHP_POLYGON)
+      Dim [lOf] As New MapWinGIS.Field
+      [lOf].Name = aLayer1FieldName
+      [lOf].Type = MapWinGIS.FieldType.INTEGER_FIELD
+      [lOf].Width = 10
+      lBsuc = lSfOut.EditInsertField([lOf], 0)
+      Dim lof2 As New MapWinGIS.Field
+      lof2.Name = aLayer2FieldName
+      lof2.Type = FieldType(lLayer2FieldIndex, lLayer2Index)
+      lof2.Width = 10
+      lBsuc = lSfOut.EditInsertField(lof2, 1)
+      Dim lof3 As New MapWinGIS.Field
+      lof3.Name = "Area"
+      lof3.Type = MapWinGIS.FieldType.DOUBLE_FIELD
+      lof3.Width = 10
+      lof3.Precision = 3
+      lBsuc = lSfOut.EditInsertField(lof3, 2)
+    Else 'open existing output shape file
+      lBsuc = lSfOut.Open(aOutputLayerName)
     End If
-    osf.StartEditingShapes(True)
 
-    Dim utilClip As New MapWinGIS.Utils
-    Dim utilArea As New MapWinGIS.Utils
-    Dim newshape As MapWinGIS.Shape
-    Dim lusfshape As MapWinGIS.Shape
-    Dim ssfshape As MapWinGIS.Shape
-    Dim ssfshapeext As MapWinGIS.Extents
+    lSfOut.StartEditingShapes(True)
+
+    Dim lShapeNew As MapWinGIS.Shape
+    Dim lShape1 As MapWinGIS.Shape
+    Dim lShape2 As MapWinGIS.Shape
+    Dim lShape2Ext As MapWinGIS.Extents
 
     'set up collections of subbasin shapes and extents to save computation time later
-    Dim cSsfShape As New Collection
-    Dim cSsfShapeExtXmax As New Collection
-    Dim cSsfShapeExtXmin As New Collection
-    Dim cSsfShapeExtYmax As New Collection
-    Dim cSsfShapeExtYmin As New Collection
-    For k = 1 To cSelectedSubbasins.Count
+    Dim lSf2Shape As New Collection
+    Dim lSf2ShapeExtXmax As New Collection
+    Dim lSf2ShapeExtXmin As New Collection
+    Dim lSf2ShapeExtYmax As New Collection
+    Dim lSf2ShapeExtYmin As New Collection
+    For k As Integer = 1 To lLayer2Selected.Count
       'loop thru each selected subbasin (or all if none selected)
-      shapeindex = cSelectedSubbasins(k)
-      ssfshape = ssf.Shape(shapeindex)
-      ssfshapeext = ssfshape.Extents
-      cSsfShape.Add(ssfshape)
-      cSsfShapeExtXmax.Add(ssfshapeext.xMax)
-      cSsfShapeExtXmin.Add(ssfshapeext.xMin)
-      cSsfShapeExtYmax.Add(ssfshapeext.yMax)
-      cSsfShapeExtYmin.Add(ssfshapeext.yMin)
+      lShape2 = lSf2.Shape(lLayer2Selected(k))
+      lShape2Ext = lShape2.Extents
+      lSf2Shape.Add(lShape2)
+      lSf2ShapeExtXmax.Add(lShape2Ext.xMax)
+      lSf2ShapeExtXmin.Add(lShape2Ext.xMin)
+      lSf2ShapeExtYmax.Add(lShape2Ext.yMax)
+      lSf2ShapeExtYmin.Add(lShape2Ext.yMin)
     Next k
 
     '********** do overlay ***********
     GetMappingObject.StatusBar.ShowProgressBar = True
-    totalpolygoncount = lusf.NumShapes * cSelectedSubbasins.Count
-    polygoncount = 0
-    lastdisplayed = 0
     GetMappingObject.StatusBar.ProgressBarValue = 0
-    lnumshapes = lusf.NumShapes
-    For i = 1 To lnumshapes
-      'loop through each shape of the land use layer
-      lusfshape = lusf.Shape(i - 1)
-      LUext = lusfshape.Extents
-      'see if the current landuse polygon falls in the extents of the subbasin shapefile
-      If Not (LUext.xMin > SSFext.xMax Or LUext.xMax < SSFext.xMin Or LUext.yMin > SSFext.yMax Or LUext.yMax < SSFext.yMin) Then
-        For k = 1 To cSelectedSubbasins.Count
-          'loop thru each selected subbasin (or all if none selected)
-          shapeindex = cSelectedSubbasins(k)
-          polygoncount = polygoncount + 1
-          If Not (LUext.xMin > cSsfShapeExtXmax(k) Or LUext.xMax < cSsfShapeExtXmin(k) Or LUext.yMin > cSsfShapeExtYmax(k) Or LUext.yMax < cSsfShapeExtYmin(k)) Then
+
+    Dim lTotalPolygonCount As Integer = lSf1.NumShapes * lLayer2Selected.Count
+    Dim lPolygonCount As Integer = 0
+    Dim lLastDisplayed As Integer = 0
+    Dim lNumShapes As Integer = lSf1.NumShapes
+    For i As Integer = 1 To lNumShapes 'loop through each shape of the land use layer
+      lShape1 = lSf1.Shape(i - 1)
+      Dim lSf1Ext As MapWinGIS.Extents = lShape1.Extents
+      If Not (lSf1Ext.xMin > lSf2Ext.xMax OrElse _
+              lSf1Ext.xMax < lSf2Ext.xMin OrElse _
+              lSf1Ext.yMin > lSf2Ext.yMax OrElse _
+              lSf1Ext.yMax < lSf2Ext.yMin) Then
+        'current first polygon falls in the extents of the second shapefile
+        For k As Integer = 1 To lLayer2Selected.Count
+          'loop thru each selected shape in second shapefile (or all if none selected)
+          Dim lShapeIndex As Integer = lLayer2Selected(k)
+          lPolygonCount = lPolygonCount + 1
+          If Not (lSf1Ext.xMin > lSf2ShapeExtXmax(k) OrElse _
+                  lSf1Ext.xMax < lSf2ShapeExtXmin(k) OrElse _
+                  lSf1Ext.yMin > lSf2ShapeExtYmax(k) OrElse _
+                  lSf1Ext.yMax < lSf2ShapeExtYmin(k)) Then
             'look for intersection from overlay of these shapes
-            newshape = utilClip.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, lusfshape, cSsfShape(k))
-            If newshape.numPoints > 0 Then
-              'Insert the shape into the shapefile 
-              bsuc = osf.EditInsertShape(newshape, osf.NumShapes)
-              If Not bsuc Then
-                'MsgBox("problem adding shape in overlay")
+            lShapeNew = MapWinGISUtils.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, lShape1, lSf2Shape(k))
+            If lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
+              lBsuc = lSfOut.EditInsertShape(lShapeNew, lSfOut.NumShapes)
+              If Not lBsuc Then
+                Logger.Dbg("Problem Adding Shape") 'TODO:add more details, message box?
               End If
-              area = Math.Abs(utilArea.Area(newshape))
-              'keep track of which subbasin and land use class
-              Feature1Id = lusf.CellValue(Layer1FieldIndex, i - 1)
-              Feature2Id = ssf.CellValue(Layer2FieldIndex, shapeindex)
-              bsuc = osf.EditCellValue(0, osf.NumShapes - 1, Feature1Id)
-              bsuc = osf.EditCellValue(1, osf.NumShapes - 1, Feature2Id)
-              bsuc = osf.EditCellValue(2, osf.NumShapes - 1, area)
+              Dim lArea As Double = Math.Abs(MapWinGISUtils.Area(lShapeNew))
+              'keep track of field values from both shapefiles
+              Dim lFeature1Id As String = lSf1.CellValue(lLayer1FieldIndex, i - 1)
+              Dim lFeature2Id As String = lSf2.CellValue(lLayer2FieldIndex, lShapeIndex)
+              lBsuc = lSfOut.EditCellValue(0, lSfOut.NumShapes - 1, lFeature1Id)
+              lBsuc = lSfOut.EditCellValue(1, lSfOut.NumShapes - 1, lFeature2Id)
+              lBsuc = lSfOut.EditCellValue(2, lSfOut.NumShapes - 1, lArea)
             End If
-            newshape = Nothing
+            lShapeNew = Nothing
           End If
         Next k
-      Else
-        polygoncount = polygoncount + cSelectedSubbasins.Count
+      Else 'quick processing of all polygons in layer2 because outside of extent
+        lPolygonCount += lLayer2Selected.Count
       End If
-      LUext = Nothing
-      If Int(polygoncount / totalpolygoncount * 100) > lastdisplayed Then
-        'lblStatus.Text = "Overlaying Land Use and Subbasins (" & Int(polygoncount / totalpolygoncount * 100) & "%)"
-        'Me.Refresh()
-        lastdisplayed = Int(polygoncount / totalpolygoncount * 100)
-        GetMappingObject.StatusBar.ProgressBarValue = Int(polygoncount / totalpolygoncount * 100)
+
+      lSf1Ext = Nothing
+      lShape1 = Nothing
+
+      Dim lCurrentDisplay As Integer = Int(lPolygonCount / lTotalPolygonCount * 100)
+      If lCurrentDisplay > lLastDisplayed Then
+        lLastDisplayed = lCurrentDisplay
+        GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
       End If
-      lusfshape = Nothing
     Next i
     GetMappingObject.StatusBar.ShowProgressBar = False
 
-    If CreateNew Then
-      'delete old version of this file if it exists
-      If FileExists(OutputLayerName) Then
-        System.IO.File.Delete(OutputLayerName)
+    If aCreateNew Then 'delete old version of this file if it exists
+      If FileExists(aOutputLayerName) Then
+        System.IO.File.Delete(aOutputLayerName)
       End If
-      If FileExists(FilenameNoExt(OutputLayerName) & ".shx") Then
-        System.IO.File.Delete(FilenameNoExt(OutputLayerName) & ".shx")
+      If FileExists(FilenameNoExt(aOutputLayerName) & ".shx") Then
+        System.IO.File.Delete(FilenameNoExt(aOutputLayerName) & ".shx")
       End If
-      If FileExists(FilenameNoExt(OutputLayerName) & ".dbf") Then
-        System.IO.File.Delete(FilenameNoExt(OutputLayerName) & ".dbf")
+      If FileExists(FilenameNoExt(aOutputLayerName) & ".dbf") Then
+        System.IO.File.Delete(FilenameNoExt(aOutputLayerName) & ".dbf")
       End If
     End If
-    bsuc = osf.SaveAs(OutputLayerName)
-    osf.StopEditingShapes()
-    osf.Close()
 
+    lBsuc = lSfOut.SaveAs(aOutputLayerName)
+    lSfOut.StopEditingShapes()
+    lSfOut.Close()
   End Sub
 
   Public Shared Function ClipShapesWithPolygon(ByVal inputlayerindex As Integer, ByVal clipperlayerindex As Integer) As String
