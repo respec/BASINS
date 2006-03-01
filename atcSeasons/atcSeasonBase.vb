@@ -4,6 +4,7 @@ Imports MapWinUtility
 
 Public Class atcSeasonBase
 
+  Private pAllSeasons As Integer() = {}
   Private pAvailableOperations As atcDataAttributes ' atcDataGroup
   Private pSeasonsSelected As New BitArray(0)
 
@@ -89,6 +90,80 @@ Public Class atcSeasonBase
     Return lNewGroup
   End Function
 
+  'Divide the data in aTS into a group of TS, one for selected seasons, other for data outside selected seasons
+  Public Overridable Function SplitBySelected(ByVal aTS As atcTimeseries, ByVal aSource As atcDataSource) As atcDataGroup
+    Dim lNewGroup As New atcDataGroup
+    Dim lSeasonIndex As Integer = -1
+    Dim lPrevSeasonIndex As Integer
+    Dim lInsideTS As New atcTimeseries(aSource)
+    Dim lOutsideTS As New atcTimeseries(aSource)
+    Dim lNewTS As atcTimeseries
+    Dim lNewTSvalueIndex As Integer
+    Dim lPoint As Boolean = aTS.Attributes.GetValue("point", False)
+
+    CopyBaseAttributes(aTS, lInsideTS)
+    With lInsideTS
+      .Dates = New atcTimeseries(aSource)
+      .numValues = aTS.numValues
+      .Dates.numValues = aTS.numValues
+      .Attributes.AddHistory("Split by " & ToString() & " Inside " & SeasonsSelectedString())
+      .Attributes.Add("SeasonDefinition", Me)
+    End With
+    lNewGroup.Add(lSeasonIndex, lInsideTS)
+
+    CopyBaseAttributes(aTS, lOutsideTS)
+    With lOutsideTS
+      .Dates = New atcTimeseries(aSource)
+      .numValues = aTS.numValues
+      .Dates.numValues = aTS.numValues
+      .Attributes.AddHistory("Split by " & ToString() & " Outside " & SeasonsSelectedString())
+      .Attributes.Add("SeasonDefinition", Me)
+    End With
+    lNewGroup.Add(lSeasonIndex, lOutsideTS)
+
+    For iValue As Integer = 1 To aTS.numValues
+      lPrevSeasonIndex = lSeasonIndex
+      If lPoint Then
+        lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue))
+      Else '
+        lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue - 1))
+      End If
+
+      If SeasonSelected(lSeasonIndex) Then
+        lNewTS = lInsideTS
+      Else
+        lNewTS = lOutsideTS
+      End If
+
+      If lPoint Then
+        lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1)
+      Else
+        lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 0)
+        If aTS.ValueAttributesExist(lNewTSvalueIndex) Then 'TODO:finish this!
+          'lnewts.ValueAttributes(lnewtsvalueindex).SetRange(
+        End If
+        If lPrevSeasonIndex <> lSeasonIndex Then
+          'Insert dummy value for start of interval after skipping dates outside season
+          lNewTS.Values(lNewTSvalueIndex) = Double.NaN
+          lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue - 1)
+          lNewTS.ValueAttributes(lNewTSvalueIndex).SetValue("Inserted", True)
+          lNewTSvalueIndex += 1
+        End If
+      End If
+      lNewTS.Value(lNewTSvalueIndex) = aTS.Value(iValue)
+      lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue)
+      lNewTS.Attributes.SetValue("NextIndex", lNewTSvalueIndex + 1)
+    Next
+
+    For Each lNewTS In lNewGroup
+      lNewTSvalueIndex = lNewTS.Attributes.GetValue("NextIndex", 1) - 1
+      lNewTS.numValues = lNewTSvalueIndex
+      lNewTS.Dates.numValues = lNewTSvalueIndex
+      lNewTS.Attributes.RemoveByKey("nextindex")
+    Next
+    Return lNewGroup
+  End Function
+
   Public Overridable Sub SetSeasonalAttributes(ByVal aTS As atcTimeseries, _
                                    ByVal aAttributes As atcDataAttributes, _
                           Optional ByVal aCalculatedAttributes As atcDataAttributes = Nothing)
@@ -136,17 +211,37 @@ Public Class atcSeasonBase
     End Set
   End Property
 
+  'Seasons that have been selected are set to True
+  Public Overridable Property SeasonsSelected() As BitArray
+    Get
+      Dim lNumSeasons As Integer = AllSeasons.GetLength(0)
+      If pSeasonsSelected.Length < lNumSeasons Then pSeasonsSelected.Length = lNumSeasons
+      Return pSeasonsSelected
+    End Get
+    Set(ByVal newValue As BitArray)
+      pSeasonsSelected = newValue
+    End Set
+  End Property
+
+  Public Function SeasonsSelectedString(Optional ByVal aXML As Boolean = False) As String
+    Dim lSeasons As String = ""
+    Dim lastSeason As Integer = pSeasonsSelected.Count - 1
+    For lSeasonIndex As Integer = 0 To lastSeason
+      If pSeasonsSelected(lSeasonIndex) Then
+        If aXML Then
+          lSeasons &= "  <Selected Name='" & SeasonName(lSeasonIndex) & "'>" & lSeasonIndex & "</Selected>" & vbCrLf
+        Else
+          lSeasons &= SeasonName(lSeasonIndex) & " "
+        End If
+      End If
+    Next
+    If aXML AndAlso lSeasons.Length > 0 Then lSeasons = "<SeasonsSelected>" & vbCrLf & lSeasons & "</SeasonsSelected>" & vbCrLf
+    Return lSeasons
+  End Function
+
   Public Overridable Property SeasonsSelectedXML() As String
     Get
-      Dim lXML As String = ""
-      Dim lastSeason As Integer = pSeasonsSelected.Count - 1
-      For lSeasonIndex As Integer = 0 To lastSeason
-        If pSeasonsSelected(lSeasonIndex) Then
-          lXML &= "  <Selected Name='" & SeasonName(lSeasonIndex) & "'>" & lSeasonIndex & "</Selected>" & vbCrLf
-        End If
-      Next
-      If lXML.Length > 0 Then lXML = "<SeasonsSelected>" & lXML & "</SeasonsSelected>" & vbCrLf
-      Return lXML
+      Return SeasonsSelectedString(True)
     End Get
     Set(ByVal newValue As String)
       Try
@@ -163,6 +258,20 @@ Public Class atcSeasonBase
       End Try
     End Set
   End Property
+
+  Public Overridable Function AllSeasons() As Integer()
+    Return pAllSeasons
+  End Function
+
+  Public Overridable Function AllSeasonNames() As String()
+    Dim lIndexArray As Integer() = AllSeasons()
+    Dim lSeasonNames As String()
+    Dim lLastSeason As Integer = lIndexArray.GetUpperBound(0)
+    ReDim lSeasonNames(lLastSeason)
+    For i As Integer = 0 To lLastSeason
+      lSeasonNames(i) = SeasonName(lIndexArray(i))
+    Next
+  End Function
 
   Public Overridable Function SeasonIndex(ByVal aDate As Double) As Integer
     Return -1

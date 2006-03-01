@@ -1,7 +1,8 @@
 Public Class atcSeasonsTraditional
   Inherits atcSeasonBase
 
-  Private pSeasonName() As String = {"Winter", "Spring", "Summer", "Autumn"}
+  Private pAllSeasons As Integer() = {0, 1, 2, 3}
+  Private pSeasonNames() As String = {"Winter", "Spring", "Summer", "Autumn"}
 
   Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
     Dim lDate As Date = Date.FromOADate(aDate)
@@ -24,8 +25,16 @@ Public Class atcSeasonsTraditional
   Public Overloads Overrides Function SeasonName(ByVal aIndex As Integer) As String
     Select Case aIndex
       Case Is < 0 : Return Nothing
-      Case Is < 4 : Return pSeasonName(aIndex)
+      Case Is < 4 : Return pSeasonNames(aIndex)
       Case Else : Return Nothing
     End Select
+  End Function
+
+  Public Overrides Function AllSeasons() As Integer()
+    Return pAllSeasons
+  End Function
+
+  Public Overrides Function AllSeasonNames() As String()
+    Return pSeasonNames
   End Function
 End Class
