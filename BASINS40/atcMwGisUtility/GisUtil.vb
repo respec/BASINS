@@ -1206,18 +1206,17 @@ Public Class GisUtil
     End If
   End Function
 
-  Public Shared Function GridValueAtPoint(ByVal GridLayerIndex As Integer, ByVal x As Double, ByVal y As Double) As Integer
-    Dim column As Integer
-    Dim row As Integer
-    Dim gridLayer As MapWindow.Interfaces.Layer
-
+  Public Shared Function GridValueAtPoint(ByVal aGridLayerIndex As Integer, ByVal aX As Double, ByVal aY As Double) As Integer
     'set input grid
-    gridLayer = GetMappingObject.Layers(GridLayerIndex)
-    Dim InputGrid As New MapWinGIS.Grid
-    InputGrid = gridLayer.GetGridObject
+    Dim gridLayer As MapWindow.Interfaces.Layer
+    gridLayer = GetMappingObject.Layers(aGridLayerIndex)
+    Dim lInputGrid As New MapWinGIS.Grid
+    lInputGrid = gridLayer.GetGridObject
 
-    InputGrid.ProjToCell(x, y, column, row)
-    GridValueAtPoint = InputGrid.Value(column, row)
+    Dim lCol As Integer
+    Dim lRow As Integer
+    lInputGrid.ProjToCell(aX, aY, lCol, lRow)
+    Return lInputGrid.Value(lCol, lRow)
   End Function
 
   ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
@@ -1230,7 +1229,7 @@ Public Class GisUtil
   ''' <param name="aLayer2Name">
   '''     <para>Name of second layer to overlay</para>
   ''' </param>
-  ''' <param name="aLayer1FieldName">
+  ''' <param name="aLayer2FieldName">
   '''     <para>Name of field in second layer to overlay</para>
   ''' </param>
   ''' <param name="aOutputLayerName">
