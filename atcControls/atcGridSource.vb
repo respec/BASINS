@@ -267,7 +267,7 @@ Public Class atcGridSource
     End While
   End Sub
 
-  Public Overrides Function ToString() As String
+  Public Function ToStringWithPrependColumns(Optional ByVal aPrepend As String = "") As String
     Dim lCellValue As String
     Dim lAddTabs() As Boolean
     ReDim lAddTabs(Me.Columns - 1)
@@ -286,17 +286,37 @@ Public Class atcGridSource
       Next
     Next
 
-    ToString = ""
+    Dim lOutString As String = ""
+    Dim lPrepend As String = aPrepend
+    Dim lPrependColumnCount As Integer = 0
     For iRow As Integer = 0 To lMaxRow
+      Dim lPrependRow As String = StrSplit(aPrepend, vbCrLf, "")
+      If lPrependRow.Length > 0 Then
+        lPrependColumnCount = 0
+        While lPrependRow.Length > 0
+          lOutString &= StrSplit(lPrependRow, vbTab, "") & vbTab
+          lPrependColumnCount += 1
+        End While
+      Else
+        For i As Integer = 1 To lPrependColumnCount
+          lOutString &= vbTab
+        Next
+      End If
+
       For iCol As Integer = 0 To lMaxCol
         lCellValue = CellValue(iRow, iCol)
         If lCellValue Is Nothing Then lCellValue = ""
-        ToString &= lCellValue
+        lOutString &= lCellValue
         'Some modified values contain "<tab>(+10%)", add a tab to those that don't
-        If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then ToString &= vbTab
-        If iCol < lMaxCol Then ToString &= vbTab 'Add tab afer each column except for last 
+        If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then lOutString &= vbTab
+        If iCol < lMaxCol Then lOutString &= vbTab 'Add tab afer each column except for last 
       Next
-      ToString &= vbCrLf
+      lOutString &= vbCrLf
     Next
+    Return lOutString
+  End Function
+
+  Public Overrides Function ToString() As String
+    Return ToStringWithPrependColumns()
   End Function
 End Class

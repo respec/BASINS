@@ -270,7 +270,8 @@ Public Class Variation
                 Case "computationsource"
                   ComputationSource = g_DataManager.DataSourceByName(.Content)
                 Case "datasets" : DataSetsXML = .GetXml
-                Case "selected" : Selected = .Content.ToLower.Equals("true")
+                Case "selected"
+                  Selected = .Content.ToLower.Equals("true")
                 Case "seasons" : SeasonsXML = .GetXml
               End Select
             End With

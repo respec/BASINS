@@ -919,7 +919,11 @@ Public Class frmIterative
   End Sub
 
   Private Sub mnuCopyPivot_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyPivot.Click
-    Clipboard.SetDataObject(agdPivot.ToString)
+    Dim lPrependString As String = _
+                     lblPivotColumns.Text & vbTab & cboPivotColumns.Text & vbCrLf _
+                   & lblPivotRows.Text & vbTab & cboPivotRows.Text & vbCrLf _
+                   & lblPivotCells.Text & vbTab & cboPivotCells.Text & vbCrLf
+    Clipboard.SetDataObject(agdPivot.Source.ToStringWithPrependColumns(lPrependString))
   End Sub
 
   Private Sub mnuSaveResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveResults.Click
@@ -952,10 +956,11 @@ Public Class frmIterative
       .OverwritePrompt = True
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         'write file from grid contents
-        SaveFileString(.FileName, lblPivotRows.Text & vbTab & cboPivotRows.Text & vbCrLf _
-                                & lblPivotColumns.Text & vbTab & cboPivotColumns.Text & vbCrLf _
-                                & lblPivotCells.Text & vbTab & cboPivotCells.Text & vbCrLf _
-                                & agdPivot.Source.ToString)
+        Dim lPrependString As String = _
+                         lblPivotColumns.Text & vbTab & cboPivotColumns.Text & vbCrLf _
+                       & lblPivotRows.Text & vbTab & cboPivotRows.Text & vbCrLf _
+                       & lblPivotCells.Text & vbTab & cboPivotCells.Text & vbCrLf
+        SaveFileString(.FileName, agdPivot.Source.ToStringWithPrependColumns(lPrependString))
         SaveSetting("ScenarioBuilder", "Settings", "LastPivot", .FileName)
       End If
     End With
@@ -1188,15 +1193,22 @@ Public Class frmIterative
   Public Property XML() As String
     Get
       Dim lXML As String = "<Iterative>" & vbCrLf
+
+      lXML &= "<Wdm>" & vbCrLf
+      For Each lScenario As String In cboBaseScenarioName.Items
+        lXML &= "  <FileName>" & lScenario & "</FileName>" & vbCrLf
+      Next
+      lXML &= "</Wdm>" & vbCrLf
+
       Dim lVariation As Variation
       Dim lVariationIndex As Integer = 0
-
       lXML &= "<Variations>" & vbCrLf
       For Each lVariation In pInputs
         lXML &= lVariation.XML
         lVariationIndex += 1
       Next
       lXML &= "</Variations>" & vbCrLf
+
       lXML &= "<Endpoints>" & vbCrLf
       lVariationIndex = 0
       For Each lVariation In pEndpoints
@@ -1222,13 +1234,30 @@ Public Class frmIterative
       Return lXML
       'End If
     End Get
-    Set(ByVal Value As String)
+
+    Set(ByVal aValue As String)
       Dim lXML As New Chilkat.Xml
-      If lXML.LoadXml(Value) AndAlso lXML.Tag.ToLower.Equals("iterative") AndAlso lXML.FirstChild2 Then
+      If lXML.LoadXml(aValue) AndAlso lXML.Tag.ToLower.Equals("iterative") AndAlso lXML.FirstChild2 Then
         Do
           Dim lVariation As Variation
           Dim lChild As Chilkat.Xml = lXML.FirstChild
           Select Case lXML.Tag.ToLower
+            Case "wdm"
+              Dim lFileName As String = lChild.Content
+              Dim lAddSource As Boolean = True
+              For Each lDataSource As atcDataSource In g_DataManager.DataSources
+                If lDataSource.Specification = lFileName Then 'already open
+                  lAddSource = False
+                End If
+              Next
+              If lAddSource Then
+                Dim lDataSource As New atcWDM.atcDataSourceWDM
+                lDataSource.Specification = lFileName
+                g_DataManager.OpenDataSource(lDataSource, lDataSource.Specification, Nothing)
+                cboBaseScenarioName.Items.Add(lDataSource.Specification)
+                cboBaseScenarioName.SelectedIndex = cboBaseScenarioName.Items.Count - 1
+              End If
+
             Case "variations"
               pInputs.Clear()
               If Not lChild Is Nothing Then
@@ -1238,8 +1267,8 @@ Public Class frmIterative
                   pInputs.Add(lVariation)
                 Loop While lChild.NextSibling2
               End If
+              RefreshInputList()
               RefreshTotalIterations()
-
             Case "endpoints"
               pEndpoints.Clear()
               If Not lChild Is Nothing Then
@@ -1252,7 +1281,7 @@ Public Class frmIterative
               RefreshEndpointList()
           End Select
         Loop While lXML.NextSibling2
-        RefreshInputList()
+        'RefreshInputList()
       Else
         Logger.Msg("Could not parse variations " & vbCrLf & lXML.LastErrorText, "Load Variations")
       End If
