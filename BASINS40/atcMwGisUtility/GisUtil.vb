@@ -1326,7 +1326,7 @@ Public Class GisUtil
       lBsuc = lSfOut.EditInsertField([lOf], 0)
       Dim lof2 As New MapWinGIS.Field
       lof2.Name = FieldName(aLayer2FieldIndex, aLayer2Index)
-      lof2.Type = MapWinGIS.FieldType.INTEGER_FIELD
+      lof2.Type = MapWinGIS.FieldType.STRING_FIELD
       lof2.Width = 10
       lBsuc = lSfOut.EditInsertField(lof2, 1)
       Dim lof3 As New MapWinGIS.Field
@@ -1396,8 +1396,8 @@ Public Class GisUtil
               End If
               Dim lArea As Double = Math.Abs(MapWinGISUtils.Area(lShapeNew))
               'keep track of field values from both shapefiles
-              Dim lFeature1Id As String = lSf1.CellValue(aLayer1FieldIndex, i - 1)
-              Dim lFeature2Id As String = lSf2.CellValue(aLayer2FieldIndex, lShapeIndex)
+              Dim lFeature1Id As String = FieldValue(aLayer1Index, i - 1, aLayer1FieldIndex)
+              Dim lFeature2Id As String = FieldValue(aLayer2Index, lShapeIndex, aLayer2FieldIndex)
               lBsuc = lSfOut.EditCellValue(0, lSfOut.NumShapes - 1, lFeature1Id)
               lBsuc = lSfOut.EditCellValue(1, lSfOut.NumShapes - 1, lFeature2Id)
               lBsuc = lSfOut.EditCellValue(2, lSfOut.NumShapes - 1, lArea)
