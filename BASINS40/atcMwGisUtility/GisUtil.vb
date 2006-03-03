@@ -920,7 +920,7 @@ Public Class GisUtil
   ''' <param name="aLayerName">
   '''     <para>Name of layer</para>
   ''' </param>
-  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#LayerNameNameNotRecognized" caption="LayerNameNameNotRecognized">Layer specified by aLayerName does not exist</exception>
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Property LayerVisible(ByVal aLayerName As String) As Boolean
     Get
@@ -1516,26 +1516,26 @@ Public Class GisUtil
 
   End Function
 
-  Private Shared Function IsLineInPolygon(ByVal lineshape As MapWinGIS.Shape, ByVal polyshapefile As MapWinGIS.Shapefile, ByVal aIndex As Integer) As Boolean
-    Dim i As Integer
-    IsLineInPolygon = False
-    For i = 0 To lineshape.numPoints - 1
-      If polyshapefile.PointInShape(aIndex, lineshape.Point(i).x, lineshape.Point(i).y) Then
-        IsLineInPolygon = True
-        Exit For
+  Private Shared Function IsLineInPolygon(ByVal aLineShape As MapWinGIS.Shape, _
+                                          ByVal aPolyShapeFile As MapWinGIS.Shapefile, _
+                                          ByVal aIndex As Integer) As Boolean
+    For i As Integer = 0 To aLineShape.numPoints - 1
+      If aPolyShapeFile.PointInShape(aIndex, aLineShape.Point(i).x, aLineShape.Point(i).y) Then
+        Return True 'a point was within polygon
       End If
     Next i
+    Return False
   End Function
 
-  Private Shared Function IsLineEntirelyInPolygon(ByVal lineshape As MapWinGIS.Shape, ByVal polyshapefile As MapWinGIS.Shapefile, ByVal aIndex As Integer) As Boolean
-    Dim i As Integer
-    IsLineEntirelyInPolygon = True
-    For i = 0 To lineshape.numPoints - 1
-      If Not polyshapefile.PointInShape(aIndex, lineshape.Point(i).x, lineshape.Point(i).y) Then
-        IsLineEntirelyInPolygon = False
-        Exit For
+  Private Shared Function IsLineEntirelyInPolygon(ByVal aLineShape As MapWinGIS.Shape, _
+                                                  ByVal aPolyShapeFile As MapWinGIS.Shapefile, _
+                                                  ByVal aIndex As Integer) As Boolean
+    For i As Integer = 0 To aLineShape.numPoints - 1
+      If Not aPolyShapeFile.PointInShape(aIndex, aLineShape.Point(i).x, aLineShape.Point(i).y) Then
+        Return False 'a point on line was outside polygon
       End If
     Next i
+    Return True
   End Function
 
   Private Shared Function IsThisShapeTheSameAsOrPartOfAnotherShape(ByVal sf1shape As MapWinGIS.Shape, ByVal sf2shape As MapWinGIS.Shape) As Boolean
