@@ -886,7 +886,8 @@ Public Class GisUtil
     lPolygonSf.EndPointInShapefile()
   End Function
 
-  Public Shared Function AddLayer(ByVal aFileName As String, ByVal aLayerName As String) As Boolean
+  Public Shared Function AddLayer(ByVal aFileName As String, _
+                                  ByVal aLayerName As String) As Boolean
     'given a shape file name, add it to the map.
     'return true if the layer is already there or successfully added.
     If IsLayer(aLayerName) Then  'already on map 
@@ -902,16 +903,33 @@ Public Class GisUtil
     End If
   End Function
 
+  ''' <summary>Layer part of project?</summary>
+  ''' <param name="aLayerName">
+  '''     <para>Name of layer to compare to layeres in project</para>
+  ''' </param>
   Public Shared Function IsLayer(ByVal aLayerName As String) As Boolean
-    Dim i As Integer
-    IsLayer = False
-    For i = 1 To GetMappingObject.Layers.NumLayers
+    For i As Integer = 1 To GetMappingObject.Layers.NumLayers
       If aLayerName = GetMappingObject.Layers(i).Name Then
-        IsLayer = True
-        Exit For
+        Return True
       End If
     Next i
+    Return False
   End Function
+
+  ''' <summary>Layer visible flag</summary>
+  ''' <param name="aLayerName">
+  '''     <para>Name of layer</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared Property LayerVisible(ByVal aLayerName As String) As Boolean
+    Get
+      Return LayerFromIndex(LayerIndex(aLayerName)).Visible
+    End Get
+    Set(ByVal aVisible As Boolean)
+      LayerFromIndex(LayerIndex(aLayerName)).Visible = aVisible
+    End Set
+  End Property
 
   ''' <summary>Layer visible flag</summary>
   ''' <param name="aLayerIndex">
@@ -1241,30 +1259,58 @@ Public Class GisUtil
   Public Shared Sub Overlay(ByVal aLayer1Name As String, ByVal aLayer1FieldName As String, _
                             ByVal aLayer2Name As String, ByVal aLayer2FieldName As String, _
                             ByVal aOutputLayerName As String, ByVal aCreateNew As Boolean)
+    Dim lLayer1Index As Integer = LayerIndex(aLayer1Name)
+    Dim lLayer1FieldIndex As Integer = FieldIndex(lLayer1Index, aLayer1FieldName)
+    Dim lLayer2Index As Integer = LayerIndex(aLayer2Name)
+    Dim lLayer2FieldIndex As Integer = FieldIndex(lLayer2Index, aLayer2FieldName)
+
+    Overlay(lLayer1Index, lLayer1FieldIndex, lLayer2Index, lLayer2FieldIndex, _
+            aOutputLayerName, aCreateNew)
+
+  End Sub
+
+  ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
+  ''' <param name="aLayer1Index">
+  '''     <para>Index of first layer to overlay</para>
+  ''' </param>
+  ''' <param name="aLayer1FieldIndex">
+  '''     <para>Index of field in first layer to overlay</para>
+  ''' </param>
+  ''' <param name="aLayer2Index">
+  '''     <para>Index of second layer to overlay</para>
+  ''' </param>
+  ''' <param name="aLayer2FieldIndex">
+  '''     <para>Index of field in second layer to overlay</para>
+  ''' </param>
+  ''' <param name="aOutputLayerName">
+  '''     <para>Name of output layer</para>
+  ''' </param>
+  ''' <param name="aCreateNew">
+  '''     <para>Flag, true if a new output shape file is desired, false if append existing file is desired</para>
+  ''' </param>
+  Public Shared Sub Overlay(ByVal aLayer1Index As Integer, ByVal aLayer1FieldIndex As Integer, _
+                            ByVal aLayer2Index As Integer, ByVal aLayer2FieldIndex As Integer, _
+                            ByVal aOutputLayerName As String, ByVal aCreateNew As Boolean)
     Dim MapWinGISUtils As New MapWinGIS.Utils
 
     'obtain handle to layer 1  
-    Dim lLayer1Index As Integer = LayerIndex(aLayer1Name)
-    Dim lLayer1FieldIndex As Integer = FieldIndex(lLayer1Index, aLayer1FieldName)
-    Dim lLayer1 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(lLayer1Index)
+    Dim lLayer1 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aLayer1Index)
     Dim lSf1 As New MapWinGIS.Shapefile
     lSf1 = lLayer1.GetObject
 
     'set layer 2 (subbasins)
-    Dim lLayer2Index As Integer = LayerIndex(aLayer2Name)
-    Dim lLayer2FieldIndex As Integer = FieldIndex(lLayer2Index, aLayer2FieldName)
-    Dim lLayer2 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(lLayer2Index)
+    Dim lLayer2 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aLayer2Index)
     Dim lSf2 As New MapWinGIS.Shapefile
     lSf2 = lLayer2.GetObject
     Dim lSf2Ext As MapWinGIS.Extents = lSf2.Extents
 
     'if any of layer 2 is selected, use only those
     Dim lLayer2Selected As New Collection
-    For i As Integer = 1 To NumSelectedFeatures(lLayer2Index)
-      lLayer2Selected.Add(IndexOfNthSelectedFeatureInLayer(i - 1, lLayer2Index))
+    For i As Integer = 1 To NumSelectedFeatures(aLayer2Index)
+      lLayer2Selected.Add(IndexOfNthSelectedFeatureInLayer(i - 1, aLayer2Index))
     Next
     If lLayer2Selected.Count = 0 Then 'no subbasins selected, act as if all are selected
-      For i As Integer = 1 To NumFeatures(lLayer2Index)
+      For i As Integer = 1 To NumFeatures(aLayer2Index)
         lLayer2Selected.Add(i - 1)
       Next
     End If
@@ -1274,12 +1320,12 @@ Public Class GisUtil
     If aCreateNew Then 'create new output overlay shapefile
       lSfOut.CreateNew("overlay", MapWinGIS.ShpfileType.SHP_POLYGON)
       Dim [lOf] As New MapWinGIS.Field
-      [lOf].Name = aLayer1FieldName
+      [lOf].Name = FieldName(aLayer1FieldIndex, aLayer1Index)
       [lOf].Type = MapWinGIS.FieldType.INTEGER_FIELD
       [lOf].Width = 10
       lBsuc = lSfOut.EditInsertField([lOf], 0)
       Dim lof2 As New MapWinGIS.Field
-      lof2.Name = aLayer2FieldName
+      lof2.Name = FieldName(aLayer2FieldIndex, aLayer2Index)
       lof2.Type = MapWinGIS.FieldType.INTEGER_FIELD
       lof2.Width = 10
       lBsuc = lSfOut.EditInsertField(lof2, 1)
@@ -1350,8 +1396,8 @@ Public Class GisUtil
               End If
               Dim lArea As Double = Math.Abs(MapWinGISUtils.Area(lShapeNew))
               'keep track of field values from both shapefiles
-              Dim lFeature1Id As String = lSf1.CellValue(lLayer1FieldIndex, i - 1)
-              Dim lFeature2Id As String = lSf2.CellValue(lLayer2FieldIndex, lShapeIndex)
+              Dim lFeature1Id As String = lSf1.CellValue(aLayer1FieldIndex, i - 1)
+              Dim lFeature2Id As String = lSf2.CellValue(aLayer2FieldIndex, lShapeIndex)
               lBsuc = lSfOut.EditCellValue(0, lSfOut.NumShapes - 1, lFeature1Id)
               lBsuc = lSfOut.EditCellValue(1, lSfOut.NumShapes - 1, lFeature2Id)
               lBsuc = lSfOut.EditCellValue(2, lSfOut.NumShapes - 1, lArea)
