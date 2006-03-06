@@ -65,13 +65,13 @@ Public Class GisUtil
   ''' <summary>Layers on map</summary>
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared Function MapLayers() As ArrayList
-    MapLayers = New ArrayList
+    Dim lMapLayers As New ArrayList
     Dim lLastLayerIndex As Integer = GetMappingObject.Layers.NumLayers - 1
     For lLayerIndex As Integer = 0 To lLastLayerIndex
-      MapLayers.Add(GetMappingObject.Layers(lLayerIndex))
+      lMapLayers.Add(GetMappingObject.Layers(lLayerIndex))
     Next
+    Return lMapLayers
   End Function
-
 
   ''' <summary>Check to see if feature index is valid</summary>
   ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
@@ -86,7 +86,7 @@ Public Class GisUtil
 
   ''' <summary>Load MapWindow project</summary>
   ''' <param name="aProjectName">
-  '''     <para>Filename of project to load</para>
+  '''   <para>Filename of project to load</para>
   ''' </param>
   ''' <remarks>Current directory not changed</remarks>
   ''' <exception cref="Exception.html#LoadFailure" caption="LoadFailure">Failure to Load Project</exception>
@@ -121,14 +121,16 @@ Public Class GisUtil
 
   ''' <summary>Obtain pointer to a shape file from a LayerIndex</summary>
   ''' <param name="aLayerIndex">
-  '''     <para>Index of Layer containing ShapeFile</para>
+  '''   <para>Index of Layer containing ShapeFile</para>
   ''' </param>
   ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
   ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared ReadOnly Property ShapeFileFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Shapefile
     Get
-      If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
+      If aLayerIndex = UseCurrent Then
+        aLayerIndex = CurrentLayer
+      End If
 
       Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
       If lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile OrElse _
@@ -160,7 +162,6 @@ Public Class GisUtil
     End Get
   End Property
 
-
   ''' <summary>Obtain pointer to a grid from a LayerIndex</summary>
   ''' <param name="aLayerIndex">
   '''     <para>Index of desired layer containing grid (defaults to Current Layer)</para>
@@ -170,7 +171,9 @@ Public Class GisUtil
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared ReadOnly Property GridFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Grid
     Get
-      If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
+      If aLayerIndex = UseCurrent Then
+        aLayerIndex = CurrentLayer
+      End If
 
       Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aLayerIndex)
       If lLayer.LayerType = MapWindow.Interfaces.eLayerType.Grid Then
@@ -189,7 +192,9 @@ Public Class GisUtil
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Private Shared ReadOnly Property LayerFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWindow.Interfaces.Layer
     Get
-      If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
+      If aLayerIndex = UseCurrent Then
+        aLayerIndex = CurrentLayer
+      End If
 
       If aLayerIndex >= 0 And aLayerIndex < GetMappingObject.Layers.NumLayers Then
         Return (GetMappingObject.Layers(aLayerIndex))
@@ -263,20 +268,39 @@ Public Class GisUtil
     End If
   End Function
 
-  Public Shared Function LineInPolygon(ByVal aLineLayerIndex As Integer, ByVal aLineIndex As Integer, ByVal aPolygonLayerIndex As Integer, ByVal aPolygonIndex As Integer) As Integer
-    'given a line and a polygon, determine if any part of the line is in the polygon
+  ''' <summary>Given a line and a polygon, determine if any part of the line is in the polygon</summary>
+  ''' <param name="aLineLayerIndex">
+  '''     <para>Index of line Layer</para>
+  ''' </param>
+  ''' <param name="aLineIndex">
+  '''     <para>Index of line Feature</para>
+  ''' </param>
+  ''' <param name="aPolygonLayerIndex">
+  '''     <para>Index of second Layer containing ShapeFile</para>
+  ''' </param>
+  ''' <param name="aPolygonIndex">
+  '''     <para>Index of polygon Feature</para>
+  ''' </param>
+  ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
+  ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
+  ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+  Public Shared Function LineInPolygon(ByVal aLineLayerIndex As Integer, _
+                                       ByVal aLineIndex As Integer, _
+                                       ByVal aPolygonLayerIndex As Integer, _
+                                       ByVal aPolygonIndex As Integer) As Integer
     Dim lLineSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLineLayerIndex)
-    Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
     Dim lLineShape As MapWinGIS.Shape = lLineSf.Shape(aLineIndex - 1)
+    Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
     Dim lX As Double, lY As Double
 
-    Dim i As Integer
     LineInPolygon = False
-    For i = 1 To lLineShape.numPoints
+    For i As Integer = 1 To lLineShape.numPoints
       lX = lLineShape.Point(i - 1).x
       lY = lLineShape.Point(i - 1).y
       LineInPolygon = lPolygonSf.PointInShape(aPolygonIndex, lX, lY)
-      If LineInPolygon Then Exit For
+      If LineInPolygon Then 'point of line in polygon, true result
+        Exit For
+      End If
     Next i
   End Function
 
@@ -293,10 +317,9 @@ Public Class GisUtil
   ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Sub AssignContainingPolygons( _
-    ByVal aLayerIndex As Integer, _
-    ByVal aLayerIndexContaining As Integer, _
-    ByRef aIndex() As Integer)
-
+                                             ByVal aLayerIndex As Integer, _
+                                             ByVal aLayerIndexContaining As Integer, _
+                                             ByRef aIndex() As Integer)
     Dim lSf1 As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
     Dim lSf2 As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndexContaining)
 
@@ -401,14 +424,15 @@ Public Class GisUtil
     Throw New Exception("GisUtil:FieldIndex:Error:FieldName:" & aFieldName & ":IsNotRecognized")
   End Function
 
-  Public Shared Function IsField(ByVal aLayerIndex As Integer, ByVal aFieldName As String) As Boolean
+  Public Shared Function IsField(ByVal aLayerIndex As Integer, _
+                                 ByVal aFieldName As String) As Boolean
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    IsField = False
-    For iFieldIndex As Integer = 0 To lSf.NumFields - 1
-      If UCase(lSf.Field(iFieldIndex).Name) = UCase(aFieldName) Then 'this is the field we want
-        IsField = True
+    For lFieldIndex As Integer = 0 To lSf.NumFields - 1
+      If UCase(lSf.Field(lFieldIndex).Name) = UCase(aFieldName) Then 'this is the field we want
+        Return True
       End If
     Next
+    Return False 'field name not found
   End Function
 
   ''' <summary>Add a field in a shape file from a layer index and a field name</summary>
@@ -721,12 +745,12 @@ Public Class GisUtil
   ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Function RemoveFeature(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
-    Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
     If FeatureIndexValid(aFeatureIndex, lsf) Then
-      lsf.StartEditingShapes(True)
-      Dim bsuc As Boolean = lsf.EditDeleteShape(aFeatureIndex)
-      lsf.StopEditingShapes(True, True)
+      lSf.StartEditingShapes(True)
+      Dim lRetc As Boolean = lsf.EditDeleteShape(aFeatureIndex)
+      lSf.StopEditingShapes(True, True)
       'TODO: what is the return value
     End If
   End Function
@@ -749,14 +773,14 @@ Public Class GisUtil
   ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
   ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
   Public Shared Sub SetFeatureValue(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, ByVal aFeatureIndex As Integer, ByVal aValue As Object)
-    Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
-    If FeatureIndexValid(aFeatureIndex, lsf) Then
-      If FieldIndexValid(aFieldIndex, lsf) Then
-        Dim bsuc As Boolean
+    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+    If FeatureIndexValid(aFeatureIndex, lSf) Then
+      If FieldIndexValid(aFieldIndex, lSf) Then
+        Dim lRetc As Boolean
         'TODO: error checks
-        bsuc = lsf.StartEditingTable()
-        bsuc = lsf.EditCellValue(aFieldIndex, aFeatureIndex, aValue)
-        bsuc = lsf.StopEditingTable()
+        lRetc = lSf.StartEditingTable()
+        lRetc = lSf.EditCellValue(aFieldIndex, aFeatureIndex, aValue)
+        lRetc = lSf.StopEditingTable()
       End If
     End If
   End Sub
@@ -796,29 +820,29 @@ Public Class GisUtil
     Dim i As Integer
     Dim j As Integer
     Dim k As Integer
-    Dim InputLayerIndex As Integer
-    Dim bsuc As Boolean
+    Dim lInputLayerIndex As Integer
+    Dim lRetc As Boolean
 
-    InputLayerIndex = LayerIndex(aInputLayerName)
-    Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(InputLayerIndex)
+    lInputLayerIndex = LayerIndex(aInputLayerName)
+    Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(lInputLayerIndex)
 
     Dim osf As New MapWinGIS.Shapefile
     'create new shapefile
-    bsuc = osf.CreateNew(aOutputLayerName, lsf.ShapefileType)
+    lRetc = osf.CreateNew(aOutputLayerName, lsf.ShapefileType)
     For i = 1 To lsf.NumFields
       Dim [of] As New MapWinGIS.Field
       [of].Name = lsf.Field(i - 1).Name
       [of].Type = lsf.Field(i - 1).Type
       [of].Width = lsf.Field(i - 1).Width
       [of].Precision = lsf.Field(i - 1).Precision
-      bsuc = osf.EditInsertField([of], osf.NumFields)
+      lRetc = osf.EditInsertField([of], osf.NumFields)
       [of] = Nothing
     Next i
     osf.StartEditingShapes(True)
 
     Dim lsi As MapWindow.Interfaces.SelectInfo
     lsi = pMapWin.View.SelectedShapes
-    If lsi.LayerHandle = InputLayerIndex Then
+    If lsi.LayerHandle = lInputLayerIndex Then
       For i = 1 To lsf.NumShapes
         'loop through each shape of the layer
         For j = 1 To lsi.NumSelected
@@ -826,14 +850,14 @@ Public Class GisUtil
           If i - 1 = lsi.Item(j - 1).ShapeIndex Then
             osf.EditInsertShape(lsf.Shape(i - 1), osf.NumShapes)
             For k = 1 To osf.NumFields
-              bsuc = osf.EditCellValue(k - 1, osf.NumShapes - 1, lsf.CellValue(k - 1, i - 1))
+              lRetc = osf.EditCellValue(k - 1, osf.NumShapes - 1, lsf.CellValue(k - 1, i - 1))
             Next k
           End If
         Next j
       Next i
     End If
 
-    bsuc = osf.SaveAs(aOutputLayerName)
+    lRetc = osf.SaveAs(aOutputLayerName)
     osf.StopEditingShapes()
     osf.Close()
 
@@ -1437,82 +1461,80 @@ Public Class GisUtil
     lSfOut.Close()
   End Sub
 
-  Public Shared Function ClipShapesWithPolygon(ByVal inputlayerindex As Integer, ByVal clipperlayerindex As Integer) As String
+  Public Shared Function ClipShapesWithPolygon(ByVal aInputLayerIndex As Integer, _
+                                               ByVal aClipperLayerIndex As Integer) As String
     'returns output shape file name as string 
     Dim i As Integer
     Dim j As Integer
     Dim k As Integer
-    Dim bsuc As Boolean
-    Dim newname As String
-    Dim icount As Integer
-    Dim itotal As Integer
+    Dim lRetc As Boolean
+    Dim lNewShapeFileName As String
+    Dim lCount As Integer
+    Dim lTotal As Integer
 
     ClipShapesWithPolygon = ""
     'set input layer (reaches for instance)
-    Dim isf As MapWinGIS.Shapefile = ShapeFileFromIndex(inputlayerindex)
+    Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aInputLayerIndex)
 
     'set clipper layer (subbasins for instance)
-    Dim ssf As MapWinGIS.Shapefile = ShapeFileFromIndex(clipperlayerindex)
-
-    Dim sshape As MapWinGIS.Shape
-    Dim clipperpath As String = PathNameOnly(LayerFileName(clipperlayerindex))
+    Dim lSfClip As MapWinGIS.Shapefile = ShapeFileFromIndex(aClipperLayerIndex)
+    Dim lShapeClip As MapWinGIS.Shape
+    Dim lPathClip As String = PathNameOnly(LayerFileName(aClipperLayerIndex))
 
     'create results shapefile
     i = 1
-    newname = clipperpath & "\stream" & i & ".shp"
-    Do While FileExists(newname)
-      i = i + 1
-      newname = clipperpath & "\stream" & i & ".shp"
+    lNewShapeFileName = lPathClip & "\stream" & i & ".shp"
+    Do While FileExists(lNewShapeFileName)
+      i += 1
+      lNewShapeFileName = lPathClip & "\stream" & i & ".shp"
     Loop
-    Dim orsf As New MapWinGIS.Shapefile
+    Dim lNewShapeFile As New MapWinGIS.Shapefile
     Dim rsf As New MapWinGIS.Shapefile
-    orsf.CreateNew(newname, MapWinGIS.ShpfileType.SHP_POLYLINE)
-    For i = 1 To isf.NumFields
-      bsuc = orsf.EditInsertField(isf.Field(i - 1), i - 1)
+    lNewShapeFile.CreateNew(lNewShapeFileName, MapWinGIS.ShpfileType.SHP_POLYLINE)
+    For i = 1 To lSf.NumFields
+      lRetc = lNewShapeFile.EditInsertField(lSf.Field(i - 1), i - 1)
     Next i
 
     Dim issf As New MapWinGIS.Shapefile
     issf.CreateNew("temp_clip.shp", MapWinGIS.ShpfileType.SHP_POLYLINE)
 
     GetMappingObject.StatusBar.ShowProgressBar = True
-    icount = 0
-    itotal = ssf.NumShapes * isf.NumShapes
-    For i = 1 To ssf.NumShapes
-      sshape = ssf.Shape(i - 1)
-      For j = 1 To isf.NumShapes
-        icount = icount + 1
-        GetMappingObject.StatusBar.ProgressBarValue = Int(icount / itotal * 100)
-        If IsLineInPolygon(isf.Shape(j - 1), ssf, i - 1) Then
+    lCount = 0
+    lTotal = lSfClip.NumShapes * lSf.NumShapes
+    For i = 1 To lSfClip.NumShapes
+      lShapeClip = lSfClip.Shape(i - 1)
+      For j = 1 To lSf.NumShapes
+        lCount += 1
+        GetMappingObject.StatusBar.ProgressBarValue = Int(lCount / lTotal * 100)
+        If IsLineInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
           'at least one point of the line is in the polygon
-
-          If IsLineEntirelyInPolygon(isf.Shape(j - 1), ssf, i - 1) Then
+          If IsLineEntirelyInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
             'just add to output shapefile
-            bsuc = orsf.EditInsertShape(isf.Shape(j - 1), orsf.NumShapes)
+            lRetc = lNewShapeFile.EditInsertShape(lSf.Shape(j - 1), lNewShapeFile.NumShapes)
             'populate attributes of output shape
-            For k = 1 To isf.NumFields
-              bsuc = orsf.EditCellValue(k - 1, orsf.NumShapes - 1, isf.CellValue(k - 1, j - 1))
+            For k = 1 To lSf.NumFields
+              lRetc = lNewShapeFile.EditCellValue(k - 1, lNewShapeFile.NumShapes - 1, lSf.CellValue(k - 1, j - 1))
             Next k
           Else
             'need to clip
-            bsuc = issf.EditInsertShape(isf.Shape(j - 1), j - 1)
-            bsuc = MapWinX.SpatialOperations.ClipShapesWithPolygon(issf, sshape, rsf)
-            bsuc = issf.EditDeleteShape(0)
+            lRetc = issf.EditInsertShape(lSf.Shape(j - 1), j - 1)
+            lRetc = MapWinX.SpatialOperations.ClipShapesWithPolygon(issf, lShapeClip, rsf)
+            lRetc = issf.EditDeleteShape(0)
             If rsf.NumShapes > 0 Then
-              bsuc = orsf.EditInsertShape(rsf.Shape(0), orsf.NumShapes)
+              lRetc = lNewShapeFile.EditInsertShape(rsf.Shape(0), lNewShapeFile.NumShapes)
               'populate attributes of output shape
-              For k = 1 To isf.NumFields
-                bsuc = orsf.EditCellValue(k - 1, orsf.NumShapes - 1, isf.CellValue(k - 1, j - 1))
+              For k = 1 To lSf.NumFields
+                lRetc = lNewShapeFile.EditCellValue(k - 1, lNewShapeFile.NumShapes - 1, lSf.CellValue(k - 1, j - 1))
               Next k
             End If
           End If
-
         End If
       Next j
     Next i
     GetMappingObject.StatusBar.ShowProgressBar = False
 
-    bsuc = orsf.SaveAs(newname)
-    ClipShapesWithPolygon = newname
+    lRetc = lNewShapeFile.SaveAs(lNewShapeFileName)
+    ClipShapesWithPolygon = lNewShapeFileName
 
   End Function
 
@@ -1520,7 +1542,8 @@ Public Class GisUtil
                                           ByVal aPolyShapeFile As MapWinGIS.Shapefile, _
                                           ByVal aIndex As Integer) As Boolean
     For i As Integer = 0 To aLineShape.numPoints - 1
-      If aPolyShapeFile.PointInShape(aIndex, aLineShape.Point(i).x, aLineShape.Point(i).y) Then
+      If aPolyShapeFile.PointInShape(aIndex, aLineShape.Point(i).x, _
+                                             aLineShape.Point(i).y) Then
         Return True 'a point was within polygon
       End If
     Next i
@@ -1531,181 +1554,171 @@ Public Class GisUtil
                                                   ByVal aPolyShapeFile As MapWinGIS.Shapefile, _
                                                   ByVal aIndex As Integer) As Boolean
     For i As Integer = 0 To aLineShape.numPoints - 1
-      If Not aPolyShapeFile.PointInShape(aIndex, aLineShape.Point(i).x, aLineShape.Point(i).y) Then
+      If Not aPolyShapeFile.PointInShape(aIndex, aLineShape.Point(i).x, _
+                                                 aLineShape.Point(i).y) Then
         Return False 'a point on line was outside polygon
       End If
     Next i
     Return True
   End Function
 
-  Private Shared Function IsThisShapeTheSameAsOrPartOfAnotherShape(ByVal sf1shape As MapWinGIS.Shape, ByVal sf2shape As MapWinGIS.Shape) As Boolean
+  Private Shared Function IsThisShapeTheSameAsOrPartOfAnotherShape(ByVal lSf1Shape As MapWinGIS.Shape, _
+                                                                   ByVal lSf2Shape As MapWinGIS.Shape) As Boolean
     'given one shape and another which may be a piece of the first shape,
     'determine if the second shape is equivalent or part of the first shape
     '(after a reach segment has been clipped to a polygon boundary, we still need 
     'to identify which original reach it was a part of)
-    Dim i As Integer
-    Dim j As Integer
-    Dim foundpoint As Boolean
+    Dim lFoundPoint As Boolean
 
-    IsThisShapeTheSameAsOrPartOfAnotherShape = True
-
-    For j = 2 To sf1shape.numPoints - 1
-      foundpoint = False
-      For i = 1 To sf2shape.numPoints
-        If sf1shape.Point(j - 1).x = sf2shape.Point(i - 1).x And sf1shape.Point(j - 1).y = sf2shape.Point(i - 1).y Then
-          foundpoint = True
+    For j As Integer = 2 To lSf1Shape.numPoints - 1
+      lFoundPoint = False
+      For i As Integer = 1 To lSf2Shape.numPoints
+        If lSf1Shape.Point(j - 1).x = lSf2Shape.Point(i - 1).x And _
+           lSf1Shape.Point(j - 1).y = lSf2Shape.Point(i - 1).y Then
+          lFoundPoint = True
           Exit For
         End If
       Next i
-      If foundpoint = False Then
-        IsThisShapeTheSameAsOrPartOfAnotherShape = False
-        Exit Function
+      If lFoundPoint = False Then
+        Return False
       End If
     Next j
-
+    Return True
   End Function
 
-  Public Shared Sub MergeFeaturesBasedOnAttribute(ByVal aLayerIndex As Integer, ByVal FieldIndex As Integer)
-    Dim i As Integer
-    Dim j As Integer
-    Dim k As Integer
-    Dim bsuc As Boolean
-    Dim thisval As Integer
-    Dim targetval As Integer
-    Dim shape1 As MapWinGIS.Shape
-    Dim shape2 As MapWinGIS.Shape
-    Dim endx As Double
-    Dim endy As Double
-    Dim found As Boolean
+  Public Shared Sub MergeFeaturesBasedOnAttribute(ByVal aLayerIndex As Integer, _
+                                                  ByVal aFieldIndex As Integer)
+    Dim lRetc As Boolean
+    Dim lFound As Boolean
 
-    Dim isf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+    Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
-    isf.StartEditingShapes(True)
+    lsf.StartEditingShapes(True)
     'merge together based on common endpoints
-    i = 0
-    Do While i < isf.NumShapes
-      found = False
-      shape1 = isf.Shape(i)
-      targetval = FieldValue(aLayerIndex, i, FieldIndex)
-      endx = shape1.Point(shape1.numPoints - 1).x
-      endy = shape1.Point(shape1.numPoints - 1).y
-      j = 0
-      Do While j < isf.NumShapes
+    Dim i As Integer = 0
+    Do While i < lsf.NumShapes
+      lFound = False
+      Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
+      Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
+      Dim lEndX As Double = lShape1.Point(lShape1.numPoints - 1).x
+      Dim lEndY As Double = lShape1.Point(lShape1.numPoints - 1).y
+      Dim j As Integer = 0
+      Do While j < lsf.NumShapes
         If i <> j Then
-          shape2 = isf.Shape(j)
-          thisval = FieldValue(aLayerIndex, j, FieldIndex)
-          If thisval = targetval Then
+          Dim lShape2 As MapWinGIS.Shape = lsf.Shape(j)
+          Dim lVal As Integer = FieldValue(aLayerIndex, j, aFieldIndex)
+          If lVal = lTargetval Then
             'see if these have common start/end 
-            If endx = shape2.Point(0).x And endy = shape2.Point(0).y Then
+            If lEndX = lShape2.Point(0).x And lEndY = lShape2.Point(0).y Then
               'end of shape 1 is start of shape2
-              For k = 1 To shape2.numPoints
-                bsuc = shape1.InsertPoint(shape2.Point(k), shape1.numPoints)
+              For k As Integer = 1 To lShape2.numPoints
+                lRetc = lShape1.InsertPoint(lShape2.Point(k), lShape1.numPoints)
               Next k
               'remove shape2
-              isf.EditDeleteShape(j)
-              found = True
+              lsf.EditDeleteShape(j)
+              lFound = True
               Exit Do
             End If
           End If
         End If
-        j = j + 1
+        j += 1
       Loop
-      If Not found Then
-        i = i + 1
+      If Not lFound Then
+        i += 1
       End If
     Loop
 
     'merge together based on endpoint proximity
-    Dim startx1 As Double
-    Dim starty1 As Double
-    Dim endx1 As Double
-    Dim endy1 As Double
-    Dim startx2 As Double
-    Dim starty2 As Double
-    Dim endx2 As Double
-    Dim endy2 As Double
+    Dim lStartX1 As Double
+    Dim lStartY1 As Double
+    Dim lEndX1 As Double
+    Dim lEndY1 As Double
+    Dim lStartX2 As Double
+    Dim lStartY2 As Double
+    Dim lEndX2 As Double
+    Dim lEndY2 As Double
     i = 0
-    Do While i < isf.NumShapes
-      found = False
-      shape1 = isf.Shape(i)
-      targetval = FieldValue(aLayerIndex, i, FieldIndex)
-      startx1 = shape1.Point(0).x
-      starty1 = shape1.Point(0).y
-      endx1 = shape1.Point(shape1.numPoints - 1).x
-      endy1 = shape1.Point(shape1.numPoints - 1).y
-      j = 0
-      Do While j < isf.NumShapes
+    Do While i < lsf.NumShapes
+      lFound = False
+      Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
+      Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
+      lStartX1 = lShape1.Point(0).x
+      lStartY1 = lShape1.Point(0).y
+      lEndX1 = lShape1.Point(lShape1.numPoints - 1).x
+      lEndY1 = lShape1.Point(lShape1.numPoints - 1).y
+      Dim j As Integer = 0
+      Do While j < lsf.NumShapes
         If i <> j Then
-          shape2 = isf.Shape(j)
-          thisval = FieldValue(aLayerIndex, j, FieldIndex)
-          If thisval = targetval Then
-            startx2 = shape2.Point(0).x
-            starty2 = shape2.Point(0).y
-            endx2 = shape2.Point(shape2.numPoints - 1).x
-            endy2 = shape2.Point(shape2.numPoints - 1).y
-            If (startx1 - endx2) ^ 2 + (starty1 - endy2) ^ 2 < (startx2 - endx1) ^ 2 + (starty2 - endy1) ^ 2 Then
+          Dim lShape2 As MapWinGIS.Shape = lsf.Shape(j)
+          Dim lVal As Integer = FieldValue(aLayerIndex, j, aFieldIndex)
+          If lVal = lTargetval Then
+            lStartX2 = lShape2.Point(0).x
+            lStartY2 = lShape2.Point(0).y
+            lEndX2 = lShape2.Point(lShape2.numPoints - 1).x
+            lEndY2 = lShape2.Point(lShape2.numPoints - 1).y
+            If (lStartX1 - lEndX2) ^ 2 + (lStartY1 - lEndY2) ^ 2 < (lStartX2 - lEndX1) ^ 2 + (lStartY2 - lEndY1) ^ 2 Then
               'add shape 1 to the end of shape 2
-              For k = 1 To shape1.numPoints
-                bsuc = shape2.InsertPoint(shape1.Point(k), shape2.numPoints)
+              For k As Integer = 1 To lShape1.numPoints
+                lRetc = lShape2.InsertPoint(lShape1.Point(k), lShape2.numPoints)
               Next k
               'remove shape1
-              isf.EditDeleteShape(i)
-              found = True
+              lsf.EditDeleteShape(i)
+              lFound = True
               Exit Do
             Else
               'add shape 2 to the end of shape 1
-              For k = 1 To shape2.numPoints
-                bsuc = shape1.InsertPoint(shape2.Point(k), shape1.numPoints)
+              For k As Integer = 1 To lShape2.numPoints
+                lRetc = lShape1.InsertPoint(lShape2.Point(k), lShape1.numPoints)
               Next k
               'remove shape2
-              isf.EditDeleteShape(j)
-              found = True
+              lsf.EditDeleteShape(j)
+              lFound = True
               Exit Do
             End If
           End If
         End If
-        j = j + 1
+        j += 1
       Loop
-      If Not found Then
-        i = i + 1
+      If Not lFound Then
+        i += 1
       End If
     Loop
 
-    isf.StopEditingShapes(True)
+    lsf.StopEditingShapes(True)
   End Sub
 
-  Public Shared Function AreaOverlappingPolygons(ByVal Layer1index As Integer, ByVal Layer1FeatureIndex As Integer, _
-                             ByVal Layer2index As Integer, ByVal Layer2FeatureIndex As Integer) As Single
+  Public Shared Function AreaOverlappingPolygons(ByVal aLayer1index As Integer, _
+                                                 ByVal aLayer1FeatureIndex As Integer, _
+                                                 ByVal aLayer2index As Integer, _
+                                                 ByVal aLayer2FeatureIndex As Integer) As Single
     'overlay feature from layer1 with feature from layer2, 
     'determining area of feature 1 in feature 2
-    AreaOverlappingPolygons = 0.0
+    Dim lAreaOverlappingPolygons = 0.0
 
     'set layer 1 
     Dim lLayer As MapWindow.Interfaces.Layer
-    lLayer = GetMappingObject.Layers(Layer1index)
-    Dim sf1 As MapWinGIS.Shapefile
-    sf1 = lLayer.GetObject
-    Dim shape1 As MapWinGIS.Shape
-    shape1 = sf1.Shape(Layer1FeatureIndex)
+    lLayer = GetMappingObject.Layers(aLayer1index)
+    Dim lSf1 As MapWinGIS.Shapefile
+    lSf1 = lLayer.GetObject
+    Dim lShape1 As MapWinGIS.Shape
+    lShape1 = lSf1.Shape(aLayer1FeatureIndex)
 
     'set layer 2 
     Dim lLayer2 As MapWindow.Interfaces.Layer
-    lLayer2 = GetMappingObject.Layers(Layer2index)
-    Dim sf2 As MapWinGIS.Shapefile
-    sf2 = lLayer2.GetObject
-    Dim shape2 As MapWinGIS.Shape
-    shape2 = sf2.Shape(Layer2FeatureIndex)
+    lLayer2 = GetMappingObject.Layers(aLayer2index)
+    Dim lsf2 As MapWinGIS.Shapefile
+    lsf2 = lLayer2.GetObject
+    Dim lShape2 As MapWinGIS.Shape
+    lShape2 = lsf2.Shape(aLayer2FeatureIndex)
 
-    Dim utilClip As New MapWinGIS.Utils
-    Dim utilArea As New MapWinGIS.Utils
-    Dim newshape As MapWinGIS.Shape
+    Dim Util As New MapWinGIS.Utils
+    Dim lNewShape As MapWinGIS.Shape
 
-    newshape = utilClip.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, shape1, shape2)
-    If newshape.numPoints > 0 Then
-      AreaOverlappingPolygons = Math.Abs(utilArea.Area(newshape))
+    lNewShape = Util.ClipPolygon(MapWinGIS.PolygonOperation.INTERSECTION_OPERATION, lShape1, lShape2)
+    If lNewShape.numPoints > 0 Then
+      lAreaOverlappingPolygons = Math.Abs(Util.Area(lNewShape))
     End If
-    newshape = Nothing
-
+    lNewShape = Nothing
+    Return lAreaOverlappingPolygons
   End Function
-
 End Class
