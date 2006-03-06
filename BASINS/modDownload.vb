@@ -226,6 +226,62 @@ StartOver:
           Case "add_allshapes"
             lOutputFileName = lProjectorNode.Content
             AddAllShapesInDir(lOutputFileName, lProjectDir)
+          Case "clip_grid"
+            lOutputFileName = lProjectorNode.GetAttrValue("output")
+            lCurFilename = lProjectorNode.Content
+            'create extents shape to clip to, at the extents of the cat unit
+            Dim lShape As New MapWinGIS.Shape
+            lShape.Create(ShpfileType.SHP_POLYGON)
+            Dim lSf As New MapWinGIS.Shapefile
+            lSf.Open(lProjectDir & "cat.shp")
+            Dim lPoint1 As New MapWinGIS.Point
+            lPoint1.x = lSf.Extents.xMin
+            lPoint1.y = lSf.Extents.yMin
+            lSuccess = lShape.InsertPoint(lPoint1, 0)
+            Dim lPoint2 As New MapWinGIS.Point
+            lPoint2.x = lSf.Extents.xMax
+            lPoint2.y = lSf.Extents.yMin
+            lSuccess = lShape.InsertPoint(lPoint2, 0)
+            Dim lPoint3 As New MapWinGIS.Point
+            lPoint3.x = lSf.Extents.xMax
+            lPoint3.y = lSf.Extents.yMax
+            lSuccess = lShape.InsertPoint(lPoint3, 0)
+            Dim lPoint4 As New MapWinGIS.Point
+            lPoint4.x = lSf.Extents.xMin
+            lPoint4.y = lSf.Extents.yMax
+            lSuccess = lShape.InsertPoint(lPoint4, 0)
+            Dim lPoint5 As New MapWinGIS.Point
+            lPoint5.x = lSf.Extents.xMin
+            lPoint5.y = lSf.Extents.yMin
+            lSuccess = lShape.InsertPoint(lPoint5, 0)
+            If InStr(lOutputFileName, "\nlcd\") > 0 Then
+              'project the extents into the albers projection for nlcd
+              MkDirPath(lProjectDir & "nlcd")
+              If FileExists(lProjectDir & "nlcd\catextent.shp") Then
+                System.IO.File.Delete(lProjectDir & "nlcd\catextent.shp")
+                System.IO.File.Delete(lProjectDir & "nlcd\catextent.dbf")
+                System.IO.File.Delete(lProjectDir & "nlcd\catextent.shx")
+              End If
+              Dim lExtentsSf As New MapWinGIS.Shapefile
+              lSuccess = lExtentsSf.CreateNew(lProjectDir & "nlcd\catextent.shp", ShpfileType.SHP_POLYGON)
+              lSuccess = lExtentsSf.StartEditingShapes(True)
+              lSuccess = lExtentsSf.EditInsertShape(lShape, 0)
+              lSuccess = lExtentsSf.Close()
+              lInputProjection = WholeFileString(lProjectDir & "prj.proj")
+              lInputProjection = CleanUpUserProjString(lInputProjection)
+              lOutputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+              If lInputProjection <> lOutputProjection Then
+                lSuccess = MapWinX.SpatialReference.ProjectShapefile(lInputProjection, lOutputProjection, lExtentsSf)
+                lSuccess = lExtentsSf.Open(lProjectDir & "nlcd\catextent.shp")
+                lShape = lExtentsSf.Shape(0)
+              End If
+            End If
+            'clip to cat extents
+            g_MapWin.StatusBar(1).Text = "Clipping Grid..."
+            g_MapWin.Refresh()
+            DoEvents()
+            lSuccess = MapWinX.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
+            g_MapWin.StatusBar(1).Text = ""
           Case "project_dir"
             lProjectDir = lProjectorNode.Content
             If Right(lProjectDir, 1) <> "\" Then lProjectDir &= "\"
