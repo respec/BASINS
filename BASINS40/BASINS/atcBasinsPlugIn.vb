@@ -208,6 +208,16 @@ Public Class atcBasinsPlugIn
       Case BasinsHelpMenuName
         Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_MapWin.ApplicationInfo.DefaultDir & "\docs\Basins4.chm")
         If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
+      Case AnalysisMenuName & "_ArcView3"
+        'create apr if it does not exist, then open it
+        Dim lAprFileName As String = "\basins\apr\" & FilenameOnly(g_MapWin.Project.FileName) & ".apr"
+        If Not FileExists(lAprFileName) Then
+          'build it
+          Dim exename As String = FindFile("Please locate BasinsArchive.exe", "\BASINS\etc\basinsarchive\BasinsArchive.exe")
+          Dim Exec_Str = exename & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
+          Shell(Exec_Str, AppWinStyle.NormalFocus, False)
+        End If
+        Process.Start(lAprFileName)
       Case Else
         If aItemName.StartsWith(AnalysisMenuName & "_") Then
           aHandled = LaunchTool(aItemName.Substring(AnalysisMenuName.Length + 1))
