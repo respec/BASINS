@@ -594,10 +594,13 @@ Friend Class frmSelectData
     Dim lNumeric As Boolean = False
     Dim lSortedItems As New atcCollection
     Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
+    Dim lAllTs As atcDataGroup = pDataManager.DataSets
     Dim lTsIndex As Integer = 0
-    Dim lTsLastIndex As Integer = pDataManager.DataSets.Count
+    Dim lTsLastIndex As Integer = lAllTs.Count
+    Dim lItemIndex As Integer = 0
+    Dim lProgressMessage As String = "Populating Criteria List for " & aAttributeName
 
-    Logger.Dbg("Start PopulateCriteriaList(" & aAttributeName & ")")
+    Logger.Dbg("Start " & lProgressMessage)
 
     If Not lAttributeDef Is Nothing Then
       Select Case lAttributeDef.TypeString.ToLower
@@ -608,22 +611,22 @@ Friend Class frmSelectData
 
     With aList
       .Visible = False
-      For Each ts As atcDataSet In pDataManager.DataSets
-        Dim lVal As String = ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE)
-        Dim lIndex As Integer = 0
-        If Not lSortedItems.Contains(lVal) Then
-          If lNumeric Then
-            Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
-            lIndex = BinarySearchNumeric(lKey, lSortedItems.Keys)
-            lSortedItems.Insert(lIndex, lKey, lVal)
-          Else
-            Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
-            lIndex = BinarySearchString(lKey, lSortedItems.Keys)
-            lSortedItems.Insert(lIndex, lKey, lVal)
+      For Each ts As atcDataSet In lAllTs
+        If lNumeric Then
+          Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
+          lItemIndex = BinarySearchNumeric(lKey, lSortedItems.Keys)
+          If lItemIndex = lSortedItems.Count OrElse lSortedItems.Keys.Item(lItemIndex) <> lkey Then
+            lSortedItems.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
+          End If
+        Else
+          Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
+          lItemIndex = BinarySearchString(lKey, lSortedItems.Keys)
+          If lItemIndex = lSortedItems.Count OrElse lSortedItems.Keys.Item(lItemIndex) <> lkey Then
+            lSortedItems.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
           End If
         End If
         lTsIndex += 1
-        Logger.Progress("PopulateCriteriaList ", lTsIndex, lTsLastIndex)
+        Logger.Progress(lProgressMessage, lTsIndex, lTsLastIndex)
       Next
       .Initialize(New ListSource(lSortedItems))
       If lNumeric Then
@@ -639,6 +642,7 @@ Friend Class frmSelectData
   End Sub
 
   'Returns first index of a key equal to or higher than aKey
+  'Returns aKeys.Count if aKeys is empty or contains only values less than aKey
   Private Function BinarySearchString(ByVal aKey As String, ByVal aKeys As ArrayList) As Integer
     Dim lHigher As Integer = aKeys.Count
     Dim lLower As Integer = -1
@@ -655,6 +659,7 @@ Friend Class frmSelectData
   End Function
 
   'Returns first index of a key equal to or higher than aKey
+  'Returns aKeys.Count if aKeys is empty or contains only values less than aKey
   Private Function BinarySearchNumeric(ByVal aKey As Double, ByVal aKeys As ArrayList) As Integer
     Dim lHigher As Integer = aKeys.Count
     Dim lLower As Integer = -1
