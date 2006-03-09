@@ -50,7 +50,7 @@ Public Class PlugIn
     pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
     pMapWin.Menus.AddMenu(ParentMenuName & "_Projection", ParentMenuName, Nothing, "&Projection Parameters")
     pMapWin.Menus.AddMenu(ParentMenuName & "_Storet", ParentMenuName, Nothing, "STORET &Agency Codes")
-    pMapWin.Menus.AddMenu(ParentMenuName & "_Sic", ParentMenuName, Nothing, "Standard &Industrial Classifcation Codes")
+    pMapWin.Menus.AddMenu(ParentMenuName & "_Sic", ParentMenuName, Nothing, "Standard &Industrial Classification Codes")
     pMapWin.Menus.AddMenu(ParentMenuName & "_WQ", ParentMenuName, Nothing, "304a &Water Quality Criteria")
     pMapWin.Menus.AddMenu(ParentMenuName & "_LookupSeparator", ParentMenuName, Nothing, "-")
 
@@ -83,7 +83,7 @@ Public Class PlugIn
           OpenFile("http://oaspub.epa.gov/stormoda/DW_stationcriteria_STN")
           Handled = True
         Case "Sic"
-          Dim main As New frmSic
+          'Dim main As New frmSic
           'main.initializeUI(pMapWin.Project.FileName)
           'main.Show()
           'main.ReadDatabase()
