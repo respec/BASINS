@@ -82,6 +82,8 @@ Public Class frmIterative
   Friend WithEvents btnStop As System.Windows.Forms.Button
   Friend WithEvents lblAllResults As System.Windows.Forms.Label
   Friend WithEvents chkSaveAll As System.Windows.Forms.CheckBox
+  Friend WithEvents mnuPivotHeaders As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuOptions As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmIterative))
     Me.myTabs = New System.Windows.Forms.TabControl
@@ -128,6 +130,8 @@ Public Class frmIterative
     Me.mnuCopyResults = New System.Windows.Forms.MenuItem
     Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
     Me.mnuPasteResults = New System.Windows.Forms.MenuItem
+    Me.mnuOptions = New System.Windows.Forms.MenuItem
+    Me.mnuPivotHeaders = New System.Windows.Forms.MenuItem
     Me.lblTop = New System.Windows.Forms.Label
     Me.btnStop = New System.Windows.Forms.Button
     Me.myTabs.SuspendLayout()
@@ -149,7 +153,7 @@ Public Class frmIterative
     Me.myTabs.Location = New System.Drawing.Point(0, 40)
     Me.myTabs.Name = "myTabs"
     Me.myTabs.SelectedIndex = 0
-    Me.myTabs.Size = New System.Drawing.Size(296, 264)
+    Me.myTabs.Size = New System.Drawing.Size(328, 264)
     Me.myTabs.TabIndex = 0
     '
     'tabInputs
@@ -166,7 +170,7 @@ Public Class frmIterative
     Me.tabInputs.Controls.Add(Me.lblNewScenarioName)
     Me.tabInputs.Location = New System.Drawing.Point(4, 22)
     Me.tabInputs.Name = "tabInputs"
-    Me.tabInputs.Size = New System.Drawing.Size(288, 238)
+    Me.tabInputs.Size = New System.Drawing.Size(320, 238)
     Me.tabInputs.TabIndex = 0
     Me.tabInputs.Text = "Inputs"
     '
@@ -177,7 +181,7 @@ Public Class frmIterative
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lstInputs.Location = New System.Drawing.Point(8, 96)
     Me.lstInputs.Name = "lstInputs"
-    Me.lstInputs.Size = New System.Drawing.Size(272, 139)
+    Me.lstInputs.Size = New System.Drawing.Size(304, 139)
     Me.lstInputs.TabIndex = 10
     '
     'btnInputDown
@@ -226,7 +230,7 @@ Public Class frmIterative
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtModifiedScenarioName.Location = New System.Drawing.Point(96, 32)
     Me.txtModifiedScenarioName.Name = "txtModifiedScenarioName"
-    Me.txtModifiedScenarioName.Size = New System.Drawing.Size(184, 20)
+    Me.txtModifiedScenarioName.Size = New System.Drawing.Size(216, 20)
     Me.txtModifiedScenarioName.TabIndex = 4
     Me.txtModifiedScenarioName.Text = "Modified"
     '
@@ -236,7 +240,7 @@ Public Class frmIterative
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboBaseScenarioName.Location = New System.Drawing.Point(96, 8)
     Me.cboBaseScenarioName.Name = "cboBaseScenarioName"
-    Me.cboBaseScenarioName.Size = New System.Drawing.Size(184, 21)
+    Me.cboBaseScenarioName.Size = New System.Drawing.Size(216, 21)
     Me.cboBaseScenarioName.TabIndex = 2
     '
     'lblBaseScenarioName
@@ -267,7 +271,7 @@ Public Class frmIterative
     Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
     Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
     Me.tabEndpoints.Name = "tabEndpoints"
-    Me.tabEndpoints.Size = New System.Drawing.Size(288, 238)
+    Me.tabEndpoints.Size = New System.Drawing.Size(320, 238)
     Me.tabEndpoints.TabIndex = 1
     Me.tabEndpoints.Text = "Endpoints"
     '
@@ -277,7 +281,7 @@ Public Class frmIterative
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblAllResults.Location = New System.Drawing.Point(128, 16)
     Me.lblAllResults.Name = "lblAllResults"
-    Me.lblAllResults.Size = New System.Drawing.Size(144, 16)
+    Me.lblAllResults.Size = New System.Drawing.Size(176, 16)
     Me.lblAllResults.TabIndex = 18
     '
     'chkSaveAll
@@ -295,7 +299,7 @@ Public Class frmIterative
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lstEndpoints.Location = New System.Drawing.Point(8, 96)
     Me.lstEndpoints.Name = "lstEndpoints"
-    Me.lstEndpoints.Size = New System.Drawing.Size(272, 139)
+    Me.lstEndpoints.Size = New System.Drawing.Size(304, 139)
     Me.lstEndpoints.TabIndex = 17
     '
     'btnEndpointDown
@@ -343,7 +347,7 @@ Public Class frmIterative
     Me.tabResults.Controls.Add(Me.agdResults)
     Me.tabResults.Location = New System.Drawing.Point(4, 22)
     Me.tabResults.Name = "tabResults"
-    Me.tabResults.Size = New System.Drawing.Size(288, 238)
+    Me.tabResults.Size = New System.Drawing.Size(320, 238)
     Me.tabResults.TabIndex = 2
     Me.tabResults.Text = "Results"
     '
@@ -353,12 +357,13 @@ Public Class frmIterative
     Me.agdResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.agdResults.BackColor = System.Drawing.SystemColors.Control
     Me.agdResults.CellBackColor = System.Drawing.Color.Empty
     Me.agdResults.LineColor = System.Drawing.Color.Empty
     Me.agdResults.LineWidth = 0.0!
     Me.agdResults.Location = New System.Drawing.Point(8, 8)
     Me.agdResults.Name = "agdResults"
-    Me.agdResults.Size = New System.Drawing.Size(272, 224)
+    Me.agdResults.Size = New System.Drawing.Size(304, 224)
     Me.agdResults.Source = Nothing
     Me.agdResults.TabIndex = 18
     '
@@ -373,7 +378,7 @@ Public Class frmIterative
     Me.tabPivot.Controls.Add(Me.cboPivotRows)
     Me.tabPivot.Location = New System.Drawing.Point(4, 22)
     Me.tabPivot.Name = "tabPivot"
-    Me.tabPivot.Size = New System.Drawing.Size(288, 238)
+    Me.tabPivot.Size = New System.Drawing.Size(320, 238)
     Me.tabPivot.TabIndex = 3
     Me.tabPivot.Text = "Pivot"
     '
@@ -388,7 +393,7 @@ Public Class frmIterative
     Me.agdPivot.LineWidth = 0.0!
     Me.agdPivot.Location = New System.Drawing.Point(8, 80)
     Me.agdPivot.Name = "agdPivot"
-    Me.agdPivot.Size = New System.Drawing.Size(272, 152)
+    Me.agdPivot.Size = New System.Drawing.Size(304, 152)
     Me.agdPivot.Source = Nothing
     Me.agdPivot.TabIndex = 25
     '
@@ -450,7 +455,7 @@ Public Class frmIterative
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.MenuItem1})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.MenuItem1, Me.mnuOptions})
     '
     'mnuFile
     '
@@ -481,12 +486,12 @@ Public Class frmIterative
     'mnuLoadVariations
     '
     Me.mnuLoadVariations.Index = 4
-    Me.mnuLoadVariations.Text = "Load Variations"
+    Me.mnuLoadVariations.Text = "Load Inputs and Endpoints"
     '
     'mnuSaveVariations
     '
     Me.mnuSaveVariations.Index = 5
-    Me.mnuSaveVariations.Text = "Save Variations"
+    Me.mnuSaveVariations.Text = "Save Inputs and Endpoints"
     '
     'MenuItem1
     '
@@ -509,13 +514,25 @@ Public Class frmIterative
     Me.mnuPasteResults.Index = 2
     Me.mnuPasteResults.Text = "Paste Results"
     '
+    'mnuOptions
+    '
+    Me.mnuOptions.Index = 2
+    Me.mnuOptions.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuPivotHeaders})
+    Me.mnuOptions.Text = "Options"
+    '
+    'mnuPivotHeaders
+    '
+    Me.mnuPivotHeaders.Checked = True
+    Me.mnuPivotHeaders.Index = 0
+    Me.mnuPivotHeaders.Text = "Save/Copy Headers With Pivot"
+    '
     'lblTop
     '
     Me.lblTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.lblTop.Location = New System.Drawing.Point(72, 8)
     Me.lblTop.Name = "lblTop"
-    Me.lblTop.Size = New System.Drawing.Size(216, 24)
+    Me.lblTop.Size = New System.Drawing.Size(248, 24)
     Me.lblTop.TabIndex = 2
     Me.lblTop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
     '
@@ -531,7 +548,7 @@ Public Class frmIterative
     'frmIterative
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(296, 301)
+    Me.ClientSize = New System.Drawing.Size(328, 301)
     Me.Controls.Add(Me.lblTop)
     Me.Controls.Add(Me.btnStart)
     Me.Controls.Add(Me.myTabs)
@@ -564,6 +581,7 @@ Public Class frmIterative
   Private TimePerRun As Double = 0 'Time each run takes in seconds
 
   Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcDataGroup = Nothing)
+    mnuPivotHeaders.Checked = GetSetting("ScenarioBuilder", "Settings", "PivotHeaders", "Yes").Equals("Yes")
     TimePerRun = CDbl(GetSetting("ScenarioBuilder", "Settings", "TimePerRun", "0"))
     pInputs = New atcCollection
     pEndpoints = New atcCollection
@@ -605,7 +623,7 @@ Public Class frmIterative
       .CellValue(0, 0) = "Run"
       .CellColor(0, 0) = Drawing.SystemColors.Control
       .ColorCells = True
-      For Each lEndpoint As Variation In pInputs        
+      For Each lEndpoint As Variation In pInputs
         If lEndpoint.Operation Is Nothing Then
           .CellValue(0, lColumn) = lEndpoint.Name
         Else
@@ -912,6 +930,8 @@ Public Class frmIterative
   Private Sub frmMultipleResults_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
     agdResults.SizeAllColumnsToContents(agdResults.Width, True)
     agdPivot.SizeAllColumnsToContents(agdPivot.Width, True)
+    agdResults.Refresh()
+    agdPivot.Refresh()
   End Sub
 
   Private Sub mnuCopyResults_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyResults.Click
@@ -919,12 +939,29 @@ Public Class frmIterative
   End Sub
 
   Private Sub mnuCopyPivot_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyPivot.Click
-    Dim lPrependString As String = _
-                     lblPivotColumns.Text & vbTab & cboPivotColumns.Text & vbCrLf _
-                   & lblPivotRows.Text & vbTab & cboPivotRows.Text & vbCrLf _
-                   & lblPivotCells.Text & vbTab & cboPivotCells.Text & vbCrLf
-    Clipboard.SetDataObject(agdPivot.Source.ToStringWithPrependColumns(lPrependString))
+    Clipboard.SetDataObject(PivotText)
   End Sub
+
+  Private Sub mnuPivotHeaders_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuPivotHeaders.Click
+    mnuPivotHeaders.Checked = Not mnuPivotHeaders.Checked
+    If mnuPivotHeaders.Checked Then
+      DeleteSetting("ScenarioBuilder", "Settings", "PivotHeaders")
+    Else
+      SaveSetting("ScenarioBuilder", "Settings", "PivotHeaders", "No")
+    End If
+  End Sub
+
+  Private Function PivotText() As String
+    If mnuPivotHeaders.Checked Then 'Include info about columns, rows, cells
+      Dim lFieldsSource As New atcGridSource
+      lFieldsSource.FromString(lblPivotColumns.Text & vbTab & cboPivotColumns.Text & vbCrLf _
+                             & lblPivotRows.Text & vbTab & cboPivotRows.Text & vbCrLf _
+                             & lblPivotCells.Text & vbTab & cboPivotCells.Text & vbCrLf)
+      Return lFieldsSource.AppendColumns(agdPivot.Source).ToString
+    Else
+      Return agdPivot.Source.ToString
+    End If
+  End Function
 
   Private Sub mnuSaveResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSaveResults.Click
     If agdResults.Source Is Nothing Then
@@ -956,11 +993,7 @@ Public Class frmIterative
       .OverwritePrompt = True
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         'write file from grid contents
-        Dim lPrependString As String = _
-                         lblPivotColumns.Text & vbTab & cboPivotColumns.Text & vbCrLf _
-                       & lblPivotRows.Text & vbTab & cboPivotRows.Text & vbCrLf _
-                       & lblPivotCells.Text & vbTab & cboPivotCells.Text & vbCrLf
-        SaveFileString(.FileName, agdPivot.Source.ToStringWithPrependColumns(lPrependString))
+        SaveFileString(.FileName, PivotText)
         SaveSetting("ScenarioBuilder", "Settings", "LastPivot", .FileName)
       End If
     End With
@@ -1177,7 +1210,7 @@ Public Class frmIterative
   Private Sub mnuSaveVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSaveVariations.Click
     Dim lSaveDialog As New Windows.Forms.SaveFileDialog
     With lSaveDialog
-      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastVariations", "Variations.xml")
+      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastIterativeSetup", "IterativeSetup.xml")
       .Filter = "XML files (*.xml)|*.xml|All files|*.*"
       .FilterIndex = 1
       .Title = "Save Variations as XML Text"
@@ -1185,7 +1218,7 @@ Public Class frmIterative
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         'write file from form contents
         SaveFileString(.FileName, (XML))
-        SaveSetting("ScenarioBuilder", "Settings", "LastVariations", .FileName)
+        SaveSetting("ScenarioBuilder", "Settings", "LastIterativeSetup", .FileName)
       End If
     End With
   End Sub
@@ -1291,14 +1324,14 @@ Public Class frmIterative
   Private Sub mnuLoadVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuLoadVariations.Click
     Dim lOpenDialog As New Windows.Forms.OpenFileDialog
     With lOpenDialog
-      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastVariations", "Variations.xml")
+      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastIterativeSetup", "IterativeSetup.xml")
       .Filter = "XML files (*.xml)|*.xml|All files|*.*"
       .FilterIndex = 1
       .Title = "Scenario Builder - Load Variations"
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         If FileExists(.FileName) Then
           XML = WholeFileString(.FileName)
-          SaveSetting("ScenarioBuilder", "Settings", "LastVariations", .FileName)
+          SaveSetting("ScenarioBuilder", "Settings", "LastIterativeSetup", .FileName)
         End If
       End If
     End With
@@ -1318,5 +1351,4 @@ Public Class frmIterative
   Private Sub lstEndpoints_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lstEndpoints.MouseUp
     EndpointSelectionFromList()
   End Sub
-
 End Class

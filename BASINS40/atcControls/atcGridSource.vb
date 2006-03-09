@@ -267,7 +267,7 @@ Public Class atcGridSource
     End While
   End Sub
 
-  Public Function ToStringWithPrependColumns(Optional ByVal aPrepend As String = "") As String
+  Public Overrides Function ToString() As String
     Dim lCellValue As String
     Dim lAddTabs() As Boolean
     ReDim lAddTabs(Me.Columns - 1)
@@ -286,37 +286,55 @@ Public Class atcGridSource
       Next
     Next
 
-    Dim lOutString As String = ""
-    Dim lPrepend As String = aPrepend
-    Dim lPrependColumnCount As Integer = 0
+    ToString = ""
     For iRow As Integer = 0 To lMaxRow
-      Dim lPrependRow As String = StrSplit(aPrepend, vbCrLf, "")
-      If lPrependRow.Length > 0 Then
-        lPrependColumnCount = 0
-        While lPrependRow.Length > 0
-          lOutString &= StrSplit(lPrependRow, vbTab, "") & vbTab
-          lPrependColumnCount += 1
-        End While
-      Else
-        For i As Integer = 1 To lPrependColumnCount
-          lOutString &= vbTab
-        Next
-      End If
-
       For iCol As Integer = 0 To lMaxCol
         lCellValue = CellValue(iRow, iCol)
         If lCellValue Is Nothing Then lCellValue = ""
-        lOutString &= lCellValue
+        ToString &= lCellValue
         'Some modified values contain "<tab>(+10%)", add a tab to those that don't
-        If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then lOutString &= vbTab
-        If iCol < lMaxCol Then lOutString &= vbTab 'Add tab afer each column except for last 
+        If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then ToString &= vbTab
+        If iCol < lMaxCol Then ToString &= vbTab 'Add tab afer each column except for last 
       Next
-      lOutString &= vbCrLf
+      ToString &= vbCrLf
     Next
-    Return lOutString
   End Function
 
-  Public Overrides Function ToString() As String
-    Return ToStringWithPrependColumns()
+  Public Overridable Function AppendColumns(ByVal aRightColumns As atcGridSource) As atcGridSource
+    Dim lNewSource As New atcGridSource
+    With lNewSource
+      .FixedRows = Math.Max(FixedRows, aRightColumns.FixedRows)
+      .Rows = Math.Max(Rows, aRightColumns.Rows)
+      .Columns = Columns + aRightColumns.Columns
+      .ColorCells = ColorCells Or aRightColumns.ColorCells
+
+      Dim lMaxCol As Integer = .Columns - 1
+      Dim lMaxRow As Integer = .Rows - 1
+
+      For iCol As Integer = 0 To lMaxCol
+        For iRow As Integer = 0 To lMaxRow
+          If iCol < pColumns Then
+            CopyCell(Me, iRow, iCol, lNewSource, iRow, iCol)
+          Else
+            CopyCell(aRightColumns, iRow, iCol - pColumns, lNewSource, iRow, iCol)
+          End If
+        Next
+      Next
+    End With
+    Return lNewSource
   End Function
+
+  Private Shared Sub CopyCell(ByVal aFromSource As atcGridSource, ByVal aFromRow As Integer, ByVal aFromColumn As Integer, _
+                              ByVal aToSource As atcGridSource, ByVal aToRow As Integer, ByVal aToColumn As Integer)
+    If Not aFromSource.InvalidRowOrColumn(aFromRow, aFromColumn) Then
+      With aToSource
+        .Alignment(aToRow, aToColumn) = aFromSource.Alignment(aFromRow, aFromColumn)
+        .CellEditable(aToRow, aToColumn) = aFromSource.CellEditable(aFromRow, aFromColumn)
+        .CellValue(aToRow, aToColumn) = aFromSource.CellValue(aFromRow, aFromColumn)
+        If .ColorCells AndAlso aFromSource.ColorCells Then
+          .CellColor(aToRow, aToColumn) = aFromSource.CellColor(aFromRow, aFromColumn)
+        End If
+      End With
+    End If
+  End Sub
 End Class
