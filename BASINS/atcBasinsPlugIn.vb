@@ -214,10 +214,30 @@ Public Class atcBasinsPlugIn
         If Not FileExists(lAprFileName) Then
           'build it
           Dim exename As String = FindFile("Please locate BasinsArchive.exe", "\BASINS\etc\basinsarchive\BasinsArchive.exe")
-          Dim Exec_Str = exename & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
-          Shell(Exec_Str, AppWinStyle.NormalFocus, False)
+          If Len(exename) > 0 Then
+            Dim Exec_Str = exename & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
+            Shell(Exec_Str, AppWinStyle.NormalFocus, False)
+          End If
         End If
-        Process.Start(lAprFileName)
+        Try
+          Process.Start(lAprFileName)
+        Catch
+          MsgBox("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "BASINS/ArcView Problem")
+        End Try
+      Case AnalysisMenuName & "_ArcGIS"
+        Dim buildmxdFilename As String = FindFile("Please Locate build.mxd", "\BASINS\etc\build.mxd")
+        If Len(buildmxdFilename) = 0 Then
+          MsgBox("Unable to locate Build.mxd", vbOKOnly, "BASINS/ArcGIS Problem")
+        Else
+          Try
+            'write directive file here
+            SaveFileString(PathNameOnly(buildmxdFilename) & "\ArcMapInstructions.txt", "Build," & g_MapWin.Project.FileName)
+            'now start the build mxd
+            Process.Start(buildmxdFilename)
+          Catch
+            MsgBox("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "BASINS/ArcGIS Problem")
+          End Try
+        End If
       Case Else
         If aItemName.StartsWith(AnalysisMenuName & "_") Then
           aHandled = LaunchTool(aItemName.Substring(AnalysisMenuName.Length + 1))
