@@ -980,7 +980,7 @@ Public Class atcDataSourceWDM
 
     'Dim i As Integer
 
-    lDates = New atcTimeseries(Me)
+    lDates = New atcTimeseries(Nothing)
     pDates.Add(lDates)
 
     lData = New atcTimeseries(Me)
