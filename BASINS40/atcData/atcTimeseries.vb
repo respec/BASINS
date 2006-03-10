@@ -167,7 +167,7 @@ Public Class atcTimeseries
 
   ''' <summary>Make sure values have been read from the source.</summary>
   Public Sub EnsureValuesRead()
-    If pValuesNeedToBeRead Then
+    If pValuesNeedToBeRead AndAlso Not pDataSource Is Nothing Then
       'just header information was read at first, delaying using the time/space to read all the data
       pDataSource.ReadData(Me) 'ValuesNeedToBeRead = False should happen in pFile.ReadData            
     End If

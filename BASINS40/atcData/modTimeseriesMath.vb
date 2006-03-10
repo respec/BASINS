@@ -401,7 +401,7 @@ Public Module modTimeseriesMath
       Dim lDateNew As Double = lNewDates(1)
       Dim lDateOld As Double
       Dim lValOld As Double
-      Dim lOldIndex As Integer = 0
+      Dim lOldIndex As Integer = 1
       Dim lPrevDateOld As Double = lNewDates(0) 'old and new TSers should have same start date
       Dim lPrevDateNew As Double = lNewDates(0)
       Dim lOverlapStart As Double
@@ -499,8 +499,8 @@ Public Module modTimeseriesMath
     Dim lSJDay As Double
     Dim lEJDay As Double
     Dim lNewNumDates As Integer
-    Dim lDate() As Integer
-    Dim lSDate() As Integer
+    Dim lDate(5) As Integer
+    Dim lSDate(5) As Integer
     Dim lTUnit As Integer
     Dim lTStep As Integer
 
