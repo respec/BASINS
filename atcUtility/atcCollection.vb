@@ -184,4 +184,46 @@ Public Class atcCollection
     Next
   End Sub
 
+  Public Overrides Function ToString() As String
+    Dim lCount As Integer = Me.Count
+    Dim lString As String = "Collection "
+    Select Case lCount
+      Case 0 : lString &= "Empty"
+      Case 1 : lString &= "of 1 value"
+      Case Else
+        lString &= "of " & lCount & " values"     
+    End Select
+    Dim lStop As Integer = lCount - 1
+    Dim i As Integer
+    If lStop > 9 Then lStop = 9
+    For i = 0 To lStop
+      lString &= vbCrLf & i & " "
+      Try
+        lString &= Me.Keys.Item(i) & " : "
+      Catch
+        lString &= "<unprintable key> : "
+      End Try
+      Try
+        lString &= Me.ItemByIndex(i) & vbCrLf
+      Catch
+        lString &= "<unprintable value>" & vbCrLf
+      End Try
+    Next
+    If lStop < lCount - 1 Then
+      i = lCount - 1
+      lString &= "..." & vbCrLf
+      lString &= vbCrLf & i & " "
+      Try
+        lString &= Me.Keys.Item(i) & " : "
+      Catch
+        lString &= "<unprintable key> : "
+      End Try
+      Try
+        lString &= Me.ItemByIndex(i) & vbCrLf
+      Catch
+        lString &= "<unprintable value>" & vbCrLf
+      End Try
+    End If
+    Return lString
+  End Function
 End Class

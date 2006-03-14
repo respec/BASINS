@@ -259,7 +259,7 @@ Friend Class frmDisplaySeasonalAttributes
 
   Private Sub UserSpecifyAttributes()
     For Each lPlugin As atcDataPlugin In pDataManager.GetPlugins(GetType(atcDataSource))
-      If (lPlugin.Name = "Timeseries::Seasonal") Then
+      If (lPlugin.Name = "Timeseries::Seasons") Then
         Dim typ As System.Type = lPlugin.GetType()
         Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
         Dim newSource As atcDataSource = asm.CreateInstance(typ.FullName)
@@ -283,6 +283,7 @@ Friend Class frmDisplaySeasonalAttributes
     Set(ByVal newValue As Boolean)
       If pSwapperSource.SwapRowsColumns <> newValue Then
         pSwapperSource.SwapRowsColumns = newValue
+        agdMain.SizeAllColumnsToContents()
         agdMain.Refresh()
       End If
       mnuViewSeasonRows.Checked = newValue

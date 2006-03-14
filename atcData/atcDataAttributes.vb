@@ -86,7 +86,7 @@ Public Class atcDataAttributes
           If InStr(LCase(aAttributeName), "jday", CompareMethod.Text) Then
             Return pDateFormat.JDateToString(lValue)
           Else
-            Return DoubleToString(lValue)
+            Return DoubleToString(lValue, 15)
           End If
         ElseIf TypeOf (lValue) Is Integer Then
           Return Format(lValue, "#,###;-#,###;0")
@@ -294,6 +294,7 @@ Public Class atcDataAttributes
             lAttribute = ItemByKey(lKey)
           End If
         Catch CalcExcep As Exception
+          Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
         End Try
       End If
     End If

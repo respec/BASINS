@@ -135,7 +135,7 @@ Public Module modTimeseriesMath
 
     'Count total number of values and set up 
     For lIndex = 0 To lMaxGroupIndex
-      lOldTS = aGroup.ItemByIndex(lIndex)
+      lOldTS = aGroup.Item(lIndex)
       Try
         lTotalNumValues += lOldTS.numValues
         lNextIndex(lIndex) = 1
@@ -179,7 +179,7 @@ Public Module modTimeseriesMath
 
         'Add earliest date/value to new TS
         If lMinIndex >= 0 Then
-          lOldTS = aGroup.ItemByIndex(lMinIndex)
+          lOldTS = aGroup.Item(lMinIndex)
           lOldValue = lOldTS.Value(lNextIndex(lMinIndex))
           If lOldTS.ValueAttributesGetValue(lNextIndex(lMinIndex), "Inserted", False) Then
             'This value was inserted during splitting and will now be removed
@@ -196,7 +196,7 @@ Public Module modTimeseriesMath
             If lNextIndex(lIndex) > 0 Then
               If Math.Abs(lNextDate(lIndex) - lMinDate) < Double.Epsilon Then
                 If lIndex > lMinIndex Then
-                  lOldTS = aGroup.ItemByIndex(lIndex)
+                  lOldTS = aGroup.Item(lIndex)
                   lTotalNumValues -= 1
                   'Logger.dbg("MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " using " & lOldValue)
                 End If
@@ -559,4 +559,163 @@ Public Module modTimeseriesMath
     Return lNewDates
   End Function
 
+  ''Make bins, sort data values into the bins, and assign collection of Bins as new attribute
+  'Public Sub MakeBins(ByVal aTS As atcTimeseries, Optional ByVal aMaxBinSize As Integer = 100)
+  '  Dim lNumValues As Integer = aTS.numValues
+  '  Dim lCurValue As Double
+  '  Dim lBinIndex As Integer
+  '  Dim lCurBin As New ArrayList
+  '  Dim lBins As New atcCollection
+  '  lBins.Add(aTS.Attributes.GetValue("Max"), lCurBin)
+
+  '  Logger.Dbg("Sorting " & lNumValues & " values into bins of at most " & aMaxBinSize)
+  '  For lOldIndex As Integer = 1 To lNumValues
+  '    lCurValue = aTS.Value(lOldIndex)
+
+  '    'find first bin with maximum >= lCurValue
+  '    lBinIndex = 0
+  '    While lCurValue > lBins.Keys(lBinIndex)
+  '      lBinIndex += 1
+  '    End While
+  '    lCurBin = lBins.Item(lBinIndex)
+
+  '    'Insert in numeric order within bin
+  '    Dim lInsertIndex As Integer = 0
+  '    Dim lLastIndex As Integer = lCurBin.Count - 1
+  '    If lLastIndex > -1 Then  'Find position to insert
+  '      While lCurValue > lCurBin.Item(lInsertIndex)
+  '        lInsertIndex += 1
+  '        If lInsertIndex > lLastIndex Then Exit While
+  '      End While
+  '    End If
+  '    lCurBin.Insert(lInsertIndex, lCurValue)
+
+  '    If lCurBin.Count > aMaxBinSize Then
+  '      SplitBin(lBins, lCurBin, lBinIndex)
+  '    End If
+
+  '  Next
+  '  Logger.Dbg("Created " & lBins.Count & " bins")
+  '  For lBinIndex = 0 To lBins.Count - 1
+  '    lCurBin = lBins.Item(lBinIndex)
+  '    Logger.Dbg("Bin " & lBinIndex & " (" & lBins.Keys(lBinIndex) & ") contains " & lCurBin.Count)
+  '    For Each lCurValue In lCurBin
+  '      Logger.Dbg(DoubleToString(lCurValue))
+  '    Next
+  '    lNumValues -= lCurBin.Count
+  '  Next
+  '  If lNumValues <> 0 Then
+  '    Logger.Dbg("Wrong number of values in bins -- " & lNumValues & " were in dataset but not in bins")
+  '  End If
+  '  aTS.Attributes.SetValue("Bins", lBins)
+  'End Sub
+
+  'Make bins, sort data values into the bins, and assign collection of Bins as new attribute
+  'Default maximum bin size is 1% of total number of values
+  Public Sub MakeBins(ByVal aTS As atcTimeseries, Optional ByVal aMaxBinSize As Integer = 0)
+    Dim lNumValues As Integer = aTS.numValues
+    Dim lCurValue As Double
+    Dim lCurBinMax As Double = aTS.Attributes.GetValue("Max")
+    Dim lBinIndex As Integer = 0
+    Dim lCurBin As New ArrayList
+    Dim lBins As New atcCollection                     'Keys of lBins are the maximum value in each bin                                   
+    lBins.Add(lCurBinMax, lCurBin) 'First bin created is assigned maximum value for dataset
+    'Bins created later are inserted before this bin, which remains the "last" bin containing the highest values
+    If aMaxBinSize < 1 Then
+      aMaxBinSize = lNumValues / 100 'Default to max of 1% of values in each bin
+      If aMaxBinSize < 10 Then aMaxBinSize = 10
+    End If
+    Logger.Progress("Sorting values into bins", 0, lNumValues)
+    For lOldIndex As Integer = 1 To lNumValues
+      lCurValue = aTS.Value(lOldIndex)
+
+      'If the previously used bin does not fit, find first bin with maximum >= lCurValue
+      'If lCurValue > lCurBinMax OrElse (lBinIndex > 0 AndAlso lCurValue < lBins.Keys.Item(lBinIndex - 1)) Then
+      lBinIndex = BinarySearchFirstGreaterDoubleArrayList(lBins.Keys, lCurValue)
+      lCurBin = lBins.Item(lBinIndex)
+      'lCurBinMax = lBins.Keys.Item(lBinIndex)
+      'End If
+
+      'Insert in numeric order within bin
+      Dim lInsertIndex As Integer = BinarySearchFirstGreaterDoubleArrayList(lCurBin, lCurValue)
+      lCurBin.Insert(lInsertIndex, lCurValue)
+
+      If lCurBin.Count > aMaxBinSize Then
+        SplitBin(lBins, lCurBin, lBinIndex)
+        '  lCurBin = lBins.Item(lBinIndex)
+        '  lCurBinMax = lBins.Keys.Item(lBinIndex)
+        Logger.Progress("Sorting values into " & lBins.Count & " bins", lOldIndex, lNumValues)
+      End If
+
+    Next
+    Logger.Progress("Sorted values into " & lBins.Count & " bins", lNumValues, lNumValues)
+    'For lBinIndex = 0 To lBins.Count - 1
+    '  lCurBin = lBins.Item(lBinIndex)
+    '  Logger.Dbg("Bin " & lBinIndex & " (" & lBins.Keys(lBinIndex) & ") contains " & lCurBin.Count)
+    '  For Each lCurValue In lCurBin
+    '    Logger.Dbg(DoubleToString(lCurValue))
+    '  Next
+    '  lNumValues -= lCurBin.Count
+    'Next
+    'If lNumValues <> 0 Then
+    '  Logger.Dbg("Wrong number of values in bins -- " & lNumValues & " were in dataset but not in bins")
+    'End If
+    aTS.Attributes.SetValue("Bins", lBins)
+  End Sub
+
+  'aBins = collection of bins
+  'aBin = bin to be split in half
+  'aBinIndex = current index of aBin in aBins
+  Private Sub SplitBin(ByVal aBins As atcCollection, ByVal aBin As ArrayList, ByVal aBinIndex As Integer)
+    Dim lSplitStart As Integer = 0
+    Dim lSplitCount As Integer = aBin.Count / 2
+    Dim lNewBin As New ArrayList(aBin.GetRange(lSplitStart, lSplitCount))
+    aBin.RemoveRange(lSplitStart, lSplitCount)
+    aBins.Insert(aBinIndex, lNewBin.Item(lSplitCount - 1), lNewBin)
+  End Sub
+
+  'Binary search through an ArrayList containing Double values sorted in ascending order
+  'Return the index of the first value >= aValue
+  'Returns aArray.Count if aArray contains no values >= aValue
+  Private Function BinarySearchFirstGreaterDoubleArrayList(ByVal aArray As ArrayList, ByVal aValue As Double) As Integer
+    Dim lHigher As Integer = aArray.Count - 1
+    If lHigher < 0 Then Return 0 'No values present to compare to
+    Dim lLower As Integer = -1 'Note: this starts one *lower than* start of where to search in array
+    Dim lProbe As Integer
+    While (lHigher - lLower > 1)
+      lProbe = (lHigher + lLower) / 2
+      If aArray(lProbe) < aValue Then
+        lLower = lProbe
+      Else
+        lHigher = lProbe
+      End If
+    End While
+    If aValue > aArray(lHigher) Then
+      Return lHigher + 1
+    Else
+      Return lHigher
+    End If
+  End Function
+
+  Public Sub ComputePercentile(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
+    Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
+    If lBins Is Nothing Then
+      MakeBins(aTimeseries)
+      lBins = aTimeseries.Attributes.GetValue("Bins")
+    End If
+
+    'TODO: could interpolate between closest two values rather than choosing closest one, should we?
+    Dim lPercentileIndex As Integer = aPercentile * aTimeseries.numValues / 100.0
+    Dim lAccumulatedCount As Integer = 0
+    Dim lNextAccumulatedCount As Integer = 0
+    Dim lBinIndex As Integer = -1
+
+    While lNextAccumulatedCount < lPercentileIndex
+      lAccumulatedCount = lNextAccumulatedCount
+      lBinIndex += 1
+      lNextAccumulatedCount = lAccumulatedCount + lBins(lBinIndex).Count
+    End While
+    Dim lBin As ArrayList = lBins(lBinIndex)
+    aTimeseries.Attributes.SetValue(Format(aPercentile, "00.####") & "%", lBin.Item(lPercentileIndex - lAccumulatedCount))
+  End Sub
 End Module

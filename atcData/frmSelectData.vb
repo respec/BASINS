@@ -123,6 +123,7 @@ Friend Class frmSelectData
     Me.pMatchingGrid.AutoScrollMargin = CType(resources.GetObject("pMatchingGrid.AutoScrollMargin"), System.Drawing.Size)
     Me.pMatchingGrid.AutoScrollMinSize = CType(resources.GetObject("pMatchingGrid.AutoScrollMinSize"), System.Drawing.Size)
     Me.pMatchingGrid.BackgroundImage = CType(resources.GetObject("pMatchingGrid.BackgroundImage"), System.Drawing.Image)
+    Me.pMatchingGrid.CellBackColor = System.Drawing.Color.Empty
     Me.pMatchingGrid.Dock = CType(resources.GetObject("pMatchingGrid.Dock"), System.Windows.Forms.DockStyle)
     Me.pMatchingGrid.Enabled = CType(resources.GetObject("pMatchingGrid.Enabled"), Boolean)
     Me.pMatchingGrid.Font = CType(resources.GetObject("pMatchingGrid.Font"), System.Drawing.Font)
@@ -320,6 +321,7 @@ Friend Class frmSelectData
     Me.pSelectedGrid.AutoScrollMargin = CType(resources.GetObject("pSelectedGrid.AutoScrollMargin"), System.Drawing.Size)
     Me.pSelectedGrid.AutoScrollMinSize = CType(resources.GetObject("pSelectedGrid.AutoScrollMinSize"), System.Drawing.Size)
     Me.pSelectedGrid.BackgroundImage = CType(resources.GetObject("pSelectedGrid.BackgroundImage"), System.Drawing.Image)
+    Me.pSelectedGrid.CellBackColor = System.Drawing.Color.Empty
     Me.pSelectedGrid.Dock = CType(resources.GetObject("pSelectedGrid.Dock"), System.Windows.Forms.DockStyle)
     Me.pSelectedGrid.Enabled = CType(resources.GetObject("pSelectedGrid.Enabled"), Boolean)
     Me.pSelectedGrid.Font = CType(resources.GetObject("pSelectedGrid.Font"), System.Drawing.Font)
@@ -489,6 +491,8 @@ Friend Class frmSelectData
 
   Private Const LAYOUT_PADDING As Integer = 5
   Private Const NOTHING_VALUE As String = "~Missing~"
+  Private Const CALCULATED_LABEL As String = "Calculated Attributes:"
+  Private Const BLANK_LABEL As String = ""
 
   Private pcboCriteria() As Windows.Forms.ComboBox
   Private plstCriteria() As atcGrid
@@ -573,61 +577,99 @@ Friend Class frmSelectData
   End Sub
 
   Private Sub PopulateCriteriaCombos()
+    Dim lCalculatedItems As New atcCollection
+    Dim lNotCalculatedItems As New atcCollection
+
     Dim i As Integer
     For i = 0 To pcboCriteria.GetUpperBound(0)
       pcboCriteria(i).Items.Clear()
     Next
     Dim lAllDefinitions As atcCollection = atcDataAttributes.AllDefinitions
+    Dim lName As String
+    Dim lItemIndex As Integer
     If Not lAllDefinitions Is Nothing Then
       For Each def As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-        If Not pcboCriteria(0).Items.Contains(def.Name) _
-         AndAlso atcDataAttributes.IsSimple(def) Then
-          For i = 0 To pcboCriteria.GetUpperBound(0)
-            pcboCriteria(i).Items.Add(def.Name)
-          Next
+        If atcDataAttributes.IsSimple(def) Then
+          lName = def.Name
+          If def.Calculated Then
+            lItemIndex = BinarySearchString(lName, lCalculatedItems.Keys)
+            If lItemIndex = lCalculatedItems.Count OrElse lCalculatedItems.Keys.Item(lItemIndex) <> lName Then
+              lCalculatedItems.Insert(lItemIndex, lName, lName)
+            End If
+          ElseIf SortedAttributeValues(lName, False).Count > 1 Then
+            lItemIndex = BinarySearchString(lName, lNotCalculatedItems.Keys)
+            If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
+              lNotCalculatedItems.Insert(lItemIndex, lName, lName)
+            End If
+          End If
         End If
       Next
+      For Each lName In lNotCalculatedItems
+        For i = 0 To pcboCriteria.GetUpperBound(0)
+          pcboCriteria(i).Items.Add(lName)
+        Next
+      Next
+      If lCalculatedItems.Count > 0 Then
+        For i = 0 To pcboCriteria.GetUpperBound(0)
+          pcboCriteria(i).Items.Add(BLANK_LABEL)
+          pcboCriteria(i).Items.Add(CALCULATED_LABEL)
+        Next
+        For Each lName In lCalculatedItems
+          For i = 0 To pcboCriteria.GetUpperBound(0)
+            pcboCriteria(i).Items.Add(lName)
+          Next
+        Next
+      End If
     End If
   End Sub
 
+  Private Function SortedAttributeValues(ByVal aAttributeName As String, ByVal aNumeric As Boolean) As atcCollection
+    Dim lSortedValues As New atcCollection
+    Dim lAllTs As atcDataGroup = pDataManager.DataSets
+    Dim lTsCount As Integer = lAllTs.Count
+    Dim lTsIndex As Integer = 0
+    Dim lItemIndex As Integer = 0
+    Dim lProgressMessage As String = "Sorting Values for " & aAttributeName
+    For Each ts As atcDataSet In lAllTs
+      If aNumeric Then
+        Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
+        lItemIndex = BinarySearchNumeric(lKey, lSortedValues.Keys)
+        If lItemIndex = lSortedValues.Count OrElse lKey <> lSortedValues.Keys.Item(lItemIndex) Then
+          lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
+        End If
+        Logger.Progress(lProgressMessage, lTsIndex + 1, lTsCount)
+      Else
+        Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
+        lItemIndex = BinarySearchString(lKey, lSortedValues.Keys)
+        If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
+          lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
+        End If
+      End If
+      lTsIndex += 1
+    Next
+    Return lSortedValues
+  End Function
+
   Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As atcGrid)
     Dim lNumeric As Boolean = False
-    Dim lSortedItems As New atcCollection
+    Dim lSortedItems As atcCollection
     Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
-    Dim lAllTs As atcDataGroup = pDataManager.DataSets
-    Dim lTsIndex As Integer = 0
-    Dim lTsLastIndex As Integer = lAllTs.Count
-    Dim lItemIndex As Integer = 0
-    Dim lProgressMessage As String = "Populating Criteria List for " & aAttributeName
 
-    Logger.Dbg("Start " & lProgressMessage)
+    Logger.Dbg("Start Populating Criteria List for " & aAttributeName)
 
-    If Not lAttributeDef Is Nothing Then
+    If lAttributeDef Is Nothing Then
+      lSortedItems = New atcCollection
+    Else
+      aList.Visible = False
+
       Select Case lAttributeDef.TypeString.ToLower
-        Case "integer", "single", "double"
-          lNumeric = True
+        Case "integer", "single", "double" : lNumeric = True
       End Select
+
+      lSortedItems = SortedAttributeValues(aAttributeName, lNumeric)
     End If
 
     With aList
-      .Visible = False
-      For Each ts As atcDataSet In lAllTs
-        If lNumeric Then
-          Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
-          lItemIndex = BinarySearchNumeric(lKey, lSortedItems.Keys)
-          If lItemIndex = lSortedItems.Count OrElse lSortedItems.Keys.Item(lItemIndex) <> lkey Then
-            lSortedItems.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
-          End If
-        Else
-          Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
-          lItemIndex = BinarySearchString(lKey, lSortedItems.Keys)
-          If lItemIndex = lSortedItems.Count OrElse lSortedItems.Keys.Item(lItemIndex) <> lkey Then
-            lSortedItems.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
-          End If
-        End If
-        lTsIndex += 1
-        Logger.Progress(lProgressMessage, lTsIndex, lTsLastIndex)
-      Next
       .Initialize(New ListSource(lSortedItems))
       If lNumeric Then
         .Source.Alignment(0, 0) = atcAlignment.HAlignDecimal
@@ -683,15 +725,18 @@ Friend Class frmSelectData
       pTotalTS += 1
       For iCriteria As Integer = 0 To iLastCriteria
         Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
-        If Not attrName Is Nothing Then
-          Dim selectedValues As atcCollection = CType(plstCriteria(iCriteria).Source, ListSource).SelectedItems
-          If selectedValues.Count > 0 Then 'none selected = all selected
-            Dim attrValue As String = ts.Attributes.GetFormattedValue(attrName, NOTHING_VALUE)
-            If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
-              GoTo NextTS
+        Select Case attrName
+          Case Nothing, CALCULATED_LABEL, BLANK_LABEL
+            'can't use this criteria
+          Case Else
+            Dim selectedValues As atcCollection = CType(plstCriteria(iCriteria).Source, ListSource).SelectedItems
+            If selectedValues.Count > 0 Then 'none selected = all selected
+              Dim attrValue As String = ts.Attributes.GetFormattedValue(attrName, NOTHING_VALUE)
+              If Not selectedValues.Contains(attrValue) Then 'Does not match this criteria
+                GoTo NextTS
+              End If
             End If
-          End If
-        End If
+        End Select
       Next
       'Matched all criteria, add to matching table
       pMatchingGroup.Add(ts)
@@ -827,7 +872,6 @@ NextTS:
       .Name = "cboCriteria#" & iCriteria
       .DropDownStyle = Windows.Forms.ComboBoxStyle.DropDownList
       .MaxDropDownItems = 40
-      .Sorted = True
     End With
 
     With plstCriteria(iCriteria)

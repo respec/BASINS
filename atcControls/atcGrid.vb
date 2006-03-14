@@ -299,6 +299,7 @@ Public Class atcGrid
       Dim y As Integer = 0
 
       Dim lRows As Integer = pSource.Rows
+      Dim lRowsVisible As Integer = 0
       Dim lFixedRows As Integer = pSource.FixedRows
 
       Dim lColumns As Integer = pSource.Columns
@@ -348,36 +349,45 @@ Public Class atcGrid
       Dim lCellAlignment As Integer
       Dim lCellValueSize As SizeF
       Dim lCellValueLeftSize As SizeF
+      Dim lVscrollInUse As Boolean = False
 
       'Clear whole area to default cell background color
       g.FillRectangle(lCellBrush, 0, 0, visibleWidth, visibleHeight)
 
       'Draw Row Lines
       pRowBottom = New atcCollection
-      If pTopRow = 0 Then VScroller.Visible = False
+      If pTopRow > 0 Then
+        lVscrollInUse = True
+      Else
+        VScroller.Visible = False
+      End If
       y = -1
 
       For lRow = 0 To lRows - 1
         If lRow < lFixedRows OrElse lRow >= pTopRow Then
+          lRowsVisible += 1
           y += RowHeight(lRow)
           g.DrawLine(lLinePen, 0, y, visibleWidth, y)
           pRowBottom.Add(lRow, y)
           If y > visibleHeight Then
-            visibleWidth -= VScroller.Width
-            VScroller.Visible = True
-            If lRow - pTopRow > 2 Then
-              VScroller.LargeChange = lRow - pTopRow - 1
+            lVscrollInUse = True
+            If lRowsVisible > 1 Then
+              VScroller.LargeChange = lRowsVisible - 1
             Else
               VScroller.LargeChange = 1
             End If
-            VScroller.Maximum = lRows '- VScroller.LargeChange + 2
-            'Debug.WriteLine("Rows = " & lRows & ", TopRow = " & pTopRow & ", LargeChange = " & VScroller.LargeChange & ", Maximum = " & VScroller.Maximum)
             Exit For
           End If
         ElseIf lRow < pTopRow - 1 Then 'skip rows we can't see
           lRow = pTopRow - 1
         End If
       Next
+
+      If lVscrollInUse Then
+        VScroller.Visible = True
+        visibleWidth -= VScroller.Width
+        If lRows > 1 Then VScroller.Maximum = lRows - 1
+      End If
 
       'Fill unused space below bottom line
       If y < visibleHeight Then
@@ -503,6 +513,9 @@ Public Class atcGrid
                   lCellValueSize = g.MeasureString(lMainValue, pFont)
                   x = lCellLeft + (lCellRight - lCellLeft - lCellValueSize.Width) / 2
                 Case atcAlignment.HAlignDecimal
+                  'Draw debugging line down center of cell to check for correct decimal alignment
+                  'x = lCellLeft + (lCellRight - lCellLeft) / 2
+                  'g.DrawLine(lLinePen, x, lCellTop, x, lCellBottom)
                   x = lCellLeft + (lCellRight - lCellLeft) / 2 - WidthLeftOfDecimal(lMainValue, g)
                 Case Else 'Default to left alignment 
                   x = lCellLeft
@@ -533,31 +546,50 @@ Public Class atcGrid
     End If
   End Sub
 
-  Private Function WidthLeftOfDecimal(ByVal aCellValue As String, ByVal g As Graphics) As Integer
+  'Private Function MeasureDisplayStringWidth(ByVal aText As String, ByVal g As Graphics)
+  '  Dim lFormat As New System.Drawing.StringFormat
+  '  Dim lRect As RectangleF = New System.Drawing.RectangleF(0, 0, 1000, 1000)
+  '  Dim lRanges() As CharacterRange = {New System.Drawing.CharacterRange(0, aText.Length)}
+  '  Dim lRegions() As Region
+
+  '  lFormat.SetMeasurableCharacterRanges(lRanges)
+
+  '  lRegions = g.MeasureCharacterRanges(aText, pFont, lRect, lFormat)
+  '  lRect = lRegions(0).GetBounds(g)
+
+  '  Return CInt(lRect.Right + 1.0)
+  'End Function
+
+  Private Function WidthLeftOfDecimal(ByVal aText As String, ByVal g As Graphics) As Integer
     Dim lCellValueSize As SizeF
-    If IsNumeric(aCellValue) Then
-      Dim lDecimalPos As Integer = aCellValue.IndexOf(".")
-      If lDecimalPos = -1 Then
-        lCellValueSize = g.MeasureString(aCellValue, pFont)
+    If IsNumeric(aText) Then
+      Dim lDecimalPos As Integer = aText.IndexOf(".")
+      'If lDecimalPos = -1 Then
+      '  Return MeasureDisplayStringWidth(aText & ".", g)
+      'Else
+      '  Return MeasureDisplayStringWidth(aText.Substring(0, lDecimalPos + 1), g)
+      'End If
+      If lDecimalPos = -1 Then 'TODO: use something more accurate than .net 1.1 MeasureString
+        lCellValueSize = g.MeasureString(aText, pFont)
       Else
-        lCellValueSize = g.MeasureString(aCellValue.Substring(0, lDecimalPos), pFont)
+        lCellValueSize = g.MeasureString(aText.Substring(0, lDecimalPos), pFont)
       End If
       Return lCellValueSize.Width
     Else 'Center non-numeric values
-      Return g.MeasureString(aCellValue, pFont).Width / 2
+      Return g.MeasureString(aText, pFont).Width / 2
     End If
   End Function
 
-  Private Function WidthRightOfDecimal(ByVal aCellValue As String, ByVal g As Graphics) As Integer
-    If IsNumeric(aCellValue) Then
-      Dim lDecimalPos As Integer = aCellValue.IndexOf(".")
+  Private Function WidthRightOfDecimal(ByVal aText As String, ByVal g As Graphics) As Integer
+    If IsNumeric(aText) Then
+      Dim lDecimalPos As Integer = aText.IndexOf(".")
       If lDecimalPos = -1 Then
         Return 0
       Else
-        Return g.MeasureString(aCellValue.Substring(lDecimalPos + 1), pFont).Width
+        Return g.MeasureString(aText.Substring(lDecimalPos + 1), pFont).Width
       End If
     Else 'Center non-numeric values
-      Return g.MeasureString(aCellValue, pFont).Width / 2
+      Return g.MeasureString(aText, pFont).Width / 2
     End If
   End Function
 
@@ -674,6 +706,7 @@ Public Class atcGrid
   End Sub
 
   Protected Overrides Sub OnMouseDown(ByVal e As System.Windows.Forms.MouseEventArgs)
+    If Not Me.Focused Then Me.Focus()
     If pRowBottom.Count > 0 Then
       Dim lLastRowDisplayed As Integer = pRowBottom.Keys.Item(pRowBottom.Count - 1)
       Dim lRowIndex As Integer = 0
@@ -792,10 +825,18 @@ Public Class atcGrid
       VScroller.Height = Me.Height - HScroller.Height
     Else
       VScroller.Height = Me.Height
+      If VScroller.Focused Then 'Work around buggy scrollbar focus effect
+        Me.Focus()
+        VScroller.Focus()
+      End If
     End If
 
     If VScroller.Visible Then
       HScroller.Width = Me.Width - VScroller.Width
+      If HScroller.Focused Then 'Work around buggy scrollbar focus effect
+        Me.Focus()
+        HScroller.Focus()
+      End If
     Else
       HScroller.Width = Me.Width
     End If

@@ -57,7 +57,6 @@ Public Class frmIterative
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSaveResults As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSavePivot As System.Windows.Forms.MenuItem
-  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuCopyResults As System.Windows.Forms.MenuItem
   Friend WithEvents mnuCopyPivot As System.Windows.Forms.MenuItem
   Friend WithEvents mnuPasteResults As System.Windows.Forms.MenuItem
@@ -84,6 +83,8 @@ Public Class frmIterative
   Friend WithEvents chkSaveAll As System.Windows.Forms.CheckBox
   Friend WithEvents mnuPivotHeaders As System.Windows.Forms.MenuItem
   Friend WithEvents mnuOptions As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSep2 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmIterative))
     Me.myTabs = New System.Windows.Forms.TabControl
@@ -120,13 +121,14 @@ Public Class frmIterative
     Me.btnStart = New System.Windows.Forms.Button
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuLoadResults = New System.Windows.Forms.MenuItem
-    Me.mnuSaveResults = New System.Windows.Forms.MenuItem
-    Me.mnuSavePivot = New System.Windows.Forms.MenuItem
-    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
     Me.mnuLoadVariations = New System.Windows.Forms.MenuItem
     Me.mnuSaveVariations = New System.Windows.Forms.MenuItem
-    Me.MenuItem1 = New System.Windows.Forms.MenuItem
+    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
+    Me.mnuLoadResults = New System.Windows.Forms.MenuItem
+    Me.mnuSaveResults = New System.Windows.Forms.MenuItem
+    Me.mnuFileSep2 = New System.Windows.Forms.MenuItem
+    Me.mnuSavePivot = New System.Windows.Forms.MenuItem
+    Me.mnuEdit = New System.Windows.Forms.MenuItem
     Me.mnuCopyResults = New System.Windows.Forms.MenuItem
     Me.mnuCopyPivot = New System.Windows.Forms.MenuItem
     Me.mnuPasteResults = New System.Windows.Forms.MenuItem
@@ -455,49 +457,54 @@ Public Class frmIterative
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.MenuItem1, Me.mnuOptions})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuOptions})
     '
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuSavePivot, Me.mnuFileSep1, Me.mnuLoadVariations, Me.mnuSaveVariations})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuLoadVariations, Me.mnuSaveVariations, Me.mnuFileSep1, Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuFileSep2, Me.mnuSavePivot})
     Me.mnuFile.Text = "File"
-    '
-    'mnuLoadResults
-    '
-    Me.mnuLoadResults.Index = 0
-    Me.mnuLoadResults.Text = "Load Results"
-    '
-    'mnuSaveResults
-    '
-    Me.mnuSaveResults.Index = 1
-    Me.mnuSaveResults.Text = "Save Results"
-    '
-    'mnuSavePivot
-    '
-    Me.mnuSavePivot.Index = 2
-    Me.mnuSavePivot.Text = "Save Pivot"
-    '
-    'mnuFileSep1
-    '
-    Me.mnuFileSep1.Index = 3
-    Me.mnuFileSep1.Text = "-"
     '
     'mnuLoadVariations
     '
-    Me.mnuLoadVariations.Index = 4
+    Me.mnuLoadVariations.Index = 0
     Me.mnuLoadVariations.Text = "Load Inputs and Endpoints"
     '
     'mnuSaveVariations
     '
-    Me.mnuSaveVariations.Index = 5
+    Me.mnuSaveVariations.Index = 1
     Me.mnuSaveVariations.Text = "Save Inputs and Endpoints"
     '
-    'MenuItem1
+    'mnuFileSep1
     '
-    Me.MenuItem1.Index = 1
-    Me.MenuItem1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuCopyResults, Me.mnuCopyPivot, Me.mnuPasteResults})
-    Me.MenuItem1.Text = "Edit"
+    Me.mnuFileSep1.Index = 2
+    Me.mnuFileSep1.Text = "-"
+    '
+    'mnuLoadResults
+    '
+    Me.mnuLoadResults.Index = 3
+    Me.mnuLoadResults.Text = "Load Results"
+    '
+    'mnuSaveResults
+    '
+    Me.mnuSaveResults.Index = 4
+    Me.mnuSaveResults.Text = "Save Results"
+    '
+    'mnuFileSep2
+    '
+    Me.mnuFileSep2.Index = 5
+    Me.mnuFileSep2.Text = "-"
+    '
+    'mnuSavePivot
+    '
+    Me.mnuSavePivot.Index = 6
+    Me.mnuSavePivot.Text = "Save Pivot"
+    '
+    'mnuEdit
+    '
+    Me.mnuEdit.Index = 1
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuCopyResults, Me.mnuCopyPivot, Me.mnuPasteResults})
+    Me.mnuEdit.Text = "Edit"
     '
     'mnuCopyResults
     '
