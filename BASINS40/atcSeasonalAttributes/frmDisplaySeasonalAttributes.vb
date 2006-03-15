@@ -72,6 +72,7 @@ Friend Class frmDisplaySeasonalAttributes
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSizeColumnsToContents As System.Windows.Forms.MenuItem
   Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySeasonalAttributes))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -84,10 +85,11 @@ Friend Class frmDisplaySeasonalAttributes
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonColumns = New System.Windows.Forms.MenuItem
     Me.mnuViewSeasonRows = New System.Windows.Forms.MenuItem
+    Me.MenuItem1 = New System.Windows.Forms.MenuItem
     Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
-    Me.MenuItem1 = New System.Windows.Forms.MenuItem
+    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -97,7 +99,7 @@ Friend Class frmDisplaySeasonalAttributes
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes, Me.mnuFileSave})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes, Me.mnuFileSep1, Me.mnuFileSave})
     Me.mnuFile.Text = "&File"
     '
     'mnuFileAdd
@@ -112,7 +114,7 @@ Friend Class frmDisplaySeasonalAttributes
     '
     'mnuFileSave
     '
-    Me.mnuFileSave.Index = 2
+    Me.mnuFileSave.Index = 3
     Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
     Me.mnuFileSave.Text = "Save"
     '
@@ -145,6 +147,11 @@ Friend Class frmDisplaySeasonalAttributes
     Me.mnuViewSeasonRows.Index = 1
     Me.mnuViewSeasonRows.Text = "Season Rows"
     '
+    'MenuItem1
+    '
+    Me.MenuItem1.Index = 2
+    Me.MenuItem1.Text = "-"
+    '
     'mnuSizeColumnsToContents
     '
     Me.mnuSizeColumnsToContents.Index = 3
@@ -158,6 +165,7 @@ Friend Class frmDisplaySeasonalAttributes
     'agdMain
     '
     Me.agdMain.AllowHorizontalScrolling = True
+    Me.agdMain.CellBackColor = System.Drawing.Color.Empty
     Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
     Me.agdMain.LineColor = System.Drawing.Color.Empty
     Me.agdMain.LineWidth = 0.0!
@@ -167,10 +175,10 @@ Friend Class frmDisplaySeasonalAttributes
     Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
     '
-    'MenuItem1
+    'mnuFileSep1
     '
-    Me.MenuItem1.Index = 2
-    Me.MenuItem1.Text = "-"
+    Me.mnuFileSep1.Index = 2
+    Me.mnuFileSep1.Text = "-"
     '
     'frmDisplaySeasonalAttributes
     '

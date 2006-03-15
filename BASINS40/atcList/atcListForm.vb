@@ -33,52 +33,83 @@ Friend Class atcListForm
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents agdMain As atcControls.atcGrid
-  Friend WithEvents mnuSelectTimeseries As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuSelectAttributes As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAttributeRows As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAttributeColumns As System.Windows.Forms.MenuItem
   Friend WithEvents mnuView As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSizeColumnsToContents As System.Windows.Forms.MenuItem
-  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSelectTimeseries As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcListForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuSelectTimeseries = New System.Windows.Forms.MenuItem
-    Me.mnuSelectAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectTimeseries = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
+    Me.mnuFileSave = New System.Windows.Forms.MenuItem
+    Me.mnuEdit = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuAttributeRows = New System.Windows.Forms.MenuItem
     Me.mnuAttributeColumns = New System.Windows.Forms.MenuItem
+    Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
     Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
-    Me.MenuItem1 = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis})
     '
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuSelectTimeseries, Me.mnuSelectAttributes})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectTimeseries, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
     Me.mnuFile.Text = "File"
     '
-    'mnuSelectTimeseries
+    'mnuFileSelectTimeseries
     '
-    Me.mnuSelectTimeseries.Index = 0
-    Me.mnuSelectTimeseries.Text = "Select Timeseries"
+    Me.mnuFileSelectTimeseries.Index = 0
+    Me.mnuFileSelectTimeseries.Text = "Select Timeseries"
     '
-    'mnuSelectAttributes
+    'mnuFileSelectAttributes
     '
-    Me.mnuSelectAttributes.Index = 1
-    Me.mnuSelectAttributes.Text = "Select Attributes"
+    Me.mnuFileSelectAttributes.Index = 1
+    Me.mnuFileSelectAttributes.Text = "Select Attributes"
+    '
+    'mnuFileSep1
+    '
+    Me.mnuFileSep1.Index = 2
+    Me.mnuFileSep1.Text = "-"
+    '
+    'mnuFileSave
+    '
+    Me.mnuFileSave.Index = 3
+    Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
+    Me.mnuFileSave.Text = "Save"
+    '
+    'mnuEdit
+    '
+    Me.mnuEdit.Index = 1
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
+    Me.mnuEdit.Text = "Edit"
+    '
+    'mnuEditCopy
+    '
+    Me.mnuEditCopy.Index = 0
+    Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
+    Me.mnuEditCopy.Text = "Copy"
     '
     'mnuView
     '
-    Me.mnuView.Index = 1
-    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.MenuItem1, Me.mnuSizeColumnsToContents})
+    Me.mnuView.Index = 2
+    Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents})
     Me.mnuView.Text = "View"
     '
     'mnuAttributeRows
@@ -92,6 +123,11 @@ Friend Class atcListForm
     Me.mnuAttributeColumns.Index = 1
     Me.mnuAttributeColumns.Text = "Attribute Columns"
     '
+    'mnuViewSep1
+    '
+    Me.mnuViewSep1.Index = 2
+    Me.mnuViewSep1.Text = "-"
+    '
     'mnuSizeColumnsToContents
     '
     Me.mnuSizeColumnsToContents.Index = 3
@@ -99,12 +135,13 @@ Friend Class atcListForm
     '
     'mnuAnalysis
     '
-    Me.mnuAnalysis.Index = 2
+    Me.mnuAnalysis.Index = 3
     Me.mnuAnalysis.Text = "Analysis"
     '
     'agdMain
     '
     Me.agdMain.AllowHorizontalScrolling = True
+    Me.agdMain.CellBackColor = System.Drawing.Color.Empty
     Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
     Me.agdMain.LineColor = System.Drawing.Color.Empty
     Me.agdMain.LineWidth = 0.0!
@@ -113,11 +150,6 @@ Friend Class atcListForm
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
     Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
-    '
-    'MenuItem1
-    '
-    Me.MenuItem1.Index = 2
-    Me.MenuItem1.Text = "-"
     '
     'atcListForm
     '
@@ -199,10 +231,6 @@ Friend Class atcListForm
     pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
-  Private Sub mnuSelectTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectTimeseries.Click
-    pDataManager.UserSelectData(, pDataGroup, False)
-  End Sub
-
   Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
     If Me.Visible Then PopulateGrid()
     'TODO: could efficiently insert newly added item(s)
@@ -219,7 +247,31 @@ Friend Class atcListForm
     pSource = Nothing
   End Sub
 
-  Private Sub mnuSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAttributes.Click
+  Private Sub mnuAttributeRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAttributeRows.Click
+    SwapRowsColumns = False
+  End Sub
+
+  Private Sub mnuAttributeColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAttributeColumns.Click
+    SwapRowsColumns = True
+  End Sub
+
+  Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
+    Clipboard.SetDataObject(Me.ToString)
+  End Sub
+
+  Private Sub mnuFileSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
+    Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+    With lSaveDialog
+      .Title = "Save Grid As"
+      .DefaultExt = ".txt"
+      .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
+      If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+        SaveFileString(.FileName, Me.ToString)
+      End If
+    End With
+  End Sub
+
+  Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
     Dim lst As New atcControls.atcSelectList
     Dim lAvailable As New ArrayList
     For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
@@ -234,12 +286,13 @@ Friend Class atcListForm
     End If
   End Sub
 
-  Private Sub mnuAttributeRows_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAttributeRows.Click
-    SwapRowsColumns = False
+  Private Sub mnuFileSelectTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectTimeseries.Click
+    pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 
-  Private Sub mnuAttributeColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAttributeColumns.Click
-    SwapRowsColumns = True
+  Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
+    agdMain.SizeAllColumnsToContents()
+    agdMain.Refresh()
   End Sub
 
   'True for attributes in columns, False for attributes in rows
@@ -250,6 +303,7 @@ Friend Class atcListForm
     Set(ByVal newValue As Boolean)
       If pSwapperSource.SwapRowsColumns <> newValue Then
         pSwapperSource.SwapRowsColumns = newValue
+        agdMain.SizeAllColumnsToContents()
         agdMain.Refresh()
       End If
       mnuAttributeColumns.Checked = newValue
@@ -257,8 +311,8 @@ Friend Class atcListForm
     End Set
   End Property
 
-  Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
-    agdMain.SizeAllColumnsToContents()
-    agdMain.Refresh()
-  End Sub
+  Public Overrides Function ToString() As String
+    Return Me.Text & vbCrLf & agdMain.ToString
+  End Function
+
 End Class
