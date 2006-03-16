@@ -230,7 +230,7 @@
     <value>pMatchingGrid</value>
   </data>
   <data name="&gt;&gt;pMatchingGrid.Type">
-    <value>atcControls.atcGrid, atcControls, Version=1.0.2260.18570, Culture=neutral, PublicKeyToken=null</value>
+    <value>atcControls.atcGrid, atcControls, Version=1.0.2266.21732, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;pMatchingGrid.Parent">
     <value>groupTop</value>
@@ -460,9 +460,6 @@
   <data name="&gt;&gt;panelCriteria.ZOrder">
     <value>3</value>
   </data>
-  <data name="pnlButtons.Modifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>Assembly</value>
-  </data>
   <data name="pnlButtons.Locked" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </data>
@@ -477,6 +474,9 @@
   </data>
   <data name="pnlButtons.DrawGrid" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
+  </data>
+  <data name="pnlButtons.Modifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>Assembly</value>
   </data>
   <data name="pnlButtons.AccessibleDescription" type="System.Resources.ResXNullRef, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value />
@@ -622,10 +622,10 @@
   <data name="btnOk.Locked" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
   </data>
-  <data name="btnOk.Modifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="btnOk.DefaultModifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>Assembly</value>
   </data>
-  <data name="btnOk.DefaultModifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="btnOk.Modifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>Assembly</value>
   </data>
   <data name="btnOk.AccessibleDescription" type="System.Resources.ResXNullRef, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -896,7 +896,7 @@
     <value>pSelectedGrid</value>
   </data>
   <data name="&gt;&gt;pSelectedGrid.Type">
-    <value>atcControls.atcGrid, atcControls, Version=1.0.2260.18570, Culture=neutral, PublicKeyToken=null</value>
+    <value>atcControls.atcGrid, atcControls, Version=1.0.2266.21732, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;pSelectedGrid.Parent">
     <value>groupSelected</value>
@@ -932,30 +932,30 @@
     <value>True</value>
   </data>
   <data name="mnuFile.Text">
-    <value>&amp;File</value>
+    <value>File</value>
   </data>
   <data name="mnuFile.Visible" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </data>
-  <data name="mnuAddData.Modifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="mnuOpenData.Modifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>Assembly</value>
   </data>
-  <data name="mnuAddData.DefaultModifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="mnuOpenData.DefaultModifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>Assembly</value>
   </data>
-  <data name="mnuAddData.Enabled" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="mnuOpenData.Enabled" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </data>
-  <data name="mnuAddData.Shortcut" type="System.Windows.Forms.Shortcut, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="mnuOpenData.Shortcut" type="System.Windows.Forms.Shortcut, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>None</value>
   </data>
-  <data name="mnuAddData.ShowShortcut" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="mnuOpenData.ShowShortcut" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </data>
-  <data name="mnuAddData.Text">
-    <value>&amp;Add Data</value>
+  <data name="mnuOpenData.Text">
+    <value>Open Data</value>
   </data>
-  <data name="mnuAddData.Visible" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <data name="mnuOpenData.Visible" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </data>
   <data name="mnuFileManage.Modifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -974,7 +974,7 @@
     <value>True</value>
   </data>
   <data name="mnuFileManage.Text">
-    <value>&amp;Manage Data Sources</value>
+    <value>Manage Data Sources</value>
   </data>
   <data name="mnuFileManage.Visible" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -995,7 +995,7 @@
     <value>True</value>
   </data>
   <data name="mnuAttributes.Text">
-    <value>&amp;Attributes</value>
+    <value>Attributes</value>
   </data>
   <data name="mnuAttributes.Visible" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -1079,7 +1079,7 @@
     <value>True</value>
   </data>
   <data name="mnuSelect.Text">
-    <value>&amp;Select</value>
+    <value>Select</value>
   </data>
   <data name="mnuSelect.Visible" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -1094,7 +1094,7 @@
     <value>True</value>
   </data>
   <data name="mnuSelectAll.Shortcut" type="System.Windows.Forms.Shortcut, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>None</value>
+    <value>CtrlA</value>
   </data>
   <data name="mnuSelectAll.ShowShortcut" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -1121,7 +1121,7 @@
     <value>True</value>
   </data>
   <data name="mnuSelectClear.Text">
-    <value>&amp;Un-select All</value>
+    <value>Un-select All</value>
   </data>
   <data name="mnuSelectClear.Visible" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -1163,16 +1163,13 @@
     <value>True</value>
   </data>
   <data name="mnuSelectNoMatching.Text">
-    <value>&amp;Un-select Matching</value>
+    <value>Un-select Matching</value>
   </data>
   <data name="mnuSelectNoMatching.Visible" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </data>
   <data name="$this.Locked" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>False</value>
-  </data>
-  <data name="$this.Name">
-    <value>frmSelectData</value>
   </data>
   <data name="$this.Language" type="System.Globalization.CultureInfo, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>(Default)</value>
@@ -1194,6 +1191,9 @@
   </data>
   <data name="$this.SnapToGrid" type="System.Boolean, mscorlib, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
+  </data>
+  <data name="$this.Name">
+    <value>frmSelectData</value>
   </data>
   <data name="$this.DefaultModifiers" type="System.CodeDom.MemberAttributes, System, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>Assembly</value>
@@ -1271,7 +1271,7 @@
 </value>
   </data>
   <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>Inherit</value>
+    <value>NoControl</value>
   </data>
   <data name="$this.Location" type="System.Drawing.Point, System.Drawing, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>0, 0</value>
@@ -1303,10 +1303,10 @@
   <data name="&gt;&gt;mnuFile.Type">
     <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;mnuAddData.Name">
-    <value>mnuAddData</value>
+  <data name="&gt;&gt;mnuOpenData.Name">
+    <value>mnuOpenData</value>
   </data>
-  <data name="&gt;&gt;mnuAddData.Type">
+  <data name="&gt;&gt;mnuOpenData.Type">
     <value>System.Windows.Forms.MenuItem, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;mnuFileManage.Name">

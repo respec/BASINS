@@ -61,24 +61,25 @@ Friend Class frmDisplaySeasonalAttributes
   Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
   Friend WithEvents agdMain As atcControls.atcGrid
   Friend WithEvents mnuView As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewSeasonColumns As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewSeasonRows As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuAddAttributes As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSizeColumnsToContents As System.Windows.Forms.MenuItem
   Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySeasonalAttributes))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuFileAdd = New System.Windows.Forms.MenuItem
-    Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
     Me.mnuEdit = New System.Windows.Forms.MenuItem
     Me.mnuEditCopy = New System.Windows.Forms.MenuItem
@@ -89,7 +90,6 @@ Friend Class frmDisplaySeasonalAttributes
     Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
-    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -99,18 +99,23 @@ Friend Class frmDisplaySeasonalAttributes
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes, Me.mnuFileSep1, Me.mnuFileSave})
-    Me.mnuFile.Text = "&File"
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
+    Me.mnuFile.Text = "File"
     '
-    'mnuFileAdd
+    'mnuFileSelectData
     '
-    Me.mnuFileAdd.Index = 0
-    Me.mnuFileAdd.Text = "Add Timeseries"
+    Me.mnuFileSelectData.Index = 0
+    Me.mnuFileSelectData.Text = "Select &Data"
     '
-    'mnuAddAttributes
+    'mnuFileSelectAttributes
     '
-    Me.mnuAddAttributes.Index = 1
-    Me.mnuAddAttributes.Text = "Add Attributes"
+    Me.mnuFileSelectAttributes.Index = 1
+    Me.mnuFileSelectAttributes.Text = "Select &Attributes"
+    '
+    'mnuFileSep1
+    '
+    Me.mnuFileSep1.Index = 2
+    Me.mnuFileSep1.Text = "-"
     '
     'mnuFileSave
     '
@@ -122,7 +127,7 @@ Friend Class frmDisplaySeasonalAttributes
     '
     Me.mnuEdit.Index = 1
     Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
-    Me.mnuEdit.Text = "&Edit"
+    Me.mnuEdit.Text = "Edit"
     '
     'mnuEditCopy
     '
@@ -134,7 +139,7 @@ Friend Class frmDisplaySeasonalAttributes
     '
     Me.mnuView.Index = 2
     Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewSeasonColumns, Me.mnuViewSeasonRows, Me.MenuItem1, Me.mnuSizeColumnsToContents})
-    Me.mnuView.Text = "&View"
+    Me.mnuView.Text = "View"
     '
     'mnuViewSeasonColumns
     '
@@ -160,7 +165,7 @@ Friend Class frmDisplaySeasonalAttributes
     'mnuAnalysis
     '
     Me.mnuAnalysis.Index = 3
-    Me.mnuAnalysis.Text = "&Analysis"
+    Me.mnuAnalysis.Text = "Analysis"
     '
     'agdMain
     '
@@ -174,11 +179,6 @@ Friend Class frmDisplaySeasonalAttributes
     Me.agdMain.Size = New System.Drawing.Size(528, 545)
     Me.agdMain.Source = Nothing
     Me.agdMain.TabIndex = 0
-    '
-    'mnuFileSep1
-    '
-    Me.mnuFileSep1.Index = 2
-    Me.mnuFileSep1.Text = "-"
     '
     'frmDisplaySeasonalAttributes
     '
@@ -222,7 +222,7 @@ Friend Class frmDisplaySeasonalAttributes
     pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
-  Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
+  Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
     pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 
@@ -244,7 +244,7 @@ Friend Class frmDisplaySeasonalAttributes
     SwapRowsColumns = True
   End Sub
 
-  Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
+  Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
     UserSpecifyAttributes()
     PopulateGrid()
   End Sub

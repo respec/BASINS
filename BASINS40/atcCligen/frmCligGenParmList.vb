@@ -51,51 +51,51 @@ Public Class frmCliGenParmList
     Me.chklstParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.chklstParms.Location = New System.Drawing.Point(24, 32)
+    Me.chklstParms.Location = New System.Drawing.Point(8, 8)
     Me.chklstParms.Name = "chklstParms"
-    Me.chklstParms.Size = New System.Drawing.Size(176, 274)
+    Me.chklstParms.Size = New System.Drawing.Size(216, 274)
     Me.chklstParms.TabIndex = 0
     '
     'btnOK
     '
-    Me.btnOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnOK.Location = New System.Drawing.Point(52, 328)
+    Me.btnOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.btnOK.Location = New System.Drawing.Point(20, 336)
     Me.btnOK.Name = "btnOK"
-    Me.btnOK.Size = New System.Drawing.Size(48, 24)
+    Me.btnOK.Size = New System.Drawing.Size(64, 24)
     Me.btnOK.TabIndex = 1
     Me.btnOK.Text = "OK"
     '
     'btnCancel
     '
-    Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnCancel.Location = New System.Drawing.Point(124, 328)
+    Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnCancel.Location = New System.Drawing.Point(148, 336)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(48, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
     Me.btnCancel.TabIndex = 2
     Me.btnCancel.Text = "Cancel"
     '
     'btnSelNone
     '
-    Me.btnSelNone.Anchor = System.Windows.Forms.AnchorStyles.Top
-    Me.btnSelNone.Location = New System.Drawing.Point(24, 8)
+    Me.btnSelNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnSelNone.Location = New System.Drawing.Point(148, 296)
     Me.btnSelNone.Name = "btnSelNone"
-    Me.btnSelNone.Size = New System.Drawing.Size(80, 18)
+    Me.btnSelNone.Size = New System.Drawing.Size(64, 24)
     Me.btnSelNone.TabIndex = 3
-    Me.btnSelNone.Text = "Select None"
+    Me.btnSelNone.Text = "None"
     '
     'btnSelAll
     '
-    Me.btnSelAll.Anchor = System.Windows.Forms.AnchorStyles.Top
-    Me.btnSelAll.Location = New System.Drawing.Point(120, 8)
+    Me.btnSelAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.btnSelAll.Location = New System.Drawing.Point(20, 296)
     Me.btnSelAll.Name = "btnSelAll"
-    Me.btnSelAll.Size = New System.Drawing.Size(80, 18)
+    Me.btnSelAll.Size = New System.Drawing.Size(64, 24)
     Me.btnSelAll.TabIndex = 4
-    Me.btnSelAll.Text = "Select All"
+    Me.btnSelAll.Text = "All"
     '
     'frmCliGenParmList
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(224, 365)
+    Me.ClientSize = New System.Drawing.Size(232, 373)
     Me.Controls.Add(Me.btnSelAll)
     Me.Controls.Add(Me.btnSelNone)
     Me.Controls.Add(Me.btnCancel)
