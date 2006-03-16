@@ -596,10 +596,13 @@ Friend Class frmSelectData
             If lItemIndex = lCalculatedItems.Count OrElse lCalculatedItems.Keys.Item(lItemIndex) <> lName Then
               lCalculatedItems.Insert(lItemIndex, lName, lName)
             End If
-          ElseIf SortedAttributeValues(lName, False).Count > 1 Then
-            lItemIndex = BinarySearchString(lName, lNotCalculatedItems.Keys)
-            If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
-              lNotCalculatedItems.Insert(lItemIndex, lName, lName)
+          Else
+            Dim lAttributeValues As atcCollection = SortedAttributeValues(lName, False)
+            If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
+              lItemIndex = BinarySearchString(lName, lNotCalculatedItems.Keys)
+              If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
+                lNotCalculatedItems.Insert(lItemIndex, lName, lName)
+              End If
             End If
           End If
         End If
@@ -631,20 +634,24 @@ Friend Class frmSelectData
     Dim lItemIndex As Integer = 0
     Dim lProgressMessage As String = "Sorting Values for " & aAttributeName
     For Each ts As atcDataSet In lAllTs
-      If aNumeric Then
-        Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
-        lItemIndex = BinarySearchNumeric(lKey, lSortedValues.Keys)
-        If lItemIndex = lSortedValues.Count OrElse lKey <> lSortedValues.Keys.Item(lItemIndex) Then
-          lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
+      Try
+        If aNumeric Then
+          Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
+          lItemIndex = BinarySearchNumeric(lKey, lSortedValues.Keys)
+          If lItemIndex = lSortedValues.Count OrElse lKey <> lSortedValues.Keys.Item(lItemIndex) Then
+            lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
+          End If
+          Logger.Progress(lProgressMessage, lTsIndex + 1, lTsCount)
+        Else
+          Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
+          lItemIndex = BinarySearchString(lKey, lSortedValues.Keys)
+          If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
+            lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
+          End If
         End If
-        Logger.Progress(lProgressMessage, lTsIndex + 1, lTsCount)
-      Else
-        Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
-        lItemIndex = BinarySearchString(lKey, lSortedValues.Keys)
-        If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
-          lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
-        End If
-      End If
+      Catch ex As Exception
+        Logger.Dbg("Can't display value of " & aAttributeName & ": " & ex.Message)
+      End Try
       lTsIndex += 1
     Next
     Return lSortedValues
