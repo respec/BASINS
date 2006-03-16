@@ -610,9 +610,9 @@ Public Module modTimeseriesMath
   '  aTS.Attributes.SetValue("Bins", lBins)
   'End Sub
 
-  'Make bins, sort data values into the bins, and assign collection of Bins as new attribute
+  'Make bins, sort data values into the bins
   'Default maximum bin size is 1% of total number of values
-  Public Sub MakeBins(ByVal aTS As atcTimeseries, Optional ByVal aMaxBinSize As Integer = 0)
+  Public Function MakeBins(ByVal aTS As atcTimeseries, Optional ByVal aMaxBinSize As Integer = 0) As atcCollection
     Dim lNumValues As Integer = aTS.numValues
     Dim lCurValue As Double
     Dim lCurBinMax As Double = aTS.Attributes.GetValue("Max")
@@ -660,8 +660,8 @@ Public Module modTimeseriesMath
     'If lNumValues <> 0 Then
     '  Logger.Dbg("Wrong number of values in bins -- " & lNumValues & " were in dataset but not in bins")
     'End If
-    aTS.Attributes.SetValue("Bins", lBins)
-  End Sub
+    Return lBins
+  End Function
 
   'aBins = collection of bins
   'aBin = bin to be split in half
@@ -698,24 +698,33 @@ Public Module modTimeseriesMath
   End Function
 
   Public Sub ComputePercentile(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
-    Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
-    If lBins Is Nothing Then
-      MakeBins(aTimeseries)
-      lBins = aTimeseries.Attributes.GetValue("Bins")
-    End If
+    Dim lNumValues As Integer = aTimeseries.numValues
+    Select Case lNumValues
+      Case Is < 1
+        'Can't compute with no values
+      Case 1
+        aTimeseries.Attributes.SetValue(Format(aPercentile, "00.####") & "%", aTimeseries.Value(0))
+      Case Else
+        Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
+        If lBins Is Nothing Then
+          lBins = MakeBins(aTimeseries)
+          aTimeseries.Attributes.SetValue("Bins", lBins)
+        End If
 
-    'TODO: could interpolate between closest two values rather than choosing closest one, should we?
-    Dim lPercentileIndex As Integer = aPercentile * aTimeseries.numValues / 100.0
-    Dim lAccumulatedCount As Integer = 0
-    Dim lNextAccumulatedCount As Integer = 0
-    Dim lBinIndex As Integer = -1
-
-    While lNextAccumulatedCount < lPercentileIndex
-      lAccumulatedCount = lNextAccumulatedCount
-      lBinIndex += 1
-      lNextAccumulatedCount = lAccumulatedCount + lBins(lBinIndex).Count
-    End While
-    Dim lBin As ArrayList = lBins(lBinIndex)
-    aTimeseries.Attributes.SetValue(Format(aPercentile, "00.####") & "%", lBin.Item(lPercentileIndex - lAccumulatedCount))
+        'TODO: could interpolate between closest two values rather than choosing closest one, should we?
+        Dim lAccumulatedCount As Integer = 0
+        Dim lNextAccumulatedCount As Integer = 0
+        Dim lBinIndex As Integer = -1
+        Dim lPercentileIndex As Integer = aPercentile * lNumValues / 100.0 - 1
+        If lPercentileIndex < 0 Then lPercentileIndex = 0
+        If lPercentileIndex >= aTimeseries.numValues Then lPercentileIndex = lNumValues - 1
+        While lNextAccumulatedCount <= lPercentileIndex
+          lAccumulatedCount = lNextAccumulatedCount
+          lBinIndex += 1
+          lNextAccumulatedCount = lAccumulatedCount + lBins(lBinIndex).Count
+        End While
+        Dim lBin As ArrayList = lBins(lBinIndex)
+        aTimeseries.Attributes.SetValue(Format(aPercentile, "00.####") & "%", lBin.Item(lPercentileIndex - lAccumulatedCount))
+    End Select
   End Sub
 End Module
