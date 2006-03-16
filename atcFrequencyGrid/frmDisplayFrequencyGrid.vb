@@ -74,13 +74,13 @@ Friend Class frmDisplayFrequencyGrid
   Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuViewSep2 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuFileSelectTimeseries As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplayFrequencyGrid))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuFileSelectTimeseries = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
     Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
     Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
@@ -105,18 +105,18 @@ Friend Class frmDisplayFrequencyGrid
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectTimeseries, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
     Me.mnuFile.Text = "File"
     '
-    'mnuFileSelectTimeseries
+    'mnuFileSelectData
     '
-    Me.mnuFileSelectTimeseries.Index = 0
-    Me.mnuFileSelectTimeseries.Text = "Select Timeseries"
+    Me.mnuFileSelectData.Index = 0
+    Me.mnuFileSelectData.Text = "Select &Data"
     '
     'mnuFileSelectAttributes
     '
     Me.mnuFileSelectAttributes.Index = 1
-    Me.mnuFileSelectAttributes.Text = "Select Attributes"
+    Me.mnuFileSelectAttributes.Text = "Select &Attributes"
     '
     'mnuFileSep1
     '
@@ -274,7 +274,7 @@ Friend Class frmDisplayFrequencyGrid
     PopulateGrid()
   End Sub
 
-  Private Sub mnuFileSelectTimeseries_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectTimeseries.Click
+  Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
     pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 

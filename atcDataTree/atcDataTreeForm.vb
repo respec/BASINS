@@ -54,7 +54,6 @@ Public Class atcDataTreeForm
   'It can be modified using the Windows Form Designer.  
   'Do not modify it using the code editor.
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
   Friend WithEvents mnuView As System.Windows.Forms.MenuItem
   Friend WithEvents mnuExpand As System.Windows.Forms.MenuItem
@@ -62,14 +61,16 @@ Public Class atcDataTreeForm
   Friend WithEvents mnuDefault As System.Windows.Forms.MenuItem
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuMain As System.Windows.Forms.MainMenu
-  Friend WithEvents mnuCopyClipboard As System.Windows.Forms.MenuItem
   Friend WithEvents mnuDataCount As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
+  Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDataTreeForm))
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuFileAdd = New System.Windows.Forms.MenuItem
-    Me.mnuCopyClipboard = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.mnuView = New System.Windows.Forms.MenuItem
     Me.mnuExpand = New System.Windows.Forms.MenuItem
     Me.mnuCollapse = New System.Windows.Forms.MenuItem
@@ -77,67 +78,76 @@ Public Class atcDataTreeForm
     Me.mnuDataCount = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.mnuMain = New System.Windows.Forms.MainMenu
+    Me.MenuItem1 = New System.Windows.Forms.MenuItem
     '
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuCopyClipboard, Me.mnuFileSave})
-    Me.mnuFile.Text = "&File"
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSave})
+    Me.mnuFile.Text = "File"
     '
-    'mnuFileAdd
+    'mnuFileSelectData
     '
-    Me.mnuFileAdd.Index = 0
-    Me.mnuFileAdd.Text = "&Add Data"
-    '
-    'mnuCopyClipboard
-    '
-    Me.mnuCopyClipboard.Index = 1
-    Me.mnuCopyClipboard.Text = "Copy to Clipboard"
+    Me.mnuFileSelectData.Index = 0
+    Me.mnuFileSelectData.Text = "Select &Data"
     '
     'mnuFileSave
     '
-    Me.mnuFileSave.Index = 2
-    Me.mnuFileSave.Text = "&Save"
+    Me.mnuFileSave.Index = 1
+    Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
+    Me.mnuFileSave.Text = "Save"
+    '
+    'mnuEditCopy
+    '
+    Me.mnuEditCopy.Index = 0
+    Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
+    Me.mnuEditCopy.Text = "Copy"
     '
     'mnuView
     '
-    Me.mnuView.Index = 1
+    Me.mnuView.Index = 2
     Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuExpand, Me.mnuCollapse, Me.mnuDefault, Me.mnuDataCount})
-    Me.mnuView.Text = "&View"
+    Me.mnuView.Text = "View"
     '
     'mnuExpand
     '
     Me.mnuExpand.Index = 0
-    Me.mnuExpand.Text = "&Expand"
+    Me.mnuExpand.Text = "Expand"
     '
     'mnuCollapse
     '
     Me.mnuCollapse.Index = 1
-    Me.mnuCollapse.Text = "&Collapse"
+    Me.mnuCollapse.Text = "Collapse"
     '
     'mnuDefault
     '
     Me.mnuDefault.Index = 2
-    Me.mnuDefault.Text = "&Default"
+    Me.mnuDefault.Text = "Default"
     '
     'mnuDataCount
     '
     Me.mnuDataCount.Index = 3
-    Me.mnuDataCount.Text = "Data to Show " & pNumValuesShow
+    Me.mnuDataCount.Text = ""
     '
     'mnuAnalysis
     '
-    Me.mnuAnalysis.Index = 2
-    Me.mnuAnalysis.Text = "&Analysis"
+    Me.mnuAnalysis.Index = 3
+    Me.mnuAnalysis.Text = "Analysis"
     '
     'mnuMain
     '
-    Me.mnuMain.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuView, Me.mnuAnalysis})
+    Me.mnuMain.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.MenuItem1, Me.mnuView, Me.mnuAnalysis})
+    '
+    'MenuItem1
+    '
+    Me.MenuItem1.Index = 1
+    Me.MenuItem1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
+    Me.MenuItem1.Text = "Edit"
     '
     'atcDataTreeForm
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-    Me.ClientSize = New System.Drawing.Size(633, 628)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+    Me.ClientSize = New System.Drawing.Size(527, 544)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.mnuMain
     Me.Name = "atcDataTreeForm"
@@ -339,7 +349,7 @@ Public Class atcDataTreeForm
     pDataManager.ShowDisplay(sender.Text, pDataGroup)
   End Sub
 
-  Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
+  Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
     pDataManager.UserSelectData(, pDataGroup)
   End Sub
 
@@ -369,7 +379,7 @@ Public Class atcDataTreeForm
     TreeAction("Default")
   End Sub
 
-  Private Sub mnuCopyClipboard_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyClipboard.Click
+  Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
     Clipboard.SetDataObject(ToString)
   End Sub
 

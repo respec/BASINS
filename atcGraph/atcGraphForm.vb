@@ -125,7 +125,6 @@ Public Class atcGraphForm
   'Do not modify it using the code editor.
   Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFilePrint As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
@@ -137,11 +136,14 @@ Public Class atcGraphForm
   Friend WithEvents mnuEditY As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditX As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditY2 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditSep1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcGraphForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuFileAdd = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
     Me.mnuFilePrint = New System.Windows.Forms.MenuItem
     Me.mnuEdit = New System.Windows.Forms.MenuItem
@@ -151,6 +153,8 @@ Public Class atcGraphForm
     Me.mnuEditTitles = New System.Windows.Forms.MenuItem
     Me.mnuEditCurves = New System.Windows.Forms.MenuItem
     Me.mnuEditFont = New System.Windows.Forms.MenuItem
+    Me.mnuEditSep1 = New System.Windows.Forms.MenuItem
+    Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.zgc = New ZedGraph.ZedGraphControl
     Me.SuspendLayout()
@@ -162,29 +166,29 @@ Public Class atcGraphForm
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuFileSave, Me.mnuFilePrint})
-    Me.mnuFile.Text = "&File"
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSave, Me.mnuFilePrint})
+    Me.mnuFile.Text = "File"
     '
-    'mnuFileAdd
+    'mnuFileSelectData
     '
-    Me.mnuFileAdd.Index = 0
-    Me.mnuFileAdd.Text = "&Add Data"
+    Me.mnuFileSelectData.Index = 0
+    Me.mnuFileSelectData.Text = "Select &Data"
     '
     'mnuFileSave
     '
     Me.mnuFileSave.Index = 1
-    Me.mnuFileSave.Text = "&Save"
+    Me.mnuFileSave.Text = "Save"
     '
     'mnuFilePrint
     '
     Me.mnuFilePrint.Index = 2
-    Me.mnuFilePrint.Text = "&Print"
+    Me.mnuFilePrint.Text = "Print"
     '
     'mnuEdit
     '
     Me.mnuEdit.Index = 1
-    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditX, Me.mnuEditY, Me.mnuEditY2, Me.mnuEditTitles, Me.mnuEditCurves, Me.mnuEditFont})
-    Me.mnuEdit.Text = "&Edit"
+    Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditX, Me.mnuEditY, Me.mnuEditY2, Me.mnuEditTitles, Me.mnuEditCurves, Me.mnuEditFont, Me.mnuEditSep1, Me.mnuEditCopy})
+    Me.mnuEdit.Text = "Edit"
     '
     'mnuEditX
     '
@@ -216,10 +220,21 @@ Public Class atcGraphForm
     Me.mnuEditFont.Index = 5
     Me.mnuEditFont.Text = "&Font"
     '
+    'mnuEditSep1
+    '
+    Me.mnuEditSep1.Index = 6
+    Me.mnuEditSep1.Text = "-"
+    '
+    'mnuEditCopy
+    '
+    Me.mnuEditCopy.Index = 7
+    Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
+    Me.mnuEditCopy.Text = "Copy"
+    '
     'mnuAnalysis
     '
     Me.mnuAnalysis.Index = 2
-    Me.mnuAnalysis.Text = "&Analysis"
+    Me.mnuAnalysis.Text = "Analysis"
     '
     'zgc
     '
@@ -227,6 +242,7 @@ Public Class atcGraphForm
     Me.zgc.IsEnableHPan = True
     Me.zgc.IsEnableVPan = True
     Me.zgc.IsEnableZoom = True
+    Me.zgc.IsScrollY2 = False
     Me.zgc.IsShowContextMenu = True
     Me.zgc.IsShowHScrollBar = False
     Me.zgc.IsShowPointValues = False
@@ -234,14 +250,24 @@ Public Class atcGraphForm
     Me.zgc.IsZoomOnMouseCenter = False
     Me.zgc.Location = New System.Drawing.Point(0, 0)
     Me.zgc.Name = "zgc"
+    Me.zgc.PanButtons = System.Windows.Forms.MouseButtons.Left
+    Me.zgc.PanButtons2 = System.Windows.Forms.MouseButtons.Middle
+    Me.zgc.PanModifierKeys = System.Windows.Forms.Keys.Shift + System.Windows.Forms.Keys.None
+    Me.zgc.PanModifierKeys2 = System.Windows.Forms.Keys.None
     Me.zgc.PointDateFormat = "g"
     Me.zgc.PointValueFormat = "G"
     Me.zgc.ScrollMaxX = 0
     Me.zgc.ScrollMaxY = 0
+    Me.zgc.ScrollMaxY2 = 0
     Me.zgc.ScrollMinX = 0
     Me.zgc.ScrollMinY = 0
+    Me.zgc.ScrollMinY2 = 0
     Me.zgc.Size = New System.Drawing.Size(543, 496)
     Me.zgc.TabIndex = 0
+    Me.zgc.ZoomButtons = System.Windows.Forms.MouseButtons.Left
+    Me.zgc.ZoomButtons2 = System.Windows.Forms.MouseButtons.None
+    Me.zgc.ZoomModifierKeys = System.Windows.Forms.Keys.None
+    Me.zgc.ZoomModifierKeys2 = System.Windows.Forms.Keys.None
     Me.zgc.ZoomStepFraction = 0.1
     '
     'atcGraphForm
@@ -265,7 +291,7 @@ Public Class atcGraphForm
     End Get
   End Property
 
-  Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
+  Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
     pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 
@@ -297,8 +323,11 @@ Public Class atcGraphForm
       Dim lStream As New StreamWriter(aFileName)
       zgc.MasterPane.Image.Save(lStream.BaseStream, lFormat)
       lStream.Close()
-
     End If
+  End Sub
+
+  Private Sub mnuEditCopy_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
+    Clipboard.SetDataObject(zgc.MasterPane.Image)
   End Sub
 
   Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click

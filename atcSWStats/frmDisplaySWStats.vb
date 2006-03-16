@@ -59,8 +59,6 @@ Friend Class frmDisplaySWStats
   Friend WithEvents MainMenu1 As System.Windows.Forms.MainMenu
   Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuFileAdd As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuAddAttributes As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
@@ -69,12 +67,14 @@ Friend Class frmDisplaySWStats
   Friend WithEvents mnuRptNDay As System.Windows.Forms.MenuItem
   Friend WithEvents mnuRptTrend As System.Windows.Forms.MenuItem
   Friend WithEvents txtReport As System.Windows.Forms.TextBox
+  Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySWStats))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuFileAdd = New System.Windows.Forms.MenuItem
-    Me.mnuAddAttributes = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
+    Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
     Me.mnuEdit = New System.Windows.Forms.MenuItem
     Me.mnuEditCopy = New System.Windows.Forms.MenuItem
@@ -93,29 +93,30 @@ Friend Class frmDisplaySWStats
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileAdd, Me.mnuAddAttributes, Me.mnuFileSave})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSave})
     Me.mnuFile.Text = "File"
     '
-    'mnuFileAdd
+    'mnuFileSelectData
     '
-    Me.mnuFileAdd.Index = 0
-    Me.mnuFileAdd.Text = "Add Timeseries"
+    Me.mnuFileSelectData.Index = 0
+    Me.mnuFileSelectData.Text = "Select &Data"
     '
-    'mnuAddAttributes
+    'mnuFileSelectAttributes
     '
-    Me.mnuAddAttributes.Index = 1
-    Me.mnuAddAttributes.Text = "Add Attributes"
+    Me.mnuFileSelectAttributes.Index = 1
+    Me.mnuFileSelectAttributes.Text = "Select &Attributes"
     '
     'mnuFileSave
     '
     Me.mnuFileSave.Index = 2
+    Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
     Me.mnuFileSave.Text = "Save"
     '
     'mnuEdit
     '
     Me.mnuEdit.Index = 1
     Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
-    Me.mnuEdit.Text = "&Edit"
+    Me.mnuEdit.Text = "Edit"
     '
     'mnuEditCopy
     '
@@ -125,12 +126,12 @@ Friend Class frmDisplaySWStats
     '
     'mnuAnalysis
     '
-    Me.mnuAnalysis.Index = 3
+    Me.mnuAnalysis.Index = 2
     Me.mnuAnalysis.Text = "Analysis"
     '
     'mnuReport
     '
-    Me.mnuReport.Index = 4
+    Me.mnuReport.Index = 3
     Me.mnuReport.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuRptFreq, Me.mnuRptNDay, Me.mnuRptTrend})
     Me.mnuReport.Text = "Report"
     '
@@ -197,7 +198,7 @@ Friend Class frmDisplaySWStats
     Next
   End Sub
 
-  Private Sub mnuFileAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileAdd.Click
+  Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
     pDataManager.UserSelectData(, pDataGroup, False)
   End Sub
 
@@ -211,7 +212,7 @@ Friend Class frmDisplaySWStats
     'TODO: could efficiently remove by serial number
   End Sub
 
-  Private Sub mnuAddAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddAttributes.Click
+  Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
     UserSpecifyAttributes()
     PopulateGrid()
   End Sub

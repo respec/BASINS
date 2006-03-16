@@ -56,9 +56,9 @@ Friend Class frmSelectData
   Friend WithEvents mnuSelectClear As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSelectNoMatching As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileManage As System.Windows.Forms.MenuItem
-  Friend WithEvents mnuAddData As System.Windows.Forms.MenuItem
   Friend WithEvents mnuSelectAll As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuOpenData As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectData))
     Me.groupTop = New System.Windows.Forms.GroupBox
@@ -74,7 +74,7 @@ Friend Class frmSelectData
     Me.pSelectedGrid = New atcControls.atcGrid
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
-    Me.mnuAddData = New System.Windows.Forms.MenuItem
+    Me.mnuOpenData = New System.Windows.Forms.MenuItem
     Me.mnuFileManage = New System.Windows.Forms.MenuItem
     Me.mnuAttributes = New System.Windows.Forms.MenuItem
     Me.mnuAttributesAdd = New System.Windows.Forms.MenuItem
@@ -345,20 +345,20 @@ Friend Class frmSelectData
     '
     Me.mnuFile.Enabled = CType(resources.GetObject("mnuFile.Enabled"), Boolean)
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAddData, Me.mnuFileManage})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenData, Me.mnuFileManage})
     Me.mnuFile.Shortcut = CType(resources.GetObject("mnuFile.Shortcut"), System.Windows.Forms.Shortcut)
     Me.mnuFile.ShowShortcut = CType(resources.GetObject("mnuFile.ShowShortcut"), Boolean)
     Me.mnuFile.Text = resources.GetString("mnuFile.Text")
     Me.mnuFile.Visible = CType(resources.GetObject("mnuFile.Visible"), Boolean)
     '
-    'mnuAddData
+    'mnuOpenData
     '
-    Me.mnuAddData.Enabled = CType(resources.GetObject("mnuAddData.Enabled"), Boolean)
-    Me.mnuAddData.Index = 0
-    Me.mnuAddData.Shortcut = CType(resources.GetObject("mnuAddData.Shortcut"), System.Windows.Forms.Shortcut)
-    Me.mnuAddData.ShowShortcut = CType(resources.GetObject("mnuAddData.ShowShortcut"), Boolean)
-    Me.mnuAddData.Text = resources.GetString("mnuAddData.Text")
-    Me.mnuAddData.Visible = CType(resources.GetObject("mnuAddData.Visible"), Boolean)
+    Me.mnuOpenData.Enabled = CType(resources.GetObject("mnuOpenData.Enabled"), Boolean)
+    Me.mnuOpenData.Index = 0
+    Me.mnuOpenData.Shortcut = CType(resources.GetObject("mnuOpenData.Shortcut"), System.Windows.Forms.Shortcut)
+    Me.mnuOpenData.ShowShortcut = CType(resources.GetObject("mnuOpenData.ShowShortcut"), Boolean)
+    Me.mnuOpenData.Text = resources.GetString("mnuOpenData.Text")
+    Me.mnuOpenData.Visible = CType(resources.GetObject("mnuOpenData.Visible"), Boolean)
     '
     'mnuFileManage
     '
@@ -1128,7 +1128,7 @@ NextName:
     'TODO: re-order criteria
   End Sub
 
-  Private Sub mnuAddData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAddData.Click
+  Private Sub mnuOpenData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenData.Click
     Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
     If Not lNewSource Is Nothing Then
       pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)

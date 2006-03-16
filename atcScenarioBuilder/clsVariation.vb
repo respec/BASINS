@@ -25,7 +25,7 @@ Public Class Variation
   Public ColorBelowMin As System.Drawing.Color = System.Drawing.Color.DeepSkyBlue
   Public ColorDefault As System.Drawing.Color = System.Drawing.Color.White
 
-  Public Property Name() As String
+  Public Overridable Property Name() As String
     Get
       Return pName
     End Get
@@ -34,7 +34,7 @@ Public Class Variation
     End Set
   End Property
 
-  Public Property DataSets() As atcDataGroup
+  Public Overridable Property DataSets() As atcDataGroup
     Get
       Return pDataSets
     End Get
@@ -43,7 +43,7 @@ Public Class Variation
     End Set
   End Property
 
-  Public Property ComputationSource() As atcDataSource
+  Public Overridable Property ComputationSource() As atcDataSource
     Get
       Return pComputationSource
     End Get
@@ -52,7 +52,7 @@ Public Class Variation
     End Set
   End Property
 
-  Public Property Operation() As String
+  Public Overridable Property Operation() As String
     Get
       Return pOperation
     End Get
@@ -61,7 +61,7 @@ Public Class Variation
     End Set
   End Property
 
-  Public Property Selected() As Boolean
+  Public Overridable Property Selected() As Boolean
     Get
       Return pSelected
     End Get
@@ -69,7 +69,8 @@ Public Class Variation
       pSelected = newValue
     End Set
   End Property
-  Public ReadOnly Property Iterations() As Integer
+
+  Public Overridable ReadOnly Property Iterations() As Integer
     Get
       Try
         Return (Max - Min) / Increment + 1
@@ -79,13 +80,13 @@ Public Class Variation
     End Get
   End Property
 
-  Public Function StartIteration() As atcDataGroup
+  Public Overridable Function StartIteration() As atcDataGroup
     Me.CurrentValue = Me.Min
     pIncrementsSinceStart = 0
     Return VaryData()
   End Function
 
-  Public Function NextIteration() As atcDataGroup
+  Public Overridable Function NextIteration() As atcDataGroup
     pIncrementsSinceStart += 1
     If pIncrementsSinceStart < Iterations Then
       Me.CurrentValue = Me.Min + Me.Increment * pIncrementsSinceStart
@@ -95,7 +96,7 @@ Public Class Variation
     End If
   End Function
 
-  Private Function VaryData() As atcDataGroup
+  Protected Overridable Function VaryData() As atcDataGroup
     Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
     Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
     Dim lArgsMath As New atcDataAttributes
@@ -138,14 +139,14 @@ Public Class Variation
           'Dim lEvapMean As String = Format(lModifiedTS.Attributes.GetValue("Mean") * 365.25, "#.00")
           With lModifiedTS.Attributes
             .SetValue("Constituent", "PET")
-            .SetValue("Id", 111)
+            .SetValue("Id", 111) 'TODO: don't hard code ID for PET
           End With
       End Select
     Next
     Return lModifiedGroup
   End Function
 
-  Public Function Clone() As Variation
+  Public Overridable Function Clone() As Variation
     Dim newVariation As New Variation
     With newVariation
       .Name = Name
@@ -165,7 +166,7 @@ Public Class Variation
     Return newVariation
   End Function
 
-  Private Property SeasonsXML() As String
+  Protected Overridable Property SeasonsXML() As String
     Get
       If Seasons Is Nothing Then
         Return ""
@@ -192,7 +193,7 @@ Public Class Variation
     End Set
   End Property
 
-  Private Property DataSetsXML() As String
+  Protected Overridable Property DataSetsXML() As String
     Get
       If DataSets Is Nothing Then
         Return ""
@@ -232,7 +233,7 @@ Public Class Variation
     End Set
   End Property
 
-  Public Property XML() As String
+  Public Overridable Property XML() As String
     Get
       Dim lXML As String = "<Variation>" & vbCrLf _
            & "  <Name>" & Name & "</Name>" & vbCrLf

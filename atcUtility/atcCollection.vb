@@ -193,37 +193,25 @@ Public Class atcCollection
       Case Else
         lString &= "of " & lCount & " values"     
     End Select
-    Dim lStop As Integer = lCount - 1
     Dim i As Integer
+    Dim lStop As Integer = lCount - 1
     If lStop > 9 Then lStop = 9
     For i = 0 To lStop
-      lString &= vbCrLf & i & " "
       Try
-        lString &= Me.Keys.Item(i) & " : "
+        lString &= vbCrLf & i & " key = " & Me.Keys.Item(i) & ", value = " & Me.ItemByIndex(i) & vbCrLf
       Catch
-        lString &= "<unprintable key> : "
-      End Try
-      Try
-        lString &= Me.ItemByIndex(i) & vbCrLf
-      Catch
-        lString &= "<unprintable value>" & vbCrLf
+        'Skip listing unprintable keys/values
       End Try
     Next
-    If lStop < lCount - 1 Then
-      i = lCount - 1
-      lString &= "..." & vbCrLf
-      lString &= vbCrLf & i & " "
-      Try
-        lString &= Me.Keys.Item(i) & " : "
-      Catch
-        lString &= "<unprintable key> : "
-      End Try
-      Try
-        lString &= Me.ItemByIndex(i) & vbCrLf
-      Catch
-        lString &= "<unprintable value>" & vbCrLf
-      End Try
-    End If
+    'If lStop < lCount - 1 Then
+    '  i = lCount - 1
+    '  lString &= "..." & vbCrLf
+    '  lString &= vbCrLf & i & " "
+    '  Try
+    '    lString &= vbCrLf & i & " " & Me.Keys.Item(i) & " : " & Me.ItemByIndex(i) & vbCrLf
+    '  Catch
+    '  End Try
+    'End If
     Return lString
   End Function
 End Class
