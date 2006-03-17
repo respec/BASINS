@@ -334,21 +334,7 @@ Public Class frmVariation
       End Select
     Next
 
-    With pVariation
-      txtName.Text = .Name
-      txtFunction.Text = .Operation
-      If Not Double.IsNaN(.Min) Then txtMin.Text = .Min
-      If Not Double.IsNaN(.Max) Then txtMax.Text = .Max
-      If Not Double.IsNaN(.Increment) Then txtIncrement.Text = .Increment
-      UpdateDataText(txtVaryData, pVariation.DataSets)
-      If .Seasons Is Nothing Then
-        cboSeasons.SelectedIndex = 0
-      Else
-        cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
-        pSeasons = .Seasons
-        RefreshSeasonsList()
-      End If
-    End With
+    FormFromVariation()
 
     If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
       Return pVariation
@@ -386,7 +372,7 @@ Public Class frmVariation
 
   Private Sub UpdateDataText(ByVal aTextBox As Windows.Forms.TextBox, _
                              ByVal aGroup As atcDataGroup)
-    If aGroup.Count > 0 Then
+    If Not aGroup Is Nothing AndAlso aGroup.Count > 0 Then
       aTextBox.Text = aGroup.ItemByIndex(0).ToString
       If aGroup.Count > 1 Then aTextBox.Text &= " (and " & aGroup.Count - 1 & " more)"
     Else
@@ -498,6 +484,7 @@ Public Class frmVariation
   Private Sub btnScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScript.Click
     Dim lOpenDialog As New System.Windows.Forms.OpenFileDialog
     Dim lVariationTemplate As New Variation
+
     If VariationFromForm(lVariationTemplate) Then
       With lOpenDialog
         .Title = "Select Script"
@@ -515,6 +502,7 @@ Public Class frmVariation
           Try
             If .FileName.EndsWith("testtest") Then
               pVariation = BuiltInVariationScript(lVariationTemplate)
+              pVariation.Name = "ScriptBuiltIn"
             Else
               pVariation = Scripting.Run(FileExt(.FileName), "", .FileName, lErrors, False, g_MapWin, lVariationTemplate)
             End If
@@ -524,9 +512,29 @@ Public Class frmVariation
           End Try
           If lErrors.Length > 0 Then
             Logger.Msg("Error running variation script" & vbCrLf & vbCrLf & lErrors)
+          Else 'ok scriped variation - update form as appropriate
+            FormFromVariation()
           End If
         End If
       End With
     End If
+  End Sub
+
+  Private Sub FormFromVariation()
+    With pVariation
+      txtName.Text = .Name
+      txtFunction.Text = .Operation
+      If Not Double.IsNaN(.Min) Then txtMin.Text = .Min
+      If Not Double.IsNaN(.Max) Then txtMax.Text = .Max
+      If Not Double.IsNaN(.Increment) Then txtIncrement.Text = .Increment
+      UpdateDataText(txtVaryData, pVariation.DataSets)
+      If .Seasons Is Nothing Then
+        cboSeasons.SelectedIndex = 0
+      Else
+        cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
+        pSeasons = .Seasons
+        RefreshSeasonsList()
+      End If
+    End With
   End Sub
 End Class
