@@ -342,13 +342,13 @@ ErrHand:
 
   'Returns zero if the named field does not appear in this file
   Public Overrides Function FieldNumber(ByVal aFieldName As String) As Integer
-    Dim retval As Integer
-    For retval = 1 To pNumFields
-      If pFields(retval).FieldName = aFieldName Then
-        FieldNumber = retval
-        Exit Function
+    Dim lField As Integer
+    For lField = 1 To pNumFields
+      If pFields(lField).FieldName = aFieldName Then
+        Return lField
       End If
     Next
+    Return 0
   End Function
 
   'Read a stream into the table

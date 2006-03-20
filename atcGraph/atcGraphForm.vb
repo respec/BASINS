@@ -139,6 +139,7 @@ Public Class atcGraphForm
   Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditSep1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcGraphForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -157,6 +158,7 @@ Public Class atcGraphForm
     Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.zgc = New ZedGraph.ZedGraphControl
+    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
@@ -166,7 +168,7 @@ Public Class atcGraphForm
     'mnuFile
     '
     Me.mnuFile.Index = 0
-    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSave, Me.mnuFilePrint})
+    Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSep1, Me.mnuFileSave, Me.mnuFilePrint})
     Me.mnuFile.Text = "File"
     '
     'mnuFileSelectData
@@ -176,12 +178,12 @@ Public Class atcGraphForm
     '
     'mnuFileSave
     '
-    Me.mnuFileSave.Index = 1
+    Me.mnuFileSave.Index = 2
     Me.mnuFileSave.Text = "Save"
     '
     'mnuFilePrint
     '
-    Me.mnuFilePrint.Index = 2
+    Me.mnuFilePrint.Index = 3
     Me.mnuFilePrint.Text = "Print"
     '
     'mnuEdit
@@ -269,6 +271,11 @@ Public Class atcGraphForm
     Me.zgc.ZoomModifierKeys = System.Windows.Forms.Keys.None
     Me.zgc.ZoomModifierKeys2 = System.Windows.Forms.Keys.None
     Me.zgc.ZoomStepFraction = 0.1
+    '
+    'mnuFileSep1
+    '
+    Me.mnuFileSep1.Index = 1
+    Me.mnuFileSep1.Text = "-"
     '
     'atcGraphForm
     '
