@@ -4,7 +4,7 @@ Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 
-Module modCliGen
+Public Module modCliGen
 
   Public Function ReadParmFile(ByVal aFileName As String, ByRef aHeader As String, ByRef aTable As atcTableFixed, ByRef aFooter As String) As Boolean
     Dim lStr As String = WholeFileString(aFileName)
