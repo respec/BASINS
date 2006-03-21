@@ -13,6 +13,7 @@ Public Class atcDataSourceCligen
   Inherits atcDataSource
   '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
+  Private pAvailableOperations As atcDataAttributes ' atcDataGroup
   Private Shared pFileFilter As String = "Cligen Output Files (*.dat)|*.dat"
   Private pErrorDescription As String
   Private pColDefs As Hashtable
@@ -48,7 +49,7 @@ Public Class atcDataSourceCligen
     End Get
   End Property
 
-  Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
+  Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aArgs As atcData.atcDataAttributes = Nothing) As Boolean
     Dim lData As atcTimeseries
     Dim lDates As atcTimeseries
 
@@ -61,7 +62,15 @@ Public Class atcDataSourceCligen
     Else
       Me.Specification = aFileName
 
+      Dim lIncludeDaily As Boolean = True
+      Dim lIncludeHourly As Boolean = False
+      If Not aArgs Is Nothing Then
+        lIncludeDaily = aArgs.GetValue("Include Daily")
+        lIncludeHourly = aArgs.GetValue("Include Hourly")
+      End If
+
       Try
+        Dim lDailyData As New atcDataGroup
         Dim lTable As New atcTableFixed
         Dim lSCol() As Integer = {0, 2, 5, 8, 12, 18, 24, 29, 36, 42, 48, 53, 58, 64}
         Dim lFLen() As Integer = {0, 2, 2, 4, 6, 6, 5, 7, 6, 6, 5, 5, 6, 6}
@@ -101,7 +110,7 @@ Public Class atcDataSourceCligen
                   lData.Attributes.SetValue("point", False)
                   lData.Attributes.SetValue("tu", atcTimeUnit.TUDay)
                   lData.Attributes.SetValue("ts", 1)
-                  DataSets.Add(lTSKey, lData)
+                  lDailyData.Add(lTSKey, lData)
                 End If
                 lDate(0) = .Value(3)
                 lDate(1) = .Value(2)
@@ -119,9 +128,17 @@ Public Class atcDataSourceCligen
               Next i
               .MoveNext()
             End While
-            For Each lData In DataSets
+            For Each lData In lDailyData
               lData.numValues = lData.Attributes.GetValue("Count")
             Next
+            If lIncludeDaily Then
+              DataSets.AddRange(lDailyData)
+            End If
+            If lIncludeHourly Then
+              Dim lHourlyData As New atcDataGroup
+              lHourlyData = DisaggCliGen(lDailyData)
+              DataSets.AddRange(lHourlyData)
+            End If
             Open = True
           Else
             Open = False
@@ -131,8 +148,55 @@ Public Class atcDataSourceCligen
       Catch endEx As EndOfStreamException
         Open = False
       End Try
-    End If
+      End If
   End Function
+
+  Public Overrides ReadOnly Property AvailableOperations() As atcData.atcDataAttributes
+    Get
+      Dim lOperations As atcDataAttributes
+      If Not pAvailableOperations Is Nothing Then
+        lOperations = pAvailableOperations
+      Else
+        lOperations = New atcDataAttributes
+        Dim lArguments As atcDataAttributes
+
+        Dim defIncludeDaily As New atcAttributeDefinition
+        With defIncludeDaily
+          .Name = "Include Daily"
+          .Description = "Include Daily data as output timeseries"
+          .DefaultValue = False
+          .Editable = True
+          .TypeString = "Boolean"
+        End With
+
+        Dim defIncludeHourly As New atcAttributeDefinition
+        With defIncludeHourly
+          .Name = "Include Hourly"
+          .Description = "Include Hourly data as output timeseries"
+          .DefaultValue = False
+          .Editable = True
+          .TypeString = "Boolean"
+        End With
+
+        Dim lCliGenOutput As New atcAttributeDefinition
+        With lCliGenOutput
+          .Name = "CliGen Output"
+          .Description = "Read CliGen output file"
+          .Editable = False
+          .TypeString = "atcTimeseries"
+          .Calculator = Me
+        End With
+
+        lArguments = New atcDataAttributes
+        lArguments.SetValue(defIncludeDaily, Nothing)
+        lArguments.SetValue(defIncludeHourly, Nothing)
+
+        lOperations.SetValue(lCliGenOutput, Nothing, lArguments)
+      End If
+
+      Return lOperations
+    End Get
+  End Property
 
   Private Function parseWQObsDate(ByVal aDate As String, ByVal aTime As String) As Double
     'assume point values at specified time
@@ -160,6 +224,135 @@ Public Class atcDataSourceCligen
     Else
       Return 0
     End If
+  End Function
+
+  Private Function DisaggCliGen(ByVal aDailyData As atcDataGroup) As atcDataGroup
+
+    Dim lDisTS As New atcMetCmp.atcMetCmpPlugin
+    Dim lts As atcTimeseries
+
+    Dim lArgsMet As New atcDataAttributes
+    Dim lMatch As New atcDataGroup
+    Dim lErr As String = ""
+    Dim lStr As String = ""
+
+    Logger.Dbg("CliGenUpdate:FindDataManager")
+    Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+    Logger.Dbg("CliGenUpdate:TsMath: " & lTsMath.ToString)
+
+    Dim lDataGroup As New atcDataGroup
+
+    Dim lTMax As atcTimeseries = Nothing
+    Dim lTMin As atcTimeseries = Nothing
+    Dim lATmp As atcTimeseries = Nothing
+    Dim lDewPt As atcTimeseries = Nothing
+    Dim lPrecip As atcTimeseries = Nothing
+    Dim lPrecDur As atcTimeseries = Nothing
+    Dim lPrecPkTime As atcTimeseries = Nothing
+    Dim lPrecPkInten As atcTimeseries = Nothing
+    For Each lDS As atcTimeseries In aDailyData
+      lStr = UCase(lDS.Attributes.GetValue("Constituent"))
+      Select Case lStr
+        Case "TMAX"
+          Logger.Dbg("Found CliGen TMax data")
+          lArgsMet.Clear()
+          lArgsMet.SetValue("Timeseries", lDS)
+          lTsMath.Open("Celsius to F", lArgsMet)
+          lTMax = lTsMath.DataSets(0)
+          Logger.Dbg("Converted CliGen TMax data to Deg F")
+        Case "TMIN"
+          Logger.Dbg("Found CliGen TMin data")
+          lArgsMet.Clear()
+          lArgsMet.SetValue("Timeseries", lDS)
+          lTsMath.Open("Celsius to F", lArgsMet)
+          lTMin = lTsMath.DataSets(0)
+          Logger.Dbg("Converted CliGen TMax data to Deg F")
+        Case "RAD"
+          Logger.Dbg("Disaggregating Daily Solar Radiation to Hourly")
+          lArgsMet.Clear()
+          lArgsMet.SetValue("SRAD", lDS)
+          lArgsMet.SetValue("Latitude", "38.85") 'latitude of Washington National
+          lDisTS.Open("Solar Radiation (Disaggregate)", lArgsMet)
+          Logger.Dbg("Solar Radiation Disaggregation complete!")
+          lDataGroup.Add(lDisTS.DataSets(0))
+        Case "W-VL"
+          Logger.Dbg("Found Wlind Velocity (m/s) - convert to mi/day")
+          lArgsMet.Clear()
+          lArgsMet.SetValue("Timeseries", lDS)
+          lArgsMet.SetValue("Number", 53.7) 'multiplier converts (m/s) to (mi/day)
+          lTsMath.Open("Multiply", lArgsMet)
+          Dim lWind As atcTimeseries = lTsMath.DataSets(0)
+          Logger.Dbg("Disaggregating Daily Wind to Hourly")
+          Dim lHrDist() As Double = {0, 0.034, 0.034, 0.034, 0.034, 0.034, 0.034, 0.034, 0.035, 0.037, 0.041, 0.046, 0.05, 0.053, 0.054, 0.058, 0.057, 0.056, 0.05, 0.043, 0.04, 0.038, 0.035, 0.035, 0.034}
+          lArgsMet.Clear()
+          lArgsMet.SetValue("TWND", lWind)
+          lArgsMet.SetValue("Hourly Distribution", lHrDist)
+          lDisTS.Open("Wind (Disaggregate)", lArgsMet)
+          Logger.Dbg("Wind Disaggregation complete!")
+          lDataGroup.Add(lDisTS.DataSets(0))
+        Case "TDEW"
+          Logger.Dbg("Found Dewpoint Temp - Convert to Deg F")
+          lArgsMet.Clear()
+          lArgsMet.SetValue("Timeseries", lDS)
+          lTsMath.Open("Celsius to F", lArgsMet)
+          lDewPt = lTsMath.DataSets(0)
+          Logger.Dbg("Converted Dewpoint Temp to Deg F")
+        Case "PRCP"
+          Logger.Dbg("Found Precip")
+          lPrecip = lDS
+          Logger.Dbg("Precip contains " & lPrecip.numValues & " values")
+        Case "DUR"
+          Logger.Dbg("Found Precip Duration")
+          lPrecDur = lDS
+          Logger.Dbg("Precip Duration contains " & lPrecDur.numValues & " values")
+        Case "TP"
+          Logger.Dbg("Found Precip Time to Peak")
+          lPrecPkTime = lDS
+          Logger.Dbg("Precip Time to Peak contains " & lPrecPkTime.numValues & " values")
+        Case "IP"
+          Logger.Dbg("Found Precip Peak Intensity")
+          lPrecPkInten = lDS
+          Logger.Dbg("Precip Peak Intensity contains " & lPrecPkInten.numValues & " values")
+      End Select
+    Next
+
+    If Not lTMin Is Nothing AndAlso Not lTMax Is Nothing Then 'disaggregate tmin/tmax to hrly temp
+      Logger.Dbg("Disaggregating TMin/TMax to Hourly Temp")
+      lArgsMet.Clear()
+      lArgsMet.SetValue("TMIN", lTMin)
+      lArgsMet.SetValue("TMAX", lTMax)
+      lArgsMet.SetValue("Observation Time", "24")
+      lDisTS.Open("Temperature", lArgsMet)
+      lATmp = lDisTS.DataSets(0)
+      Logger.Dbg("Temperature Disaggregation complete!")
+      lDataGroup.Add(lATmp)
+      'now disaggregate Dewpoint using hourly temp
+      lArgsMet.Clear()
+      lArgsMet.SetValue("Dewpoint", lDewPt)
+      lArgsMet.SetValue("ATMP", lATmp)
+      lDisTS.Open("Dewpoint", lArgsMet)
+      Logger.Dbg("Dewpoint Temp Disaggregation complete!")
+      lDataGroup.Add(lDisTS.DataSets(0))
+      'now generate Hamon PET
+      Dim lCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
+      Logger.Dbg("Computing Hamon PET from Hourly temperature")
+      lts = atcMetCmp.CmpHamX(lATmp, Nothing, True, 39, lCTS)
+      Logger.Dbg("Hamon PET generation complete!")
+      lts.Attributes.SetValue("Location", lTMin.Attributes.GetValue("Location"))
+      lDataGroup.Add(lts)
+    End If
+    If Not lPrecip Is Nothing AndAlso Not lPrecDur Is Nothing AndAlso _
+       Not lPrecPkTime Is Nothing AndAlso Not lPrecPkInten Is Nothing Then 'disagg daily precip
+      Logger.Dbg("Disaggregating Precip")
+      lts = atcMetCmp.DisCliGenPrecip(lPrecip, lPrecDur, lPrecPkTime, lPrecPkInten)
+      Logger.Dbg("Precip Disaggregation complete!")
+      lArgsMet.Clear()
+      lArgsMet.SetValue("Timeseries", lts)
+      lArgsMet.SetValue("Number", 25.4) 'multiplier converts mm to inches
+      lTsMath.Open("Divide", lArgsMet)
+      lDataGroup.Add(lTsMath.DataSets(0))
+    End If
+    Return lDataGroup
   End Function
 
 End Class

@@ -49,6 +49,7 @@ Public Class atcMetCmpPlugin
     Dim lAttDef As atcAttributeDefinition
     Dim lOk As Boolean
 
+    DataSets.Clear() 'assume we don't want any old datasets (maybe add arg to define this???)
     Select Case aOperationName
       Case "Solar Radiation"
         Dim lCldTSer As atcTimeseries = Nothing
