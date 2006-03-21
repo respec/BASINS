@@ -211,6 +211,8 @@ Public Class atcTimeseriesMath
 
     ReDim newVals(-1) ' If this gets populated, it will be turned into an atcTimeseries at the end
 
+    DataSets.Clear() 'assume we don't want any old datasets (maybe add arg to define this???)
+
     If aOperationName Is Nothing OrElse aOperationName.Length = 0 Then
       'TODO: ask user which operation to perform
       aOperationName = "Add"

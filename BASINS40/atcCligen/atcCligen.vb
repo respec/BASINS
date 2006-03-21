@@ -71,6 +71,9 @@ Public Class atcCligen
     Dim lOutFile As String
     Dim lSYr As Integer
     Dim lNYrs As Integer
+    Dim lIncDaily As Boolean
+    Dim lIncHourly As Boolean
+
     If aArgs Is Nothing Then
       Dim lForm As New frmCliGen
       lOk = lForm.AskUser(lParmFile, lOutFile, lSYr, lNYrs)
@@ -79,6 +82,8 @@ Public Class atcCligen
       lOutFile = aArgs.GetValue("CliGen Out")
       lSYr = aArgs.GetValue("Start Year")
       lNYrs = aArgs.GetValue("Num Years")
+      lIncDaily = aArgs.GetValue("Include Daily")
+      lIncHourly = aArgs.GetValue("Include Hourly")
       lOk = True
     End If
     lAttDef = atcDataAttributes.GetDefinition("Start Year")
@@ -87,7 +92,11 @@ Public Class atcCligen
        lNYrs >= lAttDef2.Min And lNYrs <= lAttDef2.Max Then 'run CliGen
       If RunCliGen(lParmFile, lOutFile, lSYr, lNYrs) Then 'successful run
         Dim lCliGenOut As New atcDataSourceCligen
-        If lCliGenOut.Open(lOutFile) Then 'add output datasets to this class' datasets
+        Dim lArgs As atcDataAttributes
+        lArgs.Clear()
+        lArgs.Add("Include Daily", lIncDaily)
+        lArgs.Add("Include Hourly", lIncHourly)
+        If lCliGenOut.Open(lOutFile, lArgs) Then 'add output datasets to this class' datasets
           Me.DataSets.AddRange(lCliGenOut.DataSets)
         End If
       Else
@@ -149,6 +158,24 @@ Public Class atcCligen
           .TypeString = "Integer"
         End With
 
+        Dim defIncludeDaily As New atcAttributeDefinition
+        With defIncludeDaily
+          .Name = "Include Daily"
+          .Description = "Include Daily data as output timeseries"
+          .DefaultValue = False
+          .Editable = True
+          .TypeString = "Boolean"
+        End With
+
+        Dim defIncludeHourly As New atcAttributeDefinition
+        With defIncludeHourly
+          .Name = "Include Hourly"
+          .Description = "Include Hourly data as output timeseries"
+          .DefaultValue = False
+          .Editable = True
+          .TypeString = "Boolean"
+        End With
+
         Dim lCliGen As New atcAttributeDefinition
         With lCliGen
           .Name = "CliGen"
@@ -164,6 +191,8 @@ Public Class atcCligen
         lArguments.SetValue(defOutFile, Nothing)
         lArguments.SetValue(defStartYear, Nothing)
         lArguments.SetValue(defNumYears, Nothing)
+        lArguments.SetValue(defIncludeDaily, Nothing)
+        lArguments.SetValue(defIncludeHourly, Nothing)
 
         lOperations.SetValue(lCliGen, Nothing, lArguments)
       End If
