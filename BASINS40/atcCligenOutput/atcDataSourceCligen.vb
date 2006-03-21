@@ -96,7 +96,7 @@ Public Class atcDataSourceCligen
             While Not lTable.atEOF
               For i = 4 To .NumFields
                 lTSKey = .FieldName(i)
-                lData = DataSets.ItemByKey(lTSKey)
+                lData = lDailyData.ItemByKey(lTSKey)
                 If lData Is Nothing Then
                   lData = New atcTimeseries(Me)
                   lData.Dates = New atcTimeseries(Me)

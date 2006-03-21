@@ -45,7 +45,28 @@ Module modScriptTest
         lArgs.SetValue("Include Daily", False)
         lArgs.SetValue("Include Hourly", True)
         lCliGen.Open("Run CliGen", lArgs)
-        Return lCliGen.DataSets
+        For lDataSetIndex As Integer = 0 To Me.DataSets.Count - 1
+          Dim lDataSet As atcTimeseries = Me.DataSets(lDataSetIndex)
+          Dim lCligenConstituent As String = ""
+          Select Case lDataSet.Attributes.GetValue("Constituent")
+            Case "AIRTMP" : lCligenConstituent = "ATMP"
+            Case "HPRECIP" : lCligenConstituent = "HPCP"
+              'Case "PET" : lCligenConstituent = "EVAP"
+              'Case "" : lCligenConstituent = "WIND"
+              'Case "" : lCligenConstituent = "DEWP"
+              'Case "" : lCligenConstituent = "SOLR"
+          End Select
+          If lCligenConstituent.Length > 0 Then
+            For Each lCligenDataSet As atcTimeseries In lCliGen.DataSets
+              If lCligenDataSet.Attributes.GetValue("Constituent") = lCligenConstituent Then
+                lCligenDataSet.Attributes.SetValue("ID", lDataSet.Attributes.GetValue("ID"))
+                lCligenDataSet.Attributes.SetValue("Constituent", lDataSet.Attributes.GetValue("Constituent"))
+                Me.DataSets.SetRange(lDataSetIndex, New atcCollection(lCligenDataSet))
+              End If
+            Next
+          End If
+        Next
+        Return Me.DataSets
       End If
     End Function
 
