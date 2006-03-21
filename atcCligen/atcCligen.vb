@@ -92,7 +92,7 @@ Public Class atcCligen
        lNYrs >= lAttDef2.Min And lNYrs <= lAttDef2.Max Then 'run CliGen
       If RunCliGen(lParmFile, lOutFile, lSYr, lNYrs) Then 'successful run
         Dim lCliGenOut As New atcDataSourceCligen
-        Dim lArgs As atcDataAttributes
+        Dim lArgs As New atcDataAttributes
         lArgs.Clear()
         lArgs.Add("Include Daily", lIncDaily)
         lArgs.Add("Include Hourly", lIncHourly)
