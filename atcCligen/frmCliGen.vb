@@ -193,7 +193,6 @@ Public Class frmCliGen
     Me.lblStation.Name = "lblStation"
     Me.lblStation.Size = New System.Drawing.Size(400, 56)
     Me.lblStation.TabIndex = 2
-    Me.lblStation.Text = "Name:"
     '
     'btnParmFile
     '
@@ -386,6 +385,7 @@ Public Class frmCliGen
         rdoAbs.Enabled = True
         rdoPct.Enabled = True
         btnReset.Enabled = True
+        lblStation.Text = cHeader
       End If
     End If
   End Sub
