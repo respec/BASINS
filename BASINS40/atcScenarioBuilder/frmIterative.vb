@@ -85,6 +85,8 @@ Public Class frmIterative
   Friend WithEvents mnuOptions As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSep2 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
+  Friend WithEvents btnInputAddCligen As System.Windows.Forms.Button
+  Friend WithEvents btnEndpointAddCligen As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmIterative))
     Me.myTabs = New System.Windows.Forms.TabControl
@@ -136,6 +138,8 @@ Public Class frmIterative
     Me.mnuPivotHeaders = New System.Windows.Forms.MenuItem
     Me.lblTop = New System.Windows.Forms.Label
     Me.btnStop = New System.Windows.Forms.Button
+    Me.btnInputAddCligen = New System.Windows.Forms.Button
+    Me.btnEndpointAddCligen = New System.Windows.Forms.Button
     Me.myTabs.SuspendLayout()
     Me.tabInputs.SuspendLayout()
     Me.tabEndpoints.SuspendLayout()
@@ -160,6 +164,7 @@ Public Class frmIterative
     '
     'tabInputs
     '
+    Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
     Me.tabInputs.Controls.Add(Me.lstInputs)
     Me.tabInputs.Controls.Add(Me.btnInputDown)
     Me.tabInputs.Controls.Add(Me.btnInputUp)
@@ -188,7 +193,8 @@ Public Class frmIterative
     '
     'btnInputDown
     '
-    Me.btnInputDown.Location = New System.Drawing.Point(248, 64)
+    Me.btnInputDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnInputDown.Location = New System.Drawing.Point(288, 64)
     Me.btnInputDown.Name = "btnInputDown"
     Me.btnInputDown.Size = New System.Drawing.Size(24, 24)
     Me.btnInputDown.TabIndex = 9
@@ -196,7 +202,8 @@ Public Class frmIterative
     '
     'btnInputUp
     '
-    Me.btnInputUp.Location = New System.Drawing.Point(216, 64)
+    Me.btnInputUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnInputUp.Location = New System.Drawing.Point(256, 64)
     Me.btnInputUp.Name = "btnInputUp"
     Me.btnInputUp.Size = New System.Drawing.Size(24, 24)
     Me.btnInputUp.TabIndex = 8
@@ -204,7 +211,7 @@ Public Class frmIterative
     '
     'btnInputRemove
     '
-    Me.btnInputRemove.Location = New System.Drawing.Point(80, 64)
+    Me.btnInputRemove.Location = New System.Drawing.Point(120, 64)
     Me.btnInputRemove.Name = "btnInputRemove"
     Me.btnInputRemove.Size = New System.Drawing.Size(56, 24)
     Me.btnInputRemove.TabIndex = 6
@@ -212,7 +219,7 @@ Public Class frmIterative
     '
     'btnInputModify
     '
-    Me.btnInputModify.Location = New System.Drawing.Point(152, 64)
+    Me.btnInputModify.Location = New System.Drawing.Point(184, 64)
     Me.btnInputModify.Name = "btnInputModify"
     Me.btnInputModify.Size = New System.Drawing.Size(48, 24)
     Me.btnInputModify.TabIndex = 7
@@ -220,7 +227,7 @@ Public Class frmIterative
     '
     'btnInputAdd
     '
-    Me.btnInputAdd.Location = New System.Drawing.Point(16, 64)
+    Me.btnInputAdd.Location = New System.Drawing.Point(8, 64)
     Me.btnInputAdd.Name = "btnInputAdd"
     Me.btnInputAdd.Size = New System.Drawing.Size(48, 24)
     Me.btnInputAdd.TabIndex = 5
@@ -263,6 +270,7 @@ Public Class frmIterative
     '
     'tabEndpoints
     '
+    Me.tabEndpoints.Controls.Add(Me.btnEndpointAddCligen)
     Me.tabEndpoints.Controls.Add(Me.lblAllResults)
     Me.tabEndpoints.Controls.Add(Me.chkSaveAll)
     Me.tabEndpoints.Controls.Add(Me.lstEndpoints)
@@ -306,7 +314,8 @@ Public Class frmIterative
     '
     'btnEndpointDown
     '
-    Me.btnEndpointDown.Location = New System.Drawing.Point(248, 64)
+    Me.btnEndpointDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnEndpointDown.Location = New System.Drawing.Point(288, 64)
     Me.btnEndpointDown.Name = "btnEndpointDown"
     Me.btnEndpointDown.Size = New System.Drawing.Size(24, 24)
     Me.btnEndpointDown.TabIndex = 16
@@ -314,7 +323,8 @@ Public Class frmIterative
     '
     'btnEndpointUp
     '
-    Me.btnEndpointUp.Location = New System.Drawing.Point(216, 64)
+    Me.btnEndpointUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnEndpointUp.Location = New System.Drawing.Point(256, 64)
     Me.btnEndpointUp.Name = "btnEndpointUp"
     Me.btnEndpointUp.Size = New System.Drawing.Size(24, 24)
     Me.btnEndpointUp.TabIndex = 15
@@ -322,7 +332,7 @@ Public Class frmIterative
     '
     'btnEndpointRemove
     '
-    Me.btnEndpointRemove.Location = New System.Drawing.Point(80, 64)
+    Me.btnEndpointRemove.Location = New System.Drawing.Point(120, 64)
     Me.btnEndpointRemove.Name = "btnEndpointRemove"
     Me.btnEndpointRemove.Size = New System.Drawing.Size(56, 24)
     Me.btnEndpointRemove.TabIndex = 13
@@ -330,7 +340,7 @@ Public Class frmIterative
     '
     'btnEndpointModify
     '
-    Me.btnEndpointModify.Location = New System.Drawing.Point(152, 64)
+    Me.btnEndpointModify.Location = New System.Drawing.Point(184, 64)
     Me.btnEndpointModify.Name = "btnEndpointModify"
     Me.btnEndpointModify.Size = New System.Drawing.Size(48, 24)
     Me.btnEndpointModify.TabIndex = 14
@@ -338,7 +348,7 @@ Public Class frmIterative
     '
     'btnEndpointAdd
     '
-    Me.btnEndpointAdd.Location = New System.Drawing.Point(16, 64)
+    Me.btnEndpointAdd.Location = New System.Drawing.Point(8, 64)
     Me.btnEndpointAdd.Name = "btnEndpointAdd"
     Me.btnEndpointAdd.Size = New System.Drawing.Size(48, 24)
     Me.btnEndpointAdd.TabIndex = 12
@@ -552,6 +562,23 @@ Public Class frmIterative
     Me.btnStop.Text = "Stop"
     Me.btnStop.Visible = False
     '
+    'btnInputAddCligen
+    '
+    Me.btnInputAddCligen.Location = New System.Drawing.Point(64, 64)
+    Me.btnInputAddCligen.Name = "btnInputAddCligen"
+    Me.btnInputAddCligen.Size = New System.Drawing.Size(48, 24)
+    Me.btnInputAddCligen.TabIndex = 11
+    Me.btnInputAddCligen.Text = "Cligen"
+    '
+    'btnEndpointAddCligen
+    '
+    Me.btnEndpointAddCligen.Location = New System.Drawing.Point(64, 64)
+    Me.btnEndpointAddCligen.Name = "btnEndpointAddCligen"
+    Me.btnEndpointAddCligen.Size = New System.Drawing.Size(48, 24)
+    Me.btnEndpointAddCligen.TabIndex = 19
+    Me.btnEndpointAddCligen.Text = "Cligen"
+    Me.btnEndpointAddCligen.Visible = False
+    '
     'frmIterative
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -574,6 +601,8 @@ Public Class frmIterative
   End Sub
 
 #End Region
+
+  Private Const CLIGEN_NAME As String = "Cligen"
 
   'all the variations listed in the Input tab
   Private pInputs As atcCollection
@@ -1065,12 +1094,39 @@ Public Class frmIterative
     End If
   End Sub
 
+  Private Sub btnInputAddCligen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputAddCligen.Click
+    Dim frmVary As New frmVariationCligen
+    Dim lVariation As New VariationCligen
+    With lVariation
+      .Name = CLIGEN_NAME
+      .ComputationSource = New atcTimeseriesMath.atcTimeseriesMath
+      .Operation = "Multiply"
+      .Min = 0.9
+      .Max = 1.1
+      .Increment = 0.1
+    End With
+    lVariation = frmVary.AskUser(lVariation)
+    If Not lVariation Is Nothing Then
+      If lVariation.Name.IndexOf(CLIGEN_NAME) < 0 Then lVariation.Name = CLIGEN_NAME & " " & lVariation.Name
+      lVariation.Selected = True
+      lVariation.CurrentValue = lVariation.Min
+      pInputs.Add(lVariation)
+      RefreshInputList()
+      RefreshTotalIterations()
+    End If
+  End Sub
+
   Private Sub btnInputModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputModify.Click
     Dim lIndex As Integer = lstInputs.SelectedIndex
     If lIndex >= 0 And lIndex < pInputs.Count Then
       Dim lVariation As Variation = pInputs.ItemByIndex(lIndex)
-      Dim frmVary As New frmVariation
-      lVariation = frmVary.AskUser(lVariation)
+      If lVariation.GetType.Name.EndsWith("Cligen") Then
+        Dim frmVaryCligen As New frmVariationCligen
+        lVariation = frmVaryCligen.AskUser(lVariation)
+      Else
+        Dim frmVary As New frmVariation
+        lVariation = frmVary.AskUser(lVariation)
+      End If
       If Not lVariation Is Nothing Then
         pInputs.RemoveAt(lIndex)
         pInputs.Insert(lIndex, lVariation)
@@ -1302,7 +1358,11 @@ Public Class frmIterative
               pInputs.Clear()
               If Not lChild Is Nothing Then
                 Do
-                  lVariation = New Variation
+                  If lChild.GetChildWithTag("Name").Content.IndexOf(CLIGEN_NAME) >= 0 Then
+                    lVariation = New VariationCligen
+                  Else
+                    lVariation = New Variation
+                  End If
                   lVariation.XML = lChild.GetXml
                   pInputs.Add(lVariation)
                 Loop While lChild.NextSibling2
@@ -1358,4 +1418,5 @@ Public Class frmIterative
   Private Sub lstEndpoints_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lstEndpoints.MouseUp
     EndpointSelectionFromList()
   End Sub
+
 End Class
