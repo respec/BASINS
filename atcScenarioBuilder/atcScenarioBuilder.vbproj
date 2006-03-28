@@ -201,6 +201,11 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "clsVariationCligen.vb"
+                    SubType = "Code"
+                    BuildAction = "Compile"
+                />
+                <File
                     RelPath = "frmEndpoint.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
@@ -231,12 +236,17 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
-                    RelPath = "modScenarioBuild.vb"
-                    SubType = "Code"
+                    RelPath = "frmVariationCligen.vb"
+                    SubType = "Form"
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "modScriptTest.vb"
+                    RelPath = "frmVariationCligen.resx"
+                    DependentUpon = "frmVariationCligen.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
+                    RelPath = "modScenarioBuild.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

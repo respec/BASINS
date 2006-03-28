@@ -37,8 +37,10 @@ Public Module modScenarioBuild
         'Update scenario name in new WDM
         Dim lCurrentTimeseries As atcTimeseries
         For Each lCurrentTimeseries In aModifiedData
-          lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
-          lNewWDM.AddDataSet(lCurrentTimeseries)
+          If Not lCurrentTimeseries Is Nothing Then
+            lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
+            lNewWDM.AddDataSet(lCurrentTimeseries)
+          End If
         Next
         For Each lCurrentTimeseries In lNewWDM.DataSets
           If lCurrentTimeseries.Attributes.GetValue("scenario").ToLower = "base" Then

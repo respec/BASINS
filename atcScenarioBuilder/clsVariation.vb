@@ -199,34 +199,45 @@ Public Class Variation
         Return ""
       Else
         Dim lXML As String = "  <DataSets count='" & DataSets.Count & "'>" & vbCrLf
-        For Each lDataSet As atcDataSet In DataSets
+        For lIndex As Integer = 0 To DataSets.Count - 1
+          Dim lDataSet As atcDataSet = DataSets.Item(lIndex)
+          Dim lDataKey As String = DataSets.Keys(lIndex)
           lXML &= "    <DataSet"
-          lXML &= " ID='" & lDataSet.Attributes.GetValue("ID") & "'"
-          lXML &= " Location='" & lDataSet.Attributes.GetValue("Location") & "'"
-          lXML &= " Constituent='" & lDataSet.Attributes.GetValue("Constituent") & "'"
+          If Not lDataSet Is Nothing Then
+            lXML &= " ID='" & lDataSet.Attributes.GetValue("ID") & "'"
+            lXML &= " Location='" & lDataSet.Attributes.GetValue("Location") & "'"
+            lXML &= " Constituent='" & lDataSet.Attributes.GetValue("Constituent") & "'"
+          End If
+          If Not lDataKey Is Nothing Then
+            lXML &= " Key='" & lDataKey & "'"
+          End If
           lXML &= " />" & vbCrLf
         Next
         Return lXML & "  </DataSets>" & vbCrLf
       End If
-
     End Get
+
     Set(ByVal newValue As String)
       Dim lXML As New Chilkat.Xml
       If lXML.LoadXml(newValue) Then
         DataSets = New atcDataGroup
         If lXML.FirstChild2() Then
           Do
+            Dim lKey As String = lXML.GetAttrValue("Key")
             Dim lID As String = lXML.GetAttrValue("ID")
             If lID.Length > 0 Then
               Dim lDataGroup As atcDataGroup = g_DataManager.DataSets.FindData("ID", lID, 1)
               If lDataGroup.Count > 0 Then
-                DataSets.Add(lDataGroup.ItemByIndex(0))
+                DataSets.Add(lKey, lDataGroup.ItemByIndex(0))
               Else
                 Logger.Msg("No data loaded with ID " & lID, "Variation from XML")
               End If
             Else
-              Logger.Msg("No data set ID found in XML", "Variation from XML")
-            End If
+              If lKey Is Nothing OrElse lKey.Length = 0 Then
+                Logger.Msg("No data set ID found in XML", "Variation from XML")
+              End If
+              DataSets.Add(lKey, Nothing)
+              End If
           Loop While lXML.NextSibling2
         End If
       End If

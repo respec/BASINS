@@ -29,10 +29,10 @@ Public Class atcTableDBF
   'on June 14, 1999, source was provided to Smith by Marc Hoogerwerf
   'contact Smith via: www.smithvoice.com/vbfun.htm
 
-  'This code was turned into a class by Mark.Gray@pobox.com March 14, 2001
+  'This code was turned into a class by Mark Gray at Aqua Terra March 14, 2001
   'modification and extensions continue through 2003
 
-  'Converted to VB.NET by Mark.Gray@pobox.com October 2004
+  'Converted to VB.NET by Mark Gray at Aqua Terra October 2004
 
   'dBaseIII file header, 32 bytes
   Private Class clsHeader
