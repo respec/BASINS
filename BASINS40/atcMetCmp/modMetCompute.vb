@@ -121,6 +121,41 @@ Public Module modMetCompute
 
   End Function
 
+  Public Function CmpCldFromSolar(ByVal aDSolTSer As atcTimeseries, ByVal aSource As atcDataSource, ByVal aLatDeg As Double) As atcTimeseries
+    'compute daily cloud cover based on daily solar radiation 
+    Dim i As Integer
+    Dim ldate(5) As Integer
+    Dim SolRad(aDSolTSer.numValues) As Double
+    Dim CldCov(aDSolTSer.numValues) As Double
+    Dim lCmpTs As New atcTimeseries(aSource)
+    Dim lPoint As Boolean = aDSolTSer.Attributes.GetValue("point", False)
+
+    CopyBaseAttributes(aDSolTSer, lCmpTs)
+    lCmpTs.Attributes.SetValue("Constituent", "DCLD")
+    lCmpTs.Attributes.SetValue("TSTYPE", "DCLD")
+    lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
+    lCmpTs.Attributes.SetValue("Description", "Daily Cloud Cover (0-10) computed from Daily Solar Radiation (Langleys)")
+    lCmpTs.Attributes.AddHistory("Computed Daily Cloud Cover - inputs: DSOL, Latitude")
+    lCmpTs.Attributes.Add("DSOL", aDSolTSer.ToString)
+    lCmpTs.Attributes.Add("Latitude", aLatDeg)
+    lCmpTs.Dates = aDSolTSer.Dates
+    lCmpTs.numValues = aDSolTSer.numValues
+    Array.Copy(aDSolTSer.Values, 1, SolRad, 1, aDSolTSer.numValues)
+
+    For i = 1 To lCmpTs.numValues
+      If lPoint Then
+        Call J2Date(aDSolTSer.Dates.Value(i), ldate)
+      Else
+        Call J2Date(aDSolTSer.Dates.Value(i - 1), ldate)
+      End If
+      Call CldClc(aLatDeg, SolRad(i), ldate(1), ldate(2), CldCov(i))
+    Next i
+    Array.Copy(CldCov, 1, lCmpTs.Values, 1, lCmpTs.numValues)
+
+    Return lCmpTs
+
+  End Function
+
   Public Function CmpJen(ByVal aTMinTS As atcTimeseries, ByVal aTMaxTS As atcTimeseries, ByVal aSRadTS As atcTimeseries, ByVal aSource As atcDataSource, ByVal aDegF As Boolean, ByVal aCTX As Double, ByVal aCTS() As Double) As atcTimeseries
     'compute JENSEN-HAISE - PET
     'aTMinTS/aTMaxTS - min/max temp timeseries
@@ -990,7 +1025,7 @@ Public Module modMetCompute
 
     Y100 = A0 + A1 * Math.Cos(x) + A2 * Math.Cos(2 * x) + A3 * Math.Cos(3 * x) + b1 * Math.Sin(x) + b2 * Math.Sin(2 * x)
 
-    ii = CEIL((SS + 10.0#) / 10.0#)
+    ii = Math.Ceiling((SS + 10.0#) / 10.0#)
 
     If aDegLat > 43.0# Then
       YRD = Lat3 * SS ^ Exp2 + Lat4
@@ -1010,18 +1045,75 @@ Public Module modMetCompute
 
   End Sub
 
-  Private Function CEIL(ByRef x As Double) As Integer
+  Private Sub CldClc(ByRef aDegLat As Double, ByRef aDayRad As Double, ByRef aMon As Integer, ByRef aDay As Integer, ByRef aCloud As Double)
 
-    'This routine returns the next higher integer
-    'from the input double precision argument X.
+    'This routine computes the daily cloud cover based on daily solar radiation.
+    'NOTE:  This routine makes what is likely a gross assumption - 
+    'that percent sun, and thus, cloud cover is essentially the ratio
+    'of actual solar radiation to potential max solar radiation.
+    'Max solar radiation is based on the above routine (RadClc), which uses
+    'the HSPII (Hydrocomp, 1978) RADIATION procedure, which is based
+    'on empirical curves of radiation as a function of latitude
+    '(Hamon et al, 1954, Monthly Weather Review 82(6):141-146.
 
-    If (x - CDbl(Fix(x))) <= 0.00001 Then
-      CEIL = Fix(x)
-    Else
-      CEIL = Fix(x) + 1
+    Dim ILat, ii As Integer
+    Dim Lat3, Lat1, Lat2, Lat4 As Double
+    Dim A1, b, Exp2, Exp1, a, A0, A2 As Double
+    Dim b2, A3, b1, Frac As Double
+    Dim SS, x As Double
+    Dim Y100, YRD As Double
+
+    'integer part of latitude
+    ILat = Int(aDegLat)
+
+    'fractional part of latitude
+    Frac = aDegLat - CSng(ILat)
+    If Frac <= 0.0001 Then Frac = 0.0#
+
+    A0 = XLax(ILat, 1) + Frac * (XLax(ILat + 1, 1) - XLax(ILat, 1))
+    A1 = XLax(ILat, 2) + Frac * (XLax(ILat + 1, 2) - XLax(ILat, 2))
+    A2 = XLax(ILat, 3) + Frac * (XLax(ILat + 1, 3) - XLax(ILat, 3))
+    A3 = XLax(ILat, 4) + Frac * (XLax(ILat + 1, 4) - XLax(ILat, 4))
+    b1 = XLax(ILat, 5) + Frac * (XLax(ILat + 1, 5) - XLax(ILat, 5))
+    b2 = XLax(ILat, 6) + Frac * (XLax(ILat + 1, 6) - XLax(ILat, 6))
+    b = aDegLat - 44.0#
+    a = aDegLat - 25.0#
+    Exp1 = 0.7575 - 0.0018 * a
+    Exp2 = 0.725 + 0.00288 * b
+    Lat1 = 2.139 + 0.0423 * a
+    Lat2 = 30.0# - 0.667 * a
+    Lat3 = 2.9 - 0.0629 * b
+    Lat4 = 18.0# + 0.833 * b
+
+    x = X1(aMon) + aDay
+    'convert to radians
+    x = x * 2.0# * 3.14159 / 360.0#
+
+    Y100 = A0 + A1 * Math.Cos(x) + A2 * Math.Cos(2 * x) + A3 * Math.Cos(3 * x) + b1 * Math.Sin(x) + b2 * Math.Sin(2 * x)
+
+    YRD = (aDayRad / Y100) * 100
+
+    'NOTE: here's where the ratio of Rad to Max Rad is used as %Sun
+    ii = Math.Ceiling((Math.Min(100, YRD) + 10.0#) / 10.0#)
+    If ii < 11 Then
+      YRD = YRD - c(ii, aMon)
     End If
 
-  End Function
+    If aDegLat > 43.0# Then
+      SS = Math.Pow(((YRD - Lat4) / Lat3), 1 / Exp2)
+    Else
+      SS = Math.Pow(((YRD - Lat2) / Lat1), 1 / Exp1)
+    End If
+
+    If SS < 0.0# Then
+      'can't have SS being negative
+      SS = 0.0#
+    End If
+    'get cloud cover from %sun
+    SS = 100.0# * (1.0# - (aCloud / 10.0#) ^ (5.0# / 3.0#))
+    aCloud = 10 * Math.Pow(-((SS / 100) - 1), 3 / 5)
+
+  End Sub
 
   Private Sub Jensen(ByVal aMon As Integer, ByVal aCTS() As Double, ByVal aAirTmp As Double, ByVal aDegF As Boolean, ByVal aCTX As Double, ByVal aSolRad As Double, ByRef aPanEvp As Double, ByRef aRetCod As Integer)
 
@@ -1724,7 +1816,7 @@ OuttaHere:
     Dim lPostSlope As Double
     Dim lPrevTotal As Double
     Dim lCurrTotal As Double
-    Dim lHrDay(23) As Double
+    Dim lHrDay(24) As Double
     Dim i As Integer
 
     CopyBaseAttributes(aDPrecTSer, lDisTs)
@@ -1756,7 +1848,8 @@ OuttaHere:
                      "Daily value: " & aDPrecTSer.Value(lDyInd) & vbCrLf & _
                      "Sum of Hourly values: " & lHrDay(0))
         End If
-        lEventDur = Int(aDurTSer.Value(lDyInd)) + 1
+        'subtract .001 for to make sure whole Dur value (e.g. 12.0) ends up as same duration length (e.g. 12)
+        lEventDur = Int(Math.Ceiling(aDurTSer.Value(lDyInd)))
         lEventStart = 12 - lEventDur / 2
         For i = 1 To lEventDur
           lHrInd = lHrPos + lEventStart + i
