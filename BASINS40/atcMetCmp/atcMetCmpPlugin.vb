@@ -67,6 +67,22 @@ Public Class atcMetCmpPlugin
           Dim lMetCmpTS As atcTimeseries = CmpSol(lCldTSer, Me, lLatitude)
           MyBase.DataSets.Add(lMetCmpTS)
         End If
+      Case "Cloud Cover from Solar"
+        If aArgs Is Nothing Then
+          'NOTE: Add interface to this some time???
+          'Dim lForm As New frmCmpSol
+          'lOk = lForm.AskUser(DataManager, lCldTSer, lLatitude)
+        Else
+          lSRadTSer = aArgs.GetValue("SRAD")
+          lLatitude = aArgs.GetValue("Latitude")
+          lOk = True
+        End If
+        lAttDef = atcDataAttributes.GetDefinition("Latitude")
+        If lOk And Not lSRadTSer Is Nothing And _
+          lLatitude >= lAttDef.Min And lLatitude <= lAttDef.Max Then
+          Dim lMetCmpTS As atcTimeseries = CmpCldFromSolar(lSRadTSer, Me, lLatitude)
+          MyBase.DataSets.Add(lMetCmpTS)
+        End If
       Case "Jensen PET"
         Dim lCTX As Double
         If aArgs Is Nothing Then
@@ -335,6 +351,25 @@ Public Class atcMetCmpPlugin
 
         lOperations.SetValue(lSolar, Nothing, lArguments)
 
+        Dim lCloud As New atcAttributeDefinition
+        With lCloud
+          .Name = "Cloud Cover from Solar"
+          .Category = "Computations"
+          .Description = "Generate Cloud Cover from Solar Radiation"
+          .Editable = False
+          .TypeString = "atcTimeseries"
+          .Calculator = Me
+        End With
+
+        Dim defSRadTS As New atcAttributeDefinition
+        defSRadTS = defTimeSeriesOne.Clone("SRAD", "Daily Solar Radiation (Langleys)")
+
+        lArguments = New atcDataAttributes
+        lArguments.SetValue(defSRadTS, Nothing)
+        lArguments.SetValue(defLat, Nothing)
+
+        lOperations.SetValue(lCloud, Nothing, lArguments)
+
         Dim defDegF As New atcAttributeDefinition
         With defDegF
           .Name = "Degrees F"
@@ -394,9 +429,6 @@ Public Class atcMetCmpPlugin
           .TypeString = "atcTimeseries"
           .Calculator = Me
         End With
-
-        Dim defSRadTS As New atcAttributeDefinition
-        defSRadTS = defTimeSeriesOne.Clone("SRAD", "Daily Solar Radiation (Langleys)")
 
         Dim defConstCoeff As New atcAttributeDefinition
         With defConstCoeff

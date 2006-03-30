@@ -131,8 +131,8 @@ Public Module modMetCompute
     Dim lPoint As Boolean = aDSolTSer.Attributes.GetValue("point", False)
 
     CopyBaseAttributes(aDSolTSer, lCmpTs)
-    lCmpTs.Attributes.SetValue("Constituent", "DCLD")
-    lCmpTs.Attributes.SetValue("TSTYPE", "DCLD")
+    lCmpTs.Attributes.SetValue("Constituent", "CLDC")
+    lCmpTs.Attributes.SetValue("TSTYPE", "CLDC")
     lCmpTs.Attributes.SetValue("Scenario", "COMPUTED")
     lCmpTs.Attributes.SetValue("Description", "Daily Cloud Cover (0-10) computed from Daily Solar Radiation (Langleys)")
     lCmpTs.Attributes.AddHistory("Computed Daily Cloud Cover - inputs: DSOL, Latitude")
