@@ -73,6 +73,9 @@ Public Class frmCliGen
   Friend WithEvents rdoPct As System.Windows.Forms.RadioButton
   Friend WithEvents fraStaParms As System.Windows.Forms.GroupBox
   Friend WithEvents btnReset As System.Windows.Forms.Button
+  Friend WithEvents lblData As System.Windows.Forms.Label
+  Friend WithEvents chkDaily As System.Windows.Forms.CheckBox
+  Friend WithEvents chkHourly As System.Windows.Forms.CheckBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCliGen))
     Me.fraStaParms = New System.Windows.Forms.GroupBox
@@ -97,6 +100,9 @@ Public Class frmCliGen
     Me.txtStartYear = New System.Windows.Forms.TextBox
     Me.txtParmFile = New System.Windows.Forms.TextBox
     Me.txtOutFile = New System.Windows.Forms.TextBox
+    Me.lblData = New System.Windows.Forms.Label
+    Me.chkDaily = New System.Windows.Forms.CheckBox
+    Me.chkHourly = New System.Windows.Forms.CheckBox
     Me.fraStaParms.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -315,10 +321,39 @@ Public Class frmCliGen
     Me.txtOutFile.TabIndex = 17
     Me.txtOutFile.Text = ""
     '
+    'lblData
+    '
+    Me.lblData.Location = New System.Drawing.Point(320, 112)
+    Me.lblData.Name = "lblData"
+    Me.lblData.Size = New System.Drawing.Size(216, 16)
+    Me.lblData.TabIndex = 18
+    Me.lblData.Text = "Select Data to be Available after Running:"
+    '
+    'chkDaily
+    '
+    Me.chkDaily.Checked = True
+    Me.chkDaily.CheckState = System.Windows.Forms.CheckState.Checked
+    Me.chkDaily.Location = New System.Drawing.Point(536, 104)
+    Me.chkDaily.Name = "chkDaily"
+    Me.chkDaily.Size = New System.Drawing.Size(176, 16)
+    Me.chkDaily.TabIndex = 19
+    Me.chkDaily.Text = "Original Daily Cligen"
+    '
+    'chkHourly
+    '
+    Me.chkHourly.Location = New System.Drawing.Point(536, 120)
+    Me.chkHourly.Name = "chkHourly"
+    Me.chkHourly.Size = New System.Drawing.Size(176, 16)
+    Me.chkHourly.TabIndex = 20
+    Me.chkHourly.Text = "Disaggregated Hourly"
+    '
     'frmCliGen
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(744, 493)
+    Me.Controls.Add(Me.chkHourly)
+    Me.Controls.Add(Me.chkDaily)
+    Me.Controls.Add(Me.lblData)
     Me.Controls.Add(Me.txtOutFile)
     Me.Controls.Add(Me.txtParmFile)
     Me.Controls.Add(Me.txtStartYear)
@@ -344,13 +379,20 @@ Public Class frmCliGen
 
 #End Region
 
-  Public Function AskUser(ByRef aParmFileName As String, ByRef aOutFileName As String, ByRef aStartYear As Integer, ByRef aNumYears As Integer) As Boolean
+  Public Function AskUser(ByRef aParmFileName As String, _
+                          ByRef aOutFileName As String, _
+                          ByRef aStartYear As Integer, _
+                          ByRef aNumYears As Integer, _
+                          ByRef aIncludeDaily As Boolean, _
+                          ByRef aIncludeHourly As Boolean) As Boolean
     Me.ShowDialog()
     If pOk Then
       aParmFileName = pParmFileName
       aOutFileName = pOutFileName
       aStartYear = pStartYear
       aNumYears = pNumYears
+      aIncludeDaily = chkDaily.Checked
+      aIncludeHourly = chkHourly.Checked
     End If
     Return pOk
   End Function
@@ -739,5 +781,9 @@ Public Class frmCliGen
 
   Private Sub btnReset_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnReset.Click
     LoadGrid()
+  End Sub
+
+  Private Sub chkDaily_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkDaily.CheckedChanged
+
   End Sub
 End Class

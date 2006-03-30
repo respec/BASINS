@@ -1110,7 +1110,6 @@ Public Module modMetCompute
       SS = 0.0#
     End If
     'get cloud cover from %sun
-    SS = 100.0# * (1.0# - (aCloud / 10.0#) ^ (5.0# / 3.0#))
     aCloud = 10 * Math.Pow(-((SS / 100) - 1), 3 / 5)
 
   End Sub
@@ -1822,7 +1821,7 @@ OuttaHere:
     CopyBaseAttributes(aDPrecTSer, lDisTs)
     lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
     lDisTs.Attributes.SetValue("ts", 1)
-    lDisTs.Attributes.SetValue("Scenario", "CLIGEN")
+    lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
     lDisTs.Attributes.SetValue("Constituent", "HPCP")
     lDisTs.Attributes.SetValue("TSTYPE", "HPCP")
     lDisTs.Attributes.SetValue("Description", "Hourly Precipitation disaggregated from Daily CliGen Precip")
