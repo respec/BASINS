@@ -280,6 +280,11 @@ StartOver:
             g_MapWin.StatusBar(1).Text = "Clipping Grid..."
             g_MapWin.Refresh()
             DoEvents()
+            If Not FileExists(FilenameNoExt(lCurFilename) & ".prj") Then
+              'create .prj file as work-around for clipping bug
+              SaveFileString(FilenameNoExt(lCurFilename) & ".prj", "")
+            End If
+            Logger.Dbg("ClipGridWithPolygon: " & lCurFilename & " " & lProjectDir & "nlcd\catextent.shp" & " " & lOutputFileName & " " & "True")
             lSuccess = MapWinX.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
             g_MapWin.StatusBar(1).Text = ""
           Case "project_dir"
