@@ -76,7 +76,7 @@ Public Class atcCligen
 
     If aArgs Is Nothing Then
       Dim lForm As New frmCliGen
-      lOk = lForm.AskUser(lParmFile, lOutFile, lSYr, lNYrs)
+      lOk = lForm.AskUser(lParmFile, lOutFile, lSYr, lNYrs, lIncDaily, lIncHourly)
     Else
       lParmFile = aArgs.GetValue("CliGen Parm")
       lOutFile = aArgs.GetValue("CliGen Out")
