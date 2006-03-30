@@ -6,7 +6,7 @@ Imports MapWinUtility
 Public Class VariationCligen
   Inherits Variation
 
-  Public Shared CligenConstituents As String() = {"HPCP", "EVAP", "ATMP", "WIND", "DEWP", "SOLR"}
+  Public Shared CligenConstituents As String() = {"HPCP", "EVAP", "ATMP", "WIND", "DEWP", "SOLR", "CLDC"}
 
   Public BaseParmFileName As String = "<click to select>"
   Public ParmToVary As String = "<click to select>"

@@ -234,7 +234,7 @@ Public Class frmVariationCligen
     'btnOk
     '
     Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnOk.Location = New System.Drawing.Point(96, 460)
+    Me.btnOk.Location = New System.Drawing.Point(96, 484)
     Me.btnOk.Name = "btnOk"
     Me.btnOk.Size = New System.Drawing.Size(72, 24)
     Me.btnOk.TabIndex = 18
@@ -243,7 +243,7 @@ Public Class frmVariationCligen
     'btnCancel
     '
     Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnCancel.Location = New System.Drawing.Point(184, 460)
+    Me.btnCancel.Location = New System.Drawing.Point(184, 484)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(72, 24)
     Me.btnCancel.TabIndex = 19
@@ -298,9 +298,9 @@ Public Class frmVariationCligen
     Me.agdCligenHSPF.CellBackColor = System.Drawing.Color.Empty
     Me.agdCligenHSPF.LineColor = System.Drawing.Color.Empty
     Me.agdCligenHSPF.LineWidth = 0.0!
-    Me.agdCligenHSPF.Location = New System.Drawing.Point(8, 296)
+    Me.agdCligenHSPF.Location = New System.Drawing.Point(8, 304)
     Me.agdCligenHSPF.Name = "agdCligenHSPF"
-    Me.agdCligenHSPF.Size = New System.Drawing.Size(335, 152)
+    Me.agdCligenHSPF.Size = New System.Drawing.Size(335, 168)
     Me.agdCligenHSPF.Source = Nothing
     Me.agdCligenHSPF.TabIndex = 26
     '
@@ -374,7 +374,7 @@ Public Class frmVariationCligen
     'frmVariationCligen
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(352, 493)
+    Me.ClientSize = New System.Drawing.Size(352, 517)
     Me.Controls.Add(Me.txtNumYears)
     Me.Controls.Add(Me.txtStartYear)
     Me.Controls.Add(Me.txtParameterFilename)

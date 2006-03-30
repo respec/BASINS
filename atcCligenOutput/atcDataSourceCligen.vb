@@ -4,6 +4,7 @@ Option Explicit On
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports atcMetCmp
 
 Imports Microsoft.VisualBasic
 Imports System.Collections
@@ -268,6 +269,15 @@ Public Class atcDataSourceCligen
           lTMin = lTsMath.DataSets(0)
           Logger.Dbg("Converted CliGen TMax data to Deg F")
         Case "RAD"
+          Logger.Dbg("Using Daily Solar Radiation to calculate Daily Cloud Cover")
+          lArgsMet.Clear()
+          lArgsMet.SetValue("SRAD", lDS)
+          lArgsMet.SetValue("Latitude", "38.85") 'latitude of Washington National
+          lDisTS.Open("Cloud Cover from Solar", lArgsMet)
+          Logger.Dbg("Cloud Cover from Solar Radiation complete, now disaggregate it to Hourly")
+          lts = Aggregate(lDisTS.DataSets(0), atcTimeUnit.TUHour, 1, atcTran.TranAverSame)
+          Logger.Dbg("Disaggregated Daily Cloud Cover to Hourly")
+          lDataGroup.Add(lts)
           Logger.Dbg("Disaggregating Daily Solar Radiation to Hourly")
           lArgsMet.Clear()
           lArgsMet.SetValue("SRAD", lDS)
