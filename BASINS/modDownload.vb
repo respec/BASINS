@@ -223,6 +223,10 @@ StartOver:
             lOutputFileName = lProjectorNode.Content
             If lDefaultsXML Is Nothing Then lDefaultsXML = GetDefaultsXML()
             AddGridToMW(lOutputFileName, GetDefaultsFor(lOutputFileName, lProjectDir, lDefaultsXML))
+            If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
+              'create .prj file as work-around for bug
+              SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
+            End If
           Case "add_allshapes"
             lOutputFileName = lProjectorNode.Content
             AddAllShapesInDir(lOutputFileName, lProjectDir)
@@ -322,6 +326,10 @@ StartOver:
               DoEvents()
               lSuccess = MapWinX.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
               g_MapWin.StatusBar(1).Text = ""
+              If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
+                'create .prj file as work-around for bug
+                SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
+              End If
               If Not lSuccess Then
                 Logger.Msg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
                 System.IO.File.Copy(lCurFilename, lOutputFileName)
