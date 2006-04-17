@@ -262,9 +262,13 @@ StartOver:
               'project the extents into the albers projection for nlcd
               MkDirPath(lProjectDir & "nlcd")
               If FileExists(lProjectDir & "nlcd\catextent.shp") Then
-                System.IO.File.Delete(lProjectDir & "nlcd\catextent.shp")
-                System.IO.File.Delete(lProjectDir & "nlcd\catextent.dbf")
-                System.IO.File.Delete(lProjectDir & "nlcd\catextent.shx")
+                Try
+                  System.IO.File.Delete(lProjectDir & "nlcd\catextent.shp")
+                  System.IO.File.Delete(lProjectDir & "nlcd\catextent.dbf")
+                  System.IO.File.Delete(lProjectDir & "nlcd\catextent.shx")
+                Catch e As Exception
+                  'Ignore error if files do not exist or can't be removed
+                End Try
               End If
               Dim lExtentsSf As New MapWinGIS.Shapefile
               lSuccess = lExtentsSf.CreateNew(lProjectDir & "nlcd\catextent.shp", ShpfileType.SHP_POLYGON)
@@ -771,6 +775,7 @@ StartOver:
       colorBreak.EndValue = 19
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(120, 120, 120))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
 
       colorBreak = New MapWinGIS.ShapefileColorBreak
@@ -779,6 +784,7 @@ StartOver:
       colorBreak.EndValue = 29
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 255, 0))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
 
       colorBreak = New MapWinGIS.ShapefileColorBreak
@@ -787,6 +793,7 @@ StartOver:
       colorBreak.EndValue = 39
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(146, 174, 47))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
 
       colorBreak = New MapWinGIS.ShapefileColorBreak
@@ -795,6 +802,7 @@ StartOver:
       colorBreak.EndValue = 49
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(161, 102, 50))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
 
       colorBreak = New MapWinGIS.ShapefileColorBreak
@@ -803,6 +811,7 @@ StartOver:
       colorBreak.EndValue = 59
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 0, 255))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
 
       colorBreak = New MapWinGIS.ShapefileColorBreak
@@ -811,6 +820,7 @@ StartOver:
       colorBreak.EndValue = 69
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(0, 209, 220))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
 
       colorBreak = New MapWinGIS.ShapefileColorBreak
@@ -819,6 +829,7 @@ StartOver:
       colorBreak.EndValue = 79
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(255, 255, 0))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
 
       colorBreak = New MapWinGIS.ShapefileColorBreak
@@ -827,6 +838,7 @@ StartOver:
       colorBreak.EndValue = 89
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(60, 105, 0))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
 
       colorBreak = New MapWinGIS.ShapefileColorBreak
@@ -835,9 +847,10 @@ StartOver:
       colorBreak.EndValue = 99
       colorBreak.StartColor = System.Convert.ToUInt32(RGB(210, 210, 210))
       colorBreak.EndColor = colorBreak.StartColor
+      colorBreak.ColoringType = ColoringType.Random
       colorScheme.Add(colorBreak)
+
       MWlay.ColoringScheme = colorScheme
-      'MWlay.Color = System.Drawing.Color.White
       MWlay.DrawFill = True
       MWlay.LineOrPointSize = 0
       MWlay.OutlineColor = System.Drawing.Color.Black
@@ -959,6 +972,7 @@ StartOver:
     Dim colorScheme As MapWinGIS.GridColorScheme
 
     colorScheme = New MapWinGIS.GridColorScheme
+    colorScheme.LightSourceIntensity = 0
 
     colorBreak = New MapWinGIS.GridColorBreak
     colorBreak.Caption = "Water"
@@ -966,6 +980,7 @@ StartOver:
     colorBreak.HighValue = 12
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 0, 255))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -974,6 +989,7 @@ StartOver:
     colorBreak.HighValue = 23
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 0, 255))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -982,6 +998,7 @@ StartOver:
     colorBreak.HighValue = 32
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 0, 0))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -990,6 +1007,7 @@ StartOver:
     colorBreak.HighValue = 33
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 128, 128))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -998,6 +1016,7 @@ StartOver:
     colorBreak.HighValue = 43
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 128, 0))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -1006,6 +1025,7 @@ StartOver:
     colorBreak.HighValue = 53
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 255, 0))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -1014,6 +1034,7 @@ StartOver:
     colorBreak.HighValue = 61
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -1022,6 +1043,7 @@ StartOver:
     colorBreak.HighValue = 71
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(128, 255, 128))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -1030,6 +1052,7 @@ StartOver:
     colorBreak.HighValue = 80
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -1038,6 +1061,7 @@ StartOver:
     colorBreak.HighValue = 81
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 128, 0))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -1046,6 +1070,7 @@ StartOver:
     colorBreak.HighValue = 85
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(255, 255, 0))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     colorBreak = New MapWinGIS.GridColorBreak
@@ -1054,6 +1079,7 @@ StartOver:
     colorBreak.HighValue = 92
     colorBreak.LowColor = System.Convert.ToUInt32(RGB(0, 255, 255))
     colorBreak.HighColor = colorBreak.LowColor
+    colorBreak.ColoringType = ColoringType.Random
     colorScheme.InsertBreak(colorBreak)
 
     MWlay.ColoringScheme = colorScheme
