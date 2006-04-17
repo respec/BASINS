@@ -9,7 +9,7 @@
             <Settings
                 ApplicationIcon = ""
                 AssemblyKeyContainerName = ""
-                AssemblyName = "atcScenarioBuilder"
+                AssemblyName = "atcClimateAssessmentTool"
                 AssemblyOriginatorKeyFile = ""
                 AssemblyOriginatorKeyMode = "None"
                 DefaultClientScript = "JScript"
@@ -181,16 +181,6 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcScenarioBuilderForm.vb"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcScenarioBuilderForm.resx"
-                    DependentUpon = "atcScenarioBuilderForm.vb"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
                     RelPath = "atcScenarioBuilderPlugin.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
@@ -206,6 +196,16 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "frmCAT.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmCAT.resx"
+                    DependentUpon = "frmCAT.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "frmEndpoint.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
@@ -213,16 +213,6 @@
                 <File
                     RelPath = "frmEndpoint.resx"
                     DependentUpon = "frmEndpoint.vb"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmIterative.vb"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmIterative.resx"
-                    DependentUpon = "frmIterative.vb"
                     BuildAction = "EmbeddedResource"
                 />
                 <File

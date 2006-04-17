@@ -19,4 +19,12 @@ Public Class atcSeasonsDayOfMonth
     Return pAllSeasons
   End Function
 
+  Public Overrides Property SeasonSelected(ByVal aSeasonIndex As Integer) As Boolean
+    Get
+      Return MyBase.SeasonSelected(aSeasonIndex - 1)
+    End Get
+    Set(ByVal newValue As Boolean)
+      MyBase.SeasonSelected(aSeasonIndex - 1) = newValue
+    End Set
+  End Property
 End Class

@@ -6,10 +6,14 @@ Imports MapWinUtility
 Public Class frmEndpoint
   Inherits System.Windows.Forms.Form
 
+  Private Const AllSeasons As String = "All Seasons"
+
   Private pNotNumberString As String = "<none>"
   Private pVariation As Variation
   Private pSeasonsAvailable As New atcCollection
   Private pSeasons As atcSeasonBase
+
+  Private pSettingFormSeason As Boolean = False
 
 #Region " Windows Form Designer generated code "
 
@@ -384,8 +388,11 @@ Public Class frmEndpoint
 #End Region
 
   Public Function AskUser(Optional ByVal aVariation As Variation = Nothing) As Variation
-    pVariation = aVariation.Clone
-    If pVariation Is Nothing Then pVariation = New Variation
+    If aVariation Is Nothing Then
+      pVariation = New Variation
+    Else
+      pVariation = aVariation.Clone
+    End If
     If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
     For Each lAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
@@ -394,7 +401,7 @@ Public Class frmEndpoint
       End If
     Next
 
-    cboSeasons.Items.Add("All Seasons")
+    cboSeasons.Items.Add(AllSeasons)
     pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
     For Each lSeasonType As Type In pSeasonsAvailable
       Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
@@ -407,43 +414,13 @@ Public Class frmEndpoint
       End Select
     Next
 
-    With pVariation
-      txtName.Text = .Name
-      UpdateDataText(txtData, pVariation.DataSets)
-      cboAttribute.Text = .Operation
+    FormFromVariation()
 
-      If Double.IsNaN(.Min) Then
-        txtMin.Text = pNotNumberString
-      Else
-        txtMin.Text = CStr(.Min)
-      End If
-      If Double.IsNaN(.Max) Then
-        txtMax.Text = pNotNumberString
-      Else
-        txtMax.Text = CStr(.Max)
-      End If
-
-      txtHighColor.BackColor = .ColorAboveMax
-      txtHighColor.Text = .ColorAboveMax.Name
-
-      txtLowColor.BackColor = .ColorBelowMin
-      txtLowColor.Text = .ColorBelowMin.Name
-
-      txtDefaultColor.BackColor = .ColorDefault
-      txtDefaultColor.Text = .ColorDefault.Name
-      If .Seasons Is Nothing Then
-        cboSeasons.SelectedIndex = 0
-      Else
-        cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
-        pSeasons = .Seasons
-        RefreshSeasonsList()
-      End If
-    End With
-
-    Me.ShowDialog()
-
-    Return pVariation
-
+    If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
+      Return pVariation
+    Else
+      Return Nothing
+    End If
   End Function
 
   Private Sub txtData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtData.Click
@@ -464,7 +441,7 @@ Public Class frmEndpoint
 
   Private Sub UpdateDataText(ByVal aTextBox As Windows.Forms.TextBox, _
                              ByVal aGroup As atcDataGroup)
-    If aGroup.Count > 0 Then
+    If Not aGroup Is Nothing AndAlso aGroup.Count > 0 Then
       aTextBox.Text = aGroup.ItemByIndex(0).ToString
       If aGroup.Count > 1 Then aTextBox.Text &= " (and " & aGroup.Count - 1 & " more)"
     Else
@@ -473,14 +450,21 @@ Public Class frmEndpoint
   End Sub
 
   Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
-    pSeasons = Nothing
-    Try
-      pSeasons = SelectedSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
-      pSeasons.SeasonsSelected.SetAll(True)
-      RefreshSeasonsList()
-    Catch ex As Exception
-      Logger.Dbg("Could not create new seasons for '" & cboSeasons.Text & "': " & ex.ToString)
-    End Try
+    If Not pSettingFormSeason Then
+      pSeasons = Nothing
+      lstSeasons.Items.Clear()
+      If cboSeasons.Text <> AllSeasons Then
+        Try
+          pSeasons = SelectedSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+          For Each lSeasonIndex As Integer In pSeasons.AllSeasons
+            pSeasons.SeasonSelected(lSeasonIndex) = True
+          Next
+          RefreshSeasonsList()
+        Catch ex As Exception
+          Logger.Dbg("Could not create new seasons for '" & cboSeasons.Text & "': " & ex.ToString)
+        End Try
+      End If
+    End If
   End Sub
 
   Private Sub RefreshSeasonsList()
@@ -491,6 +475,7 @@ Public Class frmEndpoint
         lstSeasons.SetSelected(lstSeasons.Items.Count - 1, pSeasons.SeasonSelected(lSeasonIndex))
       Next
       lstSeasons.TopIndex = 0
+      'Loop to check what was selected - removing this reveals a bug in the list control and it forgets what was selected
       For Each lSelectedIndex As Integer In lstSeasons.SelectedIndices
         Logger.Dbg("Selected " & lSelectedIndex & " = " & lstSeasons.Items(lSelectedIndex))
       Next
@@ -510,22 +495,49 @@ Public Class frmEndpoint
     Return Nothing
   End Function
 
+  Private Sub btnSeasonsAll_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSeasonsAll.Click
+    For iItem As Integer = lstSeasons.Items.Count - 1 To 0 Step -1
+      lstSeasons.SetSelected(iItem, True)
+    Next
+  End Sub
+
+  Private Sub btnSeasonsNone_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSeasonsNone.Click
+    For iItem As Integer = lstSeasons.Items.Count - 1 To 0 Step -1
+      lstSeasons.SetSelected(iItem, False)
+    Next
+  End Sub
+
   Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
-    pVariation = Nothing
+    Me.DialogResult = Windows.Forms.DialogResult.Cancel
     Me.Close()
   End Sub
 
   Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
     Try
-      With pVariation
+      If VariationFromForm(pVariation) Then
+        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.Close()
+      End If
+    Catch ex As Exception
+      Logger.Msg(ex.Message, "Could not create variation")
+    End Try
+  End Sub
+
+  Private Function VariationFromForm(ByVal aVariation) As Boolean
+    Try
+      With aVariation
         .Name = txtName.Text
         .Operation = cboAttribute.Text
         .Seasons = pSeasons
         If Not pSeasons Is Nothing Then
-          pSeasons.SeasonsSelected.SetAll(False)
-          Dim lSeasonIndexes As Integer() = pSeasons.AllSeasons
-          For Each lstIndex As Integer In lstSeasons.SelectedIndices
-            pSeasons.SeasonSelected(lSeasonIndexes(lstIndex)) = True
+          For lListIndex As Integer = 0 To lstSeasons.Items.Count - 1
+            Dim lSeasonName As String = lstSeasons.Items(lListIndex)
+            For Each lSeasonIndex As Integer In pSeasons.AllSeasons
+              If pSeasons.SeasonName(lSeasonIndex) = lSeasonName Then
+                pSeasons.SeasonSelected(lSeasonIndex) = lstSeasons.SelectedIndices.Contains(lListIndex)
+                Exit For
+              End If
+            Next
           Next
         End If
         Try
@@ -542,11 +554,12 @@ Public Class frmEndpoint
         .ColorBelowMin = txtLowColor.BackColor
         .ColorDefault = txtDefaultColor.BackColor
       End With
-      Me.Close()
     Catch ex As Exception
       Logger.Msg(ex.Message, "Could not create endpoint")
+      Return False
     End Try
-  End Sub
+    Return True
+  End Function
 
   Private Sub UserSelectColor(ByVal txt As Windows.Forms.TextBox)
     Dim cdlg As New Windows.Forms.ColorDialog
@@ -581,15 +594,39 @@ Public Class frmEndpoint
     UserSelectColor(txtLowColor)
   End Sub
 
-  Private Sub btnSeasonsAll_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSeasonsAll.Click
-    For iItem As Integer = lstSeasons.Items.Count - 1 To 0 Step -1
-      lstSeasons.SetSelected(iItem, True)
-    Next
-  End Sub
+  Private Sub FormFromVariation()
+    With pVariation
+      txtName.Text = .Name
+      cboAttribute.Text = .Operation
+      If Double.IsNaN(.Min) Then
+        txtMin.Text = pNotNumberString
+      Else
+        txtMin.Text = CStr(.Min)
+      End If
+      If Double.IsNaN(.Max) Then
+        txtMax.Text = pNotNumberString
+      Else
+        txtMax.Text = CStr(.Max)
+      End If
+      txtHighColor.BackColor = .ColorAboveMax
+      txtHighColor.Text = .ColorAboveMax.Name
 
-  Private Sub btnSeasonsNone_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSeasonsNone.Click
-    For iItem As Integer = lstSeasons.Items.Count - 1 To 0 Step -1
-      lstSeasons.SetSelected(iItem, False)
-    Next
+      txtLowColor.BackColor = .ColorBelowMin
+      txtLowColor.Text = .ColorBelowMin.Name
+
+      txtDefaultColor.BackColor = .ColorDefault
+      txtDefaultColor.Text = .ColorDefault.Name
+
+      UpdateDataText(txtData, pVariation.DataSets)
+      If .Seasons Is Nothing Then
+        cboSeasons.SelectedIndex = 0
+      Else
+        pSettingFormSeason = True
+        cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
+        pSeasons = .Seasons
+        RefreshSeasonsList()
+        pSettingFormSeason = False
+      End If
+    End With
   End Sub
 End Class

@@ -5,14 +5,14 @@ Public Class atcScenarioBuilderPlugin
 
   Public Overrides ReadOnly Property Name() As String
     Get
-      Return "Analysis::Climate Change Scenario"
+            Return "Analysis::Climate Assessment Tool"
     End Get
   End Property
 
   Public Overrides Function Show(ByVal aManager As atcDataManager, _
                    Optional ByVal aGroup As atcDataGroup = Nothing) As Object
     g_DataManager = aManager
-    Dim lForm As New frmIterative  'atcScenarioBuilderForm
+    Dim lForm As New frmCAT
     lForm.Initialize(aGroup)
     Return lForm
   End Function
