@@ -5,7 +5,7 @@ Imports MapWinUtility
 
 Imports System.Windows.Forms
 
-Public Class frmIterative
+Public Class frmCAT
   Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -88,9 +88,10 @@ Public Class frmIterative
   Friend WithEvents btnInputAddCligen As System.Windows.Forms.Button
   Friend WithEvents btnEndpointAddCligen As System.Windows.Forms.Button
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmIterative))
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCAT))
     Me.myTabs = New System.Windows.Forms.TabControl
     Me.tabInputs = New System.Windows.Forms.TabPage
+    Me.btnInputAddCligen = New System.Windows.Forms.Button
     Me.lstInputs = New System.Windows.Forms.CheckedListBox
     Me.btnInputDown = New System.Windows.Forms.Button
     Me.btnInputUp = New System.Windows.Forms.Button
@@ -102,6 +103,7 @@ Public Class frmIterative
     Me.lblBaseScenarioName = New System.Windows.Forms.Label
     Me.lblNewScenarioName = New System.Windows.Forms.Label
     Me.tabEndpoints = New System.Windows.Forms.TabPage
+    Me.btnEndpointAddCligen = New System.Windows.Forms.Button
     Me.lblAllResults = New System.Windows.Forms.Label
     Me.chkSaveAll = New System.Windows.Forms.CheckBox
     Me.lstEndpoints = New System.Windows.Forms.CheckedListBox
@@ -138,8 +140,6 @@ Public Class frmIterative
     Me.mnuPivotHeaders = New System.Windows.Forms.MenuItem
     Me.lblTop = New System.Windows.Forms.Label
     Me.btnStop = New System.Windows.Forms.Button
-    Me.btnInputAddCligen = New System.Windows.Forms.Button
-    Me.btnEndpointAddCligen = New System.Windows.Forms.Button
     Me.myTabs.SuspendLayout()
     Me.tabInputs.SuspendLayout()
     Me.tabEndpoints.SuspendLayout()
@@ -180,6 +180,14 @@ Public Class frmIterative
     Me.tabInputs.Size = New System.Drawing.Size(320, 238)
     Me.tabInputs.TabIndex = 0
     Me.tabInputs.Text = "Inputs"
+    '
+    'btnInputAddCligen
+    '
+    Me.btnInputAddCligen.Location = New System.Drawing.Point(64, 64)
+    Me.btnInputAddCligen.Name = "btnInputAddCligen"
+    Me.btnInputAddCligen.Size = New System.Drawing.Size(48, 24)
+    Me.btnInputAddCligen.TabIndex = 11
+    Me.btnInputAddCligen.Text = "Cligen"
     '
     'lstInputs
     '
@@ -284,6 +292,15 @@ Public Class frmIterative
     Me.tabEndpoints.Size = New System.Drawing.Size(320, 238)
     Me.tabEndpoints.TabIndex = 1
     Me.tabEndpoints.Text = "Endpoints"
+    '
+    'btnEndpointAddCligen
+    '
+    Me.btnEndpointAddCligen.Location = New System.Drawing.Point(64, 64)
+    Me.btnEndpointAddCligen.Name = "btnEndpointAddCligen"
+    Me.btnEndpointAddCligen.Size = New System.Drawing.Size(48, 24)
+    Me.btnEndpointAddCligen.TabIndex = 19
+    Me.btnEndpointAddCligen.Text = "Cligen"
+    Me.btnEndpointAddCligen.Visible = False
     '
     'lblAllResults
     '
@@ -562,24 +579,7 @@ Public Class frmIterative
     Me.btnStop.Text = "Stop"
     Me.btnStop.Visible = False
     '
-    'btnInputAddCligen
-    '
-    Me.btnInputAddCligen.Location = New System.Drawing.Point(64, 64)
-    Me.btnInputAddCligen.Name = "btnInputAddCligen"
-    Me.btnInputAddCligen.Size = New System.Drawing.Size(48, 24)
-    Me.btnInputAddCligen.TabIndex = 11
-    Me.btnInputAddCligen.Text = "Cligen"
-    '
-    'btnEndpointAddCligen
-    '
-    Me.btnEndpointAddCligen.Location = New System.Drawing.Point(64, 64)
-    Me.btnEndpointAddCligen.Name = "btnEndpointAddCligen"
-    Me.btnEndpointAddCligen.Size = New System.Drawing.Size(48, 24)
-    Me.btnEndpointAddCligen.TabIndex = 19
-    Me.btnEndpointAddCligen.Text = "Cligen"
-    Me.btnEndpointAddCligen.Visible = False
-    '
-    'frmIterative
+    'frmCAT
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
     Me.ClientSize = New System.Drawing.Size(328, 301)
@@ -589,8 +589,8 @@ Public Class frmIterative
     Me.Controls.Add(Me.btnStop)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Menu = Me.MainMenu1
-    Me.Name = "frmIterative"
-    Me.Text = "Iterative Analysis"
+    Me.Name = "frmCAT"
+    Me.Text = "Climate Assessment Tool"
     Me.myTabs.ResumeLayout(False)
     Me.tabInputs.ResumeLayout(False)
     Me.tabEndpoints.ResumeLayout(False)
@@ -617,8 +617,8 @@ Public Class frmIterative
   Private TimePerRun As Double = 0 'Time each run takes in seconds
 
   Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcDataGroup = Nothing)
-    mnuPivotHeaders.Checked = GetSetting("ScenarioBuilder", "Settings", "PivotHeaders", "Yes").Equals("Yes")
-    TimePerRun = CDbl(GetSetting("ScenarioBuilder", "Settings", "TimePerRun", "0"))
+    mnuPivotHeaders.Checked = GetSetting("BasinsCAT", "Settings", "PivotHeaders", "Yes").Equals("Yes")
+    TimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
     pInputs = New atcCollection
     pEndpoints = New atcCollection
     For Each lDataSource As atcDataSource In g_DataManager.DataSources
@@ -688,7 +688,7 @@ Public Class frmIterative
         lWDMFileName, _
         lRuns, 0, Nothing)
 
-    SaveSetting("ScenarioBuilder", "Settings", "TimePerRun", TimePerRun)
+    SaveSetting("BasinsCAT", "Settings", "TimePerRun", TimePerRun)
 
     PopulatePivotCombos()
     UpdateTopLabel("Finished with " & lRuns & " runs")
@@ -939,7 +939,7 @@ Public Class frmIterative
   Private Sub mnuLoadResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLoadResults.Click
     Dim lOpenDialog As New Windows.Forms.OpenFileDialog
     With lOpenDialog
-      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastResults", "Results.txt")
+      .FileName = GetSetting("BasinsCAT", "Settings", "LastResults", "Results.txt")
       .Filter = "Text files (*.txt)|*.txt|All files|*.*"
       .FilterIndex = 1
       .Title = "Scenario Builder - Load Results"
@@ -947,7 +947,7 @@ Public Class frmIterative
         If FileExists(.FileName) Then 'read file into grid
           PopulateResultsGrid(WholeFileString(.FileName))
           myTabs.SelectedIndex = ResultsTabIndex
-          SaveSetting("ScenarioBuilder", "Settings", "LastResults", .FileName)
+          SaveSetting("BasinsCAT", "Settings", "LastResults", .FileName)
         End If
       End If
     End With
@@ -981,9 +981,9 @@ Public Class frmIterative
   Private Sub mnuPivotHeaders_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuPivotHeaders.Click
     mnuPivotHeaders.Checked = Not mnuPivotHeaders.Checked
     If mnuPivotHeaders.Checked Then
-      DeleteSetting("ScenarioBuilder", "Settings", "PivotHeaders")
+      DeleteSetting("BasinsCAT", "Settings", "PivotHeaders")
     Else
-      SaveSetting("ScenarioBuilder", "Settings", "PivotHeaders", "No")
+      SaveSetting("BasinsCAT", "Settings", "PivotHeaders", "No")
     End If
   End Sub
 
@@ -1005,7 +1005,7 @@ Public Class frmIterative
     Else
       Dim lSaveDialog As New Windows.Forms.SaveFileDialog
       With lSaveDialog
-        .FileName = GetSetting("ScenarioBuilder", "Settings", "LastResults", "Results.txt")
+        .FileName = GetSetting("BasinsCAT", "Settings", "LastResults", "Results.txt")
         .Filter = "Text files (*.txt)|*.txt|All files|*.*"
         .FilterIndex = 1
         .Title = "Save Results as Tab-Delimited Text"
@@ -1013,7 +1013,7 @@ Public Class frmIterative
         If .ShowDialog() = Windows.Forms.DialogResult.OK Then
           'write file from grid contents
           SaveFileString(.FileName, agdResults.Source.ToString)
-          SaveSetting("ScenarioBuilder", "Settings", "LastResults", .FileName)
+          SaveSetting("BasinsCAT", "Settings", "LastResults", .FileName)
         End If
       End With
     End If
@@ -1022,7 +1022,7 @@ Public Class frmIterative
   Private Sub mnuSavePivot_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSavePivot.Click
     Dim lSaveDialog As New Windows.Forms.SaveFileDialog
     With lSaveDialog
-      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastPivot", "Pivot.txt")
+      .FileName = GetSetting("BasinsCAT", "Settings", "LastPivot", "Pivot.txt")
       .Filter = "Text files (*.txt)|*.txt|All files|*.*"
       .FilterIndex = 1
       .Title = "Save Pivot Table as Tab-Delimited Text"
@@ -1030,7 +1030,7 @@ Public Class frmIterative
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         'write file from grid contents
         SaveFileString(.FileName, PivotText)
-        SaveSetting("ScenarioBuilder", "Settings", "LastPivot", .FileName)
+        SaveSetting("BasinsCAT", "Settings", "LastPivot", .FileName)
       End If
     End With
   End Sub
@@ -1273,7 +1273,7 @@ Public Class frmIterative
   Private Sub mnuSaveVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSaveVariations.Click
     Dim lSaveDialog As New Windows.Forms.SaveFileDialog
     With lSaveDialog
-      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastIterativeSetup", "IterativeSetup.xml")
+      .FileName = GetSetting("BasinsCAT", "Settings", "LastSetup", "CAT.xml")
       .Filter = "XML files (*.xml)|*.xml|All files|*.*"
       .FilterIndex = 1
       .Title = "Save Variations as XML Text"
@@ -1281,14 +1281,14 @@ Public Class frmIterative
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         'write file from form contents
         SaveFileString(.FileName, (XML))
-        SaveSetting("ScenarioBuilder", "Settings", "LastIterativeSetup", .FileName)
+        SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
       End If
     End With
   End Sub
 
   Public Property XML() As String
     Get
-      Dim lXML As String = "<Iterative>" & vbCrLf
+      Dim lXML As String = "<BasinsCAT>" & vbCrLf
 
       lXML &= "<Wdm>" & vbCrLf
       For Each lScenario As String In cboBaseScenarioName.Items
@@ -1320,7 +1320,7 @@ Public Class frmIterative
       Next
       lXML &= "</Endpoints>" & vbCrLf
 
-      lXML &= "</Iterative>" & vbCrLf
+      lXML &= "</BasinsCAT>" & vbCrLf
 
       'Dim lCXML As New Chilkat.Xml
       'If lCXML.LoadXml(lXML) Then
@@ -1333,7 +1333,7 @@ Public Class frmIterative
 
     Set(ByVal aValue As String)
       Dim lXML As New Chilkat.Xml
-      If lXML.LoadXml(aValue) AndAlso lXML.Tag.ToLower.Equals("iterative") AndAlso lXML.FirstChild2 Then
+      If lXML.LoadXml(aValue) AndAlso lXML.Tag.ToLower.Equals("basinscat") AndAlso lXML.FirstChild2 Then
         Do
           Dim lVariation As Variation
           Dim lChild As Chilkat.Xml = lXML.FirstChild
@@ -1391,14 +1391,14 @@ Public Class frmIterative
   Private Sub mnuLoadVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuLoadVariations.Click
     Dim lOpenDialog As New Windows.Forms.OpenFileDialog
     With lOpenDialog
-      .FileName = GetSetting("ScenarioBuilder", "Settings", "LastIterativeSetup", "IterativeSetup.xml")
+      .FileName = GetSetting("BasinsCAT", "Settings", "LastSetup", "CAT.xml")
       .Filter = "XML files (*.xml)|*.xml|All files|*.*"
       .FilterIndex = 1
       .Title = "Scenario Builder - Load Variations"
       If .ShowDialog() = Windows.Forms.DialogResult.OK Then
         If FileExists(.FileName) Then
           XML = WholeFileString(.FileName)
-          SaveSetting("ScenarioBuilder", "Settings", "LastIterativeSetup", .FileName)
+          SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
         End If
       End If
     End With

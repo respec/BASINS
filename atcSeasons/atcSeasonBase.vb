@@ -195,7 +195,7 @@ Public Class atcSeasonBase
   End Sub
 
   'Seasons that have been selected are set to True
-  Public Overridable Property SeasonSelected(ByVal aSeasonIndex) As Boolean
+  Public Overridable Property SeasonSelected(ByVal aSeasonIndex As Integer) As Boolean
     Get
       If aSeasonIndex >= 0 AndAlso aSeasonIndex < pSeasonsSelected.Count Then
         Return pSeasonsSelected(aSeasonIndex)
@@ -212,7 +212,7 @@ Public Class atcSeasonBase
   End Property
 
   'Seasons that have been selected are set to True
-  Public Overridable Property SeasonsSelected() As BitArray
+  Protected Overridable Property SeasonsSelected() As BitArray
     Get
       Dim lNumSeasons As Integer = AllSeasons.GetLength(0)
       If pSeasonsSelected.Length < lNumSeasons Then pSeasonsSelected.Length = lNumSeasons
@@ -225,16 +225,20 @@ Public Class atcSeasonBase
 
   Public Function SeasonsSelectedString(Optional ByVal aXML As Boolean = False) As String
     Dim lSeasons As String = ""
-    Dim lastSeason As Integer = pSeasonsSelected.Count - 1
-    For lSeasonIndex As Integer = 0 To lastSeason
-      If pSeasonsSelected(lSeasonIndex) Then
+    Dim lIndexArray As Integer() = AllSeasons()
+    Dim lLastSeason As Integer = lIndexArray.GetUpperBound(0)
+    For i As Integer = 0 To lLastSeason
+      Dim lSeasonIndex As Integer = lIndexArray(i)
+      Dim lSeasonName As String = SeasonName(lSeasonIndex)
+      If SeasonSelected(lSeasonIndex) Then
         If aXML Then
-          lSeasons &= "  <Selected Name='" & SeasonName(lSeasonIndex) & "'>" & lSeasonIndex & "</Selected>" & vbCrLf
+          lSeasons &= "  <Selected Name='" & lSeasonName & "'>" & lSeasonIndex & "</Selected>" & vbCrLf
         Else
-          lSeasons &= SeasonName(lSeasonIndex) & " "
+          lSeasons &= lSeasonName & " "
         End If
       End If
     Next
+
     If aXML AndAlso lSeasons.Length > 0 Then lSeasons = "<SeasonsSelected>" & vbCrLf & lSeasons & "</SeasonsSelected>" & vbCrLf
     Return lSeasons
   End Function
@@ -245,7 +249,7 @@ Public Class atcSeasonBase
     End Get
     Set(ByVal newValue As String)
       Try
-        pSeasonsSelected.SetAll(False)
+        pSeasonsSelected.SetAll(False) 'TODO: not all season types use pSeasonsSelected, need to clear selection another way
         Dim lNextSelected As Integer = newValue.IndexOf("<Selected")
         While lNextSelected > -1
           lNextSelected = newValue.IndexOf(">", lNextSelected + 10) + 1

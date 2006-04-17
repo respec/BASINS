@@ -7,10 +7,14 @@ Imports MapWinUtility
 Public Class frmVariationCligen
   Inherits System.Windows.Forms.Form
 
+  Private Const AllSeasons As String = "All Seasons"
+
   Private pVariation As VariationCligen
   Private pSeasonsAvailable As New atcCollection
   Private pSeasons As atcSeasonBase
   Private pParmDescs As New atcCollection
+
+  Private pSettingFormSeason As Boolean = False
 
 #Region " Windows Form Designer generated code "
 
@@ -102,7 +106,7 @@ Public Class frmVariationCligen
     'lblFunction
     '
     Me.lblFunction.BackColor = System.Drawing.Color.Transparent
-    Me.lblFunction.Location = New System.Drawing.Point(24, 128)
+    Me.lblFunction.Location = New System.Drawing.Point(24, 112)
     Me.lblFunction.Name = "lblFunction"
     Me.lblFunction.Size = New System.Drawing.Size(64, 18)
     Me.lblFunction.TabIndex = 5
@@ -111,7 +115,7 @@ Public Class frmVariationCligen
     '
     'txtFunction
     '
-    Me.txtFunction.Location = New System.Drawing.Point(96, 128)
+    Me.txtFunction.Location = New System.Drawing.Point(96, 112)
     Me.txtFunction.Name = "txtFunction"
     Me.txtFunction.Size = New System.Drawing.Size(71, 20)
     Me.txtFunction.TabIndex = 6
@@ -119,7 +123,7 @@ Public Class frmVariationCligen
     '
     'txtIncrement
     '
-    Me.txtIncrement.Location = New System.Drawing.Point(96, 200)
+    Me.txtIncrement.Location = New System.Drawing.Point(96, 184)
     Me.txtIncrement.Name = "txtIncrement"
     Me.txtIncrement.Size = New System.Drawing.Size(71, 20)
     Me.txtIncrement.TabIndex = 12
@@ -129,7 +133,7 @@ Public Class frmVariationCligen
     '
     Me.lblIncrement.BackColor = System.Drawing.Color.Transparent
     Me.lblIncrement.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-    Me.lblIncrement.Location = New System.Drawing.Point(24, 200)
+    Me.lblIncrement.Location = New System.Drawing.Point(24, 184)
     Me.lblIncrement.Name = "lblIncrement"
     Me.lblIncrement.Size = New System.Drawing.Size(64, 17)
     Me.lblIncrement.TabIndex = 11
@@ -138,7 +142,7 @@ Public Class frmVariationCligen
     '
     'txtMax
     '
-    Me.txtMax.Location = New System.Drawing.Point(96, 176)
+    Me.txtMax.Location = New System.Drawing.Point(96, 160)
     Me.txtMax.Name = "txtMax"
     Me.txtMax.Size = New System.Drawing.Size(71, 20)
     Me.txtMax.TabIndex = 10
@@ -146,7 +150,7 @@ Public Class frmVariationCligen
     '
     'txtMin
     '
-    Me.txtMin.Location = New System.Drawing.Point(96, 152)
+    Me.txtMin.Location = New System.Drawing.Point(96, 136)
     Me.txtMin.Name = "txtMin"
     Me.txtMin.Size = New System.Drawing.Size(71, 20)
     Me.txtMin.TabIndex = 8
@@ -156,7 +160,7 @@ Public Class frmVariationCligen
     '
     Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
     Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-    Me.lblMaximum.Location = New System.Drawing.Point(24, 176)
+    Me.lblMaximum.Location = New System.Drawing.Point(24, 160)
     Me.lblMaximum.Name = "lblMaximum"
     Me.lblMaximum.Size = New System.Drawing.Size(64, 18)
     Me.lblMaximum.TabIndex = 9
@@ -167,7 +171,7 @@ Public Class frmVariationCligen
     '
     Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
     Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-    Me.lblMinimum.Location = New System.Drawing.Point(24, 152)
+    Me.lblMinimum.Location = New System.Drawing.Point(24, 136)
     Me.lblMinimum.Name = "lblMinimum"
     Me.lblMinimum.Size = New System.Drawing.Size(64, 18)
     Me.lblMinimum.TabIndex = 7
@@ -183,7 +187,7 @@ Public Class frmVariationCligen
     Me.grpSeasons.Controls.Add(Me.lstSeasons)
     Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
     Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
-    Me.grpSeasons.Location = New System.Drawing.Point(176, 120)
+    Me.grpSeasons.Location = New System.Drawing.Point(176, 104)
     Me.grpSeasons.Name = "grpSeasons"
     Me.grpSeasons.Size = New System.Drawing.Size(162, 168)
     Me.grpSeasons.TabIndex = 13
@@ -234,7 +238,7 @@ Public Class frmVariationCligen
     'btnOk
     '
     Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnOk.Location = New System.Drawing.Point(96, 484)
+    Me.btnOk.Location = New System.Drawing.Point(96, 460)
     Me.btnOk.Name = "btnOk"
     Me.btnOk.Size = New System.Drawing.Size(72, 24)
     Me.btnOk.TabIndex = 18
@@ -243,7 +247,7 @@ Public Class frmVariationCligen
     'btnCancel
     '
     Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnCancel.Location = New System.Drawing.Point(184, 484)
+    Me.btnCancel.Location = New System.Drawing.Point(184, 460)
     Me.btnCancel.Name = "btnCancel"
     Me.btnCancel.Size = New System.Drawing.Size(72, 24)
     Me.btnCancel.TabIndex = 19
@@ -252,18 +256,18 @@ Public Class frmVariationCligen
     'lblName
     '
     Me.lblName.BackColor = System.Drawing.Color.Transparent
-    Me.lblName.Location = New System.Drawing.Point(0, 24)
+    Me.lblName.Location = New System.Drawing.Point(0, 12)
     Me.lblName.Name = "lblName"
-    Me.lblName.Size = New System.Drawing.Size(111, 18)
+    Me.lblName.Size = New System.Drawing.Size(112, 18)
     Me.lblName.TabIndex = 1
-    Me.lblName.Text = "Variation Name:"
+    Me.lblName.Text = "Input Name:"
     Me.lblName.TextAlign = System.Drawing.ContentAlignment.TopRight
     '
     'txtName
     '
     Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtName.Location = New System.Drawing.Point(120, 16)
+    Me.txtName.Location = New System.Drawing.Point(120, 8)
     Me.txtName.Name = "txtName"
     Me.txtName.Size = New System.Drawing.Size(215, 20)
     Me.txtName.TabIndex = 2
@@ -272,9 +276,9 @@ Public Class frmVariationCligen
     'txtParameter
     '
     Me.txtParameter.BackColor = System.Drawing.Color.Transparent
-    Me.txtParameter.Location = New System.Drawing.Point(0, 72)
+    Me.txtParameter.Location = New System.Drawing.Point(0, 60)
     Me.txtParameter.Name = "txtParameter"
-    Me.txtParameter.Size = New System.Drawing.Size(111, 18)
+    Me.txtParameter.Size = New System.Drawing.Size(112, 18)
     Me.txtParameter.TabIndex = 21
     Me.txtParameter.Text = "Parameter to Vary:"
     Me.txtParameter.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -284,7 +288,7 @@ Public Class frmVariationCligen
     Me.cboParameter.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboParameter.ItemHeight = 13
-    Me.cboParameter.Location = New System.Drawing.Point(120, 64)
+    Me.cboParameter.Location = New System.Drawing.Point(120, 56)
     Me.cboParameter.MaxDropDownItems = 20
     Me.cboParameter.Name = "cboParameter"
     Me.cboParameter.Size = New System.Drawing.Size(215, 21)
@@ -298,18 +302,18 @@ Public Class frmVariationCligen
     Me.agdCligenHSPF.CellBackColor = System.Drawing.Color.Empty
     Me.agdCligenHSPF.LineColor = System.Drawing.Color.Empty
     Me.agdCligenHSPF.LineWidth = 0.0!
-    Me.agdCligenHSPF.Location = New System.Drawing.Point(8, 304)
+    Me.agdCligenHSPF.Location = New System.Drawing.Point(8, 288)
     Me.agdCligenHSPF.Name = "agdCligenHSPF"
-    Me.agdCligenHSPF.Size = New System.Drawing.Size(335, 168)
+    Me.agdCligenHSPF.Size = New System.Drawing.Size(335, 160)
     Me.agdCligenHSPF.Source = Nothing
     Me.agdCligenHSPF.TabIndex = 26
     '
     'lblParameterFilename
     '
     Me.lblParameterFilename.BackColor = System.Drawing.Color.Transparent
-    Me.lblParameterFilename.Location = New System.Drawing.Point(0, 48)
+    Me.lblParameterFilename.Location = New System.Drawing.Point(16, 36)
     Me.lblParameterFilename.Name = "lblParameterFilename"
-    Me.lblParameterFilename.Size = New System.Drawing.Size(111, 18)
+    Me.lblParameterFilename.Size = New System.Drawing.Size(96, 18)
     Me.lblParameterFilename.TabIndex = 27
     Me.lblParameterFilename.Text = "Parameter File:"
     Me.lblParameterFilename.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -318,7 +322,7 @@ Public Class frmVariationCligen
     '
     Me.txtParameterFilename.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtParameterFilename.Location = New System.Drawing.Point(120, 40)
+    Me.txtParameterFilename.Location = New System.Drawing.Point(120, 32)
     Me.txtParameterFilename.Name = "txtParameterFilename"
     Me.txtParameterFilename.Size = New System.Drawing.Size(215, 20)
     Me.txtParameterFilename.TabIndex = 28
@@ -326,7 +330,7 @@ Public Class frmVariationCligen
     '
     'txtNumYears
     '
-    Me.txtNumYears.Location = New System.Drawing.Point(96, 248)
+    Me.txtNumYears.Location = New System.Drawing.Point(96, 232)
     Me.txtNumYears.Name = "txtNumYears"
     Me.txtNumYears.Size = New System.Drawing.Size(71, 20)
     Me.txtNumYears.TabIndex = 32
@@ -334,7 +338,7 @@ Public Class frmVariationCligen
     '
     'txtStartYear
     '
-    Me.txtStartYear.Location = New System.Drawing.Point(96, 224)
+    Me.txtStartYear.Location = New System.Drawing.Point(96, 208)
     Me.txtStartYear.Name = "txtStartYear"
     Me.txtStartYear.Size = New System.Drawing.Size(71, 20)
     Me.txtStartYear.TabIndex = 30
@@ -344,7 +348,7 @@ Public Class frmVariationCligen
     '
     Me.Label2.BackColor = System.Drawing.Color.Transparent
     Me.Label2.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-    Me.Label2.Location = New System.Drawing.Point(24, 248)
+    Me.Label2.Location = New System.Drawing.Point(24, 232)
     Me.Label2.Name = "Label2"
     Me.Label2.Size = New System.Drawing.Size(64, 17)
     Me.Label2.TabIndex = 31
@@ -355,7 +359,7 @@ Public Class frmVariationCligen
     '
     Me.lblStartYear.BackColor = System.Drawing.Color.Transparent
     Me.lblStartYear.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-    Me.lblStartYear.Location = New System.Drawing.Point(24, 224)
+    Me.lblStartYear.Location = New System.Drawing.Point(24, 208)
     Me.lblStartYear.Name = "lblStartYear"
     Me.lblStartYear.Size = New System.Drawing.Size(64, 18)
     Me.lblStartYear.TabIndex = 29
@@ -365,16 +369,16 @@ Public Class frmVariationCligen
     'lblParameterDescription
     '
     Me.lblParameterDescription.BackColor = System.Drawing.Color.Transparent
-    Me.lblParameterDescription.Location = New System.Drawing.Point(121, 88)
+    Me.lblParameterDescription.Location = New System.Drawing.Point(121, 80)
     Me.lblParameterDescription.Name = "lblParameterDescription"
-    Me.lblParameterDescription.Size = New System.Drawing.Size(215, 18)
+    Me.lblParameterDescription.Size = New System.Drawing.Size(215, 16)
     Me.lblParameterDescription.TabIndex = 33
     Me.lblParameterDescription.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
     '
     'frmVariationCligen
     '
     Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(352, 517)
+    Me.ClientSize = New System.Drawing.Size(352, 493)
     Me.Controls.Add(Me.txtNumYears)
     Me.Controls.Add(Me.txtStartYear)
     Me.Controls.Add(Me.txtParameterFilename)
@@ -400,7 +404,7 @@ Public Class frmVariationCligen
     Me.Controls.Add(Me.lblParameterDescription)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmVariationCligen"
-    Me.Text = "Variation"
+    Me.Text = "Generate Input With Cligen"
     Me.grpSeasons.ResumeLayout(False)
     Me.ResumeLayout(False)
 
@@ -417,7 +421,7 @@ Public Class frmVariationCligen
 
     FindAllCligenParameters()
 
-    cboSeasons.Items.Add("All Seasons")
+    cboSeasons.Items.Add(AllSeasons)
     pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
     For Each lSeasonType As Type In pSeasonsAvailable
       Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
@@ -459,14 +463,21 @@ Public Class frmVariationCligen
   End Sub
 
   Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
-    pSeasons = Nothing
-    Try
-      pSeasons = SelectedSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
-      pSeasons.SeasonsSelected.SetAll(True)
-      RefreshSeasonsList()
-    Catch ex As Exception
-      Logger.Dbg("Could not create new seasons for '" & cboSeasons.Text & "': " & ex.ToString)
-    End Try
+    If Not pSettingFormSeason Then
+      pSeasons = Nothing
+      lstSeasons.Items.Clear()
+      If cboSeasons.Text <> AllSeasons Then
+        Try
+          pSeasons = SelectedSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
+          For Each lSeasonIndex As Integer In pSeasons.AllSeasons
+            pSeasons.SeasonSelected(lSeasonIndex) = True
+          Next
+          RefreshSeasonsList()
+        Catch ex As Exception
+          Logger.Dbg("Could not create new seasons for '" & cboSeasons.Text & "': " & ex.ToString)
+        End Try
+      End If
+    End If
   End Sub
 
   Private Sub RefreshSeasonsList()
@@ -477,6 +488,7 @@ Public Class frmVariationCligen
         lstSeasons.SetSelected(lstSeasons.Items.Count - 1, pSeasons.SeasonSelected(lSeasonIndex))
       Next
       lstSeasons.TopIndex = 0
+      'Loop to check what was selected - removing this reveals a bug in the list control and it forgets what was selected
       For Each lSelectedIndex As Integer In lstSeasons.SelectedIndices
         Logger.Dbg("Selected " & lSelectedIndex & " = " & lstSeasons.Items(lSelectedIndex))
       Next
@@ -496,11 +508,6 @@ Public Class frmVariationCligen
     Return Nothing
   End Function
 
-  Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
-    Me.DialogResult = Windows.Forms.DialogResult.Cancel
-    Me.Close()
-  End Sub
-
   Private Sub btnSeasonsAll_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSeasonsAll.Click
     For iItem As Integer = lstSeasons.Items.Count - 1 To 0 Step -1
       lstSeasons.SetSelected(iItem, True)
@@ -511,6 +518,11 @@ Public Class frmVariationCligen
     For iItem As Integer = lstSeasons.Items.Count - 1 To 0 Step -1
       lstSeasons.SetSelected(iItem, False)
     Next
+  End Sub
+
+  Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+    Me.DialogResult = Windows.Forms.DialogResult.Cancel
+    Me.Close()
   End Sub
 
   Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
@@ -535,10 +547,14 @@ Public Class frmVariationCligen
       .Operation = txtFunction.Text
       .Seasons = pSeasons
       If Not pSeasons Is Nothing Then
-        pSeasons.SeasonsSelected.SetAll(False)
-        Dim lSeasonIndexes As Integer() = pSeasons.AllSeasons
-        For Each lstIndex As Integer In lstSeasons.SelectedIndices
-          pSeasons.SeasonSelected(lSeasonIndexes(lstIndex)) = True
+        For lListIndex As Integer = 0 To lstSeasons.Items.Count - 1
+          Dim lSeasonName As String = lstSeasons.Items(lListIndex)
+          For Each lSeasonIndex As Integer In pSeasons.AllSeasons
+            If pSeasons.SeasonName(lSeasonIndex) = lSeasonName Then
+              pSeasons.SeasonSelected(lSeasonIndex) = lstSeasons.SelectedIndices.Contains(lListIndex)
+              Exit For
+            End If
+          Next
         Next
       End If
 
@@ -580,9 +596,11 @@ Public Class frmVariationCligen
       If .Seasons Is Nothing Then
         cboSeasons.SelectedIndex = 0
       Else
+        pSettingFormSeason = True
         cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
         pSeasons = .Seasons
         RefreshSeasonsList()
+        pSettingFormSeason = False
       End If
     End With
   End Sub

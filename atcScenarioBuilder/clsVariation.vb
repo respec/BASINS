@@ -295,8 +295,8 @@ Public Class Variation
 
   Public Overrides Function ToString() As String
     Dim retStr As String = Name & " " & Operation
-    If Not Double.IsNaN(Min) Then retStr &= " from " & Format(Min, "0.0")
-    If Not Double.IsNaN(Max) Then retStr &= " to " & Format(Max, "0.0")
+    If Not Double.IsNaN(Min) Then retStr &= " from " & Format(Min, "0.00")
+    If Not Double.IsNaN(Max) Then retStr &= " to " & Format(Max, "0.00")
     If Not Double.IsNaN(Increment) Then retStr &= " step " & Format(Increment, "0.0")
     If Not Seasons Is Nothing Then
       retStr &= " " & atcSeasons.atcSeasonPlugin.SeasonClassNameToLabel(Seasons.GetType.Name) _
