@@ -288,14 +288,18 @@ Public Class atcDataSourceWDM
 
       aDataSet.Attributes.CalculateAll()
 
+      Dim lWdmHandle As New atcWdmHandle(0, Specification)
+      Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
+
       Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
-      If Not aExistAction = ExistReplace Then
+      If aExistAction = ExistReplace Then
+        Dim lRet As Integer
+        F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
+        Logger.Dbg("atcDataSourceWdm:RemoveOld:" & lDsn & ":" & lret)
+      Else
         lDsn = findNextDsn(lDsn)
         aDataSet.Attributes.SetValue("Id", lDsn)
       End If
-
-      Dim lWdmHandle As New atcWdmHandle(0, Specification)
-      Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
 
       If DsnBld(lWdmHandle.Unit, lTimser) Then
         MyBase.AddDataSet(lTimser)
