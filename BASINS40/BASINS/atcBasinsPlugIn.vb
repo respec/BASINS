@@ -534,8 +534,6 @@ Public Class atcBasinsPlugIn
   End Sub
 
   Public Sub LegendDoubleClick(ByVal Handle As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendDoubleClick
-    Dim r As New frmRange
-    r.Show()
     'This event fires when a user double-clicks a layer in the legend.
   End Sub
 
