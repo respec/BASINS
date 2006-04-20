@@ -1090,7 +1090,7 @@ Public Class frmModelSetup
       .Columns = 5
       .CellValue(0, 0) = "Code"
       .CellValue(0, 1) = "Group Description"
-      .CellValue(0, 2) = "Percent Pervious"
+      .CellValue(0, 2) = "Impervious Percent"
       .CellValue(0, 3) = "Multiplier"
       .CellValue(0, 4) = "Subbasin"
       .ColorCells = True
@@ -1330,7 +1330,7 @@ Public Class frmModelSetup
             If UCase(Microsoft.VisualBasic.Left(GisUtil.FieldValue(layerindex, j, i), 5)) = "URBAN" Then
               .CellValue(.Rows - 1, 2) = 50
             Else
-              .CellValue(.Rows - 1, 2) = 100
+              .CellValue(.Rows - 1, 2) = 0
             End If
             .CellEditable(.Rows - 1, 2) = True
             cUnique.Add(GisUtil.FieldValue(layerindex, j, i))
@@ -1724,12 +1724,12 @@ ErrHand:
 
     'are any streams selected?
     StreamsThemeName = cboStreams.Items(cboStreams.SelectedIndex)
-    StreamsFieldName = cboSub1.Items(cboStream1.SelectedIndex)
+    StreamsFieldName = cboStream1.Items(cboStream1.SelectedIndex)
     StreamsLayerIndex = GisUtil.LayerIndex(StreamsThemeName)
     StreamsFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, StreamsFieldName)
     Dim cSelectedStreams As New Collection
     For i = 1 To GisUtil.NumSelectedFeatures(StreamsLayerIndex)
-      cSelectedStreams.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i, StreamsLayerIndex))
+      cSelectedStreams.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, StreamsLayerIndex))
     Next
     If cSelectedStreams.Count <> 1 Then
       MsgBox("BASINS AQUATOX requires one and only one selected stream segment.", MsgBoxStyle.Critical, "BASINS AQUATOX Problem")
@@ -1841,7 +1841,7 @@ ErrHand:
     Dim OutFile As Integer
     Dim i As Integer, j As Integer, k As Integer
     Dim incollection As Boolean
-    Dim percentperv As Double
+    Dim percentimperv As Double
     Dim tarea As Double, stype As String
     Dim tmpDbf As IatcTable
     Dim PerArea(,) As Single
@@ -1933,7 +1933,7 @@ ErrHand:
         'find percent perv that corresponds to this lugroup
         For j = 1 To AtcGridPervious.Source.Rows
           If luname = AtcGridPervious.Source.CellValue(j, 1) Then
-            percentperv = AtcGridPervious.Source.CellValue(j, 2)
+            percentimperv = AtcGridPervious.Source.CellValue(j, 2)
             Exit For
           End If
         Next j
@@ -1945,8 +1945,8 @@ ErrHand:
           End If
         Next j
 
-        PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * percentperv / 100)
-        ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * (100 - percentperv) / 100)
+        PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * (100 - percentimperv) / 100)
+        ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * percentimperv / 100)
         length(spos) = 0.0
         slope(spos) = cSubslope(i) / 100.0
 
@@ -1971,7 +1971,7 @@ ErrHand:
           lpos = -1
           If cLucode(i) = AtcGridPervious.Source.CellValue(j, 0) Then
             'see if any of these are subbasin-specific
-            percentperv = AtcGridPervious.Source.CellValue(j, 2)
+            percentimperv = AtcGridPervious.Source.CellValue(j, 2)
             If IsNumeric(AtcGridPervious.Source.CellValue(j, 3)) Then
               multiplier = CSng(AtcGridPervious.Source.CellValue(j, 3))
             Else
@@ -2024,8 +2024,8 @@ ErrHand:
             End If
 
             If lpos > 0 Then
-              PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * multiplier * percentperv / 100)
-              ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * multiplier * (100 - percentperv) / 100)
+              PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * multiplier * (100 - percentimperv) / 100)
+              ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * multiplier * percentimperv / 100)
               length(spos) = 0.0 'were not computing lsur since winhspf does that
               slope(spos) = cSubslope(i) / 100.0
             End If
