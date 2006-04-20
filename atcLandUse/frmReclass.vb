@@ -254,7 +254,7 @@ Public Class frmReclass
       .CellValue(0, 1) = "Description"
       .CellValue(0, 2) = "Area Percent"
       .CellValue(0, 3) = "Group"
-      .CellValue(0, 4) = "% Pervious"
+      .CellValue(0, 4) = "Impervious%"
       .CellValue(0, 5) = "Multiplier"
       .CellValue(0, 6) = "Subbasin"
       .ColorCells = True
@@ -762,7 +762,7 @@ Public Class frmReclass
       tmpDbf.FieldName(2) = "Landuse"
       tmpDbf.FieldType(2) = "C"
       tmpDbf.FieldLength(2) = 30
-      tmpDbf.FieldName(3) = "Pervious"
+      tmpDbf.FieldName(3) = "Impervious%"
       tmpDbf.FieldType(3) = "C"
       tmpDbf.FieldLength(3) = 10
       tmpDbf.FieldName(4) = "Multiplier"
