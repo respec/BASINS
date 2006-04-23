@@ -7,6 +7,7 @@ Public Class frmVariation
   Inherits System.Windows.Forms.Form
 
   Private Const AllSeasons As String = "All Seasons"
+    Private Const pClickMe As String = "<click to specify>"
 
   Private pVariation As Variation
   Private pSeasonsAvailable As New atcCollection
@@ -364,12 +365,12 @@ Public Class frmVariation
 
   Private Sub txtFunction_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtFunction.Click
     Dim aCategory As New ArrayList(1)
-    aCategory.Add("Compute")
+        aCategory.Add("Generate Timeseries")
     pVariation.ComputationSource = g_DataManager.UserSelectDataSource(aCategory, "Select Function for Varying Input Data")
     If pVariation.ComputationSource Is Nothing Then
-      txtFunction.Text = "<click to specify>"
+            txtFunction.Text = pClickMe
     Else
-      txtFunction.Text = pVariation.ComputationSource.ToString
+            txtFunction.Text = pVariation.ComputationSource.Specification
     End If
   End Sub
 
@@ -379,7 +380,7 @@ Public Class frmVariation
       aTextBox.Text = aGroup.ItemByIndex(0).ToString
       If aGroup.Count > 1 Then aTextBox.Text &= " (and " & aGroup.Count - 1 & " more)"
     Else
-      aTextBox.Text = "<click to select data>"
+            aTextBox.Text = pClickMe
     End If
   End Sub
 
@@ -457,9 +458,17 @@ Public Class frmVariation
     End Try
   End Sub
 
-  Private Function VariationFromForm(ByVal aVariation) As Boolean
+    Private Function VariationFromForm(ByVal aVariation As Variation) As Boolean
     With aVariation
       .Name = txtName.Text
+            If txtVaryData.Text.Equals(pClickMe) Then
+                Logger.Msg("No data was selected", "Need Data To Vary")
+                Return False
+            End If
+            If txtFunction.Text.Equals(pClickMe) Then
+                Logger.Msg("No function was selected", "Need Function")
+                Return False
+            End If
       .Operation = txtFunction.Text
       .Seasons = pSeasons
       If Not pSeasons Is Nothing Then

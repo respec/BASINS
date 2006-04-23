@@ -8,6 +8,7 @@ Public Class frmVariationCligen
   Inherits System.Windows.Forms.Form
 
   Private Const AllSeasons As String = "All Seasons"
+    Private Const pClickMe As String = "<click to specify>"
 
   Private pVariation As VariationCligen
   Private pSeasonsAvailable As New atcCollection
@@ -326,7 +327,7 @@ Public Class frmVariationCligen
     Me.txtParameterFilename.Name = "txtParameterFilename"
     Me.txtParameterFilename.Size = New System.Drawing.Size(215, 20)
     Me.txtParameterFilename.TabIndex = 28
-    Me.txtParameterFilename.Text = "<click to select>"
+        Me.txtParameterFilename.Text = "<click to specify>"
     '
     'txtNumYears
     '
@@ -453,12 +454,12 @@ Public Class frmVariationCligen
 
   Private Sub txtFunction_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtFunction.Click
     Dim aCategory As New ArrayList(1)
-    aCategory.Add("Compute")
+        aCategory.Add("Generate Timeseries")
     pVariation.ComputationSource = g_DataManager.UserSelectDataSource(aCategory, "Select Function for Varying Input Data")
     If pVariation.ComputationSource Is Nothing Then
-      txtFunction.Text = "<click to specify>"
+            txtFunction.Text = pClickMe
     Else
-      txtFunction.Text = pVariation.ComputationSource.ToString
+      txtFunction.Text = pVariation.ComputationSource.Specification
     End If
   End Sub
 
@@ -621,7 +622,7 @@ Public Class frmVariationCligen
         Dim lDataset As atcDataSet = pVariation.DataSets.ItemByKey(lCligenParm)
         .CellValue(lRow, 0) = lCligenParm
         If lDataset Is Nothing Then
-          .CellValue(lRow, 1) = "<click to select data>"
+                    .CellValue(lRow, 1) = pClickMe
         Else
           .CellValue(lRow, 1) = lDataset.ToString
         End If

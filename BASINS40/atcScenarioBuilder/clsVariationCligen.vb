@@ -21,15 +21,14 @@ Public Class VariationCligen
   End Sub
 
   Protected Overrides Function VaryData() As atcData.atcDataGroup
-    Dim lHeader As String
-    Dim lFooter As String
-    Dim lTable As atcTableFixed
+    Dim lHeader As String = Nothing
+    Dim lFooter As String = Nothing
+    Dim lTable As atcTableFixed = Nothing
     Dim lArgs As New atcDataAttributes
     Dim lCliGen As New atcCligen.atcCligen
     If ReadParmFile(BaseParmFileName, lHeader, lTable, lFooter) Then
       Dim lTempParmFileName As String = System.IO.Path.GetTempFileName()
       Dim lTempOutputFileName As String = System.IO.Path.GetTempFileName()
-      Dim lNewVal As Double
       lTable.FindFirst(1, ParmToVary)
       For iMon As Integer = 2 To 13
         'Vary each monthly value unless it is in a non-selected season
@@ -73,6 +72,7 @@ Public Class VariationCligen
       End Try
       Return Me.DataSets
     End If
+    Return Nothing
   End Function
 
   Public Overrides Property XML() As String

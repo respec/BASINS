@@ -61,6 +61,8 @@ Public Class atcTimeseriesStatistics
 
         AddOperation("Sum", "Summation of all values", defTimeSeriesOne, lCategory)
 
+        AddOperation("SumAnnual", "Average annual value from summation of all values", defTimeSeriesOne, lCategory)
+
         AddOperation("Mean", "Sum of all values divided by number of values", _
                      defTimeSeriesOne, lCategory)
 
@@ -175,6 +177,8 @@ Public Class atcTimeseriesStatistics
         aTimeseries.Attributes.SetValue("Max", lMax)
         aTimeseries.Attributes.SetValue("Min", lMin)
         aTimeseries.Attributes.SetValue("Sum", lSum)
+        Dim lYearSpan As Double = (aTimeseries.Dates.Value(lLastValueIndex) - aTimeseries.Dates.Value(0)) / 365.25
+        aTimeseries.Attributes.SetValue("SumAnnual", lSum / lYearSpan)
         lMean = lSum / lCount
         aTimeseries.Attributes.SetValue("Mean", lMean)
         If lMin > 0 Then

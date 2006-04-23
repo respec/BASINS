@@ -202,16 +202,23 @@ Public Class Variation
         For lIndex As Integer = 0 To DataSets.Count - 1
           Dim lDataSet As atcDataSet = DataSets.Item(lIndex)
           Dim lDataKey As String = DataSets.Keys(lIndex)
-          lXML &= "    <DataSet"
           If Not lDataSet Is Nothing Then
+            lXML &= "    <DataSet"
             lXML &= " ID='" & lDataSet.Attributes.GetValue("ID") & "'"
-            lXML &= " Location='" & lDataSet.Attributes.GetValue("Location") & "'"
-            lXML &= " Constituent='" & lDataSet.Attributes.GetValue("Constituent") & "'"
+            If lDataSet.Attributes.ContainsAttribute("History 1") Then
+              lXML &= " History='" & lDataSet.Attributes.GetValue("History 1") & "'"
+            End If
+            If lDataSet.Attributes.ContainsAttribute("Location") Then
+              lXML &= " Location='" & lDataSet.Attributes.GetValue("Location") & "'"
+            End If
+            If lDataSet.Attributes.ContainsAttribute("Constituent") Then
+              lXML &= " Constituent='" & lDataSet.Attributes.GetValue("Constituent") & "'"
+            End If
+            If Not lDataKey Is Nothing Then
+              lXML &= " Key='" & lDataKey & "'"
+            End If
+            lXML &= " />" & vbCrLf
           End If
-          If Not lDataKey Is Nothing Then
-            lXML &= " Key='" & lDataKey & "'"
-          End If
-          lXML &= " />" & vbCrLf
         Next
         Return lXML & "  </DataSets>" & vbCrLf
       End If
@@ -225,19 +232,39 @@ Public Class Variation
           Do
             Dim lKey As String = lXML.GetAttrValue("Key")
             Dim lID As String = lXML.GetAttrValue("ID")
+            Dim lHistory As String = lXML.GetAttrValue("History")
             If lID.Length > 0 Then
-              Dim lDataGroup As atcDataGroup = g_DataManager.DataSets.FindData("ID", lID, 1)
+              Dim lDataGroup As atcDataGroup = Nothing
+              If lHistory.Length > 10 Then
+                Dim lSourceSpecification As String = lHistory.Substring(10).ToLower
+                For Each lDataSource As atcDataSource In g_DataManager.DataSources
+                  If lDataSource.Specification.ToLower.Equals(lSourceSpecification) Then
+                    lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
+                    If lDataGroup.Count > 0 Then
+                      Logger.Dbg("Found data set #" & lID & " in " & lSourceSpecification)
+                      Exit For
+                    Else
+                      lDataGroup = Nothing
+                    End If
+                  End If
+                Next
+              End If
+              If lDataGroup Is Nothing Then
+                lDataGroup = g_DataManager.DataSets.FindData("ID", lID, 2)
+              End If
               If lDataGroup.Count > 0 Then
+                Logger.Dbg("Found data set #" & lID & " without a specification")
+                If lDataGroup.Count > 1 Then Logger.Dbg("Warning: more than one data set matched ID " & lID)
                 DataSets.Add(lKey, lDataGroup.ItemByIndex(0))
               Else
-                Logger.Msg("No data loaded with ID " & lID, "Variation from XML")
+                Logger.Msg("No data found with ID " & lID, "Variation from XML")
               End If
             Else
               If lKey Is Nothing OrElse lKey.Length = 0 Then
-                Logger.Msg("No data set ID found in XML", "Variation from XML")
+                Logger.Dbg("No data set ID found in XML, skipping: ", lXML.GetXml)
               End If
               DataSets.Add(lKey, Nothing)
-              End If
+            End If
           Loop While lXML.NextSibling2
         End If
       End If

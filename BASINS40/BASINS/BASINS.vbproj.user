@@ -15,7 +15,7 @@
                     StartPage = ""
                     StartProgram = "C:\dev\BASINS40\Bin\MapWindow.exe"
                     StartURL = ""
-                    StartWorkingDirectory = "C:\test\BASINS4\scripts\"
+                    StartWorkingDirectory = "D:\basins\data"
                     StartWithIE = "true"
                 />
                 <Config

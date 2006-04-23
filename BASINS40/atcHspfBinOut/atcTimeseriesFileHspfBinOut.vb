@@ -187,6 +187,7 @@ Public Class atcTimeseriesFileHspfBinOut
             .Attributes.SetValue("IDSCEN", FilenameOnly(Specification))
             .Attributes.SetValue("IDLOCN", Left(lBinHeader.id.OperationName, 1) & ":" & (lBinHeader.id.OperationNumber))
             .Attributes.SetValue("IDCONS", lBinHeader.VarNames.ItemByIndex(j))
+            .Attributes.SetValue("ID", Me.DataSets.Count)
             If lBinHeader.VarNames.ItemByIndex(j) = "LZS" Then 'TODO: need better check here
               .Attributes.SetValue("Point", True)
             End If

@@ -165,6 +165,11 @@
                     Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
                     Private = "False"
                 />
+                <Reference
+                    Name = "atcHspfBinOut"
+                    Project = "{61FAB3D2-9A2D-4D0A-BC4D-41C499DBE4B9}"
+                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
+                />
             </References>
             <Imports>
                 <Import Namespace = "Microsoft.VisualBasic" />
