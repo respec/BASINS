@@ -389,5 +389,6 @@ Public Class frmReport
       '  Logger.Msg("atcReport:" & lTitle2 & vbCrLf & lProblem, "BASINS Report Problem")
       'End If
     Next
+    Return lAllReports
   End Function
 End Class

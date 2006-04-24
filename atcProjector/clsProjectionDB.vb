@@ -29,8 +29,8 @@ Public Class ProjectionDB
   End Property
 
   Private Function OpenProjectionDatabase() As IatcTable
+    OpenProjectionDatabase = Nothing
     Dim dbFilename As String
-
     Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
     dbFilename = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "etc\atcprj.dbf"
     If Not FileExists(dbFilename) Then
@@ -125,7 +125,6 @@ Public Class ProjectionDB
                                  ByVal D4 As String, _
                                  ByVal D5 As String, _
                                  ByVal D6 As String)
-    Dim id As Integer
     Dim tmpDBF As atcTable
     tmpDBF = OpenProjectionDatabase()
 

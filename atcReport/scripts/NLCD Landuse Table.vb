@@ -11,12 +11,12 @@ Public Module NLCDLanduseTable
   Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
                              ByVal aAreaIDFieldIndex As Integer, _
                              ByVal aAreaNameFieldIndex As Integer, _
-                             ByVal aSelectedAreaIndexes As Collection)
+                             ByVal aSelectedAreaIndexes As Collection) As Object
 
     Dim i As Integer
     Dim lLanduseLayerIndex As Integer
     Dim lProblem As String = ""
-    Dim lGridSource = New atcGridSource
+    Dim lGridSource As New atcGridSource
 
     'find appropriate lu grid layer
     For i = 0 To GisUtil.NumLayers() - 1

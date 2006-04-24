@@ -136,7 +136,7 @@ Public Class atcMetCmpPlugin
           MyBase.DataSets.Add(lMetCmpTS)
         End If
       Case "Penman Pan Evaporation"
-        Dim lDewPTSer As atcTimeseries
+        Dim lDewPTSer As atcTimeseries = Nothing
         If aArgs Is Nothing Then
           Dim lForm As New frmCmpPenman
           lOk = lForm.AskUser(DataManager, lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer)
@@ -273,8 +273,8 @@ Public Class atcMetCmpPlugin
           MyBase.DataSets.Add(lMetCmpTS)
         End If
       Case "Dewpoint"
-        Dim lDewPTSer As atcTimeseries
-        Dim lATmpTSer As atcTimeseries
+        Dim lDewPTSer As atcTimeseries = Nothing
+        Dim lATmpTSer As atcTimeseries = Nothing
         If aArgs Is Nothing Then
           '          Dim lForm As New frmDisTemp
           '         lOk = lForm.AskUser(DataManager, lTMinTSer, lTMaxTSer, lObsTime)

@@ -49,7 +49,6 @@ Public Class atcDataSourceSWATDBF
 
   Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
     Dim lData As atcTimeseries
-    Dim lDates As atcTimeseries
 
     If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
       aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
@@ -72,7 +71,6 @@ Public Class atcDataSourceSWATDBF
         Dim lNCons As Integer = 0
         Dim lConsName As String
         Dim lDate As Double = 0
-        Dim s As String
 
         lDBF = New atcTableDBF
         lDBF.OpenFile(aFileName)

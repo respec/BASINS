@@ -275,6 +275,7 @@ Public Class atcSeasonBase
     For i As Integer = 0 To lLastSeason
       lSeasonNames(i) = SeasonName(lIndexArray(i))
     Next
+    Return lSeasonNames
   End Function
 
   Public Overridable Function SeasonIndex(ByVal aDate As Double) As Integer

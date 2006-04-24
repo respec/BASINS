@@ -123,7 +123,6 @@ Public Module modTimeseriesMath
     Dim lNextIndex() As Integer
     Dim lNextDate() As Double
     Dim lOldValue As Double
-    Dim lValueAttributes As atcDataAttributes
 
     ReDim lNextIndex(aGroup.Count - 1)
     ReDim lNextDate(aGroup.Count - 1)
@@ -268,11 +267,6 @@ Public Module modTimeseriesMath
     'aFillVal - Value to Fill data gaps with.
     'aMissVal - Value indicating missing data.
     'aAccumVal - Value indicating accumulated data.
-    Dim lIntvl As Double
-    Dim lVarLength As Integer
-    Dim lNVals As Integer
-    Dim lSJDay As Double
-    Dim lEJDay As Double
     Dim lDate(5) As Integer
     Dim lNewNumVals As Integer
     Dim lNewInd As Integer
@@ -495,7 +489,6 @@ Public Module modTimeseriesMath
 
     Dim lNewDates() As Double
     Dim lIntvl As Double
-    Dim lVarLength As Integer
     Dim lSJDay As Double
     Dim lEJDay As Double
     Dim lNewNumDates As Integer

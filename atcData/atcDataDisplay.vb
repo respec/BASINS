@@ -5,6 +5,7 @@ Public Class atcDataDisplay
   ''' <summary>Show the specified data interactively.</summary>
   Public Overridable Function Show(ByVal aDataManager As atcData.atcDataManager, _
                    Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
+    Return Nothing
   End Function
 
   ''' <summary>Save contents of data display to specified file</summary>

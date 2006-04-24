@@ -172,7 +172,6 @@ ErrHand:
       NumRecords = pNumRecords
     End Get
     Set(ByVal Value As Integer)
-      Dim iBlank As Integer
       If Value > pNumRecords Then
         pNumRecords = Value
         'Expand the record array capacity
@@ -353,7 +352,6 @@ ErrHand:
 
   'Read a stream into the table
   Public Function OpenStream(ByVal aStream As Stream) As Boolean
-    Dim inFile As Short
     Dim iRec As Integer
     Dim curLine As String
     Dim inReader As New BinaryReader(aStream)
@@ -450,8 +448,8 @@ ErrHand:
   'Returns Nothing if already at end of file
   Private Function NextLine(ByVal aReader As BinaryReader) As String
     Dim ch As Char
+    NextLine = Nothing
     Try
-      NextLine = Nothing
 ReadCharacter:
       ch = aReader.ReadChar
       Select Case ch
@@ -477,12 +475,12 @@ ReadCharacter:
   End Function
 
   Public Overrides Function CreationCode() As String
-
+    Return ("")
   End Function
 
   Public Overrides Property FieldType(ByVal aFieldNumber As Integer) As String
     Get
-
+      Return ("")
     End Get
     Set(ByVal Value As String)
 

@@ -1,6 +1,5 @@
 Imports atcData
 Imports atcUtility
-Imports MapWinUtility
 
 Friend Class atcFrequencyGridSource
   Inherits atcControls.atcGridSource

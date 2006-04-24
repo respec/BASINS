@@ -50,7 +50,6 @@ Public Class atcDataSourceBasinsObsWQ
 
   Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
     Dim lData As atcTimeseries
-    Dim lDates As atcTimeseries
 
     If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
       aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)

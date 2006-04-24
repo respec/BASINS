@@ -52,7 +52,6 @@ Public Class atcDataSourceCligen
 
   Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aArgs As atcData.atcDataAttributes = Nothing) As Boolean
     Dim lData As atcTimeseries
-    Dim lDates As atcTimeseries
 
     If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
       aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
@@ -84,7 +83,6 @@ Public Class atcDataSourceCligen
         Dim lJDate As Double
         Dim lDate() As Integer = {0, 0, 0, 24, 0, 0}
         Dim i As Integer
-        Dim s As String
         With lTable
           .NumFields = 13
           .NumHeaderRows = 15

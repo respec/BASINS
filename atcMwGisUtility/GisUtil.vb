@@ -604,7 +604,9 @@ Public Class GisUtil
     Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
     If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
       Throw New Exception("GisUtil:FieldValue:Error:FieldIndex:" & aFieldIndex & ":OutOfRange:0:" & lSf.NumFields - 1)
-    ElseIf FeatureIndexValid(aFeatureIndex, lSf) Then
+    ElseIf Not FeatureIndexValid(aFeatureIndex, lSf) Then
+      Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aFeatureIndex & ":OutOfRange")
+    Else
       Dim lCellValue As Object = lSf.CellValue(aFieldIndex, aFeatureIndex)
       If lCellValue.GetType.Name = "DBNull" Then
         Return Nothing

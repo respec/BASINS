@@ -264,8 +264,8 @@ Public Class atcDataSourceWDM
     End Select
   End Function
 
-  Public Overrides Function AddDataset(ByRef aDataSet As atcData.atcDataSet, _
-                                       Optional ByRef aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
+  Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
+                              Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                        As Boolean
     Logger.Dbg("atcDataSourceWdm:AddDataset:entry")
     Try

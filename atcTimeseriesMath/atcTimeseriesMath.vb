@@ -197,7 +197,7 @@ Public Class atcTimeseriesMath
     Dim newVals() As Double
     'Dim retval As New atcTimeseries(newDataSource)
     Dim iTS As Integer
-    Dim curTS As atcTimeseries
+    Dim curTS As atcTimeseries = Nothing
     Dim firstTS As atcTimeseries
     Dim needToAsk As Boolean = False
     'Dim lSelectedOperation As atcDataSet
@@ -510,10 +510,10 @@ Public Class atcTimeseriesMath
 
   'Should only be used within Open routine since results of computations are all that should get added
   'Appends a new history entry to track this computation
-  Public Overrides Function AddDataSet(ByRef t As atcData.atcDataSet, Optional ByRef ExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
-    t.Attributes.SetValue("Data Source", Specification)
-    t.Attributes.AddHistory(Specification)
-    MyBase.AddDataSet(t)
+  Public Overrides Function AddDataSet(ByVal aDataSet As atcData.atcDataSet, Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
+    aDataSet.Attributes.SetValue("Data Source", Specification)
+    aDataSet.Attributes.AddHistory(Specification)
+    MyBase.AddDataSet(aDataSet, aExistAction)
   End Function
 
 End Class

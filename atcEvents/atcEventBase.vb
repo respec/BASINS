@@ -10,7 +10,6 @@ Public Module atcEventBase
     Dim lNewGroup As New atcDataGroup
     Dim lEventIndex As Integer = 0
     Dim lNewTS As atcTimeseries
-    Dim lNewTSvalueIndex As Integer
     Dim lPoint As Boolean = aTS.Attributes.GetValue("point", False)
     Dim lInEvent As Boolean = False
     Dim lSPos As Integer

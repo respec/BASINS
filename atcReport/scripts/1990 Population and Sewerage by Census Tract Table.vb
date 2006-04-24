@@ -11,7 +11,7 @@ Public Module Population1990Table
   Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
                              ByVal aAreaIDFieldIndex As Integer, _
                              ByVal aAreaNameFieldIndex As Integer, _
-                             ByVal aSelectedAreaIndexes As Collection)
+                             ByVal aSelectedAreaIndexes As Collection) As Object
 
     Dim i As Integer
     Dim lTractLayerIndex As Long
@@ -24,7 +24,7 @@ Public Module Population1990Table
     Dim lProblem As String = ""
 
     'build grid source for results
-    Dim lGridSource = New atcGridSource
+    Dim lGridSource As New atcGridSource
     With lGridSource
       .Rows = 1
       .Columns = 9
@@ -68,15 +68,15 @@ Public Module Population1990Table
           For i = 1 To GisUtil.NumFeatures(lTractLayerIndex)
             If GisUtil.OverlappingPolygons(lTractLayerIndex, i - 1, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
               'these overlap
-              lGridSource.rows = lGridSource.rows + 1
-              lGridSource.CellValue(lGridSource.rows - 1, 0) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaIDFieldIndex)
-              lGridSource.CellValue(lGridSource.rows - 1, 1) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaNameFieldIndex)
-              lGridSource.CellValue(lGridSource.rows - 1, 2) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lTractNameFieldIndex)
-              lGridSource.CellValue(lGridSource.rows - 1, 3) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lTractPopulationFieldIndex)
-              lGridSource.CellValue(lGridSource.rows - 1, 4) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lHouseUnitsFieldIndex)
-              lGridSource.CellValue(lGridSource.rows - 1, 5) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lPublicFieldIndex)
-              lGridSource.CellValue(lGridSource.rows - 1, 6) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lSepticFieldIndex)
-              lGridSource.CellValue(lGridSource.rows - 1, 7) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lOtherFieldIndex)
+              lGridSource.Rows = lGridSource.Rows + 1
+              lGridSource.CellValue(lGridSource.Rows - 1, 0) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaIDFieldIndex)
+              lGridSource.CellValue(lGridSource.Rows - 1, 1) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaNameFieldIndex)
+              lGridSource.CellValue(lGridSource.Rows - 1, 2) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lTractNameFieldIndex)
+              lGridSource.CellValue(lGridSource.Rows - 1, 3) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lTractPopulationFieldIndex)
+              lGridSource.CellValue(lGridSource.Rows - 1, 4) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lHouseUnitsFieldIndex)
+              lGridSource.CellValue(lGridSource.Rows - 1, 5) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lPublicFieldIndex)
+              lGridSource.CellValue(lGridSource.Rows - 1, 6) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lSepticFieldIndex)
+              lGridSource.CellValue(lGridSource.Rows - 1, 7) = GisUtil.FieldValue(lTractLayerIndex, i - 1, lOtherFieldIndex)
               'what percent of this tract is in this area?
               larea = GisUtil.AreaOverlappingPolygons(lTractLayerIndex, i - 1, aAreaLayerIndex, aSelectedAreaIndexes(j))
               lareat = GisUtil.FeatureArea(lTractLayerIndex, i - 1)
@@ -85,7 +85,7 @@ Public Module Population1990Table
               Else
                 larea = 0.0
               End If
-              lGridSource.CellValue(lGridSource.rows - 1, 8) = Format(larea, "0.0")
+              lGridSource.CellValue(lGridSource.Rows - 1, 8) = Format(larea, "0.0")
             End If
           Next i
         Next j

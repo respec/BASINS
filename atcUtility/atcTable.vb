@@ -39,6 +39,7 @@ End Interface
 
 Public Class atcTableOpener
   Public Shared Function OpenAnyTable(ByVal filename As String) As IatcTable
+    OpenAnyTable = Nothing
     Select Case LCase(System.IO.Path.GetExtension(filename))
       Case ".dbf" : OpenAnyTable = New atcTableDBF
         'Case "abt": Set OpenFile = New clsATCTableBin
@@ -156,9 +157,6 @@ Public MustInherit Class atcTable
   'A summary of the file
   Public Overridable Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String Implements IatcTable.SummaryFile
     Dim retval As String
-    Dim iTrash As Short
-    Dim ShowTrash As Boolean
-    Dim ShowHeaders As Boolean
 
     If LCase(aFormat) = "text" Then 'text version
       retval = "    FileName: " & FileName & vbCrLf
@@ -173,7 +171,7 @@ Public MustInherit Class atcTable
 
   'A summary of the fields (names, types, lengths)
   Public Overridable Function SummaryFields(Optional ByVal aFormat As String = "tab,headers,expandtype") As String Implements IatcTable.SummaryFields
-    Dim retval As String
+    Dim retval As String = ""
     Dim iField As Integer
     Dim ShowTrash As Boolean
     Dim ShowHeaders As Boolean

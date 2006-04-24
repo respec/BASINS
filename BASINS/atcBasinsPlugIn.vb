@@ -215,7 +215,7 @@ Public Class atcBasinsPlugIn
           'build it
           Dim exename As String = FindFile("Please locate BasinsArchive.exe", "\BASINS\etc\basinsarchive\BasinsArchive.exe")
           If Len(exename) > 0 Then
-            Dim Exec_Str = exename & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
+            Dim Exec_Str As String = exename & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
             Shell(Exec_Str, AppWinStyle.NormalFocus, False)
           End If
         End If
@@ -337,7 +337,7 @@ Public Class atcBasinsPlugIn
   End Property
 
   Private Function LaunchTool(ByVal aToolName As String) As Boolean ', Optional ByVal aCmdLine As String = "") As Boolean
-    Dim exename As String
+    Dim exename As String = ""
     Select Case aToolName
       Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
       Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")

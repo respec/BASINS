@@ -452,15 +452,12 @@ Public Class frmWelcomeScreenBasins
       lProjectName = CType(lProject.RecentProjects(lCurrent), String)
       lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
       If LCase(lProjectId) <> "national" Then
-        If lRecentCount = 0 Then
-          lbProject = lbProject1
-        ElseIf lRecentCount = 1 Then
-          lbProject = lbProject2
-        ElseIf lRecentCount = 2 Then
-          lbProject = lbProject3
-        ElseIf lRecentCount = 3 Then
-          lbProject = lbProject4
-        End If
+        Select Case lRecentCount
+          Case 0 : lbProject = lbProject1
+          Case 1 : lbProject = lbProject2
+          Case 2 : lbProject = lbProject3
+          Case Else : lbProject = lbProject4
+        End Select
         lbProject.Text = lProjectId
         lbProject.Tag = lProjectName
         lbProject.Visible = True

@@ -105,10 +105,11 @@ Public Class PlugIn
       lArgs(3) = cSelectedAreaIndexes
 
       'now run script
-      Dim lError As String
+      Dim lError As String = ""
       'Return ListedSegmentsTable.ScriptMain(lArgs(0), lArgs(1), lArgs(2), lArgs(3))
       Return Scripting.Run("vb", "", Reports(aReportIndex), lError, False, pMapWin, lArgs)
-
+    Else
+      Return "Error: " & lProblem
     End If
 
   End Function

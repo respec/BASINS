@@ -107,9 +107,10 @@ Public Class atcDataSource
   ''' <param name="aDs">dataset to add to data source</param>
   ''' <param name="aExistAction">action to take if dataset already exists in data source</param>
   ''' <summary>Add a dataset to this data source</summary>
-  Public Overridable Function AddDataSet(ByRef aDs As atcDataSet, _
-                                Optional ByRef aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+  Public Overridable Function AddDataSet(ByVal aDs As atcDataSet, _
+                                Optional ByVal aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
     If pData.Contains(aDs) Then
+      'TODO: follow aExistAction
       Return False 'can't add, already have it
     Else
       pData.Add(aDs)
