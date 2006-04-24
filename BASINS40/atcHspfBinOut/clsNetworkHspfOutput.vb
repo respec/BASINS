@@ -52,7 +52,6 @@ Friend Class clsNetworkHspfOutput
   Private Sub GetNetworkConnections(ByVal s As String)
     Dim Sch As String, SchRec As String
     Dim SchPos As Integer, SchLen As Integer, RchPos As Integer
-    Dim lConn As clsConnectionType
 
     SchPos = 0
     While SchPos = 0
@@ -76,6 +75,7 @@ Friend Class clsNetworkHspfOutput
         If Len(SchRec) > 40 And InStr(SchRec, "***") = 0 Then 'looks like a valid record
           RchPos = InStr(40, SchRec, "RCHRES")
           If RchPos > 40 Then 'something connecting to a reach
+            Dim lConn As New clsConnectionType
             lConn.UpID = Left(SchRec, 10)
             lConn.DnID = Mid(SchRec, 44, 10)
             If Len(Trim(Mid(SchRec, 29, 10))) > 0 Then
@@ -94,9 +94,11 @@ Friend Class clsNetworkHspfOutput
   End Sub
 
   Private Sub GetExtSrcConnections(ByVal s As String)
-    Dim ES As String, ESRec As String
-    Dim ESPos As Integer, ESLen As Integer, InPos As Integer
-    Dim lConn As clsConnectionType
+    Dim ES As String
+    Dim ESRec As String
+    Dim ESPos As Integer
+    Dim ESLen As Integer
+    Dim InPos As Integer
 
     ESPos = 0
     While ESPos = 0
@@ -120,6 +122,7 @@ Friend Class clsNetworkHspfOutput
         If Len(ESRec) > 40 And InStr(ESRec, "***") = 0 Then 'looks like a valid record
           InPos = InStr(50, ESRec, "INFLOW")
           If InPos > 50 Then 'something connecting to a reach
+            Dim lConn As New clsConnectionType
             lConn.UpID = Left(ESRec, 10)
             lConn.DnID = Mid(ESRec, 44, 10)
             If Len(Trim(Mid(ESRec, 29, 10))) > 0 Then

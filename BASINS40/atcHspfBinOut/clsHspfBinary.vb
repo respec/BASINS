@@ -102,10 +102,9 @@ Friend Class clsHspfBinary
     Dim myId As New clsHspfBinId
     Dim myHeader As clsHspfBinHeader
     Dim myData As clsHspfBinData
-    Dim myVar As String
     Dim myKey As String, myDataKey As String
     Dim j As Integer, varCnt As Integer
-    Dim k As String, s As String
+    Dim s As String
     Dim currec() As Byte
     Dim recbyte As Integer 'Byte position within current header record
     Dim thisVarName As String

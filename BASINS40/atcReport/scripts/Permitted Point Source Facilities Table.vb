@@ -11,7 +11,7 @@ Public Module PCSFacilityTable
   Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
                              ByVal aAreaIDFieldIndex As Integer, _
                              ByVal aAreaNameFieldIndex As Integer, _
-                             ByVal aSelectedAreaIndexes As Collection)
+                             ByVal aSelectedAreaIndexes As Collection) As Object
 
     Dim lPCSLayerIndex As Integer
     Dim lNPDESFieldIndex As Integer
@@ -23,7 +23,7 @@ Public Module PCSFacilityTable
     Dim lProblem As String = ""
 
     'build grid source for results
-    Dim lGridSource = New atcGridSource
+    Dim lGridSource As New atcGridSource
     With lGridSource
       .Rows = 1
       .Columns = 8

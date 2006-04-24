@@ -1189,7 +1189,6 @@ EndFound:
     ' ##PARAM Value I Value to be converted
     ' ##RETURNS Input parameter Val in string form.
     Dim bVal As Byte()
-    Dim S As String
     ' ##LOCAL bval - FourByteType equivalent value of lVal
 
     bVal = System.BitConverter.GetBytes(Value)

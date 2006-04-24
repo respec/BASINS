@@ -9,7 +9,7 @@ Public Module ListedSegmentsTable
   Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
                              ByVal aAreaIDFieldIndex As Integer, _
                              ByVal aAreaNameFieldIndex As Integer, _
-                             ByVal aSelectedAreaIndexes As Collection)
+                             ByVal aSelectedAreaIndexes As Collection) As Object
     Dim i As Integer
     Dim j As Integer
     Dim lImpairedLayerIndex As Integer
@@ -19,7 +19,7 @@ Public Module ListedSegmentsTable
     Dim lProblem As String = ""
 
     'build grid source for results
-    Dim lGridSource = New atcGridSource
+    Dim lGridSource As New atcGridSource
     With lGridSource
       .Rows = 1
       .Columns = 5
@@ -56,12 +56,12 @@ Public Module ListedSegmentsTable
         For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
           If GisUtil.LineInPolygon(lImpairedLayerIndex, i, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
             'these overlap
-            lGridSource.rows = lGridSource.rows + 1
-            lGridSource.CellValue(lGridSource.rows - 1, 0) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaIDFieldIndex)
-            lGridSource.CellValue(lGridSource.rows - 1, 1) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaNameFieldIndex)
-            lGridSource.CellValue(lGridSource.rows - 1, 2) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairedIdFieldIndex)
-            lGridSource.CellValue(lGridSource.rows - 1, 3) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairedNameFieldIndex)
-            lGridSource.CellValue(lGridSource.rows - 1, 4) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairmentFieldIndex)
+            lGridSource.Rows = lGridSource.Rows + 1
+            lGridSource.CellValue(lGridSource.Rows - 1, 0) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaIDFieldIndex)
+            lGridSource.CellValue(lGridSource.Rows - 1, 1) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaNameFieldIndex)
+            lGridSource.CellValue(lGridSource.Rows - 1, 2) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairedIdFieldIndex)
+            lGridSource.CellValue(lGridSource.Rows - 1, 3) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairedNameFieldIndex)
+            lGridSource.CellValue(lGridSource.Rows - 1, 4) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairmentFieldIndex)
           End If
         Next i
       Next j
@@ -94,12 +94,12 @@ Public Module ListedSegmentsTable
         For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
           If GisUtil.OverlappingPolygons(lImpairedLayerIndex, i - 1, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
             'these overlap
-            lGridSource.rows = lGridSource.rows + 1
-            lGridSource.CellValue(lGridSource.rows - 1, 0) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaIDFieldIndex)
-            lGridSource.CellValue(lGridSource.rows - 1, 1) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaNameFieldIndex)
-            lGridSource.CellValue(lGridSource.rows - 1, 2) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairedIdFieldIndex)
-            lGridSource.CellValue(lGridSource.rows - 1, 3) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairedNameFieldIndex)
-            lGridSource.CellValue(lGridSource.rows - 1, 4) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairmentFieldIndex)
+            lGridSource.Rows = lGridSource.Rows + 1
+            lGridSource.CellValue(lGridSource.Rows - 1, 0) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaIDFieldIndex)
+            lGridSource.CellValue(lGridSource.Rows - 1, 1) = GisUtil.FieldValue(aAreaLayerIndex, aSelectedAreaIndexes(j), aAreaNameFieldIndex)
+            lGridSource.CellValue(lGridSource.Rows - 1, 2) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairedIdFieldIndex)
+            lGridSource.CellValue(lGridSource.Rows - 1, 3) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairedNameFieldIndex)
+            lGridSource.CellValue(lGridSource.Rows - 1, 4) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairmentFieldIndex)
           End If
         Next i
       Next j

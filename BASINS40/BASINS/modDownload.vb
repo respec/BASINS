@@ -201,7 +201,7 @@ StartOver:
     Dim lFileObject As Object
     Dim lCurFilename As String
     Dim lProjectDir As String
-    Dim lDefaultsXML As Chilkat.Xml
+    Dim lDefaultsXML As Chilkat.Xml = Nothing
     Dim lSuccess As Boolean
     Dim lInputProjection As String
     Dim lOutputProjection As String
@@ -472,7 +472,7 @@ StartOver:
   End Function
 
   Private Function GetDefaultsXML() As Chilkat.Xml
-    Dim lDefaultsXML As Chilkat.Xml
+    Dim lDefaultsXML As Chilkat.Xml = Nothing
     Dim lDefaultsPath As String 'full file name of defaults XML
     lDefaultsPath = FindFile("Please Locate BasinsDefaultLayers.xml", "\basins\etc\BasinsDefaultLayers.xml")
     'lDefaultsPath = "E:\BASINS\etc\BasinsDefaultRenderers.xml"
@@ -654,8 +654,6 @@ StartOver:
 
     Dim MWlay As MapWindow.Interfaces.Layer
     Dim g As MapWinGIS.Grid
-    Dim RGBcolor As Int32
-    Dim RGBoutline As Int32
 
     'Don't add layer again if we already have it
     For lLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
@@ -1087,7 +1085,6 @@ StartOver:
   End Sub
 
   Private Sub SetElevationGridColors(ByVal MWlay As MapWindow.Interfaces.Layer, ByVal g As MapWinGIS.Grid)
-    Dim colorBreak As MapWinGIS.GridColorBreak
     Dim colorScheme As MapWinGIS.GridColorScheme
 
     colorScheme = New MapWinGIS.GridColorScheme

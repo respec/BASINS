@@ -2193,7 +2193,7 @@ ErrHand:
     Dim huc As String
     Dim mipt As Single
     Dim dbffilename As String
-    Dim dbname As String
+    Dim dbname As String = ""
     Dim lnpdes As Object
     Dim ctemp As String
     Dim tmpDbf As IatcTable

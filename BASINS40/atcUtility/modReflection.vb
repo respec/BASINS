@@ -19,7 +19,6 @@ Public Module modReflection
     Dim sTest As New Collection
     Dim sAdd As New Collection
     Dim sRec As String
-    Dim lFirstClass As Boolean
 
     Dim a As [Assembly] = Reflection.Assembly.GetCallingAssembly 'GetExecutingAssembly
 

@@ -11,12 +11,12 @@ Public Module GIRASLanduseTable
   Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
                              ByVal aAreaIDFieldIndex As Integer, _
                              ByVal aAreaNameFieldIndex As Integer, _
-                             ByVal aSelectedAreaIndexes As Collection)
+                             ByVal aSelectedAreaIndexes As Collection) As Object
 
     Dim lProblem As String = ""
     Dim lLanduseLayerIndex As Long
     Dim lLandUseFieldIndex As Long
-    Dim lGridSource = New atcGridSource
+    Dim lGridSource As New atcGridSource
 
     'set land use index layer
     Try

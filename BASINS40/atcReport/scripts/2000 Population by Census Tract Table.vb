@@ -11,7 +11,7 @@ Public Module Population2000Table
   Public Function ScriptMain(ByVal aAreaLayerIndex As Integer, _
                              ByVal aAreaIDFieldIndex As Integer, _
                              ByVal aAreaNameFieldIndex As Integer, _
-                             ByVal aSelectedAreaIndexes As Collection)
+                             ByVal aSelectedAreaIndexes As Collection) As Object
 
     Dim i As Integer
     Dim lTractLayerIndex As Long
@@ -20,7 +20,7 @@ Public Module Population2000Table
     Dim lProblem As String = ""
 
     'build grid source for results
-    Dim lGridSource = New atcGridSource
+    Dim lGridSource As New atcGridSource
     With lGridSource
       .Rows = 1
       .Columns = 5

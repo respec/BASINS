@@ -26,9 +26,9 @@ Friend Class atcMsgWDM
     Dim lHlpLen As Integer 'help length
     Dim lHlpRec As Integer 'help record withing message file
     Dim lValidLen As Integer 'length of valid values
-    Dim lDesc As String  'description 
-    Dim lName As String 'name
-    Dim lValid As String 'valid values, comma delimeted
+    Dim lDesc As String = "" 'description 
+    Dim lName As String = "" 'name
+    Dim lValid As String = "" 'valid values, comma delimeted
 
     Dim lAttr As atcAttributeDefinition
 

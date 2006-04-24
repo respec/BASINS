@@ -190,10 +190,11 @@ errHand:
   End Function
 
   Private Function unitsDB() As Chilkat.Xml
-    Dim SaveUnitsDatabase As Chilkat.Xml
-    'Static AlreadyReportedErrOpen As Boolean
+    unitsDB = Nothing
+    Dim SaveUnitsDatabase As Chilkat.Xml = Nothing
+    Static AlreadyReportedErrOpen As Boolean
 
-    Dim DBpath As String
+    Dim DBpath As String = ""
 
     Try
       If SaveUnitsDatabase Is Nothing Then
@@ -208,10 +209,10 @@ errHand:
       unitsDB = SaveUnitsDatabase
 
     Catch e As Exception
-      'If Not AlreadyReportedErrOpen Then
-      Logger.Msg("Error opening units database '" & DBpath & "'" & vbCr & Err.Description, "ATCutility.modUnits")
-      'AlreadyReportedErrOpen = True
-      'End If
+      If Not AlreadyReportedErrOpen Then
+        Logger.Msg("Error opening units database '" & DBpath & "'" & vbCr & Err.Description, "ATCutility.modUnits")
+        AlreadyReportedErrOpen = True
+      End If
     End Try
   End Function
 End Module

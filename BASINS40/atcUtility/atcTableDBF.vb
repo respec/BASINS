@@ -694,7 +694,7 @@ ErrHand:
   Public Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperator() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
     Dim numRules As Integer
     Dim iRule As Integer
-    Dim Value As Object
+    Dim lValue As Object
     Dim allMatch As Boolean
     Dim thisMatches As Boolean
     Dim NotAtTheEnd As Boolean
@@ -715,18 +715,18 @@ ErrHand:
       allMatch = True
       While iRule <= numRules And allMatch
         thisMatches = False
-        Value = Value(aFieldNum(iRule))
+        lValue = Value(aFieldNum(iRule))
         Select Case aOperator(iRule)
           Case "="
-            If Value = aFieldVal(iRule) Then thisMatches = True
+            If lValue = aFieldVal(iRule) Then thisMatches = True
           Case "<"
-            If Value < aFieldVal(iRule) Then thisMatches = True
+            If lValue < aFieldVal(iRule) Then thisMatches = True
           Case ">"
-            If Value > aFieldVal(iRule) Then thisMatches = True
+            If lValue > aFieldVal(iRule) Then thisMatches = True
           Case "<="
-            If Value <= aFieldVal(iRule) Then thisMatches = True
+            If lValue <= aFieldVal(iRule) Then thisMatches = True
           Case ">="
-            If Value >= aFieldVal(iRule) Then thisMatches = True
+            If lValue >= aFieldVal(iRule) Then thisMatches = True
           Case Else : System.Diagnostics.Debug.WriteLine("Unrecognized operator:" & aOperator(iRule))
         End Select
         If aMatchAny Then
@@ -896,7 +896,6 @@ ErrHand:
 
   Public Overrides Function CreationCode() As String
     Dim retval As String
-    Dim iTrash As Integer
     Dim iField As Integer
 
     retval = "Dim newDBF as clsDBF"

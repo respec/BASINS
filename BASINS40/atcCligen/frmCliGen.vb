@@ -701,7 +701,7 @@ Public Class frmCliGen
   End Sub
 
   Private Sub WriteParmsToEdit()
-    Dim lStr As String
+    Dim lStr As String = ""
     If cParmsFile.Length = 0 Then
       Dim cdlg As New Windows.Forms.SaveFileDialog
       With cdlg

@@ -359,8 +359,6 @@ Public Class atcGraphForm
   '' <param name="sender"> Object raising this event. </param> 
   '' <param name="e"> Event arguments passing graphics context to print to. </param> 
   Private Sub PrintPage(ByVal sender As System.Object, ByVal e As Printing.PrintPageEventArgs)
-    Dim sBuf As String
-
     ' Validate. 
     If (e Is Nothing) Then Return
     If (e.Graphics Is Nothing) Then Return
@@ -412,7 +410,7 @@ Public Class atcGraphForm
     Dim lOldCons As String
 
     Dim curveColor As Color = GetMatchingColor(t.Attributes.GetValue("scenario"))
-    Dim curve As LineItem
+    Dim curve As LineItem = Nothing
     Dim lOldCurve As LineItem
 
     Dim y() As Double = t.Values

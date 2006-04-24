@@ -811,7 +811,6 @@ NextTS:
     Dim iRemoving As Integer = GetIndex(cbo.Name)
     Dim newLastCriteria As Integer = pcboCriteria.GetUpperBound(0) - 1
     Dim OldToNew As Single = 1 / (1 - pCriteriaFraction(iRemoving))
-    Dim mnu As MenuItem
     RemoveHandler cbo.SelectedValueChanged, AddressOf cboCriteria_SelectedIndexChanged
     RemoveHandler lst.MouseDownCell, AddressOf lstCriteria_MouseDownCell
     panelCriteria.Controls.Remove(cbo)

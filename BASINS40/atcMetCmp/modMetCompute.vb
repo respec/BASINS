@@ -632,7 +632,7 @@ Public Module modMetCompute
     'InTs - input daily wind timeseries
     'DCurve - hourly diurnal curve for wind disaggregation
 
-    Dim k, i, j, lnval As Integer
+    Dim k, i, j As Integer
     Dim lDisTs As New atcTimeseries(aDataSource)
     Dim lHrVals(24) As Double
 
@@ -1807,14 +1807,7 @@ OuttaHere:
     Dim lDyInd As Integer
     Dim lHrInd As Integer
     Dim lEventDur As Integer
-    Dim lEventPkTime As Double
-    Dim lEventMaxVal As Double
     Dim lEventStart As Integer
-    Dim lEventInd As Integer
-    Dim lPreSlope As Double
-    Dim lPostSlope As Double
-    Dim lPrevTotal As Double
-    Dim lCurrTotal As Double
     Dim lHrDay(24) As Double
     Dim i As Integer
 
@@ -1880,8 +1873,6 @@ OuttaHere:
     Dim lSecTime As Double
     Dim lDurSeconds As Double = aDur * 3600
     Dim lHrVals(24) As Double
-    Dim lHrInd As Integer
-    Dim lNumHrs As Integer
     Dim lCurTime As Double
     Dim lCurSpan As Double
     Dim lSTime As Double
