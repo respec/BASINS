@@ -147,6 +147,7 @@ Public Class atcTimeseriesFileHspfBinOut
         lBaseAttributes = New atcDataAttributes
         With lBaseAttributes
           .SetValue("CIntvl", True)
+          .SetValue("History 1", "Read from " & pBinFile.Filename)
           Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(pBinFile.Filename)
           .SetValue("Date Created", lFileDetails.CreationTime)
           .SetValue("Date Modified", lFileDetails.LastWriteTime)
