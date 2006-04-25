@@ -11,6 +11,7 @@ Friend Class clsFtnUnfFile
   Dim pFileNum As Integer = 0
   Dim pBytesInFile As Integer = 0
   Dim pErrorDescription As String = ""
+  Dim pSeek As Integer
   Dim pRecords As ArrayList 'of clsUnfRec
 
   Private Class clsUnfRec
@@ -47,28 +48,26 @@ Friend Class clsFtnUnfFile
       If Not FileExists(newFileName) Then
         pErrorDescription = "File '" & newFileName & "' not found"
       Else
-        pFileNum = FreeFile()
-        FileOpen(pFileNum, newFileName, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
-        pBytesInFile = LOF(pFileNum)
+        pFileName = newFileName
+        Open()
         If pBytesInFile = 0 Then
-          FileClose(pFileNum)
           pErrorDescription = "File '" & newFileName & "' is empty"
         Else
           FileGet(pFileNum, Byt)
           If Byt <> &HFD Then
-            FileClose(pFileNum)
             pErrorDescription = "File: '" & newFileName & "' is not a Fortran Unformatted Sequential File" & vbCrLf & "(does not begin with hex FD)"
           Else
-            pFileName = newFileName
             pRecords = New ArrayList 'of UnfRec (TODO: make initial allocation here?)
             ReadRestOfRecordsInFile(True)
           End If
         End If
+        Close()
       End If
     End Set
   End Property
 
   Friend Sub ReadRestOfRecordsInFile(Optional ByVal first As Boolean = False)
+    Dim lNeedToClose As Boolean = Open()
     pBytesInFile = LOF(pFileNum)
     Do While Seek(pFileNum) < pBytesInFile - 2
       Dim lUnfRec As New clsUnfRec
@@ -85,6 +84,7 @@ Friend Class clsFtnUnfFile
       End With
       pRecords.Add(lUnfRec)
     Loop
+    If lNeedToClose Then Close()
   End Sub
 
   Private Function FtnUnfSeqRecLen(ByVal f As Integer, ByRef first As Boolean) As Integer
@@ -123,4 +123,26 @@ Friend Class clsFtnUnfFile
       pErrorDescription = ""
     End Get
   End Property
+
+  'Open file if it is not already open; seek to the position where we were when Close was called
+  'Returns true if file needed to be opened, false if file was already open
+  Private Function Open() As Boolean
+    If pFileNum = 0 Then
+      pFileNum = FreeFile()
+      FileOpen(pFileNum, pFileName, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
+      pBytesInFile = LOF(pFileNum)
+      If pSeek > 0 Then Seek(pFileNum, pSeek)
+      Return True
+    Else
+      Return False
+    End If
+  End Function
+
+  Private Sub Close()
+    If pFileNum > 0 Then
+      pSeek = Seek(pFileNum)
+      FileClose(pFileNum)
+      pFileNum = 0
+    End If
+  End Sub
 End Class
