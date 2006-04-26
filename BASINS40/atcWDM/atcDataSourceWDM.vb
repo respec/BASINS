@@ -286,7 +286,7 @@ Public Class atcDataSourceWDM
         Throw New Exception("NVals:" & lNvals & ":" & lNValsExpected)
       End If
 
-      aDataSet.Attributes.CalculateAll()
+      'aDataSet.Attributes.CalculateAll() 'should we calculdate attributes on request, not here on creation
 
       Dim lWdmHandle As New atcWdmHandle(0, Specification)
       Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
