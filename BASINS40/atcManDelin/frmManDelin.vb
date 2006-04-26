@@ -247,6 +247,7 @@ Public Class frmManDelin
     Me.Controls.Add(Me.cmdDelineate)
     Me.Controls.Add(Me.cmdClose)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmManDelin"
     Me.Text = "Manual Watershed Delineator"
     Me.ResumeLayout(False)
@@ -1180,4 +1181,9 @@ Public Class frmManDelin
 
   End Sub
 
+  Private Sub frmManDelin_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Watershed Delineation\Manual Watershed Delineation.html")
+    End If
+  End Sub
 End Class

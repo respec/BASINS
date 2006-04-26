@@ -51,9 +51,9 @@ Public Class frmBuildNew
     '
     Me.cmdBuild.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.cmdBuild.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdBuild.Location = New System.Drawing.Point(130, 166)
+    Me.cmdBuild.Location = New System.Drawing.Point(156, 192)
     Me.cmdBuild.Name = "cmdBuild"
-    Me.cmdBuild.Size = New System.Drawing.Size(80, 28)
+    Me.cmdBuild.Size = New System.Drawing.Size(96, 32)
     Me.cmdBuild.TabIndex = 1
     Me.cmdBuild.Text = "Build"
     '
@@ -64,10 +64,10 @@ Public Class frmBuildNew
     Me.txtInstructions.BackColor = System.Drawing.SystemColors.InactiveCaptionText
     Me.txtInstructions.BorderStyle = System.Windows.Forms.BorderStyle.None
     Me.txtInstructions.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txtInstructions.Location = New System.Drawing.Point(13, 14)
+    Me.txtInstructions.Location = New System.Drawing.Point(16, 16)
     Me.txtInstructions.Multiline = True
     Me.txtInstructions.Name = "txtInstructions"
-    Me.txtInstructions.Size = New System.Drawing.Size(327, 83)
+    Me.txtInstructions.Size = New System.Drawing.Size(392, 96)
     Me.txtInstructions.TabIndex = 2
     Me.txtInstructions.Text = ""
     '
@@ -77,21 +77,22 @@ Public Class frmBuildNew
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.txtSelected.BackColor = System.Drawing.SystemColors.Menu
-    Me.txtSelected.Location = New System.Drawing.Point(13, 97)
+    Me.txtSelected.Location = New System.Drawing.Point(16, 112)
     Me.txtSelected.Multiline = True
     Me.txtSelected.Name = "txtSelected"
-    Me.txtSelected.Size = New System.Drawing.Size(327, 56)
+    Me.txtSelected.Size = New System.Drawing.Size(392, 65)
     Me.txtSelected.TabIndex = 3
     Me.txtSelected.Text = "Selected Features:"
     '
     'frmBuildNew
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(353, 208)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(423, 239)
     Me.Controls.Add(Me.txtSelected)
     Me.Controls.Add(Me.txtInstructions)
     Me.Controls.Add(Me.cmdBuild)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmBuildNew"
     Me.Text = "Build New BASINS 4 Project"
     Me.TopMost = True
@@ -106,5 +107,11 @@ Public Class frmBuildNew
     SaveSetting("BASINS4", "Window Positions", "BuildLeft", Me.Left)
     Me.Close()
     SpecifyAndCreateNewProject()
+  End Sub
+
+  Private Sub frmBuildNew_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Welcome to BASINS 4 Window\Build BASINS Project.html")
+    End If
   End Sub
 End Class

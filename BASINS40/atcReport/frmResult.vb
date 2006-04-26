@@ -1,4 +1,5 @@
 Imports atcControls
+Imports atcUtility
 
 Public Class frmResult
   Inherits System.Windows.Forms.Form
@@ -72,6 +73,7 @@ Public Class frmResult
     Me.Controls.Add(Me.agdResult)
     Me.Controls.Add(Me.lblHeader)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmResult"
     Me.Text = "Form1"
     Me.ResumeLayout(False)
@@ -89,4 +91,9 @@ Public Class frmResult
     agdResult.Refresh()
   End Sub
 
+  Private Sub frmResult_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Watershed Characterization Reports.html")
+    End If
+  End Sub
 End Class
