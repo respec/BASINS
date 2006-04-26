@@ -158,6 +158,16 @@
                     BuildAction = "Compile"
                 />
                 <File
+                    RelPath = "frmAbout.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmAbout.resx"
+                    DependentUpon = "frmAbout.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "frmBuildNew.vb"
                     SubType = "Form"
                     BuildAction = "Compile"
