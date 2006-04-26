@@ -102,6 +102,8 @@ Public Class frmBuildNew
 #End Region
 
   Private Sub cmdBuild_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdBuild.Click
+    SaveSetting("BASINS4", "Window Positions", "BuildTop", Me.Top)
+    SaveSetting("BASINS4", "Window Positions", "BuildLeft", Me.Left)
     Me.Close()
     SpecifyAndCreateNewProject()
   End Sub

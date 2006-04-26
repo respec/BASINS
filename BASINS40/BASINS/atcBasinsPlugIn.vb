@@ -179,8 +179,11 @@ Public Class atcBasinsPlugIn
     Logger.Dbg(aItemName)
     aHandled = True 'Assume we will handle it
     Select Case aItemName
-      Case "mnuNew" 'Override File/New menu item behavior
+      Case "mnuNew"            'Override File/New menu
         LoadNationalProject()
+      Case "mnuAboutMapWindow" 'Override Help/About menu
+        Dim lAbout As New frmAbout
+        lAbout.ShowAbout()
       Case NewDataMenuName
         UserOpenDataFile(False, True)
       Case OpenDataMenuName

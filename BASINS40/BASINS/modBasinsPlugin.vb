@@ -107,30 +107,20 @@ Friend Module modBasinsPlugin
   End Sub
 
   Friend Sub LoadNationalProject()
-    pBuildFrm = New frmBuildNew
-
     If Not NationalProjectIsOpen() Then
-      Dim lDrive As Integer
-      Dim lNationalProjectDir As String = "\BASINS\Data\national\"
-      Dim lAllFiles As New NameValueCollection
+      Dim lDrive As Integer = 0
 
-      Dim lFileName As String = PathNameOnly(PathNameOnly(g_MapWin.Plugins.PluginFolder)) & "\Data\national\" & NationalProjectFilename
-      If FileExists(lFileName) Then 'found existing national project, save name for later loading
-        lAllFiles.Add(lFileName.ToLower, lFileName)
-      Else 'look for national project in basins folders
-        Dim lDriveU As String
-        For lDrive = 0 To g_BasinsDrives.Length - 1
-          lDriveU = UCase(g_BasinsDrives.Chars(lDrive))
-          AddFilesInDir(lAllFiles, lDriveU & ":" & lNationalProjectDir, True, NationalProjectFilename)
-          If lAllFiles.Count > 0 Then 'load national project
-            g_MapWin.Project.Load(lAllFiles.Item(0))
-            Exit For
-          End If
-        Next
-      End If
+      Dim lFileName As String = g_BasinsDir & "\Data\national\" & NationalProjectFilename
+      While Not FileExists(lFileName) AndAlso lDrive < g_BasinsDrives.Length
+        lFileName = UCase(g_BasinsDrives.Chars(lDrive)) & ":" _
+                  & "\BASINS\Data\national\" & NationalProjectFilename
+        'found existing national project, save name for later loading
+      End While
 
-      If lAllFiles.Count = 0 Then
-        Logger.Msg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives & " in folder " & lNationalProjectDir, "Open National")
+      If FileExists(lFileName) Then  'load national project
+        g_MapWin.Project.Load(lFileName)
+      Else
+        Logger.Msg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives, "Open National")
         Exit Sub
       End If
     End If
@@ -143,12 +133,11 @@ Friend Module modBasinsPlugin
           Exit For
         End If
       Next
+      pBuildFrm = New frmBuildNew
       pBuildFrm.Show()
-      pBuildFrm.Top = 300
-      pBuildFrm.Left = 0
+      pBuildFrm.Top = GetSetting("BASINS4", "Window Positions", "BuildTop", "300")
+      pBuildFrm.Left = GetSetting("BASINS4", "Window Positions", "BuildLeft", "0")
       UpdateSelectedFeatures()
-      'TODO: default to Select
-      'g_MapWin.Toolbar.ButtonItem("mwSelect").Pressed = True
     Else
       Logger.Msg("Unable to open national project on drives: " & g_BasinsDrives, "Open National")
     End If
@@ -165,6 +154,8 @@ Friend Module modBasinsPlugin
   End Function
 
   Friend Sub SpecifyAndCreateNewProject()
+    pBuildFrm = Nothing
+
     Dim lThemeTag As String = ""
     Dim lFieldName As String = ""
     Dim lField As Integer
@@ -317,17 +308,17 @@ Friend Module modBasinsPlugin
   'End Sub
 
   Friend Sub UpdateSelectedFeatures()
-    Dim lFieldName As String = ""
-    Dim lFieldDesc As String = ""
-    Dim lField As Integer
-    Dim lNameIndex As Integer = -1
-    Dim lDescIndex As Integer = -1
-    Dim lCurLayer As MapWinGIS.Shapefile
-    Dim ctext As String
+    If Not pBuildFrm Is Nothing AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
+      Dim lFieldName As String = ""
+      Dim lFieldDesc As String = ""
+      Dim lField As Integer
+      Dim lNameIndex As Integer = -1
+      Dim lDescIndex As Integer = -1
+      Dim lCurLayer As MapWinGIS.Shapefile
+      Dim ctext As String
 
-    g_MapWin.Refresh()
-    ctext = "Selected Features:" & vbCrLf & "  <none>"
-    If g_MapWin.Layers.NumLayers > 0 And g_MapWin.Layers.CurrentLayer > -1 Then
+      g_MapWin.Refresh()
+      ctext = "Selected Features:" & vbCrLf & "  <none>"
       lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
 
       If g_MapWin.View.SelectedShapes.NumSelected > 0 Then
@@ -373,9 +364,8 @@ Friend Module modBasinsPlugin
           ctext = ctext & vbCrLf & "  " & lname & " : " & ldesc
         Next
       End If
+      pBuildFrm.txtSelected.Text = ctext
     End If
-    pBuildFrm.txtSelected.Text = ctext
-
   End Sub
 
 End Module
