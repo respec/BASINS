@@ -312,10 +312,11 @@ Module HassLibs
     outstr = RTrim(outstr)
 
   End Sub
+
   Private Sub NumChrA(ByRef icnt As Integer, ByRef ilen As Integer, ByRef inam() As Integer, ByRef outstr() As String)
 
     Dim j, i, p As Integer
-    Dim s As String
+    Dim s As String = ""
     Dim jnam() As Integer
 
     ReDim jnam(ilen)

@@ -121,7 +121,7 @@ Public Module modReflection
   Private Function ReflectAssemblyAsString(ByVal mA As [Assembly]) As String
 
     Dim lTypes As Type() = mA.GetTypes
-    Dim lReturnStr As String
+    Dim lReturnStr As String = ""
 
     For Each lType As Type In lTypes
       lReturnStr &= MethodDetails(lType, "Public,Static", BindingFlags.Public Or BindingFlags.Static)
@@ -133,7 +133,7 @@ Public Module modReflection
   End Function
 
   Private Function MethodDetails(ByRef aT As Type, ByVal aMethodType As String, ByVal aFlag As Integer) As String
-    Dim lReturnStr As String
+    Dim lReturnStr As String = ""
     Dim lThisMethodStr As String
 
     Dim lMethods As MethodInfo() = aT.GetMethods(aFlag)

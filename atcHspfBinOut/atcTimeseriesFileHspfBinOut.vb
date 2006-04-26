@@ -222,8 +222,14 @@ Public Class atcTimeseriesFileHspfBinOut
     Dim lCurJday As Double
     Dim lSJday As Integer
     Dim lEJday As Integer
-    Dim v() As Double, i As Integer, j As Integer, f() As Integer
+    Dim i As Integer
+    Dim j As Integer
+    Dim v() As Double
+    Dim f() As Integer
     Dim d() As Double
+    ReDim v(0)
+    ReDim f(0)
+    ReDim d(0)
 
     lKey = lts.Attributes.GetValue("Operation") & ":" & _
            Mid(lts.Attributes.GetValue("IDLOCN"), 3) & ":" & _
@@ -232,14 +238,7 @@ Public Class atcTimeseriesFileHspfBinOut
     Try
       lBinHeader = pBinFile.Headers.ItemByKey(lKey)
       With lBinHeader
-        'lVind = -1
-        'i = 0
-        'While lVind = -1 And i < .VarNames.Count
-        'If .VarNames.ItemByIndex(i) = t.Attributes.GetValue("IDCONS") Then
         lVind = .VarNames.IndexFromKey(lts.Attributes.GetValue("IDCONS"))
-        'End I
-        'i = i + 1
-        'End While
         If lVind >= 0 Then
           ReDim v(pNvals)
           ReDim f(pNvals)
@@ -271,11 +270,9 @@ Public Class atcTimeseriesFileHspfBinOut
         End If
       End With
     Catch
-      'Else
       pErrorDescription = "Could not retrieve data values for HSPF Binary TSER" & "Key = " & lKey
       ReDim v(0)
       ReDim f(0)
-      'End If
     End Try
     't.flags = f
     lts.Dates.Values = d

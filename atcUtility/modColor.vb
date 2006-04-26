@@ -143,7 +143,7 @@ erropen:
   End Function
 
   Public Function TextOrNumericColor(ByVal colr As String) As Color
-    Static AlreadyReportedError As Boolean
+    Static AlreadyReportedError As Boolean = False
 
     Dim c As String
 
@@ -177,7 +177,7 @@ erropen:
   End Function
 
   Public Function colorName(ByVal aColor As Color) As String
-    Static HadErrOpen As Boolean
+    Static HadErrOpen As Boolean = False
     Dim iColor As Integer
 
     Dim retval As String
@@ -204,7 +204,7 @@ erropen:
     Dim colorRaw As String
     Dim thisColor As Color
     Dim thisDist, minDist As Single
-    Dim minDistName As String
+    Dim minDistName As String = ""
     If db.FindFirst(2, ColorTranslator.ToOle(aColor)) Then
       retval = db.Value(1)
     Else

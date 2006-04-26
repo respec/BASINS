@@ -713,9 +713,10 @@ Public Class frmCAT
             If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
                 UpdateTopLabel(aIteration)
                 If chkSaveAll.Checked Then aModifiedScenarioName &= "-" & aIteration + 1
-                Dim lWDMResults, lHBNResults As atcDataSource
+                Dim lWDMResults As atcDataSource = Nothing
+                Dim lHBNResults As atcDataSource = Nothing
                 TimePerRun = Now.ToOADate
-        ScenarioRun(aBaseWDMFileName, aModifiedScenarioName, aModifiedData, lWDMResults, lHBNResults)
+                ScenarioRun(aBaseWDMFileName, aModifiedScenarioName, aModifiedData, lWDMResults, lHBNResults)
                 If lWDMResults Is Nothing Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
                     Exit Sub

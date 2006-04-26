@@ -64,6 +64,7 @@ Public Class atcDataTreeForm
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDataTreeForm))
     Me.mnuFile = New System.Windows.Forms.MenuItem
@@ -78,6 +79,7 @@ Public Class atcDataTreeForm
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.mnuMain = New System.Windows.Forms.MainMenu
     Me.MenuItem1 = New System.Windows.Forms.MenuItem
+    Me.mnuHelp = New System.Windows.Forms.MenuItem
     '
     'mnuFile
     '
@@ -135,13 +137,20 @@ Public Class atcDataTreeForm
     '
     'mnuMain
     '
-    Me.mnuMain.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.MenuItem1, Me.mnuView, Me.mnuAnalysis})
+    Me.mnuMain.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.MenuItem1, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp})
     '
     'MenuItem1
     '
     Me.MenuItem1.Index = 1
     Me.MenuItem1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditCopy})
     Me.MenuItem1.Text = "Edit"
+    '
+    'mnuHelp
+    '
+    Me.mnuHelp.Index = 4
+    Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
+    Me.mnuHelp.ShowShortcut = False
+    Me.mnuHelp.Text = "Help"
     '
     'atcDataTreeForm
     '
@@ -276,7 +285,7 @@ Public Class atcDataTreeForm
   End Sub
 
   Public Overrides Function ToString() As String
-    Dim s As String
+    Dim s As String = ""
     Dim t As String
     Dim ta(3) As String
 
@@ -393,6 +402,10 @@ Public Class atcDataTreeForm
     pDataManager = Nothing
     pDataGroup = Nothing
     atrMain = Nothing
+  End Sub
+
+  Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+    ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
   End Sub
 
 End Class

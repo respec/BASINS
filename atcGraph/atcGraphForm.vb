@@ -140,11 +140,13 @@ Public Class atcGraphForm
   Friend WithEvents mnuEditSep1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcGraphForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
     Me.mnuFile = New System.Windows.Forms.MenuItem
     Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
+    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
     Me.mnuFileSave = New System.Windows.Forms.MenuItem
     Me.mnuFilePrint = New System.Windows.Forms.MenuItem
     Me.mnuEdit = New System.Windows.Forms.MenuItem
@@ -158,12 +160,12 @@ Public Class atcGraphForm
     Me.mnuEditCopy = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
     Me.zgc = New ZedGraph.ZedGraphControl
-    Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
+    Me.mnuHelp = New System.Windows.Forms.MenuItem
     Me.SuspendLayout()
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuAnalysis})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuAnalysis, Me.mnuHelp})
     '
     'mnuFile
     '
@@ -175,6 +177,11 @@ Public Class atcGraphForm
     '
     Me.mnuFileSelectData.Index = 0
     Me.mnuFileSelectData.Text = "Select &Data"
+    '
+    'mnuFileSep1
+    '
+    Me.mnuFileSep1.Index = 1
+    Me.mnuFileSep1.Text = "-"
     '
     'mnuFileSave
     '
@@ -254,7 +261,7 @@ Public Class atcGraphForm
     Me.zgc.Name = "zgc"
     Me.zgc.PanButtons = System.Windows.Forms.MouseButtons.Left
     Me.zgc.PanButtons2 = System.Windows.Forms.MouseButtons.Middle
-    Me.zgc.PanModifierKeys = System.Windows.Forms.Keys.Shift + System.Windows.Forms.Keys.None
+    Me.zgc.PanModifierKeys = System.Windows.Forms.Keys.Shift
     Me.zgc.PanModifierKeys2 = System.Windows.Forms.Keys.None
     Me.zgc.PointDateFormat = "g"
     Me.zgc.PointValueFormat = "G"
@@ -272,10 +279,12 @@ Public Class atcGraphForm
     Me.zgc.ZoomModifierKeys2 = System.Windows.Forms.Keys.None
     Me.zgc.ZoomStepFraction = 0.1
     '
-    'mnuFileSep1
+    'mnuHelp
     '
-    Me.mnuFileSep1.Index = 1
-    Me.mnuFileSep1.Text = "-"
+    Me.mnuHelp.Index = 3
+    Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
+    Me.mnuHelp.ShowShortcut = False
+    Me.mnuHelp.Text = "Help"
     '
     'atcGraphForm
     '
@@ -497,5 +506,9 @@ Public Class atcGraphForm
     pMaster = Nothing
     pDataManager = Nothing
     pDataGroup = Nothing
+  End Sub
+
+  Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+    ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
   End Sub
 End Class

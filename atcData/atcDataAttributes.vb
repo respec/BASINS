@@ -285,7 +285,7 @@ Public Class atcDataAttributes
         Try
           Dim lOwnerTS As atcTimeseries = Owner
           Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
-          Dim lOperation As atcDefinedValue
+          Dim lOperation As atcDefinedValue = Nothing
           If lDef.Calculated AndAlso IsSimple(lDef, lKey, lOperation) Then
             Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
             Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone

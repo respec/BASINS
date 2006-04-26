@@ -42,8 +42,8 @@ Public Class atcSeasonPlugin
   'The attribute(s) will be set to the result(s) of calculation(s)
   Public Overrides Function Open(ByVal aOperationName As String, _
                         Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-    Dim lSeasonName As String
-    Dim ltsGroup As atcDataGroup
+    Dim lSeasonName As String = ""
+    Dim ltsGroup As atcDataGroup = Nothing
 
     If Not aArgs Is Nothing Then
       ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))

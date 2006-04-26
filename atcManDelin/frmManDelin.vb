@@ -584,7 +584,6 @@ Public Class frmManDelin
     Dim j As Integer
     Dim SlopeFieldIndex As Integer
     Dim SubbasinFieldIndex As Integer
-    Dim LengthFieldIndex As Integer
     Dim nsub As Integer
     Dim nelev As Integer
 

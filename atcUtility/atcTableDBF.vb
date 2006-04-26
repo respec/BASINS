@@ -552,8 +552,8 @@ ErrHand:
   '    If usingQuotes Then
   '      If InStr(fieldVal, aDelimiter) > 0 Then fieldVal = aQuote & fieldVal & aQuote
   '    End If
-  '    retval = retval & Value(iField)
-  '    If iField < pNumFields Then retval = retval & aDelimiter
+  '    retval &= Value(iField)
+  '    If iField < pNumFields Then retval &= aDelimiter
   '  Next
   '  CurrentRecordAsDelimitedString = retval
   'End Function
@@ -899,28 +899,28 @@ ErrHand:
     Dim iField As Integer
 
     retval = "Dim newDBF as clsDBF"
-    retval = retval & vbCrLf & "set newDBF = new clsDBF"
-    retval = retval & vbCrLf & "With newDBF"
+    retval &= vbCrLf & "set newDBF = new clsDBF"
+    retval &= vbCrLf & "With newDBF"
 
-    retval = retval & vbCrLf & "  .Year = CInt(Format(Now, ""yyyy"")) - 1900"
-    retval = retval & vbCrLf & "  .Month = CByte(Format(Now, ""mm""))"
-    retval = retval & vbCrLf & "  .Day = CByte(Format(Now, ""dd""))"
-    retval = retval & vbCrLf & "  .NumFields = " & pNumFields
-    retval = retval & vbCrLf
+    retval &= vbCrLf & "  .Year = CInt(Format(Now, ""yyyy"")) - 1900"
+    retval &= vbCrLf & "  .Month = CByte(Format(Now, ""mm""))"
+    retval &= vbCrLf & "  .Day = CByte(Format(Now, ""dd""))"
+    retval &= vbCrLf & "  .NumFields = " & pNumFields
+    retval &= vbCrLf
 
     For iField = 1 To pNumFields
       With pFields(iField)
-        retval = retval & vbCrLf & "  .FieldName(" & iField & ") = """ & TrimNull(.FieldName) & """"
-        retval = retval & vbCrLf & "  .FieldType(" & iField & ") = """ & .FieldType & """"
-        retval = retval & vbCrLf & "  .FieldLength(" & iField & ") = " & .FieldLength
-        retval = retval & vbCrLf & "  .FieldDecimalCount(" & iField & ") = " & .DecimalCount
-        retval = retval & vbCrLf
+        retval &= vbCrLf & "  .FieldName(" & iField & ") = """ & TrimNull(.FieldName) & """"
+        retval &= vbCrLf & "  .FieldType(" & iField & ") = """ & .FieldType & """"
+        retval &= vbCrLf & "  .FieldLength(" & iField & ") = " & .FieldLength
+        retval &= vbCrLf & "  .FieldDecimalCount(" & iField & ") = " & .DecimalCount
+        retval &= vbCrLf
       End With
     Next
-    retval = retval & vbCrLf & "  '.NumRecords = " & pHeader.NumRecs
-    retval = retval & vbCrLf & "  '.InitData"
-    retval = retval & vbCrLf & "End With"
-    retval = retval & vbCrLf
+    retval &= vbCrLf & "  '.NumRecords = " & pHeader.NumRecs
+    retval &= vbCrLf & "  '.InitData"
+    retval &= vbCrLf & "End With"
+    retval &= vbCrLf
     CreationCode = retval
   End Function
 
@@ -982,7 +982,7 @@ ErrHand:
   End Function
 
   Public Overrides Function SummaryFields(Optional ByVal aFormat As String = "tab,headers,expandtype") As String
-    Dim retval As String
+    Dim retval As String = ""
     Dim iTrash As Integer
     Dim iField As Integer
     Dim ShowTrash As Boolean
@@ -996,76 +996,76 @@ ErrHand:
     If InStr(LCase(aFormat), "text") > 0 Then 'text version
       For iField = 1 To pNumFields
         With pFields(iField)
-          retval = retval & vbCrLf & "Field " & iField & ": '" & TrimNull(.FieldName) & "'"
-          retval = retval & vbCrLf & "    Type: " & .FieldType & " "
+          retval &= vbCrLf & "Field " & iField & ": '" & TrimNull(.FieldName) & "'"
+          retval &= vbCrLf & "    Type: " & .FieldType & " "
           If ExpandType Then
             Select Case .FieldType
-              Case "C" : retval = retval & "Character"
-              Case "D" : retval = retval & "Date     "
-              Case "N" : retval = retval & "Numeric  "
-              Case "L" : retval = retval & "Logical  "
-              Case "M" : retval = retval & "Memo     "
+              Case "C" : retval &= "Character"
+              Case "D" : retval &= "Date     "
+              Case "N" : retval &= "Numeric  "
+              Case "L" : retval &= "Logical  "
+              Case "M" : retval &= "Memo     "
             End Select
           Else
-            retval = retval & .FieldType
+            retval &= .FieldType
           End If
-          retval = retval & vbCrLf & "    Length: " & .FieldLength & " "
-          retval = retval & vbCrLf & "    DecimalCount: " & .DecimalCount & " "
+          retval &= vbCrLf & "    Length: " & .FieldLength & " "
+          retval &= vbCrLf & "    DecimalCount: " & .DecimalCount & " "
           If ShowTrash Then
-            retval = retval & vbCrLf & "    Trash: "
+            retval &= vbCrLf & "    Trash: "
             For iTrash = 1 To 14
-              retval = retval & .Trash(iTrash) & " "
+              retval &= .Trash(iTrash) & " "
             Next
           End If
         End With
-        retval = retval & vbCrLf
+        retval &= vbCrLf
       Next
     Else 'table version
       If ShowHeaders Then
-        retval = retval & "Field "
-        retval = retval & vbTab & "Name "
-        retval = retval & vbTab & "Type "
-        retval = retval & vbTab & "Length "
-        retval = retval & vbTab & "DecimalCount "
+        retval &= "Field "
+        retval &= vbTab & "Name "
+        retval &= vbTab & "Type "
+        retval &= vbTab & "Length "
+        retval &= vbTab & "DecimalCount "
         If ShowTrash Then
           For iTrash = 1 To 14
-            retval = retval & vbTab & "Trash" & iTrash
+            retval &= vbTab & "Trash" & iTrash
           Next
         End If
       End If
-      retval = retval & vbCrLf
+      retval &= vbCrLf
       'now field details
       For iField = 1 To pNumFields
         With pFields(iField)
-          retval = retval & iField & vbTab & "'" & TrimNull(.FieldName) & "' "
+          retval &= iField & vbTab & "'" & TrimNull(.FieldName) & "' "
           If ExpandType Then
             Select Case .FieldType
-              Case "C" : retval = retval & vbTab & "Character"
-              Case "D" : retval = retval & vbTab & "Date     "
-              Case "N" : retval = retval & vbTab & "Numeric  "
-              Case "L" : retval = retval & vbTab & "Logical  "
-              Case "M" : retval = retval & vbTab & "Memo     "
+              Case "C" : retval &= vbTab & "Character"
+              Case "D" : retval &= vbTab & "Date     "
+              Case "N" : retval &= vbTab & "Numeric  "
+              Case "L" : retval &= vbTab & "Logical  "
+              Case "M" : retval &= vbTab & "Memo     "
             End Select
           Else
-            retval = retval & vbTab & .FieldType
+            retval &= vbTab & .FieldType
           End If
-          retval = retval & vbTab & .FieldLength
-          retval = retval & vbTab & .DecimalCount
+          retval &= vbTab & .FieldLength
+          retval &= vbTab & .DecimalCount
           If ShowTrash Then
-            retval = retval & vbCrLf & "    Trash: "
+            retval &= vbCrLf & "    Trash: "
             For iTrash = 1 To 14
-              retval = retval & vbTab & .Trash(iTrash)
+              retval &= vbTab & .Trash(iTrash)
             Next
           End If
         End With
-        retval = retval & vbCrLf
+        retval &= vbCrLf
       Next
     End If
     Return retval
   End Function
 
   Public Overrides Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String
-    Dim retval As String
+    Dim retval As String = ""
     Dim iTrash As Integer
     Dim ShowTrash As Boolean
     Dim ShowHeaders As Boolean
@@ -1076,16 +1076,16 @@ ErrHand:
     If LCase(aFormat) = "text" Then 'text version
       With pHeader
         retval = "DBF Header: "
-        retval = retval & vbCrLf & "    FileName: " & pFilename
-        retval = retval & vbCrLf & "    Version: " & .version
-        retval = retval & vbCrLf & "    Date: " & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
-        retval = retval & vbCrLf & "    NumRecs: " & .NumRecs
-        retval = retval & vbCrLf & "    NumBytesHeader: " & .NumBytesHeader
-        retval = retval & vbCrLf & "    NumBytesRec: " & .NumBytesRec
+        retval &= vbCrLf & "    FileName: " & pFilename
+        retval &= vbCrLf & "    Version: " & .version
+        retval &= vbCrLf & "    Date: " & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
+        retval &= vbCrLf & "    NumRecs: " & .NumRecs
+        retval &= vbCrLf & "    NumBytesHeader: " & .NumBytesHeader
+        retval &= vbCrLf & "    NumBytesRec: " & .NumBytesRec
         If ShowTrash Then
-          retval = retval & vbCrLf & "    Trash: "
+          retval &= vbCrLf & "    Trash: "
           For iTrash = 1 To 20
-            retval = retval & pHeader.Trash(iTrash) & " "
+            retval &= pHeader.Trash(iTrash) & " "
           Next
         End If
       End With
@@ -1093,33 +1093,33 @@ ErrHand:
       'build header header
       If ShowHeaders Then
         retval = "FileName "
-        retval = retval & vbTab & "Version "
-        retval = retval & vbTab & "Date "
-        retval = retval & vbTab & "NumFields "
-        retval = retval & vbTab & "NumRecs "
-        retval = retval & vbTab & "NumBytesHeader "
-        retval = retval & vbTab & "NumBytesRec "
+        retval &= vbTab & "Version "
+        retval &= vbTab & "Date "
+        retval &= vbTab & "NumFields "
+        retval &= vbTab & "NumRecs "
+        retval &= vbTab & "NumBytesHeader "
+        retval &= vbTab & "NumBytesRec "
       End If
       If ShowTrash Then
         For iTrash = 0 To 19
-          retval = retval & vbTab & "Trash" & iTrash
+          retval &= vbTab & "Trash" & iTrash
         Next
       End If
-      retval = retval & vbCrLf
+      retval &= vbCrLf
       With pHeader 'now header data
-        retval = retval & pFilename
-        retval = retval & vbTab & .version
-        retval = retval & vbTab & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
-        retval = retval & vbTab & pNumFields
-        retval = retval & vbTab & .NumRecs
-        retval = retval & vbTab & .NumBytesHeader
-        retval = retval & vbTab & .NumBytesRec
+        retval &= pFilename
+        retval &= vbTab & .version
+        retval &= vbTab & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
+        retval &= vbTab & pNumFields
+        retval &= vbTab & .NumRecs
+        retval &= vbTab & .NumBytesHeader
+        retval &= vbTab & .NumBytesRec
         If ShowTrash Then
           For iTrash = 0 To 19
-            retval = retval & vbTab & pHeader.Trash(iTrash)
+            retval &= vbTab & pHeader.Trash(iTrash)
           Next
         End If
-        retval = retval & vbCrLf
+        retval &= vbCrLf
       End With
     End If
     SummaryFile = retval

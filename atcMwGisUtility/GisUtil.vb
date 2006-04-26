@@ -993,15 +993,15 @@ Public Class GisUtil
   '''         number of cells of each grid category within each 
   '''         feature. The MapWinGIS calls to use include the Grid 
   '''         Property Value, the GridHeader Properties dX, dY, XllCenter, 
-  '''         and YllCenter, and the Shapefile Function PointInShapefile. 
+  '''         and YllCenter, and the Shapefile Function PointInShapefile.</remark>
   ''' <param name="aGridLayerIndex">
   '''     <para>Index of grid layer containing values</para>
   ''' </param>
   ''' <param name="aPolygonLayerIndex">
   '''     <para>Index of polgon layer to calculate areas for</para>
   ''' </param>
-  ''' <param name="aAreaGridPoly(,)">
-  '''     <para>Array used to store output areas</para>
+  ''' <param name="aAreaGridPoly">
+  '''     <para>2-D Array used to store output areas</para>
   ''' </param>
   Public Shared Sub TabulateAreas(ByVal aGridLayerIndex As Integer, _
                                   ByVal aPolygonLayerIndex As Integer, _
@@ -1693,7 +1693,7 @@ Public Class GisUtil
                                                  ByVal aLayer2FeatureIndex As Integer) As Single
     'overlay feature from layer1 with feature from layer2, 
     'determining area of feature 1 in feature 2
-    Dim lAreaOverlappingPolygons = 0.0
+    Dim lAreaOverlappingPolygons As Double = 0.0
 
     'set layer 1 
     Dim lLayer As MapWindow.Interfaces.Layer

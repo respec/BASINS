@@ -5,6 +5,45 @@ Imports System.Collections.Specialized
 Imports MapWinUtility
 
 Public Module modFile
+
+  'if aHelpTopic is a file, set the file to display instead of opening help
+  Public Sub ShowHelp(ByVal aHelpTopic As String)
+    Static lHelpFilename As String = ""
+    Static lHelpProcess As Process = Nothing
+
+    If FileExists(aHelpTopic) Then
+      lHelpFilename = aHelpTopic
+      Logger.Dbg("Set new help file '" & lHelpFilename & "'")
+    Else
+      If Not lHelpProcess Is Nothing Then
+        If Not lHelpProcess.HasExited Then
+          Try
+            Logger.Dbg("Killing old help process")
+            lHelpProcess.Kill()
+          Catch e As Exception
+            Logger.Dbg("Error killing old help process: " & e.Message)
+          End Try
+        Else
+          Logger.Dbg("Old help process already exited")
+        End If
+        lHelpProcess.Close()
+        lHelpProcess = Nothing
+      Else
+        Logger.Dbg("No old help process")
+      End If
+
+      If lHelpFilename.Length > 0 Then
+        If aHelpTopic.Length < 1 Then
+          Logger.Dbg("Showing help file '" & lHelpFilename & "'")
+          lHelpProcess = Process.Start("hh.exe", lHelpFilename)
+        ElseIf Not aHelpTopic.Equals("CLOSE") Then
+          Logger.Dbg("Showing help file '" & lHelpFilename & "' topic '" & aHelpTopic & "'")
+          lHelpProcess = Process.Start("hh.exe", "mk:@MSITStore:" & lHelpFilename & "::/" & aHelpTopic)
+        End If
+      End If
+    End If
+  End Sub
+
   Public Function ChDriveDir(ByVal newPath As String) As Boolean
     ' ##SUMMARY Changes directory and, if necessary, drive. Returns True if successful.
     ' ##PARAM newPath I New pathname.
@@ -27,7 +66,7 @@ Public Module modFile
     ' ##PARAM S I Filename to be converted, if necessary.
     ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="_").
     ' ##RETURNS Input parameter S with non-printable characters replaced with specific printable character (default="_").
-    Dim retval As String 'return string
+    Dim retval As String = "" 'return string
     Dim i As Short 'loop counter
     Dim strLen As Short 'length of string
     Dim ch As String 'individual character in filename
@@ -451,9 +490,9 @@ ErrorWriting:
           End If
 
           'Finally, check in the Windows system folders
-          If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
-            lFileName = FindRecursive(lBaseFileName, "c:\winnt\", "c:\windows\")
-          End If
+          'If lFileName.Length = 0 AndAlso lExePath.IndexOf("\bin\") > 0 Then
+          '  lFileName = FindRecursive(lBaseFileName, "c:\winnt\", "c:\windows\")
+          'End If
 
           If FileExists(lFileName) Then
             aDefaultFileName = lFileName

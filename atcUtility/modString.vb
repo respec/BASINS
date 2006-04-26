@@ -837,7 +837,7 @@ Public Module modString
     ' ##PARAM Replace I Substring to replace Find
     ' ##RETURNS Returns new string like Source except that _
     'any occurences of Find (not case sensitive) are replaced with Replace.
-    Dim retval As String
+    Dim retval As String = ""
     Dim findPos As Integer
     Dim lastFindEnd As Integer
     Dim findlen As Integer
@@ -860,7 +860,7 @@ Public Module modString
       findPos = InStr(lSource, lFind)
       lastFindEnd = 1
       While findPos > 0
-        retval = retval & Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
+        retval &= Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
         lastFindEnd = findPos + findlen
         findPos = InStr(findPos + findlen, lSource, lFind)
       End While
@@ -878,7 +878,7 @@ Public Module modString
     ' ##PARAM Replace I Substring to replace Find
     ' ##RETURNS Returns new string like Source except that _
     'any occurences of Find (case sensitive) are replaced with Replace.
-    Dim retval As String
+    Dim retval As String = ""
     Dim findPos As Integer
     Dim lastFindEnd As Integer
     Dim findlen As Integer
@@ -895,7 +895,7 @@ Public Module modString
       findPos = InStr(Source, Find)
       lastFindEnd = 1
       While findPos > 0
-        retval = retval & Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
+        retval &= Mid(Source, lastFindEnd, findPos - lastFindEnd) & ReplaceWith
         lastFindEnd = findPos + findlen
         findPos = InStr(findPos + findlen, Source, Find)
       End While
