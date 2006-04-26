@@ -418,17 +418,16 @@ Public Class frmWelcomeScreenBasins
   End Sub
 
   Private Sub lbProject_LinkClicked(ByVal sender As System.Object, _
-      ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) _
+                                    ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) _
       Handles lbProject1.LinkClicked, lbProject2.LinkClicked, lbProject3.LinkClicked, lbProject4.LinkClicked
 
     Dim fileName As String = CStr(CType(sender, Label).Tag)
-    If (System.IO.File.Exists(fileName)) Then
-      lProject.Load(fileName)
+    If lProject.Load(fileName) Then
+      Logger.Dbg("Loaded Project '" & fileName & "'")
       Me.DialogResult = Windows.Forms.DialogResult.OK
       Me.Close()
     Else
-      'TODO - 2/3/2005 - jlk - need a findFile here 
-      Logger.Msg("Could not find " & fileName, "Open BASINS Project", "OK")
+      Logger.Msg("Could not load '" & fileName & "'", "Could Not Load Project")
     End If
   End Sub
 
@@ -451,7 +450,7 @@ Public Class frmWelcomeScreenBasins
     While lRecentCount < 4 And lCurrent < lProject.RecentProjects.Count
       lProjectName = CType(lProject.RecentProjects(lCurrent), String)
       lProjectId = System.IO.Path.GetFileNameWithoutExtension(lProjectName)
-      If LCase(lProjectId) <> "national" Then
+      If FileExists(lProjectName) AndAlso LCase(lProjectId) <> "national" Then
         Select Case lRecentCount
           Case 0 : lbProject = lbProject1
           Case 1 : lbProject = lbProject2
@@ -478,9 +477,13 @@ Public Class frmWelcomeScreenBasins
   End Sub
 
   Private Sub lbBasinsHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles lbBasinsHelp.Click
-    Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", lAppInfo.DefaultDir & "\docs\Basins4.chm")
-    If FileExists(lHelpFilename) Then
-      System.Diagnostics.Process.Start(lHelpFilename)
-    End If
+    ShowHelp("")
+    'Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_BasinsDir & "docs\Basins4.0.chm")
+    'If FileExists(lHelpFilename) Then
+    '  ShowHelp(lHelpFilename)
+    '  'Help.ShowHelp(Me, lHelpFilename, HelpNavigator.TableOfContents)
+    '  'System.Diagnostics.Process.Start(lHelpFilename)
+    'End If
   End Sub
+
 End Class

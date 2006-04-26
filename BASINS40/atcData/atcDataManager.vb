@@ -20,9 +20,6 @@ Public Class atcDataManager
   ''' <param name="aMapWin">
   '''     <para>Pointer to the root interface for the MapWindow</para>
   ''' </param>  
-  ''' <param name="aBasins">
-  '''     <para>Pointer to the Basins plugin (Deprecated - DO NOT USE - consult ATC for alternatives)</para>
-  ''' </param>  
   Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
     pMapWin = aMapWin
     Me.Clear()
@@ -181,7 +178,7 @@ Public Class atcDataManager
                                        Optional ByVal aNeedToOpen As Boolean = True, _
                                        Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
     Dim lForm As New frmDataSource
-    Dim lSelectedDataSource As atcDataSource
+    Dim lSelectedDataSource As atcDataSource = Nothing
     lForm.Text = aTitle
     lForm.AskUser(Me, lSelectedDataSource, aNeedToOpen, aNeedToSave, aCategories)
     Return lSelectedDataSource

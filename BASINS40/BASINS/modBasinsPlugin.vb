@@ -11,6 +11,7 @@ Friend Module modBasinsPlugin
   Public g_MapWinWindowHandle As Integer
   Public g_AppName As String = "BASINS4"
   Public g_BasinsDrives As String = ""
+  Public g_BasinsDir As String = ""
   Public pBuildFrm As frmBuildNew
 
   Friend pCommandLineScript As Boolean = False
@@ -54,14 +55,14 @@ Friend Module modBasinsPlugin
   Friend Const CheckForUpdatesMenuName As String = "CheckForUpdates"
   Friend Const CheckForUpdatesMenuString As String = "&Check For Updates"
 
+  Friend Const BasinsHelpMenuName As String = "BasinsHelp"
+  Friend Const BasinsHelpMenuString As String = "BASINS Documentation"
+
   Friend Const BasinsWebPageMenuName As String = "BasinsWebPage"
-  Friend Const BasinsWebPageMenuString As String = "&Basins Web Page"
+  Friend Const BasinsWebPageMenuString As String = "BASINS Web Page"
 
   Friend Const SendFeedbackMenuName As String = "SendFeedback"
   Friend Const SendFeedbackMenuString As String = "Send &Feedback"
-
-  Friend Const BasinsHelpMenuName As String = "BASINS Help"
-  Friend Const BasinsHelpMenuString As String = "BASINS Help"
 
   Friend Const DataMenuName As String = "BasinsData"
   Friend Const DataMenuString As String = "&Data"
@@ -97,20 +98,19 @@ Friend Module modBasinsPlugin
           End If
         End If
       Next
-      If g_BasinsDrives.Length = 0 Then
-        Logger.Msg("No BASINS folders found on any drives on this computer", "FindBasinsDrives")
-      Else
-        Logger.Dbg("Found BasinsDrives: " & g_BasinsDrives)
-      End If
+      Select Case g_BasinsDrives.Length
+        Case 0 : Logger.Msg("No BASINS folders found on any drives on this computer", "FindBasinsDrives")
+        Case 1 : Logger.Dbg("Found BASINS Drive: " & g_BasinsDrives)
+        Case Is > 1 : Logger.Dbg("Found BASINS Drives: " & g_BasinsDrives)
+      End Select
     End If
   End Sub
 
   Friend Sub LoadNationalProject()
-    Dim newFrm As New frmBuildNew
-    pBuildFrm = newFrm
 
     If Not NationalProjectIsOpen() Then
       Dim lDrive As Integer
+      Dim lNationalProjectDir As String = "\BASINS\Data\national\"
       Dim lAllFiles As New NameValueCollection
 
       Dim lFileName As String = PathNameOnly(PathNameOnly(g_MapWin.Plugins.PluginFolder)) & "\Data\national\" & NationalProjectFilename
@@ -120,25 +120,37 @@ Friend Module modBasinsPlugin
         Dim lDriveU As String
         For lDrive = 0 To g_BasinsDrives.Length - 1
           lDriveU = UCase(g_BasinsDrives.Chars(lDrive))
-          AddFilesInDir(lAllFiles, lDriveU & ":\BASINS\Data\national\", True, NationalProjectFilename)
+          AddFilesInDir(lAllFiles, lDriveU & ":" & lNationalProjectDir, True, NationalProjectFilename)
+          If lAllFiles.Count > 0 Then 'load national project
+            g_MapWin.Project.Load(lAllFiles.Item(0))
+            Exit For
+          End If
         Next
       End If
 
-      If lAllFiles.Count > 0 Then 'load national project
-        g_MapWin.Project.Load(lAllFiles.Item(0))
-      Else
-        Logger.Msg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives & " in folder \BASINS\Data\national\", "Open National")
+      If lAllFiles.Count = 0 Then
+        Logger.Msg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives & " in folder " & lNationalProjectDir, "Open National")
+        Exit Sub
       End If
     End If
+
     If NationalProjectIsOpen() Then
-      g_MapWin.Layers.CurrentLayer = 0 'HUC 8 layer in our national.mwprj
-      'Logger.Msg("Select the Area(s) of Interest by a Mouse Click, " & vbCr & _
-      '           "then Download from the Data menu" & vbCr & _
-      '           "to create a new BASINS project", "Build BASINS Project")
-      newFrm.Show()
+      'Select the Cataloging Units layer by default 
+      For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
+        If g_MapWin.Layers(iLayer).Name = "Cataloging Units" Then
+          g_MapWin.Layers.CurrentLayer = iLayer
+          Exit For
+        End If
+      Next
+      pBuildFrm = New frmBuildNew
+      pBuildFrm.Top = 0
+      pBuildFrm.Left = 0
+      pBuildFrm.Show()
       UpdateSelectedFeatures()
       'TODO: default to Select
       'g_MapWin.Toolbar.ButtonItem("mwSelect").Pressed = True
+    Else
+      Logger.Msg("Unable to open national project on drives: " & g_BasinsDrives, "Open National")
     End If
   End Sub
 
@@ -153,8 +165,8 @@ Friend Module modBasinsPlugin
   End Function
 
   Friend Sub SpecifyAndCreateNewProject()
-    Dim lThemeTag As String
-    Dim lFieldName As String
+    Dim lThemeTag As String = ""
+    Dim lFieldName As String = ""
     Dim lField As Integer
     Dim lFieldMatch As Integer = -1
     Dim lCurLayer As MapWinGIS.Shapefile
@@ -305,8 +317,8 @@ Friend Module modBasinsPlugin
   'End Sub
 
   Friend Sub UpdateSelectedFeatures()
-    Dim lFieldName As String
-    Dim lFieldDesc As String
+    Dim lFieldName As String = ""
+    Dim lFieldDesc As String = ""
     Dim lField As Integer
     Dim lNameIndex As Integer = -1
     Dim lDescIndex As Integer = -1

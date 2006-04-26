@@ -248,7 +248,7 @@ Public Class atcTimeseriesNdayHighLow
                          ByVal aNDay As Object, _
                          ByVal aHigh As Boolean, _
                          ByVal aAttributesStorage As atcDataAttributes)
-    Dim lNdayTsGroup As atcDataGroup
+    Dim lNdayTsGroup As atcDataGroup = Nothing
 
     If aTimeseries.Attributes.GetValue("Tu", 1) <> 6 Then
       'calculate the n day annual timeseries
@@ -260,60 +260,61 @@ Public Class atcTimeseriesNdayHighLow
       End If
     End If
 
-    For Each lNdayTs As atcTimeseries In lNdayTsGroup
-      If Not lNdayTs Is Nothing Then
-        Dim lNday As Integer = lNdayTs.Attributes.GetValue("NDay")
-        Dim lTau As Double
-        Dim lLevel As Double
-        Dim lSlope As Double
-        Dim lMsg As String = ""
+    If Not lNdayTsGroup Is Nothing Then
+      For Each lNdayTs As atcTimeseries In lNdayTsGroup
+        If Not lNdayTs Is Nothing Then
+          Dim lNday As Integer = lNdayTs.Attributes.GetValue("NDay")
+          Dim lTau As Double
+          Dim lLevel As Double
+          Dim lSlope As Double
+          Dim lMsg As String = ""
 
-        Try
-          KendallTau(lNdayTs, lTau, lLevel, lSlope)
-        Catch ex As Exception
-          lMsg = "ComputeFreq:Exception:" & ex.ToString & ":" & lNdayTs.ToString
-          Logger.Dbg(lMsg)
-          lTau = Double.NaN
-          lLevel = Double.NaN
-          lSlope = Double.NaN
-        End Try
+          Try
+            KendallTau(lNdayTs, lTau, lLevel, lSlope)
+          Catch ex As Exception
+            lMsg = "ComputeFreq:Exception:" & ex.ToString & ":" & lNdayTs.ToString
+            Logger.Dbg(lMsg)
+            lTau = Double.NaN
+            lLevel = Double.NaN
+            lSlope = Double.NaN
+          End Try
 
-        Dim lS As String
-        If aHigh Then
-          lS = lNday & "Hi"
-        Else
-          lS = lNday & "Low"
+          Dim lS As String
+          If aHigh Then
+            lS = lNday & "Hi"
+          Else
+            lS = lNday & "Low"
+          End If
+          Dim lNewAttribute As New atcAttributeDefinition
+          With lNewAttribute
+            .Name = lS & "KT"
+            .Description = lS & " Kendall Tau "
+            .DefaultValue = ""
+            .Editable = False
+            .TypeString = "Double"
+            .Calculator = Me
+            .Category = "nDay & Frequency"
+          End With
+          Dim lKenTauValue As atcAttributeDefinition = lNewAttribute.Clone
+          lKenTauValue.Description = lKenTauValue.Description & "Value"
+          lKenTauValue.Name = lKenTauValue.Name & "Value"
+          Dim lKenTauProbLevel As atcAttributeDefinition = lNewAttribute.Clone
+          lKenTauProbLevel.Name = lKenTauProbLevel.Name & "ProbLevel"
+          lKenTauProbLevel.Description = lKenTauProbLevel.Description & "Probability Level"
+          Dim lKenTauSlope As atcAttributeDefinition = lNewAttribute.Clone
+          lKenTauSlope.Name = lKenTauSlope.Name & "Slope"
+          lKenTauSlope.Description = lKenTauSlope.Description & "Slope"
+
+          Dim lArguments As New atcDataAttributes
+          lArguments.SetValue("Nday", lNday)
+          lArguments.SetValue("HighFlag", aHigh)
+
+          aAttributesStorage.SetValue(lKenTauValue, lTau, lArguments)
+          aAttributesStorage.SetValue(lKenTauProbLevel, lLevel, lArguments)
+          aAttributesStorage.SetValue(lKenTauSlope, lSlope, lArguments)
         End If
-        Dim lNewAttribute As New atcAttributeDefinition
-        With lNewAttribute
-          .Name = lS & "KT"
-          .Description = lS & " Kendall Tau "
-          .DefaultValue = ""
-          .Editable = False
-          .TypeString = "Double"
-          .Calculator = Me
-          .Category = "nDay & Frequency"
-        End With
-        Dim lKenTauValue As atcAttributeDefinition = lNewAttribute.Clone
-        lKenTauValue.Description = lKenTauValue.Description & "Value"
-        lKenTauValue.Name = lKenTauValue.Name & "Value"
-        Dim lKenTauProbLevel As atcAttributeDefinition = lNewAttribute.Clone
-        lKenTauProbLevel.Name = lKenTauProbLevel.Name & "ProbLevel"
-        lKenTauProbLevel.Description = lKenTauProbLevel.Description & "Probability Level"
-        Dim lKenTauSlope As atcAttributeDefinition = lNewAttribute.Clone
-        lKenTauSlope.Name = lKenTauSlope.Name & "Slope"
-        lKenTauSlope.Description = lKenTauSlope.Description & "Slope"
-
-        Dim lArguments As New atcDataAttributes
-        lArguments.SetValue("Nday", lNday)
-        lArguments.SetValue("HighFlag", aHigh)
-
-        aAttributesStorage.SetValue(lKenTauValue, lTau, lArguments)
-        aAttributesStorage.SetValue(lKenTauProbLevel, lLevel, lArguments)
-        aAttributesStorage.SetValue(lKenTauSlope, lSlope, lArguments)
-      End If
-    Next
-
+      Next
+    End If
   End Sub
 
   Public Sub ComputeFreq(ByRef aTimeseries As atcTimeseries, _
@@ -324,7 +325,7 @@ Public Class atcTimeseriesNdayHighLow
                          ByVal aAttributesStorage As atcDataAttributes, _
                 Optional ByRef aNdayTsGroup As atcDataGroup = Nothing)
 
-    Dim lTsMath As atcDataSource
+    Dim lTsMath As atcDataSource = Nothing
     Dim lQ As Double
     Dim lMsg As String = ""
 
@@ -406,7 +407,7 @@ Public Class atcTimeseriesNdayHighLow
           aAttributesStorage.SetValue(lNewAttribute, lQ, lArguments)
         Next
 
-        If aLogFg Then 'remove log10 transform timser
+        If aLogFg And Not lTsMath Is Nothing Then 'remove log10 transform timser
           DataManager.DataSources.Remove(lTsMath)
           lTsMath = Nothing
         End If
@@ -433,7 +434,7 @@ Public Class atcTimeseriesNdayHighLow
   'first element of aArgs is atcData object whose attribute(s) will be set to the result(s) of calculation(s)
   'remaining aArgs are expected to follow the args required for the specified operation
   Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-    Dim ltsGroup As atcDataGroup
+    Dim ltsGroup As atcDataGroup = Nothing
     Dim lTs As atcTimeseries
     Dim lTsB As atcTimeseries
     Dim lNDayTsGroup As atcDataGroup 'atcTimeseries

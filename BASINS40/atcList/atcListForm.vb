@@ -44,6 +44,7 @@ Friend Class atcListForm
   Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcListForm))
     Me.MainMenu1 = New System.Windows.Forms.MainMenu
@@ -60,12 +61,13 @@ Friend Class atcListForm
     Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
     Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
     Me.mnuAnalysis = New System.Windows.Forms.MenuItem
+    Me.mnuHelp = New System.Windows.Forms.MenuItem
     Me.agdMain = New atcControls.atcGrid
     Me.SuspendLayout()
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp})
     '
     'mnuFile
     '
@@ -137,6 +139,12 @@ Friend Class atcListForm
     '
     Me.mnuAnalysis.Index = 3
     Me.mnuAnalysis.Text = "Analysis"
+    '
+    'mnuHelp
+    '
+    Me.mnuHelp.Index = 4
+    Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
+    Me.mnuHelp.Text = "Help"
     '
     'agdMain
     '
@@ -315,4 +323,7 @@ Friend Class atcListForm
     Return Me.Text & vbCrLf & agdMain.ToString
   End Function
 
+  Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+    ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
+  End Sub
 End Class

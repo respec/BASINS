@@ -37,7 +37,7 @@ Public Class atcEventPlugin
   'The attribute(s) will be set to the result(s) of calculation(s)
   Public Overrides Function Open(ByVal aOperationName As String, _
                         Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
-    Dim ltsGroup As atcDataGroup
+    Dim ltsGroup As atcDataGroup = Nothing
     Dim lThresh As Double = Double.NaN
     Dim lHigh As Boolean
     Dim lOk As Boolean
@@ -232,8 +232,8 @@ Public Class atcEventPlugin
   Private Function MinMaxLabel(ByVal aTSGroup As atcDataGroup) As String
     Dim lMin As Double = Double.MaxValue
     Dim lMax As Double = Double.MinValue
-    Dim lMinStr As String
-    Dim lMaxStr As String
+    Dim lMinStr As String = ""
+    Dim lMaxStr As String = ""
     For Each lts As atcTimeseries In aTSGroup
       If lts.Attributes.GetValue("Min") < lMin Then
         lMin = lts.Attributes.GetValue("Min")

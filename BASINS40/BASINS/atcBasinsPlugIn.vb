@@ -69,15 +69,21 @@ Public Class atcBasinsPlugIn
     'This is where buttons or menu items are added.
     g_MapWin = aMapWin
     g_MapWinWindowHandle = aParentHandle
+    'Set g_BasinsDir to folder above the Bin folder where the app and plugins live
+    g_BasinsDir = PathNameOnly(PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)) & "\"
 
-    Dim lLogFileName As String = PathNameOnly(PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)) _
-                               & "\logs\" _
-                               & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log"
-    Logger.StartToFile(lLogFileName)
+    Logger.StartToFile(g_BasinsDir & "logs\" _
+                     & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log")
     Logger.MapWin = g_MapWin
 
     pDataManager = New atcDataManager(g_MapWin)
 
+    Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_BasinsDir & "docs\Basins4.0.chm")
+    If FileExists(lHelpFilename) Then
+      ShowHelp(lHelpFilename)
+    Else
+      Logger.Dbg("Help File Not Found")
+    End If
     'BuiltInScript(False)
 
     FindBasinsDrives()
@@ -94,6 +100,8 @@ Public Class atcBasinsPlugIn
     AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
 
     Dim mnu As MapWindow.Interfaces.MenuItem
+
+    mnu = AddMenuIfMissing(BasinsHelpMenuName, "mnuHelp", BasinsHelpMenuString, "")
     mnu = AddMenuIfMissing(BasinsWebPageMenuName, "mnuHelp", BasinsWebPageMenuString, "")
     AddMenuIfMissing("BasinsHelp_Separator2", "mnuHelp", "-")
     mnu = AddMenuIfMissing(CheckForUpdatesMenuName, "mnuHelp", CheckForUpdatesMenuString, "")
@@ -142,6 +150,8 @@ Public Class atcBasinsPlugIn
     'box, or by un-checkmarking it in the plug-ins menu.  This is where you would remove any
     'buttons from the tool bar tool bar or menu items from the menu that you may have added.
     'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
+
+    ShowHelp("CLOSE") 'Close any active Help window
 
     g_MapWin.Menus.Remove(DataMenuName)
     pLoadedDataMenu = False
@@ -206,8 +216,7 @@ Public Class atcBasinsPlugIn
       Case SendFeedbackMenuName
         SendFeedback()
       Case BasinsHelpMenuName
-        Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_MapWin.ApplicationInfo.DefaultDir & "\docs\Basins4.chm")
-        If FileExists(lHelpFilename) Then System.Diagnostics.Process.Start(lHelpFilename)
+        ShowHelp("")
       Case AnalysisMenuName & "_ArcView3"
         'create apr if it does not exist, then open it
         Dim lAprFileName As String = "\basins\apr\" & FilenameOnly(g_MapWin.Project.FileName) & ".apr"
@@ -254,7 +263,7 @@ Public Class atcBasinsPlugIn
   End Sub
 
   Private Function UserSaveData(ByVal aSpecification As String) As Boolean
-    Dim lSaveIn As atcDataSource
+    Dim lSaveIn As atcDataSource = Nothing
     Dim lSaveGroup As atcDataGroup = pDataManager.UserSelectData("Select Data to Save")
     If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
       For Each lDataSource As atcDataSource In pDataManager.DataSources

@@ -157,7 +157,7 @@ Public Class atcDataGroup
 
   ''' <summary>Remove dataset specified by aIndex from this group.</summary>
   ''' <remarks>
-  '''     Cannot just do: <see cref="Remove(atcDataSet)">Remove(ItemByIndex(index))</see>
+  '''     Cannot just Remove(ItemByIndex(index))
   '''     because this overriding RemoveAt is called by MyBase.Remove--infinite loop
   ''' </remarks>
   Public Shadows Sub RemoveAt(ByVal aIndex As Integer)

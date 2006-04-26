@@ -120,7 +120,7 @@ Public Class atcDataSourceWDM
 
   '  oldID must be given if dataObject has a changed id
   Private Function writeDataHeader(ByRef aFileUnit As Integer, ByRef dataObject As atcTimeseries, Optional ByRef oldID As Integer = -1) As Boolean
-    Dim wdmfg, salen, dsn, saind, lRetcod, i As Integer
+    Dim salen, dsn, saind, lRetcod, i As Integer
     Dim c, S, l, d As String
     Dim lAttribs As atcDataAttributes = dataObject.Attributes
 

@@ -523,7 +523,7 @@ Public Class frmEndpoint
     End Try
   End Sub
 
-  Private Function VariationFromForm(ByVal aVariation) As Boolean
+  Private Function VariationFromForm(ByVal aVariation as Variation) As Boolean
     Try
       With aVariation
         .Name = txtName.Text

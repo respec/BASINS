@@ -44,7 +44,7 @@ Public Class frmSelectDisplay
 
 #End Region
 
-  Private Const PADDING As Integer = 5
+  Private Const pPADDING As Integer = 5
   Private pArgButton() As Windows.Forms.Button
   Private pDataManager As atcDataManager
   Private pDataGroup As atcDataGroup
@@ -52,7 +52,7 @@ Public Class frmSelectDisplay
   Public Sub AskUser(ByVal aDataManager As atcDataManager, ByVal aDataGroup As atcDataGroup)
     pDataManager = aDataManager
     pDataGroup = aDataGroup
-    Dim lButtonWidth As Integer = Me.ClientRectangle.Width - PADDING * 2
+    Dim lButtonWidth As Integer = Me.ClientRectangle.Width - pPADDING * 2
     Dim iArg As Integer = 0
 
     Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
@@ -62,12 +62,12 @@ Public Class frmSelectDisplay
       pArgButton(iArg) = New Windows.Forms.Button
       With pArgButton(iArg)
         If iArg = 0 Then
-          .Top = PADDING
+          .Top = pPADDING
         Else
-          .Top = pArgButton(iArg - 1).Top + pArgButton(iArg - 1).Height + PADDING
+          .Top = pArgButton(iArg - 1).Top + pArgButton(iArg - 1).Height + pPADDING
         End If
         .Width = lButtonWidth
-        .Left = PADDING
+        .Left = pPADDING
 
         .Tag = lDisp.Name
         Dim iColon As Integer = lDisp.Name.IndexOf("::")
@@ -85,7 +85,7 @@ Public Class frmSelectDisplay
     Next
     iArg -= 1
     If iArg >= 0 Then
-      Me.Height = pArgButton(iArg).Top + pArgButton(iArg).Height + PADDING + (Me.Height - Me.ClientRectangle.Height)
+      Me.Height = pArgButton(iArg).Top + pArgButton(iArg).Height + pPADDING + (Me.Height - Me.ClientRectangle.Height)
       Me.Show()
     Else
       Me.Close()

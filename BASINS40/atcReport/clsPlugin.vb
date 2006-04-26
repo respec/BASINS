@@ -117,7 +117,7 @@ Public Class PlugIn
   Public ReadOnly Property Reports() As Collection
     Get
       If pReports Is Nothing Then 'fill in first time thru
-        Dim lAllFiles = New NameValueCollection
+        Dim lAllFiles As New NameValueCollection
         AddFilesInDir(lAllFiles, pReportsDir, True, "*.vb")
         pReports = New Collection
         For Each lReport As String In lAllFiles

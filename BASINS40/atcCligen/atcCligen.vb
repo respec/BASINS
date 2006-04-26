@@ -67,8 +67,8 @@ Public Class atcCligen
     Dim lOk As Boolean
     Dim lAttDef As atcAttributeDefinition
     Dim lAttDef2 As atcAttributeDefinition
-    Dim lParmFile As String
-    Dim lOutFile As String
+    Dim lParmFile As String = ""
+    Dim lOutFile As String = ""
     Dim lSYr As Integer
     Dim lNYrs As Integer
     Dim lIncDaily As Boolean
