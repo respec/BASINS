@@ -107,6 +107,7 @@ Friend Module modBasinsPlugin
   End Sub
 
   Friend Sub LoadNationalProject()
+    pBuildFrm = New frmBuildNew
 
     If Not NationalProjectIsOpen() Then
       Dim lDrive As Integer
@@ -142,10 +143,9 @@ Friend Module modBasinsPlugin
           Exit For
         End If
       Next
-      pBuildFrm = New frmBuildNew
-      pBuildFrm.Top = 0
-      pBuildFrm.Left = 0
       pBuildFrm.Show()
+      pBuildFrm.Top = 300
+      pBuildFrm.Left = 0
       UpdateSelectedFeatures()
       'TODO: default to Select
       'g_MapWin.Toolbar.ButtonItem("mwSelect").Pressed = True
