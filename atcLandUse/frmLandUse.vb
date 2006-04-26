@@ -1,4 +1,5 @@
 Imports atcMwGisUtility
+Imports atcUtility
 
 Public Class frmLandUse
   Inherits System.Windows.Forms.Form
@@ -74,9 +75,9 @@ Public Class frmLandUse
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboSubbasins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboSubbasins.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cboSubbasins.Location = New System.Drawing.Point(192, 144)
+    Me.cboSubbasins.Location = New System.Drawing.Point(192, 154)
     Me.cboSubbasins.Name = "cboSubbasins"
-    Me.cboSubbasins.Size = New System.Drawing.Size(200, 24)
+    Me.cboSubbasins.Size = New System.Drawing.Size(200, 25)
     Me.cboSubbasins.TabIndex = 12
     '
     'cboLanduse
@@ -86,35 +87,35 @@ Public Class frmLandUse
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboLanduse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboLanduse.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cboLanduse.Location = New System.Drawing.Point(192, 16)
+    Me.cboLanduse.Location = New System.Drawing.Point(192, 17)
     Me.cboLanduse.Name = "cboLanduse"
-    Me.cboLanduse.Size = New System.Drawing.Size(200, 24)
+    Me.cboLanduse.Size = New System.Drawing.Size(200, 25)
     Me.cboLanduse.TabIndex = 11
     '
     'Label3
     '
     Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.Label3.Location = New System.Drawing.Point(16, 144)
+    Me.Label3.Location = New System.Drawing.Point(16, 154)
     Me.Label3.Name = "Label3"
-    Me.Label3.Size = New System.Drawing.Size(168, 24)
+    Me.Label3.Size = New System.Drawing.Size(168, 25)
     Me.Label3.TabIndex = 10
     Me.Label3.Text = "Summarize within Layer:"
     '
     'Label2
     '
     Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.Label2.Location = New System.Drawing.Point(16, 16)
+    Me.Label2.Location = New System.Drawing.Point(16, 17)
     Me.Label2.Name = "Label2"
-    Me.Label2.Size = New System.Drawing.Size(152, 24)
+    Me.Label2.Size = New System.Drawing.Size(152, 26)
     Me.Label2.TabIndex = 9
     Me.Label2.Text = "Land Use Type:"
     '
     'lblLandUseLayer
     '
     Me.lblLandUseLayer.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblLandUseLayer.Location = New System.Drawing.Point(16, 48)
+    Me.lblLandUseLayer.Location = New System.Drawing.Point(16, 51)
     Me.lblLandUseLayer.Name = "lblLandUseLayer"
-    Me.lblLandUseLayer.Size = New System.Drawing.Size(152, 24)
+    Me.lblLandUseLayer.Size = New System.Drawing.Size(152, 26)
     Me.lblLandUseLayer.TabIndex = 13
     Me.lblLandUseLayer.Text = "Land Use Layer:"
     '
@@ -124,9 +125,9 @@ Public Class frmLandUse
     Me.cboLandUseLayer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-    Me.cboLandUseLayer.Location = New System.Drawing.Point(192, 48)
+    Me.cboLandUseLayer.Location = New System.Drawing.Point(192, 51)
     Me.cboLandUseLayer.Name = "cboLandUseLayer"
-    Me.cboLandUseLayer.Size = New System.Drawing.Size(200, 24)
+    Me.cboLandUseLayer.Size = New System.Drawing.Size(200, 25)
     Me.cboLandUseLayer.TabIndex = 14
     '
     'cboDescription
@@ -135,17 +136,17 @@ Public Class frmLandUse
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboDescription.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboDescription.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cboDescription.Location = New System.Drawing.Point(208, 112)
+    Me.cboDescription.Location = New System.Drawing.Point(208, 119)
     Me.cboDescription.Name = "cboDescription"
-    Me.cboDescription.Size = New System.Drawing.Size(184, 24)
+    Me.cboDescription.Size = New System.Drawing.Size(184, 25)
     Me.cboDescription.TabIndex = 16
     '
     'lblDescription
     '
     Me.lblDescription.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblDescription.Location = New System.Drawing.Point(40, 112)
+    Me.lblDescription.Location = New System.Drawing.Point(40, 119)
     Me.lblDescription.Name = "lblDescription"
-    Me.lblDescription.Size = New System.Drawing.Size(152, 24)
+    Me.lblDescription.Size = New System.Drawing.Size(152, 26)
     Me.lblDescription.TabIndex = 15
     Me.lblDescription.Text = "Description Field:"
     '
@@ -155,26 +156,26 @@ Public Class frmLandUse
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboSub1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboSub1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cboSub1.Location = New System.Drawing.Point(208, 176)
+    Me.cboSub1.Location = New System.Drawing.Point(208, 188)
     Me.cboSub1.Name = "cboSub1"
-    Me.cboSub1.Size = New System.Drawing.Size(184, 24)
+    Me.cboSub1.Size = New System.Drawing.Size(184, 25)
     Me.cboSub1.TabIndex = 18
     '
     'lblSubid
     '
     Me.lblSubid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblSubid.Location = New System.Drawing.Point(40, 176)
+    Me.lblSubid.Location = New System.Drawing.Point(40, 188)
     Me.lblSubid.Name = "lblSubid"
-    Me.lblSubid.Size = New System.Drawing.Size(152, 24)
+    Me.lblSubid.Size = New System.Drawing.Size(152, 25)
     Me.lblSubid.TabIndex = 17
     Me.lblSubid.Text = "ID Field:"
     '
     'lblLUID
     '
     Me.lblLUID.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblLUID.Location = New System.Drawing.Point(40, 80)
+    Me.lblLUID.Location = New System.Drawing.Point(40, 85)
     Me.lblLUID.Name = "lblLUID"
-    Me.lblLUID.Size = New System.Drawing.Size(152, 24)
+    Me.lblLUID.Size = New System.Drawing.Size(152, 26)
     Me.lblLUID.TabIndex = 19
     Me.lblLUID.Text = "ID Field:"
     '
@@ -184,17 +185,17 @@ Public Class frmLandUse
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboLUID.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboLUID.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cboLUID.Location = New System.Drawing.Point(208, 80)
+    Me.cboLUID.Location = New System.Drawing.Point(208, 85)
     Me.cboLUID.Name = "cboLUID"
-    Me.cboLUID.Size = New System.Drawing.Size(184, 24)
+    Me.cboLUID.Size = New System.Drawing.Size(184, 25)
     Me.cboLUID.TabIndex = 20
     '
     'lblSubname
     '
     Me.lblSubname.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lblSubname.Location = New System.Drawing.Point(40, 208)
+    Me.lblSubname.Location = New System.Drawing.Point(40, 222)
     Me.lblSubname.Name = "lblSubname"
-    Me.lblSubname.Size = New System.Drawing.Size(152, 24)
+    Me.lblSubname.Size = New System.Drawing.Size(152, 25)
     Me.lblSubname.TabIndex = 21
     Me.lblSubname.Text = "Name Field:"
     '
@@ -204,33 +205,33 @@ Public Class frmLandUse
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.cboSub2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
     Me.cboSub2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cboSub2.Location = New System.Drawing.Point(208, 208)
+    Me.cboSub2.Location = New System.Drawing.Point(208, 222)
     Me.cboSub2.Name = "cboSub2"
-    Me.cboSub2.Size = New System.Drawing.Size(184, 24)
+    Me.cboSub2.Size = New System.Drawing.Size(184, 25)
     Me.cboSub2.TabIndex = 22
     '
     'cmdNext
     '
     Me.cmdNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdNext.Location = New System.Drawing.Point(232, 248)
+    Me.cmdNext.Location = New System.Drawing.Point(232, 265)
     Me.cmdNext.Name = "cmdNext"
-    Me.cmdNext.Size = New System.Drawing.Size(72, 32)
+    Me.cmdNext.Size = New System.Drawing.Size(72, 34)
     Me.cmdNext.TabIndex = 23
     Me.cmdNext.Text = "&Next"
     '
     'cmdCancel
     '
     Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.cmdCancel.Location = New System.Drawing.Point(136, 248)
+    Me.cmdCancel.Location = New System.Drawing.Point(136, 265)
     Me.cmdCancel.Name = "cmdCancel"
-    Me.cmdCancel.Size = New System.Drawing.Size(72, 32)
+    Me.cmdCancel.Size = New System.Drawing.Size(72, 34)
     Me.cmdCancel.TabIndex = 24
     Me.cmdCancel.Text = "&Cancel"
     '
     'frmLandUse
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(7, 15)
-    Me.ClientSize = New System.Drawing.Size(440, 296)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(7, 16)
+    Me.ClientSize = New System.Drawing.Size(440, 315)
     Me.Controls.Add(Me.cmdCancel)
     Me.Controls.Add(Me.cmdNext)
     Me.Controls.Add(Me.cboSub2)
@@ -249,6 +250,7 @@ Public Class frmLandUse
     Me.Controls.Add(Me.Label2)
     Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmLandUse"
     Me.Text = "BASINS LandUse Reclassification"
     Me.ResumeLayout(False)
@@ -507,4 +509,9 @@ Public Class frmLandUse
 
   End Sub
 
+  Private Sub frmLandUse_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Analysis\Reclassify Land Use.html")
+    End If
+  End Sub
 End Class

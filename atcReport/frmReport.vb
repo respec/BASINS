@@ -201,6 +201,7 @@ Public Class frmReport
     Me.Controls.Add(Me.Label3)
     Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmReport"
     Me.Text = "BASINS Watershed Characterization Reports"
     Me.ResumeLayout(False)
@@ -391,4 +392,10 @@ Public Class frmReport
     Next
     Return lAllReports
   End Function
+
+  Private Sub frmReport_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Watershed Characterization Reports.html")
+    End If
+  End Sub
 End Class

@@ -217,6 +217,7 @@ Public Class frmReclass
     Me.Controls.Add(Me.cmdLoad)
     Me.Controls.Add(Me.Panel1)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmReclass"
     Me.Text = "BASINS LandUse Reclassification"
     Me.Panel1.ResumeLayout(False)
@@ -1007,5 +1008,11 @@ Public Class frmReclass
 
   Private Sub AtcGridLanduse_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridLanduse.MouseDownCell
     pLastClickedRow = aRow
+  End Sub
+
+  Private Sub frmReclass_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Analysis\Reclassify Land Use.html")
+    End If
   End Sub
 End Class

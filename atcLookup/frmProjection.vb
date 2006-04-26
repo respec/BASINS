@@ -72,6 +72,7 @@ Public Class frmProjection
     Me.Controls.Add(Me.tbxProjection)
     Me.Controls.Add(Me.cmdOK)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmProjection"
     Me.Text = "Projection Parameters"
     Me.ResumeLayout(False)
@@ -96,5 +97,11 @@ Public Class frmProjection
 
   Public Sub InitializeUI(ByVal projectfilename As String)
     pProjectFileName = projectfilename
+  End Sub
+
+  Private Sub frmProjection_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Analysis\Lookup Tables.html")
+    End If
   End Sub
 End Class

@@ -812,6 +812,7 @@ Public Class frmModelSetup
     Me.Controls.Add(Me.GroupBox1)
     Me.Controls.Add(Me.TabControl1)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmModelSetup"
     Me.Text = "BASINS"
     Me.TabControl1.ResumeLayout(False)
@@ -1303,7 +1304,8 @@ Public Class frmModelSetup
   End Sub
 
   Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
-    MsgBox("Help is not yet implemented.", MsgBoxStyle.Critical, "BASINS " & pModelName & " Problem")
+    'MsgBox("Help is not yet implemented.", MsgBoxStyle.Critical, "BASINS " & pModelName & " Problem")
+    ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
   End Sub
 
   Private Sub FillListUniqueLandUses(ByVal layerindex As Long, ByVal fieldname As String)
@@ -2585,6 +2587,16 @@ ErrHand:
 
     If Not lNewColor.Equals(aGrid.Source.CellColor(aRow, aColumn)) Then
       aGrid.Source.CellColor(aRow, aColumn) = lNewColor
+    End If
+  End Sub
+
+  Private Sub frmModelSetup_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      If pModelName = "HSPF" Then
+        ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
+      ElseIf pModelName = "AQUATOX" Then
+        ShowHelp("BASINS Details\Watershed and Instream Model Setup\AQUATOX.html")
+      End If
     End If
   End Sub
 End Class
