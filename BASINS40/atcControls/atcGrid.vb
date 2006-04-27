@@ -21,12 +21,13 @@ Public Class atcGrid
   Private pCellTextColor As Color
   Private pRowHeight As ArrayList = New ArrayList   'of Integer
   Private pColumnWidth As ArrayList = New ArrayList 'of Integer
+  Private pVisibleWidth As Integer = 0
 
   Private pTopRow As Integer
   Private pLeftColumn As Integer
 
-  Private pRowBottom As atcCollection = New atcCollection
-  Private pColumnRight As atcCollection = New atcCollection
+  Private pRowBottom As New atcCollection
+  Private pColumnRight As New atcCollection
 
   Private pColumnDragging As Integer = -1
 
@@ -62,17 +63,19 @@ Public Class atcGrid
   Friend WithEvents VScroller As System.Windows.Forms.VScrollBar
   Friend WithEvents HScroller As System.Windows.Forms.HScrollBar
   Friend WithEvents CellEditBox As System.Windows.Forms.TextBox
+  Friend WithEvents CellComboBox As System.Windows.Forms.ComboBox
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Me.VScroller = New System.Windows.Forms.VScrollBar
     Me.HScroller = New System.Windows.Forms.HScrollBar
     Me.scrollCorner = New System.Windows.Forms.Panel
     Me.CellEditBox = New System.Windows.Forms.TextBox
+    Me.CellComboBox = New System.Windows.Forms.ComboBox
     Me.SuspendLayout()
     '
     'VScroller
     '
     Me.VScroller.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.VScroller.Location = New System.Drawing.Point(144, 0)
+    Me.VScroller.Location = New System.Drawing.Point(134, 0)
     Me.VScroller.Name = "VScroller"
     Me.VScroller.Size = New System.Drawing.Size(16, 72)
     Me.VScroller.TabIndex = 1
@@ -81,7 +84,7 @@ Public Class atcGrid
     'HScroller
     '
     Me.HScroller.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.HScroller.Location = New System.Drawing.Point(0, 144)
+    Me.HScroller.Location = New System.Drawing.Point(0, 134)
     Me.HScroller.Name = "HScroller"
     Me.HScroller.Size = New System.Drawing.Size(88, 16)
     Me.HScroller.TabIndex = 2
@@ -90,7 +93,7 @@ Public Class atcGrid
     'scrollCorner
     '
     Me.scrollCorner.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.scrollCorner.Location = New System.Drawing.Point(144, 144)
+    Me.scrollCorner.Location = New System.Drawing.Point(134, 134)
     Me.scrollCorner.Name = "scrollCorner"
     Me.scrollCorner.Size = New System.Drawing.Size(16, 16)
     Me.scrollCorner.TabIndex = 3
@@ -105,14 +108,23 @@ Public Class atcGrid
     Me.CellEditBox.Text = ""
     Me.CellEditBox.Visible = False
     '
+    'CellComboBox
+    '
+    Me.CellComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+    Me.CellComboBox.Location = New System.Drawing.Point(32, 40)
+    Me.CellComboBox.Name = "CellComboBox"
+    Me.CellComboBox.Size = New System.Drawing.Size(104, 21)
+    Me.CellComboBox.TabIndex = 5
+    Me.CellComboBox.Visible = False
+    '
     'atcGrid
     '
+    Me.Controls.Add(Me.CellComboBox)
     Me.Controls.Add(Me.CellEditBox)
     Me.Controls.Add(Me.scrollCorner)
     Me.Controls.Add(Me.HScroller)
     Me.Controls.Add(Me.VScroller)
     Me.Name = "atcGrid"
-    Me.Size = New System.Drawing.Size(160, 160)
     Me.ResumeLayout(False)
 
   End Sub
@@ -155,7 +167,34 @@ Public Class atcGrid
     End If
 
     pColumnDragging = -1
+
+    CellComboBox.Items.Clear()
   End Sub
+
+  Public Property ValidValues() As ICollection
+    Get
+      Return CellComboBox.Items
+    End Get
+    Set(ByVal newValues As ICollection)
+      CellComboBox.Items.Clear()
+      For Each lValue As Object In newValues
+        If Not lValue Is Nothing Then CellComboBox.Items.Add(lValue)
+      Next
+    End Set
+  End Property
+
+  Public Property AllowNewValidValues() As Boolean
+    Get
+      Return CellComboBox.DropDownStyle.Equals(ComboBoxStyle.DropDown)
+    End Get
+    Set(ByVal newValue As Boolean)
+      If newValue Then
+        CellComboBox.DropDownStyle = ComboBoxStyle.DropDown
+      Else
+        CellComboBox.DropDownStyle = ComboBoxStyle.DropDownList
+      End If
+    End Set
+  End Property
 
   Public Property Source() As atcGridSource
     Get
@@ -314,7 +353,7 @@ Public Class atcGrid
         Dim lColumnIndex As Integer
 
         Dim visibleHeight As Integer = Me.Height
-        Dim visibleWidth As Integer = Me.Width
+        pVisibleWidth = Me.Width
 
         If pTopRow > 0 Then        'Scrolled down at least one row
           If lRows < pTopRow Then  'Scrolled past last row
@@ -349,11 +388,10 @@ Public Class atcGrid
         Dim lCellValue As String
         Dim lCellAlignment As Integer
         Dim lCellValueSize As SizeF
-        Dim lCellValueLeftSize As SizeF
         Dim lVscrollInUse As Boolean = False
 
         'Clear whole area to default cell background color
-        g.FillRectangle(lCellBrush, 0, 0, visibleWidth, visibleHeight)
+        g.FillRectangle(lCellBrush, 0, 0, pVisibleWidth, visibleHeight)
 
         'Draw Row Lines
         pRowBottom = New atcCollection
@@ -368,7 +406,7 @@ Public Class atcGrid
           If lRow < lFixedRows OrElse lRow >= pTopRow Then
             lRowsVisible += 1
             y += RowHeight(lRow)
-            g.DrawLine(lLinePen, 0, y, visibleWidth, y)
+            g.DrawLine(lLinePen, 0, y, pVisibleWidth, y)
             pRowBottom.Add(lRow, y)
             If y > visibleHeight Then
               lVscrollInUse = True
@@ -386,13 +424,13 @@ Public Class atcGrid
 
         If lVscrollInUse Then
           VScroller.Visible = True
-          visibleWidth -= VScroller.Width
+          pVisibleWidth -= VScroller.Width
           If lRows > 1 Then VScroller.Maximum = lRows - 1
         End If
 
         'Fill unused space below bottom line
         If y < visibleHeight Then
-          g.FillRectangle(lOutsideBrush, 0, y, visibleWidth, visibleHeight - y)
+          g.FillRectangle(lOutsideBrush, 0, y, pVisibleWidth, visibleHeight - y)
         End If
 
         'Draw Column Lines
@@ -409,18 +447,18 @@ Public Class atcGrid
             lColumnWidth = ColumnWidth(lColumn)
             If lColumnWidth > 0 Then
               x += lColumnWidth
-              If Not AllowHorizontalScrolling AndAlso x < visibleWidth Then
+              If Not AllowHorizontalScrolling AndAlso x < pVisibleWidth Then
                 'See if this is the last non-hidden column to expand to fit the available width
                 Dim lScanHiddenColumns As Integer = lColumn + 1
                 While lScanHiddenColumns < lColumns AndAlso ColumnWidth(lScanHiddenColumns) = 0
                   lScanHiddenColumns += 1
                 End While
                 If lScanHiddenColumns = lColumns Then 'Any columns right of this one are hidden
-                  ColumnWidth(lColumn) += visibleWidth - x 'Expand this one
-                  x = visibleWidth
+                  ColumnWidth(lColumn) += pVisibleWidth - x 'Expand this one
+                  x = pVisibleWidth
                 End If
               End If
-              If x > visibleWidth Then
+              If x > pVisibleWidth Then
                 If AllowHorizontalScrolling Then
                   visibleHeight -= HScroller.Height
                   If Not VScroller.Visible AndAlso y > visibleHeight Then
@@ -436,7 +474,7 @@ Public Class atcGrid
                   pColumnRight.Add(lColumn, x)
                   Exit For
                 Else
-                  x = visibleWidth
+                  x = pVisibleWidth
                 End If
               End If
               g.DrawLine(lLinePen, x, 0, x, visibleHeight)
@@ -450,8 +488,8 @@ Public Class atcGrid
         SizeScrollers()
 
         'Fill unused space right of rightmost column
-        If x < visibleWidth Then
-          g.FillRectangle(lOutsideBrush, x, 0, visibleWidth - x, visibleHeight)
+        If x < pVisibleWidth Then
+          g.FillRectangle(lOutsideBrush, x, 0, pVisibleWidth - x, visibleHeight)
         End If
 
         Dim lCellLeft As Integer
@@ -545,8 +583,8 @@ Public Class atcGrid
           Next
         Next
       End If
-    Catch
-      'Stop
+    Catch e as Exception
+      Logger.Dbg(e.Message)
     End Try
   End Sub
 
@@ -660,6 +698,7 @@ Public Class atcGrid
   Private Function CellBounds(ByVal aRow As Integer, ByVal aColumn As Integer) As Rectangle
     Dim lX As Integer = 0
     Dim lY As Integer = 0
+    Dim lWidth As Integer = 0
     Dim lFixedRows As Integer = pSource.FixedRows
     Dim lFixedColumns As Integer = pSource.FixedColumns
 
@@ -677,7 +716,12 @@ Public Class atcGrid
         lColumn = pLeftColumn - 1
       End If
     Next
-    Return New Rectangle(lX, lY, ColumnWidth(aColumn), RowHeight(aRow))
+
+    lWidth = ColumnWidth(aColumn)
+    If lX + lWidth > pVisibleWidth Then lWidth = pVisibleWidth - lX
+    If lWidth < 0 Then lWidth = 0
+
+    Return New Rectangle(lX, lY, lWidth, RowHeight(aRow))
   End Function
 
   Public Sub EditCell(ByVal aRow As Integer, ByVal aColumn As Integer, Optional ByVal aOverrideEditable As Boolean = False)
@@ -687,19 +731,34 @@ Public Class atcGrid
         Dim EditCellBounds As Rectangle = CellBounds(aRow, aColumn)
         pColumnEditing = aColumn
         pRowEditing = aRow
-        CellEditBox.Font = pFont
-        CellEditBox.Text = pSource.CellValue(aRow, aColumn)
-        CellEditBox.BackColor = pSource.CellColor(aRow, aColumn)
-        CellEditBox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)
-        CellEditBox.Visible = True
-        CellEditBox.Focus()
+        If CellComboBox.Items.Count > 0 Then
+          CellComboBox.Font = pFont
+          CellComboBox.Text = pSource.CellValue(aRow, aColumn)
+          CellComboBox.BackColor = pSource.CellColor(aRow, aColumn)
+          CellComboBox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)
+          CellComboBox.Visible = True
+          CellComboBox.Focus()
+        Else
+          CellEditBox.Font = pFont
+          CellEditBox.Text = pSource.CellValue(aRow, aColumn)
+          CellEditBox.BackColor = pSource.CellColor(aRow, aColumn)
+          CellEditBox.SetBounds(EditCellBounds.Left, EditCellBounds.Top, EditCellBounds.Width, EditCellBounds.Height)
+          CellEditBox.Visible = True
+          CellEditBox.Focus()
+        End If
       End If
     End If
   End Sub
 
   Public Sub EditCellFinished()
-    If CellEditBox.Visible Then ChangeEditingValues(CellEditBox.Text)
-    CellEditBox.Visible = False
+    If CellComboBox.Visible Then
+      ChangeEditingValues(CellComboBox.Text)
+      CellComboBox.Visible = False
+    End If
+    If CellEditBox.Visible Then
+      ChangeEditingValues(CellEditBox.Text)
+      CellEditBox.Visible = False
+    End If
   End Sub
 
   Private Sub ChangeEditingValues(ByVal aNewValue As String)
@@ -731,10 +790,10 @@ Public Class atcGrid
         If lRowIndex < pRowBottom.Count AndAlso lColumnIndex < pColumnRight.Count Then
           lRow = pRowBottom.Keys(lRowIndex)
           lColumn = pColumnRight.Keys(lColumnIndex)
+          RaiseEvent MouseDownCell(Me, lRow, lColumn)
           If pSource.CellEditable(lRow, lColumn) Then
             EditCell(lRow, lColumn)
           End If
-          RaiseEvent MouseDownCell(Me, lRow, lColumn)
         End If
       End If
     End If
@@ -820,6 +879,8 @@ Public Class atcGrid
   End Function
 
   Private Sub atcGrid_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+    CellComboBox.Visible = False
+    CellEditBox.Visible = False
     SizeScrollers()
     Refresh()
   End Sub
@@ -878,6 +939,18 @@ Public Class atcGrid
     EditCellFinished()
   End Sub
 
+  Private Sub CellComboBox_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles CellComboBox.KeyDown
+    Select Case e.KeyCode
+      Case Keys.Escape : CellComboBox.Visible = False : EditCellFinished()
+      Case Keys.Enter : EditCellFinished()
+      Case Keys.Tab : EditCellFinished() 'TODO: shift editing right one column
+    End Select
+  End Sub
+
+  Private Sub CellComboBox_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles CellComboBox.LostFocus
+    EditCellFinished()
+  End Sub
+
   Private Sub VScroller_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles VScroller.MouseWheel
     Dim lNewValue As Integer = VScroller.Value
     If e.Delta > 0 Then lNewValue -= 1 Else lNewValue += 1
@@ -892,5 +965,13 @@ Public Class atcGrid
 
   Protected Overrides Sub OnMouseWheel(ByVal e As System.Windows.Forms.MouseEventArgs)
     VScroller_MouseWheel(Me, e)
+  End Sub
+
+  Private Sub VScroller_MouseEnter(ByVal sender As Object, ByVal e As System.EventArgs) Handles VScroller.MouseEnter
+    Me.Cursor = Cursors.Arrow
+  End Sub
+
+  Private Sub HScroller_MouseEnter(ByVal sender As Object, ByVal e As System.EventArgs) Handles HScroller.MouseEnter
+    Me.Cursor = Cursors.Arrow
   End Sub
 End Class
