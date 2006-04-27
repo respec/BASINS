@@ -31,7 +31,7 @@ Friend Class atcWdmHandle
     If Not FileExists(lFileName) AndAlso aRWCFlg <> 2 Then
       Logger.Msg("Could not find " & aFileName, "atcWdmHandle")
     Else
-      Logger.Dbg("atcWdmHandle:New:Open:" & lFileName)
+      'Logger.Dbg("atcWdmHandle:New:Open:" & lFileName)
       If aRWCFlg = 0 Then
         lAttr = GetAttr(lFileName) 'if read only, change to not read only
         If (lAttr And FileAttribute.ReadOnly) <> 0 Then
@@ -43,7 +43,7 @@ Friend Class atcWdmHandle
       pUnit = -2 'code to try to use existing unit number from INQUIRE_NAME
       F90_WDBOPNR(aRWCFlg, lFileName, pUnit, lRetcod, CShort(Len(lFileName)))
 
-      Logger.Dbg("atcWdmHandle:New:Open:" & lFileName & ":" & pUnit)
+      'Logger.Dbg("atcWdmHandle:New:Open:" & lFileName & ":" & pUnit)
 
       If lRetcod <> 0 Then
         If lRetcod = 159 Then
@@ -59,7 +59,7 @@ Friend Class atcWdmHandle
   Public Sub Dispose() Implements System.IDisposable.Dispose
     Dim lRetcod As Integer
 
-    Logger.Dbg("atcWdmHandle:Dispose:" & pUnit)
+    'Logger.Dbg("atcWdmHandle:Dispose:" & pUnit)
 
     If pUnit > 0 Then
       lRetcod = F90_WDFLCL(pUnit)
