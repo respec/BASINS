@@ -286,21 +286,15 @@ Public Class atcDataAttributes
           Dim lOwnerTS As atcTimeseries = Owner
           Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
           Dim lOperation As atcDefinedValue = Nothing
-          If lDef Is Nothing Then 'if rogue attributes are suspected, uncomment this code to help discover them
-            'Logger.Dbg("Attribute Without Definition: " & aAttributeName & ": " & _
-            '           "Owner: " & Owner.ToString)
-          Else
-            If lDef.Calculated AndAlso IsSimple(lDef, lKey, lOperation) Then
-              Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
-              Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
-              lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
-              lDef.Calculator.Open(lDef.Name, lArgs)
-              lAttribute = ItemByKey(lKey)
-            End If
+          If lDef.Calculated AndAlso IsSimple(lDef, lKey, lOperation) Then
+            Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
+            Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
+            lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
+            lDef.Calculator.Open(lDef.Name, lArgs)
+            lAttribute = ItemByKey(lKey)
           End If
         Catch CalcExcep As Exception
-          Logger.Dbg("Exception calculating " & aAttributeName & ": " & _
-                      CalcExcep.Message & ": Owner: " & Owner.ToString)
+          Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
         End Try
       End If
     End If
