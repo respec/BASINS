@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On 
 
 Imports System.Collections.Specialized
+Imports System.IO
 Imports MapWinUtility
 
 Public Module modFile
@@ -789,5 +790,36 @@ ErrorReading:
     reader.Close()
 
   End Sub
+
+  'Reads the next line from a text file whose lines end with carriage return and/or linefeed
+  'Advances the position of the stream to the beginning of the next line
+  'Returns Nothing if already at end of file
+  Public Function NextLine(ByVal aReader As BinaryReader) As String
+    Dim ch As Char
+    NextLine = Nothing
+    Try
+ReadCharacter:
+      ch = aReader.ReadChar
+      Select Case ch
+        Case vbCr 'Found end of line, consume linefeed if it is next
+          If CInt(aReader.PeekChar) = CInt(10) Then aReader.ReadChar()
+        Case vbLf 'Unix-style line ends without carriage return
+        Case Else 'Found a character that does not end the line
+          If NextLine Is Nothing Then
+            NextLine = ch
+          Else
+            NextLine &= ch
+          End If
+          GoTo ReadCharacter
+      End Select
+    Catch endEx As EndOfStreamException
+      If NextLine Is Nothing Then 'We had nothing to read, already finished file last time
+        Throw endEx
+      Else
+        'Reaching the end of file is fine, we have finished reading this file
+      End If
+    End Try
+
+  End Function
 
 End Module
