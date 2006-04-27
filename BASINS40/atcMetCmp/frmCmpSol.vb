@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmCmpSol
@@ -60,25 +61,25 @@ Public Class frmCmpSol
     '
     'lblCloudCover
     '
-    Me.lblCloudCover.Location = New System.Drawing.Point(16, 16)
+    Me.lblCloudCover.Location = New System.Drawing.Point(19, 18)
     Me.lblCloudCover.Name = "lblCloudCover"
-    Me.lblCloudCover.Size = New System.Drawing.Size(224, 16)
+    Me.lblCloudCover.Size = New System.Drawing.Size(269, 19)
     Me.lblCloudCover.TabIndex = 2
     Me.lblCloudCover.Text = "Specify Cloud Cover Timeseries"
     '
     'lblLatitude
     '
-    Me.lblLatitude.Location = New System.Drawing.Point(16, 96)
+    Me.lblLatitude.Location = New System.Drawing.Point(19, 111)
     Me.lblLatitude.Name = "lblLatitude"
-    Me.lblLatitude.Size = New System.Drawing.Size(152, 16)
+    Me.lblLatitude.Size = New System.Drawing.Size(183, 18)
     Me.lblLatitude.TabIndex = 3
     Me.lblLatitude.Text = "Latitude (in decimal degress)"
     '
     'txtLatitude
     '
-    Me.txtLatitude.Location = New System.Drawing.Point(176, 96)
+    Me.txtLatitude.Location = New System.Drawing.Point(211, 111)
     Me.txtLatitude.Name = "txtLatitude"
-    Me.txtLatitude.Size = New System.Drawing.Size(72, 20)
+    Me.txtLatitude.Size = New System.Drawing.Size(87, 22)
     Me.txtLatitude.TabIndex = 4
     Me.txtLatitude.Text = ""
     '
@@ -87,48 +88,48 @@ Public Class frmCmpSol
     Me.panelBottom.Controls.Add(Me.btnCancel)
     Me.panelBottom.Controls.Add(Me.btnOk)
     Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.panelBottom.Location = New System.Drawing.Point(0, 133)
+    Me.panelBottom.Location = New System.Drawing.Point(0, 153)
     Me.panelBottom.Name = "panelBottom"
-    Me.panelBottom.Size = New System.Drawing.Size(296, 32)
+    Me.panelBottom.Size = New System.Drawing.Size(355, 37)
     Me.panelBottom.TabIndex = 16
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(176, 0)
+    Me.btnCancel.Location = New System.Drawing.Point(211, 0)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(77, 28)
     Me.btnCancel.TabIndex = 1
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(80, 0)
+    Me.btnOk.Location = New System.Drawing.Point(96, 0)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(64, 24)
+    Me.btnOk.Size = New System.Drawing.Size(77, 28)
     Me.btnOk.TabIndex = 0
     Me.btnOk.Text = "Ok"
     '
     'btnCloudCover
     '
-    Me.btnCloudCover.Location = New System.Drawing.Point(16, 40)
+    Me.btnCloudCover.Location = New System.Drawing.Point(19, 46)
     Me.btnCloudCover.Name = "btnCloudCover"
-    Me.btnCloudCover.Size = New System.Drawing.Size(48, 20)
+    Me.btnCloudCover.Size = New System.Drawing.Size(58, 23)
     Me.btnCloudCover.TabIndex = 18
     Me.btnCloudCover.Text = "Select"
     '
     'txtCloudCover
     '
-    Me.txtCloudCover.Location = New System.Drawing.Point(72, 40)
+    Me.txtCloudCover.Location = New System.Drawing.Point(86, 46)
     Me.txtCloudCover.Name = "txtCloudCover"
     Me.txtCloudCover.ReadOnly = True
-    Me.txtCloudCover.Size = New System.Drawing.Size(216, 20)
+    Me.txtCloudCover.Size = New System.Drawing.Size(260, 22)
     Me.txtCloudCover.TabIndex = 19
     Me.txtCloudCover.Text = ""
     '
     'frmCmpSol
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(296, 165)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(355, 190)
     Me.Controls.Add(Me.txtCloudCover)
     Me.Controls.Add(Me.btnCloudCover)
     Me.Controls.Add(Me.panelBottom)
@@ -136,6 +137,7 @@ Public Class frmCmpSol
     Me.Controls.Add(Me.lblLatitude)
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmCmpSol"
     Me.Text = "Compute Solar Radiation"
     Me.panelBottom.ResumeLayout(False)
@@ -183,6 +185,12 @@ Public Class frmCmpSol
     pTSGroup = pDataManager.UserSelectData("Select data for Cloud Cover")
     If pTSGroup.Count > 0 Then
       txtCloudCover.Text = pTSGroup.ItemByIndex(0).ToString
+    End If
+  End Sub
+
+  Private Sub frmCmpSol_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Compute\Computations.html")
     End If
   End Sub
 End Class

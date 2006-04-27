@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmDisTemp
@@ -69,25 +70,25 @@ Public Class frmDisTemp
     '
     'lblCloudCover
     '
-    Me.lblCloudCover.Location = New System.Drawing.Point(16, 16)
+    Me.lblCloudCover.Location = New System.Drawing.Point(19, 18)
     Me.lblCloudCover.Name = "lblCloudCover"
-    Me.lblCloudCover.Size = New System.Drawing.Size(208, 16)
+    Me.lblCloudCover.Size = New System.Drawing.Size(250, 19)
     Me.lblCloudCover.TabIndex = 2
     Me.lblCloudCover.Text = "Specify Daily Temperature Timeseries"
     '
     'lblObsTime
     '
-    Me.lblObsTime.Location = New System.Drawing.Point(8, 104)
+    Me.lblObsTime.Location = New System.Drawing.Point(10, 120)
     Me.lblObsTime.Name = "lblObsTime"
-    Me.lblObsTime.Size = New System.Drawing.Size(112, 16)
+    Me.lblObsTime.Size = New System.Drawing.Size(134, 18)
     Me.lblObsTime.TabIndex = 3
     Me.lblObsTime.Text = "Observation Hour:"
     '
     'txtObsTime
     '
-    Me.txtObsTime.Location = New System.Drawing.Point(128, 104)
+    Me.txtObsTime.Location = New System.Drawing.Point(154, 120)
     Me.txtObsTime.Name = "txtObsTime"
-    Me.txtObsTime.Size = New System.Drawing.Size(48, 20)
+    Me.txtObsTime.Size = New System.Drawing.Size(57, 22)
     Me.txtObsTime.TabIndex = 4
     Me.txtObsTime.Text = ""
     '
@@ -96,81 +97,81 @@ Public Class frmDisTemp
     Me.panelBottom.Controls.Add(Me.btnCancel)
     Me.panelBottom.Controls.Add(Me.btnOk)
     Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.panelBottom.Location = New System.Drawing.Point(0, 141)
+    Me.panelBottom.Location = New System.Drawing.Point(0, 162)
     Me.panelBottom.Name = "panelBottom"
-    Me.panelBottom.Size = New System.Drawing.Size(464, 32)
+    Me.panelBottom.Size = New System.Drawing.Size(556, 37)
     Me.panelBottom.TabIndex = 16
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(240, 0)
+    Me.btnCancel.Location = New System.Drawing.Point(288, 0)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(77, 28)
     Me.btnCancel.TabIndex = 1
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(152, 0)
+    Me.btnOk.Location = New System.Drawing.Point(182, 0)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(64, 24)
+    Me.btnOk.Size = New System.Drawing.Size(77, 28)
     Me.btnOk.TabIndex = 0
     Me.btnOk.Text = "Ok"
     '
     'btnTMin
     '
-    Me.btnTMin.Location = New System.Drawing.Point(72, 40)
+    Me.btnTMin.Location = New System.Drawing.Point(86, 46)
     Me.btnTMin.Name = "btnTMin"
-    Me.btnTMin.Size = New System.Drawing.Size(48, 20)
+    Me.btnTMin.Size = New System.Drawing.Size(58, 23)
     Me.btnTMin.TabIndex = 18
     Me.btnTMin.Text = "Select"
     '
     'txtTMin
     '
-    Me.txtTMin.Location = New System.Drawing.Point(128, 40)
+    Me.txtTMin.Location = New System.Drawing.Point(154, 46)
     Me.txtTMin.Name = "txtTMin"
     Me.txtTMin.ReadOnly = True
-    Me.txtTMin.Size = New System.Drawing.Size(328, 20)
+    Me.txtTMin.Size = New System.Drawing.Size(393, 22)
     Me.txtTMin.TabIndex = 19
     Me.txtTMin.Text = ""
     '
     'lblTMin
     '
-    Me.lblTMin.Location = New System.Drawing.Point(8, 40)
+    Me.lblTMin.Location = New System.Drawing.Point(10, 46)
     Me.lblTMin.Name = "lblTMin"
-    Me.lblTMin.Size = New System.Drawing.Size(64, 16)
+    Me.lblTMin.Size = New System.Drawing.Size(76, 19)
     Me.lblTMin.TabIndex = 20
     Me.lblTMin.Text = "Min Temp:"
     '
     'lblTMax
     '
-    Me.lblTMax.Location = New System.Drawing.Point(8, 72)
+    Me.lblTMax.Location = New System.Drawing.Point(10, 83)
     Me.lblTMax.Name = "lblTMax"
-    Me.lblTMax.Size = New System.Drawing.Size(64, 16)
+    Me.lblTMax.Size = New System.Drawing.Size(76, 19)
     Me.lblTMax.TabIndex = 21
     Me.lblTMax.Text = "Max Temp:"
     '
     'btnTMax
     '
-    Me.btnTMax.Location = New System.Drawing.Point(72, 71)
+    Me.btnTMax.Location = New System.Drawing.Point(86, 82)
     Me.btnTMax.Name = "btnTMax"
-    Me.btnTMax.Size = New System.Drawing.Size(48, 20)
+    Me.btnTMax.Size = New System.Drawing.Size(58, 23)
     Me.btnTMax.TabIndex = 22
     Me.btnTMax.Text = "Select"
     '
     'txtTMax
     '
-    Me.txtTMax.Location = New System.Drawing.Point(128, 72)
+    Me.txtTMax.Location = New System.Drawing.Point(154, 83)
     Me.txtTMax.Name = "txtTMax"
     Me.txtTMax.ReadOnly = True
-    Me.txtTMax.Size = New System.Drawing.Size(328, 20)
+    Me.txtTMax.Size = New System.Drawing.Size(393, 22)
     Me.txtTMax.TabIndex = 23
     Me.txtTMax.Text = ""
     '
     'frmDisTemp
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(464, 173)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(556, 199)
     Me.Controls.Add(Me.txtTMax)
     Me.Controls.Add(Me.txtTMin)
     Me.Controls.Add(Me.txtObsTime)
@@ -182,6 +183,7 @@ Public Class frmDisTemp
     Me.Controls.Add(Me.lblObsTime)
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmDisTemp"
     Me.Text = "Disaggregate Temperature"
     Me.panelBottom.ResumeLayout(False)
@@ -242,4 +244,9 @@ Public Class frmDisTemp
     End If
   End Sub
 
+  Private Sub frmDisTemp_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Compute\Disaggregations.html")
+    End If
+  End Sub
 End Class

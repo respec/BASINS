@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmDisSol
@@ -60,25 +61,25 @@ Public Class frmDisSol
     '
     'lblTSer
     '
-    Me.lblTSer.Location = New System.Drawing.Point(16, 16)
+    Me.lblTSer.Location = New System.Drawing.Point(19, 18)
     Me.lblTSer.Name = "lblTSer"
-    Me.lblTSer.Size = New System.Drawing.Size(224, 16)
+    Me.lblTSer.Size = New System.Drawing.Size(269, 19)
     Me.lblTSer.TabIndex = 2
     Me.lblTSer.Text = "Specify Daily Solar Radiation Timeseries"
     '
     'lblLatitude
     '
-    Me.lblLatitude.Location = New System.Drawing.Point(16, 88)
+    Me.lblLatitude.Location = New System.Drawing.Point(19, 102)
     Me.lblLatitude.Name = "lblLatitude"
-    Me.lblLatitude.Size = New System.Drawing.Size(152, 16)
+    Me.lblLatitude.Size = New System.Drawing.Size(183, 18)
     Me.lblLatitude.TabIndex = 3
     Me.lblLatitude.Text = "Latitude (in decimal degress)"
     '
     'txtLatitude
     '
-    Me.txtLatitude.Location = New System.Drawing.Point(176, 88)
+    Me.txtLatitude.Location = New System.Drawing.Point(211, 102)
     Me.txtLatitude.Name = "txtLatitude"
-    Me.txtLatitude.Size = New System.Drawing.Size(72, 20)
+    Me.txtLatitude.Size = New System.Drawing.Size(87, 22)
     Me.txtLatitude.TabIndex = 4
     Me.txtLatitude.Text = ""
     '
@@ -87,48 +88,48 @@ Public Class frmDisSol
     Me.panelBottom.Controls.Add(Me.btnCancel)
     Me.panelBottom.Controls.Add(Me.btnOk)
     Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.panelBottom.Location = New System.Drawing.Point(0, 125)
+    Me.panelBottom.Location = New System.Drawing.Point(0, 144)
     Me.panelBottom.Name = "panelBottom"
-    Me.panelBottom.Size = New System.Drawing.Size(296, 32)
+    Me.panelBottom.Size = New System.Drawing.Size(355, 37)
     Me.panelBottom.TabIndex = 16
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(176, 0)
+    Me.btnCancel.Location = New System.Drawing.Point(211, 0)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(77, 28)
     Me.btnCancel.TabIndex = 1
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(80, 0)
+    Me.btnOk.Location = New System.Drawing.Point(96, 0)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(64, 24)
+    Me.btnOk.Size = New System.Drawing.Size(77, 28)
     Me.btnOk.TabIndex = 0
     Me.btnOk.Text = "Ok"
     '
     'btnSolar
     '
-    Me.btnSolar.Location = New System.Drawing.Point(16, 40)
+    Me.btnSolar.Location = New System.Drawing.Point(19, 46)
     Me.btnSolar.Name = "btnSolar"
-    Me.btnSolar.Size = New System.Drawing.Size(48, 20)
+    Me.btnSolar.Size = New System.Drawing.Size(58, 23)
     Me.btnSolar.TabIndex = 18
     Me.btnSolar.Text = "Select"
     '
     'txtSolar
     '
-    Me.txtSolar.Location = New System.Drawing.Point(72, 40)
+    Me.txtSolar.Location = New System.Drawing.Point(86, 46)
     Me.txtSolar.Name = "txtSolar"
     Me.txtSolar.ReadOnly = True
-    Me.txtSolar.Size = New System.Drawing.Size(216, 20)
+    Me.txtSolar.Size = New System.Drawing.Size(260, 22)
     Me.txtSolar.TabIndex = 19
     Me.txtSolar.Text = ""
     '
     'frmDisSol
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(296, 157)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(355, 181)
     Me.Controls.Add(Me.txtSolar)
     Me.Controls.Add(Me.txtLatitude)
     Me.Controls.Add(Me.btnSolar)
@@ -136,6 +137,7 @@ Public Class frmDisSol
     Me.Controls.Add(Me.lblLatitude)
     Me.Controls.Add(Me.lblTSer)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmDisSol"
     Me.Text = "Disaggregate Solar Radiation"
     Me.panelBottom.ResumeLayout(False)
@@ -183,6 +185,12 @@ Public Class frmDisSol
     pTSGroup = pDataManager.UserSelectData("Select Daily Solar Radiation Timeseries")
     If pTSGroup.Count > 0 Then
       txtSolar.Text = pTSGroup.ItemByIndex(0).ToString
+    End If
+  End Sub
+
+  Private Sub frmDisSol_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Compute\Disaggregations.html")
     End If
   End Sub
 End Class

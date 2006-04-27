@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmDisWind
@@ -112,9 +113,9 @@ Public Class frmDisWind
     '
     'lblCloudCover
     '
-    Me.lblCloudCover.Location = New System.Drawing.Point(16, 16)
+    Me.lblCloudCover.Location = New System.Drawing.Point(19, 18)
     Me.lblCloudCover.Name = "lblCloudCover"
-    Me.lblCloudCover.Size = New System.Drawing.Size(168, 16)
+    Me.lblCloudCover.Size = New System.Drawing.Size(202, 19)
     Me.lblCloudCover.TabIndex = 2
     Me.lblCloudCover.Text = "Specify Daily Wind Timeseries"
     '
@@ -123,272 +124,272 @@ Public Class frmDisWind
     Me.panelBottom.Controls.Add(Me.btnCancel)
     Me.panelBottom.Controls.Add(Me.btnOk)
     Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.panelBottom.Location = New System.Drawing.Point(0, 165)
+    Me.panelBottom.Location = New System.Drawing.Point(0, 190)
     Me.panelBottom.Name = "panelBottom"
-    Me.panelBottom.Size = New System.Drawing.Size(520, 32)
+    Me.panelBottom.Size = New System.Drawing.Size(624, 37)
     Me.panelBottom.TabIndex = 16
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(240, 0)
+    Me.btnCancel.Location = New System.Drawing.Point(288, 0)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(77, 28)
     Me.btnCancel.TabIndex = 1
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(152, 0)
+    Me.btnOk.Location = New System.Drawing.Point(182, 0)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(64, 24)
+    Me.btnOk.Size = New System.Drawing.Size(77, 28)
     Me.btnOk.TabIndex = 0
     Me.btnOk.Text = "Ok"
     '
     'btnWind
     '
-    Me.btnWind.Location = New System.Drawing.Point(72, 40)
+    Me.btnWind.Location = New System.Drawing.Point(86, 46)
     Me.btnWind.Name = "btnWind"
-    Me.btnWind.Size = New System.Drawing.Size(48, 20)
+    Me.btnWind.Size = New System.Drawing.Size(58, 23)
     Me.btnWind.TabIndex = 18
     Me.btnWind.Text = "Select"
     '
     'txtWind
     '
-    Me.txtWind.Location = New System.Drawing.Point(128, 40)
+    Me.txtWind.Location = New System.Drawing.Point(154, 46)
     Me.txtWind.Name = "txtWind"
     Me.txtWind.ReadOnly = True
-    Me.txtWind.Size = New System.Drawing.Size(384, 20)
+    Me.txtWind.Size = New System.Drawing.Size(460, 22)
     Me.txtWind.TabIndex = 19
     Me.txtWind.Text = ""
     '
     'lblWind
     '
-    Me.lblWind.Location = New System.Drawing.Point(16, 40)
+    Me.lblWind.Location = New System.Drawing.Point(19, 46)
     Me.lblWind.Name = "lblWind"
-    Me.lblWind.Size = New System.Drawing.Size(40, 16)
+    Me.lblWind.Size = New System.Drawing.Size(48, 19)
     Me.lblWind.TabIndex = 20
     Me.lblWind.Text = "Wind:"
     '
     'lblHrDist
     '
-    Me.lblHrDist.Location = New System.Drawing.Point(8, 80)
+    Me.lblHrDist.Location = New System.Drawing.Point(10, 92)
     Me.lblHrDist.Name = "lblHrDist"
-    Me.lblHrDist.Size = New System.Drawing.Size(160, 16)
+    Me.lblHrDist.Size = New System.Drawing.Size(192, 19)
     Me.lblHrDist.TabIndex = 26
     Me.lblHrDist.Text = "Specify Hourly Distribution"
     '
     'txtHr1
     '
-    Me.txtHr1.Location = New System.Drawing.Point(40, 104)
+    Me.txtHr1.Location = New System.Drawing.Point(48, 120)
     Me.txtHr1.Name = "txtHr1"
-    Me.txtHr1.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr1.Size = New System.Drawing.Size(48, 22)
     Me.txtHr1.TabIndex = 39
     Me.txtHr1.Text = "0.034"
     '
     'txtHr2
     '
-    Me.txtHr2.Location = New System.Drawing.Point(80, 104)
+    Me.txtHr2.Location = New System.Drawing.Point(96, 120)
     Me.txtHr2.Name = "txtHr2"
-    Me.txtHr2.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr2.Size = New System.Drawing.Size(48, 22)
     Me.txtHr2.TabIndex = 40
     Me.txtHr2.Text = "0.034"
     '
     'txtHr3
     '
-    Me.txtHr3.Location = New System.Drawing.Point(120, 104)
+    Me.txtHr3.Location = New System.Drawing.Point(144, 120)
     Me.txtHr3.Name = "txtHr3"
-    Me.txtHr3.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr3.Size = New System.Drawing.Size(48, 22)
     Me.txtHr3.TabIndex = 41
     Me.txtHr3.Text = "0.034"
     '
     'txtHr4
     '
-    Me.txtHr4.Location = New System.Drawing.Point(160, 104)
+    Me.txtHr4.Location = New System.Drawing.Point(192, 120)
     Me.txtHr4.Name = "txtHr4"
-    Me.txtHr4.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr4.Size = New System.Drawing.Size(48, 22)
     Me.txtHr4.TabIndex = 42
     Me.txtHr4.Text = "0.034"
     '
     'txtHr5
     '
-    Me.txtHr5.Location = New System.Drawing.Point(200, 104)
+    Me.txtHr5.Location = New System.Drawing.Point(240, 120)
     Me.txtHr5.Name = "txtHr5"
-    Me.txtHr5.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr5.Size = New System.Drawing.Size(48, 22)
     Me.txtHr5.TabIndex = 43
     Me.txtHr5.Text = "0.034"
     '
     'txtHr6
     '
-    Me.txtHr6.Location = New System.Drawing.Point(240, 104)
+    Me.txtHr6.Location = New System.Drawing.Point(288, 120)
     Me.txtHr6.Name = "txtHr6"
-    Me.txtHr6.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr6.Size = New System.Drawing.Size(48, 22)
     Me.txtHr6.TabIndex = 44
     Me.txtHr6.Text = "0.034"
     '
     'txtHr7
     '
-    Me.txtHr7.Location = New System.Drawing.Point(280, 104)
+    Me.txtHr7.Location = New System.Drawing.Point(336, 120)
     Me.txtHr7.Name = "txtHr7"
-    Me.txtHr7.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr7.Size = New System.Drawing.Size(48, 22)
     Me.txtHr7.TabIndex = 45
     Me.txtHr7.Text = "0.034"
     '
     'txtHr8
     '
-    Me.txtHr8.Location = New System.Drawing.Point(320, 104)
+    Me.txtHr8.Location = New System.Drawing.Point(384, 120)
     Me.txtHr8.Name = "txtHr8"
-    Me.txtHr8.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr8.Size = New System.Drawing.Size(48, 22)
     Me.txtHr8.TabIndex = 46
     Me.txtHr8.Text = "0.035"
     '
     'txtHr9
     '
-    Me.txtHr9.Location = New System.Drawing.Point(360, 104)
+    Me.txtHr9.Location = New System.Drawing.Point(432, 120)
     Me.txtHr9.Name = "txtHr9"
-    Me.txtHr9.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr9.Size = New System.Drawing.Size(48, 22)
     Me.txtHr9.TabIndex = 47
     Me.txtHr9.Text = "0.037"
     '
     'txtHr10
     '
-    Me.txtHr10.Location = New System.Drawing.Point(400, 104)
+    Me.txtHr10.Location = New System.Drawing.Point(480, 120)
     Me.txtHr10.Name = "txtHr10"
-    Me.txtHr10.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr10.Size = New System.Drawing.Size(48, 22)
     Me.txtHr10.TabIndex = 48
     Me.txtHr10.Text = "0.041"
     '
     'txtHr11
     '
-    Me.txtHr11.Location = New System.Drawing.Point(440, 104)
+    Me.txtHr11.Location = New System.Drawing.Point(528, 120)
     Me.txtHr11.Name = "txtHr11"
-    Me.txtHr11.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr11.Size = New System.Drawing.Size(48, 22)
     Me.txtHr11.TabIndex = 49
     Me.txtHr11.Text = "0.046"
     '
     'txtHr12
     '
-    Me.txtHr12.Location = New System.Drawing.Point(480, 104)
+    Me.txtHr12.Location = New System.Drawing.Point(576, 120)
     Me.txtHr12.Name = "txtHr12"
-    Me.txtHr12.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr12.Size = New System.Drawing.Size(48, 22)
     Me.txtHr12.TabIndex = 50
     Me.txtHr12.Text = "0.05"
     '
     'lbl1To12
     '
-    Me.lbl1To12.Location = New System.Drawing.Point(8, 104)
+    Me.lbl1To12.Location = New System.Drawing.Point(10, 120)
     Me.lbl1To12.Name = "lbl1To12"
-    Me.lbl1To12.Size = New System.Drawing.Size(32, 16)
+    Me.lbl1To12.Size = New System.Drawing.Size(38, 18)
     Me.lbl1To12.TabIndex = 51
     Me.lbl1To12.Text = "1-12:"
     '
     'Label1
     '
-    Me.Label1.Location = New System.Drawing.Point(8, 128)
+    Me.Label1.Location = New System.Drawing.Point(10, 148)
     Me.Label1.Name = "Label1"
-    Me.Label1.Size = New System.Drawing.Size(40, 16)
+    Me.Label1.Size = New System.Drawing.Size(48, 18)
     Me.Label1.TabIndex = 52
     Me.Label1.Text = "12-24:"
     '
     'txtHr24
     '
-    Me.txtHr24.Location = New System.Drawing.Point(480, 128)
+    Me.txtHr24.Location = New System.Drawing.Point(576, 148)
     Me.txtHr24.Name = "txtHr24"
-    Me.txtHr24.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr24.Size = New System.Drawing.Size(48, 22)
     Me.txtHr24.TabIndex = 64
     Me.txtHr24.Text = "0.034"
     '
     'txtHr23
     '
-    Me.txtHr23.Location = New System.Drawing.Point(440, 128)
+    Me.txtHr23.Location = New System.Drawing.Point(528, 148)
     Me.txtHr23.Name = "txtHr23"
-    Me.txtHr23.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr23.Size = New System.Drawing.Size(48, 22)
     Me.txtHr23.TabIndex = 63
     Me.txtHr23.Text = "0.035"
     '
     'txtHr22
     '
-    Me.txtHr22.Location = New System.Drawing.Point(400, 128)
+    Me.txtHr22.Location = New System.Drawing.Point(480, 148)
     Me.txtHr22.Name = "txtHr22"
-    Me.txtHr22.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr22.Size = New System.Drawing.Size(48, 22)
     Me.txtHr22.TabIndex = 62
     Me.txtHr22.Text = "0.035"
     '
     'txtHr21
     '
-    Me.txtHr21.Location = New System.Drawing.Point(360, 128)
+    Me.txtHr21.Location = New System.Drawing.Point(432, 148)
     Me.txtHr21.Name = "txtHr21"
-    Me.txtHr21.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr21.Size = New System.Drawing.Size(48, 22)
     Me.txtHr21.TabIndex = 61
     Me.txtHr21.Text = "0.038"
     '
     'txtHr20
     '
-    Me.txtHr20.Location = New System.Drawing.Point(320, 128)
+    Me.txtHr20.Location = New System.Drawing.Point(384, 148)
     Me.txtHr20.Name = "txtHr20"
-    Me.txtHr20.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr20.Size = New System.Drawing.Size(48, 22)
     Me.txtHr20.TabIndex = 60
     Me.txtHr20.Text = "0.04"
     '
     'txtHr19
     '
-    Me.txtHr19.Location = New System.Drawing.Point(280, 128)
+    Me.txtHr19.Location = New System.Drawing.Point(336, 148)
     Me.txtHr19.Name = "txtHr19"
-    Me.txtHr19.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr19.Size = New System.Drawing.Size(48, 22)
     Me.txtHr19.TabIndex = 59
     Me.txtHr19.Text = "0.043"
     '
     'txtHr18
     '
-    Me.txtHr18.Location = New System.Drawing.Point(240, 128)
+    Me.txtHr18.Location = New System.Drawing.Point(288, 148)
     Me.txtHr18.Name = "txtHr18"
-    Me.txtHr18.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr18.Size = New System.Drawing.Size(48, 22)
     Me.txtHr18.TabIndex = 58
     Me.txtHr18.Text = "0.05"
     '
     'txtHr17
     '
-    Me.txtHr17.Location = New System.Drawing.Point(200, 128)
+    Me.txtHr17.Location = New System.Drawing.Point(240, 148)
     Me.txtHr17.Name = "txtHr17"
-    Me.txtHr17.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr17.Size = New System.Drawing.Size(48, 22)
     Me.txtHr17.TabIndex = 57
     Me.txtHr17.Text = "0.056"
     '
     'txtHr16
     '
-    Me.txtHr16.Location = New System.Drawing.Point(160, 128)
+    Me.txtHr16.Location = New System.Drawing.Point(192, 148)
     Me.txtHr16.Name = "txtHr16"
-    Me.txtHr16.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr16.Size = New System.Drawing.Size(48, 22)
     Me.txtHr16.TabIndex = 56
     Me.txtHr16.Text = "0.057"
     '
     'txtHr15
     '
-    Me.txtHr15.Location = New System.Drawing.Point(120, 128)
+    Me.txtHr15.Location = New System.Drawing.Point(144, 148)
     Me.txtHr15.Name = "txtHr15"
-    Me.txtHr15.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr15.Size = New System.Drawing.Size(48, 22)
     Me.txtHr15.TabIndex = 55
     Me.txtHr15.Text = "0.058"
     '
     'txtHr14
     '
-    Me.txtHr14.Location = New System.Drawing.Point(80, 128)
+    Me.txtHr14.Location = New System.Drawing.Point(96, 148)
     Me.txtHr14.Name = "txtHr14"
-    Me.txtHr14.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr14.Size = New System.Drawing.Size(48, 22)
     Me.txtHr14.TabIndex = 54
     Me.txtHr14.Text = "0.054"
     '
     'txtHr13
     '
-    Me.txtHr13.Location = New System.Drawing.Point(40, 128)
+    Me.txtHr13.Location = New System.Drawing.Point(48, 148)
     Me.txtHr13.Name = "txtHr13"
-    Me.txtHr13.Size = New System.Drawing.Size(40, 20)
+    Me.txtHr13.Size = New System.Drawing.Size(48, 22)
     Me.txtHr13.TabIndex = 53
     Me.txtHr13.Text = "0.053"
     '
     'frmDisWind
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(520, 197)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(624, 227)
     Me.Controls.Add(Me.txtHr24)
     Me.Controls.Add(Me.txtHr23)
     Me.Controls.Add(Me.txtHr22)
@@ -422,6 +423,7 @@ Public Class frmDisWind
     Me.Controls.Add(Me.panelBottom)
     Me.Controls.Add(Me.lblCloudCover)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmDisWind"
     Me.Text = "Disaggregate Wind"
     Me.panelBottom.ResumeLayout(False)
@@ -512,4 +514,9 @@ BadHourDist:
     End If
   End Sub
 
+  Private Sub frmDisWind_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Compute\Disaggregations.html")
+    End If
+  End Sub
 End Class
