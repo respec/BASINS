@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmCmpPenman
@@ -85,9 +86,9 @@ Public Class frmCmpPenman
     '
     'lblJensenPET
     '
-    Me.lblJensenPET.Location = New System.Drawing.Point(16, 16)
+    Me.lblJensenPET.Location = New System.Drawing.Point(19, 18)
     Me.lblJensenPET.Name = "lblJensenPET"
-    Me.lblJensenPET.Size = New System.Drawing.Size(144, 16)
+    Me.lblJensenPET.Size = New System.Drawing.Size(173, 19)
     Me.lblJensenPET.TabIndex = 2
     Me.lblJensenPET.Text = "Specify Input Timeseries"
     '
@@ -96,156 +97,156 @@ Public Class frmCmpPenman
     Me.panelBottom.Controls.Add(Me.btnCancel)
     Me.panelBottom.Controls.Add(Me.btnOk)
     Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.panelBottom.Location = New System.Drawing.Point(0, 205)
+    Me.panelBottom.Location = New System.Drawing.Point(0, 237)
     Me.panelBottom.Name = "panelBottom"
-    Me.panelBottom.Size = New System.Drawing.Size(504, 32)
+    Me.panelBottom.Size = New System.Drawing.Size(604, 36)
     Me.panelBottom.TabIndex = 16
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(256, 0)
+    Me.btnCancel.Location = New System.Drawing.Point(307, 0)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(77, 28)
     Me.btnCancel.TabIndex = 1
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(160, 0)
+    Me.btnOk.Location = New System.Drawing.Point(192, 0)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(64, 24)
+    Me.btnOk.Size = New System.Drawing.Size(77, 28)
     Me.btnOk.TabIndex = 0
     Me.btnOk.Text = "Ok"
     '
     'btnTMin
     '
-    Me.btnTMin.Location = New System.Drawing.Point(104, 40)
+    Me.btnTMin.Location = New System.Drawing.Point(125, 46)
     Me.btnTMin.Name = "btnTMin"
-    Me.btnTMin.Size = New System.Drawing.Size(48, 20)
+    Me.btnTMin.Size = New System.Drawing.Size(57, 23)
     Me.btnTMin.TabIndex = 18
     Me.btnTMin.Text = "Select"
     '
     'txtTMin
     '
-    Me.txtTMin.Location = New System.Drawing.Point(160, 40)
+    Me.txtTMin.Location = New System.Drawing.Point(192, 46)
     Me.txtTMin.Name = "txtTMin"
     Me.txtTMin.ReadOnly = True
-    Me.txtTMin.Size = New System.Drawing.Size(344, 20)
+    Me.txtTMin.Size = New System.Drawing.Size(413, 22)
     Me.txtTMin.TabIndex = 19
     Me.txtTMin.Text = ""
     '
     'lblTMin
     '
-    Me.lblTMin.Location = New System.Drawing.Point(8, 40)
+    Me.lblTMin.Location = New System.Drawing.Point(10, 46)
     Me.lblTMin.Name = "lblTMin"
-    Me.lblTMin.Size = New System.Drawing.Size(64, 16)
+    Me.lblTMin.Size = New System.Drawing.Size(76, 19)
     Me.lblTMin.TabIndex = 20
     Me.lblTMin.Text = "Min Temp:"
     '
     'lblTMax
     '
-    Me.lblTMax.Location = New System.Drawing.Point(8, 72)
+    Me.lblTMax.Location = New System.Drawing.Point(10, 83)
     Me.lblTMax.Name = "lblTMax"
-    Me.lblTMax.Size = New System.Drawing.Size(64, 16)
+    Me.lblTMax.Size = New System.Drawing.Size(76, 19)
     Me.lblTMax.TabIndex = 21
     Me.lblTMax.Text = "Max Temp:"
     '
     'btnTMax
     '
-    Me.btnTMax.Location = New System.Drawing.Point(104, 72)
+    Me.btnTMax.Location = New System.Drawing.Point(125, 83)
     Me.btnTMax.Name = "btnTMax"
-    Me.btnTMax.Size = New System.Drawing.Size(48, 20)
+    Me.btnTMax.Size = New System.Drawing.Size(57, 23)
     Me.btnTMax.TabIndex = 22
     Me.btnTMax.Text = "Select"
     '
     'txtTMax
     '
-    Me.txtTMax.Location = New System.Drawing.Point(160, 72)
+    Me.txtTMax.Location = New System.Drawing.Point(192, 83)
     Me.txtTMax.Name = "txtTMax"
     Me.txtTMax.ReadOnly = True
-    Me.txtTMax.Size = New System.Drawing.Size(344, 20)
+    Me.txtTMax.Size = New System.Drawing.Size(413, 22)
     Me.txtTMax.TabIndex = 23
     Me.txtTMax.Text = ""
     '
     'lblSRad
     '
-    Me.lblSRad.Location = New System.Drawing.Point(8, 104)
+    Me.lblSRad.Location = New System.Drawing.Point(10, 120)
     Me.lblSRad.Name = "lblSRad"
-    Me.lblSRad.Size = New System.Drawing.Size(96, 16)
+    Me.lblSRad.Size = New System.Drawing.Size(115, 18)
     Me.lblSRad.TabIndex = 51
     Me.lblSRad.Text = "Solar Radiation:"
     '
     'btnSRad
     '
-    Me.btnSRad.Location = New System.Drawing.Point(104, 104)
+    Me.btnSRad.Location = New System.Drawing.Point(125, 120)
     Me.btnSRad.Name = "btnSRad"
-    Me.btnSRad.Size = New System.Drawing.Size(48, 20)
+    Me.btnSRad.Size = New System.Drawing.Size(57, 23)
     Me.btnSRad.TabIndex = 52
     Me.btnSRad.Text = "Select"
     '
     'txtSRad
     '
-    Me.txtSRad.Location = New System.Drawing.Point(160, 104)
+    Me.txtSRad.Location = New System.Drawing.Point(192, 120)
     Me.txtSRad.Name = "txtSRad"
     Me.txtSRad.ReadOnly = True
-    Me.txtSRad.Size = New System.Drawing.Size(344, 20)
+    Me.txtSRad.Size = New System.Drawing.Size(413, 22)
     Me.txtSRad.TabIndex = 53
     Me.txtSRad.Text = ""
     '
     'lblDewP
     '
-    Me.lblDewP.Location = New System.Drawing.Point(8, 136)
+    Me.lblDewP.Location = New System.Drawing.Point(10, 157)
     Me.lblDewP.Name = "lblDewP"
-    Me.lblDewP.Size = New System.Drawing.Size(96, 16)
+    Me.lblDewP.Size = New System.Drawing.Size(115, 18)
     Me.lblDewP.TabIndex = 54
     Me.lblDewP.Text = "Dewpoint Temp:"
     '
     'lblWind
     '
-    Me.lblWind.Location = New System.Drawing.Point(8, 168)
+    Me.lblWind.Location = New System.Drawing.Point(10, 194)
     Me.lblWind.Name = "lblWind"
-    Me.lblWind.Size = New System.Drawing.Size(96, 16)
+    Me.lblWind.Size = New System.Drawing.Size(115, 18)
     Me.lblWind.TabIndex = 55
     Me.lblWind.Text = "Wind Movement:"
     '
     'btnDewP
     '
-    Me.btnDewP.Location = New System.Drawing.Point(104, 136)
+    Me.btnDewP.Location = New System.Drawing.Point(125, 157)
     Me.btnDewP.Name = "btnDewP"
-    Me.btnDewP.Size = New System.Drawing.Size(48, 20)
+    Me.btnDewP.Size = New System.Drawing.Size(57, 23)
     Me.btnDewP.TabIndex = 56
     Me.btnDewP.Text = "Select"
     '
     'btnWind
     '
-    Me.btnWind.Location = New System.Drawing.Point(104, 168)
+    Me.btnWind.Location = New System.Drawing.Point(125, 194)
     Me.btnWind.Name = "btnWind"
-    Me.btnWind.Size = New System.Drawing.Size(48, 20)
+    Me.btnWind.Size = New System.Drawing.Size(57, 23)
     Me.btnWind.TabIndex = 57
     Me.btnWind.Text = "Select"
     '
     'txtDewP
     '
-    Me.txtDewP.Location = New System.Drawing.Point(160, 136)
+    Me.txtDewP.Location = New System.Drawing.Point(192, 157)
     Me.txtDewP.Name = "txtDewP"
     Me.txtDewP.ReadOnly = True
-    Me.txtDewP.Size = New System.Drawing.Size(344, 20)
+    Me.txtDewP.Size = New System.Drawing.Size(413, 22)
     Me.txtDewP.TabIndex = 58
     Me.txtDewP.Text = ""
     '
     'txtWind
     '
-    Me.txtWind.Location = New System.Drawing.Point(160, 168)
+    Me.txtWind.Location = New System.Drawing.Point(192, 194)
     Me.txtWind.Name = "txtWind"
     Me.txtWind.ReadOnly = True
-    Me.txtWind.Size = New System.Drawing.Size(344, 20)
+    Me.txtWind.Size = New System.Drawing.Size(413, 22)
     Me.txtWind.TabIndex = 59
     Me.txtWind.Text = ""
     '
     'frmCmpPenman
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(504, 237)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(604, 273)
     Me.Controls.Add(Me.txtWind)
     Me.Controls.Add(Me.txtDewP)
     Me.Controls.Add(Me.btnWind)
@@ -264,6 +265,7 @@ Public Class frmCmpPenman
     Me.Controls.Add(Me.panelBottom)
     Me.Controls.Add(Me.lblJensenPET)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmCmpPenman"
     Me.Text = "Compute Penman Pan Evaporation"
     Me.panelBottom.ResumeLayout(False)
@@ -338,6 +340,12 @@ Public Class frmCmpPenman
     If lTSGroup.Count > 0 Then
       pWindTS = lTSGroup(0)
       txtWind.Text = pWindTS.ToString
+    End If
+  End Sub
+
+  Private Sub frmCmpPenman_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Compute\Computations.html")
     End If
   End Sub
 End Class

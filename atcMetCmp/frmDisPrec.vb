@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmDisPrec
@@ -78,25 +79,25 @@ Public Class frmDisPrec
     '
     'lblDailyPrec
     '
-    Me.lblDailyPrec.Location = New System.Drawing.Point(16, 16)
+    Me.lblDailyPrec.Location = New System.Drawing.Point(19, 18)
     Me.lblDailyPrec.Name = "lblDailyPrec"
-    Me.lblDailyPrec.Size = New System.Drawing.Size(296, 16)
+    Me.lblDailyPrec.Size = New System.Drawing.Size(355, 19)
     Me.lblDailyPrec.TabIndex = 2
     Me.lblDailyPrec.Text = "Specify Daily Precipitation Timeseries to Disaggregate"
     '
     'lblObsTime
     '
-    Me.lblObsTime.Location = New System.Drawing.Point(8, 192)
+    Me.lblObsTime.Location = New System.Drawing.Point(10, 222)
     Me.lblObsTime.Name = "lblObsTime"
-    Me.lblObsTime.Size = New System.Drawing.Size(112, 16)
+    Me.lblObsTime.Size = New System.Drawing.Size(134, 18)
     Me.lblObsTime.TabIndex = 3
     Me.lblObsTime.Text = "Observation Hour:"
     '
     'txtObsTime
     '
-    Me.txtObsTime.Location = New System.Drawing.Point(104, 192)
+    Me.txtObsTime.Location = New System.Drawing.Point(125, 222)
     Me.txtObsTime.Name = "txtObsTime"
-    Me.txtObsTime.Size = New System.Drawing.Size(48, 20)
+    Me.txtObsTime.Size = New System.Drawing.Size(57, 22)
     Me.txtObsTime.TabIndex = 4
     Me.txtObsTime.Text = ""
     '
@@ -105,113 +106,114 @@ Public Class frmDisPrec
     Me.panelBottom.Controls.Add(Me.btnCancel)
     Me.panelBottom.Controls.Add(Me.btnOk)
     Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-    Me.panelBottom.Location = New System.Drawing.Point(0, 285)
+    Me.panelBottom.Location = New System.Drawing.Point(0, 328)
     Me.panelBottom.Name = "panelBottom"
-    Me.panelBottom.Size = New System.Drawing.Size(464, 32)
+    Me.panelBottom.Size = New System.Drawing.Size(556, 37)
     Me.panelBottom.TabIndex = 16
     '
     'btnCancel
     '
-    Me.btnCancel.Location = New System.Drawing.Point(240, 0)
+    Me.btnCancel.Location = New System.Drawing.Point(288, 0)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(77, 28)
     Me.btnCancel.TabIndex = 1
     Me.btnCancel.Text = "Cancel"
     '
     'btnOk
     '
-    Me.btnOk.Location = New System.Drawing.Point(152, 0)
+    Me.btnOk.Location = New System.Drawing.Point(182, 0)
     Me.btnOk.Name = "btnOk"
-    Me.btnOk.Size = New System.Drawing.Size(64, 24)
+    Me.btnOk.Size = New System.Drawing.Size(77, 28)
     Me.btnOk.TabIndex = 0
     Me.btnOk.Text = "Ok"
     '
     'btnDailyPrec
     '
-    Me.btnDailyPrec.Location = New System.Drawing.Point(8, 40)
+    Me.btnDailyPrec.Location = New System.Drawing.Point(10, 46)
     Me.btnDailyPrec.Name = "btnDailyPrec"
-    Me.btnDailyPrec.Size = New System.Drawing.Size(56, 20)
+    Me.btnDailyPrec.Size = New System.Drawing.Size(67, 23)
     Me.btnDailyPrec.TabIndex = 18
     Me.btnDailyPrec.Text = "Select"
     '
     'txtDailyPrec
     '
-    Me.txtDailyPrec.Location = New System.Drawing.Point(72, 40)
+    Me.txtDailyPrec.Location = New System.Drawing.Point(86, 46)
     Me.txtDailyPrec.Name = "txtDailyPrec"
     Me.txtDailyPrec.ReadOnly = True
-    Me.txtDailyPrec.Size = New System.Drawing.Size(384, 20)
+    Me.txtDailyPrec.Size = New System.Drawing.Size(461, 22)
     Me.txtDailyPrec.TabIndex = 19
     Me.txtDailyPrec.Text = ""
     '
     'lblHourlyPrec
     '
-    Me.lblHourlyPrec.Location = New System.Drawing.Point(8, 80)
+    Me.lblHourlyPrec.Location = New System.Drawing.Point(10, 92)
     Me.lblHourlyPrec.Name = "lblHourlyPrec"
-    Me.lblHourlyPrec.Size = New System.Drawing.Size(232, 16)
+    Me.lblHourlyPrec.Size = New System.Drawing.Size(278, 19)
     Me.lblHourlyPrec.TabIndex = 21
     Me.lblHourlyPrec.Text = "Specify Hourly Precipitation Timeseries:"
     '
     'btnAddHourlyPrec
     '
-    Me.btnAddHourlyPrec.Location = New System.Drawing.Point(8, 120)
+    Me.btnAddHourlyPrec.Location = New System.Drawing.Point(10, 138)
     Me.btnAddHourlyPrec.Name = "btnAddHourlyPrec"
-    Me.btnAddHourlyPrec.Size = New System.Drawing.Size(56, 20)
+    Me.btnAddHourlyPrec.Size = New System.Drawing.Size(67, 24)
     Me.btnAddHourlyPrec.TabIndex = 22
     Me.btnAddHourlyPrec.Text = "Select"
     '
     'lstHourlyPrec
     '
     Me.lstHourlyPrec.Enabled = False
-    Me.lstHourlyPrec.Location = New System.Drawing.Point(72, 104)
+    Me.lstHourlyPrec.ItemHeight = 16
+    Me.lstHourlyPrec.Location = New System.Drawing.Point(86, 120)
     Me.lstHourlyPrec.Name = "lstHourlyPrec"
-    Me.lstHourlyPrec.Size = New System.Drawing.Size(384, 69)
+    Me.lstHourlyPrec.Size = New System.Drawing.Size(461, 68)
     Me.lstHourlyPrec.TabIndex = 23
     '
     'lblDataTol
     '
-    Me.lblDataTol.Location = New System.Drawing.Point(232, 192)
+    Me.lblDataTol.Location = New System.Drawing.Point(278, 222)
     Me.lblDataTol.Name = "lblDataTol"
-    Me.lblDataTol.Size = New System.Drawing.Size(112, 16)
+    Me.lblDataTol.Size = New System.Drawing.Size(135, 18)
     Me.lblDataTol.TabIndex = 25
     Me.lblDataTol.Text = "Data Tolerance (%):"
     '
     'txtDataTol
     '
-    Me.txtDataTol.Location = New System.Drawing.Point(336, 192)
+    Me.txtDataTol.Location = New System.Drawing.Point(403, 222)
     Me.txtDataTol.Name = "txtDataTol"
-    Me.txtDataTol.Size = New System.Drawing.Size(48, 20)
+    Me.txtDataTol.Size = New System.Drawing.Size(58, 22)
     Me.txtDataTol.TabIndex = 26
     Me.txtDataTol.Text = ""
     '
     'lblSummFile
     '
-    Me.lblSummFile.Location = New System.Drawing.Point(8, 224)
+    Me.lblSummFile.Location = New System.Drawing.Point(10, 258)
     Me.lblSummFile.Name = "lblSummFile"
-    Me.lblSummFile.Size = New System.Drawing.Size(128, 16)
+    Me.lblSummFile.Size = New System.Drawing.Size(153, 19)
     Me.lblSummFile.TabIndex = 27
     Me.lblSummFile.Text = "Summary File (optional):"
     '
     'txtSummFile
     '
-    Me.txtSummFile.Location = New System.Drawing.Point(72, 248)
+    Me.txtSummFile.Location = New System.Drawing.Point(86, 286)
     Me.txtSummFile.Name = "txtSummFile"
     Me.txtSummFile.ReadOnly = True
-    Me.txtSummFile.Size = New System.Drawing.Size(384, 20)
+    Me.txtSummFile.Size = New System.Drawing.Size(461, 22)
     Me.txtSummFile.TabIndex = 28
     Me.txtSummFile.Text = ""
     '
     'btnSummFile
     '
-    Me.btnSummFile.Location = New System.Drawing.Point(8, 248)
+    Me.btnSummFile.Location = New System.Drawing.Point(10, 286)
     Me.btnSummFile.Name = "btnSummFile"
-    Me.btnSummFile.Size = New System.Drawing.Size(56, 20)
+    Me.btnSummFile.Size = New System.Drawing.Size(67, 23)
     Me.btnSummFile.TabIndex = 29
     Me.btnSummFile.Text = "Select"
     '
     'frmDisPrec
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(464, 317)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(556, 365)
     Me.Controls.Add(Me.btnSummFile)
     Me.Controls.Add(Me.txtSummFile)
     Me.Controls.Add(Me.txtDataTol)
@@ -227,6 +229,7 @@ Public Class frmDisPrec
     Me.Controls.Add(Me.lblObsTime)
     Me.Controls.Add(Me.lblDailyPrec)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmDisPrec"
     Me.Text = "Disaggregate Precipitation"
     Me.panelBottom.ResumeLayout(False)
@@ -315,5 +318,11 @@ Public Class frmDisPrec
       End If
     End With
 
+  End Sub
+
+  Private Sub frmDisPrec_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Compute\Disaggregations.html")
+    End If
   End Sub
 End Class
