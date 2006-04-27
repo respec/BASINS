@@ -1007,7 +1007,22 @@ Public Class frmReclass
   End Function
 
   Private Sub AtcGridLanduse_MouseDownCell(ByVal aGrid As atcControls.atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles AtcGridLanduse.MouseDownCell
+    Dim lUniqueValues As New ArrayList
     pLastClickedRow = aRow
+    If aColumn = 3 Then
+      With aGrid.Source
+        For lRow As Integer = 1 To .Rows - 1
+          Dim lRowValue As String = .CellValue(lRow, 3)
+          If Not lRowValue Is Nothing AndAlso Not lUniqueValues.Contains(lRowValue) Then
+            lUniqueValues.Add(lRowValue)
+          End If
+        Next
+      End With
+      aGrid.AllowNewValidValues = True
+    Else
+      aGrid.AllowNewValidValues = False
+    End If
+    aGrid.ValidValues = lUniqueValues
   End Sub
 
   Private Sub frmReclass_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
