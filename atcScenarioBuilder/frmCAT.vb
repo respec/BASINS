@@ -87,6 +87,7 @@ Public Class frmCAT
   Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
   Friend WithEvents btnInputAddCligen As System.Windows.Forms.Button
   Friend WithEvents btnEndpointAddCligen As System.Windows.Forms.Button
+  Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCAT))
     Me.myTabs = New System.Windows.Forms.TabControl
@@ -140,6 +141,7 @@ Public Class frmCAT
     Me.mnuPivotHeaders = New System.Windows.Forms.MenuItem
     Me.lblTop = New System.Windows.Forms.Label
     Me.btnStop = New System.Windows.Forms.Button
+    Me.mnuHelp = New System.Windows.Forms.MenuItem
     Me.myTabs.SuspendLayout()
     Me.tabInputs.SuspendLayout()
     Me.tabEndpoints.SuspendLayout()
@@ -156,10 +158,10 @@ Public Class frmCAT
     Me.myTabs.Controls.Add(Me.tabEndpoints)
     Me.myTabs.Controls.Add(Me.tabResults)
     Me.myTabs.Controls.Add(Me.tabPivot)
-    Me.myTabs.Location = New System.Drawing.Point(0, 40)
+    Me.myTabs.Location = New System.Drawing.Point(0, 46)
     Me.myTabs.Name = "myTabs"
     Me.myTabs.SelectedIndex = 0
-    Me.myTabs.Size = New System.Drawing.Size(328, 264)
+    Me.myTabs.Size = New System.Drawing.Size(394, 305)
     Me.myTabs.TabIndex = 0
     '
     'tabInputs
@@ -175,17 +177,17 @@ Public Class frmCAT
     Me.tabInputs.Controls.Add(Me.cboBaseScenarioName)
     Me.tabInputs.Controls.Add(Me.lblBaseScenarioName)
     Me.tabInputs.Controls.Add(Me.lblNewScenarioName)
-    Me.tabInputs.Location = New System.Drawing.Point(4, 22)
+    Me.tabInputs.Location = New System.Drawing.Point(4, 25)
     Me.tabInputs.Name = "tabInputs"
-    Me.tabInputs.Size = New System.Drawing.Size(320, 238)
+    Me.tabInputs.Size = New System.Drawing.Size(386, 276)
     Me.tabInputs.TabIndex = 0
     Me.tabInputs.Text = "Inputs"
     '
     'btnInputAddCligen
     '
-    Me.btnInputAddCligen.Location = New System.Drawing.Point(64, 64)
+    Me.btnInputAddCligen.Location = New System.Drawing.Point(77, 74)
     Me.btnInputAddCligen.Name = "btnInputAddCligen"
-    Me.btnInputAddCligen.Size = New System.Drawing.Size(48, 24)
+    Me.btnInputAddCligen.Size = New System.Drawing.Size(57, 28)
     Me.btnInputAddCligen.TabIndex = 11
     Me.btnInputAddCligen.Text = "Cligen"
     '
@@ -194,50 +196,50 @@ Public Class frmCAT
     Me.lstInputs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lstInputs.Location = New System.Drawing.Point(8, 96)
+    Me.lstInputs.Location = New System.Drawing.Point(10, 111)
     Me.lstInputs.Name = "lstInputs"
-    Me.lstInputs.Size = New System.Drawing.Size(304, 139)
+    Me.lstInputs.Size = New System.Drawing.Size(444, 191)
     Me.lstInputs.TabIndex = 10
     '
     'btnInputDown
     '
     Me.btnInputDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnInputDown.Location = New System.Drawing.Point(288, 64)
+    Me.btnInputDown.Location = New System.Drawing.Point(425, 74)
     Me.btnInputDown.Name = "btnInputDown"
-    Me.btnInputDown.Size = New System.Drawing.Size(24, 24)
+    Me.btnInputDown.Size = New System.Drawing.Size(29, 28)
     Me.btnInputDown.TabIndex = 9
     Me.btnInputDown.Text = "v"
     '
     'btnInputUp
     '
     Me.btnInputUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnInputUp.Location = New System.Drawing.Point(256, 64)
+    Me.btnInputUp.Location = New System.Drawing.Point(386, 74)
     Me.btnInputUp.Name = "btnInputUp"
-    Me.btnInputUp.Size = New System.Drawing.Size(24, 24)
+    Me.btnInputUp.Size = New System.Drawing.Size(29, 28)
     Me.btnInputUp.TabIndex = 8
     Me.btnInputUp.Text = "^"
     '
     'btnInputRemove
     '
-    Me.btnInputRemove.Location = New System.Drawing.Point(120, 64)
+    Me.btnInputRemove.Location = New System.Drawing.Point(144, 74)
     Me.btnInputRemove.Name = "btnInputRemove"
-    Me.btnInputRemove.Size = New System.Drawing.Size(56, 24)
+    Me.btnInputRemove.Size = New System.Drawing.Size(67, 28)
     Me.btnInputRemove.TabIndex = 6
     Me.btnInputRemove.Text = "Remove"
     '
     'btnInputModify
     '
-    Me.btnInputModify.Location = New System.Drawing.Point(184, 64)
+    Me.btnInputModify.Location = New System.Drawing.Point(221, 74)
     Me.btnInputModify.Name = "btnInputModify"
-    Me.btnInputModify.Size = New System.Drawing.Size(48, 24)
+    Me.btnInputModify.Size = New System.Drawing.Size(57, 28)
     Me.btnInputModify.TabIndex = 7
     Me.btnInputModify.Text = "Edit"
     '
     'btnInputAdd
     '
-    Me.btnInputAdd.Location = New System.Drawing.Point(8, 64)
+    Me.btnInputAdd.Location = New System.Drawing.Point(10, 74)
     Me.btnInputAdd.Name = "btnInputAdd"
-    Me.btnInputAdd.Size = New System.Drawing.Size(48, 24)
+    Me.btnInputAdd.Size = New System.Drawing.Size(57, 28)
     Me.btnInputAdd.TabIndex = 5
     Me.btnInputAdd.Text = "Add"
     '
@@ -245,9 +247,9 @@ Public Class frmCAT
     '
     Me.txtModifiedScenarioName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtModifiedScenarioName.Location = New System.Drawing.Point(96, 32)
+    Me.txtModifiedScenarioName.Location = New System.Drawing.Point(115, 37)
     Me.txtModifiedScenarioName.Name = "txtModifiedScenarioName"
-    Me.txtModifiedScenarioName.Size = New System.Drawing.Size(216, 20)
+    Me.txtModifiedScenarioName.Size = New System.Drawing.Size(339, 22)
     Me.txtModifiedScenarioName.TabIndex = 4
     Me.txtModifiedScenarioName.Text = "Modified"
     '
@@ -255,24 +257,24 @@ Public Class frmCAT
     '
     Me.cboBaseScenarioName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.cboBaseScenarioName.Location = New System.Drawing.Point(96, 8)
+    Me.cboBaseScenarioName.Location = New System.Drawing.Point(115, 9)
     Me.cboBaseScenarioName.Name = "cboBaseScenarioName"
-    Me.cboBaseScenarioName.Size = New System.Drawing.Size(216, 21)
+    Me.cboBaseScenarioName.Size = New System.Drawing.Size(339, 24)
     Me.cboBaseScenarioName.TabIndex = 2
     '
     'lblBaseScenarioName
     '
-    Me.lblBaseScenarioName.Location = New System.Drawing.Point(8, 8)
+    Me.lblBaseScenarioName.Location = New System.Drawing.Point(10, 9)
     Me.lblBaseScenarioName.Name = "lblBaseScenarioName"
-    Me.lblBaseScenarioName.Size = New System.Drawing.Size(80, 16)
+    Me.lblBaseScenarioName.Size = New System.Drawing.Size(96, 19)
     Me.lblBaseScenarioName.TabIndex = 0
     Me.lblBaseScenarioName.Text = "Base Scenario"
     '
     'lblNewScenarioName
     '
-    Me.lblNewScenarioName.Location = New System.Drawing.Point(8, 32)
+    Me.lblNewScenarioName.Location = New System.Drawing.Point(10, 37)
     Me.lblNewScenarioName.Name = "lblNewScenarioName"
-    Me.lblNewScenarioName.Size = New System.Drawing.Size(80, 16)
+    Me.lblNewScenarioName.Size = New System.Drawing.Size(96, 18)
     Me.lblNewScenarioName.TabIndex = 3
     Me.lblNewScenarioName.Text = "New Scenario"
     '
@@ -287,17 +289,17 @@ Public Class frmCAT
     Me.tabEndpoints.Controls.Add(Me.btnEndpointRemove)
     Me.tabEndpoints.Controls.Add(Me.btnEndpointModify)
     Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
-    Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
+    Me.tabEndpoints.Location = New System.Drawing.Point(4, 25)
     Me.tabEndpoints.Name = "tabEndpoints"
-    Me.tabEndpoints.Size = New System.Drawing.Size(320, 238)
+    Me.tabEndpoints.Size = New System.Drawing.Size(386, 276)
     Me.tabEndpoints.TabIndex = 1
     Me.tabEndpoints.Text = "Endpoints"
     '
     'btnEndpointAddCligen
     '
-    Me.btnEndpointAddCligen.Location = New System.Drawing.Point(64, 64)
+    Me.btnEndpointAddCligen.Location = New System.Drawing.Point(77, 74)
     Me.btnEndpointAddCligen.Name = "btnEndpointAddCligen"
-    Me.btnEndpointAddCligen.Size = New System.Drawing.Size(48, 24)
+    Me.btnEndpointAddCligen.Size = New System.Drawing.Size(57, 28)
     Me.btnEndpointAddCligen.TabIndex = 19
     Me.btnEndpointAddCligen.Text = "Cligen"
     Me.btnEndpointAddCligen.Visible = False
@@ -306,16 +308,16 @@ Public Class frmCAT
     '
     Me.lblAllResults.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblAllResults.Location = New System.Drawing.Point(128, 16)
+    Me.lblAllResults.Location = New System.Drawing.Point(154, 18)
     Me.lblAllResults.Name = "lblAllResults"
-    Me.lblAllResults.Size = New System.Drawing.Size(176, 16)
+    Me.lblAllResults.Size = New System.Drawing.Size(211, 19)
     Me.lblAllResults.TabIndex = 18
     '
     'chkSaveAll
     '
-    Me.chkSaveAll.Location = New System.Drawing.Point(16, 16)
+    Me.chkSaveAll.Location = New System.Drawing.Point(19, 18)
     Me.chkSaveAll.Name = "chkSaveAll"
-    Me.chkSaveAll.Size = New System.Drawing.Size(112, 16)
+    Me.chkSaveAll.Size = New System.Drawing.Size(135, 19)
     Me.chkSaveAll.TabIndex = 11
     Me.chkSaveAll.Text = "Save All Results"
     '
@@ -324,65 +326,66 @@ Public Class frmCAT
     Me.lstEndpoints.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lstEndpoints.Location = New System.Drawing.Point(8, 96)
+    Me.lstEndpoints.Location = New System.Drawing.Point(10, 111)
     Me.lstEndpoints.Name = "lstEndpoints"
-    Me.lstEndpoints.Size = New System.Drawing.Size(304, 139)
+    Me.lstEndpoints.Size = New System.Drawing.Size(364, 157)
     Me.lstEndpoints.TabIndex = 17
     '
     'btnEndpointDown
     '
     Me.btnEndpointDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnEndpointDown.Location = New System.Drawing.Point(288, 64)
+    Me.btnEndpointDown.Location = New System.Drawing.Point(346, 74)
     Me.btnEndpointDown.Name = "btnEndpointDown"
-    Me.btnEndpointDown.Size = New System.Drawing.Size(24, 24)
+    Me.btnEndpointDown.Size = New System.Drawing.Size(28, 28)
     Me.btnEndpointDown.TabIndex = 16
     Me.btnEndpointDown.Text = "v"
     '
     'btnEndpointUp
     '
     Me.btnEndpointUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnEndpointUp.Location = New System.Drawing.Point(256, 64)
+    Me.btnEndpointUp.Location = New System.Drawing.Point(307, 74)
     Me.btnEndpointUp.Name = "btnEndpointUp"
-    Me.btnEndpointUp.Size = New System.Drawing.Size(24, 24)
+    Me.btnEndpointUp.Size = New System.Drawing.Size(29, 28)
     Me.btnEndpointUp.TabIndex = 15
     Me.btnEndpointUp.Text = "^"
     '
     'btnEndpointRemove
     '
-    Me.btnEndpointRemove.Location = New System.Drawing.Point(120, 64)
+    Me.btnEndpointRemove.Location = New System.Drawing.Point(144, 74)
     Me.btnEndpointRemove.Name = "btnEndpointRemove"
-    Me.btnEndpointRemove.Size = New System.Drawing.Size(56, 24)
+    Me.btnEndpointRemove.Size = New System.Drawing.Size(67, 28)
     Me.btnEndpointRemove.TabIndex = 13
     Me.btnEndpointRemove.Text = "Remove"
     '
     'btnEndpointModify
     '
-    Me.btnEndpointModify.Location = New System.Drawing.Point(184, 64)
+    Me.btnEndpointModify.Location = New System.Drawing.Point(221, 74)
     Me.btnEndpointModify.Name = "btnEndpointModify"
-    Me.btnEndpointModify.Size = New System.Drawing.Size(48, 24)
+    Me.btnEndpointModify.Size = New System.Drawing.Size(57, 28)
     Me.btnEndpointModify.TabIndex = 14
     Me.btnEndpointModify.Text = "Edit"
     '
     'btnEndpointAdd
     '
-    Me.btnEndpointAdd.Location = New System.Drawing.Point(8, 64)
+    Me.btnEndpointAdd.Location = New System.Drawing.Point(10, 74)
     Me.btnEndpointAdd.Name = "btnEndpointAdd"
-    Me.btnEndpointAdd.Size = New System.Drawing.Size(48, 24)
+    Me.btnEndpointAdd.Size = New System.Drawing.Size(57, 28)
     Me.btnEndpointAdd.TabIndex = 12
     Me.btnEndpointAdd.Text = "Add"
     '
     'tabResults
     '
     Me.tabResults.Controls.Add(Me.agdResults)
-    Me.tabResults.Location = New System.Drawing.Point(4, 22)
+    Me.tabResults.Location = New System.Drawing.Point(4, 25)
     Me.tabResults.Name = "tabResults"
-    Me.tabResults.Size = New System.Drawing.Size(320, 238)
+    Me.tabResults.Size = New System.Drawing.Size(386, 276)
     Me.tabResults.TabIndex = 2
     Me.tabResults.Text = "Results"
     '
     'agdResults
     '
     Me.agdResults.AllowHorizontalScrolling = True
+    Me.agdResults.AllowNewValidValues = False
     Me.agdResults.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -390,9 +393,9 @@ Public Class frmCAT
     Me.agdResults.CellBackColor = System.Drawing.Color.Empty
     Me.agdResults.LineColor = System.Drawing.Color.Empty
     Me.agdResults.LineWidth = 0.0!
-    Me.agdResults.Location = New System.Drawing.Point(8, 8)
+    Me.agdResults.Location = New System.Drawing.Point(10, 9)
     Me.agdResults.Name = "agdResults"
-    Me.agdResults.Size = New System.Drawing.Size(304, 224)
+    Me.agdResults.Size = New System.Drawing.Size(364, 255)
     Me.agdResults.Source = Nothing
     Me.agdResults.TabIndex = 18
     '
@@ -405,86 +408,87 @@ Public Class frmCAT
     Me.tabPivot.Controls.Add(Me.cboPivotCells)
     Me.tabPivot.Controls.Add(Me.cboPivotColumns)
     Me.tabPivot.Controls.Add(Me.cboPivotRows)
-    Me.tabPivot.Location = New System.Drawing.Point(4, 22)
+    Me.tabPivot.Location = New System.Drawing.Point(4, 25)
     Me.tabPivot.Name = "tabPivot"
-    Me.tabPivot.Size = New System.Drawing.Size(320, 238)
+    Me.tabPivot.Size = New System.Drawing.Size(386, 276)
     Me.tabPivot.TabIndex = 3
     Me.tabPivot.Text = "Pivot"
     '
     'agdPivot
     '
     Me.agdPivot.AllowHorizontalScrolling = True
+    Me.agdPivot.AllowNewValidValues = False
     Me.agdPivot.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.agdPivot.CellBackColor = System.Drawing.Color.Empty
     Me.agdPivot.LineColor = System.Drawing.Color.Empty
     Me.agdPivot.LineWidth = 0.0!
-    Me.agdPivot.Location = New System.Drawing.Point(8, 80)
+    Me.agdPivot.Location = New System.Drawing.Point(10, 92)
     Me.agdPivot.Name = "agdPivot"
-    Me.agdPivot.Size = New System.Drawing.Size(304, 152)
+    Me.agdPivot.Size = New System.Drawing.Size(364, 172)
     Me.agdPivot.Source = Nothing
     Me.agdPivot.TabIndex = 25
     '
     'lblPivotColumns
     '
-    Me.lblPivotColumns.Location = New System.Drawing.Point(8, 32)
+    Me.lblPivotColumns.Location = New System.Drawing.Point(10, 37)
     Me.lblPivotColumns.Name = "lblPivotColumns"
-    Me.lblPivotColumns.Size = New System.Drawing.Size(64, 16)
+    Me.lblPivotColumns.Size = New System.Drawing.Size(76, 18)
     Me.lblPivotColumns.TabIndex = 21
     Me.lblPivotColumns.Text = "Columns"
     Me.lblPivotColumns.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'lblPivotCells
     '
-    Me.lblPivotCells.Location = New System.Drawing.Point(8, 56)
+    Me.lblPivotCells.Location = New System.Drawing.Point(10, 65)
     Me.lblPivotCells.Name = "lblPivotCells"
-    Me.lblPivotCells.Size = New System.Drawing.Size(64, 16)
+    Me.lblPivotCells.Size = New System.Drawing.Size(76, 18)
     Me.lblPivotCells.TabIndex = 23
     Me.lblPivotCells.Text = "Cells"
     Me.lblPivotCells.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'lblPivotRows
     '
-    Me.lblPivotRows.Location = New System.Drawing.Point(8, 8)
+    Me.lblPivotRows.Location = New System.Drawing.Point(10, 9)
     Me.lblPivotRows.Name = "lblPivotRows"
-    Me.lblPivotRows.Size = New System.Drawing.Size(64, 16)
+    Me.lblPivotRows.Size = New System.Drawing.Size(76, 19)
     Me.lblPivotRows.TabIndex = 19
     Me.lblPivotRows.Text = "Rows"
     Me.lblPivotRows.TextAlign = System.Drawing.ContentAlignment.MiddleRight
     '
     'cboPivotCells
     '
-    Me.cboPivotCells.Location = New System.Drawing.Point(80, 56)
+    Me.cboPivotCells.Location = New System.Drawing.Point(96, 65)
     Me.cboPivotCells.Name = "cboPivotCells"
-    Me.cboPivotCells.Size = New System.Drawing.Size(128, 21)
+    Me.cboPivotCells.Size = New System.Drawing.Size(154, 22)
     Me.cboPivotCells.TabIndex = 24
     '
     'cboPivotColumns
     '
-    Me.cboPivotColumns.Location = New System.Drawing.Point(80, 32)
+    Me.cboPivotColumns.Location = New System.Drawing.Point(96, 37)
     Me.cboPivotColumns.Name = "cboPivotColumns"
-    Me.cboPivotColumns.Size = New System.Drawing.Size(128, 21)
+    Me.cboPivotColumns.Size = New System.Drawing.Size(154, 22)
     Me.cboPivotColumns.TabIndex = 22
     '
     'cboPivotRows
     '
-    Me.cboPivotRows.Location = New System.Drawing.Point(80, 8)
+    Me.cboPivotRows.Location = New System.Drawing.Point(96, 9)
     Me.cboPivotRows.Name = "cboPivotRows"
-    Me.cboPivotRows.Size = New System.Drawing.Size(128, 21)
+    Me.cboPivotRows.Size = New System.Drawing.Size(154, 22)
     Me.cboPivotRows.TabIndex = 20
     '
     'btnStart
     '
-    Me.btnStart.Location = New System.Drawing.Point(8, 8)
+    Me.btnStart.Location = New System.Drawing.Point(10, 9)
     Me.btnStart.Name = "btnStart"
-    Me.btnStart.Size = New System.Drawing.Size(56, 24)
+    Me.btnStart.Size = New System.Drawing.Size(67, 28)
     Me.btnStart.TabIndex = 1
     Me.btnStart.Text = "Start"
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuOptions})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuOptions, Me.mnuHelp})
     '
     'mnuFile
     '
@@ -564,31 +568,37 @@ Public Class frmCAT
     '
     Me.lblTop.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblTop.Location = New System.Drawing.Point(72, 8)
+    Me.lblTop.Location = New System.Drawing.Point(86, 9)
     Me.lblTop.Name = "lblTop"
-    Me.lblTop.Size = New System.Drawing.Size(248, 24)
+    Me.lblTop.Size = New System.Drawing.Size(298, 28)
     Me.lblTop.TabIndex = 2
     Me.lblTop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
     '
     'btnStop
     '
-    Me.btnStop.Location = New System.Drawing.Point(8, 8)
+    Me.btnStop.Location = New System.Drawing.Point(10, 9)
     Me.btnStop.Name = "btnStop"
-    Me.btnStop.Size = New System.Drawing.Size(56, 24)
+    Me.btnStop.Size = New System.Drawing.Size(67, 28)
     Me.btnStop.TabIndex = 3
     Me.btnStop.Text = "Stop"
     Me.btnStop.Visible = False
     '
+    'mnuHelp
+    '
+    Me.mnuHelp.Index = 3
+    Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
+    Me.mnuHelp.ShowShortcut = False
+    Me.mnuHelp.Text = "Help"
+    '
     'frmCAT
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(328, 301)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(393, 347)
     Me.Controls.Add(Me.lblTop)
     Me.Controls.Add(Me.btnStart)
     Me.Controls.Add(Me.myTabs)
     Me.Controls.Add(Me.btnStop)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-    Me.KeyPreview = True
     Me.Menu = Me.MainMenu1
     Me.Name = "frmCAT"
     Me.Text = "Climate Assessment Tool"
@@ -1436,10 +1446,7 @@ Public Class frmCAT
     EndpointSelectionFromList()
     End Sub
 
-  Private Sub frmCAT_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-    If e.KeyValue = Windows.Forms.Keys.F1 Then
-      ShowHelp("BASINS Details\Analysis\Climate Assessment Tool.html")
-    End If
+  Private Sub mnuHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+    ShowHelp("BASINS Details\Analysis\Climate Assessment Tool.html")
   End Sub
-
 End Class

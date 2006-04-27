@@ -59,6 +59,7 @@ Friend Class frmSelectData
   Friend WithEvents mnuSelectAll As System.Windows.Forms.MenuItem
   Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
   Friend WithEvents mnuOpenData As System.Windows.Forms.MenuItem
+  Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
   <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
     Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectData))
     Me.groupTop = New System.Windows.Forms.GroupBox
@@ -85,6 +86,7 @@ Friend Class frmSelectData
     Me.mnuSelectClear = New System.Windows.Forms.MenuItem
     Me.mnuSelectAllMatching = New System.Windows.Forms.MenuItem
     Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
+    Me.mnuHelp = New System.Windows.Forms.MenuItem
     Me.groupTop.SuspendLayout()
     Me.pnlButtons.SuspendLayout()
     Me.groupSelected.SuspendLayout()
@@ -118,6 +120,7 @@ Friend Class frmSelectData
     Me.pMatchingGrid.AccessibleDescription = resources.GetString("pMatchingGrid.AccessibleDescription")
     Me.pMatchingGrid.AccessibleName = resources.GetString("pMatchingGrid.AccessibleName")
     Me.pMatchingGrid.AllowHorizontalScrolling = True
+    Me.pMatchingGrid.AllowNewValidValues = False
     Me.pMatchingGrid.Anchor = CType(resources.GetObject("pMatchingGrid.Anchor"), System.Windows.Forms.AnchorStyles)
     Me.pMatchingGrid.AutoScroll = CType(resources.GetObject("pMatchingGrid.AutoScroll"), Boolean)
     Me.pMatchingGrid.AutoScrollMargin = CType(resources.GetObject("pMatchingGrid.AutoScrollMargin"), System.Drawing.Size)
@@ -316,6 +319,7 @@ Friend Class frmSelectData
     Me.pSelectedGrid.AccessibleDescription = resources.GetString("pSelectedGrid.AccessibleDescription")
     Me.pSelectedGrid.AccessibleName = resources.GetString("pSelectedGrid.AccessibleName")
     Me.pSelectedGrid.AllowHorizontalScrolling = True
+    Me.pSelectedGrid.AllowNewValidValues = False
     Me.pSelectedGrid.Anchor = CType(resources.GetObject("pSelectedGrid.Anchor"), System.Windows.Forms.AnchorStyles)
     Me.pSelectedGrid.AutoScroll = CType(resources.GetObject("pSelectedGrid.AutoScroll"), Boolean)
     Me.pSelectedGrid.AutoScrollMargin = CType(resources.GetObject("pSelectedGrid.AutoScrollMargin"), System.Drawing.Size)
@@ -338,7 +342,7 @@ Friend Class frmSelectData
     '
     'MainMenu1
     '
-    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAttributes, Me.mnuSelect})
+    Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAttributes, Me.mnuSelect, Me.mnuHelp})
     Me.MainMenu1.RightToLeft = CType(resources.GetObject("MainMenu1.RightToLeft"), System.Windows.Forms.RightToLeft)
     '
     'mnuFile
@@ -452,6 +456,15 @@ Friend Class frmSelectData
     Me.mnuSelectNoMatching.Text = resources.GetString("mnuSelectNoMatching.Text")
     Me.mnuSelectNoMatching.Visible = CType(resources.GetObject("mnuSelectNoMatching.Visible"), Boolean)
     '
+    'mnuHelp
+    '
+    Me.mnuHelp.Enabled = CType(resources.GetObject("mnuHelp.Enabled"), Boolean)
+    Me.mnuHelp.Index = 3
+    Me.mnuHelp.Shortcut = CType(resources.GetObject("mnuHelp.Shortcut"), System.Windows.Forms.Shortcut)
+    Me.mnuHelp.ShowShortcut = CType(resources.GetObject("mnuHelp.ShowShortcut"), Boolean)
+    Me.mnuHelp.Text = resources.GetString("mnuHelp.Text")
+    Me.mnuHelp.Visible = CType(resources.GetObject("mnuHelp.Visible"), Boolean)
+    '
     'frmSelectData
     '
     Me.AcceptButton = Me.btnOk
@@ -472,7 +485,6 @@ Friend Class frmSelectData
     Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
-    Me.KeyPreview = True
     Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
     Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
     Me.Menu = Me.MainMenu1
@@ -1158,10 +1170,8 @@ NextName:
     pSelectedSource = Nothing
   End Sub
 
-  Private Sub frmSelectData_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-    If e.KeyValue = Windows.Forms.Keys.F1 Then
-      ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
-    End If
+  Private Sub mnuHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
+    ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
   End Sub
 End Class
 
