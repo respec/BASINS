@@ -147,7 +147,7 @@ Public Module modMetData
     SortRealArray(0, aStations.Count, lDistance, lOrder)
     SortIntegerArray(0, aStations.Count, lOrder, lRank)
     For i = 0 To aStations.Count - 1
-      lDist.Add(lDistance(i), CStr(lRank(i)))
+      lDist.Add(CStr(lRank(i)), lDistance(i))
     Next i
     Return lDist
   End Function
@@ -788,7 +788,7 @@ Public Module modMetData
             End If
             lNOAAattribs.Add("ELEV", Mid(lStr, 223, 2))
             lStationIndex = lStations.IndexFromKey(lStaCode)
-            If lStationIndex > 0 Then 'If there is an older station history entry, overwrite it
+            If lStationIndex >= 0 Then 'If there is an older station history entry, overwrite it
               If CDbl(lNOAAattribs.ItemByKey("END")) > CDbl(lStations.ItemByIndex(lStationIndex).ItemByKey("END")) Then
                 lStations.RemoveAt(lStationIndex)
                 lStations.Add(lStaCode, lNOAAattribs)
@@ -802,7 +802,8 @@ Public Module modMetData
       Loop
     Catch endEx As EndOfStreamException
     End Try
-    'Close(lInFile)
+
+    Return lStations
 
   End Function
 
