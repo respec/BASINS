@@ -405,7 +405,7 @@ Public Class atcDataTreeForm
   End Sub
 
   Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-    ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
+    ShowHelp("BASINS Details\Analysis\Time Series Functions\Data Tree.html")
   End Sub
 
 End Class
