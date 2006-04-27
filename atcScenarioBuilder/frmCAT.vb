@@ -588,6 +588,7 @@ Public Class frmCAT
     Me.Controls.Add(Me.myTabs)
     Me.Controls.Add(Me.btnStop)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Menu = Me.MainMenu1
     Me.Name = "frmCAT"
     Me.Text = "Climate Assessment Tool"
@@ -1433,6 +1434,12 @@ Public Class frmCAT
 
   Private Sub lstEndpoints_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lstEndpoints.MouseUp
     EndpointSelectionFromList()
+    End Sub
+
+  Private Sub frmCAT_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Analysis\Climate Assessment Tool.html")
+    End If
   End Sub
 
 End Class

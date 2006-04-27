@@ -68,322 +68,324 @@ Public Class frmEndpoint
     Friend WithEvents btnSeasonsAll As System.Windows.Forms.Button
     Friend WithEvents btnSeasonsNone As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmEndpoint))
-        Me.lblName = New System.Windows.Forms.Label
-        Me.txtName = New System.Windows.Forms.TextBox
-        Me.btnCancel = New System.Windows.Forms.Button
-        Me.btnOk = New System.Windows.Forms.Button
-        Me.lblAttribute = New System.Windows.Forms.Label
-        Me.lblData = New System.Windows.Forms.Label
-        Me.txtData = New System.Windows.Forms.TextBox
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.txtHighColor = New System.Windows.Forms.TextBox
-        Me.lblHighColor = New System.Windows.Forms.Label
-        Me.txtLowColor = New System.Windows.Forms.TextBox
-        Me.lblLowColor = New System.Windows.Forms.Label
-        Me.txtMax = New System.Windows.Forms.TextBox
-        Me.txtMin = New System.Windows.Forms.TextBox
-        Me.lblMaximum = New System.Windows.Forms.Label
-        Me.lblMinimum = New System.Windows.Forms.Label
-        Me.txtDefaultColor = New System.Windows.Forms.TextBox
-        Me.lblDefaultColor = New System.Windows.Forms.Label
-        Me.cboAttribute = New System.Windows.Forms.ComboBox
-        Me.grpSeasons = New System.Windows.Forms.GroupBox
-        Me.cboSeasons = New System.Windows.Forms.ComboBox
-        Me.lstSeasons = New System.Windows.Forms.ListBox
-        Me.btnSeasonsAll = New System.Windows.Forms.Button
-        Me.btnSeasonsNone = New System.Windows.Forms.Button
-        Me.GroupBox1.SuspendLayout()
-        Me.grpSeasons.SuspendLayout()
-        Me.SuspendLayout()
-        '
-        'lblName
-        '
-        Me.lblName.BackColor = System.Drawing.Color.Transparent
-        Me.lblName.Location = New System.Drawing.Point(8, 16)
-        Me.lblName.Name = "lblName"
-        Me.lblName.Size = New System.Drawing.Size(96, 17)
-        Me.lblName.TabIndex = 1
-        Me.lblName.Text = "Endpoint Name:"
-        Me.lblName.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'txtName
-        '
-        Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtName.Location = New System.Drawing.Point(112, 16)
-        Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(161, 20)
-        Me.txtName.TabIndex = 2
-        Me.txtName.Text = ""
-        '
-        'btnCancel
-        '
-        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnCancel.Location = New System.Drawing.Point(160, 464)
-        Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(72, 24)
-        Me.btnCancel.TabIndex = 19
-        Me.btnCancel.Text = "Cancel"
-        '
-        'btnOk
-        '
-        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(56, 464)
-        Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(72, 24)
-        Me.btnOk.TabIndex = 18
-        Me.btnOk.Text = "Ok"
-        '
-        'lblAttribute
-        '
-        Me.lblAttribute.BackColor = System.Drawing.Color.Transparent
-        Me.lblAttribute.Location = New System.Drawing.Point(8, 64)
-        Me.lblAttribute.Name = "lblAttribute"
-        Me.lblAttribute.Size = New System.Drawing.Size(96, 17)
-        Me.lblAttribute.TabIndex = 5
-        Me.lblAttribute.Text = "Attribute:"
-        Me.lblAttribute.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'lblData
-        '
-        Me.lblData.BackColor = System.Drawing.Color.Transparent
-        Me.lblData.Location = New System.Drawing.Point(8, 40)
-        Me.lblData.Name = "lblData"
-        Me.lblData.Size = New System.Drawing.Size(96, 17)
-        Me.lblData.TabIndex = 3
-        Me.lblData.Text = "Data set:"
-        Me.lblData.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'txtData
-        '
-        Me.txtData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtData.Location = New System.Drawing.Point(112, 40)
-        Me.txtData.Name = "txtData"
-        Me.txtData.Size = New System.Drawing.Size(161, 20)
-        Me.txtData.TabIndex = 4
-        Me.txtData.Text = ""
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.GroupBox1.Controls.Add(Me.txtHighColor)
-        Me.GroupBox1.Controls.Add(Me.lblHighColor)
-        Me.GroupBox1.Controls.Add(Me.txtLowColor)
-        Me.GroupBox1.Controls.Add(Me.lblLowColor)
-        Me.GroupBox1.Controls.Add(Me.txtMax)
-        Me.GroupBox1.Controls.Add(Me.txtMin)
-        Me.GroupBox1.Controls.Add(Me.lblMaximum)
-        Me.GroupBox1.Controls.Add(Me.lblMinimum)
-        Me.GroupBox1.Controls.Add(Me.txtDefaultColor)
-        Me.GroupBox1.Controls.Add(Me.lblDefaultColor)
-        Me.GroupBox1.Location = New System.Drawing.Point(16, 96)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(256, 160)
-        Me.GroupBox1.TabIndex = 7
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Highlight Values"
-        '
-        'txtHighColor
-        '
-        Me.txtHighColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtHighColor.BackColor = System.Drawing.Color.OrangeRed
-        Me.txtHighColor.Location = New System.Drawing.Point(144, 120)
-        Me.txtHighColor.Name = "txtHighColor"
-        Me.txtHighColor.Size = New System.Drawing.Size(96, 20)
-        Me.txtHighColor.TabIndex = 17
-        Me.txtHighColor.Text = ""
-        '
-        'lblHighColor
-        '
-        Me.lblHighColor.BackColor = System.Drawing.Color.Transparent
-        Me.lblHighColor.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblHighColor.Location = New System.Drawing.Point(16, 120)
-        Me.lblHighColor.Name = "lblHighColor"
-        Me.lblHighColor.Size = New System.Drawing.Size(120, 17)
-        Me.lblHighColor.TabIndex = 16
-        Me.lblHighColor.Text = "Color Higher Values:"
-        Me.lblHighColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'txtLowColor
-        '
-        Me.txtLowColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtLowColor.BackColor = System.Drawing.Color.DeepSkyBlue
-        Me.txtLowColor.Location = New System.Drawing.Point(144, 72)
-        Me.txtLowColor.Name = "txtLowColor"
-        Me.txtLowColor.Size = New System.Drawing.Size(96, 20)
-        Me.txtLowColor.TabIndex = 13
-        Me.txtLowColor.Text = ""
-        '
-        'lblLowColor
-        '
-        Me.lblLowColor.BackColor = System.Drawing.Color.Transparent
-        Me.lblLowColor.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblLowColor.Location = New System.Drawing.Point(16, 72)
-        Me.lblLowColor.Name = "lblLowColor"
-        Me.lblLowColor.Size = New System.Drawing.Size(120, 17)
-        Me.lblLowColor.TabIndex = 12
-        Me.lblLowColor.Text = "Color Lower Values:"
-        Me.lblLowColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'txtMax
-        '
-        Me.txtMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMax.Location = New System.Drawing.Point(144, 96)
-        Me.txtMax.Name = "txtMax"
-        Me.txtMax.Size = New System.Drawing.Size(96, 20)
-        Me.txtMax.TabIndex = 15
-        Me.txtMax.Text = "<none>"
-        '
-        'txtMin
-        '
-        Me.txtMin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMin.Location = New System.Drawing.Point(144, 48)
-        Me.txtMin.Name = "txtMin"
-        Me.txtMin.Size = New System.Drawing.Size(96, 20)
-        Me.txtMin.TabIndex = 11
-        Me.txtMin.Text = "<none>"
-        '
-        'lblMaximum
-        '
-        Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
-        Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMaximum.Location = New System.Drawing.Point(16, 96)
-        Me.lblMaximum.Name = "lblMaximum"
-        Me.lblMaximum.Size = New System.Drawing.Size(120, 17)
-        Me.lblMaximum.TabIndex = 14
-        Me.lblMaximum.Text = "Maximum Value:"
-        Me.lblMaximum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'lblMinimum
-        '
-        Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
-        Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMinimum.Location = New System.Drawing.Point(16, 48)
-        Me.lblMinimum.Name = "lblMinimum"
-        Me.lblMinimum.Size = New System.Drawing.Size(120, 17)
-        Me.lblMinimum.TabIndex = 10
-        Me.lblMinimum.Text = "Minimum Value:"
-        Me.lblMinimum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'txtDefaultColor
-        '
-        Me.txtDefaultColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtDefaultColor.BackColor = System.Drawing.Color.White
-        Me.txtDefaultColor.Location = New System.Drawing.Point(144, 24)
-        Me.txtDefaultColor.Name = "txtDefaultColor"
-        Me.txtDefaultColor.Size = New System.Drawing.Size(96, 20)
-        Me.txtDefaultColor.TabIndex = 9
-        Me.txtDefaultColor.Text = ""
-        '
-        'lblDefaultColor
-        '
-        Me.lblDefaultColor.BackColor = System.Drawing.Color.Transparent
-        Me.lblDefaultColor.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblDefaultColor.Location = New System.Drawing.Point(16, 24)
-        Me.lblDefaultColor.Name = "lblDefaultColor"
-        Me.lblDefaultColor.Size = New System.Drawing.Size(120, 17)
-        Me.lblDefaultColor.TabIndex = 8
-        Me.lblDefaultColor.Text = "Default Color:"
-        Me.lblDefaultColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'cboAttribute
-        '
-        Me.cboAttribute.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboAttribute.Location = New System.Drawing.Point(112, 64)
-        Me.cboAttribute.MaxDropDownItems = 20
-        Me.cboAttribute.Name = "cboAttribute"
-        Me.cboAttribute.Size = New System.Drawing.Size(161, 21)
-        Me.cboAttribute.TabIndex = 6
-        Me.cboAttribute.Text = "ComboBox1"
-        '
-        'grpSeasons
-        '
-        Me.grpSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpSeasons.Controls.Add(Me.cboSeasons)
-        Me.grpSeasons.Controls.Add(Me.lstSeasons)
-        Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
-        Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
-        Me.grpSeasons.Location = New System.Drawing.Point(16, 264)
-        Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(256, 184)
-        Me.grpSeasons.TabIndex = 20
-        Me.grpSeasons.TabStop = False
-        Me.grpSeasons.Text = "Include Values for Seasons"
-        '
-        'cboSeasons
-        '
-        Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSeasons.ItemHeight = 13
-        Me.cboSeasons.Location = New System.Drawing.Point(16, 24)
-        Me.cboSeasons.MaxDropDownItems = 20
-        Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(232, 21)
-        Me.cboSeasons.TabIndex = 14
-        '
-        'lstSeasons
-        '
-        Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstSeasons.IntegralHeight = False
-        Me.lstSeasons.Location = New System.Drawing.Point(16, 48)
-        Me.lstSeasons.Name = "lstSeasons"
-        Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(232, 88)
-        Me.lstSeasons.TabIndex = 15
-        '
-        'btnSeasonsAll
-        '
-        Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(16, 144)
-        Me.btnSeasonsAll.Name = "btnSeasonsAll"
-        Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
-        Me.btnSeasonsAll.TabIndex = 16
-        Me.btnSeasonsAll.Text = "All"
-        '
-        'btnSeasonsNone
-        '
-        Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(184, 144)
-        Me.btnSeasonsNone.Name = "btnSeasonsNone"
-        Me.btnSeasonsNone.Size = New System.Drawing.Size(64, 22)
-        Me.btnSeasonsNone.TabIndex = 17
-        Me.btnSeasonsNone.Text = "None"
-        '
-        'frmEndpoint
-        '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(296, 509)
-        Me.Controls.Add(Me.grpSeasons)
-        Me.Controls.Add(Me.cboAttribute)
-        Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.lblName)
-        Me.Controls.Add(Me.txtName)
-        Me.Controls.Add(Me.txtData)
-        Me.Controls.Add(Me.btnCancel)
-        Me.Controls.Add(Me.btnOk)
-        Me.Controls.Add(Me.lblAttribute)
-        Me.Controls.Add(Me.lblData)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Name = "frmEndpoint"
-        Me.Text = "Endpoint"
-        Me.GroupBox1.ResumeLayout(False)
-        Me.grpSeasons.ResumeLayout(False)
-        Me.ResumeLayout(False)
+    Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmEndpoint))
+    Me.lblName = New System.Windows.Forms.Label
+    Me.txtName = New System.Windows.Forms.TextBox
+    Me.btnCancel = New System.Windows.Forms.Button
+    Me.btnOk = New System.Windows.Forms.Button
+    Me.lblAttribute = New System.Windows.Forms.Label
+    Me.lblData = New System.Windows.Forms.Label
+    Me.txtData = New System.Windows.Forms.TextBox
+    Me.GroupBox1 = New System.Windows.Forms.GroupBox
+    Me.txtHighColor = New System.Windows.Forms.TextBox
+    Me.lblHighColor = New System.Windows.Forms.Label
+    Me.txtLowColor = New System.Windows.Forms.TextBox
+    Me.lblLowColor = New System.Windows.Forms.Label
+    Me.txtMax = New System.Windows.Forms.TextBox
+    Me.txtMin = New System.Windows.Forms.TextBox
+    Me.lblMaximum = New System.Windows.Forms.Label
+    Me.lblMinimum = New System.Windows.Forms.Label
+    Me.txtDefaultColor = New System.Windows.Forms.TextBox
+    Me.lblDefaultColor = New System.Windows.Forms.Label
+    Me.cboAttribute = New System.Windows.Forms.ComboBox
+    Me.grpSeasons = New System.Windows.Forms.GroupBox
+    Me.cboSeasons = New System.Windows.Forms.ComboBox
+    Me.lstSeasons = New System.Windows.Forms.ListBox
+    Me.btnSeasonsAll = New System.Windows.Forms.Button
+    Me.btnSeasonsNone = New System.Windows.Forms.Button
+    Me.GroupBox1.SuspendLayout()
+    Me.grpSeasons.SuspendLayout()
+    Me.SuspendLayout()
+    '
+    'lblName
+    '
+    Me.lblName.BackColor = System.Drawing.Color.Transparent
+    Me.lblName.Location = New System.Drawing.Point(10, 18)
+    Me.lblName.Name = "lblName"
+    Me.lblName.Size = New System.Drawing.Size(115, 20)
+    Me.lblName.TabIndex = 1
+    Me.lblName.Text = "Endpoint Name:"
+    Me.lblName.TextAlign = System.Drawing.ContentAlignment.TopRight
+    '
+    'txtName
+    '
+    Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtName.Location = New System.Drawing.Point(134, 18)
+    Me.txtName.Name = "txtName"
+    Me.txtName.Size = New System.Drawing.Size(194, 22)
+    Me.txtName.TabIndex = 2
+    Me.txtName.Text = ""
+    '
+    'btnCancel
+    '
+    Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.btnCancel.Location = New System.Drawing.Point(192, 535)
+    Me.btnCancel.Name = "btnCancel"
+    Me.btnCancel.Size = New System.Drawing.Size(86, 28)
+    Me.btnCancel.TabIndex = 19
+    Me.btnCancel.Text = "Cancel"
+    '
+    'btnOk
+    '
+    Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.btnOk.Location = New System.Drawing.Point(67, 535)
+    Me.btnOk.Name = "btnOk"
+    Me.btnOk.Size = New System.Drawing.Size(87, 28)
+    Me.btnOk.TabIndex = 18
+    Me.btnOk.Text = "Ok"
+    '
+    'lblAttribute
+    '
+    Me.lblAttribute.BackColor = System.Drawing.Color.Transparent
+    Me.lblAttribute.Location = New System.Drawing.Point(10, 74)
+    Me.lblAttribute.Name = "lblAttribute"
+    Me.lblAttribute.Size = New System.Drawing.Size(115, 19)
+    Me.lblAttribute.TabIndex = 5
+    Me.lblAttribute.Text = "Attribute:"
+    Me.lblAttribute.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'lblData
+    '
+    Me.lblData.BackColor = System.Drawing.Color.Transparent
+    Me.lblData.Location = New System.Drawing.Point(10, 46)
+    Me.lblData.Name = "lblData"
+    Me.lblData.Size = New System.Drawing.Size(115, 20)
+    Me.lblData.TabIndex = 3
+    Me.lblData.Text = "Data set:"
+    Me.lblData.TextAlign = System.Drawing.ContentAlignment.TopRight
+    '
+    'txtData
+    '
+    Me.txtData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtData.Location = New System.Drawing.Point(134, 46)
+    Me.txtData.Name = "txtData"
+    Me.txtData.Size = New System.Drawing.Size(194, 22)
+    Me.txtData.TabIndex = 4
+    Me.txtData.Text = ""
+    '
+    'GroupBox1
+    '
+    Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.GroupBox1.Controls.Add(Me.txtHighColor)
+    Me.GroupBox1.Controls.Add(Me.lblHighColor)
+    Me.GroupBox1.Controls.Add(Me.txtLowColor)
+    Me.GroupBox1.Controls.Add(Me.lblLowColor)
+    Me.GroupBox1.Controls.Add(Me.txtMax)
+    Me.GroupBox1.Controls.Add(Me.txtMin)
+    Me.GroupBox1.Controls.Add(Me.lblMaximum)
+    Me.GroupBox1.Controls.Add(Me.lblMinimum)
+    Me.GroupBox1.Controls.Add(Me.txtDefaultColor)
+    Me.GroupBox1.Controls.Add(Me.lblDefaultColor)
+    Me.GroupBox1.Location = New System.Drawing.Point(19, 111)
+    Me.GroupBox1.Name = "GroupBox1"
+    Me.GroupBox1.Size = New System.Drawing.Size(307, 184)
+    Me.GroupBox1.TabIndex = 7
+    Me.GroupBox1.TabStop = False
+    Me.GroupBox1.Text = "Highlight Values"
+    '
+    'txtHighColor
+    '
+    Me.txtHighColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtHighColor.BackColor = System.Drawing.Color.OrangeRed
+    Me.txtHighColor.Location = New System.Drawing.Point(173, 138)
+    Me.txtHighColor.Name = "txtHighColor"
+    Me.txtHighColor.Size = New System.Drawing.Size(115, 22)
+    Me.txtHighColor.TabIndex = 17
+    Me.txtHighColor.Text = ""
+    '
+    'lblHighColor
+    '
+    Me.lblHighColor.BackColor = System.Drawing.Color.Transparent
+    Me.lblHighColor.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+    Me.lblHighColor.Location = New System.Drawing.Point(19, 138)
+    Me.lblHighColor.Name = "lblHighColor"
+    Me.lblHighColor.Size = New System.Drawing.Size(144, 20)
+    Me.lblHighColor.TabIndex = 16
+    Me.lblHighColor.Text = "Color Higher Values:"
+    Me.lblHighColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'txtLowColor
+    '
+    Me.txtLowColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtLowColor.BackColor = System.Drawing.Color.DeepSkyBlue
+    Me.txtLowColor.Location = New System.Drawing.Point(173, 83)
+    Me.txtLowColor.Name = "txtLowColor"
+    Me.txtLowColor.Size = New System.Drawing.Size(115, 22)
+    Me.txtLowColor.TabIndex = 13
+    Me.txtLowColor.Text = ""
+    '
+    'lblLowColor
+    '
+    Me.lblLowColor.BackColor = System.Drawing.Color.Transparent
+    Me.lblLowColor.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+    Me.lblLowColor.Location = New System.Drawing.Point(19, 83)
+    Me.lblLowColor.Name = "lblLowColor"
+    Me.lblLowColor.Size = New System.Drawing.Size(144, 20)
+    Me.lblLowColor.TabIndex = 12
+    Me.lblLowColor.Text = "Color Lower Values:"
+    Me.lblLowColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'txtMax
+    '
+    Me.txtMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtMax.Location = New System.Drawing.Point(173, 111)
+    Me.txtMax.Name = "txtMax"
+    Me.txtMax.Size = New System.Drawing.Size(115, 22)
+    Me.txtMax.TabIndex = 15
+    Me.txtMax.Text = "<none>"
+    '
+    'txtMin
+    '
+    Me.txtMin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtMin.Location = New System.Drawing.Point(173, 55)
+    Me.txtMin.Name = "txtMin"
+    Me.txtMin.Size = New System.Drawing.Size(115, 22)
+    Me.txtMin.TabIndex = 11
+    Me.txtMin.Text = "<none>"
+    '
+    'lblMaximum
+    '
+    Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
+    Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+    Me.lblMaximum.Location = New System.Drawing.Point(19, 111)
+    Me.lblMaximum.Name = "lblMaximum"
+    Me.lblMaximum.Size = New System.Drawing.Size(144, 19)
+    Me.lblMaximum.TabIndex = 14
+    Me.lblMaximum.Text = "Maximum Value:"
+    Me.lblMaximum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'lblMinimum
+    '
+    Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
+    Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+    Me.lblMinimum.Location = New System.Drawing.Point(19, 55)
+    Me.lblMinimum.Name = "lblMinimum"
+    Me.lblMinimum.Size = New System.Drawing.Size(144, 20)
+    Me.lblMinimum.TabIndex = 10
+    Me.lblMinimum.Text = "Minimum Value:"
+    Me.lblMinimum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'txtDefaultColor
+    '
+    Me.txtDefaultColor.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.txtDefaultColor.BackColor = System.Drawing.Color.White
+    Me.txtDefaultColor.Location = New System.Drawing.Point(173, 28)
+    Me.txtDefaultColor.Name = "txtDefaultColor"
+    Me.txtDefaultColor.Size = New System.Drawing.Size(115, 22)
+    Me.txtDefaultColor.TabIndex = 9
+    Me.txtDefaultColor.Text = ""
+    '
+    'lblDefaultColor
+    '
+    Me.lblDefaultColor.BackColor = System.Drawing.Color.Transparent
+    Me.lblDefaultColor.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+    Me.lblDefaultColor.Location = New System.Drawing.Point(19, 28)
+    Me.lblDefaultColor.Name = "lblDefaultColor"
+    Me.lblDefaultColor.Size = New System.Drawing.Size(144, 19)
+    Me.lblDefaultColor.TabIndex = 8
+    Me.lblDefaultColor.Text = "Default Color:"
+    Me.lblDefaultColor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+    '
+    'cboAttribute
+    '
+    Me.cboAttribute.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.cboAttribute.Location = New System.Drawing.Point(134, 74)
+    Me.cboAttribute.MaxDropDownItems = 20
+    Me.cboAttribute.Name = "cboAttribute"
+    Me.cboAttribute.Size = New System.Drawing.Size(194, 24)
+    Me.cboAttribute.TabIndex = 6
+    Me.cboAttribute.Text = "ComboBox1"
+    '
+    'grpSeasons
+    '
+    Me.grpSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.grpSeasons.Controls.Add(Me.cboSeasons)
+    Me.grpSeasons.Controls.Add(Me.lstSeasons)
+    Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
+    Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
+    Me.grpSeasons.Location = New System.Drawing.Point(19, 305)
+    Me.grpSeasons.Name = "grpSeasons"
+    Me.grpSeasons.Size = New System.Drawing.Size(307, 212)
+    Me.grpSeasons.TabIndex = 20
+    Me.grpSeasons.TabStop = False
+    Me.grpSeasons.Text = "Include Values for Seasons"
+    '
+    'cboSeasons
+    '
+    Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.cboSeasons.ItemHeight = 16
+    Me.cboSeasons.Location = New System.Drawing.Point(19, 28)
+    Me.cboSeasons.MaxDropDownItems = 20
+    Me.cboSeasons.Name = "cboSeasons"
+    Me.cboSeasons.Size = New System.Drawing.Size(279, 24)
+    Me.cboSeasons.TabIndex = 14
+    '
+    'lstSeasons
+    '
+    Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                Or System.Windows.Forms.AnchorStyles.Left) _
+                Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.lstSeasons.IntegralHeight = False
+    Me.lstSeasons.ItemHeight = 16
+    Me.lstSeasons.Location = New System.Drawing.Point(19, 55)
+    Me.lstSeasons.Name = "lstSeasons"
+    Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+    Me.lstSeasons.Size = New System.Drawing.Size(279, 102)
+    Me.lstSeasons.TabIndex = 15
+    '
+    'btnSeasonsAll
+    '
+    Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.btnSeasonsAll.Location = New System.Drawing.Point(19, 166)
+    Me.btnSeasonsAll.Name = "btnSeasonsAll"
+    Me.btnSeasonsAll.Size = New System.Drawing.Size(76, 27)
+    Me.btnSeasonsAll.TabIndex = 16
+    Me.btnSeasonsAll.Text = "All"
+    '
+    'btnSeasonsNone
+    '
+    Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.btnSeasonsNone.Location = New System.Drawing.Point(221, 166)
+    Me.btnSeasonsNone.Name = "btnSeasonsNone"
+    Me.btnSeasonsNone.Size = New System.Drawing.Size(77, 26)
+    Me.btnSeasonsNone.TabIndex = 17
+    Me.btnSeasonsNone.Text = "None"
+    '
+    'frmEndpoint
+    '
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(355, 587)
+    Me.Controls.Add(Me.grpSeasons)
+    Me.Controls.Add(Me.cboAttribute)
+    Me.Controls.Add(Me.GroupBox1)
+    Me.Controls.Add(Me.lblName)
+    Me.Controls.Add(Me.txtName)
+    Me.Controls.Add(Me.txtData)
+    Me.Controls.Add(Me.btnCancel)
+    Me.Controls.Add(Me.btnOk)
+    Me.Controls.Add(Me.lblAttribute)
+    Me.Controls.Add(Me.lblData)
+    Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
+    Me.Name = "frmEndpoint"
+    Me.Text = "Endpoint"
+    Me.GroupBox1.ResumeLayout(False)
+    Me.grpSeasons.ResumeLayout(False)
+    Me.ResumeLayout(False)
 
-    End Sub
+  End Sub
 
 #End Region
 
@@ -628,5 +630,11 @@ Public Class frmEndpoint
         pSettingFormSeason = False
       End If
     End With
+  End Sub
+
+  Private Sub frmEndpoint_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Analysis\Climate Assessment Tool.html")
+    End If
   End Sub
 End Class
