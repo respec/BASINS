@@ -51,57 +51,58 @@ Public Class frmCliGenParmList
     Me.chklstParms.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                 Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.chklstParms.Location = New System.Drawing.Point(8, 8)
+    Me.chklstParms.Location = New System.Drawing.Point(10, 9)
     Me.chklstParms.Name = "chklstParms"
-    Me.chklstParms.Size = New System.Drawing.Size(216, 274)
+    Me.chklstParms.Size = New System.Drawing.Size(259, 293)
     Me.chklstParms.TabIndex = 0
     '
     'btnOK
     '
     Me.btnOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnOK.Location = New System.Drawing.Point(20, 336)
+    Me.btnOK.Location = New System.Drawing.Point(24, 388)
     Me.btnOK.Name = "btnOK"
-    Me.btnOK.Size = New System.Drawing.Size(64, 24)
+    Me.btnOK.Size = New System.Drawing.Size(77, 27)
     Me.btnOK.TabIndex = 1
     Me.btnOK.Text = "OK"
     '
     'btnCancel
     '
     Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnCancel.Location = New System.Drawing.Point(148, 336)
+    Me.btnCancel.Location = New System.Drawing.Point(178, 388)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(76, 27)
     Me.btnCancel.TabIndex = 2
     Me.btnCancel.Text = "Cancel"
     '
     'btnSelNone
     '
     Me.btnSelNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.btnSelNone.Location = New System.Drawing.Point(148, 296)
+    Me.btnSelNone.Location = New System.Drawing.Point(178, 342)
     Me.btnSelNone.Name = "btnSelNone"
-    Me.btnSelNone.Size = New System.Drawing.Size(64, 24)
+    Me.btnSelNone.Size = New System.Drawing.Size(76, 27)
     Me.btnSelNone.TabIndex = 3
     Me.btnSelNone.Text = "None"
     '
     'btnSelAll
     '
     Me.btnSelAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-    Me.btnSelAll.Location = New System.Drawing.Point(20, 296)
+    Me.btnSelAll.Location = New System.Drawing.Point(24, 342)
     Me.btnSelAll.Name = "btnSelAll"
-    Me.btnSelAll.Size = New System.Drawing.Size(64, 24)
+    Me.btnSelAll.Size = New System.Drawing.Size(77, 27)
     Me.btnSelAll.TabIndex = 4
     Me.btnSelAll.Text = "All"
     '
     'frmCliGenParmList
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(232, 373)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(278, 430)
     Me.Controls.Add(Me.btnSelAll)
     Me.Controls.Add(Me.btnSelNone)
     Me.Controls.Add(Me.btnCancel)
     Me.Controls.Add(Me.btnOK)
     Me.Controls.Add(Me.chklstParms)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmCliGenParmList"
     Me.Text = "Select CliGen Parms to Edit"
     Me.ResumeLayout(False)
@@ -166,4 +167,9 @@ Public Class frmCliGenParmList
     End With
   End Sub
 
+  Private Sub frmCliGenParmList_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Compute\Cligen.html")
+    End If
+  End Sub
 End Class

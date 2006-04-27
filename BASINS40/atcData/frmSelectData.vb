@@ -472,6 +472,7 @@ Friend Class frmSelectData
     Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+    Me.KeyPreview = True
     Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
     Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
     Me.Menu = Me.MainMenu1
@@ -1155,6 +1156,12 @@ NextName:
     pSaveGroup = Nothing
     pMatchingSource = Nothing
     pSelectedSource = Nothing
+  End Sub
+
+  Private Sub frmSelectData_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
+    End If
   End Sub
 End Class
 

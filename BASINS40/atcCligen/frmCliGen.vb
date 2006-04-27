@@ -118,9 +118,9 @@ Public Class frmCliGen
     Me.fraStaParms.Controls.Add(Me.btnSelParms)
     Me.fraStaParms.Controls.Add(Me.agdMonParms)
     Me.fraStaParms.Controls.Add(Me.lblStation)
-    Me.fraStaParms.Location = New System.Drawing.Point(8, 152)
+    Me.fraStaParms.Location = New System.Drawing.Point(10, 175)
     Me.fraStaParms.Name = "fraStaParms"
-    Me.fraStaParms.Size = New System.Drawing.Size(727, 296)
+    Me.fraStaParms.Size = New System.Drawing.Size(872, 342)
     Me.fraStaParms.TabIndex = 1
     Me.fraStaParms.TabStop = False
     Me.fraStaParms.Text = "Station Parameters"
@@ -129,9 +129,9 @@ Public Class frmCliGen
     '
     Me.btnReset.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.btnReset.Enabled = False
-    Me.btnReset.Location = New System.Drawing.Point(560, 256)
+    Me.btnReset.Location = New System.Drawing.Point(672, 295)
     Me.btnReset.Name = "btnReset"
-    Me.btnReset.Size = New System.Drawing.Size(136, 20)
+    Me.btnReset.Size = New System.Drawing.Size(163, 23)
     Me.btnReset.TabIndex = 17
     Me.btnReset.Text = "Reset to Original Values"
     '
@@ -139,9 +139,9 @@ Public Class frmCliGen
     '
     Me.rdoPct.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.rdoPct.Enabled = False
-    Me.rdoPct.Location = New System.Drawing.Point(640, 56)
+    Me.rdoPct.Location = New System.Drawing.Point(768, 65)
     Me.rdoPct.Name = "rdoPct"
-    Me.rdoPct.Size = New System.Drawing.Size(72, 16)
+    Me.rdoPct.Size = New System.Drawing.Size(86, 18)
     Me.rdoPct.TabIndex = 16
     Me.rdoPct.Text = "Percent"
     '
@@ -150,9 +150,9 @@ Public Class frmCliGen
     Me.rdoAbs.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.rdoAbs.Checked = True
     Me.rdoAbs.Enabled = False
-    Me.rdoAbs.Location = New System.Drawing.Point(640, 40)
+    Me.rdoAbs.Location = New System.Drawing.Point(768, 46)
     Me.rdoAbs.Name = "rdoAbs"
-    Me.rdoAbs.Size = New System.Drawing.Size(72, 16)
+    Me.rdoAbs.Size = New System.Drawing.Size(86, 19)
     Me.rdoAbs.TabIndex = 15
     Me.rdoAbs.TabStop = True
     Me.rdoAbs.Text = "Absolute"
@@ -160,9 +160,9 @@ Public Class frmCliGen
     'lblEditVals
     '
     Me.lblEditVals.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.lblEditVals.Location = New System.Drawing.Point(624, 24)
+    Me.lblEditVals.Location = New System.Drawing.Point(749, 28)
     Me.lblEditVals.Name = "lblEditVals"
-    Me.lblEditVals.Size = New System.Drawing.Size(88, 16)
+    Me.lblEditVals.Size = New System.Drawing.Size(105, 18)
     Me.lblEditVals.TabIndex = 14
     Me.lblEditVals.Text = "Edit Values by:"
     '
@@ -170,9 +170,9 @@ Public Class frmCliGen
     '
     Me.btnSelParms.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
     Me.btnSelParms.Enabled = False
-    Me.btnSelParms.Location = New System.Drawing.Point(32, 256)
+    Me.btnSelParms.Location = New System.Drawing.Point(38, 295)
     Me.btnSelParms.Name = "btnSelParms"
-    Me.btnSelParms.Size = New System.Drawing.Size(152, 20)
+    Me.btnSelParms.Size = New System.Drawing.Size(183, 23)
     Me.btnSelParms.TabIndex = 11
     Me.btnSelParms.Text = "Select Parms to View/Edit"
     '
@@ -187,115 +187,115 @@ Public Class frmCliGen
     Me.agdMonParms.Enabled = False
     Me.agdMonParms.LineColor = System.Drawing.Color.Empty
     Me.agdMonParms.LineWidth = 0.0!
-    Me.agdMonParms.Location = New System.Drawing.Point(4, 80)
+    Me.agdMonParms.Location = New System.Drawing.Point(5, 92)
     Me.agdMonParms.Name = "agdMonParms"
-    Me.agdMonParms.Size = New System.Drawing.Size(719, 160)
+    Me.agdMonParms.Size = New System.Drawing.Size(863, 185)
     Me.agdMonParms.Source = Nothing
     Me.agdMonParms.TabIndex = 3
     '
     'lblStation
     '
-    Me.lblStation.Location = New System.Drawing.Point(8, 24)
+    Me.lblStation.Location = New System.Drawing.Point(10, 28)
     Me.lblStation.Name = "lblStation"
-    Me.lblStation.Size = New System.Drawing.Size(400, 56)
+    Me.lblStation.Size = New System.Drawing.Size(480, 64)
     Me.lblStation.TabIndex = 2
     '
     'btnParmFile
     '
-    Me.btnParmFile.Location = New System.Drawing.Point(88, 40)
+    Me.btnParmFile.Location = New System.Drawing.Point(106, 46)
     Me.btnParmFile.Name = "btnParmFile"
-    Me.btnParmFile.Size = New System.Drawing.Size(48, 20)
+    Me.btnParmFile.Size = New System.Drawing.Size(57, 23)
     Me.btnParmFile.TabIndex = 3
     Me.btnParmFile.Text = "Select"
     '
     'btnRun
     '
     Me.btnRun.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnRun.Location = New System.Drawing.Point(344, 464)
+    Me.btnRun.Location = New System.Drawing.Point(413, 535)
     Me.btnRun.Name = "btnRun"
-    Me.btnRun.Size = New System.Drawing.Size(80, 24)
+    Me.btnRun.Size = New System.Drawing.Size(96, 28)
     Me.btnRun.TabIndex = 4
     Me.btnRun.Text = "Run CliGen"
     '
     'btnSave
     '
     Me.btnSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnSave.Location = New System.Drawing.Point(248, 464)
+    Me.btnSave.Location = New System.Drawing.Point(298, 535)
     Me.btnSave.Name = "btnSave"
-    Me.btnSave.Size = New System.Drawing.Size(80, 24)
+    Me.btnSave.Size = New System.Drawing.Size(96, 28)
     Me.btnSave.TabIndex = 5
     Me.btnSave.Text = "Save Parms"
     '
     'btnCancel
     '
     Me.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.btnCancel.Location = New System.Drawing.Point(440, 464)
+    Me.btnCancel.Location = New System.Drawing.Point(528, 535)
     Me.btnCancel.Name = "btnCancel"
-    Me.btnCancel.Size = New System.Drawing.Size(56, 24)
+    Me.btnCancel.Size = New System.Drawing.Size(67, 28)
     Me.btnCancel.TabIndex = 6
     Me.btnCancel.Text = "Cancel"
     '
     'lblCliGen
     '
-    Me.lblCliGen.Location = New System.Drawing.Point(8, 16)
+    Me.lblCliGen.Location = New System.Drawing.Point(10, 18)
     Me.lblCliGen.Name = "lblCliGen"
-    Me.lblCliGen.Size = New System.Drawing.Size(136, 16)
+    Me.lblCliGen.Size = New System.Drawing.Size(163, 19)
     Me.lblCliGen.TabIndex = 7
     Me.lblCliGen.Text = "Specify CliGen Files"
     '
     'lblParm
     '
-    Me.lblParm.Location = New System.Drawing.Point(8, 40)
+    Me.lblParm.Location = New System.Drawing.Point(10, 46)
     Me.lblParm.Name = "lblParm"
-    Me.lblParm.Size = New System.Drawing.Size(88, 16)
+    Me.lblParm.Size = New System.Drawing.Size(105, 19)
     Me.lblParm.TabIndex = 8
     Me.lblParm.Text = "Parameter File:"
     '
     'lblOut
     '
-    Me.lblOut.Location = New System.Drawing.Point(8, 72)
+    Me.lblOut.Location = New System.Drawing.Point(10, 83)
     Me.lblOut.Name = "lblOut"
-    Me.lblOut.Size = New System.Drawing.Size(64, 16)
+    Me.lblOut.Size = New System.Drawing.Size(76, 19)
     Me.lblOut.TabIndex = 9
     Me.lblOut.Text = "Output File:"
     '
     'btnOutFile
     '
-    Me.btnOutFile.Location = New System.Drawing.Point(88, 72)
+    Me.btnOutFile.Location = New System.Drawing.Point(106, 83)
     Me.btnOutFile.Name = "btnOutFile"
-    Me.btnOutFile.Size = New System.Drawing.Size(48, 20)
+    Me.btnOutFile.Size = New System.Drawing.Size(57, 23)
     Me.btnOutFile.TabIndex = 10
     Me.btnOutFile.Text = "Select"
     '
     'lblStart
     '
-    Me.lblStart.Location = New System.Drawing.Point(8, 112)
+    Me.lblStart.Location = New System.Drawing.Point(10, 129)
     Me.lblStart.Name = "lblStart"
-    Me.lblStart.Size = New System.Drawing.Size(80, 16)
+    Me.lblStart.Size = New System.Drawing.Size(96, 19)
     Me.lblStart.TabIndex = 12
     Me.lblStart.Text = "Starting Year:"
     '
     'lblNYrs
     '
-    Me.lblNYrs.Location = New System.Drawing.Point(144, 112)
+    Me.lblNYrs.Location = New System.Drawing.Point(173, 129)
     Me.lblNYrs.Name = "lblNYrs"
-    Me.lblNYrs.Size = New System.Drawing.Size(96, 16)
+    Me.lblNYrs.Size = New System.Drawing.Size(115, 19)
     Me.lblNYrs.TabIndex = 13
     Me.lblNYrs.Text = "Number of Years:"
     '
     'txtNumYrs
     '
-    Me.txtNumYrs.Location = New System.Drawing.Point(240, 112)
+    Me.txtNumYrs.Location = New System.Drawing.Point(288, 129)
     Me.txtNumYrs.Name = "txtNumYrs"
-    Me.txtNumYrs.Size = New System.Drawing.Size(32, 20)
+    Me.txtNumYrs.Size = New System.Drawing.Size(38, 22)
     Me.txtNumYrs.TabIndex = 14
     Me.txtNumYrs.Text = "1"
     '
     'txtStartYear
     '
-    Me.txtStartYear.Location = New System.Drawing.Point(88, 112)
+    Me.txtStartYear.Location = New System.Drawing.Point(106, 129)
     Me.txtStartYear.Name = "txtStartYear"
-    Me.txtStartYear.Size = New System.Drawing.Size(32, 20)
+    Me.txtStartYear.Size = New System.Drawing.Size(38, 22)
     Me.txtStartYear.TabIndex = 15
     Me.txtStartYear.Text = "2000"
     '
@@ -303,10 +303,10 @@ Public Class frmCliGen
     '
     Me.txtParmFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtParmFile.Location = New System.Drawing.Point(144, 40)
+    Me.txtParmFile.Location = New System.Drawing.Point(173, 46)
     Me.txtParmFile.Name = "txtParmFile"
     Me.txtParmFile.ReadOnly = True
-    Me.txtParmFile.Size = New System.Drawing.Size(591, 20)
+    Me.txtParmFile.Size = New System.Drawing.Size(709, 22)
     Me.txtParmFile.TabIndex = 16
     Me.txtParmFile.Text = ""
     '
@@ -314,18 +314,18 @@ Public Class frmCliGen
     '
     Me.txtOutFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                 Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.txtOutFile.Location = New System.Drawing.Point(144, 72)
+    Me.txtOutFile.Location = New System.Drawing.Point(173, 83)
     Me.txtOutFile.Name = "txtOutFile"
     Me.txtOutFile.ReadOnly = True
-    Me.txtOutFile.Size = New System.Drawing.Size(591, 20)
+    Me.txtOutFile.Size = New System.Drawing.Size(709, 22)
     Me.txtOutFile.TabIndex = 17
     Me.txtOutFile.Text = ""
     '
     'lblData
     '
-    Me.lblData.Location = New System.Drawing.Point(320, 112)
+    Me.lblData.Location = New System.Drawing.Point(384, 129)
     Me.lblData.Name = "lblData"
-    Me.lblData.Size = New System.Drawing.Size(216, 16)
+    Me.lblData.Size = New System.Drawing.Size(259, 19)
     Me.lblData.TabIndex = 18
     Me.lblData.Text = "Select Data to be Available after Running:"
     '
@@ -333,24 +333,24 @@ Public Class frmCliGen
     '
     Me.chkDaily.Checked = True
     Me.chkDaily.CheckState = System.Windows.Forms.CheckState.Checked
-    Me.chkDaily.Location = New System.Drawing.Point(536, 104)
+    Me.chkDaily.Location = New System.Drawing.Point(643, 120)
     Me.chkDaily.Name = "chkDaily"
-    Me.chkDaily.Size = New System.Drawing.Size(176, 16)
+    Me.chkDaily.Size = New System.Drawing.Size(211, 18)
     Me.chkDaily.TabIndex = 19
     Me.chkDaily.Text = "Original Daily Cligen"
     '
     'chkHourly
     '
-    Me.chkHourly.Location = New System.Drawing.Point(536, 120)
+    Me.chkHourly.Location = New System.Drawing.Point(643, 138)
     Me.chkHourly.Name = "chkHourly"
-    Me.chkHourly.Size = New System.Drawing.Size(176, 16)
+    Me.chkHourly.Size = New System.Drawing.Size(211, 19)
     Me.chkHourly.TabIndex = 20
     Me.chkHourly.Text = "Disaggregated Hourly"
     '
     'frmCliGen
     '
-    Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-    Me.ClientSize = New System.Drawing.Size(744, 493)
+    Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+    Me.ClientSize = New System.Drawing.Size(892, 568)
     Me.Controls.Add(Me.chkHourly)
     Me.Controls.Add(Me.chkDaily)
     Me.Controls.Add(Me.lblData)
@@ -370,6 +370,7 @@ Public Class frmCliGen
     Me.Controls.Add(Me.fraStaParms)
     Me.Controls.Add(Me.lblParm)
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+    Me.KeyPreview = True
     Me.Name = "frmCliGen"
     Me.Text = "CliGen Weather Generator"
     Me.fraStaParms.ResumeLayout(False)
@@ -785,5 +786,11 @@ Public Class frmCliGen
 
   Private Sub chkDaily_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkDaily.CheckedChanged
 
+  End Sub
+
+  Private Sub frmCliGen_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+    If e.KeyValue = Windows.Forms.Keys.F1 Then
+      ShowHelp("BASINS Details\Compute\Cligen.html")
+    End If
   End Sub
 End Class
