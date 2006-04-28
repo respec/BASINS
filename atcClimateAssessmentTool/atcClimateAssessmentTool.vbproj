@@ -20,8 +20,8 @@
                 OptionCompare = "Binary"
                 OptionExplicit = "On"
                 OptionStrict = "Off"
-                RootNamespace = "atcScenarioBuilder"
-                StartupObject = "atcScenarioBuilder.(None)"
+                RootNamespace = "atcClimateAssessmentTool"
+                StartupObject = "atcClimateAssessmentTool.(None)"
             >
                 <Config
                     Name = "Debug"
@@ -186,7 +186,7 @@
                     BuildAction = "Compile"
                 />
                 <File
-                    RelPath = "atcScenarioBuilderPlugin.vb"
+                    RelPath = "atcClimateAssessmentToolPlugin.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />
@@ -241,7 +241,7 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
-                    RelPath = "modScenarioBuild.vb"
+                    RelPath = "modCAT.vb"
                     SubType = "Code"
                     BuildAction = "Compile"
                 />

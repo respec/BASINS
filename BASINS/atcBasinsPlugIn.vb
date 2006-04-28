@@ -410,39 +410,8 @@ Public Class atcBasinsPlugIn
     End If
   End Function
 
-  Private Function FeedbackSystemInformation() As String
-    'format as an html document?
-    Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
-    lFeedback &= "Project: " & g_MapWin.Project.FileName & vbCrLf
-    lFeedback &= "Config: " & g_MapWin.Project.ConfigFileName & vbCrLf
-    lFeedback &= "CommandLine: " & System.Environment.CommandLine & vbCrLf
-    lFeedback &= "User: " & System.Environment.UserName & vbCrLf
-    lFeedback &= "Machine: " & System.Environment.MachineName & vbCrLf
-    lFeedback &= "OSVersion: " & System.Environment.OSVersion.ToString & vbCrLf
-    lFeedback &= "CLRVersion: " & System.Environment.Version.ToString & vbCrLf
-
-    lFeedback &= "LogFile: " & Logger.FileName
-    'add current log file contents (not too much!!!)
-
-    'plugin info?
-
-    'add map layers info?
-
-    Dim lSkipFilename As Integer = g_BasinsDir.Length
-    lFeedback &= vbCrLf & "Files in " & g_BasinsDir & vbCrLf
-
-    Dim lallFiles As New NameValueCollection
-    AddFilesInDir(lallFiles, g_BasinsDir, True)
-    'lFeedback &= vbCrLf & "Modified" & vbTab & "Size" & vbTab & "Filename" & vbCrLf
-    For Each lFilename As String In lallFiles
-      lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
-    Next
-
-    Return lFeedback
-  End Function
-
   Private Sub SendFeedback()
-    Dim lSystemInformation As String = FeedbackSystemInformation()
+    Dim lSystemInformation As String = ""
     Dim lName As String = ""
     Dim lEmail As String = ""
     Dim lMessage As String = ""
