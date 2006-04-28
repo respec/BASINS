@@ -368,4 +368,45 @@ Friend Module modBasinsPlugin
     End If
   End Sub
 
+  Friend Function FeedbackSystemInformation() As String
+    'TODO: format as an html document?
+    Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
+    lFeedback &= "Project: " & g_MapWin.Project.FileName & vbCrLf
+    lFeedback &= "Config: " & g_MapWin.Project.ConfigFileName & vbCrLf
+    lFeedback &= "CommandLine: " & System.Environment.CommandLine & vbCrLf
+    lFeedback &= "User: " & System.Environment.UserName & vbCrLf
+    lFeedback &= "Machine: " & System.Environment.MachineName & vbCrLf
+    lFeedback &= "OSVersion: " & System.Environment.OSVersion.ToString & vbCrLf
+    lFeedback &= "CLRVersion: " & System.Environment.Version.ToString & vbCrLf
+
+    lFeedback &= "LogFile: " & Logger.FileName & vbCrLf
+    'TODO: add current log file contents (not too much!!!)
+
+    'plugin info
+    lFeedback &= vbCrLf & "Plugins loaded:" & vbCrLf
+    Dim lLastPlugIn As Integer = g_MapWin.Plugins.Count() - 1
+    For iPlugin As Integer = 0 To lLastPlugIn
+      Dim lCurPlugin As MapWindow.Interfaces.IPlugin = g_MapWin.Plugins.Item(iPlugin)
+      If Not lCurPlugin Is Nothing Then
+        With lCurPlugin
+          lFeedback &= .Name & vbTab & .Version & vbTab & .BuildDate & vbCrLf
+        End With
+      End If
+    Next
+
+    'TODO: add map layers info?
+
+    Dim lSkipFilename As Integer = g_BasinsDir.Length
+    lFeedback &= vbCrLf & "Files in " & g_BasinsDir & vbCrLf
+
+    Dim lallFiles As New NameValueCollection
+    AddFilesInDir(lallFiles, g_BasinsDir, True)
+    'lFeedback &= vbCrLf & "Modified" & vbTab & "Size" & vbTab & "Filename" & vbCrLf
+    For Each lFilename As String In lallFiles
+      lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
+    Next
+
+    Return lFeedback
+  End Function
+
 End Module

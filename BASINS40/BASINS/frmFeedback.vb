@@ -191,22 +191,32 @@ Public Class frmFeedback
 
 #End Region
 
+  Private pSend As Boolean = False
+
   Public Function ShowFeedback(ByRef aName As String, ByRef aEmail As String, ByRef aMessage As String, ByRef aSystemInformation As String) As Boolean
     txtName.Text = aName
     txtEmail.Text = aEmail
     txtMessage.Text = aMessage
-    txtSystemInformation.Text = aSystemInformation
-    If Me.ShowDialog = Windows.Forms.DialogResult.OK Then
+    Me.Show()
+    Me.Refresh()
+
+    txtSystemInformation.Text = FeedbackSystemInformation()
+
+    While Me.Visible
+      Windows.Forms.Application.DoEvents()
+      System.Threading.Thread.Sleep(100)
+    End While
+
+    If pSend Then
       aName = txtName.Text
       aEmail = txtEmail.Text
       aMessage = txtMessage.Text
       If Not chkSendSystemInformation.Checked Then
         aSystemInformation = "System information not sent"
       End If
-      Return True
-    Else
-      Return False
     End If
+    Me.Close()
+    Return pSend
   End Function
 
   Private Sub btnCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCopy.Click
@@ -220,6 +230,8 @@ Public Class frmFeedback
   Private Sub btnSend_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSend.Click
     SaveSetting("BASINS4", "Feedback", "Name", txtName.Text)
     SaveSetting("BASINS4", "Feedback", "Email", txtEmail.Text)
+    pSend = True
+    Me.Hide()
   End Sub
 
   Private Sub frmFeedback_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -227,4 +239,8 @@ Public Class frmFeedback
     txtEmail.Text = GetSetting("BASINS4", "Feedback", "Email", "")
   End Sub
 
+  Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+    pSend = False
+    Me.Hide()
+  End Sub
 End Class

@@ -1,6 +1,6 @@
 Imports atcData
 
-Public Class atcScenarioBuilderPlugin
+Public Class atcClimateAssessmentToolPlugin
   Inherits atcData.atcDataDisplay
 
   Public Overrides ReadOnly Property Name() As String

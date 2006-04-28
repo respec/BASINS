@@ -2,7 +2,7 @@ Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 
-Public Module modScenarioBuild
+Public Module modCAT
     Public g_MapWin As MapWindow.Interfaces.IMapWin
     Public g_DataManager As atcDataManager
 
@@ -60,7 +60,7 @@ Public Module modScenarioBuild
       Shell(lWinHspfLtExeName & " -1 -1 " & lNewFilename & "uci", AppWinStyle.NormalFocus, True)
       aHBNResults.Open(lNewFilename & "hbn")
     Else
-      Logger.Msg("Could not find base WDM file '" & aCurrentWDMfilename & "'" & vbCrLf & "Could not run model", "ScenarioBuild")
+      Logger.Msg("Could not find base WDM file '" & aCurrentWDMfilename & "'" & vbCrLf & "Could not run model", "Scenario Run")
     End If
   End Sub
 End Module
