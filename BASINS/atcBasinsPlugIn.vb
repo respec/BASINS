@@ -410,32 +410,46 @@ Public Class atcBasinsPlugIn
     End If
   End Function
 
-  Private Sub SendFeedback()
+  Private Function FeedbackSystemInformation() As String
     Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
+    lFeedback &= "Project: " & g_MapWin.Project.FileName & vbCrLf
+    lFeedback &= "Config: " & g_MapWin.Project.ConfigFileName & vbCrLf
     lFeedback &= "CommandLine: " & System.Environment.CommandLine & vbCrLf
     lFeedback &= "User: " & System.Environment.UserName & vbCrLf
     lFeedback &= "Machine: " & System.Environment.MachineName & vbCrLf
     lFeedback &= "OSVersion: " & System.Environment.OSVersion.ToString & vbCrLf
     lFeedback &= "CLRVersion: " & System.Environment.Version.ToString & vbCrLf
 
-    Dim lStartDir As String = PathNameOnly(PathNameOnly(g_MapWin.Plugins.PluginFolder))
-    Dim lSkipFilename As Integer = lStartDir.Length + 1
-    lFeedback &= vbCrLf & "Files in " & lStartDir & vbCrLf
+    Dim lSkipFilename As Integer = g_BasinsDir.Length
+    lFeedback &= vbCrLf & "Files in " & g_BasinsDir & vbCrLf
 
     Dim lallFiles As New NameValueCollection
-    AddFilesInDir(lallFiles, lStartDir, True)
-    lFeedback &= vbCrLf & "Filename" & vbTab & "Size" & vbTab & "Modified" & vbCrLf
+    AddFilesInDir(lallFiles, g_BasinsDir, True)
+    'lFeedback &= vbCrLf & "Modified" & vbTab & "Size" & vbTab & "Filename" & vbCrLf
     For Each lFilename As String In lallFiles
-      lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & Format(FileLen(lFilename), "#,###") & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
+      lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
     Next
+    Return lFeedback
+  End Function
 
-    Dim client As New System.Net.WebClient
-    Dim lFeedbackCollection As New NameValueCollection
-    lFeedbackCollection.Add("sysinfo", lFeedback)
-    client.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
-    Logger.Msg("Feedback successfully sent", "Send Feedback")
+  Private Sub SendFeedback()
+    Dim lSystemInformation As String = FeedbackSystemInformation()
+    Dim lName As String = ""
+    Dim lEmail As String = ""
+    Dim lMessage As String = ""
+
+    Dim lFeedbackForm As New frmFeedback
+    If lFeedbackForm.ShowFeedback(lName, lEmail, lMessage, lSystemInformation) Then
+      Dim client As New System.Net.WebClient
+      Dim lFeedbackCollection As New NameValueCollection
+      lFeedbackCollection.Add("name", Trim(lName))
+      lFeedbackCollection.Add("email", Trim(lEmail))
+      lFeedbackCollection.Add("message", Trim(lMessage))
+      lFeedbackCollection.Add("sysinfo", lSystemInformation)
+      client.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
+      Logger.Msg("Feedback successfully sent", "Send Feedback")
+    End If
   End Sub
-
 
   Private Function LaunchDisplay(ByVal aToolName As String, Optional ByVal aCmdLine As String = "") As Boolean
     Dim searchForName As String = aToolName.ToLower
@@ -643,9 +657,9 @@ Public Class atcBasinsPlugIn
       '  If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
       '    Logger.Msg(lErrors, "Script Error")
       '  End If
-      Else
-        Logger.Dbg("Ignore:" & msg)
-      End If
+    Else
+      Logger.Dbg("Ignore:" & msg)
+    End If
   End Sub
 
   Public Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectLoading
