@@ -411,6 +411,7 @@ Public Class atcBasinsPlugIn
   End Function
 
   Private Function FeedbackSystemInformation() As String
+    'format as an html document?
     Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
     lFeedback &= "Project: " & g_MapWin.Project.FileName & vbCrLf
     lFeedback &= "Config: " & g_MapWin.Project.ConfigFileName & vbCrLf
@@ -419,6 +420,13 @@ Public Class atcBasinsPlugIn
     lFeedback &= "Machine: " & System.Environment.MachineName & vbCrLf
     lFeedback &= "OSVersion: " & System.Environment.OSVersion.ToString & vbCrLf
     lFeedback &= "CLRVersion: " & System.Environment.Version.ToString & vbCrLf
+
+    lFeedback &= "LogFile: " & Logger.FileName
+    'add current log file contents (not too much!!!)
+
+    'plugin info?
+
+    'add map layers info?
 
     Dim lSkipFilename As Integer = g_BasinsDir.Length
     lFeedback &= vbCrLf & "Files in " & g_BasinsDir & vbCrLf
@@ -429,6 +437,7 @@ Public Class atcBasinsPlugIn
     For Each lFilename As String In lallFiles
       lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
     Next
+
     Return lFeedback
   End Function
 
@@ -440,13 +449,13 @@ Public Class atcBasinsPlugIn
 
     Dim lFeedbackForm As New frmFeedback
     If lFeedbackForm.ShowFeedback(lName, lEmail, lMessage, lSystemInformation) Then
-      Dim client As New System.Net.WebClient
       Dim lFeedbackCollection As New NameValueCollection
       lFeedbackCollection.Add("name", Trim(lName))
       lFeedbackCollection.Add("email", Trim(lEmail))
       lFeedbackCollection.Add("message", Trim(lMessage))
       lFeedbackCollection.Add("sysinfo", lSystemInformation)
-      client.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
+      Dim lClient As New System.Net.WebClient
+      lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
       Logger.Msg("Feedback successfully sent", "Send Feedback")
     End If
   End Sub
