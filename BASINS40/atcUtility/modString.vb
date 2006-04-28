@@ -950,254 +950,37 @@ EndFound:
     StrPrintable = retval
   End Function
 
-  Public Function StrPad(ByRef S As String, ByVal NewLength As Short, Optional ByRef PadWith As String = " ", Optional ByRef PadLeft As Boolean = True) As String
+  Public Function StrPad(ByVal S As String, ByVal NewLength As Integer, Optional ByVal PadWith As String = " ", Optional ByVal PadLeft As Boolean = True) As String
     ' ##SUMMARY Pads a string with specific character to achieve a specified length.
     ' ##PARAM S M String to be padded.
     ' ##PARAM NewLength I Length of padded string to be returned.
     ' ##PARAM PadWith I Character with which to pad the string.
     ' ##PARAM PadLeft I Pad left if true, pad right if false.
-    ' ##RETURNS Input parameter S padded to left or right (default=left) with _
-    'specific character (default=space) to specified length.
-    Dim CharsToAdd As Short 'number of characters added to S
+    ' ##RETURNS Input parameter S padded to left or right (default=left) with specific character (default=space) to specified length.
 
-    CharsToAdd = NewLength - Len(S)
-    If CharsToAdd <= 0 Then
+    Dim NumCharsToAdd As Integer = NewLength - S.Length
+    If NumCharsToAdd <= 0 Then
       StrPad = S
     ElseIf PadLeft Then
-      StrPad = New String(PadWith, CharsToAdd) & S
+      StrPad = New String(PadWith, NumCharsToAdd) & S
     Else
-      StrPad = S & New String(PadWith, CharsToAdd)
+      StrPad = S & New String(PadWith, NumCharsToAdd)
     End If
-
   End Function
 
-  'Public Sub DecimalAlign(ByRef S() As String, Optional ByRef PadLeft As Boolean = True, Optional ByRef PadRight As Boolean = True, Optional ByRef MinWidth As Short = 0)
-  '    ' ##SUMMARY Formats array of floating point decimals around location of decimal place.
-  '    ' ##PARAM S M String array containing values to be formatted.
-  '    ' ##PARAM PadLeft I Number of spaces reserved to the left of the decimal place.
-  '    ' ##PARAM PadRight I Number of spaces reserved to the right of the decimal place.
-  '    ' ##PARAM MinWidth I Minimum number of spaces reserved for overall formatted number.
-  '    Dim MaxDecimalPos As Short 'furthest decimal position from left for all numbers in s
-  '    Dim MaxAfterDecimal As Short 'furthest decimal position from right for all numbers in s
-  '    Dim AfterDecimal() As Short 'array of digits after decimal
-  '    Dim DecimalPos() As Short 'array of decimal positions from left
-  '    Dim iMin As Short 'lower bound of s
-  '    Dim iMax As Short 'upper bound of s
-  '    Dim i As Short 'loop counter
-
-  '    iMin = LBound(S)
-  '    iMax = UBound(S)
-  '    ReDim DecimalPos(iMax)
-  '    ReDim AfterDecimal(iMax)
-  '    For i = iMin To iMax
-  '        DecimalPos(i) = InStr(S(i), ".")
-  '        If DecimalPos(i) = 0 Then DecimalPos(i) = Len(S(i)) + 1
-  '        If DecimalPos(i) > MaxDecimalPos Then MaxDecimalPos = DecimalPos(i)
-  '        If PadRight Then
-  '            AfterDecimal(i) = Len(S(i)) - DecimalPos(i)
-  '            If AfterDecimal(i) > MaxAfterDecimal Then MaxAfterDecimal = AfterDecimal(i)
-  '        End If
-  '    Next
-  '    For i = iMin To iMax
-  '        If PadLeft Then
-  '            If DecimalPos(i) < MaxDecimalPos Then
-  '                S(i) = Space(MaxDecimalPos - DecimalPos(i)) & S(i)
-  '            End If
-  '        End If
-  '        If PadRight Then
-  '            If AfterDecimal(i) < MaxAfterDecimal Then
-  '                S(i) = S(i) & Space(MaxAfterDecimal - AfterDecimal(i))
-  '            End If
-  '        End If
-  '        If MinWidth > 0 Then S(i) = StrPad(S(i), MinWidth)
-  '    Next
-
-  'End Sub
-
-  'Public Sub DispError(ByRef SubID As String, ByRef e As Object)
-  '    ' ##SUMMARY Displays error in message box for up to first 4 errors from same module.
-  '    ' ##PARAM SubID I ID of subroutine
-  '    ' ##PARAM E I Error object
-  '    Static ecnt As Integer
-  '    ' ##LOCAL ecnt - running count of errors from module
-
-  '    ecnt = ecnt + 1
-  '    If ecnt < 5 Then
-  '        MsgBox("From Sub " & SubID & ":" & vbCrLf & e.Description & vbCrLf & "Error number " & e.Number & vbCrLf, 48)
-  '    End If
-
-  'End Sub
-
-  'Sub ChkProb(ByRef id As String, ByRef txt As String, ByRef Min As String, ByRef Max As String, ByRef opt As Integer, ByRef rsp As Integer)
-  '    ' ##SUMMARY Displays problem message box when entered value out of range.
-  '    ' ##PARAM id I Name of variable
-  '    ' ##PARAM txt I Entered value of variable
-  '    ' ##PARAM Min I Minimum variable value
-  '    ' ##PARAM Max I Maximum variable value
-  '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = OK)
-  '    ' ##PARAM rsp O Response indicating whether overriding limits allowed (0 = no)
-  '    Dim eStr As String
-  '    Dim NL As String
-  '    ' ##LOCAL eStr - error string
-  '    ' ##LOCAL nl - carriage return line feed string
-
-  '    NL = Chr(13) & Chr(10)
-  '    eStr = "'" & txt & "' is not a valid value for" & NL
-  '    eStr = eStr & "'" & id & "'" & NL & NL
-  '    eStr = eStr & "Min:  " & Min
-  '    eStr = eStr & "  Max:  " & Max & NL
-  '    If opt = 1 Then 'confirm override of limits
-  '        eStr = eStr & "Please confirm that you want to use it."
-  '        rsp = MsgBox(eStr, 305, id & "Problem")
-  '    Else
-  '        MsgBox(eStr, MsgBoxStyle.Exclamation, id & "Problem")
-  '        rsp = 0
-  '    End If
-
-  'End Sub
-
-  'Sub ChkTxtI(ByRef id As String, ByRef Min As Integer, ByRef Max As Integer, ByRef txt As String, ByRef cVal As Integer, ByRef chdFlg As Integer)
-  '    ' ##SUMMARY Checks entered integer value for valid range. _
-  '    'Automatically allows user confirmation to override Min/Max limits.
-  '    ' ##PARAM ID I Variable name
-  '    ' ##PARAM Min I Minimum variable value
-  '    ' ##PARAM Max I Maximum variable value
-  '    ' ##PARAM txt I Entered value of variable
-  '    ' ##PARAM cVal I Previous value of variable
-  '    ' ##PARAM chdFlg O Flag for whether integer value changed (0 = no, 1 = yes)
-  '    Dim opt As Integer
-  '    ' ##LOCAL opt - long set to 1 allowing user confirmation to override limits
-
-  '    opt = 1
-  '    Call ChkTxtIOpt(id, Min, Max, opt, txt, cVal, chdFlg)
-
-  'End Sub
-
-  'Sub ChkTxtR(ByRef id As String, ByRef Min As Single, ByRef Max As Single, ByRef txt As String, ByRef cVal As Single, ByRef chdFlg As Integer)
-  '    ' ##SUMMARY Checks entered real value for valid range. _
-  '    'Automatically allows user confirmation to override Min/Max limits.
-  '    ' ##PARAM ID I Variable name
-  '    ' ##PARAM Min I Minimum variable value
-  '    ' ##PARAM Max I Maximum variable value
-  '    ' ##PARAM txt I Entered value of variable
-  '    ' ##PARAM cVal I Previous value of variable
-  '    ' ##PARAM chdFlg O Flag for whether real value changed (0 = no, 1 = yes)
-  '    Dim opt As Integer
-  '    ' ##LOCAL opt - long set to 1 allowing user confirmation to override limits
-
-  '    opt = 1
-  '    Call ChkTxtROpt(id, Min, Max, opt, txt, cVal, chdFlg)
-
-  'End Sub
-
-  'Public Sub ChkTxtIOpt(ByRef id As String, ByRef Min As Integer, ByRef Max As Integer, ByRef opt As Integer, ByRef txt As String, ByRef cVal As Integer, ByRef chdFlg As Integer)
-  '    ' ##SUMMARY Checks entered integer value for valid range. _
-  '    'If opt = 1, allows user confirmation to override value outside Min/Max limits.
-  '    ' ##PARAM ID I Variable name
-  '    ' ##PARAM Min I Minimum variable value
-  '    ' ##PARAM Max I Maximum variable value
-  '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = yes)
-  '    ' ##PARAM txt I Entered value of variable
-  '    ' ##PARAM cVal I Previous value of variable
-  '    ' ##PARAM chdFlg O Flag for whether integer value changed (0 = no, 1 = yes)
-  '    Dim oldval As Integer
-  '    Dim newval As Integer
-  '    Dim probFlg As Integer
-  '    Dim rsp As Integer
-  '    ' ##LOCAL oldval - long previous value of variable
-  '    ' ##LOCAL newval - long user-entered value rounded to nearest integer
-  '    ' ##LOCAL probFlg - long problem flag (-1 = no change, 0 = no problem, 1 = invalid change)
-  '    ' ##LOCAL rsp - long response indicating whether overriding limits allowed (0 = no, 1 = yes)
-
-  '    probFlg = 1
-  '    chdFlg = 0
-  '    If IsNumeric(txt) Then
-  '        '   no really bad problems
-  '        oldval = cVal
-  '        newval = CShort(txt)
-  '        If (oldval = newval) Then
-  '            '     no change
-  '            probFlg = -1
-  '        ElseIf (newval >= Min And newval <= Max) Then
-  '            '     update listing
-  '            cVal = newval
-  '            probFlg = 0
-  '            chdFlg = 1
-  '        End If
-  '    End If
-  '    If probFlg = 1 Then
-  '        '   not a valid change
-  '        Call ChkProb(id, txt, CStr(Min), CStr(Max), opt, rsp)
-  '    End If
-  '    txt = CStr(cVal)
-
-  'End Sub
-
-  'Public Sub ChkTxtROpt(ByRef id As String, ByRef Min As Single, ByRef Max As Single, ByRef opt As Integer, ByRef txt As String, ByRef cVal As Single, ByRef chdFlg As Integer)
-  '    ' ##SUMMARY Checks entered real value for valid range. _
-  '    'If opt = 1, allows user confirmation to override value outside Min/Max limits.
-  '    ' ##PARAM ID I Variable name
-  '    ' ##PARAM Min I Minimum variable value
-  '    ' ##PARAM Max I Maximum variable value
-  '    ' ##PARAM opt I Flag allowing user confirmation to override limits (1 = yes)
-  '    ' ##PARAM txt I Entered value of variable
-  '    ' ##PARAM cVal I Previous value of variable
-  '    ' ##PARAM chdFlg O Flag for whether real value changed (0 = no, 1 = yes)
-  '    Dim oldval As Single
-  '    Dim newval As Single
-  '    Dim rsp As Integer
-  '    ' ##LOCAL oldval - long previous value of variable
-  '    ' ##LOCAL newval - long user-entered value rounded to nearest integer
-  '    ' ##LOCAL rsp - long response indicating whether overriding limits allowed (0 = no, 1 = yes)
-
-  '    If IsNumeric(txt) Then
-  '        'no really bad problems
-  '        oldval = cVal
-  '        newval = CDbl(txt)
-  '        If (oldval = newval) Then
-  '            'no change
-  '            chdFlg = 0
-  '        ElseIf (newval >= Min And newval <= Max) Then
-  '            'update listing
-  '            cVal = newval
-  '            chdFlg = 1
-  '        Else
-  '            'not a valid change
-  '            Call ChkProb(id, txt, CStr(Min), CStr(Max), opt, rsp)
-  '            If rsp = 1 Then
-  '                'user wants to use value anyway
-  '                cVal = newval
-  '                chdFlg = -1
-  '            Else
-  '                'don't use value
-  '                chdFlg = 0
-  '            End If
-  '        End If
-  '    ElseIf lenStr(txt) > 0 Then
-  '        MsgBox("Value entered is not a number.", 48)
-  '        chdFlg = 0
-  '    End If
-  '    If cVal <> -999 Then
-  '        '-999 indicates undefined value, leave field blank
-  '        txt = CStr(cVal)
-  '    End If
-  'End Sub
-
   Public Function Long2String(ByRef Value As Integer) As String
-    ' ##SUMMARY Parses long integer to FourByteType then prints out corresponding ascii codes.
-    ' ##SUMMARY   Example: Long2String(98) = "b   "
+    ' ##SUMMARY Returns ASCII text version of four bytes in an integer
+    ' ##SUMMARY Example: Long2String(98) = "b   "
     ' ##PARAM Value I Value to be converted
     ' ##RETURNS Input parameter Val in string form.
     Dim bVal As Byte()
-    ' ##LOCAL bval - FourByteType equivalent value of lVal
-
     bVal = System.BitConverter.GetBytes(Value)
     Return Chr(bVal(0)) & Chr(bVal(1)) & Chr(bVal(2)) & Chr(bVal(3))
   End Function
 
   Public Function Long2Single(ByRef Value As Integer) As Single
-    ' ##SUMMARY Sets long integer to LongType then converts to SingleType.
-    ' ##SUMMARY   Example: Long2Single(999999999) =  4.723787E-03
+    ' ##SUMMARY Converts bytes of integer into SingleType.
+    ' ##SUMMARY Example: Long2Single(999999999) =  4.723787E-03
     ' ##PARAM Value I Value to be converted
     ' ##RETURNS Input parameter Val in single precision form.
     Return System.BitConverter.ToSingle(System.BitConverter.GetBytes(Value), 0)
@@ -1239,121 +1022,6 @@ EndFound:
     Next
     Return S
   End Function
-
-  '    Public Sub SortIntegerArray(ByRef opt As Integer, ByRef cnt As Integer, ByRef iVal() As Integer, ByRef pos() As Integer)
-  '        ' ##SUMMARY Sorts integers in array into ascending order.
-  '        ' ##PARAM opt I Sort option (0 = sort in place, 1 = move values in array to sorted position)
-  '        ' ##PARAM cnt I Count of integers to sort
-  '        ' ##PARAM iVal I Array of integers to sort
-  '        ' ##PARAM pos O Array containing sorted order of integers
-  '        Dim i As Integer
-  '        Dim j As Integer
-  '        Dim jpt As Integer
-  '        Dim jpt1 As Integer
-  '        Dim itmp As Integer
-  '        ' ##LOCAL i - long counter for outer loop
-  '        ' ##LOCAL j - long counter for inner loop
-  '        ' ##LOCAL jpt - long pointer to j index
-  '        ' ##LOCAL jpt1 - long pointer to (j + 1) index
-  '        ' ##LOCAL itmp - long temporary holder for values in iVal array
-
-  '        'set default positions(assume in order)
-  '        For i = 1 To cnt
-  '            pos(i) = i
-  '        Next i
-
-  '        'make a pointer to values with bubble sort
-  '        For i = cnt To 2 Step -1
-  '            For j = 1 To i - 1
-  '                jpt = pos(j)
-  '                jpt1 = pos(j + 1)
-  '                If (iVal(jpt) > iVal(jpt1)) Then
-  '                    pos(j + 1) = jpt
-  '                    pos(j) = jpt1
-  '                End If
-  '            Next j
-  '        Next i
-
-  '        If (opt = 1) Then
-  '            'move integer values to their sorted positions
-  '            For i = 1 To cnt
-  '                If (pos(i) <> i) Then
-  '                    'need to move ints, first save whats in target space
-  '                    itmp = iVal(i)
-  '                    'move sorted data to target position
-  '                    iVal(i) = iVal(pos(i))
-  '                    'move temp data to source position
-  '                    iVal(pos(i)) = itmp
-  '                    'find the pointer to the other value we are moving
-  '                    j = i
-  '50:                 'CONTINUE
-  '                    j = j + 1
-  '                    If (pos(j) <> i) Then GoTo 50
-  '                    pos(j) = pos(i)
-  '                    pos(i) = i
-  '                End If
-  '            Next i
-  '        End If
-
-  '    End Sub
-
-  '    Public Sub SortRealArray(ByRef opt As Integer, ByRef cnt As Integer, ByRef rval() As Single, ByRef pos() As Integer)
-  '        ' ##SUMMARY Sorts array of real numbers into ascending order.
-  '        ' ##PARAM opt I Integer indicating sort option: 0 - sort in place, 1 - move values in _
-  '        'array to sorted position.
-  '        ' ##PARAM cnt I Count of real numbers to sort.
-  '        ' ##PARAM rval M Array of real numbers to sort.
-  '        ' ##PARAM pos O Integer array containing sorted order of real numbers.
-  '        Dim i As Integer
-  '        Dim j As Integer
-  '        Dim jpt As Integer
-  '        Dim jpt1 As Integer
-  '        Dim rtmp As Single
-  '        ' ##LOCAL i - long counter for outer loop
-  '        ' ##LOCAL j - long counter for inner loop
-  '        ' ##LOCAL jpt - long pointer to j index
-  '        ' ##LOCAL jpt1 - long pointer to (j + 1) index
-  '        ' ##LOCAL itmp - long temporary holder for values in rVal array
-
-  '        'set default positions(assume in order)
-  '        For i = 1 To cnt
-  '            pos(i) = i
-  '        Next i
-
-  '        'make a pointer to values with bubble sort
-  '        For i = cnt To 2 Step -1
-  '            For j = 1 To i - 1
-  '                jpt = pos(j)
-  '                jpt1 = pos(j + 1)
-  '                If (rval(jpt) > rval(jpt1)) Then
-  '                    pos(j + 1) = jpt
-  '                    pos(j) = jpt1
-  '                End If
-  '            Next j
-  '        Next i
-
-  '        If (opt = 1) Then
-  '            'move real values to their sorted positions
-  '            For i = 1 To cnt
-  '                If (pos(i) <> i) Then
-  '                    'need to move reals, first save whats in target space
-  '                    rtmp = rval(i)
-  '                    'move sorted data to target position
-  '                    rval(i) = rval(pos(i))
-  '                    'move temp data to source position
-  '                    rval(pos(i)) = rtmp
-  '                    'find the pointer to the other value we are moving
-  '                    j = i
-  '50:                 'CONTINUE
-  '                    j = j + 1
-  '                    If (pos(j) <> i) Then GoTo 50
-  '                    pos(j) = pos(i)
-  '                    pos(i) = i
-  '                End If
-  '            Next i
-  '        End If
-
-  '    End Sub
 
   Public Function PatternMatch(ByVal Source As String, ByVal Pattern As String) As Boolean
     ' ##SUMMARY Searches string for presence of pattern.

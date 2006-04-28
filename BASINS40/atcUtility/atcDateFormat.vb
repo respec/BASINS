@@ -152,7 +152,7 @@ Public Class atcDateFormat
           retval &= YearString(curDate)
         End If
       Case DateOrderEnum.JulianDate
-        retval = ATCformat(aJulianDate, "00000.000")
+        retval = StrPad(DoubleToString(aJulianDate, 9, "00,000.000", , , 8), 10)
     End Select
     If pIncludeHours OrElse pIncludeMinutes OrElse pIncludeSeconds Then retval &= " "
     If pIncludeHours Then retval &= Format(curDate(3), "00")

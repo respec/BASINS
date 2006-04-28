@@ -178,6 +178,16 @@
                     BuildAction = "EmbeddedResource"
                 />
                 <File
+                    RelPath = "frmFeedback.vb"
+                    SubType = "Form"
+                    BuildAction = "Compile"
+                />
+                <File
+                    RelPath = "frmFeedback.resx"
+                    DependentUpon = "frmFeedback.vb"
+                    BuildAction = "EmbeddedResource"
+                />
+                <File
                     RelPath = "frmWelcomeScreenBasins.vb"
                     SubType = "Form"
                     BuildAction = "Compile"

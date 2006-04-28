@@ -62,61 +62,63 @@ Public Module modDate
     MJD2VBdate = FromOADate(j + JulianModification - JulianModification1899)
   End Function
 
-  'Decimal-aligns numbers by padding before and/or after number with spaces
-  'Corrects VB's Format bug by always padding return value to length of formatString
-  'If val is numeric and formatString looks like a date format,
-  ' val is assumed to be a modified julian date and is converted to a VB date then formatted
-  'If the first character of formatString is L, the result is left aligned unless there is a decimal to align
-  'Such an initial L is not counted toward the length of the format string
-  Public Function ATCformat(ByVal aString As String, ByVal aFormat As String) As String
-    Dim retval As String
-    Dim LeftAlign As Boolean
-    Dim LenFormat As Integer
-    Dim NumericVal As Boolean
-    Dim DecimalFormatPos As Integer
-    Dim DecimalRetvalPos As Integer
+  'Replace calls to ATCformat with DoubleToString, StrPad, and regular VB Format
+  ''Decimal-aligns numbers by padding before and/or after number with spaces
+  ''Corrects VB's Format bug by always padding return value to length of formatString
+  ''If val is numeric and formatString looks like a date format,
+  '' val is assumed to be a modified julian date and is converted to a VB date then formatted
+  ''If the first character of formatString is L, the result is left aligned unless there is a decimal to align
+  ''Such an initial L is not counted toward the length of the format string
+  'Public Function ATCformat(ByVal aString As String, ByVal aFormat As String) As String
+  '  Dim retval As String
+  '  Dim LeftAlign As Boolean
+  '  Dim LenFormat As Integer
+  '  Dim NumericVal As Boolean
+  '  Dim DecimalFormatPos As Integer
+  '  Dim DecimalRetvalPos As Integer
 
-    If UCase(Left(aFormat, 1)) = "L" Then
-      LeftAlign = True
-      aFormat = Mid(aFormat, 2)
-    End If
-    LenFormat = Len(aFormat)
-    NumericVal = IsNumeric(aString)
-    If NumericVal Then
-      retval = LCase(Trim(aFormat))
-      If Len(retval) > 0 And aFormat.IndexOfAny("ymdhs") >= 0 Then
-        aString = CStr(MJD2VBdate(CDbl(aString)))
-      End If
-    End If
-    If Len(Trim(aFormat)) = 0 Then
-      retval = aString
-    Else
-      retval = Format(aString, Trim(aFormat))
-    End If
-    If Len(retval) < LenFormat Then
-      If NumericVal Then
-        DecimalFormatPos = InStr(aFormat, ".")
-      End If
-      If DecimalFormatPos > 0 Then
-        DecimalRetvalPos = InStr(retval, ".")
-        If DecimalRetvalPos > 0 And DecimalRetvalPos < DecimalFormatPos Then
-          retval = Space(DecimalFormatPos - DecimalRetvalPos) & retval
-        End If
-        If LenFormat > Len(retval) Then
-          retval = retval & Space(LenFormat - Len(retval))
-        End If
-      Else
-        If LenFormat > Len(retval) Then
-          If LeftAlign Then
-            retval = retval & Space(LenFormat - Len(retval))
-          Else
-            retval = Space(LenFormat - Len(retval)) & retval
-          End If
-        End If
-      End If
-    End If
-    ATCformat = retval
-  End Function
+  '  If UCase(Left(aFormat, 1)) = "L" Then
+  '    LeftAlign = True
+  '    aFormat = Mid(aFormat, 2)
+  '  End If
+  '  LenFormat = Len(aFormat)
+  '  NumericVal = IsNumeric(aString)
+  '  If Len(Trim(aFormat)) = 0 Then
+  '    retval = aString
+  '  ElseIf NumericVal Then
+  '    Dim lDoubleVal As Double = CDbl(aString)
+  '    If aFormat.IndexOfAny("ymdhs") >= 0 Then
+  '      retval = CStr(MJD2VBdate(lDoubleVal))
+  '    Else
+  '      retval = Format(lDoubleVal, aFormat)
+  '    End If
+  '  Else
+  '    retval = Format(aString, Trim(aFormat))
+  '  End If
+  '  If Len(retval) < LenFormat Then
+  '    If NumericVal Then
+  '      DecimalFormatPos = InStr(aFormat, ".")
+  '    End If
+  '    If DecimalFormatPos > 0 Then
+  '      DecimalRetvalPos = InStr(retval, ".")
+  '      If DecimalRetvalPos > 0 And DecimalRetvalPos < DecimalFormatPos Then
+  '        retval = Space(DecimalFormatPos - DecimalRetvalPos) & retval
+  '      End If
+  '      If LenFormat > Len(retval) Then
+  '        retval = retval & Space(LenFormat - Len(retval))
+  '      End If
+  '    Else
+  '      If LenFormat > Len(retval) Then
+  '        If LeftAlign Then
+  '          retval = retval & Space(LenFormat - Len(retval))
+  '        Else
+  '          retval = Space(LenFormat - Len(retval)) & retval
+  '        End If
+  '      End If
+  '    End If
+  '  End If
+  '  ATCformat = retval
+  'End Function
 
   Public Function Date2J(ByVal d() As Integer) As Double
     '##SUMMARY Date2J - convert a date arry to a modfied Julian date (MJD)
