@@ -1,187 +1,178 @@
-<VisualStudioProject>
-    <VisualBasic
-        ProjectType = "Local"
-        ProductVersion = "7.10.3077"
-        SchemaVersion = "2.0"
-        ProjectGuid = "{6EDD0CE5-8EF6-4BA3-9953-CFD027F7FCC9}"
-    >
-        <Build>
-            <Settings
-                ApplicationIcon = ""
-                AssemblyKeyContainerName = ""
-                AssemblyName = "atcLandUse"
-                AssemblyOriginatorKeyFile = ""
-                AssemblyOriginatorKeyMode = "None"
-                DefaultClientScript = "JScript"
-                DefaultHTMLPageLayout = "Grid"
-                DefaultTargetSchema = "IE50"
-                DelaySign = "false"
-                OutputType = "Library"
-                OptionCompare = "Binary"
-                OptionExplicit = "On"
-                OptionStrict = "Off"
-                RootNamespace = "atcLandUse"
-                StartupObject = "atcLandUse.(None)"
-            >
-                <Config
-                    Name = "Debug"
-                    BaseAddress = "285212672"
-                    ConfigurationOverrideFile = ""
-                    DefineConstants = ""
-                    DefineDebug = "true"
-                    DefineTrace = "true"
-                    DebugSymbols = "true"
-                    IncrementalBuild = "true"
-                    Optimize = "false"
-                    OutputPath = "..\Bin\Plugins\BASINS\"
-                    RegisterForComInterop = "false"
-                    RemoveIntegerChecks = "false"
-                    TreatWarningsAsErrors = "false"
-                    WarningLevel = "1"
-                />
-                <Config
-                    Name = "Release"
-                    BaseAddress = "285212672"
-                    ConfigurationOverrideFile = ""
-                    DefineConstants = ""
-                    DefineDebug = "false"
-                    DefineTrace = "true"
-                    DebugSymbols = "false"
-                    IncrementalBuild = "false"
-                    Optimize = "true"
-                    OutputPath = "..\Bin\Plugins\"
-                    RegisterForComInterop = "false"
-                    RemoveIntegerChecks = "false"
-                    TreatWarningsAsErrors = "false"
-                    WarningLevel = "1"
-                />
-            </Settings>
-            <References>
-                <Reference
-                    Name = "System"
-                    AssemblyName = "System"
-                />
-                <Reference
-                    Name = "System.Data"
-                    AssemblyName = "System.Data"
-                />
-                <Reference
-                    Name = "System.Drawing"
-                    AssemblyName = "System.Drawing"
-                    HintPath = "..\..\..\..\WINDOWS\Microsoft.NET\Framework\v1.0.3705\System.Drawing.dll"
-                />
-                <Reference
-                    Name = "stdole"
-                    Guid = "{00020430-0000-0000-C000-000000000046}"
-                    VersionMajor = "2"
-                    VersionMinor = "0"
-                    Lcid = "0"
-                    WrapperTool = "primary"
-                />
-                <Reference
-                    Name = "Interop.MapWinGIS"
-                    AssemblyName = "Interop.MapWinGIS"
-                    HintPath = "..\MapWindowGUI\MapWinInterfaces\obj\Interop.MapWinGIS.dll"
-                    Private = "False"
-                />
-                <Reference
-                    Name = "System.Windows.Forms"
-                    AssemblyName = "System.Windows.Forms"
-                    HintPath = "..\..\..\..\WINDOWS\Microsoft.NET\Framework\v1.1.4322\System.Windows.Forms.dll"
-                />
-                <Reference
-                    Name = "MapWinInterfaces"
-                    AssemblyName = "MapWinInterfaces"
-                    HintPath = "..\Bin\MapWinInterfaces.dll"
-                    Private = "False"
-                />
-                <Reference
-                    Name = "MapWinGIS"
-                    Guid = "{C368D713-CC5F-40ED-9F53-F84FE197B96A}"
-                    VersionMajor = "3"
-                    VersionMinor = "0"
-                    Lcid = "0"
-                    WrapperTool = "tlbimp"
-                    Private = "False"
-                />
-                <Reference
-                    Name = "ChilkatDotNet"
-                    AssemblyName = "ChilkatDotNet"
-                    HintPath = "..\..\MapWindow40\Bin\Plugins\BASINS\ChilkatDotNet.dll"
-                    Private = "False"
-                />
-                <Reference
-                    Name = "MapWinX"
-                    AssemblyName = "MapWinX"
-                    HintPath = "..\Bin\MapWinX.dll"
-                    Private = "False"
-                />
-                <Reference
-                    Name = "atcMwGisUtility"
-                    Project = "{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                    Private = "False"
-                />
-                <Reference
-                    Name = "atcUtility"
-                    Project = "{67027820-9036-481E-80F6-077E5085F59D}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                    Private = "False"
-                />
-                <Reference
-                    Name = "atcControls"
-                    Project = "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                />
-                <Reference
-                    Name = "MapWinUtility"
-                    Project = "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                    Private = "False"
-                />
-            </References>
-            <Imports>
-                <Import Namespace = "Microsoft.VisualBasic" />
-                <Import Namespace = "System" />
-                <Import Namespace = "System.Collections" />
-                <Import Namespace = "System.Data" />
-                <Import Namespace = "System.Diagnostics" />
-            </Imports>
-        </Build>
-        <Files>
-            <Include>
-                <File
-                    RelPath = "AssemblyInfo.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "clsPlugin.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmLandUse.vb"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmLandUse.resx"
-                    DependentUpon = "frmLandUse.vb"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "frmReclass.vb"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "frmReclass.resx"
-                    DependentUpon = "frmReclass.vb"
-                    BuildAction = "EmbeddedResource"
-                />
-            </Include>
-        </Files>
-    </VisualBasic>
-</VisualStudioProject>
-
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6EDD0CE5-8EF6-4BA3-9953-CFD027F7FCC9}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>atcLandUse</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionStrict>Off</OptionStrict>
+    <RootNamespace>atcLandUse</RootNamespace>
+    <StartupObject>atcLandUse.%28None%29</StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <MyType>Windows</MyType>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcLandUse.xml</DocumentationFile>
+    <BaseAddress>285212672</BaseAddress>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>atcLandUse.xml</DocumentationFile>
+    <BaseAddress>285212672</BaseAddress>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ChilkatDotNet">
+      <Name>ChilkatDotNet</Name>
+      <HintPath>..\Bin\ChilkatDotNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Interop.MapWinGIS">
+      <Name>Interop.MapWinGIS</Name>
+      <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MapWinInterfaces">
+      <Name>MapWinInterfaces</Name>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MapWinX">
+      <Name>MapWinX</Name>
+      <HintPath>..\Bin\MapWinX.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <COMReference Include="MapWinGIS">
+      <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
+      <VersionMajor>3</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Private>False</Private>
+    </COMReference>
+    <COMReference Include="stdole">
+      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+    </COMReference>
+    <ProjectReference Include="..\atcControls\atcControls.vbproj">
+      <Name>atcControls</Name>
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
+      <Name>atcMwGisUtility</Name>
+      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Name>atcUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Diagnostics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clsPlugin.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="frmLandUse.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmReclass.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <EmbeddedResource Include="frmLandUse.resx">
+      <DependentUpon>frmLandUse.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmReclass.resx">
+      <DependentUpon>frmReclass.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="My Project\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

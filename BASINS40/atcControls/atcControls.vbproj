@@ -1,159 +1,144 @@
-<VisualStudioProject>
-    <VisualBasic
-        ProjectType = "Local"
-        ProductVersion = "7.10.3077"
-        SchemaVersion = "2.0"
-        ProjectGuid = "{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}"
-    >
-        <Build>
-            <Settings
-                ApplicationIcon = ""
-                AssemblyKeyContainerName = ""
-                AssemblyName = "atcControls"
-                AssemblyOriginatorKeyFile = ""
-                AssemblyOriginatorKeyMode = "None"
-                DefaultClientScript = "JScript"
-                DefaultHTMLPageLayout = "Grid"
-                DefaultTargetSchema = "IE50"
-                DelaySign = "false"
-                OutputType = "Library"
-                OptionCompare = "Binary"
-                OptionExplicit = "On"
-                OptionStrict = "Off"
-                RootNamespace = "atcControls"
-                StartupObject = ""
-            >
-                <Config
-                    Name = "Debug"
-                    BaseAddress = "285212672"
-                    ConfigurationOverrideFile = ""
-                    DefineConstants = ""
-                    DefineDebug = "true"
-                    DefineTrace = "true"
-                    DebugSymbols = "true"
-                    IncrementalBuild = "true"
-                    Optimize = "false"
-                    OutputPath = "..\Bin\Plugins\BASINS\"
-                    RegisterForComInterop = "false"
-                    RemoveIntegerChecks = "false"
-                    TreatWarningsAsErrors = "false"
-                    WarningLevel = "1"
-                />
-                <Config
-                    Name = "Release"
-                    BaseAddress = "285212672"
-                    ConfigurationOverrideFile = ""
-                    DefineConstants = ""
-                    DefineDebug = "false"
-                    DefineTrace = "true"
-                    DebugSymbols = "false"
-                    IncrementalBuild = "false"
-                    Optimize = "true"
-                    OutputPath = "bin\"
-                    RegisterForComInterop = "false"
-                    RemoveIntegerChecks = "false"
-                    TreatWarningsAsErrors = "false"
-                    WarningLevel = "1"
-                />
-            </Settings>
-            <References>
-                <Reference
-                    Name = "System"
-                    AssemblyName = "System"
-                />
-                <Reference
-                    Name = "System.Data"
-                    AssemblyName = "System.Data"
-                />
-                <Reference
-                    Name = "System.Drawing"
-                    AssemblyName = "System.Drawing"
-                />
-                <Reference
-                    Name = "System.Windows.Forms"
-                    AssemblyName = "System.Windows.Forms"
-                />
-                <Reference
-                    Name = "System.XML"
-                    AssemblyName = "System.Xml"
-                />
-                <Reference
-                    Name = "atcUtility"
-                    Project = "{67027820-9036-481E-80F6-077E5085F59D}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                    Private = "False"
-                />
-                <Reference
-                    Name = "MapWinUtility"
-                    Project = "{3C991AE4-9EDB-4C24-BAF3-42F7303D7DF3}"
-                    Package = "{F184B08F-C81C-45F6-A57F-5ABD9991F28F}"
-                    Private = "False"
-                />
-            </References>
-            <Imports>
-                <Import Namespace = "Microsoft.VisualBasic" />
-                <Import Namespace = "System" />
-                <Import Namespace = "System.Collections" />
-                <Import Namespace = "System.Data" />
-                <Import Namespace = "System.Drawing" />
-                <Import Namespace = "System.Diagnostics" />
-                <Import Namespace = "System.Windows.Forms" />
-            </Imports>
-        </Build>
-        <Files>
-            <Include>
-                <File
-                    RelPath = "AssemblyInfo.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcGrid.vb"
-                    SubType = "UserControl"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcGrid.resx"
-                    DependentUpon = "atcGrid.vb"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "atcGridSource.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcGridSourceRowColumnSwapper.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcGridSourceTable.vb"
-                    SubType = "Code"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcSelectList.vb"
-                    SubType = "Form"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcSelectList.resx"
-                    DependentUpon = "atcSelectList.vb"
-                    BuildAction = "EmbeddedResource"
-                />
-                <File
-                    RelPath = "atcText.vb"
-                    SubType = "UserControl"
-                    BuildAction = "Compile"
-                />
-                <File
-                    RelPath = "atcText.resx"
-                    DependentUpon = "atcText.vb"
-                    BuildAction = "EmbeddedResource"
-                />
-            </Include>
-        </Files>
-    </VisualBasic>
-</VisualStudioProject>
-
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>atcControls</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionStrict>Off</OptionStrict>
+    <RootNamespace>atcControls</RootNamespace>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <MyType>Windows</MyType>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
+    <DocumentationFile>atcControls.xml</DocumentationFile>
+    <BaseAddress>285212672</BaseAddress>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>atcControls.xml</DocumentationFile>
+    <BaseAddress>285212672</BaseAddress>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
+      <Name>atcUtility</Name>
+      <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
+      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcGrid.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="atcGridSource.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcGridSourceRowColumnSwapper.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcGridSourceTable.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="atcSelectList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="atcText.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <EmbeddedResource Include="atcGrid.resx">
+      <DependentUpon>atcGrid.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="atcSelectList.resx">
+      <DependentUpon>atcSelectList.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="atcText.resx">
+      <DependentUpon>atcText.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="My Project\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
