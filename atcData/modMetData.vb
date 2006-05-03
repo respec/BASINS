@@ -744,6 +744,7 @@ Public Module modMetData
     Dim lNOAAattribs As atcCollection
     Dim lStations As New atcCollection
     Dim lStationIndex As Integer
+    Dim lCurState As String
 
     Dim inStream As New FileStream(aFilename, FileMode.Open, FileAccess.Read)
     Dim inBuffer As New BufferedStream(inStream)
@@ -755,38 +756,42 @@ Public Module modMetData
       Do 'Until EOF(lInFile)
         'Get linFile, j, lstr
         lStr = NextLine(inReader)
-        lStaCode = Mid(lStr, 13, 6)
+        lStaCode = lStr.Substring(0, 6)
         If IsNumeric(lStaCode) Then
-          lStateCode = Mid(lStr, 72, 2)
-          If lStaCode > 0 And lStateCode.ToUpper = "GA" Then
+          lStateCode = lStr.Substring(59, 2)
+          If lStaCode > 0 And lStateCode.Length > 0 Then ' lStateCode.ToUpper = "GA" Then
+            If lStateCode <> lCurState Then
+              Logger.Dbg("ReadNOAAAttributes:  New State is " & lStateCode)
+              lCurState = lStateCode
+            End If
             lNOAAattribs = New atcCollection
             lNOAAattribs.Add("STAID", lStaCode)
-            lNOAAattribs.Add("STCODE", Mid(lStr, 72, 2))
-            lNOAAattribs.Add("COCODE", Mid(lStr, 75, 30))
-            lNOAAattribs.Add("TMZONE", Mid(lStr, 106, 5))
-            lNOAAattribs.Add("STANAM", Mid(lStr, 112, 30))
-            lNOAAattribs.Add("DESCRP", Mid(lStr, 143, 30))
-            lNOAAattribs.Add("START", Mid(lStr, 176, 6))
-            lNOAAattribs.Add("END", Mid(lStr, 185, 6))
-            If IsNumeric(Mid(lStr, 192, 3)) Then
-              lDecDeg = CLng(Mid(lStr, 192, 3))
+            lNOAAattribs.Add("STCODE", lStateCode)
+            lNOAAattribs.Add("COCODE", lStr.Substring(62, 30))
+            lNOAAattribs.Add("TMZONE", lStr.Substring(93, 4))
+            lNOAAattribs.Add("STANAM", lStr.Substring(99, 30))
+            'lNOAAattribs.Add("DESCRP", Mid(lStr, 143, 30))
+            lNOAAattribs.Add("START", lStr.Substring(130, 8))
+            lNOAAattribs.Add("END", lStr.Substring(139, 8))
+            If IsNumeric(lStr.Substring(148, 3)) Then
+              lDecDeg = CLng(lStr.Substring(148, 3))
               If lDecDeg > 0 Then
-                lDecDeg = lDecDeg + CLng(Mid(lStr, 196, 2)) / 60 + CLng(Mid(lStr, 199, 2)) / 3600
+                lDecDeg = lDecDeg + CLng(lStr.Substring(152, 2)) / 60 + CLng(lStr.Substring(155, 2)) / 3600
               Else
-                lDecDeg = lDecDeg - (CLng(Mid(lStr, 196, 2)) / 60 + CLng(Mid(lStr, 199, 2)) / 3600)
+                lDecDeg = lDecDeg - (CLng(lStr.Substring(152, 2)) / 60 + CLng(lStr.Substring(155, 2)) / 3600)
               End If
               lNOAAattribs.Add("LATDEG", lDecDeg)
             End If
-            If IsNumeric(Mid(lStr, 202, 4)) Then
-              lDecDeg = CLng(Mid(lStr, 202, 4))
+            If IsNumeric(lStr.Substring(158, 4)) Then
+              lDecDeg = CLng(lStr.Substring(158, 4))
               If lDecDeg > 0 Then
-                lDecDeg = lDecDeg + CLng(Mid(lStr, 207, 2)) / 60 + CLng(Mid(lStr, 210, 2)) / 3600
+                lDecDeg = lDecDeg + CLng(lStr.Substring(163, 2)) / 60 + CLng(lStr.Substring(166, 2)) / 3600
               Else
-                lDecDeg = lDecDeg - (CLng(Mid(lStr, 207, 2)) / 60 + CLng(Mid(lStr, 210, 2)) / 3600)
+                lDecDeg = lDecDeg - (CLng(lStr.Substring(163, 2)) / 60 + CLng(lStr.Substring(166, 2)) / 3600)
               End If
               lNOAAattribs.Add("LNGDEG", lDecDeg)
             End If
-            lNOAAattribs.Add("ELEV", Mid(lStr, 223, 2))
+            lNOAAattribs.Add("ELEV", lStr.Substring(171, 4))
             lStationIndex = lStations.IndexFromKey(lStaCode)
             If lStationIndex >= 0 Then 'If there is an older station history entry, overwrite it
               If CDbl(lNOAAattribs.ItemByKey("END")) > CDbl(lStations.ItemByIndex(lStationIndex).ItemByKey("END")) Then
