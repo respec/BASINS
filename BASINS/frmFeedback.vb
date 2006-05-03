@@ -197,10 +197,13 @@ Public Class frmFeedback
     txtName.Text = aName
     txtEmail.Text = aEmail
     txtMessage.Text = aMessage
+    txtSystemInformation.Text = aSystemInformation
     Me.Show()
     Me.Refresh()
 
-    txtSystemInformation.Text = FeedbackSystemInformation()
+    If aSystemInformation.Length = 0 Then
+      txtSystemInformation.Text = FeedbackSystemInformation()
+    End If
 
     While Me.Visible
       Windows.Forms.Application.DoEvents()
@@ -211,7 +214,9 @@ Public Class frmFeedback
       aName = txtName.Text
       aEmail = txtEmail.Text
       aMessage = txtMessage.Text
-      If Not chkSendSystemInformation.Checked Then
+      If chkSendSystemInformation.Checked Then
+        aSystemInformation = txtSystemInformation.Text
+      Else
         aSystemInformation = "System information not sent"
       End If
     End If
