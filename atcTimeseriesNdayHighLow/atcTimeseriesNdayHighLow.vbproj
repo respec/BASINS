@@ -73,6 +73,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="nunit.framework">
