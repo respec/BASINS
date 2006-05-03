@@ -70,7 +70,10 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinInterfaces, Version=4.0.2267.26168, Culture=neutral" />
+    <Reference Include="MapWinInterfaces, Version=4.0.2267.26168, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

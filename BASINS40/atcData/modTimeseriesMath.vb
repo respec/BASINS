@@ -621,25 +621,25 @@ Public Module modTimeseriesMath
         Logger.Progress("Sorting values from " & aTS.ToString & " into bins. ", 0, lNumValues)
         For lOldIndex As Integer = 1 To lNumValues
             lCurValue = aTS.Value(lOldIndex)
+            If Not Double.IsNaN(lCurValue) Then
+                'If the previously used bin does not fit, find first bin with maximum >= lCurValue
+                'If lCurValue > lCurBinMax OrElse (lBinIndex > 0 AndAlso lCurValue < lBins.Keys.Item(lBinIndex - 1)) Then
+                lBinIndex = BinarySearchFirstGreaterDoubleArrayList(lBins.Keys, lCurValue)
+                lCurBin = lBins.Item(lBinIndex)
+                'lCurBinMax = lBins.Keys.Item(lBinIndex)
+                'End If
 
-            'If the previously used bin does not fit, find first bin with maximum >= lCurValue
-            'If lCurValue > lCurBinMax OrElse (lBinIndex > 0 AndAlso lCurValue < lBins.Keys.Item(lBinIndex - 1)) Then
-            lBinIndex = BinarySearchFirstGreaterDoubleArrayList(lBins.Keys, lCurValue)
-            lCurBin = lBins.Item(lBinIndex)
-            'lCurBinMax = lBins.Keys.Item(lBinIndex)
-            'End If
+                'Insert in numeric order within bin
+                Dim lInsertIndex As Integer = BinarySearchFirstGreaterDoubleArrayList(lCurBin, lCurValue)
+                lCurBin.Insert(lInsertIndex, lCurValue)
 
-            'Insert in numeric order within bin
-            Dim lInsertIndex As Integer = BinarySearchFirstGreaterDoubleArrayList(lCurBin, lCurValue)
-            lCurBin.Insert(lInsertIndex, lCurValue)
-
-            If lCurBin.Count > aMaxBinSize Then
-                SplitBin(lBins, lCurBin, lBinIndex)
-                '  lCurBin = lBins.Item(lBinIndex)
-                '  lCurBinMax = lBins.Keys.Item(lBinIndex)
-                Logger.Progress("Sorting values into " & lBins.Count & " bins", lOldIndex, lNumValues)
+                If lCurBin.Count > aMaxBinSize Then
+                    SplitBin(lBins, lCurBin, lBinIndex)
+                    '  lCurBin = lBins.Item(lBinIndex)
+                    '  lCurBinMax = lBins.Keys.Item(lBinIndex)
+                    Logger.Progress("Sorting values into " & lBins.Count & " bins", lOldIndex, lNumValues)
+                End If
             End If
-
         Next
         Logger.Progress("Sorted values into " & lBins.Count & " bins", lNumValues, lNumValues)
         'For lBinIndex = 0 To lBins.Count - 1
@@ -696,7 +696,7 @@ Public Module modTimeseriesMath
             Case Is < 1
                 'Can't compute with no values
             Case 1
-                aTimeseries.Attributes.SetValue(Format(aPercentile, "00.####") & "%", aTimeseries.Value(0))
+                aTimeseries.Attributes.SetValue("%" & Format(aPercentile, "00.####"), aTimeseries.Value(0))
             Case Else
                 Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
                 If lBins Is Nothing Then
@@ -717,7 +717,7 @@ Public Module modTimeseriesMath
                     lNextAccumulatedCount = lAccumulatedCount + lBins(lBinIndex).Count
                 End While
                 Dim lBin As ArrayList = lBins(lBinIndex)
-                aTimeseries.Attributes.SetValue(Format(aPercentile, "00.####") & "%", lBin.Item(lPercentileIndex - lAccumulatedCount))
+                aTimeseries.Attributes.SetValue("%" & Format(aPercentile, "00.####"), lBin.Item(lPercentileIndex - lAccumulatedCount))
         End Select
     End Sub
 End Module
