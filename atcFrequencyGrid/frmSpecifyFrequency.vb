@@ -336,17 +336,24 @@ Public Class frmSpecifyFrequency
     'Return all selected items, or if none are selected then all items
     Private Function ListToArray(ByVal aList As System.Windows.Forms.ListBox) As Double()
         Dim lArray() As Double
+        Dim lCollection As New ArrayList
         If aList.SelectedItems.Count > 0 Then
-            ReDim lArray(aList.SelectedItems.Count - 1)
             For lIndex As Integer = 0 To aList.SelectedItems.Count - 1
-                lArray(lIndex) = CDbl(aList.SelectedItems(lIndex))
+                If IsNumeric(aList.SelectedItems(lIndex)) Then
+                    lCollection.Add(CDbl(aList.SelectedItems(lIndex)))
+                End If
             Next
         Else
-            ReDim lArray(aList.Items.Count - 1)
             For lIndex As Integer = 0 To aList.Items.Count - 1
-                lArray(lIndex) = CDbl(aList.Items(lIndex))
+                If IsNumeric(aList.Items(lIndex)) Then
+                    lCollection.Add(CDbl(aList.Items(lIndex)))
+                End If
             Next
         End If
+        ReDim lArray(lCollection.Count - 1)
+        For lIndex As Integer = 0 To lCollection.Count - 1
+            lArray(lIndex) = lCollection.Item(lIndex)
+        Next
         Return lArray
     End Function
 

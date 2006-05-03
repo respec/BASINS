@@ -70,6 +70,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MapWinInterfaces, Version=4.0.2267.26168, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
