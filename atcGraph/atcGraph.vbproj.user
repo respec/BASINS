@@ -3,7 +3,7 @@
     <LastOpenVersion>7.10.3077</LastOpenVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ReferencePath>C:\dev2005\BASINS40\Bin\;C:\dev2005\BASINS40\Bin\Plugins\</ReferencePath>
+    <ReferencePath>C:\dev\BASINS40\Bin\;C:\dev\BASINS40\Bin\Plugins\</ReferencePath>
     <CopyProjectDestinationFolder>
     </CopyProjectDestinationFolder>
     <CopyProjectUncPath>
