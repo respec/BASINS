@@ -6,7 +6,7 @@ Imports atcUtility
 '''     <para>
 '''         <br />
 '''         Events are defined to allow different
-'''         <see cref="atcData~atcData.atcDataDisplay">displays</see> to remain
+'''         <see cref="atcData.atcDataDisplay">displays</see> to remain
 '''         synchronized
 '''     </para>
 ''' </remarks>
@@ -15,10 +15,10 @@ Public Class atcDataGroup
 
     Private pSelectedData As atcDataGroup 'tracks currently selected group within this group
 
-    ''' <summary>One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just added</summary>
+    ''' <summary>One or more <see cref="atcData.atcDataSet">atcDataSet</see> were just added</summary>
     Public Event Added(ByVal aAdded As atcCollection)
 
-    ''' <summary>One or more <see cref="atcData~atcData.atcDataSet">atcDataSet</see> were just removed</summary>
+    ''' <summary>One or more <see cref="atcData.atcDataSet">atcDataSet</see> were just removed</summary>
     Public Event Removed(ByVal aRemoved As atcCollection)
 
     Private Sub RaiseAddedOne(ByVal aDataSet As atcDataSet)
@@ -75,7 +75,7 @@ Public Class atcDataGroup
         Add(aDataSet.Serial, aDataSet)
     End Sub
 
-    ''' <summary>Add an <see cref="atcData~atcData.atcDataSet">atcDataSet</see> 
+    ''' <summary>Add an <see cref="atcData.atcDataSet">atcDataSet</see> 
     ''' to the group with the default key of its serial number </summary>
     Public Shadows Function Add(ByVal aDataSet As atcDataSet) As Integer
         Add(aDataSet.Serial, aDataSet)
@@ -166,7 +166,7 @@ Public Class atcDataGroup
         RaiseRemovedOne(lDataSet)
     End Sub
 
-    ''' <summary>Remove an <see cref="atcData~atcData.atcDataSet">atcDataSet</see> from this 
+    ''' <summary>Remove an <see cref="atcData.atcDataSet">atcDataSet</see> from this 
     ''' group.</summary>
     Public Shadows Sub Remove(ByVal aDataSet As atcDataSet)
         MyBase.Remove(aDataSet)

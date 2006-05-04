@@ -24,7 +24,7 @@ Public Class atcDataSource
     End Property
 
     ''' <summary>
-    '''     <see cref="atcData~atcData.atcDataAttributes">atcDataAttributes</see>
+    '''     <see cref="atcData.atcDataAttributes">atcDataAttributes</see>
     '''     Operations supported by this source
     ''' </summary>
     ''' <remarks>defaults to an empty list (nothing available)</remarks>

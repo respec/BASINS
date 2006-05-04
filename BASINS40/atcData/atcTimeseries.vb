@@ -176,7 +176,7 @@ Public Class atcTimeseries
     ''' <summary>True if we have read the header and not all the values (to save time and memory)</summary>
     ''' <remarks>
     '''     Should only be changed by the
-    '''     <see cref="atcData~atcData.atcDataSource">atcDataSource</see> that reads this
+    '''     <see cref="atcData.atcDataSource">atcDataSource</see> that reads this
     '''     timeseries (aFile from New)
     ''' </remarks>
     Public Property ValuesNeedToBeRead() As Boolean
