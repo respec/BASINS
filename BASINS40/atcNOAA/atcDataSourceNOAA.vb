@@ -89,7 +89,7 @@ Public Class atcDataSourceNOAA
 
       pColDefs = New Hashtable
       Dim ColRecType As ColDef = AddColEnd(1, 3, "RecType")
-      Dim ColLocation As ColDef = AddColEnd(4, 11, "Location")
+      Dim ColLocation As ColDef = AddColEnd(4, 9, "Location")
       Dim ColElementType As ColDef = AddColEnd(12, 15, "ElementType")
       Dim ColUnits As ColDef = AddColEnd(16, 17, "Units")
       Dim ColYear As ColDef = AddColEnd(18, 21, "Year")
@@ -108,7 +108,7 @@ Public Class atcDataSourceNOAA
       Try
         curLine = NextLine(inReader)
         PopulateColumns(curLine)
-        repeatsThisLine = daymon(ColYear.Value, ColMonth.Value)
+        repeatsThisLine = ColRepeats.Value ' daymon(ColYear.Value, ColMonth.Value)
 
         If (ColRecType.Value = "DLY" AndAlso _
            IsNumeric(ColValue(0).Value) AndAlso _
@@ -158,48 +158,50 @@ Public Class atcDataSourceNOAA
               lData.numValues += lBufSiz
             End If
             For repeat = 0 To repeatsThisLine - 1
-              lTSInd += 1
-              If ColValue(repeat).Value.IndexOf("99999") = -1 Then 'make sure its not a missing value
-                Select Case ColUnits.Value
-                  Case "HI" 'hundredths of inches
-                    lData.Value(lTSInd) = CDbl(ColValue(repeat).Value) / 100
-                  Case "TI" 'tenths of inches
-                    lData.Value(lTSInd) = CDbl(ColValue(repeat).Value) / 10
-                  Case Else
-                    lData.Value(lTSInd) = CDbl(ColValue(repeat).Value)
-                End Select
-              End If
-              lJDate = Jday(ColYear.Value, _
-                            ColMonth.Value, _
-                            ColDay(repeat).Value, _
-                            24, 0, 0)
-              lData.Dates.Value(lTSInd) = lJDate
-              Select Case ColFlag1(repeat).Value
-                Case " " 'Usually flag is blank
-                  If InAccum AndAlso lData.Value(lTSInd) > 0 Then
-                    'first positive value after start of accumulated end the accum period
+              If ColFlag2(repeat).Value <> "2" Then 'invalid value, subsequent valid coming
+                lTSInd += 1
+                If ColValue(repeat).Value.IndexOf("99999") = -1 Then 'make sure its not a missing value
+                  Select Case ColUnits.Value
+                    Case "HI" 'hundredths of inches
+                      lData.Value(lTSInd) = CDbl(ColValue(repeat).Value) / 100
+                    Case "TI" 'tenths of inches
+                      lData.Value(lTSInd) = CDbl(ColValue(repeat).Value) / 10
+                    Case Else
+                      lData.Value(lTSInd) = CDbl(ColValue(repeat).Value)
+                  End Select
+                End If
+                lJDate = Jday(ColYear.Value, _
+                              ColMonth.Value, _
+                              ColDay(repeat).Value, _
+                              24, 0, 0)
+                lData.Dates.Value(lTSInd) = lJDate
+                Select Case ColFlag1(repeat).Value
+                  Case " " 'Usually flag is blank
+                    If InAccum AndAlso lData.Value(lTSInd) > 0 Then
+                      'first positive value after start of accumulated end the accum period
+                      InAccum = False
+                    End If
+                  Case "S"
+                    InAccum = True
+                  Case "A", "B"
                     InAccum = False
-                  End If
-                Case "S"
-                  InAccum = True
-                Case "A"
-                  InAccum = False
-                  'look for preceeding missing values that should be accumulated
-                  lInd = lTSInd - 1
-                  While lInd > 0 AndAlso lData.Value(lInd) = MissingVal
-                    lData.Value(lInd) = MissingAcc
-                    lInd -= 1
-                  End While
-                Case "M"
-                  lData.Value(lTSInd) = MissingVal
-              End Select
-              If InAccum Then lData.Value(lTSInd) = MissingAcc
-              lData.Attributes.SetValue("Count", lTSInd)
+                    'look for preceeding missing values that should be accumulated
+                    lInd = lTSInd - 1
+                    While lInd > 0 AndAlso lData.Value(lInd) = MissingVal
+                      lData.Value(lInd) = MissingAcc
+                      lInd -= 1
+                    End While
+                  Case "M"
+                    lData.Value(lTSInd) = MissingVal
+                End Select
+                If InAccum Then lData.Value(lTSInd) = MissingAcc
+                lData.Attributes.SetValue("Count", lTSInd)
+              End If
             Next
             curLine = NextLine(inReader)
-            Logger.Progress("Processing NOAA SOD File", inStream.Position, inStream.Length)
+            'Logger.Progress("Processing NOAA SOD File", inStream.Position, inStream.Length)
             PopulateColumns(curLine)
-            repeatsThisLine = daymon(ColYear.Value, ColMonth.Value)
+            repeatsThisLine = ColRepeats.Value ' daymon(ColYear.Value, ColMonth.Value)
           Loop
           Open = True
         Else
@@ -210,7 +212,10 @@ Public Class atcDataSourceNOAA
       Catch endEx As EndOfStreamException
         Dim lCnt As Integer = DataSets.Count
         Dim lDataSets As New atcDataGroup
+        Dim lInd As Integer = 0
         For Each lData In DataSets
+          lind += 1
+          lData.Attributes.SetValue("ID", lind)
           lData.numValues = lData.Attributes.GetValue("Count")
           lData.Dates.Value(0) = lData.Dates.Value(1) - 1 'set 0th date to start of 1st interval
           lDataFilled = FillValues(lData, 4, 1, MissingVal, MissingVal, MissingAcc)
