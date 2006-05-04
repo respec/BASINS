@@ -69,14 +69,9 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Interop.MapWinGIS">
-      <Name>Interop.MapWinGIS</Name>
-      <HintPath>..\MapWindowGUI\MapWinInterfaces\obj\Interop.MapWinGIS.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MapWinInterfaces">
-      <Name>MapWinInterfaces</Name>
-      <HintPath>..\..\BASINS\Bin\MapWinInterfaces.dll</HintPath>
+    <Reference Include="MapWinInterfaces, Version=4.0.2311.37837, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
