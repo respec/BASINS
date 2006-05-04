@@ -4,7 +4,7 @@ Imports MapWinUtility
 ''' <summary>
 '''     <para>
 '''         Store attributes (and calculate some attributes if given an
-'''         <see cref="atcData~atcData.atcTimeseries">atcTimeseries</see>)
+'''         <see cref="atcData.atcTimeseries">atcTimeseries</see>)
 '''     </para>
 ''' </summary>
 ''' <remarks>Attributes are stored as a collection of atcDefinedValue</remarks>

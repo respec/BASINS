@@ -289,9 +289,9 @@ Public Class atcTableDBF
     '      canCopyRecords = True
     '    Else
     ''      Logger.Msg "Different number of bytes per record:" & vbCr _
-    '''            & Filename & " = " & pHeader.NumBytesRec & vbCr _
-    '''            & dbf2Add.Filename & " = " & UBound(recordToCopy) + 1 & vbCr & vbCr _
-    '''            & "Cannot merge DBF files", "Merge"
+    ''            & Filename & " = " & pHeader.NumBytesRec & vbCr _
+    ''            & dbf2Add.Filename & " = " & UBound(recordToCopy) + 1 & vbCr & vbCr _
+    ''            & "Cannot merge DBF files", "Merge"
     ''      Exit Sub
     '      canCopyRecords = False
     '      Log "Different number of bytes per record:" & vbCr _
