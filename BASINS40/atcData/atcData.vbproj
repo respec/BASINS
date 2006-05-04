@@ -165,6 +165,7 @@
     <Compile Include="frmSelectDisplay.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modMetData.vb" />
     <Compile Include="modTimeseriesMath.vb">
       <SubType>Code</SubType>
     </Compile>

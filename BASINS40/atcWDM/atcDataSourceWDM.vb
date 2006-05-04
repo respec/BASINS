@@ -841,7 +841,7 @@ Public Class atcDataSourceWDM
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
-        If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
+        If aFileName Is Nothing OrElse aFileName.Length = 0 Then 'OrElse Not FileExists(aFileName) Then
             'aFileName = FindFile("Select WDM file to open", , , pFileFilter, True, , 1)
             Dim cdlg As New Windows.Forms.OpenFileDialog
             With cdlg
