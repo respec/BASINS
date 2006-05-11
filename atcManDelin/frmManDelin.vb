@@ -496,6 +496,9 @@ Public Class frmManDelin
                     cShapes.Add(lShapefile.Shape(i - 1))
                 End If
                 lOutputShapefile.Close()
+            Else
+                'add the original shape too
+                cShapes.Add(lShapefile.Shape(i - 1))
             End If
         Next i
 
@@ -576,6 +579,10 @@ Public Class frmManDelin
     End Sub
 
     Private Sub cmdCalculate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdCalculate.Click
+        CalculateSubbasinParameters()
+    End Sub
+
+    Private Sub CalculateSubbasinParameters()
         Dim SubbasinThemeName As String
         Dim SubbasinLayerIndex As Integer
         Dim ElevationThemeName As String
@@ -752,8 +759,18 @@ Public Class frmManDelin
         Dim LevelFieldIndex As Integer
         Dim i As Integer
         Dim j As Integer
+        Dim k As Integer
         Dim lowestlevel As Integer
         Dim StreamsLayerIndex As Integer
+
+        SubbasinThemeName = cboLayer.Items(cboLayer.SelectedIndex)
+        SubbasinLayerIndex = GisUtil.LayerIndex(SubbasinThemeName)
+
+        If Not GisUtil.IsField(SubbasinLayerIndex, "SUBBASIN") Or _
+           Not GisUtil.IsField(SubbasinLayerIndex, "SLO1") Then
+            'we need to calculate the subbasin parameters first
+            CalculateSubbasinParameters()
+        End If
 
         'change to hourglass cursor
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
@@ -775,15 +792,13 @@ Public Class frmManDelin
             End If
         End If
         If LevelFieldIndex = -1 Then
-            MsgBox("Cannot find field 'Level' in the streams layer", MsgBoxStyle.OkOnly, "Stream Network Problem")
+            MsgBox("Cannot find field 'Level' in the streams layer", MsgBoxStyle.OKOnly, "Stream Network Problem")
             Exit Sub
         End If
 
         lblDefine.Text = "Clipping..."
         Me.Refresh()
         'clip reach layer to subbasin boundaries
-        SubbasinThemeName = cboLayer.Items(cboLayer.SelectedIndex)
-        SubbasinLayerIndex = GisUtil.LayerIndex(SubbasinThemeName)
         OutputReachShapefileName = GisUtil.ClipShapesWithPolygon(ReachLayerIndex, SubbasinLayerIndex)
 
         'add output reach shapefile to the view
@@ -791,33 +806,11 @@ Public Class frmManDelin
         StreamsLayerIndex = GisUtil.LayerIndex("Streams")
         GisUtil.LayerVisible(StreamsLayerIndex) = True
 
-        lblDefine.Text = "Filtering..."
-        Me.Refresh()
-        'find lowest reach level 
-        lowestlevel = 999999
-        For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
-            j = GisUtil.FieldValue(StreamsLayerIndex, i - 1, LevelFieldIndex)
-            If j < lowestlevel And j > 0 Then
-                lowestlevel = j
-            End If
-        Next i
-
-        'save only segments of the lowest level
-        i = 0
-        Do While i < GisUtil.NumFeatures(StreamsLayerIndex)
-            j = GisUtil.FieldValue(StreamsLayerIndex, i, LevelFieldIndex)
-            If j <> lowestlevel Then
-                'remove this feature
-                GisUtil.RemoveFeature(StreamsLayerIndex, i)
-            Else
-                i = i + 1
-            End If
-        Loop
-
-        lblDefine.Text = "Merging..."
-        Me.Refresh()
         Dim minfield As Integer
         minfield = 9999
+
+        lblDefine.Text = "Filtering..."
+        Me.Refresh()
 
         'assign subbasin numbers to each reach segment
         Dim aIndex(GisUtil.NumFeatures(StreamsLayerIndex)) As Integer
@@ -836,6 +829,40 @@ Public Class frmManDelin
             j = GisUtil.FieldValue(SubbasinLayerIndex, aIndex(i), SubbasinFieldIndex)
             GisUtil.SetFeatureValue(StreamsLayerIndex, ReachSubbasinFieldIndex, i - 1, j)
         Next i
+
+        'find lowest reach level in each subbasin
+        For k = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+            lowestlevel = 999999
+            For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+                If GisUtil.FieldValue(StreamsLayerIndex, i - 1, ReachSubbasinFieldIndex) = k Then
+                    'this is in the subbasin of interest
+                    j = GisUtil.FieldValue(StreamsLayerIndex, i - 1, LevelFieldIndex)
+                    If j < lowestlevel And j > 0 Then
+                        lowestlevel = j
+                    End If
+                End If
+            Next i
+
+            'save only segments of the lowest level in this subbasin
+            i = 0
+            Do While i < GisUtil.NumFeatures(StreamsLayerIndex)
+                If GisUtil.FieldValue(StreamsLayerIndex, i, ReachSubbasinFieldIndex) = k Then
+                    'this is in the subbasin of interest
+                    j = GisUtil.FieldValue(StreamsLayerIndex, i, LevelFieldIndex)
+                    If j <> lowestlevel Then
+                        'remove this feature
+                        GisUtil.RemoveFeature(StreamsLayerIndex, i)
+                    Else
+                        i = i + 1
+                    End If
+                Else
+                    i = i + 1
+                End If
+            Loop
+        Next k
+
+        lblDefine.Text = "Merging..."
+        Me.Refresh()
 
         'add downstream subbasin ids
         Dim DownstreamFieldIndex As Integer
@@ -860,7 +887,6 @@ Public Class frmManDelin
         End If
         Dim rval As String
         Dim dval As String
-        Dim k As Integer
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, dfield)
             'find what is downstream of rval
