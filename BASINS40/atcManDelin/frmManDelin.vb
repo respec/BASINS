@@ -826,9 +826,23 @@ Public Class frmManDelin
         End If
         If ReachSubbasinFieldIndex < minfield Then minfield = ReachSubbasinFieldIndex
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+          If aIndex(i) > -1 Then
             j = GisUtil.FieldValue(SubbasinLayerIndex, aIndex(i), SubbasinFieldIndex)
-            GisUtil.SetFeatureValue(StreamsLayerIndex, ReachSubbasinFieldIndex, i - 1, j)
+          Else
+            j = aIndex(i)
+          End If
+          GisUtil.SetFeatureValue(StreamsLayerIndex, ReachSubbasinFieldIndex, i - 1, j)
         Next i
+        'clean out segments that are not within any subbasin, fix to clean up outliers in containing polygons
+        i = 0
+        Do While i < GisUtil.NumFeatures(StreamsLayerIndex)
+          If GisUtil.FieldValue(StreamsLayerIndex, i, ReachSubbasinFieldIndex) < 0 Then
+              'remove this feature
+              GisUtil.RemoveFeature(StreamsLayerIndex, i)
+          Else
+            i = i + 1
+          End If
+        Loop
 
         'find lowest reach level in each subbasin
         For k = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
