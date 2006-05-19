@@ -51,7 +51,7 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>atcUtility.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <ConfigurationOverrideFile>
@@ -79,11 +79,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
       <Private>False</Private>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <Name>nunit.framework</Name>
-      <HintPath>C:\Program Files\NUnit 2.2\bin\nunit.framework.dll</HintPath>
-      <AssemblyFolderKey>hklm\dn\nunit.framework</AssemblyFolderKey>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -136,9 +131,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="modUnits.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Test_atcUtility.vb">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
