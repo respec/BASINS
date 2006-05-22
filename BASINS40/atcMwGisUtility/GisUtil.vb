@@ -8,40 +8,6 @@ Public Class GisUtil
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
     Private Const UseCurrent As Integer = -1
 
-    ''' <summary>Run all tests</summary>
-    ''' <returns>Results of testing</returns>
-    ''' <requirements>Test data in 
-    ''' <strong>c:\test\atcMwGisUtility\data</strong></requirements>
-    Public Shared Function RunAllTests() As Boolean
-        Dim lTests As New Test_GisUtil
-        lTests.init()
-        lTests.TestLoadProject()
-        lTests.TestNumLayers()
-        lTests.TestLayerFileName()
-        lTests.TestLayerType()
-        lTests.TestLayerName()
-
-        lTests.Testset_CurrentLayer()
-        lTests.Testget_CurrentLayer()
-
-        lTests.TestNumFeatures()
-        lTests.TestNumFields()
-        lTests.TestFieldName()
-        lTests.TestFieldIndex()
-        lTests.TestFieldType()
-        lTests.TestFieldValue()
-
-        lTests.TestFeatureArea()
-        lTests.TestFeatureLength()
-
-        lTests.TestOverlappingPolygons()
-
-        lTests.TestGridLayerMaximum()
-        lTests.TestGridLayerMinimum()
-
-        Return True
-    End Function
-
     ''' <summary>Map Window Object</summary>
     ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
     Public Shared WriteOnly Property MappingObject() As MapWindow.Interfaces.IMapWin
