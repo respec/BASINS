@@ -35,7 +35,7 @@ Friend Class atcMsgWDM
         pAttributes = New atcCollection
         pAttributes.Add("<dummy>")
 
-        F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
+        'F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
 
         Dim lMsgHandle As atcWdmHandle = MsgHandle()
         Dim lMsgUnit As Integer = lMsgHandle.Unit
