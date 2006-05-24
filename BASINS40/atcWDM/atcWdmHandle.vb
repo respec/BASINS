@@ -9,6 +9,7 @@ Friend Class atcWdmHandle
     Implements IDisposable
 
     Dim pUnit As Integer 'fortran unit number of wdm file
+    Dim pNeedToClose As Boolean = True
 
     Public ReadOnly Property Unit() As Integer
         Get
@@ -41,9 +42,20 @@ Friend Class atcWdmHandle
             End If
 
             pUnit = -2 'code to try to use existing unit number from INQUIRE_NAME
-            F90_WDBOPNR(aRWCFlg, lFileName, pUnit, lRetcod, CShort(Len(lFileName)))
-
-            'Logger.Dbg("atcWdmHandle:New:Open:" & lFileName & ":" & pUnit)
+            Logger.Dbg("atcWdmHandle:OpenB4:" & lFileName)
+            Try
+                pUnit = F90_INQNAM(lFileName, Len(lFileName))
+                If pUnit = 0 Then
+                    F90_WDBOPNR(aRWCFlg, lFileName, pUnit, lRetcod, CShort(Len(lFileName)))
+                    pNeedToClose = True
+                Else
+                    Logger.Dbg("atcWdmHandle:New:UsingOpenWdm:" & pUnit)
+                    pNeedToClose = False
+                End If
+            Catch e As System.BadImageFormatException
+                Logger.Msg("atcWdmHandle:Exception:Check HassEnt.dll Compile/Link Output" & e.ToString)
+            End Try
+            Logger.Dbg("atcWdmHandle:OpenAft:Unit:Retcod:" & pUnit & ":" & lRetcod)
 
             If lRetcod <> 0 Then
                 If lRetcod = 159 Then
@@ -54,23 +66,26 @@ Friend Class atcWdmHandle
                 pUnit = 0
             End If
         End If
+        Dim lMsg As String = "atcWdmHandle:New:" & pUnit & ":" & lRetcod & ":" & lFileName
+        F90_MSG(lMsg, Len(lMsg))
     End Sub
 
     Public Sub Dispose() Implements System.IDisposable.Dispose
         Dim lRetcod As Integer
 
-        'Logger.Dbg("atcWdmHandle:Dispose:" & pUnit)
+        Logger.Dbg("atcWdmHandle:Dispose:" & pUnit)
 
-        If pUnit > 0 Then
+        If pNeedToClose AndAlso pUnit > 0 Then
             lRetcod = F90_WDFLCL(pUnit)
-            If lRetcod = 0 Then
-                pUnit = 0
-            ElseIf lRetcod = -255 Then
+            If lRetcod <> 0 Then
                 Logger.Dbg("atcWdmHandle:WDFLCL:retcod:" & lRetcod)
-            Else
-                Logger.Msg("retcod:" & lRetcod, "atcWdmHandle:WDFLCL")
             End If
+        Else
+            Logger.Dbg("atcWdmHandle:Dispose:DidNotNeedToClose")
         End If
+        Dim lMsg As String = "atcWdmHandle:Dispose:" & pUnit & ":" & lRetcod
+        F90_MSG(lMsg, Len(lMsg))
+        pUnit = 0
         GC.SuppressFinalize(Me)
     End Sub
 

@@ -124,73 +124,67 @@ Public Class atcDataSourceWDM
         Dim c, S, l, d As String
         Dim lAttribs As atcDataAttributes = dataObject.Attributes
 
-        Dim lMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
-        Dim lMsgHandle As New atcWdmHandle(1, lMsgFileName)
+        Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
         Dim lMsgUnit As Integer = lMsgHandle.Unit
 
-        If lMsgUnit > 0 Then
-            lRetcod = 0
-            dsn = lAttribs.GetValue("id")
-            Try
-                If oldID <> -1 And oldID <> dsn Then 'try to change dsn
-                    Call F90_WDDSRN(aFileUnit, oldID, dsn, lRetcod)
-                End If
-            Catch
-            End Try
+        lRetcod = 0
+        dsn = lAttribs.GetValue("id")
+        Try
+            If oldID <> -1 And oldID <> dsn Then 'try to change dsn
+                Call F90_WDDSRN(aFileUnit, oldID, dsn, lRetcod)
+            End If
+        Catch
+        End Try
 
+        If lRetcod = 0 Then
+            saind = 288
+            salen = 8
+            S = lAttribs.GetValue("scen")
+            i = 1
+            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, S, Len(S))
             If lRetcod = 0 Then
-                saind = 288
-                salen = 8
-                S = lAttribs.GetValue("scen")
-                i = 1
-                Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, S, Len(S))
+                saind = 289
+                c = lAttribs.GetValue("cons")
+                i = 2
+                Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, c, Len(c))
                 If lRetcod = 0 Then
-                    saind = 289
-                    c = lAttribs.GetValue("cons")
-                    i = 2
-                    Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, c, Len(c))
+                    saind = 290
+                    l = lAttribs.GetValue("locn")
+                    i = 3
+                    Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, l, Len(l))
                     If lRetcod = 0 Then
-                        saind = 290
-                        l = lAttribs.GetValue("locn")
-                        i = 3
-                        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, l, Len(l))
-                        If lRetcod = 0 Then
-                            saind = 45
-                            salen = 48
-                            d = lAttribs.GetValue("desc")
-                            If Len(d) > salen Then
-                                Logger.Msg("Description: '" & d & vbCr & "truncated to: " & Left(d, salen), "WDM Write Data Header", MsgBoxStyle.Exclamation)
-                            End If
-                            i = 4
-                            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, d, Len(d))
+                        saind = 45
+                        salen = 48
+                        d = lAttribs.GetValue("desc")
+                        If Len(d) > salen Then
+                            Logger.Msg("Description: '" & d & vbCr & "truncated to: " & Left(d, salen), "WDM Write Data Header", MsgBoxStyle.Exclamation)
                         End If
+                        i = 4
+                        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, d, Len(d))
                     End If
                 End If
-                lMsgHandle.Dispose()
-            End If
-
-            If lRetcod = 0 Then
-                writeDataHeader = DsnWriteAttributes(aFileUnit, dataObject)
-            Else
-                If Math.Abs(lRetcod) = 73 Then
-                    pErrorDescription = "Unable to renumber Dataset " & oldID & " to " & dsn
-                Else
-                    pErrorDescription = "Unable to Write a Data Header for Class WDM, Retcod:" & lRetcod & " from " & i
-                End If
-                writeDataHeader = False
             End If
         End If
+
+        If lRetcod = 0 Then
+            writeDataHeader = DsnWriteAttributes(aFileUnit, dataObject)
+        Else
+            If Math.Abs(lRetcod) = 73 Then
+                pErrorDescription = "Unable to renumber Dataset " & oldID & " to " & dsn
+            Else
+                pErrorDescription = "Unable to Write a Data Header for Class WDM, Retcod:" & lRetcod & " from " & i
+            End If
+            writeDataHeader = False
+        End If
+
+        lMsgHandle.Dispose()
     End Function
 
     Public Sub New()
         MyBase.New()
         If pMsg Is Nothing Then
-            Dim hspfMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
-            If Not FileExists(hspfMsgFileName) Then
-                Logger.Msg("Could not find hspfmsg.wdm - " & hspfMsgFileName, "ATCdataWdm")
-            Else
-                pMsg = New atcMsgWDM
-            End If
+            pMsg = New atcMsgWDM
+            F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
         End If
         Clear()
     End Sub
@@ -267,7 +261,7 @@ Public Class atcDataSourceWDM
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
-        Logger.Dbg("atcDataSourceWdm:AddDataset:entry")
+        Logger.Dbg("atcDataSourceWdm:AddDataset:entry:" & aExistAction)
         Try
             Dim lTimser As atcTimeseries = aDataSet
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
@@ -289,20 +283,47 @@ Public Class atcDataSourceWDM
             'aDataSet.Attributes.CalculateAll() 'should we calculdate attributes on request, not here on creation
 
             Dim lWdmHandle As New atcWdmHandle(0, Specification)
-            Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:" & lWdmHandle.Unit)
-
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
-            If aExistAction = ExistReplace Then
-                Dim lRet As Integer
-                F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
-                Logger.Dbg("atcDataSourceWdm:RemoveOld:" & lDsn & ":" & lRet)
+
+            Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
+
+            If F90_WDCKDT(lWdmHandle.Unit, lDsn) > 0 Then 'dataset exists, what do we do?
+                If aExistAction = ExistReplace Then
+                    Dim lRet As Integer
+                    F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
+                    Logger.Dbg("atcDataSourceWdm:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                ElseIf aExistAction = ExistAppend Then 'find dataset and try to append to it
+                    Logger.Dbg("atcDataSourceWdm:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
+                    Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
+                    If lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
+                        Throw New Exception("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
+                        lTimser.ToString & " to existing TSer " & lExistTimser.ToString & vbCrLf & _
+                        "New TSer start date (" & lTimser.Dates.Value(1) & _
+                        ") preceeds exising TSer end date (" & lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
+                    End If
+                    Logger.Dbg("atcDataSourceWdm:OldFinalDate:" & lExistTimser.Dates.Value(lExistTimser.numValues).ToString)
+                    Logger.Dbg("atcDataSourceWdm:NewFirstDate:" & lTimser.Dates.Value(1).ToString)
+                Else
+                    lDsn = findNextDsn(lDsn)
+                    Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
+                    aDataSet.Attributes.SetValue("Id", lDsn)
+                End If
             Else
-                lDsn = findNextDsn(lDsn)
-                aDataSet.Attributes.SetValue("Id", lDsn)
+                Logger.Dbg("atcDataSourceWdm:AddDataset:NewDataSet:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
             End If
 
-            If DsnBld(lWdmHandle.Unit, lTimser) Then
-                MyBase.AddDataSet(lTimser)
+            Dim lWriteIt As Boolean = False
+            If aExistAction = ExistAppend Then 'write appended data
+                lWriteIt = True
+            ElseIf DsnBld(lWdmHandle.Unit, lTimser) Then
+                'MyBase.AddDataSet(lTimser)
+                DataSets.Add(lDsn, lTimser)
+                lWriteIt = True
+            End If
+
+            If lWriteIt Then
+                'DsnBld(lWdmHandle.Unit, lTimser) Then
+                'MyBase.AddDataSet(lTimser)
                 Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
                 Dim lValue As Double
                 Dim lV(lNvals) As Single
@@ -314,10 +335,14 @@ Public Class atcDataSourceWDM
                 Next
 
                 J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
+                Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
+                            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
+                            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
                 If lNvals > 0 Then
                     Call F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
                 End If
-                Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:retcod:" & lRet)
+                Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:back:" & _
+                            lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
             End If
 
             lWdmHandle.Dispose()
@@ -564,83 +589,80 @@ Public Class atcDataSourceWDM
         Dim lTs As Integer
         Dim lTu As Integer
 
-        Dim lMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
-        Dim lMsgHandle As New atcWdmHandle(1, lMsgFileName)
+        Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
         Dim lMsgUnit As Integer = lMsgHandle.Unit
 
-        If lMsgUnit > 0 Then
-            dsn = t.Attributes.GetValue("id", 0)
-            'create label
-            ndn = t.Attributes.GetValue("NDN", 10)
-            nup = t.Attributes.GetValue("NUP", 10)
-            nsa = t.Attributes.GetValue("NSA", 30)
-            nsasp = t.Attributes.GetValue("NSASP", 100)
-            ndp = t.Attributes.GetValue("NDP", 300)
-            Call F90_WDLBAX(aFileUnit, dsn, 1, ndn, nup, nsa, nsasp, ndp, psa)
+        dsn = t.Attributes.GetValue("id", 0)
+        'create label
+        ndn = t.Attributes.GetValue("NDN", 10)
+        nup = t.Attributes.GetValue("NUP", 10)
+        nsa = t.Attributes.GetValue("NSA", 30)
+        nsasp = t.Attributes.GetValue("NSASP", 100)
+        ndp = t.Attributes.GetValue("NDP", 300)
+        Call F90_WDLBAX(aFileUnit, dsn, 1, ndn, nup, nsa, nsasp, ndp, psa)
 
-            'add needed attributes
-            saind = 1 'tstype
-            salen = 4
-            ostr = t.Attributes.GetValue("TSTYPE", Left(t.Attributes.GetValue("cons"), 4))
-            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-            salen = 1
-            saind = 34 'tgroup
-            iVal = t.Attributes.GetValue("TGROUP", 6)
-            Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-            saind = 83 'compfg
-            iVal = t.Attributes.GetValue("COMPFG", 1)
-            Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-            saind = 84 'tsform
-            iVal = t.Attributes.GetValue("TSFORM", 1)
-            Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-            saind = 17 'tcode
-            lS = t.Attributes.GetValue("tu")
-            If lS.Length = 0 Then
-                CalcTimeUnitStep(t.Dates.Value(0), t.Dates.Value(1), lTu, lTs)
-                t.Attributes.SetValue("tu", lTu)
-                t.Attributes.SetValue("ts", lTs)
-            Else
-                lTu = lS
-                saind = 33 'tsstep
-                lTs = t.Attributes.GetValue("ts")
-            End If
-            saind = 17 'tcode
-            Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, lTu, retcod)
+        'add needed attributes
+        saind = 1 'tstype
+        salen = 4
+        ostr = t.Attributes.GetValue("TSTYPE", Left(t.Attributes.GetValue("cons"), 4))
+        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
+        salen = 1
+        saind = 34 'tgroup
+        iVal = t.Attributes.GetValue("TGROUP", 6)
+        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
+        saind = 83 'compfg
+        iVal = t.Attributes.GetValue("COMPFG", 1)
+        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
+        saind = 84 'tsform
+        iVal = t.Attributes.GetValue("TSFORM", 1)
+        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
+        saind = 17 'tcode
+        lS = t.Attributes.GetValue("tu")
+        If lS.Length = 0 Then
+            CalcTimeUnitStep(t.Dates.Value(0), t.Dates.Value(1), lTu, lTs)
+            t.Attributes.SetValue("tu", lTu)
+            t.Attributes.SetValue("ts", lTs)
+        Else
+            lTu = lS
             saind = 33 'tsstep
-            Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, lTs, retcod)
-            saind = 85 'vbtime
-            iVal = t.Attributes.GetValue("VBTIME", 1)
-            If lTs > 1 Then iVal = 2 'timestep > 1 vbtime must vary
-            Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-            Call J2Date(t.Dates.Value(0), CSDat)
-            i = CSDat(0) Mod 10
-            If i > 0 Then 'subtract back to start of this decade
-                iVal = CSDat(0) - i
-            Else 'back to start of previous decade
-                iVal = CSDat(0) - 10
-            End If
-            saind = 27 'tsbyr
-            Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-            salen = 8
-            saind = 288 'scenario
-            ostr = UCase(Left(t.Attributes.GetValue("scen"), salen))
-            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-            saind = 289 'constituent
-            ostr = UCase(Left(t.Attributes.GetValue("cons"), salen))
-            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-            saind = 290 'location
-            ostr = UCase(Left(t.Attributes.GetValue("locn"), salen))
-            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-            salen = 48
-            saind = 45 'description
-            ostr = Left(t.Attributes.GetValue("desc"), salen)
-            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-
-            'others (from attrib)
-            DsnBld = DsnWriteAttributes(aFileUnit, t)
-
-            lMsgHandle.Dispose()
+            lTs = t.Attributes.GetValue("ts")
         End If
+        saind = 17 'tcode
+        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, lTu, retcod)
+        saind = 33 'tsstep
+        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, lTs, retcod)
+        saind = 85 'vbtime
+        iVal = t.Attributes.GetValue("VBTIME", 1)
+        If lTs > 1 Then iVal = 2 'timestep > 1 vbtime must vary
+        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
+        Call J2Date(t.Dates.Value(0), CSDat)
+        i = CSDat(0) Mod 10
+        If i > 0 Then 'subtract back to start of this decade
+            iVal = CSDat(0) - i
+        Else 'back to start of previous decade
+            iVal = CSDat(0) - 10
+        End If
+        saind = 27 'tsbyr
+        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
+        salen = 8
+        saind = 288 'scenario
+        ostr = UCase(Left(t.Attributes.GetValue("scen"), salen))
+        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
+        saind = 289 'constituent
+        ostr = UCase(Left(t.Attributes.GetValue("cons"), salen))
+        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
+        saind = 290 'location
+        ostr = UCase(Left(t.Attributes.GetValue("locn"), salen))
+        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
+        salen = 48
+        saind = 45 'description
+        ostr = Left(t.Attributes.GetValue("desc"), salen)
+        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
+
+        'others (from attrib)
+        DsnBld = DsnWriteAttributes(aFileUnit, t)
+
+        lMsgHandle.Dispose()
     End Function
 
     Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, ByRef t As atcTimeseries) As Boolean
@@ -994,7 +1016,7 @@ Public Class atcDataSourceWDM
 
         lData.ValuesNeedToBeRead = True
         lData.Dates.ValuesNeedToBeRead = True
-        DataSets.Add(lData)
+        DataSets.Add(aDsn, lData)
 
         Call DsnReadGeneral(aFileUnit, lData)
 
