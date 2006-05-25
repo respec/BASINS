@@ -59,7 +59,6 @@ Public Class atcDataSourceNOAA
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         Dim lData As atcTimeseries
-        Dim lDates As atcTimeseries
         Dim lDataFilled As atcTimeseries
         Dim lTSKey As String
 
@@ -76,7 +75,6 @@ Public Class atcDataSourceNOAA
             Dim inReader As New BinaryReader(inBuffer)
             Dim curLine As String
             Dim repeat As Integer = 0
-            Dim repeatOffset As Integer
             Dim repeatsThisLine As Integer
             Dim maxRepeat As Integer = 31
             Dim MissingVal As Double = -999
@@ -158,7 +156,13 @@ Public Class atcDataSourceNOAA
                             lData.numValues += lBufSiz
                         End If
                         For repeat = 0 To repeatsThisLine - 1
-                            If ColFlag2(repeat).Value <> "2" Then 'invalid value, subsequent valid coming
+                            'Data Quality Flag2 of 2 or 3 indicates invalid value
+                            'subsequent valid coming for value of 2
+                            If ColFlag2(repeat).Value <> "2" AndAlso _
+                               ColFlag2(repeat).Value <> "3" AndAlso _
+                               (ColDay(repeat).Value < 28 OrElse _
+                               ColDay(repeat).Value <= daymon(ColYear.Value, ColMonth.Value)) Then
+                                'valid value and not exceeding days in month
                                 lTSInd += 1
                                 If ColValue(repeat).Value.IndexOf("99999") = -1 Then 'make sure its not a missing value
                                     Select Case ColUnits.Value
