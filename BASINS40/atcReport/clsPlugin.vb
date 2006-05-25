@@ -108,7 +108,7 @@ Public Class PlugIn
             'now run script
             Dim lError As String = ""
             'Return ListedSegmentsTable.ScriptMain(lArgs(0), lArgs(1), lArgs(2), lArgs(3))
-            Return Scripting.Run("vb", "", Reports(aReportIndex), lError, False, pMapWin, lArgs)
+            Return Scripting.Run("vb", "", Reports(aReportIndex), lError, False, (pMapWin), lArgs)
         Else
             Return "Error: " & lProblem
         End If

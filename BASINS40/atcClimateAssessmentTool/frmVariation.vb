@@ -526,8 +526,7 @@ Public Class frmVariation
                     SaveSetting("BASINS4", "Scenario", "ScriptFilename", .FileName)
                     Dim lErrors As String = ""
                     Try
-                        'TODO: make sure g_MapWin gets set -- had to remove setting it in Initialize
-                        pVariation = Scripting.Run(FileExt(.FileName), "", .FileName, lErrors, False, g_MapWin, lVariationTemplate)
+                        pVariation = Scripting.Run(FileExt(.FileName), "", .FileName, lErrors, False, (g_MapWin), lVariationTemplate)
                     Catch ex As Exception
                         If lErrors.Length > 0 Then lErrors &= vbCrLf & vbCrLf
                         lErrors &= ex.Message

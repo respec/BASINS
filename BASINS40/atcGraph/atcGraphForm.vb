@@ -132,6 +132,7 @@ Public Class atcGraphForm
     Friend WithEvents mnuEditCurves As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditFont As System.Windows.Forms.MenuItem
     Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
+    <CLSCompliant(False)> _
     Public WithEvents zgc As ZedGraph.ZedGraphControl
     Friend WithEvents mnuEditY As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditX As System.Windows.Forms.MenuItem
@@ -301,6 +302,7 @@ Public Class atcGraphForm
 
 #End Region
 
+    <CLSCompliant(False)> _
     Public ReadOnly Property Pane() As GraphPane
         Get
             Return zgc.MasterPane.PaneList.Item(0) ' pGraphPane

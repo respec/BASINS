@@ -381,7 +381,8 @@ Public Class atcRenderStyle
         End If
     End Function
 
-    Public Property xml() As Chilkat.Xml
+    <CLSCompliant(False)> _
+     Public Property xml() As Chilkat.Xml
         Get
             xml = New Chilkat.Xml
             With xml

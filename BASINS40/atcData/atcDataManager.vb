@@ -217,7 +217,8 @@ Public Class atcDataManager
     ''' Chilkat Xml from
     ''' <a href="http://www.xml-parser.com/downloads.htm">http://www.xml-parser.com/downloads.htm</a>
     ''' </requirements>
-    Public Property XML() As Chilkat.Xml
+    <CLSCompliant(False)> _
+     Public Property XML() As Chilkat.Xml
         Get
             Dim lSaveXML As New Chilkat.Xml
             Dim lChildXML As Chilkat.Xml

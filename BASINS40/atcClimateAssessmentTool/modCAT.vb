@@ -3,8 +3,9 @@ Imports atcUtility
 Imports MapWinUtility
 
 Public Module modCAT
-    Public g_MapWin As MapWindow.Interfaces.IMapWin
-    Public g_DataManager As atcDataManager
+    <CLSCompliant(False)> _
+    Friend g_MapWin As MapWindow.Interfaces.IMapWin
+    Friend g_DataManager As atcDataManager
 
     Public Sub ScenarioRun(ByVal aCurrentWDMfilename As String, _
                                 ByVal aNewScenarioName As String, _
