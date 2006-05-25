@@ -1581,7 +1581,7 @@ Public Module modMetCompute
         Dim lDate(5) As Integer
         Dim lOutSumm As Boolean
         Dim lOutFil As Integer
-        Dim s As String
+        Dim s As String = ""
         Dim rsp, retcod, lUsedTriang As Integer
         Dim lClosestHrTser As atcTimeseries
         Dim lDaySumHrTser As atcTimeseries
