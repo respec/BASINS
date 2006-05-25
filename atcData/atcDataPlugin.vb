@@ -83,6 +83,7 @@ Public Class atcDataPlugin
     ''' A good time to add buttons to the tool bar or menu items to the menu.<br />
     ''' Save a reference to the IMapWin that is passed for later access to MapWindow.
     ''' </remarks>
+    <CLSCompliant(False)> _
     Public Overridable Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                       ByVal aParentHandle As Integer) _
                               Implements MapWindow.Interfaces.IPlugin.Initialize
@@ -125,6 +126,7 @@ Public Class atcDataPlugin
     ''' <summary>Fires when the user adds a layer to MapWindow. 
     ''' Useful in the same cases as <see cref="LayerRemoved">LayerRemoved</see>
     ''' </summary>
+    <CLSCompliant(False)> _
     Public Overridable Sub LayersAdded(ByVal aLayers() As MapWindow.Interfaces.Layer) _
                               Implements MapWindow.Interfaces.IPlugin.LayersAdded
     End Sub
@@ -142,6 +144,7 @@ Public Class atcDataPlugin
     End Sub
 
     ''' <summary>Fires when a user double-clicks a layer in the legend.</summary>
+    <CLSCompliant(False)> _
     Public Overridable Sub LegendDoubleClick(ByVal aHandle As Integer, _
                                              ByVal aLocation As MapWindow.Interfaces.ClickLocation, _
                                              ByRef aHandled As Boolean) _
@@ -149,6 +152,7 @@ Public Class atcDataPlugin
     End Sub
 
     ''' <summary>Fires when a user holds a mouse button down in the legend.</summary>
+    <CLSCompliant(False)> _
     Public Overridable Sub LegendMouseDown(ByVal aHandle As Integer, _
                                            ByVal aButton As Integer, _
                                            ByVal aLocation As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) _
@@ -156,6 +160,7 @@ Public Class atcDataPlugin
     End Sub
 
     ''' <summary>Fires when a user releases a mouse button in the legend.</summary>
+    <CLSCompliant(False)> _
     Public Overridable Sub LegendMouseUp(ByVal aHandle As Integer, _
                                          ByVal aButton As Integer, _
                                          ByVal aLocation As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) _
@@ -249,6 +254,7 @@ Public Class atcDataPlugin
     ''' selected.</param>
     ''' <param name="aSelectInfo">holds information about the shapes that were 
     ''' selected.</param>
+    <CLSCompliant(False)> _
     Public Overridable Sub ShapesSelected(ByVal aHandle As Integer, _
                                           ByVal aSelectInfo As MapWindow.Interfaces.SelectInfo) _
                         Implements MapWindow.Interfaces.IPlugin.ShapesSelected

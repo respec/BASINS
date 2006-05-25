@@ -263,6 +263,7 @@ Public Class frmManDelin
         Me.Close()
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub Initialize(ByVal m As MapWindow.Interfaces.IMapWin)
         Dim ctemp As String
         Dim lyr As Long

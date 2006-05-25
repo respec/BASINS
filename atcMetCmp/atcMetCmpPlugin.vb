@@ -293,6 +293,7 @@ Public Class atcMetCmpPlugin
 
     End Function
 
+    <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                     ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)

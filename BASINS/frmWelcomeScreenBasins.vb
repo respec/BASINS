@@ -32,7 +32,7 @@ Public Class frmWelcomeScreenBasins
     Private lAppInfo As AppInfo
 
 #Region " Windows Form Designer generated code "
-
+    <CLSCompliant(False)> _
     Public Sub New(ByVal aProject As Project, ByVal aAppInfo As AppInfo)
         MyBase.New()
 

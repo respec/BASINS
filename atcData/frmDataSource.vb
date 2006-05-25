@@ -1,3 +1,4 @@
+Imports System.Windows
 Imports System.Windows.Forms
 Imports atcUtility
 
@@ -191,7 +192,7 @@ Friend Class frmDataSource
 
     Private Sub Populate(ByRef aNeedToOpen As Boolean, _
                          ByRef aNeedToSave As Boolean)
-        Dim lNode As TreeNode
+        Dim lNode As Forms.TreeNode
         Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
         If lDataSources.Count = 0 Then
             treeSources.Nodes.Add("No data source plugins are loaded")
@@ -205,7 +206,7 @@ Friend Class frmDataSource
                     'If either no category was specified or
                     'this DataSource has one of the specified categories
                     If pCategories Is Nothing OrElse pCategories.Contains(lCategory) Then
-                        Dim lCategoryNode As TreeNode = FindOrCreateNode(treeSources.Nodes, lCategory)
+                        Dim lCategoryNode As Forms.TreeNode = FindOrCreateNode(treeSources.Nodes, lCategory)
                         If lCategory.Equals("File") OrElse _
                            GetSetting("BASINS4", "Data Source Categories", lCategory, "Expanded") = "Expanded" Then
                             lCategoryNode.ExpandAll()
@@ -216,7 +217,7 @@ Friend Class frmDataSource
                                     Case "atcTimeseries", "atcDataGroup"
                                         'Operations might have categories to further divide them
                                         If lOperation.Definition.Category.Length > 0 Then
-                                            Dim lSubCategoryNode As TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lOperation.Definition.Category)
+                                            Dim lSubCategoryNode As Forms.TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lOperation.Definition.Category)
                                             lNode = lSubCategoryNode.Nodes.Add(lOperation.Definition.Name)
                                             lSubCategoryNode.ExpandAll()
                                         Else
@@ -253,7 +254,7 @@ Friend Class frmDataSource
     Private Sub ResizeToShowBottomNode()
         Dim lTotalHeight As Integer = treeSources.Top + pnlButtons.Height + Me.Height - Me.ClientSize.Height + 10
 
-        For Each lNode As TreeNode In treeSources.Nodes
+        For Each lNode As Forms.TreeNode In treeSources.Nodes
             lTotalHeight += NodeHeight(lNode)
         Next
 
@@ -263,17 +264,17 @@ Friend Class frmDataSource
         Me.Height = lTotalHeight
     End Sub
 
-    Private Function NodeHeight(ByVal aNode As TreeNode) As Integer
+    Private Function NodeHeight(ByVal aNode As Forms.TreeNode) As Integer
         NodeHeight = aNode.Bounds.Height
         If aNode.IsExpanded Then
-            For Each lNode As TreeNode In aNode.Nodes
+            For Each lNode As Forms.TreeNode In aNode.Nodes
                 NodeHeight += NodeHeight(lNode)
             Next
         End If
     End Function
 
-    Private Function FindOrCreateNode(ByVal aNodes As TreeNodeCollection, ByVal aNodeText As String) As TreeNode
-        Dim newNode As TreeNode = Nothing
+    Private Function FindOrCreateNode(ByVal aNodes As TreeNodeCollection, ByVal aNodeText As String) As Forms.TreeNode
+        Dim newNode As Forms.TreeNode = Nothing
         For Each newNode In aNodes
             If newNode.Text = aNodeText Then
                 Exit For
@@ -281,8 +282,7 @@ Friend Class frmDataSource
             newNode = Nothing
         Next
         If newNode Is Nothing Then
-            newNode = New TreeNode
-            newNode.Text = aNodeText
+            newNode = New Forms.TreeNode(aNodeText)
             aNodes.Add(newNode)
         End If
         Return newNode

@@ -288,6 +288,7 @@ Public Class atcTimeseriesStatistics
         End If
     End Function
 
+    <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer)
         For Each lOperation As atcDefinedValue In AvailableOperations
             atcDataAttributes.AddDefinition(lOperation.Definition)

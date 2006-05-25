@@ -209,7 +209,7 @@ ErrHand:
         End Set
     End Property
 
-    'Public Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperator() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
+    'Public Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperation() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
     '  Dim numRules As Integer
     '  Dim iRule As Integer
     '  Dim Value As Object
@@ -234,7 +234,7 @@ ErrHand:
     '    While iRule <= numRules And allMatch
     '      thisMatches = False
     '      Value = Value(aFieldNum(iRule))
-    '      Select Case aOperator(iRule)
+    '      Select Case aoperation(iRule)
     '        Case "="
     '          If Value = aFieldVal(iRule) Then thisMatches = True
     '        Case "<"
@@ -245,7 +245,7 @@ ErrHand:
     '          If Value <= aFieldVal(iRule) Then thisMatches = True
     '        Case ">="
     '          If Value >= aFieldVal(iRule) Then thisMatches = True
-    '        Case Else : System.Diagnostics.Debug.WriteLine("Unrecognized operator:" & aOperator(iRule))
+    '        Case Else : System.Diagnostics.Debug.WriteLine("Unrecognized operation:" & aoperation(iRule))
     '      End Select
     '      If aMatchAny Then
     '        If thisMatches Then

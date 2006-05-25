@@ -273,8 +273,8 @@ Public Class atcDataSourceNOAA
     'Returns Nothing if already at end of file
     Private Function NextLine(ByVal aReader As BinaryReader) As String
         Dim ch As Char
+        NextLine = Nothing
         Try
-            NextLine = Nothing
 ReadCharacter:
             ch = aReader.ReadChar
             Select Case ch

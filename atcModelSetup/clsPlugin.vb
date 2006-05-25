@@ -3,7 +3,7 @@ Imports atcMwGisUtility
 Public Class PlugIn
     Implements MapWindow.Interfaces.IPlugin
 
-    Public pMapWin As MapWindow.Interfaces.IMapWin
+    Private pMapWin As MapWindow.Interfaces.IMapWin
 
     'TODO: get these from BASINS4 or plugInManager?
     Private Const ModelsMenuName As String = "BasinsModels"
@@ -45,6 +45,7 @@ Public Class PlugIn
         End Get
     End Property
 
+    <CLSCompliant(False)> _
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
         Dim mnu As MapWindow.Interfaces.MenuItem
 
@@ -89,6 +90,7 @@ Public Class PlugIn
     Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub LayersAdded(ByVal Layers() As MapWindow.Interfaces.Layer) Implements MapWindow.Interfaces.IPlugin.LayersAdded
     End Sub
 
@@ -98,12 +100,15 @@ Public Class PlugIn
     Public Sub LayerSelected(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerSelected
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub LegendDoubleClick(ByVal Handle As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendDoubleClick
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub LegendMouseDown(ByVal Handle As Integer, ByVal Button As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendMouseDown
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub LegendMouseUp(ByVal Handle As Integer, ByVal Button As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendMouseUp
     End Sub
 
@@ -131,6 +136,7 @@ Public Class PlugIn
     Public Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
     End Sub
 

@@ -1073,7 +1073,7 @@ Public Class atcDataSourceWDM
     Private Sub DsnReadGeneral(ByVal aFileUnit As Integer, ByRef aDataset As atcTimeseries)
         Dim saind, salen, retcod As Integer
         Dim ltu, lts, j As Integer, lNvals As Integer
-        Dim lstr As String
+        Dim lstr As String = ""
         Dim sdt(6) As Integer
         Dim edt(6) As Integer
         Dim dsfrc As Integer

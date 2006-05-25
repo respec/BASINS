@@ -7,7 +7,7 @@ Imports System.Collections.Specialized
 Public Class PlugIn
     Inherits atcData.atcDataDisplay
 
-    Friend pMapWin As MapWindow.Interfaces.IMapWin
+    Private pMapWin As MapWindow.Interfaces.IMapWin
     Private pReportsDir As String
     Private pReports As Collection
 
@@ -27,6 +27,7 @@ Public Class PlugIn
         End Get
     End Property
 
+    <CLSCompliant(False)> _
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
         pMapWin = aMapWin
