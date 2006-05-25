@@ -8,7 +8,7 @@ Public Class GisUtil
     Private Const UseCurrent As Integer = -1
 
     ''' <summary>Map Window Object</summary>
-    ''' <exception cref="MappingObjectNotSetException" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     <CLSCompliant(False)> _
     Public Shared WriteOnly Property MappingObject() As MapWindow.Interfaces.IMapWin
         Set(ByVal aNewValue As MapWindow.Interfaces.IMapWin)
@@ -1687,12 +1687,15 @@ Public Class GisUtil
         Return lAreaOverlappingPolygons
     End Function
 
-    Private Class MappingObjectNotSetException
-        Inherits ApplicationException
-
-        Public Sub New()
-            MyBase.New("GisUtil:Mapping Object Not Set")
-        End Sub
-    End Class
-
 End Class
+
+''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
+''' <summary>The Map Window Object has not been set with code like "GisUtil.MappingObject = ?"</summary>
+Public Class MappingObjectNotSetException
+    Inherits ApplicationException
+
+    Public Sub New()
+        MyBase.New("Mapping Object Not Set")
+    End Sub
+End Class
+
