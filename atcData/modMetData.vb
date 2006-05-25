@@ -206,7 +206,6 @@ Public Module modMetData
         Dim lHrTSer As atcTimeseries
         Dim lDaySum As Double
         Dim lRatio As Double
-        Dim lHrInd As Integer
         Dim lInd As Integer
         Static lDist As atcCollection
         Static lCurID As Integer
@@ -274,10 +273,7 @@ Public Module modMetData
 
     Public Function MissingDataSummary(ByVal aTSer As atcTimeseries, Optional ByVal aMVal As Double = -9.99, Optional ByVal aMAcc As Double = -9.98, Optional ByVal aFMin As Double = -1, Optional ByVal aFMax As Double = 90000, Optional ByVal aRepTyp As Integer = 0) As String
 
-        Dim i As Integer
-        Dim j As Integer
         Dim lMisPd As Integer
-        Dim lNV As Integer
         Dim lMPos As Integer
         Dim lMCod As Integer
         Dim lNMVals As Integer
@@ -296,7 +292,7 @@ Public Module modMetData
         Dim lTSStr As String
         Dim lTUStr() As String = {"", "seconds", "minutes", "hours", "days", "months", "years"}
         Dim s As String
-        Dim ls As String
+        Dim ls As String = ""
 
         If aRepTyp = 0 Then
             s = "For Data-set " & aTSer.ToString
@@ -386,7 +382,7 @@ Public Module modMetData
 
     End Function
 
-    Public Sub NxtMis(ByVal aBufPos As Integer, ByVal aDBuff() As Double, ByVal aValMis As Double, ByVal aValAcc As Double, ByVal aFaultMin As Double, ByVal aFaultMax As Double, ByRef aMisCod As Double, ByRef aMisPos As Integer, ByRef aNVals As Integer, ByRef aMVal As Double)
+    Public Sub NxtMis(ByVal aBufPos As Integer, ByVal aDBuff() As Double, ByVal aValMis As Double, ByVal aValAcc As Double, ByVal aFaultMin As Double, ByVal aFaultMax As Double, ByRef aMisCod As Integer, ByRef aMisPos As Integer, ByRef aNVals As Integer, ByRef aMVal As Double)
 
         'Find the next missing value or distribution or screwball value
         'in the data buffer (aDBUFF) starting at positions aBufPos.
@@ -735,8 +731,6 @@ Public Module modMetData
     End Sub
 
     Public Function ReadNOAAAttributes(ByVal aFilename As String) As atcCollection
-        Dim lInFile As Integer
-        'Dim j As Integer
         Dim lStr As String
         Dim lStaCode As String
         Dim lStateCode As String
@@ -744,7 +738,7 @@ Public Module modMetData
         Dim lNOAAattribs As atcCollection
         Dim lStations As New atcCollection
         Dim lStationIndex As Integer
-        Dim lCurState As String
+        Dim lCurState As String = ""
         Dim lStart As Object
         Dim lOldStation As atcCollection
 
@@ -755,8 +749,7 @@ Public Module modMetData
         'j = 1
 
         Try
-            Do 'Until EOF(lInFile)
-                'Get linFile, j, lstr
+            Do 
                 lStr = NextLine(inReader)
                 If lStr Is Nothing Then
                     Throw New Exception
@@ -826,8 +819,6 @@ Public Module modMetData
     End Function
 
     Public Function ReadNOAAHPDAttributes(ByVal aFilename As String) As atcCollection
-        'Dim lInFile As Integer
-        'Dim j As Integer
         Dim lStr As String
         Dim lStaCode As String
         Dim lStateCode As String
@@ -835,7 +826,7 @@ Public Module modMetData
         Dim NOAAHPDAttribs As atcCollection
         Dim lStations As New atcCollection
         Dim lStationIndex As Integer
-        Dim lCurState As String
+        Dim lCurState As String = ""
 
         Dim inStream As New FileStream(aFilename, FileMode.Open, FileAccess.Read)
         Dim inBuffer As New BufferedStream(inStream)
@@ -844,8 +835,7 @@ Public Module modMetData
         'j = 1
 
         Try
-            Do 'Until EOF(lInFile)
-                'Get linFile, j, lstr
+            Do 
                 lStr = NextLine(inReader)
                 lStaCode = lStr.Substring(0, 6)
                 If IsNumeric(lStaCode) Then
