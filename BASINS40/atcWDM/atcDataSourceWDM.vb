@@ -301,8 +301,10 @@ Public Class atcDataSourceWDM
                         "New TSer start date (" & lTimser.Dates.Value(1) & _
                         ") preceeds exising TSer end date (" & lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
                     End If
-                    Logger.Dbg("atcDataSourceWdm:OldFinalDate:" & lExistTimser.Dates.Value(lExistTimser.numValues).ToString)
-                    Logger.Dbg("atcDataSourceWdm:NewFirstDate:" & lTimser.Dates.Value(1).ToString)
+                    Dim lExistEndDateJ As Double = lExistTimser.Dates.Value(lExistTimser.numValues)
+                    Logger.Dbg("atcDataSourceWdm:OldFinalDate:" & DumpDate(lExistEndDateJ))
+                    Dim lNewStartDateJ As Double = lTimser.Dates.Value(0)
+                    Logger.Dbg("atcDataSourceWdm:NewFirstDate:" & DumpDate(lNewStartDateJ))
                 Else
                     lDsn = findNextDsn(lDsn)
                     Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
@@ -313,17 +315,15 @@ Public Class atcDataSourceWDM
             End If
 
             Dim lWriteIt As Boolean = False
-            If aExistAction = ExistAppend Then 'write appended data
+            If aExistAction = ExistAppend Then
+                'just write appended data
                 lWriteIt = True
             ElseIf DsnBld(lWdmHandle.Unit, lTimser) Then
-                'MyBase.AddDataSet(lTimser)
                 DataSets.Add(lDsn, lTimser)
                 lWriteIt = True
             End If
 
             If lWriteIt Then
-                'DsnBld(lWdmHandle.Unit, lTimser) Then
-                'MyBase.AddDataSet(lTimser)
                 Dim lTSFill As Double = lTimser.Attributes.GetValue("tsfill", -999)
                 Dim lValue As Double
                 Dim lV(lNvals) As Single
@@ -583,6 +583,7 @@ Public Class atcDataSourceWDM
     Private Function DsnBld(ByVal aFileUnit As Integer, ByRef t As atcTimeseries) As Boolean
         Dim dsn, nsasp, nup, ndn, nsa, ndp, i As Integer
         Dim salen, psa, iVal, saind, retcod As Integer
+        Dim rVal As Single
         Dim ostr As String
         Dim CSDat(6) As Integer
         Dim lS As String
@@ -616,6 +617,9 @@ Public Class atcDataSourceWDM
         saind = 84 'tsform
         iVal = t.Attributes.GetValue("TSFORM", 1)
         Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
+        saind = 34 'tsfill
+        rVal = t.Attributes.GetValue("TSFILL", -999)
+        Call F90_WDBSAR(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
         saind = 17 'tcode
         lS = t.Attributes.GetValue("tu")
         If lS.Length = 0 Then
