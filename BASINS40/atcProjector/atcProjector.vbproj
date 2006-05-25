@@ -83,6 +83,7 @@
     <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>

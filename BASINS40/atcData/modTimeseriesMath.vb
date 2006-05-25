@@ -487,7 +487,7 @@ Public Module modTimeseriesMath
     'Build Date array for a timeseries with start/end of aTSer and time units/step of aTU/aTS
     Public Function NewDates(ByVal aTSer As atcTimeseries, ByVal aTU As atcTimeUnit, ByVal aTS As Integer) As Double()
 
-        Dim lNewDates() As Double
+        Dim lNewDates(0) As Double
         Dim lIntvl As Double
         Dim lSJDay As Double
         Dim lEJDay As Double

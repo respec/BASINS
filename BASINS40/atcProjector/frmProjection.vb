@@ -463,7 +463,7 @@ Public Class frmProjection
     Public Overrides Function toString() As String
         Dim id As Integer
         Dim ProjObj As Projection
-        Dim ProjObjC As Projection
+        Dim ProjObjC As Projection = Nothing
 
         toString = "proj" & vbCrLf
 

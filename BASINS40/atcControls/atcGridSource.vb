@@ -134,10 +134,10 @@ Public Class atcGridSource
                 End If
 
                 Dim newValues(aNewRows - 1, pColumns - 1) As String
-                Dim newColors(,) As Color
-                Dim newSelected(,) As Boolean
-                Dim newEditable(,) As Boolean
-                Dim newAlignment(,) As atcAlignment
+                Dim newColors(,) As Color = Nothing
+                Dim newSelected(,) As Boolean = Nothing
+                Dim newEditable(,) As Boolean = Nothing
+                Dim newAlignment(,) As atcAlignment = Nothing
 
                 If Not pColors Is Nothing Then ReDim newColors(aNewRows - 1, pColumns - 1)
                 If Not pSelected Is Nothing Then ReDim newSelected(aNewRows - 1, pColumns - 1)

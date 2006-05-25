@@ -20,6 +20,7 @@ Public Class atcDataManager
     ''' <param name="aMapWin">
     '''     <para>Pointer to the root interface for the MapWindow</para>
     ''' </param>  
+    <CLSCompliant(False)> _
     Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
         pMapWin = aMapWin
         Me.Clear()

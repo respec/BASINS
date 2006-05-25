@@ -54,12 +54,14 @@ Public Class atcBasinsPlugIn
         End Get
     End Property
 
+    <CLSCompliant(False)> _
     Public ReadOnly Property MapWin() As MapWindow.Interfaces.IMapWin
         Get
             Return g_MapWin
         End Get
     End Property
 
+    <CLSCompliant(False)> _
     Public Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, ByVal aParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
         'fired when 
         '   1) user loads plug-in through plug-in dialog or
@@ -510,6 +512,7 @@ Public Class atcBasinsPlugIn
         'plug-in depends on a particular layer being present. 
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub LayersAdded(ByVal Layers() As MapWindow.Interfaces.Layer) Implements MapWindow.Interfaces.IPlugin.LayersAdded
         'This event fires when the user adds a layer to MapWindow.  This is useful to know if your
         'plug-in depends on a particular layer being present. Also, if you keep an internal list of 
@@ -537,14 +540,17 @@ Public Class atcBasinsPlugIn
         End If
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub LegendDoubleClick(ByVal Handle As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendDoubleClick
         'This event fires when a user double-clicks a layer in the legend.
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub LegendMouseDown(ByVal Handle As Integer, ByVal Button As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendMouseDown
         'This event fires when a user holds a mouse button down in the legend.
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub LegendMouseUp(ByVal Handle As Integer, ByVal Button As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendMouseUp
         'This event fires when a user releases a mouse button in the legend.
     End Sub
@@ -667,6 +673,7 @@ Public Class atcBasinsPlugIn
         SettingsString = saveXML.GetXml
     End Sub
 
+    <CLSCompliant(False)> _
     Public Sub ShapesSelected(ByVal Handle As Integer, ByVal SelectInfo As MapWindow.Interfaces.SelectInfo) Implements MapWindow.Interfaces.IPlugin.ShapesSelected
         'This event fires when the user selects one or more shapes using the select tool in MapWindow. Handle is the 
         'Layer handle for the shapefile on which shapes were selected. SelectInfo holds information abou the 

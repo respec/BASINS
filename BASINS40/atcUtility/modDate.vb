@@ -141,7 +141,7 @@ Public Module modDate
         HMS2J = CDbl(h / 24) + CDbl(m / 1440) + CDbl(s / 86400)
     End Function
 
-    Sub J2DateRoundup(ByVal aJDate As Double, ByVal aTU As Long, ByVal aDate() As Integer)
+    Sub J2DateRoundup(ByVal aJDate As Double, ByVal aTU As Integer, ByVal aDate() As Integer)
         'round up dates for wdm datasets
         'TODO: needs unit tests!
         J2Date(aJDate, aDate)

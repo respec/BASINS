@@ -52,7 +52,7 @@ Public Class ProjectionDB
         Dim iRecord As Integer
         Dim id As Integer
         Dim curProjection As Projection
-        Dim prevProjection As Projection
+        Dim prevProjection As Projection = Nothing
 
         pBaseProjections = New ProjectionCollection
         pEllipsoids = New ProjectionCollection

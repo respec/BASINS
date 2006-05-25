@@ -120,9 +120,9 @@ Public Class atcEventPlugin
         End If
     End Function
 
-    Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, _
-                                    ByVal ParentHandle As Integer)
-    End Sub
+    'Public Overrides Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, _
+    '                                ByVal ParentHandle As Integer)
+    'End Sub
 
     Public Overrides Function ToString() As String
         Return Name.Substring(23) 'Skip first part of Name which is "Timeseries::Seasonal - "

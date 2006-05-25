@@ -281,7 +281,7 @@ Public MustInherit Class atcTable
     '' 1 - keep existing instance of duplicates and discard duplicates from dbf being added
     '' 2 - replace existing instance of duplicates with duplicates from dbf being added
     '' 3 - ask user what to do (not currently implemented)
-    'Public Sub Merge(table2Add As clsATCTable, keyFieldNames() As String, DuplicateAction As Long)
+    'Public Sub Merge(table2Add As clsATCTable, keyFieldNames() As String, DuplicateAction As Integer)
     'End Sub
     '
     '
@@ -293,8 +293,8 @@ Public MustInherit Class atcTable
     ''Returns True if found, moves CurrentRecord to first record with .Record = FindValue
     ''If not found, returns False and moves CurrentRecord to 1
     'Public Function FindRecord(ByVal FindValue() As Byte, _
-    ''                          Optional ByVal aStartRecord As Long = 1, _
-    ''                          Optional ByVal aEndRecord As Long = -1) As Boolean
+    ''                          Optional ByVal aStartRecord As Integer = 1, _
+    ''                          Optional ByVal aEndRecord As Integer = -1) As Boolean
     'End Function
     '
     ''Returns True if CurrentRecord matches FindValue

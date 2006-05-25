@@ -1110,8 +1110,8 @@ NoMatch:
         '            Returns input parameter without that portion. If no comma or space in string, 
         '            returns whole string, and input parameter reduced to null string.
         Dim l As String
-        Dim i As Long
-        Dim j As Long
+        Dim i As Integer
+        Dim j As Integer
         ' ##LOCAL l - string to return
         ' ##LOCAL i - position of blank delimeter
         ' ##LOCAL j - position of comma delimeter

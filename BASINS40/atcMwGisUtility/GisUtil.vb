@@ -10,6 +10,7 @@ Public Class GisUtil
 
     ''' <summary>Map Window Object</summary>
     ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    <CLSCompliant(False)> _
     Public Shared WriteOnly Property MappingObject() As MapWindow.Interfaces.IMapWin
         Set(ByVal aNewValue As MapWindow.Interfaces.IMapWin)
             pMapWin = aNewValue
