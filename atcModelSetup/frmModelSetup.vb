@@ -2199,16 +2199,16 @@ ErrHand:
         Dim lnpdes As Object
         Dim ctemp As String
         Dim tmpDbf As IatcTable
-        Dim ParmCode() As String, ParmName() As String
-        Dim RowCount As Long
+        Dim ParmCode(0) As String, ParmName(0) As String
+        Dim RowCount As Long = 0
         Dim prevdbf As String
         Dim YearField As Long, ParmField As Long
         Dim LoadField As Long, NPDESField As Long
         Dim dbrcount As Long
-        Dim TableYear() As String
-        Dim TableParm() As String
-        Dim TableLoad() As String
-        Dim TableNPDES() As String
+        Dim TableYear(0) As String
+        Dim TableParm(0) As String
+        Dim TableLoad(0) As String
+        Dim TableNPDES(0) As String
         Dim tPoll As String
         Dim tValue As String
         Dim iFound As Boolean
