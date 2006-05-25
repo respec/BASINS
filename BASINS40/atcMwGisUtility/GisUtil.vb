@@ -4,12 +4,11 @@ Imports MapWinUtility
 ''' <remarks>Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
 ''' <summary>GIS Utilities implemented thru MapWindow</summary>
 Public Class GisUtil
-
     Private Shared pMapWin As MapWindow.Interfaces.IMapWin
     Private Const UseCurrent As Integer = -1
 
     ''' <summary>Map Window Object</summary>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
     <CLSCompliant(False)> _
     Public Shared WriteOnly Property MappingObject() As MapWindow.Interfaces.IMapWin
         Set(ByVal aNewValue As MapWindow.Interfaces.IMapWin)
@@ -18,11 +17,11 @@ Public Class GisUtil
     End Property
 
     ''' <summary>Map Window Object</summary>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Private Shared ReadOnly Property GetMappingObject() As MapWindow.Interfaces.IMapWin
         Get
             If pMapWin Is Nothing Then
-                Throw New Exception("GisUtil:Mapping Object Not Set")
+                Throw New MappingObjectNotSetException
             Else
                 Return pMapWin
             End If
@@ -30,7 +29,7 @@ Public Class GisUtil
     End Property
 
     ''' <summary>Layers on map</summary>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Private Shared Function MapLayers() As ArrayList
         Dim lMapLayers As New ArrayList
         Dim lLastLayerIndex As Integer = GetMappingObject.Layers.NumLayers - 1
@@ -42,7 +41,7 @@ Public Class GisUtil
 
     ''' <summary>Check to see if feature index is valid</summary>
     ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Private Shared Function FeatureIndexValid(ByVal aFeatureIndex As Integer, ByVal aSf As MapWinGIS.Shapefile) As Boolean
         If aFeatureIndex < 0 Or aFeatureIndex >= aSf.NumShapes Then
             Throw New Exception("GisUtil:FieldValue:Error:FeatureIndex:" & aFeatureIndex & ":OutOfRange:0:" & aSf.NumShapes - 1)
@@ -57,8 +56,8 @@ Public Class GisUtil
     ''' </param>
     ''' <remarks>Current directory not changed</remarks>
     ''' <exception cref="Exception.html#LoadFailure" caption="LoadFailure">Failure to Load Project</exception>
-    ''' <exception cref="Exception.html#FileNotFound" caption="FileNotFound">File Not Found</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="System.IO.IOException" caption="FileNotFound">File Not Found</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Sub LoadProject(ByVal aProjectName As String)
         If FileExists(aProjectName) Then
             Dim lBaseDir As String = CurDir()  'dont want to change curdir, save original
@@ -74,7 +73,7 @@ Public Class GisUtil
 
     ''' <summary>Current Layer Index (Handle)</summary>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Property CurrentLayer() As Integer
         Get
             Return GetMappingObject.Layers.CurrentLayer
@@ -92,7 +91,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Private Shared ReadOnly Property ShapeFileFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Shapefile
         Get
             If aLayerIndex = UseCurrent Then
@@ -115,7 +114,7 @@ Public Class GisUtil
     '''     <para>Index of Layer containing ShapeFile</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Private Shared ReadOnly Property PolygonShapeFileFromIndex(ByVal aLayerIndex As Integer) As MapWinGIS.Shapefile
         Get
             Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
@@ -135,7 +134,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotGrid" caption="LayerNotGrid">Layer specified by aLayerIndex is not a Grid</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Private Shared ReadOnly Property GridFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWinGIS.Grid
         Get
             If aLayerIndex = UseCurrent Then
@@ -156,7 +155,7 @@ Public Class GisUtil
     '''     <para>Index of desired layer (defaults to Current Layer)</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Private Shared ReadOnly Property LayerFromIndex(Optional ByVal aLayerIndex As Integer = UseCurrent) As MapWindow.Interfaces.Layer
         Get
             If aLayerIndex = UseCurrent Then
@@ -186,7 +185,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
     ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function OverlappingPolygons( _
       ByVal aLayerIndex1 As Integer, ByVal aFeatureIndex1 As Integer, _
       ByVal aLayerIndex2 As Integer, ByVal aFeatureIndex2 As Integer) As Boolean
@@ -250,7 +249,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
     ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function LineInPolygon(ByVal aLineLayerIndex As Integer, _
                                          ByVal aLineIndex As Integer, _
                                          ByVal aPolygonLayerIndex As Integer, _
@@ -282,7 +281,7 @@ Public Class GisUtil
     '''     <para>Index of polygons from contained</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Sub AssignContainingPolygons( _
                                                ByVal aLayerIndex As Integer, _
                                                ByVal aLayerIndexContaining As Integer, _
@@ -321,7 +320,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property NumFields(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
         Get
             Return ShapeFileFromIndex(aLayerIndex).NumFields
@@ -336,7 +335,7 @@ Public Class GisUtil
     '''     <para>ShapeFile containing filed</para>
     ''' </param>
     ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Private Shared ReadOnly Property FieldIndexValid(ByVal aFieldIndex As Integer, ByVal aSf As MapWinGIS.Shapefile) As Boolean
         Get
             If aFieldIndex < aSf.NumFields AndAlso aFieldIndex >= 0 Then
@@ -357,7 +356,7 @@ Public Class GisUtil
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
     ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property FieldName(ByVal aFieldIndex As Integer, ByVal aLayerIndex As Integer) As String
         Get
             Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
@@ -379,7 +378,7 @@ Public Class GisUtil
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
     ''' <exception cref="Exception.html#FieldNameNotRecognized" caption="FieldNameNotRecognized">Field specified by aFieldName is not recognized</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function FieldIndex(ByVal aLayerIndex As Integer, ByVal aFieldName As String) As Integer
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
@@ -411,7 +410,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function AddField(ByVal aLayerIndex As Integer, ByVal aFieldName As String, _
                                     ByVal aFieldType As Integer, ByVal aFieldWidth As Integer) As Integer
         Dim lField As New MapWinGIS.Field
@@ -439,7 +438,7 @@ Public Class GisUtil
     ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function RemoveField(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer) As Boolean
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
@@ -454,7 +453,7 @@ Public Class GisUtil
     End Function
 
     ''' <summary>Returns the number of layers loaded in the MapWindow. Drawing layers are not counted. </summary>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property NumLayers() As Integer
         Get
             Return GetMappingObject.Layers.NumLayers()
@@ -466,7 +465,7 @@ Public Class GisUtil
     '''     <para>Index of layer. (Defaults to current layer)</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property LayerType(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
         Get
             Return LayerFromIndex(aLayerIndex).LayerType
@@ -478,7 +477,7 @@ Public Class GisUtil
     '''     <para>Index of layer (Defaults to current layer)</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property LayerName(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
         Get
             Return LayerFromIndex(aLayerIndex).Name
@@ -491,7 +490,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNameNameNotRecognized" caption="LayerNameNameNotRecognized">Layer specified by aLayerName does not exist</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function LayerIndex(ByVal aLayerName As String) As Integer
         LayerIndex = 0
 
@@ -510,7 +509,7 @@ Public Class GisUtil
     '''     <para>Index of layer (Defaults to current layer)</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property LayerFileName(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
         Get
             Return LayerFromIndex(aLayerIndex).FileName
@@ -523,7 +522,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property NumFeatures(Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
         Get
             Return ShapeFileFromIndex(aLayerIndex).NumShapes
@@ -540,7 +539,7 @@ Public Class GisUtil
     ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property FieldType(ByVal aFieldIndex As Integer, Optional ByVal aLayerIndex As Integer = UseCurrent) As Integer
         Get
             Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
@@ -566,7 +565,7 @@ Public Class GisUtil
     ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function FieldValue(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByVal aFieldIndex As Integer) As String
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         If aFieldIndex < 0 Or aFieldIndex >= lSf.NumFields Then
@@ -589,7 +588,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotGrid" caption="LayerNotGrid">Layer specified by aLayerIndex is not a Grid</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property GridLayerMinimum(Optional ByVal aLayerIndex As Integer = UseCurrent) As Object
         Get
             Return GridFromIndex(aLayerIndex).Minimum
@@ -602,7 +601,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotGrid" caption="LayerNotGrid">Layer specified by aLayerIndex is not a Grid</exception>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property GridLayerMaximum(Optional ByVal aLayerIndex As Integer = UseCurrent) As Object
         Get
             Return GridFromIndex(aLayerIndex).Maximum
@@ -615,7 +614,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotPolygonShapeFile" caption="LayerNotPolygonShapeFile">Layer specified by aLayerIndex is not a polygon ShapeFile</exception>
     ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function FeatureArea(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
         Dim lArea As Double
 
@@ -669,7 +668,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
     Public Shared Sub EndPointsOfLine(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, _
                                       ByRef aX1 As Double, ByRef aY1 As Double, ByRef aX2 As Double, ByRef aY2 As Double)
         Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
@@ -691,7 +690,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
     Public Shared Sub PointXY(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, _
                               ByRef aX As Double, ByRef aY As Double)
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
@@ -711,7 +710,7 @@ Public Class GisUtil
     ''' </param>
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function RemoveFeature(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
 
@@ -739,7 +738,7 @@ Public Class GisUtil
     ''' <exception cref="Exception.html#LayerNotShapeFile" caption="LayerNotShapeFile">Layer specified by aLayerIndex is not a ShapeFile</exception>
     ''' <exception cref="Exception.html#FeatureIndexOutOfRange" caption="FeatureIndexOutOfRange">Feature Index Out of Range</exception>
     ''' <exception cref="Exception.html#FieldIndexOutOfRange" caption="FieldIndexOutOfRange">Field specified by aFieldIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Sub SetFeatureValue(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, ByVal aFeatureIndex As Integer, ByVal aValue As Object)
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         If FeatureIndexValid(aFeatureIndex, lSf) Then
@@ -849,7 +848,7 @@ Public Class GisUtil
     'End Function
 
     ''' <summary>Obtain file name of currently loaded project</summary>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared ReadOnly Property ProjectFileName() As String
         Get
             Return GetMappingObject.Project.FileName
@@ -913,7 +912,7 @@ Public Class GisUtil
     '''     <para>Name of layer</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerNameNameNotRecognized" caption="LayerNameNameNotRecognized">Layer specified by aLayerName does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Property LayerVisible(ByVal aLayerName As String) As Boolean
         Get
             Return LayerFromIndex(LayerIndex(aLayerName)).Visible
@@ -928,7 +927,7 @@ Public Class GisUtil
     '''     <para>Index of layer (Defaults to current layer)</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Property LayerVisible(Optional ByVal aLayerIndex As Integer = UseCurrent) As Boolean
         Get
             If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
@@ -945,7 +944,7 @@ Public Class GisUtil
     '''     <para>Index of layer (Defaults to current layer)</para>
     ''' </param>
     ''' <exception cref="Exception.html#LayerIndexOutOfRange" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
-    ''' <exception cref="Exception.html#MappingObjectNotSet" caption="MappingObjectNotSet">Mapping Object Not Set</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function RemoveLayer(Optional ByVal aLayerIndex As Integer = UseCurrent) As Boolean
         If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
         Dim lLayerName As String = LayerName(aLayerIndex) 'forces check of index
@@ -1687,4 +1686,13 @@ Public Class GisUtil
         lNewShape = Nothing
         Return lAreaOverlappingPolygons
     End Function
+
+    Private Class MappingObjectNotSetException
+        Inherits ApplicationException
+
+        Public Sub New()
+            MyBase.New("GisUtil:Mapping Object Not Set")
+        End Sub
+    End Class
+
 End Class
