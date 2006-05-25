@@ -528,7 +528,7 @@ Public Class frmReclass
         Dim i As Long
         Dim k As Long
         Dim ReclassifyFile As String
-        Dim aAreaLS(,) As Double
+        Dim aAreaLS(0, 0) As Double
         Dim area As Single
         Dim tarea As Single
         Dim numSubbasins As Long
