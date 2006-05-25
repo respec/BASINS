@@ -165,7 +165,7 @@ Public Class atcMetCmpPlugin
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Cloud Cover"
-                Dim lPctSunTSer As atcTimeseries
+                Dim lPctSunTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
                     Dim ltsgroup As atcDataGroup = DataManager.UserSelectData("Select Percent Sun data for computing " & aOperationName)
                     If Not ltsgroup Is Nothing Then lPctSunTSer = ltsgroup(0)
@@ -249,9 +249,9 @@ Public Class atcMetCmpPlugin
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Precipitation"
-                Dim lHrTSers As atcDataGroup
+                Dim lHrTSers As atcDataGroup = Nothing
                 Dim lTol As Double
-                Dim lSummFile As String
+                Dim lSummFile As String = ""
                 Dim lAttDef2 As atcAttributeDefinition
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisPrec

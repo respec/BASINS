@@ -1583,7 +1583,7 @@ Public Module modMetCompute
         Dim lOutFil As Integer
         Dim s As String = ""
         Dim rsp, retcod, lUsedTriang As Integer
-        Dim lClosestHrTser As atcTimeseries
+        Dim lClosestHrTser As atcTimeseries = Nothing
         Dim lDaySumHrTser As atcTimeseries
         Dim lDisTs As New atcTimeseries(aDataSource)
 
