@@ -1,15 +1,18 @@
-Option Strict Off
+Option Strict On
 Option Explicit On
 
 Module HassLibs
-    'Copyright 2002 by AQUA TERRA Consultants
+    'Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+
+    'NOT IN USE 
+    '  if entry points are needed, move to modVb2F90 and name arguments better
+
     'general routines
-    Declare Sub F90_MSG Lib "hass_ent.dll" (ByVal s As String, ByVal i As Short)
     Declare Sub F90_W99OPN Lib "hass_ent.dll" ()
     Declare Sub F90_W99CLO Lib "hass_ent.dll" ()
-    Declare Function F90_WDMOPN Lib "hass_ent.dll" (ByRef l As Integer, ByVal s As String, ByVal i As Short) As Integer
-    Declare Function F90_WDMCLO Lib "hass_ent.dll" (ByRef l As Integer) As Integer
-    Declare Function F90_INQNAM Lib "hass_ent.dll" (ByVal s As String, ByVal i As Short) As Integer
+    Declare Function F90_WDMOPN Lib "hass_ent.dll" (ByRef aUnit As Integer, _
+                                                    ByVal aName As String, ByVal aNameLen As Short) As Integer
+    Declare Function F90_WDMCLO Lib "hass_ent.dll" (ByRef aUnit As Integer) As Integer
     'util:utchar
     Declare Sub F90_DATLST_XX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
     Declare Sub F90_DECCHX_XX Lib "hass_ent.dll" (ByRef r As Single, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
@@ -30,38 +33,15 @@ Module HassLibs
     Declare Sub F90_DECPRC Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef r As Single)
     'adwdm:utwdmd
     Declare Sub F90_WDBFIN Lib "hass_ent.dll" ()
-    Declare Function F90_WDFLCL Lib "hass_ent.dll" (ByRef l As Integer) As Integer
-    Declare Sub F90_WDDSNX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer)
-    Declare Function F90_WDCKDT Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer) As Integer
-    'adwdm:wdopxx
-    Declare Function F90_WDBOPN Lib "hass_ent.dll" (ByRef l As Integer, ByVal s As String, ByVal i As Short) As Integer
-    Declare Sub F90_WDBOPNR Lib "hass_ent.dll" (ByRef l As Integer, ByVal s As String, ByRef l As Integer, ByRef l As Integer, ByVal i As Short)
+    'wdm:wdbtch
+    Declare Sub F90_WDDSCL Lib "hass_ent.dll" (ByRef aWdmUnitOld As Integer, ByRef aDsnOld As Integer, _
+                                               ByRef aWdmUnitNew As Integer, ByRef aDsnNew As Integer, _
+                                               ByRef aTypeNew As Integer, ByRef aRetcod As Integer)
     'adwdm:ztwdmf
     Declare Sub F90_WMSGTX_XX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef r As Single, ByRef r As Single, ByRef r As Single, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
     Declare Sub F90_WMSGTW_XX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer)
     Declare Sub F90_WMSGTT_XX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
     Declare Sub F90_WMSGTH Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer)
-    'adwdm:wdmess
-    Declare Sub F90_WDLBAX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    Declare Sub F90_WDDSDL Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    Declare Sub F90_GETATT Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    'wdm:wdtms1
-    Declare Sub F90_WDTGET Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef r As Single, ByRef l As Integer)
-    Declare Sub F90_WDTPUT Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef r As Single, ByRef l As Integer)
-    'wdm:wdtms2
-    Declare Sub F90_WTFNDT Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    'wdm:wdbtch
-    Declare Sub F90_WDBSGC_XX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    Declare Sub F90_WDBSGI Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    Declare Sub F90_WDBSGR Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef r As Single, ByRef l As Integer)
-    Declare Sub F90_WDLBAD Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    Declare Sub F90_WDDSCL Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    Declare Sub F90_WDDSRN Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    'wdm:wdatrb
-    Declare Sub F90_WDBSAC Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByVal s As String, ByVal i As Short)
-    Declare Sub F90_WDBSAI Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
-    Declare Sub F90_WDBSAR Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef r As Single, ByRef l As Integer)
-    Declare Sub F90_WDSAGY_XX Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef r As Single, ByRef r As Single, ByRef r As Single, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
     'wdm:wddlg
     Declare Sub F90_WDLGET Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef r As Single, ByRef l As Integer)
     Declare Sub F90_WDLLSU Lib "hass_ent.dll" (ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer, ByRef l As Integer)
@@ -189,7 +169,7 @@ Module HassLibs
 
 
     Private Sub ChrNum(ByRef ilen As Integer, ByRef istr As String, ByRef onam() As Integer)
-        Dim i As Short
+        Dim i As Integer
         For i = 1 To ilen
             If i <= Len(istr) Then
                 onam(i - 1) = Asc(Mid(istr, i, 1))
@@ -286,7 +266,8 @@ Module HassLibs
         Dim iac(3) As Integer
         Dim icond(64) As Integer
 
-        Call F90_STSPFN_XX(intfg, ucikey, idat(0), aval, iac(0), icond(0), uvname, Len(uvname))
+        Call F90_STSPFN_XX(intfg, ucikey, idat(0), aval, iac(0), icond(0), _
+                           uvname, CShort(uvname.Length))
         Call NumChr(3, iac, ac)
         Call NumChr(64, icond, cond)
     End Sub
@@ -352,13 +333,6 @@ Module HassLibs
         Call NumChr(ilen, i, RStr)
 
     End Sub
-    Public Sub F90_WDBSGC(ByRef w As Integer, ByRef d As Integer, ByRef i As Integer, ByRef l As Integer, ByRef s As String)
-        Dim iVal(48) As Integer
-
-        Call F90_WDBSGC_XX(w, d, i, l, iVal(0))
-        Call NumChr(l, iVal, s)
-
-    End Sub
 
     Public Sub F90_TSDSPC(ByRef dsn As Integer, ByRef LSCENM As String, ByRef LRCHNM As String, ByRef LCONNM As String, ByRef Tu As Integer, ByRef ts As Integer, ByRef SDate() As Integer, ByRef EDate() As Integer, ByRef GRPSIZ As Integer)
 
@@ -391,8 +365,13 @@ Module HassLibs
 
     End Sub
 
-    Sub F90_SGLABL(ByRef ndsn As Integer, ByRef Csennm() As String, ByRef clocnm() As String, ByRef cconnm() As String, ByRef Tu As Integer, ByRef Dtran As Integer, ByRef which() As Integer, ByRef typind() As Integer, ByRef cntcon As Integer, ByRef cntsen As Integer, ByRef cntloc As Integer, ByRef Calab As String, ByRef Cyrlab As String, ByRef Cyllab As String, ByRef Ctitl As String, ByRef clab() As String, ByRef ctran As String, ByRef ctunit As String)
-        Dim i, j As Object
+    Sub F90_SGLABL(ByRef ndsn As Integer, ByRef Csennm() As String, ByRef clocnm() As String, _
+                   ByRef cconnm() As String, ByRef Tu As Integer, ByRef Dtran As Integer, _
+                   ByRef which() As Integer, ByRef typind() As Integer, ByRef cntcon As Integer, _
+                   ByRef cntsen As Integer, ByRef cntloc As Integer, ByRef Calab As String, _
+                   ByRef Cyrlab As String, ByRef Cyllab As String, ByRef Ctitl As String, _
+                   ByRef clab() As String, ByRef ctran As String, ByRef ctunit As String)
+        Dim i, j As Integer
         Dim Isennm() As Integer
         Dim Ilocnm() As Integer
         Dim Iconnm() As Integer
@@ -413,21 +392,12 @@ Module HassLibs
         ReDim Iconnm(8 * ndsn)
 
         For i = 0 To ndsn - 1
-            'UPGRADE_WARNING: Couldn't resolve default property of object i
             Call ChrNum(8, Csennm(i), tsen)
-            'UPGRADE_WARNING: Couldn't resolve default property of object i
             Call ChrNum(8, clocnm(i), tloc)
-            'UPGRADE_WARNING: Couldn't resolve default property of object i
             Call ChrNum(8, cconnm(i), tcon)
             For j = 0 To 7
-                'UPGRADE_WARNING: Couldn't resolve default property of object j
-                'UPGRADE_WARNING: Couldn't resolve default property of object i
                 Isennm((i * 8) + j) = tsen(j)
-                'UPGRADE_WARNING: Couldn't resolve default property of object j
-                'UPGRADE_WARNING: Couldn't resolve default property of object i
                 Ilocnm((i * 8) + j) = tloc(j)
-                'UPGRADE_WARNING: Couldn't resolve default property of object j
-                'UPGRADE_WARNING: Couldn't resolve default property of object i
                 Iconnm((i * 8) + j) = tcon(j)
             Next j
         Next i
@@ -494,18 +464,6 @@ Module HassLibs
 
         Call F90_GTINS_XX(Init, idno, rorb, itxt(0), rarea)
         Call NumChr(10, itxt, ctxt)
-
-    End Sub
-
-    Sub F90_WDSAGY(ByRef wdmsfl As Integer, ByRef ID As Integer, ByRef ilen As Integer, ByRef itype As Integer, ByRef rmin As Single, ByRef rmax As Single, ByRef rdef As Single, ByRef hlen As Integer, ByRef hrec As Integer, ByRef hpos As Integer, ByRef vlen As Integer, ByRef Name As String, ByRef desc As String, ByRef valid As String)
-        Dim itxt(6) As Integer
-        Dim idesc(47) As Integer
-        Dim ivalid(240) As Integer
-
-        Call F90_WDSAGY_XX(wdmsfl, ID, ilen, itype, rmin, rmax, rdef, hlen, hrec, hpos, vlen, itxt(0), idesc(0), ivalid(0))
-        Call NumChr(6, itxt, Name)
-        Call NumChr(47, idesc, desc)
-        Call NumChr(vlen, ivalid, valid)
 
     End Sub
 
