@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
@@ -113,9 +113,7 @@
     <Compile Include="atcWdmHandle.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="modHass_Ent.vb">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="modVb2F90.vb" />
     <Compile Include="modWDMGlobal.vb">
       <SubType>Code</SubType>
     </Compile>
