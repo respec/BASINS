@@ -1,94 +1,98 @@
-Option Strict Off
+Option Strict On
 Option Explicit On
 
 Imports System.Drawing
 Imports MapWinUtility
 
 Public Module UtilColor
-    '##MODULE_REMARKS Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    '##MODULE_REMARKS Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private colorDatabase As atcTable
-    Private Const grayBasename As String = "gray" 'base name for shades of gray (gray0..gray255)
-    Private Const grayNameNumStart As Short = 5 'len(grayBasename) + 1 = where the number starts
-    Private Const forceKnownColor As Boolean = True
+    Private pColorDatabase As atcTable
+    Private Const pGrayBasename As String = "gray" 'base name for shades of gray (gray0..gray255)
+    Private Const pGrayNameNumStart As Integer = 5 'pGrayBasename.Length + 1  where the number starts
+    Private Const pForceKnownColor As Boolean = True
 
-    Private nColorRules As Integer
-    Private colorMatchingRules() As String
-    Private colorRamp() As Color
-    Private colorsUsed() As Color
-    Private MatchingColorsFilename As String
+    Private pNColorRules As Integer = 0
+    Private pColorMatchingRules() As String
+    Private pColorRamp() As Color
+    Private pColorsUsed() As Color
+    Private pMatchingColorsFilename As String = ""
 
-    Public Sub InitMatchingColors(ByVal Filename As String)
-        ReDim colorsUsed(0)
+    Public Sub InitMatchingColors(ByVal aFilename As String)
+        ReDim pColorsUsed(0)
         On Error GoTo NeverMind
 
-        If FileExists(Filename) Then
-            MatchingColorsFilename = Filename
+        If FileExists(aFilename) Then
+            pMatchingColorsFilename = aFilename
         End If
 
-        Dim LineNumber As Integer
-        Dim buf, oneLine As String
-        Dim CRpos, LFpos As Integer
+        Dim lBuf, lOneLine As String
+        Dim lCRpos, lLFpos As Integer
 
-        If FileExists(MatchingColorsFilename) Then
-            nColorRules = 0
-            ReDim colorRamp(0)
-            ReDim colorMatchingRules(0)
-            buf = WholeFileString(MatchingColorsFilename)
+        If FileExists(pMatchingColorsFilename) Then
+            pNColorRules = 0
+            ReDim pColorRamp(0)
+            ReDim pColorMatchingRules(0)
+            lBuf = WholeFileString(pMatchingColorsFilename)
 
-            While Len(buf) > 0
-                CRpos = InStr(buf, vbCr)
-                LFpos = InStr(buf, vbLf)
-                oneLine = ""
-                If CRpos = 1 Or LFpos = 1 Then
-                    buf = Mid(buf, 2)
-                ElseIf CRpos = 0 And LFpos = 0 Then
-                    oneLine = buf
-                    buf = ""
-                ElseIf CRpos = 0 Then
-                    oneLine = Left(buf, LFpos - 1)
-                    buf = Mid(buf, LFpos + 1)
-                ElseIf LFpos = 0 Or CRpos < LFpos Then
-                    oneLine = Left(buf, CRpos - 1)
-                    buf = Mid(buf, CRpos + 1)
+            While Len(lBuf) > 0
+                lCRpos = InStr(lBuf, vbCr)
+                lLFpos = InStr(lBuf, vbLf)
+                lOneLine = ""
+                If lCRpos = 1 Or lLFpos = 1 Then
+                    lBuf = Mid(lBuf, 2)
+                ElseIf lCRpos = 0 And lLFpos = 0 Then
+                    lOneLine = lBuf
+                    lBuf = ""
+                ElseIf lCRpos = 0 Then
+                    lOneLine = Left(lBuf, lLFpos - 1)
+                    lBuf = Mid(lBuf, lLFpos + 1)
+                ElseIf lLFpos = 0 Or lCRpos < lLFpos Then
+                    lOneLine = Left(lBuf, lCRpos - 1)
+                    lBuf = Mid(lBuf, lCRpos + 1)
                 Else
-                    oneLine = Left(buf, LFpos - 1)
-                    buf = Mid(buf, LFpos + 1)
+                    lOneLine = Left(lBuf, lLFpos - 1)
+                    lBuf = Mid(lBuf, lLFpos + 1)
                 End If
-                oneLine = Trim(oneLine)
-                If Len(oneLine) > 0 Then
-                    nColorRules = nColorRules + 1
-                    ReDim Preserve colorRamp(nColorRules)
-                    ReDim Preserve colorMatchingRules(nColorRules)
-                    colorRamp(nColorRules) = TextOrNumericColor(StrRetRem(oneLine))
-                    colorMatchingRules(nColorRules) = oneLine
+                lOneLine = lOneLine.Trim
+                If lOneLine.Length > 0 Then
+                    pNColorRules += 1
+                    ReDim Preserve pColorRamp(pNColorRules)
+                    ReDim Preserve pColorMatchingRules(pNColorRules)
+                    pColorRamp(pNColorRules) = TextOrNumericColor(StrRetRem(lOneLine))
+                    pColorMatchingRules(pNColorRules) = lOneLine
                 End If
             End While
         End If
 NeverMind:
     End Sub
 
-    Public Function GetMatchingColor(Optional ByVal Specification As String = "") As Color
-        Dim rule, used As Integer
+    Public Function GetMatchingColor(Optional ByVal aSpecification As String = "") As Color
+        Dim lRule As Integer
+        Dim lUsed As Integer
 
-        If Len(MatchingColorsFilename) = 0 Then
+        If pMatchingColorsFilename.Length = 0 Then
             GoTo GetRandomColor
-        ElseIf Len(Specification) = 0 Then
+        ElseIf aSpecification.Length = 0 Then
             GoTo NextUnusedColor
         Else
-            For rule = 1 To nColorRules
-                If PatternMatch(LCase(Specification), LCase(colorMatchingRules(rule))) Then
-                    For used = 1 To UBound(colorsUsed)
-                        If colorsUsed(used).Equals(colorRamp(rule)) Then GoTo NextPatternMatch
+            For lRule = 1 To pNColorRules
+                If PatternMatch(LCase(aSpecification), LCase(pColorMatchingRules(lRule))) Then
+                    For lUsed = 1 To UBound(pColorsUsed)
+                        If pColorsUsed(lUsed).Equals(pColorRamp(lRule)) Then
+                            GoTo NextPatternMatch
+                        End If
                     Next
                     GoTo FoundColor
                 End If
 NextPatternMatch:
             Next
 NextUnusedColor:
-            For rule = 1 To nColorRules
-                For used = 1 To UBound(colorsUsed)
-                    If colorsUsed(used).Equals(colorRamp(rule)) Then GoTo NextRule
+            For lRule = 1 To pNColorRules
+                For lUsed = 1 To UBound(pColorsUsed)
+                    If pColorsUsed(lUsed).Equals(pColorRamp(lRule)) Then
+                        GoTo NextRule
+                    End If
                 Next
                 GoTo FoundColor
 NextRule:
@@ -96,72 +100,75 @@ NextRule:
         End If
 GetRandomColor:
         'Did not find a matching color or an unused color in the ramp - find a random one
-        GetMatchingColor = Color.FromArgb(255, 64 + Rnd() * 128, 64 + Rnd() * 128, 64 + Rnd() * 128)
+        GetMatchingColor = Color.FromArgb(255, _
+                                          64 + CInt(Rnd()) * 128, _
+                                          64 + CInt(Rnd()) * 128, _
+                                          64 + CInt(Rnd()) * 128)
         Exit Function
 
 FoundColor:
-        GetMatchingColor = colorRamp(rule)
-        ReDim Preserve colorsUsed(UBound(colorsUsed) + 1)
-        colorsUsed(UBound(colorsUsed)) = colorRamp(rule)
+        GetMatchingColor = pColorRamp(lRule)
+        ReDim Preserve pColorsUsed(UBound(pColorsUsed) + 1)
+        pColorsUsed(UBound(pColorsUsed)) = pColorRamp(lRule)
 
     End Function
 
     Private Function colorDB() As atcTable 'clsDBF
-        Static AlreadyReportedErrOpen As Boolean
-        Static openedDB As Boolean
-        Dim DBpath As String
-        'Dim ff As New ATCoCtl.ATCoFindFile
-        If Not openedDB Then
-            On Error GoTo erropen
+        Static lAlreadyReportedErrOpen As Boolean = False
+        Static lOpenedDB As Boolean = False
+        Dim lDBpath As String
 
+        If Not lOpenedDB Then
+            On Error GoTo erropen
             'ff.SetRegistryInfo("ATCoCtl", "ATCoRend", "Path")
             'ff.SetDialogProperties("Please locate 'ATCoRend.dbf'", "ATCoRend.dbf")
             'DBpath = ff.GetName
-            DBpath = FindFile("Please locate 'ATCoRend.dbf'", "ATCoRend.dbf", "dbf")
+            lDBpath = FindFile("Please locate 'ATCoRend.dbf'", "ATCoRend.dbf", "dbf")
 
-            If LCase(FileExt(DBpath)) = "mdb" Then
-                DBpath = FilenameNoExt(DBpath) & ".dbf"
+            If LCase(FileExt(lDBpath)) = "mdb" Then
+                lDBpath = FilenameNoExt(lDBpath) & ".dbf"
             End If
 
-            If FileExists(DBpath) Then
-                colorDatabase = New atcTableDBF
-                colorDatabase.OpenFile(DBpath)
-                openedDB = True
+            If FileExists(lDBpath) Then
+                pColorDatabase = New atcTableDBF
+                pColorDatabase.OpenFile(lDBpath)
+                lOpenedDB = True
             End If
         End If
 
-        colorDB = colorDatabase
-
-        Exit Function
-
+        Return pColorDatabase
 erropen:
-        If Not AlreadyReportedErrOpen Then
-            MsgBox("Error opening color database '" & DBpath & "'" & vbCr & Err.Description)
-            AlreadyReportedErrOpen = True
+        If Not lAlreadyReportedErrOpen Then
+            Logger.Msg("Error opening color database '" & lDBpath & "'" & vbCr & Err.Description)
+            lAlreadyReportedErrOpen = True
         End If
-        colorDB = Nothing
+        Return Nothing
     End Function
 
-    Public Function TextOrNumericColor(ByVal colr As String) As Color
-        Static AlreadyReportedError As Boolean = False
+    Public Function TextOrNumericColor(ByVal aColorName As String) As Color
+        Static lAlreadyReportedError As Boolean = False
 
-        Dim c As String
+        Dim lColorName As String = aColorName.Trim.ToLower
 
-        c = LCase(Trim(colr))
         TextOrNumericColor = Color.Empty
-        Dim r As String
-        If IsNumeric(c) Then
-            TextOrNumericColor = Color.FromArgb(CInt(c))
+
+        If IsNumeric(lColorName) Then
+            Return Color.FromArgb(CInt(lColorName))
         Else
-            If Left(c, grayNameNumStart - 1) = LCase(grayBasename) Then
-                r = Mid(colr, grayNameNumStart)
-                If IsNumeric(r) Then TextOrNumericColor = Color.FromArgb(255, CInt(r), CInt(r), CInt(r))
+            If Left(lColorName, pGrayNameNumStart - 1) = LCase(pGrayBasename) Then
+                Dim lGrayId As String = Mid(aColorName, pGrayNameNumStart)
+                If IsNumeric(lGrayId) Then
+                    Return (Color.FromArgb(255, _
+                                          CInt(lGrayId), _
+                                          CInt(lGrayId), _
+                                          CInt(lGrayId)))
+                End If
             End If
             If TextOrNumericColor.Equals(Color.Empty) Then
-                Dim db As atcTable = colorDB()
-                If Not db Is Nothing Then
-                    If db.FindFirst(1, c) Then
-                        TextOrNumericColor = ColorTranslator.FromOle(CInt(db.Value(2)))
+                Dim lDb As atcTable = colorDB()
+                If Not lDb Is Nothing Then
+                    If lDb.FindFirst(1, lColorName) Then
+                        TextOrNumericColor = ColorTranslator.FromOle(CInt(lDb.Value(2)))
                     Else
                         TextOrNumericColor = Color.Gray
                     End If
@@ -170,80 +177,68 @@ erropen:
         End If
         Exit Function
 erropen:
-        If Not AlreadyReportedError Then
-            MsgBox("Error opening color table" & vbCr & Err.Description)
-            AlreadyReportedError = True
+        If Not lAlreadyReportedError Then
+            Logger.Msg("Error opening color table" & vbCr & Err.Description)
+            lAlreadyReportedError = True
         End If
     End Function
 
     Public Function colorName(ByVal aColor As Color) As String
-        Static HadErrOpen As Boolean = False
-        Dim iColor As Integer
+        Static lHadErrOpen As Boolean = False
 
-        Dim retval As String
-        Dim g, r, b As Integer
-
-        retval = aColor.Name
-
-        r = aColor.R
-        g = aColor.G
-        b = aColor.B
+        Dim lRetval As String = aColor.Name
+        Dim lR As Integer = aColor.R
+        Dim lG As Integer = aColor.G
+        Dim lB As Integer = aColor.B
 
         'If it is not black or white, check for gray
-        If Not aColor.Equals(Color.White) AndAlso Not aColor.Equals(Color.Black) Then
-            If r = g AndAlso g = b Then
-                colorName = grayBasename & r
-                Exit Function
+        If Not aColor.Equals(Color.White) AndAlso _
+           Not aColor.Equals(Color.Black) Then
+            If lr = lg AndAlso lg = lb Then
+                Return pGrayBasename & lr
             End If
         End If
 
-        Dim db As atcTable = colorDB()
-        If db Is Nothing Then GoTo SetHexValue
+        Dim ldb As atcTable = colorDB()
+        If ldb Is Nothing Then GoTo SetHexValue
 
-        Dim b1, r1, g1 As Integer
-        Dim colorRaw As String
-        Dim thisColor As Color
-        Dim thisDist, minDist As Single
-        Dim minDistName As String = ""
-        If db.FindFirst(2, ColorTranslator.ToOle(aColor)) Then
-            retval = db.Value(1)
+        If ldb.FindFirst(2, ColorTranslator.ToOle(aColor).ToString) Then
+            lRetval = ldb.Value(1)
         Else
             'If rgb_Renamed = rgb_Renamed And &HFFFFFF Then
-            If forceKnownColor Then 'Search for closest color in database
-                minDist = 255 ^ 2 * 3
-                For iColor = 1 To db.NumRecords
-                    db.CurrentRecord = iColor
-                    colorRaw = db.Value(2)
-                    If IsNumeric(colorRaw) Then
-                        thisColor = ColorTranslator.FromOle(CInt(colorRaw))
-                        r1 = thisColor.R
-                        g1 = thisColor.G
-                        b1 = thisColor.B
-                        thisDist = (r - r1) ^ 2 + (b - b1) ^ 2 + (g - g1) ^ 2
-                        If thisDist < minDist Then
-                            minDist = thisDist
-                            minDistName = db.Value(1)
+            If pForceKnownColor Then 'Search for closest color in database
+                Dim lminDistName As String = ""
+                Dim lminDist As Double = 255 ^ 2 * 3
+                For iColor As Integer = 1 To ldb.NumRecords
+                    ldb.CurrentRecord = iColor
+                    Dim lcolorRaw As String = ldb.Value(2)
+                    If IsNumeric(lcolorRaw) Then
+                        Dim lThisColor As Color = ColorTranslator.FromOle(CInt(lcolorRaw))
+                        Dim lR1 As Integer = lThisColor.R
+                        Dim lG1 As Integer = lThisColor.G
+                        Dim lB1 As Integer = lThisColor.B
+                        Dim lThisDist As Double = (lr - lR1) ^ 2 + _
+                                                  (lb - lB1) ^ 2 + _
+                                                  (lg - lG1) ^ 2
+                        If lThisDist < lminDist Then
+                            lminDist = lThisDist
+                            lminDistName = ldb.Value(1)
                         End If
                     End If
                 Next
-                retval = minDistName
+                Return lminDistName
             Else
                 GoTo SetHexValue
             End If
-            'Else 'try again with 24-bit value
-            'retval = colorName(rgb_Renamed And &HFFFFFF)
-            'End If
         End If
-        colorName = retval
-        Exit Function
+        Return lRetval
 erropen:
-        If Not HadErrOpen Then MsgBox("Error opening color table." & vbCr & "Using hex values instead of color names." & vbCr & Err.Description)
-        HadErrOpen = True
-        GoTo SetHexValue
+        If Not lHadErrOpen Then
+            Logger.Msg("Error opening color table." & vbCr & "Using hex values instead of color names." & vbCr & Err.Description)
+        End If
+        lHadErrOpen = True
 SetHexValue:
-        retval = Hex(aColor.ToArgb)
-        If Len(retval) < 8 Then retval = New String("0", 8 - Len(retval)) & retval
-        colorName = "&H" & retval
+        Return "&H" & Hex(aColor.ToArgb).PadLeft(8, CChar("0"))
     End Function
 
     'For testing color database or cycling through available named colors

@@ -61,7 +61,7 @@ Module Vb2F90
         (ByRef aWdmUnit As Integer, ByRef aDsnOld As Integer, _
          ByRef aDsnNew As Integer, ByRef aRetcod As Integer)
     Declare Sub F90_WDBSGC_XX Lib "hass_ent.dll" _
-        (ByRef l As Integer, ByRef l As Integer, _
+        (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
          ByRef aSaInd As Integer, ByRef aSaLen As Integer, _
          ByRef aISaVal As Integer)
     Declare Sub F90_WDLBAD Lib "hass_ent.dll" _
@@ -100,7 +100,7 @@ Module Vb2F90
                           ByRef aSaVal As String)
         Dim lVal(48) As Integer
 
-        F90_WDBSGC_XX(aWdmUnit, aWdmUnit, aSaInd, aSaLen, lVal(0))
+        F90_WDBSGC_XX(aWdmUnit, aDsn, aSaInd, aSaLen, lVal(0))
         NumChr(aSaLen, lVal, aSaVal)
         aSaVal = aSaVal.Trim
     End Sub

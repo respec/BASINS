@@ -45,14 +45,14 @@ Public Module modFile
         End If
     End Sub
 
-    Public Function ChDriveDir(ByVal newPath As String) As Boolean
+    Public Function ChDriveDir(ByVal aPath As String) As Boolean
         ' ##SUMMARY Changes directory and, if necessary, drive. Returns True if successful.
-        ' ##PARAM newPath I New pathname.
+        ' ##PARAM aPath I New pathname.
         ' ##RETURNS True if directory change is successful.
         Try
-            If FileExists(newPath, True, False) Then
-                If Mid(newPath, 2, 1) = ":" Then ChDrive(newPath)
-                ChDir(newPath)
+            If FileExists(aPath, True, False) Then
+                If Mid(aPath, 2, 1) = ":" Then ChDrive(aPath)
+                ChDir(aPath)
                 Return True
             Else
                 Return False
@@ -62,93 +62,96 @@ Public Module modFile
         End Try
     End Function
 
-    Public Function SafeFilename(ByVal S As String, Optional ByVal ReplaceWith As String = "_") As String
+    Public Function SafeFilename(ByVal aStr As String, _
+                                 Optional ByVal aReplaceWith As String = "_") As String
         ' ##SUMMARY Converts, if necessary, non-printable characters in filename to printable alternative.
-        ' ##PARAM S I Filename to be converted, if necessary.
-        ' ##PARAM ReplaceWith I Character to replace non-printable characters in S (default="_").
+        ' ##PARAM aStr I Filename to be converted, if necessary.
+        ' ##PARAM aReplaceWith I Character to replace non-printable characters in S (default="_").
         ' ##RETURNS Input parameter S with non-printable characters replaced with specific printable character (default="_").
-        Dim retval As String = "" 'return string
-        Dim i As Short 'loop counter
-        Dim strLen As Short 'length of string
-        Dim ch As String 'individual character in filename
+        Dim lRetval As String = "" 'return string
+        Dim lChr As String 'individual character in filename
 
-        strLen = Len(S)
-        For i = 1 To strLen
-            ch = Mid(S, i, 1)
-            Select Case Asc(ch)
+        For i As Integer = 1 To aStr.Length
+            lChr = Mid(aStr, i, 1)
+            Select Case Asc(lChr)
                 Case 0 : GoTo EndFound
-                Case Is < 32, 34, 42, 47, 58, 60, 62, 63, 92, 124, Is > 126 : retval &= ReplaceWith
-                Case Else : retval &= ch
+                Case Is < 32, 34, 42, 47, 58, 60, 62, 63, 92, 124, Is > 126 : lRetval &= aReplaceWith
+                Case Else : lRetval &= lChr
             End Select
         Next
 EndFound:
-        Return retval
+        Return lRetval
     End Function
 
-    Public Function FilenameOnly(ByVal istr As String) As String
+    Public Function FilenameOnly(ByVal aStr As String) As String
         ' ##SUMMARY Converts full path, filename, and extension to filename only.
         ' ##SUMMARY   Example: FilenameOnly("C:\foo\bar.txt") = "bar"
-        ' ##PARAM istr I Filename with path and extension.
+        ' ##PARAM aStr I Filename with path and extension.
         ' ##RETURNS Filename without directory path or extension.
-        Return System.IO.Path.GetFileNameWithoutExtension(istr)
+        Return System.IO.Path.GetFileNameWithoutExtension(aStr)
     End Function
 
-    Public Function FilenameNoPath(ByVal istr As String) As String
+    Public Function FilenameNoPath(ByVal aStr As String) As String
         ' ##SUMMARY Converts full path, filename, and extension to only filename with extension.
         ' ##SUMMARY   Example: FilenameNoPath ("C:\foo\bar.txt") = "bar.txt"
-        ' ##PARAM istr I Filename with path and extension.
+        ' ##PARAM aStr I Filename with path and extension.
         ' ##RETURNS Filename and extension without directory path.
-        Return System.IO.Path.GetFileName(istr)
+        Return System.IO.Path.GetFileName(aStr)
     End Function
 
-    Public Function FileExt(ByVal istr As String) As String
+    Public Function FileExt(ByVal aStr As String) As String
         ' ##SUMMARY Reduces full path, filename, and extension to only extension.
         ' ##SUMMARY   Example: FileExt ("C:\foo\bar.txt") = "txt"
-        ' ##PARAM istr I Filename with path and extension.
+        ' ##PARAM aStr I Filename with path and extension.
         ' ##RETURNS Extension without path or filename.
-        Return Mid(System.IO.Path.GetExtension(istr), 2)
+        Return Mid(System.IO.Path.GetExtension(aStr), 2)
     End Function
 
-    Public Function FilenameSetExt(ByVal istr As String, ByVal newExt As String) As String
+    Public Function FilenameSetExt(ByVal aStr As String, ByVal aExt As String) As String
         ' ##SUMMARY Converts extension of filename from existing to specified.
         ' ##SUMMARY   Example: FilenameSetExt ("C:\foo\bar.txt", "png") = "C:\foo\bar.png"
         ' ##SUMMARY   Example: FilenameSetExt ("C:\foo\bardtxt", "png") = "C:\foo\bardtxt.png"
-        ' ##PARAM istr I Filename with path and extension.
-        ' ##PARAM newExt I Extension to be added or to replace current extension.
+        ' ##PARAM astr I Filename with path and extension.
+        ' ##PARAM aExt I Extension to be added or to replace current extension.
         ' ##RETURNS Filename with new extension.
-        Return System.IO.Path.ChangeExtension(istr, newExt)
+        Return System.IO.Path.ChangeExtension(aStr, aExt)
     End Function
 
-    Public Function AbsolutePath(ByVal filename As String, ByVal StartPath As String) As String
+    Public Function AbsolutePath(ByVal aFileName As String, ByVal aStartPath As String) As String
         ' ##SUMMARY Converts an relative pathname to an absolute path given the starting directory.
         ' ##SUMMARY   Example: AbsolutePath("..\Data\DataFile.wdm", "C:\BASINS\models") = "C:\BASINS\Data\DataFile.wdm"
-        ' ##PARAM Filename I Relative file path and name.
-        ' ##PARAM StartPath I Absolute starting directory from which relative path is traced.
+        ' ##PARAM aFileName I Relative file path and name.
+        ' ##PARAM aStartPath I Absolute starting directory from which relative path is traced.
         ' ##RETURNS Absolute path and filename.
         ' ##LOCAL slashposFilename - position of slash in filename.
         ' ##LOCAL slashposPath - position of slash in pathname.
-        Dim slashposFilename As Integer
-        Dim slashposPath As Integer
 
-        If Mid(filename, 2, 1) = ":" Then 'Already have a path that starts with a drive letter
-            Return filename
+        If Mid(aFileName, 2, 1) = ":" Then 'Already have a path that starts with a drive letter
+            Return aFileName
         End If
 
-        If Right(StartPath, 1) = "\" Then StartPath = Left(StartPath, Len(StartPath) - 1)
+        If Right(aStartPath, 1) = "\" Then
+            aStartPath = Left(aStartPath, Len(aStartPath) - 1)
+        End If
 
-        If UCase(Left(filename, 2)) <> UCase(Left(StartPath, 2)) Then filename = StartPath & "\" & filename
+        Dim lSlashposFilename As Integer
+        Dim lSlashposPath As Integer
 
-        slashposFilename = InStr(filename, "\..\")
-        While slashposFilename > 0
-            slashposPath = InStrRev(filename, "\", slashposFilename - 1)
-            If slashposPath = 0 Then
-                slashposFilename = 0
+        If UCase(Left(aFileName, 2)) <> UCase(Left(aStartPath, 2)) Then
+            aFileName = aStartPath & "\" & aFileName
+        End If
+
+        lSlashposFilename = InStr(aFileName, "\..\")
+        While lSlashposFilename > 0
+            lSlashposPath = InStrRev(aFileName, "\", lSlashposFilename - 1)
+            If lSlashposPath = 0 Then
+                lSlashposFilename = 0
             Else
-                filename = Left(filename, slashposPath) & Mid(filename, slashposFilename + 4)
-                slashposFilename = InStr(filename, "\..\")
+                aFileName = Left(aFileName, lSlashposPath) & Mid(aFileName, lSlashposFilename + 4)
+                lSlashposFilename = InStr(aFileName, "\..\")
             End If
         End While
-        Return filename
+        Return aFileName
     End Function
 
     Public Function RelativeFilename(ByVal filename As String, ByVal StartPath As String) As String
@@ -228,7 +231,11 @@ FoundSameUntil:
         Return filename
     End Function
 
-    Public Sub AddFilesInDir(ByRef aFilenames As NameValueCollection, ByVal aDirName As String, ByVal aSubdirs As Boolean, Optional ByVal aFileFilter As String = "*", Optional ByVal aAttributes As Integer = 0)
+    Public Sub AddFilesInDir(ByRef aFilenames As NameValueCollection, _
+                             ByVal aDirName As String, _
+                             ByVal aSubdirs As Boolean, _
+                             Optional ByVal aFileFilter As String = "*", _
+                             Optional ByVal aAttributes As Integer = 0)
         Dim dirsThisDir As NameValueCollection
         Dim fName As String
         Dim vName As Object
