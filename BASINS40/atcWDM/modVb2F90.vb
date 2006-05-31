@@ -102,6 +102,7 @@ Module Vb2F90
 
         F90_WDBSGC_XX(aWdmUnit, aWdmUnit, aSaInd, aSaLen, lVal(0))
         NumChr(aSaLen, lVal, aSaVal)
+        aSaVal = aSaVal.Trim
     End Sub
 
     Private Sub NumChr(ByRef aLen As Integer, ByRef aIntStr() As Integer, ByRef aStr As String)
