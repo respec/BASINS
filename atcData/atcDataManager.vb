@@ -116,6 +116,7 @@ Public Class atcDataManager
 
         Try
             If aNewSource.Open(aSpecification, aAttributes) Then
+                Logger.Dbg("OpenDataSource:Count:" & aNewSource.DataSets.Count & ":" & aSpecification)
                 pDataSources.Add(aNewSource)
                 RaiseEvent OpenedData(aNewSource)
                 pMapWin.Project.Modified = True

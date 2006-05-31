@@ -4,10 +4,8 @@ Option Explicit On
 Imports System.DateTime
 
 Public Module modDate
-    '##MODULE_REMARKS Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
+    '##MODULE_REMARKS Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license
     '##MODULE_DESCRIPTION General date utility subroutines and functions
-
     '##GLOBAL atcTimeUnit - standard timeseries time units
     Public Enum atcTimeUnit
         TUSecond = 1
@@ -49,96 +47,38 @@ Public Module modDate
 
     Public ReadOnly MonthName3 As String() = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 
-    Public Function VBdate2MJD(ByVal d As Date) As Double
+    Public Function VBdate2MJD(ByVal aDate As Date) As Double
         '##SUMMARY VBdate2MJD - convert a VB date to a modfied Julian date(MJD), _
         'VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858
-        '##PARAM d - VBdate to convert
-        VBdate2MJD = d.ToOADate + JulianModification1899 - JulianModification
+        '##PARAM aDate - VBdate to convert
+        VBdate2MJD = aDate.ToOADate + JulianModification1899 - JulianModification
     End Function
 
-    Public Function MJD2VBdate(ByVal j As Double) As Date
+    Public Function MJD2VBdate(ByVal aJDate As Double) As Date
         '##SUMMARY MJD2VBdate - convert a modified Julian date(MJD) to a VB date
-        '##PARM j - MJD to convert
-        MJD2VBdate = FromOADate(j + JulianModification - JulianModification1899)
+        '##PARM aJDate - MJD to convert
+        MJD2VBdate = FromOADate(aJDate + JulianModification - JulianModification1899)
     End Function
 
-    'Replace calls to ATCformat with DoubleToString, StrPad, and regular VB Format
-    ''Decimal-aligns numbers by padding before and/or after number with spaces
-    ''Corrects VB's Format bug by always padding return value to length of formatString
-    ''If val is numeric and formatString looks like a date format,
-    '' val is assumed to be a modified julian date and is converted to a VB date then formatted
-    ''If the first character of formatString is L, the result is left aligned unless there is a decimal to align
-    ''Such an initial L is not counted toward the length of the format string
-    'Public Function ATCformat(ByVal aString As String, ByVal aFormat As String) As String
-    '  Dim retval As String
-    '  Dim LeftAlign As Boolean
-    '  Dim LenFormat As Integer
-    '  Dim NumericVal As Boolean
-    '  Dim DecimalFormatPos As Integer
-    '  Dim DecimalRetvalPos As Integer
-
-    '  If UCase(Left(aFormat, 1)) = "L" Then
-    '    LeftAlign = True
-    '    aFormat = Mid(aFormat, 2)
-    '  End If
-    '  LenFormat = Len(aFormat)
-    '  NumericVal = IsNumeric(aString)
-    '  If Len(Trim(aFormat)) = 0 Then
-    '    retval = aString
-    '  ElseIf NumericVal Then
-    '    Dim lDoubleVal As Double = CDbl(aString)
-    '    If aFormat.IndexOfAny("ymdhs") >= 0 Then
-    '      retval = CStr(MJD2VBdate(lDoubleVal))
-    '    Else
-    '      retval = Format(lDoubleVal, aFormat)
-    '    End If
-    '  Else
-    '    retval = Format(aString, Trim(aFormat))
-    '  End If
-    '  If Len(retval) < LenFormat Then
-    '    If NumericVal Then
-    '      DecimalFormatPos = InStr(aFormat, ".")
-    '    End If
-    '    If DecimalFormatPos > 0 Then
-    '      DecimalRetvalPos = InStr(retval, ".")
-    '      If DecimalRetvalPos > 0 And DecimalRetvalPos < DecimalFormatPos Then
-    '        retval = Space(DecimalFormatPos - DecimalRetvalPos) & retval
-    '      End If
-    '      If LenFormat > Len(retval) Then
-    '        retval = retval & Space(LenFormat - Len(retval))
-    '      End If
-    '    Else
-    '      If LenFormat > Len(retval) Then
-    '        If LeftAlign Then
-    '          retval = retval & Space(LenFormat - Len(retval))
-    '        Else
-    '          retval = Space(LenFormat - Len(retval)) & retval
-    '        End If
-    '      End If
-    '    End If
-    '  End If
-    '  ATCformat = retval
-    'End Function
-
-    Public Function Date2J(ByVal d() As Integer) As Double
+    Public Function Date2J(ByVal aDate() As Integer) As Double
         '##SUMMARY Date2J - convert a date arry to a modfied Julian date (MJD)
-        '##PARM d - date array to convert
-        Dim jd As Integer
-        Dim jhms As Double
-        '##LOCAL jd - date (year, month, day) portion of MJD
-        '##LOCAL hhms - time (hour, minute, second) portion of MJD
+        '##PARM aDate - date array to convert
+        Dim lJd As Integer
+        Dim lHms As Double
+        '##LOCAL lJd - date (year, month, day) portion of MJD
+        '##LOCAL lHms - time (hour, minute, second) portion of MJD
 
-        jd = MJD(d(0), d(1), d(2))
-        jhms = HMS2J(d(3), d(4), d(5))
-        Date2J = jd + jhms
+        lJd = MJD(aDate(0), aDate(1), aDate(2))
+        lHms = HMS2J(aDate(3), aDate(4), aDate(5))
+        Date2J = lJd + lHms
     End Function
 
-    Function HMS2J(ByVal h As Integer, ByVal m As Integer, ByVal s As Integer) As Double
+    Function HMS2J(ByVal aHr As Integer, ByVal aMi As Integer, ByVal aSc As Integer) As Double
         '##SUMMARY HMS2J - convert an hour, minute, and second to a modifed Julian date (MJD)
-        '##PARM h - hour to convert
-        '##PARM m - minute to convert
-        '##PARM s - second to convert
-        HMS2J = CDbl(h / 24) + CDbl(m / 1440) + CDbl(s / 86400)
+        '##PARM aHr - hour to convert
+        '##PARM aMn - minute to convert
+        '##PARM aSc - second to convert
+        HMS2J = CDbl(aHr / 24) + CDbl(aMi / 1440) + CDbl(aSc / 86400)
     End Function
 
     Sub J2DateRoundup(ByVal aJDate As Double, ByVal aTU As Integer, ByVal aDate() As Integer)
@@ -152,52 +92,53 @@ Public Module modDate
         End If
     End Sub
 
-    Sub J2Date(ByVal j As Double, ByRef d() As Integer)
+    Sub J2Date(ByVal aJd As Double, ByRef aDate() As Integer)
         '##SUMMARY J2Date - convert a modified Julian date (MJD) to a long array
-        '##PARM j - modfied Julian date to convert
+        '##PARM aJd - modfied Julian date to convert
         '##PARM d - array containing output year , month, day, hour, minute, second
-        Dim jd As Integer
-        Dim jhms, f As Double
-        '##LOCAL jd - date portion of date to convert
-        '##LOCAL jhms - time portion of date to convert
+        Dim lJd As Integer
+        Dim lJhms, lFrac As Double
+        '##LOCAL lJd - date portion of date to convert
+        '##LOCAL lJhms - time portion of date to convert
         '##LOCAL f - fraction of a second resulting from conversion
         Try
-            jd = Fix(j)
+            lJd = Fix(aJd)
         Catch 'TODO: what should this be, probable cause is NaN (which does not convert to integer)
-            jd = 0
+            lJd = 0
         End Try
 
-        Call INVMJD(jd, d(0), d(1), d(2))
-        jhms = j - jd
-        Call J2HMS(jhms, d(3), d(4), d(5), f)
+        Call INVMJD(lJd, aDate(0), aDate(1), aDate(2))
+        lJhms = aJd - lJd
+        Call J2HMS(lJhms, aDate(3), aDate(4), aDate(5), lFrac)
     End Sub
 
-    Sub J2HMS(ByVal j As Double, ByRef h As Integer, ByRef m As Integer, ByRef s As Integer, ByRef f As Double)
+    Sub J2HMS(ByVal aJd As Double, ByRef aHr As Integer, ByRef aMi As Integer, ByRef aSc As Integer, ByRef aFrac As Double)
         '##SUMMARY J2HMS - convert a time portion of a modfied Julian date to its component parts
-        '##Parm j - MJD to convert
-        '##PARM h - hour portion of MJD
-        '##PARM m - minute portion of MJD
-        '##PARM s - second portion of MJD
-        '##PARM f - fraction of a second
-        Dim t As Double
+        '##Parm aJd - MJD to convert
+        '##PARM aHr - hour portion of MJD
+        '##PARM aMi - minute portion of MJD
+        '##PARM aSc - second portion of MJD
+        '##PARM aFrac - fraction of a second
+        Dim lRem As Double
         '##LOCAL t - intermediate result, units change from hours to seconds
-        t = 0.0000004 + ((j Mod 1) * 24)
-        h = Fix(t)
-        t = (t - h) * 60
-        m = Fix(t)
-        t = (t - m) * 60
-        s = Fix(t)
-        f = t - s
+        lRem = 0.0000004 + ((aJd Mod 1) * 24)
+        aHr = Fix(lRem)
+        lRem = (lRem - aHr) * 60
+        aMi = Fix(lRem)
+        lRem = (lRem - aMi) * 60
+        aSc = Fix(lRem)
+        aFrac = lRem - aSc
     End Sub
 
-    Sub INVMJD(ByVal MJD As Integer, ByRef yr As Integer, ByRef mn As Integer, ByRef dy As Integer)
+    Sub INVMJD(ByVal aMJD As Integer, ByRef aYr As Integer, ByRef aMn As Integer, ByRef aDy As Integer)
         '##SUMMARY INVMJD - invert modified Julian date as computed by function MJD (from DelbertDFranz) _
         'Developed from information given in: "Astronomical Formulae _
         'for Calculators', Jean Meeus, published by Willmann-Bell.
-        '##PARM MJD - value of modified julian date date number to invert
-        '##PARM yr - calendar year
-        '##PARM mn - number of month(1-12)
-        '##PARM dy - day in the month
+        '##PARM aMJD - value of modified julian date date number to invert
+        '##PARM aYr - calendar year
+        '##PARM aMn - number of month(1-12)
+        '##PARM aDy - day in the month
+
         Dim e, c, ALPHA, a, b, d, Z As Integer
         '##LOCAL a - intermediate result
         '##LOCAL ALPHA - intermediate result
@@ -208,7 +149,7 @@ Public Module modDate
         '##LOCAL Z - intermediate result
 
         'convert to Julian time plus the .5 day correction. yields an integer
-        Z = MJD + JulianModification + 1720994 + 1
+        Z = aMJD + JulianModification + 1720994 + 1
 
         If (Z < 2299161) Then
             a = Z
@@ -222,20 +163,20 @@ Public Module modDate
         d = CInt(Fix(CDbl(365.25) * CDbl(c)))
         e = CInt(Fix(CDbl(b - d) / 30.6001))
 
-        dy = b - d - Fix(30.6001 * CDbl(e))
+        aDy = b - d - Fix(30.6001 * CDbl(e))
         If (e <= 13) Then
-            mn = e - 1
+            aMn = e - 1
         Else
-            mn = e - 13
+            aMn = e - 13
         End If
-        If (mn >= 3) Then
-            yr = c - 4716
+        If (aMn >= 3) Then
+            aYr = c - 4716
         Else
-            yr = c - 4715
+            aYr = c - 4715
         End If
     End Sub
 
-    Function MJD(ByVal yr As Integer, ByVal mn As Integer, ByVal dy As Integer) As Integer
+    Function MJD(ByVal aYr As Integer, ByVal aMn As Integer, ByVal aDy As Integer) As Integer
         '##SUMMARY MJD - 'Compute modified julian date for any date _
         'with a year greater than 1582 (from DelbertDFranz) _
         'We take the resulting date to represent the elapsed time from _
@@ -247,56 +188,60 @@ Public Module modDate
         'from 1860 through the year 25000. _
         'Developed from information given in: "Astronomical Formulae _
         'for Calculators', Jean Meeus, published by Willmann-Bell.
-        '##PARM yr - calendar year
-        '##PARM mn - number of month(1-12)
-        '##PARM dy - day in the month
+        '##PARM aYr - calendar year
+        '##PARM aMn - number of month(1-12)
+        '##PARM aDy - day in the month
+
         Dim m, a, b, y As Integer
         '##LOCAL a - intermediate result
         '##LOCAL b - intermediate result
         '##LOCAL m - intermediate result
         '##LOCAL y - intermediate result
 
-        If (mn > 2) Then
-            y = yr
-            m = mn
+        If (aMn > 2) Then
+            y = aYr
+            m = aMn
         Else
-            y = yr - 1
-            m = mn + 12
+            y = aYr - 1
+            m = aMn + 12
         End If
 
         a = Int(y / 100)
         b = 2 - a + Int(a / 4)
 
-        MJD = Int((36525 * y) / 100) + Int(30.6001 * (m + 1)) + dy + b - JulianModification
+        MJD = Int((36525 * y) / 100) + _
+              Int(30.6001 * (m + 1)) + _
+              aDy + b - JulianModification
     End Function
 
-    Function Jday(ByVal yr As Integer, ByVal mo As Integer, ByVal dy As Integer, ByVal hr As Integer, ByVal mn As Integer, ByVal sc As Integer) As Double
+    Function Jday(ByVal aYr As Integer, ByVal aMn As Integer, ByVal aDy As Integer, _
+                  ByVal aHr As Integer, ByVal aMi As Integer, ByVal aSc As Integer) As Double
         'SUMMARY jday - convert portions of date to a modfied Julian date (MJD)
-        '##PARM yr - calendar year
-        '##PARM mn - number of month(1-12)
-        '##PARM dy - day in the month
-        '##PARM hr - hour of day
-        '##PARM mn - minute of day
-        '##PARM sc - second of day
+        '##PARM aYr - calendar year
+        '##PARM aMn - number of month(1-12)
+        '##PARM aDy - day in the month
+        '##PARM aHr - hour of day
+        '##PARM aMi - minute of day
+        '##PARM aSc - second of day
         Dim d(5) As Integer
         'LOCAL d - date array
-        d(0) = yr
-        d(1) = mo
-        d(2) = dy
-        d(3) = hr
-        d(4) = mn
-        d(5) = sc
+        d(0) = aYr
+        d(1) = aMn
+        d(2) = aDy
+        d(3) = aHr
+        d(4) = aMi
+        d(5) = aSc
         Jday = Date2J(d)
     End Function
 
-    Function JDateIntrvl(ByVal j As Double) As Integer
+    Function JDateIntrvl(ByVal aJd As Double) As Integer
         '##SUMMARY JDateIntrvl - determines the date interval (6-second thru 1-year) of _
         'a modfied Julian date
-        '##PARM j - MJD to determine interval of
-        Dim d(5) As Integer
+        '##PARM aJd - MJD to determine interval of
+        Dim lDate(5) As Integer
         'LOCAL d - date array
-        Call J2Date(j, d)
-        JDateIntrvl = DateIntrvl(d)
+        Call J2Date(aJd, lDate)
+        JDateIntrvl = DateIntrvl(lDate)
     End Function
 
     Function DateIntrvl(ByVal d() As Integer) As Integer
@@ -879,7 +824,7 @@ Public Module modDate
         DATE2(5) = TSC
     End Sub
 
-    Public Sub timdif(ByVal DATE1() As Integer, ByVal DATE2() As Integer, _
+    Public Sub TimDif(ByVal DATE1() As Integer, ByVal DATE2() As Integer, _
                       ByVal TCODE As Integer, ByVal TSTEP As Integer, _
                       ByRef NVALS As Integer)
 

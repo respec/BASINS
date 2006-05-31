@@ -103,62 +103,84 @@ Public Class atcDateFormat
     End Property
 
     Public Function JDateToString(ByVal aJulianDate As Double) As String
-        Dim retval As String = ""
-        Dim curDate(5) As Integer
+        Dim lRetval As String = ""
+        Dim lCurDate(5) As Integer
 
-        J2Date(aJulianDate, curDate)
-        If curDate(3) = 24 Then
-            J2Date(aJulianDate + JulianHour, curDate)
-            curDate(3) = 0
+        J2Date(aJulianDate, lCurDate)
+        If lCurDate(3) = 24 Then
+            J2Date(aJulianDate + JulianHour, lCurDate)
+            lCurDate(3) = 0
         End If
 
-        If pMidnight24 Then timcnv(curDate) 'convert to 24th hour previous day
+        If pMidnight24 Then 'convert to 24th hour previous day
+            timcnv(lCurDate)
+        End If
 
         Select Case pDateOrder
             Case DateOrderEnum.YearMonthDay
                 If pIncludeYears Then
-                    retval = YearString(curDate)
+                    lRetval = YearString(lCurDate)
                 End If
                 If pIncludeMonths Then
-                    If pIncludeYears Then retval &= pDateSeparator
-                    retval &= MonthString(curDate)
+                    If pIncludeYears Then
+                        lRetval &= pDateSeparator
+                    End If
+                    lRetval &= MonthString(lCurDate)
                 End If
                 If pIncludeDays Then
-                    If pIncludeYears OrElse pIncludeMonths Then retval &= pDateSeparator
-                    retval &= Format(curDate(2), "00")
+                    If pIncludeYears OrElse pIncludeMonths Then
+                        lRetval &= pDateSeparator
+                    End If
+                    lRetval &= Format(lCurDate(2), "00")
                 End If
             Case DateOrderEnum.MonthDayYear
                 If pIncludeMonths Then
-                    retval &= MonthString(curDate)
+                    lRetval &= MonthString(lCurDate)
                 End If
                 If pIncludeDays Then
-                    If pIncludeMonths Then retval &= pDateSeparator
-                    retval &= Format(curDate(2), "00")
+                    If pIncludeMonths Then
+                        lRetval &= pDateSeparator
+                    End If
+                    lRetval &= Format(lCurDate(2), "00")
                 End If
                 If pIncludeYears Then
-                    If pIncludeDays OrElse pIncludeMonths Then retval &= pDateSeparator
-                    retval &= YearString(curDate)
+                    If pIncludeDays OrElse pIncludeMonths Then
+                        lRetval &= pDateSeparator
+                    End If
+                    lRetval &= YearString(lCurDate)
                 End If
             Case DateOrderEnum.DayMonthYear
                 If pIncludeDays Then
-                    retval &= Format(curDate(2), "00")
+                    lRetval &= Format(lCurDate(2), "00")
                 End If
                 If pIncludeMonths Then
-                    If pIncludeDays Then retval &= pDateSeparator
-                    retval &= MonthString(curDate)
+                    If pIncludeDays Then
+                        lRetval &= pDateSeparator
+                    End If
+                    lRetval &= MonthString(lCurDate)
                 End If
                 If pIncludeYears Then
-                    If pIncludeDays OrElse pIncludeMonths Then retval &= pDateSeparator
-                    retval &= YearString(curDate)
+                    If pIncludeDays OrElse pIncludeMonths Then
+                        lRetval &= pDateSeparator
+                    End If
+                    lRetval &= YearString(lCurDate)
                 End If
             Case DateOrderEnum.JulianDate
-                retval = StrPad(DoubleToString(aJulianDate, 9, "00,000.000", , , 8), 10)
+                lRetval = StrPad(DoubleToString(aJulianDate, 9, "00,000.000", , , 8), 10)
         End Select
-        If pIncludeHours OrElse pIncludeMinutes OrElse pIncludeSeconds Then retval &= " "
-        If pIncludeHours Then retval &= Format(curDate(3), "00")
-        If pIncludeMinutes Then retval &= pTimeSeparator & Format(curDate(4), "00")
-        If pIncludeSeconds Then retval &= pTimeSeparator & Format(curDate(5), "00")
-        Return retval
+        If pIncludeHours OrElse pIncludeMinutes OrElse pIncludeSeconds Then
+            lRetval &= " "
+        End If
+        If pIncludeHours Then
+            lRetval &= Format(lCurDate(3), "00")
+        End If
+        If pIncludeMinutes Then
+            lRetval &= pTimeSeparator & Format(lCurDate(4), "00")
+        End If
+        If pIncludeSeconds Then
+            lRetval &= pTimeSeparator & Format(lCurDate(5), "00")
+        End If
+        Return lRetval
     End Function
 
     Private Function YearString(ByVal aDate() As Integer) As String
