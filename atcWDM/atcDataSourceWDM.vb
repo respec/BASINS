@@ -349,96 +349,96 @@ Public Class atcDataSourceWDM
         'End If
     End Function
 
-    Private Function DsnBld(ByVal aFileUnit As Integer, ByRef t As atcTimeseries) As Boolean
-        Dim dsn, nsasp, nup, ndn, nsa, ndp, i As Integer
-        Dim salen, psa, iVal, saind, retcod As Integer
-        Dim rVal As Single
-        Dim ostr As String
-        Dim CSDat(6) As Integer
-        Dim lS As String
+    Private Function DsnBld(ByVal aFileUnit As Integer, ByRef aTs As atcTimeseries) As Boolean
+        Dim lDsn, lNSasp, lNUp, lNDn, lNSa, lNDp As Integer
+        Dim lDecade As Integer
+        Dim lSaLen, lPsa, lIVal, lSaInd, lRetcod As Integer
+        Dim lRVal As Single
+        Dim lCSDat(6) As Integer
+        Dim lStr As String
         Dim lTs As Integer
         Dim lTu As Integer
 
         Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
         Dim lMsgUnit As Integer = lMsgHandle.Unit
 
-        dsn = t.Attributes.GetValue("id", 0)
+        lDsn = aTs.Attributes.GetValue("id", 0)
         'create label
-        ndn = t.Attributes.GetValue("NDN", 10)
-        nup = t.Attributes.GetValue("NUP", 10)
-        nsa = t.Attributes.GetValue("NSA", 30)
-        nsasp = t.Attributes.GetValue("NSASP", 100)
-        ndp = t.Attributes.GetValue("NDP", 300)
-        Call F90_WDLBAX(aFileUnit, dsn, 1, ndn, nup, nsa, nsasp, ndp, psa)
+        lNDn = aTs.Attributes.GetValue("NDN", 10)
+        lNUp = aTs.Attributes.GetValue("NUP", 10)
+        lNSa = aTs.Attributes.GetValue("NSA", 30)
+        lNSasp = aTs.Attributes.GetValue("NSASP", 100)
+        lndp = aTs.Attributes.GetValue("NDP", 300)
+        F90_WDLBAX(aFileUnit, lDsn, 1, lNDn, lNUp, lNSa, lNSasp, lNDp, lPsa)
 
         'add needed attributes
-        saind = 1 'tstype
-        salen = 4
-        ostr = t.Attributes.GetValue("TSTYPE", Left(t.Attributes.GetValue("cons"), 4))
-        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-        salen = 1
-        saind = 34 'tgroup
-        iVal = t.Attributes.GetValue("TGROUP", 6)
-        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-        saind = 83 'compfg
-        iVal = t.Attributes.GetValue("COMPFG", 1)
-        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-        saind = 84 'tsform
-        iVal = t.Attributes.GetValue("TSFORM", 1)
-        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-        saind = 34 'tsfill
-        rVal = t.Attributes.GetValue("TSFILL", -999)
-        Call F90_WDBSAR(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-        saind = 17 'tcode
-        lS = t.Attributes.GetValue("tu")
-        If lS.Length = 0 Then
-            CalcTimeUnitStep(t.Dates.Value(0), t.Dates.Value(1), lTu, lTs)
-            t.Attributes.SetValue("tu", lTu)
-            t.Attributes.SetValue("ts", lTs)
+        lSaInd = 1 'tstype
+        lSaLen = 4
+        lStr = aTs.Attributes.GetValue("TSTYPE", Left(aTs.Attributes.GetValue("cons"), 4))
+        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        lSaLen = 1
+        lSaInd = 34 'tgroup
+        lIVal = aTs.Attributes.GetValue("TGROUP", 6)
+        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
+        lSaInd = 83 'compfg
+        lIVal = aTs.Attributes.GetValue("COMPFG", 1)
+        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
+        lSaInd = 84 'tsform
+        lIVal = aTs.Attributes.GetValue("TSFORM", 1)
+        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
+        lSaInd = 34 'tsfill
+        lRVal = aTs.Attributes.GetValue("TSFILL", -999)
+        F90_WDBSAR(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
+        lSaInd = 17 'tcode
+        lStr = aTs.Attributes.GetValue("tu")
+        If lStr.Length = 0 Then
+            CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
+            aTs.Attributes.SetValue("tu", lTu)
+            aTs.Attributes.SetValue("ts", lTs)
         Else
-            lTu = lS
-            saind = 33 'tsstep
-            lTs = t.Attributes.GetValue("ts")
+            lTu = lStr
+            lSaInd = 33 'tsstep
+            lTs = aTs.Attributes.GetValue("ts")
         End If
-        saind = 17 'tcode
-        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, lTu, retcod)
-        saind = 33 'tsstep
-        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, lTs, retcod)
-        saind = 85 'vbtime
-        iVal = t.Attributes.GetValue("VBTIME", 1)
-        If lTs > 1 Then iVal = 2 'timestep > 1 vbtime must vary
-        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-        Call J2Date(t.Dates.Value(0), CSDat)
-        i = CSDat(0) Mod 10
-        If i > 0 Then 'subtract back to start of this decade
-            iVal = CSDat(0) - i
+        lSaInd = 17 'tcode
+        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lTu, lRetcod)
+        lSaInd = 33 'tsstep
+        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lTs, lRetcod)
+        lSaInd = 85 'vbtime
+        lIVal = aTs.Attributes.GetValue("VBTIME", 1)
+        If lTs > 1 Then lIVal = 2 'timestep > 1 vbtime must vary
+        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
+        J2Date(aTs.Dates.Value(0), lCSDat)
+        lDecade = lCSDat(0) Mod 10
+        If lDecade > 0 Then 'subtract back to start of this decade
+            lIVal = lCSDat(0) - lDecade
         Else 'back to start of previous decade
-            iVal = CSDat(0) - 10
+            lIVal = lCSDat(0) - 10
         End If
-        saind = 27 'tsbyr
-        Call F90_WDBSAI(aFileUnit, dsn, lMsgUnit, saind, salen, iVal, retcod)
-        salen = 8
-        saind = 288 'scenario
-        ostr = UCase(Left(t.Attributes.GetValue("scen"), salen))
-        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-        saind = 289 'constituent
-        ostr = UCase(Left(t.Attributes.GetValue("cons"), salen))
-        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-        saind = 290 'location
-        ostr = UCase(Left(t.Attributes.GetValue("locn"), salen))
-        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
-        salen = 48
-        saind = 45 'description
-        ostr = Left(t.Attributes.GetValue("desc"), salen)
-        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, retcod, ostr, Len(ostr))
+        lSaInd = 27 'tsbyr
+        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
+        lSaLen = 8
+        lSaInd = 288 'scenario
+        lStr = UCase(Left(aTs.Attributes.GetValue("scen"), lSaLen))
+        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        lSaInd = 289 'constituent
+        lStr = UCase(Left(aTs.Attributes.GetValue("cons"), lSaLen))
+        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        lSaInd = 290 'location
+        lStr = UCase(Left(aTs.Attributes.GetValue("locn"), lSaLen))
+        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        lSaLen = 48
+        lSaInd = 45 'description
+        lStr = Left(aTs.Attributes.GetValue("desc"), lSaLen)
+        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
 
         'others (from attrib)
-        DsnBld = DsnWriteAttributes(aFileUnit, t)
+        DsnBld = DsnWriteAttributes(aFileUnit, aTs)
 
         lMsgHandle.Dispose()
     End Function
 
-    Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, ByRef t As atcTimeseries) As Boolean
+    Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, ByRef aTs As atcTimeseries) As Boolean
         Dim lName As String
         Dim lValue As Object
         Dim lDefinition As atcAttributeDefinition
@@ -446,13 +446,13 @@ Public Class atcDataSourceWDM
         Dim lRetcod As Integer
         Dim lMsg As atcWdmHandle = pMsg.MsgHandle
         Dim lMsgUnit As Integer = lMsg.Unit
-        Dim lDsn As Integer = t.Attributes.GetValue("id", 0)
+        Dim lDsn As Integer = aTs.Attributes.GetValue("id", 0)
 
         DsnWriteAttributes = True
-        For i As Integer = 0 To t.Attributes.Count - 1
-            lDefinition = t.Attributes(i).Definition
+        For lAttributeIndex As Integer = 0 To aTs.Attributes.Count - 1
+            lDefinition = aTs.Attributes(lAttributeIndex).Definition
             lName = lDefinition.Name
-            lValue = t.Attributes(i).Value
+            lValue = aTs.Attributes(lAttributeIndex).Value
             If lName.ToLower = "units" Then  'store Units ID as DCODE in WDM
                 lName = "DCODE"
                 lValue = CStr(GetUnitID(lValue))
@@ -636,8 +636,7 @@ Public Class atcDataSourceWDM
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
-        If aFileName Is Nothing OrElse aFileName.Length = 0 Then 'OrElse Not FileExists(aFileName) Then
-            'aFileName = FindFile("Select WDM file to open", , , pFileFilter, True, , 1)
+        If aFileName Is Nothing OrElse aFileName.Length = 0 Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
             With cdlg
                 .Title = "Select WDM file to open"
@@ -652,6 +651,7 @@ Public Class atcDataSourceWDM
                 End If
             End With
         End If
+
         Dim lwdmhandle As atcWdmHandle
         If FileExists(aFileName) Then
             lwdmhandle = New atcWdmHandle(0, aFileName)
@@ -664,6 +664,7 @@ Public Class atcDataSourceWDM
             Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & aFileName & "'")
             Return False
         End If
+
         If Not lwdmhandle Is Nothing AndAlso lwdmhandle.Unit > 0 Then
             Specification = aFileName
             pQuick = True
@@ -678,11 +679,9 @@ Public Class atcDataSourceWDM
     End Function
 
     Public Overrides Sub ReadData(ByVal aReadMe As atcDataSet)
-        Dim v() As Single 'array of data values
-        Dim dv() As Double 'array of data values
-        Dim dd() As Double 'array of julian dates
-        Dim nVals As Integer
-        Dim iVal As Integer
+        Dim lV() As Single 'array of data values
+        Dim lVd() As Double 'array of double data values
+        Dim lJd() As Double 'array of julian dates
         Dim lRetcod As Integer
         Dim lSdat(6) As Integer 'starting date
         Dim lEdat(6) As Integer 'ending (or current) date
@@ -708,7 +707,7 @@ Public Class atcDataSourceWDM
 
                         Dim lSJDay As Double = .GetValue("SJDay", 0)
                         J2Date(lSJDay, lSdat)
-                        nVals = lReadTS.numValues
+                        Dim nVals As Integer = lReadTS.numValues
                         If nVals = 0 Then 'constant inverval???
                             Dim lEJDay As Double = .GetValue("EJDay", 0)
                             J2Date(lEJDay, lEdat)
@@ -716,19 +715,19 @@ Public Class atcDataSourceWDM
                             lReadTS.numValues = nVals
                         End If
                         If nVals > 0 Then
-                            ReDim v(nVals)
+                            ReDim lV(nVals)
                             Dim lDsn As Integer = CInt(.GetValue("id", 0))
                             Dim lTimeStep As Integer = CInt(.GetValue("ts", 0))
                             Dim lTimeUnits As Integer = CInt(.GetValue("tu", 0))
                             Dim lTran As Integer = 0 'transformation = aver,same
                             Dim lQual As Integer = 31 'allowed quality code
                             F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat(0), nVals, _
-                                       lTran, lQual, lTimeUnits, v(1), lRetcod)
+                                       lTran, lQual, lTimeUnits, lV(1), lRetcod)
 
-                            ReDim dd(nVals)
-                            dd(0) = lSJDay
-                            ReDim dv(nVals)
-                            dv(0) = Double.NaN
+                            ReDim lJd(nVals)
+                            lJd(0) = lSJDay
+                            ReDim lVd(nVals)
+                            lVd(0) = Double.NaN
 
                             lTsFill = .GetValue("TSFill", -999)
                             If lTsFill >= 0 Then 'WDM convention - fill value, not undefined,
@@ -737,26 +736,26 @@ Public Class atcDataSourceWDM
 
                             Dim lInterval As Double = .GetValue("interval", 0)
                             Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
-                            For iVal = 1 To nVals
-                                If (v(iVal) - lTsFill) < Double.Epsilon Then
-                                    dv(iVal) = Double.NaN
+                            For iVal As Integer = 1 To nVals
+                                If (lV(iVal) - lTsFill) < Double.Epsilon Then
+                                    lVd(iVal) = Double.NaN
                                 Else
-                                    dv(iVal) = v(iVal) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
+                                    lVd(iVal) = lV(iVal) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
                                 End If
                                 If lConstInterval Then
-                                    dd(iVal) = lSJDay + iVal * lInterval
+                                    lJd(iVal) = lSJDay + iVal * lInterval
                                 Else
                                     TIMADD(lSdat, lTimeUnits, lTimeStep, iVal, lEdat)
-                                    dd(iVal) = Date2J(lEdat)
+                                    lJd(iVal) = Date2J(lEdat)
                                 End If
                             Next
                         Else
-                            ReDim v(0)
-                            ReDim dv(0)
-                            ReDim dd(0)
+                            ReDim lV(0)
+                            ReDim lVd(0)
+                            ReDim lJd(0)
                         End If
-                        lReadTS.Values = dv
-                        lReadTS.Dates.Values = dd
+                        lReadTS.Values = lVd
+                        lReadTS.Dates.Values = lJd
                     End If
                 End With
                 lWdmHandle.Dispose()
@@ -777,8 +776,6 @@ Public Class atcDataSourceWDM
         Dim lSaind As Integer
         Dim lSaval(256) As Integer
 
-        'Dim i As Integer
-
         lDates = New atcTimeseries(Nothing)
         pDates.Add(lDates)
 
@@ -791,7 +788,7 @@ Public Class atcDataSourceWDM
         lData.Dates.ValuesNeedToBeRead = True
         DataSets.Add(aDsn, lData)
 
-        Call DsnReadGeneral(aFileUnit, lData)
+        DsnReadGeneral(aFileUnit, lData)
 
         lInit = 1
         Do
@@ -840,26 +837,25 @@ Public Class atcDataSourceWDM
 
     'Before calling, make sure id property of aDataset has been set to dsn -- aDataset.Attributes.SetValue("id", dsn)
     Private Sub DsnReadGeneral(ByVal aFileUnit As Integer, ByRef aDataset As atcTimeseries)
-        Dim saind, salen, retcod As Integer
-        Dim ltu, lts, j As Integer, lNvals As Integer
-        Dim lstr As String = ""
-        Dim sdt(6) As Integer
-        Dim edt(6) As Integer
-        Dim dsfrc As Integer
-        Dim dsn As Integer = aDataset.Attributes.GetValue("id", 0)
+        Dim lSaInd, lSaLen, lRetcod As Integer
+        Dim lTu, lTs As Integer
+        Dim lNvals As Integer
+        Dim lStr As String = ""
+        Dim lSdat(6) As Integer
+        Dim lEdat(6) As Integer
+        Dim lDsn As Integer = aDataset.Attributes.GetValue("id", 0)
 
-        salen = 1
-
-        saind = 33 'time step
-        Call F90_WDBSGI(aFileUnit, dsn, saind, salen, lts, retcod)
-        If (retcod <> 0) Then ' set time step to default of 1
+        lSaLen = 1
+        lSaInd = 33 'time step
+        F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTs, lRetcod)
+        If (lRetcod <> 0) Then ' set time step to default of 1
             lts = 1
         End If
         aDataset.Attributes.SetValue("ts", lts)
 
-        saind = 17 'time units
-        Call F90_WDBSGI(aFileUnit, dsn, saind, salen, ltu, retcod)
-        If (retcod <> 0) Then 'set to default of daily time units
+        lSaInd = 17 'time units
+        F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTu, lRetcod)
+        If (lRetcod <> 0) Then 'set to default of daily time units
             ltu = 4
         End If
         aDataset.Attributes.SetValue("tu", ltu)
@@ -876,80 +872,76 @@ Public Class atcDataSourceWDM
         End Select
 
         If Not pQuick Then 'get start and end dates for each data set
-            j = 1
-            Call F90_WTFNDT(aFileUnit, dsn, j, dsfrc, sdt(0), edt(0), retcod)
-            If sdt(0) > 0 Then
-                timdif(sdt, edt, ltu, lts, lNvals)
-                aDataset.Dates.Attributes.SetValue("SJDay", Date2J(sdt))
-                aDataset.Dates.Attributes.SetValue("EJDay", Date2J(edt))
-                aDataset.Attributes.SetValue("SJDay", Date2J(sdt))
-                aDataset.Attributes.SetValue("EJDay", Date2J(edt))
+            Dim lGpFlg As Integer = 1
+            Dim lDsfrc As Integer
+            F90_WTFNDT(aFileUnit, lDsn, lGpFlg, lDsfrc, lSdat(0), lEdat(0), lRetcod)
+            If lSdat(0) > 0 Then
+                TimDif(lSdat, lEdat, lTu, lTs, lNvals)
+                aDataset.Dates.Attributes.SetValue("SJDay", Date2J(lSdat))
+                aDataset.Dates.Attributes.SetValue("EJDay", Date2J(lEdat))
+                aDataset.Attributes.SetValue("SJDay", Date2J(lSdat))
+                aDataset.Attributes.SetValue("EJDay", Date2J(lEdat))
                 aDataset.numValues = lNvals
                 aDataset.Dates.numValues = lNvals
             End If
         End If
 
         'get data-set scenario name
-        saind = 288
-        salen = 8
-        Call F90_WDBSGC(aFileUnit, dsn, saind, salen, lstr)
-        lstr = Trim(lstr)
-        If Len(lstr) = 0 Then
-            lstr = "<unk>"
+        lSaInd = 288
+        lSaLen = 8
+        F90_WDBSGC(aFileUnit, lDsn, lSaInd, lSaLen, lStr)
+        If lStr.Length = 0 Then
+            lStr = "<unk>"
         End If
         aDataset.Attributes.SetValue("scen", lstr)
         'get data-set location name
-        saind = 290
-        salen = 8
-        Call F90_WDBSGC(aFileUnit, dsn, saind, salen, lstr)
-        lstr = Trim(lstr)
-        If Len(lstr) = 0 Then
-            lstr = "<unk>"
+        lSaInd = 290
+        lSaLen = 8
+        F90_WDBSGC(aFileUnit, lDsn, lSaInd, lSaLen, lStr)
+        If lStr.Length = 0 Then
+            lStr = "<unk>"
         End If
-        aDataset.Attributes.SetValue("locn", Trim(lstr))
+        aDataset.Attributes.SetValue("locn", lStr)
         'get data-set constituent name
-        saind = 289
-        salen = 8
-        Call F90_WDBSGC(aFileUnit, dsn, saind, salen, lstr)
-        If Len(Trim(lstr)) = 0 Then 'try tstype for constituent
-            saind = 1
-            salen = 4
-            Call F90_WDBSGC(aFileUnit, dsn, saind, salen, lstr)
+        lSaInd = 289
+        lSaLen = 8
+        F90_WDBSGC(aFileUnit, lDsn, lSaInd, lSaLen, lStr)
+        If lStr.Length = 0 Then 'try tstype for constituent
+            lSaInd = 1
+            lSaLen = 4
+            F90_WDBSGC(aFileUnit, lDsn, lSaInd, lSaLen, lStr)
         End If
-        aDataset.Attributes.SetValue("cons", Trim(lstr))
+        aDataset.Attributes.SetValue("cons", lStr)
         'station name
-        Call F90_WDBSGC(aFileUnit, dsn, CInt(45), CInt(48), lstr)
-        aDataset.Attributes.SetValue("desc", Trim(lstr))
+        F90_WDBSGC(aFileUnit, lDsn, CInt(45), CInt(48), lStr)
+        aDataset.Attributes.SetValue("desc", lStr)
         aDataset.Attributes.SetValue("HeaderComplete", True)
     End Sub
 
-    Private Function AttrVal2String(ByRef saind As Integer, ByRef saval() As Integer) As String
+    Private Function AttrVal2String(ByRef aSaInd As Integer, ByRef aSaVal() As Integer) As String
         Dim lS As String
         Dim lI As Integer
         Dim lAttr As atcAttributeDefinition
 
-        lAttr = pMsg.Attributes(saind)
-
+        lAttr = pMsg.Attributes(aSaInd)
         With lAttr
             lS = ""
             Select Case .TypeString
                 Case "String"
                     For lI = 0 To (lAttr.Max / 4) - 1
-                        lS &= Long2String(saval(lI))
+                        lS &= Long2String(aSaVal(lI))
                     Next
-                Case "Single" : lS &= CStr(System.BitConverter.ToSingle(System.BitConverter.GetBytes((saval(lI))), 0))
-                Case Else : lS &= CStr(saval(lI))
+                Case "Single"
+                    lS &= CStr(System.BitConverter.ToSingle(System.BitConverter.GetBytes((aSaVal(lI))), 0))
+                Case Else
+                    lS &= CStr(aSaVal(lI))
             End Select
         End With
 
-        Return Trim(lS)
+        Return lS.Trim
     End Function
 
     Protected Overrides Sub Finalize()
-        'If pFileUnit > 0 Then
-        '  Dim i As Integer = F90_WDMCLO(pFileUnit)
-        'End If
         MyBase.Finalize()
     End Sub
-
 End Class
