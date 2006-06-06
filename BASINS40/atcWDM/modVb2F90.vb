@@ -21,12 +21,12 @@ Module Vb2F90
          ByVal aVal As String, ByVal aValLen As Short)
     Declare Sub F90_WDBSAI Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, ByRef aMsgUnit As Integer, _
-         ByRef aSaind As Integer, ByRef aSalen As Integer, ByRef aRetcod As Integer, _
-         ByRef aVal As Integer)
+         ByRef aSaind As Integer, ByRef aSalen As Integer, ByRef aVal As Integer, _
+         ByRef aRetcod As Integer)
     Declare Sub F90_WDBSAR Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aDsn As Integer, ByRef aMsgUnit As Integer, _
-         ByRef aSaind As Integer, ByRef aSalen As Integer, ByRef aRetcod As Integer, _
-         ByRef aVal As Single)
+         ByRef aSaind As Integer, ByRef aSalen As Integer, ByRef aVal As Single, _
+         ByRef aRetcod As Integer)
     Declare Sub F90_WDSAGY_XX Lib "hass_ent.dll" _
         (ByRef aWdmUnit As Integer, ByRef aSaind As Integer, _
          ByRef aLen As Integer, ByRef aType As Integer, _

@@ -388,7 +388,7 @@ Public Class atcDataSourceWDM
         F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
         lSaInd = 34 'tsfill
         lRVal = aTs.Attributes.GetValue("TSFILL", -999)
-        F90_WDBSAR(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
+        F90_WDBSAR(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRVal, lRetcod)
         lSaInd = 17 'tcode
         lStr = aTs.Attributes.GetValue("tu")
         If lStr.Length = 0 Then
