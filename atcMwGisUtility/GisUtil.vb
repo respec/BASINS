@@ -1509,6 +1509,7 @@ Public Class GisUtil
         GetMappingObject.StatusBar.ShowProgressBar = True
         lCount = 0
         lTotal = lSfClip.NumShapes * lSf.NumShapes
+        lSfClip.BeginPointInShapefile()
         For i = 1 To lSfClip.NumShapes
             lShapeClip = lSfClip.Shape(i - 1)
             For j = 1 To lSf.NumShapes
@@ -1539,6 +1540,7 @@ Public Class GisUtil
                 End If
             Next j
         Next i
+        lSfClip.EndPointInShapefile()
         GetMappingObject.StatusBar.ShowProgressBar = False
         lNewShapeFile.StopEditingShapes(True, True)
 
@@ -1551,8 +1553,8 @@ Public Class GisUtil
                                             ByVal aPolyShapeFile As MapWinGIS.Shapefile, _
                                             ByVal aIndex As Integer) As Boolean
         For i As Integer = 0 To aLineShape.numPoints - 1
-            If aPolyShapeFile.PointInShape(aIndex, aLineShape.Point(i).x, _
-                                                   aLineShape.Point(i).y) Then
+            If aPolyShapeFile.PointInShapefile(aLineShape.Point(i).x, _
+                                               aLineShape.Point(i).y) = aIndex Then
                 Return True 'a point was within polygon
             End If
         Next i
@@ -1563,8 +1565,8 @@ Public Class GisUtil
                                                     ByVal aPolyShapeFile As MapWinGIS.Shapefile, _
                                                     ByVal aIndex As Integer) As Boolean
         For i As Integer = 0 To aLineShape.numPoints - 1
-            If Not aPolyShapeFile.PointInShape(aIndex, aLineShape.Point(i).x, _
-                                                       aLineShape.Point(i).y) Then
+            If Not aPolyShapeFile.PointInShapefile(aLineShape.Point(i).x, _
+                                                   aLineShape.Point(i).y) = aIndex Then
                 Return False 'a point on line was outside polygon
             End If
         Next i
