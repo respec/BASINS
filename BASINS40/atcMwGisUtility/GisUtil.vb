@@ -722,6 +722,24 @@ Public Class GisUtil
         End If
     End Function
 
+    Public Shared Sub StartRemoveFeature(ByVal aLayerIndex As Integer)
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        lSf.StartEditingShapes(True)
+    End Sub
+
+    Public Shared Function RemoveFeatureNoStartStop(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer) As Double
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+
+        If FeatureIndexValid(aFeatureIndex, lSf) Then
+            Dim lRetc As Boolean = lSf.EditDeleteShape(aFeatureIndex)
+        End If
+    End Function
+
+    Public Shared Sub StopRemoveFeature(ByVal aLayerIndex As Integer)
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        lSf.StopEditingShapes(True, True)
+    End Sub
+
     ''' <summary>Set value of a field in a feature in a ShapeFile</summary>
     ''' <param name="aLayerIndex">
     '''     <para>Index of layer containing ShapeFile</para>
@@ -750,6 +768,29 @@ Public Class GisUtil
                 lRetc = lSf.StopEditingTable()
             End If
         End If
+    End Sub
+
+    Public Shared Sub StartSetFeatureValue(ByVal aLayerIndex As Integer)
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        Dim lRetc As Boolean
+        lRetc = lSf.StartEditingTable()
+    End Sub
+
+    Public Shared Sub SetFeatureValueNoStartStop(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, ByVal aFeatureIndex As Integer, ByVal aValue As Object)
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        If FeatureIndexValid(aFeatureIndex, lSf) Then
+            If FieldIndexValid(aFieldIndex, lSf) Then
+                Dim lRetc As Boolean
+                'TODO: error checks
+                lRetc = lSf.EditCellValue(aFieldIndex, aFeatureIndex, aValue)
+            End If
+        End If
+    End Sub
+
+    Public Shared Sub StopSetFeatureValue(ByVal aLayerIndex As Integer)
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        Dim lRetc As Boolean
+        lRetc = lSf.StopEditingTable()
     End Sub
 
     Public Shared Function NumSelectedFeatures(ByVal aLayerIndex As Integer) As Integer
@@ -1460,6 +1501,7 @@ Public Class GisUtil
         For i = 1 To lSf.NumFields
             lRetc = lNewShapeFile.EditInsertField(lSf.Field(i - 1), i - 1)
         Next i
+        lNewShapeFile.StartEditingShapes(True)
 
         Dim issf As New MapWinGIS.Shapefile
         issf.CreateNew("temp_clip.shp", MapWinGIS.ShpfileType.SHP_POLYLINE)
@@ -1498,6 +1540,7 @@ Public Class GisUtil
             Next j
         Next i
         GetMappingObject.StatusBar.ShowProgressBar = False
+        lNewShapeFile.StopEditingShapes(True, True)
 
         lRetc = lNewShapeFile.SaveAs(lNewShapeFileName)
         ClipShapesWithPolygon = lNewShapeFileName

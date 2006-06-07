@@ -810,7 +810,7 @@ Public Class frmManDelin
         Dim minfield As Integer
         minfield = 9999
 
-        lblDefine.Text = "Filtering..."
+        lblDefine.Text = "Indexing..."
         Me.Refresh()
 
         'assign subbasin numbers to each reach segment
@@ -826,24 +826,32 @@ Public Class frmManDelin
             ReachSubbasinFieldIndex = GisUtil.AddField(StreamsLayerIndex, "SUBBASIN", 1, 10)
         End If
         If ReachSubbasinFieldIndex < minfield Then minfield = ReachSubbasinFieldIndex
+        GisUtil.StartSetFeatureValue(StreamsLayerIndex)
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
-          If aIndex(i) > -1 Then
-            j = GisUtil.FieldValue(SubbasinLayerIndex, aIndex(i), SubbasinFieldIndex)
-          Else
-            j = aIndex(i)
-          End If
-          GisUtil.SetFeatureValue(StreamsLayerIndex, ReachSubbasinFieldIndex, i - 1, j)
+            If aIndex(i) > -1 Then
+                j = GisUtil.FieldValue(SubbasinLayerIndex, aIndex(i), SubbasinFieldIndex)
+            Else
+                j = aIndex(i)
+            End If
+            GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, ReachSubbasinFieldIndex, i - 1, j)
         Next i
+        GisUtil.StopSetFeatureValue(StreamsLayerIndex)
+
         'clean out segments that are not within any subbasin, fix to clean up outliers in containing polygons
+        GisUtil.StartRemoveFeature(StreamsLayerIndex)
         i = 0
         Do While i < GisUtil.NumFeatures(StreamsLayerIndex)
-          If GisUtil.FieldValue(StreamsLayerIndex, i, ReachSubbasinFieldIndex) < 0 Then
-              'remove this feature
-              GisUtil.RemoveFeature(StreamsLayerIndex, i)
-          Else
-            i = i + 1
-          End If
+            If GisUtil.FieldValue(StreamsLayerIndex, i, ReachSubbasinFieldIndex) < 0 Then
+                'remove this feature
+                GisUtil.RemoveFeatureNoStartStop(StreamsLayerIndex, i)
+            Else
+                i = i + 1
+            End If
         Loop
+        GisUtil.StopRemoveFeature(StreamsLayerIndex)
+
+        lblDefine.Text = "Filtering..."
+        Me.Refresh()
 
         'find lowest reach level in each subbasin
         For k = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
@@ -859,6 +867,7 @@ Public Class frmManDelin
             Next i
 
             'save only segments of the lowest level in this subbasin
+            GisUtil.StartRemoveFeature(StreamsLayerIndex)
             i = 0
             Do While i < GisUtil.NumFeatures(StreamsLayerIndex)
                 If GisUtil.FieldValue(StreamsLayerIndex, i, ReachSubbasinFieldIndex) = k Then
@@ -866,7 +875,7 @@ Public Class frmManDelin
                     j = GisUtil.FieldValue(StreamsLayerIndex, i, LevelFieldIndex)
                     If j <> lowestlevel Then
                         'remove this feature
-                        GisUtil.RemoveFeature(StreamsLayerIndex, i)
+                        GisUtil.RemoveFeatureNoStartStop(StreamsLayerIndex, i)
                     Else
                         i = i + 1
                     End If
@@ -874,6 +883,7 @@ Public Class frmManDelin
                     i = i + 1
                 End If
             Loop
+            GisUtil.StopRemoveFeature(StreamsLayerIndex)
         Next k
 
         lblDefine.Text = "Merging..."
