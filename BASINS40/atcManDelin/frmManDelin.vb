@@ -11,6 +11,7 @@ Public Class frmManDelin
     Dim pMapWin As MapWindow.Interfaces.IMapWin
     Dim OrigCursor As MapWinGIS.tkCursor
     Dim OperatingShapefile As String
+    Friend WithEvents lblDelin As System.Windows.Forms.Label
     Dim prevHandle As Integer
 
 #Region " Windows Form Designer generated code "
@@ -59,7 +60,7 @@ Public Class frmManDelin
     Friend WithEvents lblDefine As System.Windows.Forms.Label
     Friend WithEvents cbxPCS As System.Windows.Forms.CheckBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmManDelin))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmManDelin))
         Me.cmdClose = New System.Windows.Forms.Button
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
         Me.cmdDelineate = New System.Windows.Forms.Button
@@ -76,6 +77,7 @@ Public Class frmManDelin
         Me.lblCalc = New System.Windows.Forms.Label
         Me.lblDefine = New System.Windows.Forms.Label
         Me.cbxPCS = New System.Windows.Forms.CheckBox
+        Me.lblDelin = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
         'cmdClose
@@ -83,7 +85,7 @@ Public Class frmManDelin
         Me.cmdClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdClose.Location = New System.Drawing.Point(160, 326)
+        Me.cmdClose.Location = New System.Drawing.Point(160, 377)
         Me.cmdClose.Name = "cmdClose"
         Me.cmdClose.Size = New System.Drawing.Size(96, 24)
         Me.cmdClose.TabIndex = 0
@@ -115,7 +117,7 @@ Public Class frmManDelin
         Me.cboLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLayer.Location = New System.Drawing.Point(152, 16)
         Me.cboLayer.Name = "cboLayer"
-        Me.cboLayer.Size = New System.Drawing.Size(248, 24)
+        Me.cboLayer.Size = New System.Drawing.Size(253, 24)
         Me.cboLayer.TabIndex = 3
         '
         'cmdCommit
@@ -141,7 +143,7 @@ Public Class frmManDelin
         'Label2
         '
         Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(16, 112)
+        Me.Label2.Location = New System.Drawing.Point(16, 154)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(152, 24)
         Me.Label2.TabIndex = 6
@@ -153,15 +155,15 @@ Public Class frmManDelin
         Me.cboDEM.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboDEM.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboDEM.Location = New System.Drawing.Point(152, 112)
+        Me.cboDEM.Location = New System.Drawing.Point(152, 154)
         Me.cboDEM.Name = "cboDEM"
-        Me.cboDEM.Size = New System.Drawing.Size(248, 24)
+        Me.cboDEM.Size = New System.Drawing.Size(253, 24)
         Me.cboDEM.TabIndex = 7
         '
         'cmdCalculate
         '
         Me.cmdCalculate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCalculate.Location = New System.Drawing.Point(16, 152)
+        Me.cmdCalculate.Location = New System.Drawing.Point(16, 194)
         Me.cmdCalculate.Name = "cmdCalculate"
         Me.cmdCalculate.Size = New System.Drawing.Size(152, 40)
         Me.cmdCalculate.TabIndex = 8
@@ -170,7 +172,7 @@ Public Class frmManDelin
         'Label3
         '
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(16, 208)
+        Me.Label3.Location = New System.Drawing.Point(16, 250)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(152, 24)
         Me.Label3.TabIndex = 9
@@ -182,15 +184,15 @@ Public Class frmManDelin
         Me.cboReach.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboReach.Location = New System.Drawing.Point(152, 208)
+        Me.cboReach.Location = New System.Drawing.Point(152, 250)
         Me.cboReach.Name = "cboReach"
-        Me.cboReach.Size = New System.Drawing.Size(248, 24)
+        Me.cboReach.Size = New System.Drawing.Size(253, 24)
         Me.cboReach.TabIndex = 10
         '
         'cmdDefine
         '
         Me.cmdDefine.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdDefine.Location = New System.Drawing.Point(16, 248)
+        Me.cmdDefine.Location = New System.Drawing.Point(16, 290)
         Me.cmdDefine.Name = "cmdDefine"
         Me.cmdDefine.Size = New System.Drawing.Size(152, 40)
         Me.cmdDefine.TabIndex = 11
@@ -200,9 +202,9 @@ Public Class frmManDelin
         '
         Me.lblCalc.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblCalc.Location = New System.Drawing.Point(192, 160)
+        Me.lblCalc.Location = New System.Drawing.Point(192, 202)
         Me.lblCalc.Name = "lblCalc"
-        Me.lblCalc.Size = New System.Drawing.Size(208, 24)
+        Me.lblCalc.Size = New System.Drawing.Size(213, 24)
         Me.lblCalc.TabIndex = 12
         Me.lblCalc.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.lblCalc.Visible = False
@@ -211,9 +213,9 @@ Public Class frmManDelin
         '
         Me.lblDefine.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblDefine.Location = New System.Drawing.Point(184, 256)
+        Me.lblDefine.Location = New System.Drawing.Point(184, 298)
         Me.lblDefine.Name = "lblDefine"
-        Me.lblDefine.Size = New System.Drawing.Size(208, 24)
+        Me.lblDefine.Size = New System.Drawing.Size(213, 24)
         Me.lblDefine.TabIndex = 13
         Me.lblDefine.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.lblDefine.Visible = False
@@ -221,16 +223,27 @@ Public Class frmManDelin
         'cbxPCS
         '
         Me.cbxPCS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cbxPCS.Location = New System.Drawing.Point(40, 296)
+        Me.cbxPCS.Location = New System.Drawing.Point(40, 338)
         Me.cbxPCS.Name = "cbxPCS"
         Me.cbxPCS.Size = New System.Drawing.Size(216, 24)
         Me.cbxPCS.TabIndex = 15
         Me.cbxPCS.Text = "Include PCS as Outlets"
         '
+        'lblDelin
+        '
+        Me.lblDelin.Location = New System.Drawing.Point(16, 99)
+        Me.lblDelin.Name = "lblDelin"
+        Me.lblDelin.Size = New System.Drawing.Size(402, 42)
+        Me.lblDelin.TabIndex = 16
+        Me.lblDelin.Text = "Click points on the map to delineate a new subbasin boundary.  When completed cli" & _
+            "ck 'Commit' or right click on the map."
+        Me.lblDelin.Visible = False
+        '
         'frmManDelin
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(416, 360)
+        Me.ClientSize = New System.Drawing.Size(421, 411)
+        Me.Controls.Add(Me.lblDelin)
         Me.Controls.Add(Me.cbxPCS)
         Me.Controls.Add(Me.lblDefine)
         Me.Controls.Add(Me.lblCalc)
@@ -249,6 +262,7 @@ Public Class frmManDelin
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmManDelin"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Manual Watershed Delineator"
         Me.ResumeLayout(False)
 
@@ -350,6 +364,7 @@ Public Class frmManDelin
         cboLayer.Enabled = False
         cmdCommit.Enabled = True
         cmdCancel.Enabled = True
+        lblDelin.Visible = True
         If Len(OperatingShapefile) = 0 Then
             'first time to delineate
             'get name of current subbasin layer from combo box
@@ -429,6 +444,7 @@ Public Class frmManDelin
         'cboLayer.Enabled = True
         cmdCommit.Enabled = False
         cmdCancel.Enabled = False
+        lblDelin.Visible = False
         For i = 0 To xpts.Count
             'pMapWin.View.Draw.ClearDrawing(i - 2)
             pMapWin.View.Draw.ClearDrawing(i)
@@ -453,6 +469,7 @@ Public Class frmManDelin
         'cboLayer.Enabled = True
         cmdCommit.Enabled = False
         cmdCancel.Enabled = False
+        lblDelin.Visible = False
 
         pMapWin.View.Draw.ClearDrawing(prevHandle)
 
@@ -1237,4 +1254,5 @@ Public Class frmManDelin
             ShowHelp("BASINS Details\Watershed Delineation\Manual Watershed Delineation.html")
         End If
     End Sub
+
 End Class
