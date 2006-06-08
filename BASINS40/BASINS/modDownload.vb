@@ -302,6 +302,33 @@ StartOver:
                         lOutputFileName = lProjectorNode.GetAttrValue("output")
                         lCurFilename = lProjectorNode.Content
                         ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
+                        'if adding to some specific point layers in basins we need to refresh that map layer
+                        If Right(lOutputFileName, 8) = "pcs3.shp" Or _
+                           Right(lOutputFileName, 8) = "gage.shp" Or _
+                           Right(lOutputFileName, 9) = "wqobs.shp" Then
+                            'get index of this layer
+                            Dim lLayerIndex As Integer = 0
+                            Dim i As Integer
+                            For i = 1 To g_MapWin.Layers.NumLayers
+                                If g_MapWin.Layers(i).FileName = lOutputFileName Then
+                                    lLayerIndex = i
+                                End If
+                            Next
+                            If lLayerIndex > 0 Then
+                                Dim llayername As String = g_MapWin.Layers(lLayerIndex).Name
+                                Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerIndex).Color.R, g_MapWin.Layers(lLayerIndex).Color.G, g_MapWin.Layers(lLayerIndex).Color.B)
+                                Dim lmarkersize As Integer = g_MapWin.Layers(lLayerIndex).LineOrPointSize
+                                Dim ltargroup As Integer = g_MapWin.Layers(lLayerIndex).GroupHandle
+                                Dim lnewpos As Integer = g_MapWin.Layers(lLayerIndex).GroupPosition
+                                Dim MWlay As MapWindow.Interfaces.Layer
+                                Dim shpFile As MapWinGIS.Shapefile
+                                g_MapWin.Layers.Remove(lLayerIndex)
+                                shpFile = New MapWinGIS.Shapefile
+                                shpFile.Open(lOutputFileName)
+                                MWlay = g_MapWin.Layers.Add(shpFile, llayername, lRGBcolor, lRGBcolor, lmarkersize)
+                                g_MapWin.Layers.MoveLayer(MWlay.Handle, lnewpos, ltargroup)
+                            End If
+                        End If
                     Case "convert_grid"
                         lOutputFileName = lProjectorNode.GetAttrValue("output")
                         lCurFilename = lProjectorNode.Content
