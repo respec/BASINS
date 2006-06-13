@@ -7,6 +7,20 @@ Imports MapWinUtility
 
 Public Module modFile
 
+    ''' <summary>
+    ''' Try to delete a file. 
+    ''' If file cannot not be deleted, log a message instead of throwing an exception
+    ''' </summary>
+    ''' <param name="aFilename">Name of file to be deleted</param>
+    ''' <remarks>helpful for non-critical cleanup of temporary files that may be locked</remarks>
+    Public Sub TryDeleteFile(ByVal aFilename As String)
+        Try
+            If FileExists(aFilename) Then IO.File.Delete(aFilename)
+        Catch ex As Exception
+            Logger.Dbg("Could not delete '" & aFilename & "': " & ex.Message)
+        End Try
+    End Sub
+
     'if aHelpTopic is a file, set the file to display instead of opening help
     Public Sub ShowHelp(ByVal aHelpTopic As String)
         Static lHelpFilename As String = ""

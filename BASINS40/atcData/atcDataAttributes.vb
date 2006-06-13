@@ -293,6 +293,8 @@ Public Class atcDataAttributes
                         lDef.Calculator.Open(lDef.Name, lArgs)
                         lAttribute = ItemByKey(lKey)
                     End If
+                Catch NullExcep As NullReferenceException
+                    'Ignore these
                 Catch CalcExcep As Exception
                     Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
                 End Try
