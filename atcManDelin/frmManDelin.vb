@@ -11,7 +11,24 @@ Public Class frmManDelin
     Dim pMapWin As MapWindow.Interfaces.IMapWin
     Dim OrigCursor As MapWinGIS.tkCursor
     Dim OperatingShapefile As String
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents lblDefine As System.Windows.Forms.Label
+    Friend WithEvents cbxPCS As System.Windows.Forms.CheckBox
+    Friend WithEvents cmdDefine As System.Windows.Forms.Button
+    Friend WithEvents cboReach As System.Windows.Forms.ComboBox
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents lblCalc As System.Windows.Forms.Label
+    Friend WithEvents cmdCalculate As System.Windows.Forms.Button
+    Friend WithEvents cboDEM As System.Windows.Forms.ComboBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
     Friend WithEvents lblDelin As System.Windows.Forms.Label
+    Friend WithEvents cmdCancel As System.Windows.Forms.Button
+    Friend WithEvents cmdCommit As System.Windows.Forms.Button
+    Friend WithEvents cboLayer As System.Windows.Forms.ComboBox
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents cmdDelineate As System.Windows.Forms.Button
     Dim prevHandle As Integer
 
 #Region " Windows Form Designer generated code "
@@ -45,225 +62,264 @@ Public Class frmManDelin
     'Do not modify it using the code editor.
     Friend WithEvents OpenFileDialog1 As System.Windows.Forms.OpenFileDialog
     Friend WithEvents cmdClose As System.Windows.Forms.Button
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents cboLayer As System.Windows.Forms.ComboBox
-    Friend WithEvents cmdDelineate As System.Windows.Forms.Button
-    Friend WithEvents cmdCommit As System.Windows.Forms.Button
-    Friend WithEvents cmdCancel As System.Windows.Forms.Button
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents cboDEM As System.Windows.Forms.ComboBox
-    Friend WithEvents cmdCalculate As System.Windows.Forms.Button
-    Friend WithEvents Label3 As System.Windows.Forms.Label
-    Friend WithEvents cboReach As System.Windows.Forms.ComboBox
-    Friend WithEvents cmdDefine As System.Windows.Forms.Button
-    Friend WithEvents lblCalc As System.Windows.Forms.Label
-    Friend WithEvents lblDefine As System.Windows.Forms.Label
-    Friend WithEvents cbxPCS As System.Windows.Forms.CheckBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmManDelin))
         Me.cmdClose = New System.Windows.Forms.Button
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog
-        Me.cmdDelineate = New System.Windows.Forms.Button
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.cboLayer = New System.Windows.Forms.ComboBox
-        Me.cmdCommit = New System.Windows.Forms.Button
-        Me.cmdCancel = New System.Windows.Forms.Button
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.cboDEM = New System.Windows.Forms.ComboBox
-        Me.cmdCalculate = New System.Windows.Forms.Button
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.cboReach = New System.Windows.Forms.ComboBox
-        Me.cmdDefine = New System.Windows.Forms.Button
-        Me.lblCalc = New System.Windows.Forms.Label
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblDefine = New System.Windows.Forms.Label
         Me.cbxPCS = New System.Windows.Forms.CheckBox
+        Me.cmdDefine = New System.Windows.Forms.Button
+        Me.cboReach = New System.Windows.Forms.ComboBox
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.lblCalc = New System.Windows.Forms.Label
+        Me.cmdCalculate = New System.Windows.Forms.Button
+        Me.cboDEM = New System.Windows.Forms.ComboBox
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.cmdDelineate = New System.Windows.Forms.Button
         Me.lblDelin = New System.Windows.Forms.Label
+        Me.cmdCancel = New System.Windows.Forms.Button
+        Me.cmdCommit = New System.Windows.Forms.Button
+        Me.cboLayer = New System.Windows.Forms.ComboBox
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
         'cmdClose
         '
-        Me.cmdClose.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdClose.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdClose.Location = New System.Drawing.Point(160, 377)
+        Me.cmdClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdClose.Location = New System.Drawing.Point(160, 459)
         Me.cmdClose.Name = "cmdClose"
-        Me.cmdClose.Size = New System.Drawing.Size(96, 24)
+        Me.cmdClose.Size = New System.Drawing.Size(102, 24)
         Me.cmdClose.TabIndex = 0
         Me.cmdClose.Text = "&Close"
         '
-        'cmdDelineate
+        'GroupBox1
         '
-        Me.cmdDelineate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdDelineate.Location = New System.Drawing.Point(16, 56)
-        Me.cmdDelineate.Name = "cmdDelineate"
-        Me.cmdDelineate.Size = New System.Drawing.Size(152, 40)
-        Me.cmdDelineate.TabIndex = 1
-        Me.cmdDelineate.Text = "&Delineate Subbasin"
-        '
-        'Label1
-        '
-        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(16, 16)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(152, 24)
-        Me.Label1.TabIndex = 2
-        Me.Label1.Text = "Subbasin Layer:"
-        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'cboLayer
-        '
-        Me.cboLayer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboLayer.Location = New System.Drawing.Point(152, 16)
-        Me.cboLayer.Name = "cboLayer"
-        Me.cboLayer.Size = New System.Drawing.Size(253, 24)
-        Me.cboLayer.TabIndex = 3
+        Me.GroupBox1.Controls.Add(Me.lblDefine)
+        Me.GroupBox1.Controls.Add(Me.cbxPCS)
+        Me.GroupBox1.Controls.Add(Me.cmdDefine)
+        Me.GroupBox1.Controls.Add(Me.cboReach)
+        Me.GroupBox1.Controls.Add(Me.Label3)
+        Me.GroupBox1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBox1.Location = New System.Drawing.Point(3, 305)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(421, 140)
+        Me.GroupBox1.TabIndex = 17
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Stream Network"
         '
-        'cmdCommit
+        'lblDefine
         '
-        Me.cmdCommit.Enabled = False
-        Me.cmdCommit.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCommit.Location = New System.Drawing.Point(184, 64)
-        Me.cmdCommit.Name = "cmdCommit"
-        Me.cmdCommit.Size = New System.Drawing.Size(80, 24)
-        Me.cmdCommit.TabIndex = 4
-        Me.cmdCommit.Text = "Commit"
-        '
-        'cmdCancel
-        '
-        Me.cmdCancel.Enabled = False
-        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(280, 64)
-        Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(72, 24)
-        Me.cmdCancel.TabIndex = 5
-        Me.cmdCancel.Text = "Cancel"
-        '
-        'Label2
-        '
-        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(16, 154)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(152, 24)
-        Me.Label2.TabIndex = 6
-        Me.Label2.Text = "Elevation Layer:"
-        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        '
-        'cboDEM
-        '
-        Me.cboDEM.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lblDefine.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboDEM.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboDEM.Location = New System.Drawing.Point(152, 154)
-        Me.cboDEM.Name = "cboDEM"
-        Me.cboDEM.Size = New System.Drawing.Size(253, 24)
-        Me.cboDEM.TabIndex = 7
+        Me.lblDefine.Location = New System.Drawing.Point(185, 68)
+        Me.lblDefine.Name = "lblDefine"
+        Me.lblDefine.Size = New System.Drawing.Size(223, 28)
+        Me.lblDefine.TabIndex = 20
+        Me.lblDefine.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblDefine.Visible = False
         '
-        'cmdCalculate
+        'cbxPCS
         '
-        Me.cmdCalculate.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCalculate.Location = New System.Drawing.Point(16, 194)
-        Me.cmdCalculate.Name = "cmdCalculate"
-        Me.cmdCalculate.Size = New System.Drawing.Size(152, 40)
-        Me.cmdCalculate.TabIndex = 8
-        Me.cmdCalculate.Text = "Calculate Subbasin &Parameters"
+        Me.cbxPCS.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cbxPCS.Location = New System.Drawing.Point(68, 107)
+        Me.cbxPCS.Name = "cbxPCS"
+        Me.cbxPCS.Size = New System.Drawing.Size(216, 24)
+        Me.cbxPCS.TabIndex = 19
+        Me.cbxPCS.Text = "Include PCS as Outlets"
         '
-        'Label3
+        'cmdDefine
         '
-        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(16, 250)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(152, 24)
-        Me.Label3.TabIndex = 9
-        Me.Label3.Text = "Reach Layer:"
-        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.cmdDefine.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdDefine.Location = New System.Drawing.Point(13, 61)
+        Me.cmdDefine.Name = "cmdDefine"
+        Me.cmdDefine.Size = New System.Drawing.Size(152, 40)
+        Me.cmdDefine.TabIndex = 18
+        Me.cmdDefine.Text = "Define &Stream Network and Outlets"
         '
         'cboReach
         '
         Me.cboReach.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboReach.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboReach.Location = New System.Drawing.Point(152, 250)
+        Me.cboReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboReach.Location = New System.Drawing.Point(127, 21)
         Me.cboReach.Name = "cboReach"
-        Me.cboReach.Size = New System.Drawing.Size(253, 24)
-        Me.cboReach.TabIndex = 10
+        Me.cboReach.Size = New System.Drawing.Size(281, 24)
+        Me.cboReach.TabIndex = 17
         '
-        'cmdDefine
+        'Label3
         '
-        Me.cmdDefine.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdDefine.Location = New System.Drawing.Point(16, 290)
-        Me.cmdDefine.Name = "cmdDefine"
-        Me.cmdDefine.Size = New System.Drawing.Size(152, 40)
-        Me.cmdDefine.TabIndex = 11
-        Me.cmdDefine.Text = "Define &Stream Network and Outlets"
+        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label3.Location = New System.Drawing.Point(13, 18)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(152, 24)
+        Me.Label3.TabIndex = 16
+        Me.Label3.Text = "Reach Layer:"
+        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox2.Controls.Add(Me.lblCalc)
+        Me.GroupBox2.Controls.Add(Me.cmdCalculate)
+        Me.GroupBox2.Controls.Add(Me.cboDEM)
+        Me.GroupBox2.Controls.Add(Me.Label2)
+        Me.GroupBox2.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBox2.Location = New System.Drawing.Point(3, 165)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(420, 134)
+        Me.GroupBox2.TabIndex = 18
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Subbasin Parameters"
         '
         'lblCalc
         '
         Me.lblCalc.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblCalc.Location = New System.Drawing.Point(192, 202)
+        Me.lblCalc.Location = New System.Drawing.Point(189, 75)
         Me.lblCalc.Name = "lblCalc"
-        Me.lblCalc.Size = New System.Drawing.Size(213, 24)
-        Me.lblCalc.TabIndex = 12
+        Me.lblCalc.Size = New System.Drawing.Size(218, 24)
+        Me.lblCalc.TabIndex = 16
         Me.lblCalc.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.lblCalc.Visible = False
         '
-        'lblDefine
+        'cmdCalculate
         '
-        Me.lblDefine.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.cmdCalculate.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdCalculate.Location = New System.Drawing.Point(13, 67)
+        Me.cmdCalculate.Name = "cmdCalculate"
+        Me.cmdCalculate.Size = New System.Drawing.Size(152, 40)
+        Me.cmdCalculate.TabIndex = 15
+        Me.cmdCalculate.Text = "Calculate Subbasin &Parameters"
+        '
+        'cboDEM
+        '
+        Me.cboDEM.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblDefine.Location = New System.Drawing.Point(184, 298)
-        Me.lblDefine.Name = "lblDefine"
-        Me.lblDefine.Size = New System.Drawing.Size(213, 24)
-        Me.lblDefine.TabIndex = 13
-        Me.lblDefine.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.lblDefine.Visible = False
+        Me.cboDEM.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboDEM.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboDEM.Location = New System.Drawing.Point(127, 27)
+        Me.cboDEM.Name = "cboDEM"
+        Me.cboDEM.Size = New System.Drawing.Size(280, 24)
+        Me.cboDEM.TabIndex = 14
         '
-        'cbxPCS
+        'Label2
         '
-        Me.cbxPCS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cbxPCS.Location = New System.Drawing.Point(40, 338)
-        Me.cbxPCS.Name = "cbxPCS"
-        Me.cbxPCS.Size = New System.Drawing.Size(216, 24)
-        Me.cbxPCS.TabIndex = 15
-        Me.cbxPCS.Text = "Include PCS as Outlets"
+        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.Location = New System.Drawing.Point(13, 27)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(152, 24)
+        Me.Label2.TabIndex = 13
+        Me.Label2.Text = "Elevation Layer:"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox3.Controls.Add(Me.cmdDelineate)
+        Me.GroupBox3.Controls.Add(Me.lblDelin)
+        Me.GroupBox3.Controls.Add(Me.cmdCancel)
+        Me.GroupBox3.Controls.Add(Me.cmdCommit)
+        Me.GroupBox3.Controls.Add(Me.cboLayer)
+        Me.GroupBox3.Controls.Add(Me.Label1)
+        Me.GroupBox3.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.GroupBox3.Location = New System.Drawing.Point(3, 12)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(420, 147)
+        Me.GroupBox3.TabIndex = 19
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Manual Delineation"
+        '
+        'cmdDelineate
+        '
+        Me.cmdDelineate.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdDelineate.Location = New System.Drawing.Point(13, 65)
+        Me.cmdDelineate.Name = "cmdDelineate"
+        Me.cmdDelineate.Size = New System.Drawing.Size(152, 40)
+        Me.cmdDelineate.TabIndex = 23
+        Me.cmdDelineate.Text = "&Delineate Subbasin"
         '
         'lblDelin
         '
-        Me.lblDelin.Location = New System.Drawing.Point(16, 99)
+        Me.lblDelin.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblDelin.Location = New System.Drawing.Point(12, 108)
         Me.lblDelin.Name = "lblDelin"
-        Me.lblDelin.Size = New System.Drawing.Size(402, 42)
-        Me.lblDelin.TabIndex = 16
+        Me.lblDelin.Size = New System.Drawing.Size(402, 36)
+        Me.lblDelin.TabIndex = 22
         Me.lblDelin.Text = "Click points on the map to delineate a new subbasin boundary.  When completed cli" & _
             "ck 'Commit' or right click on the map."
         Me.lblDelin.Visible = False
         '
+        'cmdCancel
+        '
+        Me.cmdCancel.Enabled = False
+        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdCancel.Location = New System.Drawing.Point(296, 73)
+        Me.cmdCancel.Name = "cmdCancel"
+        Me.cmdCancel.Size = New System.Drawing.Size(72, 24)
+        Me.cmdCancel.TabIndex = 21
+        Me.cmdCancel.Text = "Cancel"
+        '
+        'cmdCommit
+        '
+        Me.cmdCommit.Enabled = False
+        Me.cmdCommit.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdCommit.Location = New System.Drawing.Point(204, 73)
+        Me.cmdCommit.Name = "cmdCommit"
+        Me.cmdCommit.Size = New System.Drawing.Size(80, 24)
+        Me.cmdCommit.TabIndex = 20
+        Me.cmdCommit.Text = "Commit"
+        '
+        'cboLayer
+        '
+        Me.cboLayer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboLayer.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cboLayer.Location = New System.Drawing.Point(127, 25)
+        Me.cboLayer.Name = "cboLayer"
+        Me.cboLayer.Size = New System.Drawing.Size(274, 24)
+        Me.cboLayer.TabIndex = 19
+        '
+        'Label1
+        '
+        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(6, 25)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(152, 24)
+        Me.Label1.TabIndex = 18
+        Me.Label1.Text = "Subbasin Layer:"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
         'frmManDelin
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(421, 411)
-        Me.Controls.Add(Me.lblDelin)
-        Me.Controls.Add(Me.cbxPCS)
-        Me.Controls.Add(Me.lblDefine)
-        Me.Controls.Add(Me.lblCalc)
-        Me.Controls.Add(Me.cmdDefine)
-        Me.Controls.Add(Me.cboReach)
-        Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.cmdCalculate)
-        Me.Controls.Add(Me.cboDEM)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.cmdCancel)
-        Me.Controls.Add(Me.cmdCommit)
-        Me.Controls.Add(Me.cboLayer)
-        Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.cmdDelineate)
+        Me.ClientSize = New System.Drawing.Size(427, 495)
+        Me.Controls.Add(Me.GroupBox3)
+        Me.Controls.Add(Me.GroupBox2)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.cmdClose)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmManDelin"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Manual Watershed Delineator"
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox3.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -327,6 +383,7 @@ Public Class frmManDelin
         Next lyr
         If cboDEM.SelectedIndex = -1 Then
             cmdCalculate.Enabled = False
+            cmdDefine.Enabled = False
         End If
 
         'set reach layer
@@ -586,13 +643,21 @@ Public Class frmManDelin
             ypts.Remove(1)
         Loop
 
+        Me.BringToFront()
+
     End Sub
 
     Private Sub cboDEM_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboDEM.SelectedIndexChanged
         If cboDEM.SelectedIndex = -1 Then
             cmdCalculate.Enabled = False
+            cmdDefine.Enabled = False
         Else
             cmdCalculate.Enabled = True
+            If cboReach.SelectedIndex = -1 Then
+                cmdDefine.Enabled = False
+            Else
+                cmdDefine.Enabled = True
+            End If
         End If
     End Sub
 
@@ -810,7 +875,7 @@ Public Class frmManDelin
             End If
         End If
         If LevelFieldIndex = -1 Then
-            MsgBox("Cannot find field 'Level' in the streams layer", MsgBoxStyle.OKOnly, "Stream Network Problem")
+            MsgBox("Cannot find field 'Level' in the streams layer", MsgBoxStyle.OkOnly, "Stream Network Problem")
             Exit Sub
         End If
 
@@ -1252,6 +1317,18 @@ Public Class frmManDelin
     Private Sub frmManDelin_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
             ShowHelp("BASINS Details\Watershed Delineation\Manual Watershed Delineation.html")
+        End If
+    End Sub
+
+    Private Sub cboReach_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboReach.SelectedIndexChanged
+        If cboReach.SelectedIndex = -1 Then
+            cmdDefine.Enabled = False
+        Else
+            If cboDEM.SelectedIndex = -1 Then
+                cmdDefine.Enabled = False
+            Else
+                cmdDefine.Enabled = True
+            End If
         End If
     End Sub
 
