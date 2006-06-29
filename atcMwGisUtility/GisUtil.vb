@@ -621,7 +621,7 @@ Public Class GisUtil
         Dim lSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aLayerIndex)
         If FeatureIndexValid(aFeatureIndex, lSf) Then
             Try
-                lArea = MapWinX.Utils.Area(lSf.Shape(aFeatureIndex))
+                lArea = MapWinGeoProc.Utils.Area(lSf.Shape(aFeatureIndex))
                 If lArea < 0.000001 Then 'TODO: try to calculate?
                     lArea = Double.NaN
                 End If
@@ -1419,13 +1419,13 @@ Public Class GisUtil
                             lSf1Ext.yMin > lSf2ShapeExtYmax(k) OrElse _
                             lSf1Ext.yMax < lSf2ShapeExtYmin(k)) Then
                         'look for intersection from overlay of these shapes
-                        lShapeNew = MapWinX.SpatialOperations.Intersection(lShape1, lSf2Shape(k))
+                        lShapeNew = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lSf2Shape(k))
                         If lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
                             lBsuc = lSfOut.EditInsertShape(lShapeNew, lSfOut.NumShapes)
                             If Not lBsuc Then
                                 Logger.Dbg("Problem Adding Shape") 'TODO:add more details, message box?
                             End If
-                            Dim lArea As Double = Math.Abs(MapWinX.Utils.Area(lShapeNew))
+                            Dim lArea As Double = Math.Abs(MapWinGeoProc.Utils.Area(lShapeNew))
                             'keep track of field values from both shapefiles
                             Dim lFeature1Id As String = FieldValue(aLayer1Index, i - 1, aLayer1FieldIndex)
                             Dim lFeature2Id As String = FieldValue(aLayer2Index, lShapeIndex, aLayer2FieldIndex)
@@ -1527,7 +1527,7 @@ Public Class GisUtil
                     Else
                         'need to clip
                         lRetc = issf.EditInsertShape(lSf.Shape(j - 1), j - 1)
-                        lRetc = MapWinX.SpatialOperations.ClipShapesWithPolygon(issf, lShapeClip, rsf)
+                        lRetc = MapWinGeoProc.SpatialOperations.ClipShapesWithPolygon(issf, lShapeClip, rsf)
                         lRetc = issf.EditDeleteShape(0)
                         If rsf.NumShapes > 0 Then
                             lRetc = lNewShapeFile.EditInsertShape(rsf.Shape(0), lNewShapeFile.NumShapes)
@@ -1724,9 +1724,9 @@ Public Class GisUtil
 
         Dim lNewShape As MapWinGIS.Shape
 
-        lNewShape = MapWinX.SpatialOperations.Intersection(lShape1, lShape2)
+        lNewShape = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lShape2)
         If lNewShape.numPoints > 0 Then
-            lAreaOverlappingPolygons = Math.Abs(MapWinX.Utils.Area(lNewShape))
+            lAreaOverlappingPolygons = Math.Abs(MapWinGeoProc.Utils.Area(lNewShape))
         End If
         lNewShape = Nothing
         Return lAreaOverlappingPolygons
