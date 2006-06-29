@@ -112,7 +112,7 @@ Public Class PlugIn
         success = polyShapefile.Open("c:\temp\temp2.shp")
         polyShape = polyShapefile.Shape(0)
 
-        success = MapWinX.SpatialOperations.ClipPolygonWithLine(polyShape, lineShape, "c:\temp\temp.shp")
+        success = MapWinGeoProc.SpatialOperations.ClipPolygonWithLine(polyShape, lineShape, "c:\temp\temp.shp")
 
     End Sub
 

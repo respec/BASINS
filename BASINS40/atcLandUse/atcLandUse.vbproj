@@ -89,11 +89,6 @@
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MapWinX">
-      <Name>MapWinX</Name>
-      <HintPath>..\Bin\MapWinX.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

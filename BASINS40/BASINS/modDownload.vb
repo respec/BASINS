@@ -279,7 +279,7 @@ StartOver:
                             lInputProjection = CleanUpUserProjString(lInputProjection)
                             lOutputProjection = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
                             If lInputProjection <> lOutputProjection Then
-                                lSuccess = MapWinX.SpatialReference.ProjectShapefile(lInputProjection, lOutputProjection, lExtentsSf)
+                                lSuccess = MapWinGeoProc.SpatialReference.ProjectShapefile(lInputProjection, lOutputProjection, lExtentsSf)
                                 lSuccess = lExtentsSf.Open(lProjectDir & "nlcd\catextent.shp")
                                 lShape = lExtentsSf.Shape(0)
                             End If
@@ -293,7 +293,7 @@ StartOver:
                             SaveFileString(FilenameNoExt(lCurFilename) & ".prj", "")
                         End If
                         Logger.Dbg("ClipGridWithPolygon: " & lCurFilename & " " & lProjectDir & "nlcd\catextent.shp" & " " & lOutputFileName & " " & "True")
-                        lSuccess = MapWinX.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
+                        lSuccess = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
                         g_MapWin.StatusBar(1).Text = ""
                     Case "project_dir"
                         lProjectDir = lProjectorNode.Content
@@ -355,14 +355,14 @@ StartOver:
                             g_MapWin.StatusBar(1).Text = "Projecting Grid..."
                             g_MapWin.Refresh()
                             DoEvents()
-                            lSuccess = MapWinX.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
+                            lSuccess = MapWinGeoProc.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
                             g_MapWin.StatusBar(1).Text = ""
                             If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
                                 'create .prj file as work-around for bug
                                 SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
                             End If
                             If Not lSuccess Then
-                                Logger.Msg("Failed to project grid" & vbCrLf & MapWinX.Error.GetLastErrorMsg, "ProcessProjectorFile")
+                                Logger.Msg("Failed to project grid" & vbCrLf & MapWinGeoProc.Error.GetLastErrorMsg, "ProcessProjectorFile")
                                 System.IO.File.Copy(lCurFilename, lOutputFileName)
                             End If
                         End If

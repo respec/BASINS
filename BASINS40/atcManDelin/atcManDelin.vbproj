@@ -69,6 +69,10 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MapWinGeoProc, Version=1.0.2365.24608, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.0.2311.37837, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -77,11 +81,6 @@
     <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MapWinX">
-      <Name>MapWinX</Name>
-      <HintPath>..\Bin\MapWinX.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
