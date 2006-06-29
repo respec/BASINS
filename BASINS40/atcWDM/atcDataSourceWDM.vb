@@ -179,6 +179,7 @@ Public Class atcDataSourceWDM
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
         Logger.Dbg("atcDataSourceWdm:AddDataset:entry:" & aExistAction)
+        Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Try
             Dim lTimser As atcTimeseries = aDataSet
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
@@ -199,7 +200,6 @@ Public Class atcDataSourceWDM
 
             'aDataSet.Attributes.CalculateAll() 'should we calculdate attributes on request, not here on creation
 
-            Dim lWdmHandle As New atcWdmHandle(0, Specification)
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
             Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
@@ -265,6 +265,7 @@ Public Class atcDataSourceWDM
             Return True
         Catch ex As Exception
             Logger.Dbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
+            lWdmHandle.Dispose()
             Return False
         End Try
     End Function
