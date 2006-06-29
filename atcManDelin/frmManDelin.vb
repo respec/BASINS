@@ -558,7 +558,7 @@ Public Class frmManDelin
                 ltempfile = PathNameOnly(OperatingShapefile) & "\temp" & k & ".shp"
             Loop
 
-            success = MapWinX.SpatialOperations.ClipPolygonWithLine(lShapefile.Shape(i - 1), clipshape, ltempfile)
+            success = MapWinGeoProc.SpatialOperations.ClipPolygonWithLine(lShapefile.Shape(i - 1), clipshape, ltempfile)
             If success Then
                 lOutputShapefile.Open(ltempfile)
                 If lOutputShapefile.NumShapes > 0 Then
