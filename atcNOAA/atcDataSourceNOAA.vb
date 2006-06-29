@@ -147,6 +147,7 @@ Public Class atcDataSourceNOAA
                             lData.Attributes.SetValue("tu", 4)
                             lData.Attributes.SetValue("ts", 1)
                             lData.Attributes.SetValue("point", False)
+                            lData.Attributes.SetValue("TSFILL", MissingVal)
                             lData.Attributes.SetValue("MVal", MissingVal)
                             lData.Attributes.SetValue("MAcc", MissingAcc)
                             DataSets.Add(lTSKey, lData)
@@ -217,15 +218,17 @@ Public Class atcDataSourceNOAA
                 Dim lDataSets As New atcDataGroup
                 Dim lInd As Integer = 0
                 For Each lData In DataSets
-                    lInd += 1
-                    lData.Attributes.SetValue("ID", lInd)
                     lData.numValues = lData.Attributes.GetValue("Count")
-                    lData.Dates.Value(0) = lData.Dates.Value(1) - 1 'set 0th date to start of 1st interval
-                    lDataFilled = FillValues(lData, 4, 1, MissingVal, MissingVal, MissingAcc)
-                    If Not lDataFilled Is Nothing Then
-                        lDataFilled.ValuesNeedToBeRead = False
-                        lDataFilled.Dates.ValuesNeedToBeRead = False
-                        lDataSets.Add(lDataFilled)
+                    If lData.numValues > 0 Then
+                        lInd += 1
+                        lData.Attributes.SetValue("ID", lInd)
+                        lData.Dates.Value(0) = lData.Dates.Value(1) - 1 'set 0th date to start of 1st interval
+                        lDataFilled = FillValues(lData, 4, 1, MissingVal, MissingVal, MissingAcc)
+                        If Not lDataFilled Is Nothing Then
+                            lDataFilled.ValuesNeedToBeRead = False
+                            lDataFilled.Dates.ValuesNeedToBeRead = False
+                            lDataSets.Add(lDataFilled)
+                        End If
                     End If
                 Next
                 DataSets.Clear() 'get rid of initial "unfilled" data sets

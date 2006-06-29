@@ -343,12 +343,12 @@ Public Module modMetData
                     lTotBV += lNMVals
                 End If
                 lMisPd += 1
-                lPos += lMPos + lNMVals
+                lPos = lMPos + lNMVals
                 If aRepTyp = 0 Then
                     s &= "  " & lNMVals & " " & lTSStr & ls & lDateStr & vbCrLf
                 Else
-                    s &= "DETAIL:HEADER  Index, Start, Length, Type, AccumVal" & vbCrLf
-                    s &= "DETAIL:DATA  " & lMisPd & ", " & Date2J(ldate) & ", " & lNMVals & ", " & lMCod & ", " & lAccVal & vbCrLf
+                    's &= "DETAIL:HEADER  Index, Start, Length, Type, AccumVal" & vbCrLf
+                    's &= "DETAIL:DATA  " & lMisPd & ", " & Date2J(ldate) & ", " & lNMVals & ", " & lMCod & ", " & lAccVal & vbCrLf
                 End If
             End If
         Loop
@@ -468,7 +468,7 @@ Public Module modMetData
             aMisCod = 2
             aNVals = lAccFlg
             'save accumulated value for possible distribution later
-            aMVal = aDBuff(i)
+            aMVal = aDBuff(i - 1)
         ElseIf lBadFlg > 0 Then
             'screwball values
             aMisCod = 3
@@ -769,7 +769,7 @@ Public Module modMetData
                             lNOAAattribs.Add("WMO", lStr.Substring(16, 5))
                             lNOAAattribs.Add("ICAO", lStr.Substring(33, 4))
                             lNOAAattribs.Add("COCODE", lStr.Substring(62, 30))
-                            lNOAAattribs.Add("TMZONE", lStr.Substring(93, 4))
+                            lNOAAattribs.Add("TIME", lStr.Substring(93, 4))
                             lNOAAattribs.Add("STANAM", lStr.Substring(99, 30))
                             'lNOAAattribs.Add("DESCRP", Mid(lStr, 143, 30))
                             lNOAAattribs.Add("START", lStr.Substring(130, 8))

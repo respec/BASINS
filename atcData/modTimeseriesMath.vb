@@ -267,107 +267,113 @@ Public Module modTimeseriesMath
         'aFillVal - Value to Fill data gaps with.
         'aMissVal - Value indicating missing data.
         'aAccumVal - Value indicating accumulated data.
-        Dim lDate(5) As Integer
-        Dim lNewNumVals As Integer
-        Dim lNewInd As Integer
-        Dim lOldInd As Integer
-        Dim lDateNew As Double
-        Dim lDateOld As Double
-        Dim lValOld As Double
-        Dim lNewVals() As Double
-        Dim lNewDates() As Double = NewDates(aOldTSer, aTU, aTS)
 
-        If lNewDates.GetUpperBound(0) > 0 Then 'dates for new timeseries set
-            'Select Case aTU
-            '  Case atcTimeUnit.TUSecond : lIntvl = JulianSecond : lVarLength = 0
-            '  Case atcTimeUnit.TUMinute : lIntvl = JulianMinute : lVarLength = 0
-            '  Case atcTimeUnit.TUHour : lIntvl = JulianHour : lVarLength = 0
-            '  Case atcTimeUnit.TUDay : lIntvl = aTS : lVarLength = 0
-            '  Case atcTimeUnit.TUMonth : lIntvl = aTS * 30.44 : lVarLength = 1
-            '  Case atcTimeUnit.TUYear : lIntvl = aTS * 365.25 : lVarLength = 2
-            '  Case atcTimeUnit.TUCentury : lIntvl = aTS * 36525 : lVarLength = 3
-            'End Select
+        If aOldTSer.numValues > 0 Then
+            Dim lDate(5) As Integer
+            Dim lNewNumVals As Integer
+            Dim lNewInd As Integer
+            Dim lOldInd As Integer
+            Dim lDateNew As Double
+            Dim lDateOld As Double
+            Dim lValOld As Double
+            Dim lNewVals() As Double
+            Dim lNewDates() As Double = NewDates(aOldTSer, aTU, aTS)
 
-            Dim lNewTSer As New atcTimeseries(aDataSource)
-            CopyBaseAttributes(aOldTSer, lNewTSer)
-            lNewTSer.Attributes.SetValue("point", False)
-            If aOldTSer.ValueAttributesExist Then 'TODO:: Something with value attributes
-            End If
+            If lNewDates.GetUpperBound(0) > 0 Then 'dates for new timeseries set
+                'Select Case aTU
+                '  Case atcTimeUnit.TUSecond : lIntvl = JulianSecond : lVarLength = 0
+                '  Case atcTimeUnit.TUMinute : lIntvl = JulianMinute : lVarLength = 0
+                '  Case atcTimeUnit.TUHour : lIntvl = JulianHour : lVarLength = 0
+                '  Case atcTimeUnit.TUDay : lIntvl = aTS : lVarLength = 0
+                '  Case atcTimeUnit.TUMonth : lIntvl = aTS * 30.44 : lVarLength = 1
+                '  Case atcTimeUnit.TUYear : lIntvl = aTS * 365.25 : lVarLength = 2
+                '  Case atcTimeUnit.TUCentury : lIntvl = aTS * 36525 : lVarLength = 3
+                'End Select
 
-            'If aOldTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aOldTSer.Dates.Value(0)) Then
-            '  If lVarLength > 0 Then
-            '    J2Date(aOldTSer.Dates.Value(1), lDate)
-            '    If lVarLength = 1 Then
-            '      lSJDay = aOldTSer.Dates.Value(1) - daymon(lDate(0), lDate(1))
-            '    ElseIf lVarLength = 2 Then
-            '      lSJDay = aOldTSer.Dates.Value(1) - 365 - (daymon(lDate(0), 2) - 28)
-            '    Else 'TODO::something for centuries
-            '    End If
-            '  Else
-            '    lSJDay = aOldTSer.Dates.Value(1) - lIntvl
-            '  End If
-            'Else
-            '  lSJDay = aOldTSer.Dates.Value(0)
-            'End If
-            'lEJDay = aOldTSer.Dates.Value(aOldTSer.numValues)
-            'lNewNumVals = (lEJDay - lSJDay) / lIntvl
-            'ReDim lNewVals(lNewNumVals)
-            'ReDim lNewDates(lNewNumVals)
-            'lNewDates(0) = lSJDay
-            lNewNumVals = lNewDates.GetUpperBound(0)
-            ReDim lNewVals(lNewNumVals)
-            lOldInd = 1
-            lDateOld = aOldTSer.Dates.Value(lOldInd)
-            lNewInd = 1
-            lDateNew = lNewDates(lNewInd)
-            While lNewInd <= lNewNumVals
-                While lDateNew < lDateOld - JulianSecond 'Fill values not present in original data
-                    Select Case lValOld
-                        Case aMissVal
-                            If aOldTSer.Value(lOldInd) = aMissVal Then
-                                lNewVals(lNewInd) = aMissVal
-                            Else
-                                lNewVals(lNewInd) = aFillVal
-                            End If
-                        Case aAccumVal : lNewVals(lNewInd) = aAccumVal
-                        Case Else : lNewVals(lNewInd) = aFillVal
-                    End Select
+                Dim lNewTSer As New atcTimeseries(aDataSource)
+                CopyBaseAttributes(aOldTSer, lNewTSer)
+                lNewTSer.Attributes.SetValue("point", False)
+                If aOldTSer.ValueAttributesExist Then 'TODO:: Something with value attributes
+                End If
+
+                'If aOldTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aOldTSer.Dates.Value(0)) Then
+                '  If lVarLength > 0 Then
+                '    J2Date(aOldTSer.Dates.Value(1), lDate)
+                '    If lVarLength = 1 Then
+                '      lSJDay = aOldTSer.Dates.Value(1) - daymon(lDate(0), lDate(1))
+                '    ElseIf lVarLength = 2 Then
+                '      lSJDay = aOldTSer.Dates.Value(1) - 365 - (daymon(lDate(0), 2) - 28)
+                '    Else 'TODO::something for centuries
+                '    End If
+                '  Else
+                '    lSJDay = aOldTSer.Dates.Value(1) - lIntvl
+                '  End If
+                'Else
+                '  lSJDay = aOldTSer.Dates.Value(0)
+                'End If
+                'lEJDay = aOldTSer.Dates.Value(aOldTSer.numValues)
+                'lNewNumVals = (lEJDay - lSJDay) / lIntvl
+                'ReDim lNewVals(lNewNumVals)
+                'ReDim lNewDates(lNewNumVals)
+                'lNewDates(0) = lSJDay
+                lNewNumVals = lNewDates.GetUpperBound(0)
+                ReDim lNewVals(lNewNumVals)
+                lOldInd = 1
+                lDateOld = aOldTSer.Dates.Value(lOldInd)
+                lNewInd = 1
+                lDateNew = lNewDates(lNewInd)
+                While lNewInd <= lNewNumVals
+                    While lDateNew < lDateOld - JulianSecond 'Fill values not present in original data
+                        Select Case lValOld
+                            Case aMissVal
+                                If aOldTSer.Value(lOldInd) = aMissVal Then
+                                    lNewVals(lNewInd) = aMissVal
+                                Else
+                                    lNewVals(lNewInd) = aFillVal
+                                End If
+                            Case aAccumVal : lNewVals(lNewInd) = aAccumVal
+                            Case Else : lNewVals(lNewInd) = aFillVal
+                        End Select
+                        'lNewDates(lNewInd) = lDateNew
+                        lNewInd += 1
+                        lDateNew = lNewDates(lNewInd)
+                        'If lVarLength = 1 Then
+                        '  Call J2Date(lDateNew, lDate)
+                        '  lDateNew = lDateNew + daymon(lDate(0), lDate(1))
+                        'ElseIf lVarLength = 2 Then
+                        '  Call J2Date(lDateNew, lDate)
+                        '  lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
+                        'Else
+                        '  lDateNew = lDateNew + lIntvl
+                        'End If
+                    End While
+                    lValOld = aOldTSer.Value(lOldInd)
+                    lNewVals(lNewInd) = lValOld
                     'lNewDates(lNewInd) = lDateNew
-                    lNewInd += 1
-                    lDateNew = lNewDates(lNewInd)
-                    'If lVarLength = 1 Then
+                    'If lVarLength = 1 Then 'monthly
                     '  Call J2Date(lDateNew, lDate)
                     '  lDateNew = lDateNew + daymon(lDate(0), lDate(1))
-                    'ElseIf lVarLength = 2 Then
+                    'ElseIf lVarLength = 2 Then 'yearly
                     '  Call J2Date(lDateNew, lDate)
                     '  lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
                     'Else
                     '  lDateNew = lDateNew + lIntvl
                     'End If
+                    lNewInd += 1
+                    If lNewInd <= lNewNumVals Then lDateNew = lNewDates(lNewInd)
+                    lOldInd += 1
+                    If lOldInd <= aOldTSer.numValues Then lDateOld = aOldTSer.Dates.Value(lOldInd)
                 End While
-                lValOld = aOldTSer.Value(lOldInd)
-                lNewVals(lNewInd) = lValOld
-                'lNewDates(lNewInd) = lDateNew
-                'If lVarLength = 1 Then 'monthly
-                '  Call J2Date(lDateNew, lDate)
-                '  lDateNew = lDateNew + daymon(lDate(0), lDate(1))
-                'ElseIf lVarLength = 2 Then 'yearly
-                '  Call J2Date(lDateNew, lDate)
-                '  lDateNew = lDateNew + 365 + (daymon(lDate(0), 2) - 28)
-                'Else
-                '  lDateNew = lDateNew + lIntvl
-                'End If
-                lNewInd += 1
-                If lNewInd <= lNewNumVals Then lDateNew = lNewDates(lNewInd)
-                lOldInd += 1
-                If lOldInd <= aOldTSer.numValues Then lDateOld = aOldTSer.Dates.Value(lOldInd)
-            End While
-            lNewTSer.Dates = New atcTimeseries(Nothing)
-            lNewTSer.Dates.Values = lNewDates
-            lNewTSer.Values = lNewVals
-            Return lNewTSer
+                lNewTSer.Dates = New atcTimeseries(Nothing)
+                lNewTSer.Dates.Values = lNewDates
+                lNewTSer.Values = lNewVals
+                Return lNewTSer
+            Else
+                Logger.Dbg("Problem with dates in Timeseries " & aOldTSer.ToString & ".")
+                Return Nothing
+            End If
         Else
-            Logger.Msg("Invalid value for time units ('" & aTU & "') in call to Timeseries FillValues module.", "Fill Values Problem")
+            Logger.Dbg("No data values in Timeseries " & aOldTSer.ToString & ".")
             Return Nothing
         End If
     End Function
