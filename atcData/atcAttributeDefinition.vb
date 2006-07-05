@@ -3,6 +3,16 @@ Public Class atcDefinedValue
     Public Definition As atcAttributeDefinition
     Public Value As Object
     Public Arguments As atcDataAttributes 'Arguments used for calculating Value, if any, or Nothing
+
+    Public Function Clone() As atcDefinedValue
+        Dim newDefinedValue As New atcDefinedValue
+        With newDefinedValue
+            .Definition = Me.Definition
+            .Value = Me.Value
+            .Arguments = Me.Arguments
+        End With
+        Return newDefinedValue
+    End Function
 End Class
 
 ''' <summary><para>Contains metadata about a value or data set.</para></summary>
