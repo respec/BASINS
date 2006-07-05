@@ -240,6 +240,13 @@ Public Class atcDataAttributes
         End If
     End Sub
 
+    Public Shadows Sub ChangeTo(ByVal aNewItems As atcDataAttributes)
+        Clear()
+        For index As Integer = 0 To aNewItems.Count - 1
+            Add(aNewItems.Keys(index), aNewItems.ItemByIndex(index).Clone)
+        Next
+    End Sub
+
     Public Shadows Function Clone() As atcDataAttributes
         Dim newClone As New atcDataAttributes
         For Each lAdv As atcDefinedValue In Me
