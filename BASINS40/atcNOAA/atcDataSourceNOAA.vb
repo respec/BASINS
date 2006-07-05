@@ -59,6 +59,7 @@ Public Class atcDataSourceNOAA
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         Dim lData As atcTimeseries
+        Dim lDataObs As atcTimeseries = Nothing
         Dim lDataFilled As atcTimeseries
         Dim lTSKey As String
 
@@ -151,10 +152,17 @@ Public Class atcDataSourceNOAA
                             lData.Attributes.SetValue("MVal", MissingVal)
                             lData.Attributes.SetValue("MAcc", MissingAcc)
                             DataSets.Add(lTSKey, lData)
+                            lDataObs = lData.Clone
+                            lDataObs.Attributes.SetValue("Constituent", ColElementType.Value & "-OBS")
+                            lDataObs.Attributes.SetValue("Description", "SOD Observation Times")
+                            DataSets.Add(lTSKey & "-OBS", lDataObs)
+                        Else 'find parallel obs time timeseries
+                            lDataObs = DataSets.ItemByKey(lTSKey & "-OBS")
                         End If
                         lTSInd = lData.Attributes.GetValue("Count")
                         If lTSInd + repeatsThisLine > lData.numValues Then 'expand buffer
                             lData.numValues += lBufSiz
+                            lDataObs.numValues += lBufSiz
                         End If
                         For repeat = 0 To repeatsThisLine - 1
                             'Data Quality Flag2 of 2 or 3 indicates invalid value
@@ -180,6 +188,12 @@ Public Class atcDataSourceNOAA
                                               ColDay(repeat).Value, _
                                               24, 0, 0)
                                 lData.Dates.Value(lTSInd) = lJDate
+                                lDataObs.Dates.Value(lTSInd) = lJDate
+                                If ColHour(repeat).Value = "99" Then 'missing obs time
+                                    lDataObs.Value(lTSInd) = MissingVal
+                                Else 'save valid obs time
+                                    lDataObs.Value(lTSInd) = ColHour(repeat).Value
+                                End If
                                 Select Case ColFlag1(repeat).Value
                                     Case " " 'Usually flag is blank
                                         If InAccum AndAlso lData.Value(lTSInd) > 0 Then
@@ -201,6 +215,7 @@ Public Class atcDataSourceNOAA
                                 End Select
                                 If InAccum Then lData.Value(lTSInd) = MissingAcc
                                 lData.Attributes.SetValue("Count", lTSInd)
+                                lDataObs.Attributes.SetValue("Count", lTSInd)
                             End If
                         Next
                         curLine = NextLine(inReader)
