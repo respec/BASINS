@@ -44,34 +44,34 @@ Public Class atcGraphForm
                 .Type = ZedGraph.AxisType.Date
                 '.MajorUnit = ZedGraph.DateUnit.Day
                 '.MinorUnit = ZedGraph.DateUnit.Hour
-                .Max = 0
-                .Min = 100000
-                .IsTic = False
-                .IsMinorTic = False
-                .IsInsideTic = True
-                .IsMinorInsideTic = True
+                .Scale.Max = 0
+                .Scale.Min = 100000
+                .MajorTic.IsOutside = False
+                .MajorTic.IsInside = True
+                .MinorTic.IsOutside = False
+                .MinorTic.IsInside = True
             End With
             With .YAxis
-                .IsTic = False
-                .IsMinorTic = False
-                .IsInsideTic = True
-                .IsMinorInsideTic = True
+                .MajorTic.IsOutside = False
+                .MajorTic.IsInside = True
+                .MinorTic.IsOutside = False
+                .MinorTic.IsInside = True
             End With
             With .Y2Axis
-                .IsTic = False
-                .IsMinorTic = False
-                .IsInsideTic = True
-                .IsMinorInsideTic = True
+                .MajorTic.IsOutside = False
+                .MajorTic.IsInside = True
+                .MinorTic.IsOutside = False
+                .MinorTic.IsInside = True
             End With
         End With
         pMaster.PaneList.Add(myPane)
 
         Dim g As Graphics = Me.CreateGraphics()
-        pMaster.AutoPaneLayout(g, PaneLayout.SingleColumn)
+        pMaster.SetLayout(PaneLayout.SingleColumn)
 
         For Each ts As atcTimeseries In pDataGroup
             AddDatasetTimeseries(ts, ts.ToString)
-            With Pane.XAxis
+            With Pane.XAxis.Scale
                 If ts.Attributes.GetValue("point", False) Then
                     If ts.Dates.Value(1) < .Min Then .Min = ts.Dates.Value(1)
                 Else
@@ -339,13 +339,13 @@ Public Class atcGraphForm
 
             MkDirPath(PathNameOnly(aFileName))
             Dim lStream As New StreamWriter(aFileName)
-            zgc.MasterPane.Image.Save(lStream.BaseStream, lFormat)
+            zgc.MasterPane.GetImage.Save(lStream.BaseStream, lFormat)
             lStream.Close()
         End If
     End Sub
 
     Private Sub mnuEditCopy_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
-        Clipboard.SetDataObject(zgc.MasterPane.Image)
+        Clipboard.SetDataObject(zgc.MasterPane.GetImage)
     End Sub
 
     Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
@@ -359,7 +359,7 @@ Public Class atcGraphForm
 
         ' If the result is OK then print the document.
         If (printdlg.ShowDialog = Windows.Forms.DialogResult.OK) Then
-            Dim saveRect As RectangleF = Pane.PaneRect
+            Dim saveRect As RectangleF = Pane.Rect
             printdoc.Print()
             ' Restore graph size to fit form's bounds. 
             Pane.ReSize(Me.CreateGraphics, saveRect)
@@ -455,14 +455,14 @@ Public Class atcGraphForm
                     End If
                     If curve.IsY2Axis Then
                         With Pane.Y2Axis
-                            .IsOppositeTic = False
-                            .IsMinorOppositeTic = False
+                            .MajorTic.IsOpposite = False
+                            .MinorTic.IsOpposite = False
                             .IsVisible = True
-                            .IsShowTitle = True
+                            .Title.IsVisible = True
                         End With
                         With Pane.YAxis
-                            .IsOppositeTic = False
-                            .IsMinorOppositeTic = False
+                            .MajorTic.IsOpposite = False
+                            .MinorTic.IsOpposite = False
                         End With
                     End If
                 End If
