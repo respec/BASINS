@@ -77,18 +77,14 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
-    <Reference Include="System.Data">
-      <Name>System.Data</Name>
-    </Reference>
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
-    <Reference Include="ZedGraph">
-      <Name>ZedGraph</Name>
-      <HintPath>..\Bin\ZedGraph.dll</HintPath>
+    <Reference Include="ZedGraph, Version=5.0.0.27747, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <ProjectReference Include="..\atcData\atcData.vbproj">
