@@ -58,6 +58,7 @@ Public Class PlugIn
         Dim lAreaLayerIndex As Integer
         Dim lProblem As String = ""
 
+        BuildReport = ""
         Dim lArgs(3) As Object
         'set area layer indexes
         Try
@@ -106,11 +107,11 @@ Public Class PlugIn
             lArgs(3) = cSelectedAreaIndexes
 
             'now run script
-            Dim lError As String = ""
             'Return ListedSegmentsTable.ScriptMain(lArgs(0), lArgs(1), lArgs(2), lArgs(3))
-            Return Scripting.Run("vb", "", Reports(aReportIndex), lError, False, (pMapWin), lArgs)
-        Else
-            Return "Error: " & lProblem
+            BuildReport = Scripting.Run("vb", "", Reports(aReportIndex), lProblem, False, (pMapWin), lArgs)
+        End If
+        If lProblem.Length > 0 Then
+            BuildReport = "Error: " & lProblem
         End If
 
     End Function
