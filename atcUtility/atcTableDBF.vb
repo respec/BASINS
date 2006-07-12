@@ -16,8 +16,8 @@ Public Class atcTableDBF
     'Private pCompareLongs1() As Integer
     'Private pCompareLongs2() As Integer
 
-    'Private CountAgreeNoMatch As Long
-    'Private CountAgreeMatch As Long
+    'Private CountAgreeNoMatch As Integer
+    'Private CountAgreeMatch As Integer
 
     '===========================================================================
     ' Subject: READ DBASE III                    Date: 1/25/88 (00:00)
@@ -160,30 +160,6 @@ Public Class atcTableDBF
         End Set
     End Property
 
-    'Public Property record() As Byte()
-    '	Get
-    '		'Dim i As Long
-    '		Dim retval() As Byte
-    '		ReDim retval(pHeader.NumBytesRec - 1)
-    '		CopyMemory(retval(0), pData(pCurrentRecordStart), pHeader.NumBytesRec)
-    '		'For i = 0 To pHeader.NumBytesRec - 1
-    '		'  retval(i) = pData(pCurrentRecordStart + i)
-    '		'Next
-    '		record = VB6.CopyArray(retval)
-    '	End Get
-    '	Set(ByVal Value() As Byte)
-    '		'  Dim i As Long
-    '		'  For i = 0 To pHeader.NumBytesRec - 1
-    '		'    pData(pCurrentRecordStart + i) = newValue(i)
-    '		'  Next
-    '		If UBound(newValue) = pHeader.NumBytesRec - 1 Then
-    '			CopyMemory(pData(pCurrentRecordStart), Value(0), pHeader.NumBytesRec)
-    '		Else
-    '			Logger.Msg("Cannot Let record - wrong size newValue passed" & vbCr & "new record is " & UBound(newValue) + 1 & " bytes long" & vbCr & "but should be " & pHeader.NumBytesRec & " bytes long" & vbCr & Err.Description, "Let record")
-    '		End If
-    '	End Set
-    'End Property
-
     'Merge records from dbf2Add into this dbf
     'keyFieldNames are field names in the DBFs that define a unique field.
     'If keyFieldNames is blank, no duplicate checking will occur
@@ -193,183 +169,183 @@ Public Class atcTableDBF
     ' 1 - keep existing instance of duplicates and discard duplicates from dbf being added
     ' 2 - replace existing instance of duplicates with duplicates from dbf being added
     ' 3 - ask user what to do (not currently implemented)
-    'Public Sub Merge(dbf2Add As atcTable, keyFieldNames() As String, DuplicateAction As Long)
-    '  Dim addRecordNum As Long
-    '  Dim fieldNum As Long
-    '  Dim keyField() As Long
-    '  Dim operator() As String
-    '  Dim keyValue() As Variant
-    '  Dim recordToCopy() As Byte
-    '  Dim firstKeyField As Long
-    '  Dim lastKeyField As Long
-    '  Dim lMsg As String
-    '  Dim LastOldRec As Long
-    '  Dim AllFieldsKey As Boolean
-    '  Dim foundDuplicate As Boolean
-    '  Dim canCopyRecords As Boolean
-    '
-    '  Log "Merge " & dbf2Add.Filename & " into " & Filename
-    '
-    '  If dbf2Add.NumRecords > 0 And pNumFields <> dbf2Add.NumFields And pHeader.NumRecs < 1 Then
-    '    'Replace our field definitions with the new ones since we have no data
-    '    NumFields = dbf2Add.NumFields
-    '    For fieldNum = 1 To pNumFields
-    '      FieldName(fieldNum) = dbf2Add.FieldName(fieldNum)
-    '      FieldType(fieldNum) = dbf2Add.FieldType(fieldNum)
-    '      FieldLength(fieldNum) = dbf2Add.FieldLength(fieldNum)
-    ''FIXME      FieldDecimalCount(fieldNum) = dbf2Add.FieldDecimalCount(fieldNum)
-    '    Next
-    '    NumRecords = 0
-    '    Me.InitData
-    '  End If
-    '
-    '  If dbf2Add.NumRecords < 1 Then
-    '    Log "No records to add from empty DBF:" & vbCr & dbf2Add.Filename
-    '  ElseIf pNumFields <> dbf2Add.NumFields Then
-    '    Logger.Msg "Different number of fields:" & vbCr _
-    ''          & pFilename & " = " & pNumFields & vbCr _
-    ''          & dbf2Add.Filename & " = " & dbf2Add.NumFields & vbCr & vbCr _
-    ''          & "Cannot merge DBF files", "Merge"
-    '  Else
-    '    For fieldNum = 1 To pNumFields
-    '      If UCase(Trim(FieldName(fieldNum))) <> UCase(Trim(dbf2Add.FieldName(fieldNum))) Then
-    '        If Not Logger.Msg("Field '" & FieldName(fieldNum) & "' does not appear to match '" _
-    ''               & dbf2Add.FieldName(fieldNum) & "'" & vbCr _
-    ''               & "Proceed with merge anyway, treating these fields as matching?", "Merge", True) Then
-    '          Exit Sub
+    '    Public Sub Merge(ByVal dbf2Add As atcTableDBF, ByVal keyFieldNames() As String, ByVal DuplicateAction As Integer)
+    '        Dim addRecordNum As Integer
+    '        Dim fieldNum As Integer
+    '        Dim keyField() As Integer
+    '        Dim operation() As String
+    '        Dim keyValue() As Object
+    '        Dim recordToCopy() As Byte
+    '        Dim firstKeyField As Integer
+    '        Dim lastKeyField As Integer
+    '        Dim lMsg As String
+    '        Dim LastOldRec As Integer
+    '        Dim AllFieldsKey As Boolean
+    '        Dim foundDuplicate As Boolean
+    '        Dim canCopyRecords As Boolean
+
+    '        Logger.Dbg("Merge " & dbf2Add.FileName & " into " & FileName)
+
+    '        If dbf2Add.NumRecords > 0 And pNumFields <> dbf2Add.NumFields And pHeader.NumRecs < 1 Then
+    '            'Replace our field definitions with the new ones since we have no data
+    '            NumFields = dbf2Add.NumFields
+    '            For fieldNum = 1 To pNumFields
+    '                FieldName(fieldNum) = dbf2Add.FieldName(fieldNum)
+    '                FieldType(fieldNum) = dbf2Add.FieldType(fieldNum)
+    '                FieldLength(fieldNum) = dbf2Add.FieldLength(fieldNum)
+    '                'FIXME      FieldDecimalCount(fieldNum) = dbf2Add.FieldDecimalCount(fieldNum)
+    '            Next
+    '            NumRecords = 0
+    '            Me.InitData()
     '        End If
-    '      End If
-    '    Next
-    '    If DuplicateAction > 0 Then
-    '      firstKeyField = LBound(keyFieldNames)
-    '      lastKeyField = UBound(keyFieldNames)
+
+    '        If dbf2Add.NumRecords < 1 Then
+    '            Logger.Dbg("No records to add from empty DBF:" & vbCr & dbf2Add.FileName)
+    '        ElseIf pNumFields <> dbf2Add.NumFields Then
+    '            Logger.Msg("Different number of fields:" & vbCr _
+    '                      & pFilename & " = " & pNumFields & vbCr _
+    '                      & dbf2Add.FileName & " = " & dbf2Add.NumFields & vbCr & vbCr _
+    '                      & "Cannot merge DBF files", "Merge")
+    '        Else
+    '            For fieldNum = 1 To pNumFields
+    '                If UCase(Trim(FieldName(fieldNum))) <> UCase(Trim(dbf2Add.FieldName(fieldNum))) Then
+    '                    If Not Logger.Msg("Field '" & FieldName(fieldNum) & "' does not appear to match '" _
+    '                           & dbf2Add.FieldName(fieldNum) & "'" & vbCr _
+    '                                               & "Proceed with merge anyway, treating these fields as matching?", "Merge", True) Then
+    '                        Exit Sub
+    '                    End If
+    '                End If
+    '            Next
+    '            If DuplicateAction > 0 Then
+    '                firstKeyField = LBound(keyFieldNames)
+    '                lastKeyField = UBound(keyFieldNames)
     'RedimKeys:
-    '      ReDim keyField(firstKeyField To lastKeyField)
-    '      ReDim operator(firstKeyField To lastKeyField)
-    '      ReDim keyValue(firstKeyField To lastKeyField)
-    '      For fieldNum = firstKeyField To lastKeyField
-    '        If AllFieldsKey Then
-    '          keyField(fieldNum) = fieldNum
-    '          operator(fieldNum) = "="
-    '        Else
-    '          If keyFieldNames(fieldNum) = "**ALL**" Then
-    '            AllFieldsKey = True
-    '            firstKeyField = 1
-    '            lastKeyField = pNumFields
-    '            GoTo RedimKeys
-    '          Else
-    '            lMsg = lMsg & keyFieldNames(fieldNum) & ", "
-    '            keyField(fieldNum) = FieldNumber(keyFieldNames(fieldNum))
-    '            operator(fieldNum) = "="
-    '          End If
-    '        End If
-    '      Next fieldNum
-    '      If AllFieldsKey Then
-    '        lMsg = "All fields must match to find a duplicate."
-    '      Else
-    '        If Len(lMsg) > 2 Then lMsg = " Looking for duplicate records in fields " & Left(lMsg, Len(lMsg) - 2)
-    '      End If
-    '
-    '      If Len(lMsg) > 0 Then
-    '        Select Case DuplicateAction
-    '          Case 0: Log lMsg & " Not checking for duplicates"
-    '          Case 2: Log lMsg & " Overwriting existing with new duplicates"
-    '          Case Else: Log lMsg & " Keeping existing; discarding new duplicates"
-    '        End Select
-    '        lMsg = ""
-    '      End If
-    '    End If
-    '
-    '    LastOldRec = pHeader.NumRecs 'Don't search for duplicates in newly added records
-    '    If LastOldRec < 1 Then DuplicateAction = 0 'Don't bother checking for duplicates since we start empty
-    '    dbf2Add.CurrentRecord = 1
-    '    recordToCopy = dbf2Add.record
-    '
-    '    If UBound(recordToCopy) + 1 = pHeader.NumBytesRec Then
-    '      canCopyRecords = True
-    '    Else
-    ''      Logger.Msg "Different number of bytes per record:" & vbCr _
-    ''            & Filename & " = " & pHeader.NumBytesRec & vbCr _
-    ''            & dbf2Add.Filename & " = " & UBound(recordToCopy) + 1 & vbCr & vbCr _
-    ''            & "Cannot merge DBF files", "Merge"
-    ''      Exit Sub
-    '      canCopyRecords = False
-    '      Log "Different number of bytes per record:" & vbCr _
-    ''            & Filename & " = " & pHeader.NumBytesRec & vbCr _
-    ''            & dbf2Add.Filename & " = " & UBound(recordToCopy) + 1 & vbCr _
-    ''            & "Attempting to copy fields instead of records"
-    '    End If
-    '
-    ''    Dim starttime As Date
-    ''    starttime = Now
-    '    With dbf2Add
-    '      For addRecordNum = 1 To .NumRecords
-    ''        If (addRecordNum \ 100) * 100 = addRecordNum Then
-    ''          Debug.Print "Adding " & addRecordNum & " at " & Format(Now - starttime, "h:mm:ss") & " Matches: " & CountAgreeMatch & " NoMatches: " & CountAgreeNoMatch
-    ''        End If
-    '        .CurrentRecord = addRecordNum
-    '        If DuplicateAction = 0 Then
-    '          'don't bother looking for a duplicate since we add them all anyway
-    '        ElseIf AllFieldsKey And canCopyRecords Then
-    '          'First check current record to see if it matches
-    '          If Me.MatchRecord(.record) Then
-    '            foundDuplicate = True
-    '          ElseIf pCurrentRecord < LastOldRec Then
-    '            'Check next record before searching hard for a match
-    '            'if trying to merge same data, next record will always be the one that matches
-    '            MoveNext
-    '            If Me.MatchRecord(.record) Then
-    '              foundDuplicate = True
-    '            Else
-    '              foundDuplicate = FindRecord(.record, 1, LastOldRec)
+    '                ReDim keyField(lastKeyField)
+    '                ReDim operation(lastKeyField)
+    '                ReDim keyValue(lastKeyField)
+    '                For fieldNum = firstKeyField To lastKeyField
+    '                    If AllFieldsKey Then
+    '                        keyField(fieldNum) = fieldNum
+    '                        operation(fieldNum) = "="
+    '                    Else
+    '                        If keyFieldNames(fieldNum) = "**ALL**" Then
+    '                            AllFieldsKey = True
+    '                            firstKeyField = 1
+    '                            lastKeyField = pNumFields
+    '                            GoTo RedimKeys
+    '                        Else
+    '                            lMsg = lMsg & keyFieldNames(fieldNum) & ", "
+    '                            keyField(fieldNum) = FieldNumber(keyFieldNames(fieldNum))
+    '                            operation(fieldNum) = "="
+    '                        End If
+    '                    End If
+    '                Next fieldNum
+    '                If AllFieldsKey Then
+    '                    lMsg = "All fields must match to find a duplicate."
+    '                Else
+    '                    If Len(lMsg) > 2 Then lMsg = " Looking for duplicate records in fields " & Left(lMsg, Len(lMsg) - 2)
+    '                End If
+
+    '                If Len(lMsg) > 0 Then
+    '                    Select Case DuplicateAction
+    '                        Case 0 : Logger.Dbg(lMsg & " Not checking for duplicates")
+    '                        Case 2 : Logger.Dbg(lMsg & " Overwriting existing with new duplicates")
+    '                        Case Else : Logger.Dbg(lMsg & " Keeping existing; discarding new duplicates")
+    '                    End Select
+    '                    lMsg = ""
+    '                End If
     '            End If
-    '          Else
-    '            foundDuplicate = FindRecord(.record, 1, LastOldRec)
-    '          End If
-    '        Else
-    '          For fieldNum = firstKeyField To lastKeyField
-    '            keyValue(fieldNum) = .Value(keyField(fieldNum))
-    '          Next
-    '          foundDuplicate = FindMatch(keyField, operator, keyValue, False, 1, LastOldRec)
+
+    '            LastOldRec = pHeader.NumRecs 'Don't search for duplicates in newly added records
+    '            If LastOldRec < 1 Then DuplicateAction = 0 'Don't bother checking for duplicates since we start empty
+    '            dbf2Add.CurrentRecord = 1
+    '            recordToCopy = dbf2Add.record
+
+    '            If UBound(recordToCopy) + 1 = pHeader.NumBytesRec Then
+    '                canCopyRecords = True
+    '            Else
+    '                '      Logger.Msg "Different number of bytes per record:" & vbCr _
+    '                '''            & Filename & " = " & pHeader.NumBytesRec & vbCr _
+    '                '''            & dbf2Add.Filename & " = " & UBound(recordToCopy) + 1 & vbCr & vbCr _
+    '                '''            & "Cannot merge DBF files", "Merge"
+    '                '      Exit Sub
+    '                canCopyRecords = False
+    '                Logger.Dbg("Different number of bytes per record:" & vbCr _
+    '                      & FileName & " = " & pHeader.NumBytesRec & vbCr _
+    '                            & dbf2Add.FileName & " = " & UBound(recordToCopy) + 1 & vbCr _
+    '                            & "Attempting to copy fields instead of records")
+    '            End If
+
+    '            '    Dim starttime As Date
+    '            '    starttime = Now
+    '            With dbf2Add
+    '                For addRecordNum = 1 To .NumRecords
+    '                    '        If (addRecordNum \ 100) * 100 = addRecordNum Then
+    '                    '          Debug.Print "Adding " & addRecordNum & " at " & Format(Now - starttime, "h:mm:ss") & " Matches: " & CountAgreeMatch & " NoMatches: " & CountAgreeNoMatch
+    '                    '        End If
+    '                    .CurrentRecord = addRecordNum
+    '                    If DuplicateAction = 0 Then
+    '                        'don't bother looking for a duplicate since we add them all anyway
+    '                    ElseIf AllFieldsKey And canCopyRecords Then
+    '                        'First check current record to see if it matches
+    '                        If Me.MatchRecord(.record) Then
+    '                            foundDuplicate = True
+    '                        ElseIf pCurrentRecord < LastOldRec Then
+    '                            'Check next record before searching hard for a match
+    '                            'if trying to merge same data, next record will always be the one that matches
+    '                            MoveNext()
+    '                            If Me.MatchRecord(.record) Then
+    '                                foundDuplicate = True
+    '                            Else
+    '                                foundDuplicate = FindRecord(.record, 1, LastOldRec)
+    '                            End If
+    '                        Else
+    '                            foundDuplicate = FindRecord(.record, 1, LastOldRec)
+    '                        End If
+    '                    Else
+    '                        For fieldNum = firstKeyField To lastKeyField
+    '                            keyValue(fieldNum) = .Value(keyField(fieldNum))
+    '                        Next
+    '                        foundDuplicate = FindMatch(keyField, operation, keyValue, False, 1, LastOldRec)
+    '                    End If
+    '                    If foundDuplicate Then
+    '                        'If DuplicateAction = 2 Then GoSub CopyRecord 'overwrite existing record with new record
+    '                        '      Else  'Copy this record in the DBF
+    '                        '          CurrentRecord = Me.NumRecords + 1
+    '                        'GoSub CopyRecord
+    '                    End If
+    '                Next
+    '            End With
     '        End If
-    '        If foundDuplicate Then
-    '          If DuplicateAction = 2 Then GoSub CopyRecord 'overwrite existing record with new record
-    '        Else  'Copy this record in the DBF
-    '          CurrentRecord = Me.NumRecords + 1
-    '          GoSub CopyRecord
-    '        End If
-    '      Next
-    '    End With
-    '  End If
-    '
-    '  Exit Sub
+
+    '        Exit Sub
     'CopyRecord:
-    '  If canCopyRecords Then
-    '    Me.record = dbf2Add.record
-    '  Else
-    '    For fieldNum = 1 To pNumFields
-    '      Me.Value(fieldNum) = dbf2Add.Value(fieldNum)
-    '    Next
-    '  End If
-    '  Return
-    'End Sub
+    '        If canCopyRecords Then
+    '            Me.record = dbf2Add.record
+    '        Else
+    '            For fieldNum = 1 To pNumFields
+    '                Me.Value(fieldNum) = dbf2Add.Value(fieldNum)
+    '            Next
+    '        End If
+    '        Return
+    '    End Sub
 
     Public Overrides Property CurrentRecord() As Integer
         Get
             CurrentRecord = pCurrentRecord
         End Get
         Set(ByVal Value As Integer)
-            On Error GoTo ErrHand
-            If Value > pHeader.NumRecs Then NumRecords = Value
-            If Value < 1 Or Value > pHeader.NumRecs Then
-                pCurrentRecord = 1
-            Else
-                pCurrentRecord = Value
-            End If
-            pCurrentRecordStart = pHeader.NumBytesRec * (pCurrentRecord - 1) + 1
-            Exit Property
-ErrHand:
-            Logger.Msg("Cannot set CurrentRecord to " & Value & vbCr & Err.Description, "Let CurrentRecord")
+            Try
+                If Value > pHeader.NumRecs Then NumRecords = Value
+                If Value < 1 Or Value > pHeader.NumRecs Then
+                    pCurrentRecord = 1
+                Else
+                    pCurrentRecord = Value
+                End If
+                pCurrentRecordStart = pHeader.NumBytesRec * (pCurrentRecord - 1) + 1
+            Catch ex As Exception
+                Logger.Msg("Cannot set CurrentRecord to " & Value & vbCr & ex.Message, "Let CurrentRecord")
+            End Try
         End Set
     End Property
 
@@ -482,7 +458,6 @@ ErrHand:
             ElseIf aFieldNumber < 1 Or aFieldNumber > pNumFields Then
                 Value = "Invalid Field Number"
             Else
-
                 FieldStart = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
 
                 strRet = ""
@@ -512,32 +487,32 @@ ErrHand:
 
             If pHeader.NumBytesRec = 0 Then InitData()
 
-            On Error GoTo ErrHand
-            If pCurrentRecord < 1 Then
-                'Value = "Invalid Current Record Number"
-            ElseIf aFieldNumber < 1 Or aFieldNumber > pNumFields Then
-                'Value = "Invalid Field Number"
-            Else
-                pData(pCurrentRecordStart) = 32 'clear record deleted flag or overwrite EOF
-
-                FieldStart = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
-
-                strRet = Value
-                lenStr = Len(strRet)
-                If lenStr > pFields(aFieldNumber).FieldLength Then
-                    strRet = Left(strRet, pFields(aFieldNumber).FieldLength)
-                ElseIf pFields(aFieldNumber).FieldType = "N" Then
-                    strRet = Space(pFields(aFieldNumber).FieldLength - lenStr) & strRet
+            Try
+                If pCurrentRecord < 1 Then
+                    'Value = "Invalid Current Record Number"
+                ElseIf aFieldNumber < 1 Or aFieldNumber > pNumFields Then
+                    'Value = "Invalid Field Number"
                 Else
-                    strRet = strRet & Space(pFields(aFieldNumber).FieldLength - lenStr)
+                    pData(pCurrentRecordStart) = 32 'clear record deleted flag or overwrite EOF
+
+                    FieldStart = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
+
+                    strRet = Value
+                    lenStr = Len(strRet)
+                    If lenStr > pFields(aFieldNumber).FieldLength Then
+                        strRet = Left(strRet, pFields(aFieldNumber).FieldLength)
+                    ElseIf pFields(aFieldNumber).FieldType = "N" Then
+                        strRet = Space(pFields(aFieldNumber).FieldLength - lenStr) & strRet
+                    Else
+                        strRet = strRet & Space(pFields(aFieldNumber).FieldLength - lenStr)
+                    End If
+                    For I = 0 To pFields(aFieldNumber).FieldLength - 1
+                        pData(FieldStart + I) = Asc(Mid(strRet, I + 1, 1))
+                    Next
                 End If
-                For I = 0 To pFields(aFieldNumber).FieldLength - 1
-                    pData(FieldStart + I) = Asc(Mid(strRet, I + 1, 1))
-                Next
-            End If
-            Exit Property
-ErrHand:
-            Logger.Msg("Cannot set field #" & aFieldNumber & " = '" & Value & "' in record #" & pCurrentRecord & vbCr & Err.Description, "Let Value")
+            Catch ex As Exception
+                Logger.Msg("Cannot set field #" & aFieldNumber & " = '" & Value & "' in record #" & pCurrentRecord & vbCr & ex.Message, "Let Value")
+            End Try
         End Set
     End Property
 
@@ -545,7 +520,7 @@ ErrHand:
     '  Dim retval As String
     '  Dim fieldVal As String
     '  Dim usingQuotes As Boolean
-    '  Dim iField As Long
+    '  Dim iField As integer
     '  If Len(aQuote) > 0 Then usingQuotes = True
     '  For iField = 1 To pNumFields
     '    fieldVal = Value(iField)
@@ -560,88 +535,88 @@ ErrHand:
 
     'Returns True if found, moves CurrentRecord to first record with .Record = FindValue
     'If not found, returns False and moves CurrentRecord to aStartRecord
-    '    Public Function FindRecord(ByVal FindValue() As Byte, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
-    '        Dim I As Integer
-    '        Dim firstByte As Integer
-    '        Dim lastByte As Integer
-    '        Dim lastLong As Integer
-    '        Dim nLongs As Integer
-    '        If aEndRecord < 1 Then aEndRecord = pHeader.NumRecs
+    Public Function FindRecord(ByVal FindValue() As Byte, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
+        Dim I As Integer
+        Dim firstByte As Integer
+        Dim lastByte As Integer
+        Dim lastLong As Integer
+        Dim nLongs As Integer
+        If aEndRecord < 1 Then aEndRecord = pHeader.NumRecs
 
-    '        lastByte = pHeader.NumBytesRec - 1
-    '        nLongs = pHeader.NumBytesRec \ 4
-    '        lastLong = nLongs - 1
-    '        firstByte = nLongs * 4
+        lastByte = pHeader.NumBytesRec - 1
+        nLongs = pHeader.NumBytesRec \ 4
+        lastLong = nLongs - 1
+        firstByte = nLongs * 4
 
-    '        '  Dim byt As Long
-    '        '  Dim Match As Boolean
-    '        '  Dim rec As Long
-    '        '  For rec = aStartRecord To aEndRecord
-    '        '    CurrentRecord = rec
-    '        '    Match = True
-    '        '    For byt = 0 To pHeader.NumBytesRec - 1
-    '        '      If pData(pCurrentRecordStart + byt) <> FindValue(byt) Then
-    '        '        Match = False
-    '        '        Exit For
-    '        '      End If
-    '        '    Next
-    '        '    If Match Then Exit For
-    '        '  Next
+        '  Dim byt As 
+        '  Dim Match As Boolean
+        '  Dim rec As Integer
+        '  For rec = aStartRecord To aEndRecord
+        '    CurrentRecord = rec
+        '    Match = True
+        '    For byt = 0 To pHeader.NumBytesRec - 1
+        '      If pData(pCurrentRecordStart + byt) <> FindValue(byt) Then
+        '        Match = False
+        '        Exit For
+        '      End If
+        '    Next
+        '    If Match Then Exit For
+        '  Next
 
-    '        'CAUTION! DO NOT STOP VB after StartUsingCompareLongs until after FinishedUsingCompareLongs has been called
-    '        StartUsingCompareLongs()
-    '        'UPGRADE_ISSUE: VarPtr function is not supported. Click for more: 'ms-help://MS.VSCC/commoner/redir/redirect.htm?keyword="vbup1040"'
-    '        pLongHeader1(3) = VarPtr(FindValue(0))
-    '        pCurrentRecord = aStartRecord
-    '        pCurrentRecordStart = pHeader.NumBytesRec * (pCurrentRecord - 1) + 1
+        'CAUTION! DO NOT STOP VB after StartUsingCompareLongs until after FinishedUsingCompareLongs has been called
+        'StartUsingCompareLongs()
+        'UPGRADE_ISSUE: VarPtr function is not supported. Click for more: 'ms-help://MS.VSCC/commoner/redir/redirect.htm?keyword="vbup1040"'
+        'pLongHeader1(3) = VarPtr(FindValue(0))
+        pCurrentRecord = aStartRecord
+        pCurrentRecordStart = pHeader.NumBytesRec * (pCurrentRecord - 1) + 1
 
-    'CompareCurrentRecord:
-    '        I = 0
-    '        'UPGRADE_ISSUE: VarPtr function is not supported.
-    '        pLongHeader2(3) = VarPtr(pData(pCurrentRecordStart))
-    '        For I = 0 To lastLong
-    '            If pCompareLongs1(I) <> pCompareLongs2(I) Then GoTo NotEqual
-    '        Next
+CompareCurrentRecord:
+        I = 0
+        'UPGRADE_ISSUE: VarPtr function is not supported.
+        'pLongHeader2(3) = VarPtr(pData(pCurrentRecordStart))
+        'For I = 0 To lastLong
+        ' If pCompareLongs1(I) <> pCompareLongs2(I) Then GoTo NotEqual
+        ' Next
 
-    '        For I = firstByte To lastByte
-    '            If pData(pCurrentRecordStart + I) <> FindValue(I) Then GoTo NotEqual
-    '        Next
+        For I = firstByte To lastByte
+            If pData(pCurrentRecordStart + I) <> FindValue(I) Then GoTo NotEqual
+        Next
 
-    '        FindRecord = True
-    '        FinishedUsingCompareLongs()
-    '        '    If Not Match Then Stop Else CountAgreeMatch = CountAgreeMatch + 1
-    '        Exit Function
+        FindRecord = True
+        'FinishedUsingCompareLongs()
+        '    If Not Match Then Stop Else CountAgreeMatch = CountAgreeMatch + 1
+        Exit Function
 
-    'NotEqual:
-    '        If pCurrentRecord < aEndRecord Then
-    '            pCurrentRecord = pCurrentRecord + 1
-    '            pCurrentRecordStart = pCurrentRecordStart + pHeader.NumBytesRec
-    '            GoTo CompareCurrentRecord
-    '        End If
+NotEqual:
+        If pCurrentRecord < aEndRecord Then
+            pCurrentRecord = pCurrentRecord + 1
+            pCurrentRecordStart = pCurrentRecordStart + pHeader.NumBytesRec
+            GoTo CompareCurrentRecord
+        End If
 
-    '        CurrentRecord = aStartRecord
-    '        FindRecord = False
-    '        FinishedUsingCompareLongs()
-    '        '  If Match Then Stop Else CountAgreeNoMatch = CountAgreeNoMatch + 1
-    '    End Function
+        CurrentRecord = aStartRecord
+        FindRecord = False
+        'FinishedUsingCompareLongs()
+        '  If Match Then Stop Else CountAgreeNoMatch = CountAgreeNoMatch + 1
+    End Function
 
     'Returns True if CurrentRecord matches FindValue
-    'Public Function MatchRecord(ByVal FindValue() As Byte) As Boolean
-    '    Dim byt As Integer
-    '    Dim lastbyt As Integer
-    '    If UBound(FindValue) < pHeader.NumBytesRec Then
-    '        lastbyt = UBound(FindValue)
-    '    Else
-    '        lastbyt = pHeader.NumBytesRec - 1
-    '    End If
-    '    For byt = 0 To lastbyt
-    '        If pData(pCurrentRecordStart + byt) <> FindValue(byt) Then
-    '            MatchRecord = False
-    '            Exit Function
-    '        End If
-    '    Next
-    '    MatchRecord = True
-    'End Function
+    Public Function MatchRecord(ByVal FindValue() As Byte) As Boolean
+        Dim byt As Integer
+        Dim lastbyt As Integer
+        If UBound(FindValue) < pHeader.NumBytesRec Then
+            lastbyt = UBound(FindValue)
+        Else
+            lastbyt = pHeader.NumBytesRec - 1
+        End If
+        For byt = 0 To lastbyt
+            If pData(pCurrentRecordStart + byt) <> FindValue(byt) Then
+                MatchRecord = False
+                Exit Function
+            End If
+        Next
+        MatchRecord = True
+    End Function
 
     'FindMatch Param Array
     'Returns True if a record matching rules is found
@@ -651,30 +626,30 @@ ErrHand:
     'If not found, returns False and moves CurrentRecord to 1
     'Arguments must appear in order following the pattern:
     'field number
-    'operator such as =, <, >, <=, >=
+    'operation such as =, <, >, <=, >=
     'value to compare with
     'For example, FindNextWhere(1, "=", "Mercury", 2, "<=", 0)
     'will find next record where the first field value is "Mercury" and the second is less than or equal to zero
     'Public Function FindMatchPA(ByVal aMatchAny As Boolean, _
-    ''                            ByVal aStartRecord As Long, _
-    ''                            ByVal aEndRecord As Long, _
+    ''                            ByVal aStartRecord As Integer, _
+    ''                            ByVal aEndRecord As Integer, _
     ''                            ParamArray aRules() As Variant) As Boolean
-    '  Dim iToken As Long
-    '  Dim numTokens As Long
-    '  Dim numArgs As Long
-    '  Dim iArg As Long
+    '  Dim iToken As Integer
+    '  Dim numTokens As Integer
+    '  Dim numArgs As Integer
+    '  Dim iArg As Integer
     '  numArgs = UBound(aRules()) + 1
     '  numTokens = numArgs / 3
     '  If numTokens * 3 <> numArgs Then
     '    MsgBox "Could not parse:number of args (" & numArgs & ") not divisible by 3", vbOKOnly, "clsDBF:FindNextAnd"
     '  End If
-    '  Dim fieldNum() As Long
-    '  Dim operator() As String
+    '  Dim fieldNum() As Integer
+    '  Dim operation() As String
     '  Dim fieldVal() As Variant
     '  Dim Token As String
     '
     '  ReDim fieldNum(numTokens)
-    '  ReDim operator(numTokens)
+    '  ReDim operation(numTokens)
     '  ReDim Values(numTokens)
     '  iArg = 0
     '  For iToken = 0 To numTokens - 1
@@ -683,15 +658,15 @@ ErrHand:
     '    fieldNum(iToken) = CLng(Token)
     '    If fieldNum(iToken) = 0 Then Debug.Print "FindNextRules:Field(" & aRules(iArg) & ") not found"
     '    iArg = iArg + 1
-    '    operator(iToken) = aRules(iArg)
+    '    operation(iToken) = aRules(iArg)
     '    iArg = iArg + 1
     '    fieldVal(iToken) = aRules(iArg)
     '    iArg = iArg + 1
     '  Next
-    '  FindMatchPA = FindMatch(fieldNum, operator, fieldVal, aMatchAny, aStartRecord, aEndRecord)
+    '  FindMatchPA = FindMatch(fieldNum, operation, fieldVal, aMatchAny, aStartRecord, aEndRecord)
     'End Function
 
-    Public Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperator() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
+    Public Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperation() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
         Dim numRules As Integer
         Dim iRule As Integer
         Dim lValue As Object
@@ -716,7 +691,7 @@ ErrHand:
             While iRule <= numRules And allMatch
                 thisMatches = False
                 lValue = Value(aFieldNum(iRule))
-                Select Case aOperator(iRule)
+                Select Case aOperation(iRule)
                     Case "="
                         If lValue = aFieldVal(iRule) Then thisMatches = True
                     Case "<"
@@ -727,7 +702,7 @@ ErrHand:
                         If lValue <= aFieldVal(iRule) Then thisMatches = True
                     Case ">="
                         If lValue >= aFieldVal(iRule) Then thisMatches = True
-                    Case Else : System.Diagnostics.Debug.WriteLine("Unrecognized operator:" & aOperator(iRule))
+                    Case Else : System.Diagnostics.Debug.WriteLine("Unrecognized operation:" & aOperation(iRule))
                 End Select
                 If aMatchAny Then
                     If thisMatches Then
@@ -921,7 +896,7 @@ ErrHand:
         retval &= vbCrLf & "  '.InitData"
         retval &= vbCrLf & "End With"
         retval &= vbCrLf
-        CreationCode = retval
+        Return retval
     End Function
 
     'Returns zero if the named field does not appear in this file
@@ -935,27 +910,27 @@ ErrHand:
         Next
     End Function
 
-    Public Overrides Function OpenFile(ByVal Filename As String) As Boolean
+    Public Overrides Function OpenFile(ByVal aFilename As String) As Boolean
         'Dim header As clsHeader, FieldDes As clsFieldDescriptor    'Creating variables for user-defined types
         'Dim memo As String * 512                               'Create a 512 byte fixed string variable
         ' to read memo fields
         Dim inFile As Short
         Dim I As Integer
 
-        If Not FileExists(Filename) Then
+        If Not IO.File.Exists(aFilename) Then
             Return False 'can't open a file that doesn't exist
         End If
 
-        pFilename = Filename
+        pFilename = aFilename
 
         inFile = FreeFile()
-        FileOpen(inFile, Filename, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
+        FileOpen(inFile, aFilename, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
         pHeader.ReadFromFile(inFile)
         Select Case pHeader.version 'Be sure we're using a dBASE III file
             Case 3 'Normal dBASEIII file
                 '   Case &H83 'Open a .DBT file
             Case Else
-                Logger.Msg("This is not a dBASE III file: '" & Filename & "'", "OpenDBF")
+                Logger.Msg("This is not a dBASE III file: '" & aFilename & "'", "OpenDBF")
                 FileClose(inFile)
                 Return False
         End Select
@@ -1125,47 +1100,191 @@ ErrHand:
         SummaryFile = retval
     End Function
 
-    Public Overrides Function WriteFile(ByVal Filename As String) As Boolean
+    Public Overrides Function WriteFile(ByVal aFilename As String) As Boolean
         Dim OutFile As Short
         Dim lField As Integer
-        Dim s As String
 TryAgain:
-        On Error GoTo ErrHand
+        Try
+            If IO.File.Exists(aFilename) Then
+                Kill(aFilename)
+            Else
+                IO.Directory.CreateDirectory((IO.Path.GetDirectoryName(aFilename)))
+            End If
 
-        If FileExists(Filename) Then
-            Kill(Filename)
+            OutFile = FreeFile()
+            FileOpen(OutFile, aFilename, OpenMode.Binary)
+            pHeader.WriteToFile(OutFile)
+
+            For lField = 1 To pNumFields
+                pFields(lField).WriteToFile(OutFile) 'FilePutObject(OutFile, pFields(I), (32 * I) + 1)
+            Next
+
+            'If we have over-allocated for adding more records, trim unused records
+            If pNumRecsCapacity > pHeader.NumRecs Then
+                pNumRecsCapacity = pHeader.NumRecs
+                ReDim Preserve pData(pHeader.NumRecs * pHeader.NumBytesRec)
+            End If
+
+            FilePut(OutFile, pData)
+            FileClose(OutFile)
+
+            pFilename = aFilename
+            Return True
+
+        Catch ex As Exception
+            If Logger.Msg("Error saving " & aFilename & vbCr & ex.Message, "Write DBF", MsgBoxStyle.AbortRetryIgnore) = MsgBoxResult.Retry Then
+                Try
+                    FileClose(OutFile)
+                Catch
+                    'ignore error if file cannot be closed
+                End Try
+                GoTo TryAgain
+            End If
+            Return False
+        End Try
+    End Function
+
+    Public Property RawBytesPerRecord() As Integer
+        Get
+            Return pHeader.NumBytesRec
+        End Get
+        Set(ByVal newValue As Integer)
+            pHeader.NumBytesRec = newValue
+        End Set
+    End Property
+
+    Public Property RawCurrentRecordStart() As Integer
+        Get
+            Return pCurrentRecordStart
+        End Get
+        Set(ByVal newValue As Integer)
+            pCurrentRecordStart = newValue
+        End Set
+    End Property
+
+    Public ReadOnly Property RawValueStart(ByVal aFieldNumber As Integer) As Integer
+        Get
+            Return pCurrentRecordStart + pFields(aFieldNumber).DataAddress
+        End Get
+    End Property
+
+    Public Property RawData() As Byte()
+        Get
+            Return pData
+        End Get
+        Set(ByVal newValue() As Byte)
+            pData = newValue
+            pDataBytes = pData.Length
+        End Set
+    End Property
+
+    Public Property RawRecord() As Byte()
+        Get
+            Dim retval(pHeader.NumBytesRec - 1) As Byte
+            Array.Copy(pData, pCurrentRecordStart, retval, 0, pHeader.NumBytesRec)
+            Return retval
+        End Get
+        Set(ByVal newValue() As Byte)
+            If newValue.Length = pHeader.NumBytesRec Then
+                Array.Copy(newValue, 0, pData, pCurrentRecordStart, pHeader.NumBytesRec)
+            Else
+                Logger.Msg("Cannot Let RawRecord - wrong size newValue passed" & vbCr & "new record is " & UBound(newValue) + 1 & " bytes long" & vbCr & "but should be " & pHeader.NumBytesRec & " bytes long" & vbCr & Err.Description, "Let record")
+            End If
+        End Set
+    End Property
+
+    'find(aField as Integer, aValue as String [, aStartRecord, aStopRecord] )
+    'makes a Byte() representation of aValue as it would appear in me
+    'in aField -- padded as appropriate, then scans raw data for those
+    'bytes in that field. Is there consistency about what bytes are
+    'used for padding? Might need to search for first aValue.length
+    'bytes in field, then carefully check whether a match is a longer
+    'string or the same string padded differently or as expected.
+
+    'find(aField, aRawValue as Byte() [, aStartRecord, aStopRecord])
+    'internally used by above find
+
+    'find(aRawRecord() as Byte())
+
+    'Search for the set of bytes in aFindThis starting at index aThisFirstByte for aFindNumBytes
+    'Search through aSearchIn starting at aSearchStart and advancing aSearchStride bytes.
+    'Returns how many times the pattern was searched for if found, or 0 if not found
+    'Example:
+    'findBytes( aFindThis = {0, 1, 2, 3}, 
+    '           aFindFirstByte = 1,
+    '           aFindNumBytes = 2,
+    '           aSearchIn = { 0, 0, 1, 2, 4, 1, 2, 0, 0},
+    '           aSearchStart = 1,
+    '           aSearchStride = 4)
+    ' searches for the pattern {1, 2} (the two bytes starting at 1 of aFindThis)
+    ' does not match at the first comparison with bytes {0, 1} in aSearchIn
+    ' (does not match first instance of {1, 2} in aSearchIn because search strides past)
+    ' strides 4, matches {1, 2} after the 4, and returns 2 because it was found on the second comparison
+    Private Function findBytes(ByVal aFindThis As Byte(), _
+                               ByVal aFindFirstByte As Integer, _
+                               ByVal aFindNumBytes As Integer, _
+                               ByVal aSearchIn As Byte(), _
+                               ByVal aSearchStart As Integer, _
+                               ByVal aSearchStride As Integer, _
+                               ByVal aSearchStop As Integer) As Integer
+        Dim lFindLastByte As Integer = aFindFirstByte + aFindNumBytes
+        Dim lFindByte As Integer
+        Dim lSearchPos As Integer
+        Dim lNumSearches As Integer = 0
+
+        While aSearchStart < aSearchStop
+            lNumSearches += 1
+            lFindByte = aFindFirstByte
+            While lFindByte <= lFindLastByte AndAlso aSearchIn(lSearchPos) = aFindThis(lFindByte)
+                lFindByte += 1
+                lSearchPos += 1
+            End While
+            If lFindByte > lFindLastByte Then 'Found a match
+                Return lNumSearches
+            End If
+            aSearchStart += aSearchStride
+        End While
+
+        Return 0 'not found
+    End Function
+
+    'This time only match one key field instead of entire record.
+    'Internally use find(aField, aRawValue)
+    '    Public Function findAllNew(ByVal aOtherTable As atcTableDBF, ByVal aField As Integer) As Integer()
+    Public Function findAllNew(ByVal aOtherTable As atcTableDBF, Optional ByVal aField As Integer = 0) As Integer()
+        Dim lOtherData() As Byte = aOtherTable.RawData
+        Dim lOtherBytes As Integer = aOtherTable.RawBytesPerRecord
+        Dim lOtherStart As Integer
+        Dim lOtherRecord As Integer
+
+        Dim lNewRecords As New ArrayList
+
+        If aField = 0 Then
+            lOtherBytes = aOtherTable.RawBytesPerRecord
         Else
-            MkDirPath(System.IO.Path.GetDirectoryName(Filename))
+            lOtherBytes = aOtherTable.FieldLength(aField)
         End If
 
-        OutFile = FreeFile()
-        FileOpen(OutFile, Filename, OpenMode.Binary)
-        pHeader.WriteToFile(OutFile)
+        For lOtherRecord = 1 To aOtherTable.NumRecords
+            aOtherTable.CurrentRecord = lOtherRecord
 
-        For lField = 1 To pNumFields
-            pFields(lField).WriteToFile(OutFile) 'FilePutObject(OutFile, pFields(I), (32 * I) + 1)
+            If aField = 0 Then
+                lOtherStart = aOtherTable.RawCurrentRecordStart
+            Else
+                lOtherStart = aOtherTable.RawValueStart(aField)
+            End If
+
+            If findBytes(lOtherData, lOtherStart, lOtherBytes, pData, 0, pHeader.NumBytesRec, pData.GetUpperBound(0)) = 0 Then
+                lNewRecords.Add(lOtherRecord)
+            End If
         Next
 
-        'If we have over-allocated for adding more records, trim unused records
-        If pNumRecsCapacity > pHeader.NumRecs Then
-            pNumRecsCapacity = pHeader.NumRecs
-            ReDim Preserve pData(pHeader.NumRecs * pHeader.NumBytesRec)
-        End If
-
-        FilePut(OutFile, pData)
-        FileClose(OutFile)
-
-        pFilename = Filename
-
-        Return True
-
-ErrHand:
-        Resume Next
-        If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, "Write DBF", MsgBoxStyle.AbortRetryIgnore) = MsgBoxResult.Retry Then
-            On Error Resume Next
-            FileClose(OutFile)
-            GoTo TryAgain
-        End If
-        Return False
+        Dim lReturn As Integer()
+        ReDim lReturn(lNewRecords.Count - 1)
+        For lRecord As Integer = 0 To lReturn.GetUpperBound(0)
+            lReturn(lRecord) = lNewRecords(lRecord)
+        Next
+        Return lReturn
     End Function
+
 End Class

@@ -237,7 +237,7 @@ Friend Module modBasinsPlugin
             'AddMenuIfMissing(AnalysisMenuName & "_ScriptEditor", lScriptMenuName, "Script Editor")
             'AddMenuIfMissing(AnalysisMenuName & "_RunScript", lScriptMenuName, "Select Script to Run")
 
-            'For Each lScriptFilename As String In System.IO.Directory.GetFiles(ScriptFolder, "*.vb")
+            'For Each lScriptFilename As String In IO.Directory.GetFiles(ScriptFolder, "*.vb")
             '  Dim lMenuLabel As String = FilenameOnly(lScriptFilename)
             '  If Not lMenuLabel.ToLower.StartsWith("sub") AndAlso Not lMenuLabel.ToLower.StartsWith("fun") Then
             '    AddMenuIfMissing(AnalysisMenuName & "_RunScript" & FilenameNoPath(lScriptFilename), lScriptMenuName, "Run " & lMenuLabel)
@@ -373,11 +373,11 @@ Friend Module modBasinsPlugin
         Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
         lFeedback &= "Project: " & g_MapWin.Project.FileName & vbCrLf
         lFeedback &= "Config: " & g_MapWin.Project.ConfigFileName & vbCrLf
-        lFeedback &= "CommandLine: " & System.Environment.CommandLine & vbCrLf
-        lFeedback &= "User: " & System.Environment.UserName & vbCrLf
-        lFeedback &= "Machine: " & System.Environment.MachineName & vbCrLf
-        lFeedback &= "OSVersion: " & System.Environment.OSVersion.ToString & vbCrLf
-        lFeedback &= "CLRVersion: " & System.Environment.Version.ToString & vbCrLf
+        lFeedback &= "CommandLine: " & Environment.CommandLine & vbCrLf
+        lFeedback &= "User: " & Environment.UserName & vbCrLf
+        lFeedback &= "Machine: " & Environment.MachineName & vbCrLf
+        lFeedback &= "OSVersion: " & Environment.OSVersion.ToString & vbCrLf
+        lFeedback &= "CLRVersion: " & Environment.Version.ToString & vbCrLf
 
         lFeedback &= "LogFile: " & Logger.FileName & vbCrLf
         'TODO: add current log file contents (not too much!!!)

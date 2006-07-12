@@ -44,13 +44,13 @@ Public Class atcBasinsPlugIn
 
     Public ReadOnly Property BuildDate() As String Implements MapWindow.Interfaces.IPlugin.BuildDate
         Get
-            Return System.IO.File.GetLastWriteTime(Me.GetType().Assembly.Location)
+            Return IO.File.GetLastWriteTime(Me.GetType().Assembly.Location)
         End Get
     End Property
 
     Public ReadOnly Property Version() As String Implements MapWindow.Interfaces.IPlugin.Version
         Get
-            Return System.Diagnostics.FileVersionInfo.GetVersionInfo(Me.GetType().Assembly.Location).FileVersion
+            Return Diagnostics.FileVersionInfo.GetVersionInfo(Me.GetType().Assembly.Location).FileVersion
         End Get
     End Property
 
@@ -72,11 +72,13 @@ Public Class atcBasinsPlugIn
         g_MapWin = aMapWin
         g_MapWinWindowHandle = aParentHandle
         'Set g_BasinsDir to folder above the Bin folder where the app and plugins live
-        g_BasinsDir = PathNameOnly(PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)) & "\"
+        g_BasinsDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & "\"
 
         Logger.StartToFile(g_BasinsDir & "logs\" _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log")
         Logger.MapWin = g_MapWin
+
+        CheckForUpdates(True)
 
         pDataManager = New atcDataManager(g_MapWin)
 
@@ -112,10 +114,10 @@ Public Class atcBasinsPlugIn
         For lDrive As Integer = 0 To g_BasinsDrives.Length - 1
             Dim DriveLetter As String = g_BasinsDrives.Substring(lDrive, 1)
             'Scan folder for project data, and populate menu
-            Dim lDataDirs() As String = System.IO.Directory.GetDirectories( _
+            Dim lDataDirs() As String = IO.Directory.GetDirectories( _
                                               DriveLetter & ":\BASINS\data")
             For lDirectory As Integer = 0 To lDataDirs.GetUpperBound(0)
-                Dim DirShortName As String = System.IO.Path.GetFileName(lDataDirs(lDirectory))
+                Dim DirShortName As String = IO.Path.GetFileName(lDataDirs(lDirectory))
                 If g_BasinsDrives.Length > 0 Then DirShortName = DriveLetter & ": " & DirShortName
                 mnu = AddMenuIfMissing(ProjectsMenuName & "_" & DirShortName, _
                                        ProjectsMenuName, lDataDirs(lDirectory))
@@ -215,7 +217,7 @@ Public Class atcBasinsPlugIn
             Case ManageDataMenuName
                 pDataManager.UserManage()
             Case CheckForUpdatesMenuName
-                OpenFile("http://hspf.com/pub/basins4/updates.html", True)
+                CheckForUpdates(False)
             Case BasinsWebPageMenuName
                 OpenFile("http://www.epa.gov/waterscience/basins/index.html")
             Case SendFeedbackMenuName
@@ -265,6 +267,29 @@ Public Class atcBasinsPlugIn
                     aHandled = False 'Not our item to handle
                 End If
         End Select
+    End Sub
+
+    Private Sub CheckForUpdates(ByVal aQuiet As Boolean)
+        If aQuiet Then 'Make sure automatic checking happens at most once a day
+            If GetSetting("BASINS4", "Update", "LastCheck", "Never") = Date.Today.ToString Then Exit Sub
+        End If
+        SaveSetting("BASINS4", "Update", "LastCheck", Date.Today.ToString)
+
+        Dim lSavePath As String = """" & IO.Path.Combine(g_BasinsDir, "cache") & """"
+        Dim lExePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lUpdateCheckerPath As String = """" & IO.Path.Combine(lExePath, "UpdateCheck.exe") & """"
+        Dim lUpdateURL As String = WholeFileString(IO.Path.Combine(lExePath, "UpdateURL.txt"))
+        lUpdateURL = ReplaceString(lUpdateURL, vbCr, "")
+        lUpdateURL = ReplaceString(lUpdateURL, vbLf, "")
+        If IO.File.Exists(lUpdateCheckerPath) Then
+            If aQuiet Then lUpdateCheckerPath &= " quiet"
+            Shell(lUpdateCheckerPath & " " _
+                & lUpdateURL & " " _
+                & Process.GetCurrentProcess.Id & " " _
+                & lSavePath, AppWinStyle.Hide)
+        ElseIf Not aQuiet Then 'If manually checking and UpdateCheck.exe is not found, open update web page
+            OpenFile("http://hspf.com/pub/basins4/updates.html")
+        End If
     End Sub
 
     Private Function UserSaveData(ByVal aSpecification As String) As Boolean
@@ -425,7 +450,7 @@ Public Class atcBasinsPlugIn
             lFeedbackCollection.Add("email", Trim(lEmail))
             lFeedbackCollection.Add("message", Trim(lMessage))
             lFeedbackCollection.Add("sysinfo", lSystemInformation)
-            Dim lClient As New System.Net.WebClient
+            Dim lClient As New Net.WebClient
             lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
             Logger.Msg("Feedback successfully sent", "Send Feedback")
         End If
@@ -446,8 +471,8 @@ Public Class atcBasinsPlugIn
                 foundName = foundName.Substring(ColonPos + 1)
             End If
             If ReplaceString(foundName, " ", "") = searchForName Then
-                Dim typ As System.Type = lDisp.GetType()
-                Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
+                Dim typ As Type = lDisp.GetType()
+                Dim asm As Reflection.Assembly = Reflection.Assembly.GetAssembly(typ)
                 Dim newDisplay As atcDataDisplay = asm.CreateInstance(typ.FullName)
                 newDisplay.Initialize(g_MapWin, g_MapWinWindowHandle)
                 newDisplay.Show(pDataManager)
@@ -555,9 +580,9 @@ Public Class atcBasinsPlugIn
         'This event fires when a user releases a mouse button in the legend.
     End Sub
 
-    Public Sub MapDragFinished(ByVal Bounds As System.Drawing.Rectangle, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapDragFinished
+    Public Sub MapDragFinished(ByVal Bounds As Drawing.Rectangle, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapDragFinished
         'If a user drags (ie draws a box) with the mouse on the map, this event fires at completion of the drag
-        'and returns a system.drawing.rectangle that has the bounds of the box that was "drawn"
+        'and returns a drawing.rectangle that has the bounds of the box that was "drawn"
     End Sub
 
     Public Sub MapExtentsChanged() Implements MapWindow.Interfaces.IPlugin.MapExtentsChanged
