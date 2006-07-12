@@ -2,24 +2,89 @@ Option Strict Off
 Option Explicit On
 
 Imports System.Collections.Specialized
-Imports System.IO
 Imports MapWinUtility
 
 Public Module modFile
 
     ''' <summary>
-    ''' Try to delete a file. 
-    ''' If file cannot not be deleted, log a message instead of throwing an exception
+    ''' Try to delete a file or directory. 
+    ''' If it cannot not be deleted, log a message instead of throwing an exception
     ''' </summary>
-    ''' <param name="aFilename">Name of file to be deleted</param>
-    ''' <remarks>helpful for non-critical cleanup of temporary files that may be locked</remarks>
-    Public Sub TryDeleteFile(ByVal aFilename As String)
+    ''' <param name="aPath">Full path of file or directory to be deleted</param>
+    ''' <returns>
+    ''' True if aPath was deleted without error or did not exist
+    ''' False if there was an exception while trying to delete
+    ''' </returns>
+    ''' <remarks>
+    ''' helpful for non-critical cleanup of temporary files that may be locked
+    ''' if aPath is a directory, all the contents are deleted too
+    ''' </remarks>
+    Public Function TryDelete(ByVal aPath As String) As Boolean
+        TryDelete = False
         Try
-            If FileExists(aFilename) Then IO.File.Delete(aFilename)
+            If FileExists(aPath) Then
+                IO.File.Delete(aPath)
+            ElseIf FileExists(aPath, True, False) Then
+                IO.Directory.Delete(aPath, True)
+            End If
+            TryDelete = True
         Catch ex As Exception
-            Logger.Dbg("Could not delete '" & aFilename & "': " & ex.Message)
+            Logger.Dbg("Could not delete '" & aPath & "': " & ex.Message)
         End Try
-    End Sub
+    End Function
+
+    ''' <summary>
+    ''' Try moving a file to a new location, log a failure rather than raising an exception
+    ''' </summary>
+    ''' <param name="aFromFilename">Path of file to be moved</param>
+    ''' <param name="aToPath">Folder or full path to move to</param>
+    ''' <returns>True if successful, False if unsuccessful</returns>
+    ''' <remarks></remarks>
+    Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String) As Boolean
+        TryMove = False
+        If FileExists(aFromFilename) Then
+            If FileExists(aToPath) Then
+                TryDelete(aToPath) 'Remove existing file at destination
+            End If
+            Try
+                If FileExists(aToPath, True, False) Then
+                    aToPath = IO.Path.Combine(aToPath, IO.Path.GetFileName(aFromFilename))
+                End If
+                Try
+                    IO.File.Move(aFromFilename, aToPath)
+                    TryMove = True
+                Catch exMove As Exception 'If moving didn't work, maybe copying will
+                    IO.File.Copy(aFromFilename, aToPath)
+                    TryMove = True
+                    IO.File.Delete(aFromFilename)
+                End Try
+                Logger.Dbg("Moved file from '" & aFromFilename & "' to '" & aToPath & "'")
+            Catch ex As Exception
+                Logger.Dbg("Unable to move file from '" & aFromFilename & "' to '" & aToPath & "' - " & ex.Message)
+            End Try
+        End If
+    End Function
+
+    ''' <summary>
+    ''' Create a new empty folder in the user's temporary folder. 
+    ''' </summary>
+    ''' <param name="aBaseName">String to start temporary folder name with.</param>
+    ''' <returns>
+    ''' The return value will be aBaseName if it does not yet exist, or will have 
+    ''' underscore and a number appended to avoid having the same name as an existing directory
+    ''' </returns>
+    ''' <remarks>It is the caller's responsibility to remove this folder and its contents later.</remarks>
+    Public Function NewTempDir(ByVal aBaseName As String) As String
+        Dim lCounter As Integer = 1
+        NewTempDir = IO.Path.GetTempPath & aBaseName & "\"
+
+        'If there is already a file or non-empty directory with this name, try another name
+        While IO.File.Exists(NewTempDir) OrElse IO.Directory.Exists(NewTempDir)
+            lCounter += 1
+            NewTempDir = IO.Path.GetTempPath & aBaseName & "_" & lCounter & "\"
+        End While
+        IO.Directory.CreateDirectory(NewTempDir)        
+    End Function
 
     'if aHelpTopic is a file, set the file to display instead of opening help
     Public Sub ShowHelp(ByVal aHelpTopic As String)
@@ -102,7 +167,7 @@ EndFound:
         ' ##SUMMARY   Example: FilenameOnly("C:\foo\bar.txt") = "bar"
         ' ##PARAM aStr I Filename with path and extension.
         ' ##RETURNS Filename without directory path or extension.
-        Return System.IO.Path.GetFileNameWithoutExtension(aStr)
+        Return IO.Path.GetFileNameWithoutExtension(aStr)
     End Function
 
     Public Function FilenameNoPath(ByVal aStr As String) As String
@@ -110,7 +175,7 @@ EndFound:
         ' ##SUMMARY   Example: FilenameNoPath ("C:\foo\bar.txt") = "bar.txt"
         ' ##PARAM aStr I Filename with path and extension.
         ' ##RETURNS Filename and extension without directory path.
-        Return System.IO.Path.GetFileName(aStr)
+        Return IO.Path.GetFileName(aStr)
     End Function
 
     Public Function FileExt(ByVal aStr As String) As String
@@ -118,7 +183,7 @@ EndFound:
         ' ##SUMMARY   Example: FileExt ("C:\foo\bar.txt") = "txt"
         ' ##PARAM aStr I Filename with path and extension.
         ' ##RETURNS Extension without path or filename.
-        Return Mid(System.IO.Path.GetExtension(aStr), 2)
+        Return Mid(IO.Path.GetExtension(aStr), 2)
     End Function
 
     Public Function FilenameSetExt(ByVal aStr As String, ByVal aExt As String) As String
@@ -128,7 +193,7 @@ EndFound:
         ' ##PARAM astr I Filename with path and extension.
         ' ##PARAM aExt I Extension to be added or to replace current extension.
         ' ##RETURNS Filename with new extension.
-        Return System.IO.Path.ChangeExtension(aStr, aExt)
+        Return IO.Path.ChangeExtension(aStr, aExt)
     End Function
 
     Public Function AbsolutePath(ByVal aFileName As String, ByVal aStartPath As String) As String
@@ -280,7 +345,7 @@ FoundSameUntil:
                     'Try
                     vName = aFilenames.Get(key)
                     'If aFilenames.Get(key).Length > 0 Then
-                    'System.Diagnostics.Debug.WriteLine("Already added " & fName)
+                    'Diagnostics.Debug.WriteLine("Already added " & fName)
                     'Else
                     'Catch e As Exception
 
@@ -314,7 +379,7 @@ FoundSameUntil:
 
     'Recursively remove all files and directories in aDirName
     Public Sub RemoveFilesInDir(ByVal aDirName As String)
-        System.IO.Directory.Delete(aDirName, True)
+        IO.Directory.Delete(aDirName, True)
     End Sub
 
     Public Sub SaveFileString(ByVal filename As String, ByVal FileContents As String)
@@ -353,7 +418,7 @@ FoundSameUntil:
         Exit Sub
 
 ErrorWriting:
-        MsgBox("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OkOnly, "SaveFileBytes")
+        Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OkOnly, "SaveFileBytes")
     End Sub
 
     Public Function AppendFileString(ByVal filename As String, ByVal appendString As String) As Boolean
@@ -422,7 +487,7 @@ ErrorWriting:
         Exit Sub
 
 ErrorWriting:
-        MsgBox("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OkOnly, "ReplaceStringToFile")
+        Logger.Msg("Error writing '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OkOnly, "ReplaceStringToFile")
     End Sub
 
     'Open a file using the default method the system would have used if it was double-clicked
@@ -434,11 +499,11 @@ ErrorWriting:
                 newProcess.StartInfo.FileName = FileOrURL
                 newProcess.Start()
                 If Wait Then
-                    'TODO: wait for newProcess to finish
+                    newProcess.WaitForExit()
                 End If
             End If
-        Catch ex As System.Exception
-            MsgBox(ex.Message)
+        Catch ex As Exception
+            Logger.Msg(ex.Message)
         End Try
 
     End Sub
@@ -452,7 +517,7 @@ ErrorWriting:
                     Optional ByRef aFilterIndex As Integer = 1) As String
         Dim lDir As String = CurDir()
         Dim lFileName As String = Trim(aDefaultFileName)
-        Dim lBaseFileName As String = System.IO.Path.GetFileName(lFileName) 'file name (with no path) of file we are looking for
+        Dim lBaseFileName As String = IO.Path.GetFileName(lFileName) 'file name (with no path) of file we are looking for
         Dim lExePath As String
         Dim lDLLpath As String
 
@@ -496,8 +561,8 @@ ErrorWriting:
             If Not FileExists(lFileName) AndAlso lBaseFileName.Length > 0 Then 'try some default locations if filename was specified, path was wrong or missing
                 lFileName = aDefaultFileName
                 If Not FileExists(lFileName) Then
-                    lExePath = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location).ToLower & "\"
-                    lDLLpath = PathNameOnly(System.Reflection.Assembly.GetExecutingAssembly.Location).ToLower & "\"
+                    lExePath = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location).ToLower & "\"
+                    lDLLpath = PathNameOnly(Reflection.Assembly.GetExecutingAssembly.Location).ToLower & "\"
 
                     'First check in same folder or subfolder containing current .exe or .dll
                     lFileName = FindRecursive(lBaseFileName, lDLLpath, lExePath)
@@ -546,7 +611,7 @@ ErrorWriting:
             End If
 
             If aChangeIntoDir Then
-                lDir = System.IO.Path.GetDirectoryName(lFileName)
+                lDir = IO.Path.GetDirectoryName(lFileName)
                 If FileExists(lDir, True, False) Then ChDriveDir(lDir)
             ElseIf Not lDir.Equals(CurDir) Then 'Change back to dir where we started
                 ChDriveDir(lDir)
@@ -574,7 +639,7 @@ ErrorWriting:
             If FileExists(lStartDir & aFilename) Then
                 Return lStartDir & aFilename
             ElseIf FileExists(lStartDir, True, False) Then
-                For Each lSubDir As String In System.IO.Directory.GetDirectories(lStartDir)
+                For Each lSubDir As String In IO.Directory.GetDirectories(lStartDir)
                     lFoundPath = FindRecursive(aFilename, lSubDir)
                     If lFoundPath.Length > 0 Then Exit For
                 Next
@@ -630,134 +695,117 @@ ErrorWriting:
         End Try
     End Function
 
+    ''' <summary>
+    ''' Return the contents of a file as a string
+    ''' </summary>
+    ''' <param name="aFilename">Name of text file to read</param>
+    ''' <param name="aTimeoutMilliseconds">Length of time to keep trying in case of an error</param>
+    ''' <returns>contents of specified file</returns>
+    ''' <remarks>Timeout is desirable in cases where the file might not yet be closed properly but it will be soon</remarks>
     Public Function WholeFileString(ByVal aFilename As String, Optional ByVal aTimeoutMilliseconds As Integer = 1000) As String
-        ' ##SUMMARY Converts specified text file to a string.
-        ' ##PARAM FileName I Name of text file
-        ' ##RETURNS Returns contents of specified text file as string.
-        Dim InFile As Integer
-        Dim FileLength As Integer
         Dim TryUntil As Date = Now.AddMilliseconds(aTimeoutMilliseconds)
-        ' ##LOCAL InFile - filenumber of text file
-        ' ##LOCAL FileLength - length of text file contents
-
-        InFile = FreeFile()
+        WholeFileString = ""
 TryAgain:
         Try
-            FileOpen(InFile, aFilename, OpenMode.Input, OpenAccess.Read, OpenShare.Shared)
-            FileLength = LOF(InFile)
-            WholeFileString = InputString(InFile, FileLength)
-            FileClose(InFile)
+            WholeFileString = IO.File.ReadAllText(aFilename)
         Catch ex As Exception
             If Now > TryUntil Then
                 Logger.Msg("Error reading '" & aFilename & "'" & vbCr & vbCr & ex.Message, "WholeFileString - " & ex.GetType.Name)
                 Return ""
             Else
-                'MsgBox("WholeFileString error, trying again (" & ex.GetType.Name & ": " & ex.Message & ")")
-                System.Threading.Thread.Sleep(50)
+                'Logger.Msg("WholeFileString error, trying again (" & ex.GetType.Name & ": " & ex.Message & ")")
+                Threading.Thread.Sleep(50)
                 GoTo TryAgain
             End If
         End Try
     End Function
 
 
-    Public Function WholeFileBytes(ByVal filename As String) As Byte()
-        ' ##SUMMARY Converts specified text file to Byte array
-        ' ##PARAM FileName I Name of text file
-        ' ##RETURNS Returns contents of specified text file in Byte array.
-        Dim InFile As Short
-        Dim FileLength As Integer
-        Dim retval() As Byte
-        ' ##LOCAL InFile - long filenumber of text file
-        ' ##LOCAL retval() - byte array containing return values
+    '    Public Function WholeFileBytes(ByVal aFilename As String) As Byte()
+    '        ' ##SUMMARY Converts specified text file to Byte array
+    '        ' ##PARAM FileName I Name of text file
+    '        ' ##RETURNS Returns contents of specified text file in Byte array.
+    '        Dim retval(0) As Byte
+    '        ' ##LOCAL InFile - long filenumber of text file
+    '        ' ##LOCAL retval() - byte array containing return values
 
-        On Error GoTo ErrorReading
+    '        On Error GoTo ErrorReading
 
-        InFile = FreeFile()
-        FileOpen(InFile, filename, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
-        FileLength = LOF(InFile)
-        ReDim retval(FileLength - 1)
-        FileGet(InFile, retval)
-        FileClose(InFile)
-        Return retval
+    '        WholeFileBytes = IO.File.ReadAllBytes(aFilename)
 
-ErrorReading:
-        MsgBox("Error reading '" & filename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OkOnly, "WholeFileBytes")
-    End Function
+    'ErrorReading:
+    '        Logger.Msg("Error reading '" & aFilename & "'" & vbCr & vbCr & Err.Description, MsgBoxStyle.OkOnly, "WholeFileBytes")
+    '    End Function
 
-    Public Function FirstMismatch(ByVal filename1 As String, ByVal filename2 As String) As Integer
-        ' ##SUMMARY Compares 2 files and locates first sequential byte that is different between files.
-        ' ##PARAM filename1 I Name of first file
-        ' ##PARAM filename2 I Name of second file
-        ' ##RETURNS Returns byte position of first non-matching byte between two files: _
-        'zero if they match, -1 if there was an error.
-        Dim InFile1 As Short
-        Dim FileLength1 As Integer
-        Dim InFile2 As Short
-        Dim FileLength2 As Integer
-        Dim minLength As Integer
-        Dim longBytes As Integer
-        Dim testL1, testL2 As Integer
-        Dim testB1, testB2 As Byte
-        Dim i As Integer
-        ' ##LOCAL InFile1 - file handle of first file
-        ' ##LOCAL InFile2 - file handle of second file
-        ' ##LOCAL FileLength1 - length of first file in bytes
-        ' ##LOCAL FileLength2 - length of first file in bytes
-        ' ##LOCAL i - byte index in files
+    '''' <summary>
+    '''' Compare two files and return True if contents are identical.
+    '''' </summary>
+    '''' <param name="aFilename1">Name of first file to compare</param>
+    '''' <param name="aFilename2">Name of second file to compare</param>
+    '''' <returns>true if files are identical, false if not</returns>
+    '''' <remarks>An exception will occur if either file cannot be read.</remarks>
+    'Public Function FilesMatch(ByVal aFilename1 As String, ByVal aFilename2 As String) As Boolean
+    '    Dim LongFileLength As Long = FileLen(aFilename1)
 
-        On Error GoTo ErrorReading
+    '    'If files are not the same size, they do not match
+    '    If FileLen(aFilename2) <> LongFileLength Then Return False
 
-        If Not FileExists(filename1) Or Not FileExists(filename2) Then
-            FirstMismatch = -1
-        Else
-            InFile1 = FreeFile()
-            FileOpen(InFile1, filename1, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
-            FileLength1 = LOF(InFile1)
+    '    If LongFileLength > Integer.MaxValue Then
+    '        Throw New ApplicationException("FilesMatch cannot compare files larger than 2 Gigabytes.")
+    '    End If
 
-            InFile2 = FreeFile()
-            FileOpen(InFile2, filename2, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
-            FileLength2 = LOF(InFile2)
+    '    Dim FileLength As Integer = CInt(LongFileLength)
+    '    Dim InFile1 As Short = FreeFile()
+    '    Dim InFile2 As Short = FreeFile()
+    '    Dim longBytes As Integer
+    '    Dim testL1, testL2 As Integer
+    '    Dim testB1, testB2 As Byte
+    '    Dim i As Long
 
-            If FileLength1 < FileLength2 Then
-                minLength = FileLength1
-            Else
-                minLength = FileLength2
-            End If
+    '    ' ##LOCAL FileLength - length of first file in bytes
+    '    ' ##LOCAL InFile1 - file handle of first file
+    '    ' ##LOCAL InFile2 - file handle of second file
+    '    ' ##LOCAL longBytes - number of bytes that can be tested in Integer-sized chunks
+    '    ' ##LOCAL testL1, testL2 - Integers to read and compare more than one byte at a time
+    '    ' ##LOCAL testB1, testB2 - Byte values to compare one byte at a time
+    '    ' ##LOCAL i - byte index in files
 
-            longBytes = minLength - minLength Mod 4
+    '    FileOpen(InFile1, aFilename1, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
+    '    Try
+    '        FileOpen(InFile2, aFilename2, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
+    '    Catch ex As Exception
+    '        FileClose(InFile1) 'clean up the first file which we opened before having trouble with second file
+    '        Throw ex
+    '    End Try
 
-            For i = 1 To longBytes Step 4
-                FileGet(InFile1, testL1)
-                FileGet(InFile2, testL2)
-                If testL1 <> testL2 Then Exit For
-            Next
+    '    Try
+    '        'Compare most of the file in Integer-sized chunks
+    '        longBytes = FileLength - FileLength Mod 4
+    '        For i = 1 To longBytes Step 4
+    '            FileGet(InFile1, testL1)
+    '            FileGet(InFile2, testL2)
+    '            If testL1 <> testL2 Then Return False
+    '        Next
 
-            Do While i <= minLength
-                FileGet(InFile1, testB1, i)
-                FileGet(InFile2, testB2, i)
-                If testB1 <> testB2 Then Exit Do
-                i = i + 1
-            Loop
+    '        'Compare any odd bytes at end of file one at a time
+    '        Do While i <= FileLength
+    '            FileGet(InFile1, testB1, i)
+    '            FileGet(InFile2, testB2, i)
+    '            If testB1 <> testB2 Then Return False
+    '            i = i + 1
+    '        Loop
 
-            If i <= minLength Then 'Found a mismatch before the shorter file ended
-                FirstMismatch = i
-            ElseIf FileLength1 <> FileLength2 Then  'Longer file matched shorter one while it lasted
-                FirstMismatch = i
-            Else
-                FirstMismatch = 0
-            End If
+    '        FileClose(InFile1)
+    '        FileClose(InFile2)
 
-            FileClose(InFile1)
-            FileClose(InFile2)
-        End If
-        Exit Function
+    '        Return True 'Reached the end and found no mismatches
 
-ErrorReading:
-        MsgBox("Error reading '" & filename1 & "'" & vbCr & "or '" & filename2 & "'" & vbCr & Err.Description, MsgBoxStyle.OkOnly, "WholeFileBytes")
-        On Error Resume Next
-        FileClose(InFile1)
-        FileClose(InFile2)
-    End Function
+    '    Catch ex As Exception
+    '        FileClose(InFile1)
+    '        FileClose(InFile2)
+    '        Throw ex
+    '    End Try
+    'End Function
 
     Public Function SwapBytes(ByVal n As Integer) As Integer
         ' ##SUMMARY Swaps between big and little endian 32-bit integers.
@@ -769,13 +817,13 @@ ErrorReading:
         ' ##LOCAL OrigBytes - stores original bytes
         ' ##LOCAL NewBytes - stores new bytes
 
-        OrigBytes = System.BitConverter.GetBytes(n)
+        OrigBytes = BitConverter.GetBytes(n)
         ReDim NewBytes(3)
         NewBytes(0) = OrigBytes(3)
         NewBytes(1) = OrigBytes(2)
         NewBytes(2) = OrigBytes(1)
         NewBytes(3) = OrigBytes(0)
-        Return System.BitConverter.ToInt32(NewBytes, 0)
+        Return BitConverter.ToInt32(NewBytes, 0)
     End Function
 
     Public Function ReadBigInt(ByVal InFile As Short) As Integer
@@ -802,11 +850,11 @@ ErrorReading:
 
         'initialize the reader to read binary
         Dim inStream As IO.Stream = IO.File.OpenRead(InputFilePath)
-        Dim reader As New System.IO.BinaryReader(inStream)
+        Dim reader As New IO.BinaryReader(inStream)
 
         'read in each byte and convert it to a char
         Dim numbytes As Integer = reader.BaseStream.Length
-        SaveFileString(OutputFilePath, System.Convert.ToBase64String(reader.ReadBytes(numbytes)))
+        SaveFileString(OutputFilePath, Convert.ToBase64String(reader.ReadBytes(numbytes)))
 
         reader.Close()
 
@@ -815,7 +863,7 @@ ErrorReading:
     'Reads the next line from a text file whose lines end with carriage return and/or linefeed
     'Advances the position of the stream to the beginning of the next line
     'Returns Nothing if already at end of file
-    Public Function NextLine(ByVal aReader As BinaryReader) As String
+    Public Function NextLine(ByVal aReader As IO.BinaryReader) As String
         Dim ch As Char
         NextLine = Nothing
         Try
@@ -833,7 +881,7 @@ ReadCharacter:
                     End If
                     GoTo ReadCharacter
             End Select
-        Catch endEx As EndOfStreamException
+        Catch endEx As IO.EndOfStreamException
             If NextLine Is Nothing Then 'We had nothing to read, already finished file last time
                 Throw endEx
             Else
