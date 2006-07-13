@@ -331,8 +331,10 @@ Public Module modTimeseriesMath
                                 Else
                                     lNewVals(lNewInd) = aFillVal
                                 End If
-                            Case aAccumVal : lNewVals(lNewInd) = aAccumVal
-                            Case Else : lNewVals(lNewInd) = aFillVal
+                            Case aAccumVal
+                                lNewVals(lNewInd) = aAccumVal
+                            Case Else
+                                lNewVals(lNewInd) = aFillVal
                         End Select
                         'lNewDates(lNewInd) = lDateNew
                         lNewInd += 1
@@ -360,9 +362,13 @@ Public Module modTimeseriesMath
                     '  lDateNew = lDateNew + lIntvl
                     'End If
                     lNewInd += 1
-                    If lNewInd <= lNewNumVals Then lDateNew = lNewDates(lNewInd)
+                    If lNewInd <= lNewNumVals Then
+                        lDateNew = lNewDates(lNewInd)
+                    End If
                     lOldInd += 1
-                    If lOldInd <= aOldTSer.numValues Then lDateOld = aOldTSer.Dates.Value(lOldInd)
+                    If lOldInd <= aOldTSer.numValues Then
+                        lDateOld = aOldTSer.Dates.Value(lOldInd)
+                    End If
                 End While
                 lNewTSer.Dates = New atcTimeseries(Nothing)
                 lNewTSer.Dates.Values = lNewDates
@@ -376,6 +382,61 @@ Public Module modTimeseriesMath
             Logger.Dbg("No data values in Timeseries " & aOldTSer.ToString & ".")
             Return Nothing
         End If
+    End Function
+
+    Public Function FillMissingByInterpolation(ByVal aOldTSer As atcTimeseries, _
+                                               Optional ByVal aMaxFillLength As Double = Double.NaN) As atcTimeseries
+        Dim lNewTSer As atcTimeseries = aOldTSer.Clone
+
+        Dim lInd As Integer = 1
+        Dim lIndPrevNotMissing As Integer = 1
+        Dim lIndNextNotMissing As Integer
+        Logger.Dbg("FillMissingByInterp:NumValues:" & lNewTSer.numValues & ":" & aMaxFillLength)
+        While lInd <= lNewTSer.numValues
+            If Double.IsNaN(lNewTSer.Values(lInd)) Then 'look for next good value
+                lIndNextNotMissing = FindNextNotMissing(lNewTSer, lInd)
+                Dim lMissingLength As Double
+                With lNewTSer.Dates 'find missing length
+                    lMissingLength = .Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing)
+                End With
+                Logger.Dbg("FillMissingByInterp:Missing:", lInd, lIndPrevNotMissing, lIndNextNotMissing, lMissingLength)
+                If Double.IsNaN(aMaxFillLength) OrElse lMissingLength < aMaxFillLength Then
+                    With lNewTSer
+                        If Double.IsNaN(.Values(lIndPrevNotMissing)) Then 'missing at start, use first good value
+                            .Values(lInd) = .Values(lIndNextNotMissing)
+                            Logger.Dbg("FillMissingByInterp:UseFirstNotMissing:" & .Values(lInd))
+                        ElseIf Double.IsNaN(.Values(lIndNextNotMissing)) Then 'missing at end, use last good value
+                            .Values(lInd) = .Values(lIndPrevNotMissing)
+                            Logger.Dbg("FillMissingByInterp:UseLastNotMissing:" & .Values(lInd))
+                        Else 'values prev and next, interpolate
+                            Dim lFracMissing As Double
+                            With .Dates
+                                lFracMissing = (.Values(lInd) - .Values(lIndPrevNotMissing)) / _
+                                               (.Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing))
+                            End With
+                            Dim lIncValue As Double = lFracMissing * (.Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing))
+                            .Values(lInd) = .Values(lIndPrevNotMissing) + lIncValue
+                            Logger.Dbg("FillMissingByInterp:Interp:" & .Values(lInd) & ":" & lFracMissing & ":" & lIncValue)
+                        End If
+                    End With
+                End If
+            Else 'good value, remember index
+                lIndPrevNotMissing = lInd
+            End If
+            lInd += 1
+        End While
+        Return lNewTSer
+    End Function
+
+    Private Function FindNextNotMissing(ByVal aTser As atcTimeseries, ByVal aInd As Integer) As Integer
+        Dim lInd As Integer = aInd
+        While Double.IsNaN(aTser.Values(lInd))
+            lInd += 1
+            If lInd >= aTser.numValues Then
+                Return aTser.numValues
+            End If
+        End While
+        Return lInd
     End Function
 
     Public Function Aggregate(ByVal aTimeseries As atcTimeseries, _
