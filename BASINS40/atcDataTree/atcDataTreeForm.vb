@@ -2,7 +2,7 @@ Imports System.Windows.Forms
 Imports atcData
 Imports atcUtility
 
-Public Class atcDataTreeForm
+Friend Class atcDataTreeForm
     Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -64,9 +64,13 @@ Public Class atcDataTreeForm
     Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
     Friend WithEvents MenuItem1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuShowMore As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuShowLess As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuShowAll As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcDataTreeForm))
+        Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(atcDataTreeForm))
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
         Me.mnuFileSave = New System.Windows.Forms.MenuItem
@@ -76,10 +80,14 @@ Public Class atcDataTreeForm
         Me.mnuCollapse = New System.Windows.Forms.MenuItem
         Me.mnuDefault = New System.Windows.Forms.MenuItem
         Me.mnuDataCount = New System.Windows.Forms.MenuItem
+        Me.mnuShowMore = New System.Windows.Forms.MenuItem
+        Me.mnuShowLess = New System.Windows.Forms.MenuItem
+        Me.mnuShowAll = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-        Me.mnuMain = New System.Windows.Forms.MainMenu
+        Me.mnuMain = New System.Windows.Forms.MainMenu(Me.components)
         Me.MenuItem1 = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
+        Me.SuspendLayout()
         '
         'mnuFile
         '
@@ -128,7 +136,23 @@ Public Class atcDataTreeForm
         'mnuDataCount
         '
         Me.mnuDataCount.Index = 3
-        Me.mnuDataCount.Text = ""
+        Me.mnuDataCount.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuShowMore, Me.mnuShowLess, Me.mnuShowAll})
+        Me.mnuDataCount.Text = "Data to Show"
+        '
+        'mnuShowMore
+        '
+        Me.mnuShowMore.Index = 0
+        Me.mnuShowMore.Text = "More"
+        '
+        'mnuShowLess
+        '
+        Me.mnuShowLess.Index = 1
+        Me.mnuShowLess.Text = "Less"
+        '
+        'mnuShowAll
+        '
+        Me.mnuShowAll.Index = 2
+        Me.mnuShowAll.Text = "All"
         '
         'mnuAnalysis
         '
@@ -154,21 +178,23 @@ Public Class atcDataTreeForm
         '
         'atcDataTreeForm
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.ClientSize = New System.Drawing.Size(527, 544)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.mnuMain
         Me.Name = "atcDataTreeForm"
         Me.Text = "Data Tree"
+        Me.ResumeLayout(False)
 
     End Sub
 
 #End Region
 
     Private pDataManager As atcDataManager
-    Private WithEvents atrMain As TreeView   'tree control
+    Private WithEvents pTreeViewMain As TreeView   'tree control
     Private WithEvents pDataGroup As atcDataGroup   'group of atcData displayed
-    Private pNumValuesShow As Integer = 8 'make number of values to display editable
+    Private pNumValuesShowDefault As Integer = 8
+    Private pNumValuesShow As Integer = pNumValuesShowDefault
 
     Private Sub PopulateTree()
         Dim lAttributeName As String
@@ -179,12 +205,12 @@ Public Class atcDataTreeForm
         Dim lDateString(3) As String
         Dim lDateOffset As Integer 'Mean data is labeled with previous date value (lDateOffset = -1)
 
-        If Not atrMain Is Nothing Then
-            Me.Controls.Remove(atrMain)
+        If Not pTreeViewMain Is Nothing Then
+            Me.Controls.Remove(pTreeViewMain)
         End If
 
-        atrMain = New TreeView
-        With atrMain
+        pTreeViewMain = New TreeView
+        With pTreeViewMain
             .Visible = False
             '.Font = System.Drawing.Font.  try for courier or other not proportional font here
             .Location = New System.Drawing.Point(0, 0)
@@ -195,7 +221,7 @@ Public Class atcDataTreeForm
                    Or AnchorStyles.Bottom _
                    Or AnchorStyles.Left _
                    Or AnchorStyles.Right
-            Me.Controls.Add(atrMain)
+            Me.Controls.Add(pTreeViewMain)
             .Refresh()
             For Each lData As atcTimeseries In pDataGroup
                 lData.Attributes.CalculateAll() 'be sure to get everything
@@ -227,27 +253,28 @@ Public Class atcDataTreeForm
 
                 Dim lDataNode As New TreeNode
                 lDataNode = lNode.Nodes.Add("Data")
-                If lNumValues > pNumValuesShow Then
+                If lNumValues > pNumValuesShow AndAlso pNumValuesShow <> -1 Then
                     lNumValuesNow = pNumValuesShow
                 Else
-                    lNumValuesNow = lNumValues + 1
+                    lNumValuesNow = lNumValues
                 End If
                 If lData.Attributes.GetValue("Point", False) Then
                     lDateOffset = 0
                 Else
                     lDateOffset = -1
                 End If
-                For j As Integer = 1 To lNumValuesNow - 1
+                For j As Integer = 1 To lNumValuesNow
                     'data starts at 1, date display is from prev value which is start of interval
                     lDateString = DumpDate(lData.Dates.Value(j + lDateOffset)).Split(" ")
                     lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
                                         DoubleToString(lData.Value(j)) & " : " & _
                                         lDateString(0))
                 Next
-                If lNumValues > pNumValuesShow Then  'some from end too
-                    If lNumValues - pNumValuesShow > pNumValuesShow Then
+
+                If lNumValues > pNumValuesShow AndAlso pNumValuesShow <> -1 Then  'some from end too
+                    If lNumValues - pNumValuesShow + 1 > pNumValuesShow Then
                         lDataNode.Nodes.Add("  <" & lNumValues - (2 * pNumValuesShow) & " values skipped>")
-                        lValueStart = lNumValues - pNumValuesShow
+                        lValueStart = lNumValues - pNumValuesShow + 1
                     Else
                         lValueStart = lNumValuesNow
                     End If
@@ -263,10 +290,10 @@ Public Class atcDataTreeForm
         End With
     End Sub
 
-    Public Sub Save(ByVal aFileName As String)
+    Friend Sub Save(ByVal aFileName As String)
         If Len(aFileName) = 0 Then 'prompt user
-            Dim cdlg As New Windows.Forms.SaveFileDialog
-            With cdlg
+            Dim lCdlg As New Windows.Forms.SaveFileDialog
+            With lCdlg
                 .Title = "Select File to Save Into"
                 .Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
                 .FilterIndex = 1
@@ -285,33 +312,35 @@ Public Class atcDataTreeForm
     End Sub
 
     Public Overrides Function ToString() As String
-        Dim s As String = ""
-        Dim t As String
-        Dim ta(3) As String
+        Dim lS As String = ""
+        Dim lT As String
+        Dim lTa(3) As String
 
-        For i As Integer = 0 To atrMain.GetNodeCount(False) - 1
-            With atrMain.Nodes(i)
-                s &= .Text
+        For lIndexOuter As Integer = 0 To pTreeViewMain.GetNodeCount(False) - 1
+            With pTreeViewMain.Nodes(lIndexOuter)
+                lS &= .Text
                 If Not .IsExpanded And .GetNodeCount(False) > 0 Then
-                    s &= " ..." & vbCrLf
+                    lS &= " ..." & vbCrLf
                 Else
-                    s &= vbCrLf
-                    For j As Integer = 0 To .GetNodeCount(False) - 1
-                        With .Nodes(j)
-                            s &= vbTab & .Text
+                    lS &= vbCrLf
+                    For lIndexMiddle As Integer = 0 To .GetNodeCount(False) - 1
+                        With .Nodes(lIndexMiddle)
+                            lS &= vbTab & .Text
                             If Not .IsExpanded And .GetNodeCount(False) > 0 Then
-                                s &= " ..." & vbCrLf
+                                lS &= " ..." & vbCrLf
                             Else
-                                s &= vbCrLf
-                                For k As Integer = 0 To .GetNodeCount(False) - 1
-                                    t = .Nodes(k).Text.Replace(" : ", vbTab)
-                                    If t.IndexOf(vbTab) > 0 Then
-                                        ta = t.Split(vbTab)
-                                        s &= vbTab & vbTab & ta(0).PadRight(24) & vbTab & ta(1).PadRight(16)
-                                        If UBound(ta) > 1 Then s &= vbTab & ta(2)
-                                        s &= vbCrLf
+                                lS &= vbCrLf
+                                For lIndexInner As Integer = 0 To .GetNodeCount(False) - 1
+                                    lT = .Nodes(lIndexInner).Text.Replace(" : ", vbTab)
+                                    If lT.IndexOf(vbTab) > 0 Then
+                                        lTa = lT.Split(vbTab)
+                                        lS &= vbTab & vbTab & lTa(0).PadRight(24) & vbTab & lTa(1).PadRight(16)
+                                        If UBound(lTa) > 1 Then
+                                            lS &= vbTab & lTa(2)
+                                        End If
+                                        lS &= vbCrLf
                                     Else
-                                        s &= vbTab & vbTab & .Nodes(k).Text & vbCrLf
+                                        lS &= vbTab & vbTab & .Nodes(lIndexInner).Text & vbCrLf
                                     End If
                                 Next
                             End If
@@ -320,21 +349,21 @@ Public Class atcDataTreeForm
                 End If
             End With
         Next
-        Return s
+        Return lS
     End Function
 
-    Public Sub TreeAction(ByVal ParamArray aAction() As String)
+    Friend Sub TreeAction(ByVal ParamArray aAction() As String)
         For Each lAction As String In aAction
             Dim lCurAction() As String = lAction.Split(" ")
             Select Case lCurAction(0)
                 Case "Expand"
-                    With atrMain
+                    With pTreeViewMain
                         .Visible = False
                         .ExpandAll()
                         .Visible = True
                     End With
                 Case "Collapse"
-                    With atrMain
+                    With pTreeViewMain
                         .Visible = False
                         .CollapseAll()
                         .Visible = True
@@ -391,21 +420,44 @@ Public Class atcDataTreeForm
         Clipboard.SetDataObject(ToString)
     End Sub
 
-    Private Sub mnuDataCount_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuDataCount.Click
-        pNumValuesShow *= 3
-        PopulateTree()
-        mnuDataCount.Text = "Data to Show " & pNumValuesShow
-        TreeAction("Expand")
-    End Sub
-
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
         pDataManager = Nothing
         pDataGroup = Nothing
-        atrMain = Nothing
+        pTreeViewMain = Nothing
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp("BASINS Details\Analysis\Time Series Functions\Data Tree.html")
     End Sub
 
+    Private Sub mnuShowMore_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuShowMore.Click
+        If pNumValuesShow <> -1 Then
+            pNumValuesShow *= 3
+        End If
+        ReviseDataCount()
+    End Sub
+
+    Private Sub mnuShowLess_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuShowLess.Click
+        If pNumValuesShow <> -1 Then
+            pNumValuesShow /= 3
+        Else
+            pNumValuesShow = pNumValuesShowDefault
+        End If
+        ReviseDataCount()
+    End Sub
+
+    Private Sub mnuShowAll_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuShowAll.Click
+        pNumValuesShow = -1
+        ReviseDataCount()
+    End Sub
+
+    Private Sub ReviseDataCount()
+        PopulateTree()
+        If pNumValuesShow = -1 Then
+            mnuDataCount.Text = "Show All Data"
+        Else
+            mnuDataCount.Text = "Data to Show " & pNumValuesShow
+        End If
+        TreeAction("Expand")
+    End Sub
 End Class
