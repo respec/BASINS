@@ -1248,14 +1248,22 @@ TryAgain:
         Return 0 'not found
     End Function
 
-    'This time only match one key field instead of entire record.
-    'Internally use find(aField, aRawValue)
-    '    Public Function findAllNew(ByVal aOtherTable As atcTableDBF, ByVal aField As Integer) As Integer()
-    Public Function findAllNew(ByVal aOtherTable As atcTableDBF, Optional ByVal aField As Integer = 0) As Integer()
+    ''' <summary>
+    ''' Find records in aOtherTable that do not match any record in this table
+    ''' </summary>
+    ''' <param name="aOtherTable">Table to search for new records</param>
+    ''' <param name="aField">Optional key field to search. If not specified, entire record will be compared.</param>
+    ''' <returns>ArrayList of indexes of new records found in aOtherTable</returns>
+    ''' <remarks></remarks>
+    Public Function findAllNew(ByVal aOtherTable As atcTableDBF, Optional ByVal aField As Integer = 0) As ArrayList
         Dim lOtherData() As Byte = aOtherTable.RawData
-        Dim lOtherBytes As Integer = aOtherTable.RawBytesPerRecord
+        Dim lOtherBytes As Integer
         Dim lOtherStart As Integer
         Dim lOtherRecord As Integer
+        Dim lOtherNumRecords As Integer = aOtherTable.NumRecords
+
+        Dim lStride As Integer = pHeader.NumBytesRec
+        Dim lStop As Integer = pData.GetUpperBound(0)
 
         Dim lNewRecords As New ArrayList
 
@@ -1265,7 +1273,7 @@ TryAgain:
             lOtherBytes = aOtherTable.FieldLength(aField)
         End If
 
-        For lOtherRecord = 1 To aOtherTable.NumRecords
+        For lOtherRecord = 1 To lOtherNumRecords
             aOtherTable.CurrentRecord = lOtherRecord
 
             If aField = 0 Then
@@ -1274,17 +1282,22 @@ TryAgain:
                 lOtherStart = aOtherTable.RawValueStart(aField)
             End If
 
-            If findBytes(lOtherData, lOtherStart, lOtherBytes, pData, 0, pHeader.NumBytesRec, pData.GetUpperBound(0)) = 0 Then
+            If findBytes(lOtherData, lOtherStart, lOtherBytes, pData, 0, lStride, lStop) = 0 Then
                 lNewRecords.Add(lOtherRecord)
             End If
         Next
 
-        Dim lReturn As Integer()
-        ReDim lReturn(lNewRecords.Count - 1)
-        For lRecord As Integer = 0 To lReturn.GetUpperBound(0)
-            lReturn(lRecord) = lNewRecords(lRecord)
-        Next
-        Return lReturn
+        Return lNewRecords
+        'Dim lReturn As Integer()
+        'If lNewRecords.Count > 0 Then
+        '    ReDim lReturn(lNewRecords.Count - 1)
+        '    For lRecord As Integer = 0 To lReturn.GetUpperBound(0)
+        '        lReturn(lRecord) = lNewRecords(lRecord)
+        '    Next
+        'Else
+        '    ReDim lReturn(0)
+        'End If
+        'Return lReturn
     End Function
 
 End Class

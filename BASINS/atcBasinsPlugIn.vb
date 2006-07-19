@@ -108,6 +108,7 @@ Public Class atcBasinsPlugIn
         mnu = AddMenuIfMissing(BasinsHelpMenuName, "mnuHelp", BasinsHelpMenuString, "")
         mnu = AddMenuIfMissing(BasinsWebPageMenuName, "mnuHelp", BasinsWebPageMenuString, "")
         AddMenuIfMissing("BasinsHelp_Separator2", "mnuHelp", "-")
+        mnu = AddMenuIfMissing(RegisterMenuName, "mnuHelp", RegisterMenuString, "")
         mnu = AddMenuIfMissing(CheckForUpdatesMenuName, "mnuHelp", CheckForUpdatesMenuString, "")
         mnu = AddMenuIfMissing(SendFeedbackMenuName, "mnuHelp", SendFeedbackMenuString, "")
 
@@ -168,6 +169,7 @@ Public Class atcBasinsPlugIn
         g_MapWin.Menus.Remove(ComputeMenuName)
 
         g_MapWin.Menus.Remove("BasinsHelp_Separator1")
+        g_MapWin.Menus.Remove(RegisterMenuName)
         g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
         g_MapWin.Menus.Remove("BasinsHelp_Separator2")
         g_MapWin.Menus.Remove(BasinsWebPageMenuName)
@@ -216,6 +218,8 @@ Public Class atcBasinsPlugIn
                 End If
             Case ManageDataMenuName
                 pDataManager.UserManage()
+            Case RegisterMenuName
+                OpenFile("http://hspf.com/pub/basins4/register.html")
             Case CheckForUpdatesMenuName
                 CheckForUpdates(False)
             Case BasinsWebPageMenuName
@@ -270,26 +274,39 @@ Public Class atcBasinsPlugIn
     End Sub
 
     Private Sub CheckForUpdates(ByVal aQuiet As Boolean)
-        If aQuiet Then 'Make sure automatic checking happens at most once a day
-            If GetSetting("BASINS4", "Update", "LastCheck", "Never") = Date.Today.ToString Then Exit Sub
-        End If
-        SaveSetting("BASINS4", "Update", "LastCheck", Date.Today.ToString)
+        Try
+            Dim lQuiet As String = ""
+            Dim lToday As String = Format(Date.Today, "yyyy-MM-dd")
+            If aQuiet Then 'Make sure automatic checking happens at most once a day
+                If GetSetting("BASINS4", "Update", "LastCheck", "Never") = lToday Then Exit Sub
+                lQuiet = "quiet "
+            End If
+            SaveSetting("BASINS4", "Update", "LastCheck", lToday)
 
-        Dim lSavePath As String = """" & IO.Path.Combine(g_BasinsDir, "cache") & """"
-        Dim lExePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lUpdateCheckerPath As String = """" & IO.Path.Combine(lExePath, "UpdateCheck.exe") & """"
-        Dim lUpdateURL As String = WholeFileString(IO.Path.Combine(lExePath, "UpdateURL.txt"))
-        lUpdateURL = ReplaceString(lUpdateURL, vbCr, "")
-        lUpdateURL = ReplaceString(lUpdateURL, vbLf, "")
-        If IO.File.Exists(lUpdateCheckerPath) Then
-            If aQuiet Then lUpdateCheckerPath &= " quiet"
-            Shell(lUpdateCheckerPath & " " _
-                & lUpdateURL & " " _
-                & Process.GetCurrentProcess.Id & " " _
-                & lSavePath, AppWinStyle.Hide)
-        ElseIf Not aQuiet Then 'If manually checking and UpdateCheck.exe is not found, open update web page
-            OpenFile("http://hspf.com/pub/basins4/updates.html")
-        End If
+            Dim lSavePath As String = IO.Path.Combine(g_BasinsDir, "cache")
+            Dim lExePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)
+            Dim lUpdateCheckerPath As String = IO.Path.Combine(lExePath, "UpdateCheck.exe")
+            Dim lUpdateURL As String = WholeFileString(IO.Path.Combine(lExePath, "UpdateURL.txt"))
+            lUpdateURL = ReplaceString(lUpdateURL, vbCr, "")
+            lUpdateURL = ReplaceString(lUpdateURL, vbLf, "")
+            If IO.File.Exists(lUpdateCheckerPath) Then
+                MsgBox("Launcing from PID " & Process.GetCurrentProcess.Id)
+                Shell("""" & lUpdateCheckerPath & """" & " " _
+                    & lQuiet _
+                    & lUpdateURL & " " _
+                    & Process.GetCurrentProcess.Id & " " _
+                    & """" & lSavePath & """", AppWinStyle.Hide)
+            ElseIf Not aQuiet Then 'If manually checking and UpdateCheck.exe is not found, open update web page
+                Logger.Dbg("Did not find update checker at '" & lUpdateCheckerPath & "'")
+                OpenFile("http://hspf.com/pub/basins4/updates.html")
+            End If
+        Catch ex As Exception
+            If aQuiet Then
+                Logger.Dbg("Error in CheckForUpdates: " & ex.Message)
+            Else
+                Logger.Msg("Error: " & ex.Message, "Check For Updates")
+            End If
+        End Try
     End Sub
 
     Private Function UserSaveData(ByVal aSpecification As String) As Boolean
