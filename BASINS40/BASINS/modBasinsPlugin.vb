@@ -52,6 +52,9 @@ Friend Module modBasinsPlugin
 
     Friend pWelcomeScreenShow As Boolean = False
 
+    Friend Const RegisterMenuName As String = "RegisterBASINS"
+    Friend Const RegisterMenuString As String = "&Register as a BASINS user"
+
     Friend Const CheckForUpdatesMenuName As String = "CheckForUpdates"
     Friend Const CheckForUpdatesMenuString As String = "&Check For Updates"
 
