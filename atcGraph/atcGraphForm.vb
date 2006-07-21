@@ -30,7 +30,12 @@ Public Class atcGraphForm
 
     Private Shared SaveImageExtension As String = ".png"
 
+    Private WithEvents zgc As New ZedGraphControl
+
     Private Sub InitMasterPane()
+        Me.Controls.Add(zgc)
+        zgc.Dock = DockStyle.Fill
+        zgc.Visible = True
         pMaster = zgc.MasterPane
         pMaster.PaneList.Clear() 'remove default GraphPane
         'pMaster.PaneFill = New Fill(Color.White, Color.MediumSlateBlue, 45.0F)
@@ -133,7 +138,6 @@ Public Class atcGraphForm
     Friend WithEvents mnuEditFont As System.Windows.Forms.MenuItem
     Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
     <CLSCompliant(False)> _
-    Public WithEvents zgc As ZedGraph.ZedGraphControl
     Friend WithEvents mnuEditY As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditX As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditY2 As System.Windows.Forms.MenuItem
@@ -160,7 +164,6 @@ Public Class atcGraphForm
         Me.mnuEditSep1 = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-        Me.zgc = New ZedGraph.ZedGraphControl
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
@@ -246,40 +249,6 @@ Public Class atcGraphForm
         Me.mnuAnalysis.Index = 2
         Me.mnuAnalysis.Text = "Analysis"
         '
-        'zgc
-        '
-        Me.zgc.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.zgc.IsEnableHPan = True
-        Me.zgc.IsEnableVPan = True
-        Me.zgc.IsEnableZoom = True
-        Me.zgc.IsScrollY2 = False
-        Me.zgc.IsShowContextMenu = True
-        Me.zgc.IsShowHScrollBar = False
-        Me.zgc.IsShowPointValues = False
-        Me.zgc.IsShowVScrollBar = False
-        Me.zgc.IsZoomOnMouseCenter = False
-        Me.zgc.Location = New System.Drawing.Point(0, 0)
-        Me.zgc.Name = "zgc"
-        Me.zgc.PanButtons = System.Windows.Forms.MouseButtons.Left
-        Me.zgc.PanButtons2 = System.Windows.Forms.MouseButtons.Middle
-        Me.zgc.PanModifierKeys = System.Windows.Forms.Keys.Shift
-        Me.zgc.PanModifierKeys2 = System.Windows.Forms.Keys.None
-        Me.zgc.PointDateFormat = "g"
-        Me.zgc.PointValueFormat = "G"
-        Me.zgc.ScrollMaxX = 0
-        Me.zgc.ScrollMaxY = 0
-        Me.zgc.ScrollMaxY2 = 0
-        Me.zgc.ScrollMinX = 0
-        Me.zgc.ScrollMinY = 0
-        Me.zgc.ScrollMinY2 = 0
-        Me.zgc.Size = New System.Drawing.Size(543, 496)
-        Me.zgc.TabIndex = 0
-        Me.zgc.ZoomButtons = System.Windows.Forms.MouseButtons.Left
-        Me.zgc.ZoomButtons2 = System.Windows.Forms.MouseButtons.None
-        Me.zgc.ZoomModifierKeys = System.Windows.Forms.Keys.None
-        Me.zgc.ZoomModifierKeys2 = System.Windows.Forms.Keys.None
-        Me.zgc.ZoomStepFraction = 0.1
-        '
         'mnuHelp
         '
         Me.mnuHelp.Index = 3
@@ -291,7 +260,6 @@ Public Class atcGraphForm
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(543, 496)
-        Me.Controls.Add(Me.zgc)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
         Me.Name = "atcGraphForm"
@@ -424,19 +392,25 @@ Public Class atcGraphForm
         Dim curve As LineItem = Nothing
         Dim lOldCurve As LineItem
 
-        Dim y() As Double = t.Values
-        Dim x() As Double = t.Dates.Values
+        'Dim y() As Double = t.Values
+        'Dim x() As Double = t.Dates.Values
+
 
         If t.Attributes.GetValue("point", False) Then
-            curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.Star)
+            curve = Pane.AddCurve(CurveLabel, New atcTimeseriesPointList(t), curveColor, SymbolType.Star)
+            'curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.Star)
             curve.Line.IsVisible = False
         Else
-            If UBound(y) > 0 Then
-                y(0) = y(1)
-                curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
-                curve.Line.Width = 1
-                curve.Line.StepType = StepType.RearwardStep
-            End If
+            curve = Pane.AddCurve(CurveLabel, New atcTimeseriesPointList(t), curveColor, SymbolType.None)
+            curve.Line.Width = 1
+            curve.Line.StepType = StepType.RearwardStep
+
+            'If UBound(y) > 0 Then
+            '    y(0) = y(1)
+            '    curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
+            '    curve.Line.Width = 1
+            '    curve.Line.StepType = StepType.RearwardStep
+            'End If
         End If
 
         'TODO: label Y Axis

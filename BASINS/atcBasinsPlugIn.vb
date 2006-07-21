@@ -286,14 +286,9 @@ Public Class atcBasinsPlugIn
             Dim lSavePath As String = IO.Path.Combine(g_BasinsDir, "cache")
             Dim lExePath As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)
             Dim lUpdateCheckerPath As String = IO.Path.Combine(lExePath, "UpdateCheck.exe")
-            Dim lUpdateURL As String = WholeFileString(IO.Path.Combine(lExePath, "UpdateURL.txt"))
-            lUpdateURL = ReplaceString(lUpdateURL, vbCr, "")
-            lUpdateURL = ReplaceString(lUpdateURL, vbLf, "")
             If IO.File.Exists(lUpdateCheckerPath) Then
-                MsgBox("Launcing from PID " & Process.GetCurrentProcess.Id)
                 Shell("""" & lUpdateCheckerPath & """" & " " _
                     & lQuiet _
-                    & lUpdateURL & " " _
                     & Process.GetCurrentProcess.Id & " " _
                     & """" & lSavePath & """", AppWinStyle.Hide)
             ElseIf Not aQuiet Then 'If manually checking and UpdateCheck.exe is not found, open update web page

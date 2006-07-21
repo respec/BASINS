@@ -119,6 +119,7 @@
     <Compile Include="atcGraphPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcTimeseriesPointList.vb" />
     <EmbeddedResource Include="atcGraphEdit.resx">
       <DependentUpon>atcGraphEdit.vb</DependentUpon>
     </EmbeddedResource>
