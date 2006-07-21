@@ -373,6 +373,7 @@ Friend Module modBasinsPlugin
 
     Friend Function FeedbackSystemInformation() As String
         'TODO: format as an html document?
+        Dim lSectionFooter As String = "___________________________" & vbCrLf
         Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
         lFeedback &= "Project: " & g_MapWin.Project.FileName & vbCrLf
         lFeedback &= "Config: " & g_MapWin.Project.ConfigFileName & vbCrLf
@@ -381,9 +382,11 @@ Friend Module modBasinsPlugin
         lFeedback &= "Machine: " & Environment.MachineName & vbCrLf
         lFeedback &= "OSVersion: " & Environment.OSVersion.ToString & vbCrLf
         lFeedback &= "CLRVersion: " & Environment.Version.ToString & vbCrLf
-
         lFeedback &= "LogFile: " & Logger.FileName & vbCrLf
-        'TODO: add current log file contents (not too much!!!)
+        If IO.File.Exists(Logger.FileName) Then
+            lFeedback &= IO.File.ReadAllText(Logger.FileName) & vbCrLf
+        End If
+        lFeedback &= lSectionFooter
 
         'plugin info
         lFeedback &= vbCrLf & "Plugins loaded:" & vbCrLf
@@ -396,7 +399,7 @@ Friend Module modBasinsPlugin
                 End With
             End If
         Next
-
+        lFeedback &= lSectionFooter
         'TODO: add map layers info?
 
         Dim lSkipFilename As Integer = g_BasinsDir.Length
