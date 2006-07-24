@@ -23,7 +23,7 @@ Public Class atcGraphForm
     Private pDataManager As atcData.atcDataManager
 
     'Graph editing form
-    Private WithEvents pEditor As atcGraphEdit
+    Private WithEvents pEditor As frmGraphEdit
 
     'The group of atcData displayed
     Private WithEvents pDataGroup As atcDataGroup
@@ -360,29 +360,29 @@ Public Class atcGraphForm
     End Sub
 
     Private Sub mnuEditCurves_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditCurves.Click
-        pEditor = New atcGraphEdit
-        pEditor.Edit(zgc.GraphPane.CurveList(0))
+        pEditor = New frmGraphEdit
+        pEditor.Initialize(zgc.GraphPane)
     End Sub
 
-    Private Sub mnuEditTitles_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditTitles.Click
-        pEditor = New atcGraphEdit
-        pEditor.Edit(zgc.GraphPane)
-    End Sub
+    'Private Sub mnuEditTitles_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditTitles.Click
+    '    pEditor = New atcGraphEdit
+    '    pEditor.Edit(zgc.GraphPane)
+    'End Sub
 
-    Private Sub mnuEditX_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditX.Click
-        pEditor = New atcGraphEdit
-        pEditor.Edit(zgc.GraphPane.XAxis)
-    End Sub
+    'Private Sub mnuEditX_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditX.Click
+    '    pEditor = New atcGraphEdit
+    '    pEditor.Edit(zgc.GraphPane.XAxis)
+    'End Sub
 
-    Private Sub mnuEditY_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY.Click
-        pEditor = New atcGraphEdit
-        pEditor.Edit(zgc.GraphPane.YAxis)
-    End Sub
+    'Private Sub mnuEditY_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY.Click
+    '    pEditor = New atcGraphEdit
+    '    pEditor.Edit(zgc.GraphPane.YAxis)
+    'End Sub
 
-    Private Sub mnuEditY2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY2.Click
-        pEditor = New atcGraphEdit
-        pEditor.Edit(zgc.GraphPane.Y2Axis)
-    End Sub
+    'Private Sub mnuEditY2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY2.Click
+    '    pEditor = New atcGraphEdit
+    '    pEditor.Edit(zgc.GraphPane.Y2Axis)
+    'End Sub
 
     Public Sub AddDatasetTimeseries(ByVal t As atcTimeseries, ByVal CurveLabel As String)
         Dim lCons As String = t.Attributes.GetValue("constituent")

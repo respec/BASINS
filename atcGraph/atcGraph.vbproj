@@ -120,11 +120,21 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="atcTimeseriesPointList.vb" />
+    <Compile Include="frmGraphEdit.Designer.vb">
+      <DependentUpon>frmGraphEdit.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmGraphEdit.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="atcGraphEdit.resx">
       <DependentUpon>atcGraphEdit.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="atcGraphForm.resx">
       <DependentUpon>atcGraphForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmGraphEdit.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmGraphEdit.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

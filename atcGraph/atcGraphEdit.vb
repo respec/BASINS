@@ -47,7 +47,7 @@ Public Class atcGraphEdit
     Friend WithEvents txtProperty As System.Windows.Forms.TextBox
     Friend WithEvents lblProperty As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcGraphEdit))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(atcGraphEdit))
         Me.treeProperties = New System.Windows.Forms.TreeView
         Me.grpEdit = New System.Windows.Forms.GroupBox
         Me.chkProperty = New System.Windows.Forms.CheckBox
@@ -62,10 +62,8 @@ Public Class atcGraphEdit
         'treeProperties
         '
         Me.treeProperties.Dock = System.Windows.Forms.DockStyle.Left
-        Me.treeProperties.ImageIndex = -1
         Me.treeProperties.Location = New System.Drawing.Point(0, 0)
         Me.treeProperties.Name = "treeProperties"
-        Me.treeProperties.SelectedImageIndex = -1
         Me.treeProperties.Size = New System.Drawing.Size(440, 485)
         Me.treeProperties.TabIndex = 0
         '
@@ -124,7 +122,6 @@ Public Class atcGraphEdit
         Me.txtProperty.Name = "txtProperty"
         Me.txtProperty.Size = New System.Drawing.Size(216, 120)
         Me.txtProperty.TabIndex = 2
-        Me.txtProperty.Text = ""
         Me.txtProperty.Visible = False
         '
         'Splitter1
@@ -146,6 +143,7 @@ Public Class atcGraphEdit
         Me.Name = "atcGraphEdit"
         Me.Text = "Edit Graph"
         Me.grpEdit.ResumeLayout(False)
+        Me.grpEdit.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
