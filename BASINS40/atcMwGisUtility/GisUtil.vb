@@ -1468,6 +1468,117 @@ Public Class GisUtil
         lSfOut.Close()
     End Sub
 
+    ''' <summary>Given two polygon layers, calculate the area of each polygon of the 
+    '''          first layer with each polygon of the second layer. 
+    '''          Output array contains area of each polygon combination.</summary>
+    ''' <param name="aPolygonLayer1Index">
+    '''     <para>Index of first polygon layer to calculate areas for</para>
+    ''' </param>
+    ''' <param name="aLayer1FieldIndex">
+    '''     <para>Index of id field in first layer (eg land use code)</para>
+    ''' </param>
+    ''' <param name="aPolygonLayer2Index">
+    '''     <para>Index of second polygon layer to calculate areas for</para>
+    ''' </param>
+    ''' <param name="aSelectedLayer2Indexes">
+    '''     <para>Collection of polygon indexes of second polygon layer to calculate areas for</para>
+    ''' </param>
+    ''' <param name="aArea12">
+    '''     <para>2-D Array used to store output areas</para>
+    ''' </param>
+    Public Shared Sub TabulatePolygonAreas(ByVal aPolygonLayer1Index As Integer, _
+                                           ByVal aLayer1FieldIndex As Integer, _
+                                           ByVal aPolygonLayer2Index As Integer, _
+                                           ByVal aSelectedLayer2Indexes As Collection, _
+                                           ByRef aArea12(,) As Double)
+
+        'obtain handle to layer 1 (landuse) 
+        Dim lLayer1 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aPolygonLayer1Index)
+        Dim lSf1 As New MapWinGIS.Shapefile
+        lSf1 = lLayer1.GetObject
+
+        'set layer 2 (subbasins)
+        Dim lLayer2 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aPolygonLayer2Index)
+        Dim lSf2 As New MapWinGIS.Shapefile
+        lSf2 = lLayer2.GetObject
+        Dim lSf2Ext As MapWinGIS.Extents = lSf2.Extents
+
+        Dim lShapeNew As MapWinGIS.Shape
+        Dim lShape1 As MapWinGIS.Shape
+        Dim lShape2 As MapWinGIS.Shape
+        Dim lShape2Ext As MapWinGIS.Extents
+
+        'set up collections of subbasin shapes and extents to save computation time later
+        Dim lSf2Shape As New Collection
+        Dim lSf2ShapeExtXmax As New Collection
+        Dim lSf2ShapeExtXmin As New Collection
+        Dim lSf2ShapeExtYmax As New Collection
+        Dim lSf2ShapeExtYmin As New Collection
+        For k As Integer = 1 To aSelectedLayer2Indexes.Count
+            'loop thru each selected subbasin (or all if none selected)
+            lShape2 = lSf2.Shape(aSelectedLayer2Indexes(k))
+            lShape2Ext = lShape2.Extents
+            lSf2Shape.Add(lShape2)
+            lSf2ShapeExtXmax.Add(lShape2Ext.xMax)
+            lSf2ShapeExtXmin.Add(lShape2Ext.xMin)
+            lSf2ShapeExtYmax.Add(lShape2Ext.yMax)
+            lSf2ShapeExtYmin.Add(lShape2Ext.yMin)
+        Next k
+
+        '********** do overlay ***********
+        GetMappingObject.StatusBar.ShowProgressBar = True
+        GetMappingObject.StatusBar.ProgressBarValue = 0
+
+        Dim lTotalPolygonCount As Integer = lSf1.NumShapes * aSelectedLayer2Indexes.Count
+        Dim lPolygonCount As Integer = 0
+        Dim lLastDisplayed As Integer = 0
+        Dim lNumShapes As Integer = lSf1.NumShapes
+        For i As Integer = 1 To lNumShapes 'loop through each shape of the land use layer
+            lShape1 = lSf1.Shape(i - 1)
+            Dim lSf1Ext As MapWinGIS.Extents = lShape1.Extents
+            If Not (lSf1Ext.xMin > lSf2Ext.xMax OrElse _
+                    lSf1Ext.xMax < lSf2Ext.xMin OrElse _
+                    lSf1Ext.yMin > lSf2Ext.yMax OrElse _
+                    lSf1Ext.yMax < lSf2Ext.yMin) Then
+                'current first polygon falls in the extents of the second shapefile
+                For k As Integer = 1 To aSelectedLayer2Indexes.Count
+                    'loop thru each selected shape in second shapefile (or all if none selected)
+                    Dim lShapeIndex As Integer = aSelectedLayer2Indexes(k)
+                    lPolygonCount = lPolygonCount + 1
+                    If Not (lSf1Ext.xMin > lSf2ShapeExtXmax(k) OrElse _
+                            lSf1Ext.xMax < lSf2ShapeExtXmin(k) OrElse _
+                            lSf1Ext.yMin > lSf2ShapeExtYmax(k) OrElse _
+                            lSf1Ext.yMax < lSf2ShapeExtYmin(k)) Then
+                        'look for intersection from overlay of these shapes
+                        lShapeNew = MapWinGeoProc.SpatialOperations.Intersection(lShape1, lSf2Shape(k))
+                        If lShapeNew.numPoints > 0 Then 'Insert the shape into the shapefile 
+                            Dim lArea As Double = Math.Abs(MapWinGeoProc.Utils.Area(lShapeNew))
+                            'keep track of field values from both shapefiles
+                            Dim lFeature1Id As String = FieldValue(aPolygonLayer1Index, i - 1, aLayer1FieldIndex)
+                            If lFeature1Id < aArea12.GetUpperBound(0) And lShapeIndex < aArea12.GetUpperBound(1) Then
+                                aArea12(lFeature1Id, lShapeIndex) = aArea12(lFeature1Id, lShapeIndex) + lArea
+                            End If
+                        End If
+                        lShapeNew = Nothing
+                    End If
+                Next k
+            Else 'quick processing of all polygons in layer2 because outside of extent
+                lPolygonCount += aSelectedLayer2Indexes.Count
+            End If
+
+            lSf1Ext = Nothing
+            lShape1 = Nothing
+
+            Dim lCurrentDisplay As Integer = Int(lPolygonCount / lTotalPolygonCount * 100)
+            If lCurrentDisplay > lLastDisplayed Then
+                lLastDisplayed = lCurrentDisplay
+                GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
+            End If
+        Next i
+        GetMappingObject.StatusBar.ShowProgressBar = False
+
+    End Sub
+
     Public Shared Function ClipShapesWithPolygon(ByVal aInputLayerIndex As Integer, _
                                                  ByVal aClipperLayerIndex As Integer) As String
         'returns output shape file name as string 

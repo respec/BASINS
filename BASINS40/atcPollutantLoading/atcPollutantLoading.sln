@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcPollutantLoading", "atcPollutantLoading.vbproj", "{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcMwGisUtility", "..\atcMwGisUtility\atcMwGisUtility.vbproj", "{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Debug.ActiveCfg = Debug|.NET
+		{74D9BE0B-63BA-425A-9EBC-1D85ECDD2FC0}.Release.ActiveCfg = Release|.NET
+		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Debug.ActiveCfg = Debug|.NET
+		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Debug.Build.0 = Debug|.NET
+		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Release.ActiveCfg = Release|.NET
+		{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
