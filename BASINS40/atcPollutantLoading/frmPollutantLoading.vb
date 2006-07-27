@@ -446,8 +446,12 @@ Public Class frmModelSetup
         Dim lSubbasinLayerName As String
         Dim lSubbasinLayerIndex As Integer
         Dim lucode As Integer
+        Dim lProblem As String
 
         If lblEC.Text <> "<none>" Then
+
+            Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
+
             lSubbasinLayerName = cboSubbasins.Items(cboSubbasins.SelectedIndex)
             lSubbasinLayerIndex = GisUtil.LayerIndex(lSubbasinLayerName)
 
@@ -491,21 +495,91 @@ Public Class frmModelSetup
             Dim aLoadPerAcreSC(cSelectedAreaIndexes.Count, aConsNames.GetUpperBound(0)) As Double
 
             If RadioButton1.Checked = True Then 'Export Coefficients Method
-                'calculate areas
+                'calculate areas of each land use in each subbasin
                 If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
                     GIRASAreas(lSubbasinLayerIndex, cSelectedAreaIndexes, aAreaLS)
                     ' / 4046.8564 to convert from m2 to acres
                 End If
                 'calculate loads
-                For i = 1 To cSelectedAreaIndexes.Count  'for each subbasin
-                    For j = 1 To aConsNames.GetUpperBound(0)  'for each constituent
+                For i = 0 To cSelectedAreaIndexes.Count - 1 'for each subbasin
+                    For j = 0 To aConsNames.GetUpperBound(0)  'for each constituent
                         For k = 1 To lmaxlu
                             aLoadSC(i, j) = aLoadSC(i, j) + (aCoeffLC(k, j) * aAreaLS(k, i) / 4046.8564)
                         Next k
                     Next j
                 Next i
+                'calculate areas of each subbasin
+                For i = 0 To cSelectedAreaIndexes.Count - 1 'for each subbasin
+                    For k = 1 To lmaxlu
+                        aAreaS(i) = aAreaS(i) + (aAreaLS(k, i) / 4046.8564)
+                    Next k
+                Next i
+                'calculate loads per acre
+                For i = 0 To cSelectedAreaIndexes.Count - 1 'for each subbasin
+                    If aAreaS(i) > 0 Then
+                        For j = 0 To aConsNames.GetUpperBound(0)  'for each constituent
+                            aLoadPerAcreSC(i, j) = aLoadSC(i, j) / aAreaS(i)
+                        Next j
+                    End If
+                Next i
+
+                'add group to map for output 
+                Dim lGroupName As String = "Estimated Annual Pollutant Loads"
+                GisUtil.AddGroup(lGroupName)
+
+                'now build the output shapefiles 
+                Dim lOutputShapefileName As String
+                Dim lLayerDesc As String
+                For k = 1 To 2
+                    lOutputShapefileName = ""
+                    GisUtil.SaveSelectedFeatures(lSubbasinLayerIndex, cSelectedAreaIndexes, _
+                                                 lOutputShapefileName)
+
+                    'add the output shapefile to the map
+                    If k = 1 Then
+                        lLayerDesc = "Per Acre Load (lbs)"
+                    Else
+                        lLayerDesc = "Total Load (lbs)"
+                    End If
+                    Dim basename As String = lLayerDesc
+                    i = 0
+                    Do While GisUtil.IsLayer(lLayerDesc)
+                        i = i + 1
+                        lLayerDesc = basename & " " & i
+                    Loop
+                    If Not GisUtil.AddLayerToGroup(lOutputShapefileName, lLayerDesc, lGroupName) Then
+                        lProblem = "Cant load layer " & lOutputShapefileName
+                        Logger.Dbg(lProblem)
+                    End If
+
+                    'add fields to the output shapefile
+                    Dim lOutputLayerIndex As String = GisUtil.LayerIndex(lLayerDesc)
+                    Dim lFieldIndex As Integer
+                    GisUtil.StartSetFeatureValue(lOutputLayerIndex)
+                    'add loads
+                    For j = 0 To aConsNames.GetUpperBound(0)  'for each constituent
+                        Try
+                            lFieldIndex = GisUtil.FieldIndex(lOutputLayerIndex, aConsNames(j) & "_load")
+                        Catch
+                            lFieldIndex = GisUtil.AddField(lOutputLayerIndex, aConsNames(j) & "_load", 2, 10)
+                        End Try
+                        For i = 0 To cSelectedAreaIndexes.Count - 1 'for each subbasin
+                            If k = 1 Then
+                                GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, aLoadPerAcreSC(i, j))
+                            Else
+                                GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, aLoadSC(i, j))
+                            End If
+                        Next i
+                    Next j
+                    GisUtil.StopSetFeatureValue(lOutputLayerIndex)
+                Next k
+
+                Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
 
             End If
+
+            Me.Close()
+
         End If
     End Sub
 

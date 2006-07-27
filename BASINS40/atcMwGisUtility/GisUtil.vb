@@ -516,6 +516,37 @@ Public Class GisUtil
         End Get
     End Property
 
+    ''' <summary>Index of a group from a name</summary>
+    ''' <param name="aGroupName">
+    '''     <para>Name of group to obtain index for</para>
+    ''' </param>
+    ''' <exception cref="System.Exception" caption="GroupNameNameNotRecognized">Group specified by aGroupName does not exist</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
+    Public Shared Function GroupIndex(ByVal aGroupName As String) As Integer
+        GroupIndex = 0
+        Dim i As Integer
+
+        For i = 0 To GetMappingObject.Layers.Groups.Count - 1
+            If UCase(GetMappingObject.Layers.Groups(i).Text) = UCase(aGroupName) Then
+                Return i
+            End If
+        Next
+
+        Throw New Exception("GisUtil:GroupIndex:Error:GroupName:" & aGroupName & ":IsNotRecognized")
+    End Function
+
+    Public Shared Function AddGroup(ByVal aGroupName As String) As Boolean
+        'given a group name, add it to the map.
+        'return true if the group is already there or successfully added.
+        Try
+            Dim i As Integer = GroupIndex(aGroupName)
+            AddGroup = True
+        Catch
+            GetMappingObject.Layers.Groups.Add(aGroupName)
+            AddGroup = True
+        End Try
+    End Function
+
     ''' <summary>Number of features from a layer index</summary>
     ''' <param name="aLayerIndex">
     '''     <para>Index of layer (Defaults to current layer)</para>
@@ -933,6 +964,21 @@ Public Class GisUtil
                 AddLayer = True
             End If
         End If
+    End Function
+
+    Public Shared Function AddLayerToGroup(ByVal aFileName As String, _
+                                           ByVal aLayerName As String, _
+                                           ByVal aGroupName As String) As Boolean
+        'given a shape file name, add it to the map in the specified group.
+        'return true if the layer is already there or successfully added.
+        AddLayerToGroup = AddLayer(aFileName, aLayerName)
+        Dim lGroupIndex As Integer
+        Try
+            lGroupIndex = GroupIndex(aGroupName)
+            LayerFromIndex(LayerIndex(aLayerName)).MoveTo(99, lGroupIndex)
+        Catch
+            AddLayerToGroup = False
+        End Try
     End Function
 
     ''' <summary>Layer part of project?</summary>
@@ -1842,6 +1888,68 @@ Public Class GisUtil
         lNewShape = Nothing
         Return lAreaOverlappingPolygons
     End Function
+
+    Public Shared Sub SaveSelectedFeatures(ByVal aAreaLayerIndex As Integer, _
+                                    ByVal aSelectedAreaIndexes As Collection, _
+                                    ByRef newfilename As String)
+
+        Dim sf As New MapWinGIS.Shapefile
+        Dim tollSF As New MapWinGIS.Shapefile
+        Dim fld As New MapWinGIS.Field
+        Dim seg As New MapWinGIS.Shape
+        Dim i As Long
+        Dim Status As Boolean
+
+        'set input layer
+        Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aAreaLayerIndex)
+        sf = lLayer.GetObject
+
+        If newfilename = "" Then
+            'create new shape file for output
+            Dim basename As String = FilenameNoExt(sf.Filename)
+            i = 1
+            newfilename = basename & i & ".shp"
+            Do While FileExists(newfilename)
+                i = i + 1
+                newfilename = basename & i & ".shp"
+            Loop
+        End If
+
+        If lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+            Status = tollSF.CreateNew(newfilename, MapWinGIS.ShpfileType.SHP_POLYGON)
+        ElseIf lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile Then
+            Status = tollSF.CreateNew(newfilename, MapWinGIS.ShpfileType.SHP_POLYLINE)
+        ElseIf lLayer.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile Then
+            Status = tollSF.CreateNew(newfilename, MapWinGIS.ShpfileType.SHP_POINT)
+        End If
+
+        'start editing the output shapefile 
+        Status = tollSF.StartEditingShapes(True)
+
+        'add all fields
+        Dim j As Integer
+        For j = 0 To sf.NumFields - 1
+            tollSF.EditInsertField(sf.Field(j), j)
+        Next
+
+        For i = 1 To aSelectedAreaIndexes.Count
+
+            seg = sf.Shape(aSelectedAreaIndexes(i))
+
+            'Insert it into the new shapefile
+            Status = tollSF.EditInsertShape(seg, i - 1)
+            
+            Dim h As Integer
+            For h = 0 To sf.NumFields - 1
+                tollSF.EditCellValue(h, i - 1, sf.CellValue(h, aSelectedAreaIndexes(i)))
+            Next
+
+        Next i
+
+        'Stop editing and close the output shapefile
+        tollSF.StopEditingShapes(True, True)
+
+    End Sub
 
 End Class
 
