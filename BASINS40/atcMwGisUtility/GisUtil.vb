@@ -535,15 +535,24 @@ Public Class GisUtil
         Throw New Exception("GisUtil:GroupIndex:Error:GroupName:" & aGroupName & ":IsNotRecognized")
     End Function
 
-    Public Shared Function AddGroup(ByVal aGroupName As String) As Boolean
+    ''' <summary>handle of a group from a name</summary>
+    ''' <param name="aGroupName">
+    '''     <para>Name of group to obtain handle for</para>
+    ''' </param>
+    ''' <exception cref="System.Exception" caption="GroupNameNameNotRecognized">Group specified by aGroupName does not exist</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
+    Public Shared Function GroupHandle(ByVal aGroupName As String) As Integer
+        GroupHandle = GetMappingObject.Layers.Groups.ItemByPosition(GroupIndex(aGroupName)).Handle
+    End Function
+
+    Public Shared Function AddGroup(ByVal aGroupName As String) As Integer
         'given a group name, add it to the map.
         'return true if the group is already there or successfully added.
+        AddGroup = -1
         Try
-            Dim i As Integer = GroupIndex(aGroupName)
-            AddGroup = True
+            AddGroup = GroupIndex(aGroupName)
         Catch
-            GetMappingObject.Layers.Groups.Add(aGroupName)
-            AddGroup = True
+            AddGroup = GetMappingObject.Layers.Groups.Add(aGroupName)
         End Try
     End Function
 
@@ -972,10 +981,10 @@ Public Class GisUtil
         'given a shape file name, add it to the map in the specified group.
         'return true if the layer is already there or successfully added.
         AddLayerToGroup = AddLayer(aFileName, aLayerName)
-        Dim lGroupIndex As Integer
+        Dim lGroupHandle As Integer
         Try
-            lGroupIndex = GroupIndex(aGroupName)
-            LayerFromIndex(LayerIndex(aLayerName)).MoveTo(99, lGroupIndex)
+            lGroupHandle = GroupHandle(aGroupName)
+            LayerFromIndex(LayerIndex(aLayerName)).MoveTo(99, lGroupHandle)
         Catch
             AddLayerToGroup = False
         End Try
@@ -1601,8 +1610,8 @@ Public Class GisUtil
                             Dim lArea As Double = Math.Abs(MapWinGeoProc.Utils.Area(lShapeNew))
                             'keep track of field values from both shapefiles
                             Dim lFeature1Id As String = FieldValue(aPolygonLayer1Index, i - 1, aLayer1FieldIndex)
-                            If lFeature1Id < aArea12.GetUpperBound(0) And lShapeIndex < aArea12.GetUpperBound(1) Then
-                                aArea12(lFeature1Id, lShapeIndex) = aArea12(lFeature1Id, lShapeIndex) + lArea
+                            If lFeature1Id < aArea12.GetUpperBound(0) And k - 1 < aArea12.GetUpperBound(1) Then
+                                aArea12(lFeature1Id, k - 1) = aArea12(lFeature1Id, k - 1) + lArea
                             End If
                         End If
                         lShapeNew = Nothing
