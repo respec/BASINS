@@ -1693,7 +1693,7 @@ Public Class GisUtil
                     Else
                         'need to clip
                         lRetc = issf.EditInsertShape(lSf.Shape(j - 1), j - 1)
-                        lRetc = MapWinGeoProc.SpatialOperations.ClipShapesWithPolygon(issf, lShapeClip, rsf)
+                        lRetc = MapWinGeoProc.SpatialOperations.ClipShapesWithPolygon(issf, lShapeClip, rsf, True)                        
                         lRetc = issf.EditDeleteShape(0)
                         If rsf.NumShapes > 0 Then
                             lRetc = lNewShapeFile.EditInsertShape(rsf.Shape(0), lNewShapeFile.NumShapes)
