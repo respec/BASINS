@@ -205,12 +205,14 @@ Public Class atcDataSourceWDM
             Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
 
             If F90_WDCKDT(lWdmHandle.Unit, lDsn) > 0 Then 'dataset exists, what do we do?
+                Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
                 If aExistAction = ExistReplace Then
                     Dim lRet As Integer
+                    Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
                     F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
-                    Logger.Dbg("atcDataSourceWdm:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                    Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
                 ElseIf aExistAction = ExistAppend Then 'find dataset and try to append to it
-                    Logger.Dbg("atcDataSourceWdm:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
+                    Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
                     Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
                     If lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
                         Throw New Exception("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
