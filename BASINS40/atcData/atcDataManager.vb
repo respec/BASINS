@@ -231,12 +231,12 @@ Public Class atcDataManager
                 lSaveXML.NewChild("DisplayAttribute", lName)
             Next
             For Each lSource As atcDataSource In pDataSources
-                If lSource.CanSave Then 'TODO: better test to pass only types that just need a Specification string to open
-                    If Not lSource.Specification.Equals(pInMemorySpecification) Then
-                        lChildXML = lSaveXML.NewChild("DataSource", lSource.Name)
-                        lChildXML.AddAttribute("Specification", lSource.Specification)
-                    End If
+                'If lSource.CanSave Then 'TODO: better test to pass only types that just need a Specification string to open
+                If Not lSource.Specification.Equals(pInMemorySpecification) Then
+                    lChildXML = lSaveXML.NewChild("DataSource", lSource.Name)
+                    lChildXML.AddAttribute("Specification", lSource.Specification)
                 End If
+                'End If
             Next
             Return lSaveXML
         End Get
