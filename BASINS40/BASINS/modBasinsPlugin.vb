@@ -214,7 +214,9 @@ Friend Module modBasinsPlugin
                                         ByVal aParent As String, _
                                         ByVal aMenuText As String, _
                                Optional ByVal aAfter As String = "") As MapWindow.Interfaces.MenuItem
-        With g_MapWin.Menus
+
+        Dim lMenus As MapWindow.Interfaces.Menus = g_MapWin.Menus
+        With lMenus
             If .Item(aMenuName) Is Nothing Then
                 Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
             Else
