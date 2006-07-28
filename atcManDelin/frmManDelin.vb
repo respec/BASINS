@@ -374,9 +374,9 @@ Public Class frmManDelin
             ElseIf pMapWin.Layers(lyr).LayerType = MapWindow.Interfaces.eLayerType.Grid Then
                 'grid
                 cboDEM.Items.Add(ctemp)
-                If Microsoft.VisualBasic.Right(ctemp, 5) = " DEMG" Then
+                If InStr(pMapWin.Layers(lyr).FileName, "\demg\") > 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
-                ElseIf Microsoft.VisualBasic.Right(ctemp, 4) = " NED" Then
+                ElseIf InStr(pMapWin.Layers(lyr).FileName, "\ned\") > 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                 End If
             End If
