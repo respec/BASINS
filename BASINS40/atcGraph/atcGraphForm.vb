@@ -133,34 +133,25 @@ Public Class atcGraphForm
     Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFilePrint As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuEditTitles As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuEditCurves As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuEditFont As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuEditGraph As System.Windows.Forms.MenuItem
     Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
-    <CLSCompliant(False)> _
-    Friend WithEvents mnuEditY As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuEditX As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuEditY2 As System.Windows.Forms.MenuItem
+
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcGraphForm))
-        Me.MainMenu1 = New System.Windows.Forms.MainMenu
+        Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(atcGraphForm))
+        Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
         Me.mnuFileSave = New System.Windows.Forms.MenuItem
         Me.mnuFilePrint = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
-        Me.mnuEditX = New System.Windows.Forms.MenuItem
-        Me.mnuEditY = New System.Windows.Forms.MenuItem
-        Me.mnuEditY2 = New System.Windows.Forms.MenuItem
-        Me.mnuEditTitles = New System.Windows.Forms.MenuItem
-        Me.mnuEditCurves = New System.Windows.Forms.MenuItem
-        Me.mnuEditFont = New System.Windows.Forms.MenuItem
+        Me.mnuEditGraph = New System.Windows.Forms.MenuItem
         Me.mnuEditSep1 = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
@@ -200,47 +191,22 @@ Public Class atcGraphForm
         'mnuEdit
         '
         Me.mnuEdit.Index = 1
-        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditX, Me.mnuEditY, Me.mnuEditY2, Me.mnuEditTitles, Me.mnuEditCurves, Me.mnuEditFont, Me.mnuEditSep1, Me.mnuEditCopy})
+        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditGraph, Me.mnuEditSep1, Me.mnuEditCopy})
         Me.mnuEdit.Text = "Edit"
         '
-        'mnuEditX
+        'mnuEditGraph
         '
-        Me.mnuEditX.Index = 0
-        Me.mnuEditX.Text = "&X Axis"
-        '
-        'mnuEditY
-        '
-        Me.mnuEditY.Index = 1
-        Me.mnuEditY.Text = "&Y Axis"
-        '
-        'mnuEditY2
-        '
-        Me.mnuEditY2.Index = 2
-        Me.mnuEditY2.Text = "Y&2 Axis"
-        '
-        'mnuEditTitles
-        '
-        Me.mnuEditTitles.Index = 3
-        Me.mnuEditTitles.Text = "&Titles"
-        '
-        'mnuEditCurves
-        '
-        Me.mnuEditCurves.Index = 4
-        Me.mnuEditCurves.Text = "&Curves"
-        '
-        'mnuEditFont
-        '
-        Me.mnuEditFont.Index = 5
-        Me.mnuEditFont.Text = "&Font"
+        Me.mnuEditGraph.Index = 0
+        Me.mnuEditGraph.Text = "&Graph"
         '
         'mnuEditSep1
         '
-        Me.mnuEditSep1.Index = 6
+        Me.mnuEditSep1.Index = 1
         Me.mnuEditSep1.Text = "-"
         '
         'mnuEditCopy
         '
-        Me.mnuEditCopy.Index = 7
+        Me.mnuEditCopy.Index = 2
         Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
         Me.mnuEditCopy.Text = "Copy"
         '
@@ -359,30 +325,11 @@ Public Class atcGraphForm
         Me.Refresh()
     End Sub
 
-    Private Sub mnuEditCurves_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditCurves.Click
+    Private Sub mnuEditGraph_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditGraph.Click
         pEditor = New frmGraphEdit
         pEditor.Initialize(zgc.GraphPane)
+        pEditor.Show()
     End Sub
-
-    'Private Sub mnuEditTitles_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditTitles.Click
-    '    pEditor = New atcGraphEdit
-    '    pEditor.Edit(zgc.GraphPane)
-    'End Sub
-
-    'Private Sub mnuEditX_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditX.Click
-    '    pEditor = New atcGraphEdit
-    '    pEditor.Edit(zgc.GraphPane.XAxis)
-    'End Sub
-
-    'Private Sub mnuEditY_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY.Click
-    '    pEditor = New atcGraphEdit
-    '    pEditor.Edit(zgc.GraphPane.YAxis)
-    'End Sub
-
-    'Private Sub mnuEditY2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditY2.Click
-    '    pEditor = New atcGraphEdit
-    '    pEditor.Edit(zgc.GraphPane.Y2Axis)
-    'End Sub
 
     Public Sub AddDatasetTimeseries(ByVal t As atcTimeseries, ByVal CurveLabel As String)
         Dim lCons As String = t.Attributes.GetValue("constituent")
