@@ -1764,7 +1764,8 @@ Public Class GisUtil
     End Function
 
     Public Shared Sub MergeFeaturesBasedOnAttribute(ByVal aLayerIndex As Integer, _
-                                                    ByVal aFieldIndex As Integer)
+                                                    ByVal aFieldIndex As Integer, _
+                                                    Optional ByVal CombineParts As Boolean = True)
         Dim lRetc As Boolean
         Dim lFound As Boolean
 
@@ -1805,61 +1806,63 @@ Public Class GisUtil
             End If
         Loop
 
-        'merge together based on endpoint proximity
-        Dim lStartX1 As Double
-        Dim lStartY1 As Double
-        Dim lEndX1 As Double
-        Dim lEndY1 As Double
-        Dim lStartX2 As Double
-        Dim lStartY2 As Double
-        Dim lEndX2 As Double
-        Dim lEndY2 As Double
-        i = 0
-        Do While i < lsf.NumShapes
-            lFound = False
-            Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
-            Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
-            lStartX1 = lShape1.Point(0).x
-            lStartY1 = lShape1.Point(0).y
-            lEndX1 = lShape1.Point(lShape1.numPoints - 1).x
-            lEndY1 = lShape1.Point(lShape1.numPoints - 1).y
-            Dim j As Integer = 0
-            Do While j < lsf.NumShapes
-                If i <> j Then
-                    Dim lShape2 As MapWinGIS.Shape = lsf.Shape(j)
-                    Dim lVal As Integer = FieldValue(aLayerIndex, j, aFieldIndex)
-                    If lVal = lTargetVal Then
-                        lStartX2 = lShape2.Point(0).x
-                        lStartY2 = lShape2.Point(0).y
-                        lEndX2 = lShape2.Point(lShape2.numPoints - 1).x
-                        lEndY2 = lShape2.Point(lShape2.numPoints - 1).y
-                        If (lStartX1 - lEndX2) ^ 2 + (lStartY1 - lEndY2) ^ 2 < (lStartX2 - lEndX1) ^ 2 + (lStartY2 - lEndY1) ^ 2 Then
-                            'add shape 1 to the end of shape 2
-                            For k As Integer = 1 To lShape1.numPoints
-                                lRetc = lShape2.InsertPoint(lShape1.Point(k), lShape2.numPoints)
-                            Next k
-                            'remove shape1
-                            lsf.EditDeleteShape(i)
-                            lFound = True
-                            Exit Do
-                        Else
-                            'add shape 2 to the end of shape 1
-                            For k As Integer = 1 To lShape2.numPoints
-                                lRetc = lShape1.InsertPoint(lShape2.Point(k), lShape1.numPoints)
-                            Next k
-                            'remove shape2
-                            lsf.EditDeleteShape(j)
-                            lFound = True
-                            Exit Do
+        If CombineParts Then
+            'merge together based on endpoint proximity
+            Dim lStartX1 As Double
+            Dim lStartY1 As Double
+            Dim lEndX1 As Double
+            Dim lEndY1 As Double
+            Dim lStartX2 As Double
+            Dim lStartY2 As Double
+            Dim lEndX2 As Double
+            Dim lEndY2 As Double
+            i = 0
+            Do While i < lsf.NumShapes
+                lFound = False
+                Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
+                Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
+                lStartX1 = lShape1.Point(0).x
+                lStartY1 = lShape1.Point(0).y
+                lEndX1 = lShape1.Point(lShape1.numPoints - 1).x
+                lEndY1 = lShape1.Point(lShape1.numPoints - 1).y
+                Dim j As Integer = 0
+                Do While j < lsf.NumShapes
+                    If i <> j Then
+                        Dim lShape2 As MapWinGIS.Shape = lsf.Shape(j)
+                        Dim lVal As Integer = FieldValue(aLayerIndex, j, aFieldIndex)
+                        If lVal = lTargetVal Then
+                            lStartX2 = lShape2.Point(0).x
+                            lStartY2 = lShape2.Point(0).y
+                            lEndX2 = lShape2.Point(lShape2.numPoints - 1).x
+                            lEndY2 = lShape2.Point(lShape2.numPoints - 1).y
+                            If (lStartX1 - lEndX2) ^ 2 + (lStartY1 - lEndY2) ^ 2 < (lStartX2 - lEndX1) ^ 2 + (lStartY2 - lEndY1) ^ 2 Then
+                                'add shape 1 to the end of shape 2
+                                For k As Integer = 1 To lShape1.numPoints
+                                    lRetc = lShape2.InsertPoint(lShape1.Point(k), lShape2.numPoints)
+                                Next k
+                                'remove shape1
+                                lsf.EditDeleteShape(i)
+                                lFound = True
+                                Exit Do
+                            Else
+                                'add shape 2 to the end of shape 1
+                                For k As Integer = 1 To lShape2.numPoints
+                                    lRetc = lShape1.InsertPoint(lShape2.Point(k), lShape1.numPoints)
+                                Next k
+                                'remove shape2
+                                lsf.EditDeleteShape(j)
+                                lFound = True
+                                Exit Do
+                            End If
                         End If
                     End If
+                    j += 1
+                Loop
+                If Not lFound Then
+                    i += 1
                 End If
-                j += 1
             Loop
-            If Not lFound Then
-                i += 1
-            End If
-        Loop
+        End If
 
         lsf.StopEditingShapes(True)
     End Sub

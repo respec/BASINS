@@ -1028,7 +1028,7 @@ Public Class frmManDelin
         Next i
 
         'merge reach segments together within subbasin
-        GisUtil.MergeFeaturesBasedOnAttribute(StreamsLayerIndex, ReachSubbasinFieldIndex)
+        GisUtil.MergeFeaturesBasedOnAttribute(StreamsLayerIndex, ReachSubbasinFieldIndex, False)
 
         'create and populate fields
         Dim TempFieldIndex As Integer
