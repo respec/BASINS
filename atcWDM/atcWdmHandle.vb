@@ -33,6 +33,11 @@ Friend Class atcWdmHandle
             Logger.Msg("Could not find " & aFileName, "atcWdmHandle")
         Else
             'Logger.Dbg("atcWdmHandle:New:Open:" & lFileName)
+            Dim lWdmFile As New atcWDMfile
+            lWdmFile.OpenFile(lFileName)
+            Dim lS As String = lWdmFile.ToString
+            Logger.Dbg(lS)
+
             If aRWCFlg = 0 Then
                 lAttr = GetAttr(lFileName) 'if read only, change to not read only
                 If (lAttr And FileAttribute.ReadOnly) <> 0 Then
