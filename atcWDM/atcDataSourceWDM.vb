@@ -192,7 +192,7 @@ Public Class atcDataSourceWDM
             Dim lEDat(5) As Integer
             J2Date(lEJDay, lEDat)
             Dim lNValsExpected As Integer
-            timdif(lSDat, lEDat, lTu, lTs, lNValsExpected)
+            TimDif(lSDat, lEDat, lTu, lTs, lNValsExpected)
             If lNvals <> lNValsExpected Then
                 'TODO:  make writing data smarter to deal with big gaps of missing, etc
                 Throw New Exception("NVals:" & lNvals & ":" & lNValsExpected)
@@ -371,7 +371,7 @@ Public Class atcDataSourceWDM
         lNUp = aTs.Attributes.GetValue("NUP", 10)
         lNSa = aTs.Attributes.GetValue("NSA", 30)
         lNSasp = aTs.Attributes.GetValue("NSASP", 100)
-        lndp = aTs.Attributes.GetValue("NDP", 300)
+        lNDp = aTs.Attributes.GetValue("NDP", 300)
         F90_WDLBAX(aFileUnit, lDsn, 1, lNDn, lNUp, lNSa, lNSasp, lNDp, lPsa)
 
         'add needed attributes
@@ -714,7 +714,7 @@ Public Class atcDataSourceWDM
                         If nVals = 0 Then 'constant inverval???
                             Dim lEJDay As Double = .GetValue("EJDay", 0)
                             J2Date(lEJDay, lEdat)
-                            timdif(lSdat, lEdat, .GetValue("tu", 0), .GetValue("ts", 0), nVals)
+                            TimDif(lSdat, lEdat, .GetValue("tu", 0), .GetValue("ts", 0), nVals)
                             lReadTS.numValues = nVals
                         End If
                         If nVals > 0 Then
@@ -852,26 +852,26 @@ Public Class atcDataSourceWDM
         lSaInd = 33 'time step
         F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTs, lRetcod)
         If (lRetcod <> 0) Then ' set time step to default of 1
-            lts = 1
+            lTs = 1
         End If
-        aDataset.Attributes.SetValue("ts", lts)
+        aDataset.Attributes.SetValue("ts", lTs)
 
         lSaInd = 17 'time units
         F90_WDBSGI(aFileUnit, lDsn, lSaInd, lSaLen, lTu, lRetcod)
         If (lRetcod <> 0) Then 'set to default of daily time units
-            ltu = 4
+            lTu = 4
         End If
-        aDataset.Attributes.SetValue("tu", ltu)
+        aDataset.Attributes.SetValue("tu", lTu)
 
         'TODO: set constant interval/interval length attribute(s) in aDataset.Dates
         'lDateSum.CIntvl = True
-        Select Case ltu
+        Select Case lTu
             Case 4 'day
-                aDataset.Attributes.SetValue("interval", lts)
+                aDataset.Attributes.SetValue("interval", lTs)
             Case 3 'hour
-                aDataset.Attributes.SetValue("interval", lts / CDbl(24))
+                aDataset.Attributes.SetValue("interval", lTs / CDbl(24))
             Case 2 'minute
-                aDataset.Attributes.SetValue("interval", lts / CDbl(1440))
+                aDataset.Attributes.SetValue("interval", lTs / CDbl(1440))
         End Select
 
         If Not pQuick Then 'get start and end dates for each data set
@@ -896,7 +896,7 @@ Public Class atcDataSourceWDM
         If lStr.Length = 0 Then
             lStr = "<unk>"
         End If
-        aDataset.Attributes.SetValue("scen", lstr)
+        aDataset.Attributes.SetValue("scen", lStr)
         'get data-set location name
         lSaInd = 290
         lSaLen = 8
