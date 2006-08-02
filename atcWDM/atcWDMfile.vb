@@ -1,59 +1,21 @@
+'Copyright 2006 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
+Option Strict Off
+Option Explicit On
+
+Imports atcUtility
+Imports MapWinUtility
+
 Friend Class atcWDMfile
-    Dim pFileName As String
-    Dim pFileDefinition As clsFileDefinition
-    Dim pDsnRecordPointer() As Int32
-    Dim pRecordInUse() As Int32
-    Const pDsnPerDirRec As Int32 = 500
+    Private pFileName As String
+    Private pFileDefinition As clsFileDefinition
+    Private pDsnRecordPointer() As Int32
+    Private Const pDsnPerDirRec As Int32 = 500
 
     Public Function OpenFile(ByVal aFilename As String) As Boolean
-        If Not IO.File.Exists(aFilename) Then
-            Return False 'can't open a file that doesn't exist
-        Else
-            pFileName = aFilename
-            Dim lFS As IO.FileStream
-            lFS = IO.File.Open(pFileName, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-            lFS.Seek(0, IO.SeekOrigin.Begin)
-            Dim lBR As New IO.BinaryReader(lFS)
-            pFileDefinition = New clsFileDefinition(lBR)
-            With pFileDefinition
-                ReDim pRecordInUse(.LSTREC)
-                SetRecordUse(1, -3)
-                'inventory free record chain
-                Dim lFreeRec As Int32 = pFileDefinition.FREREC
-                While lFreeRec > 0
-                    SetRecordUse(lFreeRec, -2)
-                    lFreeRec = ReadWdmInt32(lBR, lFreeRec, 2) 'forward record pointer
-                End While
-                'check direcory records
-                For lPos As Integer = 1 To .DirPnt.GetUpperBound(0)
-                    Dim lDirRecord As Integer = pFileDefinition.DirPnt(lPos)
-                    If lDirRecord > 0 Then 'process this directory
-                        SetRecordUse(lDirRecord, -1)
-                        ReDim Preserve pDsnRecordPointer(lPos * pDsnPerDirRec)
-                        SeekWdm(lFS, lDirRecord, 1)
-                        For lInd As Integer = 1 To 4
-                            If lBR.ReadInt32 <> 0 Then
-                                Throw New Exception("Directory Record " & lDirRecord & " With NonZero Pointers at" & lInd)
-                            End If
-                        Next
-                        For lInd As Integer = 1 To pDsnPerDirRec
-                            pDsnRecordPointer(lInd) = ReadWdmInt32(lBR, lDirRecord, lInd + 4)
-                            If pDsnRecordPointer(lInd) <> 0 Then
-                                Dim lDsn As Int32 = ((lPos - 1) * 500) + lInd
-                                Dim lDsnRec As Int32 = pDsnRecordPointer(lInd)
-                                While lDsnRec > 0 'follow dsn record chain
-                                    SetRecordUse(lDsnRec, lDsn)
-                                    'next forward secondary record pointer
-                                    lDsnRec = ReadWdmInt32(lBR, lDsnRec, 4)
-                                End While
-                            End If
-                        Next
-                    End If
-                Next
-            End With
-            lFS.Close()
-            Return True
-        End If
+        pFileName = aFilename
+        Dim lWdmFileHandle As New atcWdmFileHandle(1, pFileName, pFileDefinition)
+        lWdmFileHandle.Dispose()
+        Return True
     End Function
 
     Public Overrides Function ToString() As String
@@ -62,15 +24,71 @@ Friend Class atcWDMfile
         lBuilder.Append("FileDefintionRecord" & vbCr)
         lBuilder.Append(pFileDefinition.ToString())
         lBuilder.Append("Datasets" & vbCr)
-        For lInd As Integer = 1 To pDsnRecordPointer.GetUpperBound(0)
-            lBuilder.Append(Int32ToStringIfNotZero("Dsn(" & lInd & ") at ", pDsnRecordPointer(lInd)))
-        Next
+        'For lInd As Integer = 1 To pDsnRecordPointer.GetUpperBound(0)
+        'lBuilder.Append(Int32ToStringIfNotZero("Dsn(" & lInd & ") at ", pDsnRecordPointer(lInd)))
+        'Next
         lBuilder.Append("RecordUsage" & vbCr)
-        For lInd As Integer = 1 To pRecordInUse.GetUpperBound(0)
-            lBuilder.Append(Int32ToStringIfNotZero("Rec(" & lInd & ") use ", pRecordInUse(lInd)))
+        Dim lRecordInUse As Int32() = RecordUsageMap()
+        For lInd As Integer = 1 To lRecordInUse.GetUpperBound(0)
+            lBuilder.Append(Int32ToStringIfNotZero("Rec(" & lInd & ") use ", lRecordInUse(lInd)) & vbCr)
         Next
         Return lBuilder.ToString
     End Function
+
+    Friend Function RecordUsageMap() As Int32()
+        Dim lWdmFileHandle As New atcWdmFileHandle(1, pFileName, pFileDefinition)
+        Dim lBr As IO.BinaryReader = lWdmFileHandle.BinaryReader
+        Dim lRecordInUse(pFileDefinition.LSTREC) As Int32
+        SetRecordUse(lRecordInUse, 1, -3)
+        'inventory free record chain
+        Dim lFreeRec As Int32 = pFileDefinition.FREREC
+        While lFreeRec > 0
+            SetRecordUse(lRecordInUse, lFreeRec, -2)
+            lFreeRec = ReadWdmInt32(lBR, lFreeRec, 2) 'forward record pointer
+        End While
+        'check direcory records
+        For lPos As Integer = 1 To pFileDefinition.DirPnt.GetUpperBound(0)
+            Dim lDirRecord As Integer = pFileDefinition.DirPnt(lPos)
+            If lDirRecord > 0 Then 'process this directory
+                SetRecordUse(lRecordInUse, lDirRecord, -1)
+                ReDim Preserve pDsnRecordPointer(lPos * pDsnPerDirRec)
+                For lInd As Integer = 1 To 4
+                    If ReadWdmInt32(lBR, lDirRecord, lInd) <> 0 Then
+                        Throw New Exception("Directory Record " & lDirRecord & " With NonZero Pointers at" & lInd)
+                    End If
+                Next
+                For lInd As Integer = 1 To pDsnPerDirRec
+                    pDsnRecordPointer(lInd) = ReadWdmInt32(lBR, lDirRecord, lInd + 4)
+                    If pDsnRecordPointer(lInd) <> 0 Then
+                        Dim lDsn As Int32 = ((lPos - 1) * 500) + lInd
+                        Dim lDsnRec As Int32 = pDsnRecordPointer(lInd)
+                        While lDsnRec > 0 'follow dsn record chain
+                            SetRecordUse(lRecordInUse, lDsnRec, lDsn)
+                            'next forward secondary record pointer
+                            lDsnRec = ReadWdmInt32(lBR, lDsnRec, 4)
+                        End While
+                    End If
+                Next
+            End If
+        Next
+        For lInd As Int32 = 1 To pFileDefinition.LSTREC
+            If lRecordInUse(lInd) = 0 Then 'record not in chain
+                Throw New Exception("Record " & lInd & " Not In a Chain")
+            End If
+        Next
+        lWdmFileHandle.Dispose()
+        Return lRecordInUse
+    End Function
+
+    Private Sub SetRecordUse(ByRef aRecordInUse() As Int32, ByVal aRecord As Int32, ByVal aUse As Int32)
+        If aRecordInUse(aRecord) = 0 Then 'not in use
+            aRecordInUse(aRecord) = aUse
+        Else
+            Throw New Exception("WDM record " & aRecord & _
+                                " already in use with code " & aRecordInUse(aRecord) & _
+                                " can not use with new code " & aUse)
+        End If
+    End Sub
 
     Private Class clsFileDefinition
         Dim PPRBKR As Int32 ' 1 Primary backward record pointer   (always -998, was -999)
@@ -104,6 +122,7 @@ Friend Class atcWDMfile
 
         Friend Sub New(ByVal aBR As IO.BinaryReader) 'could use handle here
             PPRBKR = aBR.ReadInt32() ' Primary backward record pointer   (always -998, was -999)
+            'TODO: exception if not -998
             PPRFWR = aBR.ReadInt32() ' Primary forward record pointer    (always 0)
             PSCBKR = aBR.ReadInt32() ' Secondary backward record pointer (always 0)
             PSCFWR = aBR.ReadInt32() ' Secondary forward record pointer  (always 0)
@@ -183,26 +202,71 @@ Friend Class atcWDMfile
         End Function
     End Class
 
+    Private Class atcWdmFileHandle
+        Implements IDisposable
+
+        Dim pBr As IO.BinaryReader
+
+        Public ReadOnly Property BinaryReader() As IO.BinaryReader
+            Get
+                Return pBr
+            End Get
+        End Property
+
+        Public Sub New(ByVal aRWCFlg As Integer, ByVal aFileName As String, ByRef aFileDefinition As clsFileDefinition)
+            'aRWCFlg: 0- normal open of existing WDM file,
+            '         1- open WDM file as read only,
+            '         2- open new WDM file
+            Dim lAttr As FileAttribute
+            Dim lFileName As String
+            Dim lFS As IO.FileStream
+
+            lFileName = AbsolutePath(aFileName, CurDir())
+
+            If Not FileExists(lFileName) AndAlso aRWCFlg <> 2 Then
+                Throw New ApplicationException("atcWdmFileHandle:Could not find " & aFileName)
+            Else
+                If aRWCFlg = 0 Then
+                    lAttr = GetAttr(lFileName) 'if read only, change to not read only
+                    If (lAttr And FileAttribute.ReadOnly) <> 0 Then
+                        lAttr = lAttr - FileAttribute.ReadOnly
+                        SetAttr(lFileName, lAttr)
+                    End If
+                End If
+
+                Logger.Dbg("atcWdmFileHandle:OpenB4:" & lFileName)
+                Try
+                    lFS = IO.File.Open(lFileName, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                    pBr = New IO.BinaryReader(lFS)
+                    aFileDefinition = New clsFileDefinition(pBr)
+                    Logger.Dbg("atcWdmFileHandle:OpenAft")
+                Catch ex As Exception
+                    Throw New ApplicationException("atcWdmFileHandle:Exception:" & vbCrLf & ex.ToString)
+                End Try
+            End If
+        End Sub
+
+        Public Sub Dispose() Implements System.IDisposable.Dispose
+            Logger.Dbg("atcWdmFileHandle:Dispose:")
+            pBr.Close()
+            GC.SuppressFinalize(Me)
+        End Sub
+
+        Protected Overrides Sub Finalize()
+            Dispose()
+        End Sub
+    End Class
+
     Private Function ReadWdmInt32(ByVal aBr As IO.BinaryReader, ByRef aRec As Int32, ByRef aOff As Int32) As Int32
-        'aOff in words
-        SeekWdm(aBr.BaseStream, aRec, (aOff * 4) - 3)
+        'aOff in four byte words
+        SeekWdm(aBr.BaseStream, aRec, aOff)
         Dim lI As Int32 = aBr.ReadInt32
         Return lI
     End Function
     Private Sub SeekWdm(ByVal aFs As IO.FileStream, ByVal aRec As Int32, ByVal aOff As Int32)
-        'aOff in bytes
+        'aOff in four byte words
         Const lReclB As Int32 = 2048 'wdm record size in bytes
-        aFs.Seek(((aRec - 1) * lReclB) + (aOff - 1), IO.SeekOrigin.Begin)
-    End Sub
-
-    Private Sub SetRecordUse(ByVal aRecord As Integer, ByVal aUse As Integer)
-        If pRecordInUse(aRecord) = 0 Then 'not in use
-            pRecordInUse(aRecord) = aUse
-        Else
-            Throw New Exception("WDM record " & aRecord & _
-                                " already in use with code " & pRecordInUse(aRecord) & _
-                                " can not use with new code " & aUse)
-        End If
+        aFs.Seek(((aRec - 1) * lReclB) + ((aOff - 1) * 4), IO.SeekOrigin.Begin)
     End Sub
 
     Private Shared Function Int32ToStringIfNotZero(ByVal aTitle As String, ByVal aValue As Int32) As String
