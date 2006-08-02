@@ -32,10 +32,11 @@ Friend Class atcWdmHandle
         If Not FileExists(lFileName) AndAlso aRWCFlg <> 2 Then
             Logger.Msg("Could not find " & aFileName, "atcWdmHandle")
         Else
-            'Logger.Dbg("atcWdmHandle:New:Open:" & lFileName)
             Try
+                Logger.Dbg("atcWdmHandle:New:VBOpen:" & lFileName)
                 Dim lWdmFile As New atcWDMfile
                 lWdmFile.OpenFile(lFileName)
+                Logger.Dbg("atcWdmHandle:New:VBOpenDone")
                 'Dim lS As String = lWdmFile.ToString
                 'Logger.Dbg(lS)
             Catch ex As Exception
