@@ -35,10 +35,13 @@ Friend Class atcWdmHandle
             Try
                 Logger.Dbg("atcWdmHandle:New:VBOpen:" & lFileName)
                 Dim lWdmFile As New atcWDMfile
-                lWdmFile.OpenFile(lFileName)
-                Logger.Dbg("atcWdmHandle:New:VBOpenDone")
-                Dim lS As String = lWdmFile.ToString
-                Logger.Dbg(lS)
+                If lWdmFile.Open(lFileName) Then
+                    Logger.Dbg("atcWdmHandle:New:VBOpenDone")
+                    Dim lS As String = lWdmFile.ToString
+                    Logger.Dbg(lS)
+                Else
+                    Logger.Dbg("atcWdmHandle:New:VBOpen:False")
+                End If
             Catch ex As Exception
                 Logger.Msg(ex.ToString)
             End Try

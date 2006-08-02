@@ -2,70 +2,148 @@
 Option Strict Off
 Option Explicit On
 
+Imports atcData
+Imports atcData.atcDataSource.EnumExistAction
 Imports atcUtility
 Imports MapWinUtility
 
 Friend Class atcWDMfile
-    Private pFileName As String
-    Private pFileDefinition As clsFileDefinition
-    Private pDsnRecordPointer() As Int32
-    Private Const pDsnPerDirRec As Int32 = 500
+    Inherits atcData.atcDataSource
 
-    Public Function OpenFile(ByVal aFilename As String) As Boolean
-        pFileName = aFilename
-        Dim lWdmFileHandle As New atcWdmFileHandle(1, pFileName, pFileDefinition)
-        lWdmFileHandle.Dispose()
-        Return True
+    Private pFileDefinition As clsFileDefinition
+
+    Private Const pDsnPerDirRec As Int32 = 500
+    Private Const pFileFilter As String = "WDM Files (*.wdm)|*.wdm"
+
+    Public Overrides ReadOnly Property Category() As String
+        Get
+            Return "File"
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property Description() As String
+        Get
+            Return "WDM Time Series VB"
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property Name() As String
+        Get
+            Return "Timeseries::WDM VB"
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property CanOpen() As Boolean
+        Get
+            Return True
+        End Get
+    End Property
+
+    Public Overrides ReadOnly Property CanSave() As Boolean
+        Get
+            Return False 'TODO: change when this can save
+        End Get
+    End Property
+
+
+    Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+        If aFileName Is Nothing OrElse aFileName.Length = 0 Then
+            Dim cdlg As New Windows.Forms.OpenFileDialog
+            With cdlg
+                .Title = "Select WDM file to open"
+                .FileName = aFileName
+                .Filter = pFileFilter
+                .CheckFileExists = False
+                If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                    aFileName = AbsolutePath(.FileName, CurDir)
+                Else 'cancel
+                    Logger.Dbg("atcWDMfile:Open:User Cancelled File Dialogue for Open WDM file")
+                    Return False
+                End If
+            End With
+        End If
+
+        Dim lWdmFileHandle As atcWdmFileHandle = Nothing
+        If FileExists(aFileName) Then
+            lWdmFileHandle = New atcWdmFileHandle(0, aFileName, pFileDefinition)
+        ElseIf FilenameNoPath(aFileName).Length > 0 Then
+            Logger.Dbg("atcWDMfile:Open:WDM file " & aFileName & " does not exist - it will be created")
+            MkDirPath(PathNameOnly(aFileName))
+            lWdmFileHandle = New atcWdmFileHandle(2, aFileName, pFileDefinition)
+        Else
+            Logger.Dbg("atcWDMfile:Open:File does not exist and cannot create '" & aFileName & "'")
+            Return False
+        End If
+
+        If Not lWdmFileHandle Is Nothing Then
+            Specification = aFileName
+            'pQuick = True
+            'Refresh(lwdmhandle.Unit)
+            'pQuick = False
+            lWdmFileHandle.Dispose()
+            Return True 'Successfully opened
+        Else
+            Return False
+        End If
     End Function
 
     Public Overrides Function ToString() As String
         Dim lBuilder As New Text.StringBuilder
-        lBuilder.Append("WDMFileName = " & pFileName & vbCr)
+        lBuilder.Append("WDMFileName = " & Specification & vbCr)
         lBuilder.Append("FileDefintionRecord" & vbCr)
         lBuilder.Append(pFileDefinition.ToString())
-        lBuilder.Append("Datasets" & vbCr)
+        'lBuilder.Append("Datasets" & vbCr)
         'For lInd As Integer = 1 To pDsnRecordPointer.GetUpperBound(0)
         'lBuilder.Append(Int32ToStringIfNotZero("Dsn(" & lInd & ") at ", pDsnRecordPointer(lInd)))
         'Next
         lBuilder.Append("RecordUsage" & vbCr)
-        Dim lRecordInUse As Int32() = RecordUsageMap()
-        For lInd As Integer = 1 To lRecordInUse.GetUpperBound(0)
-            lBuilder.Append(Int32ToStringIfNotZero("Rec(" & lInd & ") use ", lRecordInUse(lInd)) & vbCr)
-        Next
+        lBuilder.Append(Check(True))
+        'Dim lRecordInUse As Int32() = RecordUsageMap()
+        'For lInd As Integer = 1 To lRecordInUse.GetUpperBound(0)
+        '    lBuilder.Append(Int32ToStringIfNotZero("Rec(" & lInd & ") use ", lRecordInUse(lInd)) & vbCr)
+        'Next
         Return lBuilder.ToString
     End Function
 
-    Friend Function RecordUsageMap() As Int32()
-        Dim lWdmFileHandle As New atcWdmFileHandle(1, pFileName, pFileDefinition)
+    Friend Function Check(ByVal aVerbose As Boolean) As String
+        Dim lReport As New Text.StringBuilder
+        Dim lWdmFileHandle As New atcWdmFileHandle(1, Specification, pFileDefinition)
         Dim lBr As IO.BinaryReader = lWdmFileHandle.BinaryReader
         Dim lRecordInUse(pFileDefinition.LSTREC) As Int32
+        Dim lDsnRecordPointer() As Int32
+
         SetRecordUse(lRecordInUse, 1, -3)
+
         'inventory free record chain
         Dim lFreeRec As Int32 = pFileDefinition.FREREC
         While lFreeRec > 0
             SetRecordUse(lRecordInUse, lFreeRec, -2)
-            lFreeRec = ReadWdmInt32(lBR, lFreeRec, 2) 'forward record pointer
+            lFreeRec = ReadWdmInt32(lBr, lFreeRec, 2) 'forward record pointer
         End While
+
         'check direcory records
         For lPos As Integer = 1 To pFileDefinition.DirPnt.GetUpperBound(0)
             Dim lDirRecord As Integer = pFileDefinition.DirPnt(lPos)
             If lDirRecord > 0 Then 'process this directory
                 SetRecordUse(lRecordInUse, lDirRecord, -1)
-                ReDim Preserve pDsnRecordPointer(lPos * pDsnPerDirRec)
+                ReDim Preserve lDsnRecordPointer(lPos * pDsnPerDirRec)
                 For lInd As Integer = 1 To 4
-                    If ReadWdmInt32(lBR, lDirRecord, lInd) <> 0 Then
-                        Throw New Exception("Directory Record " & lDirRecord & " With NonZero Pointers at" & lInd)
+                    If ReadWdmInt32(lBr, lDirRecord, lInd) <> 0 Then
+                        lReport.Append("Directory Record " & lDirRecord & " With NonZero Pointer " & lInd & " = " & ReadWdmInt32(lBr, lDirRecord, lInd))
                     End If
                 Next
                 For lInd As Integer = 1 To pDsnPerDirRec
-                    pDsnRecordPointer(lInd) = ReadWdmInt32(lBR, lDirRecord, lInd + 4)
-                    If pDsnRecordPointer(lInd) <> 0 Then
+                    lDsnRecordPointer(lInd) = ReadWdmInt32(lBr, lDirRecord, lInd + 4)
+                    If lDsnRecordPointer(lInd) <> 0 Then
+                        If aVerbose Then
+                            lReport.Append("Directory Record " & lDirRecord & " Pointer " & lInd & " = " & lDsnRecordPointer(lInd))
+                        End If
                         Dim lDsn As Int32 = ((lPos - 1) * 500) + lInd
-                        Dim lDsnRec As Int32 = pDsnRecordPointer(lInd)
+                        Dim lDsnRec As Int32 = lDsnRecordPointer(lInd)
                         While lDsnRec > 0 'follow dsn record chain
                             SetRecordUse(lRecordInUse, lDsnRec, lDsn)
                             'next forward secondary record pointer
-                            lDsnRec = ReadWdmInt32(lBR, lDsnRec, 4)
+                            lDsnRec = ReadWdmInt32(lBr, lDsnRec, 4)
                         End While
                     End If
                 Next
@@ -73,11 +151,18 @@ Friend Class atcWDMfile
         Next
         For lInd As Int32 = 1 To pFileDefinition.LSTREC
             If lRecordInUse(lInd) = 0 Then 'record not in chain
-                Throw New Exception("Record " & lInd & " Not In a Chain")
+                lReport.Append("Record " & lInd & " Not In a Chain")
+            ElseIf aVerbose Then
+                lReport.Append("Rec(" & lInd & ") use ", lRecordInUse(lInd) & vbCr)
             End If
         Next
         lWdmFileHandle.Dispose()
-        Return lRecordInUse
+
+        If Not aVerbose AndAlso lReport.Length > 0 Then
+            Throw New Exception(lReport.ToString)
+        End If
+
+        Return lReport.ToString
     End Function
 
     Private Sub SetRecordUse(ByRef aRecordInUse() As Int32, ByVal aRecord As Int32, ByVal aUse As Int32)
