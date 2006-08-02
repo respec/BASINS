@@ -110,7 +110,6 @@
     <Compile Include="atcMsgWDM.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcWDMfile.vb" />
     <Compile Include="atcWdmHandle.vb">
       <SubType>Code</SubType>
     </Compile>
