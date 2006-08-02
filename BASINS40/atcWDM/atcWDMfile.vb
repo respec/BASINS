@@ -1,9 +1,9 @@
 Friend Class atcWDMfile
-    Const pReclB As Int32 = 2048
     Dim pFileName As String
     Dim pFileDefinition As clsFileDefinition
     Dim pDsnRecordPointer() As Int32
     Dim pRecordInUse() As Int32
+    Const pDsnPerDirRec As Int32 = 500
 
     Public Function OpenFile(ByVal aFilename As String) As Boolean
         If Not IO.File.Exists(aFilename) Then
@@ -18,27 +18,35 @@ Friend Class atcWDMfile
             With pFileDefinition
                 ReDim pRecordInUse(.LSTREC)
                 SetRecordUse(1, -3)
-                'TODO inventory free record chain
-
+                'inventory free record chain
+                Dim lFreeRec As Int32 = pFileDefinition.FREREC
+                While lFreeRec > 0
+                    SetRecordUse(lFreeRec, -2)
+                    lFreeRec = ReadWdmInt32(lBR, lFreeRec, 2) 'forward record pointer
+                End While
                 'check direcory records
-                For lPos As Integer = 0 To .DirPnt.GetUpperBound(0)
+                For lPos As Integer = 1 To .DirPnt.GetUpperBound(0)
                     Dim lDirRecord As Integer = pFileDefinition.DirPnt(lPos)
                     If lDirRecord > 0 Then 'process this directory
                         SetRecordUse(lDirRecord, -1)
-                        Dim lSize As Integer = (lPos + 1) * 500
-                        ReDim Preserve pDsnRecordPointer(lSize)
-                        lFS.Seek(((lDirRecord - 1) * pReclB), IO.SeekOrigin.Begin)
+                        ReDim Preserve pDsnRecordPointer(lPos * pDsnPerDirRec)
+                        SeekWdm(lFS, lDirRecord, 1)
                         For lInd As Integer = 1 To 4
                             If lBR.ReadInt32 <> 0 Then
                                 Throw New Exception("Directory Record " & lDirRecord & " With NonZero Pointers at" & lInd)
                             End If
                         Next
-                        For lInd As Integer = lSize - 499 To lSize
-                            pDsnRecordPointer(lInd) = lBR.ReadInt32
+                        For lInd As Integer = 1 To pDsnPerDirRec
+                            pDsnRecordPointer(lInd) = ReadWdmInt32(lBR, lDirRecord, lInd + 4)
                             If pDsnRecordPointer(lInd) <> 0 Then
-                                SetRecordUse(pDsnRecordPointer(lInd), lInd)
+                                Dim lDsn As Int32 = ((lPos - 1) * 500) + lInd
+                                Dim lDsnRec As Int32 = pDsnRecordPointer(lInd)
+                                While lDsnRec > 0 'follow dsn record chain
+                                    SetRecordUse(lDsnRec, lDsn)
+                                    'next forward secondary record pointer
+                                    lDsnRec = ReadWdmInt32(lBR, lDsnRec, 4)
+                                End While
                             End If
-                            'need to follow dsn chain
                         Next
                     End If
                 Next
@@ -69,7 +77,7 @@ Friend Class atcWDMfile
         Dim PPRFWR As Int32 ' 2 Primary forward record pointer    (always 0)
         Dim PSCBKR As Int32 ' 3 Secondary backward record pointer (always 0)
         Dim PSCFWR As Int32 ' 4 Secondary forward record pointer  (always 0)
-        Dim Unused05_28(23) As Byte ' 5 - 28 
+        Dim Unused05_28(24) As Byte ' 5 - 28 
         Friend LSTREC As Int32 '29
         Dim UnusedA As Int32 '30
         Friend FREREC As Int32 '31
@@ -91,16 +99,16 @@ Friend Class atcWDMfile
         Dim DSFST_Attribute As Int32 '47
         Dim DSCNT_Message As Int32 '48
         Dim DSFST_Message As Int32 '49
-        Dim UnusedB(62) As Int32 '50 - 112 (size 63)
-        Friend DirPnt(399) As Int32 '113- 512 (size 400)
+        Dim UnusedB(63) As Int32 '50 - 112 
+        Friend DirPnt(400) As Int32 '113- 512 
 
         Friend Sub New(ByVal aBR As IO.BinaryReader) 'could use handle here
             PPRBKR = aBR.ReadInt32() ' Primary backward record pointer   (always -998, was -999)
             PPRFWR = aBR.ReadInt32() ' Primary forward record pointer    (always 0)
             PSCBKR = aBR.ReadInt32() ' Secondary backward record pointer (always 0)
             PSCFWR = aBR.ReadInt32() ' Secondary forward record pointer  (always 0)
-            For lPos As Integer = 0 To Unused05_28.GetUpperBound(0)
-                Unused05_28(lPos) = aBR.ReadInt32  ' 5 - 28 (size 24)
+            For lPos As Integer = 1 To Unused05_28.GetUpperBound(0)
+                Unused05_28(lPos) = aBR.ReadInt32  ' 5 - 28 
             Next
             LSTREC = aBR.ReadInt32() '29
             UnusedA = aBR.ReadInt32() '30
@@ -123,11 +131,11 @@ Friend Class atcWDMfile
             DSFST_Attribute = aBR.ReadInt32() '47
             DSCNT_Message = aBR.ReadInt32() '48
             DSFST_Message = aBR.ReadInt32() '49
-            For lPos As Integer = 0 To UnusedB.GetUpperBound(0)
-                UnusedB(lPos) = aBR.ReadInt32  '50 - 112 (size 63 four byte integers)
+            For lPos As Integer = 1 To UnusedB.GetUpperBound(0)
+                UnusedB(lPos) = aBR.ReadInt32  '50 - 112 
             Next
-            For lPos As Integer = 0 To DirPnt.GetUpperBound(0)
-                DirPnt(lPos) = aBR.ReadInt32  '113-512 (size 400)
+            For lPos As Integer = 1 To DirPnt.GetUpperBound(0)
+                DirPnt(lPos) = aBR.ReadInt32  '113 - 512 
             Next
         End Sub
 
@@ -140,7 +148,7 @@ Friend Class atcWDMfile
                 lBuilder.Append(Int32ToStringIfNotZero("  PPRFWR ", .PPRFWR))
                 lBuilder.Append(Int32ToStringIfNotZero("  PSCBKR ", .PSCBKR))
                 lBuilder.Append(Int32ToStringIfNotZero("  PSCFWR ", .PSCFWR))
-                For lIndex = 0 To .Unused05_28.GetUpperBound(0)
+                For lIndex = 1 To .Unused05_28.GetUpperBound(0)
                     lBuilder.Append(Int32ToStringIfNotZero("  Unused(" & lIndex + 5 & ")", .Unused05_28(lIndex)))
                 Next
                 lBuilder.Append(Int32ToStringIfNotZero("  LSTREC ", .LSTREC))
@@ -164,10 +172,10 @@ Friend Class atcWDMfile
                 lBuilder.Append(Int32ToStringIfNotZero("  DSFST_Attribute ", .DSFST_Attribute))
                 lBuilder.Append(Int32ToStringIfNotZero("  DSCNT_Message ", .DSCNT_Message))
                 lBuilder.Append(Int32ToStringIfNotZero("  DSFST_Message ", .DSFST_Message))
-                For lIndex = 0 To .UnusedB.GetUpperBound(0)
+                For lIndex = 1 To .UnusedB.GetUpperBound(0)
                     lBuilder.Append(Int32ToStringIfNotZero("  Unused50_112(" & lIndex + 50 & ") = ", .UnusedB(lIndex) & vbCrLf))
                 Next
-                For lIndex = 0 To .DirPnt.GetUpperBound(0)
+                For lIndex = 1 To .DirPnt.GetUpperBound(0)
                     lBuilder.Append(Int32ToStringIfNotZero("  DirPnt(" & lIndex + 1 & ") = ", .DirPnt(lIndex)))
                 Next
             End With
@@ -175,15 +183,29 @@ Friend Class atcWDMfile
         End Function
     End Class
 
-    Friend Sub SetRecordUse(ByVal aRecord As Integer, ByVal aUse As Integer)
+    Private Function ReadWdmInt32(ByVal aBr As IO.BinaryReader, ByRef aRec As Int32, ByRef aOff As Int32) As Int32
+        'aOff in words
+        SeekWdm(aBr.BaseStream, aRec, (aOff * 4) - 3)
+        Dim lI As Int32 = aBr.ReadInt32
+        Return lI
+    End Function
+    Private Sub SeekWdm(ByVal aFs As IO.FileStream, ByVal aRec As Int32, ByVal aOff As Int32)
+        'aOff in bytes
+        Const lReclB As Int32 = 2048 'wdm record size in bytes
+        aFs.Seek(((aRec - 1) * lReclB) + (aOff - 1), IO.SeekOrigin.Begin)
+    End Sub
+
+    Private Sub SetRecordUse(ByVal aRecord As Integer, ByVal aUse As Integer)
         If pRecordInUse(aRecord) = 0 Then 'not in use
             pRecordInUse(aRecord) = aUse
         Else
-            Throw New Exception("WDM record (" & aRecord & ") already in use with code " & aUse)
+            Throw New Exception("WDM record " & aRecord & _
+                                " already in use with code " & pRecordInUse(aRecord) & _
+                                " can not use with new code " & aUse)
         End If
     End Sub
 
-    Friend Shared Function Int32ToStringIfNotZero(ByVal aTitle As String, ByVal aValue As Int32) As String
+    Private Shared Function Int32ToStringIfNotZero(ByVal aTitle As String, ByVal aValue As Int32) As String
         If aValue <> 0 Then
             Return aTitle & aValue & vbCr
         Else
@@ -191,5 +213,3 @@ Friend Class atcWDMfile
         End If
     End Function
 End Class
-
-
