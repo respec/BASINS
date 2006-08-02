@@ -37,8 +37,8 @@ Friend Class atcWdmHandle
                 Dim lWdmFile As New atcWDMfile
                 lWdmFile.OpenFile(lFileName)
                 Logger.Dbg("atcWdmHandle:New:VBOpenDone")
-                'Dim lS As String = lWdmFile.ToString
-                'Logger.Dbg(lS)
+                Dim lS As String = lWdmFile.ToString
+                Logger.Dbg(lS)
             Catch ex As Exception
                 Logger.Msg(ex.ToString)
             End Try
