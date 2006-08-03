@@ -785,7 +785,7 @@ Public Class atcDataSourceWDM
         lData = New atcTimeseries(Me)
         lData.Dates = lDates
         lData.Attributes.SetValue("id", aDsn)
-        lData.Attributes.SetValue("History 1", "Read from " & Specification)
+        lData.Attributes.AddHistory("Read from " & Specification)
 
         lData.ValuesNeedToBeRead = True
         lData.Dates.ValuesNeedToBeRead = True

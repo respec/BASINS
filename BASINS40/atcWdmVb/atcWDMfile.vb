@@ -121,34 +121,98 @@ Public Class atcWDMfile
             Throw New Exception("DataSetFromWdm:ExpectedDsn: " & aDsn & " FoundDsn: " & lDsn)
         End If
         Dim lDataSet As New atcTimeseries(Me)
-        lDataSet.Attributes.Add("DSN", aDsn)
-        Dim lPsa As Int32 = ReadWdmInt32(aBr, lRec, 10)
-        Dim lSacnt As Int32 = ReadWdmInt32(aBr, lRec, lPsa)
+
+        'generic attributes
+        lDataSet.Attributes.SetValue("id", aDsn)
+        lDataSet.Attributes.AddHistory("Read from " & Specification)
+
+        AttributesFromWdm(aBr, lDataSet, lRec)
+
+        TimeseriesDataFromWdm(aBr, lDataSet, lRec)
+
+        Return lDataSet
+    End Function
+
+    Private Sub AttributesFromWdm(ByVal aBr As IO.BinaryReader, ByVal aDataSet As atcDataSet, ByVal aRec As Int32)
+        'attributes
+        Dim lPsa As Int32 = ReadWdmInt32(aBr, aRec, 10)
+        Dim lSacnt As Int32 = ReadWdmInt32(aBr, aRec, lPsa)
         Dim lPSastr As Int32 = aBr.ReadInt32
         Dim lAttributeDefinition As atcAttributeDefinition
-        Logger.Dbg("  PSA,SACNT,PSASTR:" & lPsa & ":" & lSacnt & ":" & lPSastr)
-        For lInd As Int32 = 1 To lSacnt
-            Dim lSaind As Int32 = aBr.ReadInt32
-            Logger.Dbg("    Ind:Saind:" & lInd & ":" & lSaind)
-            lAttributeDefinition = pMsgWdm.Attributes.ItemByIndex(lSaind)
+        Logger.Dbg("  Psa,Sacnt,Psastr:" & lPsa & ":" & lSacnt & ":" & lPSastr)
+        Dim lSaind(lSacnt) As Int32
+        Dim lPos(lSacnt) As Int32
+        For lInd As Int32 = 1 To lSacnt 'get index and location for available attributes
+            lSaind(lInd) = aBr.ReadInt32
+            lPos(lInd) = aBr.ReadInt32
+            Logger.Dbg("    Ind:Saind:Pos:" & lInd & ":" & lSaind(lInd) & ":" & lPos(lInd))
+        Next
+        For lind As Int32 = 1 To lSacnt 'get the values
+            lAttributeDefinition = pMsgWdm.Attributes.ItemByIndex(lSaind(lind))
+            SeekWdm(aBr.BaseStream, aRec, lPos(lind))
             With lAttributeDefinition
                 Select Case .TypeString
                     Case "Integer"
-                        lDataSet.Attributes.Add(.Name, aBr.ReadInt32)
+                        aDataSet.Attributes.SetValue(lAttributeDefinition, aBr.ReadInt32)
                     Case "Single"
-                        lDataSet.Attributes.Add(.Name, aBr.ReadSingle)
+                        aDataSet.Attributes.SetValue(lAttributeDefinition, aBr.ReadSingle)
                     Case "String"
                         Dim lS As String = ""
                         For lI As Int32 = 0 To (.Max / 4) - 1
-                            lS &= Long2String(aBr.ReadInt32)
+                            Dim lV As Int32 = aBr.ReadInt32
+                            lS &= Long2String(lV)
                         Next
+                        Select Case UCase(.Name)
+                            Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
+                                Dim lDate As Date
+                                lDate = New Date(CInt(lS.Substring(0, 4)), _
+                                                 CInt(lS.Substring(4, 2)), _
+                                                 CInt(lS.Substring(6, 2)), _
+                                                 CInt(lS.Substring(8, 2)), _
+                                                 CInt(lS.Substring(10, 2)), _
+                                                 CInt(lS.Substring(12, 2)))
+                                aDataSet.Attributes.SetValue(lAttributeDefinition, lDate)
+                            Case "DCODE"
+                                'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
+                            Case Else
+                                aDataSet.Attributes.SetValue(lAttributeDefinition, lS)
+                        End Select
                     Case Else
-                        Logger.Msg("Help Me With " & .TypeString)
+                        Logger.Msg("Help Me With Attribute Type " & .TypeString)
                 End Select
             End With
         Next
-        Return lDataSet
-    End Function
+
+    End Sub
+
+    Private Sub TimeseriesDataFromWdm(ByVal aBr As IO.BinaryReader, ByVal aDataSet As atcDataSet, ByVal aRec As Int32)
+        Dim lPointDataBlocks As Int32 = ReadWdmInt32(aBr, aRec, 11) 'PDAT
+        Dim lPointDataValues As Int32 = aBr.ReadInt32 'PDATV
+        Dim lDataPointerInUseCount As Int32 = ReadWdmInt32(aBr, aRec, lPointDataBlocks) 'DPCNT
+        Dim lDataPointerCount As Int32 = lPointDataValues - lPointDataBlocks - 2
+        Dim lFreePosition As UInt32 = aBr.ReadUInt32  'FREPOS
+        Dim lFreeRecord As UInt32 = lFreePosition >> 9
+        Dim lFreeOffset As UInt32 = lFreePosition And &H1FF
+        Logger.Dbg("  Pdat:Pdatv:Dpcnt:Frepos:" & _
+                    lPointDataBlocks & ":" & lPointDataValues & ":" & lDataPointerCount & _
+                    ":" & lFreePosition & "(" & lFreeRecord & "," & lFreeOffset & ")")
+        Dim lPointDataGroup(lDataPointerCount) As Int32
+        Dim ls As String = "  DataPointers: "
+        Dim lInUse As Int32 = 0
+        For lInd As UInt32 = 1 To lDataPointerCount
+            lPointDataGroup(lInd) = aBr.ReadUInt32
+            ls &= lPointDataGroup(lInd) & ", "
+            If lPointDataGroup(lInd) <> 0 Then lInUse += 1
+        Next
+        Logger.Dbg(ls.TrimEnd(", "))
+        Logger.Dbg("  DataPointersInUse:" & lInUse & ":" & lDataPointerInUseCount)
+        Dim lTsbyr As Int32 = aDataSet.Attributes.GetValue("TSBYR", 1900)
+        Dim lTsbmo As Int32 = aDataSet.Attributes.GetValue("TSBMO", 1)
+        Dim lTsbdy As Int32 = aDataSet.Attributes.GetValue("TSBDY", 1)
+        Dim lTsbhr As Int32 = aDataSet.Attributes.GetValue("TSBHR", 0)
+        Dim lTgroup As Int32 = aDataSet.Attributes.GetValue("TGROUP", 6)
+        Logger.Dbg("  Group:BaseDate:" & lTgroup & ":" & lTsbyr & ":" & lTsbmo & ":" & lTsbdy & ":" & lTsbhr)
+    End Sub
 
     Public Overrides Function ToString() As String
         Dim lBuilder As New Text.StringBuilder
