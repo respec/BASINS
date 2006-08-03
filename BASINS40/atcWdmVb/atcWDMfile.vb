@@ -121,10 +121,11 @@ Public Class atcWDMfile
             Throw New Exception("DataSetFromWdm:ExpectedDsn: " & aDsn & " FoundDsn: " & lDsn)
         End If
         Dim lDataSet As New atcTimeseries(Me)
+        lDataSet.Dates = New atcTimeseries(Me)
 
         'generic attributes
         lDataSet.Attributes.SetValue("id", aDsn)
-        lDataSet.Attributes.AddHistory("Read from " & Specification)
+        lDataSet.Attributes.AddHistory("VB read from " & Specification)
 
         AttributesFromWdm(aBr, lDataSet, lRec)
 
@@ -162,6 +163,7 @@ Public Class atcWDMfile
                             Dim lV As Int32 = aBr.ReadInt32
                             lS &= Long2String(lV)
                         Next
+                        lS = lS.TrimEnd
                         Select Case UCase(.Name)
                             Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
                                 Dim lDate As Date
@@ -185,34 +187,132 @@ Public Class atcWDMfile
 
     End Sub
 
-    Private Sub TimeseriesDataFromWdm(ByVal aBr As IO.BinaryReader, ByVal aDataSet As atcDataSet, ByVal aRec As Int32)
-        Dim lPointDataBlocks As Int32 = ReadWdmInt32(aBr, aRec, 11) 'PDAT
-        Dim lPointDataValues As Int32 = aBr.ReadInt32 'PDATV
-        Dim lDataPointerInUseCount As Int32 = ReadWdmInt32(aBr, aRec, lPointDataBlocks) 'DPCNT
-        Dim lDataPointerCount As Int32 = lPointDataValues - lPointDataBlocks - 2
-        Dim lFreePosition As UInt32 = aBr.ReadUInt32  'FREPOS
-        Dim lFreeRecord As UInt32 = lFreePosition >> 9
-        Dim lFreeOffset As UInt32 = lFreePosition And &H1FF
-        Logger.Dbg("  Pdat:Pdatv:Dpcnt:Frepos:" & _
-                    lPointDataBlocks & ":" & lPointDataValues & ":" & lDataPointerCount & _
-                    ":" & lFreePosition & "(" & lFreeRecord & "," & lFreeOffset & ")")
-        Dim lPointDataGroup(lDataPointerCount) As Int32
-        Dim ls As String = "  DataPointers: "
-        Dim lInUse As Int32 = 0
-        For lInd As UInt32 = 1 To lDataPointerCount
-            lPointDataGroup(lInd) = aBr.ReadUInt32
-            ls &= lPointDataGroup(lInd) & ", "
-            If lPointDataGroup(lInd) <> 0 Then lInUse += 1
-        Next
-        Logger.Dbg(ls.TrimEnd(", "))
-        Logger.Dbg("  DataPointersInUse:" & lInUse & ":" & lDataPointerInUseCount)
+    Private Sub TimeseriesDataFromWdm(ByVal aBr As IO.BinaryReader, ByVal aDataSet As atcTimeseries, ByVal aRec As Int32)
         Dim lTsbyr As Int32 = aDataSet.Attributes.GetValue("TSBYR", 1900)
         Dim lTsbmo As Int32 = aDataSet.Attributes.GetValue("TSBMO", 1)
         Dim lTsbdy As Int32 = aDataSet.Attributes.GetValue("TSBDY", 1)
         Dim lTsbhr As Int32 = aDataSet.Attributes.GetValue("TSBHR", 0)
-        Dim lTgroup As Int32 = aDataSet.Attributes.GetValue("TGROUP", 6)
-        Logger.Dbg("  Group:BaseDate:" & lTgroup & ":" & lTsbyr & ":" & lTsbmo & ":" & lTsbdy & ":" & lTsbhr)
+        Dim lTsFill As Double = aDataSet.Attributes.GetValue("TSFILL", -999)
+        Dim lBaseDateJ As Double = MJD(lTsbyr, lTsbmo, lTsbdy) + (lTsbhr / 24.0)
+        Dim lTgroup As atcTimeUnit = aDataSet.Attributes.GetValue("TGROUP", 6)
+        Logger.Dbg("  Group:BaseDate:" & lTgroup & ":" & lBaseDateJ & ":" & _
+                    MJD2VBdate(lBaseDateJ) & ":" & _
+                    lTsbyr & ":" & lTsbmo & ":" & lTsbdy & ":" & lTsbhr)
+
+        Dim lPointDataBlocks As Int32 = ReadWdmInt32(aBr, aRec, 11) 'PDAT
+        Dim lPointDataValues As Int32 = aBr.ReadInt32 'PDATV
+        Dim lDataPointerInUseCount As Int32 = ReadWdmInt32(aBr, aRec, lPointDataBlocks) 'DPCNT
+        Dim lDataPointerCount As Int32 = lPointDataValues - lPointDataBlocks - 2
+        Dim lDataPointerGroups(lDataPointerCount) As UInt32
+        Dim lFreePosition As UInt32 = aBr.ReadUInt32  'FREPOS
+        Dim lFreeRecord As UInt32 = lFreePosition >> 9
+        Dim lFreeOffset As UInt32 = lFreePosition And &H1FF
+        'Logger.Dbg("  Pdat:Pdatv:Dpcnt:Frepos:" & _
+        '            lPointDataBlocks & ":" & lPointDataValues & ":" & lDataPointerCount & _
+        '            ":" & lFreePosition & "(" & lFreeRecord & "," & lFreeOffset & ")")
+
+        'Dim ls As String = "  DataPointers: "
+        Dim lInUse As Int32 = 0
+        For lInd As Int32 = 1 To lDataPointerCount
+            lDataPointerGroups(lInd) = aBr.ReadUInt32
+            'ls &= lDataPointerGroups(lInd) & ", "
+            If lDataPointerGroups(lInd) <> 0 Then lInUse += 1
+        Next
+        'Logger.Dbg(ls.TrimEnd(",", " "))
+        'Logger.Dbg("  DataPointersInUse:" & lInUse & ":" & lDataPointerInUseCount)
+
+        Dim lData As New ArrayList
+        lData.Add(Double.NaN)
+        Dim lDate As New ArrayList
+        Dim lCurrentDateJ As Double
+
+        For lind As Int32 = 1 To lDataPointerCount
+            Dim lDataPointerGroup As UInt32 = lDataPointerGroups(lind)
+            If lDataPointerGroup > 0 Then 'data in this group
+                Dim lDataRecord As UInt32 = lDataPointerGroup >> 9
+                Dim lDataOffset As UInt32 = lDataPointerGroup And &H1FF
+                'Logger.Dbg("  Group:Record:Offset" & lind & ":" & lDataRecord & ":" & lDataOffset)
+                SeekWdm(aBr.BaseStream, lDataRecord, lDataOffset)
+                Dim lGroupDate As UInt32 = aBr.ReadUInt32
+                lDataOffset += 1
+                Dim lGroupDateJ As Double = WdmTimserGroupDate2JDate(lGroupDate)
+                Dim lGroupDateJCalc As Double = TimAddJ(lBaseDateJ, lTgroup, 1, lind - 1)
+                If lGroupDateJ <> lGroupDateJCalc Then
+                    Logger.Dbg("  Problem with group dates:" & lGroupDateJ & ":" & lGroupDateJCalc)
+                End If
+                'Logger.Dbg("  Group:Date:" & DumpDate(lGroupDateJ) & ":" & lGroupDateJ)
+                lcurrentdatej = lGroupDateJ
+                Dim lEndDateJ As Double = TimAddJ(lGroupDateJ, lTgroup, 1, 1)
+                Dim lBlockCount As Int32 = 0
+                While (lEndDateJ - lCurrentDateJ) > 0.00001 'about 1 second
+                    Dim lBlockStartDateJ As Double = lCurrentDateJ
+                    Dim lBlockControlWord As UInt32 = aBr.ReadUInt32
+                    lBlockCount += 1
+                    lDataOffset += 1
+                    Dim lBlockNumVals As UInt32 = lBlockControlWord >> 16
+                    Dim lBlockTimeStep As UInt32 = (lBlockControlWord >> 10) And &H3F
+                    Dim lBlockTimeUnits As UInt32 = (lBlockControlWord >> 7) And &H7
+                    Dim lBlockCompression As UInt32 = (lBlockControlWord >> 5) And &H3
+                    Dim lBlockQuality As UInt32 = lBlockControlWord And &H1F
+                    'If lBlockCount < 5 Then
+                    '    Logger.Dbg("  Block:Date:Nov:TS:TU,Cmp:Qual:" & DumpDate(lCurrentDateJ) & ":" & _
+                    '               lBlockNumVals & ":" & lBlockTimeStep & ":" & lBlockTimeUnits & ":" & _
+                    '               lBlockCompression & ":" & lBlockQuality)
+                    'End If
+                    If lBlockCompression = 0 Then
+                        For lPos As Int32 = 1 To lBlockNumVals
+                            lDate.Add(lCurrentDateJ)
+                            lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
+                            Dim lDataCurrent As Double = CDbl(aBr.ReadSingle())
+                            If Math.Abs(lDataCurrent - lTsFill) < Double.Epsilon Then
+                                lDataCurrent = Double.NaN
+                            End If
+                            lData.Add(lDataCurrent)
+                        Next
+                        lDataOffset += lBlockNumVals
+                    Else
+                        Dim lDataComp As Double = CDbl(aBr.ReadSingle())
+                        If Math.Abs(lDataComp - lTsFill) < Double.Epsilon Then
+                            lDataComp = Double.NaN
+                        End If
+                        For lPos As Int32 = 1 To lBlockNumVals
+                            lDate.Add(lCurrentDateJ)
+                            lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
+                            lData.Add(lDataComp)
+                        Next
+                        lDataOffset += 1
+                    End If
+                    If lDataOffset >= 512 Then 'move to next record
+                        lDataRecord = ReadWdmInt32(aBr, CInt(lDataRecord), 4)
+                        lDataOffset = 5
+                        SeekWdm(aBr.BaseStream, lDataRecord, lDataOffset)
+                        'Logger.Dbg("  NewRecord:" & lDataRecord)
+                        lBlockCount = 0
+                    End If
+                    'If lBlockCount < 5 Then
+                    '    Logger.Dbg("  EndBlockLoop:" & lCurrentDateJ & ":" & lEndDateJ)
+                    'End If
+                End While
+            End If
+        Next
+        lDate.Add(lCurrentDateJ)
+        Logger.Dbg("Done Dsn:DataCount:" & aDataSet.Attributes.GetValue("ID") & ":" & lData.Count)
+        Dim lDataD(lData.Count - 1) As Double
+        lData.CopyTo(lDataD)
+        aDataSet.Values = lDataD
+        Dim lDateD(lData.Count - 1) As Double
+        lDate.CopyTo(lDateD)
+        aDataSet.Dates.Values = lDateD
     End Sub
+
+    Private Function WdmTimserGroupDate2JDate(ByVal aGroupDate As UInt32) As Double
+        Dim lYr As UInt32 = aGroupDate >> 14
+        Dim lMo As UInt32 = (aGroupDate >> 10) And &HF
+        Dim lDy As UInt32 = (aGroupDate >> 5) And &H1F
+        Dim lHr As UInt32 = aGroupDate And &H1F
+        Dim lDateJ As Double = MJD(lYr, lMo, lDy) + (lHr / CDbl(24.0))
+        Return lDateJ
+    End Function
 
     Public Overrides Function ToString() As String
         Dim lBuilder As New Text.StringBuilder
