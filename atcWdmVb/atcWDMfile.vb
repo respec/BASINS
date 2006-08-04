@@ -6,12 +6,12 @@ Imports atcData
 Imports atcData.atcDataSource.EnumExistAction
 Imports atcUtility
 Imports MapWinUtility
+Imports atcWdmVb.atcWdmFileHandle
 
 Public Class atcWDMfile
     Inherits atcData.atcDataSource
 
     Shared pMsgWdm As New atcMsgWDMvb
-    Private Const pDsnPerDirRec As Int32 = 500
     Private Const pFileFilter As String = "WDM Files (*.wdm)|*.wdm"
 
     Public Overrides ReadOnly Property Category() As String
@@ -61,36 +61,36 @@ Public Class atcWDMfile
             End With
         End If
 
-        Dim lWdmFileHandle As atcWdmFileHandle = Nothing
+        Dim lWdm As atcWdmFileHandle = Nothing
         If FileExists(aFileName) Then
-            lWdmFileHandle = New atcWdmFileHandle(0, aFileName)
+            lWdm = New atcWdmFileHandle(0, aFileName)
         ElseIf FilenameNoPath(aFileName).Length > 0 Then
             Logger.Dbg("atcWDMfile:Open:WDM file " & aFileName & " does not exist - it will be created")
             MkDirPath(PathNameOnly(aFileName))
-            lWdmFileHandle = New atcWdmFileHandle(2, aFileName)
+            lWdm = New atcWdmFileHandle(2, aFileName)
         Else
             Logger.Dbg("atcWDMfile:Open:File does not exist and cannot create '" & aFileName & "'")
             Open = False
         End If
 
-        If Not lWdmFileHandle Is Nothing Then
+        If Not lWdm Is Nothing Then
             Specification = aFileName
             Open = True 'assume the best
             'do some basic checks
-            Dim lVal As Int32 = ReadWdmInt32(lWdmFileHandle.BinaryReader, Wdm_Fields.PPRBKR)
+            Dim lVal As Int32 = lWdm.ReadInt32(Wdm_Fields.PPRBKR)
             If lVal <> -998 Then
                 Logger.Dbg("atcWDMfile:Open:PrimaryBackwardRecordPointer for FileDefinitionRecord:" & lVal & " should be -998")
                 Open = False
             End If
-            Refresh(lWdmFileHandle.BinaryReader)
-            lWdmFileHandle.Dispose()
+            Refresh(lWdm)
+            lWdm.Dispose()
             Return True 'Successfully opened
         Else
             Return False
         End If
     End Function
 
-    Private Sub Refresh(ByVal aBr As IO.BinaryReader)
+    Private Sub Refresh(ByVal aWdm As atcWdmFileHandle)
         Dim lProg As Integer = 0
         Dim lProgPrev As Integer
 
@@ -98,12 +98,12 @@ Public Class atcWDMfile
         'pDates = Nothing
         'pDates = New ArrayList
 
-        Dim lDsn As Int32 = ReadWdmInt32(aBr, Wdm_Fields.DSFST_Timeseries)
+        Dim lDsn As Int32 = aWdm.ReadInt32(Wdm_Fields.DSFST_Timeseries)
         While lDsn > 0
-            Dim lRec As Int32 = FirstRecordNumberFromDsn(aBr, lDsn)
+            Dim lRec As Int32 = aWdm.FirstRecordNumberFromDsn(lDsn)
             Logger.Dbg("Dsn: " & lDsn & " Rec: " & lRec)
-            DataSets.Add(lDsn, DataSetFromWdm(aBr, lDsn))
-            lDsn = ReadWdmInt32(aBr, lRec, 2)
+            DataSets.Add(lDsn, DataSetFromWdm(aWdm, lDsn))
+            lDsn = aWdm.ReadInt32(lRec, 2)
             If lDsn = 0 Then
                 Logger.Progress("WDM Refresh Complete", 100, 0)
             Else 'try the next dsn
@@ -114,9 +114,9 @@ Public Class atcWDMfile
         End While
     End Sub
 
-    Private Function DataSetFromWdm(ByVal aBr As IO.BinaryReader, ByVal aDsn As Int32) As atcTimeseries
-        Dim lRec As Int32 = FirstRecordNumberFromDsn(aBr, aDsn)
-        Dim lDsn As Int32 = ReadWdmInt32(aBr, lRec, 5)
+    Private Function DataSetFromWdm(ByVal aWdm As atcWdmFileHandle, ByVal aDsn As Int32) As atcTimeseries
+        Dim lRec As Int32 = aWdm.FirstRecordNumberFromDsn(aDsn)
+        Dim lDsn As Int32 = aWdm.ReadInt32(lRec, 5)
         If lDsn <> aDsn Then
             Throw New Exception("DataSetFromWdm:ExpectedDsn: " & aDsn & " FoundDsn: " & lDsn)
         End If
@@ -125,42 +125,42 @@ Public Class atcWDMfile
 
         'generic attributes
         lDataSet.Attributes.SetValue("id", aDsn)
-        lDataSet.Attributes.AddHistory("VB read from " & Specification)
+        lDataSet.Attributes.AddHistory("read fromVB " & Specification)
 
-        AttributesFromWdm(aBr, lDataSet, lRec)
+        AttributesFromWdm(aWdm, lDataSet, lRec)
 
-        TimeseriesDataFromWdm(aBr, lDataSet, lRec)
+        TimeseriesDataFromWdm(aWdm, lDataSet, lRec)
 
         Return lDataSet
     End Function
 
-    Private Sub AttributesFromWdm(ByVal aBr As IO.BinaryReader, ByVal aDataSet As atcDataSet, ByVal aRec As Int32)
+    Private Sub AttributesFromWdm(ByVal aWdm As atcWdmFileHandle, ByVal aDataSet As atcDataSet, ByVal aRec As Int32)
         'attributes
-        Dim lPsa As Int32 = ReadWdmInt32(aBr, aRec, 10)
-        Dim lSacnt As Int32 = ReadWdmInt32(aBr, aRec, lPsa)
-        Dim lPSastr As Int32 = aBr.ReadInt32
+        Dim lPsa As Int32 = aWdm.ReadInt32(aRec, 10)
+        Dim lSacnt As Int32 = aWdm.ReadInt32(aRec, lPsa)
+        Dim lPSastr As Int32 = aWdm.ReadInt32
         Dim lAttributeDefinition As atcAttributeDefinition
         Logger.Dbg("  Psa,Sacnt,Psastr:" & lPsa & ":" & lSacnt & ":" & lPSastr)
         Dim lSaind(lSacnt) As Int32
         Dim lPos(lSacnt) As Int32
         For lInd As Int32 = 1 To lSacnt 'get index and location for available attributes
-            lSaind(lInd) = aBr.ReadInt32
-            lPos(lInd) = aBr.ReadInt32
+            lSaind(lInd) = aWdm.ReadInt32
+            lPos(lInd) = aWdm.ReadInt32
             Logger.Dbg("    Ind:Saind:Pos:" & lInd & ":" & lSaind(lInd) & ":" & lPos(lInd))
         Next
         For lind As Int32 = 1 To lSacnt 'get the values
             lAttributeDefinition = pMsgWdm.Attributes.ItemByIndex(lSaind(lind))
-            SeekWdm(aBr.BaseStream, aRec, lPos(lind))
+            aWdm.Seek(aRec, lPos(lind))
             With lAttributeDefinition
                 Select Case .TypeString
                     Case "Integer"
-                        aDataSet.Attributes.SetValue(lAttributeDefinition, aBr.ReadInt32)
+                        aDataSet.Attributes.SetValue(lAttributeDefinition, aWdm.ReadInt32)
                     Case "Single"
-                        aDataSet.Attributes.SetValue(lAttributeDefinition, aBr.ReadSingle)
+                        aDataSet.Attributes.SetValue(lAttributeDefinition, aWdm.ReadSingle)
                     Case "String"
                         Dim lS As String = ""
                         For lI As Int32 = 0 To (.Max / 4) - 1
-                            Dim lV As Int32 = aBr.ReadInt32
+                            Dim lV As Int32 = aWdm.ReadInt32
                             lS &= Long2String(lV)
                         Next
                         lS = lS.TrimEnd
@@ -184,10 +184,9 @@ Public Class atcWDMfile
                 End Select
             End With
         Next
-
     End Sub
 
-    Private Sub TimeseriesDataFromWdm(ByVal aBr As IO.BinaryReader, ByVal aDataSet As atcTimeseries, ByVal aRec As Int32)
+    Private Sub TimeseriesDataFromWdm(ByVal aWdm As atcWdmFileHandle, ByVal aDataSet As atcTimeseries, ByVal aRec As Int32)
         Dim lTsbyr As Int32 = aDataSet.Attributes.GetValue("TSBYR", 1900)
         Dim lTsbmo As Int32 = aDataSet.Attributes.GetValue("TSBMO", 1)
         Dim lTsbdy As Int32 = aDataSet.Attributes.GetValue("TSBDY", 1)
@@ -199,12 +198,12 @@ Public Class atcWDMfile
                     MJD2VBdate(lBaseDateJ) & ":" & _
                     lTsbyr & ":" & lTsbmo & ":" & lTsbdy & ":" & lTsbhr)
 
-        Dim lPointDataBlocks As Int32 = ReadWdmInt32(aBr, aRec, 11) 'PDAT
-        Dim lPointDataValues As Int32 = aBr.ReadInt32 'PDATV
-        Dim lDataPointerInUseCount As Int32 = ReadWdmInt32(aBr, aRec, lPointDataBlocks) 'DPCNT
+        Dim lPointDataBlocks As Int32 = aWdm.ReadInt32(aRec, 11) 'PDAT
+        Dim lPointDataValues As Int32 = aWdm.ReadInt32 'PDATV
+        Dim lDataPointerInUseCount As Int32 = aWdm.ReadInt32(aRec, lPointDataBlocks) 'DPCNT
         Dim lDataPointerCount As Int32 = lPointDataValues - lPointDataBlocks - 2
         Dim lDataPointerGroups(lDataPointerCount) As UInt32
-        Dim lFreePosition As UInt32 = aBr.ReadUInt32  'FREPOS
+        Dim lFreePosition As UInt32 = aWdm.ReadUInt32  'FREPOS
         Dim lFreeRecord As UInt32 = lFreePosition >> 9
         Dim lFreeOffset As UInt32 = lFreePosition And &H1FF
         'Logger.Dbg("  Pdat:Pdatv:Dpcnt:Frepos:" & _
@@ -214,7 +213,7 @@ Public Class atcWDMfile
         'Dim ls As String = "  DataPointers: "
         Dim lInUse As Int32 = 0
         For lInd As Int32 = 1 To lDataPointerCount
-            lDataPointerGroups(lInd) = aBr.ReadUInt32
+            lDataPointerGroups(lInd) = aWdm.ReadUInt32
             'ls &= lDataPointerGroups(lInd) & ", "
             If lDataPointerGroups(lInd) <> 0 Then lInUse += 1
         Next
@@ -226,27 +225,27 @@ Public Class atcWDMfile
         Dim lDate As New ArrayList
         Dim lCurrentDateJ As Double
 
-        For lind As Int32 = 1 To lDataPointerCount
-            Dim lDataPointerGroup As UInt32 = lDataPointerGroups(lind)
+        For lInd As Int32 = 1 To lDataPointerCount
+            Dim lDataPointerGroup As UInt32 = lDataPointerGroups(lInd)
             If lDataPointerGroup > 0 Then 'data in this group
                 Dim lDataRecord As UInt32 = lDataPointerGroup >> 9
                 Dim lDataOffset As UInt32 = lDataPointerGroup And &H1FF
                 'Logger.Dbg("  Group:Record:Offset" & lind & ":" & lDataRecord & ":" & lDataOffset)
-                SeekWdm(aBr.BaseStream, lDataRecord, lDataOffset)
-                Dim lGroupDate As UInt32 = aBr.ReadUInt32
+                aWdm.Seek(lDataRecord, lDataOffset)
+                Dim lGroupDate As UInt32 = aWdm.ReadUInt32
                 lDataOffset += 1
                 Dim lGroupDateJ As Double = WdmTimserGroupDate2JDate(lGroupDate)
-                Dim lGroupDateJCalc As Double = TimAddJ(lBaseDateJ, lTgroup, 1, lind - 1)
+                Dim lGroupDateJCalc As Double = TimAddJ(lBaseDateJ, lTgroup, 1, lInd - 1)
                 If lGroupDateJ <> lGroupDateJCalc Then
                     Logger.Dbg("  Problem with group dates:" & lGroupDateJ & ":" & lGroupDateJCalc)
                 End If
                 'Logger.Dbg("  Group:Date:" & DumpDate(lGroupDateJ) & ":" & lGroupDateJ)
-                lcurrentdatej = lGroupDateJ
+                lCurrentDateJ = lGroupDateJ
                 Dim lEndDateJ As Double = TimAddJ(lGroupDateJ, lTgroup, 1, 1)
                 Dim lBlockCount As Int32 = 0
                 While (lEndDateJ - lCurrentDateJ) > 0.00001 'about 1 second
                     Dim lBlockStartDateJ As Double = lCurrentDateJ
-                    Dim lBlockControlWord As UInt32 = aBr.ReadUInt32
+                    Dim lBlockControlWord As UInt32 = aWdm.ReadUInt32
                     lBlockCount += 1
                     lDataOffset += 1
                     Dim lBlockNumVals As UInt32 = lBlockControlWord >> 16
@@ -263,7 +262,7 @@ Public Class atcWDMfile
                         For lPos As Int32 = 1 To lBlockNumVals
                             lDate.Add(lCurrentDateJ)
                             lCurrentDateJ = TimAddJ(lBlockStartDateJ, lBlockTimeUnits, lBlockTimeStep, lPos)
-                            Dim lDataCurrent As Double = CDbl(aBr.ReadSingle())
+                            Dim lDataCurrent As Double = CDbl(aWdm.ReadSingle())
                             If Math.Abs(lDataCurrent - lTsFill) < Double.Epsilon Then
                                 lDataCurrent = Double.NaN
                             End If
@@ -271,7 +270,7 @@ Public Class atcWDMfile
                         Next
                         lDataOffset += lBlockNumVals
                     Else
-                        Dim lDataComp As Double = CDbl(aBr.ReadSingle())
+                        Dim lDataComp As Double = CDbl(aWdm.ReadSingle())
                         If Math.Abs(lDataComp - lTsFill) < Double.Epsilon Then
                             lDataComp = Double.NaN
                         End If
@@ -283,9 +282,9 @@ Public Class atcWDMfile
                         lDataOffset += 1
                     End If
                     If lDataOffset >= 512 Then 'move to next record
-                        lDataRecord = ReadWdmInt32(aBr, CInt(lDataRecord), 4)
+                        lDataRecord = aWdm.ReadInt32(CInt(lDataRecord), 4)
                         lDataOffset = 5
-                        SeekWdm(aBr.BaseStream, lDataRecord, lDataOffset)
+                        aWdm.Seek(lDataRecord, lDataOffset)
                         'Logger.Dbg("  NewRecord:" & lDataRecord)
                         lBlockCount = 0
                     End If
@@ -331,217 +330,8 @@ Public Class atcWDMfile
     End Function
 
     Friend Function Check(ByVal aVerbose As Boolean) As String
-        Dim lReport As New Text.StringBuilder
-        Dim lWdmFileHandle As New atcWdmFileHandle(1, Specification)
-        Dim lBr As IO.BinaryReader = lWdmFileHandle.BinaryReader
-        Dim lRecordInUse(ReadWdmInt32(lBr, Wdm_Fields.LSTREC)) As Int32
-        Dim lDsnRecordPointer() As Int32
-
-        SetRecordUse(lRecordInUse, 1, -3)
-
-        If aVerbose Then
-            lReport.Append(FileDefinitionToString(lBr))
-        End If
-
-        'inventory free record chain
-        Dim lFreeRec As Int32 = ReadWdmInt32(lBr, Wdm_Fields.FREREC)
-        While lFreeRec > 0
-            SetRecordUse(lRecordInUse, lFreeRec, -2)
-            lFreeRec = ReadWdmInt32(lBr, lFreeRec, 2) 'forward record pointer
-        End While
-
-        'check direcory records
-        For lPos As Integer = 1 To 400 '.DirPnt.GetUpperBound(0)
-            Dim lDirRecord As Integer = ReadWdmInt32(lBr, Wdm_Fields.DirPnt, lPos)
-            If lDirRecord > 0 Then 'process this directory
-                SetRecordUse(lRecordInUse, lDirRecord, -1)
-                ReDim Preserve lDsnRecordPointer(lPos * pDsnPerDirRec)
-                For lInd As Integer = 1 To 4
-                    If ReadWdmInt32(lBr, lDirRecord, lInd) <> 0 Then
-                        lReport.Append("Directory Record " & lDirRecord & " With NonZero Pointer " & lInd & " = " & ReadWdmInt32(lBr, lDirRecord, lInd) & vbCrLf)
-                    End If
-                Next
-                For lInd As Integer = 1 To pDsnPerDirRec
-                    lDsnRecordPointer(lInd) = ReadWdmInt32(lBr, lDirRecord, lInd + 4)
-                    If lDsnRecordPointer(lInd) <> 0 Then
-                        If aVerbose Then
-                            lReport.Append("Directory Record " & lDirRecord & " Pointer " & lInd & " = " & lDsnRecordPointer(lInd) & vbCrLf)
-                        End If
-                        Dim lDsn As Int32 = ((lPos - 1) * 500) + lInd
-                        Dim lDsnRec As Int32 = lDsnRecordPointer(lInd)
-                        While lDsnRec > 0 'follow dsn record chain
-                            SetRecordUse(lRecordInUse, lDsnRec, lDsn)
-                            'next forward secondary record pointer
-                            lDsnRec = ReadWdmInt32(lBr, lDsnRec, 4)
-                        End While
-                    End If
-                Next
-            End If
-        Next
-        For lInd As Int32 = 1 To ReadWdmInt32(lBr, Wdm_Fields.LSTREC)
-            If lRecordInUse(lInd) = 0 Then 'record not in chain
-                lReport.Append("Record " & lInd & " Not In a Chain" & vbCrLf)
-            ElseIf aVerbose Then
-                lReport.Append("Rec(" & lInd & ") use " & lRecordInUse(lInd) & vbCrLf)
-            End If
-        Next
-        lWdmFileHandle.Dispose()
-
-        If Not aVerbose AndAlso lReport.Length > 0 Then
-            Throw New Exception(lReport.ToString)
-        End If
-
-        Return lReport.ToString
+        Dim lWdm As New atcWdmFileHandle(1, Specification)
+        Check = lWdm.Check(aVerbose)
+        lWdm.Dispose()
     End Function
-
-    Private Sub SetRecordUse(ByRef aRecordInUse() As Int32, ByVal aRecord As Int32, ByVal aUse As Int32)
-        If aRecordInUse(aRecord) = 0 Then 'not in use
-            aRecordInUse(aRecord) = aUse
-        Else
-            Throw New Exception("WDM record " & aRecord & _
-                                " already in use with code " & aRecordInUse(aRecord) & _
-                                " can not use with new code " & aUse)
-        End If
-    End Sub
-
-    Private Enum Wdm_Fields As Int32
-        PPRBKR = 1 'Primary backward record pointer   (always -998, was -999)
-        PPRFWR = 2 'Primary forward record pointer    (always 0)
-        PSCBKR = 3 'Secondary backward record pointer (always 0)
-        PSCFWR = 4 'Secondary forward record pointer  (always 0)
-        'TODO - be sure 5-28 are 0 ???
-        LSTREC = 29 'Last 2048 Byte Record 
-        FREREC = 31 'First Free Recode
-        DSCNT_Timeseries = 32
-        DSFST_Timeseries = 33
-        DSCNT_Table = 34
-        DSFST_Table = 35
-        DSCNT_Schematic = 36
-        DSFST_Schematic = 37
-        DSCNT_ProjectDescription = 38
-        DSFST_ProjectDescription = 39
-        DSCNT_Vector = 40
-        DSFST_Vector = 41
-        DSCNT_Raster = 42
-        DSFST_Raster = 43
-        DSCNT_SpaceTime = 44
-        DSFST_SpaceTime = 45
-        DSCNT_Attribute = 46
-        DSFST_Attribute = 47
-        DSCNT_Message = 48
-        DSFST_Message = 49
-        'TODO - be sure 50-112 are 0 ???
-        DirPnt = 112
-    End Enum
-
-    Private Function FileDefinitionToString(ByVal aBr As IO.BinaryReader) As String
-        Dim lBuilder As New Text.StringBuilder
-
-        Dim lItems As Array
-        lItems = System.Enum.GetValues(GetType(Wdm_Fields))
-        Dim lItem As Wdm_Fields
-        For Each lItem In lItems
-            If lItem <> Wdm_Fields.DirPnt Then
-                Dim lValue As Int32 = ReadWdmInt32(aBr, lItem)
-                If lValue <> 0 Then
-                    Dim lName As String = System.Enum.GetName(GetType(Wdm_Fields), lItem)
-                    lBuilder.Append(lName & " " & lValue & vbCrLf)
-                End If
-            Else
-                For lInd As Int32 = 1 To 400
-                    Dim lValue As Int32 = ReadWdmInt32(aBr, lItem)
-                    If lValue <> 0 Then
-                        Dim lName As String = System.Enum.GetName(GetType(Wdm_Fields), lItem) & "(" & lInd & ")"
-                        lBuilder.Append(lName & " " & lValue & vbCrLf)
-                    End If
-                Next
-            End If
-        Next
-        Return lBuilder.ToString
-    End Function
-
-    Private Function FirstRecordNumberFromDsn(ByVal aBr As IO.BinaryReader, ByVal aDsn As Int32) As Int32
-        Dim lDirOff As Int32 = aDsn Mod pDsnPerDirRec
-        If lDirOff = 0 Then
-            lDirOff = pDsnPerDirRec
-        End If
-        Dim lDirRec As Int32 = 1 + ((aDsn - lDirOff) / pDsnPerDirRec)
-        Dim lRec As Int32 = ReadWdmInt32(aBr, Wdm_Fields.DirPnt, lDirRec)
-        SeekWdm(aBr.BaseStream, lRec, lDirOff + 4)
-        Dim lI As Int32 = aBr.ReadInt32
-        Return lI
-    End Function
-    Private Function ReadWdmInt32(ByVal aBr As IO.BinaryReader, ByVal aRec As Int32, ByVal aOff As Int32) As Int32
-        'aOff in four byte words
-        SeekWdm(aBr.BaseStream, aRec, aOff)
-        Dim lI As Int32 = aBr.ReadInt32
-        Return lI
-    End Function
-    Private Function ReadWdmInt32(ByVal aBr As IO.BinaryReader, ByVal aField As Wdm_Fields, Optional ByVal aOff As Int32 = 0) As Int32
-        SeekWdm(aBr.BaseStream, 1, aField + aOff)
-        Dim lI As Int32 = aBr.ReadInt32
-        Return lI
-    End Function
-
-    Private Sub SeekWdm(ByVal aFs As IO.FileStream, ByVal aRec As Int32, ByVal aOff As Int32)
-        'aOff in four byte words
-        Const lReclB As Int32 = 2048 'wdm record size in bytes
-        Dim lPos As Int32 = ((aRec - 1) * lReclB) + ((aOff - 1) * 4)
-        aFs.Seek(lPos, IO.SeekOrigin.Begin)
-        'Logger.Dbg(".Seek(" & lPos & ")")
-    End Sub
-
-    Private Class atcWdmFileHandle
-        Implements IDisposable
-
-        Dim pBr As IO.BinaryReader
-
-        Public ReadOnly Property BinaryReader() As IO.BinaryReader
-            Get
-                Return pBr
-            End Get
-        End Property
-
-        Public Sub New(ByVal aRWCFlg As Integer, ByVal aFileName As String)
-            'aRWCFlg: 0- normal open of existing WDM file,
-            '         1- open WDM file as read only,
-            '         2- open new WDM file
-            Dim lAttr As FileAttribute
-            Dim lFileName As String
-            Dim lFS As IO.FileStream
-
-            lFileName = AbsolutePath(aFileName, CurDir())
-
-            If Not FileExists(lFileName) AndAlso aRWCFlg <> 2 Then
-                Throw New ApplicationException("atcWdmFileHandle:Could not find " & aFileName)
-            Else
-                If aRWCFlg = 0 Then
-                    lAttr = GetAttr(lFileName) 'if read only, change to not read only
-                    If (lAttr And FileAttribute.ReadOnly) <> 0 Then
-                        lAttr = lAttr - FileAttribute.ReadOnly
-                        SetAttr(lFileName, lAttr)
-                    End If
-                End If
-
-                Logger.Dbg("atcWdmFileHandle:OpenB4:" & lFileName)
-                Try
-                    lFS = IO.File.Open(lFileName, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
-                    pBr = New IO.BinaryReader(lFS)
-                    Logger.Dbg("atcWdmFileHandle:OpenAft")
-                Catch ex As Exception
-                    Throw New ApplicationException("atcWdmFileHandle:Exception:" & vbCrLf & ex.ToString)
-                End Try
-            End If
-        End Sub
-
-        Public Sub Dispose() Implements System.IDisposable.Dispose
-            Logger.Dbg("atcWdmFileHandle:Dispose:")
-            pBr.Close()
-            GC.SuppressFinalize(Me)
-        End Sub
-
-        Protected Overrides Sub Finalize()
-            Dispose()
-        End Sub
-    End Class
 End Class
