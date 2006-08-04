@@ -146,7 +146,7 @@ Public Class atcWDMfile
         For lInd As Int32 = 1 To lSacnt 'get index and location for available attributes
             lSaind(lInd) = aWdm.ReadInt32
             lPos(lInd) = aWdm.ReadInt32
-            Logger.Dbg("    Ind:Saind:Pos:" & lInd & ":" & lSaind(lInd) & ":" & lPos(lInd))
+            'Logger.Dbg("    Ind:Saind:Pos:" & lInd & ":" & lSaind(lInd) & ":" & lPos(lInd))
         Next
         For lind As Int32 = 1 To lSacnt 'get the values
             lAttributeDefinition = pMsgWdm.Attributes.ItemByIndex(lSaind(lind))

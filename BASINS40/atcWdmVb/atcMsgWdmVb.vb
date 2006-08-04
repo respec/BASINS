@@ -20,7 +20,7 @@ Friend Class atcMsgWDMvb
 
     Public Sub New()
         Dim lAttr As atcAttributeDefinition
-        Dim lFileName As String = "C:\dev\BASINS40\Bin\Plugins\BASINS\hspfmsg.wdm"
+        Dim lFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
         Dim lWdmMsg As New atcWdmFileHandle(1, lFileName)
         Dim lAttributeDsn As Int32 = lWdmMsg.ReadInt32(Wdm_Fields.DSFST_Attribute)
         While lAttributeDsn > 0 'loop thru all possible attributes 
@@ -74,7 +74,7 @@ Friend Class atcMsgWDMvb
                     If lDataPointerGroup > 0 Then 'data in this group
                         Dim lDataRecord As UInt32 = lDataPointerGroup >> 9
                         Dim lDataOffset As UInt32 = lDataPointerGroup And &H1FF
-                        Logger.Dbg("  Attribute:" & lAttr.ID & ":" & lDataRecord & ":" & lDataOffset)
+                        'Logger.Dbg("  Attribute:" & lAttr.ID & ":" & lDataRecord & ":" & lDataOffset)
                         lWdmMsg.Seek(lDataRecord, lDataOffset)
                         Dim lBlockIdentifier As UInt32 = lWdmMsg.ReadInt32
                         While lBlockIdentifier > 0
