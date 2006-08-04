@@ -6,7 +6,7 @@ Imports atcUtility
 Imports MapWinUtility
 
 Friend Class atcMsgWDMvb
-    'Copyright 2005 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    'Copyright 2006 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
     Dim pAttributes As atcCollection 'of clsAttributeDefinition
 
     Public ReadOnly Property Attributes() As atcCollection
@@ -35,10 +35,6 @@ Friend Class atcMsgWDMvb
         pAttributes = New atcCollection
         pAttributes.Add("<dummy>")
 
-        'F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
-
-        'Dim lMsgHandle As atcWdmHandle = MsgHandle()
-        'Dim lMsgUnit As Integer = lMsgHandle.Unit
         Dim lRetCod As Int32
         Dim lMsgUnit As Int32 = 100
         Dim lFileName As String = "C:\dev\BASINS40\Bin\Plugins\BASINS\hspfmsg.wdm"
@@ -90,13 +86,6 @@ Friend Class atcMsgWDMvb
         End If
         lRetCod = F90_WDFLCL(lMsgUnit)
     End Sub
-
-    'Public Function MsgHandle() As atcWdmHandle
-    '    Dim lMsgFileName As String = FindFile("Please locate HSPF message file", "hspfmsg.wdm")
-    '    Dim lMsgHandle As New atcWdmHandle(1, lMsgFileName)
-
-    '    Return lMsgHandle
-    'End Function
 
     Private Declare Sub F90_WDBOPNR Lib "hass_ent.dll" _
         (ByRef aRwflg As Integer, _
