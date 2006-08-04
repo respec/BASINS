@@ -158,12 +158,7 @@ Public Class atcWDMfile
                     Case "Single"
                         aDataSet.Attributes.SetValue(lAttributeDefinition, aWdm.ReadSingle)
                     Case "String"
-                        Dim lS As String = ""
-                        For lI As Int32 = 0 To (.Max / 4) - 1
-                            Dim lV As Int32 = aWdm.ReadInt32
-                            lS &= Long2String(lV)
-                        Next
-                        lS = lS.TrimEnd
+                        Dim lS As String = aWdm.ReadString(.Max / 4)
                         Select Case UCase(.Name)
                             Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
                                 Dim lDate As Date
@@ -174,8 +169,9 @@ Public Class atcWDMfile
                                                  CInt(lS.Substring(10, 2)), _
                                                  CInt(lS.Substring(12, 2)))
                                 aDataSet.Attributes.SetValue(lAttributeDefinition, lDate)
-                            Case "DCODE"
-                                'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
+                                'TODO: set units attribute from DCODE
+                                'Case "DCODE"
+                                ' lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
                             Case Else
                                 aDataSet.Attributes.SetValue(lAttributeDefinition, lS)
                         End Select

@@ -115,6 +115,14 @@ Friend Class atcWdmFileHandle
         Return pBr.ReadByte
     End Function
 
+    Public Function ReadString(ByVal aNumWords As Integer) As String 'aNumWords = number of 32-bit words
+        ReadString = ""
+        For lChrIndex As Integer = 1 To aNumWords
+            ReadString &= Long2String(pBr.ReadInt32)
+        Next
+        ReadString = Trim(ReadString)
+    End Function
+
     Public Sub Seek(ByVal aRec As Int32, ByVal aOff As Int32)
         'aOff in four byte words
         Const lReclB As Int32 = 2048 'wdm record size in bytes

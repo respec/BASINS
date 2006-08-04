@@ -49,8 +49,8 @@ Public Class atcGraphForm
                 .Type = ZedGraph.AxisType.Date
                 '.MajorUnit = ZedGraph.DateUnit.Day
                 '.MinorUnit = ZedGraph.DateUnit.Hour
-                .Scale.Max = 0
-                .Scale.Min = 100000
+                .Scale.Max = Double.NegativeInfinity
+                .Scale.Min = Double.PositiveInfinity
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
@@ -76,14 +76,16 @@ Public Class atcGraphForm
 
         For Each ts As atcTimeseries In pDataGroup
             AddDatasetTimeseries(ts, ts.ToString)
-            With Pane.XAxis.Scale
-                If ts.Attributes.GetValue("point", False) Then
-                    If ts.Dates.Value(1) < .Min Then .Min = ts.Dates.Value(1)
-                Else
-                    If ts.Dates.Value(0) < .Min Then .Min = ts.Dates.Value(0)
-                End If
-                If ts.Dates.Value(ts.Dates.numValues) > .Max Then .Max = ts.Dates.Value(ts.Dates.numValues)
-            End With
+            If ts.numValues > 0 Then
+                With Pane.XAxis.Scale
+                    If ts.Attributes.GetValue("point", False) Then
+                        If ts.Dates.Value(1) < .Min Then .Min = ts.Dates.Value(1)
+                    Else
+                        If ts.Dates.Value(0) < .Min Then .Min = ts.Dates.Value(0)
+                    End If
+                    If ts.Dates.Value(ts.Dates.numValues) > .Max Then .Max = ts.Dates.Value(ts.Dates.numValues)
+                End With
+            End If
         Next
 
         pMaster.AxisChange(g)
