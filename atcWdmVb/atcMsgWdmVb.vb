@@ -1,13 +1,15 @@
-Option Strict On
+Option Strict Off
 Option Explicit On
 
 Imports atcData
 Imports atcUtility
 Imports MapWinUtility
+Imports atcWdmVb.atcWdmFileHandle
 
 Friend Class atcMsgWDMvb
     'Copyright 2006 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
-    Dim pAttributes As atcCollection 'of clsAttributeDefinition
+    Private pAttributes As atcCollection 'of clsAttributeDefinition
+    Private pAttributeArray(512) As atcAttributeDefinition
 
     Public ReadOnly Property Attributes() As atcCollection
         Get
@@ -16,114 +18,115 @@ Friend Class atcMsgWDMvb
     End Property
 
     Public Sub New()
-        Dim lIndex As Integer 'index
-        Dim lLen As Integer 'max dimension
-        Dim lType As Integer 'type (1-Integer, 2-Real, 3-String, 0-Dummy)
-        Dim lRMax As Single 'max allowed value
-        Dim lRMin As Single 'min allowed value
-        Dim lRDef As Single 'default value
-        Dim lHlpPos As Integer 'help position within message file record
-        Dim lHlpLen As Integer 'help length
-        Dim lHlpRec As Integer 'help record withing message file
-        Dim lValidLen As Integer 'length of valid values
-        Dim lDesc As String = "" 'description 
-        Dim lName As String = "" 'name
-        Dim lValid As String = "" 'valid values, comma delimeted
-
         Dim lAttr As atcAttributeDefinition
 
-        pAttributes = New atcCollection
-        pAttributes.Add("<dummy>")
-
-        Dim lRetCod As Int32
-        Dim lMsgUnit As Int32 = 100
         Dim lFileName As String = "C:\dev\BASINS40\Bin\Plugins\BASINS\hspfmsg.wdm"
-        F90_WDBOPNR(1, lFileName, lMsgUnit, lRetCod, CShort(Len(lFileName)))
+        Dim lWdmMsg As New atcWdmFileHandle(1, lFileName)
 
-        If lMsgUnit > 0 Then
-            For lIndex = 1 To 500 'loop thru all possible attributes 
-                'get info about attribute from message file
-                lAttr = New atcAttributeDefinition
-                lAttr.Category = "WDM"
-                Call F90_WDSAGY(lMsgUnit, lIndex, lLen, lType, lRMin, lRMax, lRDef, lHlpLen, lHlpRec, lHlpPos, lValidLen, lName, lDesc, lValid)
-                If lLen = 0 Then 'dummy
-                    lAttr.Name = "Dummy" & lIndex
-                    lAttr.ID = lIndex
-                    pAttributes.Add(lAttr, "K" & lIndex)
-                Else
-                    lAttr.Name = lName
-                    lAttr.ID = lIndex
-                    lAttr.Description = lDesc
-                    lAttr.ValidList = New ArrayList(lValid.Split(Chr(44))) ' 44=comma
-                    If InStr("-TGROUP-TSFORM-VBTIME-COMPFG-TSFILL-TSBYR-TSBMO-TSBDY-TSBHR-TSPREC-TSSTEP-TCODE-Time Units-Time Step-", "-" & lName & "-") > 0 Then
+        Dim lAttributeDsn As Int32 = lWdmMsg.ReadInt32(Wdm_Fields.DSFST_Attribute)
+        While lAttributeDsn > 0 'loop thru all possible attributes 
+            Dim lBaseRec As Int32 = lWdmMsg.FirstRecordNumberFromDsn(lAttributeDsn)
+            Dim lRec As Int32 = lBaseRec
+            Dim lPointDataBlocks As Int32 = lWdmMsg.ReadInt32(lRec, 11) 'PDAT
+            Dim lPointDataValues As Int32 = lWdmMsg.ReadInt32 'PDATV
+            Dim lDataPointerInUseCount As Int32 = lWdmMsg.ReadInt32(lRec, lPointDataBlocks) 'GRPCNT
+            Dim lFreePosition As UInt32 = lWdmMsg.ReadUInt32  'FREPOS
+            Dim lDataPointerCount As Int32 = (lPointDataValues - lPointDataBlocks - 2) / 4
+            For lInd As Int32 = 1 To lDataPointerCount
+                Dim lV As Int32 = lWdmMsg.ReadInt32
+                If lV > 0 Then
+                    lAttr = New atcAttributeDefinition
+                    lAttr.Category = "WDM"
+                    lAttr.Name &= Long2String(lV)
+                    lV = lWdmMsg.ReadUInt32
+                    lAttr.ID = lV And &H1FF
+                    lAttr.Name &= Chr((lV >> 9) And &HFF)
+                    lAttr.Name &= Chr((lV >> 17) And &HFF)
+                    lAttr.DefaultValue = lWdmMsg.ReadUInt32 'save location of details for later
+                    lV = lWdmMsg.ReadUInt32
+                    Dim lAttrType As Int32 = 1 + (lV >> 28)
+
+                    lAttr.Name = lAttr.Name.Trim
+                    Select Case lAttrType
+                        Case 1
+                            lAttr.TypeString = "Integer"
+                        Case 2 : lAttr.TypeString = "Single"
+                        Case 3
+                            lAttr.TypeString = "String"
+                            lAttr.Max = (lV >> 21) And &H7F
+                    End Select
+                    If InStr("-TGROUP-TSFORM-VBTIME-COMPFG-TSFILL-TSBYR-TSBMO-TSBDY-TSBHR-TSPREC-TSSTEP-TCODE-Time Units-Time Step-", _
+                             "-" & lAttr.Name & "-") > 0 Then
                         lAttr.Editable = False
                     Else
                         lAttr.Editable = True
                     End If
-
-                    Select Case lType
-                        Case 1 : lAttr.TypeString = "Integer"
-                        Case 2 : lAttr.TypeString = "Single"
-                        Case 3
-                            lAttr.TypeString = "String"
-                            lAttr.Max = lLen 'max length of string
-                    End Select
-
-                    If lAttr.TypeString <> "String" Then 'numeric, save valid range
-                        lAttr.Min = lRMin
-                        lAttr.Max = lRMax
-                    End If
-
-                    lAttr.DefaultValue = lRDef
-
-                    'use hlen, hrec, hpos to get myAttr.help 
-                    '(missing entry point to WDGCVL in hass_ent?)
-                    lAttr.Help = ""
-
-                    pAttributes.Add(lName.ToLower, lAttr)
+                    pAttributeArray(lAttr.ID) = lAttr
                 End If
-            Next lIndex
-        End If
-        lRetCod = F90_WDFLCL(lMsgUnit)
-    End Sub
+            Next
 
-    Private Declare Sub F90_WDBOPNR Lib "hass_ent.dll" _
-        (ByRef aRwflg As Integer, _
-         ByVal aName As String, _
-         ByRef aUnit As Integer, ByRef aRetcod As Integer, ByVal aNameLen As Short)
-    Private Declare Function F90_WDFLCL Lib "hass_ent.dll" _
-        (ByRef aWdmUnit As Integer) As Integer
+            lAttributeDsn = lWdmMsg.ReadInt32(lBaseRec, 2)
+        End While
 
-    Private Declare Sub F90_WDSAGY_XX Lib "hass_ent.dll" _
-        (ByRef aWdmUnit As Integer, ByRef aSaind As Integer, _
-         ByRef aLen As Integer, ByRef aType As Integer, _
-         ByRef aMin As Single, ByRef aMax As Single, ByRef aDef As Single, _
-         ByRef aHLen As Integer, ByRef aHRec As Integer, ByRef aHPos As Integer, _
-         ByRef aVLen As Integer, ByRef aIName As Integer, ByRef aIDesc As Integer, ByRef aIValid As Integer)
-    Private Sub F90_WDSAGY(ByRef aWdmUnit As Integer, ByRef aSaind As Integer, _
-                   ByRef aLen As Integer, ByRef aType As Integer, _
-                   ByRef aMin As Single, ByRef aMax As Single, ByRef aDef As Single, _
-                   ByRef aHLen As Integer, ByRef aHRec As Integer, ByRef aHPos As Integer, _
-                   ByRef aVLen As Integer, ByRef aName As String, ByRef aDesc As String, ByRef aValid As String)
-        Dim lName(6) As Integer
-        Dim lDesc(47) As Integer
-        Dim lValid(240) As Integer
-        F90_WDSAGY_XX(aWdmUnit, aSaind, _
-                      aLen, aType, _
-                      aMin, aMax, aDef, _
-                      aHLen, aHRec, aHPos, _
-                      aVLen, lName(0), lDesc(0), lValid(0))
-        NumChr(6, lName, aName)
-        NumChr(47, lDesc, aDesc)
-        NumChr(aVLen, lValid, aValid)
-    End Sub
-    Private Sub NumChr(ByRef aLen As Integer, ByRef aIntStr() As Integer, ByRef aStr As String)
-        aStr = ""
-        For lInd As Integer = 0 To aLen - 1 'added "- 1" 8/16/2002 Mark Gray
-            If aIntStr(lInd) > 0 Then
-                aStr &= Chr(aIntStr(lInd))
+        Try
+            For lInd As Int32 = 0 To pAttributeArray.GetUpperBound(0)
+                lAttr = pAttributeArray(lInd)
+                If Not (lAttr Is Nothing) Then
+                    Dim lDataPointerGroup As Int32 = lAttr.DefaultValue
+                    If lDataPointerGroup > 0 Then 'data in this group
+                        Dim lDataRecord As UInt32 = lDataPointerGroup >> 9
+                        Dim lDataOffset As UInt32 = lDataPointerGroup And &H1FF
+                        Logger.Dbg("  Attribute:" & lAttr.ID & ":" & lDataRecord & ":" & lDataOffset)
+                        lWdmMsg.Seek(lDataRecord, lDataOffset)
+
+                        Dim lRMax As Single 'max allowed value
+                        Dim lRMin As Single 'min allowed value
+                        Dim lRDef As Single 'default value
+                        Dim lHlpPos As Integer 'help position within message file record
+                        Dim lHlpLen As Integer 'help length
+                        Dim lHlpRec As Integer 'help record withing message file
+                        Dim lValidLen As Integer 'length of valid values
+                        Dim lDesc As String = "" 'description 
+                        Dim lValid As String = "" 'valid values, comma delimeted
+
+                        'get info about attribute from message file
+                        'Call F90_WDSAGY(lMsgUnit, lIndex, lLen, lType, lRMin, lRMax, lRDef, lHlpLen, lHlpRec, lHlpPos, lValidLen, lName, lDesc, lValid)
+
+                        lAttr.Description = lDesc
+
+                        lAttr.ValidList = New ArrayList(lValid.Split(Chr(44))) ' 44=comma
+
+                        If lAttr.TypeString <> "String" Then
+                            'numeric, save valid range
+                            lAttr.Min = lRMin
+                            lAttr.Max = lRMax
+                        End If
+
+                        lAttr.DefaultValue = lRDef
+
+                        'use hlen, hrec, hpos to get myAttr.help 
+                        '(missing entry point to WDGCVL in hass_ent?)
+                        lAttr.Help = ""
+
+                    End If
+                End If
+            Next
+        Catch ex As Exception
+            Stop
+        End Try
+
+        pAttributes = New atcCollection
+        For lInd As Int32 = 0 To pAttributeArray.GetUpperBound(0)
+            If pAttributeArray(lInd) Is Nothing Then
+                lAttr = New atcAttributeDefinition
+                lAttr.Name = "Dummy" & lInd
+                lAttr.ID = lInd
+                'pAttributes.Add(lAttr, "K" & lInd)
+            Else
+                lAttr = pAttributeArray(lInd)
             End If
-        Next lInd
-        aStr = RTrim(aStr)
+            pAttributes.Add(lAttr.Name.ToLower, lAttr)
+        Next
+        Logger.Dbg("MessageFileReadWithVB!")
     End Sub
 End Class
