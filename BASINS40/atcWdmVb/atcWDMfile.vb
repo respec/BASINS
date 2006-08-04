@@ -211,11 +211,11 @@ Public Class atcWDMfile
         '            ":" & lFreePosition & "(" & lFreeRecord & "," & lFreeOffset & ")")
 
         'Dim ls As String = "  DataPointers: "
-        Dim lInUse As Int32 = 0
+        'Dim lInUse As Int32 = 0
         For lInd As Int32 = 1 To lDataPointerCount
             lDataPointerGroups(lInd) = aWdm.ReadUInt32
             'ls &= lDataPointerGroups(lInd) & ", "
-            If lDataPointerGroups(lInd) <> 0 Then lInUse += 1
+            'If lDataPointerGroups(lInd) <> 0 Then lInUse += 1
         Next
         'Logger.Dbg(ls.TrimEnd(",", " "))
         'Logger.Dbg("  DataPointersInUse:" & lInUse & ":" & lDataPointerInUseCount)

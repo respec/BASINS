@@ -93,6 +93,9 @@ Friend Class atcWdmFileHandle
     Public Function ReadUInt32() As UInt32
         Return pBr.ReadUInt32
     End Function
+    Public Function ReadUInt16() As UInt16
+        Return pBr.ReadUInt16
+    End Function
     Public Function ReadInt32() As Int32
         Return pBr.ReadInt32
     End Function
@@ -107,6 +110,9 @@ Friend Class atcWdmFileHandle
     End Function
     Public Function ReadSingle() As Single
         Return pBr.ReadSingle
+    End Function
+    Public Function ReadByte() As Byte
+        Return pBr.ReadByte
     End Function
 
     Public Sub Seek(ByVal aRec As Int32, ByVal aOff As Int32)
