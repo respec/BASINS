@@ -140,7 +140,7 @@ Public Class atcWDMfile
         Dim lSacnt As Int32 = aWdm.ReadInt32(aRec, lPsa)
         Dim lPSastr As Int32 = aWdm.ReadInt32
         Dim lAttributeDefinition As atcAttributeDefinition
-        Logger.Dbg("  Psa,Sacnt,Psastr:" & lPsa & ":" & lSacnt & ":" & lPSastr)
+        'Logger.Dbg("  Psa,Sacnt,Psastr:" & lPsa & ":" & lSacnt & ":" & lPSastr)
         Dim lSaind(lSacnt) As Int32
         Dim lPos(lSacnt) As Int32
         For lInd As Int32 = 1 To lSacnt 'get index and location for available attributes
@@ -190,9 +190,9 @@ Public Class atcWDMfile
         Dim lTsFill As Double = aDataSet.Attributes.GetValue("TSFILL", -999)
         Dim lBaseDateJ As Double = MJD(lTsbyr, lTsbmo, lTsbdy) + (lTsbhr / 24.0)
         Dim lTgroup As atcTimeUnit = aDataSet.Attributes.GetValue("TGROUP", 6)
-        Logger.Dbg("  Group:BaseDate:" & lTgroup & ":" & lBaseDateJ & ":" & _
-                    MJD2VBdate(lBaseDateJ) & ":" & _
-                    lTsbyr & ":" & lTsbmo & ":" & lTsbdy & ":" & lTsbhr)
+        'Logger.Dbg("  Group:BaseDate:" & lTgroup & ":" & lBaseDateJ & ":" & _
+        '            MJD2VBdate(lBaseDateJ) & ":" & _
+        '            lTsbyr & ":" & lTsbmo & ":" & lTsbdy & ":" & lTsbhr)
 
         Dim lPointDataBlocks As Int32 = aWdm.ReadInt32(aRec, 11) 'PDAT
         Dim lPointDataValues As Int32 = aWdm.ReadInt32 'PDATV
@@ -291,7 +291,7 @@ Public Class atcWDMfile
             End If
         Next
         lDate.Add(lCurrentDateJ)
-        Logger.Dbg("Done Dsn:DataCount:" & aDataSet.Attributes.GetValue("ID") & ":" & lData.Count)
+        'Logger.Dbg("Done Dsn:DataCount:" & aDataSet.Attributes.GetValue("ID") & ":" & lData.Count)
         Dim lDataD(lData.Count - 1) As Double
         lData.CopyTo(lDataD)
         aDataSet.Values = lDataD
