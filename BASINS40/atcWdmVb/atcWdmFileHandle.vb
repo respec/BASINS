@@ -1,3 +1,7 @@
+'Copyright 2006 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
+Option Strict Off
+Option Explicit On
+
 Imports atcUtility
 Imports MapWinUtility
 
@@ -43,6 +47,7 @@ Friend Class atcWdmFileHandle
         '         2- open new WDM file
         Dim lAttr As FileAttribute
         Dim lFileName As String
+        Dim lFileAccess As IO.FileAccess
         Dim lFS As IO.FileStream
 
         lFileName = AbsolutePath(aFileName, CurDir())
@@ -50,19 +55,26 @@ Friend Class atcWdmFileHandle
         If Not FileExists(lFileName) AndAlso aRWCFlg <> 2 Then
             Throw New ApplicationException("atcWdmFileHandle:Could not find " & aFileName)
         Else
-            If aRWCFlg = 0 Then
+            If aRWCFlg = 2 Then 'create an empty wdm file
+                'TODO: create a wdm file
+                lFileAccess = IO.FileAccess.ReadWrite
+            ElseIf aRWCFlg = 1 Then 'read only
+                lFileAccess = IO.FileAccess.Read
+            ElseIf aRWCFlg = 0 Then
                 lAttr = GetAttr(lFileName) 'if read only, change to not read only
                 If (lAttr And FileAttribute.ReadOnly) <> 0 Then
                     lAttr = lAttr - FileAttribute.ReadOnly
                     SetAttr(lFileName, lAttr)
                 End If
+                lFileAccess = IO.FileAccess.ReadWrite
             End If
 
             Logger.Dbg("atcWdmFileHandle:OpenB4:" & lFileName)
             Try
-                lFS = IO.File.Open(lFileName, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read)
+                lFS = IO.File.Open(lFileName, IO.FileMode.Open, lFileAccess, IO.FileShare.Read)
                 pBr = New IO.BinaryReader(lFS)
-                Logger.Dbg("atcWdmFileHandle:OpenAft")
+                'YODO: writer??
+                Logger.Dbg("atcWdmFileHandle:OpenAft:" & lFileAccess)
             Catch ex As Exception
                 Throw New ApplicationException("atcWdmFileHandle:Exception:" & vbCrLf & ex.ToString)
             End Try
@@ -117,7 +129,7 @@ Friend Class atcWdmFileHandle
 
     Public Function ReadString(ByVal aNumWords As Integer) As String 'aNumWords = number of 32-bit words
         ReadString = ""
-        For lChrIndex As Integer = 1 To aNumWords
+        For lChrIndex As Integer = 1 To aNumwords
             ReadString &= Long2String(pBr.ReadInt32)
         Next
         ReadString = Trim(ReadString)
