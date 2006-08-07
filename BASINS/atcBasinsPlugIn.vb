@@ -462,7 +462,7 @@ Public Class atcBasinsPlugIn
             lFeedbackCollection.Add("email", Trim(lEmail))
             lFeedbackCollection.Add("message", Trim(lMessage))
             lFeedbackCollection.Add("sysinfo", lSystemInformation)
-            Dim lClient As New Net.WebClient
+            Dim lClient As New System.Net.WebClient
             lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
             Logger.Msg("Feedback successfully sent", "Send Feedback")
         End If
