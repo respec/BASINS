@@ -73,7 +73,7 @@ Friend Class atcWdmFileHandle
             Try
                 lFS = IO.File.Open(lFileName, IO.FileMode.Open, lFileAccess, IO.FileShare.Read)
                 pBr = New IO.BinaryReader(lFS)
-                'YODO: writer??
+                'TODO: writer?
                 Logger.Dbg("atcWdmFileHandle:OpenAft:" & lFileAccess)
             Catch ex As Exception
                 Throw New ApplicationException("atcWdmFileHandle:Exception:" & vbCrLf & ex.ToString)
