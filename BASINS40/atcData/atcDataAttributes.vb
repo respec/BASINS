@@ -290,15 +290,17 @@ Public Class atcDataAttributes
         If lAttribute Is Nothing Then  'Did not find the named attribute
             If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
                 Try
-                    Dim lOwnerTS As atcTimeseries = Owner
                     Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
-                    Dim lOperation As atcDefinedValue = Nothing
-                    If lDef.Calculated AndAlso IsSimple(lDef, lKey, lOperation) Then
-                        Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
-                        Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
-                        lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
-                        lDef.Calculator.Open(lDef.Name, lArgs)
-                        lAttribute = ItemByKey(lKey)
+                    If Not lDef Is Nothing Then
+                        Dim lOperation As atcDefinedValue = Nothing
+                        If lDef.Calculated AndAlso IsSimple(lDef, lKey, lOperation) Then
+                            Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
+                            Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
+                            Dim lOwnerTS As atcTimeseries = Owner
+                            lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
+                            lDef.Calculator.Open(lDef.Name, lArgs)
+                            lAttribute = ItemByKey(lKey)
+                        End If
                     End If
                 Catch NullExcep As NullReferenceException
                     'Ignore these
