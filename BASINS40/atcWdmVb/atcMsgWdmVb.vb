@@ -133,8 +133,18 @@ Friend Class atcMsgWDMvb
                             Case 5 'Default Value
                                 If ReferenceEquals(lAttr.TypeString, pAttributeTypeName(1)) Then 'Integer Default
                                     lAttr.DefaultValue = lWdmMsg.ReadInt32
+                                    If lAttr.DefaultValue = -999 Then
+                                        lAttr.DefaultValue = Double.NaN
+                                    ' ElseIf lAttr.DefaultValue <> 0 Then
+                                    '    Logger.Dbg("NonZeroDefault:" & lAttr.Name & ":" & lAttr.DefaultValue)
+                                    End If
                                 ElseIf ReferenceEquals(lAttr.TypeString, pAttributeTypeName(2)) Then 'Single Default
                                     lAttr.DefaultValue = lWdmMsg.ReadSingle
+                                    If lAttr.DefaultValue = -999 Then
+                                        lAttr.DefaultValue = Double.NaN
+                                    ' ElseIf lAttr.DefaultValue <> 0 Then
+                                    '    Logger.Dbg("NonZeroDefault:" & lAttr.Name & ":" & lAttr.DefaultValue)
+                                    End If
                                 ElseIf ReferenceEquals(lAttr.TypeString, pAttributeTypeName(3)) Then 'String Default
                                     lAttr.DefaultValue &= lWdmMsg.ReadString(lNumWords)
                                 Else
