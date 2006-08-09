@@ -97,7 +97,7 @@ Public Class atcDataAttributes
                 ElseIf InStr(aAttributeName.ToLower, "history") > 0 Then
                     If InStr(lValue.ToString.ToLower, "read from") Then 'make value shorter by removing path and "read "
                         Dim lString() As String = lValue.ToString.Split(" ")
-                        lString(0) = "from " & FilenameNoPath(lString(2))
+                        lString(0) = lString(1) & " " & FilenameNoPath(lString(2))
                         Return lString(0)
                     Else
                         Return lValue.ToString
