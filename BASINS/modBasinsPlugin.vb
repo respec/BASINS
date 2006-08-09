@@ -136,6 +136,7 @@ Friend Module modBasinsPlugin
                     Exit For
                 End If
             Next
+            g_MapWin.Toolbar.PressToolbarButton("tbbSelect")
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
             pBuildFrm.Top = GetSetting("BASINS4", "Window Positions", "BuildTop", "300")
