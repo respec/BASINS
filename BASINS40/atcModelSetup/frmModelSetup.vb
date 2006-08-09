@@ -908,10 +908,10 @@ Public Class frmModelSetup
                 If UCase(ctemp) = "DEP2" Or UCase(ctemp) = "DEPTH" Or UCase(ctemp) = "MEANDEPTH" Then
                     cboStream6.SelectedIndex = i
                 End If
-                If UCase(ctemp) = "MINEL" Or UCase(ctemp) = "ELEVHIGH" Then
+                If UCase(ctemp) = "MINEL" Or UCase(ctemp) = "ELEVLOW" Then
                     cboStream7.SelectedIndex = i
                 End If
-                If UCase(ctemp) = "MAXEL" Or UCase(ctemp) = "ELEVLOW" Then
+                If UCase(ctemp) = "MAXEL" Or UCase(ctemp) = "ELEVHIGH" Then
                     cboStream8.SelectedIndex = i
                 End If
                 If UCase(ctemp) = "SNAME" Then
