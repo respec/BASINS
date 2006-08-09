@@ -102,27 +102,34 @@ Friend Class atcWdmFileHandle
         Dim lI As Int32 = pBr.ReadInt32
         Return lI
     End Function
+
     Public Function ReadUInt32() As UInt32
         Return pBr.ReadUInt32
     End Function
+
     Public Function ReadUInt16() As UInt16
         Return pBr.ReadUInt16
     End Function
+
     Public Function ReadInt32() As Int32
         Return pBr.ReadInt32
     End Function
+
     Public Function ReadInt32(ByVal aRec As Int32, ByVal aOff As Int32) As Int32
         'aOff in four byte words
         Me.Seek(aRec, aOff)
         Return pBr.ReadInt32
     End Function
+
     Public Function ReadInt32(ByVal aField As Wdm_Fields, Optional ByVal aOff As Int32 = 0) As Int32
         Me.Seek(1, aField + aOff)
         Return pBr.ReadInt32
     End Function
+
     Public Function ReadSingle() As Single
         Return pBr.ReadSingle
     End Function
+
     Public Function ReadByte() As Byte
         Return pBr.ReadByte
     End Function

@@ -32,6 +32,9 @@ Public Module modDate
     Public Const JulianMinute As Double = 1 / 1440
     '##GLOBAL JulianSecond - one second as fraction of a day
     Public Const JulianSecond As Double = 1 / 86400
+    Public Const SecondsPerDay As Integer = 86400
+
+    Public Const JulianMillisecond As Double = 1 / 86400000
 
     'When doing math on months and years, it is more accurate to use timdif and timadd in UtilDateExt
     '##GLOBAL JulianMonth - estimate of month as number of days
@@ -681,6 +684,12 @@ Public Module modDate
             End If
         End If
     End Sub
+
+    Public Function RoundToSecond(ByVal aDate As Double) As Double
+        Dim lNumDays As Double = Math.Truncate(aDate)
+        Dim lNumSeconds As Double = Math.Round((aDate - lNumDays) * SecondsPerDay)
+        Return lNumDays + lNumSeconds / SecondsPerDay
+    End Function
 
     Public Function TimAddJ(ByVal jStartDate As Double, _
                             ByVal TCODE As Integer, _
