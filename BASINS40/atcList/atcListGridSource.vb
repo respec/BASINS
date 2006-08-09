@@ -67,9 +67,19 @@ Friend Class atcListGridSource
                     Else
                         Try
                             Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(aColumn - 1)
-                            Dim lIndex As Integer = lTS.Dates.IndexOfValue(pAllDates.Value(aRow - lAttributeRows + 1), True)
-                            If lIndex < 0 Then 'Did not find this date in this TS
-                                Return ""
+                            Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
+                            Dim lIndex As Integer = Array.BinarySearch(lTS.Dates.Values, lDateDisplayed)
+
+                            If lIndex < 0 Then 'Did not find this exact date in this TS
+                                lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
+                                'Test two values closest to lDateDisplayed to see if either is within a millisecond
+                                If lIndex <= pAllDates.numValues AndAlso Math.Abs(lTS.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                    Return DoubleToString(lTS.Value(lIndex))
+                                ElseIf lIndex > 0 AndAlso Math.Abs(lTS.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
+                                    Return DoubleToString(lTS.Value(lIndex - 1))
+                                Else 'No value in this TS is close enough to this date
+                                    Return ""
+                                End If
                             Else
                                 Return DoubleToString(lTS.Value(lIndex))
                             End If

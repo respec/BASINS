@@ -106,10 +106,12 @@ Public Module modTimeseriesMath
             End If
         Next
     End Sub
-    'Merge a group of atcTimeseries
-    'Each atcTimeseries is assumed to be in order by date within itself
-    'Resulting atcTimeseries will contain all unique dates from the group, sorted by date
-    'If duplicate dates exist, values from atcTimeseries later in aGroup will be left out of result
+
+    ''' <summary>Merge a group of atcTimeseries</summary>
+    ''' <param name="aGroup">Group of atcTimeseries to merge</param>
+    ''' <returns>atcTimeseries containing all unique dates from the group</returns>
+    ''' <remarks>Each atcTimeseries in aGroup is assumed to be in order by date within itself.
+    ''' If duplicate dates exist in aGroup, some values will be left out of result.</remarks>
     Public Function MergeTimeseries(ByVal aGroup As atcDataGroup) As atcTimeseries
         Dim lNewTS As New atcTimeseries(Nothing)
         Dim lNewIndex As Integer
@@ -117,12 +119,10 @@ Public Module modTimeseriesMath
         Dim lOldTS As atcTimeseries
         Dim lMinDate As Double = Double.MaxValue
         Dim lMaxGroupIndex As Integer = aGroup.Count - 1
-        Dim lMaxCheckForDuplicate As Integer
         Dim lIndex As Integer
         Dim lMinIndex As Integer
         Dim lNextIndex() As Integer
         Dim lNextDate() As Double
-        Dim lOldValue As Double
 
         ReDim lNextIndex(aGroup.Count - 1)
         ReDim lNextDate(aGroup.Count - 1)
@@ -170,33 +170,36 @@ Public Module modTimeseriesMath
                         End If
                     End If
                 Next
+
                 'TODO: could make common cases faster with Array.Copy
                 'Now that we have found lMinDate, could also find the lNextMinDate when the 
                 'minimum date from a different TS happens, then find out how many more values 
                 'from this TS are earlier than lNextMinDate, then copy all of them to the 
                 'new TS at once
 
-                'Add earliest date/value to new TS
+                'Add earliest date and value to new TS
                 If lMinIndex >= 0 Then
                     lOldTS = aGroup.Item(lMinIndex)
-                    lOldValue = lOldTS.Value(lNextIndex(lMinIndex))
                     If lOldTS.ValueAttributesGetValue(lNextIndex(lMinIndex), "Inserted", False) Then
-                        'This value was inserted during splitting and will now be removed
+                        'This value was inserted during splitting and will now be discarded
                         lNewIndex -= 1
                         lTotalNumValues -= 1
-                        lMaxCheckForDuplicate = lMinIndex 'Don't remove duplicate since we aren't using this one
+                        lNextIndex(lMinIndex) += 1
+                        If lNextIndex(lMinIndex) <= lOldTS.numValues Then
+                            lNextDate(lMinIndex) = lOldTS.Dates.Value(lNextIndex(lMinIndex))
+                        Else 'used last value from this TS
+                            lNextIndex(lMinIndex) = -1
+                        End If
                     Else
                         lNewTS.Dates.Value(lNewIndex) = lMinDate
-                        lNewTS.Value(lNewIndex) = lOldValue
-                        lMaxCheckForDuplicate = lMaxGroupIndex
-                    End If
-
-                    For lIndex = lMinIndex To lMaxCheckForDuplicate
-                        If lNextIndex(lIndex) > 0 Then
-                            If Math.Abs(lNextDate(lIndex) - lMinDate) < Double.Epsilon Then
-                                If lIndex > lMinIndex Then
-                                    lOldTS = aGroup.Item(lIndex)
-                                    lTotalNumValues -= 1
+                        lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lMinIndex))
+                        For lIndex = 0 To lMaxGroupIndex
+                            'Discard next value from any TS that falls within one millisecond
+                            'Don't need Math.Abs because we already found minimum
+                            While lNextIndex(lIndex) > 0 AndAlso (lNextDate(lIndex) - lMinDate) < JulianMillisecond
+                                If lIndex <> lMinIndex Then 'Discarding a duplicate date
+                                    lTotalNumValues -= 1    'This duplicate no longer counts toward total
+                                    'lOldTS = aGroup.Item(lIndex)
                                     'Logger.dbg("MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " using " & lOldValue)
                                 End If
                                 lNextIndex(lIndex) += 1
@@ -205,10 +208,12 @@ Public Module modTimeseriesMath
                                 Else
                                     lNextIndex(lIndex) = -1
                                 End If
-                            End If
-                        End If
-                    Next
-                Else 'ran out of values in all the datasets
+                            End While                           
+                        Next
+                    End If
+                Else 'out of values in all the datasets
+                    Logger.Dbg("Warning:MergeTimeseries:Ran out of values at " & lNewIndex & " of " & lTotalNumValues)
+                    lTotalNumValues = lNewIndex - 1
                     Exit For
                 End If
             Next

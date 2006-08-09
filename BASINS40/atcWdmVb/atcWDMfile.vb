@@ -45,6 +45,7 @@ Public Class atcWDMfile
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+        Open = False
         If aFileName Is Nothing OrElse aFileName.Length = 0 Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
             With cdlg
@@ -56,7 +57,7 @@ Public Class atcWDMfile
                     aFileName = AbsolutePath(.FileName, CurDir)
                 Else 'cancel
                     Logger.Dbg("atcWDMfile:Open:User Cancelled File Dialogue for Open WDM file")
-                    Open = False
+                    Exit Function
                 End If
             End With
         End If
@@ -70,33 +71,54 @@ Public Class atcWDMfile
             lWdm = New atcWdmFileHandle(2, aFileName)
         Else
             Logger.Dbg("atcWDMfile:Open:File does not exist and cannot create '" & aFileName & "'")
-            Open = False
         End If
 
         If Not lWdm Is Nothing Then
-            Specification = aFileName
-            Open = True 'assume the best
-            'do some basic checks
-            Dim lVal As Int32 = lWdm.ReadInt32(Wdm_Fields.PPRBKR)
-            If lVal <> -998 Then
-                Logger.Dbg("atcWDMfile:Open:PrimaryBackwardRecordPointer for FileDefinitionRecord:" & lVal & " should be -998")
+            Try
+                Specification = aFileName
+                Open = True 'assume the best
+                'do some basic checks
+                Dim lVal As Int32 = lWdm.ReadInt32(Wdm_Fields.PPRBKR)
+                If lVal <> -998 Then
+                    Logger.Dbg("atcWDMfile:Open:PrimaryBackwardRecordPointer for FileDefinitionRecord:" & lVal & " should be -998")
+                    Open = False
+                End If
+                Refresh(lWdm)
+                Open = True 'Successfully opened
+            Catch ex As Exception
+                Logger.Dbg("atcWDMfile:Open:Exception:" & ex.Message & vbCrLf & ex.StackTrace)
                 Open = False
-            End If
-            Refresh(lWdm)
+            End Try
             lWdm.Dispose()
-            Return True 'Successfully opened
-        Else
-            Return False
         End If
     End Function
 
+    Public Overrides Sub ReadData(ByVal aData As atcData.atcDataSet)
+        Dim lDsn As Int32 = aData.Attributes.GetValue("ID", 0)
+        If lDsn > 0 Then
+            Dim lWdm As New atcWdmFileHandle(0, Specification)
+            Try
+                Dim lRec As Int32 = lWdm.FirstRecordNumberFromDsn(lDsn)
+                TimeseriesDataFromWdm(lWdm, aData, lRec)
+                Dim lTimeseries As atcData.atcTimeseries = aData
+                lTimeseries.ValuesNeedToBeRead = False
+            Catch ex As Exception
+                Logger.Dbg("atcWDMfile:ReadData:Exception:" & ex.Message & vbCrLf & ex.StackTrace)
+            End Try
+            lWdm.Dispose()
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' Read all datasets from the file
+    ''' </summary>
+    ''' <param name="aWdm">handle of open WDM file to read from</param>
+    ''' <remarks>All static attributes are read, but data is not read here to save time and space</remarks>
     Private Sub Refresh(ByVal aWdm As atcWdmFileHandle)
         Dim lProg As Integer = 0
         Dim lProgPrev As Integer
 
         DataSets.Clear()
-        'pDates = Nothing
-        'pDates = New ArrayList
 
         Dim lDsn As Int32 = aWdm.ReadInt32(Wdm_Fields.DSFST_Timeseries)
         While lDsn > 0
@@ -105,37 +127,51 @@ Public Class atcWDMfile
             DataSets.Add(lDsn, DataSetFromWdm(aWdm, lDsn))
             lDsn = aWdm.ReadInt32(lRec, 2)
             If lDsn = 0 Then
-                Logger.Progress("WDM Refresh Complete", 100, 0)
+                Logger.Progress("WDM Refresh Complete", 100, 100)
             Else 'try the next dsn
                 lProgPrev = lProg
-                lProg = (100 * lDsn) / 32000
+                lProg = (100 * lDsn) / 32000 'TODO: use actual number of datasets read and total to read
                 Logger.Progress("WDM Refresh", lProg, lProgPrev)
             End If
         End While
     End Sub
 
+    ''' <summary>
+    ''' Create and return a new atcTimeseries populated from data set aDsn
+    ''' </summary>
+    ''' <param name="aWdm">handle of open WDM file to read from</param>
+    ''' <param name="aDsn">Data set number to read</param>
+    ''' <returns>newly created atcTimeseries populated as requested</returns>
     Private Function DataSetFromWdm(ByVal aWdm As atcWdmFileHandle, ByVal aDsn As Int32) As atcTimeseries
         Dim lRec As Int32 = aWdm.FirstRecordNumberFromDsn(aDsn)
         Dim lDsn As Int32 = aWdm.ReadInt32(lRec, 5)
+
         If lDsn <> aDsn Then
             Throw New Exception("DataSetFromWdm:ExpectedDsn: " & aDsn & " FoundDsn: " & lDsn)
         End If
+
         Dim lDataSet As New atcTimeseries(Me)
         lDataSet.Dates = New atcTimeseries(Me)
 
-        'generic attributes
         lDataSet.Attributes.SetValue("id", aDsn)
         lDataSet.Attributes.AddHistory("read fromVB " & Specification)
 
         AttributesFromWdm(aWdm, lDataSet, lRec)
 
-        TimeseriesDataFromWdm(aWdm, lDataSet, lRec)
+        'Delay reading all the values until they are needed
+        lDataSet.ValuesNeedToBeRead = True
 
         Return lDataSet
     End Function
 
+    ''' <summary>
+    ''' Read all the static attributes of the specified data set into aDataSet.Attributes
+    ''' </summary>
+    ''' <param name="aWdm">handle of open WDM file to read from</param>
+    ''' <param name="aDataSet">Attributes of aDataSet will be populated</param>
+    ''' <param name="aRec">record number in WDM file where this data set starts</param>
+    ''' <remarks></remarks>
     Private Sub AttributesFromWdm(ByVal aWdm As atcWdmFileHandle, ByVal aDataSet As atcDataSet, ByVal aRec As Int32)
-        'attributes
         Dim lPsa As Int32 = aWdm.ReadInt32(aRec, 10)
         Dim lSacnt As Int32 = aWdm.ReadInt32(aRec, lPsa)
         Dim lPSastr As Int32 = aWdm.ReadInt32
@@ -239,7 +275,7 @@ Public Class atcWDMfile
                 lCurrentDateJ = lGroupDateJ
                 Dim lEndDateJ As Double = TimAddJ(lGroupDateJ, lTgroup, 1, 1)
                 Dim lBlockCount As Int32 = 0
-                While (lEndDateJ - lCurrentDateJ) > 0.00001 'about 1 second
+                While (lEndDateJ - lCurrentDateJ) > JulianSecond
                     Dim lBlockStartDateJ As Double = lCurrentDateJ
                     Dim lBlockControlWord As UInt32 = aWdm.ReadUInt32
                     lBlockCount += 1
@@ -277,10 +313,15 @@ Public Class atcWDMfile
                         Next
                         lDataOffset += 1
                     End If
-                    If lDataOffset >= 512 Then 'move to next record
+                    If lDataOffset >= 512 AndAlso (lEndDateJ - lCurrentDateJ) > JulianSecond Then 'move to next record
                         lDataRecord = aWdm.ReadInt32(CInt(lDataRecord), 4)
                         lDataOffset = 5
-                        aWdm.Seek(lDataRecord, lDataOffset)
+                        Try
+                            aWdm.Seek(lDataRecord, lDataOffset)
+                        Catch exSeek As Exception
+                            Logger.Dbg("TimeseriesDataFromWdm: Error seeking to record " & lDataRecord & ", offset " & lDataOffset & " in data set " & aDataSet.Attributes.GetValue("id"))
+                            Exit Sub
+                        End Try
                         'Logger.Dbg("  NewRecord:" & lDataRecord)
                         lBlockCount = 0
                     End If
