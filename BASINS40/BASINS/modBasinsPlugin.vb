@@ -387,7 +387,12 @@ Friend Module modBasinsPlugin
         lFeedback &= "CLRVersion: " & Environment.Version.ToString & vbCrLf
         lFeedback &= "LogFile: " & Logger.FileName & vbCrLf
         If IO.File.Exists(Logger.FileName) Then
-            lFeedback &= IO.File.ReadAllText(Logger.FileName) & vbCrLf
+            Try
+                lFeedback &= IO.File.ReadAllText(Logger.FileName) & vbCrLf
+            Catch e As Exception
+                lFeedback &= vbCrLf & "Logger file read failed, exception message:" & _
+                             vbCrLf & e.ToString & vbCrLf & vbCrLf
+            End Try
         End If
         lFeedback &= lSectionFooter
 
@@ -404,6 +409,9 @@ Friend Module modBasinsPlugin
         Next
         lFeedback &= lSectionFooter
         'TODO: add map layers info?
+
+        lFeedback &= vbCrLf & "Information from MapWinUtility.MiscUtils.GetDebugInfo" & vbCrLf & _
+                              MapWinUtility.MiscUtils.GetDebugInfo & vbCrLf & vbCrLf
 
         Dim lSkipFilename As Integer = g_BasinsDir.Length
         lFeedback &= vbCrLf & "Files in " & g_BasinsDir & vbCrLf
