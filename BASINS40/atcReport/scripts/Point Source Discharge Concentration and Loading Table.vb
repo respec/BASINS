@@ -112,10 +112,12 @@ Public Module PCSDischargeTable
                         lPolygonIndex = GisUtil.PointInPolygon(lPCSLayerIndex, i, aAreaLayerIndex)
                         If lPolygonIndex > -1 Then
                             For j = 1 To aSelectedAreaIndexes.Count
+                                System.Windows.Forms.Application.DoEvents()
                                 If aSelectedAreaIndexes(j) = lPolygonIndex Then
                                     'these overlap
                                     lnpdes = GisUtil.FieldValue(lPCSLayerIndex, i - 1, lNPDESFieldIndex)
                                     For k = 1 To lcNpdes.Count
+                                        System.Windows.Forms.Application.DoEvents()
                                         If lnpdes = lcNpdes(k) Then
                                             'want to add this record
                                             lGridSource.Rows = lGridSource.Rows + 1
