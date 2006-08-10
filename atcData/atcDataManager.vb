@@ -139,7 +139,7 @@ Public Class atcDataManager
         Dim lDisplayPlugins As ICollection = GetPlugins(GetType(atcDataDisplay))
 
         For Each lDisp As atcDataDisplay In lDisplayPlugins
-            If lDisp.Name = aDisplayName OrElse lDisp.Name = "Tools::" & aDisplayName Then
+            If lDisp.Name = aDisplayName OrElse lDisp.Name.EndsWith("::" & aDisplayName) Then
                 Dim lType As System.Type = lDisp.GetType()
                 Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
                 lNewDisplay = lAssembly.CreateInstance(lType.FullName)
