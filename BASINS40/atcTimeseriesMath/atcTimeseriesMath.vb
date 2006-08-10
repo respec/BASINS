@@ -121,48 +121,43 @@ Public Class atcTimeseriesMath
                     .Max = 31
                 End With
 
-                AddOperation("Add", "Add to each value", defTimeSeriesGroup, defDouble)
+                AddOperation("Add", "Add to each value", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("Subtract", "Subtract from each value of first timeseries", defTimeSeriesOne, defDouble)
+                AddOperation("Subtract", "Subtract from each value of first timeseries", "Math", defTimeSeriesOne, defDouble)
 
-                AddOperation("Multiply", "Multiply each value", defTimeSeriesGroup, defDouble)
+                AddOperation("Multiply", "Multiply each value", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("Divide", "Divide each value of first timeseries", defTimeSeriesGroup, defDouble)
+                AddOperation("Divide", "Divide each value of first timeseries", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("Mean", "Arithmetic Mean of values for each date", defTimeSeriesGroup)
+                AddOperation("Mean", "Arithmetic Mean of values for each date", "Math", defTimeSeriesGroup)
 
-                AddOperation("Geometric Mean", "Geometric Mean of values for each date", defTimeSeriesGroup)
+                AddOperation("Geometric Mean", "Geometric Mean of values for each date", "Math", defTimeSeriesGroup)
 
-                AddOperation("Max", "Maximum value for each date", defTimeSeriesGroup, defDouble)
+                AddOperation("Max", "Maximum value for each date", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("Min", "Minimum value for each date", defTimeSeriesGroup, defDouble)
+                AddOperation("Min", "Minimum value for each date", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("Exponent", "Raise each value of first timeseries to a power", defTimeSeriesGroup, defDouble)
+                AddOperation("Exponent", "Raise each value of first timeseries to a power", "Math", defTimeSeriesGroup, defDouble)
 
-                AddOperation("e ^ x", "e raised to the power of each value", defTimeSeriesOne)
+                AddOperation("e ^ x", "e raised to the power of each value", "Math", defTimeSeriesOne)
 
-                AddOperation("10 ^ x", "10 raised to the power of each value", defTimeSeriesOne)
+                AddOperation("10 ^ x", "10 raised to the power of each value", "Math", defTimeSeriesOne)
 
-                AddOperation("Log e", "The log base e of each value", defTimeSeriesOne)
+                AddOperation("Log e", "The log base e of each value", "Math", defTimeSeriesOne)
 
-                AddOperation("Log 10", "The log base 10 of each value", defTimeSeriesOne)
+                AddOperation("Log 10", "The log base 10 of each value", "Math", defTimeSeriesOne)
 
-                AddOperation("Absolute Value", "Change negative values to positive", defTimeSeriesOne)
+                AddOperation("Absolute Value", "Change negative values to positive", "Math", defTimeSeriesOne)
 
-                AddOperation("Celsius to F", "Celsius to Fahrenheit", defTimeSeriesOne)
-                atcDataAttributes.GetDefinition("Celsius to F").Category = "Unit Conversion"
+                AddOperation("Celsius to F", "Celsius to Fahrenheit", "Unit Conversion", defTimeSeriesOne)
 
-                AddOperation("F to Celsius", "Fahrenheit to Celsius", defTimeSeriesOne)
-                atcDataAttributes.GetDefinition("F to Celsius").Category = "Unit Conversion"
+                AddOperation("F to Celsius", "Fahrenheit to Celsius", "Unit Conversion", defTimeSeriesOne)
 
-                AddOperation("Subset by date", "Choose start and end dates", defTimeSeriesOne, defStartDate, defEndDate)
-                atcDataAttributes.GetDefinition("Subset by date").Category = "Date"
+                AddOperation("Subset by date", "Choose start and end dates", "Date", defTimeSeriesOne, defStartDate, defEndDate)
 
-                AddOperation("Subset by date boundary", "Choose boundary month and day", defTimeSeriesOne, defBoundaryMonth, defBoundaryDay)
-                atcDataAttributes.GetDefinition("Subset by date boundary").Category = "Date"
+                AddOperation("Subset by date boundary", "Choose boundary month and day", "Date", defTimeSeriesOne, defBoundaryMonth, defBoundaryDay)
 
-                AddOperation("Merge", "Choose data to merge", defTimeSeriesGroup)
-                atcDataAttributes.GetDefinition("Merge").Category = "Date"
+                AddOperation("Merge", "Choose data to merge", "Date", defTimeSeriesGroup)
             End If
             Return pAvailableOperations
         End Get
@@ -170,6 +165,7 @@ Public Class atcTimeseriesMath
 
     Private Sub AddOperation(ByVal aName As String, _
                                 ByVal aDescription As String, _
+                                ByVal aCategory As String, _
                                 ByVal ParamArray aArgs() As atcAttributeDefinition)
         Dim lResult As New atcAttributeDefinition
         With lResult
@@ -179,7 +175,7 @@ Public Class atcTimeseriesMath
             .Editable = False
             .TypeString = "atcTimeseries"
             .Calculator = Me
-            .Category = Category
+            .Category = aCategory
         End With
         Dim lArguments As atcDataAttributes = New atcDataAttributes
         For Each lArg As atcAttributeDefinition In aArgs

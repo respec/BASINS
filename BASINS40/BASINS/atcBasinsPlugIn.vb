@@ -99,7 +99,7 @@ Public Class atcBasinsPlugIn
         AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
         AddMenuIfMissing(ProjectsMenuName, FileMenuName, ProjectsMenuString, "mnuRecentProjects")
 
-        AddMenuIfMissing(ComputeMenuName, "", ComputeMenuString, FileMenuName)
+        'AddMenuIfMissing(ComputeMenuName, "", ComputeMenuString, FileMenuName)
 
         AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
 
@@ -144,6 +144,7 @@ Public Class atcBasinsPlugIn
         'AddMenuIfMissing(AnalysisMenuName & "_ModelsSeparator", AnalysisMenuName, "-")
 
         RefreshAnalysisMenu()
+        RefreshComputeMenu()
 
         'load HSPF plugin (an integral part of BASINS)
         'g_MapWin.Plugins.StartPlugin("atcHSPF_PlugIn")
@@ -200,22 +201,6 @@ Public Class atcBasinsPlugIn
                 Else
                     DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
                 End If
-            Case ComputeMenuName
-                Dim lNotFiles As New ArrayList
-                Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
-                For Each ds As atcDataSource In lDataSources
-                    If ds.Category <> "File" AndAlso Not lNotFiles.Contains(ds.Category) Then
-                        lNotFiles.Add(ds.Category)
-                    End If
-                Next
-                Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lNotFiles, "Select a Computation")
-                If Not lNewSource Is Nothing Then 'user did not cancel
-                    pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
-                    'If Not lNewSource.DataSets Is Nothing AndAlso lNewSource.DataSets.Count > 0 Then
-                    'Dim lForm As New frmSelectDisplay
-                    'lForm.AskUser(pDataManager, lNewSource.DataSets)
-                    'End If
-                End If
             Case ManageDataMenuName
                 pDataManager.UserManage()
             Case RegisterMenuName
@@ -259,7 +244,40 @@ Public Class atcBasinsPlugIn
                     End Try
                 End If
             Case Else
-                If aItemName.StartsWith(AnalysisMenuName & "_") Then
+                If aItemName.StartsWith(ComputeMenuName & "_") Then
+                    Dim lNewSource As atcDataSource = Nothing
+                    Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
+                    For Each ds As atcDataSource In lDataSources
+                        If ds.Category <> "File" Then
+                            Dim lCategoryMenuName As String = ComputeMenuName & "_" & ds.Category
+                            Dim lOperations As atcDataAttributes = ds.AvailableOperations
+                            If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
+                                For Each lOperation As atcDefinedValue In lOperations
+                                    Select Case lOperation.Definition.TypeString
+                                        Case "atcTimeseries", "atcDataGroup"
+                                            'Operations might have categories to further divide them
+                                            If aItemName.Equals((lCategoryMenuName & "_" & lOperation.Definition.Name).Replace(" ", "")) OrElse _
+                                               aItemName.Equals((lCategoryMenuName & "_" & lOperation.Definition.Category & "_" & lOperation.Definition.Name).Replace(" ", "")) Then
+                                                lNewSource = ds.NewOne
+                                                lNewSource.Specification = lOperation.Definition.Name
+                                                Exit For
+                                            End If
+                                    End Select
+                                Next
+                            Else
+                                If aItemName.Equals(lCategoryMenuName & "_" & ds.Description) Then
+                                    lNewSource = ds.NewOne
+                                    Exit For
+                                End If
+                            End If
+                        End If
+                    Next
+                    If Not lNewSource Is Nothing Then
+                        If pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                            AskUserToDisplayGroup("Display Computed Data", lNewSource.DataSets)
+                        End If
+                    End If
+                ElseIf aItemName.StartsWith(AnalysisMenuName & "_") Then
                     aHandled = LaunchTool(aItemName.Substring(AnalysisMenuName.Length + 1))
                 ElseIf aItemName.StartsWith(ModelsMenuName & "_") Then
                     aHandled = LaunchTool(aItemName.Substring(ModelsMenuName.Length + 1))
@@ -271,6 +289,29 @@ Public Class atcBasinsPlugIn
                     aHandled = False 'Not our item to handle
                 End If
         End Select
+    End Sub
+
+    Friend Sub AskUserToDisplayGroup(ByVal aTitle As String, ByVal aGroup As atcDataGroup)
+        Dim lPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        If lPlugins.Count > 0 Then
+            Dim lDisplayNames As New ArrayList
+            'For Each lDisp As atcDataDisplay In lPlugins
+            '    If lDisp.Name.StartsWith("Analysis::") Then
+            '        lDisplayNames.Add(lDisp.Name.Substring(10))
+            '    End If
+            'Next
+            lDisplayNames.Add("Graph")
+            lDisplayNames.Add("List")
+            lDisplayNames.Add("Data Tree")
+            lDisplayNames.Add("Do not display")
+            Dim lForm As New frmButtons
+            Dim lSelectedDisplay As String = lForm.AskUser(aTitle, lDisplayNames)
+            Select Case lSelectedDisplay
+                Case "Cancel", "Do not display"
+                Case Else
+                    pDataManager.ShowDisplay("Analysis::" & lSelectedDisplay, aGroup)
+            End Select
+        End If
     End Sub
 
     Private Sub CheckForUpdates(ByVal aQuiet As Boolean)
@@ -659,25 +700,7 @@ Public Class atcBasinsPlugIn
                 End If
                 RefreshAnalysisMenu(lUnloading)
             End If
-            'ElseIf msg.StartsWith("COMMAND_LINE:broadcast:basins") Then
-            'COMMAND_LINE:broadcast:basins:script:c:\test\BASINS4\scripts\dummy.vb
-            'Logger.Dbg("BASINS:Message:" & msg)
-            'Dim s As String = msg.Substring(23)
-            'If s.Substring(7).StartsWith("script") Then
-            '  lScriptFileName = s.Substring(14)
-            '  ChDriveDir(PathNameOnly(lScriptFileName)) 'start where script is
-            '  RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, lErrors, "dataManager", "basinsplugin")
-            '  If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
-            '    Logger.Msg(lErrors, "Command Line Script Error", "OK")
-            '  End If
-            '  pCommandLineScript = True
-            'End If
-            'ElseIf msg.StartsWith("RUN_BASINS_SCRIPT:") Then
-            '  lScriptFileName = msg.Substring(18).Trim
-            '  RunBasinsScript(FileExt(lScriptFileName), lScriptFileName, lErrors, "dataManager", "basinsplugin")
-            '  If Not lErrors Is Nothing AndAlso lErrors.Length > 0 Then
-            '    Logger.Msg(lErrors, "Script Error")
-            '  End If
+            RefreshComputeMenu()
         Else
             Logger.Dbg("Ignore:" & msg)
         End If

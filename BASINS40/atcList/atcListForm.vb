@@ -195,7 +195,7 @@ Friend Class atcListForm
         Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
         For Each lDisp As atcDataDisplay In DisplayPlugins
             Dim lMenuText As String = lDisp.Name
-            If lMenuText.StartsWith("Tools::") Then lMenuText = lMenuText.Substring(7)
+            If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
             mnuAnalysis.MenuItems.Add(lMenuText, New EventHandler(AddressOf mnuAnalysis_Click))
         Next
 

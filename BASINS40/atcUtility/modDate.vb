@@ -685,11 +685,11 @@ Public Module modDate
         End If
     End Sub
 
-    Public Function RoundToSecond(ByVal aDate As Double) As Double
-        Dim lNumDays As Double = Math.Truncate(aDate)
-        Dim lNumSeconds As Double = Math.Round((aDate - lNumDays) * SecondsPerDay)
-        Return lNumDays + lNumSeconds / SecondsPerDay
-    End Function
+    'Public Function RoundToSecond(ByVal aDate As Double) As Double
+    '    Dim lNumDays As Double = Math.Truncate(aDate)
+    '    Dim lNumSeconds As Double = Math.Round((aDate - lNumDays) * SecondsPerDay)
+    '    Return lNumDays + lNumSeconds / SecondsPerDay
+    'End Function
 
     Public Function TimAddJ(ByVal jStartDate As Double, _
                             ByVal TCODE As Integer, _

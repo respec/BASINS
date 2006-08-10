@@ -8,6 +8,7 @@ Public Class frmGraphEdit
     Private pPane As GraphPane
     Private pCurveParent As TreeNode
 
+    <CLSCompliant(False)> _
     Public Sub Initialize(ByVal aPane As GraphPane)
         pPane = aPane
 
