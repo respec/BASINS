@@ -162,6 +162,7 @@ Public Class frmSpecifyComputation
             Case "Description" : lblDescription.Text = aDefVal.Value
             Case Else
                 If aDefVal.Definition.Editable Then
+                    Dim g As System.Drawing.Graphics = Me.CreateGraphics
                     Dim iArg As Integer = pArgLabel.GetUpperBound(0)
                     iArg += 1
 
@@ -178,6 +179,7 @@ Public Class frmSpecifyComputation
                         End If
                         .Left = lblDescription.Left
                         .Text = aDefVal.Definition.Name
+                        .Width = Math.Max(.Width, g.MeasureString(.Text, .Font).Width + 10)
                     End With
                     Controls.Add(pArgLabel(iArg))
 
