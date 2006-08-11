@@ -245,6 +245,7 @@ Public Class atcBasinsPlugIn
                 End If
             Case Else
                 If aItemName.StartsWith(ComputeMenuName & "_") Then
+                    aItemName = aItemName.Replace(" ", "")
                     Dim lNewSource As atcDataSource = Nothing
                     Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
                     For Each ds As atcDataSource In lDataSources

@@ -272,12 +272,12 @@ Friend Module modBasinsPlugin
         For Each ds As atcDataSource In lDataSources
             If ds.Category <> "File" Then
                 Dim lCategoryMenuName As String = ComputeMenuName & "_" & ds.Category
-                Dim lCategoryMenu As MapWindow.Interfaces.MenuItem = AddMenuIfMissing(lCategoryMenuName, ComputeMenuName, ds.Category)
                 Dim lOperations As atcDataAttributes = ds.AvailableOperations
                 If Not lOperations Is Nothing AndAlso lOperations.Count > 0 Then
                     For Each lOperation As atcDefinedValue In lOperations
                         Select Case lOperation.Definition.TypeString
                             Case "atcTimeseries", "atcDataGroup"
+                                AddMenuIfMissing(lCategoryMenuName, ComputeMenuName, ds.Category)
                                 'Operations might have categories to further divide them
                                 If lOperation.Definition.Category.Length > 0 Then
                                     Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category

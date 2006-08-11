@@ -1,5 +1,6 @@
 Imports atcdata
 Imports atcUtility
+Imports MapWinUtility
 
 Imports System.Reflection
 
@@ -69,7 +70,8 @@ Public Class atcMetCmpPlugin
                 End If
             Case "Cloud Cover from Solar"
                 If aArgs Is Nothing Then
-                    'NOTE: Add interface to this some time???
+                    'TODO: Add interface to Cloud Cover from Solar
+                    Logger.Msg("No user interface available for <Cloud Cover from Solar>.  Use a script for now", "Cloud Cover from Solar")
                     'Dim lForm As New frmCmpSol
                     'lOk = lForm.AskUser(DataManager, lCldTSer, lLatitude)
                 Else
@@ -276,6 +278,8 @@ Public Class atcMetCmpPlugin
                 Dim lDewPTSer As atcTimeseries = Nothing
                 Dim lATmpTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
+                    'TODO: Add interface to Dewpoint Disaggregation
+                    Logger.Msg("No user interface available for <Dewpoint Disaggration>.  Use a script for now", "Dewpoint Disaggration")
                     '          Dim lForm As New frmDisTemp
                     '         lOk = lForm.AskUser(DataManager, lTMinTSer, lTMaxTSer, lObsTime)
                 Else
