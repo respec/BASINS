@@ -703,13 +703,22 @@ ErrorWriting:
     ''' <returns>contents of specified file</returns>
     ''' <remarks>Timeout is desirable in cases where the file might not yet be closed properly but it will be soon</remarks>
     Public Function WholeFileString(ByVal aFilename As String, Optional ByVal aTimeoutMilliseconds As Integer = 1000) As String
-        Dim TryUntil As Date = Now.AddMilliseconds(aTimeoutMilliseconds)
+        Dim lTryUntil As Date = Now.AddMilliseconds(aTimeoutMilliseconds)
+        Dim lInFile As Integer
+        Dim lFileLength As Integer
+
         WholeFileString = ""
+        lInFile = FreeFile()
 TryAgain:
         Try
-            WholeFileString = IO.File.ReadAllText(aFilename)
+            'IO.File.ReadAllText cannot read an open for writing file(like the logger)
+            'WholeFileString = IO.File.ReadAllText(aFilename)
+            FileOpen(lInFile, aFilename, OpenMode.Input, OpenAccess.Read, OpenShare.Shared)
+            lFileLength = LOF(lInFile)
+            WholeFileString = InputString(lInFile, lFileLength)
+            FileClose(lInFile)
         Catch ex As Exception
-            If Now > TryUntil Then
+            If Now > lTryUntil Then
                 Logger.Msg("Error reading '" & aFilename & "'" & vbCr & vbCr & ex.Message, "WholeFileString - " & ex.GetType.Name)
                 Return ""
             Else
