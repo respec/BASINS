@@ -418,7 +418,8 @@ Friend Module modBasinsPlugin
         lFeedback &= "LogFile: " & Logger.FileName & vbCrLf
         If IO.File.Exists(Logger.FileName) Then
             Try
-                lFeedback &= IO.File.ReadAllText(Logger.FileName) & vbCrLf
+                'lFeedback &= IO.File.ReadAllText(Logger.FileName) & vbCrLf
+                lFeedback &= WholeFileString(Logger.FileName) & vbCrLf
             Catch e As Exception
                 lFeedback &= vbCrLf & "Logger file read failed, exception message:" & _
                              vbCrLf & e.ToString & vbCrLf & vbCrLf
