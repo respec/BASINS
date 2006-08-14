@@ -94,6 +94,7 @@
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Name>atcUtility</Name>
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
