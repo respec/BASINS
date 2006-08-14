@@ -1,5 +1,6 @@
 Imports atcUtility
 Imports MapWinUtility
+Imports Microsoft.VisualBasic
 
 ''' <remarks>Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
 ''' <summary>GIS Utilities implemented thru MapWindow</summary>
@@ -1144,6 +1145,7 @@ Public Class GisUtil
                 If lCurrentDisplay > lLastdisplayed Then
                     lLastdisplayed = lCurrentDisplay
                     GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
+                    System.Windows.Forms.Application.DoEvents()
                 End If
             Next lCol
         Next lRow
@@ -1502,6 +1504,7 @@ Public Class GisUtil
             If lCurrentDisplay > lLastDisplayed Then
                 lLastDisplayed = lCurrentDisplay
                 GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
+                System.Windows.Forms.Application.DoEvents()
             End If
         Next i
         GetMappingObject.StatusBar.ShowProgressBar = False

@@ -439,6 +439,7 @@ Public Class frmReclass
             If pSubbasinsLayer <> "<none>" Then
                 'do overlay
 
+                System.Windows.Forms.Application.DoEvents()
                 GisUtil.Overlay(cluTiles(j), LandUseFieldName, pSubbasinsLayer, pSubbasinsIDFieldName, _
                             PathName & "\overlay.shp", True)
 
@@ -493,6 +494,7 @@ Public Class frmReclass
                             End If
                         Next
                         If Not inlist Then
+                            System.Windows.Forms.Application.DoEvents()
                             AtcGridLanduse.Source.Rows = AtcGridLanduse.Source.Rows + 1
                             AtcGridLanduse.Source.CellValue(AtcGridLanduse.Source.Rows - 1, 0) = lucode
                             AtcGridLanduse.Source.CellValue(AtcGridLanduse.Source.Rows - 1, 1) = desc
