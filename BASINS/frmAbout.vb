@@ -207,7 +207,7 @@ Friend Class frmAbout
         Me.lblBasinsVersion.Name = "lblBasinsVersion"
         Me.lblBasinsVersion.Size = New System.Drawing.Size(211, 18)
         Me.lblBasinsVersion.TabIndex = 20
-        Me.lblBasinsVersion.Text = "Version 4.0 Beta 2006-05-26"
+        Me.lblBasinsVersion.Text = "Version 4.0"
         '
         'lblBasinsURL
         '
@@ -344,6 +344,7 @@ Friend Class frmAbout
     Public Sub ShowAbout()
         Try
             Me.Icon = g_MapWin.ApplicationInfo.FormIcon
+            lblBasinsVersion.Text = "Version Dated:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
             lblMapwinVersion.Text = "Version:  " & System.Reflection.Assembly.GetEntryAssembly.GetName.Version.ToString
             lblProjFile.Text = g_MapWin.Project.FileName
             lblConfigFile.Text = g_MapWin.Project.ConfigFileName
