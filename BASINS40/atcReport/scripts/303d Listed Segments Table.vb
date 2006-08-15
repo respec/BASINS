@@ -54,6 +54,7 @@ Public Module ListedSegmentsTable
             'loop through each selected polygon and each 303d feature looking for overlap
             For j = 1 To aSelectedAreaIndexes.Count
                 For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
+                    System.Windows.Forms.Application.DoEvents()
                     If GisUtil.LineInPolygon(lImpairedLayerIndex, i, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
                         'these overlap
                         lGridSource.Rows = lGridSource.Rows + 1
@@ -92,6 +93,7 @@ Public Module ListedSegmentsTable
             'loop through each selected polygon and each 303d feature looking for overlap
             For j = 1 To aSelectedAreaIndexes.Count
                 For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
+                    System.Windows.Forms.Application.DoEvents()
                     If GisUtil.OverlappingPolygons(lImpairedLayerIndex, i - 1, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
                         'these overlap
                         lGridSource.Rows = lGridSource.Rows + 1

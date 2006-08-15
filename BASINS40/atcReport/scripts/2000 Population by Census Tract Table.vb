@@ -54,6 +54,7 @@ Public Module Population2000Table
                 'loop through each selected polygon and each census tract looking for overlap
                 For j = 1 To aSelectedAreaIndexes.Count
                     For i = 1 To GisUtil.NumFeatures(lTractLayerIndex)
+                        System.Windows.Forms.Application.DoEvents()
                         If GisUtil.OverlappingPolygons(lTractLayerIndex, i - 1, aAreaLayerIndex, aSelectedAreaIndexes(j)) Then
                             'these overlap
                             lGridSource.Rows = lGridSource.Rows + 1

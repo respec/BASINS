@@ -122,9 +122,10 @@ Public Class PlugIn
                 Dim lAllFiles As New NameValueCollection
                 AddFilesInDir(lAllFiles, pReportsDir, True, "*.vb")
                 pReports = New Collection
-                For Each lReport As String In lAllFiles
-                    pReports.Add(lReport)
-                Next lReport
+                Dim i As Integer
+                For i = 0 To lAllFiles.Count - 1
+                    pReports.Add(lAllFiles(i))
+                Next i
             End If
             Return pReports
         End Get
