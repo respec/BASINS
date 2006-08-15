@@ -143,12 +143,8 @@
     <Compile Include="scripts\303d Listed Segments Table.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="scripts\GIRAS Landuse Table.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="scripts\NLCD Landuse Table.vb">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="scripts\GIRAS Landuse Table in Acres.vb" />
+    <Compile Include="scripts\NLCD Landuse Table in Acres.vb" />
     <Compile Include="scripts\Permitted Point Source Facilities Table.vb">
       <SubType>Code</SubType>
     </Compile>

@@ -66,6 +66,7 @@ Public Module PCSFacilityTable
                 'loop through each selected polygon and pcs point looking for overlap
                 For i = 1 To GisUtil.NumFeatures(lPCSLayerIndex)
                     lPolygonIndex = GisUtil.PointInPolygon(lPCSLayerIndex, i, aAreaLayerIndex)
+                    System.Windows.Forms.Application.DoEvents()
                     If lPolygonIndex > -1 Then
                         For j = 1 To aSelectedAreaIndexes.Count
                             If aSelectedAreaIndexes(j) = lPolygonIndex Then
