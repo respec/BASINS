@@ -1108,7 +1108,10 @@ TryAgain:
             If IO.File.Exists(aFilename) Then
                 Kill(aFilename)
             Else
-                IO.Directory.CreateDirectory((IO.Path.GetDirectoryName(aFilename)))
+                Dim lPath As String = IO.Path.GetDirectoryName(aFilename)
+                If lPath.Length > 0 Then
+                    IO.Directory.CreateDirectory(lPath)
+                End If
             End If
 
             OutFile = FreeFile()
