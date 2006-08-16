@@ -6,7 +6,7 @@ Public Class PlugIn
     Public pMapWin As MapWindow.Interfaces.IMapWin
 
     Private Const ParentMenuName As String = "BasinsAnalysis"
-    Private Const ParentMenuString As String = "&Analysis"
+    Private Const ParentMenuString As String = "Analysis"
 
     Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
         Get
@@ -48,10 +48,10 @@ Public Class PlugIn
         pMapWin = MapWin
 
         pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
-        pMapWin.Menus.AddMenu(ParentMenuName & "_Projection", ParentMenuName, Nothing, "&Projection Parameters")
-        pMapWin.Menus.AddMenu(ParentMenuName & "_Storet", ParentMenuName, Nothing, "STORET &Agency Codes")
-        pMapWin.Menus.AddMenu(ParentMenuName & "_Sic", ParentMenuName, Nothing, "Standard &Industrial Classification Codes")
-        pMapWin.Menus.AddMenu(ParentMenuName & "_WQ", ParentMenuName, Nothing, "304a &Water Quality Criteria")
+        pMapWin.Menus.AddMenu(ParentMenuName & "_Projection", ParentMenuName, Nothing, "Projection Parameters")
+        pMapWin.Menus.AddMenu(ParentMenuName & "_Storet", ParentMenuName, Nothing, "STORET Agency Codes")
+        pMapWin.Menus.AddMenu(ParentMenuName & "_Sic", ParentMenuName, Nothing, "Standard Industrial Classification Codes")
+        pMapWin.Menus.AddMenu(ParentMenuName & "_WQ", ParentMenuName, Nothing, "Water Quality Criteria 304a")
         pMapWin.Menus.AddMenu(ParentMenuName & "_LookupSeparator", ParentMenuName, Nothing, "-")
 
     End Sub

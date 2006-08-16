@@ -233,7 +233,7 @@ Friend Module modBasinsPlugin
         If pLoadedDataMenu Then
             AddMenuIfMissing(AnalysisMenuName, "", AnalysisMenuString, FileMenuName)
             'AddMenuIfMissing(AnalysisMenuName & "_TestDBF", AnalysisMenuName, "Test DBF")
-            AddMenuIfMissing(AnalysisMenuName & "_ArcView3", AnalysisMenuName, "ArcView &3")
+            AddMenuIfMissing(AnalysisMenuName & "_ArcView3", AnalysisMenuName, "ArcView 3")
             AddMenuIfMissing(AnalysisMenuName & "_ArcGIS", AnalysisMenuName, "ArcGIS")
             AddMenuIfMissing(AnalysisMenuName & "_GenScn", AnalysisMenuName, "GenScn")
             AddMenuIfMissing(AnalysisMenuName & "_WDMUtil", AnalysisMenuName, "WDMUtil")

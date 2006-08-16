@@ -6,7 +6,7 @@ Public Class PlugIn
     Private pMapWin As MapWindow.Interfaces.IMapWin
 
     Private Const ParentMenuName As String = "BasinsAnalysis"
-    Private Const ParentMenuString As String = "&Analysis"
+    Private Const ParentMenuString As String = "Analysis"
 
     Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
         Get
@@ -48,7 +48,7 @@ Public Class PlugIn
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
         pMapWin = MapWin
         pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
-        pMapWin.Menus.AddMenu(ParentMenuName & "_LandUse", ParentMenuName, Nothing, "&Reclassify Land Use")
+        pMapWin.Menus.AddMenu(ParentMenuName & "_LandUse", ParentMenuName, Nothing, "Reclassify Land Use")
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
