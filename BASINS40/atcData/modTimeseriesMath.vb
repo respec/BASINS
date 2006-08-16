@@ -404,15 +404,15 @@ Public Module modTimeseriesMath
                 With lNewTSer.Dates 'find missing length
                     lMissingLength = .Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing)
                 End With
-                Logger.Dbg("FillMissingByInterp:Missing:", lInd, lIndPrevNotMissing, lIndNextNotMissing, lMissingLength)
+                'Logger.Dbg("FillMissingByInterp:Missing:", lInd, lIndPrevNotMissing, lIndNextNotMissing, lMissingLength)
                 If Double.IsNaN(aMaxFillLength) OrElse lMissingLength < aMaxFillLength Then
                     With lNewTSer
                         If Double.IsNaN(.Values(lIndPrevNotMissing)) Then 'missing at start, use first good value
                             .Values(lInd) = .Values(lIndNextNotMissing)
-                            Logger.Dbg("FillMissingByInterp:UseFirstNotMissing:" & .Values(lInd))
+                            'Logger.Dbg("FillMissingByInterp:UseFirstNotMissing:" & .Values(lInd))
                         ElseIf Double.IsNaN(.Values(lIndNextNotMissing)) Then 'missing at end, use last good value
                             .Values(lInd) = .Values(lIndPrevNotMissing)
-                            Logger.Dbg("FillMissingByInterp:UseLastNotMissing:" & .Values(lInd))
+                            'Logger.Dbg("FillMissingByInterp:UseLastNotMissing:" & .Values(lInd))
                         Else 'values prev and next, interpolate
                             Dim lFracMissing As Double
                             With .Dates
@@ -421,7 +421,7 @@ Public Module modTimeseriesMath
                             End With
                             Dim lIncValue As Double = lFracMissing * (.Values(lIndNextNotMissing) - .Values(lIndPrevNotMissing))
                             .Values(lInd) = .Values(lIndPrevNotMissing) + lIncValue
-                            Logger.Dbg("FillMissingByInterp:Interp:" & .Values(lInd) & ":" & lFracMissing & ":" & lIncValue)
+                            'Logger.Dbg("FillMissingByInterp:Interp:" & .Values(lInd) & ":" & lFracMissing & ":" & lIncValue)
                         End If
                     End With
                 End If
