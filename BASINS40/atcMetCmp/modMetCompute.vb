@@ -107,13 +107,17 @@ Public Module modMetCompute
         Array.Copy(aCldTSer.Values, 1, CldCov, 1, aCldTSer.numValues)
 
         For i = 1 To lCmpTs.numValues
-            If CldCov(i) <= 0.0# Then CldCov(i) = 0.000001
-            If lPoint Then
-                Call J2Date(aCldTSer.Dates.Value(i), ldate)
+            If Not Double.IsNaN(CldCov(i)) Then
+                If CldCov(i) <= 0.0# Then CldCov(i) = 0.000001
+                If lPoint Then
+                    Call J2Date(aCldTSer.Dates.Value(i), ldate)
+                Else
+                    Call J2Date(aCldTSer.Dates.Value(i - 1), ldate)
+                End If
+                Call RadClc(aLatDeg, CldCov(i), ldate(1), ldate(2), SolRad(i))
             Else
-                Call J2Date(aCldTSer.Dates.Value(i - 1), ldate)
+                SolRad(i) = Double.NaN
             End If
-            Call RadClc(aLatDeg, CldCov(i), ldate(1), ldate(2), SolRad(i))
         Next i
         Array.Copy(SolRad, 1, lCmpTs.Values, 1, lCmpTs.numValues)
 
@@ -296,7 +300,7 @@ Public Module modMetCompute
         lCmpTs.Attributes.Add("TMIN", aTMinTS.ToString)
         lCmpTs.Attributes.Add("TMAX", aTMaxTS.ToString)
         lCmpTs.Attributes.Add("Degrees F", aDegF)
-        lCmpTs.Attributes.Add("Latitude", aLatDeg)
+        lCmpTs.Attributes.Add("LATDEG", aLatDeg)
         Dim ls As String = "("
         For i = 1 To 12
             ls &= aCTS(i) & ", "
@@ -606,19 +610,25 @@ Public Module modMetCompute
         Dim lOutTs(lDisTs.numValues) As Double
         lHrPos = 0
         For i = 1 To aInTs.numValues
-            If lPoint Then
-                Call J2Date(aInTs.Dates.Value(i), lDate)
+            If Not Double.IsNaN(aInTs.Value(i)) Then
+                If lPoint Then
+                    Call J2Date(aInTs.Dates.Value(i), lDate)
+                Else
+                    Call J2Date(aInTs.Dates.Value(i - 1), lDate)
+                End If
+                If aDisOpt = 1 Then 'solar
+                    Call RADDST(aLatDeg, lDate(1), lDate(2), aInTs.Value(i), lHrVals, retcod)
+                ElseIf aDisOpt = 2 Then  'pet
+                    Call PETDST(aLatDeg, lDate(1), lDate(2), aInTs.Value(i), lHrVals, retcod)
+                End If
+                For j = 1 To 24
+                    lOutTs(lHrPos + j) = lHrVals(j)
+                Next j
             Else
-                Call J2Date(aInTs.Dates.Value(i - 1), lDate)
+                For j = 1 To 24
+                    lOutTs(lHrPos + j) = Double.NaN
+                Next j
             End If
-            If aDisOpt = 1 Then 'solar
-                Call RADDST(aLatDeg, lDate(1), lDate(2), aInTs.Value(i), lHrVals, retcod)
-            ElseIf aDisOpt = 2 Then  'pet
-                Call PETDST(aLatDeg, lDate(1), lDate(2), aInTs.Value(i), lHrVals, retcod)
-            End If
-            For j = 1 To 24
-                lOutTs(lHrPos + j) = lHrVals(j)
-            Next j
             'increment to next 24 hour period
             lHrPos = lHrPos + 24
         Next i
@@ -738,25 +748,40 @@ Public Module modMetCompute
     End Function
 
     Private Function DisaggDates(ByVal aInTS As atcTimeseries, ByVal aDataSource As atcDataSource) As atcTimeseries
-        'build new date array for hourly TSer based on daily TSer (aInTS)
-        Dim lHrInc As Double = 1 / 24
-        Dim lJDay As Double
-        Dim lPoint As Boolean = aInTS.Attributes.GetValue("point", False)
+        'build new date timeseries class for hourly TSer based on daily TSer (aInTS)
 
         Dim lDates As New atcTimeseries(aDataSource)
-        lDates.numValues = aInTS.numValues * 24
-        lJDay = aInTS.Attributes.GetValue("SJDAY")
-        If lPoint Then
-            lDates.Value(0) = Double.NaN
-        Else
-            lDates.Value(0) = lJDay
-            lJDay += lHrInc
-        End If
-        For i As Integer = 1 To lDates.numValues
-            lDates.Value(i) = lJDay
-            lJDay += lHrInc
-        Next i
+        'lDates.numValues = aInTS.numValues * 24
+        lDates.ValuesNeedToBeRead = True
+        lDates.Values = NewDates(aInTS, atcTimeUnit.TUHour, 1)
         Return lDates
+
+        ''NOTE: Only valid for constant interval timeseries
+        'Dim lPoint As Boolean = aInTS.Attributes.GetValue("point", False)
+
+        'If lPoint Then
+        '    'lDates.Value(ip) = Double.NaN
+        '    Return Nothing
+        'Else
+        '    Dim lJDay As Double
+        '    Dim lDates As New atcTimeseries(aDataSource)
+        '    lDates.numValues = aInTS.numValues * 24
+        '    lJDay = aInTS.Attributes.GetValue("SJDAY")
+        '    Dim ip As Integer = 0
+        '    lDates.Value(ip) = lJDay
+        '    'lJDay += lHrInc
+        '    For i As Integer = 0 To aInTS.numValues - 1
+        '        For j As Integer = 1 To 24
+        '            ip += 1
+        '            lDates.Value(ip) = aInTS.Dates.Value(i) + j * JulianHour
+        '        Next
+        '    Next
+        '    Return lDates
+        'End If
+        ''For i As Integer = 1 To lDates.numValues
+        ''    lDates.Value(i) = lJDay
+        ''    lJDay += lHrInc
+        ''Next i
     End Function
     'Public Function DisDwpnt(ByRef InTs As Collection) As atcData.ATCclsTserData
     '  'Disaggregate dewpoint temperature from daily to hourly
