@@ -708,6 +708,9 @@ StartOver:
                 End Select
             End If
             If LayerName = "" Then LayerName = FilenameOnly(aFilename)
+            If LayerName = "National Elevation Dataset" Or LayerName = "DEM Elevation Model" Then
+                LayerName &= " (" & FilenameOnly(aFilename) & ")"
+            End If
 
             g_MapWin.StatusBar.Item(1).Text = "Opening " & aFilename
             g = New MapWinGIS.Grid
