@@ -101,10 +101,9 @@ Public Class atcBasinsPlugIn
 
         'AddMenuIfMissing(ComputeMenuName, "", ComputeMenuString, FileMenuName)
 
-        AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
-
         Dim mnu As MapWindow.Interfaces.MenuItem
 
+        AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
         mnu = AddMenuIfMissing(BasinsHelpMenuName, "mnuHelp", BasinsHelpMenuString, "")
         mnu = AddMenuIfMissing(BasinsWebPageMenuName, "mnuHelp", BasinsWebPageMenuString, "")
         AddMenuIfMissing("BasinsHelp_Separator2", "mnuHelp", "-")
@@ -130,15 +129,15 @@ Public Class atcBasinsPlugIn
         pLoadedDataMenu = True
 
         AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, FileMenuName)
-        'mnu = AddMenuIfMissing(ModelsMenuName & "_HSPF", ModelsMenuName, "&HSPF")
+        'mnu = AddMenuIfMissing(ModelsMenuName & "_HSPF", ModelsMenuName, "HSPF")
         'mnu.Tooltip = "Hydrological Simulation Program - Fortran"
-        mnu = AddMenuIfMissing(ModelsMenuName & "_SWAT", ModelsMenuName, "&SWAT")
+        mnu = AddMenuIfMissing(ModelsMenuName & "_SWAT", ModelsMenuName, "SWAT")
         mnu.Tooltip = "SWAT"
         mnu.Enabled = False
-        mnu = AddMenuIfMissing(ModelsMenuName & "_PLOAD", ModelsMenuName, "&PLOAD")
+        mnu = AddMenuIfMissing(ModelsMenuName & "_PLOAD", ModelsMenuName, "PLOAD")
         mnu.Tooltip = "PLOAD"
         mnu.Enabled = False
-        mnu = AddMenuIfMissing(ModelsMenuName & "_AGWA", ModelsMenuName, "&AGWA")
+        mnu = AddMenuIfMissing(ModelsMenuName & "_AGWA", ModelsMenuName, "AGWA")
         mnu.Tooltip = "AGWA"
         mnu.Enabled = False
         'AddMenuIfMissing(AnalysisMenuName & "_ModelsSeparator", AnalysisMenuName, "-")
@@ -161,22 +160,35 @@ Public Class atcBasinsPlugIn
 
         g_MapWin.Menus.Remove(DataMenuName)
         pLoadedDataMenu = False
+
         g_MapWin.Menus.Remove(AnalysisMenuName) 'TODO: don't unload if another plugin is still using it
-        g_MapWin.Menus.Remove(ModelsMenuName)   'TODO: don't unload if another plugin is still using it
-        g_MapWin.Menus.Remove(ProjectsMenuName)
+
+        g_MapWin.Menus.Remove(ModelsMenuName & "_SWAT")
+        g_MapWin.Menus.Remove(ModelsMenuName & "_PLOAD")
+        g_MapWin.Menus.Remove(ModelsMenuName & "_AGWA")
+        If g_MapWin.Menus.Item(ModelsMenuName).NumSubItems = 0 Then
+            g_MapWin.Menus.Remove(ModelsMenuName)
+        End If
+
         g_MapWin.Menus.Remove(NewDataMenuName)
         g_MapWin.Menus.Remove(OpenDataMenuName)
+        g_MapWin.Menus.Remove(DownloadMenuName)
+        g_MapWin.Menus.Remove(ManageDataMenuName)
         g_MapWin.Menus.Remove(SaveDataMenuName)
+        g_MapWin.Menus.Remove(ProjectsMenuName)
+
         g_MapWin.Menus.Remove(ComputeMenuName)
 
         g_MapWin.Menus.Remove("BasinsHelp_Separator1")
+        g_MapWin.Menus.Remove(BasinsHelpMenuName)
+        g_MapWin.Menus.Remove(BasinsWebPageMenuName)
+        g_MapWin.Menus.Remove("BasinsHelp_Separator2")
         g_MapWin.Menus.Remove(RegisterMenuName)
         g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
-        g_MapWin.Menus.Remove("BasinsHelp_Separator2")
-        g_MapWin.Menus.Remove(BasinsWebPageMenuName)
         g_MapWin.Menus.Remove(SendFeedbackMenuName)
 
         g_MapWin.ApplicationInfo.WelcomePlugin = "WelcomeScreen"
+        g_MapWin.ClearCustomWindowTitle()
 
         'LogStopMonitor()
     End Sub
@@ -434,9 +446,9 @@ Public Class atcBasinsPlugIn
         Select Case aToolName
             Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
             Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
-            Case "HSPF"
+                'Case "HSPF"
                 'If g_MapWin.Plugins.PluginIsLoaded("atcModelSetup_PlugIn") Then 'defer to other plugin
-                Return False
+                'Return False
                 'End If
                 'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
             Case Else
@@ -743,4 +755,5 @@ Public Class atcBasinsPlugIn
             UpdateSelectedFeatures()
         End If
     End Sub
+
 End Class

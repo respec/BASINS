@@ -18,7 +18,7 @@ Friend Module modBasinsPlugin
     Friend pBuiltInScriptExists As Boolean = False
 
     'Private Const NewProjectMenuName As String = "BasinsNewProject"
-    'Private Const NewProjectMenuString As String = "&New Project"
+    'Private Const NewProjectMenuString As String = "New Project"
 
     'File menu -- created by MapWindow
     Friend Const FileMenuName As String = "mnuFile"
@@ -33,30 +33,30 @@ Friend Module modBasinsPlugin
     Friend Const OpenDataMenuString As String = "Open Data"
 
     Friend Const DownloadMenuName As String = "BasinsDownloadData"
-    Friend Const DownloadMenuString As String = "&Download Data"
+    Friend Const DownloadMenuString As String = "Download Data"
 
     Friend Const ManageDataMenuName As String = "BasinsManageData"
-    Friend Const ManageDataMenuString As String = "&Manage Data"
+    Friend Const ManageDataMenuString As String = "Manage Data"
 
     Friend Const SaveDataMenuName As String = "BasinsSaveData"
     Friend Const SaveDataMenuString As String = "Save Data In..."
 
     Friend Const AnalysisMenuName As String = "BasinsAnalysis"
-    Friend Const AnalysisMenuString As String = "&Analysis"
+    Friend Const AnalysisMenuString As String = "Analysis"
 
     Friend Const ModelsMenuName As String = "BasinsModels"
-    Friend Const ModelsMenuString As String = "&Models"
+    Friend Const ModelsMenuString As String = "Models"
 
     Friend Const ComputeMenuName As String = "BasinsCompute"
-    Friend Const ComputeMenuString As String = "&Compute"
+    Friend Const ComputeMenuString As String = "Compute"
 
     Friend pWelcomeScreenShow As Boolean = False
 
     Friend Const RegisterMenuName As String = "RegisterBASINS"
-    Friend Const RegisterMenuString As String = "&Register as a BASINS user"
+    Friend Const RegisterMenuString As String = "Register as a BASINS user"
 
     Friend Const CheckForUpdatesMenuName As String = "CheckForUpdates"
-    Friend Const CheckForUpdatesMenuString As String = "&Check For Updates"
+    Friend Const CheckForUpdatesMenuString As String = "Check For Updates"
 
     Friend Const BasinsHelpMenuName As String = "BasinsHelp"
     Friend Const BasinsHelpMenuString As String = "BASINS Documentation"
@@ -68,7 +68,7 @@ Friend Module modBasinsPlugin
     Friend Const SendFeedbackMenuString As String = "Send &Feedback"
 
     Friend Const DataMenuName As String = "BasinsData"
-    Friend Const DataMenuString As String = "&Data"
+    Friend Const DataMenuString As String = "Data"
     Friend pLoadedDataMenu As Boolean = False
 
     Private Const BasinsDataPath As String = "\Basins\data\"
@@ -214,7 +214,8 @@ Friend Module modBasinsPlugin
     Friend Function AddMenuIfMissing(ByVal aMenuName As String, _
                                         ByVal aParent As String, _
                                         ByVal aMenuText As String, _
-                               Optional ByVal aAfter As String = "") As MapWindow.Interfaces.MenuItem
+                               Optional ByVal aAfter As String = "") _
+                               As MapWindow.Interfaces.MenuItem
 
         Dim lMenus As MapWindow.Interfaces.Menus = g_MapWin.Menus
         With lMenus
@@ -233,9 +234,9 @@ Friend Module modBasinsPlugin
             AddMenuIfMissing(AnalysisMenuName, "", AnalysisMenuString, FileMenuName)
             'AddMenuIfMissing(AnalysisMenuName & "_TestDBF", AnalysisMenuName, "Test DBF")
             AddMenuIfMissing(AnalysisMenuName & "_ArcView3", AnalysisMenuName, "ArcView &3")
-            AddMenuIfMissing(AnalysisMenuName & "_ArcGIS", AnalysisMenuName, "&ArcGIS")
-            AddMenuIfMissing(AnalysisMenuName & "_GenScn", AnalysisMenuName, "&GenScn")
-            AddMenuIfMissing(AnalysisMenuName & "_WDMUtil", AnalysisMenuName, "&WDMUtil")
+            AddMenuIfMissing(AnalysisMenuName & "_ArcGIS", AnalysisMenuName, "ArcGIS")
+            AddMenuIfMissing(AnalysisMenuName & "_GenScn", AnalysisMenuName, "GenScn")
+            AddMenuIfMissing(AnalysisMenuName & "_WDMUtil", AnalysisMenuName, "WDMUtil")
             'AddMenuIfMissing(lScriptMenuName, AnalysisMenuName, "Scripting")
             'If pBuiltInScriptExists Then
             '  AddMenuIfMissing(AnalysisMenuName & "_RunBuiltInScript", lScriptMenuName, "Run Built In Script")

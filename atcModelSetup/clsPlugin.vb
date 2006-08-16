@@ -7,7 +7,7 @@ Public Class PlugIn
 
     'TODO: get these from BASINS4 or plugInManager?
     Private Const ModelsMenuName As String = "BasinsModels"
-    Private Const ModelsMenuString As String = "&Models"
+    Private Const ModelsMenuString As String = "Models"
 
     Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
         Get
@@ -52,21 +52,20 @@ Public Class PlugIn
         pMapWin = MapWin
 
         If Not pMapWin.Plugins.PluginIsLoaded(pMapWin.Plugins.GetPluginKey("BASINS 4")) Then
-            'pMapWin.Menus.AddMenu(ModelsMenuName, "", Nothing, ModelsMenuString, ToolsMenuName)
             pMapWin.Menus.AddMenu(ModelsMenuName, "", Nothing, ModelsMenuString, "mnuFile")
         End If
-        mnu = pMapWin.Menus.AddMenu(ModelsMenuName & "_HSPF", ModelsMenuName, Nothing, "&HSPF")
-        mnu = pMapWin.Menus.AddMenu(ModelsMenuName & "_AQUATOX", ModelsMenuName, Nothing, "&AQUATOX")
+        mnu = pMapWin.Menus.AddMenu(ModelsMenuName & "_HSPF", ModelsMenuName, Nothing, "HSPF")
+        mnu = pMapWin.Menus.AddMenu(ModelsMenuName & "_AQUATOX", ModelsMenuName, Nothing, "AQUATOX")
 
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
         'Remove the custom menus that this plugin added
-        If Not pMapWin.Plugins.PluginIsLoaded(pMapWin.Plugins.GetPluginKey("BASINS 4")) Then
-            pMapWin.Menus.Remove(ModelsMenuName)
-        End If
         pMapWin.Menus.Remove(ModelsMenuName & "_HSPF")
         pMapWin.Menus.Remove(ModelsMenuName & "_AQUATOX")
+        If pMapWin.Menus.Item(ModelsMenuName).NumSubItems = 0 Then
+            pMapWin.Menus.Remove(ModelsMenuName)
+        End If
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
