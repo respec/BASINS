@@ -80,7 +80,7 @@ Public Class frmCmpHPET
     Friend WithEvents txtNov As System.Windows.Forms.TextBox
     Friend WithEvents txtDec As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCmpHPET))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCmpHPET))
         Me.lblCloudCover = New System.Windows.Forms.Label
         Me.lblLatitude = New System.Windows.Forms.Label
         Me.txtLatitude = New System.Windows.Forms.TextBox
@@ -145,7 +145,6 @@ Public Class frmCmpHPET
         Me.txtLatitude.Name = "txtLatitude"
         Me.txtLatitude.Size = New System.Drawing.Size(87, 22)
         Me.txtLatitude.TabIndex = 4
-        Me.txtLatitude.Text = ""
         '
         'panelBottom
         '
@@ -159,6 +158,7 @@ Public Class frmCmpHPET
         '
         'btnCancel
         '
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Location = New System.Drawing.Point(288, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(77, 28)
@@ -188,7 +188,6 @@ Public Class frmCmpHPET
         Me.txtTMin.ReadOnly = True
         Me.txtTMin.Size = New System.Drawing.Size(432, 22)
         Me.txtTMin.TabIndex = 19
-        Me.txtTMin.Text = ""
         '
         'lblTMin
         '
@@ -221,7 +220,6 @@ Public Class frmCmpHPET
         Me.txtTMax.ReadOnly = True
         Me.txtTMax.Size = New System.Drawing.Size(432, 22)
         Me.txtTMax.TabIndex = 23
-        Me.txtTMax.Text = ""
         '
         'rdoDegF
         '
@@ -444,6 +442,7 @@ Public Class frmCmpHPET
         'frmCmpHPET
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(595, 273)
         Me.Controls.Add(Me.txtDec)
         Me.Controls.Add(Me.txtNov)
@@ -488,6 +487,7 @@ Public Class frmCmpHPET
         Me.Text = "Compute Hamon PET"
         Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

@@ -85,7 +85,7 @@ Public Class frmCmpJPET
     Friend WithEvents txtSRad As System.Windows.Forms.TextBox
     Friend WithEvents lblTempUnits As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCmpJPET))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCmpJPET))
         Me.lblJensenPET = New System.Windows.Forms.Label
         Me.lblConstant = New System.Windows.Forms.Label
         Me.txtConstant = New System.Windows.Forms.TextBox
@@ -154,7 +154,6 @@ Public Class frmCmpJPET
         Me.txtConstant.Name = "txtConstant"
         Me.txtConstant.Size = New System.Drawing.Size(86, 22)
         Me.txtConstant.TabIndex = 4
-        Me.txtConstant.Text = ""
         '
         'panelBottom
         '
@@ -168,6 +167,7 @@ Public Class frmCmpJPET
         '
         'btnCancel
         '
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Location = New System.Drawing.Point(288, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(77, 28)
@@ -197,7 +197,6 @@ Public Class frmCmpJPET
         Me.txtTMin.ReadOnly = True
         Me.txtTMin.Size = New System.Drawing.Size(413, 22)
         Me.txtTMin.TabIndex = 19
-        Me.txtTMin.Text = ""
         '
         'lblTMin
         '
@@ -230,7 +229,6 @@ Public Class frmCmpJPET
         Me.txtTMax.ReadOnly = True
         Me.txtTMax.Size = New System.Drawing.Size(413, 22)
         Me.txtTMax.TabIndex = 23
-        Me.txtTMax.Text = ""
         '
         'rdoDegF
         '
@@ -473,7 +471,6 @@ Public Class frmCmpJPET
         Me.txtSRad.ReadOnly = True
         Me.txtSRad.Size = New System.Drawing.Size(413, 22)
         Me.txtSRad.TabIndex = 53
-        Me.txtSRad.Text = ""
         '
         'lblTempUnits
         '
@@ -486,6 +483,7 @@ Public Class frmCmpJPET
         'frmCmpJPET
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(595, 328)
         Me.Controls.Add(Me.lblTempUnits)
         Me.Controls.Add(Me.txtSRad)
@@ -534,6 +532,7 @@ Public Class frmCmpJPET
         Me.Text = "Compute Jensen PET"
         Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

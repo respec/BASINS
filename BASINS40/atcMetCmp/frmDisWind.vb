@@ -73,7 +73,7 @@ Public Class frmDisWind
     Friend WithEvents txtHr14 As System.Windows.Forms.TextBox
     Friend WithEvents txtHr13 As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisWind))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisWind))
         Me.lblCloudCover = New System.Windows.Forms.Label
         Me.panelBottom = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
@@ -131,6 +131,7 @@ Public Class frmDisWind
         '
         'btnCancel
         '
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Location = New System.Drawing.Point(288, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(77, 28)
@@ -160,7 +161,6 @@ Public Class frmDisWind
         Me.txtWind.ReadOnly = True
         Me.txtWind.Size = New System.Drawing.Size(460, 22)
         Me.txtWind.TabIndex = 19
-        Me.txtWind.Text = ""
         '
         'lblWind
         '
@@ -389,6 +389,7 @@ Public Class frmDisWind
         'frmDisWind
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(624, 227)
         Me.Controls.Add(Me.txtHr24)
         Me.Controls.Add(Me.txtHr23)
@@ -428,6 +429,7 @@ Public Class frmDisWind
         Me.Text = "Disaggregate Wind"
         Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
