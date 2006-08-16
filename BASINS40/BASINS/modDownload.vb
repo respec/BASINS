@@ -495,7 +495,7 @@ StartOver:
         '        Exit Sub
 
         'ErrHand:
-        '        MsgBox(curStep & vbCr & Err.Description, MsgBoxStyle.OKOnly, "BASINS Data Download Main")
+        '        Logger.Msg(curStep & vbCr & Err.Description, MsgBoxStyle.OKOnly, "BASINS Data Download Main")
     End Function
 
     Private Function GetDefaultsXML() As Chilkat.Xml

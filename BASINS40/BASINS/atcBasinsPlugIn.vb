@@ -129,8 +129,9 @@ Public Class atcBasinsPlugIn
         pLoadedDataMenu = True
 
         AddMenuIfMissing(ModelsMenuName, "", ModelsMenuString, FileMenuName)
-        'mnu = AddMenuIfMissing(ModelsMenuName & "_HSPF", ModelsMenuName, "HSPF")
-        'mnu.Tooltip = "Hydrological Simulation Program - Fortran"
+
+        'HSPF and AQUATOX are handled in ModelSetup plugin
+
         mnu = AddMenuIfMissing(ModelsMenuName & "_SWAT", ModelsMenuName, "SWAT")
         mnu.Tooltip = "SWAT"
         mnu.Enabled = False
@@ -144,10 +145,6 @@ Public Class atcBasinsPlugIn
 
         RefreshAnalysisMenu()
         RefreshComputeMenu()
-
-        'load HSPF plugin (an integral part of BASINS)
-        'g_MapWin.Plugins.StartPlugin("atcHSPF_PlugIn")
-
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
@@ -228,23 +225,24 @@ Public Class atcBasinsPlugIn
             Case AnalysisMenuName & "_ArcView3"
                 'create apr if it does not exist, then open it
                 Dim lAprFileName As String = "\basins\apr\" & FilenameOnly(g_MapWin.Project.FileName) & ".apr"
-                If Not FileExists(lAprFileName) Then
-                    'build it
-                    Dim exename As String = FindFile("Please locate BasinsArchive.exe", "\BASINS\etc\basinsarchive\BasinsArchive.exe")
-                    If Len(exename) > 0 Then
-                        Dim Exec_Str As String = exename & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
+                If Not FileExists(lAprFileName) Then 'build it
+                    Dim lExeName As String = _
+                       FindFile("Please locate ArcView.exe", _
+                       "C:\ESRI\AV_GIS30\ARCVIEW\BIN32\arcview.exe")
+                    If Len(lExeName) > 0 Then
+                        Dim Exec_Str As String = lExeName & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
                         Shell(Exec_Str, AppWinStyle.NormalFocus, False)
                     End If
                 End If
                 Try
                     Process.Start(lAprFileName)
                 Catch
-                    MsgBox("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "BASINS/ArcView Problem")
+                    Logger.Msg("No application is associated with APR files - ArcView3 does not appear to be installed.", vbOKOnly, "BASINS/ArcView Problem")
                 End Try
             Case AnalysisMenuName & "_ArcGIS"
                 Dim buildmxdFilename As String = FindFile("Please Locate build.mxd", "\BASINS\etc\build.mxd")
                 If Len(buildmxdFilename) = 0 Then
-                    MsgBox("Unable to locate Build.mxd", vbOKOnly, "BASINS/ArcGIS Problem")
+                    Logger.Msg("Unable to locate Build.mxd", vbOKOnly, "BASINS/ArcGIS Problem")
                 Else
                     Try
                         'write directive file here
@@ -252,7 +250,7 @@ Public Class atcBasinsPlugIn
                         'now start the build mxd
                         Process.Start(buildmxdFilename)
                     Catch
-                        MsgBox("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "BASINS/ArcGIS Problem")
+                        Logger.Msg("No application is associated with MXD files - ArcGIS does not appear to be installed.", vbOKOnly, "BASINS/ArcGIS Problem")
                     End Try
                 End If
             Case Else
