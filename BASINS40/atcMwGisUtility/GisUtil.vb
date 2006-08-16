@@ -1966,6 +1966,14 @@ Public Class GisUtil
 
     End Sub
 
+    Public Shared Sub ShowProgressBar(ByVal aBoolean As Boolean)
+        GetMappingObject.StatusBar.ShowProgressBar = aBoolean
+    End Sub
+
+    Public Shared Sub ProgressBarValue(ByVal aValue As Integer)
+        GetMappingObject.StatusBar.ProgressBarValue = aValue
+    End Sub
+
 End Class
 
 ''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>

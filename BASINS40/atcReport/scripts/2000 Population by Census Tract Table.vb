@@ -51,6 +51,12 @@ Public Module Population2000Table
                 Dim larea As Double
                 Dim lareat As Double
                 Dim j As Integer
+                GisUtil.ShowProgressBar(True)
+                GisUtil.ProgressBarValue(0)
+                Dim lProgressTotal As Integer = aSelectedAreaIndexes.Count * GisUtil.NumFeatures(lTractLayerIndex)
+                Dim lProgressCurrent As Integer = 0
+                Dim lProgressPercent As Integer = 0
+                Dim lProgressLastDisplayed As Integer = 0
                 'loop through each selected polygon and each census tract looking for overlap
                 For j = 1 To aSelectedAreaIndexes.Count
                     For i = 1 To GisUtil.NumFeatures(lTractLayerIndex)
@@ -72,8 +78,15 @@ Public Module Population2000Table
                             End If
                             lGridSource.CellValue(lGridSource.Rows - 1, 4) = Format(larea, "0.0")
                         End If
+                        lProgressCurrent = lProgressCurrent + 1
+                        lProgressPercent = Int(lProgressCurrent / lProgressTotal * 100)
+                        If lProgressPercent > lProgressLastDisplayed Then
+                            GisUtil.ProgressBarValue(lProgressPercent)
+                            lProgressLastDisplayed = lProgressPercent
+                        End If
                     Next i
                 Next j
+                GisUtil.ShowProgressBar(False)
             End If
         Else
             lProblem = "No Census Tract Layer Found"
