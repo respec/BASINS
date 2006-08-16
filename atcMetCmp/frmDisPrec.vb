@@ -57,7 +57,7 @@ Public Class frmDisPrec
     Friend WithEvents txtSummFile As System.Windows.Forms.TextBox
     Friend WithEvents btnSummFile As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisPrec))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisPrec))
         Me.lblDailyPrec = New System.Windows.Forms.Label
         Me.lblObsTime = New System.Windows.Forms.Label
         Me.txtObsTime = New System.Windows.Forms.TextBox
@@ -99,7 +99,6 @@ Public Class frmDisPrec
         Me.txtObsTime.Name = "txtObsTime"
         Me.txtObsTime.Size = New System.Drawing.Size(57, 22)
         Me.txtObsTime.TabIndex = 4
-        Me.txtObsTime.Text = ""
         '
         'panelBottom
         '
@@ -113,6 +112,7 @@ Public Class frmDisPrec
         '
         'btnCancel
         '
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Location = New System.Drawing.Point(288, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(77, 28)
@@ -142,7 +142,6 @@ Public Class frmDisPrec
         Me.txtDailyPrec.ReadOnly = True
         Me.txtDailyPrec.Size = New System.Drawing.Size(461, 22)
         Me.txtDailyPrec.TabIndex = 19
-        Me.txtDailyPrec.Text = ""
         '
         'lblHourlyPrec
         '
@@ -183,7 +182,6 @@ Public Class frmDisPrec
         Me.txtDataTol.Name = "txtDataTol"
         Me.txtDataTol.Size = New System.Drawing.Size(58, 22)
         Me.txtDataTol.TabIndex = 26
-        Me.txtDataTol.Text = ""
         '
         'lblSummFile
         '
@@ -200,7 +198,6 @@ Public Class frmDisPrec
         Me.txtSummFile.ReadOnly = True
         Me.txtSummFile.Size = New System.Drawing.Size(461, 22)
         Me.txtSummFile.TabIndex = 28
-        Me.txtSummFile.Text = ""
         '
         'btnSummFile
         '
@@ -213,6 +210,7 @@ Public Class frmDisPrec
         'frmDisPrec
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(556, 365)
         Me.Controls.Add(Me.btnSummFile)
         Me.Controls.Add(Me.txtSummFile)
@@ -234,6 +232,7 @@ Public Class frmDisPrec
         Me.Text = "Disaggregate Precipitation"
         Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

@@ -47,7 +47,7 @@ Public Class frmDisSol
     Friend WithEvents txtSolar As System.Windows.Forms.TextBox
     Friend WithEvents lblTSer As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisSol))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisSol))
         Me.lblTSer = New System.Windows.Forms.Label
         Me.lblLatitude = New System.Windows.Forms.Label
         Me.txtLatitude = New System.Windows.Forms.TextBox
@@ -81,7 +81,6 @@ Public Class frmDisSol
         Me.txtLatitude.Name = "txtLatitude"
         Me.txtLatitude.Size = New System.Drawing.Size(87, 22)
         Me.txtLatitude.TabIndex = 4
-        Me.txtLatitude.Text = ""
         '
         'panelBottom
         '
@@ -95,6 +94,7 @@ Public Class frmDisSol
         '
         'btnCancel
         '
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Location = New System.Drawing.Point(211, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(77, 28)
@@ -124,11 +124,11 @@ Public Class frmDisSol
         Me.txtSolar.ReadOnly = True
         Me.txtSolar.Size = New System.Drawing.Size(260, 22)
         Me.txtSolar.TabIndex = 19
-        Me.txtSolar.Text = ""
         '
         'frmDisSol
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(355, 181)
         Me.Controls.Add(Me.txtSolar)
         Me.Controls.Add(Me.txtLatitude)
@@ -142,6 +142,7 @@ Public Class frmDisSol
         Me.Text = "Disaggregate Solar Radiation"
         Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

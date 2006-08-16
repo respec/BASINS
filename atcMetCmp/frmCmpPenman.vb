@@ -61,7 +61,7 @@ Public Class frmCmpPenman
     Friend WithEvents txtDewP As System.Windows.Forms.TextBox
     Friend WithEvents txtWind As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCmpPenman))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCmpPenman))
         Me.lblJensenPET = New System.Windows.Forms.Label
         Me.panelBottom = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
@@ -104,6 +104,7 @@ Public Class frmCmpPenman
         '
         'btnCancel
         '
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Location = New System.Drawing.Point(307, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(77, 28)
@@ -133,7 +134,6 @@ Public Class frmCmpPenman
         Me.txtTMin.ReadOnly = True
         Me.txtTMin.Size = New System.Drawing.Size(413, 22)
         Me.txtTMin.TabIndex = 19
-        Me.txtTMin.Text = ""
         '
         'lblTMin
         '
@@ -166,7 +166,6 @@ Public Class frmCmpPenman
         Me.txtTMax.ReadOnly = True
         Me.txtTMax.Size = New System.Drawing.Size(413, 22)
         Me.txtTMax.TabIndex = 23
-        Me.txtTMax.Text = ""
         '
         'lblSRad
         '
@@ -191,7 +190,6 @@ Public Class frmCmpPenman
         Me.txtSRad.ReadOnly = True
         Me.txtSRad.Size = New System.Drawing.Size(413, 22)
         Me.txtSRad.TabIndex = 53
-        Me.txtSRad.Text = ""
         '
         'lblDewP
         '
@@ -232,7 +230,6 @@ Public Class frmCmpPenman
         Me.txtDewP.ReadOnly = True
         Me.txtDewP.Size = New System.Drawing.Size(413, 22)
         Me.txtDewP.TabIndex = 58
-        Me.txtDewP.Text = ""
         '
         'txtWind
         '
@@ -241,11 +238,11 @@ Public Class frmCmpPenman
         Me.txtWind.ReadOnly = True
         Me.txtWind.Size = New System.Drawing.Size(413, 22)
         Me.txtWind.TabIndex = 59
-        Me.txtWind.Text = ""
         '
         'frmCmpPenman
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(604, 273)
         Me.Controls.Add(Me.txtWind)
         Me.Controls.Add(Me.txtDewP)
@@ -270,6 +267,7 @@ Public Class frmCmpPenman
         Me.Text = "Compute Penman Pan Evaporation"
         Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

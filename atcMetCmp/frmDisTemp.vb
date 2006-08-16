@@ -52,7 +52,7 @@ Public Class frmDisTemp
     Friend WithEvents lblObsTime As System.Windows.Forms.Label
     Friend WithEvents txtObsTime As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisTemp))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisTemp))
         Me.lblCloudCover = New System.Windows.Forms.Label
         Me.lblObsTime = New System.Windows.Forms.Label
         Me.txtObsTime = New System.Windows.Forms.TextBox
@@ -90,7 +90,6 @@ Public Class frmDisTemp
         Me.txtObsTime.Name = "txtObsTime"
         Me.txtObsTime.Size = New System.Drawing.Size(57, 22)
         Me.txtObsTime.TabIndex = 4
-        Me.txtObsTime.Text = ""
         '
         'panelBottom
         '
@@ -104,6 +103,7 @@ Public Class frmDisTemp
         '
         'btnCancel
         '
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Location = New System.Drawing.Point(288, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(77, 28)
@@ -133,7 +133,6 @@ Public Class frmDisTemp
         Me.txtTMin.ReadOnly = True
         Me.txtTMin.Size = New System.Drawing.Size(393, 22)
         Me.txtTMin.TabIndex = 19
-        Me.txtTMin.Text = ""
         '
         'lblTMin
         '
@@ -166,11 +165,11 @@ Public Class frmDisTemp
         Me.txtTMax.ReadOnly = True
         Me.txtTMax.Size = New System.Drawing.Size(393, 22)
         Me.txtTMax.TabIndex = 23
-        Me.txtTMax.Text = ""
         '
         'frmDisTemp
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(556, 199)
         Me.Controls.Add(Me.txtTMax)
         Me.Controls.Add(Me.txtTMin)
@@ -188,6 +187,7 @@ Public Class frmDisTemp
         Me.Text = "Disaggregate Temperature"
         Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

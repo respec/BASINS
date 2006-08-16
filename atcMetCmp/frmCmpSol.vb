@@ -47,7 +47,7 @@ Public Class frmCmpSol
     Friend WithEvents btnCloudCover As System.Windows.Forms.Button
     Friend WithEvents txtCloudCover As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCmpSol))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCmpSol))
         Me.lblCloudCover = New System.Windows.Forms.Label
         Me.lblLatitude = New System.Windows.Forms.Label
         Me.txtLatitude = New System.Windows.Forms.TextBox
@@ -81,7 +81,6 @@ Public Class frmCmpSol
         Me.txtLatitude.Name = "txtLatitude"
         Me.txtLatitude.Size = New System.Drawing.Size(87, 22)
         Me.txtLatitude.TabIndex = 4
-        Me.txtLatitude.Text = ""
         '
         'panelBottom
         '
@@ -95,6 +94,7 @@ Public Class frmCmpSol
         '
         'btnCancel
         '
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.Location = New System.Drawing.Point(211, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(77, 28)
@@ -124,11 +124,11 @@ Public Class frmCmpSol
         Me.txtCloudCover.ReadOnly = True
         Me.txtCloudCover.Size = New System.Drawing.Size(260, 22)
         Me.txtCloudCover.TabIndex = 19
-        Me.txtCloudCover.Text = ""
         '
         'frmCmpSol
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(355, 190)
         Me.Controls.Add(Me.txtCloudCover)
         Me.Controls.Add(Me.btnCloudCover)
@@ -142,6 +142,7 @@ Public Class frmCmpSol
         Me.Text = "Compute Solar Radiation"
         Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
