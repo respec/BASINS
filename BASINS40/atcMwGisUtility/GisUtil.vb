@@ -1777,7 +1777,9 @@ Public Class GisUtil
         lsf.StartEditingShapes(True)
         'merge together based on common endpoints
         Dim i As Integer = 0
+        GetMappingObject.StatusBar.ShowProgressBar = True
         Do While i < lsf.NumShapes
+            GetMappingObject.StatusBar.ProgressBarValue = Int(i / lsf.NumShapes * 100)
             lFound = False
             Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
             Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
@@ -1821,6 +1823,7 @@ Public Class GisUtil
             Dim lEndY2 As Double
             i = 0
             Do While i < lsf.NumShapes
+                GetMappingObject.StatusBar.ProgressBarValue = Int(i / lsf.NumShapes * 100)
                 lFound = False
                 Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
                 Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
@@ -1868,6 +1871,7 @@ Public Class GisUtil
         End If
 
         lsf.StopEditingShapes(True)
+        GetMappingObject.StatusBar.ShowProgressBar = False
     End Sub
 
     Public Shared Function AreaOverlappingPolygons(ByVal aLayer1index As Integer, _

@@ -29,6 +29,7 @@ Public Class frmManDelin
     Friend WithEvents cboLayer As System.Windows.Forms.ComboBox
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents cmdDelineate As System.Windows.Forms.Button
+    Friend WithEvents cbxCombine As System.Windows.Forms.CheckBox
     Dim prevHandle As Integer
 
 #Region " Windows Form Designer generated code "
@@ -84,6 +85,7 @@ Public Class frmManDelin
         Me.cmdCommit = New System.Windows.Forms.Button
         Me.cboLayer = New System.Windows.Forms.ComboBox
         Me.Label1 = New System.Windows.Forms.Label
+        Me.cbxCombine = New System.Windows.Forms.CheckBox
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -105,6 +107,7 @@ Public Class frmManDelin
         '
         Me.GroupBox1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.Controls.Add(Me.cbxCombine)
         Me.GroupBox1.Controls.Add(Me.lblDefine)
         Me.GroupBox1.Controls.Add(Me.cbxPCS)
         Me.GroupBox1.Controls.Add(Me.cmdDefine)
@@ -132,9 +135,9 @@ Public Class frmManDelin
         'cbxPCS
         '
         Me.cbxPCS.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cbxPCS.Location = New System.Drawing.Point(68, 107)
+        Me.cbxPCS.Location = New System.Drawing.Point(16, 107)
         Me.cbxPCS.Name = "cbxPCS"
-        Me.cbxPCS.Size = New System.Drawing.Size(216, 24)
+        Me.cbxPCS.Size = New System.Drawing.Size(183, 24)
         Me.cbxPCS.TabIndex = 19
         Me.cbxPCS.Text = "Include PCS as Outlets"
         '
@@ -155,7 +158,7 @@ Public Class frmManDelin
         Me.cboReach.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboReach.Location = New System.Drawing.Point(127, 21)
         Me.cboReach.Name = "cboReach"
-        Me.cboReach.Size = New System.Drawing.Size(281, 24)
+        Me.cboReach.Size = New System.Drawing.Size(281, 25)
         Me.cboReach.TabIndex = 17
         '
         'Label3
@@ -212,7 +215,7 @@ Public Class frmManDelin
         Me.cboDEM.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboDEM.Location = New System.Drawing.Point(127, 27)
         Me.cboDEM.Name = "cboDEM"
-        Me.cboDEM.Size = New System.Drawing.Size(280, 24)
+        Me.cboDEM.Size = New System.Drawing.Size(280, 25)
         Me.cboDEM.TabIndex = 14
         '
         'Label2
@@ -291,7 +294,7 @@ Public Class frmManDelin
         Me.cboLayer.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.cboLayer.Location = New System.Drawing.Point(127, 25)
         Me.cboLayer.Name = "cboLayer"
-        Me.cboLayer.Size = New System.Drawing.Size(274, 24)
+        Me.cboLayer.Size = New System.Drawing.Size(274, 25)
         Me.cboLayer.TabIndex = 19
         '
         'Label1
@@ -303,6 +306,16 @@ Public Class frmManDelin
         Me.Label1.TabIndex = 18
         Me.Label1.Text = "Subbasin Layer:"
         Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cbxCombine
+        '
+        Me.cbxCombine.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cbxCombine.Location = New System.Drawing.Point(205, 107)
+        Me.cbxCombine.Name = "cbxCombine"
+        Me.cbxCombine.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.cbxCombine.Size = New System.Drawing.Size(210, 24)
+        Me.cbxCombine.TabIndex = 21
+        Me.cbxCombine.Text = "Force continuous flow path"
         '
         'frmManDelin
         '
@@ -885,6 +898,9 @@ Public Class frmManDelin
         OutputReachShapefileName = GisUtil.ClipShapesWithPolygon(ReachLayerIndex, SubbasinLayerIndex)
 
         'add output reach shapefile to the view
+        If GisUtil.IsLayer("Streams") Then
+            GisUtil.RemoveLayer(GisUtil.LayerIndex("Streams"))
+        End If
         GisUtil.AddLayer(OutputReachShapefileName, "Streams")
         StreamsLayerIndex = GisUtil.LayerIndex("Streams")
         GisUtil.LayerVisible(StreamsLayerIndex) = True
@@ -994,7 +1010,9 @@ Public Class frmManDelin
         End If
         Dim rval As String
         Dim dval As String
+        GisUtil.ShowProgressBar(True)
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+            GisUtil.ProgressBarValue(Int(i / GisUtil.NumFeatures(StreamsLayerIndex) * 100))
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, dfield)
             'find what is downstream of rval
             For j = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
@@ -1009,6 +1027,7 @@ Public Class frmManDelin
         Next i
         'make another pass to set each stream within a subbasin to the same subbasinr
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+            GisUtil.ProgressBarValue(Int(i / GisUtil.NumFeatures(StreamsLayerIndex) * 100))
             rval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, ReachSubbasinFieldIndex)
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, DownstreamFieldIndex)
             If rval <> dval Then
@@ -1021,16 +1040,20 @@ Public Class frmManDelin
             End If
         Next i
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+            GisUtil.ProgressBarValue(Int(i / GisUtil.NumFeatures(StreamsLayerIndex) * 100))
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, DownstreamFieldIndex)
             If dval = 0 Then
                 GisUtil.SetFeatureValue(StreamsLayerIndex, DownstreamFieldIndex, i - 1, -999)
             End If
         Next i
+        GisUtil.ShowProgressBar(False)
 
         'merge reach segments together within subbasin
-        GisUtil.MergeFeaturesBasedOnAttribute(StreamsLayerIndex, ReachSubbasinFieldIndex, False)
+        GisUtil.MergeFeaturesBasedOnAttribute(StreamsLayerIndex, ReachSubbasinFieldIndex, cbxCombine.Checked)
 
         'create and populate fields
+        lblDefine.Text = "Calculating attributes..."
+        Me.Refresh()
         Dim TempFieldIndex As Integer
 
         'set length of stream reach
@@ -1232,6 +1255,9 @@ Public Class frmManDelin
         Next i
 
         'now add outlets
+        lblDefine.Text = "Creating outlets..."
+        Me.Refresh()
+
         'create new outlets shapefile
         i = 1
         Dim outputpath As String
@@ -1302,6 +1328,9 @@ Public Class frmManDelin
         End If
         success = lShapefile.StopEditingShapes(True, True)
         'add outlets layer to the map
+        If GisUtil.IsLayer("Outlets") Then
+            GisUtil.RemoveLayer(GisUtil.LayerIndex("Outlets"))
+        End If
         pMapWin.Layers.Add(lShapefile, "Outlets")
         pMapWin.Layers(pMapWin.Layers.NumLayers - 1).Color = System.Drawing.Color.Cyan
         pMapWin.Layers(pMapWin.Layers.NumLayers - 1).OutlineColor = System.Drawing.Color.Cyan
