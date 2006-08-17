@@ -1010,43 +1010,48 @@ Public Class frmManDelin
         End If
         Dim rval As String
         Dim dval As String
+        Dim dsubbasin As String
+        Dim rsubbasin As String
         GisUtil.ShowProgressBar(True)
+        GisUtil.StartSetFeatureValue(StreamsLayerIndex)
+        'populate the downstream subbasin ids
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
             GisUtil.ProgressBarValue(Int(i / GisUtil.NumFeatures(StreamsLayerIndex) * 100))
+            System.Windows.Forms.Application.DoEvents()
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, dfield)
             'find what is downstream of rval
             For j = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
                 rval = GisUtil.FieldValue(StreamsLayerIndex, j - 1, rfield)
                 If rval = dval Then
                     'this is the downstream segment
-                    k = GisUtil.FieldValue(StreamsLayerIndex, j - 1, ReachSubbasinFieldIndex)
-                    GisUtil.SetFeatureValue(StreamsLayerIndex, DownstreamFieldIndex, i - 1, k)
+                    dsubbasin = GisUtil.FieldValue(StreamsLayerIndex, j - 1, ReachSubbasinFieldIndex)
+                    rsubbasin = GisUtil.FieldValue(StreamsLayerIndex, i - 1, ReachSubbasinFieldIndex)
+                    'if the downstream subbasin id is different that this subbasin id
+                    'set it, and make the same change to all segments of this subbasin id
+                    If dsubbasin <> rsubbasin Then
+                        GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, DownstreamFieldIndex, i - 1, dsubbasin)
+                        'make another pass to set each stream within a subbasin to the same subbasinr
+                        For k = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+                            If GisUtil.FieldValue(StreamsLayerIndex, k - 1, ReachSubbasinFieldIndex) = rsubbasin Then
+                                GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, DownstreamFieldIndex, k - 1, dsubbasin)
+                            End If
+                        Next k
+                    End If
+                    'exit once we found what is downstream of this segment
                     Exit For
                 End If
             Next j
         Next i
-        'make another pass to set each stream within a subbasin to the same subbasinr
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
             GisUtil.ProgressBarValue(Int(i / GisUtil.NumFeatures(StreamsLayerIndex) * 100))
-            rval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, ReachSubbasinFieldIndex)
-            dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, DownstreamFieldIndex)
-            If rval <> dval Then
-                'this is what it should be
-                For j = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
-                    If rval = GisUtil.FieldValue(StreamsLayerIndex, j - 1, ReachSubbasinFieldIndex) Then
-                        GisUtil.SetFeatureValue(StreamsLayerIndex, DownstreamFieldIndex, j - 1, dval)
-                    End If
-                Next j
-            End If
-        Next i
-        For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
-            GisUtil.ProgressBarValue(Int(i / GisUtil.NumFeatures(StreamsLayerIndex) * 100))
+            System.Windows.Forms.Application.DoEvents()
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, DownstreamFieldIndex)
             If dval = 0 Then
-                GisUtil.SetFeatureValue(StreamsLayerIndex, DownstreamFieldIndex, i - 1, -999)
+                GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, DownstreamFieldIndex, i - 1, -999)
             End If
         Next i
         GisUtil.ShowProgressBar(False)
+        GisUtil.StopSetFeatureValue(StreamsLayerIndex)
 
         'merge reach segments together within subbasin
         GisUtil.MergeFeaturesBasedOnAttribute(StreamsLayerIndex, ReachSubbasinFieldIndex, cbxCombine.Checked)
