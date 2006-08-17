@@ -1213,6 +1213,7 @@ Public Class GisUtil
                     If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
                         lastdisplayed = Int(cellcount / totalcellcount * 100)
                         GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
+                        System.Windows.Forms.Application.DoEvents()
                     End If
                 Next lRow
             Next lCol
@@ -1304,6 +1305,7 @@ Public Class GisUtil
                     If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
                         lastdisplayed = Int(cellcount / totalcellcount * 100)
                         GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
+                        System.Windows.Forms.Application.DoEvents()
                     End If
                 Next lRow
             Next lCol
@@ -1631,6 +1633,7 @@ Public Class GisUtil
             If lCurrentDisplay > lLastDisplayed Then
                 lLastDisplayed = lCurrentDisplay
                 GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
+                System.Windows.Forms.Application.DoEvents()
             End If
         Next i
         GetMappingObject.StatusBar.ShowProgressBar = False
@@ -1684,6 +1687,7 @@ Public Class GisUtil
             For j = 1 To lSf.NumShapes
                 lCount += 1
                 GetMappingObject.StatusBar.ProgressBarValue = Int(lCount / lTotal * 100)
+                System.Windows.Forms.Application.DoEvents()
                 If IsLineInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
                     'at least one point of the line is in the polygon
                     If IsLineEntirelyInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
@@ -1780,6 +1784,7 @@ Public Class GisUtil
         GetMappingObject.StatusBar.ShowProgressBar = True
         Do While i < lsf.NumShapes
             GetMappingObject.StatusBar.ProgressBarValue = Int(i / lsf.NumShapes * 100)
+            System.Windows.Forms.Application.DoEvents()
             lFound = False
             Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
             Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
@@ -1824,6 +1829,7 @@ Public Class GisUtil
             i = 0
             Do While i < lsf.NumShapes
                 GetMappingObject.StatusBar.ProgressBarValue = Int(i / lsf.NumShapes * 100)
+                System.Windows.Forms.Application.DoEvents()
                 lFound = False
                 Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
                 Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
