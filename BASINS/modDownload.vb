@@ -309,6 +309,13 @@ StartOver:
                         lOutputFileName = lProjectorNode.GetAttrValue("output")
                         lCurFilename = lProjectorNode.Content
                         ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
+                        'attempt to assign prj file
+                        lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        lOutputProjection = CleanUpUserProjString(lOutputProjection)
+                        Dim sf As New MapWinGIS.Shapefile
+                        sf.Open(lOutputFileName, Nothing)
+                        sf.Projection = lOutputProjection
+                        sf.Close()
                         'if adding to some specific point layers in basins we need to refresh that map layer
                         If Right(lOutputFileName, 8) = "pcs3.shp" Or _
                            Right(lOutputFileName, 8) = "gage.shp" Or _
@@ -386,6 +393,10 @@ StartOver:
 
                         AddFilesInDir(InputFileList, lInputDirName, False, "*.shp")
 
+                        lOutputProjection = WholeFileString(lProjectDir & "prj.proj")
+                        lOutputProjection = CleanUpUserProjString(lOutputProjection)
+                        Dim sf As New MapWinGIS.Shapefile
+
                         For Each lFileObject In InputFileList
                             lCurFilename = lFileObject
                             If (FileExt(lCurFilename) = "shp") Then
@@ -396,6 +407,10 @@ StartOver:
                                     'if the output file exists and it is a landuse shape, dont bother
                                 Else
                                     ShapeUtilMerge(lCurFilename, lOutputFileName, lProjectDir & "prj.proj")
+                                    'attempt to assign prj file
+                                    sf.Open(lOutputFileName, Nothing)
+                                    sf.Projection = lOutputProjection
+                                    sf.Close()
                                 End If
                             End If
                         Next lFileObject
