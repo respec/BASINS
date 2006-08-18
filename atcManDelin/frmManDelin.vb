@@ -782,6 +782,7 @@ Public Class frmManDelin
                         End If
                     Next j
                     'store in slope field as percent
+                    'estimate slope as the difference between max and min elevations / square root of subbasin area -- better approx?
                     slope = 100 * (maxelev - minelev) / ((GisUtil.FeatureArea(SubbasinLayerIndex, i - 1)) ^ 0.5)
                     GisUtil.SetFeatureValue(SubbasinLayerIndex, SlopeFieldIndex, i - 1, slope)
                 Next i
@@ -835,6 +836,28 @@ Public Class frmManDelin
             '  End If
             '  GisUtil.SetFeatureValue(SubbasinLayerIndex, LengthFieldIndex, i - 1, sl)
             'Next i
+
+            'set area of each subbasin
+            Dim r As Double
+            Dim AreaAcresFieldIndex As Integer
+            If GisUtil.IsField(SubbasinLayerIndex, "AREAACRES") Then
+                AreaAcresFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "AREAACRES")
+            Else
+                'need to add it
+                AreaAcresFieldIndex = GisUtil.AddField(SubbasinLayerIndex, "AREAACRES", 2, 10)
+            End If
+            Dim AreaMi2FieldIndex As Integer
+            If GisUtil.IsField(SubbasinLayerIndex, "AREAMI2") Then
+                AreaMi2FieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "AREAMI2")
+            Else
+                'need to add it
+                AreaMi2FieldIndex = GisUtil.AddField(SubbasinLayerIndex, "AREAMI2", 2, 10)
+            End If
+            For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+                r = GisUtil.FeatureArea(SubbasinLayerIndex, i - 1)
+                GisUtil.SetFeatureValue(SubbasinLayerIndex, AreaAcresFieldIndex, i - 1, r / 4046.86)
+                GisUtil.SetFeatureValue(SubbasinLayerIndex, AreaMi2FieldIndex, i - 1, r / 2589988)
+            Next i
 
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
             lblCalc.Text = ""
@@ -1134,6 +1157,26 @@ Public Class frmManDelin
                 End If
             Loop
         Next i
+        'add total contributing area in acres and square miles
+        Dim AreaAcresFieldIndex As Integer
+        If GisUtil.IsField(StreamsLayerIndex, "TAREAACRES") Then
+            AreaAcresFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "TAREAACRES")
+        Else
+            'need to add it
+            AreaAcresFieldIndex = GisUtil.AddField(StreamsLayerIndex, "TAREAACRES", 2, 10)
+        End If
+        Dim AreaMi2FieldIndex As Integer
+        If GisUtil.IsField(StreamsLayerIndex, "TAREAMI2") Then
+            AreaMi2FieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "TAREAMI2")
+        Else
+            'need to add it
+            AreaMi2FieldIndex = GisUtil.AddField(StreamsLayerIndex, "TAREAMI2", 2, 10)
+        End If
+        For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+            r = GisUtil.FieldValue(StreamsLayerIndex, i - 1, tAreaFieldIndex)
+            GisUtil.SetFeatureValue(StreamsLayerIndex, AreaAcresFieldIndex, i - 1, r / 4046.86)
+            GisUtil.SetFeatureValue(StreamsLayerIndex, AreaMi2FieldIndex, i - 1, r / 2589988)
+        Next i
 
         'set stream width based on upstream area
         If GisUtil.IsField(StreamsLayerIndex, "WID2") Then
@@ -1253,6 +1296,26 @@ Public Class frmManDelin
                 GisUtil.SetFeatureValue(StreamsLayerIndex, TempFieldIndex, i - 1, Name)
             Next i
         End If
+        'add name to subbasin layer as well
+        If GisUtil.IsField(SubbasinLayerIndex, "BNAME") Then
+            NameFieldIndex = GisUtil.FieldIndex(SubbasinLayerIndex, "BNAME")
+        Else
+            'need to add it
+            NameFieldIndex = GisUtil.AddField(SubbasinLayerIndex, "BNAME", 0, 20)
+        End If
+        For i = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+            dval = GisUtil.FieldValue(SubbasinLayerIndex, i - 1, SubbasinFieldIndex)
+            For j = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+                rval = GisUtil.FieldValue(StreamsLayerIndex, j - 1, ReachSubbasinFieldIndex)
+                If rval = dval Then
+                    'this is the one
+                    If Len(Trim(GisUtil.FieldValue(SubbasinLayerIndex, i - 1, NameFieldIndex))) = 0 Then
+                        GisUtil.SetFeatureValue(SubbasinLayerIndex, NameFieldIndex, i - 1, GisUtil.FieldValue(StreamsLayerIndex, j - 1, TempFieldIndex))
+                        Exit For
+                    End If
+                End If
+            Next j
+        Next i
 
         'remove unwanted fields
         For i = 1 To minfield
