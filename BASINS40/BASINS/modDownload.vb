@@ -155,13 +155,20 @@ StartOver:
         End If
 
         SaveFileString(lDownloadFilename, lDownloadXml)
-        If DataDownload(lDownloadFilename) Then 'Succeeded, as far as we know
+        Dim lDataDownLoadStatus As Boolean = DataDownload(lDownloadFilename)
+        Logger.Dbg("CreateNewProjectAndDownloadCoreData:DownLoadStatus:" & lDataDownLoadStatus)
+        If lDataDownLoadStatus Then 'Succeeded, as far as we know
             g_MapWin.Layers.Clear()
-            g_MapWin.Project.Save(aProjectFileName)
+            If Not (g_MapWin.Project.Save(aProjectFileName)) Then
+                Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
+            End If
             g_MapWin.Project.Modified = True
             ProcessProjectorFile(lProjectorFilename)
             AddAllShapesInDir(aNewDataDir, aNewDataDir)
-            g_MapWin.Project.Save(aProjectFileName)
+            g_MapWin.PreviewMap.GetPictureFromMap()
+            If Not (g_MapWin.Project.Save(aProjectFileName)) Then
+                Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
+            End If
             'TODO: should save set .Modified?
             g_MapWin.Project.Modified = False
         End If
@@ -453,8 +460,8 @@ StartOver:
                 Else
                     Logger.Dbg("Did not find layers.dbf in same path as ShapeUtil " & lLayersDbf)
                 End If
-            Else
-                Logger.Dbg("Found " & lLayersDbf)
+                'Else
+                '   Logger.Dbg("Found " & lLayersDbf)
             End If
             'Logger.Msg("MSG2 Merging " & aCurFilename)
             'Logger.Msg("MSG6 into " & aOutputFilename)
