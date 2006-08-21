@@ -165,12 +165,10 @@ StartOver:
             g_MapWin.Project.Modified = True
             ProcessProjectorFile(lProjectorFilename)
             AddAllShapesInDir(aNewDataDir, aNewDataDir)
-            g_MapWin.PreviewMap.GetPictureFromMap()
+            g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
             If Not (g_MapWin.Project.Save(aProjectFileName)) Then
                 Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
             End If
-            'TODO: should save set .Modified?
-            g_MapWin.Project.Modified = False
         End If
     End Sub
 
