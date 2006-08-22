@@ -1717,7 +1717,7 @@ Public Class GisUtil
         GetMappingObject.StatusBar.ShowProgressBar = False
         lNewShapeFile.StopEditingShapes(True, True)
 
-        lRetc = lNewShapeFile.SaveAs(lNewShapeFileName)
+        lRetc = lNewShapeFile.Close()
         ClipShapesWithPolygon = lNewShapeFileName
 
     End Function

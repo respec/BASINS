@@ -1339,9 +1339,36 @@ Public Class frmManDelin
         Loop
         'add points to the shapefile
         Dim lShapefile As New MapWinGIS.Shapefile
-
         success = lShapefile.CreateNew(OutletShapefile, MapWinGIS.ShpfileType.SHP_POINT)
         success = lShapefile.StartEditingShapes(True)
+
+        'Add ID Field 
+        Dim [of] As New MapWinGIS.Field
+        [of].Name = "ID"
+        [of].Type = MapWinGIS.FieldType.INTEGER_FIELD
+        [of].Width = 10
+        success = lShapefile.EditInsertField([of], lShapefile.NumFields)
+        [of] = Nothing
+        'Add PCSID Field 
+        Dim of2 As New MapWinGIS.Field
+        of2.Name = "PCSID"
+        of2.Type = MapWinGIS.FieldType.STRING_FIELD
+        of2.Width = 10
+        success = lShapefile.EditInsertField(of2, lShapefile.NumFields)
+        'Add Xpr Field 
+        Dim of3 As New MapWinGIS.Field
+        of3.Name = "Xpr"
+        of3.Type = MapWinGIS.FieldType.DOUBLE_FIELD
+        of3.Width = 10
+        success = lShapefile.EditInsertField(of3, lShapefile.NumFields)
+        'Add Ypr Field 
+        Dim of4 As New MapWinGIS.Field
+        of4.Name = "Ypr"
+        of4.Type = MapWinGIS.FieldType.DOUBLE_FIELD
+        of4.Width = 10
+        success = lShapefile.EditInsertField(of4, lShapefile.NumFields)
+
+        'add points at each stream outlet
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
             Dim lShape As New MapWinGIS.Shape
             Dim lPoint As New MapWinGIS.Point
@@ -1350,26 +1377,13 @@ Public Class frmManDelin
             lPoint.x = x1
             lPoint.y = y1
             lShape.InsertPoint(lPoint, 0)
-            success = lShapefile.EditInsertShape(lShape, 0)
+            success = lShapefile.EditInsertShape(lShape, lShapefile.NumShapes)
+            success = lShapefile.EditCellValue(2, lShapefile.NumShapes - 1, x1)
+            success = lShapefile.EditCellValue(3, lShapefile.NumShapes - 1, y1)
             lPoint = Nothing
             lShape = Nothing
         Next i
-        'Add ID Field 
-        Dim [of] As New MapWinGIS.Field
-        [of].Name = "ID"
-        [of].Type = MapWinGIS.FieldType.INTEGER_FIELD
-        [of].Width = 10
-        success = lShapefile.EditInsertField([of], lShapefile.NumFields)
-        For i = 1 To lShapefile.NumShapes
-            success = lShapefile.EditCellValue(0, i - 1, i)
-        Next i
-        [of] = Nothing
-        Dim of2 As New MapWinGIS.Field
-        'Add PCSID Field 
-        of2.Name = "PCSID"
-        of2.Type = MapWinGIS.FieldType.STRING_FIELD
-        of2.Width = 10
-        success = lShapefile.EditInsertField(of2, lShapefile.NumFields)
+        
         'add pcs points if checked
         Dim pcsLayerIndex As Integer
         Dim pcsFieldindex As Integer
@@ -1389,12 +1403,20 @@ Public Class frmManDelin
                     lShape.InsertPoint(lPoint, 0)
                     success = lShapefile.EditInsertShape(lShape, lShapefile.NumShapes)
                     success = lShapefile.EditCellValue(1, lShapefile.NumShapes - 1, pcsid)
+                    success = lShapefile.EditCellValue(2, lShapefile.NumShapes - 1, x1)
+                    success = lShapefile.EditCellValue(3, lShapefile.NumShapes - 1, y1)
                     lPoint = Nothing
                     lShape = Nothing
                 End If
             Next i
         End If
+
+        'Populate ID field
+        For i = 1 To lShapefile.NumShapes
+            success = lShapefile.EditCellValue(0, i - 1, i)
+        Next i
         success = lShapefile.StopEditingShapes(True, True)
+
         'add outlets layer to the map
         If GisUtil.IsLayer("Outlets") Then
             GisUtil.RemoveLayer(GisUtil.LayerIndex("Outlets"))
