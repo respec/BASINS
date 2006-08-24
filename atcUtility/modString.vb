@@ -647,6 +647,30 @@ Public Module modString
     '    Next
     'End Sub
 
+    ''' <summary>
+    ''' Find a block of text between two known strings
+    ''' </summary>
+    ''' <param name="aSource">Text to search through</param>
+    ''' <param name="aStartsWith">String that indicates block to find is about to start</param>
+    ''' <param name="aEndsWith">String that indicates block to find has ended</param>
+    ''' <param name="aStartIndex">Optional offset within aSource to start searching</param>
+    ''' <returns>Block of text that was found between aStartsWith and aEndsWith</returns>
+    ''' <remarks>Returned string does not include aStartsWith and aEndsWith. 
+    ''' Empty string is returned if aStartsWith or aEndsWith is not found.</remarks>
+    Public Function StrFindBlock(ByVal aSource As String, ByVal aStartsWith As String, ByVal aEndsWith As String, Optional ByVal aStartIndex As Integer = 0) As String
+        Dim lStartPosition As Integer = aSource.IndexOf(aStartsWith, aStartIndex)
+        If lStartPosition < 0 Then
+            Return ""
+        Else
+            lStartPosition += aStartsWith.Length
+            Dim lEndPosition As Integer = aSource.IndexOf(aEndsWith, lStartPosition)
+            If lEndPosition < 0 Then
+                Return ""
+            Else
+                Return aSource.Substring(lStartPosition, lEndPosition - lStartPosition)
+            End If
+        End If
+    End Function
 
     Public Function StrSplit(ByRef Source As String, ByRef delim As String, ByRef quote As String) As String
         ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of specified _
