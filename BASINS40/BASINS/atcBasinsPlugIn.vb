@@ -227,8 +227,8 @@ Public Class atcBasinsPlugIn
                 Dim lAprFileName As String = "\basins\apr\" & FilenameOnly(g_MapWin.Project.FileName) & ".apr"
                 If Not FileExists(lAprFileName) Then 'build it
                     Dim lExeName As String = _
-                       FindFile("Please locate ArcView.exe", _
-                       "C:\ESRI\AV_GIS30\ARCVIEW\BIN32\arcview.exe")
+                       FindFile("Please locate BasinsArchive.exe", _
+                       "\BASINS\etc\basinsarchive\BasinsArchive.exe")
                     If Len(lExeName) > 0 Then
                         Dim Exec_Str As String = lExeName & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
                         Shell(Exec_Str, AppWinStyle.NormalFocus, False)
