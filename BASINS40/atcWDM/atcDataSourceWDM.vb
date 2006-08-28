@@ -168,10 +168,10 @@ Public Class atcDataSourceWDM
             Case 17 : AttrStored = True 'tcode
                 'Case 27: AttrStored = True 'tsbyr  'jlk commmented to fix winhspf problem
             Case 33 : AttrStored = True 'tsstep
-            Case 45 : AttrStored = True 'staname
-            Case 288 : AttrStored = True 'idscen
-            Case 289 : AttrStored = True 'idlocn
-            Case 290 : AttrStored = True 'idcons
+                'Case 45 : AttrStored = True 'staname
+                'Case 288 : AttrStored = True 'idscen
+                'Case 289 : AttrStored = True 'idlocn
+                'Case 290 : AttrStored = True 'idcons
             Case Else : AttrStored = False
         End Select
     End Function
