@@ -98,7 +98,7 @@ Module Vb2F90
     Public Sub F90_WDBSGC(ByRef aWdmUnit As Integer, ByRef aDsn As Integer, _
                           ByRef aSaInd As Integer, ByRef aSaLen As Integer, _
                           ByRef aSaVal As String)
-        Dim lVal(48) As Integer
+        Dim lVal(80) As Integer
 
         F90_WDBSGC_XX(aWdmUnit, aDsn, aSaInd, aSaLen, lVal(0))
         NumChr(aSaLen, lVal, aSaVal)
