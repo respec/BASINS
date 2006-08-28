@@ -168,10 +168,11 @@ Public Class atcDataSourceWDM
             Case 17 : AttrStored = True 'tcode
                 'Case 27: AttrStored = True 'tsbyr  'jlk commmented to fix winhspf problem
             Case 33 : AttrStored = True 'tsstep
-            Case 45 : AttrStored = True 'staname
+                'Case 45 : AttrStored = True 'staname  'prh - don't force STANAM to be read
             Case 288 : AttrStored = True 'idscen
             Case 289 : AttrStored = True 'idlocn
             Case 290 : AttrStored = True 'idcons
+                'Case 10 : AttrStored = True 'description
             Case Else : AttrStored = False
         End Select
     End Function
@@ -432,8 +433,8 @@ Public Class atcDataSourceWDM
         lStr = UCase(Left(aTs.Attributes.GetValue("locn"), lSaLen))
         F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
         lSaLen = 48
-        lSaInd = 45 'station name
-        lStr = Left(aTs.Attributes.GetValue("stanam"), lSaLen)
+        lSaInd = 10 'description
+        lStr = Left(aTs.Attributes.GetValue("desc"), lSaLen)
         F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
 
         'others (from attrib)
@@ -919,13 +920,13 @@ Public Class atcDataSourceWDM
             F90_WDBSGC(aFileUnit, lDsn, lSaInd, lSaLen, lStr)
         End If
         aDataset.Attributes.SetValue("cons", lStr)
-        'station name
-        F90_WDBSGC(aFileUnit, lDsn, CInt(45), CInt(48), lStr)
-        aDataset.Attributes.SetValue("stanam", lStr)
-        'description
-        F90_WDBSGC(aFileUnit, lDsn, CInt(10), CInt(80), lStr)
-        aDataset.Attributes.SetValue("descrp", lStr)
-        aDataset.Attributes.SetValue("HeaderComplete", True)
+        ''station name
+        'F90_WDBSGC(aFileUnit, lDsn, CInt(45), CInt(48), lStr)
+        'aDataset.Attributes.SetValue("stanam", lStr)
+        ''description
+        'F90_WDBSGC(aFileUnit, lDsn, CInt(10), CInt(80), lStr)
+        'aDataset.Attributes.SetValue("descrp", lStr)
+        'aDataset.Attributes.SetValue("HeaderComplete", True)
     End Sub
 
     Private Function AttrVal2String(ByRef aSaInd As Integer, ByRef aSaVal() As Integer) As String
