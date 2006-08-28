@@ -221,8 +221,9 @@ Public Class atcDataAttributes
                 .Add("idcons", "Constituent")
 
                 .Add("desc", "Description")
-                .Add("stanam", "Description")
-                .Add("station name", "Description")
+                .Add("descrp", "Description")
+
+                .Add("stanam", "Station Name")
 
                 .Add("long filename", "FileName")
                 .Add("path", "FileName")
