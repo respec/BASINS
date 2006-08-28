@@ -922,6 +922,9 @@ Public Class atcDataSourceWDM
         'station name
         F90_WDBSGC(aFileUnit, lDsn, CInt(45), CInt(48), lStr)
         aDataset.Attributes.SetValue("stanam", lStr)
+        'description
+        F90_WDBSGC(aFileUnit, lDsn, CInt(10), CInt(80), lStr)
+        aDataset.Attributes.SetValue("descrp", lStr)
         aDataset.Attributes.SetValue("HeaderComplete", True)
     End Sub
 
