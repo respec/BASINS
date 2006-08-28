@@ -54,8 +54,9 @@ Public Class atcDataSourceWDM
 
     '  oldID must be given if dataObject has a changed id
     Private Function writeDataHeader(ByRef aFileUnit As Integer, ByRef dataObject As atcTimeseries, Optional ByRef oldID As Integer = -1) As Boolean
-        Dim salen, dsn, saind, lRetcod, i As Integer
-        Dim c, S, l, d As String
+        'Dim salen, saind
+        'Dim c, S, l, d As String
+        Dim dsn, lRetcod, i As Integer
         Dim lAttribs As atcDataAttributes = dataObject.Attributes
 
         Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
@@ -70,35 +71,35 @@ Public Class atcDataSourceWDM
         Catch
         End Try
 
-        If lRetcod = 0 Then
-            saind = 288
-            salen = 8
-            S = lAttribs.GetValue("scen")
-            i = 1
-            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, S, Len(S))
-            If lRetcod = 0 Then
-                saind = 289
-                c = lAttribs.GetValue("cons")
-                i = 2
-                Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, c, Len(c))
-                If lRetcod = 0 Then
-                    saind = 290
-                    l = lAttribs.GetValue("locn")
-                    i = 3
-                    Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, l, Len(l))
-                    If lRetcod = 0 Then
-                        saind = 45
-                        salen = 48
-                        d = lAttribs.GetValue("desc")
-                        If Len(d) > salen Then
-                            Logger.Msg("Description: '" & d & vbCr & "truncated to: " & Left(d, salen), "WDM Write Data Header", MsgBoxStyle.Exclamation)
-                        End If
-                        i = 4
-                        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, d, Len(d))
-                    End If
-                End If
-            End If
-        End If
+        'If lRetcod = 0 Then
+        '    saind = 288
+        '    salen = 8
+        '    S = lAttribs.GetValue("scen")
+        '    i = 1
+        '    Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, S, Len(S))
+        '    If lRetcod = 0 Then
+        '        saind = 289
+        '        c = lAttribs.GetValue("cons")
+        '        i = 2
+        '        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, c, Len(c))
+        '        If lRetcod = 0 Then
+        '            saind = 290
+        '            l = lAttribs.GetValue("locn")
+        '            i = 3
+        '            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, l, Len(l))
+        '            If lRetcod = 0 Then
+        '                saind = 45
+        '                salen = 48
+        '                d = lAttribs.GetValue("desc")
+        '                If Len(d) > salen Then
+        '                    Logger.Msg("Description: '" & d & vbCr & "truncated to: " & Left(d, salen), "WDM Write Data Header", MsgBoxStyle.Exclamation)
+        '                End If
+        '                i = 4
+        '                Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, d, Len(d))
+        '            End If
+        '        End If
+        '    End If
+        'End If
 
         If lRetcod = 0 Then
             writeDataHeader = DsnWriteAttributes(aFileUnit, dataObject)
@@ -420,20 +421,20 @@ Public Class atcDataSourceWDM
         End If
         lSaInd = 27 'tsbyr
         F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
-        lSaLen = 8
-        lSaInd = 288 'scenario
-        lStr = UCase(Left(aTs.Attributes.GetValue("scen"), lSaLen))
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
-        lSaInd = 289 'constituent
-        lStr = UCase(Left(aTs.Attributes.GetValue("cons"), lSaLen))
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
-        lSaInd = 290 'location
-        lStr = UCase(Left(aTs.Attributes.GetValue("locn"), lSaLen))
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
-        lSaLen = 48
-        lSaInd = 45 'description
-        lStr = Left(aTs.Attributes.GetValue("desc"), lSaLen)
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        'lSaLen = 8
+        'lSaInd = 288 'scenario
+        'lStr = UCase(Left(aTs.Attributes.GetValue("scen"), lSaLen))
+        'F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        'lSaInd = 289 'constituent
+        'lStr = UCase(Left(aTs.Attributes.GetValue("cons"), lSaLen))
+        'F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        'lSaInd = 290 'location
+        'lStr = UCase(Left(aTs.Attributes.GetValue("locn"), lSaLen))
+        'F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        'lSaLen = 48
+        'lSaInd = 45 'station name
+        'lStr = Left(aTs.Attributes.GetValue("stanam"), lSaLen)
+        'F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
 
         'others (from attrib)
         DsnBld = DsnWriteAttributes(aFileUnit, aTs)
@@ -472,6 +473,9 @@ Public Class atcDataSourceWDM
                             F90_WDBSAR(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, 1, CSng(lValue), lRetcod)
                         End If
                     Case Else 'character
+                        If Len(lValue) > lMsgDefinition.Max Then
+                            Logger.Dbg("Attribute '" & lMsgDefinition.Name & "' truncated from '" & lValue & "' to '" & Left(lValue, lMsgDefinition.Max) & "'")
+                        End If
                         F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, lMsgDefinition.Max, lRetcod, lValue, Len(lValue))
                 End Select
                 If lRetcod <> 0 Then
@@ -917,7 +921,7 @@ Public Class atcDataSourceWDM
         aDataset.Attributes.SetValue("cons", lStr)
         'station name
         F90_WDBSGC(aFileUnit, lDsn, CInt(45), CInt(48), lStr)
-        aDataset.Attributes.SetValue("desc", lStr)
+        aDataset.Attributes.SetValue("stanam", lStr)
         aDataset.Attributes.SetValue("HeaderComplete", True)
     End Sub
 
