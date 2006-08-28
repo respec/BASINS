@@ -223,7 +223,7 @@ Public Class atcDataAttributes
                 .Add("desc", "Description")
                 .Add("descrp", "Description")
 
-                .Add("stanam", "Station Name")
+                '.Add("stanam", "Station Name")  'Add this when WDM code can handle it - mhg
 
                 .Add("long filename", "FileName")
                 .Add("path", "FileName")
