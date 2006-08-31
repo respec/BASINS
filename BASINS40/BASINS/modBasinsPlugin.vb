@@ -24,7 +24,7 @@ Friend Module modBasinsPlugin
     Friend Const FileMenuName As String = "mnuFile"
 
     Friend Const ProjectsMenuName As String = "BasinsProjects"
-    Friend Const ProjectsMenuString As String = "Open &BASINS Project"
+    Friend Const ProjectsMenuString As String = "Open BASINS Project"
 
     Friend Const NewDataMenuName As String = "BasinsNewData"
     Friend Const NewDataMenuString As String = "New Data"
@@ -65,7 +65,7 @@ Friend Module modBasinsPlugin
     Friend Const BasinsWebPageMenuString As String = "BASINS Web Page"
 
     Friend Const SendFeedbackMenuName As String = "SendFeedback"
-    Friend Const SendFeedbackMenuString As String = "Send &Feedback"
+    Friend Const SendFeedbackMenuString As String = "Send Feedback"
 
     Friend Const DataMenuName As String = "BasinsData"
     Friend Const DataMenuString As String = "Data"
