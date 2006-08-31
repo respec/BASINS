@@ -676,12 +676,12 @@ Public Module modString
     ''' Replace a block of text between two known strings
     ''' </summary>
     ''' <param name="aSource">Text to search through</param>
-    ''' <param name="aStartsWith">String that indicates block to find is about to start</param>
-    ''' <param name="aEndsWith">String that indicates block to find has ended</param>
+    ''' <param name="aStartsWith">String that indicates beginning of block to find</param>
+    ''' <param name="aEndsWith">String that indicates end of block to find</param>
     ''' <param name="aReplaceWith">String to replace block that is found</param>
     ''' <param name="aStartIndex">Optional offset within aSource to start searching</param>
     ''' <returns>aSource where block of text that was found between aStartsWith and aEndsWith is replaced by aReplaceWith</returns>
-    ''' <remarks>Returned string does not include aStartsWith and aEndsWith. 
+    ''' <remarks>Returned string includes aStartsWith and aEndsWith. 
     ''' aSource is returned unchanged if aStartsWith or aEndsWith is not found.</remarks>
     Public Function StrReplaceBlock(ByVal aSource As String, _
                                     ByVal aStartsWith As String, _
@@ -692,11 +692,12 @@ Public Module modString
         If lStartPosition < 0 Then
             Return aSource
         Else
-            Dim lEndPosition As Integer = aSource.IndexOf(aEndsWith, lStartPosition + aStartsWith.Length)
+            lStartPosition += aStartsWith.Length
+            Dim lEndPosition As Integer = aSource.IndexOf(aEndsWith, lStartPosition)
             If lEndPosition < 0 Then
                 Return aSource
             Else
-                Return aSource.Substring(0, lStartPosition) & aReplaceWith & aSource.Substring(lEndPosition + aEndsWith.Length)
+                Return aSource.Substring(0, lStartPosition) & aReplaceWith & aSource.Substring(lEndPosition)
             End If
         End If
     End Function
