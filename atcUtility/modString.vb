@@ -672,6 +672,35 @@ Public Module modString
         End If
     End Function
 
+    ''' <summary>
+    ''' Replace a block of text between two known strings
+    ''' </summary>
+    ''' <param name="aSource">Text to search through</param>
+    ''' <param name="aStartsWith">String that indicates block to find is about to start</param>
+    ''' <param name="aEndsWith">String that indicates block to find has ended</param>
+    ''' <param name="aReplaceWith">String to replace block that is found</param>
+    ''' <param name="aStartIndex">Optional offset within aSource to start searching</param>
+    ''' <returns>aSource where block of text that was found between aStartsWith and aEndsWith is replaced by aReplaceWith</returns>
+    ''' <remarks>Returned string does not include aStartsWith and aEndsWith. 
+    ''' aSource is returned unchanged if aStartsWith or aEndsWith is not found.</remarks>
+    Public Function StrReplaceBlock(ByVal aSource As String, _
+                                    ByVal aStartsWith As String, _
+                                    ByVal aEndsWith As String, _
+                                    ByVal aReplaceWith As String, _
+                           Optional ByVal aStartIndex As Integer = 0) As String
+        Dim lStartPosition As Integer = aSource.IndexOf(aStartsWith, aStartIndex)
+        If lStartPosition < 0 Then
+            Return aSource
+        Else
+            Dim lEndPosition As Integer = aSource.IndexOf(aEndsWith, lStartPosition + aStartsWith.Length)
+            If lEndPosition < 0 Then
+                Return aSource
+            Else
+                Return aSource.Substring(0, lStartPosition) & aReplaceWith & aSource.Substring(lEndPosition + aEndsWith.Length)
+            End If
+        End If
+    End Function
+
     Public Function StrSplit(ByRef Source As String, ByRef delim As String, ByRef quote As String) As String
         ' ##SUMMARY Divides string into 2 portions at position of 1st occurence of specified _
         'delimeter. Quote specifies a particular string that is exempt from the delimeter search.
