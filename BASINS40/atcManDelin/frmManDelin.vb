@@ -1035,11 +1035,10 @@ Public Class frmManDelin
         Dim dval As String
         Dim dsubbasin As String
         Dim rsubbasin As String
-        GisUtil.ShowProgressBar(True)
         GisUtil.StartSetFeatureValue(StreamsLayerIndex)
         'populate the downstream subbasin ids
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
-            GisUtil.ProgressBarValue(Int(i / GisUtil.NumFeatures(StreamsLayerIndex) * 100))
+            Logger.Progress(i, GisUtil.NumFeatures(StreamsLayerIndex))
             System.Windows.Forms.Application.DoEvents()
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, dfield)
             'find what is downstream of rval
@@ -1066,14 +1065,14 @@ Public Class frmManDelin
             Next j
         Next i
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
-            GisUtil.ProgressBarValue(Int(i / GisUtil.NumFeatures(StreamsLayerIndex) * 100))
+            Logger.Progress(i, GisUtil.NumFeatures(StreamsLayerIndex))
             System.Windows.Forms.Application.DoEvents()
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, DownstreamFieldIndex)
             If dval = 0 Then
                 GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, DownstreamFieldIndex, i - 1, -999)
             End If
         Next i
-        GisUtil.ShowProgressBar(False)
+        Logger.Progress(GisUtil.NumFeatures(StreamsLayerIndex), GisUtil.NumFeatures(StreamsLayerIndex))
         GisUtil.StopSetFeatureValue(StreamsLayerIndex)
 
         'merge reach segments together within subbasin

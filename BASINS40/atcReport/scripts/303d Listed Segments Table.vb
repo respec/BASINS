@@ -51,12 +51,8 @@ Public Module ListedSegmentsTable
         End If
 
         If Len(lProblem) = 0 Then
-            GisUtil.ShowProgressBar(True)
-            GisUtil.ProgressBarValue(0)
             Dim lProgressTotal As Integer = aSelectedAreaIndexes.Count * GisUtil.NumFeatures(lImpairedLayerIndex)
             Dim lProgressCurrent As Integer = 0
-            Dim lProgressPercent As Integer = 0
-            Dim lProgressLastDisplayed As Integer = 0
             'loop through each selected polygon and each 303d feature looking for overlap
             For j = 1 To aSelectedAreaIndexes.Count
                 For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
@@ -71,14 +67,10 @@ Public Module ListedSegmentsTable
                         lGridSource.CellValue(lGridSource.Rows - 1, 4) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairmentFieldIndex)
                     End If
                     lProgressCurrent = lProgressCurrent + 1
-                    lProgressPercent = Int(lProgressCurrent / lProgressTotal * 100)
-                    If lProgressPercent > lProgressLastDisplayed Then
-                        GisUtil.ProgressBarValue(lProgressPercent)
-                        lProgressLastDisplayed = lProgressPercent
-                    End If
+                    Logger.Progress(lProgressCurrent, lProgressTotal)
                 Next i
             Next j
-            GisUtil.ShowProgressBar(False)
+            Logger.Progress(lProgressTotal, lProgressTotal)
         End If
 
         'now check 303d polygon layer
@@ -103,12 +95,8 @@ Public Module ListedSegmentsTable
         End If
 
         If Len(lProblem) = 0 Then
-            GisUtil.ShowProgressBar(True)
-            GisUtil.ProgressBarValue(0)
             Dim lProgressTotal As Integer = aSelectedAreaIndexes.Count * GisUtil.NumFeatures(lImpairedLayerIndex)
             Dim lProgressCurrent As Integer = 0
-            Dim lProgressPercent As Integer = 0
-            Dim lProgressLastDisplayed As Integer = 0
             'loop through each selected polygon and each 303d feature looking for overlap
             For j = 1 To aSelectedAreaIndexes.Count
                 For i = 1 To GisUtil.NumFeatures(lImpairedLayerIndex)
@@ -123,14 +111,10 @@ Public Module ListedSegmentsTable
                         lGridSource.CellValue(lGridSource.Rows - 1, 4) = GisUtil.FieldValue(lImpairedLayerIndex, i - 1, lImpairmentFieldIndex)
                     End If
                     lProgressCurrent = lProgressCurrent + 1
-                    lProgressPercent = Int(lProgressCurrent / lProgressTotal * 100)
-                    If lProgressPercent > lProgressLastDisplayed Then
-                        GisUtil.ProgressBarValue(lProgressPercent)
-                        lProgressLastDisplayed = lProgressPercent
-                    End If
+                    Logger.Progress(lProgressCurrent, lProgressTotal)
                 Next i
             Next j
-            GisUtil.ShowProgressBar(False)
+            Logger.Progress(lProgressTotal, lProgressTotal)
         End If
 
         If Len(lProblem) = 0 Then

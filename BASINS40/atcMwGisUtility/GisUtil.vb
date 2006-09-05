@@ -1118,9 +1118,6 @@ Public Class GisUtil
         Dim lCellArea As Double = lInputGrid.Header.dX * lInputGrid.Header.dY
         Dim lTotalCellCount As Integer = (lEndingColumn - lStartingColumn) * (lEndingRow - lStartingRow)
         Dim lCellCount As Integer = 0
-        Dim lLastdisplayed As Integer = 0
-        GetMappingObject.StatusBar.ShowProgressBar = True
-        GetMappingObject.StatusBar.ProgressBarValue = 0
 
         lPolygonSf.BeginPointInShapefile()
         Dim lXPos As Double
@@ -1141,16 +1138,11 @@ Public Class GisUtil
                     aAreaGridPoly(lGridValue, lInsideId) += lCellArea
                 End If
                 lCellCount += 1
-                Dim lCurrentDisplay As Integer = Int(lCellCount / lTotalCellCount * 100)
-                If lCurrentDisplay > lLastdisplayed Then
-                    lLastdisplayed = lCurrentDisplay
-                    GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
-                    System.Windows.Forms.Application.DoEvents()
-                End If
+                Logger.Progress(lCellCount, lTotalCellCount)
             Next lCol
         Next lRow
 
-        GetMappingObject.StatusBar.ShowProgressBar = False
+        Logger.Progress(lTotalCellCount, lTotalCellCount)
         lPolygonSf.EndPointInShapefile()
 
     End Sub
@@ -1172,7 +1164,6 @@ Public Class GisUtil
         Dim lVal As Integer
         Dim totalcellcount As Integer
         Dim cellcount As Integer
-        Dim lastdisplayed As Integer
 
         'set input grid
         Dim lInputGrid As MapWinGIS.Grid = GridFromIndex(aGridLayerIndex)
@@ -1189,9 +1180,6 @@ Public Class GisUtil
 
             totalcellcount = (lEndCol - lStartCol) * (lEndRow - lStartRow)
             cellcount = 0
-            lastdisplayed = 0
-            GetMappingObject.StatusBar.ShowProgressBar = True
-            GetMappingObject.StatusBar.ProgressBarValue = 0
 
             aMin = 99999999
             aMax = -99999999
@@ -1210,14 +1198,10 @@ Public Class GisUtil
                         End If
                     End If
                     cellcount = cellcount + 1
-                    If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
-                        lastdisplayed = Int(cellcount / totalcellcount * 100)
-                        GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
-                        System.Windows.Forms.Application.DoEvents()
-                    End If
+                    Logger.Progress(cellcount, totalcellcount)
                 Next lRow
             Next lCol
-            GetMappingObject.StatusBar.ShowProgressBar = False
+            Logger.Progress(totalcellcount, totalcellcount)
             lPolygonSf.EndPointInShapefile()
         End If
     End Sub
@@ -1238,7 +1222,6 @@ Public Class GisUtil
         Dim lVal As Integer
         Dim totalcellcount As Integer
         Dim cellcount As Integer
-        Dim lastdisplayed As Integer
         Dim lNeighborVal As Integer
         Dim lNeighborCount As Integer
         Dim lSum As Integer
@@ -1259,9 +1242,6 @@ Public Class GisUtil
 
             totalcellcount = (lEndCol - lStartCol) * (lEndRow - lStartRow)
             cellcount = 0
-            lastdisplayed = 0
-            GetMappingObject.StatusBar.ShowProgressBar = True
-            GetMappingObject.StatusBar.ProgressBarValue = 0
 
             lPolygonSf.BeginPointInShapefile()
             lSum = 0
@@ -1302,15 +1282,11 @@ Public Class GisUtil
                         lSubCellCount = lSubCellCount + 1
                     End If
                     cellcount = cellcount + 1
-                    If Int(cellcount / totalcellcount * 100) > lastdisplayed Then
-                        lastdisplayed = Int(cellcount / totalcellcount * 100)
-                        GetMappingObject.StatusBar.ProgressBarValue = Int(cellcount / totalcellcount * 100)
-                        System.Windows.Forms.Application.DoEvents()
-                    End If
+                    Logger.Progress(cellcount, totalcellcount)
                 Next lRow
             Next lCol
             GridSlopeInPolygon = (lSum / lSubCellCount) / lInputGrid.Header.dX
-            GetMappingObject.StatusBar.ShowProgressBar = False
+            Logger.Progress(totalcellcount, totalcellcount)
             lPolygonSf.EndPointInShapefile()
         End If
     End Function
@@ -1454,12 +1430,9 @@ Public Class GisUtil
         Next k
 
         '********** do overlay ***********
-        GetMappingObject.StatusBar.ShowProgressBar = True
-        GetMappingObject.StatusBar.ProgressBarValue = 0
 
         Dim lTotalPolygonCount As Integer = lSf1.NumShapes * lLayer2Selected.Count
         Dim lPolygonCount As Integer = 0
-        Dim lLastDisplayed As Integer = 0
         Dim lNumShapes As Integer = lSf1.NumShapes
         For i As Integer = 1 To lNumShapes 'loop through each shape of the land use layer
             lShape1 = lSf1.Shape(i - 1)
@@ -1501,15 +1474,9 @@ Public Class GisUtil
 
             lSf1Ext = Nothing
             lShape1 = Nothing
-
-            Dim lCurrentDisplay As Integer = Int(lPolygonCount / lTotalPolygonCount * 100)
-            If lCurrentDisplay > lLastDisplayed Then
-                lLastDisplayed = lCurrentDisplay
-                GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
-                System.Windows.Forms.Application.DoEvents()
-            End If
+            Logger.Progress(lPolygonCount, lTotalPolygonCount)
         Next i
-        GetMappingObject.StatusBar.ShowProgressBar = False
+        Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
         If aCreateNew Then 'delete old version of this file if it exists
             If FileExists(aOutputLayerName) Then
@@ -1586,12 +1553,9 @@ Public Class GisUtil
         Next k
 
         '********** do overlay ***********
-        GetMappingObject.StatusBar.ShowProgressBar = True
-        GetMappingObject.StatusBar.ProgressBarValue = 0
 
         Dim lTotalPolygonCount As Integer = lSf1.NumShapes * aSelectedLayer2Indexes.Count
         Dim lPolygonCount As Integer = 0
-        Dim lLastDisplayed As Integer = 0
         Dim lNumShapes As Integer = lSf1.NumShapes
         For i As Integer = 1 To lNumShapes 'loop through each shape of the land use layer
             lShape1 = lSf1.Shape(i - 1)
@@ -1629,14 +1593,9 @@ Public Class GisUtil
             lSf1Ext = Nothing
             lShape1 = Nothing
 
-            Dim lCurrentDisplay As Integer = Int(lPolygonCount / lTotalPolygonCount * 100)
-            If lCurrentDisplay > lLastDisplayed Then
-                lLastDisplayed = lCurrentDisplay
-                GetMappingObject.StatusBar.ProgressBarValue = lCurrentDisplay
-                System.Windows.Forms.Application.DoEvents()
-            End If
+            Logger.Progress(lPolygonCount, lTotalPolygonCount)
         Next i
-        GetMappingObject.StatusBar.ShowProgressBar = False
+        Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
     End Sub
 
@@ -1678,7 +1637,6 @@ Public Class GisUtil
         Dim issf As New MapWinGIS.Shapefile
         issf.CreateNew("temp_clip.shp", MapWinGIS.ShpfileType.SHP_POLYLINE)
 
-        GetMappingObject.StatusBar.ShowProgressBar = True
         lCount = 0
         lTotal = lSfClip.NumShapes * lSf.NumShapes
         lSfClip.BeginPointInShapefile()
@@ -1686,8 +1644,7 @@ Public Class GisUtil
             lShapeClip = lSfClip.Shape(i - 1)
             For j = 1 To lSf.NumShapes
                 lCount += 1
-                GetMappingObject.StatusBar.ProgressBarValue = Int(lCount / lTotal * 100)
-                System.Windows.Forms.Application.DoEvents()
+                Logger.Progress(lCount, lTotal)
                 If IsLineInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
                     'at least one point of the line is in the polygon
                     If IsLineEntirelyInPolygon(lSf.Shape(j - 1), lSfClip, i - 1) Then
@@ -1714,7 +1671,7 @@ Public Class GisUtil
             Next j
         Next i
         lSfClip.EndPointInShapefile()
-        GetMappingObject.StatusBar.ShowProgressBar = False
+        Logger.Progress(lTotal, lTotal)
         lNewShapeFile.StopEditingShapes(True, True)
 
         lRetc = lNewShapeFile.Close()
@@ -1781,10 +1738,8 @@ Public Class GisUtil
         lsf.StartEditingShapes(True)
         'merge together based on common endpoints
         Dim i As Integer = 0
-        GetMappingObject.StatusBar.ShowProgressBar = True
         Do While i < lsf.NumShapes
-            GetMappingObject.StatusBar.ProgressBarValue = Int(i / lsf.NumShapes * 100)
-            System.Windows.Forms.Application.DoEvents()
+            Logger.Progress(i, lsf.NumShapes)
             lFound = False
             Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
             Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
@@ -1828,8 +1783,7 @@ Public Class GisUtil
             Dim lEndY2 As Double
             i = 0
             Do While i < lsf.NumShapes
-                GetMappingObject.StatusBar.ProgressBarValue = Int(i / lsf.NumShapes * 100)
-                System.Windows.Forms.Application.DoEvents()
+                Logger.Progress(i, lsf.NumShapes)
                 lFound = False
                 Dim lShape1 As MapWinGIS.Shape = lsf.Shape(i)
                 Dim lTargetVal As Integer = FieldValue(aLayerIndex, i, aFieldIndex)
@@ -1877,7 +1831,7 @@ Public Class GisUtil
         End If
 
         lsf.StopEditingShapes(True)
-        GetMappingObject.StatusBar.ShowProgressBar = False
+        Logger.Progress(lsf.NumShapes, lsf.NumShapes)
     End Sub
 
     Public Shared Function AreaOverlappingPolygons(ByVal aLayer1index As Integer, _
@@ -1974,14 +1928,6 @@ Public Class GisUtil
         'Stop editing and close the output shapefile
         tollSF.StopEditingShapes(True, True)
 
-    End Sub
-
-    Public Shared Sub ShowProgressBar(ByVal aBoolean As Boolean)
-        GetMappingObject.StatusBar.ShowProgressBar = aBoolean
-    End Sub
-
-    Public Shared Sub ProgressBarValue(ByVal aValue As Integer)
-        GetMappingObject.StatusBar.ProgressBarValue = aValue
     End Sub
 
 End Class

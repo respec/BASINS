@@ -63,12 +63,8 @@ Public Module PCSFacilityTable
                 Dim i As Integer
                 Dim j As Integer
                 Dim lPolygonIndex As Integer
-                GisUtil.ShowProgressBar(True)
-                GisUtil.ProgressBarValue(0)
                 Dim lProgressTotal As Integer = GisUtil.NumFeatures(lPCSLayerIndex)
                 Dim lProgressCurrent As Integer = 0
-                Dim lProgressPercent As Integer = 0
-                Dim lProgressLastDisplayed As Integer = 0
                 'loop through each selected polygon and pcs point looking for overlap
                 For i = 1 To GisUtil.NumFeatures(lPCSLayerIndex)
                     lPolygonIndex = GisUtil.PointInPolygon(lPCSLayerIndex, i, aAreaLayerIndex)
@@ -91,13 +87,9 @@ Public Module PCSFacilityTable
                         Next j
                     End If
                     lProgressCurrent = lProgressCurrent + 1
-                    lProgressPercent = Int(lProgressCurrent / lProgressTotal * 100)
-                    If lProgressPercent > lProgressLastDisplayed Then
-                        GisUtil.ProgressBarValue(lProgressPercent)
-                        lProgressLastDisplayed = lProgressPercent
-                    End If
+                    Logger.Progress(lProgressCurrent, lProgressTotal)
                 Next i
-                GisUtil.ShowProgressBar(False)
+                Logger.Progress(lProgressTotal, lProgressTotal)
             End If
         End If
 
