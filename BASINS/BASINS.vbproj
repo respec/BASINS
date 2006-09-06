@@ -164,6 +164,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmBuildNew.resx">
       <DependentUpon>frmBuildNew.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmButtons.resx">
       <DependentUpon>frmButtons.vb</DependentUpon>
