@@ -4,10 +4,6 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ReferencePath>C:\dev\Basins40\Bin\;C:\dev\Basins40\Bin\Plugins\BASINS\</ReferencePath>
-    <CopyProjectDestinationFolder>
-    </CopyProjectDestinationFolder>
-    <CopyProjectUncPath>
-    </CopyProjectUncPath>
     <CopyProjectOption>0</CopyProjectOption>
     <ProjectView>ProjectFiles</ProjectView>
     <ProjectTrust>0</ProjectTrust>
@@ -18,19 +14,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <EnableSQLServerDebugging>false</EnableSQLServerDebugging>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
-    <RemoteDebugMachine>
-    </RemoteDebugMachine>
     <StartAction>Project</StartAction>
-    <StartArguments>
-    </StartArguments>
-    <StartPage>
-    </StartPage>
-    <StartProgram>
-    </StartProgram>
-    <StartURL>
-    </StartURL>
-    <StartWorkingDirectory>
-    </StartWorkingDirectory>
     <StartWithIE>false</StartWithIE>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -39,19 +23,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <EnableSQLServerDebugging>false</EnableSQLServerDebugging>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
-    <RemoteDebugMachine>
-    </RemoteDebugMachine>
     <StartAction>Project</StartAction>
-    <StartArguments>
-    </StartArguments>
-    <StartPage>
-    </StartPage>
-    <StartProgram>
-    </StartProgram>
-    <StartURL>
-    </StartURL>
-    <StartWorkingDirectory>
-    </StartWorkingDirectory>
     <StartWithIE>false</StartWithIE>
   </PropertyGroup>
 </Project>
