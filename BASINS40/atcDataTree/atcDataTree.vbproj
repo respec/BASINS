@@ -107,7 +107,9 @@
     <Compile Include="atcDataTreePlugin.vb">
       <SubType>Code</SubType>
     </Compile>
-    <EmbeddedResource Include="atcDataTreeForm.resx" />
+    <EmbeddedResource Include="atcDataTreeForm.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />
