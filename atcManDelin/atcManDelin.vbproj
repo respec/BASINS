@@ -69,6 +69,11 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MapWinGeoProc, Version=1.0.2365.24608, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinGeoProc.dll</HintPath>
@@ -93,14 +98,6 @@
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
-    <COMReference Include="MapWinGIS">
-      <Guid>{C368D713-CC5F-40ED-9F53-F84FE197B96A}</Guid>
-      <VersionMajor>3</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Private>False</Private>
-    </COMReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
       <Name>atcMwGisUtility</Name>
       <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>

@@ -144,27 +144,35 @@
     </Compile>
     <EmbeddedResource Include="frmCmpHPET.resx">
       <DependentUpon>frmCmpHPET.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmCmpJPET.resx">
       <DependentUpon>frmCmpJPET.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmCmpPenman.resx">
       <DependentUpon>frmCmpPenman.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmCmpSol.resx">
       <DependentUpon>frmCmpSol.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDisPrec.resx">
       <DependentUpon>frmDisPrec.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDisSol.resx">
       <DependentUpon>frmDisSol.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDisTemp.resx">
       <DependentUpon>frmDisTemp.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmDisWind.resx">
       <DependentUpon>frmDisWind.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

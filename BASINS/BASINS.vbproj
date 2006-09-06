@@ -175,6 +175,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmWelcomeScreenBasins.resx">
       <DependentUpon>frmWelcomeScreenBasins.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

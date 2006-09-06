@@ -159,6 +159,7 @@
     </Compile>
     <EmbeddedResource Include="frmDataSource.resx">
       <DependentUpon>frmDataSource.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmManager.resx">
       <DependentUpon>frmManager.vb</DependentUpon>

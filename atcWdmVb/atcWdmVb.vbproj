@@ -33,6 +33,7 @@
     <Reference Include="MapWinUtility, Version=1.0.2371.15538, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

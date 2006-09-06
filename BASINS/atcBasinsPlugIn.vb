@@ -76,7 +76,7 @@ Public Class atcBasinsPlugIn
 
         Logger.StartToFile(g_BasinsDir & "logs\" _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log")
-        Logger.MapWin = g_MapWin
+        'Logger.MapWin = g_MapWin
 
         CheckForUpdates(True)
 

@@ -151,9 +151,11 @@
     </Compile>
     <EmbeddedResource Include="frmSpecifySeasonalAttributes.resx">
       <DependentUpon>frmSpecifySeasonalAttributes.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSpecifyYearSubset.resx">
       <DependentUpon>frmSpecifyYearSubset.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
