@@ -4,6 +4,7 @@ Public Class PlugIn
     Implements MapWindow.Interfaces.IPlugin
 
     Public pMapWin As MapWindow.Interfaces.IMapWin
+    Private pParentMenu As MapWindow.Interfaces.MenuItem
 
     Private Const ParentMenuName As String = "BasinsAnalysis"
     Private Const ParentMenuString As String = "Analysis"
@@ -46,24 +47,31 @@ Public Class PlugIn
 
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
         pMapWin = MapWin
+        pParentMenu = pMapWin.Menus(ParentMenuName)
+        If pParentMenu Is Nothing Then
+            pParentMenu = pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
+        End If
 
-        pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
+        pMapWin.Menus.AddMenu(ParentMenuName & "_LookupSeparator", ParentMenuName, Nothing, "-")
         pMapWin.Menus.AddMenu(ParentMenuName & "_Projection", ParentMenuName, Nothing, "Projection Parameters")
         pMapWin.Menus.AddMenu(ParentMenuName & "_Storet", ParentMenuName, Nothing, "STORET Agency Codes")
         pMapWin.Menus.AddMenu(ParentMenuName & "_Sic", ParentMenuName, Nothing, "Standard Industrial Classification Codes")
         pMapWin.Menus.AddMenu(ParentMenuName & "_WQ", ParentMenuName, Nothing, "Water Quality Criteria 304a")
-        pMapWin.Menus.AddMenu(ParentMenuName & "_LookupSeparator", ParentMenuName, Nothing, "-")
+        pMapWin.Menus.AddMenu(ParentMenuName & "_LookupSeparator2", ParentMenuName, Nothing, "-")
 
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        pMapWin.Menus.Remove(ParentMenuName)
+        pMapWin.Menus.Remove(ParentMenuName & "_LookupSeparator")
         pMapWin.Menus.Remove(ParentMenuName & "_Projection")
         pMapWin.Menus.Remove(ParentMenuName & "_Storet")
         pMapWin.Menus.Remove(ParentMenuName & "_Sic")
         pMapWin.Menus.Remove(ParentMenuName & "_WQ")
-        pMapWin.Menus.Remove(ParentMenuName & "_LookupSeparator")
+        pMapWin.Menus.Remove(ParentMenuName & "_LookupSeparator2")
 
+        If pMapWin.Menus.Item(ParentMenuName).NumSubItems = 0 Then
+            pMapWin.Menus.Remove(ParentMenuName)
+        End If
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
