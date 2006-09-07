@@ -214,52 +214,78 @@ Friend Module modBasinsPlugin
     Friend Function AddMenuIfMissing(ByVal aMenuName As String, _
                                         ByVal aParent As String, _
                                         ByVal aMenuText As String, _
-                               Optional ByVal aAfter As String = "") _
+                               Optional ByVal aAfter As String = "", _
+                               Optional ByVal aAlphabetical As Boolean = False) _
                                As MapWindow.Interfaces.MenuItem
 
         Dim lMenus As MapWindow.Interfaces.Menus = g_MapWin.Menus
         With lMenus
-            If .Item(aMenuName) Is Nothing Then
-                Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
+            Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
+            If Not lMenu Is Nothing Then 'This item already exists
+                Return lMenu
+            ElseIf aAlphabetical And aParent.Length > 0 Then
+                'Need parent to do alphabetical search for position
+                Dim lParentMenu As MapWindow.Interfaces.MenuItem = .Item(aParent)
+                Dim lSubmenuIndex As Integer = 0
+                Dim lExistingMenu As MapWindow.Interfaces.MenuItem
+
+                If aAfter.Length > 0 Then
+                    'First make sure we are after a particular item
+                    While lSubmenuIndex < lParentMenu.NumSubItems
+                        lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
+                        If Not lExistingMenu Is Nothing AndAlso _
+                           Not lExistingMenu.Name Is Nothing AndAlso _
+                               lExistingMenu.Name.Equals(aAfter) Then
+                            Exit While
+                        End If
+                        lExistingMenu = Nothing
+                        lSubmenuIndex += 1
+                    End While
+                    If lSubmenuIndex >= lParentMenu.NumSubItems Then
+                        'Did not find menu aAfter, so start at first subitem
+                        lSubmenuIndex = 0
+                    End If
+                End If
+
+                'Find alphabetical position for new menu item
+                While lSubmenuIndex < lParentMenu.NumSubItems
+                    lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
+                    If Not lExistingMenu Is Nothing AndAlso _
+                       Not lExistingMenu.Name Is Nothing AndAlso _
+                           lExistingMenu.Text > aMenuText Then
+                        'Add before existing menu with alphabetically later text
+                        Return .AddMenu(aMenuName, aParent, aMenuText, lExistingMenu.Name)
+                    End If
+                    lSubmenuIndex += 1
+                End While
+                'Add after last parent subitem
+                If lParentMenu.NumSubItems = 0 Then
+                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText)
+                Else
+                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, lParentMenu.SubItem(lParentMenu.NumSubItems - 1).Name)
+                End If
             Else
-                Return .Item(aMenuName)
+                Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
             End If
         End With
     End Function
 
     Friend Sub RefreshAnalysisMenu(Optional ByVal aIgnore As String = "")
-        'Dim lScriptMenuName As String = AnalysisMenuName & "_Scripting"
-        'Dim iPlugin As Integer
         If pLoadedDataMenu Then
             AddMenuIfMissing(AnalysisMenuName, "", AnalysisMenuString, FileMenuName)
-            'AddMenuIfMissing(AnalysisMenuName & "_TestDBF", AnalysisMenuName, "Test DBF")
             AddMenuIfMissing(AnalysisMenuName & "_ArcView3", AnalysisMenuName, "ArcView 3")
             AddMenuIfMissing(AnalysisMenuName & "_ArcGIS", AnalysisMenuName, "ArcGIS")
             AddMenuIfMissing(AnalysisMenuName & "_GenScn", AnalysisMenuName, "GenScn")
             AddMenuIfMissing(AnalysisMenuName & "_WDMUtil", AnalysisMenuName, "WDMUtil")
-            'AddMenuIfMissing(lScriptMenuName, AnalysisMenuName, "Scripting")
-            'If pBuiltInScriptExists Then
-            '  AddMenuIfMissing(AnalysisMenuName & "_RunBuiltInScript", lScriptMenuName, "Run Built In Script")
-            'End If
-            'AddMenuIfMissing(AnalysisMenuName & "_ScriptEditor", lScriptMenuName, "Script Editor")
-            'AddMenuIfMissing(AnalysisMenuName & "_RunScript", lScriptMenuName, "Select Script to Run")
-
-            'For Each lScriptFilename As String In IO.Directory.GetFiles(ScriptFolder, "*.vb")
-            '  Dim lMenuLabel As String = FilenameOnly(lScriptFilename)
-            '  If Not lMenuLabel.ToLower.StartsWith("sub") AndAlso Not lMenuLabel.ToLower.StartsWith("fun") Then
-            '    AddMenuIfMissing(AnalysisMenuName & "_RunScript" & FilenameNoPath(lScriptFilename), lScriptMenuName, "Run " & lMenuLabel)
-            '  End If
-            'Next
-
-            'AddMenuIfMissing(AnalysisMenuName & "_ChangeProjection", AnalysisMenuName, "Change &Projection")
 
             Dim lPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
             If lPlugins.Count > 0 Then
-                AddMenuIfMissing(AnalysisMenuName & "_Separator1", AnalysisMenuName, "-")
+                Dim lSeparatorName As String = AnalysisMenuName & "_Separator1"
+                AddMenuIfMissing(lSeparatorName, AnalysisMenuName, "-")
                 For Each lDisp As atcDataDisplay In lPlugins
                     Dim lMenuText As String = lDisp.Name
                     If Not lMenuText.Equals(aIgnore) AndAlso lMenuText.StartsWith("Analysis::") Then
-                        AddMenuIfMissing(AnalysisMenuName & "_" & lDisp.Name, AnalysisMenuName, lMenuText.Substring(10))
+                        AddMenuIfMissing(AnalysisMenuName & "_" & lDisp.Name, AnalysisMenuName, lMenuText.Substring(10), lSeparatorName, True)
                     End If
                 Next
             End If
@@ -278,19 +304,19 @@ Friend Module modBasinsPlugin
                     For Each lOperation As atcDefinedValue In lOperations
                         Select Case lOperation.Definition.TypeString
                             Case "atcTimeseries", "atcDataGroup"
-                                AddMenuIfMissing(lCategoryMenuName, ComputeMenuName, ds.Category)
+                                AddMenuIfMissing(lCategoryMenuName, ComputeMenuName, ds.Category, , True)
                                 'Operations might have categories to further divide them
                                 If lOperation.Definition.Category.Length > 0 Then
                                     Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
-                                    AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category)
-                                    AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name, lSubCategoryName, lOperation.Definition.Name)
+                                    AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , True)
+                                    AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name, lSubCategoryName, lOperation.Definition.Name, , True)
                                 Else
-                                    AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name, lCategoryMenuName, lOperation.Definition.Name)
+                                    AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name, lCategoryMenuName, lOperation.Definition.Name, , True)
                                 End If
                         End Select
                     Next
                 Else
-                    AddMenuIfMissing(lCategoryMenuName & "_" & ds.Description, lCategoryMenuName, ds.Description)
+                    AddMenuIfMissing(lCategoryMenuName & "_" & ds.Description, lCategoryMenuName, ds.Description, , True)
                 End If
             End If
         Next
