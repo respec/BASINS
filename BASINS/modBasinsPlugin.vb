@@ -58,6 +58,7 @@ Friend Module modBasinsPlugin
     Friend Const CheckForUpdatesMenuName As String = "CheckForUpdates"
     Friend Const CheckForUpdatesMenuString As String = "Check For Updates"
 
+    Friend Const HelpMenuName As String = "mnuHelp"
     Friend Const BasinsHelpMenuName As String = "BasinsHelp"
     Friend Const BasinsHelpMenuString As String = "BASINS Documentation"
 
@@ -215,6 +216,7 @@ Friend Module modBasinsPlugin
                                         ByVal aParent As String, _
                                         ByVal aMenuText As String, _
                                Optional ByVal aAfter As String = "", _
+                               Optional ByVal aBefore As String = "", _
                                Optional ByVal aAlphabetical As Boolean = False) _
                                As MapWindow.Interfaces.MenuItem
 
@@ -251,19 +253,19 @@ Friend Module modBasinsPlugin
                 While lSubmenuIndex < lParentMenu.NumSubItems
                     lExistingMenu = lParentMenu.SubItem(lSubmenuIndex)
                     If Not lExistingMenu Is Nothing AndAlso _
-                       Not lExistingMenu.Name Is Nothing AndAlso _
+                       Not lExistingMenu.Name Is Nothing Then
+                        If (aBefore.Length > 0 AndAlso lExistingMenu.Text = aBefore) OrElse _
                            lExistingMenu.Text > aMenuText Then
-                        'Add before existing menu with alphabetically later text
-                        Return .AddMenu(aMenuName, aParent, aMenuText, lExistingMenu.Name)
+                            'Add before existing menu with alphabetically later text
+                            Return .AddMenu(aMenuName, aParent, aMenuText, lExistingMenu.Name)
+                        End If
                     End If
                     lSubmenuIndex += 1
                 End While
-                'Add after last parent subitem
-                If lParentMenu.NumSubItems = 0 Then
-                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText)
-                Else
-                    Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, lParentMenu.SubItem(lParentMenu.NumSubItems - 1).Name)
-                End If
+                'Add at default position, after last parent subitem
+                Return .AddMenu(aMenuName, aParent, Nothing, aMenuText)
+            ElseIf aBefore.Length > 0 Then
+                Return .AddMenu(aMenuName, aParent, aMenuText, aBefore)
             Else
                 Return .AddMenu(aMenuName, aParent, Nothing, aMenuText, aAfter)
             End If
@@ -285,7 +287,7 @@ Friend Module modBasinsPlugin
                 For Each lDisp As atcDataDisplay In lPlugins
                     Dim lMenuText As String = lDisp.Name
                     If Not lMenuText.Equals(aIgnore) AndAlso lMenuText.StartsWith("Analysis::") Then
-                        AddMenuIfMissing(AnalysisMenuName & "_" & lDisp.Name, AnalysisMenuName, lMenuText.Substring(10), lSeparatorName, True)
+                        AddMenuIfMissing(AnalysisMenuName & "_" & lDisp.Name, AnalysisMenuName, lMenuText.Substring(10), lSeparatorName, , True)
                     End If
                 Next
             End If
@@ -304,19 +306,19 @@ Friend Module modBasinsPlugin
                     For Each lOperation As atcDefinedValue In lOperations
                         Select Case lOperation.Definition.TypeString
                             Case "atcTimeseries", "atcDataGroup"
-                                AddMenuIfMissing(lCategoryMenuName, ComputeMenuName, ds.Category, , True)
+                                AddMenuIfMissing(lCategoryMenuName, ComputeMenuName, ds.Category, , , True)
                                 'Operations might have categories to further divide them
                                 If lOperation.Definition.Category.Length > 0 Then
                                     Dim lSubCategoryName As String = lCategoryMenuName & "_" & lOperation.Definition.Category
-                                    AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , True)
-                                    AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name, lSubCategoryName, lOperation.Definition.Name, , True)
+                                    AddMenuIfMissing(lSubCategoryName, lCategoryMenuName, lOperation.Definition.Category, , , True)
+                                    AddMenuIfMissing(lSubCategoryName & "_" & lOperation.Definition.Name, lSubCategoryName, lOperation.Definition.Name, , , True)
                                 Else
-                                    AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name, lCategoryMenuName, lOperation.Definition.Name, , True)
+                                    AddMenuIfMissing(lCategoryMenuName & "_" & lOperation.Definition.Name, lCategoryMenuName, lOperation.Definition.Name, , , True)
                                 End If
                         End Select
                     Next
                 Else
-                    AddMenuIfMissing(lCategoryMenuName & "_" & ds.Description, lCategoryMenuName, ds.Description, , True)
+                    AddMenuIfMissing(lCategoryMenuName & "_" & ds.Description, lCategoryMenuName, ds.Description, , , True)
                 End If
             End If
         Next

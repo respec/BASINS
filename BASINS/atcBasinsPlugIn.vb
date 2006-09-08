@@ -8,7 +8,6 @@ Public Class atcBasinsPlugIn
     Implements MapWindow.Interfaces.IPlugin
 
     Private pBusy As Integer = 0 'Incremented by setting Busy = True, decremented by setting Busy = False
-    Private pBeforeBusyCursor As MapWinGIS.tkCursor
 
     Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
         'This is the name that appears in the Plug-ins menu
@@ -99,18 +98,18 @@ Public Class atcBasinsPlugIn
         AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
         AddMenuIfMissing(ProjectsMenuName, FileMenuName, ProjectsMenuString, "mnuRecentProjects")
 
-        'AddMenuIfMissing(ComputeMenuName, "", ComputeMenuString, FileMenuName)
+        AddMenuIfMissing(BasinsHelpMenuName, HelpMenuName, BasinsHelpMenuString, , "mnuOnlineDocs")
+        AddMenuIfMissing(BasinsWebPageMenuName, HelpMenuName, BasinsWebPageMenuString, , "mnuOnlineDocs")
+
+        AddMenuIfMissing(RegisterMenuName, HelpMenuName, RegisterMenuString, , "mnuShortcuts")
+
+        g_MapWin.Menus.Remove("mnuCheckForUpdates") 'Remove MW update menu so only ours will be present
+        g_MapWin.Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
+
+        AddMenuIfMissing(CheckForUpdatesMenuName, HelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
+        AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, CheckForUpdatesMenuName)
 
         Dim mnu As MapWindow.Interfaces.MenuItem
-
-        AddMenuIfMissing("BasinsHelp_Separator1", "mnuHelp", "-")
-        mnu = AddMenuIfMissing(BasinsHelpMenuName, "mnuHelp", BasinsHelpMenuString, "")
-        mnu = AddMenuIfMissing(BasinsWebPageMenuName, "mnuHelp", BasinsWebPageMenuString, "")
-        AddMenuIfMissing("BasinsHelp_Separator2", "mnuHelp", "-")
-        mnu = AddMenuIfMissing(RegisterMenuName, "mnuHelp", RegisterMenuString, "")
-        mnu = AddMenuIfMissing(CheckForUpdatesMenuName, "mnuHelp", CheckForUpdatesMenuString, "")
-        mnu = AddMenuIfMissing(SendFeedbackMenuName, "mnuHelp", SendFeedbackMenuString, "")
-
         For lDrive As Integer = 0 To g_BasinsDrives.Length - 1
             Dim DriveLetter As String = g_BasinsDrives.Substring(lDrive, 1)
             'Scan folder for project data, and populate menu
