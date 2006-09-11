@@ -77,6 +77,9 @@ Public Class atcDataSourceNOAAHPD
             Dim repeatsThisLine As Integer
             Dim maxRepeat As Integer = 24
             Dim lAccumStart As Integer = 0
+            Dim lAddBlank As Integer = 0 'assume no blanks between fields
+            Dim lRepeatsVary As Boolean = True 'assume repeats vary from record to record
+            Dim lRepeatStart As Integer
 
             Dim MissingVal As Double = -999
             Dim MissingAcc As Double = -998
@@ -95,6 +98,52 @@ Public Class atcDataSourceNOAAHPD
             Dim ColMonth As ColDef = AddColEnd(22, 23, "Month")
             Dim ColDay As ColDef = AddColEnd(26, 27, "Day")
             Dim ColRepeats As ColDef = AddColEnd(28, 30, "Repeats")
+            lRepeatStart = 31
+
+            'do 1st line read and column population to check format
+            curLine = NextLine(inReader) 'read line to examine format
+            If Mid(curLine, ColRecType.StartCol, 3) <> "HPD" OrElse _
+               Mid(curLine, ColElementType.StartCol, 4) <> "HPCP" Then
+                'not standard TD3240 format, try to adjust columns to work with format
+                Dim lpos As Integer = InStr(curLine, "HPCP")
+                If lpos > 0 Then
+                    ColElementType.StartCol = lpos
+                    If Mid(curLine, lpos + 4, 2) = "HI" OrElse Mid(curLine, lpos + 4, 2) = "HT" Then
+                        ColUnits.StartCol = lpos + 4
+                    ElseIf Mid(curLine, lpos + 5, 2) = "HI" OrElse Mid(curLine, lpos + 5, 2) = "HT" Then
+                        'blanks between fields
+                        lAddBlank = 1
+                        ColUnits.StartCol = lpos + 5
+                    Else 'no units found, not valid format
+                        Logger.Dbg("PROBLEM:  No valid unit type found - Unit type found is '" & ColUnits.Value & "'")
+                    End If
+                    'now adjust start columns for ensuing fields
+                    ColYear.StartCol = ColUnits.StartCol + 2 + lAddBlank
+                    ColMonth.StartCol = ColYear.StartCol + 4 + lAddBlank
+                    ColDay.StartCol = ColMonth.StartCol + 2 + lAddBlank
+                    If Mid(curLine, ColDay.StartCol + 2 + lAddBlank, 4) = "0100" Then
+                        'looks like 1st of month, assume all records have 24 values
+                        lRepeatsVary = False
+                        repeatsThisLine = 24
+                        lRepeatStart = ColDay.StartCol + 2 + lAddBlank
+                    Else 'assume number of repeats follows
+                        ColRepeats.StartCol = ColDay.StartCol + 2 + lAddBlank
+                        ColRepeats.Value = Mid(curLine, ColRepeats.StartCol, ColRepeats.Length)
+                        If Not IsNumeric(ColRepeats.Value) OrElse _
+                           ColRepeats.Value < 0 OrElse ColRepeats.Value > 25 Then
+                            'invalid number of repeats column
+                            Logger.Dbg("PROBLEM:  Invalid number of repeats found - repeat value is '" & ColRepeats.Value & "'")
+                        End If
+                    End If
+                    'see if station id is in 1st 6 chars
+                    If IsNumeric(Mid(curLine, 1, 6)) Then 'assume it valid id
+                        ColLocation.StartCol = 1
+                        ColState.StartCol = 1 'assume state is 1st 2 characters
+                    End If
+                Else 'no HPCP element found, not valid format
+                    Logger.Dbg("PROBLEM:  No valid Element type found - Element type found is '" & ColElementType.Value & "'")
+                End If
+            End If
 
             'These columns can repeat multiple times per line
             Dim ColHour(0) As ColDef
@@ -103,15 +152,14 @@ Public Class atcDataSourceNOAAHPD
             Dim ColFlag1(0) As ColDef
             Dim ColFlag2(0) As ColDef
 
-            RedimensionRepeating(maxRepeat, ColHour, ColMinute, ColValue, ColFlag1, ColFlag2)
+            RedimensionRepeating(maxRepeat, lRepeatStart, lAddBlank, ColHour, ColMinute, ColValue, ColFlag1, ColFlag2)
 
             Try
-                curLine = NextLine(inReader)
                 PopulateColumns(curLine)
-                repeatsThisLine = CInt(ColRepeats.Value)
+                If lRepeatsVary Then repeatsThisLine = CInt(ColRepeats.Value)
 
-                If (ColRecType.Value = "HPD" AndAlso _
-                   ColElementType.Value = "HPCP" AndAlso _
+                'If (ColRecType.Value = "HPD" AndAlso _
+                If (ColElementType.Value = "HPCP" AndAlso _
                    (ColUnits.Value = "HI" OrElse ColUnits.Value = "HT") AndAlso _
                    IsNumeric(ColValue(0).Value) AndAlso _
                    IsNumeric(ColYear.Value) AndAlso _
@@ -145,7 +193,7 @@ Public Class atcDataSourceNOAAHPD
                     Do
                         If repeatsThisLine > maxRepeat Then
                             maxRepeat = repeatsThisLine
-                            RedimensionRepeating(maxRepeat, ColHour, ColMinute, ColValue, ColFlag1, ColFlag2)
+                            RedimensionRepeating(maxRepeat, lRepeatStart, lAddBlank, ColHour, ColMinute, ColValue, ColFlag1, ColFlag2)
                             PopulateColumns(curLine)
                         End If
                         For repeat = 0 To repeatsThisLine - 2
@@ -206,7 +254,7 @@ Public Class atcDataSourceNOAAHPD
                         Next
                         curLine = NextLine(inReader)
                         PopulateColumns(curLine)
-                        repeatsThisLine = CInt(ColRepeats.Value)
+                        If lRepeatsVary Then repeatsThisLine = CInt(ColRepeats.Value)
                     Loop
                     Open = True
                 Else
@@ -222,8 +270,10 @@ Public Class atcDataSourceNOAAHPD
                 lDate(3) = 0
                 lDate(4) = 0
                 dats(0) = Date2J(lDate)
+                'see if last value fall in middle of the month
                 J2Date(dats(iVal), lDate)
-                If lDate(2) < daymon(lDate(0), lDate(1)) Or lDate(3) < 24 Then
+                If Not (lDate(2) = 1 AndAlso lDate(3) = 0) AndAlso _
+                       (lDate(2) < daymon(lDate(0), lDate(1)) Or lDate(3) < 24) Then
                     'add value to finish the month
                     lDate(2) = daymon(lDate(0), lDate(1))
                     lDate(3) = 24
@@ -232,6 +282,9 @@ Public Class atcDataSourceNOAAHPD
                     ReDim Preserve dats(iVal)
                     vals(iVal) = 0
                     dats(iVal) = Date2J(lDate)
+                Else 'resize arrays so NumValues get set to proper size
+                    ReDim Preserve vals(iVal)
+                    ReDim Preserve dats(iVal)
                 End If
                 lData.Values = vals
                 lDates.Values = dats
@@ -250,6 +303,8 @@ Public Class atcDataSourceNOAAHPD
     End Function
 
     Private Sub RedimensionRepeating(ByVal aMaximum As Integer, _
+                                     ByVal aRptStart As Integer, _
+                                     ByVal aAddBlank As Integer, _
                                      ByRef ColHour() As ColDef, _
                                      ByRef ColMinute() As ColDef, _
                                      ByRef ColValue() As ColDef, _
@@ -267,12 +322,14 @@ Public Class atcDataSourceNOAAHPD
         If oldMaximum = 0 Then oldMaximum = -1 'need to add first column
 
         For repeat As Integer = oldMaximum + 1 To aMaximum
-            repeatOffset = repeat * 12 '12 characters from 31 to 42 repeat
-            ColHour(repeat) = AddColumn(31 + repeatOffset, 2, "Hour." & repeat)
-            ColMinute(repeat) = AddColumn(33 + repeatOffset, 2, "Minute." & repeat)
-            ColValue(repeat) = AddColumn(35 + repeatOffset, 6, "Value." & repeat)
-            ColFlag1(repeat) = AddColumn(41 + repeatOffset, 1, "Flag1." & repeat)
-            ColFlag2(repeat) = AddColumn(42 + repeatOffset, 1, "Flag2." & repeat)
+            '12 characters in 4 fields repeat, with possible blanks between them
+            repeatOffset = aRptStart + repeat * 12 + repeat * aAddBlank * 4
+            'Hour and Minute are part of same data field, so no need to add possible blank between them
+            ColHour(repeat) = AddColumn(repeatOffset, 2, "Hour." & repeat)
+            ColMinute(repeat) = AddColumn(repeatOffset + 2, 2, "Minute." & repeat)
+            ColValue(repeat) = AddColumn(repeatOffset + 4 + aAddBlank, 6, "Value." & repeat)
+            ColFlag1(repeat) = AddColumn(repeatOffset + 10 + 2 * aAddBlank, 1, "Flag1." & repeat)
+            ColFlag2(repeat) = AddColumn(repeatOffset + 11 + 3 * aAddBlank, 1, "Flag2." & repeat)
         Next
 
     End Sub
