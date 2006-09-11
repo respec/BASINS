@@ -58,6 +58,10 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcClimateAssessmentTool", 
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcNOAA", "atcNOAA\atcNOAA.vbproj", "{0B5BECA9-83A8-4CEC-A476-380E9F630091}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcNOAAHPD", "atcNOAAHPD\atcNOAAHPD.vbproj", "{4A527E69-B21C-48C5-933E-2B45BADE7839}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcNOAAISH", "atcNOAAISH\atcNOAAISH.vbproj", "{24A67A2D-7C18-4DCB-976C-2C15C8AB9E6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +183,14 @@ Global
 		{0B5BECA9-83A8-4CEC-A476-380E9F630091}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B5BECA9-83A8-4CEC-A476-380E9F630091}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B5BECA9-83A8-4CEC-A476-380E9F630091}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A527E69-B21C-48C5-933E-2B45BADE7839}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A527E69-B21C-48C5-933E-2B45BADE7839}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A527E69-B21C-48C5-933E-2B45BADE7839}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A527E69-B21C-48C5-933E-2B45BADE7839}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24A67A2D-7C18-4DCB-976C-2C15C8AB9E6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A67A2D-7C18-4DCB-976C-2C15C8AB9E6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24A67A2D-7C18-4DCB-976C-2C15C8AB9E6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24A67A2D-7C18-4DCB-976C-2C15C8AB9E6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
