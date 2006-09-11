@@ -4,7 +4,7 @@ Imports MapWinUtility
 
 Public Module modMetData
 
-    Public Sub FillDailyTsers(ByVal aTS2Fill As atcCollection, ByVal aTSAvail As atcCollection, ByVal aTSObsTimes As atcCollection)
+    Public Sub FillDailyTser(ByRef aTS2Fill As atcTimeseries, ByVal aTS2FillOT As atcTimeseries, ByVal aTSAvail As atcCollection, ByVal aTSAvailOT As atcCollection)
         Dim i As Integer = 0
         Dim j As Integer
         Dim k As Integer
@@ -14,45 +14,52 @@ Public Module modMetData
         Dim lFPos As Integer
         Dim lSPos As Integer
         Dim lMLen As Integer
+        Dim lMTyp As Integer
         Dim ld(5) As Integer
         Dim lFillOT As Integer
         Dim lStaOT As Integer
         Dim s As String
         Dim lStr As String
-        Dim lOStr As String
-        Dim ls As String
         Dim lTUStr As String
-        Dim lFName As String
         Dim lSJDay As Double
+        Dim lEJDay As Double
         Dim lMJDay As Double
         Dim lFVal As Double
-        Dim lFAnn As Double
-        Dim lStaAnn As Double
+        Dim lFilledIt As Boolean
+        Dim lFillAdjust As Double
+        Dim lStaAdjust As Double
+        Dim lRatio As Double
+        Dim lCarry As Double
+        Dim lRndOff As Double
+        Dim lAccVal As Double
+        Dim lMaxDlyVal As Double
+        Dim lMaxDlyInd As Integer
         Dim lDist As atcCollection
         Dim lTSer As atcTimeseries
+        Dim lAdjustAttribute As String = GetAdjustingAttribute(aTS2Fill)
 
-        For Each lTS2Fill As atcTimeseries In aTS2Fill
-            i += 1
-            Logger.Dbg("Filling station " & i & " of " & aTS2Fill.Count)
-            lOStr = "Filling Daily Precip for " & lTS2Fill.ToString & ", " & lTS2Fill.Attributes.GetValue("Description") & vbCrLf
-            s = MissingDataSummary(lTS2Fill, -999, -998, -1, 100, 1)
-            lStr = StrSplit(s, "DETAIL:DATA", "")
-            If Len(s) > 0 Then 'missing data found
-                lDist = Nothing
-                lDist = CalcMetDistances(lTS2Fill, aTSAvail)
-                lFAnn = lTS2Fill.Attributes.GetValue("PRECIP")
-                lSJDay = lTS2Fill.Dates.Value(0)
-                While Len(s) > 0
-                    lStr = StrSplit(s, ",", "")
-                    lMJDay = CDbl(StrSplit(s, ",", ""))
-                    lMLen = CLng(StrSplit(s, ",", ""))
-                    J2Date(lMJDay, ld)
-                    ls = "  For period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " lasting " & lMLen & " days:" & vbCrLf
+        Logger.Dbg("Filling Daily values for " & aTS2Fill.ToString & ", " & aTS2Fill.Attributes.GetValue("Description"))
+        s = MissingDataSummary(aTS2Fill, -999, -998, -10000, 10000, 2)
+        lStr = StrSplit(s, "DETAIL:DATA", "")
+        If Len(s) > 0 Then 'missing data found
+            lDist = Nothing
+            lDist = CalcMetDistances(aTS2Fill, aTSAvail, lAdjustAttribute)
+            lFillAdjust = aTS2Fill.Attributes.GetValue(lAdjustAttribute)
+            lSJDay = aTS2Fill.Attributes.GetValue("SJDay")
+            While Len(s) > 0
+                lStr = StrSplit(s, ",", "")
+                lMJDay = CDbl(StrSplit(s, ",", ""))
+                lMLen = CLng(StrSplit(s, ",", ""))
+                lMTyp = CLng(StrSplit(s, ",", ""))
+                J2Date(lMJDay, ld)
+                If lMTyp = 1 Then 'fill missing period
+                    Logger.Dbg("  For period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " lasting " & lMLen & " days:")
                     lCurInd = 0
                     For k = 1 To lMLen
-                        lFPos = lMJDay - lSJDay + k
-                        lFillOT = CurrentObsTime(aTSObsTimes(i), lFPos)
-                        j = 0
+                        lFPos = lMJDay - lSJDay + k - 1
+                        lFillOT = CurrentObsTime(aTS2FillOT, lFPos)
+                        lFilledIt = False
+                        j = 1
                         While j < aTSAvail.Count
                             lInd = lDist.IndexFromKey(CStr(j))
                             lTSer = aTSAvail.ItemByIndex(lInd)
@@ -61,9 +68,9 @@ Public Module modMetData
                                (lMJDay + k - 1) < lTSer.Dates.Value(lTSer.numValues) Then
                                 'within date range, check value
                                 If lTSer.Attributes.GetValue("TU") = atcTimeUnit.TUDay Then 'check daily value
-                                    lSPos = lMJDay - lTSer.Dates.Value(0) + k
+                                    lSPos = lMJDay - lTSer.Dates.Value(0) + k - 1
                                     If lTSer.Value(lSPos) > -1 And lTSer.Value(lSPos) < 100 Then 'check obs time
-                                        lStaOT = CurrentObsTime(aTSObsTimes(lInd), lSPos)
+                                        lStaOT = CurrentObsTime(aTSAvailOT(lInd), lSPos)
                                         If Math.Abs(lStaOT - lFillOT) <= 2 Then 'obs times close enough
                                             lFVal = lTSer.Value(lSPos)
                                         End If
@@ -78,11 +85,13 @@ Public Module modMetData
                                     Next ii
                                 End If
                                 If lFVal > -0.1 And lFVal < 100 Then 'valid fill value found
-                                    lStaAnn = lTSer.Attributes.GetValue("PRECIP")
-                                    If lFAnn > 0 And lStaAnn > 0 Then 'adjust for annual averages
-                                        lTS2Fill.Value(lFPos) = lFAnn / lStaAnn * lFVal
-                                    Else
-                                        lTS2Fill.Value(lFPos) = lFVal
+                                    lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
+                                    If Math.Abs(lFillAdjust + 999) > Double.Epsilon AndAlso _
+                                       Math.Abs(lStaAdjust + 999) > Double.Epsilon Then
+                                        'adjust for historical averages
+                                        aTS2Fill.Value(lFPos) = lFillAdjust / lStaAdjust * lFVal
+                                    Else 'use value without adjustment
+                                        aTS2Fill.Value(lFPos) = lFVal
                                     End If
                                     J2Date(lMJDay + k - 1, ld)
                                     If lCurInd <> lInd Then 'changing station used to fill
@@ -91,97 +100,139 @@ Public Module modMetData
                                         Else 'assume hourly
                                             lTUStr = "Hourly"
                                         End If
-                                        ls = ls & "    Filling from " & lTUStr & " TS# " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("Description") & vbCrLf
+                                        Logger.Dbg("    Filling from " & lTUStr & " TS# " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("Description"))
                                         lCurInd = lInd
                                     End If
-                                    ls = ls & "      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " - " & lTS2Fill.Value(lFPos) & vbCrLf
+                                    Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " - " & aTS2Fill.Value(lFPos))
                                     j = aTSAvail.Count
+                                    lFilledIt = True
                                 End If
                             End If
                             j += 1
                         End While
+                        If Not lFilledIt Then
+                            Logger.Dbg("PROBLEM - Could not find acceptable nearby value for filling")
+                        End If
                     Next k
-                    lOStr &= ls
-                    lStr = StrSplit(s, "DETAIL:DATA", "")
-                End While
-            Else 'no missing data
-                lOStr &= "  No missing data to fill!" & vbCrLf
-            End If
-            lFName = "DV_Fill_" & lTS2Fill.Attributes.GetValue("Location") & ".sum"
-            SaveFileString(lFName, lOStr)
-        Next
+                Else 'fill accumulated period
+                    Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " lasting " & lMLen & " days:")
+                    lAccVal = CDbl(StrSplit(s, vbCrLf, ""))
+                    lEJDay = lMJDay + lMLen
+                    'lTSer = ClosestHourly(aTS2Fill, aTSAvail, lAccVal, lMJDay, lEJDay, aTol)
+                    If Not lTSer Is Nothing Then
+                        Logger.Dbg("    Distributing " & lAccVal & " from TS " & lTSer.ToString)
+                        lRatio = lAccVal / lTSer.Attributes.GetValue("Sum")
+                        For k = 1 To lMLen
+                            lFPos = lMJDay - lSJDay + k - 1
+                            aTS2Fill.Value(lFPos) = lRatio * lTSer.Value(k) + lCarry
+                            If aTS2Fill.Value(lFPos) > Double.Epsilon Then
+                                lCarry = aTS2Fill.Value(lFPos) - (Math.Round(aTS2Fill.Value(lFPos) / lRndOff) * lRndOff)
+                                aTS2Fill.Value(lFPos) = aTS2Fill.Value(lFPos) - lCarry
+                            Else
+                                aTS2Fill.Value(lFPos) = 0.0#
+                            End If
+                            If aTS2Fill.Value(lFPos) > lMaxDlyVal Then
+                                lMaxDlyVal = aTS2Fill.Value(lFPos)
+                                lMaxDlyInd = lFPos
+                            End If
+                            J2Date(lMJDay + (k - 1) / 24, ld)
+                            Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(lFPos))
+                        Next k
+                        If lCarry > 0 Then 'add remainder to max hourly value
+                            aTS2Fill.Value(lMaxDlyInd) = aTS2Fill.Value(lMaxDlyInd) + lCarry
+                        End If
+                    Else
+                        J2Date(lEJDay, ld)
+                        Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
+                        For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
+                            lFPos = lMJDay - lSJDay + k - 1
+                            aTS2Fill.Value(lFPos) = 0
+                        Next k
+                    End If
+                End If
+                'lOStr &= ls
+                lStr = StrSplit(s, "DETAIL:DATA", "")
+            End While
+        Else 'no missing data
+            'lOStr &= "  No missing data to fill!" & vbCrLf
+            Logger.Dbg("  No missing data to fill!")
+        End If
+        'lFName = "DV_Fill_" & lTS2Fill.Attributes.GetValue("Location") & ".sum"
+        'SaveFileString(lFName, lOStr)
     End Sub
 
     Public Sub FillHourlyTser(ByVal aTS2Fill As atcTimeseries, ByVal aTSAvail As atcCollection, ByVal aTol As Double)
         Dim j As Integer
         Dim k As Integer
-        Dim Ind As Integer
-        Dim CurInd As Integer
-        Dim fpos As Integer
-        Dim spos As Integer
-        Dim mlen As Integer
+        Dim lInd As Integer
+        Dim lCurInd As Integer
+        Dim lFPos As Integer
+        Dim lSPos As Integer
+        Dim lMLen As Integer
         Dim ld(5) As Integer
-        Dim mtyp As Integer
-        Dim nsta As Integer
+        Dim lMTyp As Integer
+        Dim lNSta As Integer
         Dim s As String
         Dim lstr As String
-        Dim sjday As Double
-        Dim mjday As Double
-        Dim ejday As Double
-        Dim FVal As Double
-        Dim FAnn As Double
-        Dim StaAnn As Double
-        Dim Ratio As Double
-        Dim CARRY As Double
-        Dim RndOff As Double
-        Dim AccVal As Double
-        Dim MaxHrVal As Double
-        Dim MaxHrInd As Integer
-        Dim Dist As atcCollection
+        Dim lSJDay As Double
+        Dim lMJDay As Double
+        Dim lEJDay As Double
+        Dim lFVal As Double
+        Dim lFillAdjust As Double
+        Dim lStaAdjust As Double
+        Dim lRatio As Double
+        Dim lCarry As Double
+        Dim lRndOff As Double
+        Dim lAccVal As Double
+        Dim lMaxHrVal As Double
+        Dim lMaxHrInd As Integer
+        Dim lDist As atcCollection
         Dim lTSer As atcTimeseries
+        Dim lAdjustAttribute As String = GetAdjustingAttribute(aTS2Fill)
 
-        nsta = 10
-        RndOff = 0.001
-        s = MissingDataSummary(aTS2Fill, -999, -998, -1, 100, 2)
+        lNSta = 10
+        lRndOff = 0.001
+        s = MissingDataSummary(aTS2Fill, -999, -998, -10000, 10000, 2)
         lstr = StrSplit(s, "DETAIL:DATA", "")
         If Len(s) > 0 Then 'missing data found
-            Dist = Nothing
-            Dist = CalcMetDistances(aTS2Fill, aTSAvail)
-            FAnn = aTS2Fill.Attributes.GetValue("PRECIP")
-            sjday = aTS2Fill.Attributes.GetValue("SJDay")
+            lDist = Nothing
+            lDist = CalcMetDistances(aTS2Fill, aTSAvail, lAdjustAttribute)
+            lFillAdjust = aTS2Fill.Attributes.GetValue(lAdjustAttribute, -999)
+            lSJDay = aTS2Fill.Attributes.GetValue("SJDay")
             While Len(s) > 0
                 lstr = StrSplit(s, ",", "")
-                mjday = CDbl(StrSplit(s, ",", ""))
-                mlen = CLng(StrSplit(s, ",", ""))
-                mtyp = CLng(StrSplit(s, ",", ""))
-                J2Date(mjday, ld)
-                If mtyp = 1 Then 'fill missing period
-                    Logger.Dbg("  For Missing period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " lasting " & mlen & " hours:")
-                    CurInd = 0
-                    For k = 1 To mlen
-                        fpos = 24 * (mjday - sjday) + k - 1
+                lMJDay = CDbl(StrSplit(s, ",", ""))
+                lMLen = CLng(StrSplit(s, ",", ""))
+                lMTyp = CLng(StrSplit(s, ",", ""))
+                J2Date(lMJDay, ld)
+                If lMTyp = 1 Then 'fill missing period
+                    Logger.Dbg("  For Missing period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " lasting " & lMLen & " hours:")
+                    lCurInd = 0
+                    For k = 1 To lMLen
+                        lFPos = 24 * (lMJDay - lSJDay) + k - 1
                         j = 1
                         While j < aTSAvail.Count
-                            Ind = Dist.IndexFromKey(CStr(j))
-                            lTSer = aTSAvail.ItemByIndex(Ind)
-                            FVal = -1
-                            If (mjday + (k - 1) / 24) - lTSer.Attributes.GetValue("SJDay") > Double.Epsilon And _
-                               (mjday + (k - 1) / 24) < lTSer.Attributes.GetValue("EJDay") Then 'check value
-                                spos = 24 * (mjday - lTSer.Attributes.GetValue("SJDay")) + k - 1
-                                If lTSer.Value(spos) > -1 And lTSer.Value(spos) < 100 Then 'good value
-                                    FVal = lTSer.Value(spos)
-                                    StaAnn = lTSer.Attributes.GetValue("PRECIP")
-                                    If FAnn > 0 And StaAnn > 0 Then 'adjust for annual averages
-                                        aTS2Fill.Value(fpos) = FAnn / StaAnn * FVal
+                            lInd = lDist.IndexFromKey(CStr(j))
+                            lTSer = aTSAvail.ItemByIndex(lInd)
+                            lFVal = -1
+                            If (lMJDay + (k - 1) / 24) - lTSer.Attributes.GetValue("SJDay") > Double.Epsilon And _
+                               (lMJDay + (k - 1) / 24) < lTSer.Attributes.GetValue("EJDay") Then 'check value
+                                lSPos = 24 * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
+                                If lTSer.Value(lSPos) > -1 And lTSer.Value(lSPos) < 100 Then 'good value
+                                    lFVal = lTSer.Value(lSPos)
+                                    lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
+                                    If Math.Abs(lFillAdjust + 999) > Double.Epsilon AndAlso _
+                                       Math.Abs(lStaAdjust + 999) > Double.Epsilon Then
+                                        aTS2Fill.Value(lFPos) = lFillAdjust / lStaAdjust * lFVal
                                     Else
-                                        aTS2Fill.Value(fpos) = FVal
+                                        aTS2Fill.Value(lFPos) = lFVal
                                     End If
-                                    J2Date(mjday + (k - 1) / 24, ld)
-                                    If CurInd <> Ind Then 'changing station used to fill
-                                        Logger.Dbg("    Filling from TS# " & lTSer.ToString)
-                                        CurInd = Ind
+                                    J2Date(lMJDay + (k - 1) / 24, ld)
+                                    If lCurInd <> lInd Then 'changing station used to fill
+                                        Logger.Dbg("    Filling from TS# " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("Description"))
+                                        lCurInd = lInd
                                     End If
-                                    Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(fpos))
+                                    Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(lFPos))
                                     j = aTSAvail.Count
                                 End If
                             End If
@@ -189,38 +240,38 @@ Public Module modMetData
                         End While
                     Next k
                 Else 'fill accumulated period
-                    Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " lasting " & mlen & " hours:")
-                    AccVal = CDbl(StrSplit(s, vbCrLf, ""))
-                    ejday = mjday + mlen / 24
-                    lTSer = ClosestHourly(aTS2Fill, aTSAvail, AccVal, mjday, ejday, aTol, nsta)
+                    Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " lasting " & lMLen & " hours:")
+                    lAccVal = CDbl(StrSplit(s, vbCrLf, ""))
+                    lEJDay = lMJDay + lMLen / 24
+                    lTSer = ClosestHourly(aTS2Fill, aTSAvail, lAccVal, lMJDay, lEJDay, aTol)
                     If Not lTSer Is Nothing Then
-                        Logger.Dbg("    Distributing " & AccVal & " from TS# " & lTSer.ToString)
-                        Ratio = AccVal / lTSer.Attributes.GetValue("Sum")
-                        For k = 1 To mlen
-                            fpos = 24 * (mjday - sjday) + k - 1
-                            aTS2Fill.Value(fpos) = Ratio * lTSer.Value(k) + CARRY
-                            If aTS2Fill.Value(fpos) > 0.00001 Then
-                                CARRY = aTS2Fill.Value(fpos) - (Math.Round(aTS2Fill.Value(fpos) / RndOff) * RndOff)
-                                aTS2Fill.Value(fpos) = aTS2Fill.Value(fpos) - CARRY
+                        Logger.Dbg("    Distributing " & lAccVal & " from TS# " & lTSer.ToString)
+                        lRatio = lAccVal / lTSer.Attributes.GetValue("Sum")
+                        For k = 1 To lMLen
+                            lFPos = 24 * (lMJDay - lSJDay) + k - 1
+                            aTS2Fill.Value(lFPos) = lRatio * lTSer.Value(k) + lCarry
+                            If aTS2Fill.Value(lFPos) > Double.Epsilon Then
+                                lCarry = aTS2Fill.Value(lFPos) - (Math.Round(aTS2Fill.Value(lFPos) / lRndOff) * lRndOff)
+                                aTS2Fill.Value(lFPos) = aTS2Fill.Value(lFPos) - lCarry
                             Else
-                                aTS2Fill.Value(fpos) = 0.0#
+                                aTS2Fill.Value(lFPos) = 0.0#
                             End If
-                            If aTS2Fill.Value(fpos) > MaxHrVal Then
-                                MaxHrVal = aTS2Fill.Value(fpos)
-                                MaxHrInd = fpos
+                            If aTS2Fill.Value(lFPos) > lMaxHrVal Then
+                                lMaxHrVal = aTS2Fill.Value(lFPos)
+                                lMaxHrInd = lFPos
                             End If
-                            J2Date(mjday + (k - 1) / 24, ld)
-                            Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(fpos))
+                            J2Date(lMJDay + (k - 1) / 24, ld)
+                            Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & " - " & aTS2Fill.Value(lFPos))
                         Next k
-                        If CARRY > 0 Then 'add remainder to max hourly value
-                            aTS2Fill.Value(MaxHrInd) = aTS2Fill.Value(MaxHrInd) + CARRY
+                        If lCarry > 0 Then 'add remainder to max hourly value
+                            aTS2Fill.Value(lMaxHrInd) = aTS2Fill.Value(lMaxHrInd) + lCarry
                         End If
                     Else
-                        J2Date(ejday, ld)
-                        Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & AccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
-                        For k = 1 To mlen - 1 'set missing dist period to 0 except for accum value at end
-                            fpos = 24 * (mjday - sjday) + k - 1
-                            aTS2Fill.Value(fpos) = 0
+                        J2Date(lEJDay, ld)
+                        Logger.Dbg("      *** No nearby station found for distributing accumulated value of " & lAccVal & " on " & ld(0) & "/" & ld(1) & "/" & ld(2))
+                        For k = 1 To lMLen - 1 'set missing dist period to 0 except for accum value at end
+                            lFPos = 24 * (lMJDay - lSJDay) + k - 1
+                            aTS2Fill.Value(lFPos) = 0
                         Next k
                     End If
                 End If
@@ -231,61 +282,73 @@ Public Module modMetData
         End If
     End Sub
 
-    Public Function CalcMetDistances(ByVal aTSer As atcTimeseries, ByVal aStations As atcCollection) As atcCollection
+    Public Function GetAdjustingAttribute(ByVal aTSer As atcTimeseries) As String
+        'based on input TSer's constituent, try to find an adjustment
+        'factor attribute based on a historical average for that constituent
+        Dim lCons As String = aTSer.Attributes.GetValue("Constituent")
+
+        Select Case lCons
+            Case "PREC", "HPCP", "PRCP", "HPRC"
+                Return "PRECIP"
+            Case "TEMP", "HTMP", "ATMP", "ATEM", "DTMP", "DPTP", "DEWP", "DWPT", "TMIN", "TMAX"
+                Return "UBC190" 'user defined att for temperature adjustment
+            Case Else
+                Return ""
+        End Select
+
+    End Function
+
+    Public Function CalcMetDistances(ByVal aTSer As atcTimeseries, ByVal aStations As atcCollection, Optional ByVal aAdjustAttribute As String = "") As atcCollection
         'calculate distance between a single station (lTSer) and a collection of nearby Stations
-        'considering both geographic distance and difference between annual historical averages from PRISM
+        'considering both geographic distance and difference between historical averages 
+        'stored on attribute aAdjustAttribute, from PRISM or other source
         'NOTE: Geographic distances may be passed in as keys for each nearby stations or
         'calculated from WDM attributes used by module GeoDist (UBC024 and UBC025)
         Dim i As Integer
         Dim lAnnAdj As Double
-        Dim lTSerAnn As Double
-        Dim lStaAnn As Double
+        Dim lTSerAdjust As Double
+        Dim lStaAdjust As Double
         Dim lCompareAnnuals As Boolean
+        Dim lStaTSer As atcTimeseries
         Dim lGDist As Double
-        Dim lDistance(aStations.Count - 1) As Double
-        Dim lOrder(aStations.Count - 1) As Integer
-        Dim lRank(aStations.Count - 1) As Integer
+        Dim lDistance(aStations.Count) As Double
+        Dim lOrder(aStations.Count) As Integer
+        Dim lRank(aStations.Count) As Integer
         Dim lDist As New atcCollection
-        Dim lCons As String = aTSer.Attributes.GetValue("Constituent")
-        Dim lAnnAtt As String = ""
 
-        Select Case lCons
-            Case "PREC", "HPCP", "PRCP", "HPRC"
-                lAnnAtt = "PRECIP"
-            Case "TEMP", "HTMP", "ATMP", "ATEM"
-                lAnnAtt = "ANNTMP"
-            Case Else
-                lAnnAtt = ""
-        End Select
-        If lAnnAtt.Length > 0 Then
-            lTSerAnn = aTSer.Attributes.GetValue(lAnnAtt, -999)
+        If aAdjustAttribute.Length > 0 Then
+            lTSerAdjust = aTSer.Attributes.GetValue(aAdjustAttribute, -999)
         Else
-            lTSerAnn = -999
+            lTSerAdjust = -999
         End If
-        If Math.Abs(lTSerAnn + 999) < Double.Epsilon Then
+        If Math.Abs(lTSerAdjust + 999) < Double.Epsilon Then
             lCompareAnnuals = False
         Else
             lCompareAnnuals = True
         End If
+        'stations part of 0-based collection
         For i = 0 To aStations.Count - 1
             lAnnAdj = 1 'assume no adjustment for annual averages
+            lStaTSer = aStations.ItemByIndex(i)
             If lCompareAnnuals Then
-                lStaAnn = aStations.ItemByIndex(i).Attribnumeric(lAnnAtt, -999)
-                If Math.Abs(lStaAnn + 999) > Double.Epsilon Then
-                    lAnnAdj = lTSerAnn / lStaAnn
+                lStaAdjust = lStaTSer.Attributes.GetValue(aAdjustAttribute, -999)
+                If Math.Abs(lStaAdjust + 999) > Double.Epsilon Then
+                    lAnnAdj = lTSerAdjust / lStaAdjust
                     If lAnnAdj < 1 Then lAnnAdj = 1 / lAnnAdj
                 End If
             End If
             If IsNumeric(aStations.Keys.Item(i)) Then 'distance value already exists
                 lGDist = aStations.Keys.Item(i)
             Else 'try to calculate distance from attributes
-                lGDist = GeoDist(aTSer, aStations.ItemByIndex(i)) 'now calculate geographic distance
+                lGDist = GeoDist(aTSer, lStaTSer) 'now calculate geographic distance
             End If
-            lDistance(i) = lAnnAdj * lGDist
+            'distance (and order and rank) array is 1-based
+            lDistance(i + 1) = lAnnAdj * lGDist
         Next i
+        'sort modules are 1-based
         SortRealArray(0, aStations.Count, lDistance, lOrder)
         SortIntegerArray(0, aStations.Count, lOrder, lRank)
-        For i = 0 To aStations.Count - 1
+        For i = 1 To aStations.Count
             lDist.Add(CStr(lRank(i)), lDistance(i))
         Next i
         Return lDist
@@ -328,11 +391,11 @@ Public Module modMetData
         Return lOT
     End Function
 
-    Public Function ClosestHourly(ByVal aTSer As atcTimeseries, ByVal aStations As atcCollection, ByVal aDV As Double, ByVal aSDt As Double, ByVal aEDt As Double, ByVal aTol As Double, ByVal aNSta As Integer) As atcTimeseries
-        'find the hourly station (from the collection Stations) that is closest to
-        'a daily precip station (lTSer) considering both geographic distance and
-        'difference between daily totals for the day specified by sdt and edt
-        '(hourly daily totals adjusted based on PRISM average annual values)
+    Public Function ClosestHourly(ByVal aTSer As atcTimeseries, ByVal aStations As atcCollection, ByVal aDV As Double, ByVal aSDt As Double, ByVal aEDt As Double, ByVal aTol As Double) As atcTimeseries
+        'find the hourly station (from the collection aStations) that is closest to
+        'a precip station (aTSer) considering both geographic distance and
+        'difference between totals for the time specified by sdt and edt
+        '(aStation totals adjusted based on PRISM average annual values)
         Dim i As Integer
         Dim lTSerAnn As Double = aTSer.Attributes.GetValue("PRECIP")
         Dim lStaAnn As Double
@@ -340,10 +403,10 @@ Public Module modMetData
         Dim lGDist As Double
         Dim lHrDist As Double
         Dim lClosestDist As Double = Double.MaxValue
-        Dim lDaySumHrTSer As atcTimeseries
+        Dim lSumHrTSer As atcTimeseries
         Dim lStaTSer As atcTimeseries
         Dim lHrTSer As atcTimeseries
-        Dim lDaySum As Double
+        Dim lSum As Double
         Dim lRatio As Double
         Dim lInd As Integer
         Static lDist As atcCollection
@@ -351,15 +414,16 @@ Public Module modMetData
 
         If aTSer.Attributes.GetValue("ID") <> lCurID Then 'calculate station distances
             lDist = New atcCollection
-            Dim lDistance(aStations.Count - 1) As Double
-            Dim lOrder(aStations.Count - 1) As Integer
-            Dim lRank(aStations.Count - 1) As Integer
+            Dim lDistance(aStations.Count) As Double
+            Dim lOrder(aStations.Count) As Integer
+            Dim lRank(aStations.Count) As Integer
             Dim lAnnAdj As Double
             If lTSerAnn = 0 Then
                 lCompareAnnuals = False
             Else
                 lCompareAnnuals = True
             End If
+            'stations part of 0-based collection
             For i = 0 To aStations.Count - 1
                 lAnnAdj = 1 'assume no adjustment for annual averages
                 lStaTSer = aStations.ItemByIndex(i)
@@ -370,39 +434,49 @@ Public Module modMetData
                         If lAnnAdj < 1 Then lAnnAdj = 1 / lAnnAdj
                     End If
                 End If
-                lGDist = GeoDist(aTSer, lStaTSer) 'now calculate geographic distance
-                lDistance(i) = lAnnAdj * lGDist
+                If IsNumeric(aStations.Keys.Item(i)) Then 'distance value already exists
+                    lGDist = aStations.Keys.Item(i)
+                Else 'try to calculate distance from attributes
+                    lGDist = GeoDist(aTSer, lStaTSer) 'now calculate geographic distance
+                End If
+                'distance (and order and rank) array is 1-based
+                lDistance(i + 1) = lAnnAdj * lGDist
             Next i
+            'sort modules are 1-based
             SortRealArray(0, aStations.Count, lDistance, lOrder)
             SortIntegerArray(0, aStations.Count, lOrder, lRank)
-            For i = 0 To aStations.Count - 1
+            For i = 1 To aStations.Count
                 lDist.Add(CStr(lRank(i)), lDistance(i))
             Next i
             lCurID = aTSer.Attributes.GetValue("ID")
         End If
 
         lHrTSer = Nothing
-        For i = 0 To aNSta - 1 'look through clostest nsta stations for an acceptable daily total
+        For i = 1 To aStations.Count 'look through closest nsta stations for an acceptable daily total
             lInd = lDist.IndexFromKey(CStr(i))
             lStaTSer = aStations.ItemByIndex(lInd)
-            lDaySumHrTSer = SubsetByDate(lStaTSer, aSDt, aEDt, Nothing)
-            lDaySum = lDaySumHrTSer.Attributes.GetValue("Sum")
-            If lDaySum > 0 Then
-                If lCompareAnnuals Then
-                    lStaAnn = lDaySumHrTSer.Attributes.GetValue("PRECIP")
-                    If lStaAnn > 0 Then
-                        lDaySum = lDaySum * lTSerAnn / lStaAnn
+            If lStaTSer.Attributes.GetValue("SJDay") <= aSDt AndAlso _
+               lStaTSer.Attributes.GetValue("EJDay") >= aEDt Then
+                'tser contains time span being filled
+                lSumHrTSer = SubsetByDate(lStaTSer, aSDt, aEDt, Nothing)
+                lSum = lSumHrTSer.Attributes.GetValue("Sum")
+                If lSum > 0 Then
+                    If lCompareAnnuals Then
+                        lStaAnn = lSumHrTSer.Attributes.GetValue("PRECIP")
+                        If lStaAnn > 0 Then
+                            lSum = lSum * lTSerAnn / lStaAnn
+                        End If
                     End If
-                End If
-                lRatio = aDV / lDaySum
-                If lRatio > 1 Then lRatio = 1 / lRatio
-                If lRatio >= 1 - aTol Then 'acceptable daily total, include distance factor
-                    lGDist = GeoDist(aTSer, lDaySumHrTSer) 'now calculate geographic distance
-                    'try 2 as a "weighting factor" for daily precip ratio
-                    lHrDist = (2 - lRatio) * lGDist
-                    If lHrDist < lClosestDist Then
-                        lClosestDist = lHrDist
-                        lHrTSer = lDaySumHrTSer
+                    lRatio = aDV / lSum
+                    If lRatio > 1 Then lRatio = 1 / lRatio
+                    If lRatio >= 1 - aTol Then 'acceptable daily total, include distance factor
+                        'lGDist = GeoDist(aTSer, lSumHrTSer) 'now calculate geographic distance
+                        'try 2 as a "weighting factor" for daily precip ratio
+                        lHrDist = (2 - lRatio) * lDist(lInd) 'lGDist
+                        If lHrDist < lClosestDist Then
+                            lClosestDist = lHrDist
+                            lHrTSer = lSumHrTSer
+                        End If
                     End If
                 End If
             End If
@@ -435,7 +509,7 @@ Public Module modMetData
         Dim lDateStrEnd As String
         Dim lTSStr As String
         Dim lTUStr() As String = {"", "seconds", "minutes", "hours", "days", "months", "years"}
-        Dim s As String
+        Dim s As String = ""
         Dim ls As String = ""
 
         If aRepTyp = 0 Then
