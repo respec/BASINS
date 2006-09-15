@@ -1,0 +1,306 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <MyType>Windows</MyType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <AssemblyName>atcUCI</AssemblyName>
+    <OutputType>Library</OutputType>
+    <AssemblyMajorVersion>2</AssemblyMajorVersion>
+    <AssemblyMinorVersion>37</AssemblyMinorVersion>
+    <AssemblyRevisionNumber>0</AssemblyRevisionNumber>
+    <GenerateRevisionNumber>False</GenerateRevisionNumber>
+    <AssemblyCompanyName>Aqua Terra Consultants</AssemblyCompanyName>
+    <StartWithIE>False</StartWithIE>
+    <RootNamespace>atcUCI</RootNamespace>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>.\bin\</OutputPath>
+    <DocumentationFile>atcUCI.xml</DocumentationFile>
+    <DebugSymbols>True</DebugSymbols>
+    <DefineDebug>True</DefineDebug>
+    <DefineTrace>True</DefineTrace>
+    <DefineConstants>Win32=True</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>.\bin\</OutputPath>
+    <DocumentationFile>atcUCI.xml</DocumentationFile>
+    <DebugSymbols>False</DebugSymbols>
+    <DefineDebug>False</DefineDebug>
+    <DefineTrace>True</DefineTrace>
+    <DefineConstants>Win32=True</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="atcUtility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Plugins\BASINS\atcUtility.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.VBA, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>obj\Debug\Interop.VBA.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic.Compatibility">
+      <Name>Microsoft.VisualBasic.Compatibility</Name>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.XML">
+      <Name>System.XML</Name>
+    </Reference>
+    <COMReference Include="ATCData">
+      <Guid>{653D928A-80CE-11D3-913A-00A024C11E04}</Guid>
+      <Lcid>0</Lcid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>11</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+    </COMReference>
+    <COMReference Include="ATCoCtl">
+      <Guid>{872F11D5-3322-11D4-9D23-00A0C9768F70}</Guid>
+      <Lcid>0</Lcid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>10</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+    </COMReference>
+    <COMReference Include="ATCTSfile">
+      <Guid>{6EEEC479-3323-11D4-9D23-00A0C9768F70}</Guid>
+      <Lcid>0</Lcid>
+      <VersionMajor>3</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+    </COMReference>
+    <COMReference Include="AxATCoCtl">
+      <Guid>{872F11D5-3322-11D4-9D23-00A0C9768F70}</Guid>
+      <Lcid>0</Lcid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>10</VersionMinor>
+      <WrapperTool>aximp</WrapperTool>
+    </COMReference>
+    <COMReference Include="DAO">
+      <Guid>{00025E01-0000-0000-C000-000000000046}</Guid>
+      <Lcid>0</Lcid>
+      <VersionMajor>4</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+    </COMReference>
+    <COMReference Include="FColl">
+      <Guid>{18F0904D-D01A-4967-90D6-FB9B55A332EC}</Guid>
+      <Lcid>0</Lcid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+    </COMReference>
+    <COMReference Include="Scripting">
+      <Guid>{420B2830-E718-11CF-893D-00A0C9054228}</Guid>
+      <Lcid>0</Lcid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="Microsoft.VisualBasic.Compatibility" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.vb" />
+    <Compile Include="Hass_Ent.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfAddChar2Keyword.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfBlockDefn.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfCategoryBlk.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfConnection.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfData.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfFilesBlk.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfFtable.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfGlobalBlk.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfMassLink.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfMetSeg.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfMetSegRec.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfMonthData.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfMonthDataTable.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfMsg.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfOperation.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfOpnBlk.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfOpnSeqBlk.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HSPFParm.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HSPFParmDef.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfPoint.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfPollutant.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfSectionDefn.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfSpecialActionBlk.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfSpecialRecord.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfSrcTar.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfStatus.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfStatusType.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfTable.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfTableDefn.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfTSGroupDefn.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfTSMemberDefn.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="HspfUci.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modClsTserFile.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modCreateUci.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modEditLimits.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modPollutants.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modRemoteHasslibs.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusImplnd.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusInputTimeseriesImplnd.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusInputTimeseriesPerlnd.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusInputTimeseriesRchres.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusOutputTimeseriesImplnd.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusOutputTimeseriesPerlnd.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusOutputTimeseriesRchres.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusPerlnd.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusRchres.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusTimeseriesUtility.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modStatusUtility.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="modUCIRecords.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UciRead.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UpgradeSupport.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="utilEdit.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <None Include="_UpgradeReport.htm">
+      <SubType>Preview</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="My Project\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
