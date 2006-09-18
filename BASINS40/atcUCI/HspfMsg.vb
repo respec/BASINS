@@ -300,11 +300,11 @@ err_Renamed:
 
 	Private Function FilterNull(ByRef v As Object, Optional ByRef NullReturn As Object = 0) As Object
 		'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-		If IsDbNull(v) Then
+        If IsDBNull(v.value) Then
             Return NullReturn
-		Else
-            Return v
-		End If
+        Else
+            Return v.value
+        End If
 	End Function
 	
 	Private Sub updateParmsMultLines(ByRef blockname As String, ByRef ltable As HspfTableDef)

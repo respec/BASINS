@@ -505,21 +505,34 @@ Imports atcUtility
 		ReadUci(Msg, newName, FullFg, FilesOK, EchoFile)
 		pFastFlag = False
 	End Sub
-	
-	Public Sub ReadUci(ByRef Msg As HspfMsg, ByRef newName As String, ByRef FullFg As Integer, ByRef FilesOK As Boolean, ByRef EchoFile As String)
-		Dim j, i, r, iwdm As Integer
-		Dim M, n, s, m2 As String
-		Dim lOpn As HspfOperation
+
+    ''' <summary>
+    ''' Read UCI file into this class
+    ''' </summary>
+    ''' <param name="Msg">HspfMsg file object</param>
+    ''' <param name="newName">File to read</param>
+    ''' <param name="FullFg">-3 = , -1 = starter</param>
+    ''' <param name="FilesOK">gets set to True if files are ok, false if not</param>
+    ''' <param name="EchoFile"></param>
+    ''' <remarks></remarks>
+    Public Sub ReadUci(ByRef Msg As HspfMsg, _
+                       ByRef newName As String, _
+                       ByRef FullFg As Integer, _
+                       ByRef FilesOK As Boolean, _
+                       ByRef EchoFile As String)
+        Dim j, i, r, iwdm As Integer
+        Dim M, n, s, m2 As String
+        Dim lOpn As HspfOperation
         Dim lopnblk As HspfOpnBlk
         Dim lOpnName As String
-		Dim ret As Integer
-		Dim lConnection As HspfConnection
-		Dim lMassLink As HspfMassLink
-		
-		On Error Resume Next
-		
-		pMsg = Msg
-		FilesOK = True
+        Dim ret As Integer
+        Dim lConnection As HspfConnection
+        Dim lMassLink As HspfMassLink
+
+        On Error Resume Next
+
+        pMsg = Msg
+        FilesOK = True
         If Not IO.File.Exists(newName) Then
             pErrorDescription = "UciFileName '" & newName & "' not found"
         Else
@@ -592,7 +605,6 @@ Imports atcUtility
                 pOpnSeqBlk.Uci = Me
                 pOpnSeqBlk.ReadUciFile()
 
-                'UPGRADE_NOTE: Object pOpnBlks may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
                 pOpnBlks = Nothing
                 pOpnBlks = New Collection
                 i = 1
@@ -660,9 +672,9 @@ Imports atcUtility
 
             End If
         End If
-		pEdited = False 'all the reads set edited
-		Exit Sub
-	End Sub
+        pEdited = False 'all the reads set edited
+        Exit Sub
+    End Sub
 	
 	Public Sub CalcMaxAreaByLand2Stream()
 		Dim vOpTyps, vOpTyp As Object
@@ -2014,7 +2026,7 @@ Imports atcUtility
 							If Len(s) > 16 Then
 								tname = Mid(s, 17, Len(s) - 16)
                                 tpath = IO.Path.GetDirectoryName(tname)
-                                If Not IO.Directory.Exists(tpath) Then
+                                If tpath.Length > 0 AndAlso Not IO.Directory.Exists(tpath) Then
                                     MsgBox("Error in Files Block:  Folder " & tpath & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
                                     FilesOK = False
                                 ElseIf UCase(Right(tname, 4)) = ".MUT" Then  'does this file exist
