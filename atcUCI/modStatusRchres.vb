@@ -30,7 +30,7 @@ Module modStatusRchres
 		TableStatus.Change("GEN-INFO", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
 		
 		If O.TableExists("GEN-INFO") Then
-            Lkfg = O.Tables.Item("GEN-INFO").Parms("LKFG")
+            Lkfg = O.Tables.Item("GEN-INFO").ParmValue("LKFG")
 		Else
 			Lkfg = 0
 		End If
@@ -42,7 +42,7 @@ Module modStatusRchres
             If ltable.Parms.Item("HYDRFG") = 1 Then
                 TableStatus.Change("HYDR-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("HYDR-PARM1") Then
-                    If O.Tables.Item("HYDR-PARM1").Parms("VCONFG") = 1 Then
+                    If O.Tables.Item("HYDR-PARM1").ParmValue("VCONFG") = 1 Then
                         TableStatus.Change("MON-CONVF", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                     End If
                 End If
@@ -60,7 +60,7 @@ Module modStatusRchres
                 TableStatus.Change("NCONS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TableStatus.Change("CONS-AD-FLAG", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("NCONS") Then
-                    nCons = O.Tables.Item("NCONS").Parms("NCONS")
+                    nCons = O.Tables.Item("NCONS").ParmValue("NCONS")
                 Else
                     nCons = 1
                 End If
@@ -72,8 +72,8 @@ Module modStatusRchres
 				TableStatus.Change("HT-BED-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
 				TableStatus.Change("HEAT-PARM", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
 				If O.TableExists("HT-BED-FLAGS") Then
-                    Bedflg = O.Tables.Item("HT-BED-FLAGS").Parms("BEDFLG")
-                    Tgflg = O.Tables.Item("HT-BED-FLAGS").Parms("TGFLG")
+                    Bedflg = O.Tables.Item("HT-BED-FLAGS").ParmValue("BEDFLG")
+                    Tgflg = O.Tables.Item("HT-BED-FLAGS").ParmValue("TGFLG")
 					If Bedflg = 1 Or Bedflg = 2 Then
 						TableStatus.Change("HT-BED-PARM", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
 						If Tgflg = 3 Then
@@ -104,13 +104,15 @@ Module modStatusRchres
                 TableStatus.Change("GQ-GENDATA", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TableStatus.Change("GQ-AD-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("GQ-GENDATA") Then
-                    nGqual = O.Tables.Item("GQ-GENDATA").Parms("NGQUAL")
-                    mWatemp = O.Tables.Item("GQ-GENDATA").Parms("TEMPFG")
-                    mPhval = O.Tables.Item("GQ-GENDATA").Parms("PHFLAG")
-                    mRoxygen = O.Tables.Item("GQ-GENDATA").Parms("ROXFG")
-                    mCloud = O.Tables.Item("GQ-GENDATA").Parms("CLDFG")
-                    mSedconc = O.Tables.Item("GQ-GENDATA").Parms("SDFG")
-                    mPhoto = O.Tables.Item("GQ-GENDATA").Parms("PHYTFG")
+                    With O.Tables.Item("GQ-GENDATA")
+                        nGqual = .ParmValue("NGQUAL")
+                        mWatemp = .ParmValue("TEMPFG")
+                        mPhval = .ParmValue("PHFLAG")
+                        mRoxygen = .ParmValue("ROXFG")
+                        mCloud = .ParmValue("CLDFG")
+                        mSedconc = .ParmValue("SDFG")
+                        mPhoto = .ParmValue("PHYTFG")
+                    End With
                 Else 'defaults
                     nGqual = 1
                     mWatemp = 2
@@ -145,18 +147,20 @@ Module modStatusRchres
                     If i > 1 Then f = f & ":" & i
                     'first parse flg2 to get dauther relationships and bio
                     If O.TableExists(f) Then
-                        Daufg(1) = O.Tables.Item(f).Parms("GQPM21")
-                        Daufg(2) = O.Tables.Item(f).Parms("GQPM22")
-                        Daufg(3) = O.Tables.Item(f).Parms("GQPM23")
-                        Daufg(4) = O.Tables.Item(f).Parms("GQPM24")
-                        Daufg(5) = O.Tables.Item(f).Parms("GQPM25")
-                        Daufg(6) = O.Tables.Item(f).Parms("GQPM26")
-                        For j = 1 To 5
-                            If Daufg(j) = 1 Then
-                                Gdaufg(j) = 1
-                            End If
-                        Next j
-                        mBio = O.Tables.Item(f).Parms("GQPM27")
+                        With O.Tables.Item(f)
+                            Daufg(1) = .ParmValue("GQPM21")
+                            Daufg(2) = .ParmValue("GQPM22")
+                            Daufg(3) = .ParmValue("GQPM23")
+                            Daufg(4) = .ParmValue("GQPM24")
+                            Daufg(5) = .ParmValue("GQPM25")
+                            Daufg(6) = .ParmValue("GQPM26")
+                            For j = 1 To 5
+                                If Daufg(j) = 1 Then
+                                    Gdaufg(j) = 1
+                                End If
+                            Next j
+                            mBio = .ParmValue("GQPM27")
+                        End With
                     Else
                         mBio = 2
                     End If
@@ -164,47 +168,49 @@ Module modStatusRchres
                     t = "GQ-QALFG"
                     If i > 1 Then t = t & ":" & i
                     If O.TableExists(t) Then
-                        If O.Tables.Item(t).Parms("QALFG1") = 1 Then
-                            nHydro = nHydro + 1
-                            TableStatus.Change("GQ-HYDPM", nHydro, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
-                            Hydrolysis = True
-                        End If
-                        If O.Tables.Item(t).Parms("QALFG2") = 1 Then
-                            nOxid = nOxid + 1
-                            TableStatus.Change("GQ-ROXPM", nOxid, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
-                            Oxidation = True
-                        End If
-                        If O.Tables.Item(t).Parms("QALFG3") = 1 Then
-                            nPhot = nPhot + 1
-                            TableStatus.Change("GQ-PHOTPM", nPhot, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
-                            Photolysis = True
-                        End If
-                        If O.Tables.Item(t).Parms("QALFG4") = 1 Then
-                            nVolat = nVolat + 1
-                            TableStatus.Change("GQ-CFGAS", nVolat, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
-                            Volatilization = True
-                        End If
-                        If O.Tables.Item(t).Parms("QALFG5") = 1 Then
-                            nBiod = nBiod + 1
-                            TableStatus.Change("GQ-BIOPM", nBiod, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
-                            Biodegradation = True
-                            If mBio = 3 Then
-                                nBioM = nBioM + 1
-                                TableStatus.Change("MON-BIO", nBioM, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                        With O.Tables.Item(t)
+                            If .ParmValue("QALFG1") = 1 Then
+                                nHydro = nHydro + 1
+                                TableStatus.Change("GQ-HYDPM", nHydro, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                                Hydrolysis = True
                             End If
-                        End If
-                        If O.Tables.Item(t).Parms("QALFG6") = 1 Then
-                            nGenDec = nGenDec + 1
-                            TableStatus.Change("GQ-GENDECAY", nGenDec, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
-                        End If
-                        If O.Tables.Item(t).Parms("QALFG7") = 1 Then
-                            nSedAs = nSedAs + 1
-                            TableStatus.Change("GQ-SEDDECAY", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
-                            TableStatus.Change("GQ-KD", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
-                            TableStatus.Change("GQ-ADRATE", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
-                            TableStatus.Change("GQ-ADTHETA", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
-                            TableStatus.Change("GQ-SEDCONC", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
-                        End If
+                            If .ParmValue("QALFG2") = 1 Then
+                                nOxid = nOxid + 1
+                                TableStatus.Change("GQ-ROXPM", nOxid, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                                Oxidation = True
+                            End If
+                            If .ParmValue("QALFG3") = 1 Then
+                                nPhot = nPhot + 1
+                                TableStatus.Change("GQ-PHOTPM", nPhot, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
+                                Photolysis = True
+                            End If
+                            If .ParmValue("QALFG4") = 1 Then
+                                nVolat = nVolat + 1
+                                TableStatus.Change("GQ-CFGAS", nVolat, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                                Volatilization = True
+                            End If
+                            If .ParmValue("QALFG5") = 1 Then
+                                nBiod = nBiod + 1
+                                TableStatus.Change("GQ-BIOPM", nBiod, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                                Biodegradation = True
+                                If mBio = 3 Then
+                                    nBioM = nBioM + 1
+                                    TableStatus.Change("MON-BIO", nBioM, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                                End If
+                            End If
+                            If .ParmValue("QALFG6") = 1 Then
+                                nGenDec = nGenDec + 1
+                                TableStatus.Change("GQ-GENDECAY", nGenDec, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                            End If
+                            If .ParmValue("QALFG7") = 1 Then
+                                nSedAs = nSedAs + 1
+                                TableStatus.Change("GQ-SEDDECAY", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
+                                TableStatus.Change("GQ-KD", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                                TableStatus.Change("GQ-ADRATE", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
+                                TableStatus.Change("GQ-ADTHETA", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
+                                TableStatus.Change("GQ-SEDCONC", nSedAs, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
+                            End If
+                        End With
                     End If
                 Next i
 
@@ -241,7 +247,7 @@ Module modStatusRchres
                 If Volatilization Then
                     TableStatus.Change("OX-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                     If O.TableExists("OX-FLAGS") Then
-                        Reamfg = O.Tables.Item("OX-FLAGS").Parms("REAMFG")
+                        Reamfg = O.Tables.Item("OX-FLAGS").ParmValue("REAMFG")
                     Else
                         Reamfg = 2
                     End If
@@ -276,14 +282,14 @@ Module modStatusRchres
             If ltable.Parms.Item("OXFG") = 1 Then
                 TableStatus.Change("BENTH-FLAG", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("BENTH-FLAG") Then
-                    Benrfg = O.Tables.Item("BENTH-FLAG").Parms("BENRFG")
+                    Benrfg = O.Tables.Item("BENTH-FLAG").ParmValue("BENRFG")
                 Else
                     Benrfg = 0
                 End If
                 TableStatus.Change("SCOUR-PARMS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TableStatus.Change("OX-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("OX-FLAGS") Then
-                    Reamfg = O.Tables.Item("OX-FLAGS").Parms("REAMFG")
+                    Reamfg = O.Tables.Item("OX-FLAGS").ParmValue("REAMFG")
                 Else
                     Reamfg = 2
                 End If
@@ -317,12 +323,14 @@ Module modStatusRchres
                     TableStatus.Change("NUT-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 End If
                 If O.TableExists("NUT-FLAGS") Then
-                    Tamfg = O.Tables.Item("NUT-FLAGS").Parms("NH3FG")
-                    Amvfg = O.Tables.Item("NUT-FLAGS").Parms("AMVFG")
-                    Phflag = O.Tables.Item("NUT-FLAGS").Parms("PHFLAG")
-                    Adnhfg = O.Tables.Item("NUT-FLAGS").Parms("ADNHFG")
-                    Po4fg = O.Tables.Item("NUT-FLAGS").Parms("PO4FG")
-                    Adpofg = O.Tables.Item("NUT-FLAGS").Parms("ADPOFG")
+                    With O.Tables.Item("NUT-FLAGS")
+                        Tamfg = .ParmValue("NH3FG")
+                        Amvfg = .ParmValue("AMVFG")
+                        Phflag = .ParmValue("PHFLAG")
+                        Adnhfg = .ParmValue("ADNHFG")
+                        Po4fg = .ParmValue("PO4FG")
+                        Adpofg = .ParmValue("ADPOFG")
+                    End With
                 Else 'defaults
                     Tamfg = 0
                     Amvfg = 0
@@ -353,9 +361,11 @@ Module modStatusRchres
             If ltable.Parms.Item("PLKFG") = 1 Then
                 TableStatus.Change("PLNK-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                 If O.TableExists("PLNK-FLAGS") Then
-                    Phyfg = O.Tables.Item("PLNK-FLAGS").Parms("PHYFG")
-                    Zoofg = O.Tables.Item("PLNK-FLAGS").Parms("ZOOFG")
-                    Balfg = O.Tables.Item("PLNK-FLAGS").Parms("BALFG")
+                    With O.Tables.Item("PLNK-FLAGS")
+                        Phyfg = .ParmValue("PHYFG")
+                        Zoofg = .ParmValue("ZOOFG")
+                        Balfg = .ParmValue("BALFG")
+                    End With
                 Else
                     Phyfg = 0
                     Zoofg = 0

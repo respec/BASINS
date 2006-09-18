@@ -206,21 +206,21 @@ NoTable:
 								If pName = "PERLND" And ltable.Def.Parent.Name = "PQUAL" Then
 									'need to compute proper index
 									If lId.TableExists("NQUALS") Then
-                                        Nqual = lId.Tables.Item("NQUALS").Parms("NQUAL")
+                                        Nqual = lId.Tables.Item("NQUALS").ParmValue("NQUAL")
 										ltable.SetQualIndex(thisoccur, Nqual)
 									End If
 								End If
 								If pName = "IMPLND" And ltable.Def.Parent.Name = "IQUAL" Then
 									'need to compute proper index
 									If lId.TableExists("NQUALS") Then
-                                        Nqual = lId.Tables.Item("NQUALS").Parms("NQUAL")
+                                        Nqual = lId.Tables.Item("NQUALS").ParmValue("NQUAL")
 										ltable.SetQualIndex(thisoccur, Nqual)
 									End If
 								End If
 								If pName = "RCHRES" And ltable.Def.Parent.Name = "GQUAL" Then
 									'need to compute proper index
 									If lId.TableExists("GQ-GENDATA") Then
-                                        nGqual = lId.Tables.Item("GQ-GENDATA").Parms("NGQUAL")
+                                        nGqual = lId.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
 										ltable.SetQualIndex(thisoccur, nGqual)
 									End If
 								End If

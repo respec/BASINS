@@ -17,7 +17,7 @@ Module modStatusInputTimeseriesRchres
 		If O.TableExists("ACTIVITY") Then
 			ltable = O.Tables.Item("ACTIVITY")
 			If O.TableExists("GEN-INFO") Then
-                nExits = O.Tables.Item("GEN-INFO").Parms("NEXITS")
+                nExits = O.Tables.Item("GEN-INFO").ParmValue("NEXITS")
 			Else
 				nExits = 1
 			End If
@@ -26,16 +26,16 @@ Module modStatusInputTimeseriesRchres
             If ltable.Parms.Item("HYDRFG") = 1 Then
                 If O.TableExists("HYDR-PARM1") Then
                     With O.Tables.Item("HYDR-PARM1")
-                        Odfvfg(1) = .Parms("ODFVF1")
-                        Odfvfg(2) = .Parms("ODFVF2")
-                        Odfvfg(3) = .Parms("ODFVF3")
-                        Odfvfg(4) = .Parms("ODFVF4")
-                        Odfvfg(5) = .Parms("ODFVF5")
-                        Odgtfg(1) = .Parms("ODGTF1")
-                        Odgtfg(2) = .Parms("ODGTF2")
-                        Odgtfg(3) = .Parms("ODGTF3")
-                        Odgtfg(4) = .Parms("ODGTF4")
-                        Odgtfg(5) = .Parms("ODGTF5")
+                        Odfvfg(1) = .ParmValue("ODFVF1")
+                        Odfvfg(2) = .ParmValue("ODFVF2")
+                        Odfvfg(3) = .ParmValue("ODFVF3")
+                        Odfvfg(4) = .ParmValue("ODFVF4")
+                        Odfvfg(5) = .ParmValue("ODFVF5")
+                        Odgtfg(1) = .ParmValue("ODGTF1")
+                        Odgtfg(2) = .ParmValue("ODGTF2")
+                        Odgtfg(3) = .ParmValue("ODGTF3")
+                        Odgtfg(4) = .ParmValue("ODGTF4")
+                        Odgtfg(5) = .ParmValue("ODGTF5")
                     End With
                 Else
                     Odfvfg(1) = 0 : Odfvfg(2) = 0 : Odfvfg(3) = 0 : Odfvfg(4) = 0 : Odfvfg(5) = 0
@@ -93,7 +93,7 @@ Module modStatusInputTimeseriesRchres
 			'section cons
             If ltable.Parms.Item("CONSFG") = 1 Then
                 If O.TableExists("NCONS") Then
-                    nCons = O.Tables.Item("NCONS").Parms("NCONS")
+                    nCons = O.Tables.Item("NCONS").ParmValue("NCONS")
                 Else
                     nCons = 0
                 End If
@@ -157,7 +157,7 @@ Module modStatusInputTimeseriesRchres
                 TimserStatus.Change("INFLOW:ISED", 2, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TimserStatus.Change("INFLOW:ISED", 3, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("SANDFG") Then
-                    sandfg = O.Tables.Item("SANDFG").Parms("SANDFG")
+                    sandfg = O.Tables.Item("SANDFG").ParmValue("SANDFG")
                 Else
                     sandfg = 0
                 End If
@@ -181,7 +181,7 @@ Module modStatusInputTimeseriesRchres
 			'section gqual
             If ltable.Parms.Item("GQALFG") = 1 Then
                 If O.TableExists("GQ-GENDATA") Then
-                    nGqual = O.Tables.Item("GQ-GENDATA").Parms("NGQUAL")
+                    nGqual = O.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
                 Else
                     nGqual = 1
                 End If
@@ -202,13 +202,13 @@ Module modStatusInputTimeseriesRchres
                 End If
 
                 If O.TableExists("GQ-GENDATA") Then
-                    If O.Tables.Item("GQ-GENDATA").Parms("PHFLAG") = 1 And ltable.Parms.Item("PHFG") = 0 Then
+                    If O.Tables.Item("GQ-GENDATA").ParmValue("PHFLAG") = 1 And ltable.Parms.Item("PHFG") = 0 Then
                         TimserStatus.Change("EXTNL:PHVAL", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if there is hydrolysis
                     End If
-                    If O.Tables.Item("GQ-GENDATA").Parms("ROXFG") = 1 Then
+                    If O.Tables.Item("GQ-GENDATA").ParmValue("ROXFG") = 1 Then
                         TimserStatus.Change("EXTNL:ROC", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if there is free radical oxidation
                     End If
-                    If O.Tables.Item("GQ-GENDATA").Parms("CLDFG") = 1 Then
+                    If O.Tables.Item("GQ-GENDATA").ParmValue("CLDFG") = 1 Then
                         TimserStatus.Change("EXTNL:CLOUD", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if there is photolysis
                     End If
                 End If
@@ -217,13 +217,13 @@ Module modStatusInputTimeseriesRchres
                 Next i
 
                 If O.TableExists("GEN-INFO") Then
-                    If O.Tables.Item("GEN-INFO").Parms("LKFG") = 1 Then
+                    If O.Tables.Item("GEN-INFO").ParmValue("LKFG") = 1 Then
                         TimserStatus.Change("EXTNL:WIND", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if there is volatilization
                     End If
                 End If
                 If ltable.Parms.Item("HYDRFG") = 0 Then
                     If O.TableExists("GEN-INFO") Then
-                        If O.Tables.Item("GEN-INFO").Parms("LKFG") = 0 Then
+                        If O.Tables.Item("GEN-INFO").ParmValue("LKFG") = 0 Then
                             TimserStatus.Change("HYDR:AVDEP", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if volatilization is on
                             TimserStatus.Change("HYDR:AVVEL", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if volatilization is on
                         End If
@@ -234,15 +234,15 @@ Module modStatusInputTimeseriesRchres
                     End If
                 End If
                 If O.TableExists("GQ-GENDATA") Then
-                    If ltable.Parms.Item("HTFG") = 0 And O.Tables.Item("GQ-GENDATA").Parms("TEMPFG") = 1 Then
+                    If ltable.Parms.Item("HTFG") = 0 And O.Tables.Item("GQ-GENDATA").ParmValue("TEMPFG") = 1 Then
                         TimserStatus.Change("HTRCH:TW", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                     End If
-                    If ltable.Parms.Item("PLKFG") = 0 Or O.Tables.Item("GQ-GENDATA").Parms("PHYTFG") = 0 Then
-                        If O.Tables.Item("GQ-GENDATA").Parms("PHYTFG") = 1 Then
+                    If ltable.Parms.Item("PLKFG") = 0 Or O.Tables.Item("GQ-GENDATA").ParmValue("PHYTFG") = 0 Then
+                        If O.Tables.Item("GQ-GENDATA").ParmValue("PHYTFG") = 1 Then
                             TimserStatus.Change("PLANK:PHYTO", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if there is photolysis
                         End If
                     End If
-                    If ltable.Parms.Item("SEDFG") = 0 And O.Tables.Item("GQ-GENDATA").Parms("SDFG") = 1 Then
+                    If ltable.Parms.Item("SEDFG") = 0 And O.Tables.Item("GQ-GENDATA").ParmValue("SDFG") = 1 Then
                         TimserStatus.Change("SEDTRN:SSED", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if there is photolysis
                         TimserStatus.Change("SEDTRN:SSED", 2, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if there is photolysis
                         TimserStatus.Change("SEDTRN:SSED", 3, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional) 'req if there is photolysis
@@ -256,7 +256,7 @@ Module modStatusInputTimeseriesRchres
                 TimserStatus.Change("INFLOW:OXIF", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TimserStatus.Change("INFLOW:OXIF", 2, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("GEN-INFO") Then
-                    If O.Tables.Item("GEN-INFO").Parms("LKFG") = 1 Then
+                    If O.Tables.Item("GEN-INFO").ParmValue("LKFG") = 1 Then
                         TimserStatus.Change("EXTNL:WIND", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                     End If
                 End If
@@ -325,7 +325,7 @@ Module modStatusInputTimeseriesRchres
                 End If
                 If ltable.Parms.Item("SEDFG") = 0 Then
                     If O.TableExists("PLNK-FLAGS") Then
-                        If O.Tables.Item("PLNK-FLAGS").Parms("SDLTFG") = 1 Then
+                        If O.Tables.Item("PLNK-FLAGS").ParmValue("SDLTFG") = 1 Then
                             TimserStatus.Change("SEDTRN:SSED", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                             TimserStatus.Change("SEDTRN:SSED", 2, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                             TimserStatus.Change("SEDTRN:SSED", 3, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
@@ -341,7 +341,7 @@ Module modStatusInputTimeseriesRchres
                     TimserStatus.Change("INFLOW:PHIF", i, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 Next i
                 If ltable.Parms.Item("CONSFG") = 0 And O.TableExists("PH-PARM1") Then
-                    For i = 1 To O.Tables.Item("PH-PARM1").Parms("ALKCON")
+                    For i = 1 To O.Tables.Item("PH-PARM1").ParmValue("ALKCON")
                         TimserStatus.Change("CONS:CON", i, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                     Next i
                 End If

@@ -23,7 +23,7 @@ Module modStatusInputTimeseriesPerlnd
 			
 			'section snow
 			If O.TableExists("SNOW-FLAGS") Then
-                snopfg = O.Tables.Item("SNOW-FLAGS").Parms("SNOPFG")
+                snopfg = O.Tables.Item("SNOW-FLAGS").ParmValue("SNOPFG")
 			Else
 				snopfg = 0
 			End If
@@ -43,13 +43,13 @@ Module modStatusInputTimeseriesPerlnd
             End If
 			
 			If O.TableExists("ICE-FLAG") Then
-                icefg = O.Tables.Item("ICE-FLAG").Parms("ICEFG")
+                icefg = O.Tables.Item("ICE-FLAG").ParmValue("ICEFG")
 			Else
 				icefg = 0
 			End If
 			If O.TableExists("PWAT-PARM1") Then
-                csnofg = O.Tables.Item("PWAT-PARM1").Parms("CSNOFG")
-                iffcfg = O.Tables.Item("PWAT-PARM1").Parms("IFFCFG")
+                csnofg = O.Tables.Item("PWAT-PARM1").ParmValue("CSNOFG")
+                iffcfg = O.Tables.Item("PWAT-PARM1").ParmValue("IFFCFG")
 			Else
 				csnofg = 0
 				iffcfg = 0
@@ -59,7 +59,7 @@ Module modStatusInputTimeseriesPerlnd
             If ltable.Parms.Item("PWATFG") = 1 Then
                 TimserStatus.Change("EXTNL:PETINP", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                 If O.TableExists("PWAT-PARM1") Then
-                    irrgfg = O.Tables.Item("PWAT-PARM1").Parms("IRRGFG")
+                    irrgfg = O.Tables.Item("PWAT-PARM1").ParmValue("IRRGFG")
                 Else
                     irrgfg = 0
                 End If
@@ -145,7 +145,7 @@ Module modStatusInputTimeseriesPerlnd
                     Next i
                 End If
                 If O.TableExists("NQUALS") Then
-                    nquals = O.Tables.Item("NQUALS").Parms("NQUAL")
+                    nquals = O.Tables.Item("NQUALS").ParmValue("NQUAL")
                 Else
                     nquals = 1
                 End If
@@ -166,18 +166,20 @@ Module modStatusInputTimeseriesPerlnd
                     End If
                     ctemp = "QUAL-PROPS" & CStr(i)
                     If O.TableExists(ctemp) Then
-                        If O.Tables.Item(ctemp).Parms("QSOFG") > 0 Then
-                            qualof = 1
-                        End If
-                        If O.Tables.Item(ctemp).Parms("QIFWFG") > 0 Then
-                            qualif = 1
-                        End If
-                        If O.Tables.Item(ctemp).Parms("QAGWFG") > 0 Then
-                            qualgw = 1
-                        End If
-                        If O.Tables.Item(ctemp).Parms("QSDFG") > 0 Then
-                            qualsd = 1
-                        End If
+                        With O.Tables.Item(ctemp)
+                            If .ParmValue("QSOFG") > 0 Then
+                                qualof = 1
+                            End If
+                            If .ParmValue("QIFWFG") > 0 Then
+                                qualif = 1
+                            End If
+                            If .ParmValue("QAGWFG") > 0 Then
+                                qualgw = 1
+                            End If
+                            If .ParmValue("QSDFG") > 0 Then
+                                qualsd = 1
+                            End If
+                        End With
                     End If
 
                     If dryadfg = 1 Then
@@ -232,7 +234,7 @@ Module modStatusInputTimeseriesPerlnd
 			'section pest
             If ltable.Parms.Item("PESTFG") = 1 Then
                 If O.TableExists("PEST-FLAGS") Then
-                    npst = O.Tables.Item("PEST-FLAGS").Parms("NPST")
+                    npst = O.Tables.Item("PEST-FLAGS").ParmValue("NPST")
                 Else
                     npst = 0
                 End If
@@ -260,9 +262,9 @@ Module modStatusInputTimeseriesPerlnd
                     Next i
                 End If
                 If O.TableExists("PEST-FLAGS") Then
-                    adopf1 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF1")
-                    adopf2 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF2")
-                    adopf3 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF3")
+                    adopf1 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF1")
+                    adopf2 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF2")
+                    adopf3 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF3")
                 Else
                     adopf1 = 0
                     adopf2 = 0
@@ -304,9 +306,9 @@ Module modStatusInputTimeseriesPerlnd
                         Next i
                     End If
                     If O.TableExists("PEST-FLAGS") Then
-                        adopf1 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF1")
-                        adopf2 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF2")
-                        adopf3 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF3")
+                        adopf1 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF1")
+                        adopf2 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF2")
+                        adopf3 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF3")
                     Else
                         adopf1 = 0
                         adopf2 = 0
@@ -349,9 +351,9 @@ Module modStatusInputTimeseriesPerlnd
                         Next i
                     End If
                     If O.TableExists("PEST-FLAGS") Then
-                        adopf1 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF1")
-                        adopf2 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF2")
-                        adopf3 = O.Tables.Item("PEST-FLAGS").Parms("ADOPF3")
+                        adopf1 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF1")
+                        adopf2 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF2")
+                        adopf3 = O.Tables.Item("PEST-FLAGS").ParmValue("ADOPF3")
                     Else
                         adopf1 = 0
                         adopf2 = 0

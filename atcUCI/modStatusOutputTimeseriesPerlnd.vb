@@ -22,7 +22,7 @@ Module modStatusOutputTimeseriesPerlnd
 			
 			'section snow
 			If O.TableExists("SNOW-FLAGS") Then
-                snopfg = O.Tables.Item("SNOW-FLAGS").Parms("SNOPFG")
+                snopfg = O.Tables.Item("SNOW-FLAGS").ParmValue("SNOPFG")
 			Else
 				snopfg = 0
 			End If
@@ -56,15 +56,17 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 			
 			'section pwater
-			If O.TableExists("PWAT-PARM1") Then
-                hwtfg = O.Tables.Item("PWAT-PARM1").Parms("HWTFG")
-                csnofg = O.Tables.Item("PWAT-PARM1").Parms("CSNOFG")
-                irrgfg = O.Tables.Item("PWAT-PARM1").Parms("IRRGFG")
-			Else
-				hwtfg = 0
-				csnofg = 0
-				irrgfg = 0
-			End If
+            If O.TableExists("PWAT-PARM1") Then
+                With O.Tables.Item("PWAT-PARM1")
+                    hwtfg = .ParmValue("HWTFG")
+                    csnofg = .ParmValue("CSNOFG")
+                    irrgfg = .ParmValue("IRRGFG")
+                End With
+            Else
+                hwtfg = 0
+                csnofg = 0
+                irrgfg = 0
+            End If
             If ltable.Parms.Item("PWATFG") = 1 Then
                 TimserStatus.Change("PWATER:PERS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TimserStatus.Change("PWATER:CEPS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
@@ -167,7 +169,7 @@ Module modStatusOutputTimeseriesPerlnd
 			'section pqual
             If ltable.Parms.Item("PQALFG") = 1 Then
                 If O.TableExists("NQUALS") Then
-                    nquals = O.Tables.Item("NQUALS").Parms("NQUAL")
+                    nquals = O.Tables.Item("NQUALS").ParmValue("NQUAL")
                 Else
                     nquals = 1
                 End If
@@ -178,18 +180,20 @@ Module modStatusOutputTimeseriesPerlnd
                 For i = 1 To nquals
                     ctemp = "QUAL-PROPS" & CStr(i)
                     If O.TableExists(ctemp) Then
-                        If O.Tables.Item(ctemp).Parms("QSOFG") > 0 Then
-                            nqof = nqof + 1
-                        End If
-                        If O.Tables.Item(ctemp).Parms("QIFWFG") > 0 Then
-                            Nqif = Nqif + 1
-                        End If
-                        If O.Tables.Item(ctemp).Parms("QAGWFG") > 0 Then
-                            Nqgw = Nqgw + 1
-                        End If
-                        If O.Tables.Item(ctemp).Parms("QSDFG") > 0 Then
-                            nqsd = nqsd + 1
-                        End If
+                        With O.Tables.Item(ctemp)
+                            If .ParmValue("QSOFG") > 0 Then
+                                nqof = nqof + 1
+                            End If
+                            If .ParmValue("QIFWFG") > 0 Then
+                                Nqif = Nqif + 1
+                            End If
+                            If .ParmValue("QAGWFG") > 0 Then
+                                Nqgw = Nqgw + 1
+                            End If
+                            If .ParmValue("QSDFG") > 0 Then
+                                nqsd = nqsd + 1
+                            End If
+                        End With
                     End If
                 Next i
 
@@ -237,7 +241,7 @@ Module modStatusOutputTimeseriesPerlnd
 			'section pest
             If ltable.Parms.Item("PESTFG") = 1 Then
                 If O.TableExists("PEST-FLAGS") Then
-                    npst = O.Tables.Item("PEST-FLAGS").Parms("NPST")
+                    npst = O.Tables.Item("PEST-FLAGS").ParmValue("NPST")
                 Else
                     npst = 1
                 End If
