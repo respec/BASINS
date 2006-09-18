@@ -21,7 +21,7 @@ Module modStatusOutputTimeseriesImplnd
 			
 			'section snow
 			If O.TableExists("SNOW-FLAGS") Then
-                snopfg = O.Tables.Item("SNOW-FLAGS").Parms("SNOPFG")
+                snopfg = O.Tables.Item("SNOW-FLAGS").ParmValue("SNOPFG")
 			Else
 				snopfg = 0
 			End If
@@ -86,7 +86,7 @@ Module modStatusOutputTimeseriesImplnd
 			'section iqual
             If ltable.Parms.Item("IQALFG") = 1 Then
                 If O.TableExists("NQUALS") Then
-                    nquals = O.Tables.Item("NQUALS").Parms("NQUAL")
+                    nquals = O.Tables.Item("NQUALS").ParmValue("NQUAL")
                 Else
                     nquals = 1
                 End If
@@ -95,12 +95,14 @@ Module modStatusOutputTimeseriesImplnd
                 For i = 1 To nquals
                     ctemp = "QUAL-PROPS" & CStr(i)
                     If O.TableExists(ctemp) Then
-                        If O.Tables.Item(ctemp).Parms("QSOFG") > 0 Then
-                            nqof = nqof + 1
-                        End If
-                        If O.Tables.Item(ctemp).Parms("QSDFG") > 0 Then
-                            nqsd = nqsd + 1
-                        End If
+                        With O.Tables.Item(ctemp)
+                            If .ParmValue("QSOFG") > 0 Then
+                                nqof = nqof + 1
+                            End If
+                            If .ParmValue("QSDFG") > 0 Then
+                                nqsd = nqsd + 1
+                            End If
+                        End With
                     End If
                 Next i
 

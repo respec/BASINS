@@ -28,7 +28,7 @@ Module modStatusImplnd
                 TableStatus.Change("ICE-FLAG", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TableStatus.Change("SNOW-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("SNOW-FLAGS") Then
-                    Vkmfg = O.Tables.Item("SNOW-FLAGS").Parms("VKMFG")
+                    Vkmfg = O.Tables.Item("SNOW-FLAGS").ParmValue("VKMFG")
                 Else
                     Vkmfg = 0
                 End If
@@ -43,10 +43,10 @@ Module modStatusImplnd
             If ltable.Parms.Item("IWATFG") = 1 Then
                 TableStatus.Change("IWAT-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("IWAT-PARM1") Then
-                    Vrsfg = O.Tables.Item("IWAT-PARM1").Parms("VRSFG")
-                    Vnnfg = O.Tables.Item("IWAT-PARM1").Parms("VNNFG")
+                    Vrsfg = O.Tables.Item("IWAT-PARM1").ParmValue("VRSFG")
+                    Vnnfg = O.Tables.Item("IWAT-PARM1").ParmValue("VNNFG")
                     If ltable.Parms.Item("SNOWFG") = 1 Then
-                        O.Tables.Item("IWAT-PARM1").Parms("CSNOFG") = 1
+                        O.Tables.Item("IWAT-PARM1").ParmValue("CSNOFG") = 1
                     End If
                 Else
                     Vrsfg = 0
@@ -65,8 +65,8 @@ Module modStatusImplnd
             If ltable.Parms.Item("SLDFG") = 1 Then
                 TableStatus.Change("SLD-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("SLD-PARM1") Then
-                    Vasdfg = O.Tables.Item("SLD-PARM1").Parms("VASDFG")
-                    Vrsdfg = O.Tables.Item("SLD-PARM1").Parms("VRSDFG")
+                    Vasdfg = O.Tables.Item("SLD-PARM1").ParmValue("VASDFG")
+                    Vrsdfg = O.Tables.Item("SLD-PARM1").ParmValue("VRSDFG")
                 Else
                     Vasdfg = 0
                     Vrsdfg = 0
@@ -83,7 +83,7 @@ Module modStatusImplnd
             If ltable.Parms.Item("IWGFG") = 1 Then
                 TableStatus.Change("IWT-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("IWT-PARM1") Then
-                    Wtfvfg = O.Tables.Item("IWT-PARM1").Parms("WTFVFG")
+                    Wtfvfg = O.Tables.Item("IWT-PARM1").ParmValue("WTFVFG")
                 Else
                     Wtfvfg = 0
                 End If
@@ -98,7 +98,7 @@ Module modStatusImplnd
             If ltable.Parms.Item("IQALFG") = 1 Then
                 TableStatus.Change("NQUALS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("NQUALS") Then
-                    Nqual = O.Tables.Item("NQUALS").Parms("NQUAL")
+                    Nqual = O.Tables.Item("NQUALS").ParmValue("NQUAL")
                 Else
                     Nqual = 1
                 End If
@@ -116,8 +116,8 @@ Module modStatusImplnd
                         tabname = "QUAL-PROPS"
                     End If
                     If O.TableExists(tabname) Then
-                        Vpfwfg = O.Tables.Item(tabname).Parms("VPFWFG")
-                        Vqofg = O.Tables.Item(tabname).Parms("VQOFG")
+                        Vpfwfg = O.Tables.Item(tabname).ParmValue("VPFWFG")
+                        Vqofg = O.Tables.Item(tabname).ParmValue("VQOFG")
                     Else
                         Vpfwfg = 0
                         Vqofg = 0

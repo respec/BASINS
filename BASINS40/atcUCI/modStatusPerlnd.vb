@@ -35,7 +35,7 @@ Module modStatusPerlnd
                 TableStatus.Change("ICE-FLAG", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TableStatus.Change("SNOW-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("SNOW-FLAGS") Then
-                    Vkmfg = O.Tables.Item("SNOW-FLAGS").Parms("VKMFG")
+                    Vkmfg = O.Tables.Item("SNOW-FLAGS").ParmValue("VKMFG")
                 Else
                     Vkmfg = 0
                 End If
@@ -51,16 +51,16 @@ Module modStatusPerlnd
                 TableStatus.Change("PWAT-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("PWAT-PARM1") Then
                     With O.Tables.Item("PWAT-PARM1")
-                        Vcsfg = .Parms("VCSFG")
-                        Vuzfg = .Parms("VUZFG")
-                        Vnnfg = .Parms("VNNFG")
-                        Vifwfg = .Parms("VIFWFG")
-                        Vircfg = .Parms("VIRCFG")
-                        Vlefg = .Parms("VLEFG")
-                        Hwtfg = .Parms("HWTFG")
-                        Irrgfg = .Parms("IRRGFG")
+                        Vcsfg = .ParmValue("VCSFG")
+                        Vuzfg = .ParmValue("VUZFG")
+                        Vnnfg = .ParmValue("VNNFG")
+                        Vifwfg = .ParmValue("VIFWFG")
+                        Vircfg = .ParmValue("VIRCFG")
+                        Vlefg = .ParmValue("VLEFG")
+                        Hwtfg = .ParmValue("HWTFG")
+                        Irrgfg = .ParmValue("IRRGFG")
                         If ltable.Parms.Item("SNOWFG") = 1 Then
-                            .Parms("CSNOFG") = 1
+                            .ParmValue("CSNOFG") = 1
                         End If
                     End With
                 Else
@@ -109,9 +109,9 @@ Module modStatusPerlnd
 					TableStatus.Change("IRRIG-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                     If O.TableExists("IRRIG-PARM1") Then
                         With O.Tables.Item("IRRIG-PARM1")
-                            Szonfg = .Parms("SZONFG")
-                            Vcrdfg = .Parms("VCRDFG")
-                            Vawdfg = .Parms("VAWDFG")
+                            Szonfg = .ParmValue("SZONFG")
+                            Vcrdfg = .ParmValue("VCRDFG")
+                            Vawdfg = .ParmValue("VAWDFG")
                         End With
                     Else
                         Szonfg = 0
@@ -146,8 +146,10 @@ Module modStatusPerlnd
             If ltable.Parms.Item("SEDFG") = 1 Then
                 TableStatus.Change("SED-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("SED-PARM1") Then
-                    Vcrvfg = O.Tables.Item("SED-PARM1").Parms("CRVFG")
-                    Vsivfg = O.Tables.Item("SED-PARM1").Parms("VSIVFG")
+                    With O.Tables.Item("SED-PARM1")
+                        Vcrvfg = .ParmValue("CRVFG")
+                        Vsivfg = .ParmValue("VSIVFG")
+                    End With
                 Else
                     Vcrvfg = 0
                     Vsivfg = 0
@@ -166,10 +168,10 @@ Module modStatusPerlnd
                 TableStatus.Change("PSTEMP-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("PSTEMP-PARM1") Then
                     With O.Tables.Item("PSTEMP-PARM1")
-                        Sltvfg = .Parms("SLTVFG")
-                        Ultvfg = .Parms("ULTVFG")
-                        Lgtvfg = .Parms("LGTVFG")
-                        Tsopfg = .Parms("TSOPFG")
+                        Sltvfg = .ParmValue("SLTVFG")
+                        Ultvfg = .ParmValue("ULTVFG")
+                        Lgtvfg = .ParmValue("LGTVFG")
+                        Tsopfg = .ParmValue("TSOPFG")
                     End With
                 Else
                     Sltvfg = 0
@@ -202,10 +204,10 @@ Module modStatusPerlnd
                 TableStatus.Change("PWT-PARM1", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("PWT-PARM1") Then
                     With O.Tables.Item("PWT-PARM1")
-                        Idvfg = .Parms("IDVFG")
-                        Icvfg = .Parms("ICVFG")
-                        Gdvfg = .Parms("GDVFG")
-                        Gcvfg = .Parms("GCVFG")
+                        Idvfg = .ParmValue("IDVFG")
+                        Icvfg = .ParmValue("ICVFG")
+                        Gdvfg = .ParmValue("GDVFG")
+                        Gcvfg = .ParmValue("GCVFG")
                     End With
                 Else
                     Idvfg = 0
@@ -233,7 +235,7 @@ Module modStatusPerlnd
             If ltable.Parms.Item("PQALFG") = 1 Then
                 TableStatus.Change("NQUALS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("NQUALS") Then
-                    Nqual = O.Tables.Item("NQUALS").Parms("NQUAL")
+                    Nqual = O.Tables.Item("NQUALS").ParmValue("NQUAL")
                 Else
                     Nqual = 1
                 End If
@@ -251,15 +253,15 @@ Module modStatusPerlnd
                     End If
                     If O.TableExists(tabname) Then
                         With O.Tables.Item(tabname)
-                            Qsdfg = .Parms("QSDFG")
-                            Vpfwfg = .Parms("VPFWFG")
-                            Vpfsfg = .Parms("VPFSFG")
-                            Qsofg = .Parms("QSOFG")
-                            Vqofg = .Parms("VQOFG")
-                            Qifwfg = .Parms("QSDFG")
-                            Viqcfg = .Parms("VIQCFG")
-                            Qagwfg = .Parms("QSDFG")
-                            Vaqcfg = .Parms("VAQCFG")
+                            Qsdfg = .ParmValue("QSDFG")
+                            Vpfwfg = .ParmValue("VPFWFG")
+                            Vpfsfg = .ParmValue("VPFSFG")
+                            Qsofg = .ParmValue("QSOFG")
+                            Vqofg = .ParmValue("VQOFG")
+                            Qifwfg = .ParmValue("QSDFG")
+                            Viqcfg = .ParmValue("VIQCFG")
+                            Qagwfg = .ParmValue("QSDFG")
+                            Vaqcfg = .ParmValue("VAQCFG")
                         End With
                     Else
                         Qsdfg = 0
@@ -307,7 +309,7 @@ Module modStatusPerlnd
                 If ltable.Parms.Item("PWATFG") = 0 Then 'pwater inactive
                     TableStatus.Change("VUZFG", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                     If O.TableExists("VUZFG") Then
-                        Vuzfg = O.Tables.Item("VUZFG").Parms("VUZFG")
+                        Vuzfg = O.Tables.Item("VUZFG").ParmValue("VUZFG")
                     Else
                         Vuzfg = 0
                     End If
@@ -325,10 +327,12 @@ Module modStatusPerlnd
             If ltable.Parms.Item("PESTFG") = 1 Then
                 TableStatus.Change("PEST-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If O.TableExists("PEST-FLAGS") Then
-                    Npest = O.Tables.Item("PEST-FLAGS").Parms("NPST")
-                    Adopfg(1) = O.Tables.Item("PEST-FLAGS").Parms("ADOPF1")
-                    Adopfg(2) = O.Tables.Item("PEST-FLAGS").Parms("ADOPF2")
-                    Adopfg(3) = O.Tables.Item("PEST-FLAGS").Parms("ADOPF3")
+                    With O.Tables.Item("PEST-FLAGS")
+                        Npest = .ParmValue("NPST")
+                        Adopfg(1) = .ParmValue("ADOPF1")
+                        Adopfg(2) = .ParmValue("ADOPF2")
+                        Adopfg(3) = .ParmValue("ADOPF3")
+                    End With
                 Else
                     Npest = 1
                     Adopfg(1) = 2
@@ -366,12 +370,12 @@ Module modStatusPerlnd
                 TableStatus.Change("NIT-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                 If O.TableExists("NIT-FLAGS") Then
                     With O.Tables.Item("NIT-FLAGS")
-                        Vnutfg = .Parms("VNUTFG")
-                        Forafg = .Parms("FORAFG")
-                        Nuptfg = .Parms("NUPTFG")
-                        Amvofg = .Parms("AMVOFG")
-                        Alpnfg = .Parms("ALPNFG")
-                        Vnprfg = .Parms("VNPRFG")
+                        Vnutfg = .ParmValue("VNUTFG")
+                        Forafg = .ParmValue("FORAFG")
+                        Nuptfg = .ParmValue("NUPTFG")
+                        Amvofg = .ParmValue("AMVOFG")
+                        Alpnfg = .ParmValue("ALPNFG")
+                        Vnprfg = .ParmValue("VNPRFG")
                     End With
                 Else
                     Vnutfg = 0
@@ -473,9 +477,11 @@ Module modStatusPerlnd
             If ltable.Parms.Item("PHOSFG") = 1 Then
                 TableStatus.Change("PHOS-FLAGS", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
                 If O.TableExists("PHOS-FLAGS") Then
-                    Vputfg = O.Tables.Item("PHOS-FLAGS").Parms("VPUTFG")
-                    Forpfg = O.Tables.Item("PHOS-FLAGS").Parms("FORPFG")
-                    Puptfg = O.Tables.Item("PHOS-FLAGS").Parms("PUPTFG")
+                    With O.Tables.Item("PHOS-FLAGS")
+                        Vputfg = .ParmValue("VPUTFG")
+                        Forpfg = .ParmValue("FORPFG")
+                        Puptfg = .ParmValue("PUPTFG")
+                    End With
                 Else
                     Vputfg = 0
                     Forpfg = 0

@@ -1146,15 +1146,15 @@ ErrHandler:
 		'update bin output units
         For i = 1 To myUci.OpnBlks.Item("PERLND").Count
             lOper = myUci.OpnBlks.Item("PERLND").Ids(i)
-            lOper.Tables.Item("GEN-INFO").Parms("BUNIT1") = 92
+            lOper.Tables.Item("GEN-INFO").ParmValue("BUNIT1") = 92
         Next i
         For i = 1 To myUci.OpnBlks.Item("IMPLND").Count
             lOper = myUci.OpnBlks.Item("IMPLND").Ids(i)
-            lOper.Tables.Item("GEN-INFO").Parms("BUNIT1") = 92
+            lOper.Tables.Item("GEN-INFO").ParmValue("BUNIT1") = 92
         Next i
         For i = 1 To myUci.OpnBlks.Item("RCHRES").Count
             lOper = myUci.OpnBlks.Item("RCHRES").Ids(i)
-            lOper.Tables.Item("GEN-INFO").Parms("BUNITE") = 92
+            lOper.Tables.Item("GEN-INFO").ParmValue("BUNITE") = 92
         Next i
 		'add binary-info tables
         myUci.OpnBlks.Item("PERLND").AddTableForAll("BINARY-INFO", "PERLND")

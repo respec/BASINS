@@ -25,7 +25,7 @@ Module modPollutants
         For Each vOpn In myUci.OpnBlks("PERLND").Ids
             lOpn = vOpn
             If lOpn.TableExists("NQUALS") Then
-                itemp = lOpn.Tables.Item("NQUALS").Parms("NQUAL")
+                itemp = lOpn.Tables.Item("NQUALS").ParmValue("NQUAL")
             ElseIf lOpn.TableExists("QUAL-PROPS") Then
                 itemp = 1
             End If
@@ -37,7 +37,7 @@ Module modPollutants
         For Each vOpn In myUci.OpnBlks("IMPLND").Ids
             lOpn = vOpn
             If lOpn.TableExists("NQUALS") Then
-                itemp = lOpn.Tables.Item("NQUALS").Parms("NQUAL")
+                itemp = lOpn.Tables.Item("NQUALS").ParmValue("NQUAL")
             ElseIf lOpn.TableExists("QUAL-PROPS") Then
                 itemp = 1
             End If
@@ -52,7 +52,7 @@ Module modPollutants
             lOpn = vOpn
             If lOpn.TableExists("GQ-QALDATA") Then
                 If lOpn.TableExists("GQ-GENDATA") Then
-                    itemp = lOpn.Tables.Item("GQ-GENDATA").Parms("NGQUAL")
+                    itemp = lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
                 Else
                     itemp = 1
                 End If
@@ -82,7 +82,7 @@ Module modPollutants
                         For Each vOpn In myUci.OpnBlks(lCtype).Ids
                             lOpn = vOpn
                             If lOpn.TableExists(tname) Then
-                                sedfg = lOpn.Tables.Item(tname).Parms("QSDFG").Value
+                                sedfg = lOpn.Tables.Item(tname).ParmValue("QSDFG")
                                 Exit For
                             End If
                         Next vOpn
@@ -162,7 +162,7 @@ Module modPollutants
                                         End If
                                     Next lTableDef
                                     If Len(tPoll.Name) = 0 Then
-                                        tPoll.Name = tPoll.Operations.Item(lCtype & newOpn.Id).Tables("QUAL-PROPS").Parms("QUALID").Value
+                                        tPoll.Name = tPoll.Operations.Item(lCtype & newOpn.Id).Tables("QUAL-PROPS").ParmValue("QUALID")
                                         tPoll.Index = piconn
                                     End If
                                 Next vOpn
@@ -201,7 +201,7 @@ Module modPollutants
                                     End If
                                 Next lTableDef
                                 If Len(tPoll.Name) = 0 Then
-                                    tPoll.Name = tPoll.Operations.Item(lCtype & newOpn.Id).Tables("GQ-QALDATA").Parms("GQID").Value
+                                    tPoll.Name = tPoll.Operations.Item(lCtype & newOpn.Id).Tables("GQ-QALDATA").ParmValue("GQID")
                                     tPoll.Index = k
                                 End If
                             Next vOpn
@@ -271,7 +271,7 @@ Module modPollutants
                                     End If
                                 Next lTableDef
                                 If Len(tPoll.Name) = 0 Then
-                                    tPoll.Name = tPoll.Operations.Item(lCtype & newOpn.Id).Tables("QUAL-PROPS").Parms("QUALID").Value
+                                    tPoll.Name = tPoll.Operations.Item(lCtype & newOpn.Id).Tables("QUAL-PROPS").ParmValue("QUALID")
                                     tPoll.Index = k
                                 End If
                             Next vOpn
@@ -607,43 +607,43 @@ Module modPollutants
         cname = "PERLND"
         For Each lOpn In myUci.OpnBlks(cname).Ids
             If lOpn.TableExists("NQUALS") Then
-                lOpn.Tables.Item("NQUALS").Parms("NQUAL") = nPqual
+                lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nPqual
             Else
                 If nPqual > 0 Then
                     myUci.OpnBlks(cname).AddTableForAll("NQUALS", cname)
-                    lOpn.Tables.Item("NQUALS").Parms("NQUAL") = nPqual
+                    lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nPqual
                 End If
             End If
             If nPqual = 0 Then
-                lOpn.Tables.Item("ACTIVITY").Parms("PQALFG") = 0
+                lOpn.Tables.Item("ACTIVITY").ParmValue("PQALFG") = 0
             End If
         Next
         cname = "IMPLND"
         For Each lOpn In myUci.OpnBlks(cname).Ids
             If lOpn.TableExists("NQUALS") Then
-                lOpn.Tables.Item("NQUALS").Parms("NQUAL") = nIqual
+                lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nIqual
             Else
                 If nIqual > 0 Then
                     myUci.OpnBlks(cname).AddTableForAll("NQUALS", cname)
-                    lOpn.Tables.Item("NQUALS").Parms("NQUAL") = nIqual
+                    lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nIqual
                 End If
             End If
             If nIqual = 0 Then
-                lOpn.Tables.Item("ACTIVITY").Parms("IQALFG") = 0
+                lOpn.Tables.Item("ACTIVITY").ParmValue("IQALFG") = 0
             End If
         Next
         cname = "RCHRES"
         For Each lOpn In myUci.OpnBlks(cname).Ids
             If lOpn.TableExists("GQ-GENDATA") Then
-                lOpn.Tables.Item("GQ-GENDATA").Parms("NGQUAL") = nGqual
+                lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL") = nGqual
             Else
                 If nGqual > 0 Then
                     myUci.OpnBlks(cname).AddTableForAll("GQ-GENDATA", cname)
-                    lOpn.Tables.Item("GQ-GENDATA").Parms("NGQUAL") = nGqual
+                    lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL") = nGqual
                 End If
             End If
             If nGqual = 0 Then
-                lOpn.Tables.Item("ACTIVITY").Parms("GQALFG") = 0
+                lOpn.Tables.Item("ACTIVITY").ParmValue("GQALFG") = 0
             End If
         Next
 

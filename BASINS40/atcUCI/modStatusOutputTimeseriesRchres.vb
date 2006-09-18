@@ -14,7 +14,7 @@ Module modStatusOutputTimeseriesRchres
 		If O.TableExists("ACTIVITY") Then
 			ltable = O.Tables.Item("ACTIVITY")
 			If O.TableExists("GEN-INFO") Then
-                nExits = O.Tables.Item("GEN-INFO").Parms("NEXITS")
+                nExits = O.Tables.Item("GEN-INFO").ParmValue("NEXITS")
 			Else
 				nExits = 1
 			End If
@@ -22,8 +22,10 @@ Module modStatusOutputTimeseriesRchres
 			'section hydr
             If ltable.Parms.Item("HYDRFG") = 1 Then
                 If O.TableExists("HYDR-PARM1") Then
-                    AUX2FG = O.Tables.Item("HYDR-PARM1").Parms("AUX2FG")
-                    AUX3FG = O.Tables.Item("HYDR-PARM1").Parms("AUX3FG")
+                    With O.Tables.Item("HYDR-PARM1")
+                        AUX2FG = .ParmValue("AUX2FG")
+                        AUX3FG = .ParmValue("AUX3FG")
+                    End With
                 Else
                     AUX2FG = 0
                     AUX2FG = 0
@@ -108,7 +110,7 @@ Module modStatusOutputTimeseriesRchres
 			'section cons
             If ltable.Parms.Item("CONSFG") = 1 Then
                 If O.TableExists("NCONS") Then
-                    nCons = O.Tables.Item("NCONS").Parms("NCONS")
+                    nCons = O.Tables.Item("NCONS").ParmValue("NCONS")
                 Else
                     nCons = 0
                 End If
@@ -182,7 +184,7 @@ Module modStatusOutputTimeseriesRchres
 			'section gqual
             If ltable.Parms.Item("GQALFG") = 1 Then
                 If O.TableExists("GQ-GENDATA") Then
-                    nGqual = O.Tables.Item("GQ-GENDATA").Parms("NGQUAL")
+                    nGqual = O.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
                 Else
                     nGqual = 1
                 End If

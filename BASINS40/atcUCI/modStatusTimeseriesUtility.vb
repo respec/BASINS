@@ -15,13 +15,15 @@ Module modStatusTimeseriesUtility
 	Public Sub UpdateInputTimeseriesCopy(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
 		Dim nmn, npt, i As Integer
 		
-		If O.TableExists("TIMESERIES") Then
-            npt = O.Tables.Item("TIMESERIES").Parms("NPT")
-            nmn = O.Tables.Item("TIMESERIES").Parms("NMN")
-		Else
-			npt = 0
-			nmn = 0
-		End If
+        If O.TableExists("TIMESERIES") Then
+            With O.Tables.Item("TIMESERIES")
+                npt = .ParmValue("NPT")
+                nmn = .ParmValue("NMN")
+            End With
+        Else
+            npt = 0
+            nmn = 0
+        End If
 		For i = 1 To npt
 			TimserStatus.Change("INPUT:POINT", i, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
 		Next i
@@ -33,13 +35,15 @@ Module modStatusTimeseriesUtility
 	Public Sub UpdateOutputTimeseriesCopy(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
 		Dim nmn, npt, i As Integer
 		
-		If O.TableExists("TIMESERIES") Then
-            npt = O.Tables.Item("TIMESERIES").Parms("NPT")
-            nmn = O.Tables.Item("TIMESERIES").Parms("NMN")
-		Else
-			npt = 0
-			nmn = 0
-		End If
+        If O.TableExists("TIMESERIES") Then
+            With O.Tables.Item("TIMESERIES")
+                npt = .ParmValue("NPT")
+                nmn = .ParmValue("NMN")
+            End With
+        Else
+            npt = 0
+            nmn = 0
+        End If
 		For i = 1 To npt
 			TimserStatus.Change("OUTPUT:POINT", i, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
 		Next i
@@ -52,13 +56,15 @@ Module modStatusTimeseriesUtility
 		'only timser for pltgen is the input timser
 		Dim nmn, npt, i As Integer
 		
-		If O.TableExists("PLOTINFO") Then
-            npt = O.Tables.Item("PLOTINFO").Parms("NPT")
-            nmn = O.Tables.Item("PLOTINFO").Parms("NMN")
-		Else
-			npt = 0
-			nmn = 0
-		End If
+        If O.TableExists("PLOTINFO") Then
+            With O.Tables.Item("PLOTINFO")
+                npt = .ParmValue("NPT")
+                nmn = .ParmValue("NMN")
+            End With
+        Else
+            npt = 0
+            nmn = 0
+        End If
 		For i = 1 To npt
 			TimserStatus.Change("INPUT:POINT", i, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
 		Next i
@@ -85,7 +91,7 @@ Module modStatusTimeseriesUtility
 		Dim Opcode As Integer
 		
 		If O.TableExists("OPCODE") Then
-            Opcode = O.Tables.Item("OPCODE").Parms("OPCODE")
+            Opcode = O.Tables.Item("OPCODE").ParmValue("OPCODE")
 		Else
 			Opcode = 0
 		End If
@@ -110,13 +116,15 @@ Module modStatusTimeseriesUtility
 		'only timser for mutsin is the output timser
 		Dim nmn, npt, i As Integer
 		
-		If O.TableExists("MUTSINFO") Then
-            npt = O.Tables.Item("MUTSINFO").Parms("NPT")
-            nmn = O.Tables.Item("MUTSINFO").Parms("NMN")
-		Else
-			npt = 0
-			nmn = 0
-		End If
+        If O.TableExists("MUTSINFO") Then
+            With O.Tables.Item("MUTSINFO")
+                npt = .ParmValue("NPT")
+                nmn = .ParmValue("NMN")
+            End With
+        Else
+            npt = 0
+            nmn = 0
+        End If
 		For i = 1 To npt
 			TimserStatus.Change("OUTPUT:POINT", i, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired)
 		Next i
@@ -128,7 +136,7 @@ Module modStatusTimeseriesUtility
 	Public Sub UpdateInputTimeseriesReport(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
 		Dim ncon, i As Integer
 		If O.TableExists("REPORT-FLAGS") Then
-            ncon = O.Tables.Item("REPORT-FLAGS").Parms("NCON")
+            ncon = O.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
 		Else
 			ncon = 0
 		End If
@@ -145,13 +153,15 @@ Module modStatusTimeseriesUtility
 		'input timsers for bmprac
 		Dim nGqual, nCons, i As Integer
 		
-		If O.TableExists("GEN-INFO") Then
-            nCons = O.Tables.Item("GEN-INFO").Parms("NCONS")
-            nGqual = O.Tables.Item("GEN-INFO").Parms("NGQUAL")
-		Else
-			nCons = 0
-			nGqual = 0
-		End If
+        If O.TableExists("GEN-INFO") Then
+            With O.Tables.Item("GEN-INFO")
+                nCons = .ParmValue("NCONS")
+                nGqual = .ParmValue("NGQUAL")
+            End With
+        Else
+            nCons = 0
+            nGqual = 0
+        End If
 		
 		'group inflow
 		TimserStatus.Change("INFLOW:IVOL", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
@@ -199,13 +209,15 @@ Module modStatusTimeseriesUtility
 		'output timsers for bmprac
 		Dim nGqual, nCons, i As Integer
 		
-		If O.TableExists("GEN-INFO") Then
-            nCons = O.Tables.Item("GEN-INFO").Parms("NCONS")
-            nGqual = O.Tables.Item("GEN-INFO").Parms("NGQUAL")
-		Else
-			nCons = 0
-			nGqual = 0
-		End If
+        If O.TableExists("GEN-INFO") Then
+            With O.Tables.Item("GEN-INFO")
+                nCons = .ParmValue("NCONS")
+                nGqual = .ParmValue("NGQUAL")
+            End With
+        Else
+            nCons = 0
+            nGqual = 0
+        End If
 		
 		'group receiv
 		TimserStatus.Change("RECEIV:IVOL", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)

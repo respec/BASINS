@@ -430,7 +430,7 @@ NoTable:
     '		End Select
     '		'  With frmPictures
     '		'    If pOpnBlk.Name = "RCHRES" Then
-    '		'      If pTables("GEN-INFO").Parms("LKFG") = 1 Then 'get the lake picture
+    '		'      If pTables("GEN-INFO").ParmValue("LKFG") = 1 Then 'get the lake picture
     '		'        pic.PaintPicture .picLake.Picture, pic.Width - .picLake.Width, 0, , , , , , barbase
     '		'      Else
     '		'        pic.PaintPicture .picStream.Picture, pic.Width - .picStream.Width, 0, , , , , , barbase

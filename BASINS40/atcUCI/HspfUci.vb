@@ -529,7 +529,7 @@ Imports atcUtility
         Dim lConnection As HspfConnection
         Dim lMassLink As HspfMassLink
 
-        On Error Resume Next
+        'On Error Resume Next
 
         pMsg = Msg
         FilesOK = True
@@ -576,9 +576,11 @@ Imports atcUtility
 
                 pInitialized = True
 
-                IPC.SendMonitorMessage("(Show)") 'where was the hide?
-                If Not pFastFlag Then
-                    IPC.SendMonitorMessage("(Msg1 Building Collections)")
+                If IPCset Then
+                    IPC.SendMonitorMessage("(Show)") 'where was the hide?
+                    If Not pFastFlag Then
+                        IPC.SendMonitorMessage("(Msg1 Building Collections)")
+                    End If
                 End If
 
                 If pFastFlag Then
@@ -668,7 +670,7 @@ Imports atcUtility
                     IPC.SendMonitorMessage("(MSG2 Processing Point Sources)")
                 End If
                 Source2Point()
-                IPC.SendMonitorMessage("(Hide)")
+                If IPCset Then IPC.SendMonitorMessage("(Hide)")
 
             End If
         End If
@@ -2837,7 +2839,7 @@ x:
 				Id = CShort(Right(Trim(cbuff), 3))
 				'find which oper this ftable is associated with
                 For Each tOpn In Me.OpnBlks.Item("RCHRES").Ids
-                    If tOpn.Tables.Item("HYDR-PARM2").Parms("FTBUCI") = Id Then
+                    If tOpn.Tables.Item("HYDR-PARM2").ParmValue("FTBUCI") = Id Then
                         lOpn = tOpn
                         Exit For
                     End If
