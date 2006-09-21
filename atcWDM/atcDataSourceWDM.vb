@@ -821,7 +821,8 @@ Public Class atcDataSourceWDM
                             Case Else
                                 lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lS)
                         End Select
-                    Catch
+                    Catch ex As Exception
+                        Logger.Dbg("RefreshDsn:" & aDsn & " Attr:" & lSaind & " Error:" & ex.ToString)
                     End Try
                 End If
             Else 'all done
