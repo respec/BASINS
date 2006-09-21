@@ -42,13 +42,29 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcData, Version=1.0.2445.25945, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Plugins\BASINS\atcData.dll</HintPath>
+    </Reference>
     <Reference Include="atcUtility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Plugins\BASINS\atcUtility.dll</HintPath>
     </Reference>
+    <Reference Include="atcWDM, Version=1.0.2445.25945, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Plugins\BASINS\atcWDM.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.VBA, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>obj\Debug\Interop.VBA.dll</HintPath>
+    </Reference>
+    <Reference Include="MapWinInterfaces, Version=4.2.2439.23261, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="MapWinUtility, Version=1.0.2442.22516, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic.Compatibility">
       <Name>Microsoft.VisualBasic.Compatibility</Name>
@@ -68,52 +84,10 @@
     <Reference Include="System.XML">
       <Name>System.XML</Name>
     </Reference>
-    <COMReference Include="ATCData">
-      <Guid>{653D928A-80CE-11D3-913A-00A024C11E04}</Guid>
-      <Lcid>0</Lcid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>11</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-    </COMReference>
-    <COMReference Include="ATCoCtl">
-      <Guid>{872F11D5-3322-11D4-9D23-00A0C9768F70}</Guid>
-      <Lcid>0</Lcid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>10</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-    </COMReference>
-    <COMReference Include="ATCTSfile">
-      <Guid>{6EEEC479-3323-11D4-9D23-00A0C9768F70}</Guid>
-      <Lcid>0</Lcid>
-      <VersionMajor>3</VersionMajor>
-      <VersionMinor>2</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-    </COMReference>
-    <COMReference Include="AxATCoCtl">
-      <Guid>{872F11D5-3322-11D4-9D23-00A0C9768F70}</Guid>
-      <Lcid>0</Lcid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>10</VersionMinor>
-      <WrapperTool>aximp</WrapperTool>
-    </COMReference>
     <COMReference Include="DAO">
       <Guid>{00025E01-0000-0000-C000-000000000046}</Guid>
       <Lcid>0</Lcid>
       <VersionMajor>4</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-    </COMReference>
-    <COMReference Include="FColl">
-      <Guid>{18F0904D-D01A-4967-90D6-FB9B55A332EC}</Guid>
-      <Lcid>0</Lcid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-    </COMReference>
-    <COMReference Include="Scripting">
-      <Guid>{420B2830-E718-11CF-893D-00A0C9054228}</Guid>
-      <Lcid>0</Lcid>
-      <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <WrapperTool>tlbimp</WrapperTool>
     </COMReference>

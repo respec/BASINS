@@ -280,7 +280,7 @@ Imports atcUtility
                         With lParm
                             tempValue = lParm.Value
                             s = s & Space(.Def.StartCol - Len(s) - 1) 'pad prev field
-                            If .Def.Typ = ATCoCtl.ATCoDataType.ATCoTxt Then 'left justify strings
+                            If .Def.Typ = 0 Then ' ATCoTxt 'left justify strings
                                 If .Def.Length < Len(tempValue) Then
                                     tempValue = Left(tempValue, .Def.Length)
                                 End If

@@ -35,7 +35,7 @@ Public Module modMetData
         Dim lMaxDlyVal As Double
         Dim lMaxDlyInd As Integer
         Dim lDist As atcCollection
-        Dim lTSer As atcTimeseries
+        Dim lTSer As atcTimeseries = Nothing
         Dim lAdjustAttribute As String = GetAdjustingAttribute(aTS2Fill)
 
         Logger.Dbg("Filling Daily values for " & aTS2Fill.ToString & ", " & aTS2Fill.Attributes.GetValue("Description"))
