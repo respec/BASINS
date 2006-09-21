@@ -649,8 +649,9 @@ Option Explicit On
 		End If
 		On Error Resume Next
 		Exit Sub
-errorhandler: 
-		myMsgBox.Show("An error occurred while building this FTable.", "FTable Problem", "+-&Close")
+errorhandler:
+        'TODO: remove MsgBox
+        MsgBox("An error occurred while building this FTable.", , "FTable Problem")
 		On Error Resume Next
 	End Sub
 	

@@ -86,21 +86,23 @@ Public Class atcDataManager
     ''' </param>  
     Public Function GetPlugins(ByVal aBaseType As Type) As atcCollection
         Dim lMatchingPlugIns As New atcCollection
-        Dim lLastPlugIn As Integer = pMapWin.Plugins.Count() - 1
-        For iPlugin As Integer = 0 To lLastPlugIn
-            Dim lCurPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
-            If Not lCurPlugin Is Nothing Then
-                If CType(lCurPlugin, Object).GetType().IsSubclassOf(aBaseType) Then
-                    lMatchingPlugIns.Add(lCurPlugin.Name, lCurPlugin)
+        If Not pMapWin Is Nothing Then
+            Dim lLastPlugIn As Integer = pMapWin.Plugins.Count() - 1
+            For iPlugin As Integer = 0 To lLastPlugIn
+                Dim lCurPlugin As MapWindow.Interfaces.IPlugin = pMapWin.Plugins.Item(iPlugin)
+                If Not lCurPlugin Is Nothing Then
+                    If CType(lCurPlugin, Object).GetType().IsSubclassOf(aBaseType) Then
+                        lMatchingPlugIns.Add(lCurPlugin.Name, lCurPlugin)
+                    End If
                 End If
-            End If
-        Next
+            Next
+        End If
         Return lMatchingPlugIns
     End Function
 
     ''' <summary>Open BASINS data source</summary>
     ''' <param name="aNewSource">
-    '''     <para>Object containing instance of new data source</para>
+    '''     <para>Instance of data source that can open the specified data</para>
     ''' </param>  
     ''' <param name="aSpecification">
     '''     <para>File name, connection string, or other information needed to initialize aNewSource</para>
@@ -119,7 +121,7 @@ Public Class atcDataManager
                 Logger.Dbg("OpenDataSource:Count:" & aNewSource.DataSets.Count & ":" & aSpecification)
                 pDataSources.Add(aNewSource)
                 RaiseEvent OpenedData(aNewSource)
-                pMapWin.Project.Modified = True
+                If Not pMapWin Is Nothing Then pMapWin.Project.Modified = True
                 Return True
             Else
                 Logger.Dbg("OpenDataSource:OpenFailure:Specification:" & aSpecification & _

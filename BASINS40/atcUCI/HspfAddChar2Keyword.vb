@@ -4,9 +4,7 @@ Module HspfAddChar2Keyword
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 	
 	Public lastOperationSerial As Integer
-	Public IPC As ATCoCtl.ATCoIPC
-	Public IPCset As Boolean
-	
+
 	Function AddChar2Keyword(ByRef k As String) As String
 		Dim kwd As String
 		
