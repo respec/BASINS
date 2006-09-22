@@ -44,7 +44,7 @@ Module modStatusOutputTimeseriesPerlnd
                 End If
                 TimserStatus.Change("SNOW:PAKTMP", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TimserStatus.Change("SNOW:SNOTMP", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
-                TimserStatus.Change("SNOW:DWMTMP", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
+                TimserStatus.Change("SNOW:DEWTMP", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TimserStatus.Change("SNOW:SNOWF", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 TimserStatus.Change("SNOW:PRAIN", 1, HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusOptional)
                 If snopfg = 0 Then
