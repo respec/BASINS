@@ -193,12 +193,12 @@ Imports atcUtility
                                 'lParm.Value = Format(CSng(lParm.Value), ".###")
                                 lParm.Value = NumFmtRE(CSng(lParm.Value), (lParmDef.Length))
                             Else
-                                lParm.Value = VB6.Format(CSng(lParm.Value), "0.###")
+                                lParm.Value = Format(CSng(lParm.Value), "0.###")
                             End If
                         ElseIf System.Math.Abs(CDbl(lParm.Value)) > 0 And System.Math.Abs(CDbl(lParm.Value)) <= 10 ^ -4 Then  'pbd bug fix for small e formats
                             lParm.Value = NumFmtRE(CSng(lParm.Value), (lParmDef.Length))
                         Else
-                            lParm.Value = VB6.Format(CSng(lParm.Value), "0.####")
+                            lParm.Value = Format(CSng(lParm.Value), "0.####")
                         End If
                         'If lParmDef.Length <= 5 Then
                         '  Debug.Print Trim(Mid(s, lParmDef.StartCol, lParmDef.Length)), lParm.Value
@@ -562,7 +562,7 @@ notMissingTableForThisOper:
                         DecimalPlaces = 1
                     End If
 
-                    retval = VB6.Format(rtmp, "#." & New String("#", DecimalPlaces) & expFormat)
+                    retval = Format(rtmp, "#." & New String("#", DecimalPlaces) & expFormat)
                 End If
             End If
         End If

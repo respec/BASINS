@@ -1,14 +1,15 @@
 Option Strict Off
 Option Explicit On
+
+Imports MapWinUtility
+
 <System.Runtime.InteropServices.ProgId("HspfMsg_NET.HspfMsg")> Public Class HspfMsg
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Dim pMsgFileName As String
-    Dim pBlockDefs As Collection 'of HspfBlockDef
-    Dim pErrorDescription As String
-    'Dim pHspfEngine As Object
-    'Dim pHspfEngineSet As Boolean
-    Dim pTSGroupDefs As Collection 'of HspfTSGroupDefs
+    Private pMsgFileName As String
+    Private pBlockDefs As Collection 'of HspfBlockDef
+    Private pErrorDescription As String
+    Private pTSGroupDefs As Collection 'of HspfTSGroupDefs
 
     'Public WriteOnly Property Monitor() As Object
     '    Set(ByVal Value As Object)
@@ -17,262 +18,277 @@ Option Explicit On
     '    End Set
     'End Property
 
+    Public Sub Open(ByVal aFilename As String)
+        If Len(aFilename) = 0 Then aFilename = "HSPFmsg.mdb"
+        If Not IO.File.Exists(aFilename) Then
+            aFilename = GetSetting("HSPF", "MessageMDB", "Path")
+            If Not IO.File.Exists(aFilename) Then
+                aFilename = atcUtility.FindFile("Please locate 'HSPFmsg.mdb' in a writable directory", "HSPFmsg.mdb")
+                SaveSetting("HSPF", "MessageMDB", "Path", aFilename)
+            End If
+        End If
+
+        Logger.Dbg("Opening " & aFilename)
+        Dim myDb As New atcMDB(aFilename)
+        pMsgFileName = aFilename
+
+        Logger.Dbg("BlockDefns")
+        Dim lBlkTable As DataTable = myDb.GetTable("BlockDefns")
+        Dim lBlock As HspfBlockDef
+        Dim lBlockFieldID As Integer = lBlkTable.Columns.IndexOf("ID")
+        Dim lBlockFieldName As Integer = lBlkTable.Columns.IndexOf("Name")
+        Dim lSections As New Collection
+
+        Logger.Dbg("SectionDefns")
+        Dim lSecTable As DataTable = myDb.GetTable("SectionDefns")
+        Dim lSection As HspfSectionDef
+        Dim lSectionFieldID As Integer = lSecTable.Columns.IndexOf("ID")
+        Dim lSectionFieldName As Integer = lSecTable.Columns.IndexOf("Name")
+        Dim lSectionFieldBlockID As Integer = lSecTable.Columns.IndexOf("BlockID")
+        Dim critSection As String
+        Dim lTables As New Collection
+        Dim lBlkTables As New Collection
+
+        Dim lTabTable As DataTable = myDb.GetTable("TableDefns")
+        Dim lTableFieldSectionID As Integer = lTabTable.Columns.IndexOf("SectionID")
+        Dim ltable As HspfTableDef
+        Dim lParms As New Collection
+
+        Dim lParmTable As DataTable = myDb.GetTable("ParmDefns")
+        Dim lParmFieldTableID As Integer = lParmTable.Columns.IndexOf("TableID")
+        Dim lParm As HSPFParmDef
+        Dim lTyp As String
+
+        Dim lTSGroupTable As DataTable = myDb.GetTable("TSGroupDefns")
+        Dim lTSGroup As HspfTSGroupDef
+        Dim lTSMembers As Collection
+        Dim lTSMemberTable As DataTable = myDb.GetTable("TSMemberDefns")
+        Dim lMemberFieldTSGroupID As Integer = lTSMemberTable.Columns.IndexOf("TSGroupID")
+        Dim lTSMember As HspfTSMemberDef
+
+        Dim lNumeric As Boolean
+        'Dim s As String
+
+        Dim lBlkCount As Integer = lBlkTable.Rows.Count
+        Dim lBlkNow As Integer
+
+        pBlockDefs = Nothing
+        pBlockDefs = New Collection
+
+        lBlkNow = 0
+        For Each lBlockRow As DataRow In lBlkTable.Rows
+            'progress bar (dumb)
+            's = "(Progress " & lBlkNow * 100 / lBlkCount & ")"
+            'IPC.SendMonitorMessage s
+            lBlkNow = lBlkNow + 1
+            Logger.Dbg("Block Row " & lBlkNow)
+
+            lBlock = New HspfBlockDef
+            lBlock.Id = lBlockRow.Item(lBlockFieldID)
+            lBlock.Name = lBlockRow.Item(lBlockFieldName)
+            lSections = Nothing
+            lSections = New Collection
+            lBlkTables = Nothing
+            lBlkTables = New Collection
+            critSection = "BlockID = " & CStr(lBlock.Id)
+            For Each lSecRow As DataRow In lSecTable.Rows
+                If lSecRow.Item(lSectionFieldBlockID) = lBlock.Id Then
+                    lSection = New HspfSectionDef
+                    lSection.Name = lSecRow.Item(lSectionFieldName)
+                    lSection.Id = lSecRow.Item(lSectionFieldID)
+                    Logger.Dbg("Section Row " & lSection.Name)
+                    lTables = Nothing
+                    lTables = New Collection
+
+                    'lTabTable = myDb.GetTable("TableDefns WHERE SectionID = " & CStr(lSection.Id))
+                    For Each lTabRow As DataRow In lTabTable.Rows
+                        If lTabRow.Item(lTableFieldSectionID) = lSection.Id Then
+                            ltable = New HspfTableDef
+                            ltable.Id = lTabRow.Item(0)
+                            ltable.Parent = lSection
+                            ltable.Name = lTabRow.Item(2)
+
+                            Logger.Dbg("Table Row " & ltable.Name)
+
+                            ltable.SGRP = lTabRow.Item(3)
+                            ltable.NumOccur = lTabRow.Item(4)
+                            ltable.HeaderE = lTabRow.Item(5)
+                            ltable.HeaderM = lTabRow.Item(6)
+                            ltable.Define = FilterNull(lTabRow.Item(7), " ")
+                            If lTabTable.Columns.Count < 9 Then
+                                ltable.OccurGroup = 0
+                            Else
+                                ltable.OccurGroup = lTabRow.Item(8)
+                            End If
+                            'UPGRADE_NOTE: Object lParms may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
+                            lParms = Nothing
+                            lParms = New Collection
+
+                            'lParmTable = myDb.GetTable("ParmDefns WHERE TableID = " & CStr(ltable.Id))
+                            For Each lParmRow As DataRow In lParmTable.Rows
+                                If lParmRow.Item(lParmFieldTableID) = ltable.Id Then
+                                    lParm = New HSPFParmDef
+                                    lParm.Name = lParmRow.Item(2) 'Name
+                                    Logger.Dbg("Parm Row " & lParm.Name)
+                                    lTyp = lParmRow.Item(3) 'Type
+                                    Select Case lTyp
+                                        Case "I" : lNumeric = True : lParm.Typ = 1 ' ATCoInt
+                                        Case "R" : lNumeric = True : lParm.Typ = 2 ' ATCoSng
+                                        Case "C" : lNumeric = False : lParm.Typ = 0 ' ATCoTxt
+                                        Case Else : lNumeric = False : lParm.Typ = -999
+                                    End Select
+                                    lParm.StartCol = lParmRow.Item(4)
+                                    lParm.Length = lParmRow.Item(5)
+                                    If lNumeric Then
+                                        lParm.Min = lParmRow.Item(6)
+                                        lParm.Max = lParmRow.Item(7)
+                                        If lParmTable.Columns.Count > 10 Then
+                                            lParm.MetricMin = lParmRow.Item(10)
+                                            lParm.MetricMax = lParmRow.Item(11)
+                                        Else
+                                            lParm.MetricMin = lParmRow.Item(6)
+                                            lParm.MetricMax = lParmRow.Item(7)
+                                        End If
+                                    End If
+                                    'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
+                                    If IsDBNull(lParmRow.Item(8)) Then
+                                        lParm.Default_Renamed = " "
+                                    Else
+                                        lParm.Default_Renamed = lParmRow.Item(8) 'default
+                                    End If
+                                    If lParmTable.Columns.Count > 10 Then
+                                        'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
+                                        If IsDBNull(lParmRow.Item(12)) Then
+                                            lParm.MetricDefault = " "
+                                        Else
+                                            lParm.MetricDefault = lParmRow.Item(12) 'default
+                                        End If
+                                    Else 'use english default
+                                        'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
+                                        If IsDBNull(lParmRow.Item(8)) Then
+                                            lParm.MetricDefault = " "
+                                        Else
+                                            lParm.MetricDefault = lParmRow.Item(8)
+                                        End If
+                                    End If
+                                    lParm.Other = lParmRow.Item(4) & ":" & lParmRow.Item(5)
+                                    'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
+                                    If IsDBNull(lParmRow.Item(9)) Then
+                                        lParm.Define = " "
+                                    Else
+                                        lParm.Define = lParmRow.Item(9)
+                                    End If
+                                    lParms.Add(lParm, lParm.Name)
+                                End If
+                            Next
+                            ltable.ParmDefs = lParms
+                            updateParmsMultLines((lBlock.Name), ltable)
+                            lTables.Add(ltable, ltable.Name)
+                            lBlkTables.Add(ltable, ltable.Name)
+                        End If
+                    Next
+                    lSection.TableDefs = lTables
+                    lSections.Add(lSection, lSection.Name)
+                End If
+            Next
+            lBlock.SectionDefs = lSections
+            lBlock.TableDefs = lBlkTables
+            pBlockDefs.Add(lBlock, lBlock.Name)
+        Next
+
+        Logger.Dbg("TSGroupDefns")
+        'now read TS group and member info
+        pTSGroupDefs = Nothing
+        pTSGroupDefs = New Collection
+        Dim lTSGroupFieldID As Integer = lTSGroupTable.Columns.IndexOf("ID")
+        Dim lTSGroupFieldName As Integer = lTSGroupTable.Columns.IndexOf("Name")
+        Dim lTSGroupFieldBlockID As Integer = lTSGroupTable.Columns.IndexOf("BlockID")
+
+        Dim lTSMemberFieldID As Integer = lTSMemberTable.Columns.IndexOf("ID")
+        Dim lTSMemberFieldName As Integer = lTSMemberTable.Columns.IndexOf("Name")
+        Dim lTSMemberFieldTSGroupID As Integer = lTSMemberTable.Columns.IndexOf("TSGroupID")
+        Dim lTSMemberFieldSCLU As Integer = lTSMemberTable.Columns.IndexOf("SCLU")
+        Dim lTSMemberFieldSGRP As Integer = lTSMemberTable.Columns.IndexOf("SGRP")
+        Dim lTSMemberFieldmdim1 As Integer = lTSMemberTable.Columns.IndexOf("mdim1")
+        Dim lTSMemberFieldmdim2 As Integer = lTSMemberTable.Columns.IndexOf("mdim2")
+        Dim lTSMemberFieldmaxsb1 As Integer = lTSMemberTable.Columns.IndexOf("maxsb1")
+        Dim lTSMemberFieldmaxsb2 As Integer = lTSMemberTable.Columns.IndexOf("maxsb2")
+        Dim lTSMemberFieldmkind As Integer = lTSMemberTable.Columns.IndexOf("mkind")
+        Dim lTSMemberFieldsptrn As Integer = lTSMemberTable.Columns.IndexOf("sptrn")
+        Dim lTSMemberFieldmsect As Integer = lTSMemberTable.Columns.IndexOf("msect")
+        Dim lTSMemberFieldmio As Integer = lTSMemberTable.Columns.IndexOf("mio")
+        Dim lTSMemberFieldosvbas As Integer = lTSMemberTable.Columns.IndexOf("osvbas")
+        Dim lTSMemberFieldosvoff As Integer = lTSMemberTable.Columns.IndexOf("osvoff")
+        Dim lTSMemberFieldeunits As Integer = lTSMemberTable.Columns.IndexOf("eunits")
+        Dim lTSMemberFieldltval1 As Integer = lTSMemberTable.Columns.IndexOf("ltval1")
+        Dim lTSMemberFieldltval2 As Integer = lTSMemberTable.Columns.IndexOf("ltval2")
+        Dim lTSMemberFieldltval3 As Integer = lTSMemberTable.Columns.IndexOf("ltval3")
+        Dim lTSMemberFieldltval4 As Integer = lTSMemberTable.Columns.IndexOf("ltval4")
+        Dim lTSMemberFielddefn As Integer = lTSMemberTable.Columns.IndexOf("defn")
+        Dim lTSMemberFieldmunits As Integer = lTSMemberTable.Columns.IndexOf("munits")
+        Dim lTSMemberFieldltval5 As Integer = lTSMemberTable.Columns.IndexOf("ltval5")
+        Dim lTSMemberFieldltval6 As Integer = lTSMemberTable.Columns.IndexOf("ltval6")
+        Dim lTSMemberFieldltval7 As Integer = lTSMemberTable.Columns.IndexOf("ltval7")
+        Dim lTSMemberFieldltval8 As Integer = lTSMemberTable.Columns.IndexOf("ltval8")
+
+        For Each lTSGroupRow As DataRow In lTSGroupTable.Rows
+            lTSGroup = New HspfTSGroupDef
+            lTSGroup.Id = lTSGroupRow.Item(lTSGroupFieldID)
+            lTSGroup.Name = lTSGroupRow.Item(lTSGroupFieldName)
+            'If IPCset Then
+            '    s = "(MSG3 Reading about Timeseries Groups and Members for " & lTSGroup.Name & ")"
+            '    'IPC.SendMonitorMessage s
+            'End If
+            lTSGroup.BlockId = lTSGroupRow.Item(lTSGroupFieldBlockID)
+            lTSMembers = Nothing
+            lTSMembers = New Collection
+            'lTSMemberTable = myDb.GetTable("TSMemberDefns WHERE TSGroupID = " & CStr(lTSGroup.Id))
+
+            For Each lTSMemberRow As DataRow In lTSMemberTable.Rows
+                If lTSMemberRow.Item(lMemberFieldTSGroupID) = lTSGroup.Id Then
+                    lTSMember = New HspfTSMemberDef
+                    lTSMember.Id = lTSMemberRow.Item(lTSMemberFieldID)
+                    lTSMember.Name = lTSMemberRow.Item(lTSMemberFieldName)
+                    lTSMember.TSGroupId = lTSMemberRow.Item(lTSMemberFieldTSGroupID)
+                    lTSMember.Parent = lTSGroup
+                    lTSMember.SCLU = lTSMemberRow.Item(lTSMemberFieldSCLU)
+                    lTSMember.SGRP = lTSMemberRow.Item(lTSMemberFieldSGRP)
+                    lTSMember.mdim1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmdim1))
+                    lTSMember.mdim2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmdim2))
+                    lTSMember.maxsb1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmaxsb1))
+                    lTSMember.maxsb2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmaxsb2))
+                    lTSMember.mkind = FilterNull(lTSMemberRow.Item(lTSMemberFieldmkind))
+                    lTSMember.sptrn = FilterNull(lTSMemberRow.Item(lTSMemberFieldsptrn))
+                    lTSMember.msect = FilterNull(lTSMemberRow.Item(lTSMemberFieldmsect))
+                    lTSMember.mio = FilterNull(lTSMemberRow.Item(lTSMemberFieldmio))
+                    lTSMember.osvbas = FilterNull(lTSMemberRow.Item(lTSMemberFieldosvbas))
+                    lTSMember.osvoff = FilterNull(lTSMemberRow.Item(lTSMemberFieldosvoff))
+                    lTSMember.eunits = FilterNull(lTSMemberRow.Item(lTSMemberFieldeunits), " ")
+                    lTSMember.ltval1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval1))
+                    lTSMember.ltval2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval2))
+                    lTSMember.ltval3 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval3))
+                    lTSMember.ltval4 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval4))
+                    lTSMember.defn = FilterNull(lTSMemberRow.Item(lTSMemberFielddefn), " ")
+                    lTSMember.munits = FilterNull(lTSMemberRow.Item(lTSMemberFieldmunits), " ")
+                    lTSMember.ltval5 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval5))
+                    lTSMember.ltval6 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval6))
+                    lTSMember.ltval7 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval7))
+                    lTSMember.ltval8 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval8))
+                    lTSMembers.Add(lTSMember, lTSMember.Name)
+                End If
+            Next
+            lTSGroup.MemberDefs = lTSMembers
+            pTSGroupDefs.Add(lTSGroup, CStr(lTSGroup.Id))
+        Next
+        Logger.Dbg("Open Finished")
+    End Sub
 
     Public Property Name() As String
         Get
             Name = pMsgFileName
         End Get
-        Set(ByVal Value As String)
-            Dim myDb As DAO.Database
-
-            Dim myBlkRs As DAO.Recordset
-            Dim lBlock As HspfBlockDef
-            Dim lSections As New Collection
-
-            Dim mySecRs As DAO.Recordset
-            Dim lSection As HspfSectionDef
-            Dim critSection As String
-            Dim lTables As New Collection
-            Dim lBlkTables As New Collection
-
-            Dim myTabRs As DAO.Recordset
-            Dim ltable As HspfTableDef
-            Dim critTable As String
-            Dim lParms As New Collection
-
-            Dim myParmRs As DAO.Recordset
-            Dim lParm As HSPFParmDef
-            Dim critParm, lTyp As String
-
-            Dim myTSGroupRs As DAO.Recordset
-            Dim lTSGroup As HspfTSGroupDef
-            Dim lTSMembers As Collection
-            Dim myTSMemberRs As DAO.Recordset
-            Dim lTSMember As HspfTSMemberDef
-
-            Dim lNumeric As Boolean
-            Dim h As String
-            Dim s As String
-
-            Dim lBlkCount, lBlkNow As Integer
-
-            On Error GoTo err_Renamed
-            If Len(Value) = 0 Then Value = "HSPFmsg.mdb"
-            If Not IO.File.Exists(Value) Then
-                Value = GetSetting("HSPF", "MessageMDB", "Path")
-                If Not IO.File.Exists(Value) Then
-                    Value = atcUtility.FindFile("Please locate 'HSPFmsg.mdb' in a writable directory", "HSPFmsg.mdb")
-                    SaveSetting("HSPF", "MessageMDB", "Path", Value)
-                End If
-            End If
-            myDb = DAODBEngine_definst.OpenDatabase(Value, , True)
-            pMsgFileName = Value
-            pBlockDefs = Nothing
-            pBlockDefs = New Collection
-            myBlkRs = myDb.OpenRecordset("BlockDefns", DAO.RecordsetTypeEnum.dbOpenDynaset)
-            myBlkRs.MoveLast()
-            lBlkCount = myBlkRs.RecordCount
-            myBlkRs.MoveFirst()
-            lBlkNow = 0
-            While Not (myBlkRs.EOF)
-                'progress bar (dumb)
-                s = "(Progress " & lBlkNow * 100 / lBlkCount & ")"
-                'IPC.SendMonitorMessage s
-                lBlkNow = lBlkNow + 1
-
-                lBlock = New HspfBlockDef
-                lBlock.Id = myBlkRs.Fields("ID").Value
-                lBlock.Name = myBlkRs.Fields("Name").Value
-                lSections = Nothing
-                lSections = New Collection
-                lBlkTables = Nothing
-                lBlkTables = New Collection
-                mySecRs = myDb.OpenRecordset("SectionDefns", DAO.RecordsetTypeEnum.dbOpenDynaset)
-                critSection = "BlockID = " & CStr(lBlock.Id)
-                mySecRs.FindFirst((critSection))
-                While Not (mySecRs.NoMatch)
-                    lSection = New HspfSectionDef
-                    lSection.Name = mySecRs.Fields("Name").Value
-                    'If IPCset Then
-                    '    If lSection.Name <> "<NONE>" Then
-                    '        s = "(MSG3 Reading about " & lBlock.Name & ":" & lSection.Name & ")"
-                    '    Else
-                    '        s = "(MSG3 Reading about " & lBlock.Name & ")"
-                    '    End If
-                    '    'IPC.SendMonitorMessage s
-                    'End If
-                    lSection.Id = mySecRs.Fields("ID").Value
-                    lTables = Nothing
-                    lTables = New Collection
-
-                    myTabRs = myDb.OpenRecordset("TableDefns", DAO.RecordsetTypeEnum.dbOpenDynaset)
-                    critTable = "SectionID = " & CStr(lSection.Id)
-                    myTabRs.FindFirst((critTable))
-                    While Not (myTabRs.NoMatch)
-                        ltable = New HspfTableDef
-                        ltable.Id = myTabRs.Fields(0).Value
-                        ltable.Parent = lSection
-                        ltable.Name = myTabRs.Fields(2).Value
-                        ltable.SGRP = myTabRs.Fields(3).Value
-                        ltable.NumOccur = myTabRs.Fields(4).Value
-                        ltable.HeaderE = myTabRs.Fields(5).Value
-                        ltable.HeaderM = myTabRs.Fields(6).Value
-                        'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                        If IsDBNull(myTabRs.Fields(7).Value) Then
-                            ltable.Define = " "
-                        Else
-                            ltable.Define = myTabRs.Fields(7).Value
-                        End If
-                        If myTabRs.Fields.Count < 9 Then
-                            ltable.OccurGroup = 0
-                        Else
-                            ltable.OccurGroup = myTabRs.Fields(8).Value
-                        End If
-                        'UPGRADE_NOTE: Object lParms may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-                        lParms = Nothing
-                        lParms = New Collection
-
-                        critParm = "TableID = " & CStr(ltable.Id)
-                        myParmRs = myDb.OpenRecordset("Select * from ParmDefns where " & critParm, DAO.RecordsetTypeEnum.dbOpenDynaset)
-                        'myParmRs.FindFirst (critParm)
-                        While Not (myParmRs.EOF)
-                            lParm = New HSPFParmDef
-                            lParm.Name = myParmRs.Fields(2).Value 'Name
-                            lTyp = myParmRs.Fields(3).Value 'Type
-                            Select Case lTyp
-                                Case "I" : lNumeric = True : lParm.Typ = 1 ' ATCoInt
-                                Case "R" : lNumeric = True : lParm.Typ = 2 ' ATCoSng
-                                Case "C" : lNumeric = False : lParm.Typ = 0 ' ATCoTxt
-                                Case Else : lNumeric = False : lParm.Typ = -999
-                            End Select
-                            lParm.StartCol = myParmRs.Fields(4).Value
-                            lParm.Length = myParmRs.Fields(5).Value
-                            If lNumeric Then
-                                lParm.Min = myParmRs.Fields(6).Value
-                                lParm.Max = myParmRs.Fields(7).Value
-                                If myParmRs.Fields.Count > 10 Then
-                                    lParm.MetricMin = myParmRs.Fields(10).Value
-                                    lParm.MetricMax = myParmRs.Fields(11).Value
-                                Else
-                                    lParm.MetricMin = myParmRs.Fields(6).Value
-                                    lParm.MetricMax = myParmRs.Fields(7).Value
-                                End If
-                            End If
-                            'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                            If IsDBNull(myParmRs.Fields(8).Value) Then
-                                lParm.Default_Renamed = " "
-                            Else
-                                lParm.Default_Renamed = myParmRs.Fields(8).Value 'default
-                            End If
-                            If myParmRs.Fields.Count > 10 Then
-                                'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                                If IsDBNull(myParmRs.Fields(12).Value) Then
-                                    lParm.MetricDefault = " "
-                                Else
-                                    lParm.MetricDefault = myParmRs.Fields(12).Value 'default
-                                End If
-                            Else 'use english default
-                                'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                                If IsDBNull(myParmRs.Fields(8).Value) Then
-                                    lParm.MetricDefault = " "
-                                Else
-                                    lParm.MetricDefault = myParmRs.Fields(8).Value
-                                End If
-                            End If
-                            lParm.Other = myParmRs.Fields(4).Value & ":" & myParmRs.Fields(5).Value
-                            'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-                            If IsDBNull(myParmRs.Fields(9).Value) Then
-                                lParm.Define = " "
-                            Else
-                                lParm.Define = myParmRs.Fields(9).Value
-                            End If
-                            lParms.Add(lParm, lParm.Name)
-                            myParmRs.MoveNext() ' .FindNext (critParm)
-                        End While
-                        myParmRs.Close()
-                        ltable.ParmDefs = lParms
-                        updateParmsMultLines((lBlock.Name), ltable)
-                        lTables.Add(ltable, ltable.Name)
-                        lBlkTables.Add(ltable, ltable.Name)
-                        myTabRs.FindNext((critTable))
-                    End While
-                    myTabRs.Close()
-                    lSection.TableDefs = lTables
-                    lSections.Add(lSection, lSection.Name)
-                    mySecRs.FindNext((critSection))
-                End While
-                mySecRs.Close()
-                lBlock.SectionDefs = lSections
-                lBlock.TableDefs = lBlkTables
-                pBlockDefs.Add(lBlock, lBlock.Name)
-                myBlkRs.MoveNext()
-            End While
-            myBlkRs.Close()
-
-            'now read TS group and member info
-            'UPGRADE_NOTE: Object pTSGroupDefs may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-            pTSGroupDefs = Nothing
-            pTSGroupDefs = New Collection
-            myTSGroupRs = myDb.OpenRecordset("TSGroupDefns", DAO.RecordsetTypeEnum.dbOpenDynaset)
-            While Not (myTSGroupRs.EOF)
-                lTSGroup = New HspfTSGroupDef
-                lTSGroup.Id = myTSGroupRs.Fields("ID").Value
-                lTSGroup.Name = myTSGroupRs.Fields("Name").Value
-                'If IPCset Then
-                '    s = "(MSG3 Reading about Timeseries Groups and Members for " & lTSGroup.Name & ")"
-                '    'IPC.SendMonitorMessage s
-                'End If
-                lTSGroup.BlockId = myTSGroupRs.Fields("BlockID").Value
-                'UPGRADE_NOTE: Object lTSMembers may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-                lTSMembers = Nothing
-                lTSMembers = New Collection
-                myTSMemberRs = myDb.OpenRecordset("TSMemberDefns", DAO.RecordsetTypeEnum.dbOpenDynaset)
-                critSection = "TSGroupID = " & CStr(lTSGroup.Id)
-                myTSMemberRs.FindFirst((critSection))
-                While Not (myTSMemberRs.NoMatch)
-                    lTSMember = New HspfTSMemberDef
-                    lTSMember.Id = myTSMemberRs.Fields("ID").Value
-                    lTSMember.Name = myTSMemberRs.Fields("Name").Value
-                    lTSMember.TSGroupId = myTSMemberRs.Fields("TSGroupID").Value
-                    lTSMember.Parent = lTSGroup
-                    lTSMember.SCLU = myTSMemberRs.Fields("SCLU").Value
-                    lTSMember.SGRP = myTSMemberRs.Fields("SGRP").Value
-                    lTSMember.mdim1 = FilterNull(myTSMemberRs.Fields("mdim1"))
-                    lTSMember.mdim2 = FilterNull(myTSMemberRs.Fields("mdim2"))
-                    lTSMember.maxsb1 = FilterNull(myTSMemberRs.Fields("maxsb1"))
-                    lTSMember.maxsb2 = FilterNull(myTSMemberRs.Fields("maxsb2"))
-                    lTSMember.mkind = FilterNull(myTSMemberRs.Fields("mkind"))
-                    lTSMember.sptrn = FilterNull(myTSMemberRs.Fields("sptrn"))
-                    lTSMember.msect = FilterNull(myTSMemberRs.Fields("msect"))
-                    lTSMember.mio = FilterNull(myTSMemberRs.Fields("mio"))
-                    lTSMember.osvbas = FilterNull(myTSMemberRs.Fields("osvbas"))
-                    lTSMember.osvoff = FilterNull(myTSMemberRs.Fields("osvoff"))
-                    lTSMember.eunits = FilterNull(myTSMemberRs.Fields("eunits"), " ")
-                    lTSMember.ltval1 = FilterNull(myTSMemberRs.Fields("ltval1"))
-                    lTSMember.ltval2 = FilterNull(myTSMemberRs.Fields("ltval2"))
-                    lTSMember.ltval3 = FilterNull(myTSMemberRs.Fields("ltval3"))
-                    lTSMember.ltval4 = FilterNull(myTSMemberRs.Fields("ltval4"))
-                    lTSMember.defn = FilterNull(myTSMemberRs.Fields("defn"), " ")
-                    lTSMember.munits = FilterNull(myTSMemberRs.Fields("munits"), " ")
-                    lTSMember.ltval5 = FilterNull(myTSMemberRs.Fields("ltval5"))
-                    lTSMember.ltval6 = FilterNull(myTSMemberRs.Fields("ltval6"))
-                    lTSMember.ltval7 = FilterNull(myTSMemberRs.Fields("ltval7"))
-                    lTSMember.ltval8 = FilterNull(myTSMemberRs.Fields("ltval8"))
-                    lTSMembers.Add(lTSMember, lTSMember.Name)
-                    myTSMemberRs.FindNext((critSection))
-                End While
-                myTSMemberRs.Close()
-                lTSGroup.MemberDefs = lTSMembers
-                pTSGroupDefs.Add(lTSGroup, CStr(lTSGroup.Id))
-                myTSGroupRs.MoveNext()
-            End While
-            myTSGroupRs.Close()
-
-            myDb.Close()
-            'If IPCset Then IPC.SendMonitorMessage "(MSG3 )"
-            Exit Property
-err_Renamed:
-            pErrorDescription = "HspfMsg:Name:" & Err.Description
+        Set(ByVal newValue As String)
+            pMsgFileName = newValue
         End Set
     End Property
 
@@ -295,12 +311,19 @@ err_Renamed:
         End Get
     End Property
 
+    'Private Function FilterNullOld(ByRef v As Object, Optional ByRef NullReturn As Object = 0) As Object
+    '    If IsDBNull(v.value) Then
+    '        Return NullReturn
+    '    Else
+    '        Return v.value
+    '    End If
+    'End Function
+
     Private Function FilterNull(ByRef v As Object, Optional ByRef NullReturn As Object = 0) As Object
-        'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
-        If IsDBNull(v.value) Then
+        If IsDBNull(v) Then
             Return NullReturn
         Else
-            Return v.value
+            Return v
         End If
     End Function
 
