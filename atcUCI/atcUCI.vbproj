@@ -54,10 +54,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Plugins\BASINS\atcWDM.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.VBA, Version=6.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>obj\Debug\Interop.VBA.dll</HintPath>
-    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.2.2439.23261, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -66,35 +62,19 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic.Compatibility">
-      <Name>Microsoft.VisualBasic.Compatibility</Name>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
-    <Reference Include="System.Drawing">
-      <Name>System.Drawing</Name>
-    </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
-    <Reference Include="System.XML">
-      <Name>System.XML</Name>
-    </Reference>
-    <COMReference Include="DAO">
-      <Guid>{00025E01-0000-0000-C000-000000000046}</Guid>
-      <Lcid>0</Lcid>
-      <VersionMajor>4</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
-    <Import Include="Microsoft.VisualBasic.Compatibility" />
     <Import Include="System" />
     <Import Include="System.Collections" />
     <Import Include="System.Data" />
@@ -104,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.vb" />
+    <Compile Include="atcMDB.vb" />
     <Compile Include="Hass_Ent.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -255,9 +236,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UciRead.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="UpgradeSupport.vb">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="utilEdit.vb">

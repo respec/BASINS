@@ -437,11 +437,11 @@ Imports atcUtility
         InitAtCoTser()
     End Sub
 
-    Public Sub CreateUci(ByRef M As HspfMsg, ByRef newName As String, ByRef outputwdm As String, ByRef metwdms() As String, ByRef wdmids() As String, ByRef MetDataDetails As String, ByRef oneseg As Boolean, ByRef PollutantList As Collection)
+    'Public Sub CreateUci(ByRef M As HspfMsg, ByRef newName As String, ByRef outputwdm As String, ByRef metwdms() As String, ByRef wdmids() As String, ByRef MetDataDetails As String, ByRef oneseg As Boolean, ByRef PollutantList As Collection)
 
-        'Call F90_SPIPH(pStatusIn, pStatusOut)
-        Call CreateUciFromBASINS(Me, M, newName, outputwdm, metwdms, wdmids, MetDataDetails, oneseg, PollutantList)
-    End Sub
+    '    'Call F90_SPIPH(pStatusIn, pStatusOut)
+    '    Call CreateUciFromBASINS(Me, M, newName, outputwdm, metwdms, wdmids, MetDataDetails, oneseg, PollutantList)
+    'End Sub
 
     Public Sub FastReadUciForStarter(ByRef Msg As HspfMsg, ByRef newName As String)
         Dim FilesOK As Boolean
@@ -2345,11 +2345,12 @@ x:
         Dim addeddsn As Boolean
         Dim SDate(6) As Integer
         Dim EDate(6) As Integer
-        Dim wdmid, nsteps As Integer
+        Dim wdmid As Integer
+        'Dim nsteps As Integer
         Dim aval() As Double
         Dim TsDate As atcData.atcTimeseries
-        Dim curdate As Single
-        Dim ival As Integer
+        'Dim curdate As Single
+        'Dim ival As Integer
 
         For i = 4 To 1 Step -1
             If pWdmUnit(i) > 0 Then
