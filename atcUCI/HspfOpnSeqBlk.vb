@@ -98,7 +98,7 @@ Imports atcUtility
 
     Public Sub ReadUciFile()
         Dim retcod, init, OmCode, retkey As Integer
-        Dim cbuff As String
+        Dim cbuff As String = Nothing
         Dim lOpn As HspfOperation
         Dim rectyp As Integer
         Dim c As String

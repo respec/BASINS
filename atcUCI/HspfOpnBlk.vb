@@ -121,13 +121,13 @@ NoTable:
     End Sub
 
     Private Sub readTables(ByRef blk As HspfBlockDef)
-        Dim kwd As String
+        Dim kwd As String = Nothing
         Dim retid, init, kflg, contfg, Nqual As Integer
         Dim nGqual, noccur, thisoccur, scnt, srec As Integer
         Dim ltable As HspfTable
         Dim i, itable As Integer
-        Dim s() As String
-        Dim c() As String
+        Dim s() As String = {}
+        Dim c() As String = {}
         Dim opf, opl As Integer
         Dim sopl As String
         Dim lId As HspfOperation
@@ -274,7 +274,7 @@ NoTable:
 
     Private Sub GetTableRecordsFromUCI(ByRef SCLU As Integer, ByRef SGRP As Integer, ByRef blockname As String, ByRef tablename As String, ByRef srec As Integer, ByRef thisoccur As Integer, ByRef scnt As Integer, ByRef s() As String, ByRef c() As String)
         Dim opf, retcod, uunits, tinit, retkey, sameoper, i As Integer
-        Dim stemp As String
+        Dim stemp As String = Nothing
         Dim pastHeader As Boolean
         Dim rectyp As Integer
 

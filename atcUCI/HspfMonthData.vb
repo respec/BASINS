@@ -57,7 +57,7 @@ Option Explicit On
         Dim done As Boolean
         Dim init, OmCode As Integer
         Dim retkey, retcod As Integer
-        Dim cbuff As String
+        Dim cbuff As String = Nothing
         Dim i, rectyp As Integer
         Dim myMonthDataTable As HspfMonthDataTable
 

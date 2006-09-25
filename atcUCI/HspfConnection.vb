@@ -141,7 +141,7 @@ Option Explicit On
     End Property
     Public Sub readTimSer(ByRef myUci As HspfUci)
         Dim retcod, OmCode, init, retkey, rectyp As Integer
-        Dim cbuff As String
+        Dim cbuff As String = Nothing
         Dim lConnection As HspfConnection
         Dim s, c As String
         Dim pastHeader As Boolean

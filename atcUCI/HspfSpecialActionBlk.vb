@@ -87,7 +87,7 @@ Option Explicit On
 		Dim done As Boolean
 		Dim init, OmCode As Integer
 		Dim retkey, retcod As Integer
-		Dim cbuff As String
+        Dim cbuff As String = Nothing
         Dim rectyp As Integer
         Dim mySpecialRecord As HspfSpecialRecord
 		Dim moreUvnames As Integer

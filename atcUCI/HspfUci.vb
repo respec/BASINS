@@ -164,7 +164,7 @@ Imports atcUtility
 
     Public Property GlobalBlock() As HspfGlobalBlk
         Get
-            If Initialized Then GlobalBlock = pGlobalBlk
+            Return pGlobalBlk
         End Get
         Set(ByVal Value As HspfGlobalBlk)
             pGlobalBlk = Value
@@ -173,7 +173,7 @@ Imports atcUtility
 
     Public Property FilesBlock() As HspfFilesBlk
         Get
-            If Initialized Then FilesBlock = pFilesBlk
+            Return pFilesBlk
         End Get
         Set(ByVal Value As HspfFilesBlk)
             pFilesBlk = Value
@@ -182,7 +182,7 @@ Imports atcUtility
 
     Public Property CategoryBlock() As HspfCategoryBlk
         Get
-            If Initialized Then CategoryBlock = pCategoryBlk
+            Return pCategoryBlk
         End Get
         Set(ByVal Value As HspfCategoryBlk)
             pCategoryBlk = Value
@@ -197,7 +197,7 @@ Imports atcUtility
 
     Public Property OpnSeqBlock() As HspfOpnSeqBlk
         Get
-            If Initialized Then OpnSeqBlock = pOpnSeqBlk
+            Return pOpnSeqBlk
         End Get
         Set(ByVal Value As HspfOpnSeqBlk)
             pOpnSeqBlk = Value
@@ -316,7 +316,7 @@ Imports atcUtility
 
     Public Property StarterPath() As String
         Get
-            If Initialized Then StarterPath = pStarterPath
+            Return pStarterPath
         End Get
         Set(ByVal Value As String)
             pStarterPath = Value
@@ -446,7 +446,7 @@ Imports atcUtility
     Public Sub FastReadUciForStarter(ByRef Msg As HspfMsg, ByRef newName As String)
         Dim FilesOK As Boolean
         Dim FullFg As Integer
-        Dim EchoFile As String
+        Dim EchoFile As String = ""
 
         pFastFlag = True
         FullFg = -1
@@ -458,7 +458,7 @@ Imports atcUtility
         'called by scripthspf, processes wdm files
         Dim FilesOK As Boolean
         Dim FullFg As Integer
-        Dim EchoFile As String
+        Dim EchoFile As String = ""
 
         pFastFlag = True
         FullFg = -3
@@ -1066,7 +1066,7 @@ Imports atcUtility
     Public Sub DeleteOperation(ByRef delname As String, ByRef delid As Integer)
 
         Dim j, i, nth As Integer
-        Dim isource() As Integer
+        Dim isource() As Integer = {}
         Dim itarget, iscnt As Integer
         Dim lOpn As HspfOperation
         Dim lConnection As HspfConnection
@@ -2035,20 +2035,19 @@ x:
         Next
     End Function
 
-    Public Sub findtimser(ByRef sen As String, ByRef aLocation As String, ByRef Con As String, ByRef lts As Collection)
-        lts = Nothing
-        lts = New Collection
+    Public Function findtimser(ByRef sen As String, ByRef aLocation As String, ByRef Con As String) As Collection
+        findtimser = New Collection
         For Each lTser As atcData.atcTimeseries In TserFiles.DataSets
             With lTser.Attributes
                 If (sen = .GetValue("Scenario") _
                   Or Len(Trim(sen)) = 0) And (aLocation = .GetValue("Location") _
                   Or Len(Trim(aLocation)) = 0) And (Con = .GetValue("Constituent") _
                   Or Len(Trim(Con)) = 0) Then 'need this timser
-                    lts.Add(lTser)
+                    findtimser.Add(lTser)
                 End If
             End With
         Next
-    End Sub
+    End Function
 
     Public Sub EditActivityAll()
         editActivityAllInit(Me, (Me.icon))
@@ -2239,7 +2238,7 @@ x:
         If wdmsfl > 0 Then
             'okay to continue
             'look for matching WDM datasets
-            Call findtimser(UCase(oldn), "", "", lts)
+            lts = findtimser(UCase(oldn), "", "")
             'return the names of the data sets from this wdm file
             ndsn = 0
             For i = 1 To lts.Count()
@@ -2347,7 +2346,7 @@ x:
         Dim EDate(6) As Integer
         Dim wdmid As Integer
         'Dim nsteps As Integer
-        Dim aval() As Double
+        Dim aval() As Double = {}
         Dim TsDate As atcData.atcTimeseries
         'Dim curdate As Single
         'Dim ival As Integer
@@ -2674,10 +2673,11 @@ x:
 
     Private Sub ProcessFTables()
         Dim retcod, OmCode, init, retkey, rectyp As Integer
-        Dim cbuff As String
+        Dim cbuff As String = Nothing
         Dim done As Boolean
         Dim j, i, Id As Integer
-        Dim lOpn, tOpn As HspfOperation
+        Dim lOpn As HspfOperation = Nothing
+        Dim tOpn As HspfOperation
 
         OmCode = HspfOmCode("FTABLES")
         init = 1

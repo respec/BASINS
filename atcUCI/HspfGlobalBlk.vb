@@ -132,7 +132,8 @@ Option Explicit On
 
     Public Sub ReadUciFile()
         Dim rectyp, lOutLev, retkey, retcod As Integer
-        Dim lRunInf, cbuff As String
+        Dim lRunInf As String = Nothing
+        Dim cbuff As String = Nothing
 
         If pUci.FastFlag Then
             retkey = -1

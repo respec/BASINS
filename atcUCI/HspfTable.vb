@@ -242,7 +242,7 @@ Imports atcUtility
         Dim r As Single
         Dim firstopn As Boolean
         Dim pFlg As Boolean
-        Dim p As String
+        Dim p As String = Nothing
         Dim units As Integer
         Dim lFirstOccur, lLastOccur As Integer
 
