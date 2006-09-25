@@ -1,26 +1,32 @@
 Option Strict Off
 Option Explicit On
+
+''' <summary>
+''' Definition of a model parameter.
+''' </summary>
+''' <remarks>
+''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' </remarks>
 <System.Runtime.InteropServices.ProgId("HSPFParmDef_NET.HSPFParmDef")> Public Class HSPFParmDef
-    '##MODULE_SUMMARY Class containing definition of a model parameter.
-    '##MODULE_REMARKS Copyright 2001-3AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    Private pName As String
+    Private pTyp As Integer 'atcoDataType is in control
+    Private pMin As Double
+    Private pMax As Double
+    Private pDefault As String
+    Private pMetricMin As Double
+    Private pMetricMax As Double
+    Private pMetricDefault As String
+    Private pSoftMin As Double
+    Private pSoftMax As Double
+    Private pDefine As String
+    Private pOther As String
+    Private pStartCol As Integer
+    Private pLength As Integer
+    Private pParent As Object
 
-    Dim pName As String
-    Dim pTyp As Integer 'atcoDataType is in control
-    Dim pMin As Double
-    Dim pMax As Double
-    Dim pDefault As String
-    Dim pMetricMin As Double
-    Dim pMetricMax As Double
-    Dim pMetricDefault As String
-    Dim pSoftMin As Double
-    Dim pSoftMax As Double
-    Dim pDefine As String
-    Dim pOther As String
-    Dim pStartCol As Integer
-    Dim pLength As Integer
-    Dim pParent As Object
-
-    '##SUMMARY Name of parameter.
+    ''' <summary>
+    ''' Name of parameter.
+    ''' </summary>
     Public Property Name() As String
         Get
             Name = pName
@@ -30,7 +36,9 @@ Option Explicit On
         End Set
     End Property
 
-    '##SUMMARY Type of parameter.
+    ''' <summary>
+    ''' Type of parameter.
+    ''' </summary>
     Public Property Typ() As Integer
         Get
             Typ = pTyp
@@ -40,7 +48,9 @@ Option Explicit On
         End Set
     End Property
 
-    '##SUMMARY Minimum value for parameter.
+    ''' <summary>
+    ''' Minimum value for parameter.
+    ''' </summary>
     Public Property Min() As Double
         Get
             Min = pMin
@@ -49,6 +59,7 @@ Option Explicit On
             pMin = Value
         End Set
     End Property
+
     Public Property MetricMin() As Double
         Get
             MetricMin = pMetricMin
@@ -58,7 +69,9 @@ Option Explicit On
         End Set
     End Property
 
-    '##SUMMARY Maximum value for parameter
+    ''' <summary>
+    ''' Maximum value for parameter
+    ''' </summary>
     Public Property Max() As Double
         Get
             Max = pMax
@@ -67,6 +80,7 @@ Option Explicit On
             pMax = Value
         End Set
     End Property
+
     Public Property MetricMax() As Double
         Get
             MetricMax = pMetricMax
@@ -79,9 +93,6 @@ Option Explicit On
     ''' <summary>
     ''' Devault value for parameter.
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
     Public Property DefaultValue() As String
         Get
             Return pDefault

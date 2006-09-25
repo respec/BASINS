@@ -3,81 +3,82 @@ Option Explicit On
 
 Imports atcUtility
 
-<System.Runtime.InteropServices.ProgId("HspfTable_NET.HspfTable")> Public Class HspfTable
+<System.Runtime.InteropServices.ProgId("HspfTable_NET.HspfTable")> _
+Public Class HspfTable
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-	
-	Dim pDef As HspfTableDef
-    Dim pOccurCount As Integer 'total number of occurences
-    Dim pOccurNum As Integer 'nth occurrence
-    Dim pOccurIndex As Integer 'occurence with which this table is associated
-	Dim pComment As String
-	Dim pTableComment As String
-	Dim pParms As Collection 'of HSPFParm
-	Dim pOpn As HspfOperation
-	Dim pEditAllSimilar As Boolean
-	Dim pEdited As Boolean
-	Dim pSuppID As Integer '>0 indicates parms on this record are in supplemental file
-	Dim pCombineOK As Boolean
-	
-	Public Property OccurCount() As Integer
-		Get
-			OccurCount = pOccurCount
-		End Get
-		Set(ByVal Value As Integer)
-			pOccurCount = Value
-		End Set
-	End Property
-	
-	Public Property OccurNum() As Integer
-		Get
-			OccurNum = pOccurNum
-		End Get
-		Set(ByVal Value As Integer)
-			pOccurNum = Value
-		End Set
-	End Property
-	
-	Public Property OccurIndex() As Integer
-		Get
-			OccurIndex = pOccurIndex
-		End Get
-		Set(ByVal Value As Integer)
-			pOccurIndex = Value
-		End Set
-	End Property
-	
-	Public Property Def() As HspfTableDef
-		Get
-			Def = pDef
-		End Get
-		Set(ByVal Value As HspfTableDef)
-			pDef = Value
-		End Set
-	End Property
-	
-	Public Property Comment() As String
-		Get
-			Comment = pComment
-		End Get
-		Set(ByVal Value As String)
-			pComment = Value
-		End Set
-	End Property
-	
-	Public Property TableComment() As String
-		Get
-			TableComment = pTableComment
-		End Get
-		Set(ByVal Value As String)
-			pTableComment = Value
-		End Set
-	End Property
-	
-	Public ReadOnly Property Name() As String
-		Get
-			Name = pDef.Name
-		End Get
-	End Property
+
+    Private pDef As HspfTableDef
+    Private pOccurCount As Integer 'total number of occurences
+    Private pOccurNum As Integer 'nth occurrence
+    Private pOccurIndex As Integer 'occurence with which this table is associated
+    Private pComment As String
+    Private pTableComment As String
+    Private pParms As Collection 'of HSPFParm
+    Private pOpn As HspfOperation
+    Private pEditAllSimilar As Boolean
+    Private pEdited As Boolean
+    Private pSuppID As Integer '>0 indicates parms on this record are in supplemental file
+    Private pCombineOK As Boolean
+
+    Public Property OccurCount() As Integer
+        Get
+            OccurCount = pOccurCount
+        End Get
+        Set(ByVal Value As Integer)
+            pOccurCount = Value
+        End Set
+    End Property
+
+    Public Property OccurNum() As Integer
+        Get
+            OccurNum = pOccurNum
+        End Get
+        Set(ByVal Value As Integer)
+            pOccurNum = Value
+        End Set
+    End Property
+
+    Public Property OccurIndex() As Integer
+        Get
+            OccurIndex = pOccurIndex
+        End Get
+        Set(ByVal Value As Integer)
+            pOccurIndex = Value
+        End Set
+    End Property
+
+    Public Property Def() As HspfTableDef
+        Get
+            Def = pDef
+        End Get
+        Set(ByVal Value As HspfTableDef)
+            pDef = Value
+        End Set
+    End Property
+
+    Public Property Comment() As String
+        Get
+            Comment = pComment
+        End Get
+        Set(ByVal Value As String)
+            pComment = Value
+        End Set
+    End Property
+
+    Public Property TableComment() As String
+        Get
+            TableComment = pTableComment
+        End Get
+        Set(ByVal Value As String)
+            pTableComment = Value
+        End Set
+    End Property
+
+    Public ReadOnly Property Name() As String
+        Get
+            Name = pDef.Name
+        End Get
+    End Property
 
     ''' <summary>
     ''' Value of parameter with the given name

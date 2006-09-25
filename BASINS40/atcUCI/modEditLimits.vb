@@ -1,14 +1,15 @@
 Option Strict Off
 Option Explicit On
+
 Module modEditLimits
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 	
-	Dim NoDsn() As Integer
-	Dim NoDsnCount, resp As Integer
-	Dim scen() As String
-	Dim locn() As String
-	Dim cons() As String
-	Dim cwdmid() As String
+    Private NoDsn() As Integer
+    Private NoDsnCount, resp As Integer
+    Private scen() As String
+    Private locn() As String
+    Private cons() As String
+    Private cwdmid() As String
 	
     'Public Sub CheckLimitsExtSources(ByRef g As System.Windows.Forms.Control, ByRef myUci As HspfUci)
     '       g.ClearValues()

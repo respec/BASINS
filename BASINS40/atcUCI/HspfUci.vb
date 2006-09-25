@@ -3,7 +3,8 @@ Option Explicit On
 
 Imports atcUtility
 
-<System.Runtime.InteropServices.ProgId("HspfUci_NET.HspfUci")> Public Class HspfUci
+<System.Runtime.InteropServices.ProgId("HspfUci_NET.HspfUci")> _
+Public Class HspfUci
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Declare Function GetCurrentProcessId Lib "kernel32" () As Integer
@@ -433,8 +434,6 @@ Imports atcUtility
             .Add("MASSLINKS")
             .Add("SPECIAL ACTIONS")
         End With
-
-        InitAtCoTser()
     End Sub
 
     'Public Sub CreateUci(ByRef M As HspfMsg, ByRef newName As String, ByRef outputwdm As String, ByRef metwdms() As String, ByRef wdmids() As String, ByRef MetDataDetails As String, ByRef oneseg As Boolean, ByRef PollutantList As Collection)
