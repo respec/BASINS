@@ -549,11 +549,11 @@ notMissingTableForThisOper:
                     'Determine appropriate log syntax
                     LogVal = System.Math.Abs(Log10(System.Math.Abs(rtmp)))
                     If LogVal >= 100 Then
-                        expFormat = "e-###"
+                        expFormat = "e-000"
                     ElseIf LogVal >= 10 Then
-                        expFormat = "e-##"
+                        expFormat = "e-00"
                     Else
-                        expFormat = "e-#"
+                        expFormat = "e-0"
                     End If
                     'Set appropriate decimal position
                     DecimalPlaces = maxWidth - Len(expFormat) - 2
