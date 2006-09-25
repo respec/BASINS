@@ -473,7 +473,7 @@ Module modPollutants
                                 ltable.OccurCount = OccurCount
                                 For Each ttable In lOpn.Tables
                                     If ttable.Name = ltable.Name Then
-                                        'set occurance count for previous tables
+                                        'set occurence count for previous tables
                                         ttable.OccurCount = OccurCount
                                     End If
                                 Next

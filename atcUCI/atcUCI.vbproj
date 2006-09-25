@@ -241,9 +241,6 @@
     <Compile Include="utilEdit.vb">
       <SubType>Code</SubType>
     </Compile>
-    <None Include="_UpgradeReport.htm">
-      <SubType>Preview</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />

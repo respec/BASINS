@@ -58,9 +58,7 @@ Option Explicit On
         Dim init, OmCode As Integer
         Dim retkey, retcod As Integer
         Dim cbuff As String
-        'UPGRADE_NOTE: val was upgraded to val_Renamed. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
         Dim i, rectyp As Integer
-        Dim val_Renamed As Single
         Dim myMonthDataTable As HspfMonthDataTable
 
         If pUci.FastFlag Then
@@ -89,8 +87,7 @@ Option Explicit On
                     Call REM_XBLOCK((Me.Uci), OmCode, init, retkey, cbuff, retcod)
                 End If
                 For i = 1 To 12
-                    val_Renamed = CSng(Mid(cbuff, 1 + (i - 1) * 6, 6))
-                    myMonthDataTable.MonthValue(i) = val_Renamed
+                    myMonthDataTable.MonthValue(i) = CSng(Mid(cbuff, 1 + (i - 1) * 6, 6))
                 Next i
                 pMonthDataTables.Add(myMonthDataTable)
             End If

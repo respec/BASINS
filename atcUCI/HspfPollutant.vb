@@ -75,20 +75,16 @@ Option Explicit On
 		End Set
 	End Property
 	
-	'UPGRADE_NOTE: Class_Initialize was upgraded to Class_Initialize_Renamed. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-	Private Sub Class_Initialize_Renamed()
-		pTables = New Collection
-		pOperations = New Collection
-		pMassLinks = New Collection
-		pId = 0
-		pName = ""
-		pModelType = ""
-		pIndex = 0
-	End Sub
-	Public Sub New()
-		MyBase.New()
-		Class_Initialize_Renamed()
-	End Sub
+    Public Sub New()
+        MyBase.New()
+        pTables = New Collection
+        pOperations = New Collection
+        pMassLinks = New Collection
+        pId = 0
+        pName = ""
+        pModelType = ""
+        pIndex = 0
+    End Sub
 	
 	Public Function TableExists(ByRef Name As String) As Boolean
 		Dim vTable As Object

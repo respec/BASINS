@@ -7,9 +7,9 @@ Imports atcUtility
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 	
 	Dim pDef As HspfTableDef
-	Dim pOccurCount As Integer 'total number of occurances
-	Dim pOccurNum As Integer 'nth occurance
-	Dim pOccurIndex As Integer 'occurance with which this table is associated
+    Dim pOccurCount As Integer 'total number of occurences
+    Dim pOccurNum As Integer 'nth occurrence
+    Dim pOccurIndex As Integer 'occurence with which this table is associated
 	Dim pComment As String
 	Dim pTableComment As String
 	Dim pParms As Collection 'of HSPFParm
@@ -174,7 +174,7 @@ Imports atcUtility
             If Len(lParm.Value) = 0 Then 'try default
                 unitfg = pOpn.OpnBlk.Uci.GlobalBlock.emfg
                 If unitfg = 1 Then
-                    lParm.Value = lParm.Def.Default_Renamed
+                    lParm.Value = lParm.Def.DefaultValue
                 Else
                     lParm.Value = lParm.Def.MetricDefault
                 End If
@@ -288,7 +288,7 @@ Imports atcUtility
                             Else
                                 'not a string
                                 'compare format of this value with the format as read
-                                If NumericallyTheSame(.ValueAsRead, tempValue, .Def.Default_Renamed) Then
+                                If NumericallyTheSame(.ValueAsRead, tempValue, .Def.DefaultValue) Then
                                     'use the value as read
                                     t = .ValueAsRead
                                 Else

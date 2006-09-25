@@ -231,7 +231,7 @@ Module modUCIRecords
             noccur = 1
             For i = srec + 1 To uciRecCnt
                 If Trim(tabname) = Trim(uciRec(i)) Then
-                    'found another occurance
+                    'found another occurence
                     noccur = noccur + 1
                     If noccur = thisoccur Then
                         retkey = i
