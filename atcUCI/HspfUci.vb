@@ -2764,6 +2764,8 @@ x:
                 done = True
             ElseIf retkey = 0 Then
                 done = True
+            ElseIf retcod = 10 Then
+                done = True
             End If
         Loop
 
