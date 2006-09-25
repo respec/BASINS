@@ -85,7 +85,8 @@ Option Explicit On
 		Dim lConnection As HspfConnection
 		Dim cOccur, lOccur As Integer
         Dim lSub2, lSub1 As Integer
-		Dim lMember, lGroup As String
+        Dim lMember As String = Nothing
+        Dim lGroup As String = Nothing
 		Dim lMemberStatus, lGroupStatus As String
 
 		For	Each vTableStatus In pTableStatus
@@ -204,7 +205,8 @@ Option Explicit On
 		Dim lConnection As HspfConnection
 		Dim cOccur, lOccur As Integer
         Dim lSub2, lSub1 As Integer
-		Dim lMember, lGroup As String
+        Dim lMember As String = ""
+        Dim lGroup As String = ""
 		Dim lMemberStatus, lGroupStatus As String
 
 		If pTableStatus.Count() = 0 Then Build()

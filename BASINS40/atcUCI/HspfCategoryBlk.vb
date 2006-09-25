@@ -114,7 +114,7 @@ Imports atcUtility
         Dim lCategory As HspfData.HspfCategory
         Dim c As String
         Dim retkey, init, retcod, OmCode, rectyp As Integer
-        Dim cbuff As String
+        Dim cbuff As String = Nothing
 
         On Error GoTo ErrHand
 

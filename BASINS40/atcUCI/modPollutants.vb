@@ -17,8 +17,8 @@ Module modPollutants
         Dim rdone As Boolean
         Dim pdone, idone As Boolean
         Dim sedcnt, nthsed, sedfg As Integer
-        Dim isedassoc() As Integer
-        Dim psedassoc() As Integer
+        Dim isedassoc() As Integer = {}
+        Dim psedassoc() As Integer = {}
 
         'figure out how many p or i quals
         nquals = 0

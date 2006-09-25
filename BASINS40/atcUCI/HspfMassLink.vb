@@ -84,12 +84,12 @@ Option Explicit On
     End Property
     Public Sub readMassLinks(ByRef myUci As HspfUci)
         Dim retkey, init, OmCode, retcod As Integer
-        Dim cbuff As String
+        Dim cbuff As String = Nothing
         Dim i, lId, curml As Integer
         Dim lMassLink As HspfMassLink
         Dim s As String
         Dim mlcnt As Integer
-        Dim kwd As String
+        Dim kwd As String = Nothing
         Dim contfg, kflg, retid As Integer
         Dim mlno(-1) As Integer
         Dim mlkeys(-1) As Integer

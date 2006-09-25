@@ -316,7 +316,7 @@ Module HassLibs
     Private Sub NumChrA(ByRef icnt As Integer, ByRef ilen As Integer, ByRef inam() As Integer, ByRef outstr() As String)
 
         Dim j, i, p As Integer
-        Dim s As String
+        Dim s As String = Nothing
         Dim jnam() As Integer
 
         ReDim jnam(ilen)
