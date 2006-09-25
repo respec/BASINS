@@ -1,15 +1,19 @@
 Option Strict Off
 Option Explicit On
+''' <summary>
+''' A model parameter value.
+''' </summary>
+''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
 <System.Runtime.InteropServices.ProgId("HSPFParm_NET.HSPFParm")> Public Class HSPFParm
-    '##MODULE_SUMMARY Class containing a model parameter value.
-    '##MODULE_REMARKS Copyright 2001-3AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pValue As String
     Private pValueAsRead As String
     Private pDef As HSPFParmDef
     Private pParent As Object = Nothing
 
-    '##SUMMARY <P>Value of parameter.
+    ''' <summary>
+    ''' Value of parameter.
+    ''' </summary>
     Public Property Value() As String
         Get
             Value = pValue
@@ -22,7 +26,9 @@ Option Explicit On
         End Set
     End Property
 
-    '##SUMMARY <P>Value of parameter as read from UCI
+    ''' <summary>
+    ''' Value of parameter as read from UCI
+    ''' </summary>
     Public Property ValueAsRead() As String
         Get
             ValueAsRead = pValueAsRead
@@ -32,7 +38,9 @@ Option Explicit On
         End Set
     End Property
 
-    '##SUMMARY Link to object containing definition of parameter.
+    ''' <summary>
+    ''' Link to object containing definition of parameter.
+    ''' </summary>
     Public Property Def() As HSPFParmDef
         Get
             Def = pDef
@@ -42,7 +50,9 @@ Option Explicit On
         End Set
     End Property
 
-    '##SUMMARY Link to object that is the parent of this parameter.
+    ''' <summary>
+    ''' Link to object that is the parent of this parameter.
+    ''' </summary>
     Public Property Parent() As Object
         Get
             Parent = pParent
@@ -52,7 +62,9 @@ Option Explicit On
         End Set
     End Property
 
-    '##SUMMARY Name of parameter.
+    ''' <summary>
+    ''' Name of parameter.
+    ''' </summary>
     Public ReadOnly Property Name() As String
         Get
             Name = pDef.Name

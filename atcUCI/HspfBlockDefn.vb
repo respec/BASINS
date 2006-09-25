@@ -1,8 +1,12 @@
 Option Strict Off
 Option Explicit On
+''' <summary>
+''' HSPF Block Definition
+''' </summary>
+''' <remarks>
+''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' </remarks>
 <System.Runtime.InteropServices.ProgId("HspfBlockDef_NET.HspfBlockDef")> Public Class HspfBlockDef
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
     Private pName As String
     Private pId As Integer
     Private pSectionDefs As Collection 'of HspfSectionDef

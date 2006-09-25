@@ -1,19 +1,25 @@
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfPoint_NET.HspfPoint")> Public Class HspfPoint
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Dim pId As Integer
-    Dim pName As String
-    Dim pCon As String
-    Dim pMFact As Double
-    Dim pRFact As Double
-    Dim pTran As String
-    Dim pSgapstrg As String
-    Dim pSsystem As String
-    Dim pSource As HspfSrcTar
-    Dim pTarget As HspfSrcTar
-    Dim pAssocOper As Integer
+''' <summary>
+''' HSPF Point Source
+''' </summary>
+''' <remarks>
+''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' </remarks>
+<System.Runtime.InteropServices.ProgId("HspfPoint_NET.HspfPoint")> _
+Public Class HspfPoint
+    Private pId As Integer
+    Private pName As String
+    Private pCon As String
+    Private pMFact As Double
+    Private pRFact As Double
+    Private pTran As String
+    Private pSgapstrg As String
+    Private pSsystem As String
+    Private pSource As HspfSrcTar
+    Private pTarget As HspfSrcTar
+    Private pAssocOper As Integer
 
     Public Property Id() As Integer
         Get
@@ -41,6 +47,7 @@ Option Explicit On
             pName = Value
         End Set
     End Property
+
     Public Property Con() As String
         Get
             Con = pCon
@@ -49,6 +56,7 @@ Option Explicit On
             pCon = Value
         End Set
     End Property
+
     Public Property MFact() As Double
         Get
             MFact = pMFact
@@ -57,6 +65,7 @@ Option Explicit On
             pMFact = Value
         End Set
     End Property
+
     Public Property RFact() As Double
         Get
             RFact = pRFact
@@ -65,6 +74,7 @@ Option Explicit On
             pRFact = Value
         End Set
     End Property
+
     Public Property Ssystem() As String
         Get
             Ssystem = pSsystem
@@ -73,6 +83,7 @@ Option Explicit On
             pSsystem = Value
         End Set
     End Property
+
     Public Property Sgapstrg() As String
         Get
             Sgapstrg = pSgapstrg
@@ -81,6 +92,7 @@ Option Explicit On
             pSgapstrg = Value
         End Set
     End Property
+
     Public Property Source() As HspfSrcTar
         Get
             Source = pSource
@@ -89,6 +101,7 @@ Option Explicit On
             pSource = Value
         End Set
     End Property
+
     Public Property Target() As HspfSrcTar
         Get
             Target = pTarget
@@ -97,6 +110,7 @@ Option Explicit On
             pTarget = Value
         End Set
     End Property
+
     Public Property Tran() As String
         Get
             Tran = pTran

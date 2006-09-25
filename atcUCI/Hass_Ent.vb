@@ -1,7 +1,12 @@
 Option Strict Off
 Option Explicit On
+''' <summary>
+''' Entry points into hass_ent.dll
+''' </summary>
+''' <remarks>
+''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' </remarks>
 Module HassLibs
-    '##MODULE_REMARKS Copyright 2001-3 AQUA TERRA Consultants - Royalty-free use permitted under open source license
     'general routines
     Declare Sub F90_W99OPN Lib "hass_ent.dll" ()
     Declare Sub F90_W99CLO Lib "hass_ent.dll" ()

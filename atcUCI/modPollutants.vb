@@ -489,42 +489,45 @@ Module modPollutants
                             End If
                             lOpn.Tables.Add(ltable, cname)
                             If lOpn.TableExists("ACTIVITY") Then
-                                lOpn.Tables.Item("ACTIVITY").Parms(SecId) = 1 'turn on this section
-                                'turn on other prerequisite sections
-                                If lOpn.Name = "RCHRES" Then
-                                    For i = 7 To SecId - 1
-                                        lOpn.Tables.Item("ACTIVITY").Parms(i) = 1 'previous rqual sections must be on
-                                    Next i
-                                    If SecId > 1 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(1) = 1 'hydr must be on
-                                    End If
-                                    If SecId > 2 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(2) = 1 'adcalc must be on
-                                    End If
-                                    If SecId > 4 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(4) = 1 'htrch must be on
-                                    End If
-                                ElseIf lOpn.Name = "IMPLND" Then
-                                    If SecId = 5 Or SecId = 2 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(1) = 1 'atemp must be on
-                                    End If
-                                    If SecId > 3 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(3) = 1 'iwater must be on
-                                    End If
-                                ElseIf lOpn.Name = "PERLND" Then
-                                    If SecId > 8 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(8) = 1 'mstlay must be on
-                                    End If
-                                    If SecId = 5 Or SecId = 2 Or SecId = 6 Or SecId = 10 Or SecId = 11 Or SecId = 12 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(1) = 1 'atemp must be on
-                                    End If
-                                    If SecId = 4 Or SecId = 6 Or SecId = 7 Or SecId = 9 Or SecId = 10 Or SecId = 11 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(3) = 1 'pwater must be on
-                                    End If
-                                    If SecId = 6 Or SecId = 10 Or SecId = 11 Then
-                                        lOpn.Tables.Item("ACTIVITY").Parms(5) = 1 'pstemp must be on
-                                    End If
-                                End If
+                                With lOpn.Tables.Item("ACTIVITY")
+                                    .Parms(SecId) = 1 'turn on this section
+                                    'turn on other prerequisite sections
+                                    Select Case lOpn.Name
+                                        Case "RCHRES"
+                                            For i = 7 To SecId - 1
+                                                .Parms(i) = 1 'previous rqual sections must be on
+                                            Next i
+                                            If SecId > 1 Then
+                                                .Parms(1) = 1 'hydr must be on
+                                            End If
+                                            If SecId > 2 Then
+                                                .Parms(2) = 1 'adcalc must be on
+                                            End If
+                                            If SecId > 4 Then
+                                                .Parms(4) = 1 'htrch must be on
+                                            End If
+                                        Case "IMPLND"
+                                            If SecId = 5 Or SecId = 2 Then
+                                                .Parms(1) = 1 'atemp must be on
+                                            End If
+                                            If SecId > 3 Then
+                                                .Parms(3) = 1 'iwater must be on
+                                            End If
+                                        Case "PERLND"
+                                            If SecId > 8 Then
+                                                .Parms(8) = 1 'mstlay must be on
+                                            End If
+                                            If SecId = 5 Or SecId = 2 Or SecId = 6 Or SecId = 10 Or SecId = 11 Or SecId = 12 Then
+                                                .Parms(1) = 1 'atemp must be on
+                                            End If
+                                            If SecId = 4 Or SecId = 6 Or SecId = 7 Or SecId = 9 Or SecId = 10 Or SecId = 11 Then
+                                                .Parms(3) = 1 'pwater must be on
+                                            End If
+                                            If SecId = 6 Or SecId = 10 Or SecId = 11 Then
+                                                .Parms(5) = 1 'pstemp must be on
+                                            End If
+                                    End Select
+                                End With
                             End If
 
                             If Not myUci.OpnBlks(lCtype).TableExists(cname) Then
