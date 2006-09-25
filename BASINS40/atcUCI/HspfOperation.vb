@@ -295,8 +295,7 @@ NoTable:
     '		Dim barbase, barHeight, sid, barPos, barWidth, maxNBars As Integer
     '		Dim lTemp As String
     '		Dim pic As System.Windows.Forms.PictureBox
-    '		'UPGRADE_NOTE: str was upgraded to str_Renamed. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-    '		Dim str_Renamed, desc As String
+    '		Dim lStr, desc As String
     '		Dim barDesc As Object
     '		Dim lSource As HspfConnection
     '		Dim lDesc As String
@@ -310,7 +309,7 @@ NoTable:
     '		'  maxNBars = pUci.OpnBlks("PERLND").Count + pUci.OpnBlks("IMPLND").Count
     '		'  If maxNBars > 10 Then maxNBars = 10
     '		'pic.Caption = pOpnBlk.Name & " " & pId
-    '		str_Renamed = pOpnBlk.Name & " " & pId
+    '		lStr = pOpnBlk.Name & " " & pId
     '		'UPGRADE_ISSUE: PictureBox property pic.ToolTipText was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '		pic.ToolTipText = pOpnBlk.Name & " " & pId & " " & pDescription
     '		'frmPictures.Show
@@ -320,14 +319,14 @@ NoTable:
 
     '		'UPGRADE_ISSUE: PictureBox method pic.TextWidth was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '		'UPGRADE_ISSUE: PictureBox property pic.CurrentX was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-    '		pic.CurrentX = (VB6.PixelsToTwipsX(pic.Width) - pic.TextWidth(str_Renamed)) / 2
+    '		pic.CurrentX = (VB6.PixelsToTwipsX(pic.Width) - pic.TextWidth(lStr)) / 2
     '		'UPGRADE_ISSUE: PictureBox method pic.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '		'UPGRADE_ISSUE: PictureBox property pic.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-    '		pic.CurrentY = VB6.PixelsToTwipsY(pic.Height) - pic.TextHeight(str_Renamed) * 1.25
+    '		pic.CurrentY = VB6.PixelsToTwipsY(pic.Height) - pic.TextHeight(lStr) * 1.25
     '		'UPGRADE_ISSUE: PictureBox property pic.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '		barbase = pic.CurrentY
     '		'UPGRADE_ISSUE: PictureBox method pic.Print was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
-    '		pic.Print(str_Renamed)
+    '		pic.Print(lStr)
     '		'Debug.Print str & " ";
     '		Dim myid As Integer
     '		Dim pPoint As HspfPoint

@@ -244,22 +244,17 @@ Option Explicit On
         pUci.Edited = True
     End Sub
 
-    Public Function Check() As String
-        'verify values are correct in relation to each other and other tables
+    'Public Function Check() As String
+    '    'verify values are correct in relation to each other and other tables
+    'End Function
 
-    End Function
-
-    'UPGRADE_NOTE: Class_Initialize was upgraded to Class_Initialize_Renamed. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-    Private Sub Class_Initialize_Renamed()
+    Public Sub New()
+        MyBase.New()
         pOutLev = New HSPFParm
         pOutLev.Parent = Me
         pOutLev.Def = readParmDef("OutLev")
         pRunInf = New HSPFParm
         pRunInf.Parent = Me
         pRunInf.Def = readParmDef("RunInf")
-    End Sub
-    Public Sub New()
-        MyBase.New()
-        Class_Initialize_Renamed()
     End Sub
 End Class

@@ -163,7 +163,7 @@ NoTable:
             End If
             init = 0
             If kflg > 0 And retid <> 0 Then
-                'check for multiple occurances
+                'check for multiple occurences
                 If Not pUci.FastFlag Then
                     Call REM_GETOCR((Me.Uci), retid, noccur)
                 End If
@@ -535,12 +535,12 @@ NoTable:
                     End If
                 Next vId
 
-            Else 'this is a multiple occurance group (like pqual, iqual, gqual)
+            Else 'this is a multiple occurence group (like pqual, iqual, gqual)
 
                 If lInGroup Then
                     If lTableDef.OccurGroup <> lCurrentOccurGroup Or i = lBlockDef.TableDefs.Count() Then
-                        'we were in a multiple occurance group but have reached end of group
-                        lGroupIndex = lGroupIndex + 1 'look for next occurance
+                        'we were in a multiple occurence group but have reached end of group
+                        lGroupIndex = lGroupIndex + 1 'look for next occurence
                         If lGroupIndex > lLastGroupIndex Then
                             lInGroup = False 'no more to do
                             If lLastInGroup > 0 Then i = lLastInGroup
@@ -550,7 +550,7 @@ NoTable:
                             lTableDef = lBlockDef.TableDefs.Item(i)
                         End If
                     End If
-                Else 'start of a multiple occurance group
+                Else 'start of a multiple occurence group
                     lInGroup = True
                     lGroupIndex = 1
                     lFirstInGroup = i
@@ -580,7 +580,7 @@ NoTable:
                                 End If
                                 If Not (firstTable) Then PrintLine(f, " ")
                                 If lTable.OccurIndex = 0 Then
-                                    Call lTable.WriteUciFile(f, lGroupIndex) 'write out just this occurance
+                                    Call lTable.WriteUciFile(f, lGroupIndex) 'write out just this occurence
                                 Else
                                     'special case for some p/i/gqual tables
                                     j = 0
@@ -596,7 +596,7 @@ NoTable:
                                         End If
                                     Next k
                                     If j > 0 Then
-                                        Call lTable.WriteUciFile(f, j) 'write out just this occurance
+                                        Call lTable.WriteUciFile(f, j) 'write out just this occurence
                                     End If
                                 End If
                                 If lTable.OccurCount > lLastGroupIndex Then lLastGroupIndex = lTable.OccurCount

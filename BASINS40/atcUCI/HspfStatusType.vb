@@ -74,18 +74,12 @@ Option Explicit On
 		End Set
 	End Property
 	
-	'UPGRADE_NOTE: Class_Initialize was upgraded to Class_Initialize_Renamed. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="A9E4979A-37FA-4718-9994-97DD76ED70A7"'
-	Private Sub Class_Initialize_Renamed()
-		pName = ""
-		pOccur = 0
-		pReqOptUnn = 0
-		pPresent = HspfStatus.HspfStatusPresentMissingEnum.HspfStatusMissing
-		pReqOptUnn = HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusUnneeded
-		'UPGRADE_NOTE: Object pDefn may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-		pDefn = Nothing
-	End Sub
 	Public Sub New()
-		MyBase.New()
-		Class_Initialize_Renamed()
-	End Sub
+        MyBase.New()
+        pName = ""
+        pOccur = 0
+        pReqOptUnn = 0
+        pPresent = HspfStatus.HspfStatusPresentMissingEnum.HspfStatusMissing
+        pReqOptUnn = HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusUnneeded
+    End Sub
 End Class

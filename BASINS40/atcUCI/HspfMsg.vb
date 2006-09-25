@@ -152,9 +152,9 @@ Imports MapWinUtility
                                     End If
                                     'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
                                     If IsDBNull(lParmRow.Item(8)) Then
-                                        lParm.Default_Renamed = " "
+                                        lParm.DefaultValue = " "
                                     Else
-                                        lParm.Default_Renamed = lParmRow.Item(8) 'default
+                                        lParm.DefaultValue = lParmRow.Item(8) 'default
                                     End If
                                     If lParmTable.Columns.Count > 10 Then
                                         'UPGRADE_WARNING: Use of Null/IsNull() detected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="2EED02CB-5C0E-4DC1-AE94-4FAA3A30F51A"'
@@ -341,7 +341,7 @@ Imports MapWinUtility
                     lParm.Length = 5
                     lParm.Min = -999
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = "LEVEL(2thru21) contains the 20 possible user-specified levels for which the input time series will be analyzed."
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -355,7 +355,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = -999
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -369,7 +369,7 @@ Imports MapWinUtility
                     lParm.Length = 4
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -380,7 +380,7 @@ Imports MapWinUtility
                     lParm.Length = 2
                     lParm.Min = 1
                     lParm.Max = 12
-                    lParm.Default_Renamed = 1
+                    lParm.DefaultValue = 1
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -391,7 +391,7 @@ Imports MapWinUtility
                     lParm.Length = 2
                     lParm.Min = 1
                     lParm.Max = 31
-                    lParm.Default_Renamed = 1
+                    lParm.DefaultValue = 1
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -402,7 +402,7 @@ Imports MapWinUtility
                     lParm.Length = 2
                     lParm.Min = 0
                     lParm.Max = 24
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -413,7 +413,7 @@ Imports MapWinUtility
                     lParm.Length = 2
                     lParm.Min = 0
                     lParm.Max = 60
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -424,7 +424,7 @@ Imports MapWinUtility
                     lParm.Length = 5
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -435,7 +435,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -446,7 +446,7 @@ Imports MapWinUtility
                     lParm.Length = 4
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -457,7 +457,7 @@ Imports MapWinUtility
                     lParm.Length = 2
                     lParm.Min = 1
                     lParm.Max = 12
-                    lParm.Default_Renamed = 1
+                    lParm.DefaultValue = 1
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -468,7 +468,7 @@ Imports MapWinUtility
                     lParm.Length = 2
                     lParm.Min = 1
                     lParm.Max = 31
-                    lParm.Default_Renamed = 1
+                    lParm.DefaultValue = 1
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -479,7 +479,7 @@ Imports MapWinUtility
                     lParm.Length = 2
                     lParm.Min = 0
                     lParm.Max = 24
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -490,7 +490,7 @@ Imports MapWinUtility
                     lParm.Length = 2
                     lParm.Min = 0
                     lParm.Max = 60
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -501,7 +501,7 @@ Imports MapWinUtility
                     lParm.Length = 5
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -512,7 +512,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -527,7 +527,7 @@ Imports MapWinUtility
                         lParm.Length = 10
                         lParm.Min = -999
                         lParm.Max = -999
-                        lParm.Default_Renamed = 0
+                        lParm.DefaultValue = 0
                         lParm.Other = lParm.StartCol & ":" & lParm.Length
                         lParm.Define = ""
                         .ParmDefs.Add(lParm, lParm.Name)
@@ -541,7 +541,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = -999
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -556,7 +556,7 @@ Imports MapWinUtility
                         lParm.Length = 10
                         lParm.Min = -999
                         lParm.Max = -999
-                        lParm.Default_Renamed = 0
+                        lParm.DefaultValue = 0
                         lParm.Other = lParm.StartCol & ":" & lParm.Length
                         lParm.Define = ""
                         .ParmDefs.Add(lParm, lParm.Name)
@@ -570,7 +570,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = -999
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -584,7 +584,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -598,15 +598,15 @@ Imports MapWinUtility
                     If i < 5 Then
                         lParm.Min = 0
                         lParm.Max = -999
-                        lParm.Default_Renamed = 0
+                        lParm.DefaultValue = 0
                     ElseIf i = 5 Then
                         lParm.Min = 0.0001
                         lParm.Max = 10
-                        lParm.Default_Renamed = 1
+                        lParm.DefaultValue = 1
                     Else
                         lParm.Min = 1
                         lParm.Max = 2
-                        lParm.Default_Renamed = 1
+                        lParm.DefaultValue = 1
                     End If
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
@@ -621,7 +621,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0.00001
                     lParm.Max = -999
-                    lParm.Default_Renamed = -999
+                    lParm.DefaultValue = -999
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -634,7 +634,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0.00001
                     lParm.Max = -999
-                    lParm.Default_Renamed = -999
+                    lParm.DefaultValue = -999
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -648,7 +648,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -661,7 +661,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -675,7 +675,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -688,7 +688,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = -999
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -702,7 +702,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = 1
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -715,7 +715,7 @@ Imports MapWinUtility
                     lParm.Length = 10
                     lParm.Min = 0
                     lParm.Max = 1
-                    lParm.Default_Renamed = 0
+                    lParm.DefaultValue = 0
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -730,7 +730,7 @@ Imports MapWinUtility
                         lParm.Length = 10
                         lParm.Min = 0
                         lParm.Max = -999
-                        lParm.Default_Renamed = 0
+                        lParm.DefaultValue = 0
                         lParm.Other = lParm.StartCol & ":" & lParm.Length
                         lParm.Define = ""
                         .ParmDefs.Add(lParm, lParm.Name)
@@ -743,7 +743,7 @@ Imports MapWinUtility
                     lParm.Typ = 0 ' ATCoTxt
                     lParm.StartCol = (70 * (i - 1)) + 11
                     lParm.Length = 20
-                    lParm.Default_Renamed = ""
+                    lParm.DefaultValue = ""
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -755,7 +755,7 @@ Imports MapWinUtility
                     lParm.Typ = 0 ' ATCoTxt
                     lParm.StartCol = ((i - 1) * 70) + 11
                     lParm.Length = 20
-                    lParm.Default_Renamed = ""
+                    lParm.DefaultValue = ""
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -764,7 +764,7 @@ Imports MapWinUtility
                     lParm.Typ = 0 ' ATCoTxt
                     lParm.StartCol = (70 * (i - 1)) + 32
                     lParm.Length = 4
-                    lParm.Default_Renamed = "SUM"
+                    lParm.DefaultValue = "SUM"
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -775,7 +775,7 @@ Imports MapWinUtility
                     lParm.Length = 5
                     lParm.Min = 2
                     lParm.Max = 5
-                    lParm.Default_Renamed = 5
+                    lParm.DefaultValue = 5
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
@@ -786,7 +786,7 @@ Imports MapWinUtility
                     lParm.Length = 5
                     lParm.Min = 0
                     lParm.Max = 3
-                    lParm.Default_Renamed = 2
+                    lParm.DefaultValue = 2
                     lParm.Other = lParm.StartCol & ":" & lParm.Length
                     lParm.Define = ""
                     .ParmDefs.Add(lParm, lParm.Name)
