@@ -50,7 +50,8 @@ Public Class UCICombiner
         Dim lConn As atcUCI.HspfConnection
 
         Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Name = "hspfmsg.mdb"
+        lMsg.Open("hspfmsg.mdb")
+        'lMsg.Name = "hspfmsg.mdb"
 
         'get names of all ucis in dir
         Dim lPerlndUcis As New Collection
@@ -120,6 +121,31 @@ Public Class UCICombiner
         'change operation number in all special actions
         RenumberOperationInSpecialActions(lCombinedUci, "PERLND", lOrigId, lOper.Id)
 
+        'save names of met and precip wdms for each met seg
+        Dim lMetWDMNames As New Collection
+        Dim lPrecWDMNames As New Collection
+        lMetWDMNames.Add(lCombinedUci.FilesBlock.Value(1).Name)
+        lPrecWDMNames.Add(lCombinedUci.FilesBlock.Value(2).Name)
+        'save names of each pt src wdm for each rchres
+        Dim lPtSrcWDMNames As New Collection
+
+        'update files block
+        Dim lHspfFile As New atcUCI.HspfData.HspfFile
+        With lCombinedUci.FilesBlock
+            lHspfFile.Name = "met.wdm"
+            lHspfFile.Typ = "WDM1"
+            lHspfFile.Unit = "21"
+            .Value(1) = lHspfFile
+            lHspfFile.Name = "prec.wdm"
+            lHspfFile.Typ = "WDM2"
+            lHspfFile.Unit = "22"
+            .Value(2) = lHspfFile
+            lHspfFile.Name = "ptsrc.wdm"
+            lHspfFile.Typ = "WDM3"
+            lHspfFile.Unit = "23"
+            .Value(3) = lHspfFile
+        End With
+
         'now start looping through the rest of the ucis
         For lUciCnt = 2 To lUcis.Count
             'read each uci 
@@ -138,6 +164,9 @@ Public Class UCICombiner
                         lLandUseCounter = lLandUseCounter + 1
                         lMetSegCounter = 100
                     End If
+                    'save the names of the wdm files associated with each met segment
+                    lMetWDMNames.Add(lUci.FilesBlock.Value(1).Name)
+                    lPrecWDMNames.Add(lUci.FilesBlock.Value(2).Name)
                     lNewOperId = lMetSegCounter + lLandUseCounter
                 Else
                     lNewOperId = 1
@@ -163,10 +192,19 @@ Public Class UCICombiner
                     lTable.Comment = ""
                 Next lTable
 
-                'update ftable number
                 If lOper.Name = "RCHRES" Then
+                    'update ftable number
                     lOper.FTable.Id = lNewOperId
                     lOper.Tables("HYDR-PARM2").parmvalue("FTBUCI") = lNewOperId
+                    'make note of which met segment this uci uses
+                    For i = 1 To lUci.FilesBlock.Count
+                        If lPrecWDMNames(i) = lUci.FilesBlock.Value(2).Name Then
+                            lMetSegCounter = i * 100
+                            Exit For
+                        End If
+                    Next i
+                    'store name of the pt src wdm this uci uses
+                    lPtSrcWDMNames.Add(lUci.FilesBlock.Value(3).Name)
                 End If
 
                 If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
@@ -178,6 +216,7 @@ Public Class UCICombiner
                     'renumber data sets to reflect met seg number
                     For Each lConn In lOpn.Sources
                         If lConn.Target.VolName = lOper.Name Then
+                            'renumber the dsn in the ext sources block
                             lConn.Source.VolId = lConn.Source.VolId + lMetSegCounter
                         End If
                     Next lConn
@@ -190,6 +229,13 @@ Public Class UCICombiner
                             lOper.Sources.Remove(i)
                         Else
                             i = i + 1
+                        End If
+                    Next lConn
+                    'renumber data sets to reflect met seg number
+                    For Each lConn In lOpn.Sources
+                        If lConn.Target.VolName = lOper.Name Then
+                            'renumber the dsn in the ext sources block
+                            lConn.Source.VolId = lConn.Source.VolId + lMetSegCounter
                         End If
                     Next lConn
                     'reset the connection operation numbers
@@ -221,8 +267,35 @@ Public Class UCICombiner
         Next lUciCnt
 
         lCombinedUci.Source2MetSeg()
+
         ChDir("C:\cbp_working\output\combined")
         lCombinedUci.Save()
+
+        'build combined wdms for prec, met data 
+        Dim lMetSeg As atcUCI.HspfMetSeg
+        Dim lMetSegRec As atcUCI.HspfMetSegRecord
+        Dim lWdmIndex As Integer
+        Dim lOrigDsn As Integer
+        For Each lMetSeg In lCombinedUci.MetSegs
+            For Each lMetSegRec In lMetSeg.MetSegRecs
+                'the index is the second digit
+                lWdmIndex = CInt(Mid(CStr(lMetSegRec.Source.VolId), 2, 1))
+                lOrigDsn = CInt(Mid(CStr(lMetSegRec.Source.VolId), 1, 1) & "0" & Mid(CStr(lMetSegRec.Source.VolId), 3, 2))
+                If lMetSegRec.Source.VolName = "WDM1" Then
+                    CopyDataSet(lMetWDMNames(lWdmIndex), lOrigDsn, "met.wdm", lMetSegRec.Source.VolId)
+                ElseIf lMetSegRec.Source.VolName = "WDM2" Then
+                    CopyDataSet(lPrecWDMNames(lWdmIndex), lOrigDsn, "prec.wdm", lMetSegRec.Source.VolId)
+                End If
+            Next
+        Next lMetSeg
+        'build combined wdms for pt srcs
+        For Each lConn In lCombinedUci.Connections
+            If lConn.Source.VolName = "WDM3" Then
+                'this is a point source dsn
+                lOrigDsn = CInt(Mid(CStr(lConn.Source.VolId), 1, 1) & "0" & Mid(CStr(lConn.Source.VolId), 3, 2))
+                CopyDataSet(lPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, "ptsrc.wdm", lConn.Source.VolId)
+            End If
+        Next lConn
 
     End Function
 
