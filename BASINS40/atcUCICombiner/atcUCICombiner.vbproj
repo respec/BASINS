@@ -69,6 +69,10 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcData, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Plugins\BASINS\atcData.dll</HintPath>
+    </Reference>
     <Reference Include="MapWinUtility, Version=1.0.2439.22903, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\MapWindow42\Bin\MapWinUtility.dll</HintPath>
@@ -102,6 +106,7 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="modCopy.vb" />
     <Compile Include="UCICombiner.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -118,6 +123,7 @@
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
