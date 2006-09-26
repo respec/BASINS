@@ -135,8 +135,9 @@ Public Class UCICombiner
         Dim lPrecWDMNames As New Collection
         lMetWDMNames.Add(lCombinedUci.FilesBlock.Value(1).Name)
         lPrecWDMNames.Add(lCombinedUci.FilesBlock.Value(2).Name)
-        'save names of each pt src wdm for each rchres
+        'save names of each pt src and output wdm for each rchres
         Dim lPtSrcWDMNames As New Collection
+        Dim lOutputWDMNames As New Collection
 
         'update files block
         Dim lHspfFile As New atcUCI.HspfData.HspfFile
@@ -149,22 +150,22 @@ Public Class UCICombiner
             lHspfFile.Typ = "WDM2"
             lHspfFile.Unit = "22"
             .Value(2) = lHspfFile
-            lHspfFile.Name = "ptsrc.wdm"
-            lHspfFile.Typ = "WDM3"
-            lHspfFile.Unit = "23"
-            .Value(3) = lHspfFile
+            'lHspfFile.Name = "ptsrc.wdm"
+            'lHspfFile.Typ = "WDM3"
+            'lHspfFile.Unit = "23"
+            '.Value(3) = lHspfFile
             lHspfFile.Name = "output.wdm"
             lHspfFile.Typ = "WDM4"
             lHspfFile.Unit = "24"
-            .Value(4) = lHspfFile
+            .Value(3) = lHspfFile
             lHspfFile.Name = "combined.ech"
             lHspfFile.Typ = "MESSU"
             lHspfFile.Unit = "25"
-            .Value(5) = lHspfFile
+            .Value(4) = lHspfFile
             lHspfFile.Name = "combined.out"
             lHspfFile.Typ = ""
             lHspfFile.Unit = "26"
-            .Value(6) = lHspfFile
+            .Value(5) = lHspfFile
         End With
 
         'now start looping through the rest of the ucis
@@ -226,6 +227,8 @@ Public Class UCICombiner
                     Next i
                     'store name of the pt src wdm this uci uses
                     lPtSrcWDMNames.Add(lUci.FilesBlock.Value(3).Name)
+                    'store name of the output wdm this uci uses
+                    lOutputWDMNames.Add(lUci.FilesBlock.Value(4).Name)
                 End If
 
                 If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
@@ -252,6 +255,16 @@ Public Class UCICombiner
                             i = i + 1
                         End If
                     Next lConn
+                    'remove all the pt src, septic, diversions for now
+                    '(until we get the full wdms from cbp)
+                    i = 1
+                    For Each lConn In lOper.Sources
+                        If lConn.Source.VolName = "WDM3" Then
+                            lOper.Sources.Remove(i)
+                        Else
+                            i = i + 1
+                        End If
+                    Next lConn
                     'renumber data sets to reflect met seg number
                     For Each lConn In lOpn.Sources
                         If lConn.Target.VolName = lOper.Name Then
@@ -264,6 +277,9 @@ Public Class UCICombiner
                         If lConn.Source.VolName = "RCHRES" Then
                             lConn.Source.Opn.Id = lNewOperId
                             lConn.Source.VolId = lNewOperId
+                            If lConn.Target.VolName = "WDM4" Then
+                                lConn.Target.VolId = lConn.Target.VolId + (100 * (lNewOperId - 1))
+                            End If
                         End If
                     Next lConn
                     For Each lConn In lOper.Sources
@@ -324,21 +340,30 @@ Public Class UCICombiner
             'build combined wdms for pt srcs and other input wdms
             For Each lOper In lCombinedUci.OpnSeqBlock.Opns
                 For Each lConn In lOper.Sources
-                    lOrigDsn = CInt(Mid(CStr(lConn.Source.VolId), 1, 1) & "0" & Mid(CStr(lConn.Source.VolId), 3, 2))
-                    lWdmIndex = CInt(Mid(CStr(lConn.Source.VolId), 2, 1))
-                    If lConn.Source.VolName = "WDM3" Then
-                        'this is a point source dsn
+                    If Mid(lConn.Source.VolName, 1, 3) = "WDM" Then
+                        lOrigDsn = CInt(Mid(CStr(lConn.Source.VolId), 1, 1) & "0" & Mid(CStr(lConn.Source.VolId), 3, 2))
+                        lWdmIndex = CInt(Mid(CStr(lConn.Source.VolId), 2, 1))
+                        If lConn.Source.VolName = "WDM3" Then
+                            CopyDataSet(lDataManager, _
+                                        "wdm", "..\" & lPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, _
+                                        "wdm", "ptsrc.wdm", lConn.Source.VolId)
+                        ElseIf lConn.Source.VolName = "WDM2" Then
+                            CopyDataSet(lDataManager, _
+                                        "wdm", lPrecWDMNames(lWdmIndex), lOrigDsn, _
+                                        "wdm", "prec.wdm", lConn.Source.VolId)
+                        End If
+                    End If
+                Next lConn
+            Next lOper
+            'build combined wdms for output wdms
+            For Each lOper In lCombinedUci.OpnSeqBlock.Opns
+                For Each lConn In lOper.Targets
+                    If lConn.Target.VolName = "WDM4" Then
+                        lOrigDsn = CInt("1" & Mid(CStr(lConn.Target.VolId), 2, 2))
                         CopyDataSet(lDataManager, _
-                                    "wdm", "..\" & lPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, _
-                                    "wdm", "ptsrc.wdm", lConn.Source.VolId)
-                    ElseIf lConn.Source.VolName = "WDM1" Then
-                        CopyDataSet(lDataManager, _
-                                    "wdm", lMetWDMNames(lWdmIndex), lOrigDsn, _
-                                    "wdm", "met.wdm", lConn.Source.VolId)
-                    ElseIf lConn.Source.VolName = "WDM2" Then
-                        CopyDataSet(lDataManager, _
-                                    "wdm", lPrecWDMNames(lWdmIndex), lOrigDsn, _
-                                    "wdm", "prec.wdm", lConn.Source.VolId)
+                                    "wdm", "..\" & lOutputWDMNames(lConn.Source.VolId), lOrigDsn, _
+                                    "wdm", "output.wdm", lConn.Target.VolId)
+
                     End If
                 Next lConn
             Next lOper
