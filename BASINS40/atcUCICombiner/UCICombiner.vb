@@ -214,6 +214,13 @@ Public Class UCICombiner
                     lTable.Comment = ""
                 Next lTable
 
+                If lOper.Name = "IMPLND" Then
+                    'make adjustment to GEN-INFO table where cbp fields are off
+                    lOper.Tables("GEN-INFO").parms(4).value = lOper.Tables("GEN-INFO").parms(5).value
+                    lOper.Tables("GEN-INFO").parms(5).value = lOper.Tables("GEN-INFO").parms(6).value
+                    lOper.Tables("GEN-INFO").parms(6).value = lOper.Tables("GEN-INFO").parms(7).value
+                End If
+
                 If lOper.Name = "RCHRES" Then
                     'update ftable number
                     lOper.FTable.Id = lNewOperId
