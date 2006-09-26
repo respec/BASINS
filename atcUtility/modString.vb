@@ -1027,7 +1027,10 @@ EndFound:
         ' ##RETURNS Input parameter Val in string form.
         Dim bVal As Byte()
         bVal = System.BitConverter.GetBytes(Value)
-        Return Chr(bVal(0)) & Chr(bVal(1)) & Chr(bVal(2)) & Chr(bVal(3))
+        Long2String = ""
+        For lByte As Integer = 0 To 3
+            If bVal(lByte) > 0 Then Long2String &= Chr(bVal(lByte))
+        Next
     End Function
 
     Public Function Long2Single(ByRef Value As Integer) As Single
