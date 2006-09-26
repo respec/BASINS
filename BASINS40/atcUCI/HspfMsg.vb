@@ -28,18 +28,18 @@ Imports MapWinUtility
             End If
         End If
 
-        Logger.Dbg("Opening " & aFilename)
+        'Logger.Dbg("Opening " & aFilename)
         Dim myDb As New atcMDB(aFilename)
         pMsgFileName = aFilename
 
-        Logger.Dbg("BlockDefns")
+        'Logger.Dbg("BlockDefns")
         Dim lBlkTable As DataTable = myDb.GetTable("BlockDefns")
         Dim lBlock As HspfBlockDef
         Dim lBlockFieldID As Integer = lBlkTable.Columns.IndexOf("ID")
         Dim lBlockFieldName As Integer = lBlkTable.Columns.IndexOf("Name")
         Dim lSections As New Collection
 
-        Logger.Dbg("SectionDefns")
+        'Logger.Dbg("SectionDefns")
         Dim lSecTable As DataTable = myDb.GetTable("SectionDefns")
         Dim lSection As HspfSectionDef
         Dim lSectionFieldID As Integer = lSecTable.Columns.IndexOf("ID")
@@ -81,7 +81,7 @@ Imports MapWinUtility
             's = "(Progress " & lBlkNow * 100 / lBlkCount & ")"
             'IPC.SendMonitorMessage s
             lBlkNow = lBlkNow + 1
-            Logger.Dbg("Block Row " & lBlkNow)
+            'Logger.Dbg("Block Row " & lBlkNow)
 
             lBlock = New HspfBlockDef
             lBlock.Id = lBlockRow.Item(lBlockFieldID)
@@ -96,7 +96,7 @@ Imports MapWinUtility
                     lSection = New HspfSectionDef
                     lSection.Name = lSecRow.Item(lSectionFieldName)
                     lSection.Id = lSecRow.Item(lSectionFieldID)
-                    Logger.Dbg("Section Row " & lSection.Name)
+                    'Logger.Dbg("Section Row " & lSection.Name)
                     lTables = Nothing
                     lTables = New Collection
 
@@ -108,7 +108,7 @@ Imports MapWinUtility
                             ltable.Parent = lSection
                             ltable.Name = lTabRow.Item(2)
 
-                            Logger.Dbg("Table Row " & ltable.Name)
+                            'Logger.Dbg("Table Row " & ltable.Name)
 
                             ltable.SGRP = lTabRow.Item(3)
                             ltable.NumOccur = lTabRow.Item(4)
@@ -129,7 +129,7 @@ Imports MapWinUtility
                                 If lParmRow.Item(lParmFieldTableID) = ltable.Id Then
                                     lParm = New HSPFParmDef
                                     lParm.Name = lParmRow.Item(2) 'Name
-                                    Logger.Dbg("Parm Row " & lParm.Name)
+                                    'Logger.Dbg("Parm Row " & lParm.Name)
                                     lTyp = lParmRow.Item(3) 'Type
                                     Select Case lTyp
                                         Case "I" : lNumeric = True : lParm.Typ = 1 ' ATCoInt
@@ -196,7 +196,7 @@ Imports MapWinUtility
             pBlockDefs.Add(lBlock, lBlock.Name)
         Next
 
-        Logger.Dbg("TSGroupDefns")
+        'Logger.Dbg("TSGroupDefns")
         'now read TS group and member info
         pTSGroupDefs = Nothing
         pTSGroupDefs = New Collection
@@ -280,7 +280,7 @@ Imports MapWinUtility
             lTSGroup.MemberDefs = lTSMembers
             pTSGroupDefs.Add(lTSGroup, CStr(lTSGroup.Id))
         Next
-        Logger.Dbg("Open Finished")
+        Logger.Dbg("HSPFMsg:Open Finished")
     End Sub
 
     Public Property Name() As String

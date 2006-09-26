@@ -3,7 +3,8 @@ Option Explicit On
 
 Imports atcUtility
 
-<System.Runtime.InteropServices.ProgId("HspfFilesBlk_NET.HspfFilesBlk")> Public Class HspfFilesBlk
+<System.Runtime.InteropServices.ProgId("HspfFilesBlk_NET.HspfFilesBlk")> _
+Public Class HspfFilesBlk
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pFiles As Collection 'of HspfFile
