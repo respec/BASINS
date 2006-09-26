@@ -12,6 +12,7 @@ Module modData
 
         'just change id in the copy
         aSourceDataSet.Attributes.SetValue("id", aTargetId)
+
         Dim lTargetDataSource As New atcWDM.atcDataSourceWDM
 
         If lTargetDataSource.Open(aTargetSpecification) Then
@@ -34,16 +35,17 @@ Module modData
                                 ByVal aTargetId As Integer, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
 
-        'Select Case aSourceType
-        '    Case "wdm"
-        '        Dim lSourceDataSource As New atcWDM.atcDataSourceWDM
-        '    Case Else
-        '        Dim lsourcedatasource As New atcData.atcDataSource
-        'End Select
-        Dim lSourceDataSource As New atcWDM.atcDataSourceWDM
-        If aDataManager.OpenDataSource((lSourceDataSource), _
-                                    aSourceSpecification, Nothing) Then
+        Dim lSourceDataSource As atcData.atcDataSource
+        Select Case aSourceType
+            Case "wdm"
+                lSourceDataSource = New atcWDM.atcDataSourceWDM
+            Case Else
+                lsourcedatasource = New atcData.atcDataSource
+        End Select
+        If aDataManager.OpenDataSource(lsourcedatasource, _
+                                       aSourceSpecification, Nothing) Then
             Dim lSourceDataSet As atcDataSet = lSourceDataSource.DataSets(lSourceDataSource.DataSets.IndexFromKey(aSourceId))
+            lSourceDataSource.ReadData(lSourceDataSet)
             If lSourceDataSet Is Nothing Then
                 Logger.Dbg("CopyDataSet:FailedToOpenSourceId " & aSourceId & " from " & aSourceSpecification)
                 Return False

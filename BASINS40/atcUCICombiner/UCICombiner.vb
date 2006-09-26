@@ -67,7 +67,10 @@ Public Class UCICombiner
         Dim lWorkingDir As String
         'lWorkingDir = "C:\cbp_working\output\"
         lWorkingDir = "C:\cbp_working\subset\"
+        Logger.StartToFile(lWorkingDir & "combined\uciCombine.log")
+
         AddFilesInDir(lUciFullNames, lWorkingDir, False, "*.uci")
+        Logger.Dbg("Processing " & lUciFullNames.Count & " ucis")
 
         'we could open each uci and look to see what operation it contains,
         'but we know based on the naming convention
@@ -150,6 +153,18 @@ Public Class UCICombiner
             lHspfFile.Typ = "WDM3"
             lHspfFile.Unit = "23"
             .Value(3) = lHspfFile
+            lHspfFile.Name = "output.wdm"
+            lHspfFile.Typ = "WDM4"
+            lHspfFile.Unit = "24"
+            .Value(4) = lHspfFile
+            lHspfFile.Name = "combined.ech"
+            lHspfFile.Typ = "MESSU"
+            lHspfFile.Unit = "25"
+            .Value(5) = lHspfFile
+            lHspfFile.Name = "combined.out"
+            lHspfFile.Typ = ""
+            lHspfFile.Unit = "26"
+            .Value(6) = lHspfFile
         End With
 
         'now start looping through the rest of the ucis
@@ -276,6 +291,7 @@ Public Class UCICombiner
 
         ChDir(lWorkingDir & "combined")
         lCombinedUci.Save()
+        Logger.Dbg("CombinedUCI Saved")
 
         Try
             'build combined wdms for prec, met data 
@@ -288,31 +304,44 @@ Public Class UCICombiner
                 For Each lMetSegRec In lMetSeg.MetSegRecs
                     'the index is the second digit
                     If Not lMetSegRec Is Nothing Then
-                        Logger.Dbg("CombineUcis:VolId:" & lMetSegRec.Source.VolId)
-                        lWdmIndex = CInt(Mid(CStr(lMetSegRec.Source.VolId), 2, 1))
-                        lOrigDsn = CInt(Mid(CStr(lMetSegRec.Source.VolId), 1, 1) & "0" & Mid(CStr(lMetSegRec.Source.VolId), 3, 2))
-                        If lMetSegRec.Source.VolName = "WDM1" Then
-                            CopyDataSet(lDataManager, _
-                                        "wdm", lMetWDMNames(lWdmIndex), lOrigDsn, _
-                                        "wdm", "met.wdm", lMetSegRec.Source.VolId)
-                        ElseIf lMetSegRec.Source.VolName = "WDM2" Then
-                            CopyDataSet(lDataManager, _
-                                        "wdm", lPrecWDMNames(lWdmIndex), lOrigDsn, _
-                                        "wdm", "prec.wdm", lMetSegRec.Source.VolId)
+                        If Not lMetSegRec.Source.VolName Is Nothing Then
+                            Logger.Dbg("CombineUcis:VolId:" & lMetSegRec.Source.VolId)
+                            lWdmIndex = CInt(Mid(CStr(lMetSegRec.Source.VolId), 2, 1))
+                            lOrigDsn = CInt(Mid(CStr(lMetSegRec.Source.VolId), 1, 1) & "0" & Mid(CStr(lMetSegRec.Source.VolId), 3, 2))
+                            If lMetSegRec.Source.VolName = "WDM1" Then
+                                CopyDataSet(lDataManager, _
+                                            "wdm", lMetWDMNames(lWdmIndex), lOrigDsn, _
+                                            "wdm", "met.wdm", lMetSegRec.Source.VolId)
+                            ElseIf lMetSegRec.Source.VolName = "WDM2" Then
+                                CopyDataSet(lDataManager, _
+                                            "wdm", lPrecWDMNames(lWdmIndex), lOrigDsn, _
+                                            "wdm", "prec.wdm", lMetSegRec.Source.VolId)
+                            End If
                         End If
                     End If
                 Next
             Next lMetSeg
-            'build combined wdms for pt srcs
-            For Each lConn In lCombinedUci.Connections
-                If lConn.Source.VolName = "WDM3" Then
-                    'this is a point source dsn
+            'build combined wdms for pt srcs and other input wdms
+            For Each lOper In lCombinedUci.OpnSeqBlock.Opns
+                For Each lConn In lOper.Sources
                     lOrigDsn = CInt(Mid(CStr(lConn.Source.VolId), 1, 1) & "0" & Mid(CStr(lConn.Source.VolId), 3, 2))
-                    CopyDataSet(lDataManager, _
-                                "wdm", lPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, _
-                                "wdm", "ptsrc.wdm", lConn.Source.VolId)
-                End If
-            Next lConn
+                    lWdmIndex = CInt(Mid(CStr(lConn.Source.VolId), 2, 1))
+                    If lConn.Source.VolName = "WDM3" Then
+                        'this is a point source dsn
+                        CopyDataSet(lDataManager, _
+                                    "wdm", "..\" & lPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, _
+                                    "wdm", "ptsrc.wdm", lConn.Source.VolId)
+                    ElseIf lConn.Source.VolName = "WDM1" Then
+                        CopyDataSet(lDataManager, _
+                                    "wdm", lMetWDMNames(lWdmIndex), lOrigDsn, _
+                                    "wdm", "met.wdm", lConn.Source.VolId)
+                    ElseIf lConn.Source.VolName = "WDM2" Then
+                        CopyDataSet(lDataManager, _
+                                    "wdm", lPrecWDMNames(lWdmIndex), lOrigDsn, _
+                                    "wdm", "prec.wdm", lConn.Source.VolId)
+                    End If
+                Next lConn
+            Next lOper
         Catch lEx As Exception
             Logger.Msg(lEx.ToString)
         End Try
