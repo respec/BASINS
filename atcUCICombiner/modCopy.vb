@@ -1,7 +1,6 @@
 Imports MapWinUtility
 Imports atcdata
 
-
 Module modData
     Public Function CopyDataSet(ByVal aDataManager As atcDataManager, _
                                 ByVal aSourceDataSet As atcDataSet, _
@@ -13,7 +12,13 @@ Module modData
         'just change id in the copy
         aSourceDataSet.Attributes.SetValue("id", aTargetId)
 
-        Dim lTargetDataSource As New atcWDM.atcDataSourceWDM
+        Dim lTargetDataSource As atcData.atcDataSource
+        Select Case aTargetType
+            Case "wdm"
+                lTargetDataSource = New atcWDM.atcDataSourceWDM
+            Case Else
+                lTargetDataSource = New atcData.atcDataSource
+        End Select
 
         If lTargetDataSource.Open(aTargetSpecification) Then
             Dim lResult As Boolean = lTargetDataSource.AddDataset(aSourceDataSet, aExistAction)
@@ -40,9 +45,9 @@ Module modData
             Case "wdm"
                 lSourceDataSource = New atcWDM.atcDataSourceWDM
             Case Else
-                lsourcedatasource = New atcData.atcDataSource
+                lSourceDataSource = New atcData.atcDataSource
         End Select
-        If aDataManager.OpenDataSource(lsourcedatasource, _
+        If aDataManager.OpenDataSource(lSourceDataSource, _
                                        aSourceSpecification, Nothing) Then
             Dim lSourceDataSet As atcDataSet = lSourceDataSource.DataSets(lSourceDataSource.DataSets.IndexFromKey(aSourceId))
             lSourceDataSource.ReadData(lSourceDataSet)
