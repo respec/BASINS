@@ -7,4 +7,5 @@ Public Interface ctlEdit
     Sub Add()
     Sub Help()
     Sub Remove()
+    Sub Save()
 End Interface

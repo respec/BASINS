@@ -19,12 +19,13 @@ Partial Class frmWinHSPF
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWinHSPF))
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip
         Me.FileToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.EditToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.FilesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.FunctionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.FilesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -50,6 +51,12 @@ Partial Class frmWinHSPF
         Me.EditToolStripMenuItem.Size = New System.Drawing.Size(43, 22)
         Me.EditToolStripMenuItem.Text = "Edit"
         '
+        'FilesToolStripMenuItem
+        '
+        Me.FilesToolStripMenuItem.Name = "FilesToolStripMenuItem"
+        Me.FilesToolStripMenuItem.Size = New System.Drawing.Size(118, 22)
+        Me.FilesToolStripMenuItem.Text = "Files"
+        '
         'FunctionsToolStripMenuItem
         '
         Me.FunctionsToolStripMenuItem.Name = "FunctionsToolStripMenuItem"
@@ -62,18 +69,13 @@ Partial Class frmWinHSPF
         Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(48, 22)
         Me.HelpToolStripMenuItem.Text = "Help"
         '
-        'FilesToolStripMenuItem
-        '
-        Me.FilesToolStripMenuItem.Name = "FilesToolStripMenuItem"
-        Me.FilesToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
-        Me.FilesToolStripMenuItem.Text = "Files"
-        '
         'frmWinHSPF
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(292, 268)
         Me.Controls.Add(Me.MenuStrip1)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MainMenuStrip = Me.MenuStrip1
         Me.Name = "frmWinHSPF"
         Me.Text = "WinHSPF"
