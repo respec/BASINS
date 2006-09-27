@@ -110,10 +110,6 @@
     <Compile Include="UCICombiner.vb">
       <SubType>Form</SubType>
     </Compile>
-    <EmbeddedResource Include="UCICombiner.resx">
-      <DependentUpon>UCICombiner.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\atcData\atcData.vbproj">

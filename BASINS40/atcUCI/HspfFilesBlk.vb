@@ -20,12 +20,11 @@ Public Class HspfFilesBlk
         End Set
     End Property
 
-    Public ReadOnly Property Caption() As String
-        Get
-            Caption = "Files Block"
-        End Get
-    End Property
-
+    'Public ReadOnly Property Caption() As String
+    '    Get
+    '        Caption = "Files Block"
+    '    End Get
+    'End Property
 
     Public Property Comment() As String
         Get
@@ -36,11 +35,11 @@ Public Class HspfFilesBlk
         End Set
     End Property
 
-    Public ReadOnly Property EditControlName() As String
-        Get
-            EditControlName = "ATCoHspf.ctlFilesBlkEdit"
-        End Get
-    End Property
+    'Public ReadOnly Property EditControlName() As String
+    '    Get
+    '        EditControlName = "ATCoHspf.ctlFilesBlkEdit"
+    '    End Get
+    'End Property
 
     Public ReadOnly Property Count() As Integer
         Get
@@ -146,9 +145,9 @@ Public Class HspfFilesBlk
         End If
     End Sub
 
-    Public Sub Edit()
-        editInit(Me, Me.Uci.icon, True)
-    End Sub
+    'Public Sub Edit()
+    '    editInit(Me, Me.Uci.icon, True)
+    'End Sub
 
     Public Sub New()
         MyBase.New()

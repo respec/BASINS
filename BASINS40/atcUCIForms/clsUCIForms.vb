@@ -1,31 +1,30 @@
 Option Strict Off
 Option Explicit On
 
-Imports atcUCI
+Imports MapWinUtility
+'Imports atcUCI
 
 Public Class UCIForms
 
     Public Shared Function Edit(ByVal aParent As Windows.Forms.Form, _
-                                ByVal aObject As Object, _
-                                Optional ByVal aModal As Boolean = True) As Boolean
+                                ByVal aObject As Object) As Boolean
         Dim lForm As Windows.Forms.Form
+
         Select Case aObject.GetType.Name
             Case "HspfFilesBlk"
-                Dim lFormEdit As New frmEdit
-                lFormEdit.EditControl = New ctlEditFilesBlock(aObject)
+                'TODO: don't create multiple forms to edit files block!
+                Dim lFormEdit As New frmEdit(aParent)
+                Dim lEditFilesBlock As New ctlEditFilesBlock(aObject, aParent)
+                lFormEdit.Text = lEditFilesBlock.Caption
+                lFormEdit.EditControl = lEditFilesBlock
                 lForm = lFormEdit
             Case Else
                 lForm = Nothing
         End Select
 
         If Not lForm Is Nothing Then
-            lForm.Text = aObject.Caption
             lForm.Icon = aParent.Icon
-            If aModal Then
-                lForm.ShowDialog()
-            Else
-                lForm.Show()
-            End If
+            lForm.Show()
         End If
     End Function
 End Class
