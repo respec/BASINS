@@ -13,4 +13,17 @@ Public Class frmEdit
             End With
         End Set
     End Property
+
+    Private Sub cmdOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmdOk.Click
+        Dim lEditControl As ctlEdit = pEditControl
+        lEditControl.Save()
+    End Sub
+
+    Public Sub New()
+
+        ' This call is required by the Windows Form Designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+    End Sub
 End Class
