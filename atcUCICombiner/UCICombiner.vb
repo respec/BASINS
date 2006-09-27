@@ -310,8 +310,81 @@ Public Class UCICombiner
             lUci = Nothing
         Next lUciCnt
 
+        'build connections 
+        Dim lAreaTable As New atcTableDBF
+        lAreaTable.OpenFile("C:\cbp_working\model\p512\pp\data\land_use\land_use_base10_2002.dbf")
+        'look through each rchres
+        Dim lRchOper As atcUCI.HspfOperation
+        Dim lLandOper As atcUCI.HspfOperation
+        Dim lLandUse As String
+        Dim lOperType As String
+        Dim lFieldNum(2) As Integer
+        Dim lTableOper(2) As String
+        Dim lFieldVal(2) As String
+        lFieldNum(1) = 1
+        lFieldNum(2) = 2
+        lTableOper(1) = "="
+        lTableOper(2) = "="
+        Dim lRchIDs As New Collection
+        Dim lDownRchIDs As New Collection
+        For Each lRchOper In lCombinedUci.OpnBlks("RCHRES").ids
+            lFieldVal(1) = lRchOper.Tables("GEN-INFO").parms("RCHID").value
+            For i = 1 To 2
+                If i = 1 Then
+                    lOperType = "PERLND"
+                Else
+                    lOperType = "IMPLND"
+                End If
+                For Each lLandOper In lCombinedUci.OpnBlks(lOperType).ids
+                    lFieldVal(2) = Mid(lLandOper.Tables("GEN-INFO").parms("LSID").value, 1, 6)
+                    lLandUse = Trim(Mid(lLandOper.Tables("GEN-INFO").parms("LSID").value, 7))
+                    If lAreaTable.FindMatch(lFieldNum, lTableOper, lFieldVal) Then
+                        'found this land series contributing to this reach
+                        lConn = New atcUCI.HspfConnection
+                        lConn.Uci = lCombinedUci
+                        lConn.Typ = 3
+                        lConn.Source.VolName = lLandOper.Name
+                        lConn.Source.VolId = lLandOper.Id
+                        lConn.MFact = lAreaTable.Value(lAreaTable.FieldNumber(UCase(lLandUse)))
+                        lConn.Target.VolName = "RCHRES"
+                        lConn.Target.VolId = lRchOper.Id
+                        lConn.MassLink = i
+                        lCombinedUci.Connections.Add(lConn)
+                        lLandOper.Targets.Add(lConn)
+                        lRchOper.Sources.Add(lConn)
+                    End If
+                Next lLandOper
+            Next i
+            'also get reach to reach connections out of the reach id
+            lRchIDs.Add(Mid(lFieldVal(1), 5, 4))
+            lDownRchIDs.Add(Mid(lFieldVal(1), 10, 4))
+        Next lRchOper
+        'add reach to reach connections
+        Dim j As Integer
+        For i = 1 To lRchIDs.Count
+            For j = 1 To lRchIDs.Count
+                If lRchIDs(j) = lDownRchIDs(i) Then
+                    lConn = New atcUCI.HspfConnection
+                    lConn.Uci = lCombinedUci
+                    lConn.Typ = 3
+                    lConn.Source.VolName = "RCHRES"
+                    lConn.Source.VolId = i
+                    lConn.MFact = 1.0#
+                    lConn.Target.VolName = "RCHRES"
+                    lConn.Target.VolId = j
+                    lConn.MassLink = 3
+                    lCombinedUci.Connections.Add(lConn)
+                    lCombinedUci.OpnBlks("RCHRES").operfromid(i).targets.add(lConn)
+                    lCombinedUci.OpnBlks("RCHRES").operfromid(j).sources.add(lConn)
+                End If
+            Next j
+        Next i
+
+
+        'convert back to met segs to look nice in the save
         lCombinedUci.Source2MetSeg()
 
+        'write the combined uci 
         ChDir(lWorkingDir & "combined")
         lCombinedUci.Save()
         Logger.Dbg("CombinedUCI Saved")
