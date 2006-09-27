@@ -54,48 +54,15 @@ Public Class UCICombiner
 
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.mdb")
-        'lMsg.Name = "hspfmsg.mdb"
 
-        'get names of all ucis in dir
-        Dim lPerlndUcis As New Collection
-        Dim lImplndUcis As New Collection
-        Dim lRchresUcis As New Collection
-        Dim lUciFullNames As New NameValueCollection
-        Dim lUcis As New Collection
-        Dim lString As String
-        Dim lUciName As String
         Dim lWorkingDir As String
         'lWorkingDir = "C:\cbp_working\output\"
         lWorkingDir = "C:\cbp_working\subset\"
         Logger.StartToFile(lWorkingDir & "combined\uciCombine.log")
 
-        AddFilesInDir(lUciFullNames, lWorkingDir, False, "*.uci")
-        Logger.Dbg("Processing " & lUciFullNames.Count & " ucis")
-
-        'we could open each uci and look to see what operation it contains,
-        'but we know based on the naming convention
-        For Each lString In lUciFullNames
-            lUciName = FilenameNoPath(lString)
-            If Mid(lUciName, 1, 3) = "afo" Or _
-               Mid(lUciName, 1, 3) = "imh" Or _
-               Mid(lUciName, 1, 3) = "iml" Then
-                lImplndUcis.Add(lUciName)
-            ElseIf Mid(lUciName, 1, 3) = "riv" Then
-                lRchresUcis.Add(lUciName)
-            Else
-                lPerlndUcis.Add(lUciName)
-            End If
-        Next lString
-        'put them in order
-        For i = 1 To lPerlndUcis.Count
-            lUcis.Add(lPerlndUcis(i))
-        Next i
-        For i = 1 To lImplndUcis.Count
-            lUcis.Add(lImplndUcis(i))
-        Next i
-        For i = 1 To lRchresUcis.Count
-            lUcis.Add(lRchresUcis(i))
-        Next i
+        'get names of all ucis in dir
+        Dim lUcis As New Collection
+        lUcis = HSPFUciNames(lWorkingDir)
 
         'create a new uci to be the combined uci
         Dim lCombinedUci As New atcUCI.HspfUci
@@ -140,33 +107,7 @@ Public Class UCICombiner
         Dim lOutputWDMNames As New Collection
 
         'update files block
-        Dim lHspfFile As New atcUCI.HspfData.HspfFile
-        With lCombinedUci.FilesBlock
-            lHspfFile.Name = "met.wdm"
-            lHspfFile.Typ = "WDM1"
-            lHspfFile.Unit = "21"
-            .Value(1) = lHspfFile
-            lHspfFile.Name = "prec.wdm"
-            lHspfFile.Typ = "WDM2"
-            lHspfFile.Unit = "22"
-            .Value(2) = lHspfFile
-            'lHspfFile.Name = "ptsrc.wdm"
-            'lHspfFile.Typ = "WDM3"
-            'lHspfFile.Unit = "23"
-            '.Value(3) = lHspfFile
-            lHspfFile.Name = "output.wdm"
-            lHspfFile.Typ = "WDM4"
-            lHspfFile.Unit = "24"
-            .Value(3) = lHspfFile
-            lHspfFile.Name = "combined.ech"
-            lHspfFile.Typ = "MESSU"
-            lHspfFile.Unit = "25"
-            .Value(4) = lHspfFile
-            lHspfFile.Name = "combined.out"
-            lHspfFile.Typ = ""
-            lHspfFile.Unit = "26"
-            .Value(5) = lHspfFile
-        End With
+        UpdateFilesBlock(lCombinedUci)
 
         'now start looping through the rest of the ucis
         For lUciCnt = 2 To lUcis.Count
@@ -310,76 +251,11 @@ Public Class UCICombiner
             lUci = Nothing
         Next lUciCnt
 
-        'build connections 
-        Dim lAreaTable As New atcTableDBF
-        lAreaTable.OpenFile("C:\cbp_working\model\p512\pp\data\land_use\land_use_base10_2002.dbf")
-        'look through each rchres
-        Dim lRchOper As atcUCI.HspfOperation
-        Dim lLandOper As atcUCI.HspfOperation
-        Dim lLandUse As String
-        Dim lOperType As String
-        Dim lFieldNum(2) As Integer
-        Dim lTableOper(2) As String
-        Dim lFieldVal(2) As String
-        lFieldNum(1) = 1
-        lFieldNum(2) = 2
-        lTableOper(1) = "="
-        lTableOper(2) = "="
-        Dim lRchIDs As New Collection
-        Dim lDownRchIDs As New Collection
-        For Each lRchOper In lCombinedUci.OpnBlks("RCHRES").ids
-            lFieldVal(1) = lRchOper.Tables("GEN-INFO").parms("RCHID").value
-            For i = 1 To 2
-                If i = 1 Then
-                    lOperType = "PERLND"
-                Else
-                    lOperType = "IMPLND"
-                End If
-                For Each lLandOper In lCombinedUci.OpnBlks(lOperType).ids
-                    lFieldVal(2) = Mid(lLandOper.Tables("GEN-INFO").parms("LSID").value, 1, 6)
-                    lLandUse = Trim(Mid(lLandOper.Tables("GEN-INFO").parms("LSID").value, 7))
-                    If lAreaTable.FindMatch(lFieldNum, lTableOper, lFieldVal) Then
-                        'found this land series contributing to this reach
-                        lConn = New atcUCI.HspfConnection
-                        lConn.Uci = lCombinedUci
-                        lConn.Typ = 3
-                        lConn.Source.VolName = lLandOper.Name
-                        lConn.Source.VolId = lLandOper.Id
-                        lConn.MFact = lAreaTable.Value(lAreaTable.FieldNumber(UCase(lLandUse)))
-                        lConn.Target.VolName = "RCHRES"
-                        lConn.Target.VolId = lRchOper.Id
-                        lConn.MassLink = i
-                        lCombinedUci.Connections.Add(lConn)
-                        lLandOper.Targets.Add(lConn)
-                        lRchOper.Sources.Add(lConn)
-                    End If
-                Next lLandOper
-            Next i
-            'also get reach to reach connections out of the reach id
-            lRchIDs.Add(Mid(lFieldVal(1), 5, 4))
-            lDownRchIDs.Add(Mid(lFieldVal(1), 10, 4))
-        Next lRchOper
-        'add reach to reach connections
-        Dim j As Integer
-        For i = 1 To lRchIDs.Count
-            For j = 1 To lRchIDs.Count
-                If lRchIDs(j) = lDownRchIDs(i) Then
-                    lConn = New atcUCI.HspfConnection
-                    lConn.Uci = lCombinedUci
-                    lConn.Typ = 3
-                    lConn.Source.VolName = "RCHRES"
-                    lConn.Source.VolId = i
-                    lConn.MFact = 1.0#
-                    lConn.Target.VolName = "RCHRES"
-                    lConn.Target.VolId = j
-                    lConn.MassLink = 3
-                    lCombinedUci.Connections.Add(lConn)
-                    lCombinedUci.OpnBlks("RCHRES").operfromid(i).targets.add(lConn)
-                    lCombinedUci.OpnBlks("RCHRES").operfromid(j).sources.add(lConn)
-                End If
-            Next j
-        Next i
+        'build connections
+        AddSchematicBlock(lCombinedUci)
 
+        'build mass links
+        AddMassLinks(lCombinedUci)
 
         'convert back to met segs to look nice in the save
         lCombinedUci.Source2MetSeg()
@@ -389,68 +265,81 @@ Public Class UCICombiner
         lCombinedUci.Save()
         Logger.Dbg("CombinedUCI Saved")
 
-        Try
-            'build combined wdms for prec, met data 
-            Dim lMetSeg As atcUCI.HspfMetSeg
-            Dim lMetSegRec As atcUCI.HspfMetSegRecord
-            Dim lWdmIndex As Integer
-            Dim lOrigDsn As Integer
-            Dim lDataManager As New atcData.atcDataManager(Nothing)
-            For Each lMetSeg In lCombinedUci.MetSegs
-                For Each lMetSegRec In lMetSeg.MetSegRecs
-                    'the index is the second digit
-                    If Not lMetSegRec Is Nothing Then
-                        If Not lMetSegRec.Source.VolName Is Nothing Then
-                            Logger.Dbg("CombineUcis:VolId:" & lMetSegRec.Source.VolId)
-                            lWdmIndex = CInt(Mid(CStr(lMetSegRec.Source.VolId), 2, 1))
-                            lOrigDsn = CInt(Mid(CStr(lMetSegRec.Source.VolId), 1, 1) & "0" & Mid(CStr(lMetSegRec.Source.VolId), 3, 2))
-                            If lMetSegRec.Source.VolName = "WDM1" Then
-                                CopyDataSet(lDataManager, _
-                                            "wdm", lMetWDMNames(lWdmIndex), lOrigDsn, _
-                                            "wdm", "met.wdm", lMetSegRec.Source.VolId)
-                            ElseIf lMetSegRec.Source.VolName = "WDM2" Then
-                                CopyDataSet(lDataManager, _
-                                            "wdm", lPrecWDMNames(lWdmIndex), lOrigDsn, _
-                                            "wdm", "prec.wdm", lMetSegRec.Source.VolId)
-                            End If
-                        End If
-                    End If
-                Next
-            Next lMetSeg
-            'build combined wdms for pt srcs and other input wdms
-            For Each lOper In lCombinedUci.OpnSeqBlock.Opns
-                For Each lConn In lOper.Sources
-                    If Mid(lConn.Source.VolName, 1, 3) = "WDM" Then
-                        lOrigDsn = CInt(Mid(CStr(lConn.Source.VolId), 1, 1) & "0" & Mid(CStr(lConn.Source.VolId), 3, 2))
-                        lWdmIndex = CInt(Mid(CStr(lConn.Source.VolId), 2, 1))
-                        If lConn.Source.VolName = "WDM3" Then
-                            CopyDataSet(lDataManager, _
-                                        "wdm", "..\" & lPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, _
-                                        "wdm", "ptsrc.wdm", lConn.Source.VolId)
-                        ElseIf lConn.Source.VolName = "WDM2" Then
-                            CopyDataSet(lDataManager, _
-                                        "wdm", lPrecWDMNames(lWdmIndex), lOrigDsn, _
-                                        "wdm", "prec.wdm", lConn.Source.VolId)
-                        End If
-                    End If
-                Next lConn
-            Next lOper
-            'build combined wdms for output wdms
-            For Each lOper In lCombinedUci.OpnSeqBlock.Opns
-                For Each lConn In lOper.Targets
-                    If lConn.Target.VolName = "WDM4" Then
-                        lOrigDsn = CInt("1" & Mid(CStr(lConn.Target.VolId), 2, 2))
-                        CopyDataSet(lDataManager, _
-                                    "wdm", "..\" & lOutputWDMNames(lConn.Source.VolId), lOrigDsn, _
-                                    "wdm", "output.wdm", lConn.Target.VolId)
+        'combine the WDM files used by the combined UCI
+        BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
 
-                    End If
-                Next lConn
-            Next lOper
-        Catch lEx As Exception
-            Logger.Msg(lEx.ToString)
-        End Try
+    End Function
 
+    Private Function HSPFUciNames(ByVal aWorkingDir As String) As Collection
+        Dim lPerlndUcis As New Collection
+        Dim lImplndUcis As New Collection
+        Dim lRchresUcis As New Collection
+        Dim lUciFullNames As New NameValueCollection
+        Dim lString As String
+        Dim lUciName As String
+        Dim i As Integer
+        Dim lUcis As New Collection
+
+        AddFilesInDir(lUciFullNames, aWorkingDir, False, "*.uci")
+        Logger.Dbg("Processing " & lUciFullNames.Count & " ucis")
+
+        'we could open each uci and look to see what operation it contains,
+        'but we know based on the naming convention
+        For Each lString In lUciFullNames
+            lUciName = FilenameNoPath(lString)
+            If Mid(lUciName, 1, 3) = "afo" Or _
+               Mid(lUciName, 1, 3) = "imh" Or _
+               Mid(lUciName, 1, 3) = "iml" Then
+                lImplndUcis.Add(lUciName)
+            ElseIf Mid(lUciName, 1, 3) = "riv" Then
+                lRchresUcis.Add(lUciName)
+            Else
+                lPerlndUcis.Add(lUciName)
+            End If
+        Next lString
+        'put them in order
+        For i = 1 To lPerlndUcis.Count
+            lUcis.Add(lPerlndUcis(i))
+        Next i
+        For i = 1 To lImplndUcis.Count
+            lUcis.Add(lImplndUcis(i))
+        Next i
+        For i = 1 To lRchresUcis.Count
+            lUcis.Add(lRchresUcis(i))
+        Next i
+
+        HSPFUciNames = lUcis
+
+    End Function
+
+    Private Function UpdateFilesBlock(ByVal aUci As atcUCI.HspfUci) As Boolean
+        Dim lHspfFile As New atcUCI.HspfData.HspfFile
+        With aUci.FilesBlock
+            lHspfFile.Name = "met.wdm"
+            lHspfFile.Typ = "WDM1"
+            lHspfFile.Unit = "21"
+            .Value(1) = lHspfFile
+            lHspfFile.Name = "prec.wdm"
+            lHspfFile.Typ = "WDM2"
+            lHspfFile.Unit = "22"
+            .Value(2) = lHspfFile
+            'lHspfFile.Name = "ptsrc.wdm"
+            'lHspfFile.Typ = "WDM3"
+            'lHspfFile.Unit = "23"
+            '.Value(3) = lHspfFile
+            lHspfFile.Name = "output.wdm"
+            lHspfFile.Typ = "WDM4"
+            lHspfFile.Unit = "24"
+            .Value(3) = lHspfFile
+            lHspfFile.Name = "combined.ech"
+            lHspfFile.Typ = "MESSU"
+            lHspfFile.Unit = "25"
+            .Value(4) = lHspfFile
+            lHspfFile.Name = "combined.out"
+            lHspfFile.Typ = ""
+            lHspfFile.Unit = "26"
+            .Value(5) = lHspfFile
+        End With
     End Function
 
     Private Function RenumberOperationInSpecialActions(ByVal aUci As atcUCI.HspfUci, ByVal aOperName As String, ByVal aOrigId As Integer, ByVal aNewId As Integer) As Boolean
@@ -467,5 +356,262 @@ Public Class UCICombiner
                 Mid(lRecord.Text, i) = aOperName & " " & aNewId
             End If
         Next
+    End Function
+
+    Private Function AddSchematicBlock(ByVal aCombinedUci As atcUCI.HspfUci) As Boolean
+        'build connections 
+        Dim i As Integer
+
+        Dim lAreaTable As New atcTableDBF
+        lAreaTable.OpenFile("C:\cbp_working\model\p512\pp\data\land_use\land_use_base10_2002.dbf")
+        'look through each rchres
+        Dim lRchOper As atcUCI.HspfOperation
+        Dim lLandOper As atcUCI.HspfOperation
+        Dim lConn As atcUCI.HspfConnection
+        Dim lLandUse As String
+        Dim lOperType As String
+        Dim lFieldNum(2) As Integer
+        Dim lTableOper(2) As String
+        Dim lFieldVal(2) As String
+        lFieldNum(1) = 1
+        lFieldNum(2) = 2
+        lTableOper(1) = "="
+        lTableOper(2) = "="
+        Dim lRchIDs As New Collection
+        Dim lDownRchIDs As New Collection
+        For Each lRchOper In aCombinedUci.OpnBlks("RCHRES").ids
+            lFieldVal(1) = lRchOper.Tables("GEN-INFO").parms("RCHID").value
+            For i = 1 To 2
+                If i = 1 Then
+                    lOperType = "PERLND"
+                Else
+                    lOperType = "IMPLND"
+                End If
+                For Each lLandOper In aCombinedUci.OpnBlks(lOperType).ids
+                    lFieldVal(2) = Mid(lLandOper.Tables("GEN-INFO").parms("LSID").value, 1, 6)
+                    lLandUse = Trim(Mid(lLandOper.Tables("GEN-INFO").parms("LSID").value, 7))
+                    If lAreaTable.FindMatch(lFieldNum, lTableOper, lFieldVal) Then
+                        'found this land series contributing to this reach
+                        lConn = New atcUCI.HspfConnection
+                        lConn.Uci = aCombinedUci
+                        lConn.Typ = 3
+                        lConn.Source.VolName = lLandOper.Name
+                        lConn.Source.VolId = lLandOper.Id
+                        lConn.MFact = lAreaTable.Value(lAreaTable.FieldNumber(UCase(lLandUse)))
+                        lConn.Target.VolName = "RCHRES"
+                        lConn.Target.VolId = lRchOper.Id
+                        lConn.MassLink = i
+                        aCombinedUci.Connections.Add(lConn)
+                        lLandOper.Targets.Add(lConn)
+                        lRchOper.Sources.Add(lConn)
+                    End If
+                Next lLandOper
+            Next i
+            'also get reach to reach connections out of the reach id
+            lRchIDs.Add(Mid(lFieldVal(1), 5, 4))
+            lDownRchIDs.Add(Mid(lFieldVal(1), 10, 4))
+        Next lRchOper
+        'add reach to reach connections
+        Dim j As Integer
+        For i = 1 To lRchIDs.Count
+            For j = 1 To lRchIDs.Count
+                If lRchIDs(j) = lDownRchIDs(i) Then
+                    lConn = New atcUCI.HspfConnection
+                    lConn.Uci = aCombinedUci
+                    lConn.Typ = 3
+                    lConn.Source.VolName = "RCHRES"
+                    lConn.Source.VolId = i
+                    lConn.MFact = 1.0#
+                    lConn.Target.VolName = "RCHRES"
+                    lConn.Target.VolId = j
+                    lConn.MassLink = 3
+                    aCombinedUci.Connections.Add(lConn)
+                    aCombinedUci.OpnBlks("RCHRES").operfromid(i).targets.add(lConn)
+                    aCombinedUci.OpnBlks("RCHRES").operfromid(j).sources.add(lConn)
+                End If
+            Next j
+        Next i
+    End Function
+
+    Private Function AddMassLinks(ByVal aCombinedUci As atcUCI.HspfUci) As Boolean
+        'build mass links 
+        Dim i As Integer
+        Dim lMassLink As atcUCI.HspfMassLink
+        Dim lLandType As String
+
+        aCombinedUci.MassLinks.Remove(1)
+        Dim lMultTable As New atcTableFixed
+        lMultTable.NumFields = 3
+        lMultTable.FieldStart(1) = 9     'riv id
+        lMultTable.FieldLength(1) = 3
+        lMultTable.FieldStart(2) = 23    'land id
+        lMultTable.FieldLength(2) = 3
+        lMultTable.FieldStart(3) = 36    'mfact
+        lMultTable.FieldLength(3) = 8
+        lMultTable.OpenFile("C:\cbp_working\model\p512\pp\catalog\iovars\land_to_river")
+        Dim lRchresTable As New atcTableFixed
+        lRchresTable.NumFields = 5
+        lRchresTable.FieldStart(1) = 7   'riv id
+        lRchresTable.FieldLength(1) = 3
+        lRchresTable.FieldStart(2) = 14  'group
+        lRchresTable.FieldLength(2) = 6
+        lRchresTable.FieldStart(3) = 21  'member 
+        lRchresTable.FieldLength(3) = 6
+        lRchresTable.FieldStart(4) = 28  'mems1
+        lRchresTable.FieldLength(4) = 1
+        lRchresTable.FieldStart(5) = 30  'mems2
+        lRchresTable.FieldLength(5) = 1
+        lRchresTable.OpenFile("C:\cbp_working\model\p512\pp\catalog\iovars\rchres_in")
+        Dim lLandTable As New atcTableFixed
+        lLandTable.NumFields = 5
+        lLandTable.FieldStart(1) = 1   'land id
+        lLandTable.FieldLength(1) = 3
+        lLandTable.FieldStart(2) = 7   'group
+        lLandTable.FieldLength(2) = 6
+        lLandTable.FieldStart(3) = 14  'member 
+        lLandTable.FieldLength(3) = 6
+        lLandTable.FieldStart(4) = 21  'mems1
+        lLandTable.FieldLength(4) = 1
+        lLandTable.FieldStart(5) = 23  'mems2
+        lLandTable.FieldLength(5) = 1
+        'now loop through each perlnd/implnd record making mass links
+        For i = 1 To 2
+            If i = 1 Then
+                lLandType = "PERLND"
+                lLandTable.OpenFile("C:\cbp_working\model\p512\pp\catalog\iovars\perlnd")
+            Else
+                lLandType = "IMPLND"
+                lLandTable.OpenFile("C:\cbp_working\model\p512\pp\catalog\iovars\implnd")
+            End If
+            lLandTable.MoveFirst()
+            Do Until lLandTable.atEOF
+                If IsNumeric(lLandTable.Value(1)) Then
+                    'look for this land id in mfacts table
+                    lMultTable.MoveFirst()
+                    Do Until lMultTable.atEOF
+                        If lLandTable.Value(1) = lMultTable.Value(2) Then
+                            'look for this riv id in rchres table
+                            lRchresTable.MoveFirst()
+                            Do Until lRchresTable.atEOF
+                                If lMultTable.Value(1) = lRchresTable.Value(1) Then
+                                    'this is a hit, add it as a mass link
+                                    lMassLink = New atcUCI.HspfMassLink
+                                    lMassLink.Uci = aCombinedUci
+                                    lMassLink.MassLinkID = i
+                                    lMassLink.Source.VolName = lLandType
+                                    lMassLink.Source.VolId = 0
+                                    lMassLink.Source.Group = lLandTable.Value(2)
+                                    lMassLink.Source.Member = lLandTable.Value(3)
+                                    If IsNumeric(lLandTable.Value(4)) Then
+                                        lMassLink.Source.MemSub1 = lLandTable.Value(4)
+                                    End If
+                                    If IsNumeric(lLandTable.Value(5)) Then
+                                        lMassLink.Source.MemSub2 = lLandTable.Value(5)
+                                    End If
+                                    If IsNumeric(lMultTable.Value(3)) Then
+                                        lMassLink.MFact = lMultTable.Value(3)
+                                    End If
+                                    lMassLink.Tran = ""
+                                    lMassLink.Target.VolName = "RCHRES"
+                                    lMassLink.Target.VolId = 0
+                                    lMassLink.Target.Group = lRchresTable.Value(2)
+                                    lMassLink.Target.Member = lRchresTable.Value(3)
+                                    If IsNumeric(lRchresTable.Value(4)) Then
+                                        lMassLink.Target.MemSub1 = lRchresTable.Value(4)
+                                    End If
+                                    If IsNumeric(lRchresTable.Value(5)) Then
+                                        lMassLink.Target.MemSub2 = lRchresTable.Value(5)
+                                    End If
+                                    aCombinedUci.MassLinks.Add(lMassLink)
+                                End If
+                                lRchresTable.MoveNext()
+                            Loop
+                        End If
+                        lMultTable.MoveNext()
+                    Loop
+                End If
+                lLandTable.MoveNext()
+            Loop
+        Next i
+        'also add the rchres to rchres mass-link
+        lMassLink = New atcUCI.HspfMassLink
+        lMassLink.Uci = aCombinedUci
+        lMassLink.MassLinkID = 3
+        lMassLink.Source.VolName = "RCHRES"
+        lMassLink.Source.VolId = 0
+        lMassLink.Source.Group = "OFLOW"
+        lMassLink.Source.Member = ""
+        lMassLink.MFact = 1.0#
+        lMassLink.Tran = ""
+        lMassLink.Target.VolName = "RCHRES"
+        lMassLink.Target.VolId = 0
+        lMassLink.Target.Group = "INFLOW"
+        lMassLink.Target.Member = ""
+        aCombinedUci.MassLinks.Add(lMassLink)
+    End Function
+
+    Private Function BuildCombinedWDMs(ByVal aCombinedUci As atcUCI.HspfUci, _
+                                       ByVal aMetWDMNames As Collection, _
+                                       ByVal aPrecWDMNames As Collection, _
+                                       ByVal aPtSrcWDMNames As Collection, _
+                                       ByVal aOutputWDMNames As Collection) As Boolean
+        Dim lOper As atcUCI.HspfOperation
+        Dim lConn As atcUCI.HspfConnection
+
+        Try
+            'build combined wdms for prec, met data 
+            Dim lMetSeg As atcUCI.HspfMetSeg
+            Dim lMetSegRec As atcUCI.HspfMetSegRecord
+            Dim lWdmIndex As Integer
+            Dim lOrigDsn As Integer
+            For Each lMetSeg In aCombinedUci.MetSegs
+                For Each lMetSegRec In lMetSeg.MetSegRecs
+                    'the index is the second digit
+                    If Not lMetSegRec Is Nothing Then
+                        If Not lMetSegRec.Source.VolName Is Nothing Then
+                            Logger.Dbg("CombineUcis:VolId:" & lMetSegRec.Source.VolId)
+                            lWdmIndex = CInt(Mid(CStr(lMetSegRec.Source.VolId), 2, 1))
+                            lOrigDsn = CInt(Mid(CStr(lMetSegRec.Source.VolId), 1, 1) & "0" & Mid(CStr(lMetSegRec.Source.VolId), 3, 2))
+                            If lMetSegRec.Source.VolName = "WDM1" Then
+                                CopyDataSet("wdm", aMetWDMNames(lWdmIndex), lOrigDsn, _
+                                            "wdm", "met.wdm", lMetSegRec.Source.VolId)
+                            ElseIf lMetSegRec.Source.VolName = "WDM2" Then
+                                CopyDataSet("wdm", aPrecWDMNames(lWdmIndex), lOrigDsn, _
+                                            "wdm", "prec.wdm", lMetSegRec.Source.VolId)
+                            End If
+                        End If
+                    End If
+                Next
+            Next lMetSeg
+            'build combined wdms for pt srcs and other input wdms
+            For Each lOper In aCombinedUci.OpnSeqBlock.Opns
+                For Each lConn In lOper.Sources
+                    If Mid(lConn.Source.VolName, 1, 3) = "WDM" Then
+                        lOrigDsn = CInt(Mid(CStr(lConn.Source.VolId), 1, 1) & "0" & Mid(CStr(lConn.Source.VolId), 3, 2))
+                        lWdmIndex = CInt(Mid(CStr(lConn.Source.VolId), 2, 1))
+                        If lConn.Source.VolName = "WDM3" Then
+                            CopyDataSet("wdm", "..\" & aPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, _
+                                        "wdm", "ptsrc.wdm", lConn.Source.VolId)
+                        ElseIf lConn.Source.VolName = "WDM2" Then
+                            CopyDataSet("wdm", aPrecWDMNames(lWdmIndex), lOrigDsn, _
+                                        "wdm", "prec.wdm", lConn.Source.VolId)
+                        End If
+                    End If
+                Next lConn
+            Next lOper
+            'build combined wdms for output wdms
+            For Each lOper In aCombinedUci.OpnSeqBlock.Opns
+                For Each lConn In lOper.Targets
+                    If lConn.Target.VolName = "WDM4" Then
+                        lOrigDsn = CInt("1" & Mid(CStr(lConn.Target.VolId), 2, 2))
+                        CopyDataSet("wdm", "..\" & aOutputWDMNames(lConn.Source.VolId), lOrigDsn, _
+                                    "wdm", "output.wdm", lConn.Target.VolId)
+
+                    End If
+                Next lConn
+            Next lOper
+        Catch lEx As Exception
+            Logger.Msg(lEx.ToString)
+        End Try
     End Function
 End Class
