@@ -9,7 +9,10 @@ Public Class UCIForms
         Dim lForm As Windows.Forms.Form
         Select Case aObject.GetType.Name
             Case "HspfFilesBlk"
-                lForm = New frmEdit
+                Dim lFormEdit As New frmEdit
+                lFormEdit.EditControl = New ctlEditFilesBlock(aObject)
+
+                lForm = lFormEdit
             Case Else
                 lForm = Nothing
         End Select
