@@ -303,7 +303,7 @@ Public Class atcDataSourceNOAAISH
         Next
         pColDefs.Remove("SKYCOND")
         pColDefs.Remove("SKYCOND" & "Flag")
-        If aCurRec.Length > 81 AndAlso aCurRec.Substring(78, 3) = "ADD" Then
+        If aCurRec.Length > 81 AndAlso aCurRec.Substring(78).Contains("ADD") Then
             'now look for additional data elements
             Dim lPos As Integer
             Dim lRemPos As Integer
