@@ -46,6 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="clsUCIForms.vb" />
+    <Compile Include="ctlEdit.vb" />
+    <Compile Include="ctlEditFilesBlock.Designer.vb">
+      <DependentUpon>ctlEditFilesBlock.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlEditFilesBlock.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="frmEdit.Designer.vb">
       <DependentUpon>frmEdit.vb</DependentUpon>
     </Compile>
@@ -69,6 +76,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ctlEditFilesBlock.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ctlEditFilesBlock.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmEdit.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmEdit.vb</DependentUpon>
@@ -92,10 +103,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcControls\atcControls.vbproj">
+      <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
+      <Name>atcControls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{94E38DFF-614B-4CBD-B67C-F211BB35CE8B}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
