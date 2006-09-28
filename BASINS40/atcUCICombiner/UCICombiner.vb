@@ -74,8 +74,8 @@ Public Class UCICombiner
         lCombinedUci.Point2Source()
 
         'make this the combined uci
-        lCombinedUci.Name = "combined.uci"
-        lCombinedUci.GlobalBlock.RunInf.Value = "Combined UCI for Monocacy"
+        lCombinedUci.Name = "base.uci"
+        lCombinedUci.GlobalBlock.RunInf.Value = "Base UCI for Monocacy"
 
         Dim lMetSegCounter As Integer = 100
         Dim lLandUseCounter As Integer = 1
@@ -173,8 +173,8 @@ Public Class UCICombiner
                             Exit For
                         End If
                     Next i
-                    'store name of the pt src wdm this uci uses
-                    lPtSrcWDMNames.Add(lUci.FilesBlock.Value(3).Name)
+                    'store name of the pt src wdm this uci uses (needs to be modified slightly)
+                    lPtSrcWDMNames.Add(Mid(lUci.FilesBlock.Value(3).Name, 1, 17) & "609" & Mid(lUci.FilesBlock.Value(3).Name, 21))
                     'store name of the output wdm this uci uses
                     lOutputWDMNames.Add(lUci.FilesBlock.Value(4).Name)
                 End If
@@ -203,16 +203,16 @@ Public Class UCICombiner
                             i = i + 1
                         End If
                     Next lConn
-                    'remove all the pt src, septic, diversions for now
-                    '(until we get the full wdms from cbp)
-                    i = 1
-                    For Each lConn In lOper.Sources
-                        If lConn.Source.VolName = "WDM3" Then
-                            lOper.Sources.Remove(i)
-                        Else
-                            i = i + 1
-                        End If
-                    Next lConn
+                    ''remove all the pt src, septic, diversions for now
+                    ''(until we get the full wdms from cbp)
+                    'i = 1
+                    'For Each lConn In lOper.Sources
+                    '    If lConn.Source.VolName = "WDM3" Then
+                    '        lOper.Sources.Remove(i)
+                    '    Else
+                    '        i = i + 1
+                    '    End If
+                    'Next lConn
                     'renumber data sets to reflect met seg number
                     For Each lConn In lOpn.Sources
                         If lConn.Target.VolName = lOper.Name Then
@@ -260,13 +260,14 @@ Public Class UCICombiner
         'convert back to met segs to look nice in the save
         lCombinedUci.Source2MetSeg()
 
+        'combine the WDM files used by the combined UCI
+        ChDir(lWorkingDir & "combined")
+        BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
+
         'write the combined uci 
         ChDir(lWorkingDir & "combined")
         lCombinedUci.Save()
         Logger.Dbg("CombinedUCI Saved")
-
-        'combine the WDM files used by the combined UCI
-        BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
 
     End Function
 
@@ -315,27 +316,23 @@ Public Class UCICombiner
     Private Function UpdateFilesBlock(ByVal aUci As atcUCI.HspfUci) As Boolean
         Dim lHspfFile As New atcUCI.HspfData.HspfFile
         With aUci.FilesBlock
-            lHspfFile.Name = "met.wdm"
+            lHspfFile.Name = "base.wdm"
             lHspfFile.Typ = "WDM1"
             lHspfFile.Unit = "21"
             .Value(1) = lHspfFile
-            lHspfFile.Name = "prec.wdm"
-            lHspfFile.Typ = "WDM2"
-            lHspfFile.Unit = "22"
+            lHspfFile.Name = "ptsrc.wdm"
+            lHspfFile.Typ = "WDM3"
+            lHspfFile.Unit = "23"
             .Value(2) = lHspfFile
-            'lHspfFile.Name = "ptsrc.wdm"
-            'lHspfFile.Typ = "WDM3"
-            'lHspfFile.Unit = "23"
-            '.Value(3) = lHspfFile
             lHspfFile.Name = "output.wdm"
             lHspfFile.Typ = "WDM4"
             lHspfFile.Unit = "24"
             .Value(3) = lHspfFile
-            lHspfFile.Name = "combined.ech"
+            lHspfFile.Name = "base.ech"
             lHspfFile.Typ = "MESSU"
             lHspfFile.Unit = "25"
             .Value(4) = lHspfFile
-            lHspfFile.Name = "combined.out"
+            lHspfFile.Name = "base.out"
             lHspfFile.Typ = ""
             lHspfFile.Unit = "26"
             .Value(5) = lHspfFile
@@ -574,10 +571,11 @@ Public Class UCICombiner
                             lOrigDsn = CInt(Mid(CStr(lMetSegRec.Source.VolId), 1, 1) & "0" & Mid(CStr(lMetSegRec.Source.VolId), 3, 2))
                             If lMetSegRec.Source.VolName = "WDM1" Then
                                 CopyDataSet("wdm", aMetWDMNames(lWdmIndex), lOrigDsn, _
-                                            "wdm", "met.wdm", lMetSegRec.Source.VolId)
+                                            "wdm", "base.wdm", lMetSegRec.Source.VolId)
                             ElseIf lMetSegRec.Source.VolName = "WDM2" Then
                                 CopyDataSet("wdm", aPrecWDMNames(lWdmIndex), lOrigDsn, _
-                                            "wdm", "prec.wdm", lMetSegRec.Source.VolId)
+                                            "wdm", "base.wdm", lMetSegRec.Source.VolId)
+                                lMetSegRec.Source.VolName = "WDM1"
                             End If
                         End If
                     End If
@@ -594,7 +592,8 @@ Public Class UCICombiner
                                         "wdm", "ptsrc.wdm", lConn.Source.VolId)
                         ElseIf lConn.Source.VolName = "WDM2" Then
                             CopyDataSet("wdm", aPrecWDMNames(lWdmIndex), lOrigDsn, _
-                                        "wdm", "prec.wdm", lConn.Source.VolId)
+                                        "wdm", "base.wdm", lConn.Source.VolId)
+                            lConn.Source.VolName = "WDM1"
                         End If
                     End If
                 Next lConn
