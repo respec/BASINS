@@ -42,6 +42,7 @@ Public Class atcTableOpener
         OpenAnyTable = Nothing
         Select Case LCase(System.IO.Path.GetExtension(filename))
             Case ".dbf" : OpenAnyTable = New atcTableDBF
+            Case ".csv" : OpenAnyTable = New atcTableDelimited
                 'Case "abt": Set OpenFile = New clsATCTableBin
         End Select
         If OpenAnyTable Is Nothing Then
