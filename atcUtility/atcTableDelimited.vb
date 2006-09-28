@@ -4,25 +4,28 @@ Imports System.IO
 Imports atcUtility
 Imports MapWinUtility
 
-Public Class atcTableFixed
+''' <summary>
+''' Read and write delimited text files as a table
+''' </summary>
+''' <remarks>
+''' Default field delimiter is a comma
+''' First row is read as field names
+''' </remarks>
+Public Class atcTableDelimited
     Inherits atcTable
 
-    Private Class clsFieldDescriptor
-        Public FieldName As String    'name of field
-        Public FieldLength As Integer 'length of field
-        Public FieldStart As Integer  'column number in which field starts
-    End Class
-
     Private pFilename As String
-    Private pFields() As clsFieldDescriptor
+    Private pFieldNames() As String
+    Private pFieldLengths() As Integer
     Private pHeader As New ArrayList
     Private pNumFields As Integer
     Private pNumHeaderRows As Integer = -1
-    Private pData() As String
+    Private pCurrentRowValues() As String
     Private pRecords() As String
     Private pNumRecords As Integer
     Private pCurrentRecord As Integer
     Private pCurrentRecordStart As Integer
+    Private pDelimiter As Char = Chr(44) 'default to Chr(44) = comma
 
     Public Overrides Property CurrentRecord() As Integer
         Get
@@ -36,9 +39,12 @@ Public Class atcTableFixed
                     pCurrentRecord = newValue
                 End If
                 'parse fields values from this record
-                For i As Integer = 1 To pNumFields
-                    pData(i) = Mid(pRecords(pCurrentRecord), pFields(i).FieldStart, pFields(i).FieldLength)
-                Next
+                'TODO: test whether prepending pDelimiter slows this down, could change usage of pCurrentRowValues to (index-1) instead
+                pCurrentRowValues = (pDelimiter & pRecords(pCurrentRecord)).Split(pDelimiter)
+                If pNumFields > pCurrentRowValues.GetUpperBound(0) Then
+                    ReDim Preserve pCurrentRowValues(pNumFields)
+                End If
+
                 Exit Property
             Catch ex As Exception
                 Throw New ApplicationException("ATCTableFixed: Cannot set CurrentRecord to " & newValue & vbCr & ex.Message)
@@ -46,18 +52,17 @@ Public Class atcTableFixed
         End Set
     End Property
 
-
     Public Overrides Property FieldLength(ByVal aFieldNumber As Integer) As Integer
         Get
             If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                FieldLength = pFields(aFieldNumber).FieldLength
+                Return pFieldLengths(aFieldNumber)
             Else
-                FieldLength = 0
+                Return 0
             End If
         End Get
         Set(ByVal newValue As Integer)
             If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                pFields(aFieldNumber).FieldLength = newValue
+                pFieldLengths(aFieldNumber) = newValue
             End If
         End Set
     End Property
@@ -65,33 +70,17 @@ Public Class atcTableFixed
     Public Overrides Property FieldName(ByVal aFieldNumber As Integer) As String
         Get
             If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                FieldName = pFields(aFieldNumber).FieldName
+                Return pFieldNames(aFieldNumber - 1)
             Else
-                FieldName = "Undefined"
+                Return "Field " & aFieldNumber
             End If
         End Get
         Set(ByVal newValue As String)
             If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                pFields(aFieldNumber).FieldName = newValue
+                pFieldNames(aFieldNumber - 1) = newValue
             End If
         End Set
     End Property
-
-    Public Property FieldStart(ByVal aFieldNumber As Integer) As Integer
-        Get
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                FieldStart = pFields(aFieldNumber).FieldStart
-            Else
-                FieldStart = 0
-            End If
-        End Get
-        Set(ByVal newValue As Integer)
-            If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                pFields(aFieldNumber).FieldStart = newValue
-            End If
-        End Set
-    End Property
-
 
     ''C = Character, D = Date, N = Numeric, L = Logical, M = Memo
     'Public Overrides Property FieldType(ByVal aFieldNumber As Integer) As String
@@ -116,11 +105,12 @@ Public Class atcTableFixed
         Set(ByVal newValue As Integer)
             Dim iField As Integer
             pNumFields = newValue
-            ReDim pFields(pNumFields)
+            ReDim pFieldNames(pNumFields)
+            ReDim pFieldLengths(pNumFields)
             For iField = 1 To pNumFields
-                pFields(iField) = New clsFieldDescriptor
+                pFieldNames(iField) = ""
+                pFieldLengths(iField) = 0
             Next
-            ReDim pData(NumFields)
         End Set
     End Property
 
@@ -208,7 +198,7 @@ ErrHand:
             ElseIf aFieldNumber > pNumFields Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
             Else
-                Return pData(aFieldNumber)
+                Return pCurrentRowValues(aFieldNumber)
             End If
         End Get
         Set(ByVal newValue As String)
@@ -220,15 +210,8 @@ ErrHand:
             ElseIf aFieldNumber > pNumFields Then
                 Throw New ApplicationException("Value: Invalid Field Number: " & aFieldNumber & " > " & pNumFields)
             Else
-                If newValue.Length < pFields(aFieldNumber).FieldLength Then
-                    newValue = newValue.PadLeft(pFields(aFieldNumber).FieldLength)
-                End If
-                pData(aFieldNumber) = newValue
-                'TODO: test this
-                pRecords(pCurrentRecord) = pRecords(pCurrentRecord).Substring(0, pFields(aFieldNumber).FieldStart) _
-                                         & newValue _
-                                         & pRecords(pCurrentRecord).Substring(pFields(aFieldNumber).FieldStart + pFields(aFieldNumber).FieldLength)
-
+                pCurrentRowValues(aFieldNumber) = newValue
+                pRecords(pCurrentRecord) = CurrentRecordAsDelimitedString(pDelimiter)
             End If
             Exit Property
 ErrHand:
@@ -237,26 +220,13 @@ ErrHand:
     End Property
 
     Public Overrides Sub Clear()
+        ClearData()
         pHeader.Clear()
-        'ClearData()
-        'pHeader.version = 3
-        'pHeader.dbfDay = 1
-        'pHeader.dbfMonth = 1
-        'pHeader.dbfYear = 70
-        'pHeader.NumBytesHeader = 32
-        'pHeader.NumBytesRec = 0
-        'pNumFields = 0
-        'ReDim pFields(0)
+        NumFields = 0
     End Sub
 
     Public Overrides Sub ClearData()
-        'If pHeader Is Nothing Then pHeader = New clsHeader
-        'pHeader.NumRecs = 0
-        'pDataBytes = 0
-        'pCurrentRecord = 1
-        'pCurrentRecordStart = 0
-        'pNumRecsCapacity = 0
-        'ReDim pData(0)
+        ReDim pRecords(0)
     End Sub
 
     Public Overrides Function Cousin() As IatcTable
@@ -268,7 +238,6 @@ ErrHand:
             For iField = 1 To pNumFields
                 .FieldName(iField) = FieldName(iField)
                 .FieldLength(iField) = FieldLength(iField)
-                .FieldStart(iField) = FieldStart(iField)
             Next
         End With
         Return newFixed
@@ -278,7 +247,7 @@ ErrHand:
     Public Overrides Function FieldNumber(ByVal aFieldName As String) As Integer
         Dim lField As Integer
         For lField = 1 To pNumFields
-            If pFields(lField).FieldName = aFieldName Then
+            If pFieldNames(lField) = aFieldName Then
                 Return lField
             End If
         Next
@@ -292,9 +261,13 @@ ErrHand:
         Dim inReader As New BinaryReader(aStream)
 
         Try
-            For iRec = 1 To pHeader.Count 'read header rows, ignore for now
+            For iRec = 1 To NumHeaderRows 'read header rows, ignore for now
                 pHeader.Add(NextLine(inReader))
             Next
+
+            curLine = NextLine(inReader)
+            NumFields = CountString(curLine, pDelimiter) + 1
+            pFieldNames = (pDelimiter & curLine).Split(pDelimiter)
 
             ReDim pRecords(100) 'initial record buffer size
             iRec = 1
@@ -338,44 +311,38 @@ ErrHand:
     End Function
 
     Public Overrides Function WriteFile(ByVal Filename As String) As Boolean
-        Dim OutFile As Short
-        Dim j, i, dot As Short
-        Dim s As String
 TryAgain:
-        On Error GoTo ErrHand
+        Try
+            Dim lPath As String = System.IO.Path.GetDirectoryName(Filename)
+            If lPath.Length > 0 And Not FileExists(lPath, True) Then
+                MkDirPath(lPath)
+            End If
 
-        If FileExists(Filename) Then
-            Kill(Filename)
-        Else
-            MkDirPath(System.IO.Path.GetDirectoryName(Filename))
-        End If
+            Dim lOutStream As StreamWriter = File.CreateText(Filename)
 
-        OutFile = FreeFile()
-        FileOpen(OutFile, Filename, OpenMode.Input)
+            lOutStream.Write(Header)
 
-        FilePut(OutFile, Header)
-        
-        MoveFirst()
-        For i = 1 To pNumRecords
-            FilePut(OutFile, CurrentRecordAsDelimitedString("") & vbCrLf)
-            MoveNext()
-        Next
+            For i As Integer = 1 To pNumFields - 1
+                lOutStream.Write(pFieldNames(i) & pDelimiter)
+            Next
+            lOutStream.Write(pFieldNames(pNumFields) & vbCrLf)
 
-        FileClose(OutFile)
+            For i As Integer = 1 To pNumRecords
+                lOutStream.Write(pRecords(i) & vbCrLf)
+            Next
 
-        pFilename = Filename
+            lOutStream.Close()
 
-        Return True
+            pFilename = Filename
 
-ErrHand:
-        Resume Next
-        If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, _
-                      MsgBoxStyle.AbortRetryIgnore, "Write File") = MsgBoxResult.Retry Then
-            On Error Resume Next
-            FileClose(OutFile)
-            GoTo TryAgain
-        End If
-        Return False
+            Return True
+        Catch ex As Exception
+            If Logger.Msg("Error saving " & Filename & vbCr & Err.Description, _
+                          MsgBoxStyle.AbortRetryIgnore, "Write File") = MsgBoxResult.Retry Then
+                GoTo TryAgain
+            End If
+            Return False
+        End Try
     End Function
 
     Public Overrides Function CreationCode() As String

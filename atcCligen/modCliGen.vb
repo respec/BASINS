@@ -57,7 +57,6 @@ Public Module modCliGen
                     Case Else
                         .Value(aIMon) = RightJustify(DoubleToString(aNewVal, , "###.00"), .FieldLength(aIMon))
                 End Select
-                .Update()
             End If
         End With
     End Sub

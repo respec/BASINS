@@ -112,6 +112,7 @@
     <Compile Include="atcTableDBF.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcTableDelimited.vb" />
     <Compile Include="atcTableFixed.vb">
       <SubType>Code</SubType>
     </Compile>
