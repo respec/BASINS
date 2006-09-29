@@ -59,7 +59,9 @@ Public Module modCAT
             'Run scenario
             Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", "\BASINS\models\HSPF\bin\WinHspfLt.exe")
             Shell(lWinHspfLtExeName & " -1 -1 " & lNewFilename & "uci", AppWinStyle.NormalFocus, True)
-            aHBNResults.Open(lNewFilename & "hbn")
+            If FileExists(lNewFilename & ".hbn") Then
+                aHBNResults.Open(lNewFilename & "hbn")
+            End If
         Else
             Logger.Msg("Could not find base WDM file '" & aCurrentWDMfilename & "'" & vbCrLf & "Could not run model", "Scenario Run")
         End If
