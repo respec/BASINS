@@ -46,11 +46,17 @@ Public Class ctlEditFilesBlock
 
     Public Sub Remove() Implements ctlEdit.Remove
         'TODO: add this code
+        With pDataSource
+            'TODO: need selected rows
+            'Dim lRow, lCol As Integer
+            'Dim lTmp As Boolean = .CellSelected(lRow, lCol)
+        End With
     End Sub
 
     Public Sub Save() Implements ctlEdit.Save
         With pDataSource
             Logger.Dbg("EditFilesBlocK:Save:RowCount:" & .Rows)
+            pHspfFilesBlk.Clear()
             For lInd As Integer = 1 To .Rows - 1
                 Dim lHspfFile As New HspfData.HspfFile
                 lHspfFile.Typ = .CellValue(lInd, 0)
@@ -124,7 +130,8 @@ Public Class ctlEditFilesBlock
 
         Select Case aColumn
             Case 1 'Unit should be between 21 and 99, must be between 1 and 99
-                If lNewValueNumeric < 1 AndAlso lNewValueNumeric > 99 Then
+                If lNewValueNumeric < 1 AndAlso lNewValueNumeric > 99 Or _
+                   lNewValueNumeric = Double.NaN Then
                     lNewColor = Color.Pink
                 ElseIf lNewValueNumeric < 21 Then
                     lNewColor = Color.Yellow
