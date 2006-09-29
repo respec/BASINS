@@ -56,8 +56,8 @@ Public Class UCICombiner
         lMsg.Open("hspfmsg.mdb")
 
         Dim lWorkingDir As String
-        'lWorkingDir = "C:\cbp_working\output\"
-        lWorkingDir = "C:\cbp_working\subset\"
+        lWorkingDir = "C:\cbp_working\output\"
+        'lWorkingDir = "C:\cbp_working\subset\"
         Logger.StartToFile(lWorkingDir & "combined\uciCombine.log")
 
         'get names of all ucis in dir
@@ -94,8 +94,19 @@ Public Class UCICombiner
         For Each lConn In lOper.Sources
             lConn.Source.VolId = lConn.Source.VolId + lMetSegCounter
         Next lConn
+
         'change operation number in all special actions
+        Dim lRecord As atcUCI.HspfSpecialRecord
         RenumberOperationInSpecialActions(lCombinedUci, "PERLND", lOrigId, lOper.Id)
+        i = 1
+        Do While i < lCombinedUci.SpecialActionBlk.Records.Count
+            lRecord = lCombinedUci.SpecialActionBlk.Records(i)
+            If InStr(lRecord.Text, "+=         0.") = 58 Then
+                lCombinedUci.SpecialActionBlk.Records.Remove(i)
+            Else
+                i = i + 1
+            End If
+        Loop
 
         'save names of met and precip wdms for each met seg
         Dim lMetWDMNames As New Collection
@@ -240,11 +251,17 @@ Public Class UCICombiner
                     Next lConn
                 End If
 
-                'RenumberOperationInSpecialActions(lUci, lOper.Name, lOrigId, lOper.Id)
+                RenumberOperationInSpecialActions(lUci, lOper.Name, lOrigId, lOper.Id)
                 'now add the special actions records to the uci
-                'For Each lRecord In lUci.SpecialActionBlk.Records
-                '    lCombinedUci.SpecialActionBlk.Records.Add(lRecord)
-                'Next
+                For Each lRecord In lUci.SpecialActionBlk.Records
+                    If lRecord.SpecType = atcUCI.HspfData.HspfSpecialRecordType.hAction Or _
+                       lRecord.SpecType = atcUCI.HspfData.HspfSpecialRecordType.hCondition Or _
+                       lRecord.SpecType = atcUCI.HspfData.HspfSpecialRecordType.hUserDefineName Then
+                        If InStr(lRecord.Text, "+=         0.") <> 58 Then
+                            lCombinedUci.SpecialActionBlk.Records.Add(lRecord)
+                        End If
+                    End If
+                Next
 
             Next lOper
 
