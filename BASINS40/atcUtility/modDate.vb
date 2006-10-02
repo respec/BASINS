@@ -632,16 +632,14 @@ Public Module modDate
                 If (tc1 < tc2) Then
                     'adjust second time units to agree with first
                     Do While tc1 < tc2
-                        'UPGRADE_WARNING: Couldn't resolve default property of object convdn()
-                        ts2 = ts2 * convdn(tc2)
-                        tc2 = tc2 - 1
+                        ts2 *= convdn(tc2)
+                        tc2 -= 1
                     Loop
                 Else
                     'adjust first time units to agree with second
                     Do While tc2 < tc1
-                        'UPGRADE_WARNING: Couldn't resolve default property of object convdn()
-                        ts1 = ts1 * convdn(tc1)
-                        tc1 = tc1 - 1
+                        ts1 *= convdn(tc1)
+                        tc1 -= 1
                     Loop
                 End If
             End If
