@@ -517,7 +517,7 @@ ErrorWriting:
                     Optional ByRef aFilterIndex As Integer = 1) As String
         Dim lDir As String = CurDir()
         Dim lFileName As String = Trim(aDefaultFileName)
-        Dim lBaseFileName As String = IO.Path.GetFileName(lFileName) 'file name (with no path) of file we are looking for
+        Dim lBaseFileName As String = IO.Path.GetFileName(lFileName).ToLower 'file name (not path) of file we are looking for
         Dim lExePath As String
         Dim lDLLpath As String
 
@@ -546,16 +546,19 @@ ErrorWriting:
             '            aFilterIndex)
         Else
             If Not FileExists(lFileName, True) Then 'don't already know where it is, first look in registry
-                lFileName = GetSetting("FindFile", "FoundFiles", lBaseFileName.ToLower, "")
+
+                'First look where this function would put a file location
+                lFileName = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\VB and VBA Program Settings\FindFile\FoundFiles", lBaseFileName, "")
                 If lFileName.Length > 0 Then
                     If Not FileExists(lFileName) Then 'delete bad name in registry
-                        DeleteSetting("FindFile", "FoundFiles", lBaseFileName.ToLower)
+                        My.Computer.Registry.CurrentUser.DeleteValue("FindFile\FoundFiles\" & lBaseFileName)
                     End If
                 End If
-                'Look in another part of registry
-                'If Not FileExists(lFileName) Then
-                '  lRegistryFileName = pRegistry.RegGetString(HKEY_LOCAL_MACHINE, pLocalMachinePrefix & pAppName & "\" & pRegistrySection, pRegistryKey)
-                'End If
+
+                'Next, look in the part of the registry where installer puts file locations
+                If Not FileExists(lFileName) Then
+                    lFileName = My.Computer.Registry.GetValue("HKEY_LOCAL_MACHINE\SOFTWARE\AQUA TERRA Consultants\BASINS\files", lBaseFileName, "")
+                End If
             End If
 
             If Not FileExists(lFileName) AndAlso lBaseFileName.Length > 0 Then 'try some default locations if filename was specified, path was wrong or missing
@@ -606,7 +609,7 @@ ErrorWriting:
                 End With
 
                 If FileExists(lFileName) Then
-                    SaveSetting("FindFile", "FoundFiles", lBaseFileName.ToLower, lFileName)
+                    My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\VB and VBA Program Settings\FindFile\FoundFiles", lBaseFileName, lFileName)
                 End If
             End If
 
