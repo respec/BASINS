@@ -1,3 +1,5 @@
+Imports MapWinUtility
+
 Public Class frmFeedback
     Inherits System.Windows.Forms.Form
 
@@ -202,7 +204,7 @@ Public Class frmFeedback
         Me.Refresh()
 
         If aSystemInformation.Length = 0 Then
-            txtSystemInformation.Text = FeedbackSystemInformation()
+            txtSystemInformation.Text = FeedbackGenericSystemInformation()
         End If
 
         While Me.Visible
@@ -248,4 +250,27 @@ Public Class frmFeedback
         pSend = False
         Me.Hide()
     End Sub
+
+    Public Function FeedbackGenericSystemInformation() As String
+        'TODO: format as an html document?
+        Dim lSectionFooter As String = "___________________________" & vbCrLf
+        Dim lFeedback As String = "Feedback at " & Now.ToString("u") & vbCrLf
+        lFeedback &= "CommandLine: " & Environment.CommandLine & vbCrLf
+        lFeedback &= "User: " & Environment.UserName & vbCrLf
+        lFeedback &= "Machine: " & Environment.MachineName & vbCrLf
+        lFeedback &= "OSVersion: " & Environment.OSVersion.ToString & vbCrLf
+        lFeedback &= "CLRVersion: " & Environment.Version.ToString & vbCrLf
+        lFeedback &= "LogFile: " & Logger.FileName & vbCrLf
+        If IO.File.Exists(Logger.FileName) Then
+            Try
+                lFeedback &= WholeFileString(Logger.FileName) & vbCrLf
+            Catch e As Exception
+                lFeedback &= vbCrLf & "Logger file read failed, exception message:" & _
+                             vbCrLf & e.ToString & vbCrLf & vbCrLf
+            End Try
+        End If
+        lFeedback &= lSectionFooter
+
+        Return lFeedback
+    End Function
 End Class

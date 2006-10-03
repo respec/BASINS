@@ -146,9 +146,6 @@
     <Compile Include="frmButtons.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmFeedback.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="frmWelcomeScreenBasins.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -168,10 +165,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmButtons.resx">
       <DependentUpon>frmButtons.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmFeedback.resx">
-      <DependentUpon>frmFeedback.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmWelcomeScreenBasins.resx">
