@@ -63,4 +63,21 @@ Module modData
             Return False
         End If
     End Function
+
+    Public Function SetWDMAttribute(ByVal aTargetSpecification As String, _
+                                    ByVal aTargetId As Integer, _
+                                    ByVal aAttName As String, _
+                                    ByVal aAttVal As String) As Boolean
+        Dim lTargetDataSource As atcData.atcDataSource
+        lTargetDataSource = New atcWDM.atcDataSourceWDM
+        If lTargetDataSource.Open(aTargetSpecification) Then
+            Dim lTargetDataSet As atcTimeseries = lTargetDataSource.DataSets(lTargetDataSource.DataSets.IndexFromKey(aTargetId))
+            lTargetDataSet.EnsureValuesRead()
+            lTargetDataSet.Attributes.SetValue(aAttName, aAttVal)
+            Dim lResult As Boolean = lTargetDataSource.AddDataSet(lTargetDataSet, atcData.atcDataSource.EnumExistAction.ExistReplace)
+            Return lResult
+        Else
+            Return False
+        End If
+    End Function
 End Module

@@ -585,7 +585,7 @@ Public Class UCICombiner
                         If Not lMetSegRec.Source.VolName Is Nothing Then
                             Logger.Dbg("CombineUcis:VolId:" & lMetSegRec.Source.VolId)
                             lWdmIndex = CInt(Mid(CStr(lMetSegRec.Source.VolId), 2, 1))
-                            lOrigDsn = CInt(Mid(CStr(lMetSegRec.Source.VolId), 1, 1) & "0" & Mid(CStr(lMetSegRec.Source.VolId), 3, 2))
+                            lOrigDsn = CInt(Mid(CStr(lMetSegRec.Source.VolId), 1, 1) & "0" & Mid(CStr(lMetSegRec.Source.VolId), 3, 2))    
                             If lMetSegRec.Source.VolName = "WDM1" Then
                                 CopyDataSet("wdm", aMetWDMNames(lWdmIndex), lOrigDsn, _
                                             "wdm", "base.wdm", lMetSegRec.Source.VolId)
@@ -594,6 +594,8 @@ Public Class UCICombiner
                                             "wdm", "base.wdm", lMetSegRec.Source.VolId)
                                 lMetSegRec.Source.VolName = "WDM1"
                             End If
+                            SetWDMAttribute("base.wdm", lMetSegRec.Source.VolId, "idscen", "OBSERVED")
+                            SetWDMAttribute("base.wdm", lMetSegRec.Source.VolId, "idlocn", "SEG" & CStr(lWdmIndex))
                         End If
                     End If
                 Next
@@ -607,9 +609,11 @@ Public Class UCICombiner
                         If lConn.Source.VolName = "WDM3" Then
                             CopyDataSet("wdm", "..\" & aPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, _
                                         "wdm", "ptsrc.wdm", lConn.Source.VolId)
+                            SetWDMAttribute("ptsrc.wdm", lConn.Source.VolId, "idscen", "PT-OBS")
                         ElseIf lConn.Source.VolName = "WDM2" Then
                             CopyDataSet("wdm", aPrecWDMNames(lWdmIndex), lOrigDsn, _
                                         "wdm", "base.wdm", lConn.Source.VolId)
+                            SetWDMAttribute("base.wdm", lConn.Source.VolId, "idscen", "OBSERVED")
                             lConn.Source.VolName = "WDM1"
                         End If
                     End If
@@ -622,7 +626,8 @@ Public Class UCICombiner
                         lOrigDsn = CInt("1" & Mid(CStr(lConn.Target.VolId), 2, 2))
                         CopyDataSet("wdm", "..\" & aOutputWDMNames(lConn.Source.VolId), lOrigDsn, _
                                     "wdm", "output.wdm", lConn.Target.VolId)
-
+                        SetWDMAttribute("output.wdm", lConn.Target.VolId, "idscen", "BASE")
+                        SetWDMAttribute("output.wdm", lConn.Target.VolId, "idlocn", "RIV" & CStr(lOper.Id))
                     End If
                 Next lConn
             Next lOper
