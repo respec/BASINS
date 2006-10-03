@@ -501,18 +501,52 @@ Public Class atcBasinsPlugIn
     End Function
 
     Private Sub SendFeedback()
-        Dim lSystemInformation As String = ""
         Dim lName As String = ""
         Dim lEmail As String = ""
         Dim lMessage As String = ""
 
         Dim lFeedbackForm As New frmFeedback
-        If lFeedbackForm.ShowFeedback(lName, lEmail, lMessage, lSystemInformation) Then
+
+        'TODO: format as an html document?
+        Dim lFeedback As String = lFeedbackForm.FeedbackGenericSystemInformation()
+        Dim lSectionFooter As String = "___________________________" & vbCrLf
+
+        lFeedback &= "Project: " & g_MapWin.Project.FileName & vbCrLf
+        lFeedback &= "Config: " & g_MapWin.Project.ConfigFileName & vbCrLf
+
+        'plugin info
+        lFeedback &= vbCrLf & "Plugins loaded:" & vbCrLf
+        Dim lLastPlugIn As Integer = g_MapWin.Plugins.Count() - 1
+        For iPlugin As Integer = 0 To lLastPlugIn
+            Dim lCurPlugin As MapWindow.Interfaces.IPlugin = g_MapWin.Plugins.Item(iPlugin)
+            If Not lCurPlugin Is Nothing Then
+                With lCurPlugin
+                    lFeedback &= .Name & vbTab & .Version & vbTab & .BuildDate & vbCrLf
+                End With
+            End If
+        Next
+        lFeedback &= lSectionFooter
+
+        'TODO: add map layers info?
+        lFeedback &= vbCrLf & "Information from MapWinUtility.MiscUtils.GetDebugInfo" & vbCrLf & _
+                              MapWinUtility.MiscUtils.GetDebugInfo & vbCrLf & vbCrLf
+
+        Dim lSkipFilename As Integer = g_BasinsDir.Length
+        lFeedback &= vbCrLf & "Files in " & g_BasinsDir & vbCrLf
+
+        Dim lallFiles As New NameValueCollection
+        AddFilesInDir(lallFiles, g_BasinsDir, True)
+        'lFeedback &= vbCrLf & "Modified" & vbTab & "Size" & vbTab & "Filename" & vbCrLf
+        For Each lFilename As String In lallFiles
+            lFeedback &= FileDateTime(lFilename).ToString("yyyy-MM-dd HH:mm:ss") & vbTab & StrPad(Format(FileLen(lFilename), "#,###"), 10) & vbTab & lFilename.Substring(lSkipFilename) & vbCrLf
+        Next
+
+        If lFeedbackForm.ShowFeedback(lName, lEmail, lMessage, lFeedback) Then
             Dim lFeedbackCollection As New NameValueCollection
             lFeedbackCollection.Add("name", Trim(lName))
             lFeedbackCollection.Add("email", Trim(lEmail))
             lFeedbackCollection.Add("message", Trim(lMessage))
-            lFeedbackCollection.Add("sysinfo", lSystemInformation)
+            lFeedbackCollection.Add("sysinfo", lFeedback)
             Dim lClient As New System.Net.WebClient
             lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
             Logger.Msg("Feedback successfully sent", "Send Feedback")
