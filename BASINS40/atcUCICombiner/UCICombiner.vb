@@ -97,13 +97,23 @@ Public Class UCICombiner
 
         'change operation number in all special actions
         Dim lRecord As atcUCI.HspfSpecialRecord
+        Dim lUvQuanIndex As Integer
         RenumberOperationInSpecialActions(lCombinedUci, "PERLND", lOrigId, lOper.Id)
         i = 1
         Do While i < lCombinedUci.SpecialActionBlk.Records.Count
             lRecord = lCombinedUci.SpecialActionBlk.Records(i)
             If InStr(lRecord.Text, "+=         0.") = 58 Then
                 lCombinedUci.SpecialActionBlk.Records.Remove(i)
+            ElseIf lRecord.SpecType = atcUCI.HspfData.HspfSpecialRecordType.hUserDefineQuan And _
+                Mid(lRecord.Text, 1, 16) = "  UVQUAN prec   " Then
+                'need one of these for each met segment
+                lRecord.Text = "  UVQUAN prec1  " & Mid(lRecord.Text, 17)
+                lUvQuanIndex = i
             Else
+                If Mid(lRecord.Text, 1, 9) = "IF (prec " Then
+                    'update to reflect met segment number
+                    lRecord.Text = "IF (prec1 " & Mid(lRecord.Text, 10)
+                End If
                 i = i + 1
             End If
         Loop
@@ -178,7 +188,7 @@ Public Class UCICombiner
                     lOper.FTable.Id = lNewOperId
                     lOper.Tables("HYDR-PARM2").parmvalue("FTBUCI") = lNewOperId
                     'make note of which met segment this uci uses
-                    For i = 1 To lUci.FilesBlock.Count
+                    For i = 1 To lPrecWDMNames.Count
                         If lPrecWDMNames(i) = lUci.FilesBlock.Value(2).Name Then
                             lMetSegCounter = i * 100
                             Exit For
@@ -214,16 +224,6 @@ Public Class UCICombiner
                             i = i + 1
                         End If
                     Next lConn
-                    ''remove all the pt src, septic, diversions for now
-                    ''(until we get the full wdms from cbp)
-                    'i = 1
-                    'For Each lConn In lOper.Sources
-                    '    If lConn.Source.VolName = "WDM3" Then
-                    '        lOper.Sources.Remove(i)
-                    '    Else
-                    '        i = i + 1
-                    '    End If
-                    'Next lConn
                     'renumber data sets to reflect met seg number
                     For Each lConn In lOpn.Sources
                         If lConn.Target.VolName = lOper.Name Then
@@ -257,6 +257,10 @@ Public Class UCICombiner
                     If lRecord.SpecType = atcUCI.HspfData.HspfSpecialRecordType.hAction Or _
                        lRecord.SpecType = atcUCI.HspfData.HspfSpecialRecordType.hCondition Or _
                        lRecord.SpecType = atcUCI.HspfData.HspfSpecialRecordType.hUserDefineName Then
+                        If Mid(lRecord.Text, 1, 9) = "IF (prec " Then
+                            'update to reflect met segment number
+                            lRecord.Text = "IF (prec" & Mid(CStr(lOper.Id), 1, 1) & " " & Mid(lRecord.Text, 10)
+                        End If
                         If InStr(lRecord.Text, "+=         0.") <> 58 Then
                             lCombinedUci.SpecialActionBlk.Records.Add(lRecord)
                         End If
@@ -276,6 +280,16 @@ Public Class UCICombiner
 
         'convert back to met segs to look nice in the save
         lCombinedUci.Source2MetSeg()
+
+        'add uvquans for each met segment
+        lRecord = lCombinedUci.SpecialActionBlk.Records(lUvQuanIndex)
+        For i = 2 To lTotalMetSegCount
+            Dim lNewRecord As New atcUCI.HspfSpecialRecord
+            lNewRecord.SpecType = lRecord.SpecType
+            lNewRecord.Text = "  UVQUAN prec" & CStr(i) & "  " & Mid(lRecord.Text, 17, 7) & CStr(i) & Mid(lRecord.Text, 25)
+            lCombinedUci.SpecialActionBlk.Records.Add(lNewRecord, , , lUvQuanIndex)
+            lUvQuanIndex = lUvQuanIndex + 1
+        Next i
 
         'combine the WDM files used by the combined UCI
         ChDir(lWorkingDir & "combined")

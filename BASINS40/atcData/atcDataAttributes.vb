@@ -170,6 +170,7 @@ Public Class atcDataAttributes
     End Function
 
     Public Sub SetValue(ByVal aAttributeName As String, ByVal aAttributeValue As Object)
+        'todo: force a read of data here with EnsureValuesRead?
         Add(aAttributeName, aAttributeValue)
     End Sub
 
