@@ -1,8 +1,8 @@
 Public Class frmStatus
-  Inherits System.Windows.Forms.Form
+    Inherits System.Windows.Forms.Form
 
-  Public Const LastLabel As Integer = 5
-  Public Exiting As Boolean = False
+    Private Const pLastLabel As Integer = 5
+    Public Exiting As Boolean = False
 
 #Region " Windows Form Designer generated code "
 
@@ -151,36 +151,42 @@ Public Class frmStatus
 
 #End Region
 
-  Public Property Label(ByVal aIndex As Integer) As String
-    Get
-      Select Case aIndex
-        Case 0 : Return Me.Text
-        Case 1 : Return lblTop.Text
-        Case 2 : Return lblLeft.Text
-        Case 3 : Return lblMiddle.Text
-        Case 4 : Return lblRight.Text
-        Case 5 : Return lblBottom.Text
-        Case Else : Return ""
-      End Select
-    End Get
-    Set(ByVal aNewValue As String)
-      Select Case aIndex
-        Case 0 : Me.Text = aNewValue
-        Case 1 : lblTop.Text = aNewValue
-        Case 2 : lblLeft.Text = aNewValue
-        Case 3 : lblMiddle.Text = aNewValue
-        Case 4 : lblRight.Text = aNewValue
-        Case 5 : lblBottom.Text = aNewValue
-      End Select
-    End Set
-  End Property
+    Public ReadOnly Property LastLabel() As Integer
+        Get
+            Return pLastLabel
+        End Get
+    End Property
 
-  Public Sub Clear()
-    For iLabel As Integer = 0 To LastLabel
-      Label(iLabel) = ""
-    Next
-    txtLog.Clear()
-  End Sub
+    Public Property Label(ByVal aIndex As Integer) As String
+        Get
+            Select Case aIndex
+                Case 0 : Return Me.Text
+                Case 1 : Return lblTop.Text
+                Case 2 : Return lblLeft.Text
+                Case 3 : Return lblMiddle.Text
+                Case 4 : Return lblRight.Text
+                Case 5 : Return lblBottom.Text
+                Case Else : Return ""
+            End Select
+        End Get
+        Set(ByVal aNewValue As String)
+            Select Case aIndex
+                Case 0 : Me.Text = aNewValue
+                Case 1 : lblTop.Text = aNewValue
+                Case 2 : lblLeft.Text = aNewValue
+                Case 3 : lblMiddle.Text = aNewValue
+                Case 4 : lblRight.Text = aNewValue
+                Case 5 : lblBottom.Text = aNewValue
+            End Select
+        End Set
+    End Property
+
+    Public Sub Clear()
+        For iLabel As Integer = 0 To LastLabel
+            Label(iLabel) = ""
+        Next
+        txtLog.Clear()
+    End Sub
 
   'Private Sub frmStatus_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
   '  MsgBox(New StackTrace(True).ToString, , "frmStatus_Closing")
@@ -200,10 +206,10 @@ Public Class frmStatus
   '  MsgBox(New StackTrace(True).ToString, , "frmStatus_Disposed")
   'End Sub
 
-  Private Sub frmStatus_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
-    If Not Exiting Then
-      e.Cancel = True
-      Me.Hide()
-    End If
-  End Sub
+    Private Sub frmStatus_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
+        If Not Exiting Then
+            e.Cancel = True
+            Me.Hide()
+        End If
+    End Sub
 End Class
