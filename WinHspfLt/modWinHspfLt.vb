@@ -86,9 +86,9 @@ Module modWinHSPFLt
             Logger.Dbg(" PipeReadFromStatus:" & pPipeReadFromStatus)
 
             Logger.Dbg("F90_W99OPN") : Call F90_W99OPN() 'open error file for fortan problems
-            'Logger.Dbg("F90_WDBFIN") : Call F90_WDBFIN() 'initialize WDM record buffer
+            Logger.Dbg("F90_WDBFIN") : Call F90_WDBFIN() 'initialize WDM record buffer
             Logger.Dbg("F90_PUTOLV") : Call F90_PUTOLV(10)
-            'Logger.Dbg("F90_SCNDBG") : Call F90_SCNDBG(10)
+            'Logger.Dbg("F90_SCNDBG") : Call F90_SCNDBG(10) 'lots of debugging
             Logger.Dbg("F90_SPIPH") : Call F90_SPIPH(pPipeReadFromStatus, pPipeWriteToStatus)
 
             pMsgName = FindFile("HSPF Message File", "hspfmsg.wdm")
@@ -187,10 +187,8 @@ Friend Class StatusMonitor
             Try
                 Dim lProcessId As Integer = Process.GetCurrentProcess.Id
                 pProcess = New Process
-                pProcess.StartInfo.FileName = "D:\Basins\models\HSPF\bin\status.exe"
-                'pProcess.StartInfo.FileName = "C:\dev\BASINS40\atcStatusMonitor\obj\Release\StatusMonitor.exe"
-                pProcess.StartInfo.Arguments = lProcessId '& " " & CurDir() & "\" & Logger.FileName
-                'Dim lMemoryStream As New IO.MemoryStream
+                pProcess.StartInfo.FileName = FindFile("Status Monitor", "status.exe")
+                pProcess.StartInfo.Arguments = lProcessId
                 pProcess.StartInfo.UseShellExecute = False
                 pProcess.StartInfo.RedirectStandardInput = True
                 pProcess.StartInfo.RedirectStandardOutput = True
@@ -206,7 +204,9 @@ Friend Class StatusMonitor
         End If
         WriteTokenToPipe(aStatusMessage)
         If aStatusMessage.ToLower = "exit" Then
-            pProcess.Kill()
+            If Not pProcess.HasExited Then
+                pProcess.Kill()
+            End If
         End If
     End Sub
 
@@ -217,7 +217,6 @@ Friend Class StatusMonitor
 
         OpenParenEscape = Chr(6)
         CloseParenEscape = Chr(7)
-        WriteTokenToPipe = False
 
         If Not IsNothing(pProcess) Then
             If pProcess.HasExited Then
