@@ -1,9 +1,8 @@
 Option Strict Off
 Option Explicit On
 
-Imports System.Collections.Specialized
-Imports MapWinUtility
-Imports atcUtility
+Imports MapWinUtility 'for Logger
+Imports atcUtility 'for StrRetRem, StrFirstInt, FindFile, FilenameOnly, FilenameSetExt, WholdFileString, frmFeedBack
 
 Module modWinHSPFLt
     Declare Sub F90_W99OPN Lib "hass_ent.dll" ()
@@ -31,35 +30,24 @@ Module modWinHSPFLt
     Declare Sub F90_SIMSCN Lib "hass_ent.dll" _
         (ByRef aRetcod As Integer)
 
-    Private pMsgUnit As Integer
-    Private pMsgName As String
-    Private pWdmUnit(4) As Integer
-    Private pIPC As Object 'ATCoIPC
-    Private pUci As String = ""
-    Private pFileName As String = ""
     Friend pPipeWriteToStatus As Integer = 0
     Friend pPipeReadFromStatus As Integer = 0
 
     Public Sub Main()
-        Dim lRetcod As Integer
-        Dim lInd As Integer
-        Dim lOpt As Integer
-        Dim lExeCmd As String 'command line
-        Dim lErrLogName As String = "WinHspfLt.log"
-        Dim lErrLogFlag As Boolean
-        Dim lMsg As String
-
         Try
-            lErrLogFlag = False
-            lExeCmd = Environment.CommandLine
+            Dim lErrLogName As String = "WinHspfLt.log"
+            Dim lErrLogFlag As Boolean = False
 
-            lInd = InStr(LCase(lExeCmd), "/log")
+            Dim lExeCmd As String = Environment.CommandLine
+
+            Dim lInd As Integer = InStr(LCase(lExeCmd), "/log")
             If lInd > 0 Then
                 Logger.StartToFile(lErrLogName, False, False, True)
                 Logger.Dbg("CommandLine '" & lExeCmd & "'")
                 lErrLogFlag = True
                 lExeCmd = Trim(Left(lExeCmd, lInd - 1) & Mid(lExeCmd, lInd + 4))
             End If
+
             Logger.Dbg("ExeName '" & StrRetRem(lExeCmd) & "'")
             Logger.Dbg("CommandLineArgs '" & lExeCmd & "'")
 
@@ -91,58 +79,68 @@ Module modWinHSPFLt
             'Logger.Dbg("F90_SCNDBG") : Call F90_SCNDBG(10) 'lots of debugging
             Logger.Dbg("F90_SPIPH") : Call F90_SPIPH(pPipeReadFromStatus, pPipeWriteToStatus)
 
-            pMsgName = FindFile("HSPF Message File", "hspfmsg.wdm")
-            Logger.Dbg("MsgName = " & pMsgName)
-            lOpt = 1
-            F90_WDBOPNR(lOpt, pMsgName, pMsgUnit, lRetcod, Len(pMsgName))
+            Dim lMsgName As String = FindFile("HSPF Message File", "hspfmsg.wdm")
+            Logger.Dbg("MsgName = " & lMsgName)
 
-            If pMsgUnit <> 0 Then
+            Dim lOpt As Integer = 1
+            Dim lMsgUnit As Integer
+            Dim lRetcod As Integer
+            F90_WDBOPNR(lOpt, lMsgName, lMsgUnit, lRetcod, Len(lMsgName))
+
+            If lMsgUnit <> 0 Then
+                Dim lFileName As String = ""
                 If FileExists(lExeCmd) Then
-                    pFileName = lExeCmd
+                    lFileName = lExeCmd
                 Else
-                    pFileName = FindFile("WinHspf UCI File Selection", _
+                    lFileName = FindFile("WinHspf UCI File Selection", _
                                          lExeCmd, , "Uci Files(*.uci)|*.uci", _
                                          True, True)
                 End If
-                If pFileName.Length > 0 Then
-                    pUci = FilenameOnly(pFileName)
+
+                Dim lUci As String = ""
+                If lFileName.Length > 0 Then
+                    lUci = FilenameOnly(lFileName)
                 End If
 
-                If pUci.Length > 0 Then
-                    Logger.Status("Open")
-                    lErrLogName = FilenameSetExt(pFileName, "log")
+                If lUci.Length > 0 Then
+                    lErrLogName = FilenameSetExt(lFileName, "log")
                     If lErrLogFlag Then
                         Logger.Dbg("ChangeLogFileTO:" & lErrLogName)
                     End If
+                    Logger.Status("Open")
                     Logger.StartToFile(lErrLogName, False, False, True)
                     Logger.Status("(LOGTOFILE " & lErrLogName & ")")
-                    lOpt = -1
 
-                    Logger.Dbg("Pre:  F90_ACTSCN (" & lOpt & ", " & pWdmUnit(1) & ", " & pMsgUnit & ", " & lRetcod & ", " & pUci & ", " & Len(pUci) & ")")
-                    Call F90_ACTSCN(lOpt, pWdmUnit(1), pMsgUnit, lRetcod, pUci, Len(pUci))
-                    Logger.Dbg("Post: F90_ACTSCN (" & lOpt & ", " & pWdmUnit(1) & ", " & pMsgUnit & ", " & lRetcod & ", " & pUci & ", " & Len(pUci) & ")")
+                    Dim lWdmUnit(4) As Integer
+                    lOpt = -1
+                    Logger.Dbg("Pre:  F90_ACTSCN (" & lOpt & ", " & lWdmUnit(1) & ", " & lMsgUnit & ", " & lRetcod & ", " & lUci & ", " & Len(lUci) & ")")
+                    Call F90_ACTSCN(lOpt, lWdmUnit(1), lMsgUnit, lRetcod, lUci, Len(lUci))
+                    Logger.Dbg("Post: F90_ACTSCN (" & lOpt & ", " & lWdmUnit(1) & ", " & lMsgUnit & ", " & lRetcod & ", " & lUci & ", " & Len(lUci) & ")")
+
                     If lRetcod = 0 Then
                         Logger.Dbg("Pre:  F90_SIMSCN (" & lRetcod & ")")
                         Call F90_SIMSCN(lRetcod)
                         Logger.Dbg("Post: F90_SIMSCN (" & lRetcod & ")")
                     End If
+
                     If lRetcod <> 0 Then
-                        lMsg = "HSPF execution terminated with return code " & CStr(lRetcod) & "." & vbCrLf
-                        Logger.Status(lMsg)
-                        Throw New Exception(lMsg)
+                        Throw New Exception("HSPF execution terminated with return code " & CStr(lRetcod) & "." & vbCrLf)
                     End If
                 End If
             Else
-                lMsg = "HSPF message file '" & pMsgName & "' is not valid. Code " & lRetcod & vbCrLf
-                Throw New Exception(lMsg)
+                Throw New Exception("HSPF message file '" & lMsgName & "' is not valid. Code " & lRetcod & vbCrLf)
             End If
+
         Catch ex As Exception
-            lMsg = "Fatal Error: " & ex.Message
+            Dim lMsg As String = "Fatal Error: " & ex.Message
+            Logger.Status(lMsg)
             If Logger.Msg(lMsg & vbCrLf & vbCrLf & "Send a feedback message to the WinHSPFLt development team.", _
                           MsgBoxStyle.YesNo, _
                           MsgBoxResult.No, "HSPF Error") = MsgBoxResult.Yes Then
                 Dim lStr As String = ""
-                If Logger.FileName.Length > 0 Then lStr = WholeFileString(Logger.FileName)
+                If Logger.FileName.Length > 0 Then
+                    lStr = WholeFileString(Logger.FileName)
+                End If
                 ShowFeedback(lStr)
             End If
         End Try
@@ -158,7 +156,7 @@ Module modWinHSPFLt
         Dim lMessage As String = ""
         Dim lFeedback As String = ""
         If lfrmFeedback.ShowFeedback(lName, lEmail, lMessage, lFeedback) Then
-            Dim lFeedbackCollection As New NameValueCollection
+            Dim lFeedbackCollection As New System.Collections.Specialized.NameValueCollection
             lFeedbackCollection.Add("name", Trim(lName))
             lFeedbackCollection.Add("email", Trim(lEmail))
             lFeedbackCollection.Add("message", Trim(lMessage))
@@ -176,7 +174,7 @@ Friend Class StatusMonitor
     Dim pInit As Boolean = False
     Dim pProcess As Process
 
-    Public Sub Progress(ByVal CurrentPosition As Integer, ByVal LastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
+    Public Sub Progress(ByVal aCurrentPosition As Integer, ByVal aLastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
 
     End Sub
 
@@ -200,7 +198,9 @@ Friend Class StatusMonitor
                 Logger.Msg("StatusProcessStartError:" & ex.Message)
             End Try
         End If
-        WriteTokenToPipe(aStatusMessage)
+
+        WriteStatus(aStatusMessage)
+
         If aStatusMessage.ToLower = "exit" Then
             If Not pProcess.HasExited Then
                 pProcess.Kill()
@@ -208,15 +208,10 @@ Friend Class StatusMonitor
         End If
     End Sub
 
-    Private Function WriteTokenToPipe(ByVal aMsg As String) As Boolean
-        Dim OpenParenEscape As String = Chr(6)
-        Dim CloseParenEscape As String = Chr(7)
-        Dim lpExitCode As Integer
-
+    Private Function WriteStatus(ByVal aMsg As String) As Boolean
         If Not IsNothing(pProcess) Then
             If pProcess.HasExited Then
-                lpExitCode = pProcess.ExitCode
-                If lpExitCode <> &H103S Then 'TODO: check to be sure codes have not changed
+                If pProcess.ExitCode <> &H103S Then 'TODO: check to be sure codes have not changed
                     Return False  'Process at other end of pipe is dead, stop talking to it
                 End If
             End If
@@ -225,9 +220,12 @@ Friend Class StatusMonitor
         If Left(aMsg, 1) = "(" And Right(aMsg, 1) = ")" Then
             aMsg = Mid(aMsg, 2, Len(aMsg) - 2)
         End If
-        aMsg = ReplaceString(aMsg, "(", OpenParenEscape)
-        aMsg = ReplaceString(aMsg, ")", CloseParenEscape)
+
         If aMsg.Length > 0 Then
+            Dim OpenParenEscape As String = Chr(6)
+            aMsg = ReplaceString(aMsg, "(", OpenParenEscape)
+            Dim CloseParenEscape As String = Chr(7)
+            aMsg = ReplaceString(aMsg, ")", CloseParenEscape)
             If Asc(Right(aMsg, 1)) > 31 Then
                 aMsg = "(" & aMsg & ")"
             End If
