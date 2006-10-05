@@ -84,9 +84,6 @@
     <Compile Include="modWinHspfLt.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UtilPipe.vb">
-      <SubType>Code</SubType>
-    </Compile>
     <Content Include="WinHspfLt.ico" />
   </ItemGroup>
   <ItemGroup>
