@@ -5,12 +5,12 @@ Public Class PlugIn
 
     Private pMapWin As MapWindow.Interfaces.IMapWin
 
-    Private Const ParentMenuName As String = "BasinsAnalysis"
-    Private Const ParentMenuString As String = "&Analysis"
+    Private Const ParentMenuName As String = "BasinsModels"
+    Private Const ParentMenuString As String = "Models"
 
     Public ReadOnly Property Name() As String Implements MapWindow.Interfaces.IPlugin.Name
         Get
-            Return "Analysis::Pollutant Loading Estimator"
+            Return "Pollutant Loading Estimator (PLOAD)"
         End Get
     End Property
 
@@ -46,18 +46,27 @@ Public Class PlugIn
 
     <CLSCompliant(False)> _
     Public Sub Initialize(ByVal MapWin As MapWindow.Interfaces.IMapWin, ByVal ParentHandle As Integer) Implements MapWindow.Interfaces.IPlugin.Initialize
+        Dim mnu As MapWindow.Interfaces.MenuItem
+
         pMapWin = MapWin
-        pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
-        pMapWin.Menus.AddMenu(ParentMenuName & "_PollutantLoading", ParentMenuName, Nothing, "&Pollutant Loading Estimator")
+
+        If Not pMapWin.Plugins.PluginIsLoaded(pMapWin.Plugins.GetPluginKey("BASINS 4")) Then
+            pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
+        End If
+        mnu = pMapWin.Menus.AddMenu(ParentMenuName & "_PLOAD", ParentMenuName, Nothing, "PLOAD")
+        mnu.Enabled = True
+
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        pMapWin.Menus.Remove(ParentMenuName)
-        pMapWin.Menus.Remove(ParentMenuName & "_PollutantLoading")
+        pMapWin.Menus.Remove(ParentMenuName & "_PLOAD")
+        If pMapWin.Menus.Item(ParentMenuName).NumSubItems = 0 Then
+            pMapWin.Menus.Remove(ParentMenuName)
+        End If
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
-        If ItemName = ParentMenuName & "_PollutantLoading" Then
+        If ItemName = ParentMenuName & "_PLOAD" Then
             GisUtil.MappingObject = pMapWin
             Dim main As New frmModelSetup
             main.InitializeUI()
