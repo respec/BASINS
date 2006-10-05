@@ -138,11 +138,9 @@ Module modWinHSPFLt
             End If
         Catch ex As Exception
             lMsg = "Fatal Error: " & ex.Message
-            If Logger.Message(lMsg & vbCrLf & vbCrLf & "Send a feedback message to the WinHSPFLt development team.", _
-                                  "HSPF Error", _
-                                  MessageBoxButtons.YesNo, _
-                                  MessageBoxIcon.Error, _
-                                  MessageBoxDefaultButton.Button2) = MsgBoxResult.Yes Then
+            If Logger.Msg(lMsg & vbCrLf & vbCrLf & "Send a feedback message to the WinHSPFLt development team.", _
+                          MsgBoxStyle.YesNo, _
+                          MsgBoxResult.No, "HSPF Error") = MsgBoxResult.Yes Then
                 Dim lStr As String = ""
                 If Logger.FileName.Length > 0 Then lStr = WholeFileString(Logger.FileName)
                 ShowFeedback(lStr)
@@ -211,12 +209,9 @@ Friend Class StatusMonitor
     End Sub
 
     Private Function WriteTokenToPipe(ByVal aMsg As String) As Boolean
-        Dim OpenParenEscape As String
-        Dim CloseParenEscape As String
+        Dim OpenParenEscape As String = Chr(6)
+        Dim CloseParenEscape As String = Chr(7)
         Dim lpExitCode As Integer
-
-        OpenParenEscape = Chr(6)
-        CloseParenEscape = Chr(7)
 
         If Not IsNothing(pProcess) Then
             If pProcess.HasExited Then
