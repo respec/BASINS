@@ -775,7 +775,7 @@ Public Module modString
         ' ##LOCAL retval - number found at beginning of Source
         ' ##LOCAL pos - long character position in search through Source
 
-        If IsNumeric(Left(Source, 2)) Then pos = 3 'account for negative number - sign
+        If Source.StartsWith("-") AndAlso IsNumeric(Left(Source, 2)) Then pos = 3 'account for negative number - sign
         While IsNumeric(Mid(Source, pos, 1))
             pos += 1
         End While

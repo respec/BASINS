@@ -545,8 +545,7 @@ ErrorWriting:
             '            aChDir2FileDir, _
             '            aFilterIndex)
         Else
-            If Not FileExists(lFileName, True) Then 'don't already know where it is, first look in registry
-
+            If lBaseFileName.Length > 0 AndAlso Not FileExists(lFileName, True) Then 'don't already know where it is, first look in registry
                 'First look where this function would put a file location
                 lFileName = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\VB and VBA Program Settings\FindFile\FoundFiles", lBaseFileName, "")
                 If lFileName.Length > 0 Then
@@ -608,7 +607,7 @@ ErrorWriting:
                     End If
                 End With
 
-                If FileExists(lFileName) Then
+                If lBaseFileName.Length > 0 AndAlso FileExists(lFileName) Then
                     My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\VB and VBA Program Settings\FindFile\FoundFiles", lBaseFileName, lFileName)
                 End If
             End If

@@ -37,15 +37,14 @@ Module modWinHSPFLt
     Private pIPC As Object 'ATCoIPC
     Private pUci As String = ""
     Private pFileName As String = ""
-    Private pPipeWriteToStatus As Integer
-    Private pPipeReadFromStatus As Integer
+    Friend pPipeWriteToStatus As Integer = 0
+    Friend pPipeReadFromStatus As Integer = 0
 
     Public Sub Main()
         Dim lRetcod As Integer
         Dim lInd As Integer
         Dim lOpt As Integer
         Dim lExeCmd As String 'command line
-        Dim lExeName As String
         Dim lErrLogName As String = "WinHspfLt.log"
         Dim lErrLogFlag As Boolean
         Dim lMsg As String
@@ -53,84 +52,85 @@ Module modWinHSPFLt
         Try
             lErrLogFlag = False
             lExeCmd = Environment.CommandLine
-            lExeName = StrRetRem(lExeCmd)
-            Logger.Dbg("CommandLineArgs: '" & lExeCmd & "'")
 
             lInd = InStr(LCase(lExeCmd), "/log")
             If lInd > 0 Then
                 Logger.StartToFile(lErrLogName, False, False, True)
+                Logger.Dbg("CommandLine '" & lExeCmd & "'")
                 lErrLogFlag = True
                 lExeCmd = Trim(Left(lExeCmd, lInd - 1) & Mid(lExeCmd, lInd + 4))
             End If
-            Logger.Dbg(" AftLogX: '" & lExeCmd & "' ErrLogFlag:" & lErrLogFlag)
+            Logger.Dbg("ExeName '" & StrRetRem(lExeCmd) & "'")
+            Logger.Dbg("CommandLineArgs '" & lExeCmd & "'")
 
             lInd = InStr(LCase(lExeCmd), "/batch")
             If lInd > 0 Then
                 Logger.DisplayMessageBoxes = False
-                lExeCmd = Trim(Left(lExeCmd, lInd - 1) & Mid(lExeCmd, lInd + 4))
+                lExeCmd = Trim(Left(lExeCmd, lInd - 1) & Mid(lExeCmd, lInd + 6))
             End If
-            Logger.Dbg(" AfBatch: '" & lExeCmd & "' MsgBoxDisplay:" & Logger.DisplayMessageBoxes)
+            Logger.Dbg(" AfterBatchCheck: '" & lExeCmd & "' MsgBoxDisplay:" & Logger.DisplayMessageBoxes)
 
             pPipeReadFromStatus = StrFirstInt(lExeCmd)
             pPipeWriteToStatus = StrFirstInt(lExeCmd)
-            Logger.Dbg(" AftPipX: '" & lExeCmd & "'")
+            Logger.Dbg(" AftPipX: '" & lExeCmd & "' FromStatus " & pPipeReadFromStatus & " ToStatus " & pPipeWriteToStatus)
+
             If pPipeWriteToStatus = 0 Or pPipeReadFromStatus = 0 Then
-                Logger.Dbg(" Set pIPC")
-                pIPC = CreateObject("ATCoCtl.ATCoIPC")
-                pPipeReadFromStatus = pIPC.hPipeReadFromProcess(0)
-                pPipeWriteToStatus = pIPC.hPipeWriteToProcess(0)
+                Logger.ProgressStatus = New StatusMonitor
+                Logger.Status("Begin") 'set handles but don't open
             End If
+
+            Logger.Dbg("StartPath:" & CurDir())
             If pPipeWriteToStatus = -1 Then pPipeWriteToStatus = 0
             If pPipeReadFromStatus = -1 Then pPipeReadFromStatus = 0
             Logger.Dbg(" PipeWriteToStatus:" & pPipeWriteToStatus)
             Logger.Dbg(" PipeReadFromStatus:" & pPipeReadFromStatus)
 
-            writeStatus("StartPath:" & CurDir())
-            writeStatus("exename " & lExeName)
+            Logger.Dbg("F90_W99OPN") : Call F90_W99OPN() 'open error file for fortan problems
+            'Logger.Dbg("F90_WDBFIN") : Call F90_WDBFIN() 'initialize WDM record buffer
+            Logger.Dbg("F90_PUTOLV") : Call F90_PUTOLV(10)
+            'Logger.Dbg("F90_SCNDBG") : Call F90_SCNDBG(10)
+            Logger.Dbg("F90_SPIPH") : Call F90_SPIPH(pPipeReadFromStatus, pPipeWriteToStatus)
 
-            writeStatus("F90_W99OPN") : Call F90_W99OPN() 'open error file for fortan problems
-            'writeStatus("F90_WDBFIN") : Call F90_WDBFIN() 'initialize WDM record buffer
-            writeStatus("F90_PUTOLV") : Call F90_PUTOLV(10)
-            'writeStatus("F90_SCNDBG") : Call F90_SCNDBG(10)
-            writeStatus("F90_SPIPH") : Call F90_SPIPH(pPipeReadFromStatus, pPipeWriteToStatus)
-
-            pMsgName = FindFile("hspfmsg.wdm")
-            writeStatus("pMsgName = " & pMsgName)
+            pMsgName = FindFile("HSPF Message File", "hspfmsg.wdm")
+            Logger.Dbg("MsgName = " & pMsgName)
             lOpt = 1
             F90_WDBOPNR(lOpt, pMsgName, pMsgUnit, lRetcod, Len(pMsgName))
 
             If pMsgUnit <> 0 Then
-                pFileName = FindFile("WinHspf UCI File Selection", _
-                                     lExeCmd, , "Uci Files(*.uci)|*.uci", _
-                                     False, True)
+                If FileExists(lExeCmd) Then
+                    pFileName = lExeCmd
+                Else
+                    pFileName = FindFile("WinHspf UCI File Selection", _
+                                         lExeCmd, , "Uci Files(*.uci)|*.uci", _
+                                         True, True)
+                End If
                 If pFileName.Length > 0 Then
                     pUci = FilenameOnly(pFileName)
                 End If
 
                 If pUci.Length > 0 Then
-                    'If lErrLogFlag Then writeStatus("(Open)")
+                    Logger.Status("Open")
                     lErrLogName = FilenameSetExt(pFileName, "log")
-                    If Not lErrLogFlag Then
+                    If lErrLogFlag Then
                         Logger.Dbg("ChangeLogFileTO:" & lErrLogName)
-                        Logger.StartToFile(lErrLogName, False, False, True)
                     End If
-                End If
-                If lErrLogFlag Then
-                    writeStatus("(LOGTOFILE " & lErrLogName & ")")
-                End If
+                    Logger.StartToFile(lErrLogName, False, False, True)
+                    Logger.Status("(LOGTOFILE " & lErrLogName & ")")
+                    lOpt = -1
 
-                lOpt = -1
-                writeStatus("Pre:  F90_ACTSCN (" & lOpt & ", " & pWdmUnit(1) & ", " & pMsgUnit & ", " & lRetcod & ", " & pUci & ", " & Len(pUci) & ")")
-                Call F90_ACTSCN(lOpt, pWdmUnit(1), pMsgUnit, lRetcod, pUci, Len(pUci))
-                writeStatus("Post: F90_ACTSCN (" & lOpt & ", " & pWdmUnit(1) & ", " & pMsgUnit & ", " & lRetcod & ", " & pUci & ", " & Len(pUci) & ")")
-                If lRetcod = 0 Then
-                    writeStatus("Pre:  F90_SIMSCN (" & lRetcod & ")")
-                    Call F90_SIMSCN(lRetcod)
-                    writeStatus("Post: F90_SIMSCN (" & lRetcod & ")")
-                End If
-                If lRetcod <> 0 Then
-                    lMsg = "HSPF execution terminated with return code " & CStr(lRetcod) & "." & vbCrLf
-                    Throw New Exception(lMsg)
+                    Logger.Dbg("Pre:  F90_ACTSCN (" & lOpt & ", " & pWdmUnit(1) & ", " & pMsgUnit & ", " & lRetcod & ", " & pUci & ", " & Len(pUci) & ")")
+                    Call F90_ACTSCN(lOpt, pWdmUnit(1), pMsgUnit, lRetcod, pUci, Len(pUci))
+                    Logger.Dbg("Post: F90_ACTSCN (" & lOpt & ", " & pWdmUnit(1) & ", " & pMsgUnit & ", " & lRetcod & ", " & pUci & ", " & Len(pUci) & ")")
+                    If lRetcod = 0 Then
+                        Logger.Dbg("Pre:  F90_SIMSCN (" & lRetcod & ")")
+                        Call F90_SIMSCN(lRetcod)
+                        Logger.Dbg("Post: F90_SIMSCN (" & lRetcod & ")")
+                    End If
+                    If lRetcod <> 0 Then
+                        lMsg = "HSPF execution terminated with return code " & CStr(lRetcod) & "." & vbCrLf
+                        Logger.Status(lMsg)
+                        Throw New Exception(lMsg)
+                    End If
                 End If
             Else
                 lMsg = "HSPF message file '" & pMsgName & "' is not valid. Code " & lRetcod & vbCrLf
@@ -143,21 +143,18 @@ Module modWinHSPFLt
                                   MessageBoxButtons.YesNo, _
                                   MessageBoxIcon.Error, _
                                   MessageBoxDefaultButton.Button2) = MsgBoxResult.Yes Then
-                ShowFeedback(WholeFileString(Logger.FileName))
+                Dim lStr As String = ""
+                If Logger.FileName.Length > 0 Then lStr = WholeFileString(Logger.FileName)
+                ShowFeedback(lStr)
             End If
         End Try
 
-        If Not (pIPC Is Nothing) Then
-            pIPC.SendMonitorMessage("(Exit)")
-        End If
+        Logger.Status("EXIT")
     End Sub
 
     Private Sub ShowFeedback(ByRef Progress As String)
-        'Dim StartTimer As Double
         Dim lfrmFeedback As New frmFeedback
 
-        'feedback.AddText(Progress & vbCrLf & vbCrLf & Err.Description)
-        'feedback.Wait = True
         Dim lName As String = ""
         Dim lEmail As String = ""
         Dim lMessage As String = ""
@@ -172,35 +169,76 @@ Module modWinHSPFLt
             lClient.UploadValues("http://hspf.com/cgi-bin/feedback-basins4.cgi", "POST", lFeedbackCollection)
             Logger.Msg("Feedback successfully sent", "Send Feedback")
         End If
+    End Sub
+End Module
 
-        'StartTimer = Timer
-        'While Timer < StartTimer + 60
-        '  DoEvents
-        'Wend
-        'Set feedback = Nothing
+Friend Class StatusMonitor
+    Implements MapWinUtility.IProgressStatus
+
+    Dim pInit As Boolean = False
+    Dim pProcess As Process
+
+    Public Sub Progress(ByVal CurrentPosition As Integer, ByVal LastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
+
     End Sub
 
-    'Private Function GetDataPath(Optional ByVal aDefaultPath As String = "") As String
-    '    Dim BasinsPos As Integer
-
-    '    If Len(aDefaultPath) = 0 Then aDefaultPath = CurDir()
-    '    If Right(aDefaultPath, 1) <> "\" Then aDefaultPath = aDefaultPath & "\"
-
-    '    BasinsPos = InStr(UCase(aDefaultPath), "BASINS\")
-    '    If BasinsPos > 0 Then
-    '        aDefaultPath = Left(aDefaultPath, BasinsPos + 6) & "data"
-    '    End If
-
-    '    GetDataPath = aDefaultPath
-    'End Function
-
-    Private Function writeStatus(ByRef aMsg As String) As String
-        Logger.Dbg(aMsg)
-        If pIPC Is Nothing Then
-            'WriteTokenToPipe(pPipeWriteToStatus, s)
-        Else
-            pIPC.SendMonitorMessage(aMsg)
+    Public Sub Status(ByVal aStatusMessage As String) Implements MapWinUtility.IProgressStatus.Status
+        If Not pInit Then
+            Try
+                Dim lProcessId As Integer = Process.GetCurrentProcess.Id
+                pProcess = New Process
+                pProcess.StartInfo.FileName = "D:\Basins\models\HSPF\bin\status.exe"
+                'pProcess.StartInfo.FileName = "C:\dev\BASINS40\atcStatusMonitor\obj\Release\StatusMonitor.exe"
+                pProcess.StartInfo.Arguments = lProcessId '& " " & CurDir() & "\" & Logger.FileName
+                'Dim lMemoryStream As New IO.MemoryStream
+                pProcess.StartInfo.UseShellExecute = False
+                pProcess.StartInfo.RedirectStandardInput = True
+                pProcess.StartInfo.RedirectStandardOutput = True
+                pProcess.Start()
+                Dim lStream As IO.FileStream = pProcess.StandardInput.BaseStream
+                pPipeWriteToStatus = lStream.Handle ' SafeFileHandle
+                lStream = pProcess.StandardOutput.BaseStream
+                pPipeReadFromStatus =lStream.Handle 
+                pInit = True
+            Catch ex As Exception
+                Logger.Msg("StatusProcessStartError:" & ex.Message)
+            End Try
         End If
-        Return aMsg 'return the message
+        WriteTokenToPipe(aStatusMessage)
+        If aStatusMessage.ToLower = "exit" Then
+            pProcess.Kill()
+        End If
+    End Sub
+
+    Private Function WriteTokenToPipe(ByVal aMsg As String) As Boolean
+        Dim OpenParenEscape As String
+        Dim CloseParenEscape As String
+        Dim lpExitCode As Integer
+
+        OpenParenEscape = Chr(6)
+        CloseParenEscape = Chr(7)
+        WriteTokenToPipe = False
+
+        If Not IsNothing(pProcess) Then
+            If pProcess.HasExited Then
+                lpExitCode = pProcess.ExitCode
+                If lpExitCode <> &H103S Then 'TODO: check to be sure codes have not changed
+                    Return False  'Process at other end of pipe is dead, stop talking to it
+                End If
+            End If
+        End If
+
+        If Left(aMsg, 1) = "(" And Right(aMsg, 1) = ")" Then
+            aMsg = Mid(aMsg, 2, Len(aMsg) - 2)
+        End If
+        aMsg = ReplaceString(aMsg, "(", OpenParenEscape)
+        aMsg = ReplaceString(aMsg, ")", CloseParenEscape)
+        If aMsg.Length > 0 Then
+            If Asc(Right(aMsg, 1)) > 31 Then
+                aMsg = "(" & aMsg & ")"
+            End If
+            pProcess.StandardInput.WriteLine(aMsg)
+        End If
+        Return True
     End Function
-End Module
+End Class
