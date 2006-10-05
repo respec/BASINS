@@ -1932,6 +1932,87 @@ Public Class GisUtil
 
     End Sub
 
+    Public Shared Sub SetLayerRendererUniqueValues(ByVal aDesc As String, ByVal aFieldName As String)
+        'create a unique values renderer for the given layer and field,
+        'adapted from MapWindow SFColoringSchemeForm.vb
+
+        Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
+        
+        Dim lLayerIndex As Integer = GisUtil.LayerIndex(aDesc)
+        Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers(lLayerIndex)
+
+        Dim lSf As New MapWinGIS.Shapefile
+        lSf = lLayer.GetObject()
+
+        Dim fld As Integer = GisUtil.FieldIndex(lLayerIndex, aFieldName)
+        lColorScheme.FieldIndex = fld
+
+        'Get unique values
+        Dim i As Integer
+        Dim lHt As New Hashtable
+        Dim lVal As Object
+        For i = 0 To lSf.NumShapes - 1
+            If Not IsDBNull(lSf.CellValue(fld, i)) Then
+                lVal = lSf.CellValue(fld, i)
+                If lHt.ContainsKey(lVal) = False Then
+                    lHt.Add(lVal, lVal)
+                End If
+            End If
+        Next
+
+        'Create sorted array:
+        Dim lArr(lHt.Count - 1) As Object
+        lHt.Values().CopyTo(lArr, 0)
+        Array.Sort(lArr)
+
+        'Create color for each unique value
+        Dim lUsedColors As New Hashtable
+        Dim lWebSafeColor As String
+        Dim lR, lG, lB As Integer
+        Dim lRandomColor As UInt32
+        For i = 0 To lArr.Length - 1
+            Dim lBrk As New MapWinGIS.ShapefileColorBreak
+
+            'because the coloring is randomly chosen, it's possible (and happens often) that
+            'the same color is chosen twice, so save the colors per scheme to avoid this.
+            lR = CInt(Rnd() * 255)
+            lG = CInt(Rnd() * 255)
+            lB = CInt(Rnd() * 255)
+            lWebSafeColor = Hex(lR).Substring(0, 1) & Hex(lG).Substring(0, 1) & Hex(lB).Substring(0, 1)
+            lRandomColor = System.Convert.ToUInt32(RGB(lR, lG, lB))
+            Do While lUsedColors.ContainsKey(lWebSafeColor)
+                lR = CInt(Rnd() * 255)
+                lG = CInt(Rnd() * 255)
+                lB = CInt(Rnd() * 255)
+                lWebSafeColor = Hex(lR).Substring(0, 1) & Hex(lG).Substring(0, 1) & Hex(lB).Substring(0, 1)
+                lRandomColor = System.Convert.ToUInt32(RGB(lR, lG, lB))
+            Loop
+            lUsedColors.Add(lWebSafeColor, lWebSafeColor)
+
+            lBrk.StartColor = lRandomColor
+            lBrk.EndColor = lBrk.StartColor
+            lBrk.StartValue = lArr(i)
+            lBrk.EndValue = lArr(i)
+            If IsNumeric(lArr(i)) Then
+                lBrk.Caption = Int(lArr(i)).ToString
+            Else
+                lBrk.Caption = CStr(lArr(i))
+            End If
+
+            lColorScheme.Add(lBrk)
+            lBrk = Nothing
+        Next
+
+        lusedColors.Clear()
+        lusedColors = Nothing
+        lHt = Nothing
+        lSf = Nothing
+
+        lLayer.ColoringScheme = lColorScheme
+        lLayer.Expanded = True
+        lLayer.Visible = True
+    End Sub
+
 End Class
 
 ''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
