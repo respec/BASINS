@@ -144,6 +144,7 @@
     </Compile>
     <EmbeddedResource Include="frmPollutantLoading.resx">
       <DependentUpon>frmPollutantLoading.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

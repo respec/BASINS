@@ -34,11 +34,11 @@ Public Class frmModelSetup
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
-    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
-    Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents tabPLOAD As System.Windows.Forms.TabControl
+    Friend WithEvents tabGeneral As System.Windows.Forms.TabPage
+    Friend WithEvents tabLanduse As System.Windows.Forms.TabPage
+    Friend WithEvents lblLanduseType As System.Windows.Forms.Label
+    Friend WithEvents lblSubbasinsLayer As System.Windows.Forms.Label
     Friend WithEvents cboLanduse As System.Windows.Forms.ComboBox
     Friend WithEvents cboSubbasins As System.Windows.Forms.ComboBox
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
@@ -47,106 +47,106 @@ Public Class frmModelSetup
     Friend WithEvents cmdOK As System.Windows.Forms.Button
     Friend WithEvents cmdHelp As System.Windows.Forms.Button
     Friend WithEvents cmdAbout As System.Windows.Forms.Button
-    Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
-    Friend WithEvents TabPage4 As System.Windows.Forms.TabPage
-    Friend WithEvents TabPage5 As System.Windows.Forms.TabPage
-    Friend WithEvents RadioButton2 As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButton1 As System.Windows.Forms.RadioButton
-    Friend WithEvents cmdEC As System.Windows.Forms.Button
-    Friend WithEvents lblEC As System.Windows.Forms.Label
-    Friend WithEvents Label4 As System.Windows.Forms.Label
-    Friend WithEvents AtcGridEC As atcControls.atcGrid
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents ofdEC As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents tabPointSources As System.Windows.Forms.TabPage
+    Friend WithEvents tabBMPs As System.Windows.Forms.TabPage
+    Friend WithEvents tabValues As System.Windows.Forms.TabPage
+    Friend WithEvents rbSimpleMethod As System.Windows.Forms.RadioButton
+    Friend WithEvents rbExportCoefficientMethod As System.Windows.Forms.RadioButton
+    Friend WithEvents cmdChangeFile As System.Windows.Forms.Button
+    Friend WithEvents lblValueFileName As System.Windows.Forms.Label
+    Friend WithEvents lblValueFile As System.Windows.Forms.Label
+    Friend WithEvents atcGridValues As atcControls.atcGrid
+    Friend WithEvents lblValueUnits As System.Windows.Forms.Label
+    Friend WithEvents ofdValues As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
-        Me.TabControl1 = New System.Windows.Forms.TabControl
-        Me.TabPage1 = New System.Windows.Forms.TabPage
-        Me.RadioButton2 = New System.Windows.Forms.RadioButton
-        Me.RadioButton1 = New System.Windows.Forms.RadioButton
+        Me.tabPLOAD = New System.Windows.Forms.TabControl
+        Me.tabGeneral = New System.Windows.Forms.TabPage
+        Me.rbSimpleMethod = New System.Windows.Forms.RadioButton
+        Me.rbExportCoefficientMethod = New System.Windows.Forms.RadioButton
         Me.cboSubbasins = New System.Windows.Forms.ComboBox
         Me.cboLanduse = New System.Windows.Forms.ComboBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.lblSubbasinsLayer = New System.Windows.Forms.Label
+        Me.lblLanduseType = New System.Windows.Forms.Label
+        Me.tabLanduse = New System.Windows.Forms.TabPage
         Me.cboLandUseLayer = New System.Windows.Forms.ComboBox
         Me.lblLandUseLayer = New System.Windows.Forms.Label
-        Me.TabPage3 = New System.Windows.Forms.TabPage
-        Me.TabPage4 = New System.Windows.Forms.TabPage
-        Me.TabPage5 = New System.Windows.Forms.TabPage
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.cmdEC = New System.Windows.Forms.Button
-        Me.lblEC = New System.Windows.Forms.Label
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.AtcGridEC = New atcControls.atcGrid
+        Me.tabValues = New System.Windows.Forms.TabPage
+        Me.lblValueUnits = New System.Windows.Forms.Label
+        Me.cmdChangeFile = New System.Windows.Forms.Button
+        Me.lblValueFileName = New System.Windows.Forms.Label
+        Me.lblValueFile = New System.Windows.Forms.Label
+        Me.atcGridValues = New atcControls.atcGrid
+        Me.tabPointSources = New System.Windows.Forms.TabPage
+        Me.tabBMPs = New System.Windows.Forms.TabPage
         Me.cmdOK = New System.Windows.Forms.Button
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdHelp = New System.Windows.Forms.Button
         Me.cmdAbout = New System.Windows.Forms.Button
-        Me.ofdEC = New System.Windows.Forms.OpenFileDialog
-        Me.TabControl1.SuspendLayout()
-        Me.TabPage1.SuspendLayout()
-        Me.TabPage2.SuspendLayout()
-        Me.TabPage5.SuspendLayout()
+        Me.ofdValues = New System.Windows.Forms.OpenFileDialog
+        Me.tabPLOAD.SuspendLayout()
+        Me.tabGeneral.SuspendLayout()
+        Me.tabLanduse.SuspendLayout()
+        Me.tabValues.SuspendLayout()
         Me.SuspendLayout()
         '
-        'TabControl1
+        'tabPLOAD
         '
-        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.tabPLOAD.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TabControl1.Controls.Add(Me.TabPage1)
-        Me.TabControl1.Controls.Add(Me.TabPage2)
-        Me.TabControl1.Controls.Add(Me.TabPage3)
-        Me.TabControl1.Controls.Add(Me.TabPage4)
-        Me.TabControl1.Controls.Add(Me.TabPage5)
-        Me.TabControl1.Cursor = System.Windows.Forms.Cursors.Default
-        Me.TabControl1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabControl1.ItemSize = New System.Drawing.Size(60, 21)
-        Me.TabControl1.Location = New System.Drawing.Point(16, 16)
-        Me.TabControl1.Name = "TabControl1"
-        Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(528, 258)
-        Me.TabControl1.TabIndex = 0
+        Me.tabPLOAD.Controls.Add(Me.tabGeneral)
+        Me.tabPLOAD.Controls.Add(Me.tabLanduse)
+        Me.tabPLOAD.Controls.Add(Me.tabValues)
+        Me.tabPLOAD.Controls.Add(Me.tabPointSources)
+        Me.tabPLOAD.Controls.Add(Me.tabBMPs)
+        Me.tabPLOAD.Cursor = System.Windows.Forms.Cursors.Default
+        Me.tabPLOAD.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.tabPLOAD.ItemSize = New System.Drawing.Size(60, 21)
+        Me.tabPLOAD.Location = New System.Drawing.Point(16, 16)
+        Me.tabPLOAD.Name = "tabPLOAD"
+        Me.tabPLOAD.SelectedIndex = 0
+        Me.tabPLOAD.Size = New System.Drawing.Size(528, 258)
+        Me.tabPLOAD.TabIndex = 0
         '
-        'TabPage1
+        'tabGeneral
         '
-        Me.TabPage1.BackColor = System.Drawing.SystemColors.Control
-        Me.TabPage1.Controls.Add(Me.RadioButton2)
-        Me.TabPage1.Controls.Add(Me.RadioButton1)
-        Me.TabPage1.Controls.Add(Me.cboSubbasins)
-        Me.TabPage1.Controls.Add(Me.cboLanduse)
-        Me.TabPage1.Controls.Add(Me.Label3)
-        Me.TabPage1.Controls.Add(Me.Label2)
-        Me.TabPage1.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TabPage1.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage1.Name = "TabPage1"
-        Me.TabPage1.Size = New System.Drawing.Size(520, 229)
-        Me.TabPage1.TabIndex = 0
-        Me.TabPage1.Text = "General"
-        Me.TabPage1.UseVisualStyleBackColor = True
+        Me.tabGeneral.BackColor = System.Drawing.SystemColors.Control
+        Me.tabGeneral.Controls.Add(Me.rbSimpleMethod)
+        Me.tabGeneral.Controls.Add(Me.rbExportCoefficientMethod)
+        Me.tabGeneral.Controls.Add(Me.cboSubbasins)
+        Me.tabGeneral.Controls.Add(Me.cboLanduse)
+        Me.tabGeneral.Controls.Add(Me.lblSubbasinsLayer)
+        Me.tabGeneral.Controls.Add(Me.lblLanduseType)
+        Me.tabGeneral.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.tabGeneral.Location = New System.Drawing.Point(4, 25)
+        Me.tabGeneral.Name = "tabGeneral"
+        Me.tabGeneral.Size = New System.Drawing.Size(520, 229)
+        Me.tabGeneral.TabIndex = 0
+        Me.tabGeneral.Text = "General"
+        Me.tabGeneral.UseVisualStyleBackColor = True
         '
-        'RadioButton2
+        'rbSimpleMethod
         '
-        Me.RadioButton2.AutoSize = True
-        Me.RadioButton2.Location = New System.Drawing.Point(27, 138)
-        Me.RadioButton2.Name = "RadioButton2"
-        Me.RadioButton2.Size = New System.Drawing.Size(162, 21)
-        Me.RadioButton2.TabIndex = 10
-        Me.RadioButton2.Text = "Simple (EMC) Method"
-        Me.RadioButton2.UseVisualStyleBackColor = True
+        Me.rbSimpleMethod.AutoSize = True
+        Me.rbSimpleMethod.Location = New System.Drawing.Point(27, 138)
+        Me.rbSimpleMethod.Name = "rbSimpleMethod"
+        Me.rbSimpleMethod.Size = New System.Drawing.Size(162, 21)
+        Me.rbSimpleMethod.TabIndex = 10
+        Me.rbSimpleMethod.Text = "Simple (EMC) Method"
+        Me.rbSimpleMethod.UseVisualStyleBackColor = True
         '
-        'RadioButton1
+        'rbExportCoefficientMethod
         '
-        Me.RadioButton1.AutoSize = True
-        Me.RadioButton1.Checked = True
-        Me.RadioButton1.Location = New System.Drawing.Point(27, 110)
-        Me.RadioButton1.Name = "RadioButton1"
-        Me.RadioButton1.Size = New System.Drawing.Size(187, 21)
-        Me.RadioButton1.TabIndex = 9
-        Me.RadioButton1.TabStop = True
-        Me.RadioButton1.Text = "Export Coefficient Method"
-        Me.RadioButton1.UseVisualStyleBackColor = True
+        Me.rbExportCoefficientMethod.AutoSize = True
+        Me.rbExportCoefficientMethod.Checked = True
+        Me.rbExportCoefficientMethod.Location = New System.Drawing.Point(27, 110)
+        Me.rbExportCoefficientMethod.Name = "rbExportCoefficientMethod"
+        Me.rbExportCoefficientMethod.Size = New System.Drawing.Size(187, 21)
+        Me.rbExportCoefficientMethod.TabIndex = 9
+        Me.rbExportCoefficientMethod.TabStop = True
+        Me.rbExportCoefficientMethod.Text = "Export Coefficient Method"
+        Me.rbExportCoefficientMethod.UseVisualStyleBackColor = True
         '
         'cboSubbasins
         '
@@ -170,32 +170,32 @@ Public Class frmModelSetup
         Me.cboLanduse.Size = New System.Drawing.Size(240, 24)
         Me.cboLanduse.TabIndex = 7
         '
-        'Label3
+        'lblSubbasinsLayer
         '
-        Me.Label3.Location = New System.Drawing.Point(24, 26)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(152, 24)
-        Me.Label3.TabIndex = 2
-        Me.Label3.Text = "Subbasins Layer:"
+        Me.lblSubbasinsLayer.Location = New System.Drawing.Point(24, 26)
+        Me.lblSubbasinsLayer.Name = "lblSubbasinsLayer"
+        Me.lblSubbasinsLayer.Size = New System.Drawing.Size(152, 24)
+        Me.lblSubbasinsLayer.TabIndex = 2
+        Me.lblSubbasinsLayer.Text = "Subbasins Layer:"
         '
-        'Label2
+        'lblLanduseType
         '
-        Me.Label2.Location = New System.Drawing.Point(24, 63)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(152, 24)
-        Me.Label2.TabIndex = 1
-        Me.Label2.Text = "Land Use Type:"
+        Me.lblLanduseType.Location = New System.Drawing.Point(24, 63)
+        Me.lblLanduseType.Name = "lblLanduseType"
+        Me.lblLanduseType.Size = New System.Drawing.Size(152, 24)
+        Me.lblLanduseType.TabIndex = 1
+        Me.lblLanduseType.Text = "Land Use Type:"
         '
-        'TabPage2
+        'tabLanduse
         '
-        Me.TabPage2.Controls.Add(Me.cboLandUseLayer)
-        Me.TabPage2.Controls.Add(Me.lblLandUseLayer)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Size = New System.Drawing.Size(520, 229)
-        Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "Land Use"
-        Me.TabPage2.UseVisualStyleBackColor = True
+        Me.tabLanduse.Controls.Add(Me.cboLandUseLayer)
+        Me.tabLanduse.Controls.Add(Me.lblLandUseLayer)
+        Me.tabLanduse.Location = New System.Drawing.Point(4, 25)
+        Me.tabLanduse.Name = "tabLanduse"
+        Me.tabLanduse.Size = New System.Drawing.Size(520, 229)
+        Me.tabLanduse.TabIndex = 1
+        Me.tabLanduse.Text = "Land Use"
+        Me.tabLanduse.UseVisualStyleBackColor = True
         '
         'cboLandUseLayer
         '
@@ -216,91 +216,91 @@ Public Class frmModelSetup
         Me.lblLandUseLayer.TabIndex = 9
         Me.lblLandUseLayer.Text = "Land Use Layer:"
         '
-        'TabPage3
+        'tabValues
         '
-        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Size = New System.Drawing.Size(520, 229)
-        Me.TabPage3.TabIndex = 2
-        Me.TabPage3.Text = "Point Sources"
-        Me.TabPage3.UseVisualStyleBackColor = True
+        Me.tabValues.Controls.Add(Me.lblValueUnits)
+        Me.tabValues.Controls.Add(Me.cmdChangeFile)
+        Me.tabValues.Controls.Add(Me.lblValueFileName)
+        Me.tabValues.Controls.Add(Me.lblValueFile)
+        Me.tabValues.Controls.Add(Me.atcGridValues)
+        Me.tabValues.Location = New System.Drawing.Point(4, 25)
+        Me.tabValues.Name = "tabValues"
+        Me.tabValues.Size = New System.Drawing.Size(520, 229)
+        Me.tabValues.TabIndex = 4
+        Me.tabValues.Text = "Export Coefficients"
+        Me.tabValues.UseVisualStyleBackColor = True
         '
-        'TabPage4
+        'lblValueUnits
         '
-        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Size = New System.Drawing.Size(520, 229)
-        Me.TabPage4.TabIndex = 3
-        Me.TabPage4.Text = "BMPs"
-        Me.TabPage4.UseVisualStyleBackColor = True
+        Me.lblValueUnits.AutoSize = True
+        Me.lblValueUnits.Location = New System.Drawing.Point(17, 32)
+        Me.lblValueUnits.Name = "lblValueUnits"
+        Me.lblValueUnits.Size = New System.Drawing.Size(71, 17)
+        Me.lblValueUnits.TabIndex = 23
+        Me.lblValueUnits.Text = "(lbs/ac/yr)"
         '
-        'TabPage5
+        'cmdChangeFile
         '
-        Me.TabPage5.Controls.Add(Me.Label1)
-        Me.TabPage5.Controls.Add(Me.cmdEC)
-        Me.TabPage5.Controls.Add(Me.lblEC)
-        Me.TabPage5.Controls.Add(Me.Label4)
-        Me.TabPage5.Controls.Add(Me.AtcGridEC)
-        Me.TabPage5.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage5.Name = "TabPage5"
-        Me.TabPage5.Size = New System.Drawing.Size(520, 229)
-        Me.TabPage5.TabIndex = 4
-        Me.TabPage5.Text = "Export Coefficients"
-        Me.TabPage5.UseVisualStyleBackColor = True
+        Me.cmdChangeFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdChangeFile.Location = New System.Drawing.Point(427, 12)
+        Me.cmdChangeFile.Name = "cmdChangeFile"
+        Me.cmdChangeFile.Size = New System.Drawing.Size(73, 24)
+        Me.cmdChangeFile.TabIndex = 22
+        Me.cmdChangeFile.Text = "Change"
         '
-        'Label1
+        'lblValueFileName
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(17, 32)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(71, 17)
-        Me.Label1.TabIndex = 23
-        Me.Label1.Text = "(lbs/ac/yr)"
-        '
-        'cmdEC
-        '
-        Me.cmdEC.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdEC.Location = New System.Drawing.Point(427, 12)
-        Me.cmdEC.Name = "cmdEC"
-        Me.cmdEC.Size = New System.Drawing.Size(73, 24)
-        Me.cmdEC.TabIndex = 22
-        Me.cmdEC.Text = "Change"
-        '
-        'lblEC
-        '
-        Me.lblEC.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lblValueFileName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblEC.Location = New System.Drawing.Point(176, 16)
-        Me.lblEC.Name = "lblEC"
-        Me.lblEC.Size = New System.Drawing.Size(243, 16)
-        Me.lblEC.TabIndex = 21
-        Me.lblEC.Text = "<none>"
-        Me.lblEC.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblValueFileName.Location = New System.Drawing.Point(176, 16)
+        Me.lblValueFileName.Name = "lblValueFileName"
+        Me.lblValueFileName.Size = New System.Drawing.Size(243, 16)
+        Me.lblValueFileName.TabIndex = 21
+        Me.lblValueFileName.Text = "<none>"
+        Me.lblValueFileName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'Label4
+        'lblValueFile
         '
-        Me.Label4.Location = New System.Drawing.Point(17, 16)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(153, 16)
-        Me.Label4.TabIndex = 20
-        Me.Label4.Text = "Export Coefficient File:"
-        Me.Label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblValueFile.Location = New System.Drawing.Point(17, 16)
+        Me.lblValueFile.Name = "lblValueFile"
+        Me.lblValueFile.Size = New System.Drawing.Size(153, 16)
+        Me.lblValueFile.TabIndex = 20
+        Me.lblValueFile.Text = "Export Coefficient File:"
+        Me.lblValueFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
-        'AtcGridEC
+        'atcGridValues
         '
-        Me.AtcGridEC.AllowHorizontalScrolling = True
-        Me.AtcGridEC.AllowNewValidValues = False
-        Me.AtcGridEC.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+        Me.atcGridValues.AllowHorizontalScrolling = True
+        Me.atcGridValues.AllowNewValidValues = False
+        Me.atcGridValues.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.AtcGridEC.CellBackColor = System.Drawing.Color.Empty
-        Me.AtcGridEC.LineColor = System.Drawing.Color.Empty
-        Me.AtcGridEC.LineWidth = 0.0!
-        Me.AtcGridEC.Location = New System.Drawing.Point(20, 54)
-        Me.AtcGridEC.Name = "AtcGridEC"
-        Me.AtcGridEC.Size = New System.Drawing.Size(480, 159)
-        Me.AtcGridEC.Source = Nothing
-        Me.AtcGridEC.TabIndex = 19
+        Me.atcGridValues.CellBackColor = System.Drawing.Color.Empty
+        Me.atcGridValues.LineColor = System.Drawing.Color.Empty
+        Me.atcGridValues.LineWidth = 0.0!
+        Me.atcGridValues.Location = New System.Drawing.Point(20, 54)
+        Me.atcGridValues.Name = "atcGridValues"
+        Me.atcGridValues.Size = New System.Drawing.Size(480, 159)
+        Me.atcGridValues.Source = Nothing
+        Me.atcGridValues.TabIndex = 19
+        '
+        'tabPointSources
+        '
+        Me.tabPointSources.Location = New System.Drawing.Point(4, 25)
+        Me.tabPointSources.Name = "tabPointSources"
+        Me.tabPointSources.Size = New System.Drawing.Size(520, 229)
+        Me.tabPointSources.TabIndex = 2
+        Me.tabPointSources.Text = "Point Sources"
+        Me.tabPointSources.UseVisualStyleBackColor = True
+        '
+        'tabBMPs
+        '
+        Me.tabBMPs.Location = New System.Drawing.Point(4, 25)
+        Me.tabBMPs.Name = "tabBMPs"
+        Me.tabBMPs.Size = New System.Drawing.Size(520, 229)
+        Me.tabBMPs.TabIndex = 3
+        Me.tabBMPs.Text = "BMPs"
+        Me.tabBMPs.UseVisualStyleBackColor = True
         '
         'cmdOK
         '
@@ -342,11 +342,11 @@ Public Class frmModelSetup
         Me.cmdAbout.TabIndex = 7
         Me.cmdAbout.Text = "&About"
         '
-        'ofdEC
+        'ofdValues
         '
-        Me.ofdEC.DefaultExt = "dbf"
-        Me.ofdEC.Filter = "DBF Files (*.dbf)|*.dbf"
-        Me.ofdEC.Title = "Select Export Coefficient File"
+        Me.ofdValues.DefaultExt = "dbf"
+        Me.ofdValues.Filter = "DBF Files (*.dbf)|*.dbf"
+        Me.ofdValues.Title = "Select File"
         '
         'frmModelSetup
         '
@@ -356,18 +356,18 @@ Public Class frmModelSetup
         Me.Controls.Add(Me.cmdHelp)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
-        Me.Controls.Add(Me.TabControl1)
+        Me.Controls.Add(Me.tabPLOAD)
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmModelSetup"
         Me.Text = "BASINS Pollutant Loading Estimator"
-        Me.TabControl1.ResumeLayout(False)
-        Me.TabPage1.ResumeLayout(False)
-        Me.TabPage1.PerformLayout()
-        Me.TabPage2.ResumeLayout(False)
-        Me.TabPage5.ResumeLayout(False)
-        Me.TabPage5.PerformLayout()
+        Me.tabPLOAD.ResumeLayout(False)
+        Me.tabGeneral.ResumeLayout(False)
+        Me.tabGeneral.PerformLayout()
+        Me.tabLanduse.ResumeLayout(False)
+        Me.tabValues.ResumeLayout(False)
+        Me.tabValues.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -379,57 +379,7 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub cboLanduse_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboLanduse.SelectedIndexChanged
-        SetECGrid()
-    End Sub
-
-    Private Sub SetECGrid()
-        Dim i As Long, k As Long
-        Dim tmpDbf As IatcTable
-        Dim lSorted As New atcCollection
-
-        If AtcGridEC.Source Is Nothing Then Exit Sub
-
-        If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-            lblEC.Text = "\BASINS\etc\ecgiras.dbf"
-        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-            lblEC.Text = "\BASINS\etc\ecgiras.dbf"
-        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-            lblEC.Text = "\BASINS\etc\ecnlcd.dbf"
-        Else 'grid
-            lblEC.Text = "\BASINS\etc\ecnlcd.dbf"
-        End If
-        AtcGridEC.Clear()
-
-        If lblEC.Text <> "<none>" Then
-            tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lblEC.Text)
-
-            With AtcGridEC.Source
-                .Rows = 1
-                .Columns = tmpDbf.NumFields
-                .ColorCells = True
-                .FixedRows = 1
-                .FixedColumns = 1
-                For i = 1 To tmpDbf.NumFields
-                    .CellValue(0, i) = tmpDbf.FieldName(i)
-                    .CellColor(0, i) = SystemColors.ControlDark
-                Next i
-
-                For k = 1 To tmpDbf.NumRecords
-                    tmpDbf.CurrentRecord = k
-                    For i = 1 To tmpDbf.NumFields
-                        .CellValue(k, i) = tmpDbf.Value(i)
-                        If i > 2 Then
-                            .CellEditable(k, i) = True
-                        Else
-                            .CellColor(k, i) = SystemColors.ControlDark
-                        End If
-                    Next i
-                Next k
-            End With
-
-        End If
-        AtcGridEC.SizeAllColumnsToContents()
-        AtcGridEC.Refresh()
+        SetGridValues()
     End Sub
 
     Private Sub cmdAbout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAbout.Click
@@ -442,13 +392,150 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+        GenerateLoads()
+    End Sub
+
+    Private Sub EnableControls(ByVal b As Boolean)
+        cmdOK.Enabled = b
+        cmdHelp.Enabled = b
+        cmdCancel.Enabled = b
+        cmdAbout.Enabled = b
+        tabPLOAD.Enabled = b
+    End Sub
+
+    Public Sub InitializeUI()
+        Dim lTemp As String
+
+        cboLanduse.Items.Add("USGS GIRAS Shapefile")
+        cboLanduse.Items.Add("NLCD Grid")
+        cboLanduse.Items.Add("Other Shapefile")
+        cboLanduse.Items.Add("User Grid")
+
+        Dim lLyr As Integer
+        Dim lSelectedLayer As Integer = -1
+        For lLyr = 0 To GisUtil.NumLayers() - 1
+            lTemp = GisUtil.LayerName(lLyr)
+            If GisUtil.LayerType(lLyr) = 3 Then
+                'PolygonShapefile 
+                cboSubbasins.Items.Add(lTemp)
+                If UCase(lTemp) = "SUBBASINS" Or InStr(lTemp, "Watershed Shapefile") > 0 Then
+                    cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
+                End If
+                If GisUtil.CurrentLayer = lLyr Then
+                    lSelectedLayer = cboSubbasins.Items.Count - 1
+                End If
+            ElseIf GisUtil.LayerType(lLyr) = 1 Then
+                'PointShapefile
+                'cboOutlets.Items.Add(ctemp)
+                'If UCase(ctemp) = "OUTLETS" Then
+                '    cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
+                'End If
+            End If
+        Next
+        If lSelectedLayer > -1 Then
+            cboSubbasins.SelectedIndex = lSelectedLayer
+        End If
+        'if all else fails set it to the first one
+        If cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
+            cboSubbasins.SelectedIndex = 0
+        End If
+        'If cboOutlets.Items.Count > 0 And cboOutlets.SelectedIndex < 0 Then
+        '    cboOutlets.SelectedIndex = 0
+        'End If
+
+        With atcGridValues
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+
+        cboLanduse.SelectedIndex = 0
+    End Sub
+
+    Private Sub frmPollutantLoading_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
+        End If
+    End Sub
+
+    Private Sub rbExportCoefficientMethod_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbExportCoefficientMethod.CheckedChanged
+        If rbExportCoefficientMethod.Checked = True Then
+            tabValues.Text = "Export Coefficients"
+        Else
+            tabValues.Text = "Event Mean Concentrations"
+        End If
+    End Sub
+
+    Private Sub cmdChangeFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdChangeFile.Click
+        If rbExportCoefficientMethod.Checked Then
+            ofdValues.Title = "Set Export Coefficient File"
+        Else
+            ofdValues.Title = "Set Event Mean Concentration File"
+        End If
+        If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            lblValueFileName.Text = ofdValues.FileName
+            SetGridValues()
+        End If
+    End Sub
+
+    Private Sub SetGridValues()
+        Dim i As Integer, k As Integer
+        Dim lDbf As IatcTable
+        Dim lSorted As New atcCollection
+
+        If atcGridValues.Source Is Nothing Then Exit Sub
+
+        If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
+            lblValueFileName.Text = "\BASINS\etc\ecgiras.dbf"
+        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
+            lblValueFileName.Text = "\BASINS\etc\ecgiras.dbf"
+        ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
+            lblValueFileName.Text = "\BASINS\etc\ecnlcd.dbf"
+        Else 'grid
+            lblValueFileName.Text = "\BASINS\etc\ecnlcd.dbf"
+        End If
+        atcGridValues.Clear()
+
+        If lblValueFileName.Text <> "<none>" Then
+            lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblValueFileName.Text)
+
+            With atcGridValues.Source
+                .Rows = 1
+                .Columns = lDbf.NumFields
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                For i = 1 To lDbf.NumFields
+                    .CellValue(0, i) = lDbf.FieldName(i)
+                    .CellColor(0, i) = SystemColors.ControlDark
+                Next i
+
+                For k = 1 To lDbf.NumRecords
+                    lDbf.CurrentRecord = k
+                    For i = 1 To lDbf.NumFields
+                        .CellValue(k, i) = lDbf.Value(i)
+                        If i > 2 Then
+                            .CellEditable(k, i) = True
+                        Else
+                            .CellColor(k, i) = SystemColors.ControlDark
+                        End If
+                    Next i
+                Next k
+            End With
+
+        End If
+        atcGridValues.SizeAllColumnsToContents()
+        atcGridValues.Refresh()
+    End Sub
+
+    Private Sub GenerateLoads()
         Dim i As Integer, j As Integer, k As Integer
         Dim lSubbasinLayerName As String
         Dim lSubbasinLayerIndex As Integer
-        Dim lucode As Integer
+        Dim lLucode As Integer
         Dim lProblem As String
 
-        If lblEC.Text <> "<none>" Then
+        If lblValueFileName.Text <> "<none>" Then
 
             Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
@@ -456,69 +543,71 @@ Public Class frmModelSetup
             lSubbasinLayerIndex = GisUtil.LayerIndex(lSubbasinLayerName)
 
             'are any areas selected?
-            Dim cSelectedAreaIndexes As New Collection
+            Dim lSelectedAreaIndexes As New Collection
             For i = 1 To GisUtil.NumSelectedFeatures(lSubbasinLayerIndex)
                 'add selected areas to the collection
-                cSelectedAreaIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex))
+                lSelectedAreaIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSubbasinLayerIndex))
             Next
-            If cSelectedAreaIndexes.Count = 0 Then
+            If lSelectedAreaIndexes.Count = 0 Then
                 'no areas selected, act as if all are selected
                 For i = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                    cSelectedAreaIndexes.Add(i - 1)
+                    lSelectedAreaIndexes.Add(i - 1)
                 Next
             End If
 
             'build array for output area values (area of each landuse in each subbasin)
-            Dim lmaxlu As Integer = AtcGridEC.Source.CellValue(AtcGridEC.Source.Rows - 1, 1)
-            Dim aAreaLS(lmaxlu, cSelectedAreaIndexes.Count) As Double
+            Dim lMaxlu As Integer = atcGridValues.Source.CellValue(atcGridValues.Source.Rows - 1, 1)
+            Dim lAreasLS(lMaxlu, lSelectedAreaIndexes.Count) As Double
 
             'build array of constituent names
-            Dim aConsNames(AtcGridEC.Source.Columns - 4) As String
-            For i = 0 To AtcGridEC.Source.Columns - 4
-                aConsNames(i) = AtcGridEC.Source.CellValue(0, i + 3)
+            Dim lConsNames(atcGridValues.Source.Columns - 4) As String
+            For i = 0 To atcGridValues.Source.Columns - 4
+                lConsNames(i) = atcGridValues.Source.CellValue(0, i + 3)
             Next i
 
             'build array for each export coeff for each land use type
-            Dim aCoeffLC(lmaxlu, AtcGridEC.Source.Columns - 4) As Double
-            For j = 1 To AtcGridEC.Source.Rows - 1
-                lucode = AtcGridEC.Source.CellValue(j, 1)
-                For i = 0 To AtcGridEC.Source.Columns - 4
-                    aCoeffLC(lucode, i) = AtcGridEC.Source.CellValue(j, i + 3)
+            Dim lCoeffsLC(lMaxlu, atcGridValues.Source.Columns - 4) As Double
+            For j = 1 To atcGridValues.Source.Rows - 1
+                lLucode = atcGridValues.Source.CellValue(j, 1)
+                For i = 0 To atcGridValues.Source.Columns - 4
+                    lCoeffsLC(lLucode, i) = atcGridValues.Source.CellValue(j, i + 3)
                 Next i
             Next j
 
             'build array for output load values (load for each subbasin and constituent)
-            Dim aLoadSC(cSelectedAreaIndexes.Count, aConsNames.GetUpperBound(0)) As Double
+            Dim lLoadsSC(lSelectedAreaIndexes.Count, lConsNames.GetUpperBound(0)) As Double
             'build array for area of each subbasin 
-            Dim aAreaS(cSelectedAreaIndexes.Count) As Double
+            Dim lAreasS(lSelectedAreaIndexes.Count) As Double
             'build array for per acre load values (load for each subbasin and constituent)
-            Dim aLoadPerAcreSC(cSelectedAreaIndexes.Count, aConsNames.GetUpperBound(0)) As Double
+            Dim lLoadsPerAcreSC(lSelectedAreaIndexes.Count, lConsNames.GetUpperBound(0)) As Double
 
-            If RadioButton1.Checked = True Then 'Export Coefficients Method
+            If rbExportCoefficientMethod.Checked Then 'Export Coefficients Method
                 'calculate areas of each land use in each subbasin
                 If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                    GIRASAreas(lSubbasinLayerIndex, cSelectedAreaIndexes, aAreaLS)
-                    ' / 4046.8564 to convert from m2 to acres
+                    CalculateGIRASAreas(lSubbasinLayerIndex, lSelectedAreaIndexes, lAreasLS)
+                    'areas will be returned in square meters
                 End If
                 'calculate loads
-                For i = 0 To cSelectedAreaIndexes.Count - 1 'for each subbasin
-                    For j = 0 To aConsNames.GetUpperBound(0)  'for each constituent
-                        For k = 1 To lmaxlu
-                            aLoadSC(i, j) = aLoadSC(i, j) + (aCoeffLC(k, j) * aAreaLS(k, i) / 4046.8564)
+                For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
+                    For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                        For k = 1 To lMaxlu
+                            lLoadsSC(i, j) = lLoadsSC(i, j) + (lCoeffsLC(k, j) * lAreasLS(k, i) / 4046.8564)
+                            ' / 4046.8564 to convert from m2 to acres
                         Next k
                     Next j
                 Next i
                 'calculate areas of each subbasin
-                For i = 0 To cSelectedAreaIndexes.Count - 1 'for each subbasin
-                    For k = 1 To lmaxlu
-                        aAreaS(i) = aAreaS(i) + (aAreaLS(k, i) / 4046.8564)
+                For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
+                    For k = 1 To lMaxlu
+                        lAreasS(i) = lAreasS(i) + (lAreasLS(k, i) / 4046.8564)
+                        ' / 4046.8564 to convert from m2 to acres
                     Next k
                 Next i
                 'calculate loads per acre
-                For i = 0 To cSelectedAreaIndexes.Count - 1 'for each subbasin
-                    If aAreaS(i) > 0 Then
-                        For j = 0 To aConsNames.GetUpperBound(0)  'for each constituent
-                            aLoadPerAcreSC(i, j) = aLoadSC(i, j) / aAreaS(i)
+                For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
+                    If lAreasS(i) > 0 Then
+                        For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                            lLoadsPerAcreSC(i, j) = lLoadsSC(i, j) / lAreasS(i)
                         Next j
                     End If
                 Next i
@@ -532,7 +621,7 @@ Public Class frmModelSetup
                 Dim lLayerDesc As String
                 For k = 1 To 2
                     lOutputShapefileName = ""
-                    GisUtil.SaveSelectedFeatures(lSubbasinLayerIndex, cSelectedAreaIndexes, _
+                    GisUtil.SaveSelectedFeatures(lSubbasinLayerIndex, lSelectedAreaIndexes, _
                                                  lOutputShapefileName)
 
                     'add the output shapefile to the map
@@ -541,11 +630,11 @@ Public Class frmModelSetup
                     Else
                         lLayerDesc = "Total Load (lbs)"
                     End If
-                    Dim basename As String = lLayerDesc
+                    Dim lBasename As String = lLayerDesc
                     i = 0
                     Do While GisUtil.IsLayer(lLayerDesc)
                         i = i + 1
-                        lLayerDesc = basename & " " & i
+                        lLayerDesc = lBasename & " " & i
                     Loop
                     If Not GisUtil.AddLayerToGroup(lOutputShapefileName, lLayerDesc, lGroupName) Then
                         lProblem = "Cant load layer " & lOutputShapefileName
@@ -557,17 +646,17 @@ Public Class frmModelSetup
                     Dim lFieldIndex As Integer
                     GisUtil.StartSetFeatureValue(lOutputLayerIndex)
                     'add loads
-                    For j = 0 To aConsNames.GetUpperBound(0)  'for each constituent
+                    For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
                         Try
-                            lFieldIndex = GisUtil.FieldIndex(lOutputLayerIndex, aConsNames(j) & "_load")
+                            lFieldIndex = GisUtil.FieldIndex(lOutputLayerIndex, lConsNames(j) & "_load")
                         Catch
-                            lFieldIndex = GisUtil.AddField(lOutputLayerIndex, aConsNames(j) & "_load", 2, 10)
+                            lFieldIndex = GisUtil.AddField(lOutputLayerIndex, lConsNames(j) & "_load", 2, 10)
                         End Try
-                        For i = 0 To cSelectedAreaIndexes.Count - 1 'for each subbasin
+                        For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                             If k = 1 Then
-                                GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, aLoadPerAcreSC(i, j))
+                                GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, lLoadsPerAcreSC(i, j))
                             Else
-                                GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, aLoadSC(i, j))
+                                GisUtil.SetFeatureValue(lOutputLayerIndex, lFieldIndex, i, lLoadsSC(i, j))
                             End If
                         Next i
                     Next j
@@ -583,83 +672,13 @@ Public Class frmModelSetup
         End If
     End Sub
 
-    Private Sub EnableControls(ByVal b As Boolean)
-        cmdOK.Enabled = b
-        cmdHelp.Enabled = b
-        cmdCancel.Enabled = b
-        cmdAbout.Enabled = b
-        TabControl1.Enabled = b
-    End Sub
-
-    Public Sub InitializeUI()
-        Dim ctemp As String
-
-        cboLanduse.Items.Add("USGS GIRAS Shapefile")
-        cboLanduse.Items.Add("NLCD Grid")
-        cboLanduse.Items.Add("Other Shapefile")
-        cboLanduse.Items.Add("User Grid")
-
-        Dim lyr As Long
-        For lyr = 0 To GisUtil.NumLayers() - 1
-            ctemp = GisUtil.LayerName(lyr)
-            If GisUtil.LayerType(lyr) = 3 Then
-                'PolygonShapefile 
-                cboSubbasins.Items.Add(ctemp)
-                If UCase(ctemp) = "SUBBASINS" Or InStr(ctemp, "Watershed Shapefile") > 0 Then
-                    cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
-                End If
-            ElseIf GisUtil.LayerType(lyr) = 1 Then
-                'PointShapefile
-                'cboOutlets.Items.Add(ctemp)
-                'If UCase(ctemp) = "OUTLETS" Then
-                '    cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
-                'End If
-            End If
-        Next
-        If cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
-            cboSubbasins.SelectedIndex = 0
-        End If
-        'If cboOutlets.Items.Count > 0 And cboOutlets.SelectedIndex < 0 Then
-        '    cboOutlets.SelectedIndex = 0
-        'End If
-
-        With AtcGridEC
-            .Source = New atcControls.atcGridSource
-            .Font = New Font(.Font, FontStyle.Regular)
-            .AllowHorizontalScrolling = True
-        End With
-
-        cboLanduse.SelectedIndex = 0
-    End Sub
-
-    Private Sub cmdEC_Click(ByVal sender As Object, ByVal e As System.EventArgs)
-        If ofdEC.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            lblEC.Text = ofdEC.FileName
-            SetECGrid()
-        End If
-    End Sub
-
-    Private Sub frmPollutantLoading_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
-        If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
-        End If
-    End Sub
-
-    Private Sub RadioButton1_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles RadioButton1.CheckedChanged
-        If RadioButton1.Checked = True Then
-            TabPage5.Text = "Export Coefficients"
-        Else
-            TabPage5.Text = "Event Mean Concentrations"
-        End If
-    End Sub
-
-    Private Sub GIRASAreas(ByVal aAreaLayerIndex As Integer, _
-                           ByVal aSelectedAreaIndexes As Collection, _
-                           ByRef aAreaLandSub(,) As Double)
+    Private Sub CalculateGIRASAreas(ByVal aAreaLayerIndex As Integer, _
+                                    ByVal aSelectedAreaIndexes As Collection, _
+                                    ByRef aAreaLandSub(,) As Double)
 
         Dim lProblem As String = ""
-        Dim lLanduseLayerIndex As Long
-        Dim lLandUseFieldIndex As Long
+        Dim lLanduseLayerIndex As Integer
+        Dim lLandUseFieldIndex As Integer
         Dim lGridSource As New atcGridSource
 
         'set land use index layer
@@ -699,7 +718,6 @@ Public Class frmModelSetup
 
                 Dim lPathName As String = PathNameOnly(GisUtil.LayerFileName(lLanduseLayerIndex)) & "\landuse"
                 Dim lLandUseFieldName As String
-                Dim lbfirst As Boolean = True
                 For j = 1 To lcluTiles.Count
                     'loop thru each land use tile
                     lNewFileName = lPathName & "\" & lcluTiles(j) & ".shp"
@@ -724,5 +742,4 @@ Public Class frmModelSetup
         End If
 
     End Sub
-
 End Class

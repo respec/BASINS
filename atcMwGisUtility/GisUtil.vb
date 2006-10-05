@@ -1927,6 +1927,8 @@ Public Class GisUtil
 
         'Stop editing and close the output shapefile
         tollSF.StopEditingShapes(True, True)
+        tollSF.Close()
+        tollSF = Nothing
 
     End Sub
 
