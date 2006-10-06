@@ -40,38 +40,39 @@ Module modWinHSPFLt
 
             Dim lExeCmd As String = Environment.CommandLine
 
-            Dim lInd As Integer = InStr(LCase(lExeCmd), "/log")
-            If lInd > 0 Then
+            If StringFindAndRemove(lExeCmd, "/log") Then
                 Logger.StartToFile(lErrLogName, False, False, True)
-                Logger.Dbg("CommandLine '" & lExeCmd & "'")
+                Logger.Dbg("Early Logging On")
                 lErrLogFlag = True
-                lExeCmd = Trim(Left(lExeCmd, lInd - 1) & Mid(lExeCmd, lInd + 4))
             End If
 
             Logger.Dbg("ExeName '" & StrRetRem(lExeCmd) & "'")
             Logger.Dbg("CommandLineArgs '" & lExeCmd & "'")
 
-            lInd = InStr(LCase(lExeCmd), "/batch")
-            If lInd > 0 Then
+            If StringFindAndRemove(lExeCmd, "/batch") Then
                 Logger.DisplayMessageBoxes = False
-                lExeCmd = Trim(Left(lExeCmd, lInd - 1) & Mid(lExeCmd, lInd + 6))
             End If
-            Logger.Dbg(" AfterBatchCheck: '" & lExeCmd & "' MsgBoxDisplay:" & Logger.DisplayMessageBoxes)
+            Logger.Dbg("AfterBatchCheck: '" & lExeCmd & "' DisplayMessagegBoxes:" & Logger.DisplayMessageBoxes)
+
+            Dim lSendFeedbackAlways As Boolean = False
+            If StringFindAndRemove(lExeCmd, "/feedback") Then
+                lSendFeedbackAlways = True
+            End If
+            Logger.Dbg("AfterFeedbackCheck: '" & lExeCmd & "' SendFeedbackAlways:" & lSendFeedbackAlways)
 
             pPipeReadFromStatus = StrFirstInt(lExeCmd)
             pPipeWriteToStatus = StrFirstInt(lExeCmd)
-            Logger.Dbg(" AftPipX: '" & lExeCmd & "' FromStatus " & pPipeReadFromStatus & " ToStatus " & pPipeWriteToStatus)
+            Logger.Dbg("AfterPipesFromCommandLine: '" & lExeCmd & "' FromStatus " & pPipeReadFromStatus & " ToStatus " & pPipeWriteToStatus)
 
             If pPipeWriteToStatus = 0 Or pPipeReadFromStatus = 0 Then
                 Logger.ProgressStatus = New StatusMonitor
                 Logger.Status("Begin") 'set handles but don't open
             End If
 
-            Logger.Dbg("StartPath:" & CurDir())
             If pPipeWriteToStatus = -1 Then pPipeWriteToStatus = 0
             If pPipeReadFromStatus = -1 Then pPipeReadFromStatus = 0
-            Logger.Dbg(" PipeWriteToStatus:" & pPipeWriteToStatus)
-            Logger.Dbg(" PipeReadFromStatus:" & pPipeReadFromStatus)
+            Logger.Dbg("PipeWriteToStatus:" & pPipeWriteToStatus)
+            Logger.Dbg("PipeReadFromStatus:" & pPipeReadFromStatus)
 
             Logger.Dbg("F90_W99OPN") : Call F90_W99OPN() 'open error file for fortan problems
             Logger.Dbg("F90_WDBFIN") : Call F90_WDBFIN() 'initialize WDM record buffer
@@ -91,10 +92,14 @@ Module modWinHSPFLt
                 Dim lFileName As String = ""
                 If FileExists(lExeCmd) Then
                     lFileName = lExeCmd
+                    Logger.Dbg("OriginalPath '" & CurDir() & "'")
+                    ChDriveDir(PathNameOnly(lFileName))
+                    Logger.Dbg("NewPath '" & CurDir() & "'")
                 Else
                     lFileName = FindFile("WinHspf UCI File Selection", _
                                          lExeCmd, , "Uci Files(*.uci)|*.uci", _
                                          True, True)
+                    Logger.Dbg("Path '" & CurDir() & "'")
                 End If
 
                 Dim lUci As String = ""
@@ -104,11 +109,14 @@ Module modWinHSPFLt
 
                 If lUci.Length > 0 Then
                     lErrLogName = FilenameSetExt(lFileName, "log")
+                    Dim lLoggerString As String = "Begin Logging"
                     If lErrLogFlag Then
+                        lLoggerString = WholeFileString(Logger.FileName)
                         Logger.Dbg("ChangeLogFileTO:" & lErrLogName)
                     End If
                     Logger.Status("Open")
                     Logger.StartToFile(lErrLogName, False, False, True)
+                    Logger.Dbg(lLoggerString)
                     Logger.Status("(LOGTOFILE " & lErrLogName & ")")
 
                     Dim lWdmUnit(4) As Integer
@@ -124,22 +132,25 @@ Module modWinHSPFLt
                     End If
 
                     If lRetcod <> 0 Then
-                        Throw New Exception("HSPF execution terminated with return code " & CStr(lRetcod) & "." & vbCrLf)
+                        Throw New Exception("ERROR - HSPF execution terminated with return code " & CStr(lRetcod) & "." & vbCrLf)
                     End If
                 End If
             Else
-                Throw New Exception("HSPF message file '" & lMsgName & "' is not valid. Code " & lRetcod & vbCrLf)
+                Throw New Exception("ERROR - HSPF message file '" & lMsgName & "' is not valid. Code " & lRetcod & vbCrLf)
+            End If
+
+            If lSendFeedbackAlways Then
+                Throw New Exception("Feedback reqested on command line")
             End If
 
         Catch ex As Exception
-            Dim lMsg As String = "Fatal Error: " & ex.Message
-            Logger.Status(lMsg)
-            If Logger.Msg(lMsg & vbCrLf & vbCrLf & "Send a feedback message to the WinHSPFLt development team.", _
+            If Logger.Msg(ex.Message & vbCrLf & "Send a feedback message to the WinHspfLt development team?", _
                           MsgBoxStyle.YesNo, _
-                          MsgBoxResult.No, "HSPF Error") = MsgBoxResult.Yes Then
+                          MsgBoxResult.No, "WinHspfLt Feedback") = MsgBoxResult.Yes Then
                 Dim lStr As String = ""
                 If Logger.FileName.Length > 0 Then
-                    lStr = WholeFileString(Logger.FileName)
+                    lStr = vbCrLf & "------------ Logfile '" & Logger.FileName & "' Contents ---------------" & _
+                           vbCrLf & WholeFileString(Logger.FileName)
                 End If
                 ShowFeedback(lStr)
             End If
@@ -148,13 +159,13 @@ Module modWinHSPFLt
         Logger.Status("EXIT")
     End Sub
 
-    Private Sub ShowFeedback(ByRef Progress As String)
+    Private Sub ShowFeedback(ByRef aProgress As String)
         Dim lfrmFeedback As New frmFeedback
 
         Dim lName As String = ""
         Dim lEmail As String = ""
         Dim lMessage As String = ""
-        Dim lFeedback As String = ""
+        Dim lFeedback As String = MapWinUtility.MiscUtils.GetDebugInfo & aProgress
         If lfrmFeedback.ShowFeedback(lName, lEmail, lMessage, lFeedback) Then
             Dim lFeedbackCollection As New System.Collections.Specialized.NameValueCollection
             lFeedbackCollection.Add("name", Trim(lName))
@@ -166,6 +177,16 @@ Module modWinHSPFLt
             Logger.Msg("Feedback successfully sent", "Send Feedback")
         End If
     End Sub
+
+    Private Function StringFindAndRemove(ByRef aStr As String, ByVal aFindStr As String) As Boolean
+        Dim lInd As Integer = InStr(aStr, aFindStr)
+        If lInd > 0 Then 'found string, remove it
+            aStr = Trim(Left(aStr, lInd - 1) & Mid(aStr, lInd + aFindStr.Length))
+            Return True
+        Else
+            Return False
+        End If
+    End Function
 End Module
 
 Friend Class StatusMonitor
@@ -175,7 +196,7 @@ Friend Class StatusMonitor
     Dim pProcess As Process
 
     Public Sub Progress(ByVal aCurrentPosition As Integer, ByVal aLastPosition As Integer) Implements MapWinUtility.IProgressStatus.Progress
-
+        'TODO: send progress messages to status monitor
     End Sub
 
     Public Sub Status(ByVal aStatusMessage As String) Implements MapWinUtility.IProgressStatus.Status
@@ -190,7 +211,7 @@ Friend Class StatusMonitor
                 pProcess.StartInfo.RedirectStandardOutput = True
                 pProcess.Start()
                 Dim lStream As IO.FileStream = pProcess.StandardInput.BaseStream
-                pPipeWriteToStatus = lStream.Handle ' SafeFileHandle
+                pPipeWriteToStatus = lStream.Handle ' SafeFileHandle?
                 lStream = pProcess.StandardOutput.BaseStream
                 pPipeReadFromStatus =lStream.Handle 
                 pInit = True

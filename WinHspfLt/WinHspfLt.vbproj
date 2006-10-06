@@ -7,9 +7,9 @@
     <ProjectGuid>{176999C8-BA24-49B5-9462-5DFE35C50ED7}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <AssemblyName>WinHsfLt</AssemblyName>
+    <AssemblyName>WinHspfLt</AssemblyName>
     <OutputType>WinExe</OutputType>
-    <StartupObject>WinHsfLt.modWinHSPFLt</StartupObject>
+    <StartupObject>WinHspfLt.modWinHSPFLt</StartupObject>
     <AssemblyMajorVersion>0</AssemblyMajorVersion>
     <AssemblyMinorVersion>7</AssemblyMinorVersion>
     <AssemblyRevisionNumber>0</AssemblyRevisionNumber>
@@ -17,13 +17,13 @@
     <AssemblyCompanyName>Aqua Terra Consultants</AssemblyCompanyName>
     <StartWithIE>False</StartWithIE>
     <ApplicationIcon>WinHspfLt.ico</ApplicationIcon>
-    <RootNamespace>WinHsfLt</RootNamespace>
+    <RootNamespace>WinHspfLt</RootNamespace>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>.\bin\</OutputPath>
-    <DocumentationFile>WinHsfLt.xml</DocumentationFile>
+    <DocumentationFile>WinHspfLt.xml</DocumentationFile>
     <DebugSymbols>True</DebugSymbols>
     <DefineDebug>True</DefineDebug>
     <DefineTrace>True</DefineTrace>
@@ -35,7 +35,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>.\bin\</OutputPath>
-    <DocumentationFile>WinHsfLt.xml</DocumentationFile>
+    <DocumentationFile>WinHspfLt.xml</DocumentationFile>
     <DebugSymbols>False</DebugSymbols>
     <DefineDebug>False</DefineDebug>
     <DefineTrace>True</DefineTrace>
