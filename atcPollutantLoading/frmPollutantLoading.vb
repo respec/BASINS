@@ -745,8 +745,16 @@ Public Class frmModelSetup
                                                  lSubbasinLayerIndex, lSelectedAreaIndexes, _
                                                  lAreasLS)
                 Else 'grid
+                    Dim lGridmax As Integer = System.Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
+                    Dim laAreaLS(lGridmax, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
                     GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, _
-                                          lAreasLS)
+                                          laAreaLS)
+                    'transfer values from selected polygons to lAreasLS
+                    For i = 1 To lSelectedAreaIndexes.Count
+                        For k = 1 To lMaxlu
+                            lAreasLS(k, i - 1) = laAreaLS(k, lSelectedAreaIndexes(i))
+                        Next k
+                    Next i
                 End If
             End If
             'calculate loads
