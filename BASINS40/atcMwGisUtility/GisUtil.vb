@@ -1074,10 +1074,6 @@ Public Class GisUtil
         'set input polygon layer
         Dim lPolygonSf As MapWinGIS.Shapefile = PolygonShapeFileFromIndex(aPolygonLayerIndex)
 
-        'save indexes of areas selected areas
-        Dim lSelectedAreaIndexes As New Collection
-        Dim i As Integer
-        
         Dim lMinX As Double
         Dim lMaxX As Double
         Dim lMinY As Double
@@ -1089,18 +1085,14 @@ Public Class GisUtil
             lMaxX = lPolygonSf.Extents.xMax
             lMinY = lPolygonSf.Extents.yMin
             lMaxY = lPolygonSf.Extents.yMax
-            'act as if all are selected
-            For i = 1 To NumFeatures(aPolygonLayerIndex)
-                lSelectedAreaIndexes.Add(i - 1)
-            Next
         Else 'use only extent of selected features
+            Dim lShapeIndex As Integer = IndexOfNthSelectedFeatureInLayer(0, aPolygonLayerIndex)
             lMinX = 1.0E+30
             lMaxX = -1.0E+30
             lMinY = 1.0E+30
             lMaxY = -1.0E+30
             For lSelectedIndex As Integer = 0 To NumSelectedFeatures(aPolygonLayerIndex) - 1
                 Dim lPolyIndex As Integer = IndexOfNthSelectedFeatureInLayer(lSelectedIndex, aPolygonLayerIndex)
-                lSelectedAreaIndexes.Add(lPolyIndex)
                 If lPolygonSf.Shape(lPolyIndex).Extents.xMin < lMinX Then
                     lMinX = lPolygonSf.Shape(lPolyIndex).Extents.xMin
                 End If
@@ -1138,18 +1130,12 @@ Public Class GisUtil
                 lInputGrid.CellToProj(lCol, lRow, lXPos, lYPos)
                 lInsideId = lPolygonSf.PointInShapefile(lXPos, lYPos)
                 If lInsideId > -1 Then 'this is in a subbasin
-                    'is this polygon index selected?
-                    For i = 1 To lSelectedAreaIndexes.Count
-                        If lSelectedAreaIndexes(i) = lInsideId Then
-                            If lInputGrid.Value(lCol, lRow).GetType.Name = "SByte" Then
-                                lGridValue = Convert.ToInt32(lInputGrid.Value(lCol, lRow))
-                            Else
-                                lGridValue = lInputGrid.Value(lCol, lRow)
-                            End If
-                            aAreaGridPoly(lGridValue, i - 1) += lCellArea
-                            Exit For
-                        End If
-                    Next
+                    If lInputGrid.Value(lCol, lRow).GetType.Name = "SByte" Then
+                        lGridValue = Convert.ToInt32(lInputGrid.Value(lCol, lRow))
+                    Else
+                        lGridValue = lInputGrid.Value(lCol, lRow)
+                    End If
+                    aAreaGridPoly(lGridValue, lInsideId) += lCellArea
                 End If
                 lCellCount += 1
                 Logger.Progress(lCellCount, lTotalCellCount)
