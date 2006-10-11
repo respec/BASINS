@@ -1932,28 +1932,27 @@ Public Class GisUtil
 
     End Sub
 
-    Public Shared Sub SetLayerRendererUniqueValues(ByVal aDesc As String, ByVal aFieldName As String)
+    Public Shared Sub SetLayerRendererUniqueValues(ByVal aDesc As String, ByVal aFieldIndex As Integer)
         'create a unique values renderer for the given layer and field,
         'adapted from MapWindow SFColoringSchemeForm.vb
 
         Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
-        
+
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aDesc)
         Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers(lLayerIndex)
 
         Dim lSf As New MapWinGIS.Shapefile
         lSf = lLayer.GetObject()
 
-        Dim fld As Integer = GisUtil.FieldIndex(lLayerIndex, aFieldName)
-        lColorScheme.FieldIndex = fld
+        lColorScheme.FieldIndex = aFieldIndex
 
         'Get unique values
         Dim i As Integer
         Dim lHt As New Hashtable
         Dim lVal As Object
         For i = 0 To lSf.NumShapes - 1
-            If Not IsDBNull(lSf.CellValue(fld, i)) Then
-                lVal = lSf.CellValue(fld, i)
+            If Not IsDBNull(lSf.CellValue(aFieldIndex, i)) Then
+                lVal = lSf.CellValue(aFieldIndex, i)
                 If lHt.ContainsKey(lVal) = False Then
                     lHt.Add(lVal, lVal)
                 End If
@@ -2003,8 +2002,8 @@ Public Class GisUtil
             lBrk = Nothing
         Next
 
-        lusedColors.Clear()
-        lusedColors = Nothing
+        lUsedColors.Clear()
+        lUsedColors = Nothing
         lHt = Nothing
         lSf = Nothing
 
