@@ -66,6 +66,17 @@ Public Class frmModelSetup
     Friend WithEvents lblPrecip As System.Windows.Forms.Label
     Friend WithEvents atxRatio As atcControls.atcText
     Friend WithEvents atxPrec As atcControls.atcText
+    Friend WithEvents cboBMPLayer As System.Windows.Forms.ComboBox
+    Friend WithEvents cbxBMPs As System.Windows.Forms.CheckBox
+    Friend WithEvents lblType As System.Windows.Forms.Label
+    Friend WithEvents lblArea As System.Windows.Forms.Label
+    Friend WithEvents lblLayer As System.Windows.Forms.Label
+    Friend WithEvents lblRemoval As System.Windows.Forms.Label
+    Friend WithEvents cboBMPType As System.Windows.Forms.ComboBox
+    Friend WithEvents cboAreaField As System.Windows.Forms.ComboBox
+    Friend WithEvents atcGridBMP As atcControls.atcGrid
+    Friend WithEvents cmdChangeBMP As System.Windows.Forms.Button
+    Friend WithEvents lblBMPFile As System.Windows.Forms.Label
     Friend WithEvents ofdValues As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
@@ -97,6 +108,17 @@ Public Class frmModelSetup
         Me.atcGridValues = New atcControls.atcGrid
         Me.tabPointSources = New System.Windows.Forms.TabPage
         Me.tabBMPs = New System.Windows.Forms.TabPage
+        Me.atcGridBMP = New atcControls.atcGrid
+        Me.cmdChangeBMP = New System.Windows.Forms.Button
+        Me.lblBMPFile = New System.Windows.Forms.Label
+        Me.lblType = New System.Windows.Forms.Label
+        Me.lblArea = New System.Windows.Forms.Label
+        Me.lblLayer = New System.Windows.Forms.Label
+        Me.lblRemoval = New System.Windows.Forms.Label
+        Me.cboBMPType = New System.Windows.Forms.ComboBox
+        Me.cboAreaField = New System.Windows.Forms.ComboBox
+        Me.cboBMPLayer = New System.Windows.Forms.ComboBox
+        Me.cbxBMPs = New System.Windows.Forms.CheckBox
         Me.cmdOK = New System.Windows.Forms.Button
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdHelp = New System.Windows.Forms.Button
@@ -106,6 +128,7 @@ Public Class frmModelSetup
         Me.tabGeneral.SuspendLayout()
         Me.tabLanduse.SuspendLayout()
         Me.tabValues.SuspendLayout()
+        Me.tabBMPs.SuspendLayout()
         Me.SuspendLayout()
         '
         'tabPLOAD
@@ -435,12 +458,143 @@ Public Class frmModelSetup
         '
         'tabBMPs
         '
+        Me.tabBMPs.Controls.Add(Me.atcGridBMP)
+        Me.tabBMPs.Controls.Add(Me.cmdChangeBMP)
+        Me.tabBMPs.Controls.Add(Me.lblBMPFile)
+        Me.tabBMPs.Controls.Add(Me.lblType)
+        Me.tabBMPs.Controls.Add(Me.lblArea)
+        Me.tabBMPs.Controls.Add(Me.lblLayer)
+        Me.tabBMPs.Controls.Add(Me.lblRemoval)
+        Me.tabBMPs.Controls.Add(Me.cboBMPType)
+        Me.tabBMPs.Controls.Add(Me.cboAreaField)
+        Me.tabBMPs.Controls.Add(Me.cboBMPLayer)
+        Me.tabBMPs.Controls.Add(Me.cbxBMPs)
         Me.tabBMPs.Location = New System.Drawing.Point(4, 25)
         Me.tabBMPs.Name = "tabBMPs"
         Me.tabBMPs.Size = New System.Drawing.Size(623, 247)
         Me.tabBMPs.TabIndex = 3
         Me.tabBMPs.Text = "BMPs"
         Me.tabBMPs.UseVisualStyleBackColor = True
+        '
+        'atcGridBMP
+        '
+        Me.atcGridBMP.AllowHorizontalScrolling = True
+        Me.atcGridBMP.AllowNewValidValues = False
+        Me.atcGridBMP.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcGridBMP.CellBackColor = System.Drawing.Color.Empty
+        Me.atcGridBMP.LineColor = System.Drawing.Color.Empty
+        Me.atcGridBMP.LineWidth = 0.0!
+        Me.atcGridBMP.Location = New System.Drawing.Point(15, 141)
+        Me.atcGridBMP.Name = "atcGridBMP"
+        Me.atcGridBMP.Size = New System.Drawing.Size(594, 96)
+        Me.atcGridBMP.Source = Nothing
+        Me.atcGridBMP.TabIndex = 27
+        '
+        'cmdChangeBMP
+        '
+        Me.cmdChangeBMP.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdChangeBMP.Location = New System.Drawing.Point(539, 116)
+        Me.cmdChangeBMP.Name = "cmdChangeBMP"
+        Me.cmdChangeBMP.Size = New System.Drawing.Size(71, 24)
+        Me.cmdChangeBMP.TabIndex = 26
+        Me.cmdChangeBMP.Text = "Change"
+        '
+        'lblBMPFile
+        '
+        Me.lblBMPFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblBMPFile.Location = New System.Drawing.Point(213, 120)
+        Me.lblBMPFile.Name = "lblBMPFile"
+        Me.lblBMPFile.Size = New System.Drawing.Size(318, 16)
+        Me.lblBMPFile.TabIndex = 25
+        Me.lblBMPFile.Text = "<none>"
+        Me.lblBMPFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblType
+        '
+        Me.lblType.AutoSize = True
+        Me.lblType.Location = New System.Drawing.Point(114, 49)
+        Me.lblType.Name = "lblType"
+        Me.lblType.Size = New System.Drawing.Size(111, 17)
+        Me.lblType.TabIndex = 24
+        Me.lblType.Text = "BMP Type Field:"
+        Me.lblType.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblArea
+        '
+        Me.lblArea.AutoSize = True
+        Me.lblArea.Location = New System.Drawing.Point(149, 79)
+        Me.lblArea.Name = "lblArea"
+        Me.lblArea.Size = New System.Drawing.Size(76, 17)
+        Me.lblArea.TabIndex = 23
+        Me.lblArea.Text = "Area Field:"
+        Me.lblArea.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblLayer
+        '
+        Me.lblLayer.AutoSize = True
+        Me.lblLayer.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblLayer.Location = New System.Drawing.Point(147, 17)
+        Me.lblLayer.Name = "lblLayer"
+        Me.lblLayer.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.lblLayer.Size = New System.Drawing.Size(81, 17)
+        Me.lblLayer.TabIndex = 22
+        Me.lblLayer.Text = "BMP Layer:"
+        Me.lblLayer.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblRemoval
+        '
+        Me.lblRemoval.Location = New System.Drawing.Point(12, 120)
+        Me.lblRemoval.Name = "lblRemoval"
+        Me.lblRemoval.Size = New System.Drawing.Size(195, 16)
+        Me.lblRemoval.TabIndex = 21
+        Me.lblRemoval.Text = "BMP Removal Efficiency File:"
+        Me.lblRemoval.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboBMPType
+        '
+        Me.cboBMPType.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboBMPType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboBMPType.FormattingEnabled = True
+        Me.cboBMPType.Location = New System.Drawing.Point(234, 46)
+        Me.cboBMPType.Name = "cboBMPType"
+        Me.cboBMPType.Size = New System.Drawing.Size(246, 24)
+        Me.cboBMPType.TabIndex = 3
+        '
+        'cboAreaField
+        '
+        Me.cboAreaField.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboAreaField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboAreaField.FormattingEnabled = True
+        Me.cboAreaField.Location = New System.Drawing.Point(234, 76)
+        Me.cboAreaField.Name = "cboAreaField"
+        Me.cboAreaField.Size = New System.Drawing.Size(246, 24)
+        Me.cboAreaField.TabIndex = 2
+        '
+        'cboBMPLayer
+        '
+        Me.cboBMPLayer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboBMPLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboBMPLayer.FormattingEnabled = True
+        Me.cboBMPLayer.Location = New System.Drawing.Point(234, 14)
+        Me.cboBMPLayer.Name = "cboBMPLayer"
+        Me.cboBMPLayer.Size = New System.Drawing.Size(301, 24)
+        Me.cboBMPLayer.TabIndex = 1
+        '
+        'cbxBMPs
+        '
+        Me.cbxBMPs.AutoSize = True
+        Me.cbxBMPs.Location = New System.Drawing.Point(15, 16)
+        Me.cbxBMPs.Name = "cbxBMPs"
+        Me.cbxBMPs.Size = New System.Drawing.Size(92, 21)
+        Me.cbxBMPs.TabIndex = 0
+        Me.cbxBMPs.Text = "Use BMPs"
+        Me.cbxBMPs.UseVisualStyleBackColor = True
         '
         'cmdOK
         '
@@ -509,6 +663,8 @@ Public Class frmModelSetup
         Me.tabLanduse.PerformLayout()
         Me.tabValues.ResumeLayout(False)
         Me.tabValues.PerformLayout()
+        Me.tabBMPs.ResumeLayout(False)
+        Me.tabBMPs.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -652,12 +808,18 @@ Public Class frmModelSetup
                 If GisUtil.CurrentLayer = lLyr Then
                     lSelectedLayer = cboSubbasins.Items.Count - 1
                 End If
+                'also possible bmp layer
+                cboBMPLayer.Items.Add(lTemp)
+                If InStr(lTemp, "BMP") > 0 Then
+                    cboBMPLayer.SelectedIndex = cboBMPLayer.Items.Count - 1
+                End If
             ElseIf GisUtil.LayerType(lLyr) = 1 Then
                 'PointShapefile
-                'cboOutlets.Items.Add(ctemp)
-                'If UCase(ctemp) = "OUTLETS" Then
-                '    cboOutlets.SelectedIndex = cboOutlets.Items.Count - 1
-                'End If
+                'possible bmp layer
+                cboBMPLayer.Items.Add(lTemp)
+                If InStr(lTemp, "BMP") > 0 Then
+                    cboBMPLayer.SelectedIndex = cboBMPLayer.Items.Count - 1
+                End If
             End If
         Next
         If lSelectedLayer > -1 Then
@@ -667,15 +829,21 @@ Public Class frmModelSetup
         If cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
             cboSubbasins.SelectedIndex = 0
         End If
-        'If cboOutlets.Items.Count > 0 And cboOutlets.SelectedIndex < 0 Then
-        '    cboOutlets.SelectedIndex = 0
-        'End If
+        If cboBMPLayer.Items.Count > 0 And cboBMPLayer.SelectedIndex < 0 Then
+            cboBMPLayer.SelectedIndex = 0
+        End If
 
         With atcGridValues
             .Source = New atcControls.atcGridSource
             .Font = New Font(.Font, FontStyle.Regular)
             .AllowHorizontalScrolling = True
         End With
+        With atcGridBMP
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+        SetBMPGridValues()
 
         cboLanduse.SelectedIndex = 0
 
@@ -734,6 +902,26 @@ Public Class frmModelSetup
 
         If cboLandUseIDField.Items.Count > 0 And cboLandUseIDField.SelectedIndex < 0 Then
             cboLandUseIDField.SelectedIndex = 0
+        End If
+    End Sub
+
+    Private Sub PopulateBMPFields()
+        Dim lLyr As Integer
+        Dim i As Integer
+
+        lLyr = GisUtil.LayerIndex(cboBMPLayer.Items(cboBMPLayer.SelectedIndex))
+        cboAreaField.Items.Clear()
+        cboBMPType.Items.Clear()
+        For i = 0 To GisUtil.NumFields(lLyr) - 1
+            cboAreaField.Items.Add(GisUtil.FieldName(i, lLyr))
+            cboBMPType.Items.Add(GisUtil.FieldName(i, lLyr))
+        Next i
+
+        If cboAreaField.Items.Count > 0 And cboAreaField.SelectedIndex < 0 Then
+            cboAreaField.SelectedIndex = 0
+        End If
+        If cboBMPType.Items.Count > 0 And cboBMPType.SelectedIndex < 0 Then
+            cboBMPType.SelectedIndex = 0
         End If
     End Sub
 
@@ -818,6 +1006,70 @@ Public Class frmModelSetup
         lstConstituents.SelectedItems.Clear()
         If lstConstituents.Items.Count > 0 Then
             lstConstituents.SelectedItems.Add(lstConstituents.Items(0))
+        End If
+    End Sub
+
+    Private Sub cboBMPLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboBMPLayer.SelectedIndexChanged
+        Logger.Dbg("BMPLayerChangedTo " & cboBMPLayer.Items(cboBMPLayer.SelectedIndex))
+
+        If GisUtil.LayerType(GisUtil.LayerIndex(cboBMPLayer.Items(cboBMPLayer.SelectedIndex))) = 3 Then
+            cboAreaField.Visible = False
+            lblArea.Visible = False
+        Else
+            'area field just applies to point bmps
+            cboAreaField.Visible = True
+            lblArea.Visible = True
+        End If
+        PopulateBMPFields()
+    End Sub
+
+    Private Sub SetBMPGridValues()
+        Dim i As Integer, k As Integer
+        Dim lDbf As IatcTable
+        Dim lSorted As New atcCollection
+
+        If atcGridBMP.Source Is Nothing Then Exit Sub
+
+        lblBMPFile.Text = "\BASINS\etc\bmpeffic.dbf"
+        atcGridBMP.Clear()
+
+        If lblBMPFile.Text <> "<none>" Then
+            lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblBMPFile.Text)
+
+            With atcGridBMP.Source
+                .Rows = 1
+                .Columns = lDbf.NumFields
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                For i = 1 To lDbf.NumFields
+                    .CellValue(0, i) = lDbf.FieldName(i)
+                    .CellColor(0, i) = SystemColors.ControlDark
+                Next i
+
+                For k = 1 To lDbf.NumRecords
+                    lDbf.CurrentRecord = k
+                    For i = 1 To lDbf.NumFields
+                        .CellValue(k, i) = lDbf.Value(i)
+                        If i > 2 Then
+                            .CellEditable(k, i) = True
+                        Else
+                            .CellColor(k, i) = SystemColors.ControlDark
+                        End If
+                    Next i
+                Next k
+            End With
+
+        End If
+        atcGridBMP.SizeAllColumnsToContents()
+        atcGridBMP.Refresh()
+    End Sub
+
+    Private Sub cmdChangeBMP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdChangeBMP.Click
+        ofdValues.Title = "Set BMP Removal Efficiency File"
+        If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            lblBMPFile.Text = ofdValues.FileName
+            SetBMPGridValues()
         End If
     End Sub
 End Class
