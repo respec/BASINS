@@ -134,8 +134,6 @@ Public Class atcBasinsPlugIn
         mnu = AddMenuIfMissing(ModelsMenuName & "_SWAT", ModelsMenuName, "SWAT")
         mnu.Tooltip = "SWAT"
         mnu.Enabled = False
-        mnu = AddMenuIfMissing(ModelsMenuName & "_PLOAD", ModelsMenuName, "PLOAD")
-        mnu.Tooltip = "PLOAD"
         mnu.Enabled = False
         mnu = AddMenuIfMissing(ModelsMenuName & "_AGWA", ModelsMenuName, "AGWA")
         mnu.Tooltip = "AGWA"
