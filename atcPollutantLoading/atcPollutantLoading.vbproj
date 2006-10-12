@@ -143,6 +143,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="modPollutantLoading.vb" />
+    <Compile Include="modPollutantLoadingScript.vb" />
     <EmbeddedResource Include="frmPollutantLoading.resx">
       <DependentUpon>frmPollutantLoading.vb</DependentUpon>
       <SubType>Designer</SubType>

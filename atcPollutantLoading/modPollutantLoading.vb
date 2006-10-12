@@ -3,8 +3,8 @@ Imports atcControls
 Imports atcUtility
 Imports MapWinUtility
 
-Module modPollutantLoading
-    Friend Sub GenerateLoads(ByVal aSubbasinLayerName As String, _
+Public Module modPollutantLoading
+    Public Sub GenerateLoads(ByVal aSubbasinLayerName As String, _
                              ByVal aGridSource As atcGridSource, _
                              ByVal aUseExportCoefficent As Boolean, _
                              ByVal aLandUse As String, _
