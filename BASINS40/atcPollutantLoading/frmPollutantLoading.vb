@@ -761,6 +761,16 @@ Public Class frmModelSetup
                     lLandUseId = cboLandUseIDField.Items(cboLandUseIDField.SelectedIndex)
                 End If
 
+                Dim lBMPAreaField As String = ""
+                If cboAreaField.SelectedIndex > -1 Then
+                    lBMPAreaField = cboAreaField.Items(cboAreaField.SelectedIndex)
+                End If
+
+                Dim lBMPTypeField As String = ""
+                If cboBMPType.SelectedIndex > -1 Then
+                    lBMPTypeField = cboBMPType.Items(cboBMPType.SelectedIndex)
+                End If
+
                 GenerateLoads(cboSubbasins.Items(cboSubbasins.SelectedIndex), _
                               atcGridValues.Source, _
                               rbExportCoefficientMethod.Checked, _
@@ -769,7 +779,12 @@ Public Class frmModelSetup
                               lLandUseId, _
                               atxPrec.Value, _
                               atxRatio.Value, _
-                              lConstituents)
+                              lConstituents, _
+                              cbxBMPs.Checked, _
+                              cboBMPLayer.Items(cboBMPLayer.SelectedIndex), _
+                              lBMPAreaField, _
+                              lBMPTypeField, _
+                              atcGridBMP.Source)
 
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
                 Me.Close()

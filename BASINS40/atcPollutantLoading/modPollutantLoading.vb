@@ -12,10 +12,23 @@ Public Module modPollutantLoading
                              ByVal aLandUseId As String, _
                              ByVal aPrec As Double, _
                              ByVal aRatio As Double, _
-                             ByVal aConstituents As atcCollection)
+                             ByVal aConstituents As atcCollection, _
+                             ByVal aUseBMPs As Boolean, _
+                             ByVal aBMPLayerName As String, _
+                             ByVal aBMPAreaField As String, _
+                             ByVal aBMPTypefield As String, _
+                             ByVal aBMPGridSource As atcGridSource)
+
         Dim i As Integer, j As Integer, k As Integer
         Dim lSubbasinLayerIndex As Integer
         Dim lLanduseLayerIndex As Integer
+        Dim lBMPLayerIndex As Integer
+        Dim lBMPLayerType As Integer
+        Dim lBMPArea As Single
+        Dim lBMPAreaFieldIndex As Integer
+        Dim lBMPTypeFieldIndex As Integer
+        Dim lBMPType As String
+        Dim lEffic As Single
         Dim lLucode As Integer
         Dim lProblem As String
 
@@ -143,6 +156,43 @@ Public Module modPollutantLoading
             Next i
         End If
 
+        If aUseBMPs Then
+            'reduce loads due to bmps
+            lBMPLayerIndex = GisUtil.LayerIndex(aBMPLayerName)
+            lBMPLayerType = GisUtil.LayerType(lBMPLayerIndex)
+            lBMPAreaFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBMPAreaField)
+            lBMPTypeFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBMPTypefield)
+            'for each subbasin
+            For i = 0 To lSelectedAreaIndexes.Count - 1
+                'for each bmp feature
+                For k = 1 To GisUtil.NumFeatures(lBMPLayerIndex)
+                    'is there an intersect?
+                    lBMPArea = 0.0
+                    If lBMPLayerType = 1 Then
+                        'point layer
+                        If GisUtil.PointInPolygon(lBMPLayerIndex, k, lSubbasinLayerIndex) = lSelectedAreaIndexes(i + 1) Then
+                            lBMPArea = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPAreaFieldIndex)
+                        End If
+                    Else
+                        'polygon layer
+                        lBMPArea = GisUtil.AreaOverlappingPolygons(lBMPLayerIndex, k - 1, lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1)) / 4046.8564
+                    End If
+                    If lBMPArea > 0.0 Then
+                        'have some bmp area
+                        lBMPType = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPTypeFieldIndex)
+                        For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                            'find the efficiency of this bmp type for this constituent
+                            lEffic = GetEfficiency(aBMPGridSource, lBMPType, lConsNames(j))
+                            'subtract the load reduction due to this bmp from the load;
+                            'the load reduction is the load * fractional area * fractional removal efficiency,
+                            'ie 1000 lbs load with 20% bmp area with a 30% removal = 60 lbs removed 
+                            lLoadsSC(i, j) = lLoadsSC(i, j) - (lLoadsSC(i, j) * lBMPArea / lAreasS(i) * lEffic / 100)
+                        Next j
+                    End If
+                Next k
+            Next i
+        End If
+
         'calculate loads per acre
         For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
             If lAreasS(i) > 0 Then
@@ -238,6 +288,30 @@ Public Module modPollutantLoading
             End If
         Next j
     End Sub
+
+    Private Function GetEfficiency(ByVal aBMPGridSource As atcGridSource, _
+                                   ByVal aBMPType As String, _
+                                   ByVal aConsName As String) As Single
+        'look thru table of BMP efficiency values looking for this bmp type and consitutuent
+        Dim i As Integer
+        Dim j As Integer
+
+        GetEfficiency = 0.0
+        With aBMPGridSource
+            For i = 1 To .Rows - 1
+                If .CellValue(i, 1) = aBMPType Then
+                    For j = 1 To .Columns
+                        If .CellValue(0, j) = aConsName Then
+                            GetEfficiency = .CellValue(i, j)
+                            Exit For
+                        End If
+                    Next j
+                    Exit For
+                End If
+            Next i
+        End With
+
+    End Function
 
     Private Sub CalculateGIRASAreas(ByVal aAreaLayerIndex As Integer, _
                                 ByVal aSelectedAreaIndexes As Collection, _
