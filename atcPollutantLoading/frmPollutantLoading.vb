@@ -81,6 +81,16 @@ Friend Class frmModelSetup
     Friend WithEvents atcGridBMP As atcControls.atcGrid
     Friend WithEvents cmdChangeBMP As System.Windows.Forms.Button
     Friend WithEvents lblBMPFile As System.Windows.Forms.Label
+    Friend WithEvents lblPointID As System.Windows.Forms.Label
+    Friend WithEvents lblPointLayer As System.Windows.Forms.Label
+    Friend WithEvents atcGridPoint As atcControls.atcGrid
+    Friend WithEvents cmdChangePoint As System.Windows.Forms.Button
+    Friend WithEvents lblPointLoadFile As System.Windows.Forms.Label
+    Friend WithEvents lblPointSourceFile As System.Windows.Forms.Label
+    Friend WithEvents cboPointIDField As System.Windows.Forms.ComboBox
+    Friend WithEvents cboPointLayer As System.Windows.Forms.ComboBox
+    Friend WithEvents cbxPoint As System.Windows.Forms.CheckBox
+    Friend WithEvents lblUnits As System.Windows.Forms.Label
     Friend WithEvents ofdValues As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
@@ -111,6 +121,15 @@ Friend Class frmModelSetup
         Me.lblValueFile = New System.Windows.Forms.Label
         Me.atcGridValues = New atcControls.atcGrid
         Me.tabPointSources = New System.Windows.Forms.TabPage
+        Me.lblPointID = New System.Windows.Forms.Label
+        Me.lblPointLayer = New System.Windows.Forms.Label
+        Me.atcGridPoint = New atcControls.atcGrid
+        Me.cmdChangePoint = New System.Windows.Forms.Button
+        Me.lblPointLoadFile = New System.Windows.Forms.Label
+        Me.lblPointSourceFile = New System.Windows.Forms.Label
+        Me.cboPointIDField = New System.Windows.Forms.ComboBox
+        Me.cboPointLayer = New System.Windows.Forms.ComboBox
+        Me.cbxPoint = New System.Windows.Forms.CheckBox
         Me.tabBMPs = New System.Windows.Forms.TabPage
         Me.atcGridBMP = New atcControls.atcGrid
         Me.cmdChangeBMP = New System.Windows.Forms.Button
@@ -128,10 +147,12 @@ Friend Class frmModelSetup
         Me.cmdHelp = New System.Windows.Forms.Button
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.ofdValues = New System.Windows.Forms.OpenFileDialog
+        Me.lblUnits = New System.Windows.Forms.Label
         Me.tabPLOAD.SuspendLayout()
         Me.tabGeneral.SuspendLayout()
         Me.tabLanduse.SuspendLayout()
         Me.tabValues.SuspendLayout()
+        Me.tabPointSources.SuspendLayout()
         Me.tabBMPs.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -151,7 +172,7 @@ Friend Class frmModelSetup
         Me.tabPLOAD.Location = New System.Drawing.Point(16, 16)
         Me.tabPLOAD.Name = "tabPLOAD"
         Me.tabPLOAD.SelectedIndex = 0
-        Me.tabPLOAD.Size = New System.Drawing.Size(631, 276)
+        Me.tabPLOAD.Size = New System.Drawing.Size(655, 283)
         Me.tabPLOAD.TabIndex = 0
         '
         'tabGeneral
@@ -173,7 +194,7 @@ Friend Class frmModelSetup
         Me.tabGeneral.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tabGeneral.Location = New System.Drawing.Point(4, 25)
         Me.tabGeneral.Name = "tabGeneral"
-        Me.tabGeneral.Size = New System.Drawing.Size(623, 247)
+        Me.tabGeneral.Size = New System.Drawing.Size(647, 254)
         Me.tabGeneral.TabIndex = 0
         Me.tabGeneral.Text = "General"
         Me.tabGeneral.UseVisualStyleBackColor = True
@@ -268,7 +289,7 @@ Friend Class frmModelSetup
         Me.lstConstituents.Location = New System.Drawing.Point(358, 38)
         Me.lstConstituents.Name = "lstConstituents"
         Me.lstConstituents.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstConstituents.Size = New System.Drawing.Size(237, 100)
+        Me.lstConstituents.Size = New System.Drawing.Size(261, 100)
         Me.lstConstituents.TabIndex = 11
         '
         'rbSimpleMethod
@@ -301,7 +322,7 @@ Friend Class frmModelSetup
         Me.cboSubbasins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSubbasins.Location = New System.Drawing.Point(201, 164)
         Me.cboSubbasins.Name = "cboSubbasins"
-        Me.cboSubbasins.Size = New System.Drawing.Size(343, 24)
+        Me.cboSubbasins.Size = New System.Drawing.Size(367, 24)
         Me.cboSubbasins.TabIndex = 8
         '
         'cboLanduse
@@ -312,7 +333,7 @@ Friend Class frmModelSetup
         Me.cboLanduse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLanduse.Location = New System.Drawing.Point(201, 201)
         Me.cboLanduse.Name = "cboLanduse"
-        Me.cboLanduse.Size = New System.Drawing.Size(343, 24)
+        Me.cboLanduse.Size = New System.Drawing.Size(367, 24)
         Me.cboLanduse.TabIndex = 7
         '
         'lblSubbasinsLayer
@@ -453,12 +474,121 @@ Friend Class frmModelSetup
         '
         'tabPointSources
         '
+        Me.tabPointSources.Controls.Add(Me.lblUnits)
+        Me.tabPointSources.Controls.Add(Me.lblPointID)
+        Me.tabPointSources.Controls.Add(Me.lblPointLayer)
+        Me.tabPointSources.Controls.Add(Me.atcGridPoint)
+        Me.tabPointSources.Controls.Add(Me.cmdChangePoint)
+        Me.tabPointSources.Controls.Add(Me.lblPointLoadFile)
+        Me.tabPointSources.Controls.Add(Me.lblPointSourceFile)
+        Me.tabPointSources.Controls.Add(Me.cboPointIDField)
+        Me.tabPointSources.Controls.Add(Me.cboPointLayer)
+        Me.tabPointSources.Controls.Add(Me.cbxPoint)
         Me.tabPointSources.Location = New System.Drawing.Point(4, 25)
         Me.tabPointSources.Name = "tabPointSources"
-        Me.tabPointSources.Size = New System.Drawing.Size(623, 247)
+        Me.tabPointSources.Size = New System.Drawing.Size(647, 254)
         Me.tabPointSources.TabIndex = 2
         Me.tabPointSources.Text = "Point Sources"
         Me.tabPointSources.UseVisualStyleBackColor = True
+        '
+        'lblPointID
+        '
+        Me.lblPointID.AutoSize = True
+        Me.lblPointID.Location = New System.Drawing.Point(158, 47)
+        Me.lblPointID.Name = "lblPointID"
+        Me.lblPointID.Size = New System.Drawing.Size(144, 17)
+        Me.lblPointID.TabIndex = 36
+        Me.lblPointID.Text = "Point Source ID Field:"
+        Me.lblPointID.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblPointLayer
+        '
+        Me.lblPointLayer.AutoSize = True
+        Me.lblPointLayer.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblPointLayer.Location = New System.Drawing.Point(169, 15)
+        Me.lblPointLayer.Name = "lblPointLayer"
+        Me.lblPointLayer.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.lblPointLayer.Size = New System.Drawing.Size(133, 17)
+        Me.lblPointLayer.TabIndex = 35
+        Me.lblPointLayer.Text = "Point Source Layer:"
+        Me.lblPointLayer.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'atcGridPoint
+        '
+        Me.atcGridPoint.AllowHorizontalScrolling = True
+        Me.atcGridPoint.AllowNewValidValues = False
+        Me.atcGridPoint.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcGridPoint.CellBackColor = System.Drawing.Color.Empty
+        Me.atcGridPoint.LineColor = System.Drawing.Color.Empty
+        Me.atcGridPoint.LineWidth = 0.0!
+        Me.atcGridPoint.Location = New System.Drawing.Point(15, 126)
+        Me.atcGridPoint.Name = "atcGridPoint"
+        Me.atcGridPoint.Size = New System.Drawing.Size(618, 116)
+        Me.atcGridPoint.Source = Nothing
+        Me.atcGridPoint.TabIndex = 34
+        '
+        'cmdChangePoint
+        '
+        Me.cmdChangePoint.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdChangePoint.Location = New System.Drawing.Point(563, 85)
+        Me.cmdChangePoint.Name = "cmdChangePoint"
+        Me.cmdChangePoint.Size = New System.Drawing.Size(71, 24)
+        Me.cmdChangePoint.TabIndex = 33
+        Me.cmdChangePoint.Text = "Change"
+        '
+        'lblPointLoadFile
+        '
+        Me.lblPointLoadFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblPointLoadFile.Location = New System.Drawing.Point(213, 89)
+        Me.lblPointLoadFile.Name = "lblPointLoadFile"
+        Me.lblPointLoadFile.Size = New System.Drawing.Size(342, 16)
+        Me.lblPointLoadFile.TabIndex = 32
+        Me.lblPointLoadFile.Text = "<none>"
+        Me.lblPointLoadFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblPointSourceFile
+        '
+        Me.lblPointSourceFile.Location = New System.Drawing.Point(12, 89)
+        Me.lblPointSourceFile.Name = "lblPointSourceFile"
+        Me.lblPointSourceFile.Size = New System.Drawing.Size(195, 16)
+        Me.lblPointSourceFile.TabIndex = 31
+        Me.lblPointSourceFile.Text = "Point Source Loading File:"
+        Me.lblPointSourceFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboPointIDField
+        '
+        Me.cboPointIDField.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPointIDField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPointIDField.FormattingEnabled = True
+        Me.cboPointIDField.Location = New System.Drawing.Point(308, 44)
+        Me.cboPointIDField.Name = "cboPointIDField"
+        Me.cboPointIDField.Size = New System.Drawing.Size(270, 24)
+        Me.cboPointIDField.TabIndex = 30
+        '
+        'cboPointLayer
+        '
+        Me.cboPointLayer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPointLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPointLayer.FormattingEnabled = True
+        Me.cboPointLayer.Location = New System.Drawing.Point(308, 12)
+        Me.cboPointLayer.Name = "cboPointLayer"
+        Me.cboPointLayer.Size = New System.Drawing.Size(325, 24)
+        Me.cboPointLayer.TabIndex = 29
+        '
+        'cbxPoint
+        '
+        Me.cbxPoint.AutoSize = True
+        Me.cbxPoint.Location = New System.Drawing.Point(15, 14)
+        Me.cbxPoint.Name = "cbxPoint"
+        Me.cbxPoint.Size = New System.Drawing.Size(144, 21)
+        Me.cbxPoint.TabIndex = 28
+        Me.cbxPoint.Text = "Use Point Sources"
+        Me.cbxPoint.UseVisualStyleBackColor = True
         '
         'tabBMPs
         '
@@ -604,7 +734,7 @@ Friend Class frmModelSetup
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOK.Location = New System.Drawing.Point(16, 310)
+        Me.cmdOK.Location = New System.Drawing.Point(16, 317)
         Me.cmdOK.Name = "cmdOK"
         Me.cmdOK.Size = New System.Drawing.Size(103, 32)
         Me.cmdOK.TabIndex = 2
@@ -614,7 +744,7 @@ Friend Class frmModelSetup
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(125, 310)
+        Me.cmdCancel.Location = New System.Drawing.Point(125, 317)
         Me.cmdCancel.Name = "cmdCancel"
         Me.cmdCancel.Size = New System.Drawing.Size(88, 32)
         Me.cmdCancel.TabIndex = 5
@@ -624,7 +754,7 @@ Friend Class frmModelSetup
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(471, 310)
+        Me.cmdHelp.Location = New System.Drawing.Point(495, 317)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(80, 32)
         Me.cmdHelp.TabIndex = 6
@@ -634,7 +764,7 @@ Friend Class frmModelSetup
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(559, 310)
+        Me.cmdAbout.Location = New System.Drawing.Point(583, 317)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(88, 32)
         Me.cmdAbout.TabIndex = 7
@@ -646,10 +776,19 @@ Friend Class frmModelSetup
         Me.ofdValues.Filter = "DBF Files (*.dbf)|*.dbf"
         Me.ofdValues.Title = "Select File"
         '
+        'lblUnits
+        '
+        Me.lblUnits.Location = New System.Drawing.Point(34, 107)
+        Me.lblUnits.Name = "lblUnits"
+        Me.lblUnits.Size = New System.Drawing.Size(195, 16)
+        Me.lblUnits.TabIndex = 37
+        Me.lblUnits.Text = "(lbs/yr or counts/yr))"
+        Me.lblUnits.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
         'frmModelSetup
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(663, 355)
+        Me.ClientSize = New System.Drawing.Size(687, 362)
         Me.Controls.Add(Me.cmdAbout)
         Me.Controls.Add(Me.cmdHelp)
         Me.Controls.Add(Me.cmdCancel)
@@ -667,6 +806,8 @@ Friend Class frmModelSetup
         Me.tabLanduse.PerformLayout()
         Me.tabValues.ResumeLayout(False)
         Me.tabValues.PerformLayout()
+        Me.tabPointSources.ResumeLayout(False)
+        Me.tabPointSources.PerformLayout()
         Me.tabBMPs.ResumeLayout(False)
         Me.tabBMPs.PerformLayout()
         Me.ResumeLayout(False)
@@ -775,6 +916,11 @@ Friend Class frmModelSetup
                     lBMPTypeField = cboBMPType.Items(cboBMPType.SelectedIndex)
                 End If
 
+                Dim lPointIdField As String = ""
+                If cboPointIDField.SelectedIndex > -1 Then
+                    lPointIdField = cboPointIDField.Items(cboPointIDField.SelectedIndex)
+                End If
+
                 GenerateLoads(cboSubbasins.Items(cboSubbasins.SelectedIndex), _
                               atcGridValues.Source, _
                               rbExportCoefficientMethod.Checked, _
@@ -788,7 +934,11 @@ Friend Class frmModelSetup
                               cboBMPLayer.Items(cboBMPLayer.SelectedIndex), _
                               lBMPAreaField, _
                               lBMPTypeField, _
-                              atcGridBMP.Source)
+                              atcGridBMP.Source, _
+                              cbxPoint.Checked, _
+                              cboPointLayer.Items(cboPointLayer.SelectedIndex), _
+                              lpointidField, _
+                              atcGridPoint.Source)
 
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
                 Me.Close()
@@ -839,6 +989,11 @@ Friend Class frmModelSetup
                 If InStr(lTemp, "BMP") > 0 Then
                     cboBMPLayer.SelectedIndex = cboBMPLayer.Items.Count - 1
                 End If
+                'possible point source layer
+                cboPointLayer.Items.Add(lTemp)
+                If InStr(lTemp, "Permit Compliance") > 0 Then
+                    cboPointLayer.SelectedIndex = cboPointLayer.Items.Count - 1
+                End If
             End If
         Next
         If lSelectedLayer > -1 Then
@@ -851,6 +1006,9 @@ Friend Class frmModelSetup
         If cboBMPLayer.Items.Count > 0 And cboBMPLayer.SelectedIndex < 0 Then
             cboBMPLayer.SelectedIndex = 0
         End If
+        If cboPointLayer.Items.Count > 0 And cboPointLayer.SelectedIndex < 0 Then
+            cboPointLayer.SelectedIndex = 0
+        End If
 
         With atcGridValues
             .Source = New atcControls.atcGridSource
@@ -858,6 +1016,11 @@ Friend Class frmModelSetup
             .AllowHorizontalScrolling = True
         End With
         With atcGridBMP
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+        With atcGridPoint
             .Source = New atcControls.atcGridSource
             .Font = New Font(.Font, FontStyle.Regular)
             .AllowHorizontalScrolling = True
@@ -944,6 +1107,21 @@ Friend Class frmModelSetup
         End If
     End Sub
 
+    Private Sub PopulatePointFields()
+        Dim lLyr As Integer
+        Dim i As Integer
+
+        lLyr = GisUtil.LayerIndex(cboPointLayer.Items(cboPointLayer.SelectedIndex))
+        cboPointIDField.Items.Clear()
+        For i = 0 To GisUtil.NumFields(lLyr) - 1
+            cboPointIDField.Items.Add(GisUtil.FieldName(i, lLyr))
+        Next i
+
+        If cboPointIDField.Items.Count > 0 And cboPointIDField.SelectedIndex < 0 Then
+            cboPointIDField.SelectedIndex = 0
+        End If
+    End Sub
+
     Private Sub SetGridValues()
         Dim lSorted As New atcCollection
 
@@ -951,24 +1129,24 @@ Friend Class frmModelSetup
 
         If rbExportCoefficientMethod.Checked = True Then
             If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                lblValueFileName.Text = "\BASINS\etc\ecgiras.dbf"
+                lblValueFileName.Text = "\BASINS\etc\pload\ecgiras.dbf"
             ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-                lblValueFileName.Text = "\BASINS\etc\ecgiras.dbf"
+                lblValueFileName.Text = "\BASINS\etc\pload\ecgiras.dbf"
             ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                lblValueFileName.Text = "\BASINS\etc\ecnlcd.dbf"
+                lblValueFileName.Text = "\BASINS\etc\pload\ecnlcd.dbf"
             Else 'grid
-                lblValueFileName.Text = "\BASINS\etc\ecnlcd.dbf"
+                lblValueFileName.Text = "\BASINS\etc\pload\ecnlcd.dbf"
             End If
         Else
             'emc (simple) method
             If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                lblValueFileName.Text = "\BASINS\etc\emcgiras.dbf"
+                lblValueFileName.Text = "\BASINS\etc\pload\emcgiras.dbf"
             ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-                lblValueFileName.Text = "\BASINS\etc\emcgiras.dbf"
+                lblValueFileName.Text = "\BASINS\etc\pload\emcgiras.dbf"
             ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                lblValueFileName.Text = "\BASINS\etc\emcnlcd.dbf"
+                lblValueFileName.Text = "\BASINS\etc\pload\emcnlcd.dbf"
             Else 'grid
-                lblValueFileName.Text = "\BASINS\etc\emcnlcd.dbf"
+                lblValueFileName.Text = "\BASINS\etc\pload\emcnlcd.dbf"
             End If
         End If
         atcGridValues.Clear()
@@ -1015,6 +1193,11 @@ Friend Class frmModelSetup
         PopulateBMPFields()
     End Sub
 
+    Private Sub cboPointLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboPointLayer.SelectedIndexChanged
+        Logger.Dbg("PointLoadLayerChangedTo " & cboPointLayer.Items(cboPointLayer.SelectedIndex))
+        PopulatePointFields()
+    End Sub
+
     Private Sub SetBMPGridValues()
         Dim i As Integer, k As Integer
         Dim lDbf As IatcTable
@@ -1022,7 +1205,7 @@ Friend Class frmModelSetup
 
         If atcGridBMP.Source Is Nothing Then Exit Sub
 
-        lblBMPFile.Text = "\BASINS\etc\bmpeffic.dbf"
+        lblBMPFile.Text = "\BASINS\etc\pload\bmpeffic.dbf"
         atcGridBMP.Clear()
 
         If lblBMPFile.Text <> "<none>" Then
@@ -1057,11 +1240,61 @@ Friend Class frmModelSetup
         atcGridBMP.Refresh()
     End Sub
 
+    Private Sub SetPointGridValues()
+        Dim i As Integer, k As Integer
+        Dim lDbf As IatcTable
+        Dim lSorted As New atcCollection
+
+        If atcGridPoint.Source Is Nothing Then Exit Sub
+
+        lblPointLoadFile.Text = "\BASINS\etc\pload\pointload.dbf"
+        atcGridPoint.Clear()
+
+        If lblPointLoadFile.Text <> "<none>" Then
+            lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblPointLoadFile.Text)
+
+            With atcGridPoint.Source
+                .Rows = 1
+                .Columns = lDbf.NumFields
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                For i = 1 To lDbf.NumFields
+                    .CellValue(0, i) = lDbf.FieldName(i)
+                    .CellColor(0, i) = SystemColors.ControlDark
+                Next i
+
+                For k = 1 To lDbf.NumRecords
+                    lDbf.CurrentRecord = k
+                    For i = 1 To lDbf.NumFields
+                        .CellValue(k, i) = lDbf.Value(i)
+                        If i > 1 Then
+                            .CellEditable(k, i) = True
+                        Else
+                            .CellColor(k, i) = SystemColors.ControlDark
+                        End If
+                    Next i
+                Next k
+            End With
+
+        End If
+        atcGridPoint.SizeAllColumnsToContents()
+        atcGridPoint.Refresh()
+    End Sub
+
     Private Sub cmdChangeBMP_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdChangeBMP.Click
         ofdValues.Title = "Set BMP Removal Efficiency File"
         If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
             lblBMPFile.Text = ofdValues.FileName
             SetBMPGridValues()
+        End If
+    End Sub
+
+    Private Sub cmdChangePoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdChangePoint.Click
+        ofdValues.Title = "Set Point Source Loading File"
+        If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            lblBMPFile.Text = ofdValues.FileName
+            SetPointGridValues()
         End If
     End Sub
 End Class

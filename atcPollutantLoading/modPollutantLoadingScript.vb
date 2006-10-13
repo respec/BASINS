@@ -49,6 +49,10 @@ Module modPollutantLoadingScript
         Dim lBMPAreaField As String = ""
         Dim lBMPTypefield As String = ""
         Dim lBMPGridSource As New atcGridSource
+        Dim lUsePointSources As Boolean = False
+        Dim lPointLayerName As String = ""
+        Dim lPointIDField As String = ""
+        Dim lPointGridSource As New atcGridSource
 
         GenerateLoads(pSubbasinLayerName, _
                       lGridSource, _
@@ -63,6 +67,10 @@ Module modPollutantLoadingScript
                       lBMPLayerName, _
                       lBMPAreaField, _
                       lBMPTypefield, _
-                      lBMPGridSource)
+                      lBMPGridSource, _
+                      lUsePointSources, _
+                      lPointLayerName, _
+                      lPointIDField, _
+                      lPointGridSource)
     End Sub
 End Module
