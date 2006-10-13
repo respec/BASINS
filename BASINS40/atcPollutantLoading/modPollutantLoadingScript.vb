@@ -16,7 +16,12 @@ Imports atcMwGisUtility
 ''' </remarks>
 Module modPollutantLoadingScript
     Private Const pDirPath As String = "c:\test\atcPollutantLoading"
-    Private Const pProject As String = "D:\Basins\data\02070009\02070009.mwprj"
+    Private Const pBasinsDir As String = "D:\Basins\"
+    Private Const pGridValuesSourceFilename As String = pBasinsDir & "etc\ecgiras.dbf"
+
+    Private Const pProject As String = pBasinsDir & "data\02070009\02070009.mwprj"
+    Private Const pSubbasinLayerName As String = "CBP Phase 5 - River Segments"
+    Private Const pLandUse As String = "USGS GIRAS Shapefile"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("PollutantLoadingScript:Start")
@@ -30,27 +35,34 @@ Module modPollutantLoadingScript
         aMapWin.Project.Load(pProject)
         Logger.Dbg(" Project '" & pProject & "' Loaded, Curdir '" & CurDir() & "'")
 
-        Dim lSubbasinLayerName As String = "CBP Phase 5 - River Segments"
-        Dim lGridSource As New atcGridSource 
-        lGridSource = Nothing
         Dim lUseExportCoefficent As Boolean = True
-        Dim lLandUse As String = "USGS GIRAS Shapefile"
+        Dim lGridSource As New atcGridSource
+        SetGridValuesSource(pGridValuesSourceFileName, lGridSource)
         Dim lLandUseLayer As String = ""
         Dim lLandUseId As String = ""
         Dim lPrec As Double = 40
         Dim lRatio As Double = 0.9
         Dim lConstituents As New atcCollection
         lConstituents.Add("BOD")
+        Dim lUseBMPs As Boolean = False
+        Dim lBMPLayerName As String = ""
+        Dim lBMPAreaField As String = ""
+        Dim lBMPTypefield As String = ""
+        Dim lBMPGridSource As New atcGridSource
 
-        GenerateLoads(lSubbasinLayerName, _
+        GenerateLoads(pSubbasinLayerName, _
                       lGridSource, _
                       lUseExportCoefficent, _
-                      lLandUse, _
+                      pLandUse, _
                       lLandUseLayer, _
                       lLandUseId, _
                       lPrec, _
                       lRatio, _
-                      lConstituents)
-
+                      lConstituents, _
+                      lUseBMPs, _
+                      lBMPLayerName, _
+                      lBMPAreaField, _
+                      lBMPTypefield, _
+                      lBMPGridSource)
     End Sub
 End Module

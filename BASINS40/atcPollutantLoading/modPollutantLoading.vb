@@ -1,9 +1,32 @@
+Imports System.Drawing
+Imports MapWinUtility
 Imports atcMwGisUtility
 Imports atcControls
 Imports atcUtility
-Imports MapWinUtility
 
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
 Public Module modPollutantLoading
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aSubbasinLayerName"></param>
+    ''' <param name="aGridSource"></param>
+    ''' <param name="aUseExportCoefficent"></param>
+    ''' <param name="aLandUse"></param>
+    ''' <param name="aLandUseLayer"></param>
+    ''' <param name="aLandUseId"></param>
+    ''' <param name="aPrec"></param>
+    ''' <param name="aRatio"></param>
+    ''' <param name="aConstituents"></param>
+    ''' <param name="aUseBMPs"></param>
+    ''' <param name="aBMPLayerName"></param>
+    ''' <param name="aBMPAreaField"></param>
+    ''' <param name="aBMPTypefield"></param>
+    ''' <param name="aBMPGridSource"></param>
+    ''' <remarks></remarks>
     Public Sub GenerateLoads(ByVal aSubbasinLayerName As String, _
                              ByVal aGridSource As atcGridSource, _
                              ByVal aUseExportCoefficent As Boolean, _
@@ -32,6 +55,7 @@ Public Module modPollutantLoading
         Dim lLucode As Integer
         Dim lProblem As String
 
+        Logger.Dbg("GenerateLoads:Start")
         lSubbasinLayerIndex = GisUtil.LayerIndex(aSubbasinLayerName)
 
         'are any areas selected?
@@ -46,6 +70,7 @@ Public Module modPollutantLoading
                 lSelectedAreaIndexes.Add(i - 1)
             Next
         End If
+        Logger.Dbg("GenerateLoads:AreaCount " & lSelectedAreaIndexes.Count)
 
         'build array for output area values (area of each landuse in each subbasin)
         Dim lMaxlu As Integer = aGridSource.CellValue(aGridSource.Rows - 1, 1)
@@ -64,6 +89,7 @@ Public Module modPollutantLoading
         For i = 0 To lCountCons
             lConsNames(i) = aGridSource.CellValue(0, i + lOffset)
         Next i
+        Logger.Dbg("GenerateLoads:ConstituentCount " & lCountCons + 1)
 
         'build array for each export coeff or emc for each land use type
         Dim lCoeffsLC(lMaxlu, lCountCons) As Double
@@ -83,6 +109,8 @@ Public Module modPollutantLoading
         'build array for output event mean concentrations (emc for each subbasin and constituent)
         'only for use in emc (simple) method
         Dim lEMCsSC(lSelectedAreaIndexes.Count, lConsNames.GetUpperBound(0)) As Double
+        Logger.Dbg("GenerateLoads:OutputArraysBuilt")
+
 
         'calculate areas of each land use in each subbasin
         If aLandUse = "USGS GIRAS Shapefile" Then
@@ -107,6 +135,7 @@ Public Module modPollutantLoading
                 Next k
             Next i
         End If
+        Logger.Dbg("GenerateLoads:AreaOfLandUsesInSubBasinsCalculated")
 
         'calculate areas of each subbasin
         For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
@@ -115,6 +144,7 @@ Public Module modPollutantLoading
                 ' / 4046.8564 to convert from m2 to acres
             Next k
         Next i
+        Logger.Dbg("GenerateLoads:SubBasinAreasCalculated")
 
         If aUseExportCoefficent Then 'Export Coefficients Method
             'calculate loads
@@ -155,6 +185,8 @@ Public Module modPollutantLoading
                 Next j
             Next i
         End If
+        Logger.Dbg("GenerateLoads:LoadsCalculated")
+
 
         If aUseBMPs Then
             'reduce loads due to bmps
@@ -191,6 +223,9 @@ Public Module modPollutantLoading
                     End If
                 Next k
             Next i
+            Logger.Dbg("GenerateLoads:BmpsApplied")
+        Else
+            Logger.Dbg("GenerateLoads:NoBmpsApplied")
         End If
 
         'calculate loads per acre
@@ -201,6 +236,7 @@ Public Module modPollutantLoading
                 Next j
             End If
         Next i
+        Logger.Dbg("GenerateLoads:LoadsPerAcreCalculated")
 
         'add group to map for output 
         Dim lGroupName As String = "Estimated Annual Pollutant Loads"
@@ -219,6 +255,7 @@ Public Module modPollutantLoading
                         lOutputShapefileName = ""
                         GisUtil.SaveSelectedFeatures(lSubbasinLayerIndex, lSelectedAreaIndexes, _
                                                      lOutputShapefileName)
+                        'TODO:need a prj file!
 
                         'add the output shapefile to the map
                         If Mid(lConsNames(j), 1, 5) = "FECAL" Then
@@ -287,8 +324,17 @@ Public Module modPollutantLoading
                 Next k
             End If
         Next j
+        Logger.Dbg("GenerateLoads:Complete")
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aBMPGridSource"></param>
+    ''' <param name="aBMPType"></param>
+    ''' <param name="aConsName"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Private Function GetEfficiency(ByVal aBMPGridSource As atcGridSource, _
                                    ByVal aBMPType As String, _
                                    ByVal aConsName As String) As Single
@@ -313,6 +359,13 @@ Public Module modPollutantLoading
 
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aAreaLayerIndex"></param>
+    ''' <param name="aSelectedAreaIndexes"></param>
+    ''' <param name="aAreaLandSub"></param>
+    ''' <remarks></remarks>
     Private Sub CalculateGIRASAreas(ByVal aAreaLayerIndex As Integer, _
                                 ByVal aSelectedAreaIndexes As Collection, _
                                 ByRef aAreaLandSub(,) As Double)
@@ -381,5 +434,40 @@ Public Module modPollutantLoading
                 Next j
             End If
         End If
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aGridValuesFileName"></param>
+    ''' <param name="aGridValuesSource"></param>
+    ''' <remarks></remarks>
+    Public Sub SetGridValuesSource(ByVal aGridValuesFileName As String, ByVal aGridValuesSource As atcGridSource)
+        Dim lDbf As IatcTable
+        lDbf = atcUtility.atcTableOpener.OpenAnyTable(aGridValuesFileName)
+
+        With aGridValuesSource
+            .Rows = 1
+            .Columns = lDbf.NumFields
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            For i As Integer = 1 To lDbf.NumFields
+                .CellValue(0, i) = lDbf.FieldName(i)
+                .CellColor(0, i) = SystemColors.ControlDark
+            Next i
+
+            For k As Integer = 1 To lDbf.NumRecords
+                lDbf.CurrentRecord = k
+                For i As Integer = 1 To lDbf.NumFields
+                    .CellValue(k, i) = lDbf.Value(i)
+                    If i > 2 Then
+                        .CellEditable(k, i) = True
+                    Else
+                        .CellColor(k, i) = SystemColors.ControlDark
+                    End If
+                Next i
+            Next k
+        End With
     End Sub
 End Module
