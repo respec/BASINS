@@ -4,7 +4,11 @@ Imports atcMwGisUtility
 Imports MapWinUtility
 Imports atcControls
 
-Public Class frmModelSetup
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
+Friend Class frmModelSetup
     Inherits System.Windows.Forms.Form
 
 #Region " Windows Form Designer generated code "
@@ -753,7 +757,7 @@ Public Class frmModelSetup
 
                 Dim lLandUseLayer As String = ""
                 If cboLandUseLayer.SelectedIndex > -1 Then
-                    llanduselayer = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
+                    lLandUseLayer = cboLandUseLayer.Items(cboLandUseLayer.SelectedIndex)
                 End If
 
                 Dim lLandUseId As String = ""
@@ -791,7 +795,7 @@ Public Class frmModelSetup
             Else
                 'TODO: add an error message
             End If
-            End If
+        End If
     End Sub
 
     Private Sub EnableControls(ByVal b As Boolean)
@@ -941,8 +945,6 @@ Public Class frmModelSetup
     End Sub
 
     Private Sub SetGridValues()
-        Dim i As Integer, k As Integer
-        Dim lDbf As IatcTable
         Dim lSorted As New atcCollection
 
         If atcGridValues.Source Is Nothing Then Exit Sub
@@ -972,32 +974,7 @@ Public Class frmModelSetup
         atcGridValues.Clear()
 
         If lblValueFileName.Text <> "<none>" Then
-            lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblValueFileName.Text)
-
-            With atcGridValues.Source
-                .Rows = 1
-                .Columns = lDbf.NumFields
-                .ColorCells = True
-                .FixedRows = 1
-                .FixedColumns = 1
-                For i = 1 To lDbf.NumFields
-                    .CellValue(0, i) = lDbf.FieldName(i)
-                    .CellColor(0, i) = SystemColors.ControlDark
-                Next i
-
-                For k = 1 To lDbf.NumRecords
-                    lDbf.CurrentRecord = k
-                    For i = 1 To lDbf.NumFields
-                        .CellValue(k, i) = lDbf.Value(i)
-                        If i > 2 Then
-                            .CellEditable(k, i) = True
-                        Else
-                            .CellColor(k, i) = SystemColors.ControlDark
-                        End If
-                    Next i
-                Next k
-            End With
-
+            SetGridValuesSource(lblValueFileName.Text, atcGridValues.Source)
         End If
         atcGridValues.SizeAllColumnsToContents()
         atcGridValues.Refresh()
