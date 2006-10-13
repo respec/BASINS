@@ -40,7 +40,11 @@ Public Module modPollutantLoading
                              ByVal aBMPLayerName As String, _
                              ByVal aBMPAreaField As String, _
                              ByVal aBMPTypefield As String, _
-                             ByVal aBMPGridSource As atcGridSource)
+                             ByVal aBMPGridSource As atcGridSource, _
+                             ByVal aUsePointSources As Boolean, _
+                             ByVal aPointLayerName As String, _
+                             ByVal aPointIDField As String, _
+                             ByVal aPointGridSource As atcGridSource)
 
         Dim i As Integer, j As Integer, k As Integer
         Dim lSubbasinLayerIndex As Integer
@@ -52,6 +56,10 @@ Public Module modPollutantLoading
         Dim lBMPTypeFieldIndex As Integer
         Dim lBMPType As String
         Dim lEffic As Single
+        Dim lPointLayerIndex As Integer
+        Dim lPointIDFieldIndex As Integer
+        Dim lFacility As String
+        Dim lLoad As Single
         Dim lLucode As Integer
         Dim lProblem As String
 
@@ -228,6 +236,35 @@ Public Module modPollutantLoading
             Logger.Dbg("NoBmpsApplied")
         End If
 
+
+        If aUsePointSources Then
+            'add point loads 
+            lPointLayerIndex = GisUtil.LayerIndex(aPointLayerName)
+            lPointIDFieldIndex = GisUtil.FieldIndex(lPointLayerIndex, aPointIDField)
+            'for each point source feature
+            For k = 1 To GisUtil.NumFeatures(lPointLayerIndex)
+                'is there an intersect?
+                j = GisUtil.PointInPolygon(lPointLayerIndex, k, lSubbasinLayerIndex)
+                For i = 0 To lSelectedAreaIndexes.Count - 1
+                    If j = lSelectedAreaIndexes(i + 1) Then
+                        'found it in a selected subbasin
+                        lFacility = GisUtil.FieldValue(lPointLayerIndex, k - 1, lPointIDFieldIndex)
+                        For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                            'find the load for this facility for this constituent
+                            lLoad = GetPointLoad(aPointGridSource, lFacility, lConsNames(j))
+                            'add the point load to the total load
+                            lLoadsSC(i, j) = lLoadsSC(i, j) + lLoad
+                        Next j
+                        Exit For
+                    End If
+                Next i
+            Next k
+            Logger.Dbg("PointSourcesApplied")
+        Else
+            Logger.Dbg("NoPointSourcesApplied")
+        End If
+
+
         'calculate loads per acre
         For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
             If lAreasS(i) > 0 Then
@@ -363,6 +400,30 @@ Public Module modPollutantLoading
                     For j = 1 To .Columns
                         If .CellValue(0, j) = aConsName Then
                             GetEfficiency = .CellValue(i, j)
+                            Exit For
+                        End If
+                    Next j
+                    Exit For
+                End If
+            Next i
+        End With
+
+    End Function
+
+    Private Function GetPointLoad(ByVal aPointGridSource As atcGridSource, _
+                                  ByVal aFacility As String, _
+                                  ByVal aConsName As String) As Single
+        'look thru table of point loads values looking for this facility and consitutuent
+        Dim i As Integer
+        Dim j As Integer
+
+        GetPointLoad = 0.0
+        With aPointGridSource
+            For i = 1 To .Rows - 1
+                If .CellValue(i, 1) = aFacility Then
+                    For j = 0 To .Columns
+                        If .CellValue(0, j) = aConsName Then
+                            GetPointLoad = .CellValue(i, j)
                             Exit For
                         End If
                     Next j
