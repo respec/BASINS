@@ -55,7 +55,7 @@ Public Module modPollutantLoading
         Dim lLucode As Integer
         Dim lProblem As String
 
-        Logger.Dbg("GenerateLoads:Start")
+        Logger.Dbg("Start")
         lSubbasinLayerIndex = GisUtil.LayerIndex(aSubbasinLayerName)
 
         'are any areas selected?
@@ -70,7 +70,7 @@ Public Module modPollutantLoading
                 lSelectedAreaIndexes.Add(i - 1)
             Next
         End If
-        Logger.Dbg("GenerateLoads:AreaCount " & lSelectedAreaIndexes.Count)
+        Logger.Dbg("AreaCount " & lSelectedAreaIndexes.Count)
 
         'build array for output area values (area of each landuse in each subbasin)
         Dim lMaxlu As Integer = aGridSource.CellValue(aGridSource.Rows - 1, 1)
@@ -89,7 +89,7 @@ Public Module modPollutantLoading
         For i = 0 To lCountCons
             lConsNames(i) = aGridSource.CellValue(0, i + lOffset)
         Next i
-        Logger.Dbg("GenerateLoads:ConstituentCount " & lCountCons + 1)
+        Logger.Dbg("ConstituentCount " & lCountCons + 1)
 
         'build array for each export coeff or emc for each land use type
         Dim lCoeffsLC(lMaxlu, lCountCons) As Double
@@ -109,7 +109,7 @@ Public Module modPollutantLoading
         'build array for output event mean concentrations (emc for each subbasin and constituent)
         'only for use in emc (simple) method
         Dim lEMCsSC(lSelectedAreaIndexes.Count, lConsNames.GetUpperBound(0)) As Double
-        Logger.Dbg("GenerateLoads:OutputArraysBuilt")
+        Logger.Dbg("OutputArraysBuilt")
 
 
         'calculate areas of each land use in each subbasin
@@ -135,7 +135,7 @@ Public Module modPollutantLoading
                 Next k
             Next i
         End If
-        Logger.Dbg("GenerateLoads:AreaOfLandUsesInSubBasinsCalculated")
+        Logger.Dbg("AreaOfLandUsesInSubBasinsCalculated")
 
         'calculate areas of each subbasin
         For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
@@ -144,7 +144,7 @@ Public Module modPollutantLoading
                 ' / 4046.8564 to convert from m2 to acres
             Next k
         Next i
-        Logger.Dbg("GenerateLoads:SubBasinAreasCalculated")
+        Logger.Dbg("SubBasinAreasCalculated")
 
         If aUseExportCoefficent Then 'Export Coefficients Method
             'calculate loads
@@ -185,7 +185,7 @@ Public Module modPollutantLoading
                 Next j
             Next i
         End If
-        Logger.Dbg("GenerateLoads:LoadsCalculated")
+        Logger.Dbg("LoadsCalculated")
 
 
         If aUseBMPs Then
@@ -223,9 +223,9 @@ Public Module modPollutantLoading
                     End If
                 Next k
             Next i
-            Logger.Dbg("GenerateLoads:BmpsApplied")
+            Logger.Dbg("BmpsApplied")
         Else
-            Logger.Dbg("GenerateLoads:NoBmpsApplied")
+            Logger.Dbg("NoBmpsApplied")
         End If
 
         'calculate loads per acre
@@ -236,7 +236,7 @@ Public Module modPollutantLoading
                 Next j
             End If
         Next i
-        Logger.Dbg("GenerateLoads:LoadsPerAcreCalculated")
+        Logger.Dbg("LoadsPerAcreCalculated")
 
         'add group to map for output 
         Dim lGroupName As String = "Estimated Annual Pollutant Loads"
@@ -318,13 +318,27 @@ Public Module modPollutantLoading
                         Next i
                         GisUtil.StopSetFeatureValue(lOutputLayerIndex)
 
+                        'TODO: should this only include some fields, but which ones?
+                        Dim lStr As String = vbCrLf & "Row"
+                        For f As Integer = 0 To GisUtil.NumFields - 1
+                            lStr &= vbTab & GisUtil.FieldName(f, lOutputLayerIndex)
+                        Next
+                        For i = 0 To GisUtil.NumFeatures(lOutputLayerIndex) - 1
+                            lStr &= vbCrLf & i + 1
+                            For f As Integer = 0 To GisUtil.NumFields - 1
+                                lStr &= vbTab & GisUtil.FieldValue(lOutputLayerIndex, i, f)
+                            Next
+                        Next
+                        Logger.Dbg("Loads" & lStr)
+
                         'set renderer for this layer
+                        'TODO: should this be a color ramp?
                         GisUtil.SetLayerRendererUniqueValues(lLayerDesc, lFieldIndex)
                     End If
                 Next k
             End If
         Next j
-        Logger.Dbg("GenerateLoads:Complete")
+        Logger.Dbg("Complete")
     End Sub
 
     ''' <summary>
