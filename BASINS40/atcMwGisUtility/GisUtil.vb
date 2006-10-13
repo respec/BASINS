@@ -997,9 +997,13 @@ Public Class GisUtil
     ''' </param>
     Public Shared Function IsLayer(ByVal aLayerName As String) As Boolean
         For i As Integer = 1 To GetMappingObject.Layers.NumLayers
-            If aLayerName = GetMappingObject.Layers(i).Name Then
-                Return True
-            End If
+            Try
+                If aLayerName = GetMappingObject.Layers(i).Name Then
+                    Return True
+                End If
+            Catch
+                Logger.Dbg("Layer " & i & " of " & GetMappingObject.Layers.NumLayers & " Problem")
+            End Try
         Next i
         Return False
     End Function
