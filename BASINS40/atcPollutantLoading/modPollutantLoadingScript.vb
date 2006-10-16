@@ -4,7 +4,7 @@ Imports MapWindow.Interfaces
 Imports MapWinUtility
 Imports atcUtility
 Imports atcControls
-Imports atcPollutantLoading.modPollutantLoading
+Imports atcPollutantLoading
 Imports atcMwGisUtility
 
 ''' <summary>
@@ -44,33 +44,29 @@ Module modPollutantLoadingScript
         Dim lRatio As Double = 0.9
         Dim lConstituents As New atcCollection
         lConstituents.Add("BOD")
-        Dim lUseBMPs As Boolean = False
-        Dim lBMPLayerName As String = ""
-        Dim lBMPAreaField As String = ""
-        Dim lBMPTypefield As String = ""
-        Dim lBMPGridSource As New atcGridSource
-        Dim lUsePointSources As Boolean = False
-        Dim lPointLayerName As String = ""
-        Dim lPointIDField As String = ""
-        Dim lPointGridSource As New atcGridSource
 
-        GenerateLoads(pSubbasinLayerName, _
-                      lGridSource, _
-                      lUseExportCoefficent, _
-                      pLandUse, _
-                      lLandUseLayer, _
-                      lLandUseId, _
-                      lPrec, _
-                      lRatio, _
-                      lConstituents, _
-                      lUseBMPs, _
-                      lBMPLayerName, _
-                      lBMPAreaField, _
-                      lBMPTypefield, _
-                      lBMPGridSource, _
-                      lUsePointSources, _
-                      lPointLayerName, _
-                      lPointIDField, _
-                      lPointGridSource)
+        Dim lBmps As PollutantLoadingBMPs = Nothing
+        'Dim lBMPLayerName As String = ""
+        'Dim lBMPAreaField As String = ""
+        'Dim lBMPTypefield As String = ""
+        'Dim lBMPGridSource As New atcGridSource
+
+        Dim lPointLoads As PollutantLoadingPointLoads = Nothing
+        'Dim lPointLayerName As String = ""
+        'Dim lPointIDField As String = ""
+        'Dim lPointGridSource As New atcGridSource
+
+        PollutantLoading.GenerateLoads( _
+            pSubbasinLayerName, _
+            lGridSource, _
+            lUseExportCoefficent, _
+            pLandUse, _
+            lLandUseLayer, _
+            lLandUseId, _
+            lPrec, _
+            lRatio, _
+            lConstituents, _
+            lBmps, _
+            lPointLoads)
     End Sub
 End Module
