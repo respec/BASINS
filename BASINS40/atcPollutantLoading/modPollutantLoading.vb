@@ -46,14 +46,14 @@ Public Class PollutantLoadingPointLoads
     ''' 
     ''' </summary>
     ''' <param name="aPointLayerName"></param>
-    ''' <param name="PointIDField"></param>
+    ''' <param name="aPointIDField"></param>
     ''' <param name="aPointGridSource"></param>
     ''' <remarks></remarks>
     Public Sub New(ByVal aPointLayerName As String, _
-                   ByVal PointIDField As String, _
+                   ByVal aPointIDField As String, _
                    ByVal aPointGridSource As atcGridSource)
         PointLayerName = aPointLayerName
-        PointIDField = aPointLayerName
+        PointIDField = aPointIDField
         PointGridSource = aPointGridSource
     End Sub
 End Class
