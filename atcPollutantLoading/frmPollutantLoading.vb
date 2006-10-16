@@ -91,6 +91,10 @@ Friend Class frmModelSetup
     Friend WithEvents cboPointLayer As System.Windows.Forms.ComboBox
     Friend WithEvents cbxPoint As System.Windows.Forms.CheckBox
     Friend WithEvents lblUnits As System.Windows.Forms.Label
+    Friend WithEvents cmdSave As System.Windows.Forms.Button
+    Friend WithEvents sfdValues As System.Windows.Forms.SaveFileDialog
+    Friend WithEvents cmdSavePoint As System.Windows.Forms.Button
+    Friend WithEvents cmdSaveBMPs As System.Windows.Forms.Button
     Friend WithEvents ofdValues As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
@@ -115,12 +119,15 @@ Friend Class frmModelSetup
         Me.cboLandUseLayer = New System.Windows.Forms.ComboBox
         Me.lblLandUseLayer = New System.Windows.Forms.Label
         Me.tabValues = New System.Windows.Forms.TabPage
+        Me.cmdSave = New System.Windows.Forms.Button
         Me.lblValueUnits = New System.Windows.Forms.Label
         Me.cmdChangeFile = New System.Windows.Forms.Button
         Me.lblValueFileName = New System.Windows.Forms.Label
         Me.lblValueFile = New System.Windows.Forms.Label
         Me.atcGridValues = New atcControls.atcGrid
         Me.tabPointSources = New System.Windows.Forms.TabPage
+        Me.cmdSavePoint = New System.Windows.Forms.Button
+        Me.lblUnits = New System.Windows.Forms.Label
         Me.lblPointID = New System.Windows.Forms.Label
         Me.lblPointLayer = New System.Windows.Forms.Label
         Me.atcGridPoint = New atcControls.atcGrid
@@ -131,6 +138,7 @@ Friend Class frmModelSetup
         Me.cboPointLayer = New System.Windows.Forms.ComboBox
         Me.cbxPoint = New System.Windows.Forms.CheckBox
         Me.tabBMPs = New System.Windows.Forms.TabPage
+        Me.cmdSaveBMPs = New System.Windows.Forms.Button
         Me.atcGridBMP = New atcControls.atcGrid
         Me.cmdChangeBMP = New System.Windows.Forms.Button
         Me.lblBMPFile = New System.Windows.Forms.Label
@@ -147,7 +155,7 @@ Friend Class frmModelSetup
         Me.cmdHelp = New System.Windows.Forms.Button
         Me.cmdAbout = New System.Windows.Forms.Button
         Me.ofdValues = New System.Windows.Forms.OpenFileDialog
-        Me.lblUnits = New System.Windows.Forms.Label
+        Me.sfdValues = New System.Windows.Forms.SaveFileDialog
         Me.tabPLOAD.SuspendLayout()
         Me.tabGeneral.SuspendLayout()
         Me.tabLanduse.SuspendLayout()
@@ -360,7 +368,7 @@ Friend Class frmModelSetup
         Me.tabLanduse.Controls.Add(Me.lblLandUseLayer)
         Me.tabLanduse.Location = New System.Drawing.Point(4, 25)
         Me.tabLanduse.Name = "tabLanduse"
-        Me.tabLanduse.Size = New System.Drawing.Size(623, 247)
+        Me.tabLanduse.Size = New System.Drawing.Size(647, 254)
         Me.tabLanduse.TabIndex = 1
         Me.tabLanduse.Text = "Land Use"
         Me.tabLanduse.UseVisualStyleBackColor = True
@@ -373,7 +381,7 @@ Friend Class frmModelSetup
         Me.cboLandUseIDField.FormattingEnabled = True
         Me.cboLandUseIDField.Location = New System.Drawing.Point(200, 78)
         Me.cboLandUseIDField.Name = "cboLandUseIDField"
-        Me.cboLandUseIDField.Size = New System.Drawing.Size(269, 24)
+        Me.cboLandUseIDField.Size = New System.Drawing.Size(293, 24)
         Me.cboLandUseIDField.TabIndex = 12
         '
         'lblLandUseIDField
@@ -393,7 +401,7 @@ Friend Class frmModelSetup
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLandUseLayer.Location = New System.Drawing.Point(200, 32)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(343, 24)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(367, 24)
         Me.cboLandUseLayer.TabIndex = 10
         '
         'lblLandUseLayer
@@ -406,6 +414,7 @@ Friend Class frmModelSetup
         '
         'tabValues
         '
+        Me.tabValues.Controls.Add(Me.cmdSave)
         Me.tabValues.Controls.Add(Me.lblValueUnits)
         Me.tabValues.Controls.Add(Me.cmdChangeFile)
         Me.tabValues.Controls.Add(Me.lblValueFileName)
@@ -413,10 +422,20 @@ Friend Class frmModelSetup
         Me.tabValues.Controls.Add(Me.atcGridValues)
         Me.tabValues.Location = New System.Drawing.Point(4, 25)
         Me.tabValues.Name = "tabValues"
-        Me.tabValues.Size = New System.Drawing.Size(623, 247)
+        Me.tabValues.Size = New System.Drawing.Size(647, 254)
         Me.tabValues.TabIndex = 4
         Me.tabValues.Text = "Export Coefficients"
         Me.tabValues.UseVisualStyleBackColor = True
+        '
+        'cmdSave
+        '
+        Me.cmdSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdSave.Location = New System.Drawing.Point(487, 12)
+        Me.cmdSave.Name = "cmdSave"
+        Me.cmdSave.Size = New System.Drawing.Size(67, 24)
+        Me.cmdSave.TabIndex = 24
+        Me.cmdSave.Text = "Save"
+        Me.cmdSave.UseVisualStyleBackColor = True
         '
         'lblValueUnits
         '
@@ -430,7 +449,7 @@ Friend Class frmModelSetup
         'cmdChangeFile
         '
         Me.cmdChangeFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangeFile.Location = New System.Drawing.Point(530, 12)
+        Me.cmdChangeFile.Location = New System.Drawing.Point(554, 12)
         Me.cmdChangeFile.Name = "cmdChangeFile"
         Me.cmdChangeFile.Size = New System.Drawing.Size(73, 24)
         Me.cmdChangeFile.TabIndex = 22
@@ -442,7 +461,7 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblValueFileName.Location = New System.Drawing.Point(176, 16)
         Me.lblValueFileName.Name = "lblValueFileName"
-        Me.lblValueFileName.Size = New System.Drawing.Size(346, 16)
+        Me.lblValueFileName.Size = New System.Drawing.Size(305, 16)
         Me.lblValueFileName.TabIndex = 21
         Me.lblValueFileName.Text = "<none>"
         Me.lblValueFileName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -468,12 +487,13 @@ Friend Class frmModelSetup
         Me.atcGridValues.LineWidth = 0.0!
         Me.atcGridValues.Location = New System.Drawing.Point(20, 54)
         Me.atcGridValues.Name = "atcGridValues"
-        Me.atcGridValues.Size = New System.Drawing.Size(583, 177)
+        Me.atcGridValues.Size = New System.Drawing.Size(607, 184)
         Me.atcGridValues.Source = Nothing
         Me.atcGridValues.TabIndex = 19
         '
         'tabPointSources
         '
+        Me.tabPointSources.Controls.Add(Me.cmdSavePoint)
         Me.tabPointSources.Controls.Add(Me.lblUnits)
         Me.tabPointSources.Controls.Add(Me.lblPointID)
         Me.tabPointSources.Controls.Add(Me.lblPointLayer)
@@ -490,6 +510,25 @@ Friend Class frmModelSetup
         Me.tabPointSources.TabIndex = 2
         Me.tabPointSources.Text = "Point Sources"
         Me.tabPointSources.UseVisualStyleBackColor = True
+        '
+        'cmdSavePoint
+        '
+        Me.cmdSavePoint.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdSavePoint.Location = New System.Drawing.Point(499, 85)
+        Me.cmdSavePoint.Name = "cmdSavePoint"
+        Me.cmdSavePoint.Size = New System.Drawing.Size(67, 24)
+        Me.cmdSavePoint.TabIndex = 38
+        Me.cmdSavePoint.Text = "Save"
+        Me.cmdSavePoint.UseVisualStyleBackColor = True
+        '
+        'lblUnits
+        '
+        Me.lblUnits.Location = New System.Drawing.Point(34, 107)
+        Me.lblUnits.Name = "lblUnits"
+        Me.lblUnits.Size = New System.Drawing.Size(195, 16)
+        Me.lblUnits.TabIndex = 37
+        Me.lblUnits.Text = "(lbs/yr or counts/yr))"
+        Me.lblUnits.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'lblPointID
         '
@@ -544,7 +583,7 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblPointLoadFile.Location = New System.Drawing.Point(213, 89)
         Me.lblPointLoadFile.Name = "lblPointLoadFile"
-        Me.lblPointLoadFile.Size = New System.Drawing.Size(342, 16)
+        Me.lblPointLoadFile.Size = New System.Drawing.Size(280, 16)
         Me.lblPointLoadFile.TabIndex = 32
         Me.lblPointLoadFile.Text = "<none>"
         Me.lblPointLoadFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -592,6 +631,7 @@ Friend Class frmModelSetup
         '
         'tabBMPs
         '
+        Me.tabBMPs.Controls.Add(Me.cmdSaveBMPs)
         Me.tabBMPs.Controls.Add(Me.atcGridBMP)
         Me.tabBMPs.Controls.Add(Me.cmdChangeBMP)
         Me.tabBMPs.Controls.Add(Me.lblBMPFile)
@@ -605,10 +645,20 @@ Friend Class frmModelSetup
         Me.tabBMPs.Controls.Add(Me.cbxBMPs)
         Me.tabBMPs.Location = New System.Drawing.Point(4, 25)
         Me.tabBMPs.Name = "tabBMPs"
-        Me.tabBMPs.Size = New System.Drawing.Size(623, 247)
+        Me.tabBMPs.Size = New System.Drawing.Size(647, 254)
         Me.tabBMPs.TabIndex = 3
         Me.tabBMPs.Text = "BMPs"
         Me.tabBMPs.UseVisualStyleBackColor = True
+        '
+        'cmdSaveBMPs
+        '
+        Me.cmdSaveBMPs.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdSaveBMPs.Location = New System.Drawing.Point(501, 116)
+        Me.cmdSaveBMPs.Name = "cmdSaveBMPs"
+        Me.cmdSaveBMPs.Size = New System.Drawing.Size(67, 24)
+        Me.cmdSaveBMPs.TabIndex = 39
+        Me.cmdSaveBMPs.Text = "Save"
+        Me.cmdSaveBMPs.UseVisualStyleBackColor = True
         '
         'atcGridBMP
         '
@@ -622,14 +672,14 @@ Friend Class frmModelSetup
         Me.atcGridBMP.LineWidth = 0.0!
         Me.atcGridBMP.Location = New System.Drawing.Point(15, 141)
         Me.atcGridBMP.Name = "atcGridBMP"
-        Me.atcGridBMP.Size = New System.Drawing.Size(594, 96)
+        Me.atcGridBMP.Size = New System.Drawing.Size(618, 103)
         Me.atcGridBMP.Source = Nothing
         Me.atcGridBMP.TabIndex = 27
         '
         'cmdChangeBMP
         '
         Me.cmdChangeBMP.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangeBMP.Location = New System.Drawing.Point(539, 116)
+        Me.cmdChangeBMP.Location = New System.Drawing.Point(563, 116)
         Me.cmdChangeBMP.Name = "cmdChangeBMP"
         Me.cmdChangeBMP.Size = New System.Drawing.Size(71, 24)
         Me.cmdChangeBMP.TabIndex = 26
@@ -641,7 +691,7 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblBMPFile.Location = New System.Drawing.Point(213, 120)
         Me.lblBMPFile.Name = "lblBMPFile"
-        Me.lblBMPFile.Size = New System.Drawing.Size(318, 16)
+        Me.lblBMPFile.Size = New System.Drawing.Size(282, 16)
         Me.lblBMPFile.TabIndex = 25
         Me.lblBMPFile.Text = "<none>"
         Me.lblBMPFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -695,7 +745,7 @@ Friend Class frmModelSetup
         Me.cboBMPType.FormattingEnabled = True
         Me.cboBMPType.Location = New System.Drawing.Point(234, 46)
         Me.cboBMPType.Name = "cboBMPType"
-        Me.cboBMPType.Size = New System.Drawing.Size(246, 24)
+        Me.cboBMPType.Size = New System.Drawing.Size(270, 24)
         Me.cboBMPType.TabIndex = 3
         '
         'cboAreaField
@@ -706,7 +756,7 @@ Friend Class frmModelSetup
         Me.cboAreaField.FormattingEnabled = True
         Me.cboAreaField.Location = New System.Drawing.Point(234, 76)
         Me.cboAreaField.Name = "cboAreaField"
-        Me.cboAreaField.Size = New System.Drawing.Size(246, 24)
+        Me.cboAreaField.Size = New System.Drawing.Size(270, 24)
         Me.cboAreaField.TabIndex = 2
         '
         'cboBMPLayer
@@ -717,7 +767,7 @@ Friend Class frmModelSetup
         Me.cboBMPLayer.FormattingEnabled = True
         Me.cboBMPLayer.Location = New System.Drawing.Point(234, 14)
         Me.cboBMPLayer.Name = "cboBMPLayer"
-        Me.cboBMPLayer.Size = New System.Drawing.Size(301, 24)
+        Me.cboBMPLayer.Size = New System.Drawing.Size(325, 24)
         Me.cboBMPLayer.TabIndex = 1
         '
         'cbxBMPs
@@ -776,14 +826,10 @@ Friend Class frmModelSetup
         Me.ofdValues.Filter = "DBF Files (*.dbf)|*.dbf"
         Me.ofdValues.Title = "Select File"
         '
-        'lblUnits
+        'sfdValues
         '
-        Me.lblUnits.Location = New System.Drawing.Point(34, 107)
-        Me.lblUnits.Name = "lblUnits"
-        Me.lblUnits.Size = New System.Drawing.Size(195, 16)
-        Me.lblUnits.TabIndex = 37
-        Me.lblUnits.Text = "(lbs/yr or counts/yr))"
-        Me.lblUnits.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.sfdValues.DefaultExt = "dbf"
+        Me.sfdValues.Filter = "DBF Files (*.dbf)|*.dbf"
         '
         'frmModelSetup
         '
@@ -921,7 +967,7 @@ Friend Class frmModelSetup
                     lPointIdField = cboPointIDField.Items(cboPointIDField.SelectedIndex)
                 End If
 
-                Dim lBmps As PollutantLoadingBmps = Nothing
+                Dim lBmps As PollutantLoadingBMPs = Nothing
                 If cbxBMPs.Checked Then
                     lBmps = New PollutantLoadingBMPs( _
                                 cboBMPLayer.Items(cboBMPLayer.SelectedIndex), _
@@ -955,7 +1001,7 @@ Friend Class frmModelSetup
             Else
                 'TODO: add an error message
             End If
-            End If
+        End If
     End Sub
 
     Private Sub EnableControls(ByVal b As Boolean)
@@ -1137,26 +1183,28 @@ Friend Class frmModelSetup
 
         If atcGridValues.Source Is Nothing Then Exit Sub
 
-        If rbExportCoefficientMethod.Checked = True Then
-            If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                lblValueFileName.Text = "\BASINS\etc\pload\ecgiras.dbf"
-            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-                lblValueFileName.Text = "\BASINS\etc\pload\ecgiras.dbf"
-            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                lblValueFileName.Text = "\BASINS\etc\pload\ecnlcd.dbf"
-            Else 'grid
-                lblValueFileName.Text = "\BASINS\etc\pload\ecnlcd.dbf"
-            End If
-        Else
-            'emc (simple) method
-            If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                lblValueFileName.Text = "\BASINS\etc\pload\emcgiras.dbf"
-            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-                lblValueFileName.Text = "\BASINS\etc\pload\emcgiras.dbf"
-            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                lblValueFileName.Text = "\BASINS\etc\pload\emcnlcd.dbf"
-            Else 'grid
-                lblValueFileName.Text = "\BASINS\etc\pload\emcnlcd.dbf"
+        If lblValueFileName.Text = "<none>" Then
+            If rbExportCoefficientMethod.Checked = True Then
+                If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
+                    lblValueFileName.Text = "\BASINS\etc\pload\ecgiras.dbf"
+                ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
+                    lblValueFileName.Text = "\BASINS\etc\pload\ecgiras.dbf"
+                ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
+                    lblValueFileName.Text = "\BASINS\etc\pload\ecnlcd.dbf"
+                Else 'grid
+                    lblValueFileName.Text = "\BASINS\etc\pload\ecnlcd.dbf"
+                End If
+            Else
+                'emc (simple) method
+                If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
+                    lblValueFileName.Text = "\BASINS\etc\pload\emcgiras.dbf"
+                ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
+                    lblValueFileName.Text = "\BASINS\etc\pload\emcgiras.dbf"
+                ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
+                    lblValueFileName.Text = "\BASINS\etc\pload\emcnlcd.dbf"
+                Else 'grid
+                    lblValueFileName.Text = "\BASINS\etc\pload\emcnlcd.dbf"
+                End If
             End If
         End If
         atcGridValues.Clear()
@@ -1215,7 +1263,9 @@ Friend Class frmModelSetup
 
         If atcGridBMP.Source Is Nothing Then Exit Sub
 
-        lblBMPFile.Text = "\BASINS\etc\pload\bmpeffic.dbf"
+        If lblBMPFile.Text = "<none>" Then
+            lblBMPFile.Text = "\BASINS\etc\pload\bmpeffic.dbf"
+        End If
         atcGridBMP.Clear()
 
         If lblBMPFile.Text <> "<none>" Then
@@ -1257,7 +1307,7 @@ Friend Class frmModelSetup
 
         If atcGridPoint.Source Is Nothing Then Exit Sub
 
-        lblPointLoadFile.Text = "\BASINS\etc\pload\pointload.dbf"
+        'lblPointLoadFile.Text = "\BASINS\etc\pload\pointload.dbf"
         atcGridPoint.Clear()
 
         If lblPointLoadFile.Text <> "<none>" Then
@@ -1303,8 +1353,57 @@ Friend Class frmModelSetup
     Private Sub cmdChangePoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdChangePoint.Click
         ofdValues.Title = "Set Point Source Loading File"
         If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            lblBMPFile.Text = ofdValues.FileName
+            lblPointLoadFile.Text = ofdValues.FileName
             SetPointGridValues()
         End If
+    End Sub
+
+    Private Sub cmdSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSave.Click
+        If rbExportCoefficientMethod.Checked Then
+            SaveGrid("Save Export Coefficient File", atcGridValues.Source)
+        Else
+            SaveGrid("Save Event Mean Concentration File", atcGridValues.Source)
+        End If
+    End Sub
+
+    Private Sub SaveGrid(ByVal aCaption As String, ByVal aSource As atcControls.atcGridSource)
+        Dim dbfname As String
+        Dim tmpDbf As IatcTable
+        Dim i As Integer
+        Dim j As Integer
+
+        sfdValues.Title = aCaption
+        If sfdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            dbfname = sfdValues.FileName
+            'does this dbf already exist?
+            If FileExists(dbfname) Then
+                'delete this file first
+                System.IO.File.Delete(dbfname)
+            End If
+            tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(dbfname)
+            tmpDbf.NumFields = aSource.Columns - 1
+            For i = 1 To tmpDbf.NumFields
+                tmpDbf.FieldName(i) = aSource.CellValue(0, i)
+                tmpDbf.FieldType(i) = "C"
+                tmpDbf.FieldLength(i) = 10
+            Next i
+
+            'now write out main grid
+            For i = 1 To aSource.Rows - 1
+                tmpDbf.CurrentRecord = i
+                For j = 1 To aSource.Columns - 1
+                    tmpDbf.Value(j) = aSource.CellValue(i, j)
+                Next j
+            Next i
+            tmpDbf.WriteFile(dbfname)
+        End If
+    End Sub
+
+    Private Sub cmdSavePoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSavePoint.Click
+        SaveGrid("Save Point Source Loading File", atcGridPoint.Source)
+    End Sub
+
+    Private Sub cmdSaveBMPs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSaveBMPs.Click
+        SaveGrid("Save BMP Removal Efficiency File", atcGridBMP.Source)
     End Sub
 End Class
