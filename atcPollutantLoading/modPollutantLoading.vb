@@ -8,7 +8,61 @@ Imports atcUtility
 ''' 
 ''' </summary>
 ''' <remarks></remarks>
-Public Module modPollutantLoading
+Public Class PollutantLoadingBMPs
+    Public ReadOnly LayerName As String
+    Public ReadOnly AreaField As String
+    Public ReadOnly TypeField As String
+    Public ReadOnly GridSource As atcGridSource
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aLayerName"></param>
+    ''' <param name="aAreaField"></param>
+    ''' <param name="aTypefield"></param>
+    ''' <param name="aGridSource"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal aLayerName As String, _
+                   ByVal aAreaField As String, _
+                   ByVal aTypefield As String, _
+                   ByVal aGridSource As atcGridSource)
+        LayerName = aLayerName
+        AreaField = aAreaField
+        TypeField = aTypefield
+        GridSource = aGridSource
+    End Sub
+End Class
+
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
+Public Class PollutantLoadingPointLoads
+    Public ReadOnly PointLayerName As String
+    Public ReadOnly PointIDField As String
+    Public ReadOnly PointGridSource As atcGridSource
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aPointLayerName"></param>
+    ''' <param name="PointIDField"></param>
+    ''' <param name="aPointGridSource"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal aPointLayerName As String, _
+                   ByVal PointIDField As String, _
+                   ByVal aPointGridSource As atcGridSource)
+        PointLayerName = aPointLayerName
+        PointIDField = aPointLayerName
+        PointGridSource = aPointGridSource
+    End Sub
+End Class
+
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
+Public Module PollutantLoading
     ''' <summary>
     ''' 
     ''' </summary>
@@ -21,11 +75,8 @@ Public Module modPollutantLoading
     ''' <param name="aPrec"></param>
     ''' <param name="aRatio"></param>
     ''' <param name="aConstituents"></param>
-    ''' <param name="aUseBMPs"></param>
-    ''' <param name="aBMPLayerName"></param>
-    ''' <param name="aBMPAreaField"></param>
-    ''' <param name="aBMPTypefield"></param>
-    ''' <param name="aBMPGridSource"></param>
+    ''' <param name="aBmps"></param>
+    ''' <param name="aPointLoads"></param>
     ''' <remarks></remarks>
     Public Sub GenerateLoads(ByVal aSubbasinLayerName As String, _
                              ByVal aGridSource As atcGridSource, _
@@ -36,15 +87,8 @@ Public Module modPollutantLoading
                              ByVal aPrec As Double, _
                              ByVal aRatio As Double, _
                              ByVal aConstituents As atcCollection, _
-                             ByVal aUseBMPs As Boolean, _
-                             ByVal aBMPLayerName As String, _
-                             ByVal aBMPAreaField As String, _
-                             ByVal aBMPTypefield As String, _
-                             ByVal aBMPGridSource As atcGridSource, _
-                             ByVal aUsePointSources As Boolean, _
-                             ByVal aPointLayerName As String, _
-                             ByVal aPointIDField As String, _
-                             ByVal aPointGridSource As atcGridSource)
+                             ByVal aBmps As PollutantLoadingBMPs, _
+                             ByVal aPointLoads As PollutantLoadingPointLoads)
 
         Dim i As Integer, j As Integer, k As Integer
         Dim lSubbasinLayerIndex As Integer
@@ -196,12 +240,12 @@ Public Module modPollutantLoading
         Logger.Dbg("LoadsCalculated")
 
 
-        If aUseBMPs Then
+        If Not (aBmps Is Nothing) Then
             'reduce loads due to bmps
-            lBMPLayerIndex = GisUtil.LayerIndex(aBMPLayerName)
+            lBMPLayerIndex = GisUtil.LayerIndex(aBmps.LayerName)
             lBMPLayerType = GisUtil.LayerType(lBMPLayerIndex)
-            lBMPAreaFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBMPAreaField)
-            lBMPTypeFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBMPTypefield)
+            lBMPAreaFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBmps.AreaField)
+            lBMPTypeFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBmps.TypeField)
             'for each subbasin
             For i = 0 To lSelectedAreaIndexes.Count - 1
                 'for each bmp feature
@@ -222,7 +266,7 @@ Public Module modPollutantLoading
                         lBMPType = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPTypeFieldIndex)
                         For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
                             'find the efficiency of this bmp type for this constituent
-                            lEffic = GetEfficiency(aBMPGridSource, lBMPType, lConsNames(j))
+                            lEffic = GetEfficiency(aBmps.GridSource, lBMPType, lConsNames(j))
                             'subtract the load reduction due to this bmp from the load;
                             'the load reduction is the load * fractional area * fractional removal efficiency,
                             'ie 1000 lbs load with 20% bmp area with a 30% removal = 60 lbs removed 
@@ -237,10 +281,10 @@ Public Module modPollutantLoading
         End If
 
 
-        If aUsePointSources Then
+        If Not (aPointLoads Is Nothing) Then
             'add point loads 
-            lPointLayerIndex = GisUtil.LayerIndex(aPointLayerName)
-            lPointIDFieldIndex = GisUtil.FieldIndex(lPointLayerIndex, aPointIDField)
+            lPointLayerIndex = GisUtil.LayerIndex(aPointLoads.PointLayerName)
+            lPointIDFieldIndex = GisUtil.FieldIndex(lPointLayerIndex, aPointLoads.PointIDField)
             'for each point source feature
             For k = 1 To GisUtil.NumFeatures(lPointLayerIndex)
                 'is there an intersect?
@@ -251,7 +295,7 @@ Public Module modPollutantLoading
                         lFacility = GisUtil.FieldValue(lPointLayerIndex, k - 1, lPointIDFieldIndex)
                         For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
                             'find the load for this facility for this constituent
-                            lLoad = GetPointLoad(aPointGridSource, lFacility, lConsNames(j))
+                            lLoad = GetPointLoad(aPointLoads.PointGridSource, lFacility, lConsNames(j))
                             'add the point load to the total load
                             lLoadsSC(i, j) = lLoadsSC(i, j) + lLoad
                         Next j

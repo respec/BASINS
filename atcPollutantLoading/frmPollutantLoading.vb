@@ -921,6 +921,23 @@ Friend Class frmModelSetup
                     lPointIdField = cboPointIDField.Items(cboPointIDField.SelectedIndex)
                 End If
 
+                Dim lBmps As PollutantLoadingBmps = Nothing
+                If cbxBMPs.Checked Then
+                    lBmps = New PollutantLoadingBMPs( _
+                                cboBMPLayer.Items(cboBMPLayer.SelectedIndex), _
+                                lBMPAreaField, _
+                                lBMPTypeField, _
+                                atcGridBMP.Source)
+                End If
+
+                Dim lPointLoads As PollutantLoadingPointLoads = Nothing
+                If cbxPoint.Checked Then
+                    lPointLoads = New PollutantLoadingPointLoads( _
+                                cboPointLayer.Items(cboPointLayer.SelectedIndex), _
+                                lPointIdField, _
+                                atcGridPoint.Source)
+                End If
+
                 GenerateLoads(cboSubbasins.Items(cboSubbasins.SelectedIndex), _
                               atcGridValues.Source, _
                               rbExportCoefficientMethod.Checked, _
@@ -930,22 +947,15 @@ Friend Class frmModelSetup
                               atxPrec.Value, _
                               atxRatio.Value, _
                               lConstituents, _
-                              cbxBMPs.Checked, _
-                              cboBMPLayer.Items(cboBMPLayer.SelectedIndex), _
-                              lBMPAreaField, _
-                              lBMPTypeField, _
-                              atcGridBMP.Source, _
-                              cbxPoint.Checked, _
-                              cboPointLayer.Items(cboPointLayer.SelectedIndex), _
-                              lpointidField, _
-                              atcGridPoint.Source)
+                              lBmps, _
+                              lPointLoads)
 
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
                 Me.Close()
             Else
                 'TODO: add an error message
             End If
-        End If
+            End If
     End Sub
 
     Private Sub EnableControls(ByVal b As Boolean)
