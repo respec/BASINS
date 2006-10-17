@@ -106,6 +106,7 @@ Friend Class frmModelSetup
     Friend WithEvents cboSubbasinIDField As System.Windows.Forms.ComboBox
     Friend WithEvents cbxBank As System.Windows.Forms.CheckBox
     Friend WithEvents lblTSS As System.Windows.Forms.Label
+    Friend WithEvents lblNoLandUse As System.Windows.Forms.Label
     Friend WithEvents ofdValues As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
@@ -125,6 +126,7 @@ Friend Class frmModelSetup
         Me.lblSubbasinsLayer = New System.Windows.Forms.Label
         Me.lblLanduseType = New System.Windows.Forms.Label
         Me.tabLanduse = New System.Windows.Forms.TabPage
+        Me.lblNoLandUse = New System.Windows.Forms.Label
         Me.cboLandUseIDField = New System.Windows.Forms.ComboBox
         Me.lblLandUseIDField = New System.Windows.Forms.Label
         Me.cboLandUseLayer = New System.Windows.Forms.ComboBox
@@ -388,6 +390,7 @@ Friend Class frmModelSetup
         '
         'tabLanduse
         '
+        Me.tabLanduse.Controls.Add(Me.lblNoLandUse)
         Me.tabLanduse.Controls.Add(Me.cboLandUseIDField)
         Me.tabLanduse.Controls.Add(Me.lblLandUseIDField)
         Me.tabLanduse.Controls.Add(Me.cboLandUseLayer)
@@ -398,6 +401,14 @@ Friend Class frmModelSetup
         Me.tabLanduse.TabIndex = 1
         Me.tabLanduse.Text = "Land Use"
         Me.tabLanduse.UseVisualStyleBackColor = True
+        '
+        'lblNoLandUse
+        '
+        Me.lblNoLandUse.Location = New System.Drawing.Point(47, 37)
+        Me.lblNoLandUse.Name = "lblNoLandUse"
+        Me.lblNoLandUse.Size = New System.Drawing.Size(437, 26)
+        Me.lblNoLandUse.TabIndex = 13
+        Me.lblNoLandUse.Text = "No land use specifications are required when using GIRAS data."
         '
         'cboLandUseIDField
         '
@@ -892,9 +903,9 @@ Friend Class frmModelSetup
         '
         Me.lblBankFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblBankFile.Location = New System.Drawing.Point(248, 94)
+        Me.lblBankFile.Location = New System.Drawing.Point(195, 94)
         Me.lblBankFile.Name = "lblBankFile"
-        Me.lblBankFile.Size = New System.Drawing.Size(214, 17)
+        Me.lblBankFile.Size = New System.Drawing.Size(267, 17)
         Me.lblBankFile.TabIndex = 42
         Me.lblBankFile.Text = "<none>"
         Me.lblBankFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -1028,7 +1039,9 @@ Friend Class frmModelSetup
             lblLandUseLayer.Visible = False
             cboLandUseIDField.Visible = False
             lblLandUseIDField.Visible = False
+            lblNoLandUse.Visible = True
         Else
+            lblNoLandUse.Visible = False
             cboLandUseLayer.Items.Clear()
             lDef = 0
             For lLyr = 0 To GisUtil.NumLayers() - 1
@@ -1232,6 +1245,11 @@ Friend Class frmModelSetup
             .Font = New Font(.Font, FontStyle.Regular)
             .AllowHorizontalScrolling = True
         End With
+        With atcGridBank
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
         SetBMPGridValues()
 
         cboLanduse.SelectedIndex = 0
@@ -1326,6 +1344,21 @@ Friend Class frmModelSetup
 
         If cboPointIDField.Items.Count > 0 And cboPointIDField.SelectedIndex < 0 Then
             cboPointIDField.SelectedIndex = 0
+        End If
+    End Sub
+
+    Private Sub PopulateSubbasinsFields()
+        Dim lLyr As Integer
+        Dim i As Integer
+
+        lLyr = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+        cboSubbasinIDField.Items.Clear()
+        For i = 0 To GisUtil.NumFields(lLyr) - 1
+            cboSubbasinIDField.Items.Add(GisUtil.FieldName(i, lLyr))
+        Next i
+
+        If cboSubbasinIDField.Items.Count > 0 And cboSubbasinIDField.SelectedIndex < 0 Then
+            cboSubbasinIDField.SelectedIndex = 0
         End If
     End Sub
 
@@ -1451,6 +1484,46 @@ Friend Class frmModelSetup
         atcGridBMP.Refresh()
     End Sub
 
+    Private Sub SetBankGridValues()
+        Dim i As Integer, k As Integer
+        Dim lDbf As IatcTable
+
+        If atcGridBank.Source Is Nothing Then Exit Sub
+
+        atcGridBank.Clear()
+
+        If lblBankFile.Text <> "<none>" Then
+            lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblBankFile.Text)
+
+            With atcGridBank.Source
+                .Rows = 1
+                .Columns = lDbf.NumFields
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                For i = 1 To lDbf.NumFields
+                    .CellValue(0, i) = lDbf.FieldName(i)
+                    .CellColor(0, i) = SystemColors.ControlDark
+                Next i
+
+                For k = 1 To lDbf.NumRecords
+                    lDbf.CurrentRecord = k
+                    For i = 1 To lDbf.NumFields
+                        .CellValue(k, i) = lDbf.Value(i)
+                        If i > 1 Then
+                            .CellEditable(k, i) = True
+                        Else
+                            .CellColor(k, i) = SystemColors.ControlDark
+                        End If
+                    Next i
+                Next k
+            End With
+
+        End If
+        atcGridBank.SizeAllColumnsToContents()
+        atcGridBank.Refresh()
+    End Sub
+
     Private Sub SetPointGridValues()
         Dim i As Integer, k As Integer
         Dim lDbf As IatcTable
@@ -1556,5 +1629,22 @@ Friend Class frmModelSetup
 
     Private Sub cmdSaveBMPs_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSaveBMPs.Click
         SaveGrid("Save BMP Removal Efficiency File", atcGridBMP.Source)
+    End Sub
+
+    Private Sub cboSubbasins_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboSubbasins.SelectedIndexChanged
+        Logger.Dbg("SubbainsLayerChangedTo " & cboSubbasins.Items(cboSubbasins.SelectedIndex))
+        PopulateSubbasinsFields()
+    End Sub
+
+    Private Sub cmdSaveBank_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSaveBank.Click
+        SaveGrid("Save Bank Erosion Loading File", atcGridBMP.Source)
+    End Sub
+
+    Private Sub cmdChangeBank_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdChangeBank.Click
+        ofdValues.Title = "Set Bank Erosion Loading File"
+        If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            lblBankFile.Text = ofdValues.FileName
+            SetBankGridValues()
+        End If
     End Sub
 End Class
