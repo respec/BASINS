@@ -1,4 +1,5 @@
 Imports atcMwGisUtility
+Imports MapWinUtility
 
 Public Class PlugIn
     Implements MapWindow.Interfaces.IPlugin
@@ -68,9 +69,9 @@ Public Class PlugIn
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         If ItemName = ParentMenuName & "_PLOAD" Then
             GisUtil.MappingObject = pMapWin
-            Dim main As New frmModelSetup
-            main.InitializeUI()
-            main.Show()
+            Dim lModelSetup As New frmModelSetup
+            lModelSetup.InitializeUI()
+            lModelSetup.Show()
             Handled = True
         End If
     End Sub

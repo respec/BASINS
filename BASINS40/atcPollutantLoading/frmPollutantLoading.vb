@@ -325,7 +325,7 @@ Friend Class frmModelSetup
         'cboSubbasins
         '
         Me.cboSubbasins.AllowDrop = True
-        Me.cboSubbasins.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.cboSubbasins.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSubbasins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSubbasins.Location = New System.Drawing.Point(201, 164)
@@ -336,7 +336,7 @@ Friend Class frmModelSetup
         'cboLanduse
         '
         Me.cboLanduse.AllowDrop = True
-        Me.cboLanduse.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.cboLanduse.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboLanduse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLanduse.Location = New System.Drawing.Point(201, 201)
@@ -346,6 +346,7 @@ Friend Class frmModelSetup
         '
         'lblSubbasinsLayer
         '
+        Me.lblSubbasinsLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblSubbasinsLayer.Location = New System.Drawing.Point(25, 164)
         Me.lblSubbasinsLayer.Name = "lblSubbasinsLayer"
         Me.lblSubbasinsLayer.Size = New System.Drawing.Size(152, 24)
@@ -354,6 +355,7 @@ Friend Class frmModelSetup
         '
         'lblLanduseType
         '
+        Me.lblLanduseType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblLanduseType.Location = New System.Drawing.Point(25, 201)
         Me.lblLanduseType.Name = "lblLanduseType"
         Me.lblLanduseType.Size = New System.Drawing.Size(152, 24)

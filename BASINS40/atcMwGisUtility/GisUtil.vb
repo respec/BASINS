@@ -1874,63 +1874,70 @@ Public Class GisUtil
 
     Public Shared Sub SaveSelectedFeatures(ByVal aAreaLayerIndex As Integer, _
                                     ByVal aSelectedAreaIndexes As Collection, _
-                                    ByRef newfilename As String)
+                                    ByRef aNewFilename As String)
 
         Dim sf As New MapWinGIS.Shapefile
         Dim tollSF As New MapWinGIS.Shapefile
         Dim fld As New MapWinGIS.Field
         Dim seg As New MapWinGIS.Shape
-        Dim i As Long
-        Dim Status As Boolean
+        Dim i As Integer
+        Dim lStatus As Boolean
 
         'set input layer
         Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aAreaLayerIndex)
         sf = lLayer.GetObject
 
-        If newfilename = "" Then
+        If aNewFilename = "" Then
             'create new shape file for output
             Dim basename As String = FilenameNoExt(sf.Filename)
             i = 1
-            newfilename = basename & i & ".shp"
-            Do While FileExists(newfilename)
+            aNewFilename = basename & i & ".shp"
+            Do While FileExists(aNewFilename)
                 i = i + 1
-                newfilename = basename & i & ".shp"
+                aNewFilename = basename & i & ".shp"
             Loop
         End If
 
         If lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
-            Status = tollSF.CreateNew(newfilename, MapWinGIS.ShpfileType.SHP_POLYGON)
+            lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POLYGON)
         ElseIf lLayer.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile Then
-            Status = tollSF.CreateNew(newfilename, MapWinGIS.ShpfileType.SHP_POLYLINE)
+            lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POLYLINE)
         ElseIf lLayer.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile Then
-            Status = tollSF.CreateNew(newfilename, MapWinGIS.ShpfileType.SHP_POINT)
+            lStatus = tollSF.CreateNew(aNewFilename, MapWinGIS.ShpfileType.SHP_POINT)
         End If
 
-        'start editing the output shapefile 
-        Status = tollSF.StartEditingShapes(True)
+        Dim lInputProjectionFileName As String = FilenameNoExt(sf.Filename) & ".prj"
+        If FileExists(lInputProjectionFileName) Then
+            FileCopy(lInputProjectionFileName, FilenameNoExt(aNewFilename) & ".prj")
+        End If
 
-        'add all fields
-        Dim j As Integer
-        For j = 0 To sf.NumFields - 1
-            tollSF.EditInsertField(sf.Field(j), j)
-        Next
+        If lStatus Then
+            'start editing the output shapefile 
+            lStatus = tollSF.StartEditingShapes(True)
 
-        For i = 1 To aSelectedAreaIndexes.Count
-
-            seg = sf.Shape(aSelectedAreaIndexes(i))
-
-            'Insert it into the new shapefile
-            Status = tollSF.EditInsertShape(seg, i - 1)
-            
-            Dim h As Integer
-            For h = 0 To sf.NumFields - 1
-                tollSF.EditCellValue(h, i - 1, sf.CellValue(h, aSelectedAreaIndexes(i)))
+            'add all fields
+            Dim j As Integer
+            For j = 0 To sf.NumFields - 1
+                tollSF.EditInsertField(sf.Field(j), j)
             Next
 
-        Next i
+            For i = 1 To aSelectedAreaIndexes.Count
 
-        'Stop editing and close the output shapefile
-        tollSF.StopEditingShapes(True, True)
+                seg = sf.Shape(aSelectedAreaIndexes(i))
+
+                'Insert it into the new shapefile
+                lStatus = tollSF.EditInsertShape(seg, i - 1)
+
+                Dim h As Integer
+                For h = 0 To sf.NumFields - 1
+                    tollSF.EditCellValue(h, i - 1, sf.CellValue(h, aSelectedAreaIndexes(i)))
+                Next
+
+            Next i
+            'Stop editing and close the output shapefile
+            tollSF.StopEditingShapes(True, True)
+        End If
+
         tollSF.Close()
         tollSF = Nothing
 
