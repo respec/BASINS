@@ -176,6 +176,7 @@ Public Module PollutantLoading
                                          lSubbasinLayerIndex, lSelectedAreaIndexes, _
                                          lAreasLS)
         Else 'grid
+            lLanduseLayerIndex = GisUtil.LayerIndex(aLandUseLayer)
             Dim lGridmax As Integer = System.Convert.ToInt32(GisUtil.GridLayerMaximum(lLanduseLayerIndex))
             Dim laAreaLS(lGridmax, GisUtil.NumFeatures(lSubbasinLayerIndex)) As Double
             GisUtil.TabulateAreas(lLanduseLayerIndex, lSubbasinLayerIndex, _
