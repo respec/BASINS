@@ -95,6 +95,17 @@ Friend Class frmModelSetup
     Friend WithEvents sfdValues As System.Windows.Forms.SaveFileDialog
     Friend WithEvents cmdSavePoint As System.Windows.Forms.Button
     Friend WithEvents cmdSaveBMPs As System.Windows.Forms.Button
+    Friend WithEvents tabBank As System.Windows.Forms.TabPage
+    Friend WithEvents cmdSaveBank As System.Windows.Forms.Button
+    Friend WithEvents lblUnitsBank As System.Windows.Forms.Label
+    Friend WithEvents lblSubbasinId As System.Windows.Forms.Label
+    Friend WithEvents atcGridBank As atcControls.atcGrid
+    Friend WithEvents cmdChangeBank As System.Windows.Forms.Button
+    Friend WithEvents lblBankFile As System.Windows.Forms.Label
+    Friend WithEvents lblStreambank As System.Windows.Forms.Label
+    Friend WithEvents cboSubbasinIDField As System.Windows.Forms.ComboBox
+    Friend WithEvents cbxBank As System.Windows.Forms.CheckBox
+    Friend WithEvents lblTSS As System.Windows.Forms.Label
     Friend WithEvents ofdValues As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
@@ -150,6 +161,17 @@ Friend Class frmModelSetup
         Me.cboAreaField = New System.Windows.Forms.ComboBox
         Me.cboBMPLayer = New System.Windows.Forms.ComboBox
         Me.cbxBMPs = New System.Windows.Forms.CheckBox
+        Me.tabBank = New System.Windows.Forms.TabPage
+        Me.lblTSS = New System.Windows.Forms.Label
+        Me.cmdSaveBank = New System.Windows.Forms.Button
+        Me.lblUnitsBank = New System.Windows.Forms.Label
+        Me.lblSubbasinId = New System.Windows.Forms.Label
+        Me.atcGridBank = New atcControls.atcGrid
+        Me.cmdChangeBank = New System.Windows.Forms.Button
+        Me.lblBankFile = New System.Windows.Forms.Label
+        Me.lblStreambank = New System.Windows.Forms.Label
+        Me.cboSubbasinIDField = New System.Windows.Forms.ComboBox
+        Me.cbxBank = New System.Windows.Forms.CheckBox
         Me.cmdOK = New System.Windows.Forms.Button
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.cmdHelp = New System.Windows.Forms.Button
@@ -162,6 +184,7 @@ Friend Class frmModelSetup
         Me.tabValues.SuspendLayout()
         Me.tabPointSources.SuspendLayout()
         Me.tabBMPs.SuspendLayout()
+        Me.tabBank.SuspendLayout()
         Me.SuspendLayout()
         '
         'tabPLOAD
@@ -174,13 +197,14 @@ Friend Class frmModelSetup
         Me.tabPLOAD.Controls.Add(Me.tabValues)
         Me.tabPLOAD.Controls.Add(Me.tabPointSources)
         Me.tabPLOAD.Controls.Add(Me.tabBMPs)
+        Me.tabPLOAD.Controls.Add(Me.tabBank)
         Me.tabPLOAD.Cursor = System.Windows.Forms.Cursors.Default
-        Me.tabPLOAD.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.tabPLOAD.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tabPLOAD.ItemSize = New System.Drawing.Size(60, 21)
-        Me.tabPLOAD.Location = New System.Drawing.Point(16, 16)
+        Me.tabPLOAD.Location = New System.Drawing.Point(19, 17)
         Me.tabPLOAD.Name = "tabPLOAD"
         Me.tabPLOAD.SelectedIndex = 0
-        Me.tabPLOAD.Size = New System.Drawing.Size(655, 283)
+        Me.tabPLOAD.Size = New System.Drawing.Size(651, 302)
         Me.tabPLOAD.TabIndex = 0
         '
         'tabGeneral
@@ -199,10 +223,10 @@ Friend Class frmModelSetup
         Me.tabGeneral.Controls.Add(Me.cboLanduse)
         Me.tabGeneral.Controls.Add(Me.lblSubbasinsLayer)
         Me.tabGeneral.Controls.Add(Me.lblLanduseType)
-        Me.tabGeneral.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.tabGeneral.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tabGeneral.Location = New System.Drawing.Point(4, 25)
         Me.tabGeneral.Name = "tabGeneral"
-        Me.tabGeneral.Size = New System.Drawing.Size(647, 254)
+        Me.tabGeneral.Size = New System.Drawing.Size(643, 273)
         Me.tabGeneral.TabIndex = 0
         Me.tabGeneral.Text = "General"
         Me.tabGeneral.UseVisualStyleBackColor = True
@@ -215,7 +239,7 @@ Friend Class frmModelSetup
         Me.atxRatio.HardMax = 1
         Me.atxRatio.HardMin = 0
         Me.atxRatio.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxRatio.Location = New System.Drawing.Point(265, 120)
+        Me.atxRatio.Location = New System.Drawing.Point(274, 128)
         Me.atxRatio.MaxDecimal = 0
         Me.atxRatio.maxWidth = 0
         Me.atxRatio.Name = "atxRatio"
@@ -223,7 +247,7 @@ Friend Class frmModelSetup
         Me.atxRatio.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.atxRatio.SelLength = 0
         Me.atxRatio.SelStart = 1
-        Me.atxRatio.Size = New System.Drawing.Size(55, 26)
+        Me.atxRatio.Size = New System.Drawing.Size(64, 28)
         Me.atxRatio.SoftMax = 0
         Me.atxRatio.SoftMin = 0
         Me.atxRatio.TabIndex = 17
@@ -237,7 +261,7 @@ Friend Class frmModelSetup
         Me.atxPrec.HardMax = 999
         Me.atxPrec.HardMin = 0
         Me.atxPrec.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxPrec.Location = New System.Drawing.Point(265, 93)
+        Me.atxPrec.Location = New System.Drawing.Point(274, 99)
         Me.atxPrec.MaxDecimal = 0
         Me.atxPrec.maxWidth = 0
         Me.atxPrec.Name = "atxPrec"
@@ -245,7 +269,7 @@ Friend Class frmModelSetup
         Me.atxPrec.OutsideSoftLimitBackground = System.Drawing.Color.Empty
         Me.atxPrec.SelLength = 0
         Me.atxPrec.SelStart = 1
-        Me.atxPrec.Size = New System.Drawing.Size(55, 24)
+        Me.atxPrec.Size = New System.Drawing.Size(64, 26)
         Me.atxPrec.SoftMax = 0
         Me.atxPrec.SoftMin = 0
         Me.atxPrec.TabIndex = 16
@@ -254,7 +278,7 @@ Friend Class frmModelSetup
         'lblRatio
         '
         Me.lblRatio.AutoSize = True
-        Me.lblRatio.Location = New System.Drawing.Point(40, 120)
+        Me.lblRatio.Location = New System.Drawing.Point(47, 128)
         Me.lblRatio.Name = "lblRatio"
         Me.lblRatio.Size = New System.Drawing.Size(219, 17)
         Me.lblRatio.TabIndex = 15
@@ -263,7 +287,7 @@ Friend Class frmModelSetup
         'lblPrecip
         '
         Me.lblPrecip.AutoSize = True
-        Me.lblPrecip.Location = New System.Drawing.Point(40, 93)
+        Me.lblPrecip.Location = New System.Drawing.Point(47, 99)
         Me.lblPrecip.Name = "lblPrecip"
         Me.lblPrecip.Size = New System.Drawing.Size(159, 17)
         Me.lblPrecip.TabIndex = 14
@@ -272,7 +296,7 @@ Friend Class frmModelSetup
         'lblMethod
         '
         Me.lblMethod.AutoSize = True
-        Me.lblMethod.Location = New System.Drawing.Point(40, 16)
+        Me.lblMethod.Location = New System.Drawing.Point(47, 17)
         Me.lblMethod.Name = "lblMethod"
         Me.lblMethod.Size = New System.Drawing.Size(59, 17)
         Me.lblMethod.TabIndex = 13
@@ -281,7 +305,7 @@ Friend Class frmModelSetup
         'lblPollutants
         '
         Me.lblPollutants.AutoSize = True
-        Me.lblPollutants.Location = New System.Drawing.Point(336, 16)
+        Me.lblPollutants.Location = New System.Drawing.Point(364, 17)
         Me.lblPollutants.Name = "lblPollutants"
         Me.lblPollutants.Size = New System.Drawing.Size(74, 17)
         Me.lblPollutants.TabIndex = 12
@@ -293,17 +317,17 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstConstituents.FormattingEnabled = True
-        Me.lstConstituents.ItemHeight = 16
-        Me.lstConstituents.Location = New System.Drawing.Point(358, 38)
+        Me.lstConstituents.ItemHeight = 17
+        Me.lstConstituents.Location = New System.Drawing.Point(388, 41)
         Me.lstConstituents.Name = "lstConstituents"
         Me.lstConstituents.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstConstituents.Size = New System.Drawing.Size(261, 100)
+        Me.lstConstituents.Size = New System.Drawing.Size(221, 106)
         Me.lstConstituents.TabIndex = 11
         '
         'rbSimpleMethod
         '
         Me.rbSimpleMethod.AutoSize = True
-        Me.rbSimpleMethod.Location = New System.Drawing.Point(58, 65)
+        Me.rbSimpleMethod.Location = New System.Drawing.Point(68, 69)
         Me.rbSimpleMethod.Name = "rbSimpleMethod"
         Me.rbSimpleMethod.Size = New System.Drawing.Size(111, 21)
         Me.rbSimpleMethod.TabIndex = 10
@@ -314,7 +338,7 @@ Friend Class frmModelSetup
         '
         Me.rbExportCoefficientMethod.AutoSize = True
         Me.rbExportCoefficientMethod.Checked = True
-        Me.rbExportCoefficientMethod.Location = New System.Drawing.Point(58, 38)
+        Me.rbExportCoefficientMethod.Location = New System.Drawing.Point(68, 41)
         Me.rbExportCoefficientMethod.Name = "rbExportCoefficientMethod"
         Me.rbExportCoefficientMethod.Size = New System.Drawing.Size(140, 21)
         Me.rbExportCoefficientMethod.TabIndex = 9
@@ -328,9 +352,9 @@ Friend Class frmModelSetup
         Me.cboSubbasins.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSubbasins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboSubbasins.Location = New System.Drawing.Point(201, 164)
+        Me.cboSubbasins.Location = New System.Drawing.Point(234, 175)
         Me.cboSubbasins.Name = "cboSubbasins"
-        Me.cboSubbasins.Size = New System.Drawing.Size(367, 24)
+        Me.cboSubbasins.Size = New System.Drawing.Size(316, 25)
         Me.cboSubbasins.TabIndex = 8
         '
         'cboLanduse
@@ -339,26 +363,26 @@ Friend Class frmModelSetup
         Me.cboLanduse.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboLanduse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboLanduse.Location = New System.Drawing.Point(201, 201)
+        Me.cboLanduse.Location = New System.Drawing.Point(234, 214)
         Me.cboLanduse.Name = "cboLanduse"
-        Me.cboLanduse.Size = New System.Drawing.Size(367, 24)
+        Me.cboLanduse.Size = New System.Drawing.Size(316, 25)
         Me.cboLanduse.TabIndex = 7
         '
         'lblSubbasinsLayer
         '
         Me.lblSubbasinsLayer.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblSubbasinsLayer.Location = New System.Drawing.Point(25, 164)
+        Me.lblSubbasinsLayer.Location = New System.Drawing.Point(29, 175)
         Me.lblSubbasinsLayer.Name = "lblSubbasinsLayer"
-        Me.lblSubbasinsLayer.Size = New System.Drawing.Size(152, 24)
+        Me.lblSubbasinsLayer.Size = New System.Drawing.Size(177, 26)
         Me.lblSubbasinsLayer.TabIndex = 2
         Me.lblSubbasinsLayer.Text = "Subbasins Layer:"
         '
         'lblLanduseType
         '
         Me.lblLanduseType.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.lblLanduseType.Location = New System.Drawing.Point(25, 201)
+        Me.lblLanduseType.Location = New System.Drawing.Point(29, 214)
         Me.lblLanduseType.Name = "lblLanduseType"
-        Me.lblLanduseType.Size = New System.Drawing.Size(152, 24)
+        Me.lblLanduseType.Size = New System.Drawing.Size(177, 26)
         Me.lblLanduseType.TabIndex = 1
         Me.lblLanduseType.Text = "Land Use Type:"
         '
@@ -370,7 +394,7 @@ Friend Class frmModelSetup
         Me.tabLanduse.Controls.Add(Me.lblLandUseLayer)
         Me.tabLanduse.Location = New System.Drawing.Point(4, 25)
         Me.tabLanduse.Name = "tabLanduse"
-        Me.tabLanduse.Size = New System.Drawing.Size(647, 254)
+        Me.tabLanduse.Size = New System.Drawing.Size(643, 273)
         Me.tabLanduse.TabIndex = 1
         Me.tabLanduse.Text = "Land Use"
         Me.tabLanduse.UseVisualStyleBackColor = True
@@ -381,15 +405,15 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboLandUseIDField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLandUseIDField.FormattingEnabled = True
-        Me.cboLandUseIDField.Location = New System.Drawing.Point(200, 78)
+        Me.cboLandUseIDField.Location = New System.Drawing.Point(233, 83)
         Me.cboLandUseIDField.Name = "cboLandUseIDField"
-        Me.cboLandUseIDField.Size = New System.Drawing.Size(293, 24)
+        Me.cboLandUseIDField.Size = New System.Drawing.Size(229, 25)
         Me.cboLandUseIDField.TabIndex = 12
         '
         'lblLandUseIDField
         '
         Me.lblLandUseIDField.AutoSize = True
-        Me.lblLandUseIDField.Location = New System.Drawing.Point(40, 81)
+        Me.lblLandUseIDField.Location = New System.Drawing.Point(47, 86)
         Me.lblLandUseIDField.Name = "lblLandUseIDField"
         Me.lblLandUseIDField.Size = New System.Drawing.Size(124, 17)
         Me.lblLandUseIDField.TabIndex = 11
@@ -401,16 +425,16 @@ Friend Class frmModelSetup
         Me.cboLandUseLayer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboLandUseLayer.Location = New System.Drawing.Point(200, 32)
+        Me.cboLandUseLayer.Location = New System.Drawing.Point(233, 34)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(367, 24)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(315, 25)
         Me.cboLandUseLayer.TabIndex = 10
         '
         'lblLandUseLayer
         '
-        Me.lblLandUseLayer.Location = New System.Drawing.Point(40, 32)
+        Me.lblLandUseLayer.Location = New System.Drawing.Point(47, 34)
         Me.lblLandUseLayer.Name = "lblLandUseLayer"
-        Me.lblLandUseLayer.Size = New System.Drawing.Size(152, 24)
+        Me.lblLandUseLayer.Size = New System.Drawing.Size(177, 26)
         Me.lblLandUseLayer.TabIndex = 9
         Me.lblLandUseLayer.Text = "Land Use Layer:"
         '
@@ -424,7 +448,7 @@ Friend Class frmModelSetup
         Me.tabValues.Controls.Add(Me.atcGridValues)
         Me.tabValues.Location = New System.Drawing.Point(4, 25)
         Me.tabValues.Name = "tabValues"
-        Me.tabValues.Size = New System.Drawing.Size(647, 254)
+        Me.tabValues.Size = New System.Drawing.Size(643, 273)
         Me.tabValues.TabIndex = 4
         Me.tabValues.Text = "Export Coefficients"
         Me.tabValues.UseVisualStyleBackColor = True
@@ -432,9 +456,9 @@ Friend Class frmModelSetup
         'cmdSave
         '
         Me.cmdSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSave.Location = New System.Drawing.Point(487, 12)
+        Me.cmdSave.Location = New System.Drawing.Point(455, 13)
         Me.cmdSave.Name = "cmdSave"
-        Me.cmdSave.Size = New System.Drawing.Size(67, 24)
+        Me.cmdSave.Size = New System.Drawing.Size(78, 25)
         Me.cmdSave.TabIndex = 24
         Me.cmdSave.Text = "Save"
         Me.cmdSave.UseVisualStyleBackColor = True
@@ -442,7 +466,7 @@ Friend Class frmModelSetup
         'lblValueUnits
         '
         Me.lblValueUnits.AutoSize = True
-        Me.lblValueUnits.Location = New System.Drawing.Point(17, 32)
+        Me.lblValueUnits.Location = New System.Drawing.Point(20, 34)
         Me.lblValueUnits.Name = "lblValueUnits"
         Me.lblValueUnits.Size = New System.Drawing.Size(71, 17)
         Me.lblValueUnits.TabIndex = 23
@@ -451,9 +475,9 @@ Friend Class frmModelSetup
         'cmdChangeFile
         '
         Me.cmdChangeFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangeFile.Location = New System.Drawing.Point(554, 12)
+        Me.cmdChangeFile.Location = New System.Drawing.Point(533, 13)
         Me.cmdChangeFile.Name = "cmdChangeFile"
-        Me.cmdChangeFile.Size = New System.Drawing.Size(73, 24)
+        Me.cmdChangeFile.Size = New System.Drawing.Size(85, 25)
         Me.cmdChangeFile.TabIndex = 22
         Me.cmdChangeFile.Text = "Change"
         '
@@ -461,18 +485,18 @@ Friend Class frmModelSetup
         '
         Me.lblValueFileName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblValueFileName.Location = New System.Drawing.Point(176, 16)
+        Me.lblValueFileName.Location = New System.Drawing.Point(205, 17)
         Me.lblValueFileName.Name = "lblValueFileName"
-        Me.lblValueFileName.Size = New System.Drawing.Size(305, 16)
+        Me.lblValueFileName.Size = New System.Drawing.Size(243, 17)
         Me.lblValueFileName.TabIndex = 21
         Me.lblValueFileName.Text = "<none>"
         Me.lblValueFileName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'lblValueFile
         '
-        Me.lblValueFile.Location = New System.Drawing.Point(17, 16)
+        Me.lblValueFile.Location = New System.Drawing.Point(20, 17)
         Me.lblValueFile.Name = "lblValueFile"
-        Me.lblValueFile.Size = New System.Drawing.Size(153, 16)
+        Me.lblValueFile.Size = New System.Drawing.Size(178, 17)
         Me.lblValueFile.TabIndex = 20
         Me.lblValueFile.Text = "Export Coefficient File:"
         Me.lblValueFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -487,9 +511,9 @@ Friend Class frmModelSetup
         Me.atcGridValues.CellBackColor = System.Drawing.Color.Empty
         Me.atcGridValues.LineColor = System.Drawing.Color.Empty
         Me.atcGridValues.LineWidth = 0.0!
-        Me.atcGridValues.Location = New System.Drawing.Point(20, 54)
+        Me.atcGridValues.Location = New System.Drawing.Point(23, 58)
         Me.atcGridValues.Name = "atcGridValues"
-        Me.atcGridValues.Size = New System.Drawing.Size(607, 184)
+        Me.atcGridValues.Size = New System.Drawing.Size(595, 196)
         Me.atcGridValues.Source = Nothing
         Me.atcGridValues.TabIndex = 19
         '
@@ -508,7 +532,7 @@ Friend Class frmModelSetup
         Me.tabPointSources.Controls.Add(Me.cbxPoint)
         Me.tabPointSources.Location = New System.Drawing.Point(4, 25)
         Me.tabPointSources.Name = "tabPointSources"
-        Me.tabPointSources.Size = New System.Drawing.Size(647, 254)
+        Me.tabPointSources.Size = New System.Drawing.Size(643, 273)
         Me.tabPointSources.TabIndex = 2
         Me.tabPointSources.Text = "Point Sources"
         Me.tabPointSources.UseVisualStyleBackColor = True
@@ -516,18 +540,18 @@ Friend Class frmModelSetup
         'cmdSavePoint
         '
         Me.cmdSavePoint.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSavePoint.Location = New System.Drawing.Point(499, 85)
+        Me.cmdSavePoint.Location = New System.Drawing.Point(469, 91)
         Me.cmdSavePoint.Name = "cmdSavePoint"
-        Me.cmdSavePoint.Size = New System.Drawing.Size(67, 24)
+        Me.cmdSavePoint.Size = New System.Drawing.Size(78, 25)
         Me.cmdSavePoint.TabIndex = 38
         Me.cmdSavePoint.Text = "Save"
         Me.cmdSavePoint.UseVisualStyleBackColor = True
         '
         'lblUnits
         '
-        Me.lblUnits.Location = New System.Drawing.Point(34, 107)
+        Me.lblUnits.Location = New System.Drawing.Point(40, 114)
         Me.lblUnits.Name = "lblUnits"
-        Me.lblUnits.Size = New System.Drawing.Size(195, 16)
+        Me.lblUnits.Size = New System.Drawing.Size(227, 17)
         Me.lblUnits.TabIndex = 37
         Me.lblUnits.Text = "(lbs/yr or counts/yr))"
         Me.lblUnits.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -535,7 +559,7 @@ Friend Class frmModelSetup
         'lblPointID
         '
         Me.lblPointID.AutoSize = True
-        Me.lblPointID.Location = New System.Drawing.Point(158, 47)
+        Me.lblPointID.Location = New System.Drawing.Point(184, 50)
         Me.lblPointID.Name = "lblPointID"
         Me.lblPointID.Size = New System.Drawing.Size(144, 17)
         Me.lblPointID.TabIndex = 36
@@ -546,7 +570,7 @@ Friend Class frmModelSetup
         '
         Me.lblPointLayer.AutoSize = True
         Me.lblPointLayer.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblPointLayer.Location = New System.Drawing.Point(169, 15)
+        Me.lblPointLayer.Location = New System.Drawing.Point(197, 16)
         Me.lblPointLayer.Name = "lblPointLayer"
         Me.lblPointLayer.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblPointLayer.Size = New System.Drawing.Size(133, 17)
@@ -564,18 +588,18 @@ Friend Class frmModelSetup
         Me.atcGridPoint.CellBackColor = System.Drawing.Color.Empty
         Me.atcGridPoint.LineColor = System.Drawing.Color.Empty
         Me.atcGridPoint.LineWidth = 0.0!
-        Me.atcGridPoint.Location = New System.Drawing.Point(15, 126)
+        Me.atcGridPoint.Location = New System.Drawing.Point(17, 134)
         Me.atcGridPoint.Name = "atcGridPoint"
-        Me.atcGridPoint.Size = New System.Drawing.Size(618, 116)
+        Me.atcGridPoint.Size = New System.Drawing.Size(608, 124)
         Me.atcGridPoint.Source = Nothing
         Me.atcGridPoint.TabIndex = 34
         '
         'cmdChangePoint
         '
         Me.cmdChangePoint.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangePoint.Location = New System.Drawing.Point(563, 85)
+        Me.cmdChangePoint.Location = New System.Drawing.Point(544, 91)
         Me.cmdChangePoint.Name = "cmdChangePoint"
-        Me.cmdChangePoint.Size = New System.Drawing.Size(71, 24)
+        Me.cmdChangePoint.Size = New System.Drawing.Size(83, 25)
         Me.cmdChangePoint.TabIndex = 33
         Me.cmdChangePoint.Text = "Change"
         '
@@ -583,18 +607,18 @@ Friend Class frmModelSetup
         '
         Me.lblPointLoadFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblPointLoadFile.Location = New System.Drawing.Point(213, 89)
+        Me.lblPointLoadFile.Location = New System.Drawing.Point(248, 95)
         Me.lblPointLoadFile.Name = "lblPointLoadFile"
-        Me.lblPointLoadFile.Size = New System.Drawing.Size(280, 16)
+        Me.lblPointLoadFile.Size = New System.Drawing.Size(214, 17)
         Me.lblPointLoadFile.TabIndex = 32
         Me.lblPointLoadFile.Text = "<none>"
         Me.lblPointLoadFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'lblPointSourceFile
         '
-        Me.lblPointSourceFile.Location = New System.Drawing.Point(12, 89)
+        Me.lblPointSourceFile.Location = New System.Drawing.Point(14, 95)
         Me.lblPointSourceFile.Name = "lblPointSourceFile"
-        Me.lblPointSourceFile.Size = New System.Drawing.Size(195, 16)
+        Me.lblPointSourceFile.Size = New System.Drawing.Size(227, 17)
         Me.lblPointSourceFile.TabIndex = 31
         Me.lblPointSourceFile.Text = "Point Source Loading File:"
         Me.lblPointSourceFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -605,9 +629,9 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPointIDField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboPointIDField.FormattingEnabled = True
-        Me.cboPointIDField.Location = New System.Drawing.Point(308, 44)
+        Me.cboPointIDField.Location = New System.Drawing.Point(359, 47)
         Me.cboPointIDField.Name = "cboPointIDField"
-        Me.cboPointIDField.Size = New System.Drawing.Size(270, 24)
+        Me.cboPointIDField.Size = New System.Drawing.Size(202, 25)
         Me.cboPointIDField.TabIndex = 30
         '
         'cboPointLayer
@@ -616,15 +640,15 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPointLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboPointLayer.FormattingEnabled = True
-        Me.cboPointLayer.Location = New System.Drawing.Point(308, 12)
+        Me.cboPointLayer.Location = New System.Drawing.Point(359, 13)
         Me.cboPointLayer.Name = "cboPointLayer"
-        Me.cboPointLayer.Size = New System.Drawing.Size(325, 24)
+        Me.cboPointLayer.Size = New System.Drawing.Size(266, 25)
         Me.cboPointLayer.TabIndex = 29
         '
         'cbxPoint
         '
         Me.cbxPoint.AutoSize = True
-        Me.cbxPoint.Location = New System.Drawing.Point(15, 14)
+        Me.cbxPoint.Location = New System.Drawing.Point(17, 15)
         Me.cbxPoint.Name = "cbxPoint"
         Me.cbxPoint.Size = New System.Drawing.Size(144, 21)
         Me.cbxPoint.TabIndex = 28
@@ -647,7 +671,7 @@ Friend Class frmModelSetup
         Me.tabBMPs.Controls.Add(Me.cbxBMPs)
         Me.tabBMPs.Location = New System.Drawing.Point(4, 25)
         Me.tabBMPs.Name = "tabBMPs"
-        Me.tabBMPs.Size = New System.Drawing.Size(647, 254)
+        Me.tabBMPs.Size = New System.Drawing.Size(643, 273)
         Me.tabBMPs.TabIndex = 3
         Me.tabBMPs.Text = "BMPs"
         Me.tabBMPs.UseVisualStyleBackColor = True
@@ -655,9 +679,9 @@ Friend Class frmModelSetup
         'cmdSaveBMPs
         '
         Me.cmdSaveBMPs.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSaveBMPs.Location = New System.Drawing.Point(501, 116)
+        Me.cmdSaveBMPs.Location = New System.Drawing.Point(471, 124)
         Me.cmdSaveBMPs.Name = "cmdSaveBMPs"
-        Me.cmdSaveBMPs.Size = New System.Drawing.Size(67, 24)
+        Me.cmdSaveBMPs.Size = New System.Drawing.Size(79, 25)
         Me.cmdSaveBMPs.TabIndex = 39
         Me.cmdSaveBMPs.Text = "Save"
         Me.cmdSaveBMPs.UseVisualStyleBackColor = True
@@ -672,18 +696,18 @@ Friend Class frmModelSetup
         Me.atcGridBMP.CellBackColor = System.Drawing.Color.Empty
         Me.atcGridBMP.LineColor = System.Drawing.Color.Empty
         Me.atcGridBMP.LineWidth = 0.0!
-        Me.atcGridBMP.Location = New System.Drawing.Point(15, 141)
+        Me.atcGridBMP.Location = New System.Drawing.Point(17, 150)
         Me.atcGridBMP.Name = "atcGridBMP"
-        Me.atcGridBMP.Size = New System.Drawing.Size(618, 103)
+        Me.atcGridBMP.Size = New System.Drawing.Size(608, 110)
         Me.atcGridBMP.Source = Nothing
         Me.atcGridBMP.TabIndex = 27
         '
         'cmdChangeBMP
         '
         Me.cmdChangeBMP.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangeBMP.Location = New System.Drawing.Point(563, 116)
+        Me.cmdChangeBMP.Location = New System.Drawing.Point(544, 124)
         Me.cmdChangeBMP.Name = "cmdChangeBMP"
-        Me.cmdChangeBMP.Size = New System.Drawing.Size(71, 24)
+        Me.cmdChangeBMP.Size = New System.Drawing.Size(83, 25)
         Me.cmdChangeBMP.TabIndex = 26
         Me.cmdChangeBMP.Text = "Change"
         '
@@ -691,9 +715,9 @@ Friend Class frmModelSetup
         '
         Me.lblBMPFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblBMPFile.Location = New System.Drawing.Point(213, 120)
+        Me.lblBMPFile.Location = New System.Drawing.Point(248, 128)
         Me.lblBMPFile.Name = "lblBMPFile"
-        Me.lblBMPFile.Size = New System.Drawing.Size(282, 16)
+        Me.lblBMPFile.Size = New System.Drawing.Size(216, 17)
         Me.lblBMPFile.TabIndex = 25
         Me.lblBMPFile.Text = "<none>"
         Me.lblBMPFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -701,7 +725,7 @@ Friend Class frmModelSetup
         'lblType
         '
         Me.lblType.AutoSize = True
-        Me.lblType.Location = New System.Drawing.Point(114, 49)
+        Me.lblType.Location = New System.Drawing.Point(133, 52)
         Me.lblType.Name = "lblType"
         Me.lblType.Size = New System.Drawing.Size(111, 17)
         Me.lblType.TabIndex = 24
@@ -711,7 +735,7 @@ Friend Class frmModelSetup
         'lblArea
         '
         Me.lblArea.AutoSize = True
-        Me.lblArea.Location = New System.Drawing.Point(149, 79)
+        Me.lblArea.Location = New System.Drawing.Point(174, 84)
         Me.lblArea.Name = "lblArea"
         Me.lblArea.Size = New System.Drawing.Size(76, 17)
         Me.lblArea.TabIndex = 23
@@ -722,7 +746,7 @@ Friend Class frmModelSetup
         '
         Me.lblLayer.AutoSize = True
         Me.lblLayer.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblLayer.Location = New System.Drawing.Point(147, 17)
+        Me.lblLayer.Location = New System.Drawing.Point(171, 18)
         Me.lblLayer.Name = "lblLayer"
         Me.lblLayer.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblLayer.Size = New System.Drawing.Size(81, 17)
@@ -732,9 +756,9 @@ Friend Class frmModelSetup
         '
         'lblRemoval
         '
-        Me.lblRemoval.Location = New System.Drawing.Point(12, 120)
+        Me.lblRemoval.Location = New System.Drawing.Point(14, 128)
         Me.lblRemoval.Name = "lblRemoval"
-        Me.lblRemoval.Size = New System.Drawing.Size(195, 16)
+        Me.lblRemoval.Size = New System.Drawing.Size(227, 17)
         Me.lblRemoval.TabIndex = 21
         Me.lblRemoval.Text = "BMP Removal Efficiency File:"
         Me.lblRemoval.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -745,9 +769,9 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboBMPType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboBMPType.FormattingEnabled = True
-        Me.cboBMPType.Location = New System.Drawing.Point(234, 46)
+        Me.cboBMPType.Location = New System.Drawing.Point(273, 49)
         Me.cboBMPType.Name = "cboBMPType"
-        Me.cboBMPType.Size = New System.Drawing.Size(270, 24)
+        Me.cboBMPType.Size = New System.Drawing.Size(202, 25)
         Me.cboBMPType.TabIndex = 3
         '
         'cboAreaField
@@ -756,9 +780,9 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboAreaField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboAreaField.FormattingEnabled = True
-        Me.cboAreaField.Location = New System.Drawing.Point(234, 76)
+        Me.cboAreaField.Location = New System.Drawing.Point(273, 81)
         Me.cboAreaField.Name = "cboAreaField"
-        Me.cboAreaField.Size = New System.Drawing.Size(270, 24)
+        Me.cboAreaField.Size = New System.Drawing.Size(202, 25)
         Me.cboAreaField.TabIndex = 2
         '
         'cboBMPLayer
@@ -767,58 +791,181 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboBMPLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboBMPLayer.FormattingEnabled = True
-        Me.cboBMPLayer.Location = New System.Drawing.Point(234, 14)
+        Me.cboBMPLayer.Location = New System.Drawing.Point(273, 15)
         Me.cboBMPLayer.Name = "cboBMPLayer"
-        Me.cboBMPLayer.Size = New System.Drawing.Size(325, 24)
+        Me.cboBMPLayer.Size = New System.Drawing.Size(266, 25)
         Me.cboBMPLayer.TabIndex = 1
         '
         'cbxBMPs
         '
         Me.cbxBMPs.AutoSize = True
-        Me.cbxBMPs.Location = New System.Drawing.Point(15, 16)
+        Me.cbxBMPs.Location = New System.Drawing.Point(17, 17)
         Me.cbxBMPs.Name = "cbxBMPs"
         Me.cbxBMPs.Size = New System.Drawing.Size(92, 21)
         Me.cbxBMPs.TabIndex = 0
         Me.cbxBMPs.Text = "Use BMPs"
         Me.cbxBMPs.UseVisualStyleBackColor = True
         '
+        'tabBank
+        '
+        Me.tabBank.Controls.Add(Me.lblTSS)
+        Me.tabBank.Controls.Add(Me.cmdSaveBank)
+        Me.tabBank.Controls.Add(Me.lblUnitsBank)
+        Me.tabBank.Controls.Add(Me.lblSubbasinId)
+        Me.tabBank.Controls.Add(Me.atcGridBank)
+        Me.tabBank.Controls.Add(Me.cmdChangeBank)
+        Me.tabBank.Controls.Add(Me.lblBankFile)
+        Me.tabBank.Controls.Add(Me.lblStreambank)
+        Me.tabBank.Controls.Add(Me.cboSubbasinIDField)
+        Me.tabBank.Controls.Add(Me.cbxBank)
+        Me.tabBank.Location = New System.Drawing.Point(4, 25)
+        Me.tabBank.Name = "tabBank"
+        Me.tabBank.Size = New System.Drawing.Size(643, 273)
+        Me.tabBank.TabIndex = 5
+        Me.tabBank.Text = "Bank Erosion"
+        Me.tabBank.UseVisualStyleBackColor = True
+        '
+        'lblTSS
+        '
+        Me.lblTSS.AutoSize = True
+        Me.lblTSS.Location = New System.Drawing.Point(57, 39)
+        Me.lblTSS.Name = "lblTSS"
+        Me.lblTSS.Size = New System.Drawing.Size(144, 17)
+        Me.lblTSS.TabIndex = 48
+        Me.lblTSS.Text = "(Only Applies to TSS)"
+        '
+        'cmdSaveBank
+        '
+        Me.cmdSaveBank.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdSaveBank.Location = New System.Drawing.Point(469, 90)
+        Me.cmdSaveBank.Name = "cmdSaveBank"
+        Me.cmdSaveBank.Size = New System.Drawing.Size(78, 25)
+        Me.cmdSaveBank.TabIndex = 47
+        Me.cmdSaveBank.Text = "Save"
+        Me.cmdSaveBank.UseVisualStyleBackColor = True
+        '
+        'lblUnitsBank
+        '
+        Me.lblUnitsBank.Location = New System.Drawing.Point(40, 113)
+        Me.lblUnitsBank.Name = "lblUnitsBank"
+        Me.lblUnitsBank.Size = New System.Drawing.Size(227, 17)
+        Me.lblUnitsBank.TabIndex = 46
+        Me.lblUnitsBank.Text = "(lbs/yr)"
+        Me.lblUnitsBank.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblSubbasinId
+        '
+        Me.lblSubbasinId.AutoSize = True
+        Me.lblSubbasinId.Location = New System.Drawing.Point(274, 17)
+        Me.lblSubbasinId.Name = "lblSubbasinId"
+        Me.lblSubbasinId.Size = New System.Drawing.Size(122, 17)
+        Me.lblSubbasinId.TabIndex = 45
+        Me.lblSubbasinId.Text = "Subbasin ID Field:"
+        Me.lblSubbasinId.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'atcGridBank
+        '
+        Me.atcGridBank.AllowHorizontalScrolling = True
+        Me.atcGridBank.AllowNewValidValues = False
+        Me.atcGridBank.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcGridBank.CellBackColor = System.Drawing.Color.Empty
+        Me.atcGridBank.LineColor = System.Drawing.Color.Empty
+        Me.atcGridBank.LineWidth = 0.0!
+        Me.atcGridBank.Location = New System.Drawing.Point(17, 133)
+        Me.atcGridBank.Name = "atcGridBank"
+        Me.atcGridBank.Size = New System.Drawing.Size(608, 124)
+        Me.atcGridBank.Source = Nothing
+        Me.atcGridBank.TabIndex = 44
+        '
+        'cmdChangeBank
+        '
+        Me.cmdChangeBank.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdChangeBank.Location = New System.Drawing.Point(544, 90)
+        Me.cmdChangeBank.Name = "cmdChangeBank"
+        Me.cmdChangeBank.Size = New System.Drawing.Size(83, 25)
+        Me.cmdChangeBank.TabIndex = 43
+        Me.cmdChangeBank.Text = "Change"
+        '
+        'lblBankFile
+        '
+        Me.lblBankFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblBankFile.Location = New System.Drawing.Point(248, 94)
+        Me.lblBankFile.Name = "lblBankFile"
+        Me.lblBankFile.Size = New System.Drawing.Size(214, 17)
+        Me.lblBankFile.TabIndex = 42
+        Me.lblBankFile.Text = "<none>"
+        Me.lblBankFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblStreambank
+        '
+        Me.lblStreambank.Location = New System.Drawing.Point(14, 94)
+        Me.lblStreambank.Name = "lblStreambank"
+        Me.lblStreambank.Size = New System.Drawing.Size(227, 17)
+        Me.lblStreambank.TabIndex = 41
+        Me.lblStreambank.Text = "Bank Erosion Loading File:"
+        Me.lblStreambank.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboSubbasinIDField
+        '
+        Me.cboSubbasinIDField.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSubbasinIDField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboSubbasinIDField.FormattingEnabled = True
+        Me.cboSubbasinIDField.Location = New System.Drawing.Point(423, 14)
+        Me.cboSubbasinIDField.Name = "cboSubbasinIDField"
+        Me.cboSubbasinIDField.Size = New System.Drawing.Size(202, 25)
+        Me.cboSubbasinIDField.TabIndex = 40
+        '
+        'cbxBank
+        '
+        Me.cbxBank.AutoSize = True
+        Me.cbxBank.Location = New System.Drawing.Point(17, 14)
+        Me.cbxBank.Name = "cbxBank"
+        Me.cbxBank.Size = New System.Drawing.Size(160, 21)
+        Me.cbxBank.TabIndex = 39
+        Me.cbxBank.Text = "Include Bank Erosion"
+        Me.cbxBank.UseVisualStyleBackColor = True
+        '
         'cmdOK
         '
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOK.Location = New System.Drawing.Point(16, 317)
+        Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdOK.Location = New System.Drawing.Point(19, 338)
         Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(103, 32)
+        Me.cmdOK.Size = New System.Drawing.Size(120, 34)
         Me.cmdOK.TabIndex = 2
         Me.cmdOK.Text = "&Generate"
         '
         'cmdCancel
         '
         Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdCancel.Location = New System.Drawing.Point(125, 317)
+        Me.cmdCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdCancel.Location = New System.Drawing.Point(146, 338)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(88, 32)
+        Me.cmdCancel.Size = New System.Drawing.Size(102, 34)
         Me.cmdCancel.TabIndex = 5
         Me.cmdCancel.Text = "&Cancel"
         '
         'cmdHelp
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(495, 317)
+        Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdHelp.Location = New System.Drawing.Point(464, 338)
         Me.cmdHelp.Name = "cmdHelp"
-        Me.cmdHelp.Size = New System.Drawing.Size(80, 32)
+        Me.cmdHelp.Size = New System.Drawing.Size(94, 34)
         Me.cmdHelp.TabIndex = 6
         Me.cmdHelp.Text = "&Help"
         '
         'cmdAbout
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(583, 317)
+        Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.cmdAbout.Location = New System.Drawing.Point(567, 338)
         Me.cmdAbout.Name = "cmdAbout"
-        Me.cmdAbout.Size = New System.Drawing.Size(88, 32)
+        Me.cmdAbout.Size = New System.Drawing.Size(103, 34)
         Me.cmdAbout.TabIndex = 7
         Me.cmdAbout.Text = "&About"
         '
@@ -835,14 +982,14 @@ Friend Class frmModelSetup
         '
         'frmModelSetup
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(687, 362)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(7, 16)
+        Me.ClientSize = New System.Drawing.Size(688, 386)
         Me.Controls.Add(Me.cmdAbout)
         Me.Controls.Add(Me.cmdHelp)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdOK)
         Me.Controls.Add(Me.tabPLOAD)
-        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmModelSetup"
@@ -858,6 +1005,8 @@ Friend Class frmModelSetup
         Me.tabPointSources.PerformLayout()
         Me.tabBMPs.ResumeLayout(False)
         Me.tabBMPs.PerformLayout()
+        Me.tabBank.ResumeLayout(False)
+        Me.tabBank.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
