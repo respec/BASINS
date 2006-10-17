@@ -158,7 +158,6 @@ Public Class atcBasinsPlugIn
         g_MapWin.Menus.Remove(AnalysisMenuName) 'TODO: don't unload if another plugin is still using it
 
         g_MapWin.Menus.Remove(ModelsMenuName & "_SWAT")
-        g_MapWin.Menus.Remove(ModelsMenuName & "_PLOAD")
         g_MapWin.Menus.Remove(ModelsMenuName & "_AGWA")
         If g_MapWin.Menus.Item(ModelsMenuName).NumSubItems = 0 Then
             g_MapWin.Menus.Remove(ModelsMenuName)

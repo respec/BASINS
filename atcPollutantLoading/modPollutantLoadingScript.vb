@@ -17,7 +17,7 @@ Imports atcMwGisUtility
 Module modPollutantLoadingScript
     Private Const pDirPath As String = "c:\test\atcPollutantLoading"
     Private Const pBasinsDir As String = "D:\Basins\"
-    Private Const pGridValuesSourceFilename As String = pBasinsDir & "etc\ecgiras.dbf"
+    Private Const pGridValuesSourceFilename As String = pBasinsDir & "etc\pload\ecgiras.dbf"
 
     Private Const pProject As String = pBasinsDir & "data\02070009\02070009.mwprj"
     Private Const pSubbasinLayerName As String = "CBP Phase 5 - River Segments"
