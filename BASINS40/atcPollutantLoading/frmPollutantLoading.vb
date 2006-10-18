@@ -1148,6 +1148,13 @@ Friend Class frmModelSetup
                                 atcGridPoint.Source)
                 End If
 
+                Dim lStreamBankLoads As PollutantLoadingStreamBankLoads = Nothing
+                If cbxBank.Checked Then
+                    lStreamBankLoads = New PollutantLoadingStreamBankLoads( _
+                                     cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex), _
+                                     atcGridBank.Source)
+                End If
+
                 GenerateLoads(cboSubbasins.Items(cboSubbasins.SelectedIndex), _
                               atcGridValues.Source, _
                               rbExportCoefficientMethod.Checked, _
@@ -1158,7 +1165,8 @@ Friend Class frmModelSetup
                               atxRatio.Value, _
                               lConstituents, _
                               lBmps, _
-                              lPointLoads)
+                              lPointLoads, _
+                              lStreamBankLoads)
 
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
                 Me.Close()

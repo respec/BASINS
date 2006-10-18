@@ -62,6 +62,27 @@ End Class
 ''' 
 ''' </summary>
 ''' <remarks></remarks>
+Public Class PollutantLoadingStreamBankLoads
+    Public ReadOnly StreamIDField As String
+    Public ReadOnly BankGridSource As atcGridSource
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aStreamIDField"></param>
+    ''' <param name="aBankGridSource"></param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal aStreamIDField As String, _
+                   ByVal aBankGridSource As atcGridSource)
+        StreamIDField = aStreamIDField
+        BankGridSource = aBankGridSource
+    End Sub
+End Class
+
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
 Public Module PollutantLoading
     ''' <summary>
     ''' 
@@ -88,7 +109,8 @@ Public Module PollutantLoading
                              ByVal aRatio As Double, _
                              ByVal aConstituents As atcCollection, _
                              ByVal aBmps As PollutantLoadingBMPs, _
-                             ByVal aPointLoads As PollutantLoadingPointLoads)
+                             ByVal aPointLoads As PollutantLoadingPointLoads, _
+                             ByVal aStreamBankLoads As PollutantLoadingStreamBankLoads)
 
         Dim i As Integer, j As Integer, k As Integer
         Dim lSubbasinLayerIndex As Integer
@@ -307,6 +329,32 @@ Public Module PollutantLoading
             Logger.Dbg("PointSourcesApplied")
         Else
             Logger.Dbg("NoPointSourcesApplied")
+        End If
+
+        Dim lSubID As String
+        Dim lStreamIDFieldIndex As Integer
+        If Not (aStreamBankLoads Is Nothing) Then
+            'add stream bank loads for TSS
+            lStreamIDFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, aStreamBankLoads.StreamIDField)
+            For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                If lConsNames(j) = "TSS" Then
+                    With aStreamBankLoads.BankGridSource
+                        For k = 1 To .Rows - 1  'for each row of the grid source
+                            lSubID = .CellValue(k, 1)
+                            For i = 0 To lSelectedAreaIndexes.Count - 1   'find the corresponding subbasin
+                                If lSubID = GisUtil.FieldValue(lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1), lStreamIDFieldIndex) Then
+                                    'this is the one
+                                    lLoadsSC(i, j) = lLoadsSC(i, j) + .CellValue(k, 2)
+                                    Exit For
+                                End If
+                            Next i
+                        Next k
+                    End With
+                End If
+            Next j
+            Logger.Dbg("StreamBankLoadsApplied")
+        Else
+            Logger.Dbg("NoStreamBankLoadsApplied")
         End If
 
 
