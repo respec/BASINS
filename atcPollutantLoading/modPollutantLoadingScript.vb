@@ -55,6 +55,7 @@ Module modPollutantLoadingScript
         'Dim lPointLayerName As String = ""
         'Dim lPointIDField As String = ""
         'Dim lPointGridSource As New atcGridSource
+        Dim lStreamBankLoads As PollutantLoadingStreamBankLoads = Nothing
 
         PollutantLoading.GenerateLoads( _
             pSubbasinLayerName, _
@@ -67,6 +68,7 @@ Module modPollutantLoadingScript
             lRatio, _
             lConstituents, _
             lBmps, _
-            lPointLoads)
+            lPointLoads, _
+            lStreamBankLoads)
     End Sub
 End Module
