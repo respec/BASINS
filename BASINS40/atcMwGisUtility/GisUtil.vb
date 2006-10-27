@@ -972,6 +972,7 @@ Public Class GisUtil
             Else
                 lLayer.Visible = False
                 AddLayer = True
+                GetMappingObject.Project.Modified = True
             End If
         End If
     End Function
@@ -2022,6 +2023,56 @@ Public Class GisUtil
         lLayer.Expanded = True
         lLayer.Visible = True
     End Sub
+
+    Public Shared ReadOnly Property LayerColor(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
+        Get
+            Dim redcolor As Integer, greencolor As Integer, bluecolor As Integer
+            redcolor = LayerFromIndex(aLayerIndex).Color.R
+            greencolor = LayerFromIndex(aLayerIndex).Color.G
+            bluecolor = LayerFromIndex(aLayerIndex).Color.B
+            Return (bluecolor * 256 * 256) + (greencolor * 256) + redcolor
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property LayerOutlineColor(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
+        Get
+            Dim redcolor As Integer, greencolor As Integer, bluecolor As Integer
+            redcolor = LayerFromIndex(aLayerIndex).OutlineColor.R
+            greencolor = LayerFromIndex(aLayerIndex).OutlineColor.G
+            bluecolor = LayerFromIndex(aLayerIndex).OutlineColor.B
+            Return (bluecolor * 256 * 256) + (greencolor * 256) + redcolor
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property LayerTransparent(Optional ByVal aLayerIndex As Integer = UseCurrent) As Boolean
+        Get
+            Return LayerFromIndex(aLayerIndex).DrawFill
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property MapExtentXmax() As Double
+        Get
+            Return GetMappingObject.View.Extents.xMax
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property MapExtentXmin() As Double
+        Get
+            Return GetMappingObject.View.Extents.xMin
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property MapExtentYmax() As Double
+        Get
+            Return GetMappingObject.View.Extents.yMax
+        End Get
+    End Property
+
+    Public Shared ReadOnly Property MapExtentYmin() As Double
+        Get
+            Return GetMappingObject.View.Extents.yMin
+        End Get
+    End Property
 
 End Class
 

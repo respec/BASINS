@@ -1688,6 +1688,11 @@ Public Class frmModelSetup
         Me.Refresh()
         WritePSRFile(BaseFileName & ".psr", cUniqueSubids, cOutSubs)
 
+        'write map file
+        lblStatus.Text = "Writing MAP file"
+        Me.Refresh()
+        WriteMAPFile(BaseFileName & ".map")
+
         'start winhspf
         lblStatus.Text = "Starting WinHSPF"
         Me.Refresh()
@@ -2461,6 +2466,41 @@ ErrHand:
         End If
 
         FileClose(OutFile)
+    End Sub
+
+    Private Sub WriteMAPFile(ByVal aMapFileName As String)
+        Dim lOutFile As Integer
+        Dim i As Integer
+        Dim lTemp As String
+
+        lOutFile = FreeFile()
+        FileOpen(lOutFile, aMapFileName, OpenMode.Output)
+
+        lTemp = "EXT " & GisUtil.MapExtentXmin & " " & GisUtil.MapExtentYmax & " " & GisUtil.MapExtentXmax & " " & GisUtil.MapExtentYmin
+        PrintLine(lOutFile, lTemp)
+
+        For i = 0 To GisUtil.NumLayers - 1
+            If GisUtil.LayerType(i) = 1 Or GisUtil.LayerType(i) = 2 Or GisUtil.LayerType(i) = 3 Then
+                'shapefile
+                lTemp = "LYR '" + GisUtil.LayerFileName(i) & "', " & GisUtil.LayerColor(i)
+                If GisUtil.LayerType(i) = 3 Then
+                    'polygon 
+                    If Not GisUtil.LayerTransparent(i) Then
+                        lTemp = lTemp & ",Style Transparent "
+                    End If
+                    lTemp = lTemp & ",Outline " & GisUtil.LayerOutlineColor(i)
+                End If
+                'hide the layers not turned on
+                If Not GisUtil.LayerVisible(i) Then
+                    lTemp = lTemp & ",Hide"
+                End If
+                'add theme name as caption
+                lTemp = lTemp & ",Name '" & GisUtil.LayerName(i) & "'"
+                PrintLine(lOutFile, lTemp)
+            End If
+        Next i
+        FileClose(lOutFile)
+
     End Sub
 
     Private Sub chkCustom_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkCustom.CheckedChanged
