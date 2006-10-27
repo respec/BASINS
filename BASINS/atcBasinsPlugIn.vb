@@ -381,6 +381,12 @@ Public Class atcBasinsPlugIn
         Dim lPrjFileName As String
 
         If FileExists(aDataDirName, True, False) Then
+            If g_MapWin.Project.Modified Then
+                If PromptToSaveProject(g_MapWin.Project.FileName) = MsgBoxResult.Cancel Then
+                    Return False
+                End If
+            End If
+
             lPrjFileName = aDataDirName & "\" & FilenameOnly(aDataDirName) & ".mwprj"
             If FileExists(lPrjFileName) Then
                 Logger.Dbg("Opening project " & lPrjFileName)
@@ -399,6 +405,46 @@ Public Class atcBasinsPlugIn
             End If
         End If
         Return False
+    End Function
+
+    'TODO: merge with function of same name in MapWindow:frmMain
+    Private Function PromptToSaveProject(ByVal aProjectFileName As String) As MsgBoxResult
+        Dim lResult As MsgBoxResult
+
+        If aProjectFileName Is Nothing OrElse FilenameNoExt(aProjectFileName) = "" Then
+            lResult = MsgBox("Do you want to save the changes to the currently open project?", _
+                             MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, _
+                             g_MapWin.ApplicationInfo.ApplicationName & " Save Changes?")
+        Else
+            lResult = MsgBox("Do you want to save the changes to " & FilenameNoExt(aProjectFileName) & "?", _
+                             MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, _
+                             g_MapWin.ApplicationInfo.ApplicationName & " Save Changes?")
+        End If
+
+        Select Case lResult
+            Case MsgBoxResult.Yes
+                Dim lCdlSave As New SaveFileDialog
+                lCdlSave.Filter = "MapWindow Project (*.mwprj)|*.mwprj"
+                If g_MapWin.Project.Modified = True And MapWinUtility.Strings.IsEmpty(aProjectFileName) = False Then
+                    g_MapWin.Project.Save(aProjectFileName)
+                    g_MapWin.Project.Modified = False
+                Else
+                    If lCdlSave.ShowDialog() = DialogResult.Cancel Then
+                        Return MsgBoxResult.Cancel
+                    End If
+
+                    If (System.IO.Path.GetExtension(lCdlSave.FileName) <> ".mwprj") Then
+                        lCdlSave.FileName &= ".mwprj"
+                    End If
+                    g_MapWin.Project.Save(lCdlSave.FileName)
+                    g_MapWin.Project.Modified = False
+                End If
+                Return MsgBoxResult.Yes
+            Case MsgBoxResult.Cancel
+                Return MsgBoxResult.Cancel
+            Case MsgBoxResult.No
+                Return MsgBoxResult.No
+        End Select
     End Function
 
     Private Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
