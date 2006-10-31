@@ -278,6 +278,9 @@ Public Class UCICombiner
         'build mass links
         AddMassLinks(lCombinedUci)
 
+        'remove duplicate mass links
+        FilterMassLinks(lCombinedUci)
+
         'convert back to met segs to look nice in the save
         lCombinedUci.Source2MetSeg()
 
@@ -401,6 +404,7 @@ Public Class UCICombiner
         Dim lFieldNum(2) As Integer
         Dim lTableOper(2) As String
         Dim lFieldVal(2) As String
+        Dim lArea As Single
         lFieldNum(1) = 1
         lFieldNum(2) = 2
         lTableOper(1) = "="
@@ -420,18 +424,21 @@ Public Class UCICombiner
                     lLandUse = Trim(Mid(lLandOper.Tables("GEN-INFO").parms("LSID").value, 7))
                     If lAreaTable.FindMatch(lFieldNum, lTableOper, lFieldVal) Then
                         'found this land series contributing to this reach
-                        lConn = New atcUCI.HspfConnection
-                        lConn.Uci = aCombinedUci
-                        lConn.Typ = 3
-                        lConn.Source.VolName = lLandOper.Name
-                        lConn.Source.VolId = lLandOper.Id
-                        lConn.MFact = lAreaTable.Value(lAreaTable.FieldNumber(UCase(lLandUse)))
-                        lConn.Target.VolName = "RCHRES"
-                        lConn.Target.VolId = lRchOper.Id
-                        lConn.MassLink = i
-                        aCombinedUci.Connections.Add(lConn)
-                        lLandOper.Targets.Add(lConn)
-                        lRchOper.Sources.Add(lConn)
+                        lArea = lAreaTable.Value(lAreaTable.FieldNumber(UCase(lLandUse)))
+                        If lArea > 0 Then
+                            lConn = New atcUCI.HspfConnection
+                            lConn.Uci = aCombinedUci
+                            lConn.Typ = 3
+                            lConn.Source.VolName = lLandOper.Name
+                            lConn.Source.VolId = lLandOper.Id
+                            lConn.MFact = lArea
+                            lConn.Target.VolName = "RCHRES"
+                            lConn.Target.VolId = lRchOper.Id
+                            lConn.MassLink = Mid(CStr(lLandOper.Id), 2)
+                            aCombinedUci.Connections.Add(lConn)
+                            lLandOper.Targets.Add(lConn)
+                            lRchOper.Sources.Add(lConn)
+                        End If
                     End If
                 Next lLandOper
             Next i
@@ -452,7 +459,7 @@ Public Class UCICombiner
                     lConn.MFact = 1.0#
                     lConn.Target.VolName = "RCHRES"
                     lConn.Target.VolId = j
-                    lConn.MassLink = 3
+                    lConn.MassLink = 99
                     aCombinedUci.Connections.Add(lConn)
                     aCombinedUci.OpnBlks("RCHRES").operfromid(i).targets.add(lConn)
                     aCombinedUci.OpnBlks("RCHRES").operfromid(j).sources.add(lConn)
@@ -466,6 +473,8 @@ Public Class UCICombiner
         Dim i As Integer
         Dim lMassLink As atcUCI.HspfMassLink
         Dim lLandType As String
+        Dim lLandOper As atcUCI.HspfOperation
+        Dim lLandUse As String
 
         aCombinedUci.MassLinks.Remove(1)
         Dim lMultTable As New atcTableFixed
@@ -491,7 +500,7 @@ Public Class UCICombiner
         lRchresTable.FieldLength(5) = 1
         lRchresTable.OpenFile("C:\cbp_working\model\p512\pp\catalog\iovars\rchres_in")
         Dim lLandTable As New atcTableFixed
-        lLandTable.NumFields = 5
+        lLandTable.NumFields = 6
         lLandTable.FieldStart(1) = 1   'land id
         lLandTable.FieldLength(1) = 3
         lLandTable.FieldStart(2) = 7   'group
@@ -502,6 +511,9 @@ Public Class UCICombiner
         lLandTable.FieldLength(4) = 1
         lLandTable.FieldStart(5) = 23  'mems2
         lLandTable.FieldLength(5) = 1
+        lLandTable.FieldStart(6) = 68  'land use names
+        lLandTable.FieldLength(6) = 88
+
         'now loop through each perlnd/implnd record making mass links
         For i = 1 To 2
             If i = 1 Then
@@ -511,60 +523,70 @@ Public Class UCICombiner
                 lLandType = "IMPLND"
                 lLandTable.OpenFile("C:\cbp_working\model\p512\pp\catalog\iovars\implnd")
             End If
-            lLandTable.MoveFirst()
-            Do Until lLandTable.atEOF
-                If IsNumeric(lLandTable.Value(1)) Then
-                    'look for this land id in mfacts table
-                    lMultTable.MoveFirst()
-                    Do Until lMultTable.atEOF
-                        If lLandTable.Value(1) = lMultTable.Value(2) Then
-                            'look for this riv id in rchres table
-                            lRchresTable.MoveFirst()
-                            Do Until lRchresTable.atEOF
-                                If lMultTable.Value(1) = lRchresTable.Value(1) Then
-                                    'this is a hit, add it as a mass link
-                                    lMassLink = New atcUCI.HspfMassLink
-                                    lMassLink.Uci = aCombinedUci
-                                    lMassLink.MassLinkID = i
-                                    lMassLink.Source.VolName = lLandType
-                                    lMassLink.Source.VolId = 0
-                                    lMassLink.Source.Group = lLandTable.Value(2)
-                                    lMassLink.Source.Member = lLandTable.Value(3)
-                                    If IsNumeric(lLandTable.Value(4)) Then
-                                        lMassLink.Source.MemSub1 = lLandTable.Value(4)
-                                    End If
-                                    If IsNumeric(lLandTable.Value(5)) Then
-                                        lMassLink.Source.MemSub2 = lLandTable.Value(5)
-                                    End If
-                                    If IsNumeric(lMultTable.Value(3)) Then
-                                        lMassLink.MFact = lMultTable.Value(3)
-                                    End If
-                                    lMassLink.Tran = ""
-                                    lMassLink.Target.VolName = "RCHRES"
-                                    lMassLink.Target.VolId = 0
-                                    lMassLink.Target.Group = lRchresTable.Value(2)
-                                    lMassLink.Target.Member = lRchresTable.Value(3)
-                                    If IsNumeric(lRchresTable.Value(4)) Then
-                                        lMassLink.Target.MemSub1 = lRchresTable.Value(4)
-                                    End If
-                                    If IsNumeric(lRchresTable.Value(5)) Then
-                                        lMassLink.Target.MemSub2 = lRchresTable.Value(5)
-                                    End If
-                                    aCombinedUci.MassLinks.Add(lMassLink)
+
+            For Each lLandOper In aCombinedUci.OpnBlks(lLandType).ids
+                If lLandOper.Id < 200 Then
+                    'only need to do for the first segment
+
+                    lLandUse = Trim(Mid(lLandOper.Tables("GEN-INFO").parms("LSID").value, 7))
+
+                    lLandTable.MoveFirst()
+                    Do Until lLandTable.atEOF
+                        If IsNumeric(lLandTable.Value(1)) And InStr(lLandTable.Value(6), lLandUse) > 0 Then
+                            'look for this land id in mfacts table
+                            lMultTable.MoveFirst()
+                            Do Until lMultTable.atEOF
+                                If lLandTable.Value(1) = lMultTable.Value(2) Then
+                                    'look for this riv id in rchres table
+                                    lRchresTable.MoveFirst()
+                                    Do Until lRchresTable.atEOF
+                                        If lMultTable.Value(1) = lRchresTable.Value(1) Then
+                                            'this is a hit, add it as a mass link
+                                            lMassLink = New atcUCI.HspfMassLink
+                                            lMassLink.Uci = aCombinedUci
+                                            lMassLink.MassLinkID = Mid(CStr(lLandOper.Id), 2)
+                                            lMassLink.Source.VolName = lLandType
+                                            lMassLink.Source.VolId = 0
+                                            lMassLink.Source.Group = lLandTable.Value(2)
+                                            lMassLink.Source.Member = lLandTable.Value(3)
+                                            If IsNumeric(lLandTable.Value(4)) Then
+                                                lMassLink.Source.MemSub1 = lLandTable.Value(4)
+                                            End If
+                                            If IsNumeric(lLandTable.Value(5)) Then
+                                                lMassLink.Source.MemSub2 = lLandTable.Value(5)
+                                            End If
+                                            If IsNumeric(lMultTable.Value(3)) Then
+                                                lMassLink.MFact = lMultTable.Value(3)
+                                            End If
+                                            lMassLink.Tran = ""
+                                            lMassLink.Target.VolName = "RCHRES"
+                                            lMassLink.Target.VolId = 0
+                                            lMassLink.Target.Group = lRchresTable.Value(2)
+                                            lMassLink.Target.Member = lRchresTable.Value(3)
+                                            If IsNumeric(lRchresTable.Value(4)) Then
+                                                lMassLink.Target.MemSub1 = lRchresTable.Value(4)
+                                            End If
+                                            If IsNumeric(lRchresTable.Value(5)) Then
+                                                lMassLink.Target.MemSub2 = lRchresTable.Value(5)
+                                            End If
+                                            aCombinedUci.MassLinks.Add(lMassLink)
+                                        End If
+                                            lRchresTable.MoveNext()
+                                    Loop
                                 End If
-                                lRchresTable.MoveNext()
+                                lMultTable.MoveNext()
                             Loop
                         End If
-                        lMultTable.MoveNext()
+                        lLandTable.MoveNext()
                     Loop
                 End If
-                lLandTable.MoveNext()
-            Loop
+            Next lLandOper
         Next i
+
         'also add the rchres to rchres mass-link
         lMassLink = New atcUCI.HspfMassLink
         lMassLink.Uci = aCombinedUci
-        lMassLink.MassLinkID = 3
+        lMassLink.MassLinkID = 99
         lMassLink.Source.VolName = "RCHRES"
         lMassLink.Source.VolId = 0
         lMassLink.Source.Group = "OFLOW"
@@ -576,6 +598,96 @@ Public Class UCICombiner
         lMassLink.Target.Group = "INFLOW"
         lMassLink.Target.Member = ""
         aCombinedUci.MassLinks.Add(lMassLink)
+    End Function
+
+    Private Function FilterMassLinks(ByVal aCombinedUci As atcUCI.HspfUci) As Boolean
+        'remove identical mass links 
+        Dim i As Integer
+        Dim j As Integer
+        Dim k As Integer
+        Dim lMassLink As atcUCI.HspfMassLink
+        Dim mlno(-1) As Integer
+        Dim mlcnt As Integer = 0
+        Dim found As Boolean
+        Dim lIdentical As Boolean
+        Dim lML1 As atcUCI.HspfMassLink
+        Dim lML2 As atcUCI.HspfMassLink
+        Dim lConn As atcUCI.HspfConnection
+
+        'develop list of mass link ids
+        For j = 1 To aCombinedUci.MassLinks.Count()
+            lMassLink = aCombinedUci.MassLinks(j)
+            found = False
+            For k = 0 To mlcnt - 1
+                If lMassLink.MassLinkID = mlno(k) Then
+                    found = True
+                End If
+            Next k
+            If found = False Then
+                mlcnt = mlcnt + 1
+                ReDim Preserve mlno(mlcnt)
+                mlno(mlcnt - 1) = lMassLink.MassLinkID
+            End If
+        Next j
+
+        For i = 1 To mlcnt - 1
+            'see if this ml is like any previous
+            Dim lUmls As New Collection
+            For Each lMassLink In aCombinedUci.MassLinks
+                If lMassLink.MassLinkID = mlno(i) Then
+                    lUmls.Add(lMassLink)
+                End If
+            Next lMassLink
+            For j = 0 To i - 1
+                Dim lLmls As New Collection
+                For Each lMassLink In aCombinedUci.MassLinks
+                    If lMassLink.MassLinkID = mlno(j) Then
+                        lLmls.Add(lMassLink)
+                    End If
+                Next lMassLink
+                'now compare
+                lIdentical = True
+                If lLmls.Count <> lUmls.Count Then
+                    lIdentical = False
+                Else
+                    For k = 1 To lUmls.Count
+                        lML1 = lLmls(k)
+                        lML2 = lUmls(k)
+                        If lML1.Source.VolName = lML2.Source.VolName And _
+                           lML1.Source.Group = lML2.Source.Group And _
+                           lML1.Source.Member = lML2.Source.Member And _
+                           lML1.Source.MemSub1 = lML2.Source.MemSub1 And _
+                           lML1.Source.MemSub2 = lML2.Source.MemSub2 And _
+                           lML1.MFact = lML2.MFact And _
+                           lML1.Target.VolName = lML2.Target.VolName And _
+                           lML1.Target.Group = lML2.Target.Group And _
+                           lML1.Target.Member = lML2.Target.Member And _
+                           lML1.Target.MemSub1 = lML2.Target.MemSub1 And _
+                           lML1.Target.MemSub2 = lML2.Target.MemSub2 Then
+                        Else
+                            lIdentical = False
+                        End If
+                    Next
+                End If
+                If lIdentical Then
+                    'if identical, get rid of the second one
+                    k = 1
+                    For Each lMassLink In aCombinedUci.MassLinks
+                        If lMassLink.MassLinkID = mlno(i) Then
+                            aCombinedUci.MassLinks.Remove(k)
+                        Else
+                            k = k + 1
+                        End If
+                    Next lMassLink
+                    'set schematic block records to first one
+                    For Each lConn In aCombinedUci.Connections
+                        If lConn.MassLink = mlno(i) Then
+                            lConn.MassLink = mlno(j)
+                        End If
+                    Next
+                End If
+            Next j
+        Next i
     End Function
 
     Private Function BuildCombinedWDMs(ByVal aCombinedUci As atcUCI.HspfUci, _
