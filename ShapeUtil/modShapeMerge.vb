@@ -146,7 +146,7 @@ CopyOverNew:
                             mergeRecordCount = 0
                             LogDbg("Merging " & FilenameNoExt((dbfIn(curInput).FileName)) & " into " & newBaseFilename)
                             outRecsBeforeThisInput = dbfOut.NumRecords
-                            If .NumRecords = dbfOut.NumRecords Then
+                            If .NumFields = dbfOut.NumFields Then
                                 canCopyRecords = True
                             Else
                                 canCopyRecords = False

@@ -39,6 +39,7 @@ Public Class atcTimeseries
         Set(ByVal newValues() As Double)
             pValues = newValues
             pNumValues = newValues.GetUpperBound(0)
+            Attributes.DiscardCalculated()
         End Set
     End Property
 
