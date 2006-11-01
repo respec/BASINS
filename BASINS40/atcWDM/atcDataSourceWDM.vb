@@ -213,6 +213,10 @@ Public Class atcDataSourceWDM
                     Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
                     F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
                     Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                    Dim lReplaceThis As atcTimeseries = DataSets.ItemByKey(lDsn)
+                    If Not lReplaceThis Is Nothing Then
+                        DataSets.Remove(lReplaceThis)
+                    End If
                 ElseIf aExistAction = ExistAppend Then 'find dataset and try to append to it
                     Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
                     Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
