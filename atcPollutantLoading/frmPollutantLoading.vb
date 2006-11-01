@@ -1372,41 +1372,61 @@ Friend Class frmModelSetup
 
     Private Sub SetGridValues()
         Dim lSorted As New atcCollection
+        Dim lStartingFile As String
+        Dim lDefaultFile As String
+        Dim i As Integer
+
+        lStartingFile = lblValueFileName.Text
 
         If atcGridValues.Source Is Nothing Then Exit Sub
 
-        If lblValueFileName.Text = "<none>" Then
-            If rbExportCoefficientMethod.Checked = True Then
-                If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                    lblValueFileName.Text = "\BASINS\etc\pload\ecgiras.dbf"
-                ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-                    lblValueFileName.Text = "\BASINS\etc\pload\ecgiras.dbf"
-                ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                    lblValueFileName.Text = "\BASINS\etc\pload\ecnlcd.dbf"
-                Else 'grid
-                    lblValueFileName.Text = "\BASINS\etc\pload\ecnlcd.dbf"
-                End If
-            Else
-                'emc (simple) method
-                If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
-                    lblValueFileName.Text = "\BASINS\etc\pload\emcgiras.dbf"
-                ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
-                    lblValueFileName.Text = "\BASINS\etc\pload\emcgiras.dbf"
-                ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
-                    lblValueFileName.Text = "\BASINS\etc\pload\emcnlcd.dbf"
-                Else 'grid
-                    lblValueFileName.Text = "\BASINS\etc\pload\emcnlcd.dbf"
-                End If
+        If rbExportCoefficientMethod.Checked = True Then
+            If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
+                lDefaultFile = "\BASINS\etc\pload\ecgiras.dbf"
+            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
+                lDefaultFile = "\BASINS\etc\pload\ecgiras.dbf"
+            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
+                lDefaultFile = "\BASINS\etc\pload\ecnlcd.dbf"
+            Else 'grid
+                lDefaultFile = "\BASINS\etc\pload\ecnlcd.dbf"
+            End If
+        Else
+            'emc (simple) method
+            If cboLanduse.Items(cboLanduse.SelectedIndex) = "USGS GIRAS Shapefile" Then
+                lDefaultFile = "\BASINS\etc\pload\emcgiras.dbf"
+            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "Other Shapefile" Then
+                lDefaultFile = "\BASINS\etc\pload\emcgiras.dbf"
+            ElseIf cboLanduse.Items(cboLanduse.SelectedIndex) = "NLCD Grid" Then
+                lDefaultFile = "\BASINS\etc\pload\emcnlcd.dbf"
+            Else 'grid
+                lDefaultFile = "\BASINS\etc\pload\emcnlcd.dbf"
             End If
         End If
-        atcGridValues.Clear()
 
-        If lblValueFileName.Text <> "<none>" Then
-            SetGridValuesSource(lblValueFileName.Text, atcGridValues.Source)
+        If lDefaultFile <> lStartingFile Then
+            'remember which pollutants are selected
+            Dim lSelectedPollutantIndices As New Collection
+            For i = 1 To lstConstituents.SelectedIndices.Count
+                lSelectedPollutantIndices.Add(lstConstituents.SelectedIndices(i - 1))
+            Next i
+            'refresh file
+            lblValueFileName.Text = lDefaultFile
+            atcGridValues.Clear()
+            If lblValueFileName.Text <> "<none>" Then
+                SetGridValuesSource(lblValueFileName.Text, atcGridValues.Source)
+            End If
+            atcGridValues.SizeAllColumnsToContents()
+            atcGridValues.Refresh()
+            SetPollutantList()
+            'set selected pollutants back again
+            For i = 1 To lSelectedPollutantIndices.Count
+                lstConstituents.SelectedIndices.Add(lSelectedPollutantIndices(i))
+            Next i
+            If lstConstituents.Items.Count > 0 And lstConstituents.SelectedItems.Count = 0 Then
+                lstConstituents.SelectedItems.Add(lstConstituents.Items(0))
+            End If
         End If
-        atcGridValues.SizeAllColumnsToContents()
-        atcGridValues.Refresh()
-        SetPollutantList()
+        
     End Sub
 
     Private Sub SetPollutantList()
@@ -1424,9 +1444,6 @@ Friend Class frmModelSetup
             lstConstituents.Items.Add(atcGridValues.Source.CellValue(0, i + lOffset))
         Next i
         lstConstituents.SelectedItems.Clear()
-        If lstConstituents.Items.Count > 0 Then
-            lstConstituents.SelectedItems.Add(lstConstituents.Items(0))
-        End If
     End Sub
 
     Private Sub cboBMPLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboBMPLayer.SelectedIndexChanged

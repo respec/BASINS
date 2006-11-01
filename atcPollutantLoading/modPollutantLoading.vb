@@ -583,9 +583,16 @@ Public Module PollutantLoading
                 For j = 1 To lcluTiles.Count
                     'loop thru each land use tile
                     lNewFileName = lPathName & "\" & lcluTiles(j) & ".shp"
-                    If Not GisUtil.AddLayer(lNewFileName, lcluTiles(j)) Then
-                        lProblem = "Missing GIRAS Land Use Layer " & lcluTiles(j)
-                        Logger.Dbg(lProblem)
+                    If Not FileExists(lNewFileName) Then
+                        lProblem = "Missing GIRAS Land Use Layer " & lcluTiles(j) & vbCrLf & _
+                                   "GIRAS Land Use data has not been added to the project."
+                        Logger.Msg(lProblem, "Calculate GIRAS Areas Problem")
+                    End If
+                    If Len(lProblem) = 0 Then
+                        If Not GisUtil.AddLayer(lNewFileName, lcluTiles(j)) Then
+                            lProblem = "Failed to add GIRAS Land Use Layer " & lcluTiles(j)
+                            Logger.Dbg(lProblem)
+                        End If
                     End If
 
                     If Len(lProblem) = 0 Then
