@@ -84,14 +84,25 @@ Public Module modDate
         HMS2J = CDbl(aHr / 24) + CDbl(aMi / 1440) + CDbl(aSc / 86400)
     End Function
 
+    ''' <summary>
+    ''' Round up dates to given time unit
+    ''' </summary>
+    ''' <param name="aJDate"></param>
+    ''' <param name="aTU"></param>
+    ''' <param name="aDate"></param>
+    ''' <remarks></remarks>
     Sub J2DateRoundup(ByVal aJDate As Double, ByVal aTU As Integer, ByVal aDate() As Integer)
         'round up dates for wdm datasets
         'TODO: needs unit tests!
         J2Date(aJDate, aDate)
         Dim lInd As Integer = 7 - aTU
         If aDate(lInd) > 1 Then
-            aDate(lInd - 1) += 1
-            aDate(lInd) = 1
+            If aTU <= atcTimeUnit.TUDay Then
+                aDate(lInd) = 0
+            Else
+                aDate(lInd) = 1
+            End If
+            TIMADD(aDate, aTU, 1, 1, aDate)
         End If
     End Sub
 

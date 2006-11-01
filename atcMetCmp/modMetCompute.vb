@@ -752,7 +752,7 @@ Public Module modMetCompute
 
         Dim lDates As New atcTimeseries(aDataSource)
         'lDates.numValues = aInTS.numValues * 24
-        lDates.ValuesNeedToBeRead = True
+        'lDates.ValuesNeedToBeRead = True
         lDates.Values = NewDates(aInTS, atcTimeUnit.TUHour, 1)
         Return lDates
 

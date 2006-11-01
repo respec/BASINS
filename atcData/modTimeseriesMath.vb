@@ -389,8 +389,17 @@ Public Module modTimeseriesMath
         End If
     End Function
 
+    ''' <summary>
+    ''' Fill missing periods in a timeseries using interpolation
+    ''' </summary>
+    ''' <param name="aOldTSer">Timeseries containing missing values</param>
+    ''' <param name="aMaxFillLength">Max span, in Julian Days, over which interpolation is allowed</param>
+    ''' <param name="aFillInstances">Array returning length of each missing period filled</param>
+    ''' <returns>atcTimeseries clone of original timeseries along with interpolated values</returns>
+    ''' <remarks></remarks>
     Public Function FillMissingByInterpolation(ByVal aOldTSer As atcTimeseries, _
-                                               Optional ByVal aMaxFillLength As Double = Double.NaN) As atcTimeseries
+                                      Optional ByVal aMaxFillLength As Double = Double.NaN, _
+                                      Optional ByVal aFillInstances As ArrayList = Nothing) As atcTimeseries
         Dim lNewTSer As atcTimeseries = aOldTSer.Clone
 
         Dim lInd As Integer = 1
@@ -406,6 +415,11 @@ Public Module modTimeseriesMath
                 End With
                 'Logger.Dbg("FillMissingByInterp:Missing:", lInd, lIndPrevNotMissing, lIndNextNotMissing, lMissingLength)
                 If Double.IsNaN(aMaxFillLength) OrElse lMissingLength < aMaxFillLength Then
+                    If Not aFillInstances Is Nothing AndAlso lInd = lIndPrevNotMissing + 1 Then
+                        '1st interval of a missing period, log/record it
+                        Logger.Dbg("FillMissingByInterp: Starting " & DumpDate(lNewTSer.Dates.Value(lInd)) & ", interpolating over a span of " & lMissingLength & " days.")
+                        aFillInstances.Add(lMissingLength)
+                    End If
                     With lNewTSer
                         If Double.IsNaN(.Values(lIndPrevNotMissing)) Then 'missing at start, use first good value
                             .Values(lInd) = .Values(lIndNextNotMissing)
@@ -571,6 +585,7 @@ Public Module modTimeseriesMath
 
         If aTU >= atcTimeUnit.TUSecond AndAlso aTU <= atcTimeUnit.TUCentury Then
             'get start date/time for existing TSer
+            aTSer.EnsureValuesRead()
             If aTSer.Dates.Value(0) <= 0 Or Double.IsNaN(aTSer.Dates.Value(0)) Then
                 lTUnit = aTSer.Attributes.GetValue("Time Unit")
                 lTStep = aTSer.Attributes.GetValue("Time Step")
