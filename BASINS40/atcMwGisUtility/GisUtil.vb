@@ -1119,6 +1119,18 @@ Public Class GisUtil
         Dim lEndingRow As Integer
         lInputGrid.ProjToCell(lMinX, lMinY, lStartingColumn, lEndingRow)
         lInputGrid.ProjToCell(lMaxX, lMaxY, lEndingColumn, lStartingRow)
+        If lStartingRow < 0 Then
+            lStartingRow = 0
+        End If
+        If lEndingRow > lInputGrid.Header.NumberRows - 1 Then
+            lEndingRow = lInputGrid.Header.NumberRows - 1
+        End If
+        If lStartingColumn < 0 Then
+            lStartingColumn = 0
+        End If
+        If lEndingColumn > lInputGrid.Header.NumberCols - 1 Then
+            lEndingColumn = lInputGrid.Header.NumberCols - 1
+        End If
 
         Dim lCellArea As Double = lInputGrid.Header.dX * lInputGrid.Header.dY
         Dim lTotalCellCount As Integer = (lEndingColumn - lStartingColumn) * (lEndingRow - lStartingRow)
