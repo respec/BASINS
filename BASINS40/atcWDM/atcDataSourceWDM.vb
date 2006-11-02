@@ -291,42 +291,33 @@ Public Class atcDataSourceWDM
         Return lNextDsn
     End Function
 
-    Private Function RemoveTimSer(ByVal aFileUnit As Integer, ByRef aTimser As atcTimeseries) As Boolean
+    Public Function RemoveDataset(ByVal aDataSet As atcData.atcDataSet) As Boolean
+        Dim lTimser As atcTimeseries = aDataSet
+        Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Dim lRetcod As Integer
 
-        Call F90_WDDSDL(aFileUnit, (aTimser.Attributes.GetValue("id")), lRetcod)
+        Call F90_WDDSDL(lWdmHandle.Unit, (aDataSet.Attributes.GetValue("id")), lRetcod)
         If lRetcod = 0 Then
             RemoveTimSer = True
-            Dim lSearchSerial As Integer = aTimser.Serial
-            For i As Integer = 1 To DataSets.Count()
-                If DataSets.Item(i).Serial = lSearchSerial Then
-                    DataSets.RemoveAt(i)
-                    Exit For
-                End If
-            Next
+            DataSets.Remove(aDataSet)
 
             Dim lRemoveDate As Boolean = True
-            lSearchSerial = aTimser.Dates.Serial
-            For i As Integer = 1 To DataSets.Count()
-                Dim lTs As atcTimeseries = DataSets.Item(i)
+            Dim lSearchSerial As Integer = lTimser.Dates.Serial
+            For Each lTs As atcTimeseries In DataSets
                 If lTs.Dates.Serial = lSearchSerial Then
                     lRemoveDate = False
                     Exit For
                 End If
             Next
-
             If lRemoveDate Then
-                For i As Integer = 1 To pDates.Count()
-                    If pDates.Item(i).serial = lSearchSerial Then
-                        pDates.Remove(i)
-                        Exit For
-                    End If
-                Next
+                pDates.Remove(lTimser.Dates)
             End If
         Else
             RemoveTimSer = False
-            pErrorDescription = "WDM:RemoveTimSer:DSN" & aTimser.Attributes.GetValue("id") & ":Retcod:" & lRetcod
+            pErrorDescription = "WDM:RemoveTimSer:DSN:" & aDataSet.Attributes.GetValue("id") & ":Retcod:" & lRetcod
+            Logger.Dbg(pErrorDescription)
         End If
+        lWdmHandle.Dispose()
     End Function
 
     Public Overrides Function Save(ByVal SaveFileName As String, _
