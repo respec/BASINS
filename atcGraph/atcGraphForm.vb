@@ -72,7 +72,7 @@ Public Class atcGraphForm
         pMaster.PaneList.Add(myPane)
 
         Dim g As Graphics = Me.CreateGraphics()
-        pMaster.SetLayout(PaneLayout.SingleColumn)
+        pMaster.SetLayout(g, PaneLayout.SingleColumn)
 
         For Each ts As atcTimeseries In pDataGroup
             AddDatasetTimeseries(ts, ts.ToString)
