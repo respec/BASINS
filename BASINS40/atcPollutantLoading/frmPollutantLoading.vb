@@ -66,10 +66,6 @@ Friend Class frmModelSetup
     Friend WithEvents lblPollutants As System.Windows.Forms.Label
     Friend WithEvents cboLandUseIDField As System.Windows.Forms.ComboBox
     Friend WithEvents lblLandUseIDField As System.Windows.Forms.Label
-    Friend WithEvents lblRatio As System.Windows.Forms.Label
-    Friend WithEvents lblPrecip As System.Windows.Forms.Label
-    Friend WithEvents atxRatio As atcControls.atcText
-    Friend WithEvents atxPrec As atcControls.atcText
     Friend WithEvents cboBMPLayer As System.Windows.Forms.ComboBox
     Friend WithEvents cbxBMPs As System.Windows.Forms.CheckBox
     Friend WithEvents lblType As System.Windows.Forms.Label
@@ -107,15 +103,26 @@ Friend Class frmModelSetup
     Friend WithEvents cbxBank As System.Windows.Forms.CheckBox
     Friend WithEvents lblTSS As System.Windows.Forms.Label
     Friend WithEvents lblNoLandUse As System.Windows.Forms.Label
+    Friend WithEvents tabPrecip As System.Windows.Forms.TabPage
+    Friend WithEvents lblNoprec As System.Windows.Forms.Label
+    Friend WithEvents atxRatio As atcControls.atcText
+    Friend WithEvents atxPrec As atcControls.atcText
+    Friend WithEvents lblRatio As System.Windows.Forms.Label
+    Friend WithEvents lblPrecip As System.Windows.Forms.Label
+    Friend WithEvents rbMultiple As System.Windows.Forms.RadioButton
+    Friend WithEvents rbSingle As System.Windows.Forms.RadioButton
+    Friend WithEvents lblPrecSubs As System.Windows.Forms.Label
+    Friend WithEvents cboPrecSubbasinField As System.Windows.Forms.ComboBox
+    Friend WithEvents atcGridPrec As atcControls.atcGrid
+    Friend WithEvents cmdSavePrec As System.Windows.Forms.Button
+    Friend WithEvents cmdChangePrec As System.Windows.Forms.Button
+    Friend WithEvents lblPrecFileName As System.Windows.Forms.Label
+    Friend WithEvents lblPrecFile As System.Windows.Forms.Label
     Friend WithEvents ofdValues As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
         Me.tabPLOAD = New System.Windows.Forms.TabControl
         Me.tabGeneral = New System.Windows.Forms.TabPage
-        Me.atxRatio = New atcControls.atcText
-        Me.atxPrec = New atcControls.atcText
-        Me.lblRatio = New System.Windows.Forms.Label
-        Me.lblPrecip = New System.Windows.Forms.Label
         Me.lblMethod = New System.Windows.Forms.Label
         Me.lblPollutants = New System.Windows.Forms.Label
         Me.lstConstituents = New System.Windows.Forms.ListBox
@@ -125,6 +132,21 @@ Friend Class frmModelSetup
         Me.cboLanduse = New System.Windows.Forms.ComboBox
         Me.lblSubbasinsLayer = New System.Windows.Forms.Label
         Me.lblLanduseType = New System.Windows.Forms.Label
+        Me.tabPrecip = New System.Windows.Forms.TabPage
+        Me.cmdSavePrec = New System.Windows.Forms.Button
+        Me.cmdChangePrec = New System.Windows.Forms.Button
+        Me.lblPrecFileName = New System.Windows.Forms.Label
+        Me.lblPrecFile = New System.Windows.Forms.Label
+        Me.atcGridPrec = New atcControls.atcGrid
+        Me.rbMultiple = New System.Windows.Forms.RadioButton
+        Me.rbSingle = New System.Windows.Forms.RadioButton
+        Me.lblPrecSubs = New System.Windows.Forms.Label
+        Me.cboPrecSubbasinField = New System.Windows.Forms.ComboBox
+        Me.lblNoprec = New System.Windows.Forms.Label
+        Me.atxRatio = New atcControls.atcText
+        Me.atxPrec = New atcControls.atcText
+        Me.lblRatio = New System.Windows.Forms.Label
+        Me.lblPrecip = New System.Windows.Forms.Label
         Me.tabLanduse = New System.Windows.Forms.TabPage
         Me.lblNoLandUse = New System.Windows.Forms.Label
         Me.cboLandUseIDField = New System.Windows.Forms.ComboBox
@@ -182,6 +204,7 @@ Friend Class frmModelSetup
         Me.sfdValues = New System.Windows.Forms.SaveFileDialog
         Me.tabPLOAD.SuspendLayout()
         Me.tabGeneral.SuspendLayout()
+        Me.tabPrecip.SuspendLayout()
         Me.tabLanduse.SuspendLayout()
         Me.tabValues.SuspendLayout()
         Me.tabPointSources.SuspendLayout()
@@ -195,6 +218,7 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.tabPLOAD.Controls.Add(Me.tabGeneral)
+        Me.tabPLOAD.Controls.Add(Me.tabPrecip)
         Me.tabPLOAD.Controls.Add(Me.tabLanduse)
         Me.tabPLOAD.Controls.Add(Me.tabValues)
         Me.tabPLOAD.Controls.Add(Me.tabPointSources)
@@ -206,16 +230,12 @@ Friend Class frmModelSetup
         Me.tabPLOAD.Location = New System.Drawing.Point(19, 17)
         Me.tabPLOAD.Name = "tabPLOAD"
         Me.tabPLOAD.SelectedIndex = 0
-        Me.tabPLOAD.Size = New System.Drawing.Size(651, 302)
+        Me.tabPLOAD.Size = New System.Drawing.Size(659, 302)
         Me.tabPLOAD.TabIndex = 0
         '
         'tabGeneral
         '
         Me.tabGeneral.BackColor = System.Drawing.SystemColors.Control
-        Me.tabGeneral.Controls.Add(Me.atxRatio)
-        Me.tabGeneral.Controls.Add(Me.atxPrec)
-        Me.tabGeneral.Controls.Add(Me.lblRatio)
-        Me.tabGeneral.Controls.Add(Me.lblPrecip)
         Me.tabGeneral.Controls.Add(Me.lblMethod)
         Me.tabGeneral.Controls.Add(Me.lblPollutants)
         Me.tabGeneral.Controls.Add(Me.lstConstituents)
@@ -228,72 +248,10 @@ Friend Class frmModelSetup
         Me.tabGeneral.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.tabGeneral.Location = New System.Drawing.Point(4, 25)
         Me.tabGeneral.Name = "tabGeneral"
-        Me.tabGeneral.Size = New System.Drawing.Size(643, 273)
+        Me.tabGeneral.Size = New System.Drawing.Size(651, 273)
         Me.tabGeneral.TabIndex = 0
         Me.tabGeneral.Text = "General"
         Me.tabGeneral.UseVisualStyleBackColor = True
-        '
-        'atxRatio
-        '
-        Me.atxRatio.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxRatio.DataType = atcControls.atcText.ATCoDataType.ATCoSng
-        Me.atxRatio.DefaultValue = 0
-        Me.atxRatio.HardMax = 1
-        Me.atxRatio.HardMin = 0
-        Me.atxRatio.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxRatio.Location = New System.Drawing.Point(274, 128)
-        Me.atxRatio.MaxDecimal = 0
-        Me.atxRatio.maxWidth = 0
-        Me.atxRatio.Name = "atxRatio"
-        Me.atxRatio.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxRatio.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxRatio.SelLength = 0
-        Me.atxRatio.SelStart = 1
-        Me.atxRatio.Size = New System.Drawing.Size(64, 28)
-        Me.atxRatio.SoftMax = 0
-        Me.atxRatio.SoftMin = 0
-        Me.atxRatio.TabIndex = 17
-        Me.atxRatio.Value = 0.0!
-        '
-        'atxPrec
-        '
-        Me.atxPrec.Alignment = System.Windows.Forms.HorizontalAlignment.Left
-        Me.atxPrec.DataType = atcControls.atcText.ATCoDataType.ATCoSng
-        Me.atxPrec.DefaultValue = 0
-        Me.atxPrec.HardMax = 999
-        Me.atxPrec.HardMin = 0
-        Me.atxPrec.InsideLimitsBackground = System.Drawing.Color.Empty
-        Me.atxPrec.Location = New System.Drawing.Point(274, 99)
-        Me.atxPrec.MaxDecimal = 0
-        Me.atxPrec.maxWidth = 0
-        Me.atxPrec.Name = "atxPrec"
-        Me.atxPrec.OutsideHardLimitBackground = System.Drawing.Color.Empty
-        Me.atxPrec.OutsideSoftLimitBackground = System.Drawing.Color.Empty
-        Me.atxPrec.SelLength = 0
-        Me.atxPrec.SelStart = 1
-        Me.atxPrec.Size = New System.Drawing.Size(64, 26)
-        Me.atxPrec.SoftMax = 0
-        Me.atxPrec.SoftMin = 0
-        Me.atxPrec.TabIndex = 16
-        Me.atxPrec.Value = 0.0!
-        '
-        'lblRatio
-        '
-        Me.lblRatio.AutoSize = True
-        Me.lblRatio.Location = New System.Drawing.Point(47, 128)
-        Me.lblRatio.Name = "lblRatio"
-        Me.lblRatio.Size = New System.Drawing.Size(219, 17)
-        Me.lblRatio.TabIndex = 15
-        Me.lblRatio.Text = "Ratio of Storms Producing Runoff"
-        '
-        'lblPrecip
-        '
-        Me.lblPrecip.AutoSize = True
-        Me.lblPrecip.Location = New System.Drawing.Point(47, 99)
-        Me.lblPrecip.Name = "lblPrecip"
-        Me.lblPrecip.Size = New System.Drawing.Size(159, 17)
-        Me.lblPrecip.TabIndex = 14
-        Me.lblPrecip.Text = "Annual Precipitation (in)"
         '
         'lblMethod
         '
@@ -307,7 +265,7 @@ Friend Class frmModelSetup
         'lblPollutants
         '
         Me.lblPollutants.AutoSize = True
-        Me.lblPollutants.Location = New System.Drawing.Point(364, 17)
+        Me.lblPollutants.Location = New System.Drawing.Point(303, 17)
         Me.lblPollutants.Name = "lblPollutants"
         Me.lblPollutants.Size = New System.Drawing.Size(74, 17)
         Me.lblPollutants.TabIndex = 12
@@ -320,10 +278,10 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstConstituents.FormattingEnabled = True
         Me.lstConstituents.ItemHeight = 17
-        Me.lstConstituents.Location = New System.Drawing.Point(388, 41)
+        Me.lstConstituents.Location = New System.Drawing.Point(327, 41)
         Me.lstConstituents.Name = "lstConstituents"
         Me.lstConstituents.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.lstConstituents.Size = New System.Drawing.Size(221, 106)
+        Me.lstConstituents.Size = New System.Drawing.Size(291, 106)
         Me.lstConstituents.TabIndex = 11
         '
         'rbSimpleMethod
@@ -356,7 +314,7 @@ Friend Class frmModelSetup
         Me.cboSubbasins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSubbasins.Location = New System.Drawing.Point(234, 175)
         Me.cboSubbasins.Name = "cboSubbasins"
-        Me.cboSubbasins.Size = New System.Drawing.Size(316, 25)
+        Me.cboSubbasins.Size = New System.Drawing.Size(384, 25)
         Me.cboSubbasins.TabIndex = 8
         '
         'cboLanduse
@@ -367,7 +325,7 @@ Friend Class frmModelSetup
         Me.cboLanduse.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLanduse.Location = New System.Drawing.Point(234, 214)
         Me.cboLanduse.Name = "cboLanduse"
-        Me.cboLanduse.Size = New System.Drawing.Size(316, 25)
+        Me.cboLanduse.Size = New System.Drawing.Size(384, 25)
         Me.cboLanduse.TabIndex = 7
         '
         'lblSubbasinsLayer
@@ -388,6 +346,201 @@ Friend Class frmModelSetup
         Me.lblLanduseType.TabIndex = 1
         Me.lblLanduseType.Text = "Land Use Type:"
         '
+        'tabPrecip
+        '
+        Me.tabPrecip.Controls.Add(Me.cmdSavePrec)
+        Me.tabPrecip.Controls.Add(Me.cmdChangePrec)
+        Me.tabPrecip.Controls.Add(Me.lblPrecFileName)
+        Me.tabPrecip.Controls.Add(Me.lblPrecFile)
+        Me.tabPrecip.Controls.Add(Me.atcGridPrec)
+        Me.tabPrecip.Controls.Add(Me.rbMultiple)
+        Me.tabPrecip.Controls.Add(Me.rbSingle)
+        Me.tabPrecip.Controls.Add(Me.lblPrecSubs)
+        Me.tabPrecip.Controls.Add(Me.cboPrecSubbasinField)
+        Me.tabPrecip.Controls.Add(Me.lblNoprec)
+        Me.tabPrecip.Controls.Add(Me.atxRatio)
+        Me.tabPrecip.Controls.Add(Me.atxPrec)
+        Me.tabPrecip.Controls.Add(Me.lblRatio)
+        Me.tabPrecip.Controls.Add(Me.lblPrecip)
+        Me.tabPrecip.Location = New System.Drawing.Point(4, 25)
+        Me.tabPrecip.Name = "tabPrecip"
+        Me.tabPrecip.Size = New System.Drawing.Size(651, 273)
+        Me.tabPrecip.TabIndex = 6
+        Me.tabPrecip.Text = "Precipitation"
+        Me.tabPrecip.UseVisualStyleBackColor = True
+        '
+        'cmdSavePrec
+        '
+        Me.cmdSavePrec.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdSavePrec.Location = New System.Drawing.Point(478, 113)
+        Me.cmdSavePrec.Name = "cmdSavePrec"
+        Me.cmdSavePrec.Size = New System.Drawing.Size(78, 25)
+        Me.cmdSavePrec.TabIndex = 54
+        Me.cmdSavePrec.Text = "Save"
+        Me.cmdSavePrec.UseVisualStyleBackColor = True
+        '
+        'cmdChangePrec
+        '
+        Me.cmdChangePrec.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdChangePrec.Location = New System.Drawing.Point(553, 113)
+        Me.cmdChangePrec.Name = "cmdChangePrec"
+        Me.cmdChangePrec.Size = New System.Drawing.Size(83, 25)
+        Me.cmdChangePrec.TabIndex = 53
+        Me.cmdChangePrec.Text = "Change"
+        '
+        'lblPrecFileName
+        '
+        Me.lblPrecFileName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblPrecFileName.Location = New System.Drawing.Point(196, 117)
+        Me.lblPrecFileName.Name = "lblPrecFileName"
+        Me.lblPrecFileName.Size = New System.Drawing.Size(275, 17)
+        Me.lblPrecFileName.TabIndex = 52
+        Me.lblPrecFileName.Text = "<none>"
+        Me.lblPrecFileName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblPrecFile
+        '
+        Me.lblPrecFile.Location = New System.Drawing.Point(15, 117)
+        Me.lblPrecFile.Name = "lblPrecFile"
+        Me.lblPrecFile.Size = New System.Drawing.Size(175, 17)
+        Me.lblPrecFile.TabIndex = 51
+        Me.lblPrecFile.Text = "Annual Precip File:"
+        Me.lblPrecFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'atcGridPrec
+        '
+        Me.atcGridPrec.AllowHorizontalScrolling = True
+        Me.atcGridPrec.AllowNewValidValues = False
+        Me.atcGridPrec.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atcGridPrec.CellBackColor = System.Drawing.Color.Empty
+        Me.atcGridPrec.LineColor = System.Drawing.Color.Empty
+        Me.atcGridPrec.LineWidth = 0.0!
+        Me.atcGridPrec.Location = New System.Drawing.Point(15, 137)
+        Me.atcGridPrec.Name = "atcGridPrec"
+        Me.atcGridPrec.Size = New System.Drawing.Size(616, 124)
+        Me.atcGridPrec.Source = Nothing
+        Me.atcGridPrec.TabIndex = 50
+        '
+        'rbMultiple
+        '
+        Me.rbMultiple.AutoSize = True
+        Me.rbMultiple.Location = New System.Drawing.Point(26, 40)
+        Me.rbMultiple.Name = "rbMultiple"
+        Me.rbMultiple.Size = New System.Drawing.Size(244, 21)
+        Me.rbMultiple.TabIndex = 49
+        Me.rbMultiple.Text = "Specify a Value for Each Subbasin"
+        Me.rbMultiple.UseVisualStyleBackColor = True
+        '
+        'rbSingle
+        '
+        Me.rbSingle.AutoSize = True
+        Me.rbSingle.Checked = True
+        Me.rbSingle.Location = New System.Drawing.Point(26, 16)
+        Me.rbSingle.Name = "rbSingle"
+        Me.rbSingle.Size = New System.Drawing.Size(134, 21)
+        Me.rbSingle.TabIndex = 48
+        Me.rbSingle.TabStop = True
+        Me.rbSingle.Text = "Use Single Value"
+        Me.rbSingle.UseVisualStyleBackColor = True
+        '
+        'lblPrecSubs
+        '
+        Me.lblPrecSubs.AutoSize = True
+        Me.lblPrecSubs.Location = New System.Drawing.Point(293, 84)
+        Me.lblPrecSubs.Name = "lblPrecSubs"
+        Me.lblPrecSubs.Size = New System.Drawing.Size(122, 17)
+        Me.lblPrecSubs.TabIndex = 47
+        Me.lblPrecSubs.Text = "Subbasin ID Field:"
+        Me.lblPrecSubs.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'cboPrecSubbasinField
+        '
+        Me.cboPrecSubbasinField.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboPrecSubbasinField.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPrecSubbasinField.FormattingEnabled = True
+        Me.cboPrecSubbasinField.Location = New System.Drawing.Point(421, 81)
+        Me.cboPrecSubbasinField.Name = "cboPrecSubbasinField"
+        Me.cboPrecSubbasinField.Size = New System.Drawing.Size(210, 25)
+        Me.cboPrecSubbasinField.TabIndex = 46
+        '
+        'lblNoprec
+        '
+        Me.lblNoprec.Location = New System.Drawing.Point(55, 35)
+        Me.lblNoprec.Name = "lblNoprec"
+        Me.lblNoprec.Size = New System.Drawing.Size(499, 26)
+        Me.lblNoprec.TabIndex = 22
+        Me.lblNoprec.Text = "No precipitation specifications are required when using export coefficients."
+        '
+        'atxRatio
+        '
+        Me.atxRatio.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxRatio.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atxRatio.DataType = atcControls.atcText.ATCoDataType.ATCoSng
+        Me.atxRatio.DefaultValue = 0
+        Me.atxRatio.HardMax = 1
+        Me.atxRatio.HardMin = 0
+        Me.atxRatio.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxRatio.Location = New System.Drawing.Point(567, 16)
+        Me.atxRatio.MaxDecimal = 0
+        Me.atxRatio.maxWidth = 0
+        Me.atxRatio.Name = "atxRatio"
+        Me.atxRatio.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxRatio.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxRatio.SelLength = 0
+        Me.atxRatio.SelStart = 1
+        Me.atxRatio.Size = New System.Drawing.Size(64, 28)
+        Me.atxRatio.SoftMax = 0
+        Me.atxRatio.SoftMin = 0
+        Me.atxRatio.TabIndex = 21
+        Me.atxRatio.Value = 0.0!
+        '
+        'atxPrec
+        '
+        Me.atxPrec.Alignment = System.Windows.Forms.HorizontalAlignment.Left
+        Me.atxPrec.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.atxPrec.DataType = atcControls.atcText.ATCoDataType.ATCoSng
+        Me.atxPrec.DefaultValue = 0
+        Me.atxPrec.HardMax = 999
+        Me.atxPrec.HardMin = 0
+        Me.atxPrec.InsideLimitsBackground = System.Drawing.Color.Empty
+        Me.atxPrec.Location = New System.Drawing.Point(567, 61)
+        Me.atxPrec.MaxDecimal = 0
+        Me.atxPrec.maxWidth = 0
+        Me.atxPrec.Name = "atxPrec"
+        Me.atxPrec.OutsideHardLimitBackground = System.Drawing.Color.Empty
+        Me.atxPrec.OutsideSoftLimitBackground = System.Drawing.Color.Empty
+        Me.atxPrec.SelLength = 0
+        Me.atxPrec.SelStart = 1
+        Me.atxPrec.Size = New System.Drawing.Size(64, 26)
+        Me.atxPrec.SoftMax = 0
+        Me.atxPrec.SoftMin = 0
+        Me.atxPrec.TabIndex = 20
+        Me.atxPrec.Value = 0.0!
+        '
+        'lblRatio
+        '
+        Me.lblRatio.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblRatio.AutoSize = True
+        Me.lblRatio.Location = New System.Drawing.Point(340, 18)
+        Me.lblRatio.Name = "lblRatio"
+        Me.lblRatio.Size = New System.Drawing.Size(219, 17)
+        Me.lblRatio.TabIndex = 19
+        Me.lblRatio.Text = "Ratio of Storms Producing Runoff"
+        '
+        'lblPrecip
+        '
+        Me.lblPrecip.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblPrecip.AutoSize = True
+        Me.lblPrecip.Location = New System.Drawing.Point(400, 61)
+        Me.lblPrecip.Name = "lblPrecip"
+        Me.lblPrecip.Size = New System.Drawing.Size(159, 17)
+        Me.lblPrecip.TabIndex = 18
+        Me.lblPrecip.Text = "Annual Precipitation (in)"
+        '
         'tabLanduse
         '
         Me.tabLanduse.Controls.Add(Me.lblNoLandUse)
@@ -397,7 +550,7 @@ Friend Class frmModelSetup
         Me.tabLanduse.Controls.Add(Me.lblLandUseLayer)
         Me.tabLanduse.Location = New System.Drawing.Point(4, 25)
         Me.tabLanduse.Name = "tabLanduse"
-        Me.tabLanduse.Size = New System.Drawing.Size(643, 273)
+        Me.tabLanduse.Size = New System.Drawing.Size(651, 273)
         Me.tabLanduse.TabIndex = 1
         Me.tabLanduse.Text = "Land Use"
         Me.tabLanduse.UseVisualStyleBackColor = True
@@ -418,7 +571,7 @@ Friend Class frmModelSetup
         Me.cboLandUseIDField.FormattingEnabled = True
         Me.cboLandUseIDField.Location = New System.Drawing.Point(233, 83)
         Me.cboLandUseIDField.Name = "cboLandUseIDField"
-        Me.cboLandUseIDField.Size = New System.Drawing.Size(229, 25)
+        Me.cboLandUseIDField.Size = New System.Drawing.Size(237, 25)
         Me.cboLandUseIDField.TabIndex = 12
         '
         'lblLandUseIDField
@@ -438,7 +591,7 @@ Friend Class frmModelSetup
         Me.cboLandUseLayer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboLandUseLayer.Location = New System.Drawing.Point(233, 34)
         Me.cboLandUseLayer.Name = "cboLandUseLayer"
-        Me.cboLandUseLayer.Size = New System.Drawing.Size(315, 25)
+        Me.cboLandUseLayer.Size = New System.Drawing.Size(323, 25)
         Me.cboLandUseLayer.TabIndex = 10
         '
         'lblLandUseLayer
@@ -459,7 +612,7 @@ Friend Class frmModelSetup
         Me.tabValues.Controls.Add(Me.atcGridValues)
         Me.tabValues.Location = New System.Drawing.Point(4, 25)
         Me.tabValues.Name = "tabValues"
-        Me.tabValues.Size = New System.Drawing.Size(643, 273)
+        Me.tabValues.Size = New System.Drawing.Size(651, 273)
         Me.tabValues.TabIndex = 4
         Me.tabValues.Text = "Export Coefficients"
         Me.tabValues.UseVisualStyleBackColor = True
@@ -467,7 +620,7 @@ Friend Class frmModelSetup
         'cmdSave
         '
         Me.cmdSave.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSave.Location = New System.Drawing.Point(455, 13)
+        Me.cmdSave.Location = New System.Drawing.Point(463, 13)
         Me.cmdSave.Name = "cmdSave"
         Me.cmdSave.Size = New System.Drawing.Size(78, 25)
         Me.cmdSave.TabIndex = 24
@@ -486,7 +639,7 @@ Friend Class frmModelSetup
         'cmdChangeFile
         '
         Me.cmdChangeFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangeFile.Location = New System.Drawing.Point(533, 13)
+        Me.cmdChangeFile.Location = New System.Drawing.Point(541, 13)
         Me.cmdChangeFile.Name = "cmdChangeFile"
         Me.cmdChangeFile.Size = New System.Drawing.Size(85, 25)
         Me.cmdChangeFile.TabIndex = 22
@@ -498,7 +651,7 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblValueFileName.Location = New System.Drawing.Point(205, 17)
         Me.lblValueFileName.Name = "lblValueFileName"
-        Me.lblValueFileName.Size = New System.Drawing.Size(243, 17)
+        Me.lblValueFileName.Size = New System.Drawing.Size(251, 17)
         Me.lblValueFileName.TabIndex = 21
         Me.lblValueFileName.Text = "<none>"
         Me.lblValueFileName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -524,7 +677,7 @@ Friend Class frmModelSetup
         Me.atcGridValues.LineWidth = 0.0!
         Me.atcGridValues.Location = New System.Drawing.Point(23, 58)
         Me.atcGridValues.Name = "atcGridValues"
-        Me.atcGridValues.Size = New System.Drawing.Size(595, 196)
+        Me.atcGridValues.Size = New System.Drawing.Size(603, 196)
         Me.atcGridValues.Source = Nothing
         Me.atcGridValues.TabIndex = 19
         '
@@ -543,7 +696,7 @@ Friend Class frmModelSetup
         Me.tabPointSources.Controls.Add(Me.cbxPoint)
         Me.tabPointSources.Location = New System.Drawing.Point(4, 25)
         Me.tabPointSources.Name = "tabPointSources"
-        Me.tabPointSources.Size = New System.Drawing.Size(643, 273)
+        Me.tabPointSources.Size = New System.Drawing.Size(651, 273)
         Me.tabPointSources.TabIndex = 2
         Me.tabPointSources.Text = "Point Sources"
         Me.tabPointSources.UseVisualStyleBackColor = True
@@ -551,7 +704,7 @@ Friend Class frmModelSetup
         'cmdSavePoint
         '
         Me.cmdSavePoint.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSavePoint.Location = New System.Drawing.Point(469, 91)
+        Me.cmdSavePoint.Location = New System.Drawing.Point(477, 91)
         Me.cmdSavePoint.Name = "cmdSavePoint"
         Me.cmdSavePoint.Size = New System.Drawing.Size(78, 25)
         Me.cmdSavePoint.TabIndex = 38
@@ -601,14 +754,14 @@ Friend Class frmModelSetup
         Me.atcGridPoint.LineWidth = 0.0!
         Me.atcGridPoint.Location = New System.Drawing.Point(17, 134)
         Me.atcGridPoint.Name = "atcGridPoint"
-        Me.atcGridPoint.Size = New System.Drawing.Size(608, 124)
+        Me.atcGridPoint.Size = New System.Drawing.Size(616, 124)
         Me.atcGridPoint.Source = Nothing
         Me.atcGridPoint.TabIndex = 34
         '
         'cmdChangePoint
         '
         Me.cmdChangePoint.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangePoint.Location = New System.Drawing.Point(544, 91)
+        Me.cmdChangePoint.Location = New System.Drawing.Point(552, 91)
         Me.cmdChangePoint.Name = "cmdChangePoint"
         Me.cmdChangePoint.Size = New System.Drawing.Size(83, 25)
         Me.cmdChangePoint.TabIndex = 33
@@ -620,7 +773,7 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblPointLoadFile.Location = New System.Drawing.Point(248, 95)
         Me.lblPointLoadFile.Name = "lblPointLoadFile"
-        Me.lblPointLoadFile.Size = New System.Drawing.Size(214, 17)
+        Me.lblPointLoadFile.Size = New System.Drawing.Size(222, 17)
         Me.lblPointLoadFile.TabIndex = 32
         Me.lblPointLoadFile.Text = "<none>"
         Me.lblPointLoadFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -642,7 +795,7 @@ Friend Class frmModelSetup
         Me.cboPointIDField.FormattingEnabled = True
         Me.cboPointIDField.Location = New System.Drawing.Point(359, 47)
         Me.cboPointIDField.Name = "cboPointIDField"
-        Me.cboPointIDField.Size = New System.Drawing.Size(202, 25)
+        Me.cboPointIDField.Size = New System.Drawing.Size(210, 25)
         Me.cboPointIDField.TabIndex = 30
         '
         'cboPointLayer
@@ -653,7 +806,7 @@ Friend Class frmModelSetup
         Me.cboPointLayer.FormattingEnabled = True
         Me.cboPointLayer.Location = New System.Drawing.Point(359, 13)
         Me.cboPointLayer.Name = "cboPointLayer"
-        Me.cboPointLayer.Size = New System.Drawing.Size(266, 25)
+        Me.cboPointLayer.Size = New System.Drawing.Size(274, 25)
         Me.cboPointLayer.TabIndex = 29
         '
         'cbxPoint
@@ -682,7 +835,7 @@ Friend Class frmModelSetup
         Me.tabBMPs.Controls.Add(Me.cbxBMPs)
         Me.tabBMPs.Location = New System.Drawing.Point(4, 25)
         Me.tabBMPs.Name = "tabBMPs"
-        Me.tabBMPs.Size = New System.Drawing.Size(643, 273)
+        Me.tabBMPs.Size = New System.Drawing.Size(651, 273)
         Me.tabBMPs.TabIndex = 3
         Me.tabBMPs.Text = "BMPs"
         Me.tabBMPs.UseVisualStyleBackColor = True
@@ -690,7 +843,7 @@ Friend Class frmModelSetup
         'cmdSaveBMPs
         '
         Me.cmdSaveBMPs.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSaveBMPs.Location = New System.Drawing.Point(471, 124)
+        Me.cmdSaveBMPs.Location = New System.Drawing.Point(479, 124)
         Me.cmdSaveBMPs.Name = "cmdSaveBMPs"
         Me.cmdSaveBMPs.Size = New System.Drawing.Size(79, 25)
         Me.cmdSaveBMPs.TabIndex = 39
@@ -709,14 +862,14 @@ Friend Class frmModelSetup
         Me.atcGridBMP.LineWidth = 0.0!
         Me.atcGridBMP.Location = New System.Drawing.Point(17, 150)
         Me.atcGridBMP.Name = "atcGridBMP"
-        Me.atcGridBMP.Size = New System.Drawing.Size(608, 110)
+        Me.atcGridBMP.Size = New System.Drawing.Size(616, 110)
         Me.atcGridBMP.Source = Nothing
         Me.atcGridBMP.TabIndex = 27
         '
         'cmdChangeBMP
         '
         Me.cmdChangeBMP.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangeBMP.Location = New System.Drawing.Point(544, 124)
+        Me.cmdChangeBMP.Location = New System.Drawing.Point(552, 124)
         Me.cmdChangeBMP.Name = "cmdChangeBMP"
         Me.cmdChangeBMP.Size = New System.Drawing.Size(83, 25)
         Me.cmdChangeBMP.TabIndex = 26
@@ -728,7 +881,7 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblBMPFile.Location = New System.Drawing.Point(248, 128)
         Me.lblBMPFile.Name = "lblBMPFile"
-        Me.lblBMPFile.Size = New System.Drawing.Size(216, 17)
+        Me.lblBMPFile.Size = New System.Drawing.Size(224, 17)
         Me.lblBMPFile.TabIndex = 25
         Me.lblBMPFile.Text = "<none>"
         Me.lblBMPFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -782,7 +935,7 @@ Friend Class frmModelSetup
         Me.cboBMPType.FormattingEnabled = True
         Me.cboBMPType.Location = New System.Drawing.Point(273, 49)
         Me.cboBMPType.Name = "cboBMPType"
-        Me.cboBMPType.Size = New System.Drawing.Size(202, 25)
+        Me.cboBMPType.Size = New System.Drawing.Size(210, 25)
         Me.cboBMPType.TabIndex = 3
         '
         'cboAreaField
@@ -793,7 +946,7 @@ Friend Class frmModelSetup
         Me.cboAreaField.FormattingEnabled = True
         Me.cboAreaField.Location = New System.Drawing.Point(273, 81)
         Me.cboAreaField.Name = "cboAreaField"
-        Me.cboAreaField.Size = New System.Drawing.Size(202, 25)
+        Me.cboAreaField.Size = New System.Drawing.Size(210, 25)
         Me.cboAreaField.TabIndex = 2
         '
         'cboBMPLayer
@@ -804,7 +957,7 @@ Friend Class frmModelSetup
         Me.cboBMPLayer.FormattingEnabled = True
         Me.cboBMPLayer.Location = New System.Drawing.Point(273, 15)
         Me.cboBMPLayer.Name = "cboBMPLayer"
-        Me.cboBMPLayer.Size = New System.Drawing.Size(266, 25)
+        Me.cboBMPLayer.Size = New System.Drawing.Size(274, 25)
         Me.cboBMPLayer.TabIndex = 1
         '
         'cbxBMPs
@@ -831,7 +984,7 @@ Friend Class frmModelSetup
         Me.tabBank.Controls.Add(Me.cbxBank)
         Me.tabBank.Location = New System.Drawing.Point(4, 25)
         Me.tabBank.Name = "tabBank"
-        Me.tabBank.Size = New System.Drawing.Size(643, 273)
+        Me.tabBank.Size = New System.Drawing.Size(651, 273)
         Me.tabBank.TabIndex = 5
         Me.tabBank.Text = "Bank Erosion"
         Me.tabBank.UseVisualStyleBackColor = True
@@ -848,7 +1001,7 @@ Friend Class frmModelSetup
         'cmdSaveBank
         '
         Me.cmdSaveBank.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdSaveBank.Location = New System.Drawing.Point(469, 90)
+        Me.cmdSaveBank.Location = New System.Drawing.Point(477, 90)
         Me.cmdSaveBank.Name = "cmdSaveBank"
         Me.cmdSaveBank.Size = New System.Drawing.Size(78, 25)
         Me.cmdSaveBank.TabIndex = 47
@@ -886,14 +1039,14 @@ Friend Class frmModelSetup
         Me.atcGridBank.LineWidth = 0.0!
         Me.atcGridBank.Location = New System.Drawing.Point(17, 133)
         Me.atcGridBank.Name = "atcGridBank"
-        Me.atcGridBank.Size = New System.Drawing.Size(608, 124)
+        Me.atcGridBank.Size = New System.Drawing.Size(616, 124)
         Me.atcGridBank.Source = Nothing
         Me.atcGridBank.TabIndex = 44
         '
         'cmdChangeBank
         '
         Me.cmdChangeBank.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cmdChangeBank.Location = New System.Drawing.Point(544, 90)
+        Me.cmdChangeBank.Location = New System.Drawing.Point(552, 90)
         Me.cmdChangeBank.Name = "cmdChangeBank"
         Me.cmdChangeBank.Size = New System.Drawing.Size(83, 25)
         Me.cmdChangeBank.TabIndex = 43
@@ -905,7 +1058,7 @@ Friend Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblBankFile.Location = New System.Drawing.Point(195, 94)
         Me.lblBankFile.Name = "lblBankFile"
-        Me.lblBankFile.Size = New System.Drawing.Size(267, 17)
+        Me.lblBankFile.Size = New System.Drawing.Size(275, 17)
         Me.lblBankFile.TabIndex = 42
         Me.lblBankFile.Text = "<none>"
         Me.lblBankFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -927,7 +1080,7 @@ Friend Class frmModelSetup
         Me.cboSubbasinIDField.FormattingEnabled = True
         Me.cboSubbasinIDField.Location = New System.Drawing.Point(423, 14)
         Me.cboSubbasinIDField.Name = "cboSubbasinIDField"
-        Me.cboSubbasinIDField.Size = New System.Drawing.Size(202, 25)
+        Me.cboSubbasinIDField.Size = New System.Drawing.Size(210, 25)
         Me.cboSubbasinIDField.TabIndex = 40
         '
         'cbxBank
@@ -964,7 +1117,7 @@ Friend Class frmModelSetup
         '
         Me.cmdHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdHelp.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdHelp.Location = New System.Drawing.Point(464, 338)
+        Me.cmdHelp.Location = New System.Drawing.Point(472, 338)
         Me.cmdHelp.Name = "cmdHelp"
         Me.cmdHelp.Size = New System.Drawing.Size(94, 34)
         Me.cmdHelp.TabIndex = 6
@@ -974,7 +1127,7 @@ Friend Class frmModelSetup
         '
         Me.cmdAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdAbout.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdAbout.Location = New System.Drawing.Point(567, 338)
+        Me.cmdAbout.Location = New System.Drawing.Point(575, 338)
         Me.cmdAbout.Name = "cmdAbout"
         Me.cmdAbout.Size = New System.Drawing.Size(103, 34)
         Me.cmdAbout.TabIndex = 7
@@ -994,7 +1147,7 @@ Friend Class frmModelSetup
         'frmModelSetup
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(7, 16)
-        Me.ClientSize = New System.Drawing.Size(688, 386)
+        Me.ClientSize = New System.Drawing.Size(696, 386)
         Me.Controls.Add(Me.cmdAbout)
         Me.Controls.Add(Me.cmdHelp)
         Me.Controls.Add(Me.cmdCancel)
@@ -1008,6 +1161,8 @@ Friend Class frmModelSetup
         Me.tabPLOAD.ResumeLayout(False)
         Me.tabGeneral.ResumeLayout(False)
         Me.tabGeneral.PerformLayout()
+        Me.tabPrecip.ResumeLayout(False)
+        Me.tabPrecip.PerformLayout()
         Me.tabLanduse.ResumeLayout(False)
         Me.tabLanduse.PerformLayout()
         Me.tabValues.ResumeLayout(False)
@@ -1224,9 +1379,7 @@ Friend Class frmModelSetup
                 End If
             End If
         Next
-        If lSelectedLayer > -1 Then
-            cboSubbasins.SelectedIndex = lSelectedLayer
-        End If
+        
         'if all else fails set it to the first one
         If cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
             cboSubbasins.SelectedIndex = 0
@@ -1258,6 +1411,16 @@ Friend Class frmModelSetup
             .Font = New Font(.Font, FontStyle.Regular)
             .AllowHorizontalScrolling = True
         End With
+        With atcGridPrec
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+
+        If lSelectedLayer > -1 Then
+            cboSubbasins.SelectedIndex = lSelectedLayer
+        End If
+
         SetBMPGridValues()
 
         cboLanduse.SelectedIndex = 0
@@ -1279,14 +1442,28 @@ Friend Class frmModelSetup
             lblPrecip.Visible = False
             atxRatio.Visible = False
             atxPrec.Visible = False
+            rbSingle.Visible = False
+            rbMultiple.Visible = False
+            lblPrecSubs.Visible = False
+            cboPrecSubbasinField.Visible = False
+            atcGridPrec.Visible = False
+            lblPrecFile.Visible = False
+            lblPrecFileName.Visible = False
+            cmdSavePrec.Visible = False
+            cmdChangePrec.Visible = False
+            lblNoprec.Visible = True
             lblValueFile.Text = "Export Coefficient File"
             lblValueUnits.Text = "(lbs/ac/yr)"
+            rbSingle.Checked = True
         Else
             tabValues.Text = "Event Mean Concentrations"
             lblRatio.Visible = True
             lblPrecip.Visible = True
             atxRatio.Visible = True
             atxPrec.Visible = True
+            lblNoprec.Visible = False
+            rbSingle.Visible = True
+            rbMultiple.Visible = True
             lblValueFile.Text = "EMC File"
             lblValueUnits.Text = "(mg/L, counts/100mL for bacteria)"
         End If
@@ -1368,6 +1545,15 @@ Friend Class frmModelSetup
         If cboSubbasinIDField.Items.Count > 0 And cboSubbasinIDField.SelectedIndex < 0 Then
             cboSubbasinIDField.SelectedIndex = 0
         End If
+
+        cboPrecSubbasinField.Items.Clear()
+        For i = 0 To GisUtil.NumFields(lLyr) - 1
+            cboPrecSubbasinField.Items.Add(GisUtil.FieldName(i, lLyr))
+        Next i
+
+        If cboPrecSubbasinField.Items.Count > 0 And cboPrecSubbasinField.SelectedIndex < 0 Then
+            cboPrecSubbasinField.SelectedIndex = 0
+        End If
     End Sub
 
     Private Sub SetGridValues()
@@ -1426,7 +1612,7 @@ Friend Class frmModelSetup
                 lstConstituents.SelectedItems.Add(lstConstituents.Items(0))
             End If
         End If
-        
+
     End Sub
 
     Private Sub SetPollutantList()
@@ -1515,38 +1701,54 @@ Friend Class frmModelSetup
 
         If atcGridBank.Source Is Nothing Then Exit Sub
 
-        atcGridBank.Clear()
-
         If lblBankFile.Text <> "<none>" Then
             lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblBankFile.Text)
 
             With atcGridBank.Source
-                .Rows = 1
-                .Columns = lDbf.NumFields
-                .ColorCells = True
-                .FixedRows = 1
-                .FixedColumns = 1
-                For i = 1 To lDbf.NumFields
-                    .CellValue(0, i) = lDbf.FieldName(i)
-                    .CellColor(0, i) = SystemColors.ControlDark
-                Next i
-
-                For k = 1 To lDbf.NumRecords
-                    lDbf.CurrentRecord = k
-                    For i = 1 To lDbf.NumFields
-                        .CellValue(k, i) = lDbf.Value(i)
-                        If i > 1 Then
-                            .CellEditable(k, i) = True
-                        Else
-                            .CellColor(k, i) = SystemColors.ControlDark
+                For i = 1 To .Rows
+                    'loop thru each row of grid
+                    For k = 1 To lDbf.NumRecords
+                        'loop thru each row of dbf
+                        lDbf.CurrentRecord = k
+                        If .CellValue(i, 1) = lDbf.Value(1) Then
+                            'found a match, insert load value
+                            .CellValue(i, 2) = lDbf.Value(2)
                         End If
-                    Next i
-                Next k
+                    Next k
+                Next i
             End With
 
         End If
         atcGridBank.SizeAllColumnsToContents()
         atcGridBank.Refresh()
+    End Sub
+
+    Private Sub SetPrecGridValues()
+        Dim i As Integer, k As Integer
+        Dim lDbf As IatcTable
+
+        If atcGridPrec.Source Is Nothing Then Exit Sub
+
+        If lblPrecFileName.Text <> "<none>" Then
+            lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblPrecFileName.Text)
+
+            With atcGridPrec.Source
+                For i = 1 To .Rows
+                    'loop thru each row of grid
+                    For k = 1 To lDbf.NumRecords
+                        'loop thru each row of dbf
+                        lDbf.CurrentRecord = k
+                        If .CellValue(i, 1) = lDbf.Value(1) Then
+                            'found a match, insert prec value from file
+                            .CellValue(i, 2) = lDbf.Value(2)
+                        End If
+                    Next k
+                Next i
+            End With
+
+        End If
+        atcGridPrec.SizeAllColumnsToContents()
+        atcGridPrec.Refresh()
     End Sub
 
     Private Sub SetPointGridValues()
@@ -1662,7 +1864,11 @@ Friend Class frmModelSetup
     End Sub
 
     Private Sub cmdSaveBank_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSaveBank.Click
-        SaveGrid("Save Bank Erosion Loading File", atcGridBMP.Source)
+        SaveGrid("Save Bank Erosion Loading File", atcGridBank.Source)
+    End Sub
+
+    Private Sub cmdSavePrec_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdSavePrec.Click
+        SaveGrid("Save Precipitation File", atcGridPrec.Source)
     End Sub
 
     Private Sub cmdChangeBank_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdChangeBank.Click
@@ -1671,5 +1877,107 @@ Friend Class frmModelSetup
             lblBankFile.Text = ofdValues.FileName
             SetBankGridValues()
         End If
+    End Sub
+
+    Private Sub cmdChangePrec_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdChangePrec.Click
+        ofdValues.Title = "Set Precipitation File"
+        If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
+            lblPrecFileName.Text = ofdValues.FileName
+            SetPrecGridValues()
+        End If
+    End Sub
+
+    Private Sub cboSubbasinIDField_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSubbasinIDField.SelectedIndexChanged
+        Dim k As Integer
+        Dim lSubbasinLayerIndex As Integer
+        Dim lSubbasinFieldIndex As Integer
+
+        If atcGridBank.Source Is Nothing Then Exit Sub
+
+        atcGridBank.Clear()
+
+        With atcGridBank.Source
+            .Rows = 1
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellValue(0, 1) = cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex)
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .CellValue(0, 2) = "LOAD"
+            .CellColor(0, 2) = SystemColors.ControlDark
+            lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+            lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex))
+            For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                .CellValue(k, 1) = GisUtil.FieldValue(lSubbasinLayerIndex, k - 1, lSubbasinFieldIndex) 'subid
+                .CellColor(k, 1) = SystemColors.ControlDark
+                .CellValue(k, 2) = 0
+                .CellEditable(k, 2) = True
+            Next
+        End With
+
+        atcGridBank.SizeAllColumnsToContents()
+        atcGridBank.Refresh()
+    End Sub
+
+    Private Sub rbSingle_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbSingle.CheckedChanged
+        If Not rbExportCoefficientMethod.Checked Then
+            If rbSingle.Checked = True Then
+                atxRatio.Visible = True
+                atxPrec.Visible = True
+                lblPrecip.Visible = True
+                lblPrecSubs.Visible = False
+                cboPrecSubbasinField.Visible = False
+                lblPrecFile.Visible = False
+                lblPrecFileName.Visible = False
+                cmdSavePrec.Visible = False
+                cmdChangePrec.Visible = False
+                atcGridPrec.Visible = False
+            Else
+                atxRatio.Visible = True
+                atxPrec.Visible = False
+                lblPrecSubs.Visible = True
+                lblPrecip.Visible = False
+                cboPrecSubbasinField.Visible = True
+                lblPrecFile.Visible = True
+                lblPrecFileName.Visible = True
+                cmdSavePrec.Visible = True
+                cmdChangePrec.Visible = True
+                atcGridPrec.Visible = True
+            End If
+        End If
+    End Sub
+
+    Private Sub cboPrecSubbasinField_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboPrecSubbasinField.SelectedIndexChanged
+        Dim k As Integer
+        Dim lSubbasinLayerIndex As Integer
+        Dim lSubbasinFieldIndex As Integer
+
+        If atcGridPrec.Source Is Nothing Then Exit Sub
+
+        atcGridPrec.Clear()
+
+        With atcGridPrec.Source
+            .Rows = 1
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellValue(0, 1) = cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex)
+            .CellColor(0, 1) = SystemColors.ControlDark
+            .CellValue(0, 2) = "Precip (in/yr)"
+            .CellColor(0, 2) = SystemColors.ControlDark
+            lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+            lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex))
+            For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                .CellValue(k, 1) = GisUtil.FieldValue(lSubbasinLayerIndex, k - 1, lSubbasinFieldIndex) 'subid
+                .CellColor(k, 1) = SystemColors.ControlDark
+                .CellValue(k, 2) = 40
+                .CellEditable(k, 2) = True
+            Next
+        End With
+
+        atcGridPrec.SizeAllColumnsToContents()
+        atcGridPrec.Refresh()
     End Sub
 End Class
