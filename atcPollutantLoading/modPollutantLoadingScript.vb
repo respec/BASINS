@@ -40,7 +40,6 @@ Module modPollutantLoadingScript
         SetGridValuesSource(pGridValuesSourceFileName, lGridSource)
         Dim lLandUseLayer As String = ""
         Dim lLandUseId As String = ""
-        Dim lPrec As Double = 40
         Dim lRatio As Double = 0.9
         Dim lConstituents As New atcCollection
         lConstituents.Add("BOD")
@@ -56,6 +55,14 @@ Module modPollutantLoadingScript
         'Dim lPointIDField As String = ""
         'Dim lPointGridSource As New atcGridSource
         Dim lStreamBankLoads As PollutantLoadingStreamBankLoads = Nothing
+
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(pSubbasinLayerName)
+        Dim lNumSubbasins As Integer = GisUtil.NumFeatures(lSubbasinLayerIndex)
+        Dim lPrec(lNumSubbasins) As Double
+        Dim i As Integer
+        For i = 0 To lNumSubbasins - 1
+            lPrec(i) = 40.0
+        Next i
 
         PollutantLoading.GenerateLoads( _
             pSubbasinLayerName, _

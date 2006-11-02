@@ -1248,6 +1248,8 @@ Friend Class frmModelSetup
     End Sub
 
     Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
+        Dim i As Integer
+
         If lstConstituents.SelectedItems.Count = 0 Then
             Logger.Message("At least one pollutant must be selected", "Pollutant Loading Estimator Problem", _
                            Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Stop, Windows.Forms.MessageBoxDefaultButton.Button1)
@@ -1257,7 +1259,7 @@ Friend Class frmModelSetup
                 Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
 
                 Dim lConstituents As New atcCollection
-                For i As Integer = 1 To lstConstituents.SelectedItems.Count
+                For i = 1 To lstConstituents.SelectedItems.Count
                     lConstituents.Add(lstConstituents.SelectedItems(i - 1))
                 Next
 
@@ -1310,13 +1312,27 @@ Friend Class frmModelSetup
                                      atcGridBank.Source)
                 End If
 
+                'set precip array
+                Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+                Dim lNumSubbasins As Integer = GisUtil.NumFeatures(lSubbasinLayerIndex)
+                Dim lPrec(lNumSubbasins) As Double
+                If rbSingle.Checked Then
+                    For i = 0 To lNumSubbasins - 1
+                        lPrec(i) = atxPrec.Value
+                    Next i
+                Else
+                    For i = 0 To lNumSubbasins - 1
+                        lPrec(i) = atcGridPrec.Source.CellValue(i + 1, 2)
+                    Next i
+                End If
+
                 GenerateLoads(cboSubbasins.Items(cboSubbasins.SelectedIndex), _
                               atcGridValues.Source, _
                               rbExportCoefficientMethod.Checked, _
                               cboLanduse.Items(cboLanduse.SelectedIndex), _
                               lLandUseLayer, _
                               lLandUseId, _
-                              atxPrec.Value, _
+                              lPrec, _
                               atxRatio.Value, _
                               lConstituents, _
                               lBmps, _
@@ -1328,7 +1344,7 @@ Friend Class frmModelSetup
             Else
                 'TODO: add an error message
             End If
-        End If
+            End If
     End Sub
 
     Private Sub EnableControls(ByVal b As Boolean)

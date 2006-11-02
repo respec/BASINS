@@ -105,7 +105,7 @@ Public Module PollutantLoading
                              ByVal aLandUse As String, _
                              ByVal aLandUseLayer As String, _
                              ByVal aLandUseId As String, _
-                             ByVal aPrec As Double, _
+                             ByVal aPrec() As Double, _
                              ByVal aRatio As Double, _
                              ByVal aConstituents As atcCollection, _
                              ByVal aBmps As PollutantLoadingBMPs, _
@@ -174,6 +174,12 @@ Public Module PollutantLoading
             Next i
         Next j
 
+        'build array for precip to each subbasin 
+        Dim lPrecS(lSelectedAreaIndexes.Count) As Single
+        For i = 1 To lSelectedAreaIndexes.Count  'for each subbasin
+            lPrecS(i - 1) = aPrec(lSelectedAreaIndexes(i))
+        Next i
+
         'build array for output load values (load for each subbasin and constituent)
         Dim lLoadsSC(lSelectedAreaIndexes.Count, lConsNames.GetUpperBound(0)) As Double
         'build array for area of each subbasin 
@@ -240,13 +246,12 @@ Public Module PollutantLoading
                 lRunoffL(lLucode) = 0.05 + (0.009 * aGridSource.CellValue(j, 3))
                 'will result in values from .05 to .95 
             Next j
-            Dim lPrec As Single = aPrec
             Dim lRatio As Single = aRatio
             'calc loads
             For i = 0 To lSelectedAreaIndexes.Count - 1 'for each subbasin
                 For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
                     For k = 1 To lMaxlu
-                        lLoadsSC(i, j) = lLoadsSC(i, j) + (lPrec * lRatio * lRunoffL(k) * lCoeffsLC(k, j) * lAreasLS(k, i) / 4046.8564 * 2.72 / 12)
+                        lLoadsSC(i, j) = lLoadsSC(i, j) + (lPrecS(i) * lRatio * lRunoffL(k) * lCoeffsLC(k, j) * lAreasLS(k, i) / 4046.8564 * 2.72 / 12)
                         ' / 4046.8564 to convert from m2 to acres
                     Next k
                 Next j
