@@ -172,8 +172,6 @@ Public Class atcTimeseriesStatistics
 
             aTimeseries.Attributes.SetValue("Count", CInt(lCount))
             If lCount > 0 Then
-                aTimeseries.Attributes.SetValue("SJDay", aTimeseries.Dates.Value(0))
-                aTimeseries.Attributes.SetValue("EJDay", aTimeseries.Dates.Value(lLastValueIndex))
                 aTimeseries.Attributes.SetValue("Max", lMax)
                 aTimeseries.Attributes.SetValue("Min", lMin)
                 aTimeseries.Attributes.SetValue("Sum", lSum)
@@ -185,6 +183,11 @@ Public Class atcTimeseriesStatistics
                     lGeoMean = Math.Exp(lGeoMean / lCount)
                     aTimeseries.Attributes.SetValue("Geometric Mean", lGeoMean)
                 End If
+            End If
+
+            If aTimeseries.Dates.Values.GetLength(0) > 0 Then
+                aTimeseries.Attributes.SetValue("SJDay", aTimeseries.Dates.Value(0))
+                aTimeseries.Attributes.SetValue("EJDay", aTimeseries.Dates.Value(lLastValueIndex))
             End If
 
             If lCount > 1 Then
@@ -251,7 +254,7 @@ Public Class atcTimeseriesStatistics
                     aTimeseries.Attributes.SetValue("Serial Correlation Coefficient", lScc)
                 End If
             End If
-        End If
+            End If
     End Sub
 
     'The only element of aArgs is an atcDataGroup or atcTimeseries

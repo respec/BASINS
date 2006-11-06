@@ -298,7 +298,7 @@ Public Class atcDataSourceWDM
 
         Call F90_WDDSDL(lWdmHandle.Unit, (aDataSet.Attributes.GetValue("id")), lRetcod)
         If lRetcod = 0 Then
-            RemoveTimSer = True
+            RemoveDataset = True
             DataSets.Remove(aDataSet)
 
             Dim lRemoveDate As Boolean = True
@@ -313,8 +313,8 @@ Public Class atcDataSourceWDM
                 pDates.Remove(lTimser.Dates)
             End If
         Else
-            RemoveTimSer = False
-            pErrorDescription = "WDM:RemoveTimSer:DSN:" & aDataSet.Attributes.GetValue("id") & ":Retcod:" & lRetcod
+            RemoveDataset = False
+            pErrorDescription = "WDM:RemoveDataset:DSN:" & aDataSet.Attributes.GetValue("id") & ":Retcod:" & lRetcod
             Logger.Dbg(pErrorDescription)
         End If
         lWdmHandle.Dispose()
