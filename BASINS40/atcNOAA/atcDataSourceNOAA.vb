@@ -153,6 +153,7 @@ Public Class atcDataSourceNOAA
                             lData.Attributes.SetValue("MAcc", MissingAcc)
                             DataSets.Add(lTSKey, lData)
                             lDataObs = lData.Clone
+                            lDataObs.Attributes.SetValue("Count", 0)
                             lDataObs.Attributes.SetValue("Constituent", ColElementType.Value & "-OBS")
                             lDataObs.Attributes.SetValue("Description", "SOD Observation Times")
                             DataSets.Add(lTSKey & "-OBS", lDataObs)
