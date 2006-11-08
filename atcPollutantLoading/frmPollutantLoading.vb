@@ -8,8 +8,11 @@ Imports atcControls
 ''' 
 ''' </summary>
 ''' <remarks></remarks>
-Friend Class frmModelSetup
+Friend Class frmPollutantLoading
     Inherits System.Windows.Forms.Form
+
+    Dim gLanduseType As Integer
+    Dim gMethod As Integer
 
 #Region " Windows Form Designer generated code "
 
@@ -120,7 +123,7 @@ Friend Class frmModelSetup
     Friend WithEvents lblPrecFile As System.Windows.Forms.Label
     Friend WithEvents ofdValues As System.Windows.Forms.OpenFileDialog
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmModelSetup))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmPollutantLoading))
         Me.tabPLOAD = New System.Windows.Forms.TabControl
         Me.tabGeneral = New System.Windows.Forms.TabPage
         Me.lblMethod = New System.Windows.Forms.Label
@@ -1227,6 +1230,7 @@ Friend Class frmModelSetup
 
         Logger.Dbg("SetGridValues")
         SetGridValues()
+        gLanduseType = cboLanduse.SelectedIndex
     End Sub
 
     Private Sub cboLandUseLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLandUseLayer.SelectedIndexChanged
@@ -1344,7 +1348,7 @@ Friend Class frmModelSetup
             Else
                 'TODO: add an error message
             End If
-            End If
+        End If
     End Sub
 
     Private Sub EnableControls(ByVal b As Boolean)
@@ -1363,6 +1367,9 @@ Friend Class frmModelSetup
         cboLanduse.Items.Add("Other Shapefile")
         cboLanduse.Items.Add("User Grid")
 
+        gLanduseType = GetSetting("PLOAD", "UserDefault", "LandUse", "0")
+        gMethod = GetSetting("PLOAD", "UserDefault", "Method", "0")
+
         Dim lLyr As Integer
         Dim lSelectedLayer As Integer = -1
         For lLyr = 0 To GisUtil.NumLayers() - 1
@@ -1373,7 +1380,7 @@ Friend Class frmModelSetup
                 If UCase(lTemp) = "SUBBASINS" Or InStr(lTemp, "Watershed Shapefile") > 0 Then
                     cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
                 End If
-                If GisUtil.CurrentLayer = lLyr Then
+                If GisUtil.CurrentLayer = lLyr Then 'And GisUtil.NumFeatures(lLyr) < 1000 Then
                     lSelectedLayer = cboSubbasins.Items.Count - 1
                 End If
                 'also possible bmp layer
@@ -1439,10 +1446,22 @@ Friend Class frmModelSetup
 
         SetBMPGridValues()
 
-        cboLanduse.SelectedIndex = 0
+        cboLanduse.SelectedIndex = gLanduseType
+        If gMethod = 0 Then
+            rbExportCoefficientMethod.Checked = True
+            rbSimpleMethod.Checked = False
+        Else
+            rbExportCoefficientMethod.Checked = False
+            rbSimpleMethod.Checked = True
+        End If
 
         atxPrec.Value = 40.0
         atxRatio.Value = 0.9
+    End Sub
+
+    Private Sub frmPollutantLoading_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        SaveSetting("PLOAD", "UserDefault", "LandUse", gLanduseType)
+        SaveSetting("PLOAD", "UserDefault", "Method", gMethod)
     End Sub
 
     Private Sub frmPollutantLoading_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
@@ -1471,6 +1490,7 @@ Friend Class frmModelSetup
             lblValueFile.Text = "Export Coefficient File"
             lblValueUnits.Text = "(lbs/ac/yr)"
             rbSingle.Checked = True
+            gMethod = 0
         Else
             tabValues.Text = "Event Mean Concentrations"
             lblRatio.Visible = True
@@ -1482,6 +1502,7 @@ Friend Class frmModelSetup
             rbMultiple.Visible = True
             lblValueFile.Text = "EMC File"
             lblValueUnits.Text = "(mg/L, counts/100mL for bacteria)"
+            gMethod = 1
         End If
         SetGridValues()
     End Sub

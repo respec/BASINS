@@ -69,9 +69,9 @@ Public Class PlugIn
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         If ItemName = ParentMenuName & "_PLOAD" Then
             GisUtil.MappingObject = pMapWin
-            Dim lModelSetup As New frmModelSetup
-            lModelSetup.InitializeUI()
-            lModelSetup.Show()
+            Dim lPollutantLoading As New frmPollutantLoading
+            lPollutantLoading.InitializeUI()
+            lPollutantLoading.Show()
             Handled = True
         End If
     End Sub
