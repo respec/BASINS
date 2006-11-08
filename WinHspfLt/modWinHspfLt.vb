@@ -4,9 +4,30 @@ Option Explicit On
 Imports MapWinUtility 'for Logger
 Imports atcUtility 'for StrRetRem, StrFirstInt, FindFile, FilenameOnly, FilenameSetExt, WholdFileString, frmFeedBack
 
+''' <summary>
+''' Windows wrapper for HSPF 
+''' </summary>
+''' <remarks></remarks>
 Module modWinHSPFLt
+    ''' <summary>
+    ''' Open FORTRAN unit 99
+    ''' </summary>
+    ''' <remarks></remarks>
     Declare Sub F90_W99OPN Lib "hass_ent.dll" ()
+    ''' <summary>
+    ''' Initialize wdm buffers
+    ''' </summary>
+    ''' <remarks></remarks>
     Declare Sub F90_WDBFIN Lib "hass_ent.dll" ()
+    ''' <summary>
+    ''' Open a WDM file
+    ''' </summary>
+    ''' <param name="aRwflg">ReadWrite flag - 0:RW, 1:RO, 2:CreateNew</param>
+    ''' <param name="aName">Name of WDM file</param>
+    ''' <param name="aUnit">Fortran unit number of WDM file</param>
+    ''' <param name="aRetcod">Return code, see WDM programmer's guide for definitions</param>
+    ''' <param name="aNameLen">Length of aName</param>
+    ''' <remarks></remarks>
     Declare Sub F90_WDBOPNR Lib "hass_ent.dll" _
         (ByRef aRwflg As Integer, _
          ByVal aName As String, _
@@ -33,6 +54,10 @@ Module modWinHSPFLt
     Friend pPipeWriteToStatus As Integer = 0
     Friend pPipeReadFromStatus As Integer = 0
 
+    ''' <summary>
+    ''' Entry point for WinHspfLt
+    ''' </summary>
+    ''' <remarks></remarks>
     Public Sub Main()
         Try
             Dim lErrLogName As String = "WinHspfLt.log"
@@ -189,6 +214,11 @@ Module modWinHSPFLt
     End Function
 End Module
 
+''' <summary>
+''' Sends messages to VB6 Status Monitor. 
+''' Passes messages received from Status Monitor to file handle pPipeReadFromStatus
+''' </summary>
+''' <remarks></remarks>
 Friend Class StatusMonitor
     Implements MapWinUtility.IProgressStatus
 

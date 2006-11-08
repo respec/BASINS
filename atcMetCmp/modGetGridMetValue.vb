@@ -14,10 +14,15 @@ Imports atcUtility
 Public Module GetPrecipValueFromGrid
     Private Const pDirPath As String = "G:\MetData\Prism\GridExtract"
     Private Const pBound As Integer = 2
-    Private Const pFilter As String = "us_tmin." 'all normal tmin grids
+
+    'ALSO change units conversion lValCnv!!!!
+    Private Const pFilter As String = "us_tmin.14" 'annual normal tmin grids
+    'Private Const pFilter As String = "us_tmin." 'all normal tmin grids
     'Private Const pFilter As String = "us_tmax." 'all normal tmax grids
+    'Private Const pFilter As String = "us_ppt.14" 'annual normal ppt grid
     'Private Const pFilter As String = "us_ppt." 'all normal ppt grids
     'Private Const pFilter As String = "us_ppt" 'all ppt grids
+
     Private Const pResultFile As String = "Results\" & pFilter & ".txt"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
