@@ -67,6 +67,13 @@ Public Class UCICombiner
         'create a new uci to be the combined uci
         Dim lCombinedUci As New atcUCI.HspfUci
 
+        ''for testing uci save
+        'lWorkingDir = "C:\cbp_working\output\CBP716Copy\"
+        'ChDir(lWorkingDir)
+        'lCombinedUci.FastReadUciForStarter(lMsg, "base.uci")
+        'ChDir(lWorkingDir & "temp")
+        'lCombinedUci.Save()
+
         ChDir(lWorkingDir)
         'read first uci
         lCombinedUci.FastReadUciForStarter(lMsg, lUcis(1))
