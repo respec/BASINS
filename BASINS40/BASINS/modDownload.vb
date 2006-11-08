@@ -2,6 +2,7 @@ Option Strict Off
 Option Explicit On
 
 Imports MapWinGIS
+Imports MapWindow.Interfaces
 Imports System.Collections.Specialized
 Imports System.Windows.Forms.Application
 Imports MapWinUtility
@@ -319,14 +320,14 @@ StartOver:
                            Right(lOutputFileName, 8) = "gage.shp" Or _
                            Right(lOutputFileName, 9) = "wqobs.shp" Then
                             'get index of this layer
-                            Dim lLayerIndex As Integer = 0
-                            Dim i As Integer
-                            For i = 1 To g_MapWin.Layers.NumLayers
-                                If g_MapWin.Layers(i).FileName = lOutputFileName Then
+                            Dim lLayerIndex As Integer = -1
+                            For i As Integer = 0 To g_MapWin.Layers.NumLayers
+                                Dim lLayer As Layer = g_MapWin.Layers(i)
+                                If Not (lLayer Is Nothing) AndAlso lLayer.FileName = lOutputFileName Then
                                     lLayerIndex = i
                                 End If
                             Next
-                            If lLayerIndex > 0 Then
+                            If lLayerIndex > -1 Then
                                 Dim llayername As String = g_MapWin.Layers(lLayerIndex).Name
                                 Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerIndex).Color.R, g_MapWin.Layers(lLayerIndex).Color.G, g_MapWin.Layers(lLayerIndex).Color.B)
                                 Dim lmarkersize As Integer = g_MapWin.Layers(lLayerIndex).LineOrPointSize
