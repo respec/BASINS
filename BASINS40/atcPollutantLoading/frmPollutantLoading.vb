@@ -13,6 +13,7 @@ Friend Class frmPollutantLoading
 
     Dim gLanduseType As Integer
     Dim gMethod As Integer
+    Dim gInitializing As Boolean
 
 #Region " Windows Form Designer generated code "
 
@@ -395,9 +396,9 @@ Friend Class frmPollutantLoading
         '
         Me.lblPrecFileName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblPrecFileName.Location = New System.Drawing.Point(196, 117)
+        Me.lblPrecFileName.Location = New System.Drawing.Point(143, 117)
         Me.lblPrecFileName.Name = "lblPrecFileName"
-        Me.lblPrecFileName.Size = New System.Drawing.Size(275, 17)
+        Me.lblPrecFileName.Size = New System.Drawing.Size(329, 17)
         Me.lblPrecFileName.TabIndex = 52
         Me.lblPrecFileName.Text = "<none>"
         Me.lblPrecFileName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -774,9 +775,9 @@ Friend Class frmPollutantLoading
         '
         Me.lblPointLoadFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblPointLoadFile.Location = New System.Drawing.Point(248, 95)
+        Me.lblPointLoadFile.Location = New System.Drawing.Point(187, 95)
         Me.lblPointLoadFile.Name = "lblPointLoadFile"
-        Me.lblPointLoadFile.Size = New System.Drawing.Size(222, 17)
+        Me.lblPointLoadFile.Size = New System.Drawing.Size(283, 17)
         Me.lblPointLoadFile.TabIndex = 32
         Me.lblPointLoadFile.Text = "<none>"
         Me.lblPointLoadFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -882,9 +883,9 @@ Friend Class frmPollutantLoading
         '
         Me.lblBMPFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblBMPFile.Location = New System.Drawing.Point(248, 128)
+        Me.lblBMPFile.Location = New System.Drawing.Point(207, 128)
         Me.lblBMPFile.Name = "lblBMPFile"
-        Me.lblBMPFile.Size = New System.Drawing.Size(224, 17)
+        Me.lblBMPFile.Size = New System.Drawing.Size(265, 17)
         Me.lblBMPFile.TabIndex = 25
         Me.lblBMPFile.Text = "<none>"
         Me.lblBMPFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -1147,7 +1148,7 @@ Friend Class frmPollutantLoading
         Me.sfdValues.DefaultExt = "dbf"
         Me.sfdValues.Filter = "DBF Files (*.dbf)|*.dbf"
         '
-        'frmModelSetup
+        'frmPollutantLoading
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(7, 16)
         Me.ClientSize = New System.Drawing.Size(696, 386)
@@ -1159,7 +1160,7 @@ Friend Class frmPollutantLoading
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
-        Me.Name = "frmModelSetup"
+        Me.Name = "frmPollutantLoading"
         Me.Text = "BASINS Pollutant Loading Estimator"
         Me.tabPLOAD.ResumeLayout(False)
         Me.tabGeneral.ResumeLayout(False)
@@ -1362,6 +1363,8 @@ Friend Class frmPollutantLoading
     Public Sub InitializeUI()
         Dim lTemp As String
 
+        gInitializing = True
+
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
         cboLanduse.Items.Add("NLCD Grid")
         cboLanduse.Items.Add("Other Shapefile")
@@ -1372,16 +1375,20 @@ Friend Class frmPollutantLoading
 
         Dim lLyr As Integer
         Dim lSelectedLayer As Integer = -1
+        Dim lSelectedLayerLastResort As Integer = -1
         For lLyr = 0 To GisUtil.NumLayers() - 1
             lTemp = GisUtil.LayerName(lLyr)
             If GisUtil.LayerType(lLyr) = 3 Then
                 'PolygonShapefile 
                 cboSubbasins.Items.Add(lTemp)
-                If UCase(lTemp) = "SUBBASINS" Or InStr(lTemp, "Watershed Shapefile") > 0 Then
-                    cboSubbasins.SelectedIndex = cboSubbasins.Items.Count - 1
-                End If
-                If GisUtil.CurrentLayer = lLyr Then 'And GisUtil.NumFeatures(lLyr) < 1000 Then
+                If (UCase(lTemp) = "SUBBASINS" Or InStr(lTemp, "Watershed Shapefile") > 0) And lSelectedLayer = -1 Then
                     lSelectedLayer = cboSubbasins.Items.Count - 1
+                End If
+                If GisUtil.CurrentLayer = lLyr And GisUtil.NumFeatures(lLyr) < 1000 Then
+                    lSelectedLayer = cboSubbasins.Items.Count - 1
+                ElseIf GisUtil.NumFeatures(lLyr) < 1000 Then
+                    'this one ok as last resort 
+                    lSelectedLayerLastResort = cboSubbasins.Items.Count - 1
                 End If
                 'also possible bmp layer
                 cboBMPLayer.Items.Add(lTemp)
@@ -1402,17 +1409,6 @@ Friend Class frmPollutantLoading
                 End If
             End If
         Next
-        
-        'if all else fails set it to the first one
-        If cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
-            cboSubbasins.SelectedIndex = 0
-        End If
-        If cboBMPLayer.Items.Count > 0 And cboBMPLayer.SelectedIndex < 0 Then
-            cboBMPLayer.SelectedIndex = 0
-        End If
-        If cboPointLayer.Items.Count > 0 And cboPointLayer.SelectedIndex < 0 Then
-            cboPointLayer.SelectedIndex = 0
-        End If
 
         With atcGridValues
             .Source = New atcControls.atcGridSource
@@ -1440,8 +1436,22 @@ Friend Class frmPollutantLoading
             .AllowHorizontalScrolling = True
         End With
 
+        gInitializing = False
+        'if all else fails set it to the first one
         If lSelectedLayer > -1 Then
             cboSubbasins.SelectedIndex = lSelectedLayer
+        ElseIf cboSubbasins.Items.Count > 0 And cboSubbasins.SelectedIndex < 0 Then
+            If lSelectedLayerLastResort > -1 Then
+                cboSubbasins.SelectedIndex = lSelectedLayerLastResort
+            Else
+                cboSubbasins.SelectedIndex = 0
+            End If
+        End If
+        If cboBMPLayer.Items.Count > 0 And cboBMPLayer.SelectedIndex < 0 Then
+            cboBMPLayer.SelectedIndex = 0
+        End If
+        If cboPointLayer.Items.Count > 0 And cboPointLayer.SelectedIndex < 0 Then
+            cboPointLayer.SelectedIndex = 0
         End If
 
         SetBMPGridValues()
@@ -1929,32 +1939,35 @@ Friend Class frmPollutantLoading
         Dim lSubbasinLayerIndex As Integer
         Dim lSubbasinFieldIndex As Integer
 
-        If atcGridBank.Source Is Nothing Then Exit Sub
+        If Not gInitializing Then
 
-        atcGridBank.Clear()
+            If atcGridBank.Source Is Nothing Then Exit Sub
 
-        With atcGridBank.Source
-            .Rows = 1
-            .Columns = 2
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellValue(0, 1) = cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex)
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellValue(0, 2) = "LOAD"
-            .CellColor(0, 2) = SystemColors.ControlDark
-            lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
-            lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex))
-            For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                .CellValue(k, 1) = GisUtil.FieldValue(lSubbasinLayerIndex, k - 1, lSubbasinFieldIndex) 'subid
-                .CellColor(k, 1) = SystemColors.ControlDark
-                .CellValue(k, 2) = 0
-                .CellEditable(k, 2) = True
-            Next
-        End With
+            atcGridBank.Clear()
 
-        atcGridBank.SizeAllColumnsToContents()
-        atcGridBank.Refresh()
+            With atcGridBank.Source
+                .Rows = 1
+                .Columns = 2
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                .CellValue(0, 1) = cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex)
+                .CellColor(0, 1) = SystemColors.ControlDark
+                .CellValue(0, 2) = "LOAD"
+                .CellColor(0, 2) = SystemColors.ControlDark
+                lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+                lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex))
+                For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                    .CellValue(k, 1) = GisUtil.FieldValue(lSubbasinLayerIndex, k - 1, lSubbasinFieldIndex) 'subid
+                    .CellColor(k, 1) = SystemColors.ControlDark
+                    .CellValue(k, 2) = 0
+                    .CellEditable(k, 2) = True
+                Next
+            End With
+
+            atcGridBank.SizeAllColumnsToContents()
+            atcGridBank.Refresh()
+        End If
     End Sub
 
     Private Sub rbSingle_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rbSingle.CheckedChanged
@@ -1990,31 +2003,33 @@ Friend Class frmPollutantLoading
         Dim lSubbasinLayerIndex As Integer
         Dim lSubbasinFieldIndex As Integer
 
-        If atcGridPrec.Source Is Nothing Then Exit Sub
+        If Not gInitializing Then
+            If atcGridPrec.Source Is Nothing Then Exit Sub
 
-        atcGridPrec.Clear()
+            atcGridPrec.Clear()
 
-        With atcGridPrec.Source
-            .Rows = 1
-            .Columns = 2
-            .ColorCells = True
-            .FixedRows = 1
-            .FixedColumns = 1
-            .CellValue(0, 1) = cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex)
-            .CellColor(0, 1) = SystemColors.ControlDark
-            .CellValue(0, 2) = "Precip (in/yr)"
-            .CellColor(0, 2) = SystemColors.ControlDark
-            lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
-            lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex))
-            For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
-                .CellValue(k, 1) = GisUtil.FieldValue(lSubbasinLayerIndex, k - 1, lSubbasinFieldIndex) 'subid
-                .CellColor(k, 1) = SystemColors.ControlDark
-                .CellValue(k, 2) = 40
-                .CellEditable(k, 2) = True
-            Next
-        End With
+            With atcGridPrec.Source
+                .Rows = 1
+                .Columns = 2
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                .CellValue(0, 1) = cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex)
+                .CellColor(0, 1) = SystemColors.ControlDark
+                .CellValue(0, 2) = "Precip (in/yr)"
+                .CellColor(0, 2) = SystemColors.ControlDark
+                lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+                lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex))
+                For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                    .CellValue(k, 1) = GisUtil.FieldValue(lSubbasinLayerIndex, k - 1, lSubbasinFieldIndex) 'subid
+                    .CellColor(k, 1) = SystemColors.ControlDark
+                    .CellValue(k, 2) = 40
+                    .CellEditable(k, 2) = True
+                Next
+            End With
 
-        atcGridPrec.SizeAllColumnsToContents()
-        atcGridPrec.Refresh()
+            atcGridPrec.SizeAllColumnsToContents()
+            atcGridPrec.Refresh()
+        End If
     End Sub
 End Class
