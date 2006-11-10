@@ -727,8 +727,9 @@ Friend Class frmPollutantLoading
         'lblPointID
         '
         Me.lblPointID.AutoSize = True
-        Me.lblPointID.Location = New System.Drawing.Point(184, 50)
+        Me.lblPointID.Location = New System.Drawing.Point(186, 50)
         Me.lblPointID.Name = "lblPointID"
+        Me.lblPointID.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.lblPointID.Size = New System.Drawing.Size(144, 17)
         Me.lblPointID.TabIndex = 36
         Me.lblPointID.Text = "Point Source ID Field:"
@@ -744,7 +745,7 @@ Friend Class frmPollutantLoading
         Me.lblPointLayer.Size = New System.Drawing.Size(133, 17)
         Me.lblPointLayer.TabIndex = 35
         Me.lblPointLayer.Text = "Point Source Layer:"
-        Me.lblPointLayer.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblPointLayer.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'atcGridPoint
         '
@@ -1365,10 +1366,37 @@ Friend Class frmPollutantLoading
 
         gInitializing = True
 
+        With atcGridValues
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+        With atcGridBMP
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+        With atcGridPoint
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+        With atcGridBank
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+        With atcGridPrec
+            .Source = New atcControls.atcGridSource
+            .Font = New Font(.Font, FontStyle.Regular)
+            .AllowHorizontalScrolling = True
+        End With
+
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
         cboLanduse.Items.Add("NLCD Grid")
         cboLanduse.Items.Add("Other Shapefile")
         cboLanduse.Items.Add("User Grid")
+        cboPointLayer.Items.Add("<none>")
 
         gLanduseType = GetSetting("PLOAD", "UserDefault", "LandUse", "0")
         gMethod = GetSetting("PLOAD", "UserDefault", "Method", "0")
@@ -1409,32 +1437,6 @@ Friend Class frmPollutantLoading
                 End If
             End If
         Next
-
-        With atcGridValues
-            .Source = New atcControls.atcGridSource
-            .Font = New Font(.Font, FontStyle.Regular)
-            .AllowHorizontalScrolling = True
-        End With
-        With atcGridBMP
-            .Source = New atcControls.atcGridSource
-            .Font = New Font(.Font, FontStyle.Regular)
-            .AllowHorizontalScrolling = True
-        End With
-        With atcGridPoint
-            .Source = New atcControls.atcGridSource
-            .Font = New Font(.Font, FontStyle.Regular)
-            .AllowHorizontalScrolling = True
-        End With
-        With atcGridBank
-            .Source = New atcControls.atcGridSource
-            .Font = New Font(.Font, FontStyle.Regular)
-            .AllowHorizontalScrolling = True
-        End With
-        With atcGridPrec
-            .Source = New atcControls.atcGridSource
-            .Font = New Font(.Font, FontStyle.Regular)
-            .AllowHorizontalScrolling = True
-        End With
 
         gInitializing = False
         'if all else fails set it to the first one
@@ -1603,6 +1605,21 @@ Friend Class frmPollutantLoading
         End If
     End Sub
 
+    Private Sub PopulateSubbasinsFieldsForPointSources()
+        Dim lLyr As Integer
+        Dim i As Integer
+
+        lLyr = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+        cboPointIDField.Items.Clear()
+        For i = 0 To GisUtil.NumFields(lLyr) - 1
+            cboPointIDField.Items.Add(GisUtil.FieldName(i, lLyr))
+        Next i
+
+        If cboPointIDField.Items.Count > 0 And cboPointIDField.SelectedIndex < 0 Then
+            cboPointIDField.SelectedIndex = 0
+        End If
+    End Sub
+
     Private Sub SetGridValues()
         Dim lSorted As New atcCollection
         Dim lStartingFile As String
@@ -1695,7 +1712,16 @@ Friend Class frmPollutantLoading
 
     Private Sub cboPointLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboPointLayer.SelectedIndexChanged
         Logger.Dbg("PointLoadLayerChangedTo " & cboPointLayer.Items(cboPointLayer.SelectedIndex))
-        PopulatePointFields()
+        If cboPointLayer.Items(cboPointLayer.SelectedIndex) <> "<none>" Then
+            lblPointID.Text = "Point Source ID Field:"
+            PopulatePointFields()
+            atcGridPoint.Source.Rows = 0
+            atcGridPoint.Source.Columns = 0
+            atcGridPoint.Clear()
+        Else
+            lblPointID.Text = "Subbasin ID Field:"
+            PopulateSubbasinsFieldsForPointSources()
+        End If
     End Sub
 
     Private Sub SetBMPGridValues()
@@ -1852,7 +1878,11 @@ Friend Class frmPollutantLoading
         ofdValues.Title = "Set Point Source Loading File"
         If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
             lblPointLoadFile.Text = ofdValues.FileName
-            SetPointGridValues()
+            If cboPointLayer.Items(cboPointLayer.SelectedIndex) <> "<none>" Then
+                SetPointGridValues()
+            Else
+                SetPointGridValuesForDefaultTableFromFile()
+            End If
         End If
     End Sub
 
@@ -2030,6 +2060,88 @@ Friend Class frmPollutantLoading
 
             atcGridPrec.SizeAllColumnsToContents()
             atcGridPrec.Refresh()
+        End If
+    End Sub
+
+    Private Sub cboPointIDField_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboPointIDField.SelectedIndexChanged
+        If Not gInitializing And cboPointLayer.Items(cboPointLayer.SelectedIndex) = "<none>" Then
+            SetPointGridValuesForDefaultTable()
+        End If
+    End Sub
+
+    Private Sub SetPointGridValuesForDefaultTable()
+        Dim k As Integer
+        Dim i As Integer
+        Dim lSubbasinLayerIndex As Integer
+        Dim lSubbasinFieldIndex As Integer
+
+        If Not gInitializing And cboPointLayer.Items(cboPointLayer.SelectedIndex) = "<none>" Then
+            If atcGridPoint.Source Is Nothing Then Exit Sub
+
+            atcGridPoint.Clear()
+            lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+            lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex))
+
+            With atcGridPoint.Source
+                .Rows = 1
+                .Columns = 1 + lstConstituents.SelectedItems.Count
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                .CellValue(0, 1) = cboPointIDField.Items(cboPointIDField.SelectedIndex)
+                .CellColor(0, 1) = SystemColors.ControlDark
+                For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                    .CellValue(k, 1) = GisUtil.FieldValue(lSubbasinLayerIndex, k - 1, lSubbasinFieldIndex) 'subid
+                    .CellColor(k, 1) = SystemColors.ControlDark
+                Next
+                For i = 1 To lstConstituents.SelectedItems.Count
+                    .CellValue(0, 1 + i) = lstConstituents.SelectedItems(i - 1)
+                    .CellColor(0, 1 + i) = SystemColors.ControlDark
+                    For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                        .CellValue(k, 1 + i) = 0
+                        .CellEditable(k, 1 + i) = True
+                    Next
+                Next i
+            End With
+
+            atcGridPoint.SizeAllColumnsToContents()
+            atcGridPoint.Refresh()
+        End If
+    End Sub
+
+    Private Sub SetPointGridValuesForDefaultTableFromFile()
+        Dim i As Integer, k As Integer, j As Integer
+        Dim lDbf As IatcTable
+
+        If atcGridPoint.Source Is Nothing Then Exit Sub
+
+        If lblPointLoadFile.Text <> "<none>" Then
+            lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblPointLoadFile.Text)
+
+            With atcGridPoint.Source
+                For i = 1 To .Rows
+                    'loop thru each row of grid
+                    For k = 1 To lDbf.NumRecords
+                        'loop thru each row of dbf
+                        lDbf.CurrentRecord = k
+                        If .CellValue(i, 1) = lDbf.Value(1) Then
+                            'found a match, insert point source values from file
+                            For j = 2 To .Columns - 1
+                                .CellValue(i, j) = lDbf.Value(j)
+                            Next j
+                        End If
+                    Next k
+                Next i
+            End With
+
+        End If
+        atcGridPoint.SizeAllColumnsToContents()
+        atcGridPoint.Refresh()
+    End Sub
+
+    Private Sub lstConstituents_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lstConstituents.SelectedIndexChanged
+        If Not gInitializing And cboPointLayer.Items(cboPointLayer.SelectedIndex) = "<none>" Then
+            SetPointGridValuesForDefaultTable()
         End If
     End Sub
 End Class
