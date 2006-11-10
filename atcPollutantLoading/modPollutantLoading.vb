@@ -189,6 +189,8 @@ Public Module PollutantLoading
         'build array for output event mean concentrations (emc for each subbasin and constituent)
         'only for use in emc (simple) method
         Dim lEMCsSC(lSelectedAreaIndexes.Count, lConsNames.GetUpperBound(0)) As Double
+        'build array for bmp removal (amount removed for each subbasin and constituent)
+        Dim lBMPRemovalSC(lSelectedAreaIndexes.Count, lConsNames.GetUpperBound(0)) As Double
         Logger.Dbg("OutputArraysBuilt")
 
 
@@ -298,45 +300,74 @@ Public Module PollutantLoading
                             'subtract the load reduction due to this bmp from the load;
                             'the load reduction is the load * fractional area * fractional removal efficiency,
                             'ie 1000 lbs load with 20% bmp area with a 30% removal = 60 lbs removed 
-                            lLoadsSC(i, j) = lLoadsSC(i, j) - (lLoadsSC(i, j) * lBMPArea / lAreasS(i) * lEffic / 100)
+                            'Note: BMP removals are assumed in parallel and not in series
+                            lBMPRemovalSC(i, j) = lBMPRemovalSC(i, j) + (lLoadsSC(i, j) * lBMPArea / lAreasS(i) * lEffic / 100)
                         Next j
                     End If
                 Next k
+                'now subtract the bmp reductions from the total load
+                For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                    lLoadsSC(i, j) = lLoadsSC(i, j) - lBMPRemovalSC(i, j)
+                Next j
             Next i
             Logger.Dbg("BmpsApplied")
         Else
             Logger.Dbg("NoBmpsApplied")
         End If
 
-
+        Dim lSubID As String
         If Not (aPointLoads Is Nothing) Then
             'add point loads 
-            lPointLayerIndex = GisUtil.LayerIndex(aPointLoads.PointLayerName)
-            lPointIDFieldIndex = GisUtil.FieldIndex(lPointLayerIndex, aPointLoads.PointIDField)
-            'for each point source feature
-            For k = 1 To GisUtil.NumFeatures(lPointLayerIndex)
-                'is there an intersect?
-                j = GisUtil.PointInPolygon(lPointLayerIndex, k, lSubbasinLayerIndex)
-                For i = 0 To lSelectedAreaIndexes.Count - 1
-                    If j = lSelectedAreaIndexes(i + 1) Then
-                        'found it in a selected subbasin
-                        lFacility = GisUtil.FieldValue(lPointLayerIndex, k - 1, lPointIDFieldIndex)
-                        For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
-                            'find the load for this facility for this constituent
-                            lLoad = GetPointLoad(aPointLoads.PointGridSource, lFacility, lConsNames(j))
-                            'add the point load to the total load
-                            lLoadsSC(i, j) = lLoadsSC(i, j) + lLoad
-                        Next j
-                        Exit For
+            If aPointLoads.PointLayerName <> "<none>" Then
+                'have a point loads layer
+                lPointLayerIndex = GisUtil.LayerIndex(aPointLoads.PointLayerName)
+                lPointIDFieldIndex = GisUtil.FieldIndex(lPointLayerIndex, aPointLoads.PointIDField)
+                'for each point source feature
+                For k = 1 To GisUtil.NumFeatures(lPointLayerIndex)
+                    'is there an intersect?
+                    j = GisUtil.PointInPolygon(lPointLayerIndex, k, lSubbasinLayerIndex)
+                    For i = 0 To lSelectedAreaIndexes.Count - 1
+                        If j = lSelectedAreaIndexes(i + 1) Then
+                            'found it in a selected subbasin
+                            lFacility = GisUtil.FieldValue(lPointLayerIndex, k - 1, lPointIDFieldIndex)
+                            For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                                'find the load for this facility for this constituent
+                                lLoad = GetPointLoad(aPointLoads.PointGridSource, lFacility, lConsNames(j))
+                                'add the point load to the total load
+                                lLoadsSC(i, j) = lLoadsSC(i, j) + lLoad
+                            Next j
+                            Exit For
+                        End If
+                    Next i
+                Next k
+            Else
+                'add point loads by table
+                Dim lnthConstit As Integer = 0
+                lPointIDFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, aPointLoads.PointIDField)
+                For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                    If aConstituents.IndexOf(lConsNames(j)) > -1 Then
+                        'this is a selected constituent
+                        lnthConstit = lnthConstit + 1
+                        With aPointLoads.PointGridSource
+                            For k = 1 To .Rows - 1  'for each row of the grid source
+                                lSubID = .CellValue(k, 1)
+                                For i = 0 To lSelectedAreaIndexes.Count - 1   'find the corresponding subbasin
+                                    If lSubID = GisUtil.FieldValue(lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1), lPointIDFieldIndex) Then
+                                        'this is the one
+                                        lLoadsSC(i, j) = lLoadsSC(i, j) + .CellValue(k, lnthConstit + 1)
+                                        Exit For
+                                    End If
+                                Next i
+                            Next k
+                        End With
                     End If
-                Next i
-            Next k
+                Next j
+            End If
             Logger.Dbg("PointSourcesApplied")
         Else
             Logger.Dbg("NoPointSourcesApplied")
         End If
 
-        Dim lSubID As String
         Dim lStreamIDFieldIndex As Integer
         If Not (aStreamBankLoads Is Nothing) Then
             'add stream bank loads for TSS
