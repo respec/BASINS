@@ -884,9 +884,9 @@ Friend Class frmPollutantLoading
         '
         Me.lblBMPFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblBMPFile.Location = New System.Drawing.Point(207, 128)
+        Me.lblBMPFile.Location = New System.Drawing.Point(231, 128)
         Me.lblBMPFile.Name = "lblBMPFile"
-        Me.lblBMPFile.Size = New System.Drawing.Size(265, 17)
+        Me.lblBMPFile.Size = New System.Drawing.Size(241, 17)
         Me.lblBMPFile.TabIndex = 25
         Me.lblBMPFile.Text = "<none>"
         Me.lblBMPFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -927,9 +927,9 @@ Friend Class frmPollutantLoading
         '
         Me.lblRemoval.Location = New System.Drawing.Point(14, 128)
         Me.lblRemoval.Name = "lblRemoval"
-        Me.lblRemoval.Size = New System.Drawing.Size(227, 17)
+        Me.lblRemoval.Size = New System.Drawing.Size(211, 17)
         Me.lblRemoval.TabIndex = 21
-        Me.lblRemoval.Text = "BMP Removal Efficiency File:"
+        Me.lblRemoval.Text = "% BMP Removal Efficiency File:"
         Me.lblRemoval.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'cboBMPType
@@ -1397,6 +1397,7 @@ Friend Class frmPollutantLoading
         cboLanduse.Items.Add("Other Shapefile")
         cboLanduse.Items.Add("User Grid")
         cboPointLayer.Items.Add("<none>")
+        cboBMPLayer.Items.Add("<none>")
 
         gLanduseType = GetSetting("PLOAD", "UserDefault", "LandUse", "0")
         gMethod = GetSetting("PLOAD", "UserDefault", "Method", "0")
@@ -1456,7 +1457,7 @@ Friend Class frmPollutantLoading
             cboPointLayer.SelectedIndex = 0
         End If
 
-        SetBMPGridValues()
+        'SetBMPGridValues()
 
         cboLanduse.SelectedIndex = gLanduseType
         If gMethod = 0 Then
@@ -1620,6 +1621,21 @@ Friend Class frmPollutantLoading
         End If
     End Sub
 
+    Private Sub PopulateSubbasinsFieldsForBMPs()
+        Dim lLyr As Integer
+        Dim i As Integer
+
+        lLyr = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+        cboBMPType.Items.Clear()
+        For i = 0 To GisUtil.NumFields(lLyr) - 1
+            cboBMPType.Items.Add(GisUtil.FieldName(i, lLyr))
+        Next i
+
+        If cboBMPType.Items.Count > 0 And cboBMPType.SelectedIndex < 0 Then
+            cboBMPType.SelectedIndex = 0
+        End If
+    End Sub
+
     Private Sub SetGridValues()
         Dim lSorted As New atcCollection
         Dim lStartingFile As String
@@ -1698,16 +1714,27 @@ Friend Class frmPollutantLoading
 
     Private Sub cboBMPLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboBMPLayer.SelectedIndexChanged
         Logger.Dbg("BMPLayerChangedTo " & cboBMPLayer.Items(cboBMPLayer.SelectedIndex))
-
-        If GisUtil.LayerType(GisUtil.LayerIndex(cboBMPLayer.Items(cboBMPLayer.SelectedIndex))) = 3 Then
+        If cboBMPLayer.Items(cboBMPLayer.SelectedIndex) <> "<none>" Then
+            lblType.Text = "BMP Type Field:"
+            If GisUtil.LayerType(GisUtil.LayerIndex(cboBMPLayer.Items(cboBMPLayer.SelectedIndex))) = 3 Then
+                cboAreaField.Visible = False
+                lblArea.Visible = False
+            Else
+                'area field just applies to point bmps
+                cboAreaField.Visible = True
+                lblArea.Visible = True
+            End If
+            PopulateBMPFields()
+            atcGridBMP.Source.Rows = 0
+            atcGridBMP.Source.Columns = 0
+            atcGridBMP.Clear()
+        Else
             cboAreaField.Visible = False
             lblArea.Visible = False
-        Else
-            'area field just applies to point bmps
-            cboAreaField.Visible = True
-            lblArea.Visible = True
+            lblType.Text = "Subbasin ID Field:"
+            lblBMPFile.Text = "<none>"
+            PopulateSubbasinsFieldsForBMPs()
         End If
-        PopulateBMPFields()
     End Sub
 
     Private Sub cboPointLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboPointLayer.SelectedIndexChanged
@@ -1870,7 +1897,11 @@ Friend Class frmPollutantLoading
         ofdValues.Title = "Set BMP Removal Efficiency File"
         If ofdValues.ShowDialog() = Windows.Forms.DialogResult.OK Then
             lblBMPFile.Text = ofdValues.FileName
-            SetBMPGridValues()
+            If cboBMPLayer.Items(cboBMPLayer.SelectedIndex) <> "<none>" Then
+                SetBMPGridValues()
+            Else
+                SetBMPGridValuesForDefaultTableFromFile()
+            End If
         End If
     End Sub
 
@@ -2080,7 +2111,7 @@ Friend Class frmPollutantLoading
 
             atcGridPoint.Clear()
             lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
-            lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboSubbasinIDField.Items(cboSubbasinIDField.SelectedIndex))
+            lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboPointIDField.Items(cboPointIDField.SelectedIndex))
 
             With atcGridPoint.Source
                 .Rows = 1
@@ -2143,5 +2174,84 @@ Friend Class frmPollutantLoading
         If Not gInitializing And cboPointLayer.Items(cboPointLayer.SelectedIndex) = "<none>" Then
             SetPointGridValuesForDefaultTable()
         End If
+        If Not gInitializing And cboBMPLayer.Items(cboBMPLayer.SelectedIndex) = "<none>" Then
+            SetBMPGridValuesForDefaultTable()
+        End If
+    End Sub
+
+    Private Sub cboBMPType_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboBMPType.SelectedIndexChanged
+        If Not gInitializing And cboBMPLayer.Items(cboBMPLayer.SelectedIndex) = "<none>" Then
+            SetBMPGridValuesForDefaultTable()
+        End If
+    End Sub
+
+    Private Sub SetBMPGridValuesForDefaultTable()
+        Dim k As Integer
+        Dim i As Integer
+        Dim lSubbasinLayerIndex As Integer
+        Dim lSubbasinFieldIndex As Integer
+
+        If Not gInitializing And cboBMPLayer.Items(cboBMPLayer.SelectedIndex) = "<none>" Then
+            If atcGridBMP.Source Is Nothing Then Exit Sub
+
+            atcGridBMP.Clear()
+            lSubbasinLayerIndex = GisUtil.LayerIndex(cboSubbasins.Items(cboSubbasins.SelectedIndex))
+            lSubbasinFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, cboBMPType.Items(cboBMPType.SelectedIndex))
+
+            With atcGridBMP.Source
+                .Rows = 1
+                .Columns = 1 + lstConstituents.SelectedItems.Count
+                .ColorCells = True
+                .FixedRows = 1
+                .FixedColumns = 1
+                .CellValue(0, 1) = cboBMPType.Items(cboBMPType.SelectedIndex)
+                .CellColor(0, 1) = SystemColors.ControlDark
+                For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                    .CellValue(k, 1) = GisUtil.FieldValue(lSubbasinLayerIndex, k - 1, lSubbasinFieldIndex) 'subid
+                    .CellColor(k, 1) = SystemColors.ControlDark
+                Next
+                For i = 1 To lstConstituents.SelectedItems.Count
+                    .CellValue(0, 1 + i) = lstConstituents.SelectedItems(i - 1)
+                    .CellColor(0, 1 + i) = SystemColors.ControlDark
+                    For k = 1 To GisUtil.NumFeatures(lSubbasinLayerIndex)
+                        .CellValue(k, 1 + i) = 0
+                        .CellEditable(k, 1 + i) = True
+                    Next
+                Next i
+            End With
+
+            atcGridBMP.SizeAllColumnsToContents()
+            atcGridBMP.Refresh()
+        End If
+    End Sub
+
+    Private Sub SetBMPGridValuesForDefaultTableFromFile()
+        Dim i As Integer, k As Integer, j As Integer
+        Dim lDbf As IatcTable
+
+        If atcGridBMP.Source Is Nothing Then Exit Sub
+
+        If lblBMPFile.Text <> "<none>" Then
+            lDbf = atcUtility.atcTableOpener.OpenAnyTable(lblBMPFile.Text)
+
+            With atcGridBMP.Source
+                For i = 1 To .Rows
+                    'loop thru each row of grid
+                    For k = 1 To lDbf.NumRecords
+                        'loop thru each row of dbf
+                        lDbf.CurrentRecord = k
+                        If .CellValue(i, 1) = lDbf.Value(1) Then
+                            'found a match, insert bmp removal values from file
+                            For j = 2 To .Columns - 1
+                                .CellValue(i, j) = lDbf.Value(j)
+                            Next j
+                        End If
+                    Next k
+                Next i
+            End With
+
+        End If
+        atcGridBMP.SizeAllColumnsToContents()
+        atcGridBMP.Refresh()
     End Sub
 End Class

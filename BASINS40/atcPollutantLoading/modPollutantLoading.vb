@@ -269,53 +269,78 @@ Public Module PollutantLoading
         End If
         Logger.Dbg("LoadsCalculated")
 
-
+        Dim lSubID As String
         If Not (aBmps Is Nothing) Then
             'reduce loads due to bmps
-            lBMPLayerIndex = GisUtil.LayerIndex(aBmps.LayerName)
-            lBMPLayerType = GisUtil.LayerType(lBMPLayerIndex)
-            lBMPAreaFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBmps.AreaField)
-            lBMPTypeFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBmps.TypeField)
-            'for each subbasin
-            For i = 0 To lSelectedAreaIndexes.Count - 1
-                'for each bmp feature
-                For k = 1 To GisUtil.NumFeatures(lBMPLayerIndex)
-                    'is there an intersect?
-                    lBMPArea = 0.0
-                    If lBMPLayerType = 1 Then
-                        'point layer
-                        If GisUtil.PointInPolygon(lBMPLayerIndex, k, lSubbasinLayerIndex) = lSelectedAreaIndexes(i + 1) Then
-                            lBMPArea = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPAreaFieldIndex)
+            If aBmps.LayerName <> "<none>" Then
+                'have a bmp map layer
+                lBMPLayerIndex = GisUtil.LayerIndex(aBmps.LayerName)
+                lBMPLayerType = GisUtil.LayerType(lBMPLayerIndex)
+                lBMPAreaFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBmps.AreaField)
+                lBMPTypeFieldIndex = GisUtil.FieldIndex(lBMPLayerIndex, aBmps.TypeField)
+                'for each subbasin
+                For i = 0 To lSelectedAreaIndexes.Count - 1
+                    'for each bmp feature
+                    For k = 1 To GisUtil.NumFeatures(lBMPLayerIndex)
+                        'is there an intersect?
+                        lBMPArea = 0.0
+                        If lBMPLayerType = 1 Then
+                            'point layer
+                            If GisUtil.PointInPolygon(lBMPLayerIndex, k, lSubbasinLayerIndex) = lSelectedAreaIndexes(i + 1) Then
+                                lBMPArea = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPAreaFieldIndex)
+                            End If
+                        Else
+                            'polygon layer
+                            lBMPArea = GisUtil.AreaOverlappingPolygons(lBMPLayerIndex, k - 1, lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1)) / 4046.8564
                         End If
-                    Else
-                        'polygon layer
-                        lBMPArea = GisUtil.AreaOverlappingPolygons(lBMPLayerIndex, k - 1, lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1)) / 4046.8564
-                    End If
-                    If lBMPArea > 0.0 Then
-                        'have some bmp area
-                        lBMPType = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPTypeFieldIndex)
-                        For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
-                            'find the efficiency of this bmp type for this constituent
-                            lEffic = GetEfficiency(aBmps.GridSource, lBMPType, lConsNames(j))
-                            'subtract the load reduction due to this bmp from the load;
-                            'the load reduction is the load * fractional area * fractional removal efficiency,
-                            'ie 1000 lbs load with 20% bmp area with a 30% removal = 60 lbs removed 
-                            'Note: BMP removals are assumed in parallel and not in series
-                            lBMPRemovalSC(i, j) = lBMPRemovalSC(i, j) + (lLoadsSC(i, j) * lBMPArea / lAreasS(i) * lEffic / 100)
-                        Next j
-                    End If
-                Next k
-                'now subtract the bmp reductions from the total load
+                        If lBMPArea > 0.0 Then
+                            'have some bmp area
+                            lBMPType = GisUtil.FieldValue(lBMPLayerIndex, k - 1, lBMPTypeFieldIndex)
+                            For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                                'find the efficiency of this bmp type for this constituent
+                                lEffic = GetEfficiency(aBmps.GridSource, lBMPType, lConsNames(j))
+                                'subtract the load reduction due to this bmp from the load;
+                                'the load reduction is the load * fractional area * fractional removal efficiency,
+                                'ie 1000 lbs load with 20% bmp area with a 30% removal = 60 lbs removed 
+                                'Note: BMP removals are assumed in parallel and not in series
+                                lBMPRemovalSC(i, j) = lBMPRemovalSC(i, j) + (lLoadsSC(i, j) * lBMPArea / lAreasS(i) * lEffic / 100)
+                            Next j
+                        End If
+                    Next k
+                    'now subtract the bmp reductions from the total load
+                    For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
+                        lLoadsSC(i, j) = lLoadsSC(i, j) - lBMPRemovalSC(i, j)
+                    Next j
+                Next i
+            Else
+                'add bmp reductions by table
+                Dim lnthConstit As Integer = 0
+                lBMPTypeFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, aBmps.TypeField)
                 For j = 0 To lConsNames.GetUpperBound(0)  'for each constituent
-                    lLoadsSC(i, j) = lLoadsSC(i, j) - lBMPRemovalSC(i, j)
+                    If aConstituents.IndexOf(lConsNames(j)) > -1 Then
+                        'this is a selected constituent
+                        lnthConstit = lnthConstit + 1
+                        With aBmps.GridSource
+                            For k = 1 To .Rows - 1  'for each row of the grid source
+                                lSubID = .CellValue(k, 1)
+                                For i = 0 To lSelectedAreaIndexes.Count - 1   'find the corresponding subbasin
+                                    If lSubID = GisUtil.FieldValue(lSubbasinLayerIndex, lSelectedAreaIndexes(i + 1), lBMPTypeFieldIndex) Then
+                                        'this is the one
+                                        lBMPRemovalSC(i, j) = lBMPRemovalSC(i, j) + (lLoadsSC(i, j) * .CellValue(k, lnthConstit + 1) / 100)
+                                        lLoadsSC(i, j) = lLoadsSC(i, j) - lBMPRemovalSC(i, j)
+                                        Exit For
+                                    End If
+                                Next i
+                            Next k
+                        End With
+                    End If
                 Next j
-            Next i
+            End If
             Logger.Dbg("BmpsApplied")
         Else
             Logger.Dbg("NoBmpsApplied")
         End If
 
-        Dim lSubID As String
         If Not (aPointLoads Is Nothing) Then
             'add point loads 
             If aPointLoads.PointLayerName <> "<none>" Then
