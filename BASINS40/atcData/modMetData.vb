@@ -1079,7 +1079,7 @@ Public Module modMetData
                                 End If
                                 lNOAAattribs.Add("LNGDEG", lDecDeg)
                             End If
-                            lNOAAattribs.Add("ELEV", lStr.Substring(171, 4))
+                            lNOAAattribs.Add("ELEV", lStr.Substring(169, 5))
                             lStationIndex = lStations.IndexFromKey(lStaCode)
                             If lStationIndex >= 0 Then 'If there is an older station history entry, overwrite it
                                 If CDbl(lNOAAattribs.ItemByKey("END")) > CDbl(lStations.ItemByIndex(lStationIndex).ItemByKey("END")) Then
