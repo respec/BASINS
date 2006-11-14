@@ -8,6 +8,10 @@ Imports System.Windows.Forms.Application
 Imports MapWinUtility
 Imports atcUtility
 
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
 Module modDownload
 
     Private Const XMLappName As String = "BASINS System Application"
@@ -241,6 +245,7 @@ StartOver:
                         lCurFilename = lProjectorNode.Content
                         'create extents shape to clip to, at the extents of the cat unit
                         Dim lShape As New MapWinGIS.Shape
+                        Dim lExtentsSf As New MapWinGIS.Shapefile
                         lShape.Create(ShpfileType.SHP_POLYGON)
                         Dim lSf As New MapWinGIS.Shapefile
                         lSf.Open(lProjectDir & "cat.shp")
@@ -276,7 +281,6 @@ StartOver:
                                     'Ignore error if files do not exist or can't be removed
                                 End Try
                             End If
-                            Dim lExtentsSf As New MapWinGIS.Shapefile
                             lSuccess = lExtentsSf.CreateNew(lProjectDir & "nlcd\catextent.shp", ShpfileType.SHP_POLYGON)
                             lSuccess = lExtentsSf.StartEditingShapes(True)
                             lSuccess = lExtentsSf.EditInsertShape(lShape, 0)
@@ -300,6 +304,7 @@ StartOver:
                         End If
                         Logger.Dbg("ClipGridWithPolygon: " & lCurFilename & " " & lProjectDir & "nlcd\catextent.shp" & " " & lOutputFileName & " " & "True")
                         lSuccess = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
+                        lSuccess = lExtentsSf.Close
                         g_MapWin.StatusBar(1).Text = ""
                     Case "project_dir"
                         lProjectDir = lProjectorNode.Content
