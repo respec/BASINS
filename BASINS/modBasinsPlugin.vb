@@ -4,6 +4,10 @@ Imports atcUtility
 Imports atcData
 Imports MapWinUtility
 
+''' <summary>
+''' 
+''' </summary>
+''' <remarks></remarks>
 Friend Module modBasinsPlugin
     'Declare this as global so that it can be accessed throughout the plug-in project.
     'These variables are initialized in the plugin_Initialize event.
@@ -81,6 +85,10 @@ Friend Module modBasinsPlugin
         RefreshSaveDataMenu()
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
     Friend Sub RefreshSaveDataMenu()
         g_MapWin.Menus.Remove(SaveDataMenuName)
         AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
@@ -91,6 +99,10 @@ Friend Module modBasinsPlugin
         Next
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
     Friend Sub FindBasinsDrives()
         If g_BasinsDrives.Length = 0 Then
             Dim lAllDrives As String() = Environment.GetLogicalDrives
@@ -110,6 +122,10 @@ Friend Module modBasinsPlugin
         End If
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
     Friend Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
             Dim lDrive As Integer = 0
@@ -148,6 +164,11 @@ Friend Module modBasinsPlugin
         End If
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Friend Function NationalProjectIsOpen() As Boolean
         If (Not g_MapWin.Project Is Nothing) _
             AndAlso (Not g_MapWin.Project.FileName Is Nothing) _
@@ -158,6 +179,10 @@ Friend Module modBasinsPlugin
         End If
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
     Friend Sub SpecifyAndCreateNewProject()
         pBuildFrm = Nothing
 
@@ -212,13 +237,24 @@ Friend Module modBasinsPlugin
         Return lRetval
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aMenuName"></param>
+    ''' <param name="aParent"></param>
+    ''' <param name="aMenuText"></param>
+    ''' <param name="aAfter"></param>
+    ''' <param name="aBefore"></param>
+    ''' <param name="aAlphabetical"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Friend Function AddMenuIfMissing(ByVal aMenuName As String, _
-                                        ByVal aParent As String, _
-                                        ByVal aMenuText As String, _
-                               Optional ByVal aAfter As String = "", _
-                               Optional ByVal aBefore As String = "", _
-                               Optional ByVal aAlphabetical As Boolean = False) _
-                               As MapWindow.Interfaces.MenuItem
+                                            ByVal aParent As String, _
+                                            ByVal aMenuText As String, _
+                                   Optional ByVal aAfter As String = "", _
+                                   Optional ByVal aBefore As String = "", _
+                                   Optional ByVal aAlphabetical As Boolean = False) _
+                                   As MapWindow.Interfaces.MenuItem
 
         Dim lMenus As MapWindow.Interfaces.Menus = g_MapWin.Menus
         With lMenus
@@ -272,6 +308,11 @@ Friend Module modBasinsPlugin
         End With
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aIgnore"></param>
+    ''' <remarks></remarks>
     Friend Sub RefreshAnalysisMenu(Optional ByVal aIgnore As String = "")
         If pLoadedDataMenu Then
             AddMenuIfMissing(AnalysisMenuName, "", AnalysisMenuString, FileMenuName)
@@ -294,6 +335,10 @@ Friend Module modBasinsPlugin
         End If
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
     Friend Sub RefreshComputeMenu()
         g_MapWin.Menus.Remove(ComputeMenuName)
         g_MapWin.Menus.AddMenu(ComputeMenuName, "", Nothing, ComputeMenuString, FileMenuName)
@@ -324,54 +369,10 @@ Friend Module modBasinsPlugin
         Next
     End Sub
 
-    'Friend Sub RefreshDataMenu()
-    '  AddMenuIfMissing(DataMenuName, "", DataMenuString, FileMenuName)
-    '  pLoadedDataMenu = True
-
-    '  'Dim mnu As MapWindow.Interfaces.MenuItem
-    '  'Dim iPlugin As Integer
-    '  'With g_MapWin.Plugins
-    '  '  For iPlugin = 0 To .Count - 1
-    '  '    If Not .Item(iPlugin) Is Nothing Then
-    '  '      Dim pluginName As String = .Item(iPlugin).Name
-    '  '      If CType(.Item(iPlugin), Object).GetType().IsSubclassOf(GetType(atcDataPlugin)) Then
-    '  '        mnu = AddMenuIfMissing(DataMenuName & "_" & pluginName, DataMenuName, pluginName)
-    '  '      End If
-    '  '    End If
-    '  '  Next
-    '  'End With
-    'End Sub
-
-    'Friend Sub BuiltInScript(ByVal aRun As Boolean)
-    '  Try
-    '    Dim lFlags As BindingFlags = BindingFlags.NonPublic Or BindingFlags.Public Or _
-    '                                 BindingFlags.Static Or BindingFlags.Instance Or _
-    '                                 BindingFlags.DeclaredOnly
-    '    Dim lAssembly As [Assembly] = [Assembly].Load("atcScriptTest")
-    '    Dim lTypes As Type() = lAssembly.GetTypes
-    '    For Each lType As Type In lTypes
-    '      Dim lMethods As MethodInfo() = lType.GetMethods(lFlags)
-    '      For Each lMethod As MethodInfo In lMethods
-    '        If lMethod.Name.ToLower = "main" AndAlso _
-    '           lMethod.GetParameters.Length = 2 AndAlso _
-    '           (lMethod.GetParameters(0).ParameterType Is pDataManager.GetType _
-    '            OrElse lMethod.GetParameters(0).ParameterType.Name = "Object") AndAlso _
-    '           (lMethod.GetParameters(1).ParameterType Is Me.GetType _
-    '            OrElse lMethod.GetParameters(1).ParameterType.Name = "Object") Then 'found built in script
-
-    '          pBuiltInScriptExists = True
-    '          If aRun Then
-    '            Dim lParameters() As Object = {pDataManager, Me}
-    '            lMethod.Invoke(Nothing, lParameters)
-    '          End If
-    '        End If
-    '      Next
-    '    Next
-    '  Catch ex As Exception
-    '    Logger.Msg("Exception:" & ex.ToString, "clsPlugIn:BuiltInScript")
-    '  End Try
-    'End Sub
-
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
     Friend Sub UpdateSelectedFeatures()
         If Not pBuildFrm Is Nothing AndAlso g_MapWin.Layers.NumLayers > 0 AndAlso g_MapWin.Layers.CurrentLayer > -1 Then
             Dim lFieldName As String = ""
