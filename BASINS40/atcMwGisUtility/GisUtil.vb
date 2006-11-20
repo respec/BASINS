@@ -35,7 +35,7 @@ Public Class GisUtil
         Dim lMapLayers As New ArrayList
         Dim lLastLayerIndex As Integer = GetMappingObject.Layers.NumLayers - 1
         For lLayerIndex As Integer = 0 To lLastLayerIndex
-            lMapLayers.Add(GetMappingObject.Layers(lLayerIndex))
+            lMapLayers.Add(LayerFromIndex(lLayerIndex))
         Next
         Return lMapLayers
     End Function
@@ -105,7 +105,7 @@ Public Class GisUtil
               lLayer.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
                 Return lLayer.GetObject
             Else
-                Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & GetMappingObject.Layers(aLayerIndex).LayerType & ":IsNotShapeFile")
+                Throw New Exception("GisUtil:ShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & LayerFromIndex(aLayerIndex).LayerType & ":IsNotShapeFile")
             End If
         End Get
     End Property
@@ -124,7 +124,7 @@ Public Class GisUtil
               lSf.ShapefileType = MapWinGIS.ShpfileType.SHP_POLYGONZ) Then
                 Return lSf
             Else
-                Throw New Exception("GisUtil:PolygonShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & GetMappingObject.Layers(aLayerIndex).LayerType & ":IsNotPolygonShapeFile")
+                Throw New Exception("GisUtil:PolygonShapeFileFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & LayerFromIndex(aLayerIndex).LayerType & ":IsNotPolygonShapeFile")
             End If
         End Get
     End Property
@@ -146,7 +146,7 @@ Public Class GisUtil
             If lLayer.LayerType = MapWindow.Interfaces.eLayerType.Grid Then
                 Return lLayer.GetGridObject
             Else
-                Throw New Exception("GisUtil:GridFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & GetMappingObject.Layers(aLayerIndex).LayerType & ":IsNotGrid")
+                Throw New Exception("GisUtil:GridFromIndex:Error:LayerIndex:" & aLayerIndex & ":Type:" & LayerFromIndex(aLayerIndex).LayerType & ":IsNotGrid")
             End If
         End Get
     End Property
@@ -164,7 +164,8 @@ Public Class GisUtil
             End If
 
             If aLayerIndex >= 0 And aLayerIndex < GetMappingObject.Layers.NumLayers Then
-                Return (GetMappingObject.Layers(aLayerIndex))
+                'Return (GetMappingObject.Layers(aLayerIndex))  'this is a bad idea
+                Return (GetMappingObject.Layers.Item(GetMappingObject.Layers.GetHandle(aLayerIndex)))
             Else
                 Throw New Exception("GisUtil:LayerFromIndex:Error:LayerIndex:" & aLayerIndex & ":OutOfRange:0:" & GetMappingObject.Layers.NumLayers - 1)
             End If
@@ -999,7 +1000,7 @@ Public Class GisUtil
     Public Shared Function IsLayer(ByVal aLayerName As String) As Boolean
         For i As Integer = 1 To GetMappingObject.Layers.NumLayers
             Try
-                If aLayerName = GetMappingObject.Layers(i).Name Then
+                If aLayerName = LayerFromIndex(i).Name Then
                     Return True
                 End If
             Catch
@@ -1311,7 +1312,7 @@ Public Class GisUtil
     Public Shared Function GridValueAtPoint(ByVal aGridLayerIndex As Integer, ByVal aX As Double, ByVal aY As Double) As Integer
         'set input grid
         Dim gridLayer As MapWindow.Interfaces.Layer
-        gridLayer = GetMappingObject.Layers(aGridLayerIndex)
+        gridLayer = LayerFromIndex(aGridLayerIndex)
         Dim lInputGrid As New MapWinGIS.Grid
         lInputGrid = gridLayer.GetGridObject
 
@@ -1377,12 +1378,12 @@ Public Class GisUtil
                               ByVal aOutputLayerName As String, ByVal aCreateNew As Boolean)
 
         'obtain handle to layer 1  
-        Dim lLayer1 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aLayer1Index)
+        Dim lLayer1 As MapWindow.Interfaces.Layer = LayerFromIndex(aLayer1Index)
         Dim lSf1 As New MapWinGIS.Shapefile
         lSf1 = lLayer1.GetObject
 
         'set layer 2 (subbasins)
-        Dim lLayer2 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aLayer2Index)
+        Dim lLayer2 As MapWindow.Interfaces.Layer = LayerFromIndex(aLayer2Index)
         Dim lSf2 As New MapWinGIS.Shapefile
         lSf2 = lLayer2.GetObject
         Dim lSf2Ext As MapWinGIS.Extents = lSf2.Extents
@@ -1539,12 +1540,12 @@ Public Class GisUtil
                                            ByRef aArea12(,) As Double)
 
         'obtain handle to layer 1 (landuse) 
-        Dim lLayer1 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aPolygonLayer1Index)
+        Dim lLayer1 As MapWindow.Interfaces.Layer = LayerFromIndex(aPolygonLayer1Index)
         Dim lSf1 As New MapWinGIS.Shapefile
         lSf1 = lLayer1.GetObject
 
         'set layer 2 (subbasins)
-        Dim lLayer2 As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aPolygonLayer2Index)
+        Dim lLayer2 As MapWindow.Interfaces.Layer = LayerFromIndex(aPolygonLayer2Index)
         Dim lSf2 As New MapWinGIS.Shapefile
         lSf2 = lLayer2.GetObject
         Dim lSf2Ext As MapWinGIS.Extents = lSf2.Extents
@@ -1863,7 +1864,7 @@ Public Class GisUtil
 
         'set layer 1 
         Dim lLayer As MapWindow.Interfaces.Layer
-        lLayer = GetMappingObject.Layers(aLayer1index)
+        lLayer = LayerFromIndex(aLayer1index)
         Dim lSf1 As MapWinGIS.Shapefile
         lSf1 = lLayer.GetObject
         Dim lShape1 As MapWinGIS.Shape
@@ -1871,7 +1872,7 @@ Public Class GisUtil
 
         'set layer 2 
         Dim lLayer2 As MapWindow.Interfaces.Layer
-        lLayer2 = GetMappingObject.Layers(aLayer2index)
+        lLayer2 = LayerFromIndex(aLayer2index)
         Dim lsf2 As MapWinGIS.Shapefile
         lsf2 = lLayer2.GetObject
         Dim lShape2 As MapWinGIS.Shape
@@ -1899,7 +1900,7 @@ Public Class GisUtil
         Dim lStatus As Boolean
 
         'set input layer
-        Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers(aAreaLayerIndex)
+        Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(aAreaLayerIndex)
         sf = lLayer.GetObject
 
         If aNewFilename = "" Then
@@ -1965,7 +1966,7 @@ Public Class GisUtil
         Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
 
         Dim lLayerIndex As Integer = GisUtil.LayerIndex(aDesc)
-        Dim lLayer As MapWindow.Interfaces.Layer = GetMappingObject.Layers(lLayerIndex)
+        Dim lLayer As MapWindow.Interfaces.Layer = LayerFromIndex(lLayerIndex)
 
         Dim lSf As New MapWinGIS.Shapefile
         lSf = lLayer.GetObject()
