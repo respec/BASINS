@@ -128,14 +128,16 @@ Friend Module modBasinsPlugin
     ''' <remarks></remarks>
     Friend Sub LoadNationalProject()
         If Not NationalProjectIsOpen() Then
-            Dim lDrive As Integer = 0
-
             Dim lFileName As String = g_BasinsDir & "\Data\national\" & NationalProjectFilename
-            While Not FileExists(lFileName) AndAlso lDrive < g_BasinsDrives.Length
-                lFileName = UCase(g_BasinsDrives.Chars(lDrive)) & ":" _
-                          & "\BASINS\Data\national\" & NationalProjectFilename
-                'found existing national project, save name for later loading
-            End While
+            If Not FileExists(lFileName) Then
+                For lDrive As Integer = 0 To g_BasinsDrives.Length - 1
+                    lFileName = UCase(g_BasinsDrives.Chars(lDrive)) & ":" _
+                              & "\BASINS\Data\national\" & NationalProjectFilename
+                    If FileExists(lFileName) Then 'found existing national project
+                        Exit For
+                    End If
+                Next lDrive
+            End If
 
             If FileExists(lFileName) Then  'load national project
                 g_MapWin.Project.Load(lFileName)
