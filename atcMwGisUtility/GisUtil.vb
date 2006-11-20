@@ -1404,7 +1404,9 @@ Public Class GisUtil
             lSfOut.CreateNew("overlay", MapWinGIS.ShpfileType.SHP_POLYGON)
             Dim [lOf] As New MapWinGIS.Field
             [lOf].Name = FieldName(aLayer1FieldIndex, aLayer1Index)
-            [lOf].Type = MapWinGIS.FieldType.INTEGER_FIELD
+            '[lOf].Type = MapWinGIS.FieldType.INTEGER_FIELD
+            'fixed to be able to use string 
+            [lOf].Type = FieldType(aLayer1FieldIndex, aLayer1Index)
             [lOf].Width = 10
             lBsuc = lSfOut.EditInsertField([lOf], 0)
             Dim lof2 As New MapWinGIS.Field

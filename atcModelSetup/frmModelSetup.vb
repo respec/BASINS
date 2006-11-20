@@ -1215,6 +1215,7 @@ Public Class frmModelSetup
                     Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor
                     For i = Convert.ToInt32(GisUtil.GridLayerMinimum(lyr)) To Convert.ToInt32(GisUtil.GridLayerMaximum(lyr))
                         AtcGridPervious.Source.Rows = AtcGridPervious.Source.Rows + 1
+                        AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 0) = i
                         AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 1) = i
                         AtcGridPervious.Source.CellValue(AtcGridPervious.Source.Rows - 1, 2) = 100
                     Next i
@@ -1329,6 +1330,7 @@ Public Class frmModelSetup
                     With AtcGridPervious.Source
                         .Rows = AtcGridPervious.Source.Rows + 1
                         .CellValue(.Rows - 1, 1) = GisUtil.FieldValue(layerindex, j, i)
+                        .CellValue(.Rows - 1, 0) = GisUtil.FieldValue(layerindex, j, i)
                         If UCase(Microsoft.VisualBasic.Left(GisUtil.FieldValue(layerindex, j, i), 5)) = "URBAN" Then
                             .CellValue(.Rows - 1, 2) = 50
                         Else
@@ -1568,6 +1570,10 @@ Public Class frmModelSetup
                 Else
                     ReclassifyFile = "\BASINS\etc\nlcd.dbf"
                 End If
+            Else
+                If lblClass.Text <> "<none>" Then
+                    ReclassifyFile = lblClass.Text
+                End If
             End If
 
             lblStatus.Text = "Overlaying Land Use and Subbasins"
@@ -1601,6 +1607,10 @@ Public Class frmModelSetup
             'other shape
             lblStatus.Text = "Overlaying Land Use and Subbasins"
             Me.Refresh()
+
+            If lblClass.Text <> "<none>" Then
+                ReclassifyFile = lblClass.Text
+            End If
 
             LanduseLayerIndex = GisUtil.LayerIndex(LandUseThemeName)
             luPathName = PathNameOnly(GisUtil.LayerFileName(LanduseLayerIndex))
