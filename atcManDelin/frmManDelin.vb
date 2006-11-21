@@ -356,12 +356,12 @@ Public Class frmManDelin
         GisUtil.MappingObject = m
 
         'set delineation layer
-        For lyr = 0 To pMapWin.Layers.NumLayers - 1
-            ctemp = pMapWin.Layers(lyr).Name
-            If pMapWin.Layers(lyr).LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+        For lyr = 0 To GisUtil.NumLayers - 1
+            ctemp = GisUtil.LayerName(lyr)
+            If GisUtil.LayerType(lyr) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
                 'PolygonShapefile 
                 cboLayer.Items.Add(ctemp)
-                If pMapWin.Layers.CurrentLayer = lyr Then
+                If GisUtil.CurrentLayer = lyr Then
                     'this is the current layer
                     cboLayer.SelectedIndex = cboLayer.Items.Count - 1
                 End If
@@ -376,20 +376,20 @@ Public Class frmManDelin
         End If
 
         'set dem layer
-        For lyr = 0 To pMapWin.Layers.NumLayers - 1
-            ctemp = pMapWin.Layers(lyr).Name
-            If pMapWin.Layers(lyr).LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
+        For lyr = 0 To GisUtil.NumLayers - 1
+            ctemp = GisUtil.LayerName(lyr)
+            If GisUtil.LayerType(lyr) = MapWindow.Interfaces.eLayerType.PolygonShapefile Then
                 'PolygonShapefile 
                 cboDEM.Items.Add(ctemp)
-                If InStr(pMapWin.Layers(lyr).FileName, "\dem\") > 0 Then
+                If InStr(GisUtil.LayerFileName(lyr), "\dem\") > 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                 End If
-            ElseIf pMapWin.Layers(lyr).LayerType = MapWindow.Interfaces.eLayerType.Grid Then
+            ElseIf GisUtil.LayerType(lyr) = MapWindow.Interfaces.eLayerType.Grid Then
                 'grid
                 cboDEM.Items.Add(ctemp)
-                If InStr(pMapWin.Layers(lyr).FileName, "\demg\") > 0 Then
+                If InStr(GisUtil.LayerFileName(lyr), "\demg\") > 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
-                ElseIf InStr(pMapWin.Layers(lyr).FileName, "\ned\") > 0 Then
+                ElseIf InStr(GisUtil.LayerFileName(lyr), "\ned\") > 0 Then
                     cboDEM.SelectedIndex = cboDEM.Items.Count - 1
                 End If
             End If
@@ -400,14 +400,14 @@ Public Class frmManDelin
         End If
 
         'set reach layer
-        For lyr = 0 To pMapWin.Layers.NumLayers - 1
-            ctemp = pMapWin.Layers(lyr).Name
-            If pMapWin.Layers(lyr).LayerType = MapWindow.Interfaces.eLayerType.LineShapefile Then
+        For lyr = 0 To GisUtil.NumLayers - 1
+            ctemp = GisUtil.LayerName(lyr)
+            If GisUtil.LayerType(lyr) = MapWindow.Interfaces.eLayerType.LineShapefile Then
                 'LineShapefile 
                 cboReach.Items.Add(ctemp)
-                If InStr(pMapWin.Layers(lyr).FileName, "\nhd\") > 0 Then
+                If InStr(GisUtil.LayerFileName(lyr), "\nhd\") > 0 Then
                     cboReach.SelectedIndex = cboReach.Items.Count - 1
-                ElseIf Microsoft.VisualBasic.Right(pMapWin.Layers(lyr).FileName, 7) = "rf1.shp" Then
+                ElseIf Microsoft.VisualBasic.Right(GisUtil.LayerFileName(lyr), 7) = "rf1.shp" Then
                     cboReach.SelectedIndex = cboReach.Items.Count - 1
                 End If
             End If
@@ -642,9 +642,9 @@ Public Class frmManDelin
         Dim newOperatingShapefile As New MapWinGIS.Shapefile
         newOperatingShapefile.Open(OperatingShapefile)
         pMapWin.Layers.Add(newOperatingShapefile, "Subbasins")
-        pMapWin.Layers(pMapWin.Layers.NumLayers - 1).Color = System.Drawing.Color.Transparent
-        pMapWin.Layers(pMapWin.Layers.NumLayers - 1).OutlineColor = System.Drawing.Color.Red
-        pMapWin.Layers(pMapWin.Layers.NumLayers - 1).DrawFill = False
+        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).Color = System.Drawing.Color.Transparent
+        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).OutlineColor = System.Drawing.Color.Red
+        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).DrawFill = False
 
         'remove old points
         For i = 0 To xpts.Count
@@ -923,6 +923,9 @@ Public Class frmManDelin
         'add output reach shapefile to the view
         If GisUtil.IsLayer("Streams") Then
             GisUtil.RemoveLayer(GisUtil.LayerIndex("Streams"))
+            'if layer removed, need to obtain new indexes 
+            SubbasinLayerIndex = GisUtil.LayerIndex(SubbasinThemeName)
+            ReachLayerIndex = GisUtil.LayerIndex(ReachThemeName)
         End If
         GisUtil.AddLayer(OutputReachShapefileName, "Streams")
         StreamsLayerIndex = GisUtil.LayerIndex("Streams")
@@ -1415,15 +1418,16 @@ Public Class frmManDelin
             success = lShapefile.EditCellValue(0, i - 1, i)
         Next i
         success = lShapefile.StopEditingShapes(True, True)
+        success = lShapefile.Close()
 
         'add outlets layer to the map
         If GisUtil.IsLayer("Outlets") Then
             GisUtil.RemoveLayer(GisUtil.LayerIndex("Outlets"))
         End If
-        pMapWin.Layers.Add(lShapefile, "Outlets")
-        pMapWin.Layers(pMapWin.Layers.NumLayers - 1).Color = System.Drawing.Color.Cyan
-        pMapWin.Layers(pMapWin.Layers.NumLayers - 1).OutlineColor = System.Drawing.Color.Cyan
-        pMapWin.Layers(pMapWin.Layers.NumLayers - 1).LineOrPointSize = 5
+        GisUtil.AddLayer(OutletShapefile, "Outlets")
+        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).Color = System.Drawing.Color.Cyan
+        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).OutlineColor = System.Drawing.Color.Cyan
+        pMapWin.Layers(pMapWin.Layers.GetHandle(pMapWin.Layers.NumLayers - 1)).LineOrPointSize = 5
 
         Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default
         lblDefine.Text = ""
