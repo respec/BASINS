@@ -150,8 +150,8 @@ Friend Module modBasinsPlugin
         If NationalProjectIsOpen() Then
             'Select the Cataloging Units layer by default 
             For iLayer As Integer = 0 To g_MapWin.Layers.NumLayers - 1
-                If g_MapWin.Layers(iLayer).Name = "Cataloging Units" Then
-                    g_MapWin.Layers.CurrentLayer = iLayer
+                If g_MapWin.Layers(g_MapWin.Layers.GetHandle(iLayer)).Name = "Cataloging Units" Then
+                    g_MapWin.Layers.CurrentLayer = g_MapWin.Layers.GetHandle(iLayer)
                     Exit For
                 End If
             Next
