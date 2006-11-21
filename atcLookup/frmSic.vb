@@ -51,7 +51,7 @@ Public Class frmSic
     Friend WithEvents lblSic As System.Windows.Forms.Label
     Friend WithEvents agdSic As atcControls.atcGrid
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSic))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSic))
         Me.lbxSic = New System.Windows.Forms.ListBox
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.lblSic = New System.Windows.Forms.Label
@@ -65,9 +65,9 @@ Public Class frmSic
         '
         Me.lbxSic.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbxSic.Location = New System.Drawing.Point(13, 14)
+        Me.lbxSic.Location = New System.Drawing.Point(12, 12)
         Me.lbxSic.Name = "lbxSic"
-        Me.lbxSic.Size = New System.Drawing.Size(240, 121)
+        Me.lbxSic.Size = New System.Drawing.Size(239, 121)
         Me.lbxSic.TabIndex = 0
         '
         'GroupBox1
@@ -76,9 +76,9 @@ Public Class frmSic
         Me.GroupBox1.Controls.Add(Me.lblSic)
         Me.GroupBox1.Controls.Add(Me.rbtName)
         Me.GroupBox1.Controls.Add(Me.rbtNumber)
-        Me.GroupBox1.Location = New System.Drawing.Point(267, 7)
+        Me.GroupBox1.Location = New System.Drawing.Point(257, 6)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(193, 139)
+        Me.GroupBox1.Size = New System.Drawing.Size(203, 139)
         Me.GroupBox1.TabIndex = 1
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Search by:"
@@ -94,7 +94,7 @@ Public Class frmSic
         '
         Me.rbtName.Location = New System.Drawing.Point(13, 49)
         Me.rbtName.Name = "rbtName"
-        Me.rbtName.Size = New System.Drawing.Size(160, 13)
+        Me.rbtName.Size = New System.Drawing.Size(160, 18)
         Me.rbtName.TabIndex = 1
         Me.rbtName.Text = "SIC Name"
         '
@@ -103,7 +103,7 @@ Public Class frmSic
         Me.rbtNumber.Checked = True
         Me.rbtNumber.Location = New System.Drawing.Point(13, 28)
         Me.rbtNumber.Name = "rbtNumber"
-        Me.rbtNumber.Size = New System.Drawing.Size(160, 14)
+        Me.rbtNumber.Size = New System.Drawing.Size(160, 18)
         Me.rbtNumber.TabIndex = 0
         Me.rbtNumber.TabStop = True
         Me.rbtNumber.Text = "SIC Number"
@@ -111,22 +111,23 @@ Public Class frmSic
         'agdSic
         '
         Me.agdSic.AllowHorizontalScrolling = True
+        Me.agdSic.AllowNewValidValues = False
         Me.agdSic.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdSic.CellBackColor = System.Drawing.Color.Empty
         Me.agdSic.LineColor = System.Drawing.Color.Empty
         Me.agdSic.LineWidth = 0.0!
-        Me.agdSic.Location = New System.Drawing.Point(16, 160)
+        Me.agdSic.Location = New System.Drawing.Point(12, 152)
         Me.agdSic.Name = "agdSic"
-        Me.agdSic.Size = New System.Drawing.Size(448, 120)
+        Me.agdSic.Size = New System.Drawing.Size(444, 128)
         Me.agdSic.Source = Nothing
         Me.agdSic.TabIndex = 2
         '
         'frmSic
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(473, 292)
+        Me.ClientSize = New System.Drawing.Size(472, 292)
         Me.Controls.Add(Me.agdSic)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.lbxSic)

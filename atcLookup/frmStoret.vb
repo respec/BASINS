@@ -47,7 +47,7 @@ Public Class frmStoret
     Friend WithEvents lblContact As System.Windows.Forms.Label
     Friend WithEvents lblPhone As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmStoret))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmStoret))
         Me.lbxAgency = New System.Windows.Forms.ListBox
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.Label1 = New System.Windows.Forms.Label
@@ -66,27 +66,26 @@ Public Class frmStoret
         '
         Me.lbxAgency.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbxAgency.ItemHeight = 16
-        Me.lbxAgency.Location = New System.Drawing.Point(16, 16)
+        Me.lbxAgency.Location = New System.Drawing.Point(12, 12)
         Me.lbxAgency.Name = "lbxAgency"
-        Me.lbxAgency.Size = New System.Drawing.Size(168, 164)
+        Me.lbxAgency.Size = New System.Drawing.Size(219, 134)
         Me.lbxAgency.TabIndex = 0
         '
         'GroupBox1
         '
         Me.GroupBox1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBox1.Controls.Add(Me.Label1)
-        Me.GroupBox1.Location = New System.Drawing.Point(208, 16)
+        Me.GroupBox1.Location = New System.Drawing.Point(237, 6)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(216, 96)
+        Me.GroupBox1.Size = New System.Drawing.Size(180, 83)
         Me.GroupBox1.TabIndex = 1
         Me.GroupBox1.TabStop = False
         '
         'Label1
         '
-        Me.Label1.Location = New System.Drawing.Point(16, 24)
+        Me.Label1.Location = New System.Drawing.Point(13, 21)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(184, 56)
+        Me.Label1.Size = New System.Drawing.Size(154, 48)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Choose a STORET Agency code from the list to display information below."
         '
@@ -101,61 +100,61 @@ Public Class frmStoret
         Me.GroupBox2.Controls.Add(Me.Label4)
         Me.GroupBox2.Controls.Add(Me.Label3)
         Me.GroupBox2.Controls.Add(Me.Label2)
-        Me.GroupBox2.Location = New System.Drawing.Point(16, 192)
+        Me.GroupBox2.Location = New System.Drawing.Point(12, 152)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(408, 192)
+        Me.GroupBox2.Size = New System.Drawing.Size(405, 223)
         Me.GroupBox2.TabIndex = 2
         Me.GroupBox2.TabStop = False
         '
         'lblPhone
         '
-        Me.lblPhone.Location = New System.Drawing.Point(32, 160)
+        Me.lblPhone.Location = New System.Drawing.Point(27, 139)
         Me.lblPhone.Name = "lblPhone"
-        Me.lblPhone.Size = New System.Drawing.Size(360, 16)
+        Me.lblPhone.Size = New System.Drawing.Size(300, 14)
         Me.lblPhone.TabIndex = 5
         '
         'lblContact
         '
-        Me.lblContact.Location = New System.Drawing.Point(32, 112)
+        Me.lblContact.Location = New System.Drawing.Point(27, 97)
         Me.lblContact.Name = "lblContact"
-        Me.lblContact.Size = New System.Drawing.Size(360, 16)
+        Me.lblContact.Size = New System.Drawing.Size(300, 14)
         Me.lblContact.TabIndex = 4
         '
         'lblProgram
         '
-        Me.lblProgram.Location = New System.Drawing.Point(32, 48)
+        Me.lblProgram.Location = New System.Drawing.Point(27, 42)
         Me.lblProgram.Name = "lblProgram"
-        Me.lblProgram.Size = New System.Drawing.Size(360, 16)
+        Me.lblProgram.Size = New System.Drawing.Size(300, 13)
         Me.lblProgram.TabIndex = 3
         '
         'Label4
         '
-        Me.Label4.Location = New System.Drawing.Point(16, 136)
+        Me.Label4.Location = New System.Drawing.Point(13, 118)
         Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(144, 16)
+        Me.Label4.Size = New System.Drawing.Size(120, 14)
         Me.Label4.TabIndex = 2
         Me.Label4.Text = "Phone Number:"
         '
         'Label3
         '
-        Me.Label3.Location = New System.Drawing.Point(16, 88)
+        Me.Label3.Location = New System.Drawing.Point(13, 76)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(144, 16)
+        Me.Label3.Size = New System.Drawing.Size(120, 14)
         Me.Label3.TabIndex = 1
         Me.Label3.Text = "Contact:"
         '
         'Label2
         '
-        Me.Label2.Location = New System.Drawing.Point(16, 24)
+        Me.Label2.Location = New System.Drawing.Point(13, 21)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(144, 16)
+        Me.Label2.Size = New System.Drawing.Size(120, 14)
         Me.Label2.TabIndex = 0
         Me.Label2.Text = "Program Name:"
         '
         'frmStoret
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.ClientSize = New System.Drawing.Size(442, 402)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(429, 387)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.lbxAgency)

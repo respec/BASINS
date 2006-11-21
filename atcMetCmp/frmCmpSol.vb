@@ -38,7 +38,6 @@ Public Class frmCmpSol
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents panelBottom As System.Windows.Forms.Panel
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents lblLatitude As System.Windows.Forms.Label
@@ -51,88 +50,84 @@ Public Class frmCmpSol
         Me.lblCloudCover = New System.Windows.Forms.Label
         Me.lblLatitude = New System.Windows.Forms.Label
         Me.txtLatitude = New System.Windows.Forms.TextBox
-        Me.panelBottom = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnCloudCover = New System.Windows.Forms.Button
         Me.txtCloudCover = New System.Windows.Forms.TextBox
-        Me.panelBottom.SuspendLayout()
         Me.SuspendLayout()
         '
         'lblCloudCover
         '
-        Me.lblCloudCover.Location = New System.Drawing.Point(19, 18)
+        Me.lblCloudCover.AutoSize = True
+        Me.lblCloudCover.Location = New System.Drawing.Point(12, 9)
         Me.lblCloudCover.Name = "lblCloudCover"
-        Me.lblCloudCover.Size = New System.Drawing.Size(269, 19)
+        Me.lblCloudCover.Size = New System.Drawing.Size(156, 13)
         Me.lblCloudCover.TabIndex = 2
         Me.lblCloudCover.Text = "Specify Cloud Cover Timeseries"
         '
         'lblLatitude
         '
-        Me.lblLatitude.Location = New System.Drawing.Point(19, 111)
+        Me.lblLatitude.AutoSize = True
+        Me.lblLatitude.Location = New System.Drawing.Point(12, 72)
         Me.lblLatitude.Name = "lblLatitude"
-        Me.lblLatitude.Size = New System.Drawing.Size(183, 18)
+        Me.lblLatitude.Size = New System.Drawing.Size(130, 13)
         Me.lblLatitude.TabIndex = 3
-        Me.lblLatitude.Text = "Latitude (in decimal degress)"
+        Me.lblLatitude.Text = "Latitude (decimal degress)"
         '
         'txtLatitude
         '
-        Me.txtLatitude.Location = New System.Drawing.Point(211, 111)
+        Me.txtLatitude.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtLatitude.Location = New System.Drawing.Point(159, 69)
         Me.txtLatitude.Name = "txtLatitude"
-        Me.txtLatitude.Size = New System.Drawing.Size(87, 22)
+        Me.txtLatitude.Size = New System.Drawing.Size(83, 20)
         Me.txtLatitude.TabIndex = 4
-        '
-        'panelBottom
-        '
-        Me.panelBottom.Controls.Add(Me.btnCancel)
-        Me.panelBottom.Controls.Add(Me.btnOk)
-        Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 153)
-        Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(355, 37)
-        Me.panelBottom.TabIndex = 16
         '
         'btnCancel
         '
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(211, 0)
+        Me.btnCancel.Location = New System.Drawing.Point(178, 109)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(77, 28)
+        Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 1
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(96, 0)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(12, 109)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(77, 28)
+        Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 0
         Me.btnOk.Text = "Ok"
         '
         'btnCloudCover
         '
-        Me.btnCloudCover.Location = New System.Drawing.Point(19, 46)
+        Me.btnCloudCover.Location = New System.Drawing.Point(15, 39)
         Me.btnCloudCover.Name = "btnCloudCover"
-        Me.btnCloudCover.Size = New System.Drawing.Size(58, 23)
+        Me.btnCloudCover.Size = New System.Drawing.Size(48, 20)
         Me.btnCloudCover.TabIndex = 18
         Me.btnCloudCover.Text = "Select"
         '
         'txtCloudCover
         '
-        Me.txtCloudCover.Location = New System.Drawing.Point(86, 46)
+        Me.txtCloudCover.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtCloudCover.Location = New System.Drawing.Point(72, 40)
         Me.txtCloudCover.Name = "txtCloudCover"
         Me.txtCloudCover.ReadOnly = True
-        Me.txtCloudCover.Size = New System.Drawing.Size(260, 22)
+        Me.txtCloudCover.Size = New System.Drawing.Size(170, 20)
         Me.txtCloudCover.TabIndex = 19
         '
         'frmCmpSol
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(355, 190)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(254, 145)
+        Me.Controls.Add(Me.btnCancel)
+        Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.txtCloudCover)
         Me.Controls.Add(Me.btnCloudCover)
-        Me.Controls.Add(Me.panelBottom)
         Me.Controls.Add(Me.txtLatitude)
         Me.Controls.Add(Me.lblLatitude)
         Me.Controls.Add(Me.lblCloudCover)
@@ -140,7 +135,6 @@ Public Class frmCmpSol
         Me.KeyPreview = True
         Me.Name = "frmCmpSol"
         Me.Text = "Compute Solar Radiation"
-        Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

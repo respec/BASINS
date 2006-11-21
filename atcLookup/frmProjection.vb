@@ -36,7 +36,7 @@ Public Class frmProjection
     Friend WithEvents cmdOK As System.Windows.Forms.Button
     Friend WithEvents tbxProjection As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmProjection))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmProjection))
         Me.cmdOK = New System.Windows.Forms.Button
         Me.tbxProjection = New System.Windows.Forms.TextBox
         Me.SuspendLayout()
@@ -46,9 +46,9 @@ Public Class frmProjection
         Me.cmdOK.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.cmdOK.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.cmdOK.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdOK.Location = New System.Drawing.Point(128, 176)
+        Me.cmdOK.Location = New System.Drawing.Point(128, 178)
         Me.cmdOK.Name = "cmdOK"
-        Me.cmdOK.Size = New System.Drawing.Size(96, 24)
+        Me.cmdOK.Size = New System.Drawing.Size(80, 20)
         Me.cmdOK.TabIndex = 0
         Me.cmdOK.Text = "&OK"
         '
@@ -57,17 +57,17 @@ Public Class frmProjection
         Me.tbxProjection.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tbxProjection.Location = New System.Drawing.Point(16, 8)
+        Me.tbxProjection.Location = New System.Drawing.Point(13, 7)
         Me.tbxProjection.Multiline = True
         Me.tbxProjection.Name = "tbxProjection"
         Me.tbxProjection.ReadOnly = True
-        Me.tbxProjection.Size = New System.Drawing.Size(320, 152)
+        Me.tbxProjection.Size = New System.Drawing.Size(326, 160)
         Me.tbxProjection.TabIndex = 1
         Me.tbxProjection.Text = "tbxProjection"
         '
         'frmProjection
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(354, 210)
         Me.Controls.Add(Me.tbxProjection)
         Me.Controls.Add(Me.cmdOK)
@@ -76,6 +76,7 @@ Public Class frmProjection
         Me.Name = "frmProjection"
         Me.Text = "Projection Parameters"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

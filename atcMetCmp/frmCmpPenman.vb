@@ -41,7 +41,6 @@ Public Class frmCmpPenman
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents panelBottom As System.Windows.Forms.Panel
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnTMin As System.Windows.Forms.Button
@@ -63,7 +62,6 @@ Public Class frmCmpPenman
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCmpPenman))
         Me.lblJensenPET = New System.Windows.Forms.Label
-        Me.panelBottom = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnTMin = New System.Windows.Forms.Button
@@ -81,169 +79,177 @@ Public Class frmCmpPenman
         Me.btnWind = New System.Windows.Forms.Button
         Me.txtDewP = New System.Windows.Forms.TextBox
         Me.txtWind = New System.Windows.Forms.TextBox
-        Me.panelBottom.SuspendLayout()
         Me.SuspendLayout()
         '
         'lblJensenPET
         '
-        Me.lblJensenPET.Location = New System.Drawing.Point(19, 18)
+        Me.lblJensenPET.AutoSize = True
+        Me.lblJensenPET.Location = New System.Drawing.Point(12, 9)
         Me.lblJensenPET.Name = "lblJensenPET"
-        Me.lblJensenPET.Size = New System.Drawing.Size(173, 19)
+        Me.lblJensenPET.Size = New System.Drawing.Size(122, 13)
         Me.lblJensenPET.TabIndex = 2
         Me.lblJensenPET.Text = "Specify Input Timeseries"
         '
-        'panelBottom
-        '
-        Me.panelBottom.Controls.Add(Me.btnCancel)
-        Me.panelBottom.Controls.Add(Me.btnOk)
-        Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 237)
-        Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(604, 36)
-        Me.panelBottom.TabIndex = 16
-        '
         'btnCancel
         '
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(307, 0)
+        Me.btnCancel.Location = New System.Drawing.Point(447, 198)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(77, 28)
+        Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 1
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(192, 0)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(12, 198)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(77, 28)
+        Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 0
         Me.btnOk.Text = "Ok"
         '
         'btnTMin
         '
-        Me.btnTMin.Location = New System.Drawing.Point(125, 46)
+        Me.btnTMin.Location = New System.Drawing.Point(104, 40)
         Me.btnTMin.Name = "btnTMin"
-        Me.btnTMin.Size = New System.Drawing.Size(57, 23)
+        Me.btnTMin.Size = New System.Drawing.Size(48, 20)
         Me.btnTMin.TabIndex = 18
         Me.btnTMin.Text = "Select"
         '
         'txtTMin
         '
-        Me.txtTMin.Location = New System.Drawing.Point(192, 46)
+        Me.txtTMin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtTMin.Location = New System.Drawing.Point(158, 40)
         Me.txtTMin.Name = "txtTMin"
         Me.txtTMin.ReadOnly = True
-        Me.txtTMin.Size = New System.Drawing.Size(413, 22)
+        Me.txtTMin.Size = New System.Drawing.Size(353, 20)
         Me.txtTMin.TabIndex = 19
         '
         'lblTMin
         '
-        Me.lblTMin.Location = New System.Drawing.Point(10, 46)
+        Me.lblTMin.AutoSize = True
+        Me.lblTMin.Location = New System.Drawing.Point(12, 43)
         Me.lblTMin.Name = "lblTMin"
-        Me.lblTMin.Size = New System.Drawing.Size(76, 19)
+        Me.lblTMin.Size = New System.Drawing.Size(57, 13)
         Me.lblTMin.TabIndex = 20
         Me.lblTMin.Text = "Min Temp:"
         '
         'lblTMax
         '
-        Me.lblTMax.Location = New System.Drawing.Point(10, 83)
+        Me.lblTMax.AutoSize = True
+        Me.lblTMax.Location = New System.Drawing.Point(12, 75)
         Me.lblTMax.Name = "lblTMax"
-        Me.lblTMax.Size = New System.Drawing.Size(76, 19)
+        Me.lblTMax.Size = New System.Drawing.Size(60, 13)
         Me.lblTMax.TabIndex = 21
         Me.lblTMax.Text = "Max Temp:"
         '
         'btnTMax
         '
-        Me.btnTMax.Location = New System.Drawing.Point(125, 83)
+        Me.btnTMax.Location = New System.Drawing.Point(104, 72)
         Me.btnTMax.Name = "btnTMax"
-        Me.btnTMax.Size = New System.Drawing.Size(57, 23)
+        Me.btnTMax.Size = New System.Drawing.Size(48, 20)
         Me.btnTMax.TabIndex = 22
         Me.btnTMax.Text = "Select"
         '
         'txtTMax
         '
-        Me.txtTMax.Location = New System.Drawing.Point(192, 83)
+        Me.txtTMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtTMax.Location = New System.Drawing.Point(158, 72)
         Me.txtTMax.Name = "txtTMax"
         Me.txtTMax.ReadOnly = True
-        Me.txtTMax.Size = New System.Drawing.Size(413, 22)
+        Me.txtTMax.Size = New System.Drawing.Size(353, 20)
         Me.txtTMax.TabIndex = 23
         '
         'lblSRad
         '
-        Me.lblSRad.Location = New System.Drawing.Point(10, 120)
+        Me.lblSRad.AutoSize = True
+        Me.lblSRad.Location = New System.Drawing.Point(12, 107)
         Me.lblSRad.Name = "lblSRad"
-        Me.lblSRad.Size = New System.Drawing.Size(115, 18)
+        Me.lblSRad.Size = New System.Drawing.Size(82, 13)
         Me.lblSRad.TabIndex = 51
         Me.lblSRad.Text = "Solar Radiation:"
         '
         'btnSRad
         '
-        Me.btnSRad.Location = New System.Drawing.Point(125, 120)
+        Me.btnSRad.Location = New System.Drawing.Point(104, 104)
         Me.btnSRad.Name = "btnSRad"
-        Me.btnSRad.Size = New System.Drawing.Size(57, 23)
+        Me.btnSRad.Size = New System.Drawing.Size(48, 20)
         Me.btnSRad.TabIndex = 52
         Me.btnSRad.Text = "Select"
         '
         'txtSRad
         '
-        Me.txtSRad.Location = New System.Drawing.Point(192, 120)
+        Me.txtSRad.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSRad.Location = New System.Drawing.Point(158, 104)
         Me.txtSRad.Name = "txtSRad"
         Me.txtSRad.ReadOnly = True
-        Me.txtSRad.Size = New System.Drawing.Size(413, 22)
+        Me.txtSRad.Size = New System.Drawing.Size(353, 20)
         Me.txtSRad.TabIndex = 53
         '
         'lblDewP
         '
-        Me.lblDewP.Location = New System.Drawing.Point(10, 157)
+        Me.lblDewP.AutoSize = True
+        Me.lblDewP.Location = New System.Drawing.Point(12, 139)
         Me.lblDewP.Name = "lblDewP"
-        Me.lblDewP.Size = New System.Drawing.Size(115, 18)
+        Me.lblDewP.Size = New System.Drawing.Size(85, 13)
         Me.lblDewP.TabIndex = 54
         Me.lblDewP.Text = "Dewpoint Temp:"
         '
         'lblWind
         '
-        Me.lblWind.Location = New System.Drawing.Point(10, 194)
+        Me.lblWind.AutoSize = True
+        Me.lblWind.Location = New System.Drawing.Point(12, 171)
         Me.lblWind.Name = "lblWind"
-        Me.lblWind.Size = New System.Drawing.Size(115, 18)
+        Me.lblWind.Size = New System.Drawing.Size(88, 13)
         Me.lblWind.TabIndex = 55
         Me.lblWind.Text = "Wind Movement:"
         '
         'btnDewP
         '
-        Me.btnDewP.Location = New System.Drawing.Point(125, 157)
+        Me.btnDewP.Location = New System.Drawing.Point(104, 136)
         Me.btnDewP.Name = "btnDewP"
-        Me.btnDewP.Size = New System.Drawing.Size(57, 23)
+        Me.btnDewP.Size = New System.Drawing.Size(48, 20)
         Me.btnDewP.TabIndex = 56
         Me.btnDewP.Text = "Select"
         '
         'btnWind
         '
-        Me.btnWind.Location = New System.Drawing.Point(125, 194)
+        Me.btnWind.Location = New System.Drawing.Point(104, 168)
         Me.btnWind.Name = "btnWind"
-        Me.btnWind.Size = New System.Drawing.Size(57, 23)
+        Me.btnWind.Size = New System.Drawing.Size(48, 20)
         Me.btnWind.TabIndex = 57
         Me.btnWind.Text = "Select"
         '
         'txtDewP
         '
-        Me.txtDewP.Location = New System.Drawing.Point(192, 157)
+        Me.txtDewP.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtDewP.Location = New System.Drawing.Point(158, 136)
         Me.txtDewP.Name = "txtDewP"
         Me.txtDewP.ReadOnly = True
-        Me.txtDewP.Size = New System.Drawing.Size(413, 22)
+        Me.txtDewP.Size = New System.Drawing.Size(353, 20)
         Me.txtDewP.TabIndex = 58
         '
         'txtWind
         '
-        Me.txtWind.Location = New System.Drawing.Point(192, 194)
+        Me.txtWind.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtWind.Location = New System.Drawing.Point(158, 168)
         Me.txtWind.Name = "txtWind"
         Me.txtWind.ReadOnly = True
-        Me.txtWind.Size = New System.Drawing.Size(413, 22)
+        Me.txtWind.Size = New System.Drawing.Size(353, 20)
         Me.txtWind.TabIndex = 59
         '
         'frmCmpPenman
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(604, 273)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(523, 234)
+        Me.Controls.Add(Me.btnCancel)
+        Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.txtWind)
         Me.Controls.Add(Me.txtDewP)
         Me.Controls.Add(Me.btnWind)
@@ -259,13 +265,11 @@ Public Class frmCmpPenman
         Me.Controls.Add(Me.lblTMin)
         Me.Controls.Add(Me.txtTMin)
         Me.Controls.Add(Me.btnTMin)
-        Me.Controls.Add(Me.panelBottom)
         Me.Controls.Add(Me.lblJensenPET)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmCmpPenman"
         Me.Text = "Compute Penman Pan Evaporation"
-        Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

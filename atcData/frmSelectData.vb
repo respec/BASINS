@@ -36,7 +36,6 @@ Friend Class frmSelectData
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
     Friend WithEvents groupTop As System.Windows.Forms.GroupBox
-    Friend WithEvents pnlButtons As System.Windows.Forms.Panel
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents splitAboveSelected As System.Windows.Forms.Splitter
@@ -59,21 +58,22 @@ Friend Class frmSelectData
     Friend WithEvents mnuSelectAll As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
     Friend WithEvents mnuOpenData As System.Windows.Forms.MenuItem
+    Friend WithEvents pnlButtons As System.Windows.Forms.Panel
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSelectData))
+        Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSelectData))
         Me.groupTop = New System.Windows.Forms.GroupBox
         Me.pMatchingGrid = New atcControls.atcGrid
         Me.lblMatching = New System.Windows.Forms.Label
         Me.splitAboveMatching = New System.Windows.Forms.Splitter
         Me.panelCriteria = New System.Windows.Forms.Panel
-        Me.pnlButtons = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.splitAboveSelected = New System.Windows.Forms.Splitter
         Me.groupSelected = New System.Windows.Forms.GroupBox
         Me.pSelectedGrid = New atcControls.atcGrid
-        Me.MainMenu1 = New System.Windows.Forms.MainMenu
+        Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuOpenData = New System.Windows.Forms.MenuItem
         Me.mnuFileManage = New System.Windows.Forms.MenuItem
@@ -87,415 +87,177 @@ Friend Class frmSelectData
         Me.mnuSelectAllMatching = New System.Windows.Forms.MenuItem
         Me.mnuSelectNoMatching = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
+        Me.pnlButtons = New System.Windows.Forms.Panel
         Me.groupTop.SuspendLayout()
-        Me.pnlButtons.SuspendLayout()
         Me.groupSelected.SuspendLayout()
+        Me.pnlButtons.SuspendLayout()
         Me.SuspendLayout()
         '
         'groupTop
         '
-        Me.groupTop.AccessibleDescription = resources.GetString("groupTop.AccessibleDescription")
-        Me.groupTop.AccessibleName = resources.GetString("groupTop.AccessibleName")
-        Me.groupTop.Anchor = CType(resources.GetObject("groupTop.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.groupTop.BackgroundImage = CType(resources.GetObject("groupTop.BackgroundImage"), System.Drawing.Image)
         Me.groupTop.Controls.Add(Me.pMatchingGrid)
         Me.groupTop.Controls.Add(Me.lblMatching)
         Me.groupTop.Controls.Add(Me.splitAboveMatching)
         Me.groupTop.Controls.Add(Me.panelCriteria)
-        Me.groupTop.Dock = CType(resources.GetObject("groupTop.Dock"), System.Windows.Forms.DockStyle)
-        Me.groupTop.Enabled = CType(resources.GetObject("groupTop.Enabled"), Boolean)
-        Me.groupTop.Font = CType(resources.GetObject("groupTop.Font"), System.Drawing.Font)
-        Me.groupTop.ImeMode = CType(resources.GetObject("groupTop.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.groupTop.Location = CType(resources.GetObject("groupTop.Location"), System.Drawing.Point)
+        resources.ApplyResources(Me.groupTop, "groupTop")
         Me.groupTop.Name = "groupTop"
-        Me.groupTop.RightToLeft = CType(resources.GetObject("groupTop.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.groupTop.Size = CType(resources.GetObject("groupTop.Size"), System.Drawing.Size)
-        Me.groupTop.TabIndex = CType(resources.GetObject("groupTop.TabIndex"), Integer)
         Me.groupTop.TabStop = False
-        Me.groupTop.Text = resources.GetString("groupTop.Text")
-        Me.groupTop.Visible = CType(resources.GetObject("groupTop.Visible"), Boolean)
         '
         'pMatchingGrid
         '
-        Me.pMatchingGrid.AccessibleDescription = resources.GetString("pMatchingGrid.AccessibleDescription")
-        Me.pMatchingGrid.AccessibleName = resources.GetString("pMatchingGrid.AccessibleName")
         Me.pMatchingGrid.AllowHorizontalScrolling = True
         Me.pMatchingGrid.AllowNewValidValues = False
-        Me.pMatchingGrid.Anchor = CType(resources.GetObject("pMatchingGrid.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.pMatchingGrid.AutoScroll = CType(resources.GetObject("pMatchingGrid.AutoScroll"), Boolean)
-        Me.pMatchingGrid.AutoScrollMargin = CType(resources.GetObject("pMatchingGrid.AutoScrollMargin"), System.Drawing.Size)
-        Me.pMatchingGrid.AutoScrollMinSize = CType(resources.GetObject("pMatchingGrid.AutoScrollMinSize"), System.Drawing.Size)
-        Me.pMatchingGrid.BackgroundImage = CType(resources.GetObject("pMatchingGrid.BackgroundImage"), System.Drawing.Image)
         Me.pMatchingGrid.CellBackColor = System.Drawing.Color.Empty
-        Me.pMatchingGrid.Dock = CType(resources.GetObject("pMatchingGrid.Dock"), System.Windows.Forms.DockStyle)
-        Me.pMatchingGrid.Enabled = CType(resources.GetObject("pMatchingGrid.Enabled"), Boolean)
-        Me.pMatchingGrid.Font = CType(resources.GetObject("pMatchingGrid.Font"), System.Drawing.Font)
-        Me.pMatchingGrid.ImeMode = CType(resources.GetObject("pMatchingGrid.ImeMode"), System.Windows.Forms.ImeMode)
+        resources.ApplyResources(Me.pMatchingGrid, "pMatchingGrid")
         Me.pMatchingGrid.LineColor = System.Drawing.Color.Empty
         Me.pMatchingGrid.LineWidth = 0.0!
-        Me.pMatchingGrid.Location = CType(resources.GetObject("pMatchingGrid.Location"), System.Drawing.Point)
         Me.pMatchingGrid.Name = "pMatchingGrid"
-        Me.pMatchingGrid.RightToLeft = CType(resources.GetObject("pMatchingGrid.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.pMatchingGrid.Size = CType(resources.GetObject("pMatchingGrid.Size"), System.Drawing.Size)
         Me.pMatchingGrid.Source = Nothing
-        Me.pMatchingGrid.TabIndex = CType(resources.GetObject("pMatchingGrid.TabIndex"), Integer)
-        Me.pMatchingGrid.Visible = CType(resources.GetObject("pMatchingGrid.Visible"), Boolean)
         '
         'lblMatching
         '
-        Me.lblMatching.AccessibleDescription = resources.GetString("lblMatching.AccessibleDescription")
-        Me.lblMatching.AccessibleName = resources.GetString("lblMatching.AccessibleName")
-        Me.lblMatching.Anchor = CType(resources.GetObject("lblMatching.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.lblMatching.AutoSize = CType(resources.GetObject("lblMatching.AutoSize"), Boolean)
-        Me.lblMatching.Dock = CType(resources.GetObject("lblMatching.Dock"), System.Windows.Forms.DockStyle)
-        Me.lblMatching.Enabled = CType(resources.GetObject("lblMatching.Enabled"), Boolean)
-        Me.lblMatching.Font = CType(resources.GetObject("lblMatching.Font"), System.Drawing.Font)
-        Me.lblMatching.Image = CType(resources.GetObject("lblMatching.Image"), System.Drawing.Image)
-        Me.lblMatching.ImageAlign = CType(resources.GetObject("lblMatching.ImageAlign"), System.Drawing.ContentAlignment)
-        Me.lblMatching.ImageIndex = CType(resources.GetObject("lblMatching.ImageIndex"), Integer)
-        Me.lblMatching.ImeMode = CType(resources.GetObject("lblMatching.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.lblMatching.Location = CType(resources.GetObject("lblMatching.Location"), System.Drawing.Point)
+        resources.ApplyResources(Me.lblMatching, "lblMatching")
         Me.lblMatching.Name = "lblMatching"
-        Me.lblMatching.RightToLeft = CType(resources.GetObject("lblMatching.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.lblMatching.Size = CType(resources.GetObject("lblMatching.Size"), System.Drawing.Size)
-        Me.lblMatching.TabIndex = CType(resources.GetObject("lblMatching.TabIndex"), Integer)
-        Me.lblMatching.Text = resources.GetString("lblMatching.Text")
-        Me.lblMatching.TextAlign = CType(resources.GetObject("lblMatching.TextAlign"), System.Drawing.ContentAlignment)
-        Me.lblMatching.Visible = CType(resources.GetObject("lblMatching.Visible"), Boolean)
         '
         'splitAboveMatching
         '
-        Me.splitAboveMatching.AccessibleDescription = resources.GetString("splitAboveMatching.AccessibleDescription")
-        Me.splitAboveMatching.AccessibleName = resources.GetString("splitAboveMatching.AccessibleName")
-        Me.splitAboveMatching.Anchor = CType(resources.GetObject("splitAboveMatching.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.splitAboveMatching.BackgroundImage = CType(resources.GetObject("splitAboveMatching.BackgroundImage"), System.Drawing.Image)
-        Me.splitAboveMatching.Dock = CType(resources.GetObject("splitAboveMatching.Dock"), System.Windows.Forms.DockStyle)
-        Me.splitAboveMatching.Enabled = CType(resources.GetObject("splitAboveMatching.Enabled"), Boolean)
-        Me.splitAboveMatching.Font = CType(resources.GetObject("splitAboveMatching.Font"), System.Drawing.Font)
-        Me.splitAboveMatching.ImeMode = CType(resources.GetObject("splitAboveMatching.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.splitAboveMatching.Location = CType(resources.GetObject("splitAboveMatching.Location"), System.Drawing.Point)
-        Me.splitAboveMatching.MinExtra = CType(resources.GetObject("splitAboveMatching.MinExtra"), Integer)
-        Me.splitAboveMatching.MinSize = CType(resources.GetObject("splitAboveMatching.MinSize"), Integer)
+        resources.ApplyResources(Me.splitAboveMatching, "splitAboveMatching")
         Me.splitAboveMatching.Name = "splitAboveMatching"
-        Me.splitAboveMatching.RightToLeft = CType(resources.GetObject("splitAboveMatching.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.splitAboveMatching.Size = CType(resources.GetObject("splitAboveMatching.Size"), System.Drawing.Size)
-        Me.splitAboveMatching.TabIndex = CType(resources.GetObject("splitAboveMatching.TabIndex"), Integer)
         Me.splitAboveMatching.TabStop = False
-        Me.splitAboveMatching.Visible = CType(resources.GetObject("splitAboveMatching.Visible"), Boolean)
         '
         'panelCriteria
         '
-        Me.panelCriteria.AccessibleDescription = resources.GetString("panelCriteria.AccessibleDescription")
-        Me.panelCriteria.AccessibleName = resources.GetString("panelCriteria.AccessibleName")
-        Me.panelCriteria.Anchor = CType(resources.GetObject("panelCriteria.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.panelCriteria.AutoScroll = CType(resources.GetObject("panelCriteria.AutoScroll"), Boolean)
-        Me.panelCriteria.AutoScrollMargin = CType(resources.GetObject("panelCriteria.AutoScrollMargin"), System.Drawing.Size)
-        Me.panelCriteria.AutoScrollMinSize = CType(resources.GetObject("panelCriteria.AutoScrollMinSize"), System.Drawing.Size)
-        Me.panelCriteria.BackgroundImage = CType(resources.GetObject("panelCriteria.BackgroundImage"), System.Drawing.Image)
-        Me.panelCriteria.Dock = CType(resources.GetObject("panelCriteria.Dock"), System.Windows.Forms.DockStyle)
-        Me.panelCriteria.Enabled = CType(resources.GetObject("panelCriteria.Enabled"), Boolean)
-        Me.panelCriteria.Font = CType(resources.GetObject("panelCriteria.Font"), System.Drawing.Font)
-        Me.panelCriteria.ImeMode = CType(resources.GetObject("panelCriteria.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.panelCriteria.Location = CType(resources.GetObject("panelCriteria.Location"), System.Drawing.Point)
+        resources.ApplyResources(Me.panelCriteria, "panelCriteria")
         Me.panelCriteria.Name = "panelCriteria"
-        Me.panelCriteria.RightToLeft = CType(resources.GetObject("panelCriteria.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.panelCriteria.Size = CType(resources.GetObject("panelCriteria.Size"), System.Drawing.Size)
-        Me.panelCriteria.TabIndex = CType(resources.GetObject("panelCriteria.TabIndex"), Integer)
-        Me.panelCriteria.Text = resources.GetString("panelCriteria.Text")
-        Me.panelCriteria.Visible = CType(resources.GetObject("panelCriteria.Visible"), Boolean)
-        '
-        'pnlButtons
-        '
-        Me.pnlButtons.AccessibleDescription = resources.GetString("pnlButtons.AccessibleDescription")
-        Me.pnlButtons.AccessibleName = resources.GetString("pnlButtons.AccessibleName")
-        Me.pnlButtons.Anchor = CType(resources.GetObject("pnlButtons.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.pnlButtons.AutoScroll = CType(resources.GetObject("pnlButtons.AutoScroll"), Boolean)
-        Me.pnlButtons.AutoScrollMargin = CType(resources.GetObject("pnlButtons.AutoScrollMargin"), System.Drawing.Size)
-        Me.pnlButtons.AutoScrollMinSize = CType(resources.GetObject("pnlButtons.AutoScrollMinSize"), System.Drawing.Size)
-        Me.pnlButtons.BackgroundImage = CType(resources.GetObject("pnlButtons.BackgroundImage"), System.Drawing.Image)
-        Me.pnlButtons.Controls.Add(Me.btnCancel)
-        Me.pnlButtons.Controls.Add(Me.btnOk)
-        Me.pnlButtons.Dock = CType(resources.GetObject("pnlButtons.Dock"), System.Windows.Forms.DockStyle)
-        Me.pnlButtons.Enabled = CType(resources.GetObject("pnlButtons.Enabled"), Boolean)
-        Me.pnlButtons.Font = CType(resources.GetObject("pnlButtons.Font"), System.Drawing.Font)
-        Me.pnlButtons.ImeMode = CType(resources.GetObject("pnlButtons.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.pnlButtons.Location = CType(resources.GetObject("pnlButtons.Location"), System.Drawing.Point)
-        Me.pnlButtons.Name = "pnlButtons"
-        Me.pnlButtons.RightToLeft = CType(resources.GetObject("pnlButtons.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.pnlButtons.Size = CType(resources.GetObject("pnlButtons.Size"), System.Drawing.Size)
-        Me.pnlButtons.TabIndex = CType(resources.GetObject("pnlButtons.TabIndex"), Integer)
-        Me.pnlButtons.Text = resources.GetString("pnlButtons.Text")
-        Me.pnlButtons.Visible = CType(resources.GetObject("pnlButtons.Visible"), Boolean)
         '
         'btnCancel
         '
-        Me.btnCancel.AccessibleDescription = resources.GetString("btnCancel.AccessibleDescription")
-        Me.btnCancel.AccessibleName = resources.GetString("btnCancel.AccessibleName")
-        Me.btnCancel.Anchor = CType(resources.GetObject("btnCancel.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.btnCancel.BackgroundImage = CType(resources.GetObject("btnCancel.BackgroundImage"), System.Drawing.Image)
+        resources.ApplyResources(Me.btnCancel, "btnCancel")
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Dock = CType(resources.GetObject("btnCancel.Dock"), System.Windows.Forms.DockStyle)
-        Me.btnCancel.Enabled = CType(resources.GetObject("btnCancel.Enabled"), Boolean)
-        Me.btnCancel.FlatStyle = CType(resources.GetObject("btnCancel.FlatStyle"), System.Windows.Forms.FlatStyle)
-        Me.btnCancel.Font = CType(resources.GetObject("btnCancel.Font"), System.Drawing.Font)
-        Me.btnCancel.Image = CType(resources.GetObject("btnCancel.Image"), System.Drawing.Image)
-        Me.btnCancel.ImageAlign = CType(resources.GetObject("btnCancel.ImageAlign"), System.Drawing.ContentAlignment)
-        Me.btnCancel.ImageIndex = CType(resources.GetObject("btnCancel.ImageIndex"), Integer)
-        Me.btnCancel.ImeMode = CType(resources.GetObject("btnCancel.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.btnCancel.Location = CType(resources.GetObject("btnCancel.Location"), System.Drawing.Point)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.RightToLeft = CType(resources.GetObject("btnCancel.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.btnCancel.Size = CType(resources.GetObject("btnCancel.Size"), System.Drawing.Size)
-        Me.btnCancel.TabIndex = CType(resources.GetObject("btnCancel.TabIndex"), Integer)
-        Me.btnCancel.Text = resources.GetString("btnCancel.Text")
-        Me.btnCancel.TextAlign = CType(resources.GetObject("btnCancel.TextAlign"), System.Drawing.ContentAlignment)
-        Me.btnCancel.Visible = CType(resources.GetObject("btnCancel.Visible"), Boolean)
         '
         'btnOk
         '
-        Me.btnOk.AccessibleDescription = resources.GetString("btnOk.AccessibleDescription")
-        Me.btnOk.AccessibleName = resources.GetString("btnOk.AccessibleName")
-        Me.btnOk.Anchor = CType(resources.GetObject("btnOk.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.BackgroundImage = CType(resources.GetObject("btnOk.BackgroundImage"), System.Drawing.Image)
-        Me.btnOk.Dock = CType(resources.GetObject("btnOk.Dock"), System.Windows.Forms.DockStyle)
-        Me.btnOk.Enabled = CType(resources.GetObject("btnOk.Enabled"), Boolean)
-        Me.btnOk.FlatStyle = CType(resources.GetObject("btnOk.FlatStyle"), System.Windows.Forms.FlatStyle)
-        Me.btnOk.Font = CType(resources.GetObject("btnOk.Font"), System.Drawing.Font)
-        Me.btnOk.Image = CType(resources.GetObject("btnOk.Image"), System.Drawing.Image)
-        Me.btnOk.ImageAlign = CType(resources.GetObject("btnOk.ImageAlign"), System.Drawing.ContentAlignment)
-        Me.btnOk.ImageIndex = CType(resources.GetObject("btnOk.ImageIndex"), Integer)
-        Me.btnOk.ImeMode = CType(resources.GetObject("btnOk.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.btnOk.Location = CType(resources.GetObject("btnOk.Location"), System.Drawing.Point)
+        resources.ApplyResources(Me.btnOk, "btnOk")
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.RightToLeft = CType(resources.GetObject("btnOk.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.btnOk.Size = CType(resources.GetObject("btnOk.Size"), System.Drawing.Size)
-        Me.btnOk.TabIndex = CType(resources.GetObject("btnOk.TabIndex"), Integer)
-        Me.btnOk.Text = resources.GetString("btnOk.Text")
-        Me.btnOk.TextAlign = CType(resources.GetObject("btnOk.TextAlign"), System.Drawing.ContentAlignment)
-        Me.btnOk.Visible = CType(resources.GetObject("btnOk.Visible"), Boolean)
         '
         'splitAboveSelected
         '
-        Me.splitAboveSelected.AccessibleDescription = resources.GetString("splitAboveSelected.AccessibleDescription")
-        Me.splitAboveSelected.AccessibleName = resources.GetString("splitAboveSelected.AccessibleName")
-        Me.splitAboveSelected.Anchor = CType(resources.GetObject("splitAboveSelected.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.splitAboveSelected.BackgroundImage = CType(resources.GetObject("splitAboveSelected.BackgroundImage"), System.Drawing.Image)
-        Me.splitAboveSelected.Dock = CType(resources.GetObject("splitAboveSelected.Dock"), System.Windows.Forms.DockStyle)
-        Me.splitAboveSelected.Enabled = CType(resources.GetObject("splitAboveSelected.Enabled"), Boolean)
-        Me.splitAboveSelected.Font = CType(resources.GetObject("splitAboveSelected.Font"), System.Drawing.Font)
-        Me.splitAboveSelected.ImeMode = CType(resources.GetObject("splitAboveSelected.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.splitAboveSelected.Location = CType(resources.GetObject("splitAboveSelected.Location"), System.Drawing.Point)
-        Me.splitAboveSelected.MinExtra = CType(resources.GetObject("splitAboveSelected.MinExtra"), Integer)
-        Me.splitAboveSelected.MinSize = CType(resources.GetObject("splitAboveSelected.MinSize"), Integer)
+        resources.ApplyResources(Me.splitAboveSelected, "splitAboveSelected")
         Me.splitAboveSelected.Name = "splitAboveSelected"
-        Me.splitAboveSelected.RightToLeft = CType(resources.GetObject("splitAboveSelected.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.splitAboveSelected.Size = CType(resources.GetObject("splitAboveSelected.Size"), System.Drawing.Size)
-        Me.splitAboveSelected.TabIndex = CType(resources.GetObject("splitAboveSelected.TabIndex"), Integer)
         Me.splitAboveSelected.TabStop = False
-        Me.splitAboveSelected.Visible = CType(resources.GetObject("splitAboveSelected.Visible"), Boolean)
         '
         'groupSelected
         '
-        Me.groupSelected.AccessibleDescription = resources.GetString("groupSelected.AccessibleDescription")
-        Me.groupSelected.AccessibleName = resources.GetString("groupSelected.AccessibleName")
-        Me.groupSelected.Anchor = CType(resources.GetObject("groupSelected.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.groupSelected.BackgroundImage = CType(resources.GetObject("groupSelected.BackgroundImage"), System.Drawing.Image)
         Me.groupSelected.Controls.Add(Me.pSelectedGrid)
-        Me.groupSelected.Dock = CType(resources.GetObject("groupSelected.Dock"), System.Windows.Forms.DockStyle)
-        Me.groupSelected.Enabled = CType(resources.GetObject("groupSelected.Enabled"), Boolean)
-        Me.groupSelected.Font = CType(resources.GetObject("groupSelected.Font"), System.Drawing.Font)
-        Me.groupSelected.ImeMode = CType(resources.GetObject("groupSelected.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.groupSelected.Location = CType(resources.GetObject("groupSelected.Location"), System.Drawing.Point)
+        resources.ApplyResources(Me.groupSelected, "groupSelected")
         Me.groupSelected.Name = "groupSelected"
-        Me.groupSelected.RightToLeft = CType(resources.GetObject("groupSelected.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.groupSelected.Size = CType(resources.GetObject("groupSelected.Size"), System.Drawing.Size)
-        Me.groupSelected.TabIndex = CType(resources.GetObject("groupSelected.TabIndex"), Integer)
         Me.groupSelected.TabStop = False
-        Me.groupSelected.Text = resources.GetString("groupSelected.Text")
-        Me.groupSelected.Visible = CType(resources.GetObject("groupSelected.Visible"), Boolean)
         '
         'pSelectedGrid
         '
-        Me.pSelectedGrid.AccessibleDescription = resources.GetString("pSelectedGrid.AccessibleDescription")
-        Me.pSelectedGrid.AccessibleName = resources.GetString("pSelectedGrid.AccessibleName")
         Me.pSelectedGrid.AllowHorizontalScrolling = True
         Me.pSelectedGrid.AllowNewValidValues = False
-        Me.pSelectedGrid.Anchor = CType(resources.GetObject("pSelectedGrid.Anchor"), System.Windows.Forms.AnchorStyles)
-        Me.pSelectedGrid.AutoScroll = CType(resources.GetObject("pSelectedGrid.AutoScroll"), Boolean)
-        Me.pSelectedGrid.AutoScrollMargin = CType(resources.GetObject("pSelectedGrid.AutoScrollMargin"), System.Drawing.Size)
-        Me.pSelectedGrid.AutoScrollMinSize = CType(resources.GetObject("pSelectedGrid.AutoScrollMinSize"), System.Drawing.Size)
-        Me.pSelectedGrid.BackgroundImage = CType(resources.GetObject("pSelectedGrid.BackgroundImage"), System.Drawing.Image)
         Me.pSelectedGrid.CellBackColor = System.Drawing.Color.Empty
-        Me.pSelectedGrid.Dock = CType(resources.GetObject("pSelectedGrid.Dock"), System.Windows.Forms.DockStyle)
-        Me.pSelectedGrid.Enabled = CType(resources.GetObject("pSelectedGrid.Enabled"), Boolean)
-        Me.pSelectedGrid.Font = CType(resources.GetObject("pSelectedGrid.Font"), System.Drawing.Font)
-        Me.pSelectedGrid.ImeMode = CType(resources.GetObject("pSelectedGrid.ImeMode"), System.Windows.Forms.ImeMode)
+        resources.ApplyResources(Me.pSelectedGrid, "pSelectedGrid")
         Me.pSelectedGrid.LineColor = System.Drawing.Color.Empty
         Me.pSelectedGrid.LineWidth = 0.0!
-        Me.pSelectedGrid.Location = CType(resources.GetObject("pSelectedGrid.Location"), System.Drawing.Point)
         Me.pSelectedGrid.Name = "pSelectedGrid"
-        Me.pSelectedGrid.RightToLeft = CType(resources.GetObject("pSelectedGrid.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.pSelectedGrid.Size = CType(resources.GetObject("pSelectedGrid.Size"), System.Drawing.Size)
         Me.pSelectedGrid.Source = Nothing
-        Me.pSelectedGrid.TabIndex = CType(resources.GetObject("pSelectedGrid.TabIndex"), Integer)
-        Me.pSelectedGrid.Visible = CType(resources.GetObject("pSelectedGrid.Visible"), Boolean)
         '
         'MainMenu1
         '
         Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuAttributes, Me.mnuSelect, Me.mnuHelp})
-        Me.MainMenu1.RightToLeft = CType(resources.GetObject("MainMenu1.RightToLeft"), System.Windows.Forms.RightToLeft)
         '
         'mnuFile
         '
-        Me.mnuFile.Enabled = CType(resources.GetObject("mnuFile.Enabled"), Boolean)
         Me.mnuFile.Index = 0
         Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenData, Me.mnuFileManage})
-        Me.mnuFile.Shortcut = CType(resources.GetObject("mnuFile.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuFile.ShowShortcut = CType(resources.GetObject("mnuFile.ShowShortcut"), Boolean)
-        Me.mnuFile.Text = resources.GetString("mnuFile.Text")
-        Me.mnuFile.Visible = CType(resources.GetObject("mnuFile.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuFile, "mnuFile")
         '
         'mnuOpenData
         '
-        Me.mnuOpenData.Enabled = CType(resources.GetObject("mnuOpenData.Enabled"), Boolean)
         Me.mnuOpenData.Index = 0
-        Me.mnuOpenData.Shortcut = CType(resources.GetObject("mnuOpenData.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuOpenData.ShowShortcut = CType(resources.GetObject("mnuOpenData.ShowShortcut"), Boolean)
-        Me.mnuOpenData.Text = resources.GetString("mnuOpenData.Text")
-        Me.mnuOpenData.Visible = CType(resources.GetObject("mnuOpenData.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuOpenData, "mnuOpenData")
         '
         'mnuFileManage
         '
-        Me.mnuFileManage.Enabled = CType(resources.GetObject("mnuFileManage.Enabled"), Boolean)
         Me.mnuFileManage.Index = 1
-        Me.mnuFileManage.Shortcut = CType(resources.GetObject("mnuFileManage.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuFileManage.ShowShortcut = CType(resources.GetObject("mnuFileManage.ShowShortcut"), Boolean)
-        Me.mnuFileManage.Text = resources.GetString("mnuFileManage.Text")
-        Me.mnuFileManage.Visible = CType(resources.GetObject("mnuFileManage.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuFileManage, "mnuFileManage")
         '
         'mnuAttributes
         '
-        Me.mnuAttributes.Enabled = CType(resources.GetObject("mnuAttributes.Enabled"), Boolean)
         Me.mnuAttributes.Index = 1
         Me.mnuAttributes.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributesAdd, Me.mnuAttributesRemove, Me.mnuAttributesMove})
-        Me.mnuAttributes.Shortcut = CType(resources.GetObject("mnuAttributes.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuAttributes.ShowShortcut = CType(resources.GetObject("mnuAttributes.ShowShortcut"), Boolean)
-        Me.mnuAttributes.Text = resources.GetString("mnuAttributes.Text")
-        Me.mnuAttributes.Visible = CType(resources.GetObject("mnuAttributes.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuAttributes, "mnuAttributes")
         '
         'mnuAttributesAdd
         '
-        Me.mnuAttributesAdd.Enabled = CType(resources.GetObject("mnuAttributesAdd.Enabled"), Boolean)
         Me.mnuAttributesAdd.Index = 0
-        Me.mnuAttributesAdd.Shortcut = CType(resources.GetObject("mnuAttributesAdd.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuAttributesAdd.ShowShortcut = CType(resources.GetObject("mnuAttributesAdd.ShowShortcut"), Boolean)
-        Me.mnuAttributesAdd.Text = resources.GetString("mnuAttributesAdd.Text")
-        Me.mnuAttributesAdd.Visible = CType(resources.GetObject("mnuAttributesAdd.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuAttributesAdd, "mnuAttributesAdd")
         '
         'mnuAttributesRemove
         '
-        Me.mnuAttributesRemove.Enabled = CType(resources.GetObject("mnuAttributesRemove.Enabled"), Boolean)
         Me.mnuAttributesRemove.Index = 1
-        Me.mnuAttributesRemove.Shortcut = CType(resources.GetObject("mnuAttributesRemove.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuAttributesRemove.ShowShortcut = CType(resources.GetObject("mnuAttributesRemove.ShowShortcut"), Boolean)
-        Me.mnuAttributesRemove.Text = resources.GetString("mnuAttributesRemove.Text")
-        Me.mnuAttributesRemove.Visible = CType(resources.GetObject("mnuAttributesRemove.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuAttributesRemove, "mnuAttributesRemove")
         '
         'mnuAttributesMove
         '
-        Me.mnuAttributesMove.Enabled = CType(resources.GetObject("mnuAttributesMove.Enabled"), Boolean)
         Me.mnuAttributesMove.Index = 2
-        Me.mnuAttributesMove.Shortcut = CType(resources.GetObject("mnuAttributesMove.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuAttributesMove.ShowShortcut = CType(resources.GetObject("mnuAttributesMove.ShowShortcut"), Boolean)
-        Me.mnuAttributesMove.Text = resources.GetString("mnuAttributesMove.Text")
-        Me.mnuAttributesMove.Visible = CType(resources.GetObject("mnuAttributesMove.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuAttributesMove, "mnuAttributesMove")
         '
         'mnuSelect
         '
-        Me.mnuSelect.Enabled = CType(resources.GetObject("mnuSelect.Enabled"), Boolean)
         Me.mnuSelect.Index = 2
         Me.mnuSelect.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuSelectAll, Me.mnuSelectClear, Me.mnuSelectAllMatching, Me.mnuSelectNoMatching})
-        Me.mnuSelect.Shortcut = CType(resources.GetObject("mnuSelect.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuSelect.ShowShortcut = CType(resources.GetObject("mnuSelect.ShowShortcut"), Boolean)
-        Me.mnuSelect.Text = resources.GetString("mnuSelect.Text")
-        Me.mnuSelect.Visible = CType(resources.GetObject("mnuSelect.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuSelect, "mnuSelect")
         '
         'mnuSelectAll
         '
-        Me.mnuSelectAll.Enabled = CType(resources.GetObject("mnuSelectAll.Enabled"), Boolean)
         Me.mnuSelectAll.Index = 0
-        Me.mnuSelectAll.Shortcut = CType(resources.GetObject("mnuSelectAll.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuSelectAll.ShowShortcut = CType(resources.GetObject("mnuSelectAll.ShowShortcut"), Boolean)
-        Me.mnuSelectAll.Text = resources.GetString("mnuSelectAll.Text")
-        Me.mnuSelectAll.Visible = CType(resources.GetObject("mnuSelectAll.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuSelectAll, "mnuSelectAll")
         '
         'mnuSelectClear
         '
-        Me.mnuSelectClear.Enabled = CType(resources.GetObject("mnuSelectClear.Enabled"), Boolean)
         Me.mnuSelectClear.Index = 1
-        Me.mnuSelectClear.Shortcut = CType(resources.GetObject("mnuSelectClear.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuSelectClear.ShowShortcut = CType(resources.GetObject("mnuSelectClear.ShowShortcut"), Boolean)
-        Me.mnuSelectClear.Text = resources.GetString("mnuSelectClear.Text")
-        Me.mnuSelectClear.Visible = CType(resources.GetObject("mnuSelectClear.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuSelectClear, "mnuSelectClear")
         '
         'mnuSelectAllMatching
         '
-        Me.mnuSelectAllMatching.Enabled = CType(resources.GetObject("mnuSelectAllMatching.Enabled"), Boolean)
         Me.mnuSelectAllMatching.Index = 2
-        Me.mnuSelectAllMatching.Shortcut = CType(resources.GetObject("mnuSelectAllMatching.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuSelectAllMatching.ShowShortcut = CType(resources.GetObject("mnuSelectAllMatching.ShowShortcut"), Boolean)
-        Me.mnuSelectAllMatching.Text = resources.GetString("mnuSelectAllMatching.Text")
-        Me.mnuSelectAllMatching.Visible = CType(resources.GetObject("mnuSelectAllMatching.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuSelectAllMatching, "mnuSelectAllMatching")
         '
         'mnuSelectNoMatching
         '
-        Me.mnuSelectNoMatching.Enabled = CType(resources.GetObject("mnuSelectNoMatching.Enabled"), Boolean)
         Me.mnuSelectNoMatching.Index = 3
-        Me.mnuSelectNoMatching.Shortcut = CType(resources.GetObject("mnuSelectNoMatching.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuSelectNoMatching.ShowShortcut = CType(resources.GetObject("mnuSelectNoMatching.ShowShortcut"), Boolean)
-        Me.mnuSelectNoMatching.Text = resources.GetString("mnuSelectNoMatching.Text")
-        Me.mnuSelectNoMatching.Visible = CType(resources.GetObject("mnuSelectNoMatching.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuSelectNoMatching, "mnuSelectNoMatching")
         '
         'mnuHelp
         '
-        Me.mnuHelp.Enabled = CType(resources.GetObject("mnuHelp.Enabled"), Boolean)
         Me.mnuHelp.Index = 3
-        Me.mnuHelp.Shortcut = CType(resources.GetObject("mnuHelp.Shortcut"), System.Windows.Forms.Shortcut)
-        Me.mnuHelp.ShowShortcut = CType(resources.GetObject("mnuHelp.ShowShortcut"), Boolean)
-        Me.mnuHelp.Text = resources.GetString("mnuHelp.Text")
-        Me.mnuHelp.Visible = CType(resources.GetObject("mnuHelp.Visible"), Boolean)
+        resources.ApplyResources(Me.mnuHelp, "mnuHelp")
+        '
+        'pnlButtons
+        '
+        Me.pnlButtons.Controls.Add(Me.btnCancel)
+        Me.pnlButtons.Controls.Add(Me.btnOk)
+        resources.ApplyResources(Me.pnlButtons, "pnlButtons")
+        Me.pnlButtons.Name = "pnlButtons"
         '
         'frmSelectData
         '
         Me.AcceptButton = Me.btnOk
-        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
-        Me.AccessibleName = resources.GetString("$this.AccessibleName")
-        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
-        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
-        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
-        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
-        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        resources.ApplyResources(Me, "$this")
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
         Me.Controls.Add(Me.groupSelected)
         Me.Controls.Add(Me.splitAboveSelected)
         Me.Controls.Add(Me.pnlButtons)
         Me.Controls.Add(Me.groupTop)
-        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
-        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
-        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
-        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
         Me.Menu = Me.MainMenu1
-        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
         Me.Name = "frmSelectData"
-        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
-        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
-        Me.Text = resources.GetString("$this.Text")
         Me.groupTop.ResumeLayout(False)
-        Me.pnlButtons.ResumeLayout(False)
         Me.groupSelected.ResumeLayout(False)
+        Me.pnlButtons.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub

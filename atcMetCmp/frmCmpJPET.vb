@@ -11,6 +11,8 @@ Public Class frmCmpJPET
     Private pSRadTS As atcTimeseries
     Private pDataManager As atcDataManager
     Private cCTX As Double
+    Friend WithEvents rdoDegC As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoDegF As System.Windows.Forms.RadioButton
     Private cCTS(12) As Double
 
 #Region " Windows Form Designer generated code "
@@ -41,7 +43,6 @@ Public Class frmCmpJPET
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents panelBottom As System.Windows.Forms.Panel
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnTMin As System.Windows.Forms.Button
@@ -50,8 +51,6 @@ Public Class frmCmpJPET
     Friend WithEvents lblTMax As System.Windows.Forms.Label
     Friend WithEvents btnTMax As System.Windows.Forms.Button
     Friend WithEvents txtTMax As System.Windows.Forms.TextBox
-    Friend WithEvents rdoDegF As System.Windows.Forms.RadioButton
-    Friend WithEvents rdoDegC As System.Windows.Forms.RadioButton
     Friend WithEvents lblMonCoeff As System.Windows.Forms.Label
     Friend WithEvents lblJan As System.Windows.Forms.Label
     Friend WithEvents lblFeb As System.Windows.Forms.Label
@@ -83,13 +82,11 @@ Public Class frmCmpJPET
     Friend WithEvents lblSRad As System.Windows.Forms.Label
     Friend WithEvents btnSRad As System.Windows.Forms.Button
     Friend WithEvents txtSRad As System.Windows.Forms.TextBox
-    Friend WithEvents lblTempUnits As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCmpJPET))
         Me.lblJensenPET = New System.Windows.Forms.Label
         Me.lblConstant = New System.Windows.Forms.Label
         Me.txtConstant = New System.Windows.Forms.TextBox
-        Me.panelBottom = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnTMin = New System.Windows.Forms.Button
@@ -98,8 +95,6 @@ Public Class frmCmpJPET
         Me.lblTMax = New System.Windows.Forms.Label
         Me.btnTMax = New System.Windows.Forms.Button
         Me.txtTMax = New System.Windows.Forms.TextBox
-        Me.rdoDegF = New System.Windows.Forms.RadioButton
-        Me.rdoDegC = New System.Windows.Forms.RadioButton
         Me.lblMonCoeff = New System.Windows.Forms.Label
         Me.lblJan = New System.Windows.Forms.Label
         Me.lblFeb = New System.Windows.Forms.Label
@@ -128,364 +123,374 @@ Public Class frmCmpJPET
         Me.lblSRad = New System.Windows.Forms.Label
         Me.btnSRad = New System.Windows.Forms.Button
         Me.txtSRad = New System.Windows.Forms.TextBox
-        Me.lblTempUnits = New System.Windows.Forms.Label
-        Me.panelBottom.SuspendLayout()
+        Me.rdoDegC = New System.Windows.Forms.RadioButton
+        Me.rdoDegF = New System.Windows.Forms.RadioButton
         Me.SuspendLayout()
         '
         'lblJensenPET
         '
-        Me.lblJensenPET.Location = New System.Drawing.Point(19, 18)
+        Me.lblJensenPET.AutoSize = True
+        Me.lblJensenPET.Location = New System.Drawing.Point(12, 9)
         Me.lblJensenPET.Name = "lblJensenPET"
-        Me.lblJensenPET.Size = New System.Drawing.Size(173, 19)
+        Me.lblJensenPET.Size = New System.Drawing.Size(122, 13)
         Me.lblJensenPET.TabIndex = 2
         Me.lblJensenPET.Text = "Specify Input Timeseries"
         '
         'lblConstant
         '
-        Me.lblConstant.Location = New System.Drawing.Point(10, 166)
+        Me.lblConstant.AutoSize = True
+        Me.lblConstant.Location = New System.Drawing.Point(12, 144)
         Me.lblConstant.Name = "lblConstant"
-        Me.lblConstant.Size = New System.Drawing.Size(153, 19)
+        Me.lblConstant.Size = New System.Drawing.Size(105, 13)
         Me.lblConstant.TabIndex = 3
         Me.lblConstant.Text = "Constant Coefficient:"
         '
         'txtConstant
         '
-        Me.txtConstant.Location = New System.Drawing.Point(173, 166)
+        Me.txtConstant.Location = New System.Drawing.Point(154, 141)
         Me.txtConstant.Name = "txtConstant"
-        Me.txtConstant.Size = New System.Drawing.Size(86, 22)
+        Me.txtConstant.Size = New System.Drawing.Size(72, 20)
         Me.txtConstant.TabIndex = 4
-        '
-        'panelBottom
-        '
-        Me.panelBottom.Controls.Add(Me.btnCancel)
-        Me.panelBottom.Controls.Add(Me.btnOk)
-        Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 291)
-        Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(595, 37)
-        Me.panelBottom.TabIndex = 16
         '
         'btnCancel
         '
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(288, 0)
+        Me.btnCancel.Location = New System.Drawing.Point(432, 257)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(77, 28)
+        Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 1
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(173, 0)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(12, 257)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(77, 28)
+        Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 0
         Me.btnOk.Text = "Ok"
         '
         'btnTMin
         '
-        Me.btnTMin.Location = New System.Drawing.Point(106, 46)
+        Me.btnTMin.Location = New System.Drawing.Point(100, 39)
         Me.btnTMin.Name = "btnTMin"
-        Me.btnTMin.Size = New System.Drawing.Size(57, 23)
+        Me.btnTMin.Size = New System.Drawing.Size(48, 20)
         Me.btnTMin.TabIndex = 18
         Me.btnTMin.Text = "Select"
         '
         'txtTMin
         '
-        Me.txtTMin.Location = New System.Drawing.Point(173, 46)
+        Me.txtTMin.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtTMin.Location = New System.Drawing.Point(154, 40)
         Me.txtTMin.Name = "txtTMin"
         Me.txtTMin.ReadOnly = True
-        Me.txtTMin.Size = New System.Drawing.Size(413, 22)
+        Me.txtTMin.Size = New System.Drawing.Size(342, 20)
         Me.txtTMin.TabIndex = 19
         '
         'lblTMin
         '
-        Me.lblTMin.Location = New System.Drawing.Point(10, 46)
+        Me.lblTMin.AutoSize = True
+        Me.lblTMin.Location = New System.Drawing.Point(37, 43)
         Me.lblTMin.Name = "lblTMin"
-        Me.lblTMin.Size = New System.Drawing.Size(76, 19)
+        Me.lblTMin.Size = New System.Drawing.Size(57, 13)
         Me.lblTMin.TabIndex = 20
         Me.lblTMin.Text = "Min Temp:"
         '
         'lblTMax
         '
-        Me.lblTMax.Location = New System.Drawing.Point(10, 83)
+        Me.lblTMax.AutoSize = True
+        Me.lblTMax.Location = New System.Drawing.Point(34, 76)
         Me.lblTMax.Name = "lblTMax"
-        Me.lblTMax.Size = New System.Drawing.Size(76, 19)
+        Me.lblTMax.Size = New System.Drawing.Size(60, 13)
         Me.lblTMax.TabIndex = 21
         Me.lblTMax.Text = "Max Temp:"
         '
         'btnTMax
         '
-        Me.btnTMax.Location = New System.Drawing.Point(106, 83)
+        Me.btnTMax.Location = New System.Drawing.Point(100, 72)
         Me.btnTMax.Name = "btnTMax"
-        Me.btnTMax.Size = New System.Drawing.Size(57, 23)
+        Me.btnTMax.Size = New System.Drawing.Size(48, 20)
         Me.btnTMax.TabIndex = 22
         Me.btnTMax.Text = "Select"
         '
         'txtTMax
         '
-        Me.txtTMax.Location = New System.Drawing.Point(173, 83)
+        Me.txtTMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtTMax.Location = New System.Drawing.Point(154, 72)
         Me.txtTMax.Name = "txtTMax"
         Me.txtTMax.ReadOnly = True
-        Me.txtTMax.Size = New System.Drawing.Size(413, 22)
+        Me.txtTMax.Size = New System.Drawing.Size(342, 20)
         Me.txtTMax.TabIndex = 23
-        '
-        'rdoDegF
-        '
-        Me.rdoDegF.Checked = True
-        Me.rdoDegF.Location = New System.Drawing.Point(432, 166)
-        Me.rdoDegF.Name = "rdoDegF"
-        Me.rdoDegF.Size = New System.Drawing.Size(115, 19)
-        Me.rdoDegF.TabIndex = 24
-        Me.rdoDegF.TabStop = True
-        Me.rdoDegF.Text = "Degrees F"
-        '
-        'rdoDegC
-        '
-        Me.rdoDegC.Location = New System.Drawing.Point(432, 194)
-        Me.rdoDegC.Name = "rdoDegC"
-        Me.rdoDegC.Size = New System.Drawing.Size(115, 18)
-        Me.rdoDegC.TabIndex = 25
-        Me.rdoDegC.Text = "Degrees C"
         '
         'lblMonCoeff
         '
-        Me.lblMonCoeff.Location = New System.Drawing.Point(10, 203)
+        Me.lblMonCoeff.AutoSize = True
+        Me.lblMonCoeff.Location = New System.Drawing.Point(12, 181)
         Me.lblMonCoeff.Name = "lblMonCoeff"
-        Me.lblMonCoeff.Size = New System.Drawing.Size(192, 19)
+        Me.lblMonCoeff.Size = New System.Drawing.Size(140, 13)
         Me.lblMonCoeff.TabIndex = 26
         Me.lblMonCoeff.Text = "Specify Monthly Coefficients"
         '
         'lblJan
         '
-        Me.lblJan.Location = New System.Drawing.Point(19, 231)
+        Me.lblJan.AutoSize = True
+        Me.lblJan.Location = New System.Drawing.Point(23, 200)
         Me.lblJan.Name = "lblJan"
-        Me.lblJan.Size = New System.Drawing.Size(29, 18)
+        Me.lblJan.Size = New System.Drawing.Size(24, 13)
         Me.lblJan.TabIndex = 27
         Me.lblJan.Text = "Jan"
         '
         'lblFeb
         '
-        Me.lblFeb.Location = New System.Drawing.Point(67, 231)
+        Me.lblFeb.AutoSize = True
+        Me.lblFeb.Location = New System.Drawing.Point(63, 200)
         Me.lblFeb.Name = "lblFeb"
-        Me.lblFeb.Size = New System.Drawing.Size(29, 18)
+        Me.lblFeb.Size = New System.Drawing.Size(25, 13)
         Me.lblFeb.TabIndex = 28
         Me.lblFeb.Text = "Feb"
         '
         'lblMar
         '
-        Me.lblMar.Location = New System.Drawing.Point(115, 231)
+        Me.lblMar.AutoSize = True
+        Me.lblMar.Location = New System.Drawing.Point(103, 200)
         Me.lblMar.Name = "lblMar"
-        Me.lblMar.Size = New System.Drawing.Size(29, 18)
+        Me.lblMar.Size = New System.Drawing.Size(25, 13)
         Me.lblMar.TabIndex = 29
         Me.lblMar.Text = "Mar"
         '
         'lblApr
         '
-        Me.lblApr.Location = New System.Drawing.Point(163, 231)
+        Me.lblApr.AutoSize = True
+        Me.lblApr.Location = New System.Drawing.Point(143, 200)
         Me.lblApr.Name = "lblApr"
-        Me.lblApr.Size = New System.Drawing.Size(29, 18)
+        Me.lblApr.Size = New System.Drawing.Size(23, 13)
         Me.lblApr.TabIndex = 30
         Me.lblApr.Text = "Apr"
         '
         'lblMay
         '
-        Me.lblMay.Location = New System.Drawing.Point(211, 231)
+        Me.lblMay.AutoSize = True
+        Me.lblMay.Location = New System.Drawing.Point(183, 200)
         Me.lblMay.Name = "lblMay"
-        Me.lblMay.Size = New System.Drawing.Size(39, 18)
+        Me.lblMay.Size = New System.Drawing.Size(27, 13)
         Me.lblMay.TabIndex = 31
         Me.lblMay.Text = "May"
         '
         'lblJun
         '
-        Me.lblJun.Location = New System.Drawing.Point(259, 231)
+        Me.lblJun.AutoSize = True
+        Me.lblJun.Location = New System.Drawing.Point(223, 200)
         Me.lblJun.Name = "lblJun"
-        Me.lblJun.Size = New System.Drawing.Size(29, 18)
+        Me.lblJun.Size = New System.Drawing.Size(24, 13)
         Me.lblJun.TabIndex = 32
         Me.lblJun.Text = "Jun"
         '
         'lblJul
         '
-        Me.lblJul.Location = New System.Drawing.Point(307, 231)
+        Me.lblJul.AutoSize = True
+        Me.lblJul.Location = New System.Drawing.Point(263, 200)
         Me.lblJul.Name = "lblJul"
-        Me.lblJul.Size = New System.Drawing.Size(29, 18)
+        Me.lblJul.Size = New System.Drawing.Size(20, 13)
         Me.lblJul.TabIndex = 33
         Me.lblJul.Text = "Jul"
         '
         'lblAug
         '
-        Me.lblAug.Location = New System.Drawing.Point(355, 231)
+        Me.lblAug.AutoSize = True
+        Me.lblAug.Location = New System.Drawing.Point(303, 200)
         Me.lblAug.Name = "lblAug"
-        Me.lblAug.Size = New System.Drawing.Size(29, 18)
+        Me.lblAug.Size = New System.Drawing.Size(26, 13)
         Me.lblAug.TabIndex = 34
         Me.lblAug.Text = "Aug"
         '
         'lblSep
         '
-        Me.lblSep.Location = New System.Drawing.Point(403, 231)
+        Me.lblSep.AutoSize = True
+        Me.lblSep.Location = New System.Drawing.Point(343, 200)
         Me.lblSep.Name = "lblSep"
-        Me.lblSep.Size = New System.Drawing.Size(29, 18)
+        Me.lblSep.Size = New System.Drawing.Size(26, 13)
         Me.lblSep.TabIndex = 35
         Me.lblSep.Text = "Sep"
         '
         'lblOct
         '
-        Me.lblOct.Location = New System.Drawing.Point(451, 231)
+        Me.lblOct.AutoSize = True
+        Me.lblOct.Location = New System.Drawing.Point(383, 200)
         Me.lblOct.Name = "lblOct"
-        Me.lblOct.Size = New System.Drawing.Size(29, 18)
+        Me.lblOct.Size = New System.Drawing.Size(24, 13)
         Me.lblOct.TabIndex = 36
         Me.lblOct.Text = "Oct"
         '
         'lblNov
         '
-        Me.lblNov.Location = New System.Drawing.Point(499, 231)
+        Me.lblNov.AutoSize = True
+        Me.lblNov.Location = New System.Drawing.Point(423, 200)
         Me.lblNov.Name = "lblNov"
-        Me.lblNov.Size = New System.Drawing.Size(29, 18)
+        Me.lblNov.Size = New System.Drawing.Size(27, 13)
         Me.lblNov.TabIndex = 37
         Me.lblNov.Text = "Nov"
         '
         'lblDec
         '
-        Me.lblDec.Location = New System.Drawing.Point(547, 231)
+        Me.lblDec.AutoSize = True
+        Me.lblDec.Location = New System.Drawing.Point(463, 200)
         Me.lblDec.Name = "lblDec"
-        Me.lblDec.Size = New System.Drawing.Size(29, 18)
+        Me.lblDec.Size = New System.Drawing.Size(27, 13)
         Me.lblDec.TabIndex = 38
         Me.lblDec.Text = "Dec"
         '
         'txtJan
         '
-        Me.txtJan.Location = New System.Drawing.Point(10, 249)
+        Me.txtJan.Location = New System.Drawing.Point(15, 216)
         Me.txtJan.Name = "txtJan"
-        Me.txtJan.Size = New System.Drawing.Size(48, 22)
+        Me.txtJan.Size = New System.Drawing.Size(40, 20)
         Me.txtJan.TabIndex = 39
         Me.txtJan.Text = "0.012"
         '
         'txtFeb
         '
-        Me.txtFeb.Location = New System.Drawing.Point(58, 249)
+        Me.txtFeb.Location = New System.Drawing.Point(55, 216)
         Me.txtFeb.Name = "txtFeb"
-        Me.txtFeb.Size = New System.Drawing.Size(48, 22)
+        Me.txtFeb.Size = New System.Drawing.Size(40, 20)
         Me.txtFeb.TabIndex = 40
         Me.txtFeb.Text = "0.012"
         '
         'txtMar
         '
-        Me.txtMar.Location = New System.Drawing.Point(106, 249)
+        Me.txtMar.Location = New System.Drawing.Point(95, 216)
         Me.txtMar.Name = "txtMar"
-        Me.txtMar.Size = New System.Drawing.Size(48, 22)
+        Me.txtMar.Size = New System.Drawing.Size(40, 20)
         Me.txtMar.TabIndex = 41
         Me.txtMar.Text = "0.012"
         '
         'txtApr
         '
-        Me.txtApr.Location = New System.Drawing.Point(154, 249)
+        Me.txtApr.Location = New System.Drawing.Point(135, 216)
         Me.txtApr.Name = "txtApr"
-        Me.txtApr.Size = New System.Drawing.Size(48, 22)
+        Me.txtApr.Size = New System.Drawing.Size(40, 20)
         Me.txtApr.TabIndex = 42
         Me.txtApr.Text = "0.012"
         '
         'txtMay
         '
-        Me.txtMay.Location = New System.Drawing.Point(202, 249)
+        Me.txtMay.Location = New System.Drawing.Point(175, 216)
         Me.txtMay.Name = "txtMay"
-        Me.txtMay.Size = New System.Drawing.Size(48, 22)
+        Me.txtMay.Size = New System.Drawing.Size(40, 20)
         Me.txtMay.TabIndex = 43
         Me.txtMay.Text = "0.012"
         '
         'txtJun
         '
-        Me.txtJun.Location = New System.Drawing.Point(250, 249)
+        Me.txtJun.Location = New System.Drawing.Point(215, 216)
         Me.txtJun.Name = "txtJun"
-        Me.txtJun.Size = New System.Drawing.Size(48, 22)
+        Me.txtJun.Size = New System.Drawing.Size(40, 20)
         Me.txtJun.TabIndex = 44
         Me.txtJun.Text = "0.012"
         '
         'txtJul
         '
-        Me.txtJul.Location = New System.Drawing.Point(298, 249)
+        Me.txtJul.Location = New System.Drawing.Point(255, 216)
         Me.txtJul.Name = "txtJul"
-        Me.txtJul.Size = New System.Drawing.Size(48, 22)
+        Me.txtJul.Size = New System.Drawing.Size(40, 20)
         Me.txtJul.TabIndex = 45
         Me.txtJul.Text = "0.012"
         '
         'txtAug
         '
-        Me.txtAug.Location = New System.Drawing.Point(346, 249)
+        Me.txtAug.Location = New System.Drawing.Point(295, 216)
         Me.txtAug.Name = "txtAug"
-        Me.txtAug.Size = New System.Drawing.Size(48, 22)
+        Me.txtAug.Size = New System.Drawing.Size(40, 20)
         Me.txtAug.TabIndex = 46
         Me.txtAug.Text = "0.012"
         '
         'txtSep
         '
-        Me.txtSep.Location = New System.Drawing.Point(394, 249)
+        Me.txtSep.Location = New System.Drawing.Point(335, 216)
         Me.txtSep.Name = "txtSep"
-        Me.txtSep.Size = New System.Drawing.Size(48, 22)
+        Me.txtSep.Size = New System.Drawing.Size(40, 20)
         Me.txtSep.TabIndex = 47
         Me.txtSep.Text = "0.012"
         '
         'txtOct
         '
-        Me.txtOct.Location = New System.Drawing.Point(442, 249)
+        Me.txtOct.Location = New System.Drawing.Point(375, 216)
         Me.txtOct.Name = "txtOct"
-        Me.txtOct.Size = New System.Drawing.Size(48, 22)
+        Me.txtOct.Size = New System.Drawing.Size(40, 20)
         Me.txtOct.TabIndex = 48
         Me.txtOct.Text = "0.012"
         '
         'txtNov
         '
-        Me.txtNov.Location = New System.Drawing.Point(490, 249)
+        Me.txtNov.Location = New System.Drawing.Point(415, 216)
         Me.txtNov.Name = "txtNov"
-        Me.txtNov.Size = New System.Drawing.Size(48, 22)
+        Me.txtNov.Size = New System.Drawing.Size(40, 20)
         Me.txtNov.TabIndex = 49
         Me.txtNov.Text = "0.012"
         '
         'txtDec
         '
-        Me.txtDec.Location = New System.Drawing.Point(538, 249)
+        Me.txtDec.Location = New System.Drawing.Point(455, 216)
         Me.txtDec.Name = "txtDec"
-        Me.txtDec.Size = New System.Drawing.Size(48, 22)
+        Me.txtDec.Size = New System.Drawing.Size(40, 20)
         Me.txtDec.TabIndex = 50
         Me.txtDec.Text = "0.012"
         '
         'lblSRad
         '
-        Me.lblSRad.Location = New System.Drawing.Point(10, 120)
+        Me.lblSRad.AutoSize = True
+        Me.lblSRad.Location = New System.Drawing.Point(12, 107)
         Me.lblSRad.Name = "lblSRad"
-        Me.lblSRad.Size = New System.Drawing.Size(105, 18)
+        Me.lblSRad.Size = New System.Drawing.Size(82, 13)
         Me.lblSRad.TabIndex = 51
         Me.lblSRad.Text = "Solar Radiation:"
         '
         'btnSRad
         '
-        Me.btnSRad.Location = New System.Drawing.Point(106, 120)
+        Me.btnSRad.Location = New System.Drawing.Point(100, 103)
         Me.btnSRad.Name = "btnSRad"
-        Me.btnSRad.Size = New System.Drawing.Size(57, 23)
+        Me.btnSRad.Size = New System.Drawing.Size(48, 20)
         Me.btnSRad.TabIndex = 52
         Me.btnSRad.Text = "Select"
         '
         'txtSRad
         '
-        Me.txtSRad.Location = New System.Drawing.Point(173, 120)
+        Me.txtSRad.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSRad.Location = New System.Drawing.Point(154, 103)
         Me.txtSRad.Name = "txtSRad"
         Me.txtSRad.ReadOnly = True
-        Me.txtSRad.Size = New System.Drawing.Size(413, 22)
+        Me.txtSRad.Size = New System.Drawing.Size(342, 20)
         Me.txtSRad.TabIndex = 53
         '
-        'lblTempUnits
+        'rdoDegC
         '
-        Me.lblTempUnits.Location = New System.Drawing.Point(307, 175)
-        Me.lblTempUnits.Name = "lblTempUnits"
-        Me.lblTempUnits.Size = New System.Drawing.Size(125, 19)
-        Me.lblTempUnits.TabIndex = 54
-        Me.lblTempUnits.Text = "Temperature Units:"
+        Me.rdoDegC.Location = New System.Drawing.Point(249, 164)
+        Me.rdoDegC.Name = "rdoDegC"
+        Me.rdoDegC.Size = New System.Drawing.Size(96, 20)
+        Me.rdoDegC.TabIndex = 55
+        Me.rdoDegC.Text = "Celsius"
+        '
+        'rdoDegF
+        '
+        Me.rdoDegF.Checked = True
+        Me.rdoDegF.Location = New System.Drawing.Point(249, 144)
+        Me.rdoDegF.Name = "rdoDegF"
+        Me.rdoDegF.Size = New System.Drawing.Size(96, 20)
+        Me.rdoDegF.TabIndex = 54
+        Me.rdoDegF.TabStop = True
+        Me.rdoDegF.Text = "Fahrenheit"
         '
         'frmCmpJPET
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(595, 328)
-        Me.Controls.Add(Me.lblTempUnits)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(508, 293)
+        Me.Controls.Add(Me.btnCancel)
+        Me.Controls.Add(Me.btnOk)
+        Me.Controls.Add(Me.rdoDegC)
+        Me.Controls.Add(Me.rdoDegF)
         Me.Controls.Add(Me.txtSRad)
         Me.Controls.Add(Me.txtDec)
         Me.Controls.Add(Me.txtNov)
@@ -517,20 +522,16 @@ Public Class frmCmpJPET
         Me.Controls.Add(Me.lblFeb)
         Me.Controls.Add(Me.lblJan)
         Me.Controls.Add(Me.lblMonCoeff)
-        Me.Controls.Add(Me.rdoDegC)
-        Me.Controls.Add(Me.rdoDegF)
         Me.Controls.Add(Me.btnTMax)
         Me.Controls.Add(Me.lblTMax)
         Me.Controls.Add(Me.lblTMin)
         Me.Controls.Add(Me.btnTMin)
-        Me.Controls.Add(Me.panelBottom)
         Me.Controls.Add(Me.lblConstant)
         Me.Controls.Add(Me.lblJensenPET)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmCmpJPET"
         Me.Text = "Compute Jensen PET"
-        Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -633,4 +634,5 @@ BadCoeff:
             ShowHelp("BASINS Details\Compute\Computations.html")
         End If
     End Sub
+
 End Class

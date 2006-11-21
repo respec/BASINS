@@ -38,7 +38,6 @@ Public Class frmDisSol
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents panelBottom As System.Windows.Forms.Panel
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents lblLatitude As System.Windows.Forms.Label
@@ -51,96 +50,91 @@ Public Class frmDisSol
         Me.lblTSer = New System.Windows.Forms.Label
         Me.lblLatitude = New System.Windows.Forms.Label
         Me.txtLatitude = New System.Windows.Forms.TextBox
-        Me.panelBottom = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnSolar = New System.Windows.Forms.Button
         Me.txtSolar = New System.Windows.Forms.TextBox
-        Me.panelBottom.SuspendLayout()
         Me.SuspendLayout()
         '
         'lblTSer
         '
-        Me.lblTSer.Location = New System.Drawing.Point(19, 18)
+        Me.lblTSer.AutoSize = True
+        Me.lblTSer.Location = New System.Drawing.Point(12, 9)
         Me.lblTSer.Name = "lblTSer"
-        Me.lblTSer.Size = New System.Drawing.Size(269, 19)
+        Me.lblTSer.Size = New System.Drawing.Size(196, 13)
         Me.lblTSer.TabIndex = 2
         Me.lblTSer.Text = "Specify Daily Solar Radiation Timeseries"
         '
         'lblLatitude
         '
-        Me.lblLatitude.Location = New System.Drawing.Point(19, 102)
+        Me.lblLatitude.AutoSize = True
+        Me.lblLatitude.Location = New System.Drawing.Point(12, 88)
         Me.lblLatitude.Name = "lblLatitude"
-        Me.lblLatitude.Size = New System.Drawing.Size(183, 18)
+        Me.lblLatitude.Size = New System.Drawing.Size(130, 13)
         Me.lblLatitude.TabIndex = 3
-        Me.lblLatitude.Text = "Latitude (in decimal degress)"
+        Me.lblLatitude.Text = "Latitude (decimal degress)"
         '
         'txtLatitude
         '
-        Me.txtLatitude.Location = New System.Drawing.Point(211, 102)
+        Me.txtLatitude.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtLatitude.Location = New System.Drawing.Point(148, 85)
         Me.txtLatitude.Name = "txtLatitude"
-        Me.txtLatitude.Size = New System.Drawing.Size(87, 22)
+        Me.txtLatitude.Size = New System.Drawing.Size(116, 20)
         Me.txtLatitude.TabIndex = 4
-        '
-        'panelBottom
-        '
-        Me.panelBottom.Controls.Add(Me.btnCancel)
-        Me.panelBottom.Controls.Add(Me.btnOk)
-        Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 144)
-        Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(355, 37)
-        Me.panelBottom.TabIndex = 16
         '
         'btnCancel
         '
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(211, 0)
+        Me.btnCancel.Location = New System.Drawing.Point(200, 125)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(77, 28)
+        Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 1
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(96, 0)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(12, 125)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(77, 28)
+        Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 0
         Me.btnOk.Text = "Ok"
         '
         'btnSolar
         '
-        Me.btnSolar.Location = New System.Drawing.Point(19, 46)
+        Me.btnSolar.Location = New System.Drawing.Point(15, 39)
         Me.btnSolar.Name = "btnSolar"
-        Me.btnSolar.Size = New System.Drawing.Size(58, 23)
+        Me.btnSolar.Size = New System.Drawing.Size(48, 20)
         Me.btnSolar.TabIndex = 18
         Me.btnSolar.Text = "Select"
         '
         'txtSolar
         '
-        Me.txtSolar.Location = New System.Drawing.Point(86, 46)
+        Me.txtSolar.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSolar.Location = New System.Drawing.Point(69, 40)
         Me.txtSolar.Name = "txtSolar"
         Me.txtSolar.ReadOnly = True
-        Me.txtSolar.Size = New System.Drawing.Size(260, 22)
+        Me.txtSolar.Size = New System.Drawing.Size(195, 20)
         Me.txtSolar.TabIndex = 19
         '
         'frmDisSol
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
-        Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(355, 181)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(276, 161)
+        Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.txtSolar)
+        Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.txtLatitude)
         Me.Controls.Add(Me.btnSolar)
-        Me.Controls.Add(Me.panelBottom)
         Me.Controls.Add(Me.lblLatitude)
         Me.Controls.Add(Me.lblTSer)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmDisSol"
         Me.Text = "Disaggregate Solar Radiation"
-        Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
