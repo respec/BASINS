@@ -12,6 +12,7 @@ Imports System.Collections
 Imports System.ComponentModel
 Imports System.IO
 Imports System.Windows.Forms
+Imports System.Runtime.InteropServices
 
 Public Class atcGraphForm
     Inherits Form
@@ -46,11 +47,14 @@ Public Class atcGraphForm
         'myPane.PaneFill = New Fill(Color.White, Color.LightYellow, 45.0F)
         With myPane
             With .XAxis
-                .Type = ZedGraph.AxisType.Date
-                '.MajorUnit = ZedGraph.DateUnit.Day
-                '.MinorUnit = ZedGraph.DateUnit.Hour
-                .Scale.Max = Double.NegativeInfinity
-                .Scale.Min = Double.PositiveInfinity
+
+                .Type = AxisType.Probability
+                .Scale.Max = 0.999
+                .Scale.Min = 0.001
+
+                '.Type = ZedGraph.AxisType.Date
+                '.Scale.Max = Double.NegativeInfinity
+                '.Scale.Min = Double.PositiveInfinity
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
@@ -71,12 +75,16 @@ Public Class atcGraphForm
         End With
         pMaster.PaneList.Add(myPane)
 
+        AddDatasets(pDataGroup)
+    End Sub
+
+    Private Sub AddDatasets(ByVal aDataGroup As atcDataGroup)
         Dim g As Graphics = Me.CreateGraphics()
         pMaster.SetLayout(g, PaneLayout.SingleColumn)
-
-        For Each ts As atcTimeseries In pDataGroup
+        Pane.CurveList.Clear()
+        For Each ts As atcTimeseries In aDataGroup
             AddDatasetTimeseries(ts, ts.ToString)
-            If ts.numValues > 0 Then
+            If ts.numValues > 0 AndAlso mnuViewTime.Checked Then
                 With Pane.XAxis.Scale
                     If ts.Attributes.GetValue("point", False) Then
                         If ts.Dates.Value(1) < .Min Then .Min = ts.Dates.Value(1)
@@ -87,7 +95,6 @@ Public Class atcGraphForm
                 End With
             End If
         Next
-
         pMaster.AxisChange(g)
         Invalidate()
         g.Dispose()
@@ -134,14 +141,17 @@ Public Class atcGraphForm
     Friend WithEvents mnuFile As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFilePrint As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditGraph As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
-
-    Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuView As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuViewTime As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuViewProbability As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
+
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -156,13 +166,16 @@ Public Class atcGraphForm
         Me.mnuEditGraph = New System.Windows.Forms.MenuItem
         Me.mnuEditSep1 = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
+        Me.mnuView = New System.Windows.Forms.MenuItem
+        Me.mnuViewTime = New System.Windows.Forms.MenuItem
+        Me.mnuViewProbability = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
         '
-        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuAnalysis, Me.mnuHelp})
+        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp})
         '
         'mnuFile
         '
@@ -173,7 +186,7 @@ Public Class atcGraphForm
         'mnuFileSelectData
         '
         Me.mnuFileSelectData.Index = 0
-        Me.mnuFileSelectData.Text = "Select &Data"
+        Me.mnuFileSelectData.Text = "Select Data"
         '
         'mnuFileSep1
         '
@@ -199,7 +212,7 @@ Public Class atcGraphForm
         'mnuEditGraph
         '
         Me.mnuEditGraph.Index = 0
-        Me.mnuEditGraph.Text = "&Graph"
+        Me.mnuEditGraph.Text = "Graph"
         '
         'mnuEditSep1
         '
@@ -212,14 +225,31 @@ Public Class atcGraphForm
         Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
         Me.mnuEditCopy.Text = "Copy"
         '
+        'mnuView
+        '
+        Me.mnuView.Index = 2
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewTime, Me.mnuViewProbability})
+        Me.mnuView.Text = "View"
+        '
+        'mnuViewTime
+        '
+        Me.mnuViewTime.Index = 0
+        Me.mnuViewTime.Text = "Time"
+        '
+        'mnuViewProbability
+        '
+        Me.mnuViewProbability.Checked = True
+        Me.mnuViewProbability.Index = 1
+        Me.mnuViewProbability.Text = "Probability"
+        '
         'mnuAnalysis
         '
-        Me.mnuAnalysis.Index = 2
+        Me.mnuAnalysis.Index = 3
         Me.mnuAnalysis.Text = "Analysis"
         '
         'mnuHelp
         '
-        Me.mnuHelp.Index = 3
+        Me.mnuHelp.Index = 4
         Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
         Me.mnuHelp.ShowShortcut = False
         Me.mnuHelp.Text = "Help"
@@ -341,55 +371,78 @@ Public Class atcGraphForm
         Dim curve As LineItem = Nothing
         Dim lOldCurve As LineItem
 
-        'Dim y() As Double = t.Values
-        'Dim x() As Double = t.Dates.Values
 
+        If mnuViewProbability.Checked Then
+            Dim x() As Double = {1, 2, 5, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 95, 98, 99}
+            Dim y() As Double
 
-        If t.Attributes.GetValue("point", False) Then
+            ReDim y(x.GetUpperBound(0))
+            For i As Integer = 0 To y.GetUpperBound(0)
+                y(i) = t.Attributes.GetValue("%" & Format(x(i), "00.####"))
+                Logger.Dbg(y(i))
+                x(i) /= 100
+            Next
+            'Pane.XAxis.Scale.Min = x(0)
+            'Pane.XAxis.Scale.Max = x(x.GetUpperBound(0))
+            'If UBound(y) > 0 Then
+            '    y(0) = y(1)
+            curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
+            curve.Line.Width = 1
+            curve.Line.StepType = StepType.NonStep
+            '    curve.Line.StepType = StepType.RearwardStep
+            'End If
+            'With Pane.XAxis
+            '    If .Type <> AxisType.Probability Then
+            '        .Type = AxisType.Probability
+            '        .Scale.Max = 0.999
+            '        .Scale.Min = 0.001
+            '        Dim g As Graphics = Me.CreateGraphics()
+            '        pMaster.AxisChange(g)
+            '        g.Dispose()
+            '    End If
+            'End With
+        ElseIf t.Attributes.GetValue("point", False) Then
             curve = Pane.AddCurve(CurveLabel, New atcTimeseriesPointList(t), curveColor, SymbolType.Star)
-            'curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.Star)
             curve.Line.IsVisible = False
         Else
             curve = Pane.AddCurve(CurveLabel, New atcTimeseriesPointList(t), curveColor, SymbolType.None)
             curve.Line.Width = 1
             curve.Line.StepType = StepType.RearwardStep
-
-            'If UBound(y) > 0 Then
-            '    y(0) = y(1)
-            '    curve = Pane.AddCurve(CurveLabel, x, y, curveColor, SymbolType.None)
-            '    curve.Line.Width = 1
-            '    curve.Line.StepType = StepType.RearwardStep
-            'End If
         End If
 
         'TODO: label Y Axis
 
         'TODO: 3rd Y Axis above (for PREC)
 
+        'Use the same Y axis as other curves with this constituent
         If Pane.CurveList.Count > 1 AndAlso Not curve Is Nothing Then
+            Dim lFoundMatchingCons As Boolean = False
             For Each ts As atcTimeseries In pDataGroup
                 lOldCurve = Pane.CurveList.Item(ts.ToString)
                 If Not lOldCurve Is Nothing Then
                     lOldCons = ts.Attributes.GetValue("constituent")
                     If lOldCons = lCons Then
                         curve.IsY2Axis = lOldCurve.IsY2Axis
-                    Else
-                        curve.IsY2Axis = Not (lOldCurve.IsY2Axis)
-                    End If
-                    If curve.IsY2Axis Then
-                        With Pane.Y2Axis
-                            .MajorTic.IsOpposite = False
-                            .MinorTic.IsOpposite = False
-                            .IsVisible = True
-                            .Title.IsVisible = True
-                        End With
-                        With Pane.YAxis
-                            .MajorTic.IsOpposite = False
-                            .MinorTic.IsOpposite = False
-                        End With
+                        lFoundMatchingCons = True
+                        Exit For
                     End If
                 End If
             Next
+            If Not lFoundMatchingCons Then
+                curve.IsY2Axis = True
+            End If
+            If curve.IsY2Axis Then 'make sure second Y axis is visible and tics are not shown on other Y axis
+                With Pane.Y2Axis
+                    .MajorTic.IsOpposite = False
+                    .MinorTic.IsOpposite = False
+                    .IsVisible = True
+                    .Title.IsVisible = True
+                End With
+                With Pane.YAxis
+                    .MajorTic.IsOpposite = False
+                    .MinorTic.IsOpposite = False
+                End With
+            End If
         End If
 
         'curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
@@ -436,4 +489,69 @@ Public Class atcGraphForm
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp("BASINS Details\Analysis\Time Series Functions\Graph.html")
     End Sub
+
+    'Private Sub CopyToClip(ByVal aPane As GraphPane)
+
+    '    Dim g As Graphics = Me.CreateGraphics()
+    '    Dim hdc As IntPtr = g.GetHdc()
+    '    Dim Metafile As New Metafile(hdc, EmfType.EmfOnly)
+    '    g.ReleaseHdc(hdc)
+    '    g.Dispose()
+
+    '    Dim gMeta As Graphics = Graphics.FromImage(Metafile)
+    '    aPane.Draw(gMeta)
+    '    gMeta.Dispose()
+
+    '    ClipboardMetafileHelper.PutEnhMetafileOnClipboard(Me.Handle, Metafile)
+
+    '    MessageBox.Show("Copied to ClipBoard")
+    'End Sub
+
+    'Private Class ClipboardMetafileHelper
+    '    '<DllImport("user32.dll")> Public Shared Function OpenClipboard(ByVal hWndNewOwner As IntPtr) As Boolean
+    '    'End Function
+
+    '    '<DllImport("user32.dll")> Public Shared Function EmptyClipboard() As Boolean
+    '    'End Function
+
+    '    '<DllImport("user32.dll")> Public Shared Function SetClipboardData(ByVal uFormat As uint, ByVal hMem As IntPtr) As IntPtr
+    '    'End Function
+
+    '    '<DllImport("user32.dll")> Public Shared Function CloseClipboard() As Boolean
+    '    'End Function
+
+    '    '<DllImport("gdi32.dll")> Public Shared Function CopyEnhMetaFile(ByVal hemfSrc As IntPtr, ByVal hNULL As IntPtr) As IntPtr
+    '    'End Function
+
+    '    '<DllImport("gdi32.dll")> Public Shared Function DeleteEnhMetaFile(ByVal hemf As IntPtr) As Boolean
+    '    'End Function
+
+    '    ' Metafile mf is set to a state that is not valid inside this function.
+    '    Public Shared Function PutEnhMetafileOnClipboard(ByVal hWnd As IntPtr, ByVal mf As Metafile) As Boolean
+    '        Dim bResult As Boolean = False
+    '        '    IntPtr(hEMF, hEMF2)
+    '        '    hEMF = mf.GetHenhmetafile() ' invalidates mf
+    '        '    If (not hEMF.Equals(New IntPtr(0))) Then
+    '        '    hEMF2 = CopyEnhMetaFile( hEMF, new IntPtr(0) )
+    '        '        If (!hEMF2.Equals(New IntPtr(0))) Then
+    '        '            If (OpenClipboard(hWnd)) Then
+    '        '                If (EmptyClipboard()) Then
+    '        '                IntPtr hRes = SetClipboardData( 14 /*CF_ENHMETAFILE*/, hEMF2 )
+    '        '                bResult = hRes.Equals( hEMF2 )
+    '        '                CloseClipboard()
+    '        '                End If
+    '        '            End If
+    '        '        End If
+    '        '    DeleteEnhMetaFile( hEMF );
+    '        Return bResult
+    '    End Function
+    'End Class
+
+    Private Sub mnuViewProbability_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewTime.Click, mnuViewProbability.Click
+        mnuViewTime.Checked = mnuViewProbability.Checked
+        mnuViewProbability.Checked = Not mnuViewProbability.Checked
+        AddDatasets(pDataGroup)
+    End Sub
 End Class
+
+

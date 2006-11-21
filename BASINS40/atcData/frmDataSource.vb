@@ -41,7 +41,7 @@ Friend Class frmDataSource
     Friend WithEvents cboDisplay As System.Windows.Forms.ComboBox
     Friend WithEvents lblDisplay As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDataSource))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDataSource))
         Me.treeSources = New System.Windows.Forms.TreeView
         Me.pnlButtons = New System.Windows.Forms.Panel
         Me.lblDisplay = New System.Windows.Forms.Label
@@ -56,10 +56,8 @@ Friend Class frmDataSource
         Me.treeSources.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.treeSources.ImageIndex = -1
         Me.treeSources.Location = New System.Drawing.Point(0, 0)
         Me.treeSources.Name = "treeSources"
-        Me.treeSources.SelectedImageIndex = -1
         Me.treeSources.Size = New System.Drawing.Size(369, 389)
         Me.treeSources.TabIndex = 0
         '
@@ -73,14 +71,14 @@ Friend Class frmDataSource
         Me.pnlButtons.Location = New System.Drawing.Point(0, 389)
         Me.pnlButtons.Name = "pnlButtons"
         Me.pnlButtons.Size = New System.Drawing.Size(368, 40)
-        Me.pnlButtons.TabIndex = 13
+        Me.pnlButtons.TabIndex = 1
         '
         'lblDisplay
         '
         Me.lblDisplay.Location = New System.Drawing.Point(8, 12)
         Me.lblDisplay.Name = "lblDisplay"
         Me.lblDisplay.Size = New System.Drawing.Size(72, 20)
-        Me.lblDisplay.TabIndex = 6
+        Me.lblDisplay.TabIndex = 2
         Me.lblDisplay.Text = "Display with:"
         Me.lblDisplay.Visible = False
         '
@@ -91,7 +89,7 @@ Friend Class frmDataSource
         Me.cboDisplay.Location = New System.Drawing.Point(88, 8)
         Me.cboDisplay.Name = "cboDisplay"
         Me.cboDisplay.Size = New System.Drawing.Size(96, 21)
-        Me.cboDisplay.TabIndex = 5
+        Me.cboDisplay.TabIndex = 3
         Me.cboDisplay.Text = "No Display"
         Me.cboDisplay.Visible = False
         '
@@ -102,7 +100,7 @@ Friend Class frmDataSource
         Me.btnCancel.Location = New System.Drawing.Point(280, 8)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(80, 24)
-        Me.btnCancel.TabIndex = 4
+        Me.btnCancel.TabIndex = 5
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
@@ -111,7 +109,7 @@ Friend Class frmDataSource
         Me.btnOk.Location = New System.Drawing.Point(192, 8)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(80, 24)
-        Me.btnOk.TabIndex = 3
+        Me.btnOk.TabIndex = 4
         Me.btnOk.Text = "Ok"
         '
         'frmDataSource

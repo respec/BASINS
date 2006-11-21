@@ -32,56 +32,37 @@ Public Class atcSelectList
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents panelTop As System.Windows.Forms.Panel
-    Friend WithEvents panelBottom As System.Windows.Forms.Panel
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnAttributesNone As System.Windows.Forms.Button
     Friend WithEvents btnAttributesAll As System.Windows.Forms.Button
     Friend WithEvents lstAvailable As System.Windows.Forms.ListBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcSelectList))
-        Me.panelTop = New System.Windows.Forms.Panel
-        Me.btnAttributesNone = New System.Windows.Forms.Button
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(atcSelectList))
         Me.btnAttributesAll = New System.Windows.Forms.Button
+        Me.btnAttributesNone = New System.Windows.Forms.Button
         Me.lstAvailable = New System.Windows.Forms.ListBox
-        Me.panelBottom = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
-        Me.panelTop.SuspendLayout()
-        Me.panelBottom.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'panelTop
-        '
-        Me.panelTop.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.panelTop.Controls.Add(Me.btnAttributesNone)
-        Me.panelTop.Controls.Add(Me.btnAttributesAll)
-        Me.panelTop.Controls.Add(Me.lstAvailable)
-        Me.panelTop.Location = New System.Drawing.Point(0, 0)
-        Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(192, 328)
-        Me.panelTop.TabIndex = 14
-        '
-        'btnAttributesNone
-        '
-        Me.btnAttributesNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnAttributesNone.Location = New System.Drawing.Point(120, 290)
-        Me.btnAttributesNone.Name = "btnAttributesNone"
-        Me.btnAttributesNone.Size = New System.Drawing.Size(64, 23)
-        Me.btnAttributesNone.TabIndex = 13
-        Me.btnAttributesNone.Text = "None"
         '
         'btnAttributesAll
         '
         Me.btnAttributesAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnAttributesAll.Location = New System.Drawing.Point(8, 290)
+        Me.btnAttributesAll.Location = New System.Drawing.Point(12, 318)
         Me.btnAttributesAll.Name = "btnAttributesAll"
         Me.btnAttributesAll.Size = New System.Drawing.Size(64, 24)
         Me.btnAttributesAll.TabIndex = 12
         Me.btnAttributesAll.Text = "All"
+        '
+        'btnAttributesNone
+        '
+        Me.btnAttributesNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnAttributesNone.Location = New System.Drawing.Point(122, 318)
+        Me.btnAttributesNone.Name = "btnAttributesNone"
+        Me.btnAttributesNone.Size = New System.Drawing.Size(64, 24)
+        Me.btnAttributesNone.TabIndex = 13
+        Me.btnAttributesNone.Text = "None"
         '
         'lstAvailable
         '
@@ -89,26 +70,17 @@ Public Class atcSelectList
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstAvailable.IntegralHeight = False
-        Me.lstAvailable.Location = New System.Drawing.Point(8, 15)
+        Me.lstAvailable.Location = New System.Drawing.Point(12, 12)
         Me.lstAvailable.Name = "lstAvailable"
         Me.lstAvailable.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstAvailable.Size = New System.Drawing.Size(176, 267)
+        Me.lstAvailable.Size = New System.Drawing.Size(174, 300)
         Me.lstAvailable.TabIndex = 11
-        '
-        'panelBottom
-        '
-        Me.panelBottom.Controls.Add(Me.btnCancel)
-        Me.panelBottom.Controls.Add(Me.btnOk)
-        Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 341)
-        Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(192, 32)
-        Me.panelBottom.TabIndex = 15
         '
         'btnCancel
         '
-        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCancel.Location = New System.Drawing.Point(120, 0)
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Location = New System.Drawing.Point(122, 348)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 1
@@ -116,7 +88,9 @@ Public Class atcSelectList
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(8, 0)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK
+        Me.btnOk.Location = New System.Drawing.Point(12, 348)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 0
@@ -125,14 +99,15 @@ Public Class atcSelectList
         'atcSelectList
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(192, 373)
-        Me.Controls.Add(Me.panelTop)
-        Me.Controls.Add(Me.panelBottom)
+        Me.ClientSize = New System.Drawing.Size(198, 384)
+        Me.Controls.Add(Me.btnAttributesAll)
+        Me.Controls.Add(Me.lstAvailable)
+        Me.Controls.Add(Me.btnAttributesNone)
+        Me.Controls.Add(Me.btnOk)
+        Me.Controls.Add(Me.btnCancel)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "atcSelectList"
         Me.Text = "Select"
-        Me.panelTop.ResumeLayout(False)
-        Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -141,7 +116,6 @@ Public Class atcSelectList
 
     Private pAvailable As ArrayList
     Private pSelected As ArrayList
-    Private pOk As Boolean
 
     Public Function AskUser(ByVal aAvailable As ArrayList, ByVal aSelected As ArrayList) As Boolean
         If aAvailable Is Nothing Then
@@ -154,20 +128,19 @@ Public Class atcSelectList
         pAvailable = aAvailable
         pSelected = aSelected
         Clear()
-        Me.ShowDialog()
-
-        If pOk Then
+        If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
             aSelected.Clear()
             For Each lName As String In lstAvailable.SelectedItems
                 aSelected.Add(lName)
             Next
+            Return True
+        Else
+            Return False
         End If
-        Return pOk
     End Function
 
     Private Sub Clear()
         Dim lIndex As Integer = 0
-        pOk = False
         lstAvailable.Items.Clear()
         For Each lAttrName As String In pAvailable
             lstAvailable.Items.Add(lAttrName)
@@ -191,15 +164,6 @@ Public Class atcSelectList
         For index As Integer = 0 To lstAvailable.Items.Count - 1
             lstAvailable.SetSelected(index, False)
         Next
-    End Sub
-
-    Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-        pOk = True
-        Close()
-    End Sub
-
-    Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
-        Close()
     End Sub
 
 End Class

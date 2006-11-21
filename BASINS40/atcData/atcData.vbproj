@@ -166,6 +166,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectData.resx">
       <DependentUpon>frmSelectData.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectDisplay.resx">
       <DependentUpon>frmSelectDisplay.vb</DependentUpon>

@@ -126,6 +126,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="atcSelectList.resx">
       <DependentUpon>atcSelectList.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="atcText.resx">
       <DependentUpon>atcText.vb</DependentUpon>

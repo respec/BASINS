@@ -137,9 +137,11 @@
     </Compile>
     <EmbeddedResource Include="frmCliGen.resx">
       <DependentUpon>frmCliGen.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmCligGenParmList.resx">
       <DependentUpon>frmCligGenParmList.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

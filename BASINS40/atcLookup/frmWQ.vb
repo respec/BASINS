@@ -54,7 +54,7 @@ Public Class frmWQ
     Friend WithEvents lblParm As System.Windows.Forms.Label
     Friend WithEvents agdWQ As atcControls.atcGrid
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmWQ))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmWQ))
         Me.lblSelect = New System.Windows.Forms.Label
         Me.lbxWQ = New System.Windows.Forms.ListBox
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
@@ -68,7 +68,7 @@ Public Class frmWQ
         '
         'lblSelect
         '
-        Me.lblSelect.Location = New System.Drawing.Point(13, 14)
+        Me.lblSelect.Location = New System.Drawing.Point(12, 9)
         Me.lblSelect.Name = "lblSelect"
         Me.lblSelect.Size = New System.Drawing.Size(200, 14)
         Me.lblSelect.TabIndex = 0
@@ -78,9 +78,9 @@ Public Class frmWQ
         '
         Me.lbxWQ.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbxWQ.Location = New System.Drawing.Point(13, 35)
+        Me.lbxWQ.Location = New System.Drawing.Point(12, 26)
         Me.lbxWQ.Name = "lbxWQ"
-        Me.lbxWQ.Size = New System.Drawing.Size(194, 121)
+        Me.lbxWQ.Size = New System.Drawing.Size(204, 121)
         Me.lbxWQ.TabIndex = 1
         '
         'GroupBox1
@@ -90,9 +90,9 @@ Public Class frmWQ
         Me.GroupBox1.Controls.Add(Me.lblCas)
         Me.GroupBox1.Controls.Add(Me.Label2)
         Me.GroupBox1.Controls.Add(Me.Label1)
-        Me.GroupBox1.Location = New System.Drawing.Point(220, 14)
+        Me.GroupBox1.Location = New System.Drawing.Point(222, 20)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(193, 152)
+        Me.GroupBox1.Size = New System.Drawing.Size(194, 152)
         Me.GroupBox1.TabIndex = 2
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Parameter Information:"
@@ -132,14 +132,16 @@ Public Class frmWQ
         'agdWQ
         '
         Me.agdWQ.AllowHorizontalScrolling = True
+        Me.agdWQ.AllowNewValidValues = False
         Me.agdWQ.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.agdWQ.CellBackColor = System.Drawing.Color.Empty
         Me.agdWQ.LineColor = System.Drawing.Color.Empty
         Me.agdWQ.LineWidth = 0.0!
-        Me.agdWQ.Location = New System.Drawing.Point(16, 176)
+        Me.agdWQ.Location = New System.Drawing.Point(12, 178)
         Me.agdWQ.Name = "agdWQ"
-        Me.agdWQ.Size = New System.Drawing.Size(400, 144)
+        Me.agdWQ.Size = New System.Drawing.Size(404, 137)
         Me.agdWQ.Source = Nothing
         Me.agdWQ.TabIndex = 3
         '

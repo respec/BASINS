@@ -36,115 +36,117 @@ Public Class frmSpecifyEventAttributes
     Friend WithEvents lblHighLow As System.Windows.Forms.Label
     Friend WithEvents lblThreshold As System.Windows.Forms.Label
     Friend WithEvents txtThreshold As System.Windows.Forms.TextBox
-    Friend WithEvents panelBottom As System.Windows.Forms.Panel
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents lblMinMax As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSpecifyEventAttributes))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSpecifyEventAttributes))
         Me.rdoHigh = New System.Windows.Forms.RadioButton
         Me.rdoLow = New System.Windows.Forms.RadioButton
         Me.lblHighLow = New System.Windows.Forms.Label
         Me.lblThreshold = New System.Windows.Forms.Label
         Me.txtThreshold = New System.Windows.Forms.TextBox
-        Me.panelBottom = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.lblMinMax = New System.Windows.Forms.Label
-        Me.panelBottom.SuspendLayout()
         Me.SuspendLayout()
         '
         'rdoHigh
         '
         Me.rdoHigh.Checked = True
-        Me.rdoHigh.Location = New System.Drawing.Point(32, 40)
+        Me.rdoHigh.Location = New System.Drawing.Point(32, 28)
         Me.rdoHigh.Name = "rdoHigh"
         Me.rdoHigh.Size = New System.Drawing.Size(128, 16)
-        Me.rdoHigh.TabIndex = 0
+        Me.rdoHigh.TabIndex = 2
         Me.rdoHigh.TabStop = True
         Me.rdoHigh.Text = "Above"
         '
         'rdoLow
         '
-        Me.rdoLow.Location = New System.Drawing.Point(32, 64)
+        Me.rdoLow.Location = New System.Drawing.Point(32, 50)
         Me.rdoLow.Name = "rdoLow"
         Me.rdoLow.Size = New System.Drawing.Size(128, 16)
-        Me.rdoLow.TabIndex = 1
+        Me.rdoLow.TabIndex = 3
         Me.rdoLow.Text = "Below"
         '
         'lblHighLow
         '
-        Me.lblHighLow.Location = New System.Drawing.Point(16, 16)
+        Me.lblHighLow.AutoSize = True
+        Me.lblHighLow.Location = New System.Drawing.Point(12, 12)
         Me.lblHighLow.Name = "lblHighLow"
-        Me.lblHighLow.Size = New System.Drawing.Size(224, 16)
-        Me.lblHighLow.TabIndex = 2
+        Me.lblHighLow.Size = New System.Drawing.Size(205, 13)
+        Me.lblHighLow.TabIndex = 1
         Me.lblHighLow.Text = "Select values Above or Below Threshold?"
         '
         'lblThreshold
         '
-        Me.lblThreshold.Location = New System.Drawing.Point(16, 96)
+        Me.lblThreshold.AutoSize = True
+        Me.lblThreshold.Location = New System.Drawing.Point(12, 80)
         Me.lblThreshold.Name = "lblThreshold"
-        Me.lblThreshold.Size = New System.Drawing.Size(128, 16)
-        Me.lblThreshold.TabIndex = 3
+        Me.lblThreshold.Size = New System.Drawing.Size(124, 13)
+        Me.lblThreshold.TabIndex = 4
         Me.lblThreshold.Text = "Specify Threshold value:"
         '
         'txtThreshold
         '
-        Me.txtThreshold.Location = New System.Drawing.Point(144, 96)
+        Me.txtThreshold.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtThreshold.Location = New System.Drawing.Point(150, 77)
         Me.txtThreshold.Name = "txtThreshold"
-        Me.txtThreshold.TabIndex = 4
-        Me.txtThreshold.Text = ""
-        '
-        'panelBottom
-        '
-        Me.panelBottom.Controls.Add(Me.btnCancel)
-        Me.panelBottom.Controls.Add(Me.btnOk)
-        Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 157)
-        Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(256, 32)
-        Me.panelBottom.TabIndex = 16
+        Me.txtThreshold.Size = New System.Drawing.Size(71, 20)
+        Me.txtThreshold.TabIndex = 5
         '
         'btnCancel
         '
-        Me.btnCancel.Location = New System.Drawing.Point(128, 0)
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Location = New System.Drawing.Point(157, 143)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
-        Me.btnCancel.TabIndex = 1
+        Me.btnCancel.TabIndex = 8
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(40, 0)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(87, 143)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
-        Me.btnOk.TabIndex = 0
+        Me.btnOk.TabIndex = 7
         Me.btnOk.Text = "Ok"
         '
         'lblMinMax
         '
-        Me.lblMinMax.Location = New System.Drawing.Point(16, 120)
+        Me.lblMinMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblMinMax.AutoSize = True
+        Me.lblMinMax.Location = New System.Drawing.Point(12, 109)
         Me.lblMinMax.Name = "lblMinMax"
-        Me.lblMinMax.Size = New System.Drawing.Size(232, 16)
-        Me.lblMinMax.TabIndex = 17
+        Me.lblMinMax.Size = New System.Drawing.Size(88, 13)
+        Me.lblMinMax.TabIndex = 6
         Me.lblMinMax.Text = "Range of values:"
         '
         'frmSpecifyEventAttributes
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(256, 189)
+        Me.CancelButton = Me.btnCancel
+        Me.ClientSize = New System.Drawing.Size(233, 179)
+        Me.Controls.Add(Me.btnCancel)
+        Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.lblMinMax)
-        Me.Controls.Add(Me.panelBottom)
         Me.Controls.Add(Me.txtThreshold)
         Me.Controls.Add(Me.lblThreshold)
         Me.Controls.Add(Me.lblHighLow)
         Me.Controls.Add(Me.rdoLow)
         Me.Controls.Add(Me.rdoHigh)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmSpecifyEventAttributes"
         Me.Text = "Specify Event Attributes"
-        Me.panelBottom.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
