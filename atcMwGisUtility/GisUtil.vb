@@ -77,11 +77,19 @@ Public Class GisUtil
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Property CurrentLayer() As Integer
         Get
-            Return GetMappingObject.Layers.CurrentLayer
+            'return the index, not the handle, of the current layer
+            Dim lLayerIndex As Integer = 0
+            For Each llayer As MapWindow.Interfaces.Layer In MapLayers()
+                If GetMappingObject.Layers.GetHandle(lLayerIndex) = GetMappingObject.Layers.CurrentLayer Then
+                    Return lLayerIndex
+                End If
+                lLayerIndex += 1
+            Next
+            Throw New Exception("GisUtil:CurrentLayer:HasNoCorrespondingIndex")
         End Get
         Set(ByVal aLayerIndex As Integer)
             If Not LayerFromIndex(aLayerIndex) Is Nothing Then
-                GetMappingObject.Layers.CurrentLayer = aLayerIndex
+                GetMappingObject.Layers.CurrentLayer = GetMappingObject.Layers.GetHandle(aLayerIndex)
             End If
         End Set
     End Property
@@ -494,14 +502,13 @@ Public Class GisUtil
     ''' <exception cref="System.Exception" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function LayerIndex(ByVal aLayerName As String) As Integer
-        LayerIndex = 0
-
-        For Each llayer As MapWindow.Interfaces.Layer In MapLayers()
-            If UCase(llayer.Name) = UCase(aLayerName) Then
-                Return LayerIndex
+        'start at topmost layer and work down looking for a match
+        Dim i As Integer
+        For i = GetMappingObject.Layers.NumLayers - 1 To 0 Step -1
+            If UCase(LayerName(i)) = UCase(aLayerName) Then
+                Return i
             End If
-            LayerIndex += 1
-        Next
+        Next i
 
         Throw New Exception("GisUtil:LayerIndex:Error:LayerName:" & aLayerName & ":IsNotRecognized")
     End Function
@@ -851,7 +858,7 @@ Public Class GisUtil
     Public Shared Function SetSelectedFeature(ByVal aLayerIndex As Integer, ByVal aShapeIndex As Integer) As Boolean
         Dim lSelectColor As System.Drawing.Color
 
-        pMapWin.Layers.CurrentLayer = aLayerIndex
+        CurrentLayer = aLayerIndex
         lSelectColor = pMapWin.View.SelectColor
         pMapWin.View.SelectedShapes.AddByIndex(aShapeIndex, lSelectColor)
         Return True
@@ -1051,7 +1058,7 @@ Public Class GisUtil
     Public Shared Function RemoveLayer(Optional ByVal aLayerIndex As Integer = UseCurrent) As Boolean
         If aLayerIndex = UseCurrent Then aLayerIndex = CurrentLayer
         Dim lLayerName As String = LayerName(aLayerIndex) 'forces check of index
-        GetMappingObject.Layers.Remove(aLayerIndex)
+        GetMappingObject.Layers.Remove(GetMappingObject.Layers.GetHandle(aLayerIndex))
     End Function
 
     ''' <summary>Given a grid and a polygon layer, calculate the area of each grid category 
