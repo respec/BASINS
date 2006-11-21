@@ -324,23 +324,23 @@ StartOver:
                         If Right(lOutputFileName, 8) = "pcs3.shp" Or _
                            Right(lOutputFileName, 8) = "gage.shp" Or _
                            Right(lOutputFileName, 9) = "wqobs.shp" Then
-                            'get index of this layer
-                            Dim lLayerIndex As Integer = -1
+                            'get handle of this layer
+                            Dim lLayerHandle As Integer = -1
                             For i As Integer = 0 To g_MapWin.Layers.NumLayers
-                                Dim lLayer As Layer = g_MapWin.Layers(i)
+                                Dim lLayer As Layer = g_MapWin.Layers(g_MapWin.Layers.GetHandle(i))
                                 If Not (lLayer Is Nothing) AndAlso lLayer.FileName = lOutputFileName Then
-                                    lLayerIndex = i
+                                    lLayerHandle = g_MapWin.Layers.GetHandle(i)
                                 End If
                             Next
-                            If lLayerIndex > -1 Then
-                                Dim llayername As String = g_MapWin.Layers(lLayerIndex).Name
-                                Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerIndex).Color.R, g_MapWin.Layers(lLayerIndex).Color.G, g_MapWin.Layers(lLayerIndex).Color.B)
-                                Dim lmarkersize As Integer = g_MapWin.Layers(lLayerIndex).LineOrPointSize
-                                Dim ltargroup As Integer = g_MapWin.Layers(lLayerIndex).GroupHandle
-                                Dim lnewpos As Integer = g_MapWin.Layers(lLayerIndex).GroupPosition
+                            If lLayerHandle > -1 Then
+                                Dim llayername As String = g_MapWin.Layers(lLayerHandle).Name
+                                Dim lRGBcolor As Integer = RGB(g_MapWin.Layers(lLayerHandle).Color.R, g_MapWin.Layers(lLayerHandle).Color.G, g_MapWin.Layers(lLayerHandle).Color.B)
+                                Dim lmarkersize As Integer = g_MapWin.Layers(lLayerHandle).LineOrPointSize
+                                Dim ltargroup As Integer = g_MapWin.Layers(lLayerHandle).GroupHandle
+                                Dim lnewpos As Integer = g_MapWin.Layers(lLayerHandle).GroupPosition
                                 Dim MWlay As MapWindow.Interfaces.Layer
                                 Dim shpFile As MapWinGIS.Shapefile
-                                g_MapWin.Layers.Remove(lLayerIndex)
+                                g_MapWin.Layers.Remove(lLayerHandle)
                                 shpFile = New MapWinGIS.Shapefile
                                 shpFile.Open(lOutputFileName)
                                 MWlay = g_MapWin.Layers.Add(shpFile, llayername, lRGBcolor, lRGBcolor, lmarkersize)
