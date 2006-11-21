@@ -2174,7 +2174,7 @@ ErrHand:
                     End If
                     cELEV = ((cMAXEL + cMINEL) / 2)
                     PrintLine(OutFile, cUniqueSubids(j) & " " & Chr(34) & sname & Chr(34) & " " & cUniqueSubids(j) & " " & _
-                           " 0 1 0 S " & Format(cLENGTH, "0.00") & " " & Format(cMAXEL - cMINEL, "0.00") & " " & _
+                           " 0 1 0 S " & Format(cLENGTH, "0.00") & " " & Format(Math.Abs(cMAXEL - cMINEL), "0.00") & " " & _
                            Format(cELEV, "0.") & " 0 0 " & cDOWN & " 0 0 0 0 0 " & _
                            Format(cSLOPE, "0.000000") & " " & Format(cDEPTH, "0.0000") & " " & Format(cWIDTH, "0.000") & _
                            " 0 0 0 0 0 0 0 0 0 0 0 0 0")
