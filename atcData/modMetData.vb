@@ -38,6 +38,10 @@ Public Module modMetData
         Dim lTSer As atcTimeseries = Nothing
         Dim lCons As String = aTS2Fill.Attributes.GetValue("Constituent")
         Dim lAdjustAttribute As String = GetAdjustingAttribute(aTS2Fill)
+        Const lValMin As Double = -100
+        Const lValMax As Double = 200
+        Dim lClosestObsDiff As Integer
+        Dim lClosestObsInd As Integer
         Dim lTol As Double
 
         If lTol > 1 Then 'passed in as percentage
@@ -63,6 +67,8 @@ Public Module modMetData
                 If lMTyp = 1 Then 'fill missing period
                     Logger.Dbg("  For period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " lasting " & lMLen & " days:")
                     lCurInd = -1
+                    lClosestObsDiff = 24
+                    lClosestObsInd = -1
                     For k = 1 To lMLen
                         lFPos = lMJDay - lSJDay + k - 1
                         lFillOT = CurrentObsTime(aTS2FillOT, lFPos)
@@ -71,30 +77,66 @@ Public Module modMetData
                         While j < aTSAvail.Count
                             lInd = lDist.IndexFromKey(CStr(j))
                             lTSer = aTSAvail.ItemByIndex(lInd)
-                            lFVal = -1
+                            lFVal = lValMin - 1
                             If (lMJDay + k - 1) >= lTSer.Dates.Value(0) And _
                                (lMJDay + k - 1) < lTSer.Dates.Value(lTSer.numValues) Then
                                 'within date range, check value
                                 If lTSer.Attributes.GetValue("TU") = atcTimeUnit.TUDay Then 'check daily value
                                     lSPos = lMJDay - lTSer.Dates.Value(0) + k - 1
-                                    If lTSer.Value(lSPos) > -1 And lTSer.Value(lSPos) < 100 Then 'check obs time
+                                    If lTSer.Value(lSPos) > lValMin And lTSer.Value(lSPos) < lValMax Then 'check obs time
                                         lStaOT = CurrentObsTime(aTSAvailOT(lInd), lSPos)
                                         Select Case lCons.ToUpper
-                                            Case "TMAX"
-                                                If (lStaOT < 17 AndAlso lFillOT < 17) OrElse _
+                                            Case "TMAX" 'assume TMax occurs at hour 16 (4 pm)
+                                                If lStaOT = lFillOT OrElse _
+                                                   (lStaOT < 17 AndAlso lFillOT < 17) OrElse _
                                                    (lStaOT > 16 AndAlso lFillOT > 16) Then
                                                     'both values are for the same day
                                                     lFVal = lTSer.Value(lSPos)
+                                                ElseIf lFillOT > 16 AndAlso lStaOT < 17 Then
+                                                    'try filling with previous day's value
+                                                    If lSPos > 1 AndAlso _
+                                                       lTSer.Value(lSPos - 1) > lValMin AndAlso _
+                                                       lTSer.Value(lSPos - 1) < lValMax Then
+                                                        lFVal = lTSer.Value(lSPos - 1)
+                                                    End If
+                                                ElseIf lFillOT < 17 AndAlso lStaOT > 16 Then
+                                                    'try filling with next day's value
+                                                    If lSPos < lTSer.numValues AndAlso _
+                                                       lTSer.Value(lSPos + 1) > lValMin AndAlso _
+                                                       lTSer.Value(lSPos + 1) < lValMax Then
+                                                        lFVal = lTSer.Value(lSPos + 1)
+                                                    End If
                                                 End If
-                                            Case "TMIN"
-                                                If (lStaOT < 6 AndAlso lFillOT < 6) OrElse _
+                                            Case "TMIN" 'assume TMin occurs at hour 6 (6 am)
+                                                If lStaOT = lFillOT OrElse _
+                                                   (lStaOT < 6 AndAlso lFillOT < 6) OrElse _
                                                    (lStaOT > 5 AndAlso lFillOT > 5) Then
                                                     'both values are for the same day
                                                     lFVal = lTSer.Value(lSPos)
+                                                ElseIf lFillOT < 6 AndAlso lStaOT > 5 Then
+                                                    'try filling with previous day's value
+                                                    If lSPos > 1 AndAlso _
+                                                       lTSer.Value(lSPos - 1) > lValMin AndAlso _
+                                                       lTSer.Value(lSPos - 1) < lValMax Then
+                                                        lFVal = lTSer.Value(lSPos - 1)
+                                                    End If
+                                                ElseIf lFillOT > 5 AndAlso lStaOT < 6 Then
+                                                    'try filling with next day's value
+                                                    If lSPos < lTSer.numValues AndAlso _
+                                                       lTSer.Value(lSPos + 1) > lValMin AndAlso _
+                                                       lTSer.Value(lSPos + 1) < lValMax Then
+                                                        lFVal = lTSer.Value(lSPos + 1)
+                                                    End If
                                                 End If
                                             Case Else
-                                                If Math.Abs(lStaOT - lFillOT) <= 6 Then 'obs times close enough
+                                                'for matching obs time of 24, accept anything in the afternoon
+                                                If (Math.Abs(lStaOT - lFillOT) <= 6) OrElse _
+                                                   (lFillOT = 24 AndAlso lStaOT > 12) Then 'obs times close enough
                                                     lFVal = lTSer.Value(lSPos)
+                                                ElseIf Math.Abs(lStaOT - lFillOT) < lClosestObsDiff Then
+                                                    'save closest Obs Time difference for last filling option
+                                                    lClosestObsDiff = Math.Abs(lStaOT - lFillOT)
+                                                    lClosestObsInd = lInd
                                                 End If
                                         End Select
                                     End If
@@ -107,36 +149,46 @@ Public Module modMetData
                                         End If
                                     Next ii
                                 End If
-                                If lFVal > -0.1 And lFVal < 100 Then 'valid fill value found
-                                    lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
-                                    If Math.Abs(lFillAdjust + 999) > Double.Epsilon AndAlso _
-                                       Math.Abs(lStaAdjust + 999) > Double.Epsilon Then
-                                        'adjust for historical averages
-                                        aTS2Fill.Value(lFPos) = lFillAdjust / lStaAdjust * lFVal
-                                    Else 'use value without adjustment
-                                        aTS2Fill.Value(lFPos) = lFVal
-                                    End If
-                                    J2Date(lMJDay + k - 1, ld)
-                                    If lCurInd <> lInd Then 'changing station used to fill
-                                        If lTSer.Attributes.GetValue("TU") = atcTimeUnit.TUDay Then
-                                            lTUStr = "Daily"
-                                        Else 'assume hourly
-                                            lTUStr = "Hourly"
-                                        End If
-                                        Logger.Dbg("    Filling from " & lTUStr & " TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
-                                        If Math.Abs(lFillAdjust + 999) > Double.Epsilon Then
-                                            Logger.Dbg("      (Adjusting values using historical average of " & lStaAdjust & ")")
-                                        End If
-                                        lCurInd = lInd
-                                    End If
-                                    Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " - " & aTS2Fill.Value(lFPos))
+                                If lFVal > lValMin And lFVal < lValMax Then 'valid fill value found
                                     j = aTSAvail.Count
                                     lFilledIt = True
                                 End If
                             End If
                             j += 1
                         End While
-                        If Not lFilledIt Then
+                        If Not lFilledIt AndAlso lClosestObsInd >= 0 Then 'no acceptable station value found, 
+                            'use station with closest Obs Time difference
+                            lInd = lClosestObsInd
+                            lTSer = aTSAvail.ItemByIndex(lInd)
+                            lSPos = lMJDay - lTSer.Dates.Value(0) + k - 1
+                            lFVal = lTSer.Value(lSPos)
+                            lFilledIt = True
+                            Logger.Dbg("NOTE - Using station with Obs Time difference (" & lClosestObsDiff & ") greater than acceptable.")
+                        End If
+                        If lFilledIt Then
+                            lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
+                            If Math.Abs(lFillAdjust + 999) > Double.Epsilon AndAlso _
+                               Math.Abs(lStaAdjust + 999) > Double.Epsilon Then
+                                'adjust for historical averages
+                                aTS2Fill.Value(lFPos) = lFillAdjust / lStaAdjust * lFVal
+                            Else 'use value without adjustment
+                                aTS2Fill.Value(lFPos) = lFVal
+                            End If
+                            J2Date(lMJDay + k - 1, ld)
+                            If lCurInd <> lInd Then 'changing station used to fill
+                                If lTSer.Attributes.GetValue("TU") = atcTimeUnit.TUDay Then
+                                    lTUStr = "Daily"
+                                Else 'assume hourly
+                                    lTUStr = "Hourly"
+                                End If
+                                Logger.Dbg("    Filling from " & lTUStr & " TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
+                                If Math.Abs(lFillAdjust + 999) > Double.Epsilon Then
+                                    Logger.Dbg("      (Adjusting values using historical average of " & lStaAdjust & ")")
+                                End If
+                                lCurInd = lInd
+                            End If
+                            Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " - " & aTS2Fill.Value(lFPos))
+                        Else 'no station had a value for this date
                             Logger.Dbg("PROBLEM - Could not find acceptable nearby station for filling")
                         End If
                     Next k
@@ -226,6 +278,8 @@ Public Module modMetData
         Dim lDist As atcCollection
         Dim lTSer As atcTimeseries
         Dim lAdjustAttribute As String = GetAdjustingAttribute(aTS2Fill)
+        Const lValMin As Double = -100
+        Const lValMax As Double = 200
         Dim lTol As Double
         Dim lFilledIt As Boolean
 
@@ -264,7 +318,7 @@ Public Module modMetData
                             If (lMJDay + (k - 1) / 24) - lTSer.Attributes.GetValue("SJDay") > Double.Epsilon And _
                                (lMJDay + (k - 1) / 24) < lTSer.Attributes.GetValue("EJDay") Then 'check value
                                 lSPos = 24 * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
-                                If lTSer.Value(lSPos) > -1 And lTSer.Value(lSPos) < 100 Then 'good value
+                                If lTSer.Value(lSPos) > lValMin And lTSer.Value(lSPos) < lValMax Then 'good value
                                     lFVal = lTSer.Value(lSPos)
                                     lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
                                     If Math.Abs(lFillAdjust + 999) > Double.Epsilon AndAlso _
@@ -650,7 +704,7 @@ Public Module modMetData
                      "  MisDisTot: " & RightJustify(lTotMD, 7) & vbCrLf & _
                      "  BadValPd:" & RightJustify(lNBVPd, 9) & vbCrLf & _
                      "  BadValTot:" & RightJustify(lTotBV, 8) & vbCrLf & _
-                     "  PctMiss: " & DoubleToString(100 * lTotMissIncs / aTSer.numValues, 9, "##0.00", , , 5) & vbCrLf)
+                     "  PctMiss: " & DoubleToString(100 * lTotMissIncs / aTSer.numValues, 9, "##0.0000", , , 5) & vbCrLf)
             Else 'nothing missing
                 s.Append("  No missing data for this time series" & vbCrLf)
             End If
@@ -663,7 +717,7 @@ Public Module modMetData
             s.Append("SUMMARY:DATA  " & lDateStr & ", " & lDateStrEnd & ", " & _
                                     aTSer.numValues & ", " & lMisPd & ", " & lTotMissIncs & ", " & _
                                     lNMVPd & ", " & lTotMV & ", " & lNMDPd & ", " & lTotMD & ", " & _
-                                    lNBVPd & ", " & lTotBV & ", " & DoubleToString(100 * lTotMissIncs / aTSer.numValues, 6, "##0.00", , , 5) & vbCrLf)
+                                    lNBVPd & ", " & lTotBV & ", " & DoubleToString(100 * lTotMissIncs / aTSer.numValues, 6, "##0.0000", , , 5) & vbCrLf)
         End If
         Return s.ToString
 
