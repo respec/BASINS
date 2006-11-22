@@ -1840,6 +1840,7 @@ Public Class HspfUci
 
         If pWdmUnit(Id) > 0 Then
             GenTs = GetDataSetFromDsn(Id, adsn)
+            GenTs.Dates.EnsureValuesRead()
             pWDMObj(Id).DataSets.Remove(GenTs)
         End If
     End Sub
