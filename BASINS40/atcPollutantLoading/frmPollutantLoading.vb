@@ -636,9 +636,9 @@ Friend Class frmPollutantLoading
         Me.lblValueUnits.AutoSize = True
         Me.lblValueUnits.Location = New System.Drawing.Point(20, 34)
         Me.lblValueUnits.Name = "lblValueUnits"
-        Me.lblValueUnits.Size = New System.Drawing.Size(71, 17)
+        Me.lblValueUnits.Size = New System.Drawing.Size(232, 17)
         Me.lblValueUnits.TabIndex = 23
-        Me.lblValueUnits.Text = "(lbs/ac/yr)"
+        Me.lblValueUnits.Text = "(lbs/ac/yr, counts/ac/yr for bacteria)"
         '
         'cmdChangeFile
         '
@@ -721,7 +721,7 @@ Friend Class frmPollutantLoading
         Me.lblUnits.Name = "lblUnits"
         Me.lblUnits.Size = New System.Drawing.Size(227, 17)
         Me.lblUnits.TabIndex = 37
-        Me.lblUnits.Text = "(lbs/yr or counts/yr))"
+        Me.lblUnits.Text = "(lbs/yr or counts/yr)"
         Me.lblUnits.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'lblPointID
@@ -1501,7 +1501,7 @@ Friend Class frmPollutantLoading
             cmdChangePrec.Visible = False
             lblNoprec.Visible = True
             lblValueFile.Text = "Export Coefficient File"
-            lblValueUnits.Text = "(lbs/ac/yr)"
+            lblValueUnits.Text = "(lbs/ac/yr, counts/ac/yr for bacteria)"
             rbSingle.Checked = True
             gMethod = 0
         Else
@@ -2254,4 +2254,5 @@ Friend Class frmPollutantLoading
         atcGridBMP.SizeAllColumnsToContents()
         atcGridBMP.Refresh()
     End Sub
+
 End Class

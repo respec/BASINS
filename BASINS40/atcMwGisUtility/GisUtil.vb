@@ -2027,11 +2027,14 @@ Public Class GisUtil
             lBrk.StartValue = lArr(i)
             lBrk.EndValue = lArr(i)
             If IsNumeric(lArr(i)) Then
-                lBrk.Caption = Int(lArr(i)).ToString
+                If Int(lArr(i)) > 1 Then
+                    lBrk.Caption = Int(lArr(i)).ToString
+                Else
+                    lBrk.Caption = SignificantDigits(lArr(i), 3).ToString
+                End If
             Else
                 lBrk.Caption = CStr(lArr(i))
             End If
-
             lColorScheme.Add(lBrk)
             lBrk = Nothing
         Next
