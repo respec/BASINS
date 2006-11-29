@@ -449,7 +449,7 @@ Public Module PollutantLoading
                         'TODO:need a prj file!
 
                         'add the output shapefile to the map
-                        If Mid(lConsNames(j), 1, 5) = "FECAL" Then
+                        If Mid(lConsNames(j), 1, 5) = "FECAL" Or Mid(lConsNames(j), 1, 9) = "PATHOGENS" Or Mid(lConsNames(j), 1, 8) = "BACTERIA" Then
                             If k = 1 Then
                                 lLayerDesc = lConsNames(j) & " Load Per Acre (counts)"
                             ElseIf k = 2 Then
