@@ -87,7 +87,7 @@ Public Class frmCmpPenman
         Me.lblJensenPET.Location = New System.Drawing.Point(12, 9)
         Me.lblJensenPET.Name = "lblJensenPET"
         Me.lblJensenPET.Size = New System.Drawing.Size(122, 13)
-        Me.lblJensenPET.TabIndex = 2
+        Me.lblJensenPET.TabIndex = 0
         Me.lblJensenPET.Text = "Specify Input Timeseries"
         '
         'btnCancel
@@ -97,16 +97,16 @@ Public Class frmCmpPenman
         Me.btnCancel.Location = New System.Drawing.Point(447, 198)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
-        Me.btnCancel.TabIndex = 1
+        Me.btnCancel.TabIndex = 17
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(12, 198)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(377, 198)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
-        Me.btnOk.TabIndex = 0
+        Me.btnOk.TabIndex = 16
         Me.btnOk.Text = "Ok"
         '
         'btnTMin
@@ -114,7 +114,7 @@ Public Class frmCmpPenman
         Me.btnTMin.Location = New System.Drawing.Point(104, 40)
         Me.btnTMin.Name = "btnTMin"
         Me.btnTMin.Size = New System.Drawing.Size(48, 20)
-        Me.btnTMin.TabIndex = 18
+        Me.btnTMin.TabIndex = 2
         Me.btnTMin.Text = "Select"
         '
         'txtTMin
@@ -125,7 +125,7 @@ Public Class frmCmpPenman
         Me.txtTMin.Name = "txtTMin"
         Me.txtTMin.ReadOnly = True
         Me.txtTMin.Size = New System.Drawing.Size(353, 20)
-        Me.txtTMin.TabIndex = 19
+        Me.txtTMin.TabIndex = 3
         '
         'lblTMin
         '
@@ -133,7 +133,7 @@ Public Class frmCmpPenman
         Me.lblTMin.Location = New System.Drawing.Point(12, 43)
         Me.lblTMin.Name = "lblTMin"
         Me.lblTMin.Size = New System.Drawing.Size(57, 13)
-        Me.lblTMin.TabIndex = 20
+        Me.lblTMin.TabIndex = 1
         Me.lblTMin.Text = "Min Temp:"
         '
         'lblTMax
@@ -142,7 +142,7 @@ Public Class frmCmpPenman
         Me.lblTMax.Location = New System.Drawing.Point(12, 75)
         Me.lblTMax.Name = "lblTMax"
         Me.lblTMax.Size = New System.Drawing.Size(60, 13)
-        Me.lblTMax.TabIndex = 21
+        Me.lblTMax.TabIndex = 4
         Me.lblTMax.Text = "Max Temp:"
         '
         'btnTMax
@@ -150,7 +150,7 @@ Public Class frmCmpPenman
         Me.btnTMax.Location = New System.Drawing.Point(104, 72)
         Me.btnTMax.Name = "btnTMax"
         Me.btnTMax.Size = New System.Drawing.Size(48, 20)
-        Me.btnTMax.TabIndex = 22
+        Me.btnTMax.TabIndex = 5
         Me.btnTMax.Text = "Select"
         '
         'txtTMax
@@ -161,7 +161,7 @@ Public Class frmCmpPenman
         Me.txtTMax.Name = "txtTMax"
         Me.txtTMax.ReadOnly = True
         Me.txtTMax.Size = New System.Drawing.Size(353, 20)
-        Me.txtTMax.TabIndex = 23
+        Me.txtTMax.TabIndex = 6
         '
         'lblSRad
         '
@@ -169,7 +169,7 @@ Public Class frmCmpPenman
         Me.lblSRad.Location = New System.Drawing.Point(12, 107)
         Me.lblSRad.Name = "lblSRad"
         Me.lblSRad.Size = New System.Drawing.Size(82, 13)
-        Me.lblSRad.TabIndex = 51
+        Me.lblSRad.TabIndex = 7
         Me.lblSRad.Text = "Solar Radiation:"
         '
         'btnSRad
@@ -177,7 +177,7 @@ Public Class frmCmpPenman
         Me.btnSRad.Location = New System.Drawing.Point(104, 104)
         Me.btnSRad.Name = "btnSRad"
         Me.btnSRad.Size = New System.Drawing.Size(48, 20)
-        Me.btnSRad.TabIndex = 52
+        Me.btnSRad.TabIndex = 8
         Me.btnSRad.Text = "Select"
         '
         'txtSRad
@@ -188,7 +188,7 @@ Public Class frmCmpPenman
         Me.txtSRad.Name = "txtSRad"
         Me.txtSRad.ReadOnly = True
         Me.txtSRad.Size = New System.Drawing.Size(353, 20)
-        Me.txtSRad.TabIndex = 53
+        Me.txtSRad.TabIndex = 9
         '
         'lblDewP
         '
@@ -196,7 +196,7 @@ Public Class frmCmpPenman
         Me.lblDewP.Location = New System.Drawing.Point(12, 139)
         Me.lblDewP.Name = "lblDewP"
         Me.lblDewP.Size = New System.Drawing.Size(85, 13)
-        Me.lblDewP.TabIndex = 54
+        Me.lblDewP.TabIndex = 10
         Me.lblDewP.Text = "Dewpoint Temp:"
         '
         'lblWind
@@ -205,7 +205,7 @@ Public Class frmCmpPenman
         Me.lblWind.Location = New System.Drawing.Point(12, 171)
         Me.lblWind.Name = "lblWind"
         Me.lblWind.Size = New System.Drawing.Size(88, 13)
-        Me.lblWind.TabIndex = 55
+        Me.lblWind.TabIndex = 13
         Me.lblWind.Text = "Wind Movement:"
         '
         'btnDewP
@@ -213,7 +213,7 @@ Public Class frmCmpPenman
         Me.btnDewP.Location = New System.Drawing.Point(104, 136)
         Me.btnDewP.Name = "btnDewP"
         Me.btnDewP.Size = New System.Drawing.Size(48, 20)
-        Me.btnDewP.TabIndex = 56
+        Me.btnDewP.TabIndex = 11
         Me.btnDewP.Text = "Select"
         '
         'btnWind
@@ -221,7 +221,7 @@ Public Class frmCmpPenman
         Me.btnWind.Location = New System.Drawing.Point(104, 168)
         Me.btnWind.Name = "btnWind"
         Me.btnWind.Size = New System.Drawing.Size(48, 20)
-        Me.btnWind.TabIndex = 57
+        Me.btnWind.TabIndex = 14
         Me.btnWind.Text = "Select"
         '
         'txtDewP
@@ -232,7 +232,7 @@ Public Class frmCmpPenman
         Me.txtDewP.Name = "txtDewP"
         Me.txtDewP.ReadOnly = True
         Me.txtDewP.Size = New System.Drawing.Size(353, 20)
-        Me.txtDewP.TabIndex = 58
+        Me.txtDewP.TabIndex = 12
         '
         'txtWind
         '
@@ -242,11 +242,13 @@ Public Class frmCmpPenman
         Me.txtWind.Name = "txtWind"
         Me.txtWind.ReadOnly = True
         Me.txtWind.Size = New System.Drawing.Size(353, 20)
-        Me.txtWind.TabIndex = 59
+        Me.txtWind.TabIndex = 15
         '
         'frmCmpPenman
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(523, 234)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)

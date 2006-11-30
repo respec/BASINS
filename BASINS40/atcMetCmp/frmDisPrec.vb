@@ -108,16 +108,16 @@ Public Class frmDisPrec
         Me.btnCancel.Location = New System.Drawing.Point(265, 306)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
-        Me.btnCancel.TabIndex = 1
+        Me.btnCancel.TabIndex = 16
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(12, 306)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(195, 306)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
-        Me.btnOk.TabIndex = 0
+        Me.btnOk.TabIndex = 15
         Me.btnOk.Text = "Ok"
         '
         'btnDailyPrec
@@ -149,6 +149,7 @@ Public Class frmDisPrec
         '
         'btnAddHourlyPrec
         '
+        Me.btnAddHourlyPrec.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnAddHourlyPrec.Location = New System.Drawing.Point(12, 104)
         Me.btnAddHourlyPrec.Name = "btnAddHourlyPrec"
         Me.btnAddHourlyPrec.Size = New System.Drawing.Size(56, 20)
@@ -216,8 +217,10 @@ Public Class frmDisPrec
         '
         'frmDisPrec
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.AutoSize = True
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(341, 342)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
@@ -236,6 +239,8 @@ Public Class frmDisPrec
         Me.Controls.Add(Me.lblDailyPrec)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmDisPrec"
         Me.Text = "Disaggregate Precipitation"
         Me.ResumeLayout(False)

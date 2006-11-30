@@ -43,9 +43,10 @@ Public Class atcText
         '
         'text1
         '
+        Me.text1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.text1.Location = New System.Drawing.Point(0, 0)
         Me.text1.Name = "text1"
-        Me.text1.Size = New System.Drawing.Size(184, 22)
+        Me.text1.Size = New System.Drawing.Size(184, 20)
         Me.text1.TabIndex = 0
         Me.text1.Text = "Text1"
         '
@@ -53,8 +54,9 @@ Public Class atcText
         '
         Me.Controls.Add(Me.text1)
         Me.Name = "ATCtext"
-        Me.Size = New System.Drawing.Size(184, 16)
+        Me.Size = New System.Drawing.Size(184, 20)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

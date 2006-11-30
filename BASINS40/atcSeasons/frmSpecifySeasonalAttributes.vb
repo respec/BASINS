@@ -47,7 +47,7 @@ Public Class frmSpecifySeasonalAttributes
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSpecifySeasonalAttributes))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSpecifySeasonalAttributes))
         Me.panelTop = New System.Windows.Forms.Panel
         Me.grpSeasons = New System.Windows.Forms.GroupBox
         Me.btnSeasonsNone = New System.Windows.Forms.Button
@@ -192,14 +192,16 @@ Public Class frmSpecifySeasonalAttributes
         Me.panelBottom.Controls.Add(Me.btnCancel)
         Me.panelBottom.Controls.Add(Me.btnOk)
         Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 341)
+        Me.panelBottom.Location = New System.Drawing.Point(0, 334)
         Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(408, 32)
+        Me.panelBottom.Size = New System.Drawing.Size(408, 39)
         Me.panelBottom.TabIndex = 15
         '
         'btnCancel
         '
-        Me.btnCancel.Location = New System.Drawing.Point(216, 0)
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Location = New System.Drawing.Point(336, 3)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 1
@@ -207,7 +209,8 @@ Public Class frmSpecifySeasonalAttributes
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(128, 0)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(266, 3)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 0
@@ -215,7 +218,9 @@ Public Class frmSpecifySeasonalAttributes
         '
         'frmSpecifySeasonalAttributes
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(408, 373)
         Me.Controls.Add(Me.panelTop)
         Me.Controls.Add(Me.panelBottom)

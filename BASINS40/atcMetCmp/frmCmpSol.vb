@@ -62,7 +62,7 @@ Public Class frmCmpSol
         Me.lblCloudCover.Location = New System.Drawing.Point(12, 9)
         Me.lblCloudCover.Name = "lblCloudCover"
         Me.lblCloudCover.Size = New System.Drawing.Size(156, 13)
-        Me.lblCloudCover.TabIndex = 2
+        Me.lblCloudCover.TabIndex = 0
         Me.lblCloudCover.Text = "Specify Cloud Cover Timeseries"
         '
         'lblLatitude
@@ -90,16 +90,16 @@ Public Class frmCmpSol
         Me.btnCancel.Location = New System.Drawing.Point(178, 109)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
-        Me.btnCancel.TabIndex = 1
+        Me.btnCancel.TabIndex = 6
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(12, 109)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(108, 109)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
-        Me.btnOk.TabIndex = 0
+        Me.btnOk.TabIndex = 5
         Me.btnOk.Text = "Ok"
         '
         'btnCloudCover
@@ -107,7 +107,7 @@ Public Class frmCmpSol
         Me.btnCloudCover.Location = New System.Drawing.Point(15, 39)
         Me.btnCloudCover.Name = "btnCloudCover"
         Me.btnCloudCover.Size = New System.Drawing.Size(48, 20)
-        Me.btnCloudCover.TabIndex = 18
+        Me.btnCloudCover.TabIndex = 1
         Me.btnCloudCover.Text = "Select"
         '
         'txtCloudCover
@@ -118,11 +118,13 @@ Public Class frmCmpSol
         Me.txtCloudCover.Name = "txtCloudCover"
         Me.txtCloudCover.ReadOnly = True
         Me.txtCloudCover.Size = New System.Drawing.Size(170, 20)
-        Me.txtCloudCover.TabIndex = 19
+        Me.txtCloudCover.TabIndex = 2
         '
         'frmCmpSol
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(254, 145)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
@@ -133,6 +135,8 @@ Public Class frmCmpSol
         Me.Controls.Add(Me.lblCloudCover)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmCmpSol"
         Me.Text = "Compute Solar Radiation"
         Me.ResumeLayout(False)

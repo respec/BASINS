@@ -128,10 +128,11 @@ Public Class frmSpecifyFrequency
         '
         'txtRecurrenceAdd
         '
-        Me.txtRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtRecurrenceAdd.Location = New System.Drawing.Point(8, 323)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
-        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(96, 20)
+        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(117, 20)
         Me.txtRecurrenceAdd.TabIndex = 9
         '
         'btnRecurrenceNone
@@ -186,10 +187,11 @@ Public Class frmSpecifyFrequency
         '
         'txtNdayAdd
         '
-        Me.txtNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtNdayAdd.Location = New System.Drawing.Point(12, 323)
         Me.txtNdayAdd.Name = "txtNdayAdd"
-        Me.txtNdayAdd.Size = New System.Drawing.Size(96, 20)
+        Me.txtNdayAdd.Size = New System.Drawing.Size(112, 20)
         Me.txtNdayAdd.TabIndex = 3
         '
         'btnNdayNone

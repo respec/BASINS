@@ -41,7 +41,7 @@ Public Class frmBuildNew
     Friend WithEvents txtInstructions As System.Windows.Forms.TextBox
     Friend WithEvents txtSelected As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmBuildNew))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmBuildNew))
         Me.cmdBuild = New System.Windows.Forms.Button
         Me.txtInstructions = New System.Windows.Forms.TextBox
         Me.txtSelected = New System.Windows.Forms.TextBox
@@ -51,9 +51,9 @@ Public Class frmBuildNew
         '
         Me.cmdBuild.Anchor = System.Windows.Forms.AnchorStyles.Bottom
         Me.cmdBuild.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdBuild.Location = New System.Drawing.Point(156, 192)
+        Me.cmdBuild.Location = New System.Drawing.Point(165, 198)
         Me.cmdBuild.Name = "cmdBuild"
-        Me.cmdBuild.Size = New System.Drawing.Size(96, 32)
+        Me.cmdBuild.Size = New System.Drawing.Size(80, 28)
         Me.cmdBuild.TabIndex = 1
         Me.cmdBuild.Text = "Build"
         '
@@ -61,15 +61,14 @@ Public Class frmBuildNew
         '
         Me.txtInstructions.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtInstructions.BackColor = System.Drawing.SystemColors.InactiveCaptionText
+        Me.txtInstructions.BackColor = System.Drawing.SystemColors.Control
         Me.txtInstructions.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtInstructions.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtInstructions.Location = New System.Drawing.Point(16, 16)
+        Me.txtInstructions.Location = New System.Drawing.Point(13, 14)
         Me.txtInstructions.Multiline = True
         Me.txtInstructions.Name = "txtInstructions"
-        Me.txtInstructions.Size = New System.Drawing.Size(392, 96)
+        Me.txtInstructions.Size = New System.Drawing.Size(398, 83)
         Me.txtInstructions.TabIndex = 2
-        Me.txtInstructions.Text = ""
         '
         'txtSelected
         '
@@ -77,16 +76,16 @@ Public Class frmBuildNew
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSelected.BackColor = System.Drawing.SystemColors.Menu
-        Me.txtSelected.Location = New System.Drawing.Point(16, 112)
+        Me.txtSelected.Location = New System.Drawing.Point(13, 97)
         Me.txtSelected.Multiline = True
         Me.txtSelected.Name = "txtSelected"
-        Me.txtSelected.Size = New System.Drawing.Size(392, 65)
+        Me.txtSelected.Size = New System.Drawing.Size(398, 88)
         Me.txtSelected.TabIndex = 3
         Me.txtSelected.Text = "Selected Features:"
         '
         'frmBuildNew
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(423, 239)
         Me.Controls.Add(Me.txtSelected)
         Me.Controls.Add(Me.txtInstructions)
@@ -97,6 +96,7 @@ Public Class frmBuildNew
         Me.Text = "Build New BASINS 4 Project"
         Me.TopMost = True
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
