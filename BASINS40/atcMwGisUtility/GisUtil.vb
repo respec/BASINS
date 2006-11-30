@@ -85,7 +85,8 @@ Public Class GisUtil
                 End If
                 lLayerIndex += 1
             Next
-            Throw New Exception("GisUtil:CurrentLayer:HasNoCorrespondingIndex")
+            'Throw New Exception("GisUtil:CurrentLayer:HasNoCorrespondingIndex")
+            Return -1  'it is possible and acceptable to have no current layer
         End Get
         Set(ByVal aLayerIndex As Integer)
             If Not LayerFromIndex(aLayerIndex) Is Nothing Then
