@@ -33,23 +33,23 @@ Public Class frmReport
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents lblAreaOfInterest As System.Windows.Forms.Label
     Friend WithEvents cboSub1 As System.Windows.Forms.ComboBox
     Friend WithEvents cboSub2 As System.Windows.Forms.ComboBox
     Friend WithEvents cmdNext As System.Windows.Forms.Button
     Friend WithEvents cmdCancel As System.Windows.Forms.Button
     Friend WithEvents lblSubid As System.Windows.Forms.Label
     Friend WithEvents lblSubname As System.Windows.Forms.Label
-    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents lblAvailableReports As System.Windows.Forms.Label
     Friend WithEvents lbxReports As System.Windows.Forms.ListBox
-    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents lblReportFolder As System.Windows.Forms.Label
     Friend WithEvents lblFolder As System.Windows.Forms.Label
     Friend WithEvents fbdFolder As System.Windows.Forms.FolderBrowserDialog
     Friend WithEvents cboAreas As System.Windows.Forms.ComboBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmReport))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmReport))
         Me.cboAreas = New System.Windows.Forms.ComboBox
-        Me.Label3 = New System.Windows.Forms.Label
+        Me.lblAreaOfInterest = New System.Windows.Forms.Label
         Me.cboSub1 = New System.Windows.Forms.ComboBox
         Me.lblSubid = New System.Windows.Forms.Label
         Me.lblSubname = New System.Windows.Forms.Label
@@ -57,8 +57,8 @@ Public Class frmReport
         Me.cmdNext = New System.Windows.Forms.Button
         Me.cmdCancel = New System.Windows.Forms.Button
         Me.lbxReports = New System.Windows.Forms.ListBox
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
+        Me.lblAvailableReports = New System.Windows.Forms.Label
+        Me.lblReportFolder = New System.Windows.Forms.Label
         Me.lblFolder = New System.Windows.Forms.Label
         Me.fbdFolder = New System.Windows.Forms.FolderBrowserDialog
         Me.SuspendLayout()
@@ -70,19 +70,20 @@ Public Class frmReport
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboAreas.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboAreas.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboAreas.Location = New System.Drawing.Point(192, 16)
+        Me.cboAreas.Location = New System.Drawing.Point(165, 12)
         Me.cboAreas.Name = "cboAreas"
-        Me.cboAreas.Size = New System.Drawing.Size(224, 25)
+        Me.cboAreas.Size = New System.Drawing.Size(287, 21)
         Me.cboAreas.TabIndex = 12
         '
-        'Label3
+        'lblAreaOfInterest
         '
-        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(16, 16)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(168, 25)
-        Me.Label3.TabIndex = 10
-        Me.Label3.Text = "Area of Interest Layer:"
+        Me.lblAreaOfInterest.AutoSize = True
+        Me.lblAreaOfInterest.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblAreaOfInterest.Location = New System.Drawing.Point(14, 15)
+        Me.lblAreaOfInterest.Name = "lblAreaOfInterest"
+        Me.lblAreaOfInterest.Size = New System.Drawing.Size(134, 13)
+        Me.lblAreaOfInterest.TabIndex = 10
+        Me.lblAreaOfInterest.Text = "Area of Interest Layer:"
         '
         'cboSub1
         '
@@ -90,26 +91,28 @@ Public Class frmReport
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSub1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSub1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboSub1.Location = New System.Drawing.Point(208, 48)
+        Me.cboSub1.Location = New System.Drawing.Point(165, 39)
         Me.cboSub1.Name = "cboSub1"
-        Me.cboSub1.Size = New System.Drawing.Size(208, 25)
+        Me.cboSub1.Size = New System.Drawing.Size(287, 21)
         Me.cboSub1.TabIndex = 18
         '
         'lblSubid
         '
+        Me.lblSubid.AutoSize = True
         Me.lblSubid.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblSubid.Location = New System.Drawing.Point(40, 48)
+        Me.lblSubid.Location = New System.Drawing.Point(31, 42)
         Me.lblSubid.Name = "lblSubid"
-        Me.lblSubid.Size = New System.Drawing.Size(152, 25)
+        Me.lblSubid.Size = New System.Drawing.Size(55, 13)
         Me.lblSubid.TabIndex = 17
         Me.lblSubid.Text = "ID Field:"
         '
         'lblSubname
         '
+        Me.lblSubname.AutoSize = True
         Me.lblSubname.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblSubname.Location = New System.Drawing.Point(40, 80)
+        Me.lblSubname.Location = New System.Drawing.Point(31, 69)
         Me.lblSubname.Name = "lblSubname"
-        Me.lblSubname.Size = New System.Drawing.Size(152, 25)
+        Me.lblSubname.Size = New System.Drawing.Size(74, 13)
         Me.lblSubname.TabIndex = 21
         Me.lblSubname.Text = "Name Field:"
         '
@@ -119,77 +122,81 @@ Public Class frmReport
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSub2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSub2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cboSub2.Location = New System.Drawing.Point(208, 80)
+        Me.cboSub2.Location = New System.Drawing.Point(165, 66)
         Me.cboSub2.Name = "cboSub2"
-        Me.cboSub2.Size = New System.Drawing.Size(208, 25)
+        Me.cboSub2.Size = New System.Drawing.Size(287, 21)
         Me.cboSub2.TabIndex = 22
         '
         'cmdNext
         '
-        Me.cmdNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.cmdNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cmdNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdNext.Location = New System.Drawing.Point(240, 392)
+        Me.cmdNext.Location = New System.Drawing.Point(296, 408)
         Me.cmdNext.Name = "cmdNext"
-        Me.cmdNext.Size = New System.Drawing.Size(88, 34)
+        Me.cmdNext.Size = New System.Drawing.Size(75, 28)
         Me.cmdNext.TabIndex = 23
         Me.cmdNext.Text = "Generate"
         '
         'cmdCancel
         '
-        Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.cmdCancel.Location = New System.Drawing.Point(128, 392)
+        Me.cmdCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.cmdCancel.Location = New System.Drawing.Point(377, 408)
         Me.cmdCancel.Name = "cmdCancel"
-        Me.cmdCancel.Size = New System.Drawing.Size(88, 34)
+        Me.cmdCancel.Size = New System.Drawing.Size(75, 28)
         Me.cmdCancel.TabIndex = 24
-        Me.cmdCancel.Text = "Close"
+        Me.cmdCancel.Text = "Cancel"
         '
         'lbxReports
         '
         Me.lbxReports.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lbxReports.ItemHeight = 17
-        Me.lbxReports.Location = New System.Drawing.Point(40, 144)
+        Me.lbxReports.Location = New System.Drawing.Point(34, 125)
         Me.lbxReports.Name = "lbxReports"
         Me.lbxReports.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lbxReports.Size = New System.Drawing.Size(384, 191)
+        Me.lbxReports.Size = New System.Drawing.Size(418, 225)
         Me.lbxReports.TabIndex = 25
         '
-        'Label1
+        'lblAvailableReports
         '
-        Me.Label1.Location = New System.Drawing.Point(16, 120)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(200, 24)
-        Me.Label1.TabIndex = 26
-        Me.Label1.Text = "Available Reports:"
+        Me.lblAvailableReports.AutoSize = True
+        Me.lblAvailableReports.Location = New System.Drawing.Point(14, 96)
+        Me.lblAvailableReports.Name = "lblAvailableReports"
+        Me.lblAvailableReports.Size = New System.Drawing.Size(111, 13)
+        Me.lblAvailableReports.TabIndex = 26
+        Me.lblAvailableReports.Text = "Available Reports:"
         '
-        'Label2
+        'lblReportFolder
         '
-        Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.Label2.Location = New System.Drawing.Point(16, 352)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(112, 24)
-        Me.Label2.TabIndex = 27
-        Me.Label2.Text = "Report Folder:"
+        Me.lblReportFolder.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblReportFolder.AutoSize = True
+        Me.lblReportFolder.Location = New System.Drawing.Point(14, 371)
+        Me.lblReportFolder.Name = "lblReportFolder"
+        Me.lblReportFolder.Size = New System.Drawing.Size(88, 13)
+        Me.lblReportFolder.TabIndex = 27
+        Me.lblReportFolder.Text = "Report Folder:"
         '
         'lblFolder
         '
         Me.lblFolder.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
-        Me.lblFolder.Location = New System.Drawing.Point(128, 352)
+        Me.lblFolder.Location = New System.Drawing.Point(110, 370)
         Me.lblFolder.Name = "lblFolder"
-        Me.lblFolder.Size = New System.Drawing.Size(296, 24)
+        Me.lblFolder.Size = New System.Drawing.Size(342, 20)
         Me.lblFolder.TabIndex = 28
         Me.lblFolder.Text = "C:\BASINS\reports\"
         '
         'frmReport
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(7, 16)
+        Me.AcceptButton = Me.cmdNext
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 13)
+        Me.CancelButton = Me.cmdCancel
         Me.ClientSize = New System.Drawing.Size(464, 448)
         Me.Controls.Add(Me.lblFolder)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.lblReportFolder)
+        Me.Controls.Add(Me.lblAvailableReports)
         Me.Controls.Add(Me.lbxReports)
         Me.Controls.Add(Me.cmdCancel)
         Me.Controls.Add(Me.cmdNext)
@@ -198,13 +205,16 @@ Public Class frmReport
         Me.Controls.Add(Me.cboSub1)
         Me.Controls.Add(Me.lblSubid)
         Me.Controls.Add(Me.cboAreas)
-        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.lblAreaOfInterest)
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmReport"
         Me.Text = "BASINS Watershed Characterization Reports"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

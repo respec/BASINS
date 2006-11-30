@@ -36,7 +36,7 @@ Public Class frmSpecifyNdayHighLow
     Friend WithEvents cboStartMonth As System.Windows.Forms.ComboBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSpecifyNdayHighLow))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSpecifyNdayHighLow))
         Me.btnOk = New System.Windows.Forms.Button
         Me.txtNDays = New System.Windows.Forms.TextBox
         Me.Label1 = New System.Windows.Forms.Label
@@ -47,7 +47,8 @@ Public Class frmSpecifyNdayHighLow
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(112, 88)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(154, 89)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(80, 24)
         Me.btnOk.TabIndex = 7
@@ -55,7 +56,7 @@ Public Class frmSpecifyNdayHighLow
         '
         'txtNDays
         '
-        Me.txtNDays.Location = New System.Drawing.Point(112, 16)
+        Me.txtNDays.Location = New System.Drawing.Point(108, 19)
         Me.txtNDays.Name = "txtNDays"
         Me.txtNDays.Size = New System.Drawing.Size(40, 20)
         Me.txtNDays.TabIndex = 9
@@ -64,15 +65,16 @@ Public Class frmSpecifyNdayHighLow
         '
         'Label1
         '
-        Me.Label1.Location = New System.Drawing.Point(16, 16)
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(12, 22)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(88, 16)
+        Me.Label1.Size = New System.Drawing.Size(83, 13)
         Me.Label1.TabIndex = 8
         Me.Label1.Text = "Number of Days"
         '
         'txtStartDay
         '
-        Me.txtStartDay.Location = New System.Drawing.Point(200, 48)
+        Me.txtStartDay.Location = New System.Drawing.Point(194, 46)
         Me.txtStartDay.Name = "txtStartDay"
         Me.txtStartDay.Size = New System.Drawing.Size(40, 20)
         Me.txtStartDay.TabIndex = 14
@@ -82,7 +84,7 @@ Public Class frmSpecifyNdayHighLow
         'cboStartMonth
         '
         Me.cboStartMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboStartMonth.Location = New System.Drawing.Point(112, 48)
+        Me.cboStartMonth.Location = New System.Drawing.Point(108, 45)
         Me.cboStartMonth.Name = "cboStartMonth"
         Me.cboStartMonth.Size = New System.Drawing.Size(80, 21)
         Me.cboStartMonth.TabIndex = 13
@@ -90,16 +92,17 @@ Public Class frmSpecifyNdayHighLow
         '
         'Label2
         '
-        Me.Label2.Location = New System.Drawing.Point(16, 48)
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(12, 48)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(72, 16)
+        Me.Label2.Size = New System.Drawing.Size(59, 13)
         Me.Label2.TabIndex = 12
         Me.Label2.Text = "Year Starts"
         '
         'frmSpecifyNdayHighLow
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(256, 125)
+        Me.ClientSize = New System.Drawing.Size(246, 125)
         Me.Controls.Add(Me.txtStartDay)
         Me.Controls.Add(Me.txtNDays)
         Me.Controls.Add(Me.cboStartMonth)
@@ -107,9 +110,12 @@ Public Class frmSpecifyNdayHighLow
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.btnOk)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmSpecifyNdayHighLow"
         Me.Text = "Specify N-day"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

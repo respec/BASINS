@@ -35,9 +35,10 @@ Public Class frmSpecifyYearSubset
     Friend WithEvents txtEndDay As System.Windows.Forms.TextBox
     Friend WithEvents cboEndMonth As System.Windows.Forms.ComboBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmSpecifyYearSubset))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSpecifyYearSubset))
         Me.Label1 = New System.Windows.Forms.Label
         Me.cboStartMonth = New System.Windows.Forms.ComboBox
         Me.txtStartDay = New System.Windows.Forms.TextBox
@@ -45,28 +46,33 @@ Public Class frmSpecifyYearSubset
         Me.cboEndMonth = New System.Windows.Forms.ComboBox
         Me.Label2 = New System.Windows.Forms.Label
         Me.btnOk = New System.Windows.Forms.Button
+        Me.btnCancel = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'Label1
         '
-        Me.Label1.Location = New System.Drawing.Point(8, 20)
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(12, 19)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(72, 16)
+        Me.Label1.Size = New System.Drawing.Size(55, 13)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Start Date"
         '
         'cboStartMonth
         '
+        Me.cboStartMonth.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboStartMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboStartMonth.Location = New System.Drawing.Point(96, 16)
+        Me.cboStartMonth.Location = New System.Drawing.Point(102, 16)
         Me.cboStartMonth.Name = "cboStartMonth"
-        Me.cboStartMonth.Size = New System.Drawing.Size(80, 21)
+        Me.cboStartMonth.Size = New System.Drawing.Size(88, 21)
         Me.cboStartMonth.TabIndex = 1
         Me.cboStartMonth.Text = "January"
         '
         'txtStartDay
         '
-        Me.txtStartDay.Location = New System.Drawing.Point(184, 16)
+        Me.txtStartDay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtStartDay.Location = New System.Drawing.Point(196, 16)
         Me.txtStartDay.Name = "txtStartDay"
         Me.txtStartDay.Size = New System.Drawing.Size(40, 20)
         Me.txtStartDay.TabIndex = 2
@@ -75,7 +81,8 @@ Public Class frmSpecifyYearSubset
         '
         'txtEndDay
         '
-        Me.txtEndDay.Location = New System.Drawing.Point(184, 56)
+        Me.txtEndDay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtEndDay.Location = New System.Drawing.Point(196, 56)
         Me.txtEndDay.Name = "txtEndDay"
         Me.txtEndDay.Size = New System.Drawing.Size(40, 20)
         Me.txtEndDay.TabIndex = 5
@@ -84,33 +91,50 @@ Public Class frmSpecifyYearSubset
         '
         'cboEndMonth
         '
+        Me.cboEndMonth.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboEndMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
-        Me.cboEndMonth.Location = New System.Drawing.Point(96, 56)
+        Me.cboEndMonth.Location = New System.Drawing.Point(102, 56)
         Me.cboEndMonth.Name = "cboEndMonth"
-        Me.cboEndMonth.Size = New System.Drawing.Size(80, 21)
+        Me.cboEndMonth.Size = New System.Drawing.Size(88, 21)
         Me.cboEndMonth.TabIndex = 4
         Me.cboEndMonth.Text = "December"
         '
         'Label2
         '
-        Me.Label2.Location = New System.Drawing.Point(8, 64)
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(12, 59)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(72, 16)
+        Me.Label2.Size = New System.Drawing.Size(52, 13)
         Me.Label2.TabIndex = 3
         Me.Label2.Text = "End Date"
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(96, 104)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(102, 97)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(80, 24)
+        Me.btnOk.Size = New System.Drawing.Size(64, 24)
         Me.btnOk.TabIndex = 6
         Me.btnOk.Text = "Ok"
         '
+        'btnCancel
+        '
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Location = New System.Drawing.Point(172, 97)
+        Me.btnCancel.Name = "btnCancel"
+        Me.btnCancel.Size = New System.Drawing.Size(64, 24)
+        Me.btnCancel.TabIndex = 7
+        Me.btnCancel.Text = "Cancel"
+        '
         'frmSpecifyYearSubset
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(240, 141)
+        Me.CancelButton = Me.btnCancel
+        Me.ClientSize = New System.Drawing.Size(248, 133)
+        Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.txtEndDay)
         Me.Controls.Add(Me.cboEndMonth)
@@ -119,9 +143,12 @@ Public Class frmSpecifyYearSubset
         Me.Controls.Add(Me.cboStartMonth)
         Me.Controls.Add(Me.Label1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "frmSpecifyYearSubset"
         Me.Text = "Specify Season"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

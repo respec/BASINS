@@ -12,7 +12,7 @@ Imports System.Collections
 Imports System.ComponentModel
 Imports System.IO
 Imports System.Windows.Forms
-Imports System.Runtime.InteropServices
+'Imports System.Runtime.InteropServices
 
 Public Class atcGraphForm
     Inherits Form
@@ -47,14 +47,11 @@ Public Class atcGraphForm
         'myPane.PaneFill = New Fill(Color.White, Color.LightYellow, 45.0F)
         With myPane
             With .XAxis
-
-                .Type = AxisType.Probability
-                .Scale.Max = 0.999
-                .Scale.Min = 0.001
-
-                '.Type = ZedGraph.AxisType.Date
-                '.Scale.Max = Double.NegativeInfinity
-                '.Scale.Min = Double.PositiveInfinity
+                .Type = ZedGraph.AxisType.Date
+                '.MajorUnit = ZedGraph.DateUnit.Day
+                '.MinorUnit = ZedGraph.DateUnit.Hour
+                .Scale.Max = Double.NegativeInfinity
+                .Scale.Min = Double.PositiveInfinity
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
@@ -230,15 +227,16 @@ Public Class atcGraphForm
         Me.mnuView.Index = 2
         Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuViewTime, Me.mnuViewProbability})
         Me.mnuView.Text = "View"
+        Me.mnuView.Visible = False
         '
         'mnuViewTime
         '
+        Me.mnuViewTime.Checked = True
         Me.mnuViewTime.Index = 0
         Me.mnuViewTime.Text = "Time"
         '
         'mnuViewProbability
         '
-        Me.mnuViewProbability.Checked = True
         Me.mnuViewProbability.Index = 1
         Me.mnuViewProbability.Text = "Probability"
         '
@@ -547,7 +545,7 @@ Public Class atcGraphForm
     '    End Function
     'End Class
 
-    Private Sub mnuViewProbability_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewTime.Click, mnuViewProbability.Click
+    Private Sub mnuView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewTime.Click, mnuViewProbability.Click
         mnuViewTime.Checked = mnuViewProbability.Checked
         mnuViewProbability.Checked = Not mnuViewProbability.Checked
         AddDatasets(pDataGroup)

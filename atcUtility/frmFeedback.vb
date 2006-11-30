@@ -34,7 +34,7 @@ Public Class frmFeedback
     Friend WithEvents lblName As System.Windows.Forms.Label
     Friend WithEvents txtName As System.Windows.Forms.TextBox
     Friend WithEvents lblEmail As System.Windows.Forms.Label
-    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents lblEnterAmessage As System.Windows.Forms.Label
     Friend WithEvents btnSend As System.Windows.Forms.Button
     Friend WithEvents btnCopy As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
@@ -43,12 +43,12 @@ Public Class frmFeedback
     Friend WithEvents txtSystemInformation As System.Windows.Forms.TextBox
     Friend WithEvents chkSendSystemInformation As System.Windows.Forms.CheckBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmFeedback))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFeedback))
         Me.lblName = New System.Windows.Forms.Label
         Me.txtName = New System.Windows.Forms.TextBox
         Me.txtEmail = New System.Windows.Forms.TextBox
         Me.lblEmail = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
+        Me.lblEnterAmessage = New System.Windows.Forms.Label
         Me.txtMessage = New System.Windows.Forms.TextBox
         Me.txtSystemInformation = New System.Windows.Forms.TextBox
         Me.btnSend = New System.Windows.Forms.Button
@@ -59,11 +59,12 @@ Public Class frmFeedback
         '
         'lblName
         '
-        Me.lblName.Location = New System.Drawing.Point(16, 24)
+        Me.lblName.AutoSize = True
+        Me.lblName.Location = New System.Drawing.Point(12, 19)
         Me.lblName.Name = "lblName"
-        Me.lblName.Size = New System.Drawing.Size(72, 16)
+        Me.lblName.Size = New System.Drawing.Size(63, 13)
         Me.lblName.TabIndex = 0
-        Me.lblName.Text = "Your &Name:"
+        Me.lblName.Text = "Your Name:"
         '
         'txtName
         '
@@ -71,9 +72,8 @@ Public Class frmFeedback
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(128, 16)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(264, 20)
+        Me.txtName.Size = New System.Drawing.Size(260, 20)
         Me.txtName.TabIndex = 1
-        Me.txtName.Text = ""
         '
         'txtEmail
         '
@@ -81,37 +81,36 @@ Public Class frmFeedback
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtEmail.Location = New System.Drawing.Point(128, 40)
         Me.txtEmail.Name = "txtEmail"
-        Me.txtEmail.Size = New System.Drawing.Size(264, 20)
+        Me.txtEmail.Size = New System.Drawing.Size(260, 20)
         Me.txtEmail.TabIndex = 3
-        Me.txtEmail.Text = ""
         '
         'lblEmail
         '
-        Me.lblEmail.Location = New System.Drawing.Point(16, 48)
+        Me.lblEmail.AutoSize = True
+        Me.lblEmail.Location = New System.Drawing.Point(12, 43)
         Me.lblEmail.Name = "lblEmail"
-        Me.lblEmail.Size = New System.Drawing.Size(128, 16)
+        Me.lblEmail.Size = New System.Drawing.Size(101, 13)
         Me.lblEmail.TabIndex = 2
-        Me.lblEmail.Text = "Your &Email Address:"
+        Me.lblEmail.Text = "Your Email Address:"
         '
-        'Label1
+        'lblEnterAmessage
         '
-        Me.Label1.Location = New System.Drawing.Point(16, 80)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(192, 16)
-        Me.Label1.TabIndex = 4
-        Me.Label1.Text = "Enter a &message to the developers:"
+        Me.lblEnterAmessage.Location = New System.Drawing.Point(12, 80)
+        Me.lblEnterAmessage.Name = "lblEnterAmessage"
+        Me.lblEnterAmessage.Size = New System.Drawing.Size(192, 16)
+        Me.lblEnterAmessage.TabIndex = 4
+        Me.lblEnterAmessage.Text = "Enter a message to the developers:"
         '
         'txtMessage
         '
         Me.txtMessage.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtMessage.Location = New System.Drawing.Point(16, 104)
+        Me.txtMessage.Location = New System.Drawing.Point(12, 99)
         Me.txtMessage.Multiline = True
         Me.txtMessage.Name = "txtMessage"
         Me.txtMessage.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtMessage.Size = New System.Drawing.Size(376, 96)
+        Me.txtMessage.Size = New System.Drawing.Size(376, 104)
         Me.txtMessage.TabIndex = 5
-        Me.txtMessage.Text = ""
         '
         'txtSystemInformation
         '
@@ -120,65 +119,67 @@ Public Class frmFeedback
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtSystemInformation.BackColor = System.Drawing.SystemColors.Control
         Me.txtSystemInformation.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.txtSystemInformation.Location = New System.Drawing.Point(16, 232)
+        Me.txtSystemInformation.Location = New System.Drawing.Point(12, 232)
         Me.txtSystemInformation.Multiline = True
         Me.txtSystemInformation.Name = "txtSystemInformation"
         Me.txtSystemInformation.ScrollBars = System.Windows.Forms.ScrollBars.Both
-        Me.txtSystemInformation.Size = New System.Drawing.Size(376, 96)
-        Me.txtSystemInformation.TabIndex = 6
-        Me.txtSystemInformation.Text = ""
+        Me.txtSystemInformation.Size = New System.Drawing.Size(376, 99)
+        Me.txtSystemInformation.TabIndex = 7
         '
         'btnSend
         '
         Me.btnSend.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSend.DialogResult = System.Windows.Forms.DialogResult.OK
-        Me.btnSend.Location = New System.Drawing.Point(144, 336)
+        Me.btnSend.Location = New System.Drawing.Point(160, 337)
         Me.btnSend.Name = "btnSend"
         Me.btnSend.Size = New System.Drawing.Size(72, 24)
         Me.btnSend.TabIndex = 8
-        Me.btnSend.Text = "&Send"
+        Me.btnSend.Text = "Send"
         '
         'btnCopy
         '
         Me.btnCopy.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCopy.Location = New System.Drawing.Point(232, 336)
+        Me.btnCopy.Location = New System.Drawing.Point(238, 337)
         Me.btnCopy.Name = "btnCopy"
         Me.btnCopy.Size = New System.Drawing.Size(72, 24)
         Me.btnCopy.TabIndex = 9
-        Me.btnCopy.Text = "&Copy"
+        Me.btnCopy.Text = "Copy"
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(320, 336)
+        Me.btnCancel.Location = New System.Drawing.Point(316, 337)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 10
-        Me.btnCancel.Text = "&Cancel"
+        Me.btnCancel.Text = "Cancel"
         '
         'chkSendSystemInformation
         '
         Me.chkSendSystemInformation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkSendSystemInformation.AutoSize = True
         Me.chkSendSystemInformation.Checked = True
         Me.chkSendSystemInformation.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkSendSystemInformation.Location = New System.Drawing.Point(16, 208)
+        Me.chkSendSystemInformation.Location = New System.Drawing.Point(12, 209)
         Me.chkSendSystemInformation.Name = "chkSendSystemInformation"
-        Me.chkSendSystemInformation.Size = New System.Drawing.Size(368, 16)
-        Me.chkSendSystemInformation.TabIndex = 11
+        Me.chkSendSystemInformation.Size = New System.Drawing.Size(295, 17)
+        Me.chkSendSystemInformation.TabIndex = 6
         Me.chkSendSystemInformation.Text = "Send the following system information with your message:"
         '
         'frmFeedback
         '
+        Me.AcceptButton = Me.btnSend
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(400, 373)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnCopy)
         Me.Controls.Add(Me.btnSend)
         Me.Controls.Add(Me.txtSystemInformation)
         Me.Controls.Add(Me.txtMessage)
-        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.lblEnterAmessage)
         Me.Controls.Add(Me.txtEmail)
         Me.Controls.Add(Me.txtName)
         Me.Controls.Add(Me.lblName)
@@ -188,6 +189,7 @@ Public Class frmFeedback
         Me.Name = "frmFeedback"
         Me.Text = "Feedback"
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 

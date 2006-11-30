@@ -125,7 +125,7 @@ Public Class frmCmpHPET
         Me.lblCloudCover.Location = New System.Drawing.Point(12, 9)
         Me.lblCloudCover.Name = "lblCloudCover"
         Me.lblCloudCover.Size = New System.Drawing.Size(144, 16)
-        Me.lblCloudCover.TabIndex = 2
+        Me.lblCloudCover.TabIndex = 0
         Me.lblCloudCover.Text = "Specify Input Timeseries"
         '
         'lblLatitude
@@ -134,7 +134,7 @@ Public Class frmCmpHPET
         Me.lblLatitude.Location = New System.Drawing.Point(12, 107)
         Me.lblLatitude.Name = "lblLatitude"
         Me.lblLatitude.Size = New System.Drawing.Size(133, 13)
-        Me.lblLatitude.TabIndex = 3
+        Me.lblLatitude.TabIndex = 7
         Me.lblLatitude.Text = "Latitude (decimal degress):"
         '
         'txtLatitude
@@ -142,7 +142,7 @@ Public Class frmCmpHPET
         Me.txtLatitude.Location = New System.Drawing.Point(152, 104)
         Me.txtLatitude.Name = "txtLatitude"
         Me.txtLatitude.Size = New System.Drawing.Size(72, 20)
-        Me.txtLatitude.TabIndex = 4
+        Me.txtLatitude.TabIndex = 8
         '
         'btnCancel
         '
@@ -151,16 +151,16 @@ Public Class frmCmpHPET
         Me.btnCancel.Location = New System.Drawing.Point(429, 208)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
-        Me.btnCancel.TabIndex = 1
+        Me.btnCancel.TabIndex = 25
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(12, 208)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(359, 208)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
-        Me.btnOk.TabIndex = 0
+        Me.btnOk.TabIndex = 24
         Me.btnOk.Text = "Ok"
         '
         'btnTMin
@@ -168,7 +168,7 @@ Public Class frmCmpHPET
         Me.btnTMin.Location = New System.Drawing.Point(74, 36)
         Me.btnTMin.Name = "btnTMin"
         Me.btnTMin.Size = New System.Drawing.Size(48, 20)
-        Me.btnTMin.TabIndex = 18
+        Me.btnTMin.TabIndex = 2
         Me.btnTMin.Text = "Select"
         '
         'txtTMin
@@ -179,7 +179,7 @@ Public Class frmCmpHPET
         Me.txtTMin.Name = "txtTMin"
         Me.txtTMin.ReadOnly = True
         Me.txtTMin.Size = New System.Drawing.Size(363, 20)
-        Me.txtTMin.TabIndex = 19
+        Me.txtTMin.TabIndex = 3
         '
         'lblTMin
         '
@@ -187,7 +187,7 @@ Public Class frmCmpHPET
         Me.lblTMin.Location = New System.Drawing.Point(12, 40)
         Me.lblTMin.Name = "lblTMin"
         Me.lblTMin.Size = New System.Drawing.Size(57, 13)
-        Me.lblTMin.TabIndex = 20
+        Me.lblTMin.TabIndex = 1
         Me.lblTMin.Text = "Min Temp:"
         '
         'lblTMax
@@ -196,7 +196,7 @@ Public Class frmCmpHPET
         Me.lblTMax.Location = New System.Drawing.Point(12, 74)
         Me.lblTMax.Name = "lblTMax"
         Me.lblTMax.Size = New System.Drawing.Size(60, 13)
-        Me.lblTMax.TabIndex = 21
+        Me.lblTMax.TabIndex = 4
         Me.lblTMax.Text = "Max Temp:"
         '
         'btnTMax
@@ -204,7 +204,7 @@ Public Class frmCmpHPET
         Me.btnTMax.Location = New System.Drawing.Point(74, 71)
         Me.btnTMax.Name = "btnTMax"
         Me.btnTMax.Size = New System.Drawing.Size(48, 20)
-        Me.btnTMax.TabIndex = 22
+        Me.btnTMax.TabIndex = 5
         Me.btnTMax.Text = "Select"
         '
         'txtTMax
@@ -215,7 +215,7 @@ Public Class frmCmpHPET
         Me.txtTMax.Name = "txtTMax"
         Me.txtTMax.ReadOnly = True
         Me.txtTMax.Size = New System.Drawing.Size(363, 20)
-        Me.txtTMax.TabIndex = 23
+        Me.txtTMax.TabIndex = 6
         '
         'rdoDegF
         '
@@ -223,7 +223,7 @@ Public Class frmCmpHPET
         Me.rdoDegF.Location = New System.Drawing.Point(270, 104)
         Me.rdoDegF.Name = "rdoDegF"
         Me.rdoDegF.Size = New System.Drawing.Size(96, 20)
-        Me.rdoDegF.TabIndex = 24
+        Me.rdoDegF.TabIndex = 9
         Me.rdoDegF.TabStop = True
         Me.rdoDegF.Text = "Fahrenheit"
         '
@@ -232,7 +232,7 @@ Public Class frmCmpHPET
         Me.rdoDegC.Location = New System.Drawing.Point(270, 124)
         Me.rdoDegC.Name = "rdoDegC"
         Me.rdoDegC.Size = New System.Drawing.Size(96, 20)
-        Me.rdoDegC.TabIndex = 25
+        Me.rdoDegC.TabIndex = 10
         Me.rdoDegC.Text = "Celsius"
         '
         'lblMonCoeff
@@ -241,7 +241,7 @@ Public Class frmCmpHPET
         Me.lblMonCoeff.Location = New System.Drawing.Point(12, 142)
         Me.lblMonCoeff.Name = "lblMonCoeff"
         Me.lblMonCoeff.Size = New System.Drawing.Size(140, 13)
-        Me.lblMonCoeff.TabIndex = 26
+        Me.lblMonCoeff.TabIndex = 11
         Me.lblMonCoeff.Text = "Specify Monthly Coefficients"
         '
         'lblJan
@@ -357,7 +357,7 @@ Public Class frmCmpHPET
         Me.txtJan.Location = New System.Drawing.Point(15, 177)
         Me.txtJan.Name = "txtJan"
         Me.txtJan.Size = New System.Drawing.Size(40, 20)
-        Me.txtJan.TabIndex = 39
+        Me.txtJan.TabIndex = 12
         Me.txtJan.Text = "0.0055"
         '
         'txtFeb
@@ -365,7 +365,7 @@ Public Class frmCmpHPET
         Me.txtFeb.Location = New System.Drawing.Point(55, 177)
         Me.txtFeb.Name = "txtFeb"
         Me.txtFeb.Size = New System.Drawing.Size(40, 20)
-        Me.txtFeb.TabIndex = 40
+        Me.txtFeb.TabIndex = 13
         Me.txtFeb.Text = "0.0055"
         '
         'txtMar
@@ -373,7 +373,7 @@ Public Class frmCmpHPET
         Me.txtMar.Location = New System.Drawing.Point(95, 177)
         Me.txtMar.Name = "txtMar"
         Me.txtMar.Size = New System.Drawing.Size(40, 20)
-        Me.txtMar.TabIndex = 41
+        Me.txtMar.TabIndex = 14
         Me.txtMar.Text = "0.0055"
         '
         'txtApr
@@ -381,7 +381,7 @@ Public Class frmCmpHPET
         Me.txtApr.Location = New System.Drawing.Point(135, 177)
         Me.txtApr.Name = "txtApr"
         Me.txtApr.Size = New System.Drawing.Size(40, 20)
-        Me.txtApr.TabIndex = 42
+        Me.txtApr.TabIndex = 15
         Me.txtApr.Text = "0.0055"
         '
         'txtMay
@@ -389,7 +389,7 @@ Public Class frmCmpHPET
         Me.txtMay.Location = New System.Drawing.Point(175, 177)
         Me.txtMay.Name = "txtMay"
         Me.txtMay.Size = New System.Drawing.Size(40, 20)
-        Me.txtMay.TabIndex = 43
+        Me.txtMay.TabIndex = 16
         Me.txtMay.Text = "0.0055"
         '
         'txtJun
@@ -397,7 +397,7 @@ Public Class frmCmpHPET
         Me.txtJun.Location = New System.Drawing.Point(215, 177)
         Me.txtJun.Name = "txtJun"
         Me.txtJun.Size = New System.Drawing.Size(40, 20)
-        Me.txtJun.TabIndex = 44
+        Me.txtJun.TabIndex = 17
         Me.txtJun.Text = "0.0055"
         '
         'txtJul
@@ -405,7 +405,7 @@ Public Class frmCmpHPET
         Me.txtJul.Location = New System.Drawing.Point(255, 177)
         Me.txtJul.Name = "txtJul"
         Me.txtJul.Size = New System.Drawing.Size(40, 20)
-        Me.txtJul.TabIndex = 45
+        Me.txtJul.TabIndex = 18
         Me.txtJul.Text = "0.0055"
         '
         'txtAug
@@ -413,7 +413,7 @@ Public Class frmCmpHPET
         Me.txtAug.Location = New System.Drawing.Point(295, 177)
         Me.txtAug.Name = "txtAug"
         Me.txtAug.Size = New System.Drawing.Size(40, 20)
-        Me.txtAug.TabIndex = 46
+        Me.txtAug.TabIndex = 19
         Me.txtAug.Text = "0.0055"
         '
         'txtSep
@@ -421,7 +421,7 @@ Public Class frmCmpHPET
         Me.txtSep.Location = New System.Drawing.Point(335, 177)
         Me.txtSep.Name = "txtSep"
         Me.txtSep.Size = New System.Drawing.Size(40, 20)
-        Me.txtSep.TabIndex = 47
+        Me.txtSep.TabIndex = 20
         Me.txtSep.Text = "0.0055"
         '
         'txtOct
@@ -429,7 +429,7 @@ Public Class frmCmpHPET
         Me.txtOct.Location = New System.Drawing.Point(375, 177)
         Me.txtOct.Name = "txtOct"
         Me.txtOct.Size = New System.Drawing.Size(40, 20)
-        Me.txtOct.TabIndex = 48
+        Me.txtOct.TabIndex = 21
         Me.txtOct.Text = "0.0055"
         '
         'txtNov
@@ -437,7 +437,7 @@ Public Class frmCmpHPET
         Me.txtNov.Location = New System.Drawing.Point(415, 177)
         Me.txtNov.Name = "txtNov"
         Me.txtNov.Size = New System.Drawing.Size(40, 20)
-        Me.txtNov.TabIndex = 49
+        Me.txtNov.TabIndex = 22
         Me.txtNov.Text = "0.0055"
         '
         'txtDec
@@ -445,12 +445,14 @@ Public Class frmCmpHPET
         Me.txtDec.Location = New System.Drawing.Point(455, 177)
         Me.txtDec.Name = "txtDec"
         Me.txtDec.Size = New System.Drawing.Size(40, 20)
-        Me.txtDec.TabIndex = 50
+        Me.txtDec.TabIndex = 23
         Me.txtDec.Text = "0.0055"
         '
         'frmCmpHPET
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(505, 244)
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.btnCancel)

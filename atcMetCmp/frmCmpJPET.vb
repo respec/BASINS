@@ -133,7 +133,7 @@ Public Class frmCmpJPET
         Me.lblJensenPET.Location = New System.Drawing.Point(12, 9)
         Me.lblJensenPET.Name = "lblJensenPET"
         Me.lblJensenPET.Size = New System.Drawing.Size(122, 13)
-        Me.lblJensenPET.TabIndex = 2
+        Me.lblJensenPET.TabIndex = 1
         Me.lblJensenPET.Text = "Specify Input Timeseries"
         '
         'lblConstant
@@ -142,7 +142,7 @@ Public Class frmCmpJPET
         Me.lblConstant.Location = New System.Drawing.Point(12, 144)
         Me.lblConstant.Name = "lblConstant"
         Me.lblConstant.Size = New System.Drawing.Size(105, 13)
-        Me.lblConstant.TabIndex = 3
+        Me.lblConstant.TabIndex = 10
         Me.lblConstant.Text = "Constant Coefficient:"
         '
         'txtConstant
@@ -150,7 +150,7 @@ Public Class frmCmpJPET
         Me.txtConstant.Location = New System.Drawing.Point(154, 141)
         Me.txtConstant.Name = "txtConstant"
         Me.txtConstant.Size = New System.Drawing.Size(72, 20)
-        Me.txtConstant.TabIndex = 4
+        Me.txtConstant.TabIndex = 11
         '
         'btnCancel
         '
@@ -159,16 +159,16 @@ Public Class frmCmpJPET
         Me.btnCancel.Location = New System.Drawing.Point(432, 257)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
-        Me.btnCancel.TabIndex = 1
+        Me.btnCancel.TabIndex = 40
         Me.btnCancel.Text = "Cancel"
         '
         'btnOk
         '
-        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(12, 257)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(362, 257)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(64, 24)
-        Me.btnOk.TabIndex = 0
+        Me.btnOk.TabIndex = 39
         Me.btnOk.Text = "Ok"
         '
         'btnTMin
@@ -176,7 +176,7 @@ Public Class frmCmpJPET
         Me.btnTMin.Location = New System.Drawing.Point(100, 39)
         Me.btnTMin.Name = "btnTMin"
         Me.btnTMin.Size = New System.Drawing.Size(48, 20)
-        Me.btnTMin.TabIndex = 18
+        Me.btnTMin.TabIndex = 3
         Me.btnTMin.Text = "Select"
         '
         'txtTMin
@@ -187,7 +187,7 @@ Public Class frmCmpJPET
         Me.txtTMin.Name = "txtTMin"
         Me.txtTMin.ReadOnly = True
         Me.txtTMin.Size = New System.Drawing.Size(342, 20)
-        Me.txtTMin.TabIndex = 19
+        Me.txtTMin.TabIndex = 4
         '
         'lblTMin
         '
@@ -195,7 +195,7 @@ Public Class frmCmpJPET
         Me.lblTMin.Location = New System.Drawing.Point(37, 43)
         Me.lblTMin.Name = "lblTMin"
         Me.lblTMin.Size = New System.Drawing.Size(57, 13)
-        Me.lblTMin.TabIndex = 20
+        Me.lblTMin.TabIndex = 2
         Me.lblTMin.Text = "Min Temp:"
         '
         'lblTMax
@@ -204,7 +204,7 @@ Public Class frmCmpJPET
         Me.lblTMax.Location = New System.Drawing.Point(34, 76)
         Me.lblTMax.Name = "lblTMax"
         Me.lblTMax.Size = New System.Drawing.Size(60, 13)
-        Me.lblTMax.TabIndex = 21
+        Me.lblTMax.TabIndex = 5
         Me.lblTMax.Text = "Max Temp:"
         '
         'btnTMax
@@ -212,7 +212,7 @@ Public Class frmCmpJPET
         Me.btnTMax.Location = New System.Drawing.Point(100, 72)
         Me.btnTMax.Name = "btnTMax"
         Me.btnTMax.Size = New System.Drawing.Size(48, 20)
-        Me.btnTMax.TabIndex = 22
+        Me.btnTMax.TabIndex = 6
         Me.btnTMax.Text = "Select"
         '
         'txtTMax
@@ -223,7 +223,7 @@ Public Class frmCmpJPET
         Me.txtTMax.Name = "txtTMax"
         Me.txtTMax.ReadOnly = True
         Me.txtTMax.Size = New System.Drawing.Size(342, 20)
-        Me.txtTMax.TabIndex = 23
+        Me.txtTMax.TabIndex = 7
         '
         'lblMonCoeff
         '
@@ -231,7 +231,7 @@ Public Class frmCmpJPET
         Me.lblMonCoeff.Location = New System.Drawing.Point(12, 181)
         Me.lblMonCoeff.Name = "lblMonCoeff"
         Me.lblMonCoeff.Size = New System.Drawing.Size(140, 13)
-        Me.lblMonCoeff.TabIndex = 26
+        Me.lblMonCoeff.TabIndex = 14
         Me.lblMonCoeff.Text = "Specify Monthly Coefficients"
         '
         'lblJan
@@ -240,7 +240,7 @@ Public Class frmCmpJPET
         Me.lblJan.Location = New System.Drawing.Point(23, 200)
         Me.lblJan.Name = "lblJan"
         Me.lblJan.Size = New System.Drawing.Size(24, 13)
-        Me.lblJan.TabIndex = 27
+        Me.lblJan.TabIndex = 15
         Me.lblJan.Text = "Jan"
         '
         'lblFeb
@@ -249,7 +249,7 @@ Public Class frmCmpJPET
         Me.lblFeb.Location = New System.Drawing.Point(63, 200)
         Me.lblFeb.Name = "lblFeb"
         Me.lblFeb.Size = New System.Drawing.Size(25, 13)
-        Me.lblFeb.TabIndex = 28
+        Me.lblFeb.TabIndex = 17
         Me.lblFeb.Text = "Feb"
         '
         'lblMar
@@ -258,7 +258,7 @@ Public Class frmCmpJPET
         Me.lblMar.Location = New System.Drawing.Point(103, 200)
         Me.lblMar.Name = "lblMar"
         Me.lblMar.Size = New System.Drawing.Size(25, 13)
-        Me.lblMar.TabIndex = 29
+        Me.lblMar.TabIndex = 19
         Me.lblMar.Text = "Mar"
         '
         'lblApr
@@ -267,7 +267,7 @@ Public Class frmCmpJPET
         Me.lblApr.Location = New System.Drawing.Point(143, 200)
         Me.lblApr.Name = "lblApr"
         Me.lblApr.Size = New System.Drawing.Size(23, 13)
-        Me.lblApr.TabIndex = 30
+        Me.lblApr.TabIndex = 21
         Me.lblApr.Text = "Apr"
         '
         'lblMay
@@ -276,7 +276,7 @@ Public Class frmCmpJPET
         Me.lblMay.Location = New System.Drawing.Point(183, 200)
         Me.lblMay.Name = "lblMay"
         Me.lblMay.Size = New System.Drawing.Size(27, 13)
-        Me.lblMay.TabIndex = 31
+        Me.lblMay.TabIndex = 23
         Me.lblMay.Text = "May"
         '
         'lblJun
@@ -285,7 +285,7 @@ Public Class frmCmpJPET
         Me.lblJun.Location = New System.Drawing.Point(223, 200)
         Me.lblJun.Name = "lblJun"
         Me.lblJun.Size = New System.Drawing.Size(24, 13)
-        Me.lblJun.TabIndex = 32
+        Me.lblJun.TabIndex = 25
         Me.lblJun.Text = "Jun"
         '
         'lblJul
@@ -294,7 +294,7 @@ Public Class frmCmpJPET
         Me.lblJul.Location = New System.Drawing.Point(263, 200)
         Me.lblJul.Name = "lblJul"
         Me.lblJul.Size = New System.Drawing.Size(20, 13)
-        Me.lblJul.TabIndex = 33
+        Me.lblJul.TabIndex = 27
         Me.lblJul.Text = "Jul"
         '
         'lblAug
@@ -303,7 +303,7 @@ Public Class frmCmpJPET
         Me.lblAug.Location = New System.Drawing.Point(303, 200)
         Me.lblAug.Name = "lblAug"
         Me.lblAug.Size = New System.Drawing.Size(26, 13)
-        Me.lblAug.TabIndex = 34
+        Me.lblAug.TabIndex = 29
         Me.lblAug.Text = "Aug"
         '
         'lblSep
@@ -312,7 +312,7 @@ Public Class frmCmpJPET
         Me.lblSep.Location = New System.Drawing.Point(343, 200)
         Me.lblSep.Name = "lblSep"
         Me.lblSep.Size = New System.Drawing.Size(26, 13)
-        Me.lblSep.TabIndex = 35
+        Me.lblSep.TabIndex = 31
         Me.lblSep.Text = "Sep"
         '
         'lblOct
@@ -321,7 +321,7 @@ Public Class frmCmpJPET
         Me.lblOct.Location = New System.Drawing.Point(383, 200)
         Me.lblOct.Name = "lblOct"
         Me.lblOct.Size = New System.Drawing.Size(24, 13)
-        Me.lblOct.TabIndex = 36
+        Me.lblOct.TabIndex = 33
         Me.lblOct.Text = "Oct"
         '
         'lblNov
@@ -330,7 +330,7 @@ Public Class frmCmpJPET
         Me.lblNov.Location = New System.Drawing.Point(423, 200)
         Me.lblNov.Name = "lblNov"
         Me.lblNov.Size = New System.Drawing.Size(27, 13)
-        Me.lblNov.TabIndex = 37
+        Me.lblNov.TabIndex = 35
         Me.lblNov.Text = "Nov"
         '
         'lblDec
@@ -339,7 +339,7 @@ Public Class frmCmpJPET
         Me.lblDec.Location = New System.Drawing.Point(463, 200)
         Me.lblDec.Name = "lblDec"
         Me.lblDec.Size = New System.Drawing.Size(27, 13)
-        Me.lblDec.TabIndex = 38
+        Me.lblDec.TabIndex = 37
         Me.lblDec.Text = "Dec"
         '
         'txtJan
@@ -347,7 +347,7 @@ Public Class frmCmpJPET
         Me.txtJan.Location = New System.Drawing.Point(15, 216)
         Me.txtJan.Name = "txtJan"
         Me.txtJan.Size = New System.Drawing.Size(40, 20)
-        Me.txtJan.TabIndex = 39
+        Me.txtJan.TabIndex = 16
         Me.txtJan.Text = "0.012"
         '
         'txtFeb
@@ -355,7 +355,7 @@ Public Class frmCmpJPET
         Me.txtFeb.Location = New System.Drawing.Point(55, 216)
         Me.txtFeb.Name = "txtFeb"
         Me.txtFeb.Size = New System.Drawing.Size(40, 20)
-        Me.txtFeb.TabIndex = 40
+        Me.txtFeb.TabIndex = 18
         Me.txtFeb.Text = "0.012"
         '
         'txtMar
@@ -363,7 +363,7 @@ Public Class frmCmpJPET
         Me.txtMar.Location = New System.Drawing.Point(95, 216)
         Me.txtMar.Name = "txtMar"
         Me.txtMar.Size = New System.Drawing.Size(40, 20)
-        Me.txtMar.TabIndex = 41
+        Me.txtMar.TabIndex = 20
         Me.txtMar.Text = "0.012"
         '
         'txtApr
@@ -371,7 +371,7 @@ Public Class frmCmpJPET
         Me.txtApr.Location = New System.Drawing.Point(135, 216)
         Me.txtApr.Name = "txtApr"
         Me.txtApr.Size = New System.Drawing.Size(40, 20)
-        Me.txtApr.TabIndex = 42
+        Me.txtApr.TabIndex = 22
         Me.txtApr.Text = "0.012"
         '
         'txtMay
@@ -379,7 +379,7 @@ Public Class frmCmpJPET
         Me.txtMay.Location = New System.Drawing.Point(175, 216)
         Me.txtMay.Name = "txtMay"
         Me.txtMay.Size = New System.Drawing.Size(40, 20)
-        Me.txtMay.TabIndex = 43
+        Me.txtMay.TabIndex = 24
         Me.txtMay.Text = "0.012"
         '
         'txtJun
@@ -387,7 +387,7 @@ Public Class frmCmpJPET
         Me.txtJun.Location = New System.Drawing.Point(215, 216)
         Me.txtJun.Name = "txtJun"
         Me.txtJun.Size = New System.Drawing.Size(40, 20)
-        Me.txtJun.TabIndex = 44
+        Me.txtJun.TabIndex = 26
         Me.txtJun.Text = "0.012"
         '
         'txtJul
@@ -395,7 +395,7 @@ Public Class frmCmpJPET
         Me.txtJul.Location = New System.Drawing.Point(255, 216)
         Me.txtJul.Name = "txtJul"
         Me.txtJul.Size = New System.Drawing.Size(40, 20)
-        Me.txtJul.TabIndex = 45
+        Me.txtJul.TabIndex = 28
         Me.txtJul.Text = "0.012"
         '
         'txtAug
@@ -403,7 +403,7 @@ Public Class frmCmpJPET
         Me.txtAug.Location = New System.Drawing.Point(295, 216)
         Me.txtAug.Name = "txtAug"
         Me.txtAug.Size = New System.Drawing.Size(40, 20)
-        Me.txtAug.TabIndex = 46
+        Me.txtAug.TabIndex = 30
         Me.txtAug.Text = "0.012"
         '
         'txtSep
@@ -411,7 +411,7 @@ Public Class frmCmpJPET
         Me.txtSep.Location = New System.Drawing.Point(335, 216)
         Me.txtSep.Name = "txtSep"
         Me.txtSep.Size = New System.Drawing.Size(40, 20)
-        Me.txtSep.TabIndex = 47
+        Me.txtSep.TabIndex = 32
         Me.txtSep.Text = "0.012"
         '
         'txtOct
@@ -419,7 +419,7 @@ Public Class frmCmpJPET
         Me.txtOct.Location = New System.Drawing.Point(375, 216)
         Me.txtOct.Name = "txtOct"
         Me.txtOct.Size = New System.Drawing.Size(40, 20)
-        Me.txtOct.TabIndex = 48
+        Me.txtOct.TabIndex = 34
         Me.txtOct.Text = "0.012"
         '
         'txtNov
@@ -427,7 +427,7 @@ Public Class frmCmpJPET
         Me.txtNov.Location = New System.Drawing.Point(415, 216)
         Me.txtNov.Name = "txtNov"
         Me.txtNov.Size = New System.Drawing.Size(40, 20)
-        Me.txtNov.TabIndex = 49
+        Me.txtNov.TabIndex = 36
         Me.txtNov.Text = "0.012"
         '
         'txtDec
@@ -435,7 +435,7 @@ Public Class frmCmpJPET
         Me.txtDec.Location = New System.Drawing.Point(455, 216)
         Me.txtDec.Name = "txtDec"
         Me.txtDec.Size = New System.Drawing.Size(40, 20)
-        Me.txtDec.TabIndex = 50
+        Me.txtDec.TabIndex = 38
         Me.txtDec.Text = "0.012"
         '
         'lblSRad
@@ -452,7 +452,7 @@ Public Class frmCmpJPET
         Me.btnSRad.Location = New System.Drawing.Point(100, 103)
         Me.btnSRad.Name = "btnSRad"
         Me.btnSRad.Size = New System.Drawing.Size(48, 20)
-        Me.btnSRad.TabIndex = 52
+        Me.btnSRad.TabIndex = 8
         Me.btnSRad.Text = "Select"
         '
         'txtSRad
@@ -463,14 +463,14 @@ Public Class frmCmpJPET
         Me.txtSRad.Name = "txtSRad"
         Me.txtSRad.ReadOnly = True
         Me.txtSRad.Size = New System.Drawing.Size(342, 20)
-        Me.txtSRad.TabIndex = 53
+        Me.txtSRad.TabIndex = 9
         '
         'rdoDegC
         '
         Me.rdoDegC.Location = New System.Drawing.Point(249, 164)
         Me.rdoDegC.Name = "rdoDegC"
         Me.rdoDegC.Size = New System.Drawing.Size(96, 20)
-        Me.rdoDegC.TabIndex = 55
+        Me.rdoDegC.TabIndex = 13
         Me.rdoDegC.Text = "Celsius"
         '
         'rdoDegF
@@ -479,13 +479,15 @@ Public Class frmCmpJPET
         Me.rdoDegF.Location = New System.Drawing.Point(249, 144)
         Me.rdoDegF.Name = "rdoDegF"
         Me.rdoDegF.Size = New System.Drawing.Size(96, 20)
-        Me.rdoDegF.TabIndex = 54
+        Me.rdoDegF.TabIndex = 12
         Me.rdoDegF.TabStop = True
         Me.rdoDegF.Text = "Fahrenheit"
         '
         'frmCmpJPET
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.CancelButton = Me.btnCancel
         Me.ClientSize = New System.Drawing.Size(508, 293)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
