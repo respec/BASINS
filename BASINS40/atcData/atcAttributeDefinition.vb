@@ -26,6 +26,7 @@ Public Class atcAttributeDefinition
     Dim pName As String         'Short name (used for labeling in UI)
     Dim pDescription As String  'Something longer than Name but still short
     Dim pCategory As String     'Optional, used for grouping similar attributes in UI
+    Dim pCopiesInherit As Boolean 'True if attribute should be copied when parent object is copied 
     Dim pHelp As String         'Longer, more detailed than Description
     Dim pEditable As Boolean    'True if the attribute value can be edited by the user
     Dim pDefaultValue As Object 'Of type named by TypeString, or Nothing if not set
@@ -43,6 +44,19 @@ Public Class atcAttributeDefinition
         End Get
         Set(ByVal newValue As String)
             pName = newValue
+        End Set
+    End Property
+
+    Public Property CopiesInherit() As Boolean
+        Get
+            If Calculated Then
+                Return False
+            Else
+                Return pCopiesInherit
+            End If
+        End Get
+        Set(ByVal newValue As Boolean)
+            pCopiesInherit = newValue
         End Set
     End Property
 
@@ -189,6 +203,7 @@ Public Class atcAttributeDefinition
         Name = ""
         Description = ""
         Category = ""
+        pCopiesInherit = True
         Help = ""
         TypeString = "String"
         DefaultValue = Nothing

@@ -162,6 +162,11 @@ EndFound:
         Return lRetval
     End Function
 
+
+    ''' <summary>
+    ''' IO.Path.GetFileNameWithoutExtension
+    ''' FilenameOnly("C:\foo\bar.txt") = "bar"
+    ''' </summary>
     Public Function FilenameOnly(ByVal aStr As String) As String
         ' ##SUMMARY Converts full path, filename, and extension to filename only.
         ' ##SUMMARY   Example: FilenameOnly("C:\foo\bar.txt") = "bar"

@@ -91,7 +91,7 @@ Public Module modTimeseriesMath
                                   Optional ByVal aStartTo As Integer = 0)
 
         For Each lAttribute As atcDefinedValue In aFromDataset.Attributes
-            If Not (lAttribute.Definition.Calculated) Then
+            If lAttribute.Definition.CopiesInherit Then
                 aToDataSet.Attributes.SetValue(lAttribute.Definition, lAttribute.Value)
             End If
         Next
@@ -99,7 +99,7 @@ Public Module modTimeseriesMath
         For lIndex As Integer = 0 To aNumValues - 1
             If aFromDataset.ValueAttributesExist(lIndex + aStartFrom) Then
                 For Each lAttribute As atcDefinedValue In aFromDataset.ValueAttributes(lIndex + aStartFrom)
-                    If Not (lAttribute.Definition.Calculated) Then
+                    If lAttribute.Definition.CopiesInherit Then
                         aToDataSet.ValueAttributes(lIndex + aStartTo).SetValue(lAttribute.Definition, lAttribute.Value)
                     End If
                 Next
@@ -227,7 +227,7 @@ Public Module modTimeseriesMath
 
     Private Sub MergeAttributes(ByVal aGroup As atcDataGroup, ByVal aTarget As atcTimeseries)
         For Each lAttribute As atcDefinedValue In aGroup(0).Attributes
-            If Not lAttribute.Definition.Calculated Then
+            If lAttribute.Definition.CopiesInherit Then
                 Dim lMatch As Boolean = True
                 For Each lData As atcDataSet In aGroup
                     Try

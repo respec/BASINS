@@ -198,12 +198,20 @@ Public Class atcDataAttributes
 
         If pAllDefinitions Is Nothing Then
             pAllDefinitions = New atcCollection
-            Dim lUnitsDef As New atcAttributeDefinition
-            lUnitsDef.Name = "Units"
-            lUnitsDef.TypeString = "String"
-            lUnitsDef.Editable = True
+            Dim lDef As New atcAttributeDefinition
+            lDef.Name = "Units"
+            lDef.TypeString = "String"
+            lDef.CopiesInherit = True
+            lDef.Editable = True
             'lUnitsDef.ValidList = GetAllUnitsInCategory("all")
-            pAllDefinitions.Add("units", lUnitsDef)
+            pAllDefinitions.Add(lDef.Name.ToLower, lDef)
+
+            lDef = New atcAttributeDefinition
+            lDef.Name = "Data Source"
+            lDef.TypeString = "String"
+            lDef.CopiesInherit = False
+            lDef.Editable = False
+            pAllDefinitions.Add(lDef.Name.ToLower, lDef)
         End If
 
         If pAllAliases Is Nothing Then
@@ -252,7 +260,9 @@ Public Class atcDataAttributes
     Public Shadows Function Clone() As atcDataAttributes
         Dim newClone As New atcDataAttributes
         For Each lAdv As atcDefinedValue In Me
-            newClone.SetValue(lAdv.Definition, lAdv.Value, lAdv.Arguments)
+            If lAdv.Definition.CopiesInherit Then
+                newClone.SetValue(lAdv.Definition, lAdv.Value, lAdv.Arguments)
+            End If
         Next
         Return newClone
     End Function
