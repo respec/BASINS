@@ -90,7 +90,7 @@ Friend Class frmAbout
         Me.grpMapWindow.Location = New System.Drawing.Point(19, 368)
         Me.grpMapWindow.Name = "grpMapWindow"
         Me.grpMapWindow.Size = New System.Drawing.Size(733, 102)
-        Me.grpMapWindow.TabIndex = 7
+        Me.grpMapWindow.TabIndex = 5
         Me.grpMapWindow.TabStop = False
         Me.grpMapWindow.Text = "Powered by MapWindow Programmable Geographic Information System"
         '
@@ -125,7 +125,7 @@ Friend Class frmAbout
         Me.lblMapWindowURL.Location = New System.Drawing.Point(541, 73)
         Me.lblMapWindowURL.Name = "lblMapWindowURL"
         Me.lblMapWindowURL.Size = New System.Drawing.Size(180, 17)
-        Me.lblMapWindowURL.TabIndex = 13
+        Me.lblMapWindowURL.TabIndex = 6
         Me.lblMapWindowURL.TabStop = True
         Me.lblMapWindowURL.Text = "http://www.MapWindow.org/"
         '
@@ -137,28 +137,30 @@ Friend Class frmAbout
         Me.btnOk.Location = New System.Drawing.Point(654, 639)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(86, 27)
-        Me.btnOk.TabIndex = 8
+        Me.btnOk.TabIndex = 1
         Me.btnOk.Text = "Close"
         '
         'lblProjFileLabel
         '
         Me.lblProjFileLabel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblProjFileLabel.AutoSize = True
         Me.lblProjFileLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblProjFileLabel.Location = New System.Drawing.Point(29, 580)
         Me.lblProjFileLabel.Name = "lblProjFileLabel"
-        Me.lblProjFileLabel.Size = New System.Drawing.Size(159, 18)
+        Me.lblProjFileLabel.Size = New System.Drawing.Size(86, 17)
         Me.lblProjFileLabel.TabIndex = 11
-        Me.lblProjFileLabel.Text = "Current Project File: "
+        Me.lblProjFileLabel.Text = "Project File: "
         '
         'lblConfigFileLabel
         '
         Me.lblConfigFileLabel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.lblConfigFileLabel.AutoSize = True
         Me.lblConfigFileLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblConfigFileLabel.Location = New System.Drawing.Point(29, 608)
         Me.lblConfigFileLabel.Name = "lblConfigFileLabel"
-        Me.lblConfigFileLabel.Size = New System.Drawing.Size(149, 17)
+        Me.lblConfigFileLabel.Size = New System.Drawing.Size(78, 17)
         Me.lblConfigFileLabel.TabIndex = 15
-        Me.lblConfigFileLabel.Text = "Current Config File:"
+        Me.lblConfigFileLabel.Text = "Config File:"
         '
         'lblProjFile
         '
@@ -166,9 +168,9 @@ Friend Class frmAbout
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblProjFile.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblProjFile.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblProjFile.Location = New System.Drawing.Point(154, 580)
+        Me.lblProjFile.Location = New System.Drawing.Point(121, 580)
         Me.lblProjFile.Name = "lblProjFile"
-        Me.lblProjFile.Size = New System.Drawing.Size(586, 19)
+        Me.lblProjFile.Size = New System.Drawing.Size(619, 19)
         Me.lblProjFile.TabIndex = 16
         '
         'lblConfigFile
@@ -178,9 +180,9 @@ Friend Class frmAbout
         Me.lblConfigFile.BackColor = System.Drawing.SystemColors.Control
         Me.lblConfigFile.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblConfigFile.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblConfigFile.Location = New System.Drawing.Point(154, 608)
+        Me.lblConfigFile.Location = New System.Drawing.Point(121, 608)
         Me.lblConfigFile.Name = "lblConfigFile"
-        Me.lblConfigFile.Size = New System.Drawing.Size(586, 18)
+        Me.lblConfigFile.Size = New System.Drawing.Size(619, 18)
         Me.lblConfigFile.TabIndex = 17
         '
         'picBASINS
@@ -219,7 +221,7 @@ Friend Class frmAbout
         Me.lblBasinsURL.Location = New System.Drawing.Point(471, 120)
         Me.lblBasinsURL.Name = "lblBasinsURL"
         Me.lblBasinsURL.Size = New System.Drawing.Size(269, 17)
-        Me.lblBasinsURL.TabIndex = 21
+        Me.lblBasinsURL.TabIndex = 2
         Me.lblBasinsURL.TabStop = True
         Me.lblBasinsURL.Text = "http://www.epa.gov/waterscience/BASINS/"
         '
@@ -232,7 +234,7 @@ Friend Class frmAbout
         Me.grpATC.Location = New System.Drawing.Point(19, 174)
         Me.grpATC.Name = "grpATC"
         Me.grpATC.Size = New System.Drawing.Size(733, 185)
-        Me.grpATC.TabIndex = 27
+        Me.grpATC.TabIndex = 3
         Me.grpATC.TabStop = False
         Me.grpATC.Text = "Developed by AQUA TERRA Consultants"
         '
@@ -256,7 +258,7 @@ Friend Class frmAbout
         Me.lblAquaTerraURL.Location = New System.Drawing.Point(550, 158)
         Me.lblAquaTerraURL.Name = "lblAquaTerraURL"
         Me.lblAquaTerraURL.Size = New System.Drawing.Size(171, 17)
-        Me.lblAquaTerraURL.TabIndex = 26
+        Me.lblAquaTerraURL.TabIndex = 4
         Me.lblAquaTerraURL.TabStop = True
         Me.lblAquaTerraURL.Text = "http://www.aquaterra.com/"
         '
@@ -269,7 +271,7 @@ Friend Class frmAbout
         Me.grpZedGraph.Location = New System.Drawing.Point(19, 479)
         Me.grpZedGraph.Name = "grpZedGraph"
         Me.grpZedGraph.Size = New System.Drawing.Size(733, 83)
-        Me.grpZedGraph.TabIndex = 28
+        Me.grpZedGraph.TabIndex = 7
         Me.grpZedGraph.TabStop = False
         Me.grpZedGraph.Text = "Graphing by ZedGraph"
         '
@@ -290,7 +292,7 @@ Friend Class frmAbout
         Me.lblZedGraphURL.Location = New System.Drawing.Point(586, 55)
         Me.lblZedGraphURL.Name = "lblZedGraphURL"
         Me.lblZedGraphURL.Size = New System.Drawing.Size(135, 19)
-        Me.lblZedGraphURL.TabIndex = 27
+        Me.lblZedGraphURL.TabIndex = 8
         Me.lblZedGraphURL.TabStop = True
         Me.lblZedGraphURL.Text = "http://zedgraph.org/"
         '
