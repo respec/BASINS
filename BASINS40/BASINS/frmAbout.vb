@@ -132,6 +132,7 @@ Friend Class frmAbout
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnOk.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.btnOk.Location = New System.Drawing.Point(654, 639)
         Me.btnOk.Name = "btnOk"
@@ -303,7 +304,9 @@ Friend Class frmAbout
         '
         'frmAbout
         '
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.CancelButton = Me.btnOk
         Me.ClientSize = New System.Drawing.Size(761, 678)
         Me.Controls.Add(Me.picBASINS)
         Me.Controls.Add(Me.lblDisclaimer)
