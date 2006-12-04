@@ -5,34 +5,6 @@ Imports System.Collections.Specialized
 Imports MapWinUtility
 
 Public Module modFile
-
-    ''' <summary>
-    ''' Try to delete a file or directory. 
-    ''' If it cannot not be deleted, log a message instead of throwing an exception
-    ''' </summary>
-    ''' <param name="aPath">Full path of file or directory to be deleted</param>
-    ''' <returns>
-    ''' True if aPath was deleted without error or did not exist
-    ''' False if there was an exception while trying to delete
-    ''' </returns>
-    ''' <remarks>
-    ''' helpful for non-critical cleanup of temporary files that may be locked
-    ''' if aPath is a directory, all the contents are deleted too
-    ''' </remarks>
-    Public Function TryDelete(ByVal aPath As String) As Boolean
-        TryDelete = False
-        Try
-            If FileExists(aPath) Then
-                IO.File.Delete(aPath)
-            ElseIf FileExists(aPath, True, False) Then
-                IO.Directory.Delete(aPath, True)
-            End If
-            TryDelete = True
-        Catch ex As Exception
-            Logger.Dbg("Could not delete '" & aPath & "': " & ex.Message)
-        End Try
-    End Function
-
     ''' <summary>
     ''' Try moving a file to a new location, log a failure rather than raising an exception
     ''' </summary>
