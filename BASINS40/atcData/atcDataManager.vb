@@ -145,6 +145,7 @@ Public Class atcDataManager
                 Dim lType As System.Type = lDisp.GetType()
                 Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
                 lNewDisplay = lAssembly.CreateInstance(lType.FullName)
+                lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
                 lNewDisplay.Show(Me, aDataGroup)
                 Exit Sub
             End If

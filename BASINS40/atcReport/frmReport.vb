@@ -311,14 +311,14 @@ Public Class frmReport
                 End Try
                 Dim lTitle1 As String = "Watershed Characterization Report"
                 Dim lTitle2 As String = FilenameOnly(pPlugIn.Reports(lbxReports.SelectedIndices(i) + 1))
+                Dim lReportFilename As String = lblFolder.Text & lTitle2 & ".txt"
                 If Not lOutputGridSource Is Nothing And Len(lProblem) = 0 Then
                     'write file
-                    SaveFileString(lblFolder.Text & lTitle2 & ".txt", _
-                       lTitle1 & vbCrLf & "  " & lTitle2 & vbCrLf & vbCrLf & lOutputGridSource.ToString)
+                    SaveFileString(lReportFilename, lTitle1 & vbCrLf & "  " & lTitle2 & vbCrLf & vbCrLf & lOutputGridSource.ToString)
 
                     'form showing output
                     Dim lfrmResult As New frmResult
-                    lfrmResult.InitializeResults(lTitle1, lTitle2, lOutputGridSource)
+                    lfrmResult.InitializeResults(lTitle1, lTitle2, lReportFilename, lOutputGridSource)
                     lfrmResult.Show()
                 Else
                     Logger.Msg("atcReport:" & lTitle2 & vbCrLf & lProblem, "BASINS Report Problem")
