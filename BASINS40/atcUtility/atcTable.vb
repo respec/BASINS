@@ -270,6 +270,84 @@ Public MustInherit Class atcTable
         Return FindFirst(aFieldNumber, aFindValue, Me.CurrentRecord + 1)
     End Function
 
+    ''' <summary>
+    ''' Find a record matching a set of rules
+    ''' </summary>
+    ''' <param name="aFieldNum">array of fields to compare</param>
+    ''' <param name="aOperation">comparisons to make</param>
+    ''' <param name="aFieldVal">values to compare fields to</param>
+    ''' <param name="aMatchAny">true if any one comparison is enough to match, 
+    ''' default of false means all comparisons must be true to match a record</param>
+    ''' <param name="aStartRecord">record number to start searching</param>
+    ''' <param name="aEndRecord">record number to stop searching (default of -1 searches to end of table)</param>
+    ''' <returns>true if a matching record was found, with CurrentRecord set to the record that was found.
+    ''' false if no matching record was found, with CurrentRecord set to aStartRecord</returns>
+    Public Overridable Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperation() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
+        Dim numRules As Integer
+        Dim iRule As Integer
+        Dim lValue As Object
+        Dim allMatch As Boolean
+        Dim thisMatches As Boolean
+        Dim NotAtTheEnd As Boolean
+        numRules = UBound(aFieldNum)
+
+        If aEndRecord < 1 Then aEndRecord = Me.NumRecords
+
+        'If we are supposed to look for matches only in records that don't exist, we won't find any
+        If aStartRecord > Me.NumRecords Then
+            FindMatch = False
+            Exit Function
+        End If
+
+        CurrentRecord = aStartRecord
+        NotAtTheEnd = True
+        While NotAtTheEnd And CurrentRecord <= aEndRecord
+            iRule = 1
+            allMatch = True
+            While iRule <= numRules And allMatch
+                thisMatches = False
+                lValue = Value(aFieldNum(iRule))
+                Select Case aOperation(iRule)
+                    Case "="
+                        If lValue = aFieldVal(iRule) Then thisMatches = True
+                    Case "<"
+                        If lValue < aFieldVal(iRule) Then thisMatches = True
+                    Case ">"
+                        If lValue > aFieldVal(iRule) Then thisMatches = True
+                    Case "<="
+                        If lValue <= aFieldVal(iRule) Then thisMatches = True
+                    Case ">="
+                        If lValue >= aFieldVal(iRule) Then thisMatches = True
+                    Case Else
+                        Throw New ApplicationException("Unrecognized operation:" & aOperation(iRule))
+                End Select
+                If aMatchAny Then
+                    If thisMatches Then
+                        FindMatch = True
+                        Exit Function '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    End If
+                Else
+                    If Not thisMatches Then
+                        allMatch = False
+                    End If
+                End If
+                iRule = iRule + 1
+            End While
+            If allMatch And Not aMatchAny Then
+                FindMatch = True
+                Exit Function '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            End If
+            If CurrentRecord < Me.NumRecords Then
+                MoveNext()
+            Else
+                NotAtTheEnd = False
+            End If
+        End While
+        CurrentRecord = aStartRecord
+        FindMatch = False
+    End Function
+
+
     'FindLast     (like FindFirst but searching from end to start)
     'FindPrevious (like FindNext but searching from current to 1)
 
