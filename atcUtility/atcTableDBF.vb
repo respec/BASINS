@@ -450,25 +450,22 @@ Public Class atcTableDBF
 
     Public Overrides Property Value(ByVal aFieldNumber As Integer) As String
         Get
-            Dim FieldStart As Integer
-            Dim I As Integer
-            Dim strRet As String
             If pCurrentRecord < 1 Or pCurrentRecord > pHeader.NumRecs Then
-                Value = "Invalid Current Record Number"
+                Return "Invalid Current Record Number"
             ElseIf aFieldNumber < 1 Or aFieldNumber > pNumFields Then
-                Value = "Invalid Field Number"
+                Return "Invalid Field Number"
             Else
-                FieldStart = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
-
-                strRet = ""
-                For I = 0 To pFields(aFieldNumber).FieldLength - 1
-                    If pData(FieldStart + I) > 0 Then
-                        strRet = strRet & Chr(pData(FieldStart + I))
+                Dim lFirstByte As Integer = pCurrentRecordStart + pFields(aFieldNumber).DataAddress
+                Dim lLastByte As Integer = lFirstByte + pFields(aFieldNumber).FieldLength - 1
+                Dim strRet As String = ""
+                For lByte As Integer = lFirstByte To lLastByte
+                    If pData(lByte) > 0 Then
+                        strRet &= Chr(pData(lByte))
                     Else
-                        I = 256
+                        Exit For
                     End If
                 Next
-                Value = Trim(strRet)
+                Return Trim(strRet)
                 '    If pFields(aFieldNumber).FieldType = "N" Then
                 '      Dim dblval As Double
                 '      dblval = CDbl(strRet)
@@ -536,68 +533,28 @@ Public Class atcTableDBF
     'Returns True if found, moves CurrentRecord to first record with .Record = FindValue
     'If not found, returns False and moves CurrentRecord to aStartRecord
     Public Function FindRecord(ByVal FindValue() As Byte, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
-        Dim I As Integer
-        Dim firstByte As Integer
-        Dim lastByte As Integer
-        Dim lastLong As Integer
-        Dim nLongs As Integer
+        Dim lByteOfRecord As Integer
+
         If aEndRecord < 1 Then aEndRecord = pHeader.NumRecs
 
-        lastByte = pHeader.NumBytesRec - 1
-        nLongs = pHeader.NumBytesRec \ 4
-        lastLong = nLongs - 1
-        firstByte = nLongs * 4
 
-        '  Dim byt As 
-        '  Dim Match As Boolean
-        '  Dim rec As Integer
-        '  For rec = aStartRecord To aEndRecord
-        '    CurrentRecord = rec
-        '    Match = True
-        '    For byt = 0 To pHeader.NumBytesRec - 1
-        '      If pData(pCurrentRecordStart + byt) <> FindValue(byt) Then
-        '        Match = False
-        '        Exit For
-        '      End If
-        '    Next
-        '    If Match Then Exit For
-        '  Next
-
-        'CAUTION! DO NOT STOP VB after StartUsingCompareLongs until after FinishedUsingCompareLongs has been called
-        'StartUsingCompareLongs()
-        'UPGRADE_ISSUE: VarPtr function is not supported. Click for more: 'ms-help://MS.VSCC/commoner/redir/redirect.htm?keyword="vbup1040"'
-        'pLongHeader1(3) = VarPtr(FindValue(0))
         pCurrentRecord = aStartRecord
         pCurrentRecordStart = pHeader.NumBytesRec * (pCurrentRecord - 1) + 1
 
-CompareCurrentRecord:
-        I = 0
-        'UPGRADE_ISSUE: VarPtr function is not supported.
-        'pLongHeader2(3) = VarPtr(pData(pCurrentRecordStart))
-        'For I = 0 To lastLong
-        ' If pCompareLongs1(I) <> pCompareLongs2(I) Then GoTo NotEqual
-        ' Next
+        While pCurrentRecord <= aEndRecord
 
-        For I = firstByte To lastByte
-            If pData(pCurrentRecordStart + I) <> FindValue(I) Then GoTo NotEqual
-        Next
+            For lByteOfRecord = 0 To pHeader.NumBytesRec
+                If pData(pCurrentRecordStart + lByteOfRecord) <> FindValue(lByteOfRecord) Then GoTo NotEqual
+            Next
 
-        FindRecord = True
-        'FinishedUsingCompareLongs()
-        '    If Not Match Then Stop Else CountAgreeMatch = CountAgreeMatch + 1
-        Exit Function
+            Return True
 
 NotEqual:
-        If pCurrentRecord < aEndRecord Then
-            pCurrentRecord = pCurrentRecord + 1
-            pCurrentRecordStart = pCurrentRecordStart + pHeader.NumBytesRec
-            GoTo CompareCurrentRecord
-        End If
-
+            pCurrentRecord += 1
+            pCurrentRecordStart += pHeader.NumBytesRec            
+        End While
         CurrentRecord = aStartRecord
-        FindRecord = False
-        'FinishedUsingCompareLongs()
-        '  If Match Then Stop Else CountAgreeNoMatch = CountAgreeNoMatch + 1
+        Return False
     End Function
 
     'Returns True if CurrentRecord matches FindValue
@@ -666,69 +623,6 @@ NotEqual:
     '  FindMatchPA = FindMatch(fieldNum, operation, fieldVal, aMatchAny, aStartRecord, aEndRecord)
     'End Function
 
-    Public Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperation() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
-        Dim numRules As Integer
-        Dim iRule As Integer
-        Dim lValue As Object
-        Dim allMatch As Boolean
-        Dim thisMatches As Boolean
-        Dim NotAtTheEnd As Boolean
-        numRules = UBound(aFieldNum)
-
-        If aEndRecord < 0 Then aEndRecord = pHeader.NumRecs
-
-        'If we are supposed to look for matches only in records that don't exist, we won't find any
-        If aStartRecord > pHeader.NumRecs Then
-            FindMatch = False
-            Exit Function
-        End If
-
-        CurrentRecord = aStartRecord
-        NotAtTheEnd = True
-        While NotAtTheEnd And CurrentRecord <= aEndRecord
-            iRule = 1
-            allMatch = True
-            While iRule <= numRules And allMatch
-                thisMatches = False
-                lValue = Value(aFieldNum(iRule))
-                Select Case aOperation(iRule)
-                    Case "="
-                        If lValue = aFieldVal(iRule) Then thisMatches = True
-                    Case "<"
-                        If lValue < aFieldVal(iRule) Then thisMatches = True
-                    Case ">"
-                        If lValue > aFieldVal(iRule) Then thisMatches = True
-                    Case "<="
-                        If lValue <= aFieldVal(iRule) Then thisMatches = True
-                    Case ">="
-                        If lValue >= aFieldVal(iRule) Then thisMatches = True
-                    Case Else : System.Diagnostics.Debug.WriteLine("Unrecognized operation:" & aOperation(iRule))
-                End Select
-                If aMatchAny Then
-                    If thisMatches Then
-                        FindMatch = True
-                        Exit Function '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    End If
-                Else
-                    If Not thisMatches Then
-                        allMatch = False
-                    End If
-                End If
-                iRule = iRule + 1
-            End While
-            If allMatch And Not aMatchAny Then
-                FindMatch = True
-                Exit Function '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            End If
-            If pCurrentRecord < pHeader.NumRecs Then
-                MoveNext()
-            Else
-                NotAtTheEnd = False
-            End If
-        End While
-        CurrentRecord = aStartRecord
-        FindMatch = False
-    End Function
 
     'Dimension and initialize data buffer to all spaces (except for initial carriage return)
     'Do not call on an existing DBF since all data will be removed from memory
@@ -1129,6 +1023,8 @@ TryAgain:
             End If
 
             FilePut(OutFile, pData)
+            'Ensure that file ends with EOF character (Ctrl-Z = ASCII 26)
+            If pData(UBound(pData)) <> 26 Then FilePut(OutFile, CByte(26))
             FileClose(OutFile)
 
             pFilename = aFilename
