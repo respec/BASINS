@@ -58,6 +58,15 @@ Public MustInherit Class atcTable
 
     Private pFilename As String
 
+    'Used within FindMatch
+    Private Enum ComparisonEnum
+        EQ = 0
+        LT
+        GT
+        LE
+        GE
+    End Enum
+
     'Returns a new table with the same fields as this one, but no data
     Public MustOverride Function Cousin() As IatcTable Implements IatcTable.Cousin
 
@@ -283,13 +292,13 @@ Public MustInherit Class atcTable
     ''' <returns>true if a matching record was found, with CurrentRecord set to the record that was found.
     ''' false if no matching record was found, with CurrentRecord set to aStartRecord</returns>
     Public Overridable Function FindMatch(ByVal aFieldNum() As Integer, ByVal aOperation() As String, ByVal aFieldVal() As Object, Optional ByVal aMatchAny As Boolean = False, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean
-        Dim numRules As Integer
-        Dim iRule As Integer
+        Dim lLastRule As Integer = aFieldNum.GetUpperBound(0)
+        Dim curRule As Integer
         Dim lValue As Object
         Dim allMatch As Boolean
         Dim thisMatches As Boolean
         Dim NotAtTheEnd As Boolean
-        numRules = UBound(aFieldNum)
+        Dim lOperation(lLastRule) As ComparisonEnum
 
         If aEndRecord < 1 Then aEndRecord = Me.NumRecords
 
@@ -299,27 +308,38 @@ Public MustInherit Class atcTable
             Exit Function
         End If
 
+        'Compile strings into integers for faster operation below
+        For curRule = 0 To lLastRule
+            Select Case aOperation(curRule)
+                Case "=" : lOperation(curRule) = ComparisonEnum.EQ
+                Case "<" : lOperation(curRule) = ComparisonEnum.LT
+                Case ">" : lOperation(curRule) = ComparisonEnum.GT
+                Case "<=" : lOperation(curRule) = ComparisonEnum.LE
+                Case ">=" : lOperation(curRule) = ComparisonEnum.GE
+                Case Else
+                    Throw New ApplicationException("Unrecognized operation:" & aOperation(curRule))
+            End Select
+        Next
+
         CurrentRecord = aStartRecord
         NotAtTheEnd = True
         While NotAtTheEnd And CurrentRecord <= aEndRecord
-            iRule = 1
+            curRule = 0
             allMatch = True
-            While iRule <= numRules And allMatch
+            While curRule <= lLastRule And allMatch
                 thisMatches = False
-                lValue = Value(aFieldNum(iRule))
-                Select Case aOperation(iRule)
-                    Case "="
-                        If lValue = aFieldVal(iRule) Then thisMatches = True
-                    Case "<"
-                        If lValue < aFieldVal(iRule) Then thisMatches = True
-                    Case ">"
-                        If lValue > aFieldVal(iRule) Then thisMatches = True
-                    Case "<="
-                        If lValue <= aFieldVal(iRule) Then thisMatches = True
-                    Case ">="
-                        If lValue >= aFieldVal(iRule) Then thisMatches = True
-                    Case Else
-                        Throw New ApplicationException("Unrecognized operation:" & aOperation(iRule))
+                lValue = Value(aFieldNum(curRule))
+                Select Case lOperation(curRule)
+                    Case ComparisonEnum.EQ
+                        If lValue = aFieldVal(curRule) Then thisMatches = True
+                    Case ComparisonEnum.LT
+                        If lValue < aFieldVal(curRule) Then thisMatches = True
+                    Case ComparisonEnum.GT
+                        If lValue > aFieldVal(curRule) Then thisMatches = True
+                    Case ComparisonEnum.LE
+                        If lValue <= aFieldVal(curRule) Then thisMatches = True
+                    Case ComparisonEnum.GE
+                        If lValue >= aFieldVal(curRule) Then thisMatches = True
                 End Select
                 If aMatchAny Then
                     If thisMatches Then
@@ -331,7 +351,7 @@ Public MustInherit Class atcTable
                         allMatch = False
                     End If
                 End If
-                iRule = iRule + 1
+                curRule += 1
             End While
             If allMatch And Not aMatchAny Then
                 FindMatch = True
