@@ -1491,7 +1491,7 @@ Friend Class frmPollutantLoading
 
     Private Sub frmPollutantLoading_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         If e.KeyValue = Windows.Forms.Keys.F1 Then
-            ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
+            ShowHelp("BASINS Details\Watershed and Instream Model Setup\PLOAD.html")
         End If
     End Sub
 
