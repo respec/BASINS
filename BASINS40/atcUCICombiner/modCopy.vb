@@ -50,8 +50,12 @@ Module modData
                 lSourceDataSource = New atcData.atcDataSource
         End Select
         If lSourceDataSource.Open(aSourceSpecification) Then
-            Dim lSourceDataSet As atcDataSet = lSourceDataSource.DataSets(lSourceDataSource.DataSets.IndexFromKey(aSourceId))
-            lSourceDataSource.ReadData(lSourceDataSet)
+            Dim lSourceDataSetIndex As Integer = lSourceDataSource.DataSets.IndexFromKey(aSourceId)
+            Dim lSourceDataSet As New atcDataSet
+            If lSourceDataSetIndex >= 0 Then
+                lSourceDataSet = lSourceDataSource.DataSets(lSourceDataSetIndex)
+                lSourceDataSource.ReadData(lSourceDataSet)
+            End If
             If lSourceDataSet Is Nothing Then
                 Logger.Dbg("CopyDataSet:FailedToOpenSourceId " & aSourceId & " from " & aSourceSpecification)
                 Return False

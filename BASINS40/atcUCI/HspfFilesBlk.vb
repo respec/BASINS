@@ -1,6 +1,7 @@
 Option Strict Off
 Option Explicit On
 
+Imports MapWinUtility
 Imports atcUtility
 
 <System.Runtime.InteropServices.ProgId("HspfFilesBlk_NET.HspfFilesBlk")> _
@@ -9,14 +10,14 @@ Public Class HspfFilesBlk
 
     Private pFiles As Collection 'of HspfFile
     Private pUci As HspfUci
-    Private pComment As String
+    Private pComment As String = ""
 
     Friend Property Uci() As HspfUci
         Get
-            Uci = pUci
+            Return pUci
         End Get
-        Set(ByVal Value As HspfUci)
-            pUci = Value
+        Set(ByVal aUci As HspfUci)
+            pUci = aUci
         End Set
     End Property
 
@@ -28,10 +29,10 @@ Public Class HspfFilesBlk
 
     Public Property Comment() As String
         Get
-            Comment = pComment
+            Return pComment
         End Get
-        Set(ByVal Value As String)
-            pComment = Value
+        Set(ByVal aComment As String)
+            pComment = aComment
         End Set
     End Property
 
@@ -43,14 +44,14 @@ Public Class HspfFilesBlk
 
     Public ReadOnly Property Count() As Integer
         Get
-            Count = pFiles.Count()
+            Return pFiles.Count()
         End Get
     End Property
 
-    Public Property Value(ByVal Index As Integer) As HspfData.HspfFile
+    Public Property Value(ByVal aIndex As Integer) As HspfData.HspfFile
         Get
-            If Index > 0 And Index <= pFiles.Count() Then
-                Value = pFiles.Item(Index)
+            If aIndex > 0 And aIndex <= pFiles.Count() Then
+                Value = pFiles.Item(aIndex)
             Else
                 Value = New HspfData.HspfFile
                 Value.Name = ""
@@ -58,89 +59,70 @@ Public Class HspfFilesBlk
                 Value.Unit = 0
             End If
         End Get
-        Set(ByVal Value As HspfData.HspfFile) '????
-            If Index <= pFiles.Count() Then
-                pFiles.Remove(Index)
-                pFiles.Add(Value, , Index)
-                'Set pFiles(Index) = newValue
-            ElseIf Index = pFiles.Count() + 1 Then
-                pFiles.Add(Value)
+        Set(ByVal aValue As HspfData.HspfFile) '?
+            If aIndex > 0 And aIndex <= pFiles.Count() Then
+                pFiles.Remove(aIndex)
+                pFiles.Add(aValue, , aIndex)
+            ElseIf aIndex = pFiles.Count() + 1 Then
+                pFiles.Add(aValue)
             Else 'error?
             End If
         End Set
     End Property
 
     Public Sub Clear()
-        'UPGRADE_NOTE: Object pFiles may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
         pFiles = Nothing
         pFiles = New Collection
     End Sub
 
-    Public Sub Add(ByRef newValue As HspfData.HspfFile) 'to end, how about in between
-        pFiles.Add(newValue)
+    Public Sub Add(ByRef aValue As HspfData.HspfFile) 'to end, how about in between
+        pFiles.Add(aValue)
     End Sub
 
-    Public Sub AddFromSpecs(ByRef newName As String, ByRef wid As String)
-        Dim iunit As Integer
-        Dim vfile As HspfData.HspfFile
-        Dim ifound As Boolean
-        Dim newFile As New HspfData.HspfFile
-        newFile.Name = newName
-        newFile.Typ = wid
-        'find available unit
-        iunit = 25
-        ifound = True
-        While Not ifound
-            iunit = iunit + 1
-            ifound = False
-            For Each vfile In pFiles
-                If iunit = vfile.Unit Then
-                    ifound = True
-                End If
-            Next vfile
-        End While
-        newFile.Unit = iunit
-        pFiles.Add(newFile)
+    Public Sub AddFromSpecs(ByRef aName As String, ByRef aType As String)
+        Dim lUnit As Integer = 25
+        AddFromSpecs(aName, aType, lUnit)
     End Sub
 
-    Public Sub AddFromSpecsExt(ByRef newName As String, ByRef wid As String, ByRef Unit As Integer)
-        Dim iunit As Integer
-        Dim vfile As HspfData.HspfFile
-        Dim ifound As Boolean
-        Dim newFile As New HspfData.HspfFile
-        newFile.Name = newName
-        newFile.Typ = wid
+    Public Sub AddFromSpecs(ByRef aName As String, ByRef aType As String, ByRef aUnit As Integer)
+        Dim lUnit As Integer
+        Dim lFound As Boolean
+        Dim lNewFile As New HspfData.HspfFile
+
+        lNewFile.Name = aName
+        lNewFile.Typ = aType
         'find available unit
-        iunit = Unit - 1
-        ifound = True
-        Do Until ifound = False
-            iunit = iunit + 1
-            ifound = False
-            For Each vfile In pFiles
-                If iunit = vfile.Unit Then
-                    ifound = True
+        lUnit = aUnit - 1
+        lFound = True
+        Do Until Not lFound
+            lUnit += 1
+            lFound = False
+            For Each lFile As HspfData.HspfFile In pFiles
+                If lUnit = lFile.Unit Then
+                    lFound = True
+                    Exit For
                 End If
-            Next vfile
+            Next
         Loop
-        newFile.Unit = iunit
-        pFiles.Add(newFile)
+        lNewFile.Unit = lUnit
+        pFiles.Add(lNewFile)
     End Sub
 
-    Public Sub Remove(ByRef Index As Integer)
-        If Index > 0 And Index <= pFiles.Count() Then
-            pFiles.Remove((Index))
+    Public Sub Remove(ByRef aIndex As Integer)
+        If aIndex > 0 And aIndex <= pFiles.Count() Then
+            pFiles.Remove((aIndex))
         End If
     End Sub
 
-    Public Sub SetTyp(ByRef Index As Integer, ByRef wid As String)
-        Dim lFile As HspfData.HspfFile
-        If Index > 0 And Index <= pFiles.Count() Then
-            Dim lExistingFile As HspfData.HspfFile = pFiles.Item(Index)
-            lFile.Typ = wid
+    Public Sub SetTyp(ByRef aIndex As Integer, ByRef aType As String)
+        Dim lFile As New HspfData.HspfFile
+        If aIndex > 0 And aIndex <= pFiles.Count() Then
+            Dim lExistingFile As HspfData.HspfFile = pFiles.Item(aIndex)
+            lFile.Typ = aType
             lFile.Comment = lExistingFile.Comment
             lFile.Name = lExistingFile.Name
             lFile.Unit = lExistingFile.Unit
-            pFiles.Remove(Index)
+            pFiles.Remove(aIndex)
             pFiles.Add(lFile)
         End If
     End Sub
@@ -164,101 +146,97 @@ Public Class HspfFilesBlk
 
     Friend Sub ReadUciFile()
         Dim lFile As HspfData.HspfFile
-        Dim c As String
-        Dim retkey, init, retcod, OmCode, rectyp As Integer
-        Dim cbuff As String = Nothing
+        Dim lComment As String
+        Dim lRetkey, lInit, lRetcod, lOmCode, lRectyp As Integer
+        Dim lBuff As String = Nothing
 
-        On Error GoTo ErrHand
-
-        If pUci.FastFlag Then
-            GetCommentBeforeBlock("FILES", pComment)
-        End If
-
-        retcod = 0
-        init = 1
-        OmCode = HspfOmCode("FILES")
-        c = ""
-        retkey = -1
-        Do
+        Try
             If pUci.FastFlag Then
-                GetNextRecordFromBlock("FILES", retkey, cbuff, rectyp, retcod)
-            Else
-                retkey = -1
-                Call REM_XBLOCKEX((Me.Uci), OmCode, init, retkey, cbuff, rectyp, retcod)
+                GetCommentBeforeBlock("FILES", pComment)
             End If
-            If retcod = 10 Then Exit Do
-            If rectyp = 0 Then
-                If Len(Trim(Left(cbuff, 6))) > 0 Then
-                    lFile.Typ = StrRetRem(cbuff)
-                Else
-                    lFile.Typ = ""
-                End If
-                lFile.Unit = CInt(StrRetRem(cbuff))
-                lFile.Name = cbuff
-                lFile.Comment = c
-                pFiles.Add(lFile)
-                c = ""
-            ElseIf rectyp = -1 Then
-                'save comment
-                If Len(c) = 0 Then
-                    c = cbuff
-                Else
-                    c = c & vbCrLf & cbuff
-                End If
-            ElseIf retcod = 2 And rectyp = -2 Then
-                'save blank line
-                If Len(c) = 0 Then
-                    c = " "
-                Else
-                    c = c & vbCrLf & " "
-                End If
-            End If
-            init = 0
-        Loop
 
-        Exit Sub
-
-ErrHand:
-        MsgBox(Err.Description & vbCr & vbCr & cbuff, MsgBoxStyle.Critical, "Error in ReadUciFile")
-
+            lRetcod = 0
+            lInit = 1
+            lOmCode = HspfOmCode("FILES")
+            lComment = ""
+            lRetkey = -1
+            Do
+                If pUci.FastFlag Then
+                    GetNextRecordFromBlock("FILES", lRetkey, lBuff, lRectyp, lRetcod)
+                Else
+                    lRetkey = -1
+                    Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lRectyp, lRetcod)
+                    lInit = 0
+                End If
+                If lRetcod = 10 Then Exit Do
+                If lRectyp = 0 Then
+                    If Len(Trim(Left(lBuff, 6))) > 0 Then
+                        lFile.Typ = StrRetRem(lBuff)
+                    Else
+                        lFile.Typ = ""
+                    End If
+                    lFile.Unit = CInt(StrRetRem(lBuff))
+                    lFile.Name = lBuff
+                    lFile.Comment = lComment
+                    pFiles.Add(lFile)
+                    lComment = ""
+                ElseIf lRectyp = -1 Then
+                    'save comment
+                    If lComment.Length = 0 Then
+                        lComment = lBuff
+                    Else
+                        lComment &= vbCrLf & lBuff
+                    End If
+                ElseIf lRetcod = 2 And lRectyp = -2 Then
+                    'save blank line
+                    If lComment.Length = 0 Then
+                        lComment = " "
+                    Else
+                        lComment &= vbCrLf & " "
+                    End If
+                End If
+            Loop
+        Catch lEx As Exception
+            Logger.Msg(lEx.ToString & vbCr & vbCr & lBuff, MsgBoxStyle.Critical, "Error in HspfFilesBlock:ReadUciFile")
+        End Try
     End Sub
 
-    Friend Sub WriteUciFile(ByRef f As Short)
+    Friend Sub WriteUciFile(ByRef lUnit As Short)
         Dim lFile As HspfData.HspfFile
-        Dim tname As String
-        Dim tpath As String
 
-        If Len(pComment) > 0 Then
-            PrintLine(f, pComment)
+        If pComment.Length > 0 Then
+            PrintLine(lUnit, pComment)
         End If
-        PrintLine(f, " ")
-        PrintLine(f, "FILES")
+        PrintLine(lUnit, " ")
+        PrintLine(lUnit, "FILES")
         If pFiles.Count() > 0 Then
-            If Len(pFiles.Item(1).Comment) = 0 Then
-                'need to add header
-                PrintLine(f, "<FILE>  <UN#>***<----FILE NAME------------------------------------------------->")
+            lFile = pFiles.Item(1)
+            If Not (lFile.Comment Is Nothing) AndAlso lFile.Comment.Length = 0 Then
+                'need to add default header
+                PrintLine(lUnit, "<FILE>  <UN#>***<----FILE NAME------------------------------------------------->")
             End If
         End If
+
         For Each lFile In pFiles
-            tname = lFile.Name
-            If InStr(1, tname, ":") Then
+            Dim lName As String = lFile.Name
+            If InStr(1, lName, ":") Then
                 'this is the absolute path name, make relative
                 'tpath = CurDir
-                tpath = IO.Path.GetDirectoryName(Me.Uci.Name)
-                tname = RelativeFilename(tname, tpath)
-                lFile.Name = tname
+                Dim lpath As String = IO.Path.GetDirectoryName(Me.Uci.Name)
+                lName = RelativeFilename(lName, lpath)
+                lFile.Name = lName
             End If
             If Len(lFile.Comment) > 0 Then
-                PrintLine(f, lFile.Comment)
+                PrintLine(lUnit, lFile.Comment)
             End If
-            PrintLine(f, lFile.Typ & Space(10 - Len(lFile.Typ)) & myFormatI(lFile.Unit, 3), Space(2) & tname)
+            PrintLine(lUnit, lFile.Typ & Space(10 - Len(lFile.Typ)) & myFormatI(lFile.Unit, 3), Space(2) & lName)
         Next
-        PrintLine(f, "END FILES")
+        PrintLine(lUnit, "END FILES")
     End Sub
 
-    Public Sub newName(ByRef oldn As String, ByRef newn As String)
-        Dim l, k, i, j, islash, itmp As Integer
-        Dim tempn As String
+    Public Sub newName(ByRef aOldName As String, ByRef aNewName As String)
+        Dim lOldLength, i, j, lSlashPos, lTemp As Integer
+        Dim lTempName As String
         Dim lHspfFile As HspfData.HspfFile
         Dim lFiles As Collection
 
@@ -267,36 +245,31 @@ ErrHand:
             If Trim(lHspfFile.Typ) = "MESSU" Or Trim(lHspfFile.Typ) = "" Or Trim(lHspfFile.Typ) = "BINO" Then
                 'Close lFile.Unit
                 'replace file name
-                tempn = lHspfFile.Name
-                l = Len(oldn)
-                itmp = InStr(1, UCase(tempn), UCase(oldn))
-                j = Len(tempn)
-                islash = 0
+                lTempName = lHspfFile.Name
+                lOldLength = aOldName.Length
+                lTemp = InStr(1, UCase(lTempName), UCase(aOldName))
+                j = lTempName.Length
+                lSlashPos = 0
                 For i = 1 To j
                     'check for a path in the name
-                    If (Mid(tempn, i, 1) = "\") Then
-                        islash = i
+                    If (Mid(lTempName, i, 1) = "\") Then
+                        lSlashPos = i
                     End If
                 Next i
-                If ((itmp > 0 And islash > 0 And itmp > islash) Or (itmp > 0 And islash = 0)) Then
+                If ((lTemp > 0 And lSlashPos > 0 And lTemp > lSlashPos) Or (lTemp > 0 And lSlashPos = 0)) Then
                     'found the old name in this string, replace it
-                    j = Len(newn)
-                    lHspfFile.Name = Mid(tempn, 1, itmp - 1) & newn & Mid(tempn, itmp + l)
-                Else
-                    'just add the new scen name
-                    k = Len(newn)
-                    If islash = 0 Then
-                        'no path
-                        lHspfFile.Name = newn & "." & tempn
-                    Else
-                        'have a path name, insert after slash
-                        lHspfFile.Name = Mid(tempn, 1, islash) & newn & "." & Mid(tempn, islash + 1, j)
+                    j = aNewName.Length
+                    lHspfFile.Name = Mid(lTempName, 1, lTemp - 1) & aNewName & Mid(lTempName, lTemp + lOldLength)
+                Else  'just add the new scen name
+                    If lSlashPos = 0 Then 'no path
+                        lHspfFile.Name = aNewName & "." & lTempName
+                    Else 'have a path name, insert after slash
+                        lHspfFile.Name = Mid(lTempName, 1, lSlashPos) & aNewName & "." & Mid(lTempName, lSlashPos + 1, j)
                     End If
                 End If
             End If
             lFiles.Add(lHspfFile)
         Next
-
         pFiles = Nothing
         pFiles = lFiles
     End Sub
