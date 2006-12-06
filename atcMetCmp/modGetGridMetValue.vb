@@ -12,13 +12,16 @@ Imports atcUtility
 'Date 25 july 2006
 
 Public Module GetPrecipValueFromGrid
-    Private Const pDirPath As String = "G:\MetData\Prism\GridExtract"
+    Private Const pDirPath As String = "D:\MetData\Prism\GridExtract"
     Private Const pBound As Integer = 2
 
-    'ALSO change units conversion lValCnv!!!!
-    Private Const pFilter As String = "us_tmin.14" 'annual normal tmin grids
+    Private Const pType As String = "ATMP"
+    'Private Const pFilter As String = "us_tmin.14" 'annual normal tmin grids
+    Private Const pFilter As String = "us_tmax.14" 'annual normal tmax grids
     'Private Const pFilter As String = "us_tmin." 'all normal tmin grids
     'Private Const pFilter As String = "us_tmax." 'all normal tmax grids
+
+    'private const pType as string = "PREC"
     'Private Const pFilter As String = "us_ppt.14" 'annual normal ppt grid
     'Private Const pFilter As String = "us_ppt." 'all normal ppt grids
     'Private Const pFilter As String = "us_ppt" 'all ppt grids
@@ -83,9 +86,13 @@ Public Module GetPrecipValueFromGrid
                 For lC As Integer = lCol - pBound To lCol + pBound
                     For lR As Integer = lRow - pBound To lRow + pBound
                         lVal = lGrid.Value(lC, lR)
-                        If lVal <> -9999 then 
-                            'lValCnv = lVal / 2540 'precip
-                            lValCnv = ((lVal / 100) * 1.8) + 32  'temperature
+                        If lVal <> -9999 Then
+                            Select Case ptype
+                                Case "ATMP"
+                                    lValCnv = ((lVal / 100) * 1.8) + 32  'temperature
+                                Case "PREC"
+                                    lValCnv = lVal / 2540 'precip
+                            End Select
                         Else
                             lValCnv = -9999
                         End If
