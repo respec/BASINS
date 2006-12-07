@@ -102,15 +102,9 @@ Option Explicit On
         pIds = New Collection
         pTables = New Collection
     End Sub
-    Public Function TableExists(ByRef Name As String) As Boolean
-        Dim vTable As Object
 
-        On Error GoTo NoTable
-        vTable = pTables.Item(Name)
-        TableExists = True
-        Exit Function
-NoTable:
-        TableExists = False
+    Public Function TableExists(ByRef aName As String) As Boolean
+        Return pTables.Contains(aName)
     End Function
 
     Public Sub setTableValues(ByRef blk As HspfBlockDef)

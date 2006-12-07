@@ -201,15 +201,8 @@ Option Explicit On
         editInit(Me, (pUci.icon), True, True, False)
     End Sub
 
-    Public Function TableExists(ByRef Name As String) As Boolean
-        Dim vTable As Object
-
-        On Error GoTo NoTable
-        vTable = pTables.Item(Name)
-        TableExists = True
-        Exit Function
-NoTable:
-        TableExists = False
+    Public Function TableExists(ByRef aName As String) As Boolean
+        Return pTables.Contains(aName)
     End Function
 
     Public Sub setTimSerConnections()
