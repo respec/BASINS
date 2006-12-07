@@ -273,8 +273,6 @@ Public Module UCICombiner
         Next i
         Logger.Dbg("UvquansAdded")
 
-        lCombinedUci.FilesBlock.AddFromSpecs(pScenario & ".hbn", "BINU", 27)
-
         'combine the WDM files used by the combined UCI
         ChDir(pOutputDir)
         BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
@@ -284,6 +282,38 @@ Public Module UCICombiner
         lCombinedUci.Save()
         Logger.Dbg("CombinedUCI Saved")
 
+        With lCombinedUci
+            Dim lLastRchresOperation As atcUCI.HspfOperation = Nothing
+            For Each lOper In .OpnSeqBlock.Opns
+                If lOper.optyp = atcUCI.HspfData.HspfOperType.hRchres Then
+                    lLastRchresOperation = lOper
+                End If
+            Next
+
+            If lLastRchresOperation Is Nothing Then
+                Logger.Dbg("No RCHRES to add binary output to")
+            Else
+                .FilesBlock.AddFromSpecs(pScenario & ".hbn", "BINU", 27)
+                Dim lTable As atcUCI.HspfTable = lLastRchresOperation.Tables("GEN-INFO")
+                lTable.Parms(8).Value = 27
+
+                Dim lTableName As String = "BINARY-INFO"
+                Dim lOpnBlkRchres As atcUCI.HspfOpnBlk = .OpnBlks("RCHRES")
+                If Not lOpnBlkRchres.TableExists(lTableName) Then
+                    lOpnBlkRchres.AddTableForAll(lTableName, "RCHRES")
+                End If
+                lTable = lLastRchresOperation.Tables(lTableName)
+                Logger.Dbg("Message " & lTable.Parms.Count)
+                For i As Integer = 1 To 10
+                    lTable.Parms(i).Value = 5 'year
+                Next
+                lTable.Parms(12).Value = 12
+                .Name = "bin_" & .Name
+                .Save()
+                Logger.Dbg("Binary output added for " & lLastRchresOperation.Name & " " & _
+                                                        lLastRchresOperation.Id)
+            End If
+        End With
     End Sub
 
     Private Function HSPFUciNames(ByVal aWorkingDir As String) As Collection
@@ -656,8 +686,7 @@ Public Module UCICombiner
                         End If
                     Next
                 End If
-                If lIdentical Then
-                    'if identical, get rid of the second one
+                If lIdentical Then  'get rid of the second one
                     k = 1
                     For Each lMassLink In aCombinedUci.MassLinks
                         If lMassLink.MassLinkID = mlno(i) Then
@@ -684,14 +713,13 @@ Public Module UCICombiner
                                        ByVal aOutputWDMNames As Collection) As Boolean
         Dim lOper As atcUCI.HspfOperation
         Dim lConn As atcUCI.HspfConnection
+        Dim lWdmIndex As Integer
+        Dim lOrigDsn As Integer
 
-        Try
-            'build combined wdms for prec, met data 
+        Try 'build combined wdms for prec, met data 
             Logger.Dbg("MetSegmentWdms")
             Dim lMetSeg As atcUCI.HspfMetSeg
             Dim lMetSegRec As atcUCI.HspfMetSegRecord
-            Dim lWdmIndex As Integer
-            Dim lOrigDsn As Integer
             For Each lMetSeg In aCombinedUci.MetSegs
                 Logger.Dbg("MetSegment " & lMetSeg.Name)
                 For Each lMetSegRec In lMetSeg.MetSegRecs
@@ -715,8 +743,11 @@ Public Module UCICombiner
                     End If
                 Next
             Next lMetSeg
+        Catch lEx As Exception
+            Logger.Msg("BuildMetException" & vbCrLf & lEx.ToString)
+        End Try
 
-            'build combined wdms for pt srcs and other input wdms
+        Try 'build combined wdms for pt srcs and other input wdms
             Logger.Dbg("PointSourcesAndOtherInputWdms")
             For Each lOper In aCombinedUci.OpnSeqBlock.Opns
                 For Each lConn In lOper.Sources
@@ -731,14 +762,17 @@ Public Module UCICombiner
                         ElseIf lConn.Source.VolName = "WDM2" Then
                             CopyDataSet("wdm", aPrecWDMNames(lWdmIndex), lOrigDsn, _
                                         "wdm", pScenario & ".wdm", lConn.Source.VolId)
-                            SetWDMAttribute("base.wdm", lConn.Source.VolId, "idscen", "OBSERVED")
+                            SetWDMAttribute(pScenario & ".wdm", lConn.Source.VolId, "idscen", "OBSERVED")
                             lConn.Source.VolName = "WDM1"
                         End If
                     End If
                 Next lConn
             Next lOper
+        Catch lEx As Exception
+            Logger.Msg("BuildPointException" & vbCrLf & lEx.ToString)
+        End Try
 
-            'build combined wdms for output wdms
+        Try 'build combined wdms for output wdms
             Logger.Dbg("OutputWdms")
             For Each lOper In aCombinedUci.OpnSeqBlock.Opns
                 For Each lConn In lOper.Targets
@@ -752,9 +786,8 @@ Public Module UCICombiner
                     End If
                 Next lConn
             Next lOper
-
         Catch lEx As Exception
-            Logger.Msg(lEx.ToString)
+            Logger.Msg("BuildOutputException" & vbCrLf & lEx.ToString)
         End Try
     End Function
 End Module
