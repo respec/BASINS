@@ -1,5 +1,6 @@
 Option Strict Off
 Option Explicit On
+
 <System.Runtime.InteropServices.ProgId("HspfOperation_NET.HspfOperation")> Public Class HspfOperation
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
