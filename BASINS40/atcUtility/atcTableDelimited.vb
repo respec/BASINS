@@ -52,6 +52,15 @@ Public Class atcTableDelimited
         End Set
     End Property
 
+    Public Property Delimiter() As Char
+        Get
+            Return pDelimiter
+        End Get
+        Set(ByVal newValue As Char)
+            pDelimiter = newValue
+        End Set
+    End Property
+
     Public Overrides Property FieldLength(ByVal aFieldNumber As Integer) As Integer
         Get
             If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
@@ -70,14 +79,14 @@ Public Class atcTableDelimited
     Public Overrides Property FieldName(ByVal aFieldNumber As Integer) As String
         Get
             If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                Return pFieldNames(aFieldNumber - 1)
+                Return pFieldNames(aFieldNumber)
             Else
                 Return "Field " & aFieldNumber
             End If
         End Get
         Set(ByVal newValue As String)
             If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                pFieldNames(aFieldNumber - 1) = newValue
+                pFieldNames(aFieldNumber) = newValue
             End If
         End Set
     End Property
@@ -267,6 +276,7 @@ ErrHand:
 
             curLine = NextLine(inReader)
             NumFields = CountString(curLine, pDelimiter) + 1
+            'Split creates a zero-based array. Prepending pDelimiter inserts blank field name so pFieldNames(1) contains first name
             pFieldNames = (pDelimiter & curLine).Split(pDelimiter)
 
             ReDim pRecords(100) 'initial record buffer size
