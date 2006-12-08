@@ -236,10 +236,10 @@
     <Compile Include="modUCIRecords.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UciRead.vb">
+    <Compile Include="modUciRead.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="utilEdit.vb">
+    <Compile Include="modUtilEdit.vb">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

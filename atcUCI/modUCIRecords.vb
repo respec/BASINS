@@ -1,33 +1,38 @@
 Option Strict Off
 Option Explicit On
+
 Module modUCIRecords
 
     Private uciRec() As String
     Private uciRecCnt As Integer
 
-    Public Sub ReadUCIRecords(ByRef pName As String)
-        Dim i As Integer
-        Dim s As String
+    Public Sub ReadUCIRecords(ByRef aFileName As String)
+        Dim lFileUnit As Integer
+        Dim lCurrentRecord As String
 
-        i = FreeFile()
-        FileOpen(i, pName, OpenMode.Input)
+        lFileUnit = FreeFile()
+        FileOpen(lFileUnit, aFileName, OpenMode.Input)
         uciRecCnt = 0
         ReDim uciRec(500)
-        Do Until EOF(i)
-            s = LineInput(i)
+        Do Until EOF(lFileUnit)
+            lCurrentRecord = LineInput(lFileUnit)
             uciRecCnt = uciRecCnt + 1
             If UBound(uciRec) < uciRecCnt Then
                 ReDim Preserve uciRec(uciRecCnt * 2)
             End If
-            uciRec(uciRecCnt) = s
+            uciRec(uciRecCnt) = lCurrentRecord
         Loop
         ReDim Preserve uciRec(uciRecCnt)
-        FileClose(i)
+        FileClose(lFileUnit)
     End Sub
 
-    Public Sub GetUCIRecord(ByRef i As Integer, ByRef s As String)
-        s = uciRec(i)
-    End Sub
+    Public Function GetUCIRecord(ByRef aIndex As Integer) As String
+        If aIndex >= 0 And aIndex <= uciRec.GetUpperBound(0) Then
+            Return uciRec(aIndex)
+        Else
+            Return Nothing
+        End If
+    End Function
 
     Public Sub GetNextRecordFromBlock(ByRef blockname As String, ByRef retkey As Integer, ByRef cbuff As String, ByRef rectyp As Integer, ByRef retcod As Integer)
         Dim i, ilen As Integer

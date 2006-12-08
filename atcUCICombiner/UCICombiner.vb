@@ -275,7 +275,7 @@ Public Module UCICombiner
 
         'combine the WDM files used by the combined UCI
         ChDir(pOutputDir)
-        BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
+        'BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
         Logger.Dbg("CombinedWdmsBuilt")
 
         'write the combined uci 
@@ -293,7 +293,8 @@ Public Module UCICombiner
             If lLastRchresOperation Is Nothing Then
                 Logger.Dbg("No RCHRES to add binary output to")
             Else
-                .FilesBlock.AddFromSpecs(pScenario & ".hbn", "BINU", 27)
+                .FilesBlock.AddFromSpecs(pScenario & ".plt", "", 31)
+                .FilesBlock.AddFromSpecs(pScenario & ".hbn", "BINO", 27)
                 Dim lTable As atcUCI.HspfTable = lLastRchresOperation.Tables("GEN-INFO")
                 lTable.Parms(8).Value = 27
 
