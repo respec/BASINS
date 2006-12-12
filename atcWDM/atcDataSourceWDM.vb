@@ -17,32 +17,6 @@ Public Class atcDataSourceWDM
     Private pQuick As Boolean
     Private Shared pMsg As atcMsgWDM
 
-    'Private ReadOnly Property AvailableAttributes() As Collection
-    '  Get
-    '    Dim retval As Collection
-    '    Dim vWDMAttr As Object
-    '    Dim CurWDMAttr As clsAttributeWDM
-    '    Dim CurTSerAttr As ATCData.ATCclsAttributeDefinition
-    '    retval = New Collection
-    '    For Each vWDMAttr In gMsg.Attributes
-    '      CurTSerAttr = New ATCData.ATCclsAttributeDefinition
-    '      CurWDMAttr = vWDMAttr
-    '      With CurTSerAttr
-    '        .DataType = CurWDMAttr.DataType
-    '        .Default = CurWDMAttr.Default_Renamed
-    '        .Description = CurWDMAttr.Description
-    '        .Max = CurWDMAttr.Max
-    '        .Min = CurWDMAttr.Min
-    '        .Name = CurWDMAttr.Name
-    '        .ValidValues = CurWDMAttr.ValidValues
-    '      End With
-    '      retval.Add(CurTSerAttr)
-    '      CurTSerAttr = Nothing
-    '    Next vWDMAttr
-    '    AvailableAttributes = retval
-    '  End Get
-    'End Property
-
     Private Sub Clear()
         pErrorDescription = ""
         Specification = "<unknown>"
@@ -90,10 +64,16 @@ Public Class atcDataSourceWDM
         End While
     End Sub
 
+    ''' <summary>
+    ''' returns a dataset from a dateset number, nothing if no dataset available
+    ''' </summary>
+    ''' <param name="aDsn">dataset number</param>
+    ''' <returns>matching timeseries dataset</returns>
+    ''' <remarks></remarks>
     Private Function GetDataSetFromDsn(ByRef aDsn As Integer) As atcTimeseries
-        For Each curDataset As atcTimeseries In DataSets
-            If curDataset.Attributes.GetValue("id") = aDsn Then
-                Return curDataset
+        For Each lCurDataset As atcTimeseries In DataSets
+            If lCurDataset.Attributes.GetValue("id") = aDsn Then
+                Return lCurDataset
             End If
         Next
         Logger.Msg("DSN " & aDsn & " does not exist.", "DataFileWDM.GetDataSetFromDsn")
@@ -224,14 +204,16 @@ Public Class atcDataSourceWDM
     End Function
 
     ''' <summary>
-    ''' Write one attribute of a data set to the file
+    ''' Write one attribute of a data set in memory to the dataset on the wdm file
     ''' </summary>
     ''' <param name="aDataSet">Data set which the attribute applies to</param>
     ''' <param name="aAttribute">Attribute to write</param>
     ''' <param name="aNewValue">New value for attribute (Optional)</param>
     ''' <returns>True on success, False on failure</returns>
     ''' <remarks>Use WriteAttributes to write all attributes</remarks>
-    Public Function WriteAttribute(ByVal aDataSet As atcData.atcDataSet, ByVal aAttribute As atcDefinedValue, Optional ByVal aNewValue As Object = Nothing) As Boolean
+    Public Function WriteAttribute(ByVal aDataSet As atcData.atcDataSet, _
+                                   ByVal aAttribute As atcDefinedValue, _
+                                   Optional ByVal aNewValue As Object = Nothing) As Boolean
         Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Dim lMsg As atcWdmHandle = pMsg.MsgHandle
@@ -248,6 +230,7 @@ Public Class atcDataSourceWDM
 
     Private Function findNextDsn(ByRef aDsn As Integer) As Integer
         Dim lNextDsn As Integer = aDsn
+
         For Each lDataset As atcDataSet In DataSets
             If lDataset.GetType.FullName = "atcData.atcTimeseries" Then
                 If lNextDsn = lDataset.Attributes.GetValue("Id", lNextDsn) Then
@@ -256,6 +239,7 @@ Public Class atcDataSourceWDM
                 End If
             End If
         Next lDataset
+
         Return lNextDsn
     End Function
 
@@ -323,28 +307,29 @@ Public Class atcDataSourceWDM
     ''' <param name="aFileUnit">WDM file handle</param>
     ''' <param name="aTs">data set to add to WDM</param>
     ''' <returns></returns>
-    Private Function DsnBld(ByVal aFileUnit As Integer, ByRef aTs As atcTimeseries) As Boolean
+    Private Function DsnBld(ByVal aFileUnit As Integer, _
+                            ByRef aTs As atcTimeseries) As Boolean
         Dim lDsn, lNSasp, lNUp, lNDn, lNSa, lNDp, lPsa As Integer
-        Dim lCSDat(6) As Integer
-
-        Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
-        Dim lMsgUnit As Integer = lMsgHandle.Unit
+        'Dim lCSDat(6) As Integer
+        'Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
+        'Dim lMsgUnit As Integer = lMsgHandle.Unit
 
         lDsn = aTs.Attributes.GetValue("id", 0)
-        'create label
         lNDn = aTs.Attributes.GetValue("NDN", 10)
         lNUp = aTs.Attributes.GetValue("NUP", 10)
         lNSa = aTs.Attributes.GetValue("NSA", 30)
         lNSasp = aTs.Attributes.GetValue("NSASP", 100)
         lNDp = aTs.Attributes.GetValue("NDP", 300)
+        'create label on wdm file
         F90_WDLBAX(aFileUnit, lDsn, 1, lNDn, lNUp, lNSa, lNSasp, lNDp, lPsa)
-
+        'write attributes
         DsnBld = DsnWriteAttributes(aFileUnit, aTs)
 
-        lMsgHandle.Dispose()
+        'lMsgHandle.Dispose()
     End Function
 
-    Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, ByRef aTs As atcTimeseries) As Boolean
+    Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, _
+                                        ByRef aTs As atcTimeseries) As Boolean
         Dim lCSDat(6) As Integer
         Dim lDecade As Integer
         Dim lSaLen, lIVal, lSaInd As Integer
@@ -427,7 +412,7 @@ Public Class atcDataSourceWDM
             End If
         Next
 
-        If Len(pErrorDescription) > 0 Then
+        If pErrorDescription.Length > 0 Then
             Logger.Dbg(pErrorDescription)
         End If
 
@@ -439,7 +424,10 @@ Public Class atcDataSourceWDM
     ''' </summary>
     ''' <returns>True if attribute was written OR if attribute is not in message file</returns>
     ''' <remarks>Only attributes in WDM message file can be written to WDM files</remarks>
-    Private Function DsnWriteAttribute(ByVal aFileUnit As Integer, ByVal aMsgUnit As Integer, ByVal aDsn As Integer, ByVal aAttribute As atcDefinedValue) As Boolean
+    Private Function DsnWriteAttribute(ByVal aFileUnit As Integer, _
+                                       ByVal aMsgUnit As Integer, _
+                                       ByVal aDsn As Integer, _
+                                       ByVal aAttribute As atcDefinedValue) As Boolean
         Dim lRetcod As Integer
         Dim lName As String = aAttribute.Definition.Name
         Dim lValue As Object = aAttribute.Value
@@ -483,119 +471,6 @@ Public Class atcDataSourceWDM
         End If
     End Function
 
-    '  Public Function ReadBasInf() As Boolean
-    '    Dim bFun As Integer
-    '    Dim bNam As String
-    '    Dim ip, i, j, NLoc As Integer
-    '    Dim istr As String
-
-    '    ReadBasInf = False
-
-    '    bNam = PathNameOnly(pFileName) & "\" & FilenameOnly(pFileName) & ".inf"
-    '    If FileExists(bNam) Then
-    '      'read available BASINS .inf file
-    '      bFun = FreeFile()
-    '      FileOpen(bFun, bNam, OpenMode.Input)
-    '      'reads location records from BASINS .inf file
-    '      On Error GoTo ErrHandler
-    '      Do While InStr(istr, "number of stations") <= 0 And Not EOF(bFun)
-    '        istr = LineInput(bFun)
-    '      Loop
-    '      NLoc = CInt(Mid(istr, 1, 5))
-    '      If NLoc > 0 Then 'valid number of locations read
-    '        ReDim BasInf(NLoc - 1)
-    '        istr = LineInput(bFun)
-    '        istr = LineInput(bFun)
-    '        For i = 0 To NLoc - 1
-    '          istr = LineInput(bFun)
-    '          ip = InStr(2, istr, New String(Chr(34), 1))
-    '          If ip > 0 Then 'read description from between quotes
-    '            BasInf(i).desc = Mid(istr, 2, ip - 2)
-    '          End If
-    '          BasInf(i).Nam = Trim(Mid(istr, 30, 10))
-    '          BasInf(i).Elev = CSng(Mid(istr, 42, 10))
-    '          BasInf(i).sdat(0) = CInt(Mid(istr, 54, 4))
-    '          ip = 59
-    '          For j = 1 To 3
-    '            BasInf(i).sdat(j) = CInt(Mid(istr, ip, 2))
-    '            ip = ip + 3
-    '          Next j
-    '          BasInf(i).edat(0) = CInt(Mid(istr, 69, 4))
-    '          ip = 74
-    '          For j = 1 To 3
-    '            BasInf(i).edat(j) = CInt(Mid(istr, ip, 2))
-    '            ip = ip + 3
-    '          Next j
-    '          BasInf(i).EvapCoef = CSng(Mid(istr, 86, 8))
-    '          istr = LTrim(Mid(istr, 94))
-    '          ip = 1
-    '          j = 0
-    '          Do While j <= 7 And ip > 0
-    '            ip = InStr(istr, " ")
-    '            If ip > 0 Then 'process next data-set number
-    '              BasInf(i).dsn(j) = CInt(Mid(istr, 1, ip - 1))
-    '              istr = LTrim(Mid(istr, ip))
-    '            Else 'must be at end of string
-    '              BasInf(i).dsn(j) = CInt(Mid(istr, 1))
-    '            End If
-    '            j = j + 1
-    '          Loop
-    '        Next i
-    '      End If
-    '      'read dataset variable names and descriptions
-    '      ReDim DsnDescs(0)
-    '      nDD = 0
-    '      Do While Not EOF(bFun)
-    '        ReDim Preserve DsnDescs(nDD)
-    '        DsnDescs(nDD) = LineInput(bFun)
-    '        nDD = nDD + 1
-    '      Loop
-    '      ReadBasInf = True
-    '      FileClose(bFun)
-    '    End If
-    '    Exit Function
-
-    'ErrHandler:
-    '    MsgBox("Problem reading BASINS information file (.inf) associated with this WDM file." & vbCrLf & "Modifications made to this WDM file will not be reflected in the BASINS NPSM interface.", MsgBoxStyle.Information, "WDMUtil File Open")
-
-    '  End Function
-
-    'Private Sub HeaderFromBasinsInf(ByRef lData As atcTimeseries)
-    '  Dim j, ist, i As Integer
-    '  Dim lstr As String
-
-    '  On Error GoTo 0
-    '  With lData.Header
-    '    .Sen = "OBSERVED"
-    '    .con = lData.Attrib("TSTYPE")
-    '    i = .id - 10
-    '    ist = ((i - (i Mod 20)) / 20)
-    '    If ist >= LBound(BasInf) And ist <= UBound(BasInf) Then
-    '      lstr = BasInf(ist).Nam
-    '      If Len(lstr) > 8 Then 'compress name to fit in 8 characters
-    '        'try to weed out 00s from station ID
-    '        j = InStr(lstr, "00")
-    '        Do While j > 0 And Len(lstr) > 8
-    '          If j > 1 Then
-    '            lstr = Left(lstr, j - 1) & Mid(lstr, j + 2)
-    '          Else
-    '            lstr = Mid(lstr, j + 2)
-    '          End If
-    '        Loop
-    '        If Len(lstr) > 8 Then 'couldn't weed out 00s to compress name
-    '          lstr = Left(lstr, 8)
-    '        End If
-    '      End If
-    '      .loc = lstr
-    '      .desc = BasInf(ist).desc
-    '    End If
-    '  End With
-
-    '  'save revisions to header back to dsn
-    '  writeDataHeader(lData)
-
-    'End Sub
-
     Public Overrides ReadOnly Property Category() As String
         Get
             Return "File"
@@ -626,7 +501,9 @@ Public Class atcDataSourceWDM
         End Get
     End Property
 
-    Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+    Public Overrides Function Open(ByVal aFileName As String, _
+                          Optional ByVal aAttributes As atcDataAttributes = Nothing) _
+                                   As Boolean
         If aFileName Is Nothing OrElse aFileName.Length = 0 Then
             Dim cdlg As New Windows.Forms.OpenFileDialog
             With cdlg
@@ -646,7 +523,6 @@ Public Class atcDataSourceWDM
         Dim lwdmhandle As atcWdmHandle
         If FileExists(aFileName) Then
             lwdmhandle = New atcWdmHandle(0, aFileName)
-            'BasInfAvail = ReadBasInf()
         ElseIf FilenameNoPath(aFileName).Length > 0 Then
             Logger.Dbg("atcDataSourceWDM:Open:WDM file " & aFileName & " does not exist - it will be created")
             MkDirPath(PathNameOnly(aFileName))
@@ -685,7 +561,6 @@ Public Class atcDataSourceWDM
             Dim lReadTS As atcTimeseries = aReadMe
             'Logger.dbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))
             Dim lWdmHandle As New atcWdmHandle(0, Specification)
-            'BasInfAvail = ReadBasInf()
             If lWdmHandle.Unit > 0 Then
                 With aReadMe.Attributes
                     If Not CBool(.GetValue("HeaderComplete", False)) Then
@@ -828,7 +703,8 @@ Public Class atcDataSourceWDM
     End Sub
 
     'Before calling, make sure id property of aDataset has been set to dsn -- aDataset.Attributes.SetValue("id", dsn)
-    Private Sub DsnReadGeneral(ByVal aFileUnit As Integer, ByRef aDataset As atcTimeseries)
+    Private Sub DsnReadGeneral(ByVal aFileUnit As Integer, _
+                               ByRef aDataset As atcTimeseries)
         Dim lSaInd, lSaLen, lRetcod As Integer
         Dim lTu, lTs As Integer
         Dim lNvals As Integer
