@@ -52,69 +52,6 @@ Public Class atcDataSourceWDM
         pDates = New ArrayList
     End Sub
 
-    '  oldID must be given if dataObject has a changed id
-    Private Function writeDataHeader(ByRef aFileUnit As Integer, ByRef dataObject As atcTimeseries, Optional ByRef oldID As Integer = -1) As Boolean
-        Dim salen, saind As Integer
-        Dim c, S, l, d As String
-        Dim dsn, lRetcod, i As Integer
-        Dim lAttribs As atcDataAttributes = dataObject.Attributes
-
-        Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
-        Dim lMsgUnit As Integer = lMsgHandle.Unit
-
-        lRetcod = 0
-        dsn = lAttribs.GetValue("id")
-        Try
-            If oldID <> -1 And oldID <> dsn Then 'try to change dsn
-                Call F90_WDDSRN(aFileUnit, oldID, dsn, lRetcod)
-            End If
-        Catch
-        End Try
-
-        If lRetcod = 0 Then
-            saind = 288
-            salen = 8
-            S = lAttribs.GetValue("scen")
-            i = 1
-            Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, S, Len(S))
-            If lRetcod = 0 Then
-                saind = 289
-                c = lAttribs.GetValue("cons")
-                i = 2
-                Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, c, Len(c))
-                If lRetcod = 0 Then
-                    saind = 290
-                    l = lAttribs.GetValue("locn")
-                    i = 3
-                    Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, l, Len(l))
-                    If lRetcod = 0 Then
-                        saind = 45
-                        salen = 48
-                        d = lAttribs.GetValue("stanam")
-                        If Len(d) > salen Then
-                            Logger.Msg("Station name: '" & d & vbCr & "truncated to: " & Left(d, salen), "WDM Write Data Header", MsgBoxStyle.Exclamation)
-                        End If
-                        i = 4
-                        Call F90_WDBSAC(aFileUnit, dsn, lMsgUnit, saind, salen, lRetcod, d, Len(d))
-                    End If
-                End If
-            End If
-        End If
-
-        If lRetcod = 0 Then
-            writeDataHeader = DsnWriteAttributes(aFileUnit, dataObject)
-        Else
-            If Math.Abs(lRetcod) = 73 Then
-                pErrorDescription = "Unable to renumber Dataset " & oldID & " to " & dsn
-            Else
-                pErrorDescription = "Unable to Write a Data Header for Class WDM, Retcod:" & lRetcod & " from " & i
-            End If
-            writeDataHeader = False
-        End If
-
-        lMsgHandle.Dispose()
-    End Function
-
     Public Sub New()
         MyBase.New()
         If pMsg Is Nothing Then
@@ -278,6 +215,37 @@ Public Class atcDataSourceWDM
         End Try
     End Function
 
+    Public Function WriteAttributes(ByVal aDataSet As atcData.atcDataSet) As Boolean
+        Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
+        Dim lWdmHandle As New atcWdmHandle(0, Specification)
+        WriteAttributes = DsnWriteAttributes(lWdmHandle.Unit, aDataSet)
+        lWdmHandle.Dispose()
+        Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
+    End Function
+
+    ''' <summary>
+    ''' Write one attribute of a data set to the file
+    ''' </summary>
+    ''' <param name="aDataSet">Data set which the attribute applies to</param>
+    ''' <param name="aAttribute">Attribute to write</param>
+    ''' <param name="aNewValue">New value for attribute (Optional)</param>
+    ''' <returns>True on success, False on failure</returns>
+    ''' <remarks>Use WriteAttributes to write all attributes</remarks>
+    Public Function WriteAttribute(ByVal aDataSet As atcData.atcDataSet, ByVal aAttribute As atcDefinedValue, Optional ByVal aNewValue As Object = Nothing) As Boolean
+        Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
+        Dim lWdmHandle As New atcWdmHandle(0, Specification)
+        Dim lMsg As atcWdmHandle = pMsg.MsgHandle
+        Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 0)
+
+        If Not aNewValue Is Nothing Then aAttribute.Value = aNewValue
+
+        WriteAttribute = DsnWriteAttribute(lWdmHandle.Unit, lMsg.Unit, lDsn, aAttribute)
+
+        lMsg.Dispose()
+        lWdmHandle.Dispose()
+        Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
+    End Function
+
     Private Function findNextDsn(ByRef aDsn As Integer) As Integer
         Dim lNextDsn As Integer = aDsn
         For Each lDataset As atcDataSet In DataSets
@@ -349,15 +317,15 @@ Public Class atcDataSourceWDM
         'End If
     End Function
 
+    ''' <summary>
+    ''' Put a new dataset in the WDM file from aTs
+    ''' </summary>
+    ''' <param name="aFileUnit">WDM file handle</param>
+    ''' <param name="aTs">data set to add to WDM</param>
+    ''' <returns></returns>
     Private Function DsnBld(ByVal aFileUnit As Integer, ByRef aTs As atcTimeseries) As Boolean
-        Dim lDsn, lNSasp, lNUp, lNDn, lNSa, lNDp As Integer
-        Dim lDecade As Integer
-        Dim lSaLen, lPsa, lIVal, lSaInd, lRetcod As Integer
-        Dim lRVal As Single
+        Dim lDsn, lNSasp, lNUp, lNDn, lNSa, lNDp, lPsa As Integer
         Dim lCSDat(6) As Integer
-        Dim lStr As String
-        Dim lTs As Integer
-        Dim lTu As Integer
 
         Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
         Dim lMsgUnit As Integer = lMsgHandle.Unit
@@ -370,6 +338,25 @@ Public Class atcDataSourceWDM
         lNSasp = aTs.Attributes.GetValue("NSASP", 100)
         lNDp = aTs.Attributes.GetValue("NDP", 300)
         F90_WDLBAX(aFileUnit, lDsn, 1, lNDn, lNUp, lNSa, lNSasp, lNDp, lPsa)
+
+        DsnBld = DsnWriteAttributes(aFileUnit, aTs)
+
+        lMsgHandle.Dispose()
+    End Function
+
+    Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, ByRef aTs As atcTimeseries) As Boolean
+        Dim lCSDat(6) As Integer
+        Dim lDecade As Integer
+        Dim lSaLen, lIVal, lSaInd As Integer
+        Dim lRVal As Single
+        Dim lStr As String
+        Dim lTs As Integer
+        Dim lTu As Integer
+
+        Dim lRetcod As Integer
+        Dim lMsg As atcWdmHandle = pMsg.MsgHandle
+        Dim lMsgUnit As Integer = lMsg.Unit
+        Dim lDsn As Integer = aTs.Attributes.GetValue("id", 0)
 
         'add needed attributes
         lSaInd = 1 'tstype
@@ -432,59 +419,11 @@ Public Class atcDataSourceWDM
         lStr = Left(aTs.Attributes.GetValue("desc"), lSaLen)
         F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
 
-        'others (from attrib)
-        DsnBld = DsnWriteAttributes(aFileUnit, aTs)
-
-        lMsgHandle.Dispose()
-    End Function
-
-    Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, ByRef aTs As atcTimeseries) As Boolean
-        Dim lName As String
-        Dim lValue As Object
-        Dim lDefinition As atcAttributeDefinition
-        Dim lMsgDefinition As atcAttributeDefinition
-        Dim lRetcod As Integer
-        Dim lMsg As atcWdmHandle = pMsg.MsgHandle
-        Dim lMsgUnit As Integer = lMsg.Unit
-        Dim lDsn As Integer = aTs.Attributes.GetValue("id", 0)
-
         DsnWriteAttributes = True
         For lAttributeIndex As Integer = 0 To aTs.Attributes.Count - 1
-            lDefinition = aTs.Attributes(lAttributeIndex).Definition
-            lName = lDefinition.Name
-            lValue = aTs.Attributes(lAttributeIndex).Value
-            If lName.ToLower = "units" Then  'store Units ID as DCODE in WDM
-                lName = "DCODE"
-                lValue = CStr(GetUnitID(lValue))
-            End If
-            lMsgDefinition = pMsg.Attributes.ItemByKey(lName.ToLower)
-            If Not lMsgDefinition Is Nothing Then
-                Select Case lMsgDefinition.TypeString
-                    Case "Integer"
-                        If IsNumeric(lValue) Then
-                            F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, 1, CInt(lValue), lRetcod)
-                        End If
-                    Case "Single"
-                        If IsNumeric(lValue) Then
-                            F90_WDBSAR(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, 1, CSng(lValue), lRetcod)
-                        End If
-                    Case Else 'character
-                        If Len(lValue) > lMsgDefinition.Max Then
-                            Logger.Dbg("Attribute '" & lMsgDefinition.Name & "' truncated from '" & lValue & "' to '" & Left(lValue, lMsgDefinition.Max) & "'")
-                        End If
-                        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lMsgDefinition.ID, lMsgDefinition.Max, lRetcod, lValue, Len(lValue))
-                End Select
-                If lRetcod <> 0 Then
-                    If Math.Abs(lRetcod) = 104 Then 'cant update if data already present
-                        Logger.Dbg("Skip:" & lName & ", data present")
-                    Else
-                        If Len(pErrorDescription) = 0 Then
-                            pErrorDescription = "Unable to Write Data Attributes for Class WDM"
-                        End If
-                        pErrorDescription &= vbCrLf & "  Attribute:" & lName & ", Value:" & lValue & ", Retcod:" & lRetcod
-                        DsnWriteAttributes = False
-                    End If
-                End If
+            If Not DsnWriteAttribute(aFileUnit, lMsgUnit, lDsn, aTs.Attributes(lAttributeIndex)) Then
+                DsnWriteAttributes = False
+                Exit For
             End If
         Next
 
@@ -493,6 +432,55 @@ Public Class atcDataSourceWDM
         End If
 
         lMsg.Dispose()
+    End Function
+
+    ''' <summary>
+    ''' Write an attribute to the WDM file
+    ''' </summary>
+    ''' <returns>True if attribute was written OR if attribute is not in message file</returns>
+    ''' <remarks>Only attributes in WDM message file can be written to WDM files</remarks>
+    Private Function DsnWriteAttribute(ByVal aFileUnit As Integer, ByVal aMsgUnit As Integer, ByVal aDsn As Integer, ByVal aAttribute As atcDefinedValue) As Boolean
+        Dim lRetcod As Integer
+        Dim lName As String = aAttribute.Definition.Name
+        Dim lValue As Object = aAttribute.Value
+
+        DsnWriteAttribute = True
+
+        If lName.ToLower = "units" Then  'store Units ID as DCODE in WDM
+            lName = "DCODE"
+            lValue = CStr(GetUnitID(lValue))
+        End If
+
+        Dim lMsgDefinition As atcAttributeDefinition = pMsg.Attributes.ItemByKey(lName.ToLower)
+
+        If Not lMsgDefinition Is Nothing Then
+            Select Case lMsgDefinition.TypeString
+                Case "Integer"
+                    If IsNumeric(lValue) Then
+                        F90_WDBSAI(aFileUnit, aDsn, aMsgUnit, lMsgDefinition.ID, 1, CInt(lValue), lRetcod)
+                    End If
+                Case "Single"
+                    If IsNumeric(lValue) Then
+                        F90_WDBSAR(aFileUnit, aDsn, aMsgUnit, lMsgDefinition.ID, 1, CSng(lValue), lRetcod)
+                    End If
+                Case Else 'character
+                    If Len(lValue) > lMsgDefinition.Max Then
+                        Logger.Dbg("Attribute '" & lMsgDefinition.Name & "' truncated from '" & lValue & "' to '" & Left(lValue, lMsgDefinition.Max) & "'")
+                    End If
+                    F90_WDBSAC(aFileUnit, aDsn, aMsgUnit, lMsgDefinition.ID, lMsgDefinition.Max, lRetcod, lValue, Len(lValue))
+            End Select
+            If lRetcod <> 0 Then
+                If Math.Abs(lRetcod) = 104 Then 'cant update if data already present
+                    Logger.Dbg("Skip:" & lName & ", data present")
+                Else
+                    If Len(pErrorDescription) = 0 Then
+                        pErrorDescription = "Unable to Write Data Attribute to WDM"
+                    End If
+                    pErrorDescription &= vbCrLf & "  Attribute:" & lName & ", Value:" & lValue & ", Retcod:" & lRetcod
+                    DsnWriteAttribute = False
+                End If
+            End If
+        End If
     End Function
 
     '  Public Function ReadBasInf() As Boolean
