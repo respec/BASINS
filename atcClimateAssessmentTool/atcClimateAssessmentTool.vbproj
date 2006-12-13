@@ -183,15 +183,19 @@
     </Compile>
     <EmbeddedResource Include="frmCAT.resx">
       <DependentUpon>frmCAT.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmEndpoint.resx">
       <DependentUpon>frmEndpoint.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmVariation.resx">
       <DependentUpon>frmVariation.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmVariationCligen.resx">
       <DependentUpon>frmVariationCligen.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

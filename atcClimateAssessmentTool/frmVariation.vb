@@ -64,7 +64,7 @@ Public Class frmVariation
     Friend WithEvents txtName As System.Windows.Forms.TextBox
     Friend WithEvents btnScript As System.Windows.Forms.Button
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmVariation))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmVariation))
         Me.lblFunction = New System.Windows.Forms.Label
         Me.txtFunction = New System.Windows.Forms.TextBox
         Me.txtIncrement = New System.Windows.Forms.TextBox
@@ -90,85 +90,90 @@ Public Class frmVariation
         '
         'lblFunction
         '
+        Me.lblFunction.AutoSize = True
         Me.lblFunction.BackColor = System.Drawing.Color.Transparent
-        Me.lblFunction.Location = New System.Drawing.Point(36, 81)
+        Me.lblFunction.Location = New System.Drawing.Point(43, 71)
         Me.lblFunction.Name = "lblFunction"
-        Me.lblFunction.Size = New System.Drawing.Size(77, 21)
+        Me.lblFunction.Size = New System.Drawing.Size(51, 13)
         Me.lblFunction.TabIndex = 5
         Me.lblFunction.Text = "Function:"
         Me.lblFunction.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtFunction
         '
-        Me.txtFunction.Location = New System.Drawing.Point(120, 78)
+        Me.txtFunction.Location = New System.Drawing.Point(100, 68)
         Me.txtFunction.Name = "txtFunction"
-        Me.txtFunction.Size = New System.Drawing.Size(85, 22)
+        Me.txtFunction.Size = New System.Drawing.Size(71, 20)
         Me.txtFunction.TabIndex = 6
         Me.txtFunction.Text = "Multiply"
         '
         'txtIncrement
         '
-        Me.txtIncrement.Location = New System.Drawing.Point(120, 162)
+        Me.txtIncrement.Location = New System.Drawing.Point(100, 140)
         Me.txtIncrement.Name = "txtIncrement"
-        Me.txtIncrement.Size = New System.Drawing.Size(85, 22)
+        Me.txtIncrement.Size = New System.Drawing.Size(71, 20)
         Me.txtIncrement.TabIndex = 12
         Me.txtIncrement.Text = "0.05"
         '
         'lblIncrement
         '
+        Me.lblIncrement.AutoSize = True
         Me.lblIncrement.BackColor = System.Drawing.Color.Transparent
         Me.lblIncrement.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.lblIncrement.Location = New System.Drawing.Point(36, 164)
+        Me.lblIncrement.Location = New System.Drawing.Point(37, 143)
         Me.lblIncrement.Name = "lblIncrement"
-        Me.lblIncrement.Size = New System.Drawing.Size(77, 19)
+        Me.lblIncrement.Size = New System.Drawing.Size(57, 13)
         Me.lblIncrement.TabIndex = 11
         Me.lblIncrement.Text = "Increment:"
         Me.lblIncrement.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtMax
         '
-        Me.txtMax.Location = New System.Drawing.Point(120, 134)
+        Me.txtMax.Location = New System.Drawing.Point(100, 116)
         Me.txtMax.Name = "txtMax"
-        Me.txtMax.Size = New System.Drawing.Size(85, 22)
+        Me.txtMax.Size = New System.Drawing.Size(71, 20)
         Me.txtMax.TabIndex = 10
         Me.txtMax.Text = "1.1"
         '
         'txtMin
         '
-        Me.txtMin.Location = New System.Drawing.Point(120, 106)
+        Me.txtMin.Location = New System.Drawing.Point(100, 92)
         Me.txtMin.Name = "txtMin"
-        Me.txtMin.Size = New System.Drawing.Size(85, 22)
+        Me.txtMin.Size = New System.Drawing.Size(71, 20)
         Me.txtMin.TabIndex = 8
         Me.txtMin.Text = "0.9"
         '
         'lblMaximum
         '
+        Me.lblMaximum.AutoSize = True
         Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
         Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMaximum.Location = New System.Drawing.Point(36, 136)
+        Me.lblMaximum.Location = New System.Drawing.Point(40, 119)
         Me.lblMaximum.Name = "lblMaximum"
-        Me.lblMaximum.Size = New System.Drawing.Size(77, 21)
+        Me.lblMaximum.Size = New System.Drawing.Size(54, 13)
         Me.lblMaximum.TabIndex = 9
         Me.lblMaximum.Text = "Maximum:"
         Me.lblMaximum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'lblMinimum
         '
+        Me.lblMinimum.AutoSize = True
         Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
         Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMinimum.Location = New System.Drawing.Point(36, 108)
+        Me.lblMinimum.Location = New System.Drawing.Point(43, 95)
         Me.lblMinimum.Name = "lblMinimum"
-        Me.lblMinimum.Size = New System.Drawing.Size(77, 21)
+        Me.lblMinimum.Size = New System.Drawing.Size(51, 13)
         Me.lblMinimum.TabIndex = 7
         Me.lblMinimum.Text = "Minimum:"
         Me.lblMinimum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'lblData
         '
+        Me.lblData.AutoSize = True
         Me.lblData.BackColor = System.Drawing.Color.Transparent
-        Me.lblData.Location = New System.Drawing.Point(26, 44)
+        Me.lblData.Location = New System.Drawing.Point(25, 41)
         Me.lblData.Name = "lblData"
-        Me.lblData.Size = New System.Drawing.Size(87, 21)
+        Me.lblData.Size = New System.Drawing.Size(69, 13)
         Me.lblData.TabIndex = 3
         Me.lblData.Text = "Data to Vary:"
         Me.lblData.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -177,11 +182,10 @@ Public Class frmVariation
         '
         Me.txtVaryData.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtVaryData.Location = New System.Drawing.Point(120, 44)
+        Me.txtVaryData.Location = New System.Drawing.Point(100, 38)
         Me.txtVaryData.Name = "txtVaryData"
-        Me.txtVaryData.Size = New System.Drawing.Size(308, 22)
+        Me.txtVaryData.Size = New System.Drawing.Size(331, 20)
         Me.txtVaryData.TabIndex = 4
-        Me.txtVaryData.Text = ""
         '
         'grpSeasons
         '
@@ -192,9 +196,9 @@ Public Class frmVariation
         Me.grpSeasons.Controls.Add(Me.lstSeasons)
         Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
         Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
-        Me.grpSeasons.Location = New System.Drawing.Point(214, 78)
+        Me.grpSeasons.Location = New System.Drawing.Point(177, 64)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(214, 217)
+        Me.grpSeasons.Size = New System.Drawing.Size(253, 235)
         Me.grpSeasons.TabIndex = 13
         Me.grpSeasons.TabStop = False
         Me.grpSeasons.Text = "Vary Seasonally"
@@ -203,11 +207,11 @@ Public Class frmVariation
         '
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSeasons.ItemHeight = 16
-        Me.cboSeasons.Location = New System.Drawing.Point(19, 28)
+        Me.cboSeasons.ItemHeight = 13
+        Me.cboSeasons.Location = New System.Drawing.Point(6, 19)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(186, 24)
+        Me.cboSeasons.Size = New System.Drawing.Size(241, 21)
         Me.cboSeasons.TabIndex = 14
         '
         'lstSeasons
@@ -216,55 +220,56 @@ Public Class frmVariation
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
-        Me.lstSeasons.ItemHeight = 16
-        Me.lstSeasons.Location = New System.Drawing.Point(19, 55)
+        Me.lstSeasons.Location = New System.Drawing.Point(6, 46)
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(186, 107)
+        Me.lstSeasons.Size = New System.Drawing.Size(241, 154)
         Me.lstSeasons.TabIndex = 15
         '
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(19, 171)
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 206)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
-        Me.btnSeasonsAll.Size = New System.Drawing.Size(76, 26)
+        Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsAll.TabIndex = 16
         Me.btnSeasonsAll.Text = "All"
         '
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(128, 171)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(184, 206)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
-        Me.btnSeasonsNone.Size = New System.Drawing.Size(77, 25)
+        Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsNone.TabIndex = 17
         Me.btnSeasonsNone.Text = "None"
         '
         'btnOk
         '
-        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(144, 314)
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(280, 315)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(86, 28)
-        Me.btnOk.TabIndex = 18
+        Me.btnOk.Size = New System.Drawing.Size(72, 24)
+        Me.btnOk.TabIndex = 19
         Me.btnOk.Text = "Ok"
         '
         'btnCancel
         '
-        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnCancel.Location = New System.Drawing.Point(250, 314)
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Location = New System.Drawing.Point(358, 315)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(86, 28)
-        Me.btnCancel.TabIndex = 19
+        Me.btnCancel.Size = New System.Drawing.Size(72, 24)
+        Me.btnCancel.TabIndex = 20
         Me.btnCancel.Text = "Cancel"
         '
         'lblName
         '
+        Me.lblName.AutoSize = True
         Me.lblName.BackColor = System.Drawing.Color.Transparent
-        Me.lblName.Location = New System.Drawing.Point(1, 14)
+        Me.lblName.Location = New System.Drawing.Point(29, 15)
         Me.lblName.Name = "lblName"
-        Me.lblName.Size = New System.Drawing.Size(112, 21)
+        Me.lblName.Size = New System.Drawing.Size(65, 13)
         Me.lblName.TabIndex = 1
         Me.lblName.Text = "Input Name:"
         Me.lblName.TextAlign = System.Drawing.ContentAlignment.TopRight
@@ -273,24 +278,23 @@ Public Class frmVariation
         '
         Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtName.Location = New System.Drawing.Point(120, 14)
+        Me.txtName.Location = New System.Drawing.Point(100, 12)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(308, 22)
+        Me.txtName.Size = New System.Drawing.Size(330, 20)
         Me.txtName.TabIndex = 2
-        Me.txtName.Text = ""
         '
         'btnScript
         '
-        Me.btnScript.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnScript.Location = New System.Drawing.Point(10, 314)
+        Me.btnScript.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnScript.Location = New System.Drawing.Point(178, 315)
         Me.btnScript.Name = "btnScript"
-        Me.btnScript.Size = New System.Drawing.Size(115, 28)
-        Me.btnScript.TabIndex = 20
+        Me.btnScript.Size = New System.Drawing.Size(96, 24)
+        Me.btnScript.TabIndex = 18
         Me.btnScript.Text = "Open Script..."
         '
         'frmVariation
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(442, 351)
         Me.Controls.Add(Me.btnScript)
         Me.Controls.Add(Me.lblName)
@@ -314,6 +318,7 @@ Public Class frmVariation
         Me.Text = "Input"
         Me.grpSeasons.ResumeLayout(False)
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -566,4 +571,5 @@ Public Class frmVariation
             ShowHelp("BASINS Details\Analysis\Climate Assessment Tool.html")
         End If
     End Sub
+
 End Class
