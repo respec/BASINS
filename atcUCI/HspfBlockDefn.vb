@@ -1,5 +1,6 @@
 Option Strict Off
 Option Explicit On
+
 ''' <summary>
 ''' HSPF Block Definition
 ''' </summary>
@@ -14,51 +15,54 @@ Option Explicit On
 
     Public Property Name() As String
         Get
-            Name = pName
+            Return pName
         End Get
-        Set(ByVal Value As String)
-            pName = Value
+        Set(ByVal aName As String)
+            pName = aName
         End Set
     End Property
 
     Public Property Id() As Integer
         Get
-            Id = pId
+            Return pId
         End Get
-        Set(ByVal Value As Integer)
-            pId = Value
+        Set(ByVal aId As Integer)
+            pId = aId
         End Set
     End Property
 
     Public Property SectionDefs() As Collection
         Get 'of HspfSectionDef
-            SectionDefs = pSectionDefs
+            Return pSectionDefs
         End Get
-        Set(ByVal Value As Collection) 'of HspfSectionDef
-            pSectionDefs = Value
+        Set(ByVal aSectionDefs As Collection) 'of HspfSectionDef
+            pSectionDefs = aSectionDefs
         End Set
     End Property
 
     Public Property TableDefs() As Collection
         Get 'of HspfTableDef
-            TableDefs = pTableDefs
+            Return pTableDefs
         End Get
-        Set(ByVal Value As Collection) 'of HspfTableDef
-            pTableDefs = Value
+        Set(ByVal aTableDefs As Collection) 'of HspfTableDef
+            pTableDefs = aTableDefs
         End Set
     End Property
 
-    Public Function SectionID(ByRef inname As String) As Integer
-        Dim i As Integer
-        SectionID = 0
-        For i = 1 To pSectionDefs.Count()
-            If pSectionDefs.Item(i).Name = inname Then
-                If pName <> "RCHRES" Or (pName = "RCHRES" And i < 8) Then
-                    SectionID = i - 1
+    Public Function SectionID(ByRef aSectionName As String) As Integer
+        Dim lIndex As Integer
+        Dim lSectionID As Integer = 0
+
+        For lIndex = 1 To pSectionDefs.Count()
+            If pSectionDefs.Item(lIndex).Name = aSectionName Then
+                If pName <> "RCHRES" Or (pName = "RCHRES" And lIndex < 8) Then
+                    lSectionID = lIndex - 1
                 Else
-                    SectionID = i - 2
+                    lSectionID = lIndex - 2
                 End If
             End If
-        Next i
+        Next lIndex
+
+        Return lSectionID
     End Function
 End Class

@@ -3,9 +3,11 @@ Option Explicit On
 
 Imports atcUtility
 
+''' <summary>
+''' 
+''' </summary>
+''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
 <System.Runtime.InteropServices.ProgId("HspfCategoryBlk_NET.HspfCategoryBlk")> Public Class HspfCategoryBlk
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
     Private pCategories As Collection 'of HspfCategory
     Private pUci As HspfUci
     Private pComment As String
