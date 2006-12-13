@@ -1,8 +1,13 @@
 Option Strict On
 Option Explicit On
 
+''' <summary>
+''' Declaratiions of entry points in hass-ent.dll fortran library
+''' </summary>
+''' <remarks>
+'''Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' </remarks>
 Module Vb2F90
-    'Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     'general routines
     Declare Sub F90_MSG Lib "hass_ent.dll" _

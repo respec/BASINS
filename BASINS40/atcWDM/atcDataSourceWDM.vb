@@ -310,9 +310,6 @@ Public Class atcDataSourceWDM
     Private Function DsnBld(ByVal aFileUnit As Integer, _
                             ByRef aTs As atcTimeseries) As Boolean
         Dim lDsn, lNSasp, lNUp, lNDn, lNSa, lNDp, lPsa As Integer
-        'Dim lCSDat(6) As Integer
-        'Dim lMsgHandle As atcWdmHandle = pMsg.MsgHandle
-        'Dim lMsgUnit As Integer = lMsgHandle.Unit
 
         lDsn = aTs.Attributes.GetValue("id", 0)
         lNDn = aTs.Attributes.GetValue("NDN", 10)
@@ -324,8 +321,6 @@ Public Class atcDataSourceWDM
         F90_WDLBAX(aFileUnit, lDsn, 1, lNDn, lNUp, lNSa, lNSasp, lNDp, lPsa)
         'write attributes
         DsnBld = DsnWriteAttributes(aFileUnit, aTs)
-
-        'lMsgHandle.Dispose()
     End Function
 
     Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, _

@@ -3,10 +3,10 @@ Option Explicit On
 
 Imports System.DateTime
 
+''' <summary>General date utility subroutines and functions</summary>
+''' <remarks>Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license </remarks>
 Public Module modDate
-    '##MODULE_REMARKS Copyright 2001-6 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-    '##MODULE_DESCRIPTION General date utility subroutines and functions
-    '##GLOBAL atcTimeUnit - standard timeseries time units
+    ''' <summary>Standard timeseries time units</summary>
     Public Enum atcTimeUnit
         TUSecond = 1
         TUMinute = 2
@@ -17,7 +17,7 @@ Public Module modDate
         TUCentury = 7
     End Enum
 
-    '##GLOBAL atcTran - standard timeseries transformations
+    ''' <summary>Standard timeseries transformations</summary>
     Public Enum atcTran
         TranAverSame = 0
         TranSumDiv = 1
@@ -26,46 +26,60 @@ Public Module modDate
         TranNative = 4
     End Enum
 
-    '##GLOBAL JulianHour - one hour as fraction of a day
+    ''' <summary>one hour as fraction of a day</summary>
     Public Const JulianHour As Double = 1 / 24
-    '##GLOBAL JulianMinute - one minute as fraction of a day
+
+    ''' <summary>one minute as fraction of a day</summary>
     Public Const JulianMinute As Double = 1 / 1440
-    '##GLOBAL JulianSecond - one second as fraction of a day
+
+    ''' <summary>one second as fraction of a day</summary>
     Public Const JulianSecond As Double = 1 / 86400
+
+    ''' <summary>cound of seconds in a day</summary>
     Public Const SecondsPerDay As Integer = 86400
 
+    ''' <summary>one millisecond as fraction of a day</summary>
     Public Const JulianMillisecond As Double = 1 / 86400000
 
-    'When doing math on months and years, it is more accurate to use timdif and timadd in UtilDateExt
-    '##GLOBAL JulianMonth - estimate of month as number of days
+    ''' <summary>estimate of month as number of days</summary>
+    ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif and Timadd</remarks>
     Public Const JulianMonth As Double = 30.44
-    '##GLOBAL JulianYear - estimate of year as number of days
+
+    ''' <summary>estimate of year as number of days</summary>
+    ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif and Timadd</remarks>
     Public Const JulianYear As Double = 365.25
 
-    'Julian days from actual year zero to modified Julian day we use as zero
+    ''' <summary>Julian days from actual year zero to modified Julian day we use as zero</summary>
     Private Const JulianModification1858 As Integer = 679006 '17 Nov 1858
     Private Const JulianModification1899 As Integer = 694024 '30 Dec 1899
     'This is the offset we actually use
     Public Const JulianModification As Integer = JulianModification1899
 
+    ''' <summary>Three character month names</summary>
+    ''' <remarks>TODO: make this international</remarks>
     Public ReadOnly MonthName3 As String() = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 
+    ''' <summary>convert a VB date to a modfied Julian date(MJD)</summary>
+    ''' <param name="aDate"> VBdate to convert</param>
+    ''' <returns>modified Julian date</returns>
+    ''' <remarks>VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858</remarks>
     Public Function VBdate2MJD(ByVal aDate As Date) As Double
-        '##SUMMARY VBdate2MJD - convert a VB date to a modfied Julian date(MJD), _
-        'VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858
-        '##PARAM aDate - VBdate to convert
-        VBdate2MJD = aDate.ToOADate + JulianModification1899 - JulianModification
+        Return aDate.ToOADate + JulianModification1899 - JulianModification
     End Function
 
+    ''' <summary>convert a modified Julian date(MJD) to a VB date</summary>
+    ''' <param name="aJDate"> MJD to convert</param>
+    ''' <returns>VB date</returns>
+    ''' <remarks>VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858</remarks>
     Public Function MJD2VBdate(ByVal aJDate As Double) As Date
-        '##SUMMARY MJD2VBdate - convert a modified Julian date(MJD) to a VB date
-        '##PARM aJDate - MJD to convert
-        MJD2VBdate = FromOADate(aJDate + JulianModification - JulianModification1899)
+        Return FromOADate(aJDate + JulianModification - JulianModification1899)
     End Function
 
+    ''' <summary>convert a date array to a modfied Julian date (MJD)</summary>
+    ''' <param name="aDate">date array to convert</param>
+    ''' <returns>modified Julian date</returns>
+    ''' <remarks></remarks>
     Public Function Date2J(ByVal aDate() As Integer) As Double
-        '##SUMMARY Date2J - convert a date arry to a modfied Julian date (MJD)
-        '##PARM aDate - date array to convert
         Dim lJd As Integer
         Dim lHms As Double
         '##LOCAL lJd - date (year, month, day) portion of MJD
@@ -73,15 +87,17 @@ Public Module modDate
 
         lJd = MJD(aDate(0), aDate(1), aDate(2))
         lHms = HMS2J(aDate(3), aDate(4), aDate(5))
-        Date2J = lJd + lHms
+        Return lJd + lHms
     End Function
 
+    ''' <summary>convert an hour, minute, and second to a modifed Julian date (MJD)</summary>
+    ''' <param name="aHr">hour to convert</param>
+    ''' <param name="aMi">minute to convert</param>
+    ''' <param name="aSc">second to convert</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Function HMS2J(ByVal aHr As Integer, ByVal aMi As Integer, ByVal aSc As Integer) As Double
-        '##SUMMARY HMS2J - convert an hour, minute, and second to a modifed Julian date (MJD)
-        '##PARM aHr - hour to convert
-        '##PARM aMn - minute to convert
-        '##PARM aSc - second to convert
-        HMS2J = CDbl(aHr / 24) + CDbl(aMi / 1440) + CDbl(aSc / 86400)
+        Return (CDbl(aHr) * JulianHour) + (CDbl(aMi) * JulianMinute) + (CDbl(aSc) * JulianSecond)
     End Function
 
     ''' <summary>

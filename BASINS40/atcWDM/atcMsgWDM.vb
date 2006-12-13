@@ -5,8 +5,13 @@ Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 
+''' <summary>
+''' WDM attributes in memory, read from hspfmsg.wdm
+''' </summary>
+''' <remarks>
+'''Copyright 2005 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
+'''</remarks>
 Friend Class atcMsgWDM
-    'Copyright 2005 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
     Dim pAttributes As atcCollection 'of clsAttributeDefinition
 
     Public ReadOnly Property Attributes() As atcCollection
