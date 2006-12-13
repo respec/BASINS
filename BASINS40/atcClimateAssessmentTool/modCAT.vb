@@ -7,63 +7,100 @@ Public Module modCAT
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
     Friend g_DataManager As atcDataManager
 
-    Public Sub ScenarioRun(ByVal aCurrentWDMfilename As String, _
-                                ByVal aNewScenarioName As String, _
-                                ByVal aModifiedData As atcDataGroup, _
-                                ByRef aWDMResults As atcDataSource, _
-                                ByRef aHBNResults As atcDataSource)
+    ''' <summary>
+    ''' Given the filename of a UCI file and a file type, return the file names, if any, of that type in the UCI
+    ''' </summary>
+    ''' <param name="aUCIfileContents">Full text of UCI file</param>
+    ''' <param name="aFileType">WDM or MESSU or BINO</param>
+    ''' <returns>ArrayList of file name(s) of the requested type appearing in the FILES block</returns>
+    Public Function UCIFilesBlockFilenames(ByVal aUCIfileContents As String, ByVal aFileType As String) As ArrayList
+        UCIFilesBlockFilenames = New ArrayList
+        Dim lFilesBlock As String = StrFindBlock(aUCIfileContents, vbLf & "FILES", vbLf & "END FILES")
+        Dim lNextPosition As Integer = lFilesBlock.IndexOf(vbLf & aFileType)
+        Dim lEOL As Integer
+        Dim lEOLchars() As Char = {ChrW(10), ChrW(13)}
+        While lNextPosition >= 0
+            lEOL = lFilesBlock.IndexOfAny(lEOLchars, lNextPosition + 1)
+            UCIFilesBlockFilenames.Add(lFilesBlock.Substring(lNextPosition + 17, lEOL - lNextPosition - 17))
+            lNextPosition = lFilesBlock.IndexOf(vbLf & aFileType, lEOL)
+        End While
+    End Function
+
+    Public Function ScenarioRun(ByVal aBaseFilename As String, _
+                           ByVal aNewScenarioName As String, _
+                           ByVal aModifiedData As atcDataGroup, _
+                           ByVal aShowProgress As Boolean) As atcCollection 'of atcDataSource
         'Copy base UCI and change scenario name within it
         'Copy WDM
         'Change data to be modified in new WDM
         'Change scenario attribute in new WDM
         'Run WinHSPFlt with the new UCI
 
-        Dim lNewFilename As String
-        Dim lCurrentTimeseries As atcTimeseries
-        aWDMResults = New atcWDM.atcDataSourceWDM
-        aHBNResults = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+        Dim lModified As New atcCollection
 
-        If FileExists(aCurrentWDMfilename) Then
-            lNewFilename = AbsolutePath(aCurrentWDMfilename, CurDir)
-            lNewFilename = PathNameOnly(lNewFilename) & "\" & aNewScenarioName & "."
+        Dim lCurrentTimeseries As atcTimeseries
+
+        If FileExists(aBaseFilename & ".uci") Then
+            Dim lNewBaseFilename As String = AbsolutePath(aBaseFilename, CurDir)
+            Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & "\"
+            lNewBaseFilename = lNewFolder & aNewScenarioName & "."
 
             If aNewScenarioName.ToLower <> "base" Then
-                'Copy base UCI and change scenario name within it
-                ReplaceStringToFile(WholeFileString(FilenameSetExt(aCurrentWDMfilename, "uci")), "base.", aNewScenarioName & ".", lNewFilename & "uci")
-
-                'Copy base WDM to new WDM
-                FileCopy(aCurrentWDMfilename, lNewFilename & "wdm")
-                If Not aWDMResults.Open(lNewFilename & "wdm") Then
-                    Logger.Msg("Could not open new scenario WDM file '" & lNewFilename & "wdm'", MsgBoxStyle.Critical, "Could not run model")
-                    Return
-                End If
-
-                'Update scenario name in new WDM
-                For Each lCurrentTimeseries In aModifiedData
-                    If Not lCurrentTimeseries Is Nothing Then
-                        lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
-                        aWDMResults.AddDataSet(lCurrentTimeseries)
+                'Copy base UCI, changing base to new scenario name within it
+                ReplaceStringToFile(WholeFileString(aBaseFilename & ".uci"), "base.", aNewScenarioName & ".", lNewBaseFilename & "uci")
+                For Each lWDMfilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename & ".uci"), "WDM")
+                    lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
+                    'Copy each base WDM to new WDM
+                    Dim lNewWDMfilename As String = lNewFolder & IO.Path.GetFileName(lWDMfilename).Replace("base.", aNewScenarioName & ".")
+                    FileCopy(lWDMfilename, lNewWDMfilename)
+                    Dim lWDMResults As New atcWDM.atcDataSourceWDM
+                    If Not lWDMResults.Open(lNewWDMfilename) Then
+                        Logger.Msg("Could not open new scenario WDM file '" & lNewWDMfilename & "'", MsgBoxStyle.Critical, "Could not run model")
+                        Return Nothing
                     End If
-                Next
-                For Each lCurrentTimeseries In aWDMResults.DataSets
-                    If lCurrentTimeseries.Attributes.GetValue("scenario").ToLower = "base" Then
-                        lCurrentTimeseries.EnsureValuesRead()
-                        lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
-                        aWDMResults.AddDataSet(lCurrentTimeseries) 'TODO: Would be nice to just update this attribute, not rewrite all data values
+
+                    'Key is base file name, value is modified file name
+                    lModified.Add(lWDMfilename, lNewWDMfilename)
+
+                    'Update scenario name in new WDM
+                    For Each lCurrentTimeseries In aModifiedData
+                        If Not lCurrentTimeseries Is Nothing _
+                           AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lWDMfilename.ToLower) _
+                           AndAlso lCurrentTimeseries.Attributes.GetValue("scenario") <> aNewScenarioName Then
+                            lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
+                            lWDMResults.AddDataset(lCurrentTimeseries)
+                        End If
+                    Next
+                    For Each lCurrentTimeseries In lWDMResults.DataSets
+                        Dim lScenario As atcDefinedValue = lCurrentTimeseries.Attributes.GetDefinedValue("scenario")
+                        If lScenario.Value.ToLower = "base" Then
+                            lWDMResults.WriteAttribute(lCurrentTimeseries, lScenario, aNewScenarioName)
+                        End If
                         lCurrentTimeseries.ValuesNeedToBeRead = True
                         lCurrentTimeseries.Attributes.DiscardCalculated()
-                    End If
+                    Next
+                    lWDMResults.DataSets.Clear()
                 Next
             End If
 
             'Run scenario
             Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", "\BASINS\models\HSPF\bin\WinHspfLt.exe")
-            Shell(lWinHspfLtExeName & " -1 -1 " & lNewFilename & "uci", AppWinStyle.NormalFocus, True)
-            If FileExists(lNewFilename & ".hbn") Then
-                aHBNResults.Open(lNewFilename & "hbn")
-            End If
+
+            Dim lPipeHandles As String = " -1 -1 "
+            If aShowProgress Then lPipeHandles = " "
+
+            Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
+
+            For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename & ".uci"), "BINO")
+                lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
+                Dim lNewFilename As String = lBinOutFilename.Replace("base.", aNewScenarioName & ".")
+                Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+                lHBNResults.Open(lNewFilename)
+                lModified.Add(lBinOutFilename, lNewFilename)
+            Next
         Else
-            Logger.Msg("Could not find base WDM file '" & aCurrentWDMfilename & "'" & vbCrLf & "Could not run model", "Scenario Run")
+            Logger.Msg("Could not find base UCI file '" & aBaseFilename & ".uci" & "'" & vbCrLf & "Could not run model", "Scenario Run")
         End If
-    End Sub
+        Return lModified
+    End Function
 End Module

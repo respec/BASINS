@@ -46,12 +46,16 @@ Public Class atcDataAttributes
         Return pAllDefinitions
     End Function
 
-    Public Sub AddHistory(ByVal aNewEvent As String, Optional ByVal aInsertAt As Integer = 1)
-        Dim prevHistory As String = GetValue("History " & aInsertAt, Nothing)
-        If Not prevHistory Is Nothing Then
-            AddHistory(prevHistory, aInsertAt + 1)
-        End If
-        SetValue("History " & aInsertAt, aNewEvent)
+    ''' <summary>
+    ''' Append to the set of history items at the next available index, starting at 1
+    ''' </summary>
+    ''' <param name="aNewEvent">Description of what happened at this point in history</param>
+    Public Sub AddHistory(ByVal aNewEvent As String)
+        Dim lInsertAt As Integer = 1
+        While ContainsAttribute("History " & lInsertAt)
+            lInsertAt += 1
+        End While
+        SetValue("History " & lInsertAt, aNewEvent)
     End Sub
 
     Public Property Owner() As Object
