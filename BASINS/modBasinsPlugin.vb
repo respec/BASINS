@@ -3,6 +3,7 @@ Imports System.Reflection
 Imports atcUtility
 Imports atcData
 Imports MapWinUtility
+Imports atcMwGisUtility
 
 ''' <summary>
 ''' 
@@ -175,6 +176,101 @@ Friend Module modBasinsPlugin
         If (Not g_MapWin.Project Is Nothing) _
             AndAlso (Not g_MapWin.Project.FileName Is Nothing) _
             AndAlso g_MapWin.Project.FileName.ToLower.EndsWith(NationalProjectFilename) Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
+    Friend Sub BASINSNewMenu()
+        GisUtil.MappingObject = g_MapWin
+        Dim lResponse As Microsoft.VisualBasic.MsgBoxResult
+        If IsBASINSProject() Then
+            'if currently coming from a BASINS project,
+            'ask if the user wants to subset this project
+            'or create an entirely new one
+            lResponse = Logger.Msg("Do you want to create a BASINS project based on the selected feature(s) in this BASINS project?" & vbCrLf & vbCrLf & _
+                                   "(Answer 'No' to create an entirely new BASINS project)", vbYesNoCancel, "Create BASINS Project From Selected Features?")
+            If lResponse = MsgBoxResult.No Then
+                LoadNationalProject()
+            ElseIf lResponse = MsgBoxResult.Yes Then
+                'are any features selected?
+                Logger.Msg("'Create BASINS Project From Selected Features' Not Yet Implemented")
+            End If
+        Else
+            'if not coming from a BASINS project,
+            'ask if user wants to make this into a BASINS
+            'project or create an entirely new one
+            If GisUtil.NumLayers > 0 Then
+                lResponse = Logger.Msg("Do you want to create a BASINS project based on this MapWindow project?" & vbCrLf & vbCrLf & _
+                                       "(Answer 'No' to create an entirely new BASINS project)", vbYesNoCancel, "Convert MapWindow Project to BASINS Project?")
+                If lResponse = MsgBoxResult.No Then
+                    'create entirely new BASINS project
+                    LoadNationalProject()
+                ElseIf lResponse = MsgBoxResult.Yes Then
+                    'create a BASINS project based on this MapWindow project
+                    If GisUtil.ProjectFileName Is Nothing Then
+                        Logger.Msg("The current MapWindow project must be saved before converting it to a BASINS Project.", "Convert MapWindow Project Problem")
+                    Else
+                        Logger.Msg("'Convert MapWindow Project to BASINS Project' Not Yet Implemented")
+                        'set up temporary extents shapefile
+                        Dim lProjectDir As String = PathNameOnly(GisUtil.ProjectFileName)
+                        MkDirPath(lProjectDir & "\temp")
+                        Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
+                        If FileExists(lNewShapeName) Then
+                            TryDelete(lProjectDir & "\temp\tempextent.*")
+                        End If
+                        'are any features selected?
+                        If GisUtil.NumSelectedFeatures(GisUtil.CurrentLayer) > 0 Then
+                            'make temp shapefile from selected features
+                            GisUtil.SaveSelectedFeatures(GisUtil.LayerName(GisUtil.CurrentLayer), lNewShapeName, False)
+                        ElseIf GisUtil.CurrentLayer > -1 And (GisUtil.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile Or GisUtil.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile Or GisUtil.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile) Then
+                            'make temp shapefile from current layer
+                            Dim lBaseName As String = FilenameNoExt(GisUtil.LayerFileName(GisUtil.CurrentLayer))
+                            System.IO.File.Copy(lBaseName & ".shp", lNewShapeName)
+                            System.IO.File.Copy(lBaseName & ".dbf", lProjectDir & "\temp\tempextent.dbf")
+                            System.IO.File.Copy(lBaseName & ".shx", lProjectDir & "\temp\tempextent.shx")
+                        Else
+                            'make temp shapefile from extents of map
+                            GisUtil.CreateShapefileOfCurrentMapExtents(lNewShapeName)
+                        End If
+                        'project the extents shapefile
+                        'now open national project with temp shapefile on the map
+                        'select corresponding HUCs on the map
+                        'download core data and load into project
+                        'add layers from MapWindow Project
+                    End If
+                End If
+            Else
+                'there are no layers 
+                LoadNationalProject()
+            End If
+        End If
+    End Sub
+
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Friend Function IsBASINSProject() As Boolean
+        'make sure the project has a cat layer and state layer
+        Dim lHaveCatLayer As Boolean = False
+        Dim lHaveStateLayer As Boolean = False
+        For i As Integer = 0 To GisUtil.NumLayers - 1
+            If FilenameNoPath(GisUtil.LayerFileName(i)) = "st.shp" Then
+                lHaveStateLayer = True
+            End If
+            If FilenameNoPath(GisUtil.LayerFileName(i)) = "cat.shp" Then
+                lHaveCatLayer = True
+            End If
+        Next
+        If lHaveCatLayer And lHaveStateLayer Then
             Return True
         Else
             Return False

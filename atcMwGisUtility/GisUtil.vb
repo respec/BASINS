@@ -873,7 +873,8 @@ Public Class GisUtil
         End If
     End Function
 
-    Public Shared Sub SaveSelectedFeatures(ByVal aInputLayerName As String, ByVal aOutputLayerName As String)
+    Public Shared Sub SaveSelectedFeatures(ByVal aInputLayerName As String, ByVal aOutputLayerName As String, _
+                                           Optional ByVal aAddToMap As Boolean = True)
         'save the selected features of a layer as a new shapefile
         Dim i As Integer
         Dim j As Integer
@@ -919,7 +920,9 @@ Public Class GisUtil
         osf.StopEditingShapes()
         osf.Close()
 
-        AddLayer(aOutputLayerName, aOutputLayerName)
+        If aAddToMap Then
+            AddLayer(aOutputLayerName, aOutputLayerName)
+        End If
 
     End Sub
 
@@ -2048,6 +2051,42 @@ Public Class GisUtil
         lLayer.ColoringScheme = lColorScheme
         lLayer.Expanded = True
         lLayer.Visible = True
+    End Sub
+
+    Public Shared Sub CreateShapefileOfCurrentMapExtents(ByVal aShapeName As String)
+        Dim lShape As New MapWinGIS.Shape
+        Dim lExtentsSf As New MapWinGIS.Shapefile
+        If Not lExtentsSf.CreateNew(aShapeName, MapWinGIS.ShpfileType.SHP_POLYGON) Then
+            Logger.Dbg("Failed to create new shapefile of extents.")
+        End If
+        If Not lExtentsSf.StartEditingShapes(True) Then
+            Logger.Dbg("Failed to start editing new shapefile of extents.")
+        End If
+        lShape.Create(MapWinGIS.ShpfileType.SHP_POLYGON)
+        Dim lPoint1 As New MapWinGIS.Point
+        lPoint1.x = GisUtil.MapExtentXmin
+        lPoint1.y = GisUtil.MapExtentYmin
+        Dim lPoint2 As New MapWinGIS.Point
+        lPoint2.x = GisUtil.MapExtentXmax
+        lPoint2.y = GisUtil.MapExtentYmin
+        Dim lPoint3 As New MapWinGIS.Point
+        lPoint3.x = GisUtil.MapExtentXmax
+        lPoint3.y = GisUtil.MapExtentYmax
+        Dim lPoint4 As New MapWinGIS.Point
+        lPoint4.x = GisUtil.MapExtentXmin
+        lPoint4.y = GisUtil.MapExtentYmax
+        Dim lPoint5 As New MapWinGIS.Point
+        lPoint5.x = GisUtil.MapExtentXmin
+        lPoint5.y = GisUtil.MapExtentYmin
+        If Not (lShape.InsertPoint(lPoint1, 0) And lShape.InsertPoint(lPoint2, 0) And lShape.InsertPoint(lPoint3, 0) And lShape.InsertPoint(lPoint4, 0) And lShape.InsertPoint(lPoint5, 0)) Then
+            Logger.Dbg("Failed to create shape of extents.")
+        End If
+        If Not lExtentsSf.EditInsertShape(lShape, 0) Then
+            Logger.Dbg("Failed to insert shape of extents.")
+        End If
+        If Not lExtentsSf.Close() Then
+            Logger.Dbg("Failed to close shapefile of extents.")
+        End If
     End Sub
 
     Public Shared ReadOnly Property LayerColor(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
