@@ -1,24 +1,37 @@
-Option Strict Off
+Option Strict On
 Option Explicit On
-Module HspfAddChar2Keyword
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
+''' <summary>
+''' 
+''' </summary>
+''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
+Module HspfAddChar2Keyword
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
     Public lastOperationSerial As Integer
 
-    Function AddChar2Keyword(ByRef k As String) As String
-        Dim kwd As String
+    ''' <summary>
+    ''' adds a missing character to the end of an input keyword if needed
+    ''' </summary>
+    ''' <param name="aKeyword">keyword to add missing character to</param>
+    ''' <returns>updated keyword</returns>
+    ''' <remarks></remarks>
+    Function AddChar2Keyword(ByRef aKeyword As String) As String
+        Dim lKeyword As String = aKeyword
 
-        kwd = k
-        Select Case kwd
-            Case "MON-IFLW-CON" : kwd = kwd & "C"
-            Case "MON-GRND-CON" : kwd = kwd & "C"
-            Case "PEST-AD-FLAG" : kwd = kwd & "S"
-            Case "PHOS-AD-FLAG" : kwd = kwd & "S"
-            Case "TRAC-AD-FLAG" : kwd = kwd & "S"
-            Case "PLNK-AD-FLAG" : kwd = kwd & "S"
-            Case "HYDR-CATEGOR" : kwd = kwd & "Y"
+        Select Case lKeyword
+            Case "MON-IFLW-CON" : lKeyword &= "C"
+            Case "MON-GRND-CON" : lKeyword &= "C"
+            Case "PEST-AD-FLAG" : lKeyword &= "S"
+            Case "PHOS-AD-FLAG" : lKeyword &= "S"
+            Case "TRAC-AD-FLAG" : lKeyword &= "S"
+            Case "PLNK-AD-FLAG" : lKeyword &= "S"
+            Case "HYDR-CATEGOR" : lKeyword &= "Y"
             Case Else
         End Select
-        AddChar2Keyword = kwd
+
+        Return lKeyword
     End Function
 End Module

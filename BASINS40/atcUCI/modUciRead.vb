@@ -1,4 +1,3 @@
-Option Strict Off
 Option Explicit On
 
 Module modUciRead
@@ -45,6 +44,7 @@ Module modUciRead
             Case "CATEGORY" : lHspfOmCode = 13
             Case "MONTH-DATA" : lHspfOmCode = 14
             Case "PATHNAMES" : lHspfOmCode = 15
+            Case Else : lHspfOmCode = 0
         End Select
 
         Return lHspfOmCode

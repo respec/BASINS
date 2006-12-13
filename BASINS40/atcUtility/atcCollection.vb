@@ -1,3 +1,9 @@
+''' <summary>
+''' Collection that extends ArrayList with Keys
+''' </summary>
+''' <remarks>
+''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+''' </remarks>
 Public Class atcCollection
     Inherits ArrayList
 
