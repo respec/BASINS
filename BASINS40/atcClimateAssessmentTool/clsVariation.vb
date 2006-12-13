@@ -139,7 +139,8 @@ Public Class Variation
                     'Dim lEvapMean As String = Format(lModifiedTS.Attributes.GetValue("Mean") * 365.25, "#.00")
                     With lModifiedTS.Attributes
                         .SetValue("Constituent", "PET")
-                        .SetValue("Id", 111) 'TODO: don't hard code ID for PET
+                        .SetValue("History 1", DataSets.ItemByIndex(0).Attributes.GetValue("History 1").ToString)
+                        .SetValue("Id", 1100) 'TODO: don't hard code ID for PET
                     End With
             End Select
         Next
