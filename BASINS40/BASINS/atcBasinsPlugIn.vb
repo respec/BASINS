@@ -192,7 +192,7 @@ Public Class atcBasinsPlugIn
         aHandled = True 'Assume we will handle it
         Select Case aItemName
             Case "mnuNew"            'Override File/New menu
-                LoadNationalProject()
+                BASINSNewMenu()
             Case "mnuAboutMapWindow" 'Override Help/About menu
                 Dim lAbout As New frmAbout
                 lAbout.ShowAbout()
