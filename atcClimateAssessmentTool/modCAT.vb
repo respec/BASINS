@@ -40,15 +40,15 @@ Public Module modCAT
 
         Dim lCurrentTimeseries As atcTimeseries
 
-        If FileExists(aBaseFilename & ".uci") Then
+        If FileExists(aBaseFilename) Then
             Dim lNewBaseFilename As String = AbsolutePath(aBaseFilename, CurDir)
             Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & "\"
             lNewBaseFilename = lNewFolder & aNewScenarioName & "."
 
             If aNewScenarioName.ToLower <> "base" Then
                 'Copy base UCI, changing base to new scenario name within it
-                ReplaceStringToFile(WholeFileString(aBaseFilename & ".uci"), "base.", aNewScenarioName & ".", lNewBaseFilename & "uci")
-                For Each lWDMfilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename & ".uci"), "WDM")
+                ReplaceStringToFile(WholeFileString(aBaseFilename), "base.", aNewScenarioName & ".", lNewBaseFilename & "uci")
+                For Each lWDMfilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
                     lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
                     'Copy each base WDM to new WDM
                     Dim lNewWDMfilename As String = lNewFolder & IO.Path.GetFileName(lWDMfilename).Replace("base.", aNewScenarioName & ".")
@@ -65,8 +65,7 @@ Public Module modCAT
                     'Update scenario name in new WDM
                     For Each lCurrentTimeseries In aModifiedData
                         If Not lCurrentTimeseries Is Nothing _
-                           AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lWDMfilename.ToLower) _
-                           AndAlso lCurrentTimeseries.Attributes.GetValue("scenario") <> aNewScenarioName Then
+                           AndAlso lCurrentTimeseries.Attributes.GetValue("History 1").ToString.ToLower.Equals("read from " & lWDMfilename.ToLower) Then
                             lCurrentTimeseries.Attributes.SetValue("scenario", aNewScenarioName)
                             lWDMResults.AddDataset(lCurrentTimeseries)
                         End If
@@ -76,8 +75,10 @@ Public Module modCAT
                         If lScenario.Value.ToLower = "base" Then
                             lWDMResults.WriteAttribute(lCurrentTimeseries, lScenario, aNewScenarioName)
                         End If
-                        lCurrentTimeseries.ValuesNeedToBeRead = True
-                        lCurrentTimeseries.Attributes.DiscardCalculated()
+                        If Not aModifiedData.Contains(lCurrentTimeseries) Then
+                            lCurrentTimeseries.ValuesNeedToBeRead = True
+                            lCurrentTimeseries.Attributes.DiscardCalculated()
+                        End If
                     Next
                     lWDMResults.DataSets.Clear()
                 Next
@@ -91,7 +92,7 @@ Public Module modCAT
 
             Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
 
-            For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename & ".uci"), "BINO")
+            For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "BINO")
                 lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
                 Dim lNewFilename As String = lBinOutFilename.Replace("base.", aNewScenarioName & ".")
                 Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
@@ -99,7 +100,7 @@ Public Module modCAT
                 lModified.Add(lBinOutFilename, lNewFilename)
             Next
         Else
-            Logger.Msg("Could not find base UCI file '" & aBaseFilename & ".uci" & "'" & vbCrLf & "Could not run model", "Scenario Run")
+            Logger.Msg("Could not find base UCI file '" & aBaseFilename & "'" & vbCrLf & "Could not run model", "Scenario Run")
         End If
         Return lModified
     End Function

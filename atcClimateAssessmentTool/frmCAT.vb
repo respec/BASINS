@@ -71,7 +71,6 @@ Public Class frmCAT
     Friend WithEvents txtModifiedScenarioName As System.Windows.Forms.TextBox
     Friend WithEvents lblBaseScenarioName As System.Windows.Forms.Label
     Friend WithEvents lblNewScenarioName As System.Windows.Forms.Label
-    Friend WithEvents cboBaseScenarioName As System.Windows.Forms.ComboBox
     Friend WithEvents agdResults As atcControls.atcGrid
     Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuLoadResults As System.Windows.Forms.MenuItem
@@ -90,6 +89,7 @@ Public Class frmCAT
     Friend WithEvents chkShowEachRunProgress As System.Windows.Forms.CheckBox
     Friend WithEvents btnEndpointCopy As System.Windows.Forms.Button
     Friend WithEvents mnuOpenUCI As System.Windows.Forms.MenuItem
+    Friend WithEvents txtBaseScenario As System.Windows.Forms.TextBox
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -104,7 +104,6 @@ Public Class frmCAT
         Me.btnInputModify = New System.Windows.Forms.Button
         Me.btnInputAdd = New System.Windows.Forms.Button
         Me.txtModifiedScenarioName = New System.Windows.Forms.TextBox
-        Me.cboBaseScenarioName = New System.Windows.Forms.ComboBox
         Me.lblBaseScenarioName = New System.Windows.Forms.Label
         Me.lblNewScenarioName = New System.Windows.Forms.Label
         Me.tabEndpoints = New System.Windows.Forms.TabPage
@@ -132,6 +131,7 @@ Public Class frmCAT
         Me.btnStart = New System.Windows.Forms.Button
         Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
+        Me.mnuOpenUCI = New System.Windows.Forms.MenuItem
         Me.mnuLoadVariations = New System.Windows.Forms.MenuItem
         Me.mnuSaveVariations = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
@@ -148,7 +148,7 @@ Public Class frmCAT
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblTop = New System.Windows.Forms.Label
         Me.btnStop = New System.Windows.Forms.Button
-        Me.mnuOpenUCI = New System.Windows.Forms.MenuItem
+        Me.txtBaseScenario = New System.Windows.Forms.TextBox
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -173,6 +173,7 @@ Public Class frmCAT
         '
         'tabInputs
         '
+        Me.tabInputs.Controls.Add(Me.txtBaseScenario)
         Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
         Me.tabInputs.Controls.Add(Me.lstInputs)
         Me.tabInputs.Controls.Add(Me.btnInputDown)
@@ -181,7 +182,6 @@ Public Class frmCAT
         Me.tabInputs.Controls.Add(Me.btnInputModify)
         Me.tabInputs.Controls.Add(Me.btnInputAdd)
         Me.tabInputs.Controls.Add(Me.txtModifiedScenarioName)
-        Me.tabInputs.Controls.Add(Me.cboBaseScenarioName)
         Me.tabInputs.Controls.Add(Me.lblBaseScenarioName)
         Me.tabInputs.Controls.Add(Me.lblNewScenarioName)
         Me.tabInputs.Location = New System.Drawing.Point(4, 22)
@@ -255,20 +255,11 @@ Public Class frmCAT
         '
         Me.txtModifiedScenarioName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtModifiedScenarioName.Location = New System.Drawing.Point(96, 32)
+        Me.txtModifiedScenarioName.Location = New System.Drawing.Point(96, 34)
         Me.txtModifiedScenarioName.Name = "txtModifiedScenarioName"
         Me.txtModifiedScenarioName.Size = New System.Drawing.Size(346, 20)
         Me.txtModifiedScenarioName.TabIndex = 5
         Me.txtModifiedScenarioName.Text = "Modified"
-        '
-        'cboBaseScenarioName
-        '
-        Me.cboBaseScenarioName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboBaseScenarioName.Location = New System.Drawing.Point(96, 8)
-        Me.cboBaseScenarioName.Name = "cboBaseScenarioName"
-        Me.cboBaseScenarioName.Size = New System.Drawing.Size(346, 21)
-        Me.cboBaseScenarioName.TabIndex = 3
         '
         'lblBaseScenarioName
         '
@@ -282,7 +273,7 @@ Public Class frmCAT
         'lblNewScenarioName
         '
         Me.lblNewScenarioName.AutoSize = True
-        Me.lblNewScenarioName.Location = New System.Drawing.Point(8, 35)
+        Me.lblNewScenarioName.Location = New System.Drawing.Point(8, 37)
         Me.lblNewScenarioName.Name = "lblNewScenarioName"
         Me.lblNewScenarioName.Size = New System.Drawing.Size(74, 13)
         Me.lblNewScenarioName.TabIndex = 4
@@ -303,7 +294,7 @@ Public Class frmCAT
         Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
         Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
         Me.tabEndpoints.Name = "tabEndpoints"
-        Me.tabEndpoints.Size = New System.Drawing.Size(386, 238)
+        Me.tabEndpoints.Size = New System.Drawing.Size(451, 284)
         Me.tabEndpoints.TabIndex = 1
         Me.tabEndpoints.Text = "Endpoints"
         '
@@ -339,7 +330,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblAllResults.Location = New System.Drawing.Point(128, 16)
         Me.lblAllResults.Name = "lblAllResults"
-        Me.lblAllResults.Size = New System.Drawing.Size(242, 16)
+        Me.lblAllResults.Size = New System.Drawing.Size(307, 16)
         Me.lblAllResults.TabIndex = 18
         '
         'chkSaveAll
@@ -359,13 +350,13 @@ Public Class frmCAT
         Me.lstEndpoints.IntegralHeight = False
         Me.lstEndpoints.Location = New System.Drawing.Point(8, 94)
         Me.lstEndpoints.Name = "lstEndpoints"
-        Me.lstEndpoints.Size = New System.Drawing.Size(369, 135)
+        Me.lstEndpoints.Size = New System.Drawing.Size(434, 181)
         Me.lstEndpoints.TabIndex = 20
         '
         'btnEndpointDown
         '
         Me.btnEndpointDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointDown.Location = New System.Drawing.Point(352, 64)
+        Me.btnEndpointDown.Location = New System.Drawing.Point(417, 64)
         Me.btnEndpointDown.Name = "btnEndpointDown"
         Me.btnEndpointDown.Size = New System.Drawing.Size(24, 24)
         Me.btnEndpointDown.TabIndex = 19
@@ -374,7 +365,7 @@ Public Class frmCAT
         'btnEndpointUp
         '
         Me.btnEndpointUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointUp.Location = New System.Drawing.Point(322, 64)
+        Me.btnEndpointUp.Location = New System.Drawing.Point(387, 64)
         Me.btnEndpointUp.Name = "btnEndpointUp"
         Me.btnEndpointUp.Size = New System.Drawing.Size(24, 24)
         Me.btnEndpointUp.TabIndex = 18
@@ -409,7 +400,7 @@ Public Class frmCAT
         Me.tabResults.Controls.Add(Me.agdResults)
         Me.tabResults.Location = New System.Drawing.Point(4, 22)
         Me.tabResults.Name = "tabResults"
-        Me.tabResults.Size = New System.Drawing.Size(386, 238)
+        Me.tabResults.Size = New System.Drawing.Size(451, 284)
         Me.tabResults.TabIndex = 2
         Me.tabResults.Text = "Results"
         '
@@ -426,7 +417,7 @@ Public Class frmCAT
         Me.agdResults.LineWidth = 0.0!
         Me.agdResults.Location = New System.Drawing.Point(8, 8)
         Me.agdResults.Name = "agdResults"
-        Me.agdResults.Size = New System.Drawing.Size(369, 221)
+        Me.agdResults.Size = New System.Drawing.Size(434, 267)
         Me.agdResults.Source = Nothing
         Me.agdResults.TabIndex = 21
         '
@@ -441,7 +432,7 @@ Public Class frmCAT
         Me.tabPivot.Controls.Add(Me.cboPivotRows)
         Me.tabPivot.Location = New System.Drawing.Point(4, 22)
         Me.tabPivot.Name = "tabPivot"
-        Me.tabPivot.Size = New System.Drawing.Size(386, 238)
+        Me.tabPivot.Size = New System.Drawing.Size(451, 284)
         Me.tabPivot.TabIndex = 3
         Me.tabPivot.Text = "Pivot"
         '
@@ -457,7 +448,7 @@ Public Class frmCAT
         Me.agdPivot.LineWidth = 0.0!
         Me.agdPivot.Location = New System.Drawing.Point(8, 88)
         Me.agdPivot.Name = "agdPivot"
-        Me.agdPivot.Size = New System.Drawing.Size(369, 141)
+        Me.agdPivot.Size = New System.Drawing.Size(434, 187)
         Me.agdPivot.Source = Nothing
         Me.agdPivot.TabIndex = 28
         '
@@ -530,6 +521,11 @@ Public Class frmCAT
         Me.mnuFile.Index = 0
         Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuOpenUCI, Me.mnuLoadVariations, Me.mnuSaveVariations, Me.mnuFileSep1, Me.mnuLoadResults, Me.mnuSaveResults, Me.mnuFileSep2, Me.mnuSavePivot})
         Me.mnuFile.Text = "File"
+        '
+        'mnuOpenUCI
+        '
+        Me.mnuOpenUCI.Index = 0
+        Me.mnuOpenUCI.Text = "Open UCI file"
         '
         'mnuLoadVariations
         '
@@ -626,10 +622,15 @@ Public Class frmCAT
         Me.btnStop.Text = "Stop"
         Me.btnStop.Visible = False
         '
-        'mnuOpenUCI
+        'txtBaseScenario
         '
-        Me.mnuOpenUCI.Index = 0
-        Me.mnuOpenUCI.Text = "Open UCI file"
+        Me.txtBaseScenario.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBaseScenario.Location = New System.Drawing.Point(96, 8)
+        Me.txtBaseScenario.Name = "txtBaseScenario"
+        Me.txtBaseScenario.Size = New System.Drawing.Size(346, 20)
+        Me.txtBaseScenario.TabIndex = 3
+        Me.txtBaseScenario.Text = "<click to select>"
         '
         'frmCAT
         '
@@ -658,6 +659,7 @@ Public Class frmCAT
 #End Region
 
     Private Const CLIGEN_NAME As String = "Cligen"
+    Private Const StartFolderVariable As String = "{StartFolder}"
 
     'all the variations listed in the Input tab
     Private pInputs As atcCollection
@@ -666,6 +668,8 @@ Public Class frmCAT
 
     'all the endpoints listed in the Endpoints tab
     Private pEndpoints As atcCollection
+
+    Private pUciFile As String = ""
 
     Private InputArgumentPrefix As String = "Current Modifier for "
     Private ResultsTabIndex As Integer = 2
@@ -677,48 +681,7 @@ Public Class frmCAT
         TimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
         pInputs = New atcCollection
         pEndpoints = New atcCollection
-        For Each lDataSource As atcDataSource In g_DataManager.DataSources
-            Try
-                AddUciFilesInFolder(IO.Path.GetDirectoryName(lDataSource.Specification))
-            Catch
-                'Some data sources are not in directories, so GetDirectoryName fails, ignore
-            End Try
-        Next
         Me.Show()
-    End Sub
-
-    Private Sub AddUciFilesInFolder(ByVal aFolder As String)
-        For Each lFilename As String In IO.Directory.GetFiles(aFolder, "*.uci")
-            AddUciFile(lFilename)
-        Next
-    End Sub
-
-    Private Sub AddUciFile(ByVal aFilename As String)
-        Dim lBaseFilename As String = FilenameNoExt(aFilename)
-        Dim lLowerFileName As String = lBaseFilename.ToLower
-
-        'First, check to see if this is already in the list
-        For Each lItem As Object In cboBaseScenarioName.Items
-            If lItem.ToString.ToLower.Equals(lLowerFileName) Then
-                Exit Sub
-            End If
-        Next
-
-        'Since it is not already in list, add it
-        cboBaseScenarioName.Items.Add(FilenameNoExt(aFilename))
-        cboBaseScenarioName.SelectedIndex = cboBaseScenarioName.Items.Count - 1
-
-        'Open data files referred to in this UCI file
-        Dim lFullText As String = WholeFileString(aFilename)
-        For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
-            lWDMfilename = AbsolutePath(lWDMfilename, PathNameOnly(aFilename))
-            OpenDataSource(lWDMfilename)
-        Next
-        For Each lBinOutFilename As String In UCIFilesBlockFilenames(lFullText, "BINO")
-            lBinOutFilename = AbsolutePath(lBinOutFilename, PathNameOnly(aFilename))
-            OpenDataSource(lBinOutFilename)
-        Next
-
     End Sub
 
     Private Function OpenDataSource(ByVal aFilename As String) As atcDataSource
@@ -745,7 +708,6 @@ Public Class frmCAT
     End Function
 
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
-        Dim lBaseFileName As String = cboBaseScenarioName.Text
         Dim lSelectedVariations As atcCollection = New atcCollection
         Dim lRuns As Integer = 0
         Dim lEndpoint As Variation
@@ -794,7 +756,7 @@ Public Class frmCAT
 
         Run(txtModifiedScenarioName.Text, _
             lSelectedVariations, _
-            lBaseFileName, _
+            txtBaseScenario.Text, _
             lRuns, 0, Nothing)
 
         SaveSetting("BasinsCAT", "Settings", "TimePerRun", TimePerRun)
@@ -883,7 +845,7 @@ Public Class frmCAT
             Dim lEndpoint As Variation
             .CellValue(lRow, 0) = aIteration + 1
             For Each lEndpoint In pEndpoints
-                If pInputs.Contains(lEndpoint) Then
+                If Not Double.IsNaN(lEndpoint.CurrentValue) Then 'This is an input, display current value
                     .CellValue(lRow, lColumn) = Format(lEndpoint.CurrentValue, "0.####")
                     lColumn += 1
                 Else
@@ -1231,9 +1193,11 @@ Public Class frmCAT
             lVariation.Selected = True
             lVariation.CurrentValue = lVariation.Min
             pInputs.Add(lVariation)
-            'pEndpoints.Add(lVariation)
             RefreshInputList()
             RefreshTotalIterations()
+
+            pEndpoints.Add(lVariation.Clone)
+            RefreshEndpointList()
         End If
     End Sub
 
@@ -1336,21 +1300,20 @@ Public Class frmCAT
 
     Private Sub RefreshTotalIterations()
         Dim lLabelText As String
-        Dim iVariation As Integer = 0
         TotalIterations = 1
-        'Make a collection of the variations that are selected/checked in lstInputs
+
         For Each lVariation As Variation In pInputs
-            lVariation.Selected = lstInputs.CheckedIndices.Contains(iVariation)
             If lVariation.Selected Then
                 TotalIterations *= lVariation.Iterations
             End If
-            iVariation += 1
         Next
+
         lLabelText = "Total iterations selected = " & TotalIterations
         If TimePerRun > 0 Then
             lLabelText &= " (" & FormatTime(TimePerRun * TotalIterations) & ")"
         End If
         UpdateStatusLabel(lLabelText)
+
         'TODO: calculate size of all inputs/outputs for display
         'Try
         '    lblAllResults.Text = "(" & Format((FileLen(cboBaseScenarioName.Text) * TotalIterations) / 1048576, "#,##0.#") & " Meg)"
@@ -1416,12 +1379,14 @@ Public Class frmCAT
 
     Public Property XML() As String
         Get
-            Dim lXML As String = "<BasinsCAT>" & vbCrLf
+            Dim lXML As String = ""
+
+            lXML &= "<SaveAll>" & chkSaveAll.Checked & "</SaveAll>" & vbCrLf
+
+            lXML &= "<ShowEachRun>" & chkShowEachRunProgress.Checked & "</ShowEachRun>" & vbCrLf
 
             lXML &= "<UCI>" & vbCrLf
-            For Each lFilename As String In cboBaseScenarioName.Items
-                lXML &= "  <FileName>" & lFilename & "</FileName>" & vbCrLf
-            Next
+            lXML &= "  <FileName>" & txtBaseScenario.Text & "</FileName>" & vbCrLf
             lXML &= "</UCI>" & vbCrLf
 
             Dim lVariation As Variation
@@ -1437,8 +1402,13 @@ Public Class frmCAT
             Next
             lXML &= "</Endpoints>" & vbCrLf
 
-            lXML &= "</BasinsCAT>" & vbCrLf
+            Dim lStartFolder As String = CurDir()
+            lXML = ReplaceStringNoCase(lXML, lStartFolder, StartFolderVariable)
+            If lXML.Contains(StartFolderVariable) Then
+                lXML = "<StartFolder>" & lStartFolder & "</StartFolder>" & vbCrLf & lXML
+            End If
 
+            lXML = "<BasinsCAT>" & vbCrLf & lXML & "</BasinsCAT>" & vbCrLf
             'Dim lCXML As New Chilkat.Xml
             'If lCXML.LoadXml(lXML) Then
             '  Return lCXML.GetXml
@@ -1451,14 +1421,25 @@ Public Class frmCAT
         Set(ByVal aValue As String)
             Dim lXML As New Chilkat.Xml
             If lXML.LoadXml(aValue) AndAlso lXML.Tag.ToLower.Equals("basinscat") AndAlso lXML.FirstChild2 Then
+
+                'Replace start folder in all XML if present
+                If lXML.Tag.ToLower = "startfolder" Then
+                    Dim lStartFolder As String = lXML.Content
+                    aValue = ReplaceString(aValue, StartFolderVariable, lStartFolder)
+                    lXML.LoadXml(aValue)
+                    lXML.FirstChild2()
+                End If
+
                 Do
                     Dim lVariation As Variation
                     Dim lChild As Chilkat.Xml = lXML.FirstChild
                     Select Case lXML.Tag.ToLower
+                        Case "saveall"
+                            chkSaveAll.Checked = (lXML.Content.ToLower = "true")
+                        Case "showeachrun"
+                            chkShowEachRunProgress.Checked = (lXML.Content.ToLower = "true")
                         Case "uci"
-                            Dim lUciFilename As String = AbsolutePath(lChild.Content & ".uci", CurDir)
-                            Dim lUciPath As String = PathNameOnly(lUciFilename)
-                            AddUciFile(lUciFilename)
+                            OpenUCI(AbsolutePath(lChild.Content, CurDir))
                         Case "variations"
                             pInputs.Clear()
                             If Not lChild Is Nothing Then
@@ -1499,7 +1480,7 @@ Public Class frmCAT
             .FileName = GetSetting("BasinsCAT", "Settings", "LastSetup", "CAT.xml")
             .Filter = "XML files (*.xml)|*.xml|All files|*.*"
             .FilterIndex = 1
-            .Title = "Scenario Builder - Load Variations"
+            .Title = Me.Text & " - Load Variations"
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 If FileExists(.FileName) Then
                     XML = WholeFileString(.FileName)
@@ -1516,13 +1497,15 @@ Public Class frmCAT
         UpdateStatusLabel("Stopping")
     End Sub
 
-    Private Sub lstInputs_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles lstInputs.MouseUp
+    Private Sub lstInputs_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstInputs.ItemCheck
+        Dim lVariation As Variation = pInputs.ItemByIndex(e.Index)
+        lVariation.Selected = (e.NewValue = CheckState.Checked)
         RefreshTotalIterations()
     End Sub
 
     Private Sub lstEndpoints_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstEndpoints.ItemCheck
         Dim lVariation As Variation = pEndpoints.ItemByIndex(e.Index)
-        lVariation.Selected = lstEndpoints.GetItemChecked(e.Index)
+        lVariation.Selected = (e.NewValue = CheckState.Checked)
     End Sub
 
     Private Sub mnuHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
@@ -1555,9 +1538,47 @@ Public Class frmCAT
     End Sub
 
     Private Sub mnuOpenUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenUCI.Click
-        Dim cdlg As New OpenFileDialog
-        If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
-            AddUciFile(cdlg.FileName)
+        OpenUCI()
+    End Sub
+
+    Private Sub txtBaseScenario_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtBaseScenario.MouseClick
+        OpenUCI()
+    End Sub
+
+    ''' <summary>
+    ''' Open data files referred to in this UCI file
+    ''' </summary>
+    ''' <param name="aUCIfilename">Full path of UCI file</param>
+    ''' <remarks></remarks>
+    Private Sub OpenUCI(Optional ByVal aUCIfilename As String = "")
+
+        If Not aUCIfilename Is Nothing And Not FileExists(aUCIfilename) Then
+            If FileExists(aUCIfilename & ".uci") Then aUCIfilename &= ".uci"
+        End If
+
+        If aUCIfilename Is Nothing OrElse Not FileExists(aUCIfilename) Then
+            Dim cdlg As New OpenFileDialog
+            cdlg.Title = "Open UCI file containing base scenario"
+            If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
+                aUCIfilename = cdlg.FileName
+            End If
+        End If
+
+        If FileExists(aUCIfilename) Then
+            pUciFile = aUCIfilename
+            txtBaseScenario.Text = pUciFile
+            Dim lUciFolder As String = PathNameOnly(pUciFile)
+            ChDriveDir(lUciFolder)
+
+            Dim lFullText As String = WholeFileString(pUciFile)
+            For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
+                lWDMfilename = AbsolutePath(lWDMfilename, lUciFolder)
+                OpenDataSource(lWDMfilename)
+            Next
+            For Each lBinOutFilename As String In UCIFilesBlockFilenames(lFullText, "BINO")
+                lBinOutFilename = AbsolutePath(lBinOutFilename, lUciFolder)
+                OpenDataSource(lBinOutFilename)
+            Next
         End If
     End Sub
 
