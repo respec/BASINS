@@ -222,6 +222,7 @@ Friend Module modBasinsPlugin
                         'set up temporary extents shapefile
                         Dim lProjectDir As String = PathNameOnly(GisUtil.ProjectFileName)
                         Dim lInputProjection As String = ""
+                        Dim lTitle As String = ""
                         MkDirPath(lProjectDir & "\temp")
                         Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
                         If FileExists(lNewShapeName) Then
@@ -234,6 +235,7 @@ Friend Module modBasinsPlugin
                             'make temp shapefile from selected features
                             GisUtil.SaveSelectedFeatures(GisUtil.LayerName(GisUtil.CurrentLayer), lNewShapeName, False)
                             lInputProjection = GisUtil.ShapefileProjectionString(GisUtil.CurrentLayer)
+                            lTitle = "MapWindow Selected Features"
                         ElseIf GisUtil.CurrentLayer > -1 And (GisUtil.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile Or GisUtil.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile Or GisUtil.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile) Then
                             'make temp shapefile from current layer
                             Dim lBaseName As String = FilenameNoExt(GisUtil.LayerFileName(GisUtil.CurrentLayer))
@@ -241,9 +243,11 @@ Friend Module modBasinsPlugin
                             System.IO.File.Copy(lBaseName & ".dbf", lProjectDir & "\temp\tempextent.dbf")
                             System.IO.File.Copy(lBaseName & ".shx", lProjectDir & "\temp\tempextent.shx")
                             lInputProjection = GisUtil.ShapefileProjectionString(GisUtil.CurrentLayer)
+                            lTitle = "MapWindow Current Layer"
                         Else
                             'make temp shapefile from extents of map
                             GisUtil.CreateShapefileOfCurrentMapExtents(lNewShapeName)
+                            lTitle = "MapWindow Project Extents"
                         End If
                         If Len(lInputProjection) = 0 Or (lInputProjection Is Nothing) Then
                             'dont have a projection yet, try to use the project's projection
@@ -278,12 +282,19 @@ Friend Module modBasinsPlugin
                             End If
                             'now open national project with temp shapefile on the map
                             LoadNationalProject()
-                            GisUtil.AddLayer(lNewShapeName, "MapWindow Project Extents")
+                            'GisUtil.AddLayer(lNewShapeName, "MapWindow Project Extents")
                             'set symbology for this layer
+                            lExtentsSf.Open(lNewShapeName)
+                            g_MapWin.Layers.Add(lExtentsSf, lTitle)
+                            g_MapWin.Layers(g_MapWin.Layers.GetHandle(g_MapWin.Layers.NumLayers - 1)).Color = System.Drawing.Color.Transparent
+                            g_MapWin.Layers(g_MapWin.Layers.GetHandle(g_MapWin.Layers.NumLayers - 1)).OutlineColor = System.Drawing.Color.Black
+                            g_MapWin.Layers(g_MapWin.Layers.GetHandle(g_MapWin.Layers.NumLayers - 1)).DrawFill = False
+                            g_MapWin.Layers(g_MapWin.Layers.GetHandle(g_MapWin.Layers.NumLayers - 1)).LineStipple = MapWinGIS.tkLineStipple.lsDotted
                             'zoom near this layer
-                            Dim lTempLayerIndex As Integer = GisUtil.LayerIndex("MapWindow Project Extents")
-                            Dim lCatLayerIndex As Integer = GisUtil.LayerIndex("Cataloging Units")
+                            g_MapWin.Layers(g_MapWin.Layers.GetHandle(g_MapWin.Layers.NumLayers - 1)).ZoomTo()
                             'select corresponding HUC on the map
+                            Dim lTempLayerIndex As Integer = GisUtil.LayerIndex(lTitle)
+                            Dim lCatLayerIndex As Integer = GisUtil.LayerIndex("Cataloging Units")
                             Dim lCentroidX As Double
                             Dim lCentroidY As Double
                             For j As Integer = 1 To GisUtil.NumFeatures(lTempLayerIndex)
