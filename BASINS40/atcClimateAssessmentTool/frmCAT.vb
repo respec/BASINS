@@ -661,10 +661,11 @@ Public Class frmCAT
     Private Const CLIGEN_NAME As String = "Cligen"
     Private Const StartFolderVariable As String = "{StartFolder}"
 
+    Private pPlugin As atcClimateAssessmentToolPlugin
+
     'all the variations listed in the Input tab
     Private pInputs As atcCollection
     Private pInputFiles As atcCollection
-    Private pRunning As Boolean = False
 
     'all the endpoints listed in the Endpoints tab
     Private pEndpoints As atcCollection
@@ -676,12 +677,17 @@ Public Class frmCAT
     Private TotalIterations As Integer = 0
     Private TimePerRun As Double = 0 'Time each run takes in seconds
 
-    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcDataGroup = Nothing)
+    Public Sub Initialize(ByRef aPlugin As atcClimateAssessmentToolPlugin)
         mnuPivotHeaders.Checked = GetSetting("BasinsCAT", "Settings", "PivotHeaders", "Yes").Equals("Yes")
         TimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
         pInputs = New atcCollection
         pEndpoints = New atcCollection
         Me.Show()
+
+        pPlugin = aPlugin
+        If Not aPlugin.XML Is Nothing AndAlso aPlugin.XML.Length > 0 Then
+            XML = aPlugin.XML
+        End If
     End Sub
 
     Private Function OpenDataSource(ByVal aFilename As String) As atcDataSource
@@ -712,7 +718,7 @@ Public Class frmCAT
         Dim lRuns As Integer = 0
         Dim lEndpoint As Variation
 
-        pRunning = True
+        g_running = True
         btnStart.Visible = False
         btnStop.Visible = True
 
@@ -763,7 +769,7 @@ Public Class frmCAT
 
         PopulatePivotCombos()
         UpdateStatusLabel("Finished with " & lRuns & " runs")
-        pRunning = False
+        g_running = False
         btnStart.Visible = True
         btnStop.Visible = False
     End Sub
@@ -775,7 +781,7 @@ Public Class frmCAT
                     ByRef aStartVariation As Integer, _
                     ByRef aModifiedData As atcDataGroup)
 
-        If Not pRunning Then
+        If Not g_running Then
             UpdateStatusLabel("Stopping Run")
         Else
             Logger.Dbg("Run")
@@ -816,7 +822,7 @@ Public Class frmCAT
                 Dim lVariation As Variation = aVariations.ItemByIndex(aStartVariation)
                 With lVariation
                     Dim lModifiedGroup As atcDataGroup = .StartIteration
-                    While pRunning And Not lModifiedGroup Is Nothing
+                    While g_running And Not lModifiedGroup Is Nothing
                         If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
 
                         aModifiedData.Add(lModifiedGroup)
@@ -1065,6 +1071,12 @@ Public Class frmCAT
             Logger.Msg("No text on clipboard to paste into grid", "Paste")
         End If
         myTabs.SelectedIndex = ResultsTabIndex
+    End Sub
+
+    Private Sub frmCAT_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+        If Not pPlugin Is Nothing Then
+            pPlugin.XML = Me.XML
+        End If
     End Sub
 
     Private Sub frmMultipleResults_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
@@ -1493,7 +1505,7 @@ Public Class frmCAT
     Private Sub btnStop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStop.Click
         btnStart.Visible = True
         btnStop.Visible = False
-        pRunning = False
+        g_running = False
         UpdateStatusLabel("Stopping")
     End Sub
 
