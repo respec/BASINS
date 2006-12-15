@@ -430,7 +430,7 @@ StartOver:
         g_MapWin.View.MapCursor = tkCursor.crsrMapDefault
     End Sub
 
-    Private Function CleanUpUserProjString(ByVal aProjString As String) As String
+    Public Function CleanUpUserProjString(ByVal aProjString As String) As String
         Dim lPos As Integer
         Dim lFirst As Boolean
 

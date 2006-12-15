@@ -187,6 +187,8 @@ Friend Module modBasinsPlugin
     ''' </summary>
     ''' <remarks></remarks>
     Friend Sub BASINSNewMenu()
+        'take appropriate actions if the user selects the 'New' menu
+        'with a BASINS project open, or just a MapWindow project open
         GisUtil.MappingObject = g_MapWin
         Dim lResponse As Microsoft.VisualBasic.MsgBoxResult
         If IsBASINSProject() Then
@@ -219,30 +221,80 @@ Friend Module modBasinsPlugin
                         Logger.Msg("'Convert MapWindow Project to BASINS Project' Not Yet Implemented")
                         'set up temporary extents shapefile
                         Dim lProjectDir As String = PathNameOnly(GisUtil.ProjectFileName)
+                        Dim lInputProjection As String = ""
                         MkDirPath(lProjectDir & "\temp")
                         Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
                         If FileExists(lNewShapeName) Then
-                            TryDelete(lProjectDir & "\temp\tempextent.*")
+                            TryDelete(lProjectDir & "\temp\tempextent.shp")
+                            TryDelete(lProjectDir & "\temp\tempextent.shx")
+                            TryDelete(lProjectDir & "\temp\tempextent.dbf")
                         End If
                         'are any features selected?
                         If GisUtil.NumSelectedFeatures(GisUtil.CurrentLayer) > 0 Then
                             'make temp shapefile from selected features
                             GisUtil.SaveSelectedFeatures(GisUtil.LayerName(GisUtil.CurrentLayer), lNewShapeName, False)
+                            lInputProjection = GisUtil.ShapefileProjectionString(GisUtil.CurrentLayer)
                         ElseIf GisUtil.CurrentLayer > -1 And (GisUtil.LayerType = MapWindow.Interfaces.eLayerType.PointShapefile Or GisUtil.LayerType = MapWindow.Interfaces.eLayerType.LineShapefile Or GisUtil.LayerType = MapWindow.Interfaces.eLayerType.PolygonShapefile) Then
                             'make temp shapefile from current layer
                             Dim lBaseName As String = FilenameNoExt(GisUtil.LayerFileName(GisUtil.CurrentLayer))
                             System.IO.File.Copy(lBaseName & ".shp", lNewShapeName)
                             System.IO.File.Copy(lBaseName & ".dbf", lProjectDir & "\temp\tempextent.dbf")
                             System.IO.File.Copy(lBaseName & ".shx", lProjectDir & "\temp\tempextent.shx")
+                            lInputProjection = GisUtil.ShapefileProjectionString(GisUtil.CurrentLayer)
                         Else
                             'make temp shapefile from extents of map
                             GisUtil.CreateShapefileOfCurrentMapExtents(lNewShapeName)
                         End If
-                        'project the extents shapefile
-                        'now open national project with temp shapefile on the map
-                        'select corresponding HUCs on the map
-                        'download core data and load into project
-                        'add layers from MapWindow Project
+                        If Len(lInputProjection) = 0 Or (lInputProjection Is Nothing) Then
+                            'dont have a projection yet, try to use the project's projection
+                            lInputProjection = g_MapWin.Project.ProjectProjection
+                        End If
+                        If Len(lInputProjection) = 0 Or (lInputProjection Is Nothing) Then
+                            'see if there is a prj.proj
+                            If FileExists(lProjectDir & "\prj.proj") Then
+                                lInputProjection = WholeFileString(lProjectDir & "\prj.proj")
+                                lInputProjection = CleanUpUserProjString(lInputProjection)
+                            End If
+                        End If
+                        If Len(lInputProjection) = 0 Or (lInputProjection Is Nothing) Then
+                            'still don't have an projection for this mapwindow project, prompt for it
+                            lInputProjection = atcProjector.Methods.AskUser
+                        End If
+                        If lInputProjection.Length > 0 Then
+                            'make prj.proj if it doesn't exist
+                            If Not FileExists(lProjectDir & "\prj.proj") Then
+                                SaveFileString(lProjectDir & "\prj.proj", lInputProjection)
+                            End If
+                            'project the extents shapefile
+                            Dim lExtentsSf As New MapWinGIS.Shapefile
+                            If lExtentsSf.Open(lNewShapeName) Then
+                                Dim lOutputProjection As String = "+proj=aea +ellps=GRS80 +lon_0=-96 +lat_0=23.0 +lat_1=29.5 +lat_2=45.5 +x_0=0 +y_0=0 +datum=NAD83 +units=m"
+                                If lInputProjection <> lOutputProjection Then
+                                    If Not MapWinGeoProc.SpatialReference.ProjectShapefile(lInputProjection, lOutputProjection, lExtentsSf) Then
+                                        Logger.Msg("Problem projecting the extents shapefile.", "Convert MapWindow Project Problem")
+                                    End If
+                                End If
+                                lExtentsSf.Close()
+                            End If
+                            'now open national project with temp shapefile on the map
+                            LoadNationalProject()
+                            GisUtil.AddLayer(lNewShapeName, "MapWindow Project Extents")
+                            'set symbology for this layer
+                            'zoom near this layer
+                            Dim lTempLayerIndex As Integer = GisUtil.LayerIndex("MapWindow Project Extents")
+                            Dim lCatLayerIndex As Integer = GisUtil.LayerIndex("Cataloging Units")
+                            'select corresponding HUC on the map
+                            Dim lCentroidX As Double
+                            Dim lCentroidY As Double
+                            For j As Integer = 1 To GisUtil.NumFeatures(lTempLayerIndex)
+                                GisUtil.ShapeCentroid(lTempLayerIndex, j - 1, lCentroidX, lCentroidY)
+                                GisUtil.SetSelectedFeature(lCatLayerIndex, GisUtil.PointInPolygonXY(lCentroidX, lCentroidY, lCatLayerIndex))
+                            Next j
+                            UpdateSelectedFeatures()
+                            'GisUtil.RemoveLayer(lTempLayerIndex)
+                            'download core data and load into project
+                            'add layers from MapWindow Project
+                        End If
                     End If
                 End If
             Else

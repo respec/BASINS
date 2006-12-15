@@ -2089,6 +2089,29 @@ Public Class GisUtil
         End If
     End Sub
 
+    Public Shared Sub ShapeCentroid(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByRef aCentroidX As Double, ByRef aCentroidY As Double)
+        Dim lSf As New MapWinGIS.Shapefile
+        lSf = ShapeFileFromIndex(aLayerIndex)
+        Dim lPt As New MapWinGIS.Point
+        lPt = MapWinGeoProc.Utils.Centroid(lSf.Shape(aFeatureIndex))
+        aCentroidX = lPt.x
+        aCentroidY = lPt.y
+    End Sub
+
+    ''' <summary>Shapefile projection string from a layer index</summary>
+    ''' <param name="aLayerIndex">
+    '''     <para>Index of layer (Defaults to current layer)</para>
+    ''' </param>
+    ''' <exception cref="System.Exception" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
+    Public Shared ReadOnly Property ShapefileProjectionString(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
+        Get
+            Dim lSf As New MapWinGIS.Shapefile
+            lSf = ShapeFileFromIndex(aLayerIndex)
+            Return lSf.Projection
+        End Get
+    End Property
+
     Public Shared ReadOnly Property LayerColor(Optional ByVal aLayerIndex As Integer = UseCurrent) As String
         Get
             Dim redcolor As Integer, greencolor As Integer, bluecolor As Integer
