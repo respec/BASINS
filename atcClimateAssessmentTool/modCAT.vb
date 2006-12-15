@@ -6,6 +6,7 @@ Public Module modCAT
     <CLSCompliant(False)> _
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
     Friend g_DataManager As atcDataManager
+    Friend g_running As Boolean = False
 
     ''' <summary>
     ''' Given the filename of a UCI file and a file type, return the file names, if any, of that type in the UCI
@@ -90,7 +91,15 @@ Public Module modCAT
             Dim lPipeHandles As String = " -1 -1 "
             If aShowProgress Then lPipeHandles = " "
 
-            Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
+            'Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
+            Dim newProc As Diagnostics.Process
+            newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lPipeHandles & lNewBaseFilename & "uci")
+            While Not newProc.HasExited
+                If Not g_running Then newProc.Kill()
+                Windows.Forms.Application.DoEvents()
+                Threading.Thread.Sleep(50)
+            End While
+            Logger.Dbg("Model exit code " & newProc.ExitCode)
 
             For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "BINO")
                 lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)

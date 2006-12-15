@@ -3,6 +3,9 @@ Imports atcData
 Public Class atcClimateAssessmentToolPlugin
     Inherits atcData.atcDataDisplay
 
+    Private Shared pForm As frmCAT
+    Private Shared pXML As String
+
     Public Overrides ReadOnly Property Name() As String
         Get
             Return "Analysis::Climate Assessment Tool"
@@ -12,9 +15,9 @@ Public Class atcClimateAssessmentToolPlugin
     Public Overrides Function Show(ByVal aManager As atcDataManager, _
                      Optional ByVal aGroup As atcDataGroup = Nothing) As Object
         g_DataManager = aManager
-        Dim lForm As New frmCAT
-        lForm.Initialize(aGroup)
-        Return lForm
+        pForm = New frmCAT
+        pForm.Initialize(Me)
+        Return pForm
     End Function
 
     <CLSCompliant(False)> _
@@ -22,6 +25,24 @@ Public Class atcClimateAssessmentToolPlugin
                                     ByVal aParentHandle As Integer)
         MyBase.Initialize(aMapWin, aParentHandle)
         g_MapWin = aMapWin
+    End Sub
+
+    Public Property XML() As String
+        Get
+            Return pXML
+        End Get
+        Set(ByVal newValue As String)
+            pXML = newValue
+        End Set
+    End Property
+
+    Public Overrides Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String)
+        XML = SettingsString
+        If Not pForm Is Nothing Then pForm.XML = XML
+    End Sub
+
+    Public Overrides Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String)
+        SettingsString = XML
     End Sub
 
 End Class
