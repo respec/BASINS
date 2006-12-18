@@ -13,7 +13,8 @@ Public Class Variation
     Private pComputationSource As atcDataSource
     Private pOperation As String = ""
     Private pSelected As Boolean = False
-    'TODO: make rest of public variables into peoperties
+
+    'TODO: make rest of public variables into properties
     Public Seasons As atcSeasons.atcSeasonBase
     Public Min As Double = Double.NaN
     Public Max As Double = Double.NaN
@@ -24,6 +25,8 @@ Public Class Variation
     Public ColorAboveMax As System.Drawing.Color = System.Drawing.Color.OrangeRed
     Public ColorBelowMin As System.Drawing.Color = System.Drawing.Color.DeepSkyBlue
     Public ColorDefault As System.Drawing.Color = System.Drawing.Color.White
+
+    Public PETdata As atcDataGroup = New atcDataGroup
 
     Public Overridable Property Name() As String
         Get
@@ -102,6 +105,7 @@ Public Class Variation
         Dim lArgsMath As New atcDataAttributes
         Dim lModifiedTS As atcTimeseries
         Dim lModifiedGroup As New atcDataGroup
+        Dim lDataSetIndex As Integer = 0
         For Each lOriginalData As atcDataSet In DataSets
             If Seasons Is Nothing Then
                 lTsMath.DataSets.Clear()
@@ -131,18 +135,17 @@ Public Class Variation
 
             lModifiedGroup.Add(lModifiedTS)
 
-            Select Case DataSets.ItemByIndex(0).Attributes.GetValue("Constituent").ToString.ToUpper
-                Case "ATMP", "AIRTMP", "AIRTEMP" 'recompute PET when ATMP is changed - TODO: don't hard code ATMP
-                    'Dim lAirTmpMean As String = Format(lModifiedTS.Attributes.GetValue("Mean"), "#.00")
-                    lModifiedTS = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
-                    lModifiedGroup.Add(lModifiedTS)
-                    'Dim lEvapMean As String = Format(lModifiedTS.Attributes.GetValue("Mean") * 365.25, "#.00")
-                    With lModifiedTS.Attributes
-                        .SetValue("Constituent", "PET")
-                        .SetValue("History 1", DataSets.ItemByIndex(0).Attributes.GetValue("History 1").ToString)
-                        .SetValue("Id", 1100) 'TODO: don't hard code ID for PET
-                    End With
-            End Select
+            If PETdata.Count > lDataSetIndex Then
+                Dim lOldPET As atcDataSet = PETdata(lDataSetIndex)
+                lModifiedTS = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
+                With lModifiedTS.Attributes
+                    .SetValue("Constituent", lOldPET.Attributes.GetValue("Constituent"))
+                    .SetValue("History 1", lOldPET.Attributes.GetValue("History 1").ToString)
+                    .SetValue("Id", lOldPET.Attributes.GetValue("Id"))
+                End With
+                lModifiedGroup.Add(lModifiedTS)
+            End If
+            lDataSetIndex += 1
         Next
         Return lModifiedGroup
     End Function
@@ -194,15 +197,15 @@ Public Class Variation
         End Set
     End Property
 
-    Protected Overridable Property DataSetsXML() As String
+    Protected Overridable Property DataGroupXML(ByVal aDataGroup As atcDataGroup, ByVal aTag As String) As String
         Get
-            If DataSets Is Nothing Then
+            If aDataGroup Is Nothing Then
                 Return ""
             Else
-                Dim lXML As String = "  <DataSets count='" & DataSets.Count & "'>" & vbCrLf
-                For lIndex As Integer = 0 To DataSets.Count - 1
-                    Dim lDataSet As atcDataSet = DataSets.Item(lIndex)
-                    Dim lDataKey As String = DataSets.Keys(lIndex)
+                Dim lXML As String = "  <" & aTag & " count='" & aDataGroup.Count & "'>" & vbCrLf
+                For lIndex As Integer = 0 To aDataGroup.Count - 1
+                    Dim lDataSet As atcDataSet = aDataGroup.Item(lIndex)
+                    Dim lDataKey As String = aDataGroup.Keys(lIndex)
                     If Not lDataSet Is Nothing Then
                         lXML &= "    <DataSet"
                         lXML &= " ID='" & lDataSet.Attributes.GetValue("ID") & "'"
@@ -221,14 +224,14 @@ Public Class Variation
                         lXML &= " />" & vbCrLf
                     End If
                 Next
-                Return lXML & "  </DataSets>" & vbCrLf
+                Return lXML & "  </" & aTag & ">" & vbCrLf
             End If
         End Get
 
         Set(ByVal newValue As String)
             Dim lXML As New Chilkat.Xml
             If lXML.LoadXml(newValue) Then
-                DataSets = New atcDataGroup
+                aDataGroup = New atcDataGroup
                 If lXML.FirstChild2() Then
                     Do
                         Dim lKey As String = lXML.GetAttrValue("Key")
@@ -256,7 +259,7 @@ Public Class Variation
                             If lDataGroup.Count > 0 Then
                                 Logger.Dbg("Found data set #" & lID & " without a specification")
                                 If lDataGroup.Count > 1 Then Logger.Dbg("Warning: more than one data set matched ID " & lID)
-                                DataSets.Add(lKey, lDataGroup.ItemByIndex(0))
+                                aDataGroup.Add(lKey, lDataGroup.ItemByIndex(0))
                             Else
                                 Logger.Msg("No data found with ID " & lID, "Variation from XML")
                             End If
@@ -264,7 +267,7 @@ Public Class Variation
                             If lKey Is Nothing OrElse lKey.Length = 0 Then
                                 Logger.Dbg("No data set ID found in XML, skipping: ", lXML.GetXml)
                             End If
-                            DataSets.Add(lKey, Nothing)
+                            aDataGroup.Add(lKey, Nothing)
                         End If
                     Loop While lXML.NextSibling2
                 End If
@@ -290,7 +293,8 @@ Public Class Variation
                 lXML &= "  <ComputationSource>" & ComputationSource.Name & "</ComputationSource>" & vbCrLf
             End If
             lXML &= "  <Selected>" & Selected & "</Selected>" & vbCrLf _
-                 & DataSetsXML _
+                 & DataGroupXML(DataSets, "DataSets") _
+                 & DataGroupXML(PETdata, "PETdata") _
                  & SeasonsXML _
                  & "</Variation>" & vbCrLf
             Return lXML
@@ -309,7 +313,8 @@ Public Class Variation
                                 Case "operation" : Operation = .Content
                                 Case "computationsource"
                                     ComputationSource = g_DataManager.DataSourceByName(.Content)
-                                Case "datasets" : DataSetsXML = .GetXml
+                                Case "datasets" : DataGroupXML(DataSets, "DataSets") = .GetXml
+                                Case "petdata" : DataGroupXML(PETdata, "PETdata") = .GetXml
                                 Case "selected"
                                     Selected = .Content.ToLower.Equals("true")
                                 Case "seasons" : SeasonsXML = .GetXml
