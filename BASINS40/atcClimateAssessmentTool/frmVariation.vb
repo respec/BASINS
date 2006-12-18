@@ -419,7 +419,7 @@ Public Class frmVariation
     End Sub
 
     Private Sub UserSelectPET()
-        Dim lData As atcDataGroup = g_DataManager.UserSelectData("Select PET data to compute from air temperature", pVariation.DataSets)
+        Dim lData As atcDataGroup = g_DataManager.UserSelectData("Select PET data to compute from air temperature", pVariation.PETdata)
         If Not lData Is Nothing Then
             pVariation.PETdata = lData
             UpdateDataText(txtVaryPET, lData)
