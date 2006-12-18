@@ -155,6 +155,7 @@ Public Class Variation
         With newVariation
             .Name = Name
             If Not DataSets Is Nothing Then .DataSets = DataSets.Clone()
+            If Not PETdata Is Nothing Then .PETdata = PETdata.Clone()
             .ComputationSource = ComputationSource
             .Operation = Operation.Clone()
             .Seasons = Seasons 'TODO: clone Seasons of not Nothing
