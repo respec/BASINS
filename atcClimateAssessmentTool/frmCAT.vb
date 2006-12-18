@@ -734,27 +734,52 @@ Public Class frmCAT
         'header for attributes
         agdResults.Source = New atcGridSource
         With agdResults.Source
+            Dim lUsingSeasons As Boolean = False
             Dim lColumn As Integer = 1
-            .FixedRows = 1
+            .FixedRows = 4
             .FixedColumns = 1
             .Columns = pEndpoints.Count + 1
-            .Rows = 2
             .CellValue(0, 0) = "Run"
             .CellColor(0, 0) = Drawing.SystemColors.Control
             .ColorCells = True
+
             For Each lEndpoint In pEndpoints
+                .Columns += lEndpoint.DataSets.Count
                 For Each lDataset As atcDataSet In lEndpoint.DataSets
-                    If lEndpoint.Operation Is Nothing Then
-                        .CellValue(0, lColumn) = lEndpoint.Name
-                    Else
-                        .CellValue(0, lColumn) = lEndpoint.Name & " " & lEndpoint.Operation
+                    .CellValue(0, lColumn) = lEndpoint.Name
+                    If Not lEndpoint.Operation Is Nothing Then
+                        .CellValue(1, lColumn) = lEndpoint.Operation
                     End If
-                    If lEndpoint.DataSets.Count > 1 Then .CellValue(0, lColumn) &= " (" & lDataset.ToString & ")"
+                    .CellValue(2, lColumn) = lDataset.ToString
+                    If Not lEndpoint.Seasons Is Nothing Then
+                        lUsingSeasons = True
+                    End If
+                    lColumn += 1
+                Next
+            Next
+
+            .Rows = 5
+            lColumn = 1
+
+            For Each lEndpoint In pEndpoints
+                If lEndpoint.DataSets.Count > 1 Then
+                    .Columns += lEndpoint.DataSets.Count - 1
+                End If
+                For Each lDataset As atcDataSet In lEndpoint.DataSets
+                    .CellValue(0, lColumn) = lEndpoint.Name
+                    If Not lEndpoint.Operation Is Nothing Then
+                        .CellValue(1, lColumn) = lEndpoint.Operation
+                    End If
+                    .CellValue(2, lColumn) = lDataset.ToString
+                    If Not lEndpoint.Seasons Is Nothing Then
+                        .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
+                    End If
                     .CellColor(0, lColumn) = Drawing.SystemColors.Control
                     lColumn += 1
                 Next
             Next
         End With
+
         agdResults.Initialize(agdResults.Source)
         agdResults.Refresh()
 
@@ -798,7 +823,7 @@ Public Class frmCAT
                 End If
                 TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
 
-                UpdateResults(aIteration, lResults)
+                UpdateResults(aIteration, lResults, PathNameOnly(aBaseFileName) & "\" & aModifiedScenarioName & ".results.txt")
 
                 'Close any open results
                 For Each lSpecification As String In lResults
@@ -844,7 +869,7 @@ Public Class frmCAT
         End If
     End Sub
 
-    Private Sub UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection)
+    Private Sub UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection, ByVal aResultsFilename As String)
         With agdResults.Source
             Dim lRow As Integer = aIteration + .FixedRows
             Dim lColumn As Integer = .FixedColumns
@@ -899,7 +924,7 @@ Public Class frmCAT
         Catch
             'stop
         End Try
-        SaveFileString("ResultsIntermediate.txt", agdResults.Source.ToString)
+        SaveFileString(aResultsFilename, agdResults.Source.ToString)
     End Sub
 
     Private Sub cboPivotRows_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboPivotRows.SelectedIndexChanged
@@ -1532,6 +1557,7 @@ Public Class frmCAT
         Dim lCopyText As String = " copy "
         For Each lIndex As Integer In lstEndpoints.SelectedIndices
             Dim lNewEndpoint As Variation = pEndpoints(lIndex).Clone
+            lNewEndpoint.CurrentValue = Double.NaN
             Dim lCopyTextPosition As Integer = lNewEndpoint.Name.LastIndexOf(lCopyText)
             lCopyNumber = 1
             If (lCopyTextPosition > 0) Then
