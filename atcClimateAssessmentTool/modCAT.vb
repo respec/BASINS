@@ -47,10 +47,20 @@ Public Module modCAT
             lNewBaseFilename = lNewFolder & aNewScenarioName & "."
 
             If aNewScenarioName.ToLower <> "base" Then
+                Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
+
                 'Copy base UCI, changing base to new scenario name within it
                 ReplaceStringToFile(WholeFileString(aBaseFilename), "base.", aNewScenarioName & ".", lNewBaseFilename & "uci")
-                For Each lWDMfilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
+                For Each lWDMfilename As String In lWDMFilenames
                     lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
+                    If lWDMfilename.IndexOf("base.") < 0 Then
+                        Logger.Message("WDM file does not contain 'base.' so cannot be used in CAT:" _
+                        & vbCrLf & lWDMfilename & vbCrLf & "Name of file must be changed on disk and in UCI file:" _
+                        & vbCrLf & aBaseFilename, "WDM file must be renamed", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+                        g_running = False
+                        Return Nothing
+                    End If
+
                     'Copy each base WDM to new WDM
                     Dim lNewWDMfilename As String = lNewFolder & IO.Path.GetFileName(lWDMfilename).Replace("base.", aNewScenarioName & ".")
                     FileCopy(lWDMfilename, lNewWDMfilename)
@@ -103,6 +113,15 @@ Public Module modCAT
 
             For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "BINO")
                 lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
+
+                If lBinOutFilename.IndexOf("base.") < 0 Then
+                    Logger.Message("Binary output file does not contain 'base.' so cannot be used in CAT:" _
+                    & vbCrLf & lBinOutFilename & vbCrLf & "Name of output file must be changed in UCI file:" _
+                    & vbCrLf & aBaseFilename, "File must be renamed", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+                    g_running = False
+                    Return Nothing
+                End If
+
                 Dim lNewFilename As String = lBinOutFilename.Replace("base.", aNewScenarioName & ".")
                 Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
                 lHBNResults.Open(lNewFilename)

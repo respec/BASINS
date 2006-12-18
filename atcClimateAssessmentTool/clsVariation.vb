@@ -197,83 +197,81 @@ Public Class Variation
         End Set
     End Property
 
-    Protected Overridable Property DataGroupXML(ByVal aDataGroup As atcDataGroup, ByVal aTag As String) As String
-        Get
-            If aDataGroup Is Nothing Then
-                Return ""
-            Else
-                Dim lXML As String = "  <" & aTag & " count='" & aDataGroup.Count & "'>" & vbCrLf
-                For lIndex As Integer = 0 To aDataGroup.Count - 1
-                    Dim lDataSet As atcDataSet = aDataGroup.Item(lIndex)
-                    Dim lDataKey As String = aDataGroup.Keys(lIndex)
-                    If Not lDataSet Is Nothing Then
-                        lXML &= "    <DataSet"
-                        lXML &= " ID='" & lDataSet.Attributes.GetValue("ID") & "'"
-                        If lDataSet.Attributes.ContainsAttribute("History 1") Then
-                            lXML &= " History='" & lDataSet.Attributes.GetValue("History 1") & "'"
-                        End If
-                        If lDataSet.Attributes.ContainsAttribute("Location") Then
-                            lXML &= " Location='" & lDataSet.Attributes.GetValue("Location") & "'"
-                        End If
-                        If lDataSet.Attributes.ContainsAttribute("Constituent") Then
-                            lXML &= " Constituent='" & lDataSet.Attributes.GetValue("Constituent") & "'"
-                        End If
-                        If Not lDataKey Is Nothing Then
-                            lXML &= " Key='" & lDataKey & "'"
-                        End If
-                        lXML &= " />" & vbCrLf
+    Private Function GetDataGroupXML(ByVal aDataGroup As atcDataGroup, ByVal aTag As String) As String
+        If aDataGroup Is Nothing Then
+            Return ""
+        Else
+            Dim lXML As String = "  <" & aTag & " count='" & aDataGroup.Count & "'>" & vbCrLf
+            For lIndex As Integer = 0 To aDataGroup.Count - 1
+                Dim lDataSet As atcDataSet = aDataGroup.Item(lIndex)
+                Dim lDataKey As String = aDataGroup.Keys(lIndex)
+                If Not lDataSet Is Nothing Then
+                    lXML &= "    <DataSet"
+                    lXML &= " ID='" & lDataSet.Attributes.GetValue("ID") & "'"
+                    If lDataSet.Attributes.ContainsAttribute("History 1") Then
+                        lXML &= " History='" & lDataSet.Attributes.GetValue("History 1") & "'"
                     End If
-                Next
-                Return lXML & "  </" & aTag & ">" & vbCrLf
-            End If
-        End Get
-
-        Set(ByVal newValue As String)
-            Dim lXML As New Chilkat.Xml
-            If lXML.LoadXml(newValue) Then
-                aDataGroup = New atcDataGroup
-                If lXML.FirstChild2() Then
-                    Do
-                        Dim lKey As String = lXML.GetAttrValue("Key")
-                        Dim lID As String = lXML.GetAttrValue("ID")
-                        Dim lHistory As String = lXML.GetAttrValue("History")
-                        If lID.Length > 0 Then
-                            Dim lDataGroup As atcDataGroup = Nothing
-                            If lHistory.Length > 10 Then
-                                Dim lSourceSpecification As String = lHistory.Substring(10).ToLower
-                                For Each lDataSource As atcDataSource In g_DataManager.DataSources
-                                    If lDataSource.Specification.ToLower.Equals(lSourceSpecification) Then
-                                        lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
-                                        If lDataGroup.Count > 0 Then
-                                            Logger.Dbg("Found data set #" & lID & " in " & lSourceSpecification)
-                                            Exit For
-                                        Else
-                                            lDataGroup = Nothing
-                                        End If
-                                    End If
-                                Next
-                            End If
-                            If lDataGroup Is Nothing Then
-                                lDataGroup = g_DataManager.DataSets.FindData("ID", lID, 2)
-                            End If
-                            If lDataGroup.Count > 0 Then
-                                Logger.Dbg("Found data set #" & lID & " without a specification")
-                                If lDataGroup.Count > 1 Then Logger.Dbg("Warning: more than one data set matched ID " & lID)
-                                aDataGroup.Add(lKey, lDataGroup.ItemByIndex(0))
-                            Else
-                                Logger.Msg("No data found with ID " & lID, "Variation from XML")
-                            End If
-                        Else
-                            If lKey Is Nothing OrElse lKey.Length = 0 Then
-                                Logger.Dbg("No data set ID found in XML, skipping: ", lXML.GetXml)
-                            End If
-                            aDataGroup.Add(lKey, Nothing)
-                        End If
-                    Loop While lXML.NextSibling2
+                    If lDataSet.Attributes.ContainsAttribute("Location") Then
+                        lXML &= " Location='" & lDataSet.Attributes.GetValue("Location") & "'"
+                    End If
+                    If lDataSet.Attributes.ContainsAttribute("Constituent") Then
+                        lXML &= " Constituent='" & lDataSet.Attributes.GetValue("Constituent") & "'"
+                    End If
+                    If Not lDataKey Is Nothing Then
+                        lXML &= " Key='" & lDataKey & "'"
+                    End If
+                    lXML &= " />" & vbCrLf
                 End If
+            Next
+            Return lXML & "  </" & aTag & ">" & vbCrLf
+        End If
+    End Function
+
+    Private Sub SetDataGroupXML(ByRef aDataGroup As atcDataGroup, ByVal aTag As String, ByVal aXML As String)
+        Dim lXML As New Chilkat.Xml
+        If lXML.LoadXml(aXML) Then
+            aDataGroup = New atcDataGroup
+            If lXML.FirstChild2() Then
+                Do
+                    Dim lKey As String = lXML.GetAttrValue("Key")
+                    Dim lID As String = lXML.GetAttrValue("ID")
+                    Dim lHistory As String = lXML.GetAttrValue("History")
+                    If lID.Length > 0 Then
+                        Dim lDataGroup As atcDataGroup = Nothing
+                        If lHistory.Length > 10 Then
+                            Dim lSourceSpecification As String = lHistory.Substring(10).ToLower
+                            For Each lDataSource As atcDataSource In g_DataManager.DataSources
+                                If lDataSource.Specification.ToLower.Equals(lSourceSpecification) Then
+                                    lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
+                                    If lDataGroup.Count > 0 Then
+                                        Logger.Dbg("Found data set #" & lID & " in " & lSourceSpecification)
+                                        Exit For
+                                    Else
+                                        lDataGroup = Nothing
+                                    End If
+                                End If
+                            Next
+                        End If
+                        If lDataGroup Is Nothing Then
+                            lDataGroup = g_DataManager.DataSets.FindData("ID", lID, 2)
+                        End If
+                        If lDataGroup.Count > 0 Then
+                            Logger.Dbg("Found data set #" & lID & " without a specification")
+                            If lDataGroup.Count > 1 Then Logger.Dbg("Warning: more than one data set matched ID " & lID)
+                            aDataGroup.Add(lKey, lDataGroup.ItemByIndex(0))
+                        Else
+                            Logger.Msg("No data found with ID " & lID, "Variation from XML")
+                        End If
+                    Else
+                        If lKey Is Nothing OrElse lKey.Length = 0 Then
+                            Logger.Dbg("No data set ID found in XML, skipping: ", lXML.GetXml)
+                        End If
+                        aDataGroup.Add(lKey, Nothing)
+                    End If
+                Loop While lXML.NextSibling2
             End If
-        End Set
-    End Property
+        End If
+    End Sub
 
     Public Overridable Property XML() As String
         Get
@@ -293,8 +291,8 @@ Public Class Variation
                 lXML &= "  <ComputationSource>" & ComputationSource.Name & "</ComputationSource>" & vbCrLf
             End If
             lXML &= "  <Selected>" & Selected & "</Selected>" & vbCrLf _
-                 & DataGroupXML(DataSets, "DataSets") _
-                 & DataGroupXML(PETdata, "PETdata") _
+                 & GetDataGroupXML(DataSets, "DataSets") _
+                 & GetDataGroupXML(PETdata, "PETdata") _
                  & SeasonsXML _
                  & "</Variation>" & vbCrLf
             Return lXML
@@ -313,8 +311,8 @@ Public Class Variation
                                 Case "operation" : Operation = .Content
                                 Case "computationsource"
                                     ComputationSource = g_DataManager.DataSourceByName(.Content)
-                                Case "datasets" : DataGroupXML(DataSets, "DataSets") = .GetXml
-                                Case "petdata" : DataGroupXML(PETdata, "PETdata") = .GetXml
+                                Case "datasets" : SetDataGroupXML(DataSets, "DataSets", .GetXml)
+                                Case "petdata" : SetDataGroupXML(PETdata, "PETdata", .GetXml)
                                 Case "selected"
                                     Selected = .Content.ToLower.Equals("true")
                                 Case "seasons" : SeasonsXML = .GetXml
