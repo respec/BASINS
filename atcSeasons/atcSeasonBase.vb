@@ -291,7 +291,12 @@ Public Class atcSeasonBase
     End Function
 
     Public Overrides Function ToString() As String
-        Return Name.Substring(23) 'Skip first part of Name which is "Timeseries::Seasonal - "
+        Dim lString As String = SeasonsSelectedString()
+        If lString.Length > 0 Then
+            lString = " (" & lString & ")"
+        End If
+        'Skip first part of Name which is "Timeseries::Seasonal - "
+        Return Name.Substring(23) & lString
     End Function
 
 End Class

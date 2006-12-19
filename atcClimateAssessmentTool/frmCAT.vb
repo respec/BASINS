@@ -739,7 +739,7 @@ Public Class frmCAT
             Dim lRow As Integer
             .FixedRows = 4
             .FixedColumns = 1
-            .Columns = pEndpoints.Count + 1
+            .Columns = 1
             .CellValue(0, 0) = "Run"
             .CellColor(0, 0) = Drawing.SystemColors.Control
             .ColorCells = True
@@ -765,7 +765,7 @@ Public Class frmCAT
                         .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
                     End If
                     For lRow = 0 To .FixedRows - 1
-                        .CellColor(0, lColumn) = Drawing.SystemColors.Control
+                        .CellColor(lRow, lColumn) = Drawing.SystemColors.Control
                     Next
                     lColumn += 1
                 Next
@@ -939,17 +939,18 @@ Public Class frmCAT
         If Not agdResults.Source Is Nothing Then
             For iColumn As Integer = 0 To agdResults.Source.Columns - 1
                 Dim lColumnTitle As String = agdResults.Source.CellValue(0, iColumn)
-                cboPivotRows.Items.Add(lColumnTitle)
-                cboPivotColumns.Items.Add(lColumnTitle)
-                cboPivotCells.Items.Add(lColumnTitle)
-                'default to last entry for a constituent 
-                'TODO: make smarter
-                If lColumnTitle.ToLower.StartsWith("prec") Then
-                    cboPivotColumns.Text = lColumnTitle
-                ElseIf lColumnTitle.ToLower.StartsWith("air") Then
-                    cboPivotRows.Text = lColumnTitle
-                ElseIf lColumnTitle.ToLower.StartsWith("flow") Then
-                    cboPivotCells.Text = lColumnTitle
+                If Not lColumnTitle Is Nothing AndAlso lColumnTitle.Length > 0 Then
+                    cboPivotRows.Items.Add(lColumnTitle)
+                    cboPivotColumns.Items.Add(lColumnTitle)
+                    cboPivotCells.Items.Add(lColumnTitle)
+                    'TODO: default to last setting for each pivot 
+                    If lColumnTitle.ToLower.StartsWith("prec") Then
+                        cboPivotColumns.Text = lColumnTitle
+                    ElseIf lColumnTitle.ToLower.StartsWith("air") Then
+                        cboPivotRows.Text = lColumnTitle
+                    ElseIf lColumnTitle.ToLower.StartsWith("flow") Then
+                        cboPivotCells.Text = lColumnTitle
+                    End If
                 End If
             Next
         End If
