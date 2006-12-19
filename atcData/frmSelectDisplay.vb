@@ -86,7 +86,7 @@ Public Class frmSelectDisplay
         iArg -= 1
         If iArg >= 0 Then
             Me.Height = pArgButton(iArg).Top + pArgButton(iArg).Height + pPADDING + (Me.Height - Me.ClientRectangle.Height)
-            Me.Show()
+            Me.ShowDialog()
         Else
             Me.Close()
         End If
