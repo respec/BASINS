@@ -19,6 +19,7 @@ Friend Module modBasinsPlugin
     Public g_BasinsDir As String = ""
     Public pBuildFrm As frmBuildNew
 
+    Friend pExistingMapWindowProjectName As String = ""
     Friend pCommandLineScript As Boolean = False
     Friend pBuiltInScriptExists As Boolean = False
 
@@ -218,7 +219,6 @@ Friend Module modBasinsPlugin
                     If GisUtil.ProjectFileName Is Nothing Then
                         Logger.Msg("The current MapWindow project must be saved before converting it to a BASINS Project.", "Convert MapWindow Project Problem")
                     Else
-                        Logger.Msg("'Convert MapWindow Project to BASINS Project' Not Yet Implemented")
                         'set up temporary extents shapefile
                         Dim lProjectDir As String = PathNameOnly(GisUtil.ProjectFileName)
                         Dim lInputProjection As String = ""
@@ -280,6 +280,8 @@ Friend Module modBasinsPlugin
                                 End If
                                 lExtentsSf.Close()
                             End If
+                            'remember the name of this mapwindow project to go back to later
+                            pExistingMapWindowProjectName = g_MapWin.Project.FileName
                             'now open national project with temp shapefile on the map
                             LoadNationalProject()
                             'GisUtil.AddLayer(lNewShapeName, "MapWindow Project Extents")
@@ -295,16 +297,19 @@ Friend Module modBasinsPlugin
                             'select corresponding HUC on the map
                             Dim lTempLayerIndex As Integer = GisUtil.LayerIndex(lTitle)
                             Dim lCatLayerIndex As Integer = GisUtil.LayerIndex("Cataloging Units")
-                            Dim lCentroidX As Double
-                            Dim lCentroidY As Double
+                            Dim lPtX As Double
+                            Dim lPtY As Double
                             For j As Integer = 1 To GisUtil.NumFeatures(lTempLayerIndex)
-                                GisUtil.ShapeCentroid(lTempLayerIndex, j - 1, lCentroidX, lCentroidY)
-                                GisUtil.SetSelectedFeature(lCatLayerIndex, GisUtil.PointInPolygonXY(lCentroidX, lCentroidY, lCatLayerIndex))
+                                If (lExtentsSf.ShapefileType = MapWinGIS.ShpfileType.SHP_POLYGON OrElse _
+                                    lExtentsSf.ShapefileType = MapWinGIS.ShpfileType.SHP_POLYGONM OrElse _
+                                    lExtentsSf.ShapefileType = MapWinGIS.ShpfileType.SHP_POLYGONZ) Then
+                                    GisUtil.ShapeCentroid(lTempLayerIndex, j - 1, lPtX, lPtY)
+                                Else
+                                    GisUtil.PointXY(lTempLayerIndex, j - 1, lPtX, lPtY)
+                                End If
+                                GisUtil.SetSelectedFeature(lCatLayerIndex, GisUtil.PointInPolygonXY(lPtX, lPtY, lCatLayerIndex))
                             Next j
                             UpdateSelectedFeatures()
-                            'GisUtil.RemoveLayer(lTempLayerIndex)
-                            'download core data and load into project
-                            'add layers from MapWindow Project
                         End If
                     End If
                 End If
@@ -378,12 +383,24 @@ Friend Module modBasinsPlugin
         Next
 
         If lFieldMatch >= 0 Then
-            'Save national project as the user has zoomed it
-            g_MapWin.Project.Save(g_MapWin.Project.FileName)
-            CreateNewProjectAndDownloadCoreDataInteractive(lThemeTag, GetSelected(lFieldMatch))
+            If pExistingMapWindowProjectName.Length = 0 Then
+                'This is the normal case for building a new project,
+                'Save national project as the user has zoomed it
+                g_MapWin.Project.Save(g_MapWin.Project.FileName)
+                CreateNewProjectAndDownloadCoreDataInteractive(lThemeTag, GetSelected(lFieldMatch))
+            Else
+                'build new basins project from mapwindow project
+                Dim lDataPath As String = g_BasinsDrives.Chars(0) & ":\Basins\data\"
+                Dim lNewDataDir As String = PathNameOnly(pExistingMapWindowProjectName) & "\"
+                'download and project core data
+                Logger.Dbg("DownloadData:" & lThemeTag)
+                CreateNewProjectAndDownloadCoreData(lThemeTag, GetSelected(lFieldMatch), lDataPath, lNewDataDir, pExistingMapWindowProjectName, True)
+                pExistingMapWindowProjectName = ""
+            End If
         Else
             Logger.Msg("Could not find field " & lFieldName & " in " & lCurLayer.Filename, "Could not create project")
         End If
+
     End Sub
 
     Private Function GetSelected(ByVal aField As Integer) As ArrayList
