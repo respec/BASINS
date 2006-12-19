@@ -141,7 +141,8 @@ StartOver:
                                                    ByVal aSelectedFeatures As ArrayList, _
                                                    ByVal aDataPath As String, _
                                                    ByVal aNewDataDir As String, _
-                                                   ByVal aProjectFileName As String)
+                                                   ByVal aProjectFileName As String, _
+                                                   Optional ByVal aExistingMapWindowProject As Boolean = False)
         Dim lDownloadXml As String
         Dim lFeature As Integer
         Dim lDownloadFilename As String = aDataPath & "download.xml"
@@ -163,16 +164,38 @@ StartOver:
         Dim lDataDownLoadStatus As Boolean = DataDownload(lDownloadFilename)
         Logger.Dbg("CreateNewProjectAndDownloadCoreData:DownLoadStatus:" & lDataDownLoadStatus)
         If lDataDownLoadStatus Then 'Succeeded, as far as we know
-            g_MapWin.Layers.Clear()
-            If Not (g_MapWin.Project.Save(aProjectFileName)) Then
-                Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
+            If Not aExistingMapWindowProject Then
+                'regular case, not coming from existing mapwindow project
+                g_MapWin.Layers.Clear()
+                If Not (g_MapWin.Project.Save(aProjectFileName)) Then
+                    Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
+                End If
+            Else
+                'open existing mapwindow project again
+                g_MapWin.Project.Load(aProjectFileName)
+                Dim lProjectDir As String = PathNameOnly(aProjectFileName)
+                Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
+                If FileExists(lNewShapeName) Then
+                    TryDelete(lProjectDir & "\temp\tempextent.shp")
+                    TryDelete(lProjectDir & "\temp\tempextent.shx")
+                    TryDelete(lProjectDir & "\temp\tempextent.dbf")
+                End If
             End If
             g_MapWin.Project.Modified = True
             ProcessProjectorFile(lProjectorFilename)
             AddAllShapesInDir(aNewDataDir, aNewDataDir)
             g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
-            If Not (g_MapWin.Project.Save(aProjectFileName)) Then
-                Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
+            If Not aExistingMapWindowProject Then
+                'regular case, not coming from existing mapwindow project
+                'set mapwindow project projection to projection of first layer
+                If g_MapWin.Layers.NumLayers > 0 Then
+                    Dim lsf As MapWinGIS.Shapefile
+                    lsf = g_MapWin.Layers(0).GetObject
+                    g_MapWin.Project.ProjectProjection = lsf.Projection
+                End If
+                If Not (g_MapWin.Project.Save(aProjectFileName)) Then
+                    Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
+                End If
             End If
         End If
     End Sub
