@@ -736,6 +736,7 @@ Public Class frmCAT
         With agdResults.Source
             Dim lUsingSeasons As Boolean = False
             Dim lColumn As Integer = 1
+            Dim lRow As Integer
             .FixedRows = 4
             .FixedColumns = 1
             .Columns = pEndpoints.Count + 1
@@ -745,17 +746,6 @@ Public Class frmCAT
 
             For Each lEndpoint In pEndpoints
                 .Columns += lEndpoint.DataSets.Count
-                For Each lDataset As atcDataSet In lEndpoint.DataSets
-                    .CellValue(0, lColumn) = lEndpoint.Name
-                    If Not lEndpoint.Operation Is Nothing Then
-                        .CellValue(1, lColumn) = lEndpoint.Operation
-                    End If
-                    .CellValue(2, lColumn) = lDataset.ToString
-                    If Not lEndpoint.Seasons Is Nothing Then
-                        lUsingSeasons = True
-                    End If
-                    lColumn += 1
-                Next
             Next
 
             .Rows = 5
@@ -774,7 +764,9 @@ Public Class frmCAT
                     If Not lEndpoint.Seasons Is Nothing Then
                         .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
                     End If
-                    .CellColor(0, lColumn) = Drawing.SystemColors.Control
+                    For lRow = 0 To .FixedRows - 1
+                        .CellColor(0, lColumn) = Drawing.SystemColors.Control
+                    Next
                     lColumn += 1
                 Next
             Next

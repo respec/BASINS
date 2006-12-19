@@ -137,19 +137,22 @@ Public Class atcDataManager
     End Function
 
     Public Sub ShowDisplay(ByVal aDisplayName As String, ByVal aDataGroup As atcDataGroup)
-        Dim lNewDisplay As atcDataDisplay
-        Dim lDisplayPlugins As ICollection = GetPlugins(GetType(atcDataDisplay))
-
-        For Each lDisp As atcDataDisplay In lDisplayPlugins
-            If lDisp.Name = aDisplayName OrElse lDisp.Name.EndsWith("::" & aDisplayName) Then
-                Dim lType As System.Type = lDisp.GetType()
-                Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
-                lNewDisplay = lAssembly.CreateInstance(lType.FullName)
-                lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
-                lNewDisplay.Show(Me, aDataGroup)
-                Exit Sub
-            End If
-        Next
+        If aDisplayName Is Nothing OrElse aDisplayName.Length = 0 Then
+            Dim lSelectDisplay As New frmSelectDisplay
+            lSelectDisplay.AskUser(Me, aDataGroup)
+        Else
+            Dim lNewDisplay As atcDataDisplay
+            For Each lDisp As atcDataDisplay In GetPlugins(GetType(atcDataDisplay))
+                If lDisp.Name = aDisplayName OrElse lDisp.Name.EndsWith("::" & aDisplayName) Then
+                    Dim lType As System.Type = lDisp.GetType()
+                    Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
+                    lNewDisplay = lAssembly.CreateInstance(lType.FullName)
+                    lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
+                    lNewDisplay.Show(Me, aDataGroup)
+                    Exit Sub
+                End If
+            Next
+        End If
     End Sub
 
     ''' <summary>Creates and returns an instance of a data source by name</summary>

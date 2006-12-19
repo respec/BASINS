@@ -15,6 +15,8 @@ Public Class frmVariation
     Friend WithEvents txtVaryPET As System.Windows.Forms.TextBox
     Friend WithEvents lblPET As System.Windows.Forms.Label
     Friend WithEvents lblAirTemp As System.Windows.Forms.Label
+    Friend WithEvents btnViewData As System.Windows.Forms.Button
+    Friend WithEvents btnViewPET As System.Windows.Forms.Button
 
     Private pSettingFormSeason As Boolean = False
 
@@ -91,6 +93,8 @@ Public Class frmVariation
         Me.txtVaryPET = New System.Windows.Forms.TextBox
         Me.lblPET = New System.Windows.Forms.Label
         Me.lblAirTemp = New System.Windows.Forms.Label
+        Me.btnViewData = New System.Windows.Forms.Button
+        Me.btnViewPET = New System.Windows.Forms.Button
         Me.grpSeasons.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -110,7 +114,7 @@ Public Class frmVariation
         Me.txtFunction.Location = New System.Drawing.Point(100, 135)
         Me.txtFunction.Name = "txtFunction"
         Me.txtFunction.Size = New System.Drawing.Size(71, 20)
-        Me.txtFunction.TabIndex = 6
+        Me.txtFunction.TabIndex = 8
         Me.txtFunction.Text = "Multiply"
         '
         'txtIncrement
@@ -146,7 +150,7 @@ Public Class frmVariation
         Me.txtMin.Location = New System.Drawing.Point(100, 159)
         Me.txtMin.Name = "txtMin"
         Me.txtMin.Size = New System.Drawing.Size(71, 20)
-        Me.txtMin.TabIndex = 8
+        Me.txtMin.TabIndex = 9
         Me.txtMin.Text = "0.9"
         '
         'lblMaximum
@@ -190,7 +194,7 @@ Public Class frmVariation
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtVaryData.Location = New System.Drawing.Point(100, 38)
         Me.txtVaryData.Name = "txtVaryData"
-        Me.txtVaryData.Size = New System.Drawing.Size(330, 20)
+        Me.txtVaryData.Size = New System.Drawing.Size(270, 20)
         Me.txtVaryData.TabIndex = 4
         '
         'grpSeasons
@@ -204,7 +208,7 @@ Public Class frmVariation
         Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
         Me.grpSeasons.Location = New System.Drawing.Point(177, 115)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(253, 216)
+        Me.grpSeasons.Size = New System.Drawing.Size(250, 237)
         Me.grpSeasons.TabIndex = 13
         Me.grpSeasons.TabStop = False
         Me.grpSeasons.Text = "Vary Seasonally"
@@ -217,7 +221,7 @@ Public Class frmVariation
         Me.cboSeasons.Location = New System.Drawing.Point(6, 19)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(241, 21)
+        Me.cboSeasons.Size = New System.Drawing.Size(238, 21)
         Me.cboSeasons.TabIndex = 14
         '
         'lstSeasons
@@ -229,13 +233,13 @@ Public Class frmVariation
         Me.lstSeasons.Location = New System.Drawing.Point(6, 46)
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(241, 135)
+        Me.lstSeasons.Size = New System.Drawing.Size(238, 156)
         Me.lstSeasons.TabIndex = 15
         '
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 187)
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 208)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
         Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsAll.TabIndex = 16
@@ -244,7 +248,7 @@ Public Class frmVariation
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(184, 187)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(181, 208)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
         Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsNone.TabIndex = 17
@@ -253,7 +257,7 @@ Public Class frmVariation
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(280, 347)
+        Me.btnOk.Location = New System.Drawing.Point(277, 368)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
         Me.btnOk.TabIndex = 19
@@ -263,7 +267,7 @@ Public Class frmVariation
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(358, 347)
+        Me.btnCancel.Location = New System.Drawing.Point(355, 368)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 20
@@ -286,13 +290,13 @@ Public Class frmVariation
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(100, 12)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(330, 20)
+        Me.txtName.Size = New System.Drawing.Size(327, 20)
         Me.txtName.TabIndex = 2
         '
         'btnScript
         '
         Me.btnScript.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnScript.Location = New System.Drawing.Point(178, 347)
+        Me.btnScript.Location = New System.Drawing.Point(175, 368)
         Me.btnScript.Name = "btnScript"
         Me.btnScript.Size = New System.Drawing.Size(96, 24)
         Me.btnScript.TabIndex = 18
@@ -304,8 +308,8 @@ Public Class frmVariation
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtVaryPET.Location = New System.Drawing.Point(100, 83)
         Me.txtVaryPET.Name = "txtVaryPET"
-        Me.txtVaryPET.Size = New System.Drawing.Size(330, 20)
-        Me.txtVaryPET.TabIndex = 5
+        Me.txtVaryPET.Size = New System.Drawing.Size(270, 20)
+        Me.txtVaryPET.TabIndex = 6
         '
         'lblPET
         '
@@ -329,10 +333,30 @@ Public Class frmVariation
         Me.lblAirTemp.Text = "If the data being varied is air temperature, PET can be computed from it:"
         Me.lblAirTemp.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
+        'btnViewData
+        '
+        Me.btnViewData.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnViewData.Location = New System.Drawing.Point(376, 38)
+        Me.btnViewData.Name = "btnViewData"
+        Me.btnViewData.Size = New System.Drawing.Size(51, 21)
+        Me.btnViewData.TabIndex = 5
+        Me.btnViewData.Text = "View"
+        '
+        'btnViewPET
+        '
+        Me.btnViewPET.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnViewPET.Location = New System.Drawing.Point(376, 82)
+        Me.btnViewPET.Name = "btnViewPET"
+        Me.btnViewPET.Size = New System.Drawing.Size(51, 21)
+        Me.btnViewPET.TabIndex = 7
+        Me.btnViewPET.Text = "View"
+        '
         'frmVariation
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(442, 383)
+        Me.ClientSize = New System.Drawing.Size(439, 404)
+        Me.Controls.Add(Me.btnViewPET)
+        Me.Controls.Add(Me.btnViewData)
         Me.Controls.Add(Me.txtVaryPET)
         Me.Controls.Add(Me.lblPET)
         Me.Controls.Add(Me.btnScript)
@@ -505,11 +529,6 @@ Public Class frmVariation
         Next
     End Sub
 
-    Private Sub btnCancel_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnCancel.Click
-        Me.DialogResult = Windows.Forms.DialogResult.Cancel
-        Me.Close()
-    End Sub
-
     Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
         Try
             If VariationFromForm(pVariation) Then
@@ -629,4 +648,27 @@ Public Class frmVariation
         End If
     End Sub
 
+    Private Sub btnViewData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnViewData.Click
+        Try
+            If pVariation.DataSets.Count > 0 Then
+                g_DataManager.ShowDisplay("", pVariation.DataSets)
+            Else
+                UserSelectData()
+            End If
+        Catch ex As Exception
+            UserSelectData()
+        End Try
+    End Sub
+
+    Private Sub btnViewPET_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnViewPET.Click
+        Try
+            If pVariation.PETdata.Count > 0 Then
+                g_DataManager.ShowDisplay("", pVariation.PETdata)
+            Else
+                UserSelectPET()
+            End If
+        Catch ex As Exception
+            UserSelectPET()
+        End Try
+    End Sub
 End Class
