@@ -979,11 +979,14 @@ Public Class frmCAT
     Private Function FindMatchingRow(ByVal aSource As atcGridSource, _
                                      ByVal aCol1 As Integer, ByVal aCol1Value As String, _
                                      ByVal aCol2 As Integer, ByVal aCol2Value As String) As Integer
-        For lRow As Integer = 1 To aSource.Rows - 1
-            If aSource.CellValue(lRow, aCol1).Equals(aCol1Value) AndAlso _
-               aSource.CellValue(lRow, aCol2).Equals(aCol2Value) Then
-                Return lRow
-            End If
+        For lRow As Integer = aSource.FixedRows To aSource.Rows - 1
+            Try
+                If aSource.CellValue(lRow, aCol1) = aCol1Value AndAlso _
+                   aSource.CellValue(lRow, aCol2) = aCol2Value Then
+                    Return lRow
+                End If
+            Catch 'error indicates match not found
+            End Try
         Next
         Return -1
     End Function
