@@ -85,7 +85,6 @@ Public Class frmCAT
     Friend WithEvents mnuFileSep2 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
     Friend WithEvents btnInputAddCligen As System.Windows.Forms.Button
-    Friend WithEvents btnEndpointAddCligen As System.Windows.Forms.Button
     Friend WithEvents chkShowEachRunProgress As System.Windows.Forms.CheckBox
     Friend WithEvents btnEndpointCopy As System.Windows.Forms.Button
     Friend WithEvents mnuOpenUCI As System.Windows.Forms.MenuItem
@@ -96,6 +95,7 @@ Public Class frmCAT
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCAT))
         Me.myTabs = New System.Windows.Forms.TabControl
         Me.tabInputs = New System.Windows.Forms.TabPage
+        Me.txtBaseScenario = New System.Windows.Forms.TextBox
         Me.btnInputAddCligen = New System.Windows.Forms.Button
         Me.lstInputs = New System.Windows.Forms.CheckedListBox
         Me.btnInputDown = New System.Windows.Forms.Button
@@ -109,7 +109,6 @@ Public Class frmCAT
         Me.tabEndpoints = New System.Windows.Forms.TabPage
         Me.btnEndpointCopy = New System.Windows.Forms.Button
         Me.chkShowEachRunProgress = New System.Windows.Forms.CheckBox
-        Me.btnEndpointAddCligen = New System.Windows.Forms.Button
         Me.lblAllResults = New System.Windows.Forms.Label
         Me.chkSaveAll = New System.Windows.Forms.CheckBox
         Me.lstEndpoints = New System.Windows.Forms.CheckedListBox
@@ -148,7 +147,6 @@ Public Class frmCAT
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblTop = New System.Windows.Forms.Label
         Me.btnStop = New System.Windows.Forms.Button
-        Me.txtBaseScenario = New System.Windows.Forms.TextBox
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -190,6 +188,16 @@ Public Class frmCAT
         Me.tabInputs.TabIndex = 0
         Me.tabInputs.Text = "Inputs"
         '
+        'txtBaseScenario
+        '
+        Me.txtBaseScenario.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtBaseScenario.Location = New System.Drawing.Point(96, 8)
+        Me.txtBaseScenario.Name = "txtBaseScenario"
+        Me.txtBaseScenario.Size = New System.Drawing.Size(346, 20)
+        Me.txtBaseScenario.TabIndex = 3
+        Me.txtBaseScenario.Text = "<click to select>"
+        '
         'btnInputAddCligen
         '
         Me.btnInputAddCligen.Location = New System.Drawing.Point(178, 64)
@@ -207,24 +215,24 @@ Public Class frmCAT
         Me.lstInputs.Location = New System.Drawing.Point(8, 94)
         Me.lstInputs.Name = "lstInputs"
         Me.lstInputs.Size = New System.Drawing.Size(434, 181)
-        Me.lstInputs.TabIndex = 10
+        Me.lstInputs.TabIndex = 12
         '
         'btnInputDown
         '
         Me.btnInputDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInputDown.Location = New System.Drawing.Point(485, 64)
+        Me.btnInputDown.Location = New System.Drawing.Point(418, 64)
         Me.btnInputDown.Name = "btnInputDown"
         Me.btnInputDown.Size = New System.Drawing.Size(24, 24)
-        Me.btnInputDown.TabIndex = 9
+        Me.btnInputDown.TabIndex = 11
         Me.btnInputDown.Text = "v"
         '
         'btnInputUp
         '
         Me.btnInputUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInputUp.Location = New System.Drawing.Point(453, 64)
+        Me.btnInputUp.Location = New System.Drawing.Point(388, 64)
         Me.btnInputUp.Name = "btnInputUp"
         Me.btnInputUp.Size = New System.Drawing.Size(24, 24)
-        Me.btnInputUp.TabIndex = 8
+        Me.btnInputUp.TabIndex = 10
         Me.btnInputUp.Text = "^"
         '
         'btnInputRemove
@@ -283,7 +291,6 @@ Public Class frmCAT
         '
         Me.tabEndpoints.Controls.Add(Me.btnEndpointCopy)
         Me.tabEndpoints.Controls.Add(Me.chkShowEachRunProgress)
-        Me.tabEndpoints.Controls.Add(Me.btnEndpointAddCligen)
         Me.tabEndpoints.Controls.Add(Me.lblAllResults)
         Me.tabEndpoints.Controls.Add(Me.chkSaveAll)
         Me.tabEndpoints.Controls.Add(Me.lstEndpoints)
@@ -314,15 +321,6 @@ Public Class frmCAT
         Me.chkShowEachRunProgress.Size = New System.Drawing.Size(160, 17)
         Me.chkShowEachRunProgress.TabIndex = 12
         Me.chkShowEachRunProgress.Text = "Show Progress of Each Run"
-        '
-        'btnEndpointAddCligen
-        '
-        Me.btnEndpointAddCligen.Location = New System.Drawing.Point(232, 64)
-        Me.btnEndpointAddCligen.Name = "btnEndpointAddCligen"
-        Me.btnEndpointAddCligen.Size = New System.Drawing.Size(48, 24)
-        Me.btnEndpointAddCligen.TabIndex = 17
-        Me.btnEndpointAddCligen.Text = "Cligen"
-        Me.btnEndpointAddCligen.Visible = False
         '
         'lblAllResults
         '
@@ -621,16 +619,6 @@ Public Class frmCAT
         Me.btnStop.TabIndex = 3
         Me.btnStop.Text = "Stop"
         Me.btnStop.Visible = False
-        '
-        'txtBaseScenario
-        '
-        Me.txtBaseScenario.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtBaseScenario.Location = New System.Drawing.Point(96, 8)
-        Me.txtBaseScenario.Name = "txtBaseScenario"
-        Me.txtBaseScenario.Size = New System.Drawing.Size(346, 20)
-        Me.txtBaseScenario.TabIndex = 3
-        Me.txtBaseScenario.Text = "<click to select>"
         '
         'frmCAT
         '
@@ -977,11 +965,11 @@ Public Class frmCAT
     End Sub
 
     Private Function UniqueValuesInColumn(ByVal aSource As atcGridSource, ByVal aColumn As Integer) As ArrayList
-        Dim lRows As Integer = aSource.Rows - 1
+        Dim lLastRow As Integer = aSource.Rows - 1
         Dim lValues As New ArrayList
         Dim lCheckValue As String
         Dim lMatch As Boolean
-        For lrow As Integer = 1 To lRows
+        For lrow As Integer = aSource.FixedRows To lLastRow
             Dim lValue As String = aSource.CellValue(lrow, aColumn)
             If Not lValue Is Nothing Then
                 lMatch = False
@@ -1016,8 +1004,8 @@ Public Class frmCAT
         If cboPivotRows.Text.Length > 0 AndAlso cboPivotColumns.Text.Length > 0 AndAlso cboPivotCells.Text.Length > 0 Then
             Dim lPivotData As New atcGridSource
             Dim lRuns As Integer = agdResults.Source.Rows - 1
-            Dim lRunRow As Integer = 0
-            Dim lRunColumn As Integer = 0
+            Dim lRunRow As Integer = agdResults.Source.FixedRows
+            Dim lRunColumn As Integer = agdResults.Source.FixedColumns
             Dim lRunCell As Integer = 0
 
             While Not agdResults.Source.CellValue(0, lRunRow).Equals(cboPivotRows.Text)
@@ -1306,12 +1294,13 @@ Public Class frmCAT
         RefreshTotalIterations()
     End Sub
 
-    Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aMoveFrom As Integer, ByVal aMoveTo As Integer)
-        If aMoveFrom >= 0 AndAlso aMoveTo >= 0 AndAlso aMoveFrom < aGroup.Count AndAlso aMoveTo < aGroup.Count Then
-            Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(aMoveFrom)
-            Dim lMoveMe As Variation = aGroup.ItemByIndex(aMoveFrom)
-            aGroup.RemoveAt(aMoveFrom)
-            aList.Items.RemoveAt(aMoveFrom)
+    Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aMoveTo As Integer)
+        Dim lMoveFrom As Integer = aList.SelectedIndex
+        If lMoveFrom >= 0 AndAlso aMoveTo >= 0 AndAlso lMoveFrom < aGroup.Count AndAlso aMoveTo < aGroup.Count Then
+            Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
+            Dim lMoveMe As Variation = aGroup.ItemByIndex(lMoveFrom)
+            aGroup.RemoveAt(lMoveFrom)
+            aList.Items.RemoveAt(lMoveFrom)
             aGroup.Insert(aMoveTo, lMoveMe)
             aList.Items.Insert(aMoveTo, lMoveMe.ToString)
             If lWasChecked Then aList.SetItemChecked(aMoveTo, True)
@@ -1320,19 +1309,35 @@ Public Class frmCAT
     End Sub
 
     Private Sub btnInputUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputUp.Click
-        MoveItem(pInputs, lstInputs, lstInputs.SelectedIndex, lstInputs.SelectedIndex - 1)
+        MoveItem(pInputs, lstInputs, lstInputs.SelectedIndex - 1)
+    End Sub
+
+    Private Sub btnInputUp_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputUp.DoubleClick
+        MoveItem(pInputs, lstInputs, 0)
     End Sub
 
     Private Sub btnInputDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputDown.Click
-        MoveItem(pInputs, lstInputs, lstInputs.SelectedIndex, lstInputs.SelectedIndex + 1)
+        MoveItem(pInputs, lstInputs, lstInputs.SelectedIndex + 1)
+    End Sub
+
+    Private Sub btnInputDown_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputDown.DoubleClick
+        MoveItem(pInputs, lstInputs, lstInputs.Items.Count - 1)
     End Sub
 
     Private Sub btnEndpointUp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointUp.Click
-        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.SelectedIndex, lstEndpoints.SelectedIndex - 1)
+        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.SelectedIndex - 1)
+    End Sub
+
+    Private Sub btnEndpointUp_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointUp.DoubleClick
+        MoveItem(pEndpoints, lstEndpoints, 0)
     End Sub
 
     Private Sub btnEndpointDown_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointDown.Click
-        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.SelectedIndex, lstEndpoints.SelectedIndex + 1)
+        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.SelectedIndex + 1)
+    End Sub
+
+    Private Sub btnEndpointDown_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointDown.DoubleClick
+        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.Items.Count - 1)
     End Sub
 
     Private Sub btnEndpointAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointAdd.Click
