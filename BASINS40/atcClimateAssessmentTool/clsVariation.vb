@@ -139,6 +139,7 @@ Public Class Variation
                 Dim lOldPET As atcDataSet = PETdata(lDataSetIndex)
                 lModifiedTS = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
                 With lModifiedTS.Attributes
+                    .SetValue("Location", lOldPET.Attributes.GetValue("Location"))
                     .SetValue("Constituent", lOldPET.Attributes.GetValue("Constituent"))
                     .SetValue("History 1", lOldPET.Attributes.GetValue("History 1").ToString)
                     .SetValue("Id", lOldPET.Attributes.GetValue("Id"))
