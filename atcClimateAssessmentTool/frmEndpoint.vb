@@ -12,6 +12,9 @@ Public Class frmEndpoint
     Private pVariation As Variation
     Private pSeasonsAvailable As New atcCollection
     Private pSeasons As atcSeasonBase
+    Friend WithEvents lblOperation As System.Windows.Forms.Label
+    Friend WithEvents txtOperation As System.Windows.Forms.TextBox
+    Friend WithEvents panelOperation As System.Windows.Forms.Panel
 
     Private pSettingFormSeason As Boolean = False
 
@@ -93,15 +96,19 @@ Public Class frmEndpoint
         Me.lstSeasons = New System.Windows.Forms.ListBox
         Me.btnSeasonsAll = New System.Windows.Forms.Button
         Me.btnSeasonsNone = New System.Windows.Forms.Button
+        Me.lblOperation = New System.Windows.Forms.Label
+        Me.txtOperation = New System.Windows.Forms.TextBox
+        Me.panelOperation = New System.Windows.Forms.Panel
         Me.GroupBox1.SuspendLayout()
         Me.grpSeasons.SuspendLayout()
+        Me.panelOperation.SuspendLayout()
         Me.SuspendLayout()
         '
         'lblName
         '
         Me.lblName.AutoSize = True
         Me.lblName.BackColor = System.Drawing.Color.Transparent
-        Me.lblName.Location = New System.Drawing.Point(12, 16)
+        Me.lblName.Location = New System.Drawing.Point(12, 19)
         Me.lblName.Name = "lblName"
         Me.lblName.Size = New System.Drawing.Size(83, 13)
         Me.lblName.TabIndex = 0
@@ -114,14 +121,14 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(101, 16)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(236, 20)
+        Me.txtName.Size = New System.Drawing.Size(243, 20)
         Me.txtName.TabIndex = 1
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(271, 526)
+        Me.btnCancel.Location = New System.Drawing.Point(278, 526)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 23
@@ -130,7 +137,7 @@ Public Class frmEndpoint
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(193, 526)
+        Me.btnOk.Location = New System.Drawing.Point(200, 526)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
         Me.btnOk.TabIndex = 22
@@ -151,7 +158,7 @@ Public Class frmEndpoint
         '
         Me.lblData.AutoSize = True
         Me.lblData.BackColor = System.Drawing.Color.Transparent
-        Me.lblData.Location = New System.Drawing.Point(45, 40)
+        Me.lblData.Location = New System.Drawing.Point(45, 43)
         Me.lblData.Name = "lblData"
         Me.lblData.Size = New System.Drawing.Size(50, 13)
         Me.lblData.TabIndex = 2
@@ -164,7 +171,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtData.Location = New System.Drawing.Point(101, 40)
         Me.txtData.Name = "txtData"
-        Me.txtData.Size = New System.Drawing.Size(236, 20)
+        Me.txtData.Size = New System.Drawing.Size(243, 20)
         Me.txtData.TabIndex = 3
         '
         'GroupBox1
@@ -183,7 +190,7 @@ Public Class frmEndpoint
         Me.GroupBox1.Controls.Add(Me.lblDefaultColor)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 96)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(331, 160)
+        Me.GroupBox1.Size = New System.Drawing.Size(338, 160)
         Me.GroupBox1.TabIndex = 6
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Highlight Values"
@@ -195,7 +202,7 @@ Public Class frmEndpoint
         Me.txtHighColor.BackColor = System.Drawing.Color.OrangeRed
         Me.txtHighColor.Location = New System.Drawing.Point(144, 120)
         Me.txtHighColor.Name = "txtHighColor"
-        Me.txtHighColor.Size = New System.Drawing.Size(181, 20)
+        Me.txtHighColor.Size = New System.Drawing.Size(188, 20)
         Me.txtHighColor.TabIndex = 16
         '
         'lblHighColor
@@ -216,7 +223,7 @@ Public Class frmEndpoint
         Me.txtLowColor.BackColor = System.Drawing.Color.DeepSkyBlue
         Me.txtLowColor.Location = New System.Drawing.Point(144, 72)
         Me.txtLowColor.Name = "txtLowColor"
-        Me.txtLowColor.Size = New System.Drawing.Size(181, 20)
+        Me.txtLowColor.Size = New System.Drawing.Size(188, 20)
         Me.txtLowColor.TabIndex = 12
         '
         'lblLowColor
@@ -236,7 +243,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtMax.Location = New System.Drawing.Point(144, 96)
         Me.txtMax.Name = "txtMax"
-        Me.txtMax.Size = New System.Drawing.Size(181, 20)
+        Me.txtMax.Size = New System.Drawing.Size(188, 20)
         Me.txtMax.TabIndex = 14
         Me.txtMax.Text = "<none>"
         '
@@ -246,7 +253,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtMin.Location = New System.Drawing.Point(144, 48)
         Me.txtMin.Name = "txtMin"
-        Me.txtMin.Size = New System.Drawing.Size(181, 20)
+        Me.txtMin.Size = New System.Drawing.Size(188, 20)
         Me.txtMin.TabIndex = 10
         Me.txtMin.Text = "<none>"
         '
@@ -279,7 +286,7 @@ Public Class frmEndpoint
         Me.txtDefaultColor.BackColor = System.Drawing.Color.White
         Me.txtDefaultColor.Location = New System.Drawing.Point(144, 24)
         Me.txtDefaultColor.Name = "txtDefaultColor"
-        Me.txtDefaultColor.Size = New System.Drawing.Size(181, 20)
+        Me.txtDefaultColor.Size = New System.Drawing.Size(188, 20)
         Me.txtDefaultColor.TabIndex = 8
         '
         'lblDefaultColor
@@ -300,7 +307,7 @@ Public Class frmEndpoint
         Me.cboAttribute.Location = New System.Drawing.Point(101, 64)
         Me.cboAttribute.MaxDropDownItems = 20
         Me.cboAttribute.Name = "cboAttribute"
-        Me.cboAttribute.Size = New System.Drawing.Size(236, 21)
+        Me.cboAttribute.Size = New System.Drawing.Size(243, 21)
         Me.cboAttribute.TabIndex = 5
         Me.cboAttribute.Text = "ComboBox1"
         '
@@ -315,7 +322,7 @@ Public Class frmEndpoint
         Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
         Me.grpSeasons.Location = New System.Drawing.Point(12, 262)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(331, 258)
+        Me.grpSeasons.Size = New System.Drawing.Size(338, 258)
         Me.grpSeasons.TabIndex = 17
         Me.grpSeasons.TabStop = False
         Me.grpSeasons.Text = "Include Values for Seasons"
@@ -328,7 +335,7 @@ Public Class frmEndpoint
         Me.cboSeasons.Location = New System.Drawing.Point(6, 24)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(319, 21)
+        Me.cboSeasons.Size = New System.Drawing.Size(326, 21)
         Me.cboSeasons.TabIndex = 18
         '
         'lstSeasons
@@ -340,7 +347,7 @@ Public Class frmEndpoint
         Me.lstSeasons.Location = New System.Drawing.Point(6, 48)
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(319, 175)
+        Me.lstSeasons.Size = New System.Drawing.Size(326, 175)
         Me.lstSeasons.TabIndex = 19
         '
         'btnSeasonsAll
@@ -355,18 +362,51 @@ Public Class frmEndpoint
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(262, 229)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(269, 229)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
         Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsNone.TabIndex = 21
         Me.btnSeasonsNone.Text = "None"
         '
+        'lblOperation
+        '
+        Me.lblOperation.AutoSize = True
+        Me.lblOperation.BackColor = System.Drawing.Color.Transparent
+        Me.lblOperation.Location = New System.Drawing.Point(27, 9)
+        Me.lblOperation.Name = "lblOperation"
+        Me.lblOperation.Size = New System.Drawing.Size(56, 13)
+        Me.lblOperation.TabIndex = 5
+        Me.lblOperation.Text = "Operation:"
+        Me.lblOperation.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtOperation
+        '
+        Me.txtOperation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtOperation.Enabled = False
+        Me.txtOperation.Location = New System.Drawing.Point(89, 6)
+        Me.txtOperation.Name = "txtOperation"
+        Me.txtOperation.Size = New System.Drawing.Size(243, 20)
+        Me.txtOperation.TabIndex = 6
+        '
+        'panelOperation
+        '
+        Me.panelOperation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.panelOperation.Controls.Add(Me.txtOperation)
+        Me.panelOperation.Controls.Add(Me.lblOperation)
+        Me.panelOperation.Location = New System.Drawing.Point(12, 60)
+        Me.panelOperation.Name = "panelOperation"
+        Me.panelOperation.Size = New System.Drawing.Size(338, 30)
+        Me.panelOperation.TabIndex = 24
+        Me.panelOperation.Visible = False
+        '
         'frmEndpoint
         '
-        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(355, 562)
+        Me.ClientSize = New System.Drawing.Size(362, 562)
+        Me.Controls.Add(Me.panelOperation)
+        Me.Controls.Add(Me.lblAttribute)
         Me.Controls.Add(Me.grpSeasons)
         Me.Controls.Add(Me.cboAttribute)
         Me.Controls.Add(Me.GroupBox1)
@@ -375,7 +415,6 @@ Public Class frmEndpoint
         Me.Controls.Add(Me.txtData)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOk)
-        Me.Controls.Add(Me.lblAttribute)
         Me.Controls.Add(Me.lblData)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
@@ -384,6 +423,8 @@ Public Class frmEndpoint
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.grpSeasons.ResumeLayout(False)
+        Me.panelOperation.ResumeLayout(False)
+        Me.panelOperation.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -399,24 +440,29 @@ Public Class frmEndpoint
         End If
         If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
-        For Each lAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-            If lAttribute.TypeString.ToLower.Equals("double") AndAlso atcDataAttributes.IsSimple(lAttribute) Then
-                cboAttribute.Items.Add(lAttribute.Name)
-            End If
-        Next
+        If Not Double.IsNaN(pVariation.CurrentValue) Then
+            panelOperation.Visible = True
+            grpSeasons.Visible = False
+        Else
+            For Each lAttribute As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+                If lAttribute.TypeString.ToLower.Equals("double") AndAlso atcDataAttributes.IsSimple(lAttribute) Then
+                    cboAttribute.Items.Add(lAttribute.Name)
+                End If
+            Next
 
-        cboSeasons.Items.Add(AllSeasons)
-        pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
-        For Each lSeasonType As Type In pSeasonsAvailable
-            Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
-            Select Case lSeasonTypeShortName 'TODO: handle difficult seasons
-                Case "Calendar Year"
-                Case "Water Year"
-                Case "Year Subset"
-                Case Else
-                    cboSeasons.Items.Add(lSeasonTypeShortName)
-            End Select
-        Next
+            cboSeasons.Items.Add(AllSeasons)
+            pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
+            For Each lSeasonType As Type In pSeasonsAvailable
+                Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
+                Select Case lSeasonTypeShortName 'TODO: handle difficult seasons
+                    Case "Calendar Year"
+                    Case "Water Year"
+                    Case "Year Subset"
+                    Case Else
+                        cboSeasons.Items.Add(lSeasonTypeShortName)
+                End Select
+            Next
+        End If
 
         FormFromVariation()
 
@@ -601,6 +647,7 @@ Public Class frmEndpoint
     Private Sub FormFromVariation()
         With pVariation
             txtName.Text = .Name
+            txtOperation.Text = .Operation
             cboAttribute.Text = .Operation
             If Double.IsNaN(.Min) Then
                 txtMin.Text = pNotNumberString
@@ -622,14 +669,16 @@ Public Class frmEndpoint
             txtDefaultColor.Text = .ColorDefault.Name
 
             UpdateDataText(txtData, pVariation.DataSets)
-            If .Seasons Is Nothing Then
-                cboSeasons.SelectedIndex = 0
-            Else
-                pSettingFormSeason = True
-                cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
-                pSeasons = .Seasons
-                RefreshSeasonsList()
-                pSettingFormSeason = False
+            If Double.IsNaN(.CurrentValue) Then
+                If .Seasons Is Nothing Then
+                    cboSeasons.SelectedIndex = 0
+                Else
+                    pSettingFormSeason = True
+                    cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
+                    pSeasons = .Seasons
+                    RefreshSeasonsList()
+                    pSettingFormSeason = False
+                End If
             End If
         End With
     End Sub

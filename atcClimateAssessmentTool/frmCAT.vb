@@ -741,26 +741,28 @@ Public Class frmCAT
             .FixedColumns = 1
             .Columns = 1
             .CellValue(0, 0) = "Run"
-            .CellColor(0, 0) = Drawing.SystemColors.Control
             .ColorCells = True
 
             For Each lEndpoint In pEndpoints
-                .Columns += lEndpoint.DataSets.Count
+                If Not Double.IsNaN(lEndpoint.CurrentValue) Then
+                    .Columns += 1
+                Else
+                    .Columns += lEndpoint.DataSets.Count
+                End If
             Next
 
             .Rows = 5
             lColumn = 1
 
+            For lRow = 0 To .FixedRows - 1
+                .CellColor(lRow, 0) = Drawing.SystemColors.Control
+            Next
+
             For Each lEndpoint In pEndpoints
-                If lEndpoint.DataSets.Count > 1 Then
-                    .Columns += lEndpoint.DataSets.Count - 1
-                End If
-                For Each lDataset As atcDataSet In lEndpoint.DataSets
+                If Not Double.IsNaN(lEndpoint.CurrentValue) Then
                     .CellValue(0, lColumn) = lEndpoint.Name
-                    If Not lEndpoint.Operation Is Nothing Then
-                        .CellValue(1, lColumn) = lEndpoint.Operation
-                    End If
-                    .CellValue(2, lColumn) = lDataset.ToString
+                    .CellValue(1, lColumn) = lEndpoint.Operation
+                    .CellValue(2, lColumn) = "Current Value"
                     If Not lEndpoint.Seasons Is Nothing Then
                         .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
                     End If
@@ -768,7 +770,22 @@ Public Class frmCAT
                         .CellColor(lRow, lColumn) = Drawing.SystemColors.Control
                     Next
                     lColumn += 1
-                Next
+                Else
+                    For Each lDataset As atcDataSet In lEndpoint.DataSets
+                        .CellValue(0, lColumn) = lEndpoint.Name
+                        If Not lEndpoint.Operation Is Nothing Then
+                            .CellValue(1, lColumn) = lEndpoint.Operation
+                        End If
+                        .CellValue(2, lColumn) = lDataset.ToString
+                        If Not lEndpoint.Seasons Is Nothing Then
+                            .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
+                        End If
+                        For lRow = 0 To .FixedRows - 1
+                            .CellColor(lRow, lColumn) = Drawing.SystemColors.Control
+                        Next
+                        lColumn += 1
+                    Next
+                End If
             Next
         End With
 
@@ -866,7 +883,10 @@ Public Class frmCAT
             Dim lRow As Integer = aIteration + .FixedRows
             Dim lColumn As Integer = .FixedColumns
             Dim lEndpoint As Variation
+
             .CellValue(lRow, 0) = aIteration + 1
+            .CellColor(lRow, 0) = Drawing.SystemColors.Control
+
             For Each lEndpoint In pEndpoints
                 If Not Double.IsNaN(lEndpoint.CurrentValue) Then 'This is an input, display current value
                     .CellValue(lRow, lColumn) = Format(lEndpoint.CurrentValue, "0.####")
@@ -1229,7 +1249,9 @@ Public Class frmCAT
             RefreshInputList()
             RefreshTotalIterations()
 
-            pEndpoints.Add(lVariation.Clone)
+            'Dim lEndpoint As Variation = lVariation.Clone
+            'lEndpoint.Operation = "Current Value"
+            pEndpoints.Add(lVariation)
             RefreshEndpointList()
         End If
     End Sub
