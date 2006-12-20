@@ -137,14 +137,17 @@ Public Class Variation
 
             If PETdata.Count > lDataSetIndex Then
                 Dim lOldPET As atcDataSet = PETdata(lDataSetIndex)
-                lModifiedTS = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
-                With lModifiedTS.Attributes
+                Dim lNewPET As atcDataSet = atcMetCmp.CmpHamX(lModifiedTS, Nothing, pDegF, pLatDeg, pCTS)
+                If lOldPET.Attributes.GetValue("tu") < 4 Then
+                    lNewPET = atcMetCmp.DisSolPet(lNewPET, Nothing, 2, pLatDeg)
+                End If
+                With lNewPET.Attributes
                     .SetValue("Location", lOldPET.Attributes.GetValue("Location"))
                     .SetValue("Constituent", lOldPET.Attributes.GetValue("Constituent"))
                     .SetValue("History 1", lOldPET.Attributes.GetValue("History 1").ToString)
                     .SetValue("Id", lOldPET.Attributes.GetValue("Id"))
                 End With
-                lModifiedGroup.Add(lModifiedTS)
+                lModifiedGroup.Add(lNewPET)
             End If
             lDataSetIndex += 1
         Next

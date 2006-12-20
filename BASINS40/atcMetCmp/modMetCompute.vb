@@ -222,8 +222,21 @@ Public Module modMetCompute
 
     End Function
 
-    Public Function CmpHamX(ByVal aTIntrvl As atcTimeseries, ByVal aSource As atcDataSource, ByVal aDegF As Boolean, ByVal aLatDeg As Double, ByVal aCTS() As Double) As atcTimeseries
-        'compute HAMON - PET from less than daily air temperature timeseries
+    ''' <summary>
+    ''' Compute HAMON PET from less than daily air temperature timeseries
+    ''' </summary>
+    ''' <param name="aTemperature"></param>
+    ''' <param name="aSource"></param>
+    ''' <param name="aDegF"></param>
+    ''' <param name="aLatDeg"></param>
+    ''' <param name="aCTS"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function CmpHamX(ByVal aTemperature As atcTimeseries, _
+                            ByVal aSource As atcDataSource, _
+                            ByVal aDegF As Boolean, _
+                            ByVal aLatDeg As Double, _
+                            ByVal aCTS() As Double) As atcTimeseries
         Dim lMin As Double = 1.0E+30, lMax As Double = -1.0E+30
         Dim lValue As Double, lDate As Double, lDateYesterday As Integer = 0
         Dim lIndex As Integer
@@ -231,8 +244,8 @@ Public Module modMetCompute
         Dim lMaxValues As New ArrayList
         Dim lDates As New ArrayList
 
-        For lIndex = 1 To aTIntrvl.numValues
-            lDate = aTIntrvl.Dates.Value(lIndex)
+        For lIndex = 1 To aTemperature.numValues
+            lDate = aTemperature.Dates.Value(lIndex)
             If lDateYesterday = 0 Then
                 lDateYesterday = CInt(lDate)
             ElseIf CInt(lDate) <> lDateYesterday Then
@@ -243,7 +256,7 @@ Public Module modMetCompute
                 lMin = 1.0E+30
                 lMax = -1.0E+30
             End If
-            lValue = aTIntrvl.Value(lIndex)
+            lValue = aTemperature.Value(lIndex)
             If lValue < lMin Then
                 lMin = lValue
             End If
@@ -573,12 +586,16 @@ Public Module modMetCompute
 
     End Function
 
+    ''' <summary>
+    ''' Disaggregate daily SOLAR or PET to hourly
+    ''' </summary>
+    ''' <param name="aInTs">input timeseries to be disaggregated</param>
+    ''' <param name="aDataSource"></param>
+    ''' <param name="aDisOpt">1 does Solar, DisOpt = 2 does PET</param>
+    ''' <param name="aLatDeg">latitude, in degrees</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Function DisSolPet(ByVal aInTs As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aDisOpt As Integer, ByVal aLatDeg As Double) As atcTimeseries
-        'disaggregate daily SOLAR or PET to hourly
-        'aInTs   - input timeseries to be disaggregated
-        'aDisOpt = 1 does Solar, DisOpt = 2 does PET
-        'aLatDeg - latitude, in degrees
-
         Dim lHrPos, i, j, retcod As Integer
         Dim lDate(5) As Integer
         Dim lDisTs As New atcTimeseries(aDataSource)
