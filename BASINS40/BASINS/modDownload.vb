@@ -24,9 +24,7 @@ Module modDownload
         Dim lNoData As Boolean = False
         Dim lDefDirName As String
         Dim lNewDataDir As String
-        Dim lSuffix As Integer
         Dim lMyProjection As String
-        Dim lSaveDialog As Windows.Forms.SaveFileDialog
 
 StartOver:
         lDataPath = g_BasinsDrives.Chars(0) & ":\Basins\data\"
@@ -49,39 +47,17 @@ StartOver:
                 lDefDirName = "Multiple"
         End Select
 
-        If FileExists(lDataPath & lDefDirName, True) Then 'Find a suffix that will make name unique
-            lSuffix = 0
-            Do
-                lSuffix += 1
-            Loop While FileExists(lDataPath & lDefDirName & "-" & lSuffix, True)
-            lDefDirName = lDefDirName & "-" & lSuffix
-        End If
-
-        lDefaultProjectFileName = lDataPath & lDefDirName & "\" & lDefDirName & ".mwprj"
+        lDefaultProjectFileName = CreateDefaultNewProjectFileName(lDataPath, lDefDirName)
         lDefDirName = PathNameOnly(lDefaultProjectFileName)
         Logger.Dbg("CreateNewProjectDirectory:" & lDefDirName)
         System.IO.Directory.CreateDirectory(lDefDirName)
 
-        lSaveDialog = New Windows.Forms.SaveFileDialog
-        lSaveDialog.Title = "Save new project as..."
-        lSaveDialog.CheckPathExists = False
-        lSaveDialog.FileName = lDefaultProjectFileName
-        If lSaveDialog.ShowDialog() <> Windows.Forms.DialogResult.OK Then
-            lSaveDialog.FileName = "\"
-            lSaveDialog.Dispose()
-            System.IO.Directory.Delete(PathNameOnly(lDefaultProjectFileName), False) 'Cancelled save dialog
-            Logger.Dbg("CreateNewProject:CANCELLED")
+        lProjectFileName = PromptForNewProjectFileName(lDefDirName, lDefaultProjectFileName)
+        lNewDataDir = PathNameOnly(lProjectFileName) & "\"
+
+        If lProjectFileName.Length = 0 Then
             Return ""
         Else
-            lProjectFileName = lSaveDialog.FileName
-            lNewDataDir = PathNameOnly(lProjectFileName) & "\"
-            Logger.Dbg("CreateNewProjectDir:" & lNewDataDir)
-            Logger.Dbg("CreateNewProjectName:" & lProjectFileName)
-
-            'Make sure lSaveDialog is not holding a reference to the file so we can delete the dir if needed
-            lSaveDialog.FileName = "\"
-            lSaveDialog.Dispose()
-
             'If the user did not choose the default folder or a subfolder of it
             If Not lNewDataDir.ToLower.StartsWith(lDefDirName.ToLower) Then
                 'Remove speculatively created folder since they chose something else
@@ -487,6 +463,53 @@ StartOver:
             aProjString = "<none>"
         End If
         CleanUpUserProjString = aProjString
+    End Function
+
+    Public Function CreateDefaultNewProjectFileName(ByVal aDataPath As String, ByVal aDefDirName As String) As String
+        Dim lSuffix As Integer
+        If FileExists(aDataPath & aDefDirName, True) Then 'Find a suffix that will make name unique
+            lSuffix = 0
+            Do
+                lSuffix += 1
+            Loop While FileExists(aDataPath & aDefDirName & "-" & lSuffix, True)
+            aDefDirName = aDefDirName & "-" & lSuffix
+        End If
+        CreateDefaultNewProjectFileName = aDataPath & aDefDirName & "\" & aDefDirName & ".mwprj"
+
+    End Function
+
+    Public Function PromptForNewProjectFileName(ByVal aDefDirName As String, ByVal aDefaultProjectFileName As String) As String
+        'prompt user for new name
+        Dim lSaveDialog As Windows.Forms.SaveFileDialog
+        lSaveDialog = New Windows.Forms.SaveFileDialog
+        lSaveDialog.Title = "Save new project as..."
+        lSaveDialog.CheckPathExists = False
+        lSaveDialog.FileName = aDefaultProjectFileName
+        If lSaveDialog.ShowDialog() <> Windows.Forms.DialogResult.OK Then
+            lSaveDialog.FileName = "\"
+            lSaveDialog.Dispose()
+            System.IO.Directory.Delete(PathNameOnly(aDefaultProjectFileName), False) 'Cancelled save dialog
+            Logger.Dbg("CreateNewProject:CANCELLED")
+            PromptForNewProjectFileName = ""
+        Else
+            PromptForNewProjectFileName = lSaveDialog.FileName
+            Dim lNewDataDir As String = PathNameOnly(PromptForNewProjectFileName) & "\"
+            Logger.Dbg("CreateNewProjectDir:" & lNewDataDir)
+            Logger.Dbg("CreateNewProjectName:" & PromptForNewProjectFileName)
+            'Make sure lSaveDialog is not holding a reference to the file so we can delete the dir if needed
+            lSaveDialog.FileName = "\"
+            lSaveDialog.Dispose()
+            'If the user did not choose the default folder or a subfolder of it
+            If Not lNewDataDir.ToLower.StartsWith(aDefDirName.ToLower) Then
+                'Remove speculatively created folder since they chose something else
+                Try
+                    System.IO.Directory.Delete(aDefDirName, False) 'Cancelled save dialog or changed directory
+                    Logger.Dbg("RemoveSpeculativeProjectDir:" & aDefDirName)
+                Catch ex As Exception
+                    Logger.Dbg("CreateNewProjectAndDownloadCoreDataInteractive: Could not delete " & aDefDirName & vbCr & ex.Message)
+                End Try
+            End If
+        End If
     End Function
 
     Private Sub ShapeUtilMerge(ByVal aCurFilename As String, ByVal aOutputFilename As String, ByVal aProjectionFilename As String)

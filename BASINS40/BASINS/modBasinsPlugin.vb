@@ -190,8 +190,11 @@ Friend Module modBasinsPlugin
     Friend Sub BASINSNewMenu()
         'take appropriate actions if the user selects the 'New' menu
         'with a BASINS project open, or just a MapWindow project open
+
         GisUtil.MappingObject = g_MapWin
         Dim lResponse As Microsoft.VisualBasic.MsgBoxResult
+        Dim lInputProjection As String = ""
+
         If IsBASINSProject() Then
             'if currently coming from a BASINS project,
             'ask if the user wants to subset this project
@@ -202,8 +205,81 @@ Friend Module modBasinsPlugin
                 LoadNationalProject()
             ElseIf lResponse = MsgBoxResult.Yes Then
                 'are any features selected?
-                Logger.Msg("'Create BASINS Project From Selected Features' Not Yet Implemented")
+                If GisUtil.NumSelectedFeatures(GisUtil.CurrentLayer) > 0 Then
+                    'is this a polygon shapefile?
+                    If GisUtil.LayerType(GisUtil.CurrentLayer) = 3 Then
+                        'this is a polygon shapefile
+
+                        'build collection of selected shapes
+                        Dim lSelectedLayer As Integer = GisUtil.CurrentLayer
+                        Dim lSelectedShapeIndexes As New Collection
+                        For i As Integer = 1 To GisUtil.NumSelectedFeatures(lSelectedLayer)
+                            lSelectedShapeIndexes.Add(GisUtil.IndexOfNthSelectedFeatureInLayer(i - 1, lSelectedLayer))
+                        Next
+
+                        'come up with a suggested name for the new project
+                        Dim lDataPath As String = g_BasinsDrives.Chars(0) & ":\Basins\data\"
+                        Dim lDefDirName As String = FilenameOnly(GisUtil.ProjectFileName)
+                        Dim lDefaultProjectFileName As String = CreateDefaultNewProjectFileName(lDataPath, lDefDirName)
+                        lDefDirName = PathNameOnly(lDefaultProjectFileName)
+                        Logger.Dbg("CreateNewProjectDirectory:" & lDefDirName)
+                        System.IO.Directory.CreateDirectory(lDefDirName)
+
+                        'prompt user for new name
+                        Dim lProjectFileName As String = PromptForNewProjectFileName(lDefDirName, lDefaultProjectFileName)
+                        Dim lNewDataDir As String = PathNameOnly(lProjectFileName) & "\"
+
+                        If lProjectFileName.Length > 0 Then
+
+                            'Check to see if chosen data dir already contains any files
+                            Dim lNumFiles As Long = System.IO.Directory.GetFiles(lNewDataDir).LongLength
+                            Dim lNumDirs As Long = System.IO.Directory.GetDirectories(lNewDataDir).LongLength
+                            If lNumFiles + lNumDirs > 0 Then
+                                Logger.Msg("The folder '" & lNewDataDir & "'" & vbCr _
+                                       & "already contains " & lNumFiles & " files and " & lNumDirs & " folders." & vbCr _
+                                       & "The folder must be empty before a new project can be created here.", "BASINS Build New")
+                            Else
+                                'got a good name for the new project
+
+                                'copy all files from the old project directory to the new one
+                                Dim lTarget As String
+                                Dim lDirs As String() = System.IO.Directory.GetDirectories(PathNameOnly(GisUtil.ProjectFileName))
+                                For Each lDirName As String In lDirs
+                                    'make this dir
+                                    lTarget = lNewDataDir & Mid(lDirName, Len(PathNameOnly(GisUtil.ProjectFileName)) + 2)
+                                    System.IO.Directory.CreateDirectory(lTarget)
+                                Next
+                                Dim lFilenames As NameValueCollection
+                                lFilenames = New NameValueCollection
+                                AddFilesInDir(lFilenames, PathNameOnly(GisUtil.ProjectFileName), True)
+                                For Each lFilename As String In lFilenames
+                                    If Not FileExt(lFilename) = "mwprj" Then
+                                        lTarget = lNewDataDir & Mid(lFilename, Len(PathNameOnly(GisUtil.ProjectFileName)) + 2)
+                                        IO.File.Copy(lFilename, lTarget)
+                                    End If
+                                Next
+
+                                'copy the mapwindow project file
+                                IO.File.Copy(GisUtil.ProjectFileName, lProjectFileName)
+                                'open the new mapwindow project file
+                                g_MapWin.Project.Load(lProjectFileName)
+                                If Not (g_MapWin.Project.Save(lProjectFileName)) Then
+                                    Logger.Dbg("BASINSNewMenu:Save2Failed:" & g_MapWin.LastError)
+                                End If
+
+                                'remove features that are not in selected area
+                                'RemoveFeaturesBeyondExtent(lSelectedLayer, lSelectedShapeIndexes)
+
+                            End If
+                        End If
+                    Else
+                        Logger.Msg("The selected map feature must be a polygon shapefile to use this option.", "Create BASINS Project Problem")
+                    End If
+                Else
+                    Logger.Msg("One or more map features must be selected to use this option.", "Create BASINS Project Problem")
+                End If
             End If
+
         Else
             'if not coming from a BASINS project,
             'ask if user wants to make this into a BASINS
@@ -221,7 +297,6 @@ Friend Module modBasinsPlugin
                     Else
                         'set up temporary extents shapefile
                         Dim lProjectDir As String = PathNameOnly(GisUtil.ProjectFileName)
-                        Dim lInputProjection As String = ""
                         Dim lTitle As String = ""
                         MkDirPath(lProjectDir & "\temp")
                         Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
@@ -249,6 +324,8 @@ Friend Module modBasinsPlugin
                             GisUtil.CreateShapefileOfCurrentMapExtents(lNewShapeName)
                             lTitle = "MapWindow Project Extents"
                         End If
+
+                        'make sure projection is defined
                         If Len(lInputProjection) = 0 Or (lInputProjection Is Nothing) Then
                             'dont have a projection yet, try to use the project's projection
                             lInputProjection = g_MapWin.Project.ProjectProjection
@@ -264,6 +341,7 @@ Friend Module modBasinsPlugin
                             'still don't have an projection for this mapwindow project, prompt for it
                             lInputProjection = atcProjector.Methods.AskUser
                         End If
+
                         If lInputProjection.Length > 0 Then
                             'make prj.proj if it doesn't exist
                             If Not FileExists(lProjectDir & "\prj.proj") Then
@@ -280,11 +358,11 @@ Friend Module modBasinsPlugin
                                 End If
                                 lExtentsSf.Close()
                             End If
+
                             'remember the name of this mapwindow project to go back to later
                             pExistingMapWindowProjectName = g_MapWin.Project.FileName
                             'now open national project with temp shapefile on the map
                             LoadNationalProject()
-                            'GisUtil.AddLayer(lNewShapeName, "MapWindow Project Extents")
                             'set symbology for this layer
                             lExtentsSf.Open(lNewShapeName)
                             g_MapWin.Layers.Add(lExtentsSf, lTitle)
@@ -310,6 +388,7 @@ Friend Module modBasinsPlugin
                                 GisUtil.SetSelectedFeature(lCatLayerIndex, GisUtil.PointInPolygonXY(lPtX, lPtY, lCatLayerIndex))
                             Next j
                             UpdateSelectedFeatures()
+
                         End If
                     End If
                 End If
@@ -319,7 +398,6 @@ Friend Module modBasinsPlugin
             End If
         End If
     End Sub
-
 
     ''' <summary>
     ''' 
@@ -414,6 +492,58 @@ Friend Module modBasinsPlugin
         Next
         Return lRetval
     End Function
+
+    Private Sub RemoveFeaturesBeyondExtent(ByVal aSelectedLayer As Integer, ByVal aSelectedShapeIndexes As Collection)
+        'remove features that are not with selected indexes of selected layer
+        Dim lKeep As Boolean
+        Dim i As Integer
+        Dim j As Integer
+
+        For iLayer As Integer = 0 To GisUtil.NumLayers - 1
+            If iLayer <> aSelectedLayer Then
+
+                Dim lLayerType As Integer = GisUtil.LayerType(iLayer)
+                If lLayerType = 1 Or lLayerType = 2 Or lLayerType = 3 Then
+                    'point, line, or polygon
+                    GisUtil.StartRemoveFeature(iLayer)
+                    i = 0
+                    Do While i < GisUtil.NumFeatures(iLayer)
+                        lKeep = False
+                        For j = 1 To aSelectedShapeIndexes.Count
+                            If lLayerType = 1 Then
+                                If GisUtil.PointInPolygon(iLayer, i + 1, aSelectedLayer) = aSelectedShapeIndexes(j) Then
+                                    lKeep = True
+                                    Exit For
+                                End If
+                            ElseIf lLayerType = 2 Then
+                                If GisUtil.LineInPolygon(iLayer, i + 1, aSelectedLayer, aSelectedShapeIndexes(j)) Then
+                                    lKeep = True
+                                    Exit For
+                                End If
+                            ElseIf lLayerType = 3 Then
+                                If GisUtil.OverlappingPolygons(iLayer, i, aSelectedLayer, aSelectedShapeIndexes(j)) Then
+                                    lKeep = True
+                                    Exit For
+                                End If
+                            End If
+                        Next j
+                        If lKeep = False Then
+                            If GisUtil.NumFeatures(iLayer) > 1 Then 'dont remove last one
+                                GisUtil.RemoveFeatureNoStartStop(iLayer, i)
+                            End If
+                        Else
+                            i = i + 1
+                        End If
+                    Loop
+                    GisUtil.StopRemoveFeature(iLayer)
+
+                ElseIf GisUtil.LayerType(iLayer) = 4 Then
+                    'grid, need to clip to extents
+
+                End If
+            End If
+        Next iLayer
+    End Sub
 
     ''' <summary>
     ''' 
