@@ -781,6 +781,10 @@ Public Class frmCAT
 
         myTabs.SelectedIndex = pResultsTabIndex
 
+        'don't let winhspflt bring up message boxes
+        Dim lBaseFolder As String = PathNameOnly(AbsolutePath(txtBaseScenario.Text, CurDir))
+        SaveFileString(lBaseFolder & "\WinHSPFLtError.Log", "WinHSPFMessagesFollow:" & vbCrLf)
+
         Run(txtModifiedScenarioName.Text, _
             lSelectedVariations, _
             txtBaseScenario.Text, _
