@@ -3,10 +3,14 @@ Imports MapWinUtility
 
 Public Class Variation
 
-    'Parameters for Hammond - TODO: don't hard code these
+    'Parameters for Hammon - TODO: don't hard code these
     Private pDegF As Boolean = True
     Private pLatDeg As Double = 39
-    Private pCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
+    'WestBranch of Patux
+    'Private pCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
+    'Monocacy - CBP
+    Private pCTS() As Double = {0, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057, _
+                                   0.0057, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057}
 
     Private pName As String = "<untitled>"
     Private pDataSets As atcDataGroup
