@@ -653,21 +653,20 @@ Public Class frmCAT
 
     'all the variations listed in the Input tab
     Private pInputs As atcCollection
-    Private pInputFiles As atcCollection
 
     'all the endpoints listed in the Endpoints tab
     Private pEndpoints As atcCollection
 
-    Private pUciFile As String = ""
+    Private pLastUpDownClick As Date = Date.Now
+    Private pUpDownButtonDoubleClickSeconds As Double = 0.3
 
-    Private InputArgumentPrefix As String = "Current Modifier for "
-    Private ResultsTabIndex As Integer = 2
-    Private TotalIterations As Integer = 0
-    Private TimePerRun As Double = 0 'Time each run takes in seconds
+    Private pResultsTabIndex As Integer = 2
+    Private pTotalIterations As Integer = 0
+    Private pTimePerRun As Double = 0 'Time each run takes in seconds
 
     Public Sub Initialize(ByRef aPlugin As atcClimateAssessmentToolPlugin)
         mnuPivotHeaders.Checked = GetSetting("BasinsCAT", "Settings", "PivotHeaders", "Yes").Equals("Yes")
-        TimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
+        pTimePerRun = CDbl(GetSetting("BasinsCAT", "Settings", "TimePerRun", "0"))
         pInputs = New atcCollection
         pEndpoints = New atcCollection
         Me.Show()
@@ -780,14 +779,14 @@ Public Class frmCAT
         agdResults.Initialize(agdResults.Source)
         agdResults.Refresh()
 
-        myTabs.SelectedIndex = ResultsTabIndex
+        myTabs.SelectedIndex = pResultsTabIndex
 
         Run(txtModifiedScenarioName.Text, _
             lSelectedVariations, _
             txtBaseScenario.Text, _
             lRuns, 0, Nothing)
 
-        SaveSetting("BasinsCAT", "Settings", "TimePerRun", TimePerRun)
+        SaveSetting("BasinsCAT", "Settings", "TimePerRun", pTimePerRun)
 
         PopulatePivotCombos()
         UpdateStatusLabel("Finished with " & lRuns & " runs")
@@ -812,13 +811,13 @@ Public Class frmCAT
             If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
                 UpdateStatusLabel(aIteration)
                 If chkSaveAll.Checked Then aModifiedScenarioName &= "-" & aIteration + 1
-                TimePerRun = Now.ToOADate
+                pTimePerRun = Now.ToOADate
                 Dim lResults As atcCollection = ScenarioRun(aBaseFileName, aModifiedScenarioName, aModifiedData, chkShowEachRunProgress.Checked)
                 If lResults Is Nothing Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
                     Exit Sub
                 End If
-                TimePerRun = (Now.ToOADate - TimePerRun) * 24 * 60 * 60 'Convert days to seconds
+                pTimePerRun = (Now.ToOADate - pTimePerRun) * 24 * 60 * 60 'Convert days to seconds
 
                 UpdateResults(aIteration, lResults, PathNameOnly(aBaseFileName) & "\" & aModifiedScenarioName & ".results.txt")
 
@@ -1085,7 +1084,7 @@ Public Class frmCAT
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 If FileExists(.FileName) Then 'read file into grid
                     PopulateResultsGrid(WholeFileString(.FileName))
-                    myTabs.SelectedIndex = ResultsTabIndex
+                    myTabs.SelectedIndex = pResultsTabIndex
                     SaveSetting("BasinsCAT", "Settings", "LastResults", .FileName)
                 End If
             End If
@@ -1099,7 +1098,7 @@ Public Class frmCAT
         Else
             Logger.Msg("No text on clipboard to paste into grid", "Paste")
         End If
-        myTabs.SelectedIndex = ResultsTabIndex
+        myTabs.SelectedIndex = pResultsTabIndex
     End Sub
 
     Private Sub frmCAT_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
@@ -1188,9 +1187,9 @@ Public Class frmCAT
     End Sub
 
     Private Sub UpdateStatusLabel(ByVal aIteration As Integer)
-        Dim lLabelText As String = "Running # " & aIteration + 1 & " of " & TotalIterations
-        If TimePerRun > 0 Then
-            lLabelText &= " (" & FormatTime(TimePerRun * (TotalIterations - aIteration)) & " remaining)"
+        Dim lLabelText As String = "Running # " & aIteration + 1 & " of " & pTotalIterations
+        If pTimePerRun > 0 Then
+            lLabelText &= " (" & FormatTime(pTimePerRun * (pTotalIterations - aIteration)) & " remaining)"
         End If
         UpdateStatusLabel(lLabelText)
     End Sub
@@ -1294,50 +1293,46 @@ Public Class frmCAT
         RefreshTotalIterations()
     End Sub
 
-    Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aMoveTo As Integer)
+    Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aDirection As Integer)
         Dim lMoveFrom As Integer = aList.SelectedIndex
-        If lMoveFrom >= 0 AndAlso aMoveTo >= 0 AndAlso lMoveFrom < aGroup.Count AndAlso aMoveTo < aGroup.Count Then
+        Dim lMoveTo As Integer = lMoveFrom + aDirection
+
+        Dim lNow As Date = Date.Now
+        If lNow.Subtract(pLastUpDownClick).TotalSeconds < pUpDownButtonDoubleClickSeconds Then
+            If aDirection < 0 Then
+                lMoveTo = 0
+            Else
+                lMoveTo = aGroup.Count - 1
+            End If
+        End If
+        pLastUpDownClick = lNow
+
+        If lMoveFrom >= 0 AndAlso lMoveTo >= 0 AndAlso lMoveFrom < aGroup.Count AndAlso lMoveTo < aGroup.Count Then
             Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
             Dim lMoveMe As Variation = aGroup.ItemByIndex(lMoveFrom)
             aGroup.RemoveAt(lMoveFrom)
             aList.Items.RemoveAt(lMoveFrom)
-            aGroup.Insert(aMoveTo, lMoveMe)
-            aList.Items.Insert(aMoveTo, lMoveMe.ToString)
-            If lWasChecked Then aList.SetItemChecked(aMoveTo, True)
-            aList.SelectedIndex = aMoveTo
+            aGroup.Insert(lMoveTo, lMoveMe)
+            aList.Items.Insert(lMoveTo, lMoveMe.ToString)
+            If lWasChecked Then aList.SetItemChecked(lMoveTo, True)
+            aList.SelectedIndex = lMoveTo
         End If
     End Sub
 
     Private Sub btnInputUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputUp.Click
-        MoveItem(pInputs, lstInputs, lstInputs.SelectedIndex - 1)
-    End Sub
-
-    Private Sub btnInputUp_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputUp.DoubleClick
-        MoveItem(pInputs, lstInputs, 0)
+        MoveItem(pInputs, lstInputs, -1)
     End Sub
 
     Private Sub btnInputDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputDown.Click
-        MoveItem(pInputs, lstInputs, lstInputs.SelectedIndex + 1)
-    End Sub
-
-    Private Sub btnInputDown_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputDown.DoubleClick
-        MoveItem(pInputs, lstInputs, lstInputs.Items.Count - 1)
+        MoveItem(pInputs, lstInputs, 1)
     End Sub
 
     Private Sub btnEndpointUp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointUp.Click
-        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.SelectedIndex - 1)
-    End Sub
-
-    Private Sub btnEndpointUp_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointUp.DoubleClick
-        MoveItem(pEndpoints, lstEndpoints, 0)
+        MoveItem(pEndpoints, lstEndpoints, -1)
     End Sub
 
     Private Sub btnEndpointDown_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointDown.Click
-        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.SelectedIndex + 1)
-    End Sub
-
-    Private Sub btnEndpointDown_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointDown.DoubleClick
-        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.Items.Count - 1)
+        MoveItem(pEndpoints, lstEndpoints, 1)        
     End Sub
 
     Private Sub btnEndpointAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointAdd.Click
@@ -1360,17 +1355,17 @@ Public Class frmCAT
 
     Private Sub RefreshTotalIterations()
         Dim lLabelText As String
-        TotalIterations = 1
+        pTotalIterations = 1
 
         For Each lVariation As Variation In pInputs
             If lVariation.Selected Then
-                TotalIterations *= lVariation.Iterations
+                pTotalIterations *= lVariation.Iterations
             End If
         Next
 
-        lLabelText = "Total iterations selected = " & TotalIterations
-        If TimePerRun > 0 Then
-            lLabelText &= " (" & FormatTime(TimePerRun * TotalIterations) & ")"
+        lLabelText = "Total iterations selected = " & pTotalIterations
+        If pTimePerRun > 0 Then
+            lLabelText &= " (" & FormatTime(pTimePerRun * pTotalIterations) & ")"
         End If
         UpdateStatusLabel(lLabelText)
 
@@ -1626,12 +1621,11 @@ Public Class frmCAT
         End If
 
         If FileExists(aUCIfilename) Then
-            pUciFile = aUCIfilename
-            txtBaseScenario.Text = pUciFile
-            Dim lUciFolder As String = PathNameOnly(pUciFile)
+            txtBaseScenario.Text = aUCIfilename
+            Dim lUciFolder As String = PathNameOnly(aUCIfilename)
             ChDriveDir(lUciFolder)
 
-            Dim lFullText As String = WholeFileString(pUciFile)
+            Dim lFullText As String = WholeFileString(aUCIfilename)
             For Each lWDMfilename As String In UCIFilesBlockFilenames(lFullText, "WDM")
                 lWDMfilename = AbsolutePath(lWDMfilename, lUciFolder)
                 OpenDataSource(lWDMfilename)
