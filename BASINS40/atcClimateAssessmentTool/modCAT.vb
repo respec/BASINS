@@ -102,9 +102,12 @@ Public Module modCAT
             If aShowProgress Then lPipeHandles = " "
 
             'Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
-            Logger.Dbg("Model execution start")
+
+            AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
+            Dim lArgs As String = lPipeHandles & lNewBaseFilename & "uci"
+            Logger.Dbg("Start " & lWinHspfLtExeName & " with Arguments '" & lArgs & "'")
             Dim newProc As Diagnostics.Process
-            newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lPipeHandles & lNewBaseFilename & "uci")
+            newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
             While Not newProc.HasExited
                 If Not g_running Then newProc.Kill()
                 Windows.Forms.Application.DoEvents()
