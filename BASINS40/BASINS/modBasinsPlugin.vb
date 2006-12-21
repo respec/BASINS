@@ -268,7 +268,7 @@ Friend Module modBasinsPlugin
                                 End If
 
                                 'remove features that are not in selected area
-                                'RemoveFeaturesBeyondExtent(lSelectedLayer, lSelectedShapeIndexes)
+                                RemoveFeaturesBeyondExtent(lSelectedLayer, lSelectedShapeIndexes)
 
                             End If
                         End If
@@ -499,50 +499,78 @@ Friend Module modBasinsPlugin
         Dim i As Integer
         Dim j As Integer
 
+        g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrWait
         For iLayer As Integer = 0 To GisUtil.NumLayers - 1
             If iLayer <> aSelectedLayer Then
+                If FilenameNoPath(GisUtil.LayerFileName(iLayer)) <> "wdm.shp" And FilenameNoPath(GisUtil.LayerFileName(iLayer)) <> "metpt.shp" Then
+                    'don't want to remove met pts
+                    g_MapWin.StatusBar(2).Text = "Filtering " & GisUtil.LayerName(iLayer)
+                    g_MapWin.Refresh()
+                    Dim lLayerType As Integer = GisUtil.LayerType(iLayer)
+                    If lLayerType = 1 Or lLayerType = 2 Or lLayerType = 3 Then
+                        'point, line, or polygon
+                        GisUtil.StartRemoveFeature(iLayer)
+                        i = 0
+                        Do While i < GisUtil.NumFeatures(iLayer)
+                            lKeep = False
+                            For j = 1 To aSelectedShapeIndexes.Count
+                                If lLayerType = 1 Then
+                                    If GisUtil.PointInPolygon(iLayer, i + 1, aSelectedLayer) = aSelectedShapeIndexes(j) Then
+                                        lKeep = True
+                                        Exit For
+                                    End If
+                                ElseIf lLayerType = 2 Then
+                                    If GisUtil.LineInPolygon(iLayer, i + 1, aSelectedLayer, aSelectedShapeIndexes(j)) Then
+                                        lKeep = True
+                                        Exit For
+                                    End If
+                                ElseIf lLayerType = 3 Then
+                                    If GisUtil.OverlappingPolygons(iLayer, i, aSelectedLayer, aSelectedShapeIndexes(j)) Then
+                                        lKeep = True
+                                        Exit For
+                                    End If
+                                End If
+                            Next j
+                            If lKeep = False Then
+                                If GisUtil.NumFeatures(iLayer) > 1 Then 'dont remove last one
+                                    GisUtil.RemoveFeatureNoStartStop(iLayer, i)
+                                Else
+                                    i = i + 1
+                                End If
+                            Else
+                                i = i + 1
+                            End If
+                        Loop
+                        GisUtil.StopRemoveFeature(iLayer)
 
-                Dim lLayerType As Integer = GisUtil.LayerType(iLayer)
-                If lLayerType = 1 Or lLayerType = 2 Or lLayerType = 3 Then
-                    'point, line, or polygon
-                    GisUtil.StartRemoveFeature(iLayer)
-                    i = 0
-                    Do While i < GisUtil.NumFeatures(iLayer)
-                        lKeep = False
-                        For j = 1 To aSelectedShapeIndexes.Count
-                            If lLayerType = 1 Then
-                                If GisUtil.PointInPolygon(iLayer, i + 1, aSelectedLayer) = aSelectedShapeIndexes(j) Then
-                                    lKeep = True
-                                    Exit For
-                                End If
-                            ElseIf lLayerType = 2 Then
-                                If GisUtil.LineInPolygon(iLayer, i + 1, aSelectedLayer, aSelectedShapeIndexes(j)) Then
-                                    lKeep = True
-                                    Exit For
-                                End If
-                            ElseIf lLayerType = 3 Then
-                                If GisUtil.OverlappingPolygons(iLayer, i, aSelectedLayer, aSelectedShapeIndexes(j)) Then
-                                    lKeep = True
-                                    Exit For
-                                End If
+                    ElseIf lLayerType = 4 Then
+                        'grid, need to clip to extents
+                        Dim lExtentShape As MapWinGIS.Shape = Nothing
+                        Dim lResultShape As MapWinGIS.Shape = Nothing
+                        Dim lExtentsSf As New MapWinGIS.Shapefile
+                        Dim lExtentsFileName As String = GisUtil.LayerFileName(aSelectedLayer)
+                        If lExtentsSf.Open(lExtentsFileName) Then
+                            lExtentShape = lExtentsSf.Shape(aSelectedShapeIndexes(1))
+                            For i = 2 To aSelectedShapeIndexes.Count
+                                MapWinGeoProc.SpatialOperations.MergeShapes(lExtentShape, lExtentsSf.Shape(aSelectedShapeIndexes(i)), lResultShape)
+                                lExtentShape = lResultShape
+                            Next
+                            Dim lFileName As String = GisUtil.LayerFileName(iLayer)
+                            Dim lNewGridName As String = PathNameOnly(lFileName) & "\temp" & FilenameNoPath(lFileName)
+                            If Not MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lFileName, lExtentShape, lNewGridName, True) Then
+                                Logger.Dbg("RemoveFeaturesBeyondExtent:ClipGridFailed:" & MapWinGeoProc.Error.GetLastErrorMsg)
                             End If
-                        Next j
-                        If lKeep = False Then
-                            If GisUtil.NumFeatures(iLayer) > 1 Then 'dont remove last one
-                                GisUtil.RemoveFeatureNoStartStop(iLayer, i)
-                            End If
-                        Else
-                            i = i + 1
+                            IO.File.Copy(lNewGridName, lFileName, True)
+                            IO.File.Delete(lNewGridName)
+                            'todo: need to refresh bitmap
                         End If
-                    Loop
-                    GisUtil.StopRemoveFeature(iLayer)
-
-                ElseIf GisUtil.LayerType(iLayer) = 4 Then
-                    'grid, need to clip to extents
-
+                    End If
                 End If
             End If
         Next iLayer
+        g_MapWin.StatusBar(2).Text = ""
+        g_MapWin.Refresh()
+        g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrMapDefault
     End Sub
 
     ''' <summary>
