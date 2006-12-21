@@ -102,6 +102,7 @@ Public Module modCAT
             If aShowProgress Then lPipeHandles = " "
 
             'Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
+            Logger.Dbg("Model execution start")
             Dim newProc As Diagnostics.Process
             newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lPipeHandles & lNewBaseFilename & "uci")
             While Not newProc.HasExited
@@ -110,23 +111,29 @@ Public Module modCAT
                 Threading.Thread.Sleep(50)
             End While
             Logger.Dbg("Model exit code " & newProc.ExitCode)
+            If newProc.ExitCode <> 0 Then
+                Logger.Dbg("****************** Problem *********************")
+            End If
 
-            For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "BINO")
-                lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
+            If g_running Then
+                For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "BINO")
+                    lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
 
-                If lBinOutFilename.IndexOf("base.") < 0 Then
-                    Logger.Message("Binary output file does not contain 'base.' so cannot be used in CAT:" _
-                    & vbCrLf & lBinOutFilename & vbCrLf & "Name of output file must be changed in UCI file:" _
-                    & vbCrLf & aBaseFilename, "File must be renamed", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
-                    g_running = False
-                    Return Nothing
-                End If
+                    'TODO: make base part of base file name?
+                    If lBinOutFilename.IndexOf("base.") < 0 Then
+                        Logger.Message("Binary output file does not contain 'base.' so cannot be used in CAT:" _
+                        & vbCrLf & lBinOutFilename & vbCrLf & "Name of output file must be changed in UCI file:" _
+                        & vbCrLf & aBaseFilename, "File must be renamed", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+                        g_running = False
+                        Return Nothing
+                    End If
 
-                Dim lNewFilename As String = lBinOutFilename.Replace("base.", aNewScenarioName & ".")
-                Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-                lHBNResults.Open(lNewFilename)
-                lModified.Add(lBinOutFilename, lNewFilename)
-            Next
+                    Dim lNewFilename As String = lBinOutFilename.Replace("base.", aNewScenarioName & ".")
+                    Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+                    lHBNResults.Open(lNewFilename)
+                    lModified.Add(lBinOutFilename, lNewFilename)
+                Next
+            End If
         Else
             Logger.Msg("Could not find base UCI file '" & aBaseFilename & "'" & vbCrLf & "Could not run model", "Scenario Run")
         End If
