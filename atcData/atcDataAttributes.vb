@@ -178,6 +178,13 @@ Public Class atcDataAttributes
         Add(aAttributeName, aAttributeValue)
     End Sub
 
+    Public Sub SetValueIfMissing(ByVal aAttributeName As String, ByVal aAttributeValue As Object)
+        Dim lKey As String = AttributeNameToKey(aAttributeName)
+        If ItemByKey(lKey) Is Nothing Then  'Did not find the named attribute, add with supplied value
+            Add(aAttributeName, aAttributeValue)
+        End If
+    End Sub
+
     'Set attribute with name aAttributeName to value aValue
     Public Shadows Function Add(ByVal aAttributeName As String, ByVal aAttributeValue As Object) As Integer
         Dim lTmpAttrDef As New atcAttributeDefinition
