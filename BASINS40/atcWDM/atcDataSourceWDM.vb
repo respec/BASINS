@@ -327,36 +327,22 @@ Public Class atcDataSourceWDM
                                         ByRef aTs As atcTimeseries) As Boolean
         Dim lCSDat(6) As Integer
         Dim lDecade As Integer
-        Dim lSaLen, lIVal, lSaInd As Integer
-        Dim lRVal As Single
+        Dim lIVal As Integer
         Dim lStr As String
         Dim lTs As Integer
         Dim lTu As Integer
 
-        Dim lRetcod As Integer
         Dim lMsg As atcWdmHandle = pMsg.MsgHandle
         Dim lMsgUnit As Integer = lMsg.Unit
         Dim lDsn As Integer = aTs.Attributes.GetValue("id", 0)
 
         'add needed attributes
-        lSaInd = 1 'tstype
-        lSaLen = 4
-        lStr = aTs.Attributes.GetValue("TSTYPE", Left(aTs.Attributes.GetValue("cons"), 4))
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
-        lSaLen = 1
-        lSaInd = 34 'tgroup
-        lIVal = aTs.Attributes.GetValue("TGROUP", 6)
-        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
-        lSaInd = 83 'compfg
-        lIVal = aTs.Attributes.GetValue("COMPFG", 1)
-        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
-        lSaInd = 84 'tsform
-        lIVal = aTs.Attributes.GetValue("TSFORM", 1)
-        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
-        lSaInd = 34 'tsfill
-        lRVal = aTs.Attributes.GetValue("TSFILL", -999)
-        F90_WDBSAR(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRVal, lRetcod)
-        lSaInd = 17 'tcode
+        aTs.Attributes.SetValueIfMissing("TSTYPE", aTs.Attributes.GetValue("cons").ToString.Substring(0, 4))
+        aTs.Attributes.SetValueIfMissing("TGROUP", 6)
+        aTs.Attributes.SetValueIfMissing("COMPFG", 1)
+        aTs.Attributes.SetValueIfMissing("TSFORM", 1)
+        aTs.Attributes.SetValueIfMissing("TSFILL", -999)
+ 
         lStr = aTs.Attributes.GetValue("tu")
         If lStr.Length = 0 Then
             CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
@@ -364,17 +350,12 @@ Public Class atcDataSourceWDM
             aTs.Attributes.SetValue("ts", lTs)
         Else
             lTu = lStr
-            lSaInd = 33 'tsstep
             lTs = aTs.Attributes.GetValue("ts")
         End If
-        lSaInd = 17 'tcode
-        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lTu, lRetcod)
-        lSaInd = 33 'tsstep
-        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lTs, lRetcod)
-        lSaInd = 85 'vbtime
         lIVal = aTs.Attributes.GetValue("VBTIME", 1)
         If lTs > 1 Then lIVal = 2 'timestep > 1 vbtime must vary
-        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
+        aTs.Attributes.SetValueIfMissing("VBTIME", lIVal)
+
         J2Date(aTs.Dates.Value(0), lCSDat)
         lDecade = lCSDat(0) Mod 10
         If lDecade > 0 Then 'subtract back to start of this decade
@@ -382,22 +363,12 @@ Public Class atcDataSourceWDM
         Else 'back to start of previous decade
             lIVal = lCSDat(0) - 10
         End If
-        lSaInd = 27 'tsbyr
-        F90_WDBSAI(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lIVal, lRetcod)
-        lSaLen = 8
-        lSaInd = 288 'scenario
-        lStr = UCase(Left(aTs.Attributes.GetValue("scen"), lSaLen))
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
-        lSaInd = 289 'constituent
-        lStr = UCase(Left(aTs.Attributes.GetValue("cons"), lSaLen))
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
-        lSaInd = 290 'location
-        lStr = UCase(Left(aTs.Attributes.GetValue("locn"), lSaLen))
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
-        lSaLen = 48
-        lSaInd = 10 'description
-        lStr = Left(aTs.Attributes.GetValue("desc"), lSaLen)
-        F90_WDBSAC(aFileUnit, lDsn, lMsgUnit, lSaInd, lSaLen, lRetcod, lStr, lStr.Length)
+        aTs.Attributes.SetValue("TSBYR", lIVal)
+
+        aTs.Attributes.SetValueIfMissing("scen", "")
+        aTs.Attributes.SetValueIfMissing("cons", "")
+        aTs.Attributes.SetValueIfMissing("locn", "")
+        aTs.Attributes.SetValueIfMissing("desc", "")
 
         DsnWriteAttributes = True
         For lAttributeIndex As Integer = 0 To aTs.Attributes.Count - 1
@@ -447,10 +418,14 @@ Public Class atcDataSourceWDM
                         F90_WDBSAR(aFileUnit, aDsn, aMsgUnit, lMsgDefinition.ID, 1, CSng(lValue), lRetcod)
                     End If
                 Case Else 'character
-                    If Len(lValue) > lMsgDefinition.Max Then
-                        Logger.Dbg("Attribute '" & lMsgDefinition.Name & "' truncated from '" & lValue & "' to '" & Left(lValue, lMsgDefinition.Max) & "'")
+                    Dim lStr As String = lValue
+                    If lStr.Length > lMsgDefinition.Max Then
+                        lStr = lStr.Substring(0, lMsgDefinition.Max)
+                        Logger.Dbg("Attribute '" & lMsgDefinition.Name & "' truncated from '" & lValue & "' to '" & lStr & "'")
+                    ElseIf lStr.Length < lMsgDefinition.Max Then
+                        lStr = lStr.PadRight(lMsgDefinition.Max)
                     End If
-                    F90_WDBSAC(aFileUnit, aDsn, aMsgUnit, lMsgDefinition.ID, lMsgDefinition.Max, lRetcod, lValue, Len(lValue))
+                    F90_WDBSAC(aFileUnit, aDsn, aMsgUnit, lMsgDefinition.ID, lMsgDefinition.Max, lRetcod, lStr, lStr.Length)
             End Select
             If lRetcod <> 0 Then
                 If Math.Abs(lRetcod) = 104 Then 'cant update if data already present
