@@ -1,0 +1,14 @@
+
+Location must be mapped from model results to weather sites used.
+
+Set of runs to make can be specified as a table:
+
+Model	Period	Location	BMP 	DataType	Season/Change (have Mean, want Min, Max?) [DataType2	Change2] ...
+cccm	2010-39	Monocacy	BMP1	precip  	DJF+7.584,MAM+3.3,JJA+1.1,SON+0           [temp 
+ccsr	2070-99	...     	BMP2	
+csir	...		
+echm			
+gfdl			
+hadc
+ncar
+...

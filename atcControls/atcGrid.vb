@@ -683,6 +683,20 @@ Public Class atcGrid
         End If
     End Sub
 
+    Public Sub SizeColumnToString(ByVal aColumn As Integer, ByVal aString As String)
+        If Not aString Is Nothing AndAlso aString.Length > 0 Then
+            Dim lCellWidth As Integer
+            Dim g As Graphics = Me.CreateGraphics
+            If (pSource.Alignment(0, aColumn) And atcAlignment.HAlign) = atcAlignment.HAlignDecimal Then
+                Dim lDecimalWidth As Integer = g.MeasureString(".", pFont).Width
+                lCellWidth = lDecimalWidth + 2 * Math.Max(WidthLeftOfDecimal(aString, g), WidthRightOfDecimal(aString, g))
+            Else
+                lCellWidth = g.MeasureString(aString, pFont).Width
+            End If
+            ColumnWidth(aColumn) = lCellWidth + DRAG_TOLERANCE * 2
+        End If
+    End Sub
+
     Private Sub pSource_ChangedColumns(ByVal aColumns As Integer) Handles pSource.ChangedColumns
         Me.Refresh()
     End Sub
