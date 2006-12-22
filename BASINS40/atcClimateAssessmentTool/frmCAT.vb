@@ -646,8 +646,10 @@ Public Class frmCAT
 
 #End Region
 
+    Private Const RunTitle As String = "Run"
     Private Const CLIGEN_NAME As String = "Cligen"
     Private Const StartFolderVariable As String = "{StartFolder}"
+    Private Const ResultsFixedRows As Integer = 4
 
     Private pPlugin As atcClimateAssessmentToolPlugin
 
@@ -723,12 +725,10 @@ Public Class frmCAT
         With agdResults.Source
             Dim lUsingSeasons As Boolean = False
             Dim lColumn As Integer = 1
-            Dim lRow As Integer
-            .FixedRows = 4
+            .FixedRows = ResultsFixedRows
             .FixedColumns = 1
             .Columns = 1
-            .CellValue(0, 0) = "Run"
-            .ColorCells = True
+            .CellValue(0, 0) = RunTitle
 
             For Each lEndpoint In pEndpoints
                 If Not Double.IsNaN(lEndpoint.CurrentValue) Then
@@ -741,10 +741,6 @@ Public Class frmCAT
             .Rows = 5
             lColumn = 1
 
-            For lRow = 0 To .FixedRows - 1
-                .CellColor(lRow, 0) = Drawing.SystemColors.Control
-            Next
-
             For Each lEndpoint In pEndpoints
                 If Not Double.IsNaN(lEndpoint.CurrentValue) Then
                     .CellValue(0, lColumn) = lEndpoint.Name
@@ -753,9 +749,6 @@ Public Class frmCAT
                     If Not lEndpoint.Seasons Is Nothing Then
                         .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
                     End If
-                    For lRow = 0 To .FixedRows - 1
-                        .CellColor(lRow, lColumn) = Drawing.SystemColors.Control
-                    Next
                     lColumn += 1
                 Else
                     For Each lDataset As atcDataSet In lEndpoint.DataSets
@@ -767,16 +760,14 @@ Public Class frmCAT
                         If Not lEndpoint.Seasons Is Nothing Then
                             .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
                         End If
-                        For lRow = 0 To .FixedRows - 1
-                            .CellColor(lRow, lColumn) = Drawing.SystemColors.Control
-                        Next
                         lColumn += 1
                     Next
                 End If
             Next
         End With
-
+        ColorResultsGrid()
         agdResults.Initialize(agdResults.Source)
+        SizeResultsColumns()
         agdResults.Refresh()
 
         myTabs.SelectedIndex = pResultsTabIndex
@@ -1006,24 +997,30 @@ Public Class frmCAT
     Private Sub PopulatePivotTable()
         If cboPivotRows.Text.Length > 0 AndAlso cboPivotColumns.Text.Length > 0 AndAlso cboPivotCells.Text.Length > 0 Then
             Dim lPivotData As New atcGridSource
-            Dim lRuns As Integer = agdResults.Source.Rows - 1
-            Dim lRunRow As Integer = agdResults.Source.FixedRows
-            Dim lRunColumn As Integer = agdResults.Source.FixedColumns
-            Dim lRunCell As Integer = 0
+            Dim lRuns As Integer = agdResults.Source.Rows - agdResults.Source.FixedRows
 
-            While Not agdResults.Source.CellValue(0, lRunRow).Equals(cboPivotRows.Text)
-                lRunRow += 1
-            End While
-            While Not agdResults.Source.CellValue(0, lRunColumn).Equals(cboPivotColumns.Text)
-                lRunColumn += 1
-            End While
-            While Not agdResults.Source.CellValue(0, lRunCell).Equals(cboPivotCells.Text)
-                lRunCell += 1
-            End While
+            Dim lColumnToRow As Integer = agdResults.Source.FixedColumns
+            Dim lColumnToColumn As Integer = lColumnToRow
+            Dim lColumnToCell As Integer = lColumnToRow
+
+            With agdResults.Source
+                While Not cboPivotRows.Text.Equals(.CellValue(0, lColumnToRow))
+                    lColumnToRow += 1
+                    If lColumnToRow >= .Columns Then Exit Sub
+                End While
+                While Not cboPivotColumns.Text.Equals(.CellValue(0, lColumnToColumn))
+                    lColumnToColumn += 1
+                    If lColumnToColumn >= .Columns Then Exit Sub
+                End While
+                While Not cboPivotCells.Text.Equals(.CellValue(0, lColumnToCell))
+                    lColumnToCell += 1
+                    If lColumnToCell >= .Columns Then Exit Sub
+                End While
+            End With
 
             With lPivotData
-                Dim lRowValues As ArrayList = UniqueValuesInColumn(agdResults.Source, lRunRow)
-                Dim lColumnValues As ArrayList = UniqueValuesInColumn(agdResults.Source, lRunColumn)
+                Dim lRowValues As ArrayList = UniqueValuesInColumn(agdResults.Source, lColumnToRow)
+                Dim lColumnValues As ArrayList = UniqueValuesInColumn(agdResults.Source, lColumnToColumn)
                 Dim lRow As Integer
                 Dim lColumn As Integer
                 Dim lRowValue As String
@@ -1048,16 +1045,15 @@ Public Class frmCAT
                     For lColumn = 1 To .Columns - 1
                         lColumnValue = lColumnValues(lColumn - 1)
                         .CellValue(0, lColumn) = lColumnValue
-                        lMatchRow = FindMatchingRow(agdResults.Source, lRunRow, lRowValue, lRunColumn, lColumnValue)
+                        lMatchRow = FindMatchingRow(agdResults.Source, lColumnToRow, lRowValue, lColumnToColumn, lColumnValue)
                         If lMatchRow > 0 Then
-                            .CellValue(lRow, lColumn) = agdResults.Source.CellValue(lMatchRow, lRunCell)
-                            .CellColor(lRow, lColumn) = agdResults.Source.CellColor(lMatchRow, lRunCell)
+                            .CellValue(lRow, lColumn) = agdResults.Source.CellValue(lMatchRow, lColumnToCell)
+                            .CellColor(lRow, lColumn) = agdResults.Source.CellColor(lMatchRow, lColumnToCell)
                         End If
                     Next
                 Next
                 ' agdResults.Source.CellValue(lRow, lRunRow)
             End With
-
             agdPivot.Initialize(lPivotData)
             agdPivot.Visible = True
             agdPivot.Refresh()
@@ -1071,11 +1067,56 @@ Public Class frmCAT
             .Source = Nothing
             .Source = New atcGridSource
             .Source.FromString(aNewContentsOfGrid)
+            .Source.FixedRows = ResultsFixedRows
+            .Source.FixedColumns = 1
             .Initialize(.Source)
-            .SizeAllColumnsToContents(.Width, True)
+            ColorResultsGrid()
+            SizeResultsColumns()
             .Refresh()
         End With
         PopulatePivotCombos()
+    End Sub
+
+    Private Sub ColorResultsGrid()
+        With agdResults.Source
+            Dim lRow As Integer
+            Dim lColumn As Integer
+            .ColorCells = True
+
+            'Color fixed rows for headers
+            For lRow = 0 To .FixedRows - 1
+                For lColumn = 0 To .Columns - 1
+                    .CellColor(lRow, lColumn) = Drawing.SystemColors.Control
+                Next
+            Next
+
+            'Color fixed column for Run number
+            For lRow = .FixedRows To .Rows - 1
+                .CellColor(lRow, 0) = Drawing.SystemColors.Control
+            Next
+        End With
+    End Sub
+
+    Private Sub SizeResultsColumns()
+        With agdResults
+            Dim lColumnTitle As String
+            Dim lLongestLabel As String = "88.888"
+            Dim lLongestLabelLength As Integer = lLongestLabel.Length
+            Dim lColumn As Integer = 0
+            'Size Run number column to fit RunTitle
+            .SizeColumnToString(0, RunTitle)
+            For lColumn = 1 To .Source.Columns - 1
+                lColumnTitle = .Source.CellValue(0, lColumn)
+                If lColumnTitle.Length > lLongestLabelLength Then
+                    lLongestLabelLength = lColumnTitle.Length
+                    lLongestLabel = lColumnTitle
+                End If
+            Next
+            .SizeColumnToString(1, lLongestLabel)
+            For lColumn = 2 To .Source.Columns - 1
+                .ColumnWidth(lColumn) = .ColumnWidth(1)
+            Next
+        End With
     End Sub
 
     Private Sub mnuLoadResults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuLoadResults.Click
@@ -1111,12 +1152,12 @@ Public Class frmCAT
         End If
     End Sub
 
-    Private Sub frmMultipleResults_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-        agdResults.SizeAllColumnsToContents(agdResults.Width, True)
-        agdPivot.SizeAllColumnsToContents(agdPivot.Width, True)
-        agdResults.Refresh()
-        agdPivot.Refresh()
-    End Sub
+    'Private Sub frmMultipleResults_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+    '    agdResults.SizeAllColumnsToContents(agdResults.Width, True)
+    '    agdPivot.SizeAllColumnsToContents(agdPivot.Width, True)
+    '    agdResults.Refresh()
+    '    agdPivot.Refresh()
+    'End Sub
 
     Private Sub mnuCopyResults_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyResults.Click
         Clipboard.SetDataObject(agdResults.ToString)
@@ -1457,7 +1498,7 @@ Public Class frmCAT
 
             lXML &= "<Endpoints>" & vbCrLf
             For Each lVariation In pEndpoints
-                lXML &= lVariation.XML
+                lXML &= lVariation.XML                
             Next
             lXML &= "</Endpoints>" & vbCrLf
 
@@ -1520,6 +1561,15 @@ Public Class frmCAT
                                 Do
                                     lVariation = New Variation
                                     lVariation.XML = lChild.GetXml
+                                    'If this is a copy of an input variation, add the input variation instead
+                                    If Not Double.IsNaN(lVariation.CurrentValue) Then
+                                        For Each lInputVariation As Variation In pInputs
+                                            If lInputVariation.Name = lVariation.Name Then
+                                                lVariation = lInputVariation
+                                                Exit For
+                                            End If
+                                        Next
+                                    End If
                                     pEndpoints.Add(lVariation)
                                 Loop While lChild.NextSibling2
                             End If
