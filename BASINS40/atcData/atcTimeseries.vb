@@ -140,11 +140,13 @@ Public Class atcTimeseries
         MyBase.New()
         Clear()
         pDataSource = aDataSource
-        Try
-            Attributes.SetValue("Data Source", aDataSource.Specification)
-        Catch ex As Exception
-            'atcDataSource is Nothing or is not really an atcDataSource
-        End Try
+        If Not aDataSource Is Nothing Then
+            Try
+                Attributes.SetValue("Data Source", aDataSource.Specification)
+            Catch ex As Exception
+                'atcDataSource is not really an atcDataSource
+            End Try
+        End If
     End Sub
 
     ''' <summary>Number of data values in data set</summary>

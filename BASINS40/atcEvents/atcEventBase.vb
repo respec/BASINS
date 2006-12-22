@@ -2,7 +2,7 @@ Imports atcData
 Imports atcUtility
 
 Public Module atcEventBase
-    'Divide the data in aTS into a group of TS, one per season
+    'Divide the data in aTS into a group of TS, one per event
     Public Function EventSplit(ByVal aTS As atcTimeseries, _
                                ByVal aSource As atcDataSource, _
                                ByVal aThresh As Double, _
@@ -26,8 +26,8 @@ Public Module atcEventBase
         While iValue <= aTS.numValues
 
             If lInEvent Then
-                If (aHigh And aTS.Value(iValue) < aThresh) Or _
-                   (Not aHigh And aTS.Values(iValue) > aThresh) Then
+                If (aHigh AndAlso aTS.Value(iValue) < aThresh) OrElse _
+                   (Not aHigh AndAlso aTS.Values(iValue) > aThresh) Then
                     'clean up latest event tser
                     lEPos = iValue - 1
                     lNewTS = New atcTimeseries(aSource)
@@ -53,8 +53,8 @@ Public Module atcEventBase
                     lNewGroup.Add(lEventIndex, lNewTS)
                     lInEvent = False
                 End If
-            ElseIf (aHigh And aTS.Value(iValue) > aThresh) Or _
-                   (Not aHigh And aTS.Value(iValue) < aThresh) Then
+            ElseIf (aHigh AndAlso aTS.Value(iValue) >= aThresh) OrElse _
+                   (Not aHigh AndAlso aTS.Value(iValue) <= aThresh) Then
                 'new event
                 lEventIndex += 1
                 lSPos = iValue

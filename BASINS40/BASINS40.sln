@@ -64,6 +64,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcNOAAISH", "atcNOAAISH\at
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcPollutantLoading", "atcPollutantLoading\atcPollutantLoading.vbproj", "{9F91345F-B696-40B0-A6A4-65D93B8489FD}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSynopticAnalysis", "atcSynopticAnalysis\atcSynopticAnalysis.vbproj", "{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -197,6 +199,10 @@ Global
 		{9F91345F-B696-40B0-A6A4-65D93B8489FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F91345F-B696-40B0-A6A4-65D93B8489FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F91345F-B696-40B0-A6A4-65D93B8489FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
