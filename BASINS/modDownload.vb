@@ -800,6 +800,7 @@ StartOver:
                 SetElevationGridColors(MWlay, g)
             ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
                 SetLandUseColorsGrid(MWlay, g)
+                g.Header.NodataValue = 0
             End If
             If Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
 
