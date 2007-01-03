@@ -2282,9 +2282,9 @@ ErrHand:
 
             If Not chkCustom.Checked Then
                 'use pcs data
-                pcsLayerIndex = GisUtil.LayerIndex("Permit Compliance System")
-                If pcsLayerIndex > -1 Then
+                If GisUtil.IsLayer("Permit Compliance System") Then
                     'set pcs shape file
+                    pcsLayerIndex = GisUtil.LayerIndex("Permit Compliance System")
                     npdesIndex = GisUtil.FieldIndex(pcsLayerIndex, "NPDES")
                     flowIndex = GisUtil.FieldIndex(pcsLayerIndex, "FLOW_RATE")
                     facIndex = GisUtil.FieldIndex(pcsLayerIndex, "FAC_NAME")
