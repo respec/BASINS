@@ -227,6 +227,7 @@ Friend Module modBasinsPlugin
 
                         'prompt user for new name
                         Dim lProjectFileName As String = PromptForNewProjectFileName(lDefDirName, lDefaultProjectFileName)
+                        Dim lOldDataDir As String = PathNameOnly(GisUtil.ProjectFileName) & "\"
                         Dim lNewDataDir As String = PathNameOnly(lProjectFileName) & "\"
 
                         If lProjectFileName.Length > 0 Then
@@ -240,8 +241,9 @@ Friend Module modBasinsPlugin
                                        & "The folder must be empty before a new project can be created here.", "BASINS Build New")
                             Else
                                 'got a good name for the new project
+                                g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrWait
 
-                                'copy all files from the old project directory to the new one
+                                'make dirs from the old project in the new one
                                 Dim lTarget As String
                                 Dim lDirs As String() = System.IO.Directory.GetDirectories(PathNameOnly(GisUtil.ProjectFileName))
                                 For Each lDirName As String In lDirs
@@ -249,26 +251,36 @@ Friend Module modBasinsPlugin
                                     lTarget = lNewDataDir & Mid(lDirName, Len(PathNameOnly(GisUtil.ProjectFileName)) + 2)
                                     System.IO.Directory.CreateDirectory(lTarget)
                                 Next
+
+                                CopyFeaturesWithinExtent(lSelectedLayer, lSelectedShapeIndexes, lOldDataDir, lNewDataDir)
+
+                                'copy all other files from the old project directory to the new one
                                 Dim lFilenames As NameValueCollection
                                 lFilenames = New NameValueCollection
                                 AddFilesInDir(lFilenames, PathNameOnly(GisUtil.ProjectFileName), True)
                                 For Each lFilename As String In lFilenames
-                                    If Not FileExt(lFilename) = "mwprj" Then
+                                    If Not FileExt(lFilename) = "mwprj" And Not FileExt(lFilename) = "bmp" Then
                                         lTarget = lNewDataDir & Mid(lFilename, Len(PathNameOnly(GisUtil.ProjectFileName)) + 2)
-                                        IO.File.Copy(lFilename, lTarget)
+                                        If Not FileExists(lTarget) Then
+                                            g_MapWin.StatusBar(1).Text = "Copying " & FilenameNoPath(lFilename.ToString)
+                                            g_MapWin.Refresh()
+                                            IO.File.Copy(lFilename, lTarget, False)
+                                        End If
                                     End If
                                 Next
+                                g_MapWin.StatusBar(1).Text = ""
+                                g_MapWin.Refresh()
 
                                 'copy the mapwindow project file
                                 IO.File.Copy(GisUtil.ProjectFileName, lProjectFileName)
                                 'open the new mapwindow project file
                                 g_MapWin.Project.Load(lProjectFileName)
+                                g_MapWin.PreviewMap.Update()
                                 If Not (g_MapWin.Project.Save(lProjectFileName)) Then
                                     Logger.Dbg("BASINSNewMenu:Save2Failed:" & g_MapWin.LastError)
                                 End If
 
-                                'remove features that are not in selected area
-                                RemoveFeaturesBeyondExtent(lSelectedLayer, lSelectedShapeIndexes)
+                                g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrMapDefault
 
                             End If
                         End If
@@ -493,84 +505,76 @@ Friend Module modBasinsPlugin
         Return lRetval
     End Function
 
-    Private Sub RemoveFeaturesBeyondExtent(ByVal aSelectedLayer As Integer, ByVal aSelectedShapeIndexes As Collection)
-        'remove features that are not with selected indexes of selected layer
-        Dim lKeep As Boolean
+    Private Sub CopyFeaturesWithinExtent(ByVal aSelectedLayer As Integer, ByVal aSelectedShapeIndexes As Collection, ByVal aOldFolder As String, ByVal aNewFolder As String)
+        'copy features that are within selected indexes of selected layer to new folder
         Dim i As Integer
-        Dim j As Integer
+        Dim lCurrentSf As MapWinGIS.Shapefile
+        Dim lResultSf As MapWinGIS.Shapefile
+        Dim lNewName As String
 
-        g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrWait
+        Dim lExtentShape As MapWinGIS.Shape = Nothing
+        Dim lResultShape As MapWinGIS.Shape = Nothing
+        Dim lExtentsSf As New MapWinGIS.Shapefile
+        Dim lExtentsFileName As String = GisUtil.LayerFileName(aSelectedLayer)
+        If lExtentsSf.Open(lExtentsFileName) Then
+            lExtentShape = lExtentsSf.Shape(aSelectedShapeIndexes(1))
+            For i = 2 To aSelectedShapeIndexes.Count
+                MapWinGeoProc.SpatialOperations.MergeShapes(lExtentShape, lExtentsSf.Shape(aSelectedShapeIndexes(i)), lResultShape)
+                lExtentShape = lResultShape
+            Next
+        End If
+
         For iLayer As Integer = 0 To GisUtil.NumLayers - 1
             If iLayer <> aSelectedLayer Then
                 If FilenameNoPath(GisUtil.LayerFileName(iLayer)) <> "wdm.shp" And FilenameNoPath(GisUtil.LayerFileName(iLayer)) <> "metpt.shp" Then
-                    'don't want to remove met pts
-                    g_MapWin.StatusBar(2).Text = "Filtering " & GisUtil.LayerName(iLayer)
+                    'want to keep met pts
+                    g_MapWin.StatusBar(1).Text = "Selecting " & GisUtil.LayerName(iLayer)
                     g_MapWin.Refresh()
-                    Dim lLayerType As Integer = GisUtil.LayerType(iLayer)
-                    If lLayerType = 1 Or lLayerType = 2 Or lLayerType = 3 Then
-                        'point, line, or polygon
-                        GisUtil.StartRemoveFeature(iLayer)
-                        i = 0
-                        Do While i < GisUtil.NumFeatures(iLayer)
-                            lKeep = False
-                            For j = 1 To aSelectedShapeIndexes.Count
-                                If lLayerType = 1 Then
-                                    If GisUtil.PointInPolygon(iLayer, i + 1, aSelectedLayer) = aSelectedShapeIndexes(j) Then
-                                        lKeep = True
-                                        Exit For
-                                    End If
-                                ElseIf lLayerType = 2 Then
-                                    If GisUtil.LineInPolygon(iLayer, i + 1, aSelectedLayer, aSelectedShapeIndexes(j)) Then
-                                        lKeep = True
-                                        Exit For
-                                    End If
-                                ElseIf lLayerType = 3 Then
-                                    If GisUtil.OverlappingPolygons(iLayer, i, aSelectedLayer, aSelectedShapeIndexes(j)) Then
-                                        lKeep = True
-                                        Exit For
-                                    End If
-                                End If
-                            Next j
-                            If lKeep = False Then
-                                If GisUtil.NumFeatures(iLayer) > 1 Then 'dont remove last one
-                                    GisUtil.RemoveFeatureNoStartStop(iLayer, i)
-                                Else
-                                    i = i + 1
-                                End If
-                            Else
-                                i = i + 1
-                            End If
-                        Loop
-                        GisUtil.StopRemoveFeature(iLayer)
 
-                    ElseIf lLayerType = 4 Then
-                        'grid, need to clip to extents
-                        Dim lExtentShape As MapWinGIS.Shape = Nothing
-                        Dim lResultShape As MapWinGIS.Shape = Nothing
-                        Dim lExtentsSf As New MapWinGIS.Shapefile
-                        Dim lExtentsFileName As String = GisUtil.LayerFileName(aSelectedLayer)
-                        If lExtentsSf.Open(lExtentsFileName) Then
-                            lExtentShape = lExtentsSf.Shape(aSelectedShapeIndexes(1))
-                            For i = 2 To aSelectedShapeIndexes.Count
-                                MapWinGeoProc.SpatialOperations.MergeShapes(lExtentShape, lExtentsSf.Shape(aSelectedShapeIndexes(i)), lResultShape)
-                                lExtentShape = lResultShape
-                            Next
+                    If InStr(GisUtil.LayerFileName(iLayer), aOldFolder) > 0 Then
+                        'this layer is in our project folder
+
+                        lNewName = ReplaceString(GisUtil.LayerFileName(iLayer), aOldFolder, aNewFolder)
+                        Dim lLayerType As Integer = GisUtil.LayerType(iLayer)
+
+                        Dim rslt As Boolean = False
+                        If lLayerType = 1 Or lLayerType = 2 Or lLayerType = 3 Then
+                            'point, line, or polygon
+                            lCurrentSf = New MapWinGIS.Shapefile
+                            lResultSf = New MapWinGIS.Shapefile
+                            If lCurrentSf.Open(GisUtil.LayerFileName(iLayer)) Then
+                                If lResultSf.CreateNew(lNewName, lCurrentSf.ShapefileType) Then
+                                    rslt = False
+                                    If lLayerType = 1 Then
+                                        rslt = MapWinGeoProc.Selection.SelectPointsWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                    ElseIf lLayerType = 3 Then
+                                        rslt = MapWinGeoProc.Selection.SelectPolygonsWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                    ElseIf lLayerType = 2 Then
+                                        rslt = MapWinGeoProc.Selection.SelectLinesWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                    End If
+                                    If rslt Then
+                                        lResultSf.SaveAs(lNewName)
+                                    End If
+                                    lResultSf.Close()
+                                End If
+                                lCurrentSf.Close()
+                            End If
+
+                        ElseIf lLayerType = 4 Then
+                            'grid, need to clip to extents
+
                             Dim lFileName As String = GisUtil.LayerFileName(iLayer)
-                            Dim lNewGridName As String = PathNameOnly(lFileName) & "\temp" & FilenameNoPath(lFileName)
-                            If Not MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lFileName, lExtentShape, lNewGridName, True) Then
+                            If Not MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lFileName, lExtentShape, lNewName, True) Then
                                 Logger.Dbg("RemoveFeaturesBeyondExtent:ClipGridFailed:" & MapWinGeoProc.Error.GetLastErrorMsg)
                             End If
-                            IO.File.Copy(lNewGridName, lFileName, True)
-                            IO.File.Delete(lNewGridName)
-                            'todo: need to refresh bitmap
                         End If
                     End If
                 End If
             End If
         Next iLayer
-        g_MapWin.StatusBar(2).Text = ""
+        g_MapWin.StatusBar(1).Text = ""
         g_MapWin.Refresh()
-        g_MapWin.View.MapCursor = MapWinGIS.tkCursor.crsrMapDefault
+
     End Sub
 
     ''' <summary>
