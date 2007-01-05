@@ -45,7 +45,6 @@ Friend Class atcWdmHandle
             Catch ex As Exception
                 Logger.Msg(ex.ToString)
             End Try
-
             If aRWCFlg = 0 Then
                 lAttr = GetAttr(lFileName) 'if read only, change to not read only
                 If (lAttr And FileAttribute.ReadOnly) <> 0 Then
@@ -55,7 +54,7 @@ Friend Class atcWdmHandle
             End If
 
             pUnit = -2 'code to try to use existing unit number from INQUIRE_NAME
-            Logger.Dbg("atcWdmHandle:OpenB4:" & lFileName)
+            'Logger.Dbg("atcWdmHandle:OpenB4:" & lFileName)
             Try
                 pUnit = F90_INQNAM(lFileName, Len(lFileName))
                 If pUnit = 0 Then
@@ -68,7 +67,7 @@ Friend Class atcWdmHandle
             Catch e As System.BadImageFormatException
                 Logger.Msg("atcWdmHandle:Exception:Check HassEnt.dll Compile/Link Output" & e.ToString)
             End Try
-            Logger.Dbg("atcWdmHandle:OpenAft:Unit:Retcod:" & pUnit & ":" & lRetcod)
+            'Logger.Dbg("atcWdmHandle:OpenAft:Unit:Retcod:" & pUnit & ":" & lRetcod)
 
             If lRetcod <> 0 Then
                 If lRetcod = 159 Then
@@ -86,7 +85,7 @@ Friend Class atcWdmHandle
     Public Sub Dispose() Implements System.IDisposable.Dispose
         Dim lRetcod As Integer
 
-        Logger.Dbg("atcWdmHandle:Dispose:" & pUnit)
+        'Logger.Dbg("atcWdmHandle:Dispose:" & pUnit)
 
         If pNeedToClose AndAlso pUnit > 0 Then
             lRetcod = F90_WDFLCL(pUnit)
@@ -96,8 +95,8 @@ Friend Class atcWdmHandle
         Else
             Logger.Dbg("atcWdmHandle:Dispose:DidNotNeedToClose")
         End If
-        Dim lMsg As String = "atcWdmHandle:Dispose:" & pUnit & ":" & lRetcod
-        F90_MSG(lMsg, Len(lMsg))
+        'Dim lMsg As String = "atcWdmHandle:Dispose:" & pUnit & ":" & lRetcod
+        'F90_MSG(lMsg, Len(lMsg))
         pUnit = 0
         GC.SuppressFinalize(Me)
     End Sub
