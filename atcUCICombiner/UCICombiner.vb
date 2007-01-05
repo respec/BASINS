@@ -17,8 +17,10 @@ Public Module UCICombiner
     Private pScenario As String = "base"
 
     Public Sub Main()
-        ChDriveDir(pWorkingDir)
         Logger.StartToFile(pOutputDir & "uciCombiner.log")
+
+        ChDriveDir(pWorkingDir)
+        Logger.Dbg("WorkingDirectory " & CurDir())
 
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.mdb")
@@ -275,7 +277,7 @@ Public Module UCICombiner
 
         'combine the WDM files used by the combined UCI
         ChDir(pOutputDir)
-        'BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
+        BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
         Logger.Dbg("CombinedWdmsBuilt")
 
         'write the combined uci 
@@ -758,8 +760,8 @@ Public Module UCICombiner
                         Logger.Dbg("Volume " & lConn.Source.VolName & " DSN " & lOrigDsn)
                         If lConn.Source.VolName = "WDM3" Then
                             CopyDataSet("wdm", "..\" & aPtSrcWDMNames(lConn.Target.VolId), lOrigDsn, _
-                                        "wdm", "ptsrc.wdm", lConn.Source.VolId)
-                            SetWDMAttribute("ptsrc.wdm", lConn.Source.VolId, "idscen", "PT-OBS")
+                                        "wdm", pScenario & ".ptsrc.wdm", lConn.Source.VolId)
+                            SetWDMAttribute(pScenario & ".ptsrc.wdm", lConn.Source.VolId, "idscen", "PT-OBS")
                         ElseIf lConn.Source.VolName = "WDM2" Then
                             CopyDataSet("wdm", aPrecWDMNames(lWdmIndex), lOrigDsn, _
                                         "wdm", pScenario & ".wdm", lConn.Source.VolId)
@@ -781,9 +783,9 @@ Public Module UCICombiner
                         lOrigDsn = CInt("1" & Mid(CStr(lConn.Target.VolId), 2, 2))
                         Logger.Dbg("Volume " & lConn.Target.VolName & " DSN " & lOrigDsn)
                         CopyDataSet("wdm", "..\" & aOutputWDMNames(lConn.Source.VolId), lOrigDsn, _
-                                    "wdm", "output.wdm", lConn.Target.VolId)
-                        SetWDMAttribute("output.wdm", lConn.Target.VolId, "idscen", pScenario)
-                        SetWDMAttribute("output.wdm", lConn.Target.VolId, "idlocn", "RIV" & CStr(lOper.Id))
+                                    "wdm", pScenario & ".output.wdm", lConn.Target.VolId)
+                        SetWDMAttribute(pScenario & ".output.wdm", lConn.Target.VolId, "idscen", pScenario)
+                        SetWDMAttribute(pScenario & ".output.wdm", lConn.Target.VolId, "idlocn", "RIV" & CStr(lOper.Id))
                     End If
                 Next lConn
             Next lOper

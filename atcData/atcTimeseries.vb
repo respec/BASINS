@@ -17,8 +17,7 @@ Public Class atcTimeseries
             If aIndex >= 0 And aIndex <= pNumValues Then
                 Return pValues(aIndex)
             Else
-                'TODO: handle request for value outside range as error?
-                Return Double.NaN
+                Throw New ApplicationException("Timeseries Value Index " & aIndex & " out of range 0-" & pNumValues)
             End If
         End Get
         Set(ByVal newValue As Double)
@@ -138,6 +137,7 @@ Public Class atcTimeseries
     ''' <summary>Create a new timeseries and reference the source that it came from</summary>
     Public Sub New(ByVal aDataSource As atcDataSource)
         MyBase.New()
+
         Clear()
         pDataSource = aDataSource
         If Not aDataSource Is Nothing Then

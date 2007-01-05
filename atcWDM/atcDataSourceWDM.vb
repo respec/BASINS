@@ -15,6 +15,8 @@ Public Class atcDataSourceWDM
     Private pErrorDescription As String
     Private pDates As ArrayList 'of atcTimeseries
     Private pQuick As Boolean
+    Private pNan As Double
+    Private pEpsilon As Double
     Private Shared pMsg As atcMsgWDM
 
     Private Sub Clear()
@@ -28,6 +30,11 @@ Public Class atcDataSourceWDM
 
     Public Sub New()
         MyBase.New()
+
+        'kludge to force loading of system.double, removal may cause program to exit without message!
+        pNan = System.Double.NaN
+        pEpsilon = System.Double.Epsilon
+
         If pMsg Is Nothing Then
             pMsg = New atcMsgWDM
             F90_MSG("WRITE", 5) 'turn on very detailed debugging of fortran to error.fil
@@ -52,14 +59,19 @@ Public Class atcDataSourceWDM
                 If F90_WDCKDT(aWdmUnit, lDsn) = 1 Then
                     RefreshDsn(aWdmUnit, lDsn)
                 End If
+            Else
+                'Logger.Dbg("Refresh " & lDsn)
             End If
             If lDsn = -1 Then
-                Logger.Progress("WDM Refresh Complete", 100, 0)
+                'Logger.Status("WDM Refresh Complete")
+                'Logger.Progress(100, 0)
+                'Logger.Progress("WDM Refresh Complete", 100, 0)
             Else 'try the next dsn
                 lDsn += 1
                 lProgPrev = lProg
                 lProg = (100 * lDsn) / 32000
-                Logger.Progress("WDM Refresh", lProg, lProgPrev)
+                'Logger.Progress(lProg, lProgPrev)
+                'Logger.Progress("WDM Refresh", lProg, lProgPrev)
             End If
         End While
     End Sub
@@ -97,7 +109,7 @@ Public Class atcDataSourceWDM
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
-        Logger.Dbg("atcDataSourceWdm:AddDataset:entry:" & aExistAction)
+        'Logger.Dbg("atcDataSourceWdm:AddDataset:entry:" & aExistAction)
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Try
             Dim lTimser As atcTimeseries = aDataSet
@@ -121,21 +133,21 @@ Public Class atcDataSourceWDM
 
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
-            Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
+            'Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
 
             If F90_WDCKDT(lWdmHandle.Unit, lDsn) > 0 Then 'dataset exists, what do we do?
-                Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
+                'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
                 If aExistAction = ExistReplace Then
                     Dim lRet As Integer
-                    Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
+                    'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
                     F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
-                    Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                    'Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
                     Dim lReplaceThis As atcTimeseries = DataSets.ItemByKey(lDsn)
                     If Not lReplaceThis Is Nothing Then
                         DataSets.Remove(lReplaceThis)
                     End If
                 ElseIf aExistAction = ExistAppend Then 'find dataset and try to append to it
-                    Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
+                    'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
                     Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
                     If lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
                         Throw New Exception("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
@@ -144,16 +156,16 @@ Public Class atcDataSourceWDM
                         ") preceeds exising TSer end date (" & lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
                     End If
                     Dim lExistEndDateJ As Double = lExistTimser.Dates.Value(lExistTimser.numValues)
-                    Logger.Dbg("atcDataSourceWdm:OldFinalDate:" & DumpDate(lExistEndDateJ))
+                    'Logger.Dbg("atcDataSourceWdm:OldFinalDate:" & DumpDate(lExistEndDateJ))
                     Dim lNewStartDateJ As Double = lTimser.Dates.Value(0)
-                    Logger.Dbg("atcDataSourceWdm:NewFirstDate:" & DumpDate(lNewStartDateJ))
+                    'Logger.Dbg("atcDataSourceWdm:NewFirstDate:" & DumpDate(lNewStartDateJ))
                 Else 'use next available number
                     lDsn = findNextDsn(lDsn)
-                    Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
+                    'Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
                     aDataSet.Attributes.SetValue("Id", lDsn)
                 End If
             Else
-                Logger.Dbg("atcDataSourceWdm:AddDataset:NewDataSet:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
+                'Logger.Dbg("atcDataSourceWdm:AddDataset:NewDataSet:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
             End If
 
             Dim lWriteIt As Boolean = False
@@ -176,14 +188,19 @@ Public Class atcDataSourceWDM
                 Next
 
                 J2DateRoundup(lTimser.Dates.Value(0), lTu, lSDat)
-                Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
-                            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
-                            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
+                'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
+                '            lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
+                '            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
                 If lNvals > 0 Then
                     F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
                 End If
-                Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:back:" & _
-                            lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                If lRet <> 0 Then
+                    Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
+                                lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
+                                lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
+                    'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:back:" & _
+                    '            lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                End If
             End If
 
             lWdmHandle.Dispose()
@@ -196,11 +213,11 @@ Public Class atcDataSourceWDM
     End Function
 
     Public Function WriteAttributes(ByVal aDataSet As atcData.atcDataSet) As Boolean
-        Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
+        'Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         WriteAttributes = DsnWriteAttributes(lWdmHandle.Unit, aDataSet)
         lWdmHandle.Dispose()
-        Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
+        'Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
     End Function
 
     ''' <summary>
@@ -214,7 +231,7 @@ Public Class atcDataSourceWDM
     Public Function WriteAttribute(ByVal aDataSet As atcData.atcDataSet, _
                                    ByVal aAttribute As atcDefinedValue, _
                                    Optional ByVal aNewValue As Object = Nothing) As Boolean
-        Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
+        'Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Dim lMsg As atcWdmHandle = pMsg.MsgHandle
         Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 0)
@@ -225,7 +242,7 @@ Public Class atcDataSourceWDM
 
         lMsg.Dispose()
         lWdmHandle.Dispose()
-        Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
+        'Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
     End Function
 
     Private Function findNextDsn(ByRef aDsn As Integer) As Integer
@@ -400,14 +417,49 @@ Public Class atcDataSourceWDM
 
         DsnWriteAttribute = True
 
-        If lName.ToLower = "units" Then  'store Units ID as DCODE in WDM
-            lName = "DCODE"
-            lValue = CStr(GetUnitID(lValue))
-        End If
+        Select Case (lName.ToLower)
+            Case "units"   'store Units ID as DCODE in WDM
+                lName = "DCODE"
+                lValue = CStr(GetUnitID(lValue))
+            Case "time unit"
+                lName = "tcode"
+            Case "time step"
+                lName = "tsstep"
+            Case "time step"
+                lName = "tsstep"
+            Case "scenario"
+                lName = "idscen"
+            Case "location"
+                lName = "idlocn"
+            Case "constituent"
+                lName = "idcons"
+            Case "description"
+                lName = "descrp"
+            Case "date created"
+                lName = "datcre"
+                Dim ls As String = CStr(Year(lValue)).PadLeft(4, "0") & _
+                                   CStr(Month(lValue)).PadLeft(2, "0") & _
+                                   CStr(Day(lValue)).PadLeft(2, "0") & _
+                                   CStr(Hour(lValue)).PadLeft(2, "0") & _
+                                   CStr(Minute(lValue)).PadLeft(2, "0") & _
+                                   CStr(Second(lValue)).PadLeft(2, "0")
+                lValue = ls
+            Case "date modified"
+                lName = "datmod"
+                Dim ls As String = CStr(Year(lValue)).PadLeft(4, "0") & _
+                                   CStr(Month(lValue)).PadLeft(2, "0") & _
+                                   CStr(Day(lValue)).PadLeft(2, "0") & _
+                                   CStr(Hour(lValue)).PadLeft(2, "0") & _
+                                   CStr(Minute(lValue)).PadLeft(2, "0") & _
+                                   CStr(Second(lValue)).PadLeft(2, "0")
+                lValue = ls
+        End Select
 
         Dim lMsgDefinition As atcAttributeDefinition = pMsg.Attributes.ItemByKey(lName.ToLower)
 
-        If Not lMsgDefinition Is Nothing Then
+        If lMsgDefinition Is Nothing Then
+            'Logger.Dbg("NoAttributeDefinition for " & lName)
+        Else
             Select Case lMsgDefinition.TypeString
                 Case "Integer"
                     If IsNumeric(lValue) Then
@@ -421,7 +473,7 @@ Public Class atcDataSourceWDM
                     Dim lStr As String = lValue
                     If lStr.Length > lMsgDefinition.Max Then
                         lStr = lStr.Substring(0, lMsgDefinition.Max)
-                        Logger.Dbg("Attribute '" & lMsgDefinition.Name & "' truncated from '" & lValue & "' to '" & lStr & "'")
+                        'Logger.Dbg("Attribute '" & lMsgDefinition.Name & "' truncated from '" & lValue & "' to '" & lStr & "'")
                     ElseIf lStr.Length < lMsgDefinition.Max Then
                         lStr = lStr.PadRight(lMsgDefinition.Max)
                     End If
@@ -559,22 +611,25 @@ Public Class atcDataSourceWDM
                             Dim lQual As Integer = 31 'allowed quality code
                             F90_WDTGET(lWdmHandle.Unit, lDsn, lTimeStep, lSdat(0), nVals, _
                                        lTran, lQual, lTimeUnits, lV(1), lRetcod)
+                            If lRetcod <> 0 Then
+                                Logger.Dbg("FailedToReadDataFor " & lDsn & " with code " & lRetcod)
+                            End If
 
                             ReDim lJd(nVals)
                             lJd(0) = lSJDay
                             ReDim lVd(nVals)
-                            lVd(0) = Double.NaN
+                            lVd(0) = pNan
 
                             lTsFill = .GetValue("TSFill", -999)
                             If lTsFill >= 0 Then 'WDM convention - fill value, not undefined,
-                                lTsFill = Double.NaN
+                                lTsFill = pNan
                             End If
 
                             Dim lInterval As Double = .GetValue("interval", 0)
                             Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
                             For iVal As Integer = 1 To nVals
-                                If (lV(iVal) - lTsFill) < Double.Epsilon Then
-                                    lVd(iVal) = Double.NaN
+                                If (lV(iVal) - lTsFill) < pEpsilon Then
+                                    lVd(iVal) = pNan
                                 Else
                                     lVd(iVal) = lV(iVal) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
                                 End If
