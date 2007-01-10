@@ -77,12 +77,19 @@ Public Class atcTableFixed
         End Set
     End Property
 
+    ''' <summary>
+    ''' Character position where the field starts
+    ''' </summary>
+    ''' <param name="aFieldNumber">Number of field (one to NumFields)</param>
+    ''' <value></value>
+    ''' <returns>Character position >= 1</returns>
+    ''' <remarks>Returns zero if field does not exist</remarks>
     Public Property FieldStart(ByVal aFieldNumber As Integer) As Integer
         Get
             If aFieldNumber > 0 And aFieldNumber <= pNumFields Then
-                FieldStart = pFields(aFieldNumber).FieldStart
+                Return pFields(aFieldNumber).FieldStart
             Else
-                FieldStart = 0
+                Return 0
             End If
         End Get
         Set(ByVal newValue As Integer)
@@ -145,8 +152,10 @@ Public Class atcTableFixed
     ''' <returns>text of specified row of the header</returns>
     Public Property Header(ByVal aHeaderRow As Integer) As String
         Get
-            If aHeaderRow < 1 Or aHeaderRow > pHeader.Count Then
-                Return "Invalid Current Record Number"
+            If aHeaderRow < 1 Then
+                Return "Header Row " & aHeaderRow & " is less than one"
+            ElseIf aHeaderRow > pHeader.Count Then
+                Return "Header Row " & aHeaderRow & " is greater than number of rows (" & pHeader.Count & ")"
             Else
                 Return pHeader(aHeaderRow - 1)
             End If
@@ -292,7 +301,7 @@ ErrHand:
         Dim inReader As New BinaryReader(aStream)
 
         Try
-            For iRec = 1 To pHeader.Count 'read header rows, ignore for now
+            For iRec = 1 To NumHeaderRows 'read header rows, ignore for now
                 pHeader.Add(NextLine(inReader))
             Next
 

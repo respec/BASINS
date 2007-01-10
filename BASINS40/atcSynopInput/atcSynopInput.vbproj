@@ -3,10 +3,10 @@
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}</ProjectGuid>
+    <ProjectGuid>{69A2617A-01FB-457d-883E-22BF45EEAD64}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <AssemblyName>atcSynopticAnalysis</AssemblyName>
+    <AssemblyName>atcSynopInput</AssemblyName>
     <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
@@ -16,13 +16,13 @@
     <OptionCompare>Binary</OptionCompare>
     <OptionExplicit>On</OptionExplicit>
     <OptionStrict>Off</OptionStrict>
-    <RootNamespace>atcSynopticAnalysis</RootNamespace>
-    <StartupObject>atcSynopticAnalysis.%2528None%2529</StartupObject>
+    <RootNamespace>atcSynopInput</RootNamespace>
+    <StartupObject>atcSynopInput.%2528None%2529</StartupObject>
     <MyType>Windows</MyType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcSynopticAnalysis.xml</DocumentationFile>
+    <DocumentationFile>atcSynopInput.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
@@ -37,7 +37,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
-    <DocumentationFile>atcSynopticAnalysis.xml</DocumentationFile>
+    <DocumentationFile>atcSynopInput.xml</DocumentationFile>
     <BaseAddress>285212672</BaseAddress>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
@@ -51,18 +51,13 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MapWinUtility, Version=1.0.2559.20461, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\MapWinUtility.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
-    </Reference>
-    <Reference Include="System.Drawing">
-      <Name>System.Drawing</Name>
-    </Reference>
-    <Reference Include="System.Windows.Forms">
-      <Name>System.Windows.Forms</Name>
     </Reference>
     <Reference Include="MapWinInterfaces">
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -80,7 +75,7 @@
     <Compile Include="AssemblyInfo.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcSynopticAnalysisPlugin.vb">
+    <Compile Include="atcDataSourceSynopInput.vb">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -91,18 +86,12 @@
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\atcEvents\atcEvents.vbproj">
-      <Project>{9F469FD8-4A92-4C1F-901C-93D84D457D8F}</Project>
-      <Name>atcEvents</Name>
-    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
-      <Name>atcUtility</Name>
+      <Name>ATCutility</Name>
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

@@ -39,6 +39,7 @@ Public Class atcEventPlugin
                           Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim ltsGroup As atcDataGroup = Nothing
         Dim lThresh As Double = Double.NaN
+        Dim lDaysGapAllowed As Double = 0
         Dim lHigh As Boolean
         Dim lOk As Boolean
         Dim lExtreme As Double
@@ -46,6 +47,7 @@ Public Class atcEventPlugin
         If Not aArgs Is Nothing Then
             ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
             lThresh = aArgs.GetValue("Threshold", Double.NaN)
+            lDaysGapAllowed = aArgs.GetValue("DaysGapAllowed", 0)
             lHigh = aArgs.GetValue("High", True)
         End If
         If ltsGroup Is Nothing OrElse ltsGroup.Count = 0 Then
@@ -53,11 +55,11 @@ Public Class atcEventPlugin
         End If
         If ltsGroup.Count > 0 AndAlso Double.IsNaN(lThresh) Then
             Dim lForm As New frmSpecifyEventAttributes
-            lOk = lForm.AskUser(lHigh, lThresh, MinMaxLabel(ltsGroup))
+            lOk = lForm.AskUser(lHigh, lThresh, lDaysGapAllowed, MinMaxLabel(ltsGroup))
         End If
         If lOk Then
             For Each lts As atcTimeseries In ltsGroup
-                Dim lEvents As atcDataGroup = EventSplit(lts, Me, lThresh, lHigh)
+                Dim lEvents As atcDataGroup = EventSplit(lts, Me, lThresh, lDaysGapAllowed, lHigh)
                 Select Case aOperationName
                     Case "Split"
                         MyBase.DataSets.AddRange(lEvents)
