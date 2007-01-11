@@ -308,7 +308,7 @@ Public Module UCICombiner
                 lTable = lLastRchresOperation.Tables(lTableName)
                 Logger.Dbg("Message " & lTable.Parms.Count)
                 For i As Integer = 1 To 10
-                    lTable.Parms(i).Value = 5 'year
+                    lTable.Parms(i).Value = 4 'month
                 Next
                 lTable.Parms(12).Value = 12
                 .Name = "bin_" & .Name
