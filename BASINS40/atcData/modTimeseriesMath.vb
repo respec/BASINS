@@ -163,11 +163,9 @@ Public Module modTimeseriesMath
                 lMinIndex = -1
                 lMinDate = Double.MaxValue
                 For lIndex = 0 To lMaxGroupIndex
-                    If lNextIndex(lIndex) > 0 Then
-                        If lNextDate(lIndex) < lMinDate Then
-                            lMinIndex = lIndex
-                            lMinDate = lNextDate(lIndex)
-                        End If
+                    If lNextIndex(lIndex) > 0 AndAlso lNextDate(lIndex) < lMinDate Then
+                        lMinIndex = lIndex
+                        lMinDate = lNextDate(lIndex)
                     End If
                 Next
 
@@ -179,8 +177,10 @@ Public Module modTimeseriesMath
 
                 'Add earliest date and value to new TS
                 If lMinIndex >= 0 Then
+                    'Logger.Dbg("---found min date in data set " & lMinIndex)
                     lOldTS = aGroup.Item(lMinIndex)
                     If lOldTS.ValueAttributesGetValue(lNextIndex(lMinIndex), "Inserted", False) Then
+                        'Logger.Dbg("---discarding inserted value")
                         'This value was inserted during splitting and will now be discarded
                         lNewIndex -= 1
                         lTotalNumValues -= 1
@@ -191,24 +191,31 @@ Public Module modTimeseriesMath
                             lNextIndex(lMinIndex) = -1
                         End If
                     Else
+                        'Logger.Dbg("---MergeTimeseries adding date " & lMinDate & " value " & lOldTS.Value(lNextIndex(lMinIndex)) & " from dataset " & lMinIndex)
                         lNewTS.Dates.Value(lNewIndex) = lMinDate
                         lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lMinIndex))
+
+                        lNextIndex(lMinIndex) += 1
+                        If lNextIndex(lMinIndex) <= lOldTS.numValues Then
+                            lNextDate(lMinIndex) = lOldTS.Dates.Value(lNextIndex(lMinIndex))
+                        Else
+                            lNextIndex(lMinIndex) = -1
+                        End If
+
                         For lIndex = 0 To lMaxGroupIndex
                             'Discard next value from any TS that falls within one millisecond
                             'Don't need Math.Abs because we already found minimum
                             While lNextIndex(lIndex) > 0 AndAlso (lNextDate(lIndex) - lMinDate) < JulianMillisecond
-                                If lIndex <> lMinIndex Then 'Discarding a duplicate date
-                                    lTotalNumValues -= 1    'This duplicate no longer counts toward total
-                                    'lOldTS = aGroup.Item(lIndex)
-                                    'Logger.dbg("MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " using " & lOldValue)
-                                End If
+                                lOldTS = aGroup.Item(lIndex)
+                                'Logger.Dbg("---MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " from dataset " & lIndex)
+                                lTotalNumValues -= 1    'This duplicate no longer counts toward total
                                 lNextIndex(lIndex) += 1
                                 If lNextIndex(lIndex) <= lOldTS.numValues Then
                                     lNextDate(lIndex) = lOldTS.Dates.Value(lNextIndex(lIndex))
                                 Else
                                     lNextIndex(lIndex) = -1
                                 End If
-                            End While                           
+                            End While
                         Next
                     End If
                 Else 'out of values in all the datasets
