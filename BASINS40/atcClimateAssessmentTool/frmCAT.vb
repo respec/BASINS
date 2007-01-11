@@ -878,11 +878,15 @@ Public Class frmCAT
                         Dim lGroup As atcDataGroup = Nothing
                         Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
                         Dim lResultDataSpec As String = aResults.ItemByKey(lOriginalDataSpec)
-                        If Not lResultDataSpec Is Nothing Then
+                        If lResultDataSpec Is Nothing Then
+                            Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
+                        Else
                             Dim lResultDataSource As atcDataSource = OpenDataSource(lResultDataSpec)
-                            If Not lResultDataSource Is Nothing Then
+                            If lResultDataSource Is Nothing Then
+                                Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
+                            Else
                                 lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
-                                If Not lGroup Is Nothing AndAlso lGroup.Count > 0 Then
+                                If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
                                     Dim lData As atcTimeseries = lGroup.Item(0)
                                     If Not lEndpoint.Seasons Is Nothing Then
                                         lData = lEndpoint.Seasons.SplitBySelected(lData, Nothing).Item(0)
@@ -903,6 +907,8 @@ Public Class frmCAT
                                         End If
                                     End If
                                 Else
+                                    Logger.Dbg("No Data for ID " & lOldData.Attributes.GetValue("ID") & _
+                                               " Count " & lResultDataSource.DataSets.Count)
                                     .CellValue(lRow, lColumn) = ""
                                 End If
                                 lColumn += 1

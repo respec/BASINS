@@ -56,7 +56,10 @@ Public Module modCAT
                     If lWDMfilename.IndexOf("base.") < 0 Then
                         Logger.Message("WDM file does not contain 'base.' so cannot be used in CAT:" _
                         & vbCrLf & lWDMfilename & vbCrLf & "Name of file must be changed on disk and in UCI file:" _
-                        & vbCrLf & aBaseFilename, "WDM file must be renamed", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
+                        & vbCrLf & aBaseFilename, "WDM file must be renamed", _
+                        Windows.Forms.MessageBoxButtons.OK, _
+                        Windows.Forms.MessageBoxIcon.Error, _
+                        Windows.Forms.DialogResult.OK)
                         g_running = False
                         Return Nothing
                     End If
