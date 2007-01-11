@@ -94,7 +94,8 @@ Public Class atcSeasonBase
     Public Overridable Function SplitBySelected(ByVal aTS As atcTimeseries, ByVal aSource As atcDataSource) As atcDataGroup
         Dim lNewGroup As New atcDataGroup
         Dim lSeasonIndex As Integer = -1
-        Dim lPrevSeasonIndex As Integer
+        Dim lIsInside As Boolean = False
+        Dim lWasInside As Boolean = False
         Dim lInsideTS As New atcTimeseries(aSource)
         Dim lOutsideTS As New atcTimeseries(aSource)
         Dim lNewTS As atcTimeseries
@@ -122,14 +123,16 @@ Public Class atcSeasonBase
         lNewGroup.Add(lSeasonIndex, lOutsideTS)
 
         For iValue As Integer = 1 To aTS.numValues
-            lPrevSeasonIndex = lSeasonIndex
             If lPoint Then
                 lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue))
-            Else '
+            Else
                 lSeasonIndex = SeasonIndex(aTS.Dates.Value(iValue - 1))
             End If
 
-            If SeasonSelected(lSeasonIndex) Then
+            lWasInside = lIsInside
+            lIsInside = SeasonSelected(lSeasonIndex)
+
+            If lIsInside Then
                 lNewTS = lInsideTS
             Else
                 lNewTS = lOutsideTS
@@ -142,8 +145,8 @@ Public Class atcSeasonBase
                 If aTS.ValueAttributesExist(lNewTSvalueIndex) Then 'TODO:finish this!
                     'lnewts.ValueAttributes(lnewtsvalueindex).SetRange(
                 End If
-                If lPrevSeasonIndex <> lSeasonIndex Then
-                    'Insert dummy value for start of interval after skipping dates outside season
+                If lNewTSvalueIndex = 0 OrElse lIsInside <> lWasInside Then
+                    'Insert NaN at zero position and at start of interval after dates in other season
                     lNewTS.Values(lNewTSvalueIndex) = Double.NaN
                     lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue - 1)
                     lNewTS.ValueAttributes(lNewTSvalueIndex).SetValue("Inserted", True)
