@@ -280,41 +280,60 @@ Public Module UCICombiner
         BuildCombinedWDMs(lCombinedUci, lMetWDMNames, lPrecWDMNames, lPtSrcWDMNames, lOutputWDMNames)
         Logger.Dbg("CombinedWdmsBuilt")
 
-        'write the combined uci 
-        lCombinedUci.Save()
-        Logger.Dbg("CombinedUCI Saved")
-
         With lCombinedUci
-            Dim lLastRchresOperation As atcUCI.HspfOperation = Nothing
-            For Each lOper In .OpnSeqBlock.Opns
-                If lOper.optyp = atcUCI.HspfData.HspfOperType.hRchres Then
-                    lLastRchresOperation = lOper
+            'fill in name of pltgen file 
+            .FilesBlock.AddFromSpecs(pScenario & ".plt", "", 31)
+            'write the combined uci 
+            .Save()
+            Logger.Dbg("CombinedUCI Saved")
+
+            'try to add binary output
+            Dim lAllOperations As Boolean = True
+            Dim lBinChange As Boolean = False
+            Dim lIndex As Integer = 0
+            Dim lOpnTypesWithBinary() As String = {"RCHRES", "PERLND", "IMPLND"} '{"RCHRES"} 
+            For Each lOpnType As String In lOpnTypesWithBinary
+                lIndex += 1
+                Dim lOpnBlk As atcUCI.HspfOpnBlk = .OpnBlks(lOpnType)
+
+                If lOpnBlk.Ids.Count = 0 Then
+                    Logger.Dbg("No " & lOpnType & " to add binary output to")
+                Else
+                    Dim lBinUnit As Integer = 40 + lIndex  'TODO: don't hard code this unit number
+                    .FilesBlock.AddFromSpecs(pScenario & "." & lOpnType.ToLower & ".hbn", "BINO", lBinUnit)
+
+                    Dim lTableName As String = "BINARY-INFO"
+                    If Not lOpnBlk.TableExists(lTableName) Then
+                        lOpnBlk.AddTableForAll(lTableName, lOpnType)
+                    End If
+
+                    Dim lStartOperation As Integer = lOpnBlk.Ids.Count
+                    If lAllOperations Then
+                        lStartOperation = 1
+                    End If
+                    For lOperationIndex As Integer = lStartOperation To lOpnBlk.Ids.Count
+                        Dim lOperation As atcUCI.HspfOperation = lOpnBlk.Ids(lOperationIndex)
+                        Dim lTable As atcUCI.HspfTable = lOperation.Tables("GEN-INFO")
+                        Logger.Dbg("GenInfoParmCount " & lTable.Parms.Count)
+                        lTable.Parms(lTable.Parms.Count - 1).Value = lBinUnit
+                        lTable = lOperation.Tables(lTableName)
+
+                        Logger.Dbg("BinaryTableParmCount " & lTable.Parms.Count)
+                        For i As Integer = 1 To lTable.Parms.Count - 2
+                            lTable.Parms(i).Value = 3 'day 4 'month
+                        Next
+                        lTable.Parms(lTable.Parms.Count).Value = 12
+                        Logger.Dbg("Binary output added for " & lOperation.Name & " " & _
+                                                                lOperation.Id)
+
+                        lBinChange = True
+                    Next lOperationIndex
                 End If
             Next
 
-            If lLastRchresOperation Is Nothing Then
-                Logger.Dbg("No RCHRES to add binary output to")
-            Else
-                .FilesBlock.AddFromSpecs(pScenario & ".plt", "", 31)
-                .FilesBlock.AddFromSpecs(pScenario & ".hbn", "BINO", 27)
-                Dim lTable As atcUCI.HspfTable = lLastRchresOperation.Tables("GEN-INFO")
-                lTable.Parms(8).Value = 27
-
-                Dim lTableName As String = "BINARY-INFO"
-                Dim lOpnBlkRchres As atcUCI.HspfOpnBlk = .OpnBlks("RCHRES")
-                If Not lOpnBlkRchres.TableExists(lTableName) Then
-                    lOpnBlkRchres.AddTableForAll(lTableName, "RCHRES")
-                End If
-                lTable = lLastRchresOperation.Tables(lTableName)
-                Logger.Dbg("Message " & lTable.Parms.Count)
-                For i As Integer = 1 To 10
-                    lTable.Parms(i).Value = 4 'month
-                Next
-                lTable.Parms(12).Value = 12
+            If lBinChange Then
                 .Name = "bin_" & .Name
                 .Save()
-                Logger.Dbg("Binary output added for " & lLastRchresOperation.Name & " " & _
-                                                        lLastRchresOperation.Id)
             End If
         End With
     End Sub
@@ -368,11 +387,11 @@ Public Module UCICombiner
             lHspfFile.Typ = "WDM1"
             lHspfFile.Unit = "21"
             .Value(1) = lHspfFile
-            lHspfFile.Name = "ptsrc.wdm"
+            lHspfFile.Name = pScenario & ".ptsrc.wdm"
             lHspfFile.Typ = "WDM3"
             lHspfFile.Unit = "23"
             .Value(2) = lHspfFile
-            lHspfFile.Name = "output.wdm"
+            lHspfFile.Name = pScenario & ".output.wdm"
             lHspfFile.Typ = "WDM4"
             lHspfFile.Unit = "24"
             .Value(3) = lHspfFile
