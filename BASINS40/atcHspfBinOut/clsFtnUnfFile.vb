@@ -79,7 +79,7 @@ Friend Class clsFtnUnfFile
                     ReDim .Rec(.Len - 1)
                     FileGet(pFileNum, .Rec)
                 Else 'whats the problem?
-                    MsgBox("clsFtnUnfFile:ReadRestOfRecordsInFile:Len=0:Start=" & .StartPos & ":Lof=" & pBytesInFile & ":File=" & pFileName)
+                    Logger.Dbg("***** clsFtnUnfFile:ReadRestOfRecordsInFile:Len=0:Start=" & .StartPos & ":Lof=" & pBytesInFile & ":File=" & pFileName)
                 End If
             End With
             pRecords.Add(lUnfRec)
