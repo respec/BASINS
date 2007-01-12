@@ -51,6 +51,7 @@
     <DebugType>none</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="atcControls, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="MapWinUtility, Version=1.0.2559.20461, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
@@ -83,6 +84,12 @@
     <Compile Include="atcSynopticAnalysisPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="frmSynoptic.Designer.vb">
+      <DependentUpon>frmSynoptic.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSynoptic.vb">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\atcData\atcData.vbproj">
@@ -101,6 +108,12 @@
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="frmSynoptic.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSynoptic.vb</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />
