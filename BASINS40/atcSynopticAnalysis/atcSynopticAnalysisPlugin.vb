@@ -14,10 +14,15 @@ Public Class atcSynopticAnalysisPlugin
     Public Overrides Function Show(ByVal aDataManager As atcDataManager, _
                      Optional ByVal aDataGroup As atcDataGroup = Nothing) _
                      As Object 'System.Windows.Forms.Form
-        Dim lFilename As String = IO.Path.GetTempPath() & "SynopticAnalysis.txt"
-        Save(aDataManager, aDataGroup, lFilename)
-        Process.Start(lFilename)
-        Return Nothing
+
+        Dim lForm As New frmSynoptic
+        lForm.Initialize(aDataManager, aDataGroup)
+        Return lForm
+
+        'Dim lFilename As String = IO.Path.GetTempPath() & "SynopticAnalysis.txt"
+        'Save(aDataManager, aDataGroup, lFilename)
+        'Process.Start(lFilename)
+        'Return Nothing
     End Function
 
     Public Overrides Sub Save(ByVal aDataManager As atcDataManager, _
@@ -109,6 +114,14 @@ Public Class atcSynopticAnalysisPlugin
                Format(d(1), "00") & "/" & _
                Format(d(2), "00") & vbTab & _
                Format(d(3), "00")
+    End Function
+
+    Public Shared Function ComputeEvents(ByVal aDataGroup As atcDataGroup, ByVal aThreshold As Double, ByVal aDaysGapAllowed As Double, ByVal aHighEvents As Boolean) As atcDataGroup
+        ComputeEvents = New atcDataGroup
+        For Each lDataSet As atcTimeseries In aDataGroup
+            Dim lEvents As atcDataGroup = atcEvents.EventSplit(lDataSet, Nothing, aThreshold, aDaysGapAllowed, aHighEvents)
+            ComputeEvents.AddRange(lEvents)
+        Next
     End Function
 
 End Class
