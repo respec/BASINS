@@ -127,7 +127,9 @@ Friend Class clsHspfBinary
                             thisVarName = Byte2String(currec, recbyte + 4, varLen)
                             'On Error Resume Next
                             If InStr(thisVarName, "(") Then
-                                MsgBox("bad varname:" & thisVarName)
+                                Logger.Dbg("***** Bad VarName:" & thisVarName)
+                                thisVarName = thisVarName.Replace("(", "")
+                                thisVarName = thisVarName.Replace(")", "")
                             End If
                             .VarNames.Add(thisVarName, thisVarName)
                             'On Error GoTo 0
@@ -161,19 +163,19 @@ Friend Class clsHspfBinary
                             Try
                                 pHeaders.ItemByKey(myKey).Data.Add(myDataKey, myData) 'should this be a date string YYYY/MM/DD HH?
                             Catch e As Exception
-                                MsgBox("clsHspfBinary:ReadNewRecords:Fail to add data to header")
+                                Logger.Dbg("***** ReadNewRecords:Fail to add data to header " & e.ToString)
                             End Try
                         End With
-                    Catch
+                    Catch e As Exception
                         'Else
-                        s = "Data Without Header for Key:" & myKey
-                        MsgBox(s, vbOKOnly, "clsHspfBinary")
+                        s = "***** Data Without Header for Key:" & myKey & " " & e.ToString
+                        Logger.Dbg(s)
                         pErrorDescription = s
                         'End If
                     End Try
                 Case Else
-                    s = "Bad Record Type: " & BitConverter.ToInt32(currec, 0)
-                    MsgBox(s, vbOKOnly, "clsHspfBinary")
+                    s = "***** Bad Record Type: " & BitConverter.ToInt32(currec, 0)
+                    Logger.Dbg(s)
                     pErrorDescription = s
             End Select
             If pMonitorSet Then
