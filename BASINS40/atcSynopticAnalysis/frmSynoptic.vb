@@ -47,21 +47,19 @@ Public Class frmSynoptic
 
         If pDataGroup.Count > 0 Then
             Me.Show()
+            cboGapUnits.Items.AddRange(pGapUnitNames)
+            cboGroupBy.Items.AddRange(pGroupByNames)
+
+            cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
+            cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
+            txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
+            radioAbove.Checked = GetSetting("Synoptic", "Defaults", "High", radioAbove.Checked)
+            txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
+            cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
             PopulateGrid()
         Else 'user declined to specify timeseries
             Me.Close()
         End If
-
-        cboGapUnits.Items.AddRange(pGapUnitNames)
-        cboGroupBy.Items.AddRange(pGroupByNames)
-
-        cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
-        cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
-        txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
-        radioAbove.Checked = GetSetting("Synoptic", "Defaults", "High", radioAbove.Checked)
-        txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
-        cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
-
     End Sub
 
     Private Sub PopulateGrid()
