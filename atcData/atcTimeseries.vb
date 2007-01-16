@@ -100,6 +100,7 @@ Public Class atcTimeseries
     ''' </remarks>
     Public Property Dates() As atcTimeseries
         Get
+            EnsureValuesRead()
             Return pDates
         End Get
         Set(ByVal newValue As atcTimeseries)
@@ -172,7 +173,8 @@ Public Class atcTimeseries
     Public Sub EnsureValuesRead()
         If pValuesNeedToBeRead AndAlso Not pDataSource Is Nothing Then
             'just header information was read at first, delaying using the time/space to read all the data
-            pDataSource.ReadData(Me) 'ValuesNeedToBeRead = False should happen in pFile.ReadData            
+            ValuesNeedToBeRead = False
+            pDataSource.ReadData(Me)
         End If
     End Sub
 
@@ -188,6 +190,9 @@ Public Class atcTimeseries
         End Get
         Set(ByVal newValue As Boolean)
             pValuesNeedToBeRead = newValue
+            If Not pDates Is Nothing Then
+                pDates.ValuesNeedToBeRead = newValue
+            End If
         End Set
     End Property
 
