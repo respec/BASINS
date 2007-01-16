@@ -42,18 +42,19 @@ Module modData
                                 ByVal aTargetId As Integer, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) As Boolean
 
-        Dim lSourceDataSource As atcData.atcDataSource
-        Select Case aSourceType
-            Case "wdm"
-                lSourceDataSource = New atcWDM.atcDataSourceWDM
-            Case Else
-                lSourceDataSource = New atcData.atcDataSource
-        End Select
+        Dim lSourceDataSource As New atcWDM.atcDataSourceWDM
+        'Select Case aSourceType
+        '    Case "wdm"
+        '        lSourceDataSource = New atcWDM.atcDataSourceWDM
+        '    Case Else
+        '        Logger.Dbg("CopyDataSet:NotWDM (" & aSourceType & ") " & aSourceSpecification)
+        '        Return False
+        'End Select
         If lSourceDataSource.Open(aSourceSpecification) Then
             Dim lSourceDataSetIndex As Integer = lSourceDataSource.DataSets.IndexFromKey(aSourceId)
-            Dim lSourceDataSet As New atcDataSet
+            Dim lSourceDataSet As atcTimeseries = Nothing
             If lSourceDataSetIndex >= 0 Then
-                lSourceDataSet = lSourceDataSource.DataSets(lSourceDataSetIndex)
+                lSourceDataSet = lSourceDataSource.DataSets.ItemByIndex(lSourceDataSetIndex)
                 lSourceDataSource.ReadData(lSourceDataSet)
             End If
             If lSourceDataSet Is Nothing Then
