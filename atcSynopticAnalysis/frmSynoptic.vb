@@ -21,6 +21,7 @@ Public Class frmSynoptic
     Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum", "Mean", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
 
     Private pColumnTitles() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "Maximum Intensity", "Mean Intensity"}
+    Private pColumnUnits() As String = {"", "", "", "in/hr", "in", "in", "", "", "", "in/hr", "in/hr"}
 
     Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
     Private pVolumeGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0}
@@ -56,7 +57,6 @@ Public Class frmSynoptic
             txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
             radioAbove.Checked = GetSetting("Synoptic", "Defaults", "High", radioAbove.Checked)
             txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
-            cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
             PopulateGrid()
         Else 'user declined to specify timeseries
             Me.Close()
@@ -70,8 +70,11 @@ Public Class frmSynoptic
         Dim lValue As Double
         Dim lTemp As Double
         Dim lGroupIndex As Integer = 0
+        Dim lDurationFactor As Double = pGapUnitFactor(cboGapUnits.SelectedIndex)
 
         If pEvents Is Nothing Then ComputeEventsFromFormParameters()
+
+        SetDurationUnits(cboGapUnits.Text)
 
         Select Case cboGroupBy.Text
             Case "Each Event"
@@ -86,8 +89,8 @@ Public Class frmSynoptic
                 Next
                 For Each lEvent As atcTimeseries In pEvents
                     lValue = lEvent.numValues
-                    For lIndex = 0 To pVolumeGroupEdges.GetUpperBound(0)
-                        If lValue > pVolumeGroupEdges(lIndex) Then
+                    For lIndex = 0 To pMeasurementsGroupEdges.GetUpperBound(0)
+                        If lValue > pMeasurementsGroupEdges(lIndex) Then
                             lGroups.ItemByIndex(lIndex).Add(lEvent)
                             Exit For 'Only add to group with highest bound that fits
                         End If
@@ -96,14 +99,14 @@ Public Class frmSynoptic
             Case "Month"
                 Dim lIndex As Integer
                 For lIndex = 1 To 12
-                    lGroups.Add(lIndex, New atcDataGroup)
+                    lGroups.Add(lIndex & " " & MonthName(lIndex), New atcDataGroup)
                 Next
                 For Each lEvent As atcTimeseries In pEvents
                     'TODO: find date of peak instead of first date
                     Dim lPeakDate As Double = lEvent.Dates.Value(1)
                     Dim lVBDate As Date
                     lVBDate = Date.FromOADate(lPeakDate)
-                    lGroups.ItemByKey(lVBDate.Month).Add(lEvent)
+                    lGroups.ItemByIndex(lVBDate.Month - 1).Add(lEvent)
                 Next
             Case "Season"
             Case "Year"
@@ -156,10 +159,11 @@ Public Class frmSynoptic
 
         pSource = New atcGridSource()
         pSource.Columns = pColumnTitles.Length
-        pSource.Rows = lGroups.Count + 1
-        pSource.FixedRows = 1
+        pSource.FixedRows = 2
+        pSource.Rows = lGroups.Count + pSource.FixedRows
         For lColumn = 0 To pColumnTitles.Length - 1
             pSource.CellValue(0, lColumn) = pColumnTitles(lColumn)
+            pSource.CellValue(1, lColumn) = pColumnUnits(lColumn)
         Next
 
         lGroupIndex = 0
@@ -168,7 +172,7 @@ Public Class frmSynoptic
                 lValue = 0
                 Select Case pColumnTitles(lColumn)
                     Case "Group"
-                        pSource.CellValue(lGroupIndex + 1, lColumn) = lGroups.Keys(lGroupIndex)
+                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = lGroups.Keys(lGroupIndex)
                     Case "Events"
                         lValue = lGroup.Count
                     Case "Measurements"
@@ -197,15 +201,18 @@ Public Class frmSynoptic
                                 lValue = lTemp
                             End If
                         Next
+                        lValue /= lDurationFactor
                     Case "Mean Duration" 'TODO: add one interval, can we use Value(0)?
                         For Each lDataset In lGroup
                             lValue += lDataset.Dates.Value(lDataset.numValues) - lDataset.Dates.Value(1)
                         Next
                         lValue /= lGroup.Count
+                        lValue /= lDurationFactor
                     Case "Total Duration" 'TODO: add one interval, can we use Value(0)?
                         For Each lDataset In lGroup
                             lValue += lDataset.Dates.Value(lDataset.numValues) - lDataset.Dates.Value(1)
                         Next
+                        lValue /= lDurationFactor
                     Case "Maximum Intensity"
                         For Each lDataset In lGroup
                             lTemp = lDataset.Attributes.GetValue("Max")
@@ -222,9 +229,9 @@ Public Class frmSynoptic
                 Select Case pColumnTitles(lColumn)
                     Case "Group"
                     Case "Events", "Measurements"
-                        pSource.CellValue(lGroupIndex + 1, lColumn) = CInt(lValue)
+                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = CInt(lValue)
                     Case Else
-                        pSource.CellValue(lGroupIndex + 1, lColumn) = DoubleToString(lValue, , , , , 3)
+                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue, , , , , 3)
                 End Select
             Next
 
@@ -340,7 +347,13 @@ Public Class frmSynoptic
     End Property
 
     Public Overrides Function ToString() As String
-        Return Me.Text & vbCrLf & agdMain.ToString
+        Dim lAboveString As String
+        If radioAbove.Checked Then lAboveString = "Above" Else lAboveString = "Below"
+        Return Me.Text & vbCrLf _
+            & "Events " & lAboveString & " " & txtThreshold.Text & vbCrLf _
+            & "Allowing gaps of up to " & txtGap.Text & " " & cboGapUnits.Text & vbCrLf _
+            & "Grouped by " & cboGroupBy.Text & vbCrLf _
+            & agdMain.ToString
     End Function
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
@@ -375,5 +388,13 @@ Public Class frmSynoptic
 
     Private Sub cboGroupBy_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboGroupBy.SelectedIndexChanged
         PopulateGrid()
+    End Sub
+
+    Private Sub SetDurationUnits(ByVal aUnits As String)
+        For lIndex As Integer = 0 To pColumnUnits.Length - 1
+            If pColumnTitles(lIndex).Contains("Duration") Then
+                pColumnUnits(lIndex) = aUnits
+            End If
+        Next
     End Sub
 End Class
