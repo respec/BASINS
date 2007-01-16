@@ -848,8 +848,8 @@ Public Class GisUtil
         Dim lSi As MapWindow.Interfaces.SelectInfo
 
         lSi = pMapWin.View.SelectedShapes
-        lLayer = LayerFromIndex(aLayerIndex) 'TODO: what does this do?
-        If lSi.LayerHandle = aLayerIndex Then
+        lLayer = LayerFromIndex(aLayerIndex)
+        If lSi.LayerHandle = lLayer.Handle Then
             NumSelectedFeatures = lSi.NumSelected()
         Else
             NumSelectedFeatures = 0

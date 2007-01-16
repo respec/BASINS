@@ -530,6 +530,7 @@ Friend Module modBasinsPlugin
                     'want to keep met pts
                     g_MapWin.StatusBar(1).Text = "Selecting " & GisUtil.LayerName(iLayer)
                     g_MapWin.Refresh()
+                    Logger.Dbg("CopyFeaturesWithinExtent:" & GisUtil.LayerName(iLayer))
 
                     If InStr(GisUtil.LayerFileName(iLayer), aOldFolder) > 0 Then
                         'this layer is in our project folder
@@ -546,11 +547,17 @@ Friend Module modBasinsPlugin
                                 If lResultSf.CreateNew(lNewName, lCurrentSf.ShapefileType) Then
                                     rslt = False
                                     If lLayerType = 1 Then
+                                        Logger.Dbg("  SelectingPoints")
                                         rslt = MapWinGeoProc.Selection.SelectPointsWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                        Logger.Dbg("  FinishedSelectingPoints")
                                     ElseIf lLayerType = 3 Then
+                                        Logger.Dbg("  SelectingPolygons")
                                         rslt = MapWinGeoProc.Selection.SelectPolygonsWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                        Logger.Dbg("  FinishedSelectingPolygons")
                                     ElseIf lLayerType = 2 Then
+                                        Logger.Dbg("  SelectingLines")
                                         rslt = MapWinGeoProc.Selection.SelectLinesWithPolygon(lCurrentSf, lExtentShape, lResultSf)
+                                        Logger.Dbg("  FinishedSelectingLines")
                                     End If
                                     If rslt Then
                                         lResultSf.SaveAs(lNewName)
