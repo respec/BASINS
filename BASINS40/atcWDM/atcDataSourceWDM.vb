@@ -14,7 +14,7 @@ Public Class atcDataSourceWDM
     Private Shared pFileFilter As String = "WDM Files (*.wdm)|*.wdm"
     Private pErrorDescription As String
     Private pDates As ArrayList 'of atcTimeseries
-    Private pQuick As Boolean
+    Private pQuick As Boolean = False
     Private pNan As Double
     Private pEpsilon As Double
     Private Shared pMsg As atcMsgWDM
@@ -138,27 +138,27 @@ Public Class atcDataSourceWDM
             If F90_WDCKDT(lWdmHandle.Unit, lDsn) > 0 Then 'dataset exists, what do we do?
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
                 If aExistAction = ExistReplace Then
-                    Dim lRet As Integer
                     'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
+                    Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
+                    Dim lRet As Integer
                     F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
                     'Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
-                    Dim lReplaceThis As atcTimeseries = DataSets.ItemByKey(lDsn)
-                    If Not lReplaceThis Is Nothing Then
-                        DataSets.Remove(lReplaceThis)
+                    If Not lExistTimser Is Nothing Then
+                        DataSets.Remove(lExistTimser)
                     End If
                 ElseIf aExistAction = ExistAppend Then 'find dataset and try to append to it
                     'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
                     Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
-                    If lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
+                    If lTimser.numValues > 0 AndAlso _
+                       lExistTimser.numValues > 0 AndAlso _
+                       lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
                         Throw New Exception("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
-                        lTimser.ToString & " to existing TSer " & lExistTimser.ToString & vbCrLf & _
-                        "New TSer start date (" & lTimser.Dates.Value(1) & _
-                        ") preceeds exising TSer end date (" & lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
+                                            lTimser.ToString & " to existing TSer " & _
+                                            lExistTimser.ToString & vbCrLf & _
+                                            "New TSer start date (" & lTimser.Dates.Value(1) & _
+                                            ") preceeds exising TSer end date (" & _
+                                            lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
                     End If
-                    Dim lExistEndDateJ As Double = lExistTimser.Dates.Value(lExistTimser.numValues)
-                    'Logger.Dbg("atcDataSourceWdm:OldFinalDate:" & DumpDate(lExistEndDateJ))
-                    Dim lNewStartDateJ As Double = lTimser.Dates.Value(0)
-                    'Logger.Dbg("atcDataSourceWdm:NewFirstDate:" & DumpDate(lNewStartDateJ))
                 Else 'use next available number
                     lDsn = findNextDsn(lDsn)
                     'Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
@@ -402,6 +402,10 @@ Public Class atcDataSourceWDM
         lMsg.Dispose()
     End Function
 
+    Private Function DateToyyyyMMddHHmmss(ByVal aDate As Date) As String
+        Return aDate.ToString("yyyyMMddHHmmss")
+    End Function
+
     ''' <summary>
     ''' Write an attribute to the WDM file
     ''' </summary>
@@ -421,38 +425,19 @@ Public Class atcDataSourceWDM
             Case "units"   'store Units ID as DCODE in WDM
                 lName = "DCODE"
                 lValue = CStr(GetUnitID(lValue))
-            Case "time unit"
-                lName = "tcode"
-            Case "time step"
-                lName = "tsstep"
-            Case "time step"
-                lName = "tsstep"
-            Case "scenario"
-                lName = "idscen"
-            Case "location"
-                lName = "idlocn"
-            Case "constituent"
-                lName = "idcons"
-            Case "description"
-                lName = "descrp"
+            Case "time unit" : lName = "tcode"
+            Case "time step" : lName = "tsstep"
+            Case "time step" : lName = "tsstep"
+            Case "scenario" : lName = "idscen"
+            Case "location" : lName = "idlocn"
+            Case "constituent" : lName = "idcons"
+            Case "description" : lName = "descrp"
             Case "date created"
                 lName = "datcre"
-                Dim ls As String = CStr(Year(lValue)).PadLeft(4, "0") & _
-                                   CStr(Month(lValue)).PadLeft(2, "0") & _
-                                   CStr(Day(lValue)).PadLeft(2, "0") & _
-                                   CStr(Hour(lValue)).PadLeft(2, "0") & _
-                                   CStr(Minute(lValue)).PadLeft(2, "0") & _
-                                   CStr(Second(lValue)).PadLeft(2, "0")
-                lValue = ls
+                lValue = DateToyyyyMMddHHmmss(lValue)
             Case "date modified"
                 lName = "datmod"
-                Dim ls As String = CStr(Year(lValue)).PadLeft(4, "0") & _
-                                   CStr(Month(lValue)).PadLeft(2, "0") & _
-                                   CStr(Day(lValue)).PadLeft(2, "0") & _
-                                   CStr(Hour(lValue)).PadLeft(2, "0") & _
-                                   CStr(Minute(lValue)).PadLeft(2, "0") & _
-                                   CStr(Second(lValue)).PadLeft(2, "0")
-                lValue = ls
+                lValue = DateToyyyyMMddHHmmss(lValue)
         End Select
 
         Dim lMsgDefinition As atcAttributeDefinition = pMsg.Attributes.ItemByKey(lName.ToLower)
@@ -586,12 +571,11 @@ Public Class atcDataSourceWDM
             If lWdmHandle.Unit > 0 Then
                 With aReadMe.Attributes
                     If Not CBool(.GetValue("HeaderComplete", False)) Then
-                        DsnReadGeneral(lWdmHandle.Unit, aReadMe)
+                        DsnReadGeneral(lWdmHandle.Unit, lReadTS)
                     End If
 
                     If Not CBool(.GetValue("HeaderOnly", False)) Then
                         lReadTS.ValuesNeedToBeRead = False
-                        lReadTS.Dates.ValuesNeedToBeRead = False
 
                         Dim lSJDay As Double = .GetValue("SJDay", 0)
                         J2Date(lSJDay, lSdat)
@@ -676,7 +660,6 @@ Public Class atcDataSourceWDM
         lData.Attributes.AddHistory("Read from " & Specification)
 
         lData.ValuesNeedToBeRead = True
-        lData.Dates.ValuesNeedToBeRead = True
         DataSets.Add(aDsn, lData)
 
         DsnReadGeneral(aFileUnit, lData)
@@ -700,7 +683,7 @@ Public Class atcDataSourceWDM
                                                  CInt(lS.Substring(12, 2)))
                                 lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lDate)
                             Case "DCODE"
-                                'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(S)))
+                                lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(lS)))
                             Case Else
                                 lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lS)
                         End Select
@@ -716,10 +699,6 @@ Public Class atcDataSourceWDM
         'If Not lData.Attributes.isSet("Units") Then
         'lData.Attributes.SetValue(UnitsAttributeDefinition(True), "Unknown")
         'End If
-
-        If pQuick Then
-            lData.Attributes.SetValue("HeaderComplete", False) 'false, must do later when used
-        End If
 
         'If lData.Attributes.GetValue("locn") = "<unk>" And BasInfAvail Then 'no location, try to check BASINS inf file
         'Call HeaderFromBasinsInf(lData)
@@ -769,14 +748,18 @@ Public Class atcDataSourceWDM
             Dim lDsfrc As Integer
             F90_WTFNDT(aFileUnit, lDsn, lGpFlg, lDsfrc, lSdat(0), lEdat(0), lRetcod)
             If lSdat(0) > 0 Then
+                Dim lDates As atcTimeseries = aDataset.Dates
+                Dim lSJDay As Double = Date2J(lSdat)
+                Dim lEJDay As Double = Date2J(lEdat)
+                aDataset.Attributes.SetValue("SJDay", lSJDay)
+                aDataset.Attributes.SetValue("EJDay", lEJDay)
+                lDates.Attributes.SetValue("SJDay", lSJDay)
+                lDates.Attributes.SetValue("EJDay", lEJDay)
                 TimDif(lSdat, lEdat, lTu, lTs, lNvals)
-                aDataset.Dates.Attributes.SetValue("SJDay", Date2J(lSdat))
-                aDataset.Dates.Attributes.SetValue("EJDay", Date2J(lEdat))
-                aDataset.Attributes.SetValue("SJDay", Date2J(lSdat))
-                aDataset.Attributes.SetValue("EJDay", Date2J(lEdat))
                 aDataset.numValues = lNvals
-                aDataset.Dates.numValues = lNvals
+                lDates.numValues = lNvals
             End If
+            aDataset.Attributes.SetValue("HeaderComplete", True)
         End If
 
         'get data-set scenario name
@@ -811,7 +794,6 @@ Public Class atcDataSourceWDM
         ''description
         'F90_WDBSGC(aFileUnit, lDsn, CInt(10), CInt(80), lStr)
         'aDataset.Attributes.SetValue("descrp", lStr)
-        'aDataset.Attributes.SetValue("HeaderComplete", True)
     End Sub
 
     Private Function AttrVal2String(ByRef aSaInd As Integer, ByRef aSaVal() As Integer) As String
