@@ -18,12 +18,13 @@ Public Class frmSynoptic
     Private pGapUnitNames() As String = {"Seconds", "Minutes", "Hours", "Days", "Weeks", "Months", "Years"}
     Private pGapUnitFactor() As String = {JulianSecond, JulianMinute, JulianHour, 1, 7, 31, 366}
 
-    Private pGroupByNames() As String = {"Event", "Month", "Season", "Year", "Volume", "Maximum", "Mean", "Length", "One Group"}
+    Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum", "Mean", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
 
-    Private pColumnTitles() As String = {"Group", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "Maximum Intensity", "Mean Intensity", "Total Intensity"}
+    Private pColumnTitles() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "Maximum Intensity", "Mean Intensity"}
 
+    Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
     Private pVolumeGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0}
-
+    Private pMaximumGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0}
 
     Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
                  Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
@@ -65,35 +66,89 @@ Public Class frmSynoptic
     Private Sub PopulateGrid()
         Dim lGroups As New atcCollection
         Dim lDataset As atcTimeseries
+        Dim lColumn As Integer
         Dim lValue As Double
+        Dim lTemp As Double
         Dim lGroupIndex As Integer = 0
 
         If pEvents Is Nothing Then ComputeEventsFromFormParameters()
 
         Select Case cboGroupBy.Text
-            Case "Event"
+            Case "Each Event"
                 For Each lEvent As atcTimeseries In pEvents
-                    lGroups.Add(lGroupIndex, New atcDataGroup(lEvent))
                     lGroupIndex += 1
+                    lGroups.Add(lGroupIndex, New atcDataGroup(lEvent))
+                Next
+            Case "Number of Measurements"
+                Dim lIndex As Integer
+                For Each lValue In pMeasurementsGroupEdges
+                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
+                Next
+                For Each lEvent As atcTimeseries In pEvents
+                    lValue = lEvent.numValues
+                    For lIndex = 0 To pVolumeGroupEdges.GetUpperBound(0)
+                        If lValue > pVolumeGroupEdges(lIndex) Then
+                            lGroups.ItemByIndex(lIndex).Add(lEvent)
+                            Exit For 'Only add to group with highest bound that fits
+                        End If
+                    Next
                 Next
             Case "Month"
+                Dim lIndex As Integer
+                For lIndex = 1 To 12
+                    lGroups.Add(lIndex, New atcDataGroup)
+                Next
+                For Each lEvent As atcTimeseries In pEvents
+                    'TODO: find date of peak instead of first date
+                    Dim lPeakDate As Double = lEvent.Dates.Value(1)
+                    Dim lVBDate As Date
+                    lVBDate = Date.FromOADate(lPeakDate)
+                    lGroups.ItemByKey(lVBDate.Month).Add(lEvent)
+                Next
             Case "Season"
             Case "Year"
-            Case "Volume"
+            Case "Total Volume"
                 Dim lIndex As Integer
                 For Each lValue In pVolumeGroupEdges
-                    lGroups.Add(Format(lValue, "0.00"), New atcDataGroup)
+                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
                 Next
                 For Each lEvent As atcTimeseries In pEvents
                     lValue = lEvent.Attributes.GetValue("Sum")
                     For lIndex = 0 To pVolumeGroupEdges.GetUpperBound(0)
                         If lValue > pVolumeGroupEdges(lIndex) Then
                             lGroups.ItemByIndex(lIndex).Add(lEvent)
+                            Exit For 'Only add to group with highest bound that fits
                         End If
                     Next
                 Next
             Case "Maximum"
+                Dim lIndex As Integer
+                For Each lValue In pMaximumGroupEdges
+                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
+                Next
+                For Each lEvent As atcTimeseries In pEvents
+                    lValue = lEvent.Attributes.GetValue("Max")
+                    For lIndex = 0 To pVolumeGroupEdges.GetUpperBound(0)
+                        If lValue > pVolumeGroupEdges(lIndex) Then
+                            lGroups.ItemByIndex(lIndex).Add(lEvent)
+                            Exit For 'Only add to group with highest bound that fits
+                        End If
+                    Next
+                Next
             Case "Mean"
+                Dim lIndex As Integer
+                For Each lValue In pMaximumGroupEdges
+                    lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
+                Next
+                For Each lEvent As atcTimeseries In pEvents
+                    lValue = lEvent.Attributes.GetValue("Mean")
+                    For lIndex = 0 To pVolumeGroupEdges.GetUpperBound(0)
+                        If lValue > pVolumeGroupEdges(lIndex) Then
+                            lGroups.ItemByIndex(lIndex).Add(lEvent)
+                            Exit For 'Only add to group with highest bound that fits
+                        End If
+                    Next
+                Next
             Case "Length"
             Case "One Group"
                 lGroups.Add("All", pEvents)
@@ -103,16 +158,23 @@ Public Class frmSynoptic
         pSource.Columns = pColumnTitles.Length
         pSource.Rows = lGroups.Count + 1
         pSource.FixedRows = 1
-        For lColumn As Integer = 1 To pColumnTitles.Length
-            pSource.CellValue(0, lColumn) = pColumnTitles(lColumn - 1)
+        For lColumn = 0 To pColumnTitles.Length - 1
+            pSource.CellValue(0, lColumn) = pColumnTitles(lColumn)
         Next
 
         lGroupIndex = 0
         For Each lGroup As atcDataGroup In lGroups
-            For lColumn As Integer = 1 To pColumnTitles.Length
+            For lColumn = 0 To pColumnTitles.Length - 1
                 lValue = 0
-                Select Case pColumnTitles(lColumn - 1)
-                    Case "Group" : lValue = lGroups.Keys(lGroupIndex)
+                Select Case pColumnTitles(lColumn)
+                    Case "Group"
+                        pSource.CellValue(lGroupIndex + 1, lColumn) = lGroups.Keys(lGroupIndex)
+                    Case "Events"
+                        lValue = lGroup.Count
+                    Case "Measurements"
+                        For Each lDataset In lGroup
+                            lValue += lDataset.numValues
+                        Next
                     Case "Maximum Volume"
                         For Each lDataset In lGroup
                             If lDataset.Attributes.GetValue("Sum") > lValue Then
@@ -129,18 +191,41 @@ Public Class frmSynoptic
                             lValue += lDataset.Attributes.GetValue("Sum")
                         Next
                     Case "Maximum Duration"
-                    Case "Mean Duration"
-                    Case "Total Duration"
+                        For Each lDataset In lGroup
+                            lTemp = lDataset.Dates.Value(lDataset.numValues) - lDataset.Dates.Value(1)
+                            If lTemp > lValue Then
+                                lValue = lTemp
+                            End If
+                        Next
+                    Case "Mean Duration" 'TODO: add one interval, can we use Value(0)?
+                        For Each lDataset In lGroup
+                            lValue += lDataset.Dates.Value(lDataset.numValues) - lDataset.Dates.Value(1)
+                        Next
+                        lValue /= lGroup.Count
+                    Case "Total Duration" 'TODO: add one interval, can we use Value(0)?
+                        For Each lDataset In lGroup
+                            lValue += lDataset.Dates.Value(lDataset.numValues) - lDataset.Dates.Value(1)
+                        Next
                     Case "Maximum Intensity"
                         For Each lDataset In lGroup
-                            If lDataset.Attributes.GetValue("Max") > lValue Then
-                                lValue = lDataset.Attributes.GetValue("Max")
+                            lTemp = lDataset.Attributes.GetValue("Max")
+                            If lTemp > lValue Then
+                                lValue = lTemp
                             End If
                         Next
                     Case "Mean Intensity"
-                    Case "Total Intensity"
+                        For Each lDataset In lGroup
+                            lValue += lDataset.Attributes.GetValue("Sum") / lDataset.numValues
+                        Next
+                        lValue /= lGroup.Count
                 End Select
-                pSource.CellValue(lGroupIndex + 1, lColumn) = DoubleToString(lValue, , , , , 3)
+                Select Case pColumnTitles(lColumn)
+                    Case "Group"
+                    Case "Events", "Measurements"
+                        pSource.CellValue(lGroupIndex + 1, lColumn) = CInt(lValue)
+                    Case Else
+                        pSource.CellValue(lGroupIndex + 1, lColumn) = DoubleToString(lValue, , , , , 3)
+                End Select
             Next
 
             'Duration (hours) 'TODO: dont hard code hours?
