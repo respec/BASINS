@@ -27,6 +27,40 @@ Public Module modCAT
         End While
     End Function
 
+    Private Sub CreateModifiedUCI(ByVal aBaseFilename As String, ByVal aNewScenarioName As String, ByVal aNewUciFilename As String)
+        Dim lUciContents As String = WholeFileString(aBaseFilename)
+        Dim lStartFilesPos As Integer = lUciContents.IndexOf(vbLf & "FILES") + 1
+        Dim lEndFilesPos As Integer = lUciContents.IndexOf(vbLf & "END FILES", lStartFilesPos) + 1
+        Dim lOriginalFilesBlock As String = lUciContents.Substring(lStartFilesPos, lEndFilesPos - lStartFilesPos)
+        Dim lNewFilesBlock As String = ""
+        Dim lSaveLineEnd As String = ""
+        Dim lCurrentLine As String
+        Dim lPathname As String
+        Dim lFilename As String
+
+        For Each lCurrentLine In lOriginalFilesBlock.Split(vbLf)
+            Select Case lCurrentLine.Length
+                Case 0 'Ignore empty lines (last will be empty)
+                Case Is < 16
+                    lNewFilesBlock &= lCurrentLine & vbLf
+                Case Else
+                    lSaveLineEnd = Right(lCurrentLine, 1)
+                    If lSaveLineEnd = vbCr Then
+                        lCurrentLine = lCurrentLine.Substring(0, lCurrentLine.Length - 1)
+                    Else
+                        lSaveLineEnd = ""
+                    End If
+                    lFilename = lCurrentLine.Substring(16)
+                    lPathname = PathNameOnly(lFilename)
+                    If lPathname.Length > 0 Then lPathname &= "\"
+                    lFilename = lPathname & aNewScenarioName & "." & FilenameNoPath(lFilename)
+                    lNewFilesBlock &= lCurrentLine.Substring(0, 16) & lFilename & lSaveLineEnd & vbLf
+            End Select
+        Next
+
+        SaveFileString(aNewUciFilename, lUciContents.Substring(0, lStartFilesPos) & lNewFilesBlock & lUciContents.Substring(lEndFilesPos))
+    End Sub
+
     Public Function ScenarioRun(ByVal aBaseFilename As String, _
                            ByVal aNewScenarioName As String, _
                            ByVal aModifiedData As atcDataGroup, _
@@ -50,22 +84,13 @@ Public Module modCAT
                 Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
 
                 'Copy base UCI, changing base to new scenario name within it
-                ReplaceStringToFile(WholeFileString(aBaseFilename), "base.", aNewScenarioName & ".", lNewBaseFilename & "uci")
+                CreateModifiedUCI(aBaseFilename, aNewScenarioName, lNewBaseFilename & "uci")
+
                 For Each lWDMfilename As String In lWDMFilenames
                     lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
-                    If lWDMfilename.IndexOf("base.") < 0 Then
-                        Logger.Message("WDM file does not contain 'base.' so cannot be used in CAT:" _
-                        & vbCrLf & lWDMfilename & vbCrLf & "Name of file must be changed on disk and in UCI file:" _
-                        & vbCrLf & aBaseFilename, "WDM file must be renamed", _
-                        Windows.Forms.MessageBoxButtons.OK, _
-                        Windows.Forms.MessageBoxIcon.Error, _
-                        Windows.Forms.DialogResult.OK)
-                        g_running = False
-                        Return Nothing
-                    End If
 
                     'Copy each base WDM to new WDM
-                    Dim lNewWDMfilename As String = lNewFolder & IO.Path.GetFileName(lWDMfilename).Replace("base.", aNewScenarioName & ".")
+                    Dim lNewWDMfilename As String = lNewFolder & aNewScenarioName & "." & IO.Path.GetFileName(lWDMfilename)
                     FileCopy(lWDMfilename, lNewWDMfilename)
                     Dim lWDMResults As New atcWDM.atcDataSourceWDM
                     If Not lWDMResults.Open(lNewWDMfilename) Then
@@ -124,17 +149,7 @@ Public Module modCAT
             If g_running Then
                 For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "BINO")
                     lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
-
-                    'TODO: make base part of base file name?
-                    If lBinOutFilename.IndexOf("base.") < 0 Then
-                        Logger.Message("Binary output file does not contain 'base.' so cannot be used in CAT:" _
-                        & vbCrLf & lBinOutFilename & vbCrLf & "Name of output file must be changed in UCI file:" _
-                        & vbCrLf & aBaseFilename, "File must be renamed", Windows.Forms.MessageBoxButtons.OK, Windows.Forms.MessageBoxIcon.Error, Windows.Forms.DialogResult.OK)
-                        g_running = False
-                        Return Nothing
-                    End If
-
-                    Dim lNewFilename As String = lBinOutFilename.Replace("base.", aNewScenarioName & ".")
+                    Dim lNewFilename As String = PathNameOnly(lBinOutFilename) & "\" & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
                     Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
                     lHBNResults.Open(lNewFilename)
                     lModified.Add(lBinOutFilename, lNewFilename)
