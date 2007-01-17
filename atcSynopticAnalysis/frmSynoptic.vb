@@ -19,7 +19,7 @@ Public Class frmSynoptic
     Private pGapUnitNames() As String = {"Seconds", "Minutes", "Hours", "Days", "Weeks", "Months", "Years"}
     Private pGapUnitFactor() As String = {JulianSecond, JulianMinute, JulianHour, 1, 7, 31, 366}
 
-    Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum", "Mean", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
+    Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum Intensity", "Mean Intensity", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
 
     Private pColumnTitles() As String
     Private pColumnUnits() As String
@@ -32,8 +32,8 @@ Public Class frmSynoptic
 
 
     Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
-    Private pVolumeGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0}
-    Private pMaximumGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0}
+    Private pVolumeGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0}
+    Private pMaximumGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0}
 
     Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
                  Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
@@ -56,6 +56,7 @@ Public Class frmSynoptic
         End If
 
         If pDataGroup.Count > 0 Then
+            Me.Text &= " of " & pDataGroup.ItemByIndex(0).ToString
             Me.Show()
             cboGapUnits.Items.AddRange(pGapUnitNames)
             cboGroupBy.Items.AddRange(pGroupByNames)
@@ -150,7 +151,7 @@ Public Class frmSynoptic
                         End If
                     Next
                 Next
-            Case "Maximum"
+            Case "Maximum Intensity"
                 Dim lIndex As Integer
                 For Each lValue In pMaximumGroupEdges
                     lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
@@ -164,7 +165,7 @@ Public Class frmSynoptic
                         End If
                     Next
                 Next
-            Case "Mean"
+            Case "Mean Intensity"
                 Dim lIndex As Integer
                 For Each lValue In pMaximumGroupEdges
                     lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
@@ -273,7 +274,7 @@ Public Class frmSynoptic
                     Case "Events", "Measurements"
                         pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = CInt(lValue)
                     Case Else
-                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue, , , , , 3)
+                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue, , , , , 5)
                 End Select
             Next
 
@@ -357,10 +358,10 @@ Public Class frmSynoptic
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 Logger.Progress("Saving Synoptic Analysis", 0, cboGroupBy.Items.Count - 1)
                 SaveFileString(.FileName, "")
-                For lGroupBy As Integer = 0 To cboGroupBy.Items.Count - 1
+                For lGroupBy As Integer = cboGroupBy.Items.Count - 1 To 0 Step -1
                     cboGroupBy.Text = cboGroupBy.Items(lGroupBy)
                     AppendFileString(.FileName, Me.ToString & vbCrLf)
-                    Logger.Progress(lGroupBy, cboGroupBy.Items.Count - 1)
+                    Logger.Progress(cboGroupBy.Items.Count - lGroupBy - 1, cboGroupBy.Items.Count - 1)
                 Next
             End If
         End With
