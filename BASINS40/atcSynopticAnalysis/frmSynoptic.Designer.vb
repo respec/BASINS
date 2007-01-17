@@ -37,6 +37,7 @@ Partial Class frmSynoptic
         Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
         Me.mnuFileSave = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveAll = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
@@ -156,7 +157,7 @@ Partial Class frmSynoptic
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave, Me.mnuFileSaveAll})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
@@ -179,6 +180,11 @@ Partial Class frmSynoptic
         Me.mnuFileSave.Index = 3
         Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
         Me.mnuFileSave.Text = "Save"
+        '
+        'mnuFileSaveAll
+        '
+        Me.mnuFileSaveAll.Index = 4
+        Me.mnuFileSaveAll.Text = "Save All Groupings"
         '
         'mnuEdit
         '
@@ -301,4 +307,5 @@ Partial Class frmSynoptic
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     Friend WithEvents lblDuringEvent As System.Windows.Forms.Label
     Friend WithEvents btnComputeEvents As System.Windows.Forms.Button
+    Friend WithEvents mnuFileSaveAll As System.Windows.Forms.MenuItem
 End Class
