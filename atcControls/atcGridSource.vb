@@ -268,6 +268,7 @@ Public Class atcGridSource
     End Sub
 
     Public Overrides Function ToString() As String
+        Dim lBuilder As New System.Text.StringBuilder
         Dim lCellValue As String
         Dim lAddTabs() As Boolean
         ReDim lAddTabs(Me.Columns - 1)
@@ -286,18 +287,18 @@ Public Class atcGridSource
             Next
         Next
 
-        ToString = ""
         For iRow As Integer = 0 To lMaxRow
             For iCol As Integer = 0 To lMaxCol
                 lCellValue = CellValue(iRow, iCol)
                 If lCellValue Is Nothing Then lCellValue = ""
-                ToString &= lCellValue
+                lBuilder.Append(lCellValue)
                 'Some modified values contain "<tab>(+10%)", add a tab to those that don't
-                If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then ToString &= vbTab
-                If iCol < lMaxCol Then ToString &= vbTab 'Add tab afer each column except for last 
+                If lAddTabs(iCol) AndAlso lCellValue.IndexOf(vbTab) < 0 Then lBuilder.Append(vbTab)
+                If iCol < lMaxCol Then lBuilder.Append(vbTab) 'Add tab afer each column except for last 
             Next
-            ToString &= vbCrLf
+            lBuilder.Append(vbCrLf)
         Next
+        Return lBuilder.ToString
     End Function
 
     Public Overridable Function AppendColumns(ByVal aRightColumns As atcGridSource) As atcGridSource

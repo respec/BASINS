@@ -1,6 +1,7 @@
 Imports atcControls
 Imports atcData
 Imports atcUtility
+Imports MapWinUtility
 
 Public Class frmSynoptic
 
@@ -20,8 +21,15 @@ Public Class frmSynoptic
 
     Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum", "Mean", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
 
-    Private pColumnTitles() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "Maximum Intensity", "Mean Intensity"}
-    Private pColumnUnits() As String = {"", "", "", "in/hr", "in", "in", "", "", "", "in/hr", "in/hr"}
+    Private pColumnTitles() As String
+    Private pColumnUnits() As String
+
+    Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "Maximum Intensity", "Mean Intensity"}
+    Private pColumnUnitsDefault() As String = {"", "", "", "in/hr", "in", "in", "", "", "", "in/hr", "in/hr"}
+
+    Private pColumnTitlesEvent() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity"}
+    Private pColumnUnitsEvent() As String = {"", "", "", "", "in", "", "in/hr", "in/hr"}
+
 
     Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
     Private pVolumeGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0}
@@ -63,18 +71,36 @@ Public Class frmSynoptic
         End If
     End Sub
 
+    Private Function DataSetDuration(ByVal aTimeseries As atcTimeseries) As Double
+        If Not Double.IsNaN(aTimeseries.Dates.Value(0)) Then
+            Return aTimeseries.Dates.Value(aTimeseries.numValues) - aTimeseries.Dates.Value(0)
+        Else
+            Return aTimeseries.Dates.Value(aTimeseries.numValues) + aTimeseries.Dates.Value(2) - 2 * aTimeseries.Dates.Value(1)
+        End If
+    End Function
+
     Private Sub PopulateGrid()
         Dim lGroups As New atcCollection
+        Dim lGroup As atcDataGroup
         Dim lDataset As atcTimeseries
         Dim lColumn As Integer
+        Dim lDate As Date
         Dim lValue As Double
         Dim lTemp As Double
         Dim lGroupIndex As Integer = 0
         Dim lDurationFactor As Double = pGapUnitFactor(cboGapUnits.SelectedIndex)
 
-        If pEvents Is Nothing Then ComputeEventsFromFormParameters()
+        If cboGroupBy.Text = "Each Event" Then
+            pColumnTitles = pColumnTitlesEvent.Clone
+            pColumnUnits = pColumnUnitsEvent.Clone
+        Else
+            pColumnTitles = pColumnTitlesDefault.Clone
+            pColumnUnits = pColumnUnitsDefault.Clone
+        End If
 
         SetDurationUnits(cboGapUnits.Text)
+
+        If pEvents Is Nothing Then ComputeEventsFromFormParameters()
 
         Select Case cboGroupBy.Text
             Case "Each Event"
@@ -157,6 +183,12 @@ Public Class frmSynoptic
                 lGroups.Add("All", pEvents)
         End Select
 
+        'Omit empty groups from display
+        For lGroupIndex = lGroups.Count - 1 To 0 Step -1
+            lGroup = lGroups.ItemByIndex(lGroupIndex)
+            If lGroup.Count = 0 Then lGroups.RemoveAt(lGroupIndex)
+        Next
+
         pSource = New atcGridSource()
         pSource.Columns = pColumnTitles.Length
         pSource.FixedRows = 2
@@ -167,12 +199,21 @@ Public Class frmSynoptic
         Next
 
         lGroupIndex = 0
-        For Each lGroup As atcDataGroup In lGroups
+        For Each lGroup In lGroups
             For lColumn = 0 To pColumnTitles.Length - 1
                 lValue = 0
                 Select Case pColumnTitles(lColumn)
                     Case "Group"
                         pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = lGroups.Keys(lGroupIndex)
+                    Case "Start Date"
+                        lDataset = lGroup.ItemByIndex(0)
+                        lDate = Date.FromOADate(lDataset.Dates.Value(1))
+                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = lDate.ToString("yyyy-MM-dd")
+
+                    Case "Start Time"
+                        lDataset = lGroup.ItemByIndex(0)
+                        lDate = Date.FromOADate(lDataset.Dates.Value(1))
+                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = lDate.ToString("HH:mm")
                     Case "Events"
                         lValue = lGroup.Count
                     Case "Measurements"
@@ -196,21 +237,21 @@ Public Class frmSynoptic
                         Next
                     Case "Maximum Duration"
                         For Each lDataset In lGroup
-                            lTemp = lDataset.Dates.Value(lDataset.numValues) - lDataset.Dates.Value(1)
+                            lTemp = DataSetDuration(lDataset)
                             If lTemp > lValue Then
                                 lValue = lTemp
                             End If
                         Next
                         lValue /= lDurationFactor
-                    Case "Mean Duration" 'TODO: add one interval, can we use Value(0)?
+                    Case "Mean Duration"
                         For Each lDataset In lGroup
-                            lValue += lDataset.Dates.Value(lDataset.numValues) - lDataset.Dates.Value(1)
+                            lValue += DataSetDuration(lDataset)
                         Next
                         lValue /= lGroup.Count
                         lValue /= lDurationFactor
-                    Case "Total Duration" 'TODO: add one interval, can we use Value(0)?
+                    Case "Total Duration"
                         For Each lDataset In lGroup
-                            lValue += lDataset.Dates.Value(lDataset.numValues) - lDataset.Dates.Value(1)
+                            lValue += DataSetDuration(lDataset)
                         Next
                         lValue /= lDurationFactor
                     Case "Maximum Intensity"
@@ -227,7 +268,8 @@ Public Class frmSynoptic
                         lValue /= lGroup.Count
                 End Select
                 Select Case pColumnTitles(lColumn)
-                    Case "Group"
+                    Case "Group", "Start Date", "Start Time"
+                        'custom code above to set cell value
                     Case "Events", "Measurements"
                         pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = CInt(lValue)
                     Case Else
@@ -265,7 +307,7 @@ Public Class frmSynoptic
     End Function
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        pDataManager.ShowDisplay(sender.Text, pEvents)
+        pDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
@@ -297,11 +339,29 @@ Public Class frmSynoptic
     Private Sub mnuFileSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
         Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
         With lSaveDialog
-            .Title = "Save Grid As"
+            .Title = "Save Analysis As"
             .DefaultExt = ".txt"
             .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
+            End If
+        End With
+    End Sub
+
+    Private Sub mnuFileSaveAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveAll.Click
+        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+        With lSaveDialog
+            .Title = "Save All Groups As"
+            .DefaultExt = ".txt"
+            .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                Logger.Progress("Saving Synoptic Analysis", 0, cboGroupBy.Items.Count - 1)
+                SaveFileString(.FileName, "")
+                For lGroupBy As Integer = 0 To cboGroupBy.Items.Count - 1
+                    cboGroupBy.Text = cboGroupBy.Items(lGroupBy)
+                    AppendFileString(.FileName, Me.ToString & vbCrLf)
+                    Logger.Progress(lGroupBy, cboGroupBy.Items.Count - 1)
+                Next
             End If
         End With
     End Sub
@@ -346,14 +406,17 @@ Public Class frmSynoptic
         End Set
     End Property
 
-    Public Overrides Function ToString() As String
+    Private Function HeaderInformation() As String
         Dim lAboveString As String
         If radioAbove.Checked Then lAboveString = "Above" Else lAboveString = "Below"
         Return Me.Text & vbCrLf _
             & "Events " & lAboveString & " " & txtThreshold.Text & vbCrLf _
             & "Allowing gaps of up to " & txtGap.Text & " " & cboGapUnits.Text & vbCrLf _
-            & "Grouped by " & cboGroupBy.Text & vbCrLf _
-            & agdMain.ToString
+            & "Grouped by " & cboGroupBy.Text 
+    End Function
+
+    Public Overrides Function ToString() As String
+        Return HeaderInformation() & vbCrLf & agdMain.ToString
     End Function
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
@@ -397,4 +460,5 @@ Public Class frmSynoptic
             End If
         Next
     End Sub
+
 End Class
