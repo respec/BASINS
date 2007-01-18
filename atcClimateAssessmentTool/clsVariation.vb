@@ -25,6 +25,7 @@ Public Class Variation
     Public Increment As Double = Double.NaN
     Private pIncrementsSinceStart As Integer = 0
     Public CurrentValue As Double = Double.NaN
+    Public IsInput As Boolean = False
 
     Public ColorAboveMax As System.Drawing.Color = System.Drawing.Color.OrangeRed
     Public ColorBelowMin As System.Drawing.Color = System.Drawing.Color.DeepSkyBlue
@@ -172,6 +173,7 @@ Public Class Variation
             .Min = Min
             .Max = Max
             .Increment = Increment
+            .IsInput = IsInput
             .CurrentValue = CurrentValue
             .ColorAboveMax = ColorAboveMax
             .ColorBelowMin = ColorBelowMin
@@ -296,6 +298,9 @@ Public Class Variation
             If Not Double.IsNaN(Increment) Then
                 lXML &= "  <Increment>" & Increment & "</Increment>" & vbCrLf
             End If
+            If IsInput Then
+                lXML &= "  <IsInput>" & IsInput & "</IsInput>" & vbCrLf
+            End If
             lXML &= "  <Operation>" & Operation & "</Operation>" & vbCrLf
             If Not ComputationSource Is Nothing Then
                 lXML &= "  <ComputationSource>" & ComputationSource.Name & "</ComputationSource>" & vbCrLf
@@ -318,6 +323,7 @@ Public Class Variation
                                 Case "min" : Min = CDbl(.Content)
                                 Case "max" : Max = CDbl(.Content)
                                 Case "increment" : Increment = CDbl(.Content)
+                                Case "isinput" : IsInput = CBool(.Content)
                                 Case "operation" : Operation = .Content
                                 Case "computationsource"
                                     ComputationSource = g_DataManager.DataSourceByName(.Content)

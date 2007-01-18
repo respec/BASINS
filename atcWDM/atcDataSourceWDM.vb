@@ -354,7 +354,9 @@ Public Class atcDataSourceWDM
         Dim lDsn As Integer = aTs.Attributes.GetValue("id", 0)
 
         'add needed attributes
-        aTs.Attributes.SetValueIfMissing("TSTYPE", aTs.Attributes.GetValue("cons").ToString.Substring(0, 4))
+        lStr = aTs.Attributes.GetValue("cons")
+        If lStr.Length > 4 Then lStr = lStr.Substring(0, 4)
+        aTs.Attributes.SetValueIfMissing("TSTYPE", lStr)
         aTs.Attributes.SetValueIfMissing("TGROUP", 6)
         aTs.Attributes.SetValueIfMissing("COMPFG", 1)
         aTs.Attributes.SetValueIfMissing("TSFORM", 1)
