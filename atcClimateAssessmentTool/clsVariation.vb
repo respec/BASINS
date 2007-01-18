@@ -162,7 +162,12 @@ Public Class Variation
 
     Public Overridable Function Clone() As Variation
         Dim newVariation As New Variation
-        With newVariation
+        Me.CopyTo(newVariation)
+        Return newVariation
+    End Function
+
+    Public Overridable Sub CopyTo(ByVal aTargetVariation As Variation)
+        With aTargetVariation
             .Name = Name
             If Not DataSets Is Nothing Then .DataSets = DataSets.Clone()
             If Not PETdata Is Nothing Then .PETdata = PETdata.Clone()
@@ -179,8 +184,7 @@ Public Class Variation
             .ColorBelowMin = ColorBelowMin
             .ColorDefault = ColorDefault
         End With
-        Return newVariation
-    End Function
+    End Sub
 
     Protected Overridable Property SeasonsXML() As String
         Get

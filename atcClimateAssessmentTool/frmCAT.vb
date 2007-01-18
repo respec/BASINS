@@ -1280,8 +1280,7 @@ Public Class frmCAT
             .Increment = 0.1
             .IsInput = True
         End With
-        lVariation = frmVary.AskUser(lVariation)
-        If Not lVariation Is Nothing Then
+        If frmVary.AskUser(lVariation) Then
             lVariation.Selected = True
             lVariation.CurrentValue = lVariation.Min
             pInputs.Add(lVariation)
@@ -1326,14 +1325,10 @@ Public Class frmCAT
                 lVariation = frmVaryCligen.AskUser(lVariation)
             Else
                 Dim frmVary As New frmVariation
-                lVariation = frmVary.AskUser(lVariation)
+                frmVary.AskUser(lVariation)
             End If
-            If Not lVariation Is Nothing Then
-                pInputs.RemoveAt(lIndex)
-                pInputs.Insert(lIndex, lVariation)
-                RefreshInputList()
-                RefreshTotalIterations()
-            End If
+            RefreshInputList()
+            RefreshEndpointList()
         End If
     End Sub
 
@@ -1640,7 +1635,7 @@ Public Class frmCAT
         Dim lCopyText As String = " copy "
         For Each lIndex As Integer In lstEndpoints.SelectedIndices
             Dim lNewEndpoint As Variation = pEndpoints(lIndex).Clone
-            lNewEndpoint.CurrentValue = Double.NaN
+            lNewEndpoint.IsInput = False
             Dim lCopyTextPosition As Integer = lNewEndpoint.Name.LastIndexOf(lCopyText)
             lCopyNumber = 1
             If (lCopyTextPosition > 0) Then

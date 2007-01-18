@@ -388,12 +388,9 @@ Public Class frmVariation
 
 #End Region
 
-    Public Function AskUser(Optional ByVal aVariation As Variation = Nothing) As Variation
-        If aVariation Is Nothing Then
-            pVariation = New Variation
-        Else
-            pVariation = aVariation.Clone
-        End If
+    Public Function AskUser(ByRef aVariation As Variation) As Boolean
+        pVariation = aVariation.Clone
+
         If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
         cboSeasons.Items.Add(AllSeasons)
@@ -412,9 +409,10 @@ Public Class frmVariation
         FormFromVariation()
 
         If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            Return pVariation
+            pVariation.CopyTo(aVariation)
+            Return True
         Else
-            Return Nothing
+            Return False
         End If
     End Function
 
