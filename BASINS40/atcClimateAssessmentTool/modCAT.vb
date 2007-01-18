@@ -51,10 +51,14 @@ Public Module modCAT
                         lSaveLineEnd = ""
                     End If
                     lFilename = lCurrentLine.Substring(16)
-                    lPathname = PathNameOnly(lFilename)
-                    If lPathname.Length > 0 Then lPathname &= "\"
-                    lFilename = lPathname & aNewScenarioName & "." & FilenameNoPath(lFilename)
-                    lNewFilesBlock &= lCurrentLine.Substring(0, 16) & lFilename & lSaveLineEnd & vbLf
+                    If lFilename.StartsWith("<") Then 'Not a file name
+                        lNewFilesBlock &= lCurrentLine & lSaveLineEnd & vbLf
+                    Else
+                        lPathname = PathNameOnly(lFilename)
+                        If lPathname.Length > 0 Then lPathname &= "\"
+                        lFilename = lPathname & aNewScenarioName & "." & FilenameNoPath(lFilename)
+                        lNewFilesBlock &= lCurrentLine.Substring(0, 16) & lFilename & lSaveLineEnd & vbLf
+                    End If
             End Select
         Next
 

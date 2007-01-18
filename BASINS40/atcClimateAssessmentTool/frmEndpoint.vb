@@ -440,7 +440,7 @@ Public Class frmEndpoint
         End If
         If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
-        If Not Double.IsNaN(pVariation.CurrentValue) Then
+        If pVariation.IsInput Then
             panelOperation.Visible = True
             grpSeasons.Visible = False
         Else
@@ -669,7 +669,7 @@ Public Class frmEndpoint
             txtDefaultColor.Text = .ColorDefault.Name
 
             UpdateDataText(txtData, pVariation.DataSets)
-            If Double.IsNaN(.CurrentValue) Then
+            If Not .IsInput Then
                 If .Seasons Is Nothing Then
                     cboSeasons.SelectedIndex = 0
                 Else

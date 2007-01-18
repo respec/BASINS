@@ -731,7 +731,7 @@ Public Class frmCAT
             .CellValue(0, 0) = RunTitle
 
             For Each lEndpoint In pEndpoints
-                If Not Double.IsNaN(lEndpoint.CurrentValue) Then
+                If lEndpoint.IsInput Then
                     .Columns += 1
                 Else
                     .Columns += lEndpoint.DataSets.Count
@@ -742,7 +742,7 @@ Public Class frmCAT
             lColumn = 1
 
             For Each lEndpoint In pEndpoints
-                If Not Double.IsNaN(lEndpoint.CurrentValue) Then
+                If lEndpoint.IsInput Then
                     .CellValue(0, lColumn) = lEndpoint.Name
                     .CellValue(1, lColumn) = lEndpoint.Operation
                     .CellValue(2, lColumn) = "Current Value"
@@ -870,7 +870,7 @@ Public Class frmCAT
             .CellColor(lRow, 0) = Drawing.SystemColors.Control
 
             For Each lEndpoint In pEndpoints
-                If Not Double.IsNaN(lEndpoint.CurrentValue) Then 'This is an input, display current value
+                If lEndpoint.IsInput Then 'This is an input, display current value
                     .CellValue(lRow, lColumn) = Format(lEndpoint.CurrentValue, "0.####")
                     lColumn += 1
                 Else
@@ -1072,11 +1072,11 @@ Public Class frmCAT
         With agdResults
             .Source = Nothing
             .Source = New atcGridSource
-            .Source.FromString(aNewContentsOfGrid)
             .Source.FixedRows = ResultsFixedRows
             .Source.FixedColumns = 1
-            .Initialize(.Source)
+            .Source.FromString(aNewContentsOfGrid)
             ColorResultsGrid()
+            .Initialize(.Source)
             SizeResultsColumns()
             .Refresh()
         End With
@@ -1092,14 +1092,14 @@ Public Class frmCAT
             'Color fixed rows for headers
             For lRow = 0 To .FixedRows - 1
                 For lColumn = 0 To .Columns - 1
-                    .CellColor(lRow, lColumn) = Drawing.SystemColors.Control
+                    If lRow < .FixedRows OrElse lColumn < .FixedColumns Then
+                        .CellColor(lRow, lColumn) = Drawing.SystemColors.Control                        
+                    Else
+                        .CellColor(lRow, lColumn) = Drawing.SystemColors.Window
+                    End If
                 Next
             Next
 
-            'Color fixed column for Run number
-            For lRow = .FixedRows To .Rows - 1
-                .CellColor(lRow, 0) = Drawing.SystemColors.Control
-            Next
         End With
     End Sub
 
@@ -1278,6 +1278,7 @@ Public Class frmCAT
             .Min = 0.9
             .Max = 1.1
             .Increment = 0.1
+            .IsInput = True
         End With
         lVariation = frmVary.AskUser(lVariation)
         If Not lVariation Is Nothing Then
@@ -1556,6 +1557,10 @@ Public Class frmCAT
                                         lVariation = New Variation
                                     End If
                                     lVariation.XML = lChild.GetXml
+                                    If Not lVariation.IsInput Then
+                                        lVariation.IsInput = True
+                                        Logger.Dbg("Assigned IsInput to loaded variation '" & lVariation.Name & "'")
+                                    End If
                                     pInputs.Add(lVariation)
                                 Loop While lChild.NextSibling2
                             End If
@@ -1568,7 +1573,7 @@ Public Class frmCAT
                                     lVariation = New Variation
                                     lVariation.XML = lChild.GetXml
                                     'If this is a copy of an input variation, add the input variation instead
-                                    If Not Double.IsNaN(lVariation.CurrentValue) Then
+                                    If lVariation.IsInput Then
                                         For Each lInputVariation As Variation In pInputs
                                             If lInputVariation.Name = lVariation.Name Then
                                                 lVariation = lInputVariation
