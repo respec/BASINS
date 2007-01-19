@@ -10,6 +10,9 @@ Public Module modUnits
     Private Const CategoryTableName As String = "Category"
     Private Const SwatTableName As String = "SwatDbfParameter"
 
+    Private pSaveUnitsDatabase As Chilkat.Xml = Nothing
+    Private pAlreadyReportedErrOpen As Boolean
+
     'Debug.Print GetParameterUnits("LAI", "SwatDbfParameter", "sbs")
     Public Function GetParameterUnits(ByVal ParameterName As String, Optional ByVal FileType As String = "") As String
         'Static AlreadyReportedError As Boolean
@@ -191,27 +194,24 @@ errHand:
 
     Private Function unitsDB() As Chilkat.Xml
         unitsDB = Nothing
-        Dim SaveUnitsDatabase As Chilkat.Xml = Nothing
-        Static AlreadyReportedErrOpen As Boolean
-
         Dim DBpath As String = ""
 
         Try
-            If SaveUnitsDatabase Is Nothing Then
-                SaveUnitsDatabase = New Chilkat.Xml
+            If pSaveUnitsDatabase Is Nothing Then
+                pSaveUnitsDatabase = New Chilkat.Xml
                 DBpath = FindFile("Please locate ATCoUnits.xml", "ATCoUnits.xml")
                 If FileExists(DBpath) Then
-                    If Not SaveUnitsDatabase.LoadXmlFile(DBpath) Then
-                        Logger.Msg("Could not open units database '" & DBpath & "'" & vbCrLf & SaveUnitsDatabase.LastErrorText, "ATCutility.modUnits")
+                    If Not pSaveUnitsDatabase.LoadXmlFile(DBpath) Then
+                        Logger.Msg("Could not open units database '" & DBpath & "'" & vbCrLf & pSaveUnitsDatabase.LastErrorText, "ATCutility.modUnits")
                     End If
                 End If
             End If
-            unitsDB = SaveUnitsDatabase
+            unitsDB = pSaveUnitsDatabase
 
         Catch e As Exception
-            If Not AlreadyReportedErrOpen Then
+            If Not pAlreadyReportedErrOpen Then
                 Logger.Msg("Error opening units database '" & DBpath & "'" & vbCr & Err.Description, "ATCutility.modUnits")
-                AlreadyReportedErrOpen = True
+                pAlreadyReportedErrOpen = True
             End If
         End Try
     End Function
