@@ -149,7 +149,6 @@ Public Class frmDisPrec
         '
         'btnAddHourlyPrec
         '
-        Me.btnAddHourlyPrec.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnAddHourlyPrec.Location = New System.Drawing.Point(12, 104)
         Me.btnAddHourlyPrec.Name = "btnAddHourlyPrec"
         Me.btnAddHourlyPrec.Size = New System.Drawing.Size(56, 20)
@@ -306,7 +305,7 @@ Public Class frmDisPrec
         End If
     End Sub
 
-    Private Sub btnHourlyPrec_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddHourlyPrec.Click
+    Private Sub btnAddHourlyPrec_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAddHourlyPrec.Click
         Dim lTSGroup As atcDataGroup = pDataManager.UserSelectData("Select Hourly Precipitation Timeseries to use in Disaggregation")
         If lTSGroup.Count > 0 Then
             pHPrecTS = lTSGroup

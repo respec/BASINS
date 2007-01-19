@@ -334,8 +334,8 @@ Public Class atcMetCmpPlugin
                     .Name = "Latitude"
                     .Description = "Latitude in decimal degrees"
                     .DefaultValue = 0
-                    .Max = 51
-                    .Min = 25
+                    .Max = 66.5
+                    .Min = -66.5
                     .Editable = True
                     .TypeString = "Double"
                 End With

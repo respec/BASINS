@@ -234,27 +234,33 @@ Friend Class frmDisplayFrequencyGrid
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
     Private Sub PopulateGrid()
+        Dim lContinue As Boolean = True
         pSource = New atcFrequencyGridSource(pDataGroup)
         If pSource.Columns < 3 Then
-            UserSpecifyAttributes()
+            lContinue = UserSpecifyAttributes()
             pSource = New atcFrequencyGridSource(pDataGroup)
         End If
-        pSource.High = mnuViewHigh.Checked
 
-        pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
-        pSwapperSource.SwapRowsColumns = mnuViewRows.Checked
+        If lContinue Then
+            pSource.High = mnuViewHigh.Checked
 
-        agdMain.Initialize(pSwapperSource)
-        agdMain.SizeAllColumnsToContents()
+            pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
+            pSwapperSource.SwapRowsColumns = mnuViewRows.Checked
 
-        Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSource.Rows * agdMain.RowHeight(0)
-        Dim lRequestedWidth As Single = Me.Width - agdMain.Left - agdMain.Width
-        For lColumn As Integer = 0 To pSource.Columns - 1
-            lRequestedWidth += agdMain.ColumnWidth(lColumn)
-        Next
-        Me.Height = lRequestedHeight
-        Me.Width = lRequestedWidth
-        agdMain.Refresh()
+            agdMain.Initialize(pSwapperSource)
+            agdMain.SizeAllColumnsToContents()
+
+            Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSource.Rows * agdMain.RowHeight(0)
+            Dim lRequestedWidth As Single = Me.Width - agdMain.Left - agdMain.Width
+            For lColumn As Integer = 0 To pSource.Columns - 1
+                lRequestedWidth += agdMain.ColumnWidth(lColumn)
+            Next
+            Me.Height = lRequestedHeight
+            Me.Width = lRequestedWidth
+            agdMain.Refresh()
+        Else 'user cancelled Frequency Grid specs form
+            Me.Close()
+        End If
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
@@ -312,13 +318,17 @@ Friend Class frmDisplayFrequencyGrid
         HighDisplay = False
     End Sub
 
-    Private Sub UserSpecifyAttributes()
+    'Private Sub UserSpecifyAttributes()
+    Private Function UserSpecifyAttributes() As Boolean
         Dim lForm As New frmSpecifyFrequency
         Dim lChoseHigh As Boolean
-        If lForm.AskUser(pDataGroup, lChoseHigh) Then
+        If lForm.AskUser(pDataManager, pDataGroup, lChoseHigh) Then
             Me.HighDisplay = lChoseHigh
+            Return True
+        Else
+            Return False
         End If
-    End Sub
+    End Function
 
     Public Overrides Function ToString() As String
         Return Me.Text & vbCrLf & agdMain.ToString

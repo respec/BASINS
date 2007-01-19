@@ -1662,7 +1662,9 @@ Public Module modMetCompute
         lSDt = aDyTSer.Attributes.GetValue("SJDAY") - 1
         Call J2Date(lSDt, lDate)
         lDate(3) = aObsTime
-        aDyTSer.Attributes.SetValue("SJDAY", Date2J(lDate))
+        'aDyTSer.Attributes.SetValue("SJDAY", Date2J(lDate))
+        'need to set first date value to shift back to previous day's Obs Time
+        aDyTSer.Dates.Values(0) = Date2J(lDate)
         lDisTs.Dates = DisaggDates(aDyTSer, aDataSource)
         lDisTs.numValues = lDisTs.Dates.numValues
 
@@ -1723,7 +1725,7 @@ Public Module modMetCompute
                         lDaySum = lDaySum + lHrVals(lMaxHrInd)
                     End If
                     If lOutSumm Then
-                        WriteLine(lOutFil, "  Using Data-set Number:  " & lClosestHrTser.Attributes.GetValue("ID") & ", daily sum = " & SignificantDigits(lClosestDaySum, 4))
+                        WriteLine(lOutFil, "  Using Data-set:  " & lClosestHrTser.ToString & ", daily sum = " & SignificantDigits(lClosestDaySum, 4))
                     End If
                     If Math.Abs(lDaySum - aDyTSer.Value(lDyInd)) > lRndOff Then
                         'values not distributed properly

@@ -437,7 +437,7 @@ Public Class atcTimeseriesNdayHighLow
         Dim ltsGroup As atcDataGroup = Nothing
         Dim lTs As atcTimeseries
         Dim lTsB As atcTimeseries
-        Dim lNDayTsGroup As atcDataGroup 'atcTimeseries
+        Dim lNDayTsGroup As atcDataGroup = Nothing 'atcTimeseries
         Dim lLogFlg As Boolean = True
         Dim lOperationName As String = aOperationName.ToLower
         Dim lNDay As Object = 1
@@ -497,7 +497,8 @@ Public Class atcTimeseriesNdayHighLow
             lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing)
             Select Case lOperationName
                 Case "n-day low value", "n-day high value"
-                    ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes)
+                    ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes, lNDayTsGroup)
+                    Me.DataSets.AddRange(lNDayTsGroup)
                 Case "n-day low timeseries", "n-day high timeseries"
                     lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh)
                     Me.DataSets.AddRange(lNDayTsGroup)
