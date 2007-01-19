@@ -1392,8 +1392,7 @@ Public Class frmCAT
             .Max = Double.NaN
             .Increment = Double.NaN
         End With
-        lVariation = frmEnd.AskUser(lVariation)
-        If Not lVariation Is Nothing Then
+        If frmEnd.AskUser(lVariation) Then
             lVariation.Selected = True
             pEndpoints.Add(lVariation)
             RefreshEndpointList()
@@ -1445,10 +1444,7 @@ Public Class frmCAT
         If lIndex >= 0 And lIndex < pEndpoints.Count Then
             Dim lVariation As Variation = pEndpoints.ItemByIndex(lIndex)
             Dim frmEnd As New frmEndpoint
-            lVariation = frmEnd.AskUser(lVariation)
-            If Not lVariation Is Nothing Then
-                pEndpoints.RemoveAt(lIndex)
-                pEndpoints.Insert(lIndex, lVariation)
+            If frmEnd.AskUser(lVariation) Then
                 RefreshEndpointList()
             End If
         End If

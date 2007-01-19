@@ -432,12 +432,9 @@ Public Class frmEndpoint
 
 #End Region
 
-    Public Function AskUser(Optional ByVal aVariation As Variation = Nothing) As Variation
-        If aVariation Is Nothing Then
-            pVariation = New Variation
-        Else
-            pVariation = aVariation.Clone
-        End If
+    Public Function AskUser(Optional ByVal aVariation As Variation = Nothing) As Boolean
+        pVariation = aVariation.Clone
+
         If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
         If pVariation.IsInput Then
@@ -467,9 +464,10 @@ Public Class frmEndpoint
         FormFromVariation()
 
         If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then
-            Return pVariation
+            pVariation.CopyTo(aVariation)
+            Return True
         Else
-            Return Nothing
+            Return False
         End If
     End Function
 
