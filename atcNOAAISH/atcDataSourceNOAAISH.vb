@@ -255,12 +255,14 @@ Public Class atcDataSourceNOAAISH
                     lInd += 1
                     lData.Attributes.SetValue("ID", lInd)
                     lData.numValues = lData.Attributes.GetValue("Count")
-                    lData.Dates.Value(0) = lData.Dates.Value(1) - JulianHour 'set 0th date to start of 1st interval
-                    lDataFilled = FillValues(lData, 3, 1, MissingVal, MissingVal, MissingAcc)
-                    If Not lDataFilled Is Nothing Then
-                        lDataFilled.ValuesNeedToBeRead = False
-                        lDataFilled.Dates.ValuesNeedToBeRead = False
-                        lDataSets.Add(lDataFilled)
+                    If lData.numValues > 0 Then
+                        lData.Dates.Value(0) = lData.Dates.Value(1) - JulianHour 'set 0th date to start of 1st interval
+                        lDataFilled = FillValues(lData, 3, 1, MissingVal, MissingVal, MissingAcc)
+                        If Not lDataFilled Is Nothing Then
+                            lDataFilled.ValuesNeedToBeRead = False
+                            lDataFilled.Dates.ValuesNeedToBeRead = False
+                            lDataSets.Add(lDataFilled)
+                        End If
                     End If
                 Next
                 DataSets.Clear() 'get rid of initial "unfilled" data sets

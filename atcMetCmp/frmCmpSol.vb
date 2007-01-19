@@ -158,12 +158,14 @@ Public Class frmCmpSol
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
         If Not pTSGroup Is Nothing AndAlso pTSGroup.Count > 0 Then
             If IsNumeric(txtLatitude.Text) Then
+                Dim lAttDef As atcAttributeDefinition
+                lAttDef = atcDataAttributes.GetDefinition("Latitude")
                 cLat = CDbl(txtLatitude.Text)
-                If cLat >= 25 And cLat <= 51 Then
+                If cLat >= lAttDef.Min And cLat <= lAttDef.Max Then
                     pOk = True
                     Close()
                 Else
-                    Logger.Msg("Value for 'Latitude' must be between 25 and 51" & vbCrLf & _
+                    Logger.Msg("Value for 'Latitude' must be between " & lAttDef.Min & " and " & lAttDef.Max & vbCrLf & _
                                "Value specified is '" & cLat & "'", Me.Text & " Problem")
                 End If
             Else

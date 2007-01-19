@@ -124,7 +124,7 @@ Public Class atcDataSourceNOAAHPD
                     If Mid(curLine, ColDay.StartCol + 2 + lAddBlank, 4) = "0100" Then
                         'looks like 1st of month, assume all records have 24 values
                         lRepeatsVary = False
-                        repeatsThisLine = 24
+                        repeatsThisLine = 25 'include daily sum value ala varying record length format
                         lRepeatStart = ColDay.StartCol + 2 + lAddBlank
                     Else 'assume number of repeats follows
                         ColRepeats.StartCol = ColDay.StartCol + 2 + lAddBlank

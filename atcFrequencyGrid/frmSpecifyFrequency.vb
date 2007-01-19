@@ -50,6 +50,7 @@ Public Class frmSpecifyFrequency
     Friend WithEvents txtNdayAdd As System.Windows.Forms.TextBox
     Friend WithEvents btnNdayAdd As System.Windows.Forms.Button
     Friend WithEvents btnRecurrenceAdd As System.Windows.Forms.Button
+    Friend WithEvents chkKeepNDayTSers As System.Windows.Forms.CheckBox
     Friend WithEvents txtRecurrenceAdd As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSpecifyFrequency))
@@ -71,6 +72,7 @@ Public Class frmSpecifyFrequency
         Me.btnOkHigh = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOkLow = New System.Windows.Forms.Button
+        Me.chkKeepNDayTSers = New System.Windows.Forms.CheckBox
         Me.panelTop.SuspendLayout()
         Me.grpRecurrence.SuspendLayout()
         Me.grpNday.SuspendLayout()
@@ -87,7 +89,7 @@ Public Class frmSpecifyFrequency
         Me.panelTop.Controls.Add(Me.grpNday)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(416, 379)
+        Me.panelTop.Size = New System.Drawing.Size(418, 399)
         Me.panelTop.TabIndex = 14
         '
         'grpRecurrence
@@ -100,7 +102,7 @@ Public Class frmSpecifyFrequency
         Me.grpRecurrence.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grpRecurrence.Location = New System.Drawing.Point(208, 0)
         Me.grpRecurrence.Name = "grpRecurrence"
-        Me.grpRecurrence.Size = New System.Drawing.Size(208, 379)
+        Me.grpRecurrence.Size = New System.Drawing.Size(210, 399)
         Me.grpRecurrence.TabIndex = 7
         Me.grpRecurrence.TabStop = False
         Me.grpRecurrence.Text = "Recurrence Interval"
@@ -114,13 +116,13 @@ Public Class frmSpecifyFrequency
         Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
         Me.lstRecurrence.Name = "lstRecurrence"
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstRecurrence.Size = New System.Drawing.Size(189, 295)
+        Me.lstRecurrence.Size = New System.Drawing.Size(191, 315)
         Me.lstRecurrence.TabIndex = 8
         '
         'btnRecurrenceAdd
         '
         Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(131, 320)
+        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(133, 340)
         Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
         Me.btnRecurrenceAdd.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceAdd.TabIndex = 10
@@ -130,7 +132,7 @@ Public Class frmSpecifyFrequency
         '
         Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(8, 323)
+        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(8, 343)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
         Me.txtRecurrenceAdd.Size = New System.Drawing.Size(117, 20)
         Me.txtRecurrenceAdd.TabIndex = 9
@@ -138,7 +140,7 @@ Public Class frmSpecifyFrequency
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(131, 350)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(133, 370)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
         Me.btnRecurrenceNone.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceNone.TabIndex = 12
@@ -147,7 +149,7 @@ Public Class frmSpecifyFrequency
         'btnRecurrenceAll
         '
         Me.btnRecurrenceAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAll.Location = New System.Drawing.Point(8, 349)
+        Me.btnRecurrenceAll.Location = New System.Drawing.Point(8, 369)
         Me.btnRecurrenceAll.Name = "btnRecurrenceAll"
         Me.btnRecurrenceAll.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceAll.TabIndex = 11
@@ -157,12 +159,13 @@ Public Class frmSpecifyFrequency
         '
         Me.Splitter1.Location = New System.Drawing.Point(200, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(8, 379)
+        Me.Splitter1.Size = New System.Drawing.Size(8, 399)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
         'grpNday
         '
+        Me.grpNday.Controls.Add(Me.chkKeepNDayTSers)
         Me.grpNday.Controls.Add(Me.btnNdayAdd)
         Me.grpNday.Controls.Add(Me.txtNdayAdd)
         Me.grpNday.Controls.Add(Me.btnNdayNone)
@@ -171,7 +174,7 @@ Public Class frmSpecifyFrequency
         Me.grpNday.Dock = System.Windows.Forms.DockStyle.Left
         Me.grpNday.Location = New System.Drawing.Point(0, 0)
         Me.grpNday.Name = "grpNday"
-        Me.grpNday.Size = New System.Drawing.Size(200, 379)
+        Me.grpNday.Size = New System.Drawing.Size(200, 399)
         Me.grpNday.TabIndex = 1
         Me.grpNday.TabStop = False
         Me.grpNday.Text = "Number of Days"
@@ -179,7 +182,7 @@ Public Class frmSpecifyFrequency
         'btnNdayAdd
         '
         Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAdd.Location = New System.Drawing.Point(130, 320)
+        Me.btnNdayAdd.Location = New System.Drawing.Point(130, 324)
         Me.btnNdayAdd.Name = "btnNdayAdd"
         Me.btnNdayAdd.Size = New System.Drawing.Size(64, 24)
         Me.btnNdayAdd.TabIndex = 4
@@ -189,7 +192,7 @@ Public Class frmSpecifyFrequency
         '
         Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNdayAdd.Location = New System.Drawing.Point(12, 323)
+        Me.txtNdayAdd.Location = New System.Drawing.Point(12, 327)
         Me.txtNdayAdd.Name = "txtNdayAdd"
         Me.txtNdayAdd.Size = New System.Drawing.Size(112, 20)
         Me.txtNdayAdd.TabIndex = 3
@@ -197,7 +200,7 @@ Public Class frmSpecifyFrequency
         'btnNdayNone
         '
         Me.btnNdayNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayNone.Location = New System.Drawing.Point(130, 350)
+        Me.btnNdayNone.Location = New System.Drawing.Point(130, 354)
         Me.btnNdayNone.Name = "btnNdayNone"
         Me.btnNdayNone.Size = New System.Drawing.Size(64, 23)
         Me.btnNdayNone.TabIndex = 6
@@ -206,7 +209,7 @@ Public Class frmSpecifyFrequency
         'btnNdayAll
         '
         Me.btnNdayAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAll.Location = New System.Drawing.Point(12, 349)
+        Me.btnNdayAll.Location = New System.Drawing.Point(12, 353)
         Me.btnNdayAll.Name = "btnNdayAll"
         Me.btnNdayAll.Size = New System.Drawing.Size(64, 24)
         Me.btnNdayAll.TabIndex = 5
@@ -221,7 +224,7 @@ Public Class frmSpecifyFrequency
         Me.lstNday.Location = New System.Drawing.Point(12, 19)
         Me.lstNday.Name = "lstNday"
         Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstNday.Size = New System.Drawing.Size(182, 295)
+        Me.lstNday.Size = New System.Drawing.Size(182, 299)
         Me.lstNday.TabIndex = 2
         '
         'panelBottom
@@ -230,15 +233,15 @@ Public Class frmSpecifyFrequency
         Me.panelBottom.Controls.Add(Me.btnCancel)
         Me.panelBottom.Controls.Add(Me.btnOkLow)
         Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 392)
+        Me.panelBottom.Location = New System.Drawing.Point(0, 412)
         Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(415, 32)
+        Me.panelBottom.Size = New System.Drawing.Size(417, 32)
         Me.panelBottom.TabIndex = 15
         '
         'btnOkHigh
         '
         Me.btnOkHigh.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOkHigh.Location = New System.Drawing.Point(135, 0)
+        Me.btnOkHigh.Location = New System.Drawing.Point(137, 0)
         Me.btnOkHigh.Name = "btnOkHigh"
         Me.btnOkHigh.Size = New System.Drawing.Size(96, 24)
         Me.btnOkHigh.TabIndex = 13
@@ -248,7 +251,7 @@ Public Class frmSpecifyFrequency
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(339, 0)
+        Me.btnCancel.Location = New System.Drawing.Point(341, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 15
@@ -257,18 +260,29 @@ Public Class frmSpecifyFrequency
         'btnOkLow
         '
         Me.btnOkLow.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOkLow.Location = New System.Drawing.Point(237, 0)
+        Me.btnOkLow.Location = New System.Drawing.Point(239, 0)
         Me.btnOkLow.Name = "btnOkLow"
         Me.btnOkLow.Size = New System.Drawing.Size(96, 24)
         Me.btnOkLow.TabIndex = 14
         Me.btnOkLow.Text = "Compute Low"
+        '
+        'chkKeepNDayTSers
+        '
+        Me.chkKeepNDayTSers.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkKeepNDayTSers.AutoSize = True
+        Me.chkKeepNDayTSers.Location = New System.Drawing.Point(12, 380)
+        Me.chkKeepNDayTSers.Name = "chkKeepNDayTSers"
+        Me.chkKeepNDayTSers.Size = New System.Drawing.Size(134, 17)
+        Me.chkKeepNDayTSers.TabIndex = 7
+        Me.chkKeepNDayTSers.Text = "Keep NDay Timeseries"
+        Me.chkKeepNDayTSers.UseVisualStyleBackColor = True
         '
         'frmSpecifyFrequency
         '
         Me.AcceptButton = Me.btnOkHigh
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(415, 424)
+        Me.ClientSize = New System.Drawing.Size(417, 444)
         Me.Controls.Add(Me.panelTop)
         Me.Controls.Add(Me.panelBottom)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -288,10 +302,12 @@ Public Class frmSpecifyFrequency
 #End Region
 
     Private WithEvents pGroup As atcDataGroup
-    Private pOk As Boolean
-    Private pChoseHigh As Boolean
+    Private pDataManager As atcDataManager
+    Private pOk As Boolean = False
+    Private pChoseHigh As Boolean = False
 
-    Public Function AskUser(ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
+    Public Function AskUser(ByVal aDataManager As atcDataManager, ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
+        pDataManager = aDataManager
         pGroup = aGroup
         Clear()
         Me.ShowDialog()
@@ -333,6 +349,9 @@ Public Class frmSpecifyFrequency
         lArgs.SetValue("NDay", ListToArray(lstNday))
         lArgs.SetValue("Return Period", ListToArray(lstRecurrence))
         lCalculator.Open(aOperationName, lArgs)
+        If chkKeepNDayTSers.Checked Then 'add NDay Tsers to data manager
+            pDataManager.DataSources.Add(lCalculator)
+        End If
     End Sub
 
     'Return all selected items, or if none are selected then all items
@@ -418,4 +437,5 @@ Public Class frmSpecifyFrequency
             ShowHelp("BASINS Details\Analysis\Time Series Functions\Frequency Grid.html")
         End If
     End Sub
+
 End Class
