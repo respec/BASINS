@@ -35,7 +35,7 @@ Public Module modCAT
         Dim lNewFilesBlock As String = ""
         Dim lSaveLineEnd As String = ""
         Dim lCurrentLine As String
-        Dim lPathname As String
+        'Dim lPathname As String
         Dim lFilename As String
 
         For Each lCurrentLine In lOriginalFilesBlock.Split(vbLf)
@@ -54,9 +54,11 @@ Public Module modCAT
                     If lFilename.StartsWith("<") Then 'Not a file name
                         lNewFilesBlock &= lCurrentLine & lSaveLineEnd & vbLf
                     Else
-                        lPathname = PathNameOnly(lFilename)
-                        If lPathname.Length > 0 Then lPathname &= "\"
-                        lFilename = lPathname & aNewScenarioName & "." & FilenameNoPath(lFilename)
+                        'Commented out code preserves path of original file, we are putting Modified files in same folder as modified UCI
+                        'lPathname = PathNameOnly(lFilename)
+                        'If lPathname.Length > 0 Then lPathname &= "\"
+                        'lFilename = lPathname & aNewScenarioName & "." & FilenameNoPath(lFilename)
+                        lFilename = aNewScenarioName & "." & FilenameNoPath(lFilename)
                         lNewFilesBlock &= lCurrentLine.Substring(0, 16) & lFilename & lSaveLineEnd & vbLf
                     End If
             End Select
