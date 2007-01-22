@@ -15,4 +15,5 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTrademark("")> 
 <Assembly: CLSCompliant(True)> 
 
-<Assembly: AssemblyVersion("1.1.0.0")> 
+<Assembly: AssemblyVersion("3.1.1.0")> 
+<Assembly: AssemblyFileVersion("3.1.1.0")> 
