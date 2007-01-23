@@ -424,9 +424,9 @@ Public Class atcDataSourceWDM
         DsnWriteAttribute = True
 
         Select Case (lName.ToLower)
-            Case "units"   'store Units ID as DCODE in WDM
-                lName = "DCODE"
-                lValue = CStr(GetUnitID(lValue))
+            'Case "units"   'store Units ID as DCODE in WDM
+            '    lName = "DCODE"
+            '    lValue = CStr(GetUnitID(lValue))
             Case "time unit" : lName = "tcode"
             Case "time step" : lName = "tsstep"
             Case "time step" : lName = "tsstep"
@@ -685,7 +685,7 @@ Public Class atcDataSourceWDM
                                                  CInt(lS.Substring(12, 2)))
                                 lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lDate)
                             Case "DCODE"
-                                lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(lS)))
+                                'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(lS)))
                             Case Else
                                 lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lS)
                         End Select
