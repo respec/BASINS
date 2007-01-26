@@ -27,8 +27,8 @@ Public Class frmSynoptic
     Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "Maximum Intensity", "Mean Intensity"}
     Private pColumnUnitsDefault() As String = {"", "", "", "in/hr", "in", "in", "", "", "", "in/hr", "in/hr"}
 
-    Private pColumnTitlesEvent() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity"}
-    Private pColumnUnitsEvent() As String = {"", "", "", "", "in", "", "in/hr", "in/hr"}
+    Private pColumnTitlesEvent() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity", "Time Since Last"}
+    Private pColumnUnitsEvent() As String = {"", "", "", "", "in", "", "in/hr", "in/hr", "hr"}
 
 
     Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
@@ -217,6 +217,7 @@ Public Class frmSynoptic
                         pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = lDate.ToString("HH:mm")
                     Case "Events"
                         lValue = lGroup.Count
+
                     Case "Measurements"
                         For Each lDataset In lGroup
                             lValue += lDataset.numValues
@@ -267,6 +268,12 @@ Public Class frmSynoptic
                             lValue += lDataset.Attributes.GetValue("Sum") / lDataset.numValues
                         Next
                         lValue /= lGroup.Count
+                    Case "Time Since Last"
+                        For Each lDataset In lGroup
+                            lValue += lDataset.Attributes.GetValue("EventTimeSincePrevious")
+                        Next
+                        lValue /= lGroup.Count
+                        lValue /= lDurationFactor
                 End Select
                 Select Case pColumnTitles(lColumn)
                     Case "Group", "Start Date", "Start Time"
@@ -456,7 +463,7 @@ Public Class frmSynoptic
 
     Private Sub SetDurationUnits(ByVal aUnits As String)
         For lIndex As Integer = 0 To pColumnUnits.Length - 1
-            If pColumnTitles(lIndex).Contains("Duration") Then
+            If pColumnTitles(lIndex).Contains("Duration") OrElse pColumnTitles(lIndex).Equals("Time Since Last") Then
                 pColumnUnits(lIndex) = aUnits
             End If
         Next
