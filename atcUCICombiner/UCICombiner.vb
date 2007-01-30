@@ -16,7 +16,7 @@ Public Module UCICombiner
     Private pLandUseYear As String = "2002"
     Private pScenario As String = "base"
 
-    Public Sub Main()
+    Public Sub UCICombinerMain()
         Logger.StartToFile(pOutputDir & "uciCombiner.log")
 
         ChDriveDir(pWorkingDir)
