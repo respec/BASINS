@@ -35,4 +35,10 @@ Public Class frmChooseColumns
         Me.DialogResult = Windows.Forms.DialogResult.Cancel
         Me.Close()
     End Sub
+
+    Private Sub btnAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAll.Click
+        For lCurrentIndex As Integer = 0 To lstColumns.Items.Count - 1
+            lstColumns.SetItemChecked(lCurrentIndex, True)
+        Next
+    End Sub
 End Class
