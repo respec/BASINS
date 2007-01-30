@@ -21,12 +21,23 @@ Public Class frmSynoptic
     Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum Intensity", "Mean Intensity", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
 
     Private pColumnTitles() As String
-    Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration", "Maximum Intensity", "Mean Intensity"}
+    Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Cummulative Volume", "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration", "Maximum Intensity", "Mean Intensity", "Time Since Last"}
     Private pColumnTitlesEvent() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity", "Time Since Last"}
 
-    Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
-    Private pVolumeGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0}
-    Private pMaximumGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0}
+    'Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
+    Private pMeasurementsGroupEdges() As Double = {100, 75, 50, 40, 30, 20, 15, _
+                                                    10, 7.5, 5, 4, 3, 2, 1.5, _
+                                                    1}
+    'Private pVolumeGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0}
+    Private pVolumeGroupEdges() As Double = {10, 7.5, 5, 4, 3, 2, 1.5, _
+                                              1, 0.75, 0.5, 0.4, 0.3, 0.2, 0.15, _
+                                              0.1, 0.075, 0.05, 0.04, 0.03, 0.02, 0.015, _
+                                              0.01, 0}
+    'Private pMaximumGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0}
+    Private pMaximumGroupEdges() As Double = {10, 7.5, 5, 4, 3, 2, 1.5, _
+                                              1, 0.75, 0.5, 0.4, 0.3, 0.2, 0.15, _
+                                              0.1, 0.075, 0.05, 0.04, 0.03, 0.02, 0.015, _
+                                              0.01, 0}
 
     Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
                  Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
@@ -123,7 +134,7 @@ Public Class frmSynoptic
                 Next
             Case "Season"
             Case "Year"
-            Case "Total Volume"
+            Case "Total Volume", "Cummulative Volume"
                 Dim lIndex As Integer
                 For Each lValue In pVolumeGroupEdges
                     lGroups.Add(DoubleToString(lValue, , , , , 3), New atcDataGroup)
@@ -219,7 +230,7 @@ Public Class frmSynoptic
                             lValue += lDataset.Attributes.GetValue("Sum")
                         Next
                         lValue /= lGroup.Count
-                    Case "Total Volume"
+                    Case "Total Volume", "Cummulative Volume"
                         For Each lDataset In lGroup
                             lValue += lDataset.Attributes.GetValue("Sum")
                         Next
@@ -274,14 +285,22 @@ Public Class frmSynoptic
                         lValue /= lGroup.Count
                         lValue /= lDurationFactor
                 End Select
-                Select Case pColumnTitles(lColumn)
-                    Case "Group", "Start Date", "Start Time"
-                        'custom code above to set cell value
-                    Case "Events", "Measurements"
-                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = CInt(lValue)
-                    Case Else
-                        pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue, , , , , 5)
-                End Select
+
+                If lValue <> 0 Then
+                    Select Case pColumnTitles(lColumn)
+                        Case "Group", "Start Date", "Start Time"
+                            'custom code above to set cell value
+                        Case "Events", "Measurements"
+                            pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = CInt(lValue)
+                        Case Else
+                            If pColumnTitles(lColumn) = "Cummulative Volume" AndAlso lGroupIndex > 0 Then
+                                Dim lValuePrevious As Double = pSource.CellValue(lGroupIndex - 1 + pSource.FixedRows, lColumn)
+                                pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue + lValuePrevious, , , , , 5)
+                            Else
+                                pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue, , , , , 5)
+                            End If
+                    End Select
+                End If
             Next
 
             'Duration (hours) 'TODO: dont hard code hours?
@@ -427,7 +446,7 @@ Public Class frmSynoptic
     End Function
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions\List.html")
+        ShowHelp("BASINS Details\Analysis\Time Series Functions\Synoptic.html")
     End Sub
 
     Private Sub btnComputeEvents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnComputeEvents.Click
@@ -487,9 +506,9 @@ Public Class frmSynoptic
             Case "Start Date" : Return ""
             Case "Start Time" : Return ""
             Case "Measurements" : Return ""
-            Case "Maximum Volume", "Mean Volume", "Total Volume" : Return "in"
+            Case "Maximum Volume", "Cummulative Volume", "Mean Volume", "Total Volume" : Return "in"
             Case "Maximum Duration", "Mean Duration", "Total Duration" : Return cboGapUnits.Text
-            Case "Maximum Intensity", "Mean Intensity" : Return "in/hr"
+            Case "Maximum Intensity", "Mean Intensity" : Return "in/hr" 'TODO: or cboGapUnits.Text
             Case "Time Since Last" : Return cboGapUnits.Text
             Case Else : Return ""
         End Select
