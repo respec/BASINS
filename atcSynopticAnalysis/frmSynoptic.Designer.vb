@@ -49,6 +49,7 @@ Partial Class frmSynoptic
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblDuringEvent = New System.Windows.Forms.Label
         Me.btnComputeEvents = New System.Windows.Forms.Button
+        Me.mnuChooseColumns = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'lblGroupBy
@@ -201,7 +202,7 @@ Partial Class frmSynoptic
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuChooseColumns})
         Me.mnuView.Text = "View"
         '
         'mnuAttributeRows
@@ -254,6 +255,11 @@ Partial Class frmSynoptic
         Me.btnComputeEvents.TabIndex = 15
         Me.btnComputeEvents.Text = "Compute Events"
         Me.btnComputeEvents.UseVisualStyleBackColor = True
+        '
+        'mnuChooseColumns
+        '
+        Me.mnuChooseColumns.Index = 4
+        Me.mnuChooseColumns.Text = "Choose Columns"
         '
         'frmSynoptic
         '
@@ -308,4 +314,5 @@ Partial Class frmSynoptic
     Friend WithEvents lblDuringEvent As System.Windows.Forms.Label
     Friend WithEvents btnComputeEvents As System.Windows.Forms.Button
     Friend WithEvents mnuFileSaveAll As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuChooseColumns As System.Windows.Forms.MenuItem
 End Class

@@ -83,6 +83,12 @@
     <Compile Include="atcSynopticAnalysisPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="frmChooseColumns.Designer.vb">
+      <DependentUpon>frmChooseColumns.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmChooseColumns.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmSynoptic.Designer.vb">
       <DependentUpon>frmSynoptic.vb</DependentUpon>
     </Compile>
@@ -113,6 +119,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmChooseColumns.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmChooseColumns.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmSynoptic.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmSynoptic.vb</DependentUpon>

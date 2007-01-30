@@ -12,7 +12,6 @@ Public Class frmSynoptic
 
     Private WithEvents pEvents As atcDataGroup
 
-    'Translator class between pDataGroup and agdMain
     Private pSource As atcGridSource
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
@@ -22,14 +21,8 @@ Public Class frmSynoptic
     Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum Intensity", "Mean Intensity", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
 
     Private pColumnTitles() As String
-    Private pColumnUnits() As String
-
-    Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "Maximum Intensity", "Mean Intensity"}
-    Private pColumnUnitsDefault() As String = {"", "", "", "in/hr", "in", "in", "", "", "", "in/hr", "in/hr"}
-
+    Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration", "Maximum Intensity", "Mean Intensity"}
     Private pColumnTitlesEvent() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity", "Time Since Last"}
-    Private pColumnUnitsEvent() As String = {"", "", "", "", "in", "", "in/hr", "in/hr", "hr"}
-
 
     Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
     Private pVolumeGroupEdges() As Double = {10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0}
@@ -66,6 +59,7 @@ Public Class frmSynoptic
             txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
             radioAbove.Checked = GetSetting("Synoptic", "Defaults", "High", radioAbove.Checked)
             txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
+            SetColumnTitlesFromGroupBy()
             PopulateGrid()
         Else 'user declined to specify timeseries
             Me.Close()
@@ -84,22 +78,14 @@ Public Class frmSynoptic
         Dim lGroups As New atcCollection
         Dim lGroup As atcDataGroup
         Dim lDataset As atcTimeseries
+        Dim lMetaDataset As atcTimeseries
         Dim lColumn As Integer
         Dim lDate As Date
         Dim lValue As Double
         Dim lTemp As Double
         Dim lGroupIndex As Integer = 0
+        Dim lValueIndex As Integer
         Dim lDurationFactor As Double = pGapUnitFactor(cboGapUnits.SelectedIndex)
-
-        If cboGroupBy.Text = "Each Event" Then
-            pColumnTitles = pColumnTitlesEvent.Clone
-            pColumnUnits = pColumnUnitsEvent.Clone
-        Else
-            pColumnTitles = pColumnTitlesDefault.Clone
-            pColumnUnits = pColumnUnitsDefault.Clone
-        End If
-
-        SetDurationUnits(cboGapUnits.Text)
 
         If pEvents Is Nothing Then ComputeEventsFromFormParameters()
 
@@ -196,7 +182,7 @@ Public Class frmSynoptic
         pSource.Rows = lGroups.Count + pSource.FixedRows
         For lColumn = 0 To pColumnTitles.Length - 1
             pSource.CellValue(0, lColumn) = pColumnTitles(lColumn)
-            pSource.CellValue(1, lColumn) = pColumnUnits(lColumn)
+            pSource.CellValue(1, lColumn) = ColumnUnits(pColumnTitles(lColumn))
         Next
 
         lGroupIndex = 0
@@ -251,6 +237,19 @@ Public Class frmSynoptic
                         Next
                         lValue /= lGroup.Count
                         lValue /= lDurationFactor
+
+                    Case "SD Duration"
+                        lMetaDataset = New atcTimeseries(Nothing)
+                        lMetaDataset.Dates = New atcTimeseries(Nothing)
+                        lMetaDataset.numValues = lGroup.Count
+                        lMetaDataset.Dates.numValues = lGroup.Count
+                        lValueIndex = 1
+                        For Each lDataset In lGroup
+                            lMetaDataset.Value(lValueIndex) = DataSetDuration(lDataset)
+                            lValueIndex += 1
+                        Next
+                        lValue = lMetaDataset.Attributes.GetValue("Standard Deviation")
+
                     Case "Total Duration"
                         For Each lDataset In lGroup
                             lValue += DataSetDuration(lDataset)
@@ -458,15 +457,42 @@ Public Class frmSynoptic
 
 
     Private Sub cboGroupBy_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboGroupBy.SelectedIndexChanged
+        SetColumnTitlesFromGroupBy()
         PopulateGrid()
     End Sub
 
-    Private Sub SetDurationUnits(ByVal aUnits As String)
-        For lIndex As Integer = 0 To pColumnUnits.Length - 1
-            If pColumnTitles(lIndex).Contains("Duration") OrElse pColumnTitles(lIndex).Equals("Time Since Last") Then
-                pColumnUnits(lIndex) = aUnits
-            End If
-        Next
+    Private Sub SetColumnTitlesFromGroupBy()
+        If cboGroupBy.Text = "Each Event" Then
+            pColumnTitles = pColumnTitlesEvent.Clone
+        Else
+            pColumnTitles = pColumnTitlesDefault.Clone
+        End If
     End Sub
+
+    Private Sub mnuChooseColumns_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuChooseColumns.Click
+        Dim lFrmChoose As New frmChooseColumns
+
+        If cboGroupBy.Text = "Each Event" Then
+            pColumnTitles = lFrmChoose.AskUser(pColumnTitlesEvent, pColumnTitles)
+        Else
+            pColumnTitles = lFrmChoose.AskUser(pColumnTitlesDefault, pColumnTitles)
+        End If
+        PopulateGrid()
+    End Sub
+
+    Private Function ColumnUnits(ByVal aColumnName As String) As String
+        Select Case aColumnName
+            Case "Events" : Return ""
+            Case "Group" : Return ""
+            Case "Start Date" : Return ""
+            Case "Start Time" : Return ""
+            Case "Measurements" : Return ""
+            Case "Maximum Volume", "Mean Volume", "Total Volume" : Return "in"
+            Case "Maximum Duration", "Mean Duration", "Total Duration" : Return cboGapUnits.Text
+            Case "Maximum Intensity", "Mean Intensity" : Return "in/hr"
+            Case "Time Since Last" : Return cboGapUnits.Text
+            Case Else : Return ""
+        End Select
+    End Function
 
 End Class
