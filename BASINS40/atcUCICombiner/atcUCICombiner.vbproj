@@ -108,6 +108,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="modCopy.vb" />
+    <Compile Include="UCIBuilder.vb" />
     <Compile Include="UCICombiner.vb">
     </Compile>
   </ItemGroup>
