@@ -514,4 +514,55 @@ Public Class frmSynoptic
         End Select
     End Function
 
+    Private Sub mnuGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuGraph.Click
+        Dim lFirstRowOfData As Integer = agdMain.Source.FixedRows
+        Dim lLastRowOfData As Integer = agdMain.Source.Rows - 1
+        Dim lGroupNames(lLastRowOfData - lFirstRowOfData) As String
+        Dim lRow As Integer
+
+        For lRow = lFirstRowOfData To lLastRowOfData
+            lGroupNames(lRow - lFirstRowOfData) = agdMain.Source.CellValue(lRow, 0)
+        Next
+
+        For lColumn As Integer = 1 To agdMain.Source.Columns - 1
+            If IsNumeric(agdMain.Source.CellValue(lFirstRowOfData, lColumn)) Then
+                Dim lForm As New frmGraphBar
+                Dim lPane As ZedGraph.GraphPane = lForm.Pane
+
+                'Set the titles and axis labels
+                lPane.Title.Text = pColumnTitles(lColumn) & " grouped by " & cboGroupBy.Text
+                lPane.XAxis.Title.Text = cboGroupBy.Text
+                lPane.YAxis.Title.Text = pColumnTitles(lColumn)
+                If ColumnUnits(pColumnTitles(lColumn)).Length > 0 Then
+                    lPane.YAxis.Title.Text &= " (" & ColumnUnits(pColumnTitles(lColumn)) & ")"
+                End If
+
+                Dim lY(lLastRowOfData - lFirstRowOfData) As Double
+
+                For lRow = lFirstRowOfData To lLastRowOfData
+                    lY(lRow - lFirstRowOfData) = agdMain.Source.CellValue(lRow, lColumn)
+                Next
+
+                ' Add a bar to the graph
+                lPane.AddBar("", Nothing, lY, GetMatchingColor(pColumnTitles(lColumn)))
+                '        myCurve.Bar.Border.IsVisible = False
+
+
+                'Draw the X tics between the labels instead of at the labels
+                lPane.XAxis.MajorTic.IsBetweenLabels = True
+
+                lPane.XAxis.Scale.TextLabels = lGroupNames
+                lPane.XAxis.Type = ZedGraph.AxisType.Text
+
+                ' Fill the axis background with a color gradient
+                'lPane.Chart.Fill = New ZedGraph.Fill(Drawing.Color.White, Drawing.Color.SteelBlue, 45.0F)
+
+                ' disable the legend
+                lPane.Legend.IsVisible = False
+
+                lForm.zgc.AxisChange()
+                lForm.Show()
+            End If
+        Next
+    End Sub
 End Class
