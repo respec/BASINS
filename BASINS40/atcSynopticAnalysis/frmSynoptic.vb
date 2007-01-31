@@ -21,8 +21,8 @@ Public Class frmSynoptic
     Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum Intensity", "Mean Intensity", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
 
     Private pColumnTitles() As String
-    Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Cummulative Volume", "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration", "Maximum Intensity", "Mean Intensity", "Time Since Last"}
-    Private pColumnTitlesEvent() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity", "Time Since Last"}
+    Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Cummulative Volume", "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration", "Maximum Intensity", "Mean Intensity", "Mean Time Since Last"}
+    Private pColumnTitlesEvent() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity", "Mean Time Since Last"}
 
     'Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
     Private pMeasurementsGroupEdges() As Double = {100, 75, 50, 40, 30, 20, 15, _
@@ -123,7 +123,7 @@ Public Class frmSynoptic
             Case "Month"
                 Dim lIndex As Integer
                 For lIndex = 1 To 12
-                    lGroups.Add(lIndex & " " & MonthName(lIndex), New atcDataGroup)
+                    lGroups.Add(MonthName(lIndex, True), New atcDataGroup)
                 Next
                 For Each lEvent As atcTimeseries In pEvents
                     'TODO: find date of peak instead of first date
@@ -278,7 +278,7 @@ Public Class frmSynoptic
                             lValue += lDataset.Attributes.GetValue("Sum") / lDataset.numValues
                         Next
                         lValue /= lGroup.Count
-                    Case "Time Since Last"
+                    Case "Mean Time Since Last"
                         For Each lDataset In lGroup
                             lValue += lDataset.Attributes.GetValue("EventTimeSincePrevious")
                         Next
@@ -507,9 +507,9 @@ Public Class frmSynoptic
             Case "Start Time" : Return ""
             Case "Measurements" : Return ""
             Case "Maximum Volume", "Cummulative Volume", "Mean Volume", "Total Volume" : Return "in"
-            Case "Maximum Duration", "Mean Duration", "Total Duration" : Return cboGapUnits.Text
+            Case "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration" : Return cboGapUnits.Text
             Case "Maximum Intensity", "Mean Intensity" : Return "in/hr" 'TODO: or cboGapUnits.Text
-            Case "Time Since Last" : Return cboGapUnits.Text
+            Case "Mean Time Since Last" : Return cboGapUnits.Text
             Case Else : Return ""
         End Select
     End Function
