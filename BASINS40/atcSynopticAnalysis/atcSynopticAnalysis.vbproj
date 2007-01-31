@@ -69,6 +69,10 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ZedGraph, Version=5.0.2.29269, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -87,6 +91,12 @@
       <DependentUpon>frmChooseColumns.vb</DependentUpon>
     </Compile>
     <Compile Include="frmChooseColumns.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmGraphBar.Designer.vb">
+      <DependentUpon>frmGraphBar.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmGraphBar.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmSynoptic.Designer.vb">
@@ -122,6 +132,10 @@
     <EmbeddedResource Include="frmChooseColumns.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmChooseColumns.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmGraphBar.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmGraphBar.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSynoptic.resx">
       <SubType>Designer</SubType>

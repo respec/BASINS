@@ -45,11 +45,12 @@ Partial Class frmSynoptic
         Me.mnuAttributeColumns = New System.Windows.Forms.MenuItem
         Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
+        Me.mnuChooseColumns = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblDuringEvent = New System.Windows.Forms.Label
         Me.btnComputeEvents = New System.Windows.Forms.Button
-        Me.mnuChooseColumns = New System.Windows.Forms.MenuItem
+        Me.mnuGraph = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'lblGroupBy
@@ -202,7 +203,7 @@ Partial Class frmSynoptic
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuChooseColumns})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuChooseColumns, Me.mnuGraph})
         Me.mnuView.Text = "View"
         '
         'mnuAttributeRows
@@ -225,6 +226,11 @@ Partial Class frmSynoptic
         '
         Me.mnuSizeColumnsToContents.Index = 3
         Me.mnuSizeColumnsToContents.Text = "Size Columns To Contents"
+        '
+        'mnuChooseColumns
+        '
+        Me.mnuChooseColumns.Index = 4
+        Me.mnuChooseColumns.Text = "Choose Columns"
         '
         'mnuAnalysis
         '
@@ -256,10 +262,10 @@ Partial Class frmSynoptic
         Me.btnComputeEvents.Text = "Compute Events"
         Me.btnComputeEvents.UseVisualStyleBackColor = True
         '
-        'mnuChooseColumns
+        'mnuGraph
         '
-        Me.mnuChooseColumns.Index = 4
-        Me.mnuChooseColumns.Text = "Choose Columns"
+        Me.mnuGraph.Index = 5
+        Me.mnuGraph.Text = "Graph Synoptic Results"
         '
         'frmSynoptic
         '
@@ -315,4 +321,5 @@ Partial Class frmSynoptic
     Friend WithEvents btnComputeEvents As System.Windows.Forms.Button
     Friend WithEvents mnuFileSaveAll As System.Windows.Forms.MenuItem
     Friend WithEvents mnuChooseColumns As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuGraph As System.Windows.Forms.MenuItem
 End Class
