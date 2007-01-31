@@ -20,8 +20,7 @@ Public Class frmGraphBar
 
     Public Sub SaveBitmapToFile(Optional ByVal aFileName As String = "")
         If aFileName.Length = 0 Then 'No file name specified - ask user
-            Dim lSavedAs As String
-            lSavedAs = zgc.SaveAs(SaveImageExtension)
+            Dim lSavedAs As String = zgc.SaveAs(SafeFilename(Pane.Title.Text & SaveImageExtension))
             If lSavedAs.Length > 0 Then
                 SaveImageExtension = System.IO.Path.GetExtension(lSavedAs)
             End If
