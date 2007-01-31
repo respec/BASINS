@@ -26,8 +26,6 @@ Partial Class frmSynoptic
         Me.agdMain = New atcControls.atcGrid
         Me.txtThreshold = New System.Windows.Forms.TextBox
         Me.lblThreshold = New System.Windows.Forms.Label
-        Me.radioAbove = New System.Windows.Forms.RadioButton
-        Me.radioBelow = New System.Windows.Forms.RadioButton
         Me.cboGapUnits = New System.Windows.Forms.ComboBox
         Me.lblGap = New System.Windows.Forms.Label
         Me.txtGap = New System.Windows.Forms.TextBox
@@ -46,11 +44,12 @@ Partial Class frmSynoptic
         Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
         Me.mnuChooseColumns = New System.Windows.Forms.MenuItem
+        Me.mnuGraph = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblDuringEvent = New System.Windows.Forms.Label
-        Me.btnComputeEvents = New System.Windows.Forms.Button
-        Me.mnuGraph = New System.Windows.Forms.MenuItem
+        Me.lblPercentInEvents = New System.Windows.Forms.Label
+        Me.cboAboveBelow = New System.Windows.Forms.ComboBox
         Me.SuspendLayout()
         '
         'lblGroupBy
@@ -69,8 +68,8 @@ Partial Class frmSynoptic
         Me.cboGroupBy.FormattingEnabled = True
         Me.cboGroupBy.Location = New System.Drawing.Point(117, 65)
         Me.cboGroupBy.Name = "cboGroupBy"
-        Me.cboGroupBy.Size = New System.Drawing.Size(405, 21)
-        Me.cboGroupBy.TabIndex = 12
+        Me.cboGroupBy.Size = New System.Drawing.Size(196, 21)
+        Me.cboGroupBy.TabIndex = 5
         '
         'agdMain
         '
@@ -90,10 +89,10 @@ Partial Class frmSynoptic
         '
         'txtThreshold
         '
-        Me.txtThreshold.Location = New System.Drawing.Point(117, 12)
+        Me.txtThreshold.Location = New System.Drawing.Point(133, 12)
         Me.txtThreshold.Name = "txtThreshold"
-        Me.txtThreshold.Size = New System.Drawing.Size(82, 20)
-        Me.txtThreshold.TabIndex = 6
+        Me.txtThreshold.Size = New System.Drawing.Size(66, 20)
+        Me.txtThreshold.TabIndex = 2
         Me.txtThreshold.Text = "0"
         '
         'lblThreshold
@@ -101,31 +100,9 @@ Partial Class frmSynoptic
         Me.lblThreshold.AutoSize = True
         Me.lblThreshold.Location = New System.Drawing.Point(12, 15)
         Me.lblThreshold.Name = "lblThreshold"
-        Me.lblThreshold.Size = New System.Drawing.Size(85, 13)
-        Me.lblThreshold.TabIndex = 5
-        Me.lblThreshold.Text = "Event Threshold"
-        '
-        'radioAbove
-        '
-        Me.radioAbove.AutoSize = True
-        Me.radioAbove.Checked = True
-        Me.radioAbove.Location = New System.Drawing.Point(205, 13)
-        Me.radioAbove.Name = "radioAbove"
-        Me.radioAbove.Size = New System.Drawing.Size(160, 17)
-        Me.radioAbove.TabIndex = 7
-        Me.radioAbove.TabStop = True
-        Me.radioAbove.Text = "Events are Above Threshold"
-        Me.radioAbove.UseVisualStyleBackColor = True
-        '
-        'radioBelow
-        '
-        Me.radioBelow.AutoSize = True
-        Me.radioBelow.Location = New System.Drawing.Point(371, 13)
-        Me.radioBelow.Name = "radioBelow"
-        Me.radioBelow.Size = New System.Drawing.Size(158, 17)
-        Me.radioBelow.TabIndex = 8
-        Me.radioBelow.Text = "Events are Below Threshold"
-        Me.radioBelow.UseVisualStyleBackColor = True
+        Me.lblThreshold.Size = New System.Drawing.Size(40, 13)
+        Me.lblThreshold.TabIndex = 0
+        Me.lblThreshold.Text = "Events"
         '
         'cboGapUnits
         '
@@ -133,7 +110,7 @@ Partial Class frmSynoptic
         Me.cboGapUnits.Location = New System.Drawing.Point(205, 39)
         Me.cboGapUnits.Name = "cboGapUnits"
         Me.cboGapUnits.Size = New System.Drawing.Size(108, 21)
-        Me.cboGapUnits.TabIndex = 11
+        Me.cboGapUnits.TabIndex = 4
         '
         'lblGap
         '
@@ -146,10 +123,10 @@ Partial Class frmSynoptic
         '
         'txtGap
         '
-        Me.txtGap.Location = New System.Drawing.Point(117, 39)
+        Me.txtGap.Location = New System.Drawing.Point(133, 39)
         Me.txtGap.Name = "txtGap"
-        Me.txtGap.Size = New System.Drawing.Size(82, 20)
-        Me.txtGap.TabIndex = 10
+        Me.txtGap.Size = New System.Drawing.Size(66, 20)
+        Me.txtGap.TabIndex = 3
         Me.txtGap.Text = "0"
         '
         'MainMenu1
@@ -232,6 +209,11 @@ Partial Class frmSynoptic
         Me.mnuChooseColumns.Index = 4
         Me.mnuChooseColumns.Text = "Choose Columns"
         '
+        'mnuGraph
+        '
+        Me.mnuGraph.Index = 5
+        Me.mnuGraph.Text = "Graph Synoptic Results"
+        '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Index = 3
@@ -252,33 +234,35 @@ Partial Class frmSynoptic
         Me.lblDuringEvent.TabIndex = 14
         Me.lblDuringEvent.Text = "during an event"
         '
-        'btnComputeEvents
+        'lblPercentInEvents
         '
-        Me.btnComputeEvents.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnComputeEvents.Location = New System.Drawing.Point(422, 37)
-        Me.btnComputeEvents.Name = "btnComputeEvents"
-        Me.btnComputeEvents.Size = New System.Drawing.Size(100, 23)
-        Me.btnComputeEvents.TabIndex = 15
-        Me.btnComputeEvents.Text = "Compute Events"
-        Me.btnComputeEvents.UseVisualStyleBackColor = True
+        Me.lblPercentInEvents.AutoSize = True
+        Me.lblPercentInEvents.Location = New System.Drawing.Point(319, 68)
+        Me.lblPercentInEvents.Name = "lblPercentInEvents"
+        Me.lblPercentInEvents.Size = New System.Drawing.Size(15, 13)
+        Me.lblPercentInEvents.TabIndex = 16
+        Me.lblPercentInEvents.Text = "%"
         '
-        'mnuGraph
+        'cboAboveBelow
         '
-        Me.mnuGraph.Index = 5
-        Me.mnuGraph.Text = "Graph Synoptic Results"
+        Me.cboAboveBelow.FormattingEnabled = True
+        Me.cboAboveBelow.Items.AddRange(New Object() {"Above", "Below"})
+        Me.cboAboveBelow.Location = New System.Drawing.Point(58, 11)
+        Me.cboAboveBelow.Name = "cboAboveBelow"
+        Me.cboAboveBelow.Size = New System.Drawing.Size(69, 21)
+        Me.cboAboveBelow.TabIndex = 1
         '
         'frmSynoptic
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(537, 411)
-        Me.Controls.Add(Me.btnComputeEvents)
+        Me.Controls.Add(Me.cboAboveBelow)
+        Me.Controls.Add(Me.lblPercentInEvents)
         Me.Controls.Add(Me.lblDuringEvent)
         Me.Controls.Add(Me.txtGap)
         Me.Controls.Add(Me.cboGapUnits)
         Me.Controls.Add(Me.lblGap)
-        Me.Controls.Add(Me.radioBelow)
-        Me.Controls.Add(Me.radioAbove)
         Me.Controls.Add(Me.txtThreshold)
         Me.Controls.Add(Me.lblThreshold)
         Me.Controls.Add(Me.agdMain)
@@ -297,8 +281,6 @@ Partial Class frmSynoptic
     Friend WithEvents agdMain As atcControls.atcGrid
     Friend WithEvents txtThreshold As System.Windows.Forms.TextBox
     Friend WithEvents lblThreshold As System.Windows.Forms.Label
-    Friend WithEvents radioAbove As System.Windows.Forms.RadioButton
-    Friend WithEvents radioBelow As System.Windows.Forms.RadioButton
     Friend WithEvents cboGapUnits As System.Windows.Forms.ComboBox
     Friend WithEvents lblGap As System.Windows.Forms.Label
     Friend WithEvents txtGap As System.Windows.Forms.TextBox
@@ -318,8 +300,9 @@ Partial Class frmSynoptic
     Friend WithEvents mnuAnalysis As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     Friend WithEvents lblDuringEvent As System.Windows.Forms.Label
-    Friend WithEvents btnComputeEvents As System.Windows.Forms.Button
     Friend WithEvents mnuFileSaveAll As System.Windows.Forms.MenuItem
     Friend WithEvents mnuChooseColumns As System.Windows.Forms.MenuItem
     Friend WithEvents mnuGraph As System.Windows.Forms.MenuItem
+    Friend WithEvents lblPercentInEvents As System.Windows.Forms.Label
+    Friend WithEvents cboAboveBelow As System.Windows.Forms.ComboBox
 End Class

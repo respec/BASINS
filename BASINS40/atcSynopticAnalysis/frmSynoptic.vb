@@ -12,17 +12,22 @@ Public Class frmSynoptic
 
     Private WithEvents pEvents As atcDataGroup
 
+    Private pInitialized As Boolean = False
+
     Private pSource As atcGridSource
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
     Private pGapUnitNames() As String = {"Seconds", "Minutes", "Hours", "Days", "Weeks", "Months", "Years"}
     Private pGapUnitFactor() As String = {JulianSecond, JulianMinute, JulianHour, 1, 7, 31, 366}
 
-    Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum Intensity", "Mean Intensity", "Total Volume", "Month", "One Group"} ', "Season", "Year", "Length", }
+    Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum Intensity", "Mean Intensity", "Total Volume", "Month", "Year", "One Group"} ', "Season", "Year", "Length", }
 
     Private pColumnTitles() As String
-    Private pColumnTitlesDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Cummulative Volume", "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration", "Maximum Intensity", "Mean Intensity", "Mean Time Since Last"}
-    Private pColumnTitlesEvent() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity", "Mean Time Since Last"}
+    Private pColumnTitlesAll() As String   'Column titles to use for all but "Each Event" grouping
+    Private pColumnTitlesEvent() As String 'Column titles in use for "Each Event" grouping
+
+    Private pColumnTitlesAllDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Cummulative Volume", "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration", "Maximum Intensity", "Mean Intensity", "Mean Time Since Last"}
+    Private pColumnTitlesEventDefault() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity", "Mean Time Since Last"}
 
     'Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
     Private pMeasurementsGroupEdges() As Double = {100, 75, 50, 40, 30, 20, 15, _
@@ -68,13 +73,44 @@ Public Class frmSynoptic
             cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
             cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
             txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
-            radioAbove.Checked = GetSetting("Synoptic", "Defaults", "High", radioAbove.Checked)
+            If GetSetting("Synoptic", "Defaults", "High", True) Then
+                cboAboveBelow.SelectedIndex = 0
+            Else
+                cboAboveBelow.SelectedIndex = 1
+            End If
             txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
+
+            Dim lTitleString As String
+            lTitleString = GetSetting("Synoptic", "Defaults", "Columns")
+            If lTitleString.Length > 0 Then
+                pColumnTitlesAll = lTitleString.Split(",")
+            Else
+                pColumnTitlesAll = pColumnTitlesAllDefault.Clone
+            End If
+
+            lTitleString = GetSetting("Synoptic", "Defaults", "ColumnsEvent")
+            If lTitleString.Length > 0 Then
+                pColumnTitlesEvent = lTitleString.Split(",")
+            Else
+                pColumnTitlesEvent = pColumnTitlesEventDefault.Clone
+            End If
+
             SetColumnTitlesFromGroupBy()
+            pInitialized = True
             PopulateGrid()
         Else 'user declined to specify timeseries
             Me.Close()
         End If
+    End Sub
+
+    Private Sub SaveSettings()
+        SaveSetting("Synoptic", "Defaults", "GapUnits", cboGapUnits.SelectedIndex)
+        SaveSetting("Synoptic", "Defaults", "GroupBy", cboGroupBy.SelectedIndex)
+        SaveSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
+        SaveSetting("Synoptic", "Defaults", "High", (cboAboveBelow.SelectedIndex = 0))
+        SaveSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
+        SaveSetting("Synoptic", "Defaults", "Columns", String.Join(",", pColumnTitlesAll))
+        SaveSetting("Synoptic", "Defaults", "ColumnsEvent", String.Join(",", pColumnTitlesEvent))
     End Sub
 
     Private Function DataSetDuration(ByVal aTimeseries As atcTimeseries) As Double
@@ -121,19 +157,48 @@ Public Class frmSynoptic
                     Next
                 Next
             Case "Month"
-                Dim lIndex As Integer
-                For lIndex = 1 To 12
-                    lGroups.Add(MonthName(lIndex, True), New atcDataGroup)
+                For lGroupIndex = 1 To 12
+                    lGroups.Add(MonthName(lGroupIndex, True), New atcDataGroup)
                 Next
                 For Each lEvent As atcTimeseries In pEvents
-                    'TODO: find date of peak instead of first date
-                    Dim lPeakDate As Double = lEvent.Dates.Value(1)
-                    Dim lVBDate As Date
-                    lVBDate = Date.FromOADate(lPeakDate)
-                    lGroups.ItemByIndex(lVBDate.Month - 1).Add(lEvent)
+                    'Find peak if event spans a month boundary
+                    Dim lPeakIndex As Integer = 1
+                    If Date.FromOADate(lEvent.Dates.Value(lPeakIndex)).Month <> _
+                       Date.FromOADate(lEvent.Dates.Value(lEvent.numValues)).Month Then
+                        For lValueIndex = 2 To lEvent.numValues
+                            If lEvent.Value(lValueIndex) > lEvent.Value(lPeakIndex) Then
+                                lPeakIndex = lValueIndex
+                            End If
+                        Next
+                    End If
+                    Dim lMonth As Integer = Date.FromOADate(lEvent.Dates.Value(lPeakIndex)).Month
+                    lGroups.ItemByIndex(lMonth - 1).Add(lEvent)
                 Next
             Case "Season"
+                'TODO
             Case "Year"
+                Dim lFirstYear As Integer = 0
+                For Each lEvent As atcTimeseries In pEvents
+                    'Find peak if event spans a year boundary
+                    Dim lPeakIndex As Integer = 1
+                    If Date.FromOADate(lEvent.Dates.Value(lPeakIndex)).Year <> _
+                       Date.FromOADate(lEvent.Dates.Value(lEvent.numValues)).Year Then
+                        For lValueIndex = 2 To lEvent.numValues
+                            If lEvent.Value(lValueIndex) > lEvent.Value(lPeakIndex) Then
+                                lPeakIndex = lValueIndex
+                            End If
+                        Next
+                    End If
+
+                    Dim lYear As Integer = Date.FromOADate(lEvent.Dates.Value(lPeakIndex)).Year
+
+                    If lFirstYear = 0 Then lFirstYear = lYear
+
+                    For lAddYear As Integer = lGroups.Count To lYear - lFirstYear
+                        lGroups.Add(lYear, New atcDataGroup)
+                    Next
+                    lGroups.ItemByIndex(lYear - lFirstYear).Add(lEvent)
+                Next
             Case "Total Volume", "Cummulative Volume"
                 Dim lIndex As Integer
                 For Each lValue In pVolumeGroupEdges
@@ -337,11 +402,11 @@ Public Class frmSynoptic
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
-        If Me.Visible Then PopulateGrid()
+        If pInitialized Then PopulateGrid()
     End Sub
 
     Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
-        If Me.Visible Then PopulateGrid()
+        If pInitialized Then PopulateGrid()
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
@@ -433,12 +498,10 @@ Public Class frmSynoptic
     End Property
 
     Private Function HeaderInformation() As String
-        Dim lAboveString As String
-        If radioAbove.Checked Then lAboveString = "Above" Else lAboveString = "Below"
         Return Me.Text & vbCrLf _
-            & "Events " & lAboveString & " " & txtThreshold.Text & vbCrLf _
+            & "Events " & cboAboveBelow.Text & " " & txtThreshold.Text & vbCrLf _
             & "Allowing gaps of up to " & txtGap.Text & " " & cboGapUnits.Text & vbCrLf _
-            & "Grouped by " & cboGroupBy.Text 
+            & "Grouped by " & cboGroupBy.Text
     End Function
 
     Public Overrides Function ToString() As String
@@ -447,10 +510,6 @@ Public Class frmSynoptic
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp("BASINS Details\Analysis\Time Series Functions\Synoptic.html")
-    End Sub
-
-    Private Sub btnComputeEvents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnComputeEvents.Click
-        ComputeEventsFromFormParameters()
     End Sub
 
     Private Sub ComputeEventsFromFormParameters()
@@ -462,21 +521,16 @@ Public Class frmSynoptic
 
         Dim lThreshold As Double = txtThreshold.Text
         Dim lDaysGapAllowed As Double = Double.Parse(txtGap.Text) * pGapUnitFactor(cboGapUnits.SelectedIndex) + JulianSecond / 2
-        Dim lHighEvents As Boolean = radioAbove.Checked
+        Dim lHighEvents As Boolean = (cboAboveBelow.SelectedIndex = 0)
 
         pEvents = atcSynopticAnalysisPlugin.ComputeEvents(pDataGroup, lThreshold, lDaysGapAllowed, lHighEvents)
 
-        PopulateGrid()
-
-        SaveSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
-        SaveSetting("Synoptic", "Defaults", "High", lHighEvents)
-        SaveSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
-        SaveSetting("Synoptic", "Defaults", "GapUnits", cboGapUnits.SelectedIndex)
+        SaveSettings()
     End Sub
-
 
     Private Sub cboGroupBy_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboGroupBy.SelectedIndexChanged
         SetColumnTitlesFromGroupBy()
+        SaveSettings()
         PopulateGrid()
     End Sub
 
@@ -484,7 +538,7 @@ Public Class frmSynoptic
         If cboGroupBy.Text = "Each Event" Then
             pColumnTitles = pColumnTitlesEvent.Clone
         Else
-            pColumnTitles = pColumnTitlesDefault.Clone
+            pColumnTitles = pColumnTitlesAll.Clone
         End If
     End Sub
 
@@ -492,9 +546,9 @@ Public Class frmSynoptic
         Dim lFrmChoose As New frmChooseColumns
 
         If cboGroupBy.Text = "Each Event" Then
-            pColumnTitles = lFrmChoose.AskUser(pColumnTitlesEvent, pColumnTitles)
+            pColumnTitles = lFrmChoose.AskUser(pColumnTitlesEventDefault, pColumnTitles)
         Else
-            pColumnTitles = lFrmChoose.AskUser(pColumnTitlesDefault, pColumnTitles)
+            pColumnTitles = lFrmChoose.AskUser(pColumnTitlesAllDefault, pColumnTitles)
         End If
         PopulateGrid()
     End Sub
@@ -530,7 +584,8 @@ Public Class frmSynoptic
                 Dim lPane As ZedGraph.GraphPane = lForm.Pane
 
                 'Set the titles and axis labels
-                lPane.Title.Text = pColumnTitles(lColumn) & " grouped by " & cboGroupBy.Text
+                lForm.Text = pColumnTitles(lColumn) & " grouped by " & cboGroupBy.Text
+                lPane.Title.Text = lForm.Text
                 lPane.XAxis.Title.Text = cboGroupBy.Text
                 lPane.YAxis.Title.Text = pColumnTitles(lColumn)
                 If ColumnUnits(pColumnTitles(lColumn)).Length > 0 Then
@@ -565,4 +620,16 @@ Public Class frmSynoptic
             End If
         Next
     End Sub
+
+    Private Sub EventParametersChanged(ByVal sender As Object, ByVal e As System.EventArgs) _
+        Handles cboAboveBelow.SelectedIndexChanged, _
+                txtThreshold.TextChanged, _
+                txtGap.TextChanged, _
+                cboGapUnits.SelectedIndexChanged
+        If pInitialized Then
+            ComputeEventsFromFormParameters()
+            PopulateGrid()
+        End If
+    End Sub
+
 End Class
