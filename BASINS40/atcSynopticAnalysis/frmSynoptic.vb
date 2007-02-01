@@ -70,16 +70,6 @@ Public Class frmSynoptic
             cboGapUnits.Items.AddRange(pGapUnitNames)
             cboGroupBy.Items.AddRange(pGroupByNames)
 
-            cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
-            cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
-            txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
-            If GetSetting("Synoptic", "Defaults", "High", True) Then
-                cboAboveBelow.SelectedIndex = 0
-            Else
-                cboAboveBelow.SelectedIndex = 1
-            End If
-            txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
-
             Dim lTitleString As String
             lTitleString = GetSetting("Synoptic", "Defaults", "Columns")
             If lTitleString.Length > 0 Then
@@ -95,6 +85,16 @@ Public Class frmSynoptic
                 pColumnTitlesEvent = pColumnTitlesEventDefault.Clone
             End If
 
+            cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
+            cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
+            txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
+            If GetSetting("Synoptic", "Defaults", "High", True) Then
+                cboAboveBelow.SelectedIndex = 0
+            Else
+                cboAboveBelow.SelectedIndex = 1
+            End If
+            txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
+
             SetColumnTitlesFromGroupBy()
             pInitialized = True
             PopulateGrid()
@@ -104,13 +104,15 @@ Public Class frmSynoptic
     End Sub
 
     Private Sub SaveSettings()
-        SaveSetting("Synoptic", "Defaults", "GapUnits", cboGapUnits.SelectedIndex)
-        SaveSetting("Synoptic", "Defaults", "GroupBy", cboGroupBy.SelectedIndex)
-        SaveSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
-        SaveSetting("Synoptic", "Defaults", "High", (cboAboveBelow.SelectedIndex = 0))
-        SaveSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
-        SaveSetting("Synoptic", "Defaults", "Columns", String.Join(",", pColumnTitlesAll))
-        SaveSetting("Synoptic", "Defaults", "ColumnsEvent", String.Join(",", pColumnTitlesEvent))
+        If pInitialized Then
+            SaveSetting("Synoptic", "Defaults", "GapUnits", cboGapUnits.SelectedIndex)
+            SaveSetting("Synoptic", "Defaults", "GroupBy", cboGroupBy.SelectedIndex)
+            SaveSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
+            SaveSetting("Synoptic", "Defaults", "High", (cboAboveBelow.SelectedIndex = 0))
+            SaveSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
+            SaveSetting("Synoptic", "Defaults", "Columns", String.Join(",", pColumnTitlesAll))
+            SaveSetting("Synoptic", "Defaults", "ColumnsEvent", String.Join(",", pColumnTitlesEvent))
+        End If
     End Sub
 
     Private Function DataSetDuration(ByVal aTimeseries As atcTimeseries) As Double
@@ -133,6 +135,8 @@ Public Class frmSynoptic
         Dim lGroupIndex As Integer = 0
         Dim lValueIndex As Integer
         Dim lDurationFactor As Double = pGapUnitFactor(cboGapUnits.SelectedIndex)
+
+        If Not pInitialized Then Exit Sub 'too early to do this!
 
         If pEvents Is Nothing Then ComputeEventsFromFormParameters()
 
@@ -623,8 +627,8 @@ Public Class frmSynoptic
 
     Private Sub EventParametersChanged(ByVal sender As Object, ByVal e As System.EventArgs) _
         Handles cboAboveBelow.SelectedIndexChanged, _
-                txtThreshold.TextChanged, _
-                txtGap.TextChanged, _
+                txtThreshold.LostFocus, _
+                txtGap.LostFocus, _
                 cboGapUnits.SelectedIndexChanged
         If pInitialized Then
             ComputeEventsFromFormParameters()
