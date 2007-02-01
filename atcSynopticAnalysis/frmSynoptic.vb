@@ -13,6 +13,9 @@ Public Class frmSynoptic
     Private WithEvents pEvents As atcDataGroup
 
     Private pInitialized As Boolean = False
+    Private pLastThreshold As Double = Double.NaN
+    Private pLastDaysGapAllowed As Double = Double.NaN
+    Private pLastHighEvents As Boolean = True
 
     Private pSource As atcGridSource
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
@@ -88,7 +91,7 @@ Public Class frmSynoptic
             cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
             cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
             txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
-            If GetSetting("Synoptic", "Defaults", "High", True) Then
+            If GetSetting("Synoptic", "Defaults", "High", 0) Then
                 cboAboveBelow.SelectedIndex = 0
             Else
                 cboAboveBelow.SelectedIndex = 1
@@ -138,7 +141,7 @@ Public Class frmSynoptic
 
         If Not pInitialized Then Exit Sub 'too early to do this!
 
-        If pEvents Is Nothing Then ComputeEventsFromFormParameters()
+        If pEvents Is Nothing Then ComputeEventsFromFormParameters(False)
 
         Select Case cboGroupBy.Text
             Case "Each Event"
@@ -503,7 +506,7 @@ Public Class frmSynoptic
 
     Private Function HeaderInformation() As String
         Return Me.Text & vbCrLf _
-            & "Events " & cboAboveBelow.Text & " " & txtThreshold.Text & vbCrLf _
+            & "Events " & cboAboveBelow.Text & " " & txtThreshold.Text & " " & lblPercentInEvents.Text & vbCrLf _
             & "Allowing gaps of up to " & txtGap.Text & " " & cboGapUnits.Text & vbCrLf _
             & "Grouped by " & cboGroupBy.Text
     End Function
@@ -516,7 +519,13 @@ Public Class frmSynoptic
         ShowHelp("BASINS Details\Analysis\Time Series Functions\Synoptic.html")
     End Sub
 
-    Private Sub ComputeEventsFromFormParameters()
+    ''' <summary>
+    ''' ComputeEventsFromFormParameters
+    ''' </summary>
+    ''' <param name="aCheckForChange">True to make sure event parameters have changed, False to recompute regardless of change</param>
+    ''' <returns>True if events were recomputed, False if they were not</returns>
+    ''' <remarks></remarks>
+    Private Function ComputeEventsFromFormParameters(ByVal aCheckForChange As Boolean) As Boolean
         txtThreshold.Text = txtThreshold.Text.Trim
         If Not IsNumeric(txtThreshold.Text) Then txtThreshold.Text = "0"
 
@@ -527,10 +536,17 @@ Public Class frmSynoptic
         Dim lDaysGapAllowed As Double = Double.Parse(txtGap.Text) * pGapUnitFactor(cboGapUnits.SelectedIndex) + JulianSecond / 2
         Dim lHighEvents As Boolean = (cboAboveBelow.SelectedIndex = 0)
 
-        pEvents = atcSynopticAnalysisPlugin.ComputeEvents(pDataGroup, lThreshold, lDaysGapAllowed, lHighEvents)
-
-        SaveSettings()
-    End Sub
+        If Not aCheckForChange OrElse lThreshold <> pLastThreshold OrElse lDaysGapAllowed <> pLastDaysGapAllowed OrElse lHighEvents <> pLastHighEvents Then
+            pEvents = atcSynopticAnalysisPlugin.ComputeEvents(pDataGroup, lThreshold, lDaysGapAllowed, lHighEvents)
+            lblPercentInEvents.Text = DoubleToString(GroupTotal(pEvents) / GroupTotal(pDataGroup) * 100, , , , , 3) & "% of volume in " & pEvents.Count & " events"
+            SaveSettings()
+            pLastThreshold = lThreshold
+            pLastDaysGapAllowed = lDaysGapAllowed
+            pLastHighEvents = lHighEvents
+            Return True
+        End If
+        Return False
+    End Function
 
     Private Sub cboGroupBy_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboGroupBy.SelectedIndexChanged
         SetColumnTitlesFromGroupBy()
@@ -625,15 +641,34 @@ Public Class frmSynoptic
         Next
     End Sub
 
+    Private Sub txtParameter_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles txtThreshold.KeyPress, txtGap.KeyPress
+        If e.KeyChar.Equals(Chr(13)) Then
+            RecomputeEventsIfFormParametersChanged()
+        End If
+    End Sub
+
     Private Sub EventParametersChanged(ByVal sender As Object, ByVal e As System.EventArgs) _
         Handles cboAboveBelow.SelectedIndexChanged, _
                 txtThreshold.LostFocus, _
                 txtGap.LostFocus, _
                 cboGapUnits.SelectedIndexChanged
+        RecomputeEventsIfFormParametersChanged()
+    End Sub
+
+    Private Sub RecomputeEventsIfFormParametersChanged()
         If pInitialized Then
-            ComputeEventsFromFormParameters()
-            PopulateGrid()
+            If ComputeEventsFromFormParameters(True) Then
+                PopulateGrid()
+            End If
         End If
     End Sub
+
+    Private Function GroupTotal(ByVal aDataGroup As atcDataGroup) As Double
+        Dim lTotal As Double = 0
+        For Each lTimeseries As atcTimeseries In aDataGroup
+            lTotal += lTimeseries.Attributes.GetValue("Sum")
+        Next
+        Return lTotal
+    End Function
 
 End Class
