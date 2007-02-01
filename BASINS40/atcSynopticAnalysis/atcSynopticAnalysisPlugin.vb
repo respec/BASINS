@@ -118,10 +118,12 @@ Public Class atcSynopticAnalysisPlugin
 
     Public Shared Function ComputeEvents(ByVal aDataGroup As atcDataGroup, ByVal aThreshold As Double, ByVal aDaysGapAllowed As Double, ByVal aHighEvents As Boolean) As atcDataGroup
         ComputeEvents = New atcDataGroup
-        For Each lDataSet As atcTimeseries In aDataGroup
-            Dim lEvents As atcDataGroup = atcEvents.EventSplit(lDataSet, Nothing, aThreshold, aDaysGapAllowed, aHighEvents)
-            ComputeEvents.AddRange(lEvents)
-        Next
+        If Not aDataGroup Is Nothing Then
+            For Each lDataSet As atcTimeseries In aDataGroup
+                Dim lEvents As atcDataGroup = atcEvents.EventSplit(lDataSet, Nothing, aThreshold, aDaysGapAllowed, aHighEvents)
+                ComputeEvents.AddRange(lEvents)
+            Next
+        End If
     End Function
 
 End Class

@@ -63,12 +63,10 @@ Partial Class frmSynoptic
         '
         'cboGroupBy
         '
-        Me.cboGroupBy.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboGroupBy.FormattingEnabled = True
-        Me.cboGroupBy.Location = New System.Drawing.Point(117, 65)
+        Me.cboGroupBy.Location = New System.Drawing.Point(133, 65)
         Me.cboGroupBy.Name = "cboGroupBy"
-        Me.cboGroupBy.Size = New System.Drawing.Size(196, 21)
+        Me.cboGroupBy.Size = New System.Drawing.Size(180, 21)
         Me.cboGroupBy.TabIndex = 5
         '
         'agdMain
@@ -237,7 +235,7 @@ Partial Class frmSynoptic
         'lblPercentInEvents
         '
         Me.lblPercentInEvents.AutoSize = True
-        Me.lblPercentInEvents.Location = New System.Drawing.Point(319, 68)
+        Me.lblPercentInEvents.Location = New System.Drawing.Point(205, 14)
         Me.lblPercentInEvents.Name = "lblPercentInEvents"
         Me.lblPercentInEvents.Size = New System.Drawing.Size(15, 13)
         Me.lblPercentInEvents.TabIndex = 16
