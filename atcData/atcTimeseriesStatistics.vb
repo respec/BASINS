@@ -175,8 +175,10 @@ Public Class atcTimeseriesStatistics
                 aTimeseries.Attributes.SetValue("Max", lMax)
                 aTimeseries.Attributes.SetValue("Min", lMin)
                 aTimeseries.Attributes.SetValue("Sum", lSum)
-                Dim lYearSpan As Double = (aTimeseries.Dates.Value(lLastValueIndex) - aTimeseries.Dates.Value(0)) / 365.25
-                aTimeseries.Attributes.SetValue("SumAnnual", lSum / lYearSpan)
+                If Not aTimeseries.Dates Is Nothing Then
+                    Dim lYearSpan As Double = (aTimeseries.Dates.Value(lLastValueIndex) - aTimeseries.Dates.Value(0)) / 365.25
+                    aTimeseries.Attributes.SetValue("SumAnnual", lSum / lYearSpan)
+                End If
                 lMean = lSum / lCount
                 aTimeseries.Attributes.SetValue("Mean", lMean)
                 If lMin > 0 Then
@@ -185,7 +187,7 @@ Public Class atcTimeseriesStatistics
                 End If
             End If
 
-            If aTimeseries.Dates.Values.GetLength(0) > 0 Then
+            If Not aTimeseries.Dates Is Nothing AndAlso aTimeseries.Dates.Values.GetLength(0) > 0 Then
                 aTimeseries.Attributes.SetValue("SJDay", aTimeseries.Dates.Value(0))
                 aTimeseries.Attributes.SetValue("EJDay", aTimeseries.Dates.Value(lLastValueIndex))
             End If

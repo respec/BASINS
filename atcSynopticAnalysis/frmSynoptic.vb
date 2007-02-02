@@ -26,11 +26,22 @@ Public Class frmSynoptic
     Private pGroupByNames() As String = {"Each Event", "Number of Measurements", "Maximum Intensity", "Mean Intensity", "Total Volume", "Month", "Year", "One Group"} ', "Season", "Year", "Length", }
 
     Private pColumnTitles() As String
+    Private pColumnAttributes() As String
+
     Private pColumnTitlesAll() As String   'Column titles to use for all but "Each Event" grouping
     Private pColumnTitlesEvent() As String 'Column titles in use for "Each Event" grouping
 
-    Private pColumnTitlesAllDefault() As String = {"Group", "Events", "Measurements", "Maximum Volume", "Mean Volume", "Total Volume", "Cummulative Volume", "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration", "Maximum Intensity", "Mean Intensity", "Mean Time Since Last"}
-    Private pColumnTitlesEventDefault() As String = {"Group", "Start Date", "Start Time", "Measurements", "Total Volume", "Total Duration", "Maximum Intensity", "Mean Intensity", "Mean Time Since Last"}
+    'Column Attributes (Min, Max, Mean, SD) to use for all but "Each Event" grouping
+    Private pColumnAttributesAll() As String
+    'Column Attributes (Min, Max, Mean, SD) to use for "Each Event" grouping
+    Private pColumnAttributesEvent() As String
+
+    'Private pColumnTitlesAllAvailable() As String = {"Group", "Events", "Measurements", "Volume", "Duration", "Intensity", "Time Since Last"}
+    Private pColumnTitlesAllDefault() As String = {"Group", "Events", "Measurements", "Volume", "Volume", "Volume", "Volume", "Duration", "Duration", "Duration", "Duration", "Intensity", "Intensity", "Intensity", "Time Since Last"}
+    Private pColumnAttributesAllDefault() As String = {"", "", "", "Max", "Mean", "Sum", "Cumulative", "Max", "Mean", "Sum", "Standard Deviation", "Max", "Mean", "Standard Deviation", "Mean"}
+
+    Private pColumnTitlesEventDefault() As String = {"Group", "Start Date", "Start Time", "Measurements", "Volume", "Duration", "Intensity", "Intensity", "Time Since Last"}
+    Private pColumnAttributesEventDefault() As String = {"", "", "", "", "Sum", "Sum", "Max", "Mean", "Mean"}
 
     'Private pMeasurementsGroupEdges() As Double = {100, 50, 20, 10, 5, 2, 1}
     Private pMeasurementsGroupEdges() As Double = {100, 75, 50, 40, 30, 20, 15, _
@@ -73,20 +84,7 @@ Public Class frmSynoptic
             cboGapUnits.Items.AddRange(pGapUnitNames)
             cboGroupBy.Items.AddRange(pGroupByNames)
 
-            Dim lTitleString As String
-            lTitleString = GetSetting("Synoptic", "Defaults", "Columns")
-            If lTitleString.Length > 0 Then
-                pColumnTitlesAll = lTitleString.Split(",")
-            Else
-                pColumnTitlesAll = pColumnTitlesAllDefault.Clone
-            End If
-
-            lTitleString = GetSetting("Synoptic", "Defaults", "ColumnsEvent")
-            If lTitleString.Length > 0 Then
-                pColumnTitlesEvent = lTitleString.Split(",")
-            Else
-                pColumnTitlesEvent = pColumnTitlesEventDefault.Clone
-            End If
+            LoadColumnTitles()
 
             cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
             cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
@@ -106,6 +104,35 @@ Public Class frmSynoptic
         End If
     End Sub
 
+    Private Sub LoadColumnTitles()
+        pColumnTitlesAll = LoadStringArray("ColumnTitles", pColumnTitlesAllDefault)
+        pColumnAttributesAll = LoadStringArray("ColumnAttributes", pColumnAttributesAllDefault)
+
+        'Sanity check, these have to be the same length, set to defaults if not
+        If pColumnAttributesAll.Length <> pColumnTitlesAll.Length Then
+            pColumnTitlesAll = pColumnTitlesAllDefault.Clone
+            pColumnAttributesAll = pColumnAttributesAllDefault.Clone
+        End If
+
+        pColumnTitlesEvent = LoadStringArray("ColumnTitlesEvent", pColumnTitlesEventDefault)
+        pColumnAttributesEvent = LoadStringArray("ColumnAttributesEvent", pColumnAttributesEventDefault)
+
+        'Sanity check, these have to be the same length, set to defaults if not
+        If pColumnAttributesEvent.Length <> pColumnTitlesEvent.Length Then
+            pColumnTitlesEvent = pColumnTitlesEventDefault.Clone
+            pColumnAttributesEvent = pColumnAttributesEventDefault.Clone
+        End If
+    End Sub
+
+    Private Function LoadStringArray(ByVal aKey As String, ByVal aDefault() As String) As String()
+        Dim lTitleString As String = GetSetting("Synoptic", "Defaults", aKey)
+        If lTitleString.Length > 0 Then
+            Return lTitleString.Split(",")
+        Else
+            Return aDefault.Clone
+        End If
+    End Function
+
     Private Sub SaveSettings()
         If pInitialized Then
             SaveSetting("Synoptic", "Defaults", "GapUnits", cboGapUnits.SelectedIndex)
@@ -113,8 +140,10 @@ Public Class frmSynoptic
             SaveSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
             SaveSetting("Synoptic", "Defaults", "High", (cboAboveBelow.SelectedIndex = 0))
             SaveSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
-            SaveSetting("Synoptic", "Defaults", "Columns", String.Join(",", pColumnTitlesAll))
-            SaveSetting("Synoptic", "Defaults", "ColumnsEvent", String.Join(",", pColumnTitlesEvent))
+            SaveSetting("Synoptic", "Defaults", "ColumnTitles", String.Join(",", pColumnTitlesAll))
+            SaveSetting("Synoptic", "Defaults", "ColumnAttributes", String.Join(",", pColumnAttributesAll))
+            SaveSetting("Synoptic", "Defaults", "ColumnTitlesEvent", String.Join(",", pColumnTitlesEvent))
+            SaveSetting("Synoptic", "Defaults", "ColumnAttributesEvent", String.Join(",", pColumnAttributesEvent))
         End If
     End Sub
 
@@ -130,11 +159,10 @@ Public Class frmSynoptic
         Dim lGroups As New atcCollection
         Dim lGroup As atcDataGroup
         Dim lDataset As atcTimeseries
-        Dim lMetaDataset As atcTimeseries
+
         Dim lColumn As Integer
         Dim lDate As Date
         Dim lValue As Double
-        Dim lTemp As Double
         Dim lGroupIndex As Integer = 0
         Dim lValueIndex As Integer
         Dim lDurationFactor As Double = pGapUnitFactor(cboGapUnits.SelectedIndex)
@@ -261,17 +289,40 @@ Public Class frmSynoptic
 
         pSource = New atcGridSource()
         pSource.Columns = pColumnTitles.Length
-        pSource.FixedRows = 2
+        pSource.FixedRows = 3
         pSource.Rows = lGroups.Count + pSource.FixedRows
         For lColumn = 0 To pColumnTitles.Length - 1
             pSource.CellValue(0, lColumn) = pColumnTitles(lColumn)
-            pSource.CellValue(1, lColumn) = ColumnUnits(pColumnTitles(lColumn))
+            pSource.CellValue(1, lColumn) = pColumnAttributes(lColumn)
+            pSource.CellValue(2, lColumn) = ColumnUnits(pColumnTitles(lColumn))
         Next
 
         lGroupIndex = 0
         For Each lGroup In lGroups
+            Dim lMeasurements As Integer = 0
+            Dim lWholeGroupDataset As atcTimeseries = MergeTimeseries(lGroup)
+            Dim lDurationDataset As New atcTimeseries(Nothing)
+            Dim lVolumeDataset As New atcTimeseries(Nothing)
+            Dim lTimeSinceLastDataset As New atcTimeseries(Nothing)
+
+            For Each lDataset In lGroup
+                lMeasurements += lDataset.numValues
+            Next
+
+            lDurationDataset.numValues = lGroup.Count
+            lVolumeDataset.numValues = lGroup.Count
+            lTimeSinceLastDataset.numValues = lGroup.Count
+            lValueIndex = 1
+            For Each lDataset In lGroup
+                lDurationDataset.Value(lValueIndex) = DataSetDuration(lDataset)
+                lVolumeDataset.Value(lValueIndex) = lDataset.Attributes.GetValue("Sum")
+                lTimeSinceLastDataset.Value(lValueIndex) = lDataset.Attributes.GetValue("EventTimeSincePrevious")
+                lValueIndex += 1
+            Next
+
             For lColumn = 0 To pColumnTitles.Length - 1
                 lValue = 0
+                lDataset = Nothing
                 Select Case pColumnTitles(lColumn)
                     Case "Group"
                         pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = lGroups.Keys(lGroupIndex)
@@ -286,75 +337,36 @@ Public Class frmSynoptic
                         pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = lDate.ToString("HH:mm")
                     Case "Events"
                         lValue = lGroup.Count
-
                     Case "Measurements"
-                        For Each lDataset In lGroup
-                            lValue += lDataset.numValues
-                        Next
-                    Case "Maximum Volume"
-                        For Each lDataset In lGroup
-                            If lDataset.Attributes.GetValue("Sum") > lValue Then
-                                lValue = lDataset.Attributes.GetValue("Sum")
-                            End If
-                        Next
-                    Case "Mean Volume"
-                        For Each lDataset In lGroup
-                            lValue += lDataset.Attributes.GetValue("Sum")
-                        Next
-                        lValue /= lGroup.Count
-                    Case "Total Volume", "Cummulative Volume"
-                        For Each lDataset In lGroup
-                            lValue += lDataset.Attributes.GetValue("Sum")
-                        Next
-                    Case "Maximum Duration"
-                        For Each lDataset In lGroup
-                            lTemp = DataSetDuration(lDataset)
-                            If lTemp > lValue Then
-                                lValue = lTemp
-                            End If
-                        Next
-                        lValue /= lDurationFactor
-                    Case "Mean Duration"
-                        For Each lDataset In lGroup
-                            lValue += DataSetDuration(lDataset)
-                        Next
-                        lValue /= lGroup.Count
-                        lValue /= lDurationFactor
+                        lValue = lMeasurements
 
-                    Case "SD Duration"
-                        lMetaDataset = New atcTimeseries(Nothing)
-                        lMetaDataset.Dates = New atcTimeseries(Nothing)
-                        lMetaDataset.numValues = lGroup.Count
-                        lMetaDataset.Dates.numValues = lGroup.Count
-                        lValueIndex = 1
-                        For Each lDataset In lGroup
-                            lMetaDataset.Value(lValueIndex) = DataSetDuration(lDataset)
-                            lValueIndex += 1
-                        Next
-                        lValue = lMetaDataset.Attributes.GetValue("Standard Deviation")
+                    Case "Volume"
+                        lDataset = lVolumeDataset
 
-                    Case "Total Duration"
-                        For Each lDataset In lGroup
-                            lValue += DataSetDuration(lDataset)
-                        Next
-                        lValue /= lDurationFactor
-                    Case "Maximum Intensity"
-                        For Each lDataset In lGroup
-                            lTemp = lDataset.Attributes.GetValue("Max")
-                            If lTemp > lValue Then
-                                lValue = lTemp
+                        If pColumnAttributes(lColumn) = "Cumulative" Then
+                            lValue = lVolumeDataset.Attributes.GetValue("Sum")
+                            If lGroupIndex > 0 Then
+                                lValue += CDbl(pSource.CellValue(lGroupIndex - 1 + pSource.FixedRows, lColumn))
                             End If
-                        Next
-                    Case "Mean Intensity"
-                        For Each lDataset In lGroup
-                            lValue += lDataset.Attributes.GetValue("Sum") / lDataset.numValues
-                        Next
-                        lValue /= lGroup.Count
-                    Case "Mean Time Since Last"
-                        For Each lDataset In lGroup
-                            lValue += lDataset.Attributes.GetValue("EventTimeSincePrevious")
-                        Next
-                        lValue /= lGroup.Count
+                            lDataset = Nothing
+                        End If
+
+                    Case "Duration"
+                        lDataset = lDurationDataset
+
+                    Case "Intensity"
+                        lDataset = lWholeGroupDataset
+
+                    Case "Time Since Last"
+                        lDataset = lTimeSinceLastDataset
+                End Select
+
+                If pColumnAttributes(lColumn).Length > 0 AndAlso Not lDataset Is Nothing Then
+                    lValue = lDataset.Attributes.GetValue(pColumnAttributes(lColumn))
+                End If
+
+                Select Case pColumnTitles(lColumn)
+                    Case "Duration", "Time Since Last"
                         lValue /= lDurationFactor
                 End Select
 
@@ -362,34 +374,13 @@ Public Class frmSynoptic
                     Select Case pColumnTitles(lColumn)
                         Case "Group", "Start Date", "Start Time"
                             'custom code above to set cell value
-                        Case "Events", "Measurements"
+                        Case "Events", "Measurements" 'Integer values
                             pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = CInt(lValue)
                         Case Else
-                            If pColumnTitles(lColumn) = "Cummulative Volume" AndAlso lGroupIndex > 0 Then
-                                Dim lValuePrevious As Double = pSource.CellValue(lGroupIndex - 1 + pSource.FixedRows, lColumn)
-                                pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue + lValuePrevious, , , , , 5)
-                            Else
-                                pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue, , , , , 5)
-                            End If
+                            pSource.CellValue(lGroupIndex + pSource.FixedRows, lColumn) = DoubleToString(lValue)
                     End Select
                 End If
             Next
-
-            'Duration (hours) 'TODO: dont hard code hours?
-            'TODO: 1 + should be 1 time unit, not 1 hour
-            '            lDuration = 1 + 24 * (lStorm.Dates.Value(lStorm.Dates.numValues) - lStorm.Dates.Value(1))
-            '            lReport.Write(vbTab & StrPad(CInt(lDuration), 8))
-
-
-            'Average Intensity
-            '            lReport.Write(vbTab & StrPad(Format(lVolume / lDuration, "0.00"), 9))
-
-            'Time since previous event
-            'lTimeSince = lStorm.Attributes.GetValue("EventTimeSincePrevious", 0)
-            'If lTimeSince > 0 Then
-            '    lReport.Write(vbTab & StrPad(Format(lTimeSince * 24, "#,###"), 9))
-            'End If
-
             lGroupIndex += 1
         Next
 
@@ -557,8 +548,10 @@ Public Class frmSynoptic
     Private Sub SetColumnTitlesFromGroupBy()
         If cboGroupBy.Text = "Each Event" Then
             pColumnTitles = pColumnTitlesEvent.Clone
+            pColumnAttributes = pColumnAttributesEvent.Clone
         Else
             pColumnTitles = pColumnTitlesAll.Clone
+            pColumnAttributes = pColumnAttributesAll.Clone
         End If
     End Sub
 
@@ -580,10 +573,10 @@ Public Class frmSynoptic
             Case "Start Date" : Return ""
             Case "Start Time" : Return ""
             Case "Measurements" : Return ""
-            Case "Maximum Volume", "Cummulative Volume", "Mean Volume", "Total Volume" : Return "in"
-            Case "Maximum Duration", "Mean Duration", "Total Duration", "SD Duration" : Return cboGapUnits.Text
-            Case "Maximum Intensity", "Mean Intensity" : Return "in/hr" 'TODO: or cboGapUnits.Text
-            Case "Mean Time Since Last" : Return cboGapUnits.Text
+            Case "Volume" : Return "in"
+            Case "Duration" : Return cboGapUnits.Text
+            Case "Intensity" : Return "in/hr" 'TODO: use cboGapUnits.Text?
+            Case "Time Since Last" : Return cboGapUnits.Text
             Case Else : Return ""
         End Select
     End Function
