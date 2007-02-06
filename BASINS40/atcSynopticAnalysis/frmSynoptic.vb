@@ -40,6 +40,7 @@ Public Class frmSynoptic
     Private pColumnTitlesAllDefault() As String = {"Group", "Events", "Measurements", "Volume", "Volume", "Volume", "Volume", "Duration", "Duration", "Duration", "Duration", "Intensity", "Intensity", "Intensity", "Time Since Last"}
     Private pColumnAttributesAllDefault() As String = {"", "", "", "Max", "Mean", "Sum", "Cumulative", "Max", "Mean", "Sum", "Standard Deviation", "Max", "Mean", "Standard Deviation", "Mean"}
 
+    'Private pColumnTitlesEventAvailable() As String = {"Group", "Start Date", "Start Time", "Measurements", "Volume", "Duration", "Intensity", "Time Since Last"}
     Private pColumnTitlesEventDefault() As String = {"Group", "Start Date", "Start Time", "Measurements", "Volume", "Duration", "Intensity", "Intensity", "Time Since Last"}
     Private pColumnAttributesEventDefault() As String = {"", "", "", "", "Sum", "Sum", "Max", "Mean", "Mean"}
 
@@ -84,18 +85,23 @@ Public Class frmSynoptic
             cboGapUnits.Items.AddRange(pGapUnitNames)
             cboGroupBy.Items.AddRange(pGroupByNames)
 
-            LoadColumnTitles()
+            Try
+                LoadColumnTitles()
 
-            cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
-            cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
-            txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
-            If GetSetting("Synoptic", "Defaults", "High", 0) Then
-                cboAboveBelow.SelectedIndex = 0
-            Else
-                cboAboveBelow.SelectedIndex = 1
-            End If
-            txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
-
+                cboGapUnits.SelectedIndex = GetSetting("Synoptic", "Defaults", "GapUnits", 3)
+                cboGroupBy.SelectedIndex = GetSetting("Synoptic", "Defaults", "GroupBy", 0)
+                txtThreshold.Text = GetSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
+                If GetSetting("Synoptic", "Defaults", "High", 0) Then
+                    cboAboveBelow.SelectedIndex = 0
+                Else
+                    cboAboveBelow.SelectedIndex = 1
+                End If
+                txtGap.Text = GetSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
+                If GetSetting("Synoptic", "Defaults", "ReverseGroupOrder", "False") = "True" Then
+                    mnuReverseGroupOrder.Checked = True
+                End If
+            Catch 'Restoring setting is not critical, ignore errors
+            End Try
             SetColumnTitlesFromGroupBy()
             pInitialized = True
             PopulateGrid()
@@ -108,16 +114,14 @@ Public Class frmSynoptic
         pColumnTitlesAll = LoadStringArray("ColumnTitles", pColumnTitlesAllDefault)
         pColumnAttributesAll = LoadStringArray("ColumnAttributes", pColumnAttributesAllDefault)
 
-        'Sanity check, these have to be the same length, set to defaults if not
+        pColumnTitlesEvent = LoadStringArray("ColumnTitlesEvent", pColumnTitlesEventDefault)
+        pColumnAttributesEvent = LoadStringArray("ColumnAttributesEvent", pColumnAttributesEventDefault)
+
+        'Sanity check: attributes and titles have to be the same length, set to defaults if not
         If pColumnAttributesAll.Length <> pColumnTitlesAll.Length Then
             pColumnTitlesAll = pColumnTitlesAllDefault.Clone
             pColumnAttributesAll = pColumnAttributesAllDefault.Clone
         End If
-
-        pColumnTitlesEvent = LoadStringArray("ColumnTitlesEvent", pColumnTitlesEventDefault)
-        pColumnAttributesEvent = LoadStringArray("ColumnAttributesEvent", pColumnAttributesEventDefault)
-
-        'Sanity check, these have to be the same length, set to defaults if not
         If pColumnAttributesEvent.Length <> pColumnTitlesEvent.Length Then
             pColumnTitlesEvent = pColumnTitlesEventDefault.Clone
             pColumnAttributesEvent = pColumnAttributesEventDefault.Clone
@@ -135,15 +139,26 @@ Public Class frmSynoptic
 
     Private Sub SaveSettings()
         If pInitialized Then
-            SaveSetting("Synoptic", "Defaults", "GapUnits", cboGapUnits.SelectedIndex)
-            SaveSetting("Synoptic", "Defaults", "GroupBy", cboGroupBy.SelectedIndex)
-            SaveSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
-            SaveSetting("Synoptic", "Defaults", "High", (cboAboveBelow.SelectedIndex = 0))
-            SaveSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
-            SaveSetting("Synoptic", "Defaults", "ColumnTitles", String.Join(",", pColumnTitlesAll))
-            SaveSetting("Synoptic", "Defaults", "ColumnAttributes", String.Join(",", pColumnAttributesAll))
-            SaveSetting("Synoptic", "Defaults", "ColumnTitlesEvent", String.Join(",", pColumnTitlesEvent))
-            SaveSetting("Synoptic", "Defaults", "ColumnAttributesEvent", String.Join(",", pColumnAttributesEvent))
+            Try
+                SaveSetting("Synoptic", "Defaults", "GapUnits", cboGapUnits.SelectedIndex)
+                SaveSetting("Synoptic", "Defaults", "GroupBy", cboGroupBy.SelectedIndex)
+                SaveSetting("Synoptic", "Defaults", "Threshold", txtThreshold.Text)
+                SaveSetting("Synoptic", "Defaults", "High", (cboAboveBelow.SelectedIndex = 0))
+                SaveSetting("Synoptic", "Defaults", "GapNumber", txtGap.Text)
+                SaveSetting("Synoptic", "Defaults", "ColumnTitles", String.Join(",", pColumnTitlesAll))
+                SaveSetting("Synoptic", "Defaults", "ColumnAttributes", String.Join(",", pColumnAttributesAll))
+                SaveSetting("Synoptic", "Defaults", "ColumnTitlesEvent", String.Join(",", pColumnTitlesEvent))
+                SaveSetting("Synoptic", "Defaults", "ColumnAttributesEvent", String.Join(",", pColumnAttributesEvent))
+                If mnuReverseGroupOrder.Checked Then
+                    SaveSetting("Synoptic", "Defaults", "ReverseGroupOrder", "True")
+                Else
+                    Try
+                        DeleteSetting("Synoptic", "Defaults", "ReverseGroupOrder")
+                    Catch 'ignore error if setting is already not there
+                    End Try
+                End If
+            Catch 'Saving setting is not critical, ignore errors
+            End Try
         End If
     End Sub
 
@@ -455,20 +470,20 @@ Public Class frmSynoptic
         End With
     End Sub
 
-    Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
-        Dim lst As New atcControls.atcSelectList
-        Dim lAvailable As New ArrayList
-        For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
-            Select Case lAttrDef.TypeString.ToLower
-                Case "double", "integer", "boolean", "string"
-                    lAvailable.Add(lAttrDef.Name)
-            End Select
-        Next
-        lAvailable.Sort()
-        If lst.AskUser(lAvailable, pDataManager.DisplayAttributes) Then
-            PopulateGrid()
-        End If
-    End Sub
+    'Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
+    '    Dim lst As New atcControls.atcSelectList
+    '    Dim lAvailable As New ArrayList
+    '    For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+    '        Select Case lAttrDef.TypeString.ToLower
+    '            Case "double", "integer", "boolean", "string"
+    '                lAvailable.Add(lAttrDef.Name)
+    '        End Select
+    '    Next
+    '    lAvailable.Sort()
+    '    If lst.AskUser(lAvailable, pDataManager.DisplayAttributes) Then
+    '        PopulateGrid()
+    '    End If
+    'End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
         pDataManager.UserSelectData(, pDataGroup, False)
@@ -559,9 +574,9 @@ Public Class frmSynoptic
         Dim lFrmChoose As New frmChooseColumns
 
         If cboGroupBy.Text = "Each Event" Then
-            pColumnTitles = lFrmChoose.AskUser(pColumnTitlesEventDefault, pColumnTitles)
+            lFrmChoose.AskUser(pColumnTitles, pColumnAttributes)
         Else
-            pColumnTitles = lFrmChoose.AskUser(pColumnTitlesAllDefault, pColumnTitles)
+            lFrmChoose.AskUser(pColumnTitles, pColumnAttributes)
         End If
         PopulateGrid()
     End Sub
@@ -664,4 +679,8 @@ Public Class frmSynoptic
         Return lTotal
     End Function
 
+    Private Sub mnuReverseGroupOrder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuReverseGroupOrder.Click
+        mnuReverseGroupOrder.Checked = Not mnuReverseGroupOrder.Checked
+        PopulateGrid()
+    End Sub
 End Class
