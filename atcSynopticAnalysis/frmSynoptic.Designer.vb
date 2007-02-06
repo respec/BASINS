@@ -45,6 +45,7 @@ Partial Class frmSynoptic
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
         Me.mnuChooseColumns = New System.Windows.Forms.MenuItem
         Me.mnuGraph = New System.Windows.Forms.MenuItem
+        Me.mnuReverseGroupOrder = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblDuringEvent = New System.Windows.Forms.Label
@@ -178,7 +179,7 @@ Partial Class frmSynoptic
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuChooseColumns, Me.mnuGraph})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuChooseColumns, Me.mnuGraph, Me.mnuReverseGroupOrder})
         Me.mnuView.Text = "View"
         '
         'mnuAttributeRows
@@ -211,6 +212,11 @@ Partial Class frmSynoptic
         '
         Me.mnuGraph.Index = 5
         Me.mnuGraph.Text = "Graph Synoptic Results"
+        '
+        'mnuReverseGroupOrder
+        '
+        Me.mnuReverseGroupOrder.Index = 6
+        Me.mnuReverseGroupOrder.Text = "Reverse Group Order"
         '
         'mnuAnalysis
         '
@@ -303,4 +309,5 @@ Partial Class frmSynoptic
     Friend WithEvents mnuGraph As System.Windows.Forms.MenuItem
     Friend WithEvents lblPercentInEvents As System.Windows.Forms.Label
     Friend WithEvents cboAboveBelow As System.Windows.Forms.ComboBox
+    Friend WithEvents mnuReverseGroupOrder As System.Windows.Forms.MenuItem
 End Class
