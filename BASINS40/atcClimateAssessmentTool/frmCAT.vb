@@ -1329,40 +1329,52 @@ Public Class frmCAT
             End If
             RefreshInputList()
             RefreshEndpointList()
+        ElseIf lstInputs.Items.Count = 0 Then 'Don't have any inputs to edit, add one
+            btnInputAdd_Click(sender, e)
+        Else
+            MsgBox("An input must be selected to edit", MsgBoxStyle.Critical, "No Input Selected")
         End If
     End Sub
 
     Private Sub btnInputRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputRemove.Click
-        For Each lIndex As Integer In lstInputs.SelectedIndices
-            pInputs.RemoveAt(lIndex)
-            RefreshInputList()
-        Next
-        RefreshTotalIterations()
+        If lstInputs.SelectedIndices.Count > 0 Then
+            For Each lIndex As Integer In lstInputs.SelectedIndices
+                pInputs.RemoveAt(lIndex)
+                RefreshInputList()
+            Next
+            RefreshTotalIterations()
+        Else
+            MsgBox("An input must be selected to remove it", MsgBoxStyle.Critical, "No Inputs Selected")
+        End If
     End Sub
 
     Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aDirection As Integer)
         Dim lMoveFrom As Integer = aList.SelectedIndex
-        Dim lMoveTo As Integer = lMoveFrom + aDirection
+        If lMoveFrom >= 0 AndAlso lMoveFrom < aGroup.Count Then
+            Dim lMoveTo As Integer = lMoveFrom + aDirection
 
-        Dim lNow As Date = Date.Now
-        If lNow.Subtract(pLastUpDownClick).TotalSeconds < pUpDownButtonDoubleClickSeconds Then
-            If aDirection < 0 Then
-                lMoveTo = 0
-            Else
-                lMoveTo = aGroup.Count - 1
+            Dim lNow As Date = Date.Now
+            If lNow.Subtract(pLastUpDownClick).TotalSeconds < pUpDownButtonDoubleClickSeconds Then
+                If aDirection < 0 Then
+                    lMoveTo = 0
+                Else
+                    lMoveTo = aGroup.Count - 1
+                End If
             End If
-        End If
-        pLastUpDownClick = lNow
+            pLastUpDownClick = lNow
 
-        If lMoveFrom >= 0 AndAlso lMoveTo >= 0 AndAlso lMoveFrom < aGroup.Count AndAlso lMoveTo < aGroup.Count Then
-            Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
-            Dim lMoveMe As Variation = aGroup.ItemByIndex(lMoveFrom)
-            aGroup.RemoveAt(lMoveFrom)
-            aList.Items.RemoveAt(lMoveFrom)
-            aGroup.Insert(lMoveTo, lMoveMe)
-            aList.Items.Insert(lMoveTo, lMoveMe.ToString)
-            If lWasChecked Then aList.SetItemChecked(lMoveTo, True)
-            aList.SelectedIndex = lMoveTo
+            If lMoveTo >= 0 AndAlso lMoveTo < aGroup.Count Then
+                Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
+                Dim lMoveMe As Variation = aGroup.ItemByIndex(lMoveFrom)
+                aGroup.RemoveAt(lMoveFrom)
+                aList.Items.RemoveAt(lMoveFrom)
+                aGroup.Insert(lMoveTo, lMoveMe)
+                aList.Items.Insert(lMoveTo, lMoveMe.ToString)
+                If lWasChecked Then aList.SetItemChecked(lMoveTo, True)
+                aList.SelectedIndex = lMoveTo
+            End If
+        Else
+            MsgBox("Something must be selected to move it", MsgBoxStyle.Critical, "Nothing Selected")
         End If
     End Sub
 
@@ -1447,16 +1459,24 @@ Public Class frmCAT
             If frmEnd.AskUser(lVariation) Then
                 RefreshEndpointList()
             End If
+        ElseIf lstEndpoints.Items.Count = 0 Then 'Don't have any to edit, add one
+            btnEndpointAdd_Click(sender, e)
+        Else
+            MsgBox("An endpoint must be selected to edit", MsgBoxStyle.Critical, "No Endpoint Selected")
         End If
     End Sub
 
     Private Sub btnEndpointRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointRemove.Click
-        For lIndex As Integer = pEndpoints.Count - 1 To 0 Step -1
-            If lstEndpoints.GetSelected(lIndex) Then
-                pEndpoints.RemoveAt(lIndex)
-            End If
-        Next
-        RefreshEndpointList()
+        If lstEndpoints.SelectedIndices.Count > 0 Then
+            For lIndex As Integer = pEndpoints.Count - 1 To 0 Step -1
+                If lstEndpoints.GetSelected(lIndex) Then
+                    pEndpoints.RemoveAt(lIndex)
+                End If
+            Next
+            RefreshEndpointList()
+        Else
+            MsgBox("An endpoint must be selected to remove it", MsgBoxStyle.Critical, "No Endpoints Selected")
+        End If
     End Sub
 
     Private Sub mnuSaveVariations_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSaveVariations.Click
@@ -1627,26 +1647,30 @@ Public Class frmCAT
     ''' Add a copy of the currently selected endpoint(s) to the list
     ''' </summary>
     Private Sub btnEndpointCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointCopy.Click
-        Dim lCopyNumber As Integer
-        Dim lCopyText As String = " copy "
-        For Each lIndex As Integer In lstEndpoints.SelectedIndices
-            Dim lNewEndpoint As Variation = pEndpoints(lIndex).Clone
-            lNewEndpoint.IsInput = False
-            Dim lCopyTextPosition As Integer = lNewEndpoint.Name.LastIndexOf(lCopyText)
-            lCopyNumber = 1
-            If (lCopyTextPosition > 0) Then
-                If IsNumeric(lNewEndpoint.Name.Substring(lCopyTextPosition + 6)) Then
-                    lCopyNumber = CInt(lNewEndpoint.Name.Substring(lCopyTextPosition + lCopyText.Length)) + 1
-                    lNewEndpoint.Name = lNewEndpoint.Name.Substring(0, lCopyTextPosition) 'remove " copy 1" from name
+        If lstEndpoints.SelectedIndices.Count > 0 Then
+            Dim lCopyNumber As Integer
+            Dim lCopyText As String = " copy "
+            For Each lIndex As Integer In lstEndpoints.SelectedIndices
+                Dim lNewEndpoint As Variation = pEndpoints(lIndex).Clone
+                lNewEndpoint.IsInput = False
+                Dim lCopyTextPosition As Integer = lNewEndpoint.Name.LastIndexOf(lCopyText)
+                lCopyNumber = 1
+                If (lCopyTextPosition > 0) Then
+                    If IsNumeric(lNewEndpoint.Name.Substring(lCopyTextPosition + 6)) Then
+                        lCopyNumber = CInt(lNewEndpoint.Name.Substring(lCopyTextPosition + lCopyText.Length)) + 1
+                        lNewEndpoint.Name = lNewEndpoint.Name.Substring(0, lCopyTextPosition) 'remove " copy 1" from name
+                    End If
                 End If
-            End If
-            While lstEndpoints.Items.Contains(lNewEndpoint.Name & lCopyText & lCopyNumber)
-                lCopyNumber += 1
-            End While
-            lNewEndpoint.Name &= lCopyText & lCopyNumber
-            pEndpoints.Add(lNewEndpoint)
-        Next
-        RefreshEndpointList()
+                While lstEndpoints.Items.Contains(lNewEndpoint.Name & lCopyText & lCopyNumber)
+                    lCopyNumber += 1
+                End While
+                lNewEndpoint.Name &= lCopyText & lCopyNumber
+                pEndpoints.Add(lNewEndpoint)
+            Next
+            RefreshEndpointList()
+        Else
+            MsgBox("An endpoint must be selected to copy it", MsgBoxStyle.Critical, "No Endpoints Selected")
+        End If
     End Sub
 
     Private Sub mnuOpenUCI_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenUCI.Click
