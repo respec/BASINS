@@ -302,6 +302,10 @@ Public Class frmSynoptic
             If lGroup.Count = 0 Then lGroups.RemoveAt(lGroupIndex)
         Next
 
+        If mnuReverseGroupOrder.Checked Then
+            lGroups.Reverse()
+        End If
+
         pSource = New atcGridSource()
         pSource.Columns = pColumnTitles.Length
         pSource.FixedRows = 3
@@ -574,10 +578,12 @@ Public Class frmSynoptic
         Dim lFrmChoose As New frmChooseColumns
 
         If cboGroupBy.Text = "Each Event" Then
-            lFrmChoose.AskUser(pColumnTitles, pColumnAttributes)
+            lFrmChoose.AskUser(pColumnTitlesEvent, pColumnAttributesEvent)
         Else
-            lFrmChoose.AskUser(pColumnTitles, pColumnAttributes)
+            lFrmChoose.AskUser(pColumnTitlesAll, pColumnAttributesAll)
         End If
+        SaveSettings()
+        SetColumnTitlesFromGroupBy()
         PopulateGrid()
     End Sub
 
