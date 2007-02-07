@@ -2003,67 +2003,69 @@ ErrHand:
                 For j = 1 To AtcGridPervious.Source.Rows
                     luname = ""
                     lpos = -1
-                    If cLucode(i) = AtcGridPervious.Source.CellValue(j, 0) Then
-                        'see if any of these are subbasin-specific
-                        percentimperv = AtcGridPervious.Source.CellValue(j, 2)
-                        If IsNumeric(AtcGridPervious.Source.CellValue(j, 3)) Then
-                            multiplier = CSng(AtcGridPervious.Source.CellValue(j, 3))
-                        Else
-                            multiplier = 1.0
-                        End If
-                        subbasin = AtcGridPervious.Source.CellValue(j, 4)
-                        If Len(subbasin) > 0 Then
-                            'this row is subbasin-specific
-                            If subbasin = cSubid(i) Then
-                                'we want this one now
-                                luname = AtcGridPervious.Source.CellValue(j, 1)
+                    If AtcGridPervious.Source.CellValue(j, 0) <> "" Then
+                        If cLucode(i) = AtcGridPervious.Source.CellValue(j, 0) Then
+                            'see if any of these are subbasin-specific
+                            percentimperv = AtcGridPervious.Source.CellValue(j, 2)
+                            If IsNumeric(AtcGridPervious.Source.CellValue(j, 3)) Then
+                                multiplier = CSng(AtcGridPervious.Source.CellValue(j, 3))
+                            Else
+                                multiplier = 1.0
                             End If
-                        Else
-                            'make sure that no other rows of this lucode are 
-                            'subbasin-specific for this subbasin and that we 
-                            'should therefore not use this row
-                            useit = True
-                            For k = 1 To AtcGridPervious.Source.Rows
-                                If k <> j Then
-                                    If AtcGridPervious.Source.CellValue(k, 0) = AtcGridPervious.Source.CellValue(j, 0) Then
-                                        'this other row has same lucode
-                                        If AtcGridPervious.Source.CellValue(k, 1) = AtcGridPervious.Source.CellValue(j, 1) Then
-                                            'and the same group name
-                                            subbasin = AtcGridPervious.Source.CellValue(k, 4)
-                                            If Len(subbasin) > 0 Then
-                                                'and its subbasin-specific
-                                                If subbasin = cSubid(i) Then
-                                                    'and its specific to this subbasin
-                                                    useit = False
+                            subbasin = AtcGridPervious.Source.CellValue(j, 4)
+                            If Len(subbasin) > 0 And subbasin <> "Invalid Field Number" Then
+                                'this row is subbasin-specific
+                                If subbasin = cSubid(i) Then
+                                    'we want this one now
+                                    luname = AtcGridPervious.Source.CellValue(j, 1)
+                                End If
+                            Else
+                                'make sure that no other rows of this lucode are 
+                                'subbasin-specific for this subbasin and that we 
+                                'should therefore not use this row
+                                useit = True
+                                For k = 1 To AtcGridPervious.Source.Rows
+                                    If k <> j Then
+                                        If AtcGridPervious.Source.CellValue(k, 0) = AtcGridPervious.Source.CellValue(j, 0) Then
+                                            'this other row has same lucode
+                                            If AtcGridPervious.Source.CellValue(k, 1) = AtcGridPervious.Source.CellValue(j, 1) Then
+                                                'and the same group name
+                                                subbasin = AtcGridPervious.Source.CellValue(k, 4)
+                                                If Len(subbasin) > 0 Then
+                                                    'and its subbasin-specific
+                                                    If subbasin = cSubid(i) Then
+                                                        'and its specific to this subbasin
+                                                        useit = False
+                                                    End If
                                                 End If
                                             End If
                                         End If
                                     End If
+                                Next k
+                                If useit Then
+                                    'we want this one now
+                                    luname = AtcGridPervious.Source.CellValue(j, 1)
                                 End If
-                            Next k
-                            If useit Then
-                                'we want this one now
-                                luname = AtcGridPervious.Source.CellValue(j, 1)
                             End If
-                        End If
 
-                        If Len(luname) > 0 Then
-                            'find lugroup position in the area array
-                            For k = 1 To cUniqueLugroups.Count
-                                If luname = cUniqueLugroups(k) Then
-                                    lpos = k
-                                    Exit For
-                                End If
-                            Next k
-                        End If
+                            If Len(luname) > 0 Then
+                                'find lugroup position in the area array
+                                For k = 1 To cUniqueLugroups.Count
+                                    If luname = cUniqueLugroups(k) Then
+                                        lpos = k
+                                        Exit For
+                                    End If
+                                Next k
+                            End If
 
-                        If lpos > 0 Then
-                            PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * multiplier * (100 - percentimperv) / 100)
-                            ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * multiplier * percentimperv / 100)
-                            length(spos) = 0.0 'were not computing lsur since winhspf does that
-                            slope(spos) = cSubslope(i) / 100.0
-                        End If
+                            If lpos > 0 Then
+                                PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * multiplier * (100 - percentimperv) / 100)
+                                ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * multiplier * percentimperv / 100)
+                                length(spos) = 0.0 'were not computing lsur since winhspf does that
+                                slope(spos) = cSubslope(i) / 100.0
+                            End If
 
+                        End If
                     End If
                 Next j
 
