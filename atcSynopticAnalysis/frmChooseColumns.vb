@@ -2,7 +2,7 @@ Public Class frmChooseColumns
 
     Private pInitialTitles() As String
     Private pInitialAttributes() As String
-    Private pAvailableAttributes() As String = {"Max", "Min", "Sum", "Mean", "Geometric Mean", "Variance", "Standard Deviation", "Skew"}
+    Private pAvailableAttributes() As String = {"Max", "Min", "Sum", "Cumulative", "Mean", "Geometric Mean", "Variance", "Standard Deviation", "Skew"}
     Private pLists() As Windows.Forms.CheckedListBox
     Private pCheckboxes() As Windows.Forms.CheckBox
 
