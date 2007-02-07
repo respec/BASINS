@@ -787,6 +787,23 @@ StartOver:
             g_MapWin.StatusBar.Item(1).Text = "Opening " & aFilename
             g = New MapWinGIS.Grid
             g.Open(aFilename)
+            Dim lSuccess As Boolean = False
+            If LCase(aFilename).IndexOf("\demg\") > 0 Then
+                lSuccess = g.SetInvalidValuesToNodata(0, 20000000)
+                lSuccess = g.Save(aFilename)
+                g.Close()
+                g.Open(aFilename)
+            ElseIf LCase(aFilename).IndexOf("\ned\") > 0 Then
+                lSuccess = g.SetInvalidValuesToNodata(-2000000, Double.MaxValue)
+                lSuccess = g.Save(aFilename)
+                g.Close()
+                g.Open(aFilename)
+            ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
+                g.Header.NodataValue = 0
+                lSuccess = g.Save(aFilename)
+                g.Close()
+                g.Open(aFilename)
+            End If
 
             MWlay = g_MapWin.Layers.Add(g, LayerName)
             MWlay.UseTransparentColor = True
@@ -800,7 +817,6 @@ StartOver:
                 SetElevationGridColors(MWlay, g)
             ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
                 SetLandUseColorsGrid(MWlay, g)
-                g.Header.NodataValue = 0
             End If
             If Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
 
