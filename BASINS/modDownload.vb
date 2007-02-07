@@ -788,17 +788,7 @@ StartOver:
             g = New MapWinGIS.Grid
             g.Open(aFilename)
             Dim lSuccess As Boolean = False
-            If LCase(aFilename).IndexOf("\demg\") > 0 Then
-                lSuccess = g.SetInvalidValuesToNodata(0, 20000000)
-                lSuccess = g.Save(aFilename)
-                g.Close()
-                g.Open(aFilename)
-            ElseIf LCase(aFilename).IndexOf("\ned\") > 0 Then
-                lSuccess = g.SetInvalidValuesToNodata(-2000000, Double.MaxValue)
-                lSuccess = g.Save(aFilename)
-                g.Close()
-                g.Open(aFilename)
-            ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
+            If LCase(aFilename).IndexOf("\nlcd\") > 0 Then
                 g.Header.NodataValue = 0
                 lSuccess = g.Save(aFilename)
                 g.Close()
