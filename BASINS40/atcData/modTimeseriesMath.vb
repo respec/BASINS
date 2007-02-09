@@ -3,38 +3,50 @@ Imports MapWinUtility
 
 Public Module modTimeseriesMath
 
+    Public Function FindDateAtOrAfter(ByVal aDates() As Double, ByVal aDate As Double, Optional ByVal aStartAt As Integer = 0) As Integer
+        aDate -= JulianMillisecond 'Allow for floating point error
+        Dim lIndex As Integer = Array.BinarySearch(aDates, aDate)
+        If lIndex < 0 Then
+            lIndex = lIndex Xor -1
+        End If
+        Return lIndex
+
+        '    Dim lEnd As Integer = aDates.GetUpperBound(0)
+        '    While aStartAt < lEnd AndAlso aDates(aStartAt) < aDate
+        '        aStartAt += 1
+        '    End While
+        '    Debug.Print(lIndex & " " & aStartAt)
+        '    Return aStartAt
+    End Function
+
     Public Function SubsetByDate(ByVal aTimeseries As atcTimeseries, _
                                  ByVal aStartDate As Double, _
                                  ByVal aEndDate As Double, _
                                  ByVal aDataSource As atcDataSource) As atcTimeseries
         'TODO: boundary conditions...
-        Dim iStart As Integer = 0
-        Dim iEnd As Integer = aTimeseries.numValues - 1
-
-        'TODO: binary search for iStart and iEnd could be faster
-        While iStart < iEnd AndAlso aTimeseries.Dates.Value(iStart) < aStartDate
-            iStart += 1
-        End While
-
-        While iEnd > iStart AndAlso aTimeseries.Dates.Value(iEnd) >= aEndDate
-            iEnd -= 1
-        End While
-
-        Dim numNewValues As Integer = iEnd - iStart + 1
-        Dim newValues(numNewValues) As Double
-        Dim newDates(numNewValues) As Double
-
-        System.Array.Copy(aTimeseries.Dates.Values, iStart, newDates, 0, numNewValues + 1)
-        System.Array.Copy(aTimeseries.Values, iStart + 1, newValues, 1, numNewValues)
-
+        Dim lStart As Integer = 0
+        Dim lEnd As Integer = aTimeseries.numValues - 1
         Dim lnewTS As New atcTimeseries(aDataSource)
         lnewTS.Dates = New atcTimeseries(aDataSource)
-        lnewTS.Values = newValues
-        lnewTS.Dates.Values = newDates
-        CopyBaseAttributes(aTimeseries, lnewTS, numNewValues, iStart + 1, 1)
-
         lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
 
+        lStart = FindDateAtOrAfter(aTimeseries.Dates.Values, aStartDate)
+        lEnd = FindDateAtOrAfter(aTimeseries.Dates.Values, aEndDate, lStart) - 1
+
+        Dim numNewValues As Integer = lEnd - lStart + 1
+        If numNewValues > 0 Then
+            Dim newValues(numNewValues) As Double
+            Dim newDates(numNewValues) As Double
+
+            System.Array.Copy(aTimeseries.Dates.Values, lStart, newDates, 0, numNewValues + 1)
+            System.Array.Copy(aTimeseries.Values, lStart + 1, newValues, 1, numNewValues)
+
+            lnewTS.Values = newValues
+            lnewTS.Dates.Values = newDates
+            CopyBaseAttributes(aTimeseries, lnewTS, numNewValues, lStart + 1, 1)
+        Else
+            CopyBaseAttributes(aTimeseries, lnewTS)
+        End If
         Return lnewTS
 
     End Function
@@ -335,7 +347,7 @@ Public Module modTimeseriesMath
                 lNewInd = 1
                 lDateNew = lNewDates(lNewInd)
                 While lNewInd <= lNewNumVals
-                    While lDateNew < lDateOld - JulianSecond 'Fill values not present in original data
+                    While lDateNew < lDateOld - JulianMillisecond 'Fill values not present in original data
                         Select Case lValOld
                             Case aMissVal
                                 If aOldTSer.Value(lOldInd) = aMissVal Then
@@ -761,9 +773,13 @@ Public Module modTimeseriesMath
         aBins.Insert(aBinIndex, lNewBin.Item(lSplitCount - 1), lNewBin)
     End Sub
 
-    'Binary search through an ArrayList containing Double values sorted in ascending order
-    'Return the index of the first value >= aValue
-    'Returns aArray.Count if aArray contains no values >= aValue
+    ''' <summary>
+    ''' Binary search through an ArrayList containing Double values sorted in ascending order
+    ''' </summary>
+    ''' <param name="aArray">Array to search</param>
+    ''' <param name="aValue">Value to search for</param>
+    ''' <returns>Return the index of the first value >= aValue</returns>
+    ''' <remarks>Returns aArray.Count if aArray contains no values >= aValue</remarks>
     Private Function BinarySearchFirstGreaterDoubleArrayList(ByVal aArray As ArrayList, ByVal aValue As Double) As Integer
         Dim lHigher As Integer = aArray.Count - 1
         If lHigher < 0 Then Return 0 'No values present to compare to

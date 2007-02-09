@@ -163,6 +163,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmManager.resx">
       <DependentUpon>frmManager.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectData.resx">
       <DependentUpon>frmSelectData.vb</DependentUpon>
@@ -170,6 +171,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectDisplay.resx">
       <DependentUpon>frmSelectDisplay.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
