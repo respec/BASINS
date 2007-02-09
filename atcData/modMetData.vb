@@ -31,6 +31,7 @@ Public Module modMetData
         Dim lTUStr As String
         Dim lSJDay As Double
         Dim lEJDay As Double
+        Dim lSubSJDay As Double
         Dim lMJDay As Double
         Dim lFVal As Double
         Dim lFilledIt As Boolean
@@ -143,8 +144,11 @@ Public Module modMetData
                                                 If (Math.Abs(lStaOT - lFillOT) <= 6) OrElse _
                                                    (lFillOT = 24 AndAlso lStaOT > 12) Then 'obs times close enough
                                                     lFVal = lTSer.Value(lSPos)
-                                                ElseIf Math.Abs(lStaOT - lFillOT) < lClosestObsDiff Then
-                                                    'save closest Obs Time difference for last filling option
+                                                ElseIf Math.Abs(lStaOT - lFillOT) < lClosestObsDiff AndAlso _
+                                                       lTSer.Attributes.GetValue("SJDay") <= lMJDay AndAlso _
+                                                       lTSer.Attributes.GetValue("EJDay") >= lMJDay + lMLen Then
+                                                    'save closest Obs Time difference for last ditch filling option
+                                                    'timseries must bracket missing period
                                                     lClosestObsDiff = Math.Abs(lStaOT - lFillOT)
                                                     lClosestObsInd = lInd
                                                 End If
@@ -205,10 +209,11 @@ Public Module modMetData
                 Else 'fill accumulated period
                     Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " lasting " & lMLen & " days:")
                     lAccVal = CDbl(StrSplit(s, vbCrLf, ""))
-                    lEJDay = lMJDay + lMLen
+                    lSubSJDay = lMJDay - 1 'back up an interval for SubSetByDate call in ClosestPrecip
+                    lEJDay = lSubSJDay + lMLen
                     lFPos = lMJDay - lSJDay
                     lFillOT = CurrentObsTime(aTS2FillOT, lFPos)
-                    lTSer = ClosestPrecip(aTS2Fill, aTSAvail, lAccVal, lMJDay, lEJDay, aTol, lFillOT)
+                    lTSer = ClosestPrecip(aTS2Fill, aTSAvail, lAccVal, lSubSJDay, lEJDay, aTol, lFillOT)
                     If Not lTSer Is Nothing Then
                         Logger.Dbg("    Distributing " & lAccVal & " from TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
                         lRatio = lAccVal / lTSer.Attributes.GetValue("Sum")
@@ -234,7 +239,7 @@ Public Module modMetData
                                 lMaxDlyVal = aTS2Fill.Value(lFPos)
                                 lMaxDlyInd = lFPos
                             End If
-                            J2Date(lMJDay + (k - 1) / 24, ld)
+                            J2Date(lMJDay + (k - 1), ld)
                             Logger.Dbg("      " & ld(0) & "/" & ld(1) & "/" & ld(2) & " - " & aTS2Fill.Value(lFPos))
                         Next k
                         If lCarry > 0 Then 'add remainder to max hourly value
@@ -280,6 +285,7 @@ Public Module modMetData
         Dim lSJDay As Double
         Dim lMJDay As Double
         Dim lEJDay As Double
+        Dim lSubSJDay As Double
         Dim lFVal As Double
         Dim lFillAdjust As Double
         Dim lStaAdjust As Double
@@ -349,7 +355,7 @@ Public Module modMetData
                             lTSer = aTSAvail.ItemByIndex(lInd)
                             lFVal = -1
                             If (lMJDay + (k - 1) / lIntsPerDay) - lTSer.Attributes.GetValue("SJDay") > Double.Epsilon And _
-                               (lMJDay + (k - 1) / lIntsPerDay) < lTSer.Attributes.GetValue("EJDay") Then 'check value
+                               (lMJDay + (k - 1) / lIntsPerDay) <= lTSer.Attributes.GetValue("EJDay") Then 'check value
                                 lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
                                 If lTSer.Value(lSPos) > lValMin And lTSer.Value(lSPos) < lValMax Then 'good value
                                     lFVal = lTSer.Value(lSPos)
@@ -394,8 +400,9 @@ Public Module modMetData
                         Logger.Dbg("  For Accumulated period starting " & ld(0) & "/" & ld(1) & "/" & ld(2) & " " & ld(3) & ":" & ld(4) & ":" & ld(5) & " lasting " & lMLen & " intervals:")
                     End If
                     lAccVal = CDbl(StrSplit(s, vbCrLf, ""))
-                    lEJDay = lMJDay + lMLen / lIntsPerDay
-                    lTSer = ClosestPrecip(aTS2Fill, aTSAvail, lAccVal, lMJDay, lEJDay, aTol)
+                    lSubSJDay = lMJDay - 1 / lIntsPerDay 'back up one interval for SubSetByDate in ClosestPrecip
+                    lEJDay = lSubSJDay + lMLen
+                    lTSer = ClosestPrecip(aTS2Fill, aTSAvail, lAccVal, lSubSJDay, lEJDay, aTol)
                     If Not lTSer Is Nothing Then
                         Logger.Dbg("    Distributing " & lAccVal & " from TS# " & lTSer.ToString)
                         lRatio = lAccVal / lTSer.Attributes.GetValue("Sum")
@@ -627,8 +634,9 @@ Public Module modMetData
             lStaTSer = aStations.ItemByIndex(lInd)
             If lFillDaily And lStaTSer.Attributes.GetValue("TU") < aTSer.Attributes.GetValue("TU") Then
                 'filling daily with less than daily time step, use obs time to set date subset
-                lSDt = aSDt - 1 + aObsTime / 24
-                lEDt = aEDt - 1 + aObsTime / 24
+                'calling routine (FillDailyTSer) backed up start date, so adjust forward with ObsTime
+                lSDt = aSDt + aObsTime
+                lEDt = aEDt + aObsTime
             Else
                 lSDt = aSDt
                 lEDt = aEDt
