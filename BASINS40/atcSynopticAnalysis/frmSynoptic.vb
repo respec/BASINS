@@ -296,7 +296,7 @@ Public Class frmSynoptic
         If Not IsNumeric(txtGap.Text) Then txtGap.Text = "0"
 
         Dim lThreshold As Double = txtThreshold.Text
-        Dim lDaysGapAllowed As Double = Double.Parse(txtGap.Text) * atcSynopticAnalysisPlugin.TimeUnitFactor(cboGapUnits.SelectedIndex) + JulianSecond / 2
+        Dim lDaysGapAllowed As Double = Double.Parse(txtGap.Text) * atcSynopticAnalysisPlugin.TimeUnitFactor(cboGapUnits.SelectedIndex)
         Dim lHighEvents As Boolean = (cboAboveBelow.SelectedIndex = 0)
 
         If Not aCheckForChange OrElse lThreshold <> pLastThreshold OrElse lDaysGapAllowed <> pLastDaysGapAllowed OrElse lHighEvents <> pLastHighEvents Then

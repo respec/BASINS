@@ -27,10 +27,17 @@ Public Module atcEventBase
         Dim lSPos As Integer
         Dim lEPos As Integer
         Dim lEDate As Double = aTS.Dates.Value(1)
-        Dim lDelayEventEnd As Boolean = (aDaysGapAllowed > 0)
+        Dim lDelayEventEnd As Boolean
         Dim lCurrentDate As Double = 0
         Dim lLastEventDate As Double = 0
         Dim lLastEventIndex As Integer = 0
+
+        If aDaysGapAllowed > 0 Then
+            aDaysGapAllowed += JulianMillisecond 'avoid floating point error
+            lDelayEventEnd = True
+        Else
+            lDelayEventEnd = False
+        End If
 
         If lPoint Then
             lPointOffset = 0
