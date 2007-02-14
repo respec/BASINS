@@ -76,12 +76,11 @@ Public Module atcEventBase
     Private Function FindHighEventStart(ByVal aTS As atcTimeseries, _
                                         ByVal aThreshold As Double, _
                                         ByVal aStartAt As Integer) As Integer
-        While aStartAt <= aTS.numValues
-            If (aTS.Value(aStartAt) > aThreshold) Then
-                Return aStartAt
-            End If            
-            aStartAt += 1
-        End While
+        For lCurrentIndex As Integer = aStartAt To aTS.numValues
+            If (aTS.Value(lCurrentIndex) > aThreshold) Then
+                Return lCurrentIndex
+            End If
+        Next
         Return -1
     End Function
 
@@ -89,7 +88,7 @@ Public Module atcEventBase
                                         ByVal aThreshold As Double, _
                                         ByVal aStartAt As Integer) As Integer
         For lCurrentIndex As Integer = aStartAt To aTS.numValues
-            If (aTS.Value(aStartAt) < aThreshold) Then
+            If (aTS.Value(lCurrentIndex) < aThreshold) Then
                 Return lCurrentIndex
             End If
         Next
