@@ -110,6 +110,10 @@
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcEvents\atcEvents.vbproj">
+      <Project>{9F469FD8-4A92-4C1F-901C-93D84D457D8F}</Project>
+      <Name>atcEvents</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcHspfBinOut\atcHspfBinOut.vbproj">
       <Name>atcHspfBinOut</Name>
       <Project>{61FAB3D2-9A2D-4D0A-BC4D-41C499DBE4B9}</Project>
@@ -127,6 +131,10 @@
       <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis.vbproj">
+      <Project>{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}</Project>
+      <Name>atcSynopticAnalysis</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
       <Name>atcTimeseriesMath</Name>
