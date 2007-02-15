@@ -66,6 +66,9 @@ Public Module UCIBuilder
                     MkDir(pOutputDir & lProjectbase)
                 End If
                 Dim lUciname As String = pOutputDir & lProjectbase & "\" & lUcibase & ".uci"
+                If FileExists(lUciname, False, True) Then
+                    Kill(lUciname)
+                End If
                 If Not FileExists(lUciname, False, True) Then
                     'create this uci
                     FileCopy(pOutputDir & "base.uci", lUciname)
@@ -153,6 +156,20 @@ Public Module UCIBuilder
 
             Loop
 
+            'read reach connections table
+            Dim lConnTable As New atcTableDelimited
+            If Not lConnTable.OpenFile(pDataDir & "ReachConnections.csv") Then
+                Logger.Dbg("Could not open ReachConnections.csv")
+            End If
+            Dim lConnSources As New Collection
+            Dim lConnTargets As New Collection
+            lConnTable.CurrentRecord = 1
+            Do Until lConnTable.atEOF
+                lConnTable.MoveNext()
+                lConnSources.Add(lConnTable.Value(1))
+                lConnTargets.Add(lConnTable.Value(2))
+            Loop
+
             'combine the ucis within each project
             For Each lProjectbase In lProjectNames
                 'see how many ucis within this projectname
@@ -216,6 +233,28 @@ Public Module UCIBuilder
                                 'update ftable number
                                 lOper.FTable.Id = lNewOperId
                                 lOper.Tables("HYDR-PARM2").parmvalue("FTBUCI") = lNewOperId
+                                'do we need to add a connection to this reach?
+                                For i As Integer = 1 To lConnTargets.Count
+                                    If lConnTargets(i) = lUCIsInProject(lUciIndex) Then
+                                        For j As Integer = 1 To lUCIsInProject.Count
+                                            If lConnSources(i) = lUCIsInProject(j) Then
+                                                'add a connection from RCHRES j to RCHRES lUciIndex
+                                                lconn = New atcUCI.HspfConnection
+                                                lconn.Uci = lCombinedUci
+                                                lconn.Typ = 3
+                                                lconn.Source.VolName = "RCHRES"
+                                                lconn.Source.VolId = j
+                                                lconn.MFact = 1.0#
+                                                lconn.Target.VolName = "RCHRES"
+                                                lconn.Target.VolId = lUciIndex
+                                                lconn.MassLink = 3
+                                                lCombinedUci.Connections.Add(lconn)
+                                                lCombinedUci.OpnBlks("RCHRES").operfromid(j).targets.add(lconn)
+                                                lOper.Sources.Add(lconn)
+                                            End If
+                                        Next j
+                                    End If
+                                Next
                             End If
 
                             'reset the connection operation numbers
@@ -244,6 +283,81 @@ Public Module UCIBuilder
                     lCombinedUci.Save()
                 End If
             Next
+
+            'add bay connector reaches to some projects
+            Dim lBayTable As New atcTableDelimited
+            If Not lBayTable.OpenFile(pDataDir & "BayConnectors.csv") Then
+                Logger.Dbg("Could not open BayConnectors.csv")
+            End If
+            lBayTable.CurrentRecord = 1
+            Do Until lBayTable.atEOF
+                lBayTable.MoveNext()
+                Dim lUciname As String = pOutputDir & lBayTable.Value(1) & "\" & lBayTable.Value(1) & ".uci"
+                Dim lUci As New atcUCI.HspfUci
+                lUci.FastReadUciForStarter(lMsg, lUciname)
+                lUci.MetSeg2Source()
+
+                Dim lNewOperId As Integer = 1
+                'make sure this is a unique number
+                Do While Not lUci.OpnBlks("RCHRES").operfromid(lNewOperId) Is Nothing
+                    lNewOperId = lNewOperId + 1
+                Loop
+                'open a copy of this operation
+                Dim lCopyUci As New atcUCI.HspfUci
+                lCopyUci.FastReadUciForStarter(lMsg, lUciname)
+                Dim lCopyOpn As atcUCI.HspfOperation = lCopyUci.OpnBlks("RCHRES").operfromid(lNewOperId - 1)
+                'add this operation to this uci
+                Dim lOpn As New atcUCI.HspfOperation
+                lOpn = lCopyOpn
+                lOpn.Id = lNewOperId
+                lOpn.Uci = lUci
+                lUci.OpnBlks("RCHRES").Ids.Add(lOpn, "K" & lOpn.Id)
+                lOpn.OpnBlk = lUci.OpnBlks("RCHRES")
+                lUci.OpnSeqBlock.Add(lCopyOpn)
+                'remove the comments so we don't get repeated headers
+                For Each lTable As atcUCI.HspfTable In lOpn.Tables
+                    lTable.Comment = ""
+                Next lTable
+
+                'update ftable number
+                lOpn.FTable.Id = lNewOperId
+                lOpn.Tables("HYDR-PARM2").parmvalue("FTBUCI") = lNewOperId
+                'update some parms
+                'lStreamLen = SignificantDigits(lStreamTable.Value(4) / 1610, 4)
+                'lOpn.Tables("HYDR-PARM2").parmvalue("LEN") = lStreamLen
+                'lStreamDeltah = SignificantDigits((lStreamTable.Value(12) - lStreamTable.Value(11)) * 3.281 / 100, 4)
+                'lOpn.Tables("HYDR-PARM2").parmvalue("DELTH") = lStreamDeltah
+                'lStreamName = lStreamTable.Value(14)
+                'lOpn.Tables("GEN-INFO").parmvalue("RCHID") = lStreamName
+                'update the ftable
+                'lStreamDepth = lStreamTable.Value(10) * 3.28
+                'lStreamWidth = lStreamTable.Value(9) * 3.28
+                'lStreamSlope = lStreamTable.Value(13) / 10000 'to convert to m/m
+                'lOpn.FTable.FTableFromCrossSect(lStreamLen * 5280, lStreamDepth, lStreamWidth, 0.05, lStreamSlope, 1.0, 1.0, lStreamDepth * 1.25, 0.5, 0.5, lStreamDepth * 1.875, lStreamDepth * 62.5, 0.5, 0.5, lStreamWidth, lStreamWidth)
+
+                'remove all connections to this reach
+                Do While lOpn.Sources.Count > 0
+                    lOpn.Sources.Remove(1)
+                Loop
+                ''add a connection from RCHRES lNewOperId-1 to RCHRES lNewOperId
+                lconn = New atcUCI.HspfConnection
+                lconn.Uci = lUci
+                lconn.Typ = 3
+                lconn.Source.VolName = "RCHRES"
+                lconn.Source.VolId = lNewOperId - 1
+                lconn.MFact = 1.0#
+                lconn.Target.VolName = "RCHRES"
+                lconn.Target.VolId = lNewOperId
+                lconn.MassLink = 3
+                lconn.Source.Opn = lUci.OpnBlks("RCHRES").operfromid(lNewOperId - 1)
+                lconn.Target.Opn = lOpn
+                lUci.Connections.Add(lconn)
+                lUci.OpnBlks("RCHRES").operfromid(lNewOperId - 1).targets.add(lconn)
+                lOpn.Sources.Add(lconn)
+
+                lUci.Source2MetSeg()
+                lUci.Save()
+            Loop
 
         End If
     End Sub
