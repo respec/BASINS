@@ -1,4 +1,5 @@
 Imports atcData
+Imports atcEvents
 Imports MapWinUtility
 
 Public Class Variation
@@ -25,6 +26,14 @@ Public Class Variation
     Public Increment As Double = Double.NaN
     Private pIncrementsSinceStart As Integer = 0
     Public CurrentValue As Double = Double.NaN
+
+    Public UseEvents As Boolean = False
+    Public EventThreshold As Double = Double.NaN
+    Public EventDaysGapAllowed As Double = 0
+    Public EventGapDisplayUnits As String = ""
+    Public EventHigh As Boolean = True
+    Public EventsPer As String = ""
+
     Public IsInput As Boolean = False
 
     Public ColorAboveMax As System.Drawing.Color = System.Drawing.Color.OrangeRed
@@ -105,32 +114,70 @@ Public Class Variation
     End Function
 
     Protected Overridable Function VaryData() As atcDataGroup
-        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
         Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
         Dim lArgsMath As New atcDataAttributes
         Dim lModifiedTS As atcTimeseries
         Dim lModifiedGroup As New atcDataGroup
         Dim lDataSetIndex As Integer = 0
+
+        Dim lEvents As atcDataGroup = Nothing
+        Dim lEvent As atcTimeseries
+
+        Dim lModifyThis As atcTimeseries
+
         For Each lOriginalData As atcDataSet In DataSets
-            If Seasons Is Nothing Then
-                lTsMath.DataSets.Clear()
-                lArgsMath.Clear()
-                lArgsMath.SetValue("timeseries", lOriginalData)
-                lArgsMath.SetValue("Number", CurrentValue)
-                lTsMath.Open(Operation, lArgsMath)
-                lModifiedTS = lTsMath.DataSets(0)
+            If UseEvents Then
+                lEvents = EventSplit(lOriginalData, Nothing, EventThreshold, EventDaysGapAllowed, EventHigh)
+
+                'Remove events outside selected seasons
+                If Not Seasons Is Nothing Then
+                    Dim lValueIndex As Integer
+                    For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
+                        lEvent = lEvents.ItemByIndex(lEventIndex)
+
+                        Dim lPeakIndex As Integer = 1
+                        For lValueIndex = 2 To lEvent.numValues
+                            If lEvent.Value(lValueIndex) > lEvent.Value(lPeakIndex) Then
+                                lPeakIndex = lValueIndex
+                            End If
+                        Next
+
+                        If Not Seasons.SeasonSelected(Seasons.SeasonIndex(lEvent.Dates.Value(lPeakIndex))) Then
+                            lEvents.RemoveAt(lEventIndex)
+                        End If
+                    Next
+                End If
+                lModifyThis = MergeTimeseries(lEvents)
             Else
-                Dim lSplitData As atcDataGroup = Seasons.Split(lOriginalData, Nothing)
+                lModifyThis = lOriginalData
+            End If
+
+            If Seasons Is Nothing OrElse UseEvents Then
+                Select Case Operation
+                    Case "AddEvents"
+                        lModifiedTS = AddRemoveEventsTotalVolume(lOriginalData, Math.Abs(CurrentValue), lEvents, 0)
+                    Case "AddVolume"
+                        'TODO
+                    Case Else '"Add", "Multiply"
+                        ComputationSource.DataSets.Clear()
+                        lArgsMath.Clear()
+                        lArgsMath.SetValue("timeseries", lModifyThis)
+                        lArgsMath.SetValue("Number", CurrentValue)
+                        ComputationSource.Open(Operation, lArgsMath)
+                        lModifiedTS = ComputationSource.DataSets(0)
+                End Select
+            Else
+                Dim lSplitData As atcDataGroup = Seasons.Split(lModifyThis, Nothing)
                 Dim lModifiedSplit As New atcDataGroup
                 For Each lSplitTS As atcTimeseries In lSplitData
                     If Seasons.SeasonSelected(lSplitTS.Attributes.GetValue("SeasonIndex")) Then
                         'modify data from this season
-                        lTsMath.DataSets.Clear()
+                        ComputationSource.DataSets.Clear()
                         lArgsMath.Clear()
                         lArgsMath.SetValue("timeseries", lSplitTS)
                         lArgsMath.SetValue("Number", CurrentValue)
-                        lTsMath.Open(Operation, lArgsMath)
-                        lModifiedSplit.Add(lTsMath.DataSets(0))
+                        ComputationSource.Open(Operation, lArgsMath)
+                        lModifiedSplit.Add(ComputationSource.DataSets(0))
                     Else 'Add unmodified data from this season that was not selected
                         lModifiedSplit.Add(lSplitTS)
                     End If
@@ -160,6 +207,64 @@ Public Class Variation
         Return lModifiedGroup
     End Function
 
+    Private Function AddRemoveEventsTotalVolume(ByVal aTimeseries As atcTimeseries, ByVal aTargetVolumeChange As Double, ByVal aEventsToSearch As atcDataGroup, ByVal aSeed As Integer) As atcTimeseries
+        '    Private Function FindEventsTotalVolume(ByVal aTargetTotalVolume As Double, ByVal aEventsToSearch As atcDataGroup, ByVal aSeed As Integer) As atcDataGroup
+        'Dim lEventsFound As New atcDataGroup
+        Dim lNewTimeseries As atcTimeseries = aTimeseries.Clone
+        Dim lMaxEventIndex As Integer = aEventsToSearch.Count - 1
+        Dim lFoundIndexes As New ArrayList
+        Dim lVolumeFound As Double = 0
+        Dim lRandom As New Random(aSeed)
+        Dim lAdd As Boolean = True
+        Dim lValueIndex As Integer
+        Dim lLastValueIndex As Integer
+
+        If aTargetVolumeChange < 0 Then
+            lVolumeFound = aTargetVolumeChange
+            aTargetVolumeChange = 0
+            lAdd = False
+        End If
+
+        While lVolumeFound < aTargetVolumeChange
+            Dim lCheckIndex As Integer = lRandom.Next(0, lMaxEventIndex)
+            If Not lFoundIndexes.Contains(lCheckIndex) Then
+                Dim lEvent As atcTimeseries = aEventsToSearch.ItemByIndex(lCheckIndex)
+                lFoundIndexes.Add(lCheckIndex)
+                'lEventsFound.Add(lEvent)
+                lVolumeFound += lEvent.Attributes.GetValue("Sum")
+
+                'Find starting index of event
+                If lAdd Then
+                    lValueIndex = lRandom.Next(1, aTimeseries.numValues - lEvent.numValues)
+                Else
+                    lValueIndex = FindDateAtOrAfter(lNewTimeseries.Dates.Values, lEvent.Dates.Value(1))
+                End If
+                lLastValueIndex = lValueIndex + lEvent.numValues - 1
+
+                'Reduce event volume by volume being replaced
+                For lScanReplaced As Integer = lValueIndex To lLastValueIndex
+                    lVolumeFound -= lNewTimeseries.Values(lScanReplaced)
+                Next
+
+                If lAdd Then
+                    Array.Copy(lEvent.Values, 1, lNewTimeseries.Values, lValueIndex, lEvent.numValues)
+                Else
+                    Array.Clear(lNewTimeseries.Values, lValueIndex, lEvent.numValues)
+                End If
+
+            End If
+        End While
+
+        Dim lOperation As String
+        If lAdd Then lOperation = "Added " Else lOperation = "Removed "
+
+        lNewTimeseries.Attributes.AddHistory(lOperation & lFoundIndexes.Count & " events to change total volume " & DoubleString(aTargetVolumeChange) _
+            & " (actual change = " & DoubleString(lNewTimeseries.Attributes.GetValue("Sum") - aTimeseries.Attributes.GetValue("Sum")) & ")")
+
+        Return lNewTimeseries
+
+    End Function
+
     Public Overridable Function Clone() As Variation
         Dim newVariation As New Variation
         Me.CopyTo(newVariation)
@@ -169,6 +274,15 @@ Public Class Variation
     Public Overridable Sub CopyTo(ByVal aTargetVariation As Variation)
         With aTargetVariation
             .Name = Name
+            .UseEvents = UseEvents
+            If UseEvents Then
+                .EventDaysGapAllowed = EventDaysGapAllowed
+                .EventGapDisplayUnits = EventGapDisplayUnits
+                .EventHigh = EventHigh
+                .EventsPer = EventsPer
+                .EventThreshold = EventThreshold
+            End If
+
             If Not DataSets Is Nothing Then .DataSets = DataSets.Clone()
             If Not PETdata Is Nothing Then .PETdata = PETdata.Clone()
             .ComputationSource = ComputationSource
@@ -178,6 +292,7 @@ Public Class Variation
             .Min = Min
             .Max = Max
             .Increment = Increment
+            .EventsPer = EventsPer
             .IsInput = IsInput
             .CurrentValue = CurrentValue
             .ColorAboveMax = ColorAboveMax
@@ -185,6 +300,33 @@ Public Class Variation
             .ColorDefault = ColorDefault
         End With
     End Sub
+
+    Protected Overridable Property EventsXML() As String
+        Get
+            If UseEvents Then
+                Return "  <Events Threshold='" & EventThreshold & "' " _
+                              & " High='" & EventHigh & "' " _
+                              & " GapDays='" & EventDaysGapAllowed & "' " _
+                              & " GapDisplayUnits='" & EventGapDisplayUnits & "' " _
+                              & " EventsPer='" & EventsPer & "'/>" & vbCrLf
+            Else
+                Return ""
+            End If
+        End Get
+        Set(ByVal newValue As String)
+            Dim lXML As New Chilkat.Xml
+            If lXML.LoadXml(newValue) Then
+                If lXML.Tag.ToLower.Equals("events") Then
+                    UseEvents = True
+                    EventThreshold = lXML.GetAttrValue("Threshold")
+                    EventHigh = lXML.GetAttrValue("High")
+                    EventDaysGapAllowed = lXML.GetAttrValue("GapDays")
+                    EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
+                    EventsPer = lXML.GetAttrValue("EventsPer")
+                End If
+            End If
+        End Set
+    End Property
 
     Protected Overridable Property SeasonsXML() As String
         Get
@@ -312,6 +454,7 @@ Public Class Variation
             lXML &= "  <Selected>" & Selected & "</Selected>" & vbCrLf _
                  & GetDataGroupXML(DataSets, "DataSets") _
                  & GetDataGroupXML(PETdata, "PETdata") _
+                 & EventsXML _
                  & SeasonsXML _
                  & "</Variation>" & vbCrLf
             Return lXML
@@ -336,6 +479,7 @@ Public Class Variation
                                 Case "selected"
                                     Selected = .Content.ToLower.Equals("true")
                                 Case "seasons" : SeasonsXML = .GetXml
+                                Case "events" : EventsXML = .GetXml
                             End Select
                         End With
                     Loop While lXML.NextSibling2
@@ -358,6 +502,7 @@ Public Class Variation
     End Function
 
     Private Function DoubleString(ByVal aNumber As Double) As String
-        Return Format(aNumber, "0.000").TrimEnd("0"c, "."c)
+        DoubleString = Format(aNumber, "0.000").TrimEnd("0"c, "."c)
+        If DoubleString.Length = 0 Then DoubleString = "0"
     End Function
 End Class
