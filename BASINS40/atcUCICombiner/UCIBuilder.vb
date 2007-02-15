@@ -34,6 +34,11 @@ Public Module UCIBuilder
         Dim lAreaTable As New atcTableDelimited
         Dim lUcibase As String
         Dim lProjectbase As String
+        Dim lProjectNames As New Collection
+        Dim lUCINames As New Collection
+        Dim lOper As atcUCI.HspfOperation
+        Dim lconn As atcUCI.HspfConnection
+
         If lAreaTable.OpenFile(pDataDir & "land.csv") Then
 
             'get land use names from header of file
@@ -51,7 +56,11 @@ Public Module UCIBuilder
             Do Until lAreaTable.atEOF
                 lAreaTable.MoveNext()
                 lProjectbase = lAreaTable.Value(1)
+                If Not lProjectNames.Contains(lProjectbase) Then
+                    lProjectNames.Add(lProjectbase, lProjectbase)
+                End If
                 lUcibase = lAreaTable.Value(2)
+                lUCINames.Add(lUcibase, lUcibase)
                 If Not FileExists(pOutputDir & lProjectbase, True, False) Then
                     'create this folder
                     MkDir(pOutputDir & lProjectbase)
@@ -61,7 +70,7 @@ Public Module UCIBuilder
                     'create this uci
                     FileCopy(pOutputDir & "base.uci", lUciname)
                 End If
-                Dim lWdmname As String = pOutputDir & lProjectbase & "\" & lUcibase & ".wdm"
+                Dim lWdmname As String = pOutputDir & lProjectbase & "\" & lProjectbase & ".wdm"
                 If Not FileExists(lWdmname, False, True) Then
                     'copy blank wdm
                     FileCopy(pOutputDir & "base.wdm", lWdmname)
@@ -69,24 +78,23 @@ Public Module UCIBuilder
 
                 'open each uci for mods
                 Dim lUci As New atcUCI.HspfUci
-                Dim lOper As atcUCI.HspfOperation
                 lUci.FastReadUciForStarter(lMsg, lUciname)
 
                 'change base name throughout
-                lUci.GlobalBlock.RunInf.Value = "UCI Created for ABAG for " & lUcibase
+                lUci.GlobalBlock.RunInf.Value = "UCI Created for ABAG for " & lProjectbase
                 For lIndex As Integer = 1 To lUci.FilesBlock.Count
                     Dim lHspfFile As atcUCI.HspfData.HspfFile = lUci.FilesBlock.Value(lIndex)
                     If lHspfFile.Name = "base.wdm" Then
-                        lHspfFile.Name = lUcibase & ".wdm"
+                        lHspfFile.Name = lProjectbase & ".wdm"
                     End If
                     If lHspfFile.Name = "base.out" Then
-                        lHspfFile.Name = lUcibase & ".out"
+                        lHspfFile.Name = lProjectbase & ".out"
                     End If
                     If lHspfFile.Name = "base.ech" Then
-                        lHspfFile.Name = lUcibase & ".ech"
+                        lHspfFile.Name = lProjectbase & ".ech"
                     End If
                     If lHspfFile.Name = "base.hbn" Then
-                        lHspfFile.Name = lUcibase & ".hbn"
+                        lHspfFile.Name = lProjectbase & ".hbn"
                     End If
                     lUci.FilesBlock.Value(lIndex) = lHspfFile
                 Next
@@ -97,7 +105,7 @@ Public Module UCIBuilder
                 Do Until lStreamTable.atEOF
                     lStreamTable.MoveNext()
                     lStreambase = lStreamTable.Value(1)
-                    If lstreambase = lUcibase Then
+                    If lStreambase = lUcibase Then
                         'found the match, update some parms
                         lStreamLen = SignificantDigits(lStreamTable.Value(4) / 1610, 4)
                         lOper.Tables("HYDR-PARM2").parmvalue("LEN") = lStreamLen
@@ -129,10 +137,10 @@ Public Module UCIBuilder
                         For Each lLandOper In lUci.OpnBlks(lOperType).ids
                             If lName = lLandOper.Tables("GEN-INFO").parms("LSID").value Then
                                 'this is a land use match
-                                For Each lConn As atcUCI.HspfConnection In lLandOper.Targets
-                                    If lConn.Target.VolName = "RCHRES" Then
+                                For Each lconn In lLandOper.Targets
+                                    If lconn.Target.VolName = "RCHRES" Then
                                         'assume this is the one
-                                        lConn.MFact = lAreaTable.Value(lIndex + 2)
+                                        lconn.MFact = lAreaTable.Value(lIndex + 2)
                                     End If
                                 Next
                             End If
@@ -144,6 +152,98 @@ Public Module UCIBuilder
                 lUci.Save()
 
             Loop
+
+            'combine the ucis within each project
+            For Each lProjectbase In lProjectNames
+                'see how many ucis within this projectname
+                Dim lUCIsInProject As New Collection
+                For Each lUcibase In lUCINames
+                    If Mid(lUcibase, 1, lUcibase.Length - 1) = lProjectbase Then
+                        lUCIsInProject.Add(lUcibase, lUcibase)
+                    End If
+                Next
+                If lUCIsInProject.Count > 0 Then
+                    'combine each of these together into 1 uci
+                    Dim lUciname As String = pOutputDir & lProjectbase & "\" & lProjectbase & ".uci"
+                    'create this uci
+                    FileCopy(pOutputDir & lProjectbase & "\" & lUCIsInProject(1) & ".uci", lUciname)
+                    Kill(pOutputDir & lProjectbase & "\" & lUCIsInProject(1) & ".uci")
+                    'open new combined uci
+                    Dim lCombinedUci As New atcUCI.HspfUci
+                    lCombinedUci.FastReadUciForStarter(lMsg, lUciname)
+                    lCombinedUci.MetSeg2Source()
+                    lCombinedUci.Point2Source()
+
+                    'now start looping through the rest of the ucis
+                    For lUciIndex As Integer = 2 To lUCIsInProject.Count
+                        'read each uci 
+                        Dim lUci As New atcUCI.HspfUci
+                        lUci.FastReadUciForStarter(lMsg, pOutputDir & lProjectbase & "\" & lUCIsInProject(lUciIndex) & ".uci")
+                        lUci.MetSeg2Source()
+                        lUci.Point2Source()
+
+                        'add operations of second uci into first uci
+                        Dim lNewOperId As Integer
+                        For Each lOper In lUci.OpnSeqBlock.Opns
+                            If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
+                                lNewOperId = ((lUciIndex - 1) * 100) + lOper.Id
+                            Else
+                                lNewOperId = 1
+                            End If
+                            'make sure this is a unique number
+                            Do While Not lCombinedUci.OpnBlks(lOper.Name).operfromid(lNewOperId) Is Nothing
+                                lNewOperId = lNewOperId + 1
+                            Loop
+
+                            'add this operation
+                            Dim lOpn As New atcUCI.HspfOperation
+                            Dim lOrigId As Integer
+                            lOpn = lOper
+                            lOpn.Name = lOper.Name
+                            lOrigId = lOper.Id
+                            lOpn.Id = lNewOperId
+                            lOpn.Uci = lCombinedUci
+                            lCombinedUci.OpnBlks(lOper.Name).Ids.Add(lOpn, "K" & lOpn.Id)
+                            lOpn.OpnBlk = lCombinedUci.OpnBlks(lOper.Name)
+                            lCombinedUci.OpnSeqBlock.Add(lOper)
+
+                            'remove the comments so we don't get repeated headers
+                            For Each lTable As atcUCI.HspfTable In lOpn.Tables
+                                lTable.Comment = ""
+                            Next lTable
+
+                            If lOper.Name = "RCHRES" Then
+                                'update ftable number
+                                lOper.FTable.Id = lNewOperId
+                                lOper.Tables("HYDR-PARM2").parmvalue("FTBUCI") = lNewOperId
+                            End If
+
+                            'reset the connection operation numbers
+                            For Each lconn In lOper.Targets
+                                If lconn.Source.VolName = lOper.Name Then
+                                    lconn.Source.VolId = lNewOperId
+                                End If
+                            Next lconn
+                            For Each lconn In lOper.Sources
+                                If lconn.Target.VolName = lOper.Name Then
+                                    lconn.Target.VolId = lNewOperId
+                                End If
+                            Next lconn
+
+                        Next lOper
+
+                        lUci = Nothing
+                        Logger.Dbg("Added " & lUCIsInProject(lUciIndex))
+
+                        'can delete uci now
+                        Kill(pOutputDir & lProjectbase & "\" & lUCIsInProject(lUciIndex) & ".uci")
+
+                    Next lUciIndex
+
+                    lCombinedUci.Source2MetSeg()
+                    lCombinedUci.Save()
+                End If
+            Next
 
         End If
     End Sub

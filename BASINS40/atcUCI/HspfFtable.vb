@@ -1,5 +1,6 @@
 Option Strict Off
 Option Explicit On
+
 <System.Runtime.InteropServices.ProgId("HspfFtable_NET.HspfFtable")> Public Class HspfFtable
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
@@ -351,6 +352,10 @@ Option Explicit On
                                 t = .Outflow1AsRead(i)
                             Else
                                 t = Format(.Outflow1(i), fmt).PadLeft(Len(t))
+                                If t.Length > 10 Then
+                                    'too many digits in the number
+                                    t = RSet(atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(i)), 10), 10)
+                                End If
                             End If
                         End If
                         If j = 2 Then
