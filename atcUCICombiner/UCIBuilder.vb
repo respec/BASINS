@@ -74,6 +74,9 @@ Public Module UCIBuilder
                     FileCopy(pOutputDir & "base.uci", lUciname)
                 End If
                 Dim lWdmname As String = pOutputDir & lProjectbase & "\" & lProjectbase & ".wdm"
+                If FileExists(lWdmname, False, True) Then
+                    Kill(lWdmname)
+                End If
                 If Not FileExists(lWdmname, False, True) Then
                     'copy blank wdm
                     FileCopy(pOutputDir & "base.wdm", lWdmname)
@@ -323,17 +326,17 @@ Public Module UCIBuilder
                 lOpn.FTable.Id = lNewOperId
                 lOpn.Tables("HYDR-PARM2").parmvalue("FTBUCI") = lNewOperId
                 'update some parms
-                'lStreamLen = SignificantDigits(lStreamTable.Value(4) / 1610, 4)
-                'lOpn.Tables("HYDR-PARM2").parmvalue("LEN") = lStreamLen
-                'lStreamDeltah = SignificantDigits((lStreamTable.Value(12) - lStreamTable.Value(11)) * 3.281 / 100, 4)
-                'lOpn.Tables("HYDR-PARM2").parmvalue("DELTH") = lStreamDeltah
-                'lStreamName = lStreamTable.Value(14)
-                'lOpn.Tables("GEN-INFO").parmvalue("RCHID") = lStreamName
+                lStreamLen = SignificantDigits(lBayTable.Value(2) / 1610, 4)
+                lOpn.Tables("HYDR-PARM2").parmvalue("LEN") = lStreamLen
+                lStreamDeltah = SignificantDigits((lBayTable.Value(6) - lBayTable.Value(5)) * 3.281 / 100, 4)
+                lOpn.Tables("HYDR-PARM2").parmvalue("DELTH") = lStreamDeltah
+                lStreamName = lBayTable.Value(7)
+                lOpn.Tables("GEN-INFO").parmvalue("RCHID") = lStreamName
                 'update the ftable
-                'lStreamDepth = lStreamTable.Value(10) * 3.28
-                'lStreamWidth = lStreamTable.Value(9) * 3.28
-                'lStreamSlope = lStreamTable.Value(13) / 10000 'to convert to m/m
-                'lOpn.FTable.FTableFromCrossSect(lStreamLen * 5280, lStreamDepth, lStreamWidth, 0.05, lStreamSlope, 1.0, 1.0, lStreamDepth * 1.25, 0.5, 0.5, lStreamDepth * 1.875, lStreamDepth * 62.5, 0.5, 0.5, lStreamWidth, lStreamWidth)
+                lStreamDepth = lBayTable.Value(4) * 3.28
+                lStreamWidth = lBayTable.Value(3) * 3.28
+                lStreamSlope = lStreamDeltah / lStreamLen
+                lOpn.FTable.FTableFromCrossSect(lStreamLen * 5280, lStreamDepth, lStreamWidth, 0.05, lStreamSlope, 1.0, 1.0, lStreamDepth * 1.25, 0.5, 0.5, lStreamDepth * 1.875, lStreamDepth * 62.5, 0.5, 0.5, lStreamWidth, lStreamWidth)
 
                 'remove all connections to this reach
                 Do While lOpn.Sources.Count > 0
@@ -359,6 +362,133 @@ Public Module UCIBuilder
                 lUci.Save()
             Loop
 
+            'connect upstream/downstream projects
+            For Each lProjectbase In lProjectNames
+                For i As Integer = 1 To lConnSources.Count
+                    If lConnSources(i) = lProjectbase Then
+                        'add output from this project to connect to downstream project
+                        Dim lUciname As String = pOutputDir & lProjectbase & "\" & lProjectbase & ".uci"
+                        Dim lWdmname As String = pOutputDir & lProjectbase & "\" & lProjectbase & ".wdm"
+                        Dim lUci As New atcUCI.HspfUci
+                        lUci.FastReadUciForStarter(lMsg, lUciname)
+                        lUci.MetSeg2Source()
+                        MakeMods_AddExtTarLink(lUci, lWdmname)
+                        lUci.Source2MetSeg()
+                        lUci.Save()
+                    End If
+                Next
+                For i As Integer = 1 To lConnTargets.Count
+                    If lConnTargets(i) = lProjectbase Then
+                        'add upstream inflow to this project 
+                        Dim lUciname As String = pOutputDir & lProjectbase & "\" & lProjectbase & ".uci"
+                        Dim lUci As New atcUCI.HspfUci
+                        lUci.FastReadUciForStarter(lMsg, lUciname)
+                        lUci.MetSeg2Source()
+                        MakeMods_AddExtSrcLink(lUci)
+                        'add ref to upstream wdm 
+                        Dim lHspfFile As New atcUCI.HspfData.HspfFile
+                        lHspfFile.Name = lConnSources(i) & ".wdm"
+                        lHspfFile.Typ = "WDM3"
+                        lHspfFile.Unit = 27
+                        lUci.FilesBlock.Add(lHspfFile)
+                        lUci.Source2MetSeg()
+                        lUci.Save()
+                    End If
+                Next
+            Next
+
         End If
+    End Sub
+
+    Private Sub MakeMods_AddExtSrcLink(ByVal aUci As atcUCI.HspfUci)
+        Dim tstype$(8), member$(8), memsub1&(8), memsub2&(8)
+        Dim lOper As atcUCI.HspfOperation
+        Dim lConn As atcUCI.HspfConnection
+
+        tstype(1) = "VOL" : member(1) = "IVOL" : memsub1(1) = 1 : memsub2(1) = 1
+        tstype(2) = "SED1" : member(2) = "ISED" : memsub1(2) = 1 : memsub2(2) = 1
+        tstype(3) = "SED2" : member(3) = "ISED" : memsub1(3) = 2 : memsub2(3) = 1
+        tstype(4) = "SED3" : member(4) = "ISED" : memsub1(4) = 3 : memsub2(4) = 1
+        tstype(5) = "DQAL1" : member(5) = "IDQAL" : memsub1(5) = 1 : memsub2(5) = 1
+        tstype(6) = "SQAL11" : member(6) = "ISQAL" : memsub1(6) = 1 : memsub2(6) = 1
+        tstype(7) = "SQAL21" : member(7) = "ISQAL" : memsub1(7) = 2 : memsub2(7) = 1
+        tstype(8) = "SQAL31" : member(8) = "ISQAL" : memsub1(8) = 3 : memsub2(8) = 1
+
+        lOper = aUci.OpnBlks("RCHRES").Ids(aUci.OpnBlks("RCHRES").Ids.count)
+        'add whole set like this for upstream inflows
+        For i As Integer = 1 To 8
+            lConn = New atcUCI.HspfConnection
+            If i = 1 Then
+                lConn.Comment = "*** Upstream Inflows"
+            End If
+            lConn.Uci = aUci
+            lConn.Typ = 1
+            lConn.Source.VolName = "WDM3"
+            lConn.Source.VolId = 100 + i
+            lConn.Source.Member = tstype(i)
+            lConn.Ssystem = "ENGL"
+            lConn.Sgapstrg = ""
+            lConn.MFact = 1
+            lConn.Tran = "SAME"
+            lConn.Target.VolName = lOper.Name
+            lConn.Target.VolId = lOper.Id
+            lConn.Target.Group = "INFLOW"
+            lConn.Target.Member = member(i)
+            lConn.Target.MemSub1 = memsub1(i)
+            lConn.Target.MemSub2 = memsub2(i)
+            lConn.Target.Opn = lOper
+            lOper.Sources.Add(lConn)
+            aUci.Connections.Add(lConn)
+        Next
+
+    End Sub
+
+    Private Sub MakeMods_AddExtTarLink(ByVal aUci As atcUCI.HspfUci, ByVal aWdmname As String)
+        Dim lOper As atcUCI.HspfOperation
+        Dim tstype$(8), member$(8), memsub1&(8), memsub2&(8)
+
+        Dim lWdm As New atcWDM.atcDataSourceWDM
+        lWdm.Open(aWdmname)
+
+        tstype(1) = "VOL" : member(1) = "ROVOL" : memsub1(1) = 1 : memsub2(1) = 1
+        tstype(2) = "SED1" : member(2) = "ROSED" : memsub1(2) = 1 : memsub2(2) = 1
+        tstype(3) = "SED2" : member(3) = "ROSED" : memsub1(3) = 2 : memsub2(3) = 1
+        tstype(4) = "SED3" : member(4) = "ROSED" : memsub1(4) = 3 : memsub2(4) = 1
+        tstype(5) = "DQAL1" : member(5) = "RODQAL" : memsub1(5) = 1 : memsub2(5) = 1
+        tstype(6) = "SQAL11" : member(6) = "ROSQAL" : memsub1(6) = 1 : memsub2(6) = 1
+        tstype(7) = "SQAL21" : member(7) = "ROSQAL" : memsub1(7) = 2 : memsub2(7) = 1
+        tstype(8) = "SQAL31" : member(8) = "ROSQAL" : memsub1(8) = 3 : memsub2(8) = 1
+
+        lOper = aUci.OpnBlks("RCHRES").Ids(aUci.OpnBlks("RCHRES").Ids.count)
+        'add whole set like this for the bottom-most reach
+        Dim lnewdsn As Integer = 0
+        For i As Integer = 1 To 8
+
+            'add wdm data set
+            Dim GenTs As atcData.atcTimeseries
+            GenTs = New atcData.atcTimeseries(lWdm)
+            With GenTs.Attributes
+                .SetValue("ID", 100 + i)
+                .SetValue("ts", 1)
+                .SetValue("tu", 3)
+                .SetValue("Scenario", UCase(FilenameOnly(aUci.Name)))
+                .SetValue("Constituent", UCase(tstype(i)))
+                .SetValue("Location", UCase("R" & CStr(lOper.Id)))
+                .SetValue("Description", lOper.Description)
+            End With
+            GenTs.Attributes.SetValue("TSTYPE", GenTs.Attributes.GetValue("Constituent"))
+            Dim TsDate As atcData.atcTimeseries
+            TsDate = New atcData.atcTimeseries(Nothing)
+            GenTs.Dates = TsDate
+            lWdm.AddDataset(GenTs, 0)
+
+            'add external targets record
+            aUci.AddExtTarget("RCHRES", lOper.Id, "ROFLOW", member(i), memsub1(i), _
+              memsub2(i), 1.0, "SAME", "WDM1", _
+              100 + i, tstype(i), 1, "ENGL", "AGGR", "REPL")
+        Next i
+
+        lWdm.Save(aWdmname)
+
     End Sub
 End Module
