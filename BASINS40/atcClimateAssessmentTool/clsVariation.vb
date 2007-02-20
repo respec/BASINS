@@ -4,43 +4,52 @@ Imports MapWinUtility
 
 Public Class Variation
 
-    'Parameters for Hammon - TODO: don't hard code these
-    Private pDegF As Boolean = True
-    Private pLatDeg As Double = 39
+    Private Shared pNan As Double
+
+    'Parameters for Hammon
+    Private pDegF As Boolean
+    Private pLatDeg As Double
+
     'WestBranch of Patux
     'Private pCTS() As Double = {0, 0.0045, 0.01, 0.01, 0.01, 0.0085, 0.0085, 0.0085, 0.0085, 0.0085, 0.0095, 0.0095, 0.0095}
     'Monocacy - CBP
     Private pCTS() As Double = {0, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057, _
                                    0.0057, 0.0057, 0.0057, 0.0057, 0.0057, 0.0057}
 
-    Private pName As String = "<untitled>"
+    Private pName As String
     Private pDataSets As atcDataGroup
+    Public PETdata As atcDataGroup
     Private pComputationSource As atcDataSource
-    Private pOperation As String = ""
-    Private pSelected As Boolean = False
+    Private pOperation As String
+    Private pSelected As Boolean
 
     'TODO: make rest of public variables into properties
     Public Seasons As atcSeasons.atcSeasonBase
-    Public Min As Double = Double.NaN
-    Public Max As Double = Double.NaN
-    Public Increment As Double = Double.NaN
-    Private pIncrementsSinceStart As Integer = 0
-    Public CurrentValue As Double = Double.NaN
+    Public Min As Double
+    Public Max As Double
+    Public Increment As Double
+    Private pIncrementsSinceStart As Integer
+    Public CurrentValue As Double
 
-    Public UseEvents As Boolean = False
-    Public EventThreshold As Double = Double.NaN
-    Public EventDaysGapAllowed As Double = 0
-    Public EventGapDisplayUnits As String = ""
-    Public EventHigh As Boolean = True
-    Public EventsPer As String = ""
+    Public UseEvents As Boolean
+    Public EventThreshold As Double
+    Public EventDaysGapAllowed As Double
+    Public EventGapDisplayUnits As String
+    Public EventHigh As Boolean
+    Public EventsPer As String
 
-    Public IsInput As Boolean = False
+    Public EventVolumeHigh As Boolean
+    Public EventVolumeThreshold As Double
 
-    Public ColorAboveMax As System.Drawing.Color = System.Drawing.Color.OrangeRed
-    Public ColorBelowMin As System.Drawing.Color = System.Drawing.Color.DeepSkyBlue
-    Public ColorDefault As System.Drawing.Color = System.Drawing.Color.White
+    Public EventDurationHigh As Boolean
+    Public EventDurationThreshold As Double
+    Public EventDurationDisplayUnits As String
 
-    Public PETdata As atcDataGroup = New atcDataGroup
+    Public IsInput As Boolean
+
+    Public ColorAboveMax As System.Drawing.Color
+    Public ColorBelowMin As System.Drawing.Color
+    Public ColorDefault As System.Drawing.Color
 
     Public Overridable Property Name() As String
         Get
@@ -119,6 +128,7 @@ Public Class Variation
         Dim lModifiedTS As atcTimeseries
         Dim lModifiedGroup As New atcDataGroup
         Dim lDataSetIndex As Integer = 0
+        Dim lValueIndex As Integer
 
         Dim lEvents As atcDataGroup = Nothing
         Dim lEvent As atcTimeseries
@@ -131,7 +141,6 @@ Public Class Variation
 
                 'Remove events outside selected seasons
                 If Not Seasons Is Nothing Then
-                    Dim lValueIndex As Integer
                     For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
                         lEvent = lEvents.ItemByIndex(lEventIndex)
 
@@ -147,6 +156,39 @@ Public Class Variation
                         End If
                     Next
                 End If
+
+                If Not Double.IsNaN(EventVolumeThreshold) Then
+                    For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
+                        Dim lEventVolume As Double = lEvents.ItemByIndex(lEventIndex).Attributes.GetValue("Sum")
+                        If EventVolumeHigh Then
+                            If lEventVolume < EventVolumeThreshold Then
+                                lEvents.RemoveAt(lEventIndex)
+                            End If
+                        Else
+                            If lEventVolume > EventVolumeThreshold Then
+                                lEvents.RemoveAt(lEventIndex)
+                            End If
+                        End If
+
+                    Next
+                End If
+
+                If Not Double.IsNaN(EventDurationThreshold) Then
+                    For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
+                        Dim lEventDuration As Double = atcSynopticAnalysis.atcSynopticAnalysisPlugin.DataSetDuration(lEvents.ItemByIndex(lEventIndex))
+                        If EventDurationHigh Then
+                            If lEventDuration < EventDurationThreshold Then
+                                lEvents.RemoveAt(lEventIndex)
+                            End If
+                        Else
+                            If lEventDuration > EventDurationThreshold Then
+                                lEvents.RemoveAt(lEventIndex)
+                            End If
+                        End If
+
+                    Next
+                End If
+
                 lModifyThis = MergeTimeseries(lEvents)
             Else
                 lModifyThis = lOriginalData
@@ -270,6 +312,48 @@ Public Class Variation
         Me.CopyTo(newVariation)
         Return newVariation
     End Function
+
+    Sub Clear()
+
+        'Parameters for Hammon - TODO: don't hard code these
+        pDegF = True
+        pLatDeg = 39
+
+        pName = "<untitled>"
+        pDataSets = New atcDataGroup
+        pComputationSource = Nothing
+        pOperation = ""
+        pSelected = False
+
+        Seasons = Nothing
+        Min = pNan
+        Max = pNan
+        Increment = pNan
+        pIncrementsSinceStart = 0
+        CurrentValue = pNan
+
+        UseEvents = False
+        EventThreshold = pNan
+        EventDaysGapAllowed = 0
+        EventGapDisplayUnits = ""
+        EventHigh = True
+        EventsPer = ""
+
+        EventVolumeHigh = True
+        EventVolumeThreshold = pNan
+
+        EventDurationHigh = True
+        EventDurationThreshold = pNan
+        EventDurationDisplayUnits = ""
+
+        IsInput = False
+
+        ColorAboveMax = System.Drawing.Color.OrangeRed
+        ColorBelowMin = System.Drawing.Color.DeepSkyBlue
+        ColorDefault = System.Drawing.Color.White
+
+        PETdata = New atcDataGroup
+    End Sub
 
     Public Overridable Sub CopyTo(ByVal aTargetVariation As Variation)
         With aTargetVariation
@@ -505,4 +589,9 @@ Public Class Variation
         DoubleString = Format(aNumber, "0.000").TrimEnd("0"c, "."c)
         If DoubleString.Length = 0 Then DoubleString = "0"
     End Function
+
+    Public Sub New()
+        pNan = System.Double.NaN
+        Clear()
+    End Sub
 End Class
