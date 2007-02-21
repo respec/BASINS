@@ -76,23 +76,7 @@ Public Class atcDataSourceWDM
         End While
     End Sub
 
-    ''' <summary>
-    ''' returns a dataset from a dateset number, nothing if no dataset available
-    ''' </summary>
-    ''' <param name="aDsn">dataset number</param>
-    ''' <returns>matching timeseries dataset</returns>
-    ''' <remarks></remarks>
-    Private Function GetDataSetFromDsn(ByRef aDsn As Integer) As atcTimeseries
-        For Each lCurDataset As atcTimeseries In DataSets
-            If lCurDataset.Attributes.GetValue("id") = aDsn Then
-                Return lCurDataset
-            End If
-        Next
-        Logger.Msg("DSN " & aDsn & " does not exist.", "DataFileWDM.GetDataSetFromDsn")
-        Return Nothing
-    End Function
-
-    Private Function AttrStored(ByRef aSaind As Integer) As Boolean 'somewhere else
+    Private Function AttrStored(ByVal aSaind As Integer) As Boolean 'somewhere else
         Select Case aSaind
             Case 17 : AttrStored = True 'tcode
                 'Case 27: AttrStored = True 'tsbyr  'jlk commmented to fix winhspf problem
@@ -245,19 +229,12 @@ Public Class atcDataSourceWDM
         'Logger.Dbg("atcDataSourceWdm:WriteAttributes:end")
     End Function
 
-    Private Function findNextDsn(ByRef aDsn As Integer) As Integer
-        Dim lNextDsn As Integer = aDsn
-
-        For Each lDataset As atcDataSet In DataSets
-            If lDataset.GetType.FullName = "atcData.atcTimeseries" Then
-                If lNextDsn = lDataset.Attributes.GetValue("Id", lNextDsn) Then
-                    lNextDsn = findNextDsn(aDsn + 1)
-                    Exit For
-                End If
-            End If
-        Next lDataset
-
-        Return lNextDsn
+    Private Function findNextDsn(ByVal aDsn As Integer) As Integer
+        Dim lDatasets As atcDataGroup = DataSets
+        While lDatasets.Keys.Contains(aDsn)
+            aDsn += 1
+        End While
+        Return aDsn
     End Function
 
     Public Function RemoveDataset(ByVal aDataSet As atcData.atcDataSet) As Boolean
@@ -325,7 +302,7 @@ Public Class atcDataSourceWDM
     ''' <param name="aTs">data set to add to WDM</param>
     ''' <returns></returns>
     Private Function DsnBld(ByVal aFileUnit As Integer, _
-                            ByRef aTs As atcTimeseries) As Boolean
+                            ByVal aTs As atcTimeseries) As Boolean
         Dim lDsn, lNSasp, lNUp, lNDn, lNSa, lNDp, lPsa As Integer
 
         lDsn = aTs.Attributes.GetValue("id", 0)
@@ -340,8 +317,8 @@ Public Class atcDataSourceWDM
         DsnBld = DsnWriteAttributes(aFileUnit, aTs)
     End Function
 
-    Private Function DsnWriteAttributes(ByRef aFileUnit As Integer, _
-                                        ByRef aTs As atcTimeseries) As Boolean
+    Private Function DsnWriteAttributes(ByVal aFileUnit As Integer, _
+                                        ByVal aTs As atcTimeseries) As Boolean
         Dim lCSDat(6) As Integer
         Dim lDecade As Integer
         Dim lIVal As Integer
@@ -361,7 +338,7 @@ Public Class atcDataSourceWDM
         aTs.Attributes.SetValueIfMissing("COMPFG", 1)
         aTs.Attributes.SetValueIfMissing("TSFORM", 1)
         aTs.Attributes.SetValueIfMissing("TSFILL", -999)
- 
+
         lStr = aTs.Attributes.GetValue("tu")
         If lStr.Length = 0 Then
             CalcTimeUnitStep(aTs.Dates.Value(0), aTs.Dates.Value(1), lTu, lTs)
@@ -798,7 +775,7 @@ Public Class atcDataSourceWDM
         'aDataset.Attributes.SetValue("descrp", lStr)
     End Sub
 
-    Private Function AttrVal2String(ByRef aSaInd As Integer, ByRef aSaVal() As Integer) As String
+    Private Function AttrVal2String(ByVal aSaInd As Integer, ByVal aSaVal() As Integer) As String
         Dim lS As String
         Dim lI As Integer
         Dim lAttr As atcAttributeDefinition

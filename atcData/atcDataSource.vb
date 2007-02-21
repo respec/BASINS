@@ -84,7 +84,7 @@ Public Class atcDataSource
     ''' <param name="aExistAction">Action to take if data already present in file</param>
     ''' <remarks>Save must be overridden to be used, atcDataSource does not implement.</remarks>
     Public Overridable Function Save(ByVal aSaveFileName As String, _
-                            Optional ByRef aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+                            Optional ByVal aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
         Throw New Exception("Save must be overridden to be used, atcDataSource does not implement.")
     End Function
 
