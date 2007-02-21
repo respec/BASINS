@@ -267,7 +267,7 @@ Public Class atcDataSourceWDM
     End Function
 
     Public Overrides Function Save(ByVal SaveFileName As String, _
-                          Optional ByRef ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+                          Optional ByVal ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
         'Dim i, lFileUnit As Integer
         'Dim lWdmOpen As Integer
 
