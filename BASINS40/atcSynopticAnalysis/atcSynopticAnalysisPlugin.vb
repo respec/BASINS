@@ -351,7 +351,7 @@ Public Class atcSynopticAnalysisPlugin
         End Select
     End Function
 
-    Friend Shared Function DataSetDuration(ByVal aTimeseries As atcTimeseries) As Double
+    Public Shared Function DataSetDuration(ByVal aTimeseries As atcTimeseries) As Double
         If Not Double.IsNaN(aTimeseries.Dates.Value(0)) Then
             Return aTimeseries.Dates.Value(aTimeseries.numValues) - aTimeseries.Dates.Value(0)
         Else
