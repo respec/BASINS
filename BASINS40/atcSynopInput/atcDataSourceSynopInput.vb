@@ -137,7 +137,7 @@ Public Class atcDataSourceSynopInput
     End Function
 
     Public Overrides Function Save(ByVal aSaveFileName As String, _
-                            Optional ByRef aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
+                          Optional ByVal aExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
         For Each lDataSet As atcTimeseries In Me.DataSets
             For lIndex As Integer = 1 To lDataSet.numValues
                 Dim lDateArr(6) As Integer
