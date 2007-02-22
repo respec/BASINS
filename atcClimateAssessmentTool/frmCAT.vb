@@ -1275,7 +1275,7 @@ Public Class frmCAT
             .Name = ""
             .ComputationSource = New atcTimeseriesMath.atcTimeseriesMath
             .Operation = "Multiply"
-            .Min = 0.9
+            .Min = 1.1
             .Max = 1.1
             .Increment = 0.1
             .IsInput = True

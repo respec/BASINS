@@ -135,6 +135,14 @@ Imports MapWinUtility
         Me.radioFunctionAddEvents = New System.Windows.Forms.RadioButton
         Me.radioFunctionAddVolume = New System.Windows.Forms.RadioButton
         Me.tabEvents = New System.Windows.Forms.TabPage
+        Me.chkEventGap = New System.Windows.Forms.CheckBox
+        Me.cboEventDurationUnits = New System.Windows.Forms.ComboBox
+        Me.txtEventDuration = New System.Windows.Forms.TextBox
+        Me.cboAboveBelowDuration = New System.Windows.Forms.ComboBox
+        Me.chkEventDuration = New System.Windows.Forms.CheckBox
+        Me.txtEventVolume = New System.Windows.Forms.TextBox
+        Me.cboAboveBelowVolume = New System.Windows.Forms.ComboBox
+        Me.chkEventVolume = New System.Windows.Forms.CheckBox
         Me.chkEvents = New System.Windows.Forms.CheckBox
         Me.cboAboveBelow = New System.Windows.Forms.ComboBox
         Me.txtEventGap = New System.Windows.Forms.TextBox
@@ -143,14 +151,6 @@ Imports MapWinUtility
         Me.tabSeasonal = New System.Windows.Forms.TabPage
         Me.chkSeasons = New System.Windows.Forms.CheckBox
         Me.tabPET = New System.Windows.Forms.TabPage
-        Me.chkEventVolume = New System.Windows.Forms.CheckBox
-        Me.cboAboveBelowVolume = New System.Windows.Forms.ComboBox
-        Me.txtEventVolume = New System.Windows.Forms.TextBox
-        Me.txtEventDuration = New System.Windows.Forms.TextBox
-        Me.cboAboveBelowDuration = New System.Windows.Forms.ComboBox
-        Me.chkEventDuration = New System.Windows.Forms.CheckBox
-        Me.cboEventDurationUnits = New System.Windows.Forms.ComboBox
-        Me.chkEventGap = New System.Windows.Forms.CheckBox
         Me.tabs.SuspendLayout()
         Me.tabComputation.SuspendLayout()
         Me.groupMinMax.SuspendLayout()
@@ -579,6 +579,84 @@ Imports MapWinUtility
         Me.tabEvents.Text = "Events"
         Me.tabEvents.UseVisualStyleBackColor = True
         '
+        'chkEventGap
+        '
+        Me.chkEventGap.AutoSize = True
+        Me.chkEventGap.Location = New System.Drawing.Point(6, 39)
+        Me.chkEventGap.Name = "chkEventGap"
+        Me.chkEventGap.Size = New System.Drawing.Size(195, 17)
+        Me.chkEventGap.TabIndex = 32
+        Me.chkEventGap.Text = "Allow Gaps during an event of up to"
+        Me.chkEventGap.UseVisualStyleBackColor = True
+        '
+        'cboEventDurationUnits
+        '
+        Me.cboEventDurationUnits.Enabled = False
+        Me.cboEventDurationUnits.FormattingEnabled = True
+        Me.cboEventDurationUnits.Location = New System.Drawing.Point(323, 89)
+        Me.cboEventDurationUnits.Name = "cboEventDurationUnits"
+        Me.cboEventDurationUnits.Size = New System.Drawing.Size(84, 21)
+        Me.cboEventDurationUnits.TabIndex = 31
+        Me.cboEventDurationUnits.Text = "Hours"
+        '
+        'txtEventDuration
+        '
+        Me.txtEventDuration.Enabled = False
+        Me.txtEventDuration.Location = New System.Drawing.Point(251, 89)
+        Me.txtEventDuration.Name = "txtEventDuration"
+        Me.txtEventDuration.Size = New System.Drawing.Size(66, 20)
+        Me.txtEventDuration.TabIndex = 30
+        Me.txtEventDuration.Text = "0"
+        '
+        'cboAboveBelowDuration
+        '
+        Me.cboAboveBelowDuration.Enabled = False
+        Me.cboAboveBelowDuration.FormattingEnabled = True
+        Me.cboAboveBelowDuration.Items.AddRange(New Object() {"Above", "Below"})
+        Me.cboAboveBelowDuration.Location = New System.Drawing.Point(176, 89)
+        Me.cboAboveBelowDuration.Name = "cboAboveBelowDuration"
+        Me.cboAboveBelowDuration.Size = New System.Drawing.Size(69, 21)
+        Me.cboAboveBelowDuration.TabIndex = 29
+        '
+        'chkEventDuration
+        '
+        Me.chkEventDuration.AutoSize = True
+        Me.chkEventDuration.Location = New System.Drawing.Point(6, 91)
+        Me.chkEventDuration.Name = "chkEventDuration"
+        Me.chkEventDuration.Size = New System.Drawing.Size(145, 17)
+        Me.chkEventDuration.TabIndex = 28
+        Me.chkEventDuration.Text = "Only events with duration"
+        Me.chkEventDuration.UseVisualStyleBackColor = True
+        '
+        'txtEventVolume
+        '
+        Me.txtEventVolume.Enabled = False
+        Me.txtEventVolume.Location = New System.Drawing.Point(251, 63)
+        Me.txtEventVolume.Name = "txtEventVolume"
+        Me.txtEventVolume.Size = New System.Drawing.Size(66, 20)
+        Me.txtEventVolume.TabIndex = 27
+        Me.txtEventVolume.Text = "0"
+        '
+        'cboAboveBelowVolume
+        '
+        Me.cboAboveBelowVolume.Enabled = False
+        Me.cboAboveBelowVolume.FormattingEnabled = True
+        Me.cboAboveBelowVolume.Items.AddRange(New Object() {"Above", "Below"})
+        Me.cboAboveBelowVolume.Location = New System.Drawing.Point(176, 62)
+        Me.cboAboveBelowVolume.Name = "cboAboveBelowVolume"
+        Me.cboAboveBelowVolume.Size = New System.Drawing.Size(69, 21)
+        Me.cboAboveBelowVolume.TabIndex = 26
+        '
+        'chkEventVolume
+        '
+        Me.chkEventVolume.AutoSize = True
+        Me.chkEventVolume.Location = New System.Drawing.Point(6, 64)
+        Me.chkEventVolume.Name = "chkEventVolume"
+        Me.chkEventVolume.Size = New System.Drawing.Size(164, 17)
+        Me.chkEventVolume.TabIndex = 25
+        Me.chkEventVolume.Text = "Only events with total volume"
+        Me.chkEventVolume.UseVisualStyleBackColor = True
+        '
         'chkEvents
         '
         Me.chkEvents.AutoSize = True
@@ -664,84 +742,6 @@ Imports MapWinUtility
         Me.tabPET.TabIndex = 2
         Me.tabPET.Text = "PET"
         Me.tabPET.UseVisualStyleBackColor = True
-        '
-        'chkEventVolume
-        '
-        Me.chkEventVolume.AutoSize = True
-        Me.chkEventVolume.Location = New System.Drawing.Point(6, 64)
-        Me.chkEventVolume.Name = "chkEventVolume"
-        Me.chkEventVolume.Size = New System.Drawing.Size(164, 17)
-        Me.chkEventVolume.TabIndex = 25
-        Me.chkEventVolume.Text = "Only events with total volume"
-        Me.chkEventVolume.UseVisualStyleBackColor = True
-        '
-        'cboAboveBelowVolume
-        '
-        Me.cboAboveBelowVolume.Enabled = False
-        Me.cboAboveBelowVolume.FormattingEnabled = True
-        Me.cboAboveBelowVolume.Items.AddRange(New Object() {"Above", "Below"})
-        Me.cboAboveBelowVolume.Location = New System.Drawing.Point(176, 62)
-        Me.cboAboveBelowVolume.Name = "cboAboveBelowVolume"
-        Me.cboAboveBelowVolume.Size = New System.Drawing.Size(69, 21)
-        Me.cboAboveBelowVolume.TabIndex = 26
-        '
-        'txtEventVolume
-        '
-        Me.txtEventVolume.Enabled = False
-        Me.txtEventVolume.Location = New System.Drawing.Point(251, 63)
-        Me.txtEventVolume.Name = "txtEventVolume"
-        Me.txtEventVolume.Size = New System.Drawing.Size(66, 20)
-        Me.txtEventVolume.TabIndex = 27
-        Me.txtEventVolume.Text = "0"
-        '
-        'txtEventDuration
-        '
-        Me.txtEventDuration.Enabled = False
-        Me.txtEventDuration.Location = New System.Drawing.Point(251, 89)
-        Me.txtEventDuration.Name = "txtEventDuration"
-        Me.txtEventDuration.Size = New System.Drawing.Size(66, 20)
-        Me.txtEventDuration.TabIndex = 30
-        Me.txtEventDuration.Text = "0"
-        '
-        'cboAboveBelowDuration
-        '
-        Me.cboAboveBelowDuration.Enabled = False
-        Me.cboAboveBelowDuration.FormattingEnabled = True
-        Me.cboAboveBelowDuration.Items.AddRange(New Object() {"Above", "Below"})
-        Me.cboAboveBelowDuration.Location = New System.Drawing.Point(176, 89)
-        Me.cboAboveBelowDuration.Name = "cboAboveBelowDuration"
-        Me.cboAboveBelowDuration.Size = New System.Drawing.Size(69, 21)
-        Me.cboAboveBelowDuration.TabIndex = 29
-        '
-        'chkEventDuration
-        '
-        Me.chkEventDuration.AutoSize = True
-        Me.chkEventDuration.Location = New System.Drawing.Point(6, 91)
-        Me.chkEventDuration.Name = "chkEventDuration"
-        Me.chkEventDuration.Size = New System.Drawing.Size(145, 17)
-        Me.chkEventDuration.TabIndex = 28
-        Me.chkEventDuration.Text = "Only events with duration"
-        Me.chkEventDuration.UseVisualStyleBackColor = True
-        '
-        'cboEventDurationUnits
-        '
-        Me.cboEventDurationUnits.Enabled = False
-        Me.cboEventDurationUnits.FormattingEnabled = True
-        Me.cboEventDurationUnits.Location = New System.Drawing.Point(323, 89)
-        Me.cboEventDurationUnits.Name = "cboEventDurationUnits"
-        Me.cboEventDurationUnits.Size = New System.Drawing.Size(84, 21)
-        Me.cboEventDurationUnits.TabIndex = 31
-        Me.cboEventDurationUnits.Text = "Hours"
-        '
-        'chkEventGap
-        '
-        Me.chkEventGap.AutoSize = True
-        Me.chkEventGap.Location = New System.Drawing.Point(6, 39)
-        Me.chkEventGap.Name = "chkEventGap"
-        Me.chkEventGap.Size = New System.Drawing.Size(195, 17)
-        Me.chkEventGap.TabIndex = 32
-        Me.chkEventGap.Text = "Allow Gaps during an event of up to"
-        Me.chkEventGap.UseVisualStyleBackColor = True
         '
         'frmVariation
         '
@@ -1072,6 +1072,7 @@ Imports MapWinUtility
             cboAddRemovePer.Text = .EventsPer
 
             chkEvents.Checked = .UseEvents
+            EnableEvents(.UseEvents)
             If .UseEvents Then
                 If .EventHigh Then
                     cboAboveBelow.SelectedIndex = 0

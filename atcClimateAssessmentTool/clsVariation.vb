@@ -198,8 +198,9 @@ Public Class Variation
                 Select Case Operation
                     Case "AddEvents"
                         lModifiedTS = AddRemoveEventsTotalVolume(lOriginalData, Math.Abs(CurrentValue), lEvents, 0)
-                    Case "AddVolume"
-                        'TODO
+
+                        'TODO Case "AddVolume"
+
                     Case Else '"Add", "Multiply"
                         ComputationSource.DataSets.Clear()
                         lArgsMath.Clear()
