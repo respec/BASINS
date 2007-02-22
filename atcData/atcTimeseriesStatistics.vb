@@ -7,6 +7,9 @@ Imports System.Windows.Forms
 Public Class atcTimeseriesStatistics
     Inherits atcDataSource
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
+    Private Shared pNaN As Double = Double.NaN
+    Private Shared pMinValue As Double = Double.MinValue
+    Private Shared pMaxValue As Double = Double.MaxValue
 
     ''' <summary>returns 'Timeseries::Statistics'</summary>
     Public Overrides ReadOnly Property Name() As String
@@ -143,21 +146,21 @@ Public Class atcTimeseriesStatistics
             Dim lVal As Double
             Dim lDev As Double
 
-            Dim lMax As Double = Double.MinValue
-            Dim lMin As Double = Double.MaxValue
+            Dim lMax As Double = pMinValue
+            Dim lMin As Double = pMaxValue
 
             Dim lGeoMean As Double = 0
-            Dim lStdDev As Double = Double.NaN
+            Dim lStdDev As Double = pNaN
             Dim lCount As Double = 0
-            Dim lMean As Double = Double.NaN
+            Dim lMean As Double = pNaN
             Dim lSum As Double = 0
             Dim lSumDevSquares As Double = 0
             Dim lSumDevCubes As Double = 0
-            Dim lVariance As Double = Double.NaN
-            Dim lSkew As Double = Double.NaN
-            Dim lStErSkew As Double = Double.NaN
-            Dim lScc As Double = Double.NaN
-            Dim lCvr As Double = Double.NaN
+            Dim lVariance As Double = pNaN
+            Dim lSkew As Double = pNaN
+            Dim lStErSkew As Double = pNaN
+            Dim lScc As Double = pNaN
+            Dim lCvr As Double = pNaN
 
             For lIndex = 1 To lLastValueIndex
                 lVal = aTimeseries.Value(lIndex)
@@ -299,5 +302,4 @@ Public Class atcTimeseriesStatistics
             atcDataAttributes.AddDefinition(lOperation.Definition)
         Next
     End Sub
-
 End Class

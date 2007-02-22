@@ -3,8 +3,7 @@ Imports atcEvents
 Imports MapWinUtility
 
 Public Class Variation
-
-    Private Shared pNan As Double
+    Private pNaN As Double = atcUtility.GetNaN
 
     'Parameters for Hammon
     Private pDegF As Boolean
@@ -315,7 +314,6 @@ Public Class Variation
     End Function
 
     Sub Clear()
-
         'Parameters for Hammon - TODO: don't hard code these
         pDegF = True
         pLatDeg = 39
@@ -328,23 +326,23 @@ Public Class Variation
 
         Seasons = Nothing
         Min = pNan
-        Max = pNan
-        Increment = pNan
+        Max = pNaN
+        Increment = pNaN
         pIncrementsSinceStart = 0
-        CurrentValue = pNan
+        CurrentValue = pNaN
 
         UseEvents = False
-        EventThreshold = pNan
+        EventThreshold = pNaN
         EventDaysGapAllowed = 0
         EventGapDisplayUnits = ""
         EventHigh = True
         EventsPer = ""
 
         EventVolumeHigh = True
-        EventVolumeThreshold = pNan
+        EventVolumeThreshold = pNaN
 
         EventDurationHigh = True
-        EventDurationThreshold = pNan
+        EventDurationThreshold = pNaN
         EventDurationDisplayUnits = ""
 
         IsInput = False
@@ -592,7 +590,6 @@ Public Class Variation
     End Function
 
     Public Sub New()
-        pNan = System.Double.NaN
         Clear()
     End Sub
 End Class

@@ -886,4 +886,23 @@ ReadCharacter:
         End Try
     End Function
 
+    ''' <summary>
+    ''' Gets System.Double.NaN (not a number)
+    ''' </summary>
+    ''' <returns>Double.NaN</returns>
+    ''' <remarks>workaround for mystery bug - program exit without message on first reference to NaN</remarks>
+    Public Function GetNaN() As Double
+        Return GetNaNInternal()
+    End Function
+
+    ''' <summary>
+    ''' Magic - reference to System.Double.NaN in optional argument elimates problem
+    ''' </summary>
+    ''' <param name="aNaN"></param>
+    ''' <returns>Double.NaN</returns>
+    ''' <remarks>workaround for mystery bug - program exit without message on first reference to NaN</remarks>
+    Private Function GetNaNInternal(Optional ByVal aNaN As Double = System.Double.NaN) As Double
+        Return aNaN
+    End Function
+
 End Module
