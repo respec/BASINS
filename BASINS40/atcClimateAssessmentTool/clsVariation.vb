@@ -20,6 +20,7 @@ Public Class Variation
     Public PETdata As atcDataGroup
     Private pComputationSource As atcDataSource
     Private pOperation As String
+    Public AddRemovePer As String
     Private pSelected As Boolean
 
     'TODO: make rest of public variables into properties
@@ -35,13 +36,12 @@ Public Class Variation
     Public EventDaysGapAllowed As Double
     Public EventGapDisplayUnits As String
     Public EventHigh As Boolean
-    Public EventsPer As String
 
     Public EventVolumeHigh As Boolean
     Public EventVolumeThreshold As Double
 
     Public EventDurationHigh As Boolean
-    Public EventDurationThreshold As Double
+    Public EventDurationDays As Double
     Public EventDurationDisplayUnits As String
 
     Public IsInput As Boolean
@@ -172,15 +172,15 @@ Public Class Variation
                     Next
                 End If
 
-                If Not Double.IsNaN(EventDurationThreshold) Then
+                If Not Double.IsNaN(EventDurationDays) Then
                     For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
                         Dim lEventDuration As Double = atcSynopticAnalysis.atcSynopticAnalysisPlugin.DataSetDuration(lEvents.ItemByIndex(lEventIndex))
                         If EventDurationHigh Then
-                            If lEventDuration < EventDurationThreshold Then
+                            If lEventDuration < EventDurationDays Then
                                 lEvents.RemoveAt(lEventIndex)
                             End If
                         Else
-                            If lEventDuration > EventDurationThreshold Then
+                            If lEventDuration > EventDurationDays Then
                                 lEvents.RemoveAt(lEventIndex)
                             End If
                         End If
@@ -314,6 +314,7 @@ Public Class Variation
     End Function
 
     Sub Clear()
+
         'Parameters for Hammon - TODO: don't hard code these
         pDegF = True
         pLatDeg = 39
@@ -336,13 +337,13 @@ Public Class Variation
         EventDaysGapAllowed = 0
         EventGapDisplayUnits = ""
         EventHigh = True
-        EventsPer = ""
+        AddRemovePer = "Entire Span"
 
         EventVolumeHigh = True
         EventVolumeThreshold = pNaN
 
         EventDurationHigh = True
-        EventDurationThreshold = pNaN
+        EventDurationDays = pNaN
         EventDurationDisplayUnits = ""
 
         IsInput = False
@@ -362,7 +363,6 @@ Public Class Variation
                 .EventDaysGapAllowed = EventDaysGapAllowed
                 .EventGapDisplayUnits = EventGapDisplayUnits
                 .EventHigh = EventHigh
-                .EventsPer = EventsPer
                 .EventThreshold = EventThreshold
             End If
 
@@ -375,7 +375,7 @@ Public Class Variation
             .Min = Min
             .Max = Max
             .Increment = Increment
-            .EventsPer = EventsPer
+            .AddRemovePer = AddRemovePer
             .IsInput = IsInput
             .CurrentValue = CurrentValue
             .ColorAboveMax = ColorAboveMax
@@ -391,7 +391,12 @@ Public Class Variation
                               & " High='" & EventHigh & "' " _
                               & " GapDays='" & EventDaysGapAllowed & "' " _
                               & " GapDisplayUnits='" & EventGapDisplayUnits & "' " _
-                              & " EventsPer='" & EventsPer & "'/>" & vbCrLf
+                              & " VolumeHigh='" & EventVolumeHigh & "' " _
+                              & " VolumeThreshold='" & EventVolumeThreshold & "' " _
+                              & " DurationHigh='" & EventDurationHigh & "' " _
+                              & " DurationDays='" & EventDurationDays & "' " _
+                              & " DurationDisplayUnits='" & EventDurationDisplayUnits & "' " _
+                              & "/>" & vbCrLf
             Else
                 Return ""
             End If
@@ -405,7 +410,13 @@ Public Class Variation
                     EventHigh = lXML.GetAttrValue("High")
                     EventDaysGapAllowed = lXML.GetAttrValue("GapDays")
                     EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
-                    EventsPer = lXML.GetAttrValue("EventsPer")
+
+                    EventVolumeHigh = lXML.GetAttrValue("VolumeHigh")
+                    EventVolumeThreshold = lXML.GetAttrValue("VolumeThreshold")
+
+                    EventDurationHigh = lXML.GetAttrValue("DurationHigh")
+                    EventDurationDays = lXML.GetAttrValue("DurationDays")
+                    EventDurationDisplayUnits = lXML.GetAttrValue("DurationDisplayUnits")
                 End If
             End If
         End Set
@@ -531,6 +542,7 @@ Public Class Variation
                 lXML &= "  <IsInput>" & IsInput & "</IsInput>" & vbCrLf
             End If
             lXML &= "  <Operation>" & Operation & "</Operation>" & vbCrLf
+            lXML &= "  <AddRemovePer>" & AddRemovePer & "</AddRemovePer>" & vbCrLf
             If Not ComputationSource Is Nothing Then
                 lXML &= "  <ComputationSource>" & ComputationSource.Name & "</ComputationSource>" & vbCrLf
             End If
@@ -555,6 +567,7 @@ Public Class Variation
                                 Case "increment" : Increment = CDbl(.Content)
                                 Case "isinput" : IsInput = CBool(.Content)
                                 Case "operation" : Operation = .Content
+                                Case "addremoveper" : AddRemovePer = .Content
                                 Case "computationsource"
                                     ComputationSource = g_DataManager.DataSourceByName(.Content)
                                 Case "datasets" : SetDataGroupXML(DataSets, "DataSets", .GetXml)

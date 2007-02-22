@@ -9,37 +9,23 @@ Imports MapWinUtility
     Private Const AllSeasons As String = "All Seasons"
     Private Const pClickMe As String = "<click to specify>"
 
+    Private pNaN As Double = GetNaN()
+
     Private pVariation As Variation
     Private pSeasonsAvailable As New atcCollection
     Private pSeasons As atcSeasonBase
     Friend WithEvents txtVaryPET As System.Windows.Forms.TextBox
-    Friend WithEvents lblPET As System.Windows.Forms.Label
-    Friend WithEvents lblAirTemp As System.Windows.Forms.Label
     Friend WithEvents btnViewData As System.Windows.Forms.Button
     Friend WithEvents btnViewPET As System.Windows.Forms.Button
-    Friend WithEvents tabs As System.Windows.Forms.TabControl
-    Friend WithEvents tabComputation As System.Windows.Forms.TabPage
-    Friend WithEvents tabSeasonal As System.Windows.Forms.TabPage
-    Friend WithEvents tabPET As System.Windows.Forms.TabPage
-    Friend WithEvents radioFunctionAddEvents As System.Windows.Forms.RadioButton
-    Friend WithEvents radioFunctionMultiply As System.Windows.Forms.RadioButton
-    Friend WithEvents radioFunctionAdd As System.Windows.Forms.RadioButton
-    Friend WithEvents tabEvents As System.Windows.Forms.TabPage
     Friend WithEvents cboAboveBelow As System.Windows.Forms.ComboBox
     Friend WithEvents txtEventGap As System.Windows.Forms.TextBox
     Friend WithEvents cboEventGapUnits As System.Windows.Forms.ComboBox
     Friend WithEvents txtEventThreshold As System.Windows.Forms.TextBox
     Friend WithEvents chkEvents As System.Windows.Forms.CheckBox
-    Friend WithEvents chkSeasons As System.Windows.Forms.CheckBox
-    Friend WithEvents radioFunctionAddVolume As System.Windows.Forms.RadioButton
     Friend WithEvents cboAddRemovePer As System.Windows.Forms.ComboBox
     Friend WithEvents cboYearStartMonth As System.Windows.Forms.ComboBox
     Friend WithEvents lblYearStart As System.Windows.Forms.Label
     Friend WithEvents txtYearStartDay As System.Windows.Forms.TextBox
-    Friend WithEvents groupFunction As System.Windows.Forms.GroupBox
-    Friend WithEvents groupMinMax As System.Windows.Forms.GroupBox
-    Friend WithEvents radioSingle As System.Windows.Forms.RadioButton
-    Friend WithEvents radioIterative As System.Windows.Forms.RadioButton
     Friend WithEvents cboEventDurationUnits As System.Windows.Forms.ComboBox
     Friend WithEvents txtEventDuration As System.Windows.Forms.TextBox
     Friend WithEvents cboAboveBelowDuration As System.Windows.Forms.ComboBox
@@ -48,6 +34,21 @@ Imports MapWinUtility
     Friend WithEvents cboAboveBelowVolume As System.Windows.Forms.ComboBox
     Friend WithEvents chkEventVolume As System.Windows.Forms.CheckBox
     Friend WithEvents chkEventGap As System.Windows.Forms.CheckBox
+    Friend WithEvents cboFunction As System.Windows.Forms.ComboBox
+    Friend WithEvents lblFunction As System.Windows.Forms.Label
+    Friend WithEvents chkIterative As System.Windows.Forms.CheckBox
+    Friend WithEvents lblThreshold As System.Windows.Forms.Label
+    Friend WithEvents chkSeasons As System.Windows.Forms.CheckBox
+    Friend WithEvents cboSeasons As System.Windows.Forms.ComboBox
+    Friend WithEvents lstSeasons As System.Windows.Forms.ListBox
+    Friend WithEvents btnSeasonsNone As System.Windows.Forms.Button
+    Friend WithEvents btnSeasonsAll As System.Windows.Forms.Button
+    Friend WithEvents grpSeasons As System.Windows.Forms.GroupBox
+    Friend WithEvents lblIncrement2 As System.Windows.Forms.Label
+    Friend WithEvents lblPET As System.Windows.Forms.Label
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents grpMinMax As System.Windows.Forms.GroupBox
+    Friend WithEvents grpEvents As System.Windows.Forms.GroupBox
 
     Private pSettingFormSeason As Boolean = False
 
@@ -87,10 +88,6 @@ Imports MapWinUtility
     Friend WithEvents lblMinimum As System.Windows.Forms.Label
     Friend WithEvents lblData As System.Windows.Forms.Label
     Friend WithEvents txtVaryData As System.Windows.Forms.TextBox
-    Friend WithEvents cboSeasons As System.Windows.Forms.ComboBox
-    Friend WithEvents lstSeasons As System.Windows.Forms.ListBox
-    Friend WithEvents btnSeasonsAll As System.Windows.Forms.Button
-    Friend WithEvents btnSeasonsNone As System.Windows.Forms.Button
     Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents lblName As System.Windows.Forms.Label
@@ -106,35 +103,14 @@ Imports MapWinUtility
         Me.lblMinimum = New System.Windows.Forms.Label
         Me.lblData = New System.Windows.Forms.Label
         Me.txtVaryData = New System.Windows.Forms.TextBox
-        Me.cboSeasons = New System.Windows.Forms.ComboBox
-        Me.lstSeasons = New System.Windows.Forms.ListBox
-        Me.btnSeasonsAll = New System.Windows.Forms.Button
-        Me.btnSeasonsNone = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
         Me.lblName = New System.Windows.Forms.Label
         Me.txtName = New System.Windows.Forms.TextBox
         Me.btnScript = New System.Windows.Forms.Button
         Me.txtVaryPET = New System.Windows.Forms.TextBox
-        Me.lblPET = New System.Windows.Forms.Label
-        Me.lblAirTemp = New System.Windows.Forms.Label
         Me.btnViewData = New System.Windows.Forms.Button
         Me.btnViewPET = New System.Windows.Forms.Button
-        Me.tabs = New System.Windows.Forms.TabControl
-        Me.tabComputation = New System.Windows.Forms.TabPage
-        Me.groupMinMax = New System.Windows.Forms.GroupBox
-        Me.radioIterative = New System.Windows.Forms.RadioButton
-        Me.radioSingle = New System.Windows.Forms.RadioButton
-        Me.txtYearStartDay = New System.Windows.Forms.TextBox
-        Me.cboYearStartMonth = New System.Windows.Forms.ComboBox
-        Me.lblYearStart = New System.Windows.Forms.Label
-        Me.cboAddRemovePer = New System.Windows.Forms.ComboBox
-        Me.groupFunction = New System.Windows.Forms.GroupBox
-        Me.radioFunctionAdd = New System.Windows.Forms.RadioButton
-        Me.radioFunctionMultiply = New System.Windows.Forms.RadioButton
-        Me.radioFunctionAddEvents = New System.Windows.Forms.RadioButton
-        Me.radioFunctionAddVolume = New System.Windows.Forms.RadioButton
-        Me.tabEvents = New System.Windows.Forms.TabPage
         Me.chkEventGap = New System.Windows.Forms.CheckBox
         Me.cboEventDurationUnits = New System.Windows.Forms.ComboBox
         Me.txtEventDuration = New System.Windows.Forms.TextBox
@@ -148,24 +124,36 @@ Imports MapWinUtility
         Me.txtEventGap = New System.Windows.Forms.TextBox
         Me.cboEventGapUnits = New System.Windows.Forms.ComboBox
         Me.txtEventThreshold = New System.Windows.Forms.TextBox
-        Me.tabSeasonal = New System.Windows.Forms.TabPage
+        Me.txtYearStartDay = New System.Windows.Forms.TextBox
+        Me.cboYearStartMonth = New System.Windows.Forms.ComboBox
+        Me.lblYearStart = New System.Windows.Forms.Label
+        Me.cboAddRemovePer = New System.Windows.Forms.ComboBox
+        Me.cboFunction = New System.Windows.Forms.ComboBox
+        Me.lblFunction = New System.Windows.Forms.Label
+        Me.chkIterative = New System.Windows.Forms.CheckBox
+        Me.lblThreshold = New System.Windows.Forms.Label
         Me.chkSeasons = New System.Windows.Forms.CheckBox
-        Me.tabPET = New System.Windows.Forms.TabPage
-        Me.tabs.SuspendLayout()
-        Me.tabComputation.SuspendLayout()
-        Me.groupMinMax.SuspendLayout()
-        Me.groupFunction.SuspendLayout()
-        Me.tabEvents.SuspendLayout()
-        Me.tabSeasonal.SuspendLayout()
-        Me.tabPET.SuspendLayout()
+        Me.cboSeasons = New System.Windows.Forms.ComboBox
+        Me.lstSeasons = New System.Windows.Forms.ListBox
+        Me.btnSeasonsNone = New System.Windows.Forms.Button
+        Me.btnSeasonsAll = New System.Windows.Forms.Button
+        Me.grpSeasons = New System.Windows.Forms.GroupBox
+        Me.lblIncrement2 = New System.Windows.Forms.Label
+        Me.lblPET = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.grpMinMax = New System.Windows.Forms.GroupBox
+        Me.grpEvents = New System.Windows.Forms.GroupBox
+        Me.grpSeasons.SuspendLayout()
+        Me.grpMinMax.SuspendLayout()
+        Me.grpEvents.SuspendLayout()
         Me.SuspendLayout()
         '
         'txtIncrement
         '
-        Me.txtIncrement.Location = New System.Drawing.Point(75, 116)
+        Me.txtIncrement.Location = New System.Drawing.Point(75, 68)
         Me.txtIncrement.Name = "txtIncrement"
         Me.txtIncrement.Size = New System.Drawing.Size(71, 20)
-        Me.txtIncrement.TabIndex = 12
+        Me.txtIncrement.TabIndex = 18
         Me.txtIncrement.Text = "0.05"
         '
         'lblIncrement
@@ -173,27 +161,27 @@ Imports MapWinUtility
         Me.lblIncrement.AutoSize = True
         Me.lblIncrement.BackColor = System.Drawing.Color.Transparent
         Me.lblIncrement.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.lblIncrement.Location = New System.Drawing.Point(12, 119)
+        Me.lblIncrement.Location = New System.Drawing.Point(4, 71)
         Me.lblIncrement.Name = "lblIncrement"
         Me.lblIncrement.Size = New System.Drawing.Size(57, 13)
-        Me.lblIncrement.TabIndex = 11
+        Me.lblIncrement.TabIndex = 17
         Me.lblIncrement.Text = "Increment:"
         Me.lblIncrement.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtMax
         '
-        Me.txtMax.Location = New System.Drawing.Point(75, 92)
+        Me.txtMax.Location = New System.Drawing.Point(75, 94)
         Me.txtMax.Name = "txtMax"
         Me.txtMax.Size = New System.Drawing.Size(71, 20)
-        Me.txtMax.TabIndex = 10
+        Me.txtMax.TabIndex = 21
         Me.txtMax.Text = "1.1"
         '
         'txtMin
         '
-        Me.txtMin.Location = New System.Drawing.Point(75, 68)
+        Me.txtMin.Location = New System.Drawing.Point(75, 42)
         Me.txtMin.Name = "txtMin"
         Me.txtMin.Size = New System.Drawing.Size(71, 20)
-        Me.txtMin.TabIndex = 9
+        Me.txtMin.TabIndex = 13
         Me.txtMin.Text = "0.9"
         '
         'lblMaximum
@@ -201,10 +189,10 @@ Imports MapWinUtility
         Me.lblMaximum.AutoSize = True
         Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
         Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMaximum.Location = New System.Drawing.Point(15, 95)
+        Me.lblMaximum.Location = New System.Drawing.Point(4, 98)
         Me.lblMaximum.Name = "lblMaximum"
         Me.lblMaximum.Size = New System.Drawing.Size(54, 13)
-        Me.lblMaximum.TabIndex = 9
+        Me.lblMaximum.TabIndex = 20
         Me.lblMaximum.Text = "Maximum:"
         Me.lblMaximum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
@@ -213,10 +201,10 @@ Imports MapWinUtility
         Me.lblMinimum.AutoSize = True
         Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
         Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMinimum.Location = New System.Drawing.Point(18, 71)
+        Me.lblMinimum.Location = New System.Drawing.Point(4, 45)
         Me.lblMinimum.Name = "lblMinimum"
         Me.lblMinimum.Size = New System.Drawing.Size(51, 13)
-        Me.lblMinimum.TabIndex = 7
+        Me.lblMinimum.TabIndex = 12
         Me.lblMinimum.Text = "Minimum:"
         Me.lblMinimum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
@@ -224,10 +212,10 @@ Imports MapWinUtility
         '
         Me.lblData.AutoSize = True
         Me.lblData.BackColor = System.Drawing.Color.Transparent
-        Me.lblData.Location = New System.Drawing.Point(13, 41)
+        Me.lblData.Location = New System.Drawing.Point(12, 42)
         Me.lblData.Name = "lblData"
         Me.lblData.Size = New System.Drawing.Size(69, 13)
-        Me.lblData.TabIndex = 3
+        Me.lblData.TabIndex = 2
         Me.lblData.Text = "Data to Vary:"
         Me.lblData.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
@@ -237,81 +225,36 @@ Imports MapWinUtility
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtVaryData.Location = New System.Drawing.Point(88, 38)
         Me.txtVaryData.Name = "txtVaryData"
-        Me.txtVaryData.Size = New System.Drawing.Size(285, 20)
-        Me.txtVaryData.TabIndex = 4
-        '
-        'cboSeasons
-        '
-        Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSeasons.Enabled = False
-        Me.cboSeasons.ItemHeight = 13
-        Me.cboSeasons.Location = New System.Drawing.Point(3, 36)
-        Me.cboSeasons.MaxDropDownItems = 20
-        Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(401, 21)
-        Me.cboSeasons.TabIndex = 14
-        '
-        'lstSeasons
-        '
-        Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstSeasons.Enabled = False
-        Me.lstSeasons.IntegralHeight = False
-        Me.lstSeasons.Location = New System.Drawing.Point(3, 63)
-        Me.lstSeasons.Name = "lstSeasons"
-        Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(401, 190)
-        Me.lstSeasons.TabIndex = 15
-        '
-        'btnSeasonsAll
-        '
-        Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Enabled = False
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(3, 259)
-        Me.btnSeasonsAll.Name = "btnSeasonsAll"
-        Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
-        Me.btnSeasonsAll.TabIndex = 16
-        Me.btnSeasonsAll.Text = "All"
-        '
-        'btnSeasonsNone
-        '
-        Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Enabled = False
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(341, 259)
-        Me.btnSeasonsNone.Name = "btnSeasonsNone"
-        Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
-        Me.btnSeasonsNone.TabIndex = 17
-        Me.btnSeasonsNone.Text = "None"
+        Me.txtVaryData.Size = New System.Drawing.Size(568, 20)
+        Me.txtVaryData.TabIndex = 3
         '
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(280, 382)
+        Me.btnOk.Location = New System.Drawing.Point(563, 357)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
-        Me.btnOk.TabIndex = 19
+        Me.btnOk.TabIndex = 45
         Me.btnOk.Text = "Ok"
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(358, 382)
+        Me.btnCancel.Location = New System.Drawing.Point(641, 357)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
-        Me.btnCancel.TabIndex = 20
+        Me.btnCancel.TabIndex = 46
         Me.btnCancel.Text = "Cancel"
         '
         'lblName
         '
         Me.lblName.AutoSize = True
         Me.lblName.BackColor = System.Drawing.Color.Transparent
-        Me.lblName.Location = New System.Drawing.Point(13, 15)
+        Me.lblName.Location = New System.Drawing.Point(12, 15)
         Me.lblName.Name = "lblName"
         Me.lblName.Size = New System.Drawing.Size(65, 13)
-        Me.lblName.TabIndex = 1
+        Me.lblName.TabIndex = 0
         Me.lblName.Text = "Input Name:"
         Me.lblName.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
@@ -321,145 +264,177 @@ Imports MapWinUtility
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtName.Location = New System.Drawing.Point(88, 12)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(342, 20)
-        Me.txtName.TabIndex = 2
+        Me.txtName.Size = New System.Drawing.Size(568, 20)
+        Me.txtName.TabIndex = 1
         '
         'btnScript
         '
         Me.btnScript.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnScript.Location = New System.Drawing.Point(178, 382)
+        Me.btnScript.Location = New System.Drawing.Point(461, 357)
         Me.btnScript.Name = "btnScript"
         Me.btnScript.Size = New System.Drawing.Size(96, 24)
-        Me.btnScript.TabIndex = 18
+        Me.btnScript.TabIndex = 44
         Me.btnScript.Text = "Open Script..."
         '
         'txtVaryPET
         '
         Me.txtVaryPET.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtVaryPET.Location = New System.Drawing.Point(79, 32)
+        Me.txtVaryPET.Location = New System.Drawing.Point(276, 64)
         Me.txtVaryPET.Name = "txtVaryPET"
-        Me.txtVaryPET.Size = New System.Drawing.Size(270, 20)
+        Me.txtVaryPET.Size = New System.Drawing.Size(380, 20)
         Me.txtVaryPET.TabIndex = 6
-        '
-        'lblPET
-        '
-        Me.lblPET.AutoSize = True
-        Me.lblPET.BackColor = System.Drawing.Color.Transparent
-        Me.lblPET.Location = New System.Drawing.Point(6, 35)
-        Me.lblPET.Name = "lblPET"
-        Me.lblPET.Size = New System.Drawing.Size(67, 13)
-        Me.lblPET.TabIndex = 21
-        Me.lblPET.Text = "PET to Vary:"
-        Me.lblPET.TextAlign = System.Drawing.ContentAlignment.TopRight
-        '
-        'lblAirTemp
-        '
-        Me.lblAirTemp.AutoSize = True
-        Me.lblAirTemp.BackColor = System.Drawing.Color.Transparent
-        Me.lblAirTemp.Location = New System.Drawing.Point(6, 15)
-        Me.lblAirTemp.Name = "lblAirTemp"
-        Me.lblAirTemp.Size = New System.Drawing.Size(346, 13)
-        Me.lblAirTemp.TabIndex = 22
-        Me.lblAirTemp.Text = "If the data being varied is air temperature, PET can be computed from it:"
-        Me.lblAirTemp.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'btnViewData
         '
         Me.btnViewData.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnViewData.Location = New System.Drawing.Point(379, 38)
+        Me.btnViewData.Location = New System.Drawing.Point(662, 38)
         Me.btnViewData.Name = "btnViewData"
         Me.btnViewData.Size = New System.Drawing.Size(51, 21)
-        Me.btnViewData.TabIndex = 5
+        Me.btnViewData.TabIndex = 4
         Me.btnViewData.Text = "View"
         '
         'btnViewPET
         '
         Me.btnViewPET.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnViewPET.Location = New System.Drawing.Point(355, 32)
+        Me.btnViewPET.Location = New System.Drawing.Point(662, 64)
         Me.btnViewPET.Name = "btnViewPET"
         Me.btnViewPET.Size = New System.Drawing.Size(51, 21)
         Me.btnViewPET.TabIndex = 7
         Me.btnViewPET.Text = "View"
         '
-        'tabs
+        'chkEventGap
         '
-        Me.tabs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tabs.Controls.Add(Me.tabComputation)
-        Me.tabs.Controls.Add(Me.tabEvents)
-        Me.tabs.Controls.Add(Me.tabSeasonal)
-        Me.tabs.Controls.Add(Me.tabPET)
-        Me.tabs.Location = New System.Drawing.Point(12, 65)
-        Me.tabs.Name = "tabs"
-        Me.tabs.SelectedIndex = 0
-        Me.tabs.Size = New System.Drawing.Size(418, 311)
-        Me.tabs.TabIndex = 23
+        Me.chkEventGap.AutoSize = True
+        Me.chkEventGap.Location = New System.Drawing.Point(6, 61)
+        Me.chkEventGap.Name = "chkEventGap"
+        Me.chkEventGap.Size = New System.Drawing.Size(195, 17)
+        Me.chkEventGap.TabIndex = 28
+        Me.chkEventGap.Text = "Allow Gaps during an event of up to"
+        Me.chkEventGap.UseVisualStyleBackColor = True
         '
-        'tabComputation
+        'cboEventDurationUnits
         '
-        Me.tabComputation.Controls.Add(Me.groupMinMax)
-        Me.tabComputation.Controls.Add(Me.groupFunction)
-        Me.tabComputation.Location = New System.Drawing.Point(4, 22)
-        Me.tabComputation.Name = "tabComputation"
-        Me.tabComputation.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabComputation.Size = New System.Drawing.Size(410, 285)
-        Me.tabComputation.TabIndex = 0
-        Me.tabComputation.Text = "Computation"
-        Me.tabComputation.UseVisualStyleBackColor = True
+        Me.cboEventDurationUnits.Enabled = False
+        Me.cboEventDurationUnits.FormattingEnabled = True
+        Me.cboEventDurationUnits.Location = New System.Drawing.Point(322, 110)
+        Me.cboEventDurationUnits.Name = "cboEventDurationUnits"
+        Me.cboEventDurationUnits.Size = New System.Drawing.Size(84, 21)
+        Me.cboEventDurationUnits.TabIndex = 37
+        Me.cboEventDurationUnits.Text = "Hours"
         '
-        'groupMinMax
+        'txtEventDuration
         '
-        Me.groupMinMax.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.groupMinMax.Controls.Add(Me.radioIterative)
-        Me.groupMinMax.Controls.Add(Me.radioSingle)
-        Me.groupMinMax.Controls.Add(Me.txtMin)
-        Me.groupMinMax.Controls.Add(Me.txtIncrement)
-        Me.groupMinMax.Controls.Add(Me.txtYearStartDay)
-        Me.groupMinMax.Controls.Add(Me.txtMax)
-        Me.groupMinMax.Controls.Add(Me.cboYearStartMonth)
-        Me.groupMinMax.Controls.Add(Me.lblIncrement)
-        Me.groupMinMax.Controls.Add(Me.lblYearStart)
-        Me.groupMinMax.Controls.Add(Me.lblMaximum)
-        Me.groupMinMax.Controls.Add(Me.cboAddRemovePer)
-        Me.groupMinMax.Controls.Add(Me.lblMinimum)
-        Me.groupMinMax.Location = New System.Drawing.Point(6, 127)
-        Me.groupMinMax.Name = "groupMinMax"
-        Me.groupMinMax.Size = New System.Drawing.Size(398, 152)
-        Me.groupMinMax.TabIndex = 23
-        Me.groupMinMax.TabStop = False
+        Me.txtEventDuration.Enabled = False
+        Me.txtEventDuration.Location = New System.Drawing.Point(250, 111)
+        Me.txtEventDuration.Name = "txtEventDuration"
+        Me.txtEventDuration.Size = New System.Drawing.Size(66, 20)
+        Me.txtEventDuration.TabIndex = 36
+        Me.txtEventDuration.Text = "0"
         '
-        'radioIterative
+        'cboAboveBelowDuration
         '
-        Me.radioIterative.AutoSize = True
-        Me.radioIterative.Location = New System.Drawing.Point(12, 42)
-        Me.radioIterative.Name = "radioIterative"
-        Me.radioIterative.Size = New System.Drawing.Size(103, 17)
-        Me.radioIterative.TabIndex = 23
-        Me.radioIterative.TabStop = True
-        Me.radioIterative.Text = "Iterative Change"
-        Me.radioIterative.UseVisualStyleBackColor = True
+        Me.cboAboveBelowDuration.Enabled = False
+        Me.cboAboveBelowDuration.FormattingEnabled = True
+        Me.cboAboveBelowDuration.Items.AddRange(New Object() {"Above", "Below"})
+        Me.cboAboveBelowDuration.Location = New System.Drawing.Point(175, 111)
+        Me.cboAboveBelowDuration.Name = "cboAboveBelowDuration"
+        Me.cboAboveBelowDuration.Size = New System.Drawing.Size(69, 21)
+        Me.cboAboveBelowDuration.TabIndex = 35
         '
-        'radioSingle
+        'chkEventDuration
         '
-        Me.radioSingle.AutoSize = True
-        Me.radioSingle.Location = New System.Drawing.Point(12, 19)
-        Me.radioSingle.Name = "radioSingle"
-        Me.radioSingle.Size = New System.Drawing.Size(94, 17)
-        Me.radioSingle.TabIndex = 22
-        Me.radioSingle.TabStop = True
-        Me.radioSingle.Text = "Single Change"
-        Me.radioSingle.UseVisualStyleBackColor = True
+        Me.chkEventDuration.AutoSize = True
+        Me.chkEventDuration.Location = New System.Drawing.Point(6, 113)
+        Me.chkEventDuration.Name = "chkEventDuration"
+        Me.chkEventDuration.Size = New System.Drawing.Size(145, 17)
+        Me.chkEventDuration.TabIndex = 34
+        Me.chkEventDuration.Text = "Only events with duration"
+        Me.chkEventDuration.UseVisualStyleBackColor = True
+        '
+        'txtEventVolume
+        '
+        Me.txtEventVolume.Enabled = False
+        Me.txtEventVolume.Location = New System.Drawing.Point(250, 85)
+        Me.txtEventVolume.Name = "txtEventVolume"
+        Me.txtEventVolume.Size = New System.Drawing.Size(66, 20)
+        Me.txtEventVolume.TabIndex = 33
+        Me.txtEventVolume.Text = "0"
+        '
+        'cboAboveBelowVolume
+        '
+        Me.cboAboveBelowVolume.Enabled = False
+        Me.cboAboveBelowVolume.FormattingEnabled = True
+        Me.cboAboveBelowVolume.Items.AddRange(New Object() {"Above", "Below"})
+        Me.cboAboveBelowVolume.Location = New System.Drawing.Point(175, 85)
+        Me.cboAboveBelowVolume.Name = "cboAboveBelowVolume"
+        Me.cboAboveBelowVolume.Size = New System.Drawing.Size(69, 21)
+        Me.cboAboveBelowVolume.TabIndex = 32
+        '
+        'chkEventVolume
+        '
+        Me.chkEventVolume.AutoSize = True
+        Me.chkEventVolume.Location = New System.Drawing.Point(6, 87)
+        Me.chkEventVolume.Name = "chkEventVolume"
+        Me.chkEventVolume.Size = New System.Drawing.Size(164, 17)
+        Me.chkEventVolume.TabIndex = 31
+        Me.chkEventVolume.Text = "Only events with total volume"
+        Me.chkEventVolume.UseVisualStyleBackColor = True
+        '
+        'chkEvents
+        '
+        Me.chkEvents.AutoSize = True
+        Me.chkEvents.Location = New System.Drawing.Point(6, 10)
+        Me.chkEvents.Name = "chkEvents"
+        Me.chkEvents.Size = New System.Drawing.Size(212, 17)
+        Me.chkEvents.TabIndex = 24
+        Me.chkEvents.Text = "Vary values only in the following Events"
+        Me.chkEvents.UseVisualStyleBackColor = True
+        '
+        'cboAboveBelow
+        '
+        Me.cboAboveBelow.Enabled = False
+        Me.cboAboveBelow.FormattingEnabled = True
+        Me.cboAboveBelow.Items.AddRange(New Object() {"Above", "Below"})
+        Me.cboAboveBelow.Location = New System.Drawing.Point(175, 33)
+        Me.cboAboveBelow.Name = "cboAboveBelow"
+        Me.cboAboveBelow.Size = New System.Drawing.Size(69, 21)
+        Me.cboAboveBelow.TabIndex = 26
+        '
+        'txtEventGap
+        '
+        Me.txtEventGap.Enabled = False
+        Me.txtEventGap.Location = New System.Drawing.Point(250, 59)
+        Me.txtEventGap.Name = "txtEventGap"
+        Me.txtEventGap.Size = New System.Drawing.Size(66, 20)
+        Me.txtEventGap.TabIndex = 29
+        Me.txtEventGap.Text = "0"
+        '
+        'cboEventGapUnits
+        '
+        Me.cboEventGapUnits.Enabled = False
+        Me.cboEventGapUnits.FormattingEnabled = True
+        Me.cboEventGapUnits.Location = New System.Drawing.Point(322, 58)
+        Me.cboEventGapUnits.Name = "cboEventGapUnits"
+        Me.cboEventGapUnits.Size = New System.Drawing.Size(84, 21)
+        Me.cboEventGapUnits.TabIndex = 30
+        Me.cboEventGapUnits.Text = "Hours"
+        '
+        'txtEventThreshold
+        '
+        Me.txtEventThreshold.Enabled = False
+        Me.txtEventThreshold.Location = New System.Drawing.Point(250, 33)
+        Me.txtEventThreshold.Name = "txtEventThreshold"
+        Me.txtEventThreshold.Size = New System.Drawing.Size(66, 20)
+        Me.txtEventThreshold.TabIndex = 27
+        Me.txtEventThreshold.Text = "0"
         '
         'txtYearStartDay
         '
-        Me.txtYearStartDay.Location = New System.Drawing.Point(320, 92)
+        Me.txtYearStartDay.Location = New System.Drawing.Point(395, 42)
         Me.txtYearStartDay.Name = "txtYearStartDay"
-        Me.txtYearStartDay.Size = New System.Drawing.Size(44, 20)
-        Me.txtYearStartDay.TabIndex = 21
+        Me.txtYearStartDay.Size = New System.Drawing.Size(29, 20)
+        Me.txtYearStartDay.TabIndex = 16
         Me.txtYearStartDay.Text = "1"
         Me.txtYearStartDay.Visible = False
         '
@@ -467,10 +442,10 @@ Imports MapWinUtility
         '
         Me.cboYearStartMonth.FormattingEnabled = True
         Me.cboYearStartMonth.Items.AddRange(New Object() {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Nov", "Dec"})
-        Me.cboYearStartMonth.Location = New System.Drawing.Point(243, 92)
+        Me.cboYearStartMonth.Location = New System.Drawing.Point(318, 41)
         Me.cboYearStartMonth.Name = "cboYearStartMonth"
         Me.cboYearStartMonth.Size = New System.Drawing.Size(71, 21)
-        Me.cboYearStartMonth.TabIndex = 20
+        Me.cboYearStartMonth.TabIndex = 15
         Me.cboYearStartMonth.Visible = False
         '
         'lblYearStart
@@ -478,7 +453,7 @@ Imports MapWinUtility
         Me.lblYearStart.AutoSize = True
         Me.lblYearStart.BackColor = System.Drawing.Color.Transparent
         Me.lblYearStart.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.lblYearStart.Location = New System.Drawing.Point(175, 95)
+        Me.lblYearStart.Location = New System.Drawing.Point(250, 45)
         Me.lblYearStart.Name = "lblYearStart"
         Me.lblYearStart.Size = New System.Drawing.Size(62, 13)
         Me.lblYearStart.TabIndex = 19
@@ -490,264 +465,214 @@ Imports MapWinUtility
         '
         Me.cboAddRemovePer.FormattingEnabled = True
         Me.cboAddRemovePer.Items.AddRange(New Object() {"Entire Span", "Each Year", "Each Month", "Each Day"})
-        Me.cboAddRemovePer.Location = New System.Drawing.Point(152, 68)
+        Me.cboAddRemovePer.Location = New System.Drawing.Point(155, 41)
         Me.cboAddRemovePer.Name = "cboAddRemovePer"
         Me.cboAddRemovePer.Size = New System.Drawing.Size(89, 21)
-        Me.cboAddRemovePer.TabIndex = 18
+        Me.cboAddRemovePer.TabIndex = 14
         Me.cboAddRemovePer.Text = "Entire Span"
         Me.cboAddRemovePer.Visible = False
         '
-        'groupFunction
+        'cboFunction
         '
-        Me.groupFunction.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.groupFunction.Controls.Add(Me.radioFunctionAdd)
-        Me.groupFunction.Controls.Add(Me.radioFunctionMultiply)
-        Me.groupFunction.Controls.Add(Me.radioFunctionAddEvents)
-        Me.groupFunction.Controls.Add(Me.radioFunctionAddVolume)
-        Me.groupFunction.Location = New System.Drawing.Point(6, 6)
-        Me.groupFunction.Name = "groupFunction"
-        Me.groupFunction.Size = New System.Drawing.Size(398, 115)
-        Me.groupFunction.TabIndex = 22
-        Me.groupFunction.TabStop = False
-        Me.groupFunction.Text = "Function"
+        Me.cboFunction.FormattingEnabled = True
+        Me.cboFunction.Items.AddRange(New Object() {"Multiply Each Value by a Number", "Add a Number to Each Value", "Add/Remove Events to Reach Target Volume"})
+        Me.cboFunction.Location = New System.Drawing.Point(87, 90)
+        Me.cboFunction.Name = "cboFunction"
+        Me.cboFunction.Size = New System.Drawing.Size(356, 21)
+        Me.cboFunction.TabIndex = 9
         '
-        'radioFunctionAdd
+        'lblFunction
         '
-        Me.radioFunctionAdd.AutoSize = True
-        Me.radioFunctionAdd.Location = New System.Drawing.Point(12, 42)
-        Me.radioFunctionAdd.Name = "radioFunctionAdd"
-        Me.radioFunctionAdd.Size = New System.Drawing.Size(168, 17)
-        Me.radioFunctionAdd.TabIndex = 13
-        Me.radioFunctionAdd.Tag = "Constant to add to each value"
-        Me.radioFunctionAdd.Text = "Add a Constant to Each Value"
-        Me.radioFunctionAdd.UseVisualStyleBackColor = True
+        Me.lblFunction.AutoSize = True
+        Me.lblFunction.BackColor = System.Drawing.Color.Transparent
+        Me.lblFunction.Location = New System.Drawing.Point(12, 93)
+        Me.lblFunction.Name = "lblFunction"
+        Me.lblFunction.Size = New System.Drawing.Size(68, 13)
+        Me.lblFunction.TabIndex = 8
+        Me.lblFunction.Text = "How to Vary:"
+        Me.lblFunction.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'radioFunctionMultiply
+        'chkIterative
         '
-        Me.radioFunctionMultiply.AutoSize = True
-        Me.radioFunctionMultiply.Location = New System.Drawing.Point(12, 19)
-        Me.radioFunctionMultiply.Name = "radioFunctionMultiply"
-        Me.radioFunctionMultiply.Size = New System.Drawing.Size(186, 17)
-        Me.radioFunctionMultiply.TabIndex = 14
-        Me.radioFunctionMultiply.Tag = "Constant to multiply each value by"
-        Me.radioFunctionMultiply.Text = "Multiply Each Value by a Constant"
-        Me.radioFunctionMultiply.UseVisualStyleBackColor = True
+        Me.chkIterative.AutoSize = True
+        Me.chkIterative.Location = New System.Drawing.Point(7, 19)
+        Me.chkIterative.Name = "chkIterative"
+        Me.chkIterative.Size = New System.Drawing.Size(100, 17)
+        Me.chkIterative.TabIndex = 11
+        Me.chkIterative.Text = "Iterate changes"
+        Me.chkIterative.UseVisualStyleBackColor = True
         '
-        'radioFunctionAddEvents
+        'lblThreshold
         '
-        Me.radioFunctionAddEvents.AutoSize = True
-        Me.radioFunctionAddEvents.Location = New System.Drawing.Point(12, 65)
-        Me.radioFunctionAddEvents.Name = "radioFunctionAddEvents"
-        Me.radioFunctionAddEvents.Size = New System.Drawing.Size(244, 17)
-        Me.radioFunctionAddEvents.TabIndex = 15
-        Me.radioFunctionAddEvents.Tag = "Volume to add (negative to remove)"
-        Me.radioFunctionAddEvents.Text = "Add/Remove Events to Reach Target Volume"
-        Me.radioFunctionAddEvents.UseVisualStyleBackColor = True
-        '
-        'radioFunctionAddVolume
-        '
-        Me.radioFunctionAddVolume.AutoSize = True
-        Me.radioFunctionAddVolume.Location = New System.Drawing.Point(12, 88)
-        Me.radioFunctionAddVolume.Name = "radioFunctionAddVolume"
-        Me.radioFunctionAddVolume.Size = New System.Drawing.Size(214, 17)
-        Me.radioFunctionAddVolume.TabIndex = 16
-        Me.radioFunctionAddVolume.Tag = "Volume to add (negative to remove)"
-        Me.radioFunctionAddVolume.Text = "Multiply Values to Reach Target Volume"
-        Me.radioFunctionAddVolume.UseVisualStyleBackColor = True
-        Me.radioFunctionAddVolume.Visible = False
-        '
-        'tabEvents
-        '
-        Me.tabEvents.Controls.Add(Me.chkEventGap)
-        Me.tabEvents.Controls.Add(Me.cboEventDurationUnits)
-        Me.tabEvents.Controls.Add(Me.txtEventDuration)
-        Me.tabEvents.Controls.Add(Me.cboAboveBelowDuration)
-        Me.tabEvents.Controls.Add(Me.chkEventDuration)
-        Me.tabEvents.Controls.Add(Me.txtEventVolume)
-        Me.tabEvents.Controls.Add(Me.cboAboveBelowVolume)
-        Me.tabEvents.Controls.Add(Me.chkEventVolume)
-        Me.tabEvents.Controls.Add(Me.chkEvents)
-        Me.tabEvents.Controls.Add(Me.cboAboveBelow)
-        Me.tabEvents.Controls.Add(Me.txtEventGap)
-        Me.tabEvents.Controls.Add(Me.cboEventGapUnits)
-        Me.tabEvents.Controls.Add(Me.txtEventThreshold)
-        Me.tabEvents.Location = New System.Drawing.Point(4, 22)
-        Me.tabEvents.Name = "tabEvents"
-        Me.tabEvents.Size = New System.Drawing.Size(410, 285)
-        Me.tabEvents.TabIndex = 3
-        Me.tabEvents.Text = "Events"
-        Me.tabEvents.UseVisualStyleBackColor = True
-        '
-        'chkEventGap
-        '
-        Me.chkEventGap.AutoSize = True
-        Me.chkEventGap.Location = New System.Drawing.Point(6, 39)
-        Me.chkEventGap.Name = "chkEventGap"
-        Me.chkEventGap.Size = New System.Drawing.Size(195, 17)
-        Me.chkEventGap.TabIndex = 32
-        Me.chkEventGap.Text = "Allow Gaps during an event of up to"
-        Me.chkEventGap.UseVisualStyleBackColor = True
-        '
-        'cboEventDurationUnits
-        '
-        Me.cboEventDurationUnits.Enabled = False
-        Me.cboEventDurationUnits.FormattingEnabled = True
-        Me.cboEventDurationUnits.Location = New System.Drawing.Point(323, 89)
-        Me.cboEventDurationUnits.Name = "cboEventDurationUnits"
-        Me.cboEventDurationUnits.Size = New System.Drawing.Size(84, 21)
-        Me.cboEventDurationUnits.TabIndex = 31
-        Me.cboEventDurationUnits.Text = "Hours"
-        '
-        'txtEventDuration
-        '
-        Me.txtEventDuration.Enabled = False
-        Me.txtEventDuration.Location = New System.Drawing.Point(251, 89)
-        Me.txtEventDuration.Name = "txtEventDuration"
-        Me.txtEventDuration.Size = New System.Drawing.Size(66, 20)
-        Me.txtEventDuration.TabIndex = 30
-        Me.txtEventDuration.Text = "0"
-        '
-        'cboAboveBelowDuration
-        '
-        Me.cboAboveBelowDuration.Enabled = False
-        Me.cboAboveBelowDuration.FormattingEnabled = True
-        Me.cboAboveBelowDuration.Items.AddRange(New Object() {"Above", "Below"})
-        Me.cboAboveBelowDuration.Location = New System.Drawing.Point(176, 89)
-        Me.cboAboveBelowDuration.Name = "cboAboveBelowDuration"
-        Me.cboAboveBelowDuration.Size = New System.Drawing.Size(69, 21)
-        Me.cboAboveBelowDuration.TabIndex = 29
-        '
-        'chkEventDuration
-        '
-        Me.chkEventDuration.AutoSize = True
-        Me.chkEventDuration.Location = New System.Drawing.Point(6, 91)
-        Me.chkEventDuration.Name = "chkEventDuration"
-        Me.chkEventDuration.Size = New System.Drawing.Size(145, 17)
-        Me.chkEventDuration.TabIndex = 28
-        Me.chkEventDuration.Text = "Only events with duration"
-        Me.chkEventDuration.UseVisualStyleBackColor = True
-        '
-        'txtEventVolume
-        '
-        Me.txtEventVolume.Enabled = False
-        Me.txtEventVolume.Location = New System.Drawing.Point(251, 63)
-        Me.txtEventVolume.Name = "txtEventVolume"
-        Me.txtEventVolume.Size = New System.Drawing.Size(66, 20)
-        Me.txtEventVolume.TabIndex = 27
-        Me.txtEventVolume.Text = "0"
-        '
-        'cboAboveBelowVolume
-        '
-        Me.cboAboveBelowVolume.Enabled = False
-        Me.cboAboveBelowVolume.FormattingEnabled = True
-        Me.cboAboveBelowVolume.Items.AddRange(New Object() {"Above", "Below"})
-        Me.cboAboveBelowVolume.Location = New System.Drawing.Point(176, 62)
-        Me.cboAboveBelowVolume.Name = "cboAboveBelowVolume"
-        Me.cboAboveBelowVolume.Size = New System.Drawing.Size(69, 21)
-        Me.cboAboveBelowVolume.TabIndex = 26
-        '
-        'chkEventVolume
-        '
-        Me.chkEventVolume.AutoSize = True
-        Me.chkEventVolume.Location = New System.Drawing.Point(6, 64)
-        Me.chkEventVolume.Name = "chkEventVolume"
-        Me.chkEventVolume.Size = New System.Drawing.Size(164, 17)
-        Me.chkEventVolume.TabIndex = 25
-        Me.chkEventVolume.Text = "Only events with total volume"
-        Me.chkEventVolume.UseVisualStyleBackColor = True
-        '
-        'chkEvents
-        '
-        Me.chkEvents.AutoSize = True
-        Me.chkEvents.Location = New System.Drawing.Point(6, 13)
-        Me.chkEvents.Name = "chkEvents"
-        Me.chkEvents.Size = New System.Drawing.Size(142, 17)
-        Me.chkEvents.TabIndex = 24
-        Me.chkEvents.Text = "Only events with a value"
-        Me.chkEvents.UseVisualStyleBackColor = True
-        '
-        'cboAboveBelow
-        '
-        Me.cboAboveBelow.Enabled = False
-        Me.cboAboveBelow.FormattingEnabled = True
-        Me.cboAboveBelow.Items.AddRange(New Object() {"Above", "Below"})
-        Me.cboAboveBelow.Location = New System.Drawing.Point(176, 11)
-        Me.cboAboveBelow.Name = "cboAboveBelow"
-        Me.cboAboveBelow.Size = New System.Drawing.Size(69, 21)
-        Me.cboAboveBelow.TabIndex = 18
-        '
-        'txtEventGap
-        '
-        Me.txtEventGap.Enabled = False
-        Me.txtEventGap.Location = New System.Drawing.Point(251, 37)
-        Me.txtEventGap.Name = "txtEventGap"
-        Me.txtEventGap.Size = New System.Drawing.Size(66, 20)
-        Me.txtEventGap.TabIndex = 20
-        Me.txtEventGap.Text = "0"
-        '
-        'cboEventGapUnits
-        '
-        Me.cboEventGapUnits.Enabled = False
-        Me.cboEventGapUnits.FormattingEnabled = True
-        Me.cboEventGapUnits.Location = New System.Drawing.Point(323, 37)
-        Me.cboEventGapUnits.Name = "cboEventGapUnits"
-        Me.cboEventGapUnits.Size = New System.Drawing.Size(84, 21)
-        Me.cboEventGapUnits.TabIndex = 21
-        Me.cboEventGapUnits.Text = "Hours"
-        '
-        'txtEventThreshold
-        '
-        Me.txtEventThreshold.Enabled = False
-        Me.txtEventThreshold.Location = New System.Drawing.Point(251, 11)
-        Me.txtEventThreshold.Name = "txtEventThreshold"
-        Me.txtEventThreshold.Size = New System.Drawing.Size(66, 20)
-        Me.txtEventThreshold.TabIndex = 19
-        Me.txtEventThreshold.Text = "0"
-        '
-        'tabSeasonal
-        '
-        Me.tabSeasonal.Controls.Add(Me.chkSeasons)
-        Me.tabSeasonal.Controls.Add(Me.cboSeasons)
-        Me.tabSeasonal.Controls.Add(Me.lstSeasons)
-        Me.tabSeasonal.Controls.Add(Me.btnSeasonsNone)
-        Me.tabSeasonal.Controls.Add(Me.btnSeasonsAll)
-        Me.tabSeasonal.Location = New System.Drawing.Point(4, 22)
-        Me.tabSeasonal.Name = "tabSeasonal"
-        Me.tabSeasonal.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabSeasonal.Size = New System.Drawing.Size(410, 285)
-        Me.tabSeasonal.TabIndex = 1
-        Me.tabSeasonal.Text = "Seasonal"
-        Me.tabSeasonal.UseVisualStyleBackColor = True
+        Me.lblThreshold.AutoSize = True
+        Me.lblThreshold.BackColor = System.Drawing.Color.Transparent
+        Me.lblThreshold.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblThreshold.Location = New System.Drawing.Point(22, 36)
+        Me.lblThreshold.Name = "lblThreshold"
+        Me.lblThreshold.Size = New System.Drawing.Size(126, 13)
+        Me.lblThreshold.TabIndex = 25
+        Me.lblThreshold.Text = "Events containing values"
+        Me.lblThreshold.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'chkSeasons
         '
         Me.chkSeasons.AutoSize = True
-        Me.chkSeasons.Location = New System.Drawing.Point(6, 13)
+        Me.chkSeasons.Location = New System.Drawing.Point(6, 10)
         Me.chkSeasons.Name = "chkSeasons"
-        Me.chkSeasons.Size = New System.Drawing.Size(263, 17)
-        Me.chkSeasons.TabIndex = 25
-        Me.chkSeasons.Text = "Apply computation only to values in these seasons"
+        Me.chkSeasons.Size = New System.Drawing.Size(220, 17)
+        Me.chkSeasons.TabIndex = 39
+        Me.chkSeasons.Text = "Vary values only in the following Seasons"
         Me.chkSeasons.UseVisualStyleBackColor = True
         '
-        'tabPET
+        'cboSeasons
         '
-        Me.tabPET.Controls.Add(Me.lblAirTemp)
-        Me.tabPET.Controls.Add(Me.btnViewPET)
-        Me.tabPET.Controls.Add(Me.lblPET)
-        Me.tabPET.Controls.Add(Me.txtVaryPET)
-        Me.tabPET.Location = New System.Drawing.Point(4, 22)
-        Me.tabPET.Name = "tabPET"
-        Me.tabPET.Size = New System.Drawing.Size(410, 285)
-        Me.tabPET.TabIndex = 2
-        Me.tabPET.Text = "PET"
-        Me.tabPET.UseVisualStyleBackColor = True
+        Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboSeasons.Enabled = False
+        Me.cboSeasons.ItemHeight = 13
+        Me.cboSeasons.Location = New System.Drawing.Point(6, 33)
+        Me.cboSeasons.MaxDropDownItems = 20
+        Me.cboSeasons.Name = "cboSeasons"
+        Me.cboSeasons.Size = New System.Drawing.Size(240, 21)
+        Me.cboSeasons.TabIndex = 40
+        '
+        'lstSeasons
+        '
+        Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstSeasons.Enabled = False
+        Me.lstSeasons.IntegralHeight = False
+        Me.lstSeasons.Location = New System.Drawing.Point(6, 60)
+        Me.lstSeasons.Name = "lstSeasons"
+        Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstSeasons.Size = New System.Drawing.Size(240, 166)
+        Me.lstSeasons.TabIndex = 41
+        '
+        'btnSeasonsNone
+        '
+        Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnSeasonsNone.Enabled = False
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(183, 232)
+        Me.btnSeasonsNone.Name = "btnSeasonsNone"
+        Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
+        Me.btnSeasonsNone.TabIndex = 43
+        Me.btnSeasonsNone.Text = "None"
+        '
+        'btnSeasonsAll
+        '
+        Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnSeasonsAll.Enabled = False
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 232)
+        Me.btnSeasonsAll.Name = "btnSeasonsAll"
+        Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
+        Me.btnSeasonsAll.TabIndex = 42
+        Me.btnSeasonsAll.Text = "All"
+        '
+        'grpSeasons
+        '
+        Me.grpSeasons.Controls.Add(Me.chkSeasons)
+        Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
+        Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
+        Me.grpSeasons.Controls.Add(Me.lstSeasons)
+        Me.grpSeasons.Controls.Add(Me.cboSeasons)
+        Me.grpSeasons.Location = New System.Drawing.Point(461, 90)
+        Me.grpSeasons.Name = "grpSeasons"
+        Me.grpSeasons.Size = New System.Drawing.Size(252, 261)
+        Me.grpSeasons.TabIndex = 38
+        Me.grpSeasons.TabStop = False
+        '
+        'lblIncrement2
+        '
+        Me.lblIncrement2.AutoSize = True
+        Me.lblIncrement2.BackColor = System.Drawing.Color.Transparent
+        Me.lblIncrement2.ImageAlign = System.Drawing.ContentAlignment.BottomRight
+        Me.lblIncrement2.Location = New System.Drawing.Point(155, 71)
+        Me.lblIncrement2.Name = "lblIncrement2"
+        Me.lblIncrement2.Size = New System.Drawing.Size(230, 13)
+        Me.lblIncrement2.TabIndex = 19
+        Me.lblIncrement2.Text = "Increase this much each iteration from Minimum"
+        Me.lblIncrement2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblPET
+        '
+        Me.lblPET.AutoSize = True
+        Me.lblPET.BackColor = System.Drawing.Color.Transparent
+        Me.lblPET.Location = New System.Drawing.Point(12, 67)
+        Me.lblPET.Name = "lblPET"
+        Me.lblPET.Size = New System.Drawing.Size(257, 13)
+        Me.lblPET.TabIndex = 5
+        Me.lblPET.Text = "Compute PET (Data to Vary must be air temperature):"
+        Me.lblPET.TextAlign = System.Drawing.ContentAlignment.TopRight
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.BackColor = System.Drawing.Color.Transparent
+        Me.Label2.ImageAlign = System.Drawing.ContentAlignment.BottomRight
+        Me.Label2.Location = New System.Drawing.Point(155, 98)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(140, 13)
+        Me.Label2.TabIndex = 22
+        Me.Label2.Text = "Stop increasing at this value"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'grpMinMax
+        '
+        Me.grpMinMax.Controls.Add(Me.chkIterative)
+        Me.grpMinMax.Controls.Add(Me.Label2)
+        Me.grpMinMax.Controls.Add(Me.lblMinimum)
+        Me.grpMinMax.Controls.Add(Me.cboAddRemovePer)
+        Me.grpMinMax.Controls.Add(Me.lblIncrement2)
+        Me.grpMinMax.Controls.Add(Me.lblMaximum)
+        Me.grpMinMax.Controls.Add(Me.lblYearStart)
+        Me.grpMinMax.Controls.Add(Me.lblIncrement)
+        Me.grpMinMax.Controls.Add(Me.cboYearStartMonth)
+        Me.grpMinMax.Controls.Add(Me.txtMax)
+        Me.grpMinMax.Controls.Add(Me.txtYearStartDay)
+        Me.grpMinMax.Controls.Add(Me.txtIncrement)
+        Me.grpMinMax.Controls.Add(Me.txtMin)
+        Me.grpMinMax.Location = New System.Drawing.Point(12, 117)
+        Me.grpMinMax.Name = "grpMinMax"
+        Me.grpMinMax.Size = New System.Drawing.Size(431, 120)
+        Me.grpMinMax.TabIndex = 10
+        Me.grpMinMax.TabStop = False
+        Me.grpMinMax.Text = "Number to multiply each value by"
+        '
+        'grpEvents
+        '
+        Me.grpEvents.Controls.Add(Me.cboAboveBelow)
+        Me.grpEvents.Controls.Add(Me.txtEventThreshold)
+        Me.grpEvents.Controls.Add(Me.cboEventGapUnits)
+        Me.grpEvents.Controls.Add(Me.txtEventGap)
+        Me.grpEvents.Controls.Add(Me.chkEvents)
+        Me.grpEvents.Controls.Add(Me.chkEventVolume)
+        Me.grpEvents.Controls.Add(Me.lblThreshold)
+        Me.grpEvents.Controls.Add(Me.cboAboveBelowVolume)
+        Me.grpEvents.Controls.Add(Me.chkEventGap)
+        Me.grpEvents.Controls.Add(Me.txtEventVolume)
+        Me.grpEvents.Controls.Add(Me.cboEventDurationUnits)
+        Me.grpEvents.Controls.Add(Me.chkEventDuration)
+        Me.grpEvents.Controls.Add(Me.cboAboveBelowDuration)
+        Me.grpEvents.Controls.Add(Me.txtEventDuration)
+        Me.grpEvents.Location = New System.Drawing.Point(12, 243)
+        Me.grpEvents.Name = "grpEvents"
+        Me.grpEvents.Size = New System.Drawing.Size(431, 138)
+        Me.grpEvents.TabIndex = 23
+        Me.grpEvents.TabStop = False
         '
         'frmVariation
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(442, 418)
-        Me.Controls.Add(Me.tabs)
+        Me.ClientSize = New System.Drawing.Size(725, 393)
+        Me.Controls.Add(Me.grpEvents)
+        Me.Controls.Add(Me.grpMinMax)
+        Me.Controls.Add(Me.lblPET)
+        Me.Controls.Add(Me.grpSeasons)
+        Me.Controls.Add(Me.btnViewPET)
+        Me.Controls.Add(Me.txtVaryPET)
+        Me.Controls.Add(Me.lblFunction)
+        Me.Controls.Add(Me.cboFunction)
         Me.Controls.Add(Me.btnViewData)
         Me.Controls.Add(Me.btnScript)
         Me.Controls.Add(Me.lblName)
@@ -760,18 +685,12 @@ Imports MapWinUtility
         Me.KeyPreview = True
         Me.Name = "frmVariation"
         Me.Text = "Input"
-        Me.tabs.ResumeLayout(False)
-        Me.tabComputation.ResumeLayout(False)
-        Me.groupMinMax.ResumeLayout(False)
-        Me.groupMinMax.PerformLayout()
-        Me.groupFunction.ResumeLayout(False)
-        Me.groupFunction.PerformLayout()
-        Me.tabEvents.ResumeLayout(False)
-        Me.tabEvents.PerformLayout()
-        Me.tabSeasonal.ResumeLayout(False)
-        Me.tabSeasonal.PerformLayout()
-        Me.tabPET.ResumeLayout(False)
-        Me.tabPET.PerformLayout()
+        Me.grpSeasons.ResumeLayout(False)
+        Me.grpSeasons.PerformLayout()
+        Me.grpMinMax.ResumeLayout(False)
+        Me.grpMinMax.PerformLayout()
+        Me.grpEvents.ResumeLayout(False)
+        Me.grpEvents.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -785,7 +704,12 @@ Imports MapWinUtility
         If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
         cboSeasons.Items.Add(AllSeasons)
+
         cboEventGapUnits.Items.AddRange(atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitNames)
+        cboEventGapUnits.SelectedIndex = GetSetting("BASINS4", "CAT", "EventGapUnits", 0)
+
+        cboEventDurationUnits.Items.AddRange(atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitNames)
+        cboEventDurationUnits.SelectedIndex = GetSetting("BASINS4", "CAT", "EventDurationUnits", 0)
 
         pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
         For Each lSeasonType As Type In pSeasonsAvailable
@@ -913,6 +837,7 @@ Imports MapWinUtility
         Try
             If VariationFromForm(pVariation) Then
                 Me.DialogResult = Windows.Forms.DialogResult.OK
+                SaveSettings()
                 Me.Close()
             End If
         Catch ex As Exception
@@ -920,98 +845,111 @@ Imports MapWinUtility
         End Try
     End Sub
 
+    Private Sub SaveSettings()
+        SaveSetting("BASINS4", "CAT", "EventGapUnits", cboEventGapUnits.SelectedIndex)
+        SaveSetting("BASINS4", "CAT", "EventDurationUnits", cboEventDurationUnits.SelectedIndex)
+    End Sub
+
     Private Function VariationFromForm(ByVal aVariation As Variation) As Boolean
-        With aVariation
-
-            .Name = txtName.Text
-            If txtVaryData.Text.Equals(pClickMe) Then
-                Logger.Msg("No data was selected", "Need Data To Vary")
-                Return False
-            End If
-
-            If radioFunctionAdd.Checked Then
-                .Operation = "Add"
-            ElseIf radioFunctionMultiply.Checked Then
-                .Operation = "Multiply"
-            ElseIf radioFunctionAddEvents.Checked Then
-                .Operation = "AddEvents"
-            ElseIf radioFunctionAddVolume.Checked Then
-                .Operation = "AddVolume"
-            End If
-            .EventsPer = cboAddRemovePer.Text
-
-            .UseEvents = chkEvents.Checked
-            If .UseEvents Then
-                .EventThreshold = CDbl(txtEventThreshold.Text)
-                If cboAboveBelow.Text = "Above" Then
-                    .EventHigh = True
-                Else
-                    .EventHigh = False
+        Try
+            With aVariation
+                .Name = txtName.Text
+                If txtVaryData.Text.Equals(pClickMe) Then
+                    Logger.Msg("No data was selected", "Need Data To Vary")
+                    Return False
                 End If
-                .EventGapDisplayUnits = cboEventGapUnits.Text
-                .EventDaysGapAllowed = CDbl(txtEventGap.Text) / atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(cboEventGapUnits.SelectedIndex)
 
-                If chkEventVolume.Checked Then
-                    If cboAboveBelowVolume.Text = "Above" Then
-                        .EventVolumeHigh = True
+                Select Case cboFunction.Text
+                    Case "Multiply Each Value by a Number"
+                        .Operation = "Multiply"
+                    Case "Add a Number to Each Value"
+                        .Operation = "Add"
+                    Case "Add/Remove Events to Reach Target Volume"
+                        .Operation = "AddEvents"
+                    Case Else
+                        Logger.Msg("'" & cboFunction.Text & "'" & vbCrLf & "Not recognized for '" & lblFunction.Text & "'", "Unknown Operation")
+                        Return False
+                End Select
+
+                .AddRemovePer = cboAddRemovePer.Text
+
+                .UseEvents = chkEvents.Checked
+                If .UseEvents Then
+                    .EventThreshold = CDbl(txtEventThreshold.Text)
+                    If cboAboveBelow.Text = "Above" Then
+                        .EventHigh = True
                     Else
-                        .EventVolumeHigh = False
+                        .EventHigh = False
                     End If
-                    .EventVolumeThreshold = CDbl(txtEventVolume.Text)
-                End If
+                    .EventGapDisplayUnits = cboEventGapUnits.Text
+                    .EventDaysGapAllowed = CDbl(txtEventGap.Text) / atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(cboEventGapUnits.SelectedIndex)
 
-                If chkEventDuration.Checked Then
-                    If cboAboveBelowDuration.Text = "Above" Then
-                        .EventDurationHigh = True
-                    Else
-                        .EventDurationHigh = False
-                    End If
-                    .EventDurationDisplayUnits = cboEventDurationUnits.Text
-                    .EventDurationThreshold = CDbl(txtEventDuration.Text) / atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(cboEventDurationUnits.SelectedIndex)
-                Else
-                    .EventDurationThreshold = Double.NaN
-                End If
-            End If
-
-            .Seasons = pSeasons
-            If Not pSeasons Is Nothing Then
-                For lListIndex As Integer = 0 To lstSeasons.Items.Count - 1
-                    Dim lSeasonName As String = lstSeasons.Items(lListIndex)
-                    For Each lSeasonIndex As Integer In pSeasons.AllSeasons
-                        If pSeasons.SeasonName(lSeasonIndex) = lSeasonName Then
-                            pSeasons.SeasonSelected(lSeasonIndex) = lstSeasons.SelectedIndices.Contains(lListIndex)
-                            Exit For
+                    If chkEventVolume.Checked Then
+                        If cboAboveBelowVolume.Text = "Above" Then
+                            .EventVolumeHigh = True
+                        Else
+                            .EventVolumeHigh = False
                         End If
+                        .EventVolumeThreshold = CDbl(txtEventVolume.Text)
+                    Else
+                        .EventVolumeThreshold = pNaN
+                    End If
+
+                    If chkEventDuration.Checked Then
+                        If cboAboveBelowDuration.Text = "Above" Then
+                            .EventDurationHigh = True
+                        Else
+                            .EventDurationHigh = False
+                        End If
+                        .EventDurationDisplayUnits = cboEventDurationUnits.Text
+                        .EventDurationDays = CDbl(txtEventDuration.Text) / atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(cboEventDurationUnits.SelectedIndex)
+                    Else
+                        .EventDurationDays = pNaN
+                    End If
+                End If
+
+                .Seasons = pSeasons
+                If Not pSeasons Is Nothing Then
+                    For lListIndex As Integer = 0 To lstSeasons.Items.Count - 1
+                        Dim lSeasonName As String = lstSeasons.Items(lListIndex)
+                        For Each lSeasonIndex As Integer In pSeasons.AllSeasons
+                            If pSeasons.SeasonName(lSeasonIndex) = lSeasonName Then
+                                pSeasons.SeasonSelected(lSeasonIndex) = lstSeasons.SelectedIndices.Contains(lListIndex)
+                                Exit For
+                            End If
+                        Next
                     Next
-                Next
-            End If
+                End If
 
-            Try
-                .Min = CDbl(txtMin.Text)
-            Catch
-                Logger.Msg("Minimum value must be a number", "Non-numeric value")
-                Return False
-            End Try
-
-            If radioIterative.Checked Then
                 Try
-                    .Max = CDbl(txtMax.Text)
+                    .Min = CDbl(txtMin.Text)
                 Catch
-                    Logger.Msg("Maximum value must be a number", "Non-numeric value")
+                    Logger.Msg("Minimum value must be a number", "Non-numeric value")
                     Return False
                 End Try
-                Try
-                    .Increment = CDbl(txtIncrement.Text)
-                Catch
-                    Logger.Msg("Increment must be a number", "Non-numeric value")
-                    Return False
-                End Try
-            Else
-                .Max = .Min
-                .Increment = 0
-            End If
 
-        End With
+                If chkIterative.Checked Then
+                    Try
+                        .Max = CDbl(txtMax.Text)
+                    Catch
+                        Logger.Msg("Maximum value must be a number", "Non-numeric value")
+                        Return False
+                    End Try
+                    Try
+                        .Increment = CDbl(txtIncrement.Text)
+                    Catch
+                        Logger.Msg("Increment must be a number", "Non-numeric value")
+                        Return False
+                    End Try
+                Else
+                    .Max = .Min
+                    .Increment = 0
+                End If
+            End With
+        Catch e As Exception
+            Logger.Msg(e.Message, "Cannot create variation")
+            Return False
+        End Try
         Return True
     End Function
 
@@ -1051,49 +989,66 @@ Imports MapWinUtility
 
     Private Sub FormFromVariation()
         With pVariation
-            If .Max > .Min Then
-                radioIterative.Checked = True
-            Else
-                radioSingle.Checked = True
-            End If
             txtName.Text = .Name
-            Select Case .Operation
-                Case "Add" : radioFunctionAdd.Checked = True
-                Case "Multiply" : radioFunctionMultiply.Checked = True
-                Case "AddEvents" : radioFunctionAddEvents.Checked = True
-                Case "AddVolume" : radioFunctionAddVolume.Checked = True
-            End Select
-            If Not Double.IsNaN(.Min) Then txtMin.Text = .Min
-            If Not Double.IsNaN(.Max) Then txtMax.Text = .Max
-            If Not Double.IsNaN(.Increment) Then txtIncrement.Text = .Increment
             UpdateDataText(txtVaryData, pVariation.DataSets)
             UpdateDataText(txtVaryPET, pVariation.PETdata)
 
-            cboAddRemovePer.Text = .EventsPer
+            Select Case .Operation
+                Case "Multiply" : cboFunction.SelectedIndex = 0
+                Case "Add" : cboFunction.SelectedIndex = 1
+                Case "AddEvents" : cboFunction.SelectedIndex = 2
+                Case "AddVolume" : cboFunction.SelectedIndex = 3
+            End Select
 
-            chkEvents.Checked = .UseEvents
+            EnableIterative(.Max > .Min)
+            If Not Double.IsNaN(.Min) Then txtMin.Text = .Min
+            If Not Double.IsNaN(.Max) Then txtMax.Text = .Max
+            If Not Double.IsNaN(.Increment) Then txtIncrement.Text = .Increment
+            cboAddRemovePer.Text = .AddRemovePer
+
             EnableEvents(.UseEvents)
+
+            If .EventHigh Then
+                cboAboveBelow.SelectedIndex = 0
+            Else
+                cboAboveBelow.SelectedIndex = 1
+            End If
+
+            If .EventVolumeHigh Then
+                cboAboveBelowVolume.SelectedIndex = 0
+            Else
+                cboAboveBelowVolume.SelectedIndex = 1
+            End If
+
+            If .EventDurationHigh Then
+                cboAboveBelowDuration.SelectedIndex = 0
+            Else
+                cboAboveBelowDuration.SelectedIndex = 1
+            End If
+
             If .UseEvents Then
-                If .EventHigh Then
-                    cboAboveBelow.SelectedIndex = 0
-                Else
-                    cboAboveBelow.SelectedIndex = 1
-                End If
                 txtEventThreshold.Text = .EventThreshold
 
                 Dim lGapUnitIndex As Integer = Array.IndexOf(atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitNames, .EventGapDisplayUnits)
                 If lGapUnitIndex >= 0 Then
+                    chkEventGap.Checked = True
                     cboEventGapUnits.Text = .EventGapDisplayUnits
                     txtEventGap.Text = .EventDaysGapAllowed * atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(lGapUnitIndex)
+                Else
+                    chkEventGap.Checked = False
                 End If
             Else
-                chkEvents.Checked = False
+                cboAboveBelow.SelectedIndex = 0
+                cboAboveBelowDuration.SelectedIndex = 0
+                cboAboveBelowVolume.SelectedIndex = 0
             End If
 
             If .Seasons Is Nothing Then
                 cboSeasons.SelectedIndex = 0
+                EnableSeasons(False)
             Else
                 pSettingFormSeason = True
+                EnableSeasons(True)
                 cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
                 pSeasons = .Seasons
                 RefreshSeasonsList()
@@ -1132,6 +1087,10 @@ Imports MapWinUtility
         End Try
     End Sub
 
+    Private Sub chkIterative_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkIterative.CheckedChanged
+        EnableIterative(chkIterative.Checked)
+    End Sub
+
     Private Sub chkEvents_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkEvents.CheckedChanged
         EnableEvents(chkEvents.Checked)
     End Sub
@@ -1140,8 +1099,32 @@ Imports MapWinUtility
         EnableSeasons(chkSeasons.Checked)
     End Sub
 
+    Private Sub EnableIterative(ByVal aEnable As Boolean)
+
+        If chkIterative.Checked <> aEnable Then chkIterative.Checked = aEnable
+
+        If aEnable Then
+            lblMinimum.Text = "Minimum"
+            grpMinMax.Height = 120
+        Else
+            lblMinimum.Text = "Value"
+            grpMinMax.Height = 68
+        End If
+        lblMaximum.Visible = aEnable
+        txtMax.Visible = aEnable
+        lblIncrement.Visible = aEnable
+        txtIncrement.Visible = aEnable
+    End Sub
+
     Private Sub EnableEvents(ByVal aEnable As Boolean)
 
+        If chkEvents.Checked <> aEnable Then chkEvents.Checked = aEnable
+
+        If aEnable Then
+            grpEvents.Height = 138
+        Else
+            grpEvents.Height = 33
+        End If
         chkEventGap.Enabled = aEnable
         chkEventVolume.Enabled = aEnable
         chkEventDuration.Enabled = aEnable
@@ -1153,36 +1136,24 @@ Imports MapWinUtility
         txtEventThreshold.Enabled = aEnable
         txtEventGap.Enabled = aEnable
         txtEventVolume.Enabled = aEnable
+        txtEventDuration.Enabled = aEnable
 
         cboEventGapUnits.Enabled = aEnable
         cboEventDurationUnits.Enabled = aEnable
     End Sub
 
     Private Sub EnableSeasons(ByVal aEnable As Boolean)
-        cboSeasons.Enabled = aEnable
-        lstSeasons.Enabled = aEnable
-        btnSeasonsAll.Enabled = aEnable
-        btnSeasonsNone.Enabled = aEnable
-    End Sub
 
-    Private Sub radioFunction_CheckedChanged(ByVal sender As System.Object, _
-                                             ByVal e As System.EventArgs) Handles _
-                                            radioFunctionAdd.CheckedChanged, _
-                                            radioFunctionMultiply.CheckedChanged, _
-                                            radioFunctionAddEvents.CheckedChanged, _
-                                            radioFunctionAddVolume.CheckedChanged
-        Dim lChk As Windows.Forms.RadioButton = sender
-        If lChk.Checked Then
-            groupMinMax.Text = lChk.Tag
-            If lChk.Text.IndexOf("Volume") >= 0 Then
-                cboAddRemovePer.Visible = True
-                If cboAddRemovePer.SelectedIndex < 0 Then
-                    cboAddRemovePer.SelectedIndex = 0
-                End If
-            Else
-                cboAddRemovePer.Visible = False
-            End If
-            ShowYearStart()
+        If chkSeasons.Checked <> aEnable Then chkSeasons.Checked = aEnable
+
+        cboSeasons.Visible = aEnable
+        lstSeasons.Visible = aEnable
+        btnSeasonsAll.Visible = aEnable
+        btnSeasonsNone.Visible = aEnable
+        If aEnable Then
+            grpSeasons.Height = 261
+        Else
+            grpSeasons.Height = 34
         End If
     End Sub
 
@@ -1200,17 +1171,35 @@ Imports MapWinUtility
         txtYearStartDay.Visible = lVisible
     End Sub
 
-    Private Sub SingleOrIterative(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioSingle.CheckedChanged, radioIterative.CheckedChanged
-        Dim lMultiple As Boolean = radioIterative.Checked
-        If lMultiple Then
-            lblMinimum.Text = "Minimum"
-        Else
-            lblMinimum.Text = "Value"
-        End If
-        lblMaximum.Visible = lMultiple
-        txtMax.Visible = lMultiple
-        lblIncrement.Visible = lMultiple
-        txtIncrement.Visible = lMultiple
+    Private Sub cboFunction_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboFunction.SelectedIndexChanged
+        FunctionChanged()
     End Sub
 
+    Private Sub FunctionChanged()
+        Select Case cboFunction.Text
+            Case "Multiply Each Value by a Number"
+                grpMinMax.Text = "Number to multiply each value by"
+            Case "Add a Number to Each Value"
+                grpMinMax.Text = "Number to add to each value"
+            Case "Add/Remove Events to Reach Target Volume"
+                grpMinMax.Text = "Volume to add (negative to remove)"
+        End Select
+
+        If cboFunction.Text.IndexOf("Volume") >= 0 Then
+            cboAddRemovePer.Visible = True
+            If cboAddRemovePer.SelectedIndex < 0 Then
+                cboAddRemovePer.SelectedIndex = 0
+            End If
+        Else
+            cboAddRemovePer.Visible = False
+        End If
+        ShowYearStart()
+    End Sub
+
+    Private Sub chkEventGap_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkEventGap.CheckedChanged
+        If chkEventGap.Checked Then
+        Else
+            txtEventGap.Text = "0"
+        End If
+    End Sub
 End Class
