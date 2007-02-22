@@ -315,7 +315,7 @@ Imports MapWinUtility
         '
         'cboEventDurationUnits
         '
-        Me.cboEventDurationUnits.Enabled = False
+        Me.cboEventDurationUnits.Enabled = True
         Me.cboEventDurationUnits.FormattingEnabled = True
         Me.cboEventDurationUnits.Location = New System.Drawing.Point(322, 110)
         Me.cboEventDurationUnits.Name = "cboEventDurationUnits"
@@ -325,7 +325,7 @@ Imports MapWinUtility
         '
         'txtEventDuration
         '
-        Me.txtEventDuration.Enabled = False
+        Me.txtEventDuration.Enabled = True
         Me.txtEventDuration.Location = New System.Drawing.Point(250, 111)
         Me.txtEventDuration.Name = "txtEventDuration"
         Me.txtEventDuration.Size = New System.Drawing.Size(66, 20)
@@ -334,7 +334,7 @@ Imports MapWinUtility
         '
         'cboAboveBelowDuration
         '
-        Me.cboAboveBelowDuration.Enabled = False
+        Me.cboAboveBelowDuration.Enabled = True
         Me.cboAboveBelowDuration.FormattingEnabled = True
         Me.cboAboveBelowDuration.Items.AddRange(New Object() {"Above", "Below"})
         Me.cboAboveBelowDuration.Location = New System.Drawing.Point(175, 111)
@@ -354,7 +354,7 @@ Imports MapWinUtility
         '
         'txtEventVolume
         '
-        Me.txtEventVolume.Enabled = False
+        Me.txtEventVolume.Enabled = True
         Me.txtEventVolume.Location = New System.Drawing.Point(250, 85)
         Me.txtEventVolume.Name = "txtEventVolume"
         Me.txtEventVolume.Size = New System.Drawing.Size(66, 20)
@@ -363,7 +363,7 @@ Imports MapWinUtility
         '
         'cboAboveBelowVolume
         '
-        Me.cboAboveBelowVolume.Enabled = False
+        Me.cboAboveBelowVolume.Enabled = True
         Me.cboAboveBelowVolume.FormattingEnabled = True
         Me.cboAboveBelowVolume.Items.AddRange(New Object() {"Above", "Below"})
         Me.cboAboveBelowVolume.Location = New System.Drawing.Point(175, 85)
@@ -393,7 +393,7 @@ Imports MapWinUtility
         '
         'cboAboveBelow
         '
-        Me.cboAboveBelow.Enabled = False
+        Me.cboAboveBelow.Enabled = True
         Me.cboAboveBelow.FormattingEnabled = True
         Me.cboAboveBelow.Items.AddRange(New Object() {"Above", "Below"})
         Me.cboAboveBelow.Location = New System.Drawing.Point(175, 33)
@@ -403,7 +403,7 @@ Imports MapWinUtility
         '
         'txtEventGap
         '
-        Me.txtEventGap.Enabled = False
+        Me.txtEventGap.Enabled = True
         Me.txtEventGap.Location = New System.Drawing.Point(250, 59)
         Me.txtEventGap.Name = "txtEventGap"
         Me.txtEventGap.Size = New System.Drawing.Size(66, 20)
@@ -412,7 +412,7 @@ Imports MapWinUtility
         '
         'cboEventGapUnits
         '
-        Me.cboEventGapUnits.Enabled = False
+        Me.cboEventGapUnits.Enabled = True
         Me.cboEventGapUnits.FormattingEnabled = True
         Me.cboEventGapUnits.Location = New System.Drawing.Point(322, 58)
         Me.cboEventGapUnits.Name = "cboEventGapUnits"
@@ -422,7 +422,7 @@ Imports MapWinUtility
         '
         'txtEventThreshold
         '
-        Me.txtEventThreshold.Enabled = False
+        Me.txtEventThreshold.Enabled = True
         Me.txtEventThreshold.Location = New System.Drawing.Point(250, 33)
         Me.txtEventThreshold.Name = "txtEventThreshold"
         Me.txtEventThreshold.Size = New System.Drawing.Size(66, 20)
@@ -528,7 +528,6 @@ Imports MapWinUtility
         '
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.cboSeasons.Enabled = False
         Me.cboSeasons.ItemHeight = 13
         Me.cboSeasons.Location = New System.Drawing.Point(6, 33)
         Me.cboSeasons.MaxDropDownItems = 20
@@ -541,7 +540,6 @@ Imports MapWinUtility
         Me.lstSeasons.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstSeasons.Enabled = False
         Me.lstSeasons.IntegralHeight = False
         Me.lstSeasons.Location = New System.Drawing.Point(6, 60)
         Me.lstSeasons.Name = "lstSeasons"
@@ -552,7 +550,6 @@ Imports MapWinUtility
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Enabled = False
         Me.btnSeasonsNone.Location = New System.Drawing.Point(183, 232)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
         Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
@@ -562,7 +559,6 @@ Imports MapWinUtility
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Enabled = False
         Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 232)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
         Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
@@ -1105,10 +1101,10 @@ Imports MapWinUtility
 
         If aEnable Then
             lblMinimum.Text = "Minimum"
-            grpMinMax.Height = 120
+            'grpMinMax.Height = 120
         Else
             lblMinimum.Text = "Value"
-            grpMinMax.Height = 68
+            'grpMinMax.Height = 68
         End If
         lblMaximum.Visible = aEnable
         txtMax.Visible = aEnable
@@ -1121,25 +1117,25 @@ Imports MapWinUtility
         If chkEvents.Checked <> aEnable Then chkEvents.Checked = aEnable
 
         If aEnable Then
-            grpEvents.Height = 138
+            'grpEvents.Height = 138
         Else
-            grpEvents.Height = 33
+            'grpEvents.Height = 33
         End If
-        chkEventGap.Enabled = aEnable
-        chkEventVolume.Enabled = aEnable
-        chkEventDuration.Enabled = aEnable
+        chkEventGap.Visible = aEnable
+        chkEventVolume.Visible = aEnable
+        chkEventDuration.Visible = aEnable
 
-        cboAboveBelow.Enabled = aEnable
-        cboAboveBelowVolume.Enabled = aEnable
-        cboAboveBelowDuration.Enabled = aEnable
+        cboAboveBelow.Visible = aEnable
+        cboAboveBelowVolume.Visible = aEnable
+        cboAboveBelowDuration.Visible = aEnable
 
-        txtEventThreshold.Enabled = aEnable
-        txtEventGap.Enabled = aEnable
-        txtEventVolume.Enabled = aEnable
-        txtEventDuration.Enabled = aEnable
+        txtEventThreshold.Visible = aEnable
+        txtEventGap.Visible = aEnable
+        txtEventVolume.Visible = aEnable
+        txtEventDuration.Visible = aEnable
 
-        cboEventGapUnits.Enabled = aEnable
-        cboEventDurationUnits.Enabled = aEnable
+        cboEventGapUnits.Visible = aEnable
+        cboEventDurationUnits.Visible = aEnable
     End Sub
 
     Private Sub EnableSeasons(ByVal aEnable As Boolean)
@@ -1151,9 +1147,9 @@ Imports MapWinUtility
         btnSeasonsAll.Visible = aEnable
         btnSeasonsNone.Visible = aEnable
         If aEnable Then
-            grpSeasons.Height = 261
+            'grpSeasons.Height = 261
         Else
-            grpSeasons.Height = 34
+            'grpSeasons.Height = 34
         End If
     End Sub
 

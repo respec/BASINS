@@ -383,7 +383,7 @@ Public Class frmEndpoint
         '
         Me.txtOperation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOperation.Enabled = False
+        Me.txtOperation.Enabled = True
         Me.txtOperation.Location = New System.Drawing.Point(89, 6)
         Me.txtOperation.Name = "txtOperation"
         Me.txtOperation.Size = New System.Drawing.Size(243, 20)
