@@ -7,6 +7,7 @@ Public Class atcSeasonBase
     Private pAllSeasons As Integer() = {}
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private pSeasonsSelected As New BitArray(0)
+    Private Shared pNaN As Double = atcUtility.GetNaN
 
     Public ReadOnly Property Name() As String
         Get
@@ -70,7 +71,7 @@ Public Class atcSeasonBase
                 End If
                 If lPrevSeasonIndex <> lSeasonIndex Then
                     'Insert dummy value for start of interval after skipping dates outside season
-                    lNewTS.Values(lNewTSvalueIndex) = Double.NaN
+                    lNewTS.Values(lNewTSvalueIndex) = pNaN
                     lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue - 1)
                     lNewTS.ValueAttributes(lNewTSvalueIndex).SetValue("Inserted", True)
                     lNewTSvalueIndex += 1
@@ -147,7 +148,7 @@ Public Class atcSeasonBase
                 End If
                 If lNewTSvalueIndex = 0 OrElse lIsInside <> lWasInside Then
                     'Insert NaN at zero position and at start of interval after dates in other season
-                    lNewTS.Values(lNewTSvalueIndex) = Double.NaN
+                    lNewTS.Values(lNewTSvalueIndex) = pNaN
                     lNewTS.Dates.Value(lNewTSvalueIndex) = aTS.Dates.Value(iValue - 1)
                     lNewTS.ValueAttributes(lNewTSvalueIndex).SetValue("Inserted", True)
                     lNewTSvalueIndex += 1
@@ -301,5 +302,4 @@ Public Class atcSeasonBase
         'Skip first part of Name which is "Timeseries::Seasonal - "
         Return Name.Substring(23) & lString
     End Function
-
 End Class
