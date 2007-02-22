@@ -46,7 +46,7 @@ Imports MapWinUtility
     Friend WithEvents grpSeasons As System.Windows.Forms.GroupBox
     Friend WithEvents lblIncrement2 As System.Windows.Forms.Label
     Friend WithEvents lblPET As System.Windows.Forms.Label
-    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents lblMaximum2 As System.Windows.Forms.Label
     Friend WithEvents grpMinMax As System.Windows.Forms.GroupBox
     Friend WithEvents grpEvents As System.Windows.Forms.GroupBox
 
@@ -140,7 +140,7 @@ Imports MapWinUtility
         Me.grpSeasons = New System.Windows.Forms.GroupBox
         Me.lblIncrement2 = New System.Windows.Forms.Label
         Me.lblPET = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
+        Me.lblMaximum2 = New System.Windows.Forms.Label
         Me.grpMinMax = New System.Windows.Forms.GroupBox
         Me.grpEvents = New System.Windows.Forms.GroupBox
         Me.grpSeasons.SuspendLayout()
@@ -315,7 +315,6 @@ Imports MapWinUtility
         '
         'cboEventDurationUnits
         '
-        Me.cboEventDurationUnits.Enabled = True
         Me.cboEventDurationUnits.FormattingEnabled = True
         Me.cboEventDurationUnits.Location = New System.Drawing.Point(322, 110)
         Me.cboEventDurationUnits.Name = "cboEventDurationUnits"
@@ -325,7 +324,6 @@ Imports MapWinUtility
         '
         'txtEventDuration
         '
-        Me.txtEventDuration.Enabled = True
         Me.txtEventDuration.Location = New System.Drawing.Point(250, 111)
         Me.txtEventDuration.Name = "txtEventDuration"
         Me.txtEventDuration.Size = New System.Drawing.Size(66, 20)
@@ -334,7 +332,6 @@ Imports MapWinUtility
         '
         'cboAboveBelowDuration
         '
-        Me.cboAboveBelowDuration.Enabled = True
         Me.cboAboveBelowDuration.FormattingEnabled = True
         Me.cboAboveBelowDuration.Items.AddRange(New Object() {"Above", "Below"})
         Me.cboAboveBelowDuration.Location = New System.Drawing.Point(175, 111)
@@ -354,7 +351,6 @@ Imports MapWinUtility
         '
         'txtEventVolume
         '
-        Me.txtEventVolume.Enabled = True
         Me.txtEventVolume.Location = New System.Drawing.Point(250, 85)
         Me.txtEventVolume.Name = "txtEventVolume"
         Me.txtEventVolume.Size = New System.Drawing.Size(66, 20)
@@ -363,7 +359,6 @@ Imports MapWinUtility
         '
         'cboAboveBelowVolume
         '
-        Me.cboAboveBelowVolume.Enabled = True
         Me.cboAboveBelowVolume.FormattingEnabled = True
         Me.cboAboveBelowVolume.Items.AddRange(New Object() {"Above", "Below"})
         Me.cboAboveBelowVolume.Location = New System.Drawing.Point(175, 85)
@@ -393,7 +388,6 @@ Imports MapWinUtility
         '
         'cboAboveBelow
         '
-        Me.cboAboveBelow.Enabled = True
         Me.cboAboveBelow.FormattingEnabled = True
         Me.cboAboveBelow.Items.AddRange(New Object() {"Above", "Below"})
         Me.cboAboveBelow.Location = New System.Drawing.Point(175, 33)
@@ -403,7 +397,6 @@ Imports MapWinUtility
         '
         'txtEventGap
         '
-        Me.txtEventGap.Enabled = True
         Me.txtEventGap.Location = New System.Drawing.Point(250, 59)
         Me.txtEventGap.Name = "txtEventGap"
         Me.txtEventGap.Size = New System.Drawing.Size(66, 20)
@@ -412,7 +405,6 @@ Imports MapWinUtility
         '
         'cboEventGapUnits
         '
-        Me.cboEventGapUnits.Enabled = True
         Me.cboEventGapUnits.FormattingEnabled = True
         Me.cboEventGapUnits.Location = New System.Drawing.Point(322, 58)
         Me.cboEventGapUnits.Name = "cboEventGapUnits"
@@ -422,7 +414,6 @@ Imports MapWinUtility
         '
         'txtEventThreshold
         '
-        Me.txtEventThreshold.Enabled = True
         Me.txtEventThreshold.Location = New System.Drawing.Point(250, 33)
         Me.txtEventThreshold.Name = "txtEventThreshold"
         Me.txtEventThreshold.Size = New System.Drawing.Size(66, 20)
@@ -601,22 +592,22 @@ Imports MapWinUtility
         Me.lblPET.Text = "Compute PET (Data to Vary must be air temperature):"
         Me.lblPET.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
-        'Label2
+        'lblMaximum2
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.BackColor = System.Drawing.Color.Transparent
-        Me.Label2.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.Label2.Location = New System.Drawing.Point(155, 98)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(140, 13)
-        Me.Label2.TabIndex = 22
-        Me.Label2.Text = "Stop increasing at this value"
-        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblMaximum2.AutoSize = True
+        Me.lblMaximum2.BackColor = System.Drawing.Color.Transparent
+        Me.lblMaximum2.ImageAlign = System.Drawing.ContentAlignment.BottomRight
+        Me.lblMaximum2.Location = New System.Drawing.Point(155, 98)
+        Me.lblMaximum2.Name = "lblMaximum2"
+        Me.lblMaximum2.Size = New System.Drawing.Size(214, 13)
+        Me.lblMaximum2.TabIndex = 22
+        Me.lblMaximum2.Text = "Finish increasing when this value is reached"
+        Me.lblMaximum2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'grpMinMax
         '
         Me.grpMinMax.Controls.Add(Me.chkIterative)
-        Me.grpMinMax.Controls.Add(Me.Label2)
+        Me.grpMinMax.Controls.Add(Me.lblMaximum2)
         Me.grpMinMax.Controls.Add(Me.lblMinimum)
         Me.grpMinMax.Controls.Add(Me.cboAddRemovePer)
         Me.grpMinMax.Controls.Add(Me.lblIncrement2)
@@ -1107,20 +1098,23 @@ Imports MapWinUtility
             'grpMinMax.Height = 68
         End If
         lblMaximum.Visible = aEnable
+        lblMaximum2.Visible = aEnable
         txtMax.Visible = aEnable
         lblIncrement.Visible = aEnable
+        lblIncrement2.Visible = aEnable
         txtIncrement.Visible = aEnable
+
     End Sub
 
     Private Sub EnableEvents(ByVal aEnable As Boolean)
 
         If chkEvents.Checked <> aEnable Then chkEvents.Checked = aEnable
 
-        If aEnable Then
-            'grpEvents.Height = 138
-        Else
-            'grpEvents.Height = 33
-        End If
+        'If aEnable Then
+        '    grpEvents.Height = 138
+        'Else
+        '    grpEvents.Height = 33
+        'End If
         chkEventGap.Visible = aEnable
         chkEventVolume.Visible = aEnable
         chkEventDuration.Visible = aEnable
@@ -1129,6 +1123,7 @@ Imports MapWinUtility
         cboAboveBelowVolume.Visible = aEnable
         cboAboveBelowDuration.Visible = aEnable
 
+        lblThreshold.Visible = aEnable
         txtEventThreshold.Visible = aEnable
         txtEventGap.Visible = aEnable
         txtEventVolume.Visible = aEnable
@@ -1146,11 +1141,11 @@ Imports MapWinUtility
         lstSeasons.Visible = aEnable
         btnSeasonsAll.Visible = aEnable
         btnSeasonsNone.Visible = aEnable
-        If aEnable Then
-            'grpSeasons.Height = 261
-        Else
-            'grpSeasons.Height = 34
-        End If
+        'If aEnable Then
+        '    grpSeasons.Height = 261
+        'Else
+        '    grpSeasons.Height = 34
+        'End If
     End Sub
 
     Private Sub cboAddRemovePer_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboAddRemovePer.SelectedIndexChanged
