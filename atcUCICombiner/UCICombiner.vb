@@ -5,7 +5,7 @@ Imports atcWDM
 Imports System.Collections.Specialized
 
 Public Module UCICombiner
-    Private pBaseDrive As String = "d:\"
+    Private pBaseDrive As String = "c:\"
     Private pBaseDir As String = pBaseDrive & "cbp_working\"
     Private pWorkingDir As String = pBaseDir & "output\"  '= "subset\"
     Private pOutputDir As String = pWorkingDir & "combined\"
@@ -812,4 +812,34 @@ Public Module UCICombiner
             Logger.Msg("BuildOutputException" & vbCrLf & lEx.ToString)
         End Try
     End Function
+
+    Public Sub WDMCombinerMain()
+        'copy datasets from source wdm to target wdm according to csv file
+        Dim lWDMTable As New atcTableDelimited
+        If Not lWDMTable.OpenFile(pOutputDir & "wdmupdates.csv") Then
+            Logger.Dbg("Could not open wdmupdates.csv")
+        End If
+        Dim lFromWDM As String
+        Dim lFromDSN As Integer
+        Dim lToWDM As String
+        Dim lToDSN As Integer
+        Dim lScen As String
+        Dim lLoc As String
+        lWDMTable.CurrentRecord = 1
+        Do Until lWDMTable.atEOF
+            lWDMTable.MoveNext()
+            lFromWDM = lWDMTable.Value(1)
+            lFromDSN = lWDMTable.Value(2)
+            lToWDM = lWDMTable.Value(3)
+            lToDSN = lWDMTable.Value(4)
+            lScen = lWDMTable.Value(5)
+            lLoc = lWDMTable.Value(6)
+
+            CopyDataSet("wdm", pBaseDir & "wdm\" & lFromWDM, lFromDSN, _
+                        "wdm", pOutputDir & lToWDM, lToDSN)
+
+            SetWDMAttribute(lToWDM, lToDSN, "idscen", lScen)
+            SetWDMAttribute(lToWDM, lToDSN, "idlocn", lLoc)
+        Loop
+    End Sub
 End Module
