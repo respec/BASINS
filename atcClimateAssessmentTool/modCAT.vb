@@ -70,6 +70,7 @@ Public Module modCAT
     Public Function ScenarioRun(ByVal aBaseFilename As String, _
                            ByVal aNewScenarioName As String, _
                            ByVal aModifiedData As atcDataGroup, _
+                           ByVal aPreparedInput As String, _
                            ByVal aShowProgress As Boolean) As atcCollection 'of atcDataSource
         'Copy base UCI and change scenario name within it
         'Copy WDM
@@ -78,8 +79,9 @@ Public Module modCAT
         'Run WinHSPFlt with the new UCI
 
         Dim lModified As New atcCollection
-
         Dim lCurrentTimeseries As atcTimeseries
+
+        If aModifiedData Is Nothing Then aModifiedData = New atcDataGroup
 
         If FileExists(aBaseFilename) Then
             Dim lNewBaseFilename As String = AbsolutePath(aBaseFilename, CurDir)
@@ -94,7 +96,9 @@ Public Module modCAT
 
                 For Each lWDMfilename As String In lWDMFilenames
                     lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
-
+                    If FilenameNoPath(lWDMfilename).ToLower = FilenameNoPath(aPreparedInput).ToLower Then
+                        lWDMfilename = aPreparedInput
+                    End If
                     'Copy each base WDM to new WDM
                     Dim lNewWDMfilename As String = lNewFolder & aNewScenarioName & "." & IO.Path.GetFileName(lWDMfilename)
                     FileCopy(lWDMfilename, lNewWDMfilename)

@@ -605,4 +605,12 @@ Public Class Variation
     Public Sub New()
         Clear()
     End Sub
+
+    Protected Overrides Sub Finalize()
+        If Not pDataSets Is Nothing Then pDataSets.Clear()
+        If Not PETdata Is Nothing Then PETdata.Clear()
+        pComputationSource = Nothing
+        Seasons = Nothing
+        MyBase.Finalize()
+    End Sub
 End Class
