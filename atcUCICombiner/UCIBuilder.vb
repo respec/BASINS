@@ -31,6 +31,11 @@ Public Module UCIBuilder
             Logger.Dbg("Could not open streams.csv")
         End If
 
+        Dim lMetTable As New atcTableDelimited
+        If Not lMetTable.OpenFile(pDataDir & "met4model.csv") Then
+            Logger.Dbg("Could not open met4model.csv")
+        End If
+
         Dim lAreaTable As New atcTableDelimited
         Dim lUcibase As String
         Dim lProjectbase As String
@@ -53,8 +58,10 @@ Public Module UCIBuilder
 
             'loop thru each subbasin
             lAreaTable.CurrentRecord = 1
+            lMetTable.CurrentRecord = 1
             Do Until lAreaTable.atEOF
                 lAreaTable.MoveNext()
+                lMetTable.MoveNext()
                 lProjectbase = lAreaTable.Value(1)
                 If Not lProjectNames.Contains(lProjectbase) Then
                     lProjectNames.Add(lProjectbase, lProjectbase)
@@ -153,6 +160,46 @@ Public Module UCIBuilder
                         Next
                     Next
                 Next i
+
+                'update met data
+                Dim lEtMfact As Double = lMetTable.Value(3)
+                Dim lPrecMfact As Double = lMetTable.Value(4)
+                Dim lPrecDsn As Integer = lMetTable.Value(7)
+                Dim lMetSeg As atcUCI.HspfMetSeg = lUci.MetSegs(1)
+
+                lMetSeg.MetSegRecs(1).Source.VolId = lPrecDsn
+                lMetSeg.MetSegRecs(1).MFactP = lPrecMfact
+                lMetSeg.MetSegRecs(1).MFactR = lPrecMfact
+                lMetSeg.MetSegRecs(7).MFactP = lEtMfact
+                lMetSeg.MetSegRecs(8).MFactR = lEtMfact
+
+                If lProjectbase = "PENINSUL" Then
+                    'special exception, 2 precip datasets
+                    lMetSeg.MetSegRecs(1).MFactP = lPrecMfact * 0.5
+                    lMetSeg.MetSegRecs(1).MFactR = lPrecMfact * 0.5
+                    'add some ext src records
+                    lUci.MetSeg2Source()
+                    For Each lOper In lUci.OpnSeqBlock.Opns
+                        lconn = New atcUCI.HspfConnection
+                        lconn.Uci = lUci
+                        lconn.Typ = 1
+                        lconn.Source.VolName = "WDM2"
+                        lconn.Source.VolId = 116
+                        lconn.Source.Member = "HPCP"
+                        lconn.Ssystem = "ENGL"
+                        lconn.Sgapstrg = "ZERO"
+                        lconn.MFact = lPrecMfact * 0.5
+                        lconn.Tran = "SAME"
+                        lconn.Target.VolName = lOper.Name
+                        lconn.Target.VolId = lOper.Id
+                        lconn.Target.Group = "EXTNL"
+                        lconn.Target.Member = "PREC"
+                        lconn.Target.Opn = lOper
+                        lOper.Sources.Add(lconn)
+                        lUci.Connections.Add(lconn)
+                    Next
+                    lUci.Source2MetSeg()
+                End If
 
                 'save each uci
                 lUci.Save()
@@ -414,7 +461,8 @@ Public Module UCIBuilder
         tstype(7) = "SQAL21" : member(7) = "ISQAL" : memsub1(7) = 2 : memsub2(7) = 1
         tstype(8) = "SQAL31" : member(8) = "ISQAL" : memsub1(8) = 3 : memsub2(8) = 1
 
-        lOper = aUci.OpnBlks("RCHRES").Ids(aUci.OpnBlks("RCHRES").Ids.count)
+        Dim lIndex As Integer = aUci.OpnBlks("RCHRES").Ids.count
+        lOper = aUci.OpnBlks("RCHRES").Ids(lIndex)
         'add whole set like this for upstream inflows
         For i As Integer = 1 To 8
             lConn = New atcUCI.HspfConnection
@@ -459,7 +507,9 @@ Public Module UCIBuilder
         tstype(7) = "SQAL21" : member(7) = "ROSQAL" : memsub1(7) = 2 : memsub2(7) = 1
         tstype(8) = "SQAL31" : member(8) = "ROSQAL" : memsub1(8) = 3 : memsub2(8) = 1
 
-        lOper = aUci.OpnBlks("RCHRES").Ids(aUci.OpnBlks("RCHRES").Ids.count)
+        Dim lOpnBlk As atcUCI.HspfOpnBlk = aUci.OpnBlks("RCHRES")
+        Dim lIndex As Integer = lOpnBlk.Ids.Count
+        lOper = lOpnBlk.Ids(lIndex)
         'add whole set like this for the bottom-most reach
         Dim lnewdsn As Integer = 0
         For i As Integer = 1 To 8

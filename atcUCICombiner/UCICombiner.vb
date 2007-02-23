@@ -813,10 +813,44 @@ Public Module UCICombiner
         End Try
     End Function
 
-    Public Sub WDMCombinerMain()
+    Public Sub WDMMain()
+        'copy datasets from source wdm to target wdm according to csv file
+        Dim lBaseWDMDir As String = "C:\gisdata\CBP\cat\"
+        Dim lClimScens As New Collection
+        Dim lOutputPath As String
+
+        lClimScens.Add("a_10_cccm")
+        lClimScens.Add("a_10_ccsr")
+        lClimScens.Add("a_10_csir")
+        lClimScens.Add("a_10_echm")
+        lClimScens.Add("a_10_gfdl")
+        lClimScens.Add("a_10_hadc")
+        lClimScens.Add("a_10_ncar")
+        lClimScens.Add("b_10_cccm")
+        lClimScens.Add("b_10_ccsr")
+        lClimScens.Add("b_10_csir")
+        lClimScens.Add("b_10_echm")
+        lClimScens.Add("b_10_gfdl")
+        lClimScens.Add("b_10_hadc")
+        lClimScens.Add("b_10_ncar")
+
+        For Each lScen As String In lClimScens
+            lOutputPath = lBaseWDMDir & lScen & "\"
+            If Not FileExists(lOutputPath, True, False) Then
+                MkDir(lOutputPath)
+            End If
+            If Not FileExists(lOutputPath & "base.wdm", False, True) Then
+                System.IO.File.Copy(lBaseWDMDir & "base.wdm", lOutputPath & "base.wdm")
+            End If
+            WDMUpdates(lBaseWDMDir, lBaseWDMDir & "..\met\subset\" & lScen & "\", lOutputPath, lBaseWDMDir & "..\prad\subset\" & lScen & "\")
+        Next
+    End Sub
+
+
+    Public Sub WDMUpdates(ByVal aBaseWDMDir As String, ByVal aFromFolder As String, ByVal aToFolder As String, ByVal aAltFromFolder As String)
         'copy datasets from source wdm to target wdm according to csv file
         Dim lWDMTable As New atcTableDelimited
-        If Not lWDMTable.OpenFile(pOutputDir & "wdmupdates.csv") Then
+        If Not lWDMTable.OpenFile(aBaseWDMDir & "wdmupdates.csv") Then
             Logger.Dbg("Could not open wdmupdates.csv")
         End If
         Dim lFromWDM As String
@@ -825,6 +859,7 @@ Public Module UCICombiner
         Dim lToDSN As Integer
         Dim lScen As String
         Dim lLoc As String
+        Dim lFromFolder As String
         lWDMTable.CurrentRecord = 1
         Do Until lWDMTable.atEOF
             lWDMTable.MoveNext()
@@ -834,10 +869,13 @@ Public Module UCICombiner
             lToDSN = lWDMTable.Value(4)
             lScen = lWDMTable.Value(5)
             lLoc = lWDMTable.Value(6)
-
-            CopyDataSet("wdm", pBaseDir & "wdm\" & lFromWDM, lFromDSN, _
-                        "wdm", pOutputDir & lToWDM, lToDSN)
-
+            lFromFolder = aFromFolder
+            If Not FileExists(lFromFolder & lFromWDM) Then
+                'use alternate location
+                lFromFolder = aAltFromFolder
+            End If
+            CopyDataSet("wdm", lFromFolder & lFromWDM, lFromDSN, _
+                            "wdm", aToFolder & lToWDM, lToDSN)
             SetWDMAttribute(lToWDM, lToDSN, "idscen", lScen)
             SetWDMAttribute(lToWDM, lToDSN, "idlocn", lLoc)
         Loop
