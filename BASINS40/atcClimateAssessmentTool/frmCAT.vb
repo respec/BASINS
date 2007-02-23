@@ -89,6 +89,7 @@ Public Class frmCAT
     Friend WithEvents btnEndpointCopy As System.Windows.Forms.Button
     Friend WithEvents mnuOpenUCI As System.Windows.Forms.MenuItem
     Friend WithEvents txtBaseScenario As System.Windows.Forms.TextBox
+    Friend WithEvents btnInputPrepared As System.Windows.Forms.Button
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -147,6 +148,7 @@ Public Class frmCAT
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblTop = New System.Windows.Forms.Label
         Me.btnStop = New System.Windows.Forms.Button
+        Me.btnInputPrepared = New System.Windows.Forms.Button
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -171,9 +173,9 @@ Public Class frmCAT
         '
         'tabInputs
         '
+        Me.tabInputs.Controls.Add(Me.btnInputPrepared)
         Me.tabInputs.Controls.Add(Me.txtBaseScenario)
         Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
-        Me.tabInputs.Controls.Add(Me.lstInputs)
         Me.tabInputs.Controls.Add(Me.btnInputDown)
         Me.tabInputs.Controls.Add(Me.btnInputUp)
         Me.tabInputs.Controls.Add(Me.btnInputRemove)
@@ -182,6 +184,7 @@ Public Class frmCAT
         Me.tabInputs.Controls.Add(Me.txtModifiedScenarioName)
         Me.tabInputs.Controls.Add(Me.lblBaseScenarioName)
         Me.tabInputs.Controls.Add(Me.lblNewScenarioName)
+        Me.tabInputs.Controls.Add(Me.lstInputs)
         Me.tabInputs.Location = New System.Drawing.Point(4, 22)
         Me.tabInputs.Name = "tabInputs"
         Me.tabInputs.Size = New System.Drawing.Size(451, 284)
@@ -620,6 +623,14 @@ Public Class frmCAT
         Me.btnStop.Text = "Stop"
         Me.btnStop.Visible = False
         '
+        'btnInputPrepared
+        '
+        Me.btnInputPrepared.Location = New System.Drawing.Point(232, 64)
+        Me.btnInputPrepared.Name = "btnInputPrepared"
+        Me.btnInputPrepared.Size = New System.Drawing.Size(63, 24)
+        Me.btnInputPrepared.TabIndex = 13
+        Me.btnInputPrepared.Text = "Prepared"
+        '
         'frmCAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -658,6 +669,9 @@ Public Class frmCAT
 
     'all the endpoints listed in the Endpoints tab
     Private pEndpoints As atcCollection
+
+    'file names of prepared input files
+    Private pPreparedInputs As atcCollection
 
     Private pLastUpDownClick As Date = Date.Now
     Private pUpDownButtonDoubleClickSeconds As Double = 0.3
@@ -715,10 +729,12 @@ Public Class frmCAT
 
         RefreshTotalIterations()
 
-        'Make a collection of the variations that are selected/checked in lstInputs
-        For Each lVariation As Variation In pInputs
-            If lVariation.Selected Then lSelectedVariations.Add(lVariation)
-        Next
+        If pPreparedInputs Is Nothing Then
+            'Make a collection of the variations that are selected/checked in lstInputs
+            For Each lVariation As Variation In pInputs
+                If lVariation.Selected Then lSelectedVariations.Add(lVariation)
+            Next
+        End If
 
         'header for attributes
         agdResults.Source = New atcGridSource
@@ -737,7 +753,6 @@ Public Class frmCAT
                     .Columns += lEndpoint.DataSets.Count
                 End If
             Next
-
             .Rows = 5
             lColumn = 1
 
@@ -778,6 +793,7 @@ Public Class frmCAT
 
         Run(txtModifiedScenarioName.Text, _
             lSelectedVariations, _
+            pPreparedInputs, _
             txtBaseScenario.Text, _
             lRuns, 0, Nothing)
 
@@ -792,6 +808,7 @@ Public Class frmCAT
 
     Private Sub Run(ByVal aModifiedScenarioName As String, _
                     ByVal aVariations As atcCollection, _
+                    ByVal aPreparedInputs As atcCollection, _
                     ByVal aBaseFileName As String, _
                     ByRef aIteration As Integer, _
                     ByRef aStartVariation As Integer, _
@@ -804,10 +821,11 @@ Public Class frmCAT
             ChDriveDir(PathNameOnly(aBaseFileName))
 
             If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
+NextIteration:
                 UpdateStatusLabel(aIteration)
                 If chkSaveAll.Checked Then aModifiedScenarioName &= "-" & aIteration + 1
                 pTimePerRun = Now.ToOADate
-                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, aModifiedScenarioName, aModifiedData, chkShowEachRunProgress.Checked)
+                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, aModifiedScenarioName, aModifiedData, aPreparedInputs.ItemByIndex(aIteration), chkShowEachRunProgress.Checked)
                 If lResults Is Nothing Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
                     Exit Sub
@@ -833,6 +851,9 @@ Public Class frmCAT
                 Next
 
                 aIteration += 1
+                If Not aPreparedInputs Is Nothing AndAlso aIteration < aPreparedInputs.Count Then
+                    GoTo NextIteration
+                End If
 
             Else 'Need to loop through values for next variation
                 Dim lVariation As Variation = aVariations.ItemByIndex(aStartVariation)
@@ -846,6 +867,7 @@ Public Class frmCAT
                         'We have handled a variation, now handle more input variations or run the model
                         Run(aModifiedScenarioName, _
                             aVariations, _
+                            aPreparedInputs, _
                             aBaseFileName, _
                             aIteration, _
                             aStartVariation + 1, _
@@ -857,7 +879,7 @@ Public Class frmCAT
                     End While
                 End With
             End If
-        End If
+            End If
     End Sub
 
     Private Sub UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection, ByVal aResultsFilename As String)
@@ -866,7 +888,11 @@ Public Class frmCAT
             Dim lColumn As Integer = .FixedColumns
             Dim lEndpoint As Variation
 
-            .CellValue(lRow, 0) = aIteration + 1
+            If pPreparedInputs Is Nothing Then
+                .CellValue(lRow, 0) = aIteration + 1
+            Else
+                .CellValue(lRow, 0) = FilenameOnly(PathNameOnly(pPreparedInputs.ItemByIndex(aIteration)))
+            End If
             .CellColor(lRow, 0) = Drawing.SystemColors.Control
 
             For Each lEndpoint In pEndpoints
@@ -1413,14 +1439,17 @@ Public Class frmCAT
 
     Private Sub RefreshTotalIterations()
         Dim lLabelText As String
-        pTotalIterations = 1
 
-        For Each lVariation As Variation In pInputs
-            If lVariation.Selected Then
-                pTotalIterations *= lVariation.Iterations
-            End If
-        Next
-
+        If pPreparedInputs Is Nothing Then
+            pTotalIterations = 1
+            For Each lVariation As Variation In pInputs
+                If lVariation.Selected Then
+                    pTotalIterations *= lVariation.Iterations
+                End If
+            Next
+        Else
+            pTotalIterations = pPreparedInputs.Count
+        End If
         lLabelText = "Total iterations selected = " & pTotalIterations
         If pTimePerRun > 0 Then
             lLabelText &= " (" & FormatTime(pTimePerRun * pTotalIterations) & ")"
@@ -1436,7 +1465,12 @@ Public Class frmCAT
     End Sub
 
     Private Sub RefreshInputList()
-        RefreshList(lstInputs, pInputs)
+        If pPreparedInputs Is Nothing Then
+            RefreshList(lstInputs, pInputs)
+        Else
+            lstInputs.Items.Clear()
+            lstInputs.Items.AddRange(pPreparedInputs.ToArray)
+        End If
     End Sub
 
     Private Sub RefreshEndpointList()
@@ -1629,9 +1663,13 @@ Public Class frmCAT
     End Sub
 
     Private Sub lstInputs_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstInputs.ItemCheck
-        Dim lVariation As Variation = pInputs.ItemByIndex(e.Index)
-        lVariation.Selected = (e.NewValue = CheckState.Checked)
-        RefreshTotalIterations()
+        If pPreparedInputs Is Nothing Then
+            Dim lVariation As Variation = pInputs.ItemByIndex(e.Index)
+            lVariation.Selected = (e.NewValue = CheckState.Checked)
+            RefreshTotalIterations()
+        Else
+            'TODO: make check/uncheck work for pPreparedInputs
+        End If
     End Sub
 
     Private Sub lstEndpoints_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstEndpoints.ItemCheck
@@ -1717,4 +1755,37 @@ Public Class frmCAT
         End If
     End Sub
 
+    Private Sub btnInputPrepared_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputPrepared.Click
+        Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+        With lOpenDialog
+            .FileName = GetSetting("BasinsCAT", "Settings", "LastPreparedWDM")
+            .Filter = "WDM files (*.wdm)|*.wdm|All files|*.*"
+            .FilterIndex = 1
+            .Title = "Select First base WDM file to use"
+            If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                If FileExists(.FileName) Then
+                    If pPreparedInputs Is Nothing Then
+                        pPreparedInputs = New atcCollection
+                    Else
+                        pPreparedInputs.Clear()
+                    End If
+                    Dim lBaseFilename As String = FilenameNoPath(.FileName)
+                    Dim lFolderStart As String = PathNameOnly(.FileName)
+                    Dim lParentFolder As String = PathNameOnly(lFolderStart)
+                    Dim lAllSubfolders() As String = System.IO.Directory.GetDirectories(lParentFolder)
+                    For Each lFolder As String In lAllSubfolders
+                        If lFolder >= lFolderStart Then
+                            Dim lFilename As String = IO.Path.Combine(lFolder, lBaseFilename)
+                            If FileExists(lFilename) Then
+                                pPreparedInputs.Add(lFilename)
+                            End If
+                        End If
+                    Next
+                    SaveSetting("BasinsCAT", "Settings", "LastPreparedWDM", .FileName)
+                    RefreshInputList()
+                    RefreshTotalIterations()
+                End If
+            End If
+        End With
+    End Sub
 End Class

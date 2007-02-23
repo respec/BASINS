@@ -140,4 +140,10 @@ Public Class atcDataSource
         End If
         Return lName & ":" & Specification & ":" & DataSets.Count
     End Function
+
+    Protected Overrides Sub Finalize()
+        If Not pAttributes Is Nothing Then pAttributes.Clear()
+        If Not pData Is Nothing Then pData.Clear()
+        MyBase.Finalize()
+    End Sub
 End Class
