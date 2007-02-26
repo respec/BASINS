@@ -122,7 +122,7 @@ Public Class Variation
     End Function
 
     Protected Overridable Function VaryData() As atcDataGroup
-        Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
+        'Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
         Dim lArgsMath As New atcDataAttributes
         Dim lModifiedTS As atcTimeseries
         Dim lModifiedGroup As New atcDataGroup
