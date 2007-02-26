@@ -58,10 +58,8 @@ Public Module UCIBuilder
 
             'loop thru each subbasin
             lAreaTable.CurrentRecord = 1
-            lMetTable.CurrentRecord = 1
             Do Until lAreaTable.atEOF
                 lAreaTable.MoveNext()
-                lMetTable.MoveNext()
                 lProjectbase = lAreaTable.Value(1)
                 If Not lProjectNames.Contains(lProjectbase) Then
                     lProjectNames.Add(lProjectbase, lProjectbase)
@@ -161,45 +159,55 @@ Public Module UCIBuilder
                     Next
                 Next i
 
-                'update met data
-                Dim lEtMfact As Double = lMetTable.Value(3)
-                Dim lPrecMfact As Double = lMetTable.Value(4)
-                Dim lPrecDsn As Integer = lMetTable.Value(7)
-                Dim lMetSeg As atcUCI.HspfMetSeg = lUci.MetSegs(1)
+                'look thru met table looking for a match
+                lMetTable.CurrentRecord = 1
+                Dim lmetbase As String = ""
+                Do Until lMetTable.atEOF
+                    lMetTable.MoveNext()
+                    lMetbase = lMetTable.Value(2)
+                    If lMetbase = lUcibase Then
+                        'found the match, update met data
+                        Dim lEtMfact As Double = lMetTable.Value(3)
+                        Dim lPrecMfact As Double = lMetTable.Value(4)
+                        Dim lPrecDsn As Integer = lMetTable.Value(7)
+                        Dim lMetSeg As atcUCI.HspfMetSeg = lUci.MetSegs(1)
 
-                lMetSeg.MetSegRecs(1).Source.VolId = lPrecDsn
-                lMetSeg.MetSegRecs(1).MFactP = lPrecMfact
-                lMetSeg.MetSegRecs(1).MFactR = lPrecMfact
-                lMetSeg.MetSegRecs(7).MFactP = lEtMfact
-                lMetSeg.MetSegRecs(8).MFactR = lEtMfact
+                        lMetSeg.MetSegRecs(1).Source.VolId = lPrecDsn
+                        lMetSeg.MetSegRecs(1).MFactP = lPrecMfact
+                        lMetSeg.MetSegRecs(1).MFactR = lPrecMfact
+                        lMetSeg.MetSegRecs(7).MFactP = lEtMfact
+                        lMetSeg.MetSegRecs(8).MFactR = lEtMfact
 
-                If lProjectbase = "PENINSUL" Then
-                    'special exception, 2 precip datasets
-                    lMetSeg.MetSegRecs(1).MFactP = lPrecMfact * 0.5
-                    lMetSeg.MetSegRecs(1).MFactR = lPrecMfact * 0.5
-                    'add some ext src records
-                    lUci.MetSeg2Source()
-                    For Each lOper In lUci.OpnSeqBlock.Opns
-                        lconn = New atcUCI.HspfConnection
-                        lconn.Uci = lUci
-                        lconn.Typ = 1
-                        lconn.Source.VolName = "WDM2"
-                        lconn.Source.VolId = 116
-                        lconn.Source.Member = "HPCP"
-                        lconn.Ssystem = "ENGL"
-                        lconn.Sgapstrg = "ZERO"
-                        lconn.MFact = lPrecMfact * 0.5
-                        lconn.Tran = "SAME"
-                        lconn.Target.VolName = lOper.Name
-                        lconn.Target.VolId = lOper.Id
-                        lconn.Target.Group = "EXTNL"
-                        lconn.Target.Member = "PREC"
-                        lconn.Target.Opn = lOper
-                        lOper.Sources.Add(lconn)
-                        lUci.Connections.Add(lconn)
-                    Next
-                    lUci.Source2MetSeg()
-                End If
+                        If lProjectbase = "PENINSUL" Then
+                            'special exception, 2 precip datasets
+                            lMetSeg.MetSegRecs(1).MFactP = lPrecMfact * 0.5
+                            lMetSeg.MetSegRecs(1).MFactR = lPrecMfact * 0.5
+                            'add some ext src records
+                            lUci.MetSeg2Source()
+                            For Each lOper In lUci.OpnSeqBlock.Opns
+                                lconn = New atcUCI.HspfConnection
+                                lconn.Uci = lUci
+                                lconn.Typ = 1
+                                lconn.Source.VolName = "WDM2"
+                                lconn.Source.VolId = 116
+                                lconn.Source.Member = "HPCP"
+                                lconn.Ssystem = "ENGL"
+                                lconn.Sgapstrg = "ZERO"
+                                lconn.MFact = lPrecMfact * 0.5
+                                lconn.Tran = "SAME"
+                                lconn.Target.VolName = lOper.Name
+                                lconn.Target.VolId = lOper.Id
+                                lconn.Target.Group = "EXTNL"
+                                lconn.Target.Member = "PREC"
+                                lconn.Target.Opn = lOper
+                                lOper.Sources.Add(lconn)
+                                lUci.Connections.Add(lconn)
+                            Next
+                            lUci.Source2MetSeg()
+                        End If
+                        lMetTable.MoveLast()
+                    End If
+                Loop
 
                 'save each uci
                 lUci.Save()
