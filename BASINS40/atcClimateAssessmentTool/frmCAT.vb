@@ -90,15 +90,18 @@ Public Class frmCAT
     Friend WithEvents mnuOpenUCI As System.Windows.Forms.MenuItem
     Friend WithEvents txtBaseScenario As System.Windows.Forms.TextBox
     Friend WithEvents btnInputPrepared As System.Windows.Forms.Button
+    Friend WithEvents chkRunModel As System.Windows.Forms.CheckBox
+    Friend WithEvents btnInputView As System.Windows.Forms.Button
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCAT))
         Me.myTabs = New System.Windows.Forms.TabControl
         Me.tabInputs = New System.Windows.Forms.TabPage
+        Me.btnInputView = New System.Windows.Forms.Button
+        Me.btnInputPrepared = New System.Windows.Forms.Button
         Me.txtBaseScenario = New System.Windows.Forms.TextBox
         Me.btnInputAddCligen = New System.Windows.Forms.Button
-        Me.lstInputs = New System.Windows.Forms.CheckedListBox
         Me.btnInputDown = New System.Windows.Forms.Button
         Me.btnInputUp = New System.Windows.Forms.Button
         Me.btnInputRemove = New System.Windows.Forms.Button
@@ -107,7 +110,9 @@ Public Class frmCAT
         Me.txtModifiedScenarioName = New System.Windows.Forms.TextBox
         Me.lblBaseScenarioName = New System.Windows.Forms.Label
         Me.lblNewScenarioName = New System.Windows.Forms.Label
+        Me.lstInputs = New System.Windows.Forms.CheckedListBox
         Me.tabEndpoints = New System.Windows.Forms.TabPage
+        Me.chkRunModel = New System.Windows.Forms.CheckBox
         Me.btnEndpointCopy = New System.Windows.Forms.Button
         Me.chkShowEachRunProgress = New System.Windows.Forms.CheckBox
         Me.lblAllResults = New System.Windows.Forms.Label
@@ -148,7 +153,6 @@ Public Class frmCAT
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblTop = New System.Windows.Forms.Label
         Me.btnStop = New System.Windows.Forms.Button
-        Me.btnInputPrepared = New System.Windows.Forms.Button
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -173,6 +177,7 @@ Public Class frmCAT
         '
         'tabInputs
         '
+        Me.tabInputs.Controls.Add(Me.btnInputView)
         Me.tabInputs.Controls.Add(Me.btnInputPrepared)
         Me.tabInputs.Controls.Add(Me.txtBaseScenario)
         Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
@@ -191,6 +196,22 @@ Public Class frmCAT
         Me.tabInputs.TabIndex = 0
         Me.tabInputs.Text = "Inputs"
         '
+        'btnInputView
+        '
+        Me.btnInputView.Location = New System.Drawing.Point(124, 64)
+        Me.btnInputView.Name = "btnInputView"
+        Me.btnInputView.Size = New System.Drawing.Size(48, 24)
+        Me.btnInputView.TabIndex = 8
+        Me.btnInputView.Text = "View"
+        '
+        'btnInputPrepared
+        '
+        Me.btnInputPrepared.Location = New System.Drawing.Point(286, 64)
+        Me.btnInputPrepared.Name = "btnInputPrepared"
+        Me.btnInputPrepared.Size = New System.Drawing.Size(63, 24)
+        Me.btnInputPrepared.TabIndex = 11
+        Me.btnInputPrepared.Text = "Prepared"
+        '
         'txtBaseScenario
         '
         Me.txtBaseScenario.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
@@ -203,22 +224,11 @@ Public Class frmCAT
         '
         'btnInputAddCligen
         '
-        Me.btnInputAddCligen.Location = New System.Drawing.Point(178, 64)
+        Me.btnInputAddCligen.Location = New System.Drawing.Point(232, 64)
         Me.btnInputAddCligen.Name = "btnInputAddCligen"
         Me.btnInputAddCligen.Size = New System.Drawing.Size(48, 24)
-        Me.btnInputAddCligen.TabIndex = 9
+        Me.btnInputAddCligen.TabIndex = 10
         Me.btnInputAddCligen.Text = "Cligen"
-        '
-        'lstInputs
-        '
-        Me.lstInputs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstInputs.IntegralHeight = False
-        Me.lstInputs.Location = New System.Drawing.Point(8, 94)
-        Me.lstInputs.Name = "lstInputs"
-        Me.lstInputs.Size = New System.Drawing.Size(434, 181)
-        Me.lstInputs.TabIndex = 12
         '
         'btnInputDown
         '
@@ -226,7 +236,7 @@ Public Class frmCAT
         Me.btnInputDown.Location = New System.Drawing.Point(418, 64)
         Me.btnInputDown.Name = "btnInputDown"
         Me.btnInputDown.Size = New System.Drawing.Size(24, 24)
-        Me.btnInputDown.TabIndex = 11
+        Me.btnInputDown.TabIndex = 13
         Me.btnInputDown.Text = "v"
         '
         'btnInputUp
@@ -235,7 +245,7 @@ Public Class frmCAT
         Me.btnInputUp.Location = New System.Drawing.Point(388, 64)
         Me.btnInputUp.Name = "btnInputUp"
         Me.btnInputUp.Size = New System.Drawing.Size(24, 24)
-        Me.btnInputUp.TabIndex = 10
+        Me.btnInputUp.TabIndex = 12
         Me.btnInputUp.Text = "^"
         '
         'btnInputRemove
@@ -248,10 +258,10 @@ Public Class frmCAT
         '
         'btnInputModify
         '
-        Me.btnInputModify.Location = New System.Drawing.Point(124, 64)
+        Me.btnInputModify.Location = New System.Drawing.Point(178, 64)
         Me.btnInputModify.Name = "btnInputModify"
         Me.btnInputModify.Size = New System.Drawing.Size(48, 24)
-        Me.btnInputModify.TabIndex = 8
+        Me.btnInputModify.TabIndex = 9
         Me.btnInputModify.Text = "Edit"
         '
         'btnInputAdd
@@ -290,8 +300,20 @@ Public Class frmCAT
         Me.lblNewScenarioName.TabIndex = 4
         Me.lblNewScenarioName.Text = "New Scenario"
         '
+        'lstInputs
+        '
+        Me.lstInputs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstInputs.IntegralHeight = False
+        Me.lstInputs.Location = New System.Drawing.Point(8, 94)
+        Me.lstInputs.Name = "lstInputs"
+        Me.lstInputs.Size = New System.Drawing.Size(434, 181)
+        Me.lstInputs.TabIndex = 14
+        '
         'tabEndpoints
         '
+        Me.tabEndpoints.Controls.Add(Me.chkRunModel)
         Me.tabEndpoints.Controls.Add(Me.btnEndpointCopy)
         Me.tabEndpoints.Controls.Add(Me.chkShowEachRunProgress)
         Me.tabEndpoints.Controls.Add(Me.lblAllResults)
@@ -308,12 +330,24 @@ Public Class frmCAT
         Me.tabEndpoints.TabIndex = 1
         Me.tabEndpoints.Text = "Endpoints"
         '
+        'chkRunModel
+        '
+        Me.chkRunModel.AutoSize = True
+        Me.chkRunModel.Checked = True
+        Me.chkRunModel.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkRunModel.Location = New System.Drawing.Point(191, 35)
+        Me.chkRunModel.Name = "chkRunModel"
+        Me.chkRunModel.Size = New System.Drawing.Size(78, 17)
+        Me.chkRunModel.TabIndex = 13
+        Me.chkRunModel.Text = "Run Model"
+        Me.chkRunModel.UseVisualStyleBackColor = True
+        '
         'btnEndpointCopy
         '
         Me.btnEndpointCopy.Location = New System.Drawing.Point(178, 64)
         Me.btnEndpointCopy.Name = "btnEndpointCopy"
         Me.btnEndpointCopy.Size = New System.Drawing.Size(48, 24)
-        Me.btnEndpointCopy.TabIndex = 16
+        Me.btnEndpointCopy.TabIndex = 17
         Me.btnEndpointCopy.Text = "Copy"
         '
         'chkShowEachRunProgress
@@ -377,7 +411,7 @@ Public Class frmCAT
         Me.btnEndpointRemove.Location = New System.Drawing.Point(62, 64)
         Me.btnEndpointRemove.Name = "btnEndpointRemove"
         Me.btnEndpointRemove.Size = New System.Drawing.Size(56, 24)
-        Me.btnEndpointRemove.TabIndex = 14
+        Me.btnEndpointRemove.TabIndex = 15
         Me.btnEndpointRemove.Text = "Remove"
         '
         'btnEndpointModify
@@ -385,7 +419,7 @@ Public Class frmCAT
         Me.btnEndpointModify.Location = New System.Drawing.Point(124, 64)
         Me.btnEndpointModify.Name = "btnEndpointModify"
         Me.btnEndpointModify.Size = New System.Drawing.Size(48, 24)
-        Me.btnEndpointModify.TabIndex = 15
+        Me.btnEndpointModify.TabIndex = 16
         Me.btnEndpointModify.Text = "Edit"
         '
         'btnEndpointAdd
@@ -393,7 +427,7 @@ Public Class frmCAT
         Me.btnEndpointAdd.Location = New System.Drawing.Point(8, 64)
         Me.btnEndpointAdd.Name = "btnEndpointAdd"
         Me.btnEndpointAdd.Size = New System.Drawing.Size(48, 24)
-        Me.btnEndpointAdd.TabIndex = 13
+        Me.btnEndpointAdd.TabIndex = 14
         Me.btnEndpointAdd.Text = "Add"
         '
         'tabResults
@@ -623,14 +657,6 @@ Public Class frmCAT
         Me.btnStop.Text = "Stop"
         Me.btnStop.Visible = False
         '
-        'btnInputPrepared
-        '
-        Me.btnInputPrepared.Location = New System.Drawing.Point(232, 64)
-        Me.btnInputPrepared.Name = "btnInputPrepared"
-        Me.btnInputPrepared.Size = New System.Drawing.Size(63, 24)
-        Me.btnInputPrepared.TabIndex = 13
-        Me.btnInputPrepared.Text = "Prepared"
-        '
         'frmCAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -822,17 +848,22 @@ Public Class frmCAT
 
             If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
 NextIteration:
+                Dim lModifiedScenarioName As String = aModifiedScenarioName
+                If chkSaveAll.Checked Then lModifiedScenarioName &= "-" & aIteration + 1
                 UpdateStatusLabel(aIteration)
-                If chkSaveAll.Checked Then aModifiedScenarioName &= "-" & aIteration + 1
                 pTimePerRun = Now.ToOADate
-                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, aModifiedScenarioName, aModifiedData, aPreparedInputs.ItemByIndex(aIteration), chkShowEachRunProgress.Checked)
+                Dim lPreparedInput As String = ""
+                If Not aPreparedInputs Is Nothing Then
+                    lPreparedInput = aPreparedInputs.ItemByIndex(aIteration)
+                End If
+                Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, chkRunModel.Checked, chkShowEachRunProgress.Checked)
                 If lResults Is Nothing Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
                     Exit Sub
                 End If
                 pTimePerRun = (Now.ToOADate - pTimePerRun) * 24 * 60 * 60 'Convert days to seconds
 
-                UpdateResults(aIteration, lResults, PathNameOnly(aBaseFileName) & "\" & aModifiedScenarioName & ".results.txt")
+                UpdateResults(aIteration, lResults, PathNameOnly(aBaseFileName) & "\" & lModifiedScenarioName & ".results.txt")
 
                 'Close any open results
                 For Each lSpecification As String In lResults
@@ -879,7 +910,7 @@ NextIteration:
                     End While
                 End With
             End If
-            End If
+        End If
     End Sub
 
     Private Sub UpdateResults(ByVal aIteration As Integer, ByVal aResults As atcCollection, ByVal aResultsFilename As String)
@@ -1119,7 +1150,7 @@ NextIteration:
             For lRow = 0 To .FixedRows - 1
                 For lColumn = 0 To .Columns - 1
                     If lRow < .FixedRows OrElse lColumn < .FixedColumns Then
-                        .CellColor(lRow, lColumn) = Drawing.SystemColors.Control                        
+                        .CellColor(lRow, lColumn) = Drawing.SystemColors.Control
                     Else
                         .CellColor(lRow, lColumn) = Drawing.SystemColors.Window
                     End If
@@ -1139,7 +1170,7 @@ NextIteration:
             .SizeColumnToString(0, RunTitle)
             For lColumn = 1 To .Source.Columns - 1
                 lColumnTitle = .Source.CellValue(0, lColumn)
-                If lColumnTitle.Length > lLongestLabelLength Then
+                If Not lColumnTitle Is Nothing AndAlso lColumnTitle.Length > lLongestLabelLength Then
                     lLongestLabelLength = lColumnTitle.Length
                     lLongestLabel = lColumnTitle
                 End If
@@ -1362,6 +1393,29 @@ NextIteration:
         End If
     End Sub
 
+    Private Sub btnInputView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputView.Click
+        If pPreparedInputs Is Nothing Then
+            If lstInputs.SelectedIndices.Count > 0 Then
+                Dim lData As New atcDataGroup
+                For Each lIndex As Integer In lstInputs.SelectedIndices
+                    Dim lDataThisIteration As atcDataGroup
+                    Dim lVariation As Variation = pInputs.ItemByIndex(lIndex)
+                    lDataThisIteration = lVariation.StartIteration
+                    While Not lDataThisIteration Is Nothing
+                        lData.AddRange(lDataThisIteration)
+                        lDataThisIteration.Clear()
+                        lDataThisIteration = lVariation.NextIteration
+                    End While
+                Next
+                g_DataManager.ShowDisplay("List", lData)
+            Else
+                MsgBox("An input must be selected to view", MsgBoxStyle.Critical, "No Input Selected")
+            End If
+        Else
+            MsgBox("Viewing prepared inputs not available", MsgBoxStyle.Critical, "Cannot view input")
+        End If
+    End Sub
+
     Private Sub btnInputRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputRemove.Click
         If lstInputs.SelectedIndices.Count > 0 Then
             For Each lIndex As Integer In lstInputs.SelectedIndices
@@ -1372,6 +1426,40 @@ NextIteration:
         Else
             MsgBox("An input must be selected to remove it", MsgBoxStyle.Critical, "No Inputs Selected")
         End If
+    End Sub
+
+    Private Sub btnInputPrepared_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputPrepared.Click
+        Dim lOpenDialog As New Windows.Forms.OpenFileDialog
+        With lOpenDialog
+            .FileName = GetSetting("BasinsCAT", "Settings", "LastPreparedWDM")
+            .Filter = "WDM files (*.wdm)|*.wdm|All files|*.*"
+            .FilterIndex = 1
+            .Title = "Select First base WDM file to use"
+            If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                If FileExists(.FileName) Then
+                    If pPreparedInputs Is Nothing Then
+                        pPreparedInputs = New atcCollection
+                    Else
+                        pPreparedInputs.Clear()
+                    End If
+                    Dim lBaseFilename As String = FilenameNoPath(.FileName)
+                    Dim lFolderStart As String = PathNameOnly(.FileName)
+                    Dim lParentFolder As String = PathNameOnly(lFolderStart)
+                    Dim lAllSubfolders() As String = System.IO.Directory.GetDirectories(lParentFolder)
+                    For Each lFolder As String In lAllSubfolders
+                        If lFolder >= lFolderStart Then
+                            Dim lFilename As String = IO.Path.Combine(lFolder, lBaseFilename)
+                            If FileExists(lFilename) Then
+                                pPreparedInputs.Add(lFilename)
+                            End If
+                        End If
+                    Next
+                    SaveSetting("BasinsCAT", "Settings", "LastPreparedWDM", .FileName)
+                    RefreshInputList()
+                    RefreshTotalIterations()
+                End If
+            End If
+        End With
     End Sub
 
     Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aDirection As Integer)
@@ -1417,7 +1505,7 @@ NextIteration:
     End Sub
 
     Private Sub btnEndpointDown_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointDown.Click
-        MoveItem(pEndpoints, lstEndpoints, 1)        
+        MoveItem(pEndpoints, lstEndpoints, 1)
     End Sub
 
     Private Sub btnEndpointAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointAdd.Click
@@ -1550,7 +1638,7 @@ NextIteration:
 
             lXML &= "<Endpoints>" & vbCrLf
             For Each lVariation In pEndpoints
-                lXML &= lVariation.XML                
+                lXML &= lVariation.XML
             Next
             lXML &= "</Endpoints>" & vbCrLf
 
@@ -1755,37 +1843,4 @@ NextIteration:
         End If
     End Sub
 
-    Private Sub btnInputPrepared_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputPrepared.Click
-        Dim lOpenDialog As New Windows.Forms.OpenFileDialog
-        With lOpenDialog
-            .FileName = GetSetting("BasinsCAT", "Settings", "LastPreparedWDM")
-            .Filter = "WDM files (*.wdm)|*.wdm|All files|*.*"
-            .FilterIndex = 1
-            .Title = "Select First base WDM file to use"
-            If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-                If FileExists(.FileName) Then
-                    If pPreparedInputs Is Nothing Then
-                        pPreparedInputs = New atcCollection
-                    Else
-                        pPreparedInputs.Clear()
-                    End If
-                    Dim lBaseFilename As String = FilenameNoPath(.FileName)
-                    Dim lFolderStart As String = PathNameOnly(.FileName)
-                    Dim lParentFolder As String = PathNameOnly(lFolderStart)
-                    Dim lAllSubfolders() As String = System.IO.Directory.GetDirectories(lParentFolder)
-                    For Each lFolder As String In lAllSubfolders
-                        If lFolder >= lFolderStart Then
-                            Dim lFilename As String = IO.Path.Combine(lFolder, lBaseFilename)
-                            If FileExists(lFilename) Then
-                                pPreparedInputs.Add(lFilename)
-                            End If
-                        End If
-                    Next
-                    SaveSetting("BasinsCAT", "Settings", "LastPreparedWDM", .FileName)
-                    RefreshInputList()
-                    RefreshTotalIterations()
-                End If
-            End If
-        End With
-    End Sub
 End Class

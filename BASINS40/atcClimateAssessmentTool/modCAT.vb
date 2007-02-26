@@ -71,6 +71,7 @@ Public Module modCAT
                            ByVal aNewScenarioName As String, _
                            ByVal aModifiedData As atcDataGroup, _
                            ByVal aPreparedInput As String, _
+                           ByVal aRunModel As Boolean, _
                            ByVal aShowProgress As Boolean) As atcCollection 'of atcDataSource
         'Copy base UCI and change scenario name within it
         'Copy WDM
@@ -133,36 +134,46 @@ Public Module modCAT
                 Next
             End If
 
-            'Run scenario
-            Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", "\BASINS\models\HSPF\bin\WinHspfLt.exe")
+            If aRunModel Then
+                'Run scenario
+                Dim lWinHspfLtExeName As String = FindFile("Please locate WinHspfLt.exe", "\BASINS\models\HSPF\bin\WinHspfLt.exe")
 
-            Dim lPipeHandles As String = " -1 -1 "
-            If aShowProgress Then lPipeHandles = " "
+                Dim lPipeHandles As String = " -1 -1 "
+                If aShowProgress Then lPipeHandles = " "
 
-            'Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
+                'Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
 
-            AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
-            Dim lArgs As String = lPipeHandles & lNewBaseFilename & "uci"
-            Logger.Dbg("Start " & lWinHspfLtExeName & " with Arguments '" & lArgs & "'")
-            Dim newProc As Diagnostics.Process
-            newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
-            While Not newProc.HasExited
-                If Not g_running Then newProc.Kill()
-                Windows.Forms.Application.DoEvents()
-                Threading.Thread.Sleep(50)
-            End While
-            Logger.Dbg("Model exit code " & newProc.ExitCode)
-            If newProc.ExitCode <> 0 Then
-                Logger.Dbg("****************** Problem *********************")
+                AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
+                Dim lArgs As String = lPipeHandles & lNewBaseFilename & "uci"
+                Logger.Dbg("Start " & lWinHspfLtExeName & " with Arguments '" & lArgs & "'")
+                Dim newProc As Diagnostics.Process
+                newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)
+                While Not newProc.HasExited
+                    If Not g_running Then newProc.Kill()
+                    Windows.Forms.Application.DoEvents()
+                    Threading.Thread.Sleep(50)
+                End While
+                Logger.Dbg("Model exit code " & newProc.ExitCode)
+                If newProc.ExitCode <> 0 Then
+                    Logger.Dbg("****************** Problem *********************")
+                End If
+            Else
+                Logger.Dbg("Skipping running model")
             End If
-
             If g_running Then
                 For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "BINO")
                     lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
                     Dim lNewFilename As String = PathNameOnly(lBinOutFilename) & "\" & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
-                    Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-                    lHBNResults.Open(lNewFilename)
-                    lModified.Add(lBinOutFilename, lNewFilename)
+                    If IO.File.Exists(lNewFilename) Then
+                        Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+                        If lHBNResults.Open(lNewFilename) Then
+                            lModified.Add(lBinOutFilename, lNewFilename)
+                        Else
+                            Logger.Dbg("Could not open HBN file '" & lNewFilename & "'")
+                        End If
+                    Else
+                        Logger.Dbg("Could not find HBN file '" & lNewFilename & "'")
+                    End If
                 Next
             End If
         Else
