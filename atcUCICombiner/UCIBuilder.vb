@@ -36,6 +36,33 @@ Public Module UCIBuilder
             Logger.Dbg("Could not open met4model.csv")
         End If
 
+        Dim lSoilClassTable As New atcTableDelimited
+        If Not lSoilClassTable.OpenFile(pDataDir & "soilclass.csv") Then
+            Logger.Dbg("Could not open soilclass.csv")
+        End If
+
+        Dim lSlopeClassTable As New atcTableDelimited
+        If Not lSlopeClassTable.OpenFile(pDataDir & "meanslope.csv") Then
+            Logger.Dbg("Could not open meanslope.csv")
+        End If
+
+        Dim lParmTable As New atcTableDelimited
+        Dim lParmValue(12, 83) As String
+        If Not lParmTable.OpenFile(pDataDir & "parametervalues.csv") Then
+            Logger.Dbg("Could not open parametervalues.csv")
+        Else
+            'read parm table into memory for later use
+            Dim lrow As Integer = 0
+            lParmTable.CurrentRecord = 1
+            Do Until lParmTable.atEOF
+                lParmTable.MoveNext()
+                lrow = lrow + 1
+                For icol As Integer = 1 To 12
+                    lParmValue(icol, lrow) = lParmTable.Value(icol + 1)
+                Next icol
+            Loop
+        End If
+
         Dim lAreaTable As New atcTableDelimited
         Dim lUcibase As String
         Dim lProjectbase As String
@@ -208,6 +235,94 @@ Public Module UCIBuilder
                         lMetTable.MoveLast()
                     End If
                 Loop
+
+                'look thru soil class table looking for a match
+                lSoilClassTable.CurrentRecord = 1
+                Dim lsoilbase As String = ""
+                Dim lSoilGroup As String = ""
+                Do Until lSoilClassTable.atEOF
+                    lSoilClassTable.MoveNext()
+                    lsoilbase = lSoilClassTable.Value(4)
+                    If lsoilbase = lUcibase Then
+                        'found the match, store soil group
+                        lSoilGroup = lSoilClassTable.Value(3)
+                        lSoilClassTable.MoveLast()
+                    End If
+                Loop
+
+                'get slope from slope table 
+                lSlopeClassTable.CurrentRecord = 1
+                Dim lSlopeBase As String = ""
+                Dim lAgSlope As Single = 0
+                Dim lDevSlope As Single = 0
+                Dim lForSlope As Single = 0
+                Dim lGrassSlope As Single = 0
+                Dim lShrubSlope As Single = 0
+                Do Until lSlopeClassTable.atEOF
+                    lSlopeClassTable.MoveNext()
+                    lSlopeBase = lSoilClassTable.Value(1)
+                    If lSlopeBase = lUcibase Then
+                        'found the match, store slopes by land use
+                        lAgSlope = lSoilClassTable.Value(3)
+                        lDevSlope = lSoilClassTable.Value(4)
+                        lForSlope = lSoilClassTable.Value(5)
+                        lGrassSlope = lSoilClassTable.Value(6)
+                        lShrubSlope = lSoilClassTable.Value(7)
+                        lSlopeClassTable.MoveLast()
+                    End If
+                Loop
+
+                'begin loop thru each operation to set parameters
+                Dim lSlope As Single = 0
+                Dim lSlopeClass As Integer = 1
+                Dim lParmLine As Integer = 1
+                For Each lOper In lUci.OpnSeqBlock.Opns
+                    If lOper.Name = "PERLND" And lOper.Id = 101 Then
+                        'forest
+                        lSlope = lForSlope
+                        lParmLine = 1
+                    ElseIf lOper.Name = "PERLND" And lOper.Id = 102 Then
+                        'shrub
+                        lSlope = lShrubSlope
+                        lParmLine = 2
+                    ElseIf lOper.Name = "PERLND" And lOper.Id = 103 Then
+                        'grass
+                        lSlope = lGrassSlope
+                        lParmLine = 3
+                    ElseIf lOper.Name = "PERLND" And lOper.Id = 104 Then
+                        'dev
+                        lSlope = lDevSlope
+                        lParmLine = 4
+                    ElseIf lOper.Name = "PERLND" And lOper.Id = 105 Then
+                        'ag
+                        lSlope = lAgSlope
+                        lParmLine = 3
+                    ElseIf lOper.Name = "IMPLND" Then
+                        lSlope = lDevSlope
+                        lParmLine = 4
+                    End If
+                    'assign slope class
+                    If lSlope < 5 Then
+                        lSlopeClass = 1
+                    ElseIf lSlope < 10 Then
+                        lSlopeClass = 2
+                    ElseIf lSlope < 20 Then
+                        lSlopeClass = 3
+                    Else
+                        lSlopeClass = 4
+                    End If
+
+                    'update parameters based on parm table
+                    Dim lParmColumn As Integer
+                    If lSoilGroup = "A" Then
+                        lParmColumn = 1 + lSlopeClass
+                    ElseIf lSoilGroup = "B" Then
+                        lParmColumn = 5 + lSlopeClass
+                    Else
+                        lParmColumn = 9 + lSlopeClass
+                    End If
+
+                Next lOper
 
                 'save each uci
                 lUci.Save()
