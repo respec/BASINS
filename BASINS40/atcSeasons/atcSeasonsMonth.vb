@@ -1,8 +1,14 @@
 Public Class atcSeasonsMonth
     Inherits atcSeasonBase
 
-    Private pAllSeasons As Integer() = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
-    Private pMonthNames() As String = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+    Private Shared pAllSeasons As Integer() = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+    Private Shared pMonthNames() As String = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+
+    Public Overrides Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonsMonth
+        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        Return lNewSeason
+    End Function
 
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
         Return Date.FromOADate(aDate).Month

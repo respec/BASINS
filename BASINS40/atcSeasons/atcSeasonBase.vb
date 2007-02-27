@@ -5,9 +5,14 @@ Imports MapWinUtility
 Public Class atcSeasonBase
 
     Private pAllSeasons As Integer() = {}
-    Private pAvailableOperations As atcDataAttributes ' atcDataGroup
     Private pSeasonsSelected As New BitArray(0)
     Private Shared pNaN As Double = atcUtility.GetNaN
+
+    Public Overridable Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonBase
+        lNewSeason.SeasonsSelected = pSeasonsSelected.Clone
+        Return lNewSeason
+    End Function
 
     Public ReadOnly Property Name() As String
         Get

@@ -231,7 +231,7 @@ Imports MapWinUtility
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(563, 357)
+        Me.btnOk.Location = New System.Drawing.Point(563, 369)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
         Me.btnOk.TabIndex = 45
@@ -241,7 +241,7 @@ Imports MapWinUtility
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(641, 357)
+        Me.btnCancel.Location = New System.Drawing.Point(641, 369)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 46
@@ -270,7 +270,7 @@ Imports MapWinUtility
         'btnScript
         '
         Me.btnScript.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnScript.Location = New System.Drawing.Point(461, 357)
+        Me.btnScript.Location = New System.Drawing.Point(461, 369)
         Me.btnScript.Name = "btnScript"
         Me.btnScript.Size = New System.Drawing.Size(96, 24)
         Me.btnScript.TabIndex = 44
@@ -306,7 +306,7 @@ Imports MapWinUtility
         'chkEventGap
         '
         Me.chkEventGap.AutoSize = True
-        Me.chkEventGap.Location = New System.Drawing.Point(6, 61)
+        Me.chkEventGap.Location = New System.Drawing.Point(6, 70)
         Me.chkEventGap.Name = "chkEventGap"
         Me.chkEventGap.Size = New System.Drawing.Size(195, 17)
         Me.chkEventGap.TabIndex = 28
@@ -316,7 +316,7 @@ Imports MapWinUtility
         'cboEventDurationUnits
         '
         Me.cboEventDurationUnits.FormattingEnabled = True
-        Me.cboEventDurationUnits.Location = New System.Drawing.Point(322, 110)
+        Me.cboEventDurationUnits.Location = New System.Drawing.Point(322, 119)
         Me.cboEventDurationUnits.Name = "cboEventDurationUnits"
         Me.cboEventDurationUnits.Size = New System.Drawing.Size(84, 21)
         Me.cboEventDurationUnits.TabIndex = 37
@@ -324,7 +324,7 @@ Imports MapWinUtility
         '
         'txtEventDuration
         '
-        Me.txtEventDuration.Location = New System.Drawing.Point(250, 111)
+        Me.txtEventDuration.Location = New System.Drawing.Point(250, 120)
         Me.txtEventDuration.Name = "txtEventDuration"
         Me.txtEventDuration.Size = New System.Drawing.Size(66, 20)
         Me.txtEventDuration.TabIndex = 36
@@ -334,7 +334,7 @@ Imports MapWinUtility
         '
         Me.cboAboveBelowDuration.FormattingEnabled = True
         Me.cboAboveBelowDuration.Items.AddRange(New Object() {"Above", "Below"})
-        Me.cboAboveBelowDuration.Location = New System.Drawing.Point(175, 111)
+        Me.cboAboveBelowDuration.Location = New System.Drawing.Point(175, 120)
         Me.cboAboveBelowDuration.Name = "cboAboveBelowDuration"
         Me.cboAboveBelowDuration.Size = New System.Drawing.Size(69, 21)
         Me.cboAboveBelowDuration.TabIndex = 35
@@ -342,7 +342,7 @@ Imports MapWinUtility
         'chkEventDuration
         '
         Me.chkEventDuration.AutoSize = True
-        Me.chkEventDuration.Location = New System.Drawing.Point(6, 113)
+        Me.chkEventDuration.Location = New System.Drawing.Point(6, 122)
         Me.chkEventDuration.Name = "chkEventDuration"
         Me.chkEventDuration.Size = New System.Drawing.Size(145, 17)
         Me.chkEventDuration.TabIndex = 34
@@ -351,7 +351,7 @@ Imports MapWinUtility
         '
         'txtEventVolume
         '
-        Me.txtEventVolume.Location = New System.Drawing.Point(250, 85)
+        Me.txtEventVolume.Location = New System.Drawing.Point(250, 94)
         Me.txtEventVolume.Name = "txtEventVolume"
         Me.txtEventVolume.Size = New System.Drawing.Size(66, 20)
         Me.txtEventVolume.TabIndex = 33
@@ -361,7 +361,7 @@ Imports MapWinUtility
         '
         Me.cboAboveBelowVolume.FormattingEnabled = True
         Me.cboAboveBelowVolume.Items.AddRange(New Object() {"Above", "Below"})
-        Me.cboAboveBelowVolume.Location = New System.Drawing.Point(175, 85)
+        Me.cboAboveBelowVolume.Location = New System.Drawing.Point(175, 94)
         Me.cboAboveBelowVolume.Name = "cboAboveBelowVolume"
         Me.cboAboveBelowVolume.Size = New System.Drawing.Size(69, 21)
         Me.cboAboveBelowVolume.TabIndex = 32
@@ -369,7 +369,7 @@ Imports MapWinUtility
         'chkEventVolume
         '
         Me.chkEventVolume.AutoSize = True
-        Me.chkEventVolume.Location = New System.Drawing.Point(6, 87)
+        Me.chkEventVolume.Location = New System.Drawing.Point(6, 96)
         Me.chkEventVolume.Name = "chkEventVolume"
         Me.chkEventVolume.Size = New System.Drawing.Size(164, 17)
         Me.chkEventVolume.TabIndex = 31
@@ -379,7 +379,7 @@ Imports MapWinUtility
         'chkEvents
         '
         Me.chkEvents.AutoSize = True
-        Me.chkEvents.Location = New System.Drawing.Point(6, 10)
+        Me.chkEvents.Location = New System.Drawing.Point(6, 19)
         Me.chkEvents.Name = "chkEvents"
         Me.chkEvents.Size = New System.Drawing.Size(212, 17)
         Me.chkEvents.TabIndex = 24
@@ -390,14 +390,14 @@ Imports MapWinUtility
         '
         Me.cboAboveBelow.FormattingEnabled = True
         Me.cboAboveBelow.Items.AddRange(New Object() {"Above", "Below"})
-        Me.cboAboveBelow.Location = New System.Drawing.Point(175, 33)
+        Me.cboAboveBelow.Location = New System.Drawing.Point(175, 42)
         Me.cboAboveBelow.Name = "cboAboveBelow"
         Me.cboAboveBelow.Size = New System.Drawing.Size(69, 21)
         Me.cboAboveBelow.TabIndex = 26
         '
         'txtEventGap
         '
-        Me.txtEventGap.Location = New System.Drawing.Point(250, 59)
+        Me.txtEventGap.Location = New System.Drawing.Point(250, 68)
         Me.txtEventGap.Name = "txtEventGap"
         Me.txtEventGap.Size = New System.Drawing.Size(66, 20)
         Me.txtEventGap.TabIndex = 29
@@ -406,7 +406,7 @@ Imports MapWinUtility
         'cboEventGapUnits
         '
         Me.cboEventGapUnits.FormattingEnabled = True
-        Me.cboEventGapUnits.Location = New System.Drawing.Point(322, 58)
+        Me.cboEventGapUnits.Location = New System.Drawing.Point(322, 67)
         Me.cboEventGapUnits.Name = "cboEventGapUnits"
         Me.cboEventGapUnits.Size = New System.Drawing.Size(84, 21)
         Me.cboEventGapUnits.TabIndex = 30
@@ -414,7 +414,7 @@ Imports MapWinUtility
         '
         'txtEventThreshold
         '
-        Me.txtEventThreshold.Location = New System.Drawing.Point(250, 33)
+        Me.txtEventThreshold.Location = New System.Drawing.Point(250, 42)
         Me.txtEventThreshold.Name = "txtEventThreshold"
         Me.txtEventThreshold.Size = New System.Drawing.Size(66, 20)
         Me.txtEventThreshold.TabIndex = 27
@@ -498,7 +498,7 @@ Imports MapWinUtility
         Me.lblThreshold.AutoSize = True
         Me.lblThreshold.BackColor = System.Drawing.Color.Transparent
         Me.lblThreshold.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblThreshold.Location = New System.Drawing.Point(22, 36)
+        Me.lblThreshold.Location = New System.Drawing.Point(22, 45)
         Me.lblThreshold.Name = "lblThreshold"
         Me.lblThreshold.Size = New System.Drawing.Size(126, 13)
         Me.lblThreshold.TabIndex = 25
@@ -508,7 +508,7 @@ Imports MapWinUtility
         'chkSeasons
         '
         Me.chkSeasons.AutoSize = True
-        Me.chkSeasons.Location = New System.Drawing.Point(6, 10)
+        Me.chkSeasons.Location = New System.Drawing.Point(6, 18)
         Me.chkSeasons.Name = "chkSeasons"
         Me.chkSeasons.Size = New System.Drawing.Size(220, 17)
         Me.chkSeasons.TabIndex = 39
@@ -520,7 +520,7 @@ Imports MapWinUtility
         Me.cboSeasons.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboSeasons.ItemHeight = 13
-        Me.cboSeasons.Location = New System.Drawing.Point(6, 33)
+        Me.cboSeasons.Location = New System.Drawing.Point(6, 41)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
         Me.cboSeasons.Size = New System.Drawing.Size(240, 21)
@@ -532,10 +532,10 @@ Imports MapWinUtility
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
-        Me.lstSeasons.Location = New System.Drawing.Point(6, 60)
+        Me.lstSeasons.Location = New System.Drawing.Point(6, 68)
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(240, 166)
+        Me.lstSeasons.Size = New System.Drawing.Size(240, 158)
         Me.lstSeasons.TabIndex = 41
         '
         'btnSeasonsNone
@@ -568,6 +568,7 @@ Imports MapWinUtility
         Me.grpSeasons.Size = New System.Drawing.Size(252, 261)
         Me.grpSeasons.TabIndex = 38
         Me.grpSeasons.TabStop = False
+        Me.grpSeasons.Text = "Seasons"
         '
         'lblIncrement2
         '
@@ -644,14 +645,15 @@ Imports MapWinUtility
         Me.grpEvents.Controls.Add(Me.txtEventDuration)
         Me.grpEvents.Location = New System.Drawing.Point(12, 243)
         Me.grpEvents.Name = "grpEvents"
-        Me.grpEvents.Size = New System.Drawing.Size(431, 138)
+        Me.grpEvents.Size = New System.Drawing.Size(431, 150)
         Me.grpEvents.TabIndex = 23
         Me.grpEvents.TabStop = False
+        Me.grpEvents.Text = "Events"
         '
         'frmVariation
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(725, 393)
+        Me.ClientSize = New System.Drawing.Size(725, 405)
         Me.Controls.Add(Me.grpEvents)
         Me.Controls.Add(Me.grpMinMax)
         Me.Controls.Add(Me.lblPET)

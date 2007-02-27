@@ -1,8 +1,14 @@
 Public Class atcSeasonsDayOfWeek
     Inherits atcSeasonBase
 
-    Private pAllSeasons As Integer() = {1, 2, 3, 4, 5, 6, 7}
-    Private pDayNames() As String = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+    Private Shared pAllSeasons As Integer() = {1, 2, 3, 4, 5, 6, 7}
+    Private Shared pDayNames() As String = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+
+    Public Overrides Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonsDayOfWeek
+        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        Return lNewSeason
+    End Function
 
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
         Return Date.FromOADate(aDate).DayOfWeek
