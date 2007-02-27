@@ -92,6 +92,8 @@ Public Class frmCAT
     Friend WithEvents btnInputPrepared As System.Windows.Forms.Button
     Friend WithEvents chkRunModel As System.Windows.Forms.CheckBox
     Friend WithEvents btnInputView As System.Windows.Forms.Button
+    Friend WithEvents btnEndpointBottom As System.Windows.Forms.Button
+    Friend WithEvents btnEndpointTop As System.Windows.Forms.Button
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -153,6 +155,8 @@ Public Class frmCAT
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblTop = New System.Windows.Forms.Label
         Me.btnStop = New System.Windows.Forms.Button
+        Me.btnEndpointTop = New System.Windows.Forms.Button
+        Me.btnEndpointBottom = New System.Windows.Forms.Button
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -313,6 +317,8 @@ Public Class frmCAT
         '
         'tabEndpoints
         '
+        Me.tabEndpoints.Controls.Add(Me.btnEndpointBottom)
+        Me.tabEndpoints.Controls.Add(Me.btnEndpointTop)
         Me.tabEndpoints.Controls.Add(Me.chkRunModel)
         Me.tabEndpoints.Controls.Add(Me.btnEndpointCopy)
         Me.tabEndpoints.Controls.Add(Me.chkShowEachRunProgress)
@@ -386,24 +392,24 @@ Public Class frmCAT
         Me.lstEndpoints.Location = New System.Drawing.Point(8, 94)
         Me.lstEndpoints.Name = "lstEndpoints"
         Me.lstEndpoints.Size = New System.Drawing.Size(434, 181)
-        Me.lstEndpoints.TabIndex = 20
+        Me.lstEndpoints.TabIndex = 22
         '
         'btnEndpointDown
         '
         Me.btnEndpointDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointDown.Location = New System.Drawing.Point(417, 64)
+        Me.btnEndpointDown.Location = New System.Drawing.Point(362, 64)
         Me.btnEndpointDown.Name = "btnEndpointDown"
         Me.btnEndpointDown.Size = New System.Drawing.Size(24, 24)
-        Me.btnEndpointDown.TabIndex = 19
+        Me.btnEndpointDown.TabIndex = 20
         Me.btnEndpointDown.Text = "v"
         '
         'btnEndpointUp
         '
         Me.btnEndpointUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointUp.Location = New System.Drawing.Point(387, 64)
+        Me.btnEndpointUp.Location = New System.Drawing.Point(332, 64)
         Me.btnEndpointUp.Name = "btnEndpointUp"
         Me.btnEndpointUp.Size = New System.Drawing.Size(24, 24)
-        Me.btnEndpointUp.TabIndex = 18
+        Me.btnEndpointUp.TabIndex = 19
         Me.btnEndpointUp.Text = "^"
         '
         'btnEndpointRemove
@@ -657,6 +663,24 @@ Public Class frmCAT
         Me.btnStop.Text = "Stop"
         Me.btnStop.Visible = False
         '
+        'btnEndpointTop
+        '
+        Me.btnEndpointTop.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEndpointTop.Location = New System.Drawing.Point(292, 64)
+        Me.btnEndpointTop.Name = "btnEndpointTop"
+        Me.btnEndpointTop.Size = New System.Drawing.Size(34, 24)
+        Me.btnEndpointTop.TabIndex = 18
+        Me.btnEndpointTop.Text = "Top"
+        '
+        'btnEndpointBottom
+        '
+        Me.btnEndpointBottom.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEndpointBottom.Location = New System.Drawing.Point(392, 64)
+        Me.btnEndpointBottom.Name = "btnEndpointBottom"
+        Me.btnEndpointBottom.Size = New System.Drawing.Size(50, 24)
+        Me.btnEndpointBottom.TabIndex = 21
+        Me.btnEndpointBottom.Text = "Bottom"
+        '
         'frmCAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -882,7 +906,7 @@ NextIteration:
                 Next
 
                 aIteration += 1
-                If Not aPreparedInputs Is Nothing AndAlso aIteration < aPreparedInputs.Count Then
+                If g_running AndAlso Not aPreparedInputs Is Nothing AndAlso aIteration < aPreparedInputs.Count Then
                     GoTo NextIteration
                 End If
 
@@ -934,7 +958,7 @@ NextIteration:
                     For Each lOldData As atcDataSet In lEndpoint.DataSets
                         Dim lGroup As atcDataGroup = Nothing
                         Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
-                        Dim lResultDataSpec As String = aResults.ItemByKey(lOriginalDataSpec)
+                        Dim lResultDataSpec As String = aResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower)
                         If lResultDataSpec Is Nothing Then
                             Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
                         Else
@@ -1467,15 +1491,15 @@ NextIteration:
         If lMoveFrom >= 0 AndAlso lMoveFrom < aGroup.Count Then
             Dim lMoveTo As Integer = lMoveFrom + aDirection
 
-            Dim lNow As Date = Date.Now
-            If lNow.Subtract(pLastUpDownClick).TotalSeconds < pUpDownButtonDoubleClickSeconds Then
-                If aDirection < 0 Then
-                    lMoveTo = 0
-                Else
-                    lMoveTo = aGroup.Count - 1
-                End If
-            End If
-            pLastUpDownClick = lNow
+            'Dim lNow As Date = Date.Now
+            'If lNow.Subtract(pLastUpDownClick).TotalSeconds < pUpDownButtonDoubleClickSeconds Then
+            '    If aDirection < 0 Then
+            '        lMoveTo = 0
+            '    Else
+            '        lMoveTo = aGroup.Count - 1
+            '    End If
+            'End If
+            'pLastUpDownClick = lNow
 
             If lMoveTo >= 0 AndAlso lMoveTo < aGroup.Count Then
                 Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
@@ -1506,6 +1530,14 @@ NextIteration:
 
     Private Sub btnEndpointDown_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointDown.Click
         MoveItem(pEndpoints, lstEndpoints, 1)
+    End Sub
+
+    Private Sub btnEndpointTop_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointTop.Click
+        MoveItem(pEndpoints, lstEndpoints, -lstEndpoints.SelectedIndex)
+    End Sub
+
+    Private Sub btnEndpointBottom_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointBottom.Click
+        MoveItem(pEndpoints, lstEndpoints, lstEndpoints.Items.Count - lstEndpoints.SelectedIndex - 1)
     End Sub
 
     Private Sub btnEndpointAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointAdd.Click
@@ -1774,24 +1806,29 @@ NextIteration:
     ''' </summary>
     Private Sub btnEndpointCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointCopy.Click
         If lstEndpoints.SelectedIndices.Count > 0 Then
+            Dim lNumCopied As Integer = 0
             Dim lCopyNumber As Integer
             Dim lCopyText As String = " copy "
             For Each lIndex As Integer In lstEndpoints.SelectedIndices
+                lIndex += lNumCopied
                 Dim lNewEndpoint As Variation = pEndpoints(lIndex).Clone
+                Dim lNewEndpointName As String = lNewEndpoint.Name
                 lNewEndpoint.IsInput = False
-                Dim lCopyTextPosition As Integer = lNewEndpoint.Name.LastIndexOf(lCopyText)
+                Dim lCopyTextPosition As Integer = lNewEndpointName.LastIndexOf(lCopyText)
                 lCopyNumber = 1
                 If (lCopyTextPosition > 0) Then
                     If IsNumeric(lNewEndpoint.Name.Substring(lCopyTextPosition + 6)) Then
-                        lCopyNumber = CInt(lNewEndpoint.Name.Substring(lCopyTextPosition + lCopyText.Length)) + 1
-                        lNewEndpoint.Name = lNewEndpoint.Name.Substring(0, lCopyTextPosition) 'remove " copy 1" from name
+                        lCopyNumber = CInt(lNewEndpointName.Substring(lCopyTextPosition + lCopyText.Length)) + 1
+                        lNewEndpointName = lNewEndpointName.Substring(0, lCopyTextPosition) 'remove " copy 1" from name
                     End If
                 End If
-                While lstEndpoints.Items.Contains(lNewEndpoint.Name & lCopyText & lCopyNumber)
+                lNewEndpoint.Name = lNewEndpointName & lCopyText & lCopyNumber
+                While lstEndpoints.Items.Contains(lNewEndpoint.ToString)
                     lCopyNumber += 1
+                    lNewEndpoint.Name = lNewEndpointName & lCopyText & lCopyNumber
                 End While
-                lNewEndpoint.Name &= lCopyText & lCopyNumber
-                pEndpoints.Add(lNewEndpoint)
+                pEndpoints.Insert(lIndex + 1, lNewEndpoint)
+                lNumCopied += 1
             Next
             RefreshEndpointList()
         Else
@@ -1842,5 +1879,4 @@ NextIteration:
             Next
         End If
     End Sub
-
 End Class

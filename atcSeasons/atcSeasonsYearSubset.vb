@@ -3,11 +3,16 @@ Imports atcData
 Public Class atcSeasonsYearSubset
     Inherits atcSeasonBase
 
-    Private pAllSeasons As Integer() = {0, 1}
-    Private pTS As atcTimeseries
+    Private Shared pAllSeasons As Integer() = {0, 1}
     Private pStartDate As Date
     Private pEndDate As Date
     Private pEndDateNextYear As Boolean = False
+
+    Public Overrides Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonsYearSubset(pStartDate, pEndDate)
+        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        Return lNewSeason
+    End Function
 
     'Season 0 = values are outside range  
     'Season 1 = values are in range  

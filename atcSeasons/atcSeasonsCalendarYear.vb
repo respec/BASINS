@@ -3,6 +3,12 @@ Public Class atcSeasonsCalendarYear
 
     Private pSeasonsSelected As New ArrayList
 
+    Public Overrides Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonsCalendarYear
+        lNewSeason.pSeasonsSelected = pSeasonsSelected.Clone
+        Return lNewSeason
+    End Function
+
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
         Return Date.FromOADate(aDate).Year
     End Function

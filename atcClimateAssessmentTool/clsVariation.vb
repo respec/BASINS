@@ -370,7 +370,9 @@ Public Class Variation
             If Not PETdata Is Nothing Then .PETdata = PETdata.Clone()
             .ComputationSource = ComputationSource
             .Operation = Operation.Clone()
-            .Seasons = Seasons 'TODO: clone Seasons of not Nothing
+            If Not Seasons Is Nothing Then
+                .Seasons = Seasons.Clone 'TODO: clone Seasons of not Nothing
+            End If
             .Selected = Selected
             .Min = Min
             .Max = Max

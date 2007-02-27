@@ -1,6 +1,12 @@
 Public Class atcSeasonsDayOfYear
     Inherits atcSeasonBase
 
+    Public Overrides Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonsDayOfYear
+        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        Return lNewSeason
+    End Function
+
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
         Return Date.FromOADate(aDate).DayOfYear
     End Function

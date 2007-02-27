@@ -110,7 +110,7 @@ Public Module modCAT
                     End If
 
                     'Key is base file name, value is modified file name
-                    lModified.Add(lWDMfilename, lNewWDMfilename)
+                    lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower, lNewWDMfilename)
 
                     'Update scenario name in new WDM
                     For Each lCurrentTimeseries In aModifiedData
@@ -167,7 +167,7 @@ Public Module modCAT
                     If IO.File.Exists(lNewFilename) Then
                         Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
                         If lHBNResults.Open(lNewFilename) Then
-                            lModified.Add(lBinOutFilename, lNewFilename)
+                            lModified.Add(IO.Path.GetFileName(lBinOutFilename).ToLower, lNewFilename)
                         Else
                             Logger.Dbg("Could not open HBN file '" & lNewFilename & "'")
                         End If

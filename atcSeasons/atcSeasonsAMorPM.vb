@@ -1,7 +1,13 @@
 Public Class atcSeasonsAMorPM
     Inherits atcSeasonBase
 
-    Private pAllSeasons As Integer() = {0, 1}
+    Private Shared pAllSeasons As Integer() = {0, 1}
+
+    Public Overrides Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonsAMorPM
+        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        Return lNewSeason
+    End Function
 
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
         If Date.FromOADate(aDate).Hour < 12 Then

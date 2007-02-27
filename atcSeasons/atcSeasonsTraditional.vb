@@ -1,8 +1,14 @@
 Public Class atcSeasonsTraditional
     Inherits atcSeasonBase
 
-    Private pAllSeasons As Integer() = {0, 1, 2, 3}
-    Private pSeasonNames() As String = {"Winter", "Spring", "Summer", "Autumn"}
+    Private Shared pAllSeasons As Integer() = {0, 1, 2, 3}
+    Private Shared pSeasonNames() As String = {"Winter", "Spring", "Summer", "Autumn"}
+
+    Public Overrides Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonsTraditional
+        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        Return lNewSeason
+    End Function
 
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
         Dim lDate As Date = Date.FromOADate(aDate)
