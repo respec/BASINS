@@ -42,8 +42,8 @@ Public Module UCIBuilder
         End If
 
         Dim lSlopeClassTable As New atcTableDelimited
-        If Not lSlopeClassTable.OpenFile(pDataDir & "meanslope.csv") Then
-            Logger.Dbg("Could not open meanslope.csv")
+        If Not lSlopeClassTable.OpenFile(pDataDir & "meanslopes.csv") Then
+            Logger.Dbg("Could not open meanslopes.csv")
         End If
 
         Dim lParmTable As New atcTableDelimited
@@ -260,14 +260,14 @@ Public Module UCIBuilder
                 Dim lShrubSlope As Single = 0
                 Do Until lSlopeClassTable.atEOF
                     lSlopeClassTable.MoveNext()
-                    lSlopeBase = lSoilClassTable.Value(1)
+                    lSlopeBase = lSlopeClassTable.Value(1)
                     If lSlopeBase = lUcibase Then
                         'found the match, store slopes by land use
-                        lAgSlope = lSoilClassTable.Value(3)
-                        lDevSlope = lSoilClassTable.Value(4)
-                        lForSlope = lSoilClassTable.Value(5)
-                        lGrassSlope = lSoilClassTable.Value(6)
-                        lShrubSlope = lSoilClassTable.Value(7)
+                        lAgSlope = lSlopeClassTable.Value(3)
+                        lDevSlope = lSlopeClassTable.Value(4)
+                        lForSlope = lSlopeClassTable.Value(5)
+                        lGrassSlope = lSlopeClassTable.Value(6)
+                        lShrubSlope = lSlopeClassTable.Value(7)
                         lSlopeClassTable.MoveLast()
                     End If
                 Loop
@@ -277,49 +277,70 @@ Public Module UCIBuilder
                 Dim lSlopeClass As Integer = 1
                 Dim lParmLine As Integer = 1
                 For Each lOper In lUci.OpnSeqBlock.Opns
-                    If lOper.Name = "PERLND" And lOper.Id = 101 Then
-                        'forest
-                        lSlope = lForSlope
-                        lParmLine = 1
-                    ElseIf lOper.Name = "PERLND" And lOper.Id = 102 Then
-                        'shrub
-                        lSlope = lShrubSlope
-                        lParmLine = 2
-                    ElseIf lOper.Name = "PERLND" And lOper.Id = 103 Then
-                        'grass
-                        lSlope = lGrassSlope
-                        lParmLine = 3
-                    ElseIf lOper.Name = "PERLND" And lOper.Id = 104 Then
-                        'dev
-                        lSlope = lDevSlope
-                        lParmLine = 4
-                    ElseIf lOper.Name = "PERLND" And lOper.Id = 105 Then
-                        'ag
-                        lSlope = lAgSlope
-                        lParmLine = 3
-                    ElseIf lOper.Name = "IMPLND" Then
-                        lSlope = lDevSlope
-                        lParmLine = 4
-                    End If
-                    'assign slope class
-                    If lSlope < 5 Then
-                        lSlopeClass = 1
-                    ElseIf lSlope < 10 Then
-                        lSlopeClass = 2
-                    ElseIf lSlope < 20 Then
-                        lSlopeClass = 3
-                    Else
-                        lSlopeClass = 4
-                    End If
+                    If lOper.Name = "PERLND" Or lOper.Name = "IMPLND" Then
+                        If lOper.Name = "PERLND" And lOper.Id = 101 Then
+                            'forest
+                            lSlope = lForSlope
+                            lParmLine = 1
+                        ElseIf lOper.Name = "PERLND" And lOper.Id = 102 Then
+                            'shrub
+                            lSlope = lShrubSlope
+                            lParmLine = 2
+                        ElseIf lOper.Name = "PERLND" And lOper.Id = 103 Then
+                            'grass
+                            lSlope = lGrassSlope
+                            lParmLine = 3
+                        ElseIf lOper.Name = "PERLND" And lOper.Id = 104 Then
+                            'dev
+                            lSlope = lDevSlope
+                            lParmLine = 4
+                        ElseIf lOper.Name = "PERLND" And lOper.Id = 105 Then
+                            'ag
+                            lSlope = lAgSlope
+                            lParmLine = 3
+                        ElseIf lOper.Name = "IMPLND" Then
+                            lSlope = lDevSlope
+                            lParmLine = 4
+                        End If
+                        'assign slope class
+                        If lSlope < 5 Then
+                            lSlopeClass = 1
+                        ElseIf lSlope < 10 Then
+                            lSlopeClass = 2
+                        ElseIf lSlope < 20 Then
+                            lSlopeClass = 3
+                        Else
+                            lSlopeClass = 4
+                        End If
 
-                    'update parameters based on parm table
-                    Dim lParmColumn As Integer
-                    If lSoilGroup = "A" Then
-                        lParmColumn = 1 + lSlopeClass
-                    ElseIf lSoilGroup = "B" Then
-                        lParmColumn = 5 + lSlopeClass
-                    Else
-                        lParmColumn = 9 + lSlopeClass
+                        'update parameters based on parm table
+                        Dim lParmColumn As Integer
+                        If lSoilGroup = "A" Then
+                            lParmColumn = lSlopeClass
+                        ElseIf lSoilGroup = "B" Then
+                            lParmColumn = 4 + lSlopeClass
+                        Else
+                            lParmColumn = 8 + lSlopeClass
+                        End If
+                        If lOper.Name = "PERLND" Then
+                            lOper.Tables("PWAT-PARM2").parmvalue("LZSN") = lParmValue(lParmColumn, lParmLine + 1)
+                            lOper.Tables("PWAT-PARM2").parmvalue("INFILT") = lParmValue(lParmColumn, lParmLine + 8)
+                            lOper.Tables("PWAT-PARM2").parmvalue("LSUR") = lParmValue(lParmColumn, lParmLine + 15)
+                            lOper.Tables("PWAT-PARM2").parmvalue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22)
+                            lOper.Tables("PWAT-PARM2").parmvalue("KVARY") = lParmValue(lParmColumn, lParmLine + 29)
+                            lOper.Tables("PWAT-PARM2").parmvalue("AGWRC") = lParmValue(lParmColumn, lParmLine + 36)
+                            lOper.Tables("PWAT-PARM3").parmvalue("BASETP") = lParmValue(lParmColumn, lParmLine + 43)
+                            lOper.Tables("PWAT-PARM4").parmvalue("UZSN") = lParmValue(lParmColumn, lParmLine + 50)
+                            lOper.Tables("PWAT-PARM4").parmvalue("NSUR") = lParmValue(lParmColumn, lParmLine + 57)
+                            lOper.Tables("PWAT-PARM4").parmvalue("INTFW") = lParmValue(lParmColumn, lParmLine + 64)
+                            lOper.Tables("PWAT-PARM4").parmvalue("IRC") = lParmValue(lParmColumn, lParmLine + 71)
+                            lOper.Tables("PWAT-PARM3").parmvalue("DEEPFR") = lParmValue(lParmColumn, lParmLine + 78)
+                        Else
+                            lOper.Tables("IWAT-PARM2").parmvalue("LSUR") = lParmValue(lParmColumn, lParmLine + 15)
+                            lOper.Tables("IWAT-PARM2").parmvalue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22)
+                            lOper.Tables("IWAT-PARM2").parmvalue("NSUR") = lParmValue(lParmColumn, lParmLine + 57)
+                        End If
+
                     End If
 
                 Next lOper
