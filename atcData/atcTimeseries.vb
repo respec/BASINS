@@ -128,7 +128,9 @@ Public Class atcTimeseries
             If Not pValues Is Nothing Then .Values = pValues.Clone
             If Not pValueAttributes Is Nothing Then
                 For lValueAttIndex As Integer = 0 To pNumValues
-                    .ValueAttributes(lValueAttIndex) = pValueAttributes(lValueAttIndex).Clone
+                    If Not pValueAttributes(lValueAttIndex) Is Nothing Then
+                        .ValueAttributes(lValueAttIndex) = pValueAttributes(lValueAttIndex).Clone
+                    End If
                 Next
             End If
         End With
