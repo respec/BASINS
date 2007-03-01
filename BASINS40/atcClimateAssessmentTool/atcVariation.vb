@@ -124,7 +124,7 @@ Public Class atcVariation
     Protected Overridable Function VaryData() As atcDataGroup
         'Dim lMetCmp As New atcMetCmp.atcMetCmpPlugin
         Dim lArgsMath As New atcDataAttributes
-        Dim lModifiedTS As atcTimeseries
+        Dim lModifiedTS As atcTimeseries = Nothing
         Dim lModifiedGroup As New atcDataGroup
         Dim lDataSetIndex As Integer = 0
         Dim lValueIndex As Integer
@@ -143,6 +143,7 @@ Public Class atcVariation
                     For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
                         lEvent = lEvents.ItemByIndex(lEventIndex)
 
+                        'Find peak value of event
                         Dim lPeakIndex As Integer = 1
                         For lValueIndex = 2 To lEvent.numValues
                             If lEvent.Value(lValueIndex) > lEvent.Value(lPeakIndex) Then
@@ -150,12 +151,14 @@ Public Class atcVariation
                             End If
                         Next
 
+                        'If peak is not in season, remove this event
                         If Not Seasons.SeasonSelected(Seasons.SeasonIndex(lEvent.Dates.Value(lPeakIndex))) Then
                             lEvents.RemoveAt(lEventIndex)
                         End If
                     Next
                 End If
 
+                'Remove events outside target volume threshold
                 If Not Double.IsNaN(EventVolumeThreshold) Then
                     For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
                         Dim lEventVolume As Double = lEvents.ItemByIndex(lEventIndex).Attributes.GetValue("Sum")
@@ -172,6 +175,7 @@ Public Class atcVariation
                     Next
                 End If
 
+                'Remove events outside target duration threshold
                 If Not Double.IsNaN(EventDurationDays) Then
                     For lEventIndex As Integer = lEvents.Count - 1 To 0 Step -1
                         Dim lEventDuration As Double = atcSynopticAnalysis.atcSynopticAnalysisPlugin.DataSetDuration(lEvents.ItemByIndex(lEventIndex))
@@ -193,39 +197,45 @@ Public Class atcVariation
                 lModifyThis = lOriginalData
             End If
 
-            If Seasons Is Nothing OrElse UseEvents Then
-                Select Case Operation
-                    Case "AddEvents"
-                        lModifiedTS = AddRemoveEventsTotalVolume(lOriginalData, Math.Abs(CurrentValue), lEvents, 0)
+            Dim lSplitData As atcDataGroup
+            Dim lModifiedSplit As New atcDataGroup
 
-                        'TODO Case "AddVolume"
-
-                    Case Else '"Add", "Multiply"
-                        ComputationSource.DataSets.Clear()
-                        lArgsMath.Clear()
-                        lArgsMath.SetValue("timeseries", lModifyThis)
-                        lArgsMath.SetValue("Number", CurrentValue)
-                        ComputationSource.Open(Operation, lArgsMath)
-                        lModifiedTS = ComputationSource.DataSets(0)
-                End Select
+            If Seasons Is Nothing Then
+                lSplitData = New atcDataGroup(lModifyThis)
             Else
-                Dim lSplitData As atcDataGroup = Seasons.Split(lModifyThis, Nothing)
-                Dim lModifiedSplit As New atcDataGroup
-                For Each lSplitTS As atcTimeseries In lSplitData
-                    If Seasons.SeasonSelected(lSplitTS.Attributes.GetValue("SeasonIndex")) Then
-                        'modify data from this season
-                        ComputationSource.DataSets.Clear()
-                        lArgsMath.Clear()
-                        lArgsMath.SetValue("timeseries", lSplitTS)
-                        lArgsMath.SetValue("Number", CurrentValue)
-                        ComputationSource.Open(Operation, lArgsMath)
-                        lModifiedSplit.Add(ComputationSource.DataSets(0))
-                    Else 'Add unmodified data from this season that was not selected
-                        lModifiedSplit.Add(lSplitTS)
-                    End If
-                Next
-                lModifiedTS = MergeTimeseries(lModifiedSplit)
+                lSplitData = Seasons.Split(lModifyThis, Nothing)
             End If
+
+            For Each lSplitTS As atcTimeseries In lSplitData
+                'if there are seasons, modify data only from selected seasons
+                If Seasons Is Nothing OrElse Seasons.SeasonSelected(lSplitTS.Attributes.GetValue("SeasonIndex")) Then
+                    Select Case Operation
+                        Case "AddEvents"
+                            lModifiedSplit.Add(AddRemoveEventsVolumeFraction(lOriginalData, CurrentValue, lEvents, 0))
+
+                            'TODO Case "AddVolume"
+
+                        Case Else '"Add", "Multiply"
+                            ComputationSource.DataSets.Clear()
+                            lArgsMath.Clear()
+                            lArgsMath.SetValue("timeseries", lSplitTS)
+                            lArgsMath.SetValue("Number", CurrentValue)
+                            ComputationSource.Open(Operation, lArgsMath)
+                            lModifiedTS = ComputationSource.DataSets(0)
+                            lModifiedSplit.Add(ComputationSource.DataSets(0))
+                    End Select
+                Else 'Add unmodified data from this season that was not selected
+                    lModifiedSplit.Add(lSplitTS)
+                End If
+            Next
+            Select Case lModifiedSplit.Count
+                Case 0
+                    Throw New ApplicationException("VaryData: No data computed")
+                Case 1
+                    lModifiedTS = lModifiedSplit.Item(0)
+                Case Is > 1
+                    lModifiedTS = MergeTimeseries(lModifiedSplit)
+            End Select
 
             lModifiedGroup.Add(lModifiedTS)
 
@@ -247,6 +257,79 @@ Public Class atcVariation
             lDataSetIndex += 1
         Next
         Return lModifiedGroup
+    End Function
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aTimeseries">Original data values</param>
+    ''' <param name="aVolumeChangeFraction">Amount to change total volume, (-0.5=remove 50%, 0=no change, 0.5=add 50%)</param>
+    ''' <param name="aEventsToSearch">Events available for adding</param>
+    ''' <param name="aSeed">Random number seed</param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Function AddRemoveEventsVolumeFraction(ByVal aTimeseries As atcTimeseries, _
+                                                   ByVal aVolumeChangeFraction As Double, _
+                                                   ByVal aEventsToSearch As atcDataGroup, _
+                                                   ByVal aSeed As Integer) As atcTimeseries
+        Dim lNewTimeseries As atcTimeseries = aTimeseries.Clone
+        Dim lMaxEventIndex As Integer = aEventsToSearch.Count - 1
+        Dim lFoundIndexes As New ArrayList
+        Dim lRandom As New Random(aSeed)
+        Dim lAdd As Boolean = True
+        Dim lValueIndex As Integer
+        Dim lValueLastIndex As Integer
+        Dim lOriginalVolume As Double = aTimeseries.Attributes.GetValue("Sum")
+        Dim lCurrentVolume As Double = lOriginalVolume
+        Dim lTargetVolume As Double = lOriginalVolume * (1 + aVolumeChangeFraction)
+
+        If aVolumeChangeFraction < 0 Then lAdd = False
+
+        'While adding and not yet added enough, or removing and not yet removed enough
+        While (lAdd AndAlso (lCurrentVolume < lTargetVolume)) OrElse _
+         ((Not lAdd) AndAlso (lCurrentVolume > lTargetVolume))
+            Dim lCheckIndex As Integer = lRandom.Next(0, lMaxEventIndex)
+            If Not lFoundIndexes.Contains(lCheckIndex) Then
+                Dim lEvent As atcTimeseries = aEventsToSearch.ItemByIndex(lCheckIndex)
+                lFoundIndexes.Add(lCheckIndex)
+
+                'Find starting index of event and add it or remove it
+                If lAdd Then
+                    lValueIndex = lRandom.Next(1, aTimeseries.numValues - lEvent.numValues)
+                    lValueLastIndex = lValueIndex + lEvent.numValues - 1
+                    For lIndex As Integer = lValueIndex To lValueLastIndex
+                        lCurrentVolume -= aTimeseries.Values(lIndex)
+                        aTimeseries.Values(lIndex) = lEvent.Values(lIndex - lValueIndex + 1)
+                        lCurrentVolume += aTimeseries.Values(lIndex)
+                    Next
+                Else
+                    lValueIndex = FindDateAtOrAfter(lNewTimeseries.Dates.Values, lEvent.Dates.Value(1))
+                    lCurrentVolume -= DoubleArraySum(aTimeseries.Values, lValueIndex, lEvent.numValues)
+                    Array.Clear(lNewTimeseries.Values, lValueIndex, lEvent.numValues)
+                End If
+                'lNewTimeseries.Attributes.DiscardCalculated()
+                'lCurrentVolume = lNewTimeseries.Attributes.GetValue("Sum")
+            End If
+        End While
+
+        lNewTimeseries.Attributes.DiscardCalculated()
+
+        Dim lOperation As String
+        If lAdd Then lOperation = "Added " Else lOperation = "Removed "
+
+        lNewTimeseries.Attributes.AddHistory(lOperation & lFoundIndexes.Count & " events to change total volume " & DoubleString(aVolumeChangeFraction) _
+            & " (actual change = " & DoubleString((lNewTimeseries.Attributes.GetValue("Sum") - lOriginalVolume) / lOriginalVolume) & ")")
+
+        Return lNewTimeseries
+    End Function
+
+    Private Function DoubleArraySum(ByVal aValues() As Double, ByVal aStart As Integer, ByVal aCount As Integer) As Double
+        DoubleArraySum = 0
+        Dim lBeyondLastIndex As Integer = aStart + aCount
+        While aStart < lBeyondLastIndex
+            DoubleArraySum += aValues(aStart)
+            aStart += 1
+        End While
     End Function
 
     Private Function AddRemoveEventsTotalVolume(ByVal aTimeseries As atcTimeseries, ByVal aTargetVolumeChange As Double, ByVal aEventsToSearch As atcDataGroup, ByVal aSeed As Integer) As atcTimeseries
