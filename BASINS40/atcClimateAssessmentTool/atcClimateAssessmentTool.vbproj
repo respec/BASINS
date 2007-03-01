@@ -168,12 +168,8 @@
     <Compile Include="atcClimateAssessmentToolPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="clsVariation.vb">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="clsVariationCligen.vb">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="atcVariation.vb" />
+    <Compile Include="atcVariationCligen.vb" />
     <Compile Include="frmCAT.vb">
       <SubType>Form</SubType>
     </Compile>

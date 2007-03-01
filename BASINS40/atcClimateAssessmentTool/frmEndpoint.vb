@@ -9,7 +9,7 @@ Public Class frmEndpoint
     Private Const AllSeasons As String = "All Seasons"
 
     Private pNotNumberString As String = "<none>"
-    Private pVariation As Variation
+    Private pVariation As atcVariation
     Private pSeasonsAvailable As New atcCollection
     Private pSeasons As atcSeasonBase
     Friend WithEvents lblOperation As System.Windows.Forms.Label
@@ -432,7 +432,7 @@ Public Class frmEndpoint
 
 #End Region
 
-    Public Function AskUser(Optional ByVal aVariation As Variation = Nothing) As Boolean
+    Public Function AskUser(Optional ByVal aVariation As atcVariation = Nothing) As Boolean
         pVariation = aVariation.Clone
 
         If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
@@ -571,7 +571,7 @@ Public Class frmEndpoint
         End Try
     End Sub
 
-    Private Function VariationFromForm(ByVal aVariation As Variation) As Boolean
+    Private Function VariationFromForm(ByVal aVariation As atcVariation) As Boolean
         Try
             With aVariation
                 .Name = txtName.Text

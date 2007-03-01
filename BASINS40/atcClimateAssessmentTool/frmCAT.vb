@@ -769,7 +769,7 @@ Public Class frmCAT
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
         Dim lSelectedVariations As atcCollection = New atcCollection
         Dim lRuns As Integer = 0
-        Dim lEndpoint As Variation
+        Dim lEndpoint As atcVariation
 
         g_running = True
         btnStart.Visible = False
@@ -781,7 +781,7 @@ Public Class frmCAT
 
         If pPreparedInputs Is Nothing Then
             'Make a collection of the variations that are selected/checked in lstInputs
-            For Each lVariation As Variation In pInputs
+            For Each lVariation As atcVariation In pInputs
                 If lVariation.Selected Then lSelectedVariations.Add(lVariation)
             Next
         End If
@@ -911,7 +911,7 @@ NextIteration:
                 End If
 
             Else 'Need to loop through values for next variation
-                Dim lVariation As Variation = aVariations.ItemByIndex(aStartVariation)
+                Dim lVariation As atcVariation = aVariations.ItemByIndex(aStartVariation)
                 With lVariation
                     Dim lModifiedGroup As atcDataGroup = .StartIteration
                     While g_running And Not lModifiedGroup Is Nothing
@@ -941,7 +941,7 @@ NextIteration:
         With agdResults.Source
             Dim lRow As Integer = aIteration + .FixedRows
             Dim lColumn As Integer = .FixedColumns
-            Dim lEndpoint As Variation
+            Dim lEndpoint As atcVariation
 
             If pPreparedInputs Is Nothing Then
                 .CellValue(lRow, 0) = aIteration + 1
@@ -1351,7 +1351,7 @@ NextIteration:
 
     Private Sub btnInputAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputAdd.Click
         Dim frmVary As New frmVariation
-        Dim lVariation As New Variation
+        Dim lVariation As New atcVariation
         With lVariation
             .Name = ""
             .ComputationSource = New atcTimeseriesMath.atcTimeseriesMath
@@ -1368,7 +1368,7 @@ NextIteration:
             RefreshInputList()
             RefreshTotalIterations()
 
-            'Dim lEndpoint As Variation = lVariation.Clone
+            'Dim lEndpoint As atcVariation = lVariation.Clone
             'lEndpoint.Operation = "Current Value"
             pEndpoints.Add(lVariation)
             RefreshEndpointList()
@@ -1400,7 +1400,7 @@ NextIteration:
     Private Sub btnInputModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputModify.Click
         Dim lIndex As Integer = lstInputs.SelectedIndex
         If lIndex >= 0 And lIndex < pInputs.Count Then
-            Dim lVariation As Variation = pInputs.ItemByIndex(lIndex)
+            Dim lVariation As atcVariation = pInputs.ItemByIndex(lIndex)
             If lVariation.GetType.Name.EndsWith("Cligen") Then
                 Dim frmVaryCligen As New frmVariationCligen
                 lVariation = frmVaryCligen.AskUser(lVariation)
@@ -1423,7 +1423,7 @@ NextIteration:
                 Dim lData As New atcDataGroup
                 For Each lIndex As Integer In lstInputs.SelectedIndices
                     Dim lDataThisIteration As atcDataGroup
-                    Dim lVariation As Variation = pInputs.ItemByIndex(lIndex)
+                    Dim lVariation As atcVariation = pInputs.ItemByIndex(lIndex)
                     lDataThisIteration = lVariation.StartIteration
                     While Not lDataThisIteration Is Nothing
                         lData.AddRange(lDataThisIteration)
@@ -1503,7 +1503,7 @@ NextIteration:
 
             If lMoveTo >= 0 AndAlso lMoveTo < aGroup.Count Then
                 Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
-                Dim lMoveMe As Variation = aGroup.ItemByIndex(lMoveFrom)
+                Dim lMoveMe As atcVariation = aGroup.ItemByIndex(lMoveFrom)
                 aGroup.RemoveAt(lMoveFrom)
                 aList.Items.RemoveAt(lMoveFrom)
                 aGroup.Insert(lMoveTo, lMoveMe)
@@ -1542,7 +1542,7 @@ NextIteration:
 
     Private Sub btnEndpointAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointAdd.Click
         Dim frmEnd As New frmEndpoint
-        Dim lVariation As New Variation
+        Dim lVariation As New atcVariation
         With lVariation
             .Name = ""
             .Operation = "Mean"
@@ -1562,7 +1562,7 @@ NextIteration:
 
         If pPreparedInputs Is Nothing Then
             pTotalIterations = 1
-            For Each lVariation As Variation In pInputs
+            For Each lVariation As atcVariation In pInputs
                 If lVariation.Selected Then
                     pTotalIterations *= lVariation.Iterations
                 End If
@@ -1599,7 +1599,7 @@ NextIteration:
 
     Private Sub RefreshList(ByVal aList As System.Windows.Forms.CheckedListBox, ByVal aVariations As atcCollection)
         aList.Items.Clear()
-        For Each lVariation As Variation In aVariations
+        For Each lVariation As atcVariation In aVariations
             aList.Items.Add(lVariation.ToString)
             aList.SetItemChecked(aList.Items.Count - 1, lVariation.Selected)
         Next
@@ -1608,7 +1608,7 @@ NextIteration:
     Private Sub btnEndpointModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointModify.Click
         Dim lIndex As Integer = lstEndpoints.SelectedIndex
         If lIndex >= 0 And lIndex < pEndpoints.Count Then
-            Dim lVariation As Variation = pEndpoints.ItemByIndex(lIndex)
+            Dim lVariation As atcVariation = pEndpoints.ItemByIndex(lIndex)
             Dim frmEnd As New frmEndpoint
             If frmEnd.AskUser(lVariation) Then
                 RefreshEndpointList()
@@ -1661,7 +1661,7 @@ NextIteration:
             lXML &= "  <FileName>" & txtBaseScenario.Text & "</FileName>" & vbCrLf
             lXML &= "</UCI>" & vbCrLf
 
-            Dim lVariation As Variation
+            Dim lVariation As atcVariation
             lXML &= "<Variations>" & vbCrLf
             For Each lVariation In pInputs
                 lXML &= lVariation.XML
@@ -1703,7 +1703,7 @@ NextIteration:
                 End If
 
                 Do
-                    Dim lVariation As Variation
+                    Dim lVariation As atcVariation
                     Dim lChild As Chilkat.Xml = lXML.FirstChild
                     Select Case lXML.Tag.ToLower
                         Case "saveall"
@@ -1719,7 +1719,7 @@ NextIteration:
                                     If lChild.GetChildWithTag("Name").Content.IndexOf(CLIGEN_NAME) >= 0 Then
                                         lVariation = New VariationCligen
                                     Else
-                                        lVariation = New Variation
+                                        lVariation = New atcVariation
                                     End If
                                     lVariation.XML = lChild.GetXml
                                     If Not lVariation.IsInput Then
@@ -1735,11 +1735,11 @@ NextIteration:
                             pEndpoints.Clear()
                             If Not lChild Is Nothing Then
                                 Do
-                                    lVariation = New Variation
+                                    lVariation = New atcVariation
                                     lVariation.XML = lChild.GetXml
                                     'If this is a copy of an input variation, add the input variation instead
                                     If lVariation.IsInput Then
-                                        For Each lInputVariation As Variation In pInputs
+                                        For Each lInputVariation As atcVariation In pInputs
                                             If lInputVariation.Name = lVariation.Name Then
                                                 lVariation = lInputVariation
                                                 Exit For
@@ -1784,7 +1784,7 @@ NextIteration:
 
     Private Sub lstInputs_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstInputs.ItemCheck
         If pPreparedInputs Is Nothing Then
-            Dim lVariation As Variation = pInputs.ItemByIndex(e.Index)
+            Dim lVariation As atcVariation = pInputs.ItemByIndex(e.Index)
             lVariation.Selected = (e.NewValue = CheckState.Checked)
             RefreshTotalIterations()
         Else
@@ -1793,7 +1793,7 @@ NextIteration:
     End Sub
 
     Private Sub lstEndpoints_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles lstEndpoints.ItemCheck
-        Dim lVariation As Variation = pEndpoints.ItemByIndex(e.Index)
+        Dim lVariation As atcVariation = pEndpoints.ItemByIndex(e.Index)
         lVariation.Selected = (e.NewValue = CheckState.Checked)
     End Sub
 
@@ -1811,7 +1811,7 @@ NextIteration:
             Dim lCopyText As String = " copy "
             For Each lIndex As Integer In lstEndpoints.SelectedIndices
                 lIndex += lNumCopied
-                Dim lNewEndpoint As Variation = pEndpoints(lIndex).Clone
+                Dim lNewEndpoint As atcVariation = pEndpoints(lIndex).Clone
                 Dim lNewEndpointName As String = lNewEndpoint.Name
                 lNewEndpoint.IsInput = False
                 Dim lCopyTextPosition As Integer = lNewEndpointName.LastIndexOf(lCopyText)
