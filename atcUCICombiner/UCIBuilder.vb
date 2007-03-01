@@ -600,7 +600,7 @@ Public Module UCIBuilder
                         MakeMods_AddExtSrcLink(lUci)
                         'add ref to upstream wdm 
                         Dim lHspfFile As New atcUCI.HspfData.HspfFile
-                        lHspfFile.Name = lConnSources(i) & ".wdm"
+                        lHspfFile.Name = "..\" & lConnSources(i) & "\" & lConnSources(i) & ".wdm"
                         lHspfFile.Typ = "WDM3"
                         lHspfFile.Unit = 27
                         lUci.FilesBlock.Add(lHspfFile)
