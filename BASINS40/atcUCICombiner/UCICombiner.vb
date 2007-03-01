@@ -813,11 +813,13 @@ Public Module UCICombiner
         End Try
     End Function
 
-    Public Sub WDMMain()
+    Public Sub WCMain()
         'copy datasets from source wdm to target wdm according to csv file
         Dim lBaseWDMDir As String = "C:\gisdata\CBP\cat\"
         Dim lClimScens As New Collection
         Dim lOutputPath As String
+
+        Logger.StartToFile(lBaseWDMDir & "wdmCombiner.log")
 
         lClimScens.Add("a_10_cccm")
         lClimScens.Add("a_10_ccsr")
@@ -833,6 +835,7 @@ Public Module UCICombiner
         lClimScens.Add("b_10_gfdl")
         lClimScens.Add("b_10_hadc")
         lClimScens.Add("b_10_ncar")
+        lClimScens.Add("base")
 
         For Each lScen As String In lClimScens
             lOutputPath = lBaseWDMDir & lScen & "\"
@@ -842,7 +845,7 @@ Public Module UCICombiner
             If Not FileExists(lOutputPath & "base.wdm", False, True) Then
                 System.IO.File.Copy(lBaseWDMDir & "base.wdm", lOutputPath & "base.wdm")
             End If
-            WDMUpdates(lBaseWDMDir, lBaseWDMDir & "..\met\subset\" & lScen & "\", lOutputPath, lBaseWDMDir & "..\prad\subset\" & lScen & "\")
+            WDMUpdates(lBaseWDMDir, lBaseWDMDir & "..\met\subset\" & lScen & "\", lOutputPath, lBaseWDMDir & "..\prad\subset\" & lScen & "_M\")
         Next
     End Sub
 
@@ -874,10 +877,29 @@ Public Module UCICombiner
                 'use alternate location
                 lFromFolder = aAltFromFolder
             End If
-            CopyDataSet("wdm", lFromFolder & lFromWDM, lFromDSN, _
-                            "wdm", aToFolder & lToWDM, lToDSN)
+            If Not CopyDataSet("wdm", lFromFolder & lFromWDM, lFromDSN, _
+                            "wdm", aToFolder & lToWDM, lToDSN) Then
+                Logger.Dbg("problem copying dataset " & lFromDSN & " to " & lToDSN)
+            End If
             SetWDMAttribute(lToWDM, lToDSN, "idscen", lScen)
-            SetWDMAttribute(lToWDM, lToDSN, "idlocn", lLoc)
+            SetWDMAttribute(lToWDM, lToDSN, "idlocn", Mid(FilenameOnly(lFromWDM), 5))
+            'write out summary info
+            Dim lDataSource As New atcWDM.atcDataSourceWDM
+            If lDataSource.Open(aToFolder & lToWDM) Then
+                Dim lDataSetIndex As Integer = lDataSource.DataSets.IndexFromKey(lToDSN)
+                Dim lDataSet As atcTimeseries = Nothing
+                If lDataSetIndex >= 0 Then
+                    lDataSet = lDataSource.DataSets.ItemByIndex(lDataSetIndex)
+                    lDataSource.ReadData(lDataSet)
+                    Dim lsum As Double
+                    For i As Integer = 1 To lDataSet.numValues
+                        lsum = lsum + lDataSet.Value(i)
+                    Next
+                    Dim lmean As Double
+                    lmean = lsum / lDataSet.numValues
+                    Logger.Dbg("Copied data set " & lToDSN & " mean " & lmean)
+                End If
+            End If
         Loop
     End Sub
 End Module
