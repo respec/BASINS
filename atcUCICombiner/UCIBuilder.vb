@@ -191,12 +191,13 @@ Public Module UCIBuilder
                 Dim lmetbase As String = ""
                 Do Until lMetTable.atEOF
                     lMetTable.MoveNext()
-                    lMetbase = lMetTable.Value(2)
-                    If lMetbase = lUcibase Then
+                    lmetbase = lMetTable.Value(2)
+                    If lmetbase = lUcibase Then
                         'found the match, update met data
                         Dim lEtMfact As Double = lMetTable.Value(3)
                         Dim lPrecMfact As Double = lMetTable.Value(4)
                         Dim lPrecDsn As Integer = lMetTable.Value(7)
+                        Dim lIrrigDsn As Integer = lMetTable.Value(8)
                         Dim lMetSeg As atcUCI.HspfMetSeg = lUci.MetSegs(1)
 
                         lMetSeg.MetSegRecs(1).Source.VolId = lPrecDsn
@@ -232,6 +233,25 @@ Public Module UCIBuilder
                             Next
                             lUci.Source2MetSeg()
                         End If
+
+                        'add irrig to urban perlnds
+                        lOper = lUci.OpnBlks("PERLND").operfromid(104)
+                        lconn = New atcUCI.HspfConnection
+                        lconn.Uci = lUci
+                        lconn.Typ = 1
+                        lconn.Comment = "*** Urban Irrigation"
+                        lconn.Source.VolName = "WDM2"
+                        lconn.Source.VolId = lIrrigDsn
+                        lconn.Source.Member = "IRRG"
+                        lconn.Ssystem = "ENGL"
+                        lconn.Target.VolName = lOper.Name
+                        lconn.Target.VolId = lOper.Id
+                        lconn.Target.Group = "EXTNL"
+                        lconn.Target.Member = "SURLI"
+                        lconn.Target.Opn = lOper
+                        lOper.Sources.Add(lconn)
+                        lUci.Connections.Add(lconn)
+
                         lMetTable.MoveLast()
                     End If
                 Loop
