@@ -2,7 +2,7 @@ Imports atcData
 Imports atcEvents
 Imports MapWinUtility
 
-Public Class Variation
+Public Class atcVariation
     Private pNaN As Double = atcUtility.GetNaN
 
     'Parameters for Hammon
@@ -307,8 +307,8 @@ Public Class Variation
 
     End Function
 
-    Public Overridable Function Clone() As Variation
-        Dim newVariation As New Variation
+    Public Overridable Function Clone() As atcVariation
+        Dim newVariation As New atcVariation
         Me.CopyTo(newVariation)
         Return newVariation
     End Function
@@ -326,7 +326,7 @@ Public Class Variation
         pSelected = False
 
         Seasons = Nothing
-        Min = pNan
+        Min = pNaN
         Max = pNaN
         Increment = pNaN
         pIncrementsSinceStart = 0
@@ -355,7 +355,7 @@ Public Class Variation
         PETdata = New atcDataGroup
     End Sub
 
-    Public Overridable Sub CopyTo(ByVal aTargetVariation As Variation)
+    Public Overridable Sub CopyTo(ByVal aTargetVariation As atcVariation)
         With aTargetVariation
             .Name = Name
             .UseEvents = UseEvents

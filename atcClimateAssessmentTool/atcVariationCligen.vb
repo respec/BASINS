@@ -4,7 +4,7 @@ Imports atcUtility
 Imports MapWinUtility
 
 Public Class VariationCligen
-    Inherits Variation
+    Inherits atcVariation
 
     Public Shared CligenConstituents As String() = {"HPCP", "EVAP", "ATMP", "WIND", "DEWP", "SOLR", "CLDC"}
 
@@ -96,7 +96,7 @@ Public Class VariationCligen
         End Set
     End Property
 
-    Public Overrides Function Clone() As Variation
+    Public Overrides Function Clone() As atcVariation
         Dim newVariation As New VariationCligen
         With newVariation
             .BaseParmFileName = BaseParmFileName

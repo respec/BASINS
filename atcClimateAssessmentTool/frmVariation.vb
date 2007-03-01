@@ -11,7 +11,7 @@ Imports MapWinUtility
 
     Private pNaN As Double = GetNaN()
 
-    Private pVariation As Variation
+    Private pVariation As atcVariation
     Private pSeasonsAvailable As New atcCollection
     Private pSeasons As atcSeasonBase
     Friend WithEvents txtVaryPET As System.Windows.Forms.TextBox
@@ -45,10 +45,10 @@ Imports MapWinUtility
     Friend WithEvents btnSeasonsAll As System.Windows.Forms.Button
     Friend WithEvents grpSeasons As System.Windows.Forms.GroupBox
     Friend WithEvents lblIncrement2 As System.Windows.Forms.Label
-    Friend WithEvents lblPET As System.Windows.Forms.Label
     Friend WithEvents lblMaximum2 As System.Windows.Forms.Label
     Friend WithEvents grpMinMax As System.Windows.Forms.GroupBox
     Friend WithEvents grpEvents As System.Windows.Forms.GroupBox
+    Friend WithEvents lblPET As System.Windows.Forms.Label
 
     Private pSettingFormSeason As Boolean = False
 
@@ -139,10 +139,10 @@ Imports MapWinUtility
         Me.btnSeasonsAll = New System.Windows.Forms.Button
         Me.grpSeasons = New System.Windows.Forms.GroupBox
         Me.lblIncrement2 = New System.Windows.Forms.Label
-        Me.lblPET = New System.Windows.Forms.Label
         Me.lblMaximum2 = New System.Windows.Forms.Label
         Me.grpMinMax = New System.Windows.Forms.GroupBox
         Me.grpEvents = New System.Windows.Forms.GroupBox
+        Me.lblPET = New System.Windows.Forms.Label
         Me.grpSeasons.SuspendLayout()
         Me.grpMinMax.SuspendLayout()
         Me.grpEvents.SuspendLayout()
@@ -161,12 +161,11 @@ Imports MapWinUtility
         Me.lblIncrement.AutoSize = True
         Me.lblIncrement.BackColor = System.Drawing.Color.Transparent
         Me.lblIncrement.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.lblIncrement.Location = New System.Drawing.Point(4, 71)
+        Me.lblIncrement.Location = New System.Drawing.Point(6, 71)
         Me.lblIncrement.Name = "lblIncrement"
         Me.lblIncrement.Size = New System.Drawing.Size(57, 13)
         Me.lblIncrement.TabIndex = 17
         Me.lblIncrement.Text = "Increment:"
-        Me.lblIncrement.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtMax
         '
@@ -189,24 +188,22 @@ Imports MapWinUtility
         Me.lblMaximum.AutoSize = True
         Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
         Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMaximum.Location = New System.Drawing.Point(4, 98)
+        Me.lblMaximum.Location = New System.Drawing.Point(6, 97)
         Me.lblMaximum.Name = "lblMaximum"
         Me.lblMaximum.Size = New System.Drawing.Size(54, 13)
         Me.lblMaximum.TabIndex = 20
         Me.lblMaximum.Text = "Maximum:"
-        Me.lblMaximum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'lblMinimum
         '
         Me.lblMinimum.AutoSize = True
         Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
         Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMinimum.Location = New System.Drawing.Point(4, 45)
+        Me.lblMinimum.Location = New System.Drawing.Point(6, 45)
         Me.lblMinimum.Name = "lblMinimum"
         Me.lblMinimum.Size = New System.Drawing.Size(51, 13)
         Me.lblMinimum.TabIndex = 12
         Me.lblMinimum.Text = "Minimum:"
-        Me.lblMinimum.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'lblData
         '
@@ -217,7 +214,6 @@ Imports MapWinUtility
         Me.lblData.Size = New System.Drawing.Size(69, 13)
         Me.lblData.TabIndex = 2
         Me.lblData.Text = "Data to Vary:"
-        Me.lblData.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'txtVaryData
         '
@@ -256,7 +252,6 @@ Imports MapWinUtility
         Me.lblName.Size = New System.Drawing.Size(65, 13)
         Me.lblName.TabIndex = 0
         Me.lblName.Text = "Input Name:"
-        Me.lblName.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'txtName
         '
@@ -481,12 +476,11 @@ Imports MapWinUtility
         Me.lblFunction.Size = New System.Drawing.Size(68, 13)
         Me.lblFunction.TabIndex = 8
         Me.lblFunction.Text = "How to Vary:"
-        Me.lblFunction.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'chkIterative
         '
         Me.chkIterative.AutoSize = True
-        Me.chkIterative.Location = New System.Drawing.Point(7, 19)
+        Me.chkIterative.Location = New System.Drawing.Point(9, 19)
         Me.chkIterative.Name = "chkIterative"
         Me.chkIterative.Size = New System.Drawing.Size(100, 17)
         Me.chkIterative.TabIndex = 11
@@ -503,7 +497,6 @@ Imports MapWinUtility
         Me.lblThreshold.Size = New System.Drawing.Size(126, 13)
         Me.lblThreshold.TabIndex = 25
         Me.lblThreshold.Text = "Events containing values"
-        Me.lblThreshold.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'chkSeasons
         '
@@ -580,18 +573,6 @@ Imports MapWinUtility
         Me.lblIncrement2.Size = New System.Drawing.Size(230, 13)
         Me.lblIncrement2.TabIndex = 19
         Me.lblIncrement2.Text = "Increase this much each iteration from Minimum"
-        Me.lblIncrement2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        '
-        'lblPET
-        '
-        Me.lblPET.AutoSize = True
-        Me.lblPET.BackColor = System.Drawing.Color.Transparent
-        Me.lblPET.Location = New System.Drawing.Point(12, 67)
-        Me.lblPET.Name = "lblPET"
-        Me.lblPET.Size = New System.Drawing.Size(257, 13)
-        Me.lblPET.TabIndex = 5
-        Me.lblPET.Text = "Compute PET (Data to Vary must be air temperature):"
-        Me.lblPET.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'lblMaximum2
         '
@@ -603,7 +584,6 @@ Imports MapWinUtility
         Me.lblMaximum2.Size = New System.Drawing.Size(214, 13)
         Me.lblMaximum2.TabIndex = 22
         Me.lblMaximum2.Text = "Finish increasing when this value is reached"
-        Me.lblMaximum2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'grpMinMax
         '
@@ -650,13 +630,22 @@ Imports MapWinUtility
         Me.grpEvents.TabStop = False
         Me.grpEvents.Text = "Events"
         '
+        'lblPET
+        '
+        Me.lblPET.AutoSize = True
+        Me.lblPET.BackColor = System.Drawing.Color.Transparent
+        Me.lblPET.Location = New System.Drawing.Point(12, 68)
+        Me.lblPET.Name = "lblPET"
+        Me.lblPET.Size = New System.Drawing.Size(257, 13)
+        Me.lblPET.TabIndex = 5
+        Me.lblPET.Text = "Compute PET (Data to Vary must be air temperature):"
+        '
         'frmVariation
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.ClientSize = New System.Drawing.Size(725, 405)
         Me.Controls.Add(Me.grpEvents)
         Me.Controls.Add(Me.grpMinMax)
-        Me.Controls.Add(Me.lblPET)
         Me.Controls.Add(Me.grpSeasons)
         Me.Controls.Add(Me.btnViewPET)
         Me.Controls.Add(Me.txtVaryPET)
@@ -670,6 +659,7 @@ Imports MapWinUtility
         Me.Controls.Add(Me.btnOk)
         Me.Controls.Add(Me.txtVaryData)
         Me.Controls.Add(Me.lblData)
+        Me.Controls.Add(Me.lblPET)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.Name = "frmVariation"
@@ -687,7 +677,7 @@ Imports MapWinUtility
 
 #End Region
 
-    Public Function AskUser(ByRef aVariation As Variation) As Boolean
+    Public Function AskUser(ByRef aVariation As atcVariation) As Boolean
         pVariation = aVariation.Clone
 
         If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
@@ -839,7 +829,7 @@ Imports MapWinUtility
         SaveSetting("BASINS4", "CAT", "EventDurationUnits", cboEventDurationUnits.SelectedIndex)
     End Sub
 
-    Private Function VariationFromForm(ByVal aVariation As Variation) As Boolean
+    Private Function VariationFromForm(ByVal aVariation As atcVariation) As Boolean
         Try
             With aVariation
                 .Name = txtName.Text
@@ -944,7 +934,7 @@ Imports MapWinUtility
 
     Private Sub btnScript_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnScript.Click
         Dim lOpenDialog As New System.Windows.Forms.OpenFileDialog
-        Dim lVariationTemplate As New Variation
+        Dim lVariationTemplate As New atcVariation
 
         If VariationFromForm(lVariationTemplate) Then
             With lOpenDialog
