@@ -289,7 +289,7 @@ Public Class atcVariation
                                                    ByVal aEventsToSearch As atcDataGroup, _
                                                    ByVal aSeed As Integer) As atcTimeseries
         Dim lNewTimeseries As atcTimeseries = aTimeseries.Clone
-        Dim lMaxEventIndex As Integer = aEventsToSearch.Count - 1
+        Dim lMaxEventIndex As Integer = aEventsToSearch.Count  'exclusive upper value, random less than
         Dim lFoundIndexes As New ArrayList
         Dim lRandom As New Random(aSeed)
         Dim lAdd As Boolean = True
@@ -302,7 +302,11 @@ Public Class atcVariation
 
         If aVolumeChangeFraction < 0 Then lAdd = False
 
-        Logger.Dbg("OriginalVolume " & DF(lOriginalVolume) & " Target Volume " & DF(lTargetVolume) & " ChangeFraction " & DF(aVolumeChangeFraction))
+        Logger.Dbg("OriginalVolume " & DF(lOriginalVolume) & _
+                   " Target Volume " & DF(lTargetVolume) & _
+                   " ChangeFraction " & DF(aVolumeChangeFraction) & _
+                   " Event Count " & aEventsToSearch.Count)
+
         'While adding and not yet added enough, or removing and not yet removed enough
         While (lAdd AndAlso (lCurrentVolume < lTargetVolume)) OrElse _
          ((Not lAdd) AndAlso (lCurrentVolume > lTargetVolume))
@@ -310,11 +314,20 @@ Public Class atcVariation
             If Not lFoundIndexes.Contains(lCheckIndex) Then
                 Dim lEvent As atcTimeseries = aEventsToSearch.ItemByIndex(lCheckIndex)
                 lFoundIndexes.Add(lCheckIndex)
+                If lFoundIndexes.Count = aEventsToSearch.Count Then 'all events have been used, start over
+                    If lAdd Then
+                        Logger.Dbg("  ---- All events have been used, start adding over")
+                        lFoundIndexes.Clear()
+                    Else
+                        Logger.Dbg("  ***** All events have been used, nothing more to remove!")
+                        Exit While
+                    End If
+                End If
 
                 Dim lEventStr As String = "  Event " & lCheckIndex
                 lEventStr &= "    Sum " & DF(lEvent.Attributes.GetValue("Sum"))
-                lEventStr &= "  NumVals " & lEvent.numValues
-                lEventStr &= "  Starts " & DumpDate(lEvent.Dates.Value(1))
+                lEventStr &= " NumVals " & lEvent.numValues
+                lEventStr &= " Starts " & DumpDate(lEvent.Dates.Value(1))
                 Logger.Dbg(lEventStr)
 
                 'Find starting index of event and add it or remove it
@@ -352,10 +365,16 @@ Public Class atcVariation
 
         lChangeIndex -= 1
         Dim lFinalVolumeAdjustment As Double = lCurrentVolume - lTargetVolume
-        Logger.Dbg("  Final Volume Adjustment " & DF(lFinalVolumeAdjustment) & _
-                   " on " & DF(lNewTimeseries.Values(lChangeIndex)) & _
-                   " at " & DumpDate(lNewTimeseries.Dates.Value(lChangeIndex)))
-        lNewTimeseries.Values(lChangeIndex) -= lFinalVolumeAdjustment
+        If lChangeIndex >= 0 AndAlso (lNewTimeseries.Values(lChangeIndex) - lFinalVolumeAdjustment) > 0 Then
+            Logger.Dbg("  Final Volume Adjustment " & DF(lFinalVolumeAdjustment) & _
+                       " on " & DF(lNewTimeseries.Values(lChangeIndex)) & _
+                       " at " & DumpDate(lNewTimeseries.Dates.Value(lChangeIndex)))
+            lNewTimeseries.Values(lChangeIndex) -= lFinalVolumeAdjustment
+        Else
+            Dim lDbgStr As String = "  ***** Fail Final Volume Adjustment " & DF(lFinalVolumeAdjustment) & " " & lChangeIndex
+            If lChangeIndex > 0 Then lDbgStr &= " " & DF(lNewTimeseries.Values(lChangeIndex))
+            Logger.Dbg(lDbgStr)
+        End If
 
         lNewTimeseries.Attributes.DiscardCalculated()
 
@@ -366,7 +385,7 @@ Public Class atcVariation
         Dim lStr As String = lOperation & lFoundIndexes.Count & " events to change total volume " & DoubleString(aVolumeChangeFraction)
         lStr &= " (actual change = " & DoubleString((lSum - lOriginalVolume) / lOriginalVolume) & ")"
         lStr &= " Total Volume " & DF(lSum)
-        Logger.Dbg(lstr)
+        Logger.Dbg(lStr)
 
         Return lNewTimeseries
     End Function
