@@ -581,19 +581,15 @@ Public Module UCIBuilder
                 lUci.FastReadUciForStarter(lMsg, lUciname)
                 lUci.MetSeg2Source()
 
-                Dim lFound As Boolean = False
                 For i As Integer = 1 To lConnSources.Count
                     If lConnSources(i) = lProjectbase Then
                         'add output from this project to connect to downstream project
                         MakeMods_AddExtTarLink(lUci, lWdmname)
-                        lFound = True
                     End If
                 Next
-                If Not lFound Then
-                    'add output datasets for loads to bay
-                    MakeMods_AddExtTarOutput(lUci, lWdmname)
-                End If
-                
+                'add output datasets for loads to bay
+                MakeMods_AddExtTarOutput(lUci, lWdmname)
+
                 For i As Integer = 1 To lConnTargets.Count
                     If lConnTargets(i) = lProjectbase Then
                         'add upstream inflow to this project 
