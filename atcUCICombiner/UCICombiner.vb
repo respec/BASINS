@@ -815,7 +815,8 @@ Public Module UCICombiner
 
     Public Sub Main()
         'copy datasets from source wdm to target wdm according to csv file
-        Dim lBaseWDMDir As String = "C:\gisdata\CBP\cat\"
+        Dim lBaseWDMDir As String = "d:\gisdata\CBP\cat\"
+        ChDriveDir(lBaseWDMDir)
         Dim lClimScens As New Collection
         Dim lOutputPath As String
 
@@ -896,8 +897,8 @@ Public Module UCICombiner
                             "wdm", aToFolder & lToWDM, lToDSN) Then
                 Logger.Dbg("problem copying dataset " & lFromDSN & " to " & lToDSN)
             End If
-            SetWDMAttribute(lToWDM, lToDSN, "idscen", lScen)
-            SetWDMAttribute(lToWDM, lToDSN, "idlocn", Mid(FilenameOnly(lFromWDM), 5))
+            SetWDMAttribute(aToFolder & lToWDM, lToDSN, "idscen", lScen)
+            SetWDMAttribute(aToFolder & lToWDM, lToDSN, "idlocn", Mid(FilenameOnly(lFromWDM), 5))
             'write out summary info
             Dim lDataSource As New atcWDM.atcDataSourceWDM
             If lDataSource.Open(aToFolder & lToWDM) Then
