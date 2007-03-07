@@ -45,7 +45,7 @@ Public Class atcVariation
     Public EventDurationDays As Double
     Public EventDurationDisplayUnits As String
 
-    Public EventFlashFactor As Double
+    Public FlashVolumeFraction As Double
 
     Public IsInput As Boolean
 
@@ -244,16 +244,17 @@ Public Class atcVariation
                         lSplitOriginalData = Seasons.SplitBySelected(lOriginalData, Nothing)
                     End If
                     Dim lTotalVolume As Double = lSplitOriginalData.ItemByIndex(0).Attributes.GetValue("Sum")
-                    Dim lEventFlashFactor As Double = EventFlashFactor
-                    Dim lCurrentVolumeChange As Double = 0
+                    Dim lEventFlashFactor As Double
+                    Dim lCurrentVolume As Double = 0
                     Dim lTargetChange As Double = CurrentValue * lTotalVolume
-                    Logger.Dbg("TargetChange " & lTargetChange)
+                    Dim lTargetVolumeToFlash As Double = lTotalVolume * FlashVolumeFraction
+                    Logger.Dbg("TargetChange " & lTargetChange & " TargetVolumeToFlash " & lTargetVolumeToFlash)
                     Dim lNewEventTotalVolume As Double = 0.0
 
                     Try
-                        If Not Double.IsNaN(EventFlashFactor) Then
+                        If Not Double.IsNaN(FlashVolumeFraction) Then
                             'sort events by volume
-                            Logger.Dbg("Flash " & EventFlashFactor & " CurrentValue " & CurrentValue)
+                            Logger.Dbg("Flash " & FlashVolumeFraction & " CurrentValue " & CurrentValue)
                             Dim lNewEvents As New System.Collections.SortedList(lEvents.Count)
                             For Each lEvent In lEvents
                                 Dim lEventVolume As Double = lEvent.Attributes.GetValue("Sum")
@@ -270,8 +271,8 @@ tryAgain:
                             If CurrentValue > 0.0 Then
                                 For lEventIndex As Integer = lNewEvents.Count - 1 To 0 Step -1
                                     lEvent = lNewEvents.GetByIndex(lEventIndex)
-                                    Dim lAddFromThisEvent As Double = lNewEvents.GetKey(lEventIndex) * lEventFlashFactor
-                                    lCurrentVolumeChange += lAddFromThisEvent
+                                    Dim lAddFromThisEvent As Double = lNewEvents.GetKey(lEventIndex)
+                                    lCurrentVolume += lAddFromThisEvent
                                     'Logger.Dbg("CurrentVolumeAdded " & lCurrentVolumeChange & " FromThisEvent " & lAddFromThisEvent)
 
                                     'Dim lEventStr As String = "  Event " & lEventIndex
@@ -281,7 +282,7 @@ tryAgain:
                                     'Logger.Dbg(lEventStr)
 
                                     lEvents.Add(lEvent)
-                                    If lCurrentVolumeChange > lTargetChange Then
+                                    If lCurrentVolume > lTargetVolumeToFlash Then
                                         Logger.Dbg("Flash " & lNewEvents.Count - lEventIndex & " of " & lNewEvents.Count)
                                         Exit For
                                     End If
@@ -289,10 +290,10 @@ tryAgain:
                             Else
                                 For lEventIndex As Integer = 0 To lNewEvents.Count - 1
                                     lEvent = lNewEvents.GetByIndex(lEventIndex)
-                                    lCurrentVolumeChange += lNewEvents.GetKey(lEventIndex) * EventFlashFactor
+                                    lCurrentVolume += lNewEvents.GetKey(lEventIndex)
                                     ' Logger.Dbg("CurrentVolumeRemoved " & lCurrentVolumeChange)
                                     lEvents.Add(lEvent)
-                                    If lCurrentVolumeChange < lTargetChange Then
+                                    If lCurrentVolume > lTargetVolumeToFlash Then
                                         Logger.Dbg("NegativeFlash " & lEventIndex & " of " & lNewEvents.Count)
                                         Exit For
                                     End If
@@ -303,11 +304,10 @@ tryAgain:
                         Logger.Dbg("VaryDataException-EventFlashFactor " & e.Message)
                     End Try
 
-                    Logger.Dbg("EventFlashFactor " & lEventFlashFactor & _
-                               " CurrentVolumeChange " & lCurrentVolumeChange & _
+                    Logger.Dbg(" CurrentVolume " & lCurrentVolume & _
                                " TargetChange " & lTargetChange)
-                    lEventFlashFactor *= lTargetChange / lCurrentVolumeChange
-                    Logger.Dbg("NewEventFlashFactor " & lEventFlashFactor)
+                    lEventFlashFactor = lTargetChange / lCurrentVolume
+                    Logger.Dbg("EventFlashFactor " & lEventFlashFactor)
                     lModifyThis = MergeTimeseries(lEvents)
                     lSplitData = New atcDataGroup(lModifyThis)
                     lSplitData.Add(lOriginalData)
@@ -316,7 +316,7 @@ tryAgain:
                     ComputationSource.DataSets.Clear()
                     lArgsMath.Clear()
                     lArgsMath.SetValue("timeseries", lSplitTS)
-                    lArgsMath.SetValue("Number", 1 + EventFlashFactor)
+                    lArgsMath.SetValue("Number", 1 + lEventFlashFactor)
                     ComputationSource.Open("Multiply", lArgsMath)
                     lModifiedTS = ComputationSource.DataSets(0)
                     lModifiedSplit.Add(ComputationSource.DataSets(0))
@@ -586,7 +586,7 @@ tryAgain:
         EventDaysGapAllowed = 0
         EventGapDisplayUnits = ""
         EventHigh = True
-        EventFlashFactor = pNaN
+        FlashVolumeFraction = pNaN
         AddRemovePer = "Entire Span"
 
         EventVolumeHigh = True
@@ -641,7 +641,7 @@ tryAgain:
             If UseEvents Then
                 Return "  <Events Threshold='" & EventThreshold & "' " _
                               & " High='" & EventHigh & "' " _
-                              & " FlashFactor='" & EventFlashFactor & "' " _
+                              & " FlashVolumeFraction='" & FlashVolumeFraction & "' " _
                               & " GapDays='" & EventDaysGapAllowed & "' " _
                               & " GapDisplayUnits='" & EventGapDisplayUnits & "' " _
                               & " VolumeHigh='" & EventVolumeHigh & "' " _
@@ -661,7 +661,7 @@ tryAgain:
                     UseEvents = True
                     EventThreshold = lXML.GetAttrValue("Threshold")
                     EventHigh = lXML.GetAttrValue("High")
-                    EventFlashFactor = lXML.GetAttrValue("FlashFactor")
+                    FlashVolumeFraction = lXML.GetAttrValue("FlashVolumeFraction")
                     EventDaysGapAllowed = lXML.GetAttrValue("GapDays")
                     EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
 
