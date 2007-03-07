@@ -813,7 +813,7 @@ Public Module UCICombiner
         End Try
     End Function
 
-    Public Sub WBMain()
+    Public Sub Main()
         'copy datasets from source wdm to target wdm according to csv file
         Dim lBaseWDMDir As String = "C:\gisdata\CBP\cat\"
         Dim lClimScens As New Collection
@@ -835,8 +835,23 @@ Public Module UCICombiner
         lClimScens.Add("b_10_gfdl")
         lClimScens.Add("b_10_hadc")
         lClimScens.Add("b_10_ncar")
+        'lClimScens.Add("a_70_cccm")
+        'lClimScens.Add("a_70_ccsr")
+        'lClimScens.Add("a_70_csir")
+        'lClimScens.Add("a_70_echm")
+        'lClimScens.Add("a_70_gfdl")
+        'lClimScens.Add("a_70_hadc")
+        'lClimScens.Add("a_70_ncar")
+        'lClimScens.Add("b_70_cccm")
+        'lClimScens.Add("b_70_ccsr")
+        'lClimScens.Add("b_70_csir")
+        'lClimScens.Add("b_70_echm")
+        'lClimScens.Add("b_70_gfdl")
+        'lClimScens.Add("b_70_hadc")
+        'lClimScens.Add("b_70_ncar")
         'lClimScens.Add("base")
 
+        Dim lPrecSeries As String = "F" 'M, E, or F
         For Each lScen As String In lClimScens
             lOutputPath = lBaseWDMDir & lScen & "\"
             If Not FileExists(lOutputPath, True, False) Then
@@ -845,8 +860,7 @@ Public Module UCICombiner
             If Not FileExists(lOutputPath & "base.wdm", False, True) Then
                 System.IO.File.Copy(lBaseWDMDir & "base.wdm", lOutputPath & "base.wdm")
             End If
-            'WDMUpdates(lBaseWDMDir, lBaseWDMDir & "..\met\subset\" & lScen & "\", lOutputPath, lBaseWDMDir & "..\prad\subset\" & lScen & "_M\")
-            WDMUpdates(lBaseWDMDir, lBaseWDMDir & "..\met\subset\" & lScen & "\", lOutputPath, lBaseWDMDir & "..\prad\subset\" & lScen & "_E\")
+            WDMUpdates(lBaseWDMDir, lBaseWDMDir & "..\met\subset\" & lScen & "\", lOutputPath, lBaseWDMDir & "..\prad\subset\" & lScen & "_" & lPrecSeries & "\")
         Next
     End Sub
 

@@ -10,7 +10,7 @@ Public Module UCIBuilder
     Private pOutputDir As String = pBaseDir & "UCIs\"
     Private pDataDir As String = pBaseDir & "datafiles\"
 
-    Public Sub Main()
+    Public Sub UBMain()
         Logger.StartToFile(pOutputDir & "uciBuilder.log")
 
         ChDriveDir(pOutputDir)
