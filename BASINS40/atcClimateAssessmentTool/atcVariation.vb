@@ -248,13 +248,13 @@ Public Class atcVariation
                     Dim lCurrentVolume As Double = 0
                     Dim lTargetChange As Double = CurrentValue * lTotalVolume
                     Dim lTargetVolumeToFlash As Double = lTotalVolume * FlashVolumeFraction
-                    Logger.Dbg("TargetChange " & lTargetChange & " TargetVolumeToFlash " & lTargetVolumeToFlash)
+                    Logger.Dbg("TargetChange " & DF(lTargetChange) & " TargetVolumeToFlash " & DF(lTargetVolumeToFlash))
                     Dim lNewEventTotalVolume As Double = 0.0
 
                     Try
                         If Not Double.IsNaN(FlashVolumeFraction) Then
                             'sort events by volume
-                            Logger.Dbg("Flash " & FlashVolumeFraction & " CurrentValue " & CurrentValue)
+                            Logger.Dbg("Flash " & DF(FlashVolumeFraction) & " CurrentValue " & DF(CurrentValue))
                             Dim lNewEvents As New System.Collections.SortedList(lEvents.Count)
                             For Each lEvent In lEvents
                                 Dim lEventVolume As Double = lEvent.Attributes.GetValue("Sum")
@@ -268,6 +268,10 @@ tryAgain:
                                 End Try
                             Next
                             lEvents.Clear()
+                            Logger.Dbg(" TotalVolume " & DF(lTotalVolume) & _
+                                       " EventTotalVolume " & DF(lNewEventTotalVolume) & _
+                                       " PercentOfVolume " & DF(100 * (lNewEventTotalVolume / lTotalVolume)))
+
                             If CurrentValue > 0.0 Then
                                 For lEventIndex As Integer = lNewEvents.Count - 1 To 0 Step -1
                                     lEvent = lNewEvents.GetByIndex(lEventIndex)
@@ -275,11 +279,13 @@ tryAgain:
                                     lCurrentVolume += lAddFromThisEvent
                                     'Logger.Dbg("CurrentVolumeAdded " & lCurrentVolumeChange & " FromThisEvent " & lAddFromThisEvent)
 
-                                    'Dim lEventStr As String = "  Event " & lEventIndex
-                                    'lEventStr &= "    Sum " & DF(lEvent.Attributes.GetValue("Sum"))
-                                    'lEventStr &= " NumVals " & lEvent.numValues
-                                    'lEventStr &= " Starts " & DumpDate(lEvent.Dates.Value(1))
-                                    'Logger.Dbg(lEventStr)
+                                    If lEventIndex = lNewEvents.Count - 1 Then 'details of biggest event
+                                        Dim lEventStr As String = "  Event " & lEventIndex
+                                        lEventStr &= "    Sum " & DF(lEvent.Attributes.GetValue("Sum"))
+                                        lEventStr &= " NumVals " & lEvent.numValues
+                                        lEventStr &= " Starts " & DumpDate(lEvent.Dates.Value(1))
+                                        Logger.Dbg(lEventStr)
+                                    End If
 
                                     lEvents.Add(lEvent)
                                     If lCurrentVolume > lTargetVolumeToFlash Then
@@ -304,10 +310,10 @@ tryAgain:
                         Logger.Dbg("VaryDataException-EventFlashFactor " & e.Message)
                     End Try
 
-                    Logger.Dbg(" CurrentVolume " & lCurrentVolume & _
-                               " TargetChange " & lTargetChange)
+                    Logger.Dbg(" CurrentVolume " & DF(lCurrentVolume) & _
+                               " TargetChange " & DF(lTargetChange))
                     lEventFlashFactor = lTargetChange / lCurrentVolume
-                    Logger.Dbg("EventFlashFactor " & lEventFlashFactor)
+                    Logger.Dbg("EventFlashFactor " & DF(lEventFlashFactor))
                     lModifyThis = MergeTimeseries(lEvents)
                     lSplitData = New atcDataGroup(lModifyThis)
                     lSplitData.Add(lOriginalData)
