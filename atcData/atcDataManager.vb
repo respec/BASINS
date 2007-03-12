@@ -136,10 +136,15 @@ Public Class atcDataManager
         End Try
     End Function
 
+    Public Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcDataGroup)
+        Dim lSelectDisplay As New frmSelectDisplay
+        If aTitle.Length > 0 Then lSelectDisplay.Text = aTitle
+        lSelectDisplay.AskUser(Me, aDataGroup)
+    End Sub
+
     Public Sub ShowDisplay(ByVal aDisplayName As String, ByVal aDataGroup As atcDataGroup)
         If aDisplayName Is Nothing OrElse aDisplayName.Length = 0 Then
-            Dim lSelectDisplay As New frmSelectDisplay
-            lSelectDisplay.AskUser(Me, aDataGroup)
+            UserSelectDisplay("", aDataGroup)
         Else
             Dim lNewDisplay As atcDataDisplay
             For Each lDisp As atcDataDisplay In GetPlugins(GetType(atcDataDisplay))
