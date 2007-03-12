@@ -281,7 +281,11 @@ Public Class atcBasinsPlugIn
                     Next
                     If Not lNewSource Is Nothing Then
                         If pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
-                            AskUserToDisplayGroup("Display Computed Data", lNewSource.DataSets)
+                            If lNewSource.DataSets.Count > 0 Then
+                                Dim lTitle As String = "Computed " & lNewSource.DataSets.Count & " Dataset"
+                                If lNewSource.DataSets.Count > 1 Then lTitle &= "s"
+                                pDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                            End If
                         End If
                     End If
                 ElseIf aItemName.StartsWith(AnalysisMenuName & "_") Then
@@ -296,29 +300,6 @@ Public Class atcBasinsPlugIn
                     aHandled = False 'Not our item to handle
                 End If
         End Select
-    End Sub
-
-    Friend Sub AskUserToDisplayGroup(ByVal aTitle As String, ByVal aGroup As atcDataGroup)
-        Dim lPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-        If lPlugins.Count > 0 Then
-            Dim lDisplayNames As New ArrayList
-            'For Each lDisp As atcDataDisplay In lPlugins
-            '    If lDisp.Name.StartsWith("Analysis::") Then
-            '        lDisplayNames.Add(lDisp.Name.Substring(10))
-            '    End If
-            'Next
-            lDisplayNames.Add("Graph")
-            lDisplayNames.Add("List")
-            lDisplayNames.Add("Data Tree")
-            lDisplayNames.Add("Do not display")
-            Dim lForm As New frmButtons
-            Dim lSelectedDisplay As String = lForm.AskUser(aTitle, lDisplayNames)
-            Select Case lSelectedDisplay
-                Case "Cancel", "Do not display"
-                Case Else
-                    pDataManager.ShowDisplay("Analysis::" & lSelectedDisplay, aGroup)
-            End Select
-        End If
     End Sub
 
     Private Sub CheckForUpdates(ByVal aQuiet As Boolean)
