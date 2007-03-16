@@ -817,6 +817,8 @@ Public Module UCICombiner
         'copy datasets from source wdm to target wdm according to csv file
         Dim lBaseWDMDir As String = "d:\gisdata\CBP\cat\"
         ChDriveDir(lBaseWDMDir)
+        Dim lPrecSeries As String = "F30" 'M, E, F10 or F30
+
         Dim lClimScens As New Collection
         Dim lOutputPath As String
 
@@ -852,7 +854,6 @@ Public Module UCICombiner
         'lClimScens.Add("b_70_ncar")
         'lClimScens.Add("base")
 
-        Dim lPrecSeries As String = "F" 'M, E, or F
         For Each lScen As String In lClimScens
             lOutputPath = lBaseWDMDir & lScen & "\"
             If Not FileExists(lOutputPath, True, False) Then
