@@ -339,7 +339,7 @@ tryAgain:
                     ComputationSource.Open(Operation, lArgsMath)
                     lModifiedTS = ComputationSource.DataSets(0)
                     lModifiedSplit.Add(ComputationSource.DataSets(0))
-                    If lSplitData.Count > 0 Then
+                    If lSplitData.Count > 1 Then
                         lModifiedSplit.Add(lSplitData.ItemByIndex(1))
                     End If
             End Select
