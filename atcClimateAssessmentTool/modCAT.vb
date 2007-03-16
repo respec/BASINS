@@ -89,7 +89,13 @@ Public Module modCAT
             Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & "\"
             lNewBaseFilename = lNewFolder & aNewScenarioName & "."
 
-            If aNewScenarioName.ToLower <> "base" Then
+            If aNewScenarioName.ToLower = "base" Then
+                Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
+                For Each lWDMfilename As String In lWDMFilenames
+                    lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
+                    lModified.Add(IO.Path.GetFileName(lWDMfilename).ToLower, lWDMfilename)
+                Next
+            Else
                 Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
 
                 'Copy base UCI, changing base to new scenario name within it
@@ -163,14 +169,19 @@ Public Module modCAT
             If g_running Then
                 For Each lBinOutFilename As String In UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "BINO")
                     lBinOutFilename = AbsolutePath(lBinOutFilename, CurDir)
-                    Dim lNewFilename As String = PathNameOnly(lBinOutFilename) & "\" & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
+                    Dim lNewFilename As String
+                    If aNewScenarioName.ToLower = "base" Then
+                        lNewFilename = lBinOutFilename
+                    Else
+                        lNewFilename = PathNameOnly(lBinOutFilename) & "\" & aNewScenarioName & "." & IO.Path.GetFileName(lBinOutFilename)
+                    End If
                     If IO.File.Exists(lNewFilename) Then
-                        Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-                        If lHBNResults.Open(lNewFilename) Then
-                            lModified.Add(IO.Path.GetFileName(lBinOutFilename).ToLower, lNewFilename)
-                        Else
-                            Logger.Dbg("Could not open HBN file '" & lNewFilename & "'")
-                        End If
+                        'Dim lHBNResults As New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+                        'If lHBNResults.Open(lNewFilename) Then
+                        lModified.Add(IO.Path.GetFileName(lBinOutFilename).ToLower, lNewFilename)
+                        'Else
+                        '    Logger.Dbg("Could not open HBN file '" & lNewFilename & "'")
+                        'End If
                     Else
                         Logger.Dbg("Could not find HBN file '" & lNewFilename & "'")
                     End If
