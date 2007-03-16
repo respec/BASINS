@@ -855,7 +855,7 @@ Public Module UCICombiner
         'lClimScens.Add("base")
 
         For Each lScen As String In lClimScens
-            lOutputPath = lBaseWDMDir & lScen & "\"
+            lOutputPath = lBaseWDMDir & lScen & "_" & lPrecSeries & "\"
             If Not FileExists(lOutputPath, True, False) Then
                 MkDir(lOutputPath)
             End If
