@@ -16,7 +16,7 @@ Public Module UCICombiner
     Private pLandUseYear As String = "2002"
     Private pScenario As String = "base"
 
-    Public Sub UCICombinerMain()
+    Public Sub Main()
         Logger.StartToFile(pOutputDir & "uciCombiner.log")
 
         ChDriveDir(pWorkingDir)
@@ -738,6 +738,10 @@ Public Module UCICombiner
         Dim lWdmIndex As Integer
         Dim lOrigDsn As Integer
 
+        Dim pStartDate As Double = MJD(1984, 1, 1)
+        Dim pEndDate As Double = MJD(2001, 1, 1)
+        Dim pExistOption As atcDataSource.EnumExistAction = atcDataSource.EnumExistAction.ExistReplace
+
         Try 'build combined wdms for prec, met data 
             Logger.Dbg("MetSegmentWdms")
             Dim lMetSeg As atcUCI.HspfMetSeg
@@ -759,6 +763,16 @@ Public Module UCICombiner
                                             "wdm", pScenario & ".wdm", lMetSegRec.Source.VolId)
                                 lMetSegRec.Source.VolName = "WDM1"
                             End If
+
+                            'set to start and end dates of run
+                            Dim lDataSourceWDM As New atcWDM.atcDataSourceWDM
+                            If lDataSourceWDM.Open(pScenario & ".wdm") Then
+                                Dim lTimser As atcTimeseries = SubsetByDate(lDataSourceWDM.DataSets.ItemByKey(lMetSegRec.Source.VolId), _
+                                                                            pStartDate, pEndDate, Nothing)
+                                lDataSourceWDM.AddDataset(lTimser, pExistOption)
+                                lTimser.Clear()
+                            End If
+
                             SetWDMAttribute(pScenario & ".wdm", lMetSegRec.Source.VolId, "idscen", "OBSERVED")
                             SetWDMAttribute(pScenario & ".wdm", lMetSegRec.Source.VolId, "idlocn", "SEG" & CStr(lWdmIndex))
                         End If
@@ -813,7 +827,7 @@ Public Module UCICombiner
         End Try
     End Function
 
-    Public Sub Main()
+    Public Sub WCMain()
         'copy datasets from source wdm to target wdm according to csv file
         Dim lBaseWDMDir As String = "d:\gisdata\CBP\cat\"
         ChDriveDir(lBaseWDMDir)
