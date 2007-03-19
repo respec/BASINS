@@ -872,14 +872,20 @@ Public Class frmCAT
 
             If aStartVariation >= aVariations.Count Then 'All variations have values, do a model run
 NextIteration:
-                Dim lModifiedScenarioName As String = aModifiedScenarioName
-                If chkSaveAll.Checked Then lModifiedScenarioName &= "-" & aIteration + 1
+                Dim lPreparedInput As String
+                Dim lModifiedScenarioName As String
+
+                If aPreparedInputs Is Nothing Then
+                    lPreparedInput = ""
+                    lModifiedScenarioName = aModifiedScenarioName
+                    If chkSaveAll.Checked Then lModifiedScenarioName &= "-" & aIteration + 1
+                Else
+                    lPreparedInput = aPreparedInputs.ItemByIndex(aIteration)
+                    lModifiedScenarioName = FilenameOnly(PathNameOnly(lPreparedInput))
+                End If
+
                 UpdateStatusLabel(aIteration)
                 pTimePerRun = Now.ToOADate
-                Dim lPreparedInput As String = ""
-                If Not aPreparedInputs Is Nothing Then
-                    lPreparedInput = aPreparedInputs.ItemByIndex(aIteration)
-                End If
                 Dim lResults As atcCollection = ScenarioRun(aBaseFileName, lModifiedScenarioName, aModifiedData, lPreparedInput, chkRunModel.Checked, chkShowEachRunProgress.Checked)
                 If lResults Is Nothing Then
                     Logger.Dbg("Null scenario results from ScenarioRun")
