@@ -845,11 +845,15 @@ tryAgain:
     End Property
 
     Public Overrides Function ToString() As String
-        Dim retStr As String = Name & " " & Operation
+        Dim retStr As String = Name & " " & Operation & " "
 
-        If Not Double.IsNaN(Min) Then retStr &= " from " & DoubleString(Min)
-        If Not Double.IsNaN(Max) Then retStr &= " to " & DoubleString(Max)
-        If Not Double.IsNaN(Increment) Then retStr &= " step " & DoubleString(Increment)
+        If Max <= Min Then
+            retStr &= DoubleString(Min)
+        Else
+            If Not Double.IsNaN(Min) Then retStr &= "from " & DoubleString(Min)
+            If Not Double.IsNaN(Max) Then retStr &= " to " & DoubleString(Max)
+            If Not Double.IsNaN(Increment) Then retStr &= " step " & DoubleString(Increment)
+        End If
         If Not Seasons Is Nothing Then
             retStr &= " " & atcSeasons.atcSeasonPlugin.SeasonClassNameToLabel(Seasons.GetType.Name) _
                    & ": " & Seasons.SeasonsSelectedString
@@ -858,8 +862,16 @@ tryAgain:
     End Function
 
     Private Function DoubleString(ByVal aNumber As Double) As String
-        DoubleString = Format(aNumber, "0.000").TrimEnd("0"c, "."c)
-        If DoubleString.Length = 0 Then DoubleString = "0"
+        Dim lStr As String = Format(aNumber, "0.000")
+        Dim lDecimalPos As Integer = lStr.IndexOf("."c)
+        If lDecimalPos >= 0 Then
+            'Trim trailing zeroes after decimal point
+            lStr = lStr.TrimEnd("0"c)
+            'Trim trailing decimal point
+            If lStr.Length = lDecimalPos + 1 Then lStr = lStr.Substring(0, lDecimalPos)
+        End If
+        If lStr.Length = 0 Then lStr = "0"
+        Return lStr
     End Function
 
     Public Sub New()
