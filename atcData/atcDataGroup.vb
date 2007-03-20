@@ -1,4 +1,5 @@
 Imports atcUtility
+Imports MapWinUtility
 
 ''' <summary>Group of atcDataSet objects and associated selection information</summary>
 ''' <remarks>
@@ -219,6 +220,57 @@ Public Class atcDataGroup
             pSelectedData = newValue
         End Set
     End Property
+
+    ''' <summary>
+    ''' Return a sorted collection of unique values that data sets in this group have for the given attribute
+    ''' </summary>
+    ''' <param name="aAttributeName">Name of attribute to find values of</param>
+    ''' <param name="aMissingValue">Optional string to use if a dataset does not have a value for the given attribute</param>
+    Public Function SortedAttributeValues(ByVal aAttributeName As String, Optional ByVal aMissingValue As Object = Nothing) As atcCollection
+        Return SortedAttributeValues(atcDataAttributes.GetDefinition(aAttributeName), aMissingValue)
+    End Function
+
+    ''' <summary>
+    ''' Return a sorted collection of unique values that data sets in this group have for the given attribute
+    ''' </summary>
+    ''' <param name="aAttributeDefinition">Attribute to find values of</param>
+    ''' <param name="aMissingValue">Optional string to use if a dataset does not have a value for the given attribute</param>
+    Public Function SortedAttributeValues(ByVal aAttributeDefinition As atcAttributeDefinition, Optional ByVal aMissingValue As Object = Nothing) As atcCollection
+        Dim lSortedValues As New atcCollection
+        If Not aAttributeDefinition Is Nothing Then
+            Dim lAttributeName As String = aAttributeDefinition.Name
+            Dim lAttributeNumeric As Boolean = aAttributeDefinition.IsNumeric
+            Dim lTsIndex As Integer = 0
+            Dim lItemIndex As Integer = 0
+            Dim lProgressMessage As String = "Sorting Values for " & lAttributeName
+            For Each ts As atcDataSet In Me
+                Try
+                    If lAttributeNumeric Then
+                        Dim lKey As Double = ts.Attributes.GetValue(lAttributeName, Double.NegativeInfinity)
+                        If Not aMissingValue Is Nothing OrElse Not Double.IsNegativeInfinity(lKey) Then
+                            lItemIndex = lSortedValues.BinarySearchForKey(lKey)
+                            If lItemIndex = lSortedValues.Count OrElse lKey <> lSortedValues.Keys.Item(lItemIndex) Then
+                                lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue))
+                            End If
+                            Logger.Progress(lProgressMessage, lTsIndex + 1, Count)
+                        End If
+                    Else
+                        Dim lKey As String = ts.Attributes.GetValue(lAttributeName, aMissingValue)
+                        If Not lKey Is Nothing Then
+                            lItemIndex = lSortedValues.BinarySearchForKey(lKey)
+                            If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
+                                lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue))
+                            End If
+                        End If
+                    End If
+                Catch ex As Exception
+                    Logger.Dbg("Can't display value of " & lAttributeName & ": " & ex.Message)
+                End Try
+                lTsIndex += 1
+            Next
+        End If
+        Return lSortedValues
+    End Function
 
     ''' <summary>Contents of this class expressed as a string.</summary>
     Public Shadows Function ToString() As String

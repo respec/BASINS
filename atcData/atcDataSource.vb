@@ -138,7 +138,7 @@ Public Class atcDataSource
         If lName.Length = 0 Then
             lName = "atcDataSource"
         End If
-        Return lName & ":" & Specification & ":" & DataSets.Count
+        Return lName & " '" & Specification & "' " & DataSets.Count & " datasets"
     End Function
 
     Protected Overrides Sub Finalize()

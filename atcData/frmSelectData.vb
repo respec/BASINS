@@ -258,6 +258,7 @@ Friend Class frmSelectData
         Me.groupTop.ResumeLayout(False)
         Me.groupSelected.ResumeLayout(False)
         Me.pnlButtons.ResumeLayout(False)
+        Me.pnlButtons.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -297,13 +298,6 @@ Friend Class frmSelectData
         End If
 
         pDataManager = aDataManager
-
-        'If pDataManager.DataSources.Count = 1 Then
-        '  pDataManager.UserManage()
-        '  While pDataManager.DataSources.Count = 1
-        '    Application.DoEvents()
-        '  End While
-        'End If
 
         pMatchingGroup = New atcDataGroup
         pMatchingSource = New GridSource(pDataManager, pMatchingGroup)
@@ -367,14 +361,14 @@ Friend Class frmSelectData
                 If atcDataAttributes.IsSimple(def) Then
                     lName = def.Name
                     If def.Calculated Then
-                        lItemIndex = BinarySearchString(lName, lCalculatedItems.Keys)
+                        lItemIndex = lCalculatedItems.BinarySearchForKey(lName)
                         If lItemIndex = lCalculatedItems.Count OrElse lCalculatedItems.Keys.Item(lItemIndex) <> lName Then
                             lCalculatedItems.Insert(lItemIndex, lName, lName)
                         End If
                     Else
-                        Dim lAttributeValues As atcCollection = SortedAttributeValues(lName, False)
+                        Dim lAttributeValues As atcCollection = pDataManager.DataSets.SortedAttributeValues(lName, NOTHING_VALUE)
                         If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
-                            lItemIndex = BinarySearchString(lName, lNotCalculatedItems.Keys)
+                            lItemIndex = lNotCalculatedItems.BinarySearchForKey(lName)
                             If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
                                 lNotCalculatedItems.Insert(lItemIndex, lName, lName)
                             End If
@@ -401,39 +395,8 @@ Friend Class frmSelectData
         End If
     End Sub
 
-    Private Function SortedAttributeValues(ByVal aAttributeName As String, ByVal aNumeric As Boolean) As atcCollection
-        Dim lSortedValues As New atcCollection
-        Dim lAllTs As atcDataGroup = pDataManager.DataSets
-        Dim lTsCount As Integer = lAllTs.Count
-        Dim lTsIndex As Integer = 0
-        Dim lItemIndex As Integer = 0
-        Dim lProgressMessage As String = "Sorting Values for " & aAttributeName
-        For Each ts As atcDataSet In lAllTs
-            Try
-                If aNumeric Then
-                    Dim lKey As Double = ts.Attributes.GetValue(aAttributeName, Double.NegativeInfinity)
-                    lItemIndex = BinarySearchNumeric(lKey, lSortedValues.Keys)
-                    If lItemIndex = lSortedValues.Count OrElse lKey <> lSortedValues.Keys.Item(lItemIndex) Then
-                        lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
-                    End If
-                    Logger.Progress(lProgressMessage, lTsIndex + 1, lTsCount)
-                Else
-                    Dim lKey As String = ts.Attributes.GetValue(aAttributeName, NOTHING_VALUE)
-                    lItemIndex = BinarySearchString(lKey, lSortedValues.Keys)
-                    If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
-                        lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(aAttributeName, NOTHING_VALUE))
-                    End If
-                End If
-            Catch ex As Exception
-                Logger.Dbg("Can't display value of " & aAttributeName & ": " & ex.Message)
-            End Try
-            lTsIndex += 1
-        Next
-        Return lSortedValues
-    End Function
-
     Private Sub PopulateCriteriaList(ByVal aAttributeName As String, ByVal aList As atcGrid)
-        Dim lNumeric As Boolean = False
+        Dim lNumeric As Boolean = atcDataAttributes.GetDefinition(aAttributeName).IsNumeric
         Dim lSortedItems As atcCollection
         Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(aAttributeName)
 
@@ -443,12 +406,7 @@ Friend Class frmSelectData
             lSortedItems = New atcCollection
         Else
             aList.Visible = False
-
-            Select Case lAttributeDef.TypeString.ToLower
-                Case "integer", "single", "double" : lNumeric = True
-            End Select
-
-            lSortedItems = SortedAttributeValues(aAttributeName, lNumeric)
+            lSortedItems = pDataManager.DataSets.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
         End If
 
         With aList
@@ -464,40 +422,6 @@ Friend Class frmSelectData
 
         Logger.Dbg("Finished PopulateCriteriaList(" & aAttributeName & ")")
     End Sub
-
-    'Returns first index of a key equal to or higher than aKey
-    'Returns aKeys.Count if aKeys is empty or contains only values less than aKey
-    Private Function BinarySearchString(ByVal aKey As String, ByVal aKeys As ArrayList) As Integer
-        Dim lHigher As Integer = aKeys.Count
-        Dim lLower As Integer = -1
-        Dim lProbe As Integer
-        While (lHigher - lLower > 1)
-            lProbe = (lHigher + lLower) / 2
-            If (aKeys.Item(lProbe) < aKey) Then
-                lLower = lProbe
-            Else
-                lHigher = lProbe
-            End If
-        End While
-        Return lHigher
-    End Function
-
-    'Returns first index of a key equal to or higher than aKey
-    'Returns aKeys.Count if aKeys is empty or contains only values less than aKey
-    Private Function BinarySearchNumeric(ByVal aKey As Double, ByVal aKeys As ArrayList) As Integer
-        Dim lHigher As Integer = aKeys.Count
-        Dim lLower As Integer = -1
-        Dim lProbe As Integer
-        While (lHigher - lLower > 1)
-            lProbe = (lHigher + lLower) / 2
-            If (CDbl(aKeys.Item(lProbe)) < aKey) Then
-                lLower = lProbe
-            Else
-                lHigher = lProbe
-            End If
-        End While
-        Return lHigher
-    End Function
 
     Private Sub PopulateMatching()
         Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
