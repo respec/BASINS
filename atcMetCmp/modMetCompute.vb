@@ -469,6 +469,8 @@ Public Module modMetCompute
 
     End Function
 
+    'DisTemp performs disaggregation of daily TMin/TMax to hourly temperature with a constant observation time
+    'It calls DisaggTemp which uses a timeseries for observation time
     Public Function DisTemp(ByVal aMnTmpTS As atcTimeseries, ByVal aMxTmpTS As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aObsTime As Integer) As atcTimeseries ', ByRef SJDt As Double, ByRef EJDt As Double
         'Disaggregate daily min/max temperature to hourly temperature
         'Mn/MxTmpTS - input daily min/max temp values, 
@@ -482,95 +484,161 @@ Public Module modMetCompute
         '*** Note:  SJDt/EJDt no longer in use, time of output TSer assumed same as input
         'SJDt - actual start date for output time series
         'EJDt - actual end date for output time series
+        'build obs time TSer with constant value from aObsTime argument
+        Dim lObsTimeTS As atcTimeseries = aMnTmpTS.Clone
+        For i As Integer = 1 To lObsTimeTS.numValues
+            lObsTimeTS.Values(i) = aObsTime
+        Next
+        lObsTimeTS.Attributes.SetValue("Scenario", "CONST-" & aObsTime)
+        lObsTimeTS.Attributes.SetValue("Constituent", aMnTmpTS.Attributes.GetValue("Constituent") & "-OBS")
+        Return DisaggTemp(aMnTmpTS, aMxTmpTS, aDataSource, lObsTimeTS)
+    End Function
 
-        Dim lHrPos, ioff, j, i, lOpt, joff As Integer
+    'DisaggTemp performs disaggregation of daily TMin/TMax to hourly temperature 
+    'using a timeseries for observation time
+    Public Function DisaggTemp(ByVal aMnTmpTS As atcTimeseries, ByVal aMxTmpTS As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aObsTimeTS As atcTimeseries) As atcTimeseries ', ByRef SJDt As Double, ByRef EJDt As Double
+        'Disaggregate daily min/max temperature to hourly temperature
+        'Mn/MxTmpTS - input daily min/max temp values, 
+        '             since disagg method uses either previous or ensuing 
+        '             days values, these arrays contain two more days of 
+        '             values than the period being disaggregated
+        '  For Min Temp, the two extra values are at the end
+        '  For Max Temp , there is one extra value at each end of the data set
+        'aObsTime - hour of observation for the TMin/TMax values
+
+        '*** Note:  SJDt/EJDt no longer in use, time of output TSer assumed same as input
+        'SJDt - actual start date for output time series
+        'EJDt - actual end date for output time series
+        Dim lHrPos, j, i As Integer
         Dim lDate(5) As Integer
         Dim lHrVals(24) As Double
         Dim tsfil(1) As Single
+        Dim lObsTime As Integer
+        Dim lCurMin As Double
+        Dim lNxtMin As Double
+        Dim lPreMax As Double
+        Dim lCurMax As Double
         Dim lDisTs As New atcTimeseries(aDataSource)
 
         CopyBaseAttributes(aMnTmpTS, lDisTs)
         lDisTs.Attributes.SetValue("tu", atcTimeUnit.TUHour)
         lDisTs.Attributes.SetValue("ts", 1)
         lDisTs.Attributes.SetValue("Scenario", "COMPUTED")
-        lDisTs.Attributes.SetValue("Constituent", "ATMP")
-        lDisTs.Attributes.SetValue("TSTYPE", "ATMP")
+        lDisTs.Attributes.SetValue("Constituent", "ATEM")
+        lDisTs.Attributes.SetValue("TSTYPE", "ATEM")
         lDisTs.Attributes.SetValue("Description", "Hourly Temperature disaggregated from Daily TMin/TMax")
-        lDisTs.Attributes.AddHistory("Disaggregated Temperature - inputs: TMIN, TMAX, Observation Time")
+        lDisTs.Attributes.AddHistory("Disaggregated Temperature - inputs: TMIN, TMAX, Observation Time Timeseries")
         lDisTs.Attributes.Add("TMIN", aMnTmpTS.ToString)
         lDisTs.Attributes.Add("TMAX", aMxTmpTS.ToString)
-        lDisTs.Attributes.Add("Observation Time", aObsTime)
+        lDisTs.Attributes.Add("Observation Time Timeseries", aObsTimeTS.ToString)
 
         lDisTs.Dates = DisaggDates(aMnTmpTS, aDataSource)
         lDisTs.numValues = lDisTs.Dates.numValues
 
-        tsfil(0) = aMnTmpTS.Attributes.GetValue("TSFILL", -999)
-        tsfil(1) = aMxTmpTS.Attributes.GetValue("TSFILL", -999)
+        'tsfil(0) = aMnTmpTS.Attributes.GetValue("TSFILL", -999)
+        'tsfil(1) = aMxTmpTS.Attributes.GetValue("TSFILL", -999)
 
-        If aObsTime > 0 And aObsTime <= 6 Then
-            'option 1 is early morning observations,
-            'use max and min temp from previous calendar day
-            lOpt = 1
-        ElseIf aObsTime > 6 And aObsTime <= 16 Then
-            'option 2 is mid day observations,
-            'use max temp from previous day and min temp of current day
-            lOpt = 2
-        ElseIf aObsTime > 16 And aObsTime <= 24 Then
-            'option 3 is evening observations,
-            'use max and min temp from current day
-            lOpt = 3
-        End If
+        'If aObsTime > 0 And aObsTime <= 6 Then
+        '    'option 1 is early morning observations,
+        '    'use max and min temp from previous calendar day
+        '    lOpt = 1
+        'ElseIf aObsTime > 6 And aObsTime <= 16 Then
+        '    'option 2 is mid day observations,
+        '    'use max temp from previous day and min temp of current day
+        '    lOpt = 2
+        'ElseIf aObsTime > 16 And aObsTime <= 24 Then
+        '    'option 3 is evening observations,
+        '    'use max and min temp from current day
+        '    lOpt = 3
+        'End If
 
         Dim lHRTemp(lDisTs.numValues) As Double
-        Dim lMinTmp(aMnTmpTS.numValues + 2) As Double
-        Dim lMaxTmp(aMxTmpTS.numValues + 1) As Double
+        'Dim lMinTmp(aMnTmpTS.numValues + 2) As Double
+        'Dim lMaxTmp(aMxTmpTS.numValues + 1) As Double
 
-        'get max temp data
-        joff = 0
-        If lOpt = 3 Then 'back up one day (try to use 1st array element)
-            ioff = 0
-            'used to look for values prior to start date, but now just do whole available time span
-            'If aMxTmpTS.Item(2).dates.Summary.SJDay >= SJDt Then
-            'no data available prior to start date
-            joff = 1
-            'fill first max value with first available max value
-            lMaxTmp(1) = aMxTmpTS.Value(1)
-            'ElseIf aMxTmpTS.Item(2).dates.Summary.SJDay < SJDt Then
-            '1st element preceeds start date, don't need it
-            'ioff = 1
-        Else '1st element is at start date, need it
-            ioff = 0
-        End If
-        For i = 1 To aMxTmpTS.numValues - ioff
-            lMaxTmp(i + joff) = aMxTmpTS.Value(i + ioff)
-        Next i
-        If lOpt <> 3 Then ' And aMxTmpTS.Item(2).dates.Summary.EJDay <= EJDt Then
-            'extra value needed, but not available, fill with previous
-            lMaxTmp(aMxTmpTS.numValues + 1) = lMaxTmp(aMxTmpTS.numValues)
-        End If
-
-        'get min temp data
-        If lOpt = 1 Then 'move up one day for min temp values
-            ioff = 1
-        Else
-            ioff = 0
-        End If
-        For i = 1 To aMnTmpTS.numValues - ioff
-            lMinTmp(i) = aMnTmpTS.Value(i + ioff)
-        Next i
-        'check end points
-        'If MnMxTmp.Item(1).dates.Summary.EJDay <= EJDt Then
-        If lOpt = 1 Then 'need 2 extra values at end, fill with last good one
-            lMinTmp(aMnTmpTS.numValues + 1) = lMinTmp(aMnTmpTS.numValues - 1)
-        End If
-        lMinTmp(aMnTmpTS.numValues + 1 - ioff) = lMinTmp(aMnTmpTS.numValues - ioff)
+        ''get max temp data
+        'joff = 0
+        'If lOpt = 3 Then 'back up one day (try to use 1st array element)
+        '    ioff = 0
+        '    'used to look for values prior to start date, but now just do whole available time span
+        '    'If aMxTmpTS.Item(2).dates.Summary.SJDay >= SJDt Then
+        '    'no data available prior to start date
+        '    joff = 1
+        '    'fill first max value with first available max value
+        '    lMaxTmp(1) = aMxTmpTS.Value(1)
+        '    'ElseIf aMxTmpTS.Item(2).dates.Summary.SJDay < SJDt Then
+        '    '1st element preceeds start date, don't need it
+        '    'ioff = 1
+        'Else '1st element is at start date, need it
+        '    ioff = 0
         'End If
+        'For i = 1 To aMxTmpTS.numValues - ioff
+        '    lMaxTmp(i + joff) = aMxTmpTS.Value(i + ioff)
+        'Next i
+        'If lOpt <> 3 Then ' And aMxTmpTS.Item(2).dates.Summary.EJDay <= EJDt Then
+        '    'extra value needed, but not available, fill with previous
+        '    lMaxTmp(aMxTmpTS.numValues + 1) = lMaxTmp(aMxTmpTS.numValues)
+        'End If
+
+        ''get min temp data
+        'If lOpt = 1 Then 'move up one day for min temp values
+        '    ioff = 1
+        'Else
+        '    ioff = 0
+        'End If
+        'For i = 1 To aMnTmpTS.numValues - ioff
+        '    lMinTmp(i) = aMnTmpTS.Value(i + ioff)
+        'Next i
+        ''check end points
+        ''If MnMxTmp.Item(1).dates.Summary.EJDay <= EJDt Then
+        'If lOpt = 1 Then 'need 2 extra values at end, fill with last good one
+        '    lMinTmp(aMnTmpTS.numValues + 1) = lMinTmp(aMnTmpTS.numValues - 1)
+        'End If
+        'lMinTmp(aMnTmpTS.numValues + 1 - ioff) = lMinTmp(aMnTmpTS.numValues - ioff)
+        ''End If
 
         lHrPos = 0
         For i = 1 To aMnTmpTS.numValues
-            If (Math.Abs(lMaxTmp(i) - tsfil(1)) > 0.000001) Or (Math.Abs(lMinTmp(i) - tsfil(0)) > 0.000001) Then
-                'value is not missing, so distribute
-                Call DISTRB(lMaxTmp(i), lMinTmp(i), lMaxTmp(i + 1), lMinTmp(i + 1), lHrVals)
+            lObsTime = CurrentObsTime(aObsTimeTS, i)
+            If lObsTime < 6 Then 'min occured yesterday
+                If i < aMnTmpTS.numValues Then
+                    lCurMin = aMnTmpTS.Values(i + 1)
+                    If i + 1 < aMnTmpTS.numValues Then
+                        lNxtMin = aMnTmpTS.Values(i + 2)
+                    Else 'at end, just use last value
+                        lNxtMin = aMnTmpTS.Values(aMnTmpTS.numValues)
+                    End If
+                Else 'at then end, just use last value
+                    lCurMin = aMnTmpTS.Values(aMnTmpTS.numValues)
+                    lNxtMin = aMnTmpTS.Values(aMnTmpTS.numValues)
+                End If
+            Else 'min occured today
+                lCurMin = aMnTmpTS.Values(i)
+                If i < aMnTmpTS.numValues Then
+                    lNxtMin = aMnTmpTS.Values(i + 1)
+                Else 'at end, use same value as today for tomorrow's min
+                    lNxtMin = lCurMin
+                End If
+            End If
+            If lObsTime > 16 Then 'max occured today, so need to back up 1 for previous days max
+                lCurMax = aMxTmpTS.Values(i)
+                If i > 1 Then
+                    lPreMax = aMxTmpTS.Values(i - 1)
+                Else 'at the first value, use same value as today for previous day's max
+                    lPreMax = lCurMax
+                End If
+            Else 'max occured yesterday, so need to look ahead one for today's max
+                lPreMax = aMxTmpTS.Values(i)
+                If i < aMxTmpTS.numValues Then
+                    lCurMax = aMxTmpTS.Values(i + 1)
+                Else 'at end, use same as yesterday's max for today
+                    lCurMax = lPreMax
+                End If
+            End If
+            If Not Double.IsNaN(lCurMin) AndAlso Not Double.IsNaN(lNxtMin) AndAlso _
+               Not Double.IsNaN(lPreMax) AndAlso Not Double.IsNaN(lCurMax) Then
+                'values not missing, so distribute
+                Call DISTRB(lPreMax, lCurMin, lCurMax, lNxtMin, lHrVals)
                 For j = 1 To 24
                     lHRTemp(lHrPos + j) = lHrVals(j)
                 Next j
@@ -579,7 +647,7 @@ Public Module modMetCompute
                     lHRTemp(lHrPos + j) = tsfil(1)
                 Next j
             End If
-            lHrPos = lHrPos + 24
+                lHrPos = lHrPos + 24
         Next i
         Array.Copy(lHRTemp, 1, lDisTs.Values, 1, lDisTs.numValues)
         Return lDisTs
@@ -1606,10 +1674,31 @@ Public Module modMetCompute
 
     End Sub
 
+    'DisPrecip performs disaggregation of daily precip to hourly with a constant observation time
+    'It calls DisaggPrecip which uses a timeseries for observation time
     Public Function DisPrecip(ByVal aDyTSer As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aHrTSer As atcDataGroup, ByVal aObsTime As Integer, ByVal aTolerance As Double, Optional ByVal aSumFile As String = "") As atcTimeseries
         'aDyTSer - daily time series being disaggregated
         'aHrTser - collection of hourly timeseries used to disaggregate daily
         'aObsTime - observation time of daily precip (1 - 24)
+        'aTolerance - tolerance for comparison of hourly daily sums to daily value (%)
+        'aSumFile - name of file for output summary info
+
+        'build obs time TSer with constant value from aObsTime argument
+        Dim lObsTimeTS As atcTimeseries = aDyTSer.Clone
+        For i As Integer = 1 To lObsTimeTS.numValues
+            lObsTimeTS.Values(i) = aObsTime
+        Next
+        lObsTimeTS.Attributes.SetValue("Scenario", "CONST-" & aObsTime)
+        lObsTimeTS.Attributes.SetValue("Constituent", aDyTSer.Attributes.GetValue("Constituent") & "-OBS")
+        Return DisaggPrecip(aDyTSer, aDataSource, aHrTSer, lObsTimeTS, aTolerance, aSumFile)
+    End Function
+
+    'DisaggPrecip performs disaggregation of daily precip to hourly 
+    'using a timeseries for the observation time
+    Public Function DisaggPrecip(ByVal aDyTSer As atcTimeseries, ByVal aDataSource As atcDataSource, ByVal aHrTSer As atcDataGroup, ByVal aObsTimeTS As atcTimeseries, ByVal aTolerance As Double, Optional ByVal aSumFile As String = "") As atcTimeseries
+        'aDyTSer - daily time series being disaggregated
+        'aHrTser - collection of hourly timeseries used to disaggregate daily
+        'aObsTimeTS - timeseries of observation times for daily precip data (1 - 24)
         'aTolerance - tolerance for comparison of hourly daily sums to daily value (%)
         'aSumFile - name of file for output summary info
 
@@ -1628,6 +1717,8 @@ Public Module modMetCompute
         Dim lClosestHrTser As atcTimeseries = Nothing
         Dim lDaySumHrTser As atcTimeseries
         Dim lDisTs As New atcTimeseries(aDataSource)
+        Dim lDistCnt As Integer = 0
+        Dim lTriDistCnt As Integer = 0
 
         On Error GoTo DisPrecipErrHnd
         lUsedTriang = 0
@@ -1655,13 +1746,13 @@ Public Module modMetCompute
         lDisTs.Attributes.AddHistory("Disaggregated Precipitation - inputs: DPRC, HPCP, Observation Hour, Data Tolerance")
         lDisTs.Attributes.Add("DPRC", aDyTSer.ToString)
         lDisTs.Attributes.Add("HPCP", aHrTSer.ToString)
-        lDisTs.Attributes.Add("Observation Hour", aObsTime)
+        lDisTs.Attributes.Add("Observation Timeseries", aObsTimeTS.ToString)
         lDisTs.Attributes.Add("Data Tolerance", aTolerance)
 
         'build new date array for hourly TSer, set start date to previous day's Obs Time
         lSDt = aDyTSer.Attributes.GetValue("SJDAY") - 1
         Call J2Date(lSDt, lDate)
-        lDate(3) = aObsTime
+        lDate(3) = CurrentObsTime(aObsTimeTS, 1)
         'aDyTSer.Attributes.SetValue("SJDAY", Date2J(lDate))
         'need to set first date value to shift back to previous day's Obs Time
         aDyTSer.Dates.Values(0) = Date2J(lDate)
@@ -1679,7 +1770,7 @@ Public Module modMetCompute
                 'back up a day, then add obs hour to get actual end of period
                 lEDt = aDyTSer.Dates.Value(lDyInd) - 1
                 Call J2Date(lEDt, lDate)
-                lDate(3) = aObsTime
+                lDate(3) = CurrentObsTime(aObsTimeTS, lDyInd)
                 lEDt = Date2J(lDate)
                 lSDt = lEDt - 1
                 lClosestRatio = 0
@@ -1742,7 +1833,7 @@ Public Module modMetCompute
                 Else 'no data available at hourly stations,
                     'distribute using triangular distribution
                     Call DistTriang(aDyTSer.Value(lDyInd), lTmpHrVals, retcod)
-                    lUsedTriang = lUsedTriang + 1
+                    lTriDistCnt += 1
                     For lHrInd = 1 To 24
                         lHrVals(lHrPos + lHrInd) = lTmpHrVals(lHrInd)
                     Next lHrInd
@@ -1764,6 +1855,7 @@ Public Module modMetCompute
                         Err.Raise(vbObjectError + 513 + System.Math.Abs(retcod))
                     End If
                 End If
+                lDistCnt += 1
             Else 'no daily value to distribute, fill hourly
                 For lHrInd = lHrPos + 1 To lHrPos + 24
                     lHrVals(lHrInd) = 0
@@ -1774,7 +1866,13 @@ Public Module modMetCompute
 
 DisPrecipErrHnd:
         On Error GoTo OuttaHere 'in case there's an error in these statements
-        If lOutSumm Then FileClose(lOutFil)
+        If lOutSumm Then
+            WriteLine(lOutFil, "")
+            WriteLine(lOutFil, "  Total Number of Values Distributed: " & lDistCnt)
+            WriteLine(lOutFil, "  Number of Triangular Distributed Values : " & lTriDistCnt)
+            WriteLine(lOutFil, "  Percentage of Triangular Distributed Values: " & lTriDistCnt / lDistCnt * 100)
+            FileClose(lOutFil)
+        End If
         Array.Copy(lHrVals, 1, lDisTs.Values, 1, lDisTs.numValues)
 
 OuttaHere:
