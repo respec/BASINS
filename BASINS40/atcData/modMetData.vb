@@ -354,8 +354,8 @@ Public Module modMetData
                             lInd = lDist.IndexFromKey(CStr(j))
                             lTSer = aTSAvail.ItemByIndex(lInd)
                             lFVal = -1
-                            If (lMJDay + (k - 1) / lIntsPerDay) - lTSer.Attributes.GetValue("SJDay") > Double.Epsilon And _
-                               (lMJDay + (k - 1) / lIntsPerDay) <= lTSer.Attributes.GetValue("EJDay") Then 'check value
+                            If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > Double.Epsilon And _
+                               (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Values(lTSer.numValues) Then 'check value
                                 lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
                                 If lTSer.Value(lSPos) > lValMin And lTSer.Value(lSPos) < lValMax Then 'good value
                                     lFVal = lTSer.Value(lSPos)
@@ -401,7 +401,7 @@ Public Module modMetData
                     End If
                     lAccVal = CDbl(StrSplit(s, vbCrLf, ""))
                     lSubSJDay = lMJDay - 1 / lIntsPerDay 'back up one interval for SubSetByDate in ClosestPrecip
-                    lEJDay = lSubSJDay + lMLen
+                    lEJDay = lSubSJDay + lMLen / lIntsPerDay
                     lTSer = ClosestPrecip(aTS2Fill, aTSAvail, lAccVal, lSubSJDay, lEJDay, aTol)
                     If Not lTSer Is Nothing Then
                         Logger.Dbg("    Distributing " & lAccVal & " from TS# " & lTSer.ToString)
