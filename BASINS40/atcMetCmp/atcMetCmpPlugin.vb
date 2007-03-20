@@ -547,6 +547,9 @@ Public Class atcMetCmpPlugin
                 lArguments.SetValue(defLat, Nothing)
                 lOperations.SetValue(lDisEvap, Nothing, lArguments)
 
+                Dim defObsTimeTS As New atcAttributeDefinition
+                defObsTimeTS = defTimeSeriesOne.Clone("Observation Timeseries", "Timeseries of Daily Observation times (1-24)")
+
                 Dim lDisTemp As New atcAttributeDefinition
                 With lDisTemp
                     .Name = "Temperature"
@@ -557,21 +560,21 @@ Public Class atcMetCmpPlugin
                     .Calculator = Me
                 End With
 
-                Dim defObsTime As New atcAttributeDefinition
-                With defObsTime
-                    .Name = "Observation Time"
-                    .Description = "Hour (1 - 24) that Daily TMin/TMax observations were made"
-                    .DefaultValue = 24
-                    .Max = 24
-                    .Min = 1
-                    .Editable = True
-                    .TypeString = "Integer"
-                End With
+                'Dim defObsTime As New atcAttributeDefinition
+                'With defObsTime
+                '    .Name = "Observation Time"
+                '    .Description = "Hour (1 - 24) that Daily TMin/TMax observations were made"
+                '    .DefaultValue = 24
+                '    .Max = 24
+                '    .Min = 1
+                '    .Editable = True
+                '    .TypeString = "Integer"
+                'End With
 
                 lArguments = New atcDataAttributes
                 lArguments.SetValue(defTMinTS, Nothing)
                 lArguments.SetValue(defTMaxTS, Nothing)
-                lArguments.SetValue(defObsTime, Nothing)
+                lArguments.SetValue(defObsTimeTS, Nothing)
                 lOperations.SetValue(lDisTemp, Nothing, lArguments)
 
                 Dim lDisWind As New atcAttributeDefinition
@@ -644,7 +647,7 @@ Public Class atcMetCmpPlugin
                 lArguments = New atcDataAttributes
                 lArguments.SetValue(defDPrecTS, Nothing)
                 lArguments.SetValue(defHrPrec, Nothing)
-                lArguments.SetValue(defObsTime.Clone("Observation Hour", "Hour (1 - 24) that Daily Precipitation was recorded"), Nothing)
+                lArguments.SetValue(defObsTimeTS, Nothing)
                 lArguments.SetValue(defTolerance, Nothing)
                 lArguments.SetValue(defSummFile, Nothing)
                 lOperations.SetValue(lDisPrec, Nothing, lArguments)
