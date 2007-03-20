@@ -9,6 +9,44 @@ Public Class atcCollection
 
     Private pKeys As ArrayList = New ArrayList
 
+    ''' <summary>Returns first index of a key equal to or higher than aKey</summary>
+    ''' <param name="aKey">Key to search for</param>
+    ''' <returns>Returns aKeys.Count if aKeys is empty or contains only values less than aKey</returns>
+    ''' <remarks>Only works for collections sorted by key</remarks>
+    Public Function BinarySearchForKey(ByVal aKey As String) As Integer
+        Dim lHigher As Integer = pKeys.Count
+        Dim lLower As Integer = -1
+        Dim lProbe As Integer
+        While (lHigher - lLower > 1)
+            lProbe = (lHigher + lLower) / 2
+            If (pKeys.Item(lProbe) < aKey) Then
+                lLower = lProbe
+            Else
+                lHigher = lProbe
+            End If
+        End While
+        Return lHigher
+    End Function
+
+    ''' <summary>Returns first index of a key equal to or higher than aKey</summary>
+    ''' <param name="aKey">Key to search for</param>
+    ''' <returns>Returns aKeys.Count if aKeys is empty or contains only values less than aKey</returns>
+    ''' <remarks>Only works for collections sorted by key</remarks>
+    Public Function BinarySearchForKey(ByVal aKey As Double) As Integer
+        Dim lHigher As Integer = pKeys.Count
+        Dim lLower As Integer = -1
+        Dim lProbe As Integer
+        While (lHigher - lLower > 1)
+            lProbe = (lHigher + lLower) / 2
+            If (CDbl(pKeys.Item(lProbe)) < aKey) Then
+                lLower = lProbe
+            Else
+                lHigher = lProbe
+            End If
+        End While
+        Return lHigher
+    End Function
+
     Public Sub New(ByVal ParamArray aValuesToAdd() As Object)
         MyBase.New()
         AddRange(aValuesToAdd)
