@@ -361,14 +361,19 @@ Public Class atcGrid
                         Me.VScroller.Value = 0
                     Else                     'Check to see if all rows could fit
                         y = 0
-                        For lRow = 0 To lRows - 1
+                        For lRow = lRows - 1 To 0 Step -1
                             y += RowHeight(lRow)
                             If y > visibleHeight Then Exit For
                         Next
-                        If y <= visibleHeight Then 'If all rows can fit
-                            pTopRow = 0              'Reset scrollbar to top row
-                            Me.VScroller.Value = 0
+                        lRow += 2
+                        If lRow < pTopRow Then
+                            pTopRow = lRow
+                            Me.VScroller.Value = pTopRow
                         End If
+                        'If y <= visibleHeight Then 'If all rows can fit
+                        '    pTopRow = 0              'Reset scrollbar to top row
+                        '    Me.VScroller.Value = 0
+                        'End If
                     End If
                 End If
                 If lColumns < pLeftColumn Then 'Scrolled past rightmost column
