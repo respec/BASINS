@@ -4,7 +4,7 @@ Public Class atcClimateAssessmentToolPlugin
     Inherits atcData.atcDataDisplay
 
     Private Shared pForm As frmCAT
-    Private Shared pXML As String
+    'Private Shared pXML As String
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -27,22 +27,22 @@ Public Class atcClimateAssessmentToolPlugin
         g_MapWin = aMapWin
     End Sub
 
-    Public Property XML() As String
-        Get
-            Return pXML
-        End Get
-        Set(ByVal newValue As String)
-            pXML = newValue
-        End Set
-    End Property
+    'Public Property XML() As String
+    '    Get
+    '        Return pXML
+    '    End Get
+    '    Set(ByVal newValue As String)
+    '        pXML = newValue
+    '    End Set
+    'End Property
 
-    Public Overrides Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String)
-        XML = SettingsString
-        If Not pForm Is Nothing Then pForm.XML = XML
-    End Sub
+    'Public Overrides Sub ProjectLoading(ByVal ProjectFile As String, ByVal SettingsString As String)
+    '    XML = SettingsString
+    '    If Not pForm Is Nothing Then pForm.XML = XML
+    'End Sub
 
-    Public Overrides Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String)
-        SettingsString = XML
-    End Sub
+    'Public Overrides Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String)
+    '    SettingsString = XML
+    'End Sub
 
 End Class

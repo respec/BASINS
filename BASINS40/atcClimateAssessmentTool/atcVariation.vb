@@ -21,7 +21,7 @@ Public Class atcVariation
     Public PETdata As atcDataGroup
     Private pComputationSource As atcDataSource
     Private pOperation As String
-    Public AddRemovePer As String
+    'Public AddRemovePer As String
     Private pSelected As Boolean
 
     'TODO: make rest of public variables into properties
@@ -35,7 +35,7 @@ Public Class atcVariation
     Public UseEvents As Boolean
     Public EventThreshold As Double
     Public EventDaysGapAllowed As Double
-    Public EventGapDisplayUnits As String
+    'Public EventGapDisplayUnits As String
     Public EventHigh As Boolean
 
     Public EventVolumeHigh As Boolean
@@ -43,7 +43,7 @@ Public Class atcVariation
 
     Public EventDurationHigh As Boolean
     Public EventDurationDays As Double
-    Public EventDurationDisplayUnits As String
+    'Public EventDurationDisplayUnits As String
 
     Public FlashVolumeFraction As Double
 
@@ -138,7 +138,7 @@ Public Class atcVariation
         Dim lModifyThis As atcTimeseries
 
         For Each lOriginalData As atcDataSet In DataSets
-            Dim lSplitData As atcDataGroup
+            Dim lSplitData As atcDataGroup = Nothing
             If UseEvents Then
                 lEvents = EventSplit(lOriginalData, Nothing, EventThreshold, EventDaysGapAllowed, EventHigh)
 
@@ -590,17 +590,17 @@ tryAgain:
         UseEvents = False
         EventThreshold = pNaN
         EventDaysGapAllowed = 0
-        EventGapDisplayUnits = ""
+        'EventGapDisplayUnits = ""
         EventHigh = True
         FlashVolumeFraction = pNaN
-        AddRemovePer = "Entire Span"
+        'AddRemovePer = "Entire Span"
 
         EventVolumeHigh = True
         EventVolumeThreshold = pNaN
 
         EventDurationHigh = True
         EventDurationDays = pNaN
-        EventDurationDisplayUnits = ""
+        'EventDurationDisplayUnits = ""
 
         IsInput = False
 
@@ -617,7 +617,7 @@ tryAgain:
             .UseEvents = UseEvents
             If UseEvents Then
                 .EventDaysGapAllowed = EventDaysGapAllowed
-                .EventGapDisplayUnits = EventGapDisplayUnits
+                '.EventGapDisplayUnits = EventGapDisplayUnits
                 .EventHigh = EventHigh
                 .EventThreshold = EventThreshold
             End If
@@ -626,14 +626,16 @@ tryAgain:
             If Not PETdata Is Nothing Then .PETdata = PETdata.Clone()
             .ComputationSource = ComputationSource
             .Operation = Operation.Clone()
-            If Not Seasons Is Nothing Then
-                .Seasons = Seasons.Clone 'TODO: clone Seasons of not Nothing
+            If Seasons Is Nothing Then
+                .Seasons = Nothing
+            Else
+                .Seasons = Seasons.Clone
             End If
             .Selected = Selected
             .Min = Min
             .Max = Max
             .Increment = Increment
-            .AddRemovePer = AddRemovePer
+            '.AddRemovePer = AddRemovePer
             .IsInput = IsInput
             .CurrentValue = CurrentValue
             .ColorAboveMax = ColorAboveMax
@@ -649,13 +651,13 @@ tryAgain:
                               & " High='" & EventHigh & "' " _
                               & " FlashVolumeFraction='" & FlashVolumeFraction & "' " _
                               & " GapDays='" & EventDaysGapAllowed & "' " _
-                              & " GapDisplayUnits='" & EventGapDisplayUnits & "' " _
                               & " VolumeHigh='" & EventVolumeHigh & "' " _
                               & " VolumeThreshold='" & EventVolumeThreshold & "' " _
                               & " DurationHigh='" & EventDurationHigh & "' " _
                               & " DurationDays='" & EventDurationDays & "' " _
-                              & " DurationDisplayUnits='" & EventDurationDisplayUnits & "' " _
                               & "/>" & vbCrLf
+                '& " GapDisplayUnits='" & EventGapDisplayUnits & "' " _
+                '& " DurationDisplayUnits='" & EventDurationDisplayUnits & "' " _
             Else
                 Return ""
             End If
@@ -669,14 +671,14 @@ tryAgain:
                     EventHigh = lXML.GetAttrValue("High")
                     FlashVolumeFraction = lXML.GetAttrValue("FlashVolumeFraction")
                     EventDaysGapAllowed = lXML.GetAttrValue("GapDays")
-                    EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
+                    'EventGapDisplayUnits = lXML.GetAttrValue("GapDisplayUnits")
 
                     EventVolumeHigh = lXML.GetAttrValue("VolumeHigh")
                     EventVolumeThreshold = lXML.GetAttrValue("VolumeThreshold")
 
                     EventDurationHigh = lXML.GetAttrValue("DurationHigh")
                     EventDurationDays = lXML.GetAttrValue("DurationDays")
-                    EventDurationDisplayUnits = lXML.GetAttrValue("DurationDisplayUnits")
+                    'EventDurationDisplayUnits = lXML.GetAttrValue("DurationDisplayUnits")
                 End If
             End If
         End Set
@@ -802,7 +804,7 @@ tryAgain:
                 lXML &= "  <IsInput>" & IsInput & "</IsInput>" & vbCrLf
             End If
             lXML &= "  <Operation>" & Operation & "</Operation>" & vbCrLf
-            lXML &= "  <AddRemovePer>" & AddRemovePer & "</AddRemovePer>" & vbCrLf
+            'lXML &= "  <AddRemovePer>" & AddRemovePer & "</AddRemovePer>" & vbCrLf
             If Not ComputationSource Is Nothing Then
                 lXML &= "  <ComputationSource>" & ComputationSource.Name & "</ComputationSource>" & vbCrLf
             End If
@@ -827,7 +829,7 @@ tryAgain:
                                 Case "increment" : Increment = CDbl(.Content)
                                 Case "isinput" : IsInput = CBool(.Content)
                                 Case "operation" : Operation = .Content
-                                Case "addremoveper" : AddRemovePer = .Content
+                                    'Case "addremoveper" : AddRemovePer = .Content
                                 Case "computationsource"
                                     ComputationSource = g_DataManager.DataSourceByName(.Content)
                                 Case "datasets" : SetDataGroupXML(DataSets, "DataSets", .GetXml)

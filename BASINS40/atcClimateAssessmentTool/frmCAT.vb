@@ -101,7 +101,6 @@ Public Class frmCAT
         Me.myTabs = New System.Windows.Forms.TabControl
         Me.tabInputs = New System.Windows.Forms.TabPage
         Me.btnInputView = New System.Windows.Forms.Button
-        Me.btnInputPrepared = New System.Windows.Forms.Button
         Me.txtBaseScenario = New System.Windows.Forms.TextBox
         Me.btnInputAddCligen = New System.Windows.Forms.Button
         Me.btnInputDown = New System.Windows.Forms.Button
@@ -113,7 +112,10 @@ Public Class frmCAT
         Me.lblBaseScenarioName = New System.Windows.Forms.Label
         Me.lblNewScenarioName = New System.Windows.Forms.Label
         Me.lstInputs = New System.Windows.Forms.CheckedListBox
+        Me.btnInputPrepared = New System.Windows.Forms.Button
         Me.tabEndpoints = New System.Windows.Forms.TabPage
+        Me.btnEndpointBottom = New System.Windows.Forms.Button
+        Me.btnEndpointTop = New System.Windows.Forms.Button
         Me.chkRunModel = New System.Windows.Forms.CheckBox
         Me.btnEndpointCopy = New System.Windows.Forms.Button
         Me.chkShowEachRunProgress = New System.Windows.Forms.CheckBox
@@ -155,8 +157,6 @@ Public Class frmCAT
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.lblTop = New System.Windows.Forms.Label
         Me.btnStop = New System.Windows.Forms.Button
-        Me.btnEndpointTop = New System.Windows.Forms.Button
-        Me.btnEndpointBottom = New System.Windows.Forms.Button
         Me.myTabs.SuspendLayout()
         Me.tabInputs.SuspendLayout()
         Me.tabEndpoints.SuspendLayout()
@@ -176,13 +176,12 @@ Public Class frmCAT
         Me.myTabs.Location = New System.Drawing.Point(0, 3)
         Me.myTabs.Name = "myTabs"
         Me.myTabs.SelectedIndex = 0
-        Me.myTabs.Size = New System.Drawing.Size(459, 310)
+        Me.myTabs.Size = New System.Drawing.Size(520, 310)
         Me.myTabs.TabIndex = 1
         '
         'tabInputs
         '
         Me.tabInputs.Controls.Add(Me.btnInputView)
-        Me.tabInputs.Controls.Add(Me.btnInputPrepared)
         Me.tabInputs.Controls.Add(Me.txtBaseScenario)
         Me.tabInputs.Controls.Add(Me.btnInputAddCligen)
         Me.tabInputs.Controls.Add(Me.btnInputDown)
@@ -194,27 +193,21 @@ Public Class frmCAT
         Me.tabInputs.Controls.Add(Me.lblBaseScenarioName)
         Me.tabInputs.Controls.Add(Me.lblNewScenarioName)
         Me.tabInputs.Controls.Add(Me.lstInputs)
+        Me.tabInputs.Controls.Add(Me.btnInputPrepared)
         Me.tabInputs.Location = New System.Drawing.Point(4, 22)
         Me.tabInputs.Name = "tabInputs"
-        Me.tabInputs.Size = New System.Drawing.Size(451, 284)
+        Me.tabInputs.Size = New System.Drawing.Size(512, 284)
         Me.tabInputs.TabIndex = 0
-        Me.tabInputs.Text = "Inputs"
+        Me.tabInputs.Text = "Climate Data"
+        Me.tabInputs.UseVisualStyleBackColor = True
         '
         'btnInputView
         '
-        Me.btnInputView.Location = New System.Drawing.Point(124, 64)
+        Me.btnInputView.Location = New System.Drawing.Point(260, 64)
         Me.btnInputView.Name = "btnInputView"
         Me.btnInputView.Size = New System.Drawing.Size(48, 24)
         Me.btnInputView.TabIndex = 8
         Me.btnInputView.Text = "View"
-        '
-        'btnInputPrepared
-        '
-        Me.btnInputPrepared.Location = New System.Drawing.Point(286, 64)
-        Me.btnInputPrepared.Name = "btnInputPrepared"
-        Me.btnInputPrepared.Size = New System.Drawing.Size(63, 24)
-        Me.btnInputPrepared.TabIndex = 11
-        Me.btnInputPrepared.Text = "Prepared"
         '
         'txtBaseScenario
         '
@@ -222,22 +215,22 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtBaseScenario.Location = New System.Drawing.Point(96, 8)
         Me.txtBaseScenario.Name = "txtBaseScenario"
-        Me.txtBaseScenario.Size = New System.Drawing.Size(346, 20)
+        Me.txtBaseScenario.Size = New System.Drawing.Size(407, 20)
         Me.txtBaseScenario.TabIndex = 3
         Me.txtBaseScenario.Text = "<click to select>"
         '
         'btnInputAddCligen
         '
-        Me.btnInputAddCligen.Location = New System.Drawing.Point(232, 64)
+        Me.btnInputAddCligen.Location = New System.Drawing.Point(105, 64)
         Me.btnInputAddCligen.Name = "btnInputAddCligen"
-        Me.btnInputAddCligen.Size = New System.Drawing.Size(48, 24)
+        Me.btnInputAddCligen.Size = New System.Drawing.Size(87, 24)
         Me.btnInputAddCligen.TabIndex = 10
-        Me.btnInputAddCligen.Text = "Cligen"
+        Me.btnInputAddCligen.Text = "Generate New"
         '
         'btnInputDown
         '
         Me.btnInputDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInputDown.Location = New System.Drawing.Point(418, 64)
+        Me.btnInputDown.Location = New System.Drawing.Point(453, 64)
         Me.btnInputDown.Name = "btnInputDown"
         Me.btnInputDown.Size = New System.Drawing.Size(24, 24)
         Me.btnInputDown.TabIndex = 13
@@ -246,7 +239,7 @@ Public Class frmCAT
         'btnInputUp
         '
         Me.btnInputUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInputUp.Location = New System.Drawing.Point(388, 64)
+        Me.btnInputUp.Location = New System.Drawing.Point(483, 64)
         Me.btnInputUp.Name = "btnInputUp"
         Me.btnInputUp.Size = New System.Drawing.Size(24, 24)
         Me.btnInputUp.TabIndex = 12
@@ -254,7 +247,7 @@ Public Class frmCAT
         '
         'btnInputRemove
         '
-        Me.btnInputRemove.Location = New System.Drawing.Point(62, 64)
+        Me.btnInputRemove.Location = New System.Drawing.Point(198, 64)
         Me.btnInputRemove.Name = "btnInputRemove"
         Me.btnInputRemove.Size = New System.Drawing.Size(56, 24)
         Me.btnInputRemove.TabIndex = 7
@@ -262,7 +255,7 @@ Public Class frmCAT
         '
         'btnInputModify
         '
-        Me.btnInputModify.Location = New System.Drawing.Point(178, 64)
+        Me.btnInputModify.Location = New System.Drawing.Point(314, 64)
         Me.btnInputModify.Name = "btnInputModify"
         Me.btnInputModify.Size = New System.Drawing.Size(48, 24)
         Me.btnInputModify.TabIndex = 9
@@ -272,9 +265,9 @@ Public Class frmCAT
         '
         Me.btnInputAdd.Location = New System.Drawing.Point(8, 64)
         Me.btnInputAdd.Name = "btnInputAdd"
-        Me.btnInputAdd.Size = New System.Drawing.Size(48, 24)
+        Me.btnInputAdd.Size = New System.Drawing.Size(91, 24)
         Me.btnInputAdd.TabIndex = 6
-        Me.btnInputAdd.Text = "Add"
+        Me.btnInputAdd.Text = "Modify Existing"
         '
         'txtModifiedScenarioName
         '
@@ -282,7 +275,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtModifiedScenarioName.Location = New System.Drawing.Point(96, 34)
         Me.txtModifiedScenarioName.Name = "txtModifiedScenarioName"
-        Me.txtModifiedScenarioName.Size = New System.Drawing.Size(346, 20)
+        Me.txtModifiedScenarioName.Size = New System.Drawing.Size(407, 20)
         Me.txtModifiedScenarioName.TabIndex = 5
         Me.txtModifiedScenarioName.Text = "Modified"
         '
@@ -312,8 +305,16 @@ Public Class frmCAT
         Me.lstInputs.IntegralHeight = False
         Me.lstInputs.Location = New System.Drawing.Point(8, 94)
         Me.lstInputs.Name = "lstInputs"
-        Me.lstInputs.Size = New System.Drawing.Size(434, 181)
+        Me.lstInputs.Size = New System.Drawing.Size(495, 181)
         Me.lstInputs.TabIndex = 14
+        '
+        'btnInputPrepared
+        '
+        Me.btnInputPrepared.Location = New System.Drawing.Point(368, 64)
+        Me.btnInputPrepared.Name = "btnInputPrepared"
+        Me.btnInputPrepared.Size = New System.Drawing.Size(63, 24)
+        Me.btnInputPrepared.TabIndex = 11
+        Me.btnInputPrepared.Text = "Prepared"
         '
         'tabEndpoints
         '
@@ -332,9 +333,28 @@ Public Class frmCAT
         Me.tabEndpoints.Controls.Add(Me.btnEndpointAdd)
         Me.tabEndpoints.Location = New System.Drawing.Point(4, 22)
         Me.tabEndpoints.Name = "tabEndpoints"
-        Me.tabEndpoints.Size = New System.Drawing.Size(451, 284)
+        Me.tabEndpoints.Size = New System.Drawing.Size(512, 284)
         Me.tabEndpoints.TabIndex = 1
-        Me.tabEndpoints.Text = "Endpoints"
+        Me.tabEndpoints.Text = "Assessment Endpoints"
+        Me.tabEndpoints.UseVisualStyleBackColor = True
+        '
+        'btnEndpointBottom
+        '
+        Me.btnEndpointBottom.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEndpointBottom.Location = New System.Drawing.Point(453, 64)
+        Me.btnEndpointBottom.Name = "btnEndpointBottom"
+        Me.btnEndpointBottom.Size = New System.Drawing.Size(50, 24)
+        Me.btnEndpointBottom.TabIndex = 21
+        Me.btnEndpointBottom.Text = "Bottom"
+        '
+        'btnEndpointTop
+        '
+        Me.btnEndpointTop.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnEndpointTop.Location = New System.Drawing.Point(353, 64)
+        Me.btnEndpointTop.Name = "btnEndpointTop"
+        Me.btnEndpointTop.Size = New System.Drawing.Size(34, 24)
+        Me.btnEndpointTop.TabIndex = 18
+        Me.btnEndpointTop.Text = "Top"
         '
         'chkRunModel
         '
@@ -371,7 +391,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblAllResults.Location = New System.Drawing.Point(128, 16)
         Me.lblAllResults.Name = "lblAllResults"
-        Me.lblAllResults.Size = New System.Drawing.Size(307, 16)
+        Me.lblAllResults.Size = New System.Drawing.Size(368, 16)
         Me.lblAllResults.TabIndex = 18
         '
         'chkSaveAll
@@ -391,13 +411,13 @@ Public Class frmCAT
         Me.lstEndpoints.IntegralHeight = False
         Me.lstEndpoints.Location = New System.Drawing.Point(8, 94)
         Me.lstEndpoints.Name = "lstEndpoints"
-        Me.lstEndpoints.Size = New System.Drawing.Size(434, 181)
+        Me.lstEndpoints.Size = New System.Drawing.Size(495, 181)
         Me.lstEndpoints.TabIndex = 22
         '
         'btnEndpointDown
         '
         Me.btnEndpointDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointDown.Location = New System.Drawing.Point(362, 64)
+        Me.btnEndpointDown.Location = New System.Drawing.Point(423, 64)
         Me.btnEndpointDown.Name = "btnEndpointDown"
         Me.btnEndpointDown.Size = New System.Drawing.Size(24, 24)
         Me.btnEndpointDown.TabIndex = 20
@@ -406,7 +426,7 @@ Public Class frmCAT
         'btnEndpointUp
         '
         Me.btnEndpointUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointUp.Location = New System.Drawing.Point(332, 64)
+        Me.btnEndpointUp.Location = New System.Drawing.Point(393, 64)
         Me.btnEndpointUp.Name = "btnEndpointUp"
         Me.btnEndpointUp.Size = New System.Drawing.Size(24, 24)
         Me.btnEndpointUp.TabIndex = 19
@@ -441,9 +461,10 @@ Public Class frmCAT
         Me.tabResults.Controls.Add(Me.agdResults)
         Me.tabResults.Location = New System.Drawing.Point(4, 22)
         Me.tabResults.Name = "tabResults"
-        Me.tabResults.Size = New System.Drawing.Size(451, 284)
+        Me.tabResults.Size = New System.Drawing.Size(512, 284)
         Me.tabResults.TabIndex = 2
-        Me.tabResults.Text = "Results"
+        Me.tabResults.Text = "Results Table"
+        Me.tabResults.UseVisualStyleBackColor = True
         '
         'agdResults
         '
@@ -458,7 +479,7 @@ Public Class frmCAT
         Me.agdResults.LineWidth = 0.0!
         Me.agdResults.Location = New System.Drawing.Point(8, 8)
         Me.agdResults.Name = "agdResults"
-        Me.agdResults.Size = New System.Drawing.Size(434, 267)
+        Me.agdResults.Size = New System.Drawing.Size(495, 267)
         Me.agdResults.Source = Nothing
         Me.agdResults.TabIndex = 21
         '
@@ -473,9 +494,10 @@ Public Class frmCAT
         Me.tabPivot.Controls.Add(Me.cboPivotRows)
         Me.tabPivot.Location = New System.Drawing.Point(4, 22)
         Me.tabPivot.Name = "tabPivot"
-        Me.tabPivot.Size = New System.Drawing.Size(451, 284)
+        Me.tabPivot.Size = New System.Drawing.Size(512, 284)
         Me.tabPivot.TabIndex = 3
-        Me.tabPivot.Text = "Pivot"
+        Me.tabPivot.Text = "Pivot Table"
+        Me.tabPivot.UseVisualStyleBackColor = True
         '
         'agdPivot
         '
@@ -487,16 +509,16 @@ Public Class frmCAT
         Me.agdPivot.CellBackColor = System.Drawing.Color.Empty
         Me.agdPivot.LineColor = System.Drawing.Color.Empty
         Me.agdPivot.LineWidth = 0.0!
-        Me.agdPivot.Location = New System.Drawing.Point(8, 88)
+        Me.agdPivot.Location = New System.Drawing.Point(8, 89)
         Me.agdPivot.Name = "agdPivot"
-        Me.agdPivot.Size = New System.Drawing.Size(434, 187)
+        Me.agdPivot.Size = New System.Drawing.Size(495, 186)
         Me.agdPivot.Source = Nothing
         Me.agdPivot.TabIndex = 28
         '
         'lblPivotColumns
         '
         Me.lblPivotColumns.AutoSize = True
-        Me.lblPivotColumns.Location = New System.Drawing.Point(27, 37)
+        Me.lblPivotColumns.Location = New System.Drawing.Point(43, 37)
         Me.lblPivotColumns.Name = "lblPivotColumns"
         Me.lblPivotColumns.Size = New System.Drawing.Size(47, 13)
         Me.lblPivotColumns.TabIndex = 24
@@ -506,7 +528,7 @@ Public Class frmCAT
         'lblPivotCells
         '
         Me.lblPivotCells.AutoSize = True
-        Me.lblPivotCells.Location = New System.Drawing.Point(45, 64)
+        Me.lblPivotCells.Location = New System.Drawing.Point(61, 63)
         Me.lblPivotCells.Name = "lblPivotCells"
         Me.lblPivotCells.Size = New System.Drawing.Size(29, 13)
         Me.lblPivotCells.TabIndex = 26
@@ -516,7 +538,7 @@ Public Class frmCAT
         'lblPivotRows
         '
         Me.lblPivotRows.AutoSize = True
-        Me.lblPivotRows.Location = New System.Drawing.Point(40, 10)
+        Me.lblPivotRows.Location = New System.Drawing.Point(56, 11)
         Me.lblPivotRows.Name = "lblPivotRows"
         Me.lblPivotRows.Size = New System.Drawing.Size(34, 13)
         Me.lblPivotRows.TabIndex = 22
@@ -525,21 +547,21 @@ Public Class frmCAT
         '
         'cboPivotCells
         '
-        Me.cboPivotCells.Location = New System.Drawing.Point(80, 61)
+        Me.cboPivotCells.Location = New System.Drawing.Point(96, 60)
         Me.cboPivotCells.Name = "cboPivotCells"
         Me.cboPivotCells.Size = New System.Drawing.Size(128, 21)
         Me.cboPivotCells.TabIndex = 27
         '
         'cboPivotColumns
         '
-        Me.cboPivotColumns.Location = New System.Drawing.Point(80, 34)
+        Me.cboPivotColumns.Location = New System.Drawing.Point(96, 34)
         Me.cboPivotColumns.Name = "cboPivotColumns"
         Me.cboPivotColumns.Size = New System.Drawing.Size(128, 21)
         Me.cboPivotColumns.TabIndex = 25
         '
         'cboPivotRows
         '
-        Me.cboPivotRows.Location = New System.Drawing.Point(80, 7)
+        Me.cboPivotRows.Location = New System.Drawing.Point(96, 8)
         Me.cboPivotRows.Name = "cboPivotRows"
         Me.cboPivotRows.Size = New System.Drawing.Size(128, 21)
         Me.cboPivotRows.TabIndex = 23
@@ -571,12 +593,12 @@ Public Class frmCAT
         'mnuLoadVariations
         '
         Me.mnuLoadVariations.Index = 1
-        Me.mnuLoadVariations.Text = "Load Inputs and Endpoints"
+        Me.mnuLoadVariations.Text = "Load Climate and Endpoints"
         '
         'mnuSaveVariations
         '
         Me.mnuSaveVariations.Index = 2
-        Me.mnuSaveVariations.Text = "Save Inputs and Endpoints"
+        Me.mnuSaveVariations.Text = "Save Climate and Endpoints"
         '
         'mnuFileSep1
         '
@@ -649,7 +671,7 @@ Public Class frmCAT
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblTop.Location = New System.Drawing.Point(74, 319)
         Me.lblTop.Name = "lblTop"
-        Me.lblTop.Size = New System.Drawing.Size(372, 24)
+        Me.lblTop.Size = New System.Drawing.Size(433, 24)
         Me.lblTop.TabIndex = 2
         Me.lblTop.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
@@ -663,28 +685,10 @@ Public Class frmCAT
         Me.btnStop.Text = "Stop"
         Me.btnStop.Visible = False
         '
-        'btnEndpointTop
-        '
-        Me.btnEndpointTop.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointTop.Location = New System.Drawing.Point(292, 64)
-        Me.btnEndpointTop.Name = "btnEndpointTop"
-        Me.btnEndpointTop.Size = New System.Drawing.Size(34, 24)
-        Me.btnEndpointTop.TabIndex = 18
-        Me.btnEndpointTop.Text = "Top"
-        '
-        'btnEndpointBottom
-        '
-        Me.btnEndpointBottom.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnEndpointBottom.Location = New System.Drawing.Point(392, 64)
-        Me.btnEndpointBottom.Name = "btnEndpointBottom"
-        Me.btnEndpointBottom.Size = New System.Drawing.Size(50, 24)
-        Me.btnEndpointBottom.TabIndex = 21
-        Me.btnEndpointBottom.Text = "Bottom"
-        '
         'frmCAT
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(458, 351)
+        Me.ClientSize = New System.Drawing.Size(519, 351)
         Me.Controls.Add(Me.lblTop)
         Me.Controls.Add(Me.btnStart)
         Me.Controls.Add(Me.myTabs)
@@ -712,7 +716,9 @@ Public Class frmCAT
     Private Const StartFolderVariable As String = "{StartFolder}"
     Private Const ResultsFixedRows As Integer = 4
 
-    Private pPlugin As atcClimateAssessmentToolPlugin
+    'Private pPlugin As atcClimateAssessmentToolPlugin
+
+    Private pUnsaved As Boolean = False
 
     'all the variations listed in the Input tab
     Private pInputs As atcCollection
@@ -737,10 +743,10 @@ Public Class frmCAT
         pEndpoints = New atcCollection
         Me.Show()
 
-        pPlugin = aPlugin
-        If Not aPlugin.XML Is Nothing AndAlso aPlugin.XML.Length > 0 Then
-            XML = aPlugin.XML
-        End If
+        'pPlugin = aPlugin
+        'If Not aPlugin.XML Is Nothing AndAlso aPlugin.XML.Length > 0 Then
+        '    XML = aPlugin.XML
+        'End If
     End Sub
 
     Private Function OpenDataSource(ByVal aFilename As String) As atcDataSource
@@ -768,6 +774,7 @@ Public Class frmCAT
 
     Private Sub btnStart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnStart.Click
         Dim lSelectedVariations As atcCollection = New atcCollection
+        Dim lSelectedPreparedInputs As atcCollection
         Dim lRuns As Integer = 0
         Dim lEndpoint As atcVariation
 
@@ -780,9 +787,15 @@ Public Class frmCAT
         RefreshTotalIterations()
 
         If pPreparedInputs Is Nothing Then
+            lSelectedPreparedInputs = Nothing
             'Make a collection of the variations that are selected/checked in lstInputs
             For Each lVariation As atcVariation In pInputs
                 If lVariation.Selected Then lSelectedVariations.Add(lVariation)
+            Next
+        Else
+            lSelectedPreparedInputs = New atcCollection
+            For Each lInputIndex As Integer In lstInputs.SelectedIndices
+                lSelectedPreparedInputs.Add(pPreparedInputs.ItemByIndex(lInputIndex))
             Next
         End If
 
@@ -843,7 +856,7 @@ Public Class frmCAT
 
         Run(txtModifiedScenarioName.Text, _
             lSelectedVariations, _
-            pPreparedInputs, _
+            lSelectedPreparedInputs, _
             txtBaseScenario.Text, _
             lRuns, 0, Nothing)
 
@@ -1240,17 +1253,15 @@ NextIteration:
     End Sub
 
     Private Sub frmCAT_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-        If Not pPlugin Is Nothing Then
-            pPlugin.XML = Me.XML
+        If pUnsaved Then
+            If Logger.Msg("Close CAT without saving changes?", MsgBoxStyle.YesNo, "Modifications or Endpoints Changed") = MsgBoxResult.No Then
+                e.Cancel = True
+            End If
         End If
+        'If Not pPlugin Is Nothing Then
+        '    pPlugin.XML = Me.XML
+        'End If
     End Sub
-
-    'Private Sub frmMultipleResults_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
-    '    agdResults.SizeAllColumnsToContents(agdResults.Width, True)
-    '    agdPivot.SizeAllColumnsToContents(agdPivot.Width, True)
-    '    agdResults.Refresh()
-    '    agdPivot.Refresh()
-    'End Sub
 
     Private Sub mnuCopyResults_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuCopyResults.Click
         Clipboard.SetDataObject(agdResults.ToString)
@@ -1368,6 +1379,7 @@ NextIteration:
             .IsInput = True
         End With
         If frmVary.AskUser(lVariation) Then
+            pUnsaved = True
             lVariation.Selected = True
             lVariation.CurrentValue = lVariation.Min
             pInputs.Add(lVariation)
@@ -1394,6 +1406,7 @@ NextIteration:
         End With
         lVariation = frmVary.AskUser(lVariation)
         If Not lVariation Is Nothing Then
+            pUnsaved = True
             If lVariation.Name.IndexOf(CLIGEN_NAME) < 0 Then lVariation.Name = CLIGEN_NAME & " " & lVariation.Name
             lVariation.Selected = True
             lVariation.CurrentValue = lVariation.Min
@@ -1406,6 +1419,7 @@ NextIteration:
     Private Sub btnInputModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputModify.Click
         Dim lIndex As Integer = lstInputs.SelectedIndex
         If lIndex >= 0 And lIndex < pInputs.Count Then
+            pUnsaved = True
             Dim lVariation As atcVariation = pInputs.ItemByIndex(lIndex)
             If lVariation.GetType.Name.EndsWith("Cligen") Then
                 Dim frmVaryCligen As New frmVariationCligen
@@ -1448,6 +1462,7 @@ NextIteration:
 
     Private Sub btnInputRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputRemove.Click
         If lstInputs.SelectedIndices.Count > 0 Then
+            pUnsaved = True
             For Each lIndex As Integer In lstInputs.SelectedIndices
                 pInputs.RemoveAt(lIndex)
                 RefreshInputList()
@@ -1467,6 +1482,7 @@ NextIteration:
             .Title = "Select First base WDM file to use"
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 If FileExists(.FileName) Then
+                    pUnsaved = True
                     If pPreparedInputs Is Nothing Then
                         pPreparedInputs = New atcCollection
                     Else
@@ -1495,6 +1511,7 @@ NextIteration:
     Private Sub MoveItem(ByVal aGroup As atcCollection, ByVal aList As CheckedListBox, ByVal aDirection As Integer)
         Dim lMoveFrom As Integer = aList.SelectedIndex
         If lMoveFrom >= 0 AndAlso lMoveFrom < aGroup.Count Then
+            pUnsaved = True
             Dim lMoveTo As Integer = lMoveFrom + aDirection
 
             'Dim lNow As Date = Date.Now
@@ -1557,6 +1574,7 @@ NextIteration:
             .Increment = Double.NaN
         End With
         If frmEnd.AskUser(lVariation) Then
+            pUnsaved = True
             lVariation.Selected = True
             pEndpoints.Add(lVariation)
             RefreshEndpointList()
@@ -1596,6 +1614,11 @@ NextIteration:
         Else
             lstInputs.Items.Clear()
             lstInputs.Items.AddRange(pPreparedInputs.ToArray)
+            If lstInputs.SelectedIndices.Count = 0 Then 'Select all if none are selected
+                For lIndex As Integer = 0 To lstInputs.Items.Count - 1
+                    lstInputs.SetItemChecked(lIndex, True)
+                Next
+            End If
         End If
     End Sub
 
@@ -1617,6 +1640,7 @@ NextIteration:
             Dim lVariation As atcVariation = pEndpoints.ItemByIndex(lIndex)
             Dim frmEnd As New frmEndpoint
             If frmEnd.AskUser(lVariation) Then
+                pUnsaved = True
                 RefreshEndpointList()
             End If
         ElseIf lstEndpoints.Items.Count = 0 Then 'Don't have any to edit, add one
@@ -1628,6 +1652,7 @@ NextIteration:
 
     Private Sub btnEndpointRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointRemove.Click
         If lstEndpoints.SelectedIndices.Count > 0 Then
+            pUnsaved = True
             For lIndex As Integer = pEndpoints.Count - 1 To 0 Step -1
                 If lstEndpoints.GetSelected(lIndex) Then
                     pEndpoints.RemoveAt(lIndex)
@@ -1650,6 +1675,7 @@ NextIteration:
             If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                 'write file from form contents
                 SaveFileString(.FileName, (XML))
+                pUnsaved = False
                 SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
             End If
         End With
@@ -1658,6 +1684,7 @@ NextIteration:
     Public Property XML() As String
         Get
             Dim lXML As String = ""
+            Dim lVariation As atcVariation
 
             lXML &= "<SaveAll>" & chkSaveAll.Checked & "</SaveAll>" & vbCrLf
 
@@ -1667,12 +1694,20 @@ NextIteration:
             lXML &= "  <FileName>" & txtBaseScenario.Text & "</FileName>" & vbCrLf
             lXML &= "</UCI>" & vbCrLf
 
-            Dim lVariation As atcVariation
-            lXML &= "<Variations>" & vbCrLf
-            For Each lVariation In pInputs
-                lXML &= lVariation.XML
-            Next
-            lXML &= "</Variations>" & vbCrLf
+            If pPreparedInputs Is Nothing Then
+                lXML &= "<Variations>" & vbCrLf
+                For Each lVariation In pInputs
+                    lXML &= lVariation.XML
+                Next
+                lXML &= "</Variations>" & vbCrLf
+            Else
+                lXML &= "<PreparedInputs>"
+                For Each lPreparedInput As String In pPreparedInputs
+                    lXML &= "<PreparedInput selected=""" & lstInputs.SelectedItems.Contains(lPreparedInput)
+                    lXML &= """>" & lPreparedInput & "</PreparedInput>" & vbCrLf
+                Next
+                lXML &= "</PreparedInputs>"
+            End If
 
             lXML &= "<Endpoints>" & vbCrLf
             For Each lVariation In pEndpoints
@@ -1718,6 +1753,20 @@ NextIteration:
                             chkShowEachRunProgress.Checked = (lXML.Content.ToLower = "true")
                         Case "uci"
                             OpenUCI(AbsolutePath(lChild.Content, CurDir))
+                        Case "preparedinputs"
+                            If pPreparedInputs Is Nothing Then
+                                pPreparedInputs = New atcCollection
+                            Else
+                                pPreparedInputs.Clear()
+                            End If
+                            If Not lChild Is Nothing Then
+                                Do
+                                    pPreparedInputs.Add(lChild.Content)
+                                Loop While lChild.NextSibling2
+                            End If
+                            RefreshInputList()
+                            RefreshTotalIterations()
+
                         Case "variations"
                             pInputs.Clear()
                             If Not lChild Is Nothing Then
@@ -1776,6 +1825,7 @@ NextIteration:
                 If FileExists(.FileName) Then
                     XML = WholeFileString(.FileName)
                     SaveSetting("BasinsCAT", "Settings", "LastSetup", .FileName)
+                    pUnsaved = False
                 End If
             End If
         End With
@@ -1812,6 +1862,7 @@ NextIteration:
     ''' </summary>
     Private Sub btnEndpointCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEndpointCopy.Click
         If lstEndpoints.SelectedIndices.Count > 0 Then
+            pUnsaved = True
             Dim lNumCopied As Integer = 0
             Dim lCopyNumber As Integer
             Dim lCopyText As String = " copy "

@@ -12,6 +12,8 @@ Public Class frmEndpoint
     Private pVariation As atcVariation
     Private pSeasonsAvailable As New atcCollection
     Private pSeasons As atcSeasonBase
+    Private pAllSeasons As Integer()
+
     Friend WithEvents lblOperation As System.Windows.Forms.Label
     Friend WithEvents txtOperation As System.Windows.Forms.TextBox
     Friend WithEvents panelOperation As System.Windows.Forms.Panel
@@ -345,6 +347,7 @@ Public Class frmEndpoint
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstSeasons.IntegralHeight = False
         Me.lstSeasons.Location = New System.Drawing.Point(6, 48)
+        Me.lstSeasons.MultiColumn = True
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lstSeasons.Size = New System.Drawing.Size(326, 175)
@@ -383,7 +386,6 @@ Public Class frmEndpoint
         '
         Me.txtOperation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOperation.Enabled = True
         Me.txtOperation.Location = New System.Drawing.Point(89, 6)
         Me.txtOperation.Name = "txtOperation"
         Me.txtOperation.Size = New System.Drawing.Size(243, 20)
@@ -451,11 +453,8 @@ Public Class frmEndpoint
             pSeasonsAvailable = atcSeasonPlugin.AllSeasonTypes
             For Each lSeasonType As Type In pSeasonsAvailable
                 Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
-                Select Case lSeasonTypeShortName 'TODO: handle difficult seasons
-                    Case "Calendar Year"
-                    Case "Water Year"
-                    Case "Year Subset"
-                    Case Else
+                Select Case lSeasonTypeShortName
+                    Case "Calendar Year", "Water Year", "Month"
                         cboSeasons.Items.Add(lSeasonTypeShortName)
                 End Select
             Next
@@ -497,16 +496,27 @@ Public Class frmEndpoint
         End If
     End Sub
 
+    Private Sub SetAllSeasons()
+        If pSeasons.AllSeasons.Length = 0 Then
+            Dim lTimeseries As atcTimeseries = pVariation.DataSets.ItemByIndex(0)
+            pAllSeasons = pSeasons.AllSeasonsInDates(lTimeseries.Dates.Values)
+        Else
+            pAllSeasons = pSeasons.AllSeasons
+        End If
+    End Sub
+
     Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
         If Not pSettingFormSeason Then
             pSeasons = Nothing
+            pAllSeasons = Nothing
             lstSeasons.Items.Clear()
             If cboSeasons.Text <> AllSeasons Then
                 Try
                     pSeasons = SelectedSeasonType.InvokeMember(Nothing, Reflection.BindingFlags.CreateInstance, Nothing, Nothing, New Object() {})
-                    For Each lSeasonIndex As Integer In pSeasons.AllSeasons
-                        pSeasons.SeasonSelected(lSeasonIndex) = True
-                    Next
+                    SetAllSeasons
+                    'For Each lSeasonIndex As Integer In pSeasons.AllSeasons
+                    '    pSeasons.SeasonSelected(lSeasonIndex) = True
+                    'Next
                     RefreshSeasonsList()
                 Catch ex As Exception
                     Logger.Dbg("Could not create new seasons for '" & cboSeasons.Text & "': " & ex.ToString)
@@ -517,11 +527,17 @@ Public Class frmEndpoint
 
     Private Sub RefreshSeasonsList()
         Try
+            Dim lMaxWidth As Integer = 0
+            Dim lSeasonName As String
             lstSeasons.Items.Clear()
-            For Each lSeasonIndex As Integer In pSeasons.AllSeasons
-                lstSeasons.Items.Add(pSeasons.SeasonName(lSeasonIndex))
+            For Each lSeasonIndex As Integer In pAllSeasons
+                lSeasonName = pSeasons.SeasonName(lSeasonIndex)
+                If lSeasonName.Length > lMaxWidth Then lMaxWidth = lSeasonName.Length
+                lstSeasons.Items.Add(lSeasonName)
                 lstSeasons.SetSelected(lstSeasons.Items.Count - 1, pSeasons.SeasonSelected(lSeasonIndex))
             Next
+
+            lstSeasons.ColumnWidth = lstSeasons.CreateGraphics().MeasureString("X", lstSeasons.Font).Width * (lMaxWidth + 1)
             lstSeasons.TopIndex = 0
             'Loop to check what was selected - removing this reveals a bug in the list control and it forgets what was selected
             For Each lSelectedIndex As Integer In lstSeasons.SelectedIndices
@@ -578,14 +594,8 @@ Public Class frmEndpoint
                 .Operation = cboAttribute.Text
                 .Seasons = pSeasons
                 If Not pSeasons Is Nothing Then
-                    For lListIndex As Integer = 0 To lstSeasons.Items.Count - 1
-                        Dim lSeasonName As String = lstSeasons.Items(lListIndex)
-                        For Each lSeasonIndex As Integer In pSeasons.AllSeasons
-                            If pSeasons.SeasonName(lSeasonIndex) = lSeasonName Then
-                                pSeasons.SeasonSelected(lSeasonIndex) = lstSeasons.SelectedIndices.Contains(lListIndex)
-                                Exit For
-                            End If
-                        Next
+                    For Each lSeasonIndex As Integer In pAllSeasons
+                        pSeasons.SeasonSelected(lSeasonIndex) = lstSeasons.SelectedItems.Contains(pSeasons.SeasonName(lSeasonIndex))
                     Next
                 End If
                 Try
@@ -674,6 +684,7 @@ Public Class frmEndpoint
                     pSettingFormSeason = True
                     cboSeasons.Text = atcSeasonPlugin.SeasonClassNameToLabel(.Seasons.GetType.Name)
                     pSeasons = .Seasons
+                    SetAllSeasons()
                     RefreshSeasonsList()
                     pSettingFormSeason = False
                 End If
