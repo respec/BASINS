@@ -228,34 +228,28 @@ Public Class atcCollection
         Next
     End Sub
 
-    Public Overrides Function ToString() As String
+    Public Overloads Function ToString(ByVal aNumValues As Integer) As String
         Dim lCount As Integer = Me.Count
-        Dim lString As String = "Collection "
-        Select Case lCount
-            Case 0 : lString &= "Empty"
-            Case 1 : lString &= "of 1 value"
-            Case Else
-                lString &= "of " & lCount & " values"
-        End Select
-        Dim i As Integer
+        Dim lString As New Text.StringBuilder
+        lString.AppendLine("Collection count = " & lCount)
+
         Dim lStop As Integer = lCount - 1
-        If lStop > 9 Then lStop = 9
-        For i = 0 To lStop
+        If lStop >= aNumValues - 1 Then lStop = aNumValues - 2
+        For lIndex As Integer = 0 To lStop
             Try
-                lString &= vbCrLf & i & " key = " & Me.Keys.Item(i) & ", value = " & Me.ItemByIndex(i) & vbCrLf
+                lString.AppendLine(lIndex & " (" & Me.Keys.Item(lIndex) & ") " & Me.ItemByIndex(lIndex))
             Catch
                 'Skip listing unprintable keys/values
             End Try
         Next
-        'If lStop < lCount - 1 Then
-        '  i = lCount - 1
-        '  lString &= "..." & vbCrLf
-        '  lString &= vbCrLf & i & " "
-        '  Try
-        '    lString &= vbCrLf & i & " " & Me.Keys.Item(i) & " : " & Me.ItemByIndex(i) & vbCrLf
-        '  Catch
-        '  End Try
-        'End If
-        Return lString
+        If lCount - lStop > 1 Then
+            lString.AppendLine("(skipped " & lCount - lStop - 2 & " values)")
+            lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1) & ") " & Me.ItemByIndex(lCount - 1))
+        End If
+        Return lString.ToString
+    End Function
+
+    Public Overrides Function ToString() As String
+        Return Me.ToString(10)
     End Function
 End Class
