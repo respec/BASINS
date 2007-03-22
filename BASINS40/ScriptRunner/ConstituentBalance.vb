@@ -18,24 +18,33 @@ Public Module ScriptStatTest
 
         Dim lScenario As String = "base"
 
+        Dim lOperations As New atcCollection
+        lOperations.Add("P:", "PERLND")
+        lOperations.Add("I:", "IMPLND")
+        lOperations.Add("R:", "RCHRES")
+
         Dim lConstituents2Output As New atcCollection
         Select Case pBalanceType
             Case "Water"
-                lConstituents2Output.Add("SUPY", "Rainfall")
-                lConstituents2Output.Add("Header1", "Runoff")
-                lConstituents2Output.Add("SURO", "    Surface")
-                lConstituents2Output.Add("IFWO", "    Interflow")
-                lConstituents2Output.Add("AGWO", "    Baseflow")
-                lConstituents2Output.Add("PERO", "    Total")
-                lConstituents2Output.Add("IGWI", "Deep Groundwater")
-                lConstituents2Output.Add("Header2", "Evaporation")
-                lConstituents2Output.Add("PET", "    Potential")
-                lConstituents2Output.Add("CEPE", "    Intercep St")
-                lConstituents2Output.Add("UZET", "    Upper Zone")
-                lConstituents2Output.Add("LZET", "    Lower Zone")
-                lConstituents2Output.Add("AGWET", "    Ground Water")
-                lConstituents2Output.Add("BASET", "    Baseflow")
-                lConstituents2Output.Add("TAET", "    Total")
+                lConstituents2Output.Add("I:SUPY", "Rainfall")
+                lConstituents2Output.Add("I:SURO", "Runoff  ")
+                lConstituents2Output.Add("I:PET", "ET Potential")
+                lConstituents2Output.Add("I:IMPEV", "ET Actual")
+                lConstituents2Output.Add("P:SUPY", "Rainfall")
+                lConstituents2Output.Add("P:Header1", "Runoff")
+                lConstituents2Output.Add("P:SURO", "    Surface")
+                lConstituents2Output.Add("P:IFWO", "    Interflow")
+                lConstituents2Output.Add("P:AGWO", "    Baseflow")
+                lConstituents2Output.Add("P:PERO", "    Total")
+                lConstituents2Output.Add("P:IGWI", "Deep GW")
+                lConstituents2Output.Add("P:Header2", "Evaporation")
+                lConstituents2Output.Add("P:PET", "    Potential")
+                lConstituents2Output.Add("P:CEPE", "    Intercep St")
+                lConstituents2Output.Add("P:UZET", "    Upper Zone")
+                lConstituents2Output.Add("P:LZET", "    Lower Zone")
+                lConstituents2Output.Add("P:AGWET", "    Grnd Water")
+                lConstituents2Output.Add("P:BASET", "    Baseflow")
+                lConstituents2Output.Add("P:TAET", "    Total")
         End Select
 
         Dim lString As New Text.StringBuilder
@@ -63,59 +72,66 @@ Public Module ScriptStatTest
         Dim lMatchConstituentGroup As atcDataGroup
         Dim lTempDataSet As atcDataSet
 
-        For Each lLocation As String In lLocations
-            If lLocation.StartsWith("P:") Then
-                Logger.Dbg("   Perlnd " & lLocation)
-                lString.AppendLine(pBalanceType & " Balance Report For " & lLocation)
-                Dim lTempDataGroup As atcDataGroup = lHspfBinFile.Datasets.FindData("Location", lLocation)
-                Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
-                Dim lNeedHeader As Boolean = True
+        For lOperationIndex As Integer = 0 To lOperations.Count - 1
+            Dim lOperationKey As String = lOperations.Keys(lOperationIndex)
+            For Each lLocation As String In lLocations
+                If lLocation.StartsWith(lOperationKey) Then
+                    Logger.Dbg(lOperations(lOperationIndex) & " " & lLocation)
+                    lString.AppendLine(pBalanceType & " Balance Report For " & lLocation)
+                    Dim lTempDataGroup As atcDataGroup = lHspfBinFile.DataSets.FindData("Location", lLocation)
+                    Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
+                    Dim lNeedHeader As Boolean = True
 
-                For lIndex As Integer = 0 To lConstituents2Output.Count - 1
-                    Dim lConstituentKey As String = lConstituents2Output.Keys(lIndex)
-                    Dim lConstituentName As String = lConstituents2Output(lIndex)
-                    lMatchConstituentGroup = lTempDataGroup.FindData("Constituent", lConstituentKey)
-                    If lMatchConstituentGroup.Count > 0 Then
-                        lTempDataSet = lMatchConstituentGroup.Item(0)
-                        Logger.Dbg("       Match " & lConstituentKey & " with " & lTempDataSet.ToString)
+                    For lIndex As Integer = 0 To lConstituents2Output.Count - 1
+                        Dim lConstituentKey As String = lConstituents2Output.Keys(lIndex)
+                        If lConstituentKey.StartsWith(lOperationKey) Then
+                            lConstituentKey = lConstituentKey.Remove(0, 2)
+                            Dim lConstituentName As String = lConstituents2Output(lIndex)
+                            lMatchConstituentGroup = lTempDataGroup.FindData("Constituent", lConstituentKey)
+                            If lMatchConstituentGroup.Count > 0 Then
+                                lTempDataSet = lMatchConstituentGroup.Item(0)
+                                Logger.Dbg("       Match " & lConstituentKey & " with " & lTempDataSet.ToString)
 
-                        Dim lSeasons As New atcSeasons.atcSeasonsCalendarYear
-                        Dim lSeasonalAttributes As New atcDataAttributes
-                        Dim lCalculatedAttributes As New atcDataAttributes
-                        lSeasonalAttributes.SetValue("Mean", 0)
-                        lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
+                                Dim lSeasons As New atcSeasons.atcSeasonsCalendarYear
+                                Dim lSeasonalAttributes As New atcDataAttributes
+                                Dim lCalculatedAttributes As New atcDataAttributes
+                                lSeasonalAttributes.SetValue("Mean", 0)
+                                lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
 
-                        If lNeedHeader Then
-                            lString.Append("Date" & vbTab & "Mean")
-                            For Each lAttribute As atcDefinedValue In lCalculatedAttributes
-                                lString.Append(vbTab & lAttribute.Definition.Name)
-                            Next
-                            lString.AppendLine()
-                            lNeedHeader = False
+                                If lNeedHeader Then
+                                    lString.Append("Date    " & vbTab & "Mean")
+                                    For Each lAttribute As atcDefinedValue In lCalculatedAttributes
+                                        lString.Append(vbTab & lAttribute.Arguments(1).Value)
+                                    Next
+                                    lString.AppendLine()
+                                    lNeedHeader = False
+                                End If
+
+                                lString.Append(lConstituentName & vbTab & DF(lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value))
+                                For Each lAttribute As atcDefinedValue In lCalculatedAttributes
+                                    lString.Append(vbTab & DF(lAttribute.Value))
+                                Next
+                                lString.AppendLine()
+                            Else
+                                lString.AppendLine(vbCrLf & lConstituentName)
+                            End If
                         End If
+                    Next
+                    lTempDataGroup = Nothing
+                    lString.AppendLine(vbCrLf)
+                Else
+                    'Logger.Dbg("   SKIP " & lLocation)
+                End If
+            Next lLocation
+        Next
 
-                        lString.Append(lConstituentName & vbTab & DF(lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value))
-                        For Each lAttribute As atcDefinedValue In lCalculatedAttributes
-                            lString.Append(vbTab & DF(lAttribute.Value))
-                        Next
-                        lString.AppendLine()
-                    Else
-                        lString.AppendLine(lConstituentName)
-                    End If
-
-                Next
-                lTempDataGroup = Nothing
-                lString.AppendLine(vbCrLf)
-            Else
-                'Logger.Dbg("   SKIP " & lLocation)
-            End If
-        Next lLocation
         Dim lOutFileName As String = lScenario & "_" & pBalanceType & "_" & "Balance.txt"
         Logger.Dbg("  WriteReportTo " & lOutFileName)
         SaveFileString(lOutFileName, lString.ToString)
 
     End Sub
     Private Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
+        'DoubleToString( 
         Return Trim(Format(aValue, "##########0." & StrDup(aDecimalPlaces, "0")))
     End Function
 End Module
