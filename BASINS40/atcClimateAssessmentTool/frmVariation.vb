@@ -9,6 +9,11 @@ Imports MapWinUtility
     Private pNaN As Double = GetNaN()
     Private pSettingFormSeason As Boolean = False
 
+    Private pFunctionLabels As String() = {"Change Temperature", "Multiply Existing Values by a Number", "Add/Remove Storm Events", "Add/Remove Volume in Extreme Events"}
+    Private pFunctionGroupLabels As String() = {"Degrees to add to each existing temperature value", "Number to multiply existing data by", "Percent Change in Volume", "Percent Change in Volume"}
+    Private pFunctionOperations As String() = {"Add", "Multiply", "AddEvents", "Flash"}
+    Private pFunctionUnits As String() = {"degrees", "multiplication factor", "%", "%"}
+
     Private pVariation As atcVariation
     Private pSeasonTypesAvailable As New atcCollection
     Private pSeasons As atcSeasonBase
@@ -46,6 +51,9 @@ Imports MapWinUtility
     Friend WithEvents lblDuration As System.Windows.Forms.Label
     Friend WithEvents lblValueUnits As System.Windows.Forms.Label
     Friend WithEvents lstSeasons As System.Windows.Forms.ListBox
+    Friend WithEvents lblVolumePercent As System.Windows.Forms.Label
+    Friend WithEvents txtVolumePercent As System.Windows.Forms.TextBox
+    Friend WithEvents lblVolumePercent2 As System.Windows.Forms.Label
     Friend WithEvents cboSeasons As System.Windows.Forms.ComboBox
 
     Public Sub New()
@@ -123,6 +131,8 @@ Imports MapWinUtility
         Me.lblIncrement2 = New System.Windows.Forms.Label
         Me.lblMaximum2 = New System.Windows.Forms.Label
         Me.grpMinMax = New System.Windows.Forms.GroupBox
+        Me.lblVolumePercent = New System.Windows.Forms.Label
+        Me.txtVolumePercent = New System.Windows.Forms.TextBox
         Me.lblValueUnits = New System.Windows.Forms.Label
         Me.grpEvents = New System.Windows.Forms.GroupBox
         Me.lblVolumeUnits = New System.Windows.Forms.Label
@@ -133,6 +143,7 @@ Imports MapWinUtility
         Me.lblVolume = New System.Windows.Forms.Label
         Me.lblGap = New System.Windows.Forms.Label
         Me.lblPET = New System.Windows.Forms.Label
+        Me.lblVolumePercent2 = New System.Windows.Forms.Label
         Me.grpSeasons.SuspendLayout()
         Me.grpMinMax.SuspendLayout()
         Me.grpEvents.SuspendLayout()
@@ -337,7 +348,6 @@ Imports MapWinUtility
         Me.cboFunction.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboFunction.FormattingEnabled = True
-        Me.cboFunction.Items.AddRange(New Object() {"Change Temperature", "Multiply Existing Values by a Number", "Add/Remove Storm Events"})
         Me.cboFunction.Location = New System.Drawing.Point(136, 90)
         Me.cboFunction.Name = "cboFunction"
         Me.cboFunction.Size = New System.Drawing.Size(212, 21)
@@ -469,6 +479,7 @@ Imports MapWinUtility
         '
         Me.grpMinMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpMinMax.Controls.Add(Me.txtVolumePercent)
         Me.grpMinMax.Controls.Add(Me.lblValueUnits)
         Me.grpMinMax.Controls.Add(Me.chkIterative)
         Me.grpMinMax.Controls.Add(Me.lblMaximum2)
@@ -479,12 +490,37 @@ Imports MapWinUtility
         Me.grpMinMax.Controls.Add(Me.txtMax)
         Me.grpMinMax.Controls.Add(Me.txtIncrement)
         Me.grpMinMax.Controls.Add(Me.txtMin)
+        Me.grpMinMax.Controls.Add(Me.lblVolumePercent)
+        Me.grpMinMax.Controls.Add(Me.lblVolumePercent2)
         Me.grpMinMax.Location = New System.Drawing.Point(12, 117)
         Me.grpMinMax.Name = "grpMinMax"
         Me.grpMinMax.Size = New System.Drawing.Size(393, 120)
         Me.grpMinMax.TabIndex = 10
         Me.grpMinMax.TabStop = False
         Me.grpMinMax.Text = "Multiply each value by a number"
+        '
+        'lblVolumePercent
+        '
+        Me.lblVolumePercent.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblVolumePercent.AutoSize = True
+        Me.lblVolumePercent.BackColor = System.Drawing.Color.Transparent
+        Me.lblVolumePercent.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblVolumePercent.Location = New System.Drawing.Point(243, 45)
+        Me.lblVolumePercent.Name = "lblVolumePercent"
+        Me.lblVolumePercent.Size = New System.Drawing.Size(44, 13)
+        Me.lblVolumePercent.TabIndex = 24
+        Me.lblVolumePercent.Text = "Change"
+        Me.lblVolumePercent.Visible = False
+        '
+        'txtVolumePercent
+        '
+        Me.txtVolumePercent.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtVolumePercent.Location = New System.Drawing.Point(293, 42)
+        Me.txtVolumePercent.Name = "txtVolumePercent"
+        Me.txtVolumePercent.Size = New System.Drawing.Size(22, 20)
+        Me.txtVolumePercent.TabIndex = 25
+        Me.txtVolumePercent.Text = "88"
+        Me.txtVolumePercent.Visible = False
         '
         'lblValueUnits
         '
@@ -607,6 +643,19 @@ Imports MapWinUtility
         Me.lblPET.TabIndex = 5
         Me.lblPET.Text = "Compute PET:"
         '
+        'lblVolumePercent2
+        '
+        Me.lblVolumePercent2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblVolumePercent2.AutoSize = True
+        Me.lblVolumePercent2.BackColor = System.Drawing.Color.Transparent
+        Me.lblVolumePercent2.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblVolumePercent2.Location = New System.Drawing.Point(321, 45)
+        Me.lblVolumePercent2.Name = "lblVolumePercent2"
+        Me.lblVolumePercent2.Size = New System.Drawing.Size(62, 13)
+        Me.lblVolumePercent2.TabIndex = 26
+        Me.lblVolumePercent2.Text = "% of events"
+        Me.lblVolumePercent2.Visible = False
+        '
         'frmVariation
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
@@ -649,12 +698,15 @@ Imports MapWinUtility
 
         If pVariation.DataSets Is Nothing Then pVariation.DataSets = New atcDataGroup
 
+        cboFunction.Items.Clear()
+        cboFunction.Items.AddRange(pFunctionLabels)
+
         pSeasonTypesAvailable = atcSeasonPlugin.AllSeasonTypes
         For Each lSeasonType As Type In pSeasonTypesAvailable
             Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
             Select Case lSeasonTypeShortName
                 Case "Calendar Year", "Water Year", "Month"
-                    cboSeasons.Items.Add(lSeasonTypeShortName)
+                    cboSeasons.Items.Add(lSeasonTypeShortName & "s")
             End Select
         Next
 
@@ -768,7 +820,8 @@ Imports MapWinUtility
     Private Function SelectedSeasonType() As Type
         Dim lSeasonPlugin As New atcSeasonPlugin
         For Each lSeasonType As Type In pSeasonTypesAvailable
-            If atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name).Equals(cboSeasons.Text) Then
+            Dim lSeasonName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
+            If lSeasonName.Equals(cboSeasons.Text) OrElse lSeasonName.Equals(cboSeasons.Text & "s") Then
                 Return lSeasonType
             End If
         Next
@@ -807,18 +860,13 @@ Imports MapWinUtility
                     Return False
                 End If
 
-                Select Case cboFunction.Text
-                    Case "Multiply Each Value by a Number"
-                        .Operation = "Multiply"
-                    Case "Add a Number to Each Value"
-                        .Operation = "Add"
-                    Case "Add/Remove Events to Reach Target Volume"
-                        .Operation = "AddEvents"
-                    Case Else
-                        Logger.Msg("'" & cboFunction.Text & "'" & vbCrLf & "Not recognized for '" & lblFunction.Text & "'", "Unknown Operation")
-                        Return False
-                End Select
+                .Operation = pFunctionOperations(cboFunction.SelectedIndex)
 
+                If IsNumeric(txtVolumePercent.Text) Then
+                    .FlashVolumeFraction = 1 + (CDbl(txtVolumePercent.Text) / 100)
+                Else
+                    .FlashVolumeFraction = pNaN
+                End If
 
                 .UseEvents = chkEvents.Checked
                 If .UseEvents Then
@@ -921,11 +969,17 @@ Imports MapWinUtility
             UpdateDataText(txtVaryPET, pVariation.PETdata)
 
             Select Case .Operation
-                Case "Multiply" : cboFunction.SelectedIndex = 0
-                Case "Add" : cboFunction.SelectedIndex = 1
+                Case "Add" : cboFunction.SelectedIndex = 0
+                Case "Multiply" : cboFunction.SelectedIndex = 1
                 Case "AddEvents" : cboFunction.SelectedIndex = 2
-                Case "AddVolume" : cboFunction.SelectedIndex = 3
+                Case "Flash" : cboFunction.SelectedIndex = 3
             End Select
+
+            If Double.IsNaN(.FlashVolumeFraction) Then
+                txtVolumePercent.Text = ""
+            Else
+                txtVolumePercent.Text = (.FlashVolumeFraction - 1) * 100
+            End If
 
             EnableIterative(.Max > .Min)
             If Not Double.IsNaN(.Min) Then txtMin.Text = .Min
@@ -940,7 +994,6 @@ Imports MapWinUtility
             End If
 
             If .Seasons Is Nothing Then
-                cboSeasons.SelectedIndex = 0
                 EnableSeasons(False)
             Else
                 pSettingFormSeason = True
@@ -1056,17 +1109,17 @@ Imports MapWinUtility
     End Sub
 
     Private Sub FunctionChanged()
-        Select Case cboFunction.Text
-            Case "Multiply Existing Values by a Number"
-                grpMinMax.Text = "Number to multiply existing data by"
-                lblValueUnits.Text = "multiplication factor"
-            Case "Change Temperature"
-                grpMinMax.Text = "Degrees to add to each existing temperature value"
-                lblValueUnits.Text = "degrees"
-            Case "Add/Remove Storm Events", "Change Annual/Seasonal Volume"
-                grpMinMax.Text = "Percent Change in Volume"
-                lblValueUnits.Text = "%"
-        End Select
+        grpMinMax.Text = pFunctionGroupLabels(cboFunction.SelectedIndex)
+        lblValueUnits.Text = pFunctionUnits(cboFunction.SelectedIndex)
+        If pFunctionOperations(cboFunction.SelectedIndex) = "Flash" Then
+            lblVolumePercent.Visible = True
+            lblVolumePercent2.Visible = True
+            txtVolumePercent.Visible = True
+        Else
+            lblVolumePercent.Visible = False
+            lblVolumePercent2.Visible = False
+            txtVolumePercent.Visible = False
+        End If
     End Sub
 
 End Class
