@@ -5,12 +5,13 @@ Imports MapWinUtility
 Public Class atcSeasonBase
 
     Private pAllSeasons As Integer() = {}
-    Private pSeasonsSelected As New BitArray(0)
+    Private pSeasonsSelected As New ArrayList
+
     Private Shared pNaN As Double = atcUtility.GetNaN
 
     Public Overridable Function Clone() As atcSeasonBase
         Dim lNewSeason As New atcSeasonBase
-        lNewSeason.SeasonsSelected = pSeasonsSelected.Clone
+        lNewSeason.SeasonsSelected = pSeasonsSelected
         Return lNewSeason
     End Function
 
@@ -203,41 +204,49 @@ Public Class atcSeasonBase
         Next
     End Sub
 
-    'Seasons that have been selected are set to True
+    ''' <summary>
+    ''' True if specified season index is selected, False if it is not
+    ''' </summary>
+    ''' <param name="aSeasonIndex">Index of season to get/set selection of</param>
     Public Overridable Property SeasonSelected(ByVal aSeasonIndex As Integer) As Boolean
         Get
-            If aSeasonIndex >= 0 AndAlso aSeasonIndex < pSeasonsSelected.Count Then
-                Return pSeasonsSelected(aSeasonIndex)
+            Return pSeasonsSelected.Contains(aSeasonIndex)
+        End Get
+        Set(ByVal aSelect As Boolean)
+            If aSelect Then
+                If Not pSeasonsSelected.Contains(aSeasonIndex) Then
+                    pSeasonsSelected.Add(aSeasonIndex)
+                End If
             Else
-                Return False
+                While pSeasonsSelected.Contains(aSeasonIndex)
+                    pSeasonsSelected.Remove(aSeasonIndex)
+                End While
             End If
-        End Get
-        Set(ByVal newValue As Boolean)
-            If pSeasonsSelected.Length < aSeasonIndex + 1 Then
-                pSeasonsSelected.Length = aSeasonIndex + 1
-            End If
-            pSeasonsSelected(aSeasonIndex) = newValue
         End Set
     End Property
 
-    'Seasons that have been selected are set to True
-    Protected Overridable Property SeasonsSelected() As BitArray
+    ''' <summary>
+    ''' Integer ArrayList containing SeasonIndex of selected seasons
+    ''' </summary>
+    Protected Overridable Property SeasonsSelected() As ArrayList
         Get
-            Dim lNumSeasons As Integer = AllSeasons.GetLength(0)
-            If pSeasonsSelected.Length < lNumSeasons Then pSeasonsSelected.Length = lNumSeasons
-            Return pSeasonsSelected
+            Return pSeasonsSelected.Clone
         End Get
-        Set(ByVal newValue As BitArray)
-            pSeasonsSelected = newValue
+        Set(ByVal newValue As ArrayList)
+            pSeasonsSelected.Clear()
+            For Each lIndex As Integer In newValue
+                SeasonSelected(lIndex) = True
+            Next
         End Set
     End Property
 
-    Public Function SeasonsSelectedString(Optional ByVal aXML As Boolean = False) As String
+    ''' <summary>
+    ''' List of selected season names
+    ''' </summary>
+    ''' <param name="aXML">True to get list formatted as XML, False for plain text</param>
+    Public Overridable Function SeasonsSelectedString(Optional ByVal aXML As Boolean = False) As String
         Dim lSeasons As String = ""
-        Dim lIndexArray As Integer() = AllSeasons()
-        Dim lLastSeason As Integer = lIndexArray.GetUpperBound(0)
-        For i As Integer = 0 To lLastSeason
-            Dim lSeasonIndex As Integer = lIndexArray(i)
+        For Each lSeasonIndex As Integer In SeasonsSelected
             Dim lSeasonName As String = SeasonName(lSeasonIndex)
             If SeasonSelected(lSeasonIndex) Then
                 If aXML Then
@@ -258,7 +267,7 @@ Public Class atcSeasonBase
         End Get
         Set(ByVal newValue As String)
             Try
-                pSeasonsSelected.SetAll(False) 'TODO: not all season types use pSeasonsSelected, need to clear selection another way
+                pSeasonsSelected.Clear()
                 Dim lNextSelected As Integer = newValue.IndexOf("<Selected")
                 While lNextSelected > -1
                     lNextSelected = newValue.IndexOf(">", lNextSelected + 10) + 1
@@ -271,6 +280,28 @@ Public Class atcSeasonBase
             End Try
         End Set
     End Property
+
+    ''' <summary>
+    ''' Returns an ArrayList containing all the unique season indexes which correspond to dates in the given array
+    ''' </summary>
+    ''' <param name="aDates">Dates to search for seasons</param>
+    Public Function AllSeasonsInDates(ByVal aDates As Double()) As Integer()
+        Dim lAllSeasons As New ArrayList
+        Dim lSeasonIndex As Integer
+        Dim lLastSeason As Integer = Integer.MinValue
+        For Each lDateValue As Double In aDates
+            If Not Double.IsNaN(lDateValue) Then
+                lSeasonIndex = SeasonIndex(lDateValue)
+                If lSeasonIndex <> lLastSeason Then
+                    lLastSeason = lSeasonIndex
+                    If Not lAllSeasons.Contains(lSeasonIndex) Then
+                        lAllSeasons.Add(lSeasonIndex)
+                    End If
+                End If
+            End If
+        Next
+        Return lAllSeasons.ToArray(GetType(Integer))
+    End Function
 
     Public Overridable Function AllSeasons() As Integer()
         Return pAllSeasons

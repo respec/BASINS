@@ -1,11 +1,17 @@
+Imports MapWinUtility
+
 Public Class atcSeasonsWaterYear
     Inherits atcSeasonBase
 
-    Public Overrides Function Clone() As atcSeasonBase
-        Dim lNewSeason As New atcSeasonsWaterYear
-        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
-        Return lNewSeason
+    Private Shared pAllSeasons As Integer() = {}
+
+    Public Overrides Function AllSeasons() As Integer()
+        Return pAllSeasons
     End Function
+
+    Public Sub SetAllSeasons(ByVal aAllSeasons As Integer())
+        pAllSeasons = aAllSeasons.Clone
+    End Sub
 
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
         Dim lDate As Date = Date.FromOADate(aDate)
@@ -15,4 +21,5 @@ Public Class atcSeasonsWaterYear
             Return lDate.Year + 1
         End If
     End Function
+
 End Class
