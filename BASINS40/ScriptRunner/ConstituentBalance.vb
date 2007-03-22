@@ -21,19 +21,21 @@ Public Module ScriptStatTest
         Dim lConstituents2Output As New atcCollection
         Select Case pBalanceType
             Case "Water"
-                lConstituents2Output.Add("SUPY")
-                lConstituents2Output.Add("PERO")
-                lConstituents2Output.Add("IFWO")
-                lConstituents2Output.Add("AGWO")
-                lConstituents2Output.Add("IGWI")
-                lConstituents2Output.Add("PET")
-                lConstituents2Output.Add("CEPE")
-                lConstituents2Output.Add("SURET")
-                lConstituents2Output.Add("UZET")
-                lConstituents2Output.Add("LZET")
-                lConstituents2Output.Add("AGWET")
-                lConstituents2Output.Add("BASET")
-                lConstituents2Output.Add("TAET")
+                lConstituents2Output.Add("SUPY", "Rainfall")
+                lConstituents2Output.Add("Header1", "Runoff")
+                lConstituents2Output.Add("SURO", "    Surface")
+                lConstituents2Output.Add("IFWO", "    Interflow")
+                lConstituents2Output.Add("AGWO", "    Baseflow")
+                lConstituents2Output.Add("PERO", "    Total")
+                lConstituents2Output.Add("IGWI", "Deep Groundwater")
+                lConstituents2Output.Add("Header2", "Evaporation")
+                lConstituents2Output.Add("PET", "    Potential")
+                lConstituents2Output.Add("CEPE", "    Intercep St")
+                lConstituents2Output.Add("UZET", "    Upper Zone")
+                lConstituents2Output.Add("LZET", "    Lower Zone")
+                lConstituents2Output.Add("AGWET", "    Ground Water")
+                lConstituents2Output.Add("BASET", "    Baseflow")
+                lConstituents2Output.Add("TAET", "    Total")
         End Select
 
         Dim lString As New Text.StringBuilder
@@ -45,17 +47,21 @@ Public Module ScriptStatTest
 
         Dim lHspfBinFile As atcDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
         Dim lHspfBinFileName As String = "Input\" & lScenario & ".hbn"
+        Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
+        lString.AppendLine("   Run Made " & lFileDetails.CreationTime & vbCrLf)
+
         Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
         lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
         Logger.Dbg(" DataSetCount " & lHspfBinFile.Datasets.Count)
-        Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-        lString.AppendLine("   Run Made " & lFileDetails.CreationTime & vbcrlf)
 
         Dim lLocations As atcCollection = lHspfBinFile.DataSets.SortedAttributeValues("Location")
         'Logger.Dbg(" LocationCount " & lLocations.ToString(lLocations.Count))
 
         Dim lConstituents As atcCollection = lHspfBinFile.DataSets.SortedAttributeValues("Constituent")
-        'Logger.Dbg(" ConstituentCount " & lConstituents.ToString(lConstituents.Count))
+        Logger.Dbg(" ConstituentCount " & lConstituents.ToString(lConstituents.Count))
+
+        Dim lMatchConstituentGroup As atcDataGroup
+        Dim lTempDataSet As atcDataSet
 
         For Each lLocation As String In lLocations
             If lLocation.StartsWith("P:") Then
@@ -63,10 +69,40 @@ Public Module ScriptStatTest
                 lString.AppendLine(pBalanceType & " Balance Report For " & lLocation)
                 Dim lTempDataGroup As atcDataGroup = lHspfBinFile.Datasets.FindData("Location", lLocation)
                 Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
-                For Each lConstituent as String In lConstituents2Output
-                    Dim lTempDataSet As atcDataSet = lTempDataGroup.FindData("Constituent", lConstituent).Item(0)
-                    Logger.Dbg("       Match " & lConstituent & " with " & lTempDataSet.ToString)
-                    lString.AppendLine(Space(6) & lConstituent & "  " & lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value)
+                Dim lNeedHeader As Boolean = True
+
+                For lIndex As Integer = 0 To lConstituents2Output.Count - 1
+                    Dim lConstituentKey As String = lConstituents2Output.Keys(lIndex)
+                    Dim lConstituentName As String = lConstituents2Output(lIndex)
+                    lMatchConstituentGroup = lTempDataGroup.FindData("Constituent", lConstituentKey)
+                    If lMatchConstituentGroup.Count > 0 Then
+                        lTempDataSet = lMatchConstituentGroup.Item(0)
+                        Logger.Dbg("       Match " & lConstituentKey & " with " & lTempDataSet.ToString)
+
+                        Dim lSeasons As New atcSeasons.atcSeasonsCalendarYear
+                        Dim lSeasonalAttributes As New atcDataAttributes
+                        Dim lCalculatedAttributes As New atcDataAttributes
+                        lSeasonalAttributes.SetValue("Mean", 0)
+                        lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
+
+                        If lNeedHeader Then
+                            lString.Append("Date" & vbTab & "Mean")
+                            For Each lAttribute As atcDefinedValue In lCalculatedAttributes
+                                lString.Append(vbTab & lAttribute.Definition.Name)
+                            Next
+                            lString.AppendLine()
+                            lNeedHeader = False
+                        End If
+
+                        lString.Append(lConstituentName & vbTab & DF(lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value))
+                        For Each lAttribute As atcDefinedValue In lCalculatedAttributes
+                            lString.Append(vbTab & DF(lAttribute.Value))
+                        Next
+                        lString.AppendLine()
+                    Else
+                        lString.AppendLine(lConstituentName)
+                    End If
+
                 Next
                 lTempDataGroup = Nothing
                 lString.AppendLine(vbCrLf)
@@ -79,4 +115,7 @@ Public Module ScriptStatTest
         SaveFileString(lOutFileName, lString.ToString)
 
     End Sub
+    Private Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
+        Return Trim(Format(aValue, "##########0." & StrDup(aDecimalPlaces, "0")))
+    End Function
 End Module

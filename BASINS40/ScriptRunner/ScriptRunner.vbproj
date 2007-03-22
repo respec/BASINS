@@ -100,6 +100,10 @@
       <Name>atcHspfBinOut</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcSeasons\atcSeasons.vbproj">
+      <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
+      <Name>atcSeasons</Name>
+    </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Project>{67027820-9036-481E-80F6-077E5085F59D}</Project>
       <Name>atcUtility</Name>
