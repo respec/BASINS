@@ -110,7 +110,7 @@ Public Class frmVariationCligen
         '
         Me.lblFunction.AutoSize = True
         Me.lblFunction.BackColor = System.Drawing.Color.Transparent
-        Me.lblFunction.Location = New System.Drawing.Point(55, 130)
+        Me.lblFunction.Location = New System.Drawing.Point(58, 304)
         Me.lblFunction.Name = "lblFunction"
         Me.lblFunction.Size = New System.Drawing.Size(51, 13)
         Me.lblFunction.TabIndex = 7
@@ -119,7 +119,7 @@ Public Class frmVariationCligen
         '
         'txtFunction
         '
-        Me.txtFunction.Location = New System.Drawing.Point(112, 127)
+        Me.txtFunction.Location = New System.Drawing.Point(115, 301)
         Me.txtFunction.Name = "txtFunction"
         Me.txtFunction.Size = New System.Drawing.Size(71, 20)
         Me.txtFunction.TabIndex = 8
@@ -127,7 +127,7 @@ Public Class frmVariationCligen
         '
         'txtIncrement
         '
-        Me.txtIncrement.Location = New System.Drawing.Point(112, 205)
+        Me.txtIncrement.Location = New System.Drawing.Point(115, 379)
         Me.txtIncrement.Name = "txtIncrement"
         Me.txtIncrement.Size = New System.Drawing.Size(71, 20)
         Me.txtIncrement.TabIndex = 14
@@ -138,7 +138,7 @@ Public Class frmVariationCligen
         Me.lblIncrement.AutoSize = True
         Me.lblIncrement.BackColor = System.Drawing.Color.Transparent
         Me.lblIncrement.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.lblIncrement.Location = New System.Drawing.Point(49, 208)
+        Me.lblIncrement.Location = New System.Drawing.Point(52, 382)
         Me.lblIncrement.Name = "lblIncrement"
         Me.lblIncrement.Size = New System.Drawing.Size(57, 13)
         Me.lblIncrement.TabIndex = 13
@@ -147,7 +147,7 @@ Public Class frmVariationCligen
         '
         'txtMax
         '
-        Me.txtMax.Location = New System.Drawing.Point(112, 179)
+        Me.txtMax.Location = New System.Drawing.Point(115, 353)
         Me.txtMax.Name = "txtMax"
         Me.txtMax.Size = New System.Drawing.Size(71, 20)
         Me.txtMax.TabIndex = 12
@@ -155,7 +155,7 @@ Public Class frmVariationCligen
         '
         'txtMin
         '
-        Me.txtMin.Location = New System.Drawing.Point(112, 153)
+        Me.txtMin.Location = New System.Drawing.Point(115, 327)
         Me.txtMin.Name = "txtMin"
         Me.txtMin.Size = New System.Drawing.Size(71, 20)
         Me.txtMin.TabIndex = 10
@@ -166,7 +166,7 @@ Public Class frmVariationCligen
         Me.lblMaximum.AutoSize = True
         Me.lblMaximum.BackColor = System.Drawing.Color.Transparent
         Me.lblMaximum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMaximum.Location = New System.Drawing.Point(52, 182)
+        Me.lblMaximum.Location = New System.Drawing.Point(55, 356)
         Me.lblMaximum.Name = "lblMaximum"
         Me.lblMaximum.Size = New System.Drawing.Size(54, 13)
         Me.lblMaximum.TabIndex = 11
@@ -178,7 +178,7 @@ Public Class frmVariationCligen
         Me.lblMinimum.AutoSize = True
         Me.lblMinimum.BackColor = System.Drawing.Color.Transparent
         Me.lblMinimum.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblMinimum.Location = New System.Drawing.Point(55, 156)
+        Me.lblMinimum.Location = New System.Drawing.Point(58, 330)
         Me.lblMinimum.Name = "lblMinimum"
         Me.lblMinimum.Size = New System.Drawing.Size(51, 13)
         Me.lblMinimum.TabIndex = 9
@@ -194,12 +194,12 @@ Public Class frmVariationCligen
         Me.grpSeasons.Controls.Add(Me.lstSeasons)
         Me.grpSeasons.Controls.Add(Me.btnSeasonsAll)
         Me.grpSeasons.Controls.Add(Me.btnSeasonsNone)
-        Me.grpSeasons.Location = New System.Drawing.Point(189, 107)
+        Me.grpSeasons.Location = New System.Drawing.Point(192, 282)
         Me.grpSeasons.Name = "grpSeasons"
-        Me.grpSeasons.Size = New System.Drawing.Size(221, 184)
+        Me.grpSeasons.Size = New System.Drawing.Size(205, 204)
         Me.grpSeasons.TabIndex = 19
         Me.grpSeasons.TabStop = False
-        Me.grpSeasons.Text = "Vary Seasonally"
+        Me.grpSeasons.Text = "Seasons"
         '
         'cboSeasons
         '
@@ -209,7 +209,7 @@ Public Class frmVariationCligen
         Me.cboSeasons.Location = New System.Drawing.Point(6, 19)
         Me.cboSeasons.MaxDropDownItems = 20
         Me.cboSeasons.Name = "cboSeasons"
-        Me.cboSeasons.Size = New System.Drawing.Size(209, 21)
+        Me.cboSeasons.Size = New System.Drawing.Size(193, 21)
         Me.cboSeasons.TabIndex = 20
         '
         'lstSeasons
@@ -222,13 +222,13 @@ Public Class frmVariationCligen
         Me.lstSeasons.MultiColumn = True
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstSeasons.Size = New System.Drawing.Size(209, 103)
+        Me.lstSeasons.Size = New System.Drawing.Size(193, 123)
         Me.lstSeasons.TabIndex = 21
         '
         'btnSeasonsAll
         '
         Me.btnSeasonsAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 155)
+        Me.btnSeasonsAll.Location = New System.Drawing.Point(6, 175)
         Me.btnSeasonsAll.Name = "btnSeasonsAll"
         Me.btnSeasonsAll.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsAll.TabIndex = 22
@@ -237,7 +237,7 @@ Public Class frmVariationCligen
         'btnSeasonsNone
         '
         Me.btnSeasonsNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSeasonsNone.Location = New System.Drawing.Point(152, 155)
+        Me.btnSeasonsNone.Location = New System.Drawing.Point(136, 175)
         Me.btnSeasonsNone.Name = "btnSeasonsNone"
         Me.btnSeasonsNone.Size = New System.Drawing.Size(63, 23)
         Me.btnSeasonsNone.TabIndex = 23
@@ -246,7 +246,7 @@ Public Class frmVariationCligen
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(260, 472)
+        Me.btnOk.Location = New System.Drawing.Point(247, 492)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(72, 24)
         Me.btnOk.TabIndex = 25
@@ -256,7 +256,7 @@ Public Class frmVariationCligen
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(338, 472)
+        Me.btnCancel.Location = New System.Drawing.Point(325, 492)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(72, 24)
         Me.btnCancel.TabIndex = 26
@@ -266,27 +266,27 @@ Public Class frmVariationCligen
         '
         Me.lblName.AutoSize = True
         Me.lblName.BackColor = System.Drawing.Color.Transparent
-        Me.lblName.Location = New System.Drawing.Point(41, 15)
+        Me.lblName.Location = New System.Drawing.Point(11, 15)
         Me.lblName.Name = "lblName"
-        Me.lblName.Size = New System.Drawing.Size(65, 13)
+        Me.lblName.Size = New System.Drawing.Size(98, 13)
         Me.lblName.TabIndex = 1
-        Me.lblName.Text = "Input Name:"
+        Me.lblName.Text = "Modification Name:"
         Me.lblName.TextAlign = System.Drawing.ContentAlignment.TopRight
         '
         'txtName
         '
         Me.txtName.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtName.Location = New System.Drawing.Point(112, 12)
+        Me.txtName.Location = New System.Drawing.Point(115, 12)
         Me.txtName.Name = "txtName"
-        Me.txtName.Size = New System.Drawing.Size(298, 20)
+        Me.txtName.Size = New System.Drawing.Size(282, 20)
         Me.txtName.TabIndex = 2
         '
         'txtParameter
         '
         Me.txtParameter.AutoSize = True
         Me.txtParameter.BackColor = System.Drawing.Color.Transparent
-        Me.txtParameter.Location = New System.Drawing.Point(12, 67)
+        Me.txtParameter.Location = New System.Drawing.Point(15, 242)
         Me.txtParameter.Name = "txtParameter"
         Me.txtParameter.Size = New System.Drawing.Size(94, 13)
         Me.txtParameter.TabIndex = 5
@@ -298,24 +298,24 @@ Public Class frmVariationCligen
         Me.cboParameter.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboParameter.ItemHeight = 13
-        Me.cboParameter.Location = New System.Drawing.Point(112, 64)
+        Me.cboParameter.Location = New System.Drawing.Point(115, 239)
         Me.cboParameter.MaxDropDownItems = 20
         Me.cboParameter.Name = "cboParameter"
-        Me.cboParameter.Size = New System.Drawing.Size(298, 21)
+        Me.cboParameter.Size = New System.Drawing.Size(282, 21)
         Me.cboParameter.TabIndex = 6
         '
         'agdCligenHSPF
         '
         Me.agdCligenHSPF.AllowHorizontalScrolling = False
         Me.agdCligenHSPF.AllowNewValidValues = False
-        Me.agdCligenHSPF.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.agdCligenHSPF.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.agdCligenHSPF.CellBackColor = System.Drawing.Color.Empty
         Me.agdCligenHSPF.LineColor = System.Drawing.Color.Empty
         Me.agdCligenHSPF.LineWidth = 0.0!
-        Me.agdCligenHSPF.Location = New System.Drawing.Point(12, 297)
+        Me.agdCligenHSPF.Location = New System.Drawing.Point(12, 38)
         Me.agdCligenHSPF.Name = "agdCligenHSPF"
-        Me.agdCligenHSPF.Size = New System.Drawing.Size(398, 169)
+        Me.agdCligenHSPF.Size = New System.Drawing.Size(385, 169)
         Me.agdCligenHSPF.Source = Nothing
         Me.agdCligenHSPF.TabIndex = 24
         '
@@ -323,7 +323,7 @@ Public Class frmVariationCligen
         '
         Me.lblParameterFilename.AutoSize = True
         Me.lblParameterFilename.BackColor = System.Drawing.Color.Transparent
-        Me.lblParameterFilename.Location = New System.Drawing.Point(29, 41)
+        Me.lblParameterFilename.Location = New System.Drawing.Point(32, 216)
         Me.lblParameterFilename.Name = "lblParameterFilename"
         Me.lblParameterFilename.Size = New System.Drawing.Size(77, 13)
         Me.lblParameterFilename.TabIndex = 3
@@ -334,15 +334,15 @@ Public Class frmVariationCligen
         '
         Me.txtParameterFilename.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtParameterFilename.Location = New System.Drawing.Point(112, 38)
+        Me.txtParameterFilename.Location = New System.Drawing.Point(115, 213)
         Me.txtParameterFilename.Name = "txtParameterFilename"
-        Me.txtParameterFilename.Size = New System.Drawing.Size(298, 20)
+        Me.txtParameterFilename.Size = New System.Drawing.Size(282, 20)
         Me.txtParameterFilename.TabIndex = 4
         Me.txtParameterFilename.Text = "<click to specify>"
         '
         'txtNumYears
         '
-        Me.txtNumYears.Location = New System.Drawing.Point(112, 257)
+        Me.txtNumYears.Location = New System.Drawing.Point(115, 431)
         Me.txtNumYears.Name = "txtNumYears"
         Me.txtNumYears.Size = New System.Drawing.Size(71, 20)
         Me.txtNumYears.TabIndex = 18
@@ -350,7 +350,7 @@ Public Class frmVariationCligen
         '
         'txtStartYear
         '
-        Me.txtStartYear.Location = New System.Drawing.Point(112, 231)
+        Me.txtStartYear.Location = New System.Drawing.Point(115, 405)
         Me.txtStartYear.Name = "txtStartYear"
         Me.txtStartYear.Size = New System.Drawing.Size(71, 20)
         Me.txtStartYear.TabIndex = 16
@@ -361,7 +361,7 @@ Public Class frmVariationCligen
         Me.Label2.AutoSize = True
         Me.Label2.BackColor = System.Drawing.Color.Transparent
         Me.Label2.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.Label2.Location = New System.Drawing.Point(44, 260)
+        Me.Label2.Location = New System.Drawing.Point(47, 434)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(62, 13)
         Me.Label2.TabIndex = 17
@@ -373,7 +373,7 @@ Public Class frmVariationCligen
         Me.lblStartYear.AutoSize = True
         Me.lblStartYear.BackColor = System.Drawing.Color.Transparent
         Me.lblStartYear.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblStartYear.Location = New System.Drawing.Point(49, 234)
+        Me.lblStartYear.Location = New System.Drawing.Point(52, 408)
         Me.lblStartYear.Name = "lblStartYear"
         Me.lblStartYear.Size = New System.Drawing.Size(57, 13)
         Me.lblStartYear.TabIndex = 15
@@ -385,16 +385,16 @@ Public Class frmVariationCligen
         Me.lblParameterDescription.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblParameterDescription.BackColor = System.Drawing.Color.Transparent
-        Me.lblParameterDescription.Location = New System.Drawing.Point(112, 88)
+        Me.lblParameterDescription.Location = New System.Drawing.Point(112, 263)
         Me.lblParameterDescription.Name = "lblParameterDescription"
-        Me.lblParameterDescription.Size = New System.Drawing.Size(298, 16)
+        Me.lblParameterDescription.Size = New System.Drawing.Size(285, 16)
         Me.lblParameterDescription.TabIndex = 33
         Me.lblParameterDescription.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'frmVariationCligen
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(422, 508)
+        Me.ClientSize = New System.Drawing.Size(409, 528)
         Me.Controls.Add(Me.txtNumYears)
         Me.Controls.Add(Me.txtStartYear)
         Me.Controls.Add(Me.txtParameterFilename)
@@ -445,7 +445,7 @@ Public Class frmVariationCligen
             Dim lSeasonTypeShortName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
             Select Case lSeasonTypeShortName
                 Case "Calendar Year", "Water Year", "Month"
-                    cboSeasons.Items.Add(lSeasonTypeShortName)
+                    cboSeasons.Items.Add(lSeasonTypeShortName & "s")
             End Select
         Next
 
@@ -537,7 +537,8 @@ Public Class frmVariationCligen
     Private Function SelectedSeasonType() As Type
         Dim lSeasonPlugin As New atcSeasonPlugin
         For Each lSeasonType As Type In pSeasonsAvailable
-            If atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name).Equals(cboSeasons.Text) Then
+            Dim lSeasonName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
+            If lSeasonName.Equals(cboSeasons.Text) OrElse lSeasonName.Equals(cboSeasons.Text & "s") Then
                 Return lSeasonType
             End If
         Next
@@ -644,8 +645,8 @@ Public Class frmVariationCligen
             .FixedRows = 1
             .Rows = VariationCligen.CligenConstituents.Length + 1
             .Columns = 2
-            .CellValue(0, 0) = "Cligen Parameter"
-            .CellValue(0, 1) = "HSPF Input to Replace"
+            .CellValue(0, 0) = "Cligen Output"
+            .CellValue(0, 1) = "Existing Data to Replace"
             .CellColor(0, 0) = System.Drawing.SystemColors.Control
             .CellColor(0, 1) = System.Drawing.SystemColors.Control
             .ColorCells = True

@@ -93,9 +93,8 @@
       <Name>System.Windows.Forms</Name>
     </Reference>
     <ProjectReference Include="..\atcCligen\atcCligen.vbproj">
-      <Name>atcCligen</Name>
       <Project>{2EBD52CD-4BB4-4EC9-BE11-1101602958A2}</Project>
-      <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
+      <Name>atcCligen</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcControls\atcControls.vbproj">
@@ -113,6 +112,7 @@
     <ProjectReference Include="..\atcEvents\atcEvents.vbproj">
       <Project>{9F469FD8-4A92-4C1F-901C-93D84D457D8F}</Project>
       <Name>atcEvents</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcHspfBinOut\atcHspfBinOut.vbproj">
       <Name>atcHspfBinOut</Name>
@@ -135,6 +135,7 @@
     <ProjectReference Include="..\atcSynopticAnalysis\atcSynopticAnalysis.vbproj">
       <Project>{FABF7AA3-DDE7-48A4-8226-ECD3AD423597}</Project>
       <Name>atcSynopticAnalysis</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
       <Name>atcTimeseriesMath</Name>
