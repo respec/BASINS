@@ -18,19 +18,13 @@ Public Module ScriptStatTest
 
         Dim lScenario As String = "base"
 
-        Dim lPerConstituents2Output As New atcCollection
-        Dim lImpConstituents2Output As New atcCollection
+        Dim lPrimaryConstituent As String = ""
         Select Case pSummaryType
             Case "Water"
             Case "TotalN"
                 'Total N is a combination of NH4, No3, OrganicN
-                lPerConstituents2Output.Add("NITROGEN - ALL FORMS")
-                lPerConstituents2Output.Add("POQUAL-NH4")
-                lPerConstituents2Output.Add("POQUAL-NO3")
-                lPerConstituents2Output.Add("POQUAL-BOD")  'to be mult by 0.048
-                lImpConstituents2Output.Add("SOQUAL-NH4")
-                lImpConstituents2Output.Add("SOQUAL-NO3")
-                lImpConstituents2Output.Add("SOQUAL-BOD")  'to be mult by 0.048
+                lPrimaryConstituent = "NITROGEN - ALL FORMS"
+
         End Select
 
         Dim lString As New Text.StringBuilder
@@ -59,17 +53,39 @@ Public Module ScriptStatTest
         Dim lLuName As String
         Dim lLuArea As Single
         Dim lValue As Single
-        For Each lOper In lHspfUci.OpnBlks("PERLND").ids
-            'for each operation, get land use name, number of acres, and load/acre
-            lLuName = lOper.Tables("GEN-INFO").parms(1).value
-            lLuArea = LandArea(lOper.Name, lOper.Id, lHspfUci)
+        Dim lTempDataSet As atcDataSet
+        Dim lOperTypes As New Collection
+        lOperTypes.Add("PERLND")
+        lOperTypes.Add("IMPLND")
+        For Each lOperType As String In lOperTypes
+            For Each lOper In lHspfUci.OpnBlks(lOperType).ids
+                'for each operation, get land use name, number of acres, and load/acre
+                lLuName = lOper.Tables("GEN-INFO").parms(1).value
+                lLuArea = LandArea(lOper.Name, lOper.Id, lHspfUci)
 
-            Dim lTempDataGroup As atcDataGroup = lHspfBinFile.DataSets.FindData("Location", "P:" & lOper.Id)
-            For Each lCon As String In lPerConstituents2Output
-                'Dim lTempDataSet As atcDataSet = lTempDataGroup.FindData("Constituent", lCon).Item(0)
-                'lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                Dim lTempDataGroup As atcDataGroup = lHspfBinFile.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)
+                lTempDataSet = lTempDataGroup.FindData("Constituent", lPrimaryConstituent).Item(0)
+                If Not lTempDataSet Is Nothing Then
+                    'lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                Else
+                    If lOperType = "PERLND" Then
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-NH4").Item(0)
+                        'lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-NO3").Item(0)
+                        'lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-BOD").Item(0)
+                        'lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * 0.048
+                    Else
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-NH4").Item(0)
+                        'lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-NO3").Item(0)
+                        'lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-BOD").Item(0)
+                        'lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * 0.048
+                    End If
+                End If
+                lString.AppendLine(lLuName & lLuArea & lValue)
             Next
-            lString.AppendLine(lLuName & lLuArea & lValue)
         Next
 
         Dim lOutFileName As String = lScenario & "_" & pSummaryType & "_" & "WatershedSummary.txt"
