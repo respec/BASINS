@@ -43,6 +43,7 @@ Public Module ScriptStatTest
         Logger.Dbg(" DataSetCount " & lHspfBinFile.Datasets.Count)
         Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
         lString.AppendLine("   Run Made " & lFileDetails.CreationTime & vbCrLf)
+        lString.AppendLine("Land Use Name" & vbTab & "Area (acres)" & vbTab & "Load (lbs/acre)" & vbTab & "Total Load (lbs)")
 
         'make uci available 
         Dim lMsg As New atcUCI.HspfMsg
@@ -54,6 +55,7 @@ Public Module ScriptStatTest
         Dim lLuName As String
         Dim lLuArea As Single
         Dim lValue As Single
+        Dim lTotal As Single
         Dim lTempDataSet As atcDataSet
         Dim lOperTypes As New Collection
         lOperTypes.Add("PERLND")
@@ -65,27 +67,28 @@ Public Module ScriptStatTest
                 lLuArea = LandArea(lOper.Name, lOper.Id, lHspfUci)
 
                 Dim lTempDataGroup As atcDataGroup = lHspfBinFile.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)
-                lTempDataSet = lTempDataGroup.FindData("Constituent", lPrimaryConstituent).Item(0)
-                If Not lTempDataSet Is Nothing Then
+                If lTempDataGroup.FindData("Constituent", lPrimaryConstituent).Count > 0 Then
+                    lTempDataSet = lTempDataGroup.FindData("Constituent", lPrimaryConstituent).Item(0)
                     lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
                 Else
                     If lOperType = "PERLND" Then
                         lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-NH4").Item(0)
-                        'lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                        lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
                         lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-NO3").Item(0)
-                        'lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                        lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
                         lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-BOD").Item(0)
-                        'lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * 0.048
+                        lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * 0.048
                     Else
                         lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-NH4").Item(0)
-                        'lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                        lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
                         lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-NO3").Item(0)
-                        'lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                        lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
                         lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-BOD").Item(0)
-                        'lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * 0.048
+                        lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * 0.048
                     End If
                 End If
-                lString.AppendLine(lLuName & lLuArea & lValue)
+                lTotal = lLuArea * lValue
+                lString.AppendLine(lLuName & vbTab & lLuArea & vbTab & lValue & vbTab & lTotal)
             Next
         Next
 
