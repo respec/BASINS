@@ -1,6 +1,7 @@
 Imports atcData
 Imports atcData.atcDataGroup
 Imports atcUtility
+Imports atcUCI
 Imports MapWindow.Interfaces
 Imports MapWinUtility
 
@@ -66,7 +67,7 @@ Public Module ScriptStatTest
                 Dim lTempDataGroup As atcDataGroup = lHspfBinFile.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)
                 lTempDataSet = lTempDataGroup.FindData("Constituent", lPrimaryConstituent).Item(0)
                 If Not lTempDataSet Is Nothing Then
-                    'lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                    lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
                 Else
                     If lOperType = "PERLND" Then
                         lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-NH4").Item(0)

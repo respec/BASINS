@@ -45,22 +45,27 @@
     <Reference Include="atcData, Version=1.0.2445.25945, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Plugins\BASINS\atcData.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="atcUtility, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Plugins\BASINS\atcUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="atcWDM, Version=1.0.2445.25945, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\Plugins\BASINS\atcWDM.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MapWinInterfaces, Version=4.2.2439.23261, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MapWinUtility, Version=1.0.2442.22516, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinUtility.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>

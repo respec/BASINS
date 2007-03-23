@@ -242,7 +242,7 @@ Public Class atcCollection
                 'Skip listing unprintable keys/values
             End Try
         Next
-        If lCount - lStop > 1 Then
+        If lCount - lStop > 2 Then
             lString.AppendLine("(skipped " & lCount - lStop - 2 & " values)")
             lString.AppendLine(lCount - 1 & " (" & Me.Keys.Item(lCount - 1) & ") " & Me.ItemByIndex(lCount - 1))
         End If

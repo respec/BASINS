@@ -5,7 +5,7 @@ Imports atcWDM
 Imports System.Collections.Specialized
 
 Public Module UCICombiner
-    Private pBaseDrive As String = "c:\"
+    Private pBaseDrive As String = "d:\"
     Private pBaseDir As String = pBaseDrive & "cbp_working\"
     Private pWorkingDir As String = pBaseDir & "output\"  '= "subset\"
     Private pOutputDir As String = pWorkingDir & "combined\"
@@ -16,7 +16,7 @@ Public Module UCICombiner
     Private pLandUseYear As String = "2002"
     Private pScenario As String = "base"
 
-    Public Sub Main()
+    Public Sub XMain()
         Logger.StartToFile(pOutputDir & "uciCombiner.log")
 
         ChDriveDir(pWorkingDir)
@@ -740,7 +740,7 @@ Public Module UCICombiner
 
         Dim pStartDate As Double = MJD(1984, 1, 1)
         Dim pEndDate As Double = MJD(2001, 1, 1)
-        Dim pExistOption As atcDataSource.EnumExistAction = atcDataSource.EnumExistAction.ExistReplace
+        Dim pExistOptionReplace As atcDataSource.EnumExistAction = atcDataSource.EnumExistAction.ExistReplace
 
         Try 'build combined wdms for prec, met data 
             Logger.Dbg("MetSegmentWdms")
@@ -769,7 +769,7 @@ Public Module UCICombiner
                             If lDataSourceWDM.Open(pScenario & ".wdm") Then
                                 Dim lTimser As atcTimeseries = SubsetByDate(lDataSourceWDM.DataSets.ItemByKey(lMetSegRec.Source.VolId), _
                                                                             pStartDate, pEndDate, Nothing)
-                                lDataSourceWDM.AddDataset(lTimser, pExistOption)
+                                lDataSourceWDM.AddDataset(lTimser, pExistOptionReplace)
                                 lTimser.Clear()
                             End If
 
@@ -789,6 +789,14 @@ Public Module UCICombiner
                 For Each lConn In lOper.Sources
                     If Mid(lConn.Source.VolName, 1, 3) = "WDM" Then
                         lOrigDsn = CInt(Mid(CStr(lConn.Source.VolId), 1, 1) & "0" & Mid(CStr(lConn.Source.VolId), 3, 2))
+
+                        'kludge for ignoring that CBP added NH4D as 2004 but we don't have the ucis that have 2004 referenced
+                        Select Case lOrigDsn
+                            Case 2004 : lOrigDsn = 2005
+                            Case 2005 : lOrigDsn = 2006
+                            Case 2006 : lOrigDsn = 2007
+                        End Select
+
                         lWdmIndex = CInt(Mid(CStr(lConn.Source.VolId), 2, 1))
                         Logger.Dbg("Volume " & lConn.Source.VolName & " DSN " & lOrigDsn)
                         If lConn.Source.VolName = "WDM3" Then
@@ -798,6 +806,15 @@ Public Module UCICombiner
                         ElseIf lConn.Source.VolName = "WDM2" Then
                             CopyDataSet("wdm", aPrecWDMNames(lWdmIndex), lOrigDsn, _
                                         "wdm", pScenario & ".wdm", lConn.Source.VolId)
+                            Logger.Dbg("CopyFrom " & aPrecWDMNames(lWdmIndex) & " " & lOrigDsn & " To " & pScenario & ".wdm" & " " & lConn.Source.VolId)
+                            'set to start and end dates of run
+                            Dim lDataSourceWDM As New atcWDM.atcDataSourceWDM
+                            If lDataSourceWDM.Open(pScenario & ".wdm") Then
+                                Dim lTimser As atcTimeseries = SubsetByDate(lDataSourceWDM.DataSets.ItemByKey(lConn.Source.VolId), _
+                                                                            pStartDate, pEndDate, Nothing)
+                                lDataSourceWDM.AddDataset(lTimser, pExistOptionReplace)
+                                lTimser.Clear()
+                            End If
                             SetWDMAttribute(pScenario & ".wdm", lConn.Source.VolId, "idscen", "OBSERVED")
                             lConn.Source.VolName = "WDM1"
                         End If
@@ -827,45 +844,45 @@ Public Module UCICombiner
         End Try
     End Function
 
-    Public Sub WCMain()
+    Public Sub Main()
         'copy datasets from source wdm to target wdm according to csv file
         Dim lBaseWDMDir As String = "d:\gisdata\CBP\cat\"
         ChDriveDir(lBaseWDMDir)
-        Dim lPrecSeries As String = "F30" 'M, E, F10 or F30
+        Dim lPrecSeries As String = "M" 'M, E, F10 or F30
 
         Dim lClimScens As New Collection
         Dim lOutputPath As String
 
         Logger.StartToFile(lBaseWDMDir & "wdmCombiner.log")
 
-        lClimScens.Add("a_10_cccm")
-        lClimScens.Add("a_10_ccsr")
-        lClimScens.Add("a_10_csir")
-        lClimScens.Add("a_10_echm")
-        lClimScens.Add("a_10_gfdl")
-        lClimScens.Add("a_10_hadc")
-        lClimScens.Add("a_10_ncar")
-        lClimScens.Add("b_10_cccm")
-        lClimScens.Add("b_10_ccsr")
-        lClimScens.Add("b_10_csir")
-        lClimScens.Add("b_10_echm")
-        lClimScens.Add("b_10_gfdl")
-        lClimScens.Add("b_10_hadc")
-        lClimScens.Add("b_10_ncar")
-        'lClimScens.Add("a_70_cccm")
-        'lClimScens.Add("a_70_ccsr")
-        'lClimScens.Add("a_70_csir")
-        'lClimScens.Add("a_70_echm")
-        'lClimScens.Add("a_70_gfdl")
-        'lClimScens.Add("a_70_hadc")
-        'lClimScens.Add("a_70_ncar")
-        'lClimScens.Add("b_70_cccm")
-        'lClimScens.Add("b_70_ccsr")
-        'lClimScens.Add("b_70_csir")
-        'lClimScens.Add("b_70_echm")
-        'lClimScens.Add("b_70_gfdl")
-        'lClimScens.Add("b_70_hadc")
-        'lClimScens.Add("b_70_ncar")
+        'lClimScens.Add("a_10_cccm")
+        'lClimScens.Add("a_10_ccsr")
+        'lClimScens.Add("a_10_csir")
+        'lClimScens.Add("a_10_echm")
+        'lClimScens.Add("a_10_gfdl")
+        'lClimScens.Add("a_10_hadc")
+        'lClimScens.Add("a_10_ncar")
+        'lClimScens.Add("b_10_cccm")
+        'lClimScens.Add("b_10_ccsr")
+        'lClimScens.Add("b_10_csir")
+        'lClimScens.Add("b_10_echm")
+        'lClimScens.Add("b_10_gfdl")
+        'lClimScens.Add("b_10_hadc")
+        'lClimScens.Add("b_10_ncar")
+        lClimScens.Add("a_70_cccm")
+        lClimScens.Add("a_70_ccsr")
+        lClimScens.Add("a_70_csir")
+        lClimScens.Add("a_70_echm")
+        lClimScens.Add("a_70_gfdl")
+        lClimScens.Add("a_70_hadc")
+        lClimScens.Add("a_70_ncar")
+        lClimScens.Add("b_70_cccm")
+        lClimScens.Add("b_70_ccsr")
+        lClimScens.Add("b_70_csir")
+        lClimScens.Add("b_70_echm")
+        lClimScens.Add("b_70_gfdl")
+        lClimScens.Add("b_70_hadc")
+        lClimScens.Add("b_70_ncar")
         'lClimScens.Add("base")
 
         For Each lScen As String In lClimScens

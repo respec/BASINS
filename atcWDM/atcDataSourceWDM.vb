@@ -100,10 +100,10 @@ Public Class atcDataSourceWDM
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
             Dim lTu As Integer = lTimser.Attributes.GetValue("tu")
             Dim lNvals As Integer = lTimser.numValues
-            Dim lSJDay As Double = lTimser.Attributes.GetValue("SJDay", 0)
+            Dim lSJDay As Double = lTimser.Dates.Value(0)
             Dim lSDat(5) As Integer
             J2Date(lSJDay, lSDat)
-            Dim lEJDay As Double = lTimser.Attributes.GetValue("EJDay", 0)
+            Dim lEJDay As Double = lTimser.Dates.Value(lTimser.numValues)
             Dim lEDat(5) As Integer
             J2Date(lEJDay, lEDat)
             Dim lNValsExpected As Integer
