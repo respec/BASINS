@@ -7,14 +7,14 @@ Imports MapWinUtility
 Imports Microsoft.VisualBasic
 Imports System
 
-Public Module ScriptStatTest
+Public Module ScriptStatTestX
     Private Const pTestPath As String = "C:\test\WaterBalance\"
     Private Const pBalanceType As String = "Water"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("Start")
         ChDriveDir(pTestPath)
-        Logger.Dbg(" CurDir:" & CurDir)
+        Logger.Dbg(" CurDir:" & CurDir())
 
         Dim lScenario As String = "base"
 
@@ -61,7 +61,7 @@ Public Module ScriptStatTest
 
         Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
         lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
-        Logger.Dbg(" DataSetCount " & lHspfBinFile.Datasets.Count)
+        Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
         Dim lLocations As atcCollection = lHspfBinFile.DataSets.SortedAttributeValues("Location")
         'Logger.Dbg(" LocationCount " & lLocations.ToString(lLocations.Count))
