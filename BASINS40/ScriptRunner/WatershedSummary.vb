@@ -43,7 +43,9 @@ Public Module ScriptStatTest
         Logger.Dbg(" DataSetCount " & lHspfBinFile.Datasets.Count)
         Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
         lString.AppendLine("   Run Made " & lFileDetails.CreationTime & vbCrLf)
-        lString.AppendLine("Land Use Name" & vbTab & "Area (acres)" & vbTab & "Load (lbs/acre)" & vbTab & "Total Load (lbs)")
+        lString.AppendLine("Land Use" & vbTab & vbTab & "Area" & vbTab & vbTab & "Load" & vbTab & vbTab & "Total Load" & vbTab & "Total Load")
+        lString.AppendLine(vbTab & vbTab & vbTab & "(acres)" & vbTab & vbTab & "(lbs/acre)" & vbTab & "(lbs)" & vbTab & vbTab & "(%)")
+        lString.AppendLine("")
 
         'make uci available 
         Dim lMsg As New atcUCI.HspfMsg
@@ -60,6 +62,13 @@ Public Module ScriptStatTest
         Dim lOperTypes As New Collection
         lOperTypes.Add("PERLND")
         lOperTypes.Add("IMPLND")
+
+        Dim lLandUses As New Collection
+        Dim lAreas As New Collection
+        Dim lLoads As New Collection
+        Dim lTotalLoads As New Collection
+        Dim lSum As Double = 0.0
+
         For Each lOperType As String In lOperTypes
             For Each lOper In lHspfUci.OpnBlks(lOperType).ids
                 'for each operation, get land use name, number of acres, and load/acre
@@ -88,9 +97,19 @@ Public Module ScriptStatTest
                     End If
                 End If
                 lTotal = lLuArea * lValue
-                lString.AppendLine(lLuName & vbTab & lLuArea & vbTab & lValue & vbTab & lTotal)
+                lLandUses.Add(Left(lOperType, 1) & lOper.Id & ":" & lLuName)
+                lAreas.Add(lLuArea)
+                lLoads.Add(lValue)
+                lTotalLoads.Add(lTotal)
+                lSum = lSum + lTotal
             Next
         Next
+
+        For lIndex As Integer = 1 To lLandUses.Count
+            lString.AppendLine(lLandUses(lIndex) & vbTab & DoubleToString(lAreas(lIndex)) & vbTab & vbTab & DoubleToString(lLoads(lIndex)) & vbTab & vbTab & DoubleToString(lTotalLoads(lIndex)) & vbTab & vbTab & DoubleToString((lTotalLoads(lIndex) / lSum * 100), , , , , 2))
+        Next
+        lString.AppendLine("")
+        lString.AppendLine(vbTab & vbTab & vbTab & vbTab & vbTab & "Total Load = " & DoubleToString(lSum) & " lbs.")
 
         Dim lOutFileName As String = lScenario & "_" & pSummaryType & "_" & "WatershedSummary.txt"
         Logger.Dbg("  WriteReportTo " & lOutFileName)
