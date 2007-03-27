@@ -8,6 +8,7 @@ Imports Microsoft.VisualBasic
 Imports System
 
 Public Module ScriptStatTest
+    Private Const pFieldWidth As Integer = 10
     Private Const pTestPath As String = "C:\test\SegmentBalance\"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -23,7 +24,8 @@ Public Module ScriptStatTest
 
         Dim lScenarios As New atcCollection
         'lScenarios.Add("USANFRAN")
-        lScenarios.Add("base")
+        'lScenarios.Add("base")
+        lScenarios.Add("baseExcerpt")
 
         Dim lOperations As New atcCollection
         lOperations.Add("P:", "PERLND")
@@ -36,7 +38,7 @@ Public Module ScriptStatTest
 
         For Each lScenario As String In lScenarios
             Dim lHspfBinFile As atcDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-            Dim lHspfBinFileName As String =  lScenario & ".hbn"
+            Dim lHspfBinFileName As String = lScenario & ".hbn"
             Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
 
             Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
@@ -66,7 +68,7 @@ Public Module ScriptStatTest
                         lConstituents2Output.Add("P:IFWO", "    Interflow")
                         lConstituents2Output.Add("P:AGWO", "    Baseflow")
                         lConstituents2Output.Add("P:PERO", "    Total")
-                        lConstituents2Output.Add("P:IGWI", "Deep GW")
+                        lConstituents2Output.Add("P:IGWI", "Deep Grnd Water")
                         lConstituents2Output.Add("P:Header2", "Evaporation")
                         lConstituents2Output.Add("P:PET", "    Potential")
                         lConstituents2Output.Add("P:CEPE", "    Intercep St")
@@ -131,13 +133,14 @@ Public Module ScriptStatTest
                                         Dim lSeasons As New atcSeasons.atcSeasonsCalendarYear
                                         Dim lSeasonalAttributes As New atcDataAttributes
                                         Dim lCalculatedAttributes As New atcDataAttributes
-                                        lSeasonalAttributes.SetValue("Mean", 0)
+                                        lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
                                         lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
 
                                         If lNeedHeader Then
-                                            lString.Append("Date    " & vbTab & "Mean")
+                                            lString.Append("Date    " & vbTab & "      Mean")
                                             For Each lAttribute As atcDefinedValue In lCalculatedAttributes
-                                                lString.Append(vbTab & lAttribute.Arguments(1).Value)
+                                                Dim s As String = lAttribute.Arguments(1).Value
+                                                lString.Append(vbTab & s.PadRight(pFieldWidth))
                                             Next
                                             lString.AppendLine()
                                             lNeedHeader = False
@@ -170,7 +173,12 @@ Public Module ScriptStatTest
     End Sub
 
     Private Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
-        Return DoubleToString(aValue, , , , 5)
+        Dim s As String = DoubleToString(aValue, , "#,###.0###", , 5)
+        Dim dp As Integer = s.IndexOf("."c)
+        If dp >= 0 Then
+            s = Space(5 - dp) & s
+        End If
+        Return s.PadRight(pFieldWidth)
         'Return Trim(Format(aValue, "##########0." & StrDup(aDecimalPlaces, "0")))
     End Function
 End Module
