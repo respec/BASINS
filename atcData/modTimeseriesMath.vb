@@ -265,15 +265,13 @@ Public Module modTimeseriesMath
     End Sub
 
     Public Function DatasetOrGroupToGroup(ByVal aObj As Object) As atcDataGroup
-        Try
-            Return aObj
-        Catch
-        End Try
-        Try
-            Return New atcDataGroup(aObj)
-        Catch
-        End Try
-        Return Nothing
+        Select Case aObj.GetType.Name
+            Case "atcDataGroup" : Return aObj
+            Case "atcTimeseries" : Return New atcDataGroup(aObj)
+            Case Else
+                Logger.Dbg("DatasetOrGroupToGroup: Unrecognized type '" & aObj.GetType.Name & "'")
+                Return Nothing
+        End Select
     End Function
 
     'Fill values in constant interval timeseries with specified values.

@@ -323,13 +323,15 @@ Friend Class frmSelectData
     Private Sub Populate()
         pInitializing = True
 
-        Try
-            For iCriteria As Integer = pcboCriteria.GetUpperBound(0) To 0 Step -1
-                RemoveCriteria(pcboCriteria(iCriteria), plstCriteria(iCriteria))
-            Next
-        Catch ex As Exception
-            'first time through there is nothing to remove, error is normal
-        End Try
+        If Not pcboCriteria Is Nothing Then
+            Try
+                For iCriteria As Integer = pcboCriteria.GetUpperBound(0) To 0 Step -1
+                    RemoveCriteria(pcboCriteria(iCriteria), plstCriteria(iCriteria))
+                Next
+            Catch ex As Exception
+                'first time through there is nothing to remove, error is normal
+            End Try
+        End If
 
         ReDim pcboCriteria(0)
         ReDim plstCriteria(0)

@@ -70,7 +70,7 @@ Public Class frmSelectDisplay
         Me.GroupBox1.Controls.Add(Me.btnList)
         Me.GroupBox1.Location = New System.Drawing.Point(12, 144)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(161, 165)
+        Me.GroupBox1.Size = New System.Drawing.Size(211, 165)
         Me.GroupBox1.TabIndex = 0
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Display"
@@ -81,7 +81,7 @@ Public Class frmSelectDisplay
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnFrequency.Location = New System.Drawing.Point(6, 135)
         Me.btnFrequency.Name = "btnFrequency"
-        Me.btnFrequency.Size = New System.Drawing.Size(147, 23)
+        Me.btnFrequency.Size = New System.Drawing.Size(197, 23)
         Me.btnFrequency.TabIndex = 8
         Me.btnFrequency.Tag = "Analysis::Frequency Grid"
         Me.btnFrequency.Text = "Frequency Grid"
@@ -93,7 +93,7 @@ Public Class frmSelectDisplay
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSeasonal.Location = New System.Drawing.Point(6, 106)
         Me.btnSeasonal.Name = "btnSeasonal"
-        Me.btnSeasonal.Size = New System.Drawing.Size(147, 23)
+        Me.btnSeasonal.Size = New System.Drawing.Size(197, 23)
         Me.btnSeasonal.TabIndex = 7
         Me.btnSeasonal.Tag = "Analysis::Seasonal Attributes"
         Me.btnSeasonal.Text = "Seasonal Attributes"
@@ -105,7 +105,7 @@ Public Class frmSelectDisplay
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnTree.Location = New System.Drawing.Point(6, 77)
         Me.btnTree.Name = "btnTree"
-        Me.btnTree.Size = New System.Drawing.Size(147, 23)
+        Me.btnTree.Size = New System.Drawing.Size(197, 23)
         Me.btnTree.TabIndex = 6
         Me.btnTree.Tag = "Analysis::Data Tree"
         Me.btnTree.Text = "Data Tree"
@@ -117,7 +117,7 @@ Public Class frmSelectDisplay
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnGraph.Location = New System.Drawing.Point(6, 48)
         Me.btnGraph.Name = "btnGraph"
-        Me.btnGraph.Size = New System.Drawing.Size(147, 23)
+        Me.btnGraph.Size = New System.Drawing.Size(197, 23)
         Me.btnGraph.TabIndex = 5
         Me.btnGraph.Tag = "Analysis::Graph"
         Me.btnGraph.Text = "Graph"
@@ -129,7 +129,7 @@ Public Class frmSelectDisplay
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnList.Location = New System.Drawing.Point(6, 19)
         Me.btnList.Name = "btnList"
-        Me.btnList.Size = New System.Drawing.Size(147, 23)
+        Me.btnList.Size = New System.Drawing.Size(197, 23)
         Me.btnList.TabIndex = 5
         Me.btnList.Tag = "Analysis::List"
         Me.btnList.Text = "List"
@@ -159,7 +159,7 @@ Public Class frmSelectDisplay
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSave.Location = New System.Drawing.Point(18, 57)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(147, 23)
+        Me.btnSave.Size = New System.Drawing.Size(197, 23)
         Me.btnSave.TabIndex = 3
         Me.btnSave.Text = "Save to file"
         Me.btnSave.UseVisualStyleBackColor = True
@@ -170,7 +170,7 @@ Public Class frmSelectDisplay
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnDiscard.Location = New System.Drawing.Point(18, 86)
         Me.btnDiscard.Name = "btnDiscard"
-        Me.btnDiscard.Size = New System.Drawing.Size(147, 23)
+        Me.btnDiscard.Size = New System.Drawing.Size(197, 23)
         Me.btnDiscard.TabIndex = 4
         Me.btnDiscard.Text = "Discard"
         Me.btnDiscard.UseVisualStyleBackColor = True
@@ -181,15 +181,15 @@ Public Class frmSelectDisplay
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSelect.Location = New System.Drawing.Point(18, 115)
         Me.btnSelect.Name = "btnSelect"
-        Me.btnSelect.Size = New System.Drawing.Size(147, 23)
+        Me.btnSelect.Size = New System.Drawing.Size(197, 23)
         Me.btnSelect.TabIndex = 5
-        Me.btnSelect.Text = "Select Data"
+        Me.btnSelect.Text = "Add/Remove Data"
         Me.btnSelect.UseVisualStyleBackColor = True
         '
         'frmSelectDisplay
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(185, 321)
+        Me.ClientSize = New System.Drawing.Size(235, 321)
         Me.Controls.Add(Me.btnSelect)
         Me.Controls.Add(Me.btnDiscard)
         Me.Controls.Add(Me.btnSave)
@@ -208,7 +208,7 @@ Public Class frmSelectDisplay
 #End Region
 
     Private Const pPADDING As Integer = 5
-    Private pArgButton() As Windows.Forms.Button
+    'Private pArgButton() As Windows.Forms.Button
     Private pDataManager As atcDataManager
     Private pDataGroup As atcDataGroup
 
