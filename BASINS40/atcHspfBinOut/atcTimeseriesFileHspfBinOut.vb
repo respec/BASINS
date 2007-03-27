@@ -13,8 +13,8 @@ Public Class atcTimeseriesFileHspfBinOut
     Private pFileFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
     Private pName As String = "Timeseries::HSPF Binary Output"
     Private pErrorDescription As String
-    Private pMonitor As Object
-    Private pMonitorSet As Boolean = False
+    'Private pMonitor As Object
+    'Private pMonitorSet As Boolean = False
     Private pDates As ArrayList 'of atcTimeseries
     Private pNvals As Integer
 
@@ -95,8 +95,8 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Public WriteOnly Property Monitor() As Object
         Set(ByVal Value As Object)
-            pMonitor = Value
-            pMonitorSet = True
+            'pMonitor = Value
+            'pMonitorSet = True
         End Set
     End Property
 
@@ -109,17 +109,17 @@ Public Class atcTimeseriesFileHspfBinOut
         Dim lTu As Integer, lTs As Integer, lIntvl As Integer
         Dim lTDate(5) As Integer
         Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
-        Dim i As Integer, j As Integer, s As String
+        Dim i As Integer, j As Integer ', s As String
 
-        If pMonitorSet Then
-            pMonitor.SendMonitorMessage("(OPEN HSPF Binary Output File)")
-            pMonitor.SendMonitorMessage("(BUTTOFF CANCEL)")
-            pMonitor.SendMonitorMessage("(BUTTOFF PAUSE)")
-            pMonitor.SendMonitorMessage("(MSG1 " & Specification & ")")
-        End If
+        'If pMonitorSet Then
+        '    pMonitor.SendMonitorMessage("(OPEN HSPF Binary Output File)")
+        '    pMonitor.SendMonitorMessage("(BUTTOFF CANCEL)")
+        '    pMonitor.SendMonitorMessage("(BUTTOFF PAUSE)")
+        '    pMonitor.SendMonitorMessage("(MSG1 " & Specification & ")")
+        'End If
 
         pBinFile = New clsHspfBinary
-        pBinFile.Monitor = pMonitor
+        'pBinFile.Monitor = pMonitor
         pBinFile.Filename = Specification
 
         i = 0
@@ -198,18 +198,19 @@ Public Class atcTimeseriesFileHspfBinOut
                     End With
                 Next j
             End With
-            If pMonitorSet Then
-                s = "(PROGRESS " & CStr(50 + ((100 * i) / (pBinFile.Headers.Count * 2))) & ")"
-                pMonitor.SendMonitorMessage(s)
-            End If
+            Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
+            'If pMonitorSet Then
+            '    s = "(PROGRESS " & CStr(50 + ((100 * i) / (pBinFile.Headers.Count * 2))) & ")"
+            '    pMonitor.SendMonitorMessage(s)
+            'End If
             i = i + 1
         Next
 
-        If pMonitorSet Then
-            pMonitor.SendMonitorMessage("(CLOSE)")
-            pMonitor.SendMonitorMessage("(BUTTON CANCEL)")
-            pMonitor.SendMonitorMessage("(BUTTON PAUSE)")
-        End If
+        'If pMonitorSet Then
+        '    pMonitor.SendMonitorMessage("(CLOSE)")
+        '    pMonitor.SendMonitorMessage("(BUTTON CANCEL)")
+        '    pMonitor.SendMonitorMessage("(BUTTON PAUSE)")
+        'End If
 
     End Sub
 

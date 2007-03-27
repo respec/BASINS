@@ -109,7 +109,8 @@ Friend Class clsHspfBinary
         Dim recbyte As Integer 'Byte position within current header record
         Dim thisVarName As String
         Dim varLen As Integer
-        Dim i As Integer, percent As Double, lastprog As Double
+        Dim i As Integer
+        'Dim percent As Double, lastprog As Double
 
         pFile.ReadRestOfRecordsInFile()
         While pFileRecordIndex < pFile.RecordCount
@@ -178,14 +179,15 @@ Friend Class clsHspfBinary
                     Logger.Dbg(s)
                     pErrorDescription = s
             End Select
-            If pMonitorSet Then
-                percent = (100 * i) / (pFile.RecordCount * 2)
-                If percent > lastprog + 1 Then  ' update progress message
-                    s = "(PROGRESS " & CStr(percent) & ")"
-                    pMonitor.SendMonitorMessage(s)
-                    lastprog = percent
-                End If
-            End If
+            Logger.Progress(i, pFile.RecordCount * 2)
+            'If pMonitorSet Then
+            '    percent = (100 * i) / (pFile.RecordCount * 2)
+            '    If percent > lastprog + 1 Then  ' update progress message
+            '        s = "(PROGRESS " & CStr(percent) & ")"
+            '        pMonitor.SendMonitorMessage(s)
+            '        lastprog = percent
+            '    End If
+            'End If
             pFileRecordIndex = pFileRecordIndex + 1
         End While
     End Sub
