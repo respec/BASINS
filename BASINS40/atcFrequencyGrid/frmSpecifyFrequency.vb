@@ -301,18 +301,18 @@ Public Class frmSpecifyFrequency
 
 #End Region
 
-    Private WithEvents pGroup As atcDataGroup
+    Private WithEvents pDataGroup As atcDataGroup
     Private pDataManager As atcDataManager
     Private pOk As Boolean = False
     Private pChoseHigh As Boolean = False
 
     Public Function AskUser(ByVal aDataManager As atcDataManager, ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
         pDataManager = aDataManager
-        pGroup = aGroup
+        pDataGroup = aGroup
         Clear()
         Me.ShowDialog()
         If pOk Then aChoseHigh = pChoseHigh
-        pGroup = Nothing
+        pDataGroup = Nothing
         Return pOk
     End Function
 
@@ -342,13 +342,33 @@ Public Class frmSpecifyFrequency
 
     End Sub
 
+    Private Sub ClearAttributes()
+        Dim lRemoveThese As New atcCollection
+        For Each lData As atcDataSet In pDataGroup
+            For Each lAttribute As atcDefinedValue In lData.Attributes
+                If Not lAttribute.Arguments Is Nothing Then
+                    If lAttribute.Arguments.ContainsAttribute("Nday") OrElse _
+                       lAttribute.Arguments.ContainsAttribute("Return Period") Then
+                        lRemoveThese.Add(lAttribute)
+                    End If
+                End If
+            Next
+            For Each lAttribute As atcDefinedValue In lRemoveThese
+                lData.Attributes.Remove(lAttribute)
+            Next
+        Next
+    End Sub
+
     Private Sub Calculate(ByVal aOperationName As String)
+        ClearAttributes()
+        Debug.WriteLine("Cleared,    " & pDataGroup.Item(0).ToString & " has " & pDataGroup.Item(0).Attributes.Count & " attributes")
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lArgs As New atcDataAttributes
-        lArgs.SetValue("Timeseries", pGroup)
+        lArgs.SetValue("Timeseries", pDataGroup)
         lArgs.SetValue("NDay", ListToArray(lstNday))
         lArgs.SetValue("Return Period", ListToArray(lstRecurrence))
         lCalculator.Open(aOperationName, lArgs)
+        Debug.WriteLine("Calculated, " & pDataGroup.Item(0).ToString & " has " & pDataGroup.Item(0).Attributes.Count & " attributes")
         If chkKeepNDayTSers.Checked Then 'add NDay Tsers to data manager
             pDataManager.DataSources.Add(lCalculator)
         End If

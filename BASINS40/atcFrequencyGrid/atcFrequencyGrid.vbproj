@@ -90,9 +90,11 @@
     </Compile>
     <EmbeddedResource Include="frmDisplayFrequencyGrid.resx">
       <DependentUpon>frmDisplayFrequencyGrid.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSpecifyFrequency.resx">
       <DependentUpon>frmSpecifyFrequency.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +122,8 @@
       <Package>{F184B08F-C81C-45F6-A57F-5ABD9991F28F}</Package>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

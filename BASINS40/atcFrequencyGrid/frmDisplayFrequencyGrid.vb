@@ -238,7 +238,9 @@ Friend Class frmDisplayFrequencyGrid
         pSource = New atcFrequencyGridSource(pDataGroup)
         If pSource.Columns < 3 Then
             lContinue = UserSpecifyAttributes()
-            pSource = New atcFrequencyGridSource(pDataGroup)
+            If lContinue Then
+                pSource = New atcFrequencyGridSource(pDataGroup)
+            End If
         End If
 
         If lContinue Then
@@ -284,8 +286,7 @@ Friend Class frmDisplayFrequencyGrid
     End Sub
 
     Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
-        UserSpecifyAttributes()
-        PopulateGrid()
+        If UserSpecifyAttributes() Then PopulateGrid()
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
@@ -318,11 +319,11 @@ Friend Class frmDisplayFrequencyGrid
         HighDisplay = False
     End Sub
 
-    'Private Sub UserSpecifyAttributes()
     Private Function UserSpecifyAttributes() As Boolean
         Dim lForm As New frmSpecifyFrequency
         Dim lChoseHigh As Boolean
         If lForm.AskUser(pDataManager, pDataGroup, lChoseHigh) Then
+            pSource = Nothing 'Get rid of obsolete source before changing HighDisplay to avoid refresh trouble
             Me.HighDisplay = lChoseHigh
             Return True
         Else
@@ -354,17 +355,17 @@ Friend Class frmDisplayFrequencyGrid
             Return pSource.High
         End Get
         Set(ByVal newValue As Boolean)
-            pSource.High = newValue
+            mnuViewHigh.Checked = newValue
+            mnuViewLow.Checked = Not newValue
             If newValue Then
                 Me.Text = "High Values"
-                mnuViewHigh.Checked = True
-                mnuViewLow.Checked = False
             Else
                 Me.Text = "Low Values"
-                mnuViewHigh.Checked = False
-                mnuViewLow.Checked = True
             End If
-            agdMain.Refresh()
+            If Not pSource Is Nothing AndAlso pSource.High <> newValue Then
+                pSource.High = newValue
+                agdMain.Refresh()
+            End If
         End Set
     End Property
 
