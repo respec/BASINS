@@ -1,5 +1,4 @@
 Imports atcUtility
-Imports MapWinUtility
 
 Public Class frmProjection
     Inherits System.Windows.Forms.Form
@@ -88,8 +87,8 @@ Public Class frmProjection
 
     Private Sub frmProjection_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Dim ProjectionFile As String
-        ProjectionFile = PathNameOnly(pProjectFileName) & "\prj.proj"
-        If FileExists(ProjectionFile) Then
+        ProjectionFile = IO.Path.Combine(IO.Path.GetDirectoryName(pProjectFileName), "prj.proj")
+        If IO.File.Exists(ProjectionFile) Then
             tbxProjection.Text = WholeFileString(ProjectionFile)
         Else
             tbxProjection.Text = "Projection Properties are not available"
