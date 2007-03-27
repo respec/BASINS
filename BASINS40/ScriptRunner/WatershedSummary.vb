@@ -24,8 +24,7 @@ Public Module ScriptStatTest
             Case "Water"
             Case "TotalN"
                 'Total N is a combination of NH4, No3, OrganicN
-                lPrimaryConstituent = "NITROGEN - ALL FORMS"
-
+                lPrimaryConstituent = "NITROGEN - TOTAL OUTFLOW"
         End Select
 
         Dim lString As New Text.StringBuilder
