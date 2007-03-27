@@ -114,6 +114,20 @@ Public Module ScriptStatTest
                     lConstituents2Output.Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
                     lConstituents2Output.Add("R:Copper-TROQAL", "Total Cu")
                 Case "TotalN"
+                    lConstituents2Output.Add("P:Header1", "Atmospheric Deposition")
+                    lConstituents2Output.Add("P:NH4-N - SURFACE LAYER - TOTAL AD", "NH4-N - Surface Layer")
+                    lConstituents2Output.Add("P:NH4-N - UPPER LAYER - TOTAL AD", "NH4-N - Upper Layer")
+                    lConstituents2Output.Add("P:NO3-N - SURFACE LAYER - TOTAL AD", "NO3-N - Surface Layer")
+                    lConstituents2Output.Add("P:NO3-N - UPPER LAYER - TOTAL AD", "NO3-N - Upper Layer")
+                    lConstituents2Output.Add("P:ORGN - SURFACE LAYER - TOTAL AD", "ORGN - Surface Layer")
+                    lConstituents2Output.Add("P:ORGN - UPPER LAYER - TOTAL AD", "ORGN - Upper Layer")
+                    lConstituents2Output.Add("P:Header1", "")
+                    lConstituents2Output.Add("P:TOTAL NITROGEN APPLICATION", "N Application")
+                    lConstituents2Output.Add("P:Header1", "NO3 Loss")
+                    'lConstituents2Output.Add("P:", "Surface")
+                    'lConstituents2Output.Add("P:", "Interflow")
+                    'lConstituents2Output.Add("P:", "Baseflow")
+                    'lConstituents2Output.Add("P:", "Total")
                 Case "TotalP"
             End Select
 
