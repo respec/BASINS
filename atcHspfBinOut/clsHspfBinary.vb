@@ -128,9 +128,8 @@ Friend Class clsHspfBinary
                             thisVarName = Byte2String(currec, recbyte + 4, varLen)
                             'On Error Resume Next
                             If InStr(thisVarName, "(") Then
-                                Logger.Dbg("***** Bad VarName:" & thisVarName)
-                                thisVarName = thisVarName.Replace("(", "")
-                                thisVarName = thisVarName.Replace(")", "")
+                                Logger.Dbg("***** Removing Parens From:" & thisVarName)
+                                thisVarName = thisVarName.Replace("("c, " "c).Replace(")"c, " "c)
                             End If
                             .VarNames.Add(thisVarName, thisVarName)
                             'On Error GoTo 0
@@ -180,15 +179,7 @@ Friend Class clsHspfBinary
                     pErrorDescription = s
             End Select
             Logger.Progress(i, pFile.RecordCount * 2)
-            'If pMonitorSet Then
-            '    percent = (100 * i) / (pFile.RecordCount * 2)
-            '    If percent > lastprog + 1 Then  ' update progress message
-            '        s = "(PROGRESS " & CStr(percent) & ")"
-            '        pMonitor.SendMonitorMessage(s)
-            '        lastprog = percent
-            '    End If
-            'End If
-            pFileRecordIndex = pFileRecordIndex + 1
+            pFileRecordIndex += 1
         End While
     End Sub
 
