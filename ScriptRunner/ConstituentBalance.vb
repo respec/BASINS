@@ -8,7 +8,7 @@ Imports Microsoft.VisualBasic
 Imports System
 
 Public Module ScriptStatTest
-    Private Const pFieldWidth As Integer = 10
+    Private Const pFieldWidth As Integer = 12
     Private Const pTestPath As String = "C:\test\SegmentBalance\"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -16,11 +16,11 @@ Public Module ScriptStatTest
         ChDriveDir(pTestPath)
         Logger.Dbg(" CurDir:" & CurDir())
 
-        Dim lBalanceTypes As New atcCollection
-        lBalanceTypes.Add("Water")
+        Dim lConstituents As New atcCollection
+        lConstituents.Add("Water")
         'lBalanceTypes.Add("SedimentCopper")
-        lBalanceTypes.Add("Nitrogen")
-        lBalanceTypes.Add("Phosphorus")
+        lConstituents.Add("TotalN")
+        lConstituents.Add("TotalP")
 
         Dim lScenarios As New atcCollection
         'lScenarios.Add("USANFRAN")
@@ -49,10 +49,12 @@ Public Module ScriptStatTest
             'lLocations.Add("I:101")
             Logger.Dbg(" LocationCount " & lLocations.ToString(lLocations.Count))
 
-            Dim lConstituents As atcCollection = lHspfBinFile.DataSets.SortedAttributeValues("Constituent")
-            Logger.Dbg(" ConstituentCount " & lConstituents.ToString(lConstituents.Count))
+            Dim lConstituentsAvailable As atcCollection = lHspfBinFile.DataSets.SortedAttributeValues("Constituent")
+            Logger.Dbg(" ConstituentCount " & lConstituents.ToString(lConstituentsAvailable.Count))
 
-            DoSegmentBalances(lOperations, lBalanceTypes, lScenario, lHspfBinFile, lLocations, lFileDetails.CreationTime)
+            DoSegmentBalances(lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lFileDetails.CreationTime)
+
+            DoWatershedSummary(lConstituents, lScenario, lHspfBinFile, lFileDetails.CreationTime)
 
             lHspfBinFile = Nothing
         Next lScenario
@@ -111,8 +113,8 @@ Public Module ScriptStatTest
                     lConstituents2Output.Add("R:Copper-ROSQAL-CLAY", "  Clay Cu")
                     lConstituents2Output.Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
                     lConstituents2Output.Add("R:Copper-TROQAL", "Total Cu")
-                Case "Nitrogen"
-                Case "Phosphorus"
+                Case "TotalN"
+                Case "TotalP"
             End Select
 
             Dim lString As New Text.StringBuilder
@@ -182,11 +184,12 @@ Public Module ScriptStatTest
         Next lBalanceType
     End Sub
 
-    Private Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
-        Dim s As String = DoubleToString(aValue, , "#,###.0###", , 5)
+    Friend Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
+        Dim s As String = DoubleToString(aValue, , "###,###.0###", , 5)
         Dim dp As Integer = s.IndexOf("."c)
         If dp >= 0 Then
-            s = Space(5 - dp) & s
+            Dim laddLeft As Integer = pFieldWidth - 5 - dp
+            If laddLeft > 0 Then s = Space(laddLeft) & s
         End If
         Return s.PadRight(pFieldWidth)
         'Return Trim(Format(aValue, "##########0." & StrDup(aDecimalPlaces, "0")))
