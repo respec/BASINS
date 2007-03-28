@@ -10,11 +10,13 @@ Imports System
 Public Module ScriptStatTest
     Private Const pFieldWidth As Integer = 12
     Private Const pTestPath As String = "C:\test\SegmentBalance\"
+    Private Const pCatSummaryFileName As String = "CatSummary.txt"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("Start")
         ChDriveDir(pTestPath)
         Logger.Dbg(" CurDir:" & CurDir())
+        If FileExists(pCatSummaryFileName) Then Kill(pCatSummaryFileName)
 
         Dim lConstituents As New atcCollection
         lConstituents.Add("Water")
@@ -24,8 +26,8 @@ Public Module ScriptStatTest
 
         Dim lScenarios As New atcCollection
         'lScenarios.Add("USANFRAN")
-        'lScenarios.Add("base")
-        lScenarios.Add("baseExcerpt")
+        lScenarios.Add("base")
+        'lScenarios.Add("baseExcerpt")
 
         Dim lOperations As New atcCollection
         lOperations.Add("P:", "PERLND")
@@ -39,24 +41,33 @@ Public Module ScriptStatTest
         For Each lScenario As String In lScenarios
             Dim lHspfBinFile As atcDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
             Dim lHspfBinFileName As String = lScenario & ".hbn"
-            Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-
+            Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
             Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
             lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
             Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
-            Dim lLocations As atcCollection = lHspfBinFile.DataSets.SortedAttributeValues("Location")
+            Dim lHspfWdmFile As atcDataSource = New atcWDM.atcDataSourceWDM
+            Dim lHspfWdmFileName As String = lScenario & ".wdm"
+            Logger.Dbg(" AboutToOpen " & lHspfWdmFileName)
+            lDataManager.OpenDataSource(lHspfWdmFile, lHspfWdmFileName, Nothing)
+            Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
+
+            Dim lLocations As atcCollection = lDataManager.DataSets.SortedAttributeValues("Location")
             'lLocations.Add("I:101")
             Logger.Dbg(" LocationCount " & lLocations.ToString(lLocations.Count))
 
-            Dim lConstituentsAvailable As atcCollection = lHspfBinFile.DataSets.SortedAttributeValues("Constituent")
+            Dim lConstituentsAvailable As atcCollection = lDataManager.DataSets.SortedAttributeValues("Constituent")
             Logger.Dbg(" ConstituentCount " & lConstituents.ToString(lConstituentsAvailable.Count))
 
-            DoSegmentBalances(lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lFileDetails.CreationTime)
+            DoSegmentBalances(lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.CreationTime)
 
-            DoWatershedSummary(lConstituents, lScenario, lHspfBinFile, lFileDetails.CreationTime)
+            DoWatershedSummary(lConstituents, lScenario, lHspfBinFile, lHspfBinFileInfo.CreationTime)
 
+            DoCatSummary(lScenario, lDataManager)
+
+            'more code needed to close data source???
             lHspfBinFile = Nothing
+            lHspfWdmFile = Nothing
         Next lScenario
     End Sub
 
@@ -242,14 +253,105 @@ Public Module ScriptStatTest
         Next lBalanceType
     End Sub
 
+    Private Sub DoCatSummary(ByVal aScenario As String, ByVal aDataManager As atcDataManager)
+        Dim lString As New Text.StringBuilder
+        lString.Append(aScenario)
+
+        'Get this hard coded stuff from CAT endpoints/variations!
+
+        Dim lMetDataGroup As atcDataGroup = aDataManager.DataSets.FindData("Location", "SEG1")
+        Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
+        If lMetDataGroup.Count > 0 Then
+            lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "HPRC", "Sum"))
+            lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "ATMP", "Mean"))
+            lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "EVAP", "Sum"))
+        End If
+
+        Dim lRchDataGroupW As atcDataGroup = aDataManager.DataSets.FindData("Location", "RIV9")
+        If lRchDataGroupW.Count > 0 Then
+            lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "WATR", "Mean"))
+            lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "WATR", "1Hi100"))
+            lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "FLOW", "7Q10"))
+        End If
+
+        Dim lRchDataGroup As atcDataGroup = aDataManager.DataSets.FindData("Location", "R:9")
+        If lRchDataGroup.Count > 0 Then
+            lString.Append(AnnualValue(lRchDataGroup, "RO", "Mean"))
+            lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "SumAnnual"))
+            lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "SumAnnual", True))
+            lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "Mean"))
+            lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "Mean", True))
+            lString.Append(AnnualValue(lRchDataGroup, "P-TOT-OUT", "SumAnnual"))
+            lString.Append(AnnualValue(lRchDataGroup, "N-TOT-OUT", "SumAnnual"))
+        End If
+
+        AppendFileString(pCatSummaryFileName, lString.ToString)
+    End Sub
+
+    Private Function AnnualValue(ByVal aDataGroup As atcDataGroup, ByVal aCons As String, ByVal aTrans As String, Optional ByVal aSummer As Boolean = False) As String
+        Dim lConsDataGroup As atcDataGroup = aDataGroup.FindData("Constituent", aCons)
+        Logger.Dbg("     " & aCons & "MatchingDatasetCount " & lConsDataGroup.Count)
+        Dim lString As String = ""
+        If lConsDataGroup.Count > 0 Then
+            Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
+            Dim lValue As Double = lTempDataSet.Attributes.GetDefinedValue(aTrans).Value
+            lString = vbTab & DF(lValue)
+            If aSummer Then
+                Dim lSeasons As New atcSeasons.atcSeasonsMonth
+                Dim lSeasonalAttributes As New atcDataAttributes
+                Dim lCalculatedAttributes As New atcDataAttributes
+                lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
+                lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
+                lValue = 0
+                For lIndex As Integer = 3 To 9
+                    lValue += lCalculatedAttributes(lIndex).Value 'AMJJASO
+                Next lIndex
+                lString &= vbTab & DF(lValue)
+            End If
+        End If
+        Return lString
+    End Function
+
+    Private Function AnnualAndSeasonalValues(ByVal aDataGroup As atcDataGroup, ByVal aCons As String, ByVal aTrans As String) As String
+        Dim lConsDataGroup As atcDataGroup = aDataGroup.FindData("Constituent", aCons)
+        Logger.Dbg("     " & aCons & "MatchingDatasetCount " & lConsDataGroup.Count)
+        Dim lString As String = ""
+        If lConsDataGroup.Count > 0 Then
+            Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
+            Dim lValue As Double = lTempDataSet.Attributes.GetDefinedValue(aTrans).Value
+            lString = vbTab & DF(lValue)
+            Dim lSeasons As New atcSeasons.atcSeasonsMonth
+            Dim lSeasonalAttributes As New atcDataAttributes
+            Dim lCalculatedAttributes As New atcDataAttributes
+            lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
+            lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
+            lValue = lCalculatedAttributes(0).Value + lCalculatedAttributes(1).Value + lCalculatedAttributes(11).Value  'DJF
+            lString &= vbTab & DF(lValue)
+            lValue = lCalculatedAttributes(2).Value + lCalculatedAttributes(3).Value + lCalculatedAttributes(4).Value  'MAM
+            lString &= vbTab & DF(lValue)
+            lValue = lCalculatedAttributes(5).Value + lCalculatedAttributes(6).Value + lCalculatedAttributes(7).Value  'JJA
+            lString &= vbTab & DF(lValue)
+            lValue = lCalculatedAttributes(8).Value + lCalculatedAttributes(9).Value + lCalculatedAttributes(10).Value  'SON
+            lString &= vbTab & DF(lValue)
+        End If
+        Return lString
+
+    End Function
+
     Friend Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
-        Dim s As String = DoubleToString(aValue, , "###,###.0###", , 5)
-        Dim dp As Integer = s.IndexOf("."c)
+        Dim lFormat As String
+        If aDecimalPlaces > 1 Then
+            lFormat = "###,##0.0" & StrDup(aDecimalPlaces - 1, "#")
+        Else
+            lFormat = "###,##0.0"
+        End If
+        Dim lString As String = DoubleToString(aValue, , lFormat, , , 5)
+        Dim dp As Integer = lString.IndexOf("."c)
         If dp >= 0 Then
             Dim laddLeft As Integer = pFieldWidth - 5 - dp
-            If laddLeft > 0 Then s = Space(laddLeft) & s
+            If laddLeft > 0 Then lString = Space(laddLeft) & lString
         End If
-        Return s.PadRight(pFieldWidth)
+        Return lString.PadRight(pFieldWidth)
         'Return Trim(Format(aValue, "##########0." & StrDup(aDecimalPlaces, "0")))
     End Function
 End Module
