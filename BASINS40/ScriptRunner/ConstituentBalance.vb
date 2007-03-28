@@ -22,7 +22,7 @@ Public Module ScriptStatTest
         lConstituents.Add("Water")
         'lBalanceTypes.Add("SedimentCopper")
         lConstituents.Add("TotalN")
-        lConstituents.Add("TotalP")
+        'lConstituents.Add("TotalP")
 
         Dim lScenarios As New atcCollection
         'lScenarios.Add("USANFRAN")
@@ -183,6 +183,25 @@ Public Module ScriptStatTest
                     lConstituents2Output.Add("P:TREFON", "Labile/Refr ORGN Conversion")
                     lConstituents2Output.Add("P:TFIXN", "Nitrogen Fixation")
                     lConstituents2Output.Add("P:TAMVOL", "NH3 Volatilization")
+                    lConstituents2Output.Add("Header1", "TAM")
+                    lConstituents2Output.Add("TAM-INTOT", "  TAM-INTOT")
+                    lConstituents2Output.Add("TAM-INDIS", "  TAM-INDIS")
+                    lConstituents2Output.Add("NH4-INPART-TOT", "  NH4-INPART-TOT")
+                    lConstituents2Output.Add("TAM-OUTTOT", "  TAM-OUTTOT")
+                    lConstituents2Output.Add("TAM-OUTDIS", "  TAM-OUTDIS")
+                    lConstituents2Output.Add("TAM-OUTPART-TOT", "  TAM-OUTPART-TOT")
+                    lConstituents2Output.Add("TAM-OUTTOT-EXIT3", "  TAM-OUTTOT-EXIT3")
+                    lConstituents2Output.Add("TAM-OUTDIS-EXIT3", "  TAM-OUTDIS-EXIT3")
+                    lConstituents2Output.Add("TAM-OUTPART-TOT-EXIT3", "  TAM-OUTPART-TOT-EXIT3")
+                    lConstituents2Output.Add("Header2", "NO3")
+                    lConstituents2Output.Add("NO3-INTOT", "  NO3-INTOT")
+                    lConstituents2Output.Add("NO3-PROCFLUX-TOT", "  NO3-PROCFLUX-TOT")
+                    lConstituents2Output.Add("NO3-OUTTOT", "  NO3-OUTTOT")
+                    lConstituents2Output.Add("NO3-OUTTOT-EXIT3", "  NO3-OUTTOT-EXIT3")
+                    lConstituents2Output.Add("Header3", "Totals")
+                    lConstituents2Output.Add("N-TOT-IN", "  N-TOT-IN")
+                    lConstituents2Output.Add("N-TOT-OUT", "  N-TOT-OUT")
+                    lConstituents2Output.Add("N-TOT-EXIT3", "  N-TOT-EXIT3")
                 Case "TotalP"
             End Select
 
@@ -198,11 +217,10 @@ Public Module ScriptStatTest
                 For Each lLocation As String In aLocations
                     If lLocation.StartsWith(lOperationKey) Then
                         Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
-                        lString.AppendLine(lBalanceType & " Balance Report For " & lLocation)
                         Dim lTempDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", lLocation)
                         Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
                         Dim lNeedHeader As Boolean = True
-
+                        Dim lPendingOutput As String = ""
                         For lIndex As Integer = 0 To lConstituents2Output.Count - 1
                             Dim lConstituentKey As String = lConstituents2Output.Keys(lIndex)
                             If lConstituentKey.StartsWith(lOperationKey) Then
@@ -220,6 +238,7 @@ Public Module ScriptStatTest
                                     lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
 
                                     If lNeedHeader Then
+                                        lString.AppendLine(lBalanceType & " Balance Report For " & lLocation & vbCrLf)
                                         lString.Append("Date    " & vbTab & "      Mean")
                                         For Each lAttribute As atcDefinedValue In lCalculatedAttributes
                                             Dim s As String = lAttribute.Arguments(1).Value
@@ -228,6 +247,10 @@ Public Module ScriptStatTest
                                         lString.AppendLine()
                                         lNeedHeader = False
                                     End If
+                                    If lPendingOutput.Length > 0 Then
+                                        lString.AppendLine(lPendingOutput)
+                                        lPendingOutput = ""
+                                    End If
 
                                     lString.Append(lConstituentName & vbTab & DF(lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value))
                                     For Each lAttribute As atcDefinedValue In lCalculatedAttributes
@@ -235,10 +258,17 @@ Public Module ScriptStatTest
                                     Next
                                     lString.AppendLine()
                                 Else
-                                    lString.AppendLine(vbCrLf & lConstituentName)
+                                    lPendingOutput &= vbCrLf & lConstituentName
                                 End If
                             End If
                         Next
+                        If lConstituents2Output.Count = 0 Then
+                            Logger.Dbg(" BalanceType " & lBalanceType & " at " & lLocation & " has no timeseries to output in script!")
+                        Else
+                            If lPendingOutput.Length > 0 Then
+                                lString.AppendLine("No data for " & lBalanceType & " balance report at " & lLocation & "!")
+                            End If
+                        End If
                         lTempDataGroup = Nothing
                         lString.AppendLine(vbCrLf)
                     Else
@@ -325,13 +355,17 @@ Public Module ScriptStatTest
             Dim lCalculatedAttributes As New atcDataAttributes
             lSeasonalAttributes.SetValue(aTrans, 0) 'fluxes are summed from daily, monthly or annual to annual
             lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
-            lValue = lCalculatedAttributes(0).Value + lCalculatedAttributes(1).Value + lCalculatedAttributes(11).Value  'DJF
+            lValue = lCalculatedAttributes(0).Value + lCalculatedAttributes(1).Value + lCalculatedAttributes(11).Value   'DJF
+            If aTrans = "Mean" Then lValue = lValue / 3
             lString &= vbTab & DF(lValue)
             lValue = lCalculatedAttributes(2).Value + lCalculatedAttributes(3).Value + lCalculatedAttributes(4).Value  'MAM
+            If aTrans = "Mean" Then lValue = lValue / 3
             lString &= vbTab & DF(lValue)
             lValue = lCalculatedAttributes(5).Value + lCalculatedAttributes(6).Value + lCalculatedAttributes(7).Value  'JJA
+            If aTrans = "Mean" Then lValue = lValue / 3
             lString &= vbTab & DF(lValue)
             lValue = lCalculatedAttributes(8).Value + lCalculatedAttributes(9).Value + lCalculatedAttributes(10).Value  'SON
+            If aTrans = "Mean" Then lValue = lValue / 3
             lString &= vbTab & DF(lValue)
         End If
         Return lString
