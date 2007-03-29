@@ -353,6 +353,7 @@ Public Class frmSpecifyFrequency
     End Sub
 
     Private Sub SaveList(ByVal aArgName As String, ByVal lst As Windows.Forms.ListBox)
+        SaveSetting("atcFrequencyGrid", aArgName, "dummy", "")
         DeleteSetting("atcFrequencyGrid", aArgName)
         For Each lItem As String In lst.SelectedItems
             SaveSetting("atcFrequencyGrid", aArgName, lItem, lItem)
