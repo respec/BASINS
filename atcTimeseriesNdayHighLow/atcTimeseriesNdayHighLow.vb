@@ -107,11 +107,11 @@ Public Class atcTimeseriesNdayHighLow
         With lResult
             .Name = aName
             .Description = aDescription
-            .DefaultValue = ""
+            .DefaultValue = Nothing
             .Editable = False
             .TypeString = aTypeString
             .Calculator = Me
-            .Category = "nDay & Frequency"
+            .Category = "N-day and Frequency"
         End With
         Dim lArguments As atcDataAttributes = New atcDataAttributes
         For Each lArg As atcAttributeDefinition In aArgs
@@ -125,7 +125,10 @@ Public Class atcTimeseriesNdayHighLow
                      ByVal aNDay As Integer, _
                      ByVal aHigh As Boolean) As Double
 
-        If aNDay > 0 And aTS.numValues >= aNDay Then
+        If aNDay <= 0 Then
+        ElseIf aTS.numValues < aNDay Then 'Cannot compute a value because fewer than aNDay values are present 
+            Throw New ApplicationException("Only " & aTS.numValues & " values available, needed " & aNDay)
+        Else
             Dim lBestSoFar As Double
             Dim lTimeIndex As Integer = 1
             Dim lNumSummed As Integer = 1
@@ -147,7 +150,7 @@ Public Class atcTimeseriesNdayHighLow
                         lNumSummed = 1
                         lRunningSum = 0
                     Else
-                        Return Double.NaN
+                        Throw New ApplicationException("Missing Value " & DumpDate(aTS.Dates.Value(lCurrentValue)))
                     End If
                 Else
                     lRunningSum += lCurrentValue
@@ -164,11 +167,7 @@ Public Class atcTimeseriesNdayHighLow
                 End If
                 lTimeIndex += 1
             End While
-
             Return (lBestSoFar / aNDay)
-
-        Else 'Cannot compute a value because fewer than aNDay values are present 
-            Return Double.NaN
         End If
     End Function
 
@@ -191,28 +190,32 @@ Public Class atcTimeseriesNdayHighLow
             End If
 
             For Each lNDayNow As Double In lNDay
-                Dim newValues(nYears) As Double
-                Dim newDates(nYears) As Double
-                newDates(0) = sjday
+                Dim newValueAttributes(nYears) As atcDataAttributes
+                Dim newTS As New atcTimeseries(Me)
+                newTS.Dates = New atcTimeseries(Me)
+                newTS.numValues = nYears
+
+                newTS.Dates.Value(0) = sjday
 
                 Dim lsjday As Double = sjday
                 For indexNew = 1 To nYears
                     Dim nextSJday As Double = TimAddJ(lsjday, lTimeCode, 1, 1)
                     Dim oneYear As atcTimeseries = SubsetByDate(aTS, lsjday, nextSJday, Me)
-                    newDates(indexNew) = nextSJday
-                    newValues(indexNew) = HighOrLowValue(oneYear, CInt(lNDayNow), aHigh)
+                    newTS.Dates.Value(indexNew) = nextSJday
+                    Try
+                        newTS.Value(indexNew) = HighOrLowValue(oneYear, CInt(lNDayNow), aHigh)
+                    Catch e As Exception
+                        newTS.Value(indexNew) = Double.NaN
+                        newTS.ValueAttributes(indexNew) = New atcDataAttributes()
+                        newTS.ValueAttributes(indexNew).SetValue("Explanation", e.Message)
+                    End Try
                     lsjday = nextSJday
                 Next
 
-                Dim newTS As New atcTimeseries(Me)
-                newTS.Values = newValues
-                newTS.Dates = New atcTimeseries(Me)
-                newTS.Dates.Values = newDates
-                newTS.Attributes.SetValue("Parent Timeseries", aTS)
                 Dim lDateNow As Date = Now
                 newTS.Attributes.SetValue("Date Created", lDateNow)
                 newTS.Attributes.SetValue("Date Modified", lDateNow)
-
+                newTS.Attributes.SetValue("Parent Timeseries", aTS)
                 CopyBaseAttributes(aTS, newTS)
 
                 With newTS.Attributes
@@ -234,6 +237,7 @@ Public Class atcTimeseriesNdayHighLow
                 End If
                 newTS.Attributes.SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
                 newTS.Attributes.AddHistory(lDescription)
+                ComputeTau(newTS, aNDay, aHigh, newTS.Attributes)
                 newTsGroup.Add(newTS)
             Next
         Catch ex As Exception
