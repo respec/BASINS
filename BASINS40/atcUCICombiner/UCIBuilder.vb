@@ -346,7 +346,7 @@ Public Module UCIBuilder
                             lOper.Tables("PWAT-PARM2").parmvalue("LZSN") = lParmValue(lParmColumn, lParmLine + 1)
                             lOper.Tables("PWAT-PARM2").parmvalue("INFILT") = lParmValue(lParmColumn, lParmLine + 8)
                             lOper.Tables("PWAT-PARM2").parmvalue("LSUR") = lParmValue(lParmColumn, lParmLine + 15)
-                            lOper.Tables("PWAT-PARM2").parmvalue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22)
+                            lOper.Tables("PWAT-PARM2").parmvalue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22) 'should have used lslope here
                             lOper.Tables("PWAT-PARM2").parmvalue("KVARY") = lParmValue(lParmColumn, lParmLine + 29)
                             lOper.Tables("PWAT-PARM2").parmvalue("AGWRC") = lParmValue(lParmColumn, lParmLine + 36)
                             lOper.Tables("PWAT-PARM3").parmvalue("BASETP") = lParmValue(lParmColumn, lParmLine + 43)
@@ -356,7 +356,7 @@ Public Module UCIBuilder
                             lOper.Tables("PWAT-PARM4").parmvalue("IRC") = lParmValue(lParmColumn, lParmLine + 71)
                             lOper.Tables("PWAT-PARM3").parmvalue("DEEPFR") = lParmValue(lParmColumn, lParmLine + 78)
                         Else
-                            lOper.Tables("IWAT-PARM2").parmvalue("LSUR") = lParmValue(lParmColumn, lParmLine + 15)
+                            lOper.Tables("IWAT-PARM2").parmvalue("LSUR") = lParmValue(lParmColumn, lParmLine + 15) 'these should not be the same as perlnds
                             lOper.Tables("IWAT-PARM2").parmvalue("SLSUR") = lParmValue(lParmColumn, lParmLine + 22)
                             lOper.Tables("IWAT-PARM2").parmvalue("NSUR") = lParmValue(lParmColumn, lParmLine + 57)
                         End If
