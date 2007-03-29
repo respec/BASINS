@@ -44,10 +44,12 @@ Friend Class atcListForm
     Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuViewValues As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(atcListForm))
-        Me.MainMenu1 = New System.Windows.Forms.MainMenu
+        Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(atcListForm))
+        Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
@@ -63,6 +65,7 @@ Friend Class atcListForm
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
+        Me.mnuViewValues = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -111,7 +114,7 @@ Friend Class atcListForm
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues})
         Me.mnuView.Text = "View"
         '
         'mnuAttributeRows
@@ -149,6 +152,7 @@ Friend Class atcListForm
         'agdMain
         '
         Me.agdMain.AllowHorizontalScrolling = True
+        Me.agdMain.AllowNewValidValues = False
         Me.agdMain.CellBackColor = System.Drawing.Color.Empty
         Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.agdMain.LineColor = System.Drawing.Color.Empty
@@ -158,6 +162,12 @@ Friend Class atcListForm
         Me.agdMain.Size = New System.Drawing.Size(528, 545)
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
+        '
+        'mnuViewValues
+        '
+        Me.mnuViewValues.Checked = True
+        Me.mnuViewValues.Index = 4
+        Me.mnuViewValues.Text = "Timeseries Values"
         '
         'atcListForm
         '
@@ -181,15 +191,25 @@ Friend Class atcListForm
 
     'Translator class between pDataGroup and agdMain
     Private pSource As atcListGridSource
+    Private pDisplayAttributes As ArrayList
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
     Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
-                 Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
+                 Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing, _
+                 Optional ByVal aDisplayAttributes As ArrayList = Nothing, _
+                 Optional ByVal aShowValues As Boolean = True)
         pDataManager = aDataManager
+
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcDataGroup
         Else
             pDataGroup = aTimeseriesGroup
+        End If
+
+        If aDisplayAttributes Is Nothing Then
+            pDisplayAttributes = pDataManager.DisplayAttributes
+        Else
+            pDisplayAttributes = aDisplayAttributes
         End If
 
         Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
@@ -205,6 +225,7 @@ Friend Class atcListForm
 
         If pDataGroup.Count > 0 Then
             Me.Show()
+            mnuViewValues.Checked = aShowValues
             PopulateGrid()
         Else 'user declined to specify timeseries
             Me.Close()
@@ -214,7 +235,7 @@ Friend Class atcListForm
 
     Private Sub PopulateGrid()
         Dim lTotalWidth As Integer = 10
-        pSource = New atcListGridSource(pDataManager, pDataGroup)
+        pSource = New atcListGridSource(pDataManager, pDataGroup, pDisplayAttributes, mnuViewValues.Checked)
         pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
         pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
         agdMain.Initialize(pSwapperSource)
@@ -301,6 +322,11 @@ Friend Class atcListForm
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click
         agdMain.SizeAllColumnsToContents()
         agdMain.Refresh()
+    End Sub
+
+    Private Sub mnuViewValues_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewValues.Click
+        mnuViewValues.Checked = Not mnuViewValues.Checked
+        PopulateGrid()
     End Sub
 
     'True for attributes in columns, False for attributes in rows

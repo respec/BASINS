@@ -121,33 +121,48 @@ Public Class atcDataSourceWDM
 
             If F90_WDCKDT(lWdmHandle.Unit, lDsn) > 0 Then 'dataset exists, what do we do?
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
-                If aExistAction = ExistReplace Then
-                    'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
-                    Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
-                    Dim lRet As Integer
-                    F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
-                    'Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
-                    If Not lExistTimser Is Nothing Then
-                        DataSets.Remove(lExistTimser)
-                    End If
-                ElseIf aExistAction = ExistAppend Then 'find dataset and try to append to it
-                    'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
-                    Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
-                    If lTimser.numValues > 0 AndAlso _
-                       lExistTimser.numValues > 0 AndAlso _
-                       lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
-                        Throw New Exception("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
-                                            lTimser.ToString & " to existing TSer " & _
-                                            lExistTimser.ToString & vbCrLf & _
-                                            "New TSer start date (" & lTimser.Dates.Value(1) & _
-                                            ") preceeds exising TSer end date (" & _
-                                            lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
-                    End If
-                Else 'use next available number
-                    lDsn = findNextDsn(lDsn)
-                    'Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
-                    aDataSet.Attributes.SetValue("Id", lDsn)
-                End If
+                Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
+                Select Case aExistAction
+                    Case ExistNoAction
+                        'Don't add, take no action
+                        Logger.Dbg("DSN conflict:ExistNoAction:not added")
+                        Return True
+                    Case ExistAskUser
+                        If Logger.Msg("Replace existing dataset '" & lExistTimser.ToString & "'" & vbCrLf & "with new dataset '" & lTimser.ToString & "'", MsgBoxStyle.YesNo, "Dataset Number Conflict") = MsgBoxResult.Yes Then
+                            GoTo CaseExistReplace
+                        ElseIf Logger.Msg("Use next available DSN (" & findNextDsn(lDsn) & ") for new dataset '" & lTimser.ToString & "'", MsgBoxStyle.YesNo, "Dataset Number Conflict") = MsgBoxResult.Yes Then
+                            GoTo CaseExistRenumber
+                        Else
+                            Logger.Dbg("Asked user to resolve DSN conflict, chose not to replace or renumber, not added")
+                            Return False
+                        End If
+                    Case ExistReplace
+CaseExistReplace:
+                        'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistReplace:")
+                        Dim lRet As Integer
+                        F90_WDDSDL(lWdmHandle.Unit, lDsn, lRet)
+                        'Logger.Dbg("atcDataSourceWdm:AddDataset:RemovedOld:" & lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
+                        If Not lExistTimser Is Nothing Then
+                            DataSets.Remove(lExistTimser)
+                        End If
+                    Case ExistAppend  'find dataset and try to append to it
+                        'Logger.Dbg("atcDataSourceWdm:AddDataset:ExistAppend:" & lWdmHandle.Unit & ":" & lDsn)
+                        If lTimser.numValues > 0 AndAlso _
+                           lExistTimser.numValues > 0 AndAlso _
+                           lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
+                            Throw New Exception("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
+                                                lTimser.ToString & " to existing TSer " & _
+                                                lExistTimser.ToString & vbCrLf & _
+                                                "New TSer start date (" & lTimser.Dates.Value(1) & _
+                                                ") preceeds exising TSer end date (" & _
+                                                lExistTimser.Dates.Value(lExistTimser.numValues) & ")")
+                        End If
+                    Case ExistRenumber 'use next available number
+CaseExistRenumber:
+                        lDsn = findNextDsn(lDsn)
+                        'Logger.Dbg("atcDataSourceWdm:AddNew:" & lWdmHandle.Unit & ":" & lDsn)
+                        aDataSet.Attributes.SetValue("Id", lDsn)
+                End Select
             Else
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:NewDataSet:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
             End If
@@ -268,31 +283,11 @@ Public Class atcDataSourceWDM
 
     Public Overrides Function Save(ByVal SaveFileName As String, _
                           Optional ByVal ExistAction As EnumExistAction = EnumExistAction.ExistReplace) As Boolean
-        'Dim i, lFileUnit As Integer
-        'Dim lWdmOpen As Integer
-
-        'TODO: check FileName and SaveFileName, use value of ExistAction
-
-        'If Len(FileName) > 0 Then
-        '  lWdmOpen = F90_WDMOPN(pFileUnit, FileName, Len(FileName))
-        'Else
-        '  lWdmOpen = -1
-        'End If
-
-        'i = 2
-        'lFileUnit = F90_WDBOPN(i, SaveFileName, Len(SaveFileName))
-        'If lFileUnit > 0 Then 'create worked
-        '  If pFileUnit > 0 Then 'copy existing data here
-
-        '    'close current
-        '    i = F90_WDFLCL(pFileUnit)
-        '  End If
-        '  'update
-        '  FileName = AbsolutePath(SaveFileName, CurDir())
-        '  pFileUnit = lFileUnit
-        '  refresh(lFileUnit)
-        '  If lWdmOpen <> 1 Then i = F90_WDMCLO(pFileUnit)
-        'End If
+        If SaveFileName.ToLower.Equals(Me.Specification.ToLower) Then
+            Return True
+        Else
+            Return False
+        End If
     End Function
 
     ''' <summary>

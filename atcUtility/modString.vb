@@ -215,6 +215,8 @@ Public Module modString
             End Select
             'At this point we know string is too long and cannot simply be truncated at or after decimal point
             lString = Format(lValue, aExpFormat)
+            'A trailing e might be correct if there is no exponent, but it is ugly so we trim it off
+            If lString.EndsWith("e") Then lString = lString.Substring(0, lString.Length - 1)
             If lString.Length <= aMaxWidth Then
                 Return lString
             Else

@@ -43,6 +43,8 @@ Public Class atcDataManager
 
         pDisplayAttributes = New ArrayList
         pDisplayAttributes.Add("History 1")
+        pDisplayAttributes.Add("Constituent")
+        pDisplayAttributes.Add("Id")
         pDisplayAttributes.Add("Min")
         pDisplayAttributes.Add("Max")
         pDisplayAttributes.Add("Mean")

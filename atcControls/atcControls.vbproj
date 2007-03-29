@@ -123,6 +123,7 @@
     </Compile>
     <EmbeddedResource Include="atcGrid.resx">
       <DependentUpon>atcGrid.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="atcSelectList.resx">
       <DependentUpon>atcSelectList.vb</DependentUpon>
@@ -130,6 +131,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="atcText.resx">
       <DependentUpon>atcText.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

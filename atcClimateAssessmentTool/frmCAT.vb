@@ -794,7 +794,7 @@ Public Class frmCAT
             Next
         Else
             lSelectedPreparedInputs = New atcCollection
-            For Each lInputIndex As Integer In lstInputs.SelectedIndices
+            For Each lInputIndex As Integer In lstInputs.CheckedIndices
                 lSelectedPreparedInputs.Add(pPreparedInputs.ItemByIndex(lInputIndex))
             Next
         End If
@@ -1417,23 +1417,25 @@ NextIteration:
     End Sub
 
     Private Sub btnInputModify_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputModify.Click
-        Dim lIndex As Integer = lstInputs.SelectedIndex
-        If lIndex >= 0 And lIndex < pInputs.Count Then
-            pUnsaved = True
-            Dim lVariation As atcVariation = pInputs.ItemByIndex(lIndex)
-            If lVariation.GetType.Name.EndsWith("Cligen") Then
-                Dim frmVaryCligen As New frmVariationCligen
-                lVariation = frmVaryCligen.AskUser(lVariation)
+        If pPreparedInputs Is Nothing Then
+            Dim lIndex As Integer = lstInputs.SelectedIndex
+            If lIndex >= 0 And lIndex < pInputs.Count Then
+                pUnsaved = True
+                Dim lVariation As atcVariation = pInputs.ItemByIndex(lIndex)
+                If lVariation.GetType.Name.EndsWith("Cligen") Then
+                    Dim frmVaryCligen As New frmVariationCligen
+                    lVariation = frmVaryCligen.AskUser(lVariation)
+                Else
+                    Dim frmVary As New frmVariation
+                    frmVary.AskUser(lVariation)
+                End If
+                RefreshInputList()
+                RefreshEndpointList()
+            ElseIf lstInputs.Items.Count = 0 Then 'Don't have any inputs to edit, add one
+                btnInputAdd_Click(sender, e)
             Else
-                Dim frmVary As New frmVariation
-                frmVary.AskUser(lVariation)
+                MsgBox("An input must be selected to edit", MsgBoxStyle.Critical, "No Input Selected")
             End If
-            RefreshInputList()
-            RefreshEndpointList()
-        ElseIf lstInputs.Items.Count = 0 Then 'Don't have any inputs to edit, add one
-            btnInputAdd_Click(sender, e)
-        Else
-            MsgBox("An input must be selected to edit", MsgBoxStyle.Critical, "No Input Selected")
         End If
     End Sub
 
@@ -1463,10 +1465,28 @@ NextIteration:
     Private Sub btnInputRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnInputRemove.Click
         If lstInputs.SelectedIndices.Count > 0 Then
             pUnsaved = True
-            For Each lIndex As Integer In lstInputs.SelectedIndices
-                pInputs.RemoveAt(lIndex)
-                RefreshInputList()
+            Dim lKeepThese As New atcCollection
+            Dim lRemoveFrom As atcCollection
+
+            If pPreparedInputs Is Nothing Then
+                lRemoveFrom = pInputs
+            Else
+                lRemoveFrom = pPreparedInputs
+            End If
+
+            For lIndex As Integer = 0 To lstInputs.Items.Count - 1
+                If Not lstInputs.SelectedIndices.Contains(lIndex) Then
+                    lKeepThese.Add(lRemoveFrom.ItemByIndex(lIndex))
+                End If
             Next
+
+            If pPreparedInputs Is Nothing Then
+                pInputs = lKeepThese
+            Else
+                pPreparedInputs = lKeepThese
+            End If
+
+            RefreshInputList()
             RefreshTotalIterations()
         Else
             MsgBox("An input must be selected to remove it", MsgBoxStyle.Critical, "No Inputs Selected")
@@ -1614,7 +1634,7 @@ NextIteration:
         Else
             lstInputs.Items.Clear()
             lstInputs.Items.AddRange(pPreparedInputs.ToArray)
-            If lstInputs.SelectedIndices.Count = 0 Then 'Select all if none are selected
+            If lstInputs.CheckedIndices.Count = 0 Then 'Select all if none are selected
                 For lIndex As Integer = 0 To lstInputs.Items.Count - 1
                     lstInputs.SetItemChecked(lIndex, True)
                 Next
@@ -1703,7 +1723,7 @@ NextIteration:
             Else
                 lXML &= "<PreparedInputs>"
                 For Each lPreparedInput As String In pPreparedInputs
-                    lXML &= "<PreparedInput selected=""" & lstInputs.SelectedItems.Contains(lPreparedInput)
+                    lXML &= "<PreparedInput selected=""" & lstInputs.CheckedItems.Contains(lPreparedInput)
                     lXML &= """>" & lPreparedInput & "</PreparedInput>" & vbCrLf
                 Next
                 lXML &= "</PreparedInputs>"

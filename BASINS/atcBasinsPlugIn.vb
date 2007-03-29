@@ -282,8 +282,7 @@ Public Class atcBasinsPlugIn
                     If Not lNewSource Is Nothing Then
                         If pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
                             If lNewSource.DataSets.Count > 0 Then
-                                Dim lTitle As String = "Computed " & lNewSource.DataSets.Count & " Dataset"
-                                If lNewSource.DataSets.Count > 1 Then lTitle &= "s"
+                                Dim lTitle As String = lNewSource.ToString
                                 pDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
                             End If
                         End If

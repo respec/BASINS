@@ -63,6 +63,7 @@ Public Class frmSpecifyFrequency
         Me.btnRecurrenceAll = New System.Windows.Forms.Button
         Me.Splitter1 = New System.Windows.Forms.Splitter
         Me.grpNday = New System.Windows.Forms.GroupBox
+        Me.chkKeepNDayTSers = New System.Windows.Forms.CheckBox
         Me.btnNdayAdd = New System.Windows.Forms.Button
         Me.txtNdayAdd = New System.Windows.Forms.TextBox
         Me.btnNdayNone = New System.Windows.Forms.Button
@@ -72,7 +73,6 @@ Public Class frmSpecifyFrequency
         Me.btnOkHigh = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
         Me.btnOkLow = New System.Windows.Forms.Button
-        Me.chkKeepNDayTSers = New System.Windows.Forms.CheckBox
         Me.panelTop.SuspendLayout()
         Me.grpRecurrence.SuspendLayout()
         Me.grpNday.SuspendLayout()
@@ -118,6 +118,7 @@ Public Class frmSpecifyFrequency
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lstRecurrence.Size = New System.Drawing.Size(191, 315)
         Me.lstRecurrence.TabIndex = 8
+        Me.lstRecurrence.Tag = "Return Period"
         '
         'btnRecurrenceAdd
         '
@@ -179,6 +180,17 @@ Public Class frmSpecifyFrequency
         Me.grpNday.TabStop = False
         Me.grpNday.Text = "Number of Days"
         '
+        'chkKeepNDayTSers
+        '
+        Me.chkKeepNDayTSers.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkKeepNDayTSers.AutoSize = True
+        Me.chkKeepNDayTSers.Location = New System.Drawing.Point(12, 380)
+        Me.chkKeepNDayTSers.Name = "chkKeepNDayTSers"
+        Me.chkKeepNDayTSers.Size = New System.Drawing.Size(134, 17)
+        Me.chkKeepNDayTSers.TabIndex = 7
+        Me.chkKeepNDayTSers.Text = "Keep NDay Timeseries"
+        Me.chkKeepNDayTSers.UseVisualStyleBackColor = True
+        '
         'btnNdayAdd
         '
         Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -226,6 +238,7 @@ Public Class frmSpecifyFrequency
         Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lstNday.Size = New System.Drawing.Size(182, 299)
         Me.lstNday.TabIndex = 2
+        Me.lstNday.Tag = "NDay"
         '
         'panelBottom
         '
@@ -265,17 +278,6 @@ Public Class frmSpecifyFrequency
         Me.btnOkLow.Size = New System.Drawing.Size(96, 24)
         Me.btnOkLow.TabIndex = 14
         Me.btnOkLow.Text = "Compute Low"
-        '
-        'chkKeepNDayTSers
-        '
-        Me.chkKeepNDayTSers.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkKeepNDayTSers.AutoSize = True
-        Me.chkKeepNDayTSers.Location = New System.Drawing.Point(12, 380)
-        Me.chkKeepNDayTSers.Name = "chkKeepNDayTSers"
-        Me.chkKeepNDayTSers.Size = New System.Drawing.Size(134, 17)
-        Me.chkKeepNDayTSers.TabIndex = 7
-        Me.chkKeepNDayTSers.Text = "Keep NDay Timeseries"
-        Me.chkKeepNDayTSers.UseVisualStyleBackColor = True
         '
         'frmSpecifyFrequency
         '
@@ -318,28 +320,43 @@ Public Class frmSpecifyFrequency
 
     Private Sub Clear()
         pOk = False
-        lstRecurrence.Items.Clear()
-        lstNday.Items.Clear()
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
-        Dim lDefault As Object
 
-        lDefault = lNDayHi.Arguments.GetDefinedValue("NDay").Definition.DefaultValue
+        LoadList(lstNday, lNDayHi.Arguments)
+        LoadList(lstRecurrence, lNDayHi.Arguments)
+    End Sub
+
+    Private Sub LoadList(ByVal lst As Windows.Forms.ListBox, ByVal aArgs As atcDataAttributes)
+        Dim lArgName As String = lst.Tag
+        Dim lSelectedArray As String(,) = GetAllSettings("atcFrequencyGrid", lArgName)
+        Dim lSelected As New ArrayList
+        Dim lDefault As Object = aArgs.GetDefinedValue(lArgName).Definition.DefaultValue
+        lst.Items.Clear()
         If Not lDefault Is Nothing AndAlso IsArray(lDefault) Then
-            For Each lNday As Double In lDefault
-                lstNday.Items.Add(lNday)
-                'lstNday.SetSelected(lstNday.Items.Count - 1, True)
+            Try
+                For lIndex As Integer = lSelectedArray.GetUpperBound(1) To 0 Step -1
+                    lSelected.Add(lSelectedArray(lIndex, 1))
+                Next
+            Catch e As Exception
+                MapWinUtility.Logger.Dbg("Error retrieving saved settings: " & e.Message)
+            End Try
+
+            For Each lNumber As Double In lDefault
+                Dim lLabel As String = Format(lNumber, "0.####")
+                lst.Items.Add(lLabel)
+                If lSelected.Contains(lLabel) Then
+                    lst.SetSelected(lst.Items.Count - 1, True)
+                End If
             Next
         End If
+    End Sub
 
-        lDefault = lNDayHi.Arguments.GetDefinedValue("Return Period").Definition.DefaultValue
-        If Not lDefault Is Nothing AndAlso IsArray(lDefault) Then
-            For Each lNyear As Double In lDefault
-                lstRecurrence.Items.Add(Format(lNyear, "0.####"))
-                'lstRecurrence.SetSelected(lstRecurrence.Items.Count - 1, True)
-            Next
-        End If
-
+    Private Sub SaveList(ByVal aArgName As String, ByVal lst As Windows.Forms.ListBox)
+        DeleteSetting("atcFrequencyGrid", aArgName)
+        For Each lItem As String In lst.SelectedItems
+            SaveSetting("atcFrequencyGrid", aArgName, lItem, lItem)
+        Next
     End Sub
 
     Private Sub ClearAttributes()
@@ -361,17 +378,17 @@ Public Class frmSpecifyFrequency
 
     Private Sub Calculate(ByVal aOperationName As String)
         ClearAttributes()
-        Debug.WriteLine("Cleared,    " & pDataGroup.Item(0).ToString & " has " & pDataGroup.Item(0).Attributes.Count & " attributes")
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lArgs As New atcDataAttributes
         lArgs.SetValue("Timeseries", pDataGroup)
         lArgs.SetValue("NDay", ListToArray(lstNday))
         lArgs.SetValue("Return Period", ListToArray(lstRecurrence))
         lCalculator.Open(aOperationName, lArgs)
-        Debug.WriteLine("Calculated, " & pDataGroup.Item(0).ToString & " has " & pDataGroup.Item(0).Attributes.Count & " attributes")
         If chkKeepNDayTSers.Checked Then 'add NDay Tsers to data manager
             pDataManager.DataSources.Add(lCalculator)
         End If
+        SaveList("NDay", lstNday)
+        SaveList("Return Period", lstRecurrence)
     End Sub
 
     'Return all selected items, or if none are selected then all items
