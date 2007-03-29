@@ -183,7 +183,7 @@ Public Class frmSelectDisplay
         Me.btnSelect.Name = "btnSelect"
         Me.btnSelect.Size = New System.Drawing.Size(197, 23)
         Me.btnSelect.TabIndex = 5
-        Me.btnSelect.Text = "Add/Remove Data"
+        Me.btnSelect.Text = "Add/Remove Datasets"
         Me.btnSelect.UseVisualStyleBackColor = True
         '
         'frmSelectDisplay
@@ -219,69 +219,19 @@ Public Class frmSelectDisplay
         'iArg -= 1
         'If iArg >= 0 Then
         '    Me.Height = pArgButton(iArg).Top + pArgButton(iArg).Height + pPADDING + (Me.Height - Me.ClientRectangle.Height)
-        Me.ShowDialog()
+        Me.Show() 'Dialog()
         'Else
         '    Me.Close()
         'End If
     End Sub
 
     Private Sub FormFromGroup()
-        If pDataGroup.Count = 1 Then
-            lblDescribeDatasets.Text = pDataGroup.Count & " dataset created"
-        Else
-            lblDescribeDatasets.Text = pDataGroup.Count & " datasets created"
-        End If
-        'Dim lButtonWidth As Integer = Me.ClientRectangle.Width - pPADDING * 2
-        'Dim iArg As Integer = 0
-
-        'Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-        'For Each lDisp As atcDataDisplay In DisplayPlugins
-
-        '    ReDim Preserve pArgButton(iArg)
-        '    pArgButton(iArg) = New Windows.Forms.Button
-        '    With pArgButton(iArg)
-        '        If iArg = 0 Then
-        '            .Top = pPADDING
-        '        Else
-        '            .Top = pArgButton(iArg - 1).Top + pArgButton(iArg - 1).Height + pPADDING
-        '        End If
-        '        .Width = lButtonWidth
-        '        .Left = pPADDING
-
-        '        .Tag = lDisp.Name
-        '        Dim iColon As Integer = lDisp.Name.IndexOf("::")
-        '        If iColon > 0 Then
-        '            .Text = lDisp.Name.Substring(iColon + 2)
-        '        Else
-        '            .Text = lDisp.Name
-        '        End If
-        '        .Anchor = Windows.Forms.AnchorStyles.Right Or Windows.Forms.AnchorStyles.Left Or Windows.Forms.AnchorStyles.Top
-
-        '        AddHandler pArgButton(iArg).Click, AddressOf ArgButton_Click
-        '    End With
-        '    Controls.Add(pArgButton(iArg))
-        '    iArg += 1
-        'Next
+        lblDescribeDatasets.Text = pDataGroup.Count & " dataset"
+        If pDataGroup.Count <> 1 Then lblDescribeDatasets.Text &= "s"
     End Sub
-
-    'Private Sub ArgButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-    '    Dim newDisplay As atcDataDisplay
-    '    Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
-    '    For Each atf As atcDataDisplay In DisplayPlugins
-    '        If atf.Name = sender.Tag Then
-    '            Dim typ As System.Type = atf.GetType()
-    '            Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-    '            newDisplay = asm.CreateInstance(typ.FullName)
-    '            newDisplay.Show(pDataManager, pDataGroup)
-    '            Me.Close()
-    '            Exit Sub
-    '        End If
-    '    Next
-    'End Sub
 
     Private Sub btn_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnList.Click, btnGraph.Click, btnTree.Click, btnSeasonal.Click, btnFrequency.Click
         pDataManager.ShowDisplay(sender.tag, pDataGroup)
-        Me.Close()
     End Sub
 
     Private Sub btnDiscard_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDiscard.Click
@@ -301,27 +251,36 @@ Public Class frmSelectDisplay
     End Sub
 
     Private Sub btnSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnSave.Click
-        Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
-        If Not lSaveIn Is Nothing And lSaveIn.Specification.Length > 0 Then
-            For Each lDataSet As atcDataSet In pDataGroup
-
-                'TODO: allow user to select renumber or assign new number for DSN in WDM
-                'If lSaveIn.DataSets.Keys.Contains(lDataSet.Attributes.GetValue("ID")) Then
-                'End If
-
-                lSaveIn.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
-            Next
-            If lSaveIn.Save(lSaveIn.Specification) Then
-                Logger.Msg("Saved " & pDataGroup.Count & " datasets in " & vbCrLf & lSaveIn.ToString, "Saved Data")
-            Else
-                Logger.Msg("Could not save in " & lSaveIn.ToString, "Could Not Save")
-            End If
-        End If
-            Me.Close()
+        'If SaveData() Then Me.Close()
+        SaveData()
     End Sub
 
+    Private Function SaveData() As Boolean
+        Dim lSave As New frmSaveData
+        Dim lSaveSource As atcDataSource = lSave.AskUser(pDataManager, pDataGroup)
+        '    Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
+        If Not lSaveSource Is Nothing AndAlso lSaveSource.Specification.Length > 0 Then
+            For Each lDataSet As atcDataSet In pDataGroup
+                lSaveSource.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+            Next
+            If lSaveSource.Save(lSaveSource.Specification) Then
+                Dim lMsg As String = "Saved " & pDataGroup.Count & " dataset"
+                If pDataGroup.Count <> 1 Then lMsg &= "s"
+                lMsg &= " in " & vbCrLf & lSaveSource.Specification & vbCrLf & "(file now contains " & lSaveSource.DataSets.Count & " dataset"
+                If lSaveSource.DataSets.Count <> 1 Then lMsg &= "s"
+                Logger.Msg(lMsg & ")", "Saved Data")
+                Return True
+            Else
+                Logger.Msg("Could not save in " & lSaveSource.Specification, "Could Not Save")
+                Return False
+            End If
+        End If
+        '    End If
+        '    Me.Close()
+    End Function
+
     Private Function UserOpenDataFile(Optional ByVal aNeedToOpen As Boolean = True, _
-                                  Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
+                                      Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
         Dim lFilesOnly As New ArrayList(1)
         lFilesOnly.Add("File")
         Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)

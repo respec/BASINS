@@ -388,7 +388,7 @@ Public Class atcGrid
                 Dim lEachCellBackBrush As New SolidBrush(lEachCellBackColor)
                 Dim lEachCellTextBrush As New SolidBrush(SystemColors.WindowText)
 
-                Dim lColorCells As Boolean = pSource.ColorCells
+                'Dim lColorCells As Boolean = pSource.ColorCells
 
                 Dim lCellValue As String
                 Dim lCellAlignment As Integer
@@ -514,12 +514,12 @@ Public Class atcGrid
                             If pSource.CellSelected(lRow, lColumn) Then
                                 lEachCellBackColor = SystemColors.Highlight
                                 lEachCellTextBrush.Color = SystemColors.HighlightText
-                            ElseIf lColorCells Then
+                            Else 'If lColorCells Then
                                 lEachCellBackColor = pSource.CellColor(lRow, lColumn)
                                 lEachCellTextBrush.Color = SystemColors.WindowText
-                            Else
-                                lEachCellBackColor = pCellBackColor
-                                lEachCellTextBrush.Color = SystemColors.WindowText
+                                'Else
+                                '    lEachCellBackColor = pCellBackColor
+                                '    lEachCellTextBrush.Color = SystemColors.WindowText
                             End If
                             If Not lEachCellBackColor.Equals(pCellBackColor) Then
                                 lEachCellBackBrush.Color = lEachCellBackColor

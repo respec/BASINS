@@ -150,10 +150,11 @@ Friend Class frmDataSource
         Populate(aNeedToOpen, aNeedToSave)
         If treeSources.Nodes.Count = 1 AndAlso treeSources.Nodes(0).Nodes.Count = 1 Then
             treeSources.SelectedNode = treeSources.Nodes(0).Nodes(0)
-            '  btnOk_Click(Nothing, Nothing)
-            'Else
+            GetSource(treeSources.SelectedNode.Tag, treeSources.SelectedNode.Text)
+        Else
+            Me.ShowDialog() 'Block until form closes
         End If
-        Me.ShowDialog() 'Block until form closes
+
         aSelectedSource = pSelectedSource
         If Not aSelectedSource Is Nothing Then
             aSelectedSource.Specification = pSpecification
@@ -291,26 +292,30 @@ Friend Class frmDataSource
     End Sub
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
-        Dim lSourceName As String = treeSources.SelectedNode.Tag
-        Dim lOperationName As String = treeSources.SelectedNode.Text
+        If GetSource(treeSources.SelectedNode.Tag, treeSources.SelectedNode.Text) Then
+            Me.Close()
+        End If
+    End Sub
+
+    Private Function GetSource(ByVal aSourceName As String, ByVal aOperationName As String) As Boolean
         For Each ds As atcDataSource In pDataManager.GetPlugins(GetType(atcDataSource))
-            If ds.Name = lSourceName Then
+            If ds.Name = aSourceName Then
                 Dim lOperations As atcDataAttributes = ds.AvailableOperations
                 If lOperations.Count > 0 Then
                     For Each lOperation As atcDefinedValue In lOperations
-                        If lOperation.Definition.Name = lOperationName Then
+                        If lOperation.Definition.Name = aOperationName Then
                             pSelectedSource = ds.NewOne
-                            pSpecification = lOperationName
-                            Me.Close()
+                            pSpecification = aOperationName
+                            Return True
                         End If
                     Next
-                ElseIf ds.Description = lOperationName Then
+                ElseIf ds.Description = aOperationName Then
                     pSelectedSource = ds.NewOne
-                    Me.Close()
+                    Return True
                 End If
             End If
         Next
-    End Sub
+    End Function
 
     Private Sub treeSources_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles treeSources.DoubleClick
         btnOk_Click(sender, e)

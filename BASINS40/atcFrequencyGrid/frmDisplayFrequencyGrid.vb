@@ -32,13 +32,12 @@ Friend Class frmDisplayFrequencyGrid
             pDataManager.UserSelectData(, pDataGroup, True)
         End If
 
-        pInitializing = False
-        If pDataGroup.Count > 0 Then
+        If pDataGroup.Count > 0 AndAlso UserSpecifyAttributes() Then
+            pInitializing = False
             PopulateGrid()
         Else 'user declined to specify Data
             Me.Close()
         End If
-        'agdMain.AllowHorizontalScrolling = False
     End Sub
 
     'Form overrides dispose to clean up the component list.
@@ -234,34 +233,36 @@ Friend Class frmDisplayFrequencyGrid
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
     Private Sub PopulateGrid()
-        Dim lContinue As Boolean = True
-        pSource = New atcFrequencyGridSource(pDataGroup)
-        If pSource.Columns < 3 Then
-            lContinue = UserSpecifyAttributes()
+        If Not pInitializing Then
+            Dim lContinue As Boolean = True
+            pSource = New atcFrequencyGridSource(pDataGroup)
+            'If pSource.Columns < 3 Then
+            '    lContinue = UserSpecifyAttributes()
+            '    If lContinue Then
+            '        pSource = New atcFrequencyGridSource(pDataGroup)
+            '    End If
+            'End If
+
             If lContinue Then
-                pSource = New atcFrequencyGridSource(pDataGroup)
+                pSource.High = mnuViewHigh.Checked
+
+                pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
+                pSwapperSource.SwapRowsColumns = mnuViewRows.Checked
+
+                agdMain.Initialize(pSwapperSource)
+                agdMain.SizeAllColumnsToContents()
+
+                Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSource.Rows * agdMain.RowHeight(0)
+                Dim lRequestedWidth As Single = Me.Width - agdMain.Left - agdMain.Width
+                For lColumn As Integer = 0 To pSource.Columns - 1
+                    lRequestedWidth += agdMain.ColumnWidth(lColumn)
+                Next
+                Me.Height = lRequestedHeight
+                Me.Width = lRequestedWidth
+                agdMain.Refresh()
+            Else 'user cancelled Frequency Grid specs form
+                Me.Close()
             End If
-        End If
-
-        If lContinue Then
-            pSource.High = mnuViewHigh.Checked
-
-            pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
-            pSwapperSource.SwapRowsColumns = mnuViewRows.Checked
-
-            agdMain.Initialize(pSwapperSource)
-            agdMain.SizeAllColumnsToContents()
-
-            Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSource.Rows * agdMain.RowHeight(0)
-            Dim lRequestedWidth As Single = Me.Width - agdMain.Left - agdMain.Width
-            For lColumn As Integer = 0 To pSource.Columns - 1
-                lRequestedWidth += agdMain.ColumnWidth(lColumn)
-            Next
-            Me.Height = lRequestedHeight
-            Me.Width = lRequestedWidth
-            agdMain.Refresh()
-        Else 'user cancelled Frequency Grid specs form
-            Me.Close()
         End If
     End Sub
 
@@ -290,16 +291,19 @@ Friend Class frmDisplayFrequencyGrid
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataManager.UserSelectData(, pDataGroup, False)
+        pInitializing = True
+        pDataGroup = pDataManager.UserSelectData(, pDataGroup, False)
+        pInitializing = False
+        PopulateGrid()
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
-        If Not pInitializing Then PopulateGrid()
+        PopulateGrid()
         'TODO: could efficiently insert newly added item(s)
     End Sub
 
     Private Sub pDataGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
-        If Not pInitializing Then PopulateGrid()
+        PopulateGrid()
         'TODO: could efficiently remove by serial number
     End Sub
 

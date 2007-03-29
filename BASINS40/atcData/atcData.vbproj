@@ -147,6 +147,12 @@
     <Compile Include="frmManager.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmSaveData.Designer.vb">
+      <DependentUpon>frmSaveData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSaveData.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmSelectData.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -164,6 +170,10 @@
     <EmbeddedResource Include="frmManager.resx">
       <DependentUpon>frmManager.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSaveData.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmSaveData.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectData.resx">
       <DependentUpon>frmSelectData.vb</DependentUpon>

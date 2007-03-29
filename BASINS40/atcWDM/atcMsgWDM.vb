@@ -59,7 +59,7 @@ Friend Class atcMsgWDM
                     lAttr.Name = lName
                     lAttr.ID = lIndex
                     lAttr.Description = lDesc
-                    lAttr.ValidList = New ArrayList(lValid.Split(Chr(44))) ' 44=comma
+                    lAttr.ValidList = New ArrayList(lValid.Split(","c))
                     If InStr("-TGROUP-TSFORM-VBTIME-COMPFG-TSFILL-TSBYR-TSBMO-TSBDY-TSBHR-TSPREC-TSSTEP-TCODE-Time Units-Time Step-", "-" & lName & "-") > 0 Then
                         lAttr.Editable = False
                     Else

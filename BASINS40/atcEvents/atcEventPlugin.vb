@@ -127,7 +127,7 @@ Public Class atcEventPlugin
     'End Sub
 
     Public Overrides Function ToString() As String
-        Return Name.Substring(23) 'Skip first part of Name which is "Timeseries::Seasonal - "
+        Return "Event"
     End Function
 
     Public Overloads ReadOnly Property AvailableOperations(ByVal aIncludeSplits As Boolean, _

@@ -8,26 +8,36 @@ Friend Class atcListGridSource
     Private WithEvents pDataGroup As atcDataGroup
     Private pAllDates As atcTimeseries
     Private pDateFormat As New atcDateFormat
+    Private pDisplayAttributes As ArrayList
+    Private pDisplayValues As Boolean
 
     Private Sub RefreshAllDates()
         Try
-            Select Case pDataGroup.Count
-                Case 1
-                    Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(0)
-                    lTS.EnsureValuesRead()
-                    pAllDates = lTS.Dates
-                Case Is > 1 : pAllDates = MergeTimeseries(pDataGroup).Dates
-                Case Else : pAllDates = New atcTimeseries(Nothing)
-            End Select
+            If pDisplayValues Then
+                Select Case pDataGroup.Count
+                    Case 1
+                        Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(0)
+                        lTS.EnsureValuesRead()
+                        pAllDates = lTS.Dates
+                    Case Is > 1 : pAllDates = MergeTimeseries(pDataGroup).Dates
+                    Case Else : pAllDates = New atcTimeseries(Nothing)
+                End Select
+            Else
+                pAllDates = Nothing
+            End If
         Catch
             pAllDates = Nothing
         End Try
     End Sub
 
     Sub New(ByVal aDataManager As atcData.atcDataManager, _
-            ByVal aDataGroup As atcData.atcDataGroup)
+            ByVal aDataGroup As atcData.atcDataGroup, _
+            ByVal aDisplayAttributes As ArrayList, _
+            ByVal aDisplayValues As Boolean)
         pDataManager = aDataManager
         pDataGroup = aDataGroup
+        pDisplayAttributes = aDisplayAttributes
+        pDisplayValues = aDisplayValues
         RefreshAllDates()
     End Sub
 
@@ -42,29 +52,73 @@ Friend Class atcListGridSource
     Overrides Property Rows() As Integer
         Get
             If pAllDates Is Nothing Then
-                Return pDataManager.DisplayAttributes.Count
+                Return pDisplayAttributes.Count
             Else
-                Return pDataManager.DisplayAttributes.Count + pAllDates.numValues
+                Return pDisplayAttributes.Count + pAllDates.numValues
             End If
         End Get
         Set(ByVal Value As Integer)
         End Set
     End Property
 
+    Public Overrides Property CellColor(ByVal aRow As Integer, ByVal aColumn As Integer) As System.Drawing.Color
+        Get
+            If CellEditable(aRow, aColumn) Then
+                Return System.Drawing.SystemColors.Window
+            Else
+                Return System.Drawing.Color.WhiteSmoke
+            End If
+            Return MyBase.CellColor(aRow, aColumn)
+        End Get
+        Set(ByVal value As System.Drawing.Color)
+            'MyBase.CellColor(aRow, aColumn) = value
+        End Set
+    End Property
+
+    Public Overrides Property CellEditable(ByVal aRow As Integer, ByVal aColumn As Integer) As Boolean
+        Get
+            Dim lAttributeRows As Integer = pDisplayAttributes.Count
+            Select Case aColumn
+                Case 0 'First column contains attribute name or date
+                    Return False                    
+                Case Is <= pDataGroup.Count
+                    If aRow < lAttributeRows Then
+                        Dim lDefinedValue As atcDefinedValue = pDataGroup(aColumn - 1).Attributes.GetDefinedValue(pDisplayAttributes(aRow))
+                        If Not lDefinedValue Is Nothing AndAlso lDefinedValue.Definition.Editable Then
+                            Select Case lDefinedValue.Definition.TypeString
+                                Case "String", "Double", "Single", "Integer" : Return True
+                            End Select
+                        End If
+                        Return False
+                    ElseIf Not pAllDates Is Nothing Then
+                        Return (CellValue(aRow, aColumn).Length > 0)
+                    Else
+                        Return False
+                    End If
+                Case Else 'Column out of range
+                        Return False
+            End Select
+        End Get
+        Set(ByVal value As Boolean)
+        End Set
+    End Property
+
     Overrides Property CellValue(ByVal aRow As Integer, ByVal aColumn As Integer) As String
         Get
-            Dim lAttributeRows As Integer = pDataManager.DisplayAttributes.Count
+            Dim lAttributeRows As Integer = pDisplayAttributes.Count
             Select Case aColumn
                 Case 0 'First column contains attribute name or date
                     If aRow < lAttributeRows Then
-                        Return pDataManager.DisplayAttributes(aRow)
-                    Else
+                        Return pDisplayAttributes(aRow)
+                    ElseIf Not pAllDates Is Nothing Then
                         Return pDateFormat.JDateToString(pAllDates.Value(aRow - lAttributeRows + 1))
+                    Else
+                        Return ""
                     End If
                 Case Is <= pDataGroup.Count
                     If aRow < lAttributeRows Then
-                        Return pDataGroup(aColumn - 1).Attributes.GetFormattedValue(pDataManager.DisplayAttributes(aRow))
-                    Else
+                        Return pDataGroup(aColumn - 1).Attributes.GetFormattedValue(pDisplayAttributes(aRow))
+                    ElseIf Not pAllDates Is Nothing Then
                         Try
                             Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(aColumn - 1)
                             Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
@@ -73,7 +127,7 @@ Friend Class atcListGridSource
                             If lIndex < 0 Then 'Did not find this exact date in this TS
                                 lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
                                 'Test two values closest to lDateDisplayed to see if either is within a millisecond
-                                If lIndex <= pAllDates.numValues AndAlso Math.Abs(lTS.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                If lIndex <= lTS.numValues AndAlso Math.Abs(lTS.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
                                     Return DoubleToString(lTS.Value(lIndex))
                                 ElseIf lIndex > 0 AndAlso Math.Abs(lTS.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
                                     Return DoubleToString(lTS.Value(lIndex - 1))
@@ -86,12 +140,55 @@ Friend Class atcListGridSource
                         Catch 'was not a Timeseries or could not get a value
                             Return ""
                         End Try
+                    Else
+                        Return ""
                     End If
                 Case Else 'Column out of range
                     Return ""
             End Select
         End Get
-        Set(ByVal Value As String)
+        Set(ByVal newValue As String)
+            Dim lAttributeRows As Integer = pDisplayAttributes.Count
+            Select Case aColumn
+                Case 0 'First column contains attribute name or date
+                Case Is <= pDataGroup.Count
+                    If aRow < lAttributeRows Then
+                        Dim lDefinedValue As atcDefinedValue = pDataGroup(aColumn - 1).Attributes.GetDefinedValue(pDisplayAttributes(aRow))
+                        Select Case lDefinedValue.Definition.TypeString
+                            Case "String" : lDefinedValue.Value = newValue
+                            Case "Double" : lDefinedValue.Value = Double.Parse(newValue)
+                            Case "Single" : lDefinedValue.Value = Single.Parse(newValue)
+                            Case "Integer" : lDefinedValue.Value = Integer.Parse(newValue)
+                            Case Else
+                                MapWinUtility.Logger.Msg("Cannot yet edit values of type '" & lDefinedValue.Definition.TypeString & "'")
+                        End Select
+                    ElseIf Not pAllDates Is Nothing Then
+                        'Try
+                        Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(aColumn - 1)
+                        Dim lDateDisplayed As Double = pAllDates.Value(aRow - lAttributeRows + 1)
+                        Dim lIndex As Integer = Array.BinarySearch(lTS.Dates.Values, lDateDisplayed)
+
+                        If lIndex < 0 Then 'Did not find this exact date in this TS
+                            lIndex = Not (lIndex) 'BinarySearch returned not(index of next greater value)
+                            'Test two values closest to lDateDisplayed to see if either is within a millisecond
+                            If lIndex <= lTS.numValues AndAlso Math.Abs(lTS.Dates.Value(lIndex) - lDateDisplayed) < JulianMillisecond Then
+                                lTS.Value(lIndex) = CDbl(newValue)
+                            ElseIf lIndex > 0 AndAlso Math.Abs(lTS.Dates.Value(lIndex - 1) - lDateDisplayed) < JulianMillisecond Then
+                                lTS.Value(lIndex - 1) = CDbl(newValue)
+                            Else
+                                'TODO: exception?
+                            End If
+                        Else
+                            lTS.Value(lIndex) = CDbl(newValue)
+                        End If
+                        'Catch 'was not a Timeseries or could not get a value
+                        'End Try
+                    Else
+                        'TODO: exception?
+                    End If
+                Case Else 'Column out of range
+                    'TODO: exception?
+            End Select
         End Set
     End Property
 
