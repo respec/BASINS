@@ -287,44 +287,49 @@ Public Class atcTimeseriesNdayHighLow
                         lSlope = Double.NaN
                     End Try
 
-                    Dim lS As String
-                    If aHigh Then
-                        lS = lNday & "Hi"
-                    Else
-                        lS = lNday & "Low"
-                    End If
-                    Dim lNewAttribute As New atcAttributeDefinition
-                    With lNewAttribute
-                        .Name = lS & "KenTau"
-                        .Description = lS & " Kendall Tau "
-                        .DefaultValue = ""
-                        .Editable = False
-                        .TypeString = "Double"
-                        .Calculator = Me
-                        .Category = "nDay & Frequency"
-                    End With
-                    Dim lKenTauValue As atcAttributeDefinition = lNewAttribute.Clone
-                    lKenTauValue.Description = lKenTauValue.Description & "Value"
-                    lKenTauValue.Name = lKenTauValue.Name & "Value"
-
-                    Dim lKenTauProbLevel As atcAttributeDefinition = lNewAttribute.Clone
-                    lKenTauProbLevel.Name = lKenTauProbLevel.Name & "ProbLevel"
-                    lKenTauProbLevel.Description = lKenTauProbLevel.Description & "Probability Level"
-
-                    Dim lKenTauSlope As atcAttributeDefinition = lNewAttribute.Clone
-                    lKenTauSlope.Name = lKenTauSlope.Name & "Slope"
-                    lKenTauSlope.Description = lKenTauSlope.Description & "Slope"
-
                     Dim lArguments As New atcDataAttributes
                     lArguments.SetValue("Nday", lNday)
                     lArguments.SetValue("HighFlag", aHigh)
 
-                    aAttributesStorage.SetValue(lKenTauValue, lTau, lArguments)
-                    aAttributesStorage.SetValue(lKenTauProbLevel, lLevel, lArguments)
-                    aAttributesStorage.SetValue(lKenTauSlope, lSlope, lArguments)
+                    SetKenTauAttr(aAttributesStorage, aNDay, aHigh, "Value", "Value", lTau, lArguments)
+                    SetKenTauAttr(aAttributesStorage, aNDay, aHigh, "ProbLevel", "Probability Level", lLevel, lArguments)
+                    SetKenTauAttr(aAttributesStorage, aNDay, aHigh, "Slope", "Slope", lSlope, lArguments)
                 End If
             Next
         End If
+    End Sub
+
+    Private Sub SetKenTauAttr(ByVal aAttributesStorage As atcDataAttributes, _
+                              ByVal aNDay As Double, _
+                              ByVal aHigh As Boolean, _
+                              ByVal aSuffixShort As String, _
+                              ByVal aSuffixLong As String, _
+                              ByVal aValue As Double, _
+                              ByVal aArguments As atcDataAttributes)
+        Dim lS As String = aNDay & "-Day"
+        If aHigh Then
+            lS &= "High"
+        Else
+            lS &= "Low"
+        End If
+        Dim lName As String = "KenTau" & lS & aSuffixShort
+        Dim lAttrDef As atcAttributeDefinition
+        Dim lIndex As Integer = atcDataAttributes.AllDefinitions.Keys.IndexOf(lName)
+        If lIndex >= 0 Then
+            lAttrDef = atcDataAttributes.AllDefinitions.ItemByIndex(lIndex)
+        Else
+            lAttrDef = New atcAttributeDefinition
+            With lAttrDef
+                .Name = lName
+                .Description = "Kendall Tau " & lS & " " & aSuffixLong
+                .DefaultValue = ""
+                .Editable = False
+                .TypeString = "Double"
+                .Calculator = Me
+                .Category = "N-Day and Frequency"
+            End With
+        End If
+        aAttributesStorage.SetValue(lAttrDef, aValue, aArguments)
     End Sub
 
     Public Sub ComputeFreq(ByRef aTimeseries As atcTimeseries, _
@@ -394,7 +399,7 @@ Public Class atcTimeseriesNdayHighLow
                     If lNday = 7 And lRecurOrProbNow = 10 And Not aHigh Then
                         lS = lNday & "Q" & lRecurOrProbNow
                     ElseIf aHigh Then
-                        lS = lNday & "Hi" & DoubleToString(lRecurOrProbNow, , "#0.####")
+                        lS = lNday & "High" & DoubleToString(lRecurOrProbNow, , "#0.####")
                     Else
                         lS = lNday & "Low" & DoubleToString(lRecurOrProbNow, , "#0.####")
                     End If

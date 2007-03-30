@@ -101,7 +101,7 @@ Friend Class atcFrequencyGridSource
                     Case Else
                         Dim lDataSet As atcDataSet = DataSetAt(aRow)
                         Dim lAttrName As String = NdaysAt(aColumn)
-                        If pHigh Then lAttrName &= "Hi" Else lAttrName &= "Low"
+                        If pHigh Then lAttrName &= "High" Else lAttrName &= "Low"
                         lAttrName &= RecurrenceAt(aRow)
 
                         If Not lDataSet.Attributes.ContainsAttribute(lAttrName) Then
@@ -155,7 +155,8 @@ Friend Class atcFrequencyGridSource
                             End Try
                         End If
 
-                        Return lDataSet.Attributes.GetFormattedValue(lAttrName)
+                        CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
+                        If CellValue = "NaN" Then CellValue = ""
 
                 End Select
             End If
