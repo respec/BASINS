@@ -11,6 +11,7 @@ Public Module ScriptStatTest
     Private Const pFieldWidth As Integer = 12
     Private Const pTestPath As String = "C:\test\SegmentBalance\"
     Private Const pCatSummaryFileName As String = "CatSummary.txt"
+    Private Const pDebug As Boolean = False
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("Start")
@@ -24,10 +25,14 @@ Public Module ScriptStatTest
         lConstituents.Add("TotalN")
         'lConstituents.Add("TotalP")
 
+        Dim lUcis As New System.Collections.Specialized.NameValueCollection
+        AddFilesInDir(lUcis, pTestPath, False, "*.uci")
         Dim lScenarios As New atcCollection
         'lScenarios.Add("USANFRAN")
-        lScenarios.Add("base")
         'lScenarios.Add("baseExcerpt")
+        For Each lUci As String In lUcis
+            lScenarios.Add(FilenameNoPath(FilenameNoExt(lUci)))
+        Next
 
         Dim lOperations As New atcCollection
         lOperations.Add("P:", "PERLND")
@@ -41,23 +46,33 @@ Public Module ScriptStatTest
         For Each lScenario As String In lScenarios
             Dim lHspfBinFile As atcDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
             Dim lHspfBinFileName As String = lScenario & ".hbn"
-            Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
             Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
+            If Not FileExists(lHspfBinFileName) Then
+                lHspfBinFileName = lHspfBinFileName.Replace(".hbn", ".base.hbn")
+                Logger.Dbg("  NameUpdated " & lHspfBinFileName)
+            End If
+            Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
             lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
             Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
             Dim lHspfWdmFile As atcDataSource = New atcWDM.atcDataSourceWDM
             Dim lHspfWdmFileName As String = lScenario & ".wdm"
             Logger.Dbg(" AboutToOpen " & lHspfWdmFileName)
+            If Not FileExists(lHspfWdmFileName) Then
+                lHspfWdmFileName = lHspfWdmFileName.Replace(".wdm", ".base.wdm")
+                Logger.Dbg("  NameUpdated " & lHspfWdmFileName)
+            End If
             lDataManager.OpenDataSource(lHspfWdmFile, lHspfWdmFileName, Nothing)
             Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
             Dim lLocations As atcCollection = lDataManager.DataSets.SortedAttributeValues("Location")
             'lLocations.Add("I:101")
-            Logger.Dbg(" LocationCount " & lLocations.ToString(lLocations.Count))
+            'Logger.Dbg(" LocationCount " & lLocations.ToString(lLocations.Count))
+            Logger.Dbg(" LocationCount " & lLocations.Count)
 
             Dim lConstituentsAvailable As atcCollection = lDataManager.DataSets.SortedAttributeValues("Constituent")
-            Logger.Dbg(" ConstituentCount " & lConstituents.ToString(lConstituentsAvailable.Count))
+            Logger.Dbg(" ConstituentCount " & lConstituentsAvailable.Count)
+            'Logger.Dbg(" ConstituentCount " & lConstituents.ToString(lConstituentsAvailable.Count))
 
             DoSegmentBalances(lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.CreationTime)
 
@@ -65,8 +80,11 @@ Public Module ScriptStatTest
 
             DoCatSummary(lScenario, lDataManager)
 
-            'more code needed to close data source???
+            lDataManager.DataSources.Remove(lHspfBinFile)
+            lHspfBinFile.DataSets.Clear()
             lHspfBinFile = Nothing
+            lDataManager.DataSources.Remove(lHspfWdmFile)
+            lHspfWdmFile.DataSets.Clear()
             lHspfWdmFile = Nothing
         Next lScenario
     End Sub
@@ -183,25 +201,27 @@ Public Module ScriptStatTest
                     lConstituents2Output.Add("P:TREFON", "Labile/Refr ORGN Conversion")
                     lConstituents2Output.Add("P:TFIXN", "Nitrogen Fixation")
                     lConstituents2Output.Add("P:TAMVOL", "NH3 Volatilization")
-                    lConstituents2Output.Add("Header1", "TAM")
-                    lConstituents2Output.Add("TAM-INTOT", "  TAM-INTOT")
-                    lConstituents2Output.Add("TAM-INDIS", "  TAM-INDIS")
-                    lConstituents2Output.Add("NH4-INPART-TOT", "  NH4-INPART-TOT")
-                    lConstituents2Output.Add("TAM-OUTTOT", "  TAM-OUTTOT")
-                    lConstituents2Output.Add("TAM-OUTDIS", "  TAM-OUTDIS")
-                    lConstituents2Output.Add("TAM-OUTPART-TOT", "  TAM-OUTPART-TOT")
-                    lConstituents2Output.Add("TAM-OUTTOT-EXIT3", "  TAM-OUTTOT-EXIT3")
-                    lConstituents2Output.Add("TAM-OUTDIS-EXIT3", "  TAM-OUTDIS-EXIT3")
-                    lConstituents2Output.Add("TAM-OUTPART-TOT-EXIT3", "  TAM-OUTPART-TOT-EXIT3")
-                    lConstituents2Output.Add("Header2", "NO3")
-                    lConstituents2Output.Add("NO3-INTOT", "  NO3-INTOT")
-                    lConstituents2Output.Add("NO3-PROCFLUX-TOT", "  NO3-PROCFLUX-TOT")
-                    lConstituents2Output.Add("NO3-OUTTOT", "  NO3-OUTTOT")
-                    lConstituents2Output.Add("NO3-OUTTOT-EXIT3", "  NO3-OUTTOT-EXIT3")
-                    lConstituents2Output.Add("Header3", "Totals")
-                    lConstituents2Output.Add("N-TOT-IN", "  N-TOT-IN")
-                    lConstituents2Output.Add("N-TOT-OUT", "  N-TOT-OUT")
-                    lConstituents2Output.Add("N-TOT-EXIT3", "  N-TOT-EXIT3")
+                    'lConstituents2Output.Add("R:Header1", "TAM")
+                    'lConstituents2Output.Add("R:TAM-INTOT", "  TAM-INTOT")
+                    'lConstituents2Output.Add("R:TAM-INDIS", "  TAM-INDIS")
+                    'lConstituents2Output.Add("R:NH4-INPART-TOT", "  NH4-INPART-TOT")
+                    'lConstituents2Output.Add("R:TAM-OUTTOT", "  TAM-OUTTOT")
+                    'lConstituents2Output.Add("R:TAM-OUTDIS", "  TAM-OUTDIS")
+                    'lConstituents2Output.Add("R:TAM-OUTPART-TOT", "  TAM-OUTPART-TOT")
+                    'lConstituents2Output.Add("R:TAM-OUTTOT-EXIT3", "  TAM-OUTTOT-EXIT3")
+                    'lConstituents2Output.Add("R:TAM-OUTDIS-EXIT3", "  TAM-OUTDIS-EXIT3")
+                    'lConstituents2Output.Add("R:TAM-OUTPART-TOT-EXIT3", "  TAM-OUTPART-TOT-EXIT3")
+                    'lConstituents2Output.Add("R:Header2", "NO3")
+                    'lConstituents2Output.Add("R:NO3-INTOT", "  NO3-INTOT")
+                    'lConstituents2Output.Add("R:NO3-PROCFLUX-TOT", "  NO3-PROCFLUX-TOT")
+                    'lConstituents2Output.Add("R:NO3-OUTTOT", "  NO3-OUTTOT")
+                    'lConstituents2Output.Add("R:NO3-OUTTOT-EXIT3", "  NO3-OUTTOT-EXIT3")
+                    lConstituents2Output.Add("R:Header3", "Totals")
+                    lConstituents2Output.Add("R:N-TOT-IN", "  N-TOT-IN")
+                    lConstituents2Output.Add("R:N-TOT-OUT", "  N-TOT-OUT")
+                    lConstituents2Output.Add("R:N-TOT-OUT-EXIT1", "  N-TOT-OUT-EXIT1")
+                    lConstituents2Output.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
+                    lConstituents2Output.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
                 Case "TotalP"
             End Select
 
@@ -229,7 +249,7 @@ Public Module ScriptStatTest
                                 lMatchConstituentGroup = lTempDataGroup.FindData("Constituent", lConstituentKey)
                                 If lMatchConstituentGroup.Count > 0 Then
                                     lTempDataSet = lMatchConstituentGroup.Item(0)
-                                    Logger.Dbg("       Match " & lConstituentKey & " with " & lTempDataSet.ToString)
+                                    If pDebug Then Logger.Dbg("       Match " & lConstituentKey & " with " & lTempDataSet.ToString)
 
                                     Dim lSeasons As New atcSeasons.atcSeasonsCalendarYear
                                     Dim lSeasonalAttributes As New atcDataAttributes
@@ -266,7 +286,11 @@ Public Module ScriptStatTest
                             Logger.Dbg(" BalanceType " & lBalanceType & " at " & lLocation & " has no timeseries to output in script!")
                         Else
                             If lPendingOutput.Length > 0 Then
-                                lString.AppendLine("No data for " & lBalanceType & " balance report at " & lLocation & "!")
+                                If lNeedHeader Then
+                                    lString.AppendLine("No data for " & lBalanceType & " balance report at " & lLocation & "!")
+                                Else
+                                    Logger.Dbg("  No data for " & lPendingOutput)
+                                End If
                             End If
                         End If
                         lTempDataGroup = Nothing
@@ -284,6 +308,8 @@ Public Module ScriptStatTest
     End Sub
 
     Private Sub DoCatSummary(ByVal aScenario As String, ByVal aDataManager As atcDataManager)
+        Logger.Dbg("DoCatSummary for " & aScenario)
+
         Dim lString As New Text.StringBuilder
         lString.Append(aScenario)
 
@@ -291,6 +317,10 @@ Public Module ScriptStatTest
 
         Dim lMetDataGroup As atcDataGroup = aDataManager.DataSets.FindData("Location", "SEG1")
         Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
+        lMetDataGroup.Add(aDataManager.DataSets.FindData("Location", "_A24013"))
+        lMetDataGroup.Add(aDataManager.DataSets.FindData("Location", "A24013"))
+        Logger.Dbg("     AdditionalMetMatchingDatasetCount " & lMetDataGroup.Count)
+
         If lMetDataGroup.Count > 0 Then
             lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "HPRC", "Sum"))
             lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "ATMP", "Mean"))
@@ -314,7 +344,9 @@ Public Module ScriptStatTest
             lString.Append(AnnualValue(lRchDataGroup, "P-TOT-OUT", "SumAnnual"))
             lString.Append(AnnualValue(lRchDataGroup, "N-TOT-OUT", "SumAnnual"))
         End If
+        lString.AppendLine()
 
+        Logger.Dbg("CAT Report Add - " & lString.ToString)
         AppendFileString(pCatSummaryFileName, lString.ToString)
     End Sub
 
