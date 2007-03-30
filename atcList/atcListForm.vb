@@ -306,7 +306,12 @@ Friend Class atcListForm
         For Each lAttrDef As atcAttributeDefinition In atcDataAttributes.AllDefinitions
             Select Case lAttrDef.TypeString.ToLower
                 Case "double", "integer", "boolean", "string"
-                    lAvailable.Add(lAttrDef.Name)
+                    Select Case lAttrDef.Name
+                        Case "Attributes", "COMPFG", "Constant Coefficient", "Degrees F", "HeaderComplete", "HighFlag", "Kendall Tau", "n-day high value", "n-day low value", "Number", "Return Period", "Summary File", "VBTIME"
+                            'Skip displaying some things in the list
+                        Case Else
+                            lAvailable.Add(lAttrDef.Name)
+                    End Select
             End Select
         Next
         lAvailable.Sort()

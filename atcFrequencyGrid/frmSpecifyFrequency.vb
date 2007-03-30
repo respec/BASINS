@@ -352,11 +352,11 @@ Public Class frmSpecifyFrequency
         End If
     End Sub
 
-    Private Sub SaveList(ByVal aArgName As String, ByVal lst As Windows.Forms.ListBox)
-        SaveSetting("atcFrequencyGrid", aArgName, "dummy", "")
-        DeleteSetting("atcFrequencyGrid", aArgName)
+    Private Sub SaveList(ByVal lst As Windows.Forms.ListBox)
+        SaveSetting("atcFrequencyGrid", lst.Tag, "dummy", "")
+        DeleteSetting("atcFrequencyGrid", lst.Tag)
         For Each lItem As String In lst.SelectedItems
-            SaveSetting("atcFrequencyGrid", aArgName, lItem, lItem)
+            SaveSetting("atcFrequencyGrid", lst.Tag, lItem, lItem)
         Next
     End Sub
 
@@ -388,8 +388,8 @@ Public Class frmSpecifyFrequency
         If chkKeepNDayTSers.Checked Then 'add NDay Tsers to data manager
             pDataManager.DataSources.Add(lCalculator)
         End If
-        SaveList("NDay", lstNday)
-        SaveList("Return Period", lstRecurrence)
+        SaveList(lstNday)
+        SaveList(lstRecurrence)
     End Sub
 
     'Return all selected items, or if none are selected then all items
