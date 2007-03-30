@@ -124,6 +124,7 @@ Public Class frmSpecifySeasonalAttributes
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lstSeasons.Size = New System.Drawing.Size(184, 243)
         Me.lstSeasons.TabIndex = 7
+        Me.lstSeasons.Tag = "Seasons"
         '
         'cboSeasons
         '
@@ -135,6 +136,7 @@ Public Class frmSpecifySeasonalAttributes
         Me.cboSeasons.Name = "cboSeasons"
         Me.cboSeasons.Size = New System.Drawing.Size(184, 21)
         Me.cboSeasons.TabIndex = 6
+        Me.cboSeasons.Tag = "SeasonType"
         '
         'Splitter1
         '
@@ -186,6 +188,7 @@ Public Class frmSpecifySeasonalAttributes
         Me.lstAttributes.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lstAttributes.Size = New System.Drawing.Size(184, 267)
         Me.lstAttributes.TabIndex = 7
+        Me.lstAttributes.Tag = "Attributes"
         '
         'panelBottom
         '
@@ -271,6 +274,36 @@ Public Class frmSpecifySeasonalAttributes
                 lstAttributes.Items.Add(lDef.Name)
             End If
         Next
+        LoadListSelected(lstAttributes)
+        cboSeasons.SelectedItem = GetSetting("atcSeasons", "SeasonType", "combobox", "")
+        LoadListSelected(lstSeasons)
+    End Sub
+
+    Private Sub SaveListSelected(ByVal lst As Windows.Forms.ListBox)
+        SaveSetting("atcSeasons", lst.Tag, "dummy", "")
+        DeleteSetting("atcSeasons", lst.Tag)
+        For Each lItem As String In lst.SelectedItems
+            SaveSetting("atcSeasons", lst.Tag, lItem, lItem)
+        Next
+    End Sub
+
+    Private Sub LoadListSelected(ByVal lst As Windows.Forms.ListBox)
+        Dim lSelectedArray As String(,) = GetAllSettings("atcSeasons", lst.Tag)
+        Dim lItemIndex As Integer
+        Try
+            lst.ClearSelected()
+            For lIndex As Integer = lSelectedArray.GetUpperBound(0) To 0 Step -1
+                Dim lSelectedItem As String = lSelectedArray(lIndex, 1)
+                For lItemIndex = lst.Items.Count - 1 To 0 Step -1
+                    If lst.Items(lItemIndex) = lSelectedItem Then
+                        lst.SetSelected(lItemIndex, True)
+                        Exit For
+                    End If
+                Next
+            Next
+        Catch e As Exception
+            MapWinUtility.Logger.Dbg("Error retrieving saved settings: " & e.Message)
+        End Try
     End Sub
 
     Private Sub cboSeasons_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSeasons.SelectedIndexChanged
@@ -371,6 +404,9 @@ Public Class frmSpecifySeasonalAttributes
 
     Private Sub btnOk_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOk.Click
         pOk = True
+        SaveListSelected(lstAttributes)
+        SaveSetting("atcSeasons", "SeasonType", "combobox", cboSeasons.SelectedItem)
+        SaveListSelected(lstSeasons)
         Close()
     End Sub
 
