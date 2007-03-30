@@ -168,7 +168,7 @@ Friend Class frmManager
         For Each source As atcDataSource In pDataManager.DataSources
             If selectedItem = source.Name & " " & source.Specification & " (" & source.DataSets.Count & ")" Then
                 txtDetails.Text = source.Name
-                If source.Specification.Length > 0 Then txtDetails.Text &= vbCrLf & source.Specification
+                If Not source.Specification Is Nothing AndAlso source.Specification.Length > 0 Then txtDetails.Text &= vbCrLf & source.Specification
                 If source.DataSets.Count > 0 Then
                     txtDetails.Text &= vbCrLf & Format(source.DataSets.Count, "#,###") & " Timeseries"
                 End If

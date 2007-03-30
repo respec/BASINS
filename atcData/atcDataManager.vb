@@ -140,7 +140,7 @@ Public Class atcDataManager
 
     Public Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcDataGroup)
         Dim lSelectDisplay As New frmSelectDisplay
-        If aTitle.Length > 0 Then lSelectDisplay.Text = aTitle
+        If Not aTitle Is Nothing AndAlso aTitle.Length > 0 Then lSelectDisplay.Text = aTitle
         lSelectDisplay.AskUser(Me, aDataGroup)
     End Sub
 
