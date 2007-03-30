@@ -213,10 +213,10 @@ Public Class atcTimeseriesNdayHighLow
                 Next
 
                 Dim lDateNow As Date = Now
+                CopyBaseAttributes(aTS, newTS)
                 newTS.Attributes.SetValue("Date Created", lDateNow)
                 newTS.Attributes.SetValue("Date Modified", lDateNow)
                 newTS.Attributes.SetValue("Parent Timeseries", aTS)
-                CopyBaseAttributes(aTS, newTS)
 
                 With newTS.Attributes
                     .SetValue("Tu", 6)
@@ -238,7 +238,7 @@ Public Class atcTimeseriesNdayHighLow
                 newTS.Attributes.SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
                 newTS.Attributes.AddHistory(lDescription)
                 Dim lKenTauAttributes As New atcDataAttributes
-                ComputeTau(newTS, lNDayNow, aHigh, aAttributesStorage)
+                ComputeTau(newTS, lNDayNow, aHigh, lKenTauAttributes)
                 For Each lAttribute As atcDefinedValue In lKenTauAttributes
                     aAttributesStorage.SetValue(lAttribute.Definition, lAttribute.Value, lAttribute.Arguments)
                     newTS.Attributes.SetValue(lAttribute.Definition, lAttribute.Value, lAttribute.Arguments)                    
