@@ -126,6 +126,7 @@
     </Compile>
     <EmbeddedResource Include="frmSpecifyNdayHighLow.resx">
       <DependentUpon>frmSpecifyNdayHighLow.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

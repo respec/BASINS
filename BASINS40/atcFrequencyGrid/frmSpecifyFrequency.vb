@@ -335,7 +335,7 @@ Public Class frmSpecifyFrequency
         lst.Items.Clear()
         If Not lDefault Is Nothing AndAlso IsArray(lDefault) Then
             Try
-                For lIndex As Integer = lSelectedArray.GetUpperBound(1) To 0 Step -1
+                For lIndex As Integer = lSelectedArray.GetUpperBound(0) To 0 Step -1
                     lSelected.Add(lSelectedArray(lIndex, 1))
                 Next
             Catch e As Exception
