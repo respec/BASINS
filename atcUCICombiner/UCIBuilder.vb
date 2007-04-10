@@ -16,17 +16,14 @@ Public Module UCIBuilder
         ChDriveDir(pOutputDir)
         Logger.Dbg("WorkingDirectory " & CurDir())
 
+        'need to have the hspf message file open 
+        'to know about all HSPF tables, parameters, etc.
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.mdb")
 
+        'open all the input tables that we'll be using
+
         Dim lStreamTable As New atcTableDelimited
-        Dim lStreambase As String
-        Dim lStreamLen As Single
-        Dim lStreamDeltah As Single
-        Dim lStreamName As String
-        Dim lStreamDepth As Single
-        Dim lStreamWidth As Single
-        Dim lStreamSlope As Single
         If Not lStreamTable.OpenFile(pDataDir & "streams.csv") Then
             Logger.Dbg("Could not open streams.csv")
         End If
@@ -63,6 +60,7 @@ Public Module UCIBuilder
             Loop
         End If
 
+        'declare a bunch of variables we'll be using in this routine
         Dim lAreaTable As New atcTableDelimited
         Dim lUcibase As String
         Dim lProjectbase As String
@@ -70,6 +68,15 @@ Public Module UCIBuilder
         Dim lUCINames As New Collection
         Dim lOper As atcUCI.HspfOperation
         Dim lconn As atcUCI.HspfConnection
+        Dim lStreambase As String
+        Dim lStreamLen As Single
+        Dim lStreamDeltah As Single
+        Dim lStreamName As String
+        Dim lStreamDepth As Single
+        Dim lStreamWidth As Single
+        Dim lStreamSlope As Single
+
+        'open the table of areas of each land use in each subbasin
 
         If lAreaTable.OpenFile(pDataDir & "land.csv") Then
 
@@ -102,7 +109,7 @@ Public Module UCIBuilder
                     Kill(lUciname)
                 End If
                 If Not FileExists(lUciname, False, True) Then
-                    'create this uci
+                    'create this uci as a copy of the base one
                     FileCopy(pOutputDir & "base.uci", lUciname)
                 End If
                 Dim lWdmname As String = pOutputDir & lProjectbase & "\" & lProjectbase & ".wdm"
@@ -193,7 +200,7 @@ Public Module UCIBuilder
                     lMetTable.MoveNext()
                     lmetbase = lMetTable.Value(2)
                     If lmetbase = lUcibase Then
-                        'found the match, update met data
+                        'found the match, update met data specs
                         Dim lEtMfact As Double = lMetTable.Value(3)
                         Dim lPrecMfact As Double = lMetTable.Value(4)
                         Dim lPrecDsn As Integer = lMetTable.Value(7)
@@ -369,6 +376,9 @@ Public Module UCIBuilder
                 lUci.Save()
 
             Loop
+
+            'at this point we have one UCI for each subbasin/stream reach,
+            'still need to do some combining
 
             'read reach connections table
             Dim lConnTable As New atcTableDelimited
