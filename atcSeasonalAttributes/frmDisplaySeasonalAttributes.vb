@@ -73,13 +73,16 @@ Friend Class frmDisplaySeasonalAttributes
     Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileForgetAttributes As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplaySeasonalAttributes))
-        Me.MainMenu1 = New System.Windows.Forms.MainMenu
+        Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisplaySeasonalAttributes))
+        Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
+        Me.mnuFileForgetAttributes = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
         Me.mnuFileSave = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
@@ -101,7 +104,7 @@ Friend Class frmDisplaySeasonalAttributes
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileForgetAttributes, Me.mnuFileSep1, Me.mnuFileSave})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
@@ -112,18 +115,23 @@ Friend Class frmDisplaySeasonalAttributes
         'mnuFileSelectAttributes
         '
         Me.mnuFileSelectAttributes.Index = 1
-        Me.mnuFileSelectAttributes.Text = "Select &Attributes"
+        Me.mnuFileSelectAttributes.Text = "Select &Additional Attributes"
+        '
+        'mnuFileForgetAttributes
+        '
+        Me.mnuFileForgetAttributes.Index = 2
+        Me.mnuFileForgetAttributes.Text = "Select Di&fferent Attributes"
         '
         'mnuFileSep1
         '
-        Me.mnuFileSep1.Index = 2
+        Me.mnuFileSep1.Index = 3
         Me.mnuFileSep1.Text = "-"
         '
         'mnuFileSave
         '
-        Me.mnuFileSave.Index = 3
+        Me.mnuFileSave.Index = 4
         Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
-        Me.mnuFileSave.Text = "Save"
+        Me.mnuFileSave.Text = "Save Grid"
         '
         'mnuEdit
         '
@@ -178,20 +186,21 @@ Friend Class frmDisplaySeasonalAttributes
         'agdMain
         '
         Me.agdMain.AllowHorizontalScrolling = True
+        Me.agdMain.AllowNewValidValues = False
         Me.agdMain.CellBackColor = System.Drawing.Color.Empty
         Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.agdMain.LineColor = System.Drawing.Color.Empty
         Me.agdMain.LineWidth = 0.0!
         Me.agdMain.Location = New System.Drawing.Point(0, 0)
         Me.agdMain.Name = "agdMain"
-        Me.agdMain.Size = New System.Drawing.Size(528, 545)
+        Me.agdMain.Size = New System.Drawing.Size(497, 318)
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
         '
         'frmDisplaySeasonalAttributes
         '
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.ClientSize = New System.Drawing.Size(528, 545)
+        Me.ClientSize = New System.Drawing.Size(497, 318)
         Me.Controls.Add(Me.agdMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Menu = Me.MainMenu1
@@ -255,6 +264,23 @@ Friend Class frmDisplaySeasonalAttributes
     Private Sub mnuFileSelectAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectAttributes.Click
         UserSpecifyAttributes()
         PopulateGrid()
+    End Sub
+
+    Private Sub mnuFileForgetAttributes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileForgetAttributes.Click
+        For Each lData As atcDataSet In pDataGroup
+            Dim lRemoveThese As New ArrayList
+            For Each lAttribute As atcDefinedValue In lData.Attributes
+                If Not lAttribute.Arguments Is Nothing AndAlso lAttribute.Arguments.ContainsAttribute("SeasonIndex") Then
+                    lRemoveThese.Add(lAttribute)
+                End If
+            Next
+            For Each lAttribute As atcDefinedValue In lRemoveThese
+                lData.Attributes.Remove(lAttribute)
+            Next
+        Next
+        agdMain.Visible = False
+        PopulateGrid()
+        agdMain.Visible = True
     End Sub
 
     Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
@@ -321,4 +347,5 @@ Friend Class frmDisplaySeasonalAttributes
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp("BASINS Details\Analysis\Time Series Functions\Seasonal Attributes.html")
     End Sub
+
 End Class

@@ -99,7 +99,7 @@ Public Module modCAT
                 Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
 
                 'Copy base UCI, changing base to new scenario name within it
-                CreateModifiedUCI(aBaseFilename, aNewScenarioName, lNewBaseFilename & "uci")
+                CreateModifiedUCI(aBaseFilename, aNewScenarioName, lNewBaseFilename & FilenameNoPath(aBaseFilename))
 
                 For Each lWDMfilename As String In lWDMFilenames
                     lWDMfilename = AbsolutePath(lWDMfilename, CurDir)

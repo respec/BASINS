@@ -802,7 +802,9 @@ Imports MapWinUtility
                 lSeasonName = pSeasons.SeasonName(lSeasonIndex)
                 If lSeasonName.Length > lMaxWidth Then lMaxWidth = lSeasonName.Length
                 lstSeasons.Items.Add(lSeasonName)
-                lstSeasons.SetSelected(lstSeasons.Items.Count - 1, pSeasons.SeasonSelected(lSeasonIndex))
+                If pSeasons.SeasonSelected(lSeasonIndex) Then
+                    lstSeasons.SetSelected(lstSeasons.Items.Count - 1, True)
+                End If
             Next
 
             lstSeasons.ColumnWidth = lstSeasons.CreateGraphics().MeasureString("X", lstSeasons.Font).Width * (lMaxWidth + 1)
@@ -819,9 +821,12 @@ Imports MapWinUtility
 
     Private Function SelectedSeasonType() As Type
         Dim lSeasonPlugin As New atcSeasonPlugin
+        Dim lSeasonLookingFor As String = cboSeasons.Text
+        'trim trailing "s"
+        If lSeasonLookingFor.EndsWith("s") Then lSeasonLookingFor = lSeasonLookingFor.Substring(0, lSeasonLookingFor.Length - 1)
         For Each lSeasonType As Type In pSeasonTypesAvailable
             Dim lSeasonName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
-            If lSeasonName.Equals(cboSeasons.Text) OrElse lSeasonName.Equals(cboSeasons.Text & "s") Then
+            If lSeasonName.Equals(lSeasonLookingFor) OrElse lSeasonName.Equals(lSeasonLookingFor & "s") Then
                 Return lSeasonType
             End If
         Next

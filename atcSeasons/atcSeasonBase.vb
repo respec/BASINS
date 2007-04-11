@@ -11,7 +11,7 @@ Public Class atcSeasonBase
 
     Public Overridable Function Clone() As atcSeasonBase
         Dim lNewSeason As New atcSeasonBase
-        lNewSeason.SeasonsSelected = pSeasonsSelected
+        lNewSeason.SeasonsSelected = pSeasonsSelected.Clone
         Return lNewSeason
     End Function
 
@@ -233,10 +233,11 @@ Public Class atcSeasonBase
             Return pSeasonsSelected.Clone
         End Get
         Set(ByVal newValue As ArrayList)
-            pSeasonsSelected.Clear()
-            For Each lIndex As Integer In newValue
-                SeasonSelected(lIndex) = True
-            Next
+            pSeasonsSelected = newValue.Clone
+            'pSeasonsSelected.Clear()
+            'For Each lIndex As Integer In newValue
+            '    SeasonSelected(lIndex) = True
+            'Next
         End Set
     End Property
 
@@ -248,12 +249,10 @@ Public Class atcSeasonBase
         Dim lSeasons As String = ""
         For Each lSeasonIndex As Integer In SeasonsSelected
             Dim lSeasonName As String = SeasonName(lSeasonIndex)
-            If SeasonSelected(lSeasonIndex) Then
-                If aXML Then
-                    lSeasons &= "  <Selected Name='" & lSeasonName & "'>" & lSeasonIndex & "</Selected>" & vbCrLf
-                Else
-                    lSeasons &= lSeasonName & " "
-                End If
+            If aXML Then
+                lSeasons &= "  <Selected Name='" & lSeasonName & "'>" & lSeasonIndex & "</Selected>" & vbCrLf
+            Else
+                lSeasons &= lSeasonName & " "
             End If
         Next
 

@@ -10,7 +10,7 @@ Public Class atcSeasonsYearSubset
 
     Public Overrides Function Clone() As atcSeasonBase
         Dim lNewSeason As New atcSeasonsYearSubset(pStartDate, pEndDate)
-        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        lNewSeason.SeasonsSelected = SeasonsSelected
         Return lNewSeason
     End Function
 

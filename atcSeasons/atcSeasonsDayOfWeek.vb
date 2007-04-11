@@ -6,7 +6,7 @@ Public Class atcSeasonsDayOfWeek
 
     Public Overrides Function Clone() As atcSeasonBase
         Dim lNewSeason As New atcSeasonsDayOfWeek
-        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        lNewSeason.SeasonsSelected = SeasonsSelected
         Return lNewSeason
     End Function
 

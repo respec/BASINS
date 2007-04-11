@@ -245,7 +245,8 @@ Public Class atcDataManager
             Next
             For Each lSource As atcDataSource In pDataSources
                 'If lSource.CanSave Then 'TODO: better test to pass only types that just need a Specification string to open
-                If Not lSource.Specification.Equals(pInMemorySpecification) Then
+                'If Not lSource.Specification.Equals(pInMemorySpecification) Then
+                If lSource.Category = "File" Then
                     lChildXML = lSaveXML.NewChild("DataSource", lSource.Name)
                     lChildXML.AddAttribute("Specification", lSource.Specification)
                 End If
@@ -274,6 +275,8 @@ Public Class atcDataManager
                                 Dim lNewDataSource As atcDataSource = DataSourceByName(lchildXML.Content)
                                 If lNewDataSource Is Nothing Then
                                     Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
+                                ElseIf lNewDataSource.Category = "File" Then
+                                    Logger.Dbg("Skipping opening data source that is not a File: " & lSpecification)
                                 Else
                                     OpenDataSource(lNewDataSource, lSpecification, Nothing)
                                 End If
