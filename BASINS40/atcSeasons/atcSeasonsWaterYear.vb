@@ -5,6 +5,13 @@ Public Class atcSeasonsWaterYear
 
     Private Shared pAllSeasons As Integer() = {}
 
+    Public Overrides Function Clone() As atcSeasonBase
+        Dim lNewSeason As New atcSeasonsWaterYear
+        lNewSeason.SetAllSeasons(pAllSeasons)
+        lNewSeason.SeasonsSelected = SeasonsSelected
+        Return lNewSeason
+    End Function
+
     Public Overrides Function AllSeasons() As Integer()
         Return pAllSeasons
     End Function

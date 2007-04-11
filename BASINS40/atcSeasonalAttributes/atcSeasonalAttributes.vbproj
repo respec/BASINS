@@ -129,6 +129,7 @@
     </Compile>
     <EmbeddedResource Include="frmDisplaySeasonalAttributes.resx">
       <DependentUpon>frmDisplaySeasonalAttributes.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

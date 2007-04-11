@@ -5,10 +5,9 @@ Public Class atcSeasonsDayOfMonth
 
     Public Overrides Function Clone() As atcSeasonBase
         Dim lNewSeason As New atcSeasonsDayOfMonth
-        lNewSeason.SeasonsSelected = SeasonsSelected.Clone
+        lNewSeason.SeasonsSelected = SeasonsSelected
         Return lNewSeason
     End Function
-
 
     Public Overrides Function SeasonIndex(ByVal aDate As Double) As Integer
         Return Date.FromOADate(aDate).Day
