@@ -23,7 +23,7 @@ Public Class ScriptPlugin
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         MyBase.ItemClicked(aItemName, aHandled)
         If aItemName = "Test" Then
-            ScriptStatTest.ScriptMain(pMapWin)
+            ScriptDriver.ScriptMain(pMapWin)
         End If
     End Sub
 

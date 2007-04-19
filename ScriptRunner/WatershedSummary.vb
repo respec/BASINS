@@ -8,32 +8,72 @@ Imports MapWinUtility
 Imports Microsoft.VisualBasic
 Imports System
 
-Public Module ScriptStatTestX
-    Private Const pTestPath As String = "C:\test\WatershedSummary\"
+Public Module ScriptWatershedSummary
+    Private Const pFieldWidth As Integer = 12
+    Private Const pTestPath As String = "C:\test\SegmentBalance\"
 
-    Public Sub ScriptMainX(ByRef aMapWin As IMapWin)
+    Public Sub ScriptMain(ByRef aMapWin As IMapWin)
+
+        'For each UCI file in the specified (pTestPath) folder, 
+        'do a Watershed Summary (Loading) Report for the specified constituents;
+        'ie total n summary
+
+        'Requirements:
+        'UCI and HBN must reside in the same folder,
+        'base name of UCI = base name of HBN file
+
+        'Output:
+        'writes to the pTestPath folder, for each UCI and constituent,
+        'a file named as follows:
+        'UCI base name & "_" & constituent name & "_" & "WatershedSummary.txt"
+
         Logger.Dbg("Start")
+
+        'change to the directory of the current project
         ChDriveDir(pTestPath)
         Logger.Dbg(" CurDir:" & CurDir())
 
-        Dim lScenario As String = "base"
+        'build collection of constituents to report
+        Dim lConstituents As New atcCollection
+        lConstituents.Add("TotalN")
+        'lConstituents.Add("Water")    'not yet implemented
 
-        Dim lSummaryTypes As New atcCollection
-        lSummaryTypes.Add("TotalN")
+        'build collection of scenarios (uci base names) to report
+        Dim lUcis As New System.Collections.Specialized.NameValueCollection
+        AddFilesInDir(lUcis, pTestPath, False, "*.uci")
+        Dim lScenarios As New atcCollection
+        For Each lUci As String In lUcis
+            lScenarios.Add(FilenameNoPath(FilenameNoExt(lUci)))
+        Next
 
-        Dim lArgs As Object() = Nothing
-        Dim lErr As String = ""
+        'declare a new data manager to manage the hbn files
         Dim lDataManager As New atcDataManager(aMapWin) ' = Scripting.Run("vb", "", "subFindDataManager.vb", lErr, False, aMapWin, aMapWin)
 
-        'open hbn file
-        Dim lHspfBinFile As atcDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
-        Dim lHspfBinFileName As String = "Input\" & lScenario & ".hbn"
-        Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
-        lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
-        Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
-        Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
+        'loop thru each scenario (uci name)
+        For Each lScenario As String In lScenarios
 
-        DoWatershedSummary(lSummaryTypes, lScenario, lHspfBinFile, lFileDetails.CreationTime)
+            'open the corresponding hbn file
+            Dim lHspfBinFile As atcDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
+            Dim lHspfBinFileName As String = lScenario & ".hbn"
+            Logger.Dbg(" AboutToOpen " & lHspfBinFileName)
+            If Not FileExists(lHspfBinFileName) Then
+                'if hbn doesnt exist, make a guess at what the name might be
+                lHspfBinFileName = lHspfBinFileName.Replace(".hbn", ".base.hbn")
+                Logger.Dbg("  NameUpdated " & lHspfBinFileName)
+            End If
+            Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
+            lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
+            Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
+
+            'call main watershed summary routine
+            DoWatershedSummary(lConstituents, lScenario, lHspfBinFile, lHspfBinFileInfo.CreationTime)
+
+            'clean up 
+            lDataManager.DataSources.Remove(lHspfBinFile)
+            lHspfBinFile.DataSets.Clear()
+            lHspfBinFile = Nothing
+
+        Next
 
     End Sub
 
@@ -150,6 +190,23 @@ Public Module ScriptStatTestX
                 LandArea = LandArea + lConn.MFact
             End If
         Next
+    End Function
+
+    Private Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
+        Dim lFormat As String
+        If aDecimalPlaces > 1 Then
+            lFormat = "###,##0.0" & StrDup(aDecimalPlaces - 1, "#")
+        Else
+            lFormat = "###,##0.0"
+        End If
+        Dim lString As String = DoubleToString(aValue, , lFormat, , , 5)
+        Dim dp As Integer = lString.IndexOf("."c)
+        If dp >= 0 Then
+            Dim laddLeft As Integer = pFieldWidth - 5 - dp
+            If laddLeft > 0 Then lString = Space(laddLeft) & lString
+        End If
+        Return lString.PadRight(pFieldWidth)
+        'Return Trim(Format(aValue, "##########0." & StrDup(aDecimalPlaces, "0")))
     End Function
 
 End Module
