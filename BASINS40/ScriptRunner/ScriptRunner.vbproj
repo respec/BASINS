@@ -30,6 +30,11 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.MapWinGIS, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bin\Interop.MapWinGIS.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MapWinInterfaces, Version=4.3.2611.38961, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Bin\MapWinInterfaces.dll</HintPath>
@@ -55,6 +60,7 @@
   <ItemGroup>
     <Compile Include="clsScriptPlugin.vb" />
     <Compile Include="ConstituentBalance.vb" />
+    <Compile Include="BASINSProjectSummary.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -70,6 +76,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="USGSWorkshop.vb" />
     <Compile Include="WatershedSummary.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -92,6 +99,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\atcDataTree\atcDataTree.vbproj">
+      <Project>{F4EF0925-945B-418C-9A81-8490D89985DB}</Project>
+      <Name>atcDataTree</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcData\atcData.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Name>atcData</Name>
@@ -105,6 +117,11 @@
     <ProjectReference Include="..\atcSeasons\atcSeasons.vbproj">
       <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
       <Name>atcSeasons</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
+      <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
+      <Name>atcTimeseriesNdayHighLow</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
