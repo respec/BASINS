@@ -2089,6 +2089,67 @@ Public Class GisUtil
         End If
     End Sub
 
+    Public Shared Sub CreatePointShapefile(ByVal aShapefileName As String, ByVal aXPositions As Collection, ByVal aYPositions As Collection, ByVal aAttributeNames As Collection, ByVal aAttributeValues As Collection)
+        'given a shapefile name, point coordinates, and attributes,
+        'build a new point shapefile
+
+        Dim lShapefile As New MapWinGIS.Shapefile
+        If Not lShapefile.CreateNew(aShapefileName, MapWinGIS.ShpfileType.SHP_POINT) Then
+            Logger.Dbg("Failed to create new point shapefile.")
+        End If
+        If Not lShapefile.StartEditingShapes(True) Then
+            Logger.Dbg("Failed to start editing new point shapefile.")
+        End If
+
+        For Each lAttributeName As String In aAttributeNames
+            Dim lField As New MapWinGIS.Field
+            lField.Name = lAttributeName
+            lField.Type = MapWinGIS.FieldType.STRING_FIELD
+            lField.Width = 10
+            If Not lShapefile.EditInsertField(lField, lShapefile.NumFields) Then
+                Logger.Dbg("Failed to add new field to shapefile.")
+            End If
+            lField = Nothing
+        Next
+
+        Dim lAttributeCount As Integer = aAttributeNames.Count
+        For lIndex As Integer = 1 To aXPositions.Count
+            Dim lShape As New MapWinGIS.Shape
+            Dim lPoint As New MapWinGIS.Point
+            If Not lShape.Create(MapWinGIS.ShpfileType.SHP_POINT) Then
+                Logger.Dbg("Failed to create new point shape.")
+            End If
+
+            If IsNumeric(aXPositions(lIndex)) And IsNumeric(aYPositions(lIndex)) Then
+                lPoint.x = aXPositions(lIndex)
+                lPoint.y = aYPositions(lIndex)
+                If Not lShape.InsertPoint(lPoint, lIndex - 1) Then
+                    Logger.Dbg("Failed to insert point into shape.")
+                End If
+                If Not lShapefile.EditInsertShape(lShape, lShapefile.NumShapes) Then
+                    Logger.Dbg("Failed to insert point shape into shapefile.")
+                End If
+
+                For lAttributeIndex As Integer = 1 To lAttributeCount
+                    If Not lShapefile.EditCellValue(lAttributeIndex - 1, lShapefile.NumShapes - 1, aAttributeValues((lIndex * lAttributeCount) + lAttributeIndex)) Then
+                        Logger.Dbg("Failed to edit cell value.")
+                    End If
+                Next
+            End If
+
+            lPoint = Nothing
+            lShape = Nothing
+        Next
+
+        If Not lShapefile.StopEditingShapes(True, True) Then
+            Logger.Dbg("Failed to stop editing shapes.")
+        End If
+        If Not lShapefile.Close() Then
+            Logger.Dbg("Failed to close shapefile.")
+        End If
+
+    End Sub
+
     Public Shared Sub ShapeCentroid(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, ByRef aCentroidX As Double, ByRef aCentroidY As Double)
         Dim lSf As New MapWinGIS.Shapefile
         lSf = ShapeFileFromIndex(aLayerIndex)
