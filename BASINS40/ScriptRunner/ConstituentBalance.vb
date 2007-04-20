@@ -36,6 +36,7 @@ Public Module ScriptConstituentBalance
         'build collection of constituents to report
         Dim lConstituents As New atcCollection
         lConstituents.Add("Water")
+        'lConstituents.Add("NfromPQUAL")
         lConstituents.Add("TotalN")
         'lConstituents.Add("SedimentCopper")  'implemented but not in use
         'lConstituents.Add("TotalP")          'not yet implemented
@@ -44,6 +45,7 @@ Public Module ScriptConstituentBalance
         Dim lUcis As New System.Collections.Specialized.NameValueCollection
         AddFilesInDir(lUcis, pTestPath, False, "*.uci")
         Dim lScenarios As New atcCollection
+        'lScenarios.Add("USANFRAN")
         For Each lUci As String In lUcis
             lScenarios.Add(FilenameNoPath(FilenameNoExt(lUci)))
         Next
@@ -141,6 +143,25 @@ Public Module ScriptConstituentBalance
                     lConstituents2Output.Add("R:Copper-ROSQAL-CLAY", "  Clay Cu")
                     lConstituents2Output.Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
                     lConstituents2Output.Add("R:Copper-TROQAL", "Total Cu")
+                Case "NfromPQUAL"
+                    lConstituents2Output.Add("P:Header1", "NH4 (lb/ac)")
+                    lConstituents2Output.Add("P:WASHQS-NH4", "WASHQS")
+                    lConstituents2Output.Add("P:SCRQS-NH4", "SCRQS")
+                    lConstituents2Output.Add("P:SOQS-NH4", "SOQS")
+                    lConstituents2Output.Add("P:SOQO-NH4", "SOQO")
+                    lConstituents2Output.Add("P:SOQUAL-NH4", "SOQUAL")
+                    lConstituents2Output.Add("P:IOQUAL-NH4", "IOQUAL")
+                    lConstituents2Output.Add("P:AOQUAL-NH4", "AOQUAL")
+                    lConstituents2Output.Add("P:POQUAL-NH4", "POQUAL")
+                    lConstituents2Output.Add("P:Header2", "NO3 (lb/ac)")
+                    lConstituents2Output.Add("P:WASHQS-NO3", "WASHQS")
+                    lConstituents2Output.Add("P:SCRQS-NO3", "SCRQS")
+                    lConstituents2Output.Add("P:SOQS-NO3", "SOQS")
+                    lConstituents2Output.Add("P:SOQO-NO3", "SOQO")
+                    lConstituents2Output.Add("P:SOQUAL-NO3", "SOQUAL")
+                    lConstituents2Output.Add("P:IOQUAL-NO3", "IOQUAL")
+                    lConstituents2Output.Add("P:AOQUAL-NO3", "AOQUAL")
+                    lConstituents2Output.Add("P:POQUAL-NO3", "POQUAL")
                 Case "TotalN"
                     lConstituents2Output.Add("P:Header1", "Atmospheric Deposition (lb/ac)")
                     lConstituents2Output.Add("P:NH4-N - SURFACE LAYER - TOTAL AD", "NH4-N - Surface Layer")
