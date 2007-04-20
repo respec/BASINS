@@ -135,6 +135,7 @@
     <Compile Include="atcDataSource.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcListGridSource.vb" />
     <Compile Include="atcTimeseries.vb">
       <SubType>Code</SubType>
     </Compile>
