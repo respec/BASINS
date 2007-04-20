@@ -61,12 +61,12 @@ Public Module ScriptCatSummary
             lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
             Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
-            'open the corresponding hbn file
+            'open the corresponding wdm file
             Dim lHspfWdmFile As atcDataSource = New atcWDM.atcDataSourceWDM
             Dim lHspfWdmFileName As String = lScenario & ".wdm"
             Logger.Dbg(" AboutToOpen " & lHspfWdmFileName)
             If Not FileExists(lHspfWdmFileName) Then
-                'if hbn doesnt exist, make a guess at what the name might be
+                'if wdm doesnt exist, make a guess at what the name might be
                 lHspfWdmFileName = lHspfWdmFileName.Replace(".wdm", ".base.wdm")
                 Logger.Dbg("  NameUpdated " & lHspfWdmFileName)
             End If
