@@ -1,7 +1,7 @@
 Imports atcData
 Imports atcUtility
 
-Friend Class atcListGridSource
+Public Class atcListGridSource
     Inherits atcControls.atcGridSource
 
     Private pDataManager As atcDataManager
@@ -10,6 +10,17 @@ Friend Class atcListGridSource
     Private pDateFormat As New atcDateFormat
     Private pDisplayAttributes As ArrayList
     Private pDisplayValues As Boolean
+
+    Sub New(ByVal aDataManager As atcData.atcDataManager, _
+            ByVal aDataGroup As atcData.atcDataGroup, _
+            ByVal aDisplayAttributes As ArrayList, _
+            ByVal aDisplayValues As Boolean)
+        pDataManager = aDataManager
+        pDataGroup = aDataGroup
+        pDisplayAttributes = aDisplayAttributes
+        pDisplayValues = aDisplayValues
+        RefreshAllDates()
+    End Sub
 
     Private Sub RefreshAllDates()
         Try
@@ -28,17 +39,6 @@ Friend Class atcListGridSource
         Catch
             pAllDates = Nothing
         End Try
-    End Sub
-
-    Sub New(ByVal aDataManager As atcData.atcDataManager, _
-            ByVal aDataGroup As atcData.atcDataGroup, _
-            ByVal aDisplayAttributes As ArrayList, _
-            ByVal aDisplayValues As Boolean)
-        pDataManager = aDataManager
-        pDataGroup = aDataGroup
-        pDisplayAttributes = aDisplayAttributes
-        pDisplayValues = aDisplayValues
-        RefreshAllDates()
     End Sub
 
     Overrides Property Columns() As Integer
@@ -80,7 +80,7 @@ Friend Class atcListGridSource
             Dim lAttributeRows As Integer = pDisplayAttributes.Count
             Select Case aColumn
                 Case 0 'First column contains attribute name or date
-                    Return False                    
+                    Return False
                 Case Is <= pDataGroup.Count
                     If aRow < lAttributeRows Then
                         Dim lDefinedValue As atcDefinedValue = pDataGroup(aColumn - 1).Attributes.GetDefinedValue(pDisplayAttributes(aRow))
@@ -96,7 +96,7 @@ Friend Class atcListGridSource
                         Return False
                     End If
                 Case Else 'Column out of range
-                        Return False
+                    Return False
             End Select
         End Get
         Set(ByVal value As Boolean)
