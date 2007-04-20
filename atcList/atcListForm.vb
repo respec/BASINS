@@ -190,7 +190,7 @@ Friend Class atcListForm
     Private WithEvents pDataGroup As atcDataGroup
 
     'Translator class between pDataGroup and agdMain
-    Private pSource As atcListGridSource
+    Private pSource As atcTimeseriesGridSource
     Private pDisplayAttributes As ArrayList
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
@@ -235,7 +235,7 @@ Friend Class atcListForm
 
     Private Sub PopulateGrid()
         Dim lTotalWidth As Integer = 10
-        pSource = New atcListGridSource(pDataManager, pDataGroup, pDisplayAttributes, mnuViewValues.Checked)
+        pSource = New atcTimeseriesGridSource(pDataManager, pDataGroup, pDisplayAttributes, mnuViewValues.Checked)
         pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
         pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
         agdMain.Initialize(pSwapperSource)

@@ -1,7 +1,7 @@
 Imports atcData
 Imports atcUtility
 
-Public Class atcListGridSource
+Public Class atcTimeseriesGridSource
     Inherits atcControls.atcGridSource
 
     Private pDataManager As atcDataManager
