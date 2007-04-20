@@ -135,10 +135,10 @@
     <Compile Include="atcDataSource.vb">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="atcListGridSource.vb" />
     <Compile Include="atcTimeseries.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcTimeseriesGridSource.vb" />
     <Compile Include="atcTimeseriesStatistics.vb">
       <SubType>Code</SubType>
     </Compile>
