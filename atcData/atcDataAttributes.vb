@@ -256,6 +256,9 @@ Public Class atcDataAttributes
                 .Add("datcre", "Date Created")
                 .Add("datmod", "Date Modified")
 
+                .Add("latdeg", "Latitude")
+                .Add("lngdeg", "Longitude")
+
                 .Add("7low10", "7Q10")
             End With
         End If
@@ -343,7 +346,7 @@ Public Class atcDataAttributes
                     Optional ByVal aKey As String = Nothing, _
                     Optional ByRef aOperation As atcDefinedValue = Nothing) As Boolean
         Select Case aDef.TypeString.ToLower
-            Case "double", "integer", "boolean", "string"
+            Case "single", "double", "integer", "boolean", "string"
                 If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...
                     If aKey Is Nothing Then aKey = AttributeNameToKey(aDef.Name)
                     aOperation = aDef.Calculator.AvailableOperations.GetDefinedValue(aKey)
