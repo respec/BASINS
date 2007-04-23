@@ -10,8 +10,8 @@ Imports System
 
 Public Module ScriptShapefileFromWDM
     Private Const pFieldWidth As Integer = 12
-    Private Const pTestPath As String = "C:\test\SegmentBalance\"
-    Private Const pTestWDMFileName As String = "010008.wdm"
+    Private Const pTestPath As String = "D:\Basins\data\03130003\met\"
+    Private Const pTestWDMFileName As String = "FtBenMet.wdm"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
@@ -50,6 +50,7 @@ Public Module ScriptShapefileFromWDM
         lDisplayAttributes.Add("sjday")
         lDisplayAttributes.Add("ejday")
         lDisplayAttributes.Add("time unit")
+        lDisplayAttributes.Add("sumannual")
         Dim lDataGroup As New atcDataGroup
         lDataGroup = lDataManager.DataSets
         Dim lSource As atcTimeseriesGridSource

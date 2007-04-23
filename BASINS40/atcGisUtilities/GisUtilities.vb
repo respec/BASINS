@@ -32,7 +32,7 @@ Public Class GisUtilities
         Next
 
         'now populate collections of values
-        For lCol As Integer = 1 To aSource.Columns
+        For lCol As Integer = 1 To aSource.Columns - 1
             For lRow As Integer = 0 To aSource.Rows - 1
                 If lRow = lXFieldPos Then
                     lXPositions.Add(aSource.CellValue(lRow, lCol))

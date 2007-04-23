@@ -359,7 +359,7 @@ Friend Class frmSelectData
         Dim lName As String
         Dim lItemIndex As Integer
         If Not lAllDefinitions Is Nothing Then
-            For Each def As atcAttributeDefinition In atcDataAttributes.AllDefinitions
+            For Each def As atcAttributeDefinition In lAllDefinitions
                 If atcDataAttributes.IsSimple(def) Then
                     lName = def.Name
                     If def.Calculated Then
@@ -378,22 +378,22 @@ Friend Class frmSelectData
                     End If
                 End If
             Next
-            For Each lName In lNotCalculatedItems
+        For Each lName In lNotCalculatedItems
+            For i = 0 To pcboCriteria.GetUpperBound(0)
+                pcboCriteria(i).Items.Add(lName)
+            Next
+        Next
+        If lCalculatedItems.Count > 0 Then
+            For i = 0 To pcboCriteria.GetUpperBound(0)
+                pcboCriteria(i).Items.Add(BLANK_LABEL)
+                pcboCriteria(i).Items.Add(CALCULATED_LABEL)
+            Next
+            For Each lName In lCalculatedItems
                 For i = 0 To pcboCriteria.GetUpperBound(0)
                     pcboCriteria(i).Items.Add(lName)
                 Next
             Next
-            If lCalculatedItems.Count > 0 Then
-                For i = 0 To pcboCriteria.GetUpperBound(0)
-                    pcboCriteria(i).Items.Add(BLANK_LABEL)
-                    pcboCriteria(i).Items.Add(CALCULATED_LABEL)
-                Next
-                For Each lName In lCalculatedItems
-                    For i = 0 To pcboCriteria.GetUpperBound(0)
-                        pcboCriteria(i).Items.Add(lName)
-                    Next
-                Next
-            End If
+        End If
         End If
     End Sub
 
