@@ -11,9 +11,6 @@ Public Class GisUtilities
     Public Shared Sub GridSourceToShapefile(ByVal aMapWin As Object, ByVal aShapefileName As String, ByVal aSource As atcTimeseriesGridSource, ByVal aXfieldName As String, ByVal aYfieldName As String, ByVal aOutputProjection As String)
         'given an atcTimeseriesGridSource, build a shapefile 
 
-        'TODO:  handle field types, field lengths, projection changing,
-        '       add all attributes
-
         GisUtil.MappingObject = aMapWin
 
         Dim lXPositions As New Collection
@@ -58,7 +55,7 @@ Public Class GisUtilities
             System.IO.File.Delete(FilenameNoExt(aShapefileName) & ".dbf")
         End If
 
-        GisUtil.CreatePointShapefile(aShapefileName, lXPositions, lYPositions, lAttributeNames, lAttributeValues)
+        GisUtil.CreatePointShapefile(aShapefileName, lXPositions, lYPositions, lAttributeNames, lAttributeValues, aOutputProjection)
 
     End Sub
 

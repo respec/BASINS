@@ -2089,7 +2089,7 @@ Public Class GisUtil
         End If
     End Sub
 
-    Public Shared Sub CreatePointShapefile(ByVal aShapefileName As String, ByVal aXPositions As Collection, ByVal aYPositions As Collection, ByVal aAttributeNames As Collection, ByVal aAttributeValues As Collection)
+    Public Shared Sub CreatePointShapefile(ByVal aShapefileName As String, ByVal aXPositions As Collection, ByVal aYPositions As Collection, ByVal aAttributeNames As Collection, ByVal aAttributeValues As Collection, ByVal aOutputProjection As String)
         'given a shapefile name, point coordinates, and attributes,
         'build a new point shapefile
 
@@ -2121,8 +2121,13 @@ Public Class GisUtil
             End If
 
             If IsNumeric(aXPositions(lIndex)) And IsNumeric(aYPositions(lIndex)) Then
-                lPoint.x = aXPositions(lIndex)
-                lPoint.y = aYPositions(lIndex)
+                Dim lXpos As Double = aXPositions(lIndex)
+                Dim lYpos As Double = aYPositions(lIndex)
+                If aOutputProjection.Length > 0 Then
+                    MapWinGeoProc.SpatialReference.ProjectPoint(lXpos, lYpos, "+proj=longlat +datum=NAD83", aOutputProjection)
+                End If
+                lPoint.x = lXpos
+                lPoint.y = lYpos
                 If Not lShape.InsertPoint(lPoint, lIndex - 1) Then
                     Logger.Dbg("Failed to insert point into shape.")
                 End If
@@ -2135,6 +2140,8 @@ Public Class GisUtil
                         Logger.Dbg("Failed to edit cell value.")
                     End If
                 Next
+            Else
+                Logger.Dbg("No Latitude or Longitude set for this point.")
             End If
 
             lPoint = Nothing
