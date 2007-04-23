@@ -43,13 +43,20 @@ Public Module ScriptShapefileFromWDM
         lDisplayAttributes = lDataManager.DisplayAttributes
         lDisplayAttributes.Add(lXfieldName)
         lDisplayAttributes.Add(lYfieldName)
+        lDisplayAttributes.Add("scenario")
+        lDisplayAttributes.Add("location")
+        lDisplayAttributes.Add("constituent")
+        lDisplayAttributes.Add("stanam")
+        lDisplayAttributes.Add("sjday")
+        lDisplayAttributes.Add("ejday")
+        lDisplayAttributes.Add("time unit")
         Dim lDataGroup As New atcDataGroup
         lDataGroup = lDataManager.DataSets
         Dim lSource As atcTimeseriesGridSource
         lSource = New atcTimeseriesGridSource(lDataManager, lDataGroup, lDisplayAttributes, "False")
 
         'convert that grid source to a shapefile
-        Dim lOutputProjection As String = ""
+        Dim lOutputProjection As String = aMapWin.Project.ProjectProjection
         Dim lShapefileName As String = pTestPath & FilenameOnly(pTestWDMFileName) & ".shp"
         GisUtilities.GridSourceToShapefile(aMapWin, lShapefileName, lSource, lXfieldName, lYfieldName, lOutputProjection)
 
