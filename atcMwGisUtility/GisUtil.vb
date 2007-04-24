@@ -2089,11 +2089,23 @@ Public Class GisUtil
         End If
     End Sub
 
-    Public Shared Sub CreatePointShapefile(ByVal aShapefileName As String, ByVal aXPositions As Collection, ByVal aYPositions As Collection, ByVal aAttributeNames As Collection, ByVal aAttributeValues As Collection, ByVal aOutputProjection As String)
-        'given a shapefile name, point coordinates, and attributes,
-        'build a new point shapefile
-
+    ''' <summary>
+    ''' given a shapefile name, point coordinates, and attributes, build a new point shapefile
+    ''' </summary>
+    ''' <param name="aShapefileName"></param>
+    ''' <param name="aXPositions"></param>
+    ''' <param name="aYPositions"></param>
+    ''' <param name="aAttributeNames"></param>
+    ''' <param name="aAttributeValues"></param>
+    ''' <param name="aOutputProjection"></param>
+    ''' <remarks></remarks>
+    Public Shared Sub CreatePointShapefile(ByVal aShapefileName As String, _
+                                           ByVal aXPositions As Collection, ByVal aYPositions As Collection, _
+                                           ByVal aAttributeNames As Collection, ByVal aAttributeValues As Collection, _
+                                           ByVal aOutputProjection As String)
         Dim lShapefile As New MapWinGIS.Shapefile
+        Dim lInputProjection As String = "+proj=longlat +datum=NAD83"
+
         If Not lShapefile.CreateNew(aShapefileName, MapWinGIS.ShpfileType.SHP_POINT) Then
             Logger.Dbg("Failed to create new point shapefile " & aShapefileName & " ErrorCode " & lShapefile.LastErrorCode)
         End If
@@ -2131,7 +2143,7 @@ Public Class GisUtil
                 Dim lXpos As Double = aXPositions(lIndex + 1)
                 Dim lYpos As Double = aYPositions(lIndex + 1)
                 If aOutputProjection.Length > 0 Then
-                    MapWinGeoProc.SpatialReference.ProjectPoint(lXpos, lYpos, "+proj=longlat +datum=NAD83", aOutputProjection)
+                    MapWinGeoProc.SpatialReference.ProjectPoint(lXpos, lYpos, lInputProjection, aOutputProjection)
                 End If
                 lPoint.x = lXpos
                 lPoint.y = lYpos
@@ -2160,7 +2172,11 @@ Public Class GisUtil
         If Not lShapefile.StopEditingShapes(True, True) Then
             Logger.Dbg("Failed to stop editing shapes in " & lShapefile.Filename & " ErrorCode " & lShapefile.LastErrorCode)
         End If
-        lShapefile.Projection = aOutputProjection
+        If aOutputProjection.Length > 0 Then
+            lShapefile.Projection = aOutputProjection
+        Else
+            lShapefile.Projection = lInputProjection
+        End If
         If Not lShapefile.Close() Then
             Logger.Dbg("Failed to close shapefile " & lShapefile.Filename & " ErrorCode " & lShapefile.LastErrorCode)
         End If

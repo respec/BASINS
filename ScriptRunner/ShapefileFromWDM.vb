@@ -10,8 +10,10 @@ Imports System
 
 Public Module ScriptShapefileFromWDM
     Private Const pFieldWidth As Integer = 12
-    Private Const pTestPath As String = "D:\Basins\data\03130003\met\"
-    Private Const pTestWDMFileName As String = "FtBenMet.wdm"
+    'Private Const pTestPath As String = "D:\Basins\data\03130003\met\"
+    'Private Const pTestWDMFileName As String = "FtBenMet.wdm"
+    Private Const pTestPath As String = "D:\Basins\data\03130003\flow\"
+    Private Const pTestWDMFileName As String = "flow.wdm"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
@@ -37,8 +39,8 @@ Public Module ScriptShapefileFromWDM
         Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
         'populate the timeseries grid source
-        Dim lXfieldName As String = "lngdeg"
-        Dim lYfieldName As String = "latdeg"
+        Dim lXfieldName As String = "longitude"
+        Dim lYfieldName As String = "latitude"
         Dim lDisplayAttributes As New ArrayList
         lDisplayAttributes = lDataManager.DisplayAttributes
         lDisplayAttributes.Add(lXfieldName)
