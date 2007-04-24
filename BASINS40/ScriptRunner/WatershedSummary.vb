@@ -10,7 +10,7 @@ Imports System
 
 Public Module ScriptWatershedSummary
     Private Const pFieldWidth As Integer = 12
-    Private Const pTestPath As String = "C:\test\SegmentBalance\"
+    Private Const pTestPath As String = "C:\test\ScriptReports\"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
@@ -35,8 +35,22 @@ Public Module ScriptWatershedSummary
 
         'build collection of constituents to report
         Dim lConstituents As New atcCollection
+        'lConstituents.Add("Water")
+        'lConstituents.Add("BOD")
+        'lConstituents.Add("DO")
+        'lConstituents.Add("FColi")
+        'lConstituents.Add("Lead")
+        'lConstituents.Add("NH3")
+        'lConstituents.Add("NH4")
+        lConstituents.Add("NO3")
+        'lConstituents.Add("OrganicN")
+        'lConstituents.Add("OrganicP")
+        'lConstituents.Add("PO4")
+        'lConstituents.Add("Sed")
         lConstituents.Add("TotalN")
-        'lConstituents.Add("Water")    'not yet implemented
+        'lConstituents.Add("TotalP")
+        'lConstituents.Add("WaterTemp")
+        'lConstituents.Add("Zinc")
 
         'build collection of scenarios (uci base names) to report
         Dim lUcis As New System.Collections.Specialized.NameValueCollection
@@ -66,7 +80,7 @@ Public Module ScriptWatershedSummary
             Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
             'call main watershed summary routine
-            DoWatershedSummary(lConstituents, lScenario, lHspfBinFile, lHspfBinFileInfo.CreationTime)
+            DoWatershedSummary(lConstituents, lScenario, lHspfBinFile, lHspfBinFileInfo.LastWriteTime)
 
             'clean up 
             lDataManager.DataSources.Remove(lHspfBinFile)
@@ -89,17 +103,88 @@ Public Module ScriptWatershedSummary
         lHspfUci.FastReadUciForStarter(lMsg, aScenario & ".uci")
 
         For Each lSummaryType As String In aSummaryTypes
-            Dim lPrimaryConstituent As String = ""
+            Dim lAgchemConstituent As String = ""
+            Dim lUnits As String = "lbs"
+            Dim lTotalUnits As String = lUnits
+            Dim lPerlndConstituents As New Collection
+            Dim lImplndConstituents As New Collection
             Select Case lSummaryType
                 Case "Water"
+                    lPerlndConstituents.Add("PERO")
+                    lImplndConstituents.Add("SURO")
+                    lUnits = "in"
+                    lTotalUnits = "cfs"
+                Case "BOD"
+                    lPerlndConstituents.Add("POQUAL-BOD")
+                    lImplndConstituents.Add("SOQUAL-BOD")
+                Case "DO"
+                    lPerlndConstituents.Add("PODOXM")
+                    lImplndConstituents.Add("SODOXM")
+                Case "FColi"
+                    lPerlndConstituents.Add("POQUAL-F.Coliform")
+                    lImplndConstituents.Add("SOQUAL-F.Coliform")
+                    lUnits = "10^9"
+                    lTotalUnits = lUnits
+                Case "Lead"
+                    lPerlndConstituents.Add("POQUAL-LEAD")
+                    lImplndConstituents.Add("SOQUAL-LEAD")
+                Case "NH3"
+                    lPerlndConstituents.Add("POQUAL-NH3")
+                    lImplndConstituents.Add("SOQUAL-NH3")
+                Case "NH4"
+                    lAgchemConstituent = "NH4-N - TOTAL OUTFLOW"
+                    lPerlndConstituents.Add("POQUAL-NH4")
+                    lImplndConstituents.Add("SOQUAL-NH4")
+                Case "NO3"
+                    lAgchemConstituent = "N03-N - TOTAL OUTFLOW"
+                    lPerlndConstituents.Add("POQUAL-NO3")
+                    lImplndConstituents.Add("SOQUAL-NO3")
+                Case "OrganicN"
+                    lAgchemConstituent = "ORGN - TOTAL OUTFLOW"
+                    lPerlndConstituents.Add("POQUAL-BOD")
+                    lImplndConstituents.Add("SOQUAL-BOD")
+                Case "OrganicP"
+                    lPerlndConstituents.Add("POQUAL-BOD")
+                    lImplndConstituents.Add("SOQUAL-BOD")
+                Case "PO4"
+                    lPerlndConstituents.Add("POQUAL-ORTHO P")
+                    lImplndConstituents.Add("SOQUAL-ORTHO P")
+                Case "Sed"
+                    lPerlndConstituents.Add("SOSED")
+                    lImplndConstituents.Add("SOSLD")
+                    lUnits = "tons"
+                    lTotalUnits = lUnits
                 Case "TotalN"
+                    lAgchemConstituent = "NITROGEN - TOTAL OUTFLOW"
                     'Total N is a combination of NH4, No3, OrganicN
-                    lPrimaryConstituent = "NITROGEN - TOTAL OUTFLOW"
+                    lPerlndConstituents.Add("POQUAL-NH4")
+                    lPerlndConstituents.Add("POQUAL-NO3")
+                    lPerlndConstituents.Add("POQUAL-BOD")
+                    lImplndConstituents.Add("SOQUAL-NH4")
+                    lImplndConstituents.Add("SOQUAL-NO3")
+                    lImplndConstituents.Add("SOQUAL-BOD")
+                Case "TotalP"
+                    'Total P is a combination of PO4 and OrganicP
+                    lPerlndConstituents.Add("POQUAL-ORTHO P")
+                    lPerlndConstituents.Add("POQUAL-BOD")
+                    lImplndConstituents.Add("SOQUAL-ORTHO P")
+                    lImplndConstituents.Add("SOQUAL-BOD")
+                Case "WaterTemp"
+                    lPerlndConstituents.Add("POHT")
+                    lPerlndConstituents.Add("SOHT")
+                    lUnits = "btu"
+                    lTotalUnits = lUnits
+                Case "Zinc"
+                    lPerlndConstituents.Add("POQUAL-ZINC")
+                    lImplndConstituents.Add("SOQUAL-ZINC")
             End Select
 
             Dim lString As New Text.StringBuilder
             lString.AppendLine(lSummaryType & " Watershed Summary Report For " & aScenario)
-            lString.AppendLine("   Run Made " & aRunMade & vbCrLf)
+            lString.AppendLine("   Run Made " & aRunMade)
+            lString.AppendLine("   Average Annual Rates and Totals")
+            lString.AppendLine("   " & lHspfUci.GlobalBlock.RunInf.Value)
+            lString.AppendLine(vbCrLf)
             lString.AppendLine("Land Use  " & vbTab & _
                                "    Area    " & vbTab & _
                                "    Load    " & vbTab & _
@@ -107,8 +192,8 @@ Public Module ScriptWatershedSummary
                                "Total Load")
             lString.AppendLine("            " & vbTab & _
                                "   (acres)  " & vbTab & _
-                               " (lbs/acre) " & vbTab & _
-                               "  (lbs)     " & vbTab & _
+                               " (" & lUnits & "/acre) " & vbTab & _
+                               "  (" & lTotalUnits & ")     " & vbTab & _
                                "    (%)     ")
             lString.AppendLine("")
 
@@ -135,27 +220,41 @@ Public Module ScriptWatershedSummary
                     lLuArea = LandArea(lOper.Name, lOper.Id, lHspfUci)
 
                     Dim lTempDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", Left(lOperType, 1) & ":" & lOper.Id)
-                    If lTempDataGroup.FindData("Constituent", lPrimaryConstituent).Count > 0 Then
-                        lTempDataSet = lTempDataGroup.FindData("Constituent", lPrimaryConstituent).Item(0)
+                    If lTempDataGroup.FindData("Constituent", lAgchemConstituent).Count > 0 Then
+                        'if you find the agchem constituent, use it
+                        lTempDataSet = lTempDataGroup.FindData("Constituent", lAgchemConstituent).Item(0)
                         lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
                     Else
+                        'normal case -- don't have the agchem constituent
+                        Dim lConstituents As New Collection
                         If lOperType = "PERLND" Then
-                            lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-NH4").Item(0)
-                            lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
-                            lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-NO3").Item(0)
-                            lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
-                            lTempDataSet = lTempDataGroup.FindData("Constituent", "POQUAL-BOD").Item(0)
-                            lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * 0.048
+                            lConstituents = lPerlndConstituents
                         Else
-                            lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-NH4").Item(0)
-                            lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
-                            lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-NO3").Item(0)
-                            lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
-                            lTempDataSet = lTempDataGroup.FindData("Constituent", "SOQUAL-BOD").Item(0)
-                            lValue = lValue + lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * 0.048
+                            lConstituents = lImplndConstituents
                         End If
+                        lValue = 0.0
+                        For Each lConstituent As String In lConstituents
+                            If lTempDataGroup.FindData("Constituent", lConstituent).Count > 0 Then
+                                lTempDataSet = lTempDataGroup.FindData("Constituent", lConstituent).Item(0)
+                                Dim lMult As Single = 1.0
+                                If lConstituent = "POQUAL-BOD" Or lConstituent = "SOQUAL-BOD" Then
+                                    'might need another multiplier for bod
+                                    If lSummaryType = "BOD" Then
+                                        lMult = 0.4
+                                    ElseIf lSummaryType = "OrganicN" Or lSummaryType = "TotalN" Then
+                                        lMult = 0.048
+                                    ElseIf lSummaryType = "OrganicP" Or lSummaryType = "TotalP" Then
+                                        lMult = 0.0023
+                                    End If
+                                End If
+                                lValue = lValue + (lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value * lMult)
+                            End If
+                        Next
                     End If
                     lTotal = lLuArea * lValue
+                    If lSummaryType = "Water" Then
+                        lTotal = lTotal * 8687.6  'convert in to cfs
+                    End If
                     lLandUses.Add(Left(lOperType, 1) & lOper.Id & ":" & lLuName.Trim)
                     lAreas.Add(lLuArea)
                     lLoads.Add(lValue)
@@ -172,7 +271,7 @@ Public Module ScriptWatershedSummary
                                    DF((lTotalLoads(lIndex) / lSum * 100), 2))
             Next
             lString.AppendLine("")
-            lString.AppendLine(vbTab & vbTab & vbTab & vbTab & "Total Load = " & vbTab & DF(lSum) & vbTab & " lbs.")
+            lString.AppendLine(vbTab & vbTab & vbTab & vbTab & "Total Load = " & vbTab & DF(lSum) & vbTab & " " & lTotalUnits)
 
             Dim lOutFileName As String = aScenario & "_" & lSummaryType & "_" & "WatershedSummary.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
