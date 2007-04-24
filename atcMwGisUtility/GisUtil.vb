@@ -2160,6 +2160,7 @@ Public Class GisUtil
         If Not lShapefile.StopEditingShapes(True, True) Then
             Logger.Dbg("Failed to stop editing shapes in " & lShapefile.Filename & " ErrorCode " & lShapefile.LastErrorCode)
         End If
+        lShapefile.Projection = aOutputProjection
         If Not lShapefile.Close() Then
             Logger.Dbg("Failed to close shapefile " & lShapefile.Filename & " ErrorCode " & lShapefile.LastErrorCode)
         End If
