@@ -9,7 +9,7 @@ Imports System
 
 Public Module ScriptConstituentBalance
     Private Const pFieldWidth As Integer = 12
-    Private Const pTestPath As String = "C:\test\SegmentBalance\"
+    Private Const pTestPath As String = "C:\test\ScriptReports\"
     Private Const pDebug As Boolean = False
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -80,7 +80,7 @@ Public Module ScriptConstituentBalance
             Logger.Dbg(" LocationCount " & lLocations.Count)
 
             'call main constituent balances routine
-            DoConstituentBalances(lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.CreationTime)
+            DoConstituentBalances(lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.LastWriteTime)
 
             'clean up 
             lDataManager.DataSources.Remove(lHspfBinFile)
@@ -96,6 +96,13 @@ Public Module ScriptConstituentBalance
                                      ByVal aScenarioResults As atcDataSource, _
                                      ByVal aLocations As atcCollection, _
                                      ByVal aRunMade As String)
+
+        'make uci available 
+        Dim lMsg As New atcUCI.HspfMsg
+        lMsg.Open("hspfmsg.mdb")
+        Dim lHspfUci As New atcUCI.HspfUci
+        lHspfUci.FastReadUciForStarter(lMsg, aScenario & ".uci")
+
         For Each lBalanceType As String In aBalanceTypes
             Dim lConstituents2Output As New atcCollection
             Select Case lBalanceType
@@ -247,7 +254,16 @@ Public Module ScriptConstituentBalance
 
             Dim lString As New Text.StringBuilder
             lString.AppendLine(lBalanceType & " Balance Report For " & aScenario)
-            lString.AppendLine("   Run Made " & aRunMade & vbCrLf)
+            lString.AppendLine("   Run Made " & aRunMade)
+            lString.AppendLine("   " & lHspfUci.GlobalBlock.RunInf.Value)
+            If lBalanceType = "Water" Then
+                If lHspfUci.GlobalBlock.emfg = 1 Then
+                    lString.AppendLine("   (Units:Inches)")
+                Else
+                    lString.AppendLine("   (Units:mm)")
+                End If
+            End If
+            lString.AppendLine(vbCrLf)
 
             Dim lMatchConstituentGroup As atcDataGroup
             Dim lTempDataSet As atcDataSet
@@ -278,7 +294,21 @@ Public Module ScriptConstituentBalance
                                     lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
 
                                     If lNeedHeader Then
-                                        lString.AppendLine(lBalanceType & " Balance Report For " & lLocation & vbCrLf)
+                                        'get operation description for header
+                                        Dim lDesc As String = ""
+                                        Dim lOperName As String = ""
+                                        If lLocation.Substring(0, 1) = "P" Then
+                                            lOperName = "PERLND"
+                                        ElseIf lLocation.Substring(0, 1) = "I" Then
+                                            lOperName = "IMPLND"
+                                        ElseIf lLocation.Substring(0, 1) = "R" Then
+                                            lOperName = "RCHRES"
+                                        End If
+                                        If lOperName.Length > 0 Then
+                                            lDesc = lHspfUci.OpnBlks(lOperName).operfromid(lLocation.Substring(2)).description
+                                        End If
+
+                                        lString.AppendLine(lBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ")" & vbCrLf)
                                         lString.Append("Date    " & vbTab & "      Mean")
                                         For Each lAttribute As atcDefinedValue In lCalculatedAttributes
                                             Dim s As String = lAttribute.Arguments(1).Value
@@ -321,9 +351,9 @@ Public Module ScriptConstituentBalance
                 Next lLocation
             Next
 
-            Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_" & "Balance.txt"
-            Logger.Dbg("  WriteReportTo " & lOutFileName)
-            SaveFileString(lOutFileName, lString.ToString)
+                Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_" & "Balance.txt"
+                Logger.Dbg("  WriteReportTo " & lOutFileName)
+                SaveFileString(lOutFileName, lString.ToString)
         Next lBalanceType
     End Sub
 
