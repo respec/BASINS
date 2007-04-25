@@ -35,20 +35,20 @@ Public Module ScriptWatershedSummary
 
         'build collection of constituents to report
         Dim lConstituents As New atcCollection
-        'lConstituents.Add("Water")
-        'lConstituents.Add("BOD")
-        'lConstituents.Add("DO")
+        lConstituents.Add("Water")
+        lConstituents.Add("BOD")
+        lConstituents.Add("DO")
         'lConstituents.Add("FColi")
         'lConstituents.Add("Lead")
         'lConstituents.Add("NH3")
-        'lConstituents.Add("NH4")
+        lConstituents.Add("NH4")
         lConstituents.Add("NO3")
-        'lConstituents.Add("OrganicN")
-        'lConstituents.Add("OrganicP")
-        'lConstituents.Add("PO4")
-        'lConstituents.Add("Sed")
+        lConstituents.Add("OrganicN")
+        lConstituents.Add("OrganicP")
+        lConstituents.Add("PO4")
+        lConstituents.Add("Sediment")
         lConstituents.Add("TotalN")
-        'lConstituents.Add("TotalP")
+        lConstituents.Add("TotalP")
         'lConstituents.Add("WaterTemp")
         'lConstituents.Add("Zinc")
 
@@ -149,7 +149,7 @@ Public Module ScriptWatershedSummary
                 Case "PO4"
                     lPerlndConstituents.Add("POQUAL-ORTHO P")
                     lImplndConstituents.Add("SOQUAL-ORTHO P")
-                Case "Sed"
+                Case "Sediment"
                     lPerlndConstituents.Add("SOSED")
                     lImplndConstituents.Add("SOSLD")
                     lUnits = "tons"
@@ -253,7 +253,7 @@ Public Module ScriptWatershedSummary
                     End If
                     lTotal = lLuArea * lValue
                     If lSummaryType = "Water" Then
-                        lTotal = lTotal * 8687.6  'convert in to cfs
+                        lTotal = lTotal / 8687.6  'convert in to cfs
                     End If
                     lLandUses.Add(Left(lOperType, 1) & lOper.Id & ":" & lLuName.Trim)
                     lAreas.Add(lLuArea)
@@ -264,7 +264,9 @@ Public Module ScriptWatershedSummary
             Next
 
             For lIndex As Integer = 1 To lLandUses.Count
-                lString.AppendLine(lLandUses(lIndex) & vbTab & _
+                Dim s As String = lLandUses(lIndex)
+                s = s.PadRight(25)
+                lString.AppendLine(s & vbTab & _
                                    DF(lAreas(lIndex)) & vbTab & _
                                    DF(lLoads(lIndex)) & vbTab & _
                                    DF(lTotalLoads(lIndex)) & vbTab & _
