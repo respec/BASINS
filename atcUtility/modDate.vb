@@ -49,8 +49,8 @@ Public Module modDate
     ''' <remarks>When doing math on months and years, it is more accurate to use subroutines Timdif and Timadd</remarks>
     Public Const JulianYear As Double = 365.25
 
-    ''' <summary>Julian days from actual year zero to modified Julian day we use as zero</summary>
-    Private Const JulianModification1858 As Integer = 679006 '17 Nov 1858
+    '''' <summary>Julian days from actual year zero to modified Julian day we use as zero</summary>
+    'Private Const JulianModification1858 As Integer = 679006 '17 Nov 1858
     Private Const JulianModification1899 As Integer = 694024 '30 Dec 1899
     'This is the offset we actually use
     Public Const JulianModification As Integer = JulianModification1899
@@ -59,21 +59,21 @@ Public Module modDate
     ''' <remarks>TODO: make this international</remarks>
     Public ReadOnly MonthName3 As String() = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 
-    ''' <summary>convert a VB date to a modfied Julian date(MJD)</summary>
-    ''' <param name="aDate"> VBdate to convert</param>
-    ''' <returns>modified Julian date</returns>
-    ''' <remarks>VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858</remarks>
-    Public Function VBdate2MJD(ByVal aDate As Date) As Double
-        Return aDate.ToOADate + JulianModification1899 - JulianModification
-    End Function
+    '''' <summary>convert a VB date to a modfied Julian date(MJD)</summary>
+    '''' <param name="aDate"> VBdate to convert</param>
+    '''' <returns>modified Julian date</returns>
+    '''' <remarks>VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858</remarks>
+    'Public Function VBdate2MJD(ByVal aDate As Date) As Double
+    '    Return aDate.ToOADate + JulianModification1899 - JulianModification
+    'End Function
 
-    ''' <summary>convert a modified Julian date(MJD) to a VB date</summary>
-    ''' <param name="aJDate"> MJD to convert</param>
-    ''' <returns>VB date</returns>
-    ''' <remarks>VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858</remarks>
-    Public Function MJD2VBdate(ByVal aJDate As Double) As Date
-        Return FromOADate(aJDate + JulianModification - JulianModification1899)
-    End Function
+    '''' <summary>convert a modified Julian date(MJD) to a VB date</summary>
+    '''' <param name="aJDate"> MJD to convert</param>
+    '''' <returns>VB date</returns>
+    '''' <remarks>VB date 0 is 30Dec1899, MJD date 0 is 17Nov1858</remarks>
+    'Public Function MJD2VBdate(ByVal aJDate As Double) As Date
+    '    Return FromOADate(aJDate + JulianModification - JulianModification1899)
+    'End Function
 
     ''' <summary>convert a date array to a modfied Julian date (MJD)</summary>
     ''' <param name="aDate">date array to convert</param>

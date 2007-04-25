@@ -67,7 +67,6 @@ Public Class atcDataSourceSynopInput
                 lDateArr(4) = 0 'No minutes in this file format
                 lDateArr(5) = 0 'No seconds in this file format
 
-                lTable = New atcTableFixed
                 With lTable
                     .NumHeaderRows = 0
 

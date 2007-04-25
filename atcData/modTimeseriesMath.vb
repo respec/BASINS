@@ -314,7 +314,6 @@ Public Module modTimeseriesMath
 
                 Dim lNewTSer As New atcTimeseries(aDataSource)
                 CopyBaseAttributes(aOldTSer, lNewTSer)
-                lNewTSer.Attributes.SetValue("point", False)
                 If aOldTSer.ValueAttributesExist Then 'TODO:: Something with value attributes
                 End If
 
@@ -395,6 +394,16 @@ Public Module modTimeseriesMath
                 lNewTSer.Dates = New atcTimeseries(Nothing)
                 lNewTSer.Dates.Values = lNewDates
                 lNewTSer.Values = lNewVals
+
+                With lNewTSer.Attributes
+                    .SetValue("point", False)
+                    .SetValue("tu", aTU)
+                    .SetValue("ts", aTS)
+                    .SetValue("TSFILL", aFillVal)
+                    .SetValue("MVal", aMissVal)
+                    .SetValue("MAcc", aAccumVal)
+                End With
+
                 Return lNewTSer
             Else
                 Logger.Dbg("Problem with dates in Timeseries " & aOldTSer.ToString & ".")

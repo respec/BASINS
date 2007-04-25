@@ -217,10 +217,10 @@ Friend Class frmDataSource
                                         'Operations might have categories to further divide them
                                         If lOperation.Definition.Category.Length > 0 Then
                                             Dim lSubCategoryNode As Forms.TreeNode = FindOrCreateNode(lCategoryNode.Nodes, lOperation.Definition.Category)
-                                            lNode = lSubCategoryNode.Nodes.Add(lOperation.Definition.Name)
+                                            lNode = FindOrCreateNode(lSubCategoryNode.Nodes, lOperation.Definition.Name)
                                             lSubCategoryNode.ExpandAll()
                                         Else
-                                            lNode = lCategoryNode.Nodes.Add(lOperation.Definition.Name)
+                                            lNode = FindOrCreateNode(lCategoryNode.Nodes, lOperation.Definition.Name)
                                         End If
 
                                         lNode.Tag = ds.Name
@@ -230,7 +230,7 @@ Friend Class frmDataSource
                                 End Select
                             Next
                         Else
-                            lNode = lCategoryNode.Nodes.Add(ds.Description)
+                            lNode = FindOrCreateNode(lCategoryNode.Nodes, ds.Description)
                             lNode.Tag = ds.Name
                             If ds.Equals(pSelectedSource) Then
                                 treeSources.SelectedNode = lNode
@@ -282,7 +282,11 @@ Friend Class frmDataSource
         Next
         If newNode Is Nothing Then
             newNode = New Forms.TreeNode(aNodeText)
-            aNodes.Add(newNode)
+            Dim lIndex As Integer
+            For lIndex = 0 To aNodes.Count - 1
+                If aNodes(lIndex).Text > aNodeText Then Exit For
+            Next
+            aNodes.Insert(lIndex, newNode)
         End If
         Return newNode
     End Function
