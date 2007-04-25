@@ -258,13 +258,16 @@ Public Class frmSelectDisplay
     Private Function SaveData() As Boolean
         Dim lSave As New frmSaveData
         Dim lSaveSource As atcDataSource = lSave.AskUser(pDataManager, pDataGroup)
+        Dim lNumSaved As Integer = 0
         '    Dim lSaveIn As atcDataSource = UserOpenDataFile(False, True)
         If Not lSaveSource Is Nothing AndAlso lSaveSource.Specification.Length > 0 Then
             For Each lDataSet As atcDataSet In pDataGroup
-                lSaveSource.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber)
+                If lSaveSource.AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber) Then
+                    lNumSaved += 1
+                End If
             Next
-            If lSaveSource.Save(lSaveSource.Specification) Then
-                Dim lMsg As String = "Saved " & pDataGroup.Count & " dataset"
+            If lNumSaved > 0 AndAlso lSaveSource.Save(lSaveSource.Specification) Then
+                Dim lMsg As String = "Saved " & lNumSaved & " of " & pDataGroup.Count & " dataset"
                 If pDataGroup.Count <> 1 Then lMsg &= "s"
                 lMsg &= " in " & vbCrLf & lSaveSource.Specification & vbCrLf & "(file now contains " & lSaveSource.DataSets.Count & " dataset"
                 If lSaveSource.DataSets.Count <> 1 Then lMsg &= "s"

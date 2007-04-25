@@ -97,8 +97,12 @@ Public Class atcDataSourceWDM
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Try
             Dim lTimser As atcTimeseries = aDataSet
-            Dim lTs As Integer = lTimser.Attributes.GetValue("ts")
-            Dim lTu As Integer = lTimser.Attributes.GetValue("tu")
+            Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
+            Dim lTu As Integer = lTimser.Attributes.GetValue("tu", 0)
+
+            If lTs = 0 Then Throw New ApplicationException("Cannot write to WDM: time step not set")
+            If lTu = 0 Then Throw New ApplicationException("Cannot write to WDM: time units not set")
+
             Dim lNvals As Integer = lTimser.numValues
             Dim lSJDay As Double = lTimser.Dates.Value(0)
             Dim lSDat(5) As Integer
@@ -110,7 +114,7 @@ Public Class atcDataSourceWDM
             TimDif(lSDat, lEDat, lTu, lTs, lNValsExpected)
             If lNvals <> lNValsExpected Then
                 'TODO:  make writing data smarter to deal with big gaps of missing, etc
-                Throw New Exception("NVals:" & lNvals & ":" & lNValsExpected)
+                Throw New ApplicationException("NVals:" & lNvals & ":" & lNValsExpected)
             End If
 
             'aDataSet.Attributes.CalculateAll() 'should we calculdate attributes on request, not here on creation
@@ -150,7 +154,7 @@ CaseExistReplace:
                         If lTimser.numValues > 0 AndAlso _
                            lExistTimser.numValues > 0 AndAlso _
                            lTimser.Dates.Value(1) <= lExistTimser.Dates.Value(lExistTimser.numValues) Then
-                            Throw New Exception("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
+                            Throw New ApplicationException("atcDataSourceWDM:AddDataset: Unable to append new TSer " & _
                                                 lTimser.ToString & " to existing TSer " & _
                                                 lExistTimser.ToString & vbCrLf & _
                                                 "New TSer start date (" & lTimser.Dates.Value(1) & _
@@ -194,16 +198,19 @@ CaseExistRenumber:
                     F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
                 End If
                 If lRet <> 0 Then
-                    Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:call:" & _
+                    Throw New ApplicationException("WDTPUT:call:" & _
                                 lWdmHandle.Unit & ":" & lDsn & ":" & lTs & ":" & lNvals & ":" & _
                                 lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
                     'Logger.Dbg("atcDataSourceWdm:AddDataset:WDTPUT:back:" & _
                     '            lWdmHandle.Unit & ":" & lDsn & ":" & lRet)
                 End If
+                lWdmHandle.Dispose()
+                Return True
+            Else
+                lWdmHandle.Dispose()
+                Return False
             End If
 
-            lWdmHandle.Dispose()
-            Return True
         Catch ex As Exception
             Logger.Dbg("atcDataSourceWdm:AddDataSet:" & ex.ToString)
             lWdmHandle.Dispose()
@@ -233,7 +240,7 @@ CaseExistRenumber:
         'Logger.Dbg("atcDataSourceWdm:WriteAttributes:entry:" & aDataSet.ToString)
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Dim lMsg As atcWdmHandle = pMsg.MsgHandle
-        Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 0)
+        Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
         If Not aNewValue Is Nothing Then aAttribute.Value = aNewValue
 
@@ -257,7 +264,7 @@ CaseExistRenumber:
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Dim lRetcod As Integer
 
-        Call F90_WDDSDL(lWdmHandle.Unit, (aDataSet.Attributes.GetValue("id")), lRetcod)
+        Call F90_WDDSDL(lWdmHandle.Unit, (aDataSet.Attributes.GetValue("id", 1)), lRetcod)
         If lRetcod = 0 Then
             RemoveDataset = True
             DataSets.Remove(aDataSet)
@@ -275,7 +282,7 @@ CaseExistRenumber:
             End If
         Else
             RemoveDataset = False
-            pErrorDescription = "WDM:RemoveDataset:DSN:" & aDataSet.Attributes.GetValue("id") & ":Retcod:" & lRetcod
+            pErrorDescription = "WDM:RemoveDataset:DSN:" & aDataSet.Attributes.GetValue("id", 1) & ":Retcod:" & lRetcod
             Logger.Dbg(pErrorDescription)
         End If
         lWdmHandle.Dispose()
@@ -300,7 +307,7 @@ CaseExistRenumber:
                             ByVal aTs As atcTimeseries) As Boolean
         Dim lDsn, lNSasp, lNUp, lNDn, lNSa, lNDp, lPsa As Integer
 
-        lDsn = aTs.Attributes.GetValue("id", 0)
+        lDsn = aTs.Attributes.GetValue("id", 1)
         lNDn = aTs.Attributes.GetValue("NDN", 10)
         lNUp = aTs.Attributes.GetValue("NUP", 10)
         lNSa = aTs.Attributes.GetValue("NSA", 30)
@@ -323,7 +330,7 @@ CaseExistRenumber:
 
         Dim lMsg As atcWdmHandle = pMsg.MsgHandle
         Dim lMsgUnit As Integer = lMsg.Unit
-        Dim lDsn As Integer = aTs.Attributes.GetValue("id", 0)
+        Dim lDsn As Integer = aTs.Attributes.GetValue("id", 1)
 
         'add needed attributes
         lStr = aTs.Attributes.GetValue("cons")
@@ -562,7 +569,7 @@ CaseExistRenumber:
                         End If
                         If nVals > 0 Then
                             ReDim lV(nVals)
-                            Dim lDsn As Integer = CInt(.GetValue("id", 0))
+                            Dim lDsn As Integer = CInt(.GetValue("id", 1))
                             Dim lTimeStep As Integer = CInt(.GetValue("ts", 0))
                             Dim lTimeUnits As Integer = CInt(.GetValue("tu", 0))
                             Dim lTran As Integer = 0 'transformation = aver,same
@@ -689,7 +696,7 @@ CaseExistRenumber:
         Dim lStr As String = ""
         Dim lSdat(6) As Integer
         Dim lEdat(6) As Integer
-        Dim lDsn As Integer = aDataset.Attributes.GetValue("id", 0)
+        Dim lDsn As Integer = aDataset.Attributes.GetValue("id", 1)
 
         lSaLen = 1
         lSaInd = 33 'time step

@@ -181,7 +181,7 @@ Public Class atcDataSourceNOAAHPD
                     lData.Attributes.SetValue("Location", ColLocation.Value)
                     lData.Attributes.SetValue("Constituent", ColElementType.Value)
                     lData.Attributes.SetValue("Description", "Hourly Precip in Inches")
-                    lData.Attributes.SetValue("tu", 3)
+                    lData.Attributes.SetValue("tu", atcTimeUnit.TUHour)
                     lData.Attributes.SetValue("ts", 1)
                     lData.Attributes.SetValue("point", False)
                     lData.Attributes.SetValue("TSFILL", MissingVal)
