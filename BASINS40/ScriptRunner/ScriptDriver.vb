@@ -4,11 +4,11 @@ Public Module ScriptDriver
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
-        'ScriptConstituentBalance.ScriptMain(aMapWin)
-        'ScriptWatershedSummary.ScriptMain(aMapWin)
+        ScriptConstituentBalance.ScriptMain(aMapWin)
+        ScriptWatershedSummary.ScriptMain(aMapWin)
         'ScriptCatSummary.ScriptMain(aMapWin)
         'BASINSProjectSummary.ScriptMain(aMapWin)
-        ScriptShapefileFromWDM.ScriptMain(aMapWin)
+        'ScriptShapefileFromWDM.ScriptMain(aMapWin)
     End Sub
 
 End Module

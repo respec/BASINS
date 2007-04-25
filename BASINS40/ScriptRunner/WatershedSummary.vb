@@ -185,13 +185,13 @@ Public Module ScriptWatershedSummary
             lString.AppendLine("   Average Annual Rates and Totals")
             lString.AppendLine("   " & lHspfUci.GlobalBlock.RunInf.Value)
             lString.AppendLine(vbCrLf)
-            lString.AppendLine("Land Use  " & vbTab & _
-                               "    Area    " & vbTab & _
+            lString.AppendLine("Land Use                 " & vbTab & _
+                               "   Area    " & vbTab & _
                                "    Load    " & vbTab & _
                                "Total Load  " & vbTab & _
                                "Total Load")
-            lString.AppendLine("            " & vbTab & _
-                               "   (acres)  " & vbTab & _
+            lString.AppendLine("                         " & vbTab & _
+                               "  (acres)  " & vbTab & _
                                " (" & lUnits & "/acre) " & vbTab & _
                                "  (" & lTotalUnits & ")     " & vbTab & _
                                "    (%)     ")
@@ -263,8 +263,9 @@ Public Module ScriptWatershedSummary
                 Next
             Next
 
+            Dim s As String
             For lIndex As Integer = 1 To lLandUses.Count
-                Dim s As String = lLandUses(lIndex)
+                s = lLandUses(lIndex)
                 s = s.PadRight(25)
                 lString.AppendLine(s & vbTab & _
                                    DF(lAreas(lIndex)) & vbTab & _
@@ -273,7 +274,9 @@ Public Module ScriptWatershedSummary
                                    DF((lTotalLoads(lIndex) / lSum * 100), 2))
             Next
             lString.AppendLine("")
-            lString.AppendLine(vbTab & vbTab & vbTab & vbTab & "Total Load = " & vbTab & DF(lSum) & vbTab & " " & lTotalUnits)
+            s = ""
+            s = s.PadRight(25)
+            lString.AppendLine(s & vbTab & vbTab & vbTab & "Total Load = " & vbTab & DF(lSum) & vbTab & " " & lTotalUnits)
 
             Dim lOutFileName As String = aScenario & "_" & lSummaryType & "_" & "WatershedSummary.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
