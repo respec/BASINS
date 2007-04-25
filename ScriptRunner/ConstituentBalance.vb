@@ -37,7 +37,7 @@ Public Module ScriptConstituentBalance
         Dim lConstituents As New atcCollection
         lConstituents.Add("Water")
         'lConstituents.Add("NfromPQUAL")
-        lConstituents.Add("TotalN")
+        'lConstituents.Add("TotalN")
         'lConstituents.Add("SedimentCopper")  'implemented but not in use
         'lConstituents.Add("TotalP")          'not yet implemented
 
