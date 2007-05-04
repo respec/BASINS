@@ -45,12 +45,14 @@ Public Class frmSpecifyFrequency
     Friend WithEvents btnNdayNone As System.Windows.Forms.Button
     Friend WithEvents btnNdayAll As System.Windows.Forms.Button
     Friend WithEvents lstNday As System.Windows.Forms.ListBox
-    Friend WithEvents btnOkLow As System.Windows.Forms.Button
-    Friend WithEvents btnOkHigh As System.Windows.Forms.Button
+    Friend WithEvents btnOk As System.Windows.Forms.Button
     Friend WithEvents txtNdayAdd As System.Windows.Forms.TextBox
     Friend WithEvents btnNdayAdd As System.Windows.Forms.Button
     Friend WithEvents btnRecurrenceAdd As System.Windows.Forms.Button
     Friend WithEvents chkKeepNDayTSers As System.Windows.Forms.CheckBox
+    Friend WithEvents btnSelectYearsSeasons As System.Windows.Forms.Button
+    Friend WithEvents radioLow As System.Windows.Forms.RadioButton
+    Friend WithEvents radioHigh As System.Windows.Forms.RadioButton
     Friend WithEvents txtRecurrenceAdd As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSpecifyFrequency))
@@ -70,9 +72,11 @@ Public Class frmSpecifyFrequency
         Me.btnNdayAll = New System.Windows.Forms.Button
         Me.lstNday = New System.Windows.Forms.ListBox
         Me.panelBottom = New System.Windows.Forms.Panel
-        Me.btnOkHigh = New System.Windows.Forms.Button
+        Me.btnSelectYearsSeasons = New System.Windows.Forms.Button
+        Me.btnOk = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
-        Me.btnOkLow = New System.Windows.Forms.Button
+        Me.radioHigh = New System.Windows.Forms.RadioButton
+        Me.radioLow = New System.Windows.Forms.RadioButton
         Me.panelTop.SuspendLayout()
         Me.grpRecurrence.SuspendLayout()
         Me.grpNday.SuspendLayout()
@@ -89,7 +93,7 @@ Public Class frmSpecifyFrequency
         Me.panelTop.Controls.Add(Me.grpNday)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(418, 399)
+        Me.panelTop.Size = New System.Drawing.Size(447, 399)
         Me.panelTop.TabIndex = 14
         '
         'grpRecurrence
@@ -102,7 +106,7 @@ Public Class frmSpecifyFrequency
         Me.grpRecurrence.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grpRecurrence.Location = New System.Drawing.Point(208, 0)
         Me.grpRecurrence.Name = "grpRecurrence"
-        Me.grpRecurrence.Size = New System.Drawing.Size(210, 399)
+        Me.grpRecurrence.Size = New System.Drawing.Size(239, 399)
         Me.grpRecurrence.TabIndex = 7
         Me.grpRecurrence.TabStop = False
         Me.grpRecurrence.Text = "Recurrence Interval"
@@ -116,14 +120,14 @@ Public Class frmSpecifyFrequency
         Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
         Me.lstRecurrence.Name = "lstRecurrence"
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstRecurrence.Size = New System.Drawing.Size(191, 315)
+        Me.lstRecurrence.Size = New System.Drawing.Size(220, 315)
         Me.lstRecurrence.TabIndex = 8
         Me.lstRecurrence.Tag = "Return Period"
         '
         'btnRecurrenceAdd
         '
         Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(133, 340)
+        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(162, 340)
         Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
         Me.btnRecurrenceAdd.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceAdd.TabIndex = 10
@@ -135,13 +139,13 @@ Public Class frmSpecifyFrequency
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.txtRecurrenceAdd.Location = New System.Drawing.Point(8, 343)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
-        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(117, 20)
+        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(146, 20)
         Me.txtRecurrenceAdd.TabIndex = 9
         '
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(133, 370)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(162, 370)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
         Me.btnRecurrenceNone.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceNone.TabIndex = 12
@@ -242,49 +246,73 @@ Public Class frmSpecifyFrequency
         '
         'panelBottom
         '
-        Me.panelBottom.Controls.Add(Me.btnOkHigh)
+        Me.panelBottom.Controls.Add(Me.radioLow)
+        Me.panelBottom.Controls.Add(Me.radioHigh)
+        Me.panelBottom.Controls.Add(Me.btnSelectYearsSeasons)
+        Me.panelBottom.Controls.Add(Me.btnOk)
         Me.panelBottom.Controls.Add(Me.btnCancel)
-        Me.panelBottom.Controls.Add(Me.btnOkLow)
         Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.panelBottom.Location = New System.Drawing.Point(0, 412)
         Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(417, 32)
+        Me.panelBottom.Size = New System.Drawing.Size(446, 32)
         Me.panelBottom.TabIndex = 15
         '
-        'btnOkHigh
+        'btnSelectYearsSeasons
         '
-        Me.btnOkHigh.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOkHigh.Location = New System.Drawing.Point(137, 0)
-        Me.btnOkHigh.Name = "btnOkHigh"
-        Me.btnOkHigh.Size = New System.Drawing.Size(96, 24)
-        Me.btnOkHigh.TabIndex = 13
-        Me.btnOkHigh.Text = "Compute High"
+        Me.btnSelectYearsSeasons.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnSelectYearsSeasons.Location = New System.Drawing.Point(114, 0)
+        Me.btnSelectYearsSeasons.Name = "btnSelectYearsSeasons"
+        Me.btnSelectYearsSeasons.Size = New System.Drawing.Size(148, 24)
+        Me.btnSelectYearsSeasons.TabIndex = 16
+        Me.btnSelectYearsSeasons.Text = "Select Years / Seasons..."
+        '
+        'btnOk
+        '
+        Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnOk.Location = New System.Drawing.Point(268, 0)
+        Me.btnOk.Name = "btnOk"
+        Me.btnOk.Size = New System.Drawing.Size(96, 24)
+        Me.btnOk.TabIndex = 13
+        Me.btnOk.Text = "Compute"
         '
         'btnCancel
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(341, 0)
+        Me.btnCancel.Location = New System.Drawing.Point(370, 0)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 15
         Me.btnCancel.Text = "Cancel"
         '
-        'btnOkLow
+        'radioHigh
         '
-        Me.btnOkLow.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOkLow.Location = New System.Drawing.Point(239, 0)
-        Me.btnOkLow.Name = "btnOkLow"
-        Me.btnOkLow.Size = New System.Drawing.Size(96, 24)
-        Me.btnOkLow.TabIndex = 14
-        Me.btnOkLow.Text = "Compute Low"
+        Me.radioHigh.AutoSize = True
+        Me.radioHigh.Checked = True
+        Me.radioHigh.Location = New System.Drawing.Point(3, 4)
+        Me.radioHigh.Name = "radioHigh"
+        Me.radioHigh.Size = New System.Drawing.Size(47, 17)
+        Me.radioHigh.TabIndex = 17
+        Me.radioHigh.TabStop = True
+        Me.radioHigh.Text = "High"
+        Me.radioHigh.UseVisualStyleBackColor = True
+        '
+        'radioLow
+        '
+        Me.radioLow.AutoSize = True
+        Me.radioLow.Location = New System.Drawing.Point(56, 4)
+        Me.radioLow.Name = "radioLow"
+        Me.radioLow.Size = New System.Drawing.Size(45, 17)
+        Me.radioLow.TabIndex = 18
+        Me.radioLow.Text = "Low"
+        Me.radioLow.UseVisualStyleBackColor = True
         '
         'frmSpecifyFrequency
         '
-        Me.AcceptButton = Me.btnOkHigh
+        Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(417, 444)
+        Me.ClientSize = New System.Drawing.Size(446, 444)
         Me.Controls.Add(Me.panelTop)
         Me.Controls.Add(Me.panelBottom)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -297,6 +325,7 @@ Public Class frmSpecifyFrequency
         Me.grpNday.ResumeLayout(False)
         Me.grpNday.PerformLayout()
         Me.panelBottom.ResumeLayout(False)
+        Me.panelBottom.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -306,25 +335,36 @@ Public Class frmSpecifyFrequency
     Private WithEvents pDataGroup As atcDataGroup
     Private pDataManager As atcDataManager
     Private pOk As Boolean = False
-    Private pChoseHigh As Boolean = False
+    Private pYearStartMonth As Integer = 0
+    Private pYearStartDay As Integer = 0
+    Private pYearEndMonth As Integer = 0
+    Private pYearEndDay As Integer = 0
+    Private pFirstYear As Integer = 0
+    Private pLastYear As Integer = 0
 
     Public Function AskUser(ByVal aDataManager As atcDataManager, ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
         pDataManager = aDataManager
         pDataGroup = aGroup
         Clear()
         Me.ShowDialog()
-        If pOk Then aChoseHigh = pChoseHigh
+        If pOk Then aChoseHigh = radioHigh.Checked
         pDataGroup = Nothing
         Return pOk
     End Function
 
     Private Sub Clear()
+        If GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "High") = "High" Then
+            radioHigh.Checked = True
+        Else
+            radioLow.Checked = True
+        End If
         pOk = False
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
         Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
 
         LoadList(lstNday, lNDayHi.Arguments)
         LoadList(lstRecurrence, lNDayHi.Arguments)
+
     End Sub
 
     Private Sub LoadList(ByVal lst As Windows.Forms.ListBox, ByVal aArgs As atcDataAttributes)
@@ -384,10 +424,18 @@ Public Class frmSpecifyFrequency
         lArgs.SetValue("Timeseries", pDataGroup)
         lArgs.SetValue("NDay", ListToArray(lstNday))
         lArgs.SetValue("Return Period", ListToArray(lstRecurrence))
+        If pYearStartMonth > 0 Then lArgs.SetValue("BoundaryMonth", pYearStartMonth)
+        If pYearStartDay > 0 Then lArgs.SetValue("BoundaryDay", pYearStartDay)
+        If pYearEndMonth > 0 Then lArgs.SetValue("EndMonth", pYearEndMonth)
+        If pYearEndDay > 0 Then lArgs.SetValue("EndDay", pYearEndDay)
+        If pFirstYear > 0 Then lArgs.SetValue("FirstYear", pFirstYear)
+        If pLastYear > 0 Then lArgs.SetValue("LastYear", pLastYear)
+
         lCalculator.Open(aOperationName, lArgs)
         If chkKeepNDayTSers.Checked Then 'add NDay Tsers to data manager
             pDataManager.DataSources.Add(lCalculator)
         End If
+        SaveSetting("atcFrequencyGrid", "Defaults", "HighOrLow", HighOrLowString)
         SaveList(lstNday)
         SaveList(lstRecurrence)
     End Sub
@@ -450,19 +498,10 @@ Public Class frmSpecifyFrequency
         Next
     End Sub
 
-    Private Sub btnOkLow_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOkLow.Click
+    Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        Calculate("n-day low value")
+        Calculate("n-day " & HighOrLowString() & " value")
         pOk = True
-        pChoseHigh = False
-        Close()
-    End Sub
-
-    Private Sub btnOkHigh_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOkHigh.Click
-        Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
-        Calculate("n-day high value")
-        pOk = True
-        pChoseHigh = True
         Close()
     End Sub
 
@@ -475,5 +514,54 @@ Public Class frmSpecifyFrequency
             ShowHelp("BASINS Details\Analysis\Time Series Functions\Frequency Grid.html")
         End If
     End Sub
+
+    Private Sub btnSelectYearsSeasons_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelectYearsSeasons.Click
+
+        Dim lForm As New frmSpecifyYearsSeasons
+        If lForm.AskUser("FrequencyGrid" & Me.Text, pDataGroup, pYearStartMonth, pYearStartDay, pYearEndMonth, pYearEndDay, pFirstYear, pLastYear) Then
+            'lSeasons = New atcSeasonsYearSubset(aStartMonth, aStartDay, aEndMonth, aEndDay)
+            Dim lName As String = HighOrLowString()
+            SaveSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
+            SaveSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
+            SaveSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
+            SaveSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
+        End If
+
+    End Sub
+
+    Private Sub radioHigh_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles radioHigh.CheckedChanged
+        GetDefaultYearStartEnd()
+    End Sub
+
+    Private Sub radioLow_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles radioLow.CheckedChanged
+        GetDefaultYearStartEnd()
+    End Sub
+
+    Private Sub GetDefaultYearStartEnd()
+        Dim lName As String = HighOrLowString()
+        If radioHigh.Checked Then
+            pYearStartMonth = 10
+            pYearStartDay = 1
+            pYearEndMonth = 9
+            pYearEndDay = 30
+        Else
+            pYearStartMonth = 4
+            pYearStartDay = 1
+            pYearEndMonth = 3
+            pYearEndDay = 31
+        End If
+        pYearStartMonth = GetSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
+        pYearStartDay = GetSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
+        pYearEndMonth = GetSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
+        pYearEndDay = GetSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
+    End Sub
+
+    Private Function HighOrLowString() As String
+        If radioHigh.Checked Then
+            Return "High"
+        Else
+            Return "Low"
+        End If
+    End Function
 
 End Class

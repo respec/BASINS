@@ -76,8 +76,9 @@ Friend Class frmDisplayFrequencyGrid
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisplayFrequencyGrid))
-        Me.MainMenu1 = New System.Windows.Forms.MainMenu
+        Me.components = New System.ComponentModel.Container
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDisplayFrequencyGrid))
+        Me.MainMenu1 = New System.Windows.Forms.MainMenu(Me.components)
         Me.mnuFile = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
@@ -192,6 +193,7 @@ Friend Class frmDisplayFrequencyGrid
         'agdMain
         '
         Me.agdMain.AllowHorizontalScrolling = True
+        Me.agdMain.AllowNewValidValues = False
         Me.agdMain.CellBackColor = System.Drawing.Color.Empty
         Me.agdMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.agdMain.LineColor = System.Drawing.Color.Empty
@@ -368,6 +370,7 @@ Friend Class frmDisplayFrequencyGrid
             End If
             If Not pSource Is Nothing AndAlso pSource.High <> newValue Then
                 pSource.High = newValue
+                agdMain.SizeAllColumnsToContents()
                 agdMain.Refresh()
             End If
         End Set
