@@ -51,10 +51,22 @@ Public Module modTimeseriesMath
 
     End Function
 
+    ''' <summary>
+    ''' Trim a timeseries if needed to make it start and end at the desired year boundary.
+    ''' Useful when complete calendar or water years are needed
+    ''' </summary>
+    ''' <param name="aTimeseries"></param>
+    ''' <param name="aBoundaryMonth"></param>
+    ''' <param name="aBoundaryDay"></param>
+    ''' <param name="aDataSource"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Function SubsetByDateBoundary(ByVal aTimeseries As atcTimeseries, _
                                          ByVal aBoundaryMonth As Integer, _
                                          ByVal aBoundaryDay As Integer, _
-                                         ByVal aDataSource As atcDataSource) As atcTimeseries
+                                         ByVal aDataSource As atcDataSource, _
+                                Optional ByVal aFirstYear As Integer = 0, _
+                                Optional ByVal aLastYear As Integer = 0) As atcTimeseries
         Dim lStartDate As Double
         Dim lEndDate As Double
         Dim lStartTimeseriesDate As Date
@@ -64,15 +76,23 @@ Public Module modTimeseriesMath
 
         aTimeseries.EnsureValuesRead()
 
-        'TODO: boundary conditions...
+        If aFirstYear > 0 AndAlso aBoundaryMonth > 1 Then
+            'Convert water year into calendar year
+            aFirstYear -= 1
+        End If
+
         lStartTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(0))
         With lStartTimeseriesDate
             lStartYear = .Year
-            If .Month > aBoundaryMonth Then
-                lStartYear += 1
-            ElseIf .Month = aBoundaryMonth Then
-                If .Day > aBoundaryDay Then
+            If aFirstYear > lStartYear Then
+                lStartYear = aFirstYear
+            Else
+                If .Month > aBoundaryMonth Then
                     lStartYear += 1
+                ElseIf .Month = aBoundaryMonth Then
+                    If .Day > aBoundaryDay Then
+                        lStartYear += 1
+                    End If
                 End If
             End If
             lStartDate = Jday(lStartYear, aBoundaryMonth, aBoundaryDay, 0, 0, 0)
@@ -81,11 +101,15 @@ Public Module modTimeseriesMath
         lEndTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(aTimeseries.Dates.numValues))
         With lEndTimeseriesDate
             lEndYear = .Year
-            If .Month < aBoundaryMonth Then
-                lEndYear -= 1
-            ElseIf .Month = aBoundaryMonth Then
-                If .Day < aBoundaryDay Then
+            If aLastYear > 0 AndAlso aLastYear < lEndYear Then
+                lEndYear = aLastYear
+            Else
+                If .Month < aBoundaryMonth Then
                     lEndYear -= 1
+                ElseIf .Month = aBoundaryMonth Then
+                    If .Day < aBoundaryDay Then
+                        lEndYear -= 1
+                    End If
                 End If
             End If
             lEndDate = Jday(lEndYear, aBoundaryMonth, aBoundaryDay, 0, 0, 0)

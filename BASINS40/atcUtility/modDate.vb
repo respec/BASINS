@@ -956,9 +956,9 @@ Public Module modDate
 
     Public Sub CalcTimeUnitStep(ByVal aSJDate As Double, ByVal aEJDate As Double, ByRef aTu As Integer, ByRef aTs As Integer)
         aTu = 6
-        aTs = 1
+        aTs = 0
         While aTs < 1
-            aTs = timdifJ(aSJDate, aEJDate, aTu, aTs)
+            aTs = timdifJ(aSJDate, aEJDate, aTu, 1)
             If aTs = 0 Then aTu = aTu - 1
         End While
     End Sub

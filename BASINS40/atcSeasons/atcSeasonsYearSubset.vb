@@ -24,6 +24,11 @@ Public Class atcSeasonsYearSubset
         End If
     End Sub
 
+    Public Sub New(ByVal aStartMonth As Integer, ByVal aStartDay As Integer, ByVal aEndMonth As Integer, ByVal aEndDay As Integer)
+        pStartDate = New Date(1900, aStartMonth, aStartDay, 0, 0, 0, 0)
+        pEndDate = New Date(1900, aEndMonth, aEndDay, 0, 0, 0, 0)
+    End Sub
+
     Public Sub New()
         Dim lStartMonth As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetStartMonth", "1"))
         Dim lStartDay As Integer = CInt(GetSetting("BASINS4", "Seasons", "YearSubsetStartDay", "1"))
