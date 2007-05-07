@@ -88,8 +88,10 @@ Public Module modCAT
             Dim lNewBaseFilename As String = AbsolutePath(aBaseFilename, CurDir)
             Dim lNewFolder As String = PathNameOnly(lNewBaseFilename) & "\"
             lNewBaseFilename = lNewFolder & aNewScenarioName & "."
+            Dim lNewUCIfilename As String
 
             If aNewScenarioName.ToLower = "base" Then
+                lNewUCIfilename = aBaseFilename
                 Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
                 For Each lWDMfilename As String In lWDMFilenames
                     lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
@@ -97,9 +99,9 @@ Public Module modCAT
                 Next
             Else
                 Dim lWDMFilenames As ArrayList = UCIFilesBlockFilenames(WholeFileString(aBaseFilename), "WDM")
-
+                lNewUCIfilename = lNewBaseFilename & FilenameNoPath(aBaseFilename)
                 'Copy base UCI, changing base to new scenario name within it
-                CreateModifiedUCI(aBaseFilename, aNewScenarioName, lNewBaseFilename & FilenameNoPath(aBaseFilename))
+                CreateModifiedUCI(aBaseFilename, aNewScenarioName, lNewUCIfilename)
 
                 For Each lWDMfilename As String In lWDMFilenames
                     lWDMfilename = AbsolutePath(lWDMfilename, CurDir)
@@ -150,7 +152,7 @@ Public Module modCAT
                 'Shell(lWinHspfLtExeName & lPipeHandles & lNewBaseFilename & "uci", AppWinStyle.NormalFocus, True)
 
                 AppendFileString(lNewFolder & "WinHSPFLtError.Log", "Start log for " & lNewBaseFilename & vbCrLf)
-                Dim lArgs As String = lPipeHandles & lNewBaseFilename & "uci"
+                Dim lArgs As String = lPipeHandles & lNewUCIfilename
                 Logger.Dbg("Start " & lWinHspfLtExeName & " with Arguments '" & lArgs & "'")
                 Dim newProc As Diagnostics.Process
                 newProc = Diagnostics.Process.Start(lWinHspfLtExeName, lArgs)

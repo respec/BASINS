@@ -198,12 +198,12 @@ Public Class atcTimeseriesFileHspfBinOut
                     End With
                 Next j
             End With
-            Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
             'If pMonitorSet Then
             '    s = "(PROGRESS " & CStr(50 + ((100 * i) / (pBinFile.Headers.Count * 2))) & ")"
             '    pMonitor.SendMonitorMessage(s)
             'End If
             i = i + 1
+            Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
         Next
 
         'If pMonitorSet Then

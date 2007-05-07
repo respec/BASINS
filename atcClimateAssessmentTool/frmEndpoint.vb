@@ -565,7 +565,7 @@ Public Class frmEndpoint
         Dim lSeasonPlugin As New atcSeasonPlugin
         For Each lSeasonType As Type In pSeasonsAvailable
             Dim lSeasonName As String = atcSeasonPlugin.SeasonClassNameToLabel(lSeasonType.Name)
-            If lSeasonName.Equals(cboSeasons.Text) OrElse lSeasonName.Equals(cboSeasons.Text & "s") Then
+            If lSeasonName.Equals(cboSeasons.Text) OrElse lSeasonName.Equals(cboSeasons.Text & "s") OrElse cboSeasons.Text.Equals(lSeasonName & "s") Then
                 Return lSeasonType
             End If
         Next
@@ -602,8 +602,12 @@ Public Class frmEndpoint
 
     Private Function VariationFromForm(ByVal aVariation As atcVariation) As Boolean
         Try
+            If txtName.Text.Trim.Length = 0 Then
+                Logger.Msg("Name was not entered", "Name is required")
+                Return False
+            End If
             With aVariation
-                .Name = txtName.Text
+                .Name = txtName.Text.Trim
                 .Operation = cboAttribute.Text
                 If chkSeasons.Checked Then
                     .Seasons = pSeasons
