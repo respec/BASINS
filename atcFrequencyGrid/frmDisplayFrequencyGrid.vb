@@ -67,13 +67,14 @@ Friend Class frmDisplayFrequencyGrid
     Friend WithEvents mnuViewLow As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEdit As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditCopy As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSave As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSaveGrid As System.Windows.Forms.MenuItem
     Friend WithEvents mnuSizeColumnsToContents As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewSep2 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSep1 As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSaveReport As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -83,7 +84,7 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuFileSelectData = New System.Windows.Forms.MenuItem
         Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
-        Me.mnuFileSave = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
@@ -95,8 +96,9 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuViewSep2 = New System.Windows.Forms.MenuItem
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
-        Me.agdMain = New atcControls.atcGrid
         Me.mnuHelp = New System.Windows.Forms.MenuItem
+        Me.agdMain = New atcControls.atcGrid
+        Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -106,7 +108,7 @@ Friend Class frmDisplayFrequencyGrid
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSave})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSaveGrid, Me.mnuFileSaveReport})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
@@ -124,11 +126,11 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuFileSep1.Index = 2
         Me.mnuFileSep1.Text = "-"
         '
-        'mnuFileSave
+        'mnuFileSaveGrid
         '
-        Me.mnuFileSave.Index = 3
-        Me.mnuFileSave.Shortcut = System.Windows.Forms.Shortcut.CtrlS
-        Me.mnuFileSave.Text = "Save"
+        Me.mnuFileSaveGrid.Index = 3
+        Me.mnuFileSaveGrid.Shortcut = System.Windows.Forms.Shortcut.CtrlS
+        Me.mnuFileSaveGrid.Text = "Save Grid"
         '
         'mnuEdit
         '
@@ -190,6 +192,13 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuAnalysis.Index = 3
         Me.mnuAnalysis.Text = "Analysis"
         '
+        'mnuHelp
+        '
+        Me.mnuHelp.Index = 4
+        Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
+        Me.mnuHelp.ShowShortcut = False
+        Me.mnuHelp.Text = "Help"
+        '
         'agdMain
         '
         Me.agdMain.AllowHorizontalScrolling = True
@@ -204,12 +213,10 @@ Friend Class frmDisplayFrequencyGrid
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
         '
-        'mnuHelp
+        'mnuFileSaveReport
         '
-        Me.mnuHelp.Index = 4
-        Me.mnuHelp.Shortcut = System.Windows.Forms.Shortcut.F1
-        Me.mnuHelp.ShowShortcut = False
-        Me.mnuHelp.Text = "Help"
+        Me.mnuFileSaveReport.Index = 4
+        Me.mnuFileSaveReport.Text = "Save Report"
         '
         'frmDisplayFrequencyGrid
         '
@@ -254,9 +261,9 @@ Friend Class frmDisplayFrequencyGrid
                 agdMain.Initialize(pSwapperSource)
                 agdMain.SizeAllColumnsToContents()
 
-                Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSource.Rows * agdMain.RowHeight(0)
+                Dim lRequestedHeight As Single = Me.Height - agdMain.Top - agdMain.Height + pSwapperSource.Rows * agdMain.RowHeight(0)
                 Dim lRequestedWidth As Single = Me.Width - agdMain.Left - agdMain.Width
-                For lColumn As Integer = 0 To pSource.Columns - 1
+                For lColumn As Integer = 0 To pSwapperSource.Columns - 1
                     lRequestedWidth += agdMain.ColumnWidth(lColumn)
                 Next
                 Me.Height = lRequestedHeight
@@ -276,7 +283,7 @@ Friend Class frmDisplayFrequencyGrid
         Clipboard.SetDataObject(Me.ToString)
     End Sub
 
-    Private Sub mnuFileSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
+    Private Sub mnuFileSaveGrid_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveGrid.Click
         Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
         With lSaveDialog
             .Title = "Save Grid As"
@@ -284,6 +291,18 @@ Friend Class frmDisplayFrequencyGrid
             .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
+            End If
+        End With
+    End Sub
+
+    Private Sub mnuFileSaveReport_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveReport.Click
+        Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+        With lSaveDialog
+            .Title = "Save Frequency Report As"
+            .DefaultExt = ".txt"
+            .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
+            If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                SaveFileString(.FileName, pSource.CreateReport)
             End If
         End With
     End Sub
