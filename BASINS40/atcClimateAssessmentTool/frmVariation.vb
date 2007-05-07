@@ -858,8 +858,12 @@ Imports MapWinUtility
 
     Private Function VariationFromForm(ByVal aVariation As atcVariation) As Boolean
         Try
+            If txtName.Text.Trim.Length = 0 Then
+                Logger.Msg("Name was not entered", "Name is required")
+                Return False
+            End If
             With aVariation
-                .Name = txtName.Text
+                .Name = txtName.Text.Trim
                 If txtVaryData.Text.Equals(txtVaryData.Tag) Then
                     Logger.Msg("No data was selected", "Need Data To Vary")
                     Return False

@@ -230,7 +230,7 @@ Public Class frmCAT
         'btnInputDown
         '
         Me.btnInputDown.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInputDown.Location = New System.Drawing.Point(453, 64)
+        Me.btnInputDown.Location = New System.Drawing.Point(449, 64)
         Me.btnInputDown.Name = "btnInputDown"
         Me.btnInputDown.Size = New System.Drawing.Size(24, 24)
         Me.btnInputDown.TabIndex = 13
@@ -239,7 +239,7 @@ Public Class frmCAT
         'btnInputUp
         '
         Me.btnInputUp.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnInputUp.Location = New System.Drawing.Point(483, 64)
+        Me.btnInputUp.Location = New System.Drawing.Point(479, 64)
         Me.btnInputUp.Name = "btnInputUp"
         Me.btnInputUp.Size = New System.Drawing.Size(24, 24)
         Me.btnInputUp.TabIndex = 12
@@ -547,23 +547,29 @@ Public Class frmCAT
         '
         'cboPivotCells
         '
+        Me.cboPivotCells.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPivotCells.Location = New System.Drawing.Point(96, 60)
         Me.cboPivotCells.Name = "cboPivotCells"
-        Me.cboPivotCells.Size = New System.Drawing.Size(128, 21)
+        Me.cboPivotCells.Size = New System.Drawing.Size(407, 21)
         Me.cboPivotCells.TabIndex = 27
         '
         'cboPivotColumns
         '
+        Me.cboPivotColumns.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPivotColumns.Location = New System.Drawing.Point(96, 34)
         Me.cboPivotColumns.Name = "cboPivotColumns"
-        Me.cboPivotColumns.Size = New System.Drawing.Size(128, 21)
+        Me.cboPivotColumns.Size = New System.Drawing.Size(407, 21)
         Me.cboPivotColumns.TabIndex = 25
         '
         'cboPivotRows
         '
+        Me.cboPivotRows.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboPivotRows.Location = New System.Drawing.Point(96, 8)
         Me.cboPivotRows.Name = "cboPivotRows"
-        Me.cboPivotRows.Size = New System.Drawing.Size(128, 21)
+        Me.cboPivotRows.Size = New System.Drawing.Size(407, 21)
         Me.cboPivotRows.TabIndex = 23
         '
         'btnStart
@@ -1046,7 +1052,7 @@ NextIteration:
 
         If Not agdResults.Source Is Nothing Then
             For iColumn As Integer = 0 To agdResults.Source.Columns - 1
-                Dim lColumnTitle As String = agdResults.Source.CellValue(0, iColumn)
+                Dim lColumnTitle As String = ResultColumnTitle(iColumn)
                 If Not lColumnTitle Is Nothing AndAlso lColumnTitle.Length > 0 Then
                     cboPivotRows.Items.Add(lColumnTitle)
                     cboPivotColumns.Items.Add(lColumnTitle)
@@ -1100,25 +1106,31 @@ NextIteration:
         Return -1
     End Function
 
+    Private Function ResultColumnTitle(ByVal aColumn As Integer) As String
+        Return agdResults.Source.CellValue(0, aColumn) & " " _
+             & agdResults.Source.CellValue(1, aColumn) & " " _
+             & agdResults.Source.CellValue(2, aColumn)
+    End Function
+
     Private Sub PopulatePivotTable()
         If cboPivotRows.Text.Length > 0 AndAlso cboPivotColumns.Text.Length > 0 AndAlso cboPivotCells.Text.Length > 0 Then
             Dim lPivotData As New atcGridSource
             Dim lRuns As Integer = agdResults.Source.Rows - agdResults.Source.FixedRows
 
-            Dim lColumnToRow As Integer = agdResults.Source.FixedColumns
+            Dim lColumnToRow As Integer = 0 'agdResults.Source.FixedColumns
             Dim lColumnToColumn As Integer = lColumnToRow
             Dim lColumnToCell As Integer = lColumnToRow
 
             With agdResults.Source
-                While Not cboPivotRows.Text.Equals(.CellValue(0, lColumnToRow))
+                While Not cboPivotRows.Text.Equals(ResultColumnTitle(lColumnToRow))
                     lColumnToRow += 1
                     If lColumnToRow >= .Columns Then Exit Sub
                 End While
-                While Not cboPivotColumns.Text.Equals(.CellValue(0, lColumnToColumn))
+                While Not cboPivotColumns.Text.Equals(ResultColumnTitle(lColumnToColumn))
                     lColumnToColumn += 1
                     If lColumnToColumn >= .Columns Then Exit Sub
                 End While
-                While Not cboPivotCells.Text.Equals(.CellValue(0, lColumnToCell))
+                While Not cboPivotCells.Text.Equals(ResultColumnTitle(lColumnToCell))
                     lColumnToCell += 1
                     If lColumnToCell >= .Columns Then Exit Sub
                 End While
@@ -1935,6 +1947,7 @@ NextIteration:
         If aUCIfilename Is Nothing OrElse Not FileExists(aUCIfilename) Then
             Dim cdlg As New OpenFileDialog
             cdlg.Title = "Open UCI file containing base scenario"
+            cdlg.Filter = "UCI files|*.uci|All Files|*.*"
             If cdlg.ShowDialog = Windows.Forms.DialogResult.OK Then
                 aUCIfilename = cdlg.FileName
             End If
