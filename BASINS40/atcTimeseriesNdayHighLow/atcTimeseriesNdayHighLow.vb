@@ -40,6 +40,18 @@ Public Class atcTimeseriesNdayHighLow
             If pAvailableOperations Is Nothing Then
                 pAvailableOperations = New atcDataAttributes
 
+                Dim defNdayTS As New atcAttributeDefinition
+                With defNdayTS
+                    .Calculator = Me
+                    .Category = Me.Category
+                    .CopiesInherit = False
+                    .Description = "Timeseries of N-day values, one per year"
+                    .Editable = False
+                    .Name = "NDayTimeseries"
+                    .TypeString = "atcTimeseries"                    
+                End With
+                atcDataAttributes.AddDefinition(defNdayTS)
+
                 Dim defDays As New atcAttributeDefinition
                 With defDays
                     .Name = "NDay"
@@ -445,6 +457,7 @@ Public Class atcTimeseriesNdayHighLow
                     Dim lArguments As New atcDataAttributes
                     lArguments.SetValue("Nday", lNday)
                     lArguments.SetValue("Return Period", lRecurOrProbNow)
+                    lArguments.SetValue("NDayTimeseries", lNdayTs)
 
                     aAttributesStorage.SetValue(lNewAttribute, lQ, lArguments)
                 Next
