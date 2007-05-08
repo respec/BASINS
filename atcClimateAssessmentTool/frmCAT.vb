@@ -203,7 +203,7 @@ Public Class frmCAT
         '
         'btnInputView
         '
-        Me.btnInputView.Location = New System.Drawing.Point(260, 64)
+        Me.btnInputView.Location = New System.Drawing.Point(167, 64)
         Me.btnInputView.Name = "btnInputView"
         Me.btnInputView.Size = New System.Drawing.Size(48, 24)
         Me.btnInputView.TabIndex = 8
@@ -226,6 +226,7 @@ Public Class frmCAT
         Me.btnInputAddCligen.Size = New System.Drawing.Size(87, 24)
         Me.btnInputAddCligen.TabIndex = 10
         Me.btnInputAddCligen.Text = "Generate New"
+        Me.btnInputAddCligen.Visible = False
         '
         'btnInputDown
         '
@@ -247,7 +248,7 @@ Public Class frmCAT
         '
         'btnInputRemove
         '
-        Me.btnInputRemove.Location = New System.Drawing.Point(198, 64)
+        Me.btnInputRemove.Location = New System.Drawing.Point(105, 64)
         Me.btnInputRemove.Name = "btnInputRemove"
         Me.btnInputRemove.Size = New System.Drawing.Size(56, 24)
         Me.btnInputRemove.TabIndex = 7
@@ -255,7 +256,7 @@ Public Class frmCAT
         '
         'btnInputModify
         '
-        Me.btnInputModify.Location = New System.Drawing.Point(314, 64)
+        Me.btnInputModify.Location = New System.Drawing.Point(221, 64)
         Me.btnInputModify.Name = "btnInputModify"
         Me.btnInputModify.Size = New System.Drawing.Size(48, 24)
         Me.btnInputModify.TabIndex = 9
@@ -310,7 +311,7 @@ Public Class frmCAT
         '
         'btnInputPrepared
         '
-        Me.btnInputPrepared.Location = New System.Drawing.Point(368, 64)
+        Me.btnInputPrepared.Location = New System.Drawing.Point(275, 64)
         Me.btnInputPrepared.Name = "btnInputPrepared"
         Me.btnInputPrepared.Size = New System.Drawing.Size(63, 24)
         Me.btnInputPrepared.TabIndex = 11
@@ -1350,32 +1351,38 @@ NextIteration:
     Private Sub UpdateStatusLabel(ByVal aIteration As Integer)
         Dim lLabelText As String = "Running # " & aIteration + 1 & " of " & pTotalIterations
         If pTimePerRun > 0 Then
-            lLabelText &= " (" & FormatTime(pTimePerRun * (pTotalIterations - aIteration)) & " remaining)"
+            Dim lFormattedTime As String = FormatTime(pTimePerRun * (pTotalIterations - aIteration))
+            If lFormattedTime.Length > 0 Then lLabelText &= " (" & lFormattedTime & " remaining)"
         End If
         UpdateStatusLabel(lLabelText)
     End Sub
 
     Private Function FormatTime(ByVal aSeconds As Double) As String
-        Dim lFormat As String = "0"
-        Dim lFormatted As String = ""
-        Dim lDays As Integer = Int(aSeconds / 86400)
-        If lDays > 0 Then 'More than a day left
-            lFormatted &= Format(lDays, lFormat) & ":"
-            aSeconds -= 86400 * lDays
+        Try
+            Dim lFormat As String = "0"
+            Dim lFormatted As String = ""
+            Dim lDays As Integer = Int(aSeconds / 86400)
+            If lDays > 0 Then 'More than a day left
+                lFormatted &= Format(lDays, lFormat) & ":"
+                aSeconds -= 86400 * lDays
+                lFormat = "00"
+            End If
+            Dim lHours As Integer = Int(aSeconds / 3600)
+            If lHours > 0 OrElse lDays > 0 Then 'More than an hour left
+                lFormatted &= Format(lHours, lFormat) & ":"
+                aSeconds -= 3600 * lHours
+                lFormat = "00"
+            End If
+            'Always include minutes:
+            Dim lMinutes As Integer = Int(aSeconds / 60)
+            lFormatted &= Format(lMinutes, lFormat) & ":"
+            aSeconds -= 60 * lMinutes
             lFormat = "00"
-        End If
-        Dim lHours As Integer = Int(aSeconds / 3600)
-        If lHours > 0 OrElse lDays > 0 Then 'More than an hour left
-            lFormatted &= Format(lHours, lFormat) & ":"
-            aSeconds -= 3600 * lHours
-            lFormat = "00"
-        End If
-        'Always include minutes:
-        Dim lMinutes As Integer = Int(aSeconds / 60)
-        lFormatted &= Format(lMinutes, lFormat) & ":"
-        aSeconds -= 60 * lMinutes
-        lFormat = "00"
-        Return lFormatted & Format(aSeconds, lFormat)
+            Return lFormatted & Format(aSeconds, lFormat)
+        Catch e As Exception
+            Logger.Dbg("Exception formatting time '" & aSeconds.ToString & "': " & e.Message)
+            Return ""
+        End Try
     End Function
 
     Private Sub btnInputAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputAdd.Click
@@ -1628,7 +1635,8 @@ NextIteration:
         End If
         lLabelText = "Total iterations selected = " & pTotalIterations
         If pTimePerRun > 0 Then
-            lLabelText &= " (" & FormatTime(pTimePerRun * pTotalIterations) & ")"
+            Dim lFormattedTime As String = FormatTime(pTimePerRun * pTotalIterations)
+            If lFormattedTime.Length > 0 Then lLabelText &= " (" & lFormattedTime & ")"
         End If
         UpdateStatusLabel(lLabelText)
 

@@ -303,6 +303,7 @@ Friend Class frmDisplayFrequencyGrid
             .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, pSource.CreateReport)
+                OpenFile(.FileName)
             End If
         End With
     End Sub
