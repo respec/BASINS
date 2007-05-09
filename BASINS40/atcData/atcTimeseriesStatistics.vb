@@ -91,6 +91,7 @@ Public Class atcTimeseriesStatistics
                              defTimeSeriesOne, lCategory)
 
                 lCategory = "Percentile"
+                AddOperation("%*", "percentile value", defTimeSeriesOne, lCategory)
                 AddOperation("%01", "1st percentile value", defTimeSeriesOne, lCategory)
                 AddOperation("%02", "2nd percentile value", defTimeSeriesOne, lCategory)
                 AddOperation("%05", "5th percentile value", defTimeSeriesOne, lCategory)
