@@ -788,6 +788,8 @@ Public Class frmCAT
         g_running = True
         btnStart.Visible = False
         btnStop.Visible = True
+        lstEndpoints.Enabled = False
+        lstInputs.Enabled = False
 
         UpdateStatusLabel("Setting up to run")
 
@@ -817,42 +819,46 @@ Public Class frmCAT
             .CellValue(0, 0) = RunTitle
 
             For Each lEndpoint In pEndpoints
-                If lEndpoint.IsInput Then
-                    .Columns += 1
-                Else
-                    .Columns += lEndpoint.DataSets.Count
+                If lEndpoint.Selected Then
+                    If lEndpoint.IsInput Then
+                        .Columns += 1
+                    Else
+                        .Columns += lEndpoint.DataSets.Count
+                    End If
                 End If
             Next
             .Rows = 5
             lColumn = 1
 
             For Each lEndpoint In pEndpoints
-                If lEndpoint.IsInput Then
-                    .CellValue(0, lColumn) = lEndpoint.Name
-                    .CellValue(1, lColumn) = lEndpoint.Operation
-                    .CellValue(2, lColumn) = "Current Value"
-                    If Not lEndpoint.Seasons Is Nothing Then
-                        .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
-                    End If
-                    lColumn += 1
-                Else
-                    For Each lDataset As atcDataSet In lEndpoint.DataSets
+                If lEndpoint.Selected Then
+                    If lEndpoint.IsInput Then
                         .CellValue(0, lColumn) = lEndpoint.Name
-                        If Not lEndpoint.Operation Is Nothing Then
-                            .CellValue(1, lColumn) = lEndpoint.Operation
-                        End If
-                        .CellValue(2, lColumn) = lDataset.ToString
+                        .CellValue(1, lColumn) = lEndpoint.Operation
+                        .CellValue(2, lColumn) = "Current Value"
                         If Not lEndpoint.Seasons Is Nothing Then
                             .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
                         End If
                         lColumn += 1
-                    Next
+                    Else
+                        For Each lDataset As atcDataSet In lEndpoint.DataSets
+                            .CellValue(0, lColumn) = lEndpoint.Name
+                            If Not lEndpoint.Operation Is Nothing Then
+                                .CellValue(1, lColumn) = lEndpoint.Operation
+                            End If
+                            .CellValue(2, lColumn) = lDataset.ToString
+                            If Not lEndpoint.Seasons Is Nothing Then
+                                .CellValue(3, lColumn) = lEndpoint.Seasons.ToString
+                            End If
+                            lColumn += 1
+                        Next
+                    End If
                 End If
             Next
         End With
         ColorResultsGrid()
         agdResults.Initialize(agdResults.Source)
-        SizeResultsColumns()
+        agdResults.SizeAllColumnsToContents()
         agdResults.Refresh()
 
         myTabs.SelectedIndex = pResultsTabIndex
@@ -874,6 +880,9 @@ Public Class frmCAT
         g_running = False
         btnStart.Visible = True
         btnStop.Visible = False
+        lstEndpoints.Enabled = True
+        lstInputs.Enabled = True
+
     End Sub
 
     Private Sub Run(ByVal aModifiedScenarioName As String, _
@@ -977,51 +986,53 @@ NextIteration:
             .CellColor(lRow, 0) = Drawing.SystemColors.Control
 
             For Each lEndpoint In pEndpoints
-                If lEndpoint.IsInput Then 'This is an input, display current value
-                    .CellValue(lRow, lColumn) = Format(lEndpoint.CurrentValue, "0.####")
-                    lColumn += 1
-                Else
-                    For Each lOldData As atcDataSet In lEndpoint.DataSets
-                        Dim lGroup As atcDataGroup = Nothing
-                        Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
-                        Dim lResultDataSpec As String = aResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower)
-                        If lResultDataSpec Is Nothing Then
-                            Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
-                        Else
-                            Dim lResultDataSource As atcDataSource = OpenDataSource(lResultDataSpec)
-                            If lResultDataSource Is Nothing Then
-                                Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
+                If lEndpoint.Selected Then
+                    If lEndpoint.IsInput Then 'This is an input, display current value
+                        .CellValue(lRow, lColumn) = Format(lEndpoint.CurrentValue, "0.####")
+                        lColumn += 1
+                    Else
+                        For Each lOldData As atcDataSet In lEndpoint.DataSets
+                            Dim lGroup As atcDataGroup = Nothing
+                            Dim lOriginalDataSpec As String = lOldData.Attributes.GetValue("History 1", "").Substring(10)
+                            Dim lResultDataSpec As String = aResults.ItemByKey(IO.Path.GetFileName(lOriginalDataSpec).ToLower)
+                            If lResultDataSpec Is Nothing Then
+                                Logger.Dbg("ResultsDataSpec is Nothing for " & lOldData.ToString)
                             Else
-                                lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
-                                If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
-                                    Dim lData As atcTimeseries = lGroup.Item(0)
-                                    If Not lEndpoint.Seasons Is Nothing Then
-                                        lData = lEndpoint.Seasons.SplitBySelected(lData, Nothing).Item(0)
-                                    End If
-                                    .CellValue(lRow, lColumn) = lData.Attributes.GetFormattedValue(lEndpoint.Operation)
-                                    If .ColorCells Then
-                                        If Not IsNumeric(.CellValue(lRow, lColumn)) Then
-                                            .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
-                                        Else
-                                            Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lEndpoint.Operation)
-                                            If Not Double.IsNaN(lEndpoint.Min) AndAlso lValue < lEndpoint.Min Then
-                                                .CellColor(lRow, lColumn) = lEndpoint.ColorBelowMin
-                                            ElseIf Not Double.IsNaN(lEndpoint.Max) AndAlso lValue > lEndpoint.Max Then
-                                                .CellColor(lRow, lColumn) = lEndpoint.ColorAboveMax
-                                            Else
+                                Dim lResultDataSource As atcDataSource = OpenDataSource(lResultDataSpec)
+                                If lResultDataSource Is Nothing Then
+                                    Logger.Dbg("ResultsDataSource is Nothing for " & lResultDataSpec.ToString)
+                                Else
+                                    lGroup = lResultDataSource.DataSets.FindData("ID", lOldData.Attributes.GetValue("ID"), 1)
+                                    If Not (lGroup Is Nothing) AndAlso lGroup.Count > 0 Then
+                                        Dim lData As atcTimeseries = lGroup.Item(0)
+                                        If Not lEndpoint.Seasons Is Nothing Then
+                                            lData = lEndpoint.Seasons.SplitBySelected(lData, Nothing).Item(0)
+                                        End If
+                                        .CellValue(lRow, lColumn) = lData.Attributes.GetFormattedValue(lEndpoint.Operation)
+                                        If .ColorCells Then
+                                            If Not IsNumeric(.CellValue(lRow, lColumn)) Then
                                                 .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
+                                            Else
+                                                Dim lValue As Double = lGroup.Item(0).Attributes.GetValue(lEndpoint.Operation)
+                                                If Not Double.IsNaN(lEndpoint.Min) AndAlso lValue < lEndpoint.Min Then
+                                                    .CellColor(lRow, lColumn) = lEndpoint.ColorBelowMin
+                                                ElseIf Not Double.IsNaN(lEndpoint.Max) AndAlso lValue > lEndpoint.Max Then
+                                                    .CellColor(lRow, lColumn) = lEndpoint.ColorAboveMax
+                                                Else
+                                                    .CellColor(lRow, lColumn) = lEndpoint.ColorDefault
+                                                End If
                                             End If
                                         End If
+                                    Else
+                                        Logger.Dbg("No Data for ID " & lOldData.Attributes.GetValue("ID") & _
+                                                   " Count " & lResultDataSource.DataSets.Count)
+                                        .CellValue(lRow, lColumn) = ""
                                     End If
-                                Else
-                                    Logger.Dbg("No Data for ID " & lOldData.Attributes.GetValue("ID") & _
-                                               " Count " & lResultDataSource.DataSets.Count)
-                                    .CellValue(lRow, lColumn) = ""
+                                    lColumn += 1
                                 End If
-                                lColumn += 1
                             End If
-                        End If
-                    Next
+                        Next
+                    End If
                 End If
             Next
         End With
@@ -1190,7 +1201,7 @@ NextIteration:
             .Source.FromString(aNewContentsOfGrid)
             ColorResultsGrid()
             .Initialize(.Source)
-            SizeResultsColumns()
+            .SizeAllColumnsToContents()
             .Refresh()
         End With
         PopulatePivotCombos()
@@ -1213,28 +1224,6 @@ NextIteration:
                 Next
             Next
 
-        End With
-    End Sub
-
-    Private Sub SizeResultsColumns()
-        With agdResults
-            Dim lColumnTitle As String
-            Dim lLongestLabel As String = "88.888"
-            Dim lLongestLabelLength As Integer = lLongestLabel.Length
-            Dim lColumn As Integer = 0
-            'Size Run number column to fit RunTitle
-            .SizeColumnToString(0, RunTitle)
-            For lColumn = 1 To .Source.Columns - 1
-                lColumnTitle = .Source.CellValue(0, lColumn)
-                If Not lColumnTitle Is Nothing AndAlso lColumnTitle.Length > lLongestLabelLength Then
-                    lLongestLabelLength = lColumnTitle.Length
-                    lLongestLabel = lColumnTitle
-                End If
-            Next
-            .SizeColumnToString(1, lLongestLabel)
-            For lColumn = 2 To .Source.Columns - 1
-                .ColumnWidth(lColumn) = .ColumnWidth(1)
-            Next
         End With
     End Sub
 

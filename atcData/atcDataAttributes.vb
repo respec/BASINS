@@ -317,6 +317,9 @@ Public Class atcDataAttributes
             If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
                 Try
                     Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
+                    If lDef Is Nothing AndAlso lKey.StartsWith("%") Then 'Try to find with wildcard
+                        lDef = pAllDefinitions.ItemByKey("%*")
+                    End If
                     If Not lDef Is Nothing Then
                         Dim lOperation As atcDefinedValue = Nothing
                         If lDef.Calculated AndAlso IsSimple(lDef, lKey, lOperation) Then
@@ -324,7 +327,7 @@ Public Class atcDataAttributes
                             Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
                             Dim lOwnerTS As atcTimeseries = Owner
                             lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
-                            lDef.Calculator.Open(lDef.Name, lArgs)
+                            lDef.Calculator.Open(lkey, lArgs)
                             lAttribute = ItemByKey(lKey)
                         End If
                     End If
@@ -349,7 +352,12 @@ Public Class atcDataAttributes
             Case "single", "double", "integer", "boolean", "string"
                 If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...
                     If aKey Is Nothing Then aKey = AttributeNameToKey(aDef.Name)
-                    aOperation = aDef.Calculator.AvailableOperations.GetDefinedValue(aKey)
+                    aOperation = aDef.Calculator.AvailableOperations.ItemByKey(aKey)
+
+                    If aOperation Is Nothing AndAlso aKey.StartsWith("%") Then
+                        aOperation = aDef.Calculator.AvailableOperations.ItemByKey("%*")
+                    End If
+
                     If Not aOperation Is Nothing AndAlso Not aOperation.Arguments Is Nothing Then
                         If aOperation.Arguments.Count = 1 Then 'Simple calculation has only one argument
                             Dim lArg As atcDefinedValue = aOperation.Arguments.ItemByIndex(0)
