@@ -194,76 +194,135 @@ Friend Class atcFrequencyGridSource
         Dim lEndDate As Date
         Dim lStr As String
         Dim lIndex As Integer
+        Dim lColumn As Integer
         Dim lRept As New System.Text.StringBuilder
+        Dim lCurrentValue As Double
         Try
             For Each lTimeseries As atcTimeseries In pDataGroup
                 Dim lAttributes As atcDataAttributes = lTimeseries.Attributes
-                lStartDate = Date.FromOADate(lTimeseries.Dates.Value(0))
-                lEndDate = Date.FromOADate(lTimeseries.Dates.Value(lTimeseries.numValues))
                 For Each lNdaysKey As String In pNdays.Keys
                     Dim lNdays As String = pNdays.Item(lNdaysKey)
                     Dim lAttrName As String = lNdays
                     If pHigh Then lAttrName &= "High" Else lAttrName &= "Low"
                     Dim lNdayAttribute As atcDefinedValue = lAttributes.GetDefinedValue(lAttrName & pRecurrence.GetByIndex(0))
                     Dim lNdayTs As atcTimeseries = lNdayAttribute.Arguments.GetValue("NDayTimeseries")
+                    Dim lNdayTsNonLog As atcTimeseries
+                    Dim lIsLog As Boolean = False
+                    Dim lLogString As String = "   "
+
+                    If lNdayTs.Attributes.ContainsAttribute("NDayTimeseries") Then
+                        'Get original version of NDayTimeseries (not log version)
+                        lIsLog = True
+                        lLogString = "(logs)"
+                        lNdayTsNonLog = lNdayTs.Attributes.GetValue("NDayTimeseries")
+                    Else
+                        lNdayTsNonLog = lNdayTs
+                    End If
+                    Dim lLocation As String = lAttributes.GetValue("STAID", "") & " " & lAttributes.GetValue("STANAM", "")
+                    lStartDate = Date.FromOADate(lNdayTs.Dates.Value(0))
+                    lEndDate = Date.FromOADate(lNdayTs.Dates.Value(lNdayTs.numValues))
+
                     Dim lPositiveNdayTs As atcTimeseries
                     Dim lNumZero As Integer = 0
-                    Dim lNumNonZero As Integer = 0
+                    Dim lNumPositive As Integer = 0
                     Dim lNumNegative As Integer = 0
                     Dim lEpsilon As Double = (lNdayTs.Attributes.GetValue("Max") - lNdayTs.Attributes.GetValue("Min")) / Math.Pow(10, 9)
 
                     lRept.AppendLine()
                     lRept.AppendLine()
-                    lRept.AppendLine("                  Pearson Type III Statistics")
+                    If lIsLog Then
+                        lRept.AppendLine("                Log-Pearson Type III Statistics")
+                        lRept.AppendLine()
+                        lRept.AppendLine("                  (based on USGS Program A193)")
+                        lRept.AppendLine()
+                        lRept.AppendLine("  Notice -- Use of Log-Pearson Type III or Pearson-Type III")
+                        lRept.AppendLine("            distributions are for preliminary computations.")
+                        lRept.AppendLine("            User is responsible for assessment and ")
+                        lRept.AppendLine("            interpretation.")
+                    Else
+                        lRept.AppendLine("                  Pearson Type III Statistics")
+                        lRept.AppendLine()
+                        lRept.AppendLine("                  (based on USGS Program A193)")
+                        lRept.AppendLine()
+                        lRept.AppendLine("  Notice -- Use of Pearson Type III distribution is for")
+                        lRept.AppendLine("            preliminary computations.  User is responsible")
+                        lRept.AppendLine("            for assessment and interpretation.")
+                    End If
+
+
                     lRept.AppendLine()
-                    lRept.AppendLine("                  (based on USGS Program A193)")
                     lRept.AppendLine()
-                    lRept.AppendLine("  Notice -- Use of Pearson Type III distribution is for")
-                    lRept.AppendLine("            preliminary computations.  User is responsible")
-                    lRept.AppendLine("            for assessment and interpretation.")
-                    lRept.AppendLine()
-                    lRept.AppendLine()
-                    lRept.AppendLine("               " & lAttributes.GetValue("Location") & " " & lAttributes.GetValue("Description"))
-                    lRept.AppendLine(lStartDate.ToString("MMMM d").PadLeft(27) & " - start of season")
-                    lRept.AppendLine(lEndDate.ToString("MMMM d").PadLeft(27) & " - end of season")
+                    lRept.AppendLine("               " & lLocation.PadRight(64))
+                    lRept.AppendLine(lStartDate.ToString("MMMM").PadLeft(24) & lStartDate.Day.ToString.PadLeft(3) & " - start of season")
+                    lRept.AppendLine(lEndDate.ToString("MMMM").PadLeft(24) & lEndDate.Day.ToString.PadLeft(3) & " - end of season")
                     lRept.AppendLine("                " & lStartDate.Year & " - " & lEndDate.Year & " - time period")
                     lStr = lNdays & "-day "
                     If pHigh Then lStr &= "high" Else lStr &= "low"
                     lRept.AppendLine(lStr.PadLeft(27) & " - parameter")
 
-                    For lIndex = 1 To lNdayTs.numValues
-                        If Math.Abs(lNdayTs.Value(lIndex)) < lEpsilon Then
+                    For lIndex = 1 To lNdayTsNonLog.numValues
+                        lCurrentValue = lNdayTsNonLog.Value(lIndex)
+                        If Double.IsNaN(lCurrentValue) Then
+                            lNumNegative += 1
+                        ElseIf Math.Abs(lCurrentValue) < lEpsilon Then
                             lNumZero += 1
+                        ElseIf lNdayTs.Value(lIndex) < 0 Then
+                            lNumNegative += 1
                         Else
-                            lNumNonZero += 1
-                            If lNdayTs.Value(lIndex) < 0 Then
-                                lNumNegative += 1
-                            End If
+                            lNumPositive += 1
                         End If
                     Next
 
-                    lStr = lNumNonZero
+                    lStr = lNumPositive
                     lRept.AppendLine(lStr.PadLeft(27) & " - non-zero values")
                     lStr = lNumZero
                     lRept.AppendLine(lStr.PadLeft(27) & " - zero values")
                     lStr = lNumNegative
                     lRept.AppendLine(lStr.PadLeft(27) & " - negative values (ignored)")
-                    lRept.AppendLine()
-                    For lIndex = 1 To lNdayTs.numValues
-                        lStr = DoubleToString(lNdayTs.Value(lIndex))
-                        lRept.AppendLine(lStr.PadLeft(17))
-                    Next
 
                     If lNumNegative = 0 AndAlso lNumZero = 0 Then
                         lPositiveNdayTs = lNdayTs
                     Else
                         Dim lCurNewValueIndex As Integer = 1
-                        Dim lNumNewValues As Integer = lNumNonZero - lNumNegative
+                        Dim lNumNewValues As Integer = lNumPositive
                         lPositiveNdayTs = New atcTimeseries(Nothing)
                         lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
-                        lPositiveNdayTs.numValues = lNumNonZero - lNumNegative
+                        lPositiveNdayTs.numValues = lNumPositive
+                        For lIndex = 1 To lNdayTsNonLog.numValues
+                            If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
+                                lPositiveNdayTs.Value(lCurNewValueIndex) = lNdayTsNonLog.Value(lIndex)
+                                lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTsNonLog.Dates.Value(lIndex)
+                                lCurNewValueIndex += 1
+                            End If
+                        Next
+                    End If
+
+                    lColumn = 6
+                    For lIndex = 1 To lPositiveNdayTs.numValues
+                        If lColumn > 5 Then
+                            lRept.AppendLine()
+                            lRept.Append("     ")
+                            lColumn = 1
+                        End If
+                        lStr = DoubleToString(lPositiveNdayTs.Value(lIndex), , "0.000")
+                        lRept.Append(lStr.PadLeft(12))
+                        lColumn += 1
+                    Next
+
+                    lRept.AppendLine()
+                    lRept.AppendLine()
+                    lRept.AppendLine()
+                    lRept.AppendLine("  The following 7 statistics are based on non-zero values:")
+                    lRept.AppendLine()
+
+                    If lIsLog Then 'switch back to log version of n-day timeseries for stats
+                        Dim lCurNewValueIndex As Integer = 1
+                        Dim lNumNewValues As Integer = lNumPositive
+                        lPositiveNdayTs = New atcTimeseries(Nothing)
+                        lPositiveNdayTs.Dates = New atcTimeseries(Nothing)
+                        lPositiveNdayTs.numValues = lNumPositive
                         For lIndex = 1 To lNdayTs.numValues
-                            If lNdayTs.Value(lIndex) - lEpsilon > 0 Then
+                            If lNdayTsNonLog.Value(lIndex) - lEpsilon > 0 Then
                                 lPositiveNdayTs.Value(lCurNewValueIndex) = lNdayTs.Value(lIndex)
                                 lPositiveNdayTs.Dates.Value(lCurNewValueIndex) = lNdayTs.Dates.Value(lIndex)
                                 lCurNewValueIndex += 1
@@ -271,40 +330,46 @@ Friend Class atcFrequencyGridSource
                         Next
                     End If
 
-                    lRept.AppendLine()
-                    lRept.AppendLine()
-                    lRept.AppendLine("  The following 7 statistics are based on values greater than zero:")
-                    lRept.AppendLine()
-                    lStr = lPositiveNdayTs.Attributes.GetFormattedValue("Mean")
-                    lRept.AppendLine("  Mean                          " & lStr.PadLeft(17))
-                    lStr = lPositiveNdayTs.Attributes.GetFormattedValue("Variance")
-                    lRept.AppendLine("  Variance                      " & lStr.PadLeft(17))
-                    lStr = lPositiveNdayTs.Attributes.GetFormattedValue("Standard Deviation")
-                    lRept.AppendLine("  Standard Deviation            " & lStr.PadLeft(17))
-                    lStr = lPositiveNdayTs.Attributes.GetFormattedValue("Skew")
-                    lRept.AppendLine("  Skewness                      " & lStr.PadLeft(17))
-                    lStr = lPositiveNdayTs.Attributes.GetFormattedValue("Standard Error of Skew")
-                    lRept.AppendLine("  Standard Error of Skewness    " & lStr.PadLeft(17))
-                    lStr = lPositiveNdayTs.Attributes.GetFormattedValue("Serial Correlation Coefficient")
-                    lRept.AppendLine("  Serial Correlation Coefficient" & lStr.PadLeft(17))
-                    lStr = lPositiveNdayTs.Attributes.GetFormattedValue("Coefficient of Variation")
-                    lRept.AppendLine("  Coefficient of Variation      " & lStr.PadLeft(17))
+                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Mean", lLogString))
+                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Variance", lLogString))
+                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Standard Deviation", lLogString))
+                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Skew", lLogString, "Skewness"))
+                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Standard Error of Skew", lLogString, "Standard Error of Skewness"))
+                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Serial Correlation Coefficient", lLogString))
+                    lRept.AppendLine(FormatStat(lPositiveNdayTs, "Coefficient of Variation", lLogString))
+
                     lRept.AppendLine()
                     lRept.AppendLine()
                     lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
                     lRept.AppendLine("        Probability        Interval           Value  ")
                     lRept.AppendLine("        -----------       ----------        ---------")
 
+                    'For Each lRecurrenceKey As String In pRecurrence.Keys
+                    '    Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey)
+                    '    Dim lNyears As Double = CDbl(lRecurrence)
+                    '    lStr = DoubleToString(1 / lNyears, , "0.0000")
+                    '    lRept.Append("  " & lStr.PadLeft(17))
+                    '    lStr = DoubleToString(lNyears, , "0.00")
+                    '    lRept.Append(lStr.PadLeft(17))
+                    '    lStr = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000")
+                    '    lRept.AppendLine(lStr.PadLeft(17))                        
+                    'Next
+
+                    Dim lReverseString As String = ""
+                    Dim lThisRow As String
                     For Each lRecurrenceKey As String In pRecurrence.Keys
                         Dim lRecurrence As String = pRecurrence.Item(lRecurrenceKey)
                         Dim lNyears As Double = CDbl(lRecurrence)
                         lStr = DoubleToString(1 / lNyears, , "0.0000")
-                        lRept.Append("  " & lStr.PadLeft(17))
+                        lThisRow = ("  " & lStr.PadLeft(17))
                         lStr = DoubleToString(lNyears, , "0.00")
-                        lRept.Append(lStr.PadLeft(17))
+                        lThisRow &= lStr.PadLeft(17)
                         lStr = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000")
-                        lRept.AppendLine(lStr.PadLeft(17))
+                        lThisRow &= lStr.PadLeft(17)
+                        lReverseString = lThisRow & vbCrLf & lReverseString
                     Next
+                    lRept.Append(lReverseString)
+
                     lRept.AppendLine()
                     lRept.AppendLine()
                     'lRept.AppendLine("    7 statistics were added as attributes to data set   163:")
@@ -322,4 +387,10 @@ Friend Class atcFrequencyGridSource
         Return lRept.ToString
     End Function
 
+    Private Function FormatStat(ByVal aTS As atcTimeseries, ByVal aAttName As String, ByVal aLogString As String, Optional ByVal aAttLabel As String = "") As String
+        If aAttLabel.Length = 0 Then aAttLabel = aAttName
+        Dim lValue As String = DoubleToString(aTS.Attributes.GetValue(aAttName, 0), , "0.000")
+        Dim lName As String = aAttLabel & " " & aLogString
+        Return "  " & lName & Space(34 - aAttLabel.Length) & lValue.PadLeft(9)
+    End Function
 End Class

@@ -36,7 +36,11 @@ Module modFreq
         Dim lSlope As Single
         ReDim lQ(lN - 1)
         For i As Integer = 1 To aTs.numValues
-            lQ(i - 1) = aTs.Values(i)
+            If Double.IsNaN(aTs.Values(i)) Then
+                lQ(i - 1) = 0
+            Else
+                lQ(i - 1) = aTs.Values(i)
+            End If
         Next
         KENT(lQ(0), lN, lTau, lLevel, lSlope)
         aTau = lTau
@@ -52,19 +56,18 @@ Module modFreq
         Dim lStd As Double = aTs.Attributes.GetValue("Standard Deviation")
         Dim lSkew As Double = aTs.Attributes.GetValue("Skew")
 
-        If lN = 0 Or lMean <= 0 Then 'no data or problem data
+        If lN = 0 OrElse lMean <= 0 Then 'no data or problem data
             Return Double.NaN
         Else
-            Dim lNzi As Integer = aTs.numValues - lN
+            'Turn recurrence into probability
+            If aRecurOrProb > 1 Then aRecurOrProb = 1.0 / aRecurOrProb
 
+            Dim lNzi As Integer = aTs.numValues - lN
             Dim lNumons As Integer = 1
             Dim lLogarh As Integer = 2 'log trans flag 1-yes,2-no (handle earlier)
 
-            'be sure aRecurOrProb is available in lSe
-            Dim lSe() As Single = {0.9999, 0.9995, 0.999, 0.998, 0.995, 0.99, 0.98, 0.975, _
-                                   0.96, 0.95, 0.9, 0.8, 0.7, 0.6667, 0.6, 0.5704, _
-                                   0.5, 0.4292, 0.4, 0.3333, 0.3, 0.2, 0.1, 0.05, 0.04, _
-                                   0.025, 0.02, 0.01, 0.005, 0.002, 0.001, 0.0005, 0.0001}
+            Dim lSe(0) As Single
+            lSe(0) = 1 - aRecurOrProb
             Dim lI As Integer = UBound(lSe)  'number of recurrence intervals to calculate-1
 
             Dim lC(lI) As Single
@@ -77,21 +80,13 @@ Module modFreq
             Dim lRsout(1 + (2 * lI)) As Single
             Dim lRetcod As Integer
 
-            Dim lIlh As Integer = 2 'stats option 1-hi, 2-low,3-month
-            If aHigh Then lIlh = 1
+            Dim lIlh As Integer  'stats option 1-hi, 2-low,3-month
+            If aHigh Then lIlh = 1 Else lIlh = 2
 
-            LGPSTX(lN, lNzi, lNumons, lI + 1, lMean, lStd, lSkew, lLogarh, lIlh, False, lSe(0), _
+            LGPSTX(lN, lNzi, lNumons, (lI + 1), lMean, lStd, lSkew, lLogarh, lIlh, False, lSe(0), _
                    lC(0), lCcpa(0), lP(0), lQ(0), lAdp(0), lQnew(0), lRi(0), lRsout(0), lRetcod)
 
-            If aRecurOrProb > 1 Then aRecurOrProb = 1.0 / aRecurOrProb
-
-            'TODO: what about lQnew?
-            For i As Integer = 0 To lI
-                If Math.Abs(lSe(i) - aRecurOrProb) < 0.0001 Then
-                    Return lQ(i)
-                End If
-            Next
-            Return Double.NaN
+            Return lQ(0)
         End If
     End Function
 End Module
