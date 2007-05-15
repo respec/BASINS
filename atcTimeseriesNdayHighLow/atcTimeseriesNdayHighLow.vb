@@ -407,6 +407,8 @@ Public Class atcTimeseriesNdayHighLow
                     lTsMath = New atcTimeseriesMath.atcTimeseriesMath
                     lArgsMath.SetValue("timeseries", New atcDataGroup(lNdayTs))
                     lTsMath.Open("log 10", lArgsMath)
+                    'Save non-log timeseries
+                    lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNdayTs)
                     lNdayTs = lTsMath.DataSets(0)
                 End If
                 Dim lNday As Integer = lNdayTs.Attributes.GetValue("NDay")

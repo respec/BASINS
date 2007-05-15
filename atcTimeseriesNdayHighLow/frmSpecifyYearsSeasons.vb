@@ -35,6 +35,9 @@ Public Class frmSpecifyYearsSeasons
         txtEndDay.Text = aEndDay
         cboEndMonth.SelectedIndex = aEndMonth - 1
 
+        If aFirstYear <> 0 Then txtOmitBeforeYear.Text = aFirstYear
+        If aLastYear <> 0 Then txtOmitAfterYear.Text = aLastYear
+
         Dim lFirstDate As Double = Double.MaxValue
         Dim lLastDate As Double = Double.MinValue
         For Each lDataset As atcData.atcTimeseries In aDataGroup
@@ -69,8 +72,16 @@ Public Class frmSpecifyYearsSeasons
             Else
                 aEndDay = pLastDayOfMonth(aEndMonth)
             End If
-            If IsNumeric(txtOmitBeforeYear.Text) Then aFirstYear = CInt(txtOmitBeforeYear.Text)
-            If IsNumeric(txtOmitAfterYear.Text) Then aLastYear = CInt(txtOmitAfterYear.Text)
+            If IsNumeric(txtOmitBeforeYear.Text) Then
+                aFirstYear = CInt(txtOmitBeforeYear.Text)
+            Else
+                aFirstYear = 0
+            End If
+            If IsNumeric(txtOmitAfterYear.Text) Then
+                aLastYear = CInt(txtOmitAfterYear.Text)
+            Else
+                aLastYear = 0
+            End If
             If IsNumeric(txtNDays.Text) Then aNDays = CInt(txtNDays.Text)
             Return True
         Else

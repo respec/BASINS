@@ -620,6 +620,11 @@ tryAgain:
                 '.EventGapDisplayUnits = EventGapDisplayUnits
                 .EventHigh = EventHigh
                 .EventThreshold = EventThreshold
+                .EventVolumeHigh = EventVolumeHigh
+                .EventVolumeThreshold = EventVolumeThreshold
+                .EventDurationHigh = EventDurationHigh
+                .EventDurationDays = EventDurationDays
+                .FlashVolumeFraction = FlashVolumeFraction
             End If
 
             If Not DataSets Is Nothing Then .DataSets = DataSets.Clone()

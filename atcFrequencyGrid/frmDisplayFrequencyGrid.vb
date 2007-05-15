@@ -288,7 +288,7 @@ Friend Class frmDisplayFrequencyGrid
         With lSaveDialog
             .Title = "Save Grid As"
             .DefaultExt = ".txt"
-            .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
+            .FileName = ReplaceString(Me.Text, " ", "_") & "_grid.txt"
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, Me.ToString)
             End If
@@ -300,7 +300,7 @@ Friend Class frmDisplayFrequencyGrid
         With lSaveDialog
             .Title = "Save Frequency Report As"
             .DefaultExt = ".txt"
-            .FileName = ReplaceString(Me.Text, " ", "_") & ".txt"
+            .FileName = ReplaceString(Me.Text, " ", "_") & "_report.txt"
             If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 SaveFileString(.FileName, pSource.CreateReport)
                 OpenFile(.FileName)
