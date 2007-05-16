@@ -1009,7 +1009,7 @@ Public Class GisUtil
     '''     <para>Name of layer to compare to layeres in project</para>
     ''' </param>
     Public Shared Function IsLayer(ByVal aLayerName As String) As Boolean
-        For i As Integer = 1 To GetMappingObject.Layers.NumLayers
+        For i As Integer = 0 To GetMappingObject.Layers.NumLayers - 1
             Try
                 If aLayerName = LayerFromIndex(i).Name Then
                     Return True
@@ -1659,14 +1659,16 @@ Public Class GisUtil
         Loop
         Dim lNewShapeFile As New MapWinGIS.Shapefile
         Dim rsf As New MapWinGIS.Shapefile
-        lNewShapeFile.CreateNew(lNewShapeFileName, MapWinGIS.ShpfileType.SHP_POLYLINE)
+        lNewShapeFile.CreateNew(lNewShapeFileName, lSf.ShapefileType)
         For i = 1 To lSf.NumFields
             lRetc = lNewShapeFile.EditInsertField(lSf.Field(i - 1), i - 1)
         Next i
         lNewShapeFile.StartEditingShapes(True)
 
         Dim issf As New MapWinGIS.Shapefile
-        issf.CreateNew("temp_clip.shp", MapWinGIS.ShpfileType.SHP_POLYLINE)
+        If Not issf.CreateNew("temp_clip.shp", MapWinGIS.ShpfileType.SHP_POLYLINE) Then
+            Logger.Dbg("Failed to create temporary shapefile " & issf.Filename & " ErrorCode " & issf.LastErrorCode)
+        End If
 
         lCount = 0
         lTotal = lSfClip.NumShapes * lSf.NumShapes
@@ -1687,7 +1689,8 @@ Public Class GisUtil
                         Next k
                     Else
                         'need to clip
-                        lRetc = issf.EditInsertShape(lSf.Shape(j - 1), j - 1)
+                        Dim lTempShapeIndex As Integer = j - 1
+                        lRetc = issf.EditInsertShape(lSf.Shape(j - 1), lTempShapeIndex)
                         lRetc = MapWinGeoProc.SpatialOperations.ClipShapesWithPolygon(issf, lShapeClip, rsf, True)                        
                         lRetc = issf.EditDeleteShape(0)
                         If rsf.NumShapes > 0 Then
