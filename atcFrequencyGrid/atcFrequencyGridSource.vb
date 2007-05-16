@@ -191,6 +191,7 @@ Friend Class atcFrequencyGridSource
 
     Public Function CreateReport() As String
         Dim lStartDate As Date
+        Dim lStartDateAnnual As Date
         Dim lEndDate As Date
         Dim lStr As String
         Dim lIndex As Integer
@@ -220,6 +221,7 @@ Friend Class atcFrequencyGridSource
                     End If
                     Dim lLocation As String = lAttributes.GetValue("STAID", "") & " " & lAttributes.GetValue("STANAM", "")
                     lStartDate = Date.FromOADate(lNdayTs.Dates.Value(0))
+                    lStartDateAnnual = Date.FromOADate(lNdayTs.Dates.Value(1))
                     lEndDate = Date.FromOADate(lNdayTs.Dates.Value(lNdayTs.numValues))
 
                     Dim lPositiveNdayTs As atcTimeseries
@@ -255,7 +257,7 @@ Friend Class atcFrequencyGridSource
                     lRept.AppendLine("               " & lLocation.PadRight(64))
                     lRept.AppendLine(lStartDate.ToString("MMMM").PadLeft(24) & lStartDate.Day.ToString.PadLeft(3) & " - start of season")
                     lRept.AppendLine(lEndDate.ToString("MMMM").PadLeft(24) & lEndDate.Day.ToString.PadLeft(3) & " - end of season")
-                    lRept.AppendLine("                " & lStartDate.Year & " - " & lEndDate.Year & " - time period")
+                    lRept.AppendLine("                " & lStartDateAnnual.Year & " - " & lEndDate.Year & " - time period")
                     lStr = lNdays & "-day "
                     If pHigh Then lStr &= "high" Else lStr &= "low"
                     lRept.AppendLine(lStr.PadLeft(27) & " - parameter")
