@@ -564,7 +564,7 @@ Public Class atcTimeseriesNdayHighLow
         End If
 
         For Each lTs In ltsGroup
-            lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing, lFirstYear, lLastYear)
+            lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing, lFirstYear, lLastYear, lEndMonth, lEndDay)
             Select Case lOperationName
                 Case "n-day low value", "n-day high value"
                     ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes, lNDayTsGroup, lEndMonth, lEndDay)

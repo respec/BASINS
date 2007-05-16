@@ -56,17 +56,23 @@ Public Module modTimeseriesMath
     ''' Useful when complete calendar or water years are needed
     ''' </summary>
     ''' <param name="aTimeseries"></param>
-    ''' <param name="aBoundaryMonth"></param>
-    ''' <param name="aBoundaryDay"></param>
+    ''' <param name="aStartMonth"></param>
+    ''' <param name="aStartDay"></param>
     ''' <param name="aDataSource"></param>
+    ''' <param name="aFirstYear"></param>
+    ''' <param name="aLastYear"></param>
+    ''' <param name="aEndMonth"></param>
+    ''' <param name="aEndDay"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
     Public Function SubsetByDateBoundary(ByVal aTimeseries As atcTimeseries, _
-                                         ByVal aBoundaryMonth As Integer, _
-                                         ByVal aBoundaryDay As Integer, _
+                                         ByVal aStartMonth As Integer, _
+                                         ByVal aStartDay As Integer, _
                                          ByVal aDataSource As atcDataSource, _
                                 Optional ByVal aFirstYear As Integer = 0, _
-                                Optional ByVal aLastYear As Integer = 0) As atcTimeseries
+                                Optional ByVal aLastYear As Integer = 0, _
+                                Optional ByVal aEndMonth As Integer = 0, _
+                                Optional ByVal aEndDay As Integer = 0) As atcTimeseries
         Dim lStartDate As Double
         Dim lEndDate As Double
         Dim lStartTimeseriesDate As Date
@@ -74,9 +80,12 @@ Public Module modTimeseriesMath
         Dim lStartYear As Integer
         Dim lEndYear As Integer
 
+        If aEndMonth = 0 Then aEndMonth = aStartMonth
+        If aEndDay = 0 Then aEndDay = aStartDay
+
         aTimeseries.EnsureValuesRead()
 
-        If aFirstYear > 0 AndAlso aBoundaryMonth > 1 Then
+        If aFirstYear > 0 AndAlso aStartMonth > 1 Then
             'Convert water year into calendar year
             aFirstYear -= 1
         End If
@@ -87,15 +96,15 @@ Public Module modTimeseriesMath
             If aFirstYear > lStartYear Then
                 lStartYear = aFirstYear
             Else
-                If .Month > aBoundaryMonth Then
+                If .Month > aStartMonth Then
                     lStartYear += 1
-                ElseIf .Month = aBoundaryMonth Then
-                    If .Day > aBoundaryDay Then
+                ElseIf .Month = aStartMonth Then
+                    If .Day > aStartDay Then
                         lStartYear += 1
                     End If
                 End If
             End If
-            lStartDate = Jday(lStartYear, aBoundaryMonth, aBoundaryDay, 0, 0, 0)
+            lStartDate = Jday(lStartYear, aStartMonth, aStartDay, 0, 0, 0)
         End With
 
         lEndTimeseriesDate = Date.FromOADate(aTimeseries.Dates.Value(aTimeseries.Dates.numValues))
@@ -104,20 +113,20 @@ Public Module modTimeseriesMath
             If aLastYear > 0 AndAlso aLastYear < lEndYear Then
                 lEndYear = aLastYear
             Else
-                If .Month < aBoundaryMonth Then
+                If .Month < aEndMonth Then
                     lEndYear -= 1
-                ElseIf .Month = aBoundaryMonth Then
-                    If .Day < aBoundaryDay Then
+                ElseIf .Month = aEndMonth Then
+                    If .Day < aEndDay Then
                         lEndYear -= 1
                     End If
                 End If
             End If
-            lEndDate = Jday(lEndYear, aBoundaryMonth, aBoundaryDay, 0, 0, 0)
+            lEndDate = Jday(lEndYear, aEndMonth, aEndDay, 0, 0, 0)
         End With
 
         SubsetByDateBoundary = SubsetByDate(aTimeseries, lStartDate, lEndDate, aDataSource)
-        SubsetByDateBoundary.Attributes.Add("seasbg", aBoundaryMonth)
-        SubsetByDateBoundary.Attributes.Add("seadbg", aBoundaryDay)
+        SubsetByDateBoundary.Attributes.Add("seasbg", aStartMonth)
+        SubsetByDateBoundary.Attributes.Add("seadbg", aStartDay)
 
     End Function
 
