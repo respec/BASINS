@@ -342,7 +342,11 @@ Friend Class atcFrequencyGridSource
 
                     lRept.AppendLine()
                     lRept.AppendLine()
-                    lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
+                    If pHigh Then
+                        lRept.AppendLine("        Exceedance        Recurrence        Parameter")
+                    Else
+                        lRept.AppendLine("       Non-exceedance     Recurrence        Parameter")
+                    End If
                     lRept.AppendLine("        Probability        Interval           Value  ")
                     lRept.AppendLine("        -----------       ----------        ---------")
 
@@ -368,7 +372,11 @@ Friend Class atcFrequencyGridSource
                         lThisRow &= lStr.PadLeft(17)
                         lStr = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000")
                         lThisRow &= lStr.PadLeft(17)
-                        lReverseString = lThisRow & vbCrLf & lReverseString
+                        If pHigh Then
+                            lReverseString &= lThisRow & vbCrLf
+                        Else
+                            lReverseString = lThisRow & vbCrLf & lReverseString
+                        End If
                     Next
                     lRept.Append(lReverseString)
 
