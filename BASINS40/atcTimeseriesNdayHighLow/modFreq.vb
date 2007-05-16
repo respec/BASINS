@@ -67,7 +67,11 @@ Module modFreq
             Dim lLogarh As Integer = 2 'log trans flag 1-yes,2-no (handle earlier)
 
             Dim lSe(0) As Single
-            lSe(0) = 1 - aRecurOrProb
+            If aHigh Then
+                lSe(0) = aRecurOrProb
+            Else
+                lSe(0) = 1 - aRecurOrProb
+            End If
             Dim lI As Integer = UBound(lSe)  'number of recurrence intervals to calculate-1
 
             Dim lC(lI) As Single
