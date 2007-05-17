@@ -31,14 +31,13 @@ Imports MapWinUtility
     Friend WithEvents txtEventVolume As System.Windows.Forms.TextBox
     Friend WithEvents cboFunction As System.Windows.Forms.ComboBox
     Friend WithEvents lblFunction As System.Windows.Forms.Label
-    Friend WithEvents chkIterative As System.Windows.Forms.CheckBox
     Friend WithEvents lblThreshold As System.Windows.Forms.Label
     Friend WithEvents chkSeasons As System.Windows.Forms.CheckBox
     Friend WithEvents btnSeasonsNone As System.Windows.Forms.Button
     Friend WithEvents btnSeasonsAll As System.Windows.Forms.Button
     Friend WithEvents grpSeasons As System.Windows.Forms.GroupBox
     Friend WithEvents lblIncrement2 As System.Windows.Forms.Label
-    Friend WithEvents lblMaximum2 As System.Windows.Forms.Label
+    Friend WithEvents lblValueUnitsMaximum As System.Windows.Forms.Label
     Friend WithEvents grpMinMax As System.Windows.Forms.GroupBox
     Friend WithEvents grpEvents As System.Windows.Forms.GroupBox
     Friend WithEvents lblPET As System.Windows.Forms.Label
@@ -49,11 +48,13 @@ Imports MapWinUtility
     Friend WithEvents lblDurationUnits As System.Windows.Forms.Label
     Friend WithEvents lblGapUnits As System.Windows.Forms.Label
     Friend WithEvents lblDuration As System.Windows.Forms.Label
-    Friend WithEvents lblValueUnits As System.Windows.Forms.Label
+    Friend WithEvents lblValueUnitsMinimum As System.Windows.Forms.Label
     Friend WithEvents lstSeasons As System.Windows.Forms.ListBox
     Friend WithEvents lblVolumePercent As System.Windows.Forms.Label
     Friend WithEvents txtVolumePercent As System.Windows.Forms.TextBox
     Friend WithEvents lblVolumePercent2 As System.Windows.Forms.Label
+    Friend WithEvents radioSingle As System.Windows.Forms.RadioButton
+    Friend WithEvents radioIterate As System.Windows.Forms.RadioButton
     Friend WithEvents cboSeasons As System.Windows.Forms.ComboBox
 
     Public Sub New()
@@ -120,7 +121,6 @@ Imports MapWinUtility
         Me.txtEventThreshold = New System.Windows.Forms.TextBox
         Me.cboFunction = New System.Windows.Forms.ComboBox
         Me.lblFunction = New System.Windows.Forms.Label
-        Me.chkIterative = New System.Windows.Forms.CheckBox
         Me.lblThreshold = New System.Windows.Forms.Label
         Me.chkSeasons = New System.Windows.Forms.CheckBox
         Me.btnSeasonsNone = New System.Windows.Forms.Button
@@ -129,11 +129,14 @@ Imports MapWinUtility
         Me.lstSeasons = New System.Windows.Forms.ListBox
         Me.cboSeasons = New System.Windows.Forms.ComboBox
         Me.lblIncrement2 = New System.Windows.Forms.Label
-        Me.lblMaximum2 = New System.Windows.Forms.Label
+        Me.lblValueUnitsMaximum = New System.Windows.Forms.Label
         Me.grpMinMax = New System.Windows.Forms.GroupBox
-        Me.lblVolumePercent = New System.Windows.Forms.Label
+        Me.radioSingle = New System.Windows.Forms.RadioButton
+        Me.radioIterate = New System.Windows.Forms.RadioButton
+        Me.lblValueUnitsMinimum = New System.Windows.Forms.Label
         Me.txtVolumePercent = New System.Windows.Forms.TextBox
-        Me.lblValueUnits = New System.Windows.Forms.Label
+        Me.lblVolumePercent = New System.Windows.Forms.Label
+        Me.lblVolumePercent2 = New System.Windows.Forms.Label
         Me.grpEvents = New System.Windows.Forms.GroupBox
         Me.lblVolumeUnits = New System.Windows.Forms.Label
         Me.lblThresholdUnits = New System.Windows.Forms.Label
@@ -143,7 +146,6 @@ Imports MapWinUtility
         Me.lblVolume = New System.Windows.Forms.Label
         Me.lblGap = New System.Windows.Forms.Label
         Me.lblPET = New System.Windows.Forms.Label
-        Me.lblVolumePercent2 = New System.Windows.Forms.Label
         Me.grpSeasons.SuspendLayout()
         Me.grpMinMax.SuspendLayout()
         Me.grpEvents.SuspendLayout()
@@ -154,7 +156,7 @@ Imports MapWinUtility
         Me.txtIncrement.Location = New System.Drawing.Point(75, 94)
         Me.txtIncrement.Name = "txtIncrement"
         Me.txtIncrement.Size = New System.Drawing.Size(71, 20)
-        Me.txtIncrement.TabIndex = 21
+        Me.txtIncrement.TabIndex = 18
         Me.txtIncrement.Text = "0.05"
         '
         'lblIncrement
@@ -173,7 +175,7 @@ Imports MapWinUtility
         Me.txtMax.Location = New System.Drawing.Point(75, 68)
         Me.txtMax.Name = "txtMax"
         Me.txtMax.Size = New System.Drawing.Size(71, 20)
-        Me.txtMax.TabIndex = 18
+        Me.txtMax.TabIndex = 16
         Me.txtMax.Text = "1.1"
         '
         'txtMin
@@ -181,7 +183,7 @@ Imports MapWinUtility
         Me.txtMin.Location = New System.Drawing.Point(75, 42)
         Me.txtMin.Name = "txtMin"
         Me.txtMin.Size = New System.Drawing.Size(71, 20)
-        Me.txtMin.TabIndex = 13
+        Me.txtMin.TabIndex = 14
         Me.txtMin.Text = "0.9"
         '
         'lblMaximum
@@ -192,7 +194,7 @@ Imports MapWinUtility
         Me.lblMaximum.Location = New System.Drawing.Point(6, 71)
         Me.lblMaximum.Name = "lblMaximum"
         Me.lblMaximum.Size = New System.Drawing.Size(54, 13)
-        Me.lblMaximum.TabIndex = 20
+        Me.lblMaximum.TabIndex = 15
         Me.lblMaximum.Text = "Maximum:"
         '
         'lblMinimum
@@ -203,7 +205,7 @@ Imports MapWinUtility
         Me.lblMinimum.Location = New System.Drawing.Point(6, 45)
         Me.lblMinimum.Name = "lblMinimum"
         Me.lblMinimum.Size = New System.Drawing.Size(51, 13)
-        Me.lblMinimum.TabIndex = 12
+        Me.lblMinimum.TabIndex = 13
         Me.lblMinimum.Text = "Minimum:"
         '
         'lblData
@@ -272,6 +274,7 @@ Imports MapWinUtility
         Me.btnScript.Size = New System.Drawing.Size(96, 24)
         Me.btnScript.TabIndex = 44
         Me.btnScript.Text = "Open Script..."
+        Me.btnScript.Visible = False
         '
         'txtVaryPET
         '
@@ -320,12 +323,13 @@ Imports MapWinUtility
         'chkEvents
         '
         Me.chkEvents.AutoSize = True
+        Me.chkEvents.BackColor = System.Drawing.Color.Transparent
         Me.chkEvents.Location = New System.Drawing.Point(6, 19)
         Me.chkEvents.Name = "chkEvents"
         Me.chkEvents.Size = New System.Drawing.Size(238, 17)
         Me.chkEvents.TabIndex = 24
         Me.chkEvents.Text = "Vary precipitation only in the following Events"
-        Me.chkEvents.UseVisualStyleBackColor = True
+        Me.chkEvents.UseVisualStyleBackColor = False
         '
         'txtEventGap
         '
@@ -362,16 +366,6 @@ Imports MapWinUtility
         Me.lblFunction.Size = New System.Drawing.Size(78, 13)
         Me.lblFunction.TabIndex = 8
         Me.lblFunction.Text = "How to Modify:"
-        '
-        'chkIterative
-        '
-        Me.chkIterative.AutoSize = True
-        Me.chkIterative.Location = New System.Drawing.Point(9, 19)
-        Me.chkIterative.Name = "chkIterative"
-        Me.chkIterative.Size = New System.Drawing.Size(100, 17)
-        Me.chkIterative.TabIndex = 11
-        Me.chkIterative.Text = "Iterate changes"
-        Me.chkIterative.UseVisualStyleBackColor = True
         '
         'lblThreshold
         '
@@ -441,7 +435,7 @@ Imports MapWinUtility
         Me.lstSeasons.Name = "lstSeasons"
         Me.lstSeasons.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
         Me.lstSeasons.Size = New System.Drawing.Size(381, 79)
-        Me.lstSeasons.TabIndex = 57
+        Me.lstSeasons.TabIndex = 41
         '
         'cboSeasons
         '
@@ -451,7 +445,7 @@ Imports MapWinUtility
         Me.cboSeasons.Location = New System.Drawing.Point(135, 16)
         Me.cboSeasons.Name = "cboSeasons"
         Me.cboSeasons.Size = New System.Drawing.Size(252, 21)
-        Me.cboSeasons.TabIndex = 56
+        Me.cboSeasons.TabIndex = 40
         '
         'lblIncrement2
         '
@@ -464,25 +458,24 @@ Imports MapWinUtility
         Me.lblIncrement2.TabIndex = 19
         Me.lblIncrement2.Text = "Increase this much each iteration from Minimum"
         '
-        'lblMaximum2
+        'lblValueUnitsMaximum
         '
-        Me.lblMaximum2.AutoSize = True
-        Me.lblMaximum2.BackColor = System.Drawing.Color.Transparent
-        Me.lblMaximum2.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.lblMaximum2.Location = New System.Drawing.Point(152, 71)
-        Me.lblMaximum2.Name = "lblMaximum2"
-        Me.lblMaximum2.Size = New System.Drawing.Size(214, 13)
-        Me.lblMaximum2.TabIndex = 22
-        Me.lblMaximum2.Text = "Finish increasing when this value is reached"
+        Me.lblValueUnitsMaximum.AutoSize = True
+        Me.lblValueUnitsMaximum.BackColor = System.Drawing.Color.Transparent
+        Me.lblValueUnitsMaximum.ImageAlign = System.Drawing.ContentAlignment.BottomRight
+        Me.lblValueUnitsMaximum.Location = New System.Drawing.Point(152, 71)
+        Me.lblValueUnitsMaximum.Name = "lblValueUnitsMaximum"
+        Me.lblValueUnitsMaximum.Size = New System.Drawing.Size(0, 13)
+        Me.lblValueUnitsMaximum.TabIndex = 22
         '
         'grpMinMax
         '
         Me.grpMinMax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpMinMax.Controls.Add(Me.txtVolumePercent)
-        Me.grpMinMax.Controls.Add(Me.lblValueUnits)
-        Me.grpMinMax.Controls.Add(Me.chkIterative)
-        Me.grpMinMax.Controls.Add(Me.lblMaximum2)
+        Me.grpMinMax.Controls.Add(Me.radioSingle)
+        Me.grpMinMax.Controls.Add(Me.radioIterate)
+        Me.grpMinMax.Controls.Add(Me.lblValueUnitsMinimum)
+        Me.grpMinMax.Controls.Add(Me.lblValueUnitsMaximum)
         Me.grpMinMax.Controls.Add(Me.lblMinimum)
         Me.grpMinMax.Controls.Add(Me.lblIncrement2)
         Me.grpMinMax.Controls.Add(Me.lblMaximum)
@@ -490,8 +483,6 @@ Imports MapWinUtility
         Me.grpMinMax.Controls.Add(Me.txtMax)
         Me.grpMinMax.Controls.Add(Me.txtIncrement)
         Me.grpMinMax.Controls.Add(Me.txtMin)
-        Me.grpMinMax.Controls.Add(Me.lblVolumePercent)
-        Me.grpMinMax.Controls.Add(Me.lblVolumePercent2)
         Me.grpMinMax.Location = New System.Drawing.Point(12, 117)
         Me.grpMinMax.Name = "grpMinMax"
         Me.grpMinMax.Size = New System.Drawing.Size(393, 120)
@@ -499,43 +490,79 @@ Imports MapWinUtility
         Me.grpMinMax.TabStop = False
         Me.grpMinMax.Text = "Multiply each value by a number"
         '
+        'radioSingle
+        '
+        Me.radioSingle.AutoSize = True
+        Me.radioSingle.Checked = True
+        Me.radioSingle.Location = New System.Drawing.Point(9, 19)
+        Me.radioSingle.Name = "radioSingle"
+        Me.radioSingle.Size = New System.Drawing.Size(94, 17)
+        Me.radioSingle.TabIndex = 11
+        Me.radioSingle.TabStop = True
+        Me.radioSingle.Text = "Single Change"
+        Me.radioSingle.UseVisualStyleBackColor = True
+        '
+        'radioIterate
+        '
+        Me.radioIterate.AutoSize = True
+        Me.radioIterate.Location = New System.Drawing.Point(109, 19)
+        Me.radioIterate.Name = "radioIterate"
+        Me.radioIterate.Size = New System.Drawing.Size(100, 17)
+        Me.radioIterate.TabIndex = 12
+        Me.radioIterate.Text = "Iterate Changes"
+        Me.radioIterate.UseVisualStyleBackColor = True
+        '
+        'lblValueUnitsMinimum
+        '
+        Me.lblValueUnitsMinimum.AutoSize = True
+        Me.lblValueUnitsMinimum.BackColor = System.Drawing.Color.Transparent
+        Me.lblValueUnitsMinimum.ImageAlign = System.Drawing.ContentAlignment.BottomRight
+        Me.lblValueUnitsMinimum.Location = New System.Drawing.Point(152, 45)
+        Me.lblValueUnitsMinimum.Name = "lblValueUnitsMinimum"
+        Me.lblValueUnitsMinimum.Size = New System.Drawing.Size(0, 13)
+        Me.lblValueUnitsMinimum.TabIndex = 23
+        '
+        'txtVolumePercent
+        '
+        Me.txtVolumePercent.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtVolumePercent.Location = New System.Drawing.Point(300, 17)
+        Me.txtVolumePercent.Name = "txtVolumePercent"
+        Me.txtVolumePercent.Size = New System.Drawing.Size(22, 20)
+        Me.txtVolumePercent.TabIndex = 25
+        Me.txtVolumePercent.Text = "10"
+        Me.txtVolumePercent.Visible = False
+        '
         'lblVolumePercent
         '
         Me.lblVolumePercent.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblVolumePercent.AutoSize = True
         Me.lblVolumePercent.BackColor = System.Drawing.Color.Transparent
         Me.lblVolumePercent.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblVolumePercent.Location = New System.Drawing.Point(243, 45)
+        Me.lblVolumePercent.Location = New System.Drawing.Point(250, 21)
         Me.lblVolumePercent.Name = "lblVolumePercent"
         Me.lblVolumePercent.Size = New System.Drawing.Size(44, 13)
         Me.lblVolumePercent.TabIndex = 24
         Me.lblVolumePercent.Text = "Change"
         Me.lblVolumePercent.Visible = False
         '
-        'txtVolumePercent
+        'lblVolumePercent2
         '
-        Me.txtVolumePercent.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtVolumePercent.Location = New System.Drawing.Point(293, 42)
-        Me.txtVolumePercent.Name = "txtVolumePercent"
-        Me.txtVolumePercent.Size = New System.Drawing.Size(22, 20)
-        Me.txtVolumePercent.TabIndex = 25
-        Me.txtVolumePercent.Text = "88"
-        Me.txtVolumePercent.Visible = False
-        '
-        'lblValueUnits
-        '
-        Me.lblValueUnits.AutoSize = True
-        Me.lblValueUnits.BackColor = System.Drawing.Color.Transparent
-        Me.lblValueUnits.ImageAlign = System.Drawing.ContentAlignment.BottomRight
-        Me.lblValueUnits.Location = New System.Drawing.Point(152, 45)
-        Me.lblValueUnits.Name = "lblValueUnits"
-        Me.lblValueUnits.Size = New System.Drawing.Size(0, 13)
-        Me.lblValueUnits.TabIndex = 23
+        Me.lblVolumePercent2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblVolumePercent2.AutoSize = True
+        Me.lblVolumePercent2.BackColor = System.Drawing.Color.Transparent
+        Me.lblVolumePercent2.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblVolumePercent2.Location = New System.Drawing.Point(325, 21)
+        Me.lblVolumePercent2.Name = "lblVolumePercent2"
+        Me.lblVolumePercent2.Size = New System.Drawing.Size(62, 13)
+        Me.lblVolumePercent2.TabIndex = 26
+        Me.lblVolumePercent2.Text = "% of events"
+        Me.lblVolumePercent2.Visible = False
         '
         'grpEvents
         '
         Me.grpEvents.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpEvents.Controls.Add(Me.txtVolumePercent)
         Me.grpEvents.Controls.Add(Me.lblVolumeUnits)
         Me.grpEvents.Controls.Add(Me.lblThresholdUnits)
         Me.grpEvents.Controls.Add(Me.lblDurationUnits)
@@ -546,7 +573,9 @@ Imports MapWinUtility
         Me.grpEvents.Controls.Add(Me.txtEventThreshold)
         Me.grpEvents.Controls.Add(Me.txtEventGap)
         Me.grpEvents.Controls.Add(Me.chkEvents)
+        Me.grpEvents.Controls.Add(Me.lblVolumePercent)
         Me.grpEvents.Controls.Add(Me.lblThreshold)
+        Me.grpEvents.Controls.Add(Me.lblVolumePercent2)
         Me.grpEvents.Controls.Add(Me.txtEventVolume)
         Me.grpEvents.Controls.Add(Me.txtEventDuration)
         Me.grpEvents.Location = New System.Drawing.Point(12, 243)
@@ -642,19 +671,6 @@ Imports MapWinUtility
         Me.lblPET.Size = New System.Drawing.Size(76, 13)
         Me.lblPET.TabIndex = 5
         Me.lblPET.Text = "Compute PET:"
-        '
-        'lblVolumePercent2
-        '
-        Me.lblVolumePercent2.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblVolumePercent2.AutoSize = True
-        Me.lblVolumePercent2.BackColor = System.Drawing.Color.Transparent
-        Me.lblVolumePercent2.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.lblVolumePercent2.Location = New System.Drawing.Point(321, 45)
-        Me.lblVolumePercent2.Name = "lblVolumePercent2"
-        Me.lblVolumePercent2.Size = New System.Drawing.Size(62, 13)
-        Me.lblVolumePercent2.TabIndex = 26
-        Me.lblVolumePercent2.Text = "% of events"
-        Me.lblVolumePercent2.Visible = False
         '
         'frmVariation
         '
@@ -912,7 +928,7 @@ Imports MapWinUtility
                     Return False
                 End Try
 
-                If chkIterative.Checked Then
+                If radioIterate.Checked Then
                     Try
                         .Max = CDbl(txtMax.Text)
                     Catch
@@ -1046,10 +1062,6 @@ Imports MapWinUtility
         End Try
     End Sub
 
-    Private Sub chkIterative_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkIterative.CheckedChanged
-        EnableIterative(chkIterative.Checked)
-    End Sub
-
     Private Sub chkEvents_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkEvents.CheckedChanged
         EnableEvents(chkEvents.Checked)
     End Sub
@@ -1058,9 +1070,14 @@ Imports MapWinUtility
         EnableSeasons(chkSeasons.Checked)
     End Sub
 
+    Private Sub radioIterate_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles radioIterate.CheckedChanged, radioSingle.CheckedChanged
+        EnableIterative(radioIterate.Checked)
+    End Sub
+
     Private Sub EnableIterative(ByVal aEnable As Boolean)
 
-        If chkIterative.Checked <> aEnable Then chkIterative.Checked = aEnable
+        If radioIterate.Checked <> aEnable Then radioIterate.Checked = aEnable
+        If radioSingle.Checked = aEnable Then radioSingle.Checked = Not aEnable
 
         If aEnable Then
             lblMinimum.Text = "Minimum"
@@ -1068,7 +1085,7 @@ Imports MapWinUtility
             lblMinimum.Text = "Value"
         End If
         lblMaximum.Visible = aEnable
-        lblMaximum2.Visible = aEnable
+        lblValueUnitsMaximum.Visible = aEnable
         txtMax.Visible = aEnable
         lblIncrement.Visible = aEnable
         lblIncrement2.Visible = aEnable
@@ -1119,8 +1136,10 @@ Imports MapWinUtility
 
     Private Sub FunctionChanged()
         grpMinMax.Text = pFunctionGroupLabels(cboFunction.SelectedIndex)
-        lblValueUnits.Text = pFunctionUnits(cboFunction.SelectedIndex)
+        lblValueUnitsMinimum.Text = pFunctionUnits(cboFunction.SelectedIndex)
+        lblValueUnitsMaximum.Text = lblValueUnitsMinimum.Text
         If pFunctionOperations(cboFunction.SelectedIndex) = "Flash" Then
+            If Not chkEvents.Checked Then chkEvents.Checked = True
             lblVolumePercent.Visible = True
             lblVolumePercent2.Visible = True
             txtVolumePercent.Visible = True
