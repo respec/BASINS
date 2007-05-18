@@ -75,6 +75,7 @@ Friend Class frmDisplayFrequencyGrid
     Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSaveReport As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSaveViewNDay As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -85,6 +86,7 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuFileSelectAttributes = New System.Windows.Forms.MenuItem
         Me.mnuFileSep1 = New System.Windows.Forms.MenuItem
         Me.mnuFileSaveGrid = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem
         Me.mnuEdit = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
@@ -98,7 +100,7 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
-        Me.mnuFileSaveReport = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveViewNDay = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -108,7 +110,7 @@ Friend Class frmDisplayFrequencyGrid
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSaveGrid, Me.mnuFileSaveReport})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSelectAttributes, Me.mnuFileSep1, Me.mnuFileSaveGrid, Me.mnuFileSaveReport, Me.mnuFileSaveViewNDay})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
@@ -131,6 +133,11 @@ Friend Class frmDisplayFrequencyGrid
         Me.mnuFileSaveGrid.Index = 3
         Me.mnuFileSaveGrid.Shortcut = System.Windows.Forms.Shortcut.CtrlS
         Me.mnuFileSaveGrid.Text = "Save Grid"
+        '
+        'mnuFileSaveReport
+        '
+        Me.mnuFileSaveReport.Index = 4
+        Me.mnuFileSaveReport.Text = "Save Report"
         '
         'mnuEdit
         '
@@ -213,10 +220,10 @@ Friend Class frmDisplayFrequencyGrid
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
         '
-        'mnuFileSaveReport
+        'mnuFileSaveViewNDay
         '
-        Me.mnuFileSaveReport.Index = 4
-        Me.mnuFileSaveReport.Text = "Save Report"
+        Me.mnuFileSaveViewNDay.Index = 5
+        Me.mnuFileSaveViewNDay.Text = "Save/View N-Day"
         '
         'frmDisplayFrequencyGrid
         '
@@ -266,8 +273,8 @@ Friend Class frmDisplayFrequencyGrid
                 For lColumn As Integer = 0 To pSwapperSource.Columns - 1
                     lRequestedWidth += agdMain.ColumnWidth(lColumn)
                 Next
-                Me.Height = lRequestedHeight
-                Me.Width = lRequestedWidth
+                Me.Height = lRequestedHeight + 10
+                Me.Width = lRequestedWidth + 10
                 agdMain.Refresh()
             Else 'user cancelled Frequency Grid specs form
                 Me.Close()
@@ -409,5 +416,9 @@ Friend Class frmDisplayFrequencyGrid
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
+    End Sub
+
+    Private Sub mnuFileSaveViewNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveViewNDay.Click
+        pDataManager.UserSelectDisplay("N-Day timeseries", pSource.AllNday)
     End Sub
 End Class
