@@ -50,17 +50,36 @@ Public Class frmSpecifyFrequency
     Friend WithEvents txtNdayAdd As System.Windows.Forms.TextBox
     Friend WithEvents btnNdayAdd As System.Windows.Forms.Button
     Friend WithEvents btnRecurrenceAdd As System.Windows.Forms.Button
-    Friend WithEvents btnSelectYearsSeasons As System.Windows.Forms.Button
     Friend WithEvents radioLow As System.Windows.Forms.RadioButton
     Friend WithEvents radioHigh As System.Windows.Forms.RadioButton
-    Friend WithEvents chkKeepNDayTSers As System.Windows.Forms.CheckBox
     Friend WithEvents chkLog As System.Windows.Forms.CheckBox
-    Friend WithEvents lblYearsSeasons As System.Windows.Forms.Label
+    Friend WithEvents btnNdayRemove As System.Windows.Forms.Button
+    Friend WithEvents btnNdayDefault As System.Windows.Forms.Button
+    Friend WithEvents btnRecurrenceDefault As System.Windows.Forms.Button
+    Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
+    Friend WithEvents btnRecurrenceRemove As System.Windows.Forms.Button
+    Friend WithEvents grpYears As System.Windows.Forms.GroupBox
+    Friend WithEvents lblDataStart As System.Windows.Forms.Label
+    Friend WithEvents lblDataEnd As System.Windows.Forms.Label
+    Friend WithEvents lblOmitBefore As System.Windows.Forms.Label
+    Friend WithEvents lblOmitAfter As System.Windows.Forms.Label
+    Friend WithEvents txtOmitAfterYear As System.Windows.Forms.TextBox
+    Friend WithEvents txtOmitBeforeYear As System.Windows.Forms.TextBox
+    Friend WithEvents grpDates As System.Windows.Forms.GroupBox
+    Friend WithEvents cboStartMonth As System.Windows.Forms.ComboBox
+    Friend WithEvents lblYearStart As System.Windows.Forms.Label
+    Friend WithEvents txtEndDay As System.Windows.Forms.TextBox
+    Friend WithEvents txtStartDay As System.Windows.Forms.TextBox
+    Friend WithEvents cboEndMonth As System.Windows.Forms.ComboBox
+    Friend WithEvents lblYearEnd As System.Windows.Forms.Label
     Friend WithEvents txtRecurrenceAdd As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSpecifyFrequency))
         Me.panelTop = New System.Windows.Forms.Panel
         Me.grpRecurrence = New System.Windows.Forms.GroupBox
+        Me.btnRecurrenceDefault = New System.Windows.Forms.Button
+        Me.btnRecurrenceRemove = New System.Windows.Forms.Button
         Me.lstRecurrence = New System.Windows.Forms.ListBox
         Me.btnRecurrenceAdd = New System.Windows.Forms.Button
         Me.txtRecurrenceAdd = New System.Windows.Forms.TextBox
@@ -68,24 +87,40 @@ Public Class frmSpecifyFrequency
         Me.btnRecurrenceAll = New System.Windows.Forms.Button
         Me.Splitter1 = New System.Windows.Forms.Splitter
         Me.grpNday = New System.Windows.Forms.GroupBox
+        Me.btnNdayDefault = New System.Windows.Forms.Button
+        Me.btnNdayRemove = New System.Windows.Forms.Button
         Me.btnNdayAdd = New System.Windows.Forms.Button
         Me.txtNdayAdd = New System.Windows.Forms.TextBox
         Me.btnNdayNone = New System.Windows.Forms.Button
         Me.btnNdayAll = New System.Windows.Forms.Button
         Me.lstNday = New System.Windows.Forms.ListBox
         Me.panelBottom = New System.Windows.Forms.Panel
-        Me.chkKeepNDayTSers = New System.Windows.Forms.CheckBox
+        Me.chkLog = New System.Windows.Forms.CheckBox
         Me.radioLow = New System.Windows.Forms.RadioButton
         Me.radioHigh = New System.Windows.Forms.RadioButton
-        Me.btnSelectYearsSeasons = New System.Windows.Forms.Button
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
-        Me.chkLog = New System.Windows.Forms.CheckBox
-        Me.lblYearsSeasons = New System.Windows.Forms.Label
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.grpYears = New System.Windows.Forms.GroupBox
+        Me.lblDataStart = New System.Windows.Forms.Label
+        Me.lblDataEnd = New System.Windows.Forms.Label
+        Me.lblOmitBefore = New System.Windows.Forms.Label
+        Me.lblOmitAfter = New System.Windows.Forms.Label
+        Me.txtOmitAfterYear = New System.Windows.Forms.TextBox
+        Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox
+        Me.grpDates = New System.Windows.Forms.GroupBox
+        Me.cboStartMonth = New System.Windows.Forms.ComboBox
+        Me.lblYearStart = New System.Windows.Forms.Label
+        Me.txtEndDay = New System.Windows.Forms.TextBox
+        Me.txtStartDay = New System.Windows.Forms.TextBox
+        Me.cboEndMonth = New System.Windows.Forms.ComboBox
+        Me.lblYearEnd = New System.Windows.Forms.Label
         Me.panelTop.SuspendLayout()
         Me.grpRecurrence.SuspendLayout()
         Me.grpNday.SuspendLayout()
         Me.panelBottom.SuspendLayout()
+        Me.grpYears.SuspendLayout()
+        Me.grpDates.SuspendLayout()
         Me.SuspendLayout()
         '
         'panelTop
@@ -98,11 +133,13 @@ Public Class frmSpecifyFrequency
         Me.panelTop.Controls.Add(Me.grpNday)
         Me.panelTop.Location = New System.Drawing.Point(0, 0)
         Me.panelTop.Name = "panelTop"
-        Me.panelTop.Size = New System.Drawing.Size(447, 502)
+        Me.panelTop.Size = New System.Drawing.Size(422, 497)
         Me.panelTop.TabIndex = 14
         '
         'grpRecurrence
         '
+        Me.grpRecurrence.Controls.Add(Me.btnRecurrenceDefault)
+        Me.grpRecurrence.Controls.Add(Me.btnRecurrenceRemove)
         Me.grpRecurrence.Controls.Add(Me.lstRecurrence)
         Me.grpRecurrence.Controls.Add(Me.btnRecurrenceAdd)
         Me.grpRecurrence.Controls.Add(Me.txtRecurrenceAdd)
@@ -111,10 +148,30 @@ Public Class frmSpecifyFrequency
         Me.grpRecurrence.Dock = System.Windows.Forms.DockStyle.Fill
         Me.grpRecurrence.Location = New System.Drawing.Point(208, 0)
         Me.grpRecurrence.Name = "grpRecurrence"
-        Me.grpRecurrence.Size = New System.Drawing.Size(239, 502)
+        Me.grpRecurrence.Size = New System.Drawing.Size(214, 497)
         Me.grpRecurrence.TabIndex = 7
         Me.grpRecurrence.TabStop = False
         Me.grpRecurrence.Text = "Recurrence Interval"
+        '
+        'btnRecurrenceDefault
+        '
+        Me.btnRecurrenceDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnRecurrenceDefault.Location = New System.Drawing.Point(152, 438)
+        Me.btnRecurrenceDefault.Name = "btnRecurrenceDefault"
+        Me.btnRecurrenceDefault.Size = New System.Drawing.Size(56, 20)
+        Me.btnRecurrenceDefault.TabIndex = 14
+        Me.btnRecurrenceDefault.Text = "Default"
+        Me.ToolTip1.SetToolTip(Me.btnRecurrenceDefault, "Replace list above with default values")
+        '
+        'btnRecurrenceRemove
+        '
+        Me.btnRecurrenceRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnRecurrenceRemove.Location = New System.Drawing.Point(119, 438)
+        Me.btnRecurrenceRemove.Name = "btnRecurrenceRemove"
+        Me.btnRecurrenceRemove.Size = New System.Drawing.Size(27, 20)
+        Me.btnRecurrenceRemove.TabIndex = 13
+        Me.btnRecurrenceRemove.Text = "-"
+        Me.ToolTip1.SetToolTip(Me.btnRecurrenceRemove, "Remove selected items from list above")
         '
         'lstRecurrence
         '
@@ -125,57 +182,63 @@ Public Class frmSpecifyFrequency
         Me.lstRecurrence.Location = New System.Drawing.Point(6, 19)
         Me.lstRecurrence.Name = "lstRecurrence"
         Me.lstRecurrence.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstRecurrence.Size = New System.Drawing.Size(220, 418)
+        Me.lstRecurrence.Size = New System.Drawing.Size(202, 413)
         Me.lstRecurrence.TabIndex = 8
         Me.lstRecurrence.Tag = "Return Period"
         '
         'btnRecurrenceAdd
         '
         Me.btnRecurrenceAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(162, 443)
+        Me.btnRecurrenceAdd.Location = New System.Drawing.Point(86, 438)
         Me.btnRecurrenceAdd.Name = "btnRecurrenceAdd"
-        Me.btnRecurrenceAdd.Size = New System.Drawing.Size(64, 24)
+        Me.btnRecurrenceAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnRecurrenceAdd.TabIndex = 10
-        Me.btnRecurrenceAdd.Text = "Add"
+        Me.btnRecurrenceAdd.Text = "+"
+        Me.ToolTip1.SetToolTip(Me.btnRecurrenceAdd, "Add Recurrence Interval in blank to list above")
         '
         'txtRecurrenceAdd
         '
         Me.txtRecurrenceAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(8, 446)
+        Me.txtRecurrenceAdd.Location = New System.Drawing.Point(6, 438)
         Me.txtRecurrenceAdd.Name = "txtRecurrenceAdd"
-        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(146, 20)
+        Me.txtRecurrenceAdd.Size = New System.Drawing.Size(74, 20)
         Me.txtRecurrenceAdd.TabIndex = 9
+        Me.ToolTip1.SetToolTip(Me.txtRecurrenceAdd, "Recurrence Interval to add to list")
         '
         'btnRecurrenceNone
         '
         Me.btnRecurrenceNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceNone.Location = New System.Drawing.Point(162, 473)
+        Me.btnRecurrenceNone.Location = New System.Drawing.Point(144, 467)
         Me.btnRecurrenceNone.Name = "btnRecurrenceNone"
         Me.btnRecurrenceNone.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceNone.TabIndex = 12
         Me.btnRecurrenceNone.Text = "None"
+        Me.ToolTip1.SetToolTip(Me.btnRecurrenceNone, "Clear Selection")
         '
         'btnRecurrenceAll
         '
         Me.btnRecurrenceAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnRecurrenceAll.Location = New System.Drawing.Point(8, 472)
+        Me.btnRecurrenceAll.Location = New System.Drawing.Point(6, 467)
         Me.btnRecurrenceAll.Name = "btnRecurrenceAll"
         Me.btnRecurrenceAll.Size = New System.Drawing.Size(64, 24)
         Me.btnRecurrenceAll.TabIndex = 11
         Me.btnRecurrenceAll.Text = "All"
+        Me.ToolTip1.SetToolTip(Me.btnRecurrenceAll, "Select All")
         '
         'Splitter1
         '
         Me.Splitter1.BackColor = System.Drawing.SystemColors.Control
         Me.Splitter1.Location = New System.Drawing.Point(200, 0)
         Me.Splitter1.Name = "Splitter1"
-        Me.Splitter1.Size = New System.Drawing.Size(8, 502)
+        Me.Splitter1.Size = New System.Drawing.Size(8, 497)
         Me.Splitter1.TabIndex = 13
         Me.Splitter1.TabStop = False
         '
         'grpNday
         '
+        Me.grpNday.Controls.Add(Me.btnNdayDefault)
+        Me.grpNday.Controls.Add(Me.btnNdayRemove)
         Me.grpNday.Controls.Add(Me.btnNdayAdd)
         Me.grpNday.Controls.Add(Me.txtNdayAdd)
         Me.grpNday.Controls.Add(Me.btnNdayNone)
@@ -184,46 +247,70 @@ Public Class frmSpecifyFrequency
         Me.grpNday.Dock = System.Windows.Forms.DockStyle.Left
         Me.grpNday.Location = New System.Drawing.Point(0, 0)
         Me.grpNday.Name = "grpNday"
-        Me.grpNday.Size = New System.Drawing.Size(200, 502)
+        Me.grpNday.Size = New System.Drawing.Size(200, 497)
         Me.grpNday.TabIndex = 1
         Me.grpNday.TabStop = False
         Me.grpNday.Text = "Number of Days"
         '
+        'btnNdayDefault
+        '
+        Me.btnNdayDefault.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNdayDefault.Location = New System.Drawing.Point(138, 438)
+        Me.btnNdayDefault.Name = "btnNdayDefault"
+        Me.btnNdayDefault.Size = New System.Drawing.Size(56, 20)
+        Me.btnNdayDefault.TabIndex = 8
+        Me.btnNdayDefault.Text = "Default"
+        Me.ToolTip1.SetToolTip(Me.btnNdayDefault, "Replace list above with default values")
+        '
+        'btnNdayRemove
+        '
+        Me.btnNdayRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNdayRemove.Location = New System.Drawing.Point(105, 438)
+        Me.btnNdayRemove.Name = "btnNdayRemove"
+        Me.btnNdayRemove.Size = New System.Drawing.Size(27, 20)
+        Me.btnNdayRemove.TabIndex = 7
+        Me.btnNdayRemove.Text = "-"
+        Me.ToolTip1.SetToolTip(Me.btnNdayRemove, "Remove selected items from list above")
+        '
         'btnNdayAdd
         '
         Me.btnNdayAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAdd.Location = New System.Drawing.Point(130, 443)
+        Me.btnNdayAdd.Location = New System.Drawing.Point(72, 438)
         Me.btnNdayAdd.Name = "btnNdayAdd"
-        Me.btnNdayAdd.Size = New System.Drawing.Size(64, 24)
+        Me.btnNdayAdd.Size = New System.Drawing.Size(27, 20)
         Me.btnNdayAdd.TabIndex = 4
-        Me.btnNdayAdd.Text = "Add"
+        Me.btnNdayAdd.Text = "+"
+        Me.ToolTip1.SetToolTip(Me.btnNdayAdd, "Add Number of Days in blank to list above")
         '
         'txtNdayAdd
         '
         Me.txtNdayAdd.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtNdayAdd.Location = New System.Drawing.Point(12, 446)
+        Me.txtNdayAdd.Location = New System.Drawing.Point(6, 438)
         Me.txtNdayAdd.Name = "txtNdayAdd"
-        Me.txtNdayAdd.Size = New System.Drawing.Size(112, 20)
+        Me.txtNdayAdd.Size = New System.Drawing.Size(54, 20)
         Me.txtNdayAdd.TabIndex = 3
+        Me.ToolTip1.SetToolTip(Me.txtNdayAdd, "Number of Days to add to list")
         '
         'btnNdayNone
         '
         Me.btnNdayNone.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayNone.Location = New System.Drawing.Point(130, 472)
+        Me.btnNdayNone.Location = New System.Drawing.Point(130, 467)
         Me.btnNdayNone.Name = "btnNdayNone"
         Me.btnNdayNone.Size = New System.Drawing.Size(64, 23)
         Me.btnNdayNone.TabIndex = 6
         Me.btnNdayNone.Text = "None"
+        Me.ToolTip1.SetToolTip(Me.btnNdayNone, "Clear Selection")
         '
         'btnNdayAll
         '
         Me.btnNdayAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.btnNdayAll.Location = New System.Drawing.Point(12, 472)
+        Me.btnNdayAll.Location = New System.Drawing.Point(6, 467)
         Me.btnNdayAll.Name = "btnNdayAll"
         Me.btnNdayAll.Size = New System.Drawing.Size(64, 24)
         Me.btnNdayAll.TabIndex = 5
         Me.btnNdayAll.Text = "All"
+        Me.ToolTip1.SetToolTip(Me.btnNdayAll, "Select All")
         '
         'lstNday
         '
@@ -231,45 +318,44 @@ Public Class frmSpecifyFrequency
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstNday.IntegralHeight = False
-        Me.lstNday.Location = New System.Drawing.Point(12, 19)
+        Me.lstNday.Location = New System.Drawing.Point(6, 19)
         Me.lstNday.Name = "lstNday"
         Me.lstNday.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstNday.Size = New System.Drawing.Size(182, 418)
+        Me.lstNday.Size = New System.Drawing.Size(188, 413)
         Me.lstNday.TabIndex = 2
         Me.lstNday.Tag = "NDay"
         '
         'panelBottom
         '
-        Me.panelBottom.Controls.Add(Me.lblYearsSeasons)
         Me.panelBottom.Controls.Add(Me.chkLog)
-        Me.panelBottom.Controls.Add(Me.chkKeepNDayTSers)
         Me.panelBottom.Controls.Add(Me.radioLow)
         Me.panelBottom.Controls.Add(Me.radioHigh)
-        Me.panelBottom.Controls.Add(Me.btnSelectYearsSeasons)
         Me.panelBottom.Controls.Add(Me.btnOk)
         Me.panelBottom.Controls.Add(Me.btnCancel)
         Me.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.panelBottom.Location = New System.Drawing.Point(0, 508)
+        Me.panelBottom.Location = New System.Drawing.Point(0, 582)
         Me.panelBottom.Name = "panelBottom"
-        Me.panelBottom.Size = New System.Drawing.Size(446, 100)
+        Me.panelBottom.Size = New System.Drawing.Size(421, 41)
         Me.panelBottom.TabIndex = 15
         '
-        'chkKeepNDayTSers
+        'chkLog
         '
-        Me.chkKeepNDayTSers.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkKeepNDayTSers.AutoSize = True
-        Me.chkKeepNDayTSers.Location = New System.Drawing.Point(12, 73)
-        Me.chkKeepNDayTSers.Name = "chkKeepNDayTSers"
-        Me.chkKeepNDayTSers.Size = New System.Drawing.Size(137, 17)
-        Me.chkKeepNDayTSers.TabIndex = 19
-        Me.chkKeepNDayTSers.Text = "Keep N-Day Timeseries"
-        Me.chkKeepNDayTSers.UseVisualStyleBackColor = True
+        Me.chkLog.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkLog.AutoSize = True
+        Me.chkLog.Checked = True
+        Me.chkLog.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.chkLog.Location = New System.Drawing.Point(112, 14)
+        Me.chkLog.Name = "chkLog"
+        Me.chkLog.Size = New System.Drawing.Size(80, 17)
+        Me.chkLog.TabIndex = 20
+        Me.chkLog.Text = "Logarithmic"
+        Me.chkLog.UseVisualStyleBackColor = True
         '
         'radioLow
         '
         Me.radioLow.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.radioLow.AutoSize = True
-        Me.radioLow.Location = New System.Drawing.Point(65, 27)
+        Me.radioLow.Location = New System.Drawing.Point(9, 21)
         Me.radioLow.Name = "radioLow"
         Me.radioLow.Size = New System.Drawing.Size(45, 17)
         Me.radioLow.TabIndex = 18
@@ -281,7 +367,7 @@ Public Class frmSpecifyFrequency
         Me.radioHigh.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.radioHigh.AutoSize = True
         Me.radioHigh.Checked = True
-        Me.radioHigh.Location = New System.Drawing.Point(12, 27)
+        Me.radioHigh.Location = New System.Drawing.Point(9, 3)
         Me.radioHigh.Name = "radioHigh"
         Me.radioHigh.Size = New System.Drawing.Size(47, 17)
         Me.radioHigh.TabIndex = 17
@@ -289,21 +375,12 @@ Public Class frmSpecifyFrequency
         Me.radioHigh.Text = "High"
         Me.radioHigh.UseVisualStyleBackColor = True
         '
-        'btnSelectYearsSeasons
-        '
-        Me.btnSelectYearsSeasons.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSelectYearsSeasons.Location = New System.Drawing.Point(286, 0)
-        Me.btnSelectYearsSeasons.Name = "btnSelectYearsSeasons"
-        Me.btnSelectYearsSeasons.Size = New System.Drawing.Size(148, 24)
-        Me.btnSelectYearsSeasons.TabIndex = 16
-        Me.btnSelectYearsSeasons.Text = "Select Years / Seasons..."
-        '
         'btnOk
         '
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOk.Location = New System.Drawing.Point(268, 68)
+        Me.btnOk.Location = New System.Drawing.Point(269, 9)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(96, 24)
+        Me.btnOk.Size = New System.Drawing.Size(77, 24)
         Me.btnOk.TabIndex = 13
         Me.btnOk.Text = "Compute"
         '
@@ -311,40 +388,164 @@ Public Class frmSpecifyFrequency
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(370, 68)
+        Me.btnCancel.Location = New System.Drawing.Point(352, 9)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(64, 24)
         Me.btnCancel.TabIndex = 15
         Me.btnCancel.Text = "Cancel"
         '
-        'chkLog
+        'grpYears
         '
-        Me.chkLog.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkLog.AutoSize = True
-        Me.chkLog.Checked = True
-        Me.chkLog.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkLog.Location = New System.Drawing.Point(12, 50)
-        Me.chkLog.Name = "chkLog"
-        Me.chkLog.Size = New System.Drawing.Size(80, 17)
-        Me.chkLog.TabIndex = 20
-        Me.chkLog.Text = "Logarithmic"
-        Me.chkLog.UseVisualStyleBackColor = True
+        Me.grpYears.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.grpYears.Controls.Add(Me.lblDataStart)
+        Me.grpYears.Controls.Add(Me.lblDataEnd)
+        Me.grpYears.Controls.Add(Me.lblOmitBefore)
+        Me.grpYears.Controls.Add(Me.lblOmitAfter)
+        Me.grpYears.Controls.Add(Me.txtOmitAfterYear)
+        Me.grpYears.Controls.Add(Me.txtOmitBeforeYear)
+        Me.grpYears.Location = New System.Drawing.Point(208, 503)
+        Me.grpYears.Name = "grpYears"
+        Me.grpYears.Size = New System.Drawing.Size(213, 73)
+        Me.grpYears.TabIndex = 45
+        Me.grpYears.TabStop = False
+        Me.grpYears.Text = "Years to Include in Analysis (Optional)"
         '
-        'lblYearsSeasons
+        'lblDataStart
         '
-        Me.lblYearsSeasons.AutoSize = True
-        Me.lblYearsSeasons.Location = New System.Drawing.Point(9, 6)
-        Me.lblYearsSeasons.Name = "lblYearsSeasons"
-        Me.lblYearsSeasons.Size = New System.Drawing.Size(99, 13)
-        Me.lblYearsSeasons.TabIndex = 21
-        Me.lblYearsSeasons.Text = "Years and Seasons"
+        Me.lblDataStart.AutoSize = True
+        Me.lblDataStart.Location = New System.Drawing.Point(84, 22)
+        Me.lblDataStart.Name = "lblDataStart"
+        Me.lblDataStart.Size = New System.Drawing.Size(121, 13)
+        Me.lblDataStart.TabIndex = 0
+        Me.lblDataStart.Tag = "Data Starts "
+        Me.lblDataStart.Text = "Data Starts 11/22/1933"
+        '
+        'lblDataEnd
+        '
+        Me.lblDataEnd.AutoSize = True
+        Me.lblDataEnd.Location = New System.Drawing.Point(84, 48)
+        Me.lblDataEnd.Name = "lblDataEnd"
+        Me.lblDataEnd.Size = New System.Drawing.Size(118, 13)
+        Me.lblDataEnd.TabIndex = 1
+        Me.lblDataEnd.Tag = "Data Ends "
+        Me.lblDataEnd.Text = "Data Ends 11/22/1934"
+        '
+        'lblOmitBefore
+        '
+        Me.lblOmitBefore.AutoSize = True
+        Me.lblOmitBefore.Location = New System.Drawing.Point(6, 22)
+        Me.lblOmitBefore.Name = "lblOmitBefore"
+        Me.lblOmitBefore.Size = New System.Drawing.Size(29, 13)
+        Me.lblOmitBefore.TabIndex = 40
+        Me.lblOmitBefore.Text = "Start"
+        '
+        'lblOmitAfter
+        '
+        Me.lblOmitAfter.AutoSize = True
+        Me.lblOmitAfter.Location = New System.Drawing.Point(6, 48)
+        Me.lblOmitAfter.Name = "lblOmitAfter"
+        Me.lblOmitAfter.Size = New System.Drawing.Size(26, 13)
+        Me.lblOmitAfter.TabIndex = 43
+        Me.lblOmitAfter.Text = "End"
+        '
+        'txtOmitAfterYear
+        '
+        Me.txtOmitAfterYear.Location = New System.Drawing.Point(41, 45)
+        Me.txtOmitAfterYear.Name = "txtOmitAfterYear"
+        Me.txtOmitAfterYear.Size = New System.Drawing.Size(37, 20)
+        Me.txtOmitAfterYear.TabIndex = 6
+        Me.txtOmitAfterYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.ToolTip1.SetToolTip(Me.txtOmitAfterYear, "Leave blank to use all years")
+        '
+        'txtOmitBeforeYear
+        '
+        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(41, 19)
+        Me.txtOmitBeforeYear.Name = "txtOmitBeforeYear"
+        Me.txtOmitBeforeYear.Size = New System.Drawing.Size(37, 20)
+        Me.txtOmitBeforeYear.TabIndex = 5
+        Me.txtOmitBeforeYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.ToolTip1.SetToolTip(Me.txtOmitBeforeYear, "Leave blank to use all years")
+        '
+        'grpDates
+        '
+        Me.grpDates.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.grpDates.Controls.Add(Me.cboStartMonth)
+        Me.grpDates.Controls.Add(Me.lblYearStart)
+        Me.grpDates.Controls.Add(Me.txtEndDay)
+        Me.grpDates.Controls.Add(Me.txtStartDay)
+        Me.grpDates.Controls.Add(Me.cboEndMonth)
+        Me.grpDates.Controls.Add(Me.lblYearEnd)
+        Me.grpDates.Location = New System.Drawing.Point(0, 503)
+        Me.grpDates.Name = "grpDates"
+        Me.grpDates.Size = New System.Drawing.Size(200, 73)
+        Me.grpDates.TabIndex = 65
+        Me.grpDates.TabStop = False
+        Me.grpDates.Text = "Year / Season Boundaries"
+        '
+        'cboStartMonth
+        '
+        Me.cboStartMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
+        Me.cboStartMonth.Location = New System.Drawing.Point(41, 19)
+        Me.cboStartMonth.MaxDropDownItems = 12
+        Me.cboStartMonth.Name = "cboStartMonth"
+        Me.cboStartMonth.Size = New System.Drawing.Size(88, 21)
+        Me.cboStartMonth.TabIndex = 3
+        Me.cboStartMonth.Text = "January"
+        '
+        'lblYearStart
+        '
+        Me.lblYearStart.AutoSize = True
+        Me.lblYearStart.Location = New System.Drawing.Point(6, 22)
+        Me.lblYearStart.Name = "lblYearStart"
+        Me.lblYearStart.Size = New System.Drawing.Size(29, 13)
+        Me.lblYearStart.TabIndex = 23
+        Me.lblYearStart.Text = "Start"
+        '
+        'txtEndDay
+        '
+        Me.txtEndDay.Location = New System.Drawing.Point(135, 46)
+        Me.txtEndDay.Name = "txtEndDay"
+        Me.txtEndDay.Size = New System.Drawing.Size(24, 20)
+        Me.txtEndDay.TabIndex = 63
+        Me.txtEndDay.Text = "31"
+        Me.txtEndDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'txtStartDay
+        '
+        Me.txtStartDay.Location = New System.Drawing.Point(135, 19)
+        Me.txtStartDay.Name = "txtStartDay"
+        Me.txtStartDay.Size = New System.Drawing.Size(24, 20)
+        Me.txtStartDay.TabIndex = 4
+        Me.txtStartDay.Text = "1"
+        Me.txtStartDay.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'cboEndMonth
+        '
+        Me.cboEndMonth.Items.AddRange(New Object() {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"})
+        Me.cboEndMonth.Location = New System.Drawing.Point(41, 46)
+        Me.cboEndMonth.MaxDropDownItems = 12
+        Me.cboEndMonth.Name = "cboEndMonth"
+        Me.cboEndMonth.Size = New System.Drawing.Size(88, 21)
+        Me.cboEndMonth.TabIndex = 11
+        Me.cboEndMonth.Text = "December"
+        '
+        'lblYearEnd
+        '
+        Me.lblYearEnd.AutoSize = True
+        Me.lblYearEnd.Location = New System.Drawing.Point(6, 49)
+        Me.lblYearEnd.Name = "lblYearEnd"
+        Me.lblYearEnd.Size = New System.Drawing.Size(26, 13)
+        Me.lblYearEnd.TabIndex = 61
+        Me.lblYearEnd.Text = "End"
         '
         'frmSpecifyFrequency
         '
         Me.AcceptButton = Me.btnOk
         Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(446, 608)
+        Me.ClientSize = New System.Drawing.Size(421, 623)
+        Me.Controls.Add(Me.grpDates)
+        Me.Controls.Add(Me.grpYears)
         Me.Controls.Add(Me.panelTop)
         Me.Controls.Add(Me.panelBottom)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -358,6 +559,10 @@ Public Class frmSpecifyFrequency
         Me.grpNday.PerformLayout()
         Me.panelBottom.ResumeLayout(False)
         Me.panelBottom.PerformLayout()
+        Me.grpYears.ResumeLayout(False)
+        Me.grpYears.PerformLayout()
+        Me.grpDates.ResumeLayout(False)
+        Me.grpDates.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -391,20 +596,17 @@ Public Class frmSpecifyFrequency
             radioLow.Checked = True
         End If
 
-        chkKeepNDayTSers.Checked = (GetSetting("atcFrequencyGrid", "Defaults", "KeepNDayTSers", "False") = "True")
         chkLog.Checked = (GetSetting("atcFrequencyGrid", "Defaults", "Logarithmic", "True") = "True")
 
         pOk = False
-        Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
-        Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
 
-        LoadList(lstNday, lNDayHi.Arguments)
-        LoadList(lstRecurrence, lNDayHi.Arguments)
+        LoadListSettingsOrDefaults(lstNday)
+        LoadListSettingsOrDefaults(lstRecurrence)
 
-        RefreshSeasonsYearsLabel()
+        SeasonsYearsToForm()
     End Sub
 
-    Private Sub LoadList(ByVal lst As Windows.Forms.ListBox, ByVal aArgs As atcDataAttributes)
+    Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
         Dim lArgName As String = lst.Tag
         Dim lAvailableArray As String(,) = GetAllSettings("atcFrequencyGrid", "List." & lArgName)
         Dim lSelected As New ArrayList
@@ -422,13 +624,22 @@ Public Class frmSpecifyFrequency
                 MapWinUtility.Logger.Dbg("Error retrieving saved settings: " & e.Message)
             End Try
         Else
-            Dim lDefault As Object = aArgs.GetDefinedValue(lArgName).Definition.DefaultValue
-            If Not lDefault Is Nothing AndAlso IsArray(lDefault) Then
-                For Each lNumber As Double In lDefault
-                    Dim lLabel As String = Format(lNumber, "0.####")
-                    lst.Items.Add(lLabel)
-                Next
-            End If
+            LoadListDefaults(lst)
+        End If
+    End Sub
+
+    Private Sub LoadListDefaults(ByVal lst As Windows.Forms.ListBox)
+        Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
+        Dim lNDayHi As atcDefinedValue = lCalculator.AvailableOperations.GetDefinedValue("n-day high value")
+        Dim lArgs As atcDataAttributes = lNDayHi.Arguments
+        Dim lArgName As String = lst.Tag
+        Dim lDefault As Object = lArgs.GetDefinedValue(lArgName).Definition.DefaultValue
+        If Not lDefault Is Nothing AndAlso IsArray(lDefault) Then
+            lst.Items.Clear()
+            For Each lNumber As Double In lDefault
+                Dim lLabel As String = Format(lNumber, "0.####")
+                lst.Items.Add(lLabel)
+            Next
         End If
     End Sub
 
@@ -457,16 +668,41 @@ Public Class frmSpecifyFrequency
         Next
     End Sub
 
-    Private Sub RefreshSeasonsYearsLabel()
-        Dim lLabel As String = ""
-        If pYearStartMonth > 0 Then lLabel &= pYearStartMonth & "/"
-        If pYearStartDay > 0 Then lLabel &= pYearStartDay & " to "
-        If pYearEndMonth > 0 Then lLabel &= pYearEndMonth & "/"
-        If pYearEndDay > 0 Then lLabel &= pYearEndDay
-        If pFirstYear > 0 Then lLabel &= " " & pFirstYear & " - "
-        If pLastYear > 0 Then lLabel &= pLastYear
+    Private Sub SeasonsYearsToForm()
+        If cboStartMonth.Items.Count > 0 Then
+            cboStartMonth.SelectedIndex = pYearStartMonth - 1
+            cboEndMonth.SelectedIndex = pYearEndMonth - 1
+            If pYearStartDay > 0 Then txtStartDay.Text = pYearStartDay Else txtStartDay.Text = ""
+            If pYearEndDay > 0 Then txtEndDay.Text = pYearEndDay Else txtEndDay.Text = ""
+            If pFirstYear > 0 Then txtOmitBeforeYear.Text = pFirstYear Else txtOmitBeforeYear.Text = ""
+            If pLastYear > 0 Then txtOmitAfterYear.Text = pLastYear Else txtOmitAfterYear.Text = ""
+        End If
+    End Sub
 
-        lblYearsSeasons.Text = lLabel
+    Private Sub SeasonsYearsFromForm()
+        pYearStartMonth = cboStartMonth.SelectedIndex + 1
+        pYearEndMonth = cboEndMonth.SelectedIndex + 1
+        If IsNumeric(txtStartDay.Text) Then
+            pYearStartDay = txtStartDay.Text
+        Else
+            pYearStartDay = 0
+        End If
+        If IsNumeric(txtEndDay.Text) Then
+            pYearEndDay = txtEndDay.Text
+        Else
+            pYearEndDay = 0
+        End If
+        If IsNumeric(txtOmitBeforeYear.Text) Then
+            pFirstYear = CInt(txtOmitBeforeYear.Text)
+        Else
+            pFirstYear = 0
+        End If
+        If IsNumeric(txtOmitAfterYear.Text) Then
+            pLastYear = CInt(txtOmitAfterYear.Text)
+        Else
+            pLastYear = 0
+        End If
+
     End Sub
 
     Private Sub Calculate(ByVal aOperationName As String)
@@ -485,11 +721,12 @@ Public Class frmSpecifyFrequency
         If pLastYear > 0 Then lArgs.SetValue("LastYear", pLastYear)
 
         lCalculator.Open(aOperationName, lArgs)
-        If chkKeepNDayTSers.Checked Then 'add NDay Tsers to data manager
-            pDataManager.DataSources.Add(lCalculator)
-        End If
-        SaveSetting("atcFrequencyGrid", "Defaults", "HighOrLow", HighOrLowString)
-        SaveSetting("atcFrequencyGrid", "Defaults", "KeepNDayTSers", chkKeepNDayTSers.Checked.ToString)
+        Dim lName As String = HighOrLowString()
+        SaveSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
+        SaveSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
+        SaveSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
+        SaveSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
+        SaveSetting("atcFrequencyGrid", "Defaults", "HighOrLow", lName)
         SaveSetting("atcFrequencyGrid", "Defaults", "Logarithmic", chkLog.Checked.ToString)
         SaveList(lstNday)
         SaveList(lstRecurrence)
@@ -520,31 +757,87 @@ Public Class frmSpecifyFrequency
     End Function
 
     Private Sub btnNdayAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNdayAdd.Click
-        Try
-            Dim lIndex As Integer = 0
-            Dim lNewValue As Double = CDbl(txtNdayAdd.Text)
-            While lIndex < lstNday.Items.Count AndAlso CDbl(lstNday.Items(lIndex)) < lNewValue
-                lIndex += 1
-            End While
-            lstNday.Items.Insert(lIndex, txtNdayAdd.Text)
-            lstNday.SetSelected(lIndex, True)
-        Catch ex As Exception
-            Logger.Dbg("Exception adding N-day '" & txtNdayAdd.Text & "': " & ex.Message)
-        End Try
+        If IsNumeric(txtNdayAdd.Text) Then
+            Try
+                Dim lIndex As Integer = 0
+                Dim lNewValue As Double = CDbl(txtNdayAdd.Text)
+                While lIndex < lstNday.Items.Count AndAlso CDbl(lstNday.Items(lIndex)) < lNewValue
+                    lIndex += 1
+                End While
+                lstNday.Items.Insert(lIndex, txtNdayAdd.Text)
+                lstNday.SetSelected(lIndex, True)
+            Catch ex As Exception
+                Logger.Dbg("Exception adding N-day '" & txtNdayAdd.Text & "': " & ex.Message)
+            End Try
+        Else
+            Logger.Msg("Type a number of days to add in the blank, then press the add button again")
+        End If
     End Sub
 
     Private Sub btnRecurrenceAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRecurrenceAdd.Click
-        Try
-            Dim lIndex As Integer = 0
-            Dim lNewValue As Double = CDbl(txtRecurrenceAdd.Text)
-            While lIndex < lstRecurrence.Items.Count AndAlso CDbl(lstRecurrence.Items(lIndex)) < lNewValue
-                lIndex += 1
-            End While
-            lstRecurrence.Items.Insert(lIndex, txtRecurrenceAdd.Text)
-            lstRecurrence.SetSelected(lIndex, True)
-        Catch ex As Exception
-            Logger.Dbg("Exception adding Recurrence '" & txtRecurrenceAdd.Text & "': " & ex.Message)
-        End Try
+        If IsNumeric(txtRecurrenceAdd.Text) Then
+            Try
+                Dim lIndex As Integer = 0
+                Dim lNewValue As Double = CDbl(txtRecurrenceAdd.Text)
+                While lIndex < lstRecurrence.Items.Count AndAlso CDbl(lstRecurrence.Items(lIndex)) < lNewValue
+                    lIndex += 1
+                End While
+                lstRecurrence.Items.Insert(lIndex, txtRecurrenceAdd.Text)
+                lstRecurrence.SetSelected(lIndex, True)
+            Catch ex As Exception
+                Logger.Dbg("Exception adding Recurrence '" & txtRecurrenceAdd.Text & "': " & ex.Message)
+            End Try
+        Else
+            Logger.Msg("Type a return period to add in the blank, then press the add button again")
+        End If
+    End Sub
+
+    Private Sub btnNdayRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNdayRemove.Click
+        Dim lRemoveThese As New ArrayList
+        Dim lIndex As Integer
+        If lstNday.SelectedIndices.Count > 0 Then
+            For lIndex = lstNday.SelectedIndices.Count - 1 To 0 Step -1
+                lRemoveThese.Add(lstNday.SelectedIndices.Item(lIndex))
+            Next
+        Else
+            For lIndex = lstNday.Items.Count - 1 To 0 Step -1
+                If lstNday.Items(lIndex) = txtNdayAdd.Text Then
+                    lRemoveThese.Add(lIndex)
+                End If
+            Next
+        End If
+
+        For Each lIndex In lRemoveThese
+            lstNday.Items.RemoveAt(lIndex)
+        Next
+    End Sub
+
+    Private Sub btnRecurrenceRemove_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnRecurrenceRemove.Click
+        Dim lRemoveThese As New ArrayList
+        Dim lIndex As Integer
+        If lstRecurrence.SelectedIndices.Count > 0 Then
+            For lIndex = lstRecurrence.SelectedIndices.Count - 1 To 0 Step -1
+                lRemoveThese.Add(lstRecurrence.SelectedIndices.Item(lIndex))
+            Next
+        Else
+            For lIndex = lstRecurrence.Items.Count - 1 To 0 Step -1
+                If lstRecurrence.Items(lIndex) = txtRecurrenceAdd.Text Then
+                    lRemoveThese.Add(lIndex)
+                End If
+            Next
+        End If
+
+        For Each lIndex In lRemoveThese
+            lstRecurrence.Items.RemoveAt(lIndex)
+        Next
+    End Sub
+
+    Private Sub btnNdayDefault_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNdayDefault.Click
+        LoadListDefaults(lstNday)
+    End Sub
+
+    Private Sub btnRecurrenceDefault_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRecurrenceDefault.Click
+        LoadListDefaults(lstRecurrence)
     End Sub
 
     Private Sub btnNdayAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNdayAll.Click
@@ -588,20 +881,18 @@ Public Class frmSpecifyFrequency
         End If
     End Sub
 
-    Private Sub btnSelectYearsSeasons_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelectYearsSeasons.Click
-
-        Dim lForm As New frmSpecifyYearsSeasons
-        If lForm.AskUser("FrequencyGrid" & Me.Text, pDataGroup, pYearStartMonth, pYearStartDay, pYearEndMonth, pYearEndDay, pFirstYear, pLastYear) Then
-            'lSeasons = New atcSeasonsYearSubset(aStartMonth, aStartDay, aEndMonth, aEndDay)
-            Dim lName As String = HighOrLowString()
-            SaveSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
-            SaveSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
-            SaveSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
-            SaveSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
-            RefreshSeasonsYearsLabel()
-        End If
-
-    End Sub
+    'Private Sub btnSelectYearsSeasons_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSelectYearsSeasons.Click
+    '    Dim lForm As New frmSpecifyYearsSeasons
+    '    If lForm.AskUser("FrequencyGrid" & Me.Text, pDataGroup, pYearStartMonth, pYearStartDay, pYearEndMonth, pYearEndDay, pFirstYear, pLastYear) Then
+    '        'lSeasons = New atcSeasonsYearSubset(aStartMonth, aStartDay, aEndMonth, aEndDay)
+    '        Dim lName As String = HighOrLowString()
+    '        SaveSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
+    '        SaveSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
+    '        SaveSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
+    '        SaveSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
+    '        RefreshSeasonsYears()
+    '    End If
+    'End Sub
 
     Private Sub radioHigh_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles radioHigh.CheckedChanged
         GetDefaultYearStartEnd()
@@ -612,7 +903,6 @@ Public Class frmSpecifyFrequency
     End Sub
 
     Private Sub GetDefaultYearStartEnd()
-        Dim lName As String = HighOrLowString()
         If radioHigh.Checked Then
             pYearStartMonth = 10
             pYearStartDay = 1
@@ -624,11 +914,13 @@ Public Class frmSpecifyFrequency
             pYearEndMonth = 3
             pYearEndDay = 31
         End If
+
+        Dim lName As String = HighOrLowString()
         pYearStartMonth = GetSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
         pYearStartDay = GetSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
         pYearEndMonth = GetSetting("atcFrequencyGrid", "EndMonth", lName, pYearEndMonth)
         pYearEndDay = GetSetting("atcFrequencyGrid", "EndDay", lName, pYearEndDay)
-        RefreshSeasonsYearsLabel()
+        SeasonsYearsToForm()
     End Sub
 
     Private Function HighOrLowString() As String
@@ -638,5 +930,11 @@ Public Class frmSpecifyFrequency
             Return "Low"
         End If
     End Function
+
+    Private Sub Splitter1_SplitterMoved(ByVal sender As System.Object, ByVal e As System.Windows.Forms.SplitterEventArgs) Handles Splitter1.SplitterMoved
+        grpDates.Width = grpNday.Width
+        grpYears.Left = grpRecurrence.Left
+        grpYears.Width = grpRecurrence.Width
+    End Sub
 
 End Class

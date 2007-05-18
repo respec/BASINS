@@ -189,6 +189,22 @@ Friend Class atcFrequencyGridSource
         End Set
     End Property
 
+    Public Function AllNday() As atcDataGroup
+        Dim lAllNday As New atcDataGroup
+
+        For Each lTimeseries As atcTimeseries In pDataGroup
+            Dim lAttributes As atcDataAttributes = lTimeseries.Attributes
+            For Each lNdaysKey As String In pNdays.Keys
+                Dim lNdays As String = pNdays.Item(lNdaysKey)
+                Dim lAttrName As String = lNdays
+                If pHigh Then lAttrName &= "High" Else lAttrName &= "Low"
+                Dim lNdayAttribute As atcDefinedValue = lAttributes.GetDefinedValue(lAttrName & pRecurrence.GetByIndex(0))
+                lAllNday.Add(lNdayAttribute.Arguments.GetValue("NDayTimeseries"))
+            Next
+        Next
+        Return lAllNday
+    End Function
+
     Public Function CreateReport() As String
         Dim lStartDate As Date
         Dim lStartDateAnnual As Date
@@ -368,10 +384,14 @@ Friend Class atcFrequencyGridSource
                         Dim lNyears As Double = CDbl(lRecurrence)
                         lStr = DoubleToString(1 / lNyears, , "0.0000")
                         lThisRow = ("  " & lStr.PadLeft(17))
-                        lStr = DoubleToString(lNyears, , "0.00")
-                        lThisRow &= lStr.PadLeft(17)
-                        lStr = DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000")
-                        lThisRow &= lStr.PadLeft(17)
+
+                        If lNyears < 1.05 Then
+                            lThisRow &= DoubleToString(lNyears, , "0.000").PadLeft(18)
+                        Else
+                            lThisRow &= DoubleToString(lNyears, , "0.00").PadLeft(17) & " "
+                        End If
+
+                        lThisRow &= DoubleToString(lAttributes.GetValue(lAttrName & lRecurrence, 0), , "0.000").PadLeft(16)
                         If pHigh Then
                             lReverseString &= lThisRow & vbCrLf
                         Else
