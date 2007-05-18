@@ -126,6 +126,11 @@
       <Name>atcHspfBinOut</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
+      <Project>{350D3BE7-35A4-4B09-9D28-DDE2F6B716CD}</Project>
+      <Name>atcMwGisUtility</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcSeasons\atcSeasons.vbproj">
       <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
       <Name>atcSeasons</Name>
