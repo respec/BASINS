@@ -731,6 +731,28 @@ Public Class GisUtil
         End If
     End Sub
 
+    ''' <summary>
+    ''' Determine a points of a line
+    ''' </summary>
+    ''' <param name="aLayerIndex"></param>
+    ''' <param name="aFeatureIndex"></param>
+    ''' <param name="aX"></param>
+    ''' <param name="aY"></param>
+    ''' <remarks></remarks>
+    Public Shared Sub PointsOfLine(ByVal aLayerIndex As Integer, ByVal aFeatureIndex As Integer, _
+                                   ByRef aX() As Double, ByRef aY() As Double)
+        Dim lsf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        If FeatureIndexValid(aFeatureIndex, lsf) Then
+            Dim lShape As MapWinGIS.Shape = lsf.Shape(aFeatureIndex)
+            ReDim aX(lShape.numPoints - 1)
+            ReDim aY(lShape.numPoints - 1)
+            For lIndex As Integer = 0 To lShape.numPoints - 1
+                aX(lIndex) = lShape.Point(lIndex).x
+                aY(lIndex) = lShape.Point(lIndex).y
+            Next
+        End If
+    End Sub
+
     ''' <summary>Determine first point of a shape</summary>
     ''' <param name="aLayerIndex">
     '''     <para>Index of layer containing ShapeFile</para>
@@ -1691,7 +1713,7 @@ Public Class GisUtil
                         'need to clip
                         Dim lTempShapeIndex As Integer = j - 1
                         lRetc = issf.EditInsertShape(lSf.Shape(j - 1), lTempShapeIndex)
-                        lRetc = MapWinGeoProc.SpatialOperations.ClipShapesWithPolygon(issf, lShapeClip, rsf, True)                        
+                        lRetc = MapWinGeoProc.SpatialOperations.ClipShapesWithPolygon(issf, lShapeClip, rsf, True)
                         lRetc = issf.EditDeleteShape(0)
                         If rsf.NumShapes > 0 Then
                             lRetc = lNewShapeFile.EditInsertShape(rsf.Shape(0), lNewShapeFile.NumShapes)

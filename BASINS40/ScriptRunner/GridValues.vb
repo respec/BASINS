@@ -41,19 +41,35 @@ Public Module ScriptGridValues
         Dim lToComIdFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, "TOCOMID")
         Dim lLengthFieldIndex As Integer = GisUtil.FieldIndex(lLayerIndex, "LENGTHKM")
         Dim lLengthTotal As Double = 0
+        Dim lLengthSegment As Double
         Dim lLength As Double
         Dim lCnt As Integer = 0
         Dim lComId As Integer = 3434322 'downstream COMID for Upitoi Creek from visual inspection
         Do While lComId > 0
             Dim lFeatureIndex As Integer = FindFeatureIndex(lLayerIndex, lComIdFieldIndex, lComId.ToString)
-            lLength = GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lLengthFieldIndex)
-            lLengthTotal += lLength
-            Logger.Dbg("  ComId:" & lComId & " FeatureIndex:" & lFeatureIndex & " Length:" & lLength & " LengthTotal:" & lLengthTotal)
-            GisUtil.PointXY(lLayerIndex, lFeatureIndex, lX, lY)
-            lPointCollection = XY2Z(aMapWin, lX, lY)
-            ReportPoints(lX, lY, lPointCollection, lString, lLengthTotal)
-
-            'do more points along this line
+            Dim lXArray() As Double = Nothing
+            Dim lYArray() As Double = Nothing
+            lLengthSegment = 0
+            GisUtil.PointsOfLine(lLayerIndex, lFeatureIndex, lXArray, lYArray)
+            For lIndex As Integer = lXArray.GetUpperBound(0) To 0 Step -1
+                If lIndex = lXArray.GetUpperBound(0) Then
+                    lLength = 0
+                Else
+                    lLength = Math.Sqrt((lXArray(lIndex + 1) - lXArray(lIndex)) ^ 2 + _
+                                        (lYArray(lIndex + 1) - lYArray(lIndex)) ^ 2) / 1000.0
+                End If
+                lLengthSegment += lLength
+                Logger.Dbg("   CalcSegment " & lIndex & _
+                             " Length " & DoubleToString(lLength, , "#,##0.###", , , 6) & _
+                             " CumSegmentLength " & DoubleToString(lLengthSegment, , "#,##0.###", , , 6))
+                lPointCollection = XY2Z(aMapWin, lXArray(lIndex), lYArray(lIndex))
+                ReportPoints(lXArray(lIndex), lYArray(lIndex), lPointCollection, lString, lLengthTotal + lLengthSegment)
+            Next lIndex
+            lLengthTotal += lLengthSegment
+            Logger.Dbg("  ComId:" & lComId & " FeatureIndex:" & lFeatureIndex & _
+                                             " Length:" & DoubleToString(lLengthSegment, , "#,##0.###", , , 6) & _
+                                             " from DBF " & GisUtil.FieldValue(lLayerIndex, lFeatureIndex, lLengthFieldIndex) & _
+                                             " LengthTotal:" & DoubleToString(lLengthTotal, , "#,##0.###", , , 6))
 
             Dim lFeatureIndexUpstream As Integer = FindFeatureIndex(lLayerIndex, lToComIdFieldIndex, lComId.ToString)
             If lFeatureIndexUpstream >= 0 Then
@@ -63,7 +79,7 @@ Public Module ScriptGridValues
                 lComId = 0
             End If
         Loop
-        Logger.Dbg("ShapeProcessedCount:" & lCnt & " Length:" & lLength)
+        Logger.Dbg("ShapeProcessedCount:" & lCnt & " Length:" & lLengthTotal)
         SaveFileString("GridSample.txt", lString.ToString)
     End Sub
 
@@ -76,10 +92,10 @@ Public Module ScriptGridValues
         Return -1
     End Function
 
-    Sub ReportPoints(ByVal aX As Double, ByVal aY As Double, ByVal aPointCollection As atcCollection, ByRef aString As Text.StringBuilder, Optional ByVal aPos As Double = 0)
+    Sub ReportPoints(ByVal aX As Double, ByVal aY As Double, ByVal aPointCollection As atcCollection, ByRef aString As Text.StringBuilder, Optional ByVal aPos As Double = -1)
         If aPointCollection.Count > 1 Then
             Dim lRatio As Double = aPointCollection(0) / aPointCollection(1)
-            If aPos > 0 Then
+            If aPos > -1 Then
                 aString.Append(DoubleToString(aPos, 5) & vbTab)
             End If
             aString.Append(DoubleToString(aX, 14, , , , 10) & vbTab & _
