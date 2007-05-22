@@ -632,6 +632,15 @@ Public Class GisUtil
         End If
     End Function
 
+    Public Shared Function FindFeatureIndex(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer, ByVal aValue As String) As Integer
+        For lFeatureIndex As Integer = 0 To GisUtil.NumFeatures(aLayerIndex) - 1
+            If GisUtil.FieldValue(aLayerIndex, lFeatureIndex, aFieldIndex) = aValue Then
+                Return lFeatureIndex
+            End If
+        Next
+        Return -1
+    End Function
+
     ''' <summary>Minimum value in a grid from a LayerIndex</summary>
     ''' <param name="aLayerIndex">
     '''     <para>Index of desired layer containing grid (defaults to Current Layer)</para>
