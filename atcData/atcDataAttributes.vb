@@ -19,18 +19,28 @@ Public Class atcDataAttributes
     'Returns lowercase key for use in Me and pAllDefinitions
     'Warning: modifies argument aAttributeName if a preferred alias is found
     Private Shared Function AttributeNameToKey(ByRef aAttributeName As String) As String
-        Dim key As String = aAttributeName.ToLower
-        Dim lAlias As String = pAllAliases.ItemByKey(key)
+        Dim lKey As String = aAttributeName.ToLower
+        Dim lAlias As String = pAllAliases.ItemByKey(lKey)
         If Not lAlias Is Nothing Then 'We have a preferred alias for this name
             aAttributeName = lAlias
-            Return lAlias.ToLower       'use the preferred alias instead
-        Else
-            Return key
+            lKey = lAlias.ToLower       'use the preferred alias instead
+
+            'Check for High/Low frequency names in WDM format (HddYYY or LddYYY)
+        ElseIf aAttributeName.Length = 6 _
+            AndAlso (aAttributeName.Substring(0, 1).ToUpper = "H" OrElse aAttributeName.Substring(0, 1).ToUpper = "L") _
+            AndAlso IsNumeric(aAttributeName.Substring(1)) Then
+            If aAttributeName.Substring(0, 1).ToUpper = "L" Then
+                aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "Low" & CInt(aAttributeName.Substring(3))
+            Else
+                aAttributeName = CInt(aAttributeName.Substring(1, 2)) & "High" & CInt(aAttributeName.Substring(3))
+            End If
+            lKey = aAttributeName.ToLower
         End If
+        Return lKey
     End Function
 
     Public Shared Sub AddDefinition(ByVal aDefinition As atcAttributeDefinition)
-        Dim key As String = AttributeNameToKey(aDefinition.Name)
+        Dim key As String = AttributeNameToKey((aDefinition.Name))
         If Not pAllDefinitions.Keys.Contains(key) Then
             pAllDefinitions.Add(key, aDefinition)
         End If
@@ -120,7 +130,6 @@ Public Class atcDataAttributes
     'Retrieve or calculate the value for aAttributeName
     'returns aDefault if attribute has not been set and cannot be calculated
     Public Function GetValue(ByVal aAttributeName As String, Optional ByVal aDefault As Object = Nothing) As Object
-        Dim key As String = AttributeNameToKey(aAttributeName)
         Dim tmpAttribute As atcDefinedValue
         Try
             tmpAttribute = GetDefinedValue(aAttributeName)
@@ -149,7 +158,7 @@ Public Class atcDataAttributes
 
     'Set attribute with definition aAttrDefinition to value aValue
     Public Function SetValue(ByVal aAttrDefinition As atcAttributeDefinition, ByVal aValue As Object, Optional ByVal aArguments As atcDataAttributes = Nothing) As Integer
-        Dim key As String = AttributeNameToKey(aAttrDefinition.Name)
+        Dim key As String = AttributeNameToKey((aAttrDefinition.Name))
         Dim tmpAttrDefVal As atcDefinedValue
         Dim index As Integer = MyBase.Keys.IndexOf(key)
         If index = -1 Then
@@ -252,12 +261,19 @@ Public Class atcDataAttributes
                 .Add("tu", "Time Unit")
 
                 .Add("id", "ID")
+                .Add("dsn", "ID")
 
                 .Add("datcre", "Date Created")
                 .Add("datmod", "Date Modified")
 
                 .Add("latdeg", "Latitude")
                 .Add("lngdeg", "Longitude")
+
+                .Add("skewcf", "Skew")
+                .Add("stddev", "Standard Deviation")
+                .Add("meanvl", "Mean")
+                .Add("nonzro", "Count Positive")
+                .Add("numzro", "Count Zero")
 
                 .Add("7low10", "7Q10")
             End With
@@ -286,7 +302,7 @@ Public Class atcDataAttributes
         Dim lCalculateThese As New ArrayList
         For Each lDef As atcAttributeDefinition In pAllDefinitions 'For each kind of attribute we know about
             If lDef.Calculated Then                                  'This attribute can be calculated
-                Dim key As String = AttributeNameToKey(lDef.Name)
+                Dim key As String = AttributeNameToKey((lDef.Name))
                 If ItemByKey(key) Is Nothing Then                      'We do not yet have a value for this attribute
                     lCalculateThese.Add(key)
                 End If
@@ -351,7 +367,7 @@ Public Class atcDataAttributes
         Select Case aDef.TypeString.ToLower
             Case "single", "double", "integer", "boolean", "string"
                 If aDef.Calculated Then   'Maybe we can go ahead and calculate it now...
-                    If aKey Is Nothing Then aKey = AttributeNameToKey(aDef.Name)
+                    If aKey Is Nothing Then aKey = AttributeNameToKey((aDef.Name))
                     aOperation = aDef.Calculator.AvailableOperations.ItemByKey(aKey)
 
                     If aOperation Is Nothing AndAlso aKey.StartsWith("%") Then

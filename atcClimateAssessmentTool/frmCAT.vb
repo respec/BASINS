@@ -1557,7 +1557,7 @@ NextIteration:
 
             If lMoveTo >= 0 AndAlso lMoveTo < aGroup.Count Then
                 Dim lWasChecked As Boolean = aList.CheckedIndices.Contains(lMoveFrom)
-                Dim lMoveMe As atcVariation = aGroup.ItemByIndex(lMoveFrom)
+                Dim lMoveMe As Object = aGroup.ItemByIndex(lMoveFrom)
                 aGroup.RemoveAt(lMoveFrom)
                 aList.Items.RemoveAt(lMoveFrom)
                 aGroup.Insert(lMoveTo, lMoveMe)
@@ -1571,11 +1571,19 @@ NextIteration:
     End Sub
 
     Private Sub btnInputUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputUp.Click
-        MoveItem(pInputs, lstInputs, -1)
+        If pPreparedInputs Is Nothing Then
+            MoveItem(pInputs, lstInputs, -1)
+        Else
+            MoveItem(pPreparedInputs, lstInputs, -1)
+        End If
     End Sub
 
     Private Sub btnInputDown_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnInputDown.Click
-        MoveItem(pInputs, lstInputs, 1)
+        If pPreparedInputs Is Nothing Then
+            MoveItem(pInputs, lstInputs, 1)
+        Else
+            MoveItem(pPreparedInputs, lstInputs, 1)
+        End If
     End Sub
 
     Private Sub btnEndpointUp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnEndpointUp.Click

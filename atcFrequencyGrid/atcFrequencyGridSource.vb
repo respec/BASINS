@@ -213,7 +213,6 @@ Friend Class atcFrequencyGridSource
         Dim lIndex As Integer
         Dim lColumn As Integer
         Dim lRept As New System.Text.StringBuilder
-        Dim lCurrentValue As Double
         Try
             For Each lTimeseries As atcTimeseries In pDataGroup
                 Dim lAttributes As atcDataAttributes = lTimeseries.Attributes
@@ -241,9 +240,6 @@ Friend Class atcFrequencyGridSource
                     lEndDate = Date.FromOADate(lNdayTs.Dates.Value(lNdayTs.numValues))
 
                     Dim lPositiveNdayTs As atcTimeseries
-                    Dim lNumZero As Integer = 0
-                    Dim lNumPositive As Integer = 0
-                    Dim lNumNegative As Integer = 0
                     Dim lEpsilon As Double = (lNdayTs.Attributes.GetValue("Max") - lNdayTs.Attributes.GetValue("Min")) / Math.Pow(10, 9)
 
                     lRept.AppendLine()
@@ -278,18 +274,9 @@ Friend Class atcFrequencyGridSource
                     If pHigh Then lStr &= "high" Else lStr &= "low"
                     lRept.AppendLine(lStr.PadLeft(27) & " - parameter")
 
-                    For lIndex = 1 To lNdayTsNonLog.numValues
-                        lCurrentValue = lNdayTsNonLog.Value(lIndex)
-                        If Double.IsNaN(lCurrentValue) Then
-                            lNumNegative += 1
-                        ElseIf Math.Abs(lCurrentValue) < lEpsilon Then
-                            lNumZero += 1
-                        ElseIf lNdayTs.Value(lIndex) < 0 Then
-                            lNumNegative += 1
-                        Else
-                            lNumPositive += 1
-                        End If
-                    Next
+                    Dim lNumZero As Integer = lNdayTsNonLog.Attributes.GetValue("Count Zero", -1)
+                    Dim lNumPositive As Integer = lNdayTsNonLog.Attributes.GetValue("Count Positive", -1)
+                    Dim lNumNegative As Integer = lNdayTsNonLog.numValues - lNumZero - lNumPositive
 
                     lStr = lNumPositive
                     lRept.AppendLine(lStr.PadLeft(27) & " - non-zero values")

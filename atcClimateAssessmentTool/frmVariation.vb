@@ -562,6 +562,7 @@ Imports MapWinUtility
         '
         Me.grpEvents.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpEvents.Controls.Add(Me.lblVolumePercent)
         Me.grpEvents.Controls.Add(Me.txtVolumePercent)
         Me.grpEvents.Controls.Add(Me.lblVolumeUnits)
         Me.grpEvents.Controls.Add(Me.lblThresholdUnits)
@@ -573,7 +574,6 @@ Imports MapWinUtility
         Me.grpEvents.Controls.Add(Me.txtEventThreshold)
         Me.grpEvents.Controls.Add(Me.txtEventGap)
         Me.grpEvents.Controls.Add(Me.chkEvents)
-        Me.grpEvents.Controls.Add(Me.lblVolumePercent)
         Me.grpEvents.Controls.Add(Me.lblThreshold)
         Me.grpEvents.Controls.Add(Me.lblVolumePercent2)
         Me.grpEvents.Controls.Add(Me.txtEventVolume)
@@ -1138,16 +1138,22 @@ Imports MapWinUtility
         grpMinMax.Text = pFunctionGroupLabels(cboFunction.SelectedIndex)
         lblValueUnitsMinimum.Text = pFunctionUnits(cboFunction.SelectedIndex)
         lblValueUnitsMaximum.Text = lblValueUnitsMinimum.Text
-        If pFunctionOperations(cboFunction.SelectedIndex) = "Flash" Then
-            If Not chkEvents.Checked Then chkEvents.Checked = True
-            lblVolumePercent.Visible = True
-            lblVolumePercent2.Visible = True
-            txtVolumePercent.Visible = True
-        Else
-            lblVolumePercent.Visible = False
-            lblVolumePercent2.Visible = False
-            txtVolumePercent.Visible = False
-        End If
+        Select Case pFunctionOperations(cboFunction.SelectedIndex)
+            Case "Flash"
+                If Not chkEvents.Checked Then chkEvents.Checked = True
+                lblVolumePercent.Visible = True
+                lblVolumePercent2.Visible = True
+                txtVolumePercent.Visible = True
+            Case "AddEvents"
+                If Not chkEvents.Checked Then chkEvents.Checked = True
+                lblVolumePercent.Visible = False
+                lblVolumePercent2.Visible = False
+                txtVolumePercent.Visible = False
+            Case Else
+                lblVolumePercent.Visible = False
+                lblVolumePercent2.Visible = False
+                txtVolumePercent.Visible = False
+        End Select
     End Sub
 
 End Class

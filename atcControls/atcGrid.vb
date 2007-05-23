@@ -352,26 +352,36 @@ Public Class atcGrid
                 Next
                 If x > pVisibleWidth Then
                     .Maximum = x '- Me.Width + .Minimum + VScroller.Width
-                    If (lColumns - lFixedColumns) > 0 Then
-                        .LargeChange = (.Maximum - .Minimum) / (lColumns - lFixedColumns)
+                    If (lColumns - lFixedColumns) > 1 Then
+                        If pColumnRight.Count > 1 Then
+                            .SmallChange = ColumnWidth(pColumnRight.Keys(0))
+                        Else
+                            .SmallChange = (.Maximum - .Minimum) / (lColumns - lFixedColumns)
+                        End If
+                        If pVisibleWidth > (VScroller.Width + .SmallChange) Then
+                            .LargeChange = pVisibleWidth - VScroller.Width - .SmallChange
+                        Else
+                            .LargeChange = .SmallChange
+                        End If
                     Else
+                        .SmallChange = 1
                         .LargeChange = 1
                     End If
-                    If .Value < .Minimum Then
-                        .Value = .Minimum
-                        Return True
-                    End If
-                    If .Value > .Maximum Then
-                        .Value = .Maximum
-                        Return True
-                    End If
-                    .Visible = True
-                Else
-                    .Visible = False
-                    If .Value <> .Minimum Then
-                        .Value = .Minimum
-                        Return True
-                    End If
+                        If .Value < .Minimum Then
+                            .Value = .Minimum
+                            Return True
+                        End If
+                        If .Value > .Maximum Then
+                            .Value = .Maximum
+                            Return True
+                        End If
+                        .Visible = True
+                    Else
+                        .Visible = False
+                        If .Value <> .Minimum Then
+                            .Value = .Minimum
+                            Return True
+                        End If
                     End If
                     Return False
             End With
@@ -493,14 +503,8 @@ Public Class atcGrid
 
                 x = -1
                 For lColumn = 0 To lColumns - 1
-                    'ColumnWidth(lColumn) = 100
                     lColumnWidth = ColumnWidth(lColumn)
                     x += lColumnWidth
-                    'If lColumn < lFixedColumns Then
-                    '    lx = x
-                    '    g.DrawLine(lLinePen, lx, 0, lx, visibleHeight)
-                    '    pColumnRight.Add(lColumn, lx)
-                    'Else
                     If Not HScroller.Visible OrElse x > HScroller.Minimum OrElse lColumn < lFixedColumns Then
                         If HScroller.Visible AndAlso lColumn >= lFixedColumns Then
                             lx = x + HScroller.Minimum - HScroller.Value
@@ -518,12 +522,12 @@ Public Class atcGrid
                                 lx = pVisibleWidth
                             End If
                         End If
-                        'If lx > pVisibleWidth Then
-                        'lx = pVisibleWidth
-                        'End If
                         'Debug.Print("Column Line (" & lColumn & ") " & x & " -> " & lx)
-                        g.DrawLine(lLinePen, lx, 0, lx, visibleHeight)
-                        pColumnRight.Add(lColumn, lx)
+                        If lx >= 0 Then
+                            g.DrawLine(lLinePen, lx, 0, lx, visibleHeight)
+                            pColumnRight.Add(lColumn, lx)
+                        End If
+                        If lx > Me.Width Then Exit For
                     End If
                     'End If
                 Next
@@ -553,13 +557,13 @@ Public Class atcGrid
                                 'Change left edge for clipping cell contents
                                 lCellLeft = HScroller.Minimum
                             End If
-                            Dim lClipRect As New System.Drawing.Rectangle(lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
-                            g.SetClip(lClipRect, Drawing2D.CombineMode.Replace)
-                            If lCellLeft = 0 OrElse lCellLeft = HScroller.Minimum Then
-                                'Change left edge for measuring where to put cell contents
-                                lCellLeft = lCellRight - ColumnWidth(lColumn)
-                            End If
-                            If lColumnIndex < lFixedColumns OrElse Not HScroller.Visible OrElse lCellRight > HScroller.Minimum Then
+                            If lCellLeft < pVisibleWidth AndAlso lCellRight > 0 AndAlso (lColumnIndex < lFixedColumns OrElse Not HScroller.Visible OrElse lCellRight > HScroller.Minimum) Then
+                                Dim lClipRect As New System.Drawing.Rectangle(lCellLeft, lCellTop, lCellRight - lCellLeft, lCellBottom - lCellTop)
+                                g.SetClip(lClipRect, Drawing2D.CombineMode.Replace)
+                                If lCellLeft = 0 OrElse lCellLeft = HScroller.Minimum Then
+                                    'Change left edge for measuring where to put cell contents
+                                    lCellLeft = lCellRight - ColumnWidth(lColumn)
+                                End If
                                 If pSource.CellSelected(lRow, lColumn) Then
                                     lEachCellBackColor = SystemColors.Highlight
                                     lEachCellTextBrush.Color = SystemColors.HighlightText
@@ -699,7 +703,7 @@ Public Class atcGrid
             Dim lMaxColumn As Integer = pSource.Columns - 1
             Dim lContentsWidth As Integer = 0
             For lCol As Integer = 0 To lMaxColumn
-                SizeColumnToContents(lCol)
+                If lCol < 100 Then SizeColumnToContents(lCol)
                 lContentsWidth += ColumnWidth(lCol)
             Next
             If aTotalWidth > 0 AndAlso (aShrinkToTotalWidth OrElse aTotalWidth > lContentsWidth) Then

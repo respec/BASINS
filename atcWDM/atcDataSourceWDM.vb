@@ -90,6 +90,57 @@ Public Class atcDataSourceWDM
         End Select
     End Function
 
+    Public Overrides Function AddDatasets(ByVal aDataGroup As atcDataGroup) As Boolean
+        Dim lfrm As New frmSave
+        Dim lNumSaved As Integer = 0
+        Dim lDSN As Integer
+        Dim lLowestDSN As Integer = Integer.MaxValue
+        Dim lHighestDSN As Integer = 0
+        Dim lHighestNewDSN As Integer = 0
+        Dim lLabel As String = "File contains " & DataSets.Count & " datasets"
+
+        If DataSets.Count > 0 Then
+            For Each lDataSet As atcDataSet In DataSets
+                lDSN = lDataSet.Attributes.GetValue("dsn", 0)
+                If lDSN > 0 Then
+                    If lDSN > lHighestDSN Then lHighestDSN = lDSN
+                    If lDSN < lLowestDSN Then lLowestDSN = lDSN
+                End If
+            Next
+            lLabel &= " numbered " & lLowestDSN & " to " & lHighestDSN
+        End If
+
+        lHighestNewDSN = lHighestDSN
+        For Each lDataSet As atcDataSet In aDataGroup
+            lDSN = lDataSet.Attributes.GetValue("dsn", 0)
+            If lDSN > lHighestDSN AndAlso lDSN < 9999 Then
+                lHighestNewDSN = lDSN
+            Else
+                lHighestNewDSN += 1
+            End If
+            lDataSet.Attributes.SetValue("New DSN", lHighestNewDSN)
+        Next
+
+        aDataGroup = lfrm.AskUser(aDataGroup, lLabel, lHighestDSN)
+        If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
+            For Each lDataset As atcTimeseries In aDataGroup
+                Dim lNewDSN As Integer = lDataset.Attributes.GetValue("New DSN", 0)
+                If lNewDSN > 0 Then
+                    lDataset.Attributes.SetValue("DSN", lNewDSN)
+                    lDataset.Attributes.RemoveByKey("New DSN")
+                End If
+                If AddDataset(lDataset, ExistAskUser) Then lNumSaved += 1
+            Next
+            Dim lMsg As String = "Saved " & lNumSaved & " of " & aDataGroup.Count & " dataset"
+            If aDataGroup.Count <> 1 Then lMsg &= "s"
+            lMsg &= " in " & vbCrLf & Specification & vbCrLf & "(file now contains " & DataSets.Count & " dataset"
+            If DataSets.Count <> 1 Then lMsg &= "s"
+            Logger.Msg(lMsg & ")", "Saved Data")
+            Return (lNumSaved = aDataGroup.Count)
+        End If
+        Return False
+    End Function
+
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
@@ -112,7 +163,7 @@ Public Class atcDataSourceWDM
             J2Date(lEJDay, lEDat)
             Dim lNValsExpected As Integer
             TimDif(lSDat, lEDat, lTu, lTs, lNValsExpected)
-            If lNvals <> lNValsExpected Then
+            If lNvals < lNValsExpected Then
                 'TODO:  make writing data smarter to deal with big gaps of missing, etc
                 Throw New ApplicationException("NVals:" & lNvals & ":" & lNValsExpected)
             End If
