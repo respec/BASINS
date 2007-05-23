@@ -85,7 +85,7 @@ Public Module modTimeseriesMath
 
         aTimeseries.EnsureValuesRead()
 
-        If aFirstYear > 0 AndAlso aStartMonth > 1 Then
+        If aFirstYear > 0 AndAlso (aEndMonth < aStartMonth OrElse (aEndMonth = aStartMonth AndAlso aEndDay < aStartDay)) Then
             'Convert water year into calendar year
             aFirstYear -= 1
         End If
@@ -127,6 +127,8 @@ Public Module modTimeseriesMath
         SubsetByDateBoundary = SubsetByDate(aTimeseries, lStartDate, lEndDate, aDataSource)
         SubsetByDateBoundary.Attributes.Add("seasbg", aStartMonth)
         SubsetByDateBoundary.Attributes.Add("seadbg", aStartDay)
+        SubsetByDateBoundary.Attributes.Add("seasnd", aEndMonth)
+        SubsetByDateBoundary.Attributes.Add("seadnd", aEndDay)
 
     End Function
 

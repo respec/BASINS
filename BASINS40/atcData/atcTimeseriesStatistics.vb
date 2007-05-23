@@ -54,6 +54,10 @@ Public Class atcTimeseriesStatistics
 
                 AddOperation("Count", "Count of non missing values", defTimeSeriesOne, lCategory, "Integer", 0)
 
+                AddOperation("Count Positive", "Count of values greater than zero", defTimeSeriesOne, lCategory, "Integer", 0)
+
+                AddOperation("Count Zero", "Count of values equal to zero", defTimeSeriesOne, lCategory, "Integer", 0)
+
                 AddOperation("SJDay", "Starting Julian Date", defTimeSeriesOne, lCategory)
 
                 AddOperation("EJDay", "Ending Julian Date", defTimeSeriesOne, lCategory)
@@ -153,6 +157,8 @@ Public Class atcTimeseriesStatistics
             Dim lGeoMean As Double = 0
             Dim lStdDev As Double = pNaN
             Dim lCount As Double = 0
+            Dim lCountPositive As Double = 0
+            Dim lCountZero As Double = 0
             Dim lMean As Double = pNaN
             Dim lSum As Double = 0
             Dim lSumDevSquares As Double = 0
@@ -171,10 +177,18 @@ Public Class atcTimeseriesStatistics
                     If lVal < lMin Then lMin = lVal
                     lSum += lVal
                     If lMin > 0 Then lGeoMean += Math.Log(lVal)
+
+                    If Math.Abs(lVal) < 1.0E-30 Then
+                        lCountZero += 1
+                    ElseIf lVal > 0 Then
+                        lCountPositive += 1
+                    End If
                 End If
             Next
 
             aTimeseries.Attributes.SetValue("Count", CInt(lCount))
+            aTimeseries.Attributes.SetValue("Count Positive", CInt(lCountPositive))
+            aTimeseries.Attributes.SetValue("Count Zero", CInt(lCountZero))
             If lCount > 0 Then
                 aTimeseries.Attributes.SetValue("Max", lMax)
                 aTimeseries.Attributes.SetValue("Min", lMin)

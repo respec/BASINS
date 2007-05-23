@@ -101,13 +101,13 @@ Public Class frmSpecifyFrequency
         Me.btnOk = New System.Windows.Forms.Button
         Me.btnCancel = New System.Windows.Forms.Button
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.txtOmitAfterYear = New System.Windows.Forms.TextBox
+        Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox
         Me.grpYears = New System.Windows.Forms.GroupBox
         Me.lblDataStart = New System.Windows.Forms.Label
         Me.lblDataEnd = New System.Windows.Forms.Label
         Me.lblOmitBefore = New System.Windows.Forms.Label
         Me.lblOmitAfter = New System.Windows.Forms.Label
-        Me.txtOmitAfterYear = New System.Windows.Forms.TextBox
-        Me.txtOmitBeforeYear = New System.Windows.Forms.TextBox
         Me.grpDates = New System.Windows.Forms.GroupBox
         Me.cboStartMonth = New System.Windows.Forms.ComboBox
         Me.lblYearStart = New System.Windows.Forms.Label
@@ -394,6 +394,24 @@ Public Class frmSpecifyFrequency
         Me.btnCancel.TabIndex = 15
         Me.btnCancel.Text = "Cancel"
         '
+        'txtOmitAfterYear
+        '
+        Me.txtOmitAfterYear.Location = New System.Drawing.Point(41, 45)
+        Me.txtOmitAfterYear.Name = "txtOmitAfterYear"
+        Me.txtOmitAfterYear.Size = New System.Drawing.Size(37, 20)
+        Me.txtOmitAfterYear.TabIndex = 6
+        Me.txtOmitAfterYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.ToolTip1.SetToolTip(Me.txtOmitAfterYear, "Leave blank to use all years")
+        '
+        'txtOmitBeforeYear
+        '
+        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(41, 19)
+        Me.txtOmitBeforeYear.Name = "txtOmitBeforeYear"
+        Me.txtOmitBeforeYear.Size = New System.Drawing.Size(37, 20)
+        Me.txtOmitBeforeYear.TabIndex = 5
+        Me.txtOmitBeforeYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        Me.ToolTip1.SetToolTip(Me.txtOmitBeforeYear, "Leave blank to use all years")
+        '
         'grpYears
         '
         Me.grpYears.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -417,7 +435,7 @@ Public Class frmSpecifyFrequency
         Me.lblDataStart.Name = "lblDataStart"
         Me.lblDataStart.Size = New System.Drawing.Size(121, 13)
         Me.lblDataStart.TabIndex = 0
-        Me.lblDataStart.Tag = "Data Starts "
+        Me.lblDataStart.Tag = "Data Starts"
         Me.lblDataStart.Text = "Data Starts 11/22/1933"
         '
         'lblDataEnd
@@ -427,7 +445,7 @@ Public Class frmSpecifyFrequency
         Me.lblDataEnd.Name = "lblDataEnd"
         Me.lblDataEnd.Size = New System.Drawing.Size(118, 13)
         Me.lblDataEnd.TabIndex = 1
-        Me.lblDataEnd.Tag = "Data Ends "
+        Me.lblDataEnd.Tag = "Data Ends"
         Me.lblDataEnd.Text = "Data Ends 11/22/1934"
         '
         'lblOmitBefore
@@ -447,24 +465,6 @@ Public Class frmSpecifyFrequency
         Me.lblOmitAfter.Size = New System.Drawing.Size(26, 13)
         Me.lblOmitAfter.TabIndex = 43
         Me.lblOmitAfter.Text = "End"
-        '
-        'txtOmitAfterYear
-        '
-        Me.txtOmitAfterYear.Location = New System.Drawing.Point(41, 45)
-        Me.txtOmitAfterYear.Name = "txtOmitAfterYear"
-        Me.txtOmitAfterYear.Size = New System.Drawing.Size(37, 20)
-        Me.txtOmitAfterYear.TabIndex = 6
-        Me.txtOmitAfterYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.ToolTip1.SetToolTip(Me.txtOmitAfterYear, "Leave blank to use all years")
-        '
-        'txtOmitBeforeYear
-        '
-        Me.txtOmitBeforeYear.Location = New System.Drawing.Point(41, 19)
-        Me.txtOmitBeforeYear.Name = "txtOmitBeforeYear"
-        Me.txtOmitBeforeYear.Size = New System.Drawing.Size(37, 20)
-        Me.txtOmitBeforeYear.TabIndex = 5
-        Me.txtOmitBeforeYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        Me.ToolTip1.SetToolTip(Me.txtOmitBeforeYear, "Leave blank to use all years")
         '
         'grpDates
         '
@@ -571,6 +571,7 @@ Public Class frmSpecifyFrequency
 
     Private WithEvents pDataGroup As atcDataGroup
     Private pDataManager As atcDataManager
+    Private pDateFormat As atcDateFormat
     Private pOk As Boolean = False
     Private pYearStartMonth As Integer = 0
     Private pYearStartDay As Integer = 0
@@ -590,6 +591,13 @@ Public Class frmSpecifyFrequency
     End Function
 
     Private Sub Clear()
+        pDateFormat = New atcDateFormat
+        With pDateFormat
+            .IncludeHours = False
+            .IncludeMinutes = False
+            .IncludeSeconds = False            
+        End With
+
         If GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "High") = "High" Then
             radioHigh.Checked = True
         Else
@@ -604,6 +612,24 @@ Public Class frmSpecifyFrequency
         LoadListSettingsOrDefaults(lstRecurrence)
 
         SeasonsYearsToForm()
+
+        Dim lFirstDate As Double = Double.MaxValue
+        Dim lLastDate As Double = Double.MinValue
+        For Each lDataset As atcData.atcTimeseries In pDataGroup
+            If lDataset.Dates.numValues > 0 Then
+                Dim lThisDate As Double = lDataset.Dates.Value(1)
+                If lThisDate < lFirstDate Then lFirstDate = lThisDate
+                lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
+                If lThisDate > lLastDate Then lLastDate = lThisDate
+            End If
+        Next
+        If lFirstDate < Double.MaxValue Then
+            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
+        End If
+        If lLastDate > Double.MinValue Then
+            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
+        End If
+
     End Sub
 
     Private Sub LoadListSettingsOrDefaults(ByVal lst As Windows.Forms.ListBox)
@@ -866,6 +892,7 @@ Public Class frmSpecifyFrequency
 
     Private Sub btnOk_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnOk.Click
         Me.Cursor = System.Windows.Forms.Cursors.WaitCursor
+        SeasonsYearsFromForm()
         Calculate("n-day " & HighOrLowString() & " value")
         pOk = True
         Close()

@@ -91,7 +91,7 @@ Public Class atcTimeseriesNdayHighLow
 
                 AddOperation("7Q10", "Seven day low flow 10-year return period", _
                              "Double", defTimeSeriesOne)
-                AddOperation("1Hi100", "One day high 100-year return period", _
+                AddOperation("1High100", "One day high 100-year return period", _
                              "Double", defTimeSeriesOne)
 
                 AddOperation("n-day low timeseries", "n-day low value annual timeseries", _
@@ -247,13 +247,20 @@ Public Class atcTimeseriesNdayHighLow
                     lSJday = lNextSJday
                 Next
 
+                Dim lDescription As String = lNDayNow & " day annual "  'TODO: fill in day and annual
+                If aHigh Then
+                    lDescription &= "high values "
+                Else
+                    lDescription &= "low values "
+                End If
+
                 Dim lDateNow As Date = Now
                 CopyBaseAttributes(aTS, newTS)
-                newTS.Attributes.SetValue("Date Created", lDateNow)
-                newTS.Attributes.SetValue("Date Modified", lDateNow)
-                newTS.Attributes.SetValue("Parent Timeseries", aTS)
 
                 With newTS.Attributes
+                    .SetValue("Date Created", lDateNow)
+                    .SetValue("Date Modified", lDateNow)
+                    .SetValue("Parent Timeseries", aTS)
                     .SetValue("Tu", 6)
                     .SetValue("Ts", 1)
                     .SetValue("HighFlag", aHigh)
@@ -262,16 +269,12 @@ Public Class atcTimeseriesNdayHighLow
                     If aHigh Then ltstype = "H" Else ltstype = "L"
                     ltstype &= Format(lNDayNow, "000")
                     .SetValue("tstype", ltstype)
+                    .SetValue("constituent", ltstype)
+                    .SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
+                    .AddHistory(lDescription)
+                    .SetValue("LDIST", "LP")
                 End With
 
-                Dim lDescription As String = lNDayNow & " day annual "  'TODO: fill in day and annual
-                If aHigh Then
-                    lDescription &= "high values "
-                Else
-                    lDescription &= "low values "
-                End If
-                newTS.Attributes.SetValue("Description", lDescription & aTS.Attributes.GetValue("Description"))
-                newTS.Attributes.AddHistory(lDescription)
                 Dim lKenTauAttributes As New atcDataAttributes
                 ComputeTau(newTS, lNDayNow, aHigh, lKenTauAttributes)
                 For Each lAttribute As atcDefinedValue In lKenTauAttributes
@@ -410,6 +413,10 @@ Public Class atcTimeseriesNdayHighLow
                     'Save non-log timeseries
                     lTsMath.DataSets(0).Attributes.SetValue("NDayTimeseries", lNdayTs)
                     lNdayTs = lTsMath.DataSets(0)
+                    'Set log-specific attributes
+                    lNdayTs.Attributes.SetValue("MEANDD", lNdayTs.Attributes.GetValue("Mean"))
+                    lNdayTs.Attributes.SetValue("SDND", lNdayTs.Attributes.GetValue("Standard Deviation"))
+                    lNdayTs.Attributes.SetValue("SKWND", lNdayTs.Attributes.GetValue("Skew"))
                 End If
                 Dim lNday As Integer = lNdayTs.Attributes.GetValue("NDay")
 
@@ -462,12 +469,30 @@ Public Class atcTimeseriesNdayHighLow
                     lArguments.SetValue("NDayTimeseries", lNdayTs)
 
                     aAttributesStorage.SetValue(lNewAttribute, lQ, lArguments)
+
+                    'If recurrence interval is an integer, also set WDM-style attribute
+                    'Should not be needed now that atcDataAttributes translates from WDM-style names 
+                    'If Math.Abs(lRecurOrProbNow - CInt(lRecurOrProbNow)) < 0.000001 Then
+                    '    If aHigh Then
+                    '        lS = "H"
+                    '    Else
+                    '        lS = "L"
+                    '    End If
+                    '    lS &= Format(lNday, "00") & DoubleToString(lRecurOrProbNow, , "000")
+                    '    lNewAttribute = New atcAttributeDefinition
+                    '    With lNewAttribute
+                    '        .Name = lS
+                    '        .Description = lS
+                    '        .DefaultValue = ""
+                    '        .Editable = False
+                    '        .TypeString = "Double"
+                    '        .Calculator = Me
+                    '        .Category = "N-Day and Frequency"
+                    '    End With
+                    'End If
                 Next
 
-                If aLogFg And Not lTsMath Is Nothing Then 'remove log10 transform timser
-                    DataManager.DataSources.Remove(lTsMath)
-                    lTsMath = Nothing
-                End If
+                lTsMath = Nothing
 
                 If Not (aTimeseries Is lNdayTs) Then 'get rid of intermediate timeseries
                     lNdayTs = Nothing
@@ -513,7 +538,7 @@ Public Class atcTimeseriesNdayHighLow
                 lHigh = False
                 lReturn = 10
                 lOperationName = "n-day low value"
-            Case "1hi100"
+            Case "1hi100", "1high100"
                 lNDay = 1
                 lHigh = True
                 lReturn = 100

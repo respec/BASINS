@@ -1,3 +1,5 @@
+Imports MapWinUtility
+
 ''' <summary>Base class for data sources</summary>
 Public Class atcDataSource
     Inherits atcDataPlugin
@@ -115,6 +117,26 @@ Public Class atcDataSource
         Else
             pData.Add(aDs)
             Return True
+        End If
+    End Function
+
+    Public Overridable Function AddDataSets(ByVal aDataGroup As atcDataGroup) As Boolean
+        Dim lNumSaved As Integer = 0
+        For Each lDataSet As atcDataSet In aDataGroup
+            If AddDataSet(lDataSet, atcData.atcDataSource.EnumExistAction.ExistRenumber) Then
+                lNumSaved += 1
+            End If
+        Next
+        If lNumSaved > 0 AndAlso Save(Specification) Then
+            Dim lMsg As String = "Saved " & lNumSaved & " of " & aDataGroup.Count & " dataset"
+            If aDataGroup.Count <> 1 Then lMsg &= "s"
+            lMsg &= " in " & vbCrLf & Specification & vbCrLf & "(file now contains " & DataSets.Count & " dataset"
+            If DataSets.Count <> 1 Then lMsg &= "s"
+            Logger.Msg(lMsg & ")", "Saved Data")
+            Return True
+        Else
+            Logger.Msg("Could not save in " & Specification, "Could Not Save")
+            Return False
         End If
     End Function
 

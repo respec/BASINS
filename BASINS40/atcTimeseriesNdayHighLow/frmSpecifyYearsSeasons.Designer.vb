@@ -50,18 +50,20 @@ Partial Class frmSpecifyYearsSeasons
         Me.lblDataStart.AutoSize = True
         Me.lblDataStart.Location = New System.Drawing.Point(109, 22)
         Me.lblDataStart.Name = "lblDataStart"
-        Me.lblDataStart.Size = New System.Drawing.Size(63, 13)
+        Me.lblDataStart.Size = New System.Drawing.Size(60, 13)
         Me.lblDataStart.TabIndex = 0
-        Me.lblDataStart.Text = "Data Starts "
+        Me.lblDataStart.Tag = "Data Starts"
+        Me.lblDataStart.Text = "Data Starts"
         '
         'lblDataEnd
         '
         Me.lblDataEnd.AutoSize = True
         Me.lblDataEnd.Location = New System.Drawing.Point(109, 48)
         Me.lblDataEnd.Name = "lblDataEnd"
-        Me.lblDataEnd.Size = New System.Drawing.Size(60, 13)
+        Me.lblDataEnd.Size = New System.Drawing.Size(57, 13)
         Me.lblDataEnd.TabIndex = 1
-        Me.lblDataEnd.Text = "Data Ends "
+        Me.lblDataEnd.Tag = "Data Ends"
+        Me.lblDataEnd.Text = "Data Ends"
         '
         'txtStartDay
         '
