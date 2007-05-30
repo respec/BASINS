@@ -905,4 +905,41 @@ ReadCharacter:
         Return aNaN
     End Function
 
+    ''' <summary>
+    ''' Gets System.Double.MaxValue
+    ''' </summary>
+    ''' <returns>Double.MaxValue</returns>
+    ''' <remarks>workaround for mystery bug - program exit without message on first reference to Double.*</remarks>
+    Public Function GetMaxValue() As Double
+        Return GetMaxValueInternal()
+    End Function
+
+    ''' <summary>
+    ''' Magic - reference to System.Double.MaxValue in optional argument elimates problem
+    ''' </summary>
+    ''' <param name="aMaxValue"></param>
+    ''' <returns>Double.MaxValue</returns>
+    ''' <remarks>workaround for mystery bug - program exit without message on first reference to Double.*</remarks>
+    Private Function GetMaxValueInternal(Optional ByVal aMaxValue As Double = System.Double.MaxValue) As Double
+        Return aMaxValue
+    End Function
+
+    ''' <summary>
+    ''' Gets System.Double.MinValue
+    ''' </summary>
+    ''' <returns>Double.MinValue</returns>
+    ''' <remarks>workaround for mystery bug - program exit without message on first reference to Double.*</remarks>
+    Public Function GetMinValue() As Double
+        Return GetMinValueInternal()
+    End Function
+
+    ''' <summary>
+    ''' Magic - reference to System.Double.MinValue in optional argument elimates problem
+    ''' </summary>
+    ''' <param name="aMinValue"></param>
+    ''' <returns>Double.MaxValue</returns>
+    ''' <remarks>workaround for mystery bug - program exit without message on first reference to Double.*</remarks>
+    Private Function GetMinValueInternal(Optional ByVal aMinValue As Double = System.Double.MinValue) As Double
+        Return aMinValue
+    End Function
 End Module

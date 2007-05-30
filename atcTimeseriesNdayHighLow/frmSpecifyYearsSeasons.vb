@@ -51,12 +51,12 @@ Public Class frmSpecifyYearsSeasons
         If lFirstDate < Double.MaxValue Then
             'Dim lDate As Date = Date.FromOADate(lFirstDate)
             'txtOmitBeforeYear.Text = lDate.Year
-            lblDataStart.Text &= pDateFormat.JDateToString(lFirstDate)
+            lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
         End If
         If lLastDate > Double.MinValue Then
             'Dim lDate As Date = Date.FromOADate(lLastDate)
             'txtOmitAfterYear.Text = lDate.Year
-            lblDataEnd.Text &= pDateFormat.JDateToString(lLastDate)
+            lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
         End If
 
         If Me.ShowDialog() = Windows.Forms.DialogResult.OK Then

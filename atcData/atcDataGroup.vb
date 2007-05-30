@@ -14,6 +14,8 @@ Imports MapWinUtility
 Public Class atcDataGroup
     Inherits atcCollection
 
+    Private Shared pNaN As Double = GetNaN()
+
     Private pSelectedData As atcDataGroup 'tracks currently selected group within this group
 
     ''' <summary>One or more <see cref="atcData.atcDataSet">atcDataSet</see> were just added</summary>
@@ -243,23 +245,29 @@ Public Class atcDataGroup
             Dim lTsIndex As Integer = 0
             Dim lItemIndex As Integer = 0
             Dim lProgressMessage As String = "Sorting Values for " & lAttributeName
+            Dim lValue As String
             For Each ts As atcDataSet In Me
                 Try
                     If lAttributeNumeric Then
-                        Dim lKey As Double = ts.Attributes.GetValue(lAttributeName, Double.NegativeInfinity)
-                        If Not aMissingValue Is Nothing OrElse Not Double.IsNegativeInfinity(lKey) Then
+                        Dim lKey As Double = ts.Attributes.GetValue(lAttributeName, pNaN)
+                        If Not aMissingValue Is Nothing OrElse Not Double.IsNaN(lKey) Then
                             lItemIndex = lSortedValues.BinarySearchForKey(lKey)
                             If lItemIndex = lSortedValues.Count OrElse lKey <> lSortedValues.Keys.Item(lItemIndex) Then
-                                lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue))
+                                lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
+                                If Not lValue Is Nothing Then
+                                    lSortedValues.Insert(lItemIndex, lKey, lValue)
+                                End If
                             End If
-                            Logger.Progress(lProgressMessage, lTsIndex + 1, Count)
                         End If
                     Else
                         Dim lKey As String = ts.Attributes.GetValue(lAttributeName, aMissingValue)
                         If Not lKey Is Nothing Then
                             lItemIndex = lSortedValues.BinarySearchForKey(lKey)
                             If lItemIndex = lSortedValues.Count OrElse Not lKey.Equals(lSortedValues.Keys.Item(lItemIndex)) Then
-                                lSortedValues.Insert(lItemIndex, lKey, ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue))
+                                lValue = ts.Attributes.GetFormattedValue(lAttributeName, aMissingValue)
+                                If Not lValue Is Nothing Then
+                                    lSortedValues.Insert(lItemIndex, lKey, lValue)
+                                End If
                             End If
                         End If
                     End If
@@ -267,6 +275,7 @@ Public Class atcDataGroup
                     Logger.Dbg("Can't display value of " & lAttributeName & ": " & ex.Message)
                 End Try
                 lTsIndex += 1
+                Logger.Progress(lProgressMessage, lTsIndex, Count)
             Next
         End If
         Return lSortedValues

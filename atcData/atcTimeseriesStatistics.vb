@@ -7,9 +7,9 @@ Imports System.Windows.Forms
 Public Class atcTimeseriesStatistics
     Inherits atcDataSource
     Private pAvailableOperations As atcDataAttributes ' atcDataGroup
-    Private Shared pNaN As Double = Double.NaN
-    Private Shared pMinValue As Double = Double.MinValue
-    Private Shared pMaxValue As Double = Double.MaxValue
+    Private Shared pNaN As Double = GetNaN()
+    Private Shared pMinValue As Double = GetMinValue()
+    Private Shared pMaxValue As Double = GetMaxValue()
 
     ''' <summary>returns 'Timeseries::Statistics'</summary>
     Public Overrides ReadOnly Property Name() As String
