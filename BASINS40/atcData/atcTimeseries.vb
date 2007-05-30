@@ -10,6 +10,8 @@ Public Class atcTimeseries
     Private pValues() As Double
     Private pValueAttributes() As atcDataAttributes
 
+    Private Const pEpsilon As Double = 0.000000001
+
     ''' <summary>Set or get an individual value</summary>
     Public Property Value(ByVal aIndex As Integer) As Double
         Get
@@ -213,11 +215,11 @@ Public Class atcTimeseries
                     lHigher = lProbe
                 End If
             End While
-            If Math.Abs(pValues(lHigher) - aValue) < Double.Epsilon Then Return lHigher
-            If lLower > 0 AndAlso Math.Abs(pValues(lLower) - aValue) < Double.Epsilon Then Return lLower
+            If Math.Abs(pValues(lHigher) - aValue) < pEpsilon Then Return lHigher
+            If lLower > 0 AndAlso Math.Abs(pValues(lLower) - aValue) < pEpsilon Then Return lLower
         Else 'do a linear search, find wanted value in up to pNumValues steps
             For lProbe As Integer = 1 To pNumValues
-                If Math.Abs(pValues(lProbe) - aValue) < Double.Epsilon Then Return lProbe
+                If Math.Abs(pValues(lProbe) - aValue) < pEpsilon Then Return lProbe
             Next
         End If
         Return -1

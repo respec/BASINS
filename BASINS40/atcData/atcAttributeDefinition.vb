@@ -1,3 +1,5 @@
+Imports atcUtility
+
 ''' <summary>A value and its definition</summary>
 Public Class atcDefinedValue
     Public Definition As atcAttributeDefinition
@@ -20,6 +22,9 @@ End Class
 '''          can have values which share the same definition
 ''' </remarks>
 Public Class atcAttributeDefinition
+
+    Private Shared pNaN As Double = GetNaN()
+
     Dim pName As String         'Short name (used for labeling in UI)
     Dim pDescription As String  'Something longer than Name but still short
     Dim pCategory As String     'Optional, used for grouping similar attributes in UI
@@ -265,8 +270,8 @@ Public Class atcAttributeDefinition
         DefaultValue = Nothing
         ID = 0
         Editable = True
-        Min = Double.NaN
-        Max = Double.NaN
+        Min = pNaN
+        Max = pNaN
         ValidList = New ArrayList
     End Sub
 

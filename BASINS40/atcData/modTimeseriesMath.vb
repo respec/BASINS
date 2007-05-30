@@ -3,6 +3,9 @@ Imports MapWinUtility
 
 Public Module modTimeseriesMath
 
+    Private pNaN As Double = GetNaN()
+    Private pMaxValue As Double = GetMaxValue()
+
     Public Function FindDateAtOrAfter(ByVal aDates() As Double, ByVal aDate As Double, Optional ByVal aStartAt As Integer = 0) As Integer
         aDate -= JulianMillisecond 'Allow for floating point error
         Dim lIndex As Integer = Array.BinarySearch(aDates, aDate)
@@ -164,7 +167,7 @@ Public Module modTimeseriesMath
         Dim lNewIndex As Integer
         Dim lTotalNumValues As Integer = 0
         Dim lOldTS As atcTimeseries
-        Dim lMinDate As Double = Double.MaxValue
+        Dim lMinDate As Double = pMaxValue
         Dim lMaxGroupIndex As Integer = aGroup.Count - 1
         Dim lIndex As Integer
         Dim lMinIndex As Integer
@@ -198,17 +201,17 @@ Public Module modTimeseriesMath
         If lTotalNumValues > 0 Then
             lNewTS.numValues = lTotalNumValues
             lNewTS.Dates.numValues = lTotalNumValues
-            If lMinDate < Double.MaxValue Then
+            If lMinDate < pMaxValue Then
                 lNewTS.Dates.Value(0) = lMinDate
             Else
-                lNewTS.Dates.Value(0) = Double.NaN
+                lNewTS.Dates.Value(0) = pNaN
             End If
-            lNewTS.Value(0) = Double.NaN
+            lNewTS.Value(0) = pNaN
 
             For lNewIndex = 1 To lTotalNumValues
                 'Find earliest date not yet used
                 lMinIndex = -1
-                lMinDate = Double.MaxValue
+                lMinDate = pMaxValue
                 For lIndex = 0 To lMaxGroupIndex
                     If lNextIndex(lIndex) > 0 AndAlso lNextDate(lIndex) < lMinDate Then
                         lMinIndex = lIndex

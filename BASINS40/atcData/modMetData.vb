@@ -4,6 +4,10 @@ Imports MapWinUtility
 
 Public Module modMetData
 
+    Private pNaN As Double = GetNaN()
+    Private pMaxValue As Double = GetMaxValue()
+    Private Const pEpsilon As Double = 0.000000001
+
     'Use for filling DAILY timeseries
     'Fill missing values in timeseries aTS2Fill with values from nearby timeseries (aTSAvail).
     'Use Obs Time timeseries aTS2FillOT and aTSAvaillOT to determine 
@@ -63,7 +67,7 @@ Public Module modMetData
             lDist = Nothing
             lDist = CalcMetDistances(aTS2Fill, aTSAvail, lAdjustAttribute)
             lFillAdjust = aTS2Fill.Attributes.GetValue(lAdjustAttribute, -999)
-            If Math.Abs(lFillAdjust + 999) > Double.Epsilon Then
+            If Math.Abs(lFillAdjust + 999) > pEpsilon Then
                 Logger.Dbg("  (Historical average is " & lFillAdjust & ")")
             Else
                 Logger.Dbg("  (Historical averages not in use)")
@@ -181,8 +185,8 @@ Public Module modMetData
                         End If
                         If lFilledIt Then
                             lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
-                            If Math.Abs(lFillAdjust + 999) > Double.Epsilon AndAlso _
-                               Math.Abs(lStaAdjust + 999) > Double.Epsilon Then
+                            If Math.Abs(lFillAdjust + 999) > pEpsilon AndAlso _
+                               Math.Abs(lStaAdjust + 999) > pEpsilon Then
                                 'adjust for historical averages
                                 aTS2Fill.Value(lFPos) = lFillAdjust / lStaAdjust * lFVal
                             Else 'use value without adjustment
@@ -196,7 +200,7 @@ Public Module modMetData
                                     lTUStr = "Hourly"
                                 End If
                                 Logger.Dbg("    Filling from " & lTUStr & " TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
-                                If Math.Abs(lFillAdjust + 999) > Double.Epsilon Then
+                                If Math.Abs(lFillAdjust + 999) > pEpsilon Then
                                     Logger.Dbg("      (Adjusting values using historical average of " & lStaAdjust & ")")
                                 End If
                                 lCurInd = lInd
@@ -229,7 +233,7 @@ Public Module modMetData
                                 Next ii
                             End If
                             aTS2Fill.Value(lFPos) = lRatio * lFVal + lCarry
-                            If aTS2Fill.Value(lFPos) > Double.Epsilon Then
+                            If aTS2Fill.Value(lFPos) > pEpsilon Then
                                 lCarry = aTS2Fill.Value(lFPos) - (Math.Round(aTS2Fill.Value(lFPos) / lRndOff) * lRndOff)
                                 aTS2Fill.Value(lFPos) = aTS2Fill.Value(lFPos) - lCarry
                             Else
@@ -331,7 +335,7 @@ Public Module modMetData
             lDist = Nothing
             lDist = CalcMetDistances(aTS2Fill, aTSAvail, lAdjustAttribute)
             lFillAdjust = aTS2Fill.Attributes.GetValue(lAdjustAttribute, -999)
-            If Math.Abs(lFillAdjust + 999) > Double.Epsilon Then
+            If Math.Abs(lFillAdjust + 999) > pEpsilon Then
                 Logger.Dbg("  (Historical average is " & lFillAdjust & ")")
             Else
                 Logger.Dbg("  (Historical averages not in use)")
@@ -354,14 +358,14 @@ Public Module modMetData
                             lInd = lDist.IndexFromKey(CStr(j))
                             lTSer = aTSAvail.ItemByIndex(lInd)
                             lFVal = -1
-                            If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > Double.Epsilon And _
+                            If (lMJDay + (k - 1) / lIntsPerDay) + JulianMillisecond - lTSer.Dates.Values(1) > pEpsilon And _
                                (lMJDay + (k - 1) / lIntsPerDay) - JulianMillisecond <= lTSer.Dates.Values(lTSer.numValues) Then 'check value
                                 lSPos = lIntsPerDay * (lMJDay - lTSer.Attributes.GetValue("SJDay")) + k - 1
                                 If lTSer.Value(lSPos) > lValMin And lTSer.Value(lSPos) < lValMax Then 'good value
                                     lFVal = lTSer.Value(lSPos)
                                     lStaAdjust = lTSer.Attributes.GetValue(lAdjustAttribute, -999)
-                                    If Math.Abs(lFillAdjust + 999) > Double.Epsilon AndAlso _
-                                       Math.Abs(lStaAdjust + 999) > Double.Epsilon Then
+                                    If Math.Abs(lFillAdjust + 999) > pEpsilon AndAlso _
+                                       Math.Abs(lStaAdjust + 999) > pEpsilon Then
                                         aTS2Fill.Value(lFPos) = lFillAdjust / lStaAdjust * lFVal
                                     Else
                                         aTS2Fill.Value(lFPos) = lFVal
@@ -369,7 +373,7 @@ Public Module modMetData
                                     J2Date(lMJDay + (k - 1) / lIntsPerDay, ld)
                                     If lCurInd <> lInd Then 'changing station used to fill
                                         Logger.Dbg("    Filling from TS " & lTSer.ToString & ", " & lTSer.Attributes.GetValue("STANAM"))
-                                        If Math.Abs(lFillAdjust + 999) > Double.Epsilon Then
+                                        If Math.Abs(lFillAdjust + 999) > pEpsilon Then
                                             Logger.Dbg("      (Adjusting values using historical average of " & lStaAdjust & ")")
                                         End If
                                         lCurInd = lInd
@@ -409,7 +413,7 @@ Public Module modMetData
                         For k = 1 To lMLen
                             lFPos = lIntsPerDay * (lMJDay - lSJDay) + k - 1
                             aTS2Fill.Value(lFPos) = lRatio * lTSer.Value(k) + lCarry
-                            If aTS2Fill.Value(lFPos) > Double.Epsilon Then
+                            If aTS2Fill.Value(lFPos) > pEpsilon Then
                                 lCarry = aTS2Fill.Value(lFPos) - (Math.Round(aTS2Fill.Value(lFPos) / lRndOff) * lRndOff)
                                 aTS2Fill.Value(lFPos) = aTS2Fill.Value(lFPos) - lCarry
                             Else
@@ -490,7 +494,7 @@ Public Module modMetData
         Else
             lTSerAdjust = -999
         End If
-        If Math.Abs(lTSerAdjust + 999) < Double.Epsilon Then
+        If Math.Abs(lTSerAdjust + 999) < pEpsilon Then
             lCompareAnnuals = False
         Else
             lCompareAnnuals = True
@@ -501,7 +505,7 @@ Public Module modMetData
             lStaTSer = aStations.ItemByIndex(i)
             If lCompareAnnuals Then
                 lStaAdjust = lStaTSer.Attributes.GetValue(aAdjustAttribute, -999)
-                If Math.Abs(lStaAdjust + 999) > Double.Epsilon Then
+                If Math.Abs(lStaAdjust + 999) > pEpsilon Then
                     lAnnAdj = lTSerAdjust / lStaAdjust
                     If lAnnAdj < 1 Then lAnnAdj = 1 / lAnnAdj
                 End If
@@ -572,7 +576,7 @@ Public Module modMetData
         Dim lCompareAnnuals As Boolean
         Dim lGDist As Double
         Dim lPrecDist As Double
-        Dim lClosestDist As Double = Double.MaxValue
+        Dim lClosestDist As Double = pMaxValue
         Dim lSumTSer As atcTimeseries
         Dim lStaTSer As atcTimeseries
         Dim lPrecTSer As atcTimeseries
@@ -814,7 +818,7 @@ Public Module modMetData
         Dim lDonFlg As Integer = 0
 
         Do While lDonFlg = 0 And i < aDBuff.Length
-            If Double.IsNaN(aDBuff(i)) Or Math.Abs(aDBuff(i) - aValMis) < Double.Epsilon Then
+            If Double.IsNaN(aDBuff(i)) Or Math.Abs(aDBuff(i) - aValMis) < pEpsilon Then
                 'we have a missing value
                 If lAccFlg > 0 Then
                     'we were in the midst of an accum value array,
@@ -827,7 +831,7 @@ Public Module modMetData
                     'first missing value, save start position
                     aMisPos = i
                 End If
-            ElseIf Math.Abs(aDBuff(i) - aValAcc) < Double.Epsilon Then
+            ElseIf Math.Abs(aDBuff(i) - aValAcc) < pEpsilon Then
                 'we have an accumulated value
                 If lMisFlg > 0 Then
                     'report only missing values now, will get accum next time
@@ -866,7 +870,7 @@ Public Module modMetData
             'missing values
             aMisCod = 1
             aNVals = lMisFlg
-            aMVal = Double.NaN
+            aMVal = pNaN
         ElseIf lAccFlg > 0 Then
             'missing distribution
             aMisCod = 2
