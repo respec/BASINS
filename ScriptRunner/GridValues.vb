@@ -11,8 +11,8 @@ Imports System
 
 Public Module ScriptGridValues
     Private pTestPath As String = "D:\GisData\SERDP"
-    Private pStepSize As Integer = 10 'meters
-    Private pStepCount As Integer = 10 'leads to 100m wide cross section
+    Private pStepSize As Integer = 2 'meters
+    Private pStepCount As Integer = 20 'leads to 40m wide cross section
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("Start")
@@ -24,6 +24,13 @@ Public Module ScriptGridValues
         Dim lPointCollection As atcCollection
         Dim lPointCollectionX As atcCollection
         Dim lX, lY, lZMin, lXCenter, lYCenter, dX, dY, dH, lRatio As Double
+        Dim lXCpArray() As Double = {705224.72, 707123.89, 709716.24, 701852.66, 696375.7, 712539.64, 690978.93}
+        Dim lYCpArray() As Double = {3592641.85, 3583792.35, 3587516.86, 3573066.52, 3574033.65, 3587509.2, 3580256.11}
+
+        For lIndex As Integer = 0 To lXCpArray.GetUpperBound(0)
+            lPointCollection = XY2Z(aMapWin, lXCpArray(lIndex), lYCpArray(lIndex))
+            ReportPoints(lXCpArray(lIndex), lYCpArray(lIndex), lPointCollection, lString)
+        Next
 
         'Dim lStepSize As Integer = 2000 'meters
         'lString.AppendLine("SamplePointsFromGridWithStep " & lStepSize)
@@ -103,7 +110,7 @@ Public Module ScriptGridValues
                     Dim lPointCount As Integer = 0
                     lCrossSection.Create(MapWinGIS.ShpfileType.SHP_POLYLINEZ)
                     lZMin = 1.0E+30
-                    lXSectionString.Append(lLengthTotal + lLengthSegment + (lLength / 2))
+                    lXSectionString.Append(DoubleToString(lLengthTotal + lLengthSegment + (lLength / 2), , "##0.##", , , 5))
                     For lPointIndex As Integer = 0 To pStepCount
                         lPointCollectionX = XY2Z(aMapWin, lX, lY)
                         Dim lPoint As New MapWinGIS.Point
