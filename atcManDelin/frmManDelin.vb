@@ -1258,6 +1258,11 @@ Public Class frmManDelin
                 'get grid value at point
                 gmin = GisUtil.GridValueAtPoint(ElevationLayerIndex, x1, y1)
                 gmax = GisUtil.GridValueAtPoint(ElevationLayerIndex, x2, y2)
+                If InStr(GisUtil.LayerFileName(ElevationLayerIndex), "\ned\") > 0 Then
+                    'this is an ned grid (in cm), convert to meters
+                    gmin = gmin / 100
+                    gmax = gmax / 100
+                End If
             End If
             If gmax < gmin Then
                 gtemp = gmin
