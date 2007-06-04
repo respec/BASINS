@@ -102,6 +102,21 @@ Public Class atcDateFormat
         End Set
     End Property
 
+    ''' <summary>
+    ''' Midnight will be formatted as 24:00 on the previous day if true, will be formatted as 00:00 on the next day if false
+    ''' </summary>
+    ''' <value>True to format midnight as 24:00, false to format midnight as 00:00</value>
+    ''' <returns>current setting</returns>
+    ''' <remarks>default = True</remarks>
+    Public Property Midnight24() As Boolean
+        Get
+            Return pMidnight24
+        End Get
+        Set(ByVal newValue As Boolean)
+            pMidnight24 = newValue
+        End Set
+    End Property
+
     Public Function JDateToString(ByVal aJulianDate As Double) As String
         Dim lRetval As String = ""
         Dim lCurDate(5) As Integer
