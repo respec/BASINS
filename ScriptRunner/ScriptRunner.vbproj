@@ -85,6 +85,7 @@
     </Compile>
     <Compile Include="ScriptDriver.vb" />
     <Compile Include="ShapefileFromWDM.vb" />
+    <Compile Include="SummarizeWdms.vb" />
     <Compile Include="WatershedSummary.vb" />
   </ItemGroup>
   <ItemGroup>
