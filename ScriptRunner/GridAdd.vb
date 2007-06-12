@@ -37,11 +37,13 @@ Public Module ScriptGridAdd
                     FileCopy(lTileName.Replace("D:\GisData", "Z:"), lTileName)
                     FileCopy(lTileName.Replace("D:\GisData", "Z:").Replace(".flt", ".hdr"), lTileName.Replace(".flt", ".hdr"))
                 End If
-                Logger.Dbg("Open " & lTileName)
-                Dim lTile As New MapWinGIS.Grid
-                Dim lStatus As Boolean = lTile.Open(lTileName)
-                Logger.Dbg("  Open " & lStatus)
-                aMapWin.Layers.Add(lTile, lColoringScheme, lTileName)
+                'Logger.Dbg("Open " & lTileName)
+                'Dim lTile As New MapWinGIS.Grid
+                'Dim lStatus As Boolean = lTile.Open(lTileName)
+                'Logger.Dbg("  Open " & lStatus)
+                'aMapWin.Layers.Add(lTile, lColoringScheme, lTileID)
+                Logger.Dbg("Add " & lTileName)
+                aMapWin.Layers.Add(lTileName, lTileId)
             End Try
         Next
     End Sub
