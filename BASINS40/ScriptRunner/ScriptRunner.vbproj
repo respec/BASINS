@@ -67,6 +67,7 @@
     <Compile Include="clsScriptPlugin.vb" />
     <Compile Include="ConstituentBalance.vb" />
     <Compile Include="BASINSProjectSummary.vb" />
+    <Compile Include="GridAdd.vb" />
     <Compile Include="GridValues.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

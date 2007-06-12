@@ -4,7 +4,8 @@ Public Module ScriptDriver
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
 
-        ScriptSummarizeWdms.ScriptMain(aMapWin)
+        ScriptGridAdd.ScriptMain(aMapWin)
+        'ScriptSummarizeWdms.ScriptMain(aMapWin)
         'ScriptGridValues.scriptMain(aMapWin)
         'ScriptConstituentBalance.ScriptMain(aMapWin)
         'ScriptWatershedSummary.ScriptMain(aMapWin)
