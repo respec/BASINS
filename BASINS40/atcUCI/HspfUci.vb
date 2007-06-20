@@ -2812,9 +2812,8 @@ x:
         'category equivalent.  if so, turn the integer category tag into its
         'two character equivalent
         Dim i As Integer
-        IntAsCat = ""
+        IntAsCat = sint
         If Not Me.CategoryBlock Is Nothing Then
-            IntAsCat = sint
             If IsNumeric(sint) Then
                 i = CShort(sint)
                 If Me.CategoryBlock.Count > 0 And Me.CategoryBlock.Count >= i Then
