@@ -1244,6 +1244,7 @@ Friend Class frmPollutantLoading
         End If
 
         Logger.Dbg("SetGridValues")
+        lblValueFileName.Text = "<none>"
         SetGridValues()
         gLanduseType = cboLanduse.SelectedIndex
     End Sub
@@ -1529,6 +1530,7 @@ Friend Class frmPollutantLoading
             lblValueUnits.Text = "(mg/L, counts/100mL for bacteria)"
             gMethod = 1
         End If
+        lblValueFileName.Text = "<none>"
         SetGridValues()
     End Sub
 
@@ -1650,11 +1652,8 @@ Friend Class frmPollutantLoading
 
     Private Sub SetGridValues()
         Dim lSorted As New atcCollection
-        Dim lStartingFile As String
         Dim lDefaultFile As String
         Dim i As Integer
-
-        lStartingFile = lblValueFileName.Text
 
         If atcGridValues.Source Is Nothing Then Exit Sub
 
@@ -1681,28 +1680,29 @@ Friend Class frmPollutantLoading
             End If
         End If
 
-        If lDefaultFile <> lStartingFile Then
-            'remember which pollutants are selected
-            Dim lSelectedPollutantIndices As New Collection
-            For i = 1 To lstConstituents.SelectedIndices.Count
-                lSelectedPollutantIndices.Add(lstConstituents.SelectedIndices(i - 1))
-            Next i
-            'refresh file
+        If lblValueFileName.Text = "<none>" Then
             lblValueFileName.Text = lDefaultFile
-            atcGridValues.Clear()
-            If lblValueFileName.Text <> "<none>" Then
-                SetGridValuesSource(lblValueFileName.Text, atcGridValues.Source)
-            End If
-            atcGridValues.SizeAllColumnsToContents()
-            atcGridValues.Refresh()
-            SetPollutantList()
-            'set selected pollutants back again
-            For i = 1 To lSelectedPollutantIndices.Count
-                lstConstituents.SelectedIndices.Add(lSelectedPollutantIndices(i))
-            Next i
-            If lstConstituents.Items.Count > 0 And lstConstituents.SelectedItems.Count = 0 Then
-                lstConstituents.SelectedItems.Add(lstConstituents.Items(0))
-            End If
+        End If
+
+        'remember which pollutants are selected
+        Dim lSelectedPollutantIndices As New Collection
+        For i = 1 To lstConstituents.SelectedIndices.Count
+            lSelectedPollutantIndices.Add(lstConstituents.SelectedIndices(i - 1))
+        Next i
+        'refresh file
+        atcGridValues.Clear()
+        If lblValueFileName.Text <> "<none>" Then
+            SetGridValuesSource(lblValueFileName.Text, atcGridValues.Source)
+        End If
+        atcGridValues.SizeAllColumnsToContents()
+        atcGridValues.Refresh()
+        SetPollutantList()
+        'set selected pollutants back again
+        For i = 1 To lSelectedPollutantIndices.Count
+            lstConstituents.SelectedIndices.Add(lSelectedPollutantIndices(i))
+        Next i
+        If lstConstituents.Items.Count > 0 And lstConstituents.SelectedItems.Count = 0 Then
+            lstConstituents.SelectedItems.Add(lstConstituents.Items(0))
         End If
 
     End Sub
