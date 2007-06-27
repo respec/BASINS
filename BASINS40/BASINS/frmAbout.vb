@@ -48,7 +48,6 @@ Friend Class frmAbout
     Friend WithEvents grpMapWindow As System.Windows.Forms.GroupBox
     Friend WithEvents grpATC As System.Windows.Forms.GroupBox
     Friend WithEvents grpZedGraph As System.Windows.Forms.GroupBox
-    Friend WithEvents lblDisclaimer As System.Windows.Forms.Label
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmAbout))
         Me.grpMapWindow = New System.Windows.Forms.GroupBox
@@ -70,7 +69,6 @@ Friend Class frmAbout
         Me.grpZedGraph = New System.Windows.Forms.GroupBox
         Me.picZedGraph = New System.Windows.Forms.PictureBox
         Me.lblZedGraphURL = New System.Windows.Forms.LinkLabel
-        Me.lblDisclaimer = New System.Windows.Forms.Label
         Me.grpMapWindow.SuspendLayout()
         CType(Me.picMapWindow, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.picBASINS, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -87,9 +85,9 @@ Friend Class frmAbout
         Me.grpMapWindow.Controls.Add(Me.lblMapwinVersion)
         Me.grpMapWindow.Controls.Add(Me.picMapWindow)
         Me.grpMapWindow.Controls.Add(Me.lblMapWindowURL)
-        Me.grpMapWindow.Location = New System.Drawing.Point(19, 368)
+        Me.grpMapWindow.Location = New System.Drawing.Point(12, 308)
         Me.grpMapWindow.Name = "grpMapWindow"
-        Me.grpMapWindow.Size = New System.Drawing.Size(733, 102)
+        Me.grpMapWindow.Size = New System.Drawing.Size(588, 88)
         Me.grpMapWindow.TabIndex = 5
         Me.grpMapWindow.TabStop = False
         Me.grpMapWindow.Text = "Powered by MapWindow Programmable Geographic Information System"
@@ -98,9 +96,9 @@ Friend Class frmAbout
         '
         Me.lblMapwinVersion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblMapwinVersion.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblMapwinVersion.Location = New System.Drawing.Point(532, 28)
+        Me.lblMapwinVersion.Location = New System.Drawing.Point(420, 24)
         Me.lblMapwinVersion.Name = "lblMapwinVersion"
-        Me.lblMapwinVersion.Size = New System.Drawing.Size(177, 18)
+        Me.lblMapwinVersion.Size = New System.Drawing.Size(148, 16)
         Me.lblMapwinVersion.TabIndex = 12
         Me.lblMapwinVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
@@ -109,9 +107,9 @@ Friend Class frmAbout
         Me.picMapWindow.Cursor = System.Windows.Forms.Cursors.Hand
         Me.picMapWindow.Image = CType(resources.GetObject("picMapWindow.Image"), System.Drawing.Image)
         Me.picMapWindow.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.picMapWindow.Location = New System.Drawing.Point(11, 28)
+        Me.picMapWindow.Location = New System.Drawing.Point(9, 24)
         Me.picMapWindow.Name = "picMapWindow"
-        Me.picMapWindow.Size = New System.Drawing.Size(245, 62)
+        Me.picMapWindow.Size = New System.Drawing.Size(204, 54)
         Me.picMapWindow.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
         Me.picMapWindow.TabIndex = 10
         Me.picMapWindow.TabStop = False
@@ -122,9 +120,9 @@ Friend Class frmAbout
         Me.lblMapWindowURL.AutoSize = True
         Me.lblMapWindowURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblMapWindowURL.LinkArea = New System.Windows.Forms.LinkArea(0, 25)
-        Me.lblMapWindowURL.Location = New System.Drawing.Point(541, 73)
+        Me.lblMapWindowURL.Location = New System.Drawing.Point(428, 63)
         Me.lblMapWindowURL.Name = "lblMapWindowURL"
-        Me.lblMapWindowURL.Size = New System.Drawing.Size(180, 17)
+        Me.lblMapWindowURL.Size = New System.Drawing.Size(148, 13)
         Me.lblMapWindowURL.TabIndex = 6
         Me.lblMapWindowURL.TabStop = True
         Me.lblMapWindowURL.Text = "http://www.MapWindow.org/"
@@ -134,9 +132,9 @@ Friend Class frmAbout
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnOk.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnOk.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnOk.Location = New System.Drawing.Point(654, 639)
+        Me.btnOk.Location = New System.Drawing.Point(528, 545)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(86, 27)
+        Me.btnOk.Size = New System.Drawing.Size(72, 23)
         Me.btnOk.TabIndex = 1
         Me.btnOk.Text = "Close"
         '
@@ -145,9 +143,9 @@ Friend Class frmAbout
         Me.lblProjFileLabel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblProjFileLabel.AutoSize = True
         Me.lblProjFileLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblProjFileLabel.Location = New System.Drawing.Point(29, 580)
+        Me.lblProjFileLabel.Location = New System.Drawing.Point(24, 495)
         Me.lblProjFileLabel.Name = "lblProjFileLabel"
-        Me.lblProjFileLabel.Size = New System.Drawing.Size(86, 17)
+        Me.lblProjFileLabel.Size = New System.Drawing.Size(65, 13)
         Me.lblProjFileLabel.TabIndex = 11
         Me.lblProjFileLabel.Text = "Project File: "
         '
@@ -156,9 +154,9 @@ Friend Class frmAbout
         Me.lblConfigFileLabel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblConfigFileLabel.AutoSize = True
         Me.lblConfigFileLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblConfigFileLabel.Location = New System.Drawing.Point(29, 608)
+        Me.lblConfigFileLabel.Location = New System.Drawing.Point(24, 519)
         Me.lblConfigFileLabel.Name = "lblConfigFileLabel"
-        Me.lblConfigFileLabel.Size = New System.Drawing.Size(78, 17)
+        Me.lblConfigFileLabel.Size = New System.Drawing.Size(59, 13)
         Me.lblConfigFileLabel.TabIndex = 15
         Me.lblConfigFileLabel.Text = "Config File:"
         '
@@ -168,9 +166,9 @@ Friend Class frmAbout
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblProjFile.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblProjFile.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblProjFile.Location = New System.Drawing.Point(121, 580)
+        Me.lblProjFile.Location = New System.Drawing.Point(101, 495)
         Me.lblProjFile.Name = "lblProjFile"
-        Me.lblProjFile.Size = New System.Drawing.Size(619, 19)
+        Me.lblProjFile.Size = New System.Drawing.Size(499, 16)
         Me.lblProjFile.TabIndex = 16
         '
         'lblConfigFile
@@ -180,37 +178,37 @@ Friend Class frmAbout
         Me.lblConfigFile.BackColor = System.Drawing.SystemColors.Control
         Me.lblConfigFile.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.lblConfigFile.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblConfigFile.Location = New System.Drawing.Point(121, 608)
+        Me.lblConfigFile.Location = New System.Drawing.Point(101, 519)
         Me.lblConfigFile.Name = "lblConfigFile"
-        Me.lblConfigFile.Size = New System.Drawing.Size(619, 18)
+        Me.lblConfigFile.Size = New System.Drawing.Size(499, 16)
         Me.lblConfigFile.TabIndex = 17
         '
         'picBASINS
         '
         Me.picBASINS.Cursor = System.Windows.Forms.Cursors.Hand
         Me.picBASINS.Image = CType(resources.GetObject("picBASINS.Image"), System.Drawing.Image)
-        Me.picBASINS.Location = New System.Drawing.Point(10, 9)
+        Me.picBASINS.Location = New System.Drawing.Point(8, 8)
         Me.picBASINS.Name = "picBASINS"
-        Me.picBASINS.Size = New System.Drawing.Size(163, 148)
+        Me.picBASINS.Size = New System.Drawing.Size(136, 128)
         Me.picBASINS.TabIndex = 18
         Me.picBASINS.TabStop = False
         '
         'lblBASINS
         '
+        Me.lblBASINS.AutoSize = True
         Me.lblBASINS.Font = New System.Drawing.Font("Microsoft Sans Serif", 27.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblBASINS.Location = New System.Drawing.Point(182, 18)
+        Me.lblBASINS.Location = New System.Drawing.Point(152, 16)
         Me.lblBASINS.Name = "lblBASINS"
-        Me.lblBASINS.Size = New System.Drawing.Size(221, 56)
+        Me.lblBASINS.Size = New System.Drawing.Size(185, 42)
         Me.lblBASINS.TabIndex = 19
-        Me.lblBASINS.Text = "BASINS"
+        Me.lblBASINS.Text = "BASINS 4"
         '
         'lblBasinsVersion
         '
-        Me.lblBasinsVersion.Location = New System.Drawing.Point(192, 74)
+        Me.lblBasinsVersion.Location = New System.Drawing.Point(160, 64)
         Me.lblBasinsVersion.Name = "lblBasinsVersion"
-        Me.lblBasinsVersion.Size = New System.Drawing.Size(211, 18)
+        Me.lblBasinsVersion.Size = New System.Drawing.Size(176, 16)
         Me.lblBasinsVersion.TabIndex = 20
-        Me.lblBasinsVersion.Text = "Version 4.0"
         '
         'lblBasinsURL
         '
@@ -218,9 +216,9 @@ Friend Class frmAbout
         Me.lblBasinsURL.AutoSize = True
         Me.lblBasinsURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblBasinsURL.LinkArea = New System.Windows.Forms.LinkArea(0, 39)
-        Me.lblBasinsURL.Location = New System.Drawing.Point(471, 120)
+        Me.lblBasinsURL.Location = New System.Drawing.Point(369, 64)
         Me.lblBasinsURL.Name = "lblBasinsURL"
-        Me.lblBasinsURL.Size = New System.Drawing.Size(269, 17)
+        Me.lblBasinsURL.Size = New System.Drawing.Size(221, 13)
         Me.lblBasinsURL.TabIndex = 2
         Me.lblBasinsURL.TabStop = True
         Me.lblBasinsURL.Text = "http://www.epa.gov/waterscience/BASINS/"
@@ -231,9 +229,9 @@ Friend Class frmAbout
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpATC.Controls.Add(Me.picATC)
         Me.grpATC.Controls.Add(Me.lblAquaTerraURL)
-        Me.grpATC.Location = New System.Drawing.Point(19, 174)
+        Me.grpATC.Location = New System.Drawing.Point(12, 142)
         Me.grpATC.Name = "grpATC"
-        Me.grpATC.Size = New System.Drawing.Size(733, 185)
+        Me.grpATC.Size = New System.Drawing.Size(588, 160)
         Me.grpATC.TabIndex = 3
         Me.grpATC.TabStop = False
         Me.grpATC.Text = "Developed by AQUA TERRA Consultants"
@@ -242,9 +240,9 @@ Friend Class frmAbout
         '
         Me.picATC.Cursor = System.Windows.Forms.Cursors.Hand
         Me.picATC.Image = CType(resources.GetObject("picATC.Image"), System.Drawing.Image)
-        Me.picATC.Location = New System.Drawing.Point(10, 18)
+        Me.picATC.Location = New System.Drawing.Point(8, 16)
         Me.picATC.Name = "picATC"
-        Me.picATC.Size = New System.Drawing.Size(489, 157)
+        Me.picATC.Size = New System.Drawing.Size(408, 136)
         Me.picATC.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
         Me.picATC.TabIndex = 25
         Me.picATC.TabStop = False
@@ -255,9 +253,9 @@ Friend Class frmAbout
         Me.lblAquaTerraURL.AutoSize = True
         Me.lblAquaTerraURL.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.lblAquaTerraURL.LinkArea = New System.Windows.Forms.LinkArea(0, 25)
-        Me.lblAquaTerraURL.Location = New System.Drawing.Point(550, 158)
+        Me.lblAquaTerraURL.Location = New System.Drawing.Point(435, 137)
         Me.lblAquaTerraURL.Name = "lblAquaTerraURL"
-        Me.lblAquaTerraURL.Size = New System.Drawing.Size(171, 17)
+        Me.lblAquaTerraURL.Size = New System.Drawing.Size(138, 13)
         Me.lblAquaTerraURL.TabIndex = 4
         Me.lblAquaTerraURL.TabStop = True
         Me.lblAquaTerraURL.Text = "http://www.aquaterra.com/"
@@ -268,9 +266,9 @@ Friend Class frmAbout
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpZedGraph.Controls.Add(Me.picZedGraph)
         Me.grpZedGraph.Controls.Add(Me.lblZedGraphURL)
-        Me.grpZedGraph.Location = New System.Drawing.Point(19, 479)
+        Me.grpZedGraph.Location = New System.Drawing.Point(12, 402)
         Me.grpZedGraph.Name = "grpZedGraph"
-        Me.grpZedGraph.Size = New System.Drawing.Size(733, 83)
+        Me.grpZedGraph.Size = New System.Drawing.Size(588, 72)
         Me.grpZedGraph.TabIndex = 7
         Me.grpZedGraph.TabStop = False
         Me.grpZedGraph.Text = "Graphing by ZedGraph"
@@ -279,9 +277,9 @@ Friend Class frmAbout
         '
         Me.picZedGraph.Cursor = System.Windows.Forms.Cursors.Hand
         Me.picZedGraph.Image = CType(resources.GetObject("picZedGraph.Image"), System.Drawing.Image)
-        Me.picZedGraph.Location = New System.Drawing.Point(19, 18)
+        Me.picZedGraph.Location = New System.Drawing.Point(16, 16)
         Me.picZedGraph.Name = "picZedGraph"
-        Me.picZedGraph.Size = New System.Drawing.Size(211, 56)
+        Me.picZedGraph.Size = New System.Drawing.Size(176, 48)
         Me.picZedGraph.TabIndex = 28
         Me.picZedGraph.TabStop = False
         '
@@ -289,29 +287,20 @@ Friend Class frmAbout
         '
         Me.lblZedGraphURL.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblZedGraphURL.LinkArea = New System.Windows.Forms.LinkArea(0, 20)
-        Me.lblZedGraphURL.Location = New System.Drawing.Point(586, 55)
+        Me.lblZedGraphURL.Location = New System.Drawing.Point(465, 48)
         Me.lblZedGraphURL.Name = "lblZedGraphURL"
-        Me.lblZedGraphURL.Size = New System.Drawing.Size(135, 19)
+        Me.lblZedGraphURL.Size = New System.Drawing.Size(113, 16)
         Me.lblZedGraphURL.TabIndex = 8
         Me.lblZedGraphURL.TabStop = True
         Me.lblZedGraphURL.Text = "http://zedgraph.org/"
         '
-        'lblDisclaimer
-        '
-        Me.lblDisclaimer.Location = New System.Drawing.Point(192, 102)
-        Me.lblDisclaimer.Name = "lblDisclaimer"
-        Me.lblDisclaimer.Size = New System.Drawing.Size(192, 35)
-        Me.lblDisclaimer.TabIndex = 29
-        Me.lblDisclaimer.Text = "Pre-Release Version For Testing Only"
-        '
         'frmAbout
         '
         Me.AcceptButton = Me.btnOk
-        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
         Me.CancelButton = Me.btnOk
-        Me.ClientSize = New System.Drawing.Size(761, 678)
+        Me.ClientSize = New System.Drawing.Size(612, 580)
         Me.Controls.Add(Me.picBASINS)
-        Me.Controls.Add(Me.lblDisclaimer)
         Me.Controls.Add(Me.lblBasinsVersion)
         Me.Controls.Add(Me.lblBASINS)
         Me.Controls.Add(Me.lblConfigFile)
