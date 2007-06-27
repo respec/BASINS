@@ -1003,19 +1003,29 @@ Imports MapWinUtility
             If Double.IsNaN(.FlashVolumeFraction) Then
                 txtVolumePercent.Text = ""
             Else
-                txtVolumePercent.Text = (.FlashVolumeFraction - 1) * 100
+                txtVolumePercent.Text = DoubleToString((.FlashVolumeFraction - 1) * 100)
             End If
 
             EnableIterative(.Max > .Min)
-            If Not Double.IsNaN(.Min) Then txtMin.Text = .Min
-            If Not Double.IsNaN(.Max) Then txtMax.Text = .Max
-            If Not Double.IsNaN(.Increment) Then txtIncrement.Text = .Increment
+            If Not Double.IsNaN(.Min) Then txtMin.Text = DoubleToString(.Min)
+            If Not Double.IsNaN(.Max) Then txtMax.Text = DoubleToString(.Max)
+            If Not Double.IsNaN(.Increment) Then txtIncrement.Text = DoubleToString(.Increment)
 
             EnableEvents(.UseEvents)
 
             If .UseEvents Then
                 txtEventThreshold.Text = .EventThreshold
-                txtEventGap.Text = .EventDaysGapAllowed * 24 'atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(lGapUnitIndex)
+                txtEventGap.Text = DoubleToString(.EventDaysGapAllowed * 24) 'atcSynopticAnalysis.atcSynopticAnalysisPlugin.TimeUnitFactor(lGapUnitIndex)
+                If Double.IsNaN(.EventDurationDays) Then
+                    txtEventDuration.Text = "0"
+                Else
+                    txtEventDuration.Text = DoubleToString(.EventDurationDays * 24)
+                End If
+                If Double.IsNaN(.EventVolumeThreshold) Then
+                    txtEventVolume.Text = "0"
+                Else
+                    txtEventVolume.Text = DoubleToString(.EventVolumeThreshold)
+                End If
             End If
 
             If .Seasons Is Nothing Then
