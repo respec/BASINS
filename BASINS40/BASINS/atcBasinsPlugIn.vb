@@ -70,6 +70,7 @@ Public Class atcBasinsPlugIn
         'This is where buttons or menu items are added.
         g_MapWin = aMapWin
         g_MapWinWindowHandle = aParentHandle
+        g_MapWin.ApplicationInfo.WelcomePlugin = "BASINS"
         'Set g_BasinsDir to folder above the Bin folder where the app and plugins live
         g_BasinsDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & "\"
 
@@ -180,7 +181,7 @@ Public Class atcBasinsPlugIn
         g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
         g_MapWin.Menus.Remove(SendFeedbackMenuName)
 
-        g_MapWin.ApplicationInfo.WelcomePlugin = "WelcomeScreen"
+        g_MapWin.ApplicationInfo.WelcomePlugin = ""
         g_MapWin.ClearCustomWindowTitle()
 
         'LogStopMonitor()
