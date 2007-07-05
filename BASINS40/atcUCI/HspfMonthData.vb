@@ -86,10 +86,15 @@ Option Explicit On
                 Else
                     Call REM_XBLOCK((Me.Uci), OmCode, init, retkey, cbuff, retcod)
                 End If
-                For i = 1 To 12
-                    myMonthDataTable.MonthValue(i) = CSng(Mid(cbuff, 1 + (i - 1) * 6, 6))
-                Next i
-                pMonthDataTables.Add(myMonthDataTable)
+                If rectyp = -1 Then
+                    'this is a comment
+                Else
+                    'this is a regular record
+                    For i = 1 To 12
+                        myMonthDataTable.MonthValue(i) = CSng(Mid(cbuff, 1 + (i - 1) * 6, 6))
+                    Next i
+                    pMonthDataTables.Add(myMonthDataTable)
+                End If
             End If
             If retcod <> 2 Then
                 done = True
