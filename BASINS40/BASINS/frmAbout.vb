@@ -340,8 +340,8 @@ Friend Class frmAbout
             Me.Icon = g_MapWin.ApplicationInfo.FormIcon
             lblBasinsVersion.Text = "Version Dated:  " & IO.File.GetLastWriteTime(Me.GetType().Assembly.Location).ToShortDateString
             lblMapwinVersion.Text = "Version:  " & System.Reflection.Assembly.GetEntryAssembly.GetName.Version.ToString
-            lblProjFile.Text = g_MapWin.Project.FileName
-            lblConfigFile.Text = g_MapWin.Project.ConfigFileName
+            lblProjFile.Text = g_Project.FileName
+            lblConfigFile.Text = g_Project.ConfigFileName
             Me.Show()
         Catch ex As System.Exception
             g_MapWin.ShowErrorDialog(ex)

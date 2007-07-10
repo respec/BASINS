@@ -321,7 +321,7 @@ Friend Class frmDisplayFrequencyGrid
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
         pInitializing = True
-        pDataGroup = pDataManager.UserSelectData(, pDataGroup, False)
+        pDataGroup = pDataManager.UserSelectData(, pDataGroup)
         pInitializing = False
         PopulateGrid()
     End Sub

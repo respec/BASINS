@@ -286,7 +286,7 @@ Friend Class atcFrequencyGridSource
                     lRept.AppendLine(lStr.PadLeft(27) & " - negative values (ignored)")
 
                     If lNumNegative = 0 AndAlso lNumZero = 0 Then
-                        lPositiveNdayTs = lNdayTs
+                        lPositiveNdayTs = lNdayTsNonLog
                     Else
                         Dim lCurNewValueIndex As Integer = 1
                         Dim lNumNewValues As Integer = lNumPositive

@@ -59,7 +59,6 @@ Public Class frmSpecifyFrequency
     Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
     Friend WithEvents btnRecurrenceRemove As System.Windows.Forms.Button
     Friend WithEvents grpYears As System.Windows.Forms.GroupBox
-    Friend WithEvents lblDataStart As System.Windows.Forms.Label
     Friend WithEvents lblDataEnd As System.Windows.Forms.Label
     Friend WithEvents lblOmitBefore As System.Windows.Forms.Label
     Friend WithEvents lblOmitAfter As System.Windows.Forms.Label
@@ -72,6 +71,8 @@ Public Class frmSpecifyFrequency
     Friend WithEvents txtStartDay As System.Windows.Forms.TextBox
     Friend WithEvents cboEndMonth As System.Windows.Forms.ComboBox
     Friend WithEvents lblYearEnd As System.Windows.Forms.Label
+    Friend WithEvents cboYears As System.Windows.Forms.ComboBox
+    Friend WithEvents lblDataStart As System.Windows.Forms.Label
     Friend WithEvents txtRecurrenceAdd As System.Windows.Forms.TextBox
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -108,6 +109,7 @@ Public Class frmSpecifyFrequency
         Me.lblDataEnd = New System.Windows.Forms.Label
         Me.lblOmitBefore = New System.Windows.Forms.Label
         Me.lblOmitAfter = New System.Windows.Forms.Label
+        Me.cboYears = New System.Windows.Forms.ComboBox
         Me.grpDates = New System.Windows.Forms.GroupBox
         Me.cboStartMonth = New System.Windows.Forms.ComboBox
         Me.lblYearStart = New System.Windows.Forms.Label
@@ -402,6 +404,7 @@ Public Class frmSpecifyFrequency
         Me.txtOmitAfterYear.TabIndex = 6
         Me.txtOmitAfterYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.ToolTip1.SetToolTip(Me.txtOmitAfterYear, "Leave blank to use all years")
+        Me.txtOmitAfterYear.Visible = False
         '
         'txtOmitBeforeYear
         '
@@ -411,22 +414,25 @@ Public Class frmSpecifyFrequency
         Me.txtOmitBeforeYear.TabIndex = 5
         Me.txtOmitBeforeYear.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         Me.ToolTip1.SetToolTip(Me.txtOmitBeforeYear, "Leave blank to use all years")
+        Me.txtOmitBeforeYear.Visible = False
         '
         'grpYears
         '
-        Me.grpYears.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.grpYears.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpYears.Controls.Add(Me.lblDataStart)
         Me.grpYears.Controls.Add(Me.lblDataEnd)
         Me.grpYears.Controls.Add(Me.lblOmitBefore)
         Me.grpYears.Controls.Add(Me.lblOmitAfter)
         Me.grpYears.Controls.Add(Me.txtOmitAfterYear)
         Me.grpYears.Controls.Add(Me.txtOmitBeforeYear)
+        Me.grpYears.Controls.Add(Me.cboYears)
         Me.grpYears.Location = New System.Drawing.Point(208, 503)
         Me.grpYears.Name = "grpYears"
         Me.grpYears.Size = New System.Drawing.Size(213, 73)
         Me.grpYears.TabIndex = 45
         Me.grpYears.TabStop = False
-        Me.grpYears.Text = "Years to Include in Analysis (Optional)"
+        Me.grpYears.Text = "Years to Include in Analysis"
         '
         'lblDataStart
         '
@@ -434,9 +440,10 @@ Public Class frmSpecifyFrequency
         Me.lblDataStart.Location = New System.Drawing.Point(84, 22)
         Me.lblDataStart.Name = "lblDataStart"
         Me.lblDataStart.Size = New System.Drawing.Size(121, 13)
-        Me.lblDataStart.TabIndex = 0
+        Me.lblDataStart.TabIndex = 45
         Me.lblDataStart.Tag = "Data Starts"
-        Me.lblDataStart.Text = "Data Starts 11/22/1933"
+        Me.lblDataStart.Text = "Data Starts 11/22/1934"
+        Me.lblDataStart.Visible = False
         '
         'lblDataEnd
         '
@@ -447,6 +454,7 @@ Public Class frmSpecifyFrequency
         Me.lblDataEnd.TabIndex = 1
         Me.lblDataEnd.Tag = "Data Ends"
         Me.lblDataEnd.Text = "Data Ends 11/22/1934"
+        Me.lblDataEnd.Visible = False
         '
         'lblOmitBefore
         '
@@ -456,6 +464,7 @@ Public Class frmSpecifyFrequency
         Me.lblOmitBefore.Size = New System.Drawing.Size(29, 13)
         Me.lblOmitBefore.TabIndex = 40
         Me.lblOmitBefore.Text = "Start"
+        Me.lblOmitBefore.Visible = False
         '
         'lblOmitAfter
         '
@@ -465,6 +474,17 @@ Public Class frmSpecifyFrequency
         Me.lblOmitAfter.Size = New System.Drawing.Size(26, 13)
         Me.lblOmitAfter.TabIndex = 43
         Me.lblOmitAfter.Text = "End"
+        Me.lblOmitAfter.Visible = False
+        '
+        'cboYears
+        '
+        Me.cboYears.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboYears.FormattingEnabled = True
+        Me.cboYears.Location = New System.Drawing.Point(6, 18)
+        Me.cboYears.Name = "cboYears"
+        Me.cboYears.Size = New System.Drawing.Size(202, 21)
+        Me.cboYears.TabIndex = 44
         '
         'grpDates
         '
@@ -580,6 +600,11 @@ Public Class frmSpecifyFrequency
     Private pFirstYear As Integer = 0
     Private pLastYear As Integer = 0
 
+    Private pCommonStart As Double = GetMinValue()
+    Private pCommonEnd As Double = GetMaxValue()
+
+    Private Const pNoDatesInCommon As String = ": No dates in common"
+
     Public Function AskUser(ByVal aDataManager As atcDataManager, ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
         pDataManager = aDataManager
         pDataGroup = aGroup
@@ -595,7 +620,7 @@ Public Class frmSpecifyFrequency
         With pDateFormat
             .IncludeHours = False
             .IncludeMinutes = False
-            .IncludeSeconds = False            
+            .IncludeSeconds = False
         End With
 
         If GetSetting("atcFrequencyGrid", "Defaults", "HighOrLow", "High") = "High" Then
@@ -613,22 +638,44 @@ Public Class frmSpecifyFrequency
 
         SeasonsYearsToForm()
 
-        Dim lFirstDate As Double = Double.MaxValue
-        Dim lLastDate As Double = Double.MinValue
+        Dim lFirstDate As Double = GetMaxValue()
+        Dim lLastDate As Double = GetMinValue()
+
+        pCommonStart = GetMinValue()
+        pCommonEnd = GetMaxValue()
+
+        Dim lAllText As String = "All"
+        Dim lCommonText As String = "Common"
+
         For Each lDataset As atcData.atcTimeseries In pDataGroup
             If lDataset.Dates.numValues > 0 Then
                 Dim lThisDate As Double = lDataset.Dates.Value(1)
                 If lThisDate < lFirstDate Then lFirstDate = lThisDate
+                If lThisDate > pCommonStart Then pCommonStart = lThisDate
                 lThisDate = lDataset.Dates.Value(lDataset.Dates.numValues)
                 If lThisDate > lLastDate Then lLastDate = lThisDate
+                If lThisDate < pCommonEnd Then pCommonEnd = lThisDate
             End If
         Next
-        If lFirstDate < Double.MaxValue Then
+        If lFirstDate < GetMaxValue() AndAlso lLastDate > GetMinValue() Then
             lblDataStart.Text = lblDataStart.Tag & " " & pDateFormat.JDateToString(lFirstDate)
-        End If
-        If lLastDate > Double.MinValue Then
             lblDataEnd.Text = lblDataEnd.Tag & " " & pDateFormat.JDateToString(lLastDate)
+            lAllText &= ": " & pDateFormat.JDateToString(lFirstDate) & " to " & pDateFormat.JDateToString(lLastDate)
         End If
+
+        If pCommonStart > GetMinValue() AndAlso pCommonEnd < GetMaxValue() AndAlso pCommonStart < pCommonEnd Then
+            lCommonText &= ": " & pDateFormat.JDateToString(pCommonStart) & " to " & pDateFormat.JDateToString(pCommonEnd)
+        Else
+            lCommonText &= pNoDatesInCommon
+        End If
+
+        With cboYears.Items
+            .Clear()
+            .Add(lAllText)
+            .Add(lCommonText)
+            .Add("Custom")
+        End With
+        cboYears.SelectedIndex = 0
 
     End Sub
 
@@ -702,6 +749,9 @@ Public Class frmSpecifyFrequency
             If pYearEndDay > 0 Then txtEndDay.Text = pYearEndDay Else txtEndDay.Text = ""
             If pFirstYear > 0 Then txtOmitBeforeYear.Text = pFirstYear Else txtOmitBeforeYear.Text = ""
             If pLastYear > 0 Then txtOmitAfterYear.Text = pLastYear Else txtOmitAfterYear.Text = ""
+            If pFirstYear > 0 OrElse pLastYear > 0 Then
+                ShowCustomYears(True)
+            End If
         End If
     End Sub
 
@@ -731,6 +781,16 @@ Public Class frmSpecifyFrequency
 
     End Sub
 
+    Private Sub ShowCustomYears(ByVal aShowCustom As Boolean)
+        cboYears.Visible = Not aShowCustom
+        txtOmitBeforeYear.Visible = aShowCustom
+        txtOmitAfterYear.Visible = aShowCustom
+        lblDataStart.Visible = aShowCustom
+        lblDataEnd.Visible = aShowCustom
+        lblOmitBefore.Visible = aShowCustom
+        lblOmitAfter.Visible = aShowCustom
+    End Sub
+
     Private Sub Calculate(ByVal aOperationName As String)
         ClearAttributes()
         Dim lCalculator As New atcTimeseriesNdayHighLow.atcTimeseriesNdayHighLow
@@ -747,6 +807,7 @@ Public Class frmSpecifyFrequency
         If pLastYear > 0 Then lArgs.SetValue("LastYear", pLastYear)
 
         lCalculator.Open(aOperationName, lArgs)
+        lCalculator.DataSets.Clear()
         Dim lName As String = HighOrLowString()
         SaveSetting("atcFrequencyGrid", "StartMonth", lName, pYearStartMonth)
         SaveSetting("atcFrequencyGrid", "StartDay", lName, pYearStartDay)
@@ -964,4 +1025,23 @@ Public Class frmSpecifyFrequency
         grpYears.Width = grpRecurrence.Width
     End Sub
 
+    Private Sub cboYears_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboYears.SelectedIndexChanged
+        Select Case cboYears.SelectedIndex
+            Case 0 'All
+                txtOmitBeforeYear.Text = ""
+                txtOmitAfterYear.Text = ""
+            Case 1 'Common
+                If cboYears.Text.EndsWith(pNoDatesInCommon) Then
+                    cboYears.SelectedIndex = 0
+                Else
+                    Dim lCurDate(5) As Integer
+                    J2Date(pCommonStart, lCurDate)
+                    txtOmitBeforeYear.Text = Format(lCurDate(0), "0000")
+                    J2Date(pCommonEnd, lCurDate)
+                    txtOmitAfterYear.Text = Format(lCurDate(0), "0000")
+                End If
+            Case 2 'Custom
+                ShowCustomYears(True)
+        End Select
+    End Sub
 End Class

@@ -13,6 +13,11 @@ Friend Module modBasinsPlugin
     'Declare this as global so that it can be accessed throughout the plug-in project.
     'These variables are initialized in the plugin_Initialize event.
     Public g_MapWin As MapWindow.Interfaces.IMapWin
+    Public g_Menus As MapWindow.Interfaces.Menus
+    Public g_StatusBar As MapWindow.Interfaces.StatusBar
+    Public g_Toolbar As MapWindow.Interfaces.Toolbar
+    Public g_Plugins As MapWindow.Interfaces.Plugins
+    Public g_Project As MapWindow.Interfaces.Project
     Public g_MapWinWindowHandle As Integer
     Public g_AppName As String = "BASINS4"
     Public g_BasinsDrives As String = ""
@@ -21,10 +26,6 @@ Friend Module modBasinsPlugin
 
     Friend pExistingMapWindowProjectName As String = ""
     Friend pCommandLineScript As Boolean = False
-    Friend pBuiltInScriptExists As Boolean = False
-
-    'Private Const NewProjectMenuName As String = "BasinsNewProject"
-    'Private Const NewProjectMenuString As String = "New Project"
 
     'File menu -- created by MapWindow
     Friend Const FileMenuName As String = "mnuFile"
@@ -92,7 +93,7 @@ Friend Module modBasinsPlugin
     ''' </summary>
     ''' <remarks></remarks>
     Friend Sub RefreshSaveDataMenu()
-        g_MapWin.Menus.Remove(SaveDataMenuName)
+        g_Menus.Remove(SaveDataMenuName)
         AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
         For Each lDataSource As atcDataSource In pDataManager.DataSources
             If lDataSource.CanSave Then
@@ -142,7 +143,7 @@ Friend Module modBasinsPlugin
             End If
 
             If FileExists(lFileName) Then  'load national project
-                g_MapWin.Project.Load(lFileName)
+                g_Project.Load(lFileName)
             Else
                 Logger.Msg("Unable to find '" & NationalProjectFilename & "' on drives: " & g_BasinsDrives, "Open National")
                 Exit Sub
@@ -157,7 +158,7 @@ Friend Module modBasinsPlugin
                     Exit For
                 End If
             Next
-            g_MapWin.Toolbar.PressToolbarButton("tbbSelect")
+            g_Toolbar.PressToolbarButton("tbbSelect")
             pBuildFrm = New frmBuildNew
             pBuildFrm.Show()
             pBuildFrm.Top = GetSetting("BASINS4", "Window Positions", "BuildTop", "300")
@@ -174,9 +175,9 @@ Friend Module modBasinsPlugin
     ''' <returns></returns>
     ''' <remarks></remarks>
     Friend Function NationalProjectIsOpen() As Boolean
-        If (Not g_MapWin.Project Is Nothing) _
-            AndAlso (Not g_MapWin.Project.FileName Is Nothing) _
-            AndAlso g_MapWin.Project.FileName.ToLower.EndsWith(NationalProjectFilename) Then
+        If (Not g_Project Is Nothing) _
+            AndAlso (Not g_Project.FileName Is Nothing) _
+            AndAlso g_Project.FileName.ToLower.EndsWith(NationalProjectFilename) Then
             Return True
         Else
             Return False
@@ -262,21 +263,21 @@ Friend Module modBasinsPlugin
                                     If Not FileExt(lFilename) = "mwprj" And Not FileExt(lFilename) = "bmp" Then
                                         lTarget = lNewDataDir & Mid(lFilename, Len(PathNameOnly(GisUtil.ProjectFileName)) + 2)
                                         If Not FileExists(lTarget) Then
-                                            g_MapWin.StatusBar(1).Text = "Copying " & FilenameNoPath(lFilename.ToString)
-                                            g_MapWin.Refresh()
+                                            g_StatusBar(1).Text = "Copying " & FilenameNoPath(lFilename.ToString)
+                                            RefreshView()
                                             IO.File.Copy(lFilename, lTarget, False)
                                         End If
                                     End If
                                 Next
-                                g_MapWin.StatusBar(1).Text = ""
-                                g_MapWin.Refresh()
+                                g_StatusBar(1).Text = ""
+                                RefreshView()
 
                                 'copy the mapwindow project file
                                 IO.File.Copy(GisUtil.ProjectFileName, lProjectFileName)
                                 'open the new mapwindow project file
-                                g_MapWin.Project.Load(lProjectFileName)
+                                g_Project.Load(lProjectFileName)
                                 g_MapWin.PreviewMap.Update()
-                                If Not (g_MapWin.Project.Save(lProjectFileName)) Then
+                                If Not (g_Project.Save(lProjectFileName)) Then
                                     Logger.Dbg("BASINSNewMenu:Save2Failed:" & g_MapWin.LastError)
                                 End If
 
@@ -340,7 +341,7 @@ Friend Module modBasinsPlugin
                         'make sure projection is defined
                         If Len(lInputProjection) = 0 Or (lInputProjection Is Nothing) Then
                             'dont have a projection yet, try to use the project's projection
-                            lInputProjection = g_MapWin.Project.ProjectProjection
+                            lInputProjection = g_Project.ProjectProjection
                         End If
                         If Len(lInputProjection) = 0 Or (lInputProjection Is Nothing) Then
                             'see if there is a prj.proj
@@ -372,7 +373,7 @@ Friend Module modBasinsPlugin
                             End If
 
                             'remember the name of this mapwindow project to go back to later
-                            pExistingMapWindowProjectName = g_MapWin.Project.FileName
+                            pExistingMapWindowProjectName = g_Project.FileName
                             'now open national project with temp shapefile on the map
                             LoadNationalProject()
                             'set symbology for this layer
@@ -476,7 +477,7 @@ Friend Module modBasinsPlugin
             If pExistingMapWindowProjectName.Length = 0 Then
                 'This is the normal case for building a new project,
                 'Save national project as the user has zoomed it
-                g_MapWin.Project.Save(g_MapWin.Project.FileName)
+                g_Project.Save(g_Project.FileName)
                 CreateNewProjectAndDownloadCoreDataInteractive(lThemeTag, GetSelected(lFieldMatch))
             Else
                 'build new basins project from mapwindow project
@@ -528,8 +529,8 @@ Friend Module modBasinsPlugin
             If iLayer <> aSelectedLayer Then
                 If FilenameNoPath(GisUtil.LayerFileName(iLayer)) <> "wdm.shp" And FilenameNoPath(GisUtil.LayerFileName(iLayer)) <> "metpt.shp" Then
                     'want to keep met pts
-                    g_MapWin.StatusBar(1).Text = "Selecting " & GisUtil.LayerName(iLayer)
-                    g_MapWin.Refresh()
+                    g_StatusBar(1).Text = "Selecting " & GisUtil.LayerName(iLayer)
+                    RefreshView()
                     Logger.Dbg("CopyFeaturesWithinExtent:" & GisUtil.LayerName(iLayer))
 
                     If InStr(GisUtil.LayerFileName(iLayer), aOldFolder) > 0 Then
@@ -579,8 +580,8 @@ Friend Module modBasinsPlugin
                 End If
             End If
         Next iLayer
-        g_MapWin.StatusBar(1).Text = ""
-        g_MapWin.Refresh()
+        g_StatusBar(1).Text = ""
+        RefreshView()
 
     End Sub
 
@@ -603,7 +604,7 @@ Friend Module modBasinsPlugin
                                    Optional ByVal aAlphabetical As Boolean = False) _
                                    As MapWindow.Interfaces.MenuItem
 
-        Dim lMenus As MapWindow.Interfaces.Menus = g_MapWin.Menus
+        Dim lMenus As MapWindow.Interfaces.Menus = g_Menus
         With lMenus
             Dim lMenu As MapWindow.Interfaces.MenuItem = .Item(aMenuName)
             If Not lMenu Is Nothing Then 'This item already exists
@@ -687,8 +688,8 @@ Friend Module modBasinsPlugin
     ''' </summary>
     ''' <remarks></remarks>
     Friend Sub RefreshComputeMenu()
-        g_MapWin.Menus.Remove(ComputeMenuName)
-        g_MapWin.Menus.AddMenu(ComputeMenuName, "", Nothing, ComputeMenuString, FileMenuName)
+        g_Menus.Remove(ComputeMenuName)
+        g_Menus.AddMenu(ComputeMenuName, "", Nothing, ComputeMenuString, FileMenuName)
         Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
         For Each ds As atcDataSource In lDataSources
             If ds.Category <> "File" Then
@@ -730,7 +731,7 @@ Friend Module modBasinsPlugin
             Dim lCurLayer As MapWinGIS.Shapefile
             Dim ctext As String
 
-            g_MapWin.Refresh()
+            RefreshView()
             ctext = "Selected Features:" & vbCrLf & "  <none>"
             lCurLayer = g_MapWin.Layers.Item(g_MapWin.Layers.CurrentLayer).GetObject
 
@@ -779,5 +780,13 @@ Friend Module modBasinsPlugin
             End If
             pBuildFrm.txtSelected.Text = ctext
         End If
+    End Sub
+
+    Friend Sub ClearLayers()
+        g_MapWin.Layers.Clear()
+    End Sub
+
+    Friend Sub RefreshView()
+        g_MapWin.Refresh()
     End Sub
 End Module
