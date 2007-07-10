@@ -92,6 +92,12 @@ Public Class atcBasinsPlugIn
 
         FindBasinsDrives()
 
+        g_Menus = g_MapWin.Menus
+        g_StatusBar = g_MapWin.StatusBar
+        g_Toolbar = g_MapWin.Toolbar
+        g_Plugins = g_MapWin.Plugins
+        g_Project = g_MapWin.Project
+
         AddMenuIfMissing(NewDataMenuName, FileMenuName, NewDataMenuString, "mnuNew")
         AddMenuIfMissing(OpenDataMenuName, FileMenuName, OpenDataMenuString, "mnuOpen")
         AddMenuIfMissing(DownloadMenuName, FileMenuName, DownloadMenuString, OpenDataMenuName)
@@ -104,8 +110,8 @@ Public Class atcBasinsPlugIn
 
         AddMenuIfMissing(RegisterMenuName, HelpMenuName, RegisterMenuString, , "mnuShortcuts")
 
-        g_MapWin.Menus.Remove("mnuCheckForUpdates") 'Remove MW update menu so only ours will be present
-        g_MapWin.Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
+        g_Menus.Remove("mnuCheckForUpdates") 'Remove MW update menu so only ours will be present
+        g_Menus.Remove("mnuFileBreak5")      'Remove MW separator after mnuCheckForUpdates
 
         AddMenuIfMissing(CheckForUpdatesMenuName, HelpMenuName, CheckForUpdatesMenuString, RegisterMenuName)
         AddMenuIfMissing(SendFeedbackMenuName, HelpMenuName, SendFeedbackMenuString, CheckForUpdatesMenuName)
@@ -146,40 +152,36 @@ Public Class atcBasinsPlugIn
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        'This event is fired when the user unloads your plug-in either through the plug-in dialog 
-        'box, or by un-checkmarking it in the plug-ins menu.  This is where you would remove any
-        'buttons from the tool bar tool bar or menu items from the menu that you may have added.
-        'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
 
         ShowHelp("CLOSE") 'Close any active Help window
 
-        g_MapWin.Menus.Remove(DataMenuName)
+        g_Menus.Remove(DataMenuName)
         pLoadedDataMenu = False
 
-        g_MapWin.Menus.Remove(AnalysisMenuName) 'TODO: don't unload if another plugin is still using it
+        g_Menus.Remove(AnalysisMenuName) 'TODO: don't unload if another plugin is still using it
 
-        g_MapWin.Menus.Remove(ModelsMenuName & "_SWAT")
-        g_MapWin.Menus.Remove(ModelsMenuName & "_AGWA")
-        If g_MapWin.Menus.Item(ModelsMenuName).NumSubItems = 0 Then
-            g_MapWin.Menus.Remove(ModelsMenuName)
+        g_Menus.Remove(ModelsMenuName & "_SWAT")
+        g_Menus.Remove(ModelsMenuName & "_AGWA")
+        If g_Menus.Item(ModelsMenuName).NumSubItems = 0 Then
+            g_Menus.Remove(ModelsMenuName)
         End If
 
-        g_MapWin.Menus.Remove(NewDataMenuName)
-        g_MapWin.Menus.Remove(OpenDataMenuName)
-        g_MapWin.Menus.Remove(DownloadMenuName)
-        g_MapWin.Menus.Remove(ManageDataMenuName)
-        g_MapWin.Menus.Remove(SaveDataMenuName)
-        g_MapWin.Menus.Remove(ProjectsMenuName)
+        g_Menus.Remove(NewDataMenuName)
+        g_Menus.Remove(OpenDataMenuName)
+        g_Menus.Remove(DownloadMenuName)
+        g_Menus.Remove(ManageDataMenuName)
+        g_Menus.Remove(SaveDataMenuName)
+        g_Menus.Remove(ProjectsMenuName)
 
-        g_MapWin.Menus.Remove(ComputeMenuName)
+        g_Menus.Remove(ComputeMenuName)
 
-        g_MapWin.Menus.Remove("BasinsHelp_Separator1")
-        g_MapWin.Menus.Remove(BasinsHelpMenuName)
-        g_MapWin.Menus.Remove(BasinsWebPageMenuName)
-        g_MapWin.Menus.Remove("BasinsHelp_Separator2")
-        g_MapWin.Menus.Remove(RegisterMenuName)
-        g_MapWin.Menus.Remove(CheckForUpdatesMenuName)
-        g_MapWin.Menus.Remove(SendFeedbackMenuName)
+        g_Menus.Remove("BasinsHelp_Separator1")
+        g_Menus.Remove(BasinsHelpMenuName)
+        g_Menus.Remove(BasinsWebPageMenuName)
+        g_Menus.Remove("BasinsHelp_Separator2")
+        g_Menus.Remove(RegisterMenuName)
+        g_Menus.Remove(CheckForUpdatesMenuName)
+        g_Menus.Remove(SendFeedbackMenuName)
 
         g_MapWin.ApplicationInfo.WelcomePlugin = ""
         g_MapWin.ClearCustomWindowTitle()
@@ -205,7 +207,7 @@ Public Class atcBasinsPlugIn
                 If NationalProjectIsOpen() Then
                     SpecifyAndCreateNewProject()
                 Else
-                    DownloadNewData(PathNameOnly(g_MapWin.Project.FileName) & "\")
+                    DownloadNewData(PathNameOnly(g_Project.FileName) & "\")
                 End If
             Case ManageDataMenuName
                 pDataManager.UserManage()
@@ -221,13 +223,13 @@ Public Class atcBasinsPlugIn
                 ShowHelp("")
             Case AnalysisMenuName & "_ArcView3"
                 'create apr if it does not exist, then open it
-                Dim lAprFileName As String = "\basins\apr\" & FilenameOnly(g_MapWin.Project.FileName) & ".apr"
+                Dim lAprFileName As String = "\basins\apr\" & FilenameOnly(g_Project.FileName) & ".apr"
                 If Not FileExists(lAprFileName) Then 'build it
                     Dim lExeName As String = _
                        FindFile("Please locate BasinsArchive.exe", _
                        "\BASINS\etc\basinsarchive\BasinsArchive.exe")
                     If Len(lExeName) > 0 Then
-                        Dim Exec_Str As String = lExeName & " /build, " & PathNameOnly(g_MapWin.Project.FileName) & ", " & FilenameOnly(lAprFileName)
+                        Dim Exec_Str As String = lExeName & " /build, " & PathNameOnly(g_Project.FileName) & ", " & FilenameOnly(lAprFileName)
                         Shell(Exec_Str, AppWinStyle.NormalFocus, False)
                     End If
                 End If
@@ -243,7 +245,7 @@ Public Class atcBasinsPlugIn
                 Else
                     Try
                         'write directive file here
-                        SaveFileString(PathNameOnly(buildmxdFilename) & "\ArcMapInstructions.txt", "Build," & g_MapWin.Project.FileName)
+                        SaveFileString(PathNameOnly(buildmxdFilename) & "\ArcMapInstructions.txt", "Build," & g_Project.FileName)
                         'now start the build mxd
                         Process.Start(buildmxdFilename)
                     Catch
@@ -295,7 +297,7 @@ Public Class atcBasinsPlugIn
                 ElseIf aItemName.StartsWith(SaveDataMenuName & "_") Then
                     aHandled = UserSaveData(aItemName.Substring(SaveDataMenuName.Length + 1))
                 ElseIf aItemName.StartsWith(ProjectsMenuName & "_") Then
-                    aHandled = UserOpenProject(g_MapWin.Menus(aItemName).Text)
+                    aHandled = UserOpenProject(g_Menus(aItemName).Text)
                 Else
                     aHandled = False 'Not our item to handle
                 End If
@@ -362,8 +364,8 @@ Public Class atcBasinsPlugIn
         Dim lPrjFileName As String
 
         If FileExists(aDataDirName, True, False) Then
-            If g_MapWin.Project.Modified Then
-                If PromptToSaveProject(g_MapWin.Project.FileName) = MsgBoxResult.Cancel Then
+            If g_Project.Modified Then
+                If PromptToSaveProject(g_Project.FileName) = MsgBoxResult.Cancel Then
                     Return False
                 End If
             End If
@@ -371,17 +373,17 @@ Public Class atcBasinsPlugIn
             lPrjFileName = aDataDirName & "\" & FilenameOnly(aDataDirName) & ".mwprj"
             If FileExists(lPrjFileName) Then
                 Logger.Dbg("Opening project " & lPrjFileName)
-                Return g_MapWin.Project.Load(lPrjFileName)
+                Return g_Project.Load(lPrjFileName)
             Else
                 'TODO: look for other *.mwprj before creating a new one?
                 Logger.Dbg("Creating new project " & lPrjFileName)
-                g_MapWin.Layers.Clear()
-                g_MapWin.Refresh()
+                ClearLayers()
+                RefreshView()
                 g_MapWin.PreviewMap.GetPictureFromMap()
                 DoEvents()
                 AddAllShapesInDir(aDataDirName, aDataDirName)
-                g_MapWin.Project.Save(lPrjFileName)
-                g_MapWin.Project.Modified = False
+                g_Project.Save(lPrjFileName)
+                g_Project.Modified = False
                 Return True
             End If
         End If
@@ -391,24 +393,23 @@ Public Class atcBasinsPlugIn
     'TODO: merge with function of same name in MapWindow:frmMain
     Private Function PromptToSaveProject(ByVal aProjectFileName As String) As MsgBoxResult
         Dim lResult As MsgBoxResult
+        Dim lTitle As String = g_MapWin.ApplicationInfo.ApplicationName & " Save Changes?"
 
         If aProjectFileName Is Nothing OrElse FilenameNoExt(aProjectFileName) = "" Then
             lResult = MsgBox("Do you want to save the changes to the currently open project?", _
-                             MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, _
-                             g_MapWin.ApplicationInfo.ApplicationName & " Save Changes?")
+                             MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, lTitle)
         Else
             lResult = MsgBox("Do you want to save the changes to " & FilenameNoExt(aProjectFileName) & "?", _
-                             MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, _
-                             g_MapWin.ApplicationInfo.ApplicationName & " Save Changes?")
+                             MsgBoxStyle.YesNoCancel Or MsgBoxStyle.Exclamation, lTitle)
         End If
 
         Select Case lResult
             Case MsgBoxResult.Yes
                 Dim lCdlSave As New SaveFileDialog
                 lCdlSave.Filter = "MapWindow Project (*.mwprj)|*.mwprj"
-                If g_MapWin.Project.Modified = True And MapWinUtility.Strings.IsEmpty(aProjectFileName) = False Then
-                    g_MapWin.Project.Save(aProjectFileName)
-                    g_MapWin.Project.Modified = False
+                If g_Project.Modified = True And MapWinUtility.Strings.IsEmpty(aProjectFileName) = False Then
+                    g_Project.Save(aProjectFileName)
+                    g_Project.Modified = False
                 Else
                     If lCdlSave.ShowDialog() = DialogResult.Cancel Then
                         Return MsgBoxResult.Cancel
@@ -417,8 +418,8 @@ Public Class atcBasinsPlugIn
                     If (System.IO.Path.GetExtension(lCdlSave.FileName) <> ".mwprj") Then
                         lCdlSave.FileName &= ".mwprj"
                     End If
-                    g_MapWin.Project.Save(lCdlSave.FileName)
-                    g_MapWin.Project.Modified = False
+                    g_Project.Save(lCdlSave.FileName)
+                    g_Project.Modified = False
                 End If
                 Return MsgBoxResult.Yes
             Case MsgBoxResult.Cancel
@@ -468,7 +469,7 @@ Public Class atcBasinsPlugIn
             Case "GenScn" : exename = FindFile("Please locate GenScn.exe", "\BASINS\models\HSPF\bin\GenScn.exe")
             Case "WDMUtil" : exename = FindFile("Please locate WDMUtil.exe", "\BASINS\models\HSPF\WDMUtil\WDMUtil.exe")
                 'Case "HSPF"
-                'If g_MapWin.Plugins.PluginIsLoaded("atcModelSetup_PlugIn") Then 'defer to other plugin
+                'If g_Plugins.PluginIsLoaded("atcModelSetup_PlugIn") Then 'defer to other plugin
                 'Return False
                 'End If
                 'exename = FindFile("Please locate WinHSPF.exe", "\BASINS\models\HSPF\bin\WinHSPF.exe")
@@ -535,14 +536,14 @@ Public Class atcBasinsPlugIn
         Dim lFeedback As String = lFeedbackForm.FeedbackGenericSystemInformation()
         Dim lSectionFooter As String = "___________________________" & vbCrLf
 
-        lFeedback &= "Project: " & g_MapWin.Project.FileName & vbCrLf
-        lFeedback &= "Config: " & g_MapWin.Project.ConfigFileName & vbCrLf
+        lFeedback &= "Project: " & g_Project.FileName & vbCrLf
+        lFeedback &= "Config: " & g_Project.ConfigFileName & vbCrLf
 
         'plugin info
         lFeedback &= vbCrLf & "Plugins loaded:" & vbCrLf
-        Dim lLastPlugIn As Integer = g_MapWin.Plugins.Count() - 1
+        Dim lLastPlugIn As Integer = g_Plugins.Count() - 1
         For iPlugin As Integer = 0 To lLastPlugIn
-            Dim lCurPlugin As MapWindow.Interfaces.IPlugin = g_MapWin.Plugins.Item(iPlugin)
+            Dim lCurPlugin As MapWindow.Interfaces.IPlugin = g_Plugins.Item(iPlugin)
             If Not lCurPlugin Is Nothing Then
                 With lCurPlugin
                     lFeedback &= .Name & vbTab & .Version & vbTab & .BuildDate & vbCrLf
@@ -636,7 +637,7 @@ Public Class atcBasinsPlugIn
     '  Dim iTry As Integer = 1
 
     '  Do
-    '    tryName = g_MapWin.Plugins.PluginFolder & _
+    '    tryName = g_Plugins.PluginFolder & _
     '              "\Basins\RemoveMe-Script-" & iTry & ".dll"
     '    iTry += 1
     '  Loop While FileExists(tryName)
@@ -649,13 +650,11 @@ Public Class atcBasinsPlugIn
     '                         ByVal aFileName As String)
     '  CompileScript(aScript, aErrors, refs, aFileName)
     '  If aErrors.Length = 0 Then
-    '    g_MapWin.Plugins.AddFromFile(aFileName)
+    '    g_Plugins.AddFromFile(aFileName)
     '  End If
     'End Sub
 
     Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
-        'This event fires when the user removes a layer from MapWindow.  This is useful to know if your
-        'plug-in depends on a particular layer being present. 
     End Sub
 
     <CLSCompliant(False)> _
@@ -674,9 +673,6 @@ Public Class atcBasinsPlugIn
     End Sub
 
     Public Sub LayersCleared() Implements MapWindow.Interfaces.IPlugin.LayersCleared
-        'This event fires when the user clears all of the layers from MapWindow.  As with LayersAdded 
-        'and LayersRemoved, this is useful to know if your plug-in depends on a particular layer being 
-        'present or if you are maintaining your own list of layers.
     End Sub
 
     Public Sub LayerSelected(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerSelected
@@ -688,7 +684,6 @@ Public Class atcBasinsPlugIn
 
     <CLSCompliant(False)> _
     Public Sub LegendDoubleClick(ByVal Handle As Integer, ByVal Location As MapWindow.Interfaces.ClickLocation, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.LegendDoubleClick
-        'This event fires when a user double-clicks a layer in the legend.
     End Sub
 
     <CLSCompliant(False)> _
@@ -722,7 +717,7 @@ Public Class atcBasinsPlugIn
         'then you need to use g_MapWin.View.PixelToProj()
         'Dim ProjX As Double, ProjY As Double
         'g_MapWin.View.PixelToProj(ScreenX, ScreenY, ProjX, ProjY)
-        'g_MapWin.StatusBar(2).Text = "X = " & ProjX & " Y = " & ProjY
+        'g_StatusBar(2).Text = "X = " & ProjX & " Y = " & ProjY
     End Sub
 
     Public Sub MapMouseUp(ByVal Button As Integer, ByVal Shift As Integer, ByVal x As Integer, ByVal y As Integer, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.MapMouseUp
@@ -745,14 +740,14 @@ Public Class atcBasinsPlugIn
             'If Not g_MapWin.ApplicationInfo.ShowWelcomeScreen Then 
             'it is not the initial welcome screen because MapWindow does not have given us the message in that case
 
-            'If (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) then 
+            'If (g_Project.FileName Is Nothing And Not pCommandLineScript) then 
             'we did not load a project or run a script on the command line
 
             If pWelcomeScreenShow _
                OrElse Not g_MapWin.ApplicationInfo.ShowWelcomeScreen _
-               OrElse (g_MapWin.Project.FileName Is Nothing And Not pCommandLineScript) Then
+               OrElse (g_Project.FileName Is Nothing And Not pCommandLineScript) Then
                 Logger.Dbg("Welcome:Show")
-                Dim frmWelBsn As New frmWelcomeScreenBasins(g_MapWin.Project, g_MapWin.ApplicationInfo)
+                Dim frmWelBsn As New frmWelcomeScreenBasins(g_Project, g_MapWin.ApplicationInfo)
                 frmWelBsn.ShowDialog()
             Else 'Skip displaying welcome on launch
                 Logger.Dbg("Welcome:Skip")
@@ -764,7 +759,7 @@ Public Class atcBasinsPlugIn
                 Logger.Dbg(msg)
                 If msg.StartsWith("atcDataPlugin unloading") Then
                     lUnloading = msg.Substring(24)
-                    g_MapWin.Menus.Remove(AnalysisMenuName)
+                    g_Menus.Remove(AnalysisMenuName)
                 End If
                 RefreshAnalysisMenu(lUnloading)
             End If

@@ -94,14 +94,12 @@ StartOver:
 
                 If lNoData Then
                     Logger.Dbg("EmptyProjectCreated")
-                    With g_MapWin
-                        .Layers.Clear()
-                        .PreviewMap.GetPictureFromMap()
-                        .Project.Save(lProjectFileName)
-                        .Project.Modified = True
-                        .Project.Save(lProjectFileName)
-                        .Project.Modified = False
-                    End With
+                    ClearLayers()
+                    g_MapWin.PreviewMap.GetPictureFromMap()
+                    g_Project.Save(lProjectFileName)
+                    g_Project.Modified = True
+                    g_Project.Save(lProjectFileName)
+                    g_Project.Modified = False
                 Else
                     'download and project core data
                     Logger.Dbg("DownloadData:" & aThemeTag)
@@ -142,13 +140,13 @@ StartOver:
         If lDataDownLoadStatus Then 'Succeeded, as far as we know
             If Not aExistingMapWindowProject Then
                 'regular case, not coming from existing mapwindow project
-                g_MapWin.Layers.Clear()
-                If Not (g_MapWin.Project.Save(aProjectFileName)) Then
+                ClearLayers()
+                If Not (g_Project.Save(aProjectFileName)) Then
                     Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save1Failed:" & g_MapWin.LastError)
                 End If
             Else
                 'open existing mapwindow project again
-                g_MapWin.Project.Load(aProjectFileName)
+                g_Project.Load(aProjectFileName)
                 Dim lProjectDir As String = PathNameOnly(aProjectFileName)
                 Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
                 If FileExists(lNewShapeName) Then
@@ -157,7 +155,7 @@ StartOver:
                     TryDelete(lProjectDir & "\temp\tempextent.dbf")
                 End If
             End If
-            g_MapWin.Project.Modified = True
+            g_Project.Modified = True
             ProcessProjectorFile(lProjectorFilename)
             AddAllShapesInDir(aNewDataDir, aNewDataDir)
             g_MapWin.PreviewMap.Update(MapWindow.Interfaces.ePreviewUpdateExtents.CurrentMapView)
@@ -167,9 +165,9 @@ StartOver:
                 If g_MapWin.Layers.NumLayers > 0 Then
                     Dim lsf As MapWinGIS.Shapefile
                     lsf = g_MapWin.Layers(0).GetObject
-                    g_MapWin.Project.ProjectProjection = lsf.Projection
+                    g_Project.ProjectProjection = lsf.Projection
                 End If
-                If Not (g_MapWin.Project.Save(aProjectFileName)) Then
+                If Not (g_Project.Save(aProjectFileName)) Then
                     Logger.Dbg("CreateNewProjectAndDownloadCoreData:Save2Failed:" & g_MapWin.LastError)
                 End If
             End If
@@ -294,8 +292,8 @@ StartOver:
                             End If
                         End If
                         'clip to cat extents
-                        g_MapWin.StatusBar(1).Text = "Clipping Grid..."
-                        g_MapWin.Refresh()
+                        g_StatusBar(1).Text = "Clipping Grid..."
+                        RefreshView()
                         DoEvents()
                         If Not FileExists(FilenameNoExt(lCurFilename) & ".prj") Then
                             'create .prj file as work-around for clipping bug
@@ -304,7 +302,7 @@ StartOver:
                         Logger.Dbg("ClipGridWithPolygon: " & lCurFilename & " " & lProjectDir & "nlcd\catextent.shp" & " " & lOutputFileName & " " & "True")
                         lSuccess = MapWinGeoProc.SpatialOperations.ClipGridWithPolygon(lCurFilename, lShape, lOutputFileName, True)
                         lSuccess = lExtentsSf.Close
-                        g_MapWin.StatusBar(1).Text = ""
+                        g_StatusBar(1).Text = ""
                     Case "project_dir"
                         lProjectDir = lProjectorNode.Content
                         If Right(lProjectDir, 1) <> "\" Then lProjectDir &= "\"
@@ -369,11 +367,11 @@ StartOver:
                             System.IO.File.Copy(lCurFilename, lOutputFileName)
                         Else
                             'project it
-                            g_MapWin.StatusBar(1).Text = "Projecting Grid..."
-                            g_MapWin.Refresh()
+                            g_StatusBar(1).Text = "Projecting Grid..."
+                            RefreshView()
                             DoEvents()
                             lSuccess = MapWinGeoProc.SpatialReference.ProjectGrid(lInputProjection, lOutputProjection, lCurFilename, lOutputFileName, True)
-                            g_MapWin.StatusBar(1).Text = ""
+                            g_StatusBar(1).Text = ""
                             If Not FileExists(FilenameNoExt(lOutputFileName) & ".prj") Then
                                 'create .prj file as work-around for bug
                                 SaveFileString(FilenameNoExt(lOutputFileName) & ".prj", "")
@@ -648,7 +646,7 @@ StartOver:
                 End Select
             End If
 
-            g_MapWin.StatusBar.Item(1).Text = "Opening " & aFilename
+            g_StatusBar.Item(1).Text = "Opening " & aFilename
             shpFile = New MapWinGIS.Shapefile
             shpFile.Open(aFilename)
             Select Case shpFile.ShapefileType
@@ -734,11 +732,11 @@ StartOver:
                 g_MapWin.View.Redraw()
                 DoEvents()
             End If
-            g_MapWin.Project.Modified = True
+            g_Project.Modified = True
         Catch ex As Exception
             Logger.Msg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Shape")
         End Try
-        g_MapWin.StatusBar.Item(1).Text = ""
+        g_StatusBar.Item(1).Text = ""
 
         Return MWlay
     End Function
@@ -784,7 +782,7 @@ StartOver:
                 LayerName &= " (" & FilenameOnly(aFilename) & ")"
             End If
 
-            g_MapWin.StatusBar.Item(1).Text = "Opening " & aFilename
+            g_StatusBar.Item(1).Text = "Opening " & aFilename
             g = New MapWinGIS.Grid
             g.Open(aFilename)
             Dim lSuccess As Boolean = False
@@ -814,11 +812,11 @@ StartOver:
                 g_MapWin.View.Redraw()
                 DoEvents()
             End If
-            g_MapWin.Project.Modified = True
+            g_Project.Modified = True
         Catch ex As Exception
             Logger.Msg("Could not add '" & aFilename & "' to the project. " & ex.ToString & vbCr & ex.StackTrace, "Add Grid")
         End Try
-        g_MapWin.StatusBar.Item(1).Text = ""
+        g_StatusBar.Item(1).Text = ""
 
         Return MWlay
     End Function

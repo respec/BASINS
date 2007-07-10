@@ -204,10 +204,10 @@ Public Class atcDataManager
     '''     <para>Optional title for dialog window, default is 'Select Data'</para>
     ''' </param>  
     ''' <param name="aGroup">
-    '''     <para>Optional group to select data from, default is all available data</para>
+    '''     <para>Optional pre-selected group of data, default is no data already selected</para>
     ''' </param>  
     ''' <param name="aModal">
-    '''     <para>Optional modality specification for window, default is true</para>
+    '''     <para>Optional modality specification for window, default is True</para>
     ''' </param>  
     Public Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
         Dim lForm As New frmSelectData
