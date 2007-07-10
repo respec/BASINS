@@ -1719,6 +1719,7 @@ Public Module modMetCompute
         Dim lDisTs As New atcTimeseries(aDataSource)
         Dim lDistCnt As Integer = 0
         Dim lTriDistCnt As Integer = 0
+        Dim lTriDistLargeCnt As Integer = 0
 
         On Error GoTo DisPrecipErrHnd
         lUsedTriang = 0
@@ -1820,29 +1821,35 @@ Public Module modMetCompute
                     End If
                     If Math.Abs(lDaySum - aDyTSer.Value(lDyInd)) > lRndOff Then
                         'values not distributed properly
-                        s = "Problem distributing " & aDyTSer.Value(lDyInd) & " on " & lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+                        s = "PROBLEM distributing " & aDyTSer.Value(lDyInd) & " on " & lDate(1) & "/" & lDate(2) & "/" & lDate(0) & vbCrLf & _
+                            "Daily value: " & aDyTSer.Value(lDyInd) & vbCrLf & _
+                            "Hourly sum:  " & lDaySum
                         If lOutSumm Then
-                            WriteLine(lOutFil, "  *** " & s & "  ***")
+                            WriteLine(lOutFil, s)
                         End If
-                        rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
-                        If rsp = MsgBoxResult.Cancel Then
-                            'lDisTs.errordescription = s
-                            Err.Raise(vbObjectError + 513)
-                        End If
+                        Logger.Dbg(s)
+                        'rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
+                        'If rsp = MsgBoxResult.Cancel Then
+                        '    'lDisTs.errordescription = s
+                        '    Err.Raise(vbObjectError + 513)
+                        'End If
                     End If
                 Else 'no data available at hourly stations,
                     'distribute using triangular distribution
                     Call DistTriang(aDyTSer.Value(lDyInd), lTmpHrVals, retcod)
                     lTriDistCnt += 1
+                    If aDyTSer.Value(lDyInd) > 1 Then lTriDistLargeCnt += 1
                     For lHrInd = 1 To 24
                         lHrVals(lHrPos + lHrInd) = lTmpHrVals(lHrInd)
                     Next lHrInd
                     If retcod = -1 Then
-                        s = "Unable to distribute this much rain (" & lDaySum & ") using triangular distribution." & "Hourly values will be set to -9.98"
-                        rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
+                        s = "PROBLEM - Unable to distribute this much rain (" & lDaySum & ") using triangular distribution." & "Hourly values will be set to -9.98"
+                        Logger.Dbg(s)
+                        'rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
                     ElseIf retcod = -2 Then
-                        s = "Problem distributing " & aDyTSer.Value(lDyInd) & " using triangular distribution on " & lDate(1) & "/" & lDate(2) & "/" & lDate(0)
-                        rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
+                        s = "PROBLEM distributing " & aDyTSer.Value(lDyInd) & " using triangular distribution on " & lDate(1) & "/" & lDate(2) & "/" & lDate(0)
+                        Logger.Dbg(s)
+                        'rsp = MsgBox(s, MsgBoxStyle.Exclamation + MsgBoxStyle.OkCancel, "Precipitation Disaggregation Problem")
                     End If
                     If lOutSumm Then
                         WriteLine(lOutFil, "  *** No hourly total within tolerance - " & SignificantDigits(aDyTSer.Value(lDyInd), 4) & "  distributed using triangular distribution ***")
@@ -1850,10 +1857,10 @@ Public Module modMetCompute
                             WriteLine(lOutFil, "  *** " & s & " ***")
                         End If
                     End If
-                    If rsp = MsgBoxResult.Cancel Then
-                        'lDisTs.errordescription = s
-                        Err.Raise(vbObjectError + 513 + System.Math.Abs(retcod))
-                    End If
+                    'If rsp = MsgBoxResult.Cancel Then
+                    '    'lDisTs.errordescription = s
+                    '    Err.Raise(vbObjectError + 513 + System.Math.Abs(retcod))
+                    'End If
                 End If
                 lDistCnt += 1
             Else 'no daily value to distribute, fill hourly
@@ -1871,6 +1878,7 @@ DisPrecipErrHnd:
             WriteLine(lOutFil, "  Total Number of Values Distributed: " & lDistCnt)
             WriteLine(lOutFil, "  Number of Triangular Distributed Values : " & lTriDistCnt)
             WriteLine(lOutFil, "  Percentage of Triangular Distributed Values: " & lTriDistCnt / lDistCnt * 100)
+            WriteLine(lOutFil, "  Number of Triangular Distributions used for larger than 1 inch: " & lTriDistLargeCnt)
             FileClose(lOutFil)
         End If
         Array.Copy(lHrVals, 1, lDisTs.Values, 1, lDisTs.numValues)
