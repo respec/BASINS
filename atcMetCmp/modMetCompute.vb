@@ -1719,7 +1719,10 @@ Public Module modMetCompute
         Dim lDisTs As New atcTimeseries(aDataSource)
         Dim lDistCnt As Integer = 0
         Dim lTriDistCnt As Integer = 0
-        Dim lTriDistLargeCnt As Integer = 0
+        Dim lTriDist0To1Cnt As Integer = 0
+        Dim lTriDist1To2Cnt As Integer = 0
+        Dim lTriDist2To3Cnt As Integer = 0
+        Dim lTriDistGT3Cnt As Integer = 0
 
         On Error GoTo DisPrecipErrHnd
         lUsedTriang = 0
@@ -1838,7 +1841,12 @@ Public Module modMetCompute
                     'distribute using triangular distribution
                     Call DistTriang(aDyTSer.Value(lDyInd), lTmpHrVals, retcod)
                     lTriDistCnt += 1
-                    If aDyTSer.Value(lDyInd) > 1 Then lTriDistLargeCnt += 1
+                    Select Case aDyTSer.Value(lDyInd)
+                        Case Is < 1 : lTriDist0To1Cnt += 1
+                        Case Is < 2 : lTriDist1To2Cnt += 1
+                        Case Is < 3 : lTriDist2To3Cnt += 1
+                        Case Else : lTriDistGT3Cnt += 1
+                    End Select
                     For lHrInd = 1 To 24
                         lHrVals(lHrPos + lHrInd) = lTmpHrVals(lHrInd)
                     Next lHrInd
@@ -1873,15 +1881,34 @@ Public Module modMetCompute
 
 DisPrecipErrHnd:
         On Error GoTo OuttaHere 'in case there's an error in these statements
+        Array.Copy(lHrVals, 1, lDisTs.Values, 1, lDisTs.numValues)
         If lOutSumm Then
             WriteLine(lOutFil, "")
             WriteLine(lOutFil, "  Total Number of Values Distributed: " & lDistCnt)
             WriteLine(lOutFil, "  Number of Triangular Distributed Values : " & lTriDistCnt)
             WriteLine(lOutFil, "  Percentage of Triangular Distributed Values: " & lTriDistCnt / lDistCnt * 100)
-            WriteLine(lOutFil, "  Number of Triangular Distributions used for larger than 1 inch: " & lTriDistLargeCnt)
+            WriteLine(lOutFil, "    Breakdown of Triangular Distributions:")
+            WriteLine(lOutFil, "      Number used for < 1 inch: " & lTriDist0To1Cnt)
+            WriteLine(lOutFil, "      Number used for 1 to 2 inches: " & lTriDist1To2Cnt)
+            WriteLine(lOutFil, "      Number used for 2 to 3 inches: " & lTriDist2To3Cnt)
+            WriteLine(lOutFil, "      Number used for > 3 inches: " & lTriDistGT3Cnt)
+            WriteLine(lOutFil, "")
+            WriteLine(lOutFil, "  QA Checks")
+            WriteLine(lOutFil, "    Average Annual")
+            WriteLine(lOutFil, "      Original Daily:  " & SignificantDigits(aDyTSer.Attributes.GetValue("SumAnnual"), 4))
+            WriteLine(lOutFil, "      Disagged Hourly: " & SignificantDigits(lDisTs.Attributes.GetValue("SumAnnual"), 4))
+            WriteLine(lOutFil, "    Total Sum ")
+            WriteLine(lOutFil, "      Original Daily:  " & SignificantDigits(aDyTSer.Attributes.GetValue("Sum"), 6))
+            WriteLine(lOutFil, "      Disagged Hourly: " & SignificantDigits(lDisTs.Attributes.GetValue("Sum"), 6))
             FileClose(lOutFil)
         End If
-        Array.Copy(lHrVals, 1, lDisTs.Values, 1, lDisTs.numValues)
+        If aDyTSer.Attributes.GetValue("SumAnnual") - lDisTs.Attributes.GetValue("SumAnnual") > 0.1 OrElse _
+           aDyTSer.Attributes.GetValue("Sum") - lDisTs.Attributes.GetValue("Sum") > 1 Then
+            'significant difference between original and disaggregated timeseries
+            Logger.Dbg("PROBLEM: Average Annual or Total Sum values don't match between original daily and disaggregated hourly timeseries")
+            Logger.Dbg("         Average Annual - Original Daily: " & SignificantDigits(aDyTSer.Attributes.GetValue("SumAnnual"), 4) & "   Disagged Hourly: " & SignificantDigits(lDisTs.Attributes.GetValue("SumAnnual"), 4))
+            Logger.Dbg("         Total Sum      - Original Daily: " & SignificantDigits(aDyTSer.Attributes.GetValue("Sum"), 6) & "   Disagged Hourly: " & SignificantDigits(lDisTs.Attributes.GetValue("Sum"), 6))
+        End If
 
 OuttaHere:
         If lUsedTriang > 0 Then
