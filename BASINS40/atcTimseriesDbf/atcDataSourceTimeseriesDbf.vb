@@ -1,32 +1,24 @@
-Option Strict Off
-Option Explicit On
-
-Imports atcData
 Imports atcUtility
+Imports atcData
 Imports MapWinUtility
 
-Imports Microsoft.VisualBasic
-Imports System.Collections
-Imports System.IO
-
-Public Class atcDataSourceBasinsObsWQ
+Public Class atcDataSourceTimeseriesDbf
     Inherits atcDataSource
-    '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    '##MODULE_REMARKS Copyright 2007 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private Shared pFileFilter As String = "Basins Observed WQ Files (*.dbf)|*.dbf"
+    Private Shared pFileFilter As String = "DBF Files (*.dbf)|*.dbf"
     Private pErrorDescription As String
     Private pColDefs As Hashtable
-    'Private pReadAll As Boolean = False
 
     Public Overrides ReadOnly Property Description() As String
         Get
-            Return "Basins Observed Water Quality DBF"
+            Return "Timseries DBF"
         End Get
     End Property
 
     Public Overrides ReadOnly Property Name() As String
         Get
-            Return "Timeseries::BasinsObsWQ"
+            Return "Timeseries::DBF"
         End Get
     End Property
 
@@ -61,41 +53,46 @@ Public Class atcDataSourceBasinsObsWQ
             Me.Specification = aFileName
 
             Try
-                Dim lDBF As IatcTable
+                Logger.Dbg("Process:" & aFileName)
                 Dim lDateCol As Integer = -1
                 Dim lTimeCol As Integer = -1
                 Dim lLocnCol As Integer = -1
-                Dim lConsCol As Integer = -1
-                Dim lValCol As Integer = -1
+                Dim lCons As New atcCollection
                 Dim lTSKey As String
                 Dim lTSIndex As Integer
                 Dim lLocation As String = ""
                 Dim lConstituentCode As Integer = -1
-                Dim s As String
+                Dim lStr As String
+                Dim lDBF As IatcTable
                 lDBF = New atcTableDBF
                 lDBF.OpenFile(aFileName)
-                For i As Integer = 1 To lDBF.NumFields
-                    s = UCase(lDBF.FieldName(i))
-                    If s = "DATE" Then
-                        lDateCol = i
-                    ElseIf s = "TIME" Then
-                        lTimeCol = i
-                    ElseIf InStr(s, "ID") Then 'location
+                Logger.Dbg("NumFields:" & lDBF.NumFields)
+                Logger.Dbg("NumRecords:" & lDBF.NumRecords)
+
+                For lColumn As Integer = 1 To lDBF.NumFields
+                    lStr = UCase(lDBF.FieldName(lColumn))
+                    If lStr = "DATE" Then
+                        lDateCol = lColumn
+                        Logger.Dbg("DateColumn:" & lColumn)
+                    ElseIf lStr = "TIME" Then
+                        lTimeCol = lColumn
+                        Logger.Dbg("TimeColumn:" & lColumn)
+                    ElseIf InStr(lStr, "ID") Then 'location
                         If lLocnCol = -1 Then 'only use first one
                             'should be sure that field is in use here
-                            lLocnCol = i
+                            lLocnCol = lColumn
+                            Logger.Dbg("IdColumn:" & lColumn)
                         End If
-                    ElseIf s = "PARM" Then
-                        lConsCol = i
-                    ElseIf s = "VALUE" Then
-                        lValCol = i
+                    ElseIf lStr <> "SAMPLE" Then
+                        lCons.Add(lColumn, lStr)
+                        Logger.Dbg("ConstituentColumn:" & lColumn & " Name:" & lStr)
                     End If
                 Next
-                If lDateCol > 0 AndAlso lTimeCol > 0 AndAlso lLocnCol > 0 AndAlso _
-                   lConsCol > 0 AndAlso lValCol > 0 Then
+
+                If lDateCol > 0 AndAlso lTimeCol > 0 AndAlso lLocnCol > 0 Then
                     While Not lDBF.atEOF
                         lLocation = lDBF.Value(lLocnCol)
-                        lConstituentCode = lDBF.Value(lConsCol)
+                        'lConstituentCode = lDBF.Value(lConsCol)
                         lTSKey = lLocation & ":" & lConstituentCode
                         lData = DataSets.ItemByKey(lTSKey)
                         If lData Is Nothing Then
@@ -112,8 +109,8 @@ Public Class atcDataSourceBasinsObsWQ
                             DataSets.Add(lTSKey, lData)
                         End If
                         lTSIndex = lData.Attributes.GetValue("Count") + 1
-                        lData.Value(lTSIndex) = lDBF.Value(lValCol)
-                        lData.Dates.Value(lTSIndex) = parseWQObsDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
+                        'lData.Value(lTSIndex) = lDBF.Value(lValCol)
+                        lData.Dates.Value(lTSIndex) = parseDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
                         lData.Attributes.SetValue("Count", lTSIndex)
                         lDBF.MoveNext()
                     End While
@@ -123,27 +120,20 @@ Public Class atcDataSourceBasinsObsWQ
                     Open = True
                 ElseIf lDateCol < 0 Then
                     Open = False
-                    Logger.Msg("Unable to identify Date column in BASINS Observed Water Quality file " & aFileName, "BASINS Obs WQ Open")
+                    Logger.Msg("Unable to identify Date column in DBF file " & aFileName, "DBF Open")
                 ElseIf lTimeCol < 0 Then
                     Open = False
-                    Logger.Msg("Unable to identify Time column in BASINS Observed Water Quality file " & aFileName, "BASINS Obs WQ Open")
+                    Logger.Msg("Unable to identify Time column in DBF file " & aFileName, "DBF Open")
                 ElseIf lLocnCol < 0 Then
                     Open = False
-                    Logger.Msg("Unable to identify ID column in BASINS Observed Water Quality file " & aFileName, "BASINS Obs WQ Open")
-                ElseIf lConsCol < 0 Then
-                    Open = False
-                    Logger.Msg("Unable to identify Parm column in BASINS Observed Water Quality file " & aFileName, "BASINS Obs WQ Open")
-                ElseIf lValCol < 0 Then
-                    Open = False
-                    Logger.Msg("Unable to identify Value column in BASINS Observed Water Quality file " & aFileName, "BASINS Obs WQ Open")
+                    Logger.Msg("Unable to identify ID column in DBF file " & aFileName, "DBF Open")
                 End If
-            Catch endEx As EndOfStreamException
+            Catch endEx As Exception
                 Open = False
             End Try
         End If
     End Function
-
-    Private Function parseWQObsDate(ByVal aDate As String, ByVal aTime As String) As Double
+    Private Function parseDate(ByVal aDate As String, ByVal aTime As String) As Double
         'assume point values at specified time
         Dim d(5) As Integer 'date array
         Dim l As Integer 'Length of year (2 or 4 digit year)
@@ -170,5 +160,4 @@ Public Class atcDataSourceBasinsObsWQ
             Return 0
         End If
     End Function
-
 End Class
