@@ -52,66 +52,84 @@ Public Class atcDataSourceTimeseriesDbf
         Else
             Me.Specification = aFileName
 
-            Try
-                Logger.Dbg("Process:" & aFileName)
-                Dim lDateCol As Integer = -1
-                Dim lTimeCol As Integer = -1
-                Dim lLocnCol As Integer = -1
-                Dim lCons As New atcCollection
-                Dim lTSKey As String
-                Dim lTSIndex As Integer
-                Dim lLocation As String = ""
-                Dim lConstituentCode As Integer = -1
-                Dim lStr As String
-                Dim lDBF As IatcTable
-                lDBF = New atcTableDBF
-                lDBF.OpenFile(aFileName)
-                Logger.Dbg("NumFields:" & lDBF.NumFields)
-                Logger.Dbg("NumRecords:" & lDBF.NumRecords)
+            Logger.Dbg("Process:" & aFileName)
+            Dim lDateCol As Integer = -1
+            Dim lTimeCol As Integer = -1
+            Dim lLocnCol As Integer = -1
+            Dim lValueCol As Integer
+            Dim lConstituents As New atcCollection
+            Dim lTSKey As String
+            Dim lTSIndex As Integer
+            Dim lLocation As String = ""
+            Dim lConstituentName, lConstituentUnits, lValue As String
+            Dim lStr As String
+            Dim lDBF As IatcTable
+            lDBF = New atcTableDBF
+            lDBF.OpenFile(aFileName)
+            Logger.Dbg("NumFields:" & lDBF.NumFields)
+            Logger.Dbg("NumRecords:" & lDBF.NumRecords)
 
+            Try
                 For lColumn As Integer = 1 To lDBF.NumFields
                     lStr = UCase(lDBF.FieldName(lColumn))
-                    If lStr = "DATE" Then
-                        lDateCol = lColumn
-                        Logger.Dbg("DateColumn:" & lColumn)
-                    ElseIf lStr = "TIME" Then
-                        lTimeCol = lColumn
-                        Logger.Dbg("TimeColumn:" & lColumn)
-                    ElseIf InStr(lStr, "ID") Then 'location
-                        If lLocnCol = -1 Then 'only use first one
-                            'should be sure that field is in use here
-                            lLocnCol = lColumn
-                            Logger.Dbg("IdColumn:" & lColumn)
-                        End If
-                    ElseIf lStr <> "SAMPLE" Then
-                        lCons.Add(lColumn, lStr)
-                        Logger.Dbg("ConstituentColumn:" & lColumn & " Name:" & lStr)
-                    End If
+                    Select Case lStr
+                        Case "DATE"
+                            lDateCol = lColumn
+                            Logger.Dbg("DateColumn:" & lColumn)
+                        Case "TIME"
+                            lTimeCol = lColumn
+                            Logger.Dbg("TimeColumn:" & lColumn)
+                        Case "ID", "STREAM" 'location
+                            If lLocnCol = -1 Then 'only use first one
+                                'should be sure that field is in use here
+                                lLocnCol = lColumn
+                                Logger.Dbg("IdColumn:" & lColumn)
+                            End If
+                        Case "SAMPLE"
+                            'SKIP
+                        Case Else
+                            lConstituents.Add(lColumn, lStr)
+                            Logger.Dbg("ConstituentColumn:" & lColumn & " Name:" & lStr)
+                    End Select
                 Next
 
                 If lDateCol > 0 AndAlso lTimeCol > 0 AndAlso lLocnCol > 0 Then
                     While Not lDBF.atEOF
                         lLocation = lDBF.Value(lLocnCol)
-                        'lConstituentCode = lDBF.Value(lConsCol)
-                        lTSKey = lLocation & ":" & lConstituentCode
-                        lData = DataSets.ItemByKey(lTSKey)
-                        If lData Is Nothing Then
-                            lData = New atcTimeseries(Me)
-                            lData.Dates = New atcTimeseries(Me)
-                            lData.numValues = lDBF.NumRecords - lDBF.CurrentRecord + 1
-                            lData.Value(0) = Double.NaN
-                            lData.Dates.Value(0) = Double.NaN
-                            lData.Attributes.SetValue("Count", 0)
-                            lData.Attributes.SetValue("Scenario", "OBSERVED")
-                            lData.Attributes.SetValue("Location", lLocation)
-                            lData.Attributes.SetValue("Constituent", lConstituentCode)
-                            lData.Attributes.SetValue("Point", True)
-                            DataSets.Add(lTSKey, lData)
-                        End If
-                        lTSIndex = lData.Attributes.GetValue("Count") + 1
-                        'lData.Value(lTSIndex) = lDBF.Value(lValCol)
-                        lData.Dates.Value(lTSIndex) = parseDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
-                        lData.Attributes.SetValue("Count", lTSIndex)
+                        For lConstituentIndex As Integer = 0 To lConstituents.Count - 1
+                            lValueCol = lConstituents.Keys(lConstituentIndex)
+                            lStr = lDBF.Value(lValueCol)
+                            If lStr.Length > 0 Then
+                                lConstituentUnits = lConstituents.Item(lConstituentIndex)
+                                lConstituentUnits = lConstituentUnits.Replace(")", "")
+                                lConstituentName = StrSplit(lConstituentUnits, "_(", "'")
+                                lTSKey = lLocation & ":" & lConstituentName
+                                lData = DataSets.ItemByKey(lTSKey)
+                                If lData Is Nothing Then 'create new timseries dataset
+                                    lData = New atcTimeseries(Me)
+                                    lData.Dates = New atcTimeseries(Me)
+                                    lData.numValues = lDBF.NumRecords - lDBF.CurrentRecord + 1
+                                    lData.Value(0) = Double.NaN
+                                    lData.Dates.Value(0) = Double.NaN
+                                    lData.Attributes.SetValue("Count", 0)
+                                    lData.Attributes.SetValue("Scenario", "OBSERVED")
+                                    lData.Attributes.SetValue("Location", lLocation)
+                                    lData.Attributes.SetValue("Constituent", lConstituentName)
+                                    lData.Attributes.SetValue("Units", lConstituentUnits)
+                                    lData.Attributes.SetValue("Point", True)
+                                    DataSets.Add(lTSKey, lData)
+                                End If
+                                lTSIndex = lData.Attributes.GetValue("Count") + 1
+                                lValue = lDBF.Value(lValueCol)
+                                If IsNumeric(lValue) Then
+                                    lData.Value(lTSIndex) = lValue
+                                    lData.Dates.Value(lTSIndex) = parseDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
+                                    lData.Attributes.SetValue("Count", lTSIndex)
+                                Else
+
+                                End If
+                            End If
+                        Next
                         lDBF.MoveNext()
                     End While
                     For Each lData In DataSets
@@ -133,31 +151,24 @@ Public Class atcDataSourceTimeseriesDbf
             End Try
         End If
     End Function
-    Private Function parseDate(ByVal aDate As String, ByVal aTime As String) As Double
-        'assume point values at specified time
-        Dim d(5) As Integer 'date array
-        Dim l As Integer 'Length of year (2 or 4 digit year)
-        Dim i As Integer 'Year offset (1900 for 2-digit year)
 
-        If Not IsNumeric(aTime) Then aTime = "1200" 'assume noon for missing obstime
-        If IsNumeric(aDate) Then
-            If Len(aDate) = 8 Then ' 4 dig yr
-                l = 4
-                i = 0
-            Else
-                l = 2
-                i = 1900
-            End If
-            d(0) = Left(aDate, l) + i
-            d(1) = Mid(aDate, l + 1, 2)
-            d(2) = Right(aDate, 2)
-            If IsNumeric(aTime) Then
-                d(3) = Left(aTime, 2)
-                d(4) = Right(aTime, 2)
-            End If
-            Return Date2J(d)
-        Else
-            Return 0
+    Private Function parseDate(ByVal aDate As String, ByVal aTime As String) As Double
+        Dim lDate As Date
+        Dim lHour As Integer, lMinute As Integer
+        Dim lTime As String
+
+        lTime = aTime
+        If lTime.Length = 0 Then
+            lTime = "0:0"
+        ElseIf lTime.IndexOf(":") = -1 Then
+            lTime = lTime.PadLeft(4, "0")
+            lTime = lTime.Insert(2, ":")
         End If
+        lHour = StrSplit(lTime, ":", "'")
+        lMinute = lTime
+        lDate = Date.Parse(aDate)
+        lDate = lDate.AddHours(lHour)
+        lDate = lDate.AddMinutes(lMinute)
+        Return lDate.ToOADate
     End Function
 End Class
