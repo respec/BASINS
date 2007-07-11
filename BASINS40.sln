@@ -72,6 +72,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUCI", "atcUCI\atcUCI.vbp
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGisUtiliies", "atcGisUtilities\atcGisUtiliies.vbproj", "{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimseriesDbf", "atcTimseriesDbf\atcTimseriesDbf.vbproj", "{F05FE01B-E35C-4444-B5A2-47085D073631}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -221,6 +223,10 @@ Global
 		{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F05FE01B-E35C-4444-B5A2-47085D073631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F05FE01B-E35C-4444-B5A2-47085D073631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F05FE01B-E35C-4444-B5A2-47085D073631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F05FE01B-E35C-4444-B5A2-47085D073631}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
