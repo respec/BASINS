@@ -154,10 +154,15 @@ Friend Class atcFrequencyGridSource
                                 'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
                             End Try
                         End If
-
-                        CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
+                        Dim lNdayAttribute As atcDefinedValue = lDataSet.Attributes.GetDefinedValue(lAttrName)
+                        Dim lNdayTs As atcTimeseries = lNdayAttribute.Arguments.GetValue("NDayTimeseries")
+                        If lNdayTs.Attributes.ContainsAttribute("NDayTimeseries") Then 'find non-log version
+                            Dim lNdayTsNonLog As atcTimeseries = lNdayTs.Attributes.GetValue("NDayTimeseries")
+                            CellValue = lNdayTsNonLog.Attributes.GetFormattedValue(lAttrName)
+                        Else
+                            CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
+                        End If
                         If CellValue = "NaN" Then CellValue = ""
-
                 End Select
             End If
         End Get
