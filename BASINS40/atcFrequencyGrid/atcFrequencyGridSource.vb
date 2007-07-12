@@ -154,15 +154,10 @@ Friend Class atcFrequencyGridSource
                                 'LogDbg(Me.Name & " Could not calculate value at row " & aRow & ", col " & aColumn & ". " & e.ToString)
                             End Try
                         End If
-                        Dim lNdayAttribute As atcDefinedValue = lDataSet.Attributes.GetDefinedValue(lAttrName)
-                        Dim lNdayTs As atcTimeseries = lNdayAttribute.Arguments.GetValue("NDayTimeseries")
-                        If lNdayTs.Attributes.ContainsAttribute("NDayTimeseries") Then 'find non-log version
-                            Dim lNdayTsNonLog As atcTimeseries = lNdayTs.Attributes.GetValue("NDayTimeseries")
-                            CellValue = lNdayTsNonLog.Attributes.GetFormattedValue(lAttrName)
-                        Else
-                            CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
-                        End If
+
+                        CellValue = lDataSet.Attributes.GetFormattedValue(lAttrName)
                         If CellValue = "NaN" Then CellValue = ""
+
                 End Select
             End If
         End Get
@@ -204,7 +199,11 @@ Friend Class atcFrequencyGridSource
                 Dim lAttrName As String = lNdays
                 If pHigh Then lAttrName &= "High" Else lAttrName &= "Low"
                 Dim lNdayAttribute As atcDefinedValue = lAttributes.GetDefinedValue(lAttrName & pRecurrence.GetByIndex(0))
-                lAllNday.Add(lNdayAttribute.Arguments.GetValue("NDayTimeseries"))
+                Dim lNdayTs As atcTimeseries = lNdayAttribute.Arguments.GetValue("NDayTimeseries")
+                If lNdayTs.Attributes.ContainsAttribute("NDayTimeseries") Then 'find non-log version
+                    lNdayTs = lNdayTs.Attributes.GetValue("NDayTimeseries")
+                End If
+                lAllNday.Add(lNdayTs)
             Next
         Next
         Return lAllNday
