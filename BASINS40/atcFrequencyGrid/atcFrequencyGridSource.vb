@@ -234,7 +234,11 @@ Friend Class atcFrequencyGridSource
                     Else
                         lNdayTsNonLog = lNdayTs
                     End If
-                    Dim lLocation As String = lAttributes.GetValue("STAID", "") & " " & lAttributes.GetValue("STANAM", "")
+                    Dim lLocation As String = lAttributes.GetValue("STAID", "")
+                    If lLocation.Length = 0 Then'use Location attribute for start of location header
+                        lLocation = lAttributes.GetValue("Location", "")
+                    End If
+                    lLocation &= " " & lAttributes.GetValue("STANAM", "")
                     lStartDate = Date.FromOADate(lNdayTs.Dates.Value(0))
                     lStartDateAnnual = Date.FromOADate(lNdayTs.Dates.Value(1))
                     lEndDate = Date.FromOADate(lNdayTs.Dates.Value(lNdayTs.numValues))
