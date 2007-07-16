@@ -206,8 +206,14 @@ Public Class atcTimeseriesStatistics
             End If
 
             If Not aTimeseries.Dates Is Nothing AndAlso aTimeseries.Dates.Values.GetLength(0) > 0 Then
-                aTimeseries.Attributes.SetValue("SJDay", aTimeseries.Dates.Value(0))
-                aTimeseries.Attributes.SetValue("EJDay", aTimeseries.Dates.Value(lLastValueIndex))
+                With aTimeseries.Dates
+                    If Double.IsNaN(.Value(0)) Then
+                        aTimeseries.Attributes.SetValue("SJDay", .Value(1))
+                    Else
+                        aTimeseries.Attributes.SetValue("SJDay", .Value(0))
+                    End If
+                    aTimeseries.Attributes.SetValue("EJDay", .Value(lLastValueIndex))
+                End With
             End If
 
             If lCount > 1 Then
