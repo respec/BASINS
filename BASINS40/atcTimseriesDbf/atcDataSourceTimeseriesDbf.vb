@@ -111,6 +111,7 @@ Public Class atcDataSourceTimeseriesDbf
                                     lData.numValues = lDBF.NumRecords - lDBF.CurrentRecord + 1
                                     lData.Value(0) = Double.NaN
                                     lData.Dates.Value(0) = Double.NaN
+                                    lData.Attributes.SetValue("ID", DataSets.Count + 1)
                                     lData.Attributes.SetValue("Count", 0)
                                     lData.Attributes.SetValue("Scenario", "OBSERVED")
                                     lData.Attributes.SetValue("Location", lLocation)
@@ -126,7 +127,10 @@ Public Class atcDataSourceTimeseriesDbf
                                     lData.Dates.Value(lTSIndex) = parseDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
                                     lData.Attributes.SetValue("Count", lTSIndex)
                                 Else
-
+                                    'TODO: handle non numeric values somehow!
+                                    lData.Value(lTSIndex) = Double.NaN
+                                    lData.Dates.Value(lTSIndex) = parseDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
+                                    lData.Attributes.SetValue("Count", lTSIndex)
                                 End If
                             End If
                         Next
