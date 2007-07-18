@@ -5,7 +5,6 @@ Imports MapWinUtility
 Public Module modCAT
     <CLSCompliant(False)> _
     Friend g_MapWin As MapWindow.Interfaces.IMapWin
-    Friend g_DataManager As atcDataManager
     Friend g_running As Boolean = False
 
     ''' <summary>

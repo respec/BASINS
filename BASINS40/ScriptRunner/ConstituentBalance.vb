@@ -56,12 +56,8 @@ Public Module ScriptConstituentBalance
         lOperations.Add("I:", "IMPLND")
         lOperations.Add("R:", "RCHRES")
 
-        'declare a new data manager to manage the hbn files
-        Dim lDataManager As New atcDataManager(aMapWin)
-
         'loop thru each scenario (uci name)
         For Each lScenario As String In lScenarios
-
             'open the corresponding hbn file
             Dim lHspfBinFile As atcDataSource = New atcHspfBinOut.atcTimeseriesFileHspfBinOut
             Dim lHspfBinFileName As String = lScenario & ".hbn"
@@ -72,18 +68,18 @@ Public Module ScriptConstituentBalance
                 Logger.Dbg("  NameUpdated " & lHspfBinFileName)
             End If
             Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-            lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
+            atcDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
             Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
             'build collection of locations to report (hspf operations)
-            Dim lLocations As atcCollection = lDataManager.DataSets.SortedAttributeValues("Location")
+            Dim lLocations As atcCollection = atcDataManager.DataSets.SortedAttributeValues("Location")
             Logger.Dbg(" LocationCount " & lLocations.Count)
 
             'call main constituent balances routine
             DoConstituentBalances(lOperations, lConstituents, lScenario, lHspfBinFile, lLocations, lHspfBinFileInfo.LastWriteTime)
 
             'clean up 
-            lDataManager.DataSources.Remove(lHspfBinFile)
+            atcDataManager.DataSources.Remove(lHspfBinFile)
             lHspfBinFile.DataSets.Clear()
             lHspfBinFile = Nothing
 

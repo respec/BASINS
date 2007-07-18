@@ -130,19 +130,16 @@ Friend Class frmDataSource
 
 #End Region
 
-    Private pDataManager As atcDataManager
     Private pCategories As ArrayList
     Private pSelectedSource As atcDataSource
     Private pSpecification As String
     'Private Const NO_DISPLAY As String = "No Display"
     'Private pDisplayPlugins As ICollection
 
-    Public Sub AskUser(ByVal aDataManager As atcDataManager, _
-                       ByRef aSelectedSource As atcDataSource, _
+    Public Sub AskUser(ByRef aSelectedSource As atcDataSource, _
                        ByRef aNeedToOpen As Boolean, _
                        ByRef aNeedToSave As Boolean, _
               Optional ByVal aCategories As ArrayList = Nothing)
-        pDataManager = aDataManager
         pSelectedSource = aSelectedSource
         If Not aSelectedSource Is Nothing Then pSpecification = aSelectedSource.Specification
         pCategories = aCategories
@@ -158,24 +155,13 @@ Friend Class frmDataSource
         aSelectedSource = pSelectedSource
         If Not aSelectedSource Is Nothing Then
             aSelectedSource.Specification = pSpecification
-            'If Not cboDisplay.Text.Equals(NO_DISPLAY) Then
-            '  For Each lDisp As atcDataDisplay In pDisplayPlugins
-            '    Dim lName As String = lDisp.Name
-            '    Dim iColon As Integer = lName.IndexOf("::")
-            '    If iColon > 0 Then lName = lName.Substring(iColon + 2)
-            '    If cboDisplay.Text.Equals(lName) Then
-            '      lDisp.Show(pDataManager, aSelectedSource.DataSets)
-            '    End If
-            '  Next
-            'End If
         End If
-        pDataManager = Nothing
         pCategories = Nothing
         pSelectedSource = Nothing
     End Sub
 
     'Private Sub PopulateDisplays()
-    '  pDisplayPlugins = pDataManager.GetPlugins(GetType(atcDataDisplay))
+    '  pDisplayPlugins = atcDataManager.GetPlugins(GetType(atcDataDisplay))
     '  cboDisplay.Items.Clear()
     '  cboDisplay.Items.Add(NO_DISPLAY)
     '  For Each lDisp As atcDataDisplay In pDisplayPlugins
@@ -192,7 +178,7 @@ Friend Class frmDataSource
     Private Sub Populate(ByRef aNeedToOpen As Boolean, _
                          ByRef aNeedToSave As Boolean)
         Dim lNode As Forms.TreeNode
-        Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
+        Dim lDataSources As atcCollection = atcDataManager.GetPlugins(GetType(atcDataSource))
         If lDataSources.Count = 0 Then
             treeSources.Nodes.Add("No data source plugins are loaded")
         Else
@@ -302,7 +288,7 @@ Friend Class frmDataSource
     End Sub
 
     Private Function GetSource(ByVal aSourceName As String, ByVal aOperationName As String) As Boolean
-        For Each ds As atcDataSource In pDataManager.GetPlugins(GetType(atcDataSource))
+        For Each ds As atcDataSource In atcDataManager.GetPlugins(GetType(atcDataSource))
             If ds.Name = aSourceName Then
                 Dim lOperations As atcDataAttributes = ds.AvailableOperations
                 If lOperations.Count > 0 Then

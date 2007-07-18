@@ -12,9 +12,7 @@ Public Class atcClimateAssessmentToolPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(ByVal aManager As atcDataManager, _
-                     Optional ByVal aGroup As atcDataGroup = Nothing) As Object
-        g_DataManager = aManager
+    Public Overrides Function Show(Optional ByVal aGroup As atcDataGroup = Nothing) As Object
         pForm = New frmCAT
         pForm.Initialize(Me)
         Return pForm

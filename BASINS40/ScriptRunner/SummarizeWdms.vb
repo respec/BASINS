@@ -7,8 +7,8 @@ Imports atcData
 Imports atcSeasons
 
 Public Module ScriptSummarizeWdms
-    'Private Const pInputPath As String = "D:\GisData\CBP\prad\ns611a"
-    Private Const pInputPath As String = "D:\GisData\CBP\met\8405"
+    Private Const pInputPath As String = "D:\GisData\CBP\prad\ns611a"
+    'Private Const pInputPath As String = "D:\GisData\CBP\met\8405"
     Private Const pFormat As String = "#,##0.00"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
@@ -31,7 +31,7 @@ Public Module ScriptSummarizeWdms
                            "Constituent" & vbTab & _
                            "Value" & vbTab & _
                            "StartDate" & vbTab & _
-                           "EndDate" & _
+                           "EndDate" & vbTab & _
                            "Count" & vbTab & _
                            "File")
 
@@ -48,7 +48,7 @@ Public Module ScriptSummarizeWdms
                 Dim lCons As String = lDS.Attributes.GetValue("Constituent")
                 'Dim lScenario As String = lDS.Attributes.GetValue("Scenario")
                 'special case for cbp
-                Dim lScenario As String = lFile.Replace(pInputPath.ToLower, "").Replace("\" & lWDMName & ".wdm", "")
+                Dim lScenario As String = lFile.Replace(pInputPath.ToLower, "").Replace(lWDMName & ".wdm", "").Replace("\", "")
                 If lScenario.Length = 0 Then lScenario = "base"
 
                 Dim lValue As String

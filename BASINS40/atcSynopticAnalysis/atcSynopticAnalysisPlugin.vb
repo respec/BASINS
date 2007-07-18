@@ -29,22 +29,20 @@ Public Class atcSynopticAnalysisPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(ByVal aDataManager As atcDataManager, _
-                     Optional ByVal aDataGroup As atcDataGroup = Nothing) _
-                     As Object 'System.Windows.Forms.Form
+    Public Overrides Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) _
+                                   As Object 'System.Windows.Forms.Form
 
         Dim lForm As New frmSynoptic
-        lForm.Initialize(aDataManager, aDataGroup)
+        lForm.Initialize(aDataGroup)
         Return lForm
     End Function
 
-    Public Overrides Sub Save(ByVal aDataManager As atcDataManager, _
-                    ByVal aDataGroup As atcDataGroup, _
-                    ByVal aFileName As String, _
-                    ByVal ParamArray aOptions() As String)
+    Public Overrides Sub Save(ByVal aDataGroup As atcDataGroup, _
+                              ByVal aFileName As String, _
+                              ByVal ParamArray aOptions() As String)
 
         Dim lForm As New frmSynoptic
-        lForm.Initialize(aDataManager, aDataGroup)
+        lForm.Initialize(aDataGroup)
         lForm.Hide()
 
         Dim lReport As New IO.StreamWriter(aFileName)

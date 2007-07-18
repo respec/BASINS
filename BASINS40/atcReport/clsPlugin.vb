@@ -141,7 +141,7 @@ Public Class PlugIn
         End Set
     End Property
 
-    Public Overrides Function Show(ByVal aDataManager As atcData.atcDataManager, Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
+    Public Overrides Function Show(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
         GisUtil.MappingObject = pMapWin
         Dim lFrmReport As New frmReport
         lFrmReport.InitializeUI(Me)
@@ -149,8 +149,8 @@ Public Class PlugIn
         Return lFrmReport
     End Function
 
-    Public Overrides Sub Save(ByVal aDataManager As atcData.atcDataManager, ByVal aDataGroup As atcData.atcDataGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
-        Dim lFrmReport As frmReport = Show(aDataManager, aDataGroup)
+    Public Overrides Sub Save(ByVal aDataGroup As atcData.atcDataGroup, ByVal aFileName As String, ByVal ParamArray aOption() As String)
+        Dim lFrmReport As frmReport = Show(aDataGroup)
         lFrmReport.InitializeUI(Me)
         SaveFileString(aFileName, lFrmReport.ToString)
         lFrmReport.Close()

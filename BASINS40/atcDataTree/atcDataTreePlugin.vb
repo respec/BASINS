@@ -9,8 +9,7 @@ Public Class atcDataTreePlugin
         End Get
     End Property
 
-    Public Overrides Function Show(ByVal aDataManager As atcDataManager, _
-                     Optional ByVal aDataGroup As atcDataGroup = Nothing) _
+    Public Overrides Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) _
                      As Object 'System.Windows.Forms.Form
         Dim lDataGroup As atcDataGroup = aDataGroup
 
@@ -18,7 +17,7 @@ Public Class atcDataTreePlugin
             lDataGroup = New atcDataGroup
         End If
 
-        Dim lForm As New atcDataTreeForm(aDataManager, lDataGroup)
+        Dim lForm As New atcDataTreeForm(lDataGroup)
         If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
             lForm.Show()
             Return lForm
@@ -28,11 +27,10 @@ Public Class atcDataTreePlugin
         End If
     End Function
 
-    Public Overrides Sub Save(ByVal aDataManager As atcDataManager, _
-                    ByVal aDataGroup As atcDataGroup, _
-                    ByVal aFileName As String, _
-                    ByVal ParamArray aOption() As String)
-        Dim lForm As New atcDataTreeForm(aDataManager, aDataGroup)
+    Public Overrides Sub Save(ByVal aDataGroup As atcDataGroup, _
+                              ByVal aFileName As String, _
+                              ByVal ParamArray aOption() As String)
+        Dim lForm As New atcDataTreeForm(aDataGroup)
         With lForm
             .TreeAction(aOption)
             .Save(aFileName)

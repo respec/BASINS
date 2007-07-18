@@ -184,8 +184,6 @@ Friend Class atcListForm
 
 #End Region
 
-    Private pDataManager As atcDataManager
-
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcDataGroup
 
@@ -194,12 +192,9 @@ Friend Class atcListForm
     Private pDisplayAttributes As ArrayList
     Private pSwapperSource As atcControls.atcGridSourceRowColumnSwapper
 
-    Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
-                 Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing, _
-                 Optional ByVal aDisplayAttributes As ArrayList = Nothing, _
-                 Optional ByVal aShowValues As Boolean = True)
-        pDataManager = aDataManager
-
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing, _
+                          Optional ByVal aDisplayAttributes As ArrayList = Nothing, _
+                          Optional ByVal aShowValues As Boolean = True)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcDataGroup
         Else
@@ -207,12 +202,12 @@ Friend Class atcListForm
         End If
 
         If aDisplayAttributes Is Nothing Then
-            pDisplayAttributes = pDataManager.DisplayAttributes
+            pDisplayAttributes = atcDataManager.DisplayAttributes
         Else
             pDisplayAttributes = aDisplayAttributes
         End If
 
-        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
         For Each lDisp As atcDataDisplay In DisplayPlugins
             Dim lMenuText As String = lDisp.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
@@ -220,7 +215,7 @@ Friend Class atcListForm
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataManager.UserSelectData(, pDataGroup, True)
+            atcDataManager.UserSelectData(, pDataGroup, True)
         End If
 
         If pDataGroup.Count > 0 Then
@@ -235,7 +230,7 @@ Friend Class atcListForm
 
     Private Sub PopulateGrid()
         Dim lTotalWidth As Integer = 10
-        pSource = New atcTimeseriesGridSource(pDataManager, pDataGroup, pDisplayAttributes, mnuViewValues.Checked)
+        pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes, mnuViewValues.Checked)
         pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
         pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
         agdMain.Initialize(pSwapperSource)
@@ -257,7 +252,7 @@ Friend Class atcListForm
     End Function
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        pDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
@@ -271,7 +266,6 @@ Friend Class atcListForm
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        pDataManager = Nothing
         pDataGroup = Nothing
         pSource = Nothing
     End Sub
@@ -315,13 +309,13 @@ Friend Class atcListForm
             End Select
         Next
         lAvailable.Sort()
-        If lst.AskUser(lAvailable, pDataManager.DisplayAttributes) Then
+        If lst.AskUser(lAvailable, atcDataManager.DisplayAttributes) Then
             PopulateGrid()
         End If
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataManager.UserSelectData(, pDataGroup, False)
+        atcDataManager.UserSelectData(, pDataGroup, False)
     End Sub
 
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click

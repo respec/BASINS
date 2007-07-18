@@ -20,9 +20,6 @@ Public Class atcGraphForm
     'Form object that contains graph(s)
     Private pMaster As ZedGraph.MasterPane
 
-    'All the currently open files
-    Private pDataManager As atcData.atcDataManager
-
     'Graph editing form
     Private WithEvents pEditor As frmGraphEdit
 
@@ -99,27 +96,24 @@ Public Class atcGraphForm
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
-          Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+    Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
 
         SetStyle(ControlStyles.DoubleBuffer Or ControlStyles.UserPaint Or ControlStyles.AllPaintingInWmPaint, True)
 
-        pDataManager = aDataManager
-
         Dim lTempDataGroup As atcDataGroup = aDataGroup
         If aDataGroup Is Nothing Then lTempDataGroup = New atcDataGroup
 
         If lTempDataGroup.Count = 0 Then 'ask user to specify some Data
-            pDataManager.UserSelectData(, lTempDataGroup, True)
+            atcDataManager.UserSelectData(, lTempDataGroup, True)
         End If
 
         If lTempDataGroup.Count > 0 Then
             pDataGroup = lTempDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
             InitMasterPane()
 
-            Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+            Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
             For Each lDisp As atcDataDisplay In DisplayPlugins
                 Dim lMenuText As String = lDisp.Name
                 If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
@@ -274,7 +268,7 @@ Public Class atcGraphForm
     End Property
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataManager.UserSelectData(, pDataGroup, False)
+        atcDataManager.UserSelectData(, pDataGroup, False)
     End Sub
 
     Private Sub mnuFileSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFileSave.Click
@@ -471,7 +465,7 @@ Public Class atcGraphForm
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        pDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
@@ -480,7 +474,6 @@ Public Class atcGraphForm
             pEditor = Nothing
         End If
         pMaster = Nothing
-        pDataManager = Nothing
         pDataGroup = Nothing
     End Sub
 

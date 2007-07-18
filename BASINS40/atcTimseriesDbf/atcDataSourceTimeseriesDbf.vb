@@ -63,6 +63,12 @@ Public Class atcDataSourceTimeseriesDbf
             Dim lLocation As String = ""
             Dim lConstituentName, lConstituentUnits, lValue As String
             Dim lStr As String
+
+            Dim lDate As Double
+            Dim lDateFormat As New atcDateFormat
+            lDateFormat.IncludeHours = True
+            lDateFormat.IncludeMinutes = True
+
             Dim lDBF As IatcTable
             lDBF = New atcTableDBF
             lDBF.OpenFile(aFileName)
@@ -122,14 +128,21 @@ Public Class atcDataSourceTimeseriesDbf
                                 End If
                                 lTSIndex = lData.Attributes.GetValue("Count") + 1
                                 lValue = lDBF.Value(lValueCol)
+                                lDate = parseDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
+                                If lValue.IndexOf("<") >= 0 Then
+                                    'Logger.Dbg("RemoveLessThan " & lTSKey & " " & lDateFormat.JDateToString(lDate) & " '" & lValue & "'")
+                                    lValue = lValue.Replace("<", "")
+                                    lData.ValueAttributes(lTSIndex).SetValueIfMissing("Conditional", "<")
+                                End If
                                 If IsNumeric(lValue) Then
                                     lData.Value(lTSIndex) = lValue
-                                    lData.Dates.Value(lTSIndex) = parseDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
+                                    lData.Dates.Value(lTSIndex) = lDate
                                     lData.Attributes.SetValue("Count", lTSIndex)
                                 Else
-                                    'TODO: handle non numeric values somehow!
+                                    'TODO: handle other numeric values somehow!
+                                    Logger.Dbg("NonNumericValue " & lTSKey & " " & lDateFormat.JDateToString(lDate) & " '" & lValue & "'")
                                     lData.Value(lTSIndex) = Double.NaN
-                                    lData.Dates.Value(lTSIndex) = parseDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
+                                    lData.Dates.Value(lTSIndex) = lDate
                                     lData.Attributes.SetValue("Count", lTSIndex)
                                 End If
                             End If

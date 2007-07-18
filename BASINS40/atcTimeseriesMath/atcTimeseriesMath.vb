@@ -188,7 +188,6 @@ Public Class atcTimeseriesMath
     'Args are each usually either Double or atcTimeseries
     Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim newDataSource As New atcDataSource
-        newDataSource.DataManager = DataManager
         newDataSource.Specification = "Computed by " & pName
         Dim newVals() As Double
         'Dim retval As New atcTimeseries(newDataSource)
@@ -239,7 +238,7 @@ Public Class atcTimeseriesMath
         If needToAsk Then
             'Ask user what to do
             Dim lSpecify As New frmSpecifyComputation
-            If Not lSpecify.AskUser(DataManager, aArgs) Then
+            If Not lSpecify.AskUser(aArgs) Then
                 Return False 'User cancelled
             End If
         End If

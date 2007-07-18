@@ -16,12 +16,14 @@ Friend Class frmSelectData
 
         pMatchingGrid.AllowHorizontalScrolling = False
         pSelectedGrid.AllowHorizontalScrolling = False
+        AddHandler atcDataManager.OpenedData, AddressOf OpenedData
 
     End Sub
 
     'Form overrides dispose to clean up the component list.
     Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
         If disposing Then
+            RemoveHandler atcDataManager.OpenedData, AddressOf OpenedData
             If Not (components Is Nothing) Then
                 components.Dispose()
             End If
@@ -274,8 +276,6 @@ Friend Class frmSelectData
     Private plstCriteria() As atcGrid
     Private pCriteriaFraction() As Single
 
-    Private WithEvents pDataManager As atcDataManager
-
     Private pMatchingGroup As atcDataGroup
     Private pSelectedGroup As atcDataGroup
     Private pSaveGroup As atcDataGroup = Nothing
@@ -289,7 +289,7 @@ Friend Class frmSelectData
 
     Private pTotalTS As Integer
 
-    Public Function AskUser(ByVal aDataManager As atcDataManager, Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
+    Public Function AskUser(Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
         If aGroup Is Nothing Then
             pSelectedGroup = New atcDataGroup
         Else
@@ -297,12 +297,10 @@ Friend Class frmSelectData
             pSelectedGroup = aGroup
         End If
 
-        pDataManager = aDataManager
-
         pMatchingGroup = New atcDataGroup
-        pMatchingSource = New GridSource(pDataManager, pMatchingGroup)
+        pMatchingSource = New GridSource(pMatchingGroup)
         pMatchingSource.SelectedItems = pSelectedGroup
-        pSelectedSource = New GridSource(pDataManager, pSelectedGroup)
+        pSelectedSource = New GridSource(pSelectedGroup)
 
         pMatchingGrid.Initialize(pMatchingSource)
         pSelectedGrid.Initialize(pSelectedSource)
@@ -337,7 +335,7 @@ Friend Class frmSelectData
         ReDim plstCriteria(0)
         ReDim pCriteriaFraction(0)
 
-        For Each lAttribName As String In pDataManager.SelectionAttributes
+        For Each lAttribName As String In atcDataManager.SelectionAttributes
             AddCriteria(lAttribName)
         Next
 
@@ -368,7 +366,7 @@ Friend Class frmSelectData
                             lCalculatedItems.Insert(lItemIndex, lName, lName)
                         End If
                     Else
-                        Dim lAttributeValues As atcCollection = pDataManager.DataSets.SortedAttributeValues(lName, NOTHING_VALUE)
+                        Dim lAttributeValues As atcCollection = atcDataManager.DataSets.SortedAttributeValues(lName, NOTHING_VALUE)
                         If lAttributeValues.Count > 1 OrElse (lAttributeValues.Count = 1 AndAlso Not lAttributeValues.Item(0).Equals(NOTHING_VALUE)) Then
                             lItemIndex = lNotCalculatedItems.BinarySearchForKey(lName)
                             If lItemIndex = lNotCalculatedItems.Count OrElse lNotCalculatedItems.Keys.Item(lItemIndex) <> lName Then
@@ -408,7 +406,7 @@ Friend Class frmSelectData
             lSortedItems = New atcCollection
         Else
             aList.Visible = False
-            lSortedItems = pDataManager.DataSets.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
+            lSortedItems = atcDataManager.DataSets.SortedAttributeValues(aAttributeName, NOTHING_VALUE)
         End If
 
         With aList
@@ -429,7 +427,7 @@ Friend Class frmSelectData
         Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
         pMatchingGroup.Clear()
         pTotalTS = 0
-        For Each ts As atcDataSet In pDataManager.DataSets
+        For Each ts As atcDataSet In atcDataManager.DataSets
             pTotalTS += 1
             For iCriteria As Integer = 0 To iLastCriteria
                 Dim attrName As String = pcboCriteria(iCriteria).SelectedItem
@@ -686,7 +684,7 @@ NextName:
         ' but either narrowed the matching group or there are not more than 10 datasets,
         ' assume they meant to select all the matching datasets
         If pSelectedGroup.Count = 0 AndAlso _
-          (pMatchingGroup.Count < pDataManager.DataSets.Count OrElse pMatchingGroup.Count < 11) Then
+          (pMatchingGroup.Count < atcDataManager.DataSets.Count OrElse pMatchingGroup.Count < 11) Then
             pSelectedGroup.ChangeTo(pMatchingGroup)
         End If
         pSelectedOK = True
@@ -710,8 +708,8 @@ NextName:
             End If
         Next
         If curAttributes.Count > 0 Then
-            pDataManager.SelectionAttributes.Clear()
-            pDataManager.SelectionAttributes.AddRange(curAttributes)
+            atcDataManager.SelectionAttributes.Clear()
+            atcDataManager.SelectionAttributes.AddRange(curAttributes)
         End If
     End Sub
 
@@ -759,7 +757,7 @@ NextName:
         End If
     End Sub
 
-    Private Sub pDataManager_OpenedData(ByVal aDataSource As atcDataSource) Handles pDataManager.OpenedData
+    Private Sub OpenedData(ByVal aDataSource As atcDataSource)
         Populate()
     End Sub
 
@@ -815,7 +813,7 @@ NextName:
     End Sub
 
     Private Sub mnuFileManage_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileManage.Click
-        pDataManager.UserManage() ' .OpenData("")
+        atcDataManager.UserManage() ' .OpenData("")
     End Sub
 
     Private Sub mnuRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -829,15 +827,15 @@ NextName:
     End Sub
 
     Private Sub mnuOpenData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpenData.Click
-        Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource
+        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource
         If Not lNewSource Is Nothing Then
-            pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+            atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
         End If
     End Sub
 
     Private Sub mnuSelectAll_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectAll.Click
         Dim lAdd As New atcCollection
-        For Each ts As atcDataSet In pDataManager.DataSets
+        For Each ts As atcDataSet In atcDataManager.DataSets
             If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
         Next
         If lAdd.Count > 0 Then
@@ -851,7 +849,6 @@ NextName:
     End Sub
 
     Private Sub frmSelectData_Closed(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Closed
-        pDataManager = Nothing
         pMatchingGroup = Nothing
         pSaveGroup = Nothing
         pMatchingSource = Nothing
@@ -870,7 +867,6 @@ Friend Class GridSource
     '-1 to not label columns
     Private Const LabelRow As Integer = -1
 
-    Private pDataManager As atcDataManager
     Private pDataGroup As atcDataGroup
     Private pSelected As atcCollection
 
@@ -883,15 +879,13 @@ Friend Class GridSource
         End Set
     End Property
 
-    Sub New(ByVal aDataManager As atcData.atcDataManager, _
-            ByVal aDataGroup As atcData.atcDataGroup)
-        pDataManager = aDataManager
+    Sub New(ByVal aDataGroup As atcData.atcDataGroup)
         pDataGroup = aDataGroup
     End Sub
 
     Overrides Property Columns() As Integer
         Get
-            Return pDataManager.SelectionAttributes.Count() + 1
+            Return atcDataManager.SelectionAttributes.Count() + 1
         End Get
         Set(ByVal Value As Integer)
         End Set
@@ -911,12 +905,12 @@ Friend Class GridSource
                 If aColumn = 0 Then
                     Return ""
                 Else
-                    Return pDataManager.SelectionAttributes(aColumn - 1)
+                    Return atcDataManager.SelectionAttributes(aColumn - 1)
                 End If
             ElseIf aColumn = 0 Then
                 Return pDataGroup(aRow - (LabelRow + 1)).Serial()
             Else
-                Return pDataGroup(aRow - (LabelRow + 1)).Attributes.GetFormattedValue(pDataManager.SelectionAttributes(aColumn - 1))
+                Return pDataGroup(aRow - (LabelRow + 1)).Attributes.GetFormattedValue(atcDataManager.SelectionAttributes(aColumn - 1))
             End If
         End Get
         Set(ByVal Value As String)
@@ -926,7 +920,7 @@ Friend Class GridSource
     Overrides Property Alignment(ByVal aRow As Integer, ByVal aColumn As Integer) As atcControls.atcAlignment
         Get
             If aRow > LabelRow AndAlso aColumn > 0 Then
-                Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(pDataManager.SelectionAttributes(aColumn - 1))
+                Dim lAttributeDef As atcAttributeDefinition = atcDataAttributes.GetDefinition(atcDataManager.SelectionAttributes(aColumn - 1))
                 If Not lAttributeDef Is Nothing Then
                     Select Case lAttributeDef.TypeString.ToLower
                         Case "integer", "single", "double"

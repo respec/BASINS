@@ -56,7 +56,7 @@ Public Class atcMetCmpPlugin
                 Dim lCldTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
                     Dim lForm As New frmCmpSol
-                    lOk = lForm.AskUser(DataManager, lCldTSer, lLatitude)
+                    lOk = lForm.AskUser(lCldTSer, lLatitude)
                 Else
                     lCldTSer = aArgs.GetValue("DCLD")
                     lLatitude = aArgs.GetValue("Latitude")
@@ -89,7 +89,7 @@ Public Class atcMetCmpPlugin
                 Dim lCTX As Double
                 If aArgs Is Nothing Then
                     Dim lForm As New frmCmpJPET
-                    lOk = lForm.AskUser(DataManager, lTMinTSer, lTMaxTSer, lSRadTSer, lDegF, lCTX, lCTS)
+                    lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lSRadTSer, lDegF, lCTX, lCTS)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -115,7 +115,7 @@ Public Class atcMetCmpPlugin
             Case "Hamon PET"
                 If aArgs Is Nothing Then
                     Dim lForm As New frmCmpHPET
-                    lOk = lForm.AskUser(DataManager, lTMinTSer, lTMaxTSer, lDegF, lLatitude, lCTS)
+                    lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lDegF, lLatitude, lCTS)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -141,7 +141,7 @@ Public Class atcMetCmpPlugin
                 Dim lDewPTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
                     Dim lForm As New frmCmpPenman
-                    lOk = lForm.AskUser(DataManager, lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer)
+                    lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lSRadTSer, lDewPTSer, lWindTSer)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -157,7 +157,7 @@ Public Class atcMetCmpPlugin
                 End If
             Case "Wind Travel"
                 If aArgs Is Nothing Then
-                    Dim ltsgroup As atcDataGroup = DataManager.UserSelectData("Select Wind Speed data for computing " & aOperationName)
+                    Dim ltsgroup As atcDataGroup = atcDataManager.UserSelectData("Select Wind Speed data for computing " & aOperationName)
                     If Not ltsgroup Is Nothing Then lWindTSer = ltsgroup(0)
                 Else
                     lWindTSer = aArgs.GetValue("WIND")
@@ -169,7 +169,7 @@ Public Class atcMetCmpPlugin
             Case "Cloud Cover"
                 Dim lPctSunTSer As atcTimeseries = Nothing
                 If aArgs Is Nothing Then
-                    Dim ltsgroup As atcDataGroup = DataManager.UserSelectData("Select Percent Sun data for computing " & aOperationName)
+                    Dim ltsgroup As atcDataGroup = atcDataManager.UserSelectData("Select Percent Sun data for computing " & aOperationName)
                     If Not ltsgroup Is Nothing Then lPctSunTSer = ltsgroup(0)
                 Else
                     lPctSunTSer = aArgs.GetValue("PSUN")
@@ -181,7 +181,7 @@ Public Class atcMetCmpPlugin
             Case "Solar Radiation (Disaggregate)"
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisSol
-                    lOk = lForm.AskUser(DataManager, lDlyTSer, lLatitude)
+                    lOk = lForm.AskUser(lDlyTSer, lLatitude)
                 Else
                     lDlyTSer = aArgs.GetValue("SRAD")
                     lLatitude = aArgs.GetValue("Latitude")
@@ -198,7 +198,7 @@ Public Class atcMetCmpPlugin
                     Dim lForm As New frmDisSol
                     lForm.Text = "Disaggregate Evapotranspiration"
                     lForm.lblTSer.Text = "Specify Daily Evapotranspiration Timeseries"
-                    lOk = lForm.AskUser(DataManager, lDlyTSer, lLatitude)
+                    lOk = lForm.AskUser(lDlyTSer, lLatitude)
                 Else
                     lDlyTSer = aArgs.GetValue("DEVT")
                     lLatitude = aArgs.GetValue("Latitude")
@@ -213,7 +213,7 @@ Public Class atcMetCmpPlugin
             Case "Temperature"
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisTemp
-                    lOk = lForm.AskUser(DataManager, lTMinTSer, lTMaxTSer, lObsTime)
+                    lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lObsTime)
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
@@ -231,7 +231,7 @@ Public Class atcMetCmpPlugin
                 Dim lHrSum As Double = 0
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisWind
-                    lOk = lForm.AskUser(DataManager, lWindTSer, lHrDist)
+                    lOk = lForm.AskUser(lWindTSer, lHrDist)
                 Else
                     lWindTSer = aArgs.GetValue("TWND")
                     lHrDist = aArgs.GetValue("Hourly Distribution")
@@ -257,7 +257,7 @@ Public Class atcMetCmpPlugin
                 Dim lAttDef2 As atcAttributeDefinition
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisPrec
-                    lOk = lForm.AskUser(DataManager, lDlyTSer, lHrTSers, lObsTime, lTol, lSummFile)
+                    lOk = lForm.AskUser(lDlyTSer, lHrTSers, lObsTime, lTol, lSummFile)
                 Else
                     lDlyTSer = aArgs.GetValue("DPRC")
                     lHrTSers = aArgs.GetValue("HPCP")

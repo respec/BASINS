@@ -9,8 +9,7 @@ Friend Class atcSeasonalAttributesGridSource
     Private pSeasons As SortedList
     Private pAttributes As SortedList
 
-    Sub New(ByVal aDataManager As atcData.atcDataManager, _
-            ByVal aDataGroup As atcData.atcDataGroup)
+    Sub New(ByVal aDataGroup As atcData.atcDataGroup)
         pDataGroup = aDataGroup
         pAttributes = New SortedList
         pSeasons = New SortedList

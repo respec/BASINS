@@ -7,6 +7,7 @@ Public Module ScriptGridAdd
     Private pTestPath As String = "D:\GisData\SERDP"
     Private pStepSize As Integer = 2 'meters
     Private pStepCount As Integer = 20 'leads to 40m wide cross section
+    Private Const pFormat As String = "#,##0.00"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Logger.Dbg("Start")
@@ -44,7 +45,14 @@ Public Module ScriptGridAdd
                 'aMapWin.Layers.Add(lTile, lColoringScheme, lTileID)
                 Logger.Dbg("Add " & lTileName)
                 aMapWin.Layers.Add(lTileName, lTileId)
+                aMapWin.Project.Save(aMapWin.Project.FileName)
             End Try
+            Logger.Dbg("Done," & MemUsage())
         Next
     End Sub
+    Private Function MemUsage() As String
+        System.GC.WaitForPendingFinalizers()
+        Return "MemoryUsage(MB):" & DoubleToString(Process.GetCurrentProcess.PrivateMemorySize64 / (2 ^ 20), , pFormat) & _
+                    " Local(MB):" & DoubleToString(System.GC.GetTotalMemory(True) / (2 ^ 20), , pFormat)
+    End Function
 End Module

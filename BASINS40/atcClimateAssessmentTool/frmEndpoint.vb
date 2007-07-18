@@ -491,7 +491,7 @@ Public Class frmEndpoint
     End Sub
 
     Private Sub UserSelectData()
-        Dim lData As atcDataGroup = g_DataManager.UserSelectData("Select data for endpoint", pVariation.DataSets)
+        Dim lData As atcDataGroup = atcDataManager.UserSelectData("Select data for endpoint", pVariation.DataSets)
         If Not lData Is Nothing Then
             pVariation.DataSets = lData
             UpdateDataText(txtData, lData)

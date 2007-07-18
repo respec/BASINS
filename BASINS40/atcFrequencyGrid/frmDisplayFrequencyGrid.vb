@@ -9,11 +9,9 @@ Friend Class frmDisplayFrequencyGrid
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
-          Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+    Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
         MyBase.New()
         pInitializing = True
-        pDataManager = aDataManager
         If aDataGroup Is Nothing Then
             pDataGroup = New atcDataGroup
         Else
@@ -21,7 +19,7 @@ Friend Class frmDisplayFrequencyGrid
         End If
         InitializeComponent() 'required by Windows Form Designer
 
-        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
         For Each lDisp As atcDataDisplay In DisplayPlugins
             Dim lMenuText As String = lDisp.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
@@ -29,7 +27,7 @@ Friend Class frmDisplayFrequencyGrid
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some Data
-            pDataManager.UserSelectData(, pDataGroup, True)
+            atcDataManager.UserSelectData(, pDataGroup, True)
         End If
 
         If pDataGroup.Count > 0 AndAlso UserSpecifyAttributes() Then
@@ -240,8 +238,6 @@ Friend Class frmDisplayFrequencyGrid
 
 #End Region
 
-    Private pDataManager As atcDataManager
-
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcDataGroup
 
@@ -283,7 +279,7 @@ Friend Class frmDisplayFrequencyGrid
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        pDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
     Private Sub mnuEditCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
@@ -321,7 +317,7 @@ Friend Class frmDisplayFrequencyGrid
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
         pInitializing = True
-        pDataGroup = pDataManager.UserSelectData(, pDataGroup)
+        pDataGroup = atcDataManager.UserSelectData(, pDataGroup)
         pInitializing = False
         PopulateGrid()
     End Sub
@@ -355,7 +351,7 @@ Friend Class frmDisplayFrequencyGrid
     Private Function UserSpecifyAttributes() As Boolean
         Dim lForm As New frmSpecifyFrequency
         Dim lChoseHigh As Boolean
-        If lForm.AskUser(pDataManager, pDataGroup, lChoseHigh) Then
+        If lForm.AskUser(pDataGroup, lChoseHigh) Then
             pSource = Nothing 'Get rid of obsolete source before changing HighDisplay to avoid refresh trouble
             Me.HighDisplay = lChoseHigh
             Return True
@@ -404,7 +400,6 @@ Friend Class frmDisplayFrequencyGrid
     End Property
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        pDataManager = Nothing
         pDataGroup = Nothing
         pSource = Nothing
     End Sub
@@ -419,6 +414,6 @@ Friend Class frmDisplayFrequencyGrid
     End Sub
 
     Private Sub mnuFileSaveViewNDay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveViewNDay.Click
-        pDataManager.UserSelectDisplay("N-Day timeseries", pSource.AllNday)
+        atcDataManager.UserSelectDisplay("N-Day timeseries", pSource.AllNday)
     End Sub
 End Class

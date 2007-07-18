@@ -9,24 +9,22 @@ Public Class atcGraphPlugin
         End Get
     End Property
 
-    Public Overrides Sub Save(ByVal aDataManager As atcData.atcDataManager, _
-                              ByVal aDataGroup As atcData.atcDataGroup, _
+    Public Overrides Sub Save(ByVal aDataGroup As atcData.atcDataGroup, _
                               ByVal aFileName As String, _
                               ByVal ParamArray aOption() As String)
 
         If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
-            Dim lForm As New atcGraphForm(aDataManager, aDataGroup)
+            Dim lForm As New atcGraphForm(aDataGroup)
             lForm.SaveBitmapToFile(aFileName)
             lForm.Dispose()
         End If
     End Sub
 
-    Public Overrides Function Show(ByVal aDataManager As atcDataManager, _
-                          Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
+    Public Overrides Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
         Dim lDataGroup As atcDataGroup = aDataGroup
         If lDataGroup Is Nothing Then lDataGroup = New atcDataGroup
 
-        Dim lForm As New atcGraphForm(aDataManager, lDataGroup)
+        Dim lForm As New atcGraphForm(lDataGroup)
         If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
             lForm.Show()
             Return lForm

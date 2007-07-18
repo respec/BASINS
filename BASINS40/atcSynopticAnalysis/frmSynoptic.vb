@@ -4,9 +4,6 @@ Imports atcUtility
 Imports MapWinUtility
 
 Public Class frmSynoptic
-
-    Private pDataManager As atcDataManager
-
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcDataGroup
 
@@ -40,16 +37,14 @@ Public Class frmSynoptic
     Private pColumnTitlesEventDefault() As String = {"Group", "Start Date", "Start Time", "Measurements", "Volume", "Duration", "Intensity", "Intensity", "Time Since Last"}
     Private pColumnAttributesEventDefault() As String = {"", "", "", "", "Sum", "Sum", "Max", "Mean", "Mean"}
 
-    Public Sub Initialize(ByVal aDataManager As atcData.atcDataManager, _
-                 Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
-        pDataManager = aDataManager
+    Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcDataGroup
         Else
             pDataGroup = aTimeseriesGroup
         End If
 
-        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
         For Each lDisp As atcDataDisplay In DisplayPlugins
             Dim lMenuText As String = lDisp.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
@@ -57,7 +52,7 @@ Public Class frmSynoptic
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some timeseries
-            pDataManager.UserSelectData("Select Data for Synoptic Analysis", pDataGroup, True)
+            atcDataManager.UserSelectData("Select Data for Synoptic Analysis", pDataGroup, True)
         End If
 
         If pDataGroup.Count > 0 Then
@@ -169,7 +164,7 @@ Public Class frmSynoptic
     End Function
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        pDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
@@ -181,7 +176,6 @@ Public Class frmSynoptic
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        pDataManager = Nothing
         pDataGroup = Nothing
     End Sub
 
@@ -237,13 +231,13 @@ Public Class frmSynoptic
     '        End Select
     '    Next
     '    lAvailable.Sort()
-    '    If lst.AskUser(lAvailable, pDataManager.DisplayAttributes) Then
+    '    If lst.AskUser(lAvailable, atcDataManager.DisplayAttributes) Then
     '        PopulateGrid()
     '    End If
     'End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataManager.UserSelectData(, pDataGroup, False)
+        atcDataManager.UserSelectData(, pDataGroup, False)
     End Sub
 
     Private Sub mnuSizeColumnsToContents_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSizeColumnsToContents.Click

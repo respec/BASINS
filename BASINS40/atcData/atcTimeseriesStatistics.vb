@@ -288,7 +288,7 @@ Public Class atcTimeseriesStatistics
     Public Overrides Function Open(ByVal aOperationName As String, Optional ByVal aArgs As atcDataAttributes = Nothing) As Boolean
         Dim ltsGroup As atcDataGroup
         If aArgs Is Nothing Then
-            ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
+            ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
         Else
             ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
         End If

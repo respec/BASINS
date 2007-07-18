@@ -51,7 +51,7 @@ Public Class atcEventPlugin
             lHigh = aArgs.GetValue("High", True)
         End If
         If ltsGroup Is Nothing OrElse ltsGroup.Count = 0 Then
-            ltsGroup = DataManager.UserSelectData("Select data for " & aOperationName)
+            ltsGroup = atcDataManager.UserSelectData("Select data for " & aOperationName)
         End If
         If ltsGroup.Count > 0 AndAlso Double.IsNaN(lThresh) Then
             Dim lForm As New frmSpecifyEventAttributes

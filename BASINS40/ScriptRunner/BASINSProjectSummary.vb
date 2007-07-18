@@ -16,8 +16,6 @@ Public Module BASINSProjectSummary
 
         Dim lLayer As MapWindow.Interfaces.Layer
 
-        Dim lDataManager As New atcDataManager(aMapWin) ' = Scripting.Run("vb", "", "subFindDataManager.vb", lErr, False, aMapWin, aMapWin)
-
         Dim lString As New Text.StringBuilder
         lString.AppendLine("BASINS Project Summary" & vbCrLf & _
                               "Name" & vbTab & aMapWin.Project.FileName & vbCrLf & _

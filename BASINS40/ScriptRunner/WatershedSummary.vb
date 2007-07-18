@@ -60,9 +60,6 @@ Public Module ScriptWatershedSummary
             lScenarios.Add(FilenameNoPath(FilenameNoExt(lUci)))
         Next
 
-        'declare a new data manager to manage the hbn files
-        Dim lDataManager As New atcDataManager(aMapWin) ' = Scripting.Run("vb", "", "subFindDataManager.vb", lErr, False, aMapWin, aMapWin)
-
         'loop thru each scenario (uci name)
         For Each lScenario As String In lScenarios
 
@@ -76,14 +73,14 @@ Public Module ScriptWatershedSummary
                 Logger.Dbg("  NameUpdated " & lHspfBinFileName)
             End If
             Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-            lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
+            atcDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
             Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
             'call main watershed summary routine
             DoWatershedSummary(lConstituents, lScenario, lHspfBinFile, lHspfBinFileInfo.LastWriteTime)
 
             'clean up 
-            lDataManager.DataSources.Remove(lHspfBinFile)
+            atcDataManager.DataSources.Remove(lHspfBinFile)
             lHspfBinFile.DataSets.Clear()
             lHspfBinFile = Nothing
 

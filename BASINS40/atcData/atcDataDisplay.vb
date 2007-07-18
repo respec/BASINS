@@ -3,8 +3,7 @@ Public Class atcDataDisplay
     Inherits atcDataPlugin
 
     ''' <summary>Show the specified data interactively.</summary>
-    Public Overridable Function Show(ByVal aDataManager As atcData.atcDataManager, _
-                     Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
+    Public Overridable Function Show(Optional ByVal aDataGroup As atcDataGroup = Nothing) As Object
         Return Nothing
     End Function
 
@@ -13,9 +12,8 @@ Public Class atcDataDisplay
     ''' not ToString because the data display may have graphics that don't convert well
     ''' to a string
     ''' </remarks>
-    Public Overridable Sub Save(ByVal aDataManager As atcData.atcDataManager, _
-                      ByVal aDataGroup As atcDataGroup, _
-                      ByVal aFileName As String, _
-                      ByVal ParamArray aOption() As String)
+    Public Overridable Sub Save(ByVal aDataGroup As atcDataGroup, _
+                                ByVal aFileName As String, _
+                                ByVal ParamArray aOption() As String)
     End Sub
 End Class
