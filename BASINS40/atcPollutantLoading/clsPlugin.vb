@@ -60,10 +60,6 @@ Public Class PlugIn
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        pMapWin.Menus.Remove(ParentMenuName & "_PLOAD")
-        If pMapWin.Menus.Item(ParentMenuName).NumSubItems = 0 Then
-            pMapWin.Menus.Remove(ParentMenuName)
-        End If
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked

@@ -151,38 +151,10 @@ Public Class atcBasinsPlugIn
 
         ShowHelp("CLOSE") 'Close any active Help window
 
-        g_Menus.Remove(DataMenuName)
         pLoadedDataMenu = False
-
-        g_Menus.Remove(AnalysisMenuName) 'TODO: don't unload if another plugin is still using it
-
-        g_Menus.Remove(ModelsMenuName & "_SWAT")
-        g_Menus.Remove(ModelsMenuName & "_AGWA")
-        If g_Menus.Item(ModelsMenuName).NumSubItems = 0 Then
-            g_Menus.Remove(ModelsMenuName)
-        End If
-
-        g_Menus.Remove(NewDataMenuName)
-        g_Menus.Remove(OpenDataMenuName)
-        g_Menus.Remove(DownloadMenuName)
-        g_Menus.Remove(ManageDataMenuName)
-        g_Menus.Remove(SaveDataMenuName)
-        g_Menus.Remove(ProjectsMenuName)
-
-        g_Menus.Remove(ComputeMenuName)
-
-        g_Menus.Remove("BasinsHelp_Separator1")
-        g_Menus.Remove(BasinsHelpMenuName)
-        g_Menus.Remove(BasinsWebPageMenuName)
-        g_Menus.Remove("BasinsHelp_Separator2")
-        g_Menus.Remove(RegisterMenuName)
-        g_Menus.Remove(CheckForUpdatesMenuName)
-        g_Menus.Remove(SendFeedbackMenuName)
 
         g_MapWin.ApplicationInfo.WelcomePlugin = ""
         g_MapWin.ClearCustomWindowTitle()
-
-        'LogStopMonitor()
     End Sub
 
     Public Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked

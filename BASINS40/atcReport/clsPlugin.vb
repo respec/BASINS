@@ -45,10 +45,6 @@ Public Class PlugIn
         ReportsDir = lReportsDir
     End Sub
 
-    'Public Overrides Sub Terminate()
-    '  pMapWin.Menus.Remove(pReportsMenuName)
-    '  pMapWin.Menus.Remove(pReportsMenuName & "_Watershed")
-    'End Sub
 
     Public Function BuildReport(ByVal aAreaLayerName As String, _
                                 ByVal aAreaIDFieldName As String, _
