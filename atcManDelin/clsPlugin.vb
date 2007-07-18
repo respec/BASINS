@@ -75,17 +75,6 @@ Public Class PlugIn
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        'This event is fired when the user unloads your plug-in either through the plug-in dialog 
-        'box, or by un-checkmarking it in the plug-ins menu.  This is where you would remove any
-        'buttons from the tool bar tool bar or menu items from the menu that you may have added.
-        'If you don't do this, then you will leave dangling menus and buttons that don't do anything.
-        pMapWin.Menus.Remove(DelineateMenuName & "_ManDelin")
-        If Not pMapWin.Menus.Item(DelineateMenuName) Is Nothing Then
-            If pMapWin.Menus.Item(DelineateMenuName).NumSubItems = 0 Then
-                pMapWin.Menus.Remove(DelineateMenuName)
-            End If
-        End If
-
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked

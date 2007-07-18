@@ -60,12 +60,6 @@ Public Class PlugIn
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        'Remove the custom menus that this plugin added
-        pMapWin.Menus.Remove(ModelsMenuName & "_HSPF")
-        pMapWin.Menus.Remove(ModelsMenuName & "_AQUATOX")
-        If pMapWin.Menus.Item(ModelsMenuName).NumSubItems = 0 Then
-            pMapWin.Menus.Remove(ModelsMenuName)
-        End If
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked

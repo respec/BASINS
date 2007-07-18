@@ -62,20 +62,6 @@ Public Class PlugIn
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
-        Try
-            pMapWin.Menus.Remove(ParentMenuName & "_LookupSeparator")
-            pMapWin.Menus.Remove(ParentMenuName & "_Projection")
-            pMapWin.Menus.Remove(ParentMenuName & "_Storet")
-            pMapWin.Menus.Remove(ParentMenuName & "_Sic")
-            pMapWin.Menus.Remove(ParentMenuName & "_WQ")
-            pMapWin.Menus.Remove(ParentMenuName & "_LookupSeparator2")
-
-            If pParentMenu.NumSubItems = 0 Then
-                pMapWin.Menus.Remove(ParentMenuName)
-            End If
-        Catch
-            'ignore
-        End Try
     End Sub
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
