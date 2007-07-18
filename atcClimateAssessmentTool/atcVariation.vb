@@ -759,7 +759,7 @@ tryAgain:
                         Dim lDataGroup As atcDataGroup = Nothing
                         If lHistory.Length > 10 Then
                             Dim lSourceSpecification As String = lHistory.Substring(10).ToLower
-                            For Each lDataSource As atcDataSource In g_DataManager.DataSources
+                            For Each lDataSource As atcDataSource In atcDataManager.DataSources
                                 If lDataSource.Specification.ToLower.Equals(lSourceSpecification) Then
                                     lDataGroup = lDataSource.DataSets.FindData("ID", lID, 2)
                                     If lDataGroup.Count > 0 Then
@@ -772,7 +772,7 @@ tryAgain:
                             Next
                         End If
                         If lDataGroup Is Nothing Then
-                            lDataGroup = g_DataManager.DataSets.FindData("ID", lID, 2)
+                            lDataGroup = atcDataManager.DataSets.FindData("ID", lID, 2)
                         End If
                         If lDataGroup.Count > 0 Then
                             Logger.Dbg("Found data set #" & lID & " without a specification")
@@ -836,7 +836,7 @@ tryAgain:
                                 Case "operation" : Operation = .Content
                                     'Case "addremoveper" : AddRemovePer = .Content
                                 Case "computationsource"
-                                    ComputationSource = g_DataManager.DataSourceByName(.Content)
+                                    ComputationSource = atcDataManager.DataSourceByName(.Content)
                                 Case "datasets" : SetDataGroupXML(DataSets, "DataSets", .GetXml)
                                 Case "petdata" : SetDataGroupXML(PETdata, "PETdata", .GetXml)
                                 Case "selected"

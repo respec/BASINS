@@ -82,9 +82,7 @@ Friend Module modBasinsPlugin
     Private Const BasinsDataPath As String = "\Basins\data\"
     Private Const NationalProjectFilename As String = "national.mwprj"
 
-    Friend WithEvents pDataManager As atcDataManager
-
-    Private Sub pDataManager_OpenedData(ByVal aDataSource As atcData.atcDataSource) Handles pDataManager.OpenedData
+    Friend Sub OpenedData(ByVal aDataSource As atcData.atcDataSource)
         RefreshSaveDataMenu()
     End Sub
 
@@ -95,7 +93,7 @@ Friend Module modBasinsPlugin
     Friend Sub RefreshSaveDataMenu()
         g_Menus.Remove(SaveDataMenuName)
         AddMenuIfMissing(SaveDataMenuName, FileMenuName, SaveDataMenuString, "mnuSaveAs")
-        For Each lDataSource As atcDataSource In pDataManager.DataSources
+        For Each lDataSource As atcDataSource In atcDataManager.DataSources
             If lDataSource.CanSave Then
                 AddMenuIfMissing(SaveDataMenuName & "_" & lDataSource.Specification, SaveDataMenuName, lDataSource.Specification)
             End If
@@ -669,7 +667,7 @@ Friend Module modBasinsPlugin
             AddMenuIfMissing(AnalysisMenuName & "_GenScn", AnalysisMenuName, "GenScn")
             AddMenuIfMissing(AnalysisMenuName & "_WDMUtil", AnalysisMenuName, "WDMUtil")
 
-            Dim lPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+            Dim lPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
             If lPlugins.Count > 0 Then
                 Dim lSeparatorName As String = AnalysisMenuName & "_Separator1"
                 AddMenuIfMissing(lSeparatorName, AnalysisMenuName, "-")
@@ -690,7 +688,7 @@ Friend Module modBasinsPlugin
     Friend Sub RefreshComputeMenu()
         g_Menus.Remove(ComputeMenuName)
         g_Menus.AddMenu(ComputeMenuName, "", Nothing, ComputeMenuString, FileMenuName)
-        Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
+        Dim lDataSources As atcCollection = atcDataManager.GetPlugins(GetType(atcDataSource))
         For Each ds As atcDataSource In lDataSources
             If ds.Category <> "File" Then
                 Dim lCategoryMenuName As String = ComputeMenuName & "_" & ds.Category

@@ -43,7 +43,7 @@ Public Module ScriptCatSummary
         Next
 
         'declare a new data manager to manage the hbn and wdm files
-        Dim lDataManager As New atcDataManager(aMapWin)
+        'Dim lDataManager As New atcDataManager(aMapWin)
 
         'loop thru each scenario (uci name)
         For Each lScenario As String In lScenarios
@@ -58,7 +58,7 @@ Public Module ScriptCatSummary
                 Logger.Dbg("  NameUpdated " & lHspfBinFileName)
             End If
             Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-            lDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
+            atcDataManager.OpenDataSource(lHspfBinFile, lHspfBinFileName, Nothing)
             Logger.Dbg(" DataSetCount " & lHspfBinFile.DataSets.Count)
 
             'open the corresponding wdm file
@@ -70,22 +70,22 @@ Public Module ScriptCatSummary
                 lHspfWdmFileName = lHspfWdmFileName.Replace(".wdm", ".base.wdm")
                 Logger.Dbg("  NameUpdated " & lHspfWdmFileName)
             End If
-            lDataManager.OpenDataSource(lHspfWdmFile, lHspfWdmFileName, Nothing)
+            atcDataManager.OpenDataSource(lHspfWdmFile, lHspfWdmFileName, Nothing)
             Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
             'call main cat summary routine
-            DoCatSummary(lScenario, lDataManager)
+            DoCatSummary(lScenario)
 
-            lDataManager.DataSources.Remove(lHspfBinFile)
+            atcDataManager.DataSources.Remove(lHspfBinFile)
             lHspfBinFile.DataSets.Clear()
             lHspfBinFile = Nothing
-            lDataManager.DataSources.Remove(lHspfWdmFile)
+            atcDataManager.DataSources.Remove(lHspfWdmFile)
             lHspfWdmFile.DataSets.Clear()
             lHspfWdmFile = Nothing
         Next lScenario
     End Sub
 
-    Friend Sub DoCatSummary(ByVal aScenario As String, ByVal aDataManager As atcDataManager)
+    Friend Sub DoCatSummary(ByVal aScenario As String)
         Logger.Dbg("DoCatSummary for " & aScenario)
 
         Dim lString As New Text.StringBuilder
@@ -93,10 +93,10 @@ Public Module ScriptCatSummary
 
         'Get this hard coded stuff from CAT endpoints/variations!
 
-        Dim lMetDataGroup As atcDataGroup = aDataManager.DataSets.FindData("Location", "SEG1")
+        Dim lMetDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "SEG1")
         Logger.Dbg("     MetMatchingDatasetCount " & lMetDataGroup.Count)
-        lMetDataGroup.Add(aDataManager.DataSets.FindData("Location", "_A24013"))
-        lMetDataGroup.Add(aDataManager.DataSets.FindData("Location", "A24013"))
+        lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "_A24013"))
+        lMetDataGroup.Add(atcDataManager.DataSets.FindData("Location", "A24013"))
         Logger.Dbg("     AdditionalMetMatchingDatasetCount " & lMetDataGroup.Count)
 
         If lMetDataGroup.Count > 0 Then
@@ -105,14 +105,14 @@ Public Module ScriptCatSummary
             lString.Append(AnnualAndSeasonalValues(lMetDataGroup, "EVAP", "Sum"))
         End If
 
-        Dim lRchDataGroupW As atcDataGroup = aDataManager.DataSets.FindData("Location", "RIV9")
+        Dim lRchDataGroupW As atcDataGroup = atcDataManager.DataSets.FindData("Location", "RIV9")
         If lRchDataGroupW.Count > 0 Then
             lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "WATR", "Mean"))
             lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "WATR", "1Hi100"))
             lString.Append(AnnualAndSeasonalValues(lRchDataGroupW, "FLOW", "7Q10"))
         End If
 
-        Dim lRchDataGroup As atcDataGroup = aDataManager.DataSets.FindData("Location", "R:9")
+        Dim lRchDataGroup As atcDataGroup = atcDataManager.DataSets.FindData("Location", "R:9")
         If lRchDataGroup.Count > 0 Then
             lString.Append(AnnualValue(lRchDataGroup, "RO", "Mean"))
             lString.Append(AnnualValue(lRchDataGroup, "ROSED-TOT", "SumAnnual"))

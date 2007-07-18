@@ -549,7 +549,7 @@ Public Class atcTimeseriesNdayHighLow
         End Select
 
         If aArgs Is Nothing Then
-            ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
+            ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
             Dim lForm As New frmSpecifyYearsSeasons
             If lHigh Then
                 lBoundaryMonth = 10
@@ -584,7 +584,7 @@ Public Class atcTimeseriesNdayHighLow
         End If
 
         If ltsGroup Is Nothing Then
-            ltsGroup = DataManager.UserSelectData("Select data to compute statistics for")
+            ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
         End If
 
         For Each lTs In ltsGroup

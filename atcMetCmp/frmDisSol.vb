@@ -7,7 +7,6 @@ Public Class frmDisSol
 
     Private pOk As Boolean
     Private pTSGroup As atcDataGroup
-    Private pDataManager As atcDataManager
     Private cLat As Double
 
 #Region " Windows Form Designer generated code "
@@ -143,8 +142,7 @@ Public Class frmDisSol
     End Sub
 
 #End Region
-    Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aSRadTSer As atcTimeseries, ByRef aLatitude As Double) As Boolean
-        pDataManager = aDataManager
+    Public Function AskUser(ByRef aSRadTSer As atcTimeseries, ByRef aLatitude As Double) As Boolean
         Me.ShowDialog()
         If pOk Then
             aLatitude = cLat
@@ -181,7 +179,7 @@ Public Class frmDisSol
     End Sub
 
     Private Sub btnSolar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSolar.Click
-        pTSGroup = pDataManager.UserSelectData("Select Daily Solar Radiation Timeseries")
+        pTSGroup = atcDataManager.UserSelectData("Select Daily Solar Radiation Timeseries")
         If pTSGroup.Count > 0 Then
             txtSolar.Text = pTSGroup.ItemByIndex(0).ToString
         End If

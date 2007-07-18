@@ -4,18 +4,15 @@ Imports atcUtility
 Public Class atcTimeseriesGridSource
     Inherits atcControls.atcGridSource
 
-    Private pDataManager As atcDataManager
     Private WithEvents pDataGroup As atcDataGroup
     Private pAllDates As atcTimeseries
     Private pDateFormat As New atcDateFormat
     Private pDisplayAttributes As ArrayList
     Private pDisplayValues As Boolean
 
-    Sub New(ByVal aDataManager As atcData.atcDataManager, _
-            ByVal aDataGroup As atcData.atcDataGroup, _
+    Sub New(ByVal aDataGroup As atcData.atcDataGroup, _
             ByVal aDisplayAttributes As ArrayList, _
             ByVal aDisplayValues As Boolean)
-        pDataManager = aDataManager
         pDataGroup = aDataGroup
         pDisplayAttributes = aDisplayAttributes
         pDisplayValues = aDisplayValues

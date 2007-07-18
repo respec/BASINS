@@ -177,7 +177,6 @@ Public Class frmSpecifyEventAttributes
 
 #End Region
     Public Function AskUser(ByRef aHigh As Boolean, ByRef aThreshold As Double, ByRef aDaysGapAllowed As Double, ByVal aMinMax As String) As Boolean
-        'pDataManager = aDataManager
         lblMinMax.Text = "Range of values: " & aMinMax
         Me.ShowDialog()
         If pOk Then

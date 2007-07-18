@@ -7,7 +7,6 @@ Public Class frmDisWind
 
     Private pOk As Boolean
     Private pWindTS As atcTimeseries
-    Private pDataManager As atcDataManager
     Private cHrDist(24) As Double
 
 #Region " Windows Form Designer generated code "
@@ -444,8 +443,7 @@ Public Class frmDisWind
     End Sub
 
 #End Region
-    Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aWindTS As atcTimeseries, ByRef aHrDist() As Double) As Boolean
-        pDataManager = aDataManager
+    Public Function AskUser(ByRef aWindTS As atcTimeseries, ByRef aHrDist() As Double) As Boolean
         Me.ShowDialog()
         If pOk Then
             aWindTS = pWindTS
@@ -519,7 +517,7 @@ BadHourDist:
     End Sub
 
     Private Sub btnWind_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnWind.Click
-        Dim lTSGroup As atcDataGroup = pDataManager.UserSelectData("Select data for Daily Min Temperature")
+        Dim lTSGroup As atcDataGroup = atcDataManager.UserSelectData("Select data for Daily Min Temperature")
         If lTSGroup.Count > 0 Then
             pWindTS = lTSGroup(0)
             txtWind.Text = pWindTS.ToString

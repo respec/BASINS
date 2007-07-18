@@ -28,12 +28,6 @@ Public Class atcBasinsPlugIn
         End Get
     End Property
 
-    Public ReadOnly Property DataManager() As atcDataManager
-        Get
-            Return pDataManager
-        End Get
-    End Property
-
     Public ReadOnly Property Description() As String Implements MapWindow.Interfaces.IPlugin.Description
         'Appears in the plug-ins dialog box when a user selects the plug-in.  
         Get
@@ -80,7 +74,8 @@ Public Class atcBasinsPlugIn
 
         CheckForUpdates(True)
 
-        pDataManager = New atcDataManager(g_MapWin)
+        atcDataManager.MapWindow = g_MapWin
+        AddHandler atcDataManager.OpenedData, AddressOf OpenedData
 
         Dim lHelpFilename As String = FindFile("Please locate BASINS 4 help file", g_BasinsDir & "docs\Basins4.0.chm")
         If FileExists(lHelpFilename) Then
@@ -152,6 +147,7 @@ Public Class atcBasinsPlugIn
     End Sub
 
     Public Sub Terminate() Implements MapWindow.Interfaces.IPlugin.Terminate
+        RemoveHandler atcDataManager.OpenedData, AddressOf OpenedData
 
         ShowHelp("CLOSE") 'Close any active Help window
 
@@ -210,7 +206,7 @@ Public Class atcBasinsPlugIn
                     DownloadNewData(PathNameOnly(g_Project.FileName) & "\")
                 End If
             Case ManageDataMenuName
-                pDataManager.UserManage()
+                atcDataManager.UserManage()
             Case RegisterMenuName
                 OpenFile("http://hspf.com/pub/basins4/register.html")
             Case CheckForUpdatesMenuName
@@ -256,7 +252,7 @@ Public Class atcBasinsPlugIn
                 If aItemName.StartsWith(ComputeMenuName & "_") Then
                     aItemName = aItemName.Replace(" ", "")
                     Dim lNewSource As atcDataSource = Nothing
-                    Dim lDataSources As atcCollection = pDataManager.GetPlugins(GetType(atcDataSource))
+                    Dim lDataSources As atcCollection = atcDataManager.GetPlugins(GetType(atcDataSource))
                     For Each ds As atcDataSource In lDataSources
                         If ds.Category <> "File" Then
                             Dim lCategoryMenuName As String = ComputeMenuName & "_" & ds.Category
@@ -283,10 +279,10 @@ Public Class atcBasinsPlugIn
                         End If
                     Next
                     If Not lNewSource Is Nothing Then
-                        If pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                        If atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
                             If lNewSource.DataSets.Count > 0 Then
                                 Dim lTitle As String = lNewSource.ToString
-                                pDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
+                                atcDataManager.UserSelectDisplay(lTitle, lNewSource.DataSets)
                             End If
                         End If
                     End If
@@ -337,9 +333,9 @@ Public Class atcBasinsPlugIn
 
     Private Function UserSaveData(ByVal aSpecification As String) As Boolean
         Dim lSaveIn As atcDataSource = Nothing
-        Dim lSaveGroup As atcDataGroup = pDataManager.UserSelectData("Select Data to Save")
+        Dim lSaveGroup As atcDataGroup = atcDataManager.UserSelectData("Select Data to Save")
         If Not lSaveGroup Is Nothing AndAlso lSaveGroup.Count > 0 Then
-            For Each lDataSource As atcDataSource In pDataManager.DataSources
+            For Each lDataSource As atcDataSource In atcDataManager.DataSources
                 If lDataSource.Specification = aSpecification Then
                     lSaveIn = lDataSource
                     Exit For
@@ -433,13 +429,9 @@ Public Class atcBasinsPlugIn
                                       Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
         Dim lFilesOnly As New ArrayList(1)
         lFilesOnly.Add("File")
-        Dim lNewSource As atcDataSource = pDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
+        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
         If Not lNewSource Is Nothing Then 'user did not cancel
-            pDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
-            'If Not lNewSource.DataSets Is Nothing AndAlso lNewSource.DataSets.Count > 0 Then
-            'Dim lForm As New frmSelectDisplay
-            'lForm.AskUser(pDataManager, lNewSource.DataSets)
-            'End If
+            atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
         End If
         Return lNewSource
     End Function
@@ -585,7 +577,7 @@ Public Class atcBasinsPlugIn
             searchForName = searchForName.Substring(ColonPos + 1)
         End If
         searchForName = ReplaceString(searchForName, " ", "")
-        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
         For Each lDisp As atcDataDisplay In DisplayPlugins
             Dim foundName As String = lDisp.Name.ToLower
             ColonPos = foundName.LastIndexOf(":")
@@ -597,62 +589,11 @@ Public Class atcBasinsPlugIn
                 Dim asm As Reflection.Assembly = Reflection.Assembly.GetAssembly(typ)
                 Dim newDisplay As atcDataDisplay = asm.CreateInstance(typ.FullName)
                 newDisplay.Initialize(g_MapWin, g_MapWinWindowHandle)
-                newDisplay.Show(pDataManager)
+                newDisplay.Show()
                 Return True
             End If
         Next
     End Function
-
-    'Public Function RunBasinsScript(ByVal aLanguage As String, _
-    '                                  ByVal aScript As String, _
-    '                                  ByRef aErrors As String, _
-    '                                  ByVal ParamArray aArgs() As Object) As Object
-
-    '  Logger.Dbg(aLanguage & vbCr & aScript) ', "atcBasinsPlugIn:RunBasinsScript")
-    '  If Not aArgs Is Nothing Then 'replace some text arguments with objects
-    '    For iArg As Integer = 0 To aArgs.GetUpperBound(0)
-    '      If aArgs(iArg).GetType Is GetType(String) Then
-    '        Select Case CStr(aArgs(iArg)).ToLower
-    '          Case "datamanager" : aArgs(iArg) = pDataManager
-    '          Case "basinsplugin" : aArgs(iArg) = Me
-    '          Case "mapwin" : aArgs(iArg) = g_MapWin
-    '        End Select
-    '      End If
-    '    Next
-    '  End If
-
-    '  If Not FileExists(aScript) Then
-    '    Dim lScriptFileName As String = ScriptFolder() & "\" & aScript
-    '    If FileExists(lScriptFileName) Then
-    '      aScript = lScriptFileName
-    '    End If
-    '  End If
-
-    '  Return RunScript(aLanguage, MakeScriptName, aScript, aErrors, aArgs)
-
-    'End Function
-
-    'Private Function MakeScriptName() As String
-    '  Dim tryName As String
-    '  Dim iTry As Integer = 1
-
-    '  Do
-    '    tryName = g_Plugins.PluginFolder & _
-    '              "\Basins\RemoveMe-Script-" & iTry & ".dll"
-    '    iTry += 1
-    '  Loop While FileExists(tryName)
-    '  Return tryName
-    'End Function
-
-    'Public Sub CompilePlugin(ByVal aScript As String, _
-    '                         ByRef aErrors As String, _
-    '                         ByVal refs() As String, _
-    '                         ByVal aFileName As String)
-    '  CompileScript(aScript, aErrors, refs, aFileName)
-    '  If aErrors.Length = 0 Then
-    '    g_Plugins.AddFromFile(aFileName)
-    '  End If
-    'End Sub
 
     Public Sub LayerRemoved(ByVal Handle As Integer) Implements MapWindow.Interfaces.IPlugin.LayerRemoved
     End Sub
@@ -779,7 +720,7 @@ Public Class atcBasinsPlugIn
         'SettingsString of the project. 
         Dim lXML As New Chilkat.Xml
         lXML.LoadXml(SettingsString)
-        pDataManager.XML = lXML.FindChild("DataManager")
+        atcDataManager.XML = lXML.FindChild("DataManager")
     End Sub
 
     Public Sub ProjectSaving(ByVal ProjectFile As String, ByRef SettingsString As String) Implements MapWindow.Interfaces.IPlugin.ProjectSaving
@@ -792,7 +733,7 @@ Public Class atcBasinsPlugIn
         'SettingsString of the project. 
         Dim saveXML As New Chilkat.Xml
         saveXML.Tag = "BASINS"
-        saveXML.AddChildTree(pDataManager.XML)
+        saveXML.AddChildTree(atcDataManager.XML)
         SettingsString = saveXML.GetXml
     End Sub
 

@@ -69,6 +69,7 @@
     <Compile Include="BASINSProjectSummary.vb" />
     <Compile Include="GridAdd.vb" />
     <Compile Include="GridValues.vb" />
+    <Compile Include="LineDump.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -86,6 +87,7 @@
     </Compile>
     <Compile Include="ScriptDriver.vb" />
     <Compile Include="ShapefileFromWDM.vb" />
+    <Compile Include="SummarizeTimeseries.vb" />
     <Compile Include="SummarizeWdms.vb" />
     <Compile Include="WatershedSummary.vb" />
   </ItemGroup>
@@ -142,6 +144,10 @@
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
       <Name>atcTimeseriesNdayHighLow</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimseriesDbf\atcTimseriesDbf.vbproj">
+      <Project>{F05FE01B-E35C-4444-B5A2-47085D073631}</Project>
+      <Name>atcTimseriesDbf</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>

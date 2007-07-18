@@ -10,14 +10,13 @@ Public Class atcSeasonalAttributesPlugin
         End Get
     End Property
 
-    Public Overrides Function Show(ByVal aDataManager As atcData.atcDataManager, _
-                     Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
+    Public Overrides Function Show(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing) As Object
         Dim lDataGroup As atcDataGroup = aDataGroup
         If lDataGroup Is Nothing Then
             lDataGroup = New atcDataGroup
         End If
 
-        Dim lForm As New frmDisplaySeasonalAttributes(aDataManager, lDataGroup)
+        Dim lForm As New frmDisplaySeasonalAttributes(lDataGroup)
         If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
             lForm.Show()
             Return lForm
@@ -26,12 +25,11 @@ Public Class atcSeasonalAttributesPlugin
         End If
     End Function
 
-    Public Overrides Sub Save(ByVal aDataManager As atcDataManager, _
-                              ByVal aDataGroup As atcDataGroup, _
+    Public Overrides Sub Save(ByVal aDataGroup As atcDataGroup, _
                               ByVal aFileName As String, _
                               ByVal ParamArray aOptions() As String)
 
-        Dim lForm As New frmDisplaySeasonalAttributes(aDataManager, aDataGroup)
+        Dim lForm As New frmDisplaySeasonalAttributes(aDataGroup)
 
         For Each lOption As String In aOptions
             Select Case lOption

@@ -7,7 +7,6 @@ Public Class frmCmpSol
 
     Private pOk As Boolean
     Private pTSGroup As atcDataGroup
-    Private pDataManager As atcDataManager
     Private cLat As Double
 
 #Region " Windows Form Designer generated code "
@@ -145,8 +144,7 @@ Public Class frmCmpSol
     End Sub
 
 #End Region
-    Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aCldTSer As atcTimeseries, ByRef aLatitude As Double) As Boolean
-        pDataManager = aDataManager
+    Public Function AskUser(ByRef aCldTSer As atcTimeseries, ByRef aLatitude As Double) As Boolean
         Me.ShowDialog()
         If pOk Then
             aLatitude = cLat
@@ -183,7 +181,7 @@ Public Class frmCmpSol
     End Sub
 
     Private Sub btnCloudCover_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCloudCover.Click
-        pTSGroup = pDataManager.UserSelectData("Select data for Cloud Cover")
+        pTSGroup = atcDataManager.UserSelectData("Select data for Cloud Cover")
         If pTSGroup.Count > 0 Then
             txtCloudCover.Text = pTSGroup.ItemByIndex(0).ToString
         End If

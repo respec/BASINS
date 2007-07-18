@@ -463,7 +463,7 @@ Public Class frmVariationCligen
         Dim lDataSet As atcDataSet = pVariation.DataSets.Item(lReplaceIndex)
         Dim lData As New atcDataGroup
         If Not lDataSet Is Nothing Then lData.Add(lDataSet)
-        lData = g_DataManager.UserSelectData("Select data to replace with Cligen " & aCligenConstituent, lData)
+        lData = atcDataManager.UserSelectData("Select data to replace with Cligen " & aCligenConstituent, lData)
         If Not lData Is Nothing AndAlso lData.Count > 0 Then
             pVariation.DataSets.Item(lReplaceIndex) = lData.Item(0)
             UpdateGrid()
@@ -473,7 +473,7 @@ Public Class frmVariationCligen
     Private Sub txtFunction_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtFunction.Click
         Dim aCategory As New ArrayList(1)
         aCategory.Add("Generate Timeseries")
-        pVariation.ComputationSource = g_DataManager.UserSelectDataSource(aCategory, "Select Function for Varying Input Data")
+        pVariation.ComputationSource = atcDataManager.UserSelectDataSource(aCategory, "Select Function for Varying Input Data")
         If pVariation.ComputationSource Is Nothing Then
             txtFunction.Text = pClickMe
         Else

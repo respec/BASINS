@@ -8,7 +8,6 @@ Public Class frmCmpHPET
     Private pOk As Boolean
     Private pTMinTS As atcTimeseries
     Private pTMaxTS As atcTimeseries
-    Private pDataManager As atcDataManager
     Private cLat As Double
     Private cCTS(12) As Double
 
@@ -502,8 +501,7 @@ Public Class frmCmpHPET
     End Sub
 
 #End Region
-    Public Function AskUser(ByVal aDataManager As atcDataManager, ByRef aTMinTS As atcTimeseries, ByRef aTMaxTS As atcTimeseries, ByRef aDegF As Boolean, ByRef aLatitude As Double, ByRef aCTS() As Double) As Boolean
-        pDataManager = aDataManager
+    Public Function AskUser(ByRef aTMinTS As atcTimeseries, ByRef aTMaxTS As atcTimeseries, ByRef aDegF As Boolean, ByRef aLatitude As Double, ByRef aCTS() As Double) As Boolean
         Me.ShowDialog()
         If pOk Then
             aTMinTS = pTMinTS
@@ -571,7 +569,7 @@ BadCoeff:
     End Sub
 
     Private Sub btnTMin_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTMin.Click
-        Dim lTSGroup As atcDataGroup = pDataManager.UserSelectData("Select data for Daily Min Temperature")
+        Dim lTSGroup As atcDataGroup = atcDataManager.UserSelectData("Select data for Daily Min Temperature")
         If lTSGroup.Count > 0 Then
             pTMinTS = lTSGroup(0)
             txtTMin.Text = pTMinTS.ToString
@@ -579,7 +577,7 @@ BadCoeff:
     End Sub
 
     Private Sub btnTMax_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTMax.Click
-        Dim lTSGroup As atcDataGroup = pDataManager.UserSelectData("Select data for Daily Max Temperature")
+        Dim lTSGroup As atcDataGroup = atcDataManager.UserSelectData("Select data for Daily Max Temperature")
         If lTSGroup.Count > 0 Then
             pTMaxTS = lTSGroup(0)
             txtTMax.Text = pTMaxTS.ToString

@@ -240,13 +240,11 @@ Public Class frmSpecifySeasonalAttributes
 
 #End Region
 
-    'Private WithEvents pDataManager As atcDataManager
     Private WithEvents pGroup As atcDataGroup
     Private pSeasonsAvailable As atcDataAttributes
     Private pOk As Boolean
 
     Public Function AskUser(ByVal aGroup As atcDataGroup, ByVal aSeasonsAvailable As atcDataAttributes) As Boolean
-        'pDataManager = aDataManager
         pGroup = aGroup
         pSeasonsAvailable = aSeasonsAvailable
         Clear()

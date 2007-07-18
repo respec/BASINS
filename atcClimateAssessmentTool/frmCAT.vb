@@ -746,7 +746,7 @@ Public Class frmCAT
 
     Private Function OpenDataSource(ByVal aFilename As String) As atcDataSource
         Dim lAddSource As Boolean = True
-        For Each lDataSource As atcDataSource In g_DataManager.DataSources
+        For Each lDataSource As atcDataSource In atcDataManager.DataSources
             If lDataSource.Specification.ToLower = aFilename.ToLower Then 'already open
                 Return lDataSource
             End If
@@ -761,7 +761,7 @@ Public Class frmCAT
                 Throw New ApplicationException("Could not open '" & aFilename & "' in frmCAT:OpenDataSource")
             End If
             lDataSource.Specification = aFilename
-            g_DataManager.OpenDataSource(lDataSource, lDataSource.Specification, Nothing)
+            atcDataManager.OpenDataSource(lDataSource, lDataSource.Specification, Nothing)
             Return lDataSource
         End If
         Return Nothing
@@ -917,7 +917,7 @@ NextIteration:
                 For Each lSpecification As String In lResults
                     lSpecification = lSpecification.ToLower
                     Dim lMatchDataSource As atcDataSource = Nothing
-                    For Each lDataSource As atcDataSource In g_DataManager.DataSources
+                    For Each lDataSource As atcDataSource In atcDataManager.DataSources
                         If lDataSource.Specification.ToLower = lSpecification Then
                             lMatchDataSource = lDataSource
                             Exit For
@@ -925,7 +925,7 @@ NextIteration:
                     Next
                     If Not lMatchDataSource Is Nothing Then
                         'lMatchDataSource.clear 'TODO: want to make sure we don't have a memory leak here
-                        g_DataManager.DataSources.Remove(lMatchDataSource)
+                        atcDataManager.DataSources.Remove(lMatchDataSource)
                     End If
                 Next
 
@@ -1446,7 +1446,7 @@ NextIteration:
                         lDataThisIteration = lVariation.NextIteration
                     End While
                 Next
-                g_DataManager.ShowDisplay("List", lData)
+                atcDataManager.ShowDisplay("List", lData)
             Else
                 MsgBox("An input must be selected to view", MsgBoxStyle.Critical, "No Input Selected")
             End If

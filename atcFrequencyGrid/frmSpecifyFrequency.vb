@@ -590,7 +590,6 @@ Public Class frmSpecifyFrequency
 #End Region
 
     Private WithEvents pDataGroup As atcDataGroup
-    Private pDataManager As atcDataManager
     Private pDateFormat As atcDateFormat
     Private pOk As Boolean = False
     Private pYearStartMonth As Integer = 0
@@ -605,8 +604,7 @@ Public Class frmSpecifyFrequency
 
     Private Const pNoDatesInCommon As String = ": No dates in common"
 
-    Public Function AskUser(ByVal aDataManager As atcDataManager, ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
-        pDataManager = aDataManager
+    Public Function AskUser(ByVal aGroup As atcDataGroup, ByRef aChoseHigh As Boolean) As Boolean
         pDataGroup = aGroup
         Clear()
         Me.ShowDialog()

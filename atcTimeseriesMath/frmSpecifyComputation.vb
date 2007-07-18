@@ -118,7 +118,6 @@ Public Class frmSpecifyComputation
 
     Private pSelectedOK As Boolean
     Private pAttributes As atcData.atcDataAttributes
-    Private pDataManager As atcDataManager
 
     Private pArgDefVal() As atcDefinedValue
     Private pArgLabel() As Windows.Forms.Label
@@ -127,18 +126,15 @@ Public Class frmSpecifyComputation
 
     'Private pArgSource As atcControls.atcGridSource  ' atcDataAttributesGridSource
 
-    Public Function AskUser(ByVal aDataManager As atcDataManager, _
-                            ByRef aArgs As atcData.atcDataAttributes) As Boolean
+    Public Function AskUser(ByRef aArgs As atcData.atcDataAttributes) As Boolean
         pSelectedOK = False
         pAttributes = aArgs.Clone 'so we are not changing the original until Ok is clicked
-        pDataManager = aDataManager
 
         Populate()
         'pArgSource = New atcDataAttributesGridSource(pArgs)
         'agdArguments.Initialize(pArgSource)
 
         Me.ShowDialog()
-        pDataManager = Nothing
 
         If pSelectedOK Then
             aArgs = pAttributes
@@ -253,7 +249,7 @@ Public Class frmSpecifyComputation
     Private Sub ArgButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Dim iArg As Integer = CInt(sender.tag)
         'TODO: ask UserSelectData to only allow one selection if only one is wanted (atcTimeseries rather than atcDataGroup)
-        Dim lSelected As atcDataGroup = pDataManager.UserSelectData("Select " _
+        Dim lSelected As atcDataGroup = atcDataManager.UserSelectData("Select " _
                                                                    & pArgLabel(iArg).Text _
                                                                    & " for " & lblName.Text)
         pArgDefVal(iArg).Value = lSelected

@@ -4,8 +4,6 @@ Imports MapWinUtility
 Public Class atcDataSource
     Inherits atcDataPlugin
 
-    Private Shared pDataManager As atcDataManager
-
     Private pAttributes As atcDataAttributes
     Private pSpecification As String
     Private pData As atcDataGroup
@@ -139,16 +137,6 @@ Public Class atcDataSource
             Return False
         End If
     End Function
-
-    ''' <summary>Data manager object</summary>
-    Public Property DataManager() As atcDataManager
-        Get
-            Return pDataManager
-        End Get
-        Set(ByVal newValue As atcDataManager)
-            pDataManager = newValue
-        End Set
-    End Property
 
     ''' <summary>Create a new data source</summary>
     Public Sub New()

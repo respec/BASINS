@@ -10,11 +10,9 @@ Friend Class frmDisplaySeasonalAttributes
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
-          Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+    Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
         MyBase.New()
         pInitializing = True
-        pDataManager = aDataManager
         If aDataGroup Is Nothing Then
             pDataGroup = New atcDataGroup
         Else
@@ -22,7 +20,7 @@ Friend Class frmDisplaySeasonalAttributes
         End If
         InitializeComponent() 'required by Windows Form Designer
 
-        Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+        Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
         For Each ldisp As atcDataDisplay In DisplayPlugins
             Dim lMenuText As String = ldisp.Name
             If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
@@ -30,7 +28,7 @@ Friend Class frmDisplaySeasonalAttributes
         Next
 
         If pDataGroup.Count = 0 Then 'ask user to specify some Data
-            pDataManager.UserSelectData(, pDataGroup, True)
+            atcDataManager.UserSelectData(, pDataGroup, True)
         End If
 
         pInitializing = False
@@ -212,8 +210,6 @@ Friend Class frmDisplaySeasonalAttributes
 
 #End Region
 
-    Private pDataManager As atcDataManager
-
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcDataGroup
 
@@ -223,10 +219,10 @@ Friend Class frmDisplaySeasonalAttributes
 
     Private Sub PopulateGrid()
         Dim lWasSwapped As Boolean = Not pSwapperSource Is Nothing AndAlso pSwapperSource.SwapRowsColumns
-        pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
+        pSource = New atcSeasonalAttributesGridSource(pDataGroup)
         If pSource.Columns < 3 Then
             UserSpecifyAttributes()
-            pSource = New atcSeasonalAttributesGridSource(pDataManager, pDataGroup)
+            pSource = New atcSeasonalAttributesGridSource(pDataGroup)
         End If
         pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
         If lWasSwapped Then pSwapperSource.SwapRowsColumns = True
@@ -236,11 +232,11 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        pDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataManager.UserSelectData(, pDataGroup, False)
+        atcDataManager.UserSelectData(, pDataGroup, False)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
@@ -300,7 +296,7 @@ Friend Class frmDisplaySeasonalAttributes
     End Sub
 
     Private Sub UserSpecifyAttributes()
-        For Each lPlugin As atcDataPlugin In pDataManager.GetPlugins(GetType(atcDataSource))
+        For Each lPlugin As atcDataPlugin In atcDataManager.GetPlugins(GetType(atcDataSource))
             If (lPlugin.Name = "Timeseries::Seasons") Then
                 Dim typ As System.Type = lPlugin.GetType()
                 Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
@@ -334,7 +330,6 @@ Friend Class frmDisplaySeasonalAttributes
     End Property
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        pDataManager = Nothing
         pDataGroup = Nothing
         pSource = Nothing
     End Sub

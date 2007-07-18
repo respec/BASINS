@@ -753,7 +753,7 @@ Imports MapWinUtility
     End Sub
 
     Private Sub UserSelectData()
-        Dim lData As atcDataGroup = g_DataManager.UserSelectData("Select data to vary", pVariation.DataSets)
+        Dim lData As atcDataGroup = atcDataManager.UserSelectData("Select data to vary", pVariation.DataSets)
         If Not lData Is Nothing Then
             pVariation.DataSets = lData
             UpdateDataText(txtVaryData, lData)
@@ -761,7 +761,7 @@ Imports MapWinUtility
     End Sub
 
     Private Sub UserSelectPET()
-        Dim lData As atcDataGroup = g_DataManager.UserSelectData("Select PET to replace with values computed from air temperature", pVariation.PETdata)
+        Dim lData As atcDataGroup = atcDataManager.UserSelectData("Select PET to replace with values computed from air temperature", pVariation.PETdata)
         If Not lData Is Nothing Then
             pVariation.PETdata = lData
             UpdateDataText(txtVaryPET, lData)
@@ -1051,7 +1051,7 @@ Imports MapWinUtility
     Private Sub btnViewData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnViewData.Click
         Try
             If pVariation.DataSets.Count > 0 Then
-                g_DataManager.ShowDisplay("", pVariation.DataSets)
+                atcDataManager.ShowDisplay("", pVariation.DataSets)
             Else
                 UserSelectData()
             End If
@@ -1063,7 +1063,7 @@ Imports MapWinUtility
     Private Sub btnViewPET_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnViewPET.Click
         Try
             If pVariation.PETdata.Count > 0 Then
-                g_DataManager.ShowDisplay("", pVariation.PETdata)
+                atcDataManager.ShowDisplay("", pVariation.PETdata)
             Else
                 UserSelectPET()
             End If

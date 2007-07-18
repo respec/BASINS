@@ -1872,9 +1872,11 @@ Public Class HspfUci
         End If
 
         AddWDMFile = New atcWDM.atcDataSourceWDM
-        If Not TserFiles.OpenDataSource(AddWDMFile, Name, Nothing) Then 'had a problem
+        If Not AddWDMFile.Open(Name) Then 'had a problem
             MsgBox("Could not open WDM file" & vbCr & Name, MsgBoxStyle.Exclamation, "AddWDMFile Failed")
             Return Nothing
+        Else
+            TserFiles.AddRange(AddWDMFile.DataSets)
         End If
     End Function
 
@@ -2037,7 +2039,7 @@ x:
 
     Public Function findtimser(ByRef sen As String, ByRef aLocation As String, ByRef Con As String) As Collection
         findtimser = New Collection
-        For Each lTser As atcData.atcTimeseries In TserFiles.DataSets
+        For Each lTser As atcData.atcTimeseries In TserFiles
             With lTser.Attributes
                 If (sen = .GetValue("Scenario") _
                   Or Len(Trim(sen)) = 0) And (aLocation = .GetValue("Location") _

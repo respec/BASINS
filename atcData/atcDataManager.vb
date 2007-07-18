@@ -6,33 +6,39 @@ Imports System.Reflection
 '''          Uses the set of plugins currently loaded to find ones that inherit atcDataSource
 ''' </summary>
 Public Class atcDataManager
-    Private pMapWin As MapWindow.Interfaces.IMapWin
-    Private pDataSources As ArrayList 'of atcDataSource, the currently open data sources
-    Private pSelectionAttributes As ArrayList
-    Private pDisplayAttributes As ArrayList
+    Private Shared pMapWin As MapWindow.Interfaces.IMapWin
+    Private Shared pDataSources As ArrayList 'of atcDataSource, the currently open data sources
+    Private Shared pSelectionAttributes As ArrayList
+    Private Shared pDisplayAttributes As ArrayList
 
     Private Const pInMemorySpecification As String = "<in memory>"
 
     ''' <summary>Event raised when a data source is opened</summary>
-    Event OpenedData(ByVal aDataSource As atcDataSource)
+    Shared Event OpenedData(ByVal aDataSource As atcDataSource)
 
     ''' <summary>Create a new instance of atcDataManager</summary>
-    ''' <param name="aMapWin">
-    '''     <para>Pointer to the root interface for the MapWindow</para>
-    ''' </param>  
-    <CLSCompliant(False)> _
-    Public Sub New(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
-        pMapWin = aMapWin
-        Me.Clear()
+    Private Sub New()
     End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <value>Pointer to the root interface for the MapWindow</value>
+    ''' <remarks></remarks>
+    <CLSCompliant(False)> _
+    Public Shared WriteOnly Property MapWindow() As MapWindow.Interfaces.IMapWin
+        Set(ByVal aMapWin As MapWindow.Interfaces.IMapWin)
+            pmapwin = aMapWin
+            Clear()
+        End Set
+    End Property
 
     ''' <summary>Sets data manager to its initial state.
     '''          Defaults Datasources, Selection Attributes and Display Attributes.
     ''' </summary>
-    Public Sub Clear()
+    Public Shared Sub Clear()
         pDataSources = New ArrayList
         Dim lMemory As New atcDataSource
-        lMemory.DataManager = Me
         lMemory.Specification = pInMemorySpecification
         pDataSources.Add(lMemory)
 
@@ -51,14 +57,14 @@ Public Class atcDataManager
     End Sub
 
     ''' <summary>Set of atcDataSource objects representing currently open DataSources</summary>
-    Public ReadOnly Property DataSources() As ArrayList
+    Public Shared ReadOnly Property DataSources() As ArrayList
         Get
             Return pDataSources
         End Get
     End Property
 
     ''' <summary>Set of atcDataSets found in currently open DataSources</summary>
-    Public Function DataSets() As atcDataGroup
+    Public Shared Function DataSets() As atcDataGroup
         Dim lAllData As New atcDataGroup
         For Each lSource As atcDataSource In DataSources
             For Each lTs As atcDataSet In lSource.DataSets
@@ -69,14 +75,14 @@ Public Class atcDataManager
     End Function
 
     ''' <summary>Names of attributes used for selection of data in UI</summary>
-    Public ReadOnly Property SelectionAttributes() As ArrayList
+    Public Shared ReadOnly Property SelectionAttributes() As ArrayList
         Get
             Return pSelectionAttributes
         End Get
     End Property
 
     ''' <summary>Names of attributes used for listing of data in UI</summary>
-    Public ReadOnly Property DisplayAttributes() As ArrayList
+    Public Shared ReadOnly Property DisplayAttributes() As ArrayList
         Get
             Return pDisplayAttributes
         End Get
@@ -86,7 +92,7 @@ Public Class atcDataManager
     ''' <param name="aBaseType">
     '''     <para>Type of plugin to match and return</para>
     ''' </param>  
-    Public Function GetPlugins(ByVal aBaseType As Type) As atcCollection
+    Public Shared Function GetPlugins(ByVal aBaseType As Type) As atcCollection
         Dim lMatchingPlugIns As New atcCollection
         If Not pMapWin Is Nothing Then
             Dim lLastPlugIn As Integer = pMapWin.Plugins.Count() - 1
@@ -113,14 +119,12 @@ Public Class atcDataManager
     '''     <para>Attributes associated with specification, may be NOTHING</para>
     ''' </param>
     ''' <returns>Boolean - True if source opened, False otherwise</returns>
-    Public Function OpenDataSource(ByVal aNewSource As atcDataSource, _
+    Public Shared Function OpenDataSource(ByVal aNewSource As atcDataSource, _
                                    ByVal aSpecification As String, _
                                    ByVal aAttributes As atcDataAttributes) As Boolean
-        aNewSource.DataManager = Me
-
         Try
             If aNewSource.Open(aSpecification, aAttributes) Then
-                Logger.Dbg("OpenDataSource:Count:" & aNewSource.DataSets.Count & ":" & aSpecification)
+                Logger.Dbg("OpenDataSource:Count:" & aNewSource.DataSets.Count & ":" & aNewSource.Specification)
                 pDataSources.Add(aNewSource)
                 RaiseEvent OpenedData(aNewSource)
                 If Not pMapWin Is Nothing Then pMapWin.Project.Modified = True
@@ -138,13 +142,13 @@ Public Class atcDataManager
         End Try
     End Function
 
-    Public Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcDataGroup)
+    Public Shared Sub UserSelectDisplay(ByVal aTitle As String, ByVal aDataGroup As atcDataGroup)
         Dim lSelectDisplay As New frmSelectDisplay
         If Not aTitle Is Nothing AndAlso aTitle.Length > 0 Then lSelectDisplay.Text = aTitle
-        lSelectDisplay.AskUser(Me, aDataGroup)
+        lSelectDisplay.AskUser(aDataGroup)
     End Sub
 
-    Public Sub ShowDisplay(ByVal aDisplayName As String, ByVal aDataGroup As atcDataGroup)
+    Public Shared Sub ShowDisplay(ByVal aDisplayName As String, ByVal aDataGroup As atcDataGroup)
         If aDisplayName Is Nothing OrElse aDisplayName.Length = 0 Then
             UserSelectDisplay("", aDataGroup)
         Else
@@ -155,7 +159,7 @@ Public Class atcDataManager
                     Dim lAssembly As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(lType)
                     lNewDisplay = lAssembly.CreateInstance(lType.FullName)
                     lNewDisplay.Initialize(pMapWin, Nothing) 'TODO: do we need the aParentHandle here?
-                    lNewDisplay.Show(Me, aDataGroup)
+                    lNewDisplay.Show(aDataGroup)
                     Exit Sub
                 End If
             Next
@@ -166,7 +170,7 @@ Public Class atcDataManager
     ''' <param name="aDataSourceName">
     '''     <para>Name of data source to create and return</para>
     ''' </param>  
-    Public Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
+    Public Shared Function DataSourceByName(ByVal aDataSourceName As String) As atcDataSource
         For Each lDataSource As atcDataSource In GetPlugins(GetType(atcDataSource))
             If lDataSource.Name = aDataSourceName Then
                 Return lDataSource.NewOne
@@ -188,14 +192,14 @@ Public Class atcDataManager
     ''' <param name="aNeedToSave">
     '''     <para>True to only include data sources that can save</para>
     ''' </param>  
-    Public Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing, _
+    Public Shared Function UserSelectDataSource(Optional ByVal aCategories As ArrayList = Nothing, _
                                          Optional ByVal aTitle As String = "Select a Data Source", _
                                          Optional ByVal aNeedToOpen As Boolean = True, _
                                          Optional ByVal aNeedToSave As Boolean = False) As atcDataSource
         Dim lForm As New frmDataSource
         Dim lSelectedDataSource As atcDataSource = Nothing
         lForm.Text = aTitle
-        lForm.AskUser(Me, lSelectedDataSource, aNeedToOpen, aNeedToSave, aCategories)
+        lForm.AskUser(lSelectedDataSource, aNeedToOpen, aNeedToSave, aCategories)
         Return lSelectedDataSource
     End Function
 
@@ -209,20 +213,21 @@ Public Class atcDataManager
     ''' <param name="aModal">
     '''     <para>Optional modality specification for window, default is True</para>
     ''' </param>  
-    Public Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
+    Public Shared Function UserSelectData(Optional ByVal aTitle As String = "", Optional ByVal aGroup As atcDataGroup = Nothing, Optional ByVal aModal As Boolean = True) As atcDataGroup
         Dim lForm As New frmSelectData
         If aTitle.Length > 0 Then lForm.Text = aTitle
-        Return lForm.AskUser(Me, aGroup, aModal)
+        UserSelectData = lForm.AskUser(aGroup, aModal)
+        lForm.Dispose()
     End Function
 
     ''' <summary>Ask user to manage data sources</summary>
     ''' <param name="aTitle">
     '''     <para>Optional title for dialog window, default is 'Data Sources'</para>
     ''' </param> 
-    Public Sub UserManage(Optional ByVal aTitle As String = "")
+    Public Shared Sub UserManage(Optional ByVal aTitle As String = "")
         Dim lForm As New frmManager
         If aTitle.Length > 0 Then lForm.Text = aTitle
-        lForm.Edit(Me)
+        lForm.Edit()
     End Sub
 
     ''' <summary>State of data manager in XML format</summary>
@@ -232,7 +237,7 @@ Public Class atcDataManager
     ''' <a href="http://www.xml-parser.com/downloads.htm">http://www.xml-parser.com/downloads.htm</a>
     ''' </requirements>
     <CLSCompliant(False)> _
-     Public Property XML() As Chilkat.Xml
+     Public Shared Property XML() As Chilkat.Xml
         Get
             Dim lSaveXML As New Chilkat.Xml
             Dim lChildXML As Chilkat.Xml
@@ -255,7 +260,7 @@ Public Class atcDataManager
             Return lSaveXML
         End Get
         Set(ByVal newValue As Chilkat.Xml)
-            Me.Clear()
+            Clear()
             If Not newValue Is Nothing Then
                 Dim clearedSelectionAttributes As Boolean = False
                 Dim clearedDisplayAttributes As Boolean = False

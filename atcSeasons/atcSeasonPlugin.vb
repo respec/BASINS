@@ -49,7 +49,7 @@ Public Class atcSeasonPlugin
             ltsGroup = DatasetOrGroupToGroup(aArgs.GetValue("Timeseries"))
         End If
         If ltsGroup Is Nothing Then
-            ltsGroup = DataManager.UserSelectData("Select data for " & aOperationName)
+            ltsGroup = atcDataManager.UserSelectData("Select data for " & aOperationName)
         End If
         If Not ltsGroup Is Nothing Then
             If aOperationName.IndexOf("::") > 0 Then

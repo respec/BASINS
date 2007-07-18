@@ -7,25 +7,22 @@ Friend Class atcDataTreeForm
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(ByVal aDataManager As atcData.atcDataManager, _
-          Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+    Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
-
-        pDataManager = aDataManager
 
         Dim lTempDataGroup As atcDataGroup = aDataGroup
         If aDataGroup Is Nothing Then lTempDataGroup = New atcDataGroup
 
         If lTempDataGroup.Count = 0 Then 'ask user to specify some Data
-            pDataManager.UserSelectData(, lTempDataGroup, True)
+            atcDataManager.UserSelectData(, lTempDataGroup, True)
         End If
 
         If lTempDataGroup.Count > 0 Then
             pDataGroup = lTempDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
             PopulateTree()
 
-            Dim DisplayPlugins As ICollection = pDataManager.GetPlugins(GetType(atcDataDisplay))
+            Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
             For Each ldisp As atcDataDisplay In DisplayPlugins
                 Dim lMenuText As String = ldisp.Name
                 If lMenuText.StartsWith("Analysis::") Then lMenuText = lMenuText.Substring(10)
@@ -190,7 +187,6 @@ Friend Class atcDataTreeForm
 
 #End Region
 
-    Private pDataManager As atcDataManager
     Private WithEvents pTreeViewMain As TreeView   'tree control
     Private WithEvents pDataGroup As atcDataGroup   'group of atcData displayed
     Private pNumValuesShowDefault As Integer = 8
@@ -203,6 +199,7 @@ Friend Class atcDataTreeForm
         Dim lNumValuesNow As Integer
         Dim lValueStart As Integer
         Dim lDateString(3) As String
+        Dim lStr, lConditional As String
         Dim lDateOffset As Integer 'Mean data is labeled with previous date value (lDateOffset = -1)
 
         If Not pTreeViewMain Is Nothing Then
@@ -266,9 +263,12 @@ Friend Class atcDataTreeForm
                 For j As Integer = 1 To lNumValuesNow
                     'data starts at 1, date display is from prev value which is start of interval
                     lDateString = DumpDate(lData.Dates.Value(j + lDateOffset)).Split(" ")
-                    lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
-                                        DoubleToString(lData.Value(j)) & " : " & _
-                                        lDateString(0))
+                    lConditional = lData.ValueAttributes(j).GetValue("Conditional", "")
+                    lStr = lDateString(2) & " " & _
+                           lDateString(3) & " : " & _
+                           lConditional & DoubleToString(lData.Value(j)) & " : " & _
+                           lDateString(0)
+                    lDataNode.Nodes.Add(lStr)
                 Next
 
                 If lNumValues > pNumValuesShow AndAlso pNumValuesShow <> -1 Then  'some from end too
@@ -280,9 +280,12 @@ Friend Class atcDataTreeForm
                     End If
                     For j As Integer = lValueStart To lData.numValues
                         lDateString = DumpDate(lData.Dates.Value(j + lDateOffset)).Split(" ")
-                        lDataNode.Nodes.Add(lDateString(2) & " " & lDateString(3) & " : " & _
-                                            DoubleToString(lData.Value(j)) & " : " & _
-                                            lDateString(0))
+                        lConditional = lData.ValueAttributes(j).GetValue("Conditional", "")
+                        lStr = lDateString(2) & " " & _
+                               lDateString(3) & " : " & _
+                               lConditional & DoubleToString(lData.Value(j)) & " : " & _
+                               lDateString(0)
+                        lDataNode.Nodes.Add(lStr)
                     Next
                 End If
             Next
@@ -383,11 +386,11 @@ Friend Class atcDataTreeForm
     End Function
 
     Private Sub mnuAnalysis_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuAnalysis.Click
-        pDataManager.ShowDisplay(sender.Text, pDataGroup)
+        atcDataManager.ShowDisplay(sender.Text, pDataGroup)
     End Sub
 
     Private Sub mnuFileSelectData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSelectData.Click
-        pDataManager.UserSelectData(, pDataGroup)
+        atcDataManager.UserSelectData(, pDataGroup)
     End Sub
 
     Private Sub pDataGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
@@ -421,7 +424,6 @@ Friend Class atcDataTreeForm
     End Sub
 
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
-        pDataManager = Nothing
         pDataGroup = Nothing
         pTreeViewMain = Nothing
     End Sub
