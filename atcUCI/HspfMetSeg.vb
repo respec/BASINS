@@ -3,7 +3,7 @@ Option Explicit On
 <System.Runtime.InteropServices.ProgId("HspfMetSeg_NET.HspfMetSeg")> Public Class HspfMetSeg
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private pMetSegRecs(8) As HspfMetSegRecord
+    Private pMetSegRecs(7) As HspfMetSegRecord
     Private pId As Integer
     Private pName As String
     Private pUci As HspfUci
@@ -15,7 +15,7 @@ Option Explicit On
         End Get
         Set(ByVal Value() As HspfMetSegRecord)
             Dim itype As Integer
-            For itype = 1 To 8
+            For itype = 1 To 7
                 pMetSegRecs(itype) = Value(itype)
             Next
         End Set
@@ -121,13 +121,13 @@ Option Explicit On
             Case "SOLRAD" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrSOLRAD
             Case "CLOUD" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrCLOUD
             Case "PETINP" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrPETINP
-            Case "POTEV" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrPOTEV
+            Case "POTEV" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrPETINP
             Case Else : Str2Type = HspfMetSegRecord.MetSegRecordType.msrUNK
         End Select
     End Function
 
     Public Function Compare(ByRef newMetSeg As HspfMetSeg, ByRef opname As String) As Boolean
-        For itype As Integer = 1 To 8
+        For itype As Integer = 1 To 7
             If Not (pMetSegRecs(itype).Compare(newMetSeg.MetSegRecs(itype), opname)) Then
                 Return False
             End If
@@ -136,7 +136,7 @@ Option Explicit On
     End Function
 
     Public Sub UpdateMetSeg(ByRef newMetSeg As HspfMetSeg)
-        For itype As Integer = 1 To 8
+        For itype As Integer = 1 To 7
             With newMetSeg.MetSegRecs(itype)
                 If pMetSegRecs(itype).MFactR = -999.0# And .MFactR <> -999.0# Then
                     pMetSegRecs(itype).MFactR = .MFactR
@@ -152,7 +152,7 @@ Option Explicit On
 
     Public Sub New()
         MyBase.New()
-        For lType As Integer = 1 To 8
+        For lType As Integer = 1 To 7
             pMetSegRecs(lType) = New HspfMetSegRecord
         Next
         pAirType = 0
@@ -165,7 +165,7 @@ Option Explicit On
 
         Me.Name = Me.Uci.GetWDMAttr(wdmid, idsn, "LOC")
 
-        For itype = 1 To 8
+        For itype = 1 To 7
             Select Case itype
                 Case 1 : Con = "PREC"
                 Case 2 : Con = "GATMP"
@@ -174,7 +174,6 @@ Option Explicit On
                 Case 5 : Con = "SOLRAD"
                 Case 6 : Con = "CLOUD"
                 Case 7 : Con = "PETINP"
-                Case 8 : Con = "POTEV"
             End Select
             If itype = 2 And Me.AirType = 2 Then
                 Con = "AIRTMP"
@@ -222,7 +221,7 @@ Option Explicit On
         Dim segRec As Integer
         Dim tmember As String = ""
 
-        For segRec = 1 To 8
+        For segRec = 1 To 7
             With pMetSegRecs(segRec)
                 If .typ <> 0 Then 'type exists
                     If (optyp = "RCHRES" And .MFactR > 0.0#) Or (optyp = "PERLND" And .MFactP > 0.0#) Or (optyp = "IMPLND" And .MFactP > 0.0#) Then
@@ -276,8 +275,7 @@ Option Explicit On
                                 Case 4 : tmember = "WIND"
                                 Case 5 : tmember = "SOLRAD"
                                 Case 6 : tmember = "CLOUD"
-                                Case 7 : tmember = "PETINP"
-                                Case 8 : tmember = "POTEV"
+                                Case 7 : tmember = "POTEV"
                             End Select
                         Else
                             Select Case .typ
@@ -288,7 +286,6 @@ Option Explicit On
                                 Case 5 : tmember = "SOLRAD"
                                 Case 6 : tmember = "CLOUD"
                                 Case 7 : tmember = "PETINP"
-                                Case 8 : tmember = "POTEV"
                             End Select
                             If .typ = 2 Then
                                 'get right air temp member name

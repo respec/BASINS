@@ -757,7 +757,7 @@ Public Class HspfUci
         'set any undefined mfacts to 0
         If pMetSegs.Count() > 0 Then
             For Each vMetSeg In pMetSegs
-                For j = 1 To 8
+                For j = 1 To 7
                     If vMetSeg.MetSegRec(j).MFactP = -999.0# Then
                         vMetSeg.MetSegRec(j).MFactP = 0
                     End If
@@ -929,7 +929,7 @@ Public Class HspfUci
         For Each vOpTyp In lOpTypes
             For Each lOpn In pOpnBlks.Item(vOpTyp).Ids
                 If Not lOpn.MetSeg Is Nothing Then
-                    For segRec = 1 To 8
+                    For segRec = 1 To 7
                         With lOpn.MetSeg.MetSegRec(segRec)
                             If .typ <> 0 Then 'type exists
                                 If (lOpn.Name = "RCHRES" And .MFactR > 0.0#) Or (lOpn.Name = "PERLND" And .MFactP > 0.0#) Or (lOpn.Name = "IMPLND" And .MFactP > 0.0#) Then
@@ -956,8 +956,7 @@ Public Class HspfUci
                                             Case 4 : lConn.Target.Member = "WIND"
                                             Case 5 : lConn.Target.Member = "SOLRAD"
                                             Case 6 : lConn.Target.Member = "CLOUD"
-                                            Case 7 : lConn.Target.Member = "PETINP"
-                                            Case 8 : lConn.Target.Member = "POTEV"
+                                            Case 7 : lConn.Target.Member = "POTEV"
                                         End Select
                                     Else
                                         lConn.MFact = .MFactP
@@ -969,7 +968,6 @@ Public Class HspfUci
                                             Case 5 : lConn.Target.Member = "SOLRAD"
                                             Case 6 : lConn.Target.Member = "CLOUD"
                                             Case 7 : lConn.Target.Member = "PETINP"
-                                            Case 8 : lConn.Target.Member = "POTEV"
                                         End Select
                                         If .typ = 2 Then
                                             'get right air temp member name
@@ -1235,12 +1233,13 @@ Public Class HspfUci
     '        With lTser
     '            lLocation = .Attributes.GetValue("Location")
     '            If Len(lLocation) > 0 And .File.FileUnit = fun Then
-    '                'first get the common dates from all timsers at this location
-    '                Call findtimser("OBSERVED", lLocation, "", llocts)
+    '                'first get the common dates from prec and pevt at this location
+    '                Call findtimser("OBSERVED", lLocation, "PREC", llocts)
     '                ldate = llocts.Item(1).Dates
     '                sj = ldate.Value(0) '.SJDay
     '                ej = ldate.Value(.numValues) '.EJDay
-    '                For j = 2 To llocts.Count()
+    '                Call findtimser("", lLocation, "PEVT", llocts)
+    '                For j = 1 To llocts.Count()
     '                    ldate = llocts.Item(j).Dates
     '                    tempsj = ldate.Value(0) '.SJDay
     '                    tempej = ldate.Value(.numValues) '.EJDay
