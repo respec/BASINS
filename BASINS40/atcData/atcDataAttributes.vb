@@ -266,12 +266,17 @@ Public Class atcDataAttributes
                 .Add("datcre", "Date Created")
                 .Add("datmod", "Date Modified")
 
+                .Add("start date", "SJDay")
+                .Add("end date", "EJDay")
+
                 .Add("latdeg", "Latitude")
                 .Add("lngdeg", "Longitude")
 
                 .Add("skewcf", "Skew")
                 .Add("stddev", "Standard Deviation")
                 .Add("meanvl", "Mean")
+                .Add("minimum", "Min")
+                .Add("maximum", "Max")
                 .Add("nonzro", "Count Positive")
                 .Add("numzro", "Count Zero")
 
