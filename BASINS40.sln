@@ -74,6 +74,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGisUtiliies", "atcGisUti
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimseriesDbf", "atcTimseriesDbf\atcTimseriesDbf.vbproj", "{F05FE01B-E35C-4444-B5A2-47085D073631}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimseriesExcel", "atcTimseriesExcel\atcTimseriesExcel.vbproj", "{94048896-37EE-4760-8707-8E5989498943}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -227,6 +229,10 @@ Global
 		{F05FE01B-E35C-4444-B5A2-47085D073631}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F05FE01B-E35C-4444-B5A2-47085D073631}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F05FE01B-E35C-4444-B5A2-47085D073631}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94048896-37EE-4760-8707-8E5989498943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94048896-37EE-4760-8707-8E5989498943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94048896-37EE-4760-8707-8E5989498943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94048896-37EE-4760-8707-8E5989498943}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

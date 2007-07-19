@@ -310,6 +310,7 @@ Friend Class atcListForm
         Next
         lAvailable.Sort()
         If lst.AskUser(lAvailable, atcDataManager.DisplayAttributes) Then
+            'TODO: set project modified flag
             PopulateGrid()
         End If
     End Sub
