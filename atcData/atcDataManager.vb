@@ -281,9 +281,9 @@ Public Class atcDataManager
                                 If lNewDataSource Is Nothing Then
                                     Logger.Msg("Unable to open data source of type '" & lDataSourceType & "'", "Data type not found")
                                 ElseIf lNewDataSource.Category = "File" Then
-                                    Logger.Dbg("Skipping opening data source that is not a File: " & lSpecification)
-                                Else
                                     OpenDataSource(lNewDataSource, lSpecification, Nothing)
+                                Else
+                                    Logger.Dbg("Skipping opening data source that is not a File: " & lSpecification)
                                 End If
                             End If
                         Case "SelectionAttribute"
