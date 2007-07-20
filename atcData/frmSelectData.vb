@@ -23,7 +23,6 @@ Friend Class frmSelectData
     'Form overrides dispose to clean up the component list.
     Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
         If disposing Then
-            RemoveHandler atcDataManager.OpenedData, AddressOf OpenedData
             If Not (components Is Nothing) Then
                 components.Dispose()
             End If
@@ -277,7 +276,7 @@ Friend Class frmSelectData
     Private pCriteriaFraction() As Single
 
     Private pMatchingGroup As atcDataGroup
-    Private pSelectedGroup As atcDataGroup
+    Private WithEvents pSelectedGroup As atcDataGroup
     Private pSaveGroup As atcDataGroup = Nothing
 
     Private pMatchingSource As GridSource
@@ -483,7 +482,6 @@ NextTS:
 
             UpdateManagerSelectionAttributes()
             PopulateMatching()
-            RefreshSelected()
 
             For Each mnu In mnuAttributesRemove.MenuItems
                 RemoveHandler mnu.Click, AddressOf mnuRemove_Click
@@ -735,13 +733,6 @@ NextName:
                 End If
             End If
         End If
-        RefreshSelected()
-    End Sub
-
-    Private Sub RefreshSelected()
-        pMatchingGrid.Refresh()
-        pSelectedGrid.Refresh()
-        groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & " of " & pTotalTS & ")"
     End Sub
 
     Private Sub pSelectedGrid_MouseDownCell(ByVal aGrid As atcGrid, ByVal aRow As Integer, ByVal aColumn As Integer) Handles pSelectedGrid.MouseDownCell
@@ -750,7 +741,6 @@ NextName:
             Dim iTS As Integer = pSelectedGroup.IndexOfSerial(lSerial)
             If iTS >= 0 Then 'Found matching serial number in pSelectedGroup
                 pSelectedGroup.RemoveAt(iTS)
-                RefreshSelected()
             Else
                 'TODO: should never reach this line
             End If
@@ -782,7 +772,6 @@ NextName:
     Private Sub mnuSelectClear_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSelectClear.Click
         If pSelectedGroup.Count > 0 Then
             pSelectedGroup.Clear()
-            RefreshSelected()
         End If
     End Sub
 
@@ -790,14 +779,12 @@ NextName:
         'For Each ts As atcDataSet In pMatchingGroup
         '  If Not pSelectedGroup.Contains(ts) Then pSelectedGroup.Add(ts)
         'Next
-        'RefreshSelected()
         Dim lAdd As New atcCollection
         For Each ts As atcDataSet In pMatchingGroup
             If Not pSelectedGroup.Contains(ts) Then lAdd.Add(ts)
         Next
         If lAdd.Count > 0 Then
             pSelectedGroup.Add(lAdd)
-            RefreshSelected()
         End If
     End Sub
 
@@ -808,7 +795,6 @@ NextName:
         Next
         If lRemove.Count > 0 Then
             pSelectedGroup.Remove(lRemove)
-            RefreshSelected()
         End If
     End Sub
 
@@ -840,7 +826,6 @@ NextName:
         Next
         If lAdd.Count > 0 Then
             pSelectedGroup.Add(lAdd) 'TODO: add with IDs as keys
-            RefreshSelected()
         End If
     End Sub
 
@@ -849,6 +834,7 @@ NextName:
     End Sub
 
     Private Sub frmSelectData_Closed(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Closed
+        RemoveHandler atcDataManager.OpenedData, AddressOf OpenedData
         pMatchingGroup = Nothing
         pSaveGroup = Nothing
         pMatchingSource = Nothing
@@ -857,6 +843,12 @@ NextName:
 
     Private Sub mnuHelp_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp("BASINS Details\Analysis\Time Series Functions.html")
+    End Sub
+
+    Private Sub pSelectedGroup_Changed(ByVal aAdded As atcUtility.atcCollection) Handles pSelectedGroup.Added, pSelectedGroup.Removed
+        pMatchingGrid.Refresh()
+        pSelectedGrid.Refresh()
+        groupSelected.Text = "Selected Data (" & pSelectedGroup.Count & " of " & pTotalTS & ")"
     End Sub
 End Class
 
