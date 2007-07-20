@@ -151,8 +151,10 @@ Public Class atcDataSourceWDM
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
             Dim lTu As Integer = lTimser.Attributes.GetValue("tu", 0)
 
-            If lTs = 0 Then Throw New ApplicationException("Cannot write to WDM: time step not set")
-            If lTu = 0 Then Throw New ApplicationException("Cannot write to WDM: time units not set")
+            If lTs = 0 Or lTu = 0 Then
+                'TODO: probably a sparse dataset - fill in dummy values
+                Throw New ApplicationException("Cannot write to WDM: TimeStep or TimeUnits not set")
+            End If
 
             Dim lNvals As Integer = lTimser.numValues
             Dim lSJDay As Double = lTimser.Dates.Value(0)
