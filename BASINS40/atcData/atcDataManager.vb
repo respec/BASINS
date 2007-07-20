@@ -217,7 +217,6 @@ Public Class atcDataManager
         Dim lForm As New frmSelectData
         If aTitle.Length > 0 Then lForm.Text = aTitle
         UserSelectData = lForm.AskUser(aGroup, aModal)
-        lForm.Dispose()
     End Function
 
     ''' <summary>Ask user to manage data sources</summary>
