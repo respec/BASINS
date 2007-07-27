@@ -57,15 +57,7 @@ Public Class GisUtilities
         Next
 
         'delete old version of this shapefile if it exists
-        If FileExists(aShapefileName) Then
-            System.IO.File.Delete(aShapefileName)
-        End If
-        If FileExists(FilenameNoExt(aShapefileName) & ".shx") Then
-            System.IO.File.Delete(FilenameNoExt(aShapefileName) & ".shx")
-        End If
-        If FileExists(FilenameNoExt(aShapefileName) & ".dbf") Then
-            System.IO.File.Delete(FilenameNoExt(aShapefileName) & ".dbf")
-        End If
+        TryDeleteShapefile(aShapefileName)
 
         GisUtil.CreatePointShapefile(aShapefileName, lXPositions, lYPositions, lAttributeNames, lAttributeValues, aOutputProjection)
 

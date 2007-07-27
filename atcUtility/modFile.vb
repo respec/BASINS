@@ -5,6 +5,9 @@ Imports System.Collections.Specialized
 Imports MapWinUtility
 
 Public Module modFile
+
+    Private ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".xml", ".shp.xml", ".mwsr"}
+
     ''' <summary>
     ''' Try moving a file to a new location, log a failure rather than raising an exception
     ''' </summary>
@@ -15,9 +18,7 @@ Public Module modFile
     Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String) As Boolean
         TryMove = False
         If FileExists(aFromFilename) Then
-            If FileExists(aToPath) Then
-                TryDelete(aToPath) 'Remove existing file at destination
-            End If
+            TryDelete(aToPath) 'Remove existing file at destination
             Try
                 If FileExists(aToPath, True, False) Then
                     aToPath = IO.Path.Combine(aToPath, IO.Path.GetFileName(aFromFilename))
@@ -28,13 +29,58 @@ Public Module modFile
                 Catch exMove As Exception 'If moving didn't work, maybe copying will
                     IO.File.Copy(aFromFilename, aToPath)
                     TryMove = True
-                    IO.File.Delete(aFromFilename)
+                    TryDelete(aFromFilename)
                 End Try
                 Logger.Dbg("Moved file from '" & aFromFilename & "' to '" & aToPath & "'")
             Catch ex As Exception
                 Logger.Dbg("Unable to move file from '" & aFromFilename & "' to '" & aToPath & "' - " & ex.Message)
             End Try
         End If
+    End Function
+
+    ''' <summary>
+    ''' Delete a shape file (including all associated files: .shp, .shx, .dbf, .prj, .spx, .sbn, .xml, .shp.xml, .mwsr)
+    ''' </summary>
+    ''' <param name="aShapefilename">file name of shape file (must end with .shp)</param>
+    ''' <returns>True if all existing files were deleted or already did not exist, 
+    ''' False if any files were present which could not be deleted.</returns>
+    ''' <remarks>Most likely cause of failure is shape file is open (currently on a map)</remarks>
+    Public Function TryDeleteShapefile(ByVal aShapeFilename As String) As Boolean
+        TryDeleteShapefile = True
+        For Each lFilename As String In ShapeFilenames(aShapeFilename)
+            If Not TryDelete(lFilename) Then TryDeleteShapefile = False
+        Next
+    End Function
+
+    ''' <summary>
+    ''' Move a shape file (including all associated files: .shp, .shx, .dbf, .prj, .spx, .sbn, .xml, .shp.xml, .mwsr)
+    ''' Log any exceptions and return false rather than raising them
+    ''' </summary>
+    ''' <param name="aShapeFilename">full path and file name of shape file to move (example: "C:\temp.shp")</param>
+    ''' <param name="aDestinationPath">full path of destination folder or file name 
+    ''' (example: "C:\NewLocation\" or "C:\NewLocation\NewFilename.shp")</param>
+    ''' <returns>True if all existing files were moved, False if an existing file could not be moved.</returns>
+    Public Function TryMoveShapefile(ByVal aShapeFilename As String, ByVal aDestinationPath As String) As Boolean
+        TryMoveShapefile = True
+        Dim lNewBaseName As String
+        If IO.Path.GetExtension(aDestinationPath).Length > 0 Then
+            lNewBaseName = IO.Path.GetFileNameWithoutExtension(aDestinationPath)
+            aDestinationPath = IO.Path.GetDirectoryName(aDestinationPath)
+        Else
+            lNewBaseName = IO.Path.GetFileNameWithoutExtension(aShapeFilename)
+        End If
+        aDestinationPath = IO.Path.Combine(aDestinationPath, lNewBaseName)
+        For Each lFilename As String In ShapeFilenames(aShapeFilename)
+            If Not TryMove(lFilename, aDestinationPath & IO.Path.GetExtension(lFilename)) Then TryMoveShapefile = False
+        Next
+    End Function
+
+    Private Function ShapeFilenames(ByVal aShapefilename As String) As ArrayList
+        Dim lBaseFilename As String = IO.Path.GetFileNameWithoutExtension(aShapefilename)
+        ShapeFilenames = New ArrayList
+        For Each lExtension As String In ShapeExtensions
+            ShapeFilenames.Add(lBaseFilename & lExtension)
+        Next
     End Function
 
     ''' <summary>
@@ -55,7 +101,7 @@ Public Module modFile
             lCounter += 1
             NewTempDir = IO.Path.GetTempPath & aBaseName & "_" & lCounter & "\"
         End While
-        IO.Directory.CreateDirectory(NewTempDir)        
+        IO.Directory.CreateDirectory(NewTempDir)
     End Function
 
     'if aHelpTopic is a file, set the file to display instead of opening help
@@ -352,11 +398,6 @@ FoundSameUntil:
             End If
             ChDriveDir(OrigDir)
         End If
-    End Sub
-
-    'Recursively remove all files and directories in aDirName
-    Public Sub RemoveFilesInDir(ByVal aDirName As String)
-        IO.Directory.Delete(aDirName, True)
     End Sub
 
     Public Sub SaveFileString(ByVal filename As String, ByVal FileContents As String)

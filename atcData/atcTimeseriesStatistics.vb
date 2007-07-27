@@ -295,21 +295,24 @@ Public Class atcTimeseriesStatistics
         If Not ltsGroup Is Nothing Then
             For Each lts As atcTimeseries In ltsGroup
                 If aOperationName.StartsWith("%") Then
-                    Dim lBinsDefinition As atcAttributeDefinition = atcDataAttributes.AllDefinitions.ItemByKey("bins")
-                    If lBinsDefinition Is Nothing Then
-                        lBinsDefinition = New atcAttributeDefinition
-                        With lBinsDefinition
-                            .Name = "Bins"
-                            .Category = "Statistics"
-                            .Description = "Values sorted into a collection of bins"
-                            .DefaultValue = Nothing
-                            .Editable = False
-                            .TypeString = "atcCollection"
-                            .Calculator = Me
-                        End With
-                        atcDataAttributes.AllDefinitions.Add(lBinsDefinition.Name.ToLower, lBinsDefinition)
+                    Dim lPercentString As String = aOperationName.Substring(1)
+                    If IsNumeric(lPercentString) Then
+                        Dim lBinsDefinition As atcAttributeDefinition = atcDataAttributes.AllDefinitions.ItemByKey("bins")
+                        If lBinsDefinition Is Nothing Then
+                            lBinsDefinition = New atcAttributeDefinition
+                            With lBinsDefinition
+                                .Name = "Bins"
+                                .Category = "Statistics"
+                                .Description = "Values sorted into a collection of bins"
+                                .DefaultValue = Nothing
+                                .Editable = False
+                                .TypeString = "atcCollection"
+                                .Calculator = Me
+                            End With
+                            atcDataAttributes.AllDefinitions.Add(lBinsDefinition.Name.ToLower, lBinsDefinition)
+                        End If
+                        ComputePercentile(lts, CDbl(lPercentString))
                     End If
-                    ComputePercentile(lts, CDbl(aOperationName.Substring(1, 2)))
                 Else
                     ComputeStatistics(lts)
                 End If
