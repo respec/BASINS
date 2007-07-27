@@ -755,7 +755,7 @@ Public Class frmReclass
             'does this dbf already exist?
             If FileExists(dbfname) Then
                 'delete this file first
-                System.IO.File.Delete(dbfname)
+                TryDelete(dbfname)
             End If
             tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(dbfname)
             tmpDbf.NumFields = 5

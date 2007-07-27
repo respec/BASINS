@@ -497,19 +497,20 @@ Public Class GisUtil
 
     ''' <summary>Index of a layer from a name</summary>
     ''' <param name="aLayerName">
-    '''     <para>Name of layer to obtain index for</para>
+    '''     <para>Name or filename of layer to obtain index for</para>
     ''' </param>
     ''' <exception cref="System.Exception" caption="LayerNameNameNotRecognized">Layer specified by aLayerName does not exist</exception>
     ''' <exception cref="System.Exception" caption="LayerIndexOutOfRange">Layer specified by aLayerIndex does not exist</exception>
     ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
     Public Shared Function LayerIndex(ByVal aLayerName As String) As Integer
         'start at topmost layer and work down looking for a match
+        aLayerName = UCase(aLayerName)
         Dim i As Integer
         For i = GetMappingObject.Layers.NumLayers - 1 To 0 Step -1
-            If UCase(LayerName(i)) = UCase(aLayerName) Then
+            If UCase(LayerName(i)) = aLayerName OrElse UCase(LayerFileName(i)) = aLayerName Then
                 Return i
             End If
-        Next i
+        Next
 
         Throw New Exception("GisUtil:LayerIndex:Error:LayerName:" & aLayerName & ":IsNotRecognized")
     End Function
@@ -1541,15 +1542,7 @@ Public Class GisUtil
         Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
         If aCreateNew Then 'delete old version of this file if it exists
-            If FileExists(aOutputLayerName) Then
-                System.IO.File.Delete(aOutputLayerName)
-            End If
-            If FileExists(FilenameNoExt(aOutputLayerName) & ".shx") Then
-                System.IO.File.Delete(FilenameNoExt(aOutputLayerName) & ".shx")
-            End If
-            If FileExists(FilenameNoExt(aOutputLayerName) & ".dbf") Then
-                System.IO.File.Delete(FilenameNoExt(aOutputLayerName) & ".dbf")
-            End If
+            TryDeleteShapefile(aOutputLayerName)
         End If
 
         lBsuc = lSfOut.SaveAs(aOutputLayerName)
