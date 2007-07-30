@@ -311,11 +311,7 @@ Friend Module modBasinsPlugin
                         Dim lTitle As String = ""
                         MkDirPath(lProjectDir & "\temp")
                         Dim lNewShapeName As String = lProjectDir & "\temp\tempextent.shp"
-                        If FileExists(lNewShapeName) Then
-                            TryDelete(lProjectDir & "\temp\tempextent.shp")
-                            TryDelete(lProjectDir & "\temp\tempextent.shx")
-                            TryDelete(lProjectDir & "\temp\tempextent.dbf")
-                        End If
+                        TryDeleteShapefile(lNewShapeName)
                         'are any features selected?
                         If GisUtil.NumSelectedFeatures(GisUtil.CurrentLayer) > 0 Then
                             'make temp shapefile from selected features
