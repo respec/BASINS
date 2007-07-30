@@ -677,6 +677,8 @@ Public Class atcBasinsPlugIn
                 RefreshAnalysisMenu(lUnloading)
             End If
             RefreshComputeMenu()
+        ElseIf msg.StartsWith("<success>") Then
+            ProcessDownloadResults(msg)
         Else
             Logger.Dbg("Ignore:" & msg)
         End If
