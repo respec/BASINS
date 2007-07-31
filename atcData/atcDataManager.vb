@@ -124,20 +124,20 @@ Public Class atcDataManager
                                    ByVal aAttributes As atcDataAttributes) As Boolean
         Try
             If aNewSource.Open(aSpecification, aAttributes) Then
-                Logger.Dbg("OpenDataSource:Count:" & aNewSource.DataSets.Count & ":" & aNewSource.Specification)
+                Logger.Dbg("DataSetCount:" & aNewSource.DataSets.Count & ":Specification:" & aNewSource.Specification)
                 pDataSources.Add(aNewSource)
                 RaiseEvent OpenedData(aNewSource)
                 If Not pMapWin Is Nothing Then pMapWin.Project.Modified = True
                 Return True
             Else
                 If Logger.LastDbgText.Length > 0 Then
-                    Logger.Dbg("OpenDataSource:OpenFailure:Specification:'" & aSpecification & "'" & vbCrLf & _
+                    Logger.Dbg("OpenFailure:Specification:'" & aSpecification & "'" & vbCrLf & _
                                "Source Name:" & aNewSource.Name)
                 End If
                 Return False
                 End If
         Catch ex As Exception
-            Logger.Dbg("OpenDataSource:Exception:" & ex.Message & vbCrLf & _
+            Logger.Dbg("Exception:" & ex.Message & vbCrLf & _
                        "Specification:'" & aSpecification & "'" & vbCrLf & _
                        "Source Name:" & aNewSource.Name)
             Return False

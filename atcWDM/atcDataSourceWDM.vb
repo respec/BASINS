@@ -1,4 +1,4 @@
-'Copyright 2001-5 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+'Copyright 2001-7 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
@@ -11,8 +11,7 @@ Imports System.Collections.Specialized
 Public Class atcDataSourceWDM
     Inherits atcData.atcDataSource
 
-    Private Shared pFileFilter As String = "WDM Files (*.wdm)|*.wdm"
-    Private pErrorDescription As String
+    Private Shared pFilter As String = "WDM Files (*.wdm)|*.wdm"
     Private pDates As ArrayList 'of atcTimeseries
     Private pQuick As Boolean = False
     Private pNan As Double
@@ -20,8 +19,7 @@ Public Class atcDataSourceWDM
     Private Shared pMsg As atcMsgWDM
 
     Private Sub Clear()
-        pErrorDescription = ""
-        Specification = "<unknown>"
+        'Specification = "<unknown>"
         pQuick = False
 
         pDates = Nothing
@@ -30,6 +28,7 @@ Public Class atcDataSourceWDM
 
     Public Sub New()
         MyBase.New()
+        Filter = pFilter
 
         'kludge to force loading of system.double, removal may cause program to exit without message!
         pNan = System.Double.NaN
@@ -335,8 +334,7 @@ CaseExistRenumber:
             End If
         Else
             RemoveDataset = False
-            pErrorDescription = "WDM:RemoveDataset:DSN:" & aDataSet.Attributes.GetValue("id", 1) & ":Retcod:" & lRetcod
-            Logger.Dbg(pErrorDescription)
+            Logger.Dbg("WDM:RemoveDataset:DSN:" & aDataSet.Attributes.GetValue("id", 1) & ":Retcod:" & lRetcod)
         End If
         lWdmHandle.Dispose()
     End Function
@@ -429,10 +427,6 @@ CaseExistRenumber:
             End If
         Next
 
-        If pErrorDescription.Length > 0 Then
-            Logger.Dbg(pErrorDescription)
-        End If
-
         lMsg.Dispose()
     End Function
 
@@ -502,10 +496,8 @@ CaseExistRenumber:
                 If Math.Abs(lRetcod) = 104 Then 'cant update if data already present
                     Logger.Dbg("Skip:" & lName & ", data present")
                 Else
-                    If Len(pErrorDescription) = 0 Then
-                        pErrorDescription = "Unable to Write Data Attribute to WDM"
-                    End If
-                    pErrorDescription &= vbCrLf & "  Attribute:" & lName & ", Value:" & lValue & ", Retcod:" & lRetcod
+                    Logger.Dbg("Unable to Write Data Attribute to WDM" & vbCrLf & _
+                               "Attribute:" & lName & ", Value:" & lValue & ", Retcod:" & lRetcod)
                     DsnWriteAttribute = False
                 End If
             End If
@@ -545,45 +537,30 @@ CaseExistRenumber:
     Public Overrides Function Open(ByVal aFileName As String, _
                           Optional ByVal aAttributes As atcDataAttributes = Nothing) _
                                    As Boolean
-        If aFileName Is Nothing OrElse aFileName.Length = 0 Then
-            Dim cdlg As New Windows.Forms.OpenFileDialog
-            With cdlg
-                .Title = "Select WDM file to open"
-                .FileName = aFileName
-                .Filter = pFileFilter
-                .CheckFileExists = False
-                If .ShowDialog() = Windows.Forms.DialogResult.OK Then
-                    aFileName = AbsolutePath(.FileName, CurDir)
-                Else 'cancel
-                    Logger.Dbg("atcDataSourceWDM:Open:User Cancelled File Dialogue for Open WDM file")
-                    Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
-                    Return False
-                End If
-            End With
-        End If
 
-        Dim lWdmHandle As atcWdmHandle
-        If FileExists(aFileName) Then
-            lWdmHandle = New atcWdmHandle(0, aFileName)
-        ElseIf FilenameNoPath(aFileName).Length > 0 Then
-            Logger.Dbg("atcDataSourceWDM:Open:WDM file " & aFileName & " does not exist - it will be created")
-            MkDirPath(PathNameOnly(aFileName))
-            lWdmHandle = New atcWdmHandle(2, aFileName)
-        Else
-            Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & aFileName & "'")
-            Return False
-        End If
+        If MyBase.Open(aFileName, aAttributes) Then
+            Dim lWdmHandle As atcWdmHandle
+            If FileExists(Specification) Then
+                lWdmHandle = New atcWdmHandle(0, Specification)
+            ElseIf FilenameNoPath(Specification).Length > 0 Then
+                Logger.Dbg("atcDataSourceWDM:Open:WDM file " & Specification & " does not exist - it will be created")
+                MkDirPath(PathNameOnly(Specification))
+                lWdmHandle = New atcWdmHandle(2, Specification)
+            Else
+                Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & Specification & "'")
+                Return False
+            End If
 
-        If Not lWdmHandle Is Nothing AndAlso lWdmHandle.Unit > 0 Then
-            Specification = aFileName
-            pQuick = True
-            Refresh(lWdmHandle.Unit)
-            pQuick = False
-            lWdmHandle.Dispose()
-            Return True 'Successfully opened
-        Else
-            Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & aFileName & "'")
-            Return False
+            If Not lWdmHandle Is Nothing AndAlso lWdmHandle.Unit > 0 Then
+                pQuick = True
+                Refresh(lWdmHandle.Unit)
+                pQuick = False
+                lWdmHandle.Dispose()
+                Return True 'Successfully opened
+            Else
+                Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & Specification & "'")
+                Return False
+            End If
         End If
     End Function
 
@@ -597,8 +574,8 @@ CaseExistRenumber:
         Dim lTsFill As Double
 
         If Not DataSets.Contains(aReadMe) Then
-            Logger.Dbg("WDM cannot read dataset, not from this file" & vbCrLf & _
-                       "Details:" & aReadMe.ToString)
+            Logger.Dbg("WDM cannot read dataset with details:" & aReadMe.ToString & vbCrLf & _
+                       "Specification:'" & Specification & "'")
         Else
             Dim lReadTS As atcTimeseries = aReadMe
             'Logger.dbg("WDM read data " & aReadMe.Attributes.GetValue("Location"))

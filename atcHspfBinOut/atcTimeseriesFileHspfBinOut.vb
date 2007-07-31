@@ -5,14 +5,13 @@ Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 
-
 Public Class atcTimeseriesFileHspfBinOut
     Inherits atcData.atcDataSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private pFileFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
+    Private pFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
     Private pName As String = "Timeseries::HSPF Binary Output"
-    Private pErrorDescription As String
+    'Private pErrorDescription As String
     'Private pMonitor As Object
     'Private pMonitorSet As Boolean = False
     Private pDates As ArrayList 'of atcTimeseries
@@ -67,19 +66,6 @@ Public Class atcTimeseriesFileHspfBinOut
         End Get
     End Property
 
-    Public ReadOnly Property ErrorDescription() As String
-        Get
-            ErrorDescription = pErrorDescription
-            pErrorDescription = ""
-        End Get
-    End Property
-
-    Public ReadOnly Property FileUnit() As Integer
-        Get
-            Return 0 'unknown here, known thru clsHspfBinary:clsFtnUnfFile
-        End Get
-    End Property
-
     Public WriteOnly Property HelpFilename() As String
         Set(ByVal newValue As String)
             'TODO:how do we handle helpfiles?
@@ -93,13 +79,6 @@ Public Class atcTimeseriesFileHspfBinOut
         End Get
     End Property
 
-    Public WriteOnly Property Monitor() As Object
-        Set(ByVal Value As Object)
-            'pMonitor = Value
-            'pMonitorSet = True
-        End Set
-    End Property
-
     Private Sub BuildTSers()
         Dim lTSer As atcTimeseries
         Dim lBaseAttributes As atcDataAttributes 'attributes related to dates common to all in ts in a header
@@ -111,15 +90,7 @@ Public Class atcTimeseriesFileHspfBinOut
         Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
         Dim i As Integer, j As Integer ', s As String
 
-        'If pMonitorSet Then
-        '    pMonitor.SendMonitorMessage("(OPEN HSPF Binary Output File)")
-        '    pMonitor.SendMonitorMessage("(BUTTOFF CANCEL)")
-        '    pMonitor.SendMonitorMessage("(BUTTOFF PAUSE)")
-        '    pMonitor.SendMonitorMessage("(MSG1 " & Specification & ")")
-        'End If
-
         pBinFile = New clsHspfBinary
-        'pBinFile.Monitor = pMonitor
         pBinFile.Filename = Specification
 
         i = 0
@@ -205,13 +176,6 @@ Public Class atcTimeseriesFileHspfBinOut
             i = i + 1
             Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
         Next
-
-        'If pMonitorSet Then
-        '    pMonitor.SendMonitorMessage("(CLOSE)")
-        '    pMonitor.SendMonitorMessage("(BUTTON CANCEL)")
-        '    pMonitor.SendMonitorMessage("(BUTTON PAUSE)")
-        'End If
-
     End Sub
 
     Public Overrides Sub readData(ByVal aDataSet As atcDataSet)
@@ -267,11 +231,12 @@ Public Class atcTimeseriesFileHspfBinOut
                         v(0) = v(1)
                     End If
                 Else
-                    pErrorDescription = "Could not retrieve HSPF Binary data values for variable: " & lts.Attributes.GetValue("IDCONS")
+                    Logger.Dbg("Could not retrieve HSPF Binary data values for variable: " & lts.Attributes.GetValue("IDCONS"))
                 End If
             End With
-        Catch
-            pErrorDescription = "Could not retrieve data values for HSPF Binary TSER" & "Key = " & lKey
+        Catch ex As Exception
+            Logger.Dbg("Could not retrieve data values for HSPF Binary TSER" & "Key = " & lKey & vbCrLf & _
+                       "Message:" & ex.Message)
             ReDim v(0)
             ReDim f(0)
         End Try
@@ -289,30 +254,23 @@ Public Class atcTimeseriesFileHspfBinOut
         pBinFile.ReadNewRecords()
     End Sub
 
-    Public Function RemoveTimSer(ByVal t As atcTimeseries) As Boolean
-        pErrorDescription = "Unable to Remove a Time Series for " & Description
+    Public Function RemoveTimSer(ByVal aTimeseries As atcTimeseries) As Boolean
+        Logger.Dbg("Unable to Remove Time Series " & aTimeseries.ToString & vbCrLf & _
+                   "From:" & Specification)
         Return False
     End Function
 
-    Public Function RewriteTimSer(ByVal t As atcTimeseries) As Boolean
-        pErrorDescription = "Unable to Rewrite a Time Series for " & Description
+    Public Function RewriteTimSer(ByVal aTimeseries As atcTimeseries) As Boolean
+        Logger.Dbg("Unable to Rewrite Time Series " & aTimeseries.ToString & vbCrLf & _
+                   "From:" & Specification)
         Return False
     End Function
 
-    Public Function SaveAs(ByVal Filename As String) As Boolean
-        pErrorDescription = "Unable to SaveAS for " & Description
+    Public Function SaveAs(ByVal aFilename As String) As Boolean
+        Logger.Dbg("Unable to SaveAs " & aFilename & vbCrLf & _
+                   "From:" & Specification)
         Return False
     End Function
-
-    Public Sub ShowFilterEdit(ByVal icon As Object) 'should this be a ATCclsTserFile property or function?
-        '  pHSPFOutput.Filter.ShowFilterEdit icon
-    End Sub
-
-    'Public Overrides ReadOnly Property FileFilter() As String
-    '  Get
-    '    Return pFileFilter
-    '  End Get
-    'End Property
 
     Public Overrides ReadOnly Property Name() As String
         Get
@@ -333,15 +291,13 @@ Public Class atcTimeseriesFileHspfBinOut
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
-        If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-            aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
-        End If
-        If FileExists(aFileName) Then
-            aFileName = AbsolutePath(aFileName, CurDir())
-            Specification = aFileName
+        If MyBase.Open(aFileName, aAttributes) Then
             BuildTSers()
             Return True
         End If
     End Function
 
+    Public Sub New()
+        Filter = pFilter
+    End Sub
 End Class
