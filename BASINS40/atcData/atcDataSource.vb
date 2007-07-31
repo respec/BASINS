@@ -10,6 +10,10 @@ Public Class atcDataSource
     Private pFilter As String = ""
     Private pData As atcDataGroup
 
+    ''' <summary>
+    ''' Enumeration of actions to take is data already exists
+    ''' </summary>
+    ''' <remarks></remarks>
     Public Enum EnumExistAction
         ExistNoAction = 0
         ExistReplace = 1
@@ -18,7 +22,9 @@ Public Class atcDataSource
         ExistAskUser = 8
     End Enum
 
-    ''' <summary>Attributes associated with all the DataSets from this instance of this source (location, constituent, etc.)</summary>
+    ''' <summary>
+    ''' Attributes associated with all the DataSets from this instance of this source (location, constituent, etc.)
+    ''' </summary>
     Public ReadOnly Property Attributes() As atcDataAttributes
         Get
             Return pAttributes
@@ -70,6 +76,9 @@ Public Class atcDataSource
     ''' <returns>Boolean - True if successfully opened.</returns>
     Public Overridable Function Open(ByVal aSpecification As String, _
                             Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
+        'assume the best
+        Open = True
+
         If aSpecification Is Nothing OrElse aSpecification.Length = 0 OrElse Not FileExists(aSpecification) Then
             Dim lString As String = Description
             If lString.Length = 0 Then lString = Name
@@ -80,11 +89,18 @@ Public Class atcDataSource
         ElseIf Not FileExists(aSpecification) Then
             Logger.Dbg("File '" & aSpecification & "' not found")
             Open = False
-        Else
+        Else 'check already open
             aSpecification = AbsolutePath(aSpecification, CurDir())
-            Me.Specification = aSpecification
+            For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                If lDataSource.Specification.ToLower = aSpecification.ToLower Then
+                    Logger.Dbg("AlreadyOpen")
+                    Open = False
+                End If
+            Next
+        End If
+        Me.Specification = aSpecification 'save regardless for messages or further processing
+        If Open Then 'looks good to try data type specific open
             Logger.Dbg("Process:" & aSpecification)
-            Open = True
         End If
     End Function
 
@@ -147,6 +163,12 @@ Public Class atcDataSource
         End If
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aDataGroup"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
     Public Overridable Function AddDataSets(ByVal aDataGroup As atcDataGroup) As Boolean
         Dim lNumSaved As Integer = 0
         For Each lDataSet As atcDataSet In aDataGroup
@@ -175,7 +197,7 @@ Public Class atcDataSource
     Public Overrides Function ToString() As String
         Dim lName As String = Name
         If lName.Length = 0 Then
-            lName = "atcDataSource"
+            lName = "atcDataSource:TypeNameUnknown"
         End If
         Return lName & " '" & Specification & "' " & DataSets.Count & " datasets"
     End Function
