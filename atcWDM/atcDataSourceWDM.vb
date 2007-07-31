@@ -556,29 +556,30 @@ CaseExistRenumber:
                     aFileName = AbsolutePath(.FileName, CurDir)
                 Else 'cancel
                     Logger.Dbg("atcDataSourceWDM:Open:User Cancelled File Dialogue for Open WDM file")
+                    Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
                     Return False
                 End If
             End With
         End If
 
-        Dim lwdmhandle As atcWdmHandle
+        Dim lWdmHandle As atcWdmHandle
         If FileExists(aFileName) Then
-            lwdmhandle = New atcWdmHandle(0, aFileName)
+            lWdmHandle = New atcWdmHandle(0, aFileName)
         ElseIf FilenameNoPath(aFileName).Length > 0 Then
             Logger.Dbg("atcDataSourceWDM:Open:WDM file " & aFileName & " does not exist - it will be created")
             MkDirPath(PathNameOnly(aFileName))
-            lwdmhandle = New atcWdmHandle(2, aFileName)
+            lWdmHandle = New atcWdmHandle(2, aFileName)
         Else
             Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & aFileName & "'")
             Return False
         End If
 
-        If Not lwdmhandle Is Nothing AndAlso lwdmhandle.Unit > 0 Then
+        If Not lWdmHandle Is Nothing AndAlso lWdmHandle.Unit > 0 Then
             Specification = aFileName
             pQuick = True
-            Refresh(lwdmhandle.Unit)
+            Refresh(lWdmHandle.Unit)
             pQuick = False
-            lwdmhandle.Dispose()
+            lWdmHandle.Dispose()
             Return True 'Successfully opened
         Else
             Logger.Dbg("atcDataSourceWDM:Open:Problem opening WDM file '" & aFileName & "'")

@@ -1,6 +1,9 @@
 Option Strict Off
 Option Explicit On
 
+
+Imports System.Text
+Imports System.Runtime.InteropServices
 Imports System.Collections.Specialized
 Imports MapWinUtility
 
@@ -217,6 +220,32 @@ EndFound:
         ' ##PARAM aExt I Extension to be added or to replace current extension.
         ' ##RETURNS Filename with new extension.
         Return IO.Path.ChangeExtension(aStr, aExt)
+    End Function
+
+    <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Auto)> _
+       Public Function GetShortPathName(ByVal lpszLongPath As String, _
+                                        ByVal lpszShortPath As StringBuilder, _
+                                        ByVal cchBuffer As Integer) As Integer
+    End Function
+
+    ''' <summary>
+    ''' Convert a long path name to a short path name
+    ''' </summary>
+    ''' <param name="aLongPathName">Long path name to convert</param>
+    ''' <returns>Converted short path name</returns>
+    ''' <remarks>Use this routine when length of file name is limited (like wdm names)</remarks>
+    Public Function ConvertLongPathToShort(ByVal aLongPathName As String) As String
+        Dim lShortNameBuffer As New StringBuilder
+
+        Dim lSize As Integer = GetShortPathName(aLongPathName, lShortNameBuffer, _
+              lShortNameBuffer.Capacity)
+        If (lSize >= lShortNameBuffer.Capacity) Then
+            lShortNameBuffer.Capacity = lSize + 1
+            GetShortPathName(aLongPathName, lShortNameBuffer, lShortNameBuffer.Capacity)
+        End If
+
+        Return lShortNameBuffer.ToString()
+
     End Function
 
     Public Function AbsolutePath(ByVal aFileName As String, ByVal aStartPath As String) As String

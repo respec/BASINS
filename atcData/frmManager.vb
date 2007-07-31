@@ -133,7 +133,11 @@ Friend Class frmManager
         lCollection.Add("File")
         Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lCollection)
         If Not lNewSource Is Nothing Then
-            atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+            If Not (atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)) Then
+                If Logger.LastDbgText.Length > 0 Then
+                    Logger.Msg(Logger.LastDbgText, "Open Problem")
+                End If
+            End If
         End If
     End Sub
 

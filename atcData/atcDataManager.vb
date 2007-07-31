@@ -130,14 +130,16 @@ Public Class atcDataManager
                 If Not pMapWin Is Nothing Then pMapWin.Project.Modified = True
                 Return True
             Else
-                Logger.Dbg("OpenDataSource:OpenFailure:Specification:" & aSpecification & _
-                       " Name:" & aNewSource.Name)
+                If Logger.LastDbgText.Length > 0 Then
+                    Logger.Dbg("OpenDataSource:OpenFailure:Specification:'" & aSpecification & "'" & vbCrLf & _
+                               "Source Name:" & aNewSource.Name)
+                End If
                 Return False
-            End If
+                End If
         Catch ex As Exception
             Logger.Dbg("OpenDataSource:Exception:" & ex.Message & vbCrLf & _
-                   " Specification:" & aSpecification & _
-                   " Name:" & aNewSource.Name)
+                       "Specification:'" & aSpecification & "'" & vbCrLf & _
+                       "Source Name:" & aNewSource.Name)
             Return False
         End Try
     End Function

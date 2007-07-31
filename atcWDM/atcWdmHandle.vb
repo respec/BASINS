@@ -5,11 +5,12 @@ Imports atcUtility
 Imports MapWinUtility
 
 Friend Class atcWdmHandle
-    'Copyright 2005 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    'Copyright 2005-7 by AQUA TERRA Consultants - Royalty-free use permitted under open source license
     Implements IDisposable
 
     Dim pUnit As Integer 'fortran unit number of wdm file
     Dim pNeedToClose As Boolean = True
+    Private Const pMaxFileNameLength As Integer = 64 'TODO: make this bigger in the fortran
 
     Public ReadOnly Property Unit() As Integer
         Get
@@ -28,6 +29,21 @@ Friend Class atcWdmHandle
         pUnit = 0
 
         lFileName = AbsolutePath(aFileName, CurDir())
+        If lFileName.Length > pMaxFileNameLength Then
+            Dim lShortFileName As String
+            If FileExists(lFileName) Then
+                lShortFileName = ConvertLongPathToShort(lFileName)
+            Else
+                lShortFileName = ConvertLongPathToShort(PathNameOnly(lFileName)) & "\" & FilenameNoPath(lFileName)
+            End If
+
+            If lShortFileName.Length > pMaxFileNameLength Then
+                Throw New Exception("File Name '" & lFileName & "'" & vbCrLf & _
+                                    "Length " & lFileName.Length & " Maximum " & pMaxFileNameLength)
+            Else
+                lFileName = lShortFileName
+            End If
+        End If
 
         If Not FileExists(lFileName) AndAlso aRWCFlg <> 2 Then
             Logger.Msg("Could not find " & aFileName, "atcWdmHandle")
@@ -78,8 +94,8 @@ Friend Class atcWdmHandle
                 pUnit = 0
             End If
         End If
-        Dim lMsg As String = "atcWdmHandle:New:" & pUnit & ":" & lRetcod & ":" & lFileName
-        F90_MSG(lMsg, Len(lMsg))
+            Dim lMsg As String = "atcWdmHandle:New:" & pUnit & ":" & lRetcod & ":" & lFileName
+            F90_MSG(lMsg, Len(lMsg))
     End Sub
 
     Public Sub Dispose() Implements System.IDisposable.Dispose
