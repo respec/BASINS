@@ -5,16 +5,13 @@ Imports atcData
 Imports atcUtility
 Imports MapWinUtility
 
-Imports Microsoft.VisualBasic
-Imports System.Collections
 Imports System.IO
 
 Public Class atcDataSourceBasinsObsWQ
     Inherits atcDataSource
     '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private Shared pFileFilter As String = "Basins Observed WQ Files (*.dbf)|*.dbf"
-    Private pErrorDescription As String
+    Private Shared pFilter As String = "Basins Observed WQ Files (*.dbf)|*.dbf"
     Private pColDefs As Hashtable
     'Private pReadAll As Boolean = False
 
@@ -49,17 +46,9 @@ Public Class atcDataSourceBasinsObsWQ
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-        Dim lData As atcTimeseries
 
-        If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-            aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
-        End If
-
-        If Not FileExists(aFileName) Then
-            pErrorDescription = "File '" & aFileName & "' not found"
-        Else
-            Me.Specification = aFileName
-
+        If MyBase.Open(aFileName, aAttributes) Then
+            Dim lData As atcTimeseries
             Try
                 Dim lDBF As IatcTable
                 Dim lDateCol As Integer = -1
@@ -171,4 +160,7 @@ Public Class atcDataSourceBasinsObsWQ
         End If
     End Function
 
+    Public Sub New()
+        Filter = pFilter
+    End Sub
 End Class

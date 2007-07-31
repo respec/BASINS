@@ -145,6 +145,7 @@ Friend Class frmManager
         'Skip In Memory data source at index zero
         For iSource As Integer = atcDataManager.DataSources.Count - 1 To 1 Step -1
             If lstFiles.SelectedIndices.Contains(iSource) Then
+                Logger.Dbg("Close:" & CType(atcDataManager.DataSources.Item(iSource), atcDataSource).Specification)
                 atcDataManager.DataSources.RemoveAt(iSource)
                 lstFiles.Items.RemoveAt(iSource)
             End If

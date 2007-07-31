@@ -1,4 +1,5 @@
 Imports MapWinUtility
+Imports atcUtility
 
 ''' <summary>Base class for data sources</summary>
 Public Class atcDataSource
@@ -6,6 +7,7 @@ Public Class atcDataSource
 
     Private pAttributes As atcDataAttributes
     Private pSpecification As String
+    Private pFilter As String = ""
     Private pData As atcDataGroup
 
     Public Enum EnumExistAction
@@ -68,9 +70,23 @@ Public Class atcDataSource
     ''' <returns>Boolean - True if successfully opened.</returns>
     Public Overridable Function Open(ByVal aSpecification As String, _
                             Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
-        Throw New Exception("Open must be overridden to be used, atcDataSource base class does not implement.")
+        If aSpecification Is Nothing OrElse aSpecification.Length = 0 OrElse Not FileExists(aSpecification) Then
+            Dim lString As String = Description
+            If lString.Length = 0 Then lString = Name
+            aSpecification = FindFile("Select " & lString & " file to open", , , Filter, True, , 1)
+        End If
+        If aSpecification.Length = 0 Then 'cancel case
+            Open = False
+        ElseIf Not FileExists(aSpecification) Then
+            Logger.Dbg("File '" & aSpecification & "' not found")
+            Open = False
+        Else
+            aSpecification = AbsolutePath(aSpecification, CurDir())
+            Me.Specification = aSpecification
+            Logger.Dbg("Process:" & aSpecification)
+            Open = True
+        End If
     End Function
-
 
     ''' <summary>Read all the data into an atcDataSet (which must be from this source).</summary>
     ''' <remarks>Called only from within atcData.EnsureValuesRead.</remarks>
@@ -100,6 +116,19 @@ Public Class atcDataSource
         End Get
         Set(ByVal newValue As String)
             pSpecification = newValue
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' For file data sources, filter is file name selection filter for use in file dialog
+    ''' </summary>
+    ''' <remarks>Should only be set by inheriting class, only during Open or Save</remarks>
+    Public Overridable Property Filter() As String
+        Get
+            Return pFilter
+        End Get
+        Set(ByVal newValue As String)
+            pFilter = newValue
         End Set
     End Property
 

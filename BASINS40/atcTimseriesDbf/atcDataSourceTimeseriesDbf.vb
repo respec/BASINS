@@ -6,8 +6,7 @@ Public Class atcDataSourceTimeseriesDbf
     Inherits atcDataSource
     '##MODULE_REMARKS Copyright 2007 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private Shared pFileFilter As String = "DBF Files (*.dbf)|*.dbf"
-    Private pErrorDescription As String
+    Private Shared pFilter As String = "DBF Files (*.dbf)|*.dbf"
     Private pColDefs As Hashtable
 
     Public Overrides ReadOnly Property Description() As String
@@ -43,16 +42,7 @@ Public Class atcDataSourceTimeseriesDbf
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
         Dim lData As atcTimeseries
 
-        If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-            aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
-        End If
-
-        If Not FileExists(aFileName) Then
-            pErrorDescription = "File '" & aFileName & "' not found"
-        Else
-            Me.Specification = aFileName
-
-            Logger.Dbg("Process:" & aFileName)
+        If MyBase.Open(aFileName, aAttributes) Then
             Dim lDateCol As Integer = -1
             Dim lTimeCol As Integer = -1
             Dim lLocnCol As Integer = -1
@@ -188,4 +178,8 @@ Public Class atcDataSourceTimeseriesDbf
         lDate = lDate.AddMinutes(lMinute)
         Return lDate.ToOADate
     End Function
+
+    Public Sub New()
+        Filter = pFilter
+    End Sub
 End Class

@@ -1,7 +1,6 @@
 Option Strict Off
 Option Explicit On
 
-
 Imports System.Text
 Imports System.Runtime.InteropServices
 Imports System.Collections.Specialized
@@ -562,6 +561,7 @@ ErrorWriting:
                     Optional ByVal aUserVerifyFileName As Boolean = False, _
                     Optional ByVal aChangeIntoDir As Boolean = False, _
                     Optional ByRef aFilterIndex As Integer = 1) As String
+
         Dim lDir As String = CurDir()
         Dim lFileName As String = Trim(aDefaultFileName)
         Dim lBaseFileName As String = IO.Path.GetFileName(lFileName).ToLower 'file name (not path) of file we are looking for
@@ -581,7 +581,7 @@ ErrorWriting:
 
         On Error Resume Next
 
-        If Right(lFileName, 1) = "\" Then
+        If Right(lFileName, 1) = "\" Then 'this is a folder
             Return ""
             'TODO: Implement FindFolder
             'Return FindFolder(aFileDialogTitle, _
@@ -637,6 +637,7 @@ ErrorWriting:
                     End If
                 End If
             End If
+
             If aUserVerifyFileName OrElse Not FileExists(lFileName) Then 'ask the user
                 Dim cdlg As New Windows.Forms.OpenFileDialog
                 With cdlg
@@ -649,8 +650,11 @@ ErrorWriting:
                     If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                         lFileName = AbsolutePath(.FileName, CurDir)
                         aFilterIndex = .FilterIndex
+                        Logger.Dbg("User specified file '" & lFileName & "'")
                     Else 'Return empty string if user clicked Cancel
                         lFileName = ""
+                        Logger.Dbg("User Cancelled File Selection Dialog for " & aFileDialogTitle)
+                        Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
                     End If
                 End With
 

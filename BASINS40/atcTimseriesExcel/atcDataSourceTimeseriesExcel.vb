@@ -1,4 +1,3 @@
-Imports atcUtility
 Imports atcData
 Imports atccontrols
 Imports MapWinUtility
@@ -7,8 +6,7 @@ Public Class atcDataSourceTimeseriesExcel
     Inherits atcDataSource
     '##MODULE_REMARKS Copyright 2007 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private Shared pFileFilter As String = "XLS Files (*.xls)|*.xls"
-    Private pErrorDescription As String
+    Private Shared pFilter As String = "XLS Files (*.xls)|*.xls"
     Private pDatesColumns As Boolean = True
 
     Public Overrides ReadOnly Property Description() As String
@@ -36,16 +34,7 @@ Public Class atcDataSourceTimeseriesExcel
     End Property
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcData.atcDataAttributes = Nothing) As Boolean
-        If aFileName Is Nothing OrElse aFileName.Length = 0 OrElse Not FileExists(aFileName) Then
-            aFileName = FindFile("Select " & Name & " file to open", , , pFileFilter, True, , 1)
-        End If
-
-        If Not FileExists(aFileName) Then
-            pErrorDescription = "File '" & aFileName & "' not found"
-        Else
-            Me.Specification = aFileName
-            Logger.Dbg("Process:" & aFileName)
-
+        If MyBase.Open(aFileName, aAttributes) Then
             'requires 'Office 2003 Update: Redistributable Primary Interop Assemblies'
             'how do we reference these?
             'Dim xlApp As Microsoft.Office.Interop.Excel.Application
@@ -120,4 +109,8 @@ Public Class atcDataSourceTimeseriesExcel
             Open = True
         End If
     End Function
+
+    Public Sub New()
+        Filter = pFilter
+    End Sub
 End Class

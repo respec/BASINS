@@ -68,13 +68,6 @@ Friend Class clsHspfBinary
         End Get
     End Property
 
-    Friend WriteOnly Property Monitor() As Object
-        Set(ByVal o As Object)
-            pMonitor = o
-            pMonitorSet = True
-        End Set
-    End Property
-
     Friend ReadOnly Property HeaderIdAsText(ByVal index As Integer) As String
         Get
             Return HspfBinaryIdAsText(Header(index).id)
