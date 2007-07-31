@@ -122,9 +122,10 @@ Friend Class frmManager
 
     Public Sub Edit()
         lstFiles.Items.Clear()
-        For Each source As atcDataSource In atcDataManager.DataSources
-            lstFiles.Items.Add(source.Name & " " & source.Specification & " (" & source.DataSets.Count & ")")
+        For Each lDataSource As atcDataSource In atcDataManager.DataSources
+            lstFiles.Items.Add(lDataSource.Name & " " & lDataSource.Specification & " (" & lDataSource.DataSets.Count & ")")
         Next
+        'lstFiles.SelectedIndex = lstFiles.Items.Count - 1
         Me.Show()
     End Sub
 
@@ -133,9 +134,11 @@ Friend Class frmManager
         lCollection.Add("File")
         Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lCollection)
         If Not lNewSource Is Nothing Then
-            If Not (atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)) Then
+            If (atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)) Then
+                lstFiles.SelectedIndex = lstFiles.Items.Count - 1
+            Else
                 If Logger.LastDbgText.Length > 0 Then
-                    Logger.Msg(Logger.LastDbgText, "Open Problem")
+                    Logger.Msg(Logger.LastDbgText, "Data Open Problem")
                 End If
             End If
         End If
@@ -143,19 +146,23 @@ Friend Class frmManager
 
     Private Sub btnClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnClose.Click
         'Skip In Memory data source at index zero
+        Dim iSourceSelectedNext As Integer = 0
         For iSource As Integer = atcDataManager.DataSources.Count - 1 To 1 Step -1
             If lstFiles.SelectedIndices.Contains(iSource) Then
                 Logger.Dbg("Close:" & CType(atcDataManager.DataSources.Item(iSource), atcDataSource).Specification)
                 atcDataManager.DataSources.RemoveAt(iSource)
                 lstFiles.Items.RemoveAt(iSource)
+                iSourceSelectedNext = iSource - 1
             End If
         Next
+        lstFiles.SelectedIndex = iSourceSelectedNext
     End Sub
 
     Private Sub btnDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDisplay.Click
         For iSource As Integer = atcDataManager.DataSources.Count - 1 To 0 Step -1
             If lstFiles.SelectedIndices.Contains(iSource) Then
                 Dim lDataSource As atcDataSource = atcDataManager.DataSources.Item(iSource)
+                Logger.Dbg("Display:" & lDataSource.Specification)
                 atcDataManager.UserSelectDisplay(lDataSource.Specification, lDataSource.DataSets.Clone)
             End If
         Next
@@ -187,41 +194,4 @@ Friend Class frmManager
     Protected Overrides Sub OnClosing(ByVal e As System.ComponentModel.CancelEventArgs)
         Debug.Write("Closing frmManager")
     End Sub
-
-    'Private Sub PopulateDataSourceTypes()
-    '  Dim lastDataSourceType As String = GetSetting("atcData", "DataSource", "LastType")
-    '  Dim DataSourcePlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataSource))
-    '  lstDataSourceType.Items.Clear()
-    '  For Each ds As atcDataSource In DataSourcePlugins
-    '    lstDataSourceType.Items.Add(ds.Name)
-    '    If ds.Name = lastDataSourceType Then lstDataSourceType.SelectedItem = ds.Name
-    '  Next
-    'End Sub
-
-    'Private Sub btnOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnOpen.Click
-    '  Dim DataSourceName As String = lstDataSourceType.SelectedItem
-    '  If DataSourceName.Length = 0 Then
-    '    MsgBox("Select a data type to open")
-    '  Else
-    '    SaveSetting("atcData", "DataSource", "LastType", DataSourceName)
-    '    Me.Cursor = Cursors.WaitCursor 'TODO: make this take effect immediately
-    '    Dim DataSourcePlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataSource))
-    '    For Each ds As atcDataSource In DataSourcePlugins
-    '      If ds.Name = DataSourceName Then
-    '        Dim typ As System.Type = ds.GetType()
-    '        Dim asm As System.Reflection.Assembly = System.Reflection.Assembly.GetAssembly(typ)
-    '        Dim newSource As atcDataSource = asm.CreateInstance(typ.FullName)
-    '        If atcDataManager.AddDataSource(newSource, "", Nothing) Then
-    '          panelOpening.Visible = False
-    '        End If
-    '      End If
-    '    Next
-    '    Me.Cursor = Cursors.Default
-    '  End If
-    'End Sub
-
-    'Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
-    '  panelOpening.Visible = False
-    'End Sub
-
 End Class

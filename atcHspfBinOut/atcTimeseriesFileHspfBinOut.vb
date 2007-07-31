@@ -11,9 +11,6 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Private pFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
     Private pName As String = "Timeseries::HSPF Binary Output"
-    'Private pErrorDescription As String
-    'Private pMonitor As Object
-    'Private pMonitorSet As Boolean = False
     Private pDates As ArrayList 'of atcTimeseries
     Private pNvals As Integer
 
@@ -42,6 +39,7 @@ Public Class atcTimeseriesFileHspfBinOut
             'for now - just return nothing
 
             retval = New Collection
+
             'Set lCurTSerAttr = New ATCclsAttributeDefinition
 
             'If pHSPFOutput.DataCollection.Count > 0 Then
@@ -169,10 +167,6 @@ Public Class atcTimeseriesFileHspfBinOut
                     End With
                 Next j
             End With
-            'If pMonitorSet Then
-            '    s = "(PROGRESS " & CStr(50 + ((100 * i) / (pBinFile.Headers.Count * 2))) & ")"
-            '    pMonitor.SendMonitorMessage(s)
-            'End If
             i = i + 1
             Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
         Next

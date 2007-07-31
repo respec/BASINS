@@ -131,8 +131,9 @@ Public Class atcDataManager
                 Return True
             Else
                 If Logger.LastDbgText.Length > 0 Then
-                    Logger.Dbg("OpenFailure:Specification:'" & aSpecification & "'" & vbCrLf & _
-                               "Source Name:" & aNewSource.Name)
+                    Logger.Dbg("OpenFailure:Specification:'" & aNewSource.Specification & "'" & vbCrLf & _
+                               "Source Name:" & aNewSource.Name & vbCrLf & _
+                               "Details:" & Logger.LastDbgText)
                 End If
                 Return False
                 End If
