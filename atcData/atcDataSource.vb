@@ -82,7 +82,22 @@ Public Class atcDataSource
         If aSpecification Is Nothing OrElse aSpecification.Length = 0 OrElse Not FileExists(aSpecification) Then
             Dim lString As String = Description
             If lString.Length = 0 Then lString = Name
-            aSpecification = FindFile("Select " & lString & " file to open", , , Filter, True, , 1)
+            Dim lCdlg As New Windows.Forms.OpenFileDialog
+            With lCdlg
+                .Title = "Select " & lString & " file to open"
+                .Filter = Filter
+                .FilterIndex = 1
+                '.DefaultExt = aDefaultExt
+                .CheckFileExists = Not (Me.CanSave)
+                If .ShowDialog() = Windows.Forms.DialogResult.OK Then
+                    aSpecification = AbsolutePath(.FileName, CurDir)
+                    Logger.Dbg("User specified file '" & aSpecification & "'")
+                Else 'Return empty string if user clicked Cancel
+                    aSpecification = ""
+                    Logger.Dbg("User Cancelled File Selection Dialog for " & lString)
+                    Logger.LastDbgText = "" 'forget about this - user was in control - no additional message box needed
+                End If
+            End With
         End If
         If aSpecification.Length = 0 Then 'cancel case
             Open = False

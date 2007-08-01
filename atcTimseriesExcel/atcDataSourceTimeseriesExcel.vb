@@ -43,7 +43,7 @@ Public Class atcDataSourceTimeseriesExcel
 
             Dim lConnection As System.Data.OleDb.OleDbConnection
             lConnection = New System.Data.OleDb.OleDbConnection("provider=Microsoft.Jet.OLEDB.4.0;" & _
-                                                                "data source=" & aFileName & ";" & _
+                                                                "data source=" & Specification & ";" & _
                                                                 "Extended Properties=Excel 8.0;")
             lConnection.Open()
 

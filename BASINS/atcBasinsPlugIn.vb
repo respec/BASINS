@@ -403,7 +403,11 @@ Public Class atcBasinsPlugIn
         lFilesOnly.Add("File")
         Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", aNeedToOpen, aNeedToSave)
         If Not lNewSource Is Nothing Then 'user did not cancel
-            atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing)
+            If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                If Logger.LastDbgText.Length > 0 Then
+                    Logger.Msg(Logger.LastDbgText, "Data Open Problem")
+                End If
+            End If
         End If
         Return lNewSource
     End Function
