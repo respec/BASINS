@@ -1390,7 +1390,7 @@ StartOver:
         If Not aDefaultsXml Is Nothing Then
             For lLayer As Integer = 0 To aDefaultsXml.NumChildren - 1
                 layerXml = aDefaultsXml.GetChild(lLayer)
-                If PatternMatch(lName, "*" & layerXml.GetAttrValue("Filename") & "*") Then
+                If lName Like "*" & layerXml.GetAttrValue("Filename") & "*" Then
                     Return layerXml
                 End If
             Next
