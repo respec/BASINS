@@ -3,7 +3,7 @@ Imports MapWindow.Interfaces
 Public Module ScriptDriver
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
-        ScriptSummarizeTimeseries.ScriptMain(aMapWin)
+        'ScriptSummarizeTimeseries.ScriptMain(aMapWin)
         'ScriptGridAdd.ScriptMain(aMapWin)
         'ScriptGridValues.ScriptMain(aMapWin)
         'ScriptLineDump.ScriptMain(aMapWin)
@@ -12,7 +12,7 @@ Public Module ScriptDriver
         'ScriptWatershedSummary.ScriptMain(aMapWin)
         'ScriptCatSummary.ScriptMain(aMapWin)
         'BASINSProjectSummary.ScriptMain(aMapWin)
-        'ScriptShapefileFromWDM.ScriptMain(aMapWin)
+        ScriptShapefileFromWDM.ScriptMain(aMapWin)
     End Sub
 
 End Module

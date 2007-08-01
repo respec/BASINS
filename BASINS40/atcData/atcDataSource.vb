@@ -88,7 +88,7 @@ Public Class atcDataSource
                 .Filter = Filter
                 .FilterIndex = 1
                 '.DefaultExt = aDefaultExt
-                .CheckFileExists = Not (Me.CanSave)
+                .CheckFileExists = Not CanSave
                 If .ShowDialog() = Windows.Forms.DialogResult.OK Then
                     aSpecification = AbsolutePath(.FileName, CurDir)
                     Logger.Dbg("User specified file '" & aSpecification & "'")
@@ -101,7 +101,7 @@ Public Class atcDataSource
         End If
         If aSpecification.Length = 0 Then 'cancel case
             Open = False
-        ElseIf Not FileExists(aSpecification) Then
+        ElseIf Not CanSave AndAlso Not FileExists(aSpecification) Then
             Logger.Dbg("File '" & aSpecification & "' not found")
             Open = False
         Else 'check already open

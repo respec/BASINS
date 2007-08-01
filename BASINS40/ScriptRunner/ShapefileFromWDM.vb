@@ -36,11 +36,10 @@ Public Module ScriptShapefileFromWDM
         Logger.Dbg(" DataSetCount " & lHspfWdmFile.DataSets.Count)
 
         'populate the timeseries grid source
+        Dim lDisplayAttributes As ArrayList = atcDataManager.DisplayAttributes
         Dim lXfieldName As String = "longitude"
-        Dim lYfieldName As String = "latitude"
-        Dim lDisplayAttributes As New ArrayList
-        lDisplayAttributes = atcDataManager.DisplayAttributes
         lDisplayAttributes.Add(lXfieldName)
+        Dim lYfieldName As String = "latitude"
         lDisplayAttributes.Add(lYfieldName)
         lDisplayAttributes.Add("scenario")
         lDisplayAttributes.Add("location")
@@ -50,8 +49,7 @@ Public Module ScriptShapefileFromWDM
         lDisplayAttributes.Add("ejday")
         lDisplayAttributes.Add("time unit")
         lDisplayAttributes.Add("sumannual")
-        Dim lDataGroup As New atcDataGroup
-        lDataGroup = atcDataManager.DataSets
+        Dim lDataGroup As atcDataGroup = atcDataManager.DataSets
         Dim lSource As atcTimeseriesGridSource
         lSource = New atcTimeseriesGridSource(lDataGroup, lDisplayAttributes, "False")
 
