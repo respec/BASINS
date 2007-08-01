@@ -77,7 +77,7 @@ NeverMind:
             GoTo NextUnusedColor
         Else
             For lRule = 1 To pNColorRules
-                If PatternMatch(LCase(aSpecification), LCase(pColorMatchingRules(lRule))) Then
+                If LCase(aSpecification) Like LCase(pColorMatchingRules(lRule)) Then
                     For lUsed = 1 To UBound(pColorsUsed)
                         If pColorsUsed(lUsed).Equals(pColorRamp(lRule)) Then
                             GoTo NextPatternMatch
