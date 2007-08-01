@@ -35,6 +35,7 @@ Friend Class frmManager
     Friend WithEvents btnOpen As System.Windows.Forms.Button
     Friend WithEvents btnClose As System.Windows.Forms.Button
     Friend WithEvents btnDisplay As System.Windows.Forms.Button
+    Friend WithEvents btnNew As System.Windows.Forms.Button
     Friend WithEvents lstFiles As System.Windows.Forms.ListBox
     'Friend WithEvents panelOpening As System.Windows.Forms.Panel
     'Friend WithEvents lstDataSourceType As System.Windows.Forms.ListBox
@@ -50,16 +51,17 @@ Friend Class frmManager
         Me.btnOpen = New System.Windows.Forms.Button
         Me.btnClose = New System.Windows.Forms.Button
         Me.btnDisplay = New System.Windows.Forms.Button
+        Me.btnNew = New System.Windows.Forms.Button
         Me.SuspendLayout()
         '
         'txtDetails
         '
         Me.txtDetails.BackColor = System.Drawing.SystemColors.ControlLight
         Me.txtDetails.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.txtDetails.Location = New System.Drawing.Point(0, 237)
+        Me.txtDetails.Location = New System.Drawing.Point(0, 225)
         Me.txtDetails.Multiline = True
         Me.txtDetails.Name = "txtDetails"
-        Me.txtDetails.Size = New System.Drawing.Size(504, 72)
+        Me.txtDetails.Size = New System.Drawing.Size(504, 84)
         Me.txtDetails.TabIndex = 2
         '
         'lstFiles
@@ -69,42 +71,53 @@ Friend Class frmManager
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstFiles.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lstFiles.IntegralHeight = False
-        Me.lstFiles.Location = New System.Drawing.Point(0, 35)
+        Me.lstFiles.ItemHeight = 17
+        Me.lstFiles.Location = New System.Drawing.Point(0, 40)
         Me.lstFiles.Name = "lstFiles"
-        Me.lstFiles.Size = New System.Drawing.Size(504, 197)
+        Me.lstFiles.Size = New System.Drawing.Size(504, 180)
         Me.lstFiles.TabIndex = 3
         '
         'btnOpen
         '
-        Me.btnOpen.Location = New System.Drawing.Point(6, 6)
+        Me.btnOpen.Location = New System.Drawing.Point(7, 7)
         Me.btnOpen.Name = "btnOpen"
-        Me.btnOpen.Size = New System.Drawing.Size(75, 23)
+        Me.btnOpen.Size = New System.Drawing.Size(90, 26)
         Me.btnOpen.TabIndex = 4
         Me.btnOpen.Text = "Open File..."
         Me.btnOpen.UseVisualStyleBackColor = True
         '
         'btnClose
         '
-        Me.btnClose.Location = New System.Drawing.Point(87, 6)
+        Me.btnClose.Location = New System.Drawing.Point(199, 8)
         Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(88, 23)
+        Me.btnClose.Size = New System.Drawing.Size(106, 26)
         Me.btnClose.TabIndex = 5
         Me.btnClose.Text = "Close Selected"
         Me.btnClose.UseVisualStyleBackColor = True
         '
         'btnDisplay
         '
-        Me.btnDisplay.Location = New System.Drawing.Point(181, 6)
+        Me.btnDisplay.Location = New System.Drawing.Point(311, 7)
         Me.btnDisplay.Name = "btnDisplay"
-        Me.btnDisplay.Size = New System.Drawing.Size(99, 23)
+        Me.btnDisplay.Size = New System.Drawing.Size(119, 26)
         Me.btnDisplay.TabIndex = 6
         Me.btnDisplay.Text = "Display Selected"
         Me.btnDisplay.UseVisualStyleBackColor = True
         '
+        'btnNew
+        '
+        Me.btnNew.Location = New System.Drawing.Point(103, 8)
+        Me.btnNew.Name = "btnNew"
+        Me.btnNew.Size = New System.Drawing.Size(90, 26)
+        Me.btnNew.TabIndex = 7
+        Me.btnNew.Text = "New File..."
+        Me.btnNew.UseVisualStyleBackColor = True
+        '
         'frmManager
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.ClientSize = New System.Drawing.Size(504, 309)
+        Me.Controls.Add(Me.btnNew)
         Me.Controls.Add(Me.btnDisplay)
         Me.Controls.Add(Me.btnClose)
         Me.Controls.Add(Me.btnOpen)
@@ -139,6 +152,19 @@ Friend Class frmManager
             Else
                 If Logger.LastDbgText.Length > 0 Then
                     Logger.Msg(Logger.LastDbgText, "Data Open Problem")
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub btnNew_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNew.Click
+        Dim lFilesOnly As New ArrayList(1)
+        lFilesOnly.Add("File")
+        Dim lNewSource As atcDataSource = atcDataManager.UserSelectDataSource(lFilesOnly, "Select a File Type", False, True)
+        If Not lNewSource Is Nothing Then 'user did not cancel
+            If Not atcDataManager.OpenDataSource(lNewSource, lNewSource.Specification, Nothing) Then
+                If Logger.LastDbgText.Length > 0 Then
+                    Logger.Msg(Logger.LastDbgText, "Data New Problem")
                 End If
             End If
         End If

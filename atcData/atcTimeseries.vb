@@ -170,6 +170,9 @@ Public Class atcTimeseries
             If Not pDates Is Nothing AndAlso pDates.numValues <> newValue Then
                 pDates.numValues = newValue
             End If
+            If Not pValueAttributes Is Nothing AndAlso pValueAttributes.GetUpperBound(0) <> newValue Then
+                ReDim Preserve pValueAttributes(pNumValues)
+            End If
         End Set
     End Property
 

@@ -96,7 +96,7 @@ Public Class atcDataSourceWDM
         Dim lLowestDSN As Integer = Integer.MaxValue
         Dim lHighestDSN As Integer = 0
         Dim lHighestNewDSN As Integer = 0
-        Dim lLabel As String = "File contains " & DataSets.Count & " datasets"
+        Dim lLabel As String = FilenameNoPath(Specification) & " contains " & DataSets.Count & " datasets"
 
         If DataSets.Count > 0 Then
             For Each lDataSet As atcDataSet In DataSets
@@ -150,16 +150,43 @@ Public Class atcDataSourceWDM
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean
-        'Logger.Dbg("atcDataSourceWdm:AddDataset:entry:" & aExistAction)
+        Logger.Dbg("atcDataSourceWdm:AddDataset:entry:" & aExistAction & ":" & MemUsage())
         Dim lWdmHandle As New atcWdmHandle(0, Specification)
         Try
             Dim lTimser As atcTimeseries = aDataSet
+            Dim lTimserConst As atcTimeseries = Nothing
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
             Dim lTu As Integer = lTimser.Attributes.GetValue("tu", 0)
 
-            If lTs = 0 Or lTu = 0 Then
-                'TODO: probably a sparse dataset - fill in dummy values
-                Throw New ApplicationException("Cannot write to WDM: TimeStep or TimeUnits not set")
+            If lTs = 0 Or lTu = 0 Then ' sparse dataset - fill in dummy values for write
+                lTu = 2 'minutes
+                lTs = 1 'one minute
+                Dim lNumValues As Integer = 1 + (lTimser.Dates.Value(lTimser.numValues) - lTimser.Dates.Value(1)) * 1440
+                lTimserConst = New atcTimeseries(Me)
+                With lTimserConst
+                    .Attributes.ChangeTo(lTimser.Attributes)
+                    .Dates = New atcTimeseries(Me)
+                    .numValues = lNumValues
+                    .Dates.Values(0) = lTimser.Dates.Values(1) - JulianMinute
+                    .Attributes.SetValue("ts", lTs)
+                    .Attributes.SetValue("tu", lTu)
+                    Dim lIndex As Integer = 1
+                    For lIndexConst As Integer = 1 To lNumValues
+                        Dim lDate As Double = .Dates.Values(0) + (JulianMinute * lIndexConst)
+                        .Dates.Values(lIndexConst) = lDate
+                        If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Values(lIndex) - JulianSecond) Then
+                            .Values(lIndexConst) = lTimser.Values(lIndex)
+                            lIndex += 1
+                        ElseIf lIndex > lTimser.numValues Then
+                            Logger.Dbg("OutOfValuesAt:" & lTimser.numValues)
+                        Else
+                            .Values(lIndexConst) = Double.NaN
+                        End If
+                    Next
+                End With
+                'Logger.Dbg(MemUsage)
+                lTimser = lTimserConst
+                'Logger.Dbg(MemUsage)
             End If
 
             Dim lNvals As Integer = lTimser.numValues
@@ -255,6 +282,9 @@ CaseExistRenumber:
                 '            lSDat(0) & ":" & lSDat(1) & ":" & lSDat(2) & ":" & lRet)
                 If lNvals > 0 Then
                     F90_WDTPUT(lWdmHandle.Unit, lDsn, lTs, lSDat(0), lNvals, CInt(1), CInt(0), lTu, lV(1), lRet)
+                End If
+                If Not lTimserConst Is Nothing Then
+                    lTimserConst.Clear() 'TODO: maybe just part?
                 End If
                 If lRet <> 0 Then
                     Throw New ApplicationException("WDTPUT:call:" & _
@@ -841,4 +871,11 @@ CaseExistRenumber:
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
     End Sub
+
+    Private Function MemUsage() As String
+        System.GC.WaitForPendingFinalizers()
+        Return "MemoryUsage(MB):" & Process.GetCurrentProcess.PrivateMemorySize64 / (2 ^ 20) & _
+                    " Local(MB):" & System.GC.GetTotalMemory(True) / (2 ^ 20)
+    End Function
+
 End Class

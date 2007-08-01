@@ -114,6 +114,7 @@ Public Class atcDataSourceTimeseriesDbf
                                     lData.Attributes.SetValue("Constituent", lConstituentName)
                                     lData.Attributes.SetValue("Units", lConstituentUnits)
                                     lData.Attributes.SetValue("Point", True)
+                                    lData.Attributes.AddHistory("Read from " & Specification)
                                     DataSets.Add(lTSKey, lData)
                                 End If
                                 lTSIndex = lData.Attributes.GetValue("Count") + 1

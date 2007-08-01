@@ -102,6 +102,7 @@ Public Class atcDataSourceTimeseriesExcel
                                 lData.Value(lCol) = lDateValue
                             End If
                         Next
+                        lData.Attributes.AddHistory("Read from " & Specification)
                         DataSets.Add(lTSKey, lData)
                     End If
                 Next
