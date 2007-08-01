@@ -98,6 +98,7 @@ Public Class atcDataSourceBasinsObsWQ
                             lData.Attributes.SetValue("Location", lLocation)
                             lData.Attributes.SetValue("Constituent", lConstituentCode)
                             lData.Attributes.SetValue("Point", True)
+                            lData.Attributes.AddHistory("Read from " & Specification)
                             DataSets.Add(lTSKey, lData)
                         End If
                         lTSIndex = lData.Attributes.GetValue("Count") + 1
