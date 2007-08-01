@@ -140,6 +140,13 @@ Public Class atcDataSourceWDM
         Return False
     End Function
 
+    ''' <summary>
+    ''' write timeseries data in dataset to wdm file
+    ''' </summary>
+    ''' <param name="aDataSet">dataset to write</param>
+    ''' <param name="aExistAction">action to take if dataset with same id(dsn) already exists on wdm file</param>
+    ''' <returns>true if successful, otherwise false</returns>
+    ''' <remarks></remarks>
     Public Overrides Function AddDataset(ByVal aDataSet As atcData.atcDataSet, _
                                 Optional ByVal aExistAction As atcData.atcDataSource.EnumExistAction = atcData.atcDataSource.EnumExistAction.ExistReplace) _
                                          As Boolean

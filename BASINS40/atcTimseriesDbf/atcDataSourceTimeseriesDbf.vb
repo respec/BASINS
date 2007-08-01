@@ -61,7 +61,7 @@ Public Class atcDataSourceTimeseriesDbf
 
             Dim lDBF As IatcTable
             lDBF = New atcTableDBF
-            lDBF.OpenFile(aFileName)
+            lDBF.OpenFile(Specification)
             Logger.Dbg("NumFields:" & lDBF.NumFields)
             Logger.Dbg("NumRecords:" & lDBF.NumRecords)
 
@@ -145,13 +145,13 @@ Public Class atcDataSourceTimeseriesDbf
                     Open = True
                 ElseIf lDateCol < 0 Then
                     Open = False
-                    Logger.Msg("Unable to identify Date column in DBF file " & aFileName, "DBF Open")
+                    Logger.Msg("Unable to identify Date column in DBF file " & Specification, "DBF Open")
                 ElseIf lTimeCol < 0 Then
                     Open = False
-                    Logger.Msg("Unable to identify Time column in DBF file " & aFileName, "DBF Open")
+                    Logger.Msg("Unable to identify Time column in DBF file " & Specification, "DBF Open")
                 ElseIf lLocnCol < 0 Then
                     Open = False
-                    Logger.Msg("Unable to identify ID column in DBF file " & aFileName, "DBF Open")
+                    Logger.Msg("Unable to identify ID column in DBF file " & Specification, "DBF Open")
                 End If
             Catch endEx As Exception
                 Open = False

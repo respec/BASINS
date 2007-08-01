@@ -62,7 +62,7 @@ Public Class atcDataSourceBasinsObsWQ
                 Dim lConstituentCode As Integer = -1
                 Dim s As String
                 lDBF = New atcTableDBF
-                lDBF.OpenFile(aFileName)
+                lDBF.OpenFile(Specification)
                 For i As Integer = 1 To lDBF.NumFields
                     s = UCase(lDBF.FieldName(i))
                     If s = "DATE" Then
