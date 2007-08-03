@@ -22,6 +22,7 @@ Partial Class frmSaveData
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSaveData))
         Me.lstDataSources = New System.Windows.Forms.ListBox
         Me.pnlButtons = New System.Windows.Forms.Panel
         Me.btnCancel = New System.Windows.Forms.Button
@@ -36,10 +37,12 @@ Partial Class frmSaveData
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstDataSources.FormattingEnabled = True
         Me.lstDataSources.IntegralHeight = False
+        Me.lstDataSources.ItemHeight = 16
         Me.lstDataSources.Items.AddRange(New Object() {"Browse for new or existing file..."})
-        Me.lstDataSources.Location = New System.Drawing.Point(12, 12)
+        Me.lstDataSources.Location = New System.Drawing.Point(16, 15)
+        Me.lstDataSources.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.lstDataSources.Name = "lstDataSources"
-        Me.lstDataSources.Size = New System.Drawing.Size(202, 136)
+        Me.lstDataSources.Size = New System.Drawing.Size(268, 166)
         Me.lstDataSources.TabIndex = 0
         '
         'pnlButtons
@@ -47,9 +50,10 @@ Partial Class frmSaveData
         Me.pnlButtons.Controls.Add(Me.btnCancel)
         Me.pnlButtons.Controls.Add(Me.btnOk)
         Me.pnlButtons.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlButtons.Location = New System.Drawing.Point(0, 146)
+        Me.pnlButtons.Location = New System.Drawing.Point(0, 180)
+        Me.pnlButtons.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.pnlButtons.Name = "pnlButtons"
-        Me.pnlButtons.Size = New System.Drawing.Size(226, 40)
+        Me.pnlButtons.Size = New System.Drawing.Size(301, 49)
         Me.pnlButtons.TabIndex = 19
         '
         'btnCancel
@@ -57,9 +61,10 @@ Partial Class frmSaveData
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnCancel.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnCancel.Location = New System.Drawing.Point(134, 8)
+        Me.btnCancel.Location = New System.Drawing.Point(179, 10)
+        Me.btnCancel.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnCancel.Name = "btnCancel"
-        Me.btnCancel.Size = New System.Drawing.Size(80, 24)
+        Me.btnCancel.Size = New System.Drawing.Size(107, 30)
         Me.btnCancel.TabIndex = 20
         Me.btnCancel.Text = "Cancel"
         '
@@ -68,21 +73,24 @@ Partial Class frmSaveData
         Me.btnOk.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnOk.DialogResult = System.Windows.Forms.DialogResult.OK
         Me.btnOk.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnOk.Location = New System.Drawing.Point(48, 8)
+        Me.btnOk.Location = New System.Drawing.Point(64, 10)
+        Me.btnOk.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.btnOk.Name = "btnOk"
-        Me.btnOk.Size = New System.Drawing.Size(80, 24)
+        Me.btnOk.Size = New System.Drawing.Size(107, 30)
         Me.btnOk.TabIndex = 19
         Me.btnOk.Text = "Ok"
         '
         'frmSaveData
         '
         Me.AcceptButton = Me.btnOk
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(226, 186)
+        Me.ClientSize = New System.Drawing.Size(301, 229)
         Me.Controls.Add(Me.pnlButtons)
         Me.Controls.Add(Me.lstDataSources)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Margin = New System.Windows.Forms.Padding(4, 4, 4, 4)
         Me.Name = "frmSaveData"
         Me.Text = "Save Data In"
         Me.pnlButtons.ResumeLayout(False)

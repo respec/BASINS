@@ -17,6 +17,9 @@ Public Class atcDataSourceWDM
     Private pNan As Double
     Private pEpsilon As Double
     Private Shared pMsg As atcMsgWDM
+    Private pTu As Integer = 0 'default time units, default 2-minutes
+    Private pTs As Integer = 0 'default timestep, default 1 
+    Private pAskAboutMissingTuTs As Boolean = True
 
     Private Sub Clear()
         'Specification = "<unknown>"
@@ -157,36 +160,45 @@ Public Class atcDataSourceWDM
             Dim lTimserConst As atcTimeseries = Nothing
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
             Dim lTu As Integer = lTimser.Attributes.GetValue("tu", 0)
+            Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
             If lTs = 0 Or lTu = 0 Then ' sparse dataset - fill in dummy values for write
-                lTu = 2 'minutes
-                lTs = 1 'one minute
-                Dim lNumValues As Integer = 1 + (lTimser.Dates.Value(lTimser.numValues) - lTimser.Dates.Value(1)) * 1440
-                lTimserConst = New atcTimeseries(Me)
-                With lTimserConst
-                    .Attributes.ChangeTo(lTimser.Attributes)
-                    .Dates = New atcTimeseries(Me)
-                    .numValues = lNumValues
-                    .Dates.Values(0) = lTimser.Dates.Values(1) - JulianMinute
-                    .Attributes.SetValue("ts", lTs)
-                    .Attributes.SetValue("tu", lTu)
-                    Dim lIndex As Integer = 1
-                    For lIndexConst As Integer = 1 To lNumValues
-                        Dim lDate As Double = .Dates.Values(0) + (JulianMinute * lIndexConst)
-                        .Dates.Values(lIndexConst) = lDate
-                        If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Values(lIndex) - JulianSecond) Then
-                            .Values(lIndexConst) = lTimser.Values(lIndex)
-                            lIndex += 1
-                        ElseIf lIndex > lTimser.numValues Then
-                            Logger.Dbg("OutOfValuesAt:" & lTimser.numValues)
-                        Else
-                            .Values(lIndexConst) = Double.NaN
-                        End If
-                    Next
-                End With
-                'Logger.Dbg(MemUsage)
-                lTimser = lTimserConst
-                'Logger.Dbg(MemUsage)
+                If pAskAboutMissingTuTs Then
+                    Dim lFrmDefaultTimeInterval As New frmDefaultTimeInterval
+                    pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lDsn, pTu, pTs)
+                End If
+                lTs = pTs
+                lTu = pTu
+                If pTs > 0 And pTu > 0 Then
+                    Dim lNumValues As Integer = 1 + (lTimser.Dates.Value(lTimser.numValues) - lTimser.Dates.Value(1)) * 1440
+                    lTimserConst = New atcTimeseries(Me)
+                    With lTimserConst
+                        .Attributes.ChangeTo(lTimser.Attributes)
+                        .Dates = New atcTimeseries(Me)
+                        .numValues = lNumValues
+                        .Dates.Values(0) = lTimser.Dates.Values(1) - JulianMinute
+                        .Attributes.SetValue("ts", lTs)
+                        .Attributes.SetValue("tu", lTu)
+                        Dim lIndex As Integer = 1
+                        For lIndexConst As Integer = 1 To lNumValues
+                            Dim lDate As Double = .Dates.Values(0) + (JulianMinute * lIndexConst)
+                            .Dates.Values(lIndexConst) = lDate
+                            If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Values(lIndex) - JulianSecond) Then
+                                .Values(lIndexConst) = lTimser.Values(lIndex)
+                                lIndex += 1
+                            ElseIf lIndex > lTimser.numValues Then
+                                Logger.Dbg("OutOfValuesAt:" & lTimser.numValues)
+                            Else
+                                .Values(lIndexConst) = Double.NaN
+                            End If
+                        Next
+                    End With
+                    'Logger.Dbg(MemUsage)
+                    lTimser = lTimserConst
+                    'Logger.Dbg(MemUsage)
+                Else
+                    Throw New ApplicationException("No Time Units or Time Step on source dataset")
+                End If
             End If
 
             Dim lNvals As Integer = lTimser.numValues
@@ -204,8 +216,6 @@ Public Class atcDataSourceWDM
             End If
 
             'aDataSet.Attributes.CalculateAll() 'should we calculdate attributes on request, not here on creation
-
-            Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
             'Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
 

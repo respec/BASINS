@@ -116,7 +116,7 @@ Public Class atcText
             HardMax = privHardMax
         End Get
         Set(ByVal newValue As Double)
-            Logger.Dbg("HardMax:Let:" & newValue)
+            'Logger.Dbg("HardMax:Let:" & newValue)
             privHardMax = newValue
         End Set
     End Property
@@ -126,7 +126,7 @@ Public Class atcText
             HardMin = privHardMin
         End Get
         Set(ByVal NewValue As Double)
-            Logger.Dbg("HardMin:Let:" & NewValue)
+            'Logger.Dbg("HardMin:Let:" & NewValue)
             'If we store a more precise value for HardMin than we
             'allow to be typed, it causes problems.
             Dim FormattedNewValue As String
@@ -155,7 +155,7 @@ Public Class atcText
             SoftMax = privSoftMax
         End Get
         Set(ByVal newValue As Double)
-            Logger.Dbg("SoftMax:Let:" & newValue)
+            'Logger.Dbg("SoftMax:Let:" & newValue)
             privSoftMax = newValue
         End Set
     End Property
@@ -165,7 +165,7 @@ Public Class atcText
             SoftMin = privSoftMin
         End Get
         Set(ByVal newValue As Double)
-            Logger.Dbg("SoftMin:Let:" & newValue)
+            'Logger.Dbg("SoftMin:Let:" & newValue)
             privSoftMin = newValue
         End Set
     End Property
@@ -202,7 +202,7 @@ Public Class atcText
             maxWidth = privMaxWidth
         End Get
         Set(ByVal newValue As Integer)
-            Logger.Dbg("MaxWidth:Let:" & newValue)
+            'Logger.Dbg("MaxWidth:Let:" & newValue)
             privMaxWidth = newValue
         End Set
     End Property
@@ -212,7 +212,7 @@ Public Class atcText
             MaxDecimal = privMaxDecimal
         End Get
         Set(ByVal newValue As Integer)
-            Logger.Dbg("MaxDecimal:Let:" & newValue)
+            'Logger.Dbg("MaxDecimal:Let:" & newValue)
             privMaxDecimal = newValue
         End Set
     End Property
@@ -222,7 +222,7 @@ Public Class atcText
             DefaultValue = DefVal
         End Get
         Set(ByVal newValue As Object)
-            Logger.Dbg("DefaultValue:Let:" & newValue)
+            'Logger.Dbg("DefaultValue:Let:" & newValue)
             If CStr(DefVal) = text1.Text Then
                 text1.Text = FormatValue(newValue)
             End If
@@ -245,7 +245,7 @@ Public Class atcText
             Enabled = text1.Enabled
         End Get
         Set(ByVal Enable As Boolean)
-            Logger.Dbg("Enabled:Let:" & Enable)
+            'Logger.Dbg("Enabled:Let:" & Enable)
             text1.Enabled = Enable
             If Enable Then
                 text1.BackColor = OkBg
@@ -262,7 +262,7 @@ Public Class atcText
             SelStart = text1.SelectionStart
         End Get
         Set(ByVal newValue As Integer)
-            Logger.Dbg("SelStart:Let:" & newValue)
+            'Logger.Dbg("SelStart:Let:" & newValue)
             If newValue >= 0 And newValue <= Len(text1.Text) Then
                 text1.SelectionStart = newValue
             End If
@@ -274,7 +274,7 @@ Public Class atcText
             SelLength = text1.SelectionLength
         End Get
         Set(ByVal newValue As Integer)
-            Logger.Dbg("SelLength:Let:" & newValue)
+            'Logger.Dbg("SelLength:Let:" & newValue)
             If newValue >= 0 And newValue + text1.SelectionStart <= Len(text1.Text) Then
                 text1.SelectionLength = newValue
             End If
@@ -304,7 +304,7 @@ Public Class atcText
             'Text1.Text = FormatValue(Value)
         End Get
         Set(ByVal newValue As Object)
-            Logger.Dbg("Value:Let:" & newValue)
+            'Logger.Dbg("Value:Let:" & newValue)
             If (DataType = ATCoDataType.ATCoInt Or _
                 DataType = ATCoDataType.ATCoSng) And _
                 IsNumeric(newValue) Then
@@ -448,7 +448,7 @@ LeaveSub:
     End Sub
 
     Private Sub Text1_GotFocus()
-        Logger.Dbg("Text1:GotFocus")
+        'Logger.Dbg("Text1:GotFocus")
         Tag = Value
         text1.SelectionStart = 0
         text1.SelectionLength = Len(text1.Text)
@@ -456,7 +456,7 @@ LeaveSub:
     End Sub
 
     Private Sub Text1_KeyDown(ByVal KeyCode As Integer, ByVal Shift As Integer)
-        Logger.Dbg("Text1:KeyDown: " & KeyCode)
+        'Logger.Dbg("Text1:KeyDown: " & KeyCode)
         'Dim newName As String = ""
         'Dim newColor As Integer
         If KeyCode = Keys.Enter Then
@@ -485,7 +485,7 @@ LeaveSub:
     End Sub
 
     Private Sub Text1_LostFocus()
-        Logger.Dbg("Text1:LostFocus:" & text1.Text & " " & DefVal)
+        'Logger.Dbg("Text1:LostFocus:" & text1.Text & " " & DefVal)
 
         Dim newValue As Object = Valid(text1.Text)
         DefVal = newValue
@@ -513,7 +513,7 @@ LeaveSub:
     End Sub
 
     Private Sub UserControl_EnterFocus()
-        Logger.Dbg("Control:EnterFocus")
+        'Logger.Dbg("Control:EnterFocus")
     End Sub
 
     Private Sub UserControl_Initialize()
