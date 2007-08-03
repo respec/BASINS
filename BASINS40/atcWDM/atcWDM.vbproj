@@ -105,6 +105,12 @@
     <Compile Include="atcWdmHandle.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="frmDefaultTimeInterval.Designer.vb">
+      <DependentUpon>frmDefaultTimeInterval.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDefaultTimeInterval.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmSave.Designer.vb">
       <DependentUpon>frmSave.vb</DependentUpon>
     </Compile>
@@ -135,6 +141,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmDefaultTimeInterval.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmDefaultTimeInterval.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmSave.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmSave.vb</DependentUpon>
