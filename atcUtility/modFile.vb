@@ -77,11 +77,10 @@ Public Module modFile
         Next
     End Function
 
-    Private Function ShapeFilenames(ByVal aShapefilename As String) As ArrayList
-        Dim lBaseFilename As String = IO.Path.GetFileNameWithoutExtension(aShapefilename)
+    Private Function ShapeFilenames(ByVal aShapefilename As String) As ArrayList 
         ShapeFilenames = New ArrayList
         For Each lExtension As String In ShapeExtensions
-            ShapeFilenames.Add(lBaseFilename & lExtension)
+            ShapeFilenames.Add(IO.Path.ChangeExtension(aShapefilename, lExtension))
         Next
     End Function
 
