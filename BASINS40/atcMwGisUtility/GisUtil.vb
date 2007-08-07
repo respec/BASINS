@@ -1542,7 +1542,11 @@ Public Class GisUtil
         Logger.Progress(lTotalPolygonCount, lTotalPolygonCount)
 
         If aCreateNew Then 'delete old version of this file if it exists
-            TryDeleteShapefile(aOutputLayerName)
+            If Not TryDeleteShapefile(aOutputLayerName) Then
+                'TryDeleteShapefile fails when the shapefile cannot be deleted, ie it is on the map
+                Logger.Msg("The Shapefile " & aOutputLayerName & " could not be deleted." & vbCrLf & _
+                           "This can cause misleading results from the overlay operation.", "Overlay Warning")
+            End If
         End If
 
         lBsuc = lSfOut.SaveAs(aOutputLayerName)
