@@ -79,7 +79,9 @@ Public Class atcDataSource
         'assume the best
         Open = True
 
-        If aSpecification Is Nothing OrElse aSpecification.Length = 0 OrElse Not FileExists(aSpecification) Then
+        If aSpecification Is Nothing OrElse _
+           aSpecification.Length = 0 OrElse _
+           (Not CanSave AndAlso Not (FileExists(aSpecification))) Then
             Dim lString As String = Description
             If lString.Length = 0 Then lString = Name
             Dim lCdlg As New Windows.Forms.OpenFileDialog

@@ -115,7 +115,7 @@ Public Class atcDataSourceWDM
         lHighestNewDSN = lHighestDSN
         For Each lDataSet As atcDataSet In aDataGroup
             lDSN = lDataSet.Attributes.GetValue("dsn", 0)
-            If lDSN > lHighestDSN AndAlso lDSN < 9999 Then
+            If lDSN > lHighestNewDSN AndAlso lDSN < 9999 Then
                 lHighestNewDSN = lDSN
             Else
                 lHighestNewDSN += 1
@@ -160,35 +160,68 @@ Public Class atcDataSourceWDM
             Dim lTimserConst As atcTimeseries = Nothing
             Dim lTs As Integer = lTimser.Attributes.GetValue("ts", 0)
             Dim lTu As Integer = lTimser.Attributes.GetValue("tu", 0)
+            Dim lAggr As Integer = lTimser.Attributes.GetValue("aggregation", 0)
             Dim lDsn As Integer = aDataSet.Attributes.GetValue("id", 1)
 
             If lTs = 0 Or lTu = 0 Then ' sparse dataset - fill in dummy values for write
                 If pAskAboutMissingTuTs Then
                     Dim lFrmDefaultTimeInterval As New frmDefaultTimeInterval
-                    pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lDsn, pTu, pTs)
+                    pAskAboutMissingTuTs = lFrmDefaultTimeInterval.AskUser(lDsn, pTu, pTs, lAggr)
                 End If
                 lTs = pTs
                 lTu = pTu
                 If pTs > 0 And pTu > 0 Then
-                    Dim lNumValues As Integer = 1 + (lTimser.Dates.Value(lTimser.numValues) - lTimser.Dates.Value(1)) * 1440
+                    Dim lJulianInterval As Double
+                    Select Case pTu
+                        Case 2 : lJulianInterval = JulianMinute * lTs 'minute
+                        Case 3 : lJulianInterval = JulianHour * lTs 'hour
+                        Case 4 : lJulianInterval = lTs
+                    End Select
                     lTimserConst = New atcTimeseries(Me)
                     With lTimserConst
                         .Attributes.ChangeTo(lTimser.Attributes)
                         .Dates = New atcTimeseries(Me)
+                        .Dates.Values(0) = CInt(lTimser.Dates.Values(1)) - 1 'whole day portion
+                        Dim lNumValues As Integer = (lTimser.Dates.Value(lTimser.numValues) - .Dates.Values(0)) / lJulianInterval
                         .numValues = lNumValues
-                        .Dates.Values(0) = lTimser.Dates.Values(1) - JulianMinute
                         .Attributes.SetValue("ts", lTs)
                         .Attributes.SetValue("tu", lTu)
                         Dim lIndex As Integer = 1
                         For lIndexConst As Integer = 1 To lNumValues
-                            Dim lDate As Double = .Dates.Values(0) + (JulianMinute * lIndexConst)
+                            Dim lDate As Double = .Dates.Values(0) + (lJulianInterval * lIndexConst)
+                            Dim lAggregationCount As Integer = .ValueAttributes(lIndexConst).GetValue("AggregationCount", 0)
                             .Dates.Values(lIndexConst) = lDate
                             If lIndex <= lTimser.numValues AndAlso lDate >= (lTimser.Dates.Values(lIndex) - JulianSecond) Then
-                                .Values(lIndexConst) = lTimser.Values(lIndex)
-                                lIndex += 1
+                                'todo: this uses only the last value, have a transformation 
+                                lAggregationCount += 1
+                                .ValueAttributes(lIndexConst).Add("AggregationCount", lAggregationCount)
+                                Dim lValue As Double = lTimser.Values(lIndex)
+                                If lAggregationCount = 1 Then 'save this first value
+                                    .Values(lIndexConst) = lValue
+                                Else
+                                    Select Case lAggr
+                                        Case 0 'aver
+                                            .Value(lIndexConst) = ((.Value(lIndexConst) * (lAggregationCount - 1)) + lValue) / lAggregationCount
+                                        Case 1 'sum
+                                            .Value(lIndexConst) += lValue
+                                        Case 2 'min
+                                            If lValue < .Value(lIndexConst) Then
+                                                .Value(lIndexConst) = lValue
+                                            End If
+                                        Case 3 'max
+                                            If lValue > .Value(lIndexConst) Then
+                                                .Value(lIndexConst) = lValue
+                                            End If
+                                        Case 4 'first - no change needed
+                                        Case 5 'last
+                                            .Value(lIndexConst) = lValue
+                                    End Select
+                                End If
+                                lIndexConst -= 1 ' more for this value?
+                                lIndex += 1 'increment the source
                             ElseIf lIndex > lTimser.numValues Then
                                 Logger.Dbg("OutOfValuesAt:" & lTimser.numValues)
-                            Else
+                            ElseIf lAggregationCount = 0 Then
                                 .Values(lIndexConst) = Double.NaN
                             End If
                         Next
