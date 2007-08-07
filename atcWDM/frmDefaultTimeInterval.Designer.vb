@@ -32,6 +32,8 @@ Partial Class frmDefaultTimeInterval
         Me.btnAll = New System.Windows.Forms.Button
         Me.btnSkip = New System.Windows.Forms.Button
         Me.btnSkipAll = New System.Windows.Forms.Button
+        Me.lstAggregation = New System.Windows.Forms.ListBox
+        Me.lblAggregation = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
         'lblTimestep
@@ -49,8 +51,8 @@ Partial Class frmDefaultTimeInterval
         Me.atcTextTimeStep.Alignment = System.Windows.Forms.HorizontalAlignment.Right
         Me.atcTextTimeStep.DataType = atcControls.atcText.ATCoDataType.ATCoInt
         Me.atcTextTimeStep.DefaultValue = 1
-        Me.atcTextTimeStep.HardMax = 1
-        Me.atcTextTimeStep.HardMin = 60
+        Me.atcTextTimeStep.HardMax = 60
+        Me.atcTextTimeStep.HardMin = 1
         Me.atcTextTimeStep.InsideLimitsBackground = System.Drawing.Color.Empty
         Me.atcTextTimeStep.Location = New System.Drawing.Point(150, 33)
         Me.atcTextTimeStep.MaxDecimal = 0
@@ -100,7 +102,7 @@ Partial Class frmDefaultTimeInterval
         '
         'btnOk
         '
-        Me.btnOk.Location = New System.Drawing.Point(45, 141)
+        Me.btnOk.Location = New System.Drawing.Point(45, 234)
         Me.btnOk.Name = "btnOk"
         Me.btnOk.Size = New System.Drawing.Size(75, 23)
         Me.btnOk.TabIndex = 14
@@ -109,7 +111,7 @@ Partial Class frmDefaultTimeInterval
         '
         'btnAll
         '
-        Me.btnAll.Location = New System.Drawing.Point(150, 141)
+        Me.btnAll.Location = New System.Drawing.Point(150, 234)
         Me.btnAll.Name = "btnAll"
         Me.btnAll.Size = New System.Drawing.Size(98, 23)
         Me.btnAll.TabIndex = 15
@@ -118,7 +120,7 @@ Partial Class frmDefaultTimeInterval
         '
         'btnSkip
         '
-        Me.btnSkip.Location = New System.Drawing.Point(45, 170)
+        Me.btnSkip.Location = New System.Drawing.Point(45, 263)
         Me.btnSkip.Name = "btnSkip"
         Me.btnSkip.Size = New System.Drawing.Size(75, 23)
         Me.btnSkip.TabIndex = 16
@@ -127,19 +129,43 @@ Partial Class frmDefaultTimeInterval
         '
         'btnSkipAll
         '
-        Me.btnSkipAll.Location = New System.Drawing.Point(150, 170)
+        Me.btnSkipAll.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnSkipAll.Location = New System.Drawing.Point(150, 263)
         Me.btnSkipAll.Name = "btnSkipAll"
         Me.btnSkipAll.Size = New System.Drawing.Size(98, 23)
         Me.btnSkipAll.TabIndex = 17
         Me.btnSkipAll.Text = "Skip All"
         Me.btnSkipAll.UseVisualStyleBackColor = True
         '
+        'lstAggregation
+        '
+        Me.lstAggregation.FormattingEnabled = True
+        Me.lstAggregation.ItemHeight = 16
+        Me.lstAggregation.Items.AddRange(New Object() {"Average", "Sum", "Minimum", "Maximum", "First", "Last"})
+        Me.lstAggregation.Location = New System.Drawing.Point(153, 119)
+        Me.lstAggregation.Name = "lstAggregation"
+        Me.lstAggregation.Size = New System.Drawing.Size(94, 100)
+        Me.lstAggregation.TabIndex = 18
+        '
+        'lblAggregation
+        '
+        Me.lblAggregation.AutoSize = True
+        Me.lblAggregation.Location = New System.Drawing.Point(62, 119)
+        Me.lblAggregation.Name = "lblAggregation"
+        Me.lblAggregation.Size = New System.Drawing.Size(85, 17)
+        Me.lblAggregation.TabIndex = 19
+        Me.lblAggregation.Text = "Aggregation"
+        Me.lblAggregation.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
         'frmDefaultTimeInterval
         '
         Me.AcceptButton = Me.btnOk
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(304, 212)
+        Me.CancelButton = Me.btnSkipAll
+        Me.ClientSize = New System.Drawing.Size(291, 302)
+        Me.Controls.Add(Me.lblAggregation)
+        Me.Controls.Add(Me.lstAggregation)
         Me.Controls.Add(Me.btnSkipAll)
         Me.Controls.Add(Me.btnSkip)
         Me.Controls.Add(Me.btnAll)
@@ -149,7 +175,10 @@ Partial Class frmDefaultTimeInterval
         Me.Controls.Add(Me.lblTimestep)
         Me.Controls.Add(Me.atcTextTimeStep)
         Me.Controls.Add(Me.lstTimeUnits)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.HelpButton = True
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MaximizeBox = False
         Me.Name = "frmDefaultTimeInterval"
         Me.Text = "Set Missing Time Interval"
         Me.ResumeLayout(False)
@@ -165,4 +194,6 @@ Partial Class frmDefaultTimeInterval
     Friend WithEvents btnAll As System.Windows.Forms.Button
     Friend WithEvents btnSkip As System.Windows.Forms.Button
     Friend WithEvents btnSkipAll As System.Windows.Forms.Button
+    Friend WithEvents lstAggregation As System.Windows.Forms.ListBox
+    Friend WithEvents lblAggregation As System.Windows.Forms.Label
 End Class
