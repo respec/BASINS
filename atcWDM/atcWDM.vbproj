@@ -126,6 +126,7 @@
     <ProjectReference Include="..\atcControls\atcControls.vbproj">
       <Project>{B219575F-1541-41DB-9FA4-D9D7CD62B4A5}</Project>
       <Name>atcControls</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcData\atcData.vbproj">
       <Name>atcData</Name>

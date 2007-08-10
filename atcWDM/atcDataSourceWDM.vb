@@ -64,18 +64,14 @@ Public Class atcDataSourceWDM
             Else
                 'Logger.Dbg("Refresh " & lDsn)
             End If
-            If lDsn = -1 Then
-                Logger.Status("WDM Refresh Complete")
-                Logger.Progress(100, 0)
-                Logger.Progress("WDM Refresh Complete", 100, 0)
-            Else 'try the next dsn
+            If lDsn > -1 Then 'try the next dsn
                 lDsn += 1
                 lProgPrev = lProg
                 lProg = (100 * lDsn) / 32000
-                Logger.Progress(lProg, lProgPrev)
-                Logger.Progress("WDM Refresh", lProg, lProgPrev)
+                'Logger.Progress("WDM Refresh", lProg, lProgPrev)
             End If
         End While
+        'Logger.Progress("", 0, 0)
     End Sub
 
     Private Function AttrStored(ByVal aSaind As Integer) As Boolean 'somewhere else

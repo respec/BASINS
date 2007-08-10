@@ -789,7 +789,7 @@ StartOver:
     Private Function AddGridToMW(ByVal aFilename As String, _
                                  ByRef layerXml As Chilkat.Xml) As MapWindow.Interfaces.Layer
         Dim LayerName As String
-        Dim Group As String
+        Dim Group As String = "Other"
         Dim Visible As Boolean
         Dim Style As atcRenderStyle = New atcRenderStyle
 
@@ -806,10 +806,11 @@ StartOver:
         MWlay = Nothing
 
         Try
+            g_StatusBar.Item(1).Text = "Opening " & aFilename
+
             If layerXml Is Nothing Then
-                LayerName = FilenameOnly(aFilename)
-                Visible = False 'True
-                Group = "Other"
+                MWlay = g_MapWin.Layers.Add(aFilename)
+                MWlay.Visible = True
             Else
                 LayerName = layerXml.GetAttrValue("Name")
                 Style.xml = layerXml.FirstChild
@@ -820,37 +821,36 @@ StartOver:
                     Case "no" : Visible = False
                     Case Else : Visible = False
                 End Select
-            End If
-            If LayerName = "" Then LayerName = FilenameOnly(aFilename)
-            If LayerName = "National Elevation Dataset" Or LayerName = "DEM Elevation Model" Then
-                LayerName &= " (" & FilenameOnly(aFilename) & ")"
-            End If
-
-            g_StatusBar.Item(1).Text = "Opening " & aFilename
-            g = New MapWinGIS.Grid
-            g.Open(aFilename)
-            Dim lSuccess As Boolean = False
-            If LCase(aFilename).IndexOf("\nlcd\") > 0 Then
-                g.Header.NodataValue = 0
-                lSuccess = g.Save(aFilename)
-                g.Close()
+                If LayerName = "" Then LayerName = FilenameOnly(aFilename)
+                If LayerName = "National Elevation Dataset" Or LayerName = "DEM Elevation Model" Then
+                    LayerName &= " (" & FilenameOnly(aFilename) & ")"
+                End If
+                g = New MapWinGIS.Grid
                 g.Open(aFilename)
+                Dim lSuccess As Boolean = False
+                If LCase(aFilename).IndexOf("\nlcd\") > 0 Then
+                    g.Header.NodataValue = 0
+                    lSuccess = g.Save(aFilename)
+                    g.Close()
+                    g.Open(aFilename)
+                End If
+
+                MWlay = g_MapWin.Layers.Add(g, LayerName)
+                MWlay.Visible = Visible
+                MWlay.UseTransparentColor = True
+
+                'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
+                If LCase(aFilename).IndexOf("\demg\") > 0 Then
+                    SetElevationGridColors(MWlay, g)
+                ElseIf LCase(aFilename).IndexOf("\ned\") > 0 Then
+                    SetElevationGridColors(MWlay, g)
+                ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
+                    SetLandUseColorsGrid(MWlay, g)
+                End If
             End If
 
-            MWlay = g_MapWin.Layers.Add(g, LayerName)
-            MWlay.UseTransparentColor = True
 
-            MWlay.Visible = Visible
-
-            'TODO: replace hard-coded SetLandUseColors and others with full renderer from defaults
-            If LCase(aFilename).IndexOf("\demg\") > 0 Then
-                SetElevationGridColors(MWlay, g)
-            ElseIf LCase(aFilename).IndexOf("\ned\") > 0 Then
-                SetElevationGridColors(MWlay, g)
-            ElseIf LCase(aFilename).IndexOf("\nlcd\") > 0 Then
-                SetLandUseColorsGrid(MWlay, g)
-            End If
-            If Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
+            If Not Group Is Nothing AndAlso Group.Length > 0 Then AddLayerToGroup(MWlay, Group)
 
             If MWlay.Visible Then
                 g_MapWin.View.Redraw()
