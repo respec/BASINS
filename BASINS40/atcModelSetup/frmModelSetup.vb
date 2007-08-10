@@ -1299,6 +1299,9 @@ Public Class frmModelSetup
             Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
             WinHSPFexe = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\winhspf.exe"
         End If
+        If Not FileExists(WinHSPFexe) Then
+            WinHSPFexe = FindFile("Please locate WinHSPF.exe", "WinHSPF.exe")
+        End If
         If FileExists(WinHSPFexe) Then
             Process.Start(WinHSPFexe, ucommand)
         Else

@@ -638,6 +638,7 @@ ErrorWriting:
             End If
 
             If aUserVerifyFileName OrElse Not FileExists(lFileName) Then 'ask the user
+                Logger.Dbg("Asking user to find " & aDefaultFileName, aFileDialogTitle)
                 Dim cdlg As New Windows.Forms.OpenFileDialog
                 With cdlg
                     .Title = aFileDialogTitle
