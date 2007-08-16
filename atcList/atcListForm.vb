@@ -45,6 +45,7 @@ Friend Class atcListForm
     Friend WithEvents mnuFileSelectAttributes As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewValues As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFilterNoData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -62,10 +63,11 @@ Friend Class atcListForm
         Me.mnuAttributeColumns = New System.Windows.Forms.MenuItem
         Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
+        Me.mnuViewValues = New System.Windows.Forms.MenuItem
+        Me.mnuFilterNoData = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
-        Me.mnuViewValues = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -114,7 +116,7 @@ Friend Class atcListForm
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues, Me.mnuFilterNoData})
         Me.mnuView.Text = "View"
         '
         'mnuAttributeRows
@@ -137,6 +139,18 @@ Friend Class atcListForm
         '
         Me.mnuSizeColumnsToContents.Index = 3
         Me.mnuSizeColumnsToContents.Text = "Size Columns To Contents"
+        '
+        'mnuViewValues
+        '
+        Me.mnuViewValues.Checked = True
+        Me.mnuViewValues.Index = 4
+        Me.mnuViewValues.Text = "Timeseries Values"
+        '
+        'mnuFilterNoData
+        '
+        Me.mnuFilterNoData.Checked = True
+        Me.mnuFilterNoData.Index = 5
+        Me.mnuFilterNoData.Text = "Filter NoData"
         '
         'mnuAnalysis
         '
@@ -163,15 +177,9 @@ Friend Class atcListForm
         Me.agdMain.Source = Nothing
         Me.agdMain.TabIndex = 0
         '
-        'mnuViewValues
-        '
-        Me.mnuViewValues.Checked = True
-        Me.mnuViewValues.Index = 4
-        Me.mnuViewValues.Text = "Timeseries Values"
-        '
         'atcListForm
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.AutoScaleBaseSize = New System.Drawing.Size(6, 15)
         Me.ClientSize = New System.Drawing.Size(528, 545)
         Me.Controls.Add(Me.agdMain)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -194,7 +202,8 @@ Friend Class atcListForm
 
     Public Sub Initialize(Optional ByVal aTimeseriesGroup As atcData.atcDataGroup = Nothing, _
                           Optional ByVal aDisplayAttributes As ArrayList = Nothing, _
-                          Optional ByVal aShowValues As Boolean = True)
+                          Optional ByVal aShowValues As Boolean = True, _
+                          Optional ByVal aFilterNoData As Boolean = False)
         If aTimeseriesGroup Is Nothing Then
             pDataGroup = New atcDataGroup
         Else
@@ -221,6 +230,7 @@ Friend Class atcListForm
         If pDataGroup.Count > 0 Then
             Me.Show()
             mnuViewValues.Checked = aShowValues
+            mnuFilterNoData.Checked = aFilterNoData
             PopulateGrid()
         Else 'user declined to specify timeseries
             Me.Close()
@@ -230,7 +240,8 @@ Friend Class atcListForm
 
     Private Sub PopulateGrid()
         Dim lTotalWidth As Integer = 10
-        pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes, mnuViewValues.Checked)
+        pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes, _
+                                              mnuViewValues.Checked, mnuFilterNoData.Checked)
         pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
         pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
         agdMain.Initialize(pSwapperSource)
@@ -326,6 +337,11 @@ Friend Class atcListForm
 
     Private Sub mnuViewValues_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewValues.Click
         mnuViewValues.Checked = Not mnuViewValues.Checked
+        PopulateGrid()
+    End Sub
+
+    Private Sub mnuFilterNoData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFilterNoData.Click
+        mnuFilterNoData.Checked = Not mnuFilterNoData.Checked
         PopulateGrid()
     End Sub
 
