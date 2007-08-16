@@ -1,4 +1,5 @@
 Imports atcData
+Imports MapWinUtility
 
 Public Class atcListPlugin
     Inherits atcData.atcDataDisplay
@@ -22,6 +23,20 @@ Public Class atcListPlugin
         If Not aDataGroup Is Nothing AndAlso aDataGroup.Count > 0 Then
             Dim lForm As New atcListForm
             lForm.Initialize(aDataGroup)
+            For Each lOption As String In aOption
+                Select Case lOption.ToLower
+                    Case "filternodata"
+                        lForm.mnuFilterNoData.Checked = True
+                    Case "viewnovalues"
+                        lForm.mnuViewValues.Checked = False
+                    Case "attributerows"
+                        lForm.mnuAttributeRows.Checked = True
+                    Case "attributecolumns"
+                        lForm.mnuAttributeColumns.Checked = True
+                    Case Else
+                        Logger.Dbg("UnknownParameter:" & lOption)
+                End Select
+            Next
             atcUtility.SaveFileString(aFileName, lForm.ToString)
             lForm.Dispose()
         End If
