@@ -46,6 +46,7 @@ Friend Class atcListForm
     Friend WithEvents mnuFileSelectData As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewValues As System.Windows.Forms.MenuItem
     Friend WithEvents mnuFilterNoData As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuOptions As System.Windows.Forms.MenuItem
     Friend WithEvents mnuHelp As System.Windows.Forms.MenuItem
     <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
@@ -65,6 +66,7 @@ Friend Class atcListForm
         Me.mnuSizeColumnsToContents = New System.Windows.Forms.MenuItem
         Me.mnuViewValues = New System.Windows.Forms.MenuItem
         Me.mnuFilterNoData = New System.Windows.Forms.MenuItem
+        Me.mnuOptions = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
         Me.agdMain = New atcControls.atcGrid
@@ -116,7 +118,7 @@ Friend Class atcListForm
         'mnuView
         '
         Me.mnuView.Index = 2
-        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues, Me.mnuFilterNoData})
+        Me.mnuView.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuAttributeRows, Me.mnuAttributeColumns, Me.mnuViewSep1, Me.mnuSizeColumnsToContents, Me.mnuViewValues, Me.mnuFilterNoData, Me.mnuOptions})
         Me.mnuView.Text = "View"
         '
         'mnuAttributeRows
@@ -151,6 +153,11 @@ Friend Class atcListForm
         Me.mnuFilterNoData.Checked = True
         Me.mnuFilterNoData.Index = 5
         Me.mnuFilterNoData.Text = "Filter NoData"
+        '
+        'mnuOptions
+        '
+        Me.mnuOptions.Index = 6
+        Me.mnuOptions.Text = "Options"
         '
         'mnuAnalysis
         '
@@ -367,5 +374,10 @@ Friend Class atcListForm
 
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
         ShowHelp("BASINS Details\Analysis\Time Series Functions\List.html")
+    End Sub
+
+    Private Sub mnuOptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOptions.Click
+        Dim lFrmOptions As New frmOptions
+        lFrmOptions.Show()
     End Sub
 End Class

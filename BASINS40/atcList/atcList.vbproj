@@ -86,9 +86,19 @@
     <Compile Include="atcListPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="frmOptions.Designer.vb">
+      <DependentUpon>frmOptions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmOptions.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="atcListForm.resx">
       <DependentUpon>atcListForm.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmOptions.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmOptions.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
