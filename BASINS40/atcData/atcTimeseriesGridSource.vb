@@ -9,27 +9,45 @@ Public Class atcTimeseriesGridSource
     Private pDateFormat As New atcDateFormat
     Private pDisplayAttributes As ArrayList
     Private pDisplayValues As Boolean
+    Private pFilterNoData As Boolean
 
     Sub New(ByVal aDataGroup As atcData.atcDataGroup, _
             ByVal aDisplayAttributes As ArrayList, _
             ByVal aDisplayValues As Boolean)
+        Me.New(aDataGroup, aDisplayAttributes, aDisplayValues, False)
+    End Sub
+
+    Sub New(ByVal aDataGroup As atcData.atcDataGroup, _
+            ByVal aDisplayAttributes As ArrayList, _
+            ByVal aDisplayValues As Boolean, _
+            ByVal aFilterNoData As Boolean)
         pDataGroup = aDataGroup
         pDisplayAttributes = aDisplayAttributes
         pDisplayValues = aDisplayValues
+        pFilterNoData = aFilterNoData
         RefreshAllDates()
     End Sub
 
     Private Sub RefreshAllDates()
         Try
             If pDisplayValues Then
-                Select Case pDataGroup.Count
-                    Case 1
-                        Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(0)
-                        lTS.EnsureValuesRead()
-                        pAllDates = lTS.Dates
-                    Case Is > 1 : pAllDates = MergeTimeseries(pDataGroup).Dates
-                    Case Else : pAllDates = New atcTimeseries(Nothing)
-                End Select
+                'Select Case pDataGroup.Count
+                '    Case 1
+                '        Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(0)
+                '        lTS.EnsureValuesRead()
+                '        pAllDates = lTS.Dates
+                '    Case Is > 1 : pAllDates = MergeTimeseries(pDataGroup).Dates
+                '    Case Else : pAllDates = New atcTimeseries(Nothing)
+                'End Select
+                If pDataGroup.Count > 1 Or pFilterNoData Then
+                    pAllDates = MergeTimeseries(pDataGroup, pFilterNoData).Dates
+                ElseIf pDataGroup.Count = 1 Then
+                    Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(0)
+                    lTS.EnsureValuesRead()
+                    pAllDates = lTS.Dates
+                Else
+                    pAllDates = New atcTimeseries(Nothing)
+                End If
             Else
                 pAllDates = Nothing
             End If
@@ -131,6 +149,8 @@ Public Class atcTimeseriesGridSource
                                 Else 'No value in this TS is close enough to this date
                                     Return ""
                                 End If
+                            ElseIf Double.IsNaN(lTS.Value(lIndex)) Then
+                                Return ""
                             Else
                                 Return DoubleToString(lTS.Value(lIndex))
                             End If

@@ -162,11 +162,11 @@ Public Module modTimeseriesMath
     ''' <returns>atcTimeseries containing all unique dates from the group</returns>
     ''' <remarks>Each atcTimeseries in aGroup is assumed to be in order by date within itself.
     ''' If duplicate dates exist in aGroup, some values will be left out of result.</remarks>
-    Public Function MergeTimeseries(ByVal aGroup As atcDataGroup) As atcTimeseries
-        Dim lNewTS As New atcTimeseries(Nothing)
+    Public Function MergeTimeseries(ByVal aGroup As atcDataGroup, Optional ByVal aFilterNoData As Boolean = False) As atcTimeseries
+        Dim lNewTS As New atcTimeseries(Nothing) 'will contain new (merged) dates
         Dim lNewIndex As Integer
         Dim lTotalNumValues As Integer = 0
-        Dim lOldTS As atcTimeseries
+        Dim lOldTS As atcTimeseries 'points to current timeseries from aGroup
         Dim lMinDate As Double = pMaxValue
         Dim lMaxGroupIndex As Integer = aGroup.Count - 1
         Dim lIndex As Integer
@@ -187,11 +187,11 @@ Public Module modTimeseriesMath
             lOldTS = aGroup.Item(lIndex)
             Try
                 lTotalNumValues += lOldTS.numValues
-                lNextIndex(lIndex) = 1
-                lNextDate(lIndex) = lOldTS.Dates.Value(1)
-                'Find minimum starting date and take date 0 from that TS
+                GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lIndex), lNextDate(lIndex))
+                'lNextDate(lIndex) = lOldTS.Dates.Value(lNextIndex(lIndex))
+                'Find minimum starting date and take date before from that TS
                 If lNextDate(lIndex) < lMinDate Then
-                    lMinDate = lOldTS.Dates.Value(0)
+                    lMinDate = lOldTS.Dates.Value(lNextIndex(lIndex) - 1)
                 End If
             Catch 'Can't get dates values from this TS
                 lNextIndex(lIndex) = -1
@@ -234,23 +234,27 @@ Public Module modTimeseriesMath
                         'This value was inserted during splitting and will now be discarded
                         lNewIndex -= 1
                         lTotalNumValues -= 1
-                        lNextIndex(lMinIndex) += 1
-                        If lNextIndex(lMinIndex) <= lOldTS.numValues Then
-                            lNextDate(lMinIndex) = lOldTS.Dates.Value(lNextIndex(lMinIndex))
-                        Else 'used last value from this TS
-                            lNextIndex(lMinIndex) = -1
-                        End If
+                        GetNextDateIndex(lOldTS, aFilterNoData, _
+                                         lNextIndex(lMinIndex), _
+                                         lNextDate(lMinIndex))
+                        'lNextIndex(lMinIndex) += 1
+                        'If lNextIndex(lMinIndex) <= lOldTS.numValues Then
+                        '    lNextDate(lMinIndex) = lOldTS.Dates.Value(lNextIndex(lMinIndex))
+                        'Else 'used last value from this TS
+                        '    lNextIndex(lMinIndex) = -1
+                        'End If
                     Else
                         'Logger.Dbg("---MergeTimeseries adding date " & lMinDate & " value " & lOldTS.Value(lNextIndex(lMinIndex)) & " from dataset " & lMinIndex)
                         lNewTS.Dates.Value(lNewIndex) = lMinDate
                         lNewTS.Value(lNewIndex) = lOldTS.Value(lNextIndex(lMinIndex))
 
-                        lNextIndex(lMinIndex) += 1
-                        If lNextIndex(lMinIndex) <= lOldTS.numValues Then
-                            lNextDate(lMinIndex) = lOldTS.Dates.Value(lNextIndex(lMinIndex))
-                        Else
-                            lNextIndex(lMinIndex) = -1
-                        End If
+                        GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lMinIndex), lNextDate(lMinIndex))
+                        'lNextIndex(lMinIndex) += 1
+                        'If lNextIndex(lMinIndex) <= lOldTS.numValues Then
+                        '    lNextDate(lMinIndex) = lOldTS.Dates.Value(lNextIndex(lMinIndex))
+                        'Else
+                        '    lNextIndex(lMinIndex) = -1
+                        'End If
 
                         For lIndex = 0 To lMaxGroupIndex
                             'Discard next value from any TS that falls within one millisecond
@@ -259,12 +263,13 @@ Public Module modTimeseriesMath
                                 lOldTS = aGroup.Item(lIndex)
                                 'Logger.Dbg("---MergeTimeseries discarding date " & DumpDate(lNextDate(lIndex)) & " value " & lOldTS.Value(lNextIndex(lIndex)) & " from dataset " & lIndex)
                                 lTotalNumValues -= 1    'This duplicate no longer counts toward total
-                                lNextIndex(lIndex) += 1
-                                If lNextIndex(lIndex) <= lOldTS.numValues Then
-                                    lNextDate(lIndex) = lOldTS.Dates.Value(lNextIndex(lIndex))
-                                Else
-                                    lNextIndex(lIndex) = -1
-                                End If
+                                GetNextDateIndex(lOldTS, aFilterNoData, lNextIndex(lIndex), lNextDate(lIndex))
+                                'lNextIndex(lIndex) += 1
+                                'If lNextIndex(lIndex) <= lOldTS.numValues Then
+                                '    lNextDate(lIndex) = lOldTS.Dates.Value(lNextIndex(lIndex))
+                                'Else
+                                '    lNextIndex(lIndex) = -1
+                                'End If
                             End While
                         Next
                     End If
@@ -281,6 +286,25 @@ Public Module modTimeseriesMath
         End If
         Return lNewTS
     End Function
+
+    Private Sub GetNextDateIndex(ByVal aTs As atcTimeseries, _
+                                      ByVal aFilterNoData As Boolean, _
+                                      ByRef aIndex As Integer, _
+                                      ByRef aNextDate As Double)
+        aIndex += 1
+        While aIndex <= aTs.numValues
+            If (Not aFilterNoData) OrElse (Not Double.IsNaN(aTs.Value(aIndex))) Then
+                aNextDate = aTs.Dates.Value(aIndex)
+                Exit While
+            Else
+                aIndex += 1
+            End If
+        End While
+        If aIndex > aTs.numValues Then
+            aNextDate = pNaN 'is this necessary?
+            aIndex = -1 'out of values
+        End If
+    End Sub
 
     Private Sub MergeAttributes(ByVal aGroup As atcDataGroup, ByVal aTarget As atcTimeseries)
         For Each lAttribute As atcDefinedValue In aGroup(0).Attributes
