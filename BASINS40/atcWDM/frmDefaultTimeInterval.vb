@@ -64,4 +64,11 @@ Public Class frmDefaultTimeInterval
         pResult = False  'dont ask next time
         Me.Close()
     End Sub
+
+    Private Sub frmDefaultTimeInterval_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            'TODO: link to documentation
+            'atcUtility.ShowHelp("BASINS Details\?.html")
+        End If
+    End Sub
 End Class
