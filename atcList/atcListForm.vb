@@ -250,13 +250,19 @@ Friend Class atcListForm
     End Sub
 
     Private Sub PopulateGrid()
-        Dim lTotalWidth As Integer = 10
+        'with timeseries data, a list of attributes and options define a timeseries grid source
         pSource = New atcTimeseriesGridSource(pDataGroup, pDisplayAttributes, _
-                                              mnuViewValues.Checked, mnuFilterNoData.Checked)
+                                              mnuViewValues.Checked, _
+                                              mnuFilterNoData.Checked)
+
         pSwapperSource = New atcControls.atcGridSourceRowColumnSwapper(pSource)
         pSwapperSource.SwapRowsColumns = mnuAttributeColumns.Checked
+
         agdMain.Initialize(pSwapperSource)
+        'TODO: could SizeAllColumnsToContents return total width?
         agdMain.SizeAllColumnsToContents()
+
+        Dim lTotalWidth As Integer = 10
         For iColumn As Integer = 0 To pSource.Columns
             lTotalWidth += agdMain.ColumnWidth(iColumn)
         Next
@@ -376,8 +382,14 @@ Friend Class atcListForm
         Return Me.Text & vbCrLf & agdMain.ToString
     End Function
 
+    Private pHelpLocation As String = "BASINS Details\Analysis\Time Series Functions\List.html"
     Private Sub mnuHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuHelp.Click
-        ShowHelp("BASINS Details\Analysis\Time Series Functions\List.html")
+        ShowHelp(pHelpLocation)
+    End Sub
+    Private Sub atcListForm_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            ShowHelp(pHelpLocation)
+        End If
     End Sub
 
     Private Sub mnuOptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOptions.Click

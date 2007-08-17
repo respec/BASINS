@@ -29,6 +29,13 @@ Public Class frmSave
     Private Sub btnSave_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSave.Click
         Me.Close()
     End Sub
+
+    Private Sub frmSave_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
+        If e.KeyValue = Windows.Forms.Keys.F1 Then
+            'TODO: link to documentation
+            'atcUtility.ShowHelp("BASINS Details\?.html")
+        End If
+    End Sub
 End Class
 
 Friend Class WDMGridSource
