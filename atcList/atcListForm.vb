@@ -202,6 +202,10 @@ Friend Class atcListForm
     'The group of atcTimeseries displayed
     Private WithEvents pDataGroup As atcDataGroup
 
+    'Numeric display properties
+    Friend pSigDig As Integer = 5
+    Friend pDecPla As Integer = 3
+
     'Translator class between pDataGroup and agdMain
     Private pSource As atcTimeseriesGridSource
     Private pDisplayAttributes As ArrayList
@@ -378,6 +382,33 @@ Friend Class atcListForm
 
     Private Sub mnuOptions_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOptions.Click
         Dim lFrmOptions As New frmOptions
-        lFrmOptions.Show()
+        With lFrmOptions
+            .txtSigDig.Value = pSigDig
+            .txtDecPla.Value = pDecPla
+            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                pSigDig = .txtSigDig.Value
+                pDecPla = .txtDecPla.Value
+                'TODO: these values are to be used in atcTimeseriesGridSrouce:CellValue in a call to DoubleToString
+                PopulateGrid()
+            End If
+        End With
     End Sub
+
+    Friend Property SigDig() As Integer
+        Get
+            Return pSigDig
+        End Get
+        Set(ByVal value As Integer)
+            pSigDig = value
+        End Set
+    End Property
+
+    Friend Property DecPla() As Integer
+        Get
+            Return pDecPla
+        End Get
+        Set(ByVal value As Integer)
+            pDecPla = value
+        End Set
+    End Property
 End Class
