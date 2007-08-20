@@ -1704,7 +1704,6 @@ Public Module modMetCompute
 
         Dim lHrPos, i, lMaxHrInd As Integer
         Dim lRndOff, lCarry, lMaxHrVal As Double
-        Dim lTmpHrVals(24) As Double
         Dim lDyInd, lHrInd As Integer
         Dim lRatio, lDaySum, lClosestDaySum, lClosestRatio As Double
         Dim lSDt, lEDt As Double
@@ -1723,6 +1722,7 @@ Public Module modMetCompute
         Dim lTriDist1To2Cnt As Integer = 0
         Dim lTriDist2To3Cnt As Integer = 0
         Dim lTriDistGT3Cnt As Integer = 0
+        Dim lNVals As Integer
 
         On Error GoTo DisPrecipErrHnd
         lUsedTriang = 0
@@ -1763,6 +1763,14 @@ Public Module modMetCompute
         lDisTs.Dates = DisaggDates(aDyTSer, aDataSource)
         lDisTs.numValues = lDisTs.Dates.numValues
 
+        'set initial start date, back up one day
+        lEDt = aDyTSer.Dates.Value(1) - 1
+        Call J2Date(lEDt, lDate)
+        'now set hour value to initial Obs Time
+        lDate(3) = CurrentObsTime(aObsTimeTS, 1)
+        lEDt = Date2J(lDate)
+        lSDt = lEDt - 1
+
         Dim lHrVals(lDisTs.numValues) As Double
         lHrPos = 0
         For lDyInd = 1 To aDyTSer.numValues
@@ -1770,13 +1778,14 @@ Public Module modMetCompute
                 Call J2Date(aDyTSer.Dates.Value(lDyInd) - 1, lDate)
                 WriteLine(lOutFil, "Distributing Daily Data for " & lDate(0) & "/" & lDate(1) & "/" & lDate(2) & ":  Value is " & SignificantDigits(aDyTSer.Value(lDyInd), 4))
             End If
+            'determine end date, start by backing up to previous day's end
+            lEDt = aDyTSer.Dates.Value(lDyInd) - 1
+            Call J2Date(lEDt, lDate)
+            'now add obs hour to get actual end of 24-hour period
+            lDate(3) = CurrentObsTime(aObsTimeTS, lDyInd)
+            lEDt = Date2J(lDate)
+            lNVals = Math.Round(24 * (lEDt - lSDt))
             If aDyTSer.Value(lDyInd) > 0 Then 'something to disaggregate
-                'back up a day, then add obs hour to get actual end of period
-                lEDt = aDyTSer.Dates.Value(lDyInd) - 1
-                Call J2Date(lEDt, lDate)
-                lDate(3) = CurrentObsTime(aObsTimeTS, lDyInd)
-                lEDt = Date2J(lDate)
-                lSDt = lEDt - 1
                 lClosestRatio = 0
                 For Each lHrTSer As atcTimeseries In aHrTSer
                     lDaySumHrTser = SubsetByDate(lHrTSer, lSDt, lEDt, Nothing)
@@ -1839,6 +1848,7 @@ Public Module modMetCompute
                     End If
                 Else 'no data available at hourly stations,
                     'distribute using triangular distribution
+                    Dim lTmpHrVals(lNVals) As Double
                     Call DistTriang(aDyTSer.Value(lDyInd), lTmpHrVals, retcod)
                     lTriDistCnt += 1
                     Select Case aDyTSer.Value(lDyInd)
@@ -1847,9 +1857,32 @@ Public Module modMetCompute
                         Case Is < 3 : lTriDist2To3Cnt += 1
                         Case Else : lTriDistGT3Cnt += 1
                     End Select
-                    For lHrInd = 1 To 24
-                        lHrVals(lHrPos + lHrInd) = lTmpHrVals(lHrInd)
-                    Next lHrInd
+                    If lNVals < 24 Then 'obs time moved to earlier in day, don't have full day to distribute values
+                        Dim lNumNonZero As Integer = 0
+                        For i = 1 To 24
+                            If lTmpHrVals(i) > 0 Then lNumNonZero += 1
+                        Next
+                        If lNumNonZero > lNVals Then 'can't fit disaggregated values in available space
+                            s = "PROBLEM - Unable to fit distributed values in available hours due to change in Obs Time"
+                            retcod = -3
+                        Else
+                            Dim lSPos As Integer = Math.Truncate((24 - lNVals) / 2)
+                            For i = 1 To lNVals
+                                lHrVals(i) = lTmpHrVals(lSPos + i)
+                            Next
+                        End If
+                    Else
+                        Dim lNGap As Integer = lNVals - 24
+                        If lNGap > 0 Then 'obs time moved to later in day, fill "gap" with 0
+                            For i = 1 To lNGap
+                                lHrVals(lHrPos + i) = 0
+                            Next
+                        End If
+                        'now fill final 24 hours with triangular distributed values
+                        For lHrInd = 1 To 24
+                            lHrVals(lHrPos + lNGap + lHrInd) = lTmpHrVals(lHrInd)
+                        Next lHrInd
+                    End If
                     If retcod = -1 Then
                         s = "PROBLEM - Unable to distribute this much rain (" & lDaySum & ") using triangular distribution." & "Hourly values will be set to -9.98"
                         Logger.Dbg(s)
@@ -1872,11 +1905,12 @@ Public Module modMetCompute
                 End If
                 lDistCnt += 1
             Else 'no daily value to distribute, fill hourly
-                For lHrInd = lHrPos + 1 To lHrPos + 24
+                For lHrInd = lHrPos + 1 To lHrPos + lNVals '24
                     lHrVals(lHrInd) = 0
                 Next lHrInd
             End If
-            lHrPos = lHrPos + 24
+            lHrPos = lHrPos + lNVals '24
+            lSDt = lEDt 'set next periods start date to end date of this period
         Next lDyInd
 
 DisPrecipErrHnd:
