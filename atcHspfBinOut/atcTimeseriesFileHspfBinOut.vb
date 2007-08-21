@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports atcData
 Imports atcUtility
+Imports atcUCI
 Imports MapWinUtility
 
 Public Class atcTimeseriesFileHspfBinOut
@@ -17,6 +18,12 @@ Public Class atcTimeseriesFileHspfBinOut
     Private pBinFile As clsHspfBinary
     Private pHSPFNetwork As clsNetworkHspfOutput
     Private pFileExt As String
+
+    Private Shared pHspfMsg As atcUCI.HspfMsg
+    Private pCountUnitsFound As Integer
+    Private pCountUnitsMissing As Integer
+    Private pCountUnitsHardCode As Integer
+    Private pUnitsMissing As atcCollection
 
     'todo: where should this really be?
     Private Enum ATCTimeUnit
@@ -88,6 +95,11 @@ Public Class atcTimeseriesFileHspfBinOut
         Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
         Dim i As Integer, j As Integer ', s As String
 
+        pCountUnitsFound = 0
+        pCountUnitsMissing = 0
+        pCountUnitsHardCode = 0
+        pUnitsMissing = New atcCollection
+
         pBinFile = New clsHspfBinary
         pBinFile.Filename = Specification
 
@@ -156,7 +168,9 @@ Public Class atcTimeseriesFileHspfBinOut
                         .Attributes.SetValue("Section", lBinHeader.id.SectionName)
                         .Attributes.SetValue("IDSCEN", FilenameOnly(Specification))
                         .Attributes.SetValue("IDLOCN", Left(lBinHeader.id.OperationName, 1) & ":" & (lBinHeader.id.OperationNumber))
-                        .Attributes.SetValue("IDCONS", lBinHeader.VarNames.ItemByIndex(j))
+                        Dim lConstituent As String = lBinHeader.VarNames.ItemByIndex(j)
+                        .Attributes.SetValue("IDCONS", lConstituent)
+                        .Attributes.SetValue("UNITS", GetUnits(lConstituent))
                         .Attributes.SetValue("ID", Me.DataSets.Count)
                         If lBinHeader.VarNames.ItemByIndex(j) = "LZS" Then 'TODO: need better check here
                             .Attributes.SetValue("Point", True)
@@ -170,7 +184,48 @@ Public Class atcTimeseriesFileHspfBinOut
             i = i + 1
             Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
         Next
+        Logger.Dbg("UnitsAssigned " & pCountUnitsFound & " " & pCountUnitsHardCode & " " & pCountUnitsMissing)
+        For lIndex As Integer = 0 To pUnitsMissing.Count - 1
+            Logger.Dbg("Missing " & pUnitsMissing.Keys(lIndex) & " " & pUnitsMissing.Item(lIndex))
+        Next
     End Sub
+
+    Private Function GetUnits(ByVal aConstituent As String) As String
+        Dim lUnits As String = ""
+        Select Case aConstituent.ToLower  'lookup table for known units not in HspfMsg
+            Case "gage", "segment", "airt"
+                lUnits = "Deg F"
+        End Select
+
+        If lUnits.Length > 0 Then 'found one!
+            pCountUnitsHardCode += 1
+        Else
+            'try HspfMsg
+            For lTsGroupIndex As Integer = 1 To pHspfMsg.TSGroupDefs.Count
+                Dim lTsGroup As atcUCI.HspfTSGroupDef = pHspfMsg.TSGroupDefs(lTsGroupIndex)
+                For lTsMemberIndex As Integer = 1 To lTsGroup.MemberDefs.Count
+                    Dim lTsMember As atcUCI.HspfTSMemberDef = lTsGroup.MemberDefs(lTsMemberIndex)
+                    If lTsMember.Name.ToLower = aConstituent.ToLower Then
+                        'todo: check english/metric flag, english assumed for now
+                        pCountUnitsFound += 1
+                        lUnits = lTsMember.eunits
+                        'Logger.Dbg("Found " & aConstituent & " (" & lUnits & ")")
+                        Return lUnits
+                    End If
+                Next
+            Next
+            pCountUnitsMissing += 1
+            'Logger.Dbg("Missing " & aConstituent)
+            Dim lIndex As Integer = pUnitsMissing.IndexFromKey(aConstituent)
+            If lIndex >= 0 Then
+                pUnitsMissing.Item(lIndex) += 1
+            Else
+                pUnitsMissing.Add(aConstituent, 1)
+            End If
+            lUnits = "<unknown>"
+        End If
+        Return lUnits
+    End Function
 
     Public Overrides Sub readData(ByVal aDataSet As atcDataSet)
         Dim lts As atcTimeseries = aDataSet
@@ -286,6 +341,10 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aFileName, aAttributes) Then
+            If pHspfMsg Is Nothing Then 'need the message file for units
+                pHspfMsg = New HspfMsg
+                pHspfMsg.Open("hspfmsg.wdm")
+            End If
             BuildTSers()
             Return True
         End If
