@@ -1848,7 +1848,7 @@ Public Module modMetCompute
                     End If
                 Else 'no data available at hourly stations,
                     'distribute using triangular distribution
-                    Dim lTmpHrVals(lNVals) As Double
+                    Dim lTmpHrVals(24) As Double
                     Call DistTriang(aDyTSer.Value(lDyInd), lTmpHrVals, retcod)
                     lTriDistCnt += 1
                     Select Case aDyTSer.Value(lDyInd)
@@ -1868,7 +1868,7 @@ Public Module modMetCompute
                         Else
                             Dim lSPos As Integer = Math.Truncate((24 - lNVals) / 2)
                             For i = 1 To lNVals
-                                lHrVals(i) = lTmpHrVals(lSPos + i)
+                                lHrVals(lHrPos + i) = lTmpHrVals(lSPos + i)
                             Next
                         End If
                     Else
