@@ -5,10 +5,11 @@ Imports atcData
 Imports atcUtility
 Imports atcUCI
 Imports MapWinUtility
+Imports System.Xml
 
 Public Class atcTimeseriesFileHspfBinOut
     Inherits atcData.atcDataSource
-    '##MODULE_REMARKS Copyright 2005 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+    '##MODULE_REMARKS Copyright 2005-2007 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pFilter As String = "HSPF Binary Output Files (*.hbn)|*.hbn"
     Private pName As String = "Timeseries::HSPF Binary Output"
@@ -20,6 +21,7 @@ Public Class atcTimeseriesFileHspfBinOut
     Private pFileExt As String
 
     Private Shared pHspfMsg As atcUCI.HspfMsg
+    Private Shared pUnitsXmlDocument As Xml.XmlDocument
     Private pCountUnitsFound As Integer
     Private pCountUnitsMissing As Integer
     Private pCountUnitsHardCode As Integer
@@ -93,7 +95,8 @@ Public Class atcTimeseriesFileHspfBinOut
         Dim lTu As Integer, lTs As Integer, lIntvl As Integer
         Dim lTDate(5) As Integer
         Dim lSJDate As Double, lEJDate As Double, lOutLev As Integer
-        Dim i As Integer, j As Integer ', s As String
+        Dim i As Integer, j As Integer
+        Dim lUnitSystem As atcUnitSystem
 
         pCountUnitsFound = 0
         pCountUnitsMissing = 0
@@ -104,7 +107,7 @@ Public Class atcTimeseriesFileHspfBinOut
         pBinFile.Filename = Specification
 
         i = 0
-        For Each lBinHeader In pBinFile.Headers '.Values
+        For Each lBinHeader In pBinFile.Headers
             With lBinHeader
                 lData = .Data.ItemByIndex(0)
                 lSJDate = Date2J(lData.DateArray)
@@ -123,7 +126,7 @@ Public Class atcTimeseriesFileHspfBinOut
                 Else 'only one value dont know what interval is, assume day
                     lEJDate = lSJDate + 1
                 End If
-                'lDates = New ATCclsTserDate
+
                 lBaseTSer = New atcTimeseries(Me)
                 lBaseAttributes = New atcDataAttributes
                 With lBaseAttributes
@@ -170,7 +173,8 @@ Public Class atcTimeseriesFileHspfBinOut
                         .Attributes.SetValue("IDLOCN", Left(lBinHeader.id.OperationName, 1) & ":" & (lBinHeader.id.OperationNumber))
                         Dim lConstituent As String = lBinHeader.VarNames.ItemByIndex(j)
                         .Attributes.SetValue("IDCONS", lConstituent)
-                        .Attributes.SetValue("UNITS", GetUnits(lConstituent))
+                        lUnitSystem = CType(CType(lBinHeader.Data(0), clsHspfBinData).UnitFlag, atcUnitSystem)
+                        .Attributes.SetValue("UNITS", GetUnits(lConstituent, lUnitSystem))
                         .Attributes.SetValue("ID", Me.DataSets.Count)
                         If lBinHeader.VarNames.ItemByIndex(j) = "LZS" Then 'TODO: need better check here
                             .Attributes.SetValue("Point", True)
@@ -184,18 +188,27 @@ Public Class atcTimeseriesFileHspfBinOut
             i = i + 1
             Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
         Next
-        Logger.Dbg("UnitsAssigned " & pCountUnitsFound & " " & pCountUnitsHardCode & " " & pCountUnitsMissing)
+        Logger.Dbg("UnitsAssigned " & pCountUnitsFound & " " & pCountUnitsHardCode)
+        Logger.Dbg("MissingUnique " & pUnitsMissing.Count & " Total " & pCountUnitsMissing)
         For lIndex As Integer = 0 To pUnitsMissing.Count - 1
             Logger.Dbg("Missing " & pUnitsMissing.Keys(lIndex) & " " & pUnitsMissing.Item(lIndex))
         Next
     End Sub
 
-    Private Function GetUnits(ByVal aConstituent As String) As String
+    Private Function GetUnits(ByVal aConstituent As String, Optional ByVal aUnitSystem As atcUnitSystem = atcUnitSystem.atcEnglish) As String
         Dim lUnits As String = ""
-        Select Case aConstituent.ToLower  'lookup table for known units not in HspfMsg
-            Case "gage", "segment", "airt"
-                lUnits = "Deg F"
-        End Select
+        Dim lNode As XmlNode = pUnitsXmlDocument.DocumentElement.SelectSingleNode("parameter[name='" & aConstituent.ToLower & "']")
+        If Not lNode Is Nothing Then
+            Dim lUnitsNode As XmlNode = lNode.SelectSingleNode("units")
+            If Not lUnitsNode Is Nothing Then
+                Dim lUnitSystemNode As XmlNode = lUnitsNode.SelectSingleNode(UnitSystem(aUnitSystem).ToLower)
+                If lUnitSystemNode Is Nothing Then
+                    lUnits = lUnitsNode.InnerText
+                Else
+                    lUnits = lUnitSystemNode.InnerText
+                End If
+            End If
+        End If
 
         If lUnits.Length > 0 Then 'found one!
             pCountUnitsHardCode += 1
@@ -344,6 +357,13 @@ Public Class atcTimeseriesFileHspfBinOut
             If pHspfMsg Is Nothing Then 'need the message file for units
                 pHspfMsg = New HspfMsg
                 pHspfMsg.Open("hspfmsg.wdm")
+            End If
+            If pUnitsXmlDocument Is Nothing Then 'need to read the xml units lookup table
+                Dim lXmlFileName As String = PathNameOnly(Me.GetType().Assembly.Location) & "\units.xml"
+                Dim lStreamReader As New IO.StreamReader(lXmlFileName)
+                pUnitsXmlDocument = New XmlDocument
+                pUnitsXmlDocument.Load(lStreamReader)
+                lStreamReader.Close()
             End If
             BuildTSers()
             Return True

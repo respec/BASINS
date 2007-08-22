@@ -64,6 +64,7 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -98,6 +99,7 @@
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>
       <Name>atcUCI</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">
       <Name>ATCutility</Name>

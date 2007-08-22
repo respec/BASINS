@@ -108,12 +108,14 @@ Public Class atcDataSource
             Open = False
         Else 'check already open
             aSpecification = AbsolutePath(aSpecification, CurDir())
-            For Each lDataSource As atcDataSource In atcDataManager.DataSources
-                If lDataSource.Specification.ToLower = aSpecification.ToLower Then
-                    Logger.Dbg("AlreadyOpen")
-                    Open = False
-                End If
-            Next
+            If Not atcDataManager.DataSources Is Nothing Then
+                For Each lDataSource As atcDataSource In atcDataManager.DataSources
+                    If lDataSource.Specification.ToLower = aSpecification.ToLower Then
+                        Logger.Dbg("AlreadyOpen")
+                        Open = False
+                    End If
+                Next
+            End If
         End If
         Me.Specification = aSpecification 'save regardless for messages or further processing
         If Open Then 'looks good to try data type specific open
