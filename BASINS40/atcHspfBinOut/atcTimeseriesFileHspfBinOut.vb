@@ -106,88 +106,101 @@ Public Class atcTimeseriesFileHspfBinOut
         pBinFile = New clsHspfBinary
         pBinFile.Filename = Specification
 
-        i = 0
-        For Each lBinHeader In pBinFile.Headers
-            With lBinHeader
-                lData = .Data.ItemByIndex(0)
-                lSJDate = Date2J(lData.DateArray)
-                lOutLev = lData.OutLev
-                If .Data.Count = 1 Then
-                    j = 1 'force daily
-                Else
-                    j = 1
-                    While lOutLev <> .Data.ItemByIndex(j).OutLev And i < .Data.Count 'looking for same outlev
-                        j = j + 1
-                    End While
-                End If
-                If j < .Data.Count Then
-                    lData = .Data.ItemByIndex(j)
-                    lEJDate = Date2J(lData.DateArray)
-                Else 'only one value dont know what interval is, assume day
-                    lEJDate = lSJDate + 1
-                End If
-
-                lBaseTSer = New atcTimeseries(Me)
-                lBaseAttributes = New atcDataAttributes
-                With lBaseAttributes
-                    .SetValue("CIntvl", True)
-                    .SetValue("History 1", "Read from " & pBinFile.Filename)
-                    Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(pBinFile.Filename)
-                    .SetValue("Date Created", lFileDetails.CreationTime)
-                    .SetValue("Date Modified", lFileDetails.LastWriteTime)
-                    If lEJDate - lSJDate >= 1 Then 'daily or longer interval
-                        lTs = 1
-                        lTu = lBinHeader.Data.ItemByIndex(0).OutLev + 1
-                        lIntvl = 1
-                        'If lTu = ATCTimeUnit.TUDay Then
-                        'Else 'undefined for monthly or annual
-                        'End If
-                    Else 'use minute
-                        lTu = ATCTimeUnit.TUMinute
-                        lTs = timdifJ(lSJDate, lEJDate, ATCTimeUnit.TUMinute, 1)
-                        lIntvl = lTs / 1440
+        Try
+            i = 0
+            For Each lBinHeader In pBinFile.Headers
+                With lBinHeader
+                    lData = .Data.ItemByIndex(0)
+                    lSJDate = Date2J(lData.DateArray)
+                    lOutLev = lData.OutLev
+                    If .Data.Count = 1 Then
+                        j = 1 'force daily
+                    Else
+                        j = 1
+                        While lOutLev <> .Data.ItemByIndex(j).OutLev And i < .Data.Count 'looking for same outlev
+                            j = j + 1
+                        End While
                     End If
-                    .SetValue("Ts", lTs)
-                    .SetValue("Tu", lTu)
-                    .SetValue("Intvl", lIntvl)
-                    lTDate = lBinHeader.Data.ItemByIndex(0).DateArray
-                    lSJDate = TimAddJ(Date2J(lTDate), lTu, lTs, -lIntvl)
-                    .SetValue("SJDay", lSJDate)
-                    lTDate = lBinHeader.Data.ItemByIndex(lBinHeader.Data.Count - 1).DateArray
-                    lEJDate = Date2J(lTDate)
-                    .SetValue("EJDay", lEJDate)
-                    pNvals = timdifJ(lSJDate, lEJDate, lTu, lTs)
-                End With
+                    If j < .Data.Count Then
+                        lData = .Data.ItemByIndex(j)
+                        lEJDate = Date2J(lData.DateArray)
+                    Else 'only one value dont know what interval is, assume day
+                        lEJDate = lSJDate + 1
+                    End If
 
-                For j = 0 To .VarNames.Count - 1
-                    lTSer = New atcTimeseries(Me)
-                    For Each lAttributeName As DictionaryEntry In lBaseAttributes.ValuesSortedByName
-                        With lBaseAttributes
-                            lTSer.Attributes.SetValue(atcDataAttributes.GetDefinition(lAttributeName.Key), lAttributeName.Value)
-                        End With
-                    Next
-                    With lTSer
-                        .Attributes.SetValue("Operation", lBinHeader.id.OperationName)
-                        .Attributes.SetValue("Section", lBinHeader.id.SectionName)
-                        .Attributes.SetValue("IDSCEN", FilenameOnly(Specification))
-                        .Attributes.SetValue("IDLOCN", Left(lBinHeader.id.OperationName, 1) & ":" & (lBinHeader.id.OperationNumber))
-                        Dim lConstituent As String = lBinHeader.VarNames.ItemByIndex(j)
-                        .Attributes.SetValue("IDCONS", lConstituent)
-                        lUnitSystem = CType(CType(lBinHeader.Data(0), clsHspfBinData).UnitFlag, atcUnitSystem)
-                        .Attributes.SetValue("UNITS", GetUnits(lConstituent, lUnitSystem))
-                        .Attributes.SetValue("ID", Me.DataSets.Count)
-                        If lBinHeader.VarNames.ItemByIndex(j) = "LZS" Then 'TODO: need better check here
-                            .Attributes.SetValue("Point", True)
+                    lBaseTSer = New atcTimeseries(Me)
+                    lBaseAttributes = New atcDataAttributes
+                    With lBaseAttributes
+                        .SetValue("CIntvl", True)
+                        .SetValue("History 1", "Read from " & pBinFile.Filename)
+                        Dim lFileDetails As System.IO.FileInfo = New System.IO.FileInfo(pBinFile.Filename)
+                        .SetValue("Date Created", lFileDetails.CreationTime)
+                        .SetValue("Date Modified", lFileDetails.LastWriteTime)
+                        If lEJDate - lSJDate >= 1 Then 'daily or longer interval
+                            lTs = 1
+                            lTu = lBinHeader.Data.ItemByIndex(0).OutLev + 1
+                            lIntvl = 1
+                            'If lTu = ATCTimeUnit.TUDay Then
+                            'Else 'undefined for monthly or annual
+                            'End If
+                        Else 'use minute
+                            lTu = ATCTimeUnit.TUMinute
+                            lTs = timdifJ(lSJDate, lEJDate, ATCTimeUnit.TUMinute, 1)
+                            lIntvl = lTs / 1440
                         End If
-                        .ValuesNeedToBeRead = True
-                        .Dates = New atcTimeseries(Me)
-                        AddDataSet(lTSer)
+                        If lTs < 1 Then
+                            Logger.Dbg("TimestepProblem:" & lSJDate & ":" & lEJDate & ":" & lTu & ":" & lTs & ":" & _
+                                       lBinHeader.id.OperationName & ":" & _
+                                       lBinHeader.id.OperationNumber & ":" & _
+                                       lBinHeader.id.SectionName)
+                            lTs = 1
+                        End If
+                        .SetValue("Ts", lTs)
+                        .SetValue("Tu", lTu)
+                        .SetValue("Intvl", lIntvl)
+                        lTDate = lBinHeader.Data.ItemByIndex(0).DateArray
+                        lSJDate = TimAddJ(Date2J(lTDate), lTu, lTs, -lIntvl)
+                        .SetValue("SJDay", lSJDate)
+                        lTDate = lBinHeader.Data.ItemByIndex(lBinHeader.Data.Count - 1).DateArray
+                        lEJDate = Date2J(lTDate)
+                        .SetValue("EJDay", lEJDate)
+                        pNvals = timdifJ(lSJDate, lEJDate, lTu, lTs)
                     End With
-                Next j
-            End With
-            i = i + 1
-            Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
-        Next
+
+                    For j = 0 To .VarNames.Count - 1
+                        lTSer = New atcTimeseries(Me)
+                        For Each lAttributeName As DictionaryEntry In lBaseAttributes.ValuesSortedByName
+                            With lBaseAttributes
+                                lTSer.Attributes.SetValue(atcDataAttributes.GetDefinition(lAttributeName.Key), lAttributeName.Value)
+                            End With
+                        Next
+                        With lTSer
+                            .Attributes.SetValue("Operation", lBinHeader.id.OperationName)
+                            .Attributes.SetValue("Section", lBinHeader.id.SectionName)
+                            .Attributes.SetValue("IDSCEN", FilenameOnly(Specification))
+                            .Attributes.SetValue("IDLOCN", Left(lBinHeader.id.OperationName, 1) & ":" & (lBinHeader.id.OperationNumber))
+                            Dim lConstituent As String = lBinHeader.VarNames.ItemByIndex(j)
+                            .Attributes.SetValue("IDCONS", lConstituent)
+                            lUnitSystem = CType(CType(lBinHeader.Data(0), clsHspfBinData).UnitFlag, atcUnitSystem)
+                            .Attributes.SetValue("UNITS", GetUnits(lConstituent, lUnitSystem))
+                            .Attributes.SetValue("ID", Me.DataSets.Count)
+                            If lBinHeader.VarNames.ItemByIndex(j) = "LZS" Then 'TODO: need better check here
+                                .Attributes.SetValue("Point", True)
+                            End If
+                            .ValuesNeedToBeRead = True
+                            .Dates = New atcTimeseries(Me)
+                            AddDataSet(lTSer)
+                        End With
+                    Next j
+                End With
+                i += 1
+                'Logger.Dbg("Loop " & i)
+                Logger.Progress(pBinFile.Headers.Count + i, pBinFile.Headers.Count * 2)
+            Next
+        Catch ex As ApplicationException
+            Logger.Dbg(ex.Message)
+        End Try
+
         Logger.Dbg("UnitsAssigned " & pCountUnitsFound & " " & pCountUnitsHardCode)
         Logger.Dbg("MissingUnique " & pUnitsMissing.Count & " Total " & pCountUnitsMissing)
         For lIndex As Integer = 0 To pUnitsMissing.Count - 1

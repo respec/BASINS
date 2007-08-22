@@ -139,7 +139,9 @@ Public Class atcDataManager
                 End If
         Catch ex As Exception
             Logger.Dbg("Exception:" & ex.Message & vbCrLf & _
+                       "Traceback:" & ex.StackTrace & vbCrLf & _
                        "Specification:'" & aSpecification & "'" & vbCrLf & _
+                       "SpecificationNew:" & aNewSource.Specification & vbCrLf & _
                        "Source Name:" & aNewSource.Name)
             Return False
         End Try

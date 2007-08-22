@@ -116,7 +116,7 @@ Friend Class clsHspfBinary
                         recbyte = 24
                         While recbyte < UBound(currec)
                             varLen = BitConverter.ToInt32(currec, recbyte)
-                            thisVarName = Byte2String(currec, recbyte + 4, varLen)
+                            thisVarName = Byte2String(currec, recbyte + 4, varLen).Trim
                             'On Error Resume Next
                             If InStr(thisVarName, "(") Then
                                 Logger.Dbg("***** Removing Parens From:" & thisVarName)

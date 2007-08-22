@@ -913,45 +913,50 @@ Public Module modDate
                              ByVal DATE1() As Integer, ByVal DATE2() As Integer, _
                              ByVal TCODE As Integer, ByVal TSTEP As Integer) As Integer
         Dim NVALS As Integer
-        Dim tmpDATE(5) As Integer
-        'convert dates to old format
-        Call timcnv(DATE1)
-        Call timcnv(DATE2)
 
-        Select Case TCODE
-            Case 1 'seconds
-                NVALS = ((EndJDate - StartJDate) * 86400.0#) / TSTEP
-            Case 2 'minutes
-                NVALS = ((EndJDate - StartJDate) * 1440.0#) / TSTEP
-            Case 3 'hours
-                NVALS = ((EndJDate - StartJDate) * 24) / TSTEP
-            Case 4 'days
-                NVALS = (EndJDate - StartJDate) / TSTEP
-            Case 5 'months
-                NVALS = ((DATE2(0) - DATE1(0)) * 12 + DATE2(1) - DATE1(1)) / TSTEP
-            Case 6 'years
-                NVALS = (DATE2(0) - DATE1(0)) / TSTEP
-            Case 7 'centuries
-                NVALS = (DATE2(0) - DATE1(0)) / (TSTEP * 100)
-            Case Else
-                NVALS = 0
-        End Select
+        If TCODE = 0 Or TSTEP = 0 Then
+            NVALS = 0
+        Else
+            'convert dates to old format
+            Call timcnv(DATE1)
+            Call timcnv(DATE2)
 
-        tmpDATE(0) = DATE2(0)
-        tmpDATE(1) = DATE2(1)
-        tmpDATE(2) = DATE2(2)
-        tmpDATE(3) = DATE2(3)
-        tmpDATE(4) = DATE2(4)
-        tmpDATE(5) = DATE2(5)
-        Do
-            Call TIMADD(DATE1, TCODE, TSTEP, NVALS, tmpDATE)
-            If EndJDate < Date2J(tmpDATE) Then 'estimate too high
-                NVALS = NVALS - 1
-            Else 'estimate ok
-                Exit Do
-            End If
-        Loop
-        pTimDif = NVALS
+            Select Case TCODE
+                Case 1 'seconds
+                    NVALS = ((EndJDate - StartJDate) * 86400.0#) / TSTEP
+                Case 2 'minutes
+                    NVALS = ((EndJDate - StartJDate) * 1440.0#) / TSTEP
+                Case 3 'hours
+                    NVALS = ((EndJDate - StartJDate) * 24) / TSTEP
+                Case 4 'days
+                    NVALS = (EndJDate - StartJDate) / TSTEP
+                Case 5 'months
+                    NVALS = ((DATE2(0) - DATE1(0)) * 12 + DATE2(1) - DATE1(1)) / TSTEP
+                Case 6 'years
+                    NVALS = (DATE2(0) - DATE1(0)) / TSTEP
+                Case 7 'centuries
+                    NVALS = (DATE2(0) - DATE1(0)) / (TSTEP * 100)
+                Case Else
+                    NVALS = 0
+            End Select
+
+            Dim tmpDATE(5) As Integer
+            tmpDATE(0) = DATE2(0)
+            tmpDATE(1) = DATE2(1)
+            tmpDATE(2) = DATE2(2)
+            tmpDATE(3) = DATE2(3)
+            tmpDATE(4) = DATE2(4)
+            tmpDATE(5) = DATE2(5)
+            Do
+                Call TIMADD(DATE1, TCODE, TSTEP, NVALS, tmpDATE)
+                If EndJDate < Date2J(tmpDATE) Then 'estimate too high
+                    NVALS = NVALS - 1
+                Else 'estimate ok
+                    Exit Do
+                End If
+            Loop
+        End If
+        Return NVALS
     End Function
 
     Public Sub CalcTimeUnitStep(ByVal aSJDate As Double, ByVal aEJDate As Double, ByRef aTu As Integer, ByRef aTs As Integer)
