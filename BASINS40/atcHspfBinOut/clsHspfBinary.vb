@@ -34,8 +34,6 @@ Friend Class clsHspfBinary
     Private pFileRecordIndex As Integer
 
     Dim pHeaders As atcCollection 'of HSPFBinaryHeader
-    Private pMonitor As Object
-    Private pMonitorSet As Boolean
 
     Friend ReadOnly Property DateAsJulian(ByVal hindex As Integer, ByVal dindex As Integer) As Double
         Get

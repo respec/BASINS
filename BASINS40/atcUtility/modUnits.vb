@@ -1,7 +1,12 @@
 Option Strict Off
 Option Explicit On
-Imports atcUtility
 Imports MapWinUtility
+
+Public Enum atcUnitSystem As Integer
+    atcUnknown = 0
+    atcEnglish = 1
+    atcMetric = 2
+End Enum
 
 Public Module modUnits
     '##MODULE_REMARKS Copyright 2001-3 AQUA TERRA Consultants - Royalty-free use permitted under open source license
@@ -214,5 +219,14 @@ errHand:
                 pAlreadyReportedErrOpen = True
             End If
         End Try
+    End Function
+
+    Public Function UnitSystem(ByVal aUnitSystem As atcUnitSystem) As String
+        Select Case aUnitSystem
+            Case atcUnitSystem.atcEnglish : Return "English"
+            Case atcUnitSystem.atcMetric : Return "Metric"
+            Case Else : Return "Unknown"
+        End Select
+        Return Nothing
     End Function
 End Module
