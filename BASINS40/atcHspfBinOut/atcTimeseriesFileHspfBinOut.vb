@@ -22,6 +22,7 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Private Shared pHspfMsg As atcUCI.HspfMsg
     Private Shared pUnitsXmlDocument As Xml.XmlDocument
+    Private Shared pSkipXml As Boolean = False
     Private pCountUnitsFound As Integer
     Private pCountUnitsMissing As Integer
     Private pCountUnitsHardCode As Integer
@@ -210,15 +211,17 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Private Function GetUnits(ByVal aConstituent As String, Optional ByVal aUnitSystem As atcUnitSystem = atcUnitSystem.atcEnglish) As String
         Dim lUnits As String = ""
-        Dim lNode As XmlNode = pUnitsXmlDocument.DocumentElement.SelectSingleNode("parameter[name='" & aConstituent.ToLower & "']")
-        If Not lNode Is Nothing Then
-            Dim lUnitsNode As XmlNode = lNode.SelectSingleNode("units")
-            If Not lUnitsNode Is Nothing Then
-                Dim lUnitSystemNode As XmlNode = lUnitsNode.SelectSingleNode(UnitSystem(aUnitSystem).ToLower)
-                If lUnitSystemNode Is Nothing Then
-                    lUnits = lUnitsNode.InnerText
-                Else
-                    lUnits = lUnitSystemNode.InnerText
+        If Not pSkipXml Then
+            Dim lNode As XmlNode = pUnitsXmlDocument.DocumentElement.SelectSingleNode("parameter[name='" & aConstituent.ToLower & "']")
+            If Not lNode Is Nothing Then
+                Dim lUnitsNode As XmlNode = lNode.SelectSingleNode("units")
+                If Not lUnitsNode Is Nothing Then
+                    Dim lUnitSystemNode As XmlNode = lUnitsNode.SelectSingleNode(UnitSystem(aUnitSystem).ToLower)
+                    If lUnitSystemNode Is Nothing Then
+                        lUnits = lUnitsNode.InnerText
+                    Else
+                        lUnits = lUnitSystemNode.InnerText
+                    End If
                 End If
             End If
         End If
@@ -371,12 +374,16 @@ Public Class atcTimeseriesFileHspfBinOut
                 pHspfMsg = New HspfMsg
                 pHspfMsg.Open("hspfmsg.wdm")
             End If
-            If pUnitsXmlDocument Is Nothing Then 'need to read the xml units lookup table
+            If pUnitsXmlDocument Is Nothing And Not pSkipXML Then 'need to read the xml units lookup table
                 Dim lXmlFileName As String = PathNameOnly(Me.GetType().Assembly.Location) & "\units.xml"
-                Dim lStreamReader As New IO.StreamReader(lXmlFileName)
                 pUnitsXmlDocument = New XmlDocument
-                pUnitsXmlDocument.Load(lStreamReader)
-                lStreamReader.Close()
+                If FileExists(lXmlFileName) Then
+                    Dim lStreamReader As New IO.StreamReader(lXmlFileName)
+                    pUnitsXmlDocument.Load(lStreamReader)
+                    lStreamReader.Close()
+                Else
+                    pSkipXml = True
+                End If
             End If
             BuildTSers()
             Return True
