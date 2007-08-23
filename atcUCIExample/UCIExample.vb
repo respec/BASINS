@@ -103,6 +103,7 @@ Public Module UCIExample
             Dim lNumValues As Integer = lHBNDataSet.numValues
             Dim lValue As Double = lHBNDataSet.Values(1)  'get the first value
             Dim lJulianDate As Double = lHBNDataSet.Dates.Values(1)  'date associated with the first value 
+            Dim lUnits As String = lHBNDataSet.Attributes.GetDefinedValue("Units").Value
             Dim lDate(5) As Integer
             J2Date(lJulianDate, lDate)
             Dim lYear As Integer = lDate(0)
