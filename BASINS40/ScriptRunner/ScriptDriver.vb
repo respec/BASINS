@@ -12,7 +12,8 @@ Public Module ScriptDriver
         'ScriptWatershedSummary.ScriptMain(aMapWin)
         'ScriptCatSummary.ScriptMain(aMapWin)
         'BASINSProjectSummary.ScriptMain(aMapWin)
-        ScriptShapefileFromWDM.ScriptMain(aMapWin)
+        'ScriptShapefileFromWDM.ScriptMain(aMapWin)
+        ScriptSQLLiteTester.ScriptMain(aMapWin)
     End Sub
 
 End Module
