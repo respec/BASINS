@@ -22,7 +22,7 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Private Shared pHspfMsg As atcUCI.HspfMsg
     Private Shared pUnitsXmlDocument As Xml.XmlDocument
-    Private Shared pSkipXml As Boolean = False
+    Private Shared pSkipXml As Boolean = True 'TODO: get xml file containing units working
     Private pCountUnitsFound As Integer
     Private pCountUnitsMissing As Integer
     Private pCountUnitsHardCode As Integer
