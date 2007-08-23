@@ -70,6 +70,7 @@
     <Compile Include="GridAdd.vb" />
     <Compile Include="GridValues.vb" />
     <Compile Include="LineDump.vb" />
+    <Compile Include="SQLiteTester.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -139,6 +140,10 @@
       <Project>{12F7FDD0-A6EC-4ABE-A01B-790AD8CAEF03}</Project>
       <Name>atcSeasons</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTableSQLite\atcTableSQLite.vbproj">
+      <Project>{C59D3153-2857-499C-B640-924E5ABE2E74}</Project>
+      <Name>atcTableSQLite</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
