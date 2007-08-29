@@ -20,6 +20,9 @@ Public Module ScriptSQLLiteTester
             Logger.Dbg(lStr)
         Next
         With lTableSQLite
+            lDatabaseFileName = lDatabaseFileName.Replace("test", "jack")
+            .WriteFile(lDatabaseFileName & vbTab & lTableName)
+
             .NumFields += 1
             .FieldName(.NumFields) = "NewField"
             .NumFields += 1
@@ -27,15 +30,33 @@ Public Module ScriptSQLLiteTester
             .FieldAdd("DetailField", "Integer", 4)
             Logger.Dbg("FieldCount " & .NumFields)
             Dim lStr As String = "FieldSummary"
-            For lColumn As Integer = 1 To .NumFields
-                lStr &= ":" & .FieldName(lColumn) & ":" & .FieldType(lColumn)
+            For lColumnIndex As Integer = 1 To .NumFields
+                lStr &= ":" & .FieldName(lColumnIndex) & ":" & .FieldType(lColumnIndex)
             Next
             Logger.Dbg(lStr)
+            .CurrentRecord = 1
+            Dim lColumn As Integer = 6
+            Logger.Dbg("Row:" & .CurrentRecord & ":Column:" & lColumn & ":Value:" & .Value(lColumn))
+            .Value(lColumn) = 23
+            Logger.Dbg("Row:" & .CurrentRecord & ":Column:" & lColumn & ":Value:" & .Value(lColumn))
             Logger.Dbg("Rowcount:" & .NumRecords & ":ColumnCount:" & .NumFields)
             .ClearData()
             Logger.Dbg("Rowcount:" & .NumRecords & ":ColumnCount:" & .NumFields)
             .Clear()
             Logger.Dbg("Rowcount:" & .NumRecords & ":ColumnCount:" & .NumFields)
+        End With
+        lTableSQLite = Nothing
+        lTableSQLite = New atcTableSQLite.atcTableSQLite
+        lResult = lTableSQLite.OpenFile(lDatabaseFileName & vbTab & lTableName)
+        Logger.Dbg("OpenResult:" & lResult)
+        Logger.Dbg("NumRows:" & lTableSQLite.NumRecords & ":NumFields:" & lTableSQLite.NumFields)
+        With lTableSQLite
+            For lRow As Integer = 1 To .NumRecords
+                .CurrentRecord = lRow
+                For lCol As Integer = 1 To .NumFields
+                    Logger.Dbg("R:" & lRow & ":C:" & lCol & ":Value:" & .Value(lCol))
+                Next
+            Next
         End With
     End Sub
 End Module

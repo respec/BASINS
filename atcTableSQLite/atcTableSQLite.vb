@@ -25,16 +25,21 @@ Public Class atcTableSQLite
             Dim lFileAndTableName As String = aFileName
             Dim lConnectionString As String = "Data Source=" & StrSplit(lFileAndTableName, vbTab, "'")
             Dim lDB As SQLiteConnection
-            Dim lCmd As SQLiteCommand
-            Dim lAdapter As SQLiteDataAdapter
             lDB = New SQLiteConnection(lConnectionString)
             lDB.Open()
-            lCmd = New SQLiteCommand(lDB)
+
+            Dim lCmd As SQLiteCommand = New SQLiteCommand(lDB)
             lCmd.CommandText = "Select * from " & lFileAndTableName 'now just table name
-            lAdapter = New SQLiteDataAdapter
+
+            Dim lAdapter As SQLiteDataAdapter = New SQLiteDataAdapter
             lAdapter.SelectCommand = lCmd
             pDataTable = New DataTable
-            Dim iResult As Integer = lAdapter.Fill(pDataTable)
+
+            Try
+                Dim iResult As Integer = lAdapter.Fill(pDataTable)
+            Catch ex As DataException
+                Logger.Dbg("SQLiteException:" & ex.Message)
+            End Try
 
             Logger.Dbg("FieldCount:" & pDataTable.Columns.Count & ":Rows:" & pDataTable.Rows.Count)
             Logger.Dbg("FieldDetails")
@@ -57,12 +62,70 @@ Public Class atcTableSQLite
             Logger.Msg(ex.Message)
             Return False
         End Try
-        pModified = False
-        Return True
+            pModified = False
+            Return True
     End Function
 
     Public Overrides Function WriteFile(ByVal aFileName As String) As Boolean
+        Dim lFileAndTableName As String = aFileName
+        Dim lConnectionString As String = "Data Source=" & StrSplit(lFileAndTableName, vbTab, "'")
+        Dim lDB As SQLiteConnection
+        lDB = New SQLiteConnection(lConnectionString)
+        lDB.Open()
+        'lDB.CreateFile(lFileAndTableName)
 
+        Dim lStr As String = "CREATE TABLE " & lFileAndTableName & "("
+        For Each lColumn As System.Data.DataColumn In pDataTable.Columns
+            If InStr(lColumn.DataType.ToString.ToLower, "byte") > 0 Then
+                Logger.Dbg("DontKnowHowToProcess:Byte")
+            Else
+                lStr &= lColumn.ColumnName & " " & lColumn.DataType.ToString & ", "
+            End If
+        Next
+        lStr &= ")"
+        lStr = lStr.Replace(", )", ")")
+        Dim lCmd As SQLiteCommand = lDB.CreateCommand
+        lCmd.CommandText = lStr.Replace("System.", "")
+
+        Dim lResult As Integer
+        Try
+            Logger.Dbg("ExecuteCommand:" & lCmd.CommandText)
+            lResult = lCmd.ExecuteNonQuery()
+
+            Dim lTransaction As DbTransaction = lDB.BeginTransaction
+            Me.MoveFirst()
+            For lRowNumber As Integer = 1 To Me.NumRecords
+                lCmd = Nothing
+                lCmd = lDB.CreateCommand
+                lStr = "INSERT INTO " & lFileAndTableName & "("
+                Dim lColumnNumber As Integer = 0
+                For Each lColumn As System.Data.DataColumn In pDataTable.Columns
+                    lColumnNumber += 1
+                    If InStr(lColumn.DataType.ToString.ToLower, "byte") = 0 Then
+                        lStr &= lColumn.ColumnName & ", "
+                        Dim lParameter As DbParameter = lCmd.CreateParameter
+                        lCmd.Parameters.Add(lParameter)
+                        lParameter.Value = Value(lColumnNumber)
+                    End If
+                Next
+                lStr &= ") values ("
+                lStr = lStr.Replace(", )", ")")
+                For lColumnNumber = 1 To lCmd.Parameters.Count
+                    lStr &= "?,"
+                Next
+                lStr &= ")"
+                lCmd.CommandText = lStr.Replace(",)", ")")
+                Logger.Dbg("ExecuteCommand:" & lCmd.CommandText & ":Parameters:" & lCmd.Parameters.Count)
+                lResult = lCmd.ExecuteNonQuery()
+                If lResult <> 1 Then 'should be one row updated, otherwise report
+                    Logger.Dbg("ProblemValueChange:Row:" & lRowNumber & ":Result:" & lResult)
+                End If
+                If Not Me.atEOF Then Me.MoveNext()
+            Next
+            lTransaction.Commit()
+        Catch ex As SQLiteException
+            Logger.Dbg(ex.Message)
+        End Try
     End Function
 
     Public Overrides Property NumRecords() As Integer
@@ -109,15 +172,27 @@ Public Class atcTableSQLite
                 Try
                     lStr = pDataTable.Rows(pRow).Item(lFieldNumber)
                 Catch
-                    Logger.Dbg("ConversionError:Row:" & pRow + 1 & ":Column:" & aFieldNumber)
-                    lStr = pDataTable.Columns(lFieldNumber).DataType.ToString
+                    Logger.Dbg("ConversionError:Row:" & pRow + 1 & _
+                               ":Column:" & aFieldNumber & _
+                               ":Type:" & pDataTable.Columns(lFieldNumber).DataType.ToString)
+                    lStr = ""
                 End Try
                 Return lStr
             End If
             Return Nothing
         End Get
         Set(ByVal newValue As String)
-            Throw New ApplicationException("atcTableSQLite:Value is ReadOnly (for now)")
+            If CheckFieldNumber(aFieldNumber) Then
+                Try
+                    Dim lRow As DataRow = pDataTable.Rows.Item(pRow)
+                    lRow.BeginEdit()
+                    lRow.Item(aFieldNumber - 1) = newValue
+                    lRow.AcceptChanges()
+                    pDataTable.AcceptChanges()
+                Catch ex As ApplicationException
+                    Logger.Msg("ValueSetFailed:Row:" & pRow & ":Column:" & aFieldNumber & ex.Message)
+                End Try
+            End If
         End Set
     End Property
 
