@@ -381,7 +381,7 @@ Module modStatusOutputTimeseriesRchres
 
             'section phcarb
             If ltable.Parms.Item("PHFG") = 1 Or ltable.Parms.Item("PHFG") = 3 Then
-                TimserStatus.Change("PHCARB:SATCO2", i, HspfStatusOptional)
+                TimserStatus.Change("PHCARB:SATCO2", 1, HspfStatusOptional)
                 For i = 1 To 3
                     TimserStatus.Change("PHCARB:PHST", i, HspfStatusOptional)
                 Next i
