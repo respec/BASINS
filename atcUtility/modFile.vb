@@ -562,25 +562,26 @@ ErrorWriting:
                     Optional ByRef aFilterIndex As Integer = 1) As String
 
         Dim lDir As String = CurDir()
-        Dim lFileName As String = Trim(aDefaultFileName)
+        Dim lFileName As String = aDefaultFileName.Trim
         Dim lBaseFileName As String = IO.Path.GetFileName(lFileName).ToLower 'file name (not path) of file we are looking for
         Dim lExePath As String
         Dim lDLLpath As String
 
-        If (Len(aDefaultExt)) = 0 Then 'get extension from default name
+        If aDefaultExt.Length = 0 Then 'get extension from default name
             aDefaultExt = FileExt(aDefaultFileName)
         End If
 
-        If (Len(aFileFilter)) = 0 Then 'get filter from default ext
-            If Len(aDefaultExt) > 0 Then
+        If aFileFilter.Length = 0 Then 'get filter from default ext
+            If aDefaultExt.Length > 0 Then
                 aFileFilter &= aDefaultExt & " Files (*." & aDefaultExt & ")|*." & aDefaultExt & "|"
             End If
             aFileFilter &= "All files (*.*)|*.*"
+            aFileFilter = aFileFilter.Replace("..", ".")
         End If
 
         On Error Resume Next
 
-        If Right(lFileName, 1) = "\" Then 'this is a folder
+        If lFileName.EndsWith("\") Then 'this is a folder
             Return ""
             'TODO: Implement FindFolder
             'Return FindFolder(aFileDialogTitle, _
