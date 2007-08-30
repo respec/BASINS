@@ -81,7 +81,8 @@ Public Class atcDataSourceSWATDBF
                     End Select
                 Next
                 If lDateCol > 0 AndAlso lLocnCol > 0 Then
-                    While Not lDBF.atEOF
+                    For lRecordNumber As Integer = 1 To lDBF.NumRecords
+                        lDBF.CurrentRecord = lRecordNumber
                         For i = 1 To lNCons
                             lConsName = lConsNames(i)
                             If lLUCol > -1 Then lConsName += ":" & lDBF.Value(lLUCol)
@@ -112,8 +113,7 @@ Public Class atcDataSourceSWATDBF
                                 End If
                             End If
                         Next i
-                        lDBF.MoveNext()
-                    End While
+                    Next lRecordNumber
                     For Each lData In DataSets
                         lData.numValues = lData.Attributes.GetValue("Count")
                     Next

@@ -1,7 +1,7 @@
 Public Class frmMain
     Dim pSource As atcControls.atcGridSourceTable
     Dim pTable As atcTableSQLite.atcTableSQLite
-    Dim pTableName As String
+    Dim pTableName As String = ""
     Dim pDatabaseFilename As String
 
     Private Sub mnuOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpen.Click
@@ -38,7 +38,22 @@ Public Class frmMain
         atcGrid.Invalidate()
     End Sub
 
+    Private Sub frmMain_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        atcUtility.ChDriveDir(Application.ExecutablePath)
+        Dim lLogFileName As String = "..\logs\DatabaseViewer.log"
+        MapWinUtility.Logger.StartToFile(lLogFileName)
+        If Command.Length > 0 Then
+            pTable.OpenFile(Command)
+        End If
+    End Sub
+
     Private Sub frmMain_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
         atcGrid.Refresh()
+    End Sub
+
+    Private Sub mnuSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSave.Click
+        If Not pTable Is Nothing Then
+            pTable.WriteFile(pDatabaseFilename & vbTab & pTableName)
+        End If
     End Sub
 End Class

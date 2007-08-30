@@ -92,7 +92,8 @@ Public Class atcDataSourceCligen
                         .FieldStart(i) = lSCol(i)
                     Next
                     If lTable.OpenFile(aFileName) Then
-                        While Not lTable.atEOF
+                        For lRecordNumber As Integer = 1 To lTable.NumRecords
+                            lTable.CurrentRecord = lRecordNumber
                             For i = 4 To .NumFields
                                 lTSKey = .FieldName(i)
                                 lData = lDailyData.ItemByKey(lTSKey)
@@ -125,8 +126,7 @@ Public Class atcDataSourceCligen
                                     End If
                                 End If
                             Next i
-                            .MoveNext()
-                        End While
+                        Next lRecordNumber
                         For Each lData In lDailyData
                             lData.numValues = lData.Attributes.GetValue("Count")
                         Next

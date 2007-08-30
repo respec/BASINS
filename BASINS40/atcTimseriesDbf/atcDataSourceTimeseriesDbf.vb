@@ -90,7 +90,8 @@ Public Class atcDataSourceTimeseriesDbf
                 Next
 
                 If lDateCol > 0 AndAlso lTimeCol > 0 AndAlso lLocnCol > 0 Then
-                    While Not lDBF.atEOF
+                    For lRecordNumber As Integer = 1 To lDBF.NumRecords
+                        lDBF.CurrentRecord = lRecordNumber
                         lLocation = lDBF.Value(lLocnCol)
                         For lConstituentIndex As Integer = 0 To lConstituents.Count - 1
                             lValueCol = lConstituents.Keys(lConstituentIndex)
@@ -138,8 +139,7 @@ Public Class atcDataSourceTimeseriesDbf
                                 End If
                             End If
                         Next
-                        lDBF.MoveNext()
-                    End While
+                    Next lRecordNumber
                     For Each lData In DataSets
                         lData.numValues = lData.Attributes.GetValue("Count")
                     Next
