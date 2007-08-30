@@ -22,7 +22,7 @@ Public Class atcGridSourceTable
                 If aRow = 0 Then
                     Return pTable.FieldName(aColumn)
                 Else
-                    If aRow <> pTable.CurrentRecord + 1 Then pTable.CurrentRecord = aRow - 1
+                    If aRow <> pTable.CurrentRecord Then pTable.CurrentRecord = aRow
                     Return pTable.Value(aColumn)
                 End If
             End If

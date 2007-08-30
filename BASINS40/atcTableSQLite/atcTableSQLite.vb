@@ -11,6 +11,7 @@ Public Class atcTableSQLite
     Private pDataTable As DataTable 'rows and columns are zero based collections
     Private pRow As Integer = 0
     Private pModified As Boolean = False 'TODO: where/when do we check this?
+    Private pTableNames As New atcCollection
 
     Public Overrides Function Cousin() As IatcTable
         Return Nothing
@@ -28,18 +29,26 @@ Public Class atcTableSQLite
             lDB = New SQLiteConnection(lConnectionString)
             lDB.Open()
 
+            Dim lTables As DataTable = lDB.GetSchema("tables")
+            For lIndex As Integer = 0 To lTables.Rows.Count - 1
+                pTableNames.Add(lTables.Rows(lIndex).Item("TABLE_NAME"))
+            Next
+
+            Dim lTableName As String = lFileAndTableName
+            If lTableName.Length = 0 AndAlso pTableNames.Count > 0 Then 'default to first available
+                lTableName = pTableNames(0)
+            End If
+
+            'TODO: check table name length?
+
             Dim lCmd As SQLiteCommand = New SQLiteCommand(lDB)
-            lCmd.CommandText = "Select * from " & lFileAndTableName 'now just table name
+            lCmd.CommandText = "Select * from " & lTableName
 
             Dim lAdapter As SQLiteDataAdapter = New SQLiteDataAdapter
             lAdapter.SelectCommand = lCmd
             pDataTable = New DataTable
 
-            Try
-                Dim iResult As Integer = lAdapter.Fill(pDataTable)
-            Catch ex As DataException
-                Logger.Dbg("SQLiteException:" & ex.Message)
-            End Try
+            Dim iResult As Integer = lAdapter.Fill(pDataTable)
 
             Logger.Dbg("FieldCount:" & pDataTable.Columns.Count & ":Rows:" & pDataTable.Rows.Count)
             Logger.Dbg("FieldDetails")
@@ -58,12 +67,13 @@ Public Class atcTableSQLite
                 lStr &= ":" & pDataTable.Columns(lField).MaxLength
             Next
             Logger.Dbg(lStr)
-        Catch ex As ApplicationException
+        Catch ex As Exception
             Logger.Msg(ex.Message)
             Return False
         End Try
-            pModified = False
-            Return True
+
+        pModified = False
+        Return True
     End Function
 
     Public Overrides Function WriteFile(ByVal aFileName As String) As Boolean
@@ -268,6 +278,12 @@ Public Class atcTableSQLite
             pDataTable.Columns.RemoveAt(0)
         End While
     End Sub
+
+    Public ReadOnly Property TableNames() As atcCollection
+        Get
+            Return pTableNames
+        End Get
+    End Property
 
     ''' <summary>
     ''' check field number
