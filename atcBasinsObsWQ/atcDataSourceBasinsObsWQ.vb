@@ -82,7 +82,8 @@ Public Class atcDataSourceBasinsObsWQ
                 Next
                 If lDateCol > 0 AndAlso lTimeCol > 0 AndAlso lLocnCol > 0 AndAlso _
                    lConsCol > 0 AndAlso lValCol > 0 Then
-                    While Not lDBF.atEOF
+                    For lRecordNumber As Integer = 1 To lDBF.NumRecords
+                        lDBF.CurrentRecord = lRecordNumber
                         lLocation = lDBF.Value(lLocnCol)
                         lConstituentCode = lDBF.Value(lConsCol)
                         lTSKey = lLocation & ":" & lConstituentCode
@@ -105,8 +106,7 @@ Public Class atcDataSourceBasinsObsWQ
                         lData.Value(lTSIndex) = lDBF.Value(lValCol)
                         lData.Dates.Value(lTSIndex) = parseWQObsDate(lDBF.Value(lDateCol), lDBF.Value(lTimeCol))
                         lData.Attributes.SetValue("Count", lTSIndex)
-                        lDBF.MoveNext()
-                    End While
+                    Next lRecordNumber
                     For Each lData In DataSets
                         lData.numValues = lData.Attributes.GetValue("Count")
                     Next

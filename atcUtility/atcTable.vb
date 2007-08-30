@@ -18,8 +18,8 @@ Public Interface IatcTable
     Function SummaryFields(Optional ByVal aFormat As String = "tab,headers,expandtype") As String
     Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String
 
-    Property atBOF() As Boolean
-    Property atEOF() As Boolean
+    'Property atBOF() As Boolean
+    'Property atEOF() As Boolean
     Property CurrentRecord() As Integer
     Property FieldLength(ByVal aFieldNumber As Integer) As Integer
     Property FieldName(ByVal aFieldNumber As Integer) As String
@@ -78,26 +78,6 @@ Public MustInherit Class atcTable
 
     'Write the current table to the specified file
     Public MustOverride Function WriteFile(ByVal filename As String) As Boolean Implements IatcTable.WriteFile
-
-    'True if CurrentRecord is at beginning of table
-    Public Overridable Property atBOF() As Boolean Implements IatcTable.atBOF
-        Get
-            If Me.CurrentRecord <= 1 Then Return True Else Return False
-        End Get
-        Set(ByVal Value As Boolean)
-            If Value Then Me.CurrentRecord = 1 Else Me.CurrentRecord = Me.NumRecords
-        End Set
-    End Property
-
-    'True if CurrentRecord is at end of table
-    Public Overridable Property atEOF() As Boolean Implements IatcTable.atEOF
-        Get
-            If Me.CurrentRecord >= Me.NumRecords Then Return True Else Return False
-        End Get
-        Set(ByVal Value As Boolean)
-            If Value Then Me.CurrentRecord = Me.NumRecords Else Me.CurrentRecord = 1
-        End Set
-    End Property
 
     'The number of records (rows) in the table
     Public MustOverride Property NumRecords() As Integer Implements IatcTable.NumRecords

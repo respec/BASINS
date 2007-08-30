@@ -2,8 +2,8 @@ Option Strict Off
 Option Explicit On
 Imports atcUtility
 Imports MapWinUtility
-Imports System.Data.SQLite
-Imports System.Data.Common
+'Imports System.Data.SQLite
+'Imports System.Data.Common
 
 Public Class atcTableSQLite
     Inherits atcTable
@@ -24,14 +24,24 @@ Public Class atcTableSQLite
     Public Overrides Function OpenFile(ByVal aFileName As String) As Boolean
         Try
             Dim lFileAndTableName As String = aFileName
-            Dim lConnectionString As String = "Data Source=" & StrSplit(lFileAndTableName, vbTab, "'")
-            Dim lDB As SQLiteConnection
-            lDB = New SQLiteConnection(lConnectionString)
+            Dim lDatabaseName As String = StrSplit(lFileAndTableName, vbTab, "'")
+            Dim lDB As System.Data.Common.DbConnection
+            Dim lConnectionString As String
+            If IO.Path.GetExtension(lDatabaseName) = ".mdb" Then
+                lConnectionString = "Driver={Microsoft Access Driver (*.mdb)};DBQ=" & lDatabaseName
+                lDB = New System.Data.Odbc.OdbcConnection(lConnectionString)
+            Else
+                lConnectionString = "Data Source=" & lDatabaseName
+                lDB = New System.Data.SQLite.SQLiteConnection(lConnectionString)
+            End If
             lDB.Open()
 
             Dim lTables As DataTable = lDB.GetSchema("tables")
             For lIndex As Integer = 0 To lTables.Rows.Count - 1
-                pTableNames.Add(lTables.Rows(lIndex).Item("TABLE_NAME"))
+                Dim lDBTableName As String = lTables.Rows(lIndex).Item("TABLE_NAME")
+                If Not lDBTableName.StartsWith("MSys") Then
+                    pTableNames.Add(lDBTableName)
+                End If
             Next
 
             Dim lTableName As String = lFileAndTableName
@@ -39,16 +49,22 @@ Public Class atcTableSQLite
                 lTableName = pTableNames(0)
             End If
 
-            'TODO: check table name length?
-
-            Dim lCmd As SQLiteCommand = New SQLiteCommand(lDB)
-            lCmd.CommandText = "Select * from " & lTableName
-
-            Dim lAdapter As SQLiteDataAdapter = New SQLiteDataAdapter
-            lAdapter.SelectCommand = lCmd
             pDataTable = New DataTable
 
-            Dim iResult As Integer = lAdapter.Fill(pDataTable)
+            Dim lCmd As System.Data.Common.DbCommand
+            Dim lCmdText As String = "Select * from " & lTableName
+            If IO.Path.GetExtension(lDatabaseName) = ".mdb" Then
+                lCmd = New System.Data.Odbc.OdbcCommand(lCmdText, lDB)
+                Dim lAdapter As New System.Data.Odbc.OdbcDataAdapter
+                lAdapter.SelectCommand = lCmd
+                lAdapter.Fill(pDataTable)
+            Else
+                lCmd = New System.Data.SQLite.SQLiteCommand(lDB)
+                lCmd.CommandText = lCmdText
+                Dim lAdapter As New System.Data.SQLite.SQLiteDataAdapter
+                lAdapter.SelectCommand = lCmd
+                Dim iResult As Integer = lAdapter.Fill(pDataTable)
+            End If
 
             Logger.Dbg("FieldCount:" & pDataTable.Columns.Count & ":Rows:" & pDataTable.Rows.Count)
             Logger.Dbg("FieldDetails")
@@ -77,14 +93,26 @@ Public Class atcTableSQLite
     End Function
 
     Public Overrides Function WriteFile(ByVal aFileName As String) As Boolean
+        'TODO: write mdb tables too
         Dim lFileAndTableName As String = aFileName
-        Dim lConnectionString As String = "Data Source=" & StrSplit(lFileAndTableName, vbTab, "'")
-        Dim lDB As SQLiteConnection
-        lDB = New SQLiteConnection(lConnectionString)
-        lDB.Open()
-        'lDB.CreateFile(lFileAndTableName)
+        Dim lStr As String
+        Dim lCmd As System.Data.SQLite.SQLiteCommand
 
-        Dim lStr As String = "CREATE TABLE " & lFileAndTableName & "("
+        Dim lConnectionString As String = "Data Source=" & StrSplit(lFileAndTableName, vbTab, "'")
+        Dim lDB As System.Data.SQLite.SQLiteConnection
+        lDB = New System.Data.SQLite.SQLiteConnection(lConnectionString)
+        lDB.Open()
+
+        Dim lTableName As String = lFileAndTableName
+
+        If TableNames.IndexFromKey(lTableName) >= 0 Then
+            lStr = "DROP TABLE " & lTableName
+            lCmd = lDB.CreateCommand
+            lCmd.CommandText = lStr
+            lCmd.ExecuteNonQuery()
+        End If
+
+        lStr = "CREATE TABLE " & lTableName & "("
         For Each lColumn As System.Data.DataColumn In pDataTable.Columns
             If InStr(lColumn.DataType.ToString.ToLower, "byte") > 0 Then
                 Logger.Dbg("DontKnowHowToProcess:Byte")
@@ -94,7 +122,8 @@ Public Class atcTableSQLite
         Next
         lStr &= ")"
         lStr = lStr.Replace(", )", ")")
-        Dim lCmd As SQLiteCommand = lDB.CreateCommand
+        lCmd = Nothing
+        lCmd = lDB.CreateCommand
         lCmd.CommandText = lStr.Replace("System.", "")
 
         Dim lResult As Integer
@@ -102,9 +131,9 @@ Public Class atcTableSQLite
             Logger.Dbg("ExecuteCommand:" & lCmd.CommandText)
             lResult = lCmd.ExecuteNonQuery()
 
-            Dim lTransaction As DbTransaction = lDB.BeginTransaction
-            Me.MoveFirst()
-            For lRowNumber As Integer = 1 To Me.NumRecords
+            Dim lTransaction As System.Data.Common.DbTransaction = lDB.BeginTransaction
+            For lRecordNumber As Integer = 1 To Me.NumRecords
+                Me.CurrentRecord = lRecordNumber
                 lCmd = Nothing
                 lCmd = lDB.CreateCommand
                 lStr = "INSERT INTO " & lFileAndTableName & "("
@@ -113,7 +142,7 @@ Public Class atcTableSQLite
                     lColumnNumber += 1
                     If InStr(lColumn.DataType.ToString.ToLower, "byte") = 0 Then
                         lStr &= lColumn.ColumnName & ", "
-                        Dim lParameter As DbParameter = lCmd.CreateParameter
+                        Dim lParameter As System.Data.Common.DbParameter = lCmd.CreateParameter
                         lCmd.Parameters.Add(lParameter)
                         lParameter.Value = Value(lColumnNumber)
                     End If
@@ -128,12 +157,11 @@ Public Class atcTableSQLite
                 Logger.Dbg("ExecuteCommand:" & lCmd.CommandText & ":Parameters:" & lCmd.Parameters.Count)
                 lResult = lCmd.ExecuteNonQuery()
                 If lResult <> 1 Then 'should be one row updated, otherwise report
-                    Logger.Dbg("ProblemValueChange:Row:" & lRowNumber & ":Result:" & lResult)
+                    Logger.Dbg("ProblemValueChange:Row:" & Me.CurrentRecord & ":Result:" & lResult)
                 End If
-                If Not Me.atEOF Then Me.MoveNext()
-            Next
+            Next lRecordNumber
             lTransaction.Commit()
-        Catch ex As SQLiteException
+        Catch ex As Exception
             Logger.Dbg(ex.Message)
         End Try
     End Function

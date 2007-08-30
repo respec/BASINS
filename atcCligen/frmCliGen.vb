@@ -613,9 +613,9 @@ Public Class frmCliGen
             Else
                 agdMonParms.Source.CellValue(0, 14) = "Edit Row, Absolute"
             End If
-            .MoveFirst()
             agdMonParms.Source.Rows = 1
-            While Not .atEOF
+            For lRecordNumber As Integer = 1 To .NumRecords
+                .CurrentRecord = lRecordNumber
                 lParm = Trim(.Value(1))
                 If lParm.IndexOf("%") >= 0 Then lWind = lParm
                 If lWind.Length > 0 And (lParm.StartsWith("MEAN") Or lParm.StartsWith("STD DEV") Or lParm.StartsWith("SKEW")) Then
@@ -647,8 +647,7 @@ Public Class frmCliGen
                         .Alignment(lRow, cTable.NumFields + 1) = atcAlignment.HAlignCenter
                     End With
                 End If
-                .MoveNext()
-            End While
+            Next lRecordNumber
             agdMonParms.SizeAllColumnsToContents(fraStaParms.Width - 30)
             agdMonParms.Refresh()
         End With
