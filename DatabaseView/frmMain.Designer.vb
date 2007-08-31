@@ -28,6 +28,7 @@ Partial Class frmMain
         Me.atcGrid = New atcControls.atcGrid
         Me.lblTable = New System.Windows.Forms.Label
         Me.lstTableName = New System.Windows.Forms.ListBox
+        Me.mnuSaveAs = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -42,7 +43,7 @@ Partial Class frmMain
         '
         'mnuFile
         '
-        Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOpen, Me.mnuSave, Me.mnuFileSep1, Me.mnuExit})
+        Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOpen, Me.mnuSave, Me.mnuSaveAs, Me.mnuFileSep1, Me.mnuExit})
         Me.mnuFile.Name = "mnuFile"
         Me.mnuFile.Size = New System.Drawing.Size(40, 22)
         Me.mnuFile.Text = "File"
@@ -106,6 +107,12 @@ Partial Class frmMain
         Me.lstTableName.Size = New System.Drawing.Size(237, 52)
         Me.lstTableName.TabIndex = 6
         '
+        'mnuSaveAs
+        '
+        Me.mnuSaveAs.Name = "mnuSaveAs"
+        Me.mnuSaveAs.Size = New System.Drawing.Size(152, 22)
+        Me.mnuSaveAs.Text = "Save As"
+        '
         'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
@@ -134,5 +141,6 @@ Partial Class frmMain
     Friend WithEvents mnuExit As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents lblTable As System.Windows.Forms.Label
     Friend WithEvents lstTableName As System.Windows.Forms.ListBox
+    Friend WithEvents mnuSaveAs As System.Windows.Forms.ToolStripMenuItem
 
 End Class

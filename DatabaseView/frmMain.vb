@@ -2,20 +2,15 @@ Public Class frmMain
     Dim pSource As atcControls.atcGridSourceTable
     Dim pTable As atcTableSQLite.atcTableSQLite
     Dim pTableName As String = ""
-    Dim pDatabaseFilename As String
+    Dim pDatabaseFileName As String
 
     Private Sub mnuOpen_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOpen.Click
         pTable = New atcTableSQLite.atcTableSQLite
-        pDatabaseFilename = atcUtility.FindFile("Open Database", , "db3", , True, True, 1)
+        pDatabaseFileName = atcUtility.FindFile("Open Database", , "db3", , True, , 1)
 
-        pTable.OpenFile(pDatabaseFilename & vbTab & pTableName)
-        lstTableName.Items.Clear()
-        For Each lTableName As String In pTable.TableNames
-            lstTableName.Items.Add(lTableName)
-        Next
-        lstTableName.SelectedIndex = 0
-        RefreshGrid()
-        Me.Text = "DatabaseViewer " & atcUtility.FilenameNoPath(pDatabaseFilename)
+        If pTable.OpenFile(pDatabaseFileName & vbTab & pTableName) Then
+            RefreshForm()
+        End If
     End Sub
 
     Private Sub mnuExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuExit.Click
@@ -26,7 +21,7 @@ Public Class frmMain
         pTable = Nothing
         pTable = New atcTableSQLite.atcTableSQLite
         pTableName = lstTableName.Items(lstTableName.SelectedIndex)
-        pTable.OpenFile(pDatabaseFilename & vbTab & pTableName)
+        pTable.OpenFile(pDatabaseFileName & vbTab & pTableName)
         RefreshGrid()
     End Sub
 
@@ -51,9 +46,46 @@ Public Class frmMain
         atcGrid.Refresh()
     End Sub
 
+    Private Sub mnuSaveAs_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSaveAs.Click
+        If Not pTable Is Nothing Then
+            Dim lSaveDialog As New System.Windows.Forms.SaveFileDialog
+            With lSaveDialog
+                .Title = "Save Table In"
+                .DefaultExt = ".db3"
+                .FileName = pDatabaseFileName
+                .OverwritePrompt = False
+                If .ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
+                    'need to update table name
+                    If pTable.WriteFile(.FileName & vbTab & pTableName) Then
+                        pDatabaseFileName = .FileName
+                        RefreshForm()
+                    End If
+                End If
+            End With
+        End If
+    End Sub
+
     Private Sub mnuSave_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuSave.Click
         If Not pTable Is Nothing Then
-            pTable.WriteFile(pDatabaseFilename & vbTab & pTableName)
+            pTable.WriteFile(pDatabaseFileName & vbTab & pTableName)
         End If
+    End Sub
+
+    Private Sub RefreshForm()
+        lstTableName.Items.Clear()
+        If pTable.TableNames.Count > 0 Then
+            For Each lTableName As String In pTable.TableNames
+                lstTableName.Items.Add(lTableName)
+            Next
+            Dim lSelectedIndex As Integer = pTable.TableNames.IndexFromKey(pTableName)
+            If lSelectedIndex > 0 Then
+                lstTableName.SelectedIndex = lSelectedIndex
+            Else
+                lstTableName.SelectedIndex = 0
+            End If
+            pTableName = lstTableName.Items(lstTableName.SelectedIndex)
+        End If
+        RefreshGrid()
+        Me.Text = "DatabaseViewer " & atcUtility.FilenameNoPath(pDatabaseFileName)
     End Sub
 End Class
