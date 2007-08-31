@@ -51,6 +51,7 @@ Public Class atcTableSQLite
                 Dim iResult As Integer = lAdapter.Fill(pDataTable)
                 pDataTable.TableName = lTableName
 
+                Logger.Dbg("---- TableName " & lTableName)
                 Logger.Dbg("FieldCount:" & pDataTable.Columns.Count & ":Rows:" & pDataTable.Rows.Count)
                 Logger.Dbg("FieldDetails")
                 Dim lStr As String = "Name"
@@ -112,7 +113,8 @@ Public Class atcTableSQLite
             lStr = lStr.Replace(", )", ")")
             lCmd = Nothing
             lCmd = lDB.CreateCommand
-            lCmd.CommandText = lStr.Replace("System.", "")
+            lStr = lStr.Replace("System.", "")
+            lCmd.CommandText = lStr.Replace(" Default ", " 'Default' ") 'reserved word!
 
             Dim lResult As Integer
             Try
@@ -142,7 +144,8 @@ Public Class atcTableSQLite
                         lStr &= "?,"
                     Next
                     lStr &= ")"
-                    lCmd.CommandText = lStr.Replace(",)", ")")
+                    lStr = lStr.Replace(",)", ")")
+                    lCmd.CommandText = lStr.Replace(" Default,", " 'Default',") 'reserved word!
                     Logger.Dbg("ExecuteCommand:" & lCmd.CommandText & ":Parameters:" & lCmd.Parameters.Count)
                     lResult = lCmd.ExecuteNonQuery()
                     If lResult <> 1 Then 'should be one row updated, otherwise report
@@ -204,8 +207,9 @@ Public Class atcTableSQLite
             If CheckFieldNumber(aFieldNumber) Then
                 Dim lFieldNumber As Integer = aFieldNumber - 1
                 Dim lStr As String
+                Dim lValue As Object = pDataTable.Rows(pRow).Item(lFieldNumber)
                 Try
-                    lStr = pDataTable.Rows(pRow).Item(lFieldNumber)
+                    lStr = lValue.ToString
                 Catch
                     Logger.Dbg("ConversionError:Row:" & pRow + 1 & _
                                ":Column:" & aFieldNumber & _
@@ -337,13 +341,14 @@ Public Class atcTableSQLite
 
     Private Function OpenDatabase(ByVal aDataBaseName As String) As System.Data.Common.DbConnection
         Dim lDB As System.Data.Common.DbConnection = Nothing
-        Dim lConnectionString As String
+        Dim lConnectionString As String = ""
         If IO.Path.GetExtension(aDataBaseName) = ".mdb" Then
+            lConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" & aDataBaseName
             If Not FileExists(aDataBaseName) Then
-                'TODO: create (or copy) an empty access database
+                'TODO: create (or copy) an empty access database  
+                'lConnectionString &= ";New=True"
                 Throw New ApplicationException("Database " & aDataBaseName & " not found")
             End If
-            lConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0; Data Source=" & aDataBaseName
             lDB = New System.Data.OleDb.OleDbConnection(lConnectionString)
         Else
             lConnectionString = "Data Source=" & aDataBaseName
