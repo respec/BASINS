@@ -237,20 +237,24 @@ Public MustInherit Class atcTable
     'If aStartRecord is specified, searching starts there instead of at first record
     'If aEndRecord is specified, search stops at aEndRecord
     Public Overridable Function FindFirst(ByVal aFieldNumber As Integer, ByVal aFindValue As String, Optional ByVal aStartRecord As Integer = 1, Optional ByVal aEndRecord As Integer = -1) As Boolean Implements IatcTable.FindFirst
-        If aEndRecord < 1 Then aEndRecord = NumRecords
-        CurrentRecord = aStartRecord
-        While CurrentRecord <= aEndRecord
-            If Trim(Value(aFieldNumber)) = Trim(aFindValue) Then
-                Return True
-            End If
-            If CurrentRecord < aEndRecord Then
-                CurrentRecord += 1
-            Else 'force exit since attempting to set CurrentRecord beyond NumRecords sets it back to 1
-                Exit While
-            End If
-        End While
-        CurrentRecord = aStartRecord
-        Return False
+        If NumRecords < aStartRecord Then 'don't look past end
+            Return False
+        Else
+            If aEndRecord < 1 Then aEndRecord = NumRecords
+            CurrentRecord = aStartRecord
+            While CurrentRecord <= aEndRecord
+                If Trim(Value(aFieldNumber)) = Trim(aFindValue) Then
+                    Return True
+                End If
+                If CurrentRecord < aEndRecord Then
+                    CurrentRecord += 1
+                Else 'force exit since attempting to set CurrentRecord beyond NumRecords sets it back to 1
+                    Exit While
+                End If
+            End While
+            CurrentRecord = aStartRecord
+            Return False
+        End If
     End Function
 
     'Returns True if found, moves CurrentRecord to next record with .Value(FieldNumber) = FindValue

@@ -20,9 +20,10 @@ Public Class atcTimeseriesFileHspfBinOut
     Private pHSPFNetwork As clsNetworkHspfOutput
     Private pFileExt As String
 
+    Private pUnitsTable As atcTable
+    Private pUnitsTableModified As Boolean = False
+    Private Shared pUnitsTableTemplate As atcTable
     Private Shared pHspfMsg As atcUCI.HspfMsg
-    Private Shared pUnitsXmlDocument As Xml.XmlDocument
-    Private Shared pSkipXml As Boolean = True 'TODO: get xml file containing units working
     Private pCountUnitsFound As Integer
     Private pCountUnitsMissing As Integer
     Private pCountUnitsHardCode As Integer
@@ -202,6 +203,12 @@ Public Class atcTimeseriesFileHspfBinOut
             Logger.Dbg(ex.Message)
         End Try
 
+        If pUnitsTableModified Then
+            With pUnitsTable
+                Logger.Dbg("SaveLocalUnitsTable:" & .FileName)
+                .WriteFile(.FileName)
+            End With
+        End If
         Logger.Dbg("UnitsAssigned " & pCountUnitsFound & " " & pCountUnitsHardCode)
         Logger.Dbg("MissingUnique " & pUnitsMissing.Count & " Total " & pCountUnitsMissing)
         For lIndex As Integer = 0 To pUnitsMissing.Count - 1
@@ -211,47 +218,73 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Private Function GetUnits(ByVal aConstituent As String, Optional ByVal aUnitSystem As atcUnitSystem = atcUnitSystem.atcEnglish) As String
         Dim lUnits As String = ""
-        If Not pSkipXml Then
-            Dim lNode As XmlNode = pUnitsXmlDocument.DocumentElement.SelectSingleNode("parameter[name='" & aConstituent.ToLower & "']")
-            If Not lNode Is Nothing Then
-                Dim lUnitsNode As XmlNode = lNode.SelectSingleNode("units")
-                If Not lUnitsNode Is Nothing Then
-                    Dim lUnitSystemNode As XmlNode = lUnitsNode.SelectSingleNode(UnitSystem(aUnitSystem).ToLower)
-                    If lUnitSystemNode Is Nothing Then
-                        lUnits = lUnitsNode.InnerText
-                    Else
-                        lUnits = lUnitSystemNode.InnerText
-                    End If
-                End If
+        Dim lUnknown As String = "<unknown>"
+        Dim lUnknownFlag As Boolean = False
+
+        If pUnitsTable.FindFirst(1, aConstituent) Then 'cons in field 1
+            lUnits = pUnitsTable.Value(2) 'units in field 2
+            If lUnits = lUnknown Then
+                lUnknownFlag = True
+                lUnits = "" 'forces another look at generic tables
+            Else 'found a good one
+                pCountUnitsHardCode += 1
+
             End If
         End If
 
-        If lUnits.Length > 0 Then 'found one!
-            pCountUnitsHardCode += 1
-        Else
-            'try HspfMsg
-            For lTsGroupIndex As Integer = 1 To pHspfMsg.TSGroupDefs.Count
-                Dim lTsGroup As atcUCI.HspfTSGroupDef = pHspfMsg.TSGroupDefs(lTsGroupIndex)
-                For lTsMemberIndex As Integer = 1 To lTsGroup.MemberDefs.Count
-                    Dim lTsMember As atcUCI.HspfTSMemberDef = lTsGroup.MemberDefs(lTsMemberIndex)
-                    If lTsMember.Name.ToLower = aConstituent.ToLower Then
-                        'todo: check english/metric flag, english assumed for now
-                        pCountUnitsFound += 1
-                        lUnits = lTsMember.eunits
-                        'Logger.Dbg("Found " & aConstituent & " (" & lUnits & ")")
-                        Return lUnits
-                    End If
-                Next
-            Next
-            pCountUnitsMissing += 1
-            'Logger.Dbg("Missing " & aConstituent)
-            Dim lIndex As Integer = pUnitsMissing.IndexFromKey(aConstituent)
-            If lIndex >= 0 Then
-                pUnitsMissing.Item(lIndex) += 1
-            Else
-                pUnitsMissing.Add(aConstituent, 1)
+        If lUnits.Length = 0 Then 'try generic unit table stored with dll - file may be customized for a specific installation
+            If pUnitsTableTemplate Is Nothing Then 'open the generic table
+                pUnitsTableTemplate = New atcTableDBF
+                Dim lUnitsTemplateFileName As String = IO.Path.ChangeExtension(Reflection.Assembly.GetExecutingAssembly.Location, "units.dbf")
+                If FileExists(lUnitsTemplateFileName) Then
+                    pUnitsTableTemplate.OpenFile(lUnitsTemplateFileName)
+                    Logger.Dbg("UsingGenericUnitsTemplateFile:" & lUnitsTemplateFileName)
+                Else
+                    Logger.Dbg("GenericUnitsTemplateFile:" & lUnitsTemplateFileName & ":NotAvailable!")
+                End If
             End If
-            lUnits = "<unknown>"
+            If pUnitsTableTemplate.FindFirst(1, aConstituent) Then 'cons in field 1
+                lUnits = pUnitsTableTemplate.Value(2) 'units in field 2
+                pCountUnitsFound += 1
+            Else  'try HspfMsg
+                If pHspfMsg Is Nothing Then 'might need the message file for units
+                    pHspfMsg = New HspfMsg
+                    pHspfMsg.Open("hspfmsg.wdm")
+                End If
+                For lTsGroupIndex As Integer = 1 To pHspfMsg.TSGroupDefs.Count
+                    Dim lTsGroup As atcUCI.HspfTSGroupDef = pHspfMsg.TSGroupDefs(lTsGroupIndex)
+                    For lTsMemberIndex As Integer = 1 To lTsGroup.MemberDefs.Count
+                        Dim lTsMember As atcUCI.HspfTSMemberDef = lTsGroup.MemberDefs(lTsMemberIndex)
+                        If lTsMember.Name.ToLower = aConstituent.ToLower Then
+                            'todo: check english/metric flag, english assumed for now
+                            pCountUnitsFound += 1
+                            lUnits = lTsMember.eunits
+                            'Logger.Dbg("FoundMsg " & aConstituent & " (" & lUnits & ")")
+                            Exit For
+                        End If
+                    Next
+                Next
+                If lUnits.Length = 0 Then
+                    pCountUnitsMissing += 1
+                    'Logger.Dbg("Missing " & aConstituent)
+                    Dim lIndex As Integer = pUnitsMissing.IndexFromKey(aConstituent)
+                    If lIndex >= 0 Then
+                        pUnitsMissing.Item(lIndex) += 1
+                    Else
+                        pUnitsMissing.Add(aConstituent, 1)
+                    End If
+                    lUnits = lUnknown
+                End If
+            End If
+            If Not lUnknownFlag Then 'save a local copy
+                With pUnitsTable
+                    .NumRecords += 1
+                    .MoveLast()
+                    .Value(1) = aConstituent
+                    .Value(2) = lUnits
+                    pUnitsTableModified = True
+                End With
+            End If
         End If
         Return lUnits
     End Function
@@ -370,27 +403,34 @@ Public Class atcTimeseriesFileHspfBinOut
 
     Public Overrides Function Open(ByVal aFileName As String, Optional ByVal aAttributes As atcDataAttributes = Nothing) As Boolean
         If MyBase.Open(aFileName, aAttributes) Then
-            If pHspfMsg Is Nothing Then 'need the message file for units
-                pHspfMsg = New HspfMsg
-                pHspfMsg.Open("hspfmsg.wdm")
-            End If
-            If pUnitsXmlDocument Is Nothing And Not pSkipXML Then 'need to read the xml units lookup table
-                Dim lXmlFileName As String = PathNameOnly(Me.GetType().Assembly.Location) & "\units.xml"
-                pUnitsXmlDocument = New XmlDocument
-                If FileExists(lXmlFileName) Then
-                    Dim lStreamReader As New IO.StreamReader(lXmlFileName)
-                    pUnitsXmlDocument.Load(lStreamReader)
-                    lStreamReader.Close()
-                Else
-                    pSkipXml = True
-                End If
+            pUnitsTable = New atcTableDBF
+            Dim lFileName As String = IO.Path.ChangeExtension(Me.Specification, "units.dbf")
+            If FileExists(lFileName) Then
+                pUnitsTable.OpenFile(lFileName)
+            Else 'create from template
+                With pUnitsTable
+                    .NumFields = 2
+                    .FieldName(1) = "CONS"
+                    .FieldType(1) = "C"
+                    .FieldLength(1) = 32
+                    .FieldName(2) = "UNITS"
+                    .FieldType(2) = "C"
+                    .FieldLength(2) = 16
+                    .FileName = lFileName
+                    .WriteFile(.FileName)
+                End With
             End If
             BuildTSers()
             Return True
         End If
+            Return False
     End Function
 
     Public Sub New()
         Filter = pFilter
+    End Sub
+
+    Protected Overrides Sub Finalize()
+        MyBase.Finalize()
     End Sub
 End Class
