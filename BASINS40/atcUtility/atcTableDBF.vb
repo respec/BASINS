@@ -105,7 +105,6 @@ Public Class atcTableDBF
         End Sub
     End Class
 
-    Private pFilename As String
     Private pHeader As clsHeader
     Private pFields() As clsFieldDescriptor
     Private pNumFields As Integer
@@ -815,7 +814,7 @@ NotEqual:
             Return False 'can't open a file that doesn't exist
         End If
 
-        pFilename = aFilename
+        FileName = aFilename
 
         inFile = FreeFile()
         FileOpen(inFile, aFilename, OpenMode.Binary, OpenAccess.Read, OpenShare.Shared)
@@ -945,7 +944,7 @@ NotEqual:
         If LCase(aFormat) = "text" Then 'text version
             With pHeader
                 retval = "DBF Header: "
-                retval &= vbCrLf & "    FileName: " & pFilename
+                retval &= vbCrLf & "    FileName: " & FileName
                 retval &= vbCrLf & "    Version: " & .version
                 retval &= vbCrLf & "    Date: " & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
                 retval &= vbCrLf & "    NumRecs: " & .NumRecs
@@ -976,7 +975,7 @@ NotEqual:
             End If
             retval &= vbCrLf
             With pHeader 'now header data
-                retval &= pFilename
+                retval &= FileName
                 retval &= vbTab & .version
                 retval &= vbTab & .dbfYear + 1900 & "/" & .dbfMonth & "/" & .dbfDay
                 retval &= vbTab & pNumFields
@@ -1027,7 +1026,7 @@ TryAgain:
             If pData(UBound(pData)) <> 26 Then FilePut(OutFile, CByte(26))
             FileClose(OutFile)
 
-            pFilename = aFilename
+            FileName = aFilename
             Return True
 
         Catch ex As Exception
