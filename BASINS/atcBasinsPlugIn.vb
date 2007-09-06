@@ -68,7 +68,7 @@ Public Class atcBasinsPlugIn
         'Set g_BasinsDir to folder above the Bin folder where the app and plugins live
         g_BasinsDir = PathNameOnly(PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location)) & "\"
 
-        Logger.StartToFile(g_BasinsDir & "logs\" _
+        Logger.StartToFile(g_BasinsDir & "cache\log\" _
                          & Format(Now, "yyyy-MM-dd") & "at" & Format(Now, "HH-mm") & "-Basins.log")
         'Logger.MapWin = g_MapWin
 

@@ -31,15 +31,7 @@ Public Class atcTimeseriesGridSource
     Private Sub RefreshAllDates()
         Try
             If pDisplayValues Then
-                'Select Case pDataGroup.Count
-                '    Case 1
-                '        Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(0)
-                '        lTS.EnsureValuesRead()
-                '        pAllDates = lTS.Dates
-                '    Case Is > 1 : pAllDates = MergeTimeseries(pDataGroup).Dates
-                '    Case Else : pAllDates = New atcTimeseries(Nothing)
-                'End Select
-                If pDataGroup.Count > 1 Or pFilterNoData Then
+                If pFilterNoData OrElse pDataGroup.Count > 1 Then
                     pAllDates = MergeTimeseries(pDataGroup, pFilterNoData).Dates
                 ElseIf pDataGroup.Count = 1 Then
                     Dim lTS As atcTimeseries = pDataGroup.ItemByIndex(0)

@@ -31,7 +31,6 @@ Public Class DownloadDataPlugin
         g_MapWin = MapWin
         g_Menus = MapWin.Menus
         g_MainForm = ParentHandle
-        atcMwGisUtility.GisUtil.MappingObject = MapWin
         AddMenuIfMissing(pMenuName, "mnuFile", pMenuLabel, "mnuNew")
     End Sub
 
@@ -163,6 +162,7 @@ Public Class DownloadDataPlugin
 
     Public Sub ItemClicked(ByVal ItemName As String, ByRef Handled As Boolean) Implements MapWindow.Interfaces.IPlugin.ItemClicked
         If ItemName.Equals(pMenuName) Then
+            atcMwGisUtility.GisUtil.MappingObject = g_MapWin
             Dim lDownloadForm As New frmDownload
             Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
             'Logger.Msg(lQuery, "Query from frmDownload")
