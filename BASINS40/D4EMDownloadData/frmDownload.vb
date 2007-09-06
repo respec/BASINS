@@ -25,7 +25,7 @@ Public Class frmDownload
         Me.Close()
     End Sub
 
-    Public Function AOI() As D4EMDataManager.AOI
+    Public Function SelectedRegion() As D4EMDataManager.Region
         Try
             Dim lExtents As MapWinGIS.Extents = Nothing
             Select Case cboAOI.SelectedIndex
@@ -33,7 +33,7 @@ Public Class frmDownload
                 Case 1 : lExtents = pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
             End Select
             If Not lExtents Is Nothing Then
-                Dim lAOI As New D4EMDataManager.AOI(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
+                Dim lAOI As New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
                 Return lAOI.GetProjected(pGeographicProjection)
             End If
         Catch ex As Exception
@@ -47,7 +47,7 @@ Public Class frmDownload
             Dim lXML As String = ""
             Dim lDesiredProjection As String = ""
             Dim lSaveFolder As String = "" '"<arg name='CacheFolder'>" & "c:\temp\" & "</arg>" & vbCrLf
-            Dim lAOI As String = "<arg name='AOI'>" & Me.AOI.XML & "</arg>" & vbCrLf
+            Dim lRegion As String = Me.SelectedRegion.XML
 
             If Not pMapWin.Project Is Nothing Then
                 If pMapWin.Project.ProjectProjection.Length > 0 Then
@@ -72,7 +72,7 @@ Public Class frmDownload
                              & lCheckedChildren _
                              & lSaveFolder _
                              & lDesiredProjection _
-                             & lAOI _
+                             & lRegion _
                              & "</arguments>" & vbCrLf _
                              & "</function>" & vbCrLf
                     End If

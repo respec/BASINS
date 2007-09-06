@@ -8,7 +8,7 @@ Imports MapWinUtility
 
 Public Module modFile
 
-    Private ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".xml", ".shp.xml", ".mwsr"}
+    Private ShapeExtensions() As String = {".shp", ".shx", ".dbf", ".prj", ".spx", ".sbn", ".sbx", ".xml", ".shp.xml", ".mwsr"}
 
     ''' <summary>
     ''' Try moving a file to a new location, log a failure rather than raising an exception
@@ -19,16 +19,25 @@ Public Module modFile
     ''' <remarks></remarks>
     Public Function TryMove(ByVal aFromFilename As String, ByVal aToPath As String) As Boolean
         TryMove = False
+        Logger.Dbg("TryMove '" & aFromFilename & "' to '" & aToPath & "'")
         If FileExists(aFromFilename) Then
-            TryDelete(aToPath) 'Remove existing file at destination
             Try
-                If FileExists(aToPath, True, False) Then
-                    aToPath = IO.Path.Combine(aToPath, IO.Path.GetFileName(aFromFilename))
-                End If
                 Try
+                    Dim lDirectory As String = aToPath
+                    If IO.Directory.Exists(lDirectory) Then
+                        aToPath = IO.Path.Combine(lDirectory, IO.Path.GetFileName(aFromFilename))
+                    ElseIf aToPath.EndsWith(IO.Path.DirectorySeparatorChar) Then
+                        IO.Directory.CreateDirectory(lDirectory)
+                        aToPath = IO.Path.Combine(lDirectory, IO.Path.GetFileName(aFromFilename))
+                    Else
+                        lDirectory = IO.Path.GetDirectoryName(lDirectory)
+                        IO.Directory.CreateDirectory(lDirectory)
+                    End If
+                    TryDelete(aToPath) 'Remove existing file at destination
                     IO.File.Move(aFromFilename, aToPath)
                     TryMove = True
                 Catch exMove As Exception 'If moving didn't work, maybe copying will
+                    Logger.Dbg("Exception '" & exMove.Message & "' while moving '" & aFromFilename & "' to '" & aToPath & "' attempting copy")
                     IO.File.Copy(aFromFilename, aToPath)
                     TryMove = True
                     TryDelete(aFromFilename)
@@ -37,6 +46,8 @@ Public Module modFile
             Catch ex As Exception
                 Logger.Dbg("Unable to move file from '" & aFromFilename & "' to '" & aToPath & "' - " & ex.Message)
             End Try
+        Else
+            Logger.Dbg("File to move does not exist: '" & aFromFilename & "'")
         End If
     End Function
 
@@ -71,9 +82,15 @@ Public Module modFile
         Else
             lNewBaseName = IO.Path.GetFileNameWithoutExtension(aShapeFilename)
         End If
+
+        aShapeFilename = IO.Path.ChangeExtension(aShapeFilename, "").TrimEnd(".")
         aDestinationPath = IO.Path.Combine(aDestinationPath, lNewBaseName)
-        For Each lFilename As String In ShapeFilenames(aShapeFilename)
-            If Not TryMove(lFilename, aDestinationPath & IO.Path.GetExtension(lFilename)) Then TryMoveShapefile = False
+
+        For Each lExtension As String In ShapeExtensions
+            If Not TryMove(aShapeFilename & lExtension, _
+                           aDestinationPath & lExtension) Then
+                TryMoveShapefile = False
+            End If
         Next
     End Function
 
@@ -95,13 +112,23 @@ Public Module modFile
     ''' <remarks>It is the caller's responsibility to remove this folder and its contents later.</remarks>
     Public Function NewTempDir(ByVal aBaseName As String) As String
         Dim lCounter As Integer = 1
-        NewTempDir = IO.Path.GetTempPath & aBaseName & "\"
+        Dim lExpirationDate As Double = Date.Now.ToOADate - 1 'Old temporary folders expire after one day
+        NewTempDir = IO.Path.GetTempPath & aBaseName & IO.Path.DirectorySeparatorChar
 
         'If there is already a file or non-empty directory with this name, try another name
-        While IO.File.Exists(NewTempDir) OrElse IO.Directory.Exists(NewTempDir)
+        While (IO.File.Exists(NewTempDir) OrElse _
+               IO.Directory.Exists(NewTempDir) AndAlso _
+               IO.Directory.GetFileSystemEntries(NewTempDir).Length > 0 AndAlso _
+               IO.Directory.GetCreationTime(NewTempDir).ToOADate > lExpirationDate)
             lCounter += 1
-            NewTempDir = IO.Path.GetTempPath & aBaseName & "_" & lCounter & "\"
+            NewTempDir = IO.Path.GetTempPath & aBaseName & "_" & lCounter & IO.Path.DirectorySeparatorChar
         End While
+        If IO.Directory.Exists(NewTempDir) Then
+            Logger.Dbg("Reusing temporary directory '" & NewTempDir & "'")
+            IO.Directory.Delete(NewTempDir, True)
+        Else
+            Logger.Dbg("Creating temporary directory '" & NewTempDir & "'")
+        End If
         IO.Directory.CreateDirectory(NewTempDir)
     End Function
 
@@ -259,7 +286,7 @@ EndFound:
             Return aFileName
         End If
 
-        If Right(aStartPath, 1) = "\" Then
+        If aStartPath.EndsWith(IO.Path.DirectorySeparatorChar) Then
             aStartPath = Left(aStartPath, Len(aStartPath) - 1)
         End If
 
@@ -267,12 +294,12 @@ EndFound:
         Dim lSlashposPath As Integer
 
         If UCase(Left(aFileName, 2)) <> UCase(Left(aStartPath, 2)) Then
-            aFileName = aStartPath & "\" & aFileName
+            aFileName = aStartPath & IO.Path.DirectorySeparatorChar & aFileName
         End If
 
         lSlashposFilename = InStr(aFileName, "\..\")
         While lSlashposFilename > 0
-            lSlashposPath = InStrRev(aFileName, "\", lSlashposFilename - 1)
+            lSlashposPath = InStrRev(aFileName, IO.Path.DirectorySeparatorChar, lSlashposFilename - 1)
             If lSlashposPath = 0 Then
                 lSlashposFilename = 0
             Else
@@ -299,19 +326,20 @@ EndFound:
         Dim sameUntil As Integer
 
         'Remove trailing slash if necessary
-        If Right(StartPath, 1) = "\" Then StartPath = Left(StartPath, Len(StartPath) - 1)
-
+        If StartPath.EndsWith(IO.Path.DirectorySeparatorChar) Then
+            StartPath = Left(StartPath, Len(StartPath) - 1)
+        End If
         If Len(filename) > 2 Then
-            If Left(filename, 3) = "..\" Then
+            If filename.StartsWith("..\") Then
                 'Concatenate StartPath and Filename
-                filename = StartPath & "\" & filename
+                filename = StartPath & IO.Path.DirectorySeparatorChar & filename
             End If
         End If
 
         'Adjust path for Filename as necessary
         slashposFilename = InStr(filename, "\..\")
         While slashposFilename > 0
-            slashposPath = InStrRev(filename, "\", slashposFilename - 1)
+            slashposPath = InStrRev(filename, IO.Path.DirectorySeparatorChar, slashposFilename - 1)
             If slashposPath = 0 Then
                 slashposFilename = 0
             Else
@@ -320,14 +348,14 @@ EndFound:
             End If
         End While
 
-        If InStr(filename, "\") = 0 Then
+        If InStr(filename, IO.Path.DirectorySeparatorChar) = 0 Then
             'No path to check, so assume it is a file in StartPath
         ElseIf LCase(Left(filename, 2)) <> LCase(Left(StartPath, 2)) Then
             'filename is already relative or is on different drive
         Else
             'Reconcile StartPath and Filename
             slashposPath = Len(StartPath)
-            If Mid(filename, slashposPath + 1, 1) = "\" Then 'Filename might include whole path
+            If Mid(filename, slashposPath + 1, 1) = IO.Path.DirectorySeparatorChar Then 'Filename might include whole path
                 If LCase(Left(filename, slashposPath)) = LCase(StartPath) Then
                     sameUntil = slashposPath + 1
                     GoTo FoundSameUntil
@@ -339,8 +367,8 @@ EndFound:
             While slashposFilename = slashposPath
                 If LCase(Left(filename, slashposPath)) = LCase(Left(StartPath, slashposPath)) Then
                     sameUntil = slashposPath
-                    slashposFilename = InStr(slashposPath + 1, filename, "\")
-                    slashposPath = InStr(slashposPath + 1, StartPath, "\")
+                    slashposFilename = InStr(slashposPath + 1, filename, IO.Path.DirectorySeparatorChar)
+                    slashposPath = InStr(slashposPath + 1, StartPath, IO.Path.DirectorySeparatorChar)
                     If slashposPath = 0 Then slashposPath = -1 'If neither has another \, must end loop
                 Else
                     slashposFilename = 0
@@ -351,10 +379,10 @@ FoundSameUntil:
             'Set relative path from point of divergence between StartPath and Filename
             filename = Mid(filename, sameUntil + 1)
             If sameUntil < 1 Then sameUntil = 1
-            slashposPath = InStr(sameUntil, StartPath, "\")
+            slashposPath = InStr(sameUntil, StartPath, IO.Path.DirectorySeparatorChar)
             While slashposPath > 0
                 filename = "..\" & filename
-                slashposPath = InStr(slashposPath + 1, StartPath, "\")
+                slashposPath = InStr(slashposPath + 1, StartPath, IO.Path.DirectorySeparatorChar)
             End While
         End If
         Return filename
@@ -390,7 +418,7 @@ FoundSameUntil:
                 End If
 
                 If FileMatches Then
-                    fName = CurDir() & "\" & fName
+                    fName = CurDir() & IO.Path.DirectorySeparatorChar & fName
                     key = fName.ToLower
                     'Try
                     vName = aFilenames.Get(key)
@@ -419,7 +447,7 @@ FoundSameUntil:
                 End While
 
                 For Each fName In dirsThisDir
-                    AddFilesInDir(aFilenames, aDirName & "\" & fName, True, aFileFilter, aAttributes)
+                    AddFilesInDir(aFilenames, aDirName & IO.Path.DirectorySeparatorChar & fName, True, aFileFilter, aAttributes)
                 Next fName
 
             End If
@@ -581,7 +609,7 @@ ErrorWriting:
 
         On Error Resume Next
 
-        If lFileName.EndsWith("\") Then 'this is a folder
+        If lFileName.EndsWith(IO.Path.DirectorySeparatorChar) Then 'this is a folder
             Return ""
             'TODO: Implement FindFolder
             'Return FindFolder(aFileDialogTitle, _
@@ -610,8 +638,8 @@ ErrorWriting:
             If Not FileExists(lFileName) AndAlso lBaseFileName.Length > 0 Then 'try some default locations if filename was specified, path was wrong or missing
                 lFileName = aDefaultFileName
                 If Not FileExists(lFileName) Then
-                    lExePath = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location).ToLower & "\"
-                    lDLLpath = PathNameOnly(Reflection.Assembly.GetExecutingAssembly.Location).ToLower & "\"
+                    lExePath = PathNameOnly(Reflection.Assembly.GetEntryAssembly.Location).ToLower & IO.Path.DirectorySeparatorChar
+                    lDLLpath = PathNameOnly(Reflection.Assembly.GetExecutingAssembly.Location).ToLower & IO.Path.DirectorySeparatorChar
 
                     'First check in same folder or subfolder containing current .exe or .dll
                     lFileName = FindRecursive(lBaseFileName, lDLLpath, lExePath)
@@ -689,7 +717,7 @@ ErrorWriting:
     Private Function FindRecursive(ByVal aFilename As String, ByVal ParamArray aStartDirs() As String) As String
         Dim lFoundPath As String = ""
         For Each lStartDir As String In aStartDirs
-            If lStartDir.Length > 0 AndAlso Not lStartDir.EndsWith("\") Then lStartDir &= "\"
+            If lStartDir.Length > 0 AndAlso Not lStartDir.EndsWith(IO.Path.DirectorySeparatorChar) Then lStartDir &= IO.Path.DirectorySeparatorChar
             If FileExists(lStartDir & aFilename) Then
                 Return lStartDir & aFilename
             ElseIf FileExists(lStartDir, True, False) Then
