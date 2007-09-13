@@ -817,6 +817,20 @@ Public Class GisUtil
         End If
     End Function
 
+    Public Shared Function AddPoint(ByVal aLayerIndex As Integer, ByVal aX As Double, ByVal ay As Double) As Boolean
+        Dim lResult As Boolean
+        Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
+        Dim lPoint As New MapWinGIS.Point
+        lPoint.x = aX
+        lPoint.y = ay
+        Dim lShape As New MapWinGIS.Shape
+        lResult = lShape.Create(MapWinGIS.ShpfileType.SHP_POINT)
+        lResult = lShape.InsertPoint(lPoint, 0)
+        lResult = lSf.StartEditingShapes()
+        lResult = lSf.EditInsertShape(lShape, lSf.NumShapes)
+        lResult = lSf.StopEditingShapes
+    End Function
+
     Public Shared Sub StopRemoveFeature(ByVal aLayerIndex As Integer)
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         lSf.StopEditingShapes(True, True)
@@ -888,11 +902,15 @@ Public Class GisUtil
         End If
     End Function
 
-    Public Shared Function SetSelectedFeature(ByVal aLayerIndex As Integer, ByVal aShapeIndex As Integer) As Boolean
-        Dim lSelectColor As System.Drawing.Color
-
+    Public Shared Function ClearSelectedFeatures(ByVal aLayerIndex As Integer) As Boolean
         CurrentLayer = aLayerIndex
-        lSelectColor = pMapWin.View.SelectColor
+        pMapWin.View.SelectedShapes.ClearSelectedShapes()
+        Return True
+    End Function
+
+    Public Shared Function SetSelectedFeature(ByVal aLayerIndex As Integer, ByVal aShapeIndex As Integer) As Boolean
+        CurrentLayer = aLayerIndex
+        Dim lSelectColor As System.Drawing.Color = pMapWin.View.SelectColor
         pMapWin.View.SelectedShapes.AddByIndex(aShapeIndex, lSelectColor)
         Return True
     End Function

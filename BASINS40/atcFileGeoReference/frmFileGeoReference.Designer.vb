@@ -22,6 +22,7 @@ Partial Class frmFileGeoReference
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmFileGeoReference))
         Me.lblLayer = New System.Windows.Forms.Label
         Me.cboLayer = New System.Windows.Forms.ComboBox
@@ -33,6 +34,10 @@ Partial Class frmFileGeoReference
         Me.btnNext = New System.Windows.Forms.Button
         Me.btnPrev = New System.Windows.Forms.Button
         Me.pbxImage = New System.Windows.Forms.PictureBox
+        Me.btnAdd = New System.Windows.Forms.Button
+        Me.lblStatus = New System.Windows.Forms.Label
+        Me.btnRemove = New System.Windows.Forms.Button
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         CType(Me.pbxImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -51,13 +56,13 @@ Partial Class frmFileGeoReference
         Me.cboLayer.FormattingEnabled = True
         Me.cboLayer.Location = New System.Drawing.Point(83, 16)
         Me.cboLayer.Name = "cboLayer"
-        Me.cboLayer.Size = New System.Drawing.Size(265, 24)
+        Me.cboLayer.Size = New System.Drawing.Size(170, 24)
         Me.cboLayer.TabIndex = 2
         '
         'lblFields
         '
         Me.lblFields.AutoSize = True
-        Me.lblFields.Location = New System.Drawing.Point(366, 16)
+        Me.lblFields.Location = New System.Drawing.Point(270, 16)
         Me.lblFields.Name = "lblFields"
         Me.lblFields.Size = New System.Drawing.Size(94, 17)
         Me.lblFields.TabIndex = 3
@@ -69,9 +74,9 @@ Partial Class frmFileGeoReference
         Me.cboFields.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboFields.FormattingEnabled = True
-        Me.cboFields.Location = New System.Drawing.Point(477, 16)
+        Me.cboFields.Location = New System.Drawing.Point(381, 16)
         Me.cboFields.Name = "cboFields"
-        Me.cboFields.Size = New System.Drawing.Size(265, 24)
+        Me.cboFields.Size = New System.Drawing.Size(415, 24)
         Me.cboFields.TabIndex = 4
         '
         'lblRecordInfo
@@ -86,7 +91,7 @@ Partial Class frmFileGeoReference
         'lblValue
         '
         Me.lblValue.AutoSize = True
-        Me.lblValue.Location = New System.Drawing.Point(412, 55)
+        Me.lblValue.Location = New System.Drawing.Point(316, 55)
         Me.lblValue.Name = "lblValue"
         Me.lblValue.Size = New System.Drawing.Size(48, 17)
         Me.lblValue.TabIndex = 6
@@ -97,30 +102,32 @@ Partial Class frmFileGeoReference
         '
         Me.txtValue.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtValue.Location = New System.Drawing.Point(477, 55)
+        Me.txtValue.Location = New System.Drawing.Point(381, 55)
         Me.txtValue.Name = "txtValue"
-        Me.txtValue.Size = New System.Drawing.Size(264, 22)
+        Me.txtValue.Size = New System.Drawing.Size(414, 22)
         Me.txtValue.TabIndex = 7
         Me.txtValue.Text = "Value"
         '
         'btnNext
         '
         Me.btnNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnNext.Location = New System.Drawing.Point(321, 55)
+        Me.btnNext.Location = New System.Drawing.Point(207, 49)
         Me.btnNext.Name = "btnNext"
         Me.btnNext.Size = New System.Drawing.Size(27, 31)
         Me.btnNext.TabIndex = 8
         Me.btnNext.Text = ">"
+        Me.ToolTip1.SetToolTip(Me.btnNext, "Move Next")
         Me.btnNext.UseVisualStyleBackColor = True
         '
         'btnPrev
         '
         Me.btnPrev.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPrev.Location = New System.Drawing.Point(277, 55)
+        Me.btnPrev.Location = New System.Drawing.Point(174, 49)
         Me.btnPrev.Name = "btnPrev"
         Me.btnPrev.Size = New System.Drawing.Size(27, 31)
         Me.btnPrev.TabIndex = 9
         Me.btnPrev.Text = "<"
+        Me.ToolTip1.SetToolTip(Me.btnPrev, "Move Previous")
         Me.btnPrev.UseVisualStyleBackColor = True
         '
         'pbxImage
@@ -128,18 +135,54 @@ Partial Class frmFileGeoReference
         Me.pbxImage.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.pbxImage.Location = New System.Drawing.Point(12, 101)
+        Me.pbxImage.Location = New System.Drawing.Point(12, 86)
         Me.pbxImage.Name = "pbxImage"
-        Me.pbxImage.Size = New System.Drawing.Size(729, 296)
+        Me.pbxImage.Size = New System.Drawing.Size(796, 540)
         Me.pbxImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbxImage.TabIndex = 10
         Me.pbxImage.TabStop = False
+        '
+        'btnAdd
+        '
+        Me.btnAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnAdd.Location = New System.Drawing.Point(240, 49)
+        Me.btnAdd.Name = "btnAdd"
+        Me.btnAdd.Size = New System.Drawing.Size(27, 31)
+        Me.btnAdd.TabIndex = 11
+        Me.btnAdd.Text = "+"
+        Me.ToolTip1.SetToolTip(Me.btnAdd, "Add File Reference Point")
+        Me.btnAdd.UseVisualStyleBackColor = True
+        '
+        'lblStatus
+        '
+        Me.lblStatus.AutoSize = True
+        Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblStatus.Location = New System.Drawing.Point(25, 97)
+        Me.lblStatus.Name = "lblStatus"
+        Me.lblStatus.Size = New System.Drawing.Size(74, 25)
+        Me.lblStatus.TabIndex = 12
+        Me.lblStatus.Text = "Status"
+        Me.lblStatus.Visible = False
+        '
+        'btnRemove
+        '
+        Me.btnRemove.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnRemove.Location = New System.Drawing.Point(273, 49)
+        Me.btnRemove.Name = "btnRemove"
+        Me.btnRemove.Size = New System.Drawing.Size(27, 31)
+        Me.btnRemove.TabIndex = 13
+        Me.btnRemove.Text = "-"
+        Me.ToolTip1.SetToolTip(Me.btnRemove, "Remove File Reference Point")
+        Me.btnRemove.UseVisualStyleBackColor = True
         '
         'frmFileGeoReference
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(753, 408)
+        Me.ClientSize = New System.Drawing.Size(820, 652)
+        Me.Controls.Add(Me.btnRemove)
+        Me.Controls.Add(Me.lblStatus)
+        Me.Controls.Add(Me.btnAdd)
         Me.Controls.Add(Me.pbxImage)
         Me.Controls.Add(Me.btnPrev)
         Me.Controls.Add(Me.btnNext)
@@ -168,4 +211,8 @@ Partial Class frmFileGeoReference
     Friend WithEvents btnNext As System.Windows.Forms.Button
     Friend WithEvents btnPrev As System.Windows.Forms.Button
     Friend WithEvents pbxImage As System.Windows.Forms.PictureBox
+    Friend WithEvents btnAdd As System.Windows.Forms.Button
+    Friend WithEvents lblStatus As System.Windows.Forms.Label
+    Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
+    Friend WithEvents btnRemove As System.Windows.Forms.Button
 End Class
