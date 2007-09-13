@@ -3,6 +3,7 @@ Imports atcMwGisUtility.GisUtil
 
 Public Class frmFileGeoReference
     Private pRecordIndex As Integer = 1
+    Private pAddingPoint As Boolean = False
 
     Private Sub cboLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLayer.SelectedIndexChanged
         Dim lCbo As System.Windows.Forms.ComboBox = sender
@@ -27,11 +28,19 @@ Public Class frmFileGeoReference
         End With
     End Sub
 
-    Private Sub RefreshRecordInfo()
+    Friend Sub RefreshRecordInfo(ByVal aRecordIndex As Integer)
+        pRecordIndex = aRecordIndex
+        RefreshRecordInfo()
+    End Sub
+
+    Friend Sub RefreshRecordInfo()
+        If pRecordIndex > NumFeatures Then pRecordIndex = NumFeatures
         lblRecordInfo.Text = "Record " & pRecordIndex & " of " & NumFeatures
         Dim lImageLocation As String = FieldValue(CurrentLayer, pRecordIndex - 1, FieldIndex(CurrentLayer, cboFields.Text))
         txtValue.Text = lImageLocation
         pbxImage.ImageLocation = lImageLocation
+        ClearSelectedFeatures(CurrentLayer)
+        SetSelectedFeature(CurrentLayer, pRecordIndex - 1)
     End Sub
 
     Private Sub btnPrev_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPrev.Click
@@ -50,5 +59,34 @@ Public Class frmFileGeoReference
 
     Private Sub txtValue_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtValue.MouseClick
         'TODO:select an image file here
+    End Sub
+
+    Private Sub cboFields_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboFields.SelectedIndexChanged
+        RefreshRecordInfo()
+    End Sub
+
+    Private Sub btnAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAdd.Click
+        pbxImage.Visible = False
+        lblStatus.Text = "Click at the Point on the Map associated with the new Item, RightClick anywhere to Cancel"
+        lblStatus.Visible = True
+        pAddingPoint = True
+        While pAddingPoint
+            System.Windows.Forms.Application.DoEvents()
+        End While
+        lblStatus.Visible = False
+        pbxImage.Visible = True
+    End Sub
+
+    Friend Property AddingPoint() As Boolean
+        Get
+            Return pAddingPoint
+        End Get
+        Set(ByVal value As Boolean)
+            pAddingPoint = value
+        End Set
+    End Property
+
+    Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
+        Logger.Msg("Not Yet Implemented")
     End Sub
 End Class
