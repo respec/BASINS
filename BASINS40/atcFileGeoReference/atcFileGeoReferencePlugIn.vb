@@ -22,7 +22,8 @@ Public Class atcFileGeoReferencePlugIn
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                     ByVal aParentHandle As Integer)
         pMapWin = aMapWin
-        'TODO: make this consitant, be sure remove handled appropriatey
+        MappingObject = aMapWin
+        'TODO: make this consistent, be sure remove handled correctly
         pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
         pMapWin.Menus.AddMenu(FullMenuName, ParentMenuName, Nothing, "File Geo Reference")
         MyBase.Initialize(aMapWin, aParentHandle)

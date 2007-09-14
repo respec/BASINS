@@ -4,6 +4,7 @@ Imports atcMwGisUtility.GisUtil
 Public Class frmFileGeoReference
     Private pRecordIndex As Integer = 1
     Private pAddingPoint As Boolean = False
+    Private pRandom As New Random
 
     Private Sub cboLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLayer.SelectedIndexChanged
         Dim lCbo As System.Windows.Forms.ComboBox = sender
@@ -103,6 +104,7 @@ Public Class frmFileGeoReference
             System.Windows.Forms.Application.DoEvents()
         End While
         lblStatus.Visible = False
+        lblStatus.Text = ""
         pbxImage.Visible = True
         RefreshRecordInfo()
     End Sub
@@ -121,4 +123,54 @@ Public Class frmFileGeoReference
         RemoveFeature(CurrentLayer, pRecordIndex - 1)
         RefreshRecordInfo()
     End Sub
+
+    Private Sub pbxImage_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles pbxImage.DoubleClick
+        Dim lExif As New ExifWorks(txtValue.Text)
+        MsgBox(lExif.ToString, MsgBoxStyle.OkOnly, "Image Metadata")
+    End Sub
+
+    Private Sub Form_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop, pbxImage.DragDrop
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            Dim MyFiles() As String
+            MyFiles = e.Data.GetData(Windows.Forms.DataFormats.FileDrop)
+            For Each lFilename As String In MyFiles
+                Dim lY As Double = 0
+                Dim lX As Double = 0
+                txtValue.Text = lFilename
+                'TODO: handle non images
+                Try
+                    pbxImage.ImageLocation = lFilename
+                    Dim lExif As New ExifWorks(lFilename)
+                    If lExif.IsPropertyDefined(ExifWorks.TagNames.GpsLatitude) Then
+                        'Place new point at given lat/long from image
+                        lY = lExif.GetPropertyFormatted(ExifWorks.TagNames.GpsLatitude)
+                        lX = lExif.GetPropertyFormatted(ExifWorks.TagNames.GpsLongitude)
+                        'TODO: Project Lat/Lon to current projection
+                    End If
+                Catch ex As Exception
+                    Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
+                End Try
+
+                If lX = 0 OrElse lY = 0 Then
+                    'Place near center of current layer
+                    Dim lXMax, lXMin, lYMax, lYMin As Double
+                    atcMwGisUtility.GisUtil.ExtentsOfLayer(CurrentLayer, lXMax, lXMin, lYMax, lYMin)
+                    lX = lXMin + (lXMax - lXMin) * (0.4 + pRandom.NextDouble / 10)
+                    lY = lYMin + (lYMax - lYMin) * (0.4 + pRandom.NextDouble / 10)
+                End If
+                AddPoint(CurrentLayer, lX, lY)                
+                'TODO: set file name (and maybe other fields) in shape DBF in new row
+            Next
+        End If
+    End Sub
+
+    Private Sub Form_DragEnter( _
+        ByVal sender As Object, ByVal e As Windows.Forms.DragEventArgs) _
+        Handles Me.DragEnter, pbxImage.DragEnter
+
+        If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            e.Effect = Windows.Forms.DragDropEffects.All
+        End If
+    End Sub
+
 End Class
