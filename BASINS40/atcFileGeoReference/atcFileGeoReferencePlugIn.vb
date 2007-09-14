@@ -1,5 +1,5 @@
 Imports atcdata
-Imports atcMwGisUtility
+Imports atcMwGisUtility.GisUtil
 
 Public Class atcFileGeoReferencePlugIn
     Inherits atcData.atcDataPlugIn
@@ -114,7 +114,7 @@ Public Class atcFileGeoReferencePlugIn
                 Dim lPx As Double
                 Dim lPy As Double
                 pMapWin.View.PixelToProj(x, y, lPx, lPy)
-                GisUtil.AddPoint(GisUtil.CurrentLayer, lPx, lPy)
+                AddPoint(CurrentLayer, lPx, lPy)
                 Handled = True
             End If
             pForm.AddingPoint = False

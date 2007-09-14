@@ -35,12 +35,21 @@ Public Class frmFileGeoReference
 
     Friend Sub RefreshRecordInfo()
         If pRecordIndex > NumFeatures Then pRecordIndex = NumFeatures
-        lblRecordInfo.Text = "Record " & pRecordIndex & " of " & NumFeatures
-        Dim lImageLocation As String = FieldValue(CurrentLayer, pRecordIndex - 1, FieldIndex(CurrentLayer, cboFields.Text))
-        txtValue.Text = lImageLocation
-        pbxImage.ImageLocation = lImageLocation
-        ClearSelectedFeatures(CurrentLayer)
-        SetSelectedFeature(CurrentLayer, pRecordIndex - 1)
+        If NumFeatures = 0 Then
+            lblRecordInfo.Text = "No Records Available"
+        Else
+            lblRecordInfo.Text = "Record " & pRecordIndex & " of " & NumFeatures
+            Dim lImageLocation As String = FieldValue(CurrentLayer, pRecordIndex - 1, FieldIndex(CurrentLayer, cboFields.Text))
+            If lImageLocation.Length = 0 Then
+                lblStatus.Text = "Click in the Value text box to specify the file location"
+            Else
+                txtValue.Text = lImageLocation
+                'TODO: handle non images
+                pbxImage.ImageLocation = lImageLocation
+            End If
+            ClearSelectedFeatures(CurrentLayer)
+            SetSelectedFeature(CurrentLayer, pRecordIndex - 1)
+        End If
     End Sub
 
     Private Sub btnPrev_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPrev.Click
@@ -58,7 +67,27 @@ Public Class frmFileGeoReference
     End Sub
 
     Private Sub txtValue_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtValue.MouseClick
-        'TODO:select an image file here
+        Dim lOpenImageDialog As New System.Windows.Forms.OpenFileDialog
+        With lOpenImageDialog
+            .DefaultExt = ".jpg"
+            .CheckFileExists = True
+            .AddExtension = True
+            .Filter = "jpeg files (*.jpg)|*.jpg|All files (*.*)|*.*"
+            .FilterIndex = 1
+            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                SetFeatureValue(CurrentLayer, _
+                                FieldIndex(CurrentLayer, cboFields.Text), _
+                                pRecordIndex - 1, _
+                                "file://" & .FileName)
+                If IsField(CurrentLayer, "date") Then
+                    SetFeatureValue(CurrentLayer, _
+                    FieldIndex(CurrentLayer, "date"), _
+                    pRecordIndex - 1, _
+                    System.IO.File.GetCreationTime(.FileName))
+                End If
+                RefreshRecordInfo()
+            End If
+        End With
     End Sub
 
     Private Sub cboFields_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboFields.SelectedIndexChanged
@@ -75,6 +104,7 @@ Public Class frmFileGeoReference
         End While
         lblStatus.Visible = False
         pbxImage.Visible = True
+        RefreshRecordInfo()
     End Sub
 
     Friend Property AddingPoint() As Boolean
@@ -87,6 +117,8 @@ Public Class frmFileGeoReference
     End Property
 
     Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
-        Logger.Msg("Not Yet Implemented")
+        'TODO: resolve issues with deleting last record
+        RemoveFeature(CurrentLayer, pRecordIndex - 1)
+        RefreshRecordInfo()
     End Sub
 End Class
