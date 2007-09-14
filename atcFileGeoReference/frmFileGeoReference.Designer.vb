@@ -156,10 +156,10 @@ Partial Class frmFileGeoReference
         'lblStatus
         '
         Me.lblStatus.AutoSize = True
-        Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblStatus.Location = New System.Drawing.Point(25, 97)
         Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(74, 25)
+        Me.lblStatus.Size = New System.Drawing.Size(63, 20)
         Me.lblStatus.TabIndex = 12
         Me.lblStatus.Text = "Status"
         Me.lblStatus.Visible = False
