@@ -1321,6 +1321,7 @@ Public Class GisUtil
         Dim lStartRow As Integer
         Dim lEndRow As Integer
         Dim lVal As Integer
+        Dim lNearVal As Integer
         Dim totalcellcount As Integer
         Dim cellcount As Integer
         Dim lNeighborVal As Integer
@@ -1353,34 +1354,48 @@ Public Class GisUtil
                     lSubId = lPolygonSf.PointInShapefile(lXPos, lYPos)
                     If lSubId = aPolygonFeatureIndex Then 'this is in the polygon we want
                         lVal = lInputGrid.Value(lCol, lRow)
-                        lNeighborCount = 0
-                        lNeighborVal = 0
-                        'find neighboring elevations
-                        If lCol > 1 Then
-                            lNeighborVal = lNeighborVal + Math.Abs(lInputGrid.Value(lCol - 1, lRow) - lVal)
-                            lNeighborCount = lNeighborCount + 1
-                        End If
-                        If lCol < lInputGrid.Header.NumberCols Then
-                            lNeighborVal = lNeighborVal + Math.Abs(lInputGrid.Value(lCol + 1, lRow) - lVal)
-                            lNeighborCount = lNeighborCount + 1
-                        End If
-                        If lRow > 1 Then
-                            lNeighborVal = lNeighborVal + Math.Abs(lInputGrid.Value(lCol, lRow - 1) - lVal)
-                            lNeighborCount = lNeighborCount + 1
-                        End If
-                        If lRow < lInputGrid.Header.NumberRows Then
-                            lNeighborVal = lNeighborVal + Math.Abs(lInputGrid.Value(lCol, lRow + 1) - lVal)
-                            lNeighborCount = lNeighborCount + 1
-                        End If
-                        'find average difference in neighboring elevation
-                        If lNeighborCount > 0 Then
-                            lNeighborVal = lNeighborVal / lNeighborCount
-                        Else
+                        If lVal > -20000000 Then 'screen out the null values
+                            lNeighborCount = 0
                             lNeighborVal = 0
+                            'find neighboring elevations
+                            If lCol > 1 Then
+                                lNearVal = lInputGrid.Value(lCol - 1, lRow)
+                                If lNearVal > -20000000 Then
+                                    lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
+                                    lNeighborCount = lNeighborCount + 1
+                                End If
+                            End If
+                            If lCol < lInputGrid.Header.NumberCols Then
+                                lNearVal = lInputGrid.Value(lCol + 1, lRow)
+                                If lNearVal > -20000000 Then
+                                    lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
+                                    lNeighborCount = lNeighborCount + 1
+                                End If
+                            End If
+                            If lRow > 1 Then
+                                lNearVal = lInputGrid.Value(lCol, lRow - 1)
+                                If lNearVal > -20000000 Then
+                                    lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
+                                    lNeighborCount = lNeighborCount + 1
+                                End If
+                            End If
+                            If lRow < lInputGrid.Header.NumberRows Then
+                                lNearVal = lInputGrid.Value(lCol, lRow + 1)
+                                If lNearVal > -20000000 Then
+                                    lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
+                                    lNeighborCount = lNeighborCount + 1
+                                End If
+                            End If
+                            'find average difference in neighboring elevation
+                            If lNeighborCount > 0 Then
+                                lNeighborVal = lNeighborVal / lNeighborCount
+                            Else
+                                lNeighborVal = 0
+                            End If
+                            'sum the elev diff for each cell in polygon
+                            lSum = lSum + lNeighborVal
+                            lSubCellCount = lSubCellCount + 1
                         End If
-                        'sum the elev diff for each cell in polygon
-                        lSum = lSum + lNeighborVal
-                        lSubCellCount = lSubCellCount + 1
                     End If
                     cellcount = cellcount + 1
                     Logger.Progress(cellcount, totalcellcount)
