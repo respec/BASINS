@@ -525,10 +525,21 @@ CaseExistRenumber:
 
         DsnWriteAttribute = True
 
+        'TODO: integrate aliases lists here and in atcDataAttributes and atcMsgWDM
         Select Case (lName.ToLower)
             'Case "units"   'store Units ID as DCODE in WDM
             '    lName = "DCODE"
             '    lValue = CStr(GetUnitID(lValue))
+            Case "latitude" : lName = "latdeg"
+            Case "longitude" : lName = "lngdeg"
+            Case "skew" : lName = "skewcf"
+            Case "standard deviation" : lName = "stddev"
+            Case "mean" : lName = "meanvl"
+            Case "min" : lName = "minval"
+            Case "max" : lName = "maxval"
+            Case "count positive" : lName = "nonzro"
+            Case "count zero" : lName = "numzro"
+
             Case "time unit" : lName = "tcode"
             Case "time step" : lName = "tsstep"
             Case "time step" : lName = "tsstep"
@@ -536,10 +547,10 @@ CaseExistRenumber:
             Case "location" : lName = "idlocn"
             Case "constituent" : lName = "idcons"
             Case "description" : lName = "descrp"
-            Case "date created"
+            Case "date created", "datcre"
                 lName = "datcre"
                 lValue = DateToyyyyMMddHHmmss(lValue)
-            Case "date modified"
+            Case "date modified", "datmod"
                 lName = "datmod"
                 lValue = DateToyyyyMMddHHmmss(lValue)
         End Select
@@ -763,12 +774,27 @@ CaseExistRenumber:
                         lS = AttrVal2String(lSaind, lSaval)
                         Select Case UCase(lName)
                             Case "DATCRE", "DATMOD", "DATE CREATED", "DATE MODIFIED"
-                                lDate = New Date(CInt(lS.Substring(0, 4)), _
-                                                 CInt(lS.Substring(4, 2)), _
-                                                 CInt(lS.Substring(6, 2)), _
-                                                 CInt(lS.Substring(8, 2)), _
-                                                 CInt(lS.Substring(10, 2)), _
-                                                 CInt(lS.Substring(12, 2)))
+                                If IsNumeric(lS.Substring(0, 4)) Then
+                                    Try 'Dates should be formatted YYYYMMDDhhmmss
+                                        lDate = New Date(CInt(lS.Substring(0, 4)), _
+                                                         CInt(lS.Substring(4, 2)), _
+                                                         CInt(lS.Substring(6, 2)), _
+                                                         CInt(lS.Substring(8, 2)), _
+                                                         CInt(lS.Substring(10, 2)), _
+                                                         CInt(lS.Substring(12, 2)))
+                                    Catch ex As Exception
+                                        GoTo ParseDate
+                                    End Try
+                                Else 'parse dates written as M/D/YYYY h:mm:ss (truncated to 14 characters)
+ParseDate:                          Logger.Dbg(lName & " text date '" & lS & "' - unknown whether AM or PM")
+                                    Dim lMonth As Integer = StrFirstInt(lS)
+                                    lS = lS.Substring(1)
+                                    Dim lDay As Integer = StrFirstInt(lS)
+                                    lS = lS.Substring(1)
+                                    Dim lYear As Integer = StrFirstInt(lS)
+                                    lDate = New Date(lYear, lMonth, lDay, 12, 0, 0)
+                                    Logger.Dbg(lName & "parsed as '" & lDate.ToString & "' rounded to noon")
+                                End If
                                 lData.Attributes.SetValue(pMsg.Attributes.Item(lSaind), lDate)
                             Case "DCODE"
                                 'lData.Attributes.SetValue(UnitsAttributeDefinition(True), GetUnitName(CInt(lS)))
