@@ -817,12 +817,12 @@ Public Class GisUtil
         End If
     End Function
 
-    Public Shared Function AddPoint(ByVal aLayerIndex As Integer, ByVal aX As Double, ByVal ay As Double) As Boolean
+    Public Shared Function AddPoint(ByVal aLayerIndex As Integer, ByVal aX As Double, ByVal aY As Double) As Boolean
         Dim lResult As Boolean
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         Dim lPoint As New MapWinGIS.Point
         lPoint.x = aX
-        lPoint.y = ay
+        lPoint.y = aY
         Dim lShape As New MapWinGIS.Shape
         lResult = lShape.Create(MapWinGIS.ShpfileType.SHP_POINT)
         lResult = lShape.InsertPoint(lPoint, 0)
@@ -998,6 +998,28 @@ Public Class GisUtil
             Return GetMappingObject.Project.FileName
         End Get
     End Property
+
+    ''' <summary>
+    ''' Projection string describing the current map projection for the open project
+    ''' </summary>
+    ''' <returns>PROJ 4 string</returns>
+    ''' <exception cref="MappingObjectNotSetException">Mapping Object Not Set</exception>
+    Public Shared Function ProjectProjection() As String
+        Return GetMappingObject.Project.ProjectProjection
+    End Function
+
+    ''' <summary>
+    ''' Changes aX and aY arguments from aInputProjection to aOutputProjection
+    ''' </summary>
+    ''' <param name="aX">X or longitude value (input and output)</param>
+    ''' <param name="aY">Y or latitude value (input and output)</param>
+    ''' <param name="aInputProjection">PROJ 4 string describing projection of aX and aY as they are passed in</param>
+    ''' <param name="aOutputProjection">PROJ 4 string describing new projection of aX and aY as they are passed back</param>
+    Public Shared Sub ProjectPoint(ByRef aX As Double, ByRef aY As Double, _
+                                   ByVal aInputProjection As String, _
+                                   ByVal aOutputProjection As String)
+        MapWinGeoProc.SpatialReference.ProjectPoint(aX, aY, aInputProjection, aOutputProjection)
+    End Sub
 
     Public Shared Function PointInPolygon(ByVal aPointLayerIndex As Integer, ByVal aPointIndex As Integer, ByVal aPolygonLayerIndex As Integer) As Integer
         'given a point and a polygon layer, return the polygon this point is in
