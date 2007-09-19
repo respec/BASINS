@@ -433,13 +433,14 @@ Public Class ExifWorks
     ''' <summary>
     ''' Initializes new instance of this class.
     ''' </summary>
-    ''' <param name="FileName">Name of file to be loaded</param>
+    ''' <param name="aFileName">Name of file to be loaded</param>
     ''' <remarks></remarks>
     ''' <history>
     ''' [altair] 13.06.2004 Created
     ''' </history>
-    Public Sub New(ByVal FileName As String)
-        Me._Image = DirectCast(System.Drawing.Bitmap.FromFile(FileName), System.Drawing.Bitmap)
+    Public Sub New(ByVal aFileName As String)
+        If aFileName.StartsWith("file://") Then aFileName = aFileName.Substring(7)
+        Me._Image = DirectCast(System.Drawing.Bitmap.FromFile(aFileName), System.Drawing.Bitmap)
     End Sub
 
     ''' <summary>
