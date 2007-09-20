@@ -347,8 +347,8 @@ Public Class frmFileGeoReference
                 lGeoExif = New ExifWorks(lGeocodedFilename)
             End If
             If lGeoExif.IsPropertyDefined(ExifWorks.TagNames.GpsLatitude) Then
-                lLatitude = lGeoExif.GetPropertyFormatted(ExifWorks.TagNames.GpsLatitude)
-                lLongitude = lGeoExif.GetPropertyFormatted(ExifWorks.TagNames.GpsLongitude)
+                lLatitude = lGeoExif.GpsLatitude
+                lLongitude = lGeoExif.GpsLongitude
                 lY = lLatitude
                 lX = lLongitude
                 ProjectPoint(lX, lY, pGeographicProjection, ProjectProjection)
@@ -380,8 +380,8 @@ Public Class frmFileGeoReference
                         lLatitude = lY
                         lLongitude = lX
                         Logger.Dbg("Setting EXIF GPS lon/lat = " & lLongitude & ", " & lLatitude)
-                        lExif.SetCoordinateGPS(ExifWorks.TagNames.GpsLatitude, lLatitude)
-                        lExif.SetCoordinateGPS(ExifWorks.TagNames.GpsLongitude, lLongitude)
+                        lExif.GpsLatitude = lLatitude
+                        lExif.GpsLongitude = lLongitude
                         Try
                             pBitmap.Save(lGeocodedFilename)
                             Logger.Dbg("Saved geocoded file '" & lGeocodedFilename & "'")

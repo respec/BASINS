@@ -800,6 +800,7 @@ Public Class GisUtil
             lSf.StartEditingShapes(True)
             Dim lRetc As Boolean = lSf.EditDeleteShape(aFeatureIndex)
             lSf.StopEditingShapes(True, True)
+            pMapWin.View.Redraw()
             'TODO: what is the return value
         End If
     End Function
@@ -829,11 +830,13 @@ Public Class GisUtil
         lResult = lSf.StartEditingShapes()
         lResult = lSf.EditInsertShape(lShape, lSf.NumShapes)
         lResult = lSf.StopEditingShapes
+        pMapWin.View.Redraw()
     End Function
 
     Public Shared Sub StopRemoveFeature(ByVal aLayerIndex As Integer)
         Dim lSf As MapWinGIS.Shapefile = ShapeFileFromIndex(aLayerIndex)
         lSf.StopEditingShapes(True, True)
+        pMapWin.View.Redraw()
     End Sub
 
     ''' <summary>Set value of a field in a feature in a ShapeFile</summary>

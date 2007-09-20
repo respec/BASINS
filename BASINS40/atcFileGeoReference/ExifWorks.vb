@@ -1015,10 +1015,26 @@ Public Class ExifWorks
     ''' </history>
     Public Property GpsLatitude() As Double
         Get
-
+            Return GetCoordinateGPS(TagNames.GpsLatitude)
         End Get
         Set(ByVal value As Double)
+            SetCoordinateGPS(TagNames.GpsLatitude, value)
+        End Set
+    End Property
 
+    ''' <summary>
+    ''' GPS Longitude
+    ''' </summary>
+    ''' <remarks>If not specified, returns Double.NaN.</remarks>
+    ''' <history>
+    ''' [vatavian] 13 September 2007 Created
+    ''' </history>
+    Public Property GpsLongitude() As Double
+        Get
+            Return GetCoordinateGPS(TagNames.GpsLongitude)
+        End Get
+        Set(ByVal value As Double)
+            SetCoordinateGPS(TagNames.GpsLongitude, value)
         End Set
     End Property
 
@@ -1234,7 +1250,7 @@ Public Class ExifWorks
         End If
     End Function
 
-    Public Function GetCoordinateGPS(ByVal PID As Int32) As Double
+    Public Function GetCoordinateGPS(ByVal PID As TagNames) As Double
         Dim pi As Drawing.Imaging.PropertyItem = Me._Image.GetPropertyItem(PID)
         If pi Is Nothing Then
             Return Double.NaN
@@ -1242,11 +1258,7 @@ Public Class ExifWorks
             Dim degrees As Double = BitConverter.ToInt32(pi.Value, 0) / BitConverter.ToInt32(pi.Value, 4)
             Dim minutes As Double = BitConverter.ToInt32(pi.Value, 8) / BitConverter.ToInt32(pi.Value, 12)
             Dim seconds As Double = BitConverter.ToInt32(pi.Value, 16) / BitConverter.ToInt32(pi.Value, 20)
-            If degrees < 0 Then
-                Return degrees - minutes / 60 - seconds / 3600
-            Else
-                Return degrees + minutes / 60 + seconds / 3600
-            End If
+            Return degrees + minutes / 60 + seconds / 3600
         End If
     End Function
 
@@ -1255,7 +1267,7 @@ Public Class ExifWorks
 
         'Subtract degrees to see how many fractional degrees are left
         'Absolute value because sign is preserved in the degrees field, minutes and seconds are always positive
-        Coordinate = Math.Abs(Coordinate - lDegrees)
+        Coordinate = Coordinate - lDegrees
 
         Dim lMinutes As Integer = CInt(Math.Floor(Coordinate * 60))
         Coordinate -= lMinutes / 60
