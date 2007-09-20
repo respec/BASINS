@@ -29,6 +29,13 @@ Public Class frmFileGeoReference
         If lSetSelectedIndex >= 0 Then
             cboLayer.SelectedIndex = lSetSelectedIndex
         End If
+        If NumSelectedFeatures(CurrentLayer) > 0 Then
+            pRecordIndex = IndexOfNthSelectedFeatureInLayer(0, CurrentLayer)
+        Else
+            pRecordIndex = 0
+            SetSelectedFeature(CurrentLayer, pRecordIndex)
+        End If
+        SetFormFromFields()
     End Sub
 
     Private Sub cboLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLayer.SelectedIndexChanged
@@ -135,8 +142,8 @@ Public Class frmFileGeoReference
     Private Sub btnPrev_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPrev.Click
         If pRecordIndex > 0 Then pRecordIndex -= 1
         ClearSelectedFeatures(CurrentLayer)
-        SetSelectedFeature(CurrentLayer, pRecordIndex - 1)
-        'RefreshRecordInfo()
+        SetSelectedFeature(CurrentLayer, pRecordIndex)
+        SetFormFromFields()
     End Sub
 
     Private Sub btnNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNext.Click
@@ -146,7 +153,7 @@ Public Class frmFileGeoReference
         End If
         ClearSelectedFeatures(CurrentLayer)
         SetSelectedFeature(CurrentLayer, pRecordIndex)
-        'RefreshRecordInfo()
+        SetFormFromFields()
     End Sub
 
     Private Sub UserSelectDocument()
@@ -187,9 +194,9 @@ Public Class frmFileGeoReference
             If lDate Is Nothing Then lDate = System.IO.File.GetCreationTime(aFilename).ToString
 
             SetFeatureValue(CurrentLayer, _
-            FieldIndex(CurrentLayer, "date"), _
-            pRecordIndex, _
-            lDate)
+                            FieldIndex(CurrentLayer, "date"), _
+                            pRecordIndex, _
+                            lDate)
         End If
     End Sub
 
@@ -305,16 +312,18 @@ Public Class frmFileGeoReference
     End Property
 
     Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
+        ClearSelectedFeatures(CurrentLayer)
         RemoveFeature(CurrentLayer, pRecordIndex)
         If pRecordIndex >= NumFeatures Then
             pRecordIndex = NumFeatures - 1
         End If
         SetFormFromFields()
+        SetSelectedFeature(CurrentLayer, pRecordIndex)
     End Sub
 
     Private Sub pbxImage_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles pbxImage.DoubleClick
         Dim lExif As New ExifWorks(txtLocation.Text)
-        MsgBox(lExif.ToString, MsgBoxStyle.OkOnly, "Image Metadata")
+        Logger.Msg(lExif.ToString, MsgBoxStyle.OkOnly, "Image Metadata")
     End Sub
 
     Private Sub AddFile(ByVal aFileName As String)
@@ -384,10 +393,11 @@ Public Class frmFileGeoReference
             End If
         End If
 
-            If NumFeatures > lSaveNumFeatures Then 'Added a shape
-                pRecordIndex = NumFeatures() - 1
-                SetFieldsFromDocument(aFileName)
-            End If
+        If NumFeatures > lSaveNumFeatures Then 'Added a shape
+            pRecordIndex = NumFeatures() - 1
+            SetFieldsFromDocument(aFileName)
+            SetSelectedFeature(CurrentLayer, pRecordIndex)
+        End If
     End Sub
 
     Private Sub Form_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop, pbxImage.DragDrop
