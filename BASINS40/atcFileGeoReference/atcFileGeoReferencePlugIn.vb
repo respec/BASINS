@@ -55,7 +55,7 @@ Public Class atcFileGeoReferencePlugIn
         If Not aSelectInfo Is Nothing Then
             Try
                 If Not pForm Is Nothing AndAlso Not pForm.AddingPoint Then
-                    pForm.RefreshRecordInfo(aSelectInfo(0).ShapeIndex + 1)
+                    pForm.RefreshRecordInfo(aSelectInfo(0).ShapeIndex)
                 End If
             Catch ex As System.Exception
                 MapWinUtility.Logger.Msg(ex.Message)

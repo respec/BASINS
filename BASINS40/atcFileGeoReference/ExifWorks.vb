@@ -1082,7 +1082,9 @@ Public Class ExifWorks
             Select Case PID
                 Case TagNames.GpsLatitude, TagNames.GpsLongitude
                     Dim lArray As Rational() = GetRationalArray(pi.Value)
-                    Dim lCoordinate As Double = lArray(0).Numerator + lArray(1).Numerator / 60.0 + lArray(2).ToDouble / 3600
+                    Dim lCoordinate As Double = lArray(0).ToDouble _
+                                              + lArray(1).ToDouble / 60.0 _
+                                              + lArray(2).ToDouble / 3600.0
                     Return lCoordinate.ToString
             End Select
 
@@ -1232,11 +1234,6 @@ Public Class ExifWorks
         End If
     End Function
 
-    Private Function GetBytes(ByVal d As Double) As Byte()
-        Dim u1 As UInt32 = Convert.ToUInt32(d)
-        Return BitConverter.GetBytes(u1)
-    End Function
-
     Public Function GetCoordinateGPS(ByVal PID As Int32) As Double
         Dim pi As Drawing.Imaging.PropertyItem = Me._Image.GetPropertyItem(PID)
         If pi Is Nothing Then
@@ -1245,30 +1242,42 @@ Public Class ExifWorks
             Dim degrees As Double = BitConverter.ToInt32(pi.Value, 0) / BitConverter.ToInt32(pi.Value, 4)
             Dim minutes As Double = BitConverter.ToInt32(pi.Value, 8) / BitConverter.ToInt32(pi.Value, 12)
             Dim seconds As Double = BitConverter.ToInt32(pi.Value, 16) / BitConverter.ToInt32(pi.Value, 20)
-            Return degrees + minutes / 60 + seconds / 3600
+            If degrees < 0 Then
+                Return degrees - minutes / 60 - seconds / 3600
+            Else
+                Return degrees + minutes / 60 + seconds / 3600
+            End If
         End If
     End Function
 
     Public Sub SetCoordinateGPS(ByVal PID As Int32, ByVal Coordinate As Double)
-        Dim d1 As Double = Math.Floor(Coordinate)
-        Dim d2 As Double = Math.Round((Coordinate - Math.Floor(Coordinate)) * 10000)
+        Dim lDegrees As Integer = CInt(Math.Floor(Coordinate))
+
+        'Subtract degrees to see how many fractional degrees are left
+        'Absolute value because sign is preserved in the degrees field, minutes and seconds are always positive
+        Coordinate = Math.Abs(Coordinate - lDegrees)
+
+        Dim lMinutes As Integer = CInt(Math.Floor(Coordinate * 60))
+        Coordinate -= lMinutes / 60
+
+        'seconds * 1000, we will put 1000 in the denominator to make it seconds
+        Dim lSeconds As Integer = CInt(Math.Round(Coordinate * 3600000))
+
         Dim Data() As Byte
-        ReDim Data(24)
-        GetBytes(d1).CopyTo(Data, 0)
-        GetBytes(1).CopyTo(Data, 4)
-        GetBytes(d2).CopyTo(Data, 8)
-        GetBytes(100).CopyTo(Data, 12)
-        GetBytes(0).CopyTo(Data, 16)
-        GetBytes(1).CopyTo(Data, 20)
+        ReDim Data(23)
+        BitConverter.GetBytes(lDegrees).CopyTo(Data, 0) : BitConverter.GetBytes(CInt(1)).CopyTo(Data, 4)
+        BitConverter.GetBytes(lMinutes).CopyTo(Data, 8) : BitConverter.GetBytes(CInt(1)).CopyTo(Data, 12)
+        BitConverter.GetBytes(lSeconds).CopyTo(Data, 16) : BitConverter.GetBytes(CInt(1000)).CopyTo(Data, 20)
+
         SetProperty(PID, Data, ExifDataTypes.UnsignedRational)
         If (PID = TagNames.GpsLongitude) Then
-            If (Coordinate >= 0) Then
+            If (lDegrees >= 0) Then
                 SetPropertyString(TagNames.GpsLongitudeRef, "E")
             Else
                 SetPropertyString(TagNames.GpsLongitudeRef, "W")
             End If
         Else
-            If (Coordinate >= 0) Then
+            If (lDegrees >= 0) Then
                 SetPropertyString(TagNames.GpsLatitudeRef, "N")
             Else
                 SetPropertyString(TagNames.GpsLatitudeRef, "S")
