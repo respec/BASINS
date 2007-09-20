@@ -2,28 +2,69 @@ Imports MapWinUtility
 Imports atcMwGisUtility.GisUtil
 
 Public Class frmFileGeoReference
-    Private pRecordIndex As Integer = 1
+    Private pRecordIndex As Integer = 0 'zero-based index of current record in georef layer
     Private pAddingPoint As Boolean = False
     Private pAddingFiles As Boolean = False
-    Private pInSelectedIndexChanged As Boolean = False
 
     Private pRandomPlacement As Boolean = False
     Private pRandom As New Random
 
+    Private pBitmap As Drawing.Bitmap
+
     Private Const pGeographicProjection As String = "+proj=longlat +datum=NAD83"
 
     Public Sub PopulateLayers(Optional ByVal aCurrentLayerName As String = "photo")
+        Dim lSetSelectedIndex As Integer = -1
         cboLayer.Items.Clear()
         For lLayerIndex As Integer = 0 To NumLayers - 1
             If LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.PointShapefile Then
                 Dim lLayerName As String = LayerName(lLayerIndex)
                 cboLayer.Items.Add(lLayerName)
-                If lLayerName.Equals(aCurrentLayerName) OrElse InStr(lLayerName.ToLower, "photo") Then
-                    cboLayer.SelectedIndex = cboLayer.Items.Count - 1
+                If lLayerName.ToLower.Equals(aCurrentLayerName.ToLower) OrElse InStr(lLayerName.ToLower, "photo") Then
+                    lSetSelectedIndex = cboLayer.Items.Count - 1
                 End If
             End If
         Next
         cboLayer.Items.Add("Create new layer...")
+        If lSetSelectedIndex >= 0 Then
+            cboLayer.SelectedIndex = lSetSelectedIndex
+        End If
+    End Sub
+
+    Private Sub cboLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLayer.SelectedIndexChanged
+        Dim lCbo As System.Windows.Forms.ComboBox = sender
+        If lCbo.SelectedIndex = lCbo.Items.Count - 1 Then
+            CreateNewGeoRefLayer() 'This causes a new call to this routine with the new index
+        Else
+            Dim lLayerIndex As Integer = LayerIndex(lCbo.Items(lCbo.SelectedIndex).ToString)
+
+            If lLayerIndex >= 0 Then 'have a selected layer to make current
+                CurrentLayer = lLayerIndex
+                LayerVisible = True
+                With cboFields
+                    .SelectedIndex = -1
+                    .Items.Clear()
+                    .Text = ""
+                    Dim lFieldName As String
+                    For lFieldIndex As Integer = 0 To NumFields - 1
+                        If FieldType(lFieldIndex) = MapWinGIS.FieldType.STRING_FIELD Then
+                            lFieldName = FieldName(lFieldIndex, lLayerIndex)
+                            .Items.Add(lFieldName)
+                            If lFieldName.ToLower.Equals("file") Then
+                                .SelectedIndex = .Items.Count - 1
+                            End If
+                        End If
+                    Next
+                    If .Items.Count > 0 Then
+                        If .SelectedIndex < 0 Then .SelectedIndex = 0 'Default to first field
+                    Else
+                        Logger.Msg("No Fields Available for Links")
+                    End If
+                    pRecordIndex = 0
+                    SetFormFromFields()
+                End With
+            End If
+        End If
     End Sub
 
     ''' <summary>Create a New GeoReferencing Point Shape Layer</summary>
@@ -35,7 +76,7 @@ Public Class frmFileGeoReference
             .AddExtension = True
             .Filter = "Shape files (*.shp)|*.shp|All files (*.*)|*.*"
             .FilterIndex = 0
-            .FileName = txtValue.Text
+            .FileName = txtLocation.Text
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
                 Dim lLayerCaption As String = IO.Path.GetFileNameWithoutExtension(.FileName)
 
@@ -60,54 +101,13 @@ Public Class frmFileGeoReference
 
                 lNewLayer = Nothing
 
-                AddLayer(.FileName, lLayerCaption)                
-                PopulateLayers(lLayerCaption) 'This causes a new call to this routine
+                AddLayer(.FileName, lLayerCaption)
+                PopulateLayers(lLayerCaption)
                 Return LayerIndex(lLayerCaption)
             End If
         End With
         Return -1
     End Function
-
-    Private Sub cboLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLayer.SelectedIndexChanged
-        If Not pInSelectedIndexChanged Then
-            pInSelectedIndexChanged = True
-            Dim lCbo As System.Windows.Forms.ComboBox = sender
-            Dim lLayerIndex As Integer = -1
-            If lCbo.SelectedIndex = lCbo.Items.Count - 1 Then
-                lLayerIndex = CreateNewGeoRefLayer()
-            Else
-                lLayerIndex = LayerIndex(lCbo.Items(lCbo.SelectedIndex).ToString)
-            End If
-
-            If lLayerIndex >= 0 Then 'have a selected layer to make current
-                CurrentLayer = lLayerIndex
-                LayerVisible = True
-                With cboFields
-                    .SelectedIndex = -1
-                    .Items.Clear()
-                    .Text = ""
-                    Dim lFieldName As String
-                    For lFieldIndex As Integer = 0 To NumFields - 1
-                        If FieldType(lFieldIndex) = MapWinGIS.FieldType.STRING_FIELD Then
-                            lFieldName = FieldName(lFieldIndex, lLayerIndex)
-                            .Items.Add(lFieldName)
-                            If lFieldName.ToLower.Equals("file") Then
-                                .SelectedIndex = .Items.Count - 1
-                            End If
-                        End If
-                    Next
-                    If .Items.Count > 0 Then
-                        If .SelectedIndex < 0 Then .SelectedIndex = 0 'Default to first field
-                    Else
-                        Logger.Msg("No Fields Available for Links")
-                    End If
-                    pRecordIndex = 1
-                    RefreshRecordInfo()
-                End With
-            End If
-            pInSelectedIndexChanged = False
-        End If
-    End Sub
 
     Private Function NewField(ByVal aFieldName As String, _
                      Optional ByVal aType As MapWinGIS.FieldType = MapWinGIS.FieldType.STRING_FIELD, _
@@ -129,58 +129,24 @@ Public Class frmFileGeoReference
 
     Friend Sub RefreshRecordInfo(ByVal aRecordIndex As Integer)
         pRecordIndex = aRecordIndex
-        RefreshRecordInfo()
-    End Sub
-
-    Friend Sub RefreshRecordInfo()
-        If Not pAddingFiles Then
-            If pRecordIndex > NumFeatures Then pRecordIndex = NumFeatures
-            If NumFeatures = 0 Then
-                lblRecordInfo.Text = "No Records Available"
-                pbxImage.Visible = False
-            Else
-                lblRecordInfo.Text = "Record " & pRecordIndex & " of " & NumFeatures
-                Dim lImageLocation As String = FieldValue(CurrentLayer, pRecordIndex - 1, FieldIndex(CurrentLayer, cboFields.Text))
-
-                'If lFileOrURL.Length > 0 Then
-                '    MapWinUtility.Logger.Dbg("FileGeoReference: Launch File or URL: " & lFileOrURL)
-                '    Dim lNewProcess As New Process
-                '    lNewProcess.StartInfo.FileName = lFileOrURL
-                '    lNewProcess.Start()
-                'End If
-
-                If lImageLocation.Length = 0 Then
-                    lblStatus.Text = "Click in the Value text box to specify the file location"
-                    lblStatus.Visible = True
-                Else
-                    lblStatus.Visible = False
-                    txtValue.Text = lImageLocation
-                    'TODO: handle non images
-                    pbxImage.ImageLocation = lImageLocation
-                    pbxImage.Visible = True
-                End If
-                If IsField(CurrentLayer, "date") Then
-                    txtDate.Text = FieldValue(CurrentLayer, pRecordIndex - 1, FieldIndex(CurrentLayer, "date"))
-                    lblDate.Visible = True
-                    txtDate.Visible = True
-                Else
-                    lblDate.Visible = False
-                    txtDate.Visible = False
-                End If
-                ClearSelectedFeatures(CurrentLayer)
-                SetSelectedFeature(CurrentLayer, pRecordIndex - 1)
-            End If
-        End If
+        SetFormFromFields()
     End Sub
 
     Private Sub btnPrev_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPrev.Click
-        If pRecordIndex > 1 Then pRecordIndex -= 1
-        RefreshRecordInfo()
+        If pRecordIndex > 0 Then pRecordIndex -= 1
+        ClearSelectedFeatures(CurrentLayer)
+        SetSelectedFeature(CurrentLayer, pRecordIndex - 1)
+        'RefreshRecordInfo()
     End Sub
 
     Private Sub btnNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNext.Click
-        If pRecordIndex < NumFeatures Then pRecordIndex += 1
-        RefreshRecordInfo()
+        pRecordIndex += 1
+        If pRecordIndex >= NumFeatures Then
+            pRecordIndex = NumFeatures - 1
+        End If
+        ClearSelectedFeatures(CurrentLayer)
+        SetSelectedFeature(CurrentLayer, pRecordIndex)
+        'RefreshRecordInfo()
     End Sub
 
     Private Sub UserSelectDocument()
@@ -191,8 +157,9 @@ Public Class frmFileGeoReference
             .AddExtension = True
             .Filter = "jpeg files (*.jpg)|*.jpg|All files (*.*)|*.*"
             .FilterIndex = 1
-            .FileName = txtValue.Text
+            .FileName = txtLocation.Text
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                SetFormFromDocument(.FileName)
                 SetFieldsFromDocument(.FileName)
             End If
         End With
@@ -201,16 +168,16 @@ Public Class frmFileGeoReference
     Private Sub SetFieldsFromDocument(ByVal aFilename As String)
         SetFeatureValue(CurrentLayer, _
                         FieldIndex(CurrentLayer, cboFields.Text), _
-                        pRecordIndex - 1, _
+                        pRecordIndex, _
                         "file://" & aFilename)
 
         If IsField(CurrentLayer, "date") Then
             Dim lDate As String = Nothing
 
             Try
-                Dim lExif As New ExifWorks(aFilename)
-                If lExif.IsPropertyDefined(ExifWorks.TagNames.DateTime) Then
-                    lDate = lExif.GetPropertyFormatted(ExifWorks.TagNames.DateTime)
+                Dim lExif As New ExifWorks(pBitmap)
+                If lExif.IsPropertyDefined(ExifWorks.TagNames.ExifDTOrig) Then
+                    lDate = lExif.DateTimeOriginal().ToString
                     Logger.Dbg("Read date from EXIF: " & lDate)
                 End If
             Catch ex As Exception
@@ -221,19 +188,88 @@ Public Class frmFileGeoReference
 
             SetFeatureValue(CurrentLayer, _
             FieldIndex(CurrentLayer, "date"), _
-            pRecordIndex - 1, _
+            pRecordIndex, _
             lDate)
         End If
-
-        RefreshRecordInfo()
     End Sub
 
-    Private Sub txtValue_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtValue.MouseClick
+    Friend Sub SetFormFromDocument(ByVal aFilename As String)
+        txtLocation.Text = aFilename
+        If aFilename.Length = 0 Then
+            lblStatus.Text = "Click in the Value text box to specify the file location"
+            lblStatus.Visible = True
+            pbxImage.Visible = False
+        ElseIf Not IO.File.Exists(aFilename) Then
+            lblStatus.Text = "File not found"
+            lblStatus.Visible = True
+            pbxImage.Visible = False
+        Else
+            lblStatus.Visible = False
+            pBitmap = DirectCast(System.Drawing.Bitmap.FromFile(aFilename), System.Drawing.Bitmap)
+            pbxImage.Image = pBitmap
+            pbxImage.Visible = True
+            Me.Refresh()
+
+            If txtDate.Text.Length = 0 Then
+                txtDate.Text = IO.File.GetCreationTime(aFilename).ToString
+            End If
+
+            'TODO: handle non images
+            'If lFileOrURL.Length > 0 Then
+            '    MapWinUtility.Logger.Dbg("FileGeoReference: Launch File or URL: " & lFileOrURL)
+            '    Dim lNewProcess As New Process
+            '    lNewProcess.StartInfo.FileName = lFileOrURL
+            '    lNewProcess.Start()
+            'End If
+        End If
+
+    End Sub
+
+    Friend Sub SetFormFromFields()
+        If Not pAddingFiles Then
+            If NumFeatures < 1 Then
+                lblRecordInfo.Text = "No Records"
+                lblDate.Visible = False
+                txtDate.Visible = False
+                pbxImage.Visible = False
+                pRecordIndex = 0
+            Else
+                If pRecordIndex >= NumFeatures Then pRecordIndex = NumFeatures - 1
+                lblRecordInfo.Text = "Record " & pRecordIndex + 1 & " of " & NumFeatures
+
+                If IsField(CurrentLayer, "date") Then
+                    txtDate.Text = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, "date"))
+                Else
+                    txtDate.Text = ""
+                End If
+
+                If IsField(CurrentLayer, cboFields.Text) Then
+                    Dim lFilename As String = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, cboFields.Text))
+                    If lFilename.StartsWith("file://") Then lFilename = lFilename.Substring(7)
+                    SetFormFromDocument(lFilename)
+                Else
+                    lblStatus.Text = "Select a field containing documents"
+                    lblStatus.Visible = True
+                    pbxImage.Visible = False
+                End If
+
+                If txtDate.Text.Length > 0 Then
+                    lblDate.Visible = True
+                    txtDate.Visible = True
+                Else
+                    lblDate.Visible = False
+                    txtDate.Visible = False
+                End If
+            End If
+        End If
+    End Sub
+
+    Private Sub txtValue_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtLocation.MouseClick
         UserSelectDocument()
     End Sub
 
     Private Sub cboFields_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboFields.SelectedIndexChanged
-        RefreshRecordInfo()
+        SetFormFromFields()
     End Sub
 
     Private Sub btnAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAdd.Click
@@ -252,7 +288,7 @@ Public Class frmFileGeoReference
         While pAddingPoint
             System.Windows.Forms.Application.DoEvents()
         End While
-        RefreshRecordInfo()
+        SetFormFromFields()
         Return (NumFeatures > lSaveNumFeatures) 'True if feature was added
     End Function
 
@@ -269,17 +305,20 @@ Public Class frmFileGeoReference
     End Property
 
     Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
-        'TODO: resolve issues with deleting last record
-        RemoveFeature(CurrentLayer, pRecordIndex - 1)
-        RefreshRecordInfo()
+        RemoveFeature(CurrentLayer, pRecordIndex)
+        If pRecordIndex >= NumFeatures Then
+            pRecordIndex = NumFeatures - 1
+        End If
+        SetFormFromFields()
     End Sub
 
     Private Sub pbxImage_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles pbxImage.DoubleClick
-        Dim lExif As New ExifWorks(txtValue.Text)
+        Dim lExif As New ExifWorks(txtLocation.Text)
         MsgBox(lExif.ToString, MsgBoxStyle.OkOnly, "Image Metadata")
     End Sub
 
     Private Sub AddFile(ByVal aFileName As String)
+        Dim lGeocodedFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(aFileName), IO.Path.GetFileNameWithoutExtension(aFileName) & ".geo" & IO.Path.GetExtension(aFileName))
         Dim lExif As ExifWorks = Nothing
         Dim lSaveNumFeatures As Integer = NumFeatures
         Logger.Dbg("Adding file '" & aFileName & "'")
@@ -288,18 +327,19 @@ Public Class frmFileGeoReference
         Dim lLatitude As String = Nothing
         Dim lLongitude As String = Nothing
         Dim lDate As String = Nothing
-        txtValue.Text = aFileName
+        txtLocation.Text = aFileName
 
-        Try
-            pbxImage.ImageLocation = aFileName
-            pbxImage.Refresh()
+        SetFormFromDocument(aFileName)
 
-            'get lat/lon from EXIF tags inside image document
-            lExif = New ExifWorks(pbxImage.Image)
-            If lExif.IsPropertyDefined(ExifWorks.TagNames.GpsLatitude) Then
-                'Place new point at given lat/long from image
-                lLatitude = lExif.GetPropertyFormatted(ExifWorks.TagNames.GpsLatitude)
-                lLongitude = lExif.GetPropertyFormatted(ExifWorks.TagNames.GpsLongitude)
+        Try 'get lat/lon from EXIF tags inside image document
+            lExif = New ExifWorks(pBitmap)
+            Dim lGeoExif As ExifWorks = lExif
+            If Not lExif.IsPropertyDefined(ExifWorks.TagNames.GpsLatitude) AndAlso FileExists(lGeocodedFilename) Then
+                lGeoExif = New ExifWorks(lGeocodedFilename)
+            End If
+            If lGeoExif.IsPropertyDefined(ExifWorks.TagNames.GpsLatitude) Then
+                lLatitude = lGeoExif.GetPropertyFormatted(ExifWorks.TagNames.GpsLatitude)
+                lLongitude = lGeoExif.GetPropertyFormatted(ExifWorks.TagNames.GpsLongitude)
                 lY = lLatitude
                 lX = lLongitude
                 ProjectPoint(lX, lY, pGeographicProjection, ProjectProjection)
@@ -319,29 +359,35 @@ Public Class frmFileGeoReference
                 Dim lYMin As Double = MapExtentYmin
                 lX = lXMin + (lXMax - lXMin) * (0.4 + pRandom.NextDouble / 10)
                 lY = lYMin + (lYMax - lYMin) * (0.4 + pRandom.NextDouble / 10)
-                If AddPoint(CurrentLayer, lX, lY) Then
-                    pRecordIndex = NumFeatures() - 1
-                End If
+                AddPoint(CurrentLayer, lX, lY)
             Else 'Ask user to click to place point
                 If UserAddPoint() Then
-                    pRecordIndex = NumFeatures() - 1
-                    PointXY(CurrentLayer, pRecordIndex, lX, lY)
-                    If Not ProjectProjection.Equals(pGeographicProjection) Then
-                        ProjectPoint(lX, lY, ProjectProjection, pGeographicProjection)
-                    End If
-                    If Not lExif Is Nothing Then
-                        lExif.SetCoordinateGPS(ExifWorks.TagNames.GpsLatitude, lY)
-                        lExif.SetCoordinateGPS(ExifWorks.TagNames.GpsLongitude, lX)
-                        pbxImage.Image.Save(aFileName)
-
+                    If Not lExif Is Nothing Then 'Set lat/lon in image to newly geocoded point
+                        PointXY(CurrentLayer, pRecordIndex, lX, lY)
+                        If Not ProjectProjection.Equals(pGeographicProjection) Then
+                            Logger.Dbg("Projecting new point from (" & lX & ", " & lY & ") in '" & ProjectProjection() & "' to '" & pGeographicProjection & "'")
+                            ProjectPoint(lX, lY, ProjectProjection, pGeographicProjection)
+                        End If
+                        lLatitude = lY
+                        lLongitude = lX
+                        Logger.Dbg("Setting EXIF GPS lon/lat = " & lLongitude & ", " & lLatitude)
+                        lExif.SetCoordinateGPS(ExifWorks.TagNames.GpsLatitude, lLatitude)
+                        lExif.SetCoordinateGPS(ExifWorks.TagNames.GpsLongitude, lLongitude)
+                        Try
+                            pBitmap.Save(lGeocodedFilename)
+                            Logger.Dbg("Saved geocoded file '" & lGeocodedFilename & "'")
+                        Catch ex As Exception
+                            Logger.Dbg("Failed to save geocoded file '" & lGeocodedFilename & "' - " & ex.Message)
+                        End Try
                     End If
                 End If
             End If
         End If
 
-        If NumFeatures > lSaveNumFeatures Then 'Added a shape
-            SetFieldsFromDocument(aFileName)
-        End If
+            If NumFeatures > lSaveNumFeatures Then 'Added a shape
+                pRecordIndex = NumFeatures() - 1
+                SetFieldsFromDocument(aFileName)
+            End If
     End Sub
 
     Private Sub Form_DragDrop(ByVal sender As Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles Me.DragDrop, pbxImage.DragDrop
@@ -353,7 +399,7 @@ Public Class frmFileGeoReference
                 If Not pAddingFiles Then Exit For
             Next
             pAddingFiles = False
-            RefreshRecordInfo()
+            SetFormFromFields()
         End If
     End Sub
 

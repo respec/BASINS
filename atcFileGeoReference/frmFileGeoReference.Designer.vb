@@ -32,15 +32,15 @@ Partial Class frmFileGeoReference
         Me.lblStatus = New System.Windows.Forms.Label
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.btnCancel = New System.Windows.Forms.Button
-        Me.grpDocument = New System.Windows.Forms.GroupBox
-        Me.txtDate = New System.Windows.Forms.TextBox
-        Me.lblDate = New System.Windows.Forms.Label
         Me.btnRemove = New System.Windows.Forms.Button
         Me.btnAdd = New System.Windows.Forms.Button
         Me.btnPrev = New System.Windows.Forms.Button
         Me.btnNext = New System.Windows.Forms.Button
-        Me.txtValue = New System.Windows.Forms.TextBox
-        Me.lblValue = New System.Windows.Forms.Label
+        Me.grpDocument = New System.Windows.Forms.GroupBox
+        Me.txtDate = New System.Windows.Forms.TextBox
+        Me.lblDate = New System.Windows.Forms.Label
+        Me.txtLocation = New System.Windows.Forms.TextBox
+        Me.lblLocation = New System.Windows.Forms.Label
         Me.lblRecordInfo = New System.Windows.Forms.Label
         CType(Me.pbxImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.grpDocument.SuspendLayout()
@@ -81,8 +81,6 @@ Partial Class frmFileGeoReference
         '
         'cboFields
         '
-        Me.cboFields.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboFields.DropDownHeight = 300
         Me.cboFields.FormattingEnabled = True
         Me.cboFields.IntegralHeight = False
@@ -100,7 +98,7 @@ Partial Class frmFileGeoReference
         Me.pbxImage.Location = New System.Drawing.Point(9, 98)
         Me.pbxImage.Margin = New System.Windows.Forms.Padding(2)
         Me.pbxImage.Name = "pbxImage"
-        Me.pbxImage.Size = New System.Drawing.Size(597, 411)
+        Me.pbxImage.Size = New System.Drawing.Size(596, 295)
         Me.pbxImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom
         Me.pbxImage.TabIndex = 10
         Me.pbxImage.TabStop = False
@@ -109,7 +107,7 @@ Partial Class frmFileGeoReference
         '
         Me.lblStatus.AutoSize = True
         Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblStatus.Location = New System.Drawing.Point(19, 79)
+        Me.lblStatus.Location = New System.Drawing.Point(11, 79)
         Me.lblStatus.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblStatus.Name = "lblStatus"
         Me.lblStatus.Size = New System.Drawing.Size(54, 17)
@@ -120,7 +118,7 @@ Partial Class frmFileGeoReference
         'btnCancel
         '
         Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCancel.Location = New System.Drawing.Point(291, 63)
+        Me.btnCancel.Location = New System.Drawing.Point(11, 108)
         Me.btnCancel.Margin = New System.Windows.Forms.Padding(2)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(108, 25)
@@ -130,21 +128,74 @@ Partial Class frmFileGeoReference
         Me.btnCancel.UseVisualStyleBackColor = True
         Me.btnCancel.Visible = False
         '
+        'btnRemove
+        '
+        Me.btnRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnRemove.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnRemove.Location = New System.Drawing.Point(286, 45)
+        Me.btnRemove.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnRemove.Name = "btnRemove"
+        Me.btnRemove.Size = New System.Drawing.Size(20, 25)
+        Me.btnRemove.TabIndex = 23
+        Me.btnRemove.Text = "-"
+        Me.ToolTip1.SetToolTip(Me.btnRemove, "Remove Document")
+        Me.btnRemove.UseVisualStyleBackColor = True
+        '
+        'btnAdd
+        '
+        Me.btnAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnAdd.Location = New System.Drawing.Point(261, 45)
+        Me.btnAdd.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnAdd.Name = "btnAdd"
+        Me.btnAdd.Size = New System.Drawing.Size(20, 25)
+        Me.btnAdd.TabIndex = 22
+        Me.btnAdd.Text = "+"
+        Me.ToolTip1.SetToolTip(Me.btnAdd, "Add Document")
+        Me.btnAdd.UseVisualStyleBackColor = True
+        '
+        'btnPrev
+        '
+        Me.btnPrev.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnPrev.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnPrev.Location = New System.Drawing.Point(211, 45)
+        Me.btnPrev.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnPrev.Name = "btnPrev"
+        Me.btnPrev.Size = New System.Drawing.Size(20, 25)
+        Me.btnPrev.TabIndex = 21
+        Me.btnPrev.Text = "<"
+        Me.ToolTip1.SetToolTip(Me.btnPrev, "Previous Record")
+        Me.btnPrev.UseVisualStyleBackColor = True
+        '
+        'btnNext
+        '
+        Me.btnNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnNext.Location = New System.Drawing.Point(236, 45)
+        Me.btnNext.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnNext.Name = "btnNext"
+        Me.btnNext.Size = New System.Drawing.Size(20, 25)
+        Me.btnNext.TabIndex = 20
+        Me.btnNext.Text = ">"
+        Me.ToolTip1.SetToolTip(Me.btnNext, "Next Record")
+        Me.btnNext.UseVisualStyleBackColor = True
+        '
         'grpDocument
         '
-        Me.grpDocument.Controls.Add(Me.btnCancel)
+        Me.grpDocument.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpDocument.Controls.Add(Me.txtDate)
         Me.grpDocument.Controls.Add(Me.lblDate)
         Me.grpDocument.Controls.Add(Me.btnRemove)
         Me.grpDocument.Controls.Add(Me.btnAdd)
         Me.grpDocument.Controls.Add(Me.btnPrev)
         Me.grpDocument.Controls.Add(Me.btnNext)
-        Me.grpDocument.Controls.Add(Me.txtValue)
-        Me.grpDocument.Controls.Add(Me.lblValue)
+        Me.grpDocument.Controls.Add(Me.txtLocation)
+        Me.grpDocument.Controls.Add(Me.lblLocation)
         Me.grpDocument.Controls.Add(Me.lblRecordInfo)
         Me.grpDocument.Location = New System.Drawing.Point(205, 12)
         Me.grpDocument.Name = "grpDocument"
-        Me.grpDocument.Size = New System.Drawing.Size(398, 82)
+        Me.grpDocument.Size = New System.Drawing.Size(397, 82)
         Me.grpDocument.TabIndex = 17
         Me.grpDocument.TabStop = False
         Me.grpDocument.Text = "Current Document"
@@ -156,7 +207,7 @@ Partial Class frmFileGeoReference
         Me.txtDate.Location = New System.Drawing.Point(60, 45)
         Me.txtDate.Margin = New System.Windows.Forms.Padding(2)
         Me.txtDate.Name = "txtDate"
-        Me.txtDate.Size = New System.Drawing.Size(163, 20)
+        Me.txtDate.Size = New System.Drawing.Size(147, 20)
         Me.txtDate.TabIndex = 25
         '
         'lblDate
@@ -170,84 +221,32 @@ Partial Class frmFileGeoReference
         Me.lblDate.Text = "Date:"
         Me.lblDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
-        'btnRemove
+        'txtLocation
         '
-        Me.btnRemove.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnRemove.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnRemove.Location = New System.Drawing.Point(302, 45)
-        Me.btnRemove.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnRemove.Name = "btnRemove"
-        Me.btnRemove.Size = New System.Drawing.Size(20, 25)
-        Me.btnRemove.TabIndex = 23
-        Me.btnRemove.Text = "-"
-        Me.ToolTip1.SetToolTip(Me.btnRemove, "Remove Document")
-        Me.btnRemove.UseVisualStyleBackColor = True
-        '
-        'btnAdd
-        '
-        Me.btnAdd.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnAdd.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnAdd.Location = New System.Drawing.Point(277, 45)
-        Me.btnAdd.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnAdd.Name = "btnAdd"
-        Me.btnAdd.Size = New System.Drawing.Size(20, 25)
-        Me.btnAdd.TabIndex = 22
-        Me.btnAdd.Text = "+"
-        Me.ToolTip1.SetToolTip(Me.btnAdd, "Add Document")
-        Me.btnAdd.UseVisualStyleBackColor = True
-        '
-        'btnPrev
-        '
-        Me.btnPrev.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnPrev.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPrev.Location = New System.Drawing.Point(227, 45)
-        Me.btnPrev.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnPrev.Name = "btnPrev"
-        Me.btnPrev.Size = New System.Drawing.Size(20, 25)
-        Me.btnPrev.TabIndex = 21
-        Me.btnPrev.Text = "<"
-        Me.ToolTip1.SetToolTip(Me.btnPrev, "Previous Record")
-        Me.btnPrev.UseVisualStyleBackColor = True
-        '
-        'btnNext
-        '
-        Me.btnNext.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNext.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnNext.Location = New System.Drawing.Point(252, 45)
-        Me.btnNext.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnNext.Name = "btnNext"
-        Me.btnNext.Size = New System.Drawing.Size(20, 25)
-        Me.btnNext.TabIndex = 20
-        Me.btnNext.Text = ">"
-        Me.ToolTip1.SetToolTip(Me.btnNext, "Next Record")
-        Me.btnNext.UseVisualStyleBackColor = True
-        '
-        'txtValue
-        '
-        Me.txtValue.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.txtLocation.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtValue.Location = New System.Drawing.Point(60, 21)
-        Me.txtValue.Margin = New System.Windows.Forms.Padding(2)
-        Me.txtValue.Name = "txtValue"
-        Me.txtValue.Size = New System.Drawing.Size(333, 20)
-        Me.txtValue.TabIndex = 19
+        Me.txtLocation.Location = New System.Drawing.Point(60, 21)
+        Me.txtLocation.Margin = New System.Windows.Forms.Padding(2)
+        Me.txtLocation.Name = "txtLocation"
+        Me.txtLocation.Size = New System.Drawing.Size(332, 20)
+        Me.txtLocation.TabIndex = 19
         '
-        'lblValue
+        'lblLocation
         '
-        Me.lblValue.AutoSize = True
-        Me.lblValue.Location = New System.Drawing.Point(5, 24)
-        Me.lblValue.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lblValue.Name = "lblValue"
-        Me.lblValue.Size = New System.Drawing.Size(51, 13)
-        Me.lblValue.TabIndex = 18
-        Me.lblValue.Text = "Location:"
-        Me.lblValue.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblLocation.AutoSize = True
+        Me.lblLocation.Location = New System.Drawing.Point(5, 24)
+        Me.lblLocation.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lblLocation.Name = "lblLocation"
+        Me.lblLocation.Size = New System.Drawing.Size(51, 13)
+        Me.lblLocation.TabIndex = 18
+        Me.lblLocation.Text = "Location:"
+        Me.lblLocation.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'lblRecordInfo
         '
         Me.lblRecordInfo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lblRecordInfo.AutoSize = True
-        Me.lblRecordInfo.Location = New System.Drawing.Point(326, 52)
+        Me.lblRecordInfo.Location = New System.Drawing.Point(310, 52)
         Me.lblRecordInfo.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lblRecordInfo.Name = "lblRecordInfo"
         Me.lblRecordInfo.Size = New System.Drawing.Size(42, 13)
@@ -259,7 +258,8 @@ Partial Class frmFileGeoReference
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(615, 530)
+        Me.ClientSize = New System.Drawing.Size(614, 414)
+        Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.pbxImage)
         Me.Controls.Add(Me.cboFields)
@@ -293,7 +293,7 @@ Partial Class frmFileGeoReference
     Friend WithEvents btnAdd As System.Windows.Forms.Button
     Friend WithEvents btnPrev As System.Windows.Forms.Button
     Friend WithEvents btnNext As System.Windows.Forms.Button
-    Friend WithEvents txtValue As System.Windows.Forms.TextBox
-    Friend WithEvents lblValue As System.Windows.Forms.Label
+    Friend WithEvents txtLocation As System.Windows.Forms.TextBox
+    Friend WithEvents lblLocation As System.Windows.Forms.Label
     Friend WithEvents lblRecordInfo As System.Windows.Forms.Label
 End Class
