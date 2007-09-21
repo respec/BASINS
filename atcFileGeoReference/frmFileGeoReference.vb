@@ -236,6 +236,8 @@ Public Class frmFileGeoReference
         If Not pAddingFiles Then
             If NumFeatures < 1 Then
                 lblRecordInfo.Text = "No Records"
+                txtLocation.Visible = False
+                lblLocation.Visible = False
                 lblDate.Visible = False
                 txtDate.Visible = False
                 pbxImage.Visible = False
@@ -254,6 +256,8 @@ Public Class frmFileGeoReference
                     Dim lFilename As String = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, cboFields.Text))
                     If lFilename.StartsWith("file://") Then lFilename = lFilename.Substring(7)
                     SetFormFromDocument(lFilename)
+                    lblLocation.Visible = True
+                    txtLocation.Visible = True
                 Else
                     lblStatus.Text = "Select a field containing documents"
                     lblStatus.Visible = True
@@ -313,7 +317,7 @@ Public Class frmFileGeoReference
 
     Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
         ClearSelectedFeatures(CurrentLayer)
-        RemoveFeature(CurrentLayer, pRecordIndex)
+        If NumFeatures > pRecordIndex Then RemoveFeature(CurrentLayer, pRecordIndex)
         If pRecordIndex >= NumFeatures Then
             pRecordIndex = NumFeatures - 1
         End If
@@ -371,8 +375,8 @@ Public Class frmFileGeoReference
                 AddPoint(CurrentLayer, lX, lY)
             Else 'Ask user to click to place point
                 If UserAddPoint() Then
-                    If Not lExif Is Nothing Then 'Set lat/lon in image to newly geocoded point
-                        PointXY(CurrentLayer, pRecordIndex, lX, lY)
+                    If Not lExif Is Nothing Then 'Set lat/lon in image to newly geocoded point (the last point in the file)
+                        PointXY(CurrentLayer, NumFeatures - 1, lX, lY)
                         If Not ProjectProjection.Equals(pGeographicProjection) Then
                             Logger.Dbg("Projecting new point from (" & lX & ", " & lY & ") in '" & ProjectProjection() & "' to '" & pGeographicProjection & "'")
                             ProjectPoint(lX, lY, ProjectProjection, pGeographicProjection)
