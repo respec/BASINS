@@ -120,9 +120,6 @@
   <metadata name="ToolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <data name="chkNHDplus_Area.ToolTip" xml:space="preserve">
-    <value>Area to be Submerged, BayInlet, Bridge, CanalDitch, DamWeir, Flume, Foreshore, Hazard Zone, Lock Chamber, Inundation Area, Rapids, SeaOcean, Special Use Zone, Spillway, StreamRiver, Submerged Stream, Wash, Water IntakeOutflow, and Area of Complex Channels</value>
-  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
