@@ -34,10 +34,11 @@ Public Class frmDownload
             End Select
             If Not lExtents Is Nothing Then
                 Dim lAOI As New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
+                lAOI.HUC8s = HUC8s()
                 Return lAOI.GetProjected(pGeographicProjection)
             End If
         Catch ex As Exception
-            MsgBox(ex.Message)
+            MapWinUtility.Logger.Msg(ex.Message)
         End Try
         Return Nothing
     End Function
@@ -46,9 +47,15 @@ Public Class frmDownload
         Get
             Dim lXML As String = ""
             Dim lDesiredProjection As String = ""
-            Dim lSaveFolder As String = "" '"<arg name='CacheFolder'>" & "c:\temp\" & "</arg>" & vbCrLf
             Dim lRegion As String = Me.SelectedRegion.XML
 
+            Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
+            If lCacheFolder.Length = 0 Then
+                lCacheFolder = IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)) & IO.Path.DirectorySeparatorChar
+            End If
+            lCacheFolder = "<arg name='CacheFolder'>" & lCacheFolder & "</arg>" & vbCrLf
+
+            Dim lSaveFolder As String = ""
             If Not pMapWin.Project Is Nothing Then
                 If pMapWin.Project.ProjectProjection.Length > 0 Then
                     lDesiredProjection = "<arg name='DesiredProjection'>" & pMapWin.Project.ProjectProjection & "</arg>" & vbCrLf
@@ -71,6 +78,7 @@ Public Class frmDownload
                              & "<arguments>" & vbCrLf _
                              & lCheckedChildren _
                              & lSaveFolder _
+                             & lCacheFolder _
                              & lDesiredProjection _
                              & lRegion _
                              & "</arguments>" & vbCrLf _
@@ -84,6 +92,24 @@ Public Class frmDownload
 
         End Set
     End Property
+
+    Public Function HUC8s() As ArrayList
+        'First check for a cat layer that contains the list of HUC-8s
+        Dim lHUC8s As New ArrayList
+        Dim lCatDbfName As String = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "cat.dbf")
+        If IO.File.Exists(lCatDbfName) Then
+            Dim lCatDbf As New atcUtility.atcTableDBF
+            lCatDbf.OpenFile(lCatDbfName)
+            Dim lHucField As Integer = lCatDbf.FieldNumber("CU")
+            If lHucField > 0 Then
+                For lRecord As Integer = 1 To lCatDbf.NumRecords
+                    lCatDbf.CurrentRecord = lRecord
+                    lHUC8s.Add(lCatDbf.Value(lHucField))
+                Next
+            End If
+        End If
+        Return lHUC8s
+    End Function
 
     '''' <summary>
     '''' Synchronous HTTP download
