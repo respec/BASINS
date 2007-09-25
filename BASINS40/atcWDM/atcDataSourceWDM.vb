@@ -711,7 +711,7 @@ CaseExistRenumber:
                             Dim lInterval As Double = .GetValue("interval", 0)
                             Dim lConstInterval As Boolean = (Math.Abs(lInterval) > 0.00001)
                             For iVal As Integer = 1 To nVals
-                                If (lV(iVal) - lTsFill) < pEpsilon Then
+                                If Math.Abs((lV(iVal) - lTsFill)) < pEpsilon Then
                                     lVd(iVal) = pNan
                                 Else
                                     lVd(iVal) = lV(iVal) 'TODO: test speed of this vs. using ReadDataset.Value(iVal) = v(iVal)
