@@ -54,7 +54,7 @@ Public Class frmDownload
                     lDesiredProjection = "<arg name='DesiredProjection'>" & pMapWin.Project.ProjectProjection & "</arg>" & vbCrLf
                 End If
                 If pMapWin.Project.FileName.Length > 0 Then
-                    lSaveFolder &= "<arg name='SaveAs'>" & IO.Path.GetDirectoryName(pMapWin.Project.FileName) & "</arg>" & vbCrLf
+                    lSaveFolder &= "<arg name='SaveIn'>" & IO.Path.GetDirectoryName(pMapWin.Project.FileName) & "</arg>" & vbCrLf
                 End If
             End If
 
