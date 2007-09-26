@@ -128,6 +128,7 @@ Public Class frmDownload
                 End If
             Catch ex As Exception
             End Try
+            lIndex += 1
         End While
         Return -1
     End Function
