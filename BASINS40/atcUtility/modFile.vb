@@ -61,7 +61,7 @@ Public Module modFile
     Public Function TryDeleteShapefile(ByVal aShapeFilename As String) As Boolean
         TryDeleteShapefile = True
         For Each lFilename As String In ShapeFilenames(aShapeFilename)
-            If Not TryDelete(lFilename) Then TryDeleteShapefile = False
+            If FileExists(lFilename) AndAlso Not TryDelete(lFilename) Then TryDeleteShapefile = False
         Next
     End Function
 
@@ -87,8 +87,8 @@ Public Module modFile
         aDestinationPath = IO.Path.Combine(aDestinationPath, lNewBaseName)
 
         For Each lExtension As String In ShapeExtensions
-            If Not TryMove(aShapeFilename & lExtension, _
-                           aDestinationPath & lExtension) Then
+            Dim lFilename As String = aShapeFilename & lExtension
+            If FileExists(lFilename) AndAlso Not TryMove(lFilename, aDestinationPath & lExtension) Then
                 TryMoveShapefile = False
             End If
         Next
