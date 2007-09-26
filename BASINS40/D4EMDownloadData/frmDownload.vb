@@ -9,7 +9,27 @@ Public Class frmDownload
 
     Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin) As String
         pMapWin = aMapWin
-        cboAOI.SelectedIndex = GetSetting("DataDownload", "Defaults", "AOI", 0)
+
+        Dim lHucIndex As Integer = HUC8Index()
+        If lHucIndex >= 0 Then
+            Dim lHUC8s As ArrayList = HUC8s()
+            If lHUC8s.Count = 1 Then
+                cboRegion.Items.Add("Hydrologic Unit " & lHUC8s(0))
+            Else
+                cboRegion.Items.Add("Hydrologic Units")
+            End If
+        End If
+        Dim lRegionIndex As Integer = GetSetting("DataDownload", "Defaults", "RegionType", 0)
+        If lRegionIndex < cboRegion.Items.Count Then cboRegion.SelectedIndex = lRegionIndex
+
+        If GetSetting("DataDownload", "Defaults", "Clip", "").ToLower.Equals("true") Then
+            chkClip.Checked = True
+        End If
+
+        If GetSetting("DataDownload", "Defaults", "Merge", "").ToLower.Equals("true") Then
+            chkMerge.Checked = True
+        End If
+
         'chkBASINS_Met.Checked = True
         Me.ShowDialog()
         If pOk Then
@@ -20,7 +40,10 @@ Public Class frmDownload
     End Function
 
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
-        SaveSetting("DataDownload", "Defaults", "AOI", cboAOI.SelectedIndex)
+        SaveSetting("DataDownload", "Defaults", "RegionType", cboRegion.SelectedIndex)
+        SaveSetting("DataDownload", "Defaults", "Clip", chkClip.Checked.ToString)
+        SaveSetting("DataDownload", "Defaults", "Merge", chkMerge.Checked.ToString)
+
         pOk = True
         Me.Close()
     End Sub
@@ -28,9 +51,10 @@ Public Class frmDownload
     Public Function SelectedRegion() As D4EMDataManager.Region
         Try
             Dim lExtents As MapWinGIS.Extents = Nothing
-            Select Case cboAOI.SelectedIndex
+            Select Case cboRegion.SelectedIndex
                 Case 0 : lExtents = pMapWin.View.Extents
                 Case 1 : lExtents = pMapWin.Layers(pMapWin.Layers.CurrentLayer).Extents
+                Case 2 : lExtents = pMapWin.Layers(HUC8Index).Extents
             End Select
             If Not lExtents Is Nothing Then
                 Dim lAOI As New D4EMDataManager.Region(lExtents.yMax, lExtents.yMin, lExtents.xMin, lExtents.xMax, pMapWin.Project.ProjectProjection)
@@ -81,6 +105,8 @@ Public Class frmDownload
                              & lCacheFolder _
                              & lDesiredProjection _
                              & lRegion _
+                             & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
+                             & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                              & "</arguments>" & vbCrLf _
                              & "</function>" & vbCrLf
                     End If
@@ -93,7 +119,20 @@ Public Class frmDownload
         End Set
     End Property
 
-    Public Function HUC8s() As ArrayList
+    Private Function HUC8Index() As Integer
+        Dim lIndex As Integer = 0
+        While lIndex < pMapWin.Layers.NumLayers
+            Try
+                If pMapWin.Layers(lIndex).FileName.ToLower.EndsWith(IO.Path.DirectorySeparatorChar & "cat.shp") Then
+                    Return lIndex
+                End If
+            Catch ex As Exception
+            End Try
+        End While
+        Return -1
+    End Function
+
+    Private Function HUC8s() As ArrayList
         'First check for a cat layer that contains the list of HUC-8s
         Dim lHUC8s As New ArrayList
         Dim lCatDbfName As String = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "cat.dbf")
