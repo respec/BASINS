@@ -77,15 +77,15 @@ Public Class frmDownload
             If lCacheFolder.Length = 0 Then
                 lCacheFolder = IO.Path.GetDirectoryName(IO.Path.GetDirectoryName(Reflection.Assembly.GetEntryAssembly.Location)) & IO.Path.DirectorySeparatorChar
             End If
-            lCacheFolder = "<arg name='CacheFolder'>" & lCacheFolder & "</arg>" & vbCrLf
+            lCacheFolder = "<CacheFolder>" & lCacheFolder & "</CacheFolder>" & vbCrLf
 
             Dim lSaveFolder As String = ""
             If Not pMapWin.Project Is Nothing Then
                 If pMapWin.Project.ProjectProjection.Length > 0 Then
-                    lDesiredProjection = "<arg name='DesiredProjection'>" & pMapWin.Project.ProjectProjection & "</arg>" & vbCrLf
+                    lDesiredProjection = "<DesiredProjection>" & pMapWin.Project.ProjectProjection & "</DesiredProjection>" & vbCrLf
                 End If
                 If pMapWin.Project.FileName.Length > 0 Then
-                    lSaveFolder &= "<arg name='SaveIn'>" & IO.Path.GetDirectoryName(pMapWin.Project.FileName) & "</arg>" & vbCrLf
+                    lSaveFolder &= "<SaveIn>" & IO.Path.GetDirectoryName(pMapWin.Project.FileName) & "</SaveIn>" & vbCrLf
                 End If
             End If
 
@@ -94,7 +94,7 @@ Public Class frmDownload
                     Dim lCheckedChildren As String = ""
                     For Each lChild As Windows.Forms.CheckBox In lControl.Controls
                         If lChild.Checked Then
-                            lCheckedChildren &= "<arg name='DataType'>" & lChild.Name.Substring(lControl.Name.Length + 1) & "</arg>" & vbCrLf
+                            lCheckedChildren &= "<DataType>" & lChild.Name.Substring(lControl.Name.Length + 1) & "</DataType>" & vbCrLf
                         End If
                     Next
                     If lCheckedChildren.Length > 0 Then
