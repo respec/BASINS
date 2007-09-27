@@ -666,7 +666,9 @@ ErrorWriting:
                 End If
             End If
 
-            If aUserVerifyFileName OrElse Not FileExists(lFileName) Then 'ask the user
+            If Not FileExists(lFileName) AndAlso (aFileDialogTitle Is Nothing OrElse aFileDialogTitle.Length = 0) Then
+                lFileName = "" 'If we don't have a dialog title, return a blank filename instead of asking the user
+            ElseIf aUserVerifyFileName OrElse Not FileExists(lFileName) Then 'ask the user
                 Logger.Dbg("Asking user to find " & aDefaultFileName, aFileDialogTitle)
                 Dim cdlg As New Windows.Forms.OpenFileDialog
                 With cdlg
