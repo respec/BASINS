@@ -82,13 +82,11 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcFileGeoReference", "atcF
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTableSQLite", "atcTableSQLite\atcTableSQLite.vbproj", "{C59D3153-2857-499C-B640-924E5ABE2E74}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager", "..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager", "..\D4EM\DataManager\DataManager\BASINS-D4EMDataManagerExpress.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "mwMetadataEditor", "..\MapWindow4Plugins\mwMetadataEditor\mwMetadataEditor.vbproj", "{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMNHDPlusDataExtension", "..\D4EM\DataManager\NHDPlusDataExtension\BASINS-D4EMNHDPlusDataExtension.vbproj", "{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapWinGeoProc2005BASINS", "..\MapWindow4Dev\MapWinGeoProc\MapWinGeoProc2005BASINS.csproj", "{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMBasinsDataExtension", "..\D4EM\DataManager\BasinsDataExtension\BASINS-D4EMBasinsDataExtension.vbproj", "{6B46450E-F526-4C3C-BC4D-0D11735022BF}"
 EndProject
