@@ -159,175 +159,186 @@ Public Class atcTableDBF
         End Set
     End Property
 
-    'Merge records from dbf2Add into this dbf
-    'keyFieldNames are field names in the DBFs that define a unique field.
-    'If keyFieldNames is blank, no duplicate checking will occur
-    'If keyFieldNames(1) = "**ALL**" then the entire record will be used as a key
-    'DuplicateAction dictates handling of duplicate records as follows:
-    ' 0 - duplicates allowed
-    ' 1 - keep existing instance of duplicates and discard duplicates from dbf being added
-    ' 2 - replace existing instance of duplicates with duplicates from dbf being added
-    ' 3 - ask user what to do (not currently implemented)
-    '    Public Sub Merge(ByVal dbf2Add As atcTableDBF, ByVal keyFieldNames() As String, ByVal DuplicateAction As Integer)
-    '        Dim addRecordNum As Integer
-    '        Dim fieldNum As Integer
-    '        Dim keyField() As Integer
-    '        Dim operation() As String
-    '        Dim keyValue() As Object
-    '        Dim recordToCopy() As Byte
-    '        Dim firstKeyField As Integer
-    '        Dim lastKeyField As Integer
-    '        Dim lMsg As String
-    '        Dim LastOldRec As Integer
-    '        Dim AllFieldsKey As Boolean
-    '        Dim foundDuplicate As Boolean
-    '        Dim canCopyRecords As Boolean
+    ''' <summary>
+    ''' Merge records from dbf2Add into this dbf
+    ''' </summary>
+    ''' <param name="aAddFrom"></param>
+    ''' <param name="aKeyFieldNames">Names of fields that together define a unique field. 
+    ''' If blank, no duplicate checking will occur.
+    ''' If Nothing or = "**ALL**" then the entire record will be used as a key</param>
+    ''' <param name="aDuplicateAction">dictates handling of duplicate records as follows:
+    ''' 0 - do not check for duplicates, just add all new records
+    ''' 1 - keep existing instance and discard duplicates from dbf being added
+    ''' 2 - replace existing instance with duplicates from dbf being added</param>
+    ''' <remarks></remarks>
+    Public Sub Merge(ByVal aAddFrom As atcTableDBF, ByVal aKeyFieldNames() As String, ByVal aDuplicateAction As Integer)
+        Dim lAddRecordNum As Integer
+        Dim lFieldNum As Integer
+        Dim lKeyField() As Integer
+        Dim lOperation() As String
+        Dim lKeyValue() As Object
+        Dim lRecordToCopy() As Byte
+        Dim lFirstKeyField As Integer
+        Dim lLastKeyField As Integer
+        Dim lMsg As String = ""
+        Dim lLastOldRec As Integer
+        Dim lAllFieldsKey As Boolean
+        Dim lFoundDuplicate As Boolean
+        Dim lCanCopyRecords As Boolean = True
+        Dim lNumRecsAtStart As Integer = pHeader.NumRecs
 
-    '        Logger.Dbg("Merge " & dbf2Add.FileName & " into " & FileName)
+        Logger.Dbg("Merge " & aAddFrom.FileName & " into " & FileName)
 
-    '        If dbf2Add.NumRecords > 0 And pNumFields <> dbf2Add.NumFields And pHeader.NumRecs < 1 Then
-    '            'Replace our field definitions with the new ones since we have no data
-    '            NumFields = dbf2Add.NumFields
-    '            For fieldNum = 1 To pNumFields
-    '                FieldName(fieldNum) = dbf2Add.FieldName(fieldNum)
-    '                FieldType(fieldNum) = dbf2Add.FieldType(fieldNum)
-    '                FieldLength(fieldNum) = dbf2Add.FieldLength(fieldNum)
-    '                'FIXME      FieldDecimalCount(fieldNum) = dbf2Add.FieldDecimalCount(fieldNum)
-    '            Next
-    '            NumRecords = 0
-    '            Me.InitData()
-    '        End If
+        If aAddFrom.NumRecords < 1 Then
+            Logger.Dbg("No records to add from empty DBF:" & vbCr & aAddFrom.FileName)
+        Else
+            If pNumFields <> aAddFrom.NumFields And pHeader.NumRecs < 1 Then
+                Logger.Dbg("Replacing field definitions with the new ones since we have no records")
+                NumFields = aAddFrom.NumFields
+                For lFieldNum = 1 To pNumFields
+                    FieldName(lFieldNum) = aAddFrom.FieldName(lFieldNum)
+                    FieldType(lFieldNum) = aAddFrom.FieldType(lFieldNum)
+                    FieldLength(lFieldNum) = aAddFrom.FieldLength(lFieldNum)
+                    FieldDecimalCount(lFieldNum) = aAddFrom.FieldDecimalCount(lFieldNum)
+                Next
+                NumRecords = 0
+                Me.InitData()
+            End If
 
-    '        If dbf2Add.NumRecords < 1 Then
-    '            Logger.Dbg("No records to add from empty DBF:" & vbCr & dbf2Add.FileName)
-    '        ElseIf pNumFields <> dbf2Add.NumFields Then
-    '            Logger.Msg("Different number of fields:" & vbCr _
-    '                      & pFilename & " = " & pNumFields & vbCr _
-    '                      & dbf2Add.FileName & " = " & dbf2Add.NumFields & vbCr & vbCr _
-    '                      & "Cannot merge DBF files", "Merge")
-    '        Else
-    '            For fieldNum = 1 To pNumFields
-    '                If UCase(Trim(FieldName(fieldNum))) <> UCase(Trim(dbf2Add.FieldName(fieldNum))) Then
-    '                    If Not Logger.Msg("Field '" & FieldName(fieldNum) & "' does not appear to match '" _
-    '                           & dbf2Add.FieldName(fieldNum) & "'" & vbCr _
-    '                                               & "Proceed with merge anyway, treating these fields as matching?", "Merge", True) Then
-    '                        Exit Sub
-    '                    End If
-    '                End If
-    '            Next
-    '            If DuplicateAction > 0 Then
-    '                firstKeyField = LBound(keyFieldNames)
-    '                lastKeyField = UBound(keyFieldNames)
-    'RedimKeys:
-    '                ReDim keyField(lastKeyField)
-    '                ReDim operation(lastKeyField)
-    '                ReDim keyValue(lastKeyField)
-    '                For fieldNum = firstKeyField To lastKeyField
-    '                    If AllFieldsKey Then
-    '                        keyField(fieldNum) = fieldNum
-    '                        operation(fieldNum) = "="
-    '                    Else
-    '                        If keyFieldNames(fieldNum) = "**ALL**" Then
-    '                            AllFieldsKey = True
-    '                            firstKeyField = 1
-    '                            lastKeyField = pNumFields
-    '                            GoTo RedimKeys
-    '                        Else
-    '                            lMsg = lMsg & keyFieldNames(fieldNum) & ", "
-    '                            keyField(fieldNum) = FieldNumber(keyFieldNames(fieldNum))
-    '                            operation(fieldNum) = "="
-    '                        End If
-    '                    End If
-    '                Next fieldNum
-    '                If AllFieldsKey Then
-    '                    lMsg = "All fields must match to find a duplicate."
-    '                Else
-    '                    If Len(lMsg) > 2 Then lMsg = " Looking for duplicate records in fields " & Left(lMsg, Len(lMsg) - 2)
-    '                End If
+            If pNumFields <> aAddFrom.NumFields Then
+                Throw New ApplicationException("Different number of fields:" & vbCr _
+                          & FileName & " = " & pNumFields & vbCr _
+                          & aAddFrom.FileName & " = " & aAddFrom.NumFields & vbCr & vbCr _
+                          & "Cannot merge DBF files")
+            Else
+                For lFieldNum = 1 To pNumFields
+                    If UCase(Trim(FieldName(lFieldNum))) <> UCase(Trim(aAddFrom.FieldName(lFieldNum))) Then
+                        If Not Logger.Msg("Field '" & FieldName(lFieldNum) & "' does not appear to match '" _
+                               & aAddFrom.FieldName(lFieldNum) & "'" & vbCr _
+                               & "Proceed with merge anyway, treating these fields as matching?", vbYesNo, "Merge") = MsgBoxResult.No Then
+                            Exit Sub
+                        End If
+                    End If
+                    If lCanCopyRecords AndAlso FieldLength(lFieldNum) <> aAddFrom.FieldLength(lFieldNum) Then
+                        Logger.Dbg("Different field lengths for " & FieldName(lFieldNum) & vbCr _
+                                 & FileName & " = " & FieldLength(lFieldNum) & vbCr _
+                                 & aAddFrom.FileName & " = " & aAddFrom.FieldLength(lFieldNum) & vbCr _
+                                 & "Will copy fields instead of records")
+                        lCanCopyRecords = False
+                    End If
+                Next
+                If aDuplicateAction > 0 Then
+                    If aKeyFieldNames Is Nothing Then
+AllKeys:
+                        lAllFieldsKey = True
+                        lFirstKeyField = 1
+                        lLastKeyField = pNumFields
+                    Else
+                        lFirstKeyField = LBound(aKeyFieldNames)
+                        lLastKeyField = UBound(aKeyFieldNames)
+                    End If
+                    ReDim lKeyField(lLastKeyField)
+                    ReDim lOperation(lLastKeyField)
+                    ReDim lKeyValue(lLastKeyField)
+                    For lFieldNum = lFirstKeyField To lLastKeyField
+                        If lAllFieldsKey Then
+                            lKeyField(lFieldNum) = lFieldNum
+                            lOperation(lFieldNum) = "="
+                        Else
+                            If aKeyFieldNames(lFieldNum) = "**ALL**" Then
+                                GoTo AllKeys
+                            Else
+                                lMsg = lMsg & aKeyFieldNames(lFieldNum) & ", "
+                                lKeyField(lFieldNum) = FieldNumber(aKeyFieldNames(lFieldNum))
+                                lOperation(lFieldNum) = "="
+                            End If
+                        End If
+                    Next
 
-    '                If Len(lMsg) > 0 Then
-    '                    Select Case DuplicateAction
-    '                        Case 0 : Logger.Dbg(lMsg & " Not checking for duplicates")
-    '                        Case 2 : Logger.Dbg(lMsg & " Overwriting existing with new duplicates")
-    '                        Case Else : Logger.Dbg(lMsg & " Keeping existing; discarding new duplicates")
-    '                    End Select
-    '                    lMsg = ""
-    '                End If
-    '            End If
+                    If lAllFieldsKey Then
+                        lMsg = "All fields must match to find a duplicate."
+                    Else
+                        If Len(lMsg) > 2 Then lMsg = " Looking for duplicate records in fields " & Left(lMsg, Len(lMsg) - 2)
+                    End If
 
-    '            LastOldRec = pHeader.NumRecs 'Don't search for duplicates in newly added records
-    '            If LastOldRec < 1 Then DuplicateAction = 0 'Don't bother checking for duplicates since we start empty
-    '            dbf2Add.CurrentRecord = 1
-    '            recordToCopy = dbf2Add.record
+                    If Len(lMsg) > 0 Then
+                        Select Case aDuplicateAction
+                            Case 0 : Logger.Dbg(lMsg & " Not checking for duplicates")
+                            Case 2 : Logger.Dbg(lMsg & " Overwriting existing with new duplicates")
+                            Case Else : Logger.Dbg(lMsg & " Keep existing, discarding new duplicates")
+                        End Select
+                        lMsg = ""
+                    End If
+                End If
 
-    '            If UBound(recordToCopy) + 1 = pHeader.NumBytesRec Then
-    '                canCopyRecords = True
-    '            Else
-    '                '      Logger.Msg "Different number of bytes per record:" & vbCr _
-    '                '''            & Filename & " = " & pHeader.NumBytesRec & vbCr _
-    '                '''            & dbf2Add.Filename & " = " & UBound(recordToCopy) + 1 & vbCr & vbCr _
-    '                '''            & "Cannot merge DBF files", "Merge"
-    '                '      Exit Sub
-    '                canCopyRecords = False
-    '                Logger.Dbg("Different number of bytes per record:" & vbCr _
-    '                      & FileName & " = " & pHeader.NumBytesRec & vbCr _
-    '                            & dbf2Add.FileName & " = " & UBound(recordToCopy) + 1 & vbCr _
-    '                            & "Attempting to copy fields instead of records")
-    '            End If
+                lLastOldRec = pHeader.NumRecs 'Don't search for duplicates in newly added records
+                If lLastOldRec < 1 Then aDuplicateAction = 0 'Don't bother checking for duplicates since we start empty
+                aAddFrom.CurrentRecord = 1
+                lRecordToCopy = aAddFrom.RawRecord
 
-    '            '    Dim starttime As Date
-    '            '    starttime = Now
-    '            With dbf2Add
-    '                For addRecordNum = 1 To .NumRecords
-    '                    '        If (addRecordNum \ 100) * 100 = addRecordNum Then
-    '                    '          Debug.Print "Adding " & addRecordNum & " at " & Format(Now - starttime, "h:mm:ss") & " Matches: " & CountAgreeMatch & " NoMatches: " & CountAgreeNoMatch
-    '                    '        End If
-    '                    .CurrentRecord = addRecordNum
-    '                    If DuplicateAction = 0 Then
-    '                        'don't bother looking for a duplicate since we add them all anyway
-    '                    ElseIf AllFieldsKey And canCopyRecords Then
-    '                        'First check current record to see if it matches
-    '                        If Me.MatchRecord(.record) Then
-    '                            foundDuplicate = True
-    '                        ElseIf pCurrentRecord < LastOldRec Then
-    '                            'Check next record before searching hard for a match
-    '                            'if trying to merge same data, next record will always be the one that matches
-    '                            MoveNext()
-    '                            If Me.MatchRecord(.record) Then
-    '                                foundDuplicate = True
-    '                            Else
-    '                                foundDuplicate = FindRecord(.record, 1, LastOldRec)
-    '                            End If
-    '                        Else
-    '                            foundDuplicate = FindRecord(.record, 1, LastOldRec)
-    '                        End If
-    '                    Else
-    '                        For fieldNum = firstKeyField To lastKeyField
-    '                            keyValue(fieldNum) = .Value(keyField(fieldNum))
-    '                        Next
-    '                        foundDuplicate = FindMatch(keyField, operation, keyValue, False, 1, LastOldRec)
-    '                    End If
-    '                    If foundDuplicate Then
-    '                        'If DuplicateAction = 2 Then GoSub CopyRecord 'overwrite existing record with new record
-    '                        '      Else  'Copy this record in the DBF
-    '                        '          CurrentRecord = Me.NumRecords + 1
-    '                        'GoSub CopyRecord
-    '                    End If
-    '                Next
-    '            End With
-    '        End If
+                If lRecordToCopy.Length <> pHeader.NumBytesRec Then
+                    lCanCopyRecords = False
+                    Logger.Dbg("Different number of bytes per record:" & vbCr _
+                          & FileName & " = " & pHeader.NumBytesRec & vbCr _
+                                & aAddFrom.FileName & " = " & lRecordToCopy.Length & vbCr _
+                                & "Attempting to copy fields instead of records")
+                End If
 
-    '        Exit Sub
-    'CopyRecord:
-    '        If canCopyRecords Then
-    '            Me.record = dbf2Add.record
-    '        Else
-    '            For fieldNum = 1 To pNumFields
-    '                Me.Value(fieldNum) = dbf2Add.Value(fieldNum)
-    '            Next
-    '        End If
-    '        Return
-    '    End Sub
+                With aAddFrom
+                    For lAddRecordNum = 1 To .NumRecords
+                        Logger.Progress(lAddRecordNum, .NumRecords)
+                        .CurrentRecord = lAddRecordNum
+                        If aDuplicateAction = 0 Then
+                            'don't bother looking for a duplicate since we add them all anyway
+                        ElseIf lAllFieldsKey AndAlso lCanCopyRecords Then
+                            'First check current record to see if it matches                            
+                            lRecordToCopy = aAddFrom.RawRecord
+                            If Me.MatchRecord(lRecordToCopy) Then
+                                lFoundDuplicate = True
+                            ElseIf pCurrentRecord < lLastOldRec Then
+                                'Check next record before searching hard for a match
+                                'if trying to merge same data, next record will always be the one that matches
+                                MoveNext()
+                                If Me.MatchRecord(lRecordToCopy) Then
+                                    lFoundDuplicate = True
+                                Else
+                                    lFoundDuplicate = FindRecord(lRecordToCopy, 1, lLastOldRec)
+                                End If
+                            Else
+                                lFoundDuplicate = FindRecord(lRecordToCopy, 1, lLastOldRec)
+                            End If
+                        Else
+                            For lFieldNum = lFirstKeyField To lLastKeyField
+                                lKeyValue(lFieldNum) = .Value(lKeyField(lFieldNum))
+                            Next
+                            lFoundDuplicate = FindMatch(lKeyField, lOperation, lKeyValue, False, 1, lLastOldRec)
+                        End If
+
+                        Dim lCopyThisRecord As Boolean = False
+                        If lFoundDuplicate Then
+                            If aDuplicateAction = 2 Then 'overwrite existing record with new record
+                                lCopyThisRecord = True
+                            End If
+                        Else  'Copy this record in the DBF
+                            CurrentRecord = Me.NumRecords + 1
+                            lCopyThisRecord = True
+                        End If
+
+                        If lCopyThisRecord Then
+                            If lCanCopyRecords Then
+                                Me.RawRecord = aAddFrom.RawRecord
+                            Else 'Copy record field-by-field
+                                For lFieldNum = 1 To pNumFields
+                                    Me.Value(lFieldNum) = aAddFrom.Value(lFieldNum)
+                                Next
+                            End If
+                        End If
+                    Next
+                End With
+            End If
+            Logger.Dbg("Had " & lNumRecsAtStart & ", Added " & pHeader.NumRecs - lNumRecsAtStart & ", now have " & pHeader.NumRecs)
+        End If
+    End Sub
 
     Public Overrides Property CurrentRecord() As Integer
         Get

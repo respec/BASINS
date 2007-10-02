@@ -18,8 +18,6 @@ Public Interface IatcTable
     Function SummaryFields(Optional ByVal aFormat As String = "tab,headers,expandtype") As String
     Function SummaryFile(Optional ByVal aFormat As String = "tab,headers") As String
 
-    'Property atBOF() As Boolean
-    'Property atEOF() As Boolean
     Property CurrentRecord() As Integer
     Property FieldLength(ByVal aFieldNumber As Integer) As Integer
     Property FieldName(ByVal aFieldNumber As Integer) As String
@@ -350,41 +348,5 @@ Public MustInherit Class atcTable
         CurrentRecord = aStartRecord
         FindMatch = False
     End Function
-
-
-    'FindLast     (like FindFirst but searching from end to start)
-    'FindPrevious (like FindNext but searching from current to 1)
-
-    ''Merge records from table2Add into this table
-    ''keyFieldNames are field names that define a unique field.
-    ''If keyFieldNames is blank, no duplicate checking will occur
-    ''If keyFieldNames(1) = "**ALL**" then the entire record will be used as a key
-    ''DuplicateAction dictates handling of duplicate records as follows:
-    '' 0 - duplicates allowed
-    '' 1 - keep existing instance of duplicates and discard duplicates from dbf being added
-    '' 2 - replace existing instance of duplicates with duplicates from dbf being added
-    '' 3 - ask user what to do (not currently implemented)
-    'Public Sub Merge(table2Add As clsATCTable, keyFieldNames() As String, DuplicateAction As Integer)
-    'End Sub
-    '
-    '
-    'Public Property Get record() As Byte()
-    'End Property
-    'Public Property Let record(newValue() As Byte)
-    'End Property
-    '
-    ''Returns True if found, moves CurrentRecord to first record with .Record = FindValue
-    ''If not found, returns False and moves CurrentRecord to 1
-    'Public Function FindRecord(ByVal FindValue() As Byte, _
-    ''                          Optional ByVal aStartRecord As Integer = 1, _
-    ''                          Optional ByVal aEndRecord As Integer = -1) As Boolean
-    'End Function
-    '
-    ''Returns True if CurrentRecord matches FindValue
-    'Public Function MatchRecord(ByVal FindValue() As Byte) As Boolean
-    'End Function
-    '
-    'Public Property Set Logger(ByVal newValue As Object)
-    'End Property
 
 End Class
