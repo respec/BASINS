@@ -799,12 +799,14 @@ Public Class frmManDelin
                     'GisUtil.GridMinMaxInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1, minelev, maxelev)
                     'store in slope field as percent
                     'slope = 100 * (maxelev - minelev) / ((GisUtil.FeatureArea(SubbasinLayerIndex, i - 1)) ^ 0.5)
-                    If InStr(GisUtil.LayerFileName(ElevationLayerIndex), "\ned\") > 0 Then
-                        slope = GisUtil.GridSlopeInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1)
-                    Else
-                        slope = 100 * GisUtil.GridSlopeInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1)
+                    If GisUtil.FieldValue(SubbasinLayerIndex, i - 1, SlopeFieldIndex) <= 0 Then
+                        If InStr(GisUtil.LayerFileName(ElevationLayerIndex), "\ned\") > 0 Then
+                            slope = GisUtil.GridSlopeInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1)
+                        Else
+                            slope = 100 * GisUtil.GridSlopeInPolygon(ElevationLayerIndex, SubbasinLayerIndex, i - 1)
+                        End If
+                        GisUtil.SetFeatureValue(SubbasinLayerIndex, SlopeFieldIndex, i - 1, slope)
                     End If
-                    GisUtil.SetFeatureValue(SubbasinLayerIndex, SlopeFieldIndex, i - 1, slope)
                 Next i
             End If
 
@@ -985,6 +987,8 @@ Public Class frmManDelin
 
         'find lowest reach level in each subbasin
         For k = 1 To GisUtil.NumFeatures(SubbasinLayerIndex)
+            Logger.Progress(k, GisUtil.NumFeatures(SubbasinLayerIndex))
+            System.Windows.Forms.Application.DoEvents()
             lowestlevel = 999999
             For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
                 If GisUtil.FieldValue(StreamsLayerIndex, i - 1, ReachSubbasinFieldIndex) = k Then
@@ -1144,6 +1148,8 @@ Public Class frmManDelin
             GisUtil.SetFeatureValue(StreamsLayerIndex, tAreaFieldIndex, i - 1, r)
         Next i
         For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+            Logger.Progress(i, GisUtil.NumFeatures(StreamsLayerIndex))
+            System.Windows.Forms.Application.DoEvents()
             'is there anything downstream of this one?
             dval = GisUtil.FieldValue(StreamsLayerIndex, i - 1, DownstreamFieldIndex)
             Do While dval > 0
@@ -1156,6 +1162,7 @@ Public Class frmManDelin
                         r2 = GisUtil.FieldValue(StreamsLayerIndex, i - 1, tAreaFieldIndex)
                         GisUtil.SetFeatureValue(StreamsLayerIndex, tAreaFieldIndex, j - 1, r + r2)
                         dval = GisUtil.FieldValue(StreamsLayerIndex, j - 1, DownstreamFieldIndex)
+                        Logger.Dbg("ManDelin:" & dval & " downstream of " & rval)
                         bfound = True
                         Exit For
                     End If
@@ -1302,6 +1309,8 @@ Public Class frmManDelin
             NameFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "PNAME")
         ElseIf GisUtil.IsField(StreamsLayerIndex, "NAME") Then
             NameFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "NAME")
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "GNIS_NAME") Then
+            NameFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "GNIS_NAME")
         End If
         If NameFieldIndex > -1 Then
             For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
