@@ -51,6 +51,7 @@ Public Class frmFileGeoReference
                 With cboFields
                     .SelectedIndex = -1
                     .Items.Clear()
+                    cboAnnotate.Items.Clear()
                     .Text = ""
                     Dim lFieldName As String
                     For lFieldIndex As Integer = 0 To NumFields - 1
@@ -59,6 +60,10 @@ Public Class frmFileGeoReference
                             .Items.Add(lFieldName)
                             If lFieldName.ToLower.Equals("file") Then
                                 .SelectedIndex = .Items.Count - 1
+                            End If
+                            cboAnnotate.Items.Add(lFieldName)
+                            If lFieldName.ToLower.Equals("annotation") Then
+                                cboAnnotate.SelectedIndex = cboAnnotate.Items.Count - 1
                             End If
                         End If
                     Next
@@ -272,6 +277,7 @@ Public Class frmFileGeoReference
                     txtDate.Visible = False
                 End If
             End If
+            txtAnnotation.Text = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, cboAnnotate.Text))
         End If
     End Sub
 
@@ -280,6 +286,10 @@ Public Class frmFileGeoReference
     End Sub
 
     Private Sub cboFields_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboFields.SelectedIndexChanged
+        SetFormFromFields()
+    End Sub
+
+    Private Sub cboAnnotate_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboAnnotate.SelectedIndexChanged
         SetFormFromFields()
     End Sub
 
@@ -430,5 +440,4 @@ Public Class frmFileGeoReference
         pAddingFiles = False
         AddingPoint = False
     End Sub
-
 End Class
