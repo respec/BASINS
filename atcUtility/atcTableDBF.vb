@@ -1030,7 +1030,7 @@ TryAgain:
             Return True
 
         Catch ex As Exception
-            If Logger.Msg("Error saving " & aFilename & vbCr & ex.Message, "Write DBF", MsgBoxStyle.AbortRetryIgnore) = MsgBoxResult.Retry Then
+            If Logger.Msg("Error saving " & aFilename & vbCr & ex.Message, MsgBoxStyle.AbortRetryIgnore, "Write DBF") = MsgBoxResult.Retry Then
                 Try
                     FileClose(OutFile)
                 Catch

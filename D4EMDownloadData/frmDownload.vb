@@ -107,6 +107,7 @@ Public Class frmDownload
                              & lRegion _
                              & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                              & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
+                             & "<mergeaddedattributes>true</mergeaddedattributes>" & vbCrLf _
                              & "</arguments>" & vbCrLf _
                              & "</function>" & vbCrLf
                     End If
