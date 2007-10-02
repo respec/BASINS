@@ -1362,29 +1362,29 @@ Public Class GisUtil
                             lNeighborVal = 0
                             'find neighboring elevations
                             If lCol > 1 Then
-                                lNearVal = lInputGrid.Value(lCol - 1, lRow)
-                                If lNearVal > -20000000 Then
+                                If lInputGrid.Value(lCol - 1, lRow) > -20000000 Then
+                                    lNearVal = lInputGrid.Value(lCol - 1, lRow)
                                     lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
                                     lNeighborCount = lNeighborCount + 1
                                 End If
                             End If
                             If lCol < lInputGrid.Header.NumberCols Then
-                                lNearVal = lInputGrid.Value(lCol + 1, lRow)
-                                If lNearVal > -20000000 Then
+                                If lInputGrid.Value(lCol + 1, lRow) > -20000000 Then
+                                    lNearVal = lInputGrid.Value(lCol + 1, lRow)
                                     lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
                                     lNeighborCount = lNeighborCount + 1
                                 End If
                             End If
                             If lRow > 1 Then
-                                lNearVal = lInputGrid.Value(lCol, lRow - 1)
-                                If lNearVal > -20000000 Then
+                                If lInputGrid.Value(lCol, lRow - 1) > -20000000 Then
+                                    lNearVal = lInputGrid.Value(lCol, lRow - 1)
                                     lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
                                     lNeighborCount = lNeighborCount + 1
                                 End If
                             End If
                             If lRow < lInputGrid.Header.NumberRows Then
-                                lNearVal = lInputGrid.Value(lCol, lRow + 1)
-                                If lNearVal > -20000000 Then
+                                If lInputGrid.Value(lCol, lRow + 1) > -20000000 Then
+                                    lNearVal = lInputGrid.Value(lCol, lRow + 1)
                                     lNeighborVal = lNeighborVal + Math.Abs(lNearVal - lVal)
                                     lNeighborCount = lNeighborCount + 1
                                 End If
@@ -1408,6 +1408,9 @@ Public Class GisUtil
             Logger.Progress(totalcellcount, totalcellcount)
             lPolygonSf.EndPointInShapefile()
         End If
+        'clean up
+        lPolygonSf = Nothing
+        lInputGrid = Nothing
     End Function
 
     Public Shared Function GridValueAtPoint(ByVal aGridLayerIndex As Integer, ByVal aX As Double, ByVal aY As Double) As Integer
@@ -1420,7 +1423,11 @@ Public Class GisUtil
         Dim lCol As Integer
         Dim lRow As Integer
         lInputGrid.ProjToCell(aX, aY, lCol, lRow)
-        Return lInputGrid.Value(lCol, lRow)
+        If lInputGrid.Value(lCol, lRow) < -9999999999 Then
+            Return -999
+        Else
+            Return lInputGrid.Value(lCol, lRow)
+        End If
     End Function
 
     ''' <summary>Overlay Layer1 and Layer2 (eg landuse and subbasins), creating a polygon layer containing features from both layers</summary>
