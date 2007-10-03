@@ -281,10 +281,13 @@ Partial Class frmFileGeoReference
         Me.txtAnnotation.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.txtAnnotation.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.txtAnnotation.Location = New System.Drawing.Point(16, 489)
+        Me.txtAnnotation.Multiline = True
         Me.txtAnnotation.Name = "txtAnnotation"
-        Me.txtAnnotation.Size = New System.Drawing.Size(790, 20)
+        Me.txtAnnotation.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtAnnotation.Size = New System.Drawing.Size(790, 22)
         Me.txtAnnotation.TabIndex = 20
         Me.txtAnnotation.Text = "Annotation"
+        Me.txtAnnotation.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'frmFileGeoReference
         '
