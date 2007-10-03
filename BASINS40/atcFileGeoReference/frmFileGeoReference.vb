@@ -13,17 +13,18 @@ Public Class frmFileGeoReference
     Private pBitmap As Drawing.Bitmap
 
     Private Const pGeographicProjection As String = "+proj=longlat +datum=NAD83"
+    Private Const pDefaultLayerName As String = "photo"
     Private Const pAddAnnotationField As String = "Add Annotation field..."
     Private Const pAnnotationFieldName As String = "Annotation"
 
-    Public Sub PopulateLayers(Optional ByVal aCurrentLayerName As String = "photo")
+    Public Sub PopulateLayers(Optional ByVal aCurrentLayerName As String = pDefaultLayerName)
         Dim lSetSelectedIndex As Integer = -1
         cboLayer.Items.Clear()
         For lLayerIndex As Integer = 0 To NumLayers - 1
             If LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.PointShapefile Then
                 Dim lLayerName As String = LayerName(lLayerIndex)
                 cboLayer.Items.Add(lLayerName)
-                If lLayerName.ToLower.Equals(aCurrentLayerName.ToLower) OrElse InStr(lLayerName.ToLower, "photo") Then
+                If lLayerName.ToLower.Equals(aCurrentLayerName.ToLower) OrElse InStr(lLayerName.ToLower, pDefaultLayerName) Then
                     lSetSelectedIndex = cboLayer.Items.Count - 1
                 End If
             End If
@@ -100,7 +101,11 @@ Public Class frmFileGeoReference
             .AddExtension = True
             .Filter = "Shape files (*.shp)|*.shp|All files (*.*)|*.*"
             .FilterIndex = 0
-            .FileName = txtLocation.Text
+            Try
+                .FileName = IO.Path.Combine(IO.Path.GetDirectoryName(LayerFileName(0)), pDefaultLayerName)
+            Catch e As Exception 'Can't get directory of first layer, just use current directory
+                .FileName = pDefaultLayerName & .DefaultExt
+            End Try
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
                 Dim lLayerCaption As String = IO.Path.GetFileNameWithoutExtension(.FileName)
 
@@ -199,49 +204,78 @@ Public Class frmFileGeoReference
                         pRecordIndex, _
                         "file://" & aFilename)
 
-        If IsField(CurrentLayer, "date") Then
-            Dim lDate As String = Nothing
-
-            Try
-                Dim lExif As New ExifWorks(pBitmap)
-                If lExif.IsPropertyDefined(ExifWorks.TagNames.ExifDTOrig) Then
-                    lDate = lExif.DateTimeOriginal().ToString
-                    Logger.Dbg("Read date from EXIF: " & lDate)
-                End If
-            Catch ex As Exception
-                Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
-            End Try
-
-            If lDate Is Nothing Then lDate = System.IO.File.GetCreationTime(aFilename).ToString
-
-            SetFeatureValue(CurrentLayer, _
-                            FieldIndex(CurrentLayer, "date"), _
-                            pRecordIndex, _
-                            lDate)
-        End If
-
-        If IsField(CurrentLayer, pAnnotationFieldName) Then
-            Dim lAnnotation As String = Nothing
-
-            Try
-                Dim lExif As New ExifWorks(pBitmap)
-                If lExif.IsPropertyDefined(ExifWorks.TagNames.ImageTitle) Then
-                    lAnnotation = lExif.Title
-                    Logger.Dbg("Read " & pAnnotationFieldName & " from EXIF Title: " & lAnnotation)
-                ElseIf lExif.IsPropertyDefined(ExifWorks.TagNames.ExifUserComment) Then
-                    lAnnotation = lExif.UserComment
-                    Logger.Dbg("Read " & pAnnotationFieldName & " from EXIF User Comment: " & lAnnotation)
-                End If
-            Catch ex As Exception
-                Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
-            End Try
-
-            If Not lAnnotation Is Nothing AndAlso lAnnotation.Length > 0 Then
-                SetFeatureValue(CurrentLayer, _
-                                FieldIndex(CurrentLayer, pAnnotationFieldName), _
-                                pRecordIndex, _
-                                lAnnotation)
+        If aFilename.ToLower.EndsWith(".jpg") Then
+            Dim lExif As New ExifWorks(pBitmap)
+            Dim lValue As String = ""
+            If IsField(CurrentLayer, "date") Then
+                Try
+                    lValue = Nothing
+                    If lExif.IsPropertyDefined(ExifWorks.TagNames.ExifDTOrig) Then
+                        lValue = lExif.DateTimeOriginal().ToString
+                        Logger.Dbg("Read date from EXIF: " & lValue)
+                    Else
+                        lValue = System.IO.File.GetCreationTime(aFilename).ToString
+                    End If
+                    SetFeatureValue(CurrentLayer, _
+                                    FieldIndex(CurrentLayer, "date"), _
+                                    pRecordIndex, _
+                                    lValue)
+                Catch ex As Exception
+                    Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
+                End Try
             End If
+
+            If IsField(CurrentLayer, pAnnotationFieldName) Then
+                Try
+                    If lExif.IsPropertyDefined(ExifWorks.TagNames.ImageTitle) Then
+                        lValue = lExif.Title
+                        Logger.Dbg("Read " & pAnnotationFieldName & " from EXIF Title: " & lValue)
+                    ElseIf lExif.IsPropertyDefined(ExifWorks.TagNames.ExifUserComment) Then
+                        lValue = lExif.UserComment
+                        Logger.Dbg("Read " & pAnnotationFieldName & " from EXIF User Comment: " & lValue)
+                    End If
+                Catch ex As Exception
+                    Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
+                End Try
+
+                If Not lValue Is Nothing AndAlso lValue.Length > 0 Then
+                    SetFeatureValue(CurrentLayer, _
+                                    FieldIndex(CurrentLayer, pAnnotationFieldName), _
+                                    pRecordIndex, _
+                                    lValue)
+                End If
+            End If
+
+            If IsField(CurrentLayer, "latitude") Then
+                Try
+                    If lExif.IsPropertyDefined(ExifWorks.TagNames.GpsLatitude) Then
+                        lValue = lExif.DateTimeOriginal().ToString
+                        Logger.Dbg("Read latitude from EXIF: " & lValue)
+                        SetFeatureValue(CurrentLayer, _
+                                        FieldIndex(CurrentLayer, "latitude"), _
+                                        pRecordIndex, _
+                                        lValue)
+                    End If
+                Catch ex As Exception
+                    Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
+                End Try
+            End If
+
+            If IsField(CurrentLayer, "longitude") Then
+                Try
+                    If lExif.IsPropertyDefined(ExifWorks.TagNames.GpsLongitude) Then
+                        lValue = lExif.DateTimeOriginal().ToString
+                        Logger.Dbg("Read longitude from EXIF: " & lValue)
+                        SetFeatureValue(CurrentLayer, _
+                                        FieldIndex(CurrentLayer, "longitude"), _
+                                        pRecordIndex, _
+                                        lValue)
+                    End If
+                Catch ex As Exception
+                    Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
+                End Try
+            End If
+
         End If
     End Sub
 
@@ -393,6 +427,7 @@ Public Class frmFileGeoReference
     Private Sub pbxImage_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles pbxImage.DoubleClick
         Dim lExif As New ExifWorks(txtLocation.Text)
         Logger.Msg(lExif.ToString, MsgBoxStyle.OkOnly, "Image Metadata")
+        lExif.Dispose()
     End Sub
 
     Private Sub AddFile(ByVal aFileName As String)
@@ -500,6 +535,20 @@ Public Class frmFileGeoReference
         Dim lAnnotationField As String = cboAnnotate.Text
         If lAnnotationField.Length > 0 AndAlso lAnnotationField <> pAddAnnotationField Then
             SetFeatureValue(CurrentLayer, FieldIndex(CurrentLayer, lAnnotationField), pRecordIndex, txtAnnotation.Text)
+        End If
+
+        If Not pBitmap Is Nothing AndAlso FileExists(txtLocation.Text) Then
+            Dim lGeocodedFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(txtLocation.Text), IO.Path.GetFileNameWithoutExtension(txtLocation.Text) & ".geo.jpg")
+            Dim lExif As New ExifWorks(pBitmap)
+            If Not lExif.Title = txtAnnotation.Text Then
+                lExif.Title = txtAnnotation.Text
+                Try
+                    pBitmap.Save(lGeocodedFilename)
+                    Logger.Dbg("Saved geocoded file '" & lGeocodedFilename & "'")
+                Catch ex As Exception
+                    Logger.Dbg("Failed to save geocoded file '" & lGeocodedFilename & "' - " & ex.Message)
+                End Try
+            End If
         End If
     End Sub
 End Class

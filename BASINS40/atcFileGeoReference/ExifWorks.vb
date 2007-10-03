@@ -1258,11 +1258,35 @@ Public Class ExifWorks
             Dim degrees As Double = BitConverter.ToInt32(pi.Value, 0) / BitConverter.ToInt32(pi.Value, 4)
             Dim minutes As Double = BitConverter.ToInt32(pi.Value, 8) / BitConverter.ToInt32(pi.Value, 12)
             Dim seconds As Double = BitConverter.ToInt32(pi.Value, 16) / BitConverter.ToInt32(pi.Value, 20)
-            Return degrees + minutes / 60 + seconds / 3600
+            Dim decimalDegrees As Double = degrees + minutes / 60 + seconds / 3600
+            Select Case PID
+                Case TagNames.GpsLongitude
+                    If GetPropertyString(TagNames.GpsLongitudeRef, "E") = "W" Then decimalDegrees = -decimalDegrees
+                Case TagNames.GpsLatitude
+                    If GetPropertyString(TagNames.GpsLatitudeRef, "N") = "S" Then decimalDegrees = -decimalDegrees
+            End Select
+            Return decimalDegrees
         End If
     End Function
 
     Public Sub SetCoordinateGPS(ByVal PID As Int32, ByVal Coordinate As Double)
+
+        If (PID = TagNames.GpsLongitude) Then
+            If (Coordinate >= 0) Then
+                SetPropertyString(TagNames.GpsLongitudeRef, "E")
+            Else
+                SetPropertyString(TagNames.GpsLongitudeRef, "W")
+            End If
+        Else
+            If (Coordinate >= 0) Then
+                SetPropertyString(TagNames.GpsLatitudeRef, "N")
+            Else
+                SetPropertyString(TagNames.GpsLatitudeRef, "S")
+            End If
+        End If
+
+        Coordinate = Math.Abs(Coordinate)
+
         Dim lDegrees As Integer = CInt(Math.Floor(Coordinate))
 
         'Subtract degrees to see how many fractional degrees are left
@@ -1282,19 +1306,6 @@ Public Class ExifWorks
         BitConverter.GetBytes(lSeconds).CopyTo(Data, 16) : BitConverter.GetBytes(CInt(1000)).CopyTo(Data, 20)
 
         SetProperty(PID, Data, ExifDataTypes.UnsignedRational)
-        If (PID = TagNames.GpsLongitude) Then
-            If (lDegrees >= 0) Then
-                SetPropertyString(TagNames.GpsLongitudeRef, "E")
-            Else
-                SetPropertyString(TagNames.GpsLongitudeRef, "W")
-            End If
-        Else
-            If (lDegrees >= 0) Then
-                SetPropertyString(TagNames.GpsLatitudeRef, "N")
-            Else
-                SetPropertyString(TagNames.GpsLatitudeRef, "S")
-            End If
-        End If
     End Sub
 
     ''' <summary>
