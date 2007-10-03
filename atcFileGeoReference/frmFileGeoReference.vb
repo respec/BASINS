@@ -5,6 +5,7 @@ Public Class frmFileGeoReference
     Private pRecordIndex As Integer = 0 'zero-based index of current record in georef layer
     Private pAddingPoint As Boolean = False
     Private pAddingFiles As Boolean = False
+    Private pLayerIndexChanged As Boolean = False
 
     Private pRandomPlacement As Boolean = False
     Private pRandom As New Random
@@ -12,6 +13,8 @@ Public Class frmFileGeoReference
     Private pBitmap As Drawing.Bitmap
 
     Private Const pGeographicProjection As String = "+proj=longlat +datum=NAD83"
+    Private Const pAddAnnotationField As String = "Add Annotation field..."
+    Private Const pAnnotationFieldName As String = "Annotation"
 
     Public Sub PopulateLayers(Optional ByVal aCurrentLayerName As String = "photo")
         Dim lSetSelectedIndex As Integer = -1
@@ -39,6 +42,7 @@ Public Class frmFileGeoReference
     End Sub
 
     Private Sub cboLayer_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboLayer.SelectedIndexChanged
+        pLayerIndexChanged = True
         Dim lCbo As System.Windows.Forms.ComboBox = sender
         If lCbo.SelectedIndex = lCbo.Items.Count - 1 Then
             CreateNewGeoRefLayer() 'This causes a new call to this routine with the new index
@@ -61,9 +65,12 @@ Public Class frmFileGeoReference
                             If lFieldName.ToLower.Equals("file") Then
                                 .SelectedIndex = .Items.Count - 1
                             End If
-                            cboAnnotate.Items.Add(lFieldName)
-                            If lFieldName.ToLower.Equals("annotation") Then
-                                cboAnnotate.SelectedIndex = cboAnnotate.Items.Count - 1
+                            If Not lFieldName.ToLower.Equals("file") AndAlso _
+                               Not lFieldName.ToLower.Equals("date") Then
+                                cboAnnotate.Items.Add(lFieldName)
+                                If lFieldName.ToLower.Equals(pAnnotationFieldName.ToLower) Then
+                                    cboAnnotate.SelectedIndex = cboAnnotate.Items.Count - 1
+                                End If
                             End If
                         End If
                     Next
@@ -72,11 +79,16 @@ Public Class frmFileGeoReference
                     Else
                         Logger.Msg("No Fields Available for Links")
                     End If
+                    If cboAnnotate.SelectedIndex < 0 Then
+                        cboAnnotate.Items.Add(pAddAnnotationField)
+                        cboAnnotate.SelectedIndex = cboAnnotate.Items.Count - 1
+                    End If
                     pRecordIndex = 0
                     SetFormFromFields()
                 End With
             End If
         End If
+        pLayerIndexChanged = False
     End Sub
 
     ''' <summary>Create a New GeoReferencing Point Shape Layer</summary>
@@ -99,7 +111,7 @@ Public Class frmFileGeoReference
                 lNewLayer.StartEditingTable()
                 lNewLayer.EditInsertField(NewField("file", MapWinGIS.FieldType.STRING_FIELD, 1024), 1)
                 lNewLayer.EditInsertField(NewField("date", MapWinGIS.FieldType.STRING_FIELD, 10), 2)
-                lNewLayer.EditInsertField(NewField("comment", MapWinGIS.FieldType.STRING_FIELD, 1024), 3)
+                lNewLayer.EditInsertField(NewField(pAnnotationFieldName, MapWinGIS.FieldType.STRING_FIELD, 1024), 3)
                 lNewLayer.EditInsertField(NewField("latitude", MapWinGIS.FieldType.DOUBLE_FIELD), 4)
                 lNewLayer.EditInsertField(NewField("longitude", MapWinGIS.FieldType.DOUBLE_FIELD), 5)
                 lNewLayer.StopEditingTable()
@@ -145,7 +157,11 @@ Public Class frmFileGeoReference
     End Sub
 
     Private Sub btnPrev_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPrev.Click
-        If pRecordIndex > 0 Then pRecordIndex -= 1
+        If pRecordIndex > 0 Then
+            pRecordIndex -= 1
+        Else
+            pRecordIndex = NumFeatures - 1
+        End If
         ClearSelectedFeatures(CurrentLayer)
         SetSelectedFeature(CurrentLayer, pRecordIndex)
         SetFormFromFields()
@@ -154,7 +170,7 @@ Public Class frmFileGeoReference
     Private Sub btnNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNext.Click
         pRecordIndex += 1
         If pRecordIndex >= NumFeatures Then
-            pRecordIndex = NumFeatures - 1
+            pRecordIndex = 0 'NumFeatures - 1
         End If
         ClearSelectedFeatures(CurrentLayer)
         SetSelectedFeature(CurrentLayer, pRecordIndex)
@@ -202,6 +218,30 @@ Public Class frmFileGeoReference
                             FieldIndex(CurrentLayer, "date"), _
                             pRecordIndex, _
                             lDate)
+        End If
+
+        If IsField(CurrentLayer, pAnnotationFieldName) Then
+            Dim lAnnotation As String = Nothing
+
+            Try
+                Dim lExif As New ExifWorks(pBitmap)
+                If lExif.IsPropertyDefined(ExifWorks.TagNames.ImageTitle) Then
+                    lAnnotation = lExif.Title
+                    Logger.Dbg("Read " & pAnnotationFieldName & " from EXIF Title: " & lAnnotation)
+                ElseIf lExif.IsPropertyDefined(ExifWorks.TagNames.ExifUserComment) Then
+                    lAnnotation = lExif.UserComment
+                    Logger.Dbg("Read " & pAnnotationFieldName & " from EXIF User Comment: " & lAnnotation)
+                End If
+            Catch ex As Exception
+                Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
+            End Try
+
+            If Not lAnnotation Is Nothing AndAlso lAnnotation.Length > 0 Then
+                SetFeatureValue(CurrentLayer, _
+                                FieldIndex(CurrentLayer, pAnnotationFieldName), _
+                                pRecordIndex, _
+                                lAnnotation)
+            End If
         End If
     End Sub
 
@@ -264,7 +304,7 @@ Public Class frmFileGeoReference
                     lblLocation.Visible = True
                     txtLocation.Visible = True
                 Else
-                    lblStatus.Text = "Select a field containing documents"
+                    lblStatus.Text = "Select a field containing document links"
                     lblStatus.Visible = True
                     pbxImage.Visible = False
                 End If
@@ -276,8 +316,11 @@ Public Class frmFileGeoReference
                     lblDate.Visible = False
                     txtDate.Visible = False
                 End If
+                Dim lAnnotationField As String = cboAnnotate.Text
+                If lAnnotationField.Length > 0 AndAlso lAnnotationField <> pAddAnnotationField Then
+                    txtAnnotation.Text = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, lAnnotationField))
+                End If
             End If
-            txtAnnotation.Text = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, cboAnnotate.Text))
         End If
     End Sub
 
@@ -290,7 +333,19 @@ Public Class frmFileGeoReference
     End Sub
 
     Private Sub cboAnnotate_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboAnnotate.SelectedIndexChanged
-        SetFormFromFields()
+        Dim lCbo As System.Windows.Forms.ComboBox = sender
+        If Not pLayerIndexChanged Then
+            If lCbo.Text = pAddAnnotationField Then
+                Dim lLayerIndex As Integer = LayerIndex(cboLayer.Items(cboLayer.SelectedIndex).ToString)
+                If lLayerIndex >= 0 Then
+                    AddField(lLayerIndex, pAnnotationFieldName, MapWinGIS.FieldType.STRING_FIELD, 80)
+                    lCbo.Items.Add(pAnnotationFieldName)
+                    lCbo.Items.Remove(pAddAnnotationField)
+                    lCbo.SelectedIndex = lCbo.Items.Count - 1
+                End If
+            End If
+            SetFormFromFields()
+        End If
     End Sub
 
     Private Sub btnAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAdd.Click
@@ -439,5 +494,12 @@ Public Class frmFileGeoReference
     Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
         pAddingFiles = False
         AddingPoint = False
+    End Sub
+
+    Private Sub txtAnnotation_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtAnnotation.TextChanged
+        Dim lAnnotationField As String = cboAnnotate.Text
+        If lAnnotationField.Length > 0 AndAlso lAnnotationField <> pAddAnnotationField Then
+            SetFeatureValue(CurrentLayer, FieldIndex(CurrentLayer, lAnnotationField), pRecordIndex, txtAnnotation.Text)
+        End If
     End Sub
 End Class
