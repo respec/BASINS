@@ -43,6 +43,7 @@ Public Class atcMetCmpPlugin
         Dim lSRadTSer As atcTimeseries = Nothing
         Dim lWindTSer As atcTimeseries = Nothing
         Dim lDlyTSer As atcTimeseries = Nothing
+        Dim lObsTimeTSer As atcTimeseries = Nothing
         Dim lLatitude As Double
         Dim lCTS(12) As Double
         Dim lDegF As Boolean
@@ -214,16 +215,21 @@ Public Class atcMetCmpPlugin
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisTemp
                     lOk = lForm.AskUser(lTMinTSer, lTMaxTSer, lObsTime)
+                    'build obs time TSer with constant value from aObsTime argument
+                    lObsTimeTSer = lTMinTSer.Clone
+                    For i As Integer = 1 To lObsTimeTSer.numValues
+                        lObsTimeTSer.Values(i) = lObsTime
+                    Next
+                    lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
+                    lObsTimeTSer.Attributes.SetValue("Constituent", lTMinTSer.Attributes.GetValue("Constituent") & "-OBS")
                 Else
                     lTMinTSer = aArgs.GetValue("TMIN")
                     lTMaxTSer = aArgs.GetValue("TMAX")
-                    lObsTime = aArgs.GetValue("Observation Time")
+                    lObsTimeTSer = aArgs.GetValue("Observation Hour Timeseries")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Observation Time")
-                If lOk And Not lTMinTSer Is Nothing And Not lTMinTSer Is Nothing And _
-                  lObsTime >= lAttDef.Min And lObsTime <= lAttDef.Max Then
-                    Dim lMetCmpTS As atcTimeseries = DisTemp(lTMinTSer, lTMaxTSer, Me, lObsTime)
+                If lOk And Not lTMinTSer Is Nothing And Not lTMinTSer Is Nothing And Not lobstimeTSer Is Nothing Then
+                    Dim lMetCmpTS As atcTimeseries = DisaggTemp(lTMinTSer, lTMaxTSer, Me, lObsTimeTSer)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Wind (Disaggregate)"
@@ -254,24 +260,28 @@ Public Class atcMetCmpPlugin
                 Dim lHrTSers As atcDataGroup = Nothing
                 Dim lTol As Double
                 Dim lSummFile As String = ""
-                Dim lAttDef2 As atcAttributeDefinition
                 If aArgs Is Nothing Then
                     Dim lForm As New frmDisPrec
                     lOk = lForm.AskUser(lDlyTSer, lHrTSers, lObsTime, lTol, lSummFile)
+                    'build obs time TSer with constant value from aObsTime argument
+                    lObsTimeTSer = lDlyTSer.Clone
+                    For i As Integer = 1 To lObsTimeTSer.numValues
+                        lObsTimeTSer.Values(i) = lObsTime
+                    Next
+                    lObsTimeTSer.Attributes.SetValue("Scenario", "CONST-" & lObsTime)
+                    lObsTimeTSer.Attributes.SetValue("Constituent", lDlyTSer.Attributes.GetValue("Constituent") & "-OBS")
                 Else
                     lDlyTSer = aArgs.GetValue("DPRC")
                     lHrTSers = aArgs.GetValue("HPCP")
-                    lObsTime = aArgs.GetValue("Observation Hour")
+                    lObsTimeTSer = aArgs.GetValue("Observation Hour Timeseries")
                     lTol = aArgs.GetValue("Data Tolerance")
                     lSummFile = aArgs.GetValue("Summary File")
                     lOk = True
                 End If
-                lAttDef = atcDataAttributes.GetDefinition("Observation Hour")
-                lAttDef2 = atcDataAttributes.GetDefinition("Data Tolerance")
-                If lOk And Not lHrTSers Is Nothing And _
-                  lObsTime >= lAttDef.Min And lObsTime <= lAttDef.Max And _
-                  lTol >= lAttDef2.Min And lTol <= lAttDef2.Max Then
-                    Dim lMetCmpTS As atcTimeseries = DisPrecip(lDlyTSer, Me, lHrTSers, lObsTime, lTol, lSummFile)
+                lAttDef = atcDataAttributes.GetDefinition("Data Tolerance")
+                If lOk And Not lHrTSers Is Nothing And Not lObsTimeTSer Is Nothing And _
+                   lTol >= lAttDef.Min And lTol <= lAttDef.Max Then
+                    Dim lMetCmpTS As atcTimeseries = DisaggPrecip(lDlyTSer, Me, lHrTSers, lObsTimeTSer, lTol, lSummFile)
                     MyBase.DataSets.Add(lMetCmpTS)
                 End If
             Case "Dewpoint"
@@ -548,7 +558,7 @@ Public Class atcMetCmpPlugin
                 lOperations.SetValue(lDisEvap, Nothing, lArguments)
 
                 Dim defObsTimeTS As New atcAttributeDefinition
-                defObsTimeTS = defTimeSeriesOne.Clone("Observation Timeseries", "Timeseries of Daily Observation times (1-24)")
+                defObsTimeTS = defTimeSeriesOne.Clone("Observation Hour Timeseries", "Timeseries of Daily Observation times (1-24)")
 
                 Dim lDisTemp As New atcAttributeDefinition
                 With lDisTemp
