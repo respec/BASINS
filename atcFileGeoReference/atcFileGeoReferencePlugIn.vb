@@ -5,9 +5,8 @@ Public Class atcFileGeoReferencePlugIn
     Inherits atcData.atcDataPlugIn
 
     Private pMapWin As MapWindow.Interfaces.IMapWin
-    Private pLayer As MapWinGIS.Shapefile
-    Private pNewPoint As MapWinGIS.Point
-    Private pForm As frmFileGeoReference
+    Private WithEvents pForm As frmFileGeoReference
+    Private pCursorSave As MapWinGIS.tkCursor
 
     Private pResourceManager As Resources.ResourceManager
     Private Const ParentMenuName As String = "BasinsAnalysis"
@@ -22,7 +21,7 @@ Public Class atcFileGeoReferencePlugIn
     Public Overrides Sub Initialize(ByVal aMapWin As MapWindow.Interfaces.IMapWin, _
                                     ByVal aParentHandle As Integer)
         pMapWin = aMapWin
-        MappingObject = aMapWin
+        MappingObject = aMapWin 'in GisUtil
         'TODO: make this consistent, be sure remove handled correctly
         pMapWin.Menus.AddMenu(ParentMenuName, "", Nothing, ParentMenuString, "mnuFile")
         pMapWin.Menus.AddMenu(FullMenuName, ParentMenuName, Nothing, "File Geo Reference")
@@ -65,9 +64,15 @@ Public Class atcFileGeoReferencePlugIn
 
     Public Overrides Sub ItemClicked(ByVal aItemName As String, ByRef aHandled As Boolean)
         If aItemName = FullMenuName Then
-            pForm = New frmFileGeoReference
-            pForm.PopulateLayers()
-            pForm.Show()
+            If pForm Is Nothing Then
+                'next line commented because we can only select on one layer at a time - therefore, only one form makes sense
+                'OrElse pForm.DocumentLayerIndex <> CurrentLayer Then
+                pForm = New frmFileGeoReference
+                pForm.PopulateLayers()
+                pForm.Show()
+            Else
+                pForm.Focus()
+            End If
             aHandled = True
         End If
     End Sub
@@ -81,11 +86,24 @@ Public Class atcFileGeoReferencePlugIn
                 Dim lPx As Double
                 Dim lPy As Double
                 pMapWin.View.PixelToProj(x, y, lPx, lPy)
-                AddPoint(CurrentLayer, lPx, lPy)
+                AddPoint(pForm.DocumentLayerIndex, lPx, lPy)
                 Handled = True
             End If
             pForm.AddingPoint = False
         End If
     End Sub
 
+    Private Sub pForm_AddPointToggle(ByVal aAdding As Boolean) Handles pForm.AddPointToggle
+        If aAdding Then
+            pCursorSave = pMapWin.View.MapCursor
+            pMapWin.View.MapCursor = MapWinGIS.tkCursor.crsrArrow
+            'TODO: use the button rather than cursor - pMapWin.Toolbar.PressToolbarButton(whatName?)
+        Else
+            pMapWin.View.MapCursor = pCursorSave
+        End If
+    End Sub
+
+    Private Sub pForm_Disposed(ByVal sender As Object, ByVal e As System.EventArgs) Handles pForm.Disposed
+        pForm = Nothing
+    End Sub
 End Class
