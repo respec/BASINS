@@ -17,14 +17,16 @@ Public Class frmFileGeoReference
     Private Const pAddAnnotationField As String = "Add Annotation field..."
     Private Const pAnnotationFieldName As String = "Annotation"
 
-    Public Sub PopulateLayers(Optional ByVal aCurrentLayerName As String = pDefaultLayerName)
+    Public Event AddPointToggle(ByVal aAdding As Boolean)
+
+    Public Sub PopulateLayers(Optional ByVal aDocumentLayerIndexName As String = pDefaultLayerName)
         Dim lSetSelectedIndex As Integer = -1
         cboLayer.Items.Clear()
         For lLayerIndex As Integer = 0 To NumLayers - 1
             If LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.PointShapefile Then
                 Dim lLayerName As String = LayerName(lLayerIndex)
                 cboLayer.Items.Add(lLayerName)
-                If lLayerName.ToLower.Equals(aCurrentLayerName.ToLower) OrElse InStr(lLayerName.ToLower, pDefaultLayerName) Then
+                If lLayerName.ToLower.Equals(aDocumentLayerIndexName.ToLower) OrElse InStr(lLayerName.ToLower, pDefaultLayerName) Then
                     lSetSelectedIndex = cboLayer.Items.Count - 1
                 End If
             End If
@@ -33,11 +35,11 @@ Public Class frmFileGeoReference
         If lSetSelectedIndex >= 0 Then
             cboLayer.SelectedIndex = lSetSelectedIndex
         End If
-        If NumSelectedFeatures(CurrentLayer) > 0 Then
-            pRecordIndex = IndexOfNthSelectedFeatureInLayer(0, CurrentLayer)
+        If NumSelectedFeatures(DocumentLayerIndex) > 0 Then
+            pRecordIndex = IndexOfNthSelectedFeatureInLayer(0, DocumentLayerIndex)
         Else
             pRecordIndex = 0
-            SetSelectedFeature(CurrentLayer, pRecordIndex)
+            SetSelectedFeature(DocumentLayerIndex, pRecordIndex)
         End If
         SetFormFromFields()
     End Sub
@@ -51,7 +53,6 @@ Public Class frmFileGeoReference
             Dim lLayerIndex As Integer = LayerIndex(lCbo.Items(lCbo.SelectedIndex).ToString)
 
             If lLayerIndex >= 0 Then 'have a selected layer to make current
-                CurrentLayer = lLayerIndex
                 LayerVisible = True
                 With cboFields
                     .SelectedIndex = -1
@@ -91,6 +92,12 @@ Public Class frmFileGeoReference
         End If
         pLayerIndexChanged = False
     End Sub
+
+    Friend ReadOnly Property DocumentLayerIndex() As Integer
+        Get
+            Return LayerIndex(cboLayer.Text) 'Items(cboLayer.SelectedIndex).ToString)
+        End Get
+    End Property
 
     ''' <summary>Create a New GeoReferencing Point Shape Layer</summary>
     ''' <returns>Layer Index of new layer, or -1 if not created</returns>
@@ -146,6 +153,7 @@ Public Class frmFileGeoReference
         lNewField.Type = aType
         If aWidth < 1 Then
             Select Case aType
+                'TODO: why are these commented
                 'Case MapWinGIS.FieldType.DOUBLE_FIELD : lNewField.Width = 8
                 'Case MapWinGIS.FieldType.INTEGER_FIELD : lNewField.Width = 4
                 Case MapWinGIS.FieldType.STRING_FIELD : lNewField.Width = 80
@@ -167,8 +175,8 @@ Public Class frmFileGeoReference
         Else
             pRecordIndex = NumFeatures - 1
         End If
-        ClearSelectedFeatures(CurrentLayer)
-        SetSelectedFeature(CurrentLayer, pRecordIndex)
+        ClearSelectedFeatures(DocumentLayerIndex)
+        SetSelectedFeature(DocumentLayerIndex, pRecordIndex)
         SetFormFromFields()
     End Sub
 
@@ -177,8 +185,8 @@ Public Class frmFileGeoReference
         If pRecordIndex >= NumFeatures Then
             pRecordIndex = 0 'NumFeatures - 1
         End If
-        ClearSelectedFeatures(CurrentLayer)
-        SetSelectedFeature(CurrentLayer, pRecordIndex)
+        ClearSelectedFeatures(DocumentLayerIndex)
+        SetSelectedFeature(DocumentLayerIndex, pRecordIndex)
         SetFormFromFields()
     End Sub
 
@@ -199,15 +207,15 @@ Public Class frmFileGeoReference
     End Sub
 
     Private Sub SetFieldsFromDocument(ByVal aFilename As String)
-        SetFeatureValue(CurrentLayer, _
-                        FieldIndex(CurrentLayer, cboFields.Text), _
+        SetFeatureValue(DocumentLayerIndex, _
+                        FieldIndex(DocumentLayerIndex, cboFields.Text), _
                         pRecordIndex, _
                         "file://" & aFilename)
 
         If aFilename.ToLower.EndsWith(".jpg") Then
             Dim lExif As New ExifWorks(pBitmap)
             Dim lValue As String = ""
-            If IsField(CurrentLayer, "date") Then
+            If IsField(DocumentLayerIndex, "date") Then
                 Try
                     lValue = Nothing
                     If lExif.IsPropertyDefined(ExifWorks.TagNames.ExifDTOrig) Then
@@ -216,8 +224,8 @@ Public Class frmFileGeoReference
                     Else
                         lValue = System.IO.File.GetCreationTime(aFilename).ToString
                     End If
-                    SetFeatureValue(CurrentLayer, _
-                                    FieldIndex(CurrentLayer, "date"), _
+                    SetFeatureValue(DocumentLayerIndex, _
+                                    FieldIndex(DocumentLayerIndex, "date"), _
                                     pRecordIndex, _
                                     lValue)
                 Catch ex As Exception
@@ -225,7 +233,7 @@ Public Class frmFileGeoReference
                 End Try
             End If
 
-            If IsField(CurrentLayer, pAnnotationFieldName) Then
+            If IsField(DocumentLayerIndex, pAnnotationFieldName) Then
                 Try
                     If lExif.IsPropertyDefined(ExifWorks.TagNames.ImageTitle) Then
                         lValue = lExif.Title
@@ -239,20 +247,20 @@ Public Class frmFileGeoReference
                 End Try
 
                 If Not lValue Is Nothing AndAlso lValue.Length > 0 Then
-                    SetFeatureValue(CurrentLayer, _
-                                    FieldIndex(CurrentLayer, pAnnotationFieldName), _
+                    SetFeatureValue(DocumentLayerIndex, _
+                                    FieldIndex(DocumentLayerIndex, pAnnotationFieldName), _
                                     pRecordIndex, _
                                     lValue)
                 End If
             End If
 
-            If IsField(CurrentLayer, "latitude") Then
+            If IsField(DocumentLayerIndex, "latitude") Then
                 Try
                     If lExif.IsPropertyDefined(ExifWorks.TagNames.GpsLatitude) Then
                         lValue = lExif.DateTimeOriginal().ToString
                         Logger.Dbg("Read latitude from EXIF: " & lValue)
-                        SetFeatureValue(CurrentLayer, _
-                                        FieldIndex(CurrentLayer, "latitude"), _
+                        SetFeatureValue(DocumentLayerIndex, _
+                                        FieldIndex(DocumentLayerIndex, "latitude"), _
                                         pRecordIndex, _
                                         lValue)
                     End If
@@ -261,13 +269,13 @@ Public Class frmFileGeoReference
                 End Try
             End If
 
-            If IsField(CurrentLayer, "longitude") Then
+            If IsField(DocumentLayerIndex, "longitude") Then
                 Try
                     If lExif.IsPropertyDefined(ExifWorks.TagNames.GpsLongitude) Then
                         lValue = lExif.DateTimeOriginal().ToString
                         Logger.Dbg("Read longitude from EXIF: " & lValue)
-                        SetFeatureValue(CurrentLayer, _
-                                        FieldIndex(CurrentLayer, "longitude"), _
+                        SetFeatureValue(DocumentLayerIndex, _
+                                        FieldIndex(DocumentLayerIndex, "longitude"), _
                                         pRecordIndex, _
                                         lValue)
                     End If
@@ -325,14 +333,14 @@ Public Class frmFileGeoReference
                 If pRecordIndex >= NumFeatures Then pRecordIndex = NumFeatures - 1
                 lblRecordInfo.Text = "Record " & pRecordIndex + 1 & " of " & NumFeatures
 
-                If IsField(CurrentLayer, "date") Then
-                    txtDate.Text = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, "date"))
+                If IsField(DocumentLayerIndex, "date") Then
+                    txtDate.Text = FieldValue(DocumentLayerIndex, pRecordIndex, FieldIndex(DocumentLayerIndex, "date"))
                 Else
                     txtDate.Text = ""
                 End If
 
-                If IsField(CurrentLayer, cboFields.Text) Then
-                    Dim lFilename As String = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, cboFields.Text))
+                If IsField(DocumentLayerIndex, cboFields.Text) Then
+                    Dim lFilename As String = FieldValue(DocumentLayerIndex, pRecordIndex, FieldIndex(DocumentLayerIndex, cboFields.Text))
                     If lFilename.StartsWith("file://") Then lFilename = lFilename.Substring(7)
                     SetFormFromDocument(lFilename)
                     lblLocation.Visible = True
@@ -352,7 +360,7 @@ Public Class frmFileGeoReference
                 End If
                 Dim lAnnotationField As String = cboAnnotate.Text
                 If lAnnotationField.Length > 0 AndAlso lAnnotationField <> pAddAnnotationField Then
-                    txtAnnotation.Text = FieldValue(CurrentLayer, pRecordIndex, FieldIndex(CurrentLayer, lAnnotationField))
+                    txtAnnotation.Text = FieldValue(DocumentLayerIndex, pRecordIndex, FieldIndex(DocumentLayerIndex, lAnnotationField))
                 End If
             End If
         End If
@@ -411,17 +419,18 @@ Public Class frmFileGeoReference
             lblStatus.Visible = pAddingPoint
             btnCancel.Visible = pAddingPoint
             grpDocument.Visible = Not pAddingPoint
+            RaiseEvent AddPointToggle(value)
         End Set
     End Property
 
     Private Sub btnRemove_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRemove.Click
-        ClearSelectedFeatures(CurrentLayer)
-        If NumFeatures > pRecordIndex Then RemoveFeature(CurrentLayer, pRecordIndex)
+        ClearSelectedFeatures(DocumentLayerIndex)
+        If NumFeatures > pRecordIndex Then RemoveFeature(DocumentLayerIndex, pRecordIndex)
         If pRecordIndex >= NumFeatures Then
             pRecordIndex = NumFeatures - 1
         End If
         SetFormFromFields()
-        SetSelectedFeature(CurrentLayer, pRecordIndex)
+        SetSelectedFeature(DocumentLayerIndex, pRecordIndex)
     End Sub
 
     Private Sub pbxImage_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles pbxImage.DoubleClick
@@ -456,7 +465,7 @@ Public Class frmFileGeoReference
                 lY = lLatitude
                 lX = lLongitude
                 ProjectPoint(lX, lY, pGeographicProjection, ProjectProjection)
-                AddPoint(CurrentLayer, lX, lY)
+                AddPoint(DocumentLayerIndex, lX, lY)
             End If
         Catch ex As Exception
             Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
@@ -472,11 +481,11 @@ Public Class frmFileGeoReference
                 Dim lYMin As Double = MapExtentYmin
                 lX = lXMin + (lXMax - lXMin) * (0.4 + pRandom.NextDouble / 10)
                 lY = lYMin + (lYMax - lYMin) * (0.4 + pRandom.NextDouble / 10)
-                AddPoint(CurrentLayer, lX, lY)
+                AddPoint(DocumentLayerIndex, lX, lY)
             Else 'Ask user to click to place point
                 If UserAddPoint() Then
                     If Not lExif Is Nothing Then 'Set lat/lon in image to newly geocoded point (the last point in the file)
-                        PointXY(CurrentLayer, NumFeatures - 1, lX, lY)
+                        PointXY(DocumentLayerIndex, NumFeatures - 1, lX, lY)
                         If Not ProjectProjection.Equals(pGeographicProjection) Then
                             Logger.Dbg("Projecting new point from (" & lX & ", " & lY & ") in '" & ProjectProjection() & "' to '" & pGeographicProjection & "'")
                             ProjectPoint(lX, lY, ProjectProjection, pGeographicProjection)
@@ -500,7 +509,7 @@ Public Class frmFileGeoReference
         If NumFeatures > lSaveNumFeatures Then 'Added a shape
             pRecordIndex = NumFeatures() - 1
             SetFieldsFromDocument(aFileName)
-            SetSelectedFeature(CurrentLayer, pRecordIndex)
+            SetSelectedFeature(DocumentLayerIndex, pRecordIndex)
         End If
     End Sub
 
@@ -534,7 +543,7 @@ Public Class frmFileGeoReference
     Private Sub txtAnnotation_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtAnnotation.TextChanged
         Dim lAnnotationField As String = cboAnnotate.Text
         If lAnnotationField.Length > 0 AndAlso lAnnotationField <> pAddAnnotationField Then
-            SetFeatureValue(CurrentLayer, FieldIndex(CurrentLayer, lAnnotationField), pRecordIndex, txtAnnotation.Text)
+            SetFeatureValue(DocumentLayerIndex, FieldIndex(DocumentLayerIndex, lAnnotationField), pRecordIndex, txtAnnotation.Text)
         End If
 
         If Not pBitmap Is Nothing AndAlso FileExists(txtLocation.Text) Then
