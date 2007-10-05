@@ -170,8 +170,13 @@ Public Class atcTableDBF
     ''' 0 - do not check for duplicates, just add all new records
     ''' 1 - keep existing instance and discard duplicates from dbf being added
     ''' 2 - replace existing instance with duplicates from dbf being added</param>
+    ''' <param name="aAddedIndexes">Indexes from aAddFrom of items merged are added to aAddedIndexes if provided</param>
     ''' <remarks></remarks>
-    Public Sub Merge(ByVal aAddFrom As atcTableDBF, ByVal aKeyFieldNames() As String, ByVal aDuplicateAction As Integer)
+    Public Sub Merge(ByVal aAddFrom As atcTableDBF, _
+                     ByVal aKeyFieldNames() As String, _
+                     ByVal aDuplicateAction As Integer, _
+            Optional ByVal aAddedIndexes As ArrayList = Nothing)
+        Dim lAddIndexes As Boolean = Not (aAddedIndexes Is Nothing)
         Dim lAddRecordNum As Integer
         Dim lFieldNum As Integer
         Dim lKeyField() As Integer
@@ -332,6 +337,7 @@ AllKeys:
                                     Me.Value(lFieldNum) = aAddFrom.Value(lFieldNum)
                                 Next
                             End If
+                            If lAddIndexes Then aAddedIndexes.Add(aAddFrom.CurrentRecord)
                         End If
                     Next
                 End With
@@ -546,19 +552,17 @@ AllKeys:
         Dim lByteOfRecord As Integer
 
         If aEndRecord < 1 Then aEndRecord = pHeader.NumRecs
-
+        Dim lLastByte As Integer = pHeader.NumBytesRec - 1
 
         pCurrentRecord = aStartRecord
         pCurrentRecordStart = pHeader.NumBytesRec * (pCurrentRecord - 1) + 1
 
         While pCurrentRecord <= aEndRecord
 
-            For lByteOfRecord = 0 To pHeader.NumBytesRec
+            For lByteOfRecord = 0 To lLastByte
                 If pData(pCurrentRecordStart + lByteOfRecord) <> FindValue(lByteOfRecord) Then GoTo NotEqual
             Next
-
             Return True
-
 NotEqual:
             pCurrentRecord += 1
             pCurrentRecordStart += pHeader.NumBytesRec            
