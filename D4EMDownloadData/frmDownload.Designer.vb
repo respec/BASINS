@@ -38,26 +38,26 @@ Partial Class frmDownload
         Me.chkNWIS_Measurements = New System.Windows.Forms.CheckBox
         Me.chkNWIS_WQ = New System.Windows.Forms.CheckBox
         Me.chkNWIS_DailyFlow = New System.Windows.Forms.CheckBox
-        Me.chkTerraServer_Urban = New System.Windows.Forms.CheckBox
-        Me.grpTerraServer = New System.Windows.Forms.GroupBox
-        Me.chkTerraServer_DRG = New System.Windows.Forms.CheckBox
-        Me.chkTerraServer_DOQ = New System.Windows.Forms.CheckBox
+        Me.chkTerraServerWebService_Urban = New System.Windows.Forms.CheckBox
+        Me.grpTerraServerWebService = New System.Windows.Forms.GroupBox
+        Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
+        Me.chkTerraServerWebService_DOQ = New System.Windows.Forms.CheckBox
         Me.chkNLCD_1992 = New System.Windows.Forms.CheckBox
         Me.grpNLCD = New System.Windows.Forms.GroupBox
         Me.chkNLCD_2001 = New System.Windows.Forms.CheckBox
         Me.grpNHDplus = New System.Windows.Forms.GroupBox
         Me.chkNHDplus_All = New System.Windows.Forms.CheckBox
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.lblClip = New System.Windows.Forms.Label
+        Me.lblMerge = New System.Windows.Forms.Label
         Me.btnDownload = New System.Windows.Forms.Button
         Me.cboRegion = New System.Windows.Forms.ComboBox
         Me.lblRegion = New System.Windows.Forms.Label
         Me.chkClip = New System.Windows.Forms.CheckBox
-        Me.lblClip = New System.Windows.Forms.Label
-        Me.lblMerge = New System.Windows.Forms.Label
         Me.chkMerge = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
-        Me.grpTerraServer.SuspendLayout()
+        Me.grpTerraServerWebService.SuspendLayout()
         Me.grpNLCD.SuspendLayout()
         Me.grpNHDplus.SuspendLayout()
         Me.SuspendLayout()
@@ -216,49 +216,49 @@ Partial Class frmDownload
         Me.chkNWIS_DailyFlow.Text = "Daily Discharge"
         Me.chkNWIS_DailyFlow.UseVisualStyleBackColor = True
         '
-        'chkTerraServer_Urban
+        'chkTerraServerWebService_Urban
         '
-        Me.chkTerraServer_Urban.AutoSize = True
-        Me.chkTerraServer_Urban.Location = New System.Drawing.Point(6, 19)
-        Me.chkTerraServer_Urban.Name = "chkTerraServer_Urban"
-        Me.chkTerraServer_Urban.Size = New System.Drawing.Size(80, 17)
-        Me.chkTerraServer_Urban.TabIndex = 12
-        Me.chkTerraServer_Urban.Text = "Urban Area"
-        Me.chkTerraServer_Urban.UseVisualStyleBackColor = True
+        Me.chkTerraServerWebService_Urban.AutoSize = True
+        Me.chkTerraServerWebService_Urban.Location = New System.Drawing.Point(6, 19)
+        Me.chkTerraServerWebService_Urban.Name = "chkTerraServerWebService_Urban"
+        Me.chkTerraServerWebService_Urban.Size = New System.Drawing.Size(80, 17)
+        Me.chkTerraServerWebService_Urban.TabIndex = 12
+        Me.chkTerraServerWebService_Urban.Text = "Urban Area"
+        Me.chkTerraServerWebService_Urban.UseVisualStyleBackColor = True
         '
-        'grpTerraServer
+        'grpTerraServerWebService
         '
-        Me.grpTerraServer.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.grpTerraServerWebService.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.grpTerraServer.Controls.Add(Me.chkTerraServer_DRG)
-        Me.grpTerraServer.Controls.Add(Me.chkTerraServer_DOQ)
-        Me.grpTerraServer.Controls.Add(Me.chkTerraServer_Urban)
-        Me.grpTerraServer.Location = New System.Drawing.Point(12, 154)
-        Me.grpTerraServer.Name = "grpTerraServer"
-        Me.grpTerraServer.Size = New System.Drawing.Size(351, 42)
-        Me.grpTerraServer.TabIndex = 9
-        Me.grpTerraServer.TabStop = False
-        Me.grpTerraServer.Text = "TerraServer Images"
+        Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_DRG)
+        Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_DOQ)
+        Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_Urban)
+        Me.grpTerraServerWebService.Location = New System.Drawing.Point(12, 154)
+        Me.grpTerraServerWebService.Name = "grpTerraServerWebService"
+        Me.grpTerraServerWebService.Size = New System.Drawing.Size(351, 42)
+        Me.grpTerraServerWebService.TabIndex = 9
+        Me.grpTerraServerWebService.TabStop = False
+        Me.grpTerraServerWebService.Text = "TerraServer Images"
         '
-        'chkTerraServer_DRG
+        'chkTerraServerWebService_DRG
         '
-        Me.chkTerraServer_DRG.AutoSize = True
-        Me.chkTerraServer_DRG.Location = New System.Drawing.Point(229, 19)
-        Me.chkTerraServer_DRG.Name = "chkTerraServer_DRG"
-        Me.chkTerraServer_DRG.Size = New System.Drawing.Size(50, 17)
-        Me.chkTerraServer_DRG.TabIndex = 14
-        Me.chkTerraServer_DRG.Text = "DRG"
-        Me.chkTerraServer_DRG.UseVisualStyleBackColor = True
+        Me.chkTerraServerWebService_DRG.AutoSize = True
+        Me.chkTerraServerWebService_DRG.Location = New System.Drawing.Point(229, 19)
+        Me.chkTerraServerWebService_DRG.Name = "chkTerraServerWebService_DRG"
+        Me.chkTerraServerWebService_DRG.Size = New System.Drawing.Size(50, 17)
+        Me.chkTerraServerWebService_DRG.TabIndex = 14
+        Me.chkTerraServerWebService_DRG.Text = "DRG"
+        Me.chkTerraServerWebService_DRG.UseVisualStyleBackColor = True
         '
-        'chkTerraServer_DOQ
+        'chkTerraServerWebService_DOQ
         '
-        Me.chkTerraServer_DOQ.AutoSize = True
-        Me.chkTerraServer_DOQ.Location = New System.Drawing.Point(112, 19)
-        Me.chkTerraServer_DOQ.Name = "chkTerraServer_DOQ"
-        Me.chkTerraServer_DOQ.Size = New System.Drawing.Size(50, 17)
-        Me.chkTerraServer_DOQ.TabIndex = 13
-        Me.chkTerraServer_DOQ.Text = "DOQ"
-        Me.chkTerraServer_DOQ.UseVisualStyleBackColor = True
+        Me.chkTerraServerWebService_DOQ.AutoSize = True
+        Me.chkTerraServerWebService_DOQ.Location = New System.Drawing.Point(112, 19)
+        Me.chkTerraServerWebService_DOQ.Name = "chkTerraServerWebService_DOQ"
+        Me.chkTerraServerWebService_DOQ.Size = New System.Drawing.Size(50, 17)
+        Me.chkTerraServerWebService_DOQ.TabIndex = 13
+        Me.chkTerraServerWebService_DOQ.Text = "DOQ"
+        Me.chkTerraServerWebService_DOQ.UseVisualStyleBackColor = True
         '
         'chkNLCD_1992
         '
@@ -315,6 +315,26 @@ Partial Class frmDownload
         Me.chkNHDplus_All.Text = "All"
         Me.chkNHDplus_All.UseVisualStyleBackColor = True
         '
+        'lblClip
+        '
+        Me.lblClip.AutoSize = True
+        Me.lblClip.Location = New System.Drawing.Point(12, 332)
+        Me.lblClip.Name = "lblClip"
+        Me.lblClip.Size = New System.Drawing.Size(73, 13)
+        Me.lblClip.TabIndex = 36
+        Me.lblClip.Text = "Clip to Region"
+        Me.ToolTip1.SetToolTip(Me.lblClip, "Remove downloaded portions that do not intersect the region")
+        '
+        'lblMerge
+        '
+        Me.lblMerge.AutoSize = True
+        Me.lblMerge.Location = New System.Drawing.Point(12, 352)
+        Me.lblMerge.Name = "lblMerge"
+        Me.lblMerge.Size = New System.Drawing.Size(37, 13)
+        Me.lblMerge.TabIndex = 38
+        Me.lblMerge.Text = "Merge"
+        Me.ToolTip1.SetToolTip(Me.lblMerge, "Merge separate parts of same coverage")
+        '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
@@ -354,26 +374,6 @@ Partial Class frmDownload
         Me.chkClip.TabIndex = 35
         Me.chkClip.UseVisualStyleBackColor = True
         '
-        'lblClip
-        '
-        Me.lblClip.AutoSize = True
-        Me.lblClip.Location = New System.Drawing.Point(12, 332)
-        Me.lblClip.Name = "lblClip"
-        Me.lblClip.Size = New System.Drawing.Size(73, 13)
-        Me.lblClip.TabIndex = 36
-        Me.lblClip.Text = "Clip to Region"
-        Me.ToolTip1.SetToolTip(Me.lblClip, "Remove downloaded portions that do not intersect the region")
-        '
-        'lblMerge
-        '
-        Me.lblMerge.AutoSize = True
-        Me.lblMerge.Location = New System.Drawing.Point(12, 352)
-        Me.lblMerge.Name = "lblMerge"
-        Me.lblMerge.Size = New System.Drawing.Size(37, 13)
-        Me.lblMerge.TabIndex = 38
-        Me.lblMerge.Text = "Merge"
-        Me.ToolTip1.SetToolTip(Me.lblMerge, "Merge separate parts of same coverage")
-        '
         'chkMerge
         '
         Me.chkMerge.AutoSize = True
@@ -398,7 +398,7 @@ Partial Class frmDownload
         Me.Controls.Add(Me.btnDownload)
         Me.Controls.Add(Me.grpNHDplus)
         Me.Controls.Add(Me.grpNLCD)
-        Me.Controls.Add(Me.grpTerraServer)
+        Me.Controls.Add(Me.grpTerraServerWebService)
         Me.Controls.Add(Me.grpNWIS)
         Me.Controls.Add(Me.grpBASINS)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -408,8 +408,8 @@ Partial Class frmDownload
         Me.grpBASINS.PerformLayout()
         Me.grpNWIS.ResumeLayout(False)
         Me.grpNWIS.PerformLayout()
-        Me.grpTerraServer.ResumeLayout(False)
-        Me.grpTerraServer.PerformLayout()
+        Me.grpTerraServerWebService.ResumeLayout(False)
+        Me.grpTerraServerWebService.PerformLayout()
         Me.grpNLCD.ResumeLayout(False)
         Me.grpNLCD.PerformLayout()
         Me.grpNHDplus.ResumeLayout(False)
@@ -432,10 +432,10 @@ Partial Class frmDownload
     Friend WithEvents chkNWIS_Measurements As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_WQ As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_DailyFlow As System.Windows.Forms.CheckBox
-    Friend WithEvents chkTerraServer_Urban As System.Windows.Forms.CheckBox
-    Friend WithEvents grpTerraServer As System.Windows.Forms.GroupBox
-    Friend WithEvents chkTerraServer_DRG As System.Windows.Forms.CheckBox
-    Friend WithEvents chkTerraServer_DOQ As System.Windows.Forms.CheckBox
+    Friend WithEvents chkTerraServerWebService_Urban As System.Windows.Forms.CheckBox
+    Friend WithEvents grpTerraServerWebService As System.Windows.Forms.GroupBox
+    Friend WithEvents chkTerraServerWebService_DRG As System.Windows.Forms.CheckBox
+    Friend WithEvents chkTerraServerWebService_DOQ As System.Windows.Forms.CheckBox
     Friend WithEvents chkNLCD_1992 As System.Windows.Forms.CheckBox
     Friend WithEvents grpNLCD As System.Windows.Forms.GroupBox
     Friend WithEvents chkNLCD_2001 As System.Windows.Forms.CheckBox
