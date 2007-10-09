@@ -121,7 +121,7 @@
     <value>AQUA TERRA Consultants</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>Launches documents or web pages from features on a map.  If your shapefile has a field called FileOrURL then, when a user selects a shape, the specified file or URL in the attribute table will be launched.</value>
+    <value>Displays photos or launches documents or web pages from features on a map.  If your shapefile has a field called FileOrURL then, when a user selects a shape, the specified file or URL in the attribute table will be launched.</value>
     <comment>based on MW4PlugIn DocLauncher</comment>
   </data>
   <data name="LabellLayer" xml:space="preserve">
@@ -129,5 +129,8 @@
   </data>
   <data name="Name" xml:space="preserve">
     <value>Analysis::File Geo Reference</value>
+  </data>
+  <data name="NameShort" xml:space="preserve">
+    <value>File Geo Reference</value>
   </data>
 </root>

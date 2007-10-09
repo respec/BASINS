@@ -18,6 +18,19 @@ Public Class frmFileGeoReference
     Private Const pAnnotationFieldName As String = "Annotation"
 
     Public Event AddPointToggle(ByVal aAdding As Boolean)
+    Public Event CreateNewGeoRefLayer()
+
+    Friend ReadOnly Property AnnotationFieldName() As String
+        Get
+            Return pAnnotationFieldName
+        End Get
+    End Property
+
+    Friend ReadOnly Property DefaultLayerName() As String
+        Get
+            Return pDefaultLayerName
+        End Get
+    End Property
 
     Public Sub PopulateLayers(Optional ByVal aDocumentLayerIndexName As String = pDefaultLayerName)
         Dim lSetSelectedIndex As Integer = -1
@@ -25,9 +38,13 @@ Public Class frmFileGeoReference
         For lLayerIndex As Integer = 0 To NumLayers - 1
             If LayerType(lLayerIndex) = MapWindow.Interfaces.eLayerType.PointShapefile Then
                 Dim lLayerName As String = LayerName(lLayerIndex)
-                cboLayer.Items.Add(lLayerName)
-                If lLayerName.ToLower.Equals(aDocumentLayerIndexName.ToLower) OrElse InStr(lLayerName.ToLower, pDefaultLayerName) Then
-                    lSetSelectedIndex = cboLayer.Items.Count - 1
+                If IsField(lLayerIndex, "File") Or _
+                   IsField(lLayerIndex, "URL") Or _
+                   IsField(lLayerIndex, "Document") Then
+                    cboLayer.Items.Add(lLayerName)
+                    If lLayerName.ToLower.Equals(aDocumentLayerIndexName.ToLower) OrElse InStr(lLayerName.ToLower, pDefaultLayerName) Then
+                        lSetSelectedIndex = cboLayer.Items.Count - 1
+                    End If
                 End If
             End If
         Next
@@ -48,7 +65,7 @@ Public Class frmFileGeoReference
         pLayerIndexChanged = True
         Dim lCbo As System.Windows.Forms.ComboBox = sender
         If lCbo.SelectedIndex = lCbo.Items.Count - 1 Then
-            CreateNewGeoRefLayer() 'This causes a new call to this routine with the new index
+            RaiseEvent CreateNewGeoRefLayer() 'This causes a new call to this routine with the new index
         Else
             Dim lLayerIndex As Integer = LayerIndex(lCbo.Items(lCbo.SelectedIndex).ToString)
 
@@ -95,74 +112,13 @@ Public Class frmFileGeoReference
 
     Friend ReadOnly Property DocumentLayerIndex() As Integer
         Get
-            Return LayerIndex(cboLayer.Text) 'Items(cboLayer.SelectedIndex).ToString)
+            If cboLayer.Text.Length > 0 Then
+                Return LayerIndex(cboLayer.Text)
+            Else
+                Return -1 'the current layer
+            End If
         End Get
     End Property
-
-    ''' <summary>Create a New GeoReferencing Point Shape Layer</summary>
-    ''' <returns>Layer Index of new layer, or -1 if not created</returns>
-    Private Function CreateNewGeoRefLayer() As Integer
-        Dim lDialog As New System.Windows.Forms.SaveFileDialog
-        With lDialog
-            .DefaultExt = ".shp"
-            .AddExtension = True
-            .Filter = "Shape files (*.shp)|*.shp|All files (*.*)|*.*"
-            .FilterIndex = 0
-            Try
-                .FileName = IO.Path.Combine(IO.Path.GetDirectoryName(LayerFileName(0)), pDefaultLayerName)
-            Catch e As Exception 'Can't get directory of first layer, just use current directory
-                .FileName = pDefaultLayerName & .DefaultExt
-            End Try
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                Dim lLayerCaption As String = IO.Path.GetFileNameWithoutExtension(.FileName)
-
-                Dim lNewLayer As New MapWinGIS.Shapefile
-                IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(.FileName))
-                lNewLayer.CreateNew(.FileName, MapWinGIS.ShpfileType.SHP_POINT)
-
-                lNewLayer.StartEditingTable()
-                lNewLayer.EditInsertField(NewField("file", MapWinGIS.FieldType.STRING_FIELD, 1024), 1)
-                lNewLayer.EditInsertField(NewField("date", MapWinGIS.FieldType.STRING_FIELD, 10), 2)
-                lNewLayer.EditInsertField(NewField(pAnnotationFieldName, MapWinGIS.FieldType.STRING_FIELD, 1024), 3)
-                lNewLayer.EditInsertField(NewField("latitude", MapWinGIS.FieldType.DOUBLE_FIELD), 4)
-                lNewLayer.EditInsertField(NewField("longitude", MapWinGIS.FieldType.DOUBLE_FIELD), 5)
-                lNewLayer.StopEditingTable()
-
-                lNewLayer.StartEditingShapes()
-                'lNewLayer.EditInsertShape(lShape, 0)
-                lNewLayer.StopEditingShapes()
-
-                lNewLayer.SaveAs(.FileName)
-                lNewLayer.Close()
-
-                lNewLayer = Nothing
-
-                AddLayer(.FileName, lLayerCaption)
-                PopulateLayers(lLayerCaption)
-                Return LayerIndex(lLayerCaption)
-            End If
-        End With
-        Return -1
-    End Function
-
-    Private Function NewField(ByVal aFieldName As String, _
-                     Optional ByVal aType As MapWinGIS.FieldType = MapWinGIS.FieldType.STRING_FIELD, _
-                     Optional ByVal aWidth As Integer = 0) As MapWinGIS.Field
-        Dim lNewField As New MapWinGIS.Field
-        lNewField.Name = aFieldName
-        lNewField.Type = aType
-        If aWidth < 1 Then
-            Select Case aType
-                'TODO: why are these commented
-                'Case MapWinGIS.FieldType.DOUBLE_FIELD : lNewField.Width = 8
-                'Case MapWinGIS.FieldType.INTEGER_FIELD : lNewField.Width = 4
-                Case MapWinGIS.FieldType.STRING_FIELD : lNewField.Width = 80
-            End Select
-        Else
-            lNewField.Width = aWidth
-        End If
-        Return lNewField
-    End Function
 
     Friend Sub RefreshRecordInfo(ByVal aRecordIndex As Integer)
         pRecordIndex = aRecordIndex
@@ -289,49 +245,60 @@ Public Class frmFileGeoReference
 
     Friend Sub SetFormFromDocument(ByVal aFilename As String)
         txtLocation.Text = aFilename
+        btnLaunch.Visible = False
         If aFilename.Length = 0 Then
-            lblStatus.Text = "Click in the Value text box to specify the file location"
+            lblStatus.Text = "Click in the Location text box to specify the file location"
             lblStatus.Visible = True
             pbxImage.Visible = False
+        ElseIf aFilename.StartsWith("http") Then
+            lblStatus.Text = "Web Link"
+            lblStatus.Visible = True
+            pbxImage.Visible = False
+            btnLaunch.Visible = True
         ElseIf Not IO.File.Exists(aFilename) Then
             lblStatus.Text = "File not found"
             lblStatus.Visible = True
             pbxImage.Visible = False
         Else
             lblStatus.Visible = False
-            pBitmap = DirectCast(System.Drawing.Bitmap.FromFile(aFilename), System.Drawing.Bitmap)
-            pbxImage.Image = pBitmap
-            pbxImage.Visible = True
+            Try
+                pBitmap = Nothing
+                pBitmap = DirectCast(System.Drawing.Bitmap.FromFile(aFilename), System.Drawing.Bitmap)
+            Catch
+            End Try
+            If pBitmap Is Nothing Then 'handle non images 
+                btnLaunch.Visible = True
+                pbxImage.Visible = False
+            Else
+                pbxImage.Image = pBitmap
+                pbxImage.Visible = True
+            End If
+
             Me.Refresh()
 
             If txtDate.Text.Length = 0 Then
                 txtDate.Text = IO.File.GetCreationTime(aFilename).ToString
             End If
-
-            'TODO: handle non images
-            'If lFileOrURL.Length > 0 Then
-            '    MapWinUtility.Logger.Dbg("FileGeoReference: Launch File or URL: " & lFileOrURL)
-            '    Dim lNewProcess As New Process
-            '    lNewProcess.StartInfo.FileName = lFileOrURL
-            '    lNewProcess.Start()
-            'End If
         End If
-
     End Sub
 
     Friend Sub SetFormFromFields()
         If Not pAddingFiles Then
-            If NumFeatures < 1 Then
+            Dim lNumFeatures As Integer = NumFeatures(DocumentLayerIndex)
+            If lNumFeatures < 1 Then
                 lblRecordInfo.Text = "No Records"
                 txtLocation.Visible = False
                 lblLocation.Visible = False
                 lblDate.Visible = False
                 txtDate.Visible = False
+                txtAnnotation.Text = ""
                 pbxImage.Visible = False
                 pRecordIndex = 0
             Else
-                If pRecordIndex >= NumFeatures Then pRecordIndex = NumFeatures - 1
-                lblRecordInfo.Text = "Record " & pRecordIndex + 1 & " of " & NumFeatures
+                If pRecordIndex >= lNumFeatures Then
+                    pRecordIndex = lNumFeatures - 1
+                End If
+                lblRecordInfo.Text = "Record " & pRecordIndex + 1 & " of " & lNumFeatures
 
                 If IsField(DocumentLayerIndex, "date") Then
                     txtDate.Text = FieldValue(DocumentLayerIndex, pRecordIndex, FieldIndex(DocumentLayerIndex, "date"))
@@ -341,7 +308,9 @@ Public Class frmFileGeoReference
 
                 If IsField(DocumentLayerIndex, cboFields.Text) Then
                     Dim lFilename As String = FieldValue(DocumentLayerIndex, pRecordIndex, FieldIndex(DocumentLayerIndex, cboFields.Text))
-                    If lFilename.StartsWith("file://") Then lFilename = lFilename.Substring(7)
+                    If lFilename.StartsWith("file://") Then
+                        lFilename = lFilename.Substring(7)
+                    End If
                     SetFormFromDocument(lFilename)
                     lblLocation.Visible = True
                     txtLocation.Visible = True
@@ -392,6 +361,7 @@ Public Class frmFileGeoReference
 
     Private Sub btnAdd_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAdd.Click
         pbxImage.Visible = False
+        btnLaunch.Visible = False
         UserAddPoint()
     End Sub
 
@@ -541,23 +511,32 @@ Public Class frmFileGeoReference
     End Sub
 
     Private Sub txtAnnotation_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtAnnotation.TextChanged
-        Dim lAnnotationField As String = cboAnnotate.Text
-        If lAnnotationField.Length > 0 AndAlso lAnnotationField <> pAddAnnotationField Then
-            SetFeatureValue(DocumentLayerIndex, FieldIndex(DocumentLayerIndex, lAnnotationField), pRecordIndex, txtAnnotation.Text)
-        End If
+        If NumFeatures(DocumentLayerIndex) > 0 Then
+            Dim lAnnotationField As String = cboAnnotate.Text
+            If lAnnotationField.Length > 0 AndAlso lAnnotationField <> pAddAnnotationField Then
+                SetFeatureValue(DocumentLayerIndex, FieldIndex(DocumentLayerIndex, lAnnotationField), pRecordIndex, txtAnnotation.Text)
+            End If
 
-        If Not pBitmap Is Nothing AndAlso FileExists(txtLocation.Text) Then
-            Dim lGeocodedFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(txtLocation.Text), IO.Path.GetFileNameWithoutExtension(txtLocation.Text) & ".geo.jpg")
-            Dim lExif As New ExifWorks(pBitmap)
-            If Not lExif.Title = txtAnnotation.Text Then
-                lExif.Title = txtAnnotation.Text
-                Try
-                    pBitmap.Save(lGeocodedFilename)
-                    Logger.Dbg("Saved geocoded file '" & lGeocodedFilename & "'")
-                Catch ex As Exception
-                    Logger.Dbg("Failed to save geocoded file '" & lGeocodedFilename & "' - " & ex.Message)
-                End Try
+            If Not pBitmap Is Nothing AndAlso FileExists(txtLocation.Text) Then
+                Dim lGeocodedFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(txtLocation.Text), IO.Path.GetFileNameWithoutExtension(txtLocation.Text) & ".geo.jpg")
+                Dim lExif As New ExifWorks(pBitmap)
+                If Not lExif.Title = txtAnnotation.Text Then
+                    lExif.Title = txtAnnotation.Text
+                    Try
+                        pBitmap.Save(lGeocodedFilename)
+                        Logger.Dbg("Saved geocoded file '" & lGeocodedFilename & "'")
+                    Catch ex As Exception
+                        Logger.Dbg("Failed to save geocoded file '" & lGeocodedFilename & "' - " & ex.Message)
+                    End Try
+                End If
             End If
         End If
+    End Sub
+
+    Private Sub btnLaunch_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnLaunch.Click
+        Logger.Dbg("FileGeoReference: Launch File or URL: " & txtLocation.Text)
+        Dim lProcess As New Process
+        lProcess.StartInfo.FileName = txtLocation.Text
+        lProcess.Start()
     End Sub
 End Class

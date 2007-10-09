@@ -36,6 +36,7 @@ Partial Class frmFileGeoReference
         Me.btnAdd = New System.Windows.Forms.Button
         Me.btnPrev = New System.Windows.Forms.Button
         Me.btnNext = New System.Windows.Forms.Button
+        Me.btnLaunch = New System.Windows.Forms.Button
         Me.grpDocument = New System.Windows.Forms.GroupBox
         Me.txtDate = New System.Windows.Forms.TextBox
         Me.lblDate = New System.Windows.Forms.Label
@@ -52,7 +53,7 @@ Partial Class frmFileGeoReference
         'lblLayer
         '
         Me.lblLayer.AutoSize = True
-        Me.lblLayer.Location = New System.Drawing.Point(15, 17)
+        Me.lblLayer.Location = New System.Drawing.Point(77, 15)
         Me.lblLayer.Name = "lblLayer"
         Me.lblLayer.Size = New System.Drawing.Size(48, 17)
         Me.lblLayer.TabIndex = 1
@@ -64,10 +65,10 @@ Partial Class frmFileGeoReference
         Me.cboLayer.DropDownHeight = 300
         Me.cboLayer.FormattingEnabled = True
         Me.cboLayer.IntegralHeight = False
-        Me.cboLayer.Location = New System.Drawing.Point(68, 14)
+        Me.cboLayer.Location = New System.Drawing.Point(132, 14)
         Me.cboLayer.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.cboLayer.Name = "cboLayer"
-        Me.cboLayer.Size = New System.Drawing.Size(197, 24)
+        Me.cboLayer.Size = New System.Drawing.Size(133, 24)
         Me.cboLayer.TabIndex = 2
         '
         'lblFields
@@ -108,7 +109,7 @@ Partial Class frmFileGeoReference
         '
         Me.lblStatus.AutoSize = True
         Me.lblStatus.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.2!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblStatus.Location = New System.Drawing.Point(15, 97)
+        Me.lblStatus.Location = New System.Drawing.Point(25, 133)
         Me.lblStatus.Name = "lblStatus"
         Me.lblStatus.Size = New System.Drawing.Size(63, 20)
         Me.lblStatus.TabIndex = 12
@@ -118,7 +119,7 @@ Partial Class frmFileGeoReference
         'btnCancel
         '
         Me.btnCancel.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnCancel.Location = New System.Drawing.Point(15, 133)
+        Me.btnCancel.Location = New System.Drawing.Point(29, 155)
         Me.btnCancel.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(144, 31)
@@ -179,6 +180,19 @@ Partial Class frmFileGeoReference
         Me.btnNext.Text = ">"
         Me.ToolTip1.SetToolTip(Me.btnNext, "Next Record")
         Me.btnNext.UseVisualStyleBackColor = True
+        '
+        'btnLaunch
+        '
+        Me.btnLaunch.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnLaunch.Location = New System.Drawing.Point(48, 170)
+        Me.btnLaunch.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
+        Me.btnLaunch.Name = "btnLaunch"
+        Me.btnLaunch.Size = New System.Drawing.Size(144, 31)
+        Me.btnLaunch.TabIndex = 21
+        Me.btnLaunch.Text = "Open"
+        Me.ToolTip1.SetToolTip(Me.btnLaunch, "Open Current Document ")
+        Me.btnLaunch.UseVisualStyleBackColor = True
+        Me.btnLaunch.Visible = False
         '
         'grpDocument
         '
@@ -295,6 +309,7 @@ Partial Class frmFileGeoReference
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(819, 510)
+        Me.Controls.Add(Me.btnLaunch)
         Me.Controls.Add(Me.txtAnnotation)
         Me.Controls.Add(Me.cboAnnotate)
         Me.Controls.Add(Me.lblAnnotate)
@@ -338,4 +353,5 @@ Partial Class frmFileGeoReference
     Friend WithEvents cboAnnotate As System.Windows.Forms.ComboBox
     Friend WithEvents lblAnnotate As System.Windows.Forms.Label
     Friend WithEvents txtAnnotation As System.Windows.Forms.TextBox
+    Friend WithEvents btnLaunch As System.Windows.Forms.Button
 End Class
