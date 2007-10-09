@@ -179,9 +179,9 @@ Public Class atcTableDBF
         Dim lAddIndexes As Boolean = Not (aAddedIndexes Is Nothing)
         Dim lAddRecordNum As Integer
         Dim lFieldNum As Integer
-        Dim lKeyField() As Integer
-        Dim lOperation() As String
-        Dim lKeyValue() As Object
+        Dim lKeyField(-1) As Integer
+        Dim lOperation(-1) As String
+        Dim lKeyValue(-1) As Object
         Dim lRecordToCopy() As Byte
         Dim lFirstKeyField As Integer
         Dim lLastKeyField As Integer
