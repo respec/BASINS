@@ -70,7 +70,7 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to Launches documents or web pages from features on a map.  If your shapefile has a field called FileOrURL then, when a user selects a shape, the specified file or URL in the attribute table will be launched..
+        '''  Looks up a localized string similar to Displays photos or launches documents or web pages from features on a map.  If your shapefile has a field called FileOrURL then, when a user selects a shape, the specified file or URL in the attribute table will be launched..
         '''</summary>
         Friend ReadOnly Property Description() As String
             Get
@@ -93,6 +93,15 @@ Namespace My.Resources
         Friend ReadOnly Property Name() As String
             Get
                 Return ResourceManager.GetString("Name", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to File Geo Reference.
+        '''</summary>
+        Friend ReadOnly Property NameShort() As String
+            Get
+                Return ResourceManager.GetString("NameShort", resourceCulture)
             End Get
         End Property
     End Module
