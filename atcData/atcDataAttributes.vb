@@ -338,25 +338,39 @@ Public Class atcDataAttributes
             If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
                 Try
                     Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
-                    If lDef Is Nothing AndAlso lKey.StartsWith("%") Then 'Try to find with wildcard
-                        lDef = pAllDefinitions.ItemByKey("%*")
+                    If lDef Is Nothing Then
+                        If lKey.StartsWith("%") Then 'Try to find with wildcard
+                            lDef = pAllDefinitions.ItemByKey("%*")
+                        ElseIf lKey.Contains("low") Then
+                            lDef = pAllDefinitions.ItemByKey("n-day low value")
+                        ElseIf lKey.Contains("high") Then
+                            lDef = pAllDefinitions.ItemByKey("n-day high value")
+                        End If
                     End If
                     If Not lDef Is Nothing Then
                         Dim lOperation As atcDefinedValue = Nothing
-                        If lDef.Calculated AndAlso IsSimple(lDef, lKey, lOperation) Then
-                            Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
-                            Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
-                            Dim lOwnerTS As atcTimeseries = Owner
-                            lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
-                            lDef.Calculator.Open(lkey, lArgs)
-                            lAttribute = ItemByKey(lKey)
+                        If lDef.Calculated Then
+                            If lDef.Calculator.Name.Contains("n-day") Then
+                                lOperation = lDef.Calculator.AvailableOperations.ItemByKey(lDef.Name)
+                                Dim lArgs As New atcDataAttributes
+                                lArgs.SetValue("Timeseries", New atcDataGroup(Owner))
+                                lDef.Calculator.Open(lKey, lArgs)
+                                lAttribute = ItemByKey(lKey)
+                            ElseIf IsSimple(lDef, lKey, lOperation) Then
+                                Dim lArg As atcDefinedValue = lOperation.Arguments.ItemByIndex(0)
+                                Dim lArgs As atcDataAttributes = lOperation.Arguments.Clone
+                                Dim lOwnerTS As atcTimeseries = Owner
+                                lArgs.SetValue(lArg.Definition, New atcDataGroup(lOwnerTS))
+                                lDef.Calculator.Open(lKey, lArgs)
+                                lAttribute = ItemByKey(lKey)
+                            End If
                         End If
                     End If
                 Catch NullExcep As NullReferenceException
-                    'Ignore these
-                Catch CalcExcep As Exception
-                    Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
-                End Try
+                'Ignore these
+            Catch CalcExcep As Exception
+                Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
+            End Try
             End If
         End If
         Return lAttribute
