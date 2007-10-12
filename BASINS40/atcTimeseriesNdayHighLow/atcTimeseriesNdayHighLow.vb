@@ -537,14 +537,27 @@ Public Class atcTimeseriesNdayHighLow
                 lHigh = False
                 lReturn = 10
                 lOperationName = "n-day low value"
+                'lLogFlg = False
             Case "1hi100", "1high100"
                 lNDay = 1
                 lHigh = True
                 lReturn = 100
                 lOperationName = "n-day high value"
             Case Else
-                If lOperationName.IndexOf(" low ") > 0 Then
+                lNDay = StrFirstInt(lOperationName)
+                Dim lPos As Integer = lOperationName.Length
+                While IsNumeric(Mid(lOperationName, lPos, 1))
+                    lPos -= 1
+                End While
+                If lPos < lOperationName.Length Then
+                    lReturn = lOperationName.Substring(lPos)
+                End If
+                If lOperationName.Contains("low") Then
+                    lOperationName = "n-day low value"
                     lHigh = False
+                Else
+                    lOperationName = "n-day high value"
+                    lHigh = True
                 End If
         End Select
 

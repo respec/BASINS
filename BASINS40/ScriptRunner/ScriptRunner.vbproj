@@ -88,6 +88,7 @@
     </Compile>
     <Compile Include="ScriptDriver.vb" />
     <Compile Include="ShapefileFromWDM.vb" />
+    <Compile Include="StatTest.vb" />
     <Compile Include="SummarizeTimeseries.vb" />
     <Compile Include="SummarizeWdms.vb" />
     <Compile Include="WatershedSummary.vb" />
@@ -144,6 +145,10 @@
     <ProjectReference Include="..\atcTableSQLite\atcTableSQLite.vbproj">
       <Project>{C59D3153-2857-499C-B640-924E5ABE2E74}</Project>
       <Name>atcTableSQLite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
+      <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
+      <Name>atcTimeseriesMath</Name>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>

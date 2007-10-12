@@ -13,7 +13,8 @@ Public Module ScriptDriver
         'ScriptCatSummary.ScriptMain(aMapWin)
         'BASINSProjectSummary.ScriptMain(aMapWin)
         'ScriptShapefileFromWDM.ScriptMain(aMapWin)
-        ScriptSQLLiteTester.ScriptMain(aMapWin)
+        'ScriptSQLLiteTester.ScriptMain(aMapWin)
+        ScriptStatTest.ScriptMain(aMapWin)
     End Sub
 
 End Module
