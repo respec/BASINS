@@ -28,6 +28,7 @@ Public Module ScriptStatTest
             .Add("Maximum")
             .Add("7Q10")
             .Add("30Low2")
+            .Add("365Low10")
             .Add("1High100")
         End With
 
