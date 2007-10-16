@@ -14,7 +14,7 @@ Public Module ScriptDriver
         'BASINSProjectSummary.ScriptMain(aMapWin)
         'ScriptShapefileFromWDM.ScriptMain(aMapWin)
         'ScriptSQLLiteTester.ScriptMain(aMapWin)
-        ScriptStatTest.ScriptMain(aMapWin)
+        'ScriptStatTest.ScriptMain(aMapWin)
+        ExpertSystemStatistics.ScriptMain(aMapWin)
     End Sub
-
 End Module
