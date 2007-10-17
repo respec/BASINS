@@ -90,8 +90,6 @@ Module ExpertSystemStatistics
     End Sub
 
     Private Function GetExpSysStats(ByVal aUciFileName As String, ByVal aExsFileName As String, ByVal DataDir As String) As String
-        Dim lRet As String
-
         pErrorTermNames(1) = "Error in total volume (%)"
         pErrorTermNames(2) = "Error in low-flow recession"
         pErrorTermNames(3) = "Error in 50% lowest flows (%)"
@@ -121,12 +119,11 @@ Module ExpertSystemStatistics
         ReadUCIFile(aUciFileName)     'gets starting and ending dates
         ReadEXSFile(aExsFileName)     'gets WDM name, DSN #s, storm data, etc...
 
-        lRet = CalcStats(DataDir)
-        lRet &= CalcErrorTerms()
-        Return lRet
+        CalcStats(DataDir)
+        Return CalcErrorTerms()
     End Function
 
-    Private Function CalcStats(ByVal aDataDir As String) As String
+    Private Sub CalcStats(ByVal aDataDir As String)
         Dim lTSer As atcTimeseries
         Dim lTSerFile As atcDataSourceWDM
         Dim lTimeStep As Integer, lTimeUnit As Integer, lNVals As Integer, _
@@ -258,10 +255,10 @@ Module ExpertSystemStatistics
                         For i As Integer = 1 To lNVals
                             If (tmpdate(1) = 12 Or tmpdate(1) = 1 Or tmpdate(1) = 2) Then
                                 'in the winter
-                                pStats(8, lStatGroup, lSiteIndex) = pStats(8, lStatGroup, lSiteIndex) + lValues(i)
+                                pStats(8, lStatGroup, lSiteIndex) += lValues(i)
                             ElseIf (tmpdate(1) = 6 Or tmpdate(1) = 7 Or tmpdate(1) = 8) Then
                                 'in the summer
-                                pStats(7, lStatGroup, lSiteIndex) = pStats(7, lStatGroup, lSiteIndex) + lValues(i)
+                                pStats(7, lStatGroup, lSiteIndex) += lValues(i)
                             End If
                             TIMADD(tmpdate, lTimeUnit, lTimeStep, lTimeStep, tmpdate)
                         Next i
@@ -286,7 +283,7 @@ Module ExpertSystemStatistics
                                     Dim lThisStormSDate(5) As Integer, lThisStormEDate(5) As Integer
                                     For i As Integer = 0 To 5
                                         lThisStormSDate(i) = pStormSDates(i, stormIndex)
-                                        lThisStormEDate(i) = pStormSDates(i, stormIndex)
+                                        lThisStormEDate(i) = pStormEDates(i, stormIndex)
                                     Next i
                                     Call TimDif(SDate, lThisStormSDate, lTimeUnit, lTimeStep, lN1)
                                     lN1 += 1
@@ -388,7 +385,7 @@ Module ExpertSystemStatistics
                 End If
             Next lStatGroup
         Next lSiteIndex
-    End Function
+    End Sub
 
     Private Function CalcErrorTerms() As String
         Dim siteIndex As Integer
@@ -494,75 +491,74 @@ Module ExpertSystemStatistics
     End Function
 
     Private Function StatReportAsString() As String
-        Dim str As String, blank15 As String, blank35 As String
-        Dim yrCnt As Double, lSite As Integer, j As Integer
+        Dim lStr As String
+        Dim lYrCnt As Double, lSite As Integer, j As Integer
 
-        blank15 = Space(15)
-        blank35 = Space(35)
+        lStr = "Expert System Statistics for " & pUciName & ".uci" & vbCrLf & vbCrLf
+        lStr &= atcFormat("Run Created: ", 15) & pUciDate & vbCrLf & vbCrLf
+        lStr &= atcFormat("Start Date: ", 15) & atcFormat(pSJdate, "yyyy/mm/dd hh:mm") & vbCrLf
+        lStr &= atcFormat("End Date: ", 15) & atcFormat(pEJdate, "yyyy/mm/dd hh:mm") & vbCrLf & vbCrLf
 
-        str = "Expert System Statistics for " & pUciName & ".uci" & vbCrLf & vbCrLf
-        str &= atcFormat("Run Created: ", 15) & pUciDate & vbCrLf & vbCrLf
-        str &= atcFormat("Start Date: ", 15) & atcFormat(pSJdate, "yyyy/mm/dd hh:mm") & vbCrLf
-        str &= atcFormat("End Date: ", 15) & atcFormat(pEJdate, "yyyy/mm/dd hh:mm") & vbCrLf & vbCrLf
-
-        yrCnt = timdifJ(pSJdate, pEJdate, 6, 1)
+        lYrCnt = timdifJ(pSJdate, pEJdate, 6, 1)
 
         For lSite = 1 To pNSites
             'loop for each site
-            str = str & atcFormat("Site: ", 15) & pSiteName(lSite) & vbCrLf & vbCrLf
-            StatDetails("Total (" & yrCnt & " year run)", lSite, 1, str)
-            StatDetails("Annual Average", lSite, yrCnt, str)
+            lStr &= atcFormat("Site: ", 15) & pSiteName(lSite) & vbCrLf & vbCrLf
+            lStr &= StatDetails("Total (" & lYrCnt & " year run)", lSite, 1)
+            lStr &= StatDetails("Annual Average", lSite, lYrCnt)
             'Write the error terms
-            str = str & blank35 & "Error Terms" & vbCrLf & vbCrLf
-            str = str & blank35 & atcFormat("Current", blank15) & atcFormat("Criteria", blank15) & vbCrLf
+            lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
+            lStr &= Space(35) & atcFormat("Current", 15) & atcFormat("Criteria", 15) & vbCrLf
             For j = 1 To pNErrorTerms
                 If pErrorTerms(j, lSite) <> 0.0# Then
-                    str = str & atcFormat(pErrorTermNames(j) & " =", blank35) & _
-                                atcFormat(pErrorTerms(j, lSite), "##########0.000") & _
-                                atcFormat(pErrorCriteria(j), "##########0.000")
+                    lStr &= atcFormat(pErrorTermNames(j) & " =", 35) & _
+                            atcFormat(pErrorTerms(j, lSite), "##########0.000") & _
+                            atcFormat(pErrorCriteria(j), "##########0.000")
                     If Math.Abs(pErrorTerms(j, lSite)) < pErrorCriteria(j) Then
-                        str = str & " OK" & vbCrLf
+                        lStr &= " OK" & vbCrLf
                     Else
-                        str = str & "    Needs Work" & vbCrLf
+                        lStr &= "    Needs Work" & vbCrLf
                     End If
                 End If
             Next j
-            str = str & vbCrLf & vbCrLf
+            lStr &= vbCrLf & vbCrLf
         Next lSite
 
-        Return str
+        Return lStr
     End Function
 
-    Private Function atcFormat(ByVal aStr As String, ByVal aLen As String)
-        Return aStr.PadRight(aLen)
+    Private Function atcFormat(ByVal aStr As String, ByVal aFormat As String)
+        If IsInteger(aFormat) Then
+            Return aStr.PadLeft(aFormat)
+        ElseIf (aFormat.StartsWith("y")) Then
+            Return DumpDate(aStr).Substring(14)
+        Else
+            Return Format(Double.Parse(aStr), aFormat).PadLeft(aFormat.Length)
+        End If
     End Function
 
-    Private Sub StatDetails(ByVal Title As String, ByVal lSite As Integer, ByVal Conv As Double, ByVal str As String)
+    Private Function StatDetails(ByVal Title As String, ByVal lSite As Integer, ByVal Conv As Double) As String
         Dim j As Integer
         Dim k As Integer
         Dim lConv As Double
-        Dim blank15 As String, blank20 As String, blank30 As String
+        Dim lStr As String
 
-        blank15 = Space(15)
-        blank20 = Space(20)
-        blank30 = Space(30)
+        lStr = Space(30) & Title & vbCrLf & vbCrLf
 
-        str &= blank30 & Title & vbCrLf & vbCrLf
-
-        str &= blank30 & _
+        lStr &= Space(30) & _
               atcFormat("Observed", 15) & _
               atcFormat("Simulated", 15) & _
               atcFormat("Simulated", 15) & _
               atcFormat("Simulated", 15) & vbCrLf
-        str = str & blank30 & _
+        lStr &= Space(30) & _
               atcFormat("Total Runoff", 15) & _
               atcFormat("Total Runoff", 15) & _
               atcFormat("Surface Runoff", 15) & _
               atcFormat("Interflow", 15) & vbCrLf
         'Write runoff block
-        For j = 1 To UBound(pStats, 1)
+        For j = 1 To pStats.GetUpperBound(1)
             'loop for each error term
-            str = str & atcFormat(pStatNames(j) & " =", 30)
+            lStr &= atcFormat(pStatNames(j) & " =", 30)
             Dim l() As Integer = {0, 2, 1, 3, 4} 'gets print order correct
             For k = 1 To 4
                 If pStats(j, l(k), lSite) <> -999 Then
@@ -571,45 +567,43 @@ Module ExpertSystemStatistics
                     Else
                         lConv = Conv
                     End If
-                    str = str & atcFormat(pStats(j, l(k), lSite) / lConv, "##########0.000")
+                    lStr &= atcFormat(pStats(j, l(k), lSite) / lConv, "##########0.000")
                 Else
-                    str = str & blank15
+                    lStr &= Space(15)
                 End If
             Next k
-            str = str & vbCrLf
+            lStr &= vbCrLf
         Next j
-        str = str & vbCrLf
+        lStr &= vbCrLf
         'Write EvapoTranspiration block
-        str = str & blank30 & "          EvapoTranspiration" & vbCrLf
-        str = str & blank30 & atcFormat("Potential", blank15) & atcFormat("Actual", blank15) & vbCrLf
-        str = str & atcFormat("total (inches) = ", blank30)
+        lStr &= Space(30) & "          EvapoTranspiration" & vbCrLf
+        lStr &= Space(30) & atcFormat("Potential", 15) & atcFormat("Actual", 15) & vbCrLf
+        lStr &= atcFormat("total (inches) = ", 30)
         For k = 5 To 6
-            str = str & atcFormat(pStats(1, k, lSite) / Conv, "##########0.000")
+            lStr &= atcFormat(pStats(1, k, lSite) / Conv, "##########0.000")
         Next k
-        str = str & vbCrLf & vbCrLf
-
-    End Sub
+        lStr &= vbCrLf & vbCrLf
+        Return lStr
+    End Function
 
     Private Sub ReadEXSFile(ByVal aFilename As String)
-        Dim textLine As String
-        Dim i As Integer, j As Integer
-        Dim thisStormSDate(0 To 5) As Integer, thisStormEDate(0 To 5) As Integer
-
         Dim lExsFileString As String = WholeFileString(aFilename)
+        Dim lExsRecords() As String = lExsFileString.Split(vbLf)
 
         'Read first line of file
-        textLine = StrSplit(lExsFileString, vbCrLf, "")
-        pWDMFileNamePrefix = Trim(Left(textLine, 8))
-        pNSites = Mid(textLine, 9, 5)
-        pCurSite = Mid(textLine, 14, 5)
-        pLatMin = Mid(textLine, 19, 8)
-        pLatMax = Mid(textLine, 27, 8)
-        pLngMin = Mid(textLine, 35, 8)
-        pLngMax = Mid(textLine, 43, 8)
+        Dim lExsRecord As String = lExsRecords(0)
+        pWDMFileNamePrefix = lExsRecord.Substring(0, 8).Trim
+        pNSites = lExsRecord.Substring(8, 5) 'Mid(textLine, 9, 5)
+        pCurSite = lExsRecord.Substring(14, 5) 'Mid(textLine, 14, 5)
+        pLatMin = lExsRecord.Substring(19, 5) 'Mid(textLine, 19, 8)
+        pLatMax = lExsRecord.Substring(27, 5) 'Mid(textLine, 27, 8)
+        pLngMin = lExsRecord.Substring(35, 5) ' Mid(textLine, 35, 8)
+        pLngMax = lExsRecord.Substring(43, 5) 'Mid(textLine, 43, 8)
 
         ReDim pDSN(10, pNSites)
         ReDim pStatDN(pNSites)
         ReDim pSiteName(pNSites)
+
         'Default unspecified lat/integer min/max values to contiguous 48 states
         If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
             pLatMin = 24
@@ -625,84 +619,91 @@ Module ExpertSystemStatistics
         End If
 
         'Read Site block
-        For i = 1 To pNSites
-            textLine = StrSplit(lExsFileString, vbCrLf, "")
-            For j = 0 To 9
-                pDSN(j + 1, i) = Mid(textLine, j * 4 + 1, 4)
-                Logger.Dbg(pDSN(j + 1, i))
-            Next j
-            pStatDN(i) = Mid(textLine, 42, 2)  '0 or 1
-            pSiteName(i) = Trim(Mid(textLine, 46, 20))
-        Next i
+        For lSiteIndex As Integer = 1 To pNSites
+            lExsRecord = lExsRecords(lSiteIndex)
+            For lConsIndex As Integer = 0 To 9
+                pDSN(lConsIndex + 1, lSiteIndex) = lExsRecord.Substring(lConsIndex * 4, 4)
+                Logger.Dbg(pDSN(lConsIndex + 1, lSiteIndex))
+            Next lConsIndex
+            pStatDN(lSiteIndex) = lExsRecord.Substring(42, 2)  '0 or 1
+            pSiteName(lSiteIndex) = lExsRecord.Substring(45, 20).Trim
+        Next lSiteIndex
 
+        Dim lRecordIndex As Integer = pNSites + 1
         'Read number of storms
-        textLine = StrSplit(lExsFileString, vbCrLf, "")
-        pNStorms = Left(textLine, 4)
+        pNStorms = lExsRecords(lRecordIndex).Substring(0, 4)
 
         'Read storm end/start dates
         ReDim pStormSDates(5, pNStorms)
-        ReDim pStormSDates(5, pNStorms)
+        ReDim pStormEDates(5, pNStorms)
         ReDim pStormSJDates(pNStorms)
         ReDim pStormEJDates(pNStorms)
-        For i = 1 To pNStorms
-            textLine = StrSplit(lExsFileString, vbCrLf, "")
-            pStormSDates(0, i) = Left(textLine, 5)
-            pStormSDates(0, i) = Mid(textLine, 21, 5)
-            For j = 0 To 4
-                pStormSDates(j + 1, i) = Mid(textLine, 6 + 3 * j, 3)
-                pStormSDates(j + 1, i) = Mid(textLine, 26 + 3 * j, 3)
-            Next j
+        For lStormIndex As Integer = 1 To pNStorms
+            lExsRecord = lExsRecords(lRecordIndex + lStormIndex)
+            pStormSDates(0, lStormIndex) = lExsRecord.Substring(0, 5) 'Left(textLine, 5)
+            pStormEDates(0, lStormIndex) = lExsRecord.Substring(21, 5) 'Mid(textLine, 21, 5)
+            For lTimeIndex As Integer = 0 To 4
+                pStormSDates(lTimeIndex + 1, lStormIndex) = lExsRecord.Substring(6 + 3 * lTimeIndex, 3)
+                pStormEDates(lTimeIndex + 1, lStormIndex) = lExsRecord.Substring(26 + 3 * lTimeIndex, 3)
+            Next lTimeIndex
             'Get the starting and ending storm dates in a 1-D Julian array
-            For j = 0 To 5
-                thisStormSDate(j) = pStormSDates(j, i)
-                thisStormEDate(j) = pStormSDates(j, i)
-            Next j
-            pStormSJDates(i) = Date2J(thisStormSDate)
-            pStormEJDates(i) = Date2J(thisStormEDate)
-        Next i
+            Dim thisStormSDate(5) As Integer, thisStormEDate(5) As Integer
+            For lTimeIndex As Integer = 0 To 5
+                thisStormSDate(lTimeIndex) = pStormSDates(lTimeIndex, lStormIndex)
+                thisStormEDate(lTimeIndex) = pStormEDates(lTimeIndex, lStormIndex)
+            Next lTimeIndex
+            pStormSJDates(lStormIndex) = Date2J(thisStormSDate)
+            pStormEJDates(lStormIndex) = Date2J(thisStormEDate)
+        Next lStormIndex
 
-        ReDim pBasinArea(pNSites)
         'Read basin area (acres)
-        textLine = StrSplit(lExsFileString, vbCrLf, "")
-        For i = 1 To pNSites
-            pBasinArea(i) = Mid(textLine, ((i - 1) * 8 + 1), 8)
-        Next i
+        lRecordIndex += pNStorms + 1
+        ReDim pBasinArea(pNSites)
+        lExsRecord = lExsRecords(lRecordIndex)
+        For lSiteIndex As Integer = 1 To pNSites
+            pBasinArea(lSiteIndex) = lExsRecord.Substring(((lSiteIndex - 1) * 8), 8)
+        Next lSiteIndex
 
         'Read error terms
-        textLine = StrSplit(lExsFileString, vbCrLf, "")
-        For i = 0 To 9
-            pErrorCriteria(i + 1) = Mid(textLine, i * 8 + 1, 8)
-        Next i
+        lRecordIndex += pNSites
+        lExsRecord = lExsRecords(lRecordIndex)
+        lRecordIndex += 1
+        For lErrorIndex As Integer = 0 To 9
+            pErrorCriteria(lErrorIndex + 1) = lExsRecord.Substring(lErrorIndex * 8, 8)
+        Next lErrorIndex
         pErrorCriteria(11) = 15  'storm peak criteria not kept in EXS file
         If (pErrorCriteria(10) < 0.000001 And pErrorCriteria(10) > -0.000001) Then
             'percent of time in baseflow read in as zero, change to 30
             pErrorCriteria(10) = 30.0#
         End If
 
-        'Read hspf output
+        'Read latest hspf output
         ReDim pHSPFOutput1(8, pNSites)
         ReDim pHSPFOutput2(8, pNSites)
         ReDim pHSPFOutput3(6, pNSites)
-        For i = 1 To pNSites
-            textLine = StrSplit(lExsFileString, vbCrLf, "")
-            For j = 0 To 7
-                pHSPFOutput1(j + 1, i) = StrSplit(textLine, " ", "") 'Mid(textLine, 8 * j + 1, 8)
-            Next j
-            textLine = StrSplit(lExsFileString, vbCrLf, "")
-            For j = 0 To 7
-                pHSPFOutput2(j + 1, i) = StrSplit(textLine, " ", "") 'Mid(textLine, 8 * j + 1, 8)
-            Next j
-            textLine = StrSplit(lExsFileString, vbCrLf, "")
-            For j = 0 To 5
-                pHSPFOutput3(j + 1, i) = StrSplit(textLine, " ", "") 'Mid(textLine, 8 * j + 1, 8)
-            Next j
-        Next i
+        For lSiteIndex As Integer = 1 To pNSites
+            lExsRecord = lExsRecords(lRecordIndex)
+            lRecordIndex += 1
+            For lIndex As Integer = 0 To 7
+                pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+            Next lIndex
+            lExsRecord = lExsRecords(lRecordIndex)
+            lRecordIndex += 1
+            For lIndex As Integer = 0 To 7
+                pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+            Next lIndex
+            lExsRecord = lExsRecords(lRecordIndex)
+            lRecordIndex += 1
+            For lIndex As Integer = 0 To 5
+                pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+            Next lIndex
+        Next lSiteIndex
 
         'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
-        textLine = StrSplit(lExsFileString, vbCrLf, "")
-        For i = 0 To 19
-            pSubjectiveData(i + 1) = Mid(textLine, i * 4 + 1, 4)
-        Next i
+        lExsRecord = lExsRecords(lRecordIndex)
+        For lIndex As Integer = 0 To 19
+            pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
+        Next lIndex
         '  'Change subjective data based on other data
         '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
         '    'Simulated storm runoff volumes higher than obs
@@ -714,20 +715,19 @@ Module ExpertSystemStatistics
     End Sub
 
     Private Sub ReadUCIFile(ByVal aFilename As String)
-        Dim lRecord As String
-        Dim lSDate(5) As Integer, lEDate(5) As Integer
-
         Dim lUciFileString As String = WholeFileString(aFilename)
+        Dim lUciRecords() As String = lUciFileString.Split(vbLf)
 
         'Search for starting and ending dates
-        While lUciFileString.Length > 0
-            lRecord = StrSplit(lUciFileString, vbCrLf, "")
-            If Left(lRecord, 5) = "START" Then
-                lSDate(0) = Mid(lRecord, 13, 4)
-                lEDate(0) = Mid(lRecord, 38, 4)
+        For lIndex As Integer = 0 To lUciRecords.GetUpperBound(0)
+            If lUciRecords(lIndex).StartsWith("  START") Then
+                Dim lUciRecord As String = lUciRecords(lIndex)
+                Dim lSDate(5) As Integer, lEDate(5) As Integer
+                lSDate(0) = lUciRecord.Substring(14, 4)
+                lEDate(0) = lUciRecord.Substring(39, 4)
                 For i As Integer = 1 To 4
-                    lSDate(i) = Mid(lRecord, 15 + i * 3, 2)
-                    lEDate(i) = Mid(lRecord, 40 + i * 3, 2)
+                    lSDate(i) = lUciRecord.Substring(16 + i * 3, 2)
+                    lEDate(i) = lUciRecord.Substring(41 + i * 3, 2)
                 Next i
                 lSDate(5) = 0
                 lEDate(5) = 0
@@ -735,7 +735,7 @@ Module ExpertSystemStatistics
                 pEJdate = Date2J(lEDate)
                 Exit Sub
             End If
-        End While
+        Next lIndex
         Logger.Msg("The starting and ending dates were not found in " & aFilename & ".", vbCritical, "bad UCI file")
     End Sub
 
