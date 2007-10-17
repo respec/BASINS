@@ -8,8 +8,8 @@ Imports MapWinUtility
 Imports Microsoft.VisualBasic
 
 Module ExpertSystemStatistics
-    Private Const pTestPath As String = "C:\test\EXP_CAL"
-    Private Const pBaseName As String = "hyd_exp"
+    Private Const pTestPath As String = "C:\test\EXP_CAL\hyd_man.net"
+    Private Const pBaseName As String = "hyd_man"
     Private Const pNSteps = 500, pNStatGroups = 6, pNStats = 10, pNErrorTerms = 11
     Private Const pConvert = 24.0# * 3600.0# * 12.0# / 43560.0#
 
@@ -86,7 +86,7 @@ Module ExpertSystemStatistics
         ChDriveDir(pTestPath)
         Dim lExpSysStats As String
         lExpSysStats = GetExpSysStats(pBaseName & ".uci", pbasename & ".exs", CurDir)
-        SaveFileString("ExpSysStats.txt", lExpSysStats)
+        SaveFileString("outfiles\ExpertSysStats.txt", lExpSysStats)
     End Sub
 
     Private Function GetExpSysStats(ByVal aUciFileName As String, ByVal aExsFileName As String, ByVal DataDir As String) As String
@@ -163,7 +163,7 @@ Module ExpertSystemStatistics
         For lSiteIndex As Integer = 1 To pNSites
             For lStatGroup = 1 To pNStatGroups
                 'set Stats to undefined for this group
-                Call ZipR(pNStats, -999.0, pStats, lStatGroup, lSiteIndex)
+                Call ZipR(pNStats, Double.NaN, pStats, lStatGroup, lSiteIndex)
 
                 Select Case lStatGroup 'get the correct dsn
                     Case 1 : lDSN = pDSN(1, lSiteIndex)
@@ -176,8 +176,8 @@ Module ExpertSystemStatistics
 
                 'Get data - daily values and max values as necessary
                 lTSer = lTSerFile.DataSets(lTSerFile.DataSets.IndexFromKey(lDSN))
-
                 Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, pSJdate, pEJdate, Nothing)
+                lTSer = Nothing
 
                 Dim lDailyTSer As atcTimeseries
                 If lStatGroup = 2 Then 'observed flow in cfs, want average
@@ -185,6 +185,7 @@ Module ExpertSystemStatistics
                 Else 'want total values
                     lDailyTSer = Aggregate(lNewTSer, atcTimeUnit.TUDay, 1, atcTran.TranSumDiv)
                 End If
+
                 lValues = lDailyTSer.Values.Clone
                 'check to make sure we got values
                 If lDailyTSer.Values.Length = 0 Then
@@ -198,14 +199,15 @@ Module ExpertSystemStatistics
                     'get data - maximum value for each day
                     lDailyTSer = Aggregate(lNewTSer, atcTimeUnit.TUDay, 1, atcTran.TranMax)
                     xDat = lDailyTSer.Values.Clone
+                    lDailyTSer = Nothing
+                Else
+                    xDat = Nothing
                 End If
-                lDailyTSer = Nothing
-                lTSer = Nothing
                 lNewTSer = Nothing
 
                 If lDataProblem Then  'if we weren't able to retrieve the data set
                     'set Stats to undefined
-                    Call ZipR(pNStats, -999.0#, pStats, lStatGroup, lSiteIndex)
+                    Call ZipR(pNStats, Double.NaN, pStats, lStatGroup, lSiteIndex)
                     Logger.Msg("Unable to retrieve DSN " & lDSN & vbCrLf & _
                                "from the file " & lWdmFileName, "Bad Data Set")
                 Else  'generate statistics
@@ -228,7 +230,7 @@ Module ExpertSystemStatistics
                         'totaling, putting values greater than upper limit in
                         'highest ranking box (box #1) and values less than lower
                         'limit in lowest ranking box (box #pNSteps).
-                        Call BOXSRT(maxVal, minVal, pNSteps, lNVals, lValues, larlgFg, _
+                        Call BoxSorT(maxVal, minVal, pNSteps, lNVals, lValues, larlgFg, _
                                     boxCnt, boxSum)
 
                         'total of lowest 50%
@@ -238,8 +240,8 @@ Module ExpertSystemStatistics
                             lnV50 = 1
                         End If
                         'find highest 50 percent ...
-                        Call BOXADD(lnV50, pNSteps, boxCnt, boxSum, _
-                                    sum1)
+                        sum1 = BoxAdd(lnV50, boxCnt, boxSum)
+
                         'then subtract from total to get lowest 50 percent
                         pStats(2, lStatGroup, lSiteIndex) = pStats(1, lStatGroup, lSiteIndex) - sum1
 
@@ -248,8 +250,7 @@ Module ExpertSystemStatistics
                         If (lnV90 < 1) Then 'need at least one value
                             lnV90 = 1
                         End If
-                        Call BOXADD(lnV90, pNSteps, boxCnt, boxSum, _
-                                    pStats(3, lStatGroup, lSiteIndex))
+                        pStats(3, lStatGroup, lSiteIndex) = BoxAdd(lnV90, boxCnt, boxSum)
 
                         J2Date(pSJdate, tmpdate)
                         For i As Integer = 1 To lNVals
@@ -275,8 +276,7 @@ Module ExpertSystemStatistics
                         'winter storms
                         pStats(10, lStatGroup, lSiteIndex) = 0.0#
 
-                        If (pNStorms > 0) Then
-                            'storms are available, loop thru them
+                        If (pNStorms > 0) Then 'storms are available, loop thru them
                             For stormIndex = 1 To pNStorms
                                 If pStormSJDates(stormIndex) >= pSJdate And _
                                    pStormEJDates(stormIndex) <= pEJdate Then 'storm within run span
@@ -288,23 +288,23 @@ Module ExpertSystemStatistics
                                     Call TimDif(SDate, lThisStormSDate, lTimeUnit, lTimeStep, lN1)
                                     lN1 += 1
                                     Call TimDif(SDate, lThisStormEDate, lTimeUnit, lTimeStep, lN2)
-                                    lThisStormSDate = tmpdate
+                                    tmpdate = lThisStormSDate
                                     rtmp = xDat(lN1)
                                     For i As Integer = lN1 To lN2
-                                        pStats(4, lStatGroup, lSiteIndex) = pStats(4, lStatGroup, lSiteIndex) + lValues(i)
+                                        pStats(4, lStatGroup, lSiteIndex) += lValues(i)
                                         If (xDat(i) > rtmp) Then 'a new peak
                                             rtmp = xDat(i)
                                         End If
                                         If (tmpdate(1) = 12 Or tmpdate(1) = 1 Or tmpdate(1) = 2) Then
                                             'in the winter
-                                            pStats(10, lStatGroup, lSiteIndex) = pStats(10, lStatGroup, lSiteIndex) + lValues(i)
+                                            pStats(10, lStatGroup, lSiteIndex) += lValues(i)
                                         ElseIf (tmpdate(1) = 6 Or tmpdate(1) = 7 Or tmpdate(1) = 8) Then
                                             'in the summer
-                                            pStats(9, lStatGroup, lSiteIndex) = pStats(9, lStatGroup, lSiteIndex) + lValues(i)
+                                            pStats(9, lStatGroup, lSiteIndex) += lValues(i)
                                         End If
                                         Call TIMADD(tmpdate, lTimeUnit, lTimeStep, lTimeStep, tmpdate)
                                     Next i
-                                    pStats(5, lStatGroup, lSiteIndex) = pStats(5, lStatGroup, lSiteIndex) + rtmp
+                                    pStats(5, lStatGroup, lSiteIndex) += rtmp
                                 End If
                             Next stormIndex
                         End If
@@ -312,6 +312,7 @@ Module ExpertSystemStatistics
 
                     If (lStatGroup = 1 Or lStatGroup = 2) Then 'Change flows to recessions
                         'save first data value
+                        Dim lNValsProcessed = lNVals
                         savDat = lValues(1)
                         For lIndex As Integer = 2 To lNVals
                             If (savDat > 0.0000000001) Then
@@ -319,13 +320,13 @@ Module ExpertSystemStatistics
                                 rtmp = lValues(lIndex) / savDat
                             Else
                                 'no flow
-                                rtmp = -999.0#
+                                rtmp = Double.NaN
                             End If
                             savDat = lValues(lIndex)
-                            lValues(lIndex) = rtmp
+                            lValues(lIndex - 1) = rtmp
                         Next lIndex
                         'adjust number of values to actual number processed
-                        lNVals = lNVals - 1
+                        lNValsProcessed -= 1
 
                         'sort the recessions
                         maxVal = 1.0#
@@ -335,15 +336,14 @@ Module ExpertSystemStatistics
                         'totaling, putting values greater than upper limit in
                         'highest ranking box (box #1) and values less than lower
                         'limit in lowest ranking box (box #pNSteps).
-                        Call BOXSRT(maxVal, minVal, pNSteps, lNVals, lValues, larlgFg, _
+                        Call BoxSort(maxVal, minVal, pNSteps, lNValsProcessed, lValues, larlgFg, _
                                     recCnt, recSum)
                         'Calc pStats
                         'new percent of time in base flow term
-                        rtmp = lNVals * pErrorCriteria(10) / 100
-                        stmp = lNVals - recCnt(1)
-                        If (stmp < rtmp Or rtmp < 1.0#) Then
-                            'not enough values available
-                            pStats(6, lStatGroup, lSiteIndex) = -999.0#
+                        rtmp = lNValsProcessed * pErrorCriteria(10) / 100
+                        stmp = lNValsProcessed - recCnt(1)
+                        If (stmp < rtmp Or rtmp < 1.0#) Then 'not enough values available
+                            pStats(6, lStatGroup, lSiteIndex) = Double.NaN
                         Else
                             sum1 = 0.0#
                             totCnt = 0.0#
@@ -352,14 +352,15 @@ Module ExpertSystemStatistics
                                 'Loop through boxes starting with highest <=1.0,
                                 'adding recession values until we have x percent of them
                                 iIndex += 1
-                                sum1 = sum1 + recSum(iIndex)
-                                totCnt = totCnt + recCnt(iIndex)
+                                sum1 += recSum(iIndex)
+                                totCnt += recCnt(iIndex)
                                 'have we added x percent of the values yet?
                             Loop While (totCnt < rtmp)
                             'Compensate for inexact number of values by interpolating,
                             'subtract off a proportional amount of the box containing
                             'the cut-off value
-                            sum1 = sum1 - (totCnt - rtmp) * recSum(iIndex) / recCnt(iIndex)
+                            Dim lSubVal = (totCnt - rtmp) * (recSum(iIndex) / recCnt(iIndex))
+                            sum1 -= lSubVal
                             'calculate average baseflow recession rate
                             pStats(6, lStatGroup, lSiteIndex) = sum1 / rtmp
                         End If
@@ -367,19 +368,17 @@ Module ExpertSystemStatistics
                 End If
                 If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then
                     'take average over NStorms
-                    pStats(5, lStatGroup, lSiteIndex) = pStats(5, lStatGroup, lSiteIndex) / pNStorms
+                    pStats(5, lStatGroup, lSiteIndex) /= pNStorms
                     'convert storm peak stat from acre-inch/day to cfs
-                    pStats(5, lStatGroup, lSiteIndex) = pStats(5, lStatGroup, lSiteIndex) * _
-                                                     pBasinArea(lSiteIndex) * 43560.0# / (12.0# * 24.0# * 3600.0#)
+                    pStats(5, lStatGroup, lSiteIndex) *= pBasinArea(lSiteIndex) * 43560.0# / (12.0# * 24.0# * 3600.0#)
                 ElseIf lStatGroup = 2 Then
                     For i As Integer = 1 To 10
                         'convert observed runoff values
                         If i < 5 Or i > 6 Then
-                            pStats(i, lStatGroup, lSiteIndex) = pStats(i, lStatGroup, lSiteIndex) _
-                                                             * pConvert / pBasinArea(lSiteIndex)
+                            pStats(i, lStatGroup, lSiteIndex) *= pConvert / pBasinArea(lSiteIndex)
                         ElseIf i = 5 Then
                             'take average over NStorms
-                            pStats(i, lStatGroup, lSiteIndex) = pStats(i, lStatGroup, lSiteIndex) / pNStorms
+                            pStats(i, lStatGroup, lSiteIndex) /= pNStorms
                         End If
                     Next i
                 End If
@@ -388,106 +387,100 @@ Module ExpertSystemStatistics
     End Sub
 
     Private Function CalcErrorTerms() As String
-        Dim siteIndex As Integer
-        Dim summerError As Double, winterError As Double
-
         ReDim pErrorTerms(pNErrorTerms, pNSites)
 
-        For siteIndex = 1 To pNSites
-
+        For lSiteIndex As Integer = 1 To pNSites
             'total volume error
-            pErrorTerms(1, siteIndex) = -999.0#
-            If (pStats(1, 2, siteIndex) > 0.0#) Then
-                pErrorTerms(1, siteIndex) = 100.0# * ((pStats(1, 1, siteIndex) - pStats(1, 2, siteIndex)) _
-                                                  / pStats(1, 2, siteIndex))
+            pErrorTerms(1, lSiteIndex) = -999.0#
+            If (pStats(1, 2, lSiteIndex) > 0.0#) Then
+                pErrorTerms(1, lSiteIndex) = 100.0# * ((pStats(1, 1, lSiteIndex) - pStats(1, 2, lSiteIndex)) _
+                                                  / pStats(1, 2, lSiteIndex))
             Else
-                pErrorTerms(1, siteIndex) = -999.0#
+                pErrorTerms(1, lSiteIndex) = Double.NaN
             End If
 
             '     'total volume difference
-            '      VOLDIF(siteIndex) = pStats(1, 1, siteIndex) - pStats(1, 2, siteIndex)
+            '      VOLDIF(lSiteIndex) = pStats(1, 1, lSiteIndex) - pStats(1, 2, lSiteIndex)
             '
             '     'unrealized potential evapotranspiration
-            '      ETDIF(siteIndex) = pStats(1, 5, siteIndex) - pStats(1, 6, siteIndex)
+            '      ETDIF(lSiteIndex) = pStats(1, 5, lSiteIndex) - pStats(1, 6, lSiteIndex)
 
             'volume error in lowest 50% flows
-            If (pStats(2, 2, siteIndex) > 0.0#) Then
-                pErrorTerms(3, siteIndex) = 100.0# * ((pStats(2, 1, siteIndex) - pStats(2, 2, siteIndex)) _
-                                                  / pStats(2, 2, siteIndex))
+            If (pStats(2, 2, lSiteIndex) > 0.0#) Then
+                pErrorTerms(3, lSiteIndex) = 100.0# * ((pStats(2, 1, lSiteIndex) - pStats(2, 2, lSiteIndex)) _
+                                                  / pStats(2, 2, lSiteIndex))
             Else
-                pErrorTerms(3, siteIndex) = -999.0#
+                pErrorTerms(3, lSiteIndex) = Double.NaN
             End If
 
             'volume error in highest 10% flows
-            If (pStats(3, 2, siteIndex) > 0.0#) Then
-                pErrorTerms(4, siteIndex) = 100.0# * ((pStats(3, 1, siteIndex) - pStats(3, 2, siteIndex)) _
-                                           / pStats(3, 2, siteIndex))
+            If (pStats(3, 2, lSiteIndex) > 0.0#) Then
+                pErrorTerms(4, lSiteIndex) = 100.0# * ((pStats(3, 1, lSiteIndex) - pStats(3, 2, lSiteIndex)) _
+                                           / pStats(3, 2, lSiteIndex))
             Else
-                pErrorTerms(4, siteIndex) = -999.0#
+                pErrorTerms(4, lSiteIndex) = Double.NaN
             End If
 
             'total storm peaks volume
-            If (pStats(5, 2, siteIndex) > 0.0#) Then
-                pErrorTerms(11, siteIndex) = 100.0# * ((pStats(5, 1, siteIndex) - pStats(5, 2, siteIndex)) _
-                                           / pStats(5, 2, siteIndex))
+            If (pStats(5, 2, lSiteIndex) > 0.0#) Then
+                pErrorTerms(11, lSiteIndex) = 100.0# * ((pStats(5, 1, lSiteIndex) - pStats(5, 2, lSiteIndex)) _
+                                           / pStats(5, 2, lSiteIndex))
             Else
-                pErrorTerms(11, siteIndex) = -999.0#
+                pErrorTerms(11, lSiteIndex) = Double.NaN
             End If
 
             'total storm volume
-            If (pStats(4, 2, siteIndex) > 0.0#) Then
-                pErrorTerms(5, siteIndex) = 100.0# * ((pStats(4, 1, siteIndex) - pStats(4, 2, siteIndex)) _
-                                           / pStats(4, 2, siteIndex))
+            If (pStats(4, 2, lSiteIndex) > 0.0#) Then
+                pErrorTerms(5, lSiteIndex) = 100.0# * ((pStats(4, 1, lSiteIndex) - pStats(4, 2, lSiteIndex)) _
+                                           / pStats(4, 2, lSiteIndex))
             Else
-                pErrorTerms(5, siteIndex) = -999.0#
+                pErrorTerms(5, lSiteIndex) = Double.NaN
             End If
 
             'summer storm volume
-            If (pStats(9, 2, siteIndex) > 0.0# And pStats(4, 2, siteIndex) > 0.0#) Then
-                pErrorTerms(8, siteIndex) = (100.0# * ((pStats(9, 1, siteIndex) - pStats(9, 2, siteIndex)) _
-                                            / pStats(9, 2, siteIndex))) - pErrorTerms(5, siteIndex)
+            If (pStats(9, 2, lSiteIndex) > 0.0# And pStats(4, 2, lSiteIndex) > 0.0#) Then
+                pErrorTerms(8, lSiteIndex) = (100.0# * ((pStats(9, 1, lSiteIndex) - pStats(9, 2, lSiteIndex)) _
+                                            / pStats(9, 2, lSiteIndex))) - pErrorTerms(5, lSiteIndex)
             Else
-                pErrorTerms(8, siteIndex) = -999.0#
+                pErrorTerms(8, lSiteIndex) = Double.NaN
             End If
 
             'error in low flow recession
-            If ((Math.Abs(Math.Abs(pStats(6, 1, siteIndex)) - 999.0#)) < 0.000001 Or _
-                (Math.Abs(Math.Abs(pStats(6, 2, siteIndex)) - 999.0#)) < 0.000001) Then
-                'one term or the other is 999.0 or -999.0,
-                pErrorTerms(2, siteIndex) = -999.0#
-            Else
-                'okay to calculate this term
-                pErrorTerms(2, siteIndex) = (1.0# - pStats(6, 1, siteIndex)) - (1.0# - pStats(6, 2, siteIndex))
+            If Double.IsNaN(pStats(6, 1, lSiteIndex)) Or _
+               Double.IsNaN(pStats(6, 2, lSiteIndex)) Then
+                pErrorTerms(2, lSiteIndex) = Double.NaN
+            Else 'okay to calculate this term
+                pErrorTerms(2, lSiteIndex) = (1.0# - pStats(6, 1, lSiteIndex)) - (1.0# - pStats(6, 2, lSiteIndex))
             End If
 
             'summer flow volume
-            If (pStats(7, 2, siteIndex) > 0.0#) Then
-                summerError = 100.0# * ((pStats(7, 1, siteIndex) - pStats(7, 2, siteIndex)) _
-                                           / pStats(7, 2, siteIndex))
+            Dim lSummerError As Double
+            If (pStats(7, 2, lSiteIndex) > 0.0#) Then
+                lSummerError = 100.0# * ((pStats(7, 1, lSiteIndex) - pStats(7, 2, lSiteIndex)) _
+                                           / pStats(7, 2, lSiteIndex))
             Else
-                summerError = -999.0#
+                lSummerError = Double.NaN
             End If
+
             'winter flow volume
-            If (pStats(8, 2, siteIndex) > 0.0#) Then
-                winterError = 100.0# * ((pStats(8, 1, siteIndex) - pStats(8, 2, siteIndex)) _
-                                           / pStats(8, 2, siteIndex))
+            Dim lWinterError As Double
+            If (pStats(8, 2, lSiteIndex) > 0.0#) Then
+                lWinterError = 100.0# * ((pStats(8, 1, lSiteIndex) - pStats(8, 2, lSiteIndex)) _
+                                           / pStats(8, 2, lSiteIndex))
             Else
-                winterError = -999.0#
+                lWinterError = Double.NaN
             End If
             'error in seasonal volume
-            If (Math.Abs(summerError - 999.0#) < 0.000001 Or _
-                Math.Abs(winterError - 999.0#) < 0.000001) Then
+            If (Double.IsNaN(lSummerError) Or _
+                Double.IsNaN(lWinterError)) Then
                 'one term or the other has not been obtained
-                pErrorTerms(7, siteIndex) = -999.0#
-            Else
-                'okay to calculate this term
-                pErrorTerms(7, siteIndex) = Math.Abs(summerError - winterError)
+                pErrorTerms(7, lSiteIndex) = Double.NaN
+            Else 'okay to calculate this term
+                pErrorTerms(7, lSiteIndex) = Math.Abs(lSummerError - lWinterError)
             End If
+        Next lSiteIndex
 
-        Next siteIndex
-
-        CalcErrorTerms = StatReportAsString()
-
+        Return StatReportAsString()
     End Function
 
     Private Function StatReportAsString() As String
@@ -556,12 +549,12 @@ Module ExpertSystemStatistics
               atcFormat("Surface Runoff", 15) & _
               atcFormat("Interflow", 15) & vbCrLf
         'Write runoff block
-        For j = 1 To pStats.GetUpperBound(1)
+        For j = 1 To pStats.GetUpperBound(0)
             'loop for each error term
             lStr &= atcFormat(pStatNames(j) & " =", 30)
             Dim l() As Integer = {0, 2, 1, 3, 4} 'gets print order correct
             For k = 1 To 4
-                If pStats(j, l(k), lSite) <> -999 Then
+                If Not Double.IsNaN(pStats(j, l(k), lSite)) Then
                     If j = 5 Or j = 6 Then 'dont need adjustment for storm peaks or recession rate
                         lConv = 1
                     Else
@@ -626,7 +619,7 @@ Module ExpertSystemStatistics
                 Logger.Dbg(pDSN(lConsIndex + 1, lSiteIndex))
             Next lConsIndex
             pStatDN(lSiteIndex) = lExsRecord.Substring(42, 2)  '0 or 1
-            pSiteName(lSiteIndex) = lExsRecord.Substring(45, 20).Trim
+            pSiteName(lSiteIndex) = lExsRecord.Substring(45).Replace(vbCr, "").Trim
         Next lSiteIndex
 
         Dim lRecordIndex As Integer = pNSites + 1
@@ -739,9 +732,9 @@ Module ExpertSystemStatistics
         Logger.Msg("The starting and ending dates were not found in " & aFilename & ".", vbCritical, "bad UCI file")
     End Sub
 
-    Private Sub BOXSRT(ByVal maxVal As Double, ByVal minVal As Double, ByVal pNSteps As Integer, ByVal NVALS As Integer, _
-    ByVal rDat() As Double, ByVal arlgFg As Integer, _
-    ByVal boxCnt() As Integer, ByVal boxSum() As Double)
+    Private Sub BoxSort(ByVal maxVal As Double, ByVal minVal As Double, ByVal pNSteps As Integer, ByVal NVALS As Integer, _
+                        ByVal rDat() As Double, ByVal arlgFg As Integer, _
+                        ByRef aBoxCnt() As Integer, ByRef aBoxSum() As Double)
         '     Compute statistics needed by the expert system using a box sort algorithm
 
         '     MaxVal - maximum value in array to be sorted
@@ -750,15 +743,15 @@ Module ExpertSystemStatistics
         '     NVals  - number of values to sort
         '     RDat   - array of values to sort
         '     ArlgFg - arith/log flag, 1-arith, 2-log
-        '     BoxCnt - number of values in box
-        '     BoxSum - sum of values in box
+        '     aBoxCnt - number of values in box
+        '     aBoxSum - sum of values in box
 
         Dim i As Integer, box As Integer
         Dim incrmt As Double, rtmp As Double, rlgMin As Double, xtmp As Double
 
         'set box counts and box sums to zero
-        boxCnt.Initialize() '.SetValue(0, 1, pNSteps)
-        boxSum.Initialize() '.SetValue(0.0, 1, pNSteps)
+        aBoxCnt.Initialize() '.SetValue(0, 1, pNSteps)
+        aBoxSum.Initialize() '.SetValue(0.0, 1, pNSteps)
 
         'set box boundaries
         If (arlgFg = 2) Then
@@ -795,35 +788,36 @@ Module ExpertSystemStatistics
                 End If
             End If
             'increment count and sum
-            boxCnt(box) = boxCnt(box) + 1
-            boxSum(box) = boxSum(box) + rDat(i)
+            aBoxCnt(box) += 1
+            aBoxSum(box) += rDat(i)
         Next i
     End Sub
 
-    Private Sub BOXADD(ByVal Limit As Integer, ByVal pNSteps As Integer, ByVal boxCnt() As Integer, _
-    ByVal boxSum() As Double, ByVal Sum As Double)
+    Private Function BoxAdd(ByVal aLimit As Integer, ByVal aBoxCnt() As Integer, _
+                            ByVal aboxSum() As Double)
         'Use box sort data to determine the sum of the values greater than any user specified limit.
 
-        '     Limit  - limit of range of values to sum (number of values to sum)
-        '     pNSteps - number of steps or boxes
-        '     BoxCnt - number of values in box
-        '     BoxSum - sum of values in box
-        '     Sum    - sum of values greater than limit
+        '     aLimit  - limit of range of values to sum (number of values to sum)
+        '     aBoxCnt - number of values in box
+        '     aBoxSum - sum of values in box
+        '     returns - sum of values greater than limit
 
-        Dim i As Integer, totalCnt As Integer
+        Dim lIndex As Integer, lTotCnt As Integer
+        Dim lSum As Double
 
-        Sum = 0.0#
-        totalCnt = 0
-        i = 0
+        lSum = 0.0#
+        lTotCnt = 0
+        lIndex = 0
         Do 'loop through boxes starting with highest
-            i = i + 1
-            Sum = Sum + boxSum(i)
-            totalCnt = totalCnt + boxCnt(i)
-        Loop While (totalCnt < Limit)
+            lIndex += 1
+            lSum += aboxSum(lIndex)
+            lTotCnt += aBoxCnt(lIndex)
+        Loop While (lTotCnt < aLimit)
         'Compensate for inexact number of values by interpolating, subtract
         'off a proportional amount of the box containing the cut-off value.
-        Sum = Sum - (totalCnt - Limit) * boxSum(i) / boxCnt(i)
-    End Sub
+        lSum -= (lTotCnt - aLimit) * aboxSum(lIndex) / aBoxCnt(lIndex)
+        Return lSum
+    End Function
 
     Private Sub ZipR(ByVal aLength As Long, ByVal aZip As Single, ByVal lArray(,,) As Double, _
                      ByVal aSecondDim As Long, ByVal aThirdDim As Long)
