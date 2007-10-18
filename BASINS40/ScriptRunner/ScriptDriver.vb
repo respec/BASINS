@@ -15,6 +15,6 @@ Public Module ScriptDriver
         'ScriptShapefileFromWDM.ScriptMain(aMapWin)
         'ScriptSQLLiteTester.ScriptMain(aMapWin)
         'ScriptStatTest.ScriptMain(aMapWin)
-        ExpertSystemStatistics.ScriptMain(aMapWin)
+        HSPFOutputReports.ScriptMain(aMapWin)
     End Sub
 End Module

@@ -70,6 +70,7 @@
     <Compile Include="ExpertSystemStatistics.vb" />
     <Compile Include="GridAdd.vb" />
     <Compile Include="GridValues.vb" />
+    <Compile Include="HSPFOutputReports.vb" />
     <Compile Include="LineDump.vb" />
     <Compile Include="SQLiteTester.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
