@@ -2,7 +2,6 @@ Imports atcUtility.modFile
 Imports atcUtility.modDate
 Imports atcUtility.modString
 Imports atcData
-Imports atcWDM
 Imports MapWinUtility
 Imports Microsoft.VisualBasic
 
@@ -10,9 +9,6 @@ Module ExpertSystemStatistics
     Private Const pNSteps = 500, pNStatGroups = 6, pNStats = 10, pNErrorTerms = 11
     Private Const pConvert = 24.0# * 3600.0# * 12.0# / 43560.0#
 
-    Dim pWDMFileNamePrefix As String
-    Dim pUciName As String
-    Dim pUciDate As String
     Dim pSiteName() As String
     Dim pNStorms As Integer
     Dim pNSites As Integer
@@ -79,7 +75,7 @@ Module ExpertSystemStatistics
     Dim pStatNames(10) As String
     Dim pStats(,,) As Double
 
-    Friend Function GetExpSysStats(ByVal aUciFileName As String, ByVal aExsFileName As String, ByVal DataDir As String) As String
+    Friend Function Report(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcDataSource) As String
         pErrorTermNames(1) = "Error in total volume (%)"
         pErrorTermNames(2) = "Error in low-flow recession"
         pErrorTermNames(3) = "Error in 50% lowest flows (%)"
@@ -92,9 +88,6 @@ Module ExpertSystemStatistics
         pErrorTermNames(10) = "Percent of flows to use in low-flow recession error"
         pErrorTermNames(11) = "Average storm peak flow error (%)"
 
-        pUciName = FilenameOnly(aUciFileName)
-        pUciDate = FileDateTime(aUciFileName)
-
         pStatNames(1) = "total (inches)"
         pStatNames(2) = "50% low (inches)"
         pStatNames(3) = "10% high (inches)"
@@ -106,25 +99,21 @@ Module ExpertSystemStatistics
         pStatNames(9) = "summer storms (inches)"
         pStatNames(10) = "winter storms (inches)"
 
-        ReadUCIFile(aUciFileName)     'gets starting and ending dates
-        ReadEXSFile(aExsFileName)     'gets WDM name, DSN #s, storm data, etc...
+        ReadEXSFile(FilenameOnly(aUci.Name) & ".exs")     'gets WDM name, DSN #s, storm data, etc...
+        pSJdate = aUci.GlobalBlock.SDateJ
+        pEJdate = aUci.GlobalBlock.EdateJ
 
-        CalcStats(DataDir)
-        Return CalcErrorTerms()
+        CalcStats(aDataSource)
+        Return CalcErrorTerms(aUci)
     End Function
 
-    Private Sub CalcStats(ByVal aDataDir As String)
+    Private Sub CalcStats(ByVal aDataSource As atcDataSource)
         'lStatGroup - Group number of pStats desired from this call
         '         1-sim runoff, 2-obs runoff, 3-sim stm sur runoff,
         '         4-sim stm interflow, 5-tot pot et, 6-act et
         'STAT   - Calculated statistics
         '         1-total, 2-50%low, 3-10%high, 4-storm vol, 5-storm peak,
         '         6-recess, 7-sum vol, 8-win vol, 9-sum strm, 10-win strm
-
-        'open WDM file
-        Dim lWdmFileName As String = aDataDir & "\" & pWDMFileNamePrefix & ".wdm"
-        Dim lTSerFile As New atcDataSourceWDM
-        lTSerFile.Open(lWdmFileName)
 
         ReDim pStats(pNStats, pNStatGroups, pNSites)
 
@@ -150,7 +139,7 @@ Module ExpertSystemStatistics
                 End Select
 
                 'Get data - daily values and max values as necessary
-                Dim lTSer As atcTimeseries = lTSerFile.DataSets(lTSerFile.DataSets.IndexFromKey(lDSN))
+                Dim lTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lDSN))
                 Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, pSJdate, pEJdate, Nothing)
                 lTSer = Nothing
 
@@ -175,7 +164,7 @@ Module ExpertSystemStatistics
                     'set Stats to undefined
                     ZipR(pNStats, Double.NaN, pStats, lStatGroup, lSiteIndex)
                     Logger.Msg("Unable to retrieve DSN " & lDSN & vbCrLf & _
-                               "from the file " & lWdmFileName, "Bad Data Set")
+                               "from the file " & aDataSource.Name, "Bad Data Set")
                 Else  'generate statistics
                     'total volume always needed; initialize total volume
                     pStats(1, lStatGroup, lSiteIndex) = 0.0#
@@ -345,7 +334,7 @@ Module ExpertSystemStatistics
         Next lSiteIndex
     End Sub
 
-    Private Function CalcErrorTerms() As String
+    Private Function CalcErrorTerms(ByVal auci As atcUCI.HspfUci) As String
         ReDim pErrorTerms(pNErrorTerms, pNSites)
 
         For lSiteIndex As Integer = 1 To pNSites
@@ -438,23 +427,23 @@ Module ExpertSystemStatistics
             End If
         Next lSiteIndex
 
-        Return StatReportAsString()
+        Return StatReportAsString(auci)
     End Function
 
-    Private Function StatReportAsString() As String
+    Private Function StatReportAsString(ByVal aUci As atcUCI.HspfUci) As String
         Dim lStr As String
-        lStr = "Expert System Statistics for " & pUciName & ".uci" & vbCrLf & vbCrLf
-        lStr &= atcFormat("Run Created: ", 15) & pUciDate & vbCrLf & vbCrLf
-        lStr &= atcFormat("Start Date: ", 15) & atcFormat(pSJdate, "yyyy/MM/dd HH:mm") & vbCrLf
-        lStr &= atcFormat("End Date: ", 15) & atcFormat(pEJdate, "yyyy/MM/dd HH:mm") & vbCrLf & vbCrLf
-
-        Dim lYrCnt As Double = timdifJ(pSJdate, pEJdate, 6, 1)
+        lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
+        lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf & vbCrLf
+        lStr &= atcFormat("Run Created: ", 15) & FileDateTime(aUci.Name) & vbCrLf & vbCrLf
+        lStr &= atcFormat("Start Date: ", 15) & Format(Date.FromOADate(pSJdate), "yyyy/MM/dd HH:mm") & vbCrLf
+        lStr &= atcFormat("End Date: ", 15) & Format(Date.FromOADate(pEJdate), "yyyy/MM/dd HH:mm") & vbCrLf & vbCrLf
 
         For lSite As Integer = 1 To pNSites
             'loop for each site
             lStr &= atcFormat("Site: ", 15) & pSiteName(lSite) & vbCrLf & vbCrLf
 
             'statistics summary
+            Dim lYrCnt As Double = timdifJ(pSJdate, pEJdate, 6, 1)
             lStr &= StatDetails("Total (" & lYrCnt & " year run)", lSite, 1)
             lStr &= StatDetails("Annual Average", lSite, lYrCnt)
 
@@ -482,8 +471,6 @@ Module ExpertSystemStatistics
     Private Function atcFormat(ByVal aStr As String, ByVal aFormat As String)
         If IsInteger(aFormat) Then
             Return aStr.PadLeft(aFormat)
-        ElseIf (aFormat.StartsWith("y")) Then
-            Return Format(Date.FromOADate(Double.Parse(aStr)), aFormat).PadLeft(aFormat.Length) 'DumpDate(aStr).Substring(14)
         Else
             Return Format(Double.Parse(aStr), aFormat).PadLeft(aFormat.Length)
         End If
@@ -544,7 +531,6 @@ Module ExpertSystemStatistics
 
         'Read first line of file
         Dim lExsRecord As String = lExsRecords(0)
-        pWDMFileNamePrefix = lExsRecord.Substring(0, 8).Trim
         pNSites = lExsRecord.Substring(8, 5) 'Mid(textLine, 9, 5)
         pCurSite = lExsRecord.Substring(14, 5) 'Mid(textLine, 14, 5)
         pLatMin = lExsRecord.Substring(19, 5) 'Mid(textLine, 19, 8)
@@ -666,31 +652,6 @@ Module ExpertSystemStatistics
         '  End If
     End Sub
 
-    Private Sub ReadUCIFile(ByVal aFilename As String)
-        Dim lUciFileString As String = WholeFileString(aFilename)
-        Dim lUciRecords() As String = lUciFileString.Split(vbLf)
-
-        'Search for starting and ending dates
-        For lIndex As Integer = 0 To lUciRecords.GetUpperBound(0)
-            If lUciRecords(lIndex).StartsWith("  START") Then
-                Dim lUciRecord As String = lUciRecords(lIndex)
-                Dim lSDate(5) As Integer, lEDate(5) As Integer
-                lSDate(0) = lUciRecord.Substring(14, 4)
-                lEDate(0) = lUciRecord.Substring(39, 4)
-                For i As Integer = 1 To 4
-                    lSDate(i) = lUciRecord.Substring(16 + i * 3, 2)
-                    lEDate(i) = lUciRecord.Substring(41 + i * 3, 2)
-                Next i
-                lSDate(5) = 0
-                lEDate(5) = 0
-                pSJdate = Date2J(lSDate)
-                pEJdate = Date2J(lEDate)
-                Exit Sub
-            End If
-        Next lIndex
-        Logger.Msg("The starting and ending dates were not found in " & aFilename & ".", vbCritical, "bad UCI file")
-    End Sub
-
     Private Sub BoxSort(ByVal maxVal As Double, ByVal minVal As Double, ByVal pNSteps As Integer, ByVal NVALS As Integer, _
                         ByVal rDat() As Double, ByVal arlgFg As Integer, _
                         ByRef aBoxCnt() As Integer, ByRef aBoxSum() As Double)
@@ -705,7 +666,7 @@ Module ExpertSystemStatistics
         '     aBoxCnt - number of values in box
         '     aBoxSum - sum of values in box
 
-        Dim i As Integer, box As Integer
+        Dim i As Integer, lBox As Integer
         Dim incrmt As Double, rtmp As Double, rlgMin As Double, xtmp As Double
 
         'set box counts and box sums to zero
@@ -713,12 +674,10 @@ Module ExpertSystemStatistics
         aBoxSum.Initialize() '.SetValue(0.0, 1, pNSteps)
 
         'set box boundaries
-        If (arlgFg = 2) Then
-            'log of data
+        If (arlgFg = 2) Then 'log of data
             rlgMin = Math.Log(minVal)
             rtmp = Math.Log(maxVal) - rlgMin
-        Else
-            'plain data
+        Else 'plain data
             rlgMin = minVal
             rtmp = maxVal - minVal
         End If
@@ -729,26 +688,23 @@ Module ExpertSystemStatistics
             'make sure value in range
             If (xtmp < minVal) Then
                 'out low
-                box = pNSteps
-            ElseIf (xtmp >= maxVal) Then
-                'out high, put in highest ranking box
-                box = 1
-            Else
-                'it falls in one of the boxes in between
+                lBox = pNSteps
+            ElseIf (xtmp >= maxVal) Then 'out high, put in highest ranking box
+                lBox = 1
+            Else 'it falls in one of the boxes in between
                 If (arlgFg = 1) Then
                     rtmp = xtmp
                 Else
                     rtmp = Math.Log(xtmp) - rlgMin
                 End If
-                box = pNSteps - Fix(rtmp / incrmt)
-                If (box <= 1) Then
-                    'max value case
-                    box = 1
+                lBox = pNSteps - Fix(rtmp / incrmt)
+                If (lBox <= 1) Then 'max value case
+                    lBox = 1
                 End If
             End If
             'increment count and sum
-            aBoxCnt(box) += 1
-            aBoxSum(box) += rDat(i)
+            aBoxCnt(lBox) += 1
+            aBoxSum(lBox) += rDat(i)
         Next i
     End Sub
 
