@@ -76,6 +76,12 @@ Option Explicit On
         End Set
     End Property
 
+    Public ReadOnly Property SDateJ() As Integer
+        Get
+            Return atcUtility.modDate.Date2J(pSDate)
+        End Get
+    End Property
+
     Public Property EDate(ByVal Index As Integer) As Integer
         Get
             EDate = pEDate(Index)
@@ -84,6 +90,12 @@ Option Explicit On
             pEDate(Index) = Value
             Update()
         End Set
+    End Property
+
+    Public ReadOnly Property EdateJ() As Integer
+        Get
+            Return atcUtility.modDate.Date2J(pEDate)
+        End Get
     End Property
 
     Public Property outlev() As HSPFParm
