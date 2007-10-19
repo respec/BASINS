@@ -10,6 +10,7 @@ Module HSPFOutputReports
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pTestPath)
 
+        'open uci file
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.mdb")
         Dim lHspfUci As New atcUCI.HspfUci
@@ -24,8 +25,13 @@ Module HSPFOutputReports
         lStr = ExpertSystemStatistics.Report(lHspfUci, lDataSource)
         SaveFileString("outfiles\ExpertSysStats.txt", lStr)
 
+        'TODO: get the following four parms from the exs file
+        Dim lCons As String = "Flow"
         Dim lSites() As String = {"RCH5"}
-        lStr = DailyMonthlyFlowStats.Report(lHspfUci, lDataSource, lSites)
-        SaveFileString("outfiles\DailyMontlyFlowStats.txt", lStr)
+        Dim lArea() As Double = {54831}
+        Dim lSimDsnId() As Integer = {1001}
+        Dim lObsDsnId() As Integer = {261}
+        lStr = DailyMonthlyCompareStats.Report(lHspfUci, lDataSource, lCons, lSites, lArea, lSimDsnId, lObsDsnId)
+        SaveFileString("outfiles\DailyMontlyCompareStats.txt", lStr)
     End Sub
 End Module
