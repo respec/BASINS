@@ -2,37 +2,48 @@ Imports atcUtility.modFile
 Imports atcUtility.modDate
 Imports atcUtility.modString
 Imports atcData
+Imports atcTimeseriesMath
 
-Module DailyMonthlyFlowStats
-    Dim pSJdate As Double, pEJdate As Double
-    'TODO: get these from exs file (in driver?)
-    Dim pSimDsn As Integer = 1001
-    Dim pObsDsn As Integer = 261
-    Dim pArea As Double = 54831.0#
-    Dim pSimConv As Double = pArea * 43560.0# / (12.0# * 24.0# * 3600.0#)
-
+Module DailyMonthlyCompareStats
     Function Report(ByVal aUci As atcUCI.HspfUci, _
                     ByVal aDataSource As atcDataSource, _
-                    ByVal aSites() As String) As String
-        pSJdate = aUci.GlobalBlock.SDateJ
-        pEJdate = aUci.GlobalBlock.EdateJ
+                    ByVal aCons As String, _
+                    ByVal aSites() As String, _
+                    ByVal aArea() As Double, _
+                    ByVal aSimDsnId() As Integer, _
+                    ByVal aObsDsnId() As Integer) As String
+
+        Dim lSJdate As Double, lEJdate As Double
+        lSJdate = aUci.GlobalBlock.SDateJ
+        lEJdate = aUci.GlobalBlock.EdateJ
+
+        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+        Dim lArgsMath As New atcDataAttributes
 
         Dim lStr As String
-        lStr = "Daily and Monthly Flow Statistics for '" & aUci.Name & "' scenario." & vbCrLf
+        lStr = "Daily and Monthly " & aCons & " Statistics for '" & FilenameOnly(aUci.Name) & "' scenario." & vbCrLf
         lStr &= "   Run Made " & FileDateTime(aUci.Name) & vbCrLf
         lStr &= "   " & aUci.GlobalBlock.RunInf.Value & vbCrLf
-        Dim lYrCnt As Double = timdifJ(pSJdate, pEJdate, 6, 1)
+        Dim lYrCnt As Double = timdifJ(lSJdate, lEJdate, 6, 1)
         lStr &= "   Simulation Period: " & lYrCnt & " years"
-        lStr &= " from " & Format(Date.FromOADate(pSJdate), "yyyy/MM/dd")
-        lStr &= " to " & Format(Date.FromOADate(pEJdate), "yyyy/MM/dd") & vbCrLf
-        lStr &= "   (Units:CFS)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
+        lStr &= " from " & Format(Date.FromOADate(lSJdate), "yyyy/MM/dd")
+        lStr &= " to " & Format(Date.FromOADate(lEJdate), "yyyy/MM/dd") & vbCrLf
+        lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
 
-        For Each lSite As String In aSites
-            Dim lSimTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(pSimDsn))
-            Dim lNewSimTSer As atcTimeseries = SubsetByDate(lSimTSer, pSJdate, pEJdate, Nothing)
+        For lSiteIndex As Integer = 0 To aSites.GetUpperBound(0)
+            Dim lSite As String = aSites(lSiteIndex)
+            Dim lSimTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aSimDsnId(lSiteIndex)))
+            Dim lNewSimTSer As atcTimeseries = SubsetByDate(lSimTSer, lSJdate, lEJdate, Nothing)
+            Dim lSimConv As Double = aArea(lSiteIndex) * 43560.0# / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
+            lTsMath.DataSets.Clear()
+            lArgsMath.Clear()
+            lArgsMath.SetValue("timeseries", lNewSimTSer)
+            lArgsMath.SetValue("number", lSimConv)
+            lTsMath.Open("multiply", lArgsMath)
+            lNewSimTSer = lTsMath.DataSets(0)
             lSimTSer = Nothing
-            Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(pObsDsn))
-            Dim lNewObsTSer As atcTimeseries = SubsetByDate(lObsTSer, pSJdate, pEJdate, Nothing)
+            Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aObsDsnId(lSiteIndex)))
+            Dim lNewObsTSer As atcTimeseries = SubsetByDate(lObsTSer, lSJdate, lEJdate, Nothing)
             lObsTSer = Nothing
 
             lStr &= IntervalReport(lSite, atcTimeUnit.TUDay, lNewSimTSer, lNewObsTSer)
@@ -56,15 +67,16 @@ Module DailyMonthlyFlowStats
         lStr &= Space(36) & "Simulated".PadLeft(10) & "Observed".PadLeft(10) & vbCrLf
 
         Dim lTSer1 As atcTimeseries
-        lTSer1 = Aggregate(aTser1, aTimeUnit, 1, atcTran.TranSumDiv)
+        lTSer1 = Aggregate(aTser1, aTimeUnit, 1, atcTran.TranAverSame)
 
         Dim lTSer2 As atcTimeseries
-        lTSer2 = Aggregate(aTSer2, aTimeUnit, 1, atcTran.TranSumDiv)
-        lStr &= Attributes("Count", lTSer1, lTSer2)
-        lStr &= Attributes("Mean", lTSer1, lTSer2, True)
-        lStr &= Attributes("Geometric Mean", lTSer1, lTSer2, True)
+        lTSer2 = Aggregate(aTSer2, aTimeUnit, 1, atcTran.TranAverSame)
 
-        lStr &= CompareStats(lTSer1, lTSer2, True)
+        lStr &= Attributes("Count", lTSer1, lTSer2)
+        lStr &= Attributes("Mean", lTSer1, lTSer2)
+        lStr &= Attributes("Geometric Mean", lTSer1, lTSer2)
+
+        lStr &= CompareStats(lTSer1, lTSer2)
 
         lTSer1.Clear()
         lTSer1.Dates.Clear()
@@ -78,21 +90,15 @@ Module DailyMonthlyFlowStats
 
     Private Function Attributes(ByVal aName As String, _
                                 ByVal aTSer1 As atcTimeseries, _
-                                ByVal aTSer2 As atcTimeseries, _
-                                Optional ByVal aConv1 As Boolean = False) As String
-        Dim lValue1 As Double = aTSer1.Attributes.GetFormattedValue(aName)
-        If aConv1 Then
-            lValue1 *= pSimConv
-        End If
-        Dim lValueStr As String = DoubleToString(lValue1).PadLeft(10)
-
-        Return aName.PadLeft(36) & lValueStr & _
-               aTSer2.Attributes.GetFormattedValue(aName).PadLeft(10) & vbCrLf
+                                ByVal aTSer2 As atcTimeseries) As String
+        Dim lStr As String = aName.PadLeft(36) & _
+                             aTSer1.Attributes.GetFormattedValue(aName).PadLeft(10) & _
+                             aTSer2.Attributes.GetFormattedValue(aName).PadLeft(10) & vbCrLf
+        Return lStr
     End Function
 
     Function CompareStats(ByVal aTSer1 As atcTimeseries, _
-                          ByVal aTSer2 As atcTimeseries, _
-                          Optional ByVal aConv1 As Boolean = False) As String
+                          ByVal aTSer2 As atcTimeseries) As String
 
         Dim lMeanError As Double = 0.0#
         Dim lMeanAbsoluteError As Double = 0.0#
@@ -101,11 +107,8 @@ Module DailyMonthlyFlowStats
         Dim lVal1 As Double
         Dim lVal2 As Double
 
-        For lIndex as Integer  = 1 To aTSer1.numValues
+        For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
-            If aConv1 Then
-                lVal1 *= pSimConv
-            End If
             lValDiff = lVal1 - aTSer2.Values(lIndex)
             lMeanError += lValDiff
             lMeanAbsoluteError += Math.Abs(lValDiff)
@@ -124,24 +127,15 @@ Module DailyMonthlyFlowStats
         Dim lCorrelationCoefficient As Double = 0.0#
         Dim lNashSutcliffe As Double = 0.0#
         Dim lMean1 As Double = aTSer1.Attributes.GetDefinedValue("Mean").Value
-        If aConv1 Then
-            lMean1 *= pSimConv
-        End If
         Dim lMean2 As Double = aTSer2.Attributes.GetDefinedValue("Mean").Value
         For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
-            If aConv1 Then
-                lVal1 *= pSimConv
-            End If
             lVal2 = aTSer2.Values(lIndex)
             lCorrelationCoefficient += (lVal1 - lMean1) * (lVal2 - lMean2)
             lNashSutcliffe += (lVal2 - lMean2) ^ 2
         Next
         lCorrelationCoefficient /= (aTSer1.numValues - 1)
         Dim lSD1 As Double = aTSer1.Attributes.GetDefinedValue("Standard Deviation").Value
-        If aConv1 Then
-            lSD1 *= pSimConv
-        End If
         Dim lSD2 As Double = aTSer2.Attributes.GetDefinedValue("Standard Deviation").Value
         If Math.Abs(lSD1 * lSD2) > 0.0001 Then
             lCorrelationCoefficient /= (lSD1 * lSD2)
