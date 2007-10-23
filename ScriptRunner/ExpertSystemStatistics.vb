@@ -427,20 +427,20 @@ Module ExpertSystemStatistics
             End If
         Next lSiteIndex
 
-        Return StatReportAsString(auci)
+        Dim lStr As String = StatReportAsString(auci)
+        Return lStr
     End Function
 
     Private Function StatReportAsString(ByVal aUci As atcUCI.HspfUci) As String
         Dim lStr As String
         lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
         lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf & vbCrLf
-        lStr &= atcFormat("Run Created: ", 15) & FileDateTime(aUci.Name) & vbCrLf & vbCrLf
-        lStr &= atcFormat("Start Date: ", 15) & Format(Date.FromOADate(pSJdate), "yyyy/MM/dd HH:mm") & vbCrLf
-        lStr &= atcFormat("End Date: ", 15) & Format(Date.FromOADate(pEJdate), "yyyy/MM/dd HH:mm") & vbCrLf & vbCrLf
+        lStr &= "Run Created: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
+        lStr &= aUci.GlobalBlock.RunPeriod & vbCrLf & vbCrLf
 
         For lSite As Integer = 1 To pNSites
             'loop for each site
-            lStr &= atcFormat("Site: ", 15) & pSiteName(lSite) & vbCrLf & vbCrLf
+            lStr &= "Site: ".PadLeft(15) & pSiteName(lSite) & vbCrLf & vbCrLf
 
             'statistics summary
             Dim lYrCnt As Double = timdifJ(pSJdate, pEJdate, 6, 1)
@@ -449,12 +449,12 @@ Module ExpertSystemStatistics
 
             'Write the error terms
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
-            lStr &= Space(35) & atcFormat("Current", 15) & atcFormat("Criteria", 15) & vbCrLf
+            lStr &= Space(35) & "Current".PadLeft(12) & "Criteria".PadLeft(12) & vbCrLf
             For lErrorTerm As Integer = 1 To pNErrorTerms
                 If pErrorTerms(lErrorTerm, lSite) <> 0.0# Then
-                    lStr &= atcFormat(pErrorTermNames(lErrorTerm) & " =", 35) & _
-                            atcFormat(pErrorTerms(lErrorTerm, lSite), "##########0.000") & _
-                            atcFormat(pErrorCriteria(lErrorTerm), "##########0.000")
+                    lStr &= (pErrorTermNames(lErrorTerm) & " =").PadLeft(35) & _
+                            DecimalAlign(pErrorTerms(lErrorTerm, lSite)) & _
+                            DecimalAlign(pErrorCriteria(lErrorTerm))
                     If Math.Abs(pErrorTerms(lErrorTerm, lSite)) < pErrorCriteria(lErrorTerm) Then
                         lStr &= " OK" & vbCrLf
                     Else
@@ -468,14 +468,6 @@ Module ExpertSystemStatistics
         Return lStr
     End Function
 
-    Private Function atcFormat(ByVal aStr As String, ByVal aFormat As String)
-        If IsInteger(aFormat) Then
-            Return aStr.PadLeft(aFormat)
-        Else
-            Return Format(Double.Parse(aStr), aFormat).PadLeft(aFormat.Length)
-        End If
-    End Function
-
     Private Function StatDetails(ByVal Title As String, ByVal lSite As Integer, ByVal Conv As Double) As String
         Dim j As Integer
         Dim k As Integer
@@ -485,19 +477,19 @@ Module ExpertSystemStatistics
         lStr = Space(30) & Title & vbCrLf & vbCrLf
 
         lStr &= Space(30) & _
-              atcFormat("Observed", 15) & _
-              atcFormat("Simulated", 15) & _
-              atcFormat("Simulated", 15) & _
-              atcFormat("Simulated", 15) & vbCrLf
+              "Observed".PadLeft(15) & _
+              "Simulated".PadLeft(15) & _
+              "Simulated".PadLeft(15) & _
+              "Simulated".PadLeft(15) & vbCrLf
         lStr &= Space(30) & _
-              atcFormat("Total Runoff", 15) & _
-              atcFormat("Total Runoff", 15) & _
-              atcFormat("Surface Runoff", 15) & _
-              atcFormat("Interflow", 15) & vbCrLf
+              "Total Runoff".PadLeft(15) & _
+              "Total Runoff".PadLeft(15) & _
+              "Surface Runoff".PadLeft(15) & _
+              "Interflow".PadLeft(15) & vbCrLf
         'Write runoff block
         For j = 1 To pStats.GetUpperBound(0)
             'loop for each error term
-            lStr &= atcFormat(pStatNames(j) & " =", 30)
+            lStr &= (pStatNames(j) & " =").PadLeft(30)
             Dim l() As Integer = {0, 2, 1, 3, 4} 'gets print order correct
             For k = 1 To 4
                 If Not Double.IsNaN(pStats(j, l(k), lSite)) Then
@@ -506,7 +498,7 @@ Module ExpertSystemStatistics
                     Else
                         lConv = Conv
                     End If
-                    lStr &= atcFormat(pStats(j, l(k), lSite) / lConv, "##########0.000")
+                    lStr &= DecimalAlign(pStats(j, l(k), lSite) / lConv, 15)
                 Else
                     lStr &= Space(15)
                 End If
@@ -516,10 +508,10 @@ Module ExpertSystemStatistics
         lStr &= vbCrLf
         'Write EvapoTranspiration block
         lStr &= Space(30) & "          EvapoTranspiration" & vbCrLf
-        lStr &= Space(30) & atcFormat("Potential", 15) & atcFormat("Actual", 15) & vbCrLf
-        lStr &= atcFormat("total (inches) = ", 30)
+        lStr &= Space(30) & "Potential".PadLeft(15) & "Actual".PadLeft(15) & vbCrLf
+        lStr &= ("total (inches) = ").PadLeft(30)
         For k = 5 To 6
-            lStr &= atcFormat(pStats(1, k, lSite) / Conv, "##########0.000")
+            lStr &= DecimalAlign(pStats(1, k, lSite) / Conv, 15)
         Next k
         lStr &= vbCrLf & vbCrLf
         Return lStr

@@ -1,21 +1,47 @@
-Imports atcUtility.modFile
-Imports atcUtility.modDate
-Imports atcUtility.modString
+Imports atcUtility
 Imports atcData
+Imports atcWDM
 Imports atcTimeseriesMath
+Imports MapWindow.Interfaces
 
 Module DailyMonthlyCompareStats
-    Function Report(ByVal aUci As atcUCI.HspfUci, _
-                    ByVal aDataSource As atcDataSource, _
-                    ByVal aCons As String, _
-                    ByVal aSites() As String, _
-                    ByVal aArea() As Double, _
-                    ByVal aSimDsnId() As Integer, _
-                    ByVal aObsDsnId() As Integer) As String
+    Private Const pTestPath As String = "C:\test\EXP_CAL\hyd_man.net"
+    Private Const pBaseName As String = "hyd_man"
 
-        Dim lSJdate As Double, lEJdate As Double
-        lSJdate = aUci.GlobalBlock.SDateJ
-        lEJdate = aUci.GlobalBlock.EdateJ
+    Public Sub ScriptMain(ByRef aMapWin As IMapWin)
+        ChDriveDir(pTestPath)
+        'open uci file
+        Dim lMsg As New atcUCI.HspfMsg
+        lMsg.Open("hspfmsg.mdb")
+        Dim lHspfUci As New atcUCI.HspfUci
+        lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
+
+        'open WDM file
+        Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
+        Dim lWdmDataSource As New atcDataSourceWDM
+        lWdmDataSource.Open(lWdmFileName)
+        'TODO: get the following four parms from the exs file
+        Dim lCons As String = "Flow"
+        Dim lSites() As String = {"RCH5"}
+        Dim lArea() As Double = {54831}
+        Dim lSimDsnId() As Integer = {1001}
+        Dim lObsDsnId() As Integer = {261}
+        Dim lStr As String = DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSites, _
+                                                             lArea, lSimDsnId, lObsDsnId)
+        Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats"
+        If lSites.GetUpperBound(0) = 0 Then lOutFileName &= "-" & lSites(0)
+        lOutFileName &= ".txt"
+        SaveFileString(lOutFileName, lStr)
+    End Sub
+
+    Friend Function Report(ByVal aUci As atcUCI.HspfUci, _
+                           ByVal aDataSource As atcDataSource, _
+                           ByVal aCons As String, _
+                           ByVal aSites() As String, _
+                           ByVal aArea() As Double, _
+                           ByVal aSimDsnId() As Integer, _
+                           ByVal aObsDsnId() As Integer) As String
+
 
         Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
         Dim lArgsMath As New atcDataAttributes
@@ -24,16 +50,15 @@ Module DailyMonthlyCompareStats
         lStr = "Daily and Monthly " & aCons & " Statistics for '" & FilenameOnly(aUci.Name) & "' scenario." & vbCrLf
         lStr &= "   Run Made " & FileDateTime(aUci.Name) & vbCrLf
         lStr &= "   " & aUci.GlobalBlock.RunInf.Value & vbCrLf
-        Dim lYrCnt As Double = timdifJ(lSJdate, lEJdate, 6, 1)
-        lStr &= "   Simulation Period: " & lYrCnt & " years"
-        lStr &= " from " & Format(Date.FromOADate(lSJdate), "yyyy/MM/dd")
-        lStr &= " to " & Format(Date.FromOADate(lEJdate), "yyyy/MM/dd") & vbCrLf
+        lStr &= "   " & aUci.GlobalBlock.RunPeriod & vbCrLf
         lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
 
         For lSiteIndex As Integer = 0 To aSites.GetUpperBound(0)
             Dim lSite As String = aSites(lSiteIndex)
             Dim lSimTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aSimDsnId(lSiteIndex)))
-            Dim lNewSimTSer As atcTimeseries = SubsetByDate(lSimTSer, lSJdate, lEJdate, Nothing)
+            Dim lSDateJ As Double = aUci.GlobalBlock.SDateJ
+            Dim lEDateJ As Double = aUci.GlobalBlock.EdateJ
+            Dim lNewSimTSer As atcTimeseries = SubsetByDate(lSimTSer, lSDateJ, lEDateJ, Nothing)
             Dim lSimConv As Double = aArea(lSiteIndex) * 43560.0# / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
             lTsMath.DataSets.Clear()
             lArgsMath.Clear()
@@ -43,7 +68,7 @@ Module DailyMonthlyCompareStats
             lNewSimTSer = lTsMath.DataSets(0)
             lSimTSer = Nothing
             Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aObsDsnId(lSiteIndex)))
-            Dim lNewObsTSer As atcTimeseries = SubsetByDate(lObsTSer, lSJdate, lEJdate, Nothing)
+            Dim lNewObsTSer As atcTimeseries = SubsetByDate(lObsTSer, lSDateJ, lEDateJ, Nothing)
             lObsTSer = Nothing
 
             lStr &= IntervalReport(lSite, atcTimeUnit.TUDay, lNewSimTSer, lNewObsTSer)
@@ -145,12 +170,12 @@ Module DailyMonthlyCompareStats
         End If
 
         Dim lStr As String = ""
-        lStr &= "Correlation Coefficient".PadLeft(36) & DoubleToString(lCorrelationCoefficient).PadLeft(15) & vbCrLf
-        lStr &= "Coefficient of Determination".PadLeft(36) & DoubleToString(lCorrelationCoefficient ^ 2).PadLeft(15) & vbCrLf
-        lStr &= "Mean Error".PadLeft(36) & DoubleToString(lMeanError).PadLeft(15) & vbCrLf
-        lStr &= "Mean Absolute Error".PadLeft(36) & DoubleToString(lMeanAbsoluteError).PadLeft(15) & vbCrLf
-        lStr &= "RMS Error".PadLeft(36) & DoubleToString(lRmsError).PadLeft(15) & vbCrLf
-        lStr &= "Model Fit Efficiency".PadLeft(36) & DoubleToString(1 - lNashSutcliffe).PadLeft(15) & vbCrLf
+        lStr &= "Correlation Coefficient".PadLeft(36) & DecimalAlign(lCorrelationCoefficient, 15) & vbCrLf
+        lStr &= "Coefficient of Determination".PadLeft(36) & DecimalAlign(lCorrelationCoefficient ^ 2, 15) & vbCrLf
+        lStr &= "Mean Error".PadLeft(36) & DecimalAlign(lMeanError, 15) & vbCrLf
+        lStr &= "Mean Absolute Error".PadLeft(36) & DecimalAlign(lMeanAbsoluteError, 15) & vbCrLf
+        lStr &= "RMS Error".PadLeft(36) & DecimalAlign(lRmsError, 15) & vbCrLf
+        lStr &= "Model Fit Efficiency".PadLeft(36) & DecimalAlign(1 - lNashSutcliffe, 15) & vbCrLf
 
         Return lStr
     End Function

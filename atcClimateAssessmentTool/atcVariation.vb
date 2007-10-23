@@ -248,13 +248,13 @@ Public Class atcVariation
                     Dim lCurrentVolume As Double = 0
                     Dim lTargetChange As Double = CurrentValue * lTotalVolume
                     Dim lTargetVolumeToFlash As Double = lTotalVolume * FlashVolumeFraction
-                    Logger.Dbg("TargetChange " & DF(lTargetChange) & " TargetVolumeToFlash " & DF(lTargetVolumeToFlash))
+                    Logger.Dbg("TargetChange " & DecimalAlign(lTargetChange) & " TargetVolumeToFlash " & DecimalAlign(lTargetVolumeToFlash))
                     Dim lNewEventTotalVolume As Double = 0.0
 
                     Try
                         If Not Double.IsNaN(FlashVolumeFraction) Then
                             'sort events by volume
-                            Logger.Dbg("Flash " & DF(FlashVolumeFraction) & " CurrentValue " & DF(CurrentValue))
+                            Logger.Dbg("Flash " & DecimalAlign(FlashVolumeFraction) & " CurrentValue " & DecimalAlign(CurrentValue))
                             Dim lNewEvents As New System.Collections.SortedList(lEvents.Count)
                             For Each lEvent In lEvents
                                 Dim lEventVolume As Double = lEvent.Attributes.GetValue("Sum")
@@ -268,9 +268,9 @@ tryAgain:
                                 End Try
                             Next
                             lEvents.Clear()
-                            Logger.Dbg(" TotalVolume " & DF(lTotalVolume) & _
-                                       " EventTotalVolume " & DF(lNewEventTotalVolume) & _
-                                       " PercentOfVolume " & DF(100 * (lNewEventTotalVolume / lTotalVolume)))
+                            Logger.Dbg(" TotalVolume " & DecimalAlign(lTotalVolume) & _
+                                       " EventTotalVolume " & DecimalAlign(lNewEventTotalVolume) & _
+                                       " PercentOfVolume " & DecimalAlign(100 * (lNewEventTotalVolume / lTotalVolume)))
 
                             If CurrentValue > 0.0 Then
                                 For lEventIndex As Integer = lNewEvents.Count - 1 To 0 Step -1
@@ -281,7 +281,7 @@ tryAgain:
 
                                     If lEventIndex = lNewEvents.Count - 1 Then 'details of biggest event
                                         Dim lEventStr As String = "  Event " & lEventIndex
-                                        lEventStr &= "    Sum " & DF(lEvent.Attributes.GetValue("Sum"))
+                                        lEventStr &= "    Sum " & DecimalAlign(lEvent.Attributes.GetValue("Sum"))
                                         lEventStr &= " NumVals " & lEvent.numValues
                                         lEventStr &= " Starts " & DumpDate(lEvent.Dates.Value(1))
                                         Logger.Dbg(lEventStr)
@@ -310,10 +310,10 @@ tryAgain:
                         Logger.Dbg("VaryDataException-EventFlashFactor " & e.Message)
                     End Try
 
-                    Logger.Dbg(" CurrentVolume " & DF(lCurrentVolume) & _
-                               " TargetChange " & DF(lTargetChange))
+                    Logger.Dbg(" CurrentVolume " & DecimalAlign(lCurrentVolume) & _
+                               " TargetChange " & DecimalAlign(lTargetChange))
                     lEventFlashFactor = lTargetChange / lCurrentVolume
-                    Logger.Dbg("EventFlashFactor " & DF(lEventFlashFactor))
+                    Logger.Dbg("EventFlashFactor " & DecimalAlign(lEventFlashFactor))
                     lModifyThis = MergeTimeseries(lEvents)
                     lSplitData = New atcDataGroup(lModifyThis)
                     lSplitData.Add(lOriginalData)
@@ -402,9 +402,9 @@ tryAgain:
 
         If aVolumeChangeFraction < 0 Then lAdd = False
 
-        Logger.Dbg("OriginalVolume " & DF(lOriginalVolume) & _
-                   " Target Volume " & DF(lTargetVolume) & _
-                   " ChangeFraction " & DF(aVolumeChangeFraction) & _
+        Logger.Dbg("OriginalVolume " & DecimalAlign(lOriginalVolume) & _
+                   " Target Volume " & DecimalAlign(lTargetVolume) & _
+                   " ChangeFraction " & DecimalAlign(aVolumeChangeFraction) & _
                    " Event Count " & aEventsToSearch.Count)
 
         'While adding and not yet added enough, or removing and not yet removed enough
@@ -425,7 +425,7 @@ tryAgain:
                 End If
 
                 Dim lEventStr As String = "  Event " & lCheckIndex
-                lEventStr &= "    Sum " & DF(lEvent.Attributes.GetValue("Sum"))
+                lEventStr &= "    Sum " & DecimalAlign(lEvent.Attributes.GetValue("Sum"))
                 lEventStr &= " NumVals " & lEvent.numValues
                 lEventStr &= " Starts " & DumpDate(lEvent.Dates.Value(1))
                 Logger.Dbg(lEventStr)
@@ -459,20 +459,20 @@ tryAgain:
                         lChangeIndex += 1
                     End While
                 End If
-                Logger.Dbg("    CurrentVolume " & DF(lCurrentVolume))
+                Logger.Dbg("    CurrentVolume " & DecimalAlign(lCurrentVolume))
             End If
         End While
 
         lChangeIndex -= 1
         Dim lFinalVolumeAdjustment As Double = lCurrentVolume - lTargetVolume
         If lChangeIndex >= 0 AndAlso (lNewTimeseries.Values(lChangeIndex) - lFinalVolumeAdjustment) > 0 Then
-            Logger.Dbg("  Final Volume Adjustment " & DF(lFinalVolumeAdjustment) & _
-                       " on " & DF(lNewTimeseries.Values(lChangeIndex)) & _
+            Logger.Dbg("  Final Volume Adjustment " & DecimalAlign(lFinalVolumeAdjustment) & _
+                       " on " & DecimalAlign(lNewTimeseries.Values(lChangeIndex)) & _
                        " at " & DumpDate(lNewTimeseries.Dates.Value(lChangeIndex)))
             lNewTimeseries.Values(lChangeIndex) -= lFinalVolumeAdjustment
         Else
-            Dim lDbgStr As String = "  ***** Fail Final Volume Adjustment " & DF(lFinalVolumeAdjustment) & " " & lChangeIndex
-            If lChangeIndex > 0 Then lDbgStr &= " " & DF(lNewTimeseries.Values(lChangeIndex))
+            Dim lDbgStr As String = "  ***** Fail Final Volume Adjustment " & DecimalAlign(lFinalVolumeAdjustment) & " " & lChangeIndex
+            If lChangeIndex > 0 Then lDbgStr &= " " & DecimalAlign(lNewTimeseries.Values(lChangeIndex))
             Logger.Dbg(lDbgStr)
         End If
 
@@ -484,14 +484,10 @@ tryAgain:
         Dim lSum As Double = lNewTimeseries.Attributes.GetValue("Sum")
         Dim lStr As String = lOperation & lFoundIndexes.Count & " events to change total volume " & DoubleString(aVolumeChangeFraction)
         lStr &= " (actual change = " & DoubleString((lSum - lOriginalVolume) / lOriginalVolume) & ")"
-        lStr &= " Total Volume " & DF(lSum)
+        lStr &= " Total Volume " & DecimalAlign(lSum)
         Logger.Dbg(lStr)
 
         Return lNewTimeseries
-    End Function
-
-    Private Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
-        Return Trim(Format(aValue, "##########0." & StrDup(aDecimalPlaces, "0")))
     End Function
 
     Private Function DoubleArraySum(ByVal aValues() As Double, ByVal aStart As Integer, ByVal aCount As Integer) As Double
