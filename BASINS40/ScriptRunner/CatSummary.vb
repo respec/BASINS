@@ -135,7 +135,7 @@ Public Module ScriptCatSummary
         If lConsDataGroup.Count > 0 Then
             Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
             Dim lValue As Double = lTempDataSet.Attributes.GetDefinedValue(aTrans).Value
-            lString = vbTab & DF(lValue)
+            lString = vbTab & DecimalAlign(lValue)
             If aSummer Then
                 Dim lSeasons As New atcSeasons.atcSeasonsMonth
                 Dim lSeasonalAttributes As New atcDataAttributes
@@ -146,7 +146,7 @@ Public Module ScriptCatSummary
                 For lIndex As Integer = 3 To 9
                     lValue += lCalculatedAttributes(lIndex).Value 'AMJJASO
                 Next lIndex
-                lString &= vbTab & DF(lValue)
+                lString &= vbTab & DecimalAlign(lValue)
             End If
         End If
         Return lString
@@ -159,7 +159,7 @@ Public Module ScriptCatSummary
         If lConsDataGroup.Count > 0 Then
             Dim lTempDataSet As atcDataSet = lConsDataGroup.Item(0)
             Dim lValue As Double = lTempDataSet.Attributes.GetDefinedValue(aTrans).Value
-            lString = vbTab & DF(lValue)
+            lString = vbTab & DecimalAlign(lValue)
             Dim lSeasons As New atcSeasons.atcSeasonsMonth
             Dim lSeasonalAttributes As New atcDataAttributes
             Dim lCalculatedAttributes As New atcDataAttributes
@@ -167,36 +167,18 @@ Public Module ScriptCatSummary
             lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
             lValue = lCalculatedAttributes(0).Value + lCalculatedAttributes(1).Value + lCalculatedAttributes(11).Value   'DJF
             If aTrans = "Mean" Then lValue = lValue / 3
-            lString &= vbTab & DF(lValue)
+            lString &= vbTab & DecimalAlign(lValue)
             lValue = lCalculatedAttributes(2).Value + lCalculatedAttributes(3).Value + lCalculatedAttributes(4).Value  'MAM
             If aTrans = "Mean" Then lValue = lValue / 3
-            lString &= vbTab & DF(lValue)
+            lString &= vbTab & DecimalAlign(lValue)
             lValue = lCalculatedAttributes(5).Value + lCalculatedAttributes(6).Value + lCalculatedAttributes(7).Value  'JJA
             If aTrans = "Mean" Then lValue = lValue / 3
-            lString &= vbTab & DF(lValue)
+            lString &= vbTab & DecimalAlign(lValue)
             lValue = lCalculatedAttributes(8).Value + lCalculatedAttributes(9).Value + lCalculatedAttributes(10).Value  'SON
             If aTrans = "Mean" Then lValue = lValue / 3
-            lString &= vbTab & DF(lValue)
+            lString &= vbTab & DecimalAlign(lValue)
         End If
         Return lString
 
     End Function
-
-    Private Function DF(ByVal aValue As Double, Optional ByVal aDecimalPlaces As Integer = 3) As String
-        Dim lFormat As String
-        If aDecimalPlaces > 1 Then
-            lFormat = "###,##0.0" & StrDup(aDecimalPlaces - 1, "#")
-        Else
-            lFormat = "###,##0.0"
-        End If
-        Dim lString As String = DoubleToString(aValue, , lFormat, , , 5)
-        Dim dp As Integer = lString.IndexOf("."c)
-        If dp >= 0 Then
-            Dim laddLeft As Integer = pFieldWidth - 5 - dp
-            If laddLeft > 0 Then lString = Space(laddLeft) & lString
-        End If
-        Return lString.PadRight(pFieldWidth)
-        'Return Trim(Format(aValue, "##########0." & StrDup(aDecimalPlaces, "0")))
-    End Function
-
 End Module

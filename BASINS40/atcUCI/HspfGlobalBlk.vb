@@ -1,5 +1,7 @@
 Option Strict Off
 Option Explicit On
+Imports atcUtility
+
 <System.Runtime.InteropServices.ProgId("HspfGlobalBlk_NET.HspfGlobalBlk")> Public Class HspfGlobalBlk
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
@@ -40,7 +42,6 @@ Option Explicit On
         End Get
     End Property
 
-
     Public Property Comment() As String
         Get
             Comment = pComment
@@ -64,6 +65,16 @@ Option Explicit On
             pRunInf = Value
             Update()
         End Set
+    End Property
+
+    Public ReadOnly Property RunPeriod() As String
+        Get
+            Dim lYrCnt As Double = timdifJ(SDateJ, EdateJ, 6, 1)
+            Dim lStr As String = "Simulation Period: " & lYrCnt & " years"
+            lStr &= " from " & Format(Date.FromOADate(SDateJ), "yyyy/MM/dd")
+            lStr &= " to " & Format(Date.FromOADate(EdateJ), "yyyy/MM/dd") & vbCrLf
+            Return lStr
+        End Get
     End Property
 
     Public Property SDate(ByVal Index As Integer) As Integer

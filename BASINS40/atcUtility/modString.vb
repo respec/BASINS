@@ -188,6 +188,24 @@ Public Module modString
         Return aValue
     End Function
 
+    Function DecimalAlign(ByVal aValue As Double, _
+                 Optional ByVal aFieldWidth As Integer = 12, _
+                 Optional ByVal aDecimalPlaces As Integer = 3) As String
+        Dim lFormat As String
+        If aDecimalPlaces > 1 Then
+            lFormat = "###,##0.0" & StrDup(aDecimalPlaces - 1, "#")
+        Else
+            lFormat = "###,##0.0"
+        End If
+        Dim lString As String = DoubleToString(aValue, aFieldWidth, lFormat)
+        Dim dp As Integer = lString.IndexOf("."c)
+        If dp >= 0 Then
+            Dim lAddLeft As Integer = aFieldWidth - 5 - dp
+            If lAddLeft > 0 Then lString = Space(lAddLeft) & lString
+        End If
+        Return lString.PadRight(aFieldWidth)
+    End Function
+
     Function DoubleToString(ByVal aValue As Double, _
                    Optional ByVal aMaxWidth As Integer = 10, _
                    Optional ByVal aFormat As String = "#,##0.########", _
