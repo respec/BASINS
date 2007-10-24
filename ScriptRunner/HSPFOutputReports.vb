@@ -24,21 +24,22 @@ Module HSPFOutputReports
         Dim lWdmDataSource As New atcDataSourceWDM
         lWdmDataSource.Open(lWdmFileName)
 
-        Dim lStr As String
-        lStr = HspfSupport.ExpertSystemStatistics.Report(lHspfUci, lWdmDataSource)
+        Dim lExpertSystem As HspfSupport.ExpertSystem
+        lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
+        Dim lStr As String = lExpertSystem.Report
         SaveFileString("outfiles\ExpertSysStats.txt", lStr)
 
-        'TODO: get the following four parms from the exs file
+        Dim lOutFileName As String
         Dim lCons As String = "Flow"
-        Dim lSites() As String = {"RCH5"}
-        Dim lArea() As Double = {54831}
-        Dim lSimDsnId() As Integer = {1001}
-        Dim lObsDsnId() As Integer = {261}
-        lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSites, lArea, lSimDsnId, lObsDsnId)
-        Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats"
-        If lSites.GetUpperBound(0) = 0 Then lOutFileName &= "-" & lSites(0)
-        lOutFileName &= ".txt"
-        SaveFileString(lOutFileName, lStr)
+        For lSiteIndex As Integer = 1 To lExpertSystem.SiteCount
+            Dim lSite As String = lExpertSystem.Site(lSiteIndex).Name
+            Dim lArea As Double = lExpertSystem.Site(lSiteIndex).Area
+            Dim lSimDsnId As Integer = lExpertSystem.Site(lSiteIndex).Dsn(0)
+            Dim lObsDsnId As Integer = lExpertSystem.Site(lSiteIndex).Dsn(1)
+            lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSite, lArea, lSimDsnId, lObsDsnId)
+            loutfilename = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
+            SaveFileString(lOutFileName, lStr)
+        Next lSiteIndex
 
         'open HBN file
         Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"

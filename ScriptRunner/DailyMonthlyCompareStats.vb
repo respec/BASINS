@@ -21,15 +21,13 @@ Module DailyMonthlyCompareStats
         lWdmDataSource.Open(lWdmFileName)
         'TODO: get the following four parms from the exs file
         Dim lCons As String = "Flow"
-        Dim lSites() As String = {"RCH5"}
-        Dim lArea() As Double = {54831}
-        Dim lSimDsnId() As Integer = {1001}
-        Dim lObsDsnId() As Integer = {261}
-        Dim lStr As String = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSites, _
+        Dim lSite As String = "RCH5"
+        Dim lArea As Double = 54831
+        Dim lSimDsnId As Integer = 1001
+        Dim lObsDsnId As Integer = 261
+        Dim lStr As String = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lsite, _
                                                                          lArea, lSimDsnId, lObsDsnId)
-        Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats"
-        If lSites.GetUpperBound(0) = 0 Then lOutFileName &= "-" & lSites(0)
-        lOutFileName &= ".txt"
+        Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
         SaveFileString(lOutFileName, lStr)
     End Sub
 End Module
