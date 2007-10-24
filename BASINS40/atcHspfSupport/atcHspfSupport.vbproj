@@ -59,6 +59,7 @@
     <Compile Include="atcExpertSystemStatistics.vb" />
     <Compile Include="atcHspfConstituentBalance.vb" />
     <Compile Include="atcHspfDailyMonthlyCompareStats.vb" />
+    <Compile Include="atcHspfExpertSystem.vb" />
     <Compile Include="atcHspfWatershedSummary.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
