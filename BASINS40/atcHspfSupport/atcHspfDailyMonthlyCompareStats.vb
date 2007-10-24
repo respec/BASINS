@@ -6,10 +6,10 @@ Public Module DailyMonthlyCompareStats
     Public Function Report(ByVal aUci As atcUCI.HspfUci, _
                            ByVal aDataSource As atcDataSource, _
                            ByVal aCons As String, _
-                           ByVal aSites() As String, _
-                           ByVal aArea() As Double, _
-                           ByVal aSimDsnId() As Integer, _
-                           ByVal aObsDsnId() As Integer) As String
+                           ByVal aSite As String, _
+                           ByVal aArea As Double, _
+                           ByVal aSimDsnId As Integer, _
+                           ByVal aObsDsnId As Integer) As String
 
 
         Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
@@ -22,27 +22,24 @@ Public Module DailyMonthlyCompareStats
         lStr &= "   " & aUci.GlobalBlock.RunPeriod & vbCrLf
         lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
 
-        For lSiteIndex As Integer = 0 To aSites.GetUpperBound(0)
-            Dim lSite As String = aSites(lSiteIndex)
-            Dim lSimTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aSimDsnId(lSiteIndex)))
-            Dim lSDateJ As Double = aUci.GlobalBlock.SDateJ
-            Dim lEDateJ As Double = aUci.GlobalBlock.EdateJ
-            Dim lNewSimTSer As atcTimeseries = SubsetByDate(lSimTSer, lSDateJ, lEDateJ, Nothing)
-            Dim lSimConv As Double = aArea(lSiteIndex) * 43560.0# / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
-            lTsMath.DataSets.Clear()
-            lArgsMath.Clear()
-            lArgsMath.SetValue("timeseries", lNewSimTSer)
-            lArgsMath.SetValue("number", lSimConv)
-            lTsMath.Open("multiply", lArgsMath)
-            lNewSimTSer = lTsMath.DataSets(0)
-            lSimTSer = Nothing
-            Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aObsDsnId(lSiteIndex)))
-            Dim lNewObsTSer As atcTimeseries = SubsetByDate(lObsTSer, lSDateJ, lEDateJ, Nothing)
-            lObsTSer = Nothing
+        Dim lSimTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aSimDsnId))
+        Dim lSDateJ As Double = aUci.GlobalBlock.SDateJ
+        Dim lEDateJ As Double = aUci.GlobalBlock.EdateJ
+        Dim lNewSimTSer As atcTimeseries = SubsetByDate(lSimTSer, lSDateJ, lEDateJ, Nothing)
+        Dim lSimConv As Double = aArea * 43560.0# / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
+        lTsMath.DataSets.Clear()
+        lArgsMath.Clear()
+        lArgsMath.SetValue("timeseries", lNewSimTSer)
+        lArgsMath.SetValue("number", lSimConv)
+        lTsMath.Open("multiply", lArgsMath)
+        lNewSimTSer = lTsMath.DataSets(0)
+        lSimTSer = Nothing
+        Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aObsDsnId))
+        Dim lNewObsTSer As atcTimeseries = SubsetByDate(lObsTSer, lSDateJ, lEDateJ, Nothing)
+        lObsTSer = Nothing
 
-            lStr &= IntervalReport(lSite, atcTimeUnit.TUDay, lNewSimTSer, lNewObsTSer)
-            lStr &= IntervalReport(lSite, atcTimeUnit.TUMonth, lNewSimTSer, lNewObsTSer)
-        Next
+        lStr &= IntervalReport(aSite, atcTimeUnit.TUDay, lNewSimTSer, lNewObsTSer)
+        lStr &= IntervalReport(aSite, atcTimeUnit.TUMonth, lNewSimTSer, lNewObsTSer)
 
         Return lStr
     End Function

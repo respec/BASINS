@@ -56,7 +56,6 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="atcExpertSystemStatistics.vb" />
     <Compile Include="atcHspfConstituentBalance.vb" />
     <Compile Include="atcHspfDailyMonthlyCompareStats.vb" />
     <Compile Include="atcHspfExpertSystem.vb" />
