@@ -10,71 +10,12 @@ Public Module ExpertSystemStatistics
     Private Const pNErrorTerms As Integer = 11
     Private Const pConvert As Double = 24.0# * 3600.0# * 12.0# / 43560.0#
 
-    Dim pSiteName() As String
-    Dim pNStorms As Integer
-    Dim pNSites As Integer
-    Dim pCurSite As Integer
-    Dim pDSN(,) As Integer '2-D. 1st dim = stat# (see below), and 2nd = site#
-    '1 = simulated total runoff (in)
-    '2 = observed streamflow (cfs)
-    '3 = simulated surface runoff (in)
-    '4 = simulated interflow (in)
-    '5 = simulated base flow (in)
-    '6 = precipitation (in)
-    '7 = potential evapotranspiration (in)
-    '8 = actual evapotranspiration (in)
-    '9 = upper zone storage (in)
-    '10 = lower zone storage (in)
-    Dim pStatDN() As Integer
-    Dim pStormSDates(,) As Integer
-    Dim pStormEDates(,) As Integer
-    Dim pSubjectiveData(20) As Integer
-    Dim pLatMin As Double, pLatMax As Double
-    Dim pLngMin As Double, pLngMax As Double
-    Dim pBasinArea() As Double
     Dim pSJdate As Double, pEJdate As Double
-    Dim pStormSJDates() As Double, pStormEJDates() As Double
-    Dim pErrorCriteria(11) As Double
-    '1 = acceptable error in total volume
-    '2 = acceptable error in low-flow recession (ratio q(t-1)/q(t))
-    '3 = acceptable error in 50 percent lowest flows (%)
-    '4 = acceptable error in 10 percent highest flows (%)
-    '5 = acceptable error in storm values (%)
-    '6 = ration of interflow to surface runoff (in/in)
-    '7 = acceptable error in seasonal volume (%)
-    '8 = acceptable error in summer storm volumes (%)
-    '9 = multiplier on third and fourth error terms
-    '10 = percent of flows to use in low-flow recession error
-    Dim pHSPFOutput1(,) As Double
-    '1 = SIMTRO - simulated total runoff
-    '2 = OBSTRO - observed total runoff
-    '3 = S010FD - simulated total of highest 10 percent daily mean of flows (in)
-    '4 = O010FD - observed total of highest 10 percent daily mean of flows (in)
-    '5 = S50100 - simulated total of lowest 50 percent daily mean of flows (in)
-    '6 = O50100 - observed total of lowest 50 percent daily mean of flows (in)
-    '7 = TACTET - simulated total actual evapotranspiration (in)
-    '8 = TPOTET - total potential evapotranspiration (in)
-    Dim pHSPFOutput2(,) As Double
-    '1 = SISTVO - simulated total storm volume (in)
-    '2 = OBSTVO - observed total storm volume (in)
-    '3 = SPKSTR - simulated storm peaks volume (in)
-    '4 = OPKSTR - observed storm peaks volume (in)
-    '5 = QTRSIM - mean simulated low-flow recession (dimensionless)
-    '6 = QTRMEA - mean observed low-flow recession (dimensionless)
-    '7 = INFSUM - total simulated storm interflow (in)
-    '8 = SROSUM - total simulated storm surface runoff (in)
-    Dim pHSPFOutput3(,) As Double
-    '1 = SMRSIM - simulated summer flow volume (in)
-    '2 = SMROBS - observed summer flow volume (in)
-    '3 = WNRSIM - simulated winter flow volume (in)
-    '4 = WNROBS - observed winter flow volume (in)
-    '5 = SRHSIM - simulated summer flow volume (in)
-    '6 = SRHOBS - observed summer flow volume (in)
-
     Dim pErrorTermNames(11) As String
     Dim pErrorTerms(,) As Double
     Dim pStatNames(10) As String
     Dim pStats(,,) As Double
+    Dim pExpertSystem As HspfSupport.ExpertSystem
 
     Public Function Report(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcDataSource) As String
         pErrorTermNames(1) = "Error in total volume (%)"
@@ -100,12 +41,13 @@ Public Module ExpertSystemStatistics
         pStatNames(9) = "summer storms (inches)"
         pStatNames(10) = "winter storms (inches)"
 
-        ReadEXSFile(FilenameOnly(aUci.Name) & ".exs")     'gets WDM name, DSN #s, storm data, etc...
+        pExpertSystem = New HspfSupport.ExpertSystem(FilenameOnly(aUci.Name))
         pSJdate = aUci.GlobalBlock.SDateJ
         pEJdate = aUci.GlobalBlock.EdateJ
 
         CalcStats(aDataSource)
-        Return CalcErrorTerms(aUci)
+        Dim lStr As String = CalcErrorTerms(aUci)
+        Return lStr
     End Function
 
     Private Sub CalcStats(ByVal aDataSource As atcDataSource)
@@ -116,7 +58,7 @@ Public Module ExpertSystemStatistics
         '         1-total, 2-50%low, 3-10%high, 4-storm vol, 5-storm peak,
         '         6-recess, 7-sum vol, 8-win vol, 9-sum strm, 10-win strm
 
-        ReDim pStats(pNStats, pNStatGroups, pNSites)
+        ReDim pStats(pNStats, pNStatGroups, pExpertSystem.NSites)
 
         'get number of values
         Dim lTimeStep As Integer, lTimeUnit As Integer, lNVals As Integer
@@ -124,19 +66,19 @@ Public Module ExpertSystemStatistics
         lTimeUnit = 4 'day
         lNVals = timdifJ(pSJdate, pEJdate, lTimeUnit, lTimeStep)
 
-        For lSiteIndex As Integer = 1 To pNSites
+        For lSiteIndex As Integer = 1 To pExpertSystem.NSites
             For lStatGroup As Integer = 1 To pNStatGroups
                 'set Stats to undefined for this group
                 ZipR(pNStats, Double.NaN, pStats, lStatGroup, lSiteIndex)
 
                 Dim lDSN As Integer
                 Select Case lStatGroup 'get the correct dsn
-                    Case 1 : lDSN = pDSN(1, lSiteIndex)
-                    Case 2 : lDSN = pDSN(2, lSiteIndex)
-                    Case 3 : lDSN = pDSN(3, lSiteIndex)
-                    Case 4 : lDSN = pDSN(4, lSiteIndex)
-                    Case 5 : lDSN = pDSN(7, lSiteIndex)
-                    Case 6 : lDSN = pDSN(8, lSiteIndex)
+                    Case 1 : lDSN = pExpertSystem.SiteDsn(0, lSiteIndex)
+                    Case 2 : lDSN = pExpertSystem.SiteDsn(1, lSiteIndex)
+                    Case 3 : lDSN = pExpertSystem.SiteDsn(2, lSiteIndex)
+                    Case 4 : lDSN = pExpertSystem.SiteDsn(3, lSiteIndex)
+                    Case 5 : lDSN = pExpertSystem.SiteDsn(6, lSiteIndex)
+                    Case 6 : lDSN = pExpertSystem.SiteDsn(7, lSiteIndex)
                 End Select
 
                 'Get data - daily values and max values as necessary
@@ -230,16 +172,16 @@ Public Module ExpertSystemStatistics
                         pStats(5, lStatGroup, lSiteIndex) = 0.0# 'storm peaks
                         pStats(9, lStatGroup, lSiteIndex) = 0.0# 'summer storms
                         pStats(10, lStatGroup, lSiteIndex) = 0.0# 'winter storms
-                        If (pNStorms > 0) Then 'storms are available, loop thru them
-                            For lStormIndex As Integer = 1 To pNStorms
-                                If pStormSJDates(lStormIndex) >= pSJdate And _
-                                   pStormEJDates(lStormIndex) <= pEJdate Then 'storm within run span
+                        If (pExpertSystem.NStorms > 0) Then 'storms are available, loop thru them
+                            For lStormIndex As Integer = 1 To pExpertSystem.NStorms
+                                If pExpertSystem.StormSJDate(lStormIndex) >= pSJdate And _
+                                   pExpertSystem.StormEJDate(lStormIndex) <= pEJdate Then 'storm within run span
                                     'TODO: this matches VB6Script results, needs to have indexes checked!
                                     Dim lN1 As Integer, lN2 As Integer
-                                    lN1 = timdifJ(pSJdate, pStormSJDates(lStormIndex), lTimeUnit, lTimeStep) + 1
-                                    lN2 = timdifJ(pSJdate, pStormEJDates(lStormIndex), lTimeUnit, lTimeStep)
+                                    lN1 = timdifJ(pSJdate, pExpertSystem.StormSJDate(lStormIndex), lTimeUnit, lTimeStep) + 1
+                                    lN2 = timdifJ(pSJdate, pExpertSystem.StormEJDate(lStormIndex), lTimeUnit, lTimeStep)
                                     Dim lTmpDate(5) As Integer
-                                    J2Date(pStormSJDates(lStormIndex) - 1, lTmpDate)
+                                    J2Date(pExpertSystem.StormSJDate(lStormIndex) - 1, lTmpDate)
                                     Dim lRtmp As Double = lDailyTSer.Values(lN1)
                                     For i As Integer = lN1 To lN2
                                         pStats(4, lStatGroup, lSiteIndex) += lValues(i)
@@ -289,7 +231,7 @@ Public Module ExpertSystemStatistics
                                 lRecCnt, lRecSum)
                         'Calc pStats
                         'new percent of time in base flow term
-                        Dim lRtmp As Double = lNValsProcessed * pErrorCriteria(10) / 100
+                        Dim lRtmp As Double = lNValsProcessed * pExpertSystem.ErrorCriteria(10) / 100
                         Dim lStmp As Double = lNValsProcessed - lRecCnt(1)
                         If (lStmp < lRtmp Or lRtmp < 1.0#) Then 'not enough values available
                             pStats(6, lStatGroup, lSiteIndex) = Double.NaN
@@ -316,15 +258,15 @@ Public Module ExpertSystemStatistics
                     End If
                 End If
                 If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
-                    pStats(5, lStatGroup, lSiteIndex) /= pNStorms
+                    pStats(5, lStatGroup, lSiteIndex) /= pExpertSystem.NStorms
                     'convert storm peak stat from acre-inch/day to cfs
-                    pStats(5, lStatGroup, lSiteIndex) *= pBasinArea(lSiteIndex) * 43560.0# / (12.0# * 24.0# * 3600.0#)
+                    pStats(5, lStatGroup, lSiteIndex) *= pExpertSystem.SiteArea(lSiteIndex) * 43560.0# / (12.0# * 24.0# * 3600.0#)
                 ElseIf lStatGroup = 2 Then
                     For i As Integer = 1 To 10
                         If i < 5 Or i > 6 Then 'convert observed runoff values
-                            pStats(i, lStatGroup, lSiteIndex) *= pConvert / pBasinArea(lSiteIndex)
+                            pStats(i, lStatGroup, lSiteIndex) *= pConvert / pExpertSystem.SiteArea(lSiteIndex)
                         ElseIf i = 5 Then 'take average over NStorms
-                            pStats(i, lStatGroup, lSiteIndex) /= pNStorms
+                            pStats(i, lStatGroup, lSiteIndex) /= pExpertSystem.NStorms
                         End If
                     Next i
                 End If
@@ -336,9 +278,9 @@ Public Module ExpertSystemStatistics
     End Sub
 
     Private Function CalcErrorTerms(ByVal auci As atcUCI.HspfUci) As String
-        ReDim pErrorTerms(pNErrorTerms, pNSites)
+        ReDim pErrorTerms(pNErrorTerms, pExpertSystem.NSites)
 
-        For lSiteIndex As Integer = 1 To pNSites
+        For lSiteIndex As Integer = 1 To pExpertSystem.NSites
             'total volume error
             If (pStats(1, 2, lSiteIndex) > 0.0#) Then
                 pErrorTerms(1, lSiteIndex) = 100.0# * ((pStats(1, 1, lSiteIndex) - pStats(1, 2, lSiteIndex)) _
@@ -435,13 +377,13 @@ Public Module ExpertSystemStatistics
     Private Function StatReportAsString(ByVal aUci As atcUCI.HspfUci) As String
         Dim lStr As String
         lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
-        lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf & vbCrLf
+        lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf
         lStr &= "Run Created: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
-        lStr &= aUci.GlobalBlock.RunPeriod & vbCrLf & vbCrLf
+        lStr &= "  " & aUci.GlobalBlock.RunPeriod & vbCrLf & vbCrLf
 
-        For lSite As Integer = 1 To pNSites
+        For lSite As Integer = 1 To pExpertSystem.NSites
             'loop for each site
-            lStr &= "Site: ".PadLeft(15) & pSiteName(lSite) & vbCrLf & vbCrLf
+            lStr &= "Site: ".PadLeft(15) & pExpertSystem.SiteName(lSite) & vbCrLf & vbCrLf
 
             'statistics summary
             Dim lYrCnt As Double = timdifJ(pSJdate, pEJdate, 6, 1)
@@ -455,8 +397,8 @@ Public Module ExpertSystemStatistics
                 If pErrorTerms(lErrorTerm, lSite) <> 0.0# Then
                     lStr &= (pErrorTermNames(lErrorTerm) & " =").PadLeft(35) & _
                             DecimalAlign(pErrorTerms(lErrorTerm, lSite)) & _
-                            DecimalAlign(pErrorCriteria(lErrorTerm))
-                    If Math.Abs(pErrorTerms(lErrorTerm, lSite)) < pErrorCriteria(lErrorTerm) Then
+                            DecimalAlign(pExpertSystem.ErrorCriteria(lErrorTerm))
+                    If Math.Abs(pErrorTerms(lErrorTerm, lSite)) < pExpertSystem.ErrorCriteria(lErrorTerm) Then
                         lStr &= " OK" & vbCrLf
                     Else
                         lStr &= "    Needs Work" & vbCrLf
@@ -517,133 +459,6 @@ Public Module ExpertSystemStatistics
         lStr &= vbCrLf & vbCrLf
         Return lStr
     End Function
-
-    Private Sub ReadEXSFile(ByVal aFilename As String)
-        Dim lExsFileString As String = WholeFileString(aFilename)
-        Dim lExsRecords() As String = lExsFileString.Split(vbLf)
-
-        'Read first line of file
-        Dim lExsRecord As String = lExsRecords(0)
-        pNSites = lExsRecord.Substring(8, 5) 'Mid(textLine, 9, 5)
-        pCurSite = lExsRecord.Substring(14, 5) 'Mid(textLine, 14, 5)
-        pLatMin = lExsRecord.Substring(19, 5) 'Mid(textLine, 19, 8)
-        pLatMax = lExsRecord.Substring(27, 5) 'Mid(textLine, 27, 8)
-        pLngMin = lExsRecord.Substring(35, 5) ' Mid(textLine, 35, 8)
-        pLngMax = lExsRecord.Substring(43, 5) 'Mid(textLine, 43, 8)
-
-        ReDim pDSN(10, pNSites)
-        ReDim pStatDN(pNSites)
-        ReDim pSiteName(pNSites)
-
-        'Default unspecified lat/integer min/max values to contiguous 48 states
-        If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
-            pLatMin = 24
-        End If
-        If ((pLatMax < 0.01) And (pLatMax > -0.01)) Then
-            pLatMax = 50
-        End If
-        If ((pLngMin < 0.01) And (pLngMin > -0.01)) Then
-            pLngMin = 66
-        End If
-        If ((pLngMax < 0.01) And (pLngMax > -0.01)) Then
-            pLngMax = 125
-        End If
-
-        'Read Site block
-        For lSiteIndex As Integer = 1 To pNSites
-            lExsRecord = lExsRecords(lSiteIndex)
-            For lConsIndex As Integer = 0 To 9
-                pDSN(lConsIndex + 1, lSiteIndex) = lExsRecord.Substring(lConsIndex * 4, 4)
-                Logger.Dbg(pDSN(lConsIndex + 1, lSiteIndex))
-            Next lConsIndex
-            pStatDN(lSiteIndex) = lExsRecord.Substring(42, 2)  '0 or 1
-            pSiteName(lSiteIndex) = lExsRecord.Substring(45).Replace(vbCr, "").Trim
-        Next lSiteIndex
-
-        Dim lRecordIndex As Integer = pNSites + 1
-        'Read number of storms
-        pNStorms = lExsRecords(lRecordIndex).Substring(0, 4)
-
-        'Read storm end/start dates
-        ReDim pStormSDates(5, pNStorms)
-        ReDim pStormEDates(5, pNStorms)
-        ReDim pStormSJDates(pNStorms)
-        ReDim pStormEJDates(pNStorms)
-        For lStormIndex As Integer = 1 To pNStorms
-            lExsRecord = lExsRecords(lRecordIndex + lStormIndex)
-            pStormSDates(0, lStormIndex) = lExsRecord.Substring(0, 5) 'Left(textLine, 5)
-            pStormEDates(0, lStormIndex) = lExsRecord.Substring(21, 5) 'Mid(textLine, 21, 5)
-            For lTimeIndex As Integer = 0 To 4
-                pStormSDates(lTimeIndex + 1, lStormIndex) = lExsRecord.Substring(6 + 3 * lTimeIndex, 3)
-                pStormEDates(lTimeIndex + 1, lStormIndex) = lExsRecord.Substring(26 + 3 * lTimeIndex, 3)
-            Next lTimeIndex
-            'Get the starting and ending storm dates in a 1-D Julian array
-            Dim thisStormSDate(5) As Integer, thisStormEDate(5) As Integer
-            For lTimeIndex As Integer = 0 To 5
-                thisStormSDate(lTimeIndex) = pStormSDates(lTimeIndex, lStormIndex)
-                thisStormEDate(lTimeIndex) = pStormEDates(lTimeIndex, lStormIndex)
-            Next lTimeIndex
-            pStormSJDates(lStormIndex) = Date2J(thisStormSDate)
-            pStormEJDates(lStormIndex) = Date2J(thisStormEDate)
-        Next lStormIndex
-
-        'Read basin area (acres)
-        lRecordIndex += pNStorms + 1
-        ReDim pBasinArea(pNSites)
-        lExsRecord = lExsRecords(lRecordIndex)
-        For lSiteIndex As Integer = 1 To pNSites
-            pBasinArea(lSiteIndex) = lExsRecord.Substring(((lSiteIndex - 1) * 8), 8)
-        Next lSiteIndex
-
-        'Read error terms
-        lRecordIndex += pNSites
-        lExsRecord = lExsRecords(lRecordIndex)
-        lRecordIndex += 1
-        For lErrorIndex As Integer = 0 To 9
-            pErrorCriteria(lErrorIndex + 1) = lExsRecord.Substring(lErrorIndex * 8, 8)
-        Next lErrorIndex
-        pErrorCriteria(11) = 15  'storm peak criteria not kept in EXS file
-        If (pErrorCriteria(10) < 0.000001 And pErrorCriteria(10) > -0.000001) Then
-            'percent of time in baseflow read in as zero, change to 30
-            pErrorCriteria(10) = 30.0#
-        End If
-
-        'Read latest hspf output
-        ReDim pHSPFOutput1(8, pNSites)
-        ReDim pHSPFOutput2(8, pNSites)
-        ReDim pHSPFOutput3(6, pNSites)
-        For lSiteIndex As Integer = 1 To pNSites
-            lExsRecord = lExsRecords(lRecordIndex)
-            lRecordIndex += 1
-            For lIndex As Integer = 0 To 7
-                pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-            Next lIndex
-            lExsRecord = lExsRecords(lRecordIndex)
-            lRecordIndex += 1
-            For lIndex As Integer = 0 To 7
-                pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-            Next lIndex
-            lExsRecord = lExsRecords(lRecordIndex)
-            lRecordIndex += 1
-            For lIndex As Integer = 0 To 5
-                pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-            Next lIndex
-        Next lSiteIndex
-
-        'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
-        lExsRecord = lExsRecords(lRecordIndex)
-        For lIndex As Integer = 0 To 19
-            pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
-        Next lIndex
-        '  'Change subjective data based on other data
-        '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
-        '    'Simulated storm runoff volumes higher than obs
-        '    SISROV = 1
-        '  ElseIf (SISTVO(CURSIT) < OBSTVO(CURSIT)) Then
-        '    'Simulated storm runoff volumes lower than obs
-        '    SISROV = 0
-        '  End If
-    End Sub
 
     Private Sub BoxSort(ByVal maxVal As Double, ByVal minVal As Double, ByVal pNSteps As Integer, ByVal NVALS As Integer, _
                         ByVal rDat() As Double, ByVal arlgFg As Integer, _
