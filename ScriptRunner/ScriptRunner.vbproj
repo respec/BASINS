@@ -25,7 +25,7 @@
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Bin\Plugins\BASINS\</OutputPath>
     <DocumentationFile>ScriptRunner.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -129,10 +129,16 @@
     <ProjectReference Include="..\atcGisUtilities\atcGisUtiliies.vbproj">
       <Project>{E5D23BF6-95FE-4DDF-A1FF-3E0A7F5DCF5F}</Project>
       <Name>atcGisUtiliies</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcHspfBinOut\atcHspfBinOut.vbproj">
       <Project>{61FAB3D2-9A2D-4D0A-BC4D-41C499DBE4B9}</Project>
       <Name>atcHspfBinOut</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcHspfSupport\atcHspfSupport.vbproj">
+      <Project>{3B2EB97A-A305-4394-9843-72E138815152}</Project>
+      <Name>atcHspfSupport</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcMwGisUtility\atcMwGisUtility.vbproj">
@@ -148,10 +154,12 @@
     <ProjectReference Include="..\atcTableSQLite\atcTableSQLite.vbproj">
       <Project>{C59D3153-2857-499C-B640-924E5ABE2E74}</Project>
       <Name>atcTableSQLite</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesMath\atcTimeseriesMath.vbproj">
       <Project>{BD299EB7-7A62-4EF9-8806-86E9288C498F}</Project>
       <Name>atcTimeseriesMath</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcTimeseriesNdayHighLow\atcTimeseriesNdayHighLow.vbproj">
       <Project>{24EEBEFB-2B19-489D-B3AF-9FE00A56346E}</Project>
@@ -161,6 +169,7 @@
     <ProjectReference Include="..\atcTimseriesDbf\atcTimseriesDbf.vbproj">
       <Project>{F05FE01B-E35C-4444-B5A2-47085D073631}</Project>
       <Name>atcTimseriesDbf</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUCI\atcUCI.vbproj">
       <Project>{2FC4314B-792B-40A3-B540-ACA05B9EA86B}</Project>

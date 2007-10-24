@@ -2,6 +2,8 @@ Imports atcUtility
 Imports atcData
 Imports atcWDM
 Imports atcHspfBinOut
+Imports HspfSupport
+
 Imports MapWindow.Interfaces
 
 Module HSPFOutputReports
@@ -23,7 +25,7 @@ Module HSPFOutputReports
         lWdmDataSource.Open(lWdmFileName)
 
         Dim lStr As String
-        lStr = ExpertSystemStatistics.Report(lHspfUci, lWdmDataSource)
+        lStr = HspfSupport.ExpertSystemStatistics.Report(lHspfUci, lWdmDataSource)
         SaveFileString("outfiles\ExpertSysStats.txt", lStr)
 
         'TODO: get the following four parms from the exs file
@@ -32,7 +34,7 @@ Module HSPFOutputReports
         Dim lArea() As Double = {54831}
         Dim lSimDsnId() As Integer = {1001}
         Dim lObsDsnId() As Integer = {261}
-        lStr = DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSites, lArea, lSimDsnId, lObsDsnId)
+        lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSites, lArea, lSimDsnId, lObsDsnId)
         Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats"
         If lSites.GetUpperBound(0) = 0 Then lOutFileName &= "-" & lSites(0)
         lOutFileName &= ".txt"
@@ -44,7 +46,7 @@ Module HSPFOutputReports
         lHspfBinDataSource.Open(lHspfBinFileName)
         Dim lSummaryType As String = "Water"
         Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
-        Dim lString As Text.StringBuilder = WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, lSummaryType)
+        Dim lString As Text.StringBuilder = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, lSummaryType)
         lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedSummary.txt"
         SaveFileString(lOutFileName, lString.ToString)
         lString = Nothing
@@ -56,7 +58,7 @@ Module HSPFOutputReports
         lOperations.Add("R:", "RCHRES")
         Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
 
-        lString = ConstituentBalance.Report(lHspfUci, lSummaryType, lOperations, pBaseName, _
+        lString = HspfSupport.ConstituentBalance.Report(lHspfUci, lSummaryType, lOperations, pBaseName, _
                                             lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime)
         lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalance.txt"
         SaveFileString(lOutFileName, lString.ToString)
