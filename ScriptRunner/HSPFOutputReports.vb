@@ -29,6 +29,9 @@ Module HSPFOutputReports
         Dim lStr As String = lExpertSystem.Report
         SaveFileString("outfiles\ExpertSysStats.txt", lStr)
 
+        lStr = lExpertSystem.AsString 'NOTE:just testing
+        SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
+
         Dim lOutFileName As String
         Dim lCons As String = "Flow"
         For lSiteIndex As Integer = 1 To lExpertSystem.SiteCount
