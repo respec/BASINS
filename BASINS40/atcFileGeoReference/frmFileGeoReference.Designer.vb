@@ -46,6 +46,7 @@ Partial Class frmFileGeoReference
         Me.cboAnnotate = New System.Windows.Forms.ComboBox
         Me.lblAnnotate = New System.Windows.Forms.Label
         Me.txtAnnotation = New System.Windows.Forms.TextBox
+        Me.btnBrowse = New System.Windows.Forms.Button
         CType(Me.pbxImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.grpDocument.SuspendLayout()
         Me.SuspendLayout()
@@ -198,6 +199,7 @@ Partial Class frmFileGeoReference
         '
         Me.grpDocument.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpDocument.Controls.Add(Me.btnBrowse)
         Me.grpDocument.Controls.Add(Me.txtDate)
         Me.grpDocument.Controls.Add(Me.lblDate)
         Me.grpDocument.Controls.Add(Me.btnRemove)
@@ -243,7 +245,7 @@ Partial Class frmFileGeoReference
         Me.txtLocation.Location = New System.Drawing.Point(80, 26)
         Me.txtLocation.Margin = New System.Windows.Forms.Padding(3, 2, 3, 2)
         Me.txtLocation.Name = "txtLocation"
-        Me.txtLocation.Size = New System.Drawing.Size(441, 22)
+        Me.txtLocation.Size = New System.Drawing.Size(367, 22)
         Me.txtLocation.TabIndex = 19
         '
         'lblLocation
@@ -303,6 +305,17 @@ Partial Class frmFileGeoReference
         Me.txtAnnotation.Text = "Annotation"
         Me.txtAnnotation.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
+        'btnBrowse
+        '
+        Me.btnBrowse.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnBrowse.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnBrowse.Location = New System.Drawing.Point(453, 26)
+        Me.btnBrowse.Name = "btnBrowse"
+        Me.btnBrowse.Size = New System.Drawing.Size(69, 27)
+        Me.btnBrowse.TabIndex = 26
+        Me.btnBrowse.Text = "Browse"
+        Me.btnBrowse.UseVisualStyleBackColor = True
+        '
         'frmFileGeoReference
         '
         Me.AllowDrop = True
@@ -354,4 +367,5 @@ Partial Class frmFileGeoReference
     Friend WithEvents lblAnnotate As System.Windows.Forms.Label
     Friend WithEvents txtAnnotation As System.Windows.Forms.TextBox
     Friend WithEvents btnLaunch As System.Windows.Forms.Button
+    Friend WithEvents btnBrowse As System.Windows.Forms.Button
 End Class
