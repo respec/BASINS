@@ -13,7 +13,7 @@ Public Class frmFileGeoReference
     Private pBitmap As Drawing.Bitmap
 
     Private Const pGeographicProjection As String = "+proj=longlat +datum=NAD83"
-    Private Const pDefaultLayerName As String = "photo"
+    Private Const pDefaultLayerName As String = "photos"
     Private Const pAddAnnotationField As String = "Add Annotation field..."
     Private Const pAnnotationFieldName As String = "Annotation"
 
@@ -42,12 +42,15 @@ Public Class frmFileGeoReference
                    IsField(lLayerIndex, "URL") Or _
                    IsField(lLayerIndex, "Document") Then
                     cboLayer.Items.Add(lLayerName)
-                    If lLayerName.ToLower.Equals(aDocumentLayerIndexName.ToLower) OrElse InStr(lLayerName.ToLower, pDefaultLayerName) Then
+                    If lLayerName.ToLower.Equals(aDocumentLayerIndexName.ToLower) Then
                         lSetSelectedIndex = cboLayer.Items.Count - 1
                     End If
                 End If
             End If
         Next
+        If lSetSelectedIndex = -1 Then
+            lSetSelectedIndex = cboLayer.Items.IndexOf(pDefaultLayerName)
+        End If
         cboLayer.Items.Add("Create new layer...")
         If lSetSelectedIndex >= 0 Then
             cboLayer.SelectedIndex = lSetSelectedIndex
@@ -77,7 +80,7 @@ Public Class frmFileGeoReference
                     cboAnnotate.Items.Clear()
                     .Text = ""
                     Dim lFieldName As String
-                    For lFieldIndex As Integer = 0 To NumFields - 1
+                    For lFieldIndex As Integer = 0 To NumFields(lLayerIndex) - 1
                         If FieldType(lFieldIndex) = MapWinGIS.FieldType.STRING_FIELD Then
                             lFieldName = FieldName(lFieldIndex, lLayerIndex)
                             .Items.Add(lFieldName)
@@ -163,10 +166,14 @@ Public Class frmFileGeoReference
     End Sub
 
     Private Sub SetFieldsFromDocument(ByVal aFilename As String)
+        Dim lFileName As String = aFilename
+        If Not lFileName.StartsWith("http://") Then
+            lFileName = "file://" & lFileName
+        End If
+
         SetFeatureValue(DocumentLayerIndex, _
                         FieldIndex(DocumentLayerIndex, cboFields.Text), _
-                        pRecordIndex, _
-                        "file://" & aFilename)
+                        pRecordIndex, lFileName)
 
         If aFilename.ToLower.EndsWith(".jpg") Then
             Dim lExif As New ExifWorks(pBitmap)
@@ -246,10 +253,17 @@ Public Class frmFileGeoReference
     Friend Sub SetFormFromDocument(ByVal aFilename As String)
         txtLocation.Text = aFilename
         btnLaunch.Visible = False
+        btnBrowse.Visible = False
         If aFilename.Length = 0 Then
-            lblStatus.Text = "Click in the Location text box to specify the file location"
+            If cboFields.Text.ToLower = "url" Then
+                lblStatus.Text = "Type the web link in the Location text box"
+                txtLocation.Focus()
+            Else
+                lblStatus.Text = "Click the Browse button to specify the geo referenced file"
+            End If
             lblStatus.Visible = True
             pbxImage.Visible = False
+            btnBrowse.Visible = True
         ElseIf aFilename.StartsWith("http") Then
             lblStatus.Text = "Web Link"
             lblStatus.Visible = True
@@ -259,6 +273,7 @@ Public Class frmFileGeoReference
             lblStatus.Text = "File not found"
             lblStatus.Visible = True
             pbxImage.Visible = False
+            btnBrowse.Visible = True
         Else
             lblStatus.Visible = False
             Try
@@ -335,8 +350,23 @@ Public Class frmFileGeoReference
         End If
     End Sub
 
-    Private Sub txtValue_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles txtLocation.MouseClick
-        UserSelectDocument()
+    Private Sub txtLocation_LostFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtLocation.LostFocus
+        If cboFields.Text.ToLower = "url" Then
+            Dim lUrl As String = txtLocation.Text
+            Dim lPrefix As String = "http://"
+            If Not lUrl.StartsWith(lPrefix) Then
+                lUrl = lPrefix & lUrl
+                SetFieldsFromDocument(lUrl)
+                txtLocation.Text = lUrl
+            End If
+        Else
+            Dim lFilename As String = txtLocation.Text
+            If FileExists(lFilename) Then
+                SetFieldsFromDocument(lFilename)
+            Else 'file not found, ask user  
+                UserSelectDocument()
+            End If
+        End If
     End Sub
 
     Private Sub cboFields_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboFields.SelectedIndexChanged
@@ -377,6 +407,10 @@ Public Class frmFileGeoReference
             System.Windows.Forms.Application.DoEvents()
         End While
         SetFormFromFields()
+        If NumFeatures > lSaveNumFeatures Then 'Added a shape
+            pRecordIndex = NumFeatures() - 1
+            SetSelectedFeature(DocumentLayerIndex, pRecordIndex)
+        End If
         Return (NumFeatures > lSaveNumFeatures) 'True if feature was added
     End Function
 
@@ -409,13 +443,21 @@ Public Class frmFileGeoReference
         lExif.Dispose()
     End Sub
 
-    Private Sub AddFile(ByVal aFileName As String)
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="aFileName"></param>
+    ''' <param name="aX">units - project projection</param>
+    ''' <param name="aY">units - project projection</param>
+    ''' <remarks></remarks>
+    Friend Sub AddFile(ByVal aFileName As String, Optional ByVal aX As Double = 0, Optional ByVal aY As Double = 0)
         Dim lGeocodedFilename As String = IO.Path.Combine(IO.Path.GetDirectoryName(aFileName), IO.Path.GetFileNameWithoutExtension(aFileName) & ".geo" & IO.Path.GetExtension(aFileName))
         Dim lExif As ExifWorks = Nothing
+        Dim lExifHasLL As Boolean = False
         Dim lSaveNumFeatures As Integer = NumFeatures
         Logger.Dbg("Adding file '" & aFileName & "'")
-        Dim lY As Double = 0
-        Dim lX As Double = 0
+        Dim lY As Double = aY
+        Dim lX As Double = aX
         Dim lLatitude As String = Nothing
         Dim lLongitude As String = Nothing
         Dim lDate As String = Nothing
@@ -436,6 +478,7 @@ Public Class frmFileGeoReference
                 lX = lLongitude
                 ProjectPoint(lX, lY, pGeographicProjection, ProjectProjection)
                 AddPoint(DocumentLayerIndex, lX, lY)
+                lExifHasLL = True
             End If
         Catch ex As Exception
             Logger.Dbg("Exception trying to read EXIF: " & ex.Message)
@@ -443,7 +486,7 @@ Public Class frmFileGeoReference
 
         'TODO: handle non images
 
-        If lX = 0 OrElse lY = 0 Then 'Did not get lat/lon from EXIF
+        If lX = 0 OrElse lY = 0 Then 'Did not get lat/lon from EXIF or arguments
             If pRandomPlacement Then 'Place near center of current view
                 Dim lXMax As Double = MapExtentXmax
                 Dim lXMin As Double = MapExtentXmin
@@ -454,26 +497,27 @@ Public Class frmFileGeoReference
                 AddPoint(DocumentLayerIndex, lX, lY)
             Else 'Ask user to click to place point
                 If UserAddPoint() Then
-                    If Not lExif Is Nothing Then 'Set lat/lon in image to newly geocoded point (the last point in the file)
-                        PointXY(DocumentLayerIndex, NumFeatures - 1, lX, lY)
-                        If Not ProjectProjection.Equals(pGeographicProjection) Then
-                            Logger.Dbg("Projecting new point from (" & lX & ", " & lY & ") in '" & ProjectProjection() & "' to '" & pGeographicProjection & "'")
-                            ProjectPoint(lX, lY, ProjectProjection, pGeographicProjection)
-                        End If
-                        lLatitude = lY
-                        lLongitude = lX
-                        Logger.Dbg("Setting EXIF GPS lon/lat = " & lLongitude & ", " & lLatitude)
-                        lExif.GpsLatitude = lLatitude
-                        lExif.GpsLongitude = lLongitude
-                        Try
-                            pBitmap.Save(lGeocodedFilename)
-                            Logger.Dbg("Saved geocoded file '" & lGeocodedFilename & "'")
-                        Catch ex As Exception
-                            Logger.Dbg("Failed to save geocoded file '" & lGeocodedFilename & "' - " & ex.Message)
-                        End Try
-                    End If
+                    PointXY(DocumentLayerIndex, NumFeatures - 1, lX, lY)
                 End If
             End If
+        End If
+
+        If (Not lExif Is Nothing) AndAlso (Not lExifHasLL) Then 'Set lat/lon in image to newly geocoded point (the last point in the file)
+            If Not ProjectProjection.Equals(pGeographicProjection) Then
+                Logger.Dbg("Projecting new point from (" & lX & ", " & lY & ") in '" & ProjectProjection() & "' to '" & pGeographicProjection & "'")
+                ProjectPoint(lX, lY, ProjectProjection, pGeographicProjection)
+            End If
+            lLatitude = lY
+            lLongitude = lX
+            Logger.Dbg("Setting EXIF GPS lon/lat = " & lLongitude & ", " & lLatitude)
+            lExif.GpsLatitude = lLatitude
+            lExif.GpsLongitude = lLongitude
+            Try
+                pBitmap.Save(lGeocodedFilename)
+                Logger.Dbg("Saved geocoded file '" & lGeocodedFilename & "'")
+            Catch ex As Exception
+                Logger.Dbg("Failed to save geocoded file '" & lGeocodedFilename & "' - " & ex.Message)
+            End Try
         End If
 
         If NumFeatures > lSaveNumFeatures Then 'Added a shape
@@ -493,6 +537,9 @@ Public Class frmFileGeoReference
             Next
             pAddingFiles = False
             SetFormFromFields()
+        ElseIf e.Data.GetDataPresent(Windows.Forms.DataFormats.Text) AndAlso _
+               e.Data.GetData(Windows.Forms.DataFormats.Text).ToString.StartsWith("http://") Then
+            AddFile(e.Data.GetData(Windows.Forms.DataFormats.Text).ToString)
         End If
     End Sub
 
@@ -501,6 +548,8 @@ Public Class frmFileGeoReference
         Handles Me.DragEnter, pbxImage.DragEnter
 
         If e.Data.GetDataPresent(Windows.Forms.DataFormats.FileDrop) Then
+            e.Effect = Windows.Forms.DragDropEffects.All
+        ElseIf e.Data.GetDataPresent(Windows.Forms.DataFormats.Text) Then
             e.Effect = Windows.Forms.DragDropEffects.All
         End If
     End Sub
@@ -538,5 +587,9 @@ Public Class frmFileGeoReference
         Dim lProcess As New Process
         lProcess.StartInfo.FileName = txtLocation.Text
         lProcess.Start()
+    End Sub
+
+    Private Sub btnBrowse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBrowse.Click
+        UserSelectDocument()
     End Sub
 End Class

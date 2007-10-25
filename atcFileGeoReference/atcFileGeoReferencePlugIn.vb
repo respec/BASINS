@@ -69,8 +69,9 @@ Public Class atcFileGeoReferencePlugIn
                 'next line commented because we can only select on one layer at a time - therefore, only one form makes sense
                 'OrElse pForm.DocumentLayerIndex <> CurrentLayer Then
                 If NumLayers > 0 Then
+                    pMapWin.View.HandleFileDrop = False
                     pForm = New frmFileGeoReference
-                    pForm.PopulateLayers()
+                    pForm.PopulateLayers(pMapWin.Layers.Item(pMapWin.Layers.CurrentLayer).Name)
                     pForm.Show()
                 Else
                     Logger.Msg("Must have a project with at least one layer to use " & Me.Name, Me.Name & " Error")
@@ -79,6 +80,12 @@ Public Class atcFileGeoReferencePlugIn
                 pForm.Focus()
             End If
             aHandled = True
+        End If
+    End Sub
+
+    Public Overrides Sub Message(ByVal msg As String, ByRef Handled As Boolean)
+        If msg.StartsWith("FileDropEvent") Then
+            pForm.AddFile(msg.Substring(14))
         End If
     End Sub
 
@@ -174,4 +181,8 @@ Public Class atcFileGeoReferencePlugIn
         End If
         Return lNewField
     End Function
+
+    Private Sub pForm_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles pForm.FormClosing
+        pMapWin.View.HandleFileDrop = True
+    End Sub
 End Class
