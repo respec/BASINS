@@ -3,14 +3,14 @@ Imports atcData
 Imports MapWinUtility
 
 Public Class ExpertSystem
-    Friend pErrorCriteria As ErrorCriteria
+    Friend pErrorCriteria As New ErrorCriteria
+    Private pStorms As New Storms
+    Private pSites As New Sites
 
     Private pUci As atcUCI.HspfUci
     Private pDataSource As atcDataSource
 
     Private pName As String
-    Private pSites As atcCollection 'of site
-    Private pStorms As atcCollection 'of storm
     Private pStats(,,) As Double
     Private pSubjectiveData(25) As Integer
     Private pLatMin As Double, pLatMax As Double
@@ -48,48 +48,24 @@ Public Class ExpertSystem
     Private pStatNames As atcCollection 'of string
 
     Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcDataSource)
-        pErrorCriteria = New ErrorCriteria
         InitializeStrings()
         pUci = aUci
         pDataSource = aDataSource
-        pSites = New atcCollection
-        pStorms = New atcCollection
         ReadEXSFile(FilenameOnly(aUci.Name) & ".exs")
         pErrorCriteria.Edit()
     End Sub
+
+    Public ReadOnly Property Sites() As Sites
+        Get
+            Return pSites
+        End Get
+    End Property
 
     Public Function Report() As String
         CalcStats(pDataSource)
         Dim lStr As String = CalcErrorTerms(pUci)
         Return lStr
     End Function
-
-    Public ReadOnly Property StormCount() As Integer
-        Get
-            Return pStorms.Count
-        End Get
-    End Property
-    Public ReadOnly Property Storm(ByVal aStormIndex As Integer) As Storm
-        Get
-            Return pStorms(aStormIndex - 1)
-        End Get
-    End Property
-
-    Public ReadOnly Property SiteCount() As Integer
-        Get
-            Return pSites.Count
-        End Get
-    End Property
-    Public ReadOnly Property Site(ByVal aSiteIndex As Integer) As Site
-        Get
-            Return pSites(aSiteIndex - 1)
-        End Get
-    End Property
-    Friend ReadOnly Property ErrorCriteria(ByVal aCriteriaIndex As Integer) As ErrorCriterion
-        Get
-            Return pErrorCriteria(aCriteriaIndex)
-        End Get
-    End Property
 
     Public Function AsString() As String
         Dim lText As New Text.StringBuilder
@@ -103,7 +79,7 @@ Public Class ExpertSystem
         lText.AppendLine(lStr)
         For lSiteIndex As Integer = 1 To pSites.Count
             lStr = ""
-            With Site(lSiteIndex)
+            With pSites(lSiteIndex)
                 For lDsnIndex As Integer = 0 To 9
                     lStr &= .Dsn(lDsnIndex).ToString.PadLeft(4)
                 Next lDsnIndex
@@ -114,7 +90,7 @@ Public Class ExpertSystem
         lText.AppendLine(pStorms.Count.ToString.PadLeft(4))
         For lStormIndex As Integer = 1 To pStorms.Count
             lStr = ""
-            With Storm(lStormIndex)
+            With pStorms(lStormIndex)
                 Dim lDate(5) As Integer
                 J2Date(.SDateJ, lDate)
                 lStr &= lDate(0).ToString.PadLeft(5)
@@ -132,13 +108,13 @@ Public Class ExpertSystem
 
         lStr = ""
         For lSiteIndex As Integer = 1 To pSites.Count
-            lStr &= Site(lSiteIndex).Area.ToString.PadLeft(8)
+            lStr &= pSites(lSiteIndex).Area.ToString.PadLeft(8)
         Next lSiteIndex
         lText.AppendLine(lStr)
 
         lStr = ""
         For lErrorIndex As Integer = 1 To 10
-            lStr &= Format(ErrorCriteria(lErrorIndex).Value, "#####.00").PadLeft(8)
+            lStr &= Format(pErrorCriteria(lErrorIndex).Value, "#####.00").PadLeft(8)
         Next lErrorIndex
         lText.AppendLine(lStr)
 
@@ -249,8 +225,8 @@ Public Class ExpertSystem
         'Read basin area (acres)
         lRecordIndex += lNStorms + 1
         lExsRecord = lExsRecords(lRecordIndex)
-        For lSiteIndex As Integer = 0 To lNSites - 1
-            pSites(lSiteIndex).Area = lExsRecord.Substring(((lSiteIndex) * 8), 8)
+        For lSiteIndex As Integer = 1 To lNSites
+            pSites(lSiteIndex).Area = lExsRecord.Substring(((lSiteIndex - 1) * 8), 8)
         Next lSiteIndex
 
         'Read error terms
@@ -258,12 +234,12 @@ Public Class ExpertSystem
         lExsRecord = lExsRecords(lRecordIndex)
         lRecordIndex += 1
         For lErrorIndex As Integer = 1 To 10
-            ErrorCriteria(lErrorIndex).Value = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
+            pErrorCriteria(lErrorIndex).Value = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
         Next lErrorIndex
-        ErrorCriteria(11).Value = 15  'storm peak criteria not kept in EXS file
-        If (ErrorCriteria(10).Value < 0.000001 And ErrorCriteria(10).Value > -0.000001) Then
+        pErrorCriteria(11).Value = 15  'storm peak criteria not kept in EXS file
+        If (pErrorCriteria(10).Value < 0.000001 And pErrorCriteria(10).Value > -0.000001) Then
             'percent of time in baseflow read in as zero, change to 30
-            ErrorCriteria(10).Value = 30.0#
+            pErrorCriteria(10).Value = 30.0#
         End If
 
         'Read latest hspf output
@@ -331,12 +307,12 @@ Public Class ExpertSystem
 
                 Dim lDSN As Integer
                 Select Case lStatGroup 'get the correct dsn
-                    Case 1 : lDSN = Site(lSiteIndex).Dsn(0)
-                    Case 2 : lDSN = Site(lSiteIndex).Dsn(1)
-                    Case 3 : lDSN = Site(lSiteIndex).Dsn(2)
-                    Case 4 : lDSN = Site(lSiteIndex).Dsn(3)
-                    Case 5 : lDSN = Site(lSiteIndex).Dsn(6)
-                    Case 6 : lDSN = Site(lSiteIndex).Dsn(7)
+                    Case 1 : lDSN = pSites(lSiteIndex).Dsn(0)
+                    Case 2 : lDSN = pSites(lSiteIndex).Dsn(1)
+                    Case 3 : lDSN = pSites(lSiteIndex).Dsn(2)
+                    Case 4 : lDSN = pSites(lSiteIndex).Dsn(3)
+                    Case 5 : lDSN = pSites(lSiteIndex).Dsn(6)
+                    Case 6 : lDSN = pSites(lSiteIndex).Dsn(7)
                 End Select
 
                 'Get data - daily values and max values as necessary
@@ -426,7 +402,7 @@ Public Class ExpertSystem
                         pStats(9, lStatGroup, lSiteIndex) = 0.0# 'summer storms
                         pStats(10, lStatGroup, lSiteIndex) = 0.0# 'winter storms
                         If (pStorms.Count > 0) Then 'storms are available, loop thru them
-                            For lStormIndex As Integer = 0 To pStorms.Count - 1
+                            For lStormIndex As Integer = 1 To pStorms.Count
                                 If pStorms(lStormIndex).SDateJ >= SDateJ And _
                                    pStorms(lStormIndex).EDateJ <= EDateJ Then 'storm within run span
                                     'TODO: this matches VB6Script results, needs to have indexes checked!
@@ -484,7 +460,7 @@ Public Class ExpertSystem
                                 lRecCnt, lRecSum)
                         'Calc pStats
                         'new percent of time in base flow term
-                        Dim lRtmp As Double = lNValsProcessed * ErrorCriteria(10).Value / 100
+                        Dim lRtmp As Double = lNValsProcessed * pErrorCriteria(10).Value / 100
                         Dim lStmp As Double = lNValsProcessed - lRecCnt(1)
                         If (lStmp < lRtmp Or lRtmp < 1.0#) Then 'not enough values available
                             pStats(6, lStatGroup, lSiteIndex) = Double.NaN
@@ -513,11 +489,11 @@ Public Class ExpertSystem
                 If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
                     pStats(5, lStatGroup, lSiteIndex) /= pStorms.Count
                     'convert storm peak stat from acre-inch/day to cfs
-                    pStats(5, lStatGroup, lSiteIndex) *= Site(lSiteIndex).Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
+                    pStats(5, lStatGroup, lSiteIndex) *= pSites(lSiteIndex).Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
                 ElseIf lStatGroup = 2 Then
                     For i As Integer = 1 To 10
                         If i < 5 Or i > 6 Then 'convert observed runoff values
-                            pStats(i, lStatGroup, lSiteIndex) *= pConvert / Site(lSiteIndex).Area
+                            pStats(i, lStatGroup, lSiteIndex) *= pConvert / pSites(lSiteIndex).Area
                         ElseIf i = 5 Then 'take average over NStorms
                             pStats(i, lStatGroup, lSiteIndex) /= pStorms.Count
                         End If
@@ -534,10 +510,10 @@ Public Class ExpertSystem
         For lSiteIndex As Integer = 1 To pSites.Count
             'total volume error
             If (pStats(1, 2, lSiteIndex) > 0.0#) Then
-                Site(lSiteIndex).ErrorTerm(1) = 100.0# * ((pStats(1, 1, lSiteIndex) - pStats(1, 2, lSiteIndex)) _
+                pSites(lSiteIndex).ErrorTerm(1) = 100.0# * ((pStats(1, 1, lSiteIndex) - pStats(1, 2, lSiteIndex)) _
                                                   / pStats(1, 2, lSiteIndex))
             Else
-                Site(lSiteIndex).ErrorTerm(1) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(1) = Double.NaN
             End If
 
             '     'total volume difference
@@ -548,50 +524,50 @@ Public Class ExpertSystem
 
             'volume error in lowest 50% flows
             If (pStats(2, 2, lSiteIndex) > 0.0#) Then
-                Site(lSiteIndex).ErrorTerm(3) = 100.0# * ((pStats(2, 1, lSiteIndex) - pStats(2, 2, lSiteIndex)) _
+                pSites(lSiteIndex).ErrorTerm(3) = 100.0# * ((pStats(2, 1, lSiteIndex) - pStats(2, 2, lSiteIndex)) _
                                                   / pStats(2, 2, lSiteIndex))
             Else
-                Site(lSiteIndex).ErrorTerm(3) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(3) = Double.NaN
             End If
 
             'volume error in highest 10% flows
             If (pStats(3, 2, lSiteIndex) > 0.0#) Then
-                Site(lSiteIndex).ErrorTerm(4) = 100.0# * ((pStats(3, 1, lSiteIndex) - pStats(3, 2, lSiteIndex)) _
+                pSites(lSiteIndex).ErrorTerm(4) = 100.0# * ((pStats(3, 1, lSiteIndex) - pStats(3, 2, lSiteIndex)) _
                                            / pStats(3, 2, lSiteIndex))
             Else
-                Site(lSiteIndex).ErrorTerm(4) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(4) = Double.NaN
             End If
 
             'total storm peaks volume
             If (pStats(5, 2, lSiteIndex) > 0.0#) Then
-                Site(lSiteIndex).ErrorTerm(11) = 100.0# * ((pStats(5, 1, lSiteIndex) - pStats(5, 2, lSiteIndex)) _
+                pSites(lSiteIndex).ErrorTerm(11) = 100.0# * ((pStats(5, 1, lSiteIndex) - pStats(5, 2, lSiteIndex)) _
                                            / pStats(5, 2, lSiteIndex))
             Else
-                Site(lSiteIndex).ErrorTerm(11) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(11) = Double.NaN
             End If
 
             'total storm volume
             If (pStats(4, 2, lSiteIndex) > 0.0#) Then
-                Site(lSiteIndex).ErrorTerm(5) = 100.0# * ((pStats(4, 1, lSiteIndex) - pStats(4, 2, lSiteIndex)) _
+                pSites(lSiteIndex).ErrorTerm(5) = 100.0# * ((pStats(4, 1, lSiteIndex) - pStats(4, 2, lSiteIndex)) _
                                            / pStats(4, 2, lSiteIndex))
             Else
-                Site(lSiteIndex).ErrorTerm(5) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(5) = Double.NaN
             End If
 
             'summer storm volume
             If (pStats(9, 2, lSiteIndex) > 0.0# And pStats(4, 2, lSiteIndex) > 0.0#) Then
-                Site(lSiteIndex).ErrorTerm(8) = (100.0# * ((pStats(9, 1, lSiteIndex) - pStats(9, 2, lSiteIndex)) _
-                                            / pStats(9, 2, lSiteIndex))) - Site(lSiteIndex).ErrorTerm(5)
+                pSites(lSiteIndex).ErrorTerm(8) = (100.0# * ((pStats(9, 1, lSiteIndex) - pStats(9, 2, lSiteIndex)) _
+                                            / pStats(9, 2, lSiteIndex))) - pSites(lSiteIndex).ErrorTerm(5)
             Else
-                Site(lSiteIndex).ErrorTerm(8) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(8) = Double.NaN
             End If
 
             'error in low flow recession
             If Double.IsNaN(pStats(6, 1, lSiteIndex)) Or _
                Double.IsNaN(pStats(6, 2, lSiteIndex)) Then
-                Site(lSiteIndex).ErrorTerm(2) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(2) = Double.NaN
             Else 'okay to calculate this term
-                Site(lSiteIndex).ErrorTerm(2) = (1.0# - pStats(6, 1, lSiteIndex)) - (1.0# - pStats(6, 2, lSiteIndex))
+                pSites(lSiteIndex).ErrorTerm(2) = (1.0# - pStats(6, 1, lSiteIndex)) - (1.0# - pStats(6, 2, lSiteIndex))
             End If
 
             'summer flow volume
@@ -615,9 +591,9 @@ Public Class ExpertSystem
             'error in seasonal volume
             If (Double.IsNaN(lSummerError) Or _
                 Double.IsNaN(lWinterError)) Then 'one term or the other has not been obtained
-                Site(lSiteIndex).ErrorTerm(7) = Double.NaN
+                pSites(lSiteIndex).ErrorTerm(7) = Double.NaN
             Else 'okay to calculate this term
-                Site(lSiteIndex).ErrorTerm(7) = Math.Abs(lSummerError - lWinterError)
+                pSites(lSiteIndex).ErrorTerm(7) = Math.Abs(lSummerError - lWinterError)
             End If
         Next lSiteIndex
 
@@ -634,7 +610,7 @@ Public Class ExpertSystem
 
         For lSiteIndex As Integer = 1 To pSites.Count
             'loop for each site
-            lStr &= "Site: ".PadLeft(15) & Site(lSiteIndex).Name & vbCrLf & vbCrLf
+            lStr &= "Site: ".PadLeft(15) & pSites(lSiteIndex).Name & vbCrLf & vbCrLf
 
             'statistics summary
             Dim lYrCnt As Double = timdifJ(SDateJ, EDateJ, 6, 1)
@@ -645,11 +621,11 @@ Public Class ExpertSystem
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
             lStr &= Space(35) & "Current".PadLeft(12) & "Criteria".PadLeft(12) & vbCrLf
             For lErrorTerm As Integer = 1 To pNErrorTerms
-                If Site(lSiteIndex).ErrorTerm(lErrorTerm) <> 0.0# Then
-                    lStr &= (ErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
-                            DecimalAlign(Site(lSiteIndex).ErrorTerm(lErrorTerm)) & _
-                            DecimalAlign(ErrorCriteria(lErrorTerm).Value)
-                    If Math.Abs(Site(lSiteIndex).ErrorTerm(lErrorTerm)) < ErrorCriteria(lErrorTerm).Value Then
+                If pSites(lSiteIndex).ErrorTerm(lErrorTerm) <> 0.0# Then
+                    lStr &= (pErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
+                            DecimalAlign(pSites(lSiteIndex).ErrorTerm(lErrorTerm)) & _
+                            DecimalAlign(pErrorCriteria(lErrorTerm).Value)
+                    If Math.Abs(pSites(lSiteIndex).ErrorTerm(lErrorTerm)) < pErrorCriteria(lErrorTerm).Value Then
                         lStr &= " OK" & vbCrLf
                     Else
                         lStr &= "    Needs Work" & vbCrLf
@@ -813,8 +789,28 @@ Public Class ExpertSystem
     End Sub
 End Class
 
+Public Class Sites
+    Private pSites As New atcCollection
+
+    Public ReadOnly Property Count() As Integer
+        Get
+            Return pSites.Count
+        End Get
+    End Property
+    Default Public ReadOnly Property Site(ByVal aIndex As Integer) As Site
+        Get
+            Return pSites(aIndex - 1)
+        End Get
+    End Property
+    Public Sub Add(ByVal aSite As Site)
+        pSites.Add(aSite)
+    End Sub
+    Public Sub Edit()
+        'TODO:add a site edit form
+    End Sub
+End Class
+
 Public Class Site
-    Private pExpertSystem As ExpertSystem
     Private pName As String
     Private pArea As Double
     Private pStatDN As Integer
@@ -832,11 +828,10 @@ Public Class Site
     Private pErrorTerm() As Double
 
     Public Sub New(ByVal aExpertSystem As ExpertSystem, ByVal aName As String, ByVal aStatDN As Integer, ByVal aDsn() As Integer)
-        pExpertSystem = aExpertSystem
         pName = aName
         pStatDN = aStatDN
         pDSN = aDsn
-        ReDim pErrorTerm(pExpertSystem.pErrorCriteria.Count)
+        ReDim pErrorTerm(aExpertSystem.pErrorCriteria.Count)
     End Sub
     Public ReadOnly Property Name() As String
         Get
@@ -869,6 +864,27 @@ Public Class Site
             pErrorTerm(aIndex) = aValue
         End Set
     End Property
+End Class
+
+Public Class Storms
+    Private pStorms As New atcCollection 'of storm
+
+    Public ReadOnly Property Count() As Integer
+        Get
+            Return pStorms.Count
+        End Get
+    End Property
+    Default Public ReadOnly Property Storm(ByVal aIndex As Integer) As Storm
+        Get
+            Return pStorms(aIndex - 1)
+        End Get
+    End Property
+    Public Sub Add(ByVal aStorm As Storm)
+        pStorms.Add(aStorm)
+    End Sub
+    Public Sub Edit()
+        'TODO:add a storm edit form
+    End Sub
 End Class
 
 Public Class Storm
