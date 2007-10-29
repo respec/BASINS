@@ -500,6 +500,8 @@ Public Class frmFileGeoReference
                     PointXY(DocumentLayerIndex, NumFeatures - 1, lX, lY)
                 End If
             End If
+        ElseIf Not lExifHasLL Then
+            AddPoint(DocumentLayerIndex, lX, lY)
         End If
 
         If (Not lExif Is Nothing) AndAlso (Not lExifHasLL) Then 'Set lat/lon in image to newly geocoded point (the last point in the file)
@@ -524,6 +526,7 @@ Public Class frmFileGeoReference
             pRecordIndex = NumFeatures() - 1
             SetFieldsFromDocument(aFileName)
             SetSelectedFeature(DocumentLayerIndex, pRecordIndex)
+            SetFormFromFields()
         End If
     End Sub
 
