@@ -85,7 +85,8 @@ Public Class atcFileGeoReferencePlugIn
 
     Public Overrides Sub Message(ByVal msg As String, ByRef Handled As Boolean)
         If msg.StartsWith("FileDropEvent") Then
-            pForm.AddFile(msg.Substring(14))
+            Dim lMsg() As String = msg.Split("|")
+            pForm.AddFile(lMsg(3), lMsg(1), lMsg(2))
         End If
     End Sub
 
