@@ -6,6 +6,7 @@ Public Class ExpertSystem
     Friend pErrorCriteria As New ErrorCriteria
     Private pStorms As New Storms
     Private pSites As New Sites
+    Private pStatistics As New Statistics
 
     Private pUci As atcUCI.HspfUci
     Private pDataSource As atcDataSource
@@ -44,11 +45,7 @@ Public Class ExpertSystem
     Private Const pNSteps As Integer = 500
     Private Const pNStatGroups As Integer = 6
 
-    Private Const pNErrorTerms As Integer = 11
-    Private pStatNames As atcCollection 'of string
-
     Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcDataSource)
-        InitializeStrings()
         pUci = aUci
         pDataSource = aDataSource
         ReadEXSFile(FilenameOnly(aUci.Name) & ".exs")
@@ -292,7 +289,7 @@ Public Class ExpertSystem
         '         1-total, 2-50%low, 3-10%high, 4-storm vol, 5-storm peak,
         '         6-recess, 7-sum vol, 8-win vol, 9-sum strm, 10-win strm
 
-        ReDim pStats(pStatNames.Count, pNStatGroups, pSites.Count)
+        ReDim pStats(pStatistics.Count, pNStatGroups, pSites.Count)
 
         'get number of values
         Dim lTimeStep As Integer, lTimeUnit As Integer, lNVals As Integer
@@ -303,7 +300,7 @@ Public Class ExpertSystem
         For lSiteIndex As Integer = 1 To pSites.Count
             For lStatGroup As Integer = 1 To pNStatGroups
                 'set Stats to undefined for this group
-                ZipR(pStatNames.Count, Double.NaN, pStats, lStatGroup, lSiteIndex)
+                ZipR(pStatistics.Count, Double.NaN, pStats, lStatGroup, lSiteIndex)
 
                 Dim lDSN As Integer
                 Select Case lStatGroup 'get the correct dsn
@@ -339,7 +336,7 @@ Public Class ExpertSystem
 
                 If lDataProblem Then  'if we weren't able to retrieve the data set
                     'set Stats to undefined
-                    ZipR(pStatNames.Count, Double.NaN, pStats, lStatGroup, lSiteIndex)
+                    ZipR(pStatistics.Count, Double.NaN, pStats, lStatGroup, lSiteIndex)
                     Logger.Msg("Unable to retrieve DSN " & lDSN & vbCrLf & _
                                "from the file " & aDataSource.Name, "Bad Data Set")
                 Else  'generate statistics
@@ -620,7 +617,7 @@ Public Class ExpertSystem
             'Write the error terms
             lStr &= Space(35) & "Error Terms" & vbCrLf & vbCrLf
             lStr &= Space(35) & "Current".PadLeft(12) & "Criteria".PadLeft(12) & vbCrLf
-            For lErrorTerm As Integer = 1 To pNErrorTerms
+            For lErrorTerm As Integer = 1 To pErrorCriteria.Count
                 If pSites(lSiteIndex).ErrorTerm(lErrorTerm) <> 0.0# Then
                     lStr &= (pErrorCriteria(lErrorTerm).Name & " =").PadLeft(35) & _
                             DecimalAlign(pSites(lSiteIndex).ErrorTerm(lErrorTerm)) & _
@@ -655,8 +652,8 @@ Public Class ExpertSystem
               "Surface Runoff".PadLeft(15) & _
               "Interflow".PadLeft(15) & vbCrLf
         'Write runoff block
-        For lStatIndex As Integer = 1 To pStatNames.Count 'loop for each statistic
-            lStr &= (pStatNames(lStatIndex - 1) & " =").PadLeft(30)
+        For lStatIndex As Integer = 1 To pStatistics.Count 'loop for each statistic
+            lStr &= (pStatistics(lStatIndex).Name & " =").PadLeft(30)
             Dim l() As Integer = {0, 2, 1, 3, 4} 'gets print order correct
             For k = 1 To 4
                 If Not Double.IsNaN(pStats(lStatIndex, l(k), aSite)) Then
@@ -702,8 +699,8 @@ Public Class ExpertSystem
         Dim lIncrmt As Double, lTmp As Double, lRlgMin As Double, lXtmp As Double
 
         'set box counts and box sums to zero
-        aBoxCnt.Initialize() '.SetValue(0, 1, pNSteps)
-        aBoxSum.Initialize() '.SetValue(0.0, 1, pNSteps)
+        aBoxCnt.Initialize()
+        aBoxSum.Initialize() 
 
         'set box boundaries
         If (aArlgFg = 2) Then 'log of data
@@ -772,20 +769,6 @@ Public Class ExpertSystem
         For lIndex As Integer = 1 To aLength
             lArray(lIndex, aSecondDim, aThirdDim) = aZip
         Next lIndex
-    End Sub
-
-    Private Sub InitializeStrings()
-        pStatNames = New atcCollection
-        pStatNames.Add("total (inches)")
-        pStatNames.Add("50% low (inches)")
-        pStatNames.Add("10% high (inches)")
-        pStatNames.Add("storm volume (inches)")
-        pStatNames.Add("average storm peak (cfs)")
-        pStatNames.Add("baseflow recession rate")
-        pStatNames.Add("summer volume (inches)")
-        pStatNames.Add("winter volume (inches)")
-        pStatNames.Add("summer storms (inches)")
-        pStatNames.Add("winter storms (inches)")
     End Sub
 End Class
 
@@ -971,5 +954,46 @@ Friend Class ErrorCriterion
         Set(ByVal aValue As Double)
             pValue = aValue
         End Set
+    End Property
+End Class
+
+Friend Class Statistics
+    Private pStatictics As New atcCollection
+
+    Public Sub New()
+        pStatictics.Add(New Statistic("total (inches)"))
+        pStatictics.Add(New Statistic("50% low (inches)"))
+        pStatictics.Add(New Statistic("10% high (inches)"))
+        pStatictics.Add(New Statistic("storm volume (inches)"))
+        pStatictics.Add(New Statistic("average storm peak (cfs)"))
+        pStatictics.Add(New Statistic("baseflow recession rate"))
+        pStatictics.Add(New Statistic("summer volume (inches)"))
+        pStatictics.Add(New Statistic("winter volume (inches)"))
+        pStatictics.Add(New Statistic("summer storms (inches)"))
+        pStatictics.Add(New Statistic("winter storms (inches)"))
+    End Sub
+
+    Public ReadOnly Property Count() As Integer
+        Get
+            Return pStatictics.Count
+        End Get
+    End Property
+    Default Public ReadOnly Property Statistic(ByVal aIndex As Integer) As Statistic
+        Get
+            Return pStatictics(aIndex - 1)
+        End Get
+    End Property
+End Class
+
+Friend Class Statistic
+    Dim pName As String
+
+    Public Sub New(ByVal aName As String)
+        pName = aName
+    End Sub
+    Public ReadOnly Property Name() As String
+        Get
+            Return pName
+        End Get
     End Property
 End Class
