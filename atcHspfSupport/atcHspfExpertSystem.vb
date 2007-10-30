@@ -7,15 +7,17 @@ Public Class ExpertSystem
     Private pStorms As New Storms
     Private pSites As New Sites
     Private pStatistics As New Statistics
+    Private pDatasetTypes As New DatasetTypes
 
     Private pUci As atcUCI.HspfUci
     Private pDataSource As atcDataSource
 
     Private pName As String
-    Private pStats(,,) As Double
     Private pSubjectiveData(25) As Integer
     Private pLatMin As Double, pLatMax As Double
     Private pLngMin As Double, pLngMax As Double
+    'TODO: get rid of next two global arrays, store in site class
+    Private pStats(,,) As Double
     Private pHSPFOutput1(,) As Double
     '1 = SIMTRO - simulated total runoff
     '2 = OBSTRO - observed total runoff
@@ -43,7 +45,6 @@ Public Class ExpertSystem
     '6 = SRHOBS - observed summer flow volume (in)
     Private Const pConvert As Double = 24.0# * 3600.0# * 12.0# / 43560.0#
     Private Const pNSteps As Integer = 500
-    Private Const pNStatGroups As Integer = 6
 
     Public Sub New(ByVal aUci As atcUCI.HspfUci, ByVal aDataSource As atcDataSource)
         pUci = aUci
@@ -165,12 +166,12 @@ Public Class ExpertSystem
         'Read first line of file
         Dim lExsRecord As String = lExsRecords(0)
         pname = lExsRecord.Substring(0, 8)
-        Dim lNSites As Integer = lExsRecord.Substring(8, 5) 'Mid(textLine, 9, 5)
-        Dim lCurSite As Integer = lExsRecord.Substring(14, 5) 'Mid(textLine, 14, 5)
-        pLatMin = lExsRecord.Substring(19, 8) 'Mid(textLine, 19, 8)
-        pLatMax = lExsRecord.Substring(27, 8) 'Mid(textLine, 27, 8)
-        pLngMin = lExsRecord.Substring(35, 8) ' Mid(textLine, 35, 8)
-        pLngMax = lExsRecord.Substring(43, 8) 'Mid(textLine, 43, 8)
+        Dim lNSites As Integer = lExsRecord.Substring(8, 5)
+        Dim lCurSite As Integer = lExsRecord.Substring(14, 5)
+        pLatMin = lExsRecord.Substring(19, 8)
+        pLatMax = lExsRecord.Substring(27, 8)
+        pLngMin = lExsRecord.Substring(35, 8)
+        pLngMax = lExsRecord.Substring(43, 8)
 
         'Default unspecified lat/integer min/max values to contiguous 48 states
         If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
@@ -282,14 +283,10 @@ Public Class ExpertSystem
     End Sub
 
     Private Sub CalcStats(ByVal aDataSource As atcDataSource)
-        'lStatGroup - Group number of pStats desired from this call
-        '         1-sim runoff, 2-obs runoff, 3-sim stm sur runoff,
-        '         4-sim stm interflow, 5-tot pot et, 6-act et
-        'STAT   - Calculated statistics
-        '         1-total, 2-50%low, 3-10%high, 4-storm vol, 5-storm peak,
-        '         6-recess, 7-sum vol, 8-win vol, 9-sum strm, 10-win strm
-
-        ReDim pStats(pStatistics.Count, pNStatGroups, pSites.Count)
+        Dim lDataSetTypes() As String = {"SimTotRunoff", "ObsStreamflow", _
+                                         "SimInterflow", "SimBaseflow", _
+                                         "ObsPotentialET", "SimActualET"}
+        ReDim pStats(pStatistics.Count, lDataSetTypes.GetUpperBound(0) + 1, pSites.Count)
 
         'get number of values
         Dim lTimeStep As Integer, lTimeUnit As Integer, lNVals As Integer
@@ -298,7 +295,8 @@ Public Class ExpertSystem
         lNVals = timdifJ(SDateJ, EDateJ, lTimeUnit, lTimeStep)
 
         For lSiteIndex As Integer = 1 To pSites.Count
-            For lStatGroup As Integer = 1 To pNStatGroups
+            For Each lDatasetType As String In lDataSetTypes ' As Integer = 1 To pDatasetTypes.Count
+                Dim lStatGroup As Integer = pDatasetTypes.IndexFromKey(lDatasetType) + 1
                 'set Stats to undefined for this group
                 ZipR(pStatistics.Count, Double.NaN, pStats, lStatGroup, lSiteIndex)
 
@@ -314,7 +312,9 @@ Public Class ExpertSystem
 
                 'Get data - daily values and max values as necessary
                 Dim lTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lDSN))
+                'subset by date to simulation period
                 Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, SDateJ, EDateJ, Nothing)
+                'don't Clear lTSer as that will clear the original, precluding its future use
                 lTSer = Nothing
 
                 Dim lDailyTSer As atcTimeseries
@@ -327,7 +327,6 @@ Public Class ExpertSystem
                 lNewTSer.Dates.Clear()
                 lNewTSer = Nothing
 
-                Dim lValues() As Double = lDailyTSer.Values
                 'check to make sure we got values
                 Dim lDataProblem As Boolean = False
                 If lDailyTSer.Values.Length = 0 Then
@@ -340,41 +339,45 @@ Public Class ExpertSystem
                     Logger.Msg("Unable to retrieve DSN " & lDSN & vbCrLf & _
                                "from the file " & aDataSource.Name, "Bad Data Set")
                 Else  'generate statistics
+                    Dim lValues() As Double = lDailyTSer.Values
                     'total volume always needed 
                     pStats(1, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("Sum").Value
                     'others?
                     If (lStatGroup = 1 Or lStatGroup = 2) Then  'full range of pStats desired
-                        Dim lMaxVal As Double = 1000000.0#
-                        Dim lMinVal As Double = 0.0001
-                        Dim lArLgFg As Integer = 2
-                        'use a box sort algorithm as an approximation for later
-                        'totaling, putting values greater than upper limit in
-                        'highest ranking box (box #1) and values less than lower
-                        'limit in lowest ranking box (box #pNSteps).
-                        Dim lBoxSum(pNSteps) As Double
-                        Dim lBoxCnt(pNSteps) As Integer
-                        BoxSort(lMaxVal, lMinVal, lNVals, lValues, lArLgFg, _
-                                lBoxCnt, lBoxSum)
-
-                        'total of lowest 50%
-                        Dim lnV50 As Integer, lnV90 As Integer
-                        lnV50 = lNVals / 2
-                        If (lnV50 < 1) Then
-                            'need at least one value
-                            lnV50 = 1
+                        Dim lBins As atcCollection = lDailyTSer.Attributes.GetValue("Bins")
+                        If lBins Is Nothing Then
+                            lBins = MakeBins(lDailyTSer)
+                            lDailyTSer.Attributes.SetValue("Bins", lBins)
                         End If
-                        'find highest 50 percent ...
-                        Dim lSum As Double = BoxAdd(lnV50, lBoxCnt, lBoxSum)
 
-                        'then subtract from total to get lowest 50 percent
-                        pStats(2, lStatGroup, lSiteIndex) = pStats(1, lStatGroup, lSiteIndex) - lSum
+                        Dim lNumValues As Integer = lDailyTSer.numValues
+                        Dim lPercentiles() As Double = {50, 90, 100, 101}
+                        Dim lPercentileSums() As Double = {0, 0, 0, 0}
+                        Dim lPercentileIndex As Double = 0
+                        Dim lCountPercentileDone As Integer = -1
 
-                        'total of highest 10%
-                        lnV90 = lNVals * 0.1
-                        If (lnV90 < 1) Then 'need at least one value
-                            lnV90 = 1
-                        End If
-                        pStats(3, lStatGroup, lSiteIndex) = BoxAdd(lnV90, lBoxCnt, lBoxSum)
+                        Dim lSum As Double = 0
+                        Dim lCount As Integer = 0
+                        For Each lBin As ArrayList In lBins
+                            For Each lValue As Double In lBin
+                                lCount += 1
+                                lSum += lValue
+                                If lCount >= lCountPercentileDone Then
+                                    If lCountPercentileDone >= 0 Then
+                                        lPercentileSums(lPercentileIndex) = lSum
+                                        lPercentileIndex += 1
+                                    End If
+                                    If lPercentileIndex <= lPercentiles.GetUpperBound(0) Then
+                                        lCountPercentileDone = lPercentiles(lPercentileIndex) * lNumValues / 100.0 - 1
+                                        If lCountPercentileDone < 0 Then lCountPercentileDone = 0
+                                        If lCountPercentileDone >= lNumValues Then lCountPercentileDone = lNumValues - 1
+                                    End If
+                                End If
+                            Next
+                        Next
+                        Logger.Dbg("Sum:" & lDailyTSer.Attributes.GetFormattedValue("Sum") & " fromBins:" & lPercentileSums(2))
+                        pStats(2, lStatGroup, lSiteIndex) = lPercentileSums(0) '50
+                        pStats(3, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lPercentileSums(1) '90
 
                         Dim lTmpDate(5) As Integer
                         J2Date(SDateJ, lTmpDate)
@@ -428,61 +431,30 @@ Public Class ExpertSystem
                     End If
 
                     If (lStatGroup = 1 Or lStatGroup = 2) Then 'Change flows to recessions
+                        Dim lRecessionTimser As atcTimeseries = lDailyTSer.Clone
                         'save first data value
-                        Dim lSavDat As Double = lValues(1)
+                        Dim lSavDat As Double = lRecessionTimser.Values(1)
                         For lIndex As Integer = 2 To lNVals
                             Dim lRecession As Double
                             If (lSavDat > 0.0000000001) Then 'have some flow
-                                lRecession = lValues(lIndex) / lSavDat
+                                lRecession = lRecessionTimser.Values(lIndex) / lSavDat
                             Else 'no flow
                                 lRecession = Double.NaN
                             End If
-                            lSavDat = lValues(lIndex)
-                            lValues(lIndex - 1) = lRecession
+                            lSavDat = lRecessionTimser.Values(lIndex)
+                            lRecessionTimser.Values(lIndex - 1) = lRecession
                         Next lIndex
-                        'adjust number of values to actual number processed
-                        Dim lNValsProcessed As Integer = lNVals - 1
+                        lRecessionTimser.Attributes.DiscardCalculated()
+                        lRecessionTimser.Attributes.CalculateAll()
 
-                        'sort the recessions
-                        Dim lMaxVal As Double = 1.0#
-                        Dim lMinVal As Double = 0.002#
-                        Dim lArLgFg As Integer = 1
-                        'use a box sort algorithm as an approximation for later
-                        'totaling, putting values greater than upper limit in
-                        'highest ranking box (box #1) and values less than lower
-                        'limit in lowest ranking box (box #pNSteps).
-                        Dim lRecCnt(pNSteps) As Integer
-                        Dim lRecSum(pNSteps) As Double
-                        BoxSort(lMaxVal, lMinVal, lNValsProcessed, lValues, lArLgFg, _
-                                lRecCnt, lRecSum)
-                        'Calc pStats
                         'new percent of time in base flow term
-                        Dim lRtmp As Double = lNValsProcessed * pErrorCriteria(10).Value / 100
-                        Dim lStmp As Double = lNValsProcessed - lRecCnt(1)
-                        If (lStmp < lRtmp Or lRtmp < 1.0#) Then 'not enough values available
-                            pStats(6, lStatGroup, lSiteIndex) = Double.NaN
-                        Else
-                            Dim lSum As Double = 0.0#
-                            Dim lTotCnt As Double = 0.0#
-                            Dim iIndex As Integer = 1
-                            Do
-                                'Loop through boxes starting with highest <=1.0,
-                                'adding recession values until we have x percent of them
-                                iIndex += 1
-                                lSum += lRecSum(iIndex)
-                                lTotCnt += lRecCnt(iIndex)
-                                'have we added x percent of the values yet?
-                            Loop While (lTotCnt < lRtmp)
-                            'Compensate for inexact number of values by interpolating,
-                            'subtract off a proportional amount of the box containing
-                            'the cut-off value
-                            Dim lSubVal As Double = (lTotCnt - lRtmp) * (lRecSum(iIndex) / lRecCnt(iIndex))
-                            lSum -= lSubVal
-                            'calculate average baseflow recession rate
-                            pStats(6, lStatGroup, lSiteIndex) = lSum / lRtmp
-                        End If
+                        pStats(6, lStatGroup, lSiteIndex) = lRecessionTimser.Attributes.GetFormattedValue("%50")
+                        lRecessionTimser.Clear()
+                        lRecessionTimser.Dates.Clear()
+                        lRecessionTimser = Nothing
                     End If
                 End If
+
                 If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
                     pStats(5, lStatGroup, lSiteIndex) /= pStorms.Count
                     'convert storm peak stat from acre-inch/day to cfs
@@ -499,7 +471,7 @@ Public Class ExpertSystem
                 lDailyTSer.Clear()
                 lDailyTSer.Dates.Clear()
                 lDailyTSer = Nothing
-            Next lStatGroup
+            Next lDatasetType
         Next lSiteIndex
     End Sub
 
@@ -636,7 +608,6 @@ Public Class ExpertSystem
     End Function
 
     Private Function StatDetails(ByVal aTitle As String, ByVal aSite As Integer, ByVal aConv As Double) As String
-        Dim k As Integer
         Dim lConv As Double
         Dim lStr As String
 
@@ -655,7 +626,7 @@ Public Class ExpertSystem
         For lStatIndex As Integer = 1 To pStatistics.Count 'loop for each statistic
             lStr &= (pStatistics(lStatIndex).Name & " =").PadLeft(30)
             Dim l() As Integer = {0, 2, 1, 3, 4} 'gets print order correct
-            For k = 1 To 4
+            For k As Integer = 1 To 4
                 If Not Double.IsNaN(pStats(lStatIndex, l(k), aSite)) Then
                     If lStatIndex = 5 Or lStatIndex = 6 Then 'dont need adjustment for storm peaks or recession rate
                         lConv = 1
@@ -674,93 +645,11 @@ Public Class ExpertSystem
         lStr &= Space(30) & "          EvapoTranspiration" & vbCrLf
         lStr &= Space(30) & "Potential".PadLeft(15) & "Actual".PadLeft(15) & vbCrLf
         lStr &= ("total (inches) = ").PadLeft(30)
-        For k = 5 To 6
+        For k As Integer = 5 To 6
             lStr &= DecimalAlign(pStats(1, k, aSite) / aConv, 15)
         Next k
         lStr &= vbCrLf & vbCrLf
         Return lStr
-    End Function
-
-    Private Sub BoxSort(ByVal aMaxVal As Double, ByVal aMinVal As Double, ByVal aNVALS As Integer, _
-                        ByVal aDat() As Double, ByVal aArlgFg As Integer, _
-                        ByRef aBoxCnt() As Integer, ByRef aBoxSum() As Double)
-        '     Compute statistics needed by the expert system using a box sort algorithm
-
-        '     MaxVal - maximum value in array to be sorted
-        '     MinVal - minimum value in array to be sorted
-        '     pNSteps - number of steps or boxes
-        '     NVals  - number of values to sort
-        '     RDat   - array of values to sort
-        '     ArlgFg - arith/log flag, 1-arith, 2-log
-        '     aBoxCnt - number of values in box
-        '     aBoxSum - sum of values in box
-
-        Dim lBox As Integer
-        Dim lIncrmt As Double, lTmp As Double, lRlgMin As Double, lXtmp As Double
-
-        'set box counts and box sums to zero
-        aBoxCnt.Initialize()
-        aBoxSum.Initialize() 
-
-        'set box boundaries
-        If (aArlgFg = 2) Then 'log of data
-            lRlgMin = Math.Log(aMinVal)
-            lTmp = Math.Log(aMaxVal) - lRlgMin
-        Else 'plain data
-            lRlgMin = aMinVal
-            lTmp = aMaxVal - aMinVal
-        End If
-        lIncrmt = lTmp / pNSteps
-        For lIndex As Integer = 1 To aNVALS
-            'find which box
-            lXtmp = aDat(lIndex) + 0.000001
-            'make sure value in range
-            If (lXtmp < aMinVal) Then
-                'out low
-                lBox = pNSteps
-            ElseIf (lXtmp >= aMaxVal) Then 'out high, put in highest ranking box
-                lBox = 1
-            Else 'it falls in one of the boxes in between
-                If (aArlgFg = 1) Then
-                    lTmp = lXtmp
-                Else
-                    lTmp = Math.Log(lXtmp) - lRlgMin
-                End If
-                lBox = pNSteps - Fix(lTmp / lIncrmt)
-                If (lBox <= 1) Then 'max value case
-                    lBox = 1
-                End If
-            End If
-            'increment count and sum
-            aBoxCnt(lBox) += 1
-            aBoxSum(lBox) += aDat(lIndex)
-        Next lIndex
-    End Sub
-
-    Private Function BoxAdd(ByVal aLimit As Integer, ByVal aBoxCnt() As Integer, _
-                            ByVal aBoxSum() As Double) As Double
-        'Use box sort data to determine the sum of the values greater than any user specified limit.
-
-        '     aLimit  - limit of range of values to sum (number of values to sum)
-        '     aBoxCnt - number of values in box
-        '     aBoxSum - sum of values in box
-        '     returns - sum of values greater than limit
-
-        Dim lIndex As Integer, lTotCnt As Integer
-        Dim lSum As Double
-
-        lSum = 0.0#
-        lTotCnt = 0
-        lIndex = 0
-        Do 'loop through boxes starting with highest
-            lIndex += 1
-            lSum += aBoxSum(lIndex)
-            lTotCnt += aBoxCnt(lIndex)
-        Loop While (lTotCnt < aLimit)
-        'Compensate for inexact number of values by interpolating, subtract
-        'off a proportional amount of the box containing the cut-off value.
-        lSum -= (lTotCnt - aLimit) * aBoxSum(lIndex) / aBoxCnt(lIndex)
-        Return lSum
     End Function
 
     Private Sub ZipR(ByVal aLength As Long, ByVal aZip As Double, ByVal lArray(,,) As Double, _
@@ -994,6 +883,75 @@ Friend Class Statistic
     Public ReadOnly Property Name() As String
         Get
             Return pName
+        End Get
+    End Property
+End Class
+
+Friend Class DatasetTypes
+    Private pDatasetTypes As New atcCollection
+    '1 = simulated total runoff (in)
+    '2 = observed streamflow (cfs)
+    '3 = simulated surface runoff (in)
+    '4 = simulated interflow (in)
+    '5 = simulated base flow (in)
+    '6 = precipitation (in)
+    '7 = potential evapotranspiration (in)
+    '8 = actual evapotranspiration (in)
+    '9 = upper zone storage (in)
+    '10 = lower zone storage (in)
+
+    Public Sub New()
+        'start of stats stored in pStats
+        pDatasetTypes.Add("SimTotRunoff", New DatasetType("Total Runoff", "Simulated", "in"))
+        pDatasetTypes.Add("ObsStreamflow", New DatasetType("Streamflow", "Observed", "cfs"))
+        pDatasetTypes.Add("SimInterflow", New DatasetType("Interflow", "Simulated", "in"))
+        pDatasetTypes.Add("SimBaseflow", New DatasetType("Baseflow", "Simulated", "in"))
+        pDatasetTypes.Add("ObsPotentialET", New DatasetType("Potential Evapotranspriation", "Observed", "in"))
+        pDatasetTypes.Add("SimActualET", New DatasetType("Actual Evapotranspriation", "Simulated", "in"))
+        'end of stats stored in pStats
+        pDatasetTypes.Add("SimSurfaceRunoff", New DatasetType("Surface Runoff", "Simulated", "in"))
+        pDatasetTypes.Add("ObsPrecipitation", New DatasetType("Precipitation", "Observed", "in"))
+        pDatasetTypes.Add("SimUpperZoneStorage", New DatasetType("Upper Zone Storage", "Simulated", "in"))
+        pDatasetTypes.Add("SimLowerZoneStorage", New DatasetType("Lower Zone Storage", "Simulated", "in"))
+    End Sub
+
+    Default Public ReadOnly Property DatasetType(ByVal aIndex As Integer) As DatasetType
+        Get
+            Return pDatasetTypes(aIndex - 1)
+        End Get
+    End Property
+    Public Function IndexFromKey(ByVal aKey As String) As Integer
+        Try
+            Return pDatasetTypes.Keys.IndexOf(aKey)
+        Catch e As Exception
+            Return -1
+        End Try
+    End Function
+End Class
+
+Friend Class DatasetType
+    Dim pName As String
+    Dim pUnits As String
+    Dim pType As String
+
+    Public Sub New(ByVal aName As String, ByVal aType As String, ByVal aUnits As String)
+        pName = aName
+        pType = aType
+        pUnits = aUnits
+    End Sub
+    Public ReadOnly Property Name() As String
+        Get
+            Return pName
+        End Get
+    End Property
+    Public ReadOnly Property Type() As String
+        Get
+            Return pType
+        End Get
+    End Property
+    Public ReadOnly Property Units() As String
+        Get
+            Return pUnits
         End Get
     End Property
 End Class

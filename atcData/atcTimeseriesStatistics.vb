@@ -113,6 +113,22 @@ Public Class atcTimeseriesStatistics
                 AddOperation("%95", "95th percentile value", defTimeSeriesOne, lCategory)
                 AddOperation("%98", "98th percentile value", defTimeSeriesOne, lCategory)
                 AddOperation("%99", "99th percentile value", defTimeSeriesOne, lCategory)
+
+                Dim lBinsDefinition As atcAttributeDefinition = atcDataAttributes.AllDefinitions.ItemByKey("bins")
+                If lBinsDefinition Is Nothing Then
+                    lBinsDefinition = New atcAttributeDefinition
+                    With lBinsDefinition
+                        .Name = "Bins"
+                        .Category = "Statistics"
+                        .Description = "Values sorted into a collection of bins"
+                        .DefaultValue = Nothing
+                        .Editable = False
+                        .TypeString = "atcCollection"
+                        .Calculator = Me
+                    End With
+                    atcDataAttributes.AllDefinitions.Add(lBinsDefinition.Name.ToLower, lBinsDefinition)
+                End If
+
             End If
             Return pAvailableOperations
         End Get
@@ -297,20 +313,6 @@ Public Class atcTimeseriesStatistics
                 If aOperationName.StartsWith("%") Then
                     Dim lPercentString As String = aOperationName.Substring(1)
                     If IsNumeric(lPercentString) Then
-                        Dim lBinsDefinition As atcAttributeDefinition = atcDataAttributes.AllDefinitions.ItemByKey("bins")
-                        If lBinsDefinition Is Nothing Then
-                            lBinsDefinition = New atcAttributeDefinition
-                            With lBinsDefinition
-                                .Name = "Bins"
-                                .Category = "Statistics"
-                                .Description = "Values sorted into a collection of bins"
-                                .DefaultValue = Nothing
-                                .Editable = False
-                                .TypeString = "atcCollection"
-                                .Calculator = Me
-                            End With
-                            atcDataAttributes.AllDefinitions.Add(lBinsDefinition.Name.ToLower, lBinsDefinition)
-                        End If
                         ComputePercentile(lts, CDbl(lPercentString))
                     End If
                 Else

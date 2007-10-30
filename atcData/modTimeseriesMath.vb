@@ -872,7 +872,7 @@ Public Module modTimeseriesMath
                 Dim lBinIndex As Integer = -1
                 Dim lPercentileIndex As Integer = aPercentile * lNumValues / 100.0 - 1
                 If lPercentileIndex < 0 Then lPercentileIndex = 0
-                If lPercentileIndex >= aTimeseries.numValues Then lPercentileIndex = lNumValues - 1
+                If lPercentileIndex >= lNumValues Then lPercentileIndex = lNumValues - 1
                 While lNextAccumulatedCount <= lPercentileIndex
                     lAccumulatedCount = lNextAccumulatedCount
                     lBinIndex += 1
