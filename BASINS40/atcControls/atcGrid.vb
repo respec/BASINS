@@ -506,11 +506,11 @@ Public Class atcGrid
                     lColumnWidth = ColumnWidth(lColumn)
                     x += lColumnWidth
                     If Not HScroller.Visible OrElse x > HScroller.Minimum OrElse lColumn < lFixedColumns Then
+                        lx = x
                         If HScroller.Visible AndAlso lColumn >= lFixedColumns Then
-                            lx = x + HScroller.Minimum - HScroller.Value
-                        Else
-                            lx = x
+                            lx += HScroller.Minimum - HScroller.Value
                         End If
+
                         If Not AllowHorizontalScrolling AndAlso lx < pVisibleWidth Then
                             'See if this is the last non-hidden column to expand to fit the available width
                             Dim lScanHiddenColumns As Integer = lColumn + 1
@@ -518,18 +518,18 @@ Public Class atcGrid
                                 lScanHiddenColumns += 1
                             End While
                             If lScanHiddenColumns = lColumns Then 'Any columns right of this one are hidden
-                                'ColumnWidth(lColumn) += pVisibleWidth - x 'Expand this one
                                 lx = pVisibleWidth
                             End If
                         End If
-                        'Debug.Print("Column Line (" & lColumn & ") " & x & " -> " & lx)
+
                         If lx >= 0 Then
                             g.DrawLine(lLinePen, lx, 0, lx, visibleHeight)
                             pColumnRight.Add(lColumn, lx)
                         End If
-                        If lx > Me.Width Then Exit For
+                        If lx >= pVisibleWidth Then
+                            Exit For
+                        End If
                     End If
-                    'End If
                 Next
 
                 SizeScrollers()
@@ -773,26 +773,26 @@ Public Class atcGrid
         Dim lX As Integer = 0
         Dim lY As Integer = 0
         Dim lWidth As Integer = 0
-        Dim lFixedRows As Integer = pSource.FixedRows
-        Dim lFixedColumns As Integer = pSource.FixedColumns
 
-        For lRow As Integer = 0 To aRow - 1
-            If lRow < lFixedRows OrElse lRow >= pTopRow Then
-                lY += RowHeight(lRow)
-            ElseIf lRow < pTopRow - 1 Then 'skip rows we can't see
-                lRow = pTopRow - 1
+        If pColumnRight.Keys.Contains(aColumn) Then
+            Dim lFixedRows As Integer = pSource.FixedRows
+            Dim lFixedColumns As Integer = pSource.FixedColumns
+
+            For lRow As Integer = 0 To aRow - 1
+                If lRow < lFixedRows OrElse lRow >= pTopRow Then
+                    lY += RowHeight(lRow)
+                ElseIf lRow < pTopRow - 1 Then 'skip rows we can't see
+                    lRow = pTopRow - 1
+                End If
+            Next
+
+            If pColumnRight.Keys.Contains(aColumn - 1) Then
+                lX = pColumnRight.ItemByKey(aColumn - 1)
             End If
-        Next
 
-        If aColumn = 0 Then
-            lX = 0
-        Else
-            lX = pColumnRight(aColumn - 1)
+            lWidth = pColumnRight.ItemByKey(aColumn) - lX
+            If lWidth < 0 Then lWidth = 0
         End If
-
-        lWidth = pColumnRight(aColumn) - lX
-        If lWidth < 0 Then lWidth = 0
-
         Return New Rectangle(lX, lY, lWidth, RowHeight(aRow))
     End Function
 
