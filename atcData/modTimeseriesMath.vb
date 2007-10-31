@@ -862,9 +862,6 @@ Public Module modTimeseriesMath
                 aTimeseries.Attributes.SetValue(lAttrName, aTimeseries.Value(0))
             Case Else
                 Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
-                Dim lPercentiles() As Double = {50, 90, 100, 101}
-                Dim lPercentileSums() As Double = {0, 0, 0, 0}
-                Dim lPercentileIndex As Double = 0
                 Dim lCountPercentileDone As Integer = aPercentile * lNumValues / 100.0 - 1
                 If lCountPercentileDone < 0 Then lCountPercentileDone = 0
                 If lCountPercentileDone >= lNumValues Then lCountPercentileDone = lNumValues - 1
@@ -891,7 +888,7 @@ Finished:
             Case Is < 1
                 'Can't compute with no values
             Case 1
-                aTimeseries.Attributes.SetValue("%" & Format(aPercentile, "00.####"), aTimeseries.Value(0))
+                aTimeseries.Attributes.SetValue(lAttrName, aTimeseries.Value(0))
             Case Else
                 Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
                 'TODO: could interpolate between closest two values rather than choosing closest one, should we?

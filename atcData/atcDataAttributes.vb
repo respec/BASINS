@@ -60,9 +60,8 @@ Public Class atcDataAttributes
             ElseIf lKey.Contains("high") Then
                 lDef = pAllDefinitions.ItemByKey("n-day high value")
             End If
-            If Not lDef Is Nothing Then 'Found a generic definition
-                lDef = lDef.Clone       'Make a specific definition
-                lDef.Name = aAttributeName
+            If Not lDef Is Nothing Then           'Found a generic definition
+                lDef = lDef.Clone(aAttributeName) 'Make a specific definition
             End If
         End If
         Return lDef
@@ -211,8 +210,7 @@ Public Class atcDataAttributes
 
     'Set attribute with name aAttributeName to value aValue
     Public Shadows Function Add(ByVal aAttributeName As String, ByVal aAttributeValue As Object) As Integer
-        Dim lTmpAttrDef As New atcAttributeDefinition
-        lTmpAttrDef = pAllDefinitions.ItemByKey(AttributeNameToKey(aAttributeName))
+        Dim lTmpAttrDef As atcAttributeDefinition = GetDefinition(aAttributeName)
         If lTmpAttrDef Is Nothing Then
             lTmpAttrDef = New atcAttributeDefinition
             lTmpAttrDef.Name = aAttributeName
