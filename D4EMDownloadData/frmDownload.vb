@@ -10,6 +10,9 @@ Public Class frmDownload
     Public Function AskUser(ByVal aMapWin As MapWindow.Interfaces.IMapWin) As String
         pMapWin = aMapWin
 
+        'The following line hot-wires the form to just do met data download
+        'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0: Return Me.XML
+
         Dim lHucIndex As Integer = HUC8Index()
         If lHucIndex >= 0 Then
             Dim lHUC8s As ArrayList = HUC8s()
@@ -30,7 +33,6 @@ Public Class frmDownload
             chkMerge.Checked = True
         End If
 
-        'chkBASINS_Met.Checked = True
         Me.ShowDialog()
         If pOk Then
             Return Me.XML
@@ -71,7 +73,9 @@ Public Class frmDownload
         Get
             Dim lXML As String = ""
             Dim lDesiredProjection As String = ""
-            Dim lRegion As String = Me.SelectedRegion.XML
+            Dim lRegionXML As String = ""
+            Dim lRegion As D4EMDataManager.Region = Me.SelectedRegion
+            If Not lRegion Is Nothing Then lRegionXML = lRegion.XML
 
             Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
             If lCacheFolder.Length = 0 Then
@@ -81,10 +85,10 @@ Public Class frmDownload
 
             Dim lSaveFolder As String = ""
             If Not pMapWin.Project Is Nothing Then
-                If pMapWin.Project.ProjectProjection.Length > 0 Then
+                If Not pMapWin.Project.ProjectProjection Is Nothing AndAlso pMapWin.Project.ProjectProjection.Length > 0 Then
                     lDesiredProjection = "<DesiredProjection>" & pMapWin.Project.ProjectProjection & "</DesiredProjection>" & vbCrLf
                 End If
-                If pMapWin.Project.FileName.Length > 0 Then
+                If Not pMapWin.Project.FileName Is Nothing AndAlso pMapWin.Project.FileName.Length > 0 Then
                     lSaveFolder &= "<SaveIn>" & IO.Path.GetDirectoryName(pMapWin.Project.FileName) & "</SaveIn>" & vbCrLf
                 End If
             End If
@@ -94,7 +98,22 @@ Public Class frmDownload
                     Dim lCheckedChildren As String = ""
                     For Each lChild As Windows.Forms.CheckBox In lControl.Controls
                         If lChild.Checked Then
-                            lCheckedChildren &= "<DataType>" & lChild.Name.Substring(lControl.Name.Length + 1) & "</DataType>" & vbCrLf
+                            Dim lChildName As String = lChild.Name.Substring(lControl.Name.Length + 1)
+                            If lChildName.ToLower.StartsWith("get") Then
+                                'this checkbox has its own function name
+                                lXML &= "<function name='" & lChildName & "'>" & vbCrLf _
+                                     & "<arguments>" & vbCrLf _
+                                     & lSaveFolder _
+                                     & lCacheFolder _
+                                     & lDesiredProjection _
+                                     & lRegionXML _
+                                     & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
+                                     & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
+                                     & "</arguments>" & vbCrLf _
+                                     & "</function>" & vbCrLf
+                            Else 'This checkbox adds a data type to the parent function
+                                lCheckedChildren &= "<DataType>" & lChildName & "</DataType>" & vbCrLf
+                            End If
                         End If
                     Next
                     If lCheckedChildren.Length > 0 Then
@@ -104,7 +123,7 @@ Public Class frmDownload
                              & lSaveFolder _
                              & lCacheFolder _
                              & lDesiredProjection _
-                             & lRegion _
+                             & lRegionXML _
                              & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                              & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                              & "<joinattributes>true</joinattributes>" & vbCrLf _

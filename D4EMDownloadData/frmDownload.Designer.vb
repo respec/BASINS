@@ -36,8 +36,8 @@ Partial Class frmDownload
         Me.chkBASINS_Census = New System.Windows.Forms.CheckBox
         Me.grpNWIS = New System.Windows.Forms.GroupBox
         Me.chkNWIS_Measurements = New System.Windows.Forms.CheckBox
-        Me.chkNWIS_WQ = New System.Windows.Forms.CheckBox
-        Me.chkNWIS_DailyFlow = New System.Windows.Forms.CheckBox
+        Me.chkNWIS_GetNWISStations = New System.Windows.Forms.CheckBox
+        Me.chkNWIS_GetNWISDischarge = New System.Windows.Forms.CheckBox
         Me.chkTerraServerWebService_Urban = New System.Windows.Forms.CheckBox
         Me.grpTerraServerWebService = New System.Windows.Forms.GroupBox
         Me.chkTerraServerWebService_DRG = New System.Windows.Forms.CheckBox
@@ -177,8 +177,8 @@ Partial Class frmDownload
         Me.grpNWIS.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_Measurements)
-        Me.grpNWIS.Controls.Add(Me.chkNWIS_WQ)
-        Me.grpNWIS.Controls.Add(Me.chkNWIS_DailyFlow)
+        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISStations)
+        Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDischarge)
         Me.grpNWIS.Location = New System.Drawing.Point(12, 106)
         Me.grpNWIS.Name = "grpNWIS"
         Me.grpNWIS.Size = New System.Drawing.Size(351, 42)
@@ -195,26 +195,27 @@ Partial Class frmDownload
         Me.chkNWIS_Measurements.TabIndex = 11
         Me.chkNWIS_Measurements.Text = "Flow Measurements"
         Me.chkNWIS_Measurements.UseVisualStyleBackColor = True
+        Me.chkNWIS_Measurements.Visible = False
         '
-        'chkNWIS_WQ
+        'chkNWIS_GetNWISStations
         '
-        Me.chkNWIS_WQ.AutoSize = True
-        Me.chkNWIS_WQ.Location = New System.Drawing.Point(112, 19)
-        Me.chkNWIS_WQ.Name = "chkNWIS_WQ"
-        Me.chkNWIS_WQ.Size = New System.Drawing.Size(90, 17)
-        Me.chkNWIS_WQ.TabIndex = 10
-        Me.chkNWIS_WQ.Text = "Water Quality"
-        Me.chkNWIS_WQ.UseVisualStyleBackColor = True
+        Me.chkNWIS_GetNWISStations.AutoSize = True
+        Me.chkNWIS_GetNWISStations.Location = New System.Drawing.Point(6, 19)
+        Me.chkNWIS_GetNWISStations.Name = "chkNWIS_GetNWISStations"
+        Me.chkNWIS_GetNWISStations.Size = New System.Drawing.Size(64, 17)
+        Me.chkNWIS_GetNWISStations.TabIndex = 10
+        Me.chkNWIS_GetNWISStations.Text = "Stations"
+        Me.chkNWIS_GetNWISStations.UseVisualStyleBackColor = True
         '
-        'chkNWIS_DailyFlow
+        'chkNWIS_GetNWISDischarge
         '
-        Me.chkNWIS_DailyFlow.AutoSize = True
-        Me.chkNWIS_DailyFlow.Location = New System.Drawing.Point(6, 19)
-        Me.chkNWIS_DailyFlow.Name = "chkNWIS_DailyFlow"
-        Me.chkNWIS_DailyFlow.Size = New System.Drawing.Size(100, 17)
-        Me.chkNWIS_DailyFlow.TabIndex = 9
-        Me.chkNWIS_DailyFlow.Text = "Daily Discharge"
-        Me.chkNWIS_DailyFlow.UseVisualStyleBackColor = True
+        Me.chkNWIS_GetNWISDischarge.AutoSize = True
+        Me.chkNWIS_GetNWISDischarge.Location = New System.Drawing.Point(112, 19)
+        Me.chkNWIS_GetNWISDischarge.Name = "chkNWIS_GetNWISDischarge"
+        Me.chkNWIS_GetNWISDischarge.Size = New System.Drawing.Size(100, 17)
+        Me.chkNWIS_GetNWISDischarge.TabIndex = 9
+        Me.chkNWIS_GetNWISDischarge.Text = "Daily Discharge"
+        Me.chkNWIS_GetNWISDischarge.UseVisualStyleBackColor = True
         '
         'chkTerraServerWebService_Urban
         '
@@ -430,8 +431,8 @@ Partial Class frmDownload
     Friend WithEvents chkBASINS_DEM As System.Windows.Forms.CheckBox
     Friend WithEvents chkBASINS_Met As System.Windows.Forms.CheckBox
     Friend WithEvents chkNWIS_Measurements As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNWIS_WQ As System.Windows.Forms.CheckBox
-    Friend WithEvents chkNWIS_DailyFlow As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNWIS_GetNWISStations As System.Windows.Forms.CheckBox
+    Friend WithEvents chkNWIS_GetNWISDischarge As System.Windows.Forms.CheckBox
     Friend WithEvents chkTerraServerWebService_Urban As System.Windows.Forms.CheckBox
     Friend WithEvents grpTerraServerWebService As System.Windows.Forms.GroupBox
     Friend WithEvents chkTerraServerWebService_DRG As System.Windows.Forms.CheckBox
