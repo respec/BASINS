@@ -40,15 +40,32 @@ Public Class atcDataAttributes
     End Function
 
     Public Shared Sub AddDefinition(ByVal aDefinition As atcAttributeDefinition)
-        Dim key As String = AttributeNameToKey((aDefinition.Name))
-        If Not pAllDefinitions.Keys.Contains(key) Then
-            pAllDefinitions.Add(key, aDefinition)
+        Dim lKey As String = AttributeNameToKey((aDefinition.Name))
+        If Not pAllDefinitions.Keys.Contains(lKey) Then
+            pAllDefinitions.Add(lKey, aDefinition)
         End If
     End Sub
 
     'Retrieve the atcAttributeDefinition for aAttributeName
     Public Shared Function GetDefinition(ByVal aAttributeName As String) As atcAttributeDefinition
-        Return pAllDefinitions.ItemByKey(AttributeNameToKey(aAttributeName))
+        Dim lKey As String = AttributeNameToKey(aAttributeName)
+        Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(AttributeNameToKey(aAttributeName))
+        If lDef Is Nothing Then
+            If lKey.StartsWith("%sum") Then
+                lDef = pAllDefinitions.ItemByKey("%sum*")
+            ElseIf lKey.StartsWith("%") Then
+                lDef = pAllDefinitions.ItemByKey("%*")
+            ElseIf lKey.Contains("low") Then
+                lDef = pAllDefinitions.ItemByKey("n-day low value")
+            ElseIf lKey.Contains("high") Then
+                lDef = pAllDefinitions.ItemByKey("n-day high value")
+            End If
+            If Not lDef Is Nothing Then 'Found a generic definition
+                lDef = lDef.Clone       'Make a specific definition
+                lDef.Name = aAttributeName
+            End If
+        End If
+        Return lDef
     End Function
 
     'Returns collection of all known atcAttributeDefinition objects
@@ -337,16 +354,7 @@ Public Class atcDataAttributes
         If lAttribute Is Nothing Then  'Did not find the named attribute
             If Not Owner Is Nothing Then   'Need an owner to calculate an attribute
                 Try
-                    Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
-                    If lDef Is Nothing Then
-                        If lKey.StartsWith("%") Then 'Try to find with wildcard
-                            lDef = pAllDefinitions.ItemByKey("%*")
-                        ElseIf lKey.Contains("low") Then
-                            lDef = pAllDefinitions.ItemByKey("n-day low value")
-                        ElseIf lKey.Contains("high") Then
-                            lDef = pAllDefinitions.ItemByKey("n-day high value")
-                        End If
-                    End If
+                    Dim lDef As atcAttributeDefinition = GetDefinition(aAttributeName)
                     If Not lDef Is Nothing Then
                         Dim lOperation As atcDefinedValue = Nothing
                         If lDef.Calculated Then

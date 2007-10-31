@@ -852,7 +852,40 @@ Public Module modTimeseriesMath
         End If
     End Function
 
+    Public Sub ComputePercentileSum(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
+        Dim lAttrName As String = "%sum" & Format(aPercentile, "00.####")
+        Dim lNumValues As Integer = aTimeseries.numValues
+        Select Case lNumValues
+            Case Is < 1
+                'Can't compute with no values
+            Case 1
+                aTimeseries.Attributes.SetValue(lAttrName, aTimeseries.Value(0))
+            Case Else
+                Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
+                Dim lPercentiles() As Double = {50, 90, 100, 101}
+                Dim lPercentileSums() As Double = {0, 0, 0, 0}
+                Dim lPercentileIndex As Double = 0
+                Dim lCountPercentileDone As Integer = aPercentile * lNumValues / 100.0 - 1
+                If lCountPercentileDone < 0 Then lCountPercentileDone = 0
+                If lCountPercentileDone >= lNumValues Then lCountPercentileDone = lNumValues - 1
+
+                Dim lSum As Double = 0
+                Dim lCount As Integer = 0
+                For Each lBin As ArrayList In lBins
+                    For Each lValue As Double In lBin
+                        If lCount >= lCountPercentileDone Then GoTo Finished
+                        lCount += 1
+                        lSum += lValue
+                    Next
+                Next
+Finished:
+                aTimeseries.Attributes.SetValue(lAttrName, lSum)
+        End Select
+
+    End Sub
+
     Public Sub ComputePercentile(ByVal aTimeseries As atcTimeseries, ByVal aPercentile As Double)
+        Dim lAttrName As String = "%" & Format(aPercentile, "00.####")
         Dim lNumValues As Integer = aTimeseries.numValues
         Select Case lNumValues
             Case Is < 1
@@ -861,11 +894,6 @@ Public Module modTimeseriesMath
                 aTimeseries.Attributes.SetValue("%" & Format(aPercentile, "00.####"), aTimeseries.Value(0))
             Case Else
                 Dim lBins As atcCollection = aTimeseries.Attributes.GetValue("Bins")
-                If lBins Is Nothing Then
-                    lBins = MakeBins(aTimeseries)
-                    aTimeseries.Attributes.SetValue("Bins", lBins)
-                End If
-
                 'TODO: could interpolate between closest two values rather than choosing closest one, should we?
                 Dim lAccumulatedCount As Integer = 0
                 Dim lNextAccumulatedCount As Integer = 0
@@ -879,7 +907,7 @@ Public Module modTimeseriesMath
                     lNextAccumulatedCount = lAccumulatedCount + lBins(lBinIndex).Count
                 End While
                 Dim lBin As ArrayList = lBins(lBinIndex)
-                aTimeseries.Attributes.SetValue("%" & Format(aPercentile, "00.####"), lBin.Item(lPercentileIndex - lAccumulatedCount))
+                aTimeseries.Attributes.SetValue(lAttrName, lBin.Item(lPercentileIndex - lAccumulatedCount))
         End Select
     End Sub
 End Module

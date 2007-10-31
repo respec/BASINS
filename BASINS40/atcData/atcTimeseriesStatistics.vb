@@ -96,23 +96,27 @@ Public Class atcTimeseriesStatistics
 
                 lCategory = "Percentile"
                 AddOperation("%*", "percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%01", "1st percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%02", "2nd percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%05", "5th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%10", "10th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%20", "20th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%25", "25th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%30", "30th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%40", "40th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%50", "50th percentile value (Median)", defTimeSeriesOne, lCategory)
-                AddOperation("%60", "60th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%70", "70th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%75", "75th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%80", "80th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%90", "90th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%95", "95th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%98", "98th percentile value", defTimeSeriesOne, lCategory)
-                AddOperation("%99", "99th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%01", "1st percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%02", "2nd percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%05", "5th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%10", "10th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%20", "20th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%25", "25th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%30", "30th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%40", "40th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%50", "50th percentile value (Median)", defTimeSeriesOne, lCategory)
+                'AddOperation("%60", "60th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%70", "70th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%75", "75th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%80", "80th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%90", "90th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%95", "95th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%98", "98th percentile value", defTimeSeriesOne, lCategory)
+                'AddOperation("%99", "99th percentile value", defTimeSeriesOne, lCategory)
+
+                AddOperation("%sum*", "percentile sum", defTimeSeriesOne, lCategory)
+
+                AddOperation("bins", "Values in sorted bins", defTimeSeriesOne, lCategory)
 
                 Dim lBinsDefinition As atcAttributeDefinition = atcDataAttributes.AllDefinitions.ItemByKey("bins")
                 If lBinsDefinition Is Nothing Then
@@ -310,11 +314,15 @@ Public Class atcTimeseriesStatistics
         End If
         If Not ltsGroup Is Nothing Then
             For Each lts As atcTimeseries In ltsGroup
-                If aOperationName.StartsWith("%") Then
+                If aOperationName.ToLower.StartsWith("%sum") AndAlso IsNumeric(aOperationName.Substring(4)) Then
+                    ComputePercentileSum(lts, CDbl(aOperationName.Substring(4)))
+                ElseIf aOperationName.StartsWith("%") Then
                     Dim lPercentString As String = aOperationName.Substring(1)
                     If IsNumeric(lPercentString) Then
                         ComputePercentile(lts, CDbl(lPercentString))
                     End If
+                ElseIf aOperationName.ToLower.Equals("bins") Then
+                    lts.Attributes.SetValue("Bins", MakeBins(lts))
                 Else
                     ComputeStatistics(lts)
                 End If
