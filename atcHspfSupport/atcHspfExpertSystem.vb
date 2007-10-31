@@ -160,126 +160,130 @@ Public Class ExpertSystem
     End Property
 
     Private Sub ReadEXSFile(ByVal aFilename As String)
-        Dim lExsFileString As String = WholeFileString(aFilename)
-        Dim lExsRecords() As String = lExsFileString.Split(vbLf)
+        If Not FileExists(aFilename) Then
+            Throw New ApplicationException("ExpertSystemFile " & aFilename & " not found")
+        Else
+            Dim lExsFileString As String = WholeFileString(aFilename)
+            Dim lExsRecords() As String = lExsFileString.Split(vbLf)
 
-        'Read first line of file
-        Dim lExsRecord As String = lExsRecords(0)
-        pname = lExsRecord.Substring(0, 8)
-        Dim lNSites As Integer = lExsRecord.Substring(8, 5)
-        Dim lCurSite As Integer = lExsRecord.Substring(14, 5)
-        pLatMin = lExsRecord.Substring(19, 8)
-        pLatMax = lExsRecord.Substring(27, 8)
-        pLngMin = lExsRecord.Substring(35, 8)
-        pLngMax = lExsRecord.Substring(43, 8)
+            'Read first line of file
+            Dim lExsRecord As String = lExsRecords(0)
+            pName = lExsRecord.Substring(0, 8)
+            Dim lNSites As Integer = lExsRecord.Substring(8, 5)
+            Dim lCurSite As Integer = lExsRecord.Substring(14, 5)
+            pLatMin = lExsRecord.Substring(19, 8)
+            pLatMax = lExsRecord.Substring(27, 8)
+            pLngMin = lExsRecord.Substring(35, 8)
+            pLngMax = lExsRecord.Substring(43, 8)
 
-        'Default unspecified lat/integer min/max values to contiguous 48 states
-        If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
-            pLatMin = 24
-        End If
-        If ((pLatMax < 0.01) And (pLatMax > -0.01)) Then
-            pLatMax = 50
-        End If
-        If ((pLngMin < 0.01) And (pLngMin > -0.01)) Then
-            pLngMin = 66
-        End If
-        If ((pLngMax < 0.01) And (pLngMax > -0.01)) Then
-            pLngMax = 125
-        End If
+            'Default unspecified lat/integer min/max values to contiguous 48 states
+            If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
+                pLatMin = 24
+            End If
+            If ((pLatMax < 0.01) And (pLatMax > -0.01)) Then
+                pLatMax = 50
+            End If
+            If ((pLngMin < 0.01) And (pLngMin > -0.01)) Then
+                pLngMin = 66
+            End If
+            If ((pLngMax < 0.01) And (pLngMax > -0.01)) Then
+                pLngMax = 125
+            End If
 
-        'Read Site block
-        For lSiteIndex As Integer = 1 To lNSites
-            lExsRecord = lExsRecords(lSiteIndex)
-            Dim lDsn(9) As Integer
-            For lConsIndex As Integer = 0 To 9
-                lDsn(lConsIndex) = lExsRecord.Substring(lConsIndex * 4, 4)
-            Next lConsIndex
-            Dim lStatDN As Integer = lExsRecord.Substring(42, 2)  '0 or 1
-            Dim lName As String = lExsRecord.Substring(45).Replace(vbCr, "").Trim
-            Dim lSite As New Site(Me, lName, lStatDN, lDsn)
-            pSites.Add(lSite)
-        Next lSiteIndex
+            'Read Site block
+            For lSiteIndex As Integer = 1 To lNSites
+                lExsRecord = lExsRecords(lSiteIndex)
+                Dim lDsn(9) As Integer
+                For lConsIndex As Integer = 0 To 9
+                    lDsn(lConsIndex) = lExsRecord.Substring(lConsIndex * 4, 4)
+                Next lConsIndex
+                Dim lStatDN As Integer = lExsRecord.Substring(42, 2)  '0 or 1
+                Dim lName As String = lExsRecord.Substring(45).Replace(vbCr, "").Trim
+                Dim lSite As New Site(Me, lName, lStatDN, lDsn)
+                pSites.Add(lSite)
+            Next lSiteIndex
 
-        Dim lRecordIndex As Integer = lNSites + 1
-        'Read number of storms
-        Dim lNStorms As Integer = lExsRecords(lRecordIndex).Substring(0, 4)
+            Dim lRecordIndex As Integer = lNSites + 1
+            'Read number of storms
+            Dim lNStorms As Integer = lExsRecords(lRecordIndex).Substring(0, 4)
 
-        'Read storm end/start dates
-        Dim lStormSDate(5) As Integer
-        Dim lStormEDate(5) As Integer
-        For lStormIndex As Integer = 1 To lNStorms
-            lExsRecord = lExsRecords(lRecordIndex + lStormIndex)
-            lStormSDate(0) = lExsRecord.Substring(0, 5) 'Left(textLine, 5)
-            lStormEDate(0) = lExsRecord.Substring(21, 5) 'Mid(textLine, 21, 5)
-            For lTimeIndex As Integer = 0 To 4
-                lStormSDate(lTimeIndex + 1) = lExsRecord.Substring(6 + 3 * lTimeIndex, 3)
-                lStormEDate(lTimeIndex + 1) = lExsRecord.Substring(26 + 3 * lTimeIndex, 3)
-            Next lTimeIndex
-            'Get the starting and ending storm dates in a 1-D Julian array
-            Dim lStorm As New Storm(lStormSDate, lStormEDate)
-            pStorms.Add(lStorm)
-        Next lStormIndex
+            'Read storm end/start dates
+            Dim lStormSDate(5) As Integer
+            Dim lStormEDate(5) As Integer
+            For lStormIndex As Integer = 1 To lNStorms
+                lExsRecord = lExsRecords(lRecordIndex + lStormIndex)
+                lStormSDate(0) = lExsRecord.Substring(0, 5) 'Left(textLine, 5)
+                lStormEDate(0) = lExsRecord.Substring(21, 5) 'Mid(textLine, 21, 5)
+                For lTimeIndex As Integer = 0 To 4
+                    lStormSDate(lTimeIndex + 1) = lExsRecord.Substring(6 + 3 * lTimeIndex, 3)
+                    lStormEDate(lTimeIndex + 1) = lExsRecord.Substring(26 + 3 * lTimeIndex, 3)
+                Next lTimeIndex
+                'Get the starting and ending storm dates in a 1-D Julian array
+                Dim lStorm As New Storm(lStormSDate, lStormEDate)
+                pStorms.Add(lStorm)
+            Next lStormIndex
 
-        'Read basin area (acres)
-        lRecordIndex += lNStorms + 1
-        lExsRecord = lExsRecords(lRecordIndex)
-        For lSiteIndex As Integer = 1 To lNSites
-            pSites(lSiteIndex).Area = lExsRecord.Substring(((lSiteIndex - 1) * 8), 8)
-        Next lSiteIndex
+            'Read basin area (acres)
+            lRecordIndex += lNStorms + 1
+            lExsRecord = lExsRecords(lRecordIndex)
+            For lSiteIndex As Integer = 1 To lNSites
+                pSites(lSiteIndex).Area = lExsRecord.Substring(((lSiteIndex - 1) * 8), 8)
+            Next lSiteIndex
 
-        'Read error terms
-        lRecordIndex += 1 'lNSites
-        lExsRecord = lExsRecords(lRecordIndex)
-        lRecordIndex += 1
-        For lErrorIndex As Integer = 1 To 10
-            pErrorCriteria(lErrorIndex).Value = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
-        Next lErrorIndex
-        pErrorCriteria(11).Value = 15  'storm peak criteria not kept in EXS file
-        If (pErrorCriteria(10).Value < 0.000001 And pErrorCriteria(10).Value > -0.000001) Then
-            'percent of time in baseflow read in as zero, change to 30
-            pErrorCriteria(10).Value = 30.0#
-        End If
-
-        'Read latest hspf output
-        ReDim pHSPFOutput1(8, pSites.Count)
-        ReDim pHSPFOutput2(8, pSites.Count)
-        ReDim pHSPFOutput3(6, pSites.Count)
-        For lSiteIndex As Integer = 0 To pSites.Count - 1
+            'Read error terms
+            lRecordIndex += 1 'lNSites
             lExsRecord = lExsRecords(lRecordIndex)
             lRecordIndex += 1
-            For lIndex As Integer = 0 To 7
-                pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-            Next lIndex
-            lExsRecord = lExsRecords(lRecordIndex)
-            lRecordIndex += 1
-            For lIndex As Integer = 0 To 7
-                pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-            Next lIndex
-            lExsRecord = lExsRecords(lRecordIndex)
-            lRecordIndex += 1
-            For lIndex As Integer = 0 To 5
-                pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
-            Next lIndex
-        Next lSiteIndex
+            For lErrorIndex As Integer = 1 To 10
+                pErrorCriteria(lErrorIndex).Value = lExsRecord.Substring((lErrorIndex - 1) * 8, 8)
+            Next lErrorIndex
+            pErrorCriteria(11).Value = 15  'storm peak criteria not kept in EXS file
+            If (pErrorCriteria(10).Value < 0.000001 And pErrorCriteria(10).Value > -0.000001) Then
+                'percent of time in baseflow read in as zero, change to 30
+                pErrorCriteria(10).Value = 30.0#
+            End If
 
-        'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
-        lExsRecord = lExsRecords(lRecordIndex)
-        For lIndex As Integer = 0 To 19
-            pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
-        Next lIndex
-        lRecordIndex += 1
-        lExsRecord = lExsRecords(lRecordIndex)
-        For lIndex As Integer = 20 To 22
-            pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
-        Next lIndex
-        '  'Change subjective data based on other data
-        '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
-        '    'Simulated storm runoff volumes higher than obs
-        '    SISROV = 1
-        '  ElseIf (SISTVO(CURSIT) < OBSTVO(CURSIT)) Then
-        '    'Simulated storm runoff volumes lower than obs
-        '    SISROV = 0
-        '  End If
+            'Read latest hspf output
+            ReDim pHSPFOutput1(8, pSites.Count)
+            ReDim pHSPFOutput2(8, pSites.Count)
+            ReDim pHSPFOutput3(6, pSites.Count)
+            For lSiteIndex As Integer = 0 To pSites.Count - 1
+                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                lRecordIndex += 1
+                For lIndex As Integer = 0 To 7
+                    pHSPFOutput1(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                Next lIndex
+                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                lRecordIndex += 1
+                For lIndex As Integer = 0 To 7
+                    pHSPFOutput2(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                Next lIndex
+                lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+                lRecordIndex += 1
+                For lIndex As Integer = 0 To 5
+                    pHSPFOutput3(lIndex + 1, lSiteIndex) = lExsRecord.Substring(8 * lIndex, 8)
+                Next lIndex
+            Next lSiteIndex
+
+            'Flags for ancillary data (1=yes, 0=no, -1=unknown, -2=undefined)
+            lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+            For lIndex As Integer = 0 To 19
+                pSubjectiveData(lIndex + 1) = lExsRecord.Substring(lIndex * 4, 4)
+            Next lIndex
+            lRecordIndex += 1
+            lExsRecord = lExsRecords(lRecordIndex).PadRight(80)
+            For lIndex As Integer = 20 To 22
+                pSubjectiveData(lIndex + 1) = lExsRecord.Substring((lIndex - 20) * 4, 4)
+            Next lIndex
+            '  'Change subjective data based on other data
+            '  If (SISTVO(CURSIT) > OBSTVO(CURSIT)) Then
+            '    'Simulated storm runoff volumes higher than obs
+            '    SISROV = 1
+            '  ElseIf (SISTVO(CURSIT) < OBSTVO(CURSIT)) Then
+            '    'Simulated storm runoff volumes lower than obs
+            '    SISROV = 0
+            '  End If
+        End If
     End Sub
 
     Private Sub CalcStats(ByVal aDataSource As atcDataSource)
@@ -344,47 +348,15 @@ Public Class ExpertSystem
                     pStats(1, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetDefinedValue("Sum").Value
                     'others?
                     If (lStatGroup = 1 Or lStatGroup = 2) Then  'full range of pStats desired
-                        Dim lBins As atcCollection = lDailyTSer.Attributes.GetValue("Bins")
-                        If lBins Is Nothing Then
-                            lBins = MakeBins(lDailyTSer)
-                            lDailyTSer.Attributes.SetValue("Bins", lBins)
-                        End If
-
-                        Dim lNumValues As Integer = lDailyTSer.numValues
-                        Dim lPercentiles() As Double = {50, 90, 100, 101}
-                        Dim lPercentileSums() As Double = {0, 0, 0, 0}
-                        Dim lPercentileIndex As Double = 0
-                        Dim lCountPercentileDone As Integer = -1
-
-                        Dim lSum As Double = 0
-                        Dim lCount As Integer = 0
-                        For Each lBin As ArrayList In lBins
-                            For Each lValue As Double In lBin
-                                lCount += 1
-                                lSum += lValue
-                                If lCount >= lCountPercentileDone Then
-                                    If lCountPercentileDone >= 0 Then
-                                        lPercentileSums(lPercentileIndex) = lSum
-                                        lPercentileIndex += 1
-                                    End If
-                                    If lPercentileIndex <= lPercentiles.GetUpperBound(0) Then
-                                        lCountPercentileDone = lPercentiles(lPercentileIndex) * lNumValues / 100.0 - 1
-                                        If lCountPercentileDone < 0 Then lCountPercentileDone = 0
-                                        If lCountPercentileDone >= lNumValues Then lCountPercentileDone = lNumValues - 1
-                                    End If
-                                End If
-                            Next
-                        Next
-                        Logger.Dbg("Sum:" & lDailyTSer.Attributes.GetFormattedValue("Sum") & " fromBins:" & lPercentileSums(2))
-                        pStats(2, lStatGroup, lSiteIndex) = lPercentileSums(0) '50
-                        pStats(3, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lPercentileSums(1) '90
+                        pStats(2, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("%Sum50")
+                        pStats(3, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum90")
 
                         Dim lTmpDate(5) As Integer
                         J2Date(SDateJ, lTmpDate)
 
                         pStats(7, lStatGroup, lSiteIndex) = 0.0# 'summer volume
                         pStats(8, lStatGroup, lSiteIndex) = 0.0# 'winter volume
-                        For i As Integer = 1 To lNVals
+                        For i As Integer = 1 To lDailyTSer.numValues
                             If (lTmpDate(1) = 12 Or lTmpDate(1) = 1 Or lTmpDate(1) = 2) Then
                                 'in the winter
                                 pStats(8, lStatGroup, lSiteIndex) += lValues(i)
@@ -409,22 +381,25 @@ Public Class ExpertSystem
                                     Dim lN1 As Integer, lN2 As Integer
                                     lN1 = timdifJ(SDateJ, pStorms(lStormIndex).SDateJ, lTimeUnit, lTimeStep) + 1
                                     lN2 = timdifJ(SDateJ, pStorms(lStormIndex).EDateJ, lTimeUnit, lTimeStep)
-                                    Dim lTmpDate(5) As Integer
-                                    J2Date(pStorms(lStormIndex).SDateJ - 1, lTmpDate)
-                                    Dim lRtmp As Double = lDailyTSer.Values(lN1)
-                                    For i As Integer = lN1 To lN2
-                                        pStats(4, lStatGroup, lSiteIndex) += lValues(i)
-                                        If (lDailyTSer.Values(i) > lRtmp) Then 'a new peak
-                                            lRtmp = lDailyTSer.Values(i)
-                                        End If
-                                        If (lTmpDate(1) = 12 Or lTmpDate(1) = 1 Or lTmpDate(1) = 2) Then 'in the winter
-                                            pStats(10, lStatGroup, lSiteIndex) += lValues(i)
-                                        ElseIf (lTmpDate(1) = 6 Or lTmpDate(1) = 7 Or lTmpDate(1) = 8) Then 'in the summer
-                                            pStats(9, lStatGroup, lSiteIndex) += lValues(i)
-                                        End If
-                                        TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
-                                    Next i
-                                    pStats(5, lStatGroup, lSiteIndex) += lRtmp
+                                    Dim lNLimit As Integer = lDailyTSer.Values.GetUpperBound(0)
+                                    If lN2 <= lNLimit Then
+                                        Dim lTmpDate(5) As Integer
+                                        J2Date(pStorms(lStormIndex).SDateJ - 1, lTmpDate)
+                                        Dim lRtmp As Double = lDailyTSer.Values(lN1)
+                                        For i As Integer = lN1 To lN2
+                                            pStats(4, lStatGroup, lSiteIndex) += lValues(i)
+                                            If (lDailyTSer.Values(i) > lRtmp) Then 'a new peak
+                                                lRtmp = lDailyTSer.Values(i)
+                                            End If
+                                            If (lTmpDate(1) = 12 Or lTmpDate(1) = 1 Or lTmpDate(1) = 2) Then 'in the winter
+                                                pStats(10, lStatGroup, lSiteIndex) += lValues(i)
+                                            ElseIf (lTmpDate(1) = 6 Or lTmpDate(1) = 7 Or lTmpDate(1) = 8) Then 'in the summer
+                                                pStats(9, lStatGroup, lSiteIndex) += lValues(i)
+                                            End If
+                                            TIMADD(lTmpDate, lTimeUnit, lTimeStep, lTimeStep, lTmpDate)
+                                        Next i
+                                        pStats(5, lStatGroup, lSiteIndex) += lRtmp
+                                    End If
                                 End If
                             Next lStormIndex
                         End If
@@ -434,7 +409,7 @@ Public Class ExpertSystem
                         Dim lRecessionTimser As atcTimeseries = lDailyTSer.Clone
                         'save first data value
                         Dim lSavDat As Double = lRecessionTimser.Values(1)
-                        For lIndex As Integer = 2 To lNVals
+                        For lIndex As Integer = 2 To lRecessionTimser.Values.GetUpperBound(0)
                             Dim lRecession As Double
                             If (lSavDat > 0.0000000001) Then 'have some flow
                                 lRecession = lRecessionTimser.Values(lIndex) / lSavDat
@@ -448,29 +423,34 @@ Public Class ExpertSystem
                         lRecessionTimser.Attributes.CalculateAll()
 
                         'new percent of time in base flow term
-                        pStats(6, lStatGroup, lSiteIndex) = lRecessionTimser.Attributes.GetFormattedValue("%50")
+                        Dim lStr As String = lRecessionTimser.Attributes.GetFormattedValue("%50")
+                        If IsNumeric(lStr) Then
+                            pStats(6, lStatGroup, lSiteIndex) = lStr
+                        Else
+                            pStats(6, lStatGroup, lSiteIndex) = Double.NaN
+                        End If
                         lRecessionTimser.Clear()
                         lRecessionTimser.Dates.Clear()
                         lRecessionTimser = Nothing
                     End If
-                End If
+                    End If
 
-                If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
-                    pStats(5, lStatGroup, lSiteIndex) /= pStorms.Count
-                    'convert storm peak stat from acre-inch/day to cfs
-                    pStats(5, lStatGroup, lSiteIndex) *= pSites(lSiteIndex).Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
-                ElseIf lStatGroup = 2 Then
-                    For i As Integer = 1 To 10
-                        If i < 5 Or i > 6 Then 'convert observed runoff values
-                            pStats(i, lStatGroup, lSiteIndex) *= pConvert / pSites(lSiteIndex).Area
-                        ElseIf i = 5 Then 'take average over NStorms
-                            pStats(i, lStatGroup, lSiteIndex) /= pStorms.Count
-                        End If
-                    Next i
-                End If
-                lDailyTSer.Clear()
-                lDailyTSer.Dates.Clear()
-                lDailyTSer = Nothing
+                    If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
+                        pStats(5, lStatGroup, lSiteIndex) /= pStorms.Count
+                        'convert storm peak stat from acre-inch/day to cfs
+                        pStats(5, lStatGroup, lSiteIndex) *= pSites(lSiteIndex).Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
+                    ElseIf lStatGroup = 2 Then
+                        For i As Integer = 1 To 10
+                            If i < 5 Or i > 6 Then 'convert observed runoff values
+                                pStats(i, lStatGroup, lSiteIndex) *= pConvert / pSites(lSiteIndex).Area
+                            ElseIf i = 5 Then 'take average over NStorms
+                                pStats(i, lStatGroup, lSiteIndex) /= pStorms.Count
+                            End If
+                        Next i
+                    End If
+                    lDailyTSer.Clear()
+                    lDailyTSer.Dates.Clear()
+                    lDailyTSer = Nothing
             Next lDatasetType
         Next lSiteIndex
     End Sub

@@ -23,9 +23,16 @@ Public Module DailyMonthlyCompareStats
         lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
 
         Dim lSimTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aSimDsnId))
+        Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aObsDsnId))
+
         Dim lSDateJ As Double = aUci.GlobalBlock.SDateJ
         Dim lEDateJ As Double = aUci.GlobalBlock.EdateJ
+        CheckDateJ(lObsTSer, "Observed", lSDateJ, lEDateJ, lStr)
+        CheckDateJ(lSimTSer, "Simulated", lSDateJ, lEDateJ, lStr)
+
         Dim lNewSimTSer As atcTimeseries = SubsetByDate(lSimTSer, lSDateJ, lEDateJ, Nothing)
+        lSimTSer = Nothing
+
         Dim lSimConv As Double = aArea * 43560.0# / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
         lTsMath.DataSets.Clear()
         lArgsMath.Clear()
@@ -33,16 +40,37 @@ Public Module DailyMonthlyCompareStats
         lArgsMath.SetValue("number", lSimConv)
         lTsMath.Open("multiply", lArgsMath)
         lNewSimTSer = lTsMath.DataSets(0)
-        lSimTSer = Nothing
-        Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aObsDsnId))
+
         Dim lNewObsTSer As atcTimeseries = SubsetByDate(lObsTSer, lSDateJ, lEDateJ, Nothing)
         lObsTSer = Nothing
+
+        If lNewSimTSer.numValues <> lNewObsTSer.numValues Then
+            lStr &= "   SimCount " & lNewSimTSer.numValues & " ObsCount " & lNewObsTSer.numValues & vbCrLf & vbCrLf
+        End If
 
         lStr &= IntervalReport(aSite, atcTimeUnit.TUDay, lNewSimTSer, lNewObsTSer)
         lStr &= IntervalReport(aSite, atcTimeUnit.TUMonth, lNewSimTSer, lNewObsTSer)
 
         Return lStr
     End Function
+
+    Private Sub CheckDateJ(ByVal aTSer As atcTimeseries, ByVal aName As String, _
+                           ByRef aSDateJ As Double, ByRef aEDateJ As Double, ByRef aStr As String)
+        Dim lDateTmp As Double = aTSer.Dates.Values(0)
+        If aSDateJ < lDateTmp Then
+            aStr &= "   Adjusted Start Date from " & Format(Date.FromOADate(aSDateJ), "yyyy/MM/dd") & _
+                                        "to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
+                                        " due to " & aName & vbCrLf & vbCrLf
+            aSDateJ = lDateTmp
+        End If
+        lDateTmp = aTSer.Dates.Values(aTSer.numValues)
+        If aEDateJ > lDateTmp Then
+            aStr &= "   Adjusted End Date from " & Format(Date.FromOADate(aEDateJ), "yyyy/MM/dd") & _
+                                        " to " & Format(Date.FromOADate(lDateTmp), "yyyy/MM/dd") & _
+                                        " due to " & aName & vbCrLf & vbCrLf
+            aEDateJ = lDateTmp
+        End If
+    End Sub
 
     Private Function IntervalReport(ByVal aSite As String, ByVal aTimeUnit As atcTimeUnit, _
                                     ByVal aTser1 As atcTimeseries, _
@@ -91,25 +119,42 @@ Public Module DailyMonthlyCompareStats
     Function CompareStats(ByVal aTSer1 As atcTimeseries, _
                           ByVal aTSer2 As atcTimeseries) As String
 
+        Dim lStr As String = ""
+        Dim lNote As String = ""
         Dim lMeanError As Double = 0.0#
         Dim lMeanAbsoluteError As Double = 0.0#
         Dim lRmsError As Double = 0.0#
         Dim lValDiff As Double
         Dim lVal1 As Double
         Dim lVal2 As Double
+        Dim lSkipCount As Integer = 0
+        Dim lGoodCount As Integer = 0
 
         For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
-            lValDiff = lVal1 - aTSer2.Values(lIndex)
-            lMeanError += lValDiff
-            lMeanAbsoluteError += Math.Abs(lValDiff)
-            lRmsError += lValDiff * lValDiff
+            lVal2 = aTSer2.Values(lIndex)
+            If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
+                lValDiff = lVal1 - lVal2
+                lMeanError += lValDiff
+                lMeanAbsoluteError += Math.Abs(lValDiff)
+                lRmsError += lValDiff * lValDiff
+                lGoodCount += 1
+            Else
+                lSkipCount += 1
+                If lSkipCount = 1 Then
+                    lNote = "*** Note - compare skipped index " & lIndex
+                End If
+            End If
         Next
+        If lNote.Length > 0 Then
+            lNote &= " and " & lSkipCount - 1 & " more" & vbCrLf
+        End If
+
         Dim lNashSutcliffeNumerator As Double = lRmsError
 
-        lMeanError /= aTSer1.numValues
-        lMeanAbsoluteError /= aTSer1.numValues
-        lRmsError /= aTSer1.numValues
+        lMeanError /= lGoodCount
+        lMeanAbsoluteError /= lGoodCount
+        lRmsError /= lGoodCount
 
         If lRmsError > 0 Then
             lRmsError = Math.Sqrt(lRmsError)
@@ -122,8 +167,10 @@ Public Module DailyMonthlyCompareStats
         For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
             lVal2 = aTSer2.Values(lIndex)
-            lCorrelationCoefficient += (lVal1 - lMean1) * (lVal2 - lMean2)
-            lNashSutcliffe += (lVal2 - lMean2) ^ 2
+            If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
+                lCorrelationCoefficient += (lVal1 - lMean1) * (lVal2 - lMean2)
+                lNashSutcliffe += (lVal2 - lMean2) ^ 2
+            End If
         Next
         lCorrelationCoefficient /= (aTSer1.numValues - 1)
         Dim lSD1 As Double = aTSer1.Attributes.GetDefinedValue("Standard Deviation").Value
@@ -135,14 +182,15 @@ Public Module DailyMonthlyCompareStats
             lNashSutcliffe = lNashSutcliffeNumerator / lNashSutcliffe
         End If
 
-        Dim lStr As String = ""
         lStr &= "Correlation Coefficient".PadLeft(36) & DecimalAlign(lCorrelationCoefficient, 15) & vbCrLf
         lStr &= "Coefficient of Determination".PadLeft(36) & DecimalAlign(lCorrelationCoefficient ^ 2, 15) & vbCrLf
         lStr &= "Mean Error".PadLeft(36) & DecimalAlign(lMeanError, 15) & vbCrLf
         lStr &= "Mean Absolute Error".PadLeft(36) & DecimalAlign(lMeanAbsoluteError, 15) & vbCrLf
         lStr &= "RMS Error".PadLeft(36) & DecimalAlign(lRmsError, 15) & vbCrLf
         lStr &= "Model Fit Efficiency".PadLeft(36) & DecimalAlign(1 - lNashSutcliffe, 15) & vbCrLf
-
+        If lNote.Length > 0 Then
+            lStr &= lNote
+        End If
         Return lStr
     End Function
 End Module
