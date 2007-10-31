@@ -2692,7 +2692,7 @@ x:
             End If
             init = 0
             If Mid(cbuff, 3, 6) = "FTABLE" Then 'this is a new one
-                Id = CShort(Right(Trim(cbuff), 3))
+                Id = CShort(cbuff.Substring(11, 4))
                 'find which oper this ftable is associated with
                 For Each tOpn In Me.OpnBlks.Item("RCHRES").Ids
                     If tOpn.Tables.Item("HYDR-PARM2").ParmValue("FTBUCI") = Id Then
