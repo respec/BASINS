@@ -3,12 +3,17 @@ Imports atcData
 Imports atcWDM
 Imports atcHspfBinOut
 Imports HspfSupport
+Imports MapWinUtility
 
 Imports MapWindow.Interfaces
 
 Module HSPFOutputReports
-    Private Const pTestPath As String = "C:\test\EXP_CAL\hyd_man.net"
-    Private Const pBaseName As String = "hyd_man"
+
+
+    Private Const pTestPath As String = "D:\MountainViewData\Calleguas\"
+    Private Const pBaseName As String = "Calleg"
+    'Private Const pTestPath As String = "C:\test\EXP_CAL\hyd_man.net"
+    'Private Const pBaseName As String = "hyd_man"
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         ChDriveDir(pTestPath)
@@ -24,25 +29,29 @@ Module HSPFOutputReports
         Dim lWdmDataSource As New atcDataSourceWDM
         lWdmDataSource.Open(lWdmFileName)
 
-        Dim lExpertSystem As HspfSupport.ExpertSystem
-        lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
-        Dim lStr As String = lExpertSystem.Report
-        SaveFileString("outfiles\ExpertSysStats.txt", lStr)
-
-        lStr = lExpertSystem.AsString 'NOTE:just testing
-        SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
-
         Dim lOutFileName As String
-        Dim lCons As String = "Flow"
-        For lSiteIndex As Integer = 1 To lExpertSystem.SiteCount
-            Dim lSite As String = lExpertSystem.Site(lSiteIndex).Name
-            Dim lArea As Double = lExpertSystem.Site(lSiteIndex).Area
-            Dim lSimDsnId As Integer = lExpertSystem.Site(lSiteIndex).Dsn(0)
-            Dim lObsDsnId As Integer = lExpertSystem.Site(lSiteIndex).Dsn(1)
-            lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSite, lArea, lSimDsnId, lObsDsnId)
-            loutfilename = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
-            SaveFileString(lOutFileName, lStr)
-        Next lSiteIndex
+        Try
+            Dim lExpertSystem As HspfSupport.ExpertSystem
+            lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
+            Dim lStr As String = lExpertSystem.Report
+            SaveFileString("outfiles\ExpertSysStats.txt", lStr)
+
+            lStr = lExpertSystem.AsString 'NOTE:just testing
+            SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
+
+            Dim lCons As String = "Flow"
+            For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
+                Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
+                Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
+                Dim lSimDsnId As Integer = lExpertSystem.Sites(lSiteIndex).Dsn(0)
+                Dim lObsDsnId As Integer = lExpertSystem.Sites(lSiteIndex).Dsn(1)
+                lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSite, lArea, lSimDsnId, lObsDsnId)
+                lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
+                SaveFileString(lOutFileName, lStr)
+            Next lSiteIndex
+        Catch lEx As ApplicationException
+            Logger.Dbg(lEx.Message)
+        End Try
 
         'open HBN file
         Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"

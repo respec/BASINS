@@ -34,153 +34,7 @@ Public Module ConstituentBalance
                            ByVal aScenarioResults As atcDataSource, _
                            ByVal aLocations As atcCollection, _
                            ByVal aRunMade As String) As Text.StringBuilder
-        Dim lConstituents2Output As New atcCollection
-        Select Case aBalanceType
-            Case "Water"
-                lConstituents2Output.Add("I:SUPY", "Rainfall")
-                lConstituents2Output.Add("I:SURO", "Runoff  ")
-                lConstituents2Output.Add("I:PET", "ET Potential")
-                lConstituents2Output.Add("I:IMPEV", "ET Actual")
-                lConstituents2Output.Add("P:SUPY", "Rainfall")
-                'lConstituents2Output.Add("P:Header0", "Irrigation")
-                'lConstituents2Output.Add("P:SURLI", "  Surface")
-                lConstituents2Output.Add("P:Header1", "Runoff")
-                lConstituents2Output.Add("P:SURO", "    Surface")
-                lConstituents2Output.Add("P:IFWO", "    Interflow")
-                lConstituents2Output.Add("P:AGWO", "    Baseflow")
-                lConstituents2Output.Add("P:PERO", "    Total")
-                lConstituents2Output.Add("P:IGWI", "Deep Grnd Water")
-                lConstituents2Output.Add("P:Header2", "Evaporation")
-                lConstituents2Output.Add("P:PET", "    Potential")
-                lConstituents2Output.Add("P:CEPE", "    Intercep St")
-                lConstituents2Output.Add("P:UZET", "    Upper Zone")
-                lConstituents2Output.Add("P:LZET", "    Lower Zone")
-                lConstituents2Output.Add("P:AGWET", "    Grnd Water")
-                lConstituents2Output.Add("P:BASET", "    Baseflow")
-                lConstituents2Output.Add("P:TAET", "    Total")
-            Case "SedimentCopper"
-                lConstituents2Output.Add("I:SOSLD", "Solids   ")
-                lConstituents2Output.Add("I:SOQUAL-Copper", "Copper   ")
-                lConstituents2Output.Add("I:SOQS-Copper", "Sed-Assoc Cu")
-                lConstituents2Output.Add("I:SOQO-Copper", "Flow-Assoc Cu")
-                lConstituents2Output.Add("P:SOSED", "Sediment")
-                lConstituents2Output.Add("P:SOQUAL-Copper", "  Surface Cu")
-                lConstituents2Output.Add("P:IOQUAL-Copper", "  Interflow Cu")
-                lConstituents2Output.Add("P:AOQUAL-Copper", "  Groundwater Cu")
-                lConstituents2Output.Add("P:SOQS-Copper", "Sed-Assoc Cu")
-                lConstituents2Output.Add("P:SOQO-Copper", "Flow-Assoc Cu")
-                lConstituents2Output.Add("P:POQUAL-Copper", "Total Cu")
-                lConstituents2Output.Add("R:ROSED-SAND", "  Sand")
-                lConstituents2Output.Add("R:ROSED-SILT", "  Silt")
-                lConstituents2Output.Add("R:ROSED-CLAY", "  Clay")
-                lConstituents2Output.Add("R:ROSED-TOT", "Total Sediment")
-                lConstituents2Output.Add("R:Copper-RODQAL", "Disolved Cu")
-                lConstituents2Output.Add("R:Copper-ROSQAL-SAND", "  Sand Cu")
-                lConstituents2Output.Add("R:Copper-ROSQAL-SILT", "  Silt Cu")
-                lConstituents2Output.Add("R:Copper-ROSQAL-CLAY", "  Clay Cu")
-                lConstituents2Output.Add("R:Copper-ROSQAL-Tot", "Total Sediment Cu")
-                lConstituents2Output.Add("R:Copper-TROQAL", "Total Cu")
-            Case "NfromPQUAL"
-                lConstituents2Output.Add("P:Header1", "NH4 (lb/ac)")
-                lConstituents2Output.Add("P:WASHQS-NH4", "WASHQS")
-                lConstituents2Output.Add("P:SCRQS-NH4", "SCRQS")
-                lConstituents2Output.Add("P:SOQS-NH4", "SOQS")
-                lConstituents2Output.Add("P:SOQO-NH4", "SOQO")
-                lConstituents2Output.Add("P:SOQUAL-NH4", "SOQUAL")
-                lConstituents2Output.Add("P:IOQUAL-NH4", "IOQUAL")
-                lConstituents2Output.Add("P:AOQUAL-NH4", "AOQUAL")
-                lConstituents2Output.Add("P:POQUAL-NH4", "POQUAL")
-                lConstituents2Output.Add("P:Header2", "NO3 (lb/ac)")
-                lConstituents2Output.Add("P:WASHQS-NO3", "WASHQS")
-                lConstituents2Output.Add("P:SCRQS-NO3", "SCRQS")
-                lConstituents2Output.Add("P:SOQS-NO3", "SOQS")
-                lConstituents2Output.Add("P:SOQO-NO3", "SOQO")
-                lConstituents2Output.Add("P:SOQUAL-NO3", "SOQUAL")
-                lConstituents2Output.Add("P:IOQUAL-NO3", "IOQUAL")
-                lConstituents2Output.Add("P:AOQUAL-NO3", "AOQUAL")
-                lConstituents2Output.Add("P:POQUAL-NO3", "POQUAL")
-            Case "TotalN"
-                lConstituents2Output.Add("P:Header1", "Atmospheric Deposition (lb/ac)")
-                lConstituents2Output.Add("P:NH4-N - SURFACE LAYER - TOTAL AD", "NH4-N - Surface Layer")
-                lConstituents2Output.Add("P:NH4-N - UPPER LAYER - TOTAL AD", "NH4-N - Upper Layer")
-                lConstituents2Output.Add("P:NO3-N - SURFACE LAYER - TOTAL AD", "NO3-N - Surface Layer")
-                lConstituents2Output.Add("P:NO3-N - UPPER LAYER - TOTAL AD", "NO3-N - Upper Layer")
-                lConstituents2Output.Add("P:ORGN - SURFACE LAYER - TOTAL AD", "ORGN - Surface Layer")
-                lConstituents2Output.Add("P:ORGN - UPPER LAYER - TOTAL AD", "ORGN - Upper Layer")
-
-                lConstituents2Output.Add("P:", "")
-                lConstituents2Output.Add("P:TOTAL NITROGEN APPLICATION", "N Application (lb/ac)")
-
-                lConstituents2Output.Add("P:Header1", "Nutrient Loss (lb/ac)")
-                lConstituents2Output.Add("P:Header2", "NO3 Loss")
-                lConstituents2Output.Add("P:NO3+NO2-N - SURFACE LAYER OUTFLOW", "Surface")
-                lConstituents2Output.Add("P:NO3+NO2-N - UPPER LAYER OUTFLOW", "Interflow")
-                lConstituents2Output.Add("P:NO3+NO2-N - GROUNDWATER OUTFLOW", "Baseflow")
-                lConstituents2Output.Add("P:NO3-N - TOTAL OUTFLOW", "Total")
-                lConstituents2Output.Add("P:Header2", "NH3 Loss")
-                lConstituents2Output.Add("P:NH4-N IN SOLUTION - SURFACE LAYER OUTFLOW", "Surface")
-                lConstituents2Output.Add("P:NH4-N IN SOLUTION - UPPER LAYER OUTFLOW", "Interflow")
-                lConstituents2Output.Add("P:NH4-N IN SOLUTION - GROUNDWATER OUTFLOW", "Baseflow")
-                lConstituents2Output.Add("P:NH4-N ADS - SEDIMENT ASSOC OUTFLOW", "Sediment")
-                lConstituents2Output.Add("P:NH4-N - TOTAL OUTFLOW", "Total")
-                lConstituents2Output.Add("P:Header2", "ORGN")
-                lConstituents2Output.Add("P:LABILE ORGN - SEDIMENT ASSOC OUTFLOW", "Sediment Labile")
-                lConstituents2Output.Add("P:REFRAC ORGN - SEDIMENT ASSOC OUTFLOW", "Sediment Refrac")
-                lConstituents2Output.Add("P:ORGN - TOTAL OUTFLOW", "Total")
-
-                lConstituents2Output.Add("P:", "")
-                lConstituents2Output.Add("P:NITROGEN - TOTAL OUTFLOW", "Total N Loss (lb/ac)")
-
-                lConstituents2Output.Add("P:Header1", "Below Ground Plant N Return (lb/ac)")
-                lConstituents2Output.Add("P:TRTLBN", "To Labile ORGN")
-                lConstituents2Output.Add("P:TRTRBN", "To Refrac ORGN")
-
-                lConstituents2Output.Add("P:Header1", "Plant Uptake (lb/ac)")
-                lConstituents2Output.Add("P:Header2", "NH3")
-                lConstituents2Output.Add("P:SAMUPB", "Surface")
-                lConstituents2Output.Add("P:UAMUPB", "Upper Zone")
-                lConstituents2Output.Add("P:LAMUPB", "Lower Zone")
-                lConstituents2Output.Add("P:AAMUPB", "Active GW")
-                lConstituents2Output.Add("P:TAMUPB", "Total")
-                lConstituents2Output.Add("P:Header2", "NO3")
-                lConstituents2Output.Add("P:SNIUPB", "Surface")
-                lConstituents2Output.Add("P:UNIUPB", "Upper Zone")
-                lConstituents2Output.Add("P:LNIUPB", "Lower Zone")
-                lConstituents2Output.Add("P:ANIUPB", "Active GW")
-                lConstituents2Output.Add("P:TNIUPB", "Total")
-
-                lConstituents2Output.Add("P:Header1", "Other Fluxes (lb/ac)")
-                lConstituents2Output.Add("P:TDENI", "Denitrification")
-                lConstituents2Output.Add("P:TAMNIT", "NH3 Nitrification")
-                lConstituents2Output.Add("P:TAMIMB", "NH3 Immobilization")
-                lConstituents2Output.Add("P:TORNMN", "ORGN Mineralization")
-                lConstituents2Output.Add("P:TNIIMB", "NO3 Immobilization")
-                lConstituents2Output.Add("P:TREFON", "Labile/Refr ORGN Conversion")
-                lConstituents2Output.Add("P:TFIXN", "Nitrogen Fixation")
-                lConstituents2Output.Add("P:TAMVOL", "NH3 Volatilization")
-                'lConstituents2Output.Add("R:Header1", "TAM")
-                'lConstituents2Output.Add("R:TAM-INTOT", "  TAM-INTOT")
-                'lConstituents2Output.Add("R:TAM-INDIS", "  TAM-INDIS")
-                'lConstituents2Output.Add("R:NH4-INPART-TOT", "  NH4-INPART-TOT")
-                'lConstituents2Output.Add("R:TAM-OUTTOT", "  TAM-OUTTOT")
-                'lConstituents2Output.Add("R:TAM-OUTDIS", "  TAM-OUTDIS")
-                'lConstituents2Output.Add("R:TAM-OUTPART-TOT", "  TAM-OUTPART-TOT")
-                'lConstituents2Output.Add("R:TAM-OUTTOT-EXIT3", "  TAM-OUTTOT-EXIT3")
-                'lConstituents2Output.Add("R:TAM-OUTDIS-EXIT3", "  TAM-OUTDIS-EXIT3")
-                'lConstituents2Output.Add("R:TAM-OUTPART-TOT-EXIT3", "  TAM-OUTPART-TOT-EXIT3")
-                'lConstituents2Output.Add("R:Header2", "NO3")
-                'lConstituents2Output.Add("R:NO3-INTOT", "  NO3-INTOT")
-                'lConstituents2Output.Add("R:NO3-PROCFLUX-TOT", "  NO3-PROCFLUX-TOT")
-                'lConstituents2Output.Add("R:NO3-OUTTOT", "  NO3-OUTTOT")
-                'lConstituents2Output.Add("R:NO3-OUTTOT-EXIT3", "  NO3-OUTTOT-EXIT3")
-                lConstituents2Output.Add("R:Header3", "Totals")
-                lConstituents2Output.Add("R:N-TOT-IN", "  N-TOT-IN")
-                lConstituents2Output.Add("R:N-TOT-OUT", "  N-TOT-OUT")
-                lConstituents2Output.Add("R:N-TOT-OUT-EXIT1", "  N-TOT-OUT-EXIT1")
-                lConstituents2Output.Add("R:N-TOT-OUT-EXIT2", "  N-TOT-OUT-EXIT2")
-                lConstituents2Output.Add("R:N-TOT-OUT-EXIT3", "  N-TOT-OUT-EXIT3")
-            Case "TotalP"
-        End Select
+        Dim lConstituents2Output As atcCollection = ConstituentsToOutput(aBalanceType)
 
         Dim lString As New Text.StringBuilder
         lString.AppendLine(aBalanceType & " Balance Report For " & aScenario)
@@ -203,9 +57,9 @@ Public Module ConstituentBalance
             Dim lOperationKey As String = aOperations.Keys(lOperationIndex)
             For Each lLocation As String In aLocations
                 If lLocation.StartsWith(lOperationKey) Then
-                    Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
+                    'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
                     Dim lTempDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", lLocation)
-                    Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
+                    'Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
                     Dim lNeedHeader As Boolean = True
                     Dim lPendingOutput As String = ""
                     For lIndex As Integer = 0 To lConstituents2Output.Count - 1
@@ -216,7 +70,12 @@ Public Module ConstituentBalance
                             lMatchConstituentGroup = lTempDataGroup.FindData("Constituent", lConstituentKey)
                             If lMatchConstituentGroup.Count > 0 Then
                                 lTempDataSet = lMatchConstituentGroup.Item(0)
-                                Dim lSeasons As New atcSeasonsCalendarYear
+                                Dim lSeasons As atcSeasonBase
+                                If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
+                                    lSeasons = New atcSeasonsWaterYear
+                                Else
+                                    lSeasons = New atcSeasonsCalendarYear
+                                End If
                                 Dim lSeasonalAttributes As New atcDataAttributes
                                 Dim lCalculatedAttributes As New atcDataAttributes
                                 lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
@@ -256,11 +115,44 @@ Public Module ConstituentBalance
                                     lString.Append(vbTab & DecimalAlign(lAttribute.Value))
                                 Next
                                 lString.AppendLine()
+                            ElseIf lConstituentKey.StartsWith("Total") AndAlso _
+                                   lConstituentKey.Length > 5 AndAlso _
+                                   IsNumeric(lConstituentKey.Substring(5)) Then
+                                Dim lTotalCount As Integer = lConstituentKey.Substring(5)
+                                Dim lStr As String = lString.ToString
+                                Dim lCurFields() As String
+                                Dim lCurFieldValues(1) As Double
+                                Dim lRecStartPos As Integer
+                                Dim lRecEndPos As Integer = lStr.LastIndexOf(vbCr)
+                                For lCount As Integer = 1 To lTotalCount
+                                    lRecStartPos = lStr.LastIndexOf(vbCr, lRecEndPos - 1)
+                                    lCurFields = lStr.Substring(lRecStartPos, lRecEndPos - lRecStartPos).Split(vbTab)
+                                    If lCount = 1 Then
+                                        ReDim lCurFieldValues(lCurFields.GetUpperBound(0))
+                                        lCurFieldValues.Initialize()
+                                    End If
+                                    For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
+                                        lCurFieldValues(lFieldPos) += lCurFields(lFieldPos)
+                                    Next
+                                    lRecEndPos = lRecStartPos
+                                Next
+                                lString.Append(lConstituentName)
+                                For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
+                                    lString.Append(vbTab & DecimalAlign(lCurFieldValues(lFieldPos)))
+                                Next
+                                lString.AppendLine()
                             Else
-                                lPendingOutput &= vbCrLf & lConstituentName
+                                If lPendingOutput.Length > 0 Then
+                                    lPendingOutput &= vbCrLf
+                                End If
+                                If lConstituentKey.StartsWith("Header") Then
+                                    lPendingOutput &= vbCrLf
+                                End If
+                                lPendingOutput &= lConstituentName
                             End If
                         End If
                     Next
+
                     If lConstituents2Output.Count = 0 Then
                         Logger.Dbg(" BalanceType " & aBalanceType & " at " & lLocation & " has no timeseries to output in script!")
                     Else
@@ -279,6 +171,7 @@ Public Module ConstituentBalance
                 End If
             Next lLocation
         Next lOperationIndex
+
         Return lString
     End Function
 End Module
