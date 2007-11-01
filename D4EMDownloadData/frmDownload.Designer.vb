@@ -55,6 +55,9 @@ Partial Class frmDownload
         Me.lblRegion = New System.Windows.Forms.Label
         Me.chkClip = New System.Windows.Forms.CheckBox
         Me.chkMerge = New System.Windows.Forms.CheckBox
+        Me.btnCancel = New System.Windows.Forms.Button
+        Me.txtMetWDM = New System.Windows.Forms.TextBox
+        Me.lblMetWDM = New System.Windows.Forms.Label
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
@@ -75,12 +78,13 @@ Partial Class frmDownload
         Me.grpBASINS.Controls.Add(Me.chkBASINS_DEMG)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_DEM)
         Me.grpBASINS.Controls.Add(Me.chkBASINS_Census)
-        Me.grpBASINS.Location = New System.Drawing.Point(12, 12)
+        Me.grpBASINS.Location = New System.Drawing.Point(369, 12)
         Me.grpBASINS.Name = "grpBASINS"
-        Me.grpBASINS.Size = New System.Drawing.Size(351, 88)
+        Me.grpBASINS.Size = New System.Drawing.Size(307, 88)
         Me.grpBASINS.TabIndex = 0
         Me.grpBASINS.TabStop = False
         Me.grpBASINS.Text = "Basins"
+        Me.grpBASINS.Visible = False
         '
         'chkBASINS_Met
         '
@@ -179,12 +183,13 @@ Partial Class frmDownload
         Me.grpNWIS.Controls.Add(Me.chkNWIS_Measurements)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISStations)
         Me.grpNWIS.Controls.Add(Me.chkNWIS_GetNWISDischarge)
-        Me.grpNWIS.Location = New System.Drawing.Point(12, 106)
+        Me.grpNWIS.Location = New System.Drawing.Point(369, 106)
         Me.grpNWIS.Name = "grpNWIS"
-        Me.grpNWIS.Size = New System.Drawing.Size(351, 42)
+        Me.grpNWIS.Size = New System.Drawing.Size(307, 42)
         Me.grpNWIS.TabIndex = 1
         Me.grpNWIS.TabStop = False
         Me.grpNWIS.Text = "NWIS"
+        Me.grpNWIS.Visible = False
         '
         'chkNWIS_Measurements
         '
@@ -234,12 +239,13 @@ Partial Class frmDownload
         Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_DRG)
         Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_DOQ)
         Me.grpTerraServerWebService.Controls.Add(Me.chkTerraServerWebService_Urban)
-        Me.grpTerraServerWebService.Location = New System.Drawing.Point(12, 154)
+        Me.grpTerraServerWebService.Location = New System.Drawing.Point(369, 154)
         Me.grpTerraServerWebService.Name = "grpTerraServerWebService"
-        Me.grpTerraServerWebService.Size = New System.Drawing.Size(351, 42)
+        Me.grpTerraServerWebService.Size = New System.Drawing.Size(307, 42)
         Me.grpTerraServerWebService.TabIndex = 9
         Me.grpTerraServerWebService.TabStop = False
         Me.grpTerraServerWebService.Text = "TerraServer Images"
+        Me.grpTerraServerWebService.Visible = False
         '
         'chkTerraServerWebService_DRG
         '
@@ -277,12 +283,13 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNLCD.Controls.Add(Me.chkNLCD_2001)
         Me.grpNLCD.Controls.Add(Me.chkNLCD_1992)
-        Me.grpNLCD.Location = New System.Drawing.Point(12, 202)
+        Me.grpNLCD.Location = New System.Drawing.Point(369, 202)
         Me.grpNLCD.Name = "grpNLCD"
-        Me.grpNLCD.Size = New System.Drawing.Size(351, 42)
+        Me.grpNLCD.Size = New System.Drawing.Size(307, 42)
         Me.grpNLCD.TabIndex = 11
         Me.grpNLCD.TabStop = False
         Me.grpNLCD.Text = "NLCD"
+        Me.grpNLCD.Visible = False
         '
         'chkNLCD_2001
         '
@@ -299,12 +306,13 @@ Partial Class frmDownload
         Me.grpNHDplus.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.grpNHDplus.Controls.Add(Me.chkNHDplus_All)
-        Me.grpNHDplus.Location = New System.Drawing.Point(12, 250)
+        Me.grpNHDplus.Location = New System.Drawing.Point(369, 250)
         Me.grpNHDplus.Name = "grpNHDplus"
-        Me.grpNHDplus.Size = New System.Drawing.Size(351, 45)
+        Me.grpNHDplus.Size = New System.Drawing.Size(307, 45)
         Me.grpNHDplus.TabIndex = 12
         Me.grpNHDplus.TabStop = False
         Me.grpNHDplus.Text = "NHD Plus"
+        Me.grpNHDplus.Visible = False
         '
         'chkNHDplus_All
         '
@@ -325,6 +333,7 @@ Partial Class frmDownload
         Me.lblClip.TabIndex = 36
         Me.lblClip.Text = "Clip to Region"
         Me.ToolTip1.SetToolTip(Me.lblClip, "Remove downloaded portions that do not intersect the region")
+        Me.lblClip.Visible = False
         '
         'lblMerge
         '
@@ -335,11 +344,12 @@ Partial Class frmDownload
         Me.lblMerge.TabIndex = 38
         Me.lblMerge.Text = "Merge"
         Me.ToolTip1.SetToolTip(Me.lblMerge, "Merge separate parts of same coverage")
+        Me.lblMerge.Visible = False
         '
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(288, 348)
+        Me.btnDownload.Location = New System.Drawing.Point(244, 74)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 29
@@ -352,15 +362,15 @@ Partial Class frmDownload
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.cboRegion.FormattingEnabled = True
         Me.cboRegion.Items.AddRange(New Object() {"View Rectangle", "Extent of Selected Layer"})
-        Me.cboRegion.Location = New System.Drawing.Point(124, 305)
+        Me.cboRegion.Location = New System.Drawing.Point(124, 12)
         Me.cboRegion.Name = "cboRegion"
-        Me.cboRegion.Size = New System.Drawing.Size(239, 21)
+        Me.cboRegion.Size = New System.Drawing.Size(195, 21)
         Me.cboRegion.TabIndex = 30
         '
         'lblRegion
         '
         Me.lblRegion.AutoSize = True
-        Me.lblRegion.Location = New System.Drawing.Point(12, 308)
+        Me.lblRegion.Location = New System.Drawing.Point(12, 15)
         Me.lblRegion.Name = "lblRegion"
         Me.lblRegion.Size = New System.Drawing.Size(104, 13)
         Me.lblRegion.TabIndex = 31
@@ -374,6 +384,7 @@ Partial Class frmDownload
         Me.chkClip.Size = New System.Drawing.Size(15, 14)
         Me.chkClip.TabIndex = 35
         Me.chkClip.UseVisualStyleBackColor = True
+        Me.chkClip.Visible = False
         '
         'chkMerge
         '
@@ -383,13 +394,47 @@ Partial Class frmDownload
         Me.chkMerge.Size = New System.Drawing.Size(15, 14)
         Me.chkMerge.TabIndex = 37
         Me.chkMerge.UseVisualStyleBackColor = True
+        Me.chkMerge.Visible = False
+        '
+        'btnCancel
+        '
+        Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnCancel.Location = New System.Drawing.Point(163, 73)
+        Me.btnCancel.Name = "btnCancel"
+        Me.btnCancel.Size = New System.Drawing.Size(75, 23)
+        Me.btnCancel.TabIndex = 39
+        Me.btnCancel.Text = "Cancel"
+        Me.btnCancel.UseVisualStyleBackColor = True
+        '
+        'txtMetWDM
+        '
+        Me.txtMetWDM.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtMetWDM.Location = New System.Drawing.Point(124, 39)
+        Me.txtMetWDM.Name = "txtMetWDM"
+        Me.txtMetWDM.Size = New System.Drawing.Size(195, 20)
+        Me.txtMetWDM.TabIndex = 40
+        '
+        'lblMetWDM
+        '
+        Me.lblMetWDM.AutoSize = True
+        Me.lblMetWDM.Location = New System.Drawing.Point(12, 42)
+        Me.lblMetWDM.Name = "lblMetWDM"
+        Me.lblMetWDM.Size = New System.Drawing.Size(90, 13)
+        Me.lblMetWDM.TabIndex = 41
+        Me.lblMetWDM.Text = "Save in WDM file"
         '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(375, 382)
+        Me.CancelButton = Me.btnCancel
+        Me.ClientSize = New System.Drawing.Size(331, 108)
+        Me.Controls.Add(Me.lblMetWDM)
+        Me.Controls.Add(Me.txtMetWDM)
+        Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.lblMerge)
         Me.Controls.Add(Me.chkMerge)
         Me.Controls.Add(Me.lblClip)
@@ -404,7 +449,7 @@ Partial Class frmDownload
         Me.Controls.Add(Me.grpBASINS)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmDownload"
-        Me.Text = "Download Data"
+        Me.Text = "Download Met Data"
         Me.grpBASINS.ResumeLayout(False)
         Me.grpBASINS.PerformLayout()
         Me.grpNWIS.ResumeLayout(False)
@@ -450,4 +495,7 @@ Partial Class frmDownload
     Friend WithEvents lblClip As System.Windows.Forms.Label
     Friend WithEvents lblMerge As System.Windows.Forms.Label
     Friend WithEvents chkMerge As System.Windows.Forms.CheckBox
+    Friend WithEvents btnCancel As System.Windows.Forms.Button
+    Friend WithEvents txtMetWDM As System.Windows.Forms.TextBox
+    Friend WithEvents lblMetWDM As System.Windows.Forms.Label
 End Class
