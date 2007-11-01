@@ -50,7 +50,7 @@ Public Class ExpertSystem
         pUci = aUci
         pDataSource = aDataSource
         ReadEXSFile(FilenameOnly(aUci.Name) & ".exs")
-        pErrorCriteria.Edit()
+        'pErrorCriteria.Edit()
     End Sub
 
     Public ReadOnly Property Sites() As Sites

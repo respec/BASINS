@@ -61,6 +61,7 @@
     <Compile Include="atcHspfConstituentBalance.vb" />
     <Compile Include="atcHspfDailyMonthlyCompareStats.vb" />
     <Compile Include="atcHspfExpertSystem.vb" />
+    <Compile Include="atcHspfWatershedConstituentBalance.vb" />
     <Compile Include="atcHspfWatershedSummary.vb" />
     <Compile Include="frmErrorCriteria.Designer.vb">
       <DependentUpon>frmErrorCriteria.vb</DependentUpon>
