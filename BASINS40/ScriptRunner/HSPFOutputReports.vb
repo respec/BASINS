@@ -8,14 +8,22 @@ Imports MapWinUtility
 Imports MapWindow.Interfaces
 
 Module HSPFOutputReports
+    Private pTestPath As String
+    Private pBaseName As String
+    Private pOutputLocations As New atcCollection
 
+    Private Sub Initialize()
+        pTestPath = "D:\MountainViewData\Calleguas\"
+        pBaseName = "Calleg"
+        pOutputLocations.Add("R:408")
+        pOutputLocations.Add("R:10")
+        'pTestPath ="C:\test\EXP_CAL\hyd_man.net"
+        'pBaseName ="hyd_man"
 
-    Private Const pTestPath As String = "D:\MountainViewData\Calleguas\"
-    Private Const pBaseName As String = "Calleg"
-    'Private Const pTestPath As String = "C:\test\EXP_CAL\hyd_man.net"
-    'Private Const pBaseName As String = "hyd_man"
+    End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
+        Initialize()
         ChDriveDir(pTestPath)
 
         'open uci file
@@ -81,12 +89,18 @@ Module HSPFOutputReports
         lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalance.txt"
         SaveFileString(lOutFileName, lString.ToString)
 
-        'watershed constituent balance
-        Dim lLandUses As atcCollection = HspfSupport.Utility.LandUses(lHspfUci)
+        'watershed constituent balance 
         lString = HspfSupport.WatershedConstituentBalance.Report _
            (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
-            lHspfBinDataSource, lLocations, llanduses, lHspfBinFileInfo.LastWriteTime)
+            lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime)
         lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalance.txt"
         SaveFileString(lOutFileName, lString.ToString)
+
+        If pOutputLocations.Count > 0 Then 'subwatershed constituent balance 
+            HspfSupport.WatershedConstituentBalance.ReportsToFiles _
+               (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
+                lHspfBinDataSource, pOutputLocations, lHspfBinFileInfo.LastWriteTime, _
+                "outfiles\")
+        End If
     End Sub
 End Module
