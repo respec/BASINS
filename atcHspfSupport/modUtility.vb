@@ -159,6 +159,7 @@ Public Module Utility
 
     Public Function LandUses(ByVal aUci As atcUCI.HspfUci) As atcUtility.atcCollection
         Dim lLandUses As New atcUtility.atcCollection
+        Dim lOperations As atcUtility.atcCollection
         For lOperationIndex As Integer = 1 To aUci.OpnSeqBlock.Opns.Count
             Dim lOperation As atcUCI.HspfOperation = aUci.OpnSeqBlock.Opns(lOperationIndex)
             Dim lLandUse As String = lOperation.Name.Substring(0, 1) & ":"
@@ -169,8 +170,15 @@ Public Module Utility
                 End If
             Next
             lLandUse = lLandUse.Trim(" ")
-            If lLandUses.IndexFromKey(lLandUse) = -1 Then
-                lLandUses.Add(lLandUse, lLandUse)
+            Dim lOperationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+            Dim lLandUseKey As Integer = lLandUses.IndexFromKey(lLandUse)
+            If lLandUseKey = -1 Then
+                lOperations = New atcUtility.atcCollection
+                lOperations.Add(lOperationKey)
+                lLandUses.Add(lLandUse, lOperations)
+            Else
+                lOperations = lLandUses.Item(lLandUseKey)
+                lOperations.Add(lOperationKey)
             End If
             Debug.Print(lOperation.Description)
         Next
