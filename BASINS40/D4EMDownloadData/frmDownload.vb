@@ -11,7 +11,13 @@ Public Class frmDownload
         pMapWin = aMapWin
 
         'The following line hot-wires the form to just do met data download
-        'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0: Return Me.XML
+        chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Return Me.XML
+
+        If Not pMapWin.Project Is Nothing Then
+            If Not pMapWin.Project.FileName Is Nothing AndAlso pMapWin.Project.FileName.Length > 0 Then
+                txtMetWDM.Text = IO.Path.Combine(IO.Path.GetDirectoryName(pMapWin.Project.FileName), "met.wdm")
+            End If
+        End If
 
         Dim lHucIndex As Integer = HUC8Index()
         If lHucIndex >= 0 Then
@@ -40,6 +46,11 @@ Public Class frmDownload
             Return CancelString
         End If
     End Function
+
+    Private Sub btnCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancel.Click
+        pOk = False
+        Me.Close()
+    End Sub
 
     Private Sub btnDownload_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDownload.Click
         SaveSetting("DataDownload", "Defaults", "RegionType", cboRegion.SelectedIndex)
@@ -75,6 +86,7 @@ Public Class frmDownload
             Dim lDesiredProjection As String = ""
             Dim lRegionXML As String = ""
             Dim lRegion As D4EMDataManager.Region = Me.SelectedRegion
+            Dim lMetWDM As String = txtMetWDM.Text
             If Not lRegion Is Nothing Then lRegionXML = lRegion.XML
 
             Dim lCacheFolder As String = GetSetting("DataDownload", "defaults", "Cache_dir")
@@ -91,6 +103,10 @@ Public Class frmDownload
                 If Not pMapWin.Project.FileName Is Nothing AndAlso pMapWin.Project.FileName.Length > 0 Then
                     lSaveFolder &= "<SaveIn>" & IO.Path.GetDirectoryName(pMapWin.Project.FileName) & "</SaveIn>" & vbCrLf
                 End If
+            End If
+
+            If lMetWDM.Length > 0 Then
+                lMetWDM = "<SaveMetWDM>" & lMetWDM & "</SaveMetWDM>" & vbCrLf
             End If
 
             For Each lControl As Windows.Forms.Control In Me.Controls
