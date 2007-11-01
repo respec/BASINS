@@ -4,28 +4,23 @@ Imports atcSeasons
 Imports MapWinUtility
 
 Public Module WatershedConstituentBalance
-    Public Sub ReportsToFiles(ByVal aOperations As atcCollection, _
-                              ByVal aBalanceTypes As atcCollection, _
+    Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci, _
+                              ByVal aBalanceType As String, _
+                              ByVal aOperationTypes As atcCollection, _
                               ByVal aScenario As String, _
                               ByVal aScenarioResults As atcDataSource, _
-                              ByVal aLocations As atcCollection, _
-                              ByVal aLandUses As atcCollection, _
-                              ByVal aRunMade As String)
+                              ByVal aOutletLocations As atcCollection, _
+                              ByVal aRunMade As String, _
+                              Optional ByVal aOutFilePrefix As String = "")
 
-        'make uci available 
-        Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
-        Dim lHspfUci As New atcUCI.HspfUci
-        lHspfUci.FastReadUciForStarter(lMsg, aScenario & ".uci")
-
-        For Each lBalanceType As String In aBalanceTypes
-            Dim lString As Text.StringBuilder = Report(lHspfUci, lBalanceType, aOperations, _
-                                                       aScenario, aScenarioResults, aLocations, _
-                                                       aLandUses, aRunMade)
-            Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_" & "Balance.txt"
+        For Each lOutletLocation As String In aOutletLocations
+            Dim lString As Text.StringBuilder = Report(aUci, aBalanceType, aOperationTypes, _
+                                                       aScenario, aScenarioResults, _
+                                                       aRunMade, lOutletLocation)
+            Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & lOutletLocation & "_" & aBalanceType & "_" & "Balance.txt")
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lString.ToString)
-        Next lBalanceType
+        Next lOutletLocation
     End Sub
 
     Public Function Report(ByVal aUci As atcUCI.HspfUci, _
@@ -33,10 +28,10 @@ Public Module WatershedConstituentBalance
                            ByVal aOperationTypes As atcCollection, _
                            ByVal aScenario As String, _
                            ByVal aScenarioResults As atcDataSource, _
-                           ByVal aLocations As atcCollection, _
-                           ByVal aLandUses As atcCollection, _
-                           ByVal aRunMade As String) As Text.StringBuilder
+                           ByVal aRunMade As String, _
+                           Optional ByVal aOutletLocation As String = "") As Text.StringBuilder
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
+        Dim lLandUses As atcCollection = HspfSupport.Utility.LandUses(aUci, aOperationTypes, aOutletLocation)
 
         Dim lString As New Text.StringBuilder
         lString.AppendLine(aBalanceType & " Watershed Balance Report For " & aScenario)
@@ -57,8 +52,8 @@ Public Module WatershedConstituentBalance
 
         For lOperationTypeIndex As Integer = 0 To aOperationTypes.Count - 1
             Dim lOperationKey As String = aOperationTypes.Keys(lOperationTypeIndex)
-            For lLanduseIndex As Integer = 0 To aLandUses.Count - 1
-                Dim lLandUse As String = aLandUses.Keys(lLanduseIndex)
+            For lLanduseIndex As Integer = 0 To lLandUses.Count - 1
+                Dim lLandUse As String = lLandUses.Keys(lLanduseIndex)
                 If lOperationKey.StartsWith(lLandUse.Substring(0, 1)) Then
                     Dim lNeedHeader As Boolean = True
                     For lIndex As Integer = 0 To lConstituentsToOutput.Count - 1
@@ -68,7 +63,7 @@ Public Module WatershedConstituentBalance
                             Dim lConstituentName As String = lConstituentsToOutput(lIndex)
                             lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentKey)
                             If lConstituentDataGroup.Count > 0 Then
-                                Dim lOperations As atcCollection = aLandUses.ItemByIndex(lLanduseIndex)
+                                Dim lOperations As atcCollection = lLandUses.ItemByIndex(lLanduseIndex)
                                 If lNeedHeader Then
                                     lString.AppendLine(vbCrLf)
                                     lString.AppendLine(aBalanceType & " Balance Report For " & lLandUse & vbCrLf)
@@ -87,10 +82,18 @@ Public Module WatershedConstituentBalance
                                     End If
                                     lString.Append(lDesc.PadRight(12))
                                     For lOperationIndex As Integer = 0 To lOperations.Count - 1
-                                        Dim lOperationName As String = lOperations.ItemByIndex(lOperationIndex)
+                                        Dim lOperationName As String = lOperations.Keys(lOperationIndex)
                                         lString.Append(vbTab & (lOperationName & "  ").PadLeft(12))
                                     Next
                                     lString.AppendLine()
+                                    If aOutletLocation.Length > 0 Then
+                                        lString.Append("Area".PadRight(12))
+                                        For lOperationIndex As Integer = 0 To lOperations.Count - 1
+                                            Dim lOperationArea As Double = lOperations.ItemByIndex(lOperationIndex)
+                                            lString.Append(vbTab & DecimalAlign(lOperationArea))
+                                        Next
+                                        lString.AppendLine()
+                                    End If
                                     lNeedHeader = False
                                 End If
                                 If lPendingOutput.Length > 0 Then
@@ -99,7 +102,7 @@ Public Module WatershedConstituentBalance
                                 End If
                                 lString.Append(lConstituentName.PadRight(12))
                                 For lOperationIndex As Integer = 0 To lOperations.Count - 1
-                                    Dim lLocation As String = lOperations.ItemByIndex(lOperationIndex)
+                                    Dim lLocation As String = lOperations.Keys(lOperationIndex)
                                     Dim lLocationDataGroup As atcDataGroup = lConstituentDataGroup.FindData("Location", lLocation)
                                     If lLocationDataGroup.Count > 0 Then
                                         lTempDataSet = lLocationDataGroup.Item(0)

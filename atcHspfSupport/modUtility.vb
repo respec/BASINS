@@ -1,6 +1,9 @@
+Imports atcUtility
+Imports atcUCI
+
 Public Module Utility
-    Friend Function ConstituentsToOutput(ByVal aType As String) As atcUtility.atcCollection
-        Dim lConstituentsToOutput As New atcUtility.atcCollection
+    Friend Function ConstituentsToOutput(ByVal aType As String) As atcCollection
+        Dim lConstituentsToOutput As New atcCollection
         Select Case aType
             Case "Water"
                 lConstituentsToOutput.Add("I:Header0", "Influx")
@@ -157,31 +160,72 @@ Public Module Utility
         Return lConstituentsToOutput
     End Function
 
-    Public Function LandUses(ByVal aUci As atcUCI.HspfUci) As atcUtility.atcCollection
-        Dim lLandUses As New atcUtility.atcCollection
-        Dim lOperations As atcUtility.atcCollection
+    Public Function LandUses(ByVal aUci As HspfUci, ByVal aOperationTypes As atcCollection, Optional ByVal aOutletLocation As String = "") As atcCollection
+        Dim lLocations As New atcCollection
+        If aOutletLocation.Length > 0 Then
+            lLocations = UpstreamLocations(aUci, aOperationTypes, aOutletLocation)
+        End If
+        Dim lLandUses As New atcCollection
+        Dim lOperations As atcCollection
         For lOperationIndex As Integer = 1 To aUci.OpnSeqBlock.Opns.Count
             Dim lOperation As atcUCI.HspfOperation = aUci.OpnSeqBlock.Opns(lOperationIndex)
-            Dim lLandUse As String = lOperation.Name.Substring(0, 1) & ":"
-            Dim lDecsriptonParts() As String = lOperation.Description.Split(" ")
-            For lIndex As Integer = 0 To lDecsriptonParts.GetUpperBound(0)
-                If Not IsNumeric(lDecsriptonParts(lIndex)) Then
-                    lLandUse &= lDecsriptonParts(lIndex) & " "
+            Dim lLocationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+            If lLocations.Count = 0 OrElse lLocations.IndexFromKey(lLocationKey) >= 0 Then
+                Dim lLandUse As String = lOperation.Name.Substring(0, 1) & ":"
+                Dim lDecsriptonParts() As String = lOperation.Description.Split(" ")
+                For lIndex As Integer = 0 To lDecsriptonParts.GetUpperBound(0)
+                    If Not IsNumeric(lDecsriptonParts(lIndex)) Then
+                        lLandUse &= lDecsriptonParts(lIndex) & " "
+                    End If
+                Next
+                lLandUse = lLandUse.Trim(" ")
+                Dim lOperationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
+                Dim lOperationArea As Double = 0.0
+                If aOutletLocation.Length > 0 Then
+                    lOperationArea = lLocations.ItemByKey(lLocationKey)
                 End If
-            Next
-            lLandUse = lLandUse.Trim(" ")
-            Dim lOperationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
-            Dim lLandUseKey As Integer = lLandUses.IndexFromKey(lLandUse)
-            If lLandUseKey = -1 Then
-                lOperations = New atcUtility.atcCollection
-                lOperations.Add(lOperationKey)
-                lLandUses.Add(lLandUse, lOperations)
-            Else
-                lOperations = lLandUses.Item(lLandUseKey)
-                lOperations.Add(lOperationKey)
+                Dim lLandUseKey As Integer = lLandUses.IndexFromKey(lLandUse)
+                If lLandUseKey = -1 Then
+                    lOperations = New atcCollection
+                    lOperations.Add(lOperationKey, lOperationArea)
+                    lLandUses.Add(lLandUse, lOperations)
+                Else
+                    lOperations = lLandUses.Item(lLandUseKey)
+                    lOperations.Add(lOperationKey, lOperationArea)
+                End If
             End If
-            Debug.Print(lOperation.Description)
         Next
         Return lLandUses
     End Function
+
+    Public Function UpstreamLocations(ByVal aUci As HspfUci, ByVal aOperationTypes As atcCollection, ByVal aLocation As String) As atcCollection
+        Dim lLocations As New atcCollection 'key-location, value-total area
+        UpstreamLocationAreaCalc(aUci, aLocation, aOperationTypes, lLocations)
+        Return lLocations
+    End Function
+
+    Private Sub UpstreamLocationAreaCalc(ByVal aUci As HspfUci, _
+                                         ByVal aLocation As String, _
+                                         ByVal aOperationTypes As atcCollection, _
+                                         ByRef aLocations As atcCollection)
+        Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
+        Dim lOperation As HspfOperation = aUci.OpnBlks(lOperName).operfromid(aLocation.Substring(2))
+        For Each lConnection As HspfConnection In lOperation.Sources
+            Dim lSourceVolName As String = lConnection.Source.VolName
+            Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
+            If lSourceVolName = "PERLND" Or lSourceVolName = "IMPLND" Then
+                If lConnection.MFact > 0 Then
+                    Dim lLocationIndex As Integer = aLocations.IndexFromKey(lLocationKey)
+                    If lLocationIndex = -1 Then
+                        aLocations.Add(lLocationKey, lConnection.MFact)
+                    Else
+                        aLocations.Item(lLocationIndex) += lConnection.MFact
+                    End If
+                End If
+            ElseIf lSourceVolName = "RCHRES" Then
+                UpstreamLocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations)
+            End If
+        Next
+        aLocations.Add(aLocation, 1.0)
+    End Sub
 End Module

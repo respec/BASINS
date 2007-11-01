@@ -4,21 +4,16 @@ Imports atcSeasons
 Imports MapWinUtility
 
 Public Module ConstituentBalance
-    Public Sub ReportsToFiles(ByVal aOperations As atcCollection, _
+    Public Sub ReportsToFiles(ByVal aUci As atcUCI.HspfUci, _
+                              ByVal aOperations As atcCollection, _
                               ByVal aBalanceTypes As atcCollection, _
                               ByVal aScenario As String, _
                               ByVal aScenarioResults As atcDataSource, _
                               ByVal aLocations As atcCollection, _
                               ByVal aRunMade As String)
 
-        'make uci available 
-        Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
-        Dim lHspfUci As New atcUCI.HspfUci
-        lHspfUci.FastReadUciForStarter(lMsg, aScenario & ".uci")
-
         For Each lBalanceType As String In aBalanceTypes
-            Dim lString As Text.StringBuilder = Report(lHspfUci, lBalanceType, aOperations, _
+            Dim lString As Text.StringBuilder = Report(aUci, lBalanceType, aOperations, _
                                                        aScenario, aScenarioResults, aLocations, _
                                                        aRunMade)
             Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_" & "Balance.txt"
