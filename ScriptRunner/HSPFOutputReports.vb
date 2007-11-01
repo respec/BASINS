@@ -26,7 +26,7 @@ Module HSPFOutputReports
 
         'open WDM file
         Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
-        Dim lWdmDataSource As New atcDataSourceWDM
+        Dim lWdmDataSource As New atcDataSourceWDM()
         lWdmDataSource.Open(lWdmFileName)
 
         Dim lOutFileName As String
@@ -55,9 +55,12 @@ Module HSPFOutputReports
 
         'open HBN file
         Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"
-        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut
+        Dim lHspfBinDataSource As New atcTimeseriesFileHspfBinOut()
         lHspfBinDataSource.Open(lHspfBinFileName)
+
         Dim lSummaryType As String = "Water"
+
+        'watershed summary
         Dim lHspfBinFileInfo As System.IO.FileInfo = New System.IO.FileInfo(lHspfBinFileName)
         Dim lString As Text.StringBuilder = HspfSupport.WatershedSummary.Report(lHspfUci, lHspfBinDataSource, lHspfBinFileInfo.LastWriteTime, lSummaryType)
         lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedSummary.txt"
@@ -65,16 +68,25 @@ Module HSPFOutputReports
         lString = Nothing
 
         'build collection of operation types to report
-        Dim lOperations As New atcCollection
-        lOperations.Add("P:", "PERLND")
-        lOperations.Add("I:", "IMPLND")
-        lOperations.Add("R:", "RCHRES")
+        Dim lOperationTypes As New atcCollection
+        lOperationTypes.Add("P:", "PERLND")
+        lOperationTypes.Add("I:", "IMPLND")
+        lOperationTypes.Add("R:", "RCHRES")
         Dim lLocations As atcCollection = lHspfBinDataSource.DataSets.SortedAttributeValues("Location")
 
-        lString = HspfSupport.ConstituentBalance.Report(lHspfUci, lSummaryType, lOperations, pBaseName, _
-                                            lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime)
+        'constituent balance
+        lString = HspfSupport.ConstituentBalance.Report _
+           (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
+            lHspfBinDataSource, lLocations, lHspfBinFileInfo.LastWriteTime)
         lOutFileName = "outfiles\" & lSummaryType & "_" & "ConstituentBalance.txt"
         SaveFileString(lOutFileName, lString.ToString)
 
+        'watershed constituent balance
+        Dim lLandUses As atcCollection = HspfSupport.Utility.LandUses(lHspfUci)
+        lString = HspfSupport.WatershedConstituentBalance.Report _
+           (lHspfUci, lSummaryType, lOperationTypes, pBaseName, _
+            lHspfBinDataSource, lLocations, llanduses, lHspfBinFileInfo.LastWriteTime)
+        lOutFileName = "outfiles\" & lSummaryType & "_" & "WatershedConstituentBalance.txt"
+        SaveFileString(lOutFileName, lString.ToString)
     End Sub
 End Module

@@ -3,12 +3,13 @@ Imports atcData
 Imports atcSeasons
 Imports MapWinUtility
 
-Public Module ConstituentBalance
+Public Module WatershedConstituentBalance
     Public Sub ReportsToFiles(ByVal aOperations As atcCollection, _
                               ByVal aBalanceTypes As atcCollection, _
                               ByVal aScenario As String, _
                               ByVal aScenarioResults As atcDataSource, _
                               ByVal aLocations As atcCollection, _
+                              ByVal aLandUses As atcCollection, _
                               ByVal aRunMade As String)
 
         'make uci available 
@@ -20,7 +21,7 @@ Public Module ConstituentBalance
         For Each lBalanceType As String In aBalanceTypes
             Dim lString As Text.StringBuilder = Report(lHspfUci, lBalanceType, aOperations, _
                                                        aScenario, aScenarioResults, aLocations, _
-                                                       aRunMade)
+                                                       aLandUses, aRunMade)
             Dim lOutFileName As String = aScenario & "_" & lBalanceType & "_" & "Balance.txt"
             Logger.Dbg("  WriteReportTo " & lOutFileName)
             SaveFileString(lOutFileName, lString.ToString)
@@ -33,11 +34,12 @@ Public Module ConstituentBalance
                            ByVal aScenario As String, _
                            ByVal aScenarioResults As atcDataSource, _
                            ByVal aLocations As atcCollection, _
+                           ByVal aLandUses As atcCollection, _
                            ByVal aRunMade As String) As Text.StringBuilder
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
 
         Dim lString As New Text.StringBuilder
-        lString.AppendLine(aBalanceType & " Balance Report For " & aScenario)
+        lString.AppendLine(aBalanceType & " Watershed Balance Report For " & aScenario)
         lString.AppendLine("   Run Made " & aRunMade)
         lString.AppendLine("   " & aUci.GlobalBlock.RunInf.Value)
         lString.AppendLine("   " & aUci.GlobalBlock.RunPeriod)
@@ -48,59 +50,45 @@ Public Module ConstituentBalance
                 lString.AppendLine("   (Units:mm)")
             End If
         End If
-        lString.AppendLine(vbCrLf)
 
         Dim lConstituentDataGroup As atcDataGroup
         Dim lTempDataSet As atcDataSet
+        Dim lPendingOutput As String = ""
 
-        For lOperationIndex As Integer = 0 To aOperationTypes.Count - 1
-            Dim lOperationKey As String = aOperationTypes.Keys(lOperationIndex)
-            For Each lLocation As String In aLocations
-                If lLocation.StartsWith(lOperationKey) Then
-                    'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
-                    Dim lLocationDataGroup As atcDataGroup = aScenarioResults.DataSets.FindData("Location", lLocation)
-                    'Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
+        For lOperationTypeIndex As Integer = 0 To aOperationTypes.Count - 1
+            Dim lOperationKey As String = aOperationTypes.Keys(lOperationTypeIndex)
+            For lLanduseIndex As Integer = 0 To aLandUses.Count - 1
+                Dim lLandUse As String = aLandUses.Keys(lLanduseIndex)
+                If lOperationKey.StartsWith(lLandUse.Substring(0, 1)) Then
                     Dim lNeedHeader As Boolean = True
-                    Dim lPendingOutput As String = ""
                     For lIndex As Integer = 0 To lConstituentsToOutput.Count - 1
                         Dim lConstituentKey As String = lConstituentsToOutput.Keys(lIndex)
                         If lConstituentKey.StartsWith(lOperationKey) Then
                             lConstituentKey = lConstituentKey.Remove(0, 2)
                             Dim lConstituentName As String = lConstituentsToOutput(lIndex)
-                            lConstituentDataGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
+                            lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentKey)
                             If lConstituentDataGroup.Count > 0 Then
-                                lTempDataSet = lConstituentDataGroup.Item(0)
-                                Dim lSeasons As atcSeasonBase
-                                If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
-                                    lSeasons = New atcSeasonsWaterYear
-                                Else
-                                    lSeasons = New atcSeasonsCalendarYear
-                                End If
-                                Dim lSeasonalAttributes As New atcDataAttributes
-                                Dim lCalculatedAttributes As New atcDataAttributes
-                                lSeasonalAttributes.SetValue("Sum", 0) 'fluxes are summed from daily, monthly or annual to annual
-                                lSeasons.SetSeasonalAttributes(lTempDataSet, lSeasonalAttributes, lCalculatedAttributes)
-
+                                Dim lOperations As atcCollection = aLandUses.ItemByIndex(lLanduseIndex)
                                 If lNeedHeader Then
+                                    lString.AppendLine(vbCrLf)
+                                    lString.AppendLine(aBalanceType & " Balance Report For " & lLandUse & vbCrLf)
                                     'get operation description for header
                                     Dim lDesc As String = ""
                                     Dim lOperName As String = ""
-                                    If lLocation.Substring(0, 1) = "P" Then
+                                    If lOperationKey.Substring(0, 1) = "P" Then
                                         lOperName = "PERLND"
-                                    ElseIf lLocation.Substring(0, 1) = "I" Then
+                                    ElseIf lOperationKey.Substring(0, 1) = "I" Then
                                         lOperName = "IMPLND"
-                                    ElseIf lLocation.Substring(0, 1) = "R" Then
+                                    ElseIf lOperationKey.Substring(0, 1) = "R" Then
                                         lOperName = "RCHRES"
                                     End If
                                     If lOperName.Length > 0 Then
-                                        lDesc = aUci.OpnBlks(lOperName).operfromid(lLocation.Substring(2)).description
+                                        lDesc = lOperName & ":"
                                     End If
-
-                                    lString.AppendLine(aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ")" & vbCrLf)
-                                    lString.Append("Date    " & vbTab & "      Mean")
-                                    For Each lAttribute As atcDefinedValue In lCalculatedAttributes
-                                        Dim s As String = lAttribute.Arguments(1).Value
-                                        lString.Append(vbTab & s.PadLeft(10))
+                                    lString.Append(lDesc.PadRight(12))
+                                    For lOperationIndex As Integer = 0 To lOperations.Count - 1
+                                        Dim lOperationName As String = lOperations.ItemByIndex(lOperationIndex)
+                                        lString.Append(vbTab & (lOperationName & "  ").PadLeft(12))
                                     Next
                                     lString.AppendLine()
                                     lNeedHeader = False
@@ -109,14 +97,20 @@ Public Module ConstituentBalance
                                     lString.AppendLine(lPendingOutput)
                                     lPendingOutput = ""
                                 End If
-
-                                lString.Append(lConstituentName & vbTab & DecimalAlign(lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value))
-                                For Each lAttribute As atcDefinedValue In lCalculatedAttributes
-                                    lString.Append(vbTab & DecimalAlign(lAttribute.Value))
-                                Next
+                                lString.Append(lConstituentName.PadRight(12))
+                                For lOperationIndex As Integer = 0 To lOperations.Count - 1
+                                    Dim lLocation As String = lOperations.ItemByIndex(lOperationIndex)
+                                    Dim lLocationDataGroup As atcDataGroup = lConstituentDataGroup.FindData("Location", lLocation)
+                                    If lLocationDataGroup.Count > 0 Then
+                                        lTempDataSet = lLocationDataGroup.Item(0)
+                                        lString.Append(vbTab & DecimalAlign(lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value))
+                                    Else
+                                        lString.Append(vbTab & Space(12))
+                                    End If
+                                Next lOperationIndex
                                 lString.AppendLine()
                             ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                   lConstituentKey.Length > 5 AndAlso _
+                                    lConstituentKey.Length > 5 AndAlso _
                                    IsNumeric(lConstituentKey.Substring(5)) Then
                                 Dim lTotalCount As Integer = lConstituentKey.Substring(5)
                                 Dim lStr As String = lString.ToString
@@ -132,11 +126,13 @@ Public Module ConstituentBalance
                                         lCurFieldValues.Initialize()
                                     End If
                                     For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
-                                        lCurFieldValues(lFieldPos) += lCurFields(lFieldPos)
+                                        If lCurFields(lFieldPos).Trim.Length > 0 Then
+                                            lCurFieldValues(lFieldPos) += lCurFields(lFieldPos)
+                                        End If
                                     Next
                                     lRecEndPos = lRecStartPos
                                 Next
-                                lString.Append(lConstituentName)
+                                lString.Append(lConstituentName.PadRight(12))
                                 For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
                                     lString.Append(vbTab & DecimalAlign(lCurFieldValues(lFieldPos)))
                                 Next
@@ -151,26 +147,10 @@ Public Module ConstituentBalance
                                 lPendingOutput &= lConstituentName
                             End If
                         End If
-                    Next
-
-                    If lConstituentsToOutput.Count = 0 Then
-                        Logger.Dbg(" BalanceType " & aBalanceType & " at " & lLocation & " has no timeseries to output in script!")
-                    Else
-                        If lPendingOutput.Length > 0 Then
-                            If lNeedHeader Then
-                                lString.AppendLine("No data for " & aBalanceType & " balance report at " & lLocation & "!")
-                            Else
-                                Logger.Dbg("  No data for " & lPendingOutput)
-                            End If
-                        End If
-                    End If
-                    lLocationDataGroup = Nothing
-                    lString.AppendLine(vbCrLf)
-                Else
-                    'Logger.Dbg("   SKIP " & lLocation)
+                    Next lIndex
                 End If
-            Next lLocation
-        Next lOperationIndex
+            Next lLanduseIndex
+        Next lOperationTypeIndex
 
         Return lString
     End Function

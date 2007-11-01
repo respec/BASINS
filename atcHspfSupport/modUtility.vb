@@ -1,4 +1,4 @@
-Module modConstituents
+Public Module Utility
     Friend Function ConstituentsToOutput(ByVal aType As String) As atcUtility.atcCollection
         Dim lConstituentsToOutput As New atcUtility.atcCollection
         Select Case aType
@@ -155,5 +155,25 @@ Module modConstituents
             Case "TotalP"
         End Select
         Return lConstituentsToOutput
+    End Function
+
+    Public Function LandUses(ByVal aUci As atcUCI.HspfUci) As atcUtility.atcCollection
+        Dim lLandUses As New atcUtility.atcCollection
+        For lOperationIndex As Integer = 1 To aUci.OpnSeqBlock.Opns.Count
+            Dim lOperation As atcUCI.HspfOperation = aUci.OpnSeqBlock.Opns(lOperationIndex)
+            Dim lLandUse As String = lOperation.Name.Substring(0, 1) & ":"
+            Dim lDecsriptonParts() As String = lOperation.Description.Split(" ")
+            For lIndex As Integer = 0 To lDecsriptonParts.GetUpperBound(0)
+                If Not IsNumeric(lDecsriptonParts(lIndex)) Then
+                    lLandUse &= lDecsriptonParts(lIndex) & " "
+                End If
+            Next
+            lLandUse = lLandUse.Trim(" ")
+            If lLandUses.IndexFromKey(lLandUse) = -1 Then
+                lLandUses.Add(lLandUse, lLandUse)
+            End If
+            Debug.Print(lOperation.Description)
+        Next
+        Return lLandUses
     End Function
 End Module
