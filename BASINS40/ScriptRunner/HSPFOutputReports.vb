@@ -13,13 +13,15 @@ Module HSPFOutputReports
     Private pOutputLocations As New atcCollection
 
     Private Sub Initialize()
+        pOutputLocations.Clear()
         pTestPath = "D:\MountainViewData\Calleguas\"
         pBaseName = "Calleg"
         pOutputLocations.Add("R:408")
         pOutputLocations.Add("R:10")
-        'pTestPath ="C:\test\EXP_CAL\hyd_man.net"
-        'pBaseName ="hyd_man"
-
+        'pTestPath = "C:\test\EXP_CAL\hyd_man.net"
+        'pBaseName = "hyd_man"
+        'pOutputLocations.Add("R:5")
+        'pOutputLocations.Add("R:4")
     End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)

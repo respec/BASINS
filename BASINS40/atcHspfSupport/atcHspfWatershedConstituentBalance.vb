@@ -30,6 +30,12 @@ Public Module WatershedConstituentBalance
                            ByVal aScenarioResults As atcDataSource, _
                            ByVal aRunMade As String, _
                            Optional ByVal aOutletLocation As String = "") As Text.StringBuilder
+
+        Dim lWeight As Boolean = False
+        If aOutletLocation.Length > 0 Then
+            lWeight = True
+        End If
+
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
         Dim lLandUses As atcCollection = HspfSupport.Utility.LandUses(aUci, aOperationTypes, aOutletLocation)
 
@@ -49,6 +55,7 @@ Public Module WatershedConstituentBalance
         Dim lConstituentDataGroup As atcDataGroup
         Dim lTempDataSet As atcDataSet
         Dim lPendingOutput As String = ""
+        Dim lAreaTotal As Double = 0.0
 
         For lOperationTypeIndex As Integer = 0 To aOperationTypes.Count - 1
             Dim lOperationKey As String = aOperationTypes.Keys(lOperationTypeIndex)
@@ -56,6 +63,9 @@ Public Module WatershedConstituentBalance
                 Dim lLandUse As String = lLandUses.Keys(lLanduseIndex)
                 If lOperationKey.StartsWith(lLandUse.Substring(0, 1)) Then
                     Dim lNeedHeader As Boolean = True
+                    Dim lAreaLanduse As Double = 0.0
+                    Dim lOperations As atcCollection = lLandUses.ItemByIndex(lLanduseIndex)
+                    Dim lAreaOperation(lOperations.Count - 1) As Double
                     For lIndex As Integer = 0 To lConstituentsToOutput.Count - 1
                         Dim lConstituentKey As String = lConstituentsToOutput.Keys(lIndex)
                         If lConstituentKey.StartsWith(lOperationKey) Then
@@ -63,7 +73,6 @@ Public Module WatershedConstituentBalance
                             Dim lConstituentName As String = lConstituentsToOutput(lIndex)
                             lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentKey)
                             If lConstituentDataGroup.Count > 0 Then
-                                Dim lOperations As atcCollection = lLandUses.ItemByIndex(lLanduseIndex)
                                 If lNeedHeader Then
                                     lString.AppendLine(vbCrLf)
                                     lString.AppendLine(aBalanceType & " Balance Report For " & lLandUse & vbCrLf)
@@ -85,13 +94,19 @@ Public Module WatershedConstituentBalance
                                         Dim lOperationName As String = lOperations.Keys(lOperationIndex)
                                         lString.Append(vbTab & (lOperationName & "  ").PadLeft(12))
                                     Next
+                                    If lWeight Then
+                                        lString.Append(vbTab & "WtdAvg  ".PadLeft(12))
+                                    End If
                                     lString.AppendLine()
-                                    If aOutletLocation.Length > 0 Then
+                                    If lWeight Then
+                                        lString.AppendLine()
                                         lString.Append("Area".PadRight(12))
                                         For lOperationIndex As Integer = 0 To lOperations.Count - 1
-                                            Dim lOperationArea As Double = lOperations.ItemByIndex(lOperationIndex)
-                                            lString.Append(vbTab & DecimalAlign(lOperationArea))
+                                            lAreaOperation(lOperationIndex) = lOperations.ItemByIndex(lOperationIndex)
+                                            lString.Append(vbTab & DecimalAlign(lAreaOperation(lOperationIndex)))
+                                            lAreaLanduse += lAreaOperation(lOperationIndex)
                                         Next
+                                        lString.Append(vbTab & DecimalAlign(lAreaLanduse))
                                         lString.AppendLine()
                                     End If
                                     lNeedHeader = False
@@ -101,16 +116,23 @@ Public Module WatershedConstituentBalance
                                     lPendingOutput = ""
                                 End If
                                 lString.Append(lConstituentName.PadRight(12))
+                                Dim lWeightAccum As Double = 0.0
                                 For lOperationIndex As Integer = 0 To lOperations.Count - 1
                                     Dim lLocation As String = lOperations.Keys(lOperationIndex)
                                     Dim lLocationDataGroup As atcDataGroup = lConstituentDataGroup.FindData("Location", lLocation)
+                                    Dim lValue As Double = 0.0
                                     If lLocationDataGroup.Count > 0 Then
                                         lTempDataSet = lLocationDataGroup.Item(0)
-                                        lString.Append(vbTab & DecimalAlign(lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value))
-                                    Else
-                                        lString.Append(vbTab & Space(12))
+                                        lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                                    End If
+                                    lString.Append(vbTab & DecimalAlign(lValue))
+                                    If lWeight Then
+                                        lWeightAccum += lValue * lAreaOperation(lOperationIndex)
                                     End If
                                 Next lOperationIndex
+                                If lWeight Then
+                                    lString.Append(vbTab & DecimalAlign(lWeightAccum / lAreaLanduse))
+                                End If
                                 lString.AppendLine()
                             ElseIf lConstituentKey.StartsWith("Total") AndAlso _
                                     lConstituentKey.Length > 5 AndAlso _
@@ -137,7 +159,8 @@ Public Module WatershedConstituentBalance
                                 Next
                                 lString.Append(lConstituentName.PadRight(12))
                                 For lFieldPos As Integer = 1 To lCurFieldValues.GetUpperBound(0)
-                                    lString.Append(vbTab & DecimalAlign(lCurFieldValues(lFieldPos)))
+                                    Dim lValue As Double = lCurFieldValues(lFieldPos)
+                                    lString.Append(vbTab & DecimalAlign(lValue))
                                 Next
                                 lString.AppendLine()
                             Else
@@ -148,6 +171,14 @@ Public Module WatershedConstituentBalance
                                     lPendingOutput &= vbCrLf
                                 End If
                                 lPendingOutput &= lConstituentName
+                                If Not lConstituentKey.StartsWith("Header") Then
+                                    For lOperationIndex As Integer = 0 To lOperations.Count - 1
+                                        lPendingOutput &= vbTab & DecimalAlign(0.0)
+                                    Next
+                                    If lWeight Then
+                                        lPendingOutput &= vbTab & DecimalAlign(0.0)
+                                    End If
+                                End If
                             End If
                         End If
                     Next lIndex
@@ -155,6 +186,34 @@ Public Module WatershedConstituentBalance
             Next lLanduseIndex
         Next lOperationTypeIndex
 
+        If lWeight Then
+            lString.AppendLine()
+            lString.AppendLine()
+            lString.AppendLine("Overall Weighted " & aBalanceType & " Balance Averages")
+            lString.AppendLine()
+            If aBalanceType = "Water" Then
+                lString.AppendLine(Space(12) & vbTab & "Over".PadLeft(12) & _
+                                               vbTab & "Land".PadRight(12) & _
+                                               vbTab & "Reach".PadLeft(12) & _
+                                               vbTab & "Outlets".PadRight(12) & _
+                                               vbTab & "Plant".PadLeft(12) & _
+                                               vbTab & "Efflnt".PadRight(12) & _
+                                               vbTab & "GW".PadLeft(12) & _
+                                               vbTab & "Pumping".PadRight(12) & _
+                                               vbTab & "Channel".PadLeft(12) & _
+                                               vbTab & "Losses".PadRight(12))
+                lString.AppendLine(Space(12) & vbTab & "Inches".PadLeft(12) & _
+                                               vbTab & "Ac-Ft".PadRight(12) & _
+                                               vbTab & "Inches".PadLeft(12) & _
+                                               vbTab & "Ac-Ft".PadRight(12) & _
+                                               vbTab & "Inches".PadLeft(12) & _
+                                               vbTab & "Ac-Ft".PadRight(12) & _
+                                               vbTab & "Inches".PadLeft(12) & _
+                                               vbTab & "Ac-Ft".PadRight(12) & _
+                                               vbTab & "Inches".PadLeft(12) & _
+                                               vbTab & "Ac-Ft".PadRight(12))
+            End If
+        End If
         Return lString
     End Function
 End Module
