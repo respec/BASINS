@@ -215,17 +215,21 @@ Public Module Utility
             Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
             If lSourceVolName = "PERLND" Or lSourceVolName = "IMPLND" Then
                 If lConnection.MFact > 0 Then
-                    Dim lLocationIndex As Integer = aLocations.IndexFromKey(lLocationKey)
-                    If lLocationIndex = -1 Then
-                        aLocations.Add(lLocationKey, lConnection.MFact)
-                    Else
-                        aLocations.Item(lLocationIndex) += lConnection.MFact
-                    End If
+                    IncrementCollectionValue(lLocationKey, lConnection.MFact, aLocations)
                 End If
             ElseIf lSourceVolName = "RCHRES" Then
                 UpstreamLocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations)
             End If
         Next
         aLocations.Add(aLocation, 1.0)
+    End Sub
+
+    Friend Sub IncrementCollectionValue(ByVal aKey As String, ByVal aValueToAdd As Double, ByRef aCollection As atcCollection)
+        Dim lKeyIndex As Integer = aCollection.IndexFromKey(aKey)
+        If lKeyIndex = -1 Then
+            aCollection.Add(aKey, aValueToAdd)
+        Else
+            aCollection.Item(lKeyIndex) += aValueToAdd
+        End If
     End Sub
 End Module

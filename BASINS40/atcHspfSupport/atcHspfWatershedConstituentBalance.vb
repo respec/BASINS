@@ -37,6 +37,7 @@ Public Module WatershedConstituentBalance
         End If
 
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
+        Dim lConstituentTotals As New atcCollection
         Dim lLandUses As atcCollection = HspfSupport.Utility.LandUses(aUci, aOperationTypes, aOutletLocation)
 
         Dim lString As New Text.StringBuilder
@@ -107,6 +108,7 @@ Public Module WatershedConstituentBalance
                                             lAreaLanduse += lAreaOperation(lOperationIndex)
                                         Next
                                         lString.Append(vbTab & DecimalAlign(lAreaLanduse))
+                                        lAreaTotal += lAreaLanduse
                                         lString.AppendLine()
                                     End If
                                     lNeedHeader = False
@@ -131,6 +133,7 @@ Public Module WatershedConstituentBalance
                                     End If
                                 Next lOperationIndex
                                 If lWeight Then
+                                    IncrementCollectionValue(lOperationKey & lConstituentKey, lWeightAccum, lConstituentTotals)
                                     lString.Append(vbTab & DecimalAlign(lWeightAccum / lAreaLanduse))
                                 End If
                                 lString.AppendLine()
@@ -213,6 +216,32 @@ Public Module WatershedConstituentBalance
                                                vbTab & "Inches".PadLeft(12) & _
                                                vbTab & "Ac-Ft".PadRight(12))
             End If
+            Dim lOperType As String = " "
+            For lIndex As Integer = 0 To lConstituentsToOutput.Count - 1
+                Dim lConstituentKey As String = lConstituentsToOutput.Keys(lIndex)
+                If Not lConstituentKey.StartsWith(lOperType) Then
+                    lOperType = lConstituentKey.Substring(0, 1)
+                    lString.AppendLine()
+                    Select Case lOperType.ToLower
+                        Case "p" : lString.AppendLine("PERLND:")
+                        Case "i" : lString.AppendLine("IMPLND:")
+                    End Select
+                End If
+                Dim lIndexTotal As Integer = lConstituentTotals.IndexFromKey(lConstituentKey)
+                If lIndexTotal >= 0 Then
+                    Dim lValue As Double = lConstituentTotals.Item(lIndexTotal)
+                    lString.AppendLine(lConstituentsToOutput(lIndex).PadRight(12) & vbTab & _
+                                       DecimalAlign(lValue / lAreaTotal) & vbTab & _
+                                       DecimalAlign(lValue / 12))
+                ElseIf Not lConstituentKey.Substring(2).StartsWith("Header") Then
+                    lString.AppendLine(lConstituentsToOutput(lIndex).PadRight(12) & vbTab & _
+                                       DecimalAlign(0.0) & vbTab & _
+                                       DecimalAlign(0.0))
+                Else
+                    lString.AppendLine()
+                    lString.AppendLine(lConstituentsToOutput(lIndex).PadRight(12))
+                End If
+            Next
         End If
         Return lString
     End Function

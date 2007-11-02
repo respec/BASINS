@@ -14,14 +14,20 @@ Module HSPFOutputReports
 
     Private Sub Initialize()
         pOutputLocations.Clear()
-        pTestPath = "D:\MountainViewData\Calleguas\"
-        pBaseName = "Calleg"
-        pOutputLocations.Add("R:408")
-        pOutputLocations.Add("R:10")
-        'pTestPath = "C:\test\EXP_CAL\hyd_man.net"
-        'pBaseName = "hyd_man"
-        'pOutputLocations.Add("R:5")
-        'pOutputLocations.Add("R:4")
+        'Dim lTestName As String = "hyd_man"
+        Dim lTestName As String = "calleguas"
+        Select Case lTestName
+            Case "calleguas"
+                pTestPath = "D:\MountainViewData\Calleguas\"
+                pBaseName = "Calleg"
+                pOutputLocations.Add("R:408")
+                pOutputLocations.Add("R:10")
+            Case "hyd_man"
+                pTestPath = "C:\test\EXP_CAL\hyd_man.net"
+                pBaseName = "hyd_man"
+                pOutputLocations.Add("R:5")
+                pOutputLocations.Add("R:4")
+        End Select
     End Sub
 
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
