@@ -166,7 +166,7 @@ Public Class DownloadDataPlugin
             Dim lDownloadForm As New frmDownload
             Dim lQuery As String = lDownloadForm.AskUser(g_MapWin)
             'Logger.Msg(lQuery, "Query from frmDownload")
-            If Not lQuery.Equals(frmDownload.CancelString) Then
+            If lQuery.Length > 0 AndAlso Not lQuery.Equals(frmDownload.CancelString) Then
                 Dim lPlugins As New ArrayList
                 For lPluginIndex As Integer = 0 To g_MapWin.Plugins.Count
                     Try

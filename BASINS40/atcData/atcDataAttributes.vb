@@ -49,7 +49,7 @@ Public Class atcDataAttributes
     'Retrieve the atcAttributeDefinition for aAttributeName
     Public Shared Function GetDefinition(ByVal aAttributeName As String) As atcAttributeDefinition
         Dim lKey As String = AttributeNameToKey(aAttributeName)
-        Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(AttributeNameToKey(aAttributeName))
+        Dim lDef As atcAttributeDefinition = pAllDefinitions.ItemByKey(lKey)
         If lDef Is Nothing Then
             If lKey.StartsWith("%sum") Then
                 lDef = pAllDefinitions.ItemByKey("%sum*")
@@ -210,6 +210,7 @@ Public Class atcDataAttributes
 
     'Set attribute with name aAttributeName to value aValue
     Public Shadows Function Add(ByVal aAttributeName As String, ByVal aAttributeValue As Object) As Integer
+        AttributeNameToKey(aAttributeName) 'Set aAttributeName to preferred alias
         Dim lTmpAttrDef As atcAttributeDefinition = GetDefinition(aAttributeName)
         If lTmpAttrDef Is Nothing Then
             lTmpAttrDef = New atcAttributeDefinition
@@ -373,10 +374,10 @@ Public Class atcDataAttributes
                         End If
                     End If
                 Catch NullExcep As NullReferenceException
-                'Ignore these
-            Catch CalcExcep As Exception
-                Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
-            End Try
+                    'Ignore these
+                Catch CalcExcep As Exception
+                    Logger.Dbg("Exception calculating " & aAttributeName & ": " & CalcExcep.Message)
+                End Try
             End If
         End If
         Return lAttribute

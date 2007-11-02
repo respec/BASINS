@@ -11,7 +11,7 @@ Public Class frmDownload
         pMapWin = aMapWin
 
         'The following line hot-wires the form to just do met data download
-        chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 ': Return Me.XML
+        'chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 : Me.Height = 133 ': Return Me.XML
 
         If Not pMapWin.Project Is Nothing Then
             If Not pMapWin.Project.FileName Is Nothing AndAlso pMapWin.Project.FileName.Length > 0 Then
@@ -123,6 +123,7 @@ Public Class frmDownload
                                      & lCacheFolder _
                                      & lDesiredProjection _
                                      & lRegionXML _
+                                     & lMetWDM _
                                      & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                                      & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                                      & "</arguments>" & vbCrLf _
@@ -140,6 +141,7 @@ Public Class frmDownload
                              & lCacheFolder _
                              & lDesiredProjection _
                              & lRegionXML _
+                             & lMetWDM _
                              & "<clip>" & chkClip.Checked & "</clip>" & vbCrLf _
                              & "<merge>" & chkMerge.Checked & "</merge>" & vbCrLf _
                              & "<joinattributes>true</joinattributes>" & vbCrLf _
