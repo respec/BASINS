@@ -11,7 +11,7 @@ Public Class frmDownload
         pMapWin = aMapWin
 
         'The following line hot-wires the form to just do met data download
-        chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 : Me.Height = 151 ': Return Me.XML
+        chkBASINS_Met.Checked = True : cboRegion.SelectedIndex = 0 : Me.Height = 141 ': Return Me.XML
 
         If Not pMapWin.Project Is Nothing Then
             If Not pMapWin.Project.FileName Is Nothing AndAlso pMapWin.Project.FileName.Length > 0 Then
