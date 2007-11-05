@@ -214,7 +214,19 @@ Public Class atcTimeseriesStatistics
                 aTimeseries.Attributes.SetValue("Min", lMin)
                 aTimeseries.Attributes.SetValue("Sum", lSum)
                 If Not aTimeseries.Dates Is Nothing Then
-                    Dim lYearSpan As Double = (aTimeseries.Dates.Value(lLastValueIndex) - aTimeseries.Dates.Value(0)) / 365.25
+                    Dim lSDate(5), lEDate(5) As Integer
+                    Dim lYearSpan As Double
+                    J2Date(aTimeseries.Dates.Value(0), lSDate)
+                    J2Date(aTimeseries.Dates.Value(lLastValueIndex), lEDate)
+                    If lSDate(1) = lEDate(1) AndAlso _
+                       lSDate(2) = lEDate(2) AndAlso _
+                       lSDate(3) = lEDate(3) AndAlso _
+                       lSDate(4) = lEDate(4) AndAlso _
+                       lSDate(5) = lEDate(5) Then ' exact number of years
+                        lYearSpan = lEDate(0) - lSDate(0)
+                    Else 'not exact, approximate
+                        lYearSpan = (aTimeseries.Dates.Value(lLastValueIndex) - aTimeseries.Dates.Value(0)) / 365.25
+                    End If
                     aTimeseries.Attributes.SetValue("SumAnnual", lSum / lYearSpan)
                 End If
                 lMean = lSum / lCount
