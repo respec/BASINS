@@ -636,7 +636,7 @@ StartOver:
     Private Function AddShapeToMW(ByVal aFilename As String, _
                                   ByRef layerXml As Chilkat.Xml) As MapWindow.Interfaces.Layer
         Dim LayerName As String
-        Dim Group As String
+        Dim Group As String = ""
         Dim Visible As Boolean
         Dim Style As atcRenderStyle = Nothing
 
@@ -658,7 +658,9 @@ StartOver:
             If layerXml Is Nothing Then
                 LayerName = FilenameOnly(aFilename)
                 Visible = True
-                Group = "Other"                
+                If Not IO.File.Exists(IO.Path.ChangeExtension(aFilename, ".mwsr")) Then
+                    Group = "Other"
+                End If
             Else
                 LayerName = layerXml.GetAttrValue("Name")
                 Group = layerXml.GetAttrValue("Group")
