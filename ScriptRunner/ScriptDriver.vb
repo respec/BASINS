@@ -15,6 +15,7 @@ Public Module ScriptDriver
         'ScriptShapefileFromWDM.ScriptMain(aMapWin)
         'ScriptSQLLiteTester.ScriptMain(aMapWin)
         'ScriptStatTest.ScriptMain(aMapWin)
-        HSPFOutputReports.ScriptMain(aMapWin)
+        'HSPFOutputReports.ScriptMain(aMapWin)
+        ScriptGridCreateFromPoly.ScriptMain(aMapWin)
     End Sub
 End Module
