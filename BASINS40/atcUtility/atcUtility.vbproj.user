@@ -20,13 +20,12 @@
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
     <RemoteDebugMachine>
     </RemoteDebugMachine>
-    <StartAction>Project</StartAction>
+    <StartAction>Program</StartAction>
     <StartArguments>
     </StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>
-    </StartProgram>
+    <StartProgram>C:\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
     <StartURL>
     </StartURL>
     <StartWorkingDirectory>
@@ -41,13 +40,12 @@
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
     <RemoteDebugMachine>
     </RemoteDebugMachine>
-    <StartAction>Project</StartAction>
+    <StartAction>Program</StartAction>
     <StartArguments>
     </StartArguments>
     <StartPage>
     </StartPage>
-    <StartProgram>
-    </StartProgram>
+    <StartProgram>C:\dev\BASINS40\Bin\MapWindow.exe</StartProgram>
     <StartURL>
     </StartURL>
     <StartWorkingDirectory>
