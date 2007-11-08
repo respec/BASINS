@@ -191,17 +191,22 @@ Public Module modString
     Function DecimalAlign(ByVal aValue As Double, _
                  Optional ByVal aFieldWidth As Integer = 12, _
                  Optional ByVal aDecimalPlaces As Integer = 3) As String
-        Dim lFormat As String
-        If aDecimalPlaces > 1 Then
-            lFormat = "###,##0.0" & StrDup(aDecimalPlaces - 1, "#")
+        Dim lString As String
+        If Double.IsNaN(aValue) Then
+            lString = Space(aFieldWidth / 2) & "NaN"
         Else
-            lFormat = "###,##0.0"
-        End If
-        Dim lString As String = DoubleToString(aValue, aFieldWidth, lFormat)
-        Dim dp As Integer = lString.IndexOf("."c)
-        If dp >= 0 Then
-            Dim lAddLeft As Integer = aFieldWidth - 5 - dp
-            If lAddLeft > 0 Then lString = Space(lAddLeft) & lString
+            Dim lFormat As String
+            If aDecimalPlaces > 1 Then
+                lFormat = "###,##0.0" & StrDup(aDecimalPlaces - 1, "#")
+            Else
+                lFormat = "###,##0.0"
+            End If
+            lString = DoubleToString(aValue, aFieldWidth, lFormat)
+            Dim dp As Integer = lString.IndexOf("."c)
+            If dp >= 0 Then
+                Dim lAddLeft As Integer = aFieldWidth - 5 - dp
+                If lAddLeft > 0 Then lString = Space(lAddLeft) & lString
+            End If
         End If
         Return lString.PadRight(aFieldWidth)
     End Function

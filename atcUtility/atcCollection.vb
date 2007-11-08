@@ -61,17 +61,26 @@ Public Class atcCollection
         End Set
     End Property
 
-    Public Shadows Function Add(ByVal Value As Object) As Integer
-        Return Add(Value, Value)
+    Public Shadows Function Add(ByVal aValue As Object) As Integer
+        Return Add(aValue, aValue)
     End Function
-    Public Shadows Function Add(ByVal key As Object, ByVal value As Object) As Integer
-        pKeys.Add(key)
-        Return MyBase.Add(value)
+    Public Shadows Function Add(ByVal aKey As Object, ByVal aValue As Object) As Integer
+        pKeys.Add(aKey)
+        Return MyBase.Add(aValue)
     End Function
 
-    Public Shadows Sub AddRange(ByVal c As System.Collections.ICollection)
-        pKeys.AddRange(c)
-        MyBase.AddRange(c)
+    Public Sub Increment(ByVal aKey As Object, ByVal aValue As Double)
+        Dim lKeyIndex As Integer = IndexFromKey(aKey)
+        If lKeyIndex = -1 Then
+            Add(aKey, aValue)
+        Else
+            Item(lKeyIndex) += aValue
+        End If
+    End Sub
+
+    Public Shadows Sub AddRange(ByVal aC As System.Collections.ICollection)
+        pKeys.AddRange(aC)
+        MyBase.AddRange(aC)
     End Sub
 
     Public Shadows Property Capacity() As Integer
@@ -97,46 +106,46 @@ Public Class atcCollection
         Return newClone
     End Function
 
-    Public Shadows Sub Insert(ByVal index As Integer, ByVal value As Object)
-        Insert(index, value, value)
+    Public Shadows Sub Insert(ByVal aIndex As Integer, ByVal aValue As Object)
+        Insert(aIndex, aValue, aValue)
     End Sub
-    Public Shadows Sub Insert(ByVal index As Integer, ByVal key As Object, ByVal value As Object)
-        pKeys.Insert(index, key)
-        MyBase.Insert(index, value)
-    End Sub
-
-    Public Shadows Sub InsertRange(ByVal index As Integer, ByVal collValues As ICollection)
-        InsertRange(index, collValues, collValues)
-    End Sub
-    Public Shadows Sub InsertRange(ByVal index As Integer, ByVal collKeys As ICollection, ByVal collValues As ICollection)
-        pKeys.InsertRange(index, collKeys)
-        MyBase.InsertRange(index, collValues)
+    Public Shadows Sub Insert(ByVal aIndex As Integer, ByVal aKey As Object, ByVal aValue As Object)
+        pKeys.Insert(aIndex, aKey)
+        MyBase.Insert(aIndex, aValue)
     End Sub
 
-    Public Shadows Sub Remove(ByVal value As Object)
+    Public Shadows Sub InsertRange(ByVal aIndex As Integer, ByVal aCollValues As ICollection)
+        InsertRange(aIndex, aCollValues, aCollValues)
+    End Sub
+    Public Shadows Sub InsertRange(ByVal aIndex As Integer, ByVal aCollKeys As ICollection, ByVal aCollValues As ICollection)
+        pKeys.InsertRange(aIndex, aCollKeys)
+        MyBase.InsertRange(aIndex, aCollValues)
+    End Sub
+
+    Public Shadows Sub Remove(ByVal aValue As Object)
         Try
-            Dim index As Integer = MyBase.IndexOf(value)
-            If index >= 0 Then RemoveAt(index)
+            Dim lIndex As Integer = MyBase.IndexOf(aValue)
+            If lIndex >= 0 Then RemoveAt(lIndex)
         Catch e As Exception
         End Try
     End Sub
 
-    Public Overridable Sub RemoveByKey(ByVal key As Object)
+    Public Overridable Sub RemoveByKey(ByVal aKey As Object)
         Try
-            Dim index As Integer = pKeys.IndexOf(key)
-            If index >= 0 Then RemoveAt(index)
+            Dim lIndex As Integer = pKeys.IndexOf(aKey)
+            If lIndex >= 0 Then RemoveAt(lIndex)
         Catch e As Exception
         End Try
     End Sub
 
-    Public Shadows Sub RemoveAt(ByVal index As Integer)
-        pKeys.RemoveAt(index)
-        MyBase.RemoveAt(index)
+    Public Shadows Sub RemoveAt(ByVal aIndex As Integer)
+        pKeys.RemoveAt(aIndex)
+        MyBase.RemoveAt(aIndex)
     End Sub
 
-    Public Shadows Sub RemoveRange(ByVal index As Integer, ByVal count As Integer)
-        pKeys.RemoveRange(index, count)
-        MyBase.RemoveRange(index, count)
+    Public Shadows Sub RemoveRange(ByVal aIndex As Integer, ByVal aCount As Integer)
+        pKeys.RemoveRange(aIndex, aCount)
+        MyBase.RemoveRange(aIndex, aCount)
     End Sub
 
     Public Shadows Sub Reverse()
@@ -144,32 +153,32 @@ Public Class atcCollection
         MyBase.Reverse()
     End Sub
 
-    Public Shadows Sub Reverse(ByVal index As Integer, ByVal count As Integer)
-        pKeys.Reverse(index, count)
-        MyBase.Reverse(index, count)
+    Public Shadows Sub Reverse(ByVal aIndex As Integer, ByVal aCount As Integer)
+        pKeys.Reverse(aIndex, aCount)
+        MyBase.Reverse(aIndex, aCount)
     End Sub
 
-    Public Shadows Sub SetRange(ByVal index As Integer, ByVal values As ICollection)
-        SetRange(index, values, values)
+    Public Shadows Sub SetRange(ByVal aIndex As Integer, ByVal aValues As ICollection)
+        SetRange(aIndex, aValues, aValues)
     End Sub
-    Public Shadows Sub SetRange(ByVal index As Integer, ByVal keys As ICollection, ByVal values As ICollection)
-        pKeys.SetRange(index, keys)
-        MyBase.SetRange(index, keys)
+    Public Shadows Sub SetRange(ByVal aIndex As Integer, ByVal aKeys As ICollection, ByVal aValues As ICollection)
+        pKeys.SetRange(aIndex, aKeys)
+        MyBase.SetRange(aIndex, aKeys)
     End Sub
 
     Public Shadows Sub Sort()
         Sort(New Comparer(New System.Globalization.CultureInfo("")))
     End Sub
 
-    Public Shadows Sub Sort(ByVal comparer As System.Collections.IComparer)
-        Sort(0, MyBase.Count, comparer)
+    Public Shadows Sub Sort(ByVal aComparer As System.Collections.IComparer)
+        Sort(0, MyBase.Count, aComparer)
     End Sub
 
-    Public Shadows Sub Sort(ByVal index As Integer, ByVal count As Integer, ByVal comparer As System.Collections.IComparer)
+    Public Shadows Sub Sort(ByVal aIndex As Integer, ByVal aCount As Integer, ByVal aComparer As System.Collections.IComparer)
         Dim lNewKeys As ArrayList = New ArrayList(pKeys)
         Dim lNewValues As New ArrayList
         Dim lOldIndex As Integer
-        lNewKeys.Sort(index, count, comparer)
+        lNewKeys.Sort(aIndex, aCount, aComparer)
         For Each lNewKey As Object In lNewKeys
             lOldIndex = pKeys.IndexOf(lNewKey)
             lNewValues.Add(MyBase.Item(lOldIndex))
@@ -185,18 +194,18 @@ Public Class atcCollection
     End Sub
 
     'Exactly the same as Item. Added for clarity as a parallel to ItemByKey.
-    Public Overridable Property ItemByIndex(ByVal index As Integer) As Object
+    Public Overridable Property ItemByIndex(ByVal aIndex As Integer) As Object
         Get
-            Return MyBase.Item(index)
+            Return MyBase.Item(aIndex)
         End Get
         Set(ByVal newValue As Object)
-            MyBase.Item(index) = newValue
+            MyBase.Item(aIndex) = newValue
         End Set
     End Property
 
-    Public Property ItemByKey(ByVal key As Object) As Object
+    Public Property ItemByKey(ByVal aKey As Object) As Object
         Get
-            Dim index As Integer = IndexFromKey(key)
+            Dim index As Integer = IndexFromKey(aKey)
             If index >= 0 Then
                 Return MyBase.Item(index)
             Else
@@ -204,18 +213,18 @@ Public Class atcCollection
             End If
         End Get
         Set(ByVal newValue As Object)
-            Dim index As Integer = IndexFromKey(key)
+            Dim index As Integer = IndexFromKey(aKey)
             If index >= 0 Then
                 MyBase.Item(index) = newValue
             Else
-                Add(key, newValue)
+                Add(aKey, newValue)
             End If
         End Set
     End Property
 
-    Public Function IndexFromKey(ByVal key As Object) As Integer
+    Public Function IndexFromKey(ByVal akey As Object) As Integer
         Try
-            Return pKeys.IndexOf(key)
+            Return pKeys.IndexOf(akey)
         Catch e As Exception
             Return -1
         End Try

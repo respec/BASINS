@@ -248,7 +248,8 @@ Public Class atcDataSourceWDM
 
             'Logger.Dbg("atcDataSourceWdm:AddDataset:WdmUnit:Dsn:" & lWdmHandle.Unit & ":" & lDsn)
 
-            If F90_WDCKDT(lWdmHandle.Unit, lDsn) > 0 Then 'dataset exists, what do we do?
+            Dim lDsnExists As Integer = F90_WDCKDT(lWdmHandle.Unit, lDsn)
+            If lDsnExists > 0 Then 'dataset exists, what do we do?
                 'Logger.Dbg("atcDataSourceWdm:AddDataset:DatasetAlreadyExists")
                 Dim lExistTimser As atcTimeseries = DataSets.ItemByKey(lDsn)
                 Select Case aExistAction
@@ -297,7 +298,7 @@ CaseExistRenumber:
             End If
 
             Dim lWriteIt As Boolean = False
-            If aExistAction = ExistAppend Then 'just write appended data
+            If lDsnExists > 0 And aExistAction = ExistAppend Then 'just write appended data
                 lWriteIt = True
             ElseIf DsnBld(lWdmHandle.Unit, lTimser) Then
                 DataSets.Add(lDsn, lTimser)
@@ -460,7 +461,7 @@ CaseExistRenumber:
         Dim lDsn As Integer = aTs.Attributes.GetValue("id", 1)
 
         'add needed attributes
-        lStr = aTs.Attributes.GetValue("cons")
+        lStr = aTs.Attributes.GetValue("cons", "")
         If lStr.Length > 4 Then lStr = lStr.Substring(0, 4)
         aTs.Attributes.SetValueIfMissing("TSTYPE", lStr)
         aTs.Attributes.SetValueIfMissing("TGROUP", 6)
