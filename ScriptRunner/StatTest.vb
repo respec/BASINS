@@ -57,24 +57,24 @@ Public Module ScriptStatTest
         Logger.Dbg("DatasetCount " & lDataSets.Count)
         For Each lDS As atcDataSet In lDataSets
             Dim lID As Integer = lDS.Attributes.GetValue("Id")
-            If lID = 4 Or lID = 15 Or lID = 30 Then '  Or lID = 8 Then
-                lStringBuilder.AppendLine(Summary(lDS, lAttributes, lD2SStart, lD2SEnd))
-                Dim lNumYears As Integer = 16
-                Dim lYearStartFirst As Integer = 1958
-                Dim lYearStartLast As Integer = 1991 '1992+15=2007
-                For lYearStart As Integer = lYearStartFirst To lYearStartLast
-                    lTsMath.DataSets.Clear()
-                    lArgsMath.Clear()
-                    lArgsMath.SetValue("timeseries", lDS)
-                    Dim lDateString = CStr(lYearStart) & "/4/1"
-                    lArgsMath.SetValue("Start Date", lDateString)
-                    lDateString = CStr(lYearStart + lNumYears) & "/4/1"
-                    lArgsMath.SetValue("End Date", lDateString)
-                    lArgsMath.SetValue("LogFlg", False)
-                    lTsMath.Open("subset by date", lArgsMath)
-                    lStringBuilder.AppendLine(Summary(lTsMath.DataSets(0), lAttributes, lD2SStart, lD2SEnd))
-                Next lYearStart
-            End If
+            'If lID = 4 Or lID = 15 Or lID = 30 Then '  Or lID = 8 Then
+            lStringBuilder.AppendLine(Summary(lDS, lAttributes, lD2SStart, lD2SEnd))
+            Dim lNumYears As Integer = 16
+            Dim lYearStartFirst As Integer = 1958
+            Dim lYearStartLast As Integer = 1991 '1992+15=2007
+            For lYearStart As Integer = lYearStartFirst To lYearStartLast
+                lTsMath.DataSets.Clear()
+                lArgsMath.Clear()
+                lArgsMath.SetValue("timeseries", lDS)
+                Dim lDateString = CStr(lYearStart) & "/4/1"
+                lArgsMath.SetValue("Start Date", lDateString)
+                lDateString = CStr(lYearStart + lNumYears) & "/4/1"
+                lArgsMath.SetValue("End Date", lDateString)
+                lArgsMath.SetValue("LogFlg", False)
+                lTsMath.Open("subset by date", lArgsMath)
+                lStringBuilder.AppendLine(Summary(lTsMath.DataSets(0), lAttributes, lD2SStart, lD2SEnd))
+            Next lYearStart
+            'End If
         Next
         SaveFileString("SummarizeTimeseries.txt", lStringBuilder.ToString)
         Logger.Dbg("SummarizeTimeseriesDone")
@@ -89,20 +89,24 @@ Public Module ScriptStatTest
         Dim lString As String = ""
         For Each lAttribute As String In aAttributes
             lValueString = aDs.Attributes.GetValue(lAttribute, "?")
-            Select Case lAttribute
-                Case "Start Date"
-                    lString &= "'" & aD2SStart.JDateToString(lValueString) & "'"
-                Case "End Date"
-                    lString &= "'" & aD2SEnd.JDateToString(lValueString) & "'"
-                Case "Count", "ID"
-                    lString &= lValueString
-                Case Else
-                    If IsNumeric(lValueString) Then
-                        lString &= DoubleToString(lValueString, , pFormat).TrimEnd("0").TrimEnd(".")
-                    Else
+            If lValueString <> "?" Then
+                Select Case lAttribute
+                    Case "Start Date"
+                        lString &= "'" & aD2SStart.JDateToString(lValueString) & "'"
+                    Case "End Date"
+                        lString &= "'" & aD2SEnd.JDateToString(lValueString) & "'"
+                    Case "Count", "ID"
                         lString &= lValueString
-                    End If
-            End Select
+                    Case Else
+                        If IsNumeric(lValueString) Then
+                            lString &= DoubleToString(lValueString, , pFormat).TrimEnd("0").TrimEnd(".")
+                        Else
+                            lString &= lValueString
+                        End If
+                End Select
+            Else
+                lString &= lValueString
+            End If
             lString &= vbTab
         Next
         lString.Trim(vbTab)
