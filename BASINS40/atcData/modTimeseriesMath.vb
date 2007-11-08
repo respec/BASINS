@@ -6,9 +6,9 @@ Public Module modTimeseriesMath
     Private pNaN As Double = GetNaN()
     Private pMaxValue As Double = GetMaxValue()
 
-    Public Function FindDateAtOrAfter(ByVal aDates() As Double, ByVal aDate As Double, Optional ByVal aStartAt As Integer = 0) As Integer
+    Public Function FindDateAtOrAfter(ByVal aDatesToSearch() As Double, ByVal aDate As Double, Optional ByVal aStartAt As Integer = 0) As Integer
         aDate -= JulianMillisecond 'Allow for floating point error
-        Dim lIndex As Integer = Array.BinarySearch(aDates, aDate)
+        Dim lIndex As Integer = Array.BinarySearch(aDatesToSearch, aDate)
         If lIndex < 0 Then
             lIndex = lIndex Xor -1
         End If
@@ -27,14 +27,15 @@ Public Module modTimeseriesMath
                                  ByVal aEndDate As Double, _
                                  ByVal aDataSource As atcDataSource) As atcTimeseries
         'TODO: boundary conditions...
-        Dim lStart As Integer = 0
-        Dim lEnd As Integer = aTimeseries.numValues - 1
+        Dim lStart As Integer =  FindDateAtOrAfter(aTimeseries.Dates.Values, aStartDate)
+        Dim lEnd As Integer =  FindDateAtOrAfter(aTimeseries.Dates.Values, aEndDate, lStart) - 1
+        If lEnd > aTimeseries.numValues - 1 Then 'adjust end to actual end
+            lEnd = aTimeseries.numValues - 1
+        End If
+
         Dim lnewTS As New atcTimeseries(aDataSource)
         lnewTS.Dates = New atcTimeseries(aDataSource)
         lnewTS.Attributes.SetValue("Parent Timeseries", aTimeseries)
-
-        lStart = FindDateAtOrAfter(aTimeseries.Dates.Values, aStartDate)
-        lEnd = FindDateAtOrAfter(aTimeseries.Dates.Values, aEndDate, lStart) - 1
 
         Dim numNewValues As Integer = lEnd - lStart + 1
         If numNewValues > 0 Then
