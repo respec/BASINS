@@ -34,6 +34,10 @@ Public Module Utility
                 lConstituentsToOutput.Add("P:AGWET", "    Grnd Water")
                 lConstituentsToOutput.Add("P:BASET", "    Baseflow")
                 lConstituentsToOutput.Add("P:TAET", "    Total")
+                lConstituentsToOutput.Add("R:Header0", "Flow")
+                lConstituentsToOutput.Add("R:ROVOL", "    OutVolume")
+                lConstituentsToOutput.Add("R:PRSUPY", "    SurfAddVol")
+                lConstituentsToOutput.Add("R:VOLEV", "    SurfEvapVol")
             Case "SedimentCopper"
                 lConstituentsToOutput.Add("I:SOSLD", "Solids   ")
                 lConstituentsToOutput.Add("I:SOQUAL-Copper", "Copper   ")
@@ -215,7 +219,7 @@ Public Module Utility
             Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
             If lSourceVolName = "PERLND" Or lSourceVolName = "IMPLND" Then
                 If lConnection.MFact > 0 Then
-                    IncrementCollectionValue(lLocationKey, lConnection.MFact, aLocations)
+                    aLocations.Increment(lLocationKey, lConnection.MFact)
                 End If
             ElseIf lSourceVolName = "RCHRES" Then
                 UpstreamLocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations)
@@ -224,12 +228,4 @@ Public Module Utility
         aLocations.Add(aLocation, 1.0)
     End Sub
 
-    Friend Sub IncrementCollectionValue(ByVal aKey As String, ByVal aValueToAdd As Double, ByRef aCollection As atcCollection)
-        Dim lKeyIndex As Integer = aCollection.IndexFromKey(aKey)
-        If lKeyIndex = -1 Then
-            aCollection.Add(aKey, aValueToAdd)
-        Else
-            aCollection.Item(lKeyIndex) += aValueToAdd
-        End If
-    End Sub
 End Module

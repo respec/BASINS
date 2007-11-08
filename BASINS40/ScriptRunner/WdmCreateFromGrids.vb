@@ -8,11 +8,14 @@ Imports atcMwGisUtility
 Imports System.Collections.Specialized
 
 Module ScriptWdmCreateFromGrids
-    Private pTestPath As String = "D:\GisData\Illinois Snow\Excerpt"
+    Private pTestPath As String = "D:\GisData\Illinois Snow\Cook_04-05\200711714384"
+    Private pPolyIdName As String = "MidlothianTinley"
     Private pPolyIdFieldName As String = "FIPS"
     Private pPolyName = "County"
     Private pUTCAdj As Double = -5
     Private pWdmName As String = "GridData.wdm"
+    Private pAggregation As String = "Aver" 'Min, Max
+    Private pDebug As Boolean = False
 
     Private Structure SnodasData
         Dim DateObs As Double
@@ -30,6 +33,7 @@ Module ScriptWdmCreateFromGrids
         Dim lGridLayersToProcess As New NameValueCollection
         AddFilesInDir(lGridLayersToProcess, pTestPath, False, "*.bil")
         Dim lSnodasData As New atcCollection 'of SnodasData
+        Logger.Dbg("Process " & lSnodasData.Count & " files")
         For lIndex As Integer = 0 To lGridLayersToProcess.Count - 1
             ParseFileName(lGridLayersToProcess(lIndex), lSnodasData)
         Next
@@ -37,56 +41,76 @@ Module ScriptWdmCreateFromGrids
         Dim lConstituents As New atcCollection
         For lIndex As Integer = 0 To lSnodasData.Count - 1
             With lSnodasData(lIndex)
-                If Not .Constituent = Nothing AndAlso lConstituents.ItemByKey(.Constituent) = Nothing AndAlso .Constituent.Length > 0 Then
-                    lConstituents.Add(.Constituent)
+                If Not .Constituent = Nothing Then
+                    lConstituents.Increment(.Constituent, 1)
                 End If
             End With
         Next
+        Logger.Dbg("ConstituentCount:" & lConstituents.Count)
 
         Dim lBaseGrid As New MapWinGIS.Grid
-        lBaseGrid.Open(lSnodasData(0).FileName)
 
-        Dim lPolyIdGridName As String = "PolyIdGrid.tif"
-        If Not FileExists(lPolyIdGridName) Then 'create it
+        Dim lPolyIdGridName As String = pPolyIdName & ".tif"
+        If FileExists(lPolyIdGridName) Then
+            Logger.Dbg("UsingExistingPolyIdGridFile:" & lPolyIdGridName)
+        Else 'create it
             Dim lPolyLayer As New MapWinGIS.Shapefile
-            lPolyLayer.Open(pPolyName & ".shp")
+            lPolyLayer.Open(pPolyIdName & ".shp")
             Dim lPolyFieldIndex As Integer = 0 'TODO:get index from a fieldname name
 
+            lBaseGrid.Open(lSnodasData(0).FileName)
+            lBaseGrid.Header.NodataValue = 65535
             Dim lVals(lBaseGrid.Header.NumberCols) As Single
             lPolyLayer.BeginPointInShapefile()
-            For lRow As Integer = 1 To lBaseGrid.Header.NumberRows
-                For lCol As Integer = 1 To lBaseGrid.Header.NumberCols
+            For lRow As Integer = 0 To lBaseGrid.Header.NumberRows
+                For lCol As Integer = 0 To lBaseGrid.Header.NumberCols
                     Dim lX, ly As Double
                     lBaseGrid.CellToProj(lCol, lRow, lX, ly)
                     Dim lPolyIndex As Integer = lPolyLayer.PointInShapefile(lX, ly)
-                    lVals(lCol - 1) = lPolyIndex 'lPolyLayer.CellValue(lPolyFieldIndex, lPolyIndex)
+                    If lPolyIndex = -1 Then
+                        lVals(lCol) = lBaseGrid.Header.NodataValue
+                    Else
+                        lVals(lCol) = lPolyIndex
+                    End If
                 Next
                 lBaseGrid.PutRow(lRow, lVals(0))
             Next
             lPolyLayer.EndPointInShapefile()
             lBaseGrid.Save(lPolyIdGridName, MapWinGIS.GridFileType.GeoTiff)
+            Logger.Dbg("DoneGridCreateFromPoly:Name:" & lPolyIdGridName)
             lBaseGrid.Close()
-            Logger.Dbg("DoneGridCreateFromPoly")
         End If
 
         Dim lPolyIdGrid As New MapWinGIS.Grid
         lPolyIdGrid.Open(lPolyIdGridName)
-        Dim lPolyIdGridNoData As Integer = lPolyIdGrid.Header.NodataValue
+        Dim lPolyIdGridNoData As Double = lPolyIdGrid.Header.NodataValue
 
         'process the data into timeseries
         Dim lDataSource As New atcDataSource
 
         For lIndexConstituent As Integer = 0 To lConstituents.Count - 1
-            Logger.Dbg("Process:" & lConstituents.ItemByIndex(lIndexConstituent))
+            Logger.Dbg("Process:" & lConstituents.Keys(lIndexConstituent))
             Dim lDates As New atcTimeseries(lDataSource)
+            lDates.numValues = lConstituents.ItemByIndex(lIndexConstituent)
+            Dim lDateCount As Integer = 0
             For lIndexFile As Integer = 0 To lSnodasData.Count - 1
-                If lSnodasData(lIndexFile).Constituent = lConstituents.ItemByIndex(lIndexConstituent) Then
+                If lSnodasData(lIndexFile).Constituent = lConstituents.Keys(lIndexConstituent) Then
                     Logger.Dbg(" Date:" & DumpDate(lSnodasData(lIndexFile).DateObs))
-                    lDates.numValues += 1
-                    lDates.Value(lDates.numValues) = lSnodasData(lIndexFile).DateObs
-                    If lDates.numValues = 1 Then 'set first date
+                    lDateCount += 1
+                    If lDateCount = 1 Then 'set first date
                         lDates.Value(0) = lSnodasData(lIndexFile).DateObs - 1 'assumes daily data
                     End If
+                    Dim lDateIndex As Integer = timdifJ(lDates.Value(0), lSnodasData(lIndexFile).dateobs, 4, 1)  'assumes daily data
+                    If lDateCount < lDateIndex Then
+                        Logger.Dbg("DateCountProblem:" & lDateIndex & ":" & lDateCount)
+                        For lDateFillIndex As Integer = lDateCount To lDateIndex - 1
+                            lDates.Value(lDateCount) = TimAddJ(lDates.Value(0), 4, 1, lDateCount) 'assume daily date
+                            lDateCount += 1
+                        Next
+                    ElseIf lDateCount > lDateIndex Then
+                        Logger.Dbg("BigDateCountProblem:" & lDateIndex & ":" & lDateCount)
+                    End If
+                    lDates.Value(lDateCount) = lSnodasData(lIndexFile).DateObs
 
                     Dim lSum(lPolyIdGrid.Maximum) As Double
                     Dim lMin(lPolyIdGrid.Maximum) As Double
@@ -100,19 +124,23 @@ Module ScriptWdmCreateFromGrids
                     Dim lCountPolyNoData As Integer = 0
 
                     lBaseGrid.Open(lSnodasData(lIndexFile).FileName)
-                    Dim lBaseGridNoData As Integer = lBaseGrid.Header.NodataValue
-                    Logger.Dbg("Base:Min:" & DoubleToString(lBaseGrid.Minimum) & " Max: " & DoubleToString(lBaseGrid.Maximum))
+                    Dim lBaseGridNoData As Double = lBaseGrid.Header.NodataValue
+                    Logger.Dbg("  Base:Min:" & DoubleToString(lBaseGrid.Minimum) & " Max: " & DoubleToString(lBaseGrid.Maximum))
 
                     For lRow As Integer = 1 To lPolyIdGrid.Header.NumberRows
                         For lCol As Integer = 1 To lPolyIdGrid.Header.NumberCols
-                            Dim lPolyIndex As Integer = lPolyIdGrid.Value(lCol, lRow)
+                            Dim lPolyIndex As Double = lPolyIdGrid.Value(lCol, lRow)
                             If lPolyIndex <> lPolyIdGridNoData Then
                                 Dim lValue As Double = lBaseGrid.Value(lCol, lRow)
                                 If lValue <> lBaseGridNoData Then
-                                    lSum(lPolyIndex) += lValue
-                                    lCount(lPolyIndex) += 1
-                                    If lMin(lPolyIndex) > lValue Then lMin(lPolyIndex) = lValue
-                                    If lMax(lPolyIndex) < lValue Then lMax(lPolyIndex) = lValue
+                                    If lValue = 55537 Then
+                                        lCountBaseNoData += 1
+                                    Else
+                                        lSum(lPolyIndex) += lValue
+                                        lCount(lPolyIndex) += 1
+                                        If lMin(lPolyIndex) > lValue Then lMin(lPolyIndex) = lValue
+                                        If lMax(lPolyIndex) < lValue Then lMax(lPolyIndex) = lValue
+                                    End If
                                 Else
                                     lCountBaseNoData += 1
                                 End If
@@ -127,41 +155,51 @@ Module ScriptWdmCreateFromGrids
                     For lIndex As Integer = 0 To lPolyIdGrid.Maximum
                         If lCount(lIndex) > 0 Then
                             lAver = lSum(lIndex) / lCount(lIndex)
-                            Logger.Dbg("Id:" & lIndex & " Aver:" & DoubleToString(lAver) & _
-                                                        " Min:" & lMin(lIndex) & _
-                                                        " Max:" & lMax(lIndex) & _
-                                                        " Sum:" & lSum(lIndex) & _
-                                                        " Count:" & lCount(lIndex))
+                            If pDebug Then
+                                Logger.Dbg("   Id:" & lIndex & _
+                                           " Aver:" & DoubleToString(lAver) & _
+                                           " Min:" & lMin(lIndex) & _
+                                           " Max:" & lMax(lIndex) & _
+                                           " Sum:" & lSum(lIndex) & _
+                                           " Count:" & lCount(lIndex))
+                            End If
                             Dim lId As Integer = lSnodasData(lIndexFile).Id * 1000 + lIndex
                             Dim lTimser As atcTimeseries = lDataSource.DataSets.ItemByKey(lId)
                             If lTimser Is Nothing Then
                                 lTimser = New atcTimeseries(lDataSource)
                                 lTimser.Dates = lDates
+                                lTimser.numValues = lDates.numValues
                                 lTimser.Attributes.SetValue("Id", lId)
                                 lTimser.Attributes.SetValue("Locn", lIndex)
-                                lTimser.Attributes.SetValue("Cons", lConstituents.ItemByIndex(lIndexConstituent))
+                                lTimser.Attributes.SetValue("Scen", "SNODAS")
+                                lTimser.Attributes.SetValue("Cons", lConstituents.Keys(lIndexConstituent))
                                 lTimser.Attributes.SetValue("ts", 1)
-                                lTimser.Attributes.SetValue("tu", 4) 'todo: check this
+                                lTimser.Attributes.SetValue("tu", 4) 'todo: check this, might be hourly
                                 lDataSource.DataSets.Add(lId, lTimser)
-                                'TODO: set attributes
+                                'TODO: set any other attributes
                             End If
-                            lTimser.numValues += 1
-                            lTimser.Value(lTimser.numValues) = lAver
+                            Select Case pAggregation.ToLower
+                                Case "aver" : lTimser.Value(lDateCount) = lAver
+                                Case "min" : lTimser.Value(lDateCount) = lMin(lIndex)
+                                Case "max" : lTimser.Value(lDateCount) = lMax(lIndex)
+                            End Select
                         Else
                             lAver = 0
                             lMin(lIndex) = 0
                             lMax(lIndex) = 0
                         End If
                     Next
-                    Logger.Dbg("Skip:PolyNoData:" & lCountPolyNoData & " BaseNoData:" & lCountBaseNoData)
+                    If pDebug Then Logger.Dbg("  Skip:PolyNoData:" & lCountPolyNoData & " BaseNoData:" & lCountBaseNoData)
                 End If
             Next
         Next
         Logger.Dbg("DataSetCount:" & lDataSource.DataSets.Count)
         Dim lWdm As New atcDataSourceWDM
-        lWdm.Open(pWdmName)
-        lWdm.AddDatasets(lDataSource.DataSets) 'TODO: add quiet parm to AddDatasets
-        lWdm.Save(pWdmName)
+        If lWdm.Open(pWdmName) Then
+            For Each lDataset As atcDataSet In lDataSource.DataSets
+                lWdm.AddDataset(lDataset, atcDataSource.EnumExistAction.ExistAppend)
+            Next
+        End If
     End Sub
 
     Private Sub ParseFileName(ByVal aFileName As String, ByRef aSnodasData As atcCollection)
