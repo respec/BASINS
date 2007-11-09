@@ -133,7 +133,7 @@ Public Module WatershedConstituentBalance
                                     End If
                                 Next lOperationIndex
                                 If lWeight Then
-                                    IncrementCollectionValue(lOperationKey & lConstituentKey, lWeightAccum, lConstituentTotals)
+                                    lConstituentTotals.Increment(lOperationKey & lConstituentKey, lWeightAccum)
                                     lString.Append(vbTab & DecimalAlign(lWeightAccum / lAreaLanduse))
                                 End If
                                 lString.AppendLine()

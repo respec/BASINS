@@ -264,6 +264,7 @@ Public Class atcBasinsPlugIn
                     aHandled = LaunchTool(aItemName.Substring(ModelsMenuName.Length + 1))
                 ElseIf aItemName.StartsWith(SaveDataMenuName & "_") Then
                     aHandled = UserSaveData(aItemName.Substring(SaveDataMenuName.Length + 1))
+                    'TODO: add case where not save data destinations are available, ask user for destination?
                 ElseIf aItemName.StartsWith(ProjectsMenuName & "_") Then
                     aHandled = UserOpenProject(g_Menus(aItemName).Text)
                 Else
