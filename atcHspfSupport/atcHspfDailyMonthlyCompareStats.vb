@@ -162,8 +162,8 @@ Public Module DailyMonthlyCompareStats
 
         Dim lCorrelationCoefficient As Double = 0.0#
         Dim lNashSutcliffe As Double = 0.0#
-        Dim lMean1 As Double = aTSer1.Attributes.GetDefinedValue("Mean").Value
-        Dim lMean2 As Double = aTSer2.Attributes.GetDefinedValue("Mean").Value
+        Dim lMean1 As Double = aTSer1.Attributes.GetValue("Mean")
+        Dim lMean2 As Double = aTSer2.Attributes.GetValue("Mean")
         For lIndex As Integer = 1 To aTSer1.numValues
             lVal1 = aTSer1.Values(lIndex)
             lVal2 = aTSer2.Values(lIndex)
@@ -173,8 +173,8 @@ Public Module DailyMonthlyCompareStats
             End If
         Next
         lCorrelationCoefficient /= (aTSer1.numValues - 1)
-        Dim lSD1 As Double = aTSer1.Attributes.GetDefinedValue("Standard Deviation").Value
-        Dim lSD2 As Double = aTSer2.Attributes.GetDefinedValue("Standard Deviation").Value
+        Dim lSD1 As Double = aTSer1.Attributes.GetValue("Standard Deviation")
+        Dim lSD2 As Double = aTSer2.Attributes.GetValue("Standard Deviation")
         If Math.Abs(lSD1 * lSD2) > 0.0001 Then
             lCorrelationCoefficient /= (lSD1 * lSD2)
         End If
