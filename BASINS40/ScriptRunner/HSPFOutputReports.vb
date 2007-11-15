@@ -15,15 +15,23 @@ Module HSPFOutputReports
     Private Sub Initialize()
         pOutputLocations.Clear()
         'Dim lTestName As String = "hyd_man"
-        Dim lTestName As String = "calleguas"
+        Dim lTestName As String = "calleguas_cat"
+        'Dim lTestName As String = "calleguas_nocat"
         Select Case lTestName
-            Case "calleguas"
-                pTestPath = "D:\MountainViewData\Calleguas\"
+            Case "calleguas_cat"
+                pTestPath = "D:\MountainViewData\Calleguas\cat"
                 pBaseName = "Calleg"
                 pOutputLocations.Add("R:408")
                 pOutputLocations.Add("R:10")
+                pOutputLocations.Add("R:307")
+            Case "calleguas_nocat"
+                pTestPath = "D:\MountainViewData\Calleguas\nocat"
+                pBaseName = "Calleg"
+                pOutputLocations.Add("R:408")
+                pOutputLocations.Add("R:10")
+                pOutputLocations.Add("R:307")
             Case "hyd_man"
-                pTestPath = "C:\test\EXP_CAL\hyd_man.net"
+                pTestPath = "C:\test\EXP_CAL\hyd_man.net_cat"
                 pBaseName = "hyd_man"
                 pOutputLocations.Add("R:5")
                 pOutputLocations.Add("R:4")
@@ -52,8 +60,8 @@ Module HSPFOutputReports
             Dim lStr As String = lExpertSystem.Report
             SaveFileString("outfiles\ExpertSysStats.txt", lStr)
 
-            lStr = lExpertSystem.AsString 'NOTE:just testing
-            SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
+            'lStr = lExpertSystem.AsString 'NOTE:just testing
+            'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
 
             Dim lCons As String = "Flow"
             For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count

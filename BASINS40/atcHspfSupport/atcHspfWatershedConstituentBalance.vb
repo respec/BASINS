@@ -14,7 +14,8 @@ Public Module WatershedConstituentBalance
                               Optional ByVal aOutFilePrefix As String = "")
 
         For Each lOutletLocation As String In aOutletLocations
-            Dim lString As Text.StringBuilder = Report(aUci, aBalanceType, aOperationTypes, _
+            Dim lString As Text.StringBuilder = Report(aUci, aBalanceType, _
+                                                       aOperationTypes, _
                                                        aScenario, aScenarioResults, _
                                                        aRunMade, lOutletLocation)
             Dim lOutFileName As String = aOutFilePrefix & SafeFilename(aScenario & "_" & lOutletLocation & "_" & aBalanceType & "_" & "Balance.txt")
@@ -31,14 +32,17 @@ Public Module WatershedConstituentBalance
                            ByVal aRunMade As String, _
                            Optional ByVal aOutletLocation As String = "") As Text.StringBuilder
 
-        Dim lWeight As Boolean = False
+        Dim lOutletReport As Boolean = False
         If aOutletLocation.Length > 0 Then
-            lWeight = True
+            lOutletReport = True
         End If
 
         Dim lConstituentsToOutput As atcCollection = ConstituentsToOutput(aBalanceType)
+        Logger.Dbg("ConstituentCount:" & lConstituentsToOutput.Count)
         Dim lConstituentTotals As New atcCollection
-        Dim lLandUses As atcCollection = HspfSupport.Utility.LandUses(aUci, aOperationTypes, aOutletLocation)
+
+        Dim lLandUses As atcCollection = LandUses(aUci, aOperationTypes, aOutletLocation)
+        Logger.Dbg("LandUsecount:" & lLandUses.Count)
 
         Dim lString As New Text.StringBuilder
         lString.AppendLine(aBalanceType & " Watershed Balance Report For " & aScenario)
@@ -56,60 +60,49 @@ Public Module WatershedConstituentBalance
         Dim lConstituentDataGroup As atcDataGroup
         Dim lTempDataSet As atcDataSet
         Dim lPendingOutput As String = ""
-        Dim lAreaTotal As Double = 0.0
+        Dim lOperationTypeAreas As New atcCollection
+        Dim lOperationAreas As New atcCollection
 
-        For lOperationTypeIndex As Integer = 0 To aOperationTypes.Count - 1
-            Dim lOperationKey As String = aOperationTypes.Keys(lOperationTypeIndex)
-            For lLanduseIndex As Integer = 0 To lLandUses.Count - 1
-                Dim lLandUse As String = lLandUses.Keys(lLanduseIndex)
-                If lOperationKey.StartsWith(lLandUse.Substring(0, 1)) Then
+        Logger.Dbg("OperationTypesCount:" & aOperationTypes.Count)
+        For Each lOperationType As String In aOperationTypes
+            Logger.Dbg("ProcessType:" & lOperationType)
+            Dim lValueOutlet As Double = 0.0
+            Dim lLandUseAreas As New atcCollection
+            For Each lLandUse As String In lLandUses.Keys
+                If lOperationType.StartsWith(lLandUse.Substring(0, 1)) Then
                     Dim lNeedHeader As Boolean = True
-                    Dim lAreaLanduse As Double = 0.0
-                    Dim lOperations As atcCollection = lLandUses.ItemByIndex(lLanduseIndex)
-                    Dim lAreaOperation(lOperations.Count - 1) As Double
-                    For lIndex As Integer = 0 To lConstituentsToOutput.Count - 1
-                        Dim lConstituentKey As String = lConstituentsToOutput.Keys(lIndex)
-                        If lConstituentKey.StartsWith(lOperationKey) Then
+                    Dim lLandUseOperations As atcCollection = lLandUses.ItemByKey(lLandUse)
+                    For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                        If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
+                            Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                             lConstituentKey = lConstituentKey.Remove(0, 2)
-                            Dim lConstituentName As String = lConstituentsToOutput(lIndex)
                             lConstituentDataGroup = aScenarioResults.DataSets.FindData("Constituent", lConstituentKey)
                             If lConstituentDataGroup.Count > 0 Then
                                 If lNeedHeader Then
                                     lString.AppendLine(vbCrLf)
                                     lString.AppendLine(aBalanceType & " Balance Report For " & lLandUse & vbCrLf)
                                     'get operation description for header
-                                    Dim lDesc As String = ""
-                                    Dim lOperName As String = ""
-                                    If lOperationKey.Substring(0, 1) = "P" Then
-                                        lOperName = "PERLND"
-                                    ElseIf lOperationKey.Substring(0, 1) = "I" Then
-                                        lOperName = "IMPLND"
-                                    ElseIf lOperationKey.Substring(0, 1) = "R" Then
-                                        lOperName = "RCHRES"
-                                    End If
-                                    If lOperName.Length > 0 Then
-                                        lDesc = lOperName & ":"
-                                    End If
-                                    lString.Append(lDesc.PadRight(12))
-                                    For lOperationIndex As Integer = 0 To lOperations.Count - 1
-                                        Dim lOperationName As String = lOperations.Keys(lOperationIndex)
+                                    lString.Append((lOperationType & ":").PadRight(12))
+                                    For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
+                                        Dim lOperationName As String = lLandUseOperations.Keys(lOperationIndex)
                                         lString.Append(vbTab & (lOperationName & "  ").PadLeft(12))
                                     Next
-                                    If lWeight Then
+                                    If lOutletReport And lOperationType <> "RCHRES" Then
                                         lString.Append(vbTab & "WtdAvg  ".PadLeft(12))
                                     End If
                                     lString.AppendLine()
-                                    If lWeight Then
+                                    If lOutletReport And lOperationType <> "RCHRES" Then
                                         lString.AppendLine()
                                         lString.Append("Area".PadRight(12))
-                                        For lOperationIndex As Integer = 0 To lOperations.Count - 1
-                                            lAreaOperation(lOperationIndex) = lOperations.ItemByIndex(lOperationIndex)
-                                            lString.Append(vbTab & DecimalAlign(lAreaOperation(lOperationIndex)))
-                                            lAreaLanduse += lAreaOperation(lOperationIndex)
+                                        For Each lOperationKey As String In lLandUseOperations.Keys
+                                            Dim lOperationArea As Double = lLandUseOperations.ItemByKey(lOperationKey)
+                                            lString.Append(vbTab & DecimalAlign(lOperationArea))
+                                            lOperationAreas.Increment(lOperationKey, lOperationArea)
+                                            lLandUseAreas.Increment(lLandUse, lOperationArea)
                                         Next
-                                        lString.Append(vbTab & DecimalAlign(lAreaLanduse))
-                                        lAreaTotal += lAreaLanduse
-                                        lString.AppendLine()
+                                        lString.Append(vbTab & DecimalAlign(lLandUseAreas.ItemByKey(lLandUse)))
+                                        lOperationTypeAreas.Increment(lOperationType, lLandUseAreas.ItemByKey(lLandUse))
+                                        lString.AppendLine(vbTab & "(Sum)")
                                     End If
                                     lNeedHeader = False
                                 End If
@@ -119,26 +112,44 @@ Public Module WatershedConstituentBalance
                                 End If
                                 lString.Append(lConstituentName.PadRight(12))
                                 Dim lWeightAccum As Double = 0.0
-                                For lOperationIndex As Integer = 0 To lOperations.Count - 1
-                                    Dim lLocation As String = lOperations.Keys(lOperationIndex)
+                                Dim lValue As Double = 0.0
+                                For Each lLocation As String In lLandUseOperations.Keys
                                     Dim lLocationDataGroup As atcDataGroup = lConstituentDataGroup.FindData("Location", lLocation)
-                                    Dim lValue As Double = 0.0
                                     If lLocationDataGroup.Count > 0 Then
                                         lTempDataSet = lLocationDataGroup.Item(0)
                                         lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                                    Else
+                                        lValue = 0.0
+                                        'Logger.Dbg("SkipLocation:" & lLocation & ":WithNo:" & lConstituentKey & ":Data")
                                     End If
                                     lString.Append(vbTab & DecimalAlign(lValue))
-                                    If lWeight Then
-                                        lWeightAccum += lValue * lAreaOperation(lOperationIndex)
+                                    If lOutletReport Then
+                                        If lOperationType <> "RCHRES" Then
+                                            lWeightAccum += lValue * lOperationAreas.ItemByKey(lLocation)
+                                        ElseIf lLocation = aOutletLocation Then
+                                            lValueOutlet = lValue * 12  'feet to inches
+                                        End If
                                     End If
-                                Next lOperationIndex
-                                If lWeight Then
-                                    lConstituentTotals.Increment(lOperationKey & lConstituentKey, lWeightAccum)
-                                    lString.Append(vbTab & DecimalAlign(lWeightAccum / lAreaLanduse))
+                                Next lLocation
+
+                                If lOutletReport Then
+                                    Dim lConstituentTotalKey As String = lOperationType.Substring(0, 1) & ":" & lConstituentKey
+                                    If lOperationType <> "RCHRES" Then
+                                        lConstituentTotals.Increment(lConstituentTotalKey, lWeightAccum)
+                                        lString.Append(vbTab & DecimalAlign(lWeightAccum / lLandUseAreas.ItemByKey(lLandUse)))
+                                    ElseIf Math.Abs(lValueOutlet) > 0.00001 Then
+                                        Dim lConstituentTotalKeyIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentTotalKey)
+                                        If lConstituentTotalKeyIndex = -1 Then
+                                            lConstituentTotals.Add(lConstituentTotalKey, lValueOutlet)
+                                        Else
+                                            lConstituentTotals(lConstituentTotalKeyIndex) = lValueOutlet
+                                        End If
+                                        lValueOutlet = 0.0
+                                    End If
                                 End If
                                 lString.AppendLine()
                             ElseIf lConstituentKey.StartsWith("Total") AndAlso _
-                                    lConstituentKey.Length > 5 AndAlso _
+                                   lConstituentKey.Length > 5 AndAlso _
                                    IsNumeric(lConstituentKey.Substring(5)) Then
                                 Dim lTotalCount As Integer = lConstituentKey.Substring(5)
                                 Dim lStr As String = lString.ToString
@@ -175,72 +186,85 @@ Public Module WatershedConstituentBalance
                                 End If
                                 lPendingOutput &= lConstituentName
                                 If Not lConstituentKey.StartsWith("Header") Then
-                                    For lOperationIndex As Integer = 0 To lOperations.Count - 1
+                                    For lOperationIndex As Integer = 0 To lLandUseOperations.Count - 1
                                         lPendingOutput &= vbTab & DecimalAlign(0.0)
                                     Next
-                                    If lWeight Then
+                                    If lOutletReport And lOperationType <> "RCHRES" Then
                                         lPendingOutput &= vbTab & DecimalAlign(0.0)
                                     End If
                                 End If
                             End If
                         End If
-                    Next lIndex
+                    Next lConstituentKey
                 End If
-            Next lLanduseIndex
-        Next lOperationTypeIndex
+            Next lLandUse
+        Next lOperationType
 
-        If lWeight Then
+        If lOutletReport Then 'watershed summary report at specified output
             lString.AppendLine()
             lString.AppendLine()
             lString.AppendLine("Overall Weighted " & aBalanceType & " Balance Averages")
             lString.AppendLine()
             If aBalanceType = "Water" Then
-                lString.AppendLine(Space(12) & vbTab & "Over".PadLeft(12) & _
+                lString.AppendLine(Space(12) & vbTab & "OverOperType".PadLeft(12) & _
                                                vbTab & "Land".PadRight(12) & _
-                                               vbTab & "Reach".PadLeft(12) & _
-                                               vbTab & "Outlets".PadRight(12) & _
-                                               vbTab & "Plant".PadLeft(12) & _
-                                               vbTab & "Efflnt".PadRight(12) & _
-                                               vbTab & "GW".PadLeft(12) & _
-                                               vbTab & "Pumping".PadRight(12) & _
-                                               vbTab & "Channel".PadLeft(12) & _
-                                               vbTab & "Losses".PadRight(12))
+                                               vbTab & "OverAll".PadLeft(12))
                 lString.AppendLine(Space(12) & vbTab & "Inches".PadLeft(12) & _
                                                vbTab & "Ac-Ft".PadRight(12) & _
-                                               vbTab & "Inches".PadLeft(12) & _
-                                               vbTab & "Ac-Ft".PadRight(12) & _
-                                               vbTab & "Inches".PadLeft(12) & _
-                                               vbTab & "Ac-Ft".PadRight(12) & _
-                                               vbTab & "Inches".PadLeft(12) & _
-                                               vbTab & "Ac-Ft".PadRight(12) & _
-                                               vbTab & "Inches".PadLeft(12) & _
-                                               vbTab & "Ac-Ft".PadRight(12))
+                                               vbTab & "Inches".PadLeft(12))
             End If
-            Dim lOperType As String = " "
-            For lIndex As Integer = 0 To lConstituentsToOutput.Count - 1
-                Dim lConstituentKey As String = lConstituentsToOutput.Keys(lIndex)
-                If Not lConstituentKey.StartsWith(lOperType) Then
-                    lOperType = lConstituentKey.Substring(0, 1)
-                    lString.AppendLine()
-                    Select Case lOperType.ToLower
-                        Case "p" : lString.AppendLine("PERLND:")
-                        Case "i" : lString.AppendLine("IMPLND:")
-                    End Select
-                End If
-                Dim lIndexTotal As Integer = lConstituentTotals.IndexFromKey(lConstituentKey)
-                If lIndexTotal >= 0 Then
-                    Dim lValue As Double = lConstituentTotals.Item(lIndexTotal)
-                    lString.AppendLine(lConstituentsToOutput(lIndex).PadRight(12) & vbTab & _
-                                       DecimalAlign(lValue / lAreaTotal) & vbTab & _
-                                       DecimalAlign(lValue / 12))
-                ElseIf Not lConstituentKey.Substring(2).StartsWith("Header") Then
-                    lString.AppendLine(lConstituentsToOutput(lIndex).PadRight(12) & vbTab & _
-                                       DecimalAlign(0.0) & vbTab & _
-                                       DecimalAlign(0.0))
-                Else
-                    lString.AppendLine()
-                    lString.AppendLine(lConstituentsToOutput(lIndex).PadRight(12))
-                End If
+            Dim lTotalArea As Double = 0.0
+            For Each lOperationType As String In lOperationTypeAreas.Keys
+                lTotalArea += lOperationTypeAreas.ItemByKey(lOperationType)
+            Next
+
+            For Each lOperationType As String In aOperationTypes
+                Dim lNeedHeader As String = True
+                Dim lOperationTypeArea As Double = lOperationTypeAreas.ItemByKey(lOperationType)
+                For Each lConstituentKey As String In lConstituentsToOutput.Keys
+                    If lConstituentKey.StartsWith(lOperationType.Substring(0, 1)) Then
+                        If lNeedHeader Then
+                            lString.AppendLine()
+                            If lOperationType <> "RCHRES" Then
+                                lString.AppendLine(lOperationType & vbTab & vbTab & "Area" & vbTab & lOperationTypeArea)
+                            Else
+                                lString.AppendLine(Space(12) & vbTab & "Reach".PadLeft(12) & _
+                                                               vbTab & "Outlets".PadRight(12))
+                                lString.AppendLine(Space(12) & vbTab & "Inches".PadLeft(12) & _
+                                                               vbTab & "Ac-Ft".PadRight(12))
+                                lString.AppendLine("RCHRES" & vbTab & vbTab & "Area" & vbTab & lTotalArea & vbTab & aOutletLocation)
+                            End If
+                            lNeedHeader = False
+                        End If
+                        Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
+                        Dim lConstituentTotalIndex As Integer = lConstituentTotals.IndexFromKey(lConstituentKey)
+                        If lConstituentTotalIndex >= 0 Then
+                            Dim lValue As Double = lConstituentTotals.Item(lConstituentTotalIndex)
+                            If Math.Abs(lValue) > 0.00001 Then
+                                If lOperationType = "RCHRES" Then
+                                    lString.Append(lConstituentName.PadRight(12) & vbTab & _
+                                               DecimalAlign(lValue / lTotalArea) & vbTab & _
+                                               DecimalAlign(lValue / 12))
+                                Else
+                                    lString.Append(lConstituentName.PadRight(12) & vbTab & _
+                                               DecimalAlign(lValue / lOperationTypeArea) & vbTab & _
+                                               DecimalAlign(lValue / 12) & vbTab & _
+                                               DecimalAlign(lValue / lTotalArea))
+                                End If
+                                lString.AppendLine()
+                            Else
+                                'Logger.Dbg("SkipNoData:" & lConstituentKey)
+                            End If
+                        ElseIf Not lConstituentKey.Substring(2).StartsWith("Header") Then
+                            lString.AppendLine(lConstituentName.PadRight(12) & vbTab & _
+                                               DecimalAlign(0.0) & vbTab & _
+                                               DecimalAlign(0.0))
+                        Else
+                            lString.AppendLine()
+                            lString.AppendLine(lConstituentName.PadRight(12))
+                        End If
+                    End If
+                Next
             Next
         End If
         Return lString
