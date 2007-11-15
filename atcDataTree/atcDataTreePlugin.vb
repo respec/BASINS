@@ -13,16 +13,14 @@ Public Class atcDataTreePlugin
                      As Object 'System.Windows.Forms.Form
         Dim lDataGroup As atcDataGroup = aDataGroup
 
-        If lDataGroup Is Nothing Then
-            lDataGroup = New atcDataGroup
-        End If
+        'creating an instance of the form asks user to specify some Data if none has been passed in
+        Dim lDataTreeForm As New atcDataTreeForm(lDataGroup)
 
-        Dim lForm As New atcDataTreeForm(lDataGroup)
         If Not (lDataGroup Is Nothing) AndAlso lDataGroup.Count > 0 Then
-            lForm.Show()
-            Return lForm
+            lDataTreeForm.Show()
+            Return lDataTreeForm
         Else 'No data to display, don't show or return the form
-            lForm.Dispose()
+            lDataTreeForm.Dispose()
             Return Nothing
         End If
     End Function
@@ -30,8 +28,8 @@ Public Class atcDataTreePlugin
     Public Overrides Sub Save(ByVal aDataGroup As atcDataGroup, _
                               ByVal aFileName As String, _
                               ByVal ParamArray aOption() As String)
-        Dim lForm As New atcDataTreeForm(aDataGroup)
-        With lForm
+        Dim lDataTreeForm As New atcDataTreeForm(aDataGroup)
+        With lDataTreeForm
             .TreeAction(aOption)
             .Save(aFileName)
         End With

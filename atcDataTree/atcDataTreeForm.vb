@@ -7,19 +7,18 @@ Friend Class atcDataTreeForm
 
 #Region " Windows Form Designer generated code "
 
-    Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing)
+    Public Sub New(Optional ByRef aDataGroup As atcData.atcDataGroup = Nothing)
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
 
-        Dim lTempDataGroup As atcDataGroup = aDataGroup
-        If aDataGroup Is Nothing Then lTempDataGroup = New atcDataGroup
+        If aDataGroup Is Nothing Then aDataGroup = New atcDataGroup
 
-        If lTempDataGroup.Count = 0 Then 'ask user to specify some Data
-            atcDataManager.UserSelectData(, lTempDataGroup, True)
+        If aDataGroup.Count = 0 Then 'ask user to specify some Data
+            atcDataManager.UserSelectData(, aDataGroup, True)
         End If
 
-        If lTempDataGroup.Count > 0 Then
-            pDataGroup = lTempDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
+        If aDataGroup.Count > 0 Then
+            pDataGroup = aDataGroup 'Don't assign to pDataGroup too soon or it may slow down UserSelectData
             PopulateTree()
 
             Dim DisplayPlugins As ICollection = atcDataManager.GetPlugins(GetType(atcDataDisplay))
@@ -199,7 +198,7 @@ Friend Class atcDataTreeForm
         Dim lNumValuesNow As Integer
         Dim lValueStart As Integer
         Dim lDateString(3) As String
-        Dim lStr, lConditional As String
+        Dim lStr As String
         Dim lDateOffset As Integer 'Mean data is labeled with previous date value (lDateOffset = -1)
 
         If Not pTreeViewMain Is Nothing Then
@@ -228,8 +227,8 @@ Friend Class atcDataTreeForm
                 Dim lAttributeNode As TreeNode = lNode.Nodes.Add("Attributes")
                 Dim lComputedNode As TreeNode = lNode.Nodes.Add("Computed")
                 Dim lAttributes As SortedList = lData.Attributes.ValuesSortedByName
-                For i As Integer = 0 To lAttributes.Count - 1
-                    lAttributeName = lAttributes.GetKey(i)
+                For lAttributeIndex As Integer = 0 To lAttributes.Count - 1
+                    lAttributeName = lAttributes.GetKey(lAttributeIndex)
                     lAttributeValue = lData.Attributes.GetFormattedValue(lAttributeName)
                     If lData.Attributes.GetDefinedValue(lAttributeName).Definition.Calculated Then
                         lComputedNode.Nodes.Add(lAttributeName & " : " & lAttributeValue)
@@ -260,14 +259,9 @@ Friend Class atcDataTreeForm
                 Else
                     lDateOffset = -1
                 End If
-                For j As Integer = 1 To lNumValuesNow
+                For lValueIndex As Integer = 1 To lNumValuesNow
                     'data starts at 1, date display is from prev value which is start of interval
-                    lDateString = DumpDate(lData.Dates.Value(j + lDateOffset)).Split(" ")
-                    lConditional = lData.ValueAttributes(j).GetValue("Conditional", "")
-                    lStr = lDateString(2) & " " & _
-                           lDateString(3) & " : " & _
-                           lConditional & DoubleToString(lData.Value(j)) & " : " & _
-                           lDateString(0)
+                    lStr = ValueWithAttributes(lData, lValueIndex, lDateOffset)
                     lDataNode.Nodes.Add(lStr)
                 Next
 
@@ -278,13 +272,9 @@ Friend Class atcDataTreeForm
                     Else
                         lValueStart = lNumValuesNow
                     End If
-                    For j As Integer = lValueStart To lData.numValues
-                        lDateString = DumpDate(lData.Dates.Value(j + lDateOffset)).Split(" ")
-                        lConditional = lData.ValueAttributes(j).GetValue("Conditional", "")
-                        lStr = lDateString(2) & " " & _
-                               lDateString(3) & " : " & _
-                               lConditional & DoubleToString(lData.Value(j)) & " : " & _
-                               lDateString(0)
+                    For lValueIndex As Integer = lValueStart To lData.numValues
+                        lDateString = DumpDate(lData.Dates.Value(lValueIndex + lDateOffset)).Split(" ")
+                        lStr = ValueWithAttributes(lData, lValueIndex, lDateOffset)
                         lDataNode.Nodes.Add(lStr)
                     Next
                 End If
@@ -293,8 +283,33 @@ Friend Class atcDataTreeForm
         End With
     End Sub
 
+    Private Function ValueWithAttributes(ByVal aData As atcTimeseries, _
+                                         ByVal aValueIndex As Integer, _
+                                         ByVal aDateOffset As Integer) As String
+        Dim lStr As String = ""
+        Dim lConditional As String = ""
+        Dim lDateString() As String = DumpDate(aData.Dates.Value(aValueIndex + aDateOffset)).Split(" ")
+        Dim lValueAttributes As atcDataAttributes = Nothing
+        If aData.ValueAttributesExist Then
+            lValueAttributes = aData.ValueAttributes(aValueIndex)
+        End If
+        If lValueAttributes Is Nothing Then
+            lConditional = ""
+        Else
+            lConditional = lValueAttributes.GetValue("Conditional", "")
+        End If
+        lStr = lDateString(2) & " " & _
+               lDateString(3) & " : " & _
+               lConditional & DoubleToString(aData.Value(aValueIndex)) & " : " & _
+               lDateString(0)
+        If Not lValueAttributes Is Nothing Then
+            'TODO: add display of any attributes other than conditional - as nodes?
+        End If
+        Return (lStr)
+    End Function
+
     Friend Sub Save(ByVal aFileName As String)
-        If Len(aFileName) = 0 Then 'prompt user
+        If aFileName.Length = 0 Then 'prompt user
             Dim lCdlg As New Windows.Forms.SaveFileDialog
             With lCdlg
                 .Title = "Select File to Save Into"
@@ -309,41 +324,43 @@ Friend Class atcDataTreeForm
             End With
         End If
 
-        If Len(aFileName) > 0 Then
+        If aFileName.Length > 0 Then
             SaveFileString(aFileName, ToString)
         End If
     End Sub
 
     Public Overrides Function ToString() As String
+        Dim lSB As New Text.StringBuilder
         Dim lS As String = ""
         Dim lT As String
         Dim lTa(3) As String
 
         For lIndexOuter As Integer = 0 To pTreeViewMain.GetNodeCount(False) - 1
             With pTreeViewMain.Nodes(lIndexOuter)
-                lS &= .Text
+                lSB.Append(.Text)
                 If Not .IsExpanded And .GetNodeCount(False) > 0 Then
-                    lS &= " ..." & vbCrLf
+                    lSB.AppendLine(" ...")
                 Else
-                    lS &= vbCrLf
+                    lSB.AppendLine()
                     For lIndexMiddle As Integer = 0 To .GetNodeCount(False) - 1
                         With .Nodes(lIndexMiddle)
-                            lS &= vbTab & .Text
+                            lSB.Append(vbTab & .Text)
                             If Not .IsExpanded And .GetNodeCount(False) > 0 Then
-                                lS &= " ..." & vbCrLf
+                                lSB.AppendLine(" ...")
                             Else
-                                lS &= vbCrLf
+                                lSB.AppendLine()
                                 For lIndexInner As Integer = 0 To .GetNodeCount(False) - 1
+                                    lS = ""
                                     lT = .Nodes(lIndexInner).Text.Replace(" : ", vbTab)
                                     If lT.IndexOf(vbTab) > 0 Then
                                         lTa = lT.Split(vbTab)
                                         lS &= vbTab & vbTab & lTa(0).PadRight(24) & vbTab & lTa(1).PadRight(16)
-                                        If UBound(lTa) > 1 Then
+                                        If lTa.GetUpperBound(0) > 1 Then
                                             lS &= vbTab & lTa(2)
                                         End If
-                                        lS &= vbCrLf
+                                        lSB.AppendLine(lS)
                                     Else
-                                        lS &= vbTab & vbTab & .Nodes(lIndexInner).Text & vbCrLf
+                                        lSB.AppendLine(vbTab & vbTab & .Nodes(lIndexInner).Text)
                                     End If
                                 Next
                             End If
@@ -352,7 +369,7 @@ Friend Class atcDataTreeForm
                 End If
             End With
         Next
-        Return lS
+        Return lSB.ToString
     End Function
 
     Friend Sub TreeAction(ByVal ParamArray aAction() As String)
