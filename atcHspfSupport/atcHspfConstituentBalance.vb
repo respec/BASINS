@@ -48,8 +48,7 @@ Public Module ConstituentBalance
         Dim lConstituentDataGroup As atcDataGroup
         Dim lTempDataSet As atcDataSet
 
-        For lOperationIndex As Integer = 0 To aOperationTypes.Count - 1
-            Dim lOperationKey As String = aOperationTypes.Keys(lOperationIndex)
+        For Each lOperationKey As String In aOperationTypes.Keys
             For Each lLocation As String In aLocations
                 If lLocation.StartsWith(lOperationKey) Then
                     'Logger.Dbg(aOperations(lOperationIndex) & " " & lLocation)
@@ -57,11 +56,10 @@ Public Module ConstituentBalance
                     'Logger.Dbg("     MatchingDatasetCount " & lTempDataGroup.Count)
                     Dim lNeedHeader As Boolean = True
                     Dim lPendingOutput As String = ""
-                    For lIndex As Integer = 0 To lConstituentsToOutput.Count - 1
-                        Dim lConstituentKey As String = lConstituentsToOutput.Keys(lIndex)
+                    For Each lConstituentKey As String In lConstituentsToOutput.Keys
                         If lConstituentKey.StartsWith(lOperationKey) Then
+                            Dim lConstituentName As String = lConstituentsToOutput.ItemByKey(lConstituentKey)
                             lConstituentKey = lConstituentKey.Remove(0, 2)
-                            Dim lConstituentName As String = lConstituentsToOutput(lIndex)
                             lConstituentDataGroup = lLocationDataGroup.FindData("Constituent", lConstituentKey)
                             If lConstituentDataGroup.Count > 0 Then
                                 lTempDataSet = lConstituentDataGroup.Item(0)
@@ -165,7 +163,7 @@ Public Module ConstituentBalance
                     'Logger.Dbg("   SKIP " & lLocation)
                 End If
             Next lLocation
-        Next lOperationIndex
+        Next lOperationKey
 
         Return lString
     End Function
