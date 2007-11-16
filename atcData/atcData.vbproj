@@ -139,6 +139,7 @@
     <Compile Include="atcTimeseries.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="atcTimeseriesBuilder.vb" />
     <Compile Include="atcTimeseriesGridSource.vb" />
     <Compile Include="atcTimeseriesStatistics.vb">
       <SubType>Code</SubType>
