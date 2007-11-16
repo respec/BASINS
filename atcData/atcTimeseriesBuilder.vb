@@ -10,6 +10,7 @@ Public Class atcTimeseriesBuilder
     Private pValues As Generic.List(Of Double)
     Private pDates As Generic.List(Of Double)
     Private pLastAddedIndex As Integer
+    Private pLogNonNumeric As Boolean = True
     Private Shared pLogDateFormat As atcDateFormat
     Private Shared pNaN As Double = atcUtility.GetNaN
 
@@ -29,24 +30,41 @@ Public Class atcTimeseriesBuilder
         pDates = New Generic.List(Of Double)
     End Sub
 
-    Public Sub AddValue(ByVal aValue As Double, ByVal aDate As Date)
-        AddValue(aValue, aDate.ToOADate)
+    ''' <summary>
+    ''' True to log when non-numeric values are added
+    ''' </summary>
+    Public Property LogNonNumeric() As Boolean
+        Get
+            Return pLogNonNumeric
+        End Get
+        Set(ByVal newValue As Boolean)
+            pLogNonNumeric = newValue
+        End Set
+    End Property
+
+    ''' <summary>
+    ''' Append a date and value to the timeseries being built 
+    ''' </summary>
+    ''' <param name="aDate"></param>
+    ''' <param name="aValue"></param>
+    ''' <remarks></remarks>
+    Public Sub AddValue(ByVal aDate As Date, ByVal aValue As Double)
+        AddValue(aDate.ToOADate, aValue)
     End Sub
 
     ''' <summary>
     ''' Append a value and date to the timeseries being built
     ''' </summary>
-    ''' <param name="aValue">a number or non-numeric value to append</param>
     ''' <param name="aDate">Date corresponding to the value</param>
-    ''' <param name="aLogNonNumeric">True to log when non-numeric aValue is passed</param>
+    ''' <param name="aValue">a number or non-numeric value to append</param>
     ''' <remarks></remarks>
-    Public Sub AddValue(ByVal aValue As String, ByVal aDate As Double, Optional ByVal aLogNonNumeric As Boolean = False)
+    Public Sub AddValue(ByVal aDate As Double, ByVal aValue As String)
         Dim lValue As Double = pNaN
         Dim lFirstNumericIndex As Integer = -1
         Dim lLenNumeric As Integer = 0
 
         If aValue Is Nothing OrElse aValue.Trim.Length = 0 Then
-            If aLogNonNumeric Then
+            If LogNonNumeric Then
                 Logger.Dbg("Missing Value at " & LogDateFormat.JDateToString(aDate))
             End If
         ElseIf IsNumeric(aValue) Then
@@ -64,13 +82,13 @@ Public Class atcTimeseriesBuilder
                 lValue = CDbl(aValue.Substring(lFirstNumericIndex))
             End If
 
-            If aLogNonNumeric Then
+            If LogNonNumeric Then
                 Logger.Dbg("NonNumericValue at " & LogDateFormat.JDateToString(aDate) & " '" & aValue & "' -> '" & lValue & "'")
             End If
 
         End If
 
-        AddValue(lValue, aDate)
+        AddValue(aDate, lValue)
 
         If lFirstNumericIndex > 0 Then
             Me.AddValueAttribute("ValuePrefix", aValue.Substring(0, lFirstNumericIndex))
@@ -84,10 +102,10 @@ Public Class atcTimeseriesBuilder
     ''' <summary>
     ''' Append a value and date to the timeseries being built
     ''' </summary>
-    ''' <param name="aValue">a number to append to the timeseries</param>
     ''' <param name="aDate">Date corresponding to the value</param>
+    ''' <param name="aValue">a number to append to the timeseries</param>
     ''' <remarks></remarks>
-    Public Sub AddValue(ByVal aValue As Double, ByVal aDate As Double)
+    Public Sub AddValue(ByVal aDate As Double, ByVal aValue As Double)
         If pValues.Count = 0 AndAlso Not Double.IsNaN(aValue) Then
             'Value at zero is always NaN (date(0) is start of first interval for constant interval)
             pValues.Add(pNaN)
