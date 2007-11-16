@@ -115,6 +115,7 @@
     </Compile>
     <EmbeddedResource Include="frmProjection.resx">
       <DependentUpon>frmProjection.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -127,9 +127,11 @@
     </Compile>
     <EmbeddedResource Include="frmLandUse.resx">
       <DependentUpon>frmLandUse.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmReclass.resx">
       <DependentUpon>frmReclass.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

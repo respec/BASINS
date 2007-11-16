@@ -103,6 +103,7 @@
     </Compile>
     <EmbeddedResource Include="atcGraphEdit.resx">
       <DependentUpon>atcGraphEdit.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="atcGraphForm.resx">
       <DependentUpon>atcGraphForm.vb</DependentUpon>
