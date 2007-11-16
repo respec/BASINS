@@ -27,8 +27,8 @@ Public Module modTimeseriesMath
                                  ByVal aEndDate As Double, _
                                  ByVal aDataSource As atcDataSource) As atcTimeseries
         'TODO: boundary conditions...
-        Dim lStart As Integer =  FindDateAtOrAfter(aTimeseries.Dates.Values, aStartDate)
-        Dim lEnd As Integer =  FindDateAtOrAfter(aTimeseries.Dates.Values, aEndDate, lStart) - 1
+        Dim lStart As Integer = FindDateAtOrAfter(aTimeseries.Dates.Values, aStartDate)
+        Dim lEnd As Integer = FindDateAtOrAfter(aTimeseries.Dates.Values, aEndDate, lStart) - 1
         If lEnd > aTimeseries.numValues - 1 Then 'adjust end to actual end
             lEnd = aTimeseries.numValues - 1
         End If

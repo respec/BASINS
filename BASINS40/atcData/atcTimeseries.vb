@@ -40,6 +40,12 @@ Public Class atcTimeseries
         Set(ByVal newValues() As Double)
             pValues = newValues
             pNumValues = newValues.GetUpperBound(0)
+            If Not pDates Is Nothing AndAlso pDates.numValues <> pNumValues Then
+                pDates.numValues = pNumValues
+            End If
+            If Not pValueAttributes Is Nothing AndAlso pValueAttributes.GetUpperBound(0) <> pNumValues Then
+                ReDim Preserve pValueAttributes(pNumValues)
+            End If
             Attributes.DiscardCalculated()
         End Set
     End Property
