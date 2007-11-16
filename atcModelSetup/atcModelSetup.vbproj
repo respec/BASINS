@@ -125,6 +125,7 @@
     </Compile>
     <EmbeddedResource Include="frmModelSetup.resx">
       <DependentUpon>frmModelSetup.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

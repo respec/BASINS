@@ -129,6 +129,7 @@
     </Compile>
     <EmbeddedResource Include="frmManDelin.resx">
       <DependentUpon>frmManDelin.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

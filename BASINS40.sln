@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+# Visual Basic Express 2005
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcUtility", "atcUtility\atcUtility.vbproj", "{67027820-9036-481E-80F6-077E5085F59D}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcData", "atcData\atcData.vbproj", "{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}"
@@ -82,21 +82,15 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcFileGeoReference", "atcF
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTableSQLite", "atcTableSQLite\atcTableSQLite.vbproj", "{C59D3153-2857-499C-B640-924E5ABE2E74}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager", "..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "mwMetadataEditor", "..\MapWindow4Plugins\mwMetadataEditor\mwMetadataEditor.vbproj", "{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMNHDPlusDataExtension", "..\D4EM\DataManager\NHDPlusDataExtension\BASINS-D4EMNHDPlusDataExtension.vbproj", "{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapWinGeoProc2005BASINS", "..\MapWindow4Dev\MapWinGeoProc\MapWinGeoProc2005BASINS.csproj", "{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMBasinsDataExtension", "..\D4EM\DataManager\BasinsDataExtension\BASINS-D4EMBasinsDataExtension.vbproj", "{6B46450E-F526-4C3C-BC4D-0D11735022BF}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMTerraServerDataExtension", "..\D4EM\DataManager\TerraServerDataExtension\BASINS-D4EMTerraServerDataExtension.vbproj", "{2E139A29-283A-4D78-B4E4-107EA5778C82}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-NWISDataExtension", "..\D4EM\DataManager\NWISDataExtension\BASINS-NWISDataExtension.vbproj", "{A97D1620-BFDE-4733-B2DC-10F32323DF8E}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcHspfSupport", "atcHspfSupport\atcHspfSupport.vbproj", "{3B2EB97A-A305-4394-9843-72E138815152}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager", "..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -267,22 +261,10 @@ Global
 		{C59D3153-2857-499C-B640-924E5ABE2E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C59D3153-2857-499C-B640-924E5ABE2E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C59D3153-2857-499C-B640-924E5ABE2E74}.Release|Any CPU.Build.0 = Release|Any CPU
-		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E2EC0A25-9479-4DA0-A39C-F710E1ED7C44}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6B46450E-F526-4C3C-BC4D-0D11735022BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6B46450E-F526-4C3C-BC4D-0D11735022BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B46450E-F526-4C3C-BC4D-0D11735022BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -291,14 +273,14 @@ Global
 		{2E139A29-283A-4D78-B4E4-107EA5778C82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E139A29-283A-4D78-B4E4-107EA5778C82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E139A29-283A-4D78-B4E4-107EA5778C82}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3B2EB97A-A305-4394-9843-72E138815152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3B2EB97A-A305-4394-9843-72E138815152}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B2EB97A-A305-4394-9843-72E138815152}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B2EB97A-A305-4394-9843-72E138815152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
