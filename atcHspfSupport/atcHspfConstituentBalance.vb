@@ -64,6 +64,7 @@ Public Module ConstituentBalance
                             If lConstituentDataGroup.Count > 0 Then
                                 lTempDataSet = lConstituentDataGroup.Item(0)
                                 Dim lSeasons As atcSeasonBase
+                                Dim lAttribute As atcDefinedValue
                                 If aUci.GlobalBlock.SDate(1) = 10 Then 'month Oct
                                     lSeasons = New atcSeasonsWaterYear
                                 Else
@@ -91,7 +92,7 @@ Public Module ConstituentBalance
 
                                     lString.AppendLine(aBalanceType & " Balance Report For " & lLocation & " (" & lDesc & ")" & vbCrLf)
                                     lString.Append("Date    " & vbTab & "      Mean")
-                                    For Each lAttribute As atcDefinedValue In lCalculatedAttributes
+                                    For Each lAttribute In lCalculatedAttributes
                                         Dim s As String = lAttribute.Arguments(1).Value
                                         lString.Append(vbTab & s.PadLeft(10))
                                     Next
@@ -103,11 +104,17 @@ Public Module ConstituentBalance
                                     lPendingOutput = ""
                                 End If
 
-                                lString.Append(lConstituentName & vbTab & DecimalAlign(lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value))
-                                For Each lAttribute As atcDefinedValue In lCalculatedAttributes
-                                    lString.Append(vbTab & DecimalAlign(lAttribute.Value))
-                                Next
-                                lString.AppendLine()
+                                lAttribute = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+
+                                If Not lAttribute Is Nothing Then
+                                    lString.Append(lConstituentName & vbTab & DecimalAlign(lAttribute.Value))
+                                    For Each lAttribute In lCalculatedAttributes
+                                        lString.Append(vbTab & DecimalAlign(lAttribute.Value))
+                                    Next
+                                    lString.AppendLine()
+                                Else
+                                    lString.AppendLine(lConstituentName & vbTab & "Skip-NoData")
+                                End If
                             ElseIf lConstituentKey.StartsWith("Total") AndAlso _
                                    lConstituentKey.Length > 5 AndAlso _
                                    IsNumeric(lConstituentKey.Substring(5)) Then

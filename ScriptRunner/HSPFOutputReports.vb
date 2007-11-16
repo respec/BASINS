@@ -6,6 +6,7 @@ Imports HspfSupport
 Imports MapWinUtility
 
 Imports MapWindow.Interfaces
+Imports System.Collections.Specialized
 
 Module HSPFOutputReports
     Private pTestPath As String
@@ -15,8 +16,9 @@ Module HSPFOutputReports
     Private Sub Initialize()
         pOutputLocations.Clear()
         'Dim lTestName As String = "hyd_man"
-        Dim lTestName As String = "calleguas_cat"
+        'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
+        Dim lTestName As String = "SantaClara"
         Select Case lTestName
             Case "calleguas_cat"
                 pTestPath = "D:\MountainViewData\Calleguas\cat"
@@ -35,6 +37,14 @@ Module HSPFOutputReports
                 pBaseName = "hyd_man"
                 pOutputLocations.Add("R:5")
                 pOutputLocations.Add("R:4")
+            Case "SantaClara"
+                pTestPath = "D:\MountainViewData\SantaClara"
+                pBaseName = "SCR10"
+                pOutputLocations.Add("R:70")
+                pOutputLocations.Add("R:180")
+                pOutputLocations.Add("R:526")
+                pOutputLocations.Add("R:410")
+                pOutputLocations.Add("R:880")
         End Select
     End Sub
 
@@ -54,28 +64,41 @@ Module HSPFOutputReports
         lWdmDataSource.Open(lWdmFileName)
 
         Dim lOutFileName As String
-        Try
-            Dim lExpertSystem As HspfSupport.ExpertSystem
-            lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
-            Dim lStr As String = lExpertSystem.Report
-            SaveFileString("outfiles\ExpertSysStats.txt", lStr)
+        Dim lExpertSystemFileNames As New NameValueCollection
+        AddFilesInDir(lExpertSystemFileNames, CurDir, False, "*.exs")
+        Dim lExpertSystem As HspfSupport.ExpertSystem
+        For Each lExpertSystemFileName As String In lExpertSystemFileNames
+            Try
+                Dim lFileCopied As Boolean = False
+                If FilenameOnly(lExpertSystemFileName) <> pBaseName Then
+                    FileCopy(lExpertSystemFileName, pBaseName & ".exs")
+                    lFileCopied = True
+                End If
+                lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
+                Dim lStr As String = lExpertSystem.Report
+                SaveFileString("outfiles\ExpertSysStats-" & FilenameOnly(lExpertSystemFileName) & ".txt", lStr)
 
-            'lStr = lExpertSystem.AsString 'NOTE:just testing
-            'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
+                'lStr = lExpertSystem.AsString 'NOTE:just testing
+                'SaveFileString(FilenameOnly(lHspfUci.Name) & ".exx", lStr)
 
-            Dim lCons As String = "Flow"
-            For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
-                Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
-                Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
-                Dim lSimDsnId As Integer = lExpertSystem.Sites(lSiteIndex).Dsn(0)
-                Dim lObsDsnId As Integer = lExpertSystem.Sites(lSiteIndex).Dsn(1)
-                lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSite, lArea, lSimDsnId, lObsDsnId)
-                lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
-                SaveFileString(lOutFileName, lStr)
-            Next lSiteIndex
-        Catch lEx As ApplicationException
-            Logger.Dbg(lEx.Message)
-        End Try
+                Dim lCons As String = "Flow"
+                For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
+                    Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
+                    Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
+                    Dim lSimDsnId As Integer = lExpertSystem.Sites(lSiteIndex).Dsn(0)
+                    Dim lObsDsnId As Integer = lExpertSystem.Sites(lSiteIndex).Dsn(1)
+                    lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSite, lArea, lSimDsnId, lObsDsnId)
+                    lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
+                    SaveFileString(lOutFileName, lStr)
+                Next lSiteIndex
+                lExpertSystem = Nothing
+                If lFileCopied Then
+                    Kill(pBaseName & ".exs")
+                End If
+            Catch lEx As ApplicationException
+                Logger.Dbg(lEx.Message)
+            End Try
+        Next lExpertSystemFileName
 
         'open HBN file
         Dim lHspfBinFileName As String = pTestPath & "\" & pBaseName & ".hbn"

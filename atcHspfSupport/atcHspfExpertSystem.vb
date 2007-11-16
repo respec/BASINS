@@ -167,7 +167,7 @@ Public Class ExpertSystem
             Dim lExsRecords() As String = lExsFileString.Split(vbLf)
 
             'Read first line of file
-            Dim lExsRecord As String = lExsRecords(0)
+            Dim lExsRecord As String = lExsRecords(0).PadRight(51)
             pName = lExsRecord.Substring(0, 8)
             Dim lNSites As Integer = lExsRecord.Substring(8, 5)
             Dim lCurSite As Integer = lExsRecord.Substring(14, 5)
