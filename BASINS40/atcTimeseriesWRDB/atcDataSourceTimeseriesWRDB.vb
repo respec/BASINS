@@ -47,19 +47,14 @@ Public Class atcDataSourceTimeseriesWRDB
             Dim lCcodeCol As Integer = -1
             Dim lRcodeCol As Integer = -1
             Dim lValueCol As Integer
-            Dim lTSKey As String
             Dim lLocation As String = ""
             Dim lConstituentName, lCcode, lValue As String
             Dim lStr As String
-
-            Dim lNewDatasets As New atcCollection
-
             Dim lDate As Double
-
             Dim lTable As atcTableDelimited
             lTable = New atcTableDelimited
             lTable.Delimiter = vbTab
-            Logger.Dbg("About to open '" & Specification & "'")
+            Logger.Status("Opening '" & Specification & "'", True)
             lTable.OpenFile(Specification)
             Logger.Dbg("NumFields:" & lTable.NumFields)
             Logger.Dbg("NumRecords:" & lTable.NumRecords)
@@ -78,7 +73,8 @@ Public Class atcDataSourceTimeseriesWRDB
                 Next
 
                 If lDateCol > 0 AndAlso lValueCol > 0 AndAlso lLocnCol > 0 Then
-                    Dim lBuilder As atcTimeseriesBuilder
+                    Dim lGroupBuilder As New atcTimeseriesGroupBuilder(Me)
+                    Dim lTSBuilder As atcTimeseriesBuilder
                     For lRecordNumber As Integer = 1 To lTable.NumRecords
                         lTable.CurrentRecord = lRecordNumber
                         lLocation = lTable.Value(lLocnCol)
@@ -86,34 +82,28 @@ Public Class atcDataSourceTimeseriesWRDB
                         If lStr.Length > 0 Then
                             lConstituentName = lTable.Value(lConsCol)
                             lCcode = lTable.Value(lCcodeCol)
-                            lTSKey = lLocation & ":" & lConstituentName & ":" & lCcode
-                            lBuilder = lNewDatasets.ItemByKey(lTSKey)
-                            If lBuilder Is Nothing Then 'create new timseries dataset
-                                lBuilder = New atcTimeseriesBuilder(Me)
-                                With lBuilder.Attributes
-                                    .SetValue("ID", lNewDatasets.Count + 1)
+                            lTSBuilder = lGroupBuilder.Builder(lLocation & ":" & lConstituentName & ":" & lCcode)
+                            With lTSBuilder.Attributes
+                                'Set attributes of newly created builder
+                                If Not .ContainsAttribute("Location") Then
                                     .SetValue("Scenario", "OBSERVED")
                                     .SetValue("Location", lLocation)
                                     .SetValue("Constituent", lConstituentName)
                                     .SetValue("CCode", lCcode)
                                     .SetValue("Point", True)
                                     .AddHistory("Read from " & Specification)
-                                End With
-                                lNewDatasets.Add(lTSKey, lBuilder)
-                            End If
+                                End If
+                            End With
                             lValue = lTable.Value(lValueCol)
                             lDate = Date.Parse(lTable.Value(lDateCol)).ToOADate
-                            lBuilder.AddValue(lValue.Substring(1), lDate)
+                            lTSBuilder.AddValue(lDate, lValue.Substring(1))
                             If lTable.Value(lRcodeCol).Length > 0 Then
-                                lBuilder.AddValueAttribute("RCode", lTable.Value(lRcodeCol))
+                                lTSBuilder.AddValueAttribute("RCode", lTable.Value(lRcodeCol))
                             End If
                         End If
                         Logger.Progress(lRecordNumber, lTable.NumRecords)
                     Next lRecordNumber
-                    For Each lBuilder In lNewDatasets
-                        Dim lDataSet As atcTimeseries = lBuilder.CreateTimeseries
-                        DataSets.Add(lDataSet.Attributes.GetValue("ID"), lDataSet)
-                    Next
+                    lGroupBuilder.CreateTimeseriesAddToGroup(DataSets)
                     Open = True
                 ElseIf lDateCol < 0 Then
                     Open = False
@@ -125,6 +115,7 @@ Public Class atcDataSourceTimeseriesWRDB
             Catch endEx As Exception
                 Open = False
             End Try
+            Logger.Status("")
         End If
     End Function
 

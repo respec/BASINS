@@ -92,6 +92,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcHspfSupport", "atcHspfSu
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager", "..\D4EM\DataManager\DataManager\BASINS-D4EMDataManager.vbproj", "{59E61F35-B014-4D34-8277-63FF6BE40DD6}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcTimseriesWRDB", "atcTimeseriesWRDB\atcTimseriesWRDB.vbproj", "{5E5A80B8-06DC-428F-A139-F1CF20D756B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -281,6 +283,10 @@ Global
 		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59E61F35-B014-4D34-8277-63FF6BE40DD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E5A80B8-06DC-428F-A139-F1CF20D756B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E5A80B8-06DC-428F-A139-F1CF20D756B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E5A80B8-06DC-428F-A139-F1CF20D756B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E5A80B8-06DC-428F-A139-F1CF20D756B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

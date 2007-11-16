@@ -426,6 +426,8 @@ Friend Class frmSelectData
         Dim iLastCriteria As Integer = pcboCriteria.GetUpperBound(0)
         pMatchingGroup.Clear()
         pTotalTS = 0
+        Dim lCount As Integer = 0
+        Dim lLast As Integer = atcDataManager.DataSets.Count
         For Each ts As atcDataSet In atcDataManager.DataSets
             pTotalTS += 1
             For iCriteria As Integer = 0 To iLastCriteria
@@ -447,6 +449,8 @@ Friend Class frmSelectData
             pMatchingGroup.Add(ts)
             SelectMatchingRow(pMatchingGroup.Count, pSelectedGroup.Contains(ts))
 NextTS:
+            lCount += 1
+            Logger.Progress(lCount, lLast)
         Next
         lblMatching.Text = "Matching Data (" & pMatchingGroup.Count & " of " & pTotalTS & ")"
         pMatchingGrid.Refresh()
