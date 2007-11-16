@@ -117,7 +117,12 @@ Public Module WatershedConstituentBalance
                                     Dim lLocationDataGroup As atcDataGroup = lConstituentDataGroup.FindData("Location", lLocation)
                                     If lLocationDataGroup.Count > 0 Then
                                         lTempDataSet = lLocationDataGroup.Item(0)
-                                        lValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual").Value
+                                        Dim lAttribute As atcDefinedValue = lTempDataSet.Attributes.GetDefinedValue("SumAnnual")
+                                        If lAttribute Is Nothing Then
+                                            lValue = Double.NaN
+                                        Else
+                                            lValue = lAttribute.Value
+                                        End If
                                     Else
                                         lValue = 0.0
                                         'Logger.Dbg("SkipLocation:" & lLocation & ":WithNo:" & lConstituentKey & ":Data")

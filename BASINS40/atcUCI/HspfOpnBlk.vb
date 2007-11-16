@@ -224,10 +224,14 @@ Option Explicit On
                                         pTables.Add(ltable, ltable.Name & ":" & thisoccur)
                                     End If
                                 Else
-                                    lId.Tables.Add(ltable, ltable.Name)
-                                    If Not TableExists((ltable.Name)) Then
-                                        pTables.Add(ltable, ltable.Name)
-                                    End If
+                                    Try
+                                        lId.Tables.Add(ltable, ltable.Name)
+                                        If Not TableExists((ltable.Name)) Then
+                                            pTables.Add(ltable, ltable.Name)
+                                        End If
+                                    Catch
+                                        Debug.Print("TableProblem:" & ltable.Name & ":" & lId.Id)
+                                    End Try
                                 End If
                                 If ltable.Name = "GEN-INFO" Then
                                     lId.Description = ltable.Parms.Item(1).Value

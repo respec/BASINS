@@ -223,17 +223,19 @@ Public Module Utility
                                          ByRef aLocations As atcCollection)
         Dim lOperName As String = aOperationTypes.ItemByKey(aLocation.Substring(0, 2))
         Dim lOperation As HspfOperation = aUci.OpnBlks(lOperName).operfromid(aLocation.Substring(2))
-        For Each lConnection As HspfConnection In lOperation.Sources
-            Dim lSourceVolName As String = lConnection.Source.VolName
-            Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
-            If lSourceVolName = "PERLND" Or lSourceVolName = "IMPLND" Then
-                If lConnection.MFact > 0 Then
-                    aLocations.Increment(lLocationKey, lConnection.MFact)
+        If Not lOperation Is Nothing Then
+            For Each lConnection As HspfConnection In lOperation.Sources
+                Dim lSourceVolName As String = lConnection.Source.VolName
+                Dim lLocationKey As String = lSourceVolName.Substring(0, 1) & ":" & lConnection.Source.VolId
+                If lSourceVolName = "PERLND" Or lSourceVolName = "IMPLND" Then
+                    If lConnection.MFact > 0 Then
+                        aLocations.Increment(lLocationKey, lConnection.MFact)
+                    End If
+                ElseIf lSourceVolName = "RCHRES" Then
+                    UpstreamLocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations)
                 End If
-            ElseIf lSourceVolName = "RCHRES" Then
-                UpstreamLocationAreaCalc(aUci, lLocationKey, aOperationTypes, aLocations)
-            End If
-        Next
+            Next
+        End If
         aLocations.Add(aLocation, 1.0)
     End Sub
 
