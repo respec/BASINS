@@ -138,6 +138,7 @@ Public Class atcTimeseriesNdayHighLow
                      ByVal aHigh As Boolean) As Double
 
         If aNDay <= 0 Then
+            Return Nothing
         ElseIf aTS.numValues < aNDay Then 'Cannot compute a value because fewer than aNDay values are present 
             Throw New ApplicationException("Only " & aTS.numValues & " values available, needed " & aNDay)
         Else
@@ -596,24 +597,26 @@ Public Class atcTimeseriesNdayHighLow
             If aArgs.ContainsAttribute("LastYear") Then lLastYear = aArgs.GetValue("LastYear")
         End If
 
-        If ltsGroup Is Nothing Then
-            ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
-        End If
+        If lNDay > 0 AndAlso lReturn > 0 Then
+            If ltsGroup Is Nothing Then
+                ltsGroup = atcDataManager.UserSelectData("Select data to compute statistics for")
+            End If
 
-        For Each lTs In ltsGroup
-            Dim lNDayTsGroup As atcDataGroup = Nothing 'atcTimeseries
-            lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing, lFirstYear, lLastYear, lEndMonth, lEndDay)
-            Select Case lOperationName
-                Case "n-day low value", "n-day high value"
-                    ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes, lNDayTsGroup, lEndMonth, lEndDay)
-                    Me.DataSets.AddRange(lNDayTsGroup)
-                Case "n-day low timeseries", "n-day high timeseries"
-                    lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
-                    Me.DataSets.AddRange(lNDayTsGroup)
-                Case "kendall tau"
-                    ComputeTau(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
-            End Select
-        Next
+            For Each lTs In ltsGroup
+                Dim lNDayTsGroup As atcDataGroup = Nothing 'atcTimeseries
+                lTsB = SubsetByDateBoundary(lTs, lBoundaryMonth, lBoundaryDay, Nothing, lFirstYear, lLastYear, lEndMonth, lEndDay)
+                Select Case lOperationName
+                    Case "n-day low value", "n-day high value"
+                        ComputeFreq(lTsB, lNDay, lHigh, lReturn, lLogFlg, lTs.Attributes, lNDayTsGroup, lEndMonth, lEndDay)
+                        Me.DataSets.AddRange(lNDayTsGroup)
+                    Case "n-day low timeseries", "n-day high timeseries"
+                        lNDayTsGroup = HighOrLowTimeseries(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
+                        Me.DataSets.AddRange(lNDayTsGroup)
+                    Case "kendall tau"
+                        ComputeTau(lTsB, lNDay, lHigh, lTs.Attributes, lEndMonth, lEndDay)
+                End Select
+            Next
+        End If
 
         If Me.DataSets.Count > 0 Then
             Return True 'todo: error checks
