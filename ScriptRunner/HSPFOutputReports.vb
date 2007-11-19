@@ -87,7 +87,11 @@ Module HSPFOutputReports
                     Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
                     Dim lSimDsnId As Integer = lExpertSystem.Sites(lSiteIndex).Dsn(0)
                     Dim lObsDsnId As Integer = lExpertSystem.Sites(lSiteIndex).Dsn(1)
-                    lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lSite, lArea, lSimDsnId, lObsDsnId)
+                    lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, _
+                                                                       lCons, lSite, lArea, _
+                                                                       lSimDsnId, lObsDsnId, _
+                                                                       lExpertSystem.SDateJ, _
+                                                                       lExpertSystem.EDateJ)
                     lOutFileName = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
                     SaveFileString(lOutFileName, lStr)
                 Next lSiteIndex

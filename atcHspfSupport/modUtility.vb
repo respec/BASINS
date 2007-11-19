@@ -45,6 +45,9 @@ Public Module Utility
                 lConstituentsToOutput.Add("R:ROVOL3", "    OVolPmpIn")
                 lConstituentsToOutput.Add("R:ROVOL3-1", "    OVolPmpInX1")
                 lConstituentsToOutput.Add("R:ROVOL3-2", "    OVolPmpInX2")
+                lConstituentsToOutput.Add("R:ROVOL4", "    OVolRsvIn")
+                lConstituentsToOutput.Add("R:ROVOL4-1", "    OVolRsvInX1")
+                lConstituentsToOutput.Add("R:ROVOL4-2", "    OVolRsvInX2")
                 lConstituentsToOutput.Add("R:PRSUPY", "    SurfPrecVol")
                 lConstituentsToOutput.Add("R:VOLEV", "    SurfEvapVol")
             Case "SedimentCopper"
