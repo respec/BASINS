@@ -9,7 +9,9 @@ Public Module DailyMonthlyCompareStats
                            ByVal aSite As String, _
                            ByVal aArea As Double, _
                            ByVal aSimDsnId As Integer, _
-                           ByVal aObsDsnId As Integer) As String
+                           ByVal aObsDsnId As Integer, _
+                           Optional ByVal aSDateJ As Double = 0, _
+                           Optional ByVal aEDateJ As Double = 0) As String
 
 
         Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
@@ -19,14 +21,22 @@ Public Module DailyMonthlyCompareStats
         lStr = "Daily and Monthly " & aCons & " Statistics for '" & FilenameOnly(aUci.Name) & "' scenario." & vbCrLf
         lStr &= "   Run Made " & FileDateTime(aUci.Name) & vbCrLf
         lStr &= "   " & aUci.GlobalBlock.RunInf.Value & vbCrLf
-        lStr &= "   " & aUci.GlobalBlock.RunPeriod & vbCrLf
-        lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
 
         Dim lSimTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aSimDsnId))
         Dim lObsTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(aObsDsnId))
 
-        Dim lSDateJ As Double = aUci.GlobalBlock.SDateJ
-        Dim lEDateJ As Double = aUci.GlobalBlock.EdateJ
+        Dim lSDateJ As Double = aSDateJ
+        If Math.Abs(lSDateJ) < 0.00001 Then lSDateJ = aUci.GlobalBlock.SDateJ
+        Dim lEDateJ As Double = aEDateJ
+        If Math.Abs(lEDateJ) < 0.00001 Then lEDateJ = aUci.GlobalBlock.EdateJ
+
+        Dim lYrCnt As Double = timdifJ(lSDateJ, lEDateJ, 6, 1)
+        lStr &= "Simulation Period: " & lYrCnt & " years"
+        lStr &= " from " & Format(Date.FromOADate(lSDateJ), "yyyy/MM/dd")
+        lStr &= " to " & Format(Date.FromOADate(lEDateJ), "yyyy/MM/dd") & vbCrLf
+
+        lStr &= "   (Units:CFS days)" & vbCrLf & vbCrLf 'TODO: do this in inches too?
+
         CheckDateJ(lObsTSer, "Observed", lSDateJ, lEDateJ, lStr)
         CheckDateJ(lSimTSer, "Simulated", lSDateJ, lEDateJ, lStr)
 

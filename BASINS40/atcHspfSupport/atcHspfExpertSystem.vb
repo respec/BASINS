@@ -16,6 +16,7 @@ Public Class ExpertSystem
     Private pSubjectiveData(25) As Integer
     Private pLatMin As Double, pLatMax As Double
     Private pLngMin As Double, pLngMax As Double
+    Private pSDateJ As Double, pEDateJ As Double
     'TODO: get rid of next two global arrays, store in site class
     Private pStats(,,) As Double
     Private pHSPFOutput1(,) As Double
@@ -52,6 +53,17 @@ Public Class ExpertSystem
         ReadEXSFile(FilenameOnly(aUci.Name) & ".exs")
         'pErrorCriteria.Edit()
     End Sub
+
+    Public ReadOnly Property SDateJ() As Double
+        Get
+            Return psdatej
+        End Get
+    End Property
+    Public ReadOnly Property EDateJ() As Double
+        Get
+            Return pedatej
+        End Get
+    End Property
 
     Public ReadOnly Property Sites() As Sites
         Get
@@ -148,17 +160,6 @@ Public Class ExpertSystem
         Return lText.ToString
     End Function
 
-    Private ReadOnly Property SDateJ() As Double
-        Get
-            Return pUci.GlobalBlock.SDateJ
-        End Get
-    End Property
-    Private ReadOnly Property EDateJ() As Double
-        Get
-            Return pUci.GlobalBlock.EdateJ
-        End Get
-    End Property
-
     Private Sub ReadEXSFile(ByVal aFilename As String)
         If Not FileExists(aFilename) Then
             Throw New ApplicationException("ExpertSystemFile " & aFilename & " not found")
@@ -175,6 +176,21 @@ Public Class ExpertSystem
             pLatMax = lExsRecord.Substring(27, 8)
             pLngMin = lExsRecord.Substring(35, 8)
             pLngMax = lExsRecord.Substring(43, 8)
+            If lExsRecord.Length = 51 Then
+                pSDateJ = pUci.GlobalBlock.SDateJ
+                pEDateJ = pUci.GlobalBlock.EdateJ
+            Else
+                lExsRecord.PadRight(70)
+                Dim lDate(5) As Integer
+                lDate(0) = lExsRecord.Substring(52, 4)
+                lDate(1) = lExsRecord.Substring(56, 2)
+                lDate(2) = lExsRecord.Substring(58, 2)
+                pSDateJ = Date2J(lDate)
+                lDate(0) = lExsRecord.Substring(62, 4)
+                lDate(1) = lExsRecord.Substring(66, 2)
+                lDate(2) = lExsRecord.Substring(68, 2)
+                pEDateJ = Date2J(lDate)
+            End If
 
             'Default unspecified lat/integer min/max values to contiguous 48 states
             If ((pLatMin < 0.01) And (pLatMin > -0.01)) Then
@@ -296,7 +312,7 @@ Public Class ExpertSystem
         Dim lTimeStep As Integer, lTimeUnit As Integer, lNVals As Integer
         lTimeStep = 1
         lTimeUnit = 4 'day
-        lNVals = timdifJ(SDateJ, EDateJ, lTimeUnit, lTimeStep)
+        lNVals = timdifJ(pSDateJ, pEDateJ, lTimeUnit, lTimeStep)
 
         For lSiteIndex As Integer = 1 To pSites.Count
             For Each lDatasetType As String In lDataSetTypes ' As Integer = 1 To pDatasetTypes.Count
@@ -317,7 +333,7 @@ Public Class ExpertSystem
                 'Get data - daily values and max values as necessary
                 Dim lTSer As atcTimeseries = aDataSource.DataSets(aDataSource.DataSets.IndexFromKey(lDSN))
                 'subset by date to simulation period
-                Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, SDateJ, EDateJ, Nothing)
+                Dim lNewTSer As atcTimeseries = SubsetByDate(lTSer, pSDateJ, pEDateJ, Nothing)
                 'don't Clear lTSer as that will clear the original, precluding its future use
                 lTSer = Nothing
 
@@ -352,7 +368,7 @@ Public Class ExpertSystem
                         pStats(3, lStatGroup, lSiteIndex) = lDailyTSer.Attributes.GetValue("Sum") - lDailyTSer.Attributes.GetValue("%Sum90")
 
                         Dim lTmpDate(5) As Integer
-                        J2Date(SDateJ, lTmpDate)
+                        J2Date(pSDateJ, lTmpDate)
 
                         pStats(7, lStatGroup, lSiteIndex) = 0.0# 'summer volume
                         pStats(8, lStatGroup, lSiteIndex) = 0.0# 'winter volume
@@ -375,12 +391,12 @@ Public Class ExpertSystem
                         pStats(10, lStatGroup, lSiteIndex) = 0.0# 'winter storms
                         If (pStorms.Count > 0) Then 'storms are available, loop thru them
                             For lStormIndex As Integer = 1 To pStorms.Count
-                                If pStorms(lStormIndex).SDateJ >= SDateJ And _
-                                   pStorms(lStormIndex).EDateJ <= EDateJ Then 'storm within run span
+                                If pStorms(lStormIndex).SDateJ >= pSDateJ And _
+                                   pStorms(lStormIndex).EDateJ <= pEDateJ Then 'storm within run span
                                     'TODO: this matches VB6Script results, needs to have indexes checked!
                                     Dim lN1 As Integer, lN2 As Integer
-                                    lN1 = timdifJ(SDateJ, pStorms(lStormIndex).SDateJ, lTimeUnit, lTimeStep) + 1
-                                    lN2 = timdifJ(SDateJ, pStorms(lStormIndex).EDateJ, lTimeUnit, lTimeStep)
+                                    lN1 = timdifJ(pSDateJ, pStorms(lStormIndex).SDateJ, lTimeUnit, lTimeStep) + 1
+                                    lN2 = timdifJ(pSDateJ, pStorms(lStormIndex).EDateJ, lTimeUnit, lTimeStep)
                                     Dim lNLimit As Integer = lDailyTSer.Values.GetUpperBound(0)
                                     If lN2 <= lNLimit Then
                                         Dim lTmpDate(5) As Integer
@@ -433,29 +449,29 @@ Public Class ExpertSystem
                         lRecessionTimser.Dates.Clear()
                         lRecessionTimser = Nothing
                     End If
-                    End If
+                End If
 
-                    If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
-                        pStats(5, lStatGroup, lSiteIndex) /= pStorms.Count
-                        'convert storm peak stat from acre-inch/day to cfs
-                        pStats(5, lStatGroup, lSiteIndex) *= pSites(lSiteIndex).Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
-                    ElseIf lStatGroup = 2 Then
-                        For i As Integer = 1 To 10
-                            If i < 5 Or i > 6 Then 'convert observed runoff values
-                                pStats(i, lStatGroup, lSiteIndex) *= pConvert / pSites(lSiteIndex).Area
-                            ElseIf i = 5 Then 'take average over NStorms
-                                pStats(i, lStatGroup, lSiteIndex) /= pStorms.Count
-                            End If
-                        Next i
-                    End If
-                    lDailyTSer.Clear()
-                    lDailyTSer.Dates.Clear()
-                    lDailyTSer = Nothing
+                If lStatGroup = 1 Or lStatGroup = 3 Or lStatGroup = 4 Then 'take average over NStorms
+                    pStats(5, lStatGroup, lSiteIndex) /= pStorms.Count
+                    'convert storm peak stat from acre-inch/day to cfs
+                    pStats(5, lStatGroup, lSiteIndex) *= pSites(lSiteIndex).Area * 43560.0# / (12.0# * 24.0# * 3600.0#)
+                ElseIf lStatGroup = 2 Then
+                    For i As Integer = 1 To 10
+                        If i < 5 Or i > 6 Then 'convert observed runoff values
+                            pStats(i, lStatGroup, lSiteIndex) *= pConvert / pSites(lSiteIndex).Area
+                        ElseIf i = 5 Then 'take average over NStorms
+                            pStats(i, lStatGroup, lSiteIndex) /= pStorms.Count
+                        End If
+                    Next i
+                End If
+                lDailyTSer.Clear()
+                lDailyTSer.Dates.Clear()
+                lDailyTSer = Nothing
             Next lDatasetType
         Next lSiteIndex
     End Sub
 
-    Private Function CalcErrorTerms(ByVal auci As atcUCI.HspfUci) As String
+    Private Function CalcErrorTerms(ByVal aUci As atcUCI.HspfUci) As String
         For lSiteIndex As Integer = 1 To pSites.Count
             'total volume error
             If (pStats(1, 2, lSiteIndex) > 0.0#) Then
@@ -555,14 +571,16 @@ Public Class ExpertSystem
         lStr = aUci.GlobalBlock.RunInf.Value & vbCrLf
         lStr &= "Expert System Statistics for " & aUci.Name & vbCrLf
         lStr &= "Run Created: ".PadLeft(15) & FileDateTime(aUci.Name) & vbCrLf
-        lStr &= "  " & aUci.GlobalBlock.RunPeriod & vbCrLf & vbCrLf
+        Dim lYrCnt As Double = timdifJ(pSDateJ, pEDateJ, 6, 1)
+        lStr &= "Simulation Period: " & lYrCnt & " years"
+        lStr &= " from " & Format(Date.FromOADate(pSDateJ), "yyyy/MM/dd")
+        lStr &= " to " & Format(Date.FromOADate(pEDateJ), "yyyy/MM/dd") & vbCrLf
 
         For lSiteIndex As Integer = 1 To pSites.Count
             'loop for each site
             lStr &= "Site: ".PadLeft(15) & pSites(lSiteIndex).Name & vbCrLf & vbCrLf
 
             'statistics summary
-            Dim lYrCnt As Double = timdifJ(SDateJ, EDateJ, 6, 1)
             lStr &= StatDetails("Total (" & lYrCnt & " year run)", lSiteIndex, 1)
             lStr &= StatDetails("Annual Average", lSiteIndex, lYrCnt)
 
