@@ -96,7 +96,7 @@ Public Class atcDataSourceTimeseriesWRDB
                             End With
                             lValue = lTable.Value(lValueCol)
                             lDate = Date.Parse(lTable.Value(lDateCol)).ToOADate
-                            lTSBuilder.AddValue(lDate, lValue.Substring(1))
+                            lTSBuilder.AddValue(lDate, lValue)
                             If lTable.Value(lRcodeCol).Length > 0 Then
                                 lTSBuilder.AddValueAttribute("RCode", lTable.Value(lRcodeCol))
                             End If

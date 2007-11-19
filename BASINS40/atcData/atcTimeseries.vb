@@ -11,6 +11,7 @@ Public Class atcTimeseries
     Private pValueAttributes() As atcDataAttributes
 
     Private Const pEpsilon As Double = 0.000000001
+    Private Shared pNaN As Double = atcUtility.GetNaN
 
     ''' <summary>Set or get an individual value</summary>
     Public Property Value(ByVal aIndex As Integer) As Double
@@ -30,6 +31,16 @@ Public Class atcTimeseries
             End If
         End Set
     End Property
+
+    ''' <summary>First number in Values that is not NaN or Infinity, NaN if no numeric values</summary>
+    Public Function FirstNumeric() As Double
+        Dim lValue As Double = pNaN
+        For lIndex As Integer = 0 To pNumValues
+            lValue = Value(lIndex)
+            If Not Double.IsNaN(lValue) AndAlso Not Double.IsInfinity(lValue) Then Exit For
+        Next
+        Return lValue
+    End Function
 
     ''' <summary>Set or get the entire array of values</summary>
     Public Property Values() As Double()

@@ -193,13 +193,15 @@ Public Module modString
                  Optional ByVal aDecimalPlaces As Integer = 3) As String
         Dim lString As String
         If Double.IsNaN(aValue) Then
-            lString = Space(aFieldWidth / 2) & "NaN"
-        Else
-            Dim lFormat As String
-            If aDecimalPlaces > 1 Then
-                lFormat = "###,##0.0" & StrDup(aDecimalPlaces - 1, "#")
+            If aFieldWidth > 5 Then
+                lString = Space(aFieldWidth / 2) & "NaN"
             Else
-                lFormat = "###,##0.0"
+                lString = "NaN"
+            End If
+        Else
+            Dim lFormat As String = "###,##0.0"
+            If aDecimalPlaces > 1 Then
+                lFormat &= StrDup(aDecimalPlaces - 1, "#")
             End If
             lString = DoubleToString(aValue, aFieldWidth, lFormat)
             Dim dp As Integer = lString.IndexOf("."c)
