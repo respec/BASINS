@@ -131,11 +131,11 @@ Public Module modDate
         '##LOCAL lJd - date portion of date to convert
         '##LOCAL lJhms - time portion of date to convert
         '##LOCAL f - fraction of a second resulting from conversion
-        Try
-            lJd = Fix(aJd)
-        Catch 'TODO: what should this be, probable cause is NaN (which does not convert to integer)
+        If Double.IsNaN(aJd) Then
             lJd = 0
-        End Try
+        Else
+            lJd = Fix(aJd)
+        End If
 
         Call INVMJD(lJd, aDate(0), aDate(1), aDate(2))
         lJhms = aJd - lJd
@@ -150,8 +150,13 @@ Public Module modDate
         '##PARM aSc - second portion of MJD
         '##PARM aFrac - fraction of a second
         Dim lRem As Double
-        '##LOCAL t - intermediate result, units change from hours to seconds
-        lRem = 0.0000004 + ((aJd Mod 1) * 24)
+        '##LOCAL lRem - intermediate result, units change from hours to seconds
+        If Double.IsNaN(aJd) Then
+            lRem = 0
+        Else
+            lRem = 0.0000004 + ((aJd Mod 1) * 24)
+        End If
+
         aHr = Fix(lRem)
         lRem = (lRem - aHr) * 60
         aMi = Fix(lRem)

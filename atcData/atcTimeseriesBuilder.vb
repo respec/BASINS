@@ -13,6 +13,7 @@ Public Class atcTimeseriesBuilder
     Private pLogNonNumeric As Boolean = True
     Private Shared pLogDateFormat As atcDateFormat
     Private Shared pNaN As Double = atcUtility.GetNaN
+    Private Shared pNumericChars As String = ".-+eE0123456789"
 
     Public Sub New(ByVal aDataSource As atcDataSource)
         pDataSource = aDataSource
@@ -60,7 +61,7 @@ Public Class atcTimeseriesBuilder
     ''' <remarks></remarks>
     Public Sub AddValue(ByVal aDate As Double, ByVal aValue As String)
         Dim lValue As Double = pNaN
-        Dim lFirstNumericIndex As Integer = -1
+        Dim lFirstNumericIndex As Integer = 0
         Dim lLenNumeric As Integer = 0
 
         If aValue Is Nothing OrElse aValue.Trim.Length = 0 Then
@@ -70,16 +71,27 @@ Public Class atcTimeseriesBuilder
         ElseIf IsNumeric(aValue) Then
             lValue = CDbl(aValue)
         Else
-            While lFirstNumericIndex < aValue.Length
-                If Char.IsNumber(aValue.Chars(lFirstNumericIndex + 1)) Then Exit While
+            While lFirstNumericIndex < aValue.Length AndAlso _
+              Not pNumericChars.Contains(aValue.Chars(lFirstNumericIndex))
                 lFirstNumericIndex += 1
             End While
 
-            If lFirstNumericIndex < aValue.Length Then
-                While lFirstNumericIndex + lLenNumeric + 1 < aValue.Length
-                    If Not Char.IsNumber(aValue.Chars(lFirstNumericIndex + lLenNumeric + 1)) Then Exit While
-                End While
-                lValue = CDbl(aValue.Substring(lFirstNumericIndex))
+            lLenNumeric = 0
+
+            While lFirstNumericIndex + lLenNumeric < aValue.Length AndAlso _
+              pNumericChars.Contains(aValue.Chars(lFirstNumericIndex + lLenNumeric))
+                lLenNumeric += 1
+            End While
+
+            If lLenNumeric > 0 Then
+                Try
+                    lValue = CDbl(aValue.Substring(lFirstNumericIndex, lLenNumeric))
+                Catch e As Exception
+                    'Let lValue stay NaN
+                    If LogNonNumeric Then
+                        Logger.Dbg("Tried to find number but could not parse substring starting " & lFirstNumericIndex & " length " & lLenNumeric)
+                    End If
+                End Try
             End If
 
             If LogNonNumeric Then
@@ -95,7 +107,7 @@ Public Class atcTimeseriesBuilder
         End If
 
         If lLenNumeric > 0 AndAlso lFirstNumericIndex + lLenNumeric < aValue.Length Then
-            Me.AddValueAttribute("ValueSuffix", aValue.Substring(aValue.Length - lLenNumeric, lLenNumeric))
+            Me.AddValueAttribute("ValueSuffix", aValue.Substring(lFirstNumericIndex + lLenNumeric))
         End If
     End Sub
 
