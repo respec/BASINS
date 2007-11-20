@@ -276,6 +276,7 @@ Public Class atcGraphForm
     End Sub
 
     Public Sub SaveBitmapToFile(Optional ByVal aFileName As String = "")
+        zgc.AxisChange()
         If aFileName.Length = 0 Then 'No file name specified - ask user
             Dim lSavedAs As String
             lSavedAs = zgc.SaveAs(SaveImageExtension)
