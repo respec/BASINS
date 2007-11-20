@@ -1,4 +1,5 @@
 Imports atcUtility
+Imports atcData
 Imports atcUCI
 
 Public Module Utility
@@ -242,4 +243,13 @@ Public Module Utility
         aLocations.Add(aLocation, 1.0)
     End Sub
 
+    Public Function InchesToCfs(ByVal aTSerIn As atcTimeseries, ByVal aArea As Double) As atcTimeseries
+        Dim lSimConv As Double = aArea * 43560.0# / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
+        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
+        Dim lArgsMath As New atcDataAttributes
+        lArgsMath.SetValue("timeseries", aTSerIn)
+        lArgsMath.SetValue("number", lSimConv)
+        lTsMath.Open("multiply", lArgsMath)
+        Return lTsMath.DataSets(0)
+    End Function
 End Module

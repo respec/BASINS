@@ -80,6 +80,7 @@
     <Compile Include="GridValues.vb" />
     <Compile Include="HSPFOutputReports.vb" />
     <Compile Include="LineDump.vb" />
+    <Compile Include="Graph.vb" />
     <Compile Include="SQLiteTester.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

@@ -39,7 +39,7 @@ Module HSPFOutputReports
                 pOutputLocations.Add("R:5")
                 pOutputLocations.Add("R:4")
             Case "SantaClara"
-                pTestPath = "D:\MountainViewData\SantaClara"
+                pTestPath = "D:\MountainViewData\SantaClara\nocat"
                 pBaseName = "SCR10"
                 pOutputLocations.Add("R:70")
                 pOutputLocations.Add("R:180")
@@ -71,7 +71,7 @@ Module HSPFOutputReports
         For Each lExpertSystemFileName As String In lExpertSystemFileNames
             Try
                 Dim lFileCopied As Boolean = False
-                If FilenameOnly(lExpertSystemFileName) <> pBaseName Then
+                If FilenameOnly(lExpertSystemFileName).ToLower <> pBaseName.ToLower Then
                     FileCopy(lExpertSystemFileName, pBaseName & ".exs")
                     lFileCopied = True
                 End If
@@ -86,10 +86,10 @@ Module HSPFOutputReports
                 For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
                     Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
                     Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
-                    Dim lSimTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0))
+                    Dim lSimTSer As atcTimeseries = InchesToCfs(lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0)), lArea)
                     Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
                     lStr = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, _
-                                                                       lCons, lSite, lArea, _
+                                                                       lCons, lSite, _
                                                                        lSimTSer, lObsTSer, _
                                                                        lExpertSystem.SDateJ, _
                                                                        lExpertSystem.EDateJ)

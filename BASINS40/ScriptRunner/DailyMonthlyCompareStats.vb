@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcData
 Imports atcWDM
+Imports HspfSupport.Utility
 Imports MapWindow.Interfaces
 
 Module DailyMonthlyCompareStats
@@ -19,15 +20,26 @@ Module DailyMonthlyCompareStats
         Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"
         Dim lWdmDataSource As New atcDataSourceWDM
         lWdmDataSource.Open(lWdmFileName)
-        'TODO: get the following four parms from the exs file
+        'open expert system
+        Dim lExpertSystem As HspfSupport.ExpertSystem
+        lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
         Dim lCons As String = "Flow"
-        Dim lSite As String = "RCH5"
-        Dim lArea As Double = 54831
-        Dim lSimTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(1001)
-        Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(261)
-        Dim lStr As String = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lCons, lSite, _
-                                                                         lArea, lSimTSer, lObsTSer)
-        Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
-        SaveFileString(lOutFileName, lStr)
+        For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
+            Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
+            Dim lArea As Double = lExpertSystem.Sites(lSiteIndex).Area
+            Dim lSimTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0))
+            lSimTser = InchesToCfs(lSimTser, lArea)
+            lSimTser = SubsetByDate(lSimTser, _
+                                    lExpertSystem.SDateJ, _
+                                    lExpertSystem.EDateJ, Nothing)
+            Dim lObsTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
+            lObsTser = SubsetByDate(lObsTser, _
+                                    lExpertSystem.SDateJ, _
+                                    lExpertSystem.EDateJ, Nothing)
+            Dim lStr As String = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lCons, lSite, _
+                                                                             lSimTser, lObsTser)
+            Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
+            SaveFileString(lOutFileName, lStr)
+        Next lSiteIndex
     End Sub
 End Module

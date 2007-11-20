@@ -6,7 +6,6 @@ Public Module DailyMonthlyCompareStats
     Public Function Report(ByVal aUci As atcUCI.HspfUci, _
                            ByVal aCons As String, _
                            ByVal aSite As String, _
-                           ByVal aArea As Double, _
                            ByVal aSimTSer As atcTimeseries, _
                            ByVal aObsTSer As atcTimeseries, _
                            Optional ByVal aSDateJ As Double = 0, _
@@ -33,17 +32,6 @@ Public Module DailyMonthlyCompareStats
         CheckDateJ(aSimTSer, "Simulated", lSDateJ, lEDateJ, lStr)
 
         Dim lNewSimTSer As atcTimeseries = SubsetByDate(aSimTSer, lSDateJ, lEDateJ, Nothing)
-
-        Dim lSimConv As Double = aArea * 43560.0# / (12.0# * 24.0# * 3600.0#) 'inches to cfs days
-        Dim lTsMath As atcDataSource = New atcTimeseriesMath.atcTimeseriesMath
-        'lTsMath.DataSets.Clear()
-        Dim lArgsMath As New atcDataAttributes
-        'lArgsMath.Clear()
-        lArgsMath.SetValue("timeseries", lNewSimTSer)
-        lArgsMath.SetValue("number", lSimConv)
-        lTsMath.Open("multiply", lArgsMath)
-        lNewSimTSer = lTsMath.DataSets(0)
-
         Dim lNewObsTSer As atcTimeseries = SubsetByDate(aObsTSer, lSDateJ, lEDateJ, Nothing)
 
         If lNewSimTSer.numValues <> lNewObsTSer.numValues Then
