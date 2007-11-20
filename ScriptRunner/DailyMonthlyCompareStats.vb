@@ -23,10 +23,10 @@ Module DailyMonthlyCompareStats
         Dim lCons As String = "Flow"
         Dim lSite As String = "RCH5"
         Dim lArea As Double = 54831
-        Dim lSimDsnId As Integer = 1001
-        Dim lObsDsnId As Integer = 261
-        Dim lStr As String = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lWdmDataSource, lCons, lsite, _
-                                                                         lArea, lSimDsnId, lObsDsnId)
+        Dim lSimTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(1001)
+        Dim lObsTSer As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(261)
+        Dim lStr As String = HspfSupport.DailyMonthlyCompareStats.Report(lHspfUci, lCons, lSite, _
+                                                                         lArea, lSimTSer, lObsTSer)
         Dim lOutFileName As String = "outfiles\DailyMonthly" & lCons & "Stats" & "-" & lSite & ".txt"
         SaveFileString(lOutFileName, lStr)
     End Sub
