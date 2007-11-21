@@ -40,34 +40,72 @@ Module Graph
                                         lExpertSystem.EDateJ, Nothing))
 
             Dim lGraphForm As New atcGraph.atcGraphForm(lDataGroup)
-            'lGraphForm.Size = lGraphForm.MaximumSize
-            lGraphForm.WindowState = Windows.Forms.FormWindowState.Maximized
+            lGraphForm.Pane.YAxis.Title.Text = lCons & " (cfs)"
+            lGraphForm.Pane.XAxis.Title.Text = "Daily Mean Flow at " & lSite
+            SetGraphSpecs(lGraphForm)
+            Dim lOutFileName As String = "outfiles\" & lCons & "_" & lSite & ".png"
+            lGraphForm.SaveBitmapToFile(lOutFileName)
             With lGraphForm.Pane
-                .XAxis.Title.Text = "Daily Mean Flow at " & lSite
-                .XAxis.MajorGrid.IsVisible = True
-                .YAxis.Title.Text = lCons & " (cfs)"
-                .YAxis.Scale.Min = 0
-                .YAxis.MajorGrid.IsVisible = True
-                .YAxis.MinorGrid.IsVisible = True
-                With .CurveList(0)
-                    .Label.Text = "Simulated"
-                    .Color = System.Drawing.Color.Red
-                End With
-                With .CurveList(1)
-                    .Label.Text = "Observed"
-                    .Color = System.Drawing.Color.Blue
-                End With
-                .Legend.Position = LegendPos.Float
-                .Legend.Location = New Location(0.3, 0.05, CoordType.PaneFraction, AlignH.Right, AlignV.Top)
-                .Legend.FontSpec.Size = 10
-                .Legend.IsHStack = False
-                Dim lOutFileName As String = "outfiles\" & lCons & "_" & lSite & ".bmp"
-                lGraphForm.SaveBitmapToFile(lOutFileName)
                 .YAxis.Type = ZedGraph.AxisType.Log
                 .YAxis.Scale.Min = 1
-                lOutFileName = "outfiles\" & lCons & "_" & lSite & "_log.bmp"
-                lGraphForm.SaveBitmapToFile(lOutFileName)
+                .YAxis.Scale.IsUseTenPower = False
             End With
+            lOutFileName = "outfiles\" & lCons & "_" & lSite & "_log.png"
+            lGraphForm.SaveBitmapToFile(lOutFileName)
+
+            lGraphForm = Nothing
+            lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Linear)
+            With lGraphForm.Pane
+                .XAxis.Title.Text = "Observed"
+                .XAxis.Type = ZedGraph.AxisType.Log
+                .XAxis.Scale.Min = 1
+                .XAxis.Scale.IsUseTenPower = False
+                .YAxis.Title.Text = "Simulated"
+                .YAxis.Type = ZedGraph.AxisType.Log
+                .YAxis.Scale.Min = 1
+                .YAxis.Scale.IsUseTenPower = False
+                .YAxis.Scale.Max = .XAxis.Scale.Max
+                .YAxis.Scale.MaxAuto = False
+            End With
+            lOutFileName = "outfiles\" & lCons & "_" & lSite & "_scat.png"
+            lGraphForm.SaveBitmapToFile(lOutFileName)
+
+            lGraphForm = Nothing
+            lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Probability)
+            SetGraphSpecs(lGraphForm)
+            With lGraphForm.Pane
+                .YAxis.Title.Text = lCons & " (cfs)"
+                .YAxis.Type = ZedGraph.AxisType.Log
+                .YAxis.Scale.Min = 1
+                .YAxis.Scale.IsUseTenPower = False
+                .XAxis.Title.Text = "Percent of Time " & lCons & " exceeded at " & lSite
+                '.XAxis.Scale.TextLabels
+            End With
+            lOutFileName = "outfiles\" & lCons & "_" & lSite & "_dur.png"
+            lGraphForm.SaveBitmapToFile(lOutFileName)
         Next lSiteIndex
+    End Sub
+
+    Private Sub SetGraphSpecs(ByRef lGraphForm As atcGraph.atcGraphForm)
+        'lGraphForm.Size = lGraphForm.MaximumSize
+        lGraphForm.WindowState = Windows.Forms.FormWindowState.Maximized
+        With lGraphForm.Pane
+            '.XAxis.MajorGrid.IsVisible = True
+            .YAxis.Scale.Min = 0
+            .YAxis.MajorGrid.IsVisible = True
+            .YAxis.MinorGrid.IsVisible = True
+            With .CurveList(0)
+                .Label.Text = "Simulated"
+                .Color = System.Drawing.Color.Red
+            End With
+            With .CurveList(1)
+                .Label.Text = "Observed"
+                .Color = System.Drawing.Color.Blue
+            End With
+            .Legend.Position = LegendPos.Float
+            .Legend.Location = New Location(0.3, 0.05, CoordType.PaneFraction, AlignH.Right, AlignV.Top)
+            .Legend.FontSpec.Size = 10
+            .Legend.IsHStack = False
+        End With
     End Sub
 End Module

@@ -2772,7 +2772,8 @@ namespace ZedGraph
 			// Must take into account Log, and Reverse Axes
 			double denom = ( _maxLinTemp - _minLinTemp );
 			double ratio;
-			if ( denom > 1e-100 )
+            // JLK 11/2006
+            if (Math.Abs(denom) > 1e-100)
 				ratio = ( Linearize( x ) - _minLinTemp ) / denom;
 			else
 				ratio = 0;
