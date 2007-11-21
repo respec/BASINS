@@ -509,24 +509,29 @@ Public Class atcGraphForm
                                             " : " & lXSd(lIndex) & _
                                             " : " & lXFracExceed(lIndex))
             Next
-            Pane.XAxis.Scale.Min = lXFracExceed(0)
-            Pane.XAxis.Scale.Max = lXFracExceed(lXFracExceed.GetUpperBound(0))
-            Pane.XAxis.Scale.IsReverse = True
+            With Pane.XAxis
+                .Scale.Min = lXFracExceed(0)
+                .Scale.Max = lXFracExceed(lXFracExceed.GetUpperBound(0))
+                .Scale.IsReverse = True
+                AddHandler .ScaleFormatEvent, AddressOf XScaleFormatEvent
+                .Scale.BaseTic = lXFracExceed(0)
+            End With
+
             lCurve = Pane.AddCurve(CurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
             lCurve.Line.Width = 1
             lCurve.Line.StepType = StepType.NonStep
             '    curve.Line.StepType = StepType.RearwardStep
-            With Pane.XAxis
-                If .Type <> AxisType.Probability Then
-                    '.Type = AxisType.Linear 'for debugging 
-                    .Type = AxisType.Probability
-                    .Scale.Max = 1
-                    .Scale.Min = 0
-                    Dim g As Graphics = Me.CreateGraphics()
-                    pMaster.AxisChange(g)
-                    g.Dispose()
-                End If
-            End With
+            'With Pane.XAxis
+            '    If .Type <> AxisType.Probability Then
+            '        '.Type = AxisType.Linear 'for debugging 
+            '        .Type = AxisType.Probability
+            '        .Scale.Max = 1
+            '        .Scale.Min = 0
+            '        Dim lGraphics As Graphics = Me.CreateGraphics()
+            '        pMaster.AxisChange(lGraphics)
+            '        lGraphics.Dispose()
+            '    End If
+            'End With
             Me.Refresh()
         ElseIf mnuViewTime.Checked Then
             With Pane.XAxis
@@ -591,6 +596,17 @@ Public Class atcGraphForm
 
     End Sub
 
+    <CLSCompliant(False)> _
+    Public Function XScaleFormatEvent(ByVal aGraphPane As GraphPane, _
+                                      ByVal aAxis As ZedGraph.Axis, _
+                                      ByVal aVal As Double, _
+                                      ByVal aIndex As Integer) As String
+        Dim lVal As Double = aVal * 100
+        Dim lStr As String = Format(lVal, "#0.##")
+        Logger.Dbg("LookingForXScaleTicValue:" & aIndex & ":" & aVal & ":" & lVal & ":" & lStr)
+        Return lStr
+    End Function
+
     Private Function Gausex(ByVal aExprob As Double) As Double
         'GAUSSIAN PROBABILITY FUNCTIONS   W.KIRBY  JUNE 71
         ' GAUSEX=VALUE EXCEEDED WITH PROB EXPROB
@@ -609,7 +625,7 @@ Public Class atcGraphForm
         Try
             p = aExprob
             If (p >= 1) Then
-                rtmp = -standardDeviations 'set to minimum
+                rtmp = -StandardDeviations 'set to minimum
             ElseIf (p <= 0) Then
                 rtmp = StandardDeviations 'set at maximum
             Else          'compute value

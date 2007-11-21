@@ -79,7 +79,6 @@ Module Graph
                 .YAxis.Scale.Min = 1
                 .YAxis.Scale.IsUseTenPower = False
                 .XAxis.Title.Text = "Percent of Time " & lCons & " exceeded at " & lSite
-                '.XAxis.Scale.TextLabels
             End With
             lOutFileName = "outfiles\" & lCons & "_" & lSite & "_dur.png"
             lGraphForm.SaveBitmapToFile(lOutFileName)
