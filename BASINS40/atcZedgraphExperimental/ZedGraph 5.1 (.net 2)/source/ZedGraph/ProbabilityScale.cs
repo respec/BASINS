@@ -174,7 +174,7 @@ namespace ZedGraph
             // gausex returns +/- standard deviations of val from 0.5
             // adding standardDeviations makes the result positive
             // multiplying by deviationScale scales it to fit within zero to one graph scale
-            return deviationScale * (1 - (gausex(val) + standardDeviations));
+            return gausex(val);
         }
 
 		/// <summary>

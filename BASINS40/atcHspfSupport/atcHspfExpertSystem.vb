@@ -86,6 +86,13 @@ Public Class ExpertSystem
                              pLatMax.ToString.PadLeft(8) & _
                              pLngMin.ToString.PadLeft(8) & _
                              pLngMax.ToString.PadLeft(8)
+        If pSDateJ > 0 Then
+            Dim lDate(5) As Integer
+            J2Date(pSDateJ, lDate)
+            lStr &= lDate(0).ToString.PadLeft(5) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
+            J2Date(pEDateJ, lDate)
+            lStr &= lDate(0).ToString.PadLeft(6) & lDate(1).ToString.PadLeft(2) & lDate(2).ToString.PadLeft(2)
+        End If
         lText.AppendLine(lStr)
         For lSiteIndex As Integer = 1 To pSites.Count
             lStr = ""
