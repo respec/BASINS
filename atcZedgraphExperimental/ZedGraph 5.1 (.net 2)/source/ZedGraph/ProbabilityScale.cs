@@ -38,7 +38,7 @@ namespace ZedGraph
     /// <author> Mark Gray </author> based on LogScale class by John Champion
 	/// <version> $Revision: 1.9 $ $Date: 2006/08/25 05:19:09 $ </version>
 	[Serializable]
-	class ProbabilityScale : Scale, ISerializable //, ICloneable
+	public class ProbabilityScale : Scale, ISerializable //, ICloneable
 	{
         /// <summary>
         /// Number of standard deviations to display in graph (plus and minus this many are displayed)
@@ -53,12 +53,18 @@ namespace ZedGraph
         /// <summary>
         /// Percent chance exceeded to label, if there is room
         /// </summary>
-        //double[] percentages = { 99.9, 99.8, 99.5, 99, 98, 95, 90, 80, 70, 50, 30, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1 };
-        double[] percentages = { 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50, 70, 80, 90, 95, 98, 99, 99.5, 99.8, 99.9 };
+        public double[] Percentages = {0.01, 0.02, 0.05, 
+                                       0.1, 0.2, 0.5, 
+                                       1, 2, 5,
+                                       10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 
+                                       95, 98, 99, 
+                                       99.5, 99.8, 99.9, 
+                                       99.95, 99.98, 99.99};
+    //{ 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 50, 70, 80, 90, 95, 98, 99, 99.5, 99.8, 99.9 };
         /// <summary>
         /// Return periods to label, if there is room
         /// </summary>
-        double[] returnperiods = { 1.001, 1.002, 1.005, 1.01, 1.02, 1.05, 1.1, 1.25, 1.5, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1000 };
+        //double[] returnperiods = { 1.001, 1.002, 1.005, 1.01, 1.02, 1.05, 1.1, 1.25, 1.5, 2, 3, 5, 10, 20, 50, 100, 200, 500, 1000 };
 	#region constructors
 
 		/// <summary>
@@ -174,7 +180,8 @@ namespace ZedGraph
             // gausex returns +/- standard deviations of val from 0.5
             // adding standardDeviations makes the result positive
             // multiplying by deviationScale scales it to fit within zero to one graph scale
-            return gausex(val);
+            //return deviationScale * (1 - (gausex(val) + standardDeviations));
+            return (1 - (gausex(val) / standardDeviations)) / 2;
         }
 
 		/// <summary>
@@ -182,9 +189,8 @@ namespace ZedGraph
 		/// for this type of scale.
 		/// </summary>
 		/// <remarks>
-		/// The default behavior is to just return the value unchanged.  However,
-		/// for <see cref="AxisType.Log" /> and <see cref="AxisType.Exponent" />,
-		/// it returns the anti-log or inverse-power equivalent.
+		/// Knowing no direct inverse of gausex, we use successive approximation to locate 
+		/// a return value where Linearize(return value) = val
 		/// </remarks>
 		/// <param name="val">The value to be converted</param>
 		override public double DeLinearize( double val )
@@ -192,10 +198,10 @@ namespace ZedGraph
             double linearized;
             double guess = 0.5;
             double guesschange = 0.25;
-            while (guesschange > 0.001)
+            while (guesschange > 0.0001)
             {
                 linearized = Linearize(guess);
-                if (linearized > val)
+                if (val > linearized)
                     guess += guesschange;
                 else
                     guess -= guesschange;
@@ -223,8 +229,8 @@ namespace ZedGraph
         override internal double CalcMajorTicValue(double baseVal, double tic)
         {
             int ticInt = (int)tic;
-            if (ticInt >= 0 && ticInt < percentages.Length)
-                return percentages[ticInt] / 100.0;
+            if (ticInt >= 0 && ticInt < Percentages.Length)
+                return Percentages[ticInt] / 100.0;
             else
                 return 0;
         }
@@ -324,7 +330,7 @@ namespace ZedGraph
         /// </returns>
         override internal double CalcBaseTic()
         {
-            return percentages[0] / 100;
+            return Percentages[0] / 100;
         }
 
         /// <summary>
@@ -335,9 +341,122 @@ namespace ZedGraph
         /// </returns>
         override internal int CalcNumTics()
         {
-            return percentages.Length;
+            return Percentages.Length;
         }
 
+        /// <summary>
+        /// Draw the value labels, tic marks, and grid lines as
+        /// required for this <see cref="Axis"/>.
+        /// </summary>
+        /// <param name="g">
+        /// A graphic device object to be drawn into.  This is normally e.Graphics from the
+        /// PaintEventArgs argument to the Paint() method.
+        /// </param>
+        /// <param name="pane">
+        /// A reference to the <see cref="GraphPane"/> object that is the parent or
+        /// owner of this object.
+        /// </param>
+        /// <param name="baseVal">
+        /// The first major tic value for the axis
+        /// </param>
+        /// <param name="nTics">
+        /// The total number of major tics for the axis
+        /// </param>
+        /// <param name="topPix">
+        /// The pixel location of the far side of the ChartRect from this axis.
+        /// This value is the ChartRect.Height for the XAxis, or the ChartRect.Width
+        /// for the YAxis and Y2Axis.
+        /// </param>
+        /// <param name="shift">The number of pixels to shift this axis, based on the
+        /// value of <see cref="Axis.Cross"/>.  A positive value is into the ChartRect relative to
+        /// the default axis position.</param>
+        /// <param name="scaleFactor">
+        /// The scaling factor to be used for rendering objects.  This is calculated and
+        /// passed down by the parent <see cref="GraphPane"/> object using the
+        /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
+        /// font sizes, etc. according to the actual size of the graph.
+        /// </param>
+        internal override void DrawLabels(Graphics g, GraphPane pane, double baseVal, int XnTics,
+                        float topPix, float shift, float scaleFactor)
+        {
+            int lNtics = Percentages.Length;
+
+            MajorTic tic = _ownerAxis._majorTic;
+            //			MajorGrid grid = _ownerAxis._majorGrid;
+
+            double dVal, dVal2;
+            float pixVal;
+            float scaledTic = tic.ScaledTic(scaleFactor);
+
+            using (Pen ticPen = tic.GetPen(pane, scaleFactor))
+            //			using ( Pen gridPen = grid.GetPen( pane, scaleFactor ) )
+            {
+                // get the Y position of the center of the axis labels
+                // (the axis itself is referenced at zero)
+                SizeF maxLabelSize = GetScaleMaxSpace(g, pane, scaleFactor, true);
+                float charHeight = _fontSpec.GetHeight(scaleFactor);
+                float maxSpace = maxLabelSize.Height;
+
+                float edgeTolerance = Default.EdgeTolerance * scaleFactor;
+                double rangeTol = (_maxLinTemp - _minLinTemp) * 0.001;
+
+                int firstTic = 0;
+
+                // save the position of the previous tic
+                float lastPixVal = -10000;
+
+                // loop for each major tic
+                for (int i = firstTic; i < lNtics + firstTic; i++)
+                {
+                    dVal = CalcMajorTicValue(baseVal, i);
+                    double linVal = Linearize(dVal);
+
+                    // If we're before the start of the scale, just go to the next tic
+                    if (linVal < _minLinTemp)
+                        continue;
+                    // if we've already past the end of the scale, then we're done
+                    if (linVal > _maxLinTemp + rangeTol)
+                        break;
+
+                    // convert the value to a pixel position
+                    pixVal = LocalTransform(linVal);
+
+                    tic.Draw(g, pane, ticPen, pixVal, topPix, shift, scaledTic);
+
+                    // draw the grid
+                    //					grid.Draw( g, gridPen, pixVal2, topPix );
+
+                    bool isMaxValueAtMaxPix = ((_ownerAxis is XAxis || _ownerAxis is Y2Axis) &&
+                                                            !IsReverse) ||
+                                                (_ownerAxis is Y2Axis && IsReverse);
+
+                    bool isSkipZone = (((_isSkipFirstLabel && isMaxValueAtMaxPix) ||
+                                            (_isSkipLastLabel && !isMaxValueAtMaxPix)) &&
+                                                pixVal < edgeTolerance) ||
+                                        (((_isSkipLastLabel && isMaxValueAtMaxPix) ||
+                                            (_isSkipFirstLabel && !isMaxValueAtMaxPix)) &&
+                                                pixVal > _maxPix - _minPix - edgeTolerance);
+
+                    bool isSkipCross = _isSkipCrossLabel && !_ownerAxis._crossAuto &&
+                                    Math.Abs(_ownerAxis._cross - dVal) < rangeTol * 10.0;
+
+                    isSkipZone = isSkipZone || isSkipCross;
+
+                    if (_isVisible && !isSkipZone)
+                    {
+                        // For exponential scales, just skip any label that would overlap with the previous one
+                        // This is because exponential scales have varying label spacing
+                        if (IsPreventLabelOverlap &&
+                                Math.Abs(pixVal - lastPixVal) < maxLabelSize.Width)
+                            continue;
+
+                        DrawLabel(g, pane, i, dVal, pixVal, shift, maxSpace, scaledTic, charHeight, scaleFactor);
+
+                        lastPixVal = pixVal;
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Computes number of standard deviations from 0.5
@@ -405,7 +524,7 @@ namespace ZedGraph
         {
             if (_format == null)
                 _format = Scale.Default.Format;
-            return percentages[index].ToString(_format);
+            return Percentages[index].ToString(_format);
         }
 
 	#endregion

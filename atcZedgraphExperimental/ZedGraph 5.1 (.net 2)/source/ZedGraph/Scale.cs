@@ -1992,7 +1992,7 @@ namespace ZedGraph
 		/// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
 		/// font sizes, etc. according to the actual size of the graph.
 		/// </param>
-		internal void DrawLabels( Graphics g, GraphPane pane, double baseVal, int nTics,
+		virtual internal void DrawLabels( Graphics g, GraphPane pane, double baseVal, int nTics,
 						float topPix, float shift, float scaleFactor )
 		{
 			MajorTic tic = _ownerAxis._majorTic;
@@ -2772,8 +2772,8 @@ namespace ZedGraph
 			// Must take into account Log, and Reverse Axes
 			double denom = ( _maxLinTemp - _minLinTemp );
 			double ratio;
-            // JLK 11/2006
-            if (Math.Abs(denom) > 1e-100)
+			// JLK 11/2006
+			if (Math.Abs(denom) > 1e-100)
 				ratio = ( Linearize( x ) - _minLinTemp ) / denom;
 			else
 				ratio = 0;

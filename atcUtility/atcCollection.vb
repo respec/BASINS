@@ -188,6 +188,29 @@ Public Class atcCollection
         MyBase.AddRange(lNewValues)
     End Sub
 
+    Public Sub SortByValue()
+        Dim lsl As New Generic.List(Of Generic.KeyValuePair(Of Object, Object))
+        For lIndex As Integer = 0 To Me.Count - 1
+            lsl.Add(New Generic.KeyValuePair(Of Object, Object)(pKeys(lIndex), Item(lIndex)))
+        Next
+        lsl.Sort(AddressOf CompareValues)
+        Me.Clear()
+        For Each lPair As Generic.KeyValuePair(Of Object, Object) In lsl
+            Me.Add(lPair.Key, lPair.Value)
+        Next
+    End Sub
+
+    Private Function CompareValues(ByVal x As Generic.KeyValuePair(Of Object, Object), _
+                                   ByVal y As Generic.KeyValuePair(Of Object, Object)) As Integer
+        If x.Value > y.Value Then
+            Return 1
+        ElseIf x.Value < y.Value Then
+            Return -1
+        Else
+            Return 0
+        End If
+    End Function
+
     Public Shadows Sub TrimToSize()
         pKeys.TrimToSize()
         MyBase.TrimToSize()
