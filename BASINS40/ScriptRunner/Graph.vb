@@ -24,6 +24,8 @@ Module Graph
         Dim lExpertSystem As HspfSupport.ExpertSystem
         lExpertSystem = New HspfSupport.ExpertSystem(lHspfUci, lWdmDataSource)
         Dim lCons As String = "Flow"
+        Dim lGraphForm As atcGraph.atcGraphForm
+        Dim lOutFileName As String
 
         For lSiteIndex As Integer = 1 To lExpertSystem.Sites.Count
             Dim lSite As String = lExpertSystem.Sites(lSiteIndex).Name
@@ -39,38 +41,38 @@ Module Graph
                                         lExpertSystem.SDateJ, _
                                         lExpertSystem.EDateJ, Nothing))
 
-            Dim lGraphForm As New atcGraph.atcGraphForm(lDataGroup)
-            lGraphForm.Pane.YAxis.Title.Text = lCons & " (cfs)"
-            lGraphForm.Pane.XAxis.Title.Text = "Daily Mean Flow at " & lSite
-            SetGraphSpecs(lGraphForm)
-            Dim lOutFileName As String = "outfiles\" & lCons & "_" & lSite & ".png"
-            lGraphForm.SaveBitmapToFile(lOutFileName)
-            With lGraphForm.Pane
-                .YAxis.Type = ZedGraph.AxisType.Log
-                .YAxis.Scale.Min = 1
-                .YAxis.Scale.IsUseTenPower = False
-            End With
-            lOutFileName = "outfiles\" & lCons & "_" & lSite & "_log.png"
-            lGraphForm.SaveBitmapToFile(lOutFileName)
+            'lGraphForm = New atcGraph.atcGraphForm(lDataGroup)
+            'lGraphForm.Pane.YAxis.Title.Text = lCons & " (cfs)"
+            'lGraphForm.Pane.XAxis.Title.Text = "Daily Mean Flow at " & lSite
+            'SetGraphSpecs(lGraphForm)
+            'lOutFileName = "outfiles\" & lCons & "_" & lSite & ".png"
+            'lGraphForm.SaveBitmapToFile(lOutFileName)
+            'With lGraphForm.Pane
+            '    .YAxis.Type = ZedGraph.AxisType.Log
+            '    .YAxis.Scale.Min = 1
+            '    .YAxis.Scale.IsUseTenPower = False
+            'End With
+            'lOutFileName = "outfiles\" & lCons & "_" & lSite & "_log.png"
+            'lGraphForm.SaveBitmapToFile(lOutFileName)
+            'lGraphForm.Dispose()
 
-            lGraphForm = Nothing
-            lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Linear)
-            With lGraphForm.Pane
-                .XAxis.Title.Text = "Observed"
-                .XAxis.Type = ZedGraph.AxisType.Log
-                .XAxis.Scale.Min = 1
-                .XAxis.Scale.IsUseTenPower = False
-                .YAxis.Title.Text = "Simulated"
-                .YAxis.Type = ZedGraph.AxisType.Log
-                .YAxis.Scale.Min = 1
-                .YAxis.Scale.IsUseTenPower = False
-                .YAxis.Scale.Max = .XAxis.Scale.Max
-                .YAxis.Scale.MaxAuto = False
-            End With
-            lOutFileName = "outfiles\" & lCons & "_" & lSite & "_scat.png"
-            lGraphForm.SaveBitmapToFile(lOutFileName)
+            'lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Linear)
+            'With lGraphForm.Pane
+            '    .XAxis.Title.Text = "Observed"
+            '    .XAxis.Type = ZedGraph.AxisType.Log
+            '    .XAxis.Scale.Min = 1
+            '    .XAxis.Scale.IsUseTenPower = False
+            '    .YAxis.Title.Text = "Simulated"
+            '    .YAxis.Type = ZedGraph.AxisType.Log
+            '    .YAxis.Scale.Min = 1
+            '    .YAxis.Scale.IsUseTenPower = False
+            '    .YAxis.Scale.Max = .XAxis.Scale.Max
+            '    .YAxis.Scale.MaxAuto = False
+            'End With
+            'lOutFileName = "outfiles\" & lCons & "_" & lSite & "_scat.png"
+            'lGraphForm.SaveBitmapToFile(lOutFileName)
+            'lGraphForm.Dispose()
 
-            lGraphForm = Nothing
             lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Probability)
             SetGraphSpecs(lGraphForm)
             With lGraphForm.Pane
@@ -82,6 +84,8 @@ Module Graph
             End With
             lOutFileName = "outfiles\" & lCons & "_" & lSite & "_dur.png"
             lGraphForm.SaveBitmapToFile(lOutFileName)
+            lGraphForm.Dispose()
+            OpenFile(lOutFileName)
         Next lSiteIndex
     End Sub
 
