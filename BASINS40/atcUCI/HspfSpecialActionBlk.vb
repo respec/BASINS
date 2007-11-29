@@ -1,8 +1,10 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfSpecialActionBlk_NET.HspfSpecialActionBlk")> _
+
+Imports System.Text
+
 Public Class HspfSpecialActionBlk
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pActions As Collection 'of HspfSpecialAction
     Private pDistributes As Collection 'of HspfSpecialDistribute
@@ -146,23 +148,24 @@ Public Class HspfSpecialActionBlk
         Loop
     End Sub
 
-    Public Sub WriteUciFile(ByRef f As Integer)
+    Public Overrides Function ToString() As String
+        Dim lSB As New StringBuilder
         Dim i As Integer
 
         If pRecords.Count() > 0 Then
-            If Len(pComment) > 0 Then
-                PrintLine(f, pComment)
+            If pComment.Length > 0 Then
+                lSB.AppendLine(pComment)
             End If
-            PrintLine(f, " ")
-            PrintLine(f, "SPEC-ACTIONS")
+            lSB.AppendLine("SPEC-ACTIONS")
             With pRecords
                 For i = 1 To .Count()
-                    PrintLine(f, .Item(i).Text)
+                    lSB.AppendLine(.Item(i).Text)
                 Next i
             End With
-            PrintLine(f, "END SPEC-ACTIONS")
+            lSB.AppendLine("END SPEC-ACTIONS")
         End If
-    End Sub
+        Return lSB.ToString
+    End Function
 
     Public Sub New()
         MyBase.New()

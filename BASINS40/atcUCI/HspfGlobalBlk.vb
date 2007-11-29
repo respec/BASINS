@@ -1,10 +1,10 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 Imports atcUtility
+Imports System.Text
 
-<System.Runtime.InteropServices.ProgId("HspfGlobalBlk_NET.HspfGlobalBlk")> Public Class HspfGlobalBlk
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
+Public Class HspfGlobalBlk
     Private pRunInf As HSPFParm ' run information
     Private pSDate(5) As Integer 'starting date
     Private pEDate(5) As Integer 'ending date
@@ -242,26 +242,26 @@ Imports atcUtility
         pRunInf.Value = lRunInf
     End Sub
 
-    Public Sub WriteUciFile(ByRef f As Short)
-        Dim s, e As String
+    Public Overrides Function ToString() As String
+        Dim lSB As New StringBuilder
 
-        If Len(pComment) > 0 Then
-            PrintLine(f, pComment)
+        If pComment.Length > 0 Then
+            lSB.AppendLine(pComment)
         End If
-        PrintLine(f, " ")
-        PrintLine(f, "GLOBAL")
-        PrintLine(f, "  " & Trim(pRunInf.Value))
-        s = "  START       " & Format(SDate(0), "0000") & "/" & Format(SDate(1), "00") & "/" & Format(SDate(2), "00") & " " & Format(SDate(3), "00") & ":" & Format(SDate(4), "00")
-        e = "  END    " & Format(EDate(0), "0000") & "/" & Format(EDate(1), "00") & "/" & Format(EDate(2), "00") & " " & Format(EDate(3), "00") & ":" & Format(EDate(4), "00")
-        PrintLine(f, s & e)
-        PrintLine(f, "  RUN INTERP OUTPT LEVELS" & myFormatI(CInt(pOutLev.Value), 5) & myFormatI(pSpOut, 5))
-        s = "  RESUME     0 RUN " & myFormatI(pRunFg, 5) & Space(26) & "UNITS" & myFormatI(pEmFg, 5)
+        lSB.AppendLine(" ")
+        lSB.AppendLine("GLOBAL")
+        lSB.AppendLine("  " & pRunInf.Value.Trim)
+        lSB.Append("  START       " & Format(SDate(0), "0000") & "/" & Format(SDate(1), "00") & "/" & Format(SDate(2), "00") & " " & Format(SDate(3), "00") & ":" & Format(SDate(4), "00"))
+        lSB.AppendLine("  END    " & Format(EDate(0), "0000") & "/" & Format(EDate(1), "00") & "/" & Format(EDate(2), "00") & " " & Format(EDate(3), "00") & ":" & Format(EDate(4), "00"))
+        lSB.AppendLine("  RUN INTERP OUTPT LEVELS" & myFormatI(CInt(pOutLev.Value), 5) & myFormatI(pSpOut, 5))
+        lSB.Append("  RESUME     0 RUN " & myFormatI(pRunFg, 5) & Space(26) & "UNITS" & myFormatI(pEmFg, 5))
         If pIhmFg <> 0 And pIhmFg <> -999 Then
-            s = s & "     " & myFormatI(pIhmFg, 5)
+            lSB.Append("     " & myFormatI(pIhmFg, 5))
         End If
-        PrintLine(f, s)
-        PrintLine(f, "END GLOBAL")
-    End Sub
+        lSB.AppendLine("")
+        lSB.AppendLine("END GLOBAL")
+        Return lSB.ToString
+    End Function
 
     Private Sub Update()
         'Call F90_PUTGLO(pSDate(0), pEDate(0), pOutLev, pSpOut, pRunFg, pEmFg, pRunInf, Len(pRunInf))

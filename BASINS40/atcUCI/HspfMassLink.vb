@@ -1,8 +1,10 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfMassLink_NET.HspfMassLink")> Public Class HspfMassLink
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
+Imports System.Text
+
+Public Class HspfMassLink
     Private pSource As HspfSrcTar
     Private pTarget As HspfSrcTar
     Private pTran As String
@@ -27,7 +29,6 @@ Option Explicit On
             pTran = Value
         End Set
     End Property
-
 
     Public Property Comment() As String
         Get
@@ -72,16 +73,19 @@ Option Explicit On
             pMassLinkId = Value
         End Set
     End Property
+
     Public ReadOnly Property EditControlName() As String
         Get
             EditControlName = "ATCoHspf.ctlMassLinkEdit"
         End Get
     End Property
+
     Public ReadOnly Property Caption() As String
         Get
             Caption = "Mass-Link Block"
         End Get
     End Property
+
     Public Sub readMassLinks(ByRef myUci As HspfUci)
         Dim retkey, init, OmCode, retcod As Integer
         Dim cbuff As String = Nothing
@@ -215,24 +219,22 @@ Option Explicit On
         editInit(Me, Me.Uci.icon, True)
     End Sub
 
-    Public Sub writeMassLinks(ByRef f As Short, ByRef M As HspfMsg)
+    Public Overrides Function ToString() As String
         Dim s As String
-        Dim lStr As System.Text.StringBuilder
+        Dim lSB As New StringBuilder
         Dim lBlockDef As HspfBlockDef
         Dim lTableDef As HspfTableDef
         Dim j, i, k As Integer
         Dim typeexists(4) As Boolean
         Dim icol(15) As Integer
         Dim ilen(15) As Integer
-        Dim lML As HspfMassLink
         Dim lParmDef As HSPFParmDef
         Dim t As String
         Dim mlno(-1) As Integer
         Dim mlcnt As Integer = 0
         Dim found As Boolean
 
-        For j = 1 To Uci.MassLinks.Count()
-            lML = Uci.MassLinks(j)
+        For Each lML As HspfMassLink In Uci.MassLinks
             found = False
             For k = 0 To mlcnt - 1
                 If lML.MassLinkID = mlno(k) Then
@@ -244,10 +246,10 @@ Option Explicit On
                 ReDim Preserve mlno(mlcnt)
                 mlno(mlcnt - 1) = lML.MassLinkID
             End If
-        Next j
+        Next lML
 
         s = "MASS-LINK"
-        lBlockDef = M.BlockDefs.Item(s)
+        lBlockDef = pUci.Msg.BlockDefs.Item(s)
         lTableDef = lBlockDef.TableDefs.Item(1)
         'get lengths and starting positions
         j = 0
@@ -256,19 +258,20 @@ Option Explicit On
             ilen(j) = lParmDef.Length
             j = j + 1
         Next lParmDef
-        PrintLine(f, " ")
-        PrintLine(f, s)
+        lSB.AppendLine(s)
 
         For i = 1 To mlcnt
-            PrintLine(f, " ")
-            PrintLine(f, "  MASS-LINK    " & CStr(mlno(i - 1)).PadLeft(5))
+            lSB.AppendLine(" ")
+            lSB.AppendLine("  MASS-LINK    " & CStr(mlno(i - 1)).PadLeft(5))
             'now start building the records
-            PrintLine(f, "<-Volume-> <-Grp> <-Member-><--Mult-->     <-Target vols> <-Grp> <-Member->  ***")
-            PrintLine(f, "<Name>            <Name> x x<-factor->     <Name>                <Name> x x  ***")
-            For j = 1 To Uci.MassLinks.Count()
-                lML = Uci.MassLinks(j)
+            lSB.AppendLine("<-Volume-> <-Grp> <-Member-><--Mult-->     <-Target vols> <-Grp> <-Member->  ***")
+            lSB.AppendLine("<Name>            <Name> x x<-factor->     <Name>                <Name> x x  ***")
+            For Each lML As HspfMassLink In Uci.MassLinks
                 If lML.MassLinkID = mlno(i - 1) Then
-                    lStr = New System.Text.StringBuilder
+                    If lML.Comment.Length > 0 Then
+                        lSB.AppendLine(lML.Comment)
+                    End If
+                    Dim lStr As New StringBuilder
                     lStr.Append(lML.Source.VolName.Trim)
                     lStr.Append(Space(icol(1) - lStr.Length - 1)) 'pad prev field
                     lStr.Append(lML.Source.Group)
@@ -311,27 +314,21 @@ Option Explicit On
                         If lML.Target.VolName = "RCHRES" Then t = pUci.IntAsCat(lML.Target.Member, 2, t)
                         lStr.Append(t)
                     End If
-                    If Len(lML.Comment) > 0 Then
-                        PrintLine(f, lML.Comment)
-                    End If
-                    PrintLine(f, lStr.ToString)
+                    lSB.AppendLine(lStr.ToString)
                 End If
-            Next j
-            PrintLine(f, "  END MASS-LINK" & CStr(mlno(i - 1)).PadLeft(5))
+            Next lML
+            lSB.AppendLine("  END MASS-LINK" & CStr(mlno(i - 1)).PadLeft(5))
         Next i
-        PrintLine(f, "END " & s)
-    End Sub
+        lSB.AppendLine("END " & s)
+        Return lSB.ToString
+    End Function
 
     Public Function FindMassLinkID(ByRef sname As String, ByRef tname As String) As Integer
-        Dim lML As HspfMassLink
-        Dim j As Integer
-
-        FindMassLinkID = 0
-        For j = 1 To pUci.MassLinks.Count()
-            lML = pUci.MassLinks.Item(j)
-            If lML.Source.VolName = sname And lML.Target.VolName = tname Then
-                FindMassLinkID = lML.MassLinkID
+        For Each lMassLink As HspfMassLink In pUci.MassLinks
+            If lMassLink.Source.VolName = sname And lMassLink.Target.VolName = tname Then
+                Return lMassLink.MassLinkID
             End If
-        Next j
+        Next lMassLink
+        Return -1
     End Function
 End Class

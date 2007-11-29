@@ -1,8 +1,11 @@
+'Copyright 2006-7 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfMetSeg_NET.HspfMetSeg")> Public Class HspfMetSeg
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
+Imports System.Text
+
+Public Class HspfMetSeg
     Private pMetSegRecs(7) As HspfMetSegRecord
     Private pId As Integer
     Private pName As String
@@ -14,22 +17,21 @@ Option Explicit On
             Return pMetSegRecs
         End Get
         Set(ByVal Value() As HspfMetSegRecord)
-            Dim itype As Integer
-            For itype = 1 To 7
+            For itype As Integer = 1 To pMetSegRecs.GetUpperBound(0)
                 pMetSegRecs(itype) = Value(itype)
             Next
         End Set
     End Property
 
-    Public ReadOnly Property MetSegRec(ByVal msr As HspfMetSegRecord.MetSegRecordType) As HspfMetSegRecord
+    Public ReadOnly Property MetSegRec(ByVal aMetSegRecordType As HspfMetSegRecord.MetSegRecordType) As HspfMetSegRecord
         Get
-            MetSegRec = pMetSegRecs(msr)
+            Return pMetSegRecs(aMetSegRecordType)
         End Get
     End Property
 
     Public Property Id() As Integer
         Get
-            Id = pId
+            Return pId
         End Get
         Set(ByVal Value As Integer)
             pId = Value
@@ -38,7 +40,7 @@ Option Explicit On
 
     Public Property AirType() As Integer
         Get
-            AirType = pAirType
+            Return pAirType
         End Get
         Set(ByVal Value As Integer)
             pAirType = Value
@@ -47,7 +49,7 @@ Option Explicit On
 
     Public Property Name() As String
         Get
-            Name = pName
+            Return pName
         End Get
         Set(ByVal Value As String)
             pName = Value
@@ -56,57 +58,57 @@ Option Explicit On
 
     Public Property Uci() As HspfUci
         Get
-            Uci = pUci
+            Return pUci
         End Get
         Set(ByVal Value As HspfUci)
             pUci = Value
         End Set
     End Property
 
-    Public Function Add(ByRef newConn As HspfConnection) As Boolean
-        Dim lMetSegRec As HspfMetSegRecord
-        Dim itype As Integer
-
-        lMetSegRec = New HspfMetSegRecord
-        If newConn.Target.VolName = "RCHRES" Then
-            lMetSegRec.MFactR = newConn.MFact
-        ElseIf newConn.Target.VolName = "PERLND" Or newConn.Target.VolName = "IMPLND" Then
-            lMetSegRec.MFactP = newConn.MFact
+    Public Function Add(ByRef aNewConnection As HspfConnection) As Boolean
+        Dim lMetSegRec As New HspfMetSegRecord
+        If aNewConnection.Target.VolName = "RCHRES" Then
+            lMetSegRec.MFactR = aNewConnection.MFact
+        ElseIf aNewConnection.Target.VolName = "PERLND" Or _
+               aNewConnection.Target.VolName = "IMPLND" Then
+            lMetSegRec.MFactP = aNewConnection.MFact
         End If
-        lMetSegRec.Source = newConn.Source
-        lMetSegRec.Tran = newConn.Tran
-        lMetSegRec.Sgapstrg = newConn.Sgapstrg
-        lMetSegRec.Ssystem = newConn.Ssystem
-        lMetSegRec.typ = Str2Type(newConn.Target.Member)
+        lMetSegRec.Source = aNewConnection.Source
+        lMetSegRec.Tran = aNewConnection.Tran
+        lMetSegRec.Sgapstrg = aNewConnection.Sgapstrg
+        lMetSegRec.Ssystem = aNewConnection.Ssystem
+        lMetSegRec.typ = Str2Type(aNewConnection.Target.Member)
 
-        Add = True
+        Dim lResult As Boolean = True
 
-        If newConn.Target.VolName = "PERLND" Or newConn.Target.VolName = "IMPLND" Or newConn.Target.VolName = "RCHRES" Then
-            itype = lMetSegRec.typ
-            If itype <> HspfMetSegRecord.MetSegRecordType.msrUNK Then
-                If Len(pMetSegRecs(itype).Source.VolName) > 0 Then
+        If aNewConnection.Target.VolName = "PERLND" Or _
+           aNewConnection.Target.VolName = "IMPLND" Or _
+           aNewConnection.Target.VolName = "RCHRES" Then
+            Dim lTyp As Integer = lMetSegRec.typ
+            If lTyp <> HspfMetSegRecord.MetSegRecordType.msrUNK Then
+                If Len(pMetSegRecs(lTyp).Source.VolName) > 0 Then
                     'dont add if already have this type of record
-                    Add = False
+                    lResult = False
                 Else
-                    pMetSegRecs(itype) = Nothing
-                    pMetSegRecs(itype) = lMetSegRec
-                    If newConn.Target.Member = "GATMP" Then
+                    pMetSegRecs(lTyp) = Nothing
+                    pMetSegRecs(lTyp) = lMetSegRec
+                    If aNewConnection.Target.Member = "GATMP" Then
                         pAirType = 1
-                    ElseIf newConn.Target.Member = "AIRTMP" Then
+                    ElseIf aNewConnection.Target.Member = "AIRTMP" Then
                         pAirType = 2
                     End If
                 End If
             Else ' not needed
-                Add = False
+                lResult = False
             End If
         Else
-            Add = False
+            lResult = False
         End If
 
-        If Not Add Then
+        If Not lResult Then
             lMetSegRec = Nothing
         End If
-
+        Return lResult
     End Function
 
     Private Function Str2Type(ByRef aStr As String) As HspfMetSegRecord.MetSegRecordType
@@ -127,185 +129,193 @@ Option Explicit On
     End Function
 
     Public Function Compare(ByRef newMetSeg As HspfMetSeg, ByRef opname As String) As Boolean
-        For itype As Integer = 1 To 7
-            If Not (pMetSegRecs(itype).Compare(newMetSeg.MetSegRecs(itype), opname)) Then
+        For ltype As Integer = 1 To pMetSegRecs.GetUpperBound(0)
+            If Not (pMetSegRecs(ltype).Compare(newMetSeg.MetSegRecs(ltype), opname)) Then
                 Return False
             End If
-        Next itype
+        Next ltype
         Return True
     End Function
 
     Public Sub UpdateMetSeg(ByRef newMetSeg As HspfMetSeg)
-        For itype As Integer = 1 To 7
-            With newMetSeg.MetSegRecs(itype)
-                If pMetSegRecs(itype).MFactR = -999.0# And .MFactR <> -999.0# Then
-                    pMetSegRecs(itype).MFactR = .MFactR
-                    pMetSegRecs(itype).Sgapstrg = .Sgapstrg
-                    pMetSegRecs(itype).Source = .Source
-                    pMetSegRecs(itype).Ssystem = .Ssystem
-                    pMetSegRecs(itype).Tran = .Tran
-                    pMetSegRecs(itype).typ = .typ
+        For lType As Integer = 1 To pMetSegRecs.GetUpperBound(0)
+            With newMetSeg.MetSegRecs(lType)
+                If pMetSegRecs(lType).MFactR = -999.0# And .MFactR <> -999.0# Then
+                    pMetSegRecs(lType).MFactR = .MFactR
+                    pMetSegRecs(lType).Sgapstrg = .Sgapstrg
+                    pMetSegRecs(lType).Source = .Source
+                    pMetSegRecs(lType).Ssystem = .Ssystem
+                    pMetSegRecs(lType).Tran = .Tran
+                    pMetSegRecs(lType).typ = .typ
                 End If
             End With
-        Next itype
+        Next lType
     End Sub
 
     Public Sub New()
         MyBase.New()
-        For lType As Integer = 1 To 7
+        For lType As Integer = 1 To pMetSegRecs.GetUpperBound(0)
             pMetSegRecs(lType) = New HspfMetSegRecord
         Next
         pAirType = 0
     End Sub
 
-    Public Sub ExpandMetSegName(ByRef wdmid As String, ByRef idsn As Integer)
-        Dim itype As Integer
-        Dim addstr As String = ""
-        Dim Con As String = ""
+    Public Sub ExpandMetSegName(ByRef aWdmId As String, ByRef aDsn As Integer)
+        Dim lType As Integer
+        Dim lAddStr As String = ""
+        Dim lCon As String = ""
 
-        Me.Name = Me.Uci.GetWDMAttr(wdmid, idsn, "LOC")
+        Me.Name = Me.Uci.GetWDMAttr(aWdmId, aDsn, "LOC")
 
-        For itype = 1 To 7
-            Select Case itype
-                Case 1 : Con = "PREC"
-                Case 2 : Con = "GATMP"
-                Case 3 : Con = "DTMPG"
-                Case 4 : Con = "WINMOV"
-                Case 5 : Con = "SOLRAD"
-                Case 6 : Con = "CLOUD"
-                Case 7 : Con = "PETINP"
+        For lType = 1 To pMetSegRecs.GetUpperBound(0)
+            Select Case lType
+                Case 1 : lCon = "PREC"
+                Case 2 : lCon = "GATMP"
+                Case 3 : lCon = "DTMPG"
+                Case 4 : lCon = "WINMOV"
+                Case 5 : lCon = "SOLRAD"
+                Case 6 : lCon = "CLOUD"
+                Case 7 : lCon = "PETINP"
+                Case Else : lCon = "<unknown>"
             End Select
-            If itype = 2 And Me.AirType = 2 Then
-                Con = "AIRTMP"
+            If lType = 2 And Me.AirType = 2 Then
+                lCon = "AIRTMP"
             End If
-            If pMetSegRecs(itype).MFactP <> 1 And pMetSegRecs(itype).MFactP <> 0 And pMetSegRecs(itype).MFactP <> -999 Then
-                addstr &= ",PI:" & Con & "=" & CStr(pMetSegRecs(itype).MFactP)
+            If pMetSegRecs(lType).MFactP <> 1 And _
+               pMetSegRecs(lType).MFactP <> 0 And _
+               pMetSegRecs(lType).MFactP <> -999 Then
+                lAddStr &= ",PI:" & lCon & "=" & CStr(pMetSegRecs(lType).MFactP)
             End If
-            If pMetSegRecs(itype).MFactR <> 1 And pMetSegRecs(itype).MFactR <> 0 And pMetSegRecs(itype).MFactR <> -999 Then
-                addstr &= ",R:" & Con & "=" & CStr(pMetSegRecs(itype).MFactR)
+            If pMetSegRecs(lType).MFactR <> 1 And _
+               pMetSegRecs(lType).MFactR <> 0 And _
+               pMetSegRecs(lType).MFactR <> -999 Then
+                lAddStr &= ",R:" & lCon & "=" & CStr(pMetSegRecs(lType).MFactR)
             End If
-        Next itype
+        Next lType
 
-        If Len(addstr) > 0 Then
-            Me.Name &= addstr
+        If lAddStr.Length > 0 Then
+            Me.Name &= lAddStr
         End If
     End Sub
 
-    Public Sub WriteUciFile(ByRef optyp As String, ByRef icol() As Integer, ByRef ilen() As Integer, ByRef f As Object)
-        Dim lOpn As HspfOperation
-        Dim j As Integer
-        Dim lastj As Integer = pUci.OpnBlks.Item(optyp).Ids.Count
-        Dim firstid, lastid As Integer
+    Public Function ToStringFromSpecs(ByRef aOpTyp As String, ByRef aCol() As Integer, ByRef aLen() As Integer) As String
+        Dim lSB As New StringBuilder
 
-        firstid = 0
-        lastid = 0
-        For j = 1 To lastj
-            lOpn = pUci.OpnBlks.Item(optyp).NthOper(j)
+        Dim lFirstId As Integer = 0
+        Dim lLastId As Integer = 0
+        For lOpnId As Integer = 1 To pUci.OpnBlks.Item(aOpTyp).Ids.Count
+            Dim lOpn As HspfOperation = pUci.OpnBlks.Item(aOpTyp).NthOper(lOpnId)
             If lOpn.MetSeg.Id = Me.Id Then
-                If firstid = 0 Then
-                    firstid = lOpn.Id
+                If lFirstId = 0 Then
+                    lFirstId = lOpn.Id
                 Else
-                    lastid = lOpn.Id
+                    lLastId = lOpn.Id
                 End If
-            ElseIf firstid > 0 Then
-                WriteRecs(optyp, firstid, lastid, icol, ilen, f)
-                firstid = 0
-                lastid = 0
+            ElseIf lFirstId > 0 Then
+                lSB.Append(FormatRecords(aOpTyp, lFirstId, lLastId, aCol, aLen))
+                lFirstId = 0
+                lLastId = 0
             End If
-        Next j
-        If firstid > 0 Then WriteRecs(optyp, firstid, lastid, icol, ilen, f)
-    End Sub
+        Next lOpnId
+        If lFirstId > 0 Then
+            lSB.Append(FormatRecords(aOpTyp, lFirstId, lLastId, aCol, aLen))
+        End If
+        Return lSB.ToString
+    End Function
 
-    Public Sub WriteRecs(ByRef optyp As String, ByRef firstid As Integer, ByRef lastid As Integer, ByRef icol() As Integer, ByRef ilen() As Integer, ByRef f As Object)
-        Dim lStr As System.Text.StringBuilder
-        Dim segRec As Integer
-        Dim tmember As String = ""
+    Public Function FormatRecords(ByRef aOpTyp As String, _
+                                  ByRef aFirstId As Integer, ByRef aLastId As Integer, _
+                                  ByRef aCol() As Integer, ByRef aLen() As Integer) As String
+        Dim lSB As New System.Text.StringBuilder
 
-        For segRec = 1 To 7
-            With pMetSegRecs(segRec)
+        For lSegRec As Integer = 1 To 7
+            With pMetSegRecs(lSegRec)
                 If .typ <> 0 Then 'type exists
-                    If (optyp = "RCHRES" And .MFactR > 0.0#) Or (optyp = "PERLND" And .MFactP > 0.0#) Or (optyp = "IMPLND" And .MFactP > 0.0#) Then
+                    If (aOpTyp = "RCHRES" And .MFactR > 0.0#) Or _
+                       (aOpTyp = "PERLND" And .MFactP > 0.0#) Or _
+                       (aOpTyp = "IMPLND" And .MFactP > 0.0#) Then
                         'have this type of met seg record
-                        lStr = New System.Text.StringBuilder
-                        lStr.Append(.Source.VolName.Trim)
-                        lStr.Append(Space(icol(1) - lStr.Length - 1)) 'pad prev field
-                        lStr.Append(CStr(.Source.VolId).PadLeft(ilen(1)))
-                        lStr.Append(Space(icol(2) - lStr.Length - 1))
-                        lStr.Append(.Source.Member)
-                        lStr.Append(Space(icol(3) - lStr.Length - 1))
-                        If .Source.MemSub1 <> 0 Then
-                            lStr.Append(CStr(.Source.MemSub1).PadLeft(ilen(3)))
+                        If lSegRec = 1 Then
+                            lSB.AppendLine("*** Met Seg " & pName)
                         End If
-                        lStr.Append(Space(icol(4) - lStr.Length - 1))
+                        Dim lStr As New StringBuilder
+                        lStr.Append(.Source.VolName.Trim.PadRight(aCol(1) - 1))
+                        lStr.Append(CStr(.Source.VolId).PadLeft(aLen(1)))
+                        lStr.Append(Space(aCol(2) - lStr.Length - 1))
+                        lStr.Append(.Source.Member)
+                        lStr.Append(Space(aCol(3) - lStr.Length - 1))
+                        If .Source.MemSub1 <> 0 Then
+                            lStr.Append(CStr(.Source.MemSub1).PadLeft(aLen(3)))
+                        End If
+                        lStr.Append(Space(aCol(4) - lStr.Length - 1))
                         lStr.Append(.Ssystem)
-                        lStr.Append(Space(icol(5) - lStr.Length - 1))
+                        lStr.Append(Space(aCol(5) - lStr.Length - 1))
                         lStr.Append(.Sgapstrg)
-                        lStr.Append(Space(icol(6) - lStr.Length - 1))
-                        If optyp = "RCHRES" Then
+                        lStr.Append(Space(aCol(6) - lStr.Length - 1))
+                        If aOpTyp = "RCHRES" Then
                             If .MFactR <> 1 Then
-                                lStr.Append(CStr(.MFactR).PadLeft(ilen(6)))
+                                lStr.Append(CStr(.MFactR).PadLeft(aLen(6)))
                             End If
                         Else
                             If .MFactP <> 1 Then
-                                lStr.Append(CStr(.MFactP).PadLeft(ilen(6)))
+                                lStr.Append(CStr(.MFactP).PadLeft(aLen(6)))
                             End If
                         End If
-                        lStr.Append(Space(icol(7) - lStr.Length - 1))
+                        lStr.Append(Space(aCol(7) - lStr.Length - 1))
                         lStr.Append(.Tran)
-                        lStr.Append(Space(icol(8) - lStr.Length - 1))
-                        lStr.Append(optyp)
-                        lStr.Append(Space(icol(9) - lStr.Length - 1))
-                        lStr.Append(CStr(firstid).PadLeft(ilen(9)))
-                        If lastid > 0 Then
-                            lStr.Append(Space(icol(10) - lStr.Length - 1))
-                            lStr.Append(CStr(lastid).PadLeft(ilen(9)))
+                        lStr.Append(Space(aCol(8) - lStr.Length - 1))
+                        lStr.Append(aOpTyp)
+                        lStr.Append(Space(aCol(9) - lStr.Length - 1))
+                        lStr.Append(CStr(aFirstId).PadLeft(aLen(9)))
+                        If aLastId > 0 Then
+                            lStr.Append(Space(aCol(10) - lStr.Length - 1))
+                            lStr.Append(CStr(aLastId).PadLeft(aLen(9)))
                         End If
-                        lStr.Append(Space(icol(11) - lStr.Length - 1))
-                        If optyp <> "RCHRES" And pAirType = 2 And .typ = 2 Then
+                        lStr.Append(Space(aCol(11) - lStr.Length - 1))
+                        If aOpTyp <> "RCHRES" And pAirType = 2 And .typ = 2 Then
                             lStr.Append("ATEMP")
                         Else
                             lStr.Append("EXTNL")
                         End If
-                        lStr.Append(Space(icol(12) - lStr.Length - 1))
-                        If optyp = "RCHRES" Then
+                        lStr.Append(Space(aCol(12) - lStr.Length - 1))
+
+                        Dim lMember As String = ""
+                        If aOpTyp = "RCHRES" Then
                             Select Case .typ
-                                Case 1 : tmember = "PREC"
-                                Case 2 : tmember = "GATMP"
-                                Case 3 : tmember = "DEWTMP"
-                                Case 4 : tmember = "WIND"
-                                Case 5 : tmember = "SOLRAD"
-                                Case 6 : tmember = "CLOUD"
-                                Case 7 : tmember = "POTEV"
+                                Case 1 : lMember = "PREC"
+                                Case 2 : lMember = "GATMP"
+                                Case 3 : lMember = "DEWTMP"
+                                Case 4 : lMember = "WIND"
+                                Case 5 : lMember = "SOLRAD"
+                                Case 6 : lMember = "CLOUD"
+                                Case 7 : lMember = "POTEV"
                             End Select
                         Else
                             Select Case .typ
-                                Case 1 : tmember = "PREC"
-                                Case 2 : tmember = "GATMP"
-                                Case 3 : tmember = "DTMPG"
-                                Case 4 : tmember = "WINMOV"
-                                Case 5 : tmember = "SOLRAD"
-                                Case 6 : tmember = "CLOUD"
-                                Case 7 : tmember = "PETINP"
+                                Case 1 : lMember = "PREC"
+                                Case 2 : lMember = "GATMP"
+                                Case 3 : lMember = "DTMPG"
+                                Case 4 : lMember = "WINMOV"
+                                Case 5 : lMember = "SOLRAD"
+                                Case 6 : lMember = "CLOUD"
+                                Case 7 : lMember = "PETINP"
                             End Select
                             If .typ = 2 Then
                                 'get right air temp member name
                                 If pAirType = 1 Then
-                                    tmember = "GATMP"
+                                    lMember = "GATMP"
                                 ElseIf pAirType = 2 Then
-                                    tmember = "AIRTMP"
+                                    lMember = "AIRTMP"
                                 End If
                             End If
                         End If
-                        lStr.Append(tmember)
-                        lStr.Append(Space(icol(13) - lStr.Length - 1))
-                        If segRec = 1 Then
-                            PrintLine(f, "*** Met Seg " & pName)
-                        End If
-                        PrintLine(f, lStr.ToString)
+                        lStr.Append(lMember)
+                        lStr.Append(Space(aCol(13) - lStr.Length - 1))
+                        lSB.AppendLine(lStr.ToString)
                     End If
                 End If
             End With
-        Next segRec
-
-    End Sub
+        Next lSegRec
+        Return lSB.ToString.Remove(lSB.Length - 1)
+    End Function
 End Class

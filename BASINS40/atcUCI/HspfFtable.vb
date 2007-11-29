@@ -1,9 +1,10 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
-<System.Runtime.InteropServices.ProgId("HspfFtable_NET.HspfFtable")> Public Class HspfFtable
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+Imports System.Text
 
+Public Class HspfFtable
     Private pId As Integer
     Private pNrows As Integer
     Private pNcols As Integer
@@ -298,31 +299,28 @@ Option Explicit On
     '
     'End Sub
 
-    Public Sub WriteUciFile(ByRef f As Integer)
-        Dim vOpn As Object
-        Dim lOpn As HspfOperation
+    Public Overrides Function ToString() As String
+        Dim lSB As New StringBuilder
         Dim i, j As Integer
         Dim t, s As String
         Dim fmt As String
 
         fmt = "0.##"
-        PrintLine(f, " ")
-        PrintLine(f, "FTABLES")
-        For Each vOpn In pOperation.OpnBlk.Ids
-            lOpn = vOpn
-            PrintLine(f, " ")
-            PrintLine(f, "  FTABLE    " & myFormatI(lOpn.FTable.Id, 3))
+        lSB.AppendLine("FTABLES")
+        For Each lOpn As HspfOperation In pOperation.OpnBlk.Ids
+            lSB.AppendLine(" ")
+            lSB.AppendLine("  FTABLE    " & myFormatI(lOpn.FTable.Id, 3))
             With lOpn.FTable
-                PrintLine(f, " rows cols" & Space((.Ncols - 1) * 10) & " ***")
-                PrintLine(f, myFormatI(lOpn.FTable.Nrows, 5) & myFormatI(lOpn.FTable.Ncols, 5))
-                If Len(.Comment) > 0 Then
-                    PrintLine(f, .Comment)
+                lSB.AppendLine(" rows cols" & Space((.Ncols - 1) * 10) & " ***")
+                lSB.AppendLine(myFormatI(lOpn.FTable.Nrows, 5) & myFormatI(lOpn.FTable.Ncols, 5))
+                If Not (.Comment Is Nothing) AndAlso .Comment.Length > 0 Then
+                    lSB.AppendLine(.Comment)
                 Else
                     s = "     depth      area    volume"
                     For j = 1 To .Ncols - 3
                         s = s & "  outflow" & j
                     Next j
-                    PrintLine(f, s & " ***")
+                    lSB.AppendLine(s & " ***")
                 End If
                 For i = 1 To .Nrows
                     s = Space(10)
@@ -388,13 +386,14 @@ Option Explicit On
                         End If
                         s = s & t
                     Next j
-                    PrintLine(f, s)
+                    lSB.AppendLine(s)
                 Next i
             End With
-            PrintLine(f, "  END FTABLE" & myFormatI(lOpn.FTable.Id, 3))
-        Next vOpn
-        PrintLine(f, "END FTABLES")
-    End Sub
+            lSB.AppendLine("  END FTABLE" & myFormatI(lOpn.FTable.Id, 3))
+        Next lOpn
+        lSB.AppendLine("END FTABLES")
+        Return lSB.ToString
+    End Function
 
     Public Sub Edit()
         editInit(Me, Me.Operation.OpnBlk.Uci.icon)

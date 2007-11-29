@@ -1,12 +1,22 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfOpnBlk_NET.HspfOpnBlk")> Public Class HspfOpnBlk
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
+Imports System.Collections.ObjectModel
+Imports System.Text
+
+Public Class HspfOpnBlks
+    Inherits KeyedCollection(Of String, HspfOpnBlk)
+    Protected Overrides Function GetKeyForItem(ByVal aHspfOpnBlk As HspfOpnBlk) As String
+        Return aHspfOpnBlk.Name
+    End Function
+End Class
+
+Public Class HspfOpnBlk
     Private pName As String
-    Private pIds As Collection 'of HspfOperation
+    Private pIds As Collection '(of HspfOperation)
     Private pEdited As Boolean
-    Private pTables As Collection 'of HspfTable
+    Private pTables As Collection '(Of HspfTable)
     Private pUci As HspfUci
     Private pComment As String
 
@@ -487,10 +497,10 @@ Option Explicit On
 
         lOper = OperFromID(opid)
         lOper.Tables.Remove(tabname)
-
     End Sub
 
-    Public Sub WriteUciFile(ByRef f As Short, ByRef M As HspfMsg)
+    Public Overrides Function ToString() As String
+        Dim lSB As New StringBuilder
         Dim lTableDef As HspfTableDef
         Dim i As Integer
         Dim lTable As HspfTable
@@ -506,12 +516,11 @@ Option Explicit On
         Dim lLastInGroup, lLastGroupIndex, lCurrentOccurGroup As Integer
 
         firstTable = True
-        If Len(pComment) > 0 Then
-            PrintLine(f, pComment)
+        If pComment.Length > 0 Then
+            lSB.AppendLine(pComment)
         End If
-        PrintLine(f, " ")
-        PrintLine(f, pName)
-        lBlockDef = M.BlockDefs.Item(pName)
+        lSB.AppendLine(pName)
+        lBlockDef = pUci.Msg.BlockDefs.Item(pName)
 
         lInGroup = False
 
@@ -522,13 +531,15 @@ Option Explicit On
                 'the basic case
                 For Each vId In pIds
                     lId = vId
-                    If lId.TableExists((lTableDef.Name)) Then
+                    If lId.TableExists(lTableDef.Name) Then
                         lTable = lId.Tables.Item(lTableDef.Name)
-                        If Len(lTable.TableComment) > 0 Then
-                            PrintLine(f, lTable.TableComment)
+                        If lTable.TableComment.Length > 0 Then
+                            lSB.AppendLine(lTable.TableComment)
                         End If
-                        If Not (firstTable) Then PrintLine(f, " ")
-                        Call lTable.WriteUciFile(f) 'this writes all like this
+                        If Not (firstTable) Then
+                            lSB.AppendLine(" ")
+                        End If
+                        lSB.AppendLine(lTable.ToString) 'this writes all like this
                         Exit For
                     End If
                 Next vId
@@ -568,17 +579,19 @@ Option Explicit On
                                     'write the comment that applies to this table
                                     t = lTable.Name & ":" & lGroupIndex
                                     ttable = lId.OpnBlk.Tables(t)
-                                    If Len(ttable.TableComment) > 0 Then
-                                        PrintLine(f, ttable.TableComment)
+                                    If ttable.TableComment.Length > 0 Then
+                                        lSB.AppendLine(ttable.TableComment)
                                     End If
                                 Else
-                                    If Len(lTable.TableComment) > 0 Then
-                                        PrintLine(f, lTable.TableComment)
+                                    If lTable.TableComment.Length > 0 Then
+                                        lSB.AppendLine(lTable.TableComment)
                                     End If
                                 End If
-                                If Not (firstTable) Then PrintLine(f, " ")
-                                If lTable.OccurIndex = 0 Then
-                                    Call lTable.WriteUciFile(f, lGroupIndex) 'write out just this occurence
+                                If Not (firstTable) Then
+                                    lSB.AppendLine(" ")
+                                End If
+                                If lTable.OccurIndex = 0 Then 'write out just this occurence
+                                    lSB.AppendLine(lTable.ToStringByIndex(lGroupIndex))
                                 Else
                                     'special case for some p/i/gqual tables
                                     j = 0
@@ -593,22 +606,23 @@ Option Explicit On
                                             Exit For
                                         End If
                                     Next k
-                                    If j > 0 Then
-                                        Call lTable.WriteUciFile(f, j) 'write out just this occurence
+                                    If j > 0 Then 'write out just this occurence
+                                        lSB.AppendLine(lTable.ToStringByIndex(j))
                                     End If
                                 End If
-                                If lTable.OccurCount > lLastGroupIndex Then lLastGroupIndex = lTable.OccurCount
+                                If lTable.OccurCount > lLastGroupIndex Then
+                                    lLastGroupIndex = lTable.OccurCount
+                                End If
                                 Exit For
                             End If
                         End If
                     Next vId
-
                 End If
-
             End If
         Next i
-        PrintLine(f, "END " & pName)
-    End Sub
+        lSB.AppendLine("END " & pName)
+        Return lSB.ToString
+    End Function
 
     Public Function OperByDesc(ByRef Desc As String) As HspfOperation
         Dim lId As HspfOperation

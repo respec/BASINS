@@ -1,9 +1,13 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfMonthData_NET.HspfMonthData")> Public Class HspfMonthData
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Private pMonthDataTables As Collection 'of HspfMonthDataTable
+Imports System.Collections.ObjectModel
+Imports System.Text
+
+Public Class HspfMonthData
+    Private pMonthDataTables As Collection(Of HspfMonthDataTable)
     Private pUci As HspfUci
     Private pComment As String
 
@@ -32,7 +36,7 @@ Option Explicit On
         End Set
     End Property
 
-    Public ReadOnly Property MonthDataTables() As Collection
+    Public ReadOnly Property MonthDataTables() As Collection(Of HspfMonthDataTable)
         Get
             MonthDataTables = pMonthDataTables
         End Get
@@ -50,7 +54,7 @@ Option Explicit On
 
     Public Sub New()
         MyBase.New()
-        pMonthDataTables = New Collection
+        pMonthDataTables = New Collection(Of HspfMonthDataTable)
     End Sub
 
     Public Sub ReadUciFile()
@@ -102,34 +106,32 @@ Option Explicit On
         Loop
     End Sub
 
-    Public Sub WriteUciFile(ByRef f As Integer)
-        Dim i, j As Integer
+    Public Overrides Function ToString() As String
+        Dim j As Integer
         Dim s, t As String
-        Dim lMonthDataTable As HspfMonthDataTable
+        Dim lSB As New StringBuilder
 
-        With pMonthDataTables
-            If .Count() > 0 Then 'something to write
-                If Len(pComment) > 0 Then
-                    PrintLine(f, pComment)
-                End If
-                PrintLine(f, " ")
-                PrintLine(f, "MONTH-DATA")
-                PrintLine(f, " ")
-                For i = 1 To .Count()
-                    lMonthDataTable = .Item(i)
-                    PrintLine(f, "  MONTH-DATA     " & myFormatI((lMonthDataTable.Id), 3))
-                    s = ""
-                    For j = 1 To 12
-                        t = Space(6)
-                        t = RSet(CStr(lMonthDataTable.MonthValue(j)), Len(t))
-                        s = s & t
-                    Next j
-                    PrintLine(f, s)
-                    PrintLine(f, "  END MONTH-DATA " & myFormatI((lMonthDataTable.Id), 3))
-                    PrintLine(f, " ")
-                Next i
-                PrintLine(f, "END MONTH-DATA")
+        If pMonthDataTables.Count() > 0 Then 'something to write
+            If pComment.Length > 0 Then
+                lSB.AppendLine(pComment)
             End If
-        End With
-    End Sub
+            lSB.AppendLine("MONTH-DATA")
+            lSB.AppendLine(" ")
+            For Each lMonthDataTable As HspfMonthDataTable In pMonthDataTables
+                lSB.AppendLine("  MONTH-DATA     " & myFormatI((lMonthDataTable.Id), 3))
+                s = ""
+                For j = 1 To 12
+                    'TODO:update this to PadRight
+                    t = Space(6)
+                    t = RSet(CStr(lMonthDataTable.MonthValue(j)), Len(t))
+                    s &= t
+                Next j
+                lSB.AppendLine(s)
+                lSB.AppendLine("  END MONTH-DATA " & myFormatI((lMonthDataTable.Id), 3))
+                lSB.AppendLine(" ")
+            Next lMonthDataTable
+            lSB.AppendLine("END MONTH-DATA")
+        End If
+        Return lSB.ToString
+    End Function
 End Class

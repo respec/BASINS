@@ -280,67 +280,70 @@ Module modUCIRecords
         End If
     End Sub
 
-    Public Sub SaveBlockOrder(ByRef aOrder As ArrayList)
-        'default order is:
-        '"GLOBAL"
-        '"FILES"
-        '"OPN SEQUENCE"
-        '"MONTH DATA"
-        '"PERLND"
-        '"IMPLND"
-        '"RCHRES"
-        '"FTABLES"
-        '"COPY"
-        '"PLTGEN"
-        '"DISPLY"
-        '"DURANL"
-        '"GENER"
-        '"MUTSIN"
-        '"BMPRAC"
-        '"REPORT"
-        '"CONNECTIONS"
-        '"MASSLINKS"
-        '"SPECIAL ACTIONS"
-        Dim i As Integer
-        Dim myOrder As New ArrayList(20)
-        Dim connfound As Boolean
-        Dim lFoundAt As Integer
-        Dim iprev As Integer
-        Dim lBlock As String
+    Public Sub DefaultBlockOrder(ByRef aOrder As ArrayList)
+        Dim lOrder As New ArrayList(20)
+        With lOrder
+            .Add("GLOBAL")
+            .Add("FILES")
+            .Add("OPN SEQUENCE")
+            .Add("MONTH DATA")
+            .Add("CATEGORY")
+            .Add("PERLND")
+            .Add("IMPLND")
+            .Add("RCHRES")
+            .Add("FTABLES")
+            .Add("COPY")
+            .Add("PLTGEN")
+            .Add("DISPLY")
+            .Add("DURANL")
+            .Add("GENER")
+            .Add("MUTSIN")
+            .Add("BMPRAC")
+            .Add("REPORT")
+            .Add("CONNECTIONS")
+            .Add("MASSLINKS")
+            .Add("SPECIAL ACTIONS")
+        End With
+        aOrder = lOrder
+    End Sub
 
-        For i = 1 To uciRecCnt
-            lBlock = Trim(uciRec(i))
+    Public Sub SaveBlockOrder(ByRef aOrder As ArrayList)
+        Dim lOrder As New ArrayList(20)
+        Dim lConnectionFound As Boolean
+        For lRecordIndex As Integer = 1 To uciRecCnt
+            Dim lBlock As String = uciRec(lRecordIndex).Trim
             Select Case lBlock
                 Case "GLOBAL", "FILES", "OPN SEQUENCE", "PERLND", "IMPLND", _
                      "RCHRES", "FTABLES", "COPY", "PLTGEN", "DISPLY", _
-                     "DURANL", "GENER", "MUTSIN", "BMPRAC", "REPORT"
-                    myOrder.Add(lBlock)
+                     "DURANL", "GENER", "MUTSIN", "BMPRAC", "REPORT", _
+                     "CATEGORY"
+                    lOrder.Add(lBlock)
                 Case "MONTH-DATA"
-                    myOrder.Add("MONTH DATA")
+                    lOrder.Add("MONTH DATA")
                 Case "MASS-LINK"
-                    myOrder.Add("MASSLINKS")
+                    lOrder.Add("MASSLINKS")
                 Case "SPEC-ACTIONS"
-                    myOrder.Add("SPECIAL ACTIONS")
+                    lOrder.Add("SPECIAL ACTIONS")
                 Case "EXT SOURCES", "EXT TARGETS", "SCHEMATIC", "NETWORK"
-                    If Not connfound Then
-                        myOrder.Add("CONNECTIONS")
-                        connfound = True
+                    If Not lConnectionFound Then
+                        lOrder.Add("CONNECTIONS")
+                        lConnectionFound = True
                     End If
             End Select
         Next
 
         'add any blocks in pOrder that aren't in myOrder
-        iprev = -1
-        For Each lBlock In aOrder
-            lFoundAt = myOrder.IndexOf(lBlock)
+        Dim iprev As Integer = -1
+        For Each lBlock As String In aOrder
+            Dim lFoundAt As Integer = lOrder.IndexOf(lBlock)
             If lFoundAt >= 0 Then
                 iprev = lFoundAt
             Else 'add this one so that myOrder has a complete set
                 iprev += 1
-                myOrder.Insert(iprev, lBlock)
+                lOrder.Insert(iprev, lBlock)
             End If
         Next
         aOrder.Clear()
-        aOrder = myOrder
+        aOrder = lOrder
     End Sub
 End Module

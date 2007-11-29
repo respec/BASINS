@@ -1,14 +1,14 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
+Imports System.Collections.ObjectModel
+Imports System.Text
 Imports MapWinUtility
 Imports atcUtility
 
-<System.Runtime.InteropServices.ProgId("HspfFilesBlk_NET.HspfFilesBlk")> _
 Public Class HspfFilesBlk
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
-    Private pFiles As Collection 'of HspfFile
+    Private pFiles As Collection(Of HspfData.HspfFile)
     Private pUci As HspfUci
     Private pComment As String = ""
 
@@ -61,8 +61,8 @@ Public Class HspfFilesBlk
         End Get
         Set(ByVal aValue As HspfData.HspfFile) '?
             If aIndex > 0 And aIndex <= pFiles.Count() Then
-                pFiles.Remove(aIndex)
-                pFiles.Add(aValue, , aIndex)
+                pFiles.RemoveAt(aIndex)
+                pFiles.Insert(aIndex, aValue)
             ElseIf aIndex = pFiles.Count() + 1 Then
                 pFiles.Add(aValue)
             Else 'error?
@@ -71,8 +71,7 @@ Public Class HspfFilesBlk
     End Property
 
     Public Sub Clear()
-        pFiles = Nothing
-        pFiles = New Collection
+        pFiles.Clear()
     End Sub
 
     Public Sub Add(ByRef aValue As HspfData.HspfFile) 'to end, how about in between
@@ -110,7 +109,7 @@ Public Class HspfFilesBlk
 
     Public Sub Remove(ByRef aIndex As Integer)
         If aIndex > 0 And aIndex <= pFiles.Count() Then
-            pFiles.Remove((aIndex))
+            pFiles.RemoveAt(aIndex)
         End If
     End Sub
 
@@ -122,7 +121,7 @@ Public Class HspfFilesBlk
             lFile.Comment = lExistingFile.Comment
             lFile.Name = lExistingFile.Name
             lFile.Unit = lExistingFile.Unit
-            pFiles.Remove(aIndex)
+            pFiles.RemoveAt(aIndex)
             pFiles.Add(lFile)
         End If
     End Sub
@@ -133,7 +132,7 @@ Public Class HspfFilesBlk
 
     Public Sub New()
         MyBase.New()
-        pFiles = New Collection
+        pFiles = New Collection(Of HspfData.HspfFile)
     End Sub
 
     Private Sub Update()
@@ -201,19 +200,19 @@ Public Class HspfFilesBlk
         End Try
     End Sub
 
-    Friend Sub WriteUciFile(ByRef lUnit As Short)
+    Public Overrides Function ToString() As String
+        Dim lSb As New StringBuilder
         Dim lFile As HspfData.HspfFile
 
         If pComment.Length > 0 Then
-            PrintLine(lUnit, pComment)
+            lSb.AppendLine(pComment)
         End If
-        PrintLine(lUnit, " ")
-        PrintLine(lUnit, "FILES")
-        If pFiles.Count() > 0 Then
-            lFile = pFiles.Item(1)
+        lSb.AppendLine("FILES")
+        If pFiles.Count > 0 Then
+            lFile = pFiles.Item(0)
             If Not (lFile.Comment Is Nothing) AndAlso lFile.Comment.Length = 0 Then
                 'need to add default header
-                PrintLine(lUnit, "<FILE>  <UN#>***<----FILE NAME------------------------------------------------->")
+                lSb.AppendLine("<FILE>  <UN#>***<----FILE NAME------------------------------------------------->")
             End If
         End If
 
@@ -226,21 +225,21 @@ Public Class HspfFilesBlk
                 lName = RelativeFilename(lName, lpath)
                 lFile.Name = lName
             End If
-            If Len(lFile.Comment) > 0 Then
-                PrintLine(lUnit, lFile.Comment)
+            If lFile.Comment.Length > 0 Then
+                lSb.AppendLine(lFile.Comment)
             End If
-            PrintLine(lUnit, lFile.Typ & Space(10 - Len(lFile.Typ)) & myFormatI(lFile.Unit, 3), Space(2) & lName)
+            lSb.AppendLine(lFile.Typ.PadRight(10) & myFormatI(lFile.Unit, 3) & Space(3) & lName)
         Next
-        PrintLine(lUnit, "END FILES")
-    End Sub
+        lSb.AppendLine("END FILES")
+        Return lSb.ToString
+    End Function
 
     Public Sub newName(ByRef aOldName As String, ByRef aNewName As String)
         Dim lOldLength, i, j, lSlashPos, lTemp As Integer
         Dim lTempName As String
         Dim lHspfFile As HspfData.HspfFile
-        Dim lFiles As Collection
+        Dim lFiles As New Collection(Of HspfData.HspfFile)
 
-        lFiles = New Collection
         For Each lHspfFile In pFiles
             If Trim(lHspfFile.Typ) = "MESSU" Or Trim(lHspfFile.Typ) = "" Or Trim(lHspfFile.Typ) = "BINO" Then
                 'Close lFile.Unit
@@ -270,7 +269,7 @@ Public Class HspfFilesBlk
             End If
             lFiles.Add(lHspfFile)
         Next
-        pFiles = Nothing
+        pFiles.Clear()
         pFiles = lFiles
     End Sub
 End Class
