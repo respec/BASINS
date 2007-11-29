@@ -14,7 +14,7 @@ Public Class HspfOpnSeqBlk
 
     Public Property Uci() As HspfUci
         Get
-            Uci = pUci
+            Return pUci
         End Get
         Set(ByVal Value As HspfUci)
             pUci = Value
@@ -26,14 +26,14 @@ Public Class HspfOpnSeqBlk
 
     Public ReadOnly Property Caption() As String
         Get
-            Caption = "Opn Sequence Block"
+            Return "Opn Sequence Block"
         End Get
     End Property
 
 
     Public Property Comment() As String
         Get
-            Comment = pComment
+            Return pComment
         End Get
         Set(ByVal Value As String)
             pComment = Value
@@ -42,13 +42,13 @@ Public Class HspfOpnSeqBlk
 
     Public ReadOnly Property EditControlName() As String
         Get
-            EditControlName = "ATCoHspf.ctlOpnSeqBlkEdit"
+            Return "ATCoHspf.ctlOpnSeqBlkEdit"
         End Get
     End Property
 
     Public ReadOnly Property Opns() As Collection
         Get
-            Opns = pOpns
+            Return pOpns
         End Get
     End Property
 
@@ -64,7 +64,7 @@ Public Class HspfOpnSeqBlk
 
     Public Property Delt() As Integer
         Get
-            Delt = pDelt
+            Return pDelt
         End Get
         Set(ByVal Value As Integer)
             pDelt = Value
@@ -75,8 +75,8 @@ Public Class HspfOpnSeqBlk
         pOpns.Add(newOpn)
     End Sub
 
-    Public Sub Delete(ByRef Index As Integer)
-        pOpns.Remove(Index)
+    Public Sub Delete(ByRef aIndex As Integer)
+        pOpns.Remove(aIndex)
     End Sub
 
     Public Sub AddAfter(ByRef newOpn As HspfOperation, ByRef afterid As Integer)

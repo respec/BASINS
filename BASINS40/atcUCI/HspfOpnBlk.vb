@@ -14,7 +14,7 @@ End Class
 
 Public Class HspfOpnBlk
     Private pName As String
-    Private pIds As Collection '(of HspfOperation)
+    Private pIds As HspfOperations
     Private pEdited As Boolean
     Private pTables As Collection '(Of HspfTable)
     Private pUci As HspfUci
@@ -48,7 +48,7 @@ Public Class HspfOpnBlk
         End Set
     End Property
 
-    Public ReadOnly Property Ids() As Collection
+    Public ReadOnly Property Ids() As HspfOperations
         Get
             Ids = pIds
         End Get
@@ -109,7 +109,7 @@ Public Class HspfOpnBlk
     Public Sub New()
         MyBase.New()
         pName = ""
-        pIds = New Collection
+        pIds = New HspfOperations
         pTables = New Collection
     End Sub
 

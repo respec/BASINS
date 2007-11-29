@@ -527,7 +527,7 @@ Public Class HspfUci
                 End While
                 For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
                     lOpnblk = pOpnBlks.Item(lOpn.Name)
-                    lOpnblk.Ids.Add(lOpn, "K" & lOpn.Id)
+                    lOpnblk.Ids.Add(lOpn)
                     lOpn.OpnBlk = lOpnblk
                 Next
 
@@ -627,13 +627,13 @@ Public Class HspfUci
                 lMetSeg = New HspfMetSeg 'init moved here
                 lMetSeg.Uci = Me
                 Dim lComment As String = ""
-                Dim lSourceIndex As Integer = 1
-                Do While lSourceIndex <= lOperation.Sources.Count()
+                Dim lSourceIndex As Integer = 0
+                Do While lSourceIndex < lOperation.Sources.Count
                     Dim lConnection As HspfConnection = lOperation.Sources.Item(lSourceIndex)
                     If lConnection.Typ = 1 Then
                         If lMetSeg.Add(lConnection) Then
-                            lOperation.Sources.Remove(lSourceIndex)
-                            If Len(lComment) = 0 Then
+                            lOperation.Sources.RemoveAt(lSourceIndex)
+                            If lComment.Length = 0 Then
                                 lComment = lConnection.Comment
                             End If
                         Else
@@ -710,42 +710,43 @@ Public Class HspfUci
         Static lOpTypes() As String = {"RCHRES", "COPY"} 'operations with assoc pt srcs
         For Each lOpTyp As String In lOpTypes
             For Each lOpn As HspfOperation In pOpnBlks.Item(lOpTyp).Ids
-                Dim j As Integer = 1
-                Do While j <= lOpn.Sources.Count()
-                    Dim lConn As HspfConnection = lOpn.Sources.Item(j)
-
-                    If (lConn.Target.VolName = lOpTyp And lConn.Target.Group <> "EXTNL") And (Left(lConn.Source.VolName, 3) = "WDM") Then
+                Dim j As Integer = 0
+                Do While j < lOpn.Sources.Count
+                    Dim lConnection As HspfConnection = lOpn.Sources.Item(j)
+                    If (lConnection.Target.VolName = lOpTyp And _
+                        lConnection.Target.Group <> "EXTNL") And _
+                        (Left(lConnection.Source.VolName, 3) = "WDM") Then
                         'if wdm data set to rchres add to collection,
                         'or if wdm data set to copy and copy goes to rchres
                         Dim lNewPoint As Boolean = False
                         Dim lRFact As Single
-                        If lConn.Target.VolName = "COPY" Then
+                        If lConnection.Target.VolName = "COPY" Then
                             lRFact = 0
-                            For lIndex As Integer = 1 To lConn.Target.Opn.Targets.Count()
-                                If lConn.Target.Opn.Targets.Item(lIndex).Target.VolName = "RCHRES" Then
+                            For lIndex As Integer = 1 To lConnection.Target.Opn.Targets.Count()
+                                If lConnection.Target.Opn.Targets.Item(lIndex).Target.VolName = "RCHRES" Then
                                     lNewPoint = True
                                     'sum up the mfacts (really for septic modeling)
-                                    lRFact += lConn.Target.Opn.Targets.Item(lIndex).MFact
+                                    lRFact += lConnection.Target.Opn.Targets.Item(lIndex).MFact
                                 End If
                             Next lIndex
-                        ElseIf lConn.Target.VolName = "RCHRES" Then
+                        ElseIf lConnection.Target.VolName = "RCHRES" Then
                             lNewPoint = True
                         End If
                         If lNewPoint Then
-                            If Trim(lConn.Source.VolName) = "WDM" Then
-                                lConn.Source.VolName = "WDM1"
+                            If Trim(lConnection.Source.VolName) = "WDM" Then
+                                lConnection.Source.VolName = "WDM1"
                             End If
                             Dim lPoint As New HspfPoint
-                            lPoint.MFact = lConn.MFact
-                            If lConn.Target.VolName = "COPY" Then
+                            lPoint.MFact = lConnection.MFact
+                            If lConnection.Target.VolName = "COPY" Then
                                 'save rfact for septics
                                 lPoint.RFact = lRFact
                             End If
-                            lPoint.Source = lConn.Source
-                            lPoint.Tran = lConn.Tran
-                            lPoint.Sgapstrg = lConn.Sgapstrg
-                            lPoint.Ssystem = lConn.Ssystem
-                            lPoint.Target = lConn.Target
+                            lPoint.Source = lConnection.Source
+                            lPoint.Tran = lConnection.Tran
+                            lPoint.Sgapstrg = lConnection.Sgapstrg
+                            lPoint.Ssystem = lConnection.Ssystem
+                            lPoint.Target = lConnection.Target
                             'pbd -- store associated operation id for use when writing
                             lPoint.AssocOper = lOpn.Id
                             'get point source name from any data set
@@ -774,7 +775,7 @@ Public Class HspfUci
                             End If
                             pPointSources.Add(lPoint)
                             lOpn.PointSources.Add(lPoint)
-                            lOpn.Sources.Remove(j)
+                            lOpn.Sources.RemoveAt(j)
                         Else
                             j += 1
                         End If
@@ -967,28 +968,25 @@ Public Class HspfUci
     End Sub
 
     Public Sub DeleteOperation(ByRef delname As String, ByRef delid As Integer)
-
         Dim j, i, nth As Integer
         Dim isource() As Integer = {}
         Dim itarget, iscnt As Integer
-        Dim lOpn As HspfOperation
-        Dim lConnection As HspfConnection
         Dim lMassLink As Integer
-        Dim lopnblk As HspfOpnBlk
 
         'figure out where this opn is in opn seq block and delete it
         nth = 1
-        For Each lOpn In pOpnSeqBlk.Opns
-            If lOpn.Name = delname And lOpn.Id = delid Then
+        For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
+            If lOpn.Name = delname And _
+               lOpn.Id = delid Then
                 pOpnSeqBlk.Delete(nth)
             End If
-            nth = nth + 1
+            nth += 1
         Next
 
         'need to remove from all operation type blocks
-        lopnblk = pOpnBlks.Item(delname)
-        If Not lopnblk.OperFromID(delid) Is Nothing Then
-            lopnblk.Ids.Remove("K" & delid)
+        Dim lOpnBlk As HspfOpnBlk = pOpnBlks.Item(delname)
+        If Not lOpnBlk.OperFromID(delid) Is Nothing Then
+            lOpnBlk.Ids.Remove("K" & delid)
         End If
 
         'remove connections
@@ -996,7 +994,7 @@ Public Class HspfUci
         i = 1
         iscnt = 0
         itarget = 0
-        For Each lConnection In Me.Connections
+        For Each lConnection As HspfConnection In Me.Connections
             If (lConnection.Source.VolName = delname And lConnection.Source.VolId = delid) Or (lConnection.Target.VolName = delname And lConnection.Target.VolId = delid) Then
                 lMassLink = lConnection.MassLink
                 If lConnection.Target.VolId = delid And lConnection.Target.VolName = delname And lConnection.Source.VolName = delname Then
@@ -1017,7 +1015,7 @@ Public Class HspfUci
         If iscnt > 0 And itarget > 0 Then
             'need to join sources and targets of this deleted opn
             For i = 1 To iscnt
-                lConnection = New HspfConnection
+                Dim lConnection As HspfConnection = New HspfConnection
                 lConnection.Uci = Me
                 lConnection.Typ = 3
                 lConnection.Source.VolName = delname
@@ -1039,19 +1037,21 @@ Public Class HspfUci
         End If
 
         'remove this oper from source and target collections for other operations
-        For Each lOpn In pOpnSeqBlk.Opns
+        For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
             j = 1
             Do While j <= lOpn.Targets.Count()
-                If lOpn.Targets.Item(j).Target.VolId = delid And lOpn.Targets.Item(j).Target.VolName = delname Then
-                    lOpn.Targets.Remove(j)
+                If lOpn.Targets.Item(j).Target.VolId = delid And _
+                   lOpn.Targets.Item(j).Target.VolName = delname Then
+                    lOpn.Targets.RemoveAt(j)
                 Else
                     j = j + 1
                 End If
             Loop
             j = 1
             Do While j <= lOpn.Sources.Count()
-                If lOpn.Sources.Item(j).Source.VolId = delid And lOpn.Sources.Item(j).Source.VolName = delname Then
-                    lOpn.Sources.Remove(j)
+                If lOpn.Sources.Item(j).Source.VolId = delid And _
+                   lOpn.Sources.Item(j).Source.VolName = delname Then
+                    lOpn.Sources.RemoveAt(j)
                 Else
                     j = j + 1
                 End If
@@ -2091,7 +2091,7 @@ x:
         lOpn.Id = opid
         lOpn.Uci = Me
 
-        lopnblk.Ids.Add(lOpn, "K" & lOpn.Id)
+        lopnblk.Ids.Add(lOpn)
         lOpn.OpnBlk = lopnblk
 
     End Sub
