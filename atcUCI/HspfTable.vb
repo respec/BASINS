@@ -1,12 +1,11 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
+Imports System.Text
 Imports atcUtility
 
-<System.Runtime.InteropServices.ProgId("HspfTable_NET.HspfTable")> _
 Public Class HspfTable
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
     Private pDef As HspfTableDef
     Private pOccurCount As Integer 'total number of occurences
     Private pOccurNum As Integer 'nth occurrence
@@ -153,6 +152,7 @@ Public Class HspfTable
             pCombineOK = Value
         End Set
     End Property
+
     Public Function EditAllSimilarChange(ByRef newEditAllSimilar As Boolean) As Object
         EditAllSimilarChange = pEditAllSimilar
         pEditAllSimilar = newEditAllSimilar
@@ -232,158 +232,152 @@ Public Class HspfTable
         '  End If
     End Sub
 
-    Public Sub WriteUciFile(ByRef f As Short, Optional ByRef instance As Integer = 0)
-        Dim lOpn As HspfOperation
-        Dim lTable As HspfTable
-        Dim lParm As HSPFParm
-        Dim SuppStr, s, t, tempValue As String
-        Dim ilen, icon As Integer
-        Dim i, j As Integer
-        Dim tname As String
-        Dim r As Single
-        Dim firstopn As Boolean
-        Dim pFlg As Boolean
-        Dim p As String = Nothing
-        Dim units As Integer
+    Public Overrides Function ToString() As String
+        Return Me.ToStringByIndex(0)
+    End Function
+
+    Public Function ToStringByIndex(Optional ByRef aInstance As Integer = 0) As String
+        Dim lSB As New StringBuilder
+
         Dim lFirstOccur, lLastOccur As Integer
-
-        units = Me.Opn.OpnBlk.Uci.GlobalBlock.emfg
-
-        If instance = 0 Then
+        If aInstance = 0 Then
             lFirstOccur = 1
             lLastOccur = pOccurCount
         Else
-            lFirstOccur = instance
-            lLastOccur = instance
+            lFirstOccur = aInstance
+            lLastOccur = aInstance
         End If
 
-        For i = lFirstOccur To lLastOccur
-            If i = 1 Then
-                tname = pDef.Name
+        Dim lTableName As String
+        For lOccur As Integer = lFirstOccur To lLastOccur
+            If lOccur = 1 Then
+                lTableName = pDef.Name
             Else
-                tname = pDef.Name & ":" & i
+                lSB.AppendLine(" ")
+                lTableName = pDef.Name & ":" & lOccur
             End If
-            PrintLine(f, "  " & pDef.Name)
+            lSB.AppendLine("  " & pDef.Name)
 
-            pFlg = False
-            firstopn = True
-            For j = 1 To pOpn.OpnBlk.Ids.Count()
+            Dim lPendingFlag As Boolean = False
+            Dim lFirstOpn As Boolean = True
+            Dim lOutPend As String = Nothing 'pending record?
+            For lOperIndex As Integer = 1 To pOpn.OpnBlk.Ids.Count()
                 On Error GoTo noTableForThisOper
-                lOpn = pOpn.OpnBlk.NthOper(j)
+                Dim lOpn As HspfOperation = pOpn.OpnBlk.NthOper(lOperIndex)
                 'write values here
                 If Err.Number Then Resume
-                If Not (lOpn.TableExists(tname)) Then
+                If Not (lOpn.TableExists(lTableName)) Then
                     'no Table for this Operation
                 Else
-                    lTable = lOpn.Tables.Item(tname)
-                    s = myFormatI((lOpn.Id), 5) & Space(5)
-                    For Each lParm In lTable.Parms
+                    Dim lTable As HspfTable = lOpn.Tables.Item(lTableName)
+                    Dim lOutRec As String = myFormatI((lOpn.Id), 5) & Space(5)
+                    Dim lOutValue As String
+                    For Each lParm As HspfParm In lTable.Parms
                         With lParm
-                            tempValue = lParm.Value
-                            s = s & Space(.Def.StartCol - Len(s) - 1) 'pad prev field
+                            Dim lValue As String = lParm.Value
+                            lOutRec = lOutRec & Space(.Def.StartCol - lOutRec.Length - 1) 'pad prev field
                             If .Def.Typ = 0 Then ' ATCoTxt 'left justify strings
-                                If .Def.Length < Len(tempValue) Then
-                                    tempValue = Left(tempValue, .Def.Length)
+                                If .Def.Length < lValue.Length Then
+                                    lValue = Left(lValue, .Def.Length)
                                 End If
-                                t = LTrim(tempValue)
+                                lOutValue = LTrim(lValue)
                             Else
                                 'not a string
                                 'compare format of this value with the format as read
-                                If NumericallyTheSame(.ValueAsRead, tempValue, .Def.DefaultValue) Then
+                                If NumericallyTheSame(.ValueAsRead, lValue, .Def.DefaultValue) Then
                                     'use the value as read
-                                    t = .ValueAsRead
+                                    lOutValue = .ValueAsRead
                                 Else
                                     'right justify everything else
-                                    t = Space(.Def.Length)
-                                    If Len(tempValue) > .Def.Length Then
-                                        r = CSng(tempValue)
-                                        If (Len(CStr(r)) = .Def.Length + 1) And tempValue < CStr(1.0#) Then
+                                    lOutValue = Space(.Def.Length)
+                                    If lValue.Length > .Def.Length Then
+                                        Dim r As Single = CSng(lValue)
+                                        If (Len(CStr(r)) = .Def.Length + 1) And lValue < CStr(1.0#) Then
                                             'just leave off leading zero
-                                            t = RSet(Mid(CStr(r), 2), Len(t))
+                                            lOutValue = RSet(Mid(CStr(r), 2), Len(lOutValue))
                                         Else
-                                            t = RSet(NumFmtRE(CSng(tempValue), .Def.Length), Len(t))
+                                            lOutValue = RSet(NumFmtRE(CSng(lValue), .Def.Length), Len(lOutValue))
                                         End If
                                     Else
-                                        t = RSet(CStr(tempValue), Len(t))
+                                        lOutValue = RSet(CStr(lValue), Len(lOutValue))
                                     End If
                                 End If
                             End If
                         End With
-                        s = s & t
+                        lOutRec &= lOutValue
                     Next lParm
                     If lTable.SuppID > 0 Then 'include supplemental file ID for this record
-                        SuppStr = "~" & lTable.SuppID & "~"
-                        s = Left(s, 10) & SuppStr & Mid(s, 11 + Len(SuppStr))
+                        Dim lSuppStr As String = "~" & lTable.SuppID & "~"
+                        lOutRec = Left(lOutRec, 10) & lSuppStr & Mid(lOutRec, 11 + lSuppStr.Length)
                     End If
-                    If pFlg Then
-                        If compareTableString(1, 10, p, s) And lTable.CombineOK Then
-                            s = Left(p, 5) & Left(s, 5) & Right(s, Len(s) - 10)
+                    If lPendingFlag Then
+                        If compareTableString(1, 10, lOutPend, lOutRec) And lTable.CombineOK Then
+                            lOutRec = Left(lOutPend, 5) & Left(lOutRec, 5) & Right(lOutRec, lOutRec.Length - 10)
                         Else
-                            ilen = Len(p)
-                            If ilen > 80 Then
+                            If lOutPend.Length > 80 Then
                                 'this is a multi line table
-                                If tname = "REPORT-CON" Then 'special case for this table
-                                    icon = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
-                                    p = Mid(p, 1, 10 + (icon * 70))
+                                If lTableName = "REPORT-CON" Then 'special case for this table
+                                    Dim lNCon As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
+                                    lOutPend = Mid(lOutPend, 1, 10 + (lNCon * 70))
                                 End If
-                                Call PrintMultiLine(f, p)
+                                lSB.AppendLine(lOutPend)
                             Else
-                                PrintLine(f, p)
-                                If Len(lTable.Comment) > 0 Then 'an comment associated with this operation
-                                    PrintLine(f, lTable.Comment)
+                                lSB.AppendLine(lOutPend)
+                                If Not lTable.Comment Is Nothing AndAlso lTable.Comment.Length > 0 Then
+                                    'an comment associated with this operation
+                                    lSB.AppendLine(lTable.Comment)
                                 End If
                             End If
                         End If
                     End If
-                    pFlg = True
-                    If firstopn Then
-                        If Len(lOpn.Tables.Item(tname).Comment) > 0 Then 'an associated comment
-                            PrintLine(f, lOpn.Tables.Item(tname).Comment) 'pbd
+                    lPendingFlag = True
+                    If lFirstOpn Then
+                        If lOpn.Tables.Item(lTableName).Comment.Length > 0 Then 'an associated comment
+                            lSB.AppendLine(lOpn.Tables.Item(lTableName).Comment) 'pbd
                         Else
-                            If units = 1 Then
-                                PrintLine(f, pDef.HeaderE)
+                            If Me.Opn.OpnBlk.Uci.GlobalBlock.emfg = 1 Then
+                                lSB.AppendLine(pDef.HeaderE)
                             Else
-                                PrintLine(f, pDef.HeaderM)
+                                lSB.AppendLine(pDef.HeaderM)
                             End If
                         End If
-                        firstopn = False
+                        lFirstOpn = False
                     End If
-                    p = s
+                    lOutPend = lOutRec
                     GoTo notMissingTableForThisOper
                 End If
 noTableForThisOper:
-                If pFlg Then 'record pending
-                    ilen = Len(p)
-                    If ilen > 80 Then
+                If lPendingFlag Then 'record pending
+                    If lOutPend.Length > 80 Then
                         'this is a multi line table
-                        If tname = "REPORT-CON" Then 'special case for this table
-                            icon = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
-                            p = Mid(p, 1, 10 + (icon * 70))
+                        If lTableName = "REPORT-CON" Then 'special case for this table
+                            Dim lNCon As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
+                            lOutPend = Mid(lOutPend, 1, 10 + (lNCon * 70))
                         End If
-                        Call PrintMultiLine(f, p)
+                        PrintMultiLine(lSB, lOutPend)
                     Else
-                        PrintLine(f, p)
+                        lSB.AppendLine(lOutPend)
                     End If
-                    pFlg = False
+                    lPendingFlag = False
                 End If
 notMissingTableForThisOper:
-            Next j
-            If pFlg Then 'record pending
-                ilen = Len(p)
-                If ilen > 80 Then
+            Next lOperIndex
+            If lPendingFlag Then 'record pending
+                If lOutPend.Length > 80 Then
                     'this is a multi line table
-                    If tname = "REPORT-CON" Then 'special case for this table
-                        icon = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
-                        p = Mid(p, 1, 10 + (icon * 70))
+                    If lTableName = "REPORT-CON" Then 'special case for this table
+                        Dim lNCon As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
+                        lOutPend = Mid(lOutPend, 1, 10 + (lNCon * 70))
                     End If
-                    Call PrintMultiLine(f, p)
+                    PrintMultiLine(lSB, lOutPend)
                 Else
-                    PrintLine(f, p)
+                    lSB.AppendLine(lOutPend)
                 End If
             End If
-            PrintLine(f, "  END " & pDef.Name & vbCrLf)
-        Next i
-    End Sub
+            lSB.AppendLine("  END " & pDef.Name)
+        Next lOccur
+        Return lSB.ToString
+    End Function
 
     Public Sub New()
         MyBase.New()
@@ -394,30 +388,31 @@ notMissingTableForThisOper:
         pCombineOK = True
     End Sub
 
-    Private Sub PrintMultiLine(ByRef f As Short, ByRef p As String)
-        Dim n, ilen, nlines, nchar As Integer
-        Dim t As String
+    Private Sub PrintMultiLine(ByRef aSB As StringBuilder, ByRef aOutPend As String)
+        aSB.AppendLine(aOutPend.Substring(0, 80)) 'first line
 
-        ilen = Len(p)
-        PrintLine(f, Mid(p, 1, 80))
-        nlines = (ilen - 10) / 70
-        If nlines > 3 Then 'make sure something in remaining lines
-            p = RTrim(p)
-            ilen = Len(p)
-            nlines = (ilen - 10) / 70
-        End If
+        Dim lLen As Integer = aOutPend.Length
+        Dim lNLinesMore As Integer = ((lLen - 10) / 70) - 1
+        'If lNLinesMore > 3 Then 'make sure something in remaining lines
+        '    lNLinesMore = aOutPend.TrimEnd
+        '    lLen = aOutPend.Length
+        '    lNLinesMore = (lLen - 10) / 70
+        'End If
 
-        For n = 1 To nlines
-            If n = nlines Then
-                nchar = ilen - (n * 70) - 10
+        Dim lNChar As Integer
+        For lLineIndex As Integer = 1 To lNLinesMore
+            If lLineIndex = lNLinesMore Then
+                lNChar = lLen - (lLineIndex * 70) - 10
             Else
-                nchar = 70
+                lNChar = 70
             End If
-            If nchar > 0 Then
-                t = Mid(p, 1, 10) & Mid(p, (n * 70) + 11, nchar)
-                PrintLine(f, t)
+            If lNChar > 0 Then
+                Dim lOutRec As String
+                lOutRec = aOutPend.Substring(0, 10) & _
+                          aOutPend.Substring((lLineIndex * 70) + 10, lNChar)
+                aSB.AppendLine(lOutRec)
             End If
-        Next n
+        Next lLineIndex
     End Sub
 
     Public Sub SetQualIndex(ByRef noccur As Integer, ByRef Nqual As Integer)

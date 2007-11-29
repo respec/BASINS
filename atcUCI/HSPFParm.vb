@@ -4,8 +4,7 @@ Option Explicit On
 ''' A model parameter value.
 ''' </summary>
 ''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
-<System.Runtime.InteropServices.ProgId("HSPFParm_NET.HSPFParm")> Public Class HSPFParm
-
+Public Class HspfParm
     Private pValue As String
     Private pValueAsRead As String
     Private pDef As HSPFParmDef

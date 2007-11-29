@@ -16,10 +16,11 @@ Module HSPFOutputReports
 
     Private Sub Initialize()
         pOutputLocations.Clear()
+        Dim lTestName As String = "hspf"
         'Dim lTestName As String = "hyd_man"
         'Dim lTestName As String = "calleguas_cat"
         'Dim lTestName As String = "calleguas_nocat"
-        Dim lTestName As String = "SantaClara"
+        'Dim lTestName As String = "SantaClara"
         Select Case lTestName
             Case "calleguas_cat"
                 pTestPath = "D:\MountainViewData\Calleguas\cat"
@@ -38,6 +39,9 @@ Module HSPFOutputReports
                 pBaseName = "hyd_man"
                 pOutputLocations.Add("R:5")
                 pOutputLocations.Add("R:4")
+            Case "hspf"
+                pTestPath = "C:\test\HSPF"
+                pBaseName = "test10"
             Case "SantaClara"
                 pTestPath = "D:\MountainViewData\SantaClara\nocat"
                 pBaseName = "SCR10"
@@ -52,12 +56,16 @@ Module HSPFOutputReports
     Public Sub ScriptMain(ByRef aMapWin As IMapWin)
         Initialize()
         ChDriveDir(pTestPath)
+        If FileExists(pBaseName & "Orig.uci") Then
+            FileCopy(pBaseName & "Orig.uci", pBaseName & ".uci")
+        End If
 
         'open uci file
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.mdb")
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.FastReadUciForStarter(lMsg, pBaseName & ".uci")
+        lHspfUci.Save()
 
         'open WDM file
         Dim lWdmFileName As String = pTestPath & "\" & pBaseName & ".wdm"

@@ -1,12 +1,12 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
+Imports System.Text
+Imports System.Collections.ObjectModel
 Imports atcUtility
 
-<System.Runtime.InteropServices.ProgId("HspfUci_NET.HspfUci")> _
 Public Class HspfUci
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
     Declare Function GetCurrentProcessId Lib "kernel32" () As Integer
 
     Private pMsgWDMName As String
@@ -19,12 +19,12 @@ Public Class HspfUci
     Private pGlobalBlk As HspfGlobalBlk
     Private pFilesBlk As HspfFilesBlk
     Private pOpnSeqBlk As HspfOpnSeqBlk
-    Private pOpnBlks As Collection 'of HspfOpnBlk
-    Private pConnections As Collection 'of HspfConnection
-    Private pMassLinks As Collection 'of HspfMasslink
-    Private pMetSegs As Collection 'of HspfMetSeg
-    Private pPointSources As Collection 'of HspfPoint
-    Private pPollutants As Collection 'of HspfPollutant
+    Private pOpnBlks As HspfOpnBlks
+    Private pConnections As Collection(Of HspfConnection)
+    Private pMassLinks As Collection(Of HspfMassLink)
+    Private pMetSegs As Collection(Of HspfMetSeg)
+    Private pPointSources As Collection(Of HspfPoint)
+    Private pPollutants As Collection(Of HspfPollutant)
     Private pMonthData As HspfMonthData
     Private pErrorDescription As String
     Private pEdited As Boolean
@@ -42,14 +42,14 @@ Public Class HspfUci
     Private pIcon As System.Drawing.Image
 
     Private pIPC As Object 'ATCoCtl.ATCoIPC
-    Private IPCset As Boolean
+    Private pIPCset As Boolean
 
     Public Sub SendHspfMessage(ByVal aMessage As String)
-        If IPCset Then pIPC.SendProcessMessage("HSPFUCI", aMessage)
+        If pIPCset Then pIPC.SendProcessMessage("HSPFUCI", aMessage)
     End Sub
 
     Public Sub SendMonitorMessage(ByVal aMessage As String)
-        If IPCset Then pIPC.SendMonitorMessage(aMessage)
+        If pIPCset Then pIPC.SendMonitorMessage(aMessage)
     End Sub
 
     'Public Property IPC() As Object
@@ -79,7 +79,6 @@ Public Class HspfUci
     '	End Set
     'End Property
 
-
     Public Property Edited() As Boolean
         Get
             Edited = pEdited
@@ -89,7 +88,6 @@ Public Class HspfUci
         End Set
     End Property
 
-
     Public Property FastFlag() As Boolean
         Get
             FastFlag = pFastFlag
@@ -98,7 +96,6 @@ Public Class HspfUci
             pFastFlag = Value
         End Set
     End Property
-
 
     Public Property AcidphFlag() As Boolean
         Get
@@ -205,61 +202,40 @@ Public Class HspfUci
         End Set
     End Property
 
-    Public Property Connections() As Collection
-        Get 'of HspfConnection
+    Public ReadOnly Property Connections() As Collection(Of HspfConnection)
+        Get
             Connections = pConnections
         End Get
-        Set(ByVal Value As Collection) 'of HspfConnection
-            Dim lConnection As HspfConnection
-            Dim vConn As Object
-            For Each vConn In Value
-                lConnection = vConn
-                pConnections.Add(lConnection)
-            Next vConn
-        End Set
     End Property
 
-    Public ReadOnly Property MetSegs() As Collection
-        Get 'of HSPFMetSeg
+    Public ReadOnly Property MetSegs() As Collection(Of HspfMetSeg)
+        Get
             MetSegs = pMetSegs
         End Get
     End Property
 
-    Public ReadOnly Property PointSources() As Collection
-        Get 'of HSPFPoint
+    Public ReadOnly Property PointSources() As Collection(Of HspfPoint)
+        Get
             PointSources = pPointSources
         End Get
     End Property
 
-    Public ReadOnly Property Pollutants() As Collection
-        Get 'of HSPFPollutant
+    Public ReadOnly Property Pollutants() As Collection(Of HspfPollutant)
+        Get
             Pollutants = pPollutants
         End Get
     End Property
 
-    Public Property MassLinks() As Collection
-        Get 'of HspfMassLinks
+    Public ReadOnly Property MassLinks() As Collection(Of HspfMassLink)
+        Get
             MassLinks = pMassLinks
         End Get
-        Set(ByVal Value As Collection) 'of HspfMassLinks
-            Dim lMassLink As HspfMassLink
-            Dim vMassLink As Object
-            For Each vMassLink In Value
-                lMassLink = vMassLink
-                pMassLinks.Add(lMassLink)
-            Next vMassLink
-        End Set
     End Property
 
-    Public Property OpnBlks() As Collection 'of HspfOpnBlk
+    Public ReadOnly Property OpnBlks() As KeyedCollection(Of String, HspfOpnBlk)
         Get
             OpnBlks = pOpnBlks
         End Get
-        Set(ByVal Value As Collection) 'of HspfOpnBlk
-            For Each lopnblk As HspfOpnBlk In Value
-                pOpnBlks.Add(lopnblk, lopnblk.Name)
-            Next
-        End Set
     End Property
 
     Public Property Name() As String
@@ -302,7 +278,6 @@ Public Class HspfUci
         End Set
     End Property
 
-
     Public Property MaxAreaByLand2Stream() As Double
         Get
             If pMaxAreaByLand2Stream = 0 Then
@@ -324,70 +299,70 @@ Public Class HspfUci
         End Set
     End Property
 
-    Public Sub Save()
-        Dim f As Short
-        Dim lopnblk As HspfOpnBlk
-        'Dim i As Integer
-
-        f = FreeFile()
-        FileOpen(f, pName, OpenMode.Output)
-
-        PrintLine(f, "RUN")
+    Public Overrides Function ToString() As String
+        Dim lSB As New StringBuilder
+        lSB.AppendLine("RUN")
 
         For Each lBlock As String In pOrder
+            Dim lStr As String = ""
             Select Case lBlock
                 Case "GLOBAL"
-                    pGlobalBlk.WriteUciFile((f))
+                    lStr = pGlobalBlk.ToString
                 Case "FILES"
-                    pFilesBlk.WriteUciFile((f))
+                    lStr = pFilesBlk.ToString
                 Case "CATEGORY"
-                    If Not pCategoryBlk Is Nothing Then
-                        If pCategoryBlk.Count > 0 Then
-                            pCategoryBlk.WriteUciFile((f))
-                        End If
+                    If Not pCategoryBlk Is Nothing AndAlso pCategoryBlk.Count > 0 Then
+                        lStr = pCategoryBlk.ToString
                     End If
                 Case "OPN SEQUENCE"
-                    pOpnSeqBlk.WriteUciFile((f))
+                    lStr = pOpnSeqBlk.ToString
                 Case "MONTH DATA"
                     If Not pMonthData Is Nothing Then
-                        pMonthData.WriteUciFile((f))
+                        lStr = pMonthData.ToString
                     End If
                 Case "FTABLES"
-                    lopnblk = OpnBlks.Item("RCHRES")
-                    If lopnblk.Count > 0 Then
-                        lopnblk.Ids.Item(1).FTable.WriteUciFile(f)
+                    Dim lOpnBlk As HspfOpnBlk = OpnBlks.Item("RCHRES")
+                    If lOpnBlk.Count > 0 Then
+                        lStr = lOpnBlk.Ids.Item(1).FTable.ToString
                     End If
                 Case "PERLND", "IMPLND", "RCHRES", "COPY", "PLTGEN", "DISPLY", _
                      "DURANL", "GENER", "MUTSIN", "BMPRAC", "REPORT"
-                    lopnblk = OpnBlks.Item(lBlock)
-                    If lopnblk.Count > 0 Then
-                        lopnblk.WriteUciFile(f, pMsg)
+                    Dim lOpnBlk As HspfOpnBlk = OpnBlks.Item(lBlock)
+                    If lOpnBlk.Count > 0 Then
+                        lStr = lOpnBlk.ToString
                     End If
                 Case "CONNECTIONS"
-                    If pConnections.Count() > 0 Then
-                        pConnections.Item(1).WriteUciFile(f, pMsg)
+                    If pConnections.Count > 0 Then
+                        lStr = pConnections.Item(0).ToString
                     End If
                 Case "MASSLINKS"
-                    If pMassLinks.Count() > 0 Then
-                        pMassLinks.Item(1).writeMassLinks(f, pMsg)
+                    If pMassLinks.Count > 0 Then
+                        lStr = pMassLinks.Item(0).ToString
                     End If
                 Case "SPECIAL ACTIONS"
                     If Not pSpecialActionBlk Is Nothing Then
-                        pSpecialActionBlk.WriteUciFile((f))
+                        lStr = pSpecialActionBlk.ToString
                     End If
             End Select
+            If lStr.Length > 0 Then
+                lSB.AppendLine(lStr)
+            End If
         Next
+        lSB.AppendLine("END RUN")
 
-        PrintLine(f, " ")
-        PrintLine(f, "END RUN")
-        FileClose(f)
+        Return lSB.ToString
+    End Function
+
+    Public Sub Save()
+        IO.File.WriteAllText(pName, Me.ToString)
         pEdited = False
     End Sub
 
-    Public Sub SaveAs(ByRef oldname As String, ByRef newName As String, ByRef basedsn As Integer, ByRef relabs As Integer)
-        If oldname <> newName Then
-            Call pFilesBlk.newName(oldname, newName)
-            Call newOutputDsns(oldname, newName, basedsn, relabs)
+    Public Sub SaveAs(ByRef aOldName As String, ByRef aNewName As String, _
+                      ByRef aBaseDsn As Integer, ByRef aRelAbs As Integer)
+        If aOldName <> aNewName Then
+            Call pFilesBlk.newName(aOldName, aNewName)
+            Call newOutputDsns(aOldName, aNewName, aBaseDsn, aRelAbs)
         End If
         Call Save()
     End Sub
@@ -404,36 +379,14 @@ Public Class HspfUci
         'init others as appropriate
 
         pMsg = Nothing
-        pConnections = New Collection
-        pOpnBlks = New Collection
-        pMetSegs = New Collection
-        pPointSources = New Collection
-        pMassLinks = New Collection
-        pPollutants = New Collection
+        pConnections = New Collection(Of HspfConnection)
+        pOpnBlks = New HspfOpnBlks
+        pMetSegs = New Collection(Of HspfMetSeg)
+        pPointSources = New Collection(Of HspfPoint)
+        pMassLinks = New Collection(Of HspfMassLink)
+        pPollutants = New Collection(Of HspfPollutant)
 
-        pOrder = New ArrayList(20)
-        With pOrder
-            .Add("GLOBAL")
-            .Add("FILES")
-            .Add("OPN SEQUENCE")
-            .Add("MONTH DATA")
-            .Add("CATEGORY")
-            .Add("PERLND")
-            .Add("IMPLND")
-            .Add("RCHRES")
-            .Add("FTABLES")
-            .Add("COPY")
-            .Add("PLTGEN")
-            .Add("DISPLY")
-            .Add("DURANL")
-            .Add("GENER")
-            .Add("MUTSIN")
-            .Add("BMPRAC")
-            .Add("REPORT")
-            .Add("CONNECTIONS")
-            .Add("MASSLINKS")
-            .Add("SPECIAL ACTIONS")
-        End With
+        DefaultBlockOrder(pOrder)
     End Sub
 
     'Public Sub CreateUci(ByRef M As HspfMsg, ByRef newName As String, ByRef outputwdm As String, ByRef metwdms() As String, ByRef wdmids() As String, ByRef MetDataDetails As String, ByRef oneseg As Boolean, ByRef PollutantList As Collection)
@@ -442,73 +395,66 @@ Public Class HspfUci
     '    Call CreateUciFromBASINS(Me, M, newName, outputwdm, metwdms, wdmids, MetDataDetails, oneseg, PollutantList)
     'End Sub
 
-    Public Sub FastReadUciForStarter(ByRef Msg As HspfMsg, ByRef newName As String)
-        Dim FilesOK As Boolean
-        Dim FullFg As Integer
-        Dim EchoFile As String = ""
+    Public Sub FastReadUciForStarter(ByRef aMsg As HspfMsg, ByRef aNewName As String)
+        Dim lFilesOK As Boolean
+        Dim lFullFg As Integer
+        Dim lEchoFile As String = ""
 
         pFastFlag = True
-        FullFg = -1
-        ReadUci(Msg, newName, FullFg, FilesOK, EchoFile)
+        lFullFg = -1
+        ReadUci(aMsg, aNewName, lFullFg, lFilesOK, lEchoFile)
         pFastFlag = False
     End Sub
 
-    Public Sub FastReadUci(ByRef Msg As HspfMsg, ByRef newName As String)
+    Public Sub FastReadUci(ByRef aMsg As HspfMsg, ByRef aNewName As String)
         'called by scripthspf, processes wdm files
-        Dim FilesOK As Boolean
-        Dim FullFg As Integer
-        Dim EchoFile As String = ""
+        Dim lFilesOK As Boolean
+        Dim lFullFg As Integer
+        Dim lEchoFile As String = ""
 
         pFastFlag = True
-        FullFg = -3
-        ReadUci(Msg, newName, FullFg, FilesOK, EchoFile)
+        lFullFg = -3
+        ReadUci(aMsg, aNewName, lFullFg, lFilesOK, lEchoFile)
         pFastFlag = False
     End Sub
 
     ''' <summary>
     ''' Read UCI file into this class
     ''' </summary>
-    ''' <param name="Msg">HspfMsg file object</param>
-    ''' <param name="newName">File to read</param>
-    ''' <param name="FullFg">-3 = , -1 = starter</param>
-    ''' <param name="FilesOK">gets set to True if files are ok, false if not</param>
-    ''' <param name="EchoFile"></param>
+    ''' <param name="aMsg">HspfMsg file object</param>
+    ''' <param name="aNewName">File to read</param>
+    ''' <param name="aFullFg">-3 = , -1 = starter</param>
+    ''' <param name="aFilesOK">gets set to True if files are ok, false if not</param>
+    ''' <param name="aEchoFile"></param>
     ''' <remarks></remarks>
-    Public Sub ReadUci(ByRef Msg As HspfMsg, _
-                       ByRef newName As String, _
-                       ByRef FullFg As Integer, _
-                       ByRef FilesOK As Boolean, _
-                       ByRef EchoFile As String)
-        Dim i As Integer
-        Dim M, s As String
-        Dim lOpn As HspfOperation
-        Dim lopnblk As HspfOpnBlk
-        Dim lOpnName As String
-        Dim lConnection As HspfConnection
-        Dim lMassLink As HspfMassLink
-
+    Public Sub ReadUci(ByRef aMsg As HspfMsg, _
+                       ByRef aNewName As String, _
+                       ByRef aFullFg As Integer, _
+                       ByRef aFilesOK As Boolean, _
+                       ByRef aEchoFile As String)
         'On Error Resume Next
+        pMsg = aMsg
+        aFilesOK = True
 
-        pMsg = Msg
-        FilesOK = True
-        If Not IO.File.Exists(newName) Then
-            pErrorDescription = "UciFileName '" & newName & "' not found"
+        If Not IO.File.Exists(aNewName) Then
+            pErrorDescription = "UciFileName '" & aNewName & "' not found"
         Else
-            pName = newName
-            If FullFg <> -1 Then 'not doing starter, process wdm files
-                PreScanFilesBlock(pName, FilesOK, EchoFile)
-                EchoFile = Trim(EchoFile)
+            pName = aNewName
+            If aFullFg <> -1 Then 'not doing starter, process wdm files
+                PreScanFilesBlock(pName, aFilesOK, aEchoFile)
+                aEchoFile = aEchoFile.Trim
             End If
-            If FilesOK Then
-                s = FilenameOnly(pName)
+            If aFilesOK Then
+                Dim lName As String = FilenameOnly(pName)
                 's = Left(s, Len(s) - 4)
                 'Call F90_SPIPH(pStatusIn, pStatusOut)
                 'set debug level
                 'Call F90_SCNDBG(0)
-                If FullFg = -3 Then
-                    i = FullFg
+                Dim lFlag As Integer
+                If aFullFg = -3 Then
+                    lFlag = aFullFg
                 Else
-                    i = -2 'flag as coming from hspf class for status title
+                    lFlag = -2 'flag as coming from hspf class for status title
                 End If
 
                 If pFastFlag Then
@@ -517,14 +463,16 @@ Public Class HspfUci
                 Else
                     'do normal activate of uci, including running the run interpreter
                     SendHspfMessage("CURDIR " & CurDir())
-                    SendHspfMessage("ACTIVATE " & s & " " & i)
+                    SendHspfMessage("ACTIVATE " & lName & " " & lFlag)
                     'IPC.SendProcessMessage "HSPFUCI", "ACTIVATE " & s & " " & -1   'should not run interpret
                     'Call F90_ACTSCN(i, pWdmUnit(1), pMsgUnit, r, s, Len(s))
-                    M = WaitForChildMessage()
-                    If Left(M, 6) = "CURDIR" Then M = WaitForChildMessage()
-                    If CDbl(Right(M, 1)) <> 0 Or Left(M, 24) = "HSPFUCI exited with code" Then
-                        'would be helpful to include m here
-                        pErrorDescription = "Error interpreting UCI File '" & s & "'." & vbCrLf & vbCrLf & "See the file '" & Trim(EchoFile) & "' for more details." '& vbCrLf & vbCrLf & M
+                    Dim lMsg As String = WaitForChildMessage()
+                    If lMsg.StartsWith("CURDIR") Then
+                        lMsg = WaitForChildMessage()
+                    End If
+                    If CDbl(Right(lMsg, 1)) <> 0 Or Left(lMsg, 24) = "HSPFUCI exited with code" Then
+                        'would be helpful to include lMsg here
+                        pErrorDescription = "Error interpreting UCI File '" & lName & "'." & vbCrLf & vbCrLf & "See the file '" & aEchoFile.Trim & "' for more details." '& vbCrLf & vbCrLf & M
                         SendMonitorMessage(pErrorDescription)
                     End If
                     'also do fast read -- this would be a very significant performance improvement
@@ -534,7 +482,7 @@ Public Class HspfUci
 
                 pInitialized = True
 
-                If IPCset Then
+                If pIPCset Then
                     SendMonitorMessage("(Show)") 'where was the hide?
                     If Not pFastFlag Then
                         SendMonitorMessage("(Msg1 Building Collections)")
@@ -565,30 +513,30 @@ Public Class HspfUci
                 pOpnSeqBlk.Uci = Me
                 pOpnSeqBlk.ReadUciFile()
 
-                pOpnBlks = Nothing
-                pOpnBlks = New Collection
-                i = 1
-                lOpnName = HspfOperName(i)
+                pOpnBlks.Clear()
+                Dim lOperIndex As Integer = 1
+                Dim lOpnName As String = HspfOperName(lOperIndex)
+                Dim lOpnblk As HspfOpnBlk
                 While lOpnName <> "UNKNOWN"
-                    lopnblk = New HspfOpnBlk
-                    lopnblk.Name = lOpnName
-                    lopnblk.Uci = Me
-                    pOpnBlks.Add(lopnblk, lOpnName)
-                    i = i + 1
-                    lOpnName = HspfOperName(i)
+                    lOpnblk = New HspfOpnBlk
+                    lOpnblk.Name = lOpnName
+                    lOpnblk.Uci = Me
+                    pOpnBlks.Add(lOpnblk)
+                    lOperIndex += 1
+                    lOpnName = HspfOperName(lOperIndex)
                 End While
-                For Each lOpn In pOpnSeqBlk.Opns
-                    lopnblk = pOpnBlks.Item(lOpn.Name)
-                    lopnblk.Ids.Add(lOpn, "K" & lOpn.Id)
-                    lOpn.OpnBlk = lopnblk
+                For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
+                    lOpnblk = pOpnBlks.Item(lOpn.Name)
+                    lOpnblk.Ids.Add(lOpn, "K" & lOpn.Id)
+                    lOpn.OpnBlk = lOpnblk
                 Next
 
-                For Each lopnblk In pOpnBlks 'perlnd, implnd, etc
-                    If lopnblk.Count > 0 Then
+                For Each lOpnblk In pOpnBlks 'perlnd, implnd, etc
+                    If lOpnblk.Count > 0 Then
                         If Not pFastFlag Then
-                            SendMonitorMessage("(MSG2 Setting table values for " & lopnblk.Name & ")")
+                            SendMonitorMessage("(MSG2 Setting table values for " & lOpnblk.Name & ")")
                         End If
-                        lopnblk.setTableValues(Msg.BlockDefs.Item(lopnblk.Name))
+                        lOpnblk.setTableValues(Msg.BlockDefs.Item(lOpnblk.Name))
                     End If
                 Next
 
@@ -605,30 +553,29 @@ Public Class HspfUci
                     SendMonitorMessage("(MSG2 Processing Connections)")
                 End If
                 pConnections = Nothing
-                pConnections = New Collection
-                lConnection = New HspfConnection 'dummy to get entry point
+                pConnections = New Collection(Of HspfConnection)
+                Dim lConnection As New HspfConnection 'dummy to get entry point
                 lConnection.readTimSer(Me)
                 lConnection = Nothing
-                For Each lOpn In pOpnSeqBlk.Opns
+                For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
                     lOpn.setTimSerConnections()
                 Next
 
-                pMassLinks = Nothing
-                pMassLinks = New Collection
-                lMassLink = New HspfMassLink
+                pMassLinks.Clear()
+                Dim lMassLink As New HspfMassLink
                 lMassLink.readMassLinks(Me)
 
                 'look for met segments
-                If Not pFastFlag And IPCset Then
+                If Not pFastFlag And pIPCset Then
                     SendMonitorMessage("(MSG2 Processing Met Segments)")
                 End If
                 Source2MetSeg()
                 'look for point loads
-                If Not pFastFlag And IPCset Then
+                If Not pFastFlag And pIPCset Then
                     SendMonitorMessage("(MSG2 Processing Point Sources)")
                 End If
                 Source2Point()
-                If IPCset Then SendMonitorMessage("(Hide)")
+                If pIPCset Then SendMonitorMessage("(Hide)")
 
             End If
         End If
@@ -673,249 +620,211 @@ Public Class HspfUci
     End Sub
 
     Public Sub Source2MetSeg()
-        Dim lOpn As HspfOperation
-        Dim vOpTyp As String
-        Dim lConn As HspfConnection
-        Dim j As Integer
-        Dim Comment As String
-        Dim tMetSeg As HspfMetSeg
-        Dim vMetSeg As HspfMetSeg
-        Dim newSeg As Boolean
-        Dim wdmid As String
-        Dim idsn As Integer
-        Dim isdat(6) As Integer
-        Dim iedat(6) As Integer
         Static lOpTypes() As String = {"PERLND", "IMPLND", "RCHRES"}
-
-        For Each vOpTyp In lOpTypes
-            For Each lOpn In pOpnBlks.Item(vOpTyp).Ids
-                tMetSeg = New HspfMetSeg 'init moved here
-                tMetSeg.Uci = Me
-                Comment = ""
-                j = 1
-                Do While j <= lOpn.Sources.Count()
-                    lConn = lOpn.Sources.Item(j)
-                    If lConn.Typ = 1 Then
-                        If tMetSeg.Add(lConn) Then
-                            lOpn.Sources.Remove(j)
-                            If Len(Comment) = 0 Then
-                                Comment = lConn.Comment
+        Dim lMetSeg As HspfMetSeg
+        For Each lOpTyp As String In lOpTypes
+            For Each lOperation As HspfOperation In pOpnBlks.Item(lOpTyp).Ids
+                lMetSeg = New HspfMetSeg 'init moved here
+                lMetSeg.Uci = Me
+                Dim lComment As String = ""
+                Dim lSourceIndex As Integer = 1
+                Do While lSourceIndex <= lOperation.Sources.Count()
+                    Dim lConnection As HspfConnection = lOperation.Sources.Item(lSourceIndex)
+                    If lConnection.Typ = 1 Then
+                        If lMetSeg.Add(lConnection) Then
+                            lOperation.Sources.Remove(lSourceIndex)
+                            If Len(lComment) = 0 Then
+                                lComment = lConnection.Comment
                             End If
                         Else
-                            j = j + 1
+                            lSourceIndex += 1
                         End If
                     Else
-                        j = j + 1
+                        lSourceIndex += 1
                     End If
                 Loop
 
                 'check to see if we already have this met segment
-                newSeg = True
+                Dim lNewSeg As Boolean = True
                 If pMetSegs.Count() > 0 Then
-                    For Each vMetSeg In pMetSegs
-                        If vMetSeg.Compare(tMetSeg, lOpn.Name) Then
-                            newSeg = False
-                            If lOpn.Name = "RCHRES" Then
+                    For Each lMetSegExisting As HspfMetSeg In pMetSegs
+                        If lMetSegExisting.Compare(lMetSeg, lOperation.Name) Then
+                            lNewSeg = False
+                            If lOperation.Name = "RCHRES" Then
                                 'may need to update met seg
-                                vMetSeg.UpdateMetSeg(tMetSeg)
+                                lMetSegExisting.UpdateMetSeg(lMetSeg)
                             End If
-                            lOpn.MetSeg = vMetSeg
+                            lOperation.MetSeg = lMetSegExisting
                             Exit For
                         End If
-                    Next vMetSeg
+                    Next lMetSegExisting
                 End If
 
-                If newSeg Then
-                    tMetSeg.Id = pMetSegs.Count() + 1
+                If lNewSeg Then
+                    lMetSeg.Id = pMetSegs.Count() + 1
                     'get met seg name from precip data set
-                    idsn = tMetSeg.MetSegRec(1).Source.VolId
-                    If idsn > 0 Then
-                        wdmid = tMetSeg.MetSegRec(1).Source.VolName
+                    Dim lDsn As Integer = lMetSeg.MetSegRec(1).Source.VolId
+                    If lDsn > 0 Then
+                        Dim lWdmId As String = lMetSeg.MetSegRec(1).Source.VolName
                         If pWdmCount > 0 Then
-                            tMetSeg.ExpandMetSegName(wdmid, idsn)
+                            lMetSeg.ExpandMetSegName(lWdmId, lDsn)
                         Else
-                            If Len(Comment) > 13 Then
-                                tMetSeg.Name = Mid(Comment, 13)
+                            If lComment.Length > 13 Then
+                                lMetSeg.Name = Mid(lComment, 13)
                             Else
-                                tMetSeg.Name = Comment
+                                lMetSeg.Name = lComment
                             End If
                         End If
-                        pMetSegs.Add(tMetSeg)
-                        lOpn.MetSeg = tMetSeg
+                        pMetSegs.Add(lMetSeg)
+                        lOperation.MetSeg = lMetSeg
                     Else 'need in case there is no prec in the met seg
-                        tMetSeg.Name = ""
-                        pMetSegs.Add(tMetSeg)
-                        lOpn.MetSeg = tMetSeg
+                        lMetSeg.Name = ""
+                        pMetSegs.Add(lMetSeg)
+                        lOperation.MetSeg = lMetSeg
                     End If
-                    tMetSeg = New HspfMetSeg
-                    tMetSeg.Uci = Me
+                    lMetSeg = New HspfMetSeg
+                    lMetSeg.Uci = Me
                 End If
             Next
-        Next vOpTyp
-        tMetSeg = Nothing 'get rid of last one
+        Next lOpTyp
+        lMetSeg = Nothing 'get rid of last one
 
         'set any undefined mfacts to 0
         If pMetSegs.Count() > 0 Then
-            For Each vMetSeg In pMetSegs
-                For j = 1 To 7
-                    If vMetSeg.MetSegRec(j).MFactP = -999.0# Then
-                        vMetSeg.MetSegRec(j).MFactP = 0
+            For Each lMetSegExisting As HspfMetSeg In pMetSegs
+                For lIndex As Integer = 1 To 7
+                    If lMetSegExisting.MetSegRec(lIndex).MFactP = -999.0# Then
+                        lMetSegExisting.MetSegRec(lIndex).MFactP = 0
                     End If
-                    If vMetSeg.MetSegRec(j).MFactR = -999.0# Then
-                        vMetSeg.MetSegRec(j).MFactR = 0
+                    If lMetSegExisting.MetSegRec(lIndex).MFactR = -999.0# Then
+                        lMetSegExisting.MetSegRec(lIndex).MFactR = 0
                     End If
-                Next j
-            Next vMetSeg
+                Next lIndex
+            Next lMetSegExisting
         End If
 
     End Sub
 
     Public Sub Source2Point()
-        Dim lOpn As HspfOperation
-        Dim lConn As HspfConnection
-        Dim j As Integer
-        Dim tPoint As HspfPoint
-        Dim idPoint As HspfPoint
-        Dim idsn As Integer
-        Dim isdat(6) As Integer
-        Dim iedat(6) As Integer
-        Dim lastid As Integer
-        Dim wdmid As String
-        Dim vOpTyp As String
-        Dim newpoint As Boolean
-        Dim i As Integer
-        Dim RFact As Single
+        Dim lLastId As Integer = 0
         Static lOpTypes() As String = {"RCHRES", "COPY"} 'operations with assoc pt srcs
-
-        For Each vOpTyp In lOpTypes
-            For Each lOpn In pOpnBlks.Item(vOpTyp).Ids
-                j = 1
+        For Each lOpTyp As String In lOpTypes
+            For Each lOpn As HspfOperation In pOpnBlks.Item(lOpTyp).Ids
+                Dim j As Integer = 1
                 Do While j <= lOpn.Sources.Count()
-                    lConn = lOpn.Sources.Item(j)
+                    Dim lConn As HspfConnection = lOpn.Sources.Item(j)
 
-                    If (lConn.Target.VolName = vOpTyp And lConn.Target.Group <> "EXTNL") And (Left(lConn.Source.VolName, 3) = "WDM") Then
+                    If (lConn.Target.VolName = lOpTyp And lConn.Target.Group <> "EXTNL") And (Left(lConn.Source.VolName, 3) = "WDM") Then
                         'if wdm data set to rchres add to collection,
                         'or if wdm data set to copy and copy goes to rchres
-                        newpoint = False
+                        Dim lNewPoint As Boolean = False
+                        Dim lRFact As Single
                         If lConn.Target.VolName = "COPY" Then
-                            RFact = 0
-                            For i = 1 To lConn.Target.Opn.Targets.Count()
-                                If lConn.Target.Opn.Targets.Item(i).Target.VolName = "RCHRES" Then
-                                    newpoint = True
+                            lRFact = 0
+                            For lIndex As Integer = 1 To lConn.Target.Opn.Targets.Count()
+                                If lConn.Target.Opn.Targets.Item(lIndex).Target.VolName = "RCHRES" Then
+                                    lNewPoint = True
                                     'sum up the mfacts (really for septic modeling)
-                                    RFact = RFact + lConn.Target.Opn.Targets.Item(i).MFact
+                                    lRFact += lConn.Target.Opn.Targets.Item(lIndex).MFact
                                 End If
-                            Next i
+                            Next lIndex
                         ElseIf lConn.Target.VolName = "RCHRES" Then
-                            newpoint = True
+                            lNewPoint = True
                         End If
-                        If newpoint Then
+                        If lNewPoint Then
                             If Trim(lConn.Source.VolName) = "WDM" Then
                                 lConn.Source.VolName = "WDM1"
                             End If
-                            tPoint = New HspfPoint
-                            tPoint.MFact = lConn.MFact
+                            Dim lPoint As New HspfPoint
+                            lPoint.MFact = lConn.MFact
                             If lConn.Target.VolName = "COPY" Then
                                 'save rfact for septics
-                                tPoint.RFact = RFact
+                                lPoint.RFact = lRFact
                             End If
-                            tPoint.Source = lConn.Source
-                            tPoint.Tran = lConn.Tran
-                            tPoint.Sgapstrg = lConn.Sgapstrg
-                            tPoint.Ssystem = lConn.Ssystem
-                            tPoint.Target = lConn.Target
+                            lPoint.Source = lConn.Source
+                            lPoint.Tran = lConn.Tran
+                            lPoint.Sgapstrg = lConn.Sgapstrg
+                            lPoint.Ssystem = lConn.Ssystem
+                            lPoint.Target = lConn.Target
                             'pbd -- store associated operation id for use when writing
-                            tPoint.AssocOper = lOpn.Id
+                            lPoint.AssocOper = lOpn.Id
                             'get point source name from any data set
-                            If Left(tPoint.Source.VolName, 3) = "WDM" Then
-                                idsn = tPoint.Source.VolId
-                                If idsn > 0 Then
-                                    wdmid = tPoint.Source.VolName
+                            If Left(lPoint.Source.VolName, 3) = "WDM" Then
+                                Dim lDsn As Integer = lPoint.Source.VolId
+                                If lDsn > 0 Then
+                                    Dim lWdmId As String = lPoint.Source.VolName
                                     If pWdmCount > 0 Then
-                                        tPoint.Name = GetWDMAttr(wdmid, idsn, "DESC")
-                                        tPoint.Con = GetWDMAttr(wdmid, idsn, "CON")
+                                        lPoint.Name = GetWDMAttr(lWdmId, lDsn, "DESC")
+                                        lPoint.Con = GetWDMAttr(lWdmId, lDsn, "CON")
                                     End If
                                 End If
                             Else
-                                tPoint.Name = tPoint.Source.VolName & " " & tPoint.Source.VolId
-                                tPoint.Con = ""
+                                lPoint.Name = lPoint.Source.VolName & " " & lPoint.Source.VolId
+                                lPoint.Con = ""
                             End If
-                            For Each idPoint In pPointSources
-                                If idPoint.Name = tPoint.Name Then
-                                    tPoint.Id = idPoint.Id
+                            For Each lPointExisting As HspfPoint In pPointSources
+                                If lPointExisting.Name = lPoint.Name Then
+                                    lPoint.Id = lPointExisting.Id
                                     Exit For
                                 End If
-                            Next idPoint
-                            If tPoint.Id = 0 Then
-                                lastid = lastid + 1
-                                tPoint.Id = lastid
+                            Next lPointExisting
+                            If lPoint.Id = 0 Then
+                                lLastId += 1
+                                lPoint.Id = lLastId
                             End If
-                            pPointSources.Add(tPoint)
-                            lOpn.PointSources.Add(tPoint)
+                            pPointSources.Add(lPoint)
+                            lOpn.PointSources.Add(lPoint)
                             lOpn.Sources.Remove(j)
                         Else
-                            j = j + 1
+                            j += 1
                         End If
                     Else
-                        j = j + 1
+                        j += 1
                     End If
                 Loop
             Next
-        Next vOpTyp
-
+        Next lOpTyp
     End Sub
 
     Public Sub Point2Source()
-        Dim lOpn As HspfOperation
-        Dim lConn As HspfConnection
-        Dim i As Integer
-        Dim tPoint As HspfPoint
-        Dim isdat(6) As Integer
-        Dim iedat(6) As Integer
-        Dim vOpTyp As String
         Static lOpTypes() As String = {"RCHRES", "COPY"} 'operations with assoc pt srcs
-
-        For Each vOpTyp In lOpTypes
-            For Each lOpn In pOpnBlks.Item(vOpTyp).Ids
-                For Each tPoint In lOpn.PointSources
-                    lConn = New HspfConnection
+        For Each lOpTyp As String In lOpTypes
+            For Each lOpn As HspfOperation In pOpnBlks.Item(lOpTyp).Ids
+                For Each lPoint As HspfPoint In lOpn.PointSources
+                    Dim lConn As HspfConnection = New HspfConnection
                     lConn.Uci = Me
-                    If tPoint.Source.VolName = "MUTSIN" Then
+                    If lPoint.Source.VolName = "MUTSIN" Then
                         lConn.Typ = 2
                     Else
                         lConn.Typ = 1
                     End If
-                    lConn.Source = tPoint.Source
-                    lConn.Ssystem = tPoint.Ssystem
-                    lConn.Sgapstrg = tPoint.Sgapstrg
-                    lConn.MFact = tPoint.MFact
-                    lConn.Tran = tPoint.Tran
-                    lConn.Target = tPoint.Target
+                    lConn.Source = lPoint.Source
+                    lConn.Ssystem = lPoint.Ssystem
+                    lConn.Sgapstrg = lPoint.Sgapstrg
+                    lConn.MFact = lPoint.MFact
+                    lConn.Tran = lPoint.Tran
+                    lConn.Target = lPoint.Target
                     'Me.Connections.Add lConn
                     lOpn.Sources.Add(lConn)
                     'now remove all point sources
-                    lOpn.PointSources.Remove(1)
-                Next tPoint
-
+                    lOpn.PointSources.Clear()
+                Next lPoint
             Next
-        Next vOpTyp
+        Next lOpTyp
+
         'now remove all point sources
-        Do Until pPointSources.Count() = 0
-            i = pPointSources.Count()
-            pPointSources.Remove((i))
-        Loop
+        pPointSources.Clear()
 
         'need to synch collection of connections with opn connections
         RemoveConnectionsFromCollection(1) 'remove all type ext src
-        For Each lOpn In Me.OpnSeqBlock.Opns
-            For i = 1 To lOpn.Sources.Count()
-                lConn = lOpn.Sources.Item(i)
+        For Each lOpn As HspfOperation In Me.OpnSeqBlock.Opns
+            For lSourceIndex As Integer = 1 To lOpn.Sources.Count()
+                Dim lConn As HspfConnection = lOpn.Sources.Item(lSourceIndex)
                 If lConn.Typ = 1 Then
                     Me.Connections.Add(lConn)
                 End If
-            Next i
+            Next lSourceIndex
         Next
-
     End Sub
 
     Public Sub MetSeg2Source()
@@ -993,10 +902,7 @@ Public Class HspfUci
         Next vOpTyp
 
         'now remove all metsegs
-        Do Until pMetSegs.Count() = 0
-            i = pMetSegs.Count()
-            pMetSegs.Remove((i))
-        Loop
+        pMetSegs.Clear()
 
         'need to synch collection of connections with opn connections
         RemoveConnectionsFromCollection(1) 'remove all type ext src
@@ -1102,7 +1008,7 @@ Public Class HspfUci
                     'remember the target
                     itarget = lConnection.Target.VolId
                 End If
-                Me.Connections.Remove(i)
+                Me.Connections.RemoveAt(i)
             Else
                 i = i + 1
             End If
@@ -1324,7 +1230,7 @@ Public Class HspfUci
                 GenTs.Dates = TsDate
 
                 GenTs.Attributes.SetValue("TSTYPE", GenTs.Attributes.GetValue("Constituent"))
-                addeddsn = pWDMObj(wdmid).AddDataSet(GenTs)
+                addeddsn = pWDMObj(wdmid).AddDataset(GenTs)
                 adsn(j) = ndsn
             Next j
         Else
@@ -1784,7 +1690,7 @@ Public Class HspfUci
             'GenTs.Dates = TsDate
 
             GenTs.Attributes.SetValue("TSTYPE", GenTs.Attributes.GetValue("Constituent"))
-            addeddsn = pWDMObj(wdmid).AddDataSet(GenTs, 0)
+            addeddsn = pWDMObj(wdmid).AddDataset(GenTs, 0)
             adsn = ndsn
         End If
     End Sub
@@ -1823,7 +1729,7 @@ Public Class HspfUci
             'delete dsn
             pWDMObj(Id).DataSets.Remove(GenTs)
             'add dsn
-            adddsn = pWDMObj(Id).AddDataSet(NewGenTs, 0)
+            adddsn = pWDMObj(Id).AddDataset(NewGenTs, 0)
         End If
     End Sub
 
@@ -1903,7 +1809,7 @@ Public Class HspfUci
                         If Left(s, 3) = "WDM" Then
                             lFile = AddWDMFile(Mid(s, 17, Len(s) - 16))
                             If Not lFile Is Nothing Then
-                                pWdmCount = pWdmCount + 1
+                                pWdmCount += 1
                                 Ind = WDMInd(Left(s, 4))
                                 'TODO: ? pWdmUnit(Ind) = lFile.FileUnit
                                 pWDMObj(Ind) = lFile
@@ -1978,7 +1884,7 @@ x:
                             Ind = WDMInd(Left(s, 4))
                             'TODO: ? pWdmUnit(Ind) = lFile.FileUnit
                             pWDMObj(Ind) = lFile
-                            pWdmCount = pWdmCount + 1
+                            pWdmCount += 1
                         Else
                             MsgBox("Error in SetWDMFiles")
                         End If
@@ -2289,7 +2195,7 @@ x:
                 If Not GenTs Is Nothing Then
                     tstype = lTimser.Attributes.GetValue("TSTYPE")
                     GenTs.Attributes.SetValue("TSTYPE", tstype)
-                    Update = pWDMObj(wdmid).AddDataSet(GenTs, atcData.atcDataSource.EnumExistAction.ExistReplace)
+                    Update = pWDMObj(wdmid).AddDataset(GenTs, atcData.atcDataSource.EnumExistAction.ExistReplace)
                 End If
 
                 'change the appropriate ext targets record
@@ -2334,7 +2240,7 @@ x:
         'TsDate.Summary = myDateSummary
         GenTs.Dates = TsDate
         GenTs.Attributes.SetValue("TSTYPE", GenTs.Attributes.GetValue("Constituent"))
-        AddWDMDataSet = pWDMObj(wdmid).AddDataSet(GenTs, 0)
+        AddWDMDataSet = pWDMObj(wdmid).AddDataset(GenTs, 0)
 
     End Function
 
@@ -2445,7 +2351,7 @@ x:
             GenTs.Values = aval
             GenTs.Attributes.SetValue("TSTYPE", tstype)
 
-            addeddsn = pWDMObj(wdmid).AddDataSet(GenTs)
+            addeddsn = pWDMObj(wdmid).AddDataset(GenTs)
         End If
     End Sub
 
@@ -2520,33 +2426,31 @@ x:
         lOpn.PointSources.Add(tPoint)
     End Sub
 
-    Public Sub RemovePoint(ByRef wdmid As String, ByRef wdmdsn As Integer, ByRef tarid As Integer)
+    Public Sub RemovePoint(ByRef lWdmId As String, ByRef lWdmDsn As Integer, ByRef lTarId As Integer)
         Dim lOpn As HspfOperation
-        Dim idPoint As HspfPoint
-        Dim irem As Integer
+        Dim lPoint As HspfPoint
 
-        lOpn = pOpnBlks.Item("RCHRES").OperFromID(tarid)
+        lOpn = pOpnBlks.Item("RCHRES").OperFromID(lTarId)
 
-        irem = 0
-        For Each idPoint In pPointSources
-            irem = irem + 1
-            If idPoint.Source.VolName = wdmid And idPoint.Source.VolId = wdmdsn And idPoint.Target.VolId = tarid Then
+        For Each lPoint In pPointSources
+            If lPoint.Source.VolName = lWdmId And _
+               lPoint.Source.VolId = lWdmDsn And _
+               lPoint.Target.VolId = lTarId Then
                 'remove this one
+                pPointSources.Remove(lPoint)
                 Exit For
             End If
-        Next idPoint
-        pPointSources.Remove(irem)
+        Next lPoint
 
-        irem = 0
-        For Each idPoint In lOpn.PointSources
-            irem = irem + 1
-            If idPoint.Source.VolName = wdmid And idPoint.Source.VolId = wdmdsn And idPoint.Target.VolId = tarid Then
+        For Each lPoint In lOpn.PointSources
+            If lPoint.Source.VolName = lWdmId And _
+               lPoint.Source.VolId = lWdmDsn And _
+               lPoint.Target.VolId = lTarId Then
                 'remove this one
+                lOpn.PointSources.Remove(lPoint)
                 Exit For
             End If
-        Next idPoint
-        lOpn.PointSources.Remove(irem)
-
+        Next lPoint
     End Sub
 
     Public Sub GetWDMUnits(ByRef nwdm As Integer, ByRef aunits() As Integer)
@@ -2584,7 +2488,7 @@ x:
             'remove this type of connections from pconnections collection
             lConn = Me.Connections.Item(i)
             If lConn.Typ = itype Then
-                Me.Connections.Remove(i)
+                Me.Connections.RemoveAt(i)
             Else
                 i = i + 1
             End If
@@ -2602,7 +2506,7 @@ x:
 
     Public Function WaitForChildMessage() As String
         Dim s As String
-        If IPCset Then
+        If pIPCset Then
             Do  'process messages from parent
                 s = pIPC.GetProcessMessage("HSPFUCI") 'pHspfEngine.ReadTokenFromPipe(IPC.ParentRead, pipeBuffer, False)
                 If Len(s) > 3 Then
@@ -2773,7 +2677,7 @@ x:
     End Sub
 
     Private Sub RestartHSPFEngine()
-        If IPCset Then
+        If pIPCset Then
             Dim HSPFEngineExe As String = GetSetting("HSPFEngine", "files", "HSPFEngine.exe", "HSPFEngine.exe")
 
             HSPFEngineExe = atcUtility.FindFile("Please locate HSPFEngine.exe", HSPFEngineExe)

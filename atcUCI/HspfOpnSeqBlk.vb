@@ -1,13 +1,14 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
+Imports System.Collections.ObjectModel
+Imports System.Text
 Imports atcUtility
 
-<System.Runtime.InteropServices.ProgId("HspfOpnSeqBlk_NET.HspfOpnSeqBlk")> Public Class HspfOpnSeqBlk
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
+Public Class HspfOpnSeqBlk
     Private pDelt As Integer
-    Private pOpns As Collection 'of HspfOperation
+    Private pOpns As Collection '(Of HspfOperation)
     Private pUci As HspfUci
     Private pComment As String
 
@@ -56,7 +57,6 @@ Imports atcUtility
             If Index > 0 And Index <= pOpns.Count() Then
                 Opn = pOpns.Item(Index)
             Else
-                'UPGRADE_NOTE: Object Opn may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
                 Opn = Nothing
             End If
         End Get
@@ -161,27 +161,26 @@ Imports atcUtility
         End If
     End Sub
 
-    Public Sub WriteUciFile(ByRef f As Short)
-        Dim vOpn As Object
+    Public Overrides Function ToString() As String
+        Dim lSb As New StringBuilder
         Dim lOpn As HspfOperation
-        Dim h, M As Integer
 
-        If Len(pComment) > 0 Then
-            PrintLine(f, pComment)
+        If pComment.Length > 0 Then
+            lSb.AppendLine(pComment)
         End If
-        PrintLine(f, " ")
-        PrintLine(f, "OPN SEQUENCE")
-        h = pDelt / 60
-        M = pDelt - h * 60
-        PrintLine(f, "    INGRP" & Space(14) & "INDELT " & Format(h, "00") & ":" & Format(M, "00"))
-        For Each vOpn In pOpns
+        lSb.AppendLine("OPN SEQUENCE")
+        Dim h As Integer = pDelt / 60
+        Dim M As Integer = pDelt - h * 60
+        lSb.AppendLine("    INGRP" & Space(14) & "INDELT " & Format(h, "00") & ":" & Format(M, "00"))
+        For Each vOpn As Object In pOpns
             lOpn = vOpn
-            If Len(lOpn.Comment) > 0 Then
-                PrintLine(f, lOpn.Comment)
+            If lOpn.Comment.Length > 0 Then
+                lSb.AppendLine(lOpn.Comment)
             End If
-            PrintLine(f, Space(6) & lOpn.Name & Space(10 - Len(lOpn.Name)) & myFormatI((lOpn.Id), 4))
+            lSb.AppendLine(Space(6) & lOpn.Name & Space(10 - Len(lOpn.Name)) & myFormatI((lOpn.Id), 4))
         Next vOpn
-        PrintLine(f, "    END INGRP")
-        PrintLine(f, "END OPN SEQUENCE")
-    End Sub
+        lSb.AppendLine("    END INGRP")
+        lSb.AppendLine("END OPN SEQUENCE")
+        Return lSb.ToString
+    End Function
 End Class

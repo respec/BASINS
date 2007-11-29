@@ -1,8 +1,10 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfConnection_NET.HspfConnection")> Public Class HspfConnection
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
+Imports System.Text
+
+Public Class HspfConnection
     Private pMFact As Double
     Private pMFactAsRead As String
     Private pTyp As Integer '1-ExtSource,2-Network,3-Schematic,4-ExtTarget
@@ -434,15 +436,15 @@ Option Explicit On
         editInit(Me, Me.Uci.icon, True) 'add remove ok
     End Sub
 
-    Public Sub WriteUciFile(ByRef f As Short, ByRef M As HspfMsg)
-        Dim lStr As System.Text.StringBuilder
-        Dim s, optyp As String
+    Public Overrides Function ToString() As String
+        Dim lSB As New StringBuilder
+        Dim s As String
         Dim lBlockDef As HspfBlockDef
         Dim lTableDef As HspfTableDef
         Dim j, i, k As Integer
         Dim typeexists(4) As Boolean
-        Dim icol(15) As Integer
-        Dim ilen(15) As Integer
+        Dim iCol(15) As Integer
+        Dim iLen(15) As Integer
         Dim lOper As HspfOperation
         Dim lConn As HspfConnection
         Dim lOpnSeqBlock As HspfOpnSeqBlk
@@ -486,7 +488,7 @@ Option Explicit On
                     Case 4 : s = "EXT TARGETS"
                     Case Else : s = ""
                 End Select
-                lBlockDef = M.BlockDefs.Item(s)
+                lBlockDef = pUci.Msg.BlockDefs.Item(s)
                 lTableDef = lBlockDef.TableDefs.Item(1)
                 'get lengths and starting positions
                 j = 0
@@ -495,25 +497,25 @@ Option Explicit On
                     ilen(j) = lParmDef.Length
                     j = j + 1
                 Next lParmDef
-                PrintLine(f, " ")
-                PrintLine(f, s)
+                lSB.AppendLine(" ")
+                lSB.AppendLine(s)
                 'now start building the records
                 Select Case i
                     Case 1 'ext srcs
-                        PrintLine(f, "<-Volume-> <Member> SsysSgap<--Mult-->Tran <-Target vols> <-Grp> <-Member-> ***")
-                        PrintLine(f, "<Name>   x <Name> x tem strg<-factor->strg <Name>   x   x        <Name> x x ***")
+                        lSB.AppendLine("<-Volume-> <Member> SsysSgap<--Mult-->Tran <-Target vols> <-Grp> <-Member-> ***")
+                        lSB.AppendLine("<Name>   x <Name> x tem strg<-factor->strg <Name>   x   x        <Name> x x ***")
                         'do met segs
-                        For Each optyp In lOpTypes
+                        For Each OpTyp As String In lOpTypes
                             For Each lMetSeg In pUci.MetSegs
-                                lMetSeg.WriteUciFile(optyp, icol, ilen, f)
+                                lSB.AppendLine(lMetSeg.ToStringFromSpecs(OpTyp, iCol, iLen))
                             Next
                         Next
+                        'If pUci.PointSources.Count() > 0 And pUci.MetSegs.Count() > 0 Then
+                        '    lSB.AppendLine("") 'write a blank line between met segs and pt srcs
+                        'End If
                         'do point sources
-                        If pUci.PointSources.Count() > 0 And pUci.MetSegs.Count() > 0 Then
-                            PrintLine(f, "") 'write a blank line between met segs and pt srcs
-                        End If
                         For Each lPtSrc In pUci.PointSources
-                            lPtSrc.WriteUciFile(icol, ilen, f)
+                            lSB.AppendLine(lPtSrc.ToStringFromSpecs(iCol, iLen))
                         Next
                         'now do everything else
                         For k = 1 To lOpnSeqBlock.Opns.Count
@@ -521,7 +523,10 @@ Option Explicit On
                             For j = 1 To lOper.Sources.Count()
                                 lConn = lOper.Sources.Item(j)
                                 If lConn.Typ = i Then
-                                    lStr = New System.Text.StringBuilder
+                                    If lConn.Comment.Length > 0 Then
+                                        lSB.Append(lConn.Comment)
+                                    End If
+                                    Dim lStr As New StringBuilder
                                     lStr.Append(lConn.Source.VolName.Trim)
                                     lStr.Append(Space(icol(1) - lStr.Length - 1)) 'pad prev field
                                     t = Space(ilen(1)) 'right justify numbers
@@ -568,22 +573,22 @@ Option Explicit On
                                         If lConn.Target.VolName = "RCHRES" Then t = pUci.IntAsCat(lConn.Target.Member, 2, t)
                                         lStr.Append(t)
                                     End If
-                                    If Len(lConn.Comment) > 0 Then
-                                        PrintLine(f, lConn.Comment)
-                                    End If
-                                    PrintLine(f, lStr.ToString)
+                                    lSB.AppendLine(lStr.ToString)
                                 End If
                             Next j
                         Next k
                     Case 2 'network
-                        PrintLine(f, "<-Volume-> <-Grp> <-Member-><--Mult-->Tran <-Target vols> <-Grp> <-Member->  ***")
-                        PrintLine(f, "<Name>   x        <Name> x x<-factor->strg <Name>   x   x        <Name> x x  ***")
+                        lSB.AppendLine("<-Volume-> <-Grp> <-Member-><--Mult-->Tran <-Target vols> <-Grp> <-Member->  ***")
+                        lSB.AppendLine("<Name>   x        <Name> x x<-factor->strg <Name>   x   x        <Name> x x  ***")
                         For k = 1 To lOpnSeqBlock.Opns.Count
                             lOper = lOpnSeqBlock.Opn(k)
                             For j = 1 To lOper.Sources.Count() 'used to go thru targets, misses range
                                 lConn = lOper.Sources.Item(j)
                                 If lConn.Typ = i Then
-                                    lStr = New System.Text.StringBuilder
+                                    If lConn.Comment.Length > 0 Then
+                                        lSB.AppendLine(lConn.Comment)
+                                    End If
+                                    Dim lStr As New StringBuilder
                                     lStr.Append(lConn.Source.VolName.Trim)
                                     lStr.Append(Space(icol(1) - lStr.Length - 1)) 'pad prev field
                                     lStr.Append(CStr(lConn.Source.VolId).PadLeft(ilen(1)))
@@ -631,22 +636,22 @@ Option Explicit On
                                         If lConn.Target.VolName = "RCHRES" Then t = pUci.IntAsCat(lConn.Target.Member, 2, t)
                                         lStr.Append(t)
                                     End If
-                                    If Len(lConn.Comment) > 0 Then
-                                        PrintLine(f, lConn.Comment)
-                                    End If
-                                    PrintLine(f, lStr.ToString)
+                                    lSB.AppendLine(lStr.ToString)
                                 End If
                             Next j
                         Next k
                     Case 3 'schematic
-                        PrintLine(f, "<-Volume->                  <--Area-->     <-Volume->  <ML#> ***       <sb>")
-                        PrintLine(f, "<Name>   x                  <-factor->     <Name>   x        ***        x x")
+                        lSB.AppendLine("<-Volume->                  <--Area-->     <-Volume->  <ML#> ***       <sb>")
+                        lSB.AppendLine("<Name>   x                  <-factor->     <Name>   x        ***        x x")
                         For k = 1 To lOpnSeqBlock.Opns.Count
                             lOper = lOpnSeqBlock.Opn(k)
                             For j = 1 To lOper.Sources.Count()
                                 lConn = lOper.Sources.Item(j)
                                 If lConn.Typ = i Then
-                                    lStr = New System.Text.StringBuilder
+                                    If lConn.Comment.Length > 0 Then
+                                        lSB.AppendLine(lConn.Comment)
+                                    End If
+                                    Dim lStr As New StringBuilder
                                     lStr.Append(lConn.Source.VolName.Trim)
                                     lStr.Append(Space(icol(1) - lStr.Length - 1)) 'pad prev field
                                     lStr.Append(CStr(lConn.Source.VolId).PadLeft(ilen(1)))
@@ -675,22 +680,22 @@ Option Explicit On
                                         If lConn.Target.VolName = "RCHRES" Then t = pUci.IntAsCat(lConn.Target.Member, 2, t)
                                         lStr.Append(t)
                                     End If
-                                    If Len(lConn.Comment) > 0 Then
-                                        PrintLine(f, lConn.Comment)
-                                    End If
-                                    PrintLine(f, lStr.ToString)
+                                    lSB.AppendLine(lStr.ToString)
                                 End If
                             Next j
                         Next k
                     Case 4 'ext targ
-                        PrintLine(f, "<-Volume-> <-Grp> <-Member-><--Mult-->Tran <-Volume-> <Member> Tsys Aggr Amd ***")
-                        PrintLine(f, "<Name>   x        <Name> x x<-factor->strg <Name>   x <Name>qf  tem strg strg***")
+                        lSB.AppendLine("<-Volume-> <-Grp> <-Member-><--Mult-->Tran <-Volume-> <Member> Tsys Aggr Amd ***")
+                        lSB.AppendLine("<Name>   x        <Name> x x<-factor->strg <Name>   x <Name>qf  tem strg strg***")
                         For k = 1 To lOpnSeqBlock.Opns.Count
                             lOper = lOpnSeqBlock.Opn(k)
                             For j = 1 To lOper.Targets.Count()
                                 lConn = lOper.Targets.Item(j)
                                 If lConn.Typ = i Then
-                                    lStr = New System.Text.StringBuilder
+                                    If lConn.Comment.Length > 0 Then
+                                        lSB.AppendLine(lConn.Comment)
+                                    End If
+                                    Dim lStr As New StringBuilder
                                     lStr.Append(lConn.Source.VolName.Trim)
                                     lStr.Append(Space(icol(1) - lStr.Length - 1)) 'pad prev field
                                     lStr.Append(CStr(lConn.Source.VolId).PadLeft(ilen(1)))
@@ -745,18 +750,16 @@ Option Explicit On
                                     lStr.Append(lConn.Sgapstrg)
                                     lStr.Append(Space(icol(14) - lStr.Length - 1))
                                     lStr.Append(lConn.Amdstrg)
-                                    If Len(lConn.Comment) > 0 Then
-                                        PrintLine(f, lConn.Comment)
-                                    End If
-                                    PrintLine(f, lStr.ToString)
+                                    lSB.AppendLine(lStr.ToString)
                                 End If
                             Next j
                         Next k
                 End Select
-                PrintLine(f, "END " & s)
+                lSB.AppendLine("END " & s)
             End If
         Next i
-    End Sub
+        Return lSB.ToString
+    End Function
 
     Private Function NumericallyTheSame(ByRef ValueAsRead As String, ByRef ValueStored As Single) As Boolean
         'see if the current mfact value is the same as the value as read from the uci

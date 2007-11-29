@@ -1,8 +1,10 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
-<System.Runtime.InteropServices.ProgId("HspfOperation_NET.HspfOperation")> Public Class HspfOperation
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+Imports System.Collections.ObjectModel
+
+Public Class HspfOperation
 
     Private Enum LegendType
         LegLand = 0
@@ -23,7 +25,7 @@ Option Explicit On
     Private pEdited As Boolean
     Private pFTable As HspfFtable
     Private pMetSeg As HspfMetSeg
-    Private pPointSources As Collection 'of HspfPoint
+    Private pPointSources As Collection(Of HspfPoint)
     Private pUci As HspfUci
     Private pComment As String
     Private pSerial As Integer
@@ -161,11 +163,11 @@ Option Explicit On
     End Property
 
 
-    Public Property PointSources() As Collection
+    Public Property PointSources() As Collection(Of HspfPoint)
         Get
             PointSources = pPointSources
         End Get
-        Set(ByVal Value As Collection)
+        Set(ByVal Value As Collection(Of HspfPoint))
             pPointSources = Value
         End Set
     End Property
@@ -494,7 +496,7 @@ Option Explicit On
         pTables = New Collection
         pSources = New Collection
         pTargets = New Collection
-        pPointSources = New Collection
+        pPointSources = New Collection(Of HspfPoint)
         pTableStatus = New HspfStatus
         pTableStatus.init(Me)
         pInputTimeseriesStatus = New HspfStatus

@@ -1,13 +1,14 @@
 Option Strict Off
 Option Explicit On
 
+Imports System.Text
+
 ''' <summary>
 ''' HSPF Point Source
 ''' </summary>
 ''' <remarks>
 ''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 ''' </remarks>
-<System.Runtime.InteropServices.ProgId("HspfPoint_NET.HspfPoint")> _
 Public Class HspfPoint
     Private pId As Integer
     Private pName As String
@@ -130,8 +131,8 @@ Public Class HspfPoint
         pSsystem = ""
     End Sub
 
-    Public Sub WriteUciFile(ByRef icol() As Integer, ByRef ilen() As Integer, ByRef f As Object)
-        Dim lStr As New System.Text.StringBuilder
+    Public Function ToStringFromSpecs(ByRef icol() As Integer, ByRef ilen() As Integer) As String
+        Dim lStr As New StringBuilder
         Dim t As String
 
         lStr.Append(pSource.VolName.Trim)
@@ -178,6 +179,6 @@ Public Class HspfPoint
             If Me.Target.VolName = "RCHRES" Then t = Me.Target.Opn.Uci.IntAsCat(Me.Target.Member, 2, t)
             lStr.Append(t)
         End If
-        PrintLine(f, lStr.ToString)
-    End Sub
+        Return lStr.ToString
+    End Function
 End Class

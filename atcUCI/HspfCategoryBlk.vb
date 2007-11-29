@@ -1,14 +1,17 @@
 Option Strict Off
 Option Explicit On
 
+Imports System.Collections.ObjectModel
+Imports System.Text
 Imports atcUtility
+Imports MapWinUtility
 
 ''' <summary>
 ''' 
 ''' </summary>
 ''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
-<System.Runtime.InteropServices.ProgId("HspfCategoryBlk_NET.HspfCategoryBlk")> Public Class HspfCategoryBlk
-    Private pCategories As Collection 'of HspfCategory
+Public Class HspfCategoryBlk
+    Private pCategories As Collection(Of HspfData.HspfCategory)
     Private pUci As HspfUci
     Private pComment As String
 
@@ -26,7 +29,6 @@ Imports atcUtility
             Caption = "Category Block"
         End Get
     End Property
-
 
     Public Property Comment() As String
         Get
@@ -49,11 +51,11 @@ Imports atcUtility
         End Get
     End Property
 
-
     Public Property Value(ByVal Index As Integer) As HspfData.HspfCategory
         Get
             If Index > 0 And Index <= pCategories.Count() Then
-                Value = pCategories.Item(Index)
+                'TODO: check this index
+                Value = pCategories.Item(Index - 1)
             Else
                 Value = New HspfData.HspfCategory
                 Value.Name = ""
@@ -62,8 +64,8 @@ Imports atcUtility
         End Get
         Set(ByVal Value As HspfData.HspfCategory) '????
             If Index <= pCategories.Count() Then
-                pCategories.Remove(Index)
-                pCategories.Add(Value, , Index)
+                pCategories.RemoveAt(Index)
+                pCategories.Insert(Index, Value)
             ElseIf Index = pCategories.Count() + 1 Then
                 pCategories.Add(Value)
             Else 'error?
@@ -72,9 +74,7 @@ Imports atcUtility
     End Property
 
     Public Sub Clear()
-        'UPGRADE_NOTE: Object pCategories may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-        pCategories = Nothing
-        pCategories = New Collection
+        pCategories.Clear()
     End Sub
 
     Public Sub Add(ByRef newValue As HspfData.HspfCategory)
@@ -90,7 +90,7 @@ Imports atcUtility
 
     Public Sub Remove(ByRef Index As Integer)
         If Index > 0 And Index <= pCategories.Count() Then
-            pCategories.Remove((Index))
+            pCategories.RemoveAt(Index)
         End If
     End Sub
 
@@ -100,7 +100,7 @@ Imports atcUtility
 
     Public Sub New()
         MyBase.New()
-        pCategories = New Collection
+        pCategories = New Collection(Of HspfData.HspfCategory)
     End Sub
 
     Private Sub Update()
@@ -168,23 +168,23 @@ Imports atcUtility
         Exit Sub
 
 ErrHand:
-        MsgBox(Err.Description & vbCr & vbCr & cbuff, MsgBoxStyle.Critical, "Error in ReadUciFile")
-
+        Logger.Msg(Err.Description & vbCr & vbCr & cbuff, MsgBoxStyle.Critical, "Error in ReadUciFile")
     End Sub
 
-    Friend Sub WriteUciFile(ByRef f As Short)
-        If Len(pComment) > 0 Then
-            PrintLine(f, pComment)
+    Public Overrides Function ToString() As String
+        Dim lSb As New StringBuilder
+        If pComment.Length > 0 Then
+            lSb.AppendLine(pComment)
         End If
-        PrintLine(f, " ")
-        PrintLine(f, "CATEGORY")
-        PrintLine(f, "   <> <----catnam----> *** ")
+        lSb.AppendLine("CATEGORY")
+        lSb.AppendLine("   <> <----catnam----> *** ")
         For Each lCategory As HspfData.HspfCategory In pCategories
-            If Len(lCategory.Comment) > 0 Then
-                PrintLine(f, lCategory.Comment)
+            If lCategory.Comment.Length > 0 Then
+                lSb.AppendLine(lCategory.Comment)
             End If
-            PrintLine(f, Space(3) & lCategory.Tag & Space(1) & lCategory.Name)
+            lSb.AppendLine(Space(3) & lCategory.Tag & Space(1) & lCategory.Name)
         Next
-        PrintLine(f, "END CATEGORY")
-    End Sub
+        lSb.AppendLine("END CATEGORY")
+        Return lSb.ToString
+    End Function
 End Class

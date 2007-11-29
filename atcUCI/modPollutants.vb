@@ -111,13 +111,13 @@ Module modPollutants
                 rdone = False
 
                 'look through all mass-links
-                j = 1
+                j = 0
                 Do While j <= myUci.MassLinks.Count
                     lML = myUci.MassLinks(j)
                     If (lML.Target.Member = "IDQAL" And lML.Target.MemSub1 = k) Or (lML.Target.Member = "ISQAL" And lML.Target.MemSub2 = k) Then
 
                         tPoll.MassLinks.Add(lML)
-                        myUci.MassLinks.Remove(j)
+                        myUci.MassLinks.RemoveAt(j)
 
                         If (lML.Source.Group = "PQUAL" Or lML.Source.Group = "IQUAL") Then
                             'this is type p-i-g
@@ -233,13 +233,13 @@ Module modPollutants
                 idone = False
 
                 'look through all mass-links
-                j = 1
+                j = 0
                 Do While j <= myUci.MassLinks.Count
                     lML = myUci.MassLinks(j)
                     If ((lML.Source.Group = "PQUAL" And lML.Source.MemSub1 = k) Or (lML.Source.Group = "IQUAL" And lML.Source.MemSub1 = k)) And lML.Target.VolName = "RCHRES" Then
 
                         tPoll.MassLinks.Add(lML)
-                        myUci.MassLinks.Remove(j)
+                        myUci.MassLinks.RemoveAt(j)
 
                         tPoll.ModelType = "PIOnly"
                         If lML.Source.Group = "PQUAL" Then
@@ -357,13 +357,13 @@ Module modPollutants
         Next
 
         'remove any lingering mls from pquals or iquals
-        i = 1
+        i = 0
         Do While i <= myUci.MassLinks.Count
             tML = myUci.MassLinks(i)
             If tML.Source.VolName = "PERLND" And tML.Source.Group = "PQUAL" And tML.Target.VolName = "RCHRES" Then
-                myUci.MassLinks.Remove(i)
+                myUci.MassLinks.RemoveAt(i)
             ElseIf tML.Source.VolName = "IMPLND" And tML.Source.Group = "IQUAL" And tML.Target.VolName = "RCHRES" Then
-                myUci.MassLinks.Remove(i)
+                myUci.MassLinks.RemoveAt(i)
             Else
                 i = i + 1
             End If
@@ -598,12 +598,12 @@ Module modPollutants
                         End If
                     Next i
                     If iexist > 0 Then
-                        myUci.MassLinks.Remove(iexist)
+                        myUci.MassLinks.RemoveAt(iexist)
                     End If
                     myUci.MassLinks.Add(lML)
                 Next
             End If
-            myUci.Pollutants.Remove(lowestpos)
+            myUci.Pollutants.RemoveAt(lowestpos)
         Loop
 
         'set nquals
