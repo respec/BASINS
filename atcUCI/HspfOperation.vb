@@ -4,8 +4,14 @@ Option Explicit On
 
 Imports System.Collections.ObjectModel
 
-Public Class HspfOperation
+Public Class HspfOperations
+    Inherits KeyedCollection(Of String, HspfOperation)
+    Protected Overrides Function GetKeyForItem(ByVal aHspfOperation As HspfOperation) As String
+        Return "K" & aHspfOperation.Id
+    End Function
+End Class
 
+Public Class HspfOperation
     Private Enum LegendType
         LegLand = 0
         LegMet = 1
@@ -19,8 +25,8 @@ Public Class HspfOperation
     Private pTableStatus As HspfStatus
     Private pInputTimeseriesStatus As HspfStatus
     Private pOutputTimeseriesStatus As HspfStatus
-    Private pSources As Collection 'of HspfConnection
-    Private pTargets As Collection 'of HspfConnection
+    Private pSources As Collection(Of HspfConnection)
+    Private pTargets As Collection(Of HspfConnection)
     Private pOpnBlk As HspfOpnBlk
     Private pEdited As Boolean
     Private pFTable As HspfFtable
@@ -33,20 +39,19 @@ Public Class HspfOperation
 
     Public ReadOnly Property EditControlName() As String
         Get
-            EditControlName = "ATCoHspf.ctlOperationEdit"
+            Return "ATCoHspf.ctlOperationEdit"
         End Get
     End Property
 
     Public ReadOnly Property Caption() As String
         Get
-            Caption = "Operation:  " & HspfOperName(pOpTyp) & " " & pId & " - " & pDescription
+            Return "Operation:  " & HspfOperName(pOpTyp) & " " & pId & " - " & pDescription
         End Get
     End Property
 
-
     Public Property Comment() As String
         Get
-            Comment = pComment
+            Return pComment
         End Get
         Set(ByVal Value As String)
             pComment = Value
@@ -55,7 +60,7 @@ Public Class HspfOperation
 
     Public Property Edited() As Boolean
         Get
-            Edited = pEdited
+            Return pEdited
         End Get
         Set(ByVal Value As Boolean)
             pEdited = Value
@@ -63,9 +68,9 @@ Public Class HspfOperation
         End Set
     End Property
 
-    Public Property optyp() As HspfData.HspfOperType
+    Public Property OpTyp() As HspfData.HspfOperType
         Get
-            optyp = pOpTyp
+            Return pOpTyp
         End Get
         Set(ByVal Value As HspfData.HspfOperType)
             pOpTyp = Value
@@ -74,7 +79,7 @@ Public Class HspfOperation
 
     Public Property Name() As String
         Get
-            Name = HspfOperName(pOpTyp)
+            Return HspfOperName(pOpTyp)
         End Get
         Set(ByVal Value As String)
             pOpTyp = HspfOperNum(Value)
@@ -83,7 +88,7 @@ Public Class HspfOperation
 
     Public Property Id() As Integer
         Get
-            Id = pId
+            Return pId
         End Get
         Set(ByVal Value As Integer)
             pId = Value
@@ -92,7 +97,7 @@ Public Class HspfOperation
 
     Public Property DefOpnId() As Integer
         Get
-            DefOpnId = pDefOpnId
+            Return pDefOpnId
         End Get
         Set(ByVal Value As Integer)
             pDefOpnId = Value
@@ -101,13 +106,13 @@ Public Class HspfOperation
 
     Public ReadOnly Property Serial() As Integer
         Get
-            Serial = pSerial
+            Return pSerial
         End Get
     End Property
 
     Public Property Description() As String
         Get
-            Description = pDescription
+            Return pDescription
         End Get
         Set(ByVal Value As String)
             Dim colonPos As Integer
@@ -119,7 +124,7 @@ Public Class HspfOperation
 
     Public Property OpnBlk() As HspfOpnBlk
         Get
-            OpnBlk = pOpnBlk
+            Return pOpnBlk
         End Get
         Set(ByVal Value As HspfOpnBlk)
             pOpnBlk = Value
@@ -128,7 +133,7 @@ Public Class HspfOperation
 
     Public Property FTable() As HspfFtable
         Get
-            FTable = pFTable
+            Return pFTable
         End Get
         Set(ByVal Value As HspfFtable)
             pFTable = Value
@@ -137,7 +142,7 @@ Public Class HspfOperation
 
     Public Property MetSeg() As HspfMetSeg
         Get
-            MetSeg = pMetSeg
+            Return pMetSeg
         End Get
         Set(ByVal Value As HspfMetSeg)
             pMetSeg = Value
@@ -146,26 +151,26 @@ Public Class HspfOperation
 
     Public ReadOnly Property TableStatus() As HspfStatus
         Get
-            TableStatus = pTableStatus
+            Return pTableStatus
         End Get
     End Property
 
     Public ReadOnly Property InputTimeseriesStatus() As HspfStatus
         Get
-            InputTimeseriesStatus = pInputTimeseriesStatus
+            Return pInputTimeseriesStatus
         End Get
     End Property
 
     Public ReadOnly Property OutputTimeseriesStatus() As HspfStatus
         Get
-            OutputTimeseriesStatus = pOutputTimeseriesStatus
+            Return pOutputTimeseriesStatus
         End Get
     End Property
 
 
     Public Property PointSources() As Collection(Of HspfPoint)
         Get
-            PointSources = pPointSources
+            Return pPointSources
         End Get
         Set(ByVal Value As Collection(Of HspfPoint))
             pPointSources = Value
@@ -174,25 +179,25 @@ Public Class HspfOperation
 
     Public ReadOnly Property Tables() As Collection
         Get 'of HspfTable
-            Tables = pTables
+            Return pTables
         End Get
     End Property
 
-    Public ReadOnly Property Sources() As Collection
+    Public ReadOnly Property Sources() As Collection(Of HspfConnection)
         Get 'of HspfConnection
-            Sources = pSources
+            Return pSources
         End Get
     End Property
 
-    Public ReadOnly Property Targets() As Collection
+    Public ReadOnly Property Targets() As Collection(Of HspfConnection)
         Get 'of HspfConnection
-            Targets = pTargets
+            Return pTargets
         End Get
     End Property
 
     Public Property Uci() As HspfUci
         Get
-            Uci = pUci
+            Return pUci
         End Get
         Set(ByVal Value As HspfUci)
             pUci = Value
@@ -209,81 +214,65 @@ Public Class HspfOperation
     End Function
 
     Public Sub setTimSerConnections()
-        Dim vConn As Object
-        Dim lConn As HspfConnection
-        Dim lName As String
-
-        lName = HspfOperName(pOpTyp)
-        For Each vConn In pUci.Connections
-            lConn = vConn
-            With lConn.Target
-                If .VolName = lName Then
+        Dim lOperName As String = HspfOperName(pOpTyp)
+        For Each lConnection As HspfConnection In pUci.Connections
+            With lConnection.Target
+                If .VolName = lOperName Then
                     If .VolId = pId Or (.VolId < pId And .VolIdL >= pId) Then
-                        lConn.Target.Opn = Me
-                        pSources.Add(lConn)
+                        lConnection.Target.Opn = Me
+                        pSources.Add(lConnection)
                     End If
                 End If
             End With
-            With lConn.Source
-                If .VolName = lName Then
+            With lConnection.Source
+                If .VolName = lOperName Then
                     If .VolId = pId Or (.VolId < pId And .VolIdL >= pId) Then
-                        lConn.Source.Opn = Me
-                        pTargets.Add(lConn)
+                        lConnection.Source.Opn = Me
+                        pTargets.Add(lConnection)
                     End If
                 End If
             End With
-        Next vConn
+        Next lConnection
     End Sub
 
     Public Sub setTimSerConnectionsSources()
-        Dim vConn As Object
-        Dim lConn As HspfConnection
-        Dim lName As String
-
-        lName = HspfOperName(pOpTyp)
-        For Each vConn In pUci.Connections
-            lConn = vConn
-            With lConn.Target
-                If .VolName = lName Then
+        Dim lOperName As String = HspfOperName(pOpTyp)
+        For Each lConnection As HspfConnection In pUci.Connections
+            With lConnection.Target
+                If .VolName = lOperName Then
                     If .VolId = pId Or (.VolId < pId And .VolIdL >= pId) Then
-                        lConn.Target.Opn = Me
-                        pSources.Add(lConn)
+                        lConnection.Target.Opn = Me
+                        pSources.Add(lConnection)
                     End If
                 End If
             End With
-        Next vConn
+        Next lConnection
     End Sub
 
     Public Sub setTimSerConnectionsTargets()
-        Dim vConn As Object
-        Dim lConn As HspfConnection
-        Dim lName As String
-
-        lName = HspfOperName(pOpTyp)
-        For Each vConn In pUci.Connections
-            lConn = vConn
-            With lConn.Source
-                If .VolName = lName Then
+        Dim lOperName As String = HspfOperName(pOpTyp)
+        For Each lConnection As HspfConnection In pUci.Connections
+            With lConnection.Source
+                If .VolName = lOperName Then
                     If .VolId = pId Or (.VolId < pId And .VolIdL >= pId) Then
-                        lConn.Source.Opn = Me
-                        pTargets.Add(lConn)
+                        lConnection.Source.Opn = Me
+                        pTargets.Add(lConnection)
                     End If
                 End If
             End With
-        Next vConn
+        Next lConnection
     End Sub
 
-    Public Function DownOper(ByRef OpType As String) As Integer
-        Dim vConn As HspfConnection
-        For Each vConn In pTargets
-            If Len(OpType) = 0 Then 'take first one of any type
-                DownOper = vConn.Target.VolId
+    Public Function DownOper(ByRef aOpType As String) As Integer
+        For Each lConnection As HspfConnection In pTargets
+            If aOpType.Length = 0 Then 'take first one of any type
+                DownOper = lConnection.Target.VolId
                 Exit For
-            ElseIf vConn.Target.VolName = OpType Then  'first of selected type
-                DownOper = vConn.Target.VolId
+            ElseIf lConnection.Target.VolName = aOpType Then  'first of selected type
+                DownOper = lConnection.Target.VolId
                 Exit For
             End If
-        Next vConn
+        Next lConnection
     End Function
 
     'Not needed until WinHSPF wants it
@@ -494,8 +483,8 @@ Public Class HspfOperation
         MyBase.New()
         'Debug.Print "init HspfOperation"
         pTables = New Collection
-        pSources = New Collection
-        pTargets = New Collection
+        pSources = New Collection(Of HspfConnection)
+        pTargets = New Collection(Of HspfConnection)
         pPointSources = New Collection(Of HspfPoint)
         pTableStatus = New HspfStatus
         pTableStatus.init(Me)
@@ -508,7 +497,7 @@ Public Class HspfOperation
         pId = 0
         pOpTyp = 0
         pDescription = ""
-        lastOperationSerial = lastOperationSerial + 1
+        lastOperationSerial += 1
         pSerial = lastOperationSerial
         pDefOpnId = 0
     End Sub
