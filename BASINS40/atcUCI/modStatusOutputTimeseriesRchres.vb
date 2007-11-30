@@ -23,7 +23,7 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section hydr
-            If ltable.Parms.Item("HYDRFG") = 1 Then
+            If ltable.Parms("HYDRFG").Value = 1 Then
                 If O.TableExists("HYDR-PARM1") Then
                     With O.Tables.Item("HYDR-PARM1")
                         AUX2FG = .ParmValue("AUX2FG")
@@ -111,7 +111,7 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section cons
-            If ltable.Parms.Item("CONSFG") = 1 Then
+            If ltable.Parms("CONSFG").Value = 1 Then
                 If O.TableExists("NCONS") Then
                     nCons = O.Tables.Item("NCONS").ParmValue("NCONS")
                 Else
@@ -135,7 +135,7 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section htrch			
-            If ltable.Parms.Item("HTFG") = 1 Then
+            If ltable.Parms("HTFG").Value = 1 Then
                 TimserStatus.Change("HTRCH:TW", 1, HspfStatusOptional)
                 TimserStatus.Change("HTRCH:AIRTMP", 1, HspfStatusOptional)
                 TimserStatus.Change("HTRCH:IHEAT", 1, HspfStatusOptional)
@@ -155,7 +155,7 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section sedtran
-            If ltable.Parms.Item("SEDFG") = 1 Then
+            If ltable.Parms("SEDFG").Value = 1 Then
                 For i = 1 To 4
                     TimserStatus.Change("SEDTRN:SSED", i, HspfStatusOptional)
                     TimserStatus.Change("SEDTRN:ISED", i, HspfStatusOptional)
@@ -185,7 +185,7 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section gqual
-            If ltable.Parms.Item("GQALFG") = 1 Then
+            If ltable.Parms("GQALFG").Value = 1 Then
                 If O.TableExists("GQ-GENDATA") Then
                     nGqual = O.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
                 Else
@@ -240,7 +240,7 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section oxrx
-            If ltable.Parms.Item("OXFG") = 1 Then
+            If ltable.Parms("OXFG").Value = 1 Then
                 TimserStatus.Change("OXRX:DOX", 1, HspfStatusOptional)
                 TimserStatus.Change("OXRX:BOD", 1, HspfStatusOptional)
                 TimserStatus.Change("OXRX:SATDO", 1, HspfStatusOptional)
@@ -265,7 +265,7 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section nutrx
-            If ltable.Parms.Item("NUTFG") = 1 Then
+            If ltable.Parms("NUTFG").Value = 1 Then
                 TimserStatus.Change("NUTRX:NUCF6", 1, HspfStatusOptional)
                 For i = 1 To 3
                     TimserStatus.Change("NUTRX:SNH4", i, HspfStatusOptional)
@@ -330,7 +330,7 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section plank
-            If ltable.Parms.Item("PLKFG") = 1 Then
+            If ltable.Parms("PLKFG").Value = 1 Then
                 TimserStatus.Change("PLANK:PHYTO", 1, HspfStatusOptional)
                 TimserStatus.Change("PLANK:ZOO", 1, HspfStatusOptional)
                 For i = 1 To 4
@@ -380,7 +380,8 @@ Module modStatusOutputTimeseriesRchres
             End If
 
             'section phcarb
-            If ltable.Parms.Item("PHFG") = 1 Or ltable.Parms.Item("PHFG") = 3 Then
+            If ltable.Parms("PHFG").Value = 1 Or _
+               ltable.Parms("PHFG").Value = 3 Then
                 TimserStatus.Change("PHCARB:SATCO2", 1, HspfStatusOptional)
                 For i = 1 To 3
                     TimserStatus.Change("PHCARB:PHST", i, HspfStatusOptional)
@@ -410,7 +411,8 @@ Module modStatusOutputTimeseriesRchres
             Next i
             If lAcidph Then
                 'section acidph
-                If ltable.Parms.Item("PHFG") = 2 Or ltable.Parms.Item("PHFG") = 3 Then
+                If ltable.Parms("PHFG").Value = 2 Or _
+                   ltable.Parms("PHFG").Value = 3 Then
                     TimserStatus.Change("ACIDPH:ACPH", 1, HspfStatusOptional)
                     For i = 1 To 7
                         TimserStatus.Change("ACIDPH:ACCONC", i, HspfStatusOptional)

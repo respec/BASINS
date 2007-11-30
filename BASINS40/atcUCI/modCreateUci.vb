@@ -595,7 +595,7 @@ Module modCreateUci
     '                        ltable.Parms.Add(0.001, "SLSUR") 'must have some slope
     '                    End If
     '                    'default lsur based on slsur
-    '                    ltable.Parms.Add(DefaultLSURFromSLSUR(ltable.Parms.Item("SLSUR")), "LSUR")
+    '                    ltable.Parms.Add(DefaultLSURFromSLSUR(ltable.Parms("SLSUR")), "LSUR")
     '                End If
     '            Loop
     '        Next i
@@ -616,7 +616,7 @@ Module modCreateUci
     '                        ltable.Parms.Add(0.001, "SLSUR") 'must have some slope
     '                    End If
     '                    'default lsur based on slsur
-    '                    ltable.Parms.Add(DefaultLSURFromSLSUR(ltable.Parms.Item("SLSUR")), "LSUR")
+    '                    ltable.Parms.Add(DefaultLSURFromSLSUR(ltable.Parms("SLSUR")), "LSUR")
     '                End If
     '            Loop
     '        Next i

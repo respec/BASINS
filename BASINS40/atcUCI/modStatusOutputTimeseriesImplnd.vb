@@ -18,7 +18,7 @@ Module modStatusOutputTimeseriesImplnd
             ltable = O.Tables.Item("ACTIVITY")
 
             'section atemp
-            If ltable.Parms.Item("ATMPFG") = 1 Then
+            If ltable.Parms("ATMPFG").Value = 1 Then
                 TimserStatus.Change("ATEMP:AIRTMP", 1, HspfStatusOptional)
             End If
 
@@ -28,7 +28,7 @@ Module modStatusOutputTimeseriesImplnd
             Else
                 snopfg = 0
             End If
-            If ltable.Parms.Item("SNOWFG") = 1 Then
+            If ltable.Parms("SNOWFG").Value = 1 Then
                 TimserStatus.Change("SNOW:PACK", 1, HspfStatusOptional)
                 TimserStatus.Change("SNOW:PACKF", 1, HspfStatusOptional)
                 TimserStatus.Change("SNOW:PACKW", 1, HspfStatusOptional)
@@ -58,7 +58,7 @@ Module modStatusOutputTimeseriesImplnd
             End If
 
             'section iwater
-            If ltable.Parms.Item("IWATFG") = 1 Then
+            If ltable.Parms("IWATFG").Value = 1 Then
                 TimserStatus.Change("IWATER:IMPS", 1, HspfStatusOptional)
                 TimserStatus.Change("IWATER:RETS", 1, HspfStatusOptional)
                 TimserStatus.Change("IWATER:SURS", 1, HspfStatusOptional)
@@ -71,13 +71,13 @@ Module modStatusOutputTimeseriesImplnd
             End If
 
             'section solids
-            If ltable.Parms.Item("SLDFG") = 1 Then
+            If ltable.Parms("SLDFG").Value = 1 Then
                 TimserStatus.Change("SOLIDS:SLDS", 1, HspfStatusOptional)
                 TimserStatus.Change("SOLIDS:SOSLD", 1, HspfStatusOptional)
             End If
 
             'section iwtgas
-            If ltable.Parms.Item("IWGFG") = 1 Then
+            If ltable.Parms("IWGFG").Value = 1 Then
                 TimserStatus.Change("IWTGAS:SOTMP", 1, HspfStatusOptional)
                 TimserStatus.Change("IWTGAS:SODOX", 1, HspfStatusOptional)
                 TimserStatus.Change("IWTGAS:SOCO2", 1, HspfStatusOptional)
@@ -87,7 +87,7 @@ Module modStatusOutputTimeseriesImplnd
             End If
 
             'section iqual
-            If ltable.Parms.Item("IQALFG") = 1 Then
+            If ltable.Parms("IQALFG").Value = 1 Then
                 If O.TableExists("NQUALS") Then
                     nquals = O.Tables.Item("NQUALS").ParmValue("NQUAL")
                 Else

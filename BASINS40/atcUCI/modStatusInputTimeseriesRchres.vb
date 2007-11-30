@@ -26,7 +26,7 @@ Module modStatusInputTimeseriesRchres
             End If
 
             'section hydr
-            If ltable.Parms.Item("HYDRFG") = 1 Then
+            If ltable.Parms("HYDRFG").Value = 1 Then
                 If O.TableExists("HYDR-PARM1") Then
                     With O.Tables.Item("HYDR-PARM1")
                         Odfvfg(1) = .ParmValue("ODFVF1")
@@ -84,8 +84,8 @@ Module modStatusInputTimeseriesRchres
             End If
 
             'section adcalc			
-            If ltable.Parms.Item("ADFG") = 1 Then
-                If ltable.Parms.Item("HYDRFG") = 0 Then 'need what HYDR would have sent
+            If ltable.Parms("ADFG").Value = 1 Then
+                If ltable.Parms("HYDRFG").Value = 0 Then 'need what HYDR would have sent
                     TimserStatus.Change("HYDR:VOL", 1, HspfStatusRequired)
                     For i = 1 To nExits
                         TimserStatus.Change("HYDR:O", i, HspfStatusRequired)
@@ -94,7 +94,7 @@ Module modStatusInputTimeseriesRchres
             End If
 
             'section cons
-            If ltable.Parms.Item("CONSFG") = 1 Then
+            If ltable.Parms("CONSFG").Value = 1 Then
                 If O.TableExists("NCONS") Then
                     nCons = O.Tables.Item("NCONS").ParmValue("NCONS")
                 Else
@@ -134,14 +134,14 @@ Module modStatusInputTimeseriesRchres
                     TimserStatus.Change("EXTNL:ICON", i, HspfStatusOptional)
                     TimserStatus.Change("INFLOW:ICON", i, HspfStatusOptional)
                 Next i
-                If (wetadfg = 1 Or dryadfg = 1) And ltable.Parms.Item("HYDRFG") = 0 Then
+                If (wetadfg = 1 Or dryadfg = 1) And ltable.Parms("HYDRFG").Value = 0 Then
                     'ad simulated and hydr off
                     TimserStatus.Change("HYDR:SAREA", 1, HspfStatusRequired)
                 End If
             End If
 
             'section htrch
-            If ltable.Parms.Item("HTFG") = 1 Then
+            If ltable.Parms("HTFG").Value = 1 Then
                 TimserStatus.Change("INFLOW:IHEAT", 1, HspfStatusOptional)
                 TimserStatus.Change("EXTNL:SOLRAD", 1, HspfStatusRequired)
                 TimserStatus.Change("EXTNL:PREC", 1, HspfStatusOptional)
@@ -149,13 +149,13 @@ Module modStatusInputTimeseriesRchres
                 TimserStatus.Change("EXTNL:DEWTMP", 1, HspfStatusRequired)
                 TimserStatus.Change("EXTNL:GATMP", 1, HspfStatusRequired)
                 TimserStatus.Change("EXTNL:WIND", 1, HspfStatusRequired)
-                If ltable.Parms.Item("HYDRFG") = 0 Then
+                If ltable.Parms("HYDRFG").Value = 0 Then
                     TimserStatus.Change("HYDR:AVDEP", 1, HspfStatusRequired)
                 End If
             End If
 
             'section sedtran
-            If ltable.Parms.Item("SEDFG") = 1 Then
+            If ltable.Parms("SEDFG").Value = 1 Then
                 TimserStatus.Change("INFLOW:ISED", 1, HspfStatusOptional)
                 TimserStatus.Change("INFLOW:ISED", 2, HspfStatusOptional)
                 TimserStatus.Change("INFLOW:ISED", 3, HspfStatusOptional)
@@ -164,7 +164,7 @@ Module modStatusInputTimeseriesRchres
                 Else
                     sandfg = 0
                 End If
-                If ltable.Parms.Item("HYDRFG") = 0 Then
+                If ltable.Parms("HYDRFG").Value = 0 Then
                     TimserStatus.Change("HYDR:TAU", 1, HspfStatusRequired)
                     TimserStatus.Change("HYDR:AVDEP", 1, HspfStatusRequired)
                     TimserStatus.Change("HYDR:AVVEL", 1, HspfStatusRequired)
@@ -174,7 +174,7 @@ Module modStatusInputTimeseriesRchres
                         TimserStatus.Change("HYDR:TWID", 1, HspfStatusRequired)
                     End If
                 End If
-                If ltable.Parms.Item("HTFG") = 0 Then
+                If ltable.Parms("HTFG").Value = 0 Then
                     If sandfg = 1 Or sandfg = 2 Then
                         TimserStatus.Change("HTRCH:TW", 1, HspfStatusRequired)
                     End If
@@ -182,7 +182,7 @@ Module modStatusInputTimeseriesRchres
             End If
 
             'section gqual
-            If ltable.Parms.Item("GQALFG") = 1 Then
+            If ltable.Parms("GQALFG").Value = 1 Then
                 If O.TableExists("GQ-GENDATA") Then
                     nGqual = O.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
                 Else
@@ -205,7 +205,8 @@ Module modStatusInputTimeseriesRchres
                 End If
 
                 If O.TableExists("GQ-GENDATA") Then
-                    If O.Tables.Item("GQ-GENDATA").ParmValue("PHFLAG") = 1 And ltable.Parms.Item("PHFG") = 0 Then
+                    If O.Tables.Item("GQ-GENDATA").ParmValue("PHFLAG") = 1 And _
+                       ltable.Parms("PHFG").Value = 0 Then
                         TimserStatus.Change("EXTNL:PHVAL", 1, HspfStatusOptional) 'req if there is hydrolysis
                     End If
                     If O.Tables.Item("GQ-GENDATA").ParmValue("ROXFG") = 1 Then
@@ -224,7 +225,7 @@ Module modStatusInputTimeseriesRchres
                         TimserStatus.Change("EXTNL:WIND", 1, HspfStatusOptional) 'req if there is volatilization
                     End If
                 End If
-                If ltable.Parms.Item("HYDRFG") = 0 Then
+                If ltable.Parms("HYDRFG").Value = 0 Then
                     If O.TableExists("GEN-INFO") Then
                         If O.Tables.Item("GEN-INFO").ParmValue("LKFG") = 0 Then
                             TimserStatus.Change("HYDR:AVDEP", 1, HspfStatusOptional) 'req if volatilization is on
@@ -237,15 +238,15 @@ Module modStatusInputTimeseriesRchres
                     End If
                 End If
                 If O.TableExists("GQ-GENDATA") Then
-                    If ltable.Parms.Item("HTFG") = 0 And O.Tables.Item("GQ-GENDATA").ParmValue("TEMPFG") = 1 Then
+                    If ltable.Parms("HTFG").Value = 0 And O.Tables.Item("GQ-GENDATA").ParmValue("TEMPFG") = 1 Then
                         TimserStatus.Change("HTRCH:TW", 1, HspfStatusRequired)
                     End If
-                    If ltable.Parms.Item("PLKFG") = 0 Or O.Tables.Item("GQ-GENDATA").ParmValue("PHYTFG") = 0 Then
+                    If ltable.Parms("PLKFG").Value = 0 Or O.Tables.Item("GQ-GENDATA").ParmValue("PHYTFG") = 0 Then
                         If O.Tables.Item("GQ-GENDATA").ParmValue("PHYTFG") = 1 Then
                             TimserStatus.Change("PLANK:PHYTO", 1, HspfStatusOptional) 'req if there is photolysis
                         End If
                     End If
-                    If ltable.Parms.Item("SEDFG") = 0 And O.Tables.Item("GQ-GENDATA").ParmValue("SDFG") = 1 Then
+                    If ltable.Parms("SEDFG").Value = 0 And O.Tables.Item("GQ-GENDATA").ParmValue("SDFG") = 1 Then
                         TimserStatus.Change("SEDTRN:SSED", 1, HspfStatusOptional) 'req if there is photolysis
                         TimserStatus.Change("SEDTRN:SSED", 2, HspfStatusOptional) 'req if there is photolysis
                         TimserStatus.Change("SEDTRN:SSED", 3, HspfStatusOptional) 'req if there is photolysis
@@ -255,7 +256,7 @@ Module modStatusInputTimeseriesRchres
             End If
 
             'section oxrx
-            If ltable.Parms.Item("OXFG") = 1 Then
+            If ltable.Parms("OXFG").Value = 1 Then
                 TimserStatus.Change("INFLOW:OXIF", 1, HspfStatusOptional)
                 TimserStatus.Change("INFLOW:OXIF", 2, HspfStatusOptional)
                 If O.TableExists("GEN-INFO") Then
@@ -263,17 +264,17 @@ Module modStatusInputTimeseriesRchres
                         TimserStatus.Change("EXTNL:WIND", 1, HspfStatusRequired)
                     End If
                 End If
-                If ltable.Parms.Item("HYDRFG") = 0 Then
+                If ltable.Parms("HYDRFG").Value = 0 Then
                     TimserStatus.Change("HYDR:AVDEP", 1, HspfStatusRequired)
                     TimserStatus.Change("HYDR:AVVEL", 1, HspfStatusRequired) 'man had avdep twice?
                 End If
-                If ltable.Parms.Item("HTFG") = 0 Then
+                If ltable.Parms("HTFG").Value = 0 Then
                     TimserStatus.Change("HTRCH:TW", 1, HspfStatusRequired)
                 End If
             End If
 
             'section nutrx
-            If ltable.Parms.Item("NUTFG") = 1 Then
+            If ltable.Parms("NUTFG").Value = 1 Then
                 For i = 1 To 4
                     TimserStatus.Change("INFLOW:NUIF1", i, HspfStatusOptional)
                 Next i
@@ -292,19 +293,19 @@ Module modStatusInputTimeseriesRchres
                     TimserStatus.Change("EXTNL:NUADCN", 3, HspfStatusRequired)
                     TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 End If
-                If (wetadfg = 1 Or dryadfg = 1) And ltable.Parms.Item("HYDRFG") = 0 Then
+                If (wetadfg = 1 Or dryadfg = 1) And ltable.Parms("HYDRFG").Value = 0 Then
                     TimserStatus.Change("HYDR:SAREA", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("HTFG") = 0 Then
+                If ltable.Parms("HTFG").Value = 0 Then
                     TimserStatus.Change("HTRCH:TW", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("SEDFG") = 0 Then
+                If ltable.Parms("SEDFG").Value = 0 Then
                     TimserStatus.Change("SEDTRN:SSED", 1, HspfStatusOptional) 'req if particulate NH4 or PO4 is simulated
                 End If
             End If
 
             'section plank
-            If ltable.Parms.Item("PLKFG") = 1 Then
+            If ltable.Parms("PLKFG").Value = 1 Then
                 For i = 1 To 5
                     TimserStatus.Change("INFLOW:PKIF", i, HspfStatusOptional)
                 Next i
@@ -320,13 +321,13 @@ Module modStatusInputTimeseriesRchres
                     TimserStatus.Change("EXTNL:PLADCN", 3, HspfStatusRequired)
                     TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 End If
-                If (wetadfg = 1 Or dryadfg = 1) And ltable.Parms.Item("HYDRFG") = 0 Then
+                If (wetadfg = 1 Or dryadfg = 1) And ltable.Parms("HYDRFG").Value = 0 Then
                     TimserStatus.Change("HYDR:SAREA", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("HTFG") = 0 Then
+                If ltable.Parms("HTFG").Value = 0 Then
                     TimserStatus.Change("HTRCH:TW", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("SEDFG") = 0 Then
+                If ltable.Parms("SEDFG").Value = 0 Then
                     If O.TableExists("PLNK-FLAGS") Then
                         If O.Tables.Item("PLNK-FLAGS").ParmValue("SDLTFG") = 1 Then
                             TimserStatus.Change("SEDTRN:SSED", 1, HspfStatusRequired)
@@ -339,16 +340,18 @@ Module modStatusInputTimeseriesRchres
             End If
 
             'section phcarb
-            If ltable.Parms.Item("PHFG") = 1 Or ltable.Parms.Item("PHFG") = 3 Then
+            If ltable.Parms("PHFG").Value = 1 Or _
+               ltable.Parms("PHFG").Value = 3 Then
                 For i = 1 To 2
                     TimserStatus.Change("INFLOW:PHIF", i, HspfStatusOptional)
                 Next i
-                If ltable.Parms.Item("CONSFG") = 0 And O.TableExists("PH-PARM1") Then
+                If ltable.Parms("CONSFG").Value = 0 And _
+                   O.TableExists("PH-PARM1") Then
                     For i = 1 To O.Tables.Item("PH-PARM1").ParmValue("ALKCON")
                         TimserStatus.Change("CONS:CON", i, HspfStatusRequired)
                     Next i
                 End If
-                If ltable.Parms.Item("HTFG") = 0 Then
+                If ltable.Parms("HTFG").Value = 0 Then
                     TimserStatus.Change("HTRCH:TW", 1, HspfStatusRequired)
                 End If
             End If
@@ -362,14 +365,15 @@ Module modStatusInputTimeseriesRchres
             Next i
             If lAcidph Then
                 'section acidph
-                If ltable.Parms.Item("PHFG") = 2 Or ltable.Parms.Item("PHFG") = 3 Then
+                If ltable.Parms("PHFG").Value = 2 Or _
+                   ltable.Parms("PHFG").Value = 3 Then
                     For i = 1 To 7
                         TimserStatus.Change("INFLOW:ACINFL", i, HspfStatusOptional)
                     Next i
-                    If ltable.Parms.Item("HYDRFG") = 0 Then
+                    If ltable.Parms("HYDRFG").Value = 0 Then
                         TimserStatus.Change("HYDR:AVDEP", 1, HspfStatusRequired)
                     End If
-                    If ltable.Parms.Item("HTFG") = 0 Then
+                    If ltable.Parms("HTFG").Value = 0 Then
                         TimserStatus.Change("HTRCH:TW", 1, HspfStatusRequired)
                     End If
                 End If

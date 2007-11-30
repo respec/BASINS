@@ -31,10 +31,10 @@ Module modStatusPerlnd
 
         If O.TableExists("ACTIVITY") Then
             ltable = O.Tables.Item("ACTIVITY")
-            If ltable.Parms.Item("AIRTFG") = 1 Then
+            If ltable.Parms("AIRTFG").Value = 1 Then
                 TableStatus.Change("ATEMP-DAT", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("SNOWFG") = 1 Then
+            If ltable.Parms("SNOWFG").Value = 1 Then
                 TableStatus.Change("ICE-FLAG", 1, HspfStatusOptional)
                 TableStatus.Change("SNOW-FLAGS", 1, HspfStatusOptional)
                 If O.TableExists("SNOW-FLAGS") Then
@@ -50,7 +50,7 @@ Module modStatusPerlnd
                 TableStatus.Change("SNOW-INIT1", 1, HspfStatusOptional)
                 TableStatus.Change("SNOW-INIT2", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("PWATFG") = 1 Then
+            If ltable.Parms("PWATFG").Value = 1 Then
                 TableStatus.Change("PWAT-PARM1", 1, HspfStatusOptional)
                 If O.TableExists("PWAT-PARM1") Then
                     With O.Tables.Item("PWAT-PARM1")
@@ -62,7 +62,7 @@ Module modStatusPerlnd
                         Vlefg = .ParmValue("VLEFG")
                         Hwtfg = .ParmValue("HWTFG")
                         Irrgfg = .ParmValue("IRRGFG")
-                        If ltable.Parms.Item("SNOWFG") = 1 Then
+                        If ltable.Parms("SNOWFG").Value = 1 Then
                             .ParmValue("CSNOFG") = 1
                         End If
                     End With
@@ -146,7 +146,7 @@ Module modStatusPerlnd
                     End If
                 End If
             End If
-            If ltable.Parms.Item("SEDFG") = 1 Then
+            If ltable.Parms("SEDFG").Value = 1 Then
                 TableStatus.Change("SED-PARM1", 1, HspfStatusOptional)
                 If O.TableExists("SED-PARM1") Then
                     With O.Tables.Item("SED-PARM1")
@@ -167,7 +167,7 @@ Module modStatusPerlnd
                 End If
                 TableStatus.Change("SED-STOR", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("PSTFG") = 1 Then
+            If ltable.Parms("PSTFG").Value = 1 Then
                 TableStatus.Change("PSTEMP-PARM1", 1, HspfStatusOptional)
                 If O.TableExists("PSTEMP-PARM1") Then
                     With O.Tables.Item("PSTEMP-PARM1")
@@ -203,7 +203,7 @@ Module modStatusPerlnd
                 End If
                 TableStatus.Change("PSTEMP-TEMPS", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("PWGFG") = 1 Then
+            If ltable.Parms("PWGFG").Value = 1 Then
                 TableStatus.Change("PWT-PARM1", 1, HspfStatusOptional)
                 If O.TableExists("PWT-PARM1") Then
                     With O.Tables.Item("PWT-PARM1")
@@ -235,7 +235,7 @@ Module modStatusPerlnd
                 TableStatus.Change("PWT-TEMPS", 1, HspfStatusOptional)
                 TableStatus.Change("PWT-GASES", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("PQALFG") = 1 Then
+            If ltable.Parms("PQALFG").Value = 1 Then
                 TableStatus.Change("NQUALS", 1, HspfStatusOptional)
                 If O.TableExists("NQUALS") Then
                     Nqual = O.Tables.Item("NQUALS").ParmValue("NQUAL")
@@ -308,8 +308,8 @@ Module modStatusPerlnd
                     End If
                 Next i
             End If
-            If ltable.Parms.Item("MSTLFG") = 1 Then
-                If ltable.Parms.Item("PWATFG") = 0 Then 'pwater inactive
+            If ltable.Parms("MSTLFG").Value = 1 Then
+                If ltable.Parms("PWATFG").Value = 0 Then 'pwater inactive
                     TableStatus.Change("VUZFG", 1, HspfStatusOptional)
                     If O.TableExists("VUZFG") Then
                         Vuzfg = O.Tables.Item("VUZFG").ParmValue("VUZFG")
@@ -327,7 +327,7 @@ Module modStatusPerlnd
                 TableStatus.Change("MST-SUBSTOR", 1, HspfStatusOptional)
                 TableStatus.Change("MST-SUBFLX", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("PESTFG") = 1 Then
+            If ltable.Parms("PESTFG").Value = 1 Then
                 TableStatus.Change("PEST-FLAGS", 1, HspfStatusOptional)
                 If O.TableExists("PEST-FLAGS") Then
                     With O.Tables.Item("PEST-FLAGS")
@@ -369,7 +369,7 @@ Module modStatusPerlnd
                     TableStatus.Change("PEST-STOR2", i, HspfStatusOptional)
                 Next i
             End If
-            If ltable.Parms.Item("NITRFG") = 1 Then
+            If ltable.Parms("NITRFG").Value = 1 Then
                 TableStatus.Change("NIT-FLAGS", 1, HspfStatusRequired)
                 If O.TableExists("NIT-FLAGS") Then
                     With O.Tables.Item("NIT-FLAGS")
@@ -477,7 +477,7 @@ Module modStatusPerlnd
                 Next j
                 TableStatus.Change("NIT-STOR2", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("PHOSFG") = 1 Then
+            If ltable.Parms("PHOSFG").Value = 1 Then
                 TableStatus.Change("PHOS-FLAGS", 1, HspfStatusRequired)
                 If O.TableExists("PHOS-FLAGS") Then
                     With O.Tables.Item("PHOS-FLAGS")
@@ -524,7 +524,7 @@ Module modStatusPerlnd
                 Next j
                 TableStatus.Change("PHOS-STOR2", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("TRACFG") = 1 Then
+            If ltable.Parms("TRACFG").Value = 1 Then
                 TableStatus.Change("TRAC-AD-FLAGS", 1, HspfStatusOptional)
                 TableStatus.Change("TRAC-ID", 1, HspfStatusOptional)
                 TableStatus.Change("TRAC-TOPSTOR", 1, HspfStatusOptional)

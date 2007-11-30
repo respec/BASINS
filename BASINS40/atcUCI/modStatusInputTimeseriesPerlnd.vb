@@ -19,7 +19,7 @@ Module modStatusInputTimeseriesPerlnd
             ltable = O.Tables.Item("ACTIVITY")
 
             'section atemp
-            If ltable.Parms.Item("AIRTFG") = 1 Then
+            If ltable.Parms("AIRTFG").Value = 1 Then
                 TimserStatus.Change("EXTNL:GATMP", 1, HspfStatusRequired)
                 TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
             End If
@@ -30,7 +30,7 @@ Module modStatusInputTimeseriesPerlnd
             Else
                 snopfg = 0
             End If
-            If ltable.Parms.Item("SNOWFG") = 1 Then
+            If ltable.Parms("SNOWFG").Value = 1 Then
                 TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 If snopfg = 0 Then
                     TimserStatus.Change("EXTNL:DTMPG", 1, HspfStatusRequired)
@@ -40,7 +40,7 @@ Module modStatusInputTimeseriesPerlnd
                 Else
                     TimserStatus.Change("EXTNL:DTMPG", 1, HspfStatusOptional)
                 End If
-                If ltable.Parms.Item("AIRTFG") = 0 Then
+                If ltable.Parms("AIRTFG").Value = 0 Then
                     TimserStatus.Change("ATEMP:AIRTMP", 1, HspfStatusRequired)
                 End If
             End If
@@ -59,7 +59,7 @@ Module modStatusInputTimeseriesPerlnd
             End If
 
             'section pwater
-            If ltable.Parms.Item("PWATFG") = 1 Then
+            If ltable.Parms("PWATFG").Value = 1 Then
                 TimserStatus.Change("EXTNL:PETINP", 1, HspfStatusRequired)
                 If O.TableExists("PWAT-PARM1") Then
                     irrgfg = O.Tables.Item("PWAT-PARM1").ParmValue("IRRGFG")
@@ -78,10 +78,10 @@ Module modStatusInputTimeseriesPerlnd
                 TimserStatus.Change("EXTNL:LZLI", 1, HspfStatusOptional)
                 TimserStatus.Change("EXTNL:AGWLI", 1, HspfStatusOptional)
                 If csnofg = 1 Then
-                    If ltable.Parms.Item("AIRTFG") = 0 Then
+                    If ltable.Parms("AIRTFG").Value = 0 Then
                         TimserStatus.Change("ATEMP:AIRTMP", 1, HspfStatusRequired)
                     End If
-                    If ltable.Parms.Item("SNOWFG") = 0 Then
+                    If ltable.Parms("SNOWFG").Value = 0 Then
                         TimserStatus.Change("SNOW:RAINF", 1, HspfStatusRequired)
                         TimserStatus.Change("SNOW:SNOCOV", 1, HspfStatusRequired)
                         TimserStatus.Change("SNOW:WYIELD", 1, HspfStatusRequired)
@@ -90,43 +90,43 @@ Module modStatusInputTimeseriesPerlnd
                         End If
                     End If
                 End If
-                If ltable.Parms.Item("PSTFG") = 0 And iffcfg = 2 Then
+                If ltable.Parms("PSTFG").Value = 0 And iffcfg = 2 Then
                     TimserStatus.Change("PSTEMP:LGTMP", 1, HspfStatusRequired)
                 End If
             End If
 
             'section sedmnt
-            If ltable.Parms.Item("SEDFG") = 1 Then
+            If ltable.Parms("SEDFG").Value = 1 Then
                 TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 TimserStatus.Change("EXTNL:SLSED", 1, HspfStatusOptional)
-                If ltable.Parms.Item("SNOWFG") = 0 And csnofg = 1 Then
+                If ltable.Parms("SNOWFG").Value = 0 And csnofg = 1 Then
                     TimserStatus.Change("SNOW:RAINF", 1, HspfStatusRequired)
                     TimserStatus.Change("SNOW:SNOCOV", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("PWATFG") = 0 Then
+                If ltable.Parms("PWATFG").Value = 0 Then
                     TimserStatus.Change("PWATER:SURO", 1, HspfStatusRequired)
                     TimserStatus.Change("PWATER:SURS", 1, HspfStatusRequired)
                 End If
             End If
 
             'section pstemp
-            If ltable.Parms.Item("PSTFG") = 1 Then
-                If ltable.Parms.Item("AIRTFG") = 0 Then
+            If ltable.Parms("PSTFG").Value = 1 Then
+                If ltable.Parms("AIRTFG").Value = 0 Then
                     TimserStatus.Change("ATEMP:AIRTMP", 1, HspfStatusRequired)
                 End If
             End If
 
             'section pwtgas
-            If ltable.Parms.Item("PWGFG") = 1 Then
-                If ltable.Parms.Item("SNOWFG") = 0 And csnofg = 1 Then
+            If ltable.Parms("PWGFG").Value = 1 Then
+                If ltable.Parms("SNOWFG").Value = 0 And csnofg = 1 Then
                     TimserStatus.Change("SNOW:WYIELD", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("PWATFG") = 0 Then
+                If ltable.Parms("PWATFG").Value = 0 Then
                     TimserStatus.Change("PWATER:SURO", 1, HspfStatusRequired)
                     TimserStatus.Change("PWATER:IFWO", 1, HspfStatusRequired)
                     TimserStatus.Change("PWATER:AGWO", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("PSTFG") = 0 Then
+                If ltable.Parms("PSTFG").Value = 0 Then
                     TimserStatus.Change("PSTEMP:SLTMP", 1, HspfStatusRequired)
                     TimserStatus.Change("PSTEMP:ULTMP", 1, HspfStatusRequired)
                     TimserStatus.Change("PSTEMP:LGTMP", 1, HspfStatusRequired)
@@ -134,7 +134,7 @@ Module modStatusInputTimeseriesPerlnd
             End If
 
             'section pqual
-            If ltable.Parms.Item("PQALFG") = 1 Then
+            If ltable.Parms("PQALFG").Value = 1 Then
                 If O.TableExists("PQL-AD-FLAGS") Then
                     With O.Tables.Item("PQL-AD-FLAGS")
                         For i = 1 To 20
@@ -195,7 +195,7 @@ Module modStatusInputTimeseriesPerlnd
                         TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                     End If
                 Next i
-                If ltable.Parms.Item("PWATFG") = 0 Then
+                If ltable.Parms("PWATFG").Value = 0 Then
                     If qualof > 0 Then
                         TimserStatus.Change("PWATER:SURO", 1, HspfStatusRequired) 'or req if SOQC is required for one or more QUALs
                     End If
@@ -207,15 +207,15 @@ Module modStatusInputTimeseriesPerlnd
                     End If
                     TimserStatus.Change("PWATER:PERO", 1, HspfStatusRequired) 'only required if POQC is required for one or more QUALs
                 End If
-                If ltable.Parms.Item("SEDFG") = 0 And qualsd > 0 Then
+                If ltable.Parms("SEDFG").Value = 0 And qualsd > 0 Then
                     TimserStatus.Change("SEDMNT:WSSD", 1, HspfStatusRequired)
                     TimserStatus.Change("SEDMNT:SCRSD", 1, HspfStatusRequired)
                 End If
             End If
 
             'section mstlay
-            If ltable.Parms.Item("MSTLFG") = 1 Then
-                If ltable.Parms.Item("PWATFG") = 0 Then
+            If ltable.Parms("MSTLFG").Value = 1 Then
+                If ltable.Parms("PWATFG").Value = 0 Then
                     TimserStatus.Change("PWATER:SURI", 1, HspfStatusRequired)
                     TimserStatus.Change("PWATER:LZS", 1, HspfStatusRequired)
                     TimserStatus.Change("PWATER:IGWI", 1, HspfStatusRequired)
@@ -235,7 +235,7 @@ Module modStatusInputTimeseriesPerlnd
             End If
 
             'section pest
-            If ltable.Parms.Item("PESTFG") = 1 Then
+            If ltable.Parms("PESTFG").Value = 1 Then
                 If O.TableExists("PEST-FLAGS") Then
                     npst = O.Tables.Item("PEST-FLAGS").ParmValue("NPST")
                 Else
@@ -256,10 +256,10 @@ Module modStatusInputTimeseriesPerlnd
                     Next i
                     TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("SEDFG") = 0 Then
+                If ltable.Parms("SEDFG").Value = 0 Then
                     TimserStatus.Change("SEDMNT:SOSED", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("MSTLFG") = 0 Then
+                If ltable.Parms("MSTLFG").Value = 0 Then
                     For i = 1 To 5
                         TimserStatus.Change("MSTLAY:MST", i, HspfStatusRequired)
                     Next i
@@ -276,7 +276,7 @@ Module modStatusInputTimeseriesPerlnd
                     adopf3 = 0
                 End If
                 If adopf1 > 0 Or adopf2 > 0 Or adopf3 > 0 Then
-                    If ltable.Parms.Item("PSTFG") = 0 Then
+                    If ltable.Parms("PSTFG").Value = 0 Then
                         TimserStatus.Change("PSTEMP:SLTMP", 1, HspfStatusRequired)
                         TimserStatus.Change("PSTEMP:ULTMP", 1, HspfStatusRequired)
                         TimserStatus.Change("PSTEMP:LGTMP", 1, HspfStatusRequired)
@@ -285,7 +285,7 @@ Module modStatusInputTimeseriesPerlnd
             End If
 
             'section nitr
-            If ltable.Parms.Item("NITRFG") = 1 Then
+            If ltable.Parms("NITRFG").Value = 1 Then
                 If dryadfg = 1 Then
                     For i = 1 To 3
                         For j = 1 To 2
@@ -301,11 +301,11 @@ Module modStatusInputTimeseriesPerlnd
                     Next i
                     TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("PESTFG") = 0 Then
-                    If ltable.Parms.Item("SEDFG") = 0 Then
+                If ltable.Parms("PESTFG").Value = 0 Then
+                    If ltable.Parms("SEDFG").Value = 0 Then
                         TimserStatus.Change("SEDMNT:SOSED", 1, HspfStatusRequired)
                     End If
-                    If ltable.Parms.Item("MSTLFG") = 0 Then
+                    If ltable.Parms("MSTLFG").Value = 0 Then
                         For i = 1 To 5
                             TimserStatus.Change("MSTLAY:MST", i, HspfStatusRequired)
                         Next i
@@ -322,7 +322,7 @@ Module modStatusInputTimeseriesPerlnd
                         adopf3 = 0
                     End If
                     If adopf1 > 0 Or adopf2 > 0 Or adopf3 > 0 Then
-                        If ltable.Parms.Item("PSTFG") = 0 Then
+                        If ltable.Parms("PSTFG").Value = 0 Then
                             TimserStatus.Change("PSTEMP:SLTMP", 1, HspfStatusRequired)
                             TimserStatus.Change("PSTEMP:ULTMP", 1, HspfStatusRequired)
                             TimserStatus.Change("PSTEMP:LGTMP", 1, HspfStatusRequired)
@@ -332,7 +332,7 @@ Module modStatusInputTimeseriesPerlnd
             End If
 
             'section phos
-            If ltable.Parms.Item("PHOSFG") = 1 Then
+            If ltable.Parms("PHOSFG").Value = 1 Then
                 If dryadfg = 1 Then
                     For i = 1 To 2
                         For j = 1 To 2
@@ -348,11 +348,11 @@ Module modStatusInputTimeseriesPerlnd
                     Next i
                     TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("PESTFG") = 0 Then
-                    If ltable.Parms.Item("SEDFG") = 0 Then
+                If ltable.Parms("PESTFG").Value = 0 Then
+                    If ltable.Parms("SEDFG").Value = 0 Then
                         TimserStatus.Change("SEDMNT:SOSED", 1, HspfStatusRequired)
                     End If
-                    If ltable.Parms.Item("MSTLFG") = 0 Then
+                    If ltable.Parms("MSTLFG").Value = 0 Then
                         For i = 1 To 5
                             TimserStatus.Change("MSTLAY:MST", i, HspfStatusRequired)
                         Next i
@@ -367,7 +367,7 @@ Module modStatusInputTimeseriesPerlnd
                         adopf3 = 0
                     End If
                     If adopf1 > 0 Or adopf2 > 0 Or adopf3 > 0 Then
-                        If ltable.Parms.Item("PSTFG") = 0 Then
+                        If ltable.Parms("PSTFG").Value = 0 Then
                             TimserStatus.Change("PSTEMP:SLTMP", 1, HspfStatusRequired)
                             TimserStatus.Change("PSTEMP:ULTMP", 1, HspfStatusRequired)
                             TimserStatus.Change("PSTEMP:LGTMP", 1, HspfStatusRequired)
@@ -377,7 +377,7 @@ Module modStatusInputTimeseriesPerlnd
             End If
 
             'section tracer
-            If ltable.Parms.Item("TRACFG") = 1 Then
+            If ltable.Parms("TRACFG").Value = 1 Then
                 If dryadfg = 1 Then
                     TimserStatus.Change("EXTNL:TRADFX", 1, HspfStatusRequired)
                 End If
@@ -385,7 +385,10 @@ Module modStatusInputTimeseriesPerlnd
                     TimserStatus.Change("EXTNL:TRADCN", 1, HspfStatusRequired)
                     TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("MSTLFG") = 0 And ltable.Parms.Item("PESTFG") = 0 And ltable.Parms.Item("NITRFG") = 0 And ltable.Parms.Item("PHOSFG") = 0 Then
+                If ltable.Parms("MSTLFG").Value = 0 And _
+                   ltable.Parms("PESTFG").Value = 0 And _
+                   ltable.Parms("NITRFG").Value = 0 And _
+                   ltable.Parms("PHOSFG").Value = 0 Then
                     For i = 1 To 5
                         TimserStatus.Change("MSTLAY:MST", i, HspfStatusRequired)
                     Next i

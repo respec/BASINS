@@ -1,5 +1,15 @@
 Option Strict Off
 Option Explicit On
+
+Imports System.Collections.ObjectModel
+
+Public Class HspfParms
+    Inherits KeyedCollection(Of String, HspfParm)
+    Protected Overrides Function GetKeyForItem(ByVal aParm As HspfParm) As String
+        Return aParm.Name
+    End Function
+End Class
+
 ''' <summary>
 ''' A model parameter value.
 ''' </summary>
@@ -15,7 +25,7 @@ Public Class HspfParm
     ''' </summary>
     Public Property Value() As String
         Get
-            Value = pValue
+            Return pValue
         End Get
         Set(ByVal Value As String)
             pValue = Value
@@ -30,7 +40,7 @@ Public Class HspfParm
     ''' </summary>
     Public Property ValueAsRead() As String
         Get
-            ValueAsRead = pValueAsRead
+            Return pValueAsRead
         End Get
         Set(ByVal Value As String)
             pValueAsRead = Value
@@ -42,7 +52,7 @@ Public Class HspfParm
     ''' </summary>
     Public Property Def() As HSPFParmDef
         Get
-            Def = pDef
+            Return pDef
         End Get
         Set(ByVal Value As HSPFParmDef)
             pDef = Value
