@@ -6,6 +6,7 @@ Public Class frmModelSegmentation
 
     Private Sub cmdAssign_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdAssign.Click
         Dim frmAssign As New frmAssignMet
+        frmAssign.SetSubbasinsLayer(cboSubbasins.Items(cboSubbasins.SelectedIndex))
         frmAssign.Show()
     End Sub
 
@@ -37,5 +38,43 @@ Public Class frmModelSegmentation
             'default to first layer if nothing more fitting has been found
             cboSubbasins.SelectedIndex = 0
         End If
+    End Sub
+
+    Private Sub cmdInput_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdInput.Click
+        Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
+
+        If GisUtil.NumSelectedFeatures(lSubbasinLayerIndex) = 0 Then
+            'nothing selected in specified layer, let user know this is a problem
+            MsgBox("Nothing is selected in layer '" & lSubbasinLayerName & "'.", MsgBoxStyle.Information, "Input Segment IDs for Selected Problem")
+        Else
+            Dim frmIDs As New frmIDs
+            frmIDs.SetSubbasinsLayer(lSubbasinLayerName)
+            frmIDs.Show()
+        End If
+    End Sub
+
+    Private Sub cmdDisplay_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdDisplay.Click
+        Dim lSubbasinLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+        Dim lSubbasinLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinLayerName)
+
+        If Not GisUtil.IsField(lSubbasinLayerIndex, "ModelSeg") Then
+            'can't do themeatic display without a modelseg field
+            MsgBox("Cannot display thematic map until model segments have been defined.", MsgBoxStyle.Information, "Display Segments Themeatically Problem")
+            Exit Sub
+        End If
+
+        Dim lModelSegFieldIndex As Integer = -1
+        lModelSegFieldIndex = GisUtil.FieldIndex(lSubbasinLayerIndex, "ModelSeg")
+
+        'save original coloring scheme in case we want to return to it
+        Dim lColoringScheme As Object = GisUtil.GetColoringScheme(lSubbasinLayerIndex)
+        'do the renderer
+        GisUtil.UniqueValuesRenderer(lSubbasinLayerIndex, lModelSegFieldIndex)
+        If MsgBox("Do you want to keep this thematic map?", MsgBoxStyle.OkCancel, "Display Segments Themeatically") = MsgBoxResult.Cancel Then
+            'revert to original renderer
+            GisUtil.ColoringScheme(lSubbasinLayerIndex) = lColoringScheme
+        End If
+
     End Sub
 End Class
