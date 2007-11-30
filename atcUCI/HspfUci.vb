@@ -1311,13 +1311,13 @@ Public Class HspfUci
     '    lOper = pOpnBlks.Item("RCHRES").OperFromID(Id)
     '    If lOper.TableExists("NUT-FLAGS") Then
     '        ltable = lOper.Tables.Item("NUT-FLAGS")
-    '        If ltable.Parms.Item("NH3FG").Value = 0 Then
+    '        If ltable.Parms("NH3FG").Value = 0 Then
     '            ostr(10) = ""
     '        End If
-    '        If ltable.Parms.Item("NO2FG").Value = 0 Then
+    '        If ltable.Parms("NO2FG").Value = 0 Then
     '            ostr(11) = ""
     '        End If
-    '        If ltable.Parms.Item("PO4FG").Value = 0 Then
+    '        If ltable.Parms("PO4FG").Value = 0 Then
     '            ostr(12) = ""
     '        End If
     '    Else
@@ -1328,7 +1328,7 @@ Public Class HspfUci
     '    End If
     '    If lOper.TableExists("PLNK-FLAGS") Then
     '        ltable = lOper.Tables.Item("PLNK-FLAGS")
-    '        If ltable.Parms.Item("PHYFG").Value = 0 Then
+    '        If ltable.Parms("PHYFG").Value = 0 Then
     '            ostr(16) = ""
     '        End If
     '    Else

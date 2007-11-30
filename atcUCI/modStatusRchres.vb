@@ -42,7 +42,7 @@ Module modStatusRchres
         If O.TableExists("ACTIVITY") Then
             'moved Benrfg to OXRX  THJ
             ltable = O.Tables.Item("ACTIVITY")
-            If ltable.Parms.Item("HYDRFG") = 1 Then
+            If ltable.Parms("HYDRFG").Value = 1 Then
                 TableStatus.Change("HYDR-PARM1", 1, HspfStatusOptional)
                 If O.TableExists("HYDR-PARM1") Then
                     If O.Tables.Item("HYDR-PARM1").ParmValue("VCONFG") = 1 Then
@@ -56,10 +56,10 @@ Module modStatusRchres
                 'must pass NCAT from CATEGORY to NCATS in HYDR to be able to
                 'process categories.
             End If
-            If ltable.Parms.Item("ADFG") = 1 Then
+            If ltable.Parms("ADFG").Value = 1 Then
                 TableStatus.Change("ADCALC-DATA", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("CONSFG") = 1 Then
+            If ltable.Parms("CONSFG").Value = 1 Then
                 TableStatus.Change("NCONS", 1, HspfStatusOptional)
                 TableStatus.Change("CONS-AD-FLAG", 1, HspfStatusOptional)
                 If O.TableExists("NCONS") Then
@@ -71,7 +71,7 @@ Module modStatusRchres
                     TableStatus.Change("CONS-DATA", i, HspfStatusRequired)
                 Next i
             End If
-            If ltable.Parms.Item("HTFG") = 1 Then
+            If ltable.Parms("HTFG").Value = 1 Then
                 TableStatus.Change("HT-BED-FLAGS", 1, HspfStatusOptional)
                 TableStatus.Change("HEAT-PARM", 1, HspfStatusOptional)
                 If O.TableExists("HT-BED-FLAGS") Then
@@ -89,10 +89,10 @@ Module modStatusRchres
                 End If
                 TableStatus.Change("HEAT-INIT", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("SEDFG") = 1 Then
+            If ltable.Parms("SEDFG").Value = 1 Then
                 TableStatus.Change("SANDFG", 1, HspfStatusOptional)
                 TableStatus.Change("SED-GENPARM", 1, HspfStatusRequired)
-                If ltable.Parms.Item("HYDRFG") = 0 Then
+                If ltable.Parms("HYDRFG").Value = 0 Then
                     TableStatus.Change("SED-HYDPARM", 1, HspfStatusRequired)
                 End If
                 TableStatus.Change("SAND-PM", 1, HspfStatusRequired)
@@ -103,7 +103,7 @@ Module modStatusRchres
                 TableStatus.Change("SSED-INIT", 1, HspfStatusOptional)
                 TableStatus.Change("BED-INIT", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("GQALFG") = 1 Then
+            If ltable.Parms("GQALFG").Value = 1 Then
                 TableStatus.Change("GQ-GENDATA", 1, HspfStatusOptional)
                 TableStatus.Change("GQ-AD-FLAGS", 1, HspfStatusOptional)
                 If O.TableExists("GQ-GENDATA") Then
@@ -243,7 +243,7 @@ Module modStatusRchres
                     If mPhoto Then
                         TableStatus.Change("MON-PHYTO", 1, HspfStatusOptional)
                     End If
-                    If ltable.Parms.Item("HTFG") = 0 Then
+                    If ltable.Parms("HTFG").Value = 0 Then
                         TableStatus.Change("SURF-EXPOSED", 1, HspfStatusOptional)
                     End If
                 End If
@@ -254,7 +254,7 @@ Module modStatusRchres
                     Else
                         Reamfg = 2
                     End If
-                    If ltable.Parms.Item("HTFG") = 0 Then
+                    If ltable.Parms("HTFG").Value = 0 Then
                         TableStatus.Change("ELEV", 1, HspfStatusOptional)
                         'added check on HTFG   THJ
                     End If
@@ -264,7 +264,7 @@ Module modStatusRchres
                     Else
                         If Reamfg = 1 Then
                             TableStatus.Change("OX-TSIVOGLOU", 1, HspfStatusOptional)
-                            If ltable.Parms.Item("HYDRFG") = 0 Then
+                            If ltable.Parms("HYDRFG").Value = 0 Then
                                 TableStatus.Change("OX-LEN-DELTH", 1, HspfStatusRequired)
                             End If
                         ElseIf Reamfg = 2 Then
@@ -282,7 +282,7 @@ Module modStatusRchres
                     End If
                 Next i
             End If
-            If ltable.Parms.Item("OXFG") = 1 Then
+            If ltable.Parms("OXFG").Value = 1 Then
                 TableStatus.Change("BENTH-FLAG", 1, HspfStatusOptional)
                 If O.TableExists("BENTH-FLAG") Then
                     Benrfg = O.Tables.Item("BENTH-FLAG").ParmValue("BENRFG")
@@ -296,7 +296,7 @@ Module modStatusRchres
                 Else
                     Reamfg = 2
                 End If
-                If ltable.Parms.Item("HTFG") = 0 Then
+                If ltable.Parms("HTFG").Value = 0 Then
                     TableStatus.Change("ELEV", 1, HspfStatusOptional)
                 End If
                 If Lkfg = 1 Then
@@ -304,7 +304,7 @@ Module modStatusRchres
                 Else
                     If Reamfg = 1 Then
                         TableStatus.Change("OX-TSIVOGLOU", 1, HspfStatusOptional)
-                        If ltable.Parms.Item("HYDRFG") = 0 Then
+                        If ltable.Parms("HYDRFG").Value = 0 Then
                             TableStatus.Change("OX-LEN-DELTH", 1, HspfStatusRequired)
                         End If
                     ElseIf Reamfg = 2 Then
@@ -319,8 +319,8 @@ Module modStatusRchres
                 TableStatus.Change("OX-GENPARM", 1, HspfStatusRequired)
                 TableStatus.Change("OX-INIT", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("NUTFG") = 1 Then
-                If ltable.Parms.Item("PLKFG") = 1 Then
+            If ltable.Parms("NUTFG").Value = 1 Then
+                If ltable.Parms("PLKFG").Value = 1 Then
                     TableStatus.Change("NUT-FLAGS", 1, HspfStatusRequired)
                 Else
                     TableStatus.Change("NUT-FLAGS", 1, HspfStatusOptional)
@@ -361,7 +361,7 @@ Module modStatusRchres
                 End If
                 TableStatus.Change("NUT-DINIT", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("PLKFG") = 1 Then
+            If ltable.Parms("PLKFG").Value = 1 Then
                 TableStatus.Change("PLNK-FLAGS", 1, HspfStatusRequired)
                 If O.TableExists("PLNK-FLAGS") Then
                     With O.Tables.Item("PLNK-FLAGS")
@@ -375,7 +375,7 @@ Module modStatusRchres
                     Balfg = 0
                 End If
                 TableStatus.Change("PLNK-AD-FLAGS", 1, HspfStatusOptional)
-                If ltable.Parms.Item("HTFG") = 0 Then
+                If ltable.Parms("HTFG").Value = 0 Then
                     TableStatus.Change("SURF-EXPOSED", 1, HspfStatusOptional)
                     'changed from required to optional - default is 1  THJ
                 End If
@@ -396,7 +396,8 @@ Module modStatusRchres
                 End If
                 TableStatus.Change("PLNK-INIT", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("PHFG") = 1 Or ltable.Parms.Item("PHFG") = 3 Then
+            If ltable.Parms("PHFG").Value = 1 Or _
+               ltable.Parms("PHFG").Value = 3 Then
                 TableStatus.Change("PH-PARM1", 1, HspfStatusOptional)
                 TableStatus.Change("PH-PARM2", 1, HspfStatusOptional)
                 TableStatus.Change("PH-INIT", 1, HspfStatusOptional)
@@ -410,7 +411,8 @@ Module modStatusRchres
                 End If
             Next i
             If lAcidph Then
-                If ltable.Parms.Item("PHFG") = 2 Or ltable.Parms.Item("PHFG") = 3 Then
+                If ltable.Parms("PHFG").Value = 2 Or _
+                   ltable.Parms("PHFG").Value = 3 Then
                     'acidph is on
                     TableStatus.Change("ACID-FLAGS", 1, HspfStatusOptional)
                     TableStatus.Change("ACID-PARMS", 1, HspfStatusOptional)

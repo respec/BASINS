@@ -3,6 +3,7 @@ Option Strict Off
 Option Explicit On
 
 Imports System.Text
+Imports System.Collections.ObjectModel
 Imports atcUtility
 
 Public Class HspfTable
@@ -12,7 +13,7 @@ Public Class HspfTable
     Private pOccurIndex As Integer 'occurence with which this table is associated
     Private pComment As String
     Private pTableComment As String
-    Private pParms As Collection 'of HSPFParm
+    Private pParms As HspfParms
     Private pOpn As HspfOperation
     Private pEditAllSimilar As Boolean
     Private pEdited As Boolean
@@ -92,15 +93,15 @@ Public Class HspfTable
         End Set
     End Property
 
-    Public ReadOnly Property Parms() As Collection
-        Get 'of HSPFParm
-            Parms = pParms
+    Public ReadOnly Property Parms() As Collection(Of HspfParm)
+        Get
+            Return pParms
         End Get
     End Property
 
     Public Property Opn() As HspfOperation
         Get
-            Opn = pOpn
+            Return pOpn
         End Get
         Set(ByVal Value As HspfOperation)
             pOpn = Value
@@ -207,7 +208,7 @@ Public Class HspfTable
                     End If
                 End If
             End If
-            pParms.Add(lParm, lParm.Name)
+            pParms.Add(lParm)
         Next vParmDef
     End Sub
 
@@ -382,7 +383,7 @@ notMissingTableForThisOper:
     Public Sub New()
         MyBase.New()
         pDef = New HspfTableDef
-        pParms = New Collection
+        pParms = New HspfParms
         pOccurCount = 0
         pEditAllSimilar = True
         pCombineOK = True

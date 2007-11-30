@@ -19,7 +19,7 @@ Module modStatusOutputTimeseriesPerlnd
             ltable = O.Tables.Item("ACTIVITY")
 
             'section atemp
-            If ltable.Parms.Item("AIRTFG") = 1 Then
+            If ltable.Parms("AIRTFG").Value = 1 Then
                 TimserStatus.Change("ATEMP:AIRTMP", 1, HspfStatusOptional)
             End If
 
@@ -29,7 +29,7 @@ Module modStatusOutputTimeseriesPerlnd
             Else
                 snopfg = 0
             End If
-            If ltable.Parms.Item("SNOWFG") = 1 Then
+            If ltable.Parms("SNOWFG").Value = 1 Then
                 TimserStatus.Change("SNOW:PACK", 1, HspfStatusOptional)
                 TimserStatus.Change("SNOW:PACKF", 1, HspfStatusOptional)
                 TimserStatus.Change("SNOW:PACKW", 1, HspfStatusOptional)
@@ -70,7 +70,7 @@ Module modStatusOutputTimeseriesPerlnd
                 csnofg = 0
                 irrgfg = 0
             End If
-            If ltable.Parms.Item("PWATFG") = 1 Then
+            If ltable.Parms("PWATFG").Value = 1 Then
                 TimserStatus.Change("PWATER:PERS", 1, HspfStatusOptional)
                 TimserStatus.Change("PWATER:CEPS", 1, HspfStatusOptional)
                 TimserStatus.Change("PWATER:SURS", 1, HspfStatusOptional)
@@ -125,7 +125,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section sedmnt
-            If ltable.Parms.Item("SEDFG") = 1 Then
+            If ltable.Parms("SEDFG").Value = 1 Then
                 TimserStatus.Change("SEDMNT:DETS", 1, HspfStatusOptional)
                 TimserStatus.Change("SEDMNT:STCAP", 1, HspfStatusOptional)
                 TimserStatus.Change("SEDMNT:COVER", 1, HspfStatusOptional)
@@ -137,7 +137,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section pstemp
-            If ltable.Parms.Item("PSTFG") = 1 Then
+            If ltable.Parms("PSTFG").Value = 1 Then
                 TimserStatus.Change("PSTEMP:AIRTC", 1, HspfStatusOptional)
                 TimserStatus.Change("PSTEMP:SLTMP", 1, HspfStatusOptional)
                 TimserStatus.Change("PSTEMP:ULTMP", 1, HspfStatusOptional)
@@ -145,7 +145,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section pwtgas
-            If ltable.Parms.Item("PWGFG") = 1 Then
+            If ltable.Parms("PWGFG").Value = 1 Then
                 TimserStatus.Change("PWTGAS:SOTMP", 1, HspfStatusOptional)
                 TimserStatus.Change("PWTGAS:IOTMP", 1, HspfStatusOptional)
                 TimserStatus.Change("PWTGAS:AOTMP", 1, HspfStatusOptional)
@@ -170,7 +170,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section pqual
-            If ltable.Parms.Item("PQALFG") = 1 Then
+            If ltable.Parms("PQALFG").Value = 1 Then
                 If O.TableExists("NQUALS") Then
                     nquals = O.Tables.Item("NQUALS").ParmValue("NQUAL")
                 Else
@@ -232,7 +232,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section mstlay
-            If ltable.Parms.Item("MSTLFG") = 1 Then
+            If ltable.Parms("MSTLFG").Value = 1 Then
                 For i = 1 To 5
                     TimserStatus.Change("MSTLAY:MST", i, HspfStatusOptional)
                 Next i
@@ -242,7 +242,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section pest
-            If ltable.Parms.Item("PESTFG") = 1 Then
+            If ltable.Parms("PESTFG").Value = 1 Then
                 If O.TableExists("PEST-FLAGS") Then
                     npst = O.Tables.Item("PEST-FLAGS").ParmValue("NPST")
                 Else
@@ -288,7 +288,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section nitr
-            If ltable.Parms.Item("NITRFG") = 1 Then
+            If ltable.Parms("NITRFG").Value = 1 Then
                 TimserStatus.Change("NITR:AGPLTN", 1, HspfStatusOptional)
                 TimserStatus.Change("NITR:LITTRN", 1, HspfStatusOptional)
                 TimserStatus.Change("NITR:TOTNIT", 1, HspfStatusOptional)
@@ -352,7 +352,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section phos
-            If ltable.Parms.Item("PHOSFG") = 1 Then
+            If ltable.Parms("PHOSFG").Value = 1 Then
                 TimserStatus.Change("PHOS:IP", 1, HspfStatusOptional)
                 TimserStatus.Change("PHOS:TOTPHO", 1, HspfStatusOptional)
                 'TimserStatus.Change "PHOS:SPDFC", 1, HspfStatusOptional 'no longer in msg file?
@@ -389,7 +389,7 @@ Module modStatusOutputTimeseriesPerlnd
             End If
 
             'section tracer
-            If ltable.Parms.Item("TRACFG") = 1 Then
+            If ltable.Parms("TRACFG").Value = 1 Then
                 TimserStatus.Change("TRACER:STRSU", 1, HspfStatusOptional)
                 TimserStatus.Change("TRACER:UTRSU", 1, HspfStatusOptional)
                 TimserStatus.Change("TRACER:ITRSU", 1, HspfStatusOptional)

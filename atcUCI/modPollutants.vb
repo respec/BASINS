@@ -429,7 +429,7 @@ Module modPollutants
                                 End If
                             End If
                             If ltable.Name = "QUAL-PROPS" Then
-                                isedfg = ltable.Parms.Item("QSDFG").Value
+                                isedfg = ltable.Parms("QSDFG").Value
                             End If
                         ElseIf lCtype = "PERLND" Then
                             If ltable.Name <> "NQUALS" And ltable.Name <> "PQL-AD-FLAGS" And ltable.Name <> "LAT-FACTOR" Then '(these three can only appear once)
@@ -442,7 +442,7 @@ Module modPollutants
                                 End If
                             End If
                             If ltable.Name = "QUAL-PROPS" Then
-                                psedfg = ltable.Parms.Item("QSDFG").Value
+                                psedfg = ltable.Parms("QSDFG").Value
                             End If
                         ElseIf lCtype = "RCHRES" Then
                             If ltable.Name <> "GQ-GENDATA" Then

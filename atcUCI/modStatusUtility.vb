@@ -18,7 +18,8 @@ Module modStatusUtility
         TableStatus.Change("PLOTINFO", 1, HspfStatusRequired)
         If O.TableExists("PLOTINFO") Then
             lTable = O.Tables.Item("PLOTINFO")
-            Ncrv = lTable.Parms.Item("NPT") + lTable.Parms.Item("NMN")
+            Ncrv = lTable.Parms("NPT").Value + _
+                   lTable.Parms("NMN").Value
         Else
             Ncrv = 1
         End If
@@ -49,7 +50,7 @@ Module modStatusUtility
         TableStatus.Change("OPCODE", 1, HspfStatusRequired)
         If O.TableExists("OPCODE") Then
             lTable = O.Tables.Item("OPCODE")
-            Opcode = lTable.Parms.Item("OPCODE")
+            Opcode = lTable.Parms("OPCODE").Value
         Else
             Opcode = 0
         End If

@@ -244,12 +244,12 @@ Public Class HspfOpnBlk
                                     End Try
                                 End If
                                 If ltable.Name = "GEN-INFO" Then
-                                    lId.Description = ltable.Parms.Item(1).Value
+                                    lId.Description = ltable.Parms(1).Value
                                 End If
                                 If ltable.Name = "HYDR-PARM2" Then
                                     lId.FTable = New HspfFtable
                                     lId.FTable.Operation = lId
-                                    lId.FTable.Id = ltable.Parms.Item(2).Value
+                                    lId.FTable.Id = ltable.ParmValue("FTBUCI")
                                 End If
                             End If
                         Next vId

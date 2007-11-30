@@ -24,10 +24,10 @@ Module modStatusImplnd
 
         If O.TableExists("ACTIVITY") Then
             ltable = O.Tables.Item("ACTIVITY")
-            If ltable.Parms.Item("ATMPFG") = 1 Then
+            If ltable.Parms("ATMPFG").Value = 1 Then
                 TableStatus.Change("ATEMP-DAT", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("SNOWFG") = 1 Then
+            If ltable.Parms("SNOWFG").Value = 1 Then
                 TableStatus.Change("ICE-FLAG", 1, HspfStatusOptional)
                 TableStatus.Change("SNOW-FLAGS", 1, HspfStatusOptional)
                 If O.TableExists("SNOW-FLAGS") Then
@@ -43,13 +43,13 @@ Module modStatusImplnd
                 TableStatus.Change("SNOW-INIT1", 1, HspfStatusOptional)
                 TableStatus.Change("SNOW-INIT2", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("IWATFG") = 1 Then
+            If ltable.Parms("IWATFG").Value = 1 Then
                 TableStatus.Change("IWAT-PARM1", 1, HspfStatusOptional)
                 If O.TableExists("IWAT-PARM1") Then
                     With O.Tables.Item("IWAT-PARM1")
                         Vrsfg = .ParmValue("VRSFG")
                         Vnnfg = .ParmValue("VNNFG")
-                        If ltable.Parms.Item("SNOWFG") = 1 Then
+                        If ltable.Parms("SNOWFG").Value = 1 Then
                             .ParmValue("CSNOFG") = 1
                         End If
                     End With
@@ -67,7 +67,7 @@ Module modStatusImplnd
                 End If
                 TableStatus.Change("IWAT-STATE1", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("SLDFG") = 1 Then
+            If ltable.Parms("SLDFG").Value = 1 Then
                 TableStatus.Change("SLD-PARM1", 1, HspfStatusOptional)
                 If O.TableExists("SLD-PARM1") Then
                     Vasdfg = O.Tables.Item("SLD-PARM1").ParmValue("VASDFG")
@@ -85,7 +85,7 @@ Module modStatusImplnd
                 End If
                 TableStatus.Change("SLD-STOR", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("IWGFG") = 1 Then
+            If ltable.Parms("IWGFG").Value = 1 Then
                 TableStatus.Change("IWT-PARM1", 1, HspfStatusOptional)
                 If O.TableExists("IWT-PARM1") Then
                     Wtfvfg = O.Tables.Item("IWT-PARM1").ParmValue("WTFVFG")
@@ -100,7 +100,7 @@ Module modStatusImplnd
                 End If
                 TableStatus.Change("IWT-INIT", 1, HspfStatusOptional)
             End If
-            If ltable.Parms.Item("IQALFG") = 1 Then
+            If ltable.Parms("IQALFG").Value = 1 Then
                 TableStatus.Change("NQUALS", 1, HspfStatusOptional)
                 If O.TableExists("NQUALS") Then
                     Nqual = O.Tables.Item("NQUALS").ParmValue("NQUAL")

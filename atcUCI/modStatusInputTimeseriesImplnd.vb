@@ -18,7 +18,7 @@ Module modStatusInputTimeseriesImplnd
             ltable = O.Tables.Item("ACTIVITY")
 
             'section atemp
-            If ltable.Parms.Item("ATMPFG") = 1 Then
+            If ltable.Parms("ATMPFG").Value = 1 Then
                 TimserStatus.Change("EXTNL:GATMP", 1, HspfStatusRequired)
                 TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
             End If
@@ -29,7 +29,7 @@ Module modStatusInputTimeseriesImplnd
             Else
                 snopfg = 0
             End If
-            If ltable.Parms.Item("SNOWFG") = 1 Then
+            If ltable.Parms("SNOWFG").Value = 1 Then
                 TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 If snopfg = 0 Then
                     TimserStatus.Change("EXTNL:DTMPG", 1, HspfStatusRequired)
@@ -39,7 +39,7 @@ Module modStatusInputTimeseriesImplnd
                 Else
                     TimserStatus.Change("EXTNL:DTMPG", 1, HspfStatusOptional)
                 End If
-                If ltable.Parms.Item("ATMPFG") = 0 Then
+                If ltable.Parms("ATMPFG").Value = 0 Then
                     TimserStatus.Change("ATEMP:AIRTMP", 1, HspfStatusRequired)
                 End If
             End If
@@ -51,17 +51,17 @@ Module modStatusInputTimeseriesImplnd
             End If
 
             'section iwater
-            If ltable.Parms.Item("IWATFG") = 1 Then
+            If ltable.Parms("IWATFG").Value = 1 Then
                 TimserStatus.Change("EXTNL:PETINP", 1, HspfStatusRequired)
                 TimserStatus.Change("EXTNL:SURLI", 1, HspfStatusOptional)
                 If csnofg = 0 Then
                     TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 End If
                 If csnofg = 1 Then
-                    If ltable.Parms.Item("ATMPFG") = 0 Then
+                    If ltable.Parms("ATMPFG").Value = 0 Then
                         TimserStatus.Change("ATEMP:AIRTMP", 1, HspfStatusRequired)
                     End If
-                    If ltable.Parms.Item("SNOWFG") = 0 Then
+                    If ltable.Parms("SNOWFG").Value = 0 Then
                         TimserStatus.Change("SNOW:RAINF", 1, HspfStatusRequired)
                         TimserStatus.Change("SNOW:SNOCOV", 1, HspfStatusRequired)
                         TimserStatus.Change("SNOW:WYIELD", 1, HspfStatusRequired)
@@ -70,24 +70,24 @@ Module modStatusInputTimeseriesImplnd
             End If
 
             'section solids
-            If ltable.Parms.Item("SLDFG") = 1 Then
+            If ltable.Parms("SLDFG").Value = 1 Then
                 TimserStatus.Change("EXTNL:PREC", 1, HspfStatusRequired)
                 TimserStatus.Change("EXTNL:SLSLD", 1, HspfStatusOptional)
-                If ltable.Parms.Item("IWATFG") = 0 Then
+                If ltable.Parms("IWATFG").Value = 0 Then
                     TimserStatus.Change("IWATER:SURO", 1, HspfStatusRequired)
                     TimserStatus.Change("IWATER:SURS", 1, HspfStatusRequired)
                 End If
             End If
 
             'section iwtgas
-            If ltable.Parms.Item("IWGFG") = 1 Then
-                If ltable.Parms.Item("ATMPFG") = 0 Then
+            If ltable.Parms("IWGFG").Value = 1 Then
+                If ltable.Parms("ATMPFG").Value = 0 Then
                     TimserStatus.Change("ATEMP:AIRTMP", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("SNOWFG") = 0 And csnofg = 1 Then
+                If ltable.Parms("SNOWFG").Value = 0 And csnofg = 1 Then
                     TimserStatus.Change("SNOW:WYIELD", 1, HspfStatusRequired)
                 End If
-                If ltable.Parms.Item("IWATFG") = 0 Then
+                If ltable.Parms("IWATFG").Value = 0 Then
                     TimserStatus.Change("IWATER:SURO", 1, HspfStatusRequired)
                 End If
             End If
@@ -106,7 +106,7 @@ Module modStatusInputTimeseriesImplnd
             End If
 
             'section iqual
-            If ltable.Parms.Item("IQALFG") = 1 Then
+            If ltable.Parms("IQALFG").Value = 1 Then
                 If O.TableExists("NQUALS") Then
                     nquals = O.Tables.Item("NQUALS").ParmValue("NQUAL")
                 Else
@@ -149,12 +149,12 @@ Module modStatusInputTimeseriesImplnd
                     End If
                 Next i
 
-                If ltable.Parms.Item("IWATFG") = 0 Then
+                If ltable.Parms("IWATFG").Value = 0 Then
                     If qualof > 0 Then
                         TimserStatus.Change("PWATER:SURO", 1, HspfStatusRequired) 'or req if SOQC is required for one or more QUALs
                     End If
                 End If
-                If ltable.Parms.Item("SLDFG") = 0 And qualsd > 0 Then
+                If ltable.Parms("SLDFG").Value = 0 And qualsd > 0 Then
                     TimserStatus.Change("SOLIDS:SOSLD", 1, HspfStatusRequired)
                 End If
             End If
