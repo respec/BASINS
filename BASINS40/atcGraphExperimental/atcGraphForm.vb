@@ -50,6 +50,7 @@ Public Class atcGraphForm
 
         Dim lPane As GraphPane = New GraphPane
 
+        InitMatchingColors(FindFile("Find graph coloring rules", "GraphColors.txt"))
         'myPane.PaneFill = New Fill(Color.White, Color.LightYellow, 45.0F)
         With lPane
             With .XAxis
@@ -77,6 +78,12 @@ Public Class atcGraphForm
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
             End With
+            With .Legend
+                .Position = LegendPos.Float
+                .Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
+                .FontSpec.Size = 10
+                .IsHStack = False
+            End With
         End With
 
         pZgc.IsEnableHZoom = mnuViewHorizontalZoom.Checked
@@ -96,7 +103,7 @@ Public Class atcGraphForm
             AddDatasetsScatter(aDataGroup)
         Else
             For Each lTimeseries As atcTimeseries In aDataGroup
-                AddDatasetTimeseries(lTimeseries, lTimeseries.ToString)
+                AddDatasetTimeseries(lTimeseries)
             Next
 
             If mnuViewTime.Checked Then
@@ -120,6 +127,7 @@ Public Class atcGraphForm
         pMaster.AxisChange(lGraphics)
         Invalidate()
         lGraphics.Dispose()
+        Me.Refresh()
     End Sub
 
 #Region " Windows Form Designer generated code "
@@ -458,20 +466,27 @@ Public Class atcGraphForm
                 .Scale.Min = lTimeseriesY.Attributes.GetValue("Max", 1000)
             End With
 
-            Dim lCurveColor As Color = GetMatchingColor(lTimeseriesX.Attributes.GetValue("scenario"))
-            Dim lCurve As LineItem = Nothing
-            Dim lXValues() As Double = lTimeseriesX.Values
-            Dim lYValues() As Double = lTimeseriesY.Values
-            lCurve = Pane.AddCurve(lTimeseriesX.ToString, lXValues, lYValues, lCurveColor, SymbolType.Star)
-            lCurve.Line.IsVisible = False
+            With lTimeseriesY.Attributes
+                Dim lScen As String = .GetValue("scenario")
+                Dim lLoc As String = .GetValue("location")
+                Dim lCons As String = .GetValue("constituent")
+                Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+                Dim lCurve As LineItem = Nothing
+                Dim lXValues() As Double = lTimeseriesX.Values
+                Dim lYValues() As Double = lTimeseriesY.Values
+                lCurve = Pane.AddCurve(TSCurveLabel(lTimeseriesY), lXValues, lYValues, lCurveColor, SymbolType.Star)
+                lCurve.Line.IsVisible = False
+            End With
         End If
     End Sub
 
-    Public Sub AddDatasetTimeseries(ByVal aTimeseries As atcTimeseries, ByVal CurveLabel As String)
+    Public Sub AddDatasetTimeseries(ByVal aTimeseries As atcTimeseries)
+        Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
+        Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
         Dim lOldCons As String
-
-        Dim lCurveColor As Color = GetMatchingColor(aTimeseries.Attributes.GetValue("scenario"))
+        Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
+        Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
         Dim lCurve As LineItem = Nothing
         Dim lOldCurve As LineItem
 
@@ -519,81 +534,104 @@ Public Class atcGraphForm
                 lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
                 lAttributeName = "%" & Format(lX(lIndex), "00.####")
                 lY(lIndex) = aTimeseries.Attributes.GetValue(lAttributeName)
-                Logger.Dbg(lAttributeName & " = " & lY(lIndex) & _
-                                            " : " & lX(lIndex) & _
-                                            " : " & lXFracExceed(lIndex))
+                'Logger.Dbg(lAttributeName & " = " & lY(lIndex) & _
+                '                            " : " & lX(lIndex) & _
+                '                            " : " & lXFracExceed(lIndex))
             Next
             With Pane.XAxis
                 .Scale.Min = lXFracExceed(0)
                 .Scale.Max = lXFracExceed(lLastIndex)
                 AddHandler .ScaleFormatEvent, AddressOf XScaleFormatEvent
                 .Scale.BaseTic = lXFracExceed(0)
+                .Title.Text = "Percent chance exceeded"
+            End With
+            With Pane.YAxis
+                .Type = AxisType.Log
+                .Scale.IsUseTenPower = False
+                If aTimeseries.Attributes.ContainsAttribute("Units") Then
+                    .Title.Text = aTimeseries.Attributes.GetValue("Units")
+                    .Title.IsVisible = True
+                End If
             End With
 
-            lCurve = Pane.AddCurve(CurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
+            'Upper right corner of chart is better for this graph type
+            Pane.Legend.Location = New Location(0.95, 0.05, CoordType.ChartFraction, AlignH.Right, AlignV.Top)
+
+            lCurve = Pane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
             lCurve.Line.Width = 1
             lCurve.Line.StepType = StepType.NonStep
             Me.Refresh()
         ElseIf mnuViewTime.Checked Then
             If Pane.XAxis.Type <> AxisType.DateMulti Then Pane.XAxis.Type = AxisType.DateMulti
             If aTimeseries.Attributes.GetValue("point", False) Then
-                lCurve = Pane.AddCurve(CurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
+                lCurve = Pane.AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
                 lCurve.Line.IsVisible = False
             Else
-                lCurve = Pane.AddCurve(CurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
+                lCurve = Pane.AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
                 lCurve.Line.Width = 1
                 lCurve.Line.StepType = StepType.RearwardStep
+            End If
+
+            If Pane.CurveList.Count = 1 Then
+                If aTimeseries.numValues > 0 Then
+                    Pane.XAxis.Scale.Min = aTimeseries.Attributes.GetValue("SJDay")
+                    Pane.XAxis.Scale.Max = aTimeseries.Attributes.GetValue("EJDay")
+                End If
+            ElseIf Pane.CurveList.Count > 1 AndAlso Not lCurve Is Nothing Then
+                'Expand time scale if needed to include all dates in new curve
+                If aTimeseries.numValues > 0 Then
+                    If aTimeseries.Attributes.GetValue("SJDay") < Pane.XAxis.Scale.Min Then
+                        Pane.XAxis.Scale.Min = aTimeseries.Attributes.GetValue("SJDay")
+                    End If
+                    If aTimeseries.Attributes.GetValue("EJDay") > Pane.XAxis.Scale.Max Then
+                        Pane.XAxis.Scale.Max = aTimeseries.Attributes.GetValue("EJDay")
+                    End If
+                End If
+
+                'Use the same Y axis as other curves with this constituent
+                Dim lFoundMatchingCons As Boolean = False
+                For Each lTs As atcTimeseries In pDataGroup
+                    lOldCurve = Pane.CurveList.Item(TSCurveLabel(lTs))
+                    If Not lOldCurve Is Nothing Then
+                        lOldCons = lTs.Attributes.GetValue("constituent")
+                        If lOldCons = lCons Then
+                            lCurve.IsY2Axis = lOldCurve.IsY2Axis
+                            lFoundMatchingCons = True
+                            Exit For
+                        End If
+                    End If
+                Next
+                If Not lFoundMatchingCons Then
+                    lCurve.IsY2Axis = True
+                End If
+                If lCurve.IsY2Axis Then 'make sure second Y axis is visible and tics are not shown on other Y axis
+                    With Pane.Y2Axis
+                        .MajorTic.IsOpposite = False
+                        .MinorTic.IsOpposite = False
+                        .IsVisible = True
+                        If aTimeseries.Attributes.ContainsAttribute("Units") Then
+                            .Title.Text = aTimeseries.Attributes.GetValue("Units")
+                            .Title.IsVisible = True
+                        End If
+                    End With
+                    With Pane.YAxis
+                        .MajorTic.IsOpposite = False
+                        .MinorTic.IsOpposite = False
+                    End With
+                Else
+                    With Pane.YAxis
+                        If aTimeseries.Attributes.ContainsAttribute("Units") Then
+                            .Title.Text = aTimeseries.Attributes.GetValue("Units")
+                            .Title.IsVisible = True
+                        End If
+                    End With
+                End If
             End If
         End If
         'TODO: label Y Axis
 
         'TODO: 3rd Y Axis above (for PREC)
 
-        If Pane.CurveList.Count = 1 Then
-            If aTimeseries.numValues > 0 Then
-                Pane.XAxis.Scale.Min = aTimeseries.Attributes.GetValue("SJDay")
-                Pane.XAxis.Scale.Max = aTimeseries.Attributes.GetValue("EJDay")
-            End If
-        ElseIf Pane.CurveList.Count > 1 AndAlso Not lCurve Is Nothing Then
-            'Expand time scale if needed to include all dates in new curve
-            If aTimeseries.numValues > 0 Then
-                If aTimeseries.Attributes.GetValue("SJDay") < Pane.XAxis.Scale.Min Then
-                    Pane.XAxis.Scale.Min = aTimeseries.Attributes.GetValue("SJDay")
-                End If
-                If aTimeseries.Attributes.GetValue("EJDay") > Pane.XAxis.Scale.Max Then
-                    Pane.XAxis.Scale.Max = aTimeseries.Attributes.GetValue("EJDay")
-                End If
-            End If
-
-            'Use the same Y axis as other curves with this constituent
-            Dim lFoundMatchingCons As Boolean = False
-            For Each ts As atcTimeseries In pDataGroup
-                lOldCurve = Pane.CurveList.Item(ts.ToString)
-                If Not lOldCurve Is Nothing Then
-                    lOldCons = ts.Attributes.GetValue("constituent")
-                    If lOldCons = lCons Then
-                        lCurve.IsY2Axis = lOldCurve.IsY2Axis
-                        lFoundMatchingCons = True
-                        Exit For
-                    End If
-                End If
-            Next
-            If Not lFoundMatchingCons Then
-                lCurve.IsY2Axis = True
-            End If
-            If lCurve.IsY2Axis Then 'make sure second Y axis is visible and tics are not shown on other Y axis
-                With Pane.Y2Axis
-                    .MajorTic.IsOpposite = False
-                    .MinorTic.IsOpposite = False
-                    .IsVisible = True
-                    .Title.IsVisible = True
-                End With
-                With Pane.YAxis
-                    .MajorTic.IsOpposite = False
-                    .MinorTic.IsOpposite = False
-                End With
-            End If
-        End If
 
         'curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
         'lCurve.Line.IsSmooth = False
@@ -612,6 +650,13 @@ Public Class atcGraphForm
         Dim lStr As String = Format(aVal * 100, "#0.##")
         'Logger.Dbg("LookingForXScaleTicValue:" & aIndex & ":" & aVal & ":" & lVal & ":" & lStr)
         Return lStr
+    End Function
+
+    Private Function TSCurveLabel(ByVal aTimeseries As atcTimeseries) As String
+        Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
+        Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
+        Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
+        Return lScen & " " & lCons & " at " & lLoc
     End Function
 
     Private Function Gausex(ByVal aExprob As Double) As Double
@@ -654,7 +699,7 @@ Public Class atcGraphForm
 
     Private Sub pTimeseriesGroup_Added(ByVal aAdded As atcCollection) Handles pDataGroup.Added
         For Each ts As atcTimeseries In aAdded
-            AddDatasetTimeseries(ts, ts.ToString)
+            AddDatasetTimeseries(ts)
         Next
         pZgc.AxisChange()
         Invalidate()
@@ -662,8 +707,8 @@ Public Class atcGraphForm
     End Sub
 
     Private Sub pTimeseriesGroup_Removed(ByVal aRemoved As atcCollection) Handles pDataGroup.Removed
-        For Each ts As atcTimeseries In aRemoved
-            Pane.CurveList.Remove(Pane.CurveList.Item(ts.ToString))
+        For Each lTs As atcTimeseries In aRemoved
+            Pane.CurveList.Remove(Pane.CurveList.Item(TSCurveLabel(lTs)))
         Next
         pZgc.AxisChange()
         Invalidate()
@@ -754,14 +799,14 @@ Public Class atcGraphForm
     Private Sub mnuViewProbability_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuViewProbability.Click
         mnuViewProbability.Checked = True
         mnuViewTime.Checked = False
-        mnuViewScatter.Checked = False        
+        mnuViewScatter.Checked = False
         SetDatasets(pDataGroup)
     End Sub
 
     Private Sub mnuViewScatter_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewScatter.Click
         mnuViewScatter.Checked = True
         mnuViewTime.Checked = False
-        mnuViewProbability.Checked = False        
+        mnuViewProbability.Checked = False
         SetDatasets(pDataGroup)
     End Sub
 
@@ -778,18 +823,6 @@ Public Class atcGraphForm
     Private Sub mnuViewZoomMouse_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewZoomMouse.Click
         mnuViewZoomMouse.Checked = Not mnuViewZoomMouse.Checked
         pZgc.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
-    End Sub
-
-    Private Sub zgc_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pZgc.MouseDown
-        System.Console.WriteLine("Mouse Down " & e.Button)
-    End Sub
-
-    Private Sub zgc_MouseWheel(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles pZgc.MouseWheel
-        System.Console.WriteLine("Mouse Wheel " & e.Button)
-    End Sub
-
-    Private Sub zgc_ZoomEvent(ByVal sender As ZedGraph.ZedGraphControl, ByVal oldState As ZedGraph.ZoomState, ByVal newState As ZedGraph.ZoomState) Handles pZgc.ZoomEvent
-        System.Console.WriteLine("zgc_ZoomEvent " & newState.ToString)
     End Sub
 End Class
 
