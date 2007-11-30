@@ -2288,6 +2288,66 @@ Public Class GisUtil
         aCentroidY = lPt.y
     End Sub
 
+    Public Shared Sub UniqueValuesRenderer(ByVal aLayerIndex As Integer, ByVal aFieldIndex As Integer)
+        'build a unique values renderer from a given layer and field
+
+        Dim lMWlayer As MapWindow.Interfaces.Layer
+        lMWlayer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
+
+        Dim lColorScheme As New MapWinGIS.ShapefileColorScheme
+        lColorScheme.FieldIndex = aFieldIndex
+        lMWlayer.DrawFill = True
+
+        Dim lSf As MapWinGIS.Shapefile
+        lSf = ShapeFileFromIndex(aLayerIndex)
+
+        'Get unique values
+        Dim lValuesHt As New Hashtable
+        Dim lIndex As Integer
+        Dim lValue As Object
+        For lIndex = 0 To lSf.NumShapes - 1
+            lValue = lSf.CellValue(aFieldIndex, lIndex)
+            If lValuesHt.ContainsKey(lValue) = False Then
+                lValuesHt.Add(lValue, lValue)
+            End If
+        Next
+
+        'Create sorted array
+        Dim lValuesArray() As Object
+        ReDim lValuesArray(lValuesHt.Count - 1)
+        lValuesHt.Values().CopyTo(lValuesArray, 0)
+        Array.Sort(lValuesArray)
+
+        'Create color for each unique value
+        For lIndex = 0 To lValuesArray.Length - 1
+            Dim lBreak As New MapWinGIS.ShapefileColorBreak
+            lBreak.StartColor = System.Convert.ToUInt32(RGB(CInt(Rnd() * 255), CInt(Rnd() * 255), CInt(Rnd() * 255)))
+            lBreak.EndColor = lBreak.StartColor
+            lBreak.StartValue = lValuesArray(lIndex)
+            lBreak.EndValue = lValuesArray(lIndex)
+            lBreak.Caption = lValuesArray(lIndex)
+            lColorScheme.Add(lBreak)
+        Next
+        lMWlayer.ColoringScheme = lColorScheme
+
+    End Sub
+
+    Public Shared WriteOnly Property ColoringScheme(ByVal aLayerIndex As Integer) As Object
+        Set(ByVal aNewValue As Object)
+            Dim lMWlayer As MapWindow.Interfaces.Layer
+            lMWlayer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
+            lMWlayer.ColoringScheme = aNewValue
+        End Set
+    End Property
+
+    Public Shared ReadOnly Property GetColoringScheme(ByVal aLayerIndex As Integer) As Object
+        Get
+            Dim lMWlayer As MapWindow.Interfaces.Layer
+            lMWlayer = pMapWin.Layers(pMapWin.Layers.GetHandle(aLayerIndex))
+            Return lMWlayer.ColoringScheme
+        End Get
+    End Property
+
     ''' <summary>Shapefile projection string from a layer index</summary>
     ''' <param name="aLayerIndex">
     '''     <para>Index of layer (Defaults to current layer)</para>

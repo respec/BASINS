@@ -117,6 +117,12 @@
     <Compile Include="clsSegmentationPlugin.vb">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="frmIDs.Designer.vb">
+      <DependentUpon>frmIDs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmIDs.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmAssignMet.Designer.vb">
       <DependentUpon>frmAssignMet.vb</DependentUpon>
     </Compile>
@@ -134,6 +140,10 @@
     <EmbeddedResource Include="frmAssignMet.resx">
       <SubType>Designer</SubType>
       <DependentUpon>frmAssignMet.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmIDs.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>frmIDs.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmModelSegmentation.resx">
       <SubType>Designer</SubType>
