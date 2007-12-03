@@ -154,7 +154,8 @@ Module modPollutants
                                             tname = lTableDef.Name
                                         End If
                                         If lOpn.TableExists(tname) Then
-                                            tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lOpn.Tables.Item(tname), lTableDef.Name)
+                                            Dim lTable As HspfTable = lOpn.Tables.Item(tname)
+                                            tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lTable)
                                             lOpn.Tables.Remove((tname))
                                         End If
                                         If myUci.OpnBlks(lCtype).TableExists(tname) Then
@@ -193,7 +194,8 @@ Module modPollutants
                                         tname = lTableDef.Name
                                     End If
                                     If lOpn.TableExists(tname) Then
-                                        tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lOpn.Tables.Item(tname), lTableDef.Name)
+                                        Dim lTable As HspfTable = lOpn.Tables.Item(tname)
+                                        tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lTable)
                                         lOpn.Tables.Remove((tname))
                                         If myUci.OpnBlks(lCtype).TableExists(tname) Then
                                             myUci.OpnBlks(lCtype).Tables.Remove(tname)
@@ -263,7 +265,8 @@ Module modPollutants
                                         tname = lTableDef.Name
                                     End If
                                     If lOpn.TableExists(tname) Then
-                                        tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lOpn.Tables.Item(tname), lTableDef.Name)
+                                        Dim lTable As HspfTable = lOpn.Tables.Item(tname)
+                                        tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lTable)
                                         lOpn.Tables.Remove((tname))
                                     End If
                                     If myUci.OpnBlks(lCtype).TableExists(tname) Then
@@ -487,44 +490,44 @@ Module modPollutants
                             Else
                                 cname = ltable.Name
                             End If
-                            lOpn.Tables.Add(ltable, cname)
+                            lOpn.Tables.Add(ltable)
                             If lOpn.TableExists("ACTIVITY") Then
                                 With lOpn.Tables.Item("ACTIVITY")
-                                    .Parms(SecId) = 1 'turn on this section
+                                    .Parms(SecId).Value = 1 'turn on this section
                                     'turn on other prerequisite sections
                                     Select Case lOpn.Name
                                         Case "RCHRES"
                                             For i = 7 To SecId - 1
-                                                .Parms(i) = 1 'previous rqual sections must be on
+                                                .Parms(i).Value = 1 'previous rqual sections must be on
                                             Next i
                                             If SecId > 1 Then
-                                                .Parms(1) = 1 'hydr must be on
+                                                .Parms(1).Value = 1 'hydr must be on
                                             End If
                                             If SecId > 2 Then
-                                                .Parms(2) = 1 'adcalc must be on
+                                                .Parms(2).Value = 1 'adcalc must be on
                                             End If
                                             If SecId > 4 Then
-                                                .Parms(4) = 1 'htrch must be on
+                                                .Parms(4).Value = 1 'htrch must be on
                                             End If
                                         Case "IMPLND"
                                             If SecId = 5 Or SecId = 2 Then
-                                                .Parms(1) = 1 'atemp must be on
+                                                .Parms(1).Value = 1 'atemp must be on
                                             End If
                                             If SecId > 3 Then
-                                                .Parms(3) = 1 'iwater must be on
+                                                .Parms(3).Value = 1 'iwater must be on
                                             End If
                                         Case "PERLND"
                                             If SecId > 8 Then
-                                                .Parms(8) = 1 'mstlay must be on
+                                                .Parms(8).Value = 1 'mstlay must be on
                                             End If
                                             If SecId = 5 Or SecId = 2 Or SecId = 6 Or SecId = 10 Or SecId = 11 Or SecId = 12 Then
-                                                .Parms(1) = 1 'atemp must be on
+                                                .Parms(1).Value = 1 'atemp must be on
                                             End If
                                             If SecId = 4 Or SecId = 6 Or SecId = 7 Or SecId = 9 Or SecId = 10 Or SecId = 11 Then
-                                                .Parms(3) = 1 'pwater must be on
+                                                .Parms(3).Value = 1 'pwater must be on
                                             End If
                                             If SecId = 6 Or SecId = 10 Or SecId = 11 Then
-                                                .Parms(5) = 1 'pstemp must be on
+                                                .Parms(5).Value = 1 'pstemp must be on
                                             End If
                                     End Select
                                 End With

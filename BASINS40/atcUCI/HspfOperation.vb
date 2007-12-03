@@ -21,7 +21,7 @@ Public Class HspfOperation
     Private pOpTyp As HspfData.HspfOperType
     Private pId As Integer
     Private pDescription As String
-    Private pTables As Collection 'of HspfTable
+    Private pTables As HspfTables
     Private pTableStatus As HspfStatus
     Private pInputTimeseriesStatus As HspfStatus
     Private pOutputTimeseriesStatus As HspfStatus
@@ -177,20 +177,20 @@ Public Class HspfOperation
         End Set
     End Property
 
-    Public ReadOnly Property Tables() As Collection
-        Get 'of HspfTable
+    Public ReadOnly Property Tables() As HspfTables
+        Get
             Return pTables
         End Get
     End Property
 
     Public ReadOnly Property Sources() As Collection(Of HspfConnection)
-        Get 'of HspfConnection
+        Get
             Return pSources
         End Get
     End Property
 
     Public ReadOnly Property Targets() As Collection(Of HspfConnection)
-        Get 'of HspfConnection
+        Get
             Return pTargets
         End Get
     End Property
@@ -453,8 +453,10 @@ Public Class HspfOperation
     '	End Sub
 
     'Returns color for source.VolId
-    Private Function IdColor(ByRef Id As Integer) As Integer
-        IdColor = RGB(Rnd(-Id - 53) * 255, Rnd(-Id - 27) * 255, Rnd(-Id - 33) * 255)
+    Private Function IdColor(ByRef aColorId As Integer) As Integer
+        IdColor = RGB(Rnd(-aColorId - 53) * 255, _
+                  Rnd(-aColorId - 27) * 255, _
+                  Rnd(-aColorId - 33) * 255)
     End Function
 
     'Returns percent (0..1) given a source.VolId and value
@@ -482,7 +484,7 @@ Public Class HspfOperation
     Public Sub New()
         MyBase.New()
         'Debug.Print "init HspfOperation"
-        pTables = New Collection
+        pTables = New HspfTables
         pSources = New Collection(Of HspfConnection)
         pTargets = New Collection(Of HspfConnection)
         pPointSources = New Collection(Of HspfPoint)

@@ -96,7 +96,7 @@ Module modStatusInputTimeseriesImplnd
                 With O.Tables.Item("IQL-AD-FLAGS")
                     For i = 1 To 20
                         ctemp = "IQADFG(" & CStr(i) & ")"
-                        iqadfg(i) = .Parms(ctemp)
+                        iqadfg(i) = .Parms(ctemp).Value
                     Next i
                 End With
             Else
