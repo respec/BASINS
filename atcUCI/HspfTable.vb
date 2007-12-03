@@ -428,63 +428,60 @@ notMissingTableForThisOper:
     End Sub
 
     Public Sub SetQualIndex(ByRef noccur As Integer, ByRef Nqual As Integer)
-        Dim tabcnt, i As Integer
-        Dim p As String = ""
-        Dim t As String = ""
-        Dim tname As String
-
+        Dim lParm As String = ""
+        Dim lT As String = ""
         Select Case pDef.Name
-            Case "GQ-GENDECAY" : t = "GQ-QALFG" : p = "QALFG6" 'rchres
-            Case "GQ-HYDPM" : t = "GQ-QALFG" : p = "QALFG1"
-            Case "GQ-ROXPM" : t = "GQ-QALFG" : p = "QALFG2"
-            Case "GQ-PHOTPM" : t = "GQ-QALFG" : p = "QALFG3"
-            Case "GQ-CFGAS" : t = "GQ-QALFG" : p = "QALFG4"
-            Case "GQ-BIOPM" : t = "GQ-QALFG" : p = "QALFG5"
-            Case "MON-BIO" : t = "GQ-QALFG" : p = "QALFG5"
-            Case "GQ-SEDDECAY" : t = "GQ-QALFG" : p = "QALFG7"
-            Case "GQ-KD" : t = "GQ-QALFG" : p = "QALFG7"
-            Case "GQ-ADRATE" : t = "GQ-QALFG" : p = "QALFG7"
-            Case "GQ-ADTHETA" : t = "GQ-QALFG" : p = "QALFG7"
-            Case "GQ-SEDCONC" : t = "GQ-QALFG" : p = "QALFG7"
-                'Case "MON-WATEMP": t = "GQ-QALFG": p = QALFG1
-            Case "MON-PHVAL" : t = "GQ-QALFG" : p = "QALFG1"
-            Case "MON-ROXYGEN" : t = "GQ-QALFG" : p = "QALFG2"
-            Case "GQ-ALPHA" : t = "GQ-QALFG" : p = "QALFG3"
-            Case "GQ-GAMMA" : t = "GQ-QALFG" : p = "QALFG3"
-            Case "GQ-DELTA" : t = "GQ-QALFG" : p = "QALFG3"
-            Case "GQ-CLDFACT" : t = "GQ-QALFG" : p = "QALFG3"
-            Case "MON-CLOUD" : t = "GQ-QALFG" : p = "QALFG3"
-            Case "MON-SEDCONC" : t = "GQ-QALFG" : p = "QALFG3"
-            Case "MON-PHYTO" : t = "GQ-QALFG" : p = "QALFG3"
-                'Case "GQ-DAUGHTER": t = "GQ-QALFG": p = QALFG1
-            Case "MON-SQOLIM" : t = "QUAL-PROPS" : p = "VQOFG" 'perlnd
-            Case "MON-POTFW" : t = "QUAL-PROPS" : p = "VPFWFG"
-            Case "MON-POTFS" : t = "QUAL-PROPS" : p = "VPFSFG"
-            Case "MON-ACCUM" : t = "QUAL-PROPS" : p = "VQOFG"
-            Case "MON-IFLW-CONC" : t = "QUAL-PROPS" : p = "VIQCFG"
-            Case "MON-GRND-CONC" : t = "QUAL-PROPS" : p = "VAQCFG"
-            Case "MON-SQOLIM" : t = "QUAL-PROPS" : p = "VQOFG" 'implnd
-            Case "MON-POTFW" : t = "QUAL-PROPS" : p = "VPFWFG"
-            Case "MON-ACCUM" : t = "QUAL-PROPS" : p = "VQOFG"
+            Case "GQ-GENDECAY" : lT = "GQ-QALFG" : lParm = "QALFG6" 'rchres
+            Case "GQ-HYDPM" : lT = "GQ-QALFG" : lParm = "QALFG1"
+            Case "GQ-ROXPM" : lT = "GQ-QALFG" : lParm = "QALFG2"
+            Case "GQ-PHOTPM" : lT = "GQ-QALFG" : lParm = "QALFG3"
+            Case "GQ-CFGAS" : lT = "GQ-QALFG" : lParm = "QALFG4"
+            Case "GQ-BIOPM" : lT = "GQ-QALFG" : lParm = "QALFG5"
+            Case "MON-BIO" : lT = "GQ-QALFG" : lParm = "QALFG5"
+            Case "GQ-SEDDECAY" : lT = "GQ-QALFG" : lParm = "QALFG7"
+            Case "GQ-KD" : lT = "GQ-QALFG" : lParm = "QALFG7"
+            Case "GQ-ADRATE" : lT = "GQ-QALFG" : lParm = "QALFG7"
+            Case "GQ-ADTHETA" : lT = "GQ-QALFG" : lParm = "QALFG7"
+            Case "GQ-SEDCONC" : lT = "GQ-QALFG" : lParm = "QALFG7"
+                'Case "MON-WATEMP": lT = "GQ-QALFG": lParm = QALFG1
+            Case "MON-PHVAL" : lT = "GQ-QALFG" : lParm = "QALFG1"
+            Case "MON-ROXYGEN" : lT = "GQ-QALFG" : lParm = "QALFG2"
+            Case "GQ-ALPHA" : lT = "GQ-QALFG" : lParm = "QALFG3"
+            Case "GQ-GAMMA" : lT = "GQ-QALFG" : lParm = "QALFG3"
+            Case "GQ-DELTA" : lT = "GQ-QALFG" : lParm = "QALFG3"
+            Case "GQ-CLDFACT" : lT = "GQ-QALFG" : lParm = "QALFG3"
+            Case "MON-CLOUD" : lT = "GQ-QALFG" : lParm = "QALFG3"
+            Case "MON-SEDCONC" : lT = "GQ-QALFG" : lParm = "QALFG3"
+            Case "MON-PHYTO" : lT = "GQ-QALFG" : lParm = "QALFG3"
+                'Case "GQ-DAUGHTER": lT = "GQ-QALFG": lParm = QALFG1
+            Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'perlnd
+            Case "MON-POTFW" : lT = "QUAL-PROPS" : lParm = "VPFWFG"
+            Case "MON-POTFS" : lT = "QUAL-PROPS" : lParm = "VPFSFG"
+            Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
+            Case "MON-IFLW-CONC" : lT = "QUAL-PROPS" : lParm = "VIQCFG"
+            Case "MON-GRND-CONC" : lT = "QUAL-PROPS" : lParm = "VAQCFG"
+            Case "MON-SQOLIM" : lT = "QUAL-PROPS" : lParm = "VQOFG" 'implnd
+            Case "MON-POTFW" : lT = "QUAL-PROPS" : lParm = "VPFWFG"
+            Case "MON-ACCUM" : lT = "QUAL-PROPS" : lParm = "VQOFG"
         End Select
 
-        If Len(t) > 0 Then
-            tabcnt = 0
-            tname = t
-            For i = 1 To Nqual
-                If i > 1 Then
-                    tname = t & ":" & i
+        If lT.Length > 0 Then
+            Dim lTableCount As Integer = 0
+            Dim lTableName As String = lT
+            For lQualIndex As Integer = 1 To Nqual
+                If lQualIndex > 1 Then
+                    lTableName = lT & ":" & lQualIndex
                 End If
-                If pOpn.TableExists(tname) Then
-                    If pOpn.Tables.Item(tname).Parms.Item(p).Value > 0 Then
-                        tabcnt = tabcnt + 1
-                        If tabcnt = noccur Then
+                If pOpn.TableExists(lTableName) Then
+                    If pOpn.Tables.Item(lTableName).Parms.Item(lParm).Value > 0 Then
+                        lTableCount += 1
+                        If lTableCount = noccur Then
                             'this is the one this table belongs to
-                            pOccurIndex = i
+                            pOccurIndex = lQualIndex
                         End If
                     End If
                 End If
-            Next i
+            Next lQualIndex
         End If
     End Sub
 
@@ -501,32 +498,33 @@ notMissingTableForThisOper:
         End If
     End Function
 
-    Private Function NumericallyTheSame(ByRef ValueAsRead As String, ByRef ValueStored As String, ByRef ValueDefault As String) As Boolean
+    Private Function NumericallyTheSame(ByRef aValueAsRead As String, _
+                                        ByRef aValueStored As String, _
+                                        ByRef aValueDefault As String) As Boolean
         'see if the current table value is the same as the value as read from the uci
         '4. is the same as 4.0
         '"  " is the same as 1 if 1 is the default
-        Dim rtemp1, rtemp2 As Single
+        Dim lSingle1, lSingle2 As Single
+        Dim lNumericallyTheSame As Boolean = False
 
-        NumericallyTheSame = False
-        If IsNumeric(ValueStored) Then
-            If IsNumeric(ValueAsRead) Then
-                'simple case
-                rtemp1 = CSng(ValueAsRead)
-                rtemp2 = CSng(ValueStored)
-                If rtemp1 = rtemp2 Then
-                    NumericallyTheSame = True
+        If IsNumeric(aValueStored) Then
+            If IsNumeric(aValueAsRead) Then 'simple case
+                lSingle1 = CSng(aValueAsRead)
+                lSingle2 = CSng(aValueStored)
+                If lSingle1 = lSingle2 Then
+                    lNumericallyTheSame = True
                 End If
-            ElseIf Len(ValueAsRead) > 0 And Len(Trim(ValueAsRead)) = 0 Then
+            ElseIf aValueAsRead.Length > 0 AndAlso aValueAsRead.Trim.Length = 0 Then
                 'one or more blank characters
                 'see if the value stored is the same as the default
-                rtemp1 = CSng(ValueStored)
-                rtemp2 = CSng(ValueDefault)
-                If rtemp1 = rtemp2 Then
-                    'we can use the blanks
-                    NumericallyTheSame = True
+                lSingle1 = CSng(aValueStored)
+                lSingle2 = CSng(aValueDefault)
+                If lSingle1 = lSingle2 Then 'we can use the blanks
+                    lNumericallyTheSame = True
                 End If
             End If
         End If
+        Return lNumericallyTheSame
     End Function
 
     Shared Function NumFmtRE(ByVal rtmp As Single, Optional ByRef maxWidth As Integer = 16) As String

@@ -15,9 +15,15 @@ Public Class HspfCategoryBlk
     Private pUci As HspfUci
     Private pComment As String
 
+    Public ReadOnly Property Categories() As Collection(Of HspfData.HspfCategory)
+        Get
+            Return pCategories
+        End Get
+    End Property
+
     Friend Property Uci() As HspfUci
         Get
-            Uci = pUci
+            Return pUci
         End Get
         Set(ByVal Value As HspfUci)
             pUci = Value
@@ -60,6 +66,7 @@ Public Class HspfCategoryBlk
                 Value = New HspfData.HspfCategory
                 Value.Name = ""
                 Value.Tag = ""
+                Value.Id = pCategories.Count + 1
             End If
         End Get
         Set(ByVal Value As HspfData.HspfCategory) '????
@@ -85,6 +92,7 @@ Public Class HspfCategoryBlk
         Dim newCategory As New HspfData.HspfCategory
         newCategory.Name = newName
         newCategory.Tag = Tag
+        newCategory.Id = pCategories.Count + 1
         pCategories.Add(newCategory)
     End Sub
 
@@ -145,6 +153,7 @@ Public Class HspfCategoryBlk
                 End If
                 lCategory.Name = cbuff
                 lCategory.Comment = c
+                lCategory.Id = pCategories.Count + 1
                 pCategories.Add(lCategory)
                 c = ""
             ElseIf rectyp = -1 And init = 0 Then  'dont save first comment, its the header
