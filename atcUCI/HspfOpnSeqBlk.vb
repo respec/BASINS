@@ -8,7 +8,7 @@ Imports atcUtility
 
 Public Class HspfOpnSeqBlk
     Private pDelt As Integer
-    Private pOpns As Collection '(Of HspfOperation)
+    Private pOpns As Collection (Of HspfOperation)
     Private pUci As HspfUci
     Private pComment As String
 
@@ -18,8 +18,8 @@ Public Class HspfOpnSeqBlk
         End Get
         Set(ByVal Value As HspfUci)
             pUci = Value
-            For Each lOpn As HspfOperation In pOpns
-                lOpn.Uci = pUci
+            For Each lOperation As HspfOperation In pOpns
+                lOperation.Uci = pUci
             Next
         End Set
     End Property
@@ -46,16 +46,17 @@ Public Class HspfOpnSeqBlk
         End Get
     End Property
 
-    Public ReadOnly Property Opns() As Collection
+    Public ReadOnly Property Opns() As Collection(Of HspfOperation)
         Get
             Return pOpns
         End Get
     End Property
 
-    Public ReadOnly Property Opn(ByVal Index As Integer) As HspfOperation
+    Public ReadOnly Property Opn(ByVal aIndex As Integer) As HspfOperation
         Get
-            If Index > 0 And Index <= pOpns.Count() Then
-                Opn = pOpns.Item(Index)
+            'TODO: 0 or 1 based
+            If aIndex > 0 And aIndex <= pOpns.Count() Then
+                Opn = pOpns.Item(aIndex)
             Else
                 Opn = Nothing
             End If
@@ -71,20 +72,22 @@ Public Class HspfOpnSeqBlk
         End Set
     End Property
 
-    Public Sub Add(ByRef newOpn As HspfOperation) 'to end
-        pOpns.Add(newOpn)
+    Public Sub Add(ByRef aNewOpn As HspfOperation) 'to end
+        pOpns.Add(aNewOpn)
     End Sub
 
     Public Sub Delete(ByRef aIndex As Integer)
-        pOpns.Remove(aIndex)
+        pOpns.RemoveAt(aIndex)
     End Sub
 
-    Public Sub AddAfter(ByRef newOpn As HspfOperation, ByRef afterid As Integer)
-        pOpns.Add(newOpn, , , afterid)
+    Public Sub AddAfter(ByRef aNewOpn As HspfOperation, ByRef aAfterId As Integer)
+        'TODO: not used in atcUci, not tested
+        pOpns.Insert(aAfterId + 1, aNewOpn)
     End Sub
 
-    Public Sub AddBefore(ByRef newOpn As HspfOperation, ByRef beforeid As Integer)
-        pOpns.Add(newOpn, , beforeid)
+    Public Sub AddBefore(ByRef aNewOpn As HspfOperation, ByRef aBeforeId As Integer)
+        'TODO: not used in atcUci, not tested
+        pOpns.Insert(aBeforeId, aNewOpn)
     End Sub
 
     Public Sub Edit()
@@ -93,68 +96,68 @@ Public Class HspfOpnSeqBlk
 
     Public Sub New()
         MyBase.New()
-        pOpns = New Collection
+        pOpns = New Collection(Of HspfOperation)
     End Sub
 
     Public Sub ReadUciFile()
-        Dim retcod, init, OmCode, retkey As Integer
-        Dim cbuff As String = Nothing
-        Dim lOpn As HspfOperation
-        Dim rectyp As Integer
-        Dim c As String
+        Dim lReturnCode, lInit, lOmCode, lRetkey As Integer
+        Dim lBuff As String = Nothing
+        Dim lOperation As HspfOperation
+        Dim lRecTyp As Integer
+        Dim lComment As String
 
-        init = 1
-        OmCode = HspfOmCode("OPN SEQUENCE")
-        retcod = 0
+        lInit = 1
+        lOmCode = HspfOmCode("OPN SEQUENCE")
+        lReturnCode = 0
         ' first call gets delt
         If pUci.FastFlag Then
-            retkey = -1
+            lRetkey = -1
             GetCommentBeforeBlock("OPN SEQUENCE", pComment)
-            GetNextRecordFromBlock("OPN SEQUENCE", retkey, cbuff, rectyp, retcod)
+            GetNextRecordFromBlock("OPN SEQUENCE", lRetkey, lBuff, lRecTyp, lReturnCode)
         Else
-            Call REM_XBLOCK((Me.Uci), OmCode, init, retkey, cbuff, retcod)
+            Call REM_XBLOCK((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lReturnCode)
         End If
-        If retcod >= 0 Then
-            pDelt = CDbl(Mid(cbuff, 31, 2)) * 60
-            If Len(cbuff) > 33 Then
-                pDelt = pDelt + CDbl(Mid(cbuff, 34, 2))
+        If lReturnCode >= 0 Then
+            pDelt = CDbl(Mid(lBuff, 31, 2)) * 60
+            If lBuff.Length > 33 Then
+                pDelt = pDelt + CDbl(Mid(lBuff, 34, 2))
             End If
-            init = 0
-            c = ""
-            While retcod = 2
+            lInit = 0
+            lComment = ""
+            While lReturnCode = 2
                 If pUci.FastFlag Then
-                    GetNextRecordFromBlock("OPN SEQUENCE", retkey, cbuff, rectyp, retcod)
+                    GetNextRecordFromBlock("OPN SEQUENCE", lRetkey, lBuff, lRecTyp, lReturnCode)
                 Else
-                    retkey = -1
-                    Call REM_XBLOCKEX((Me.Uci), OmCode, init, retkey, cbuff, rectyp, retcod)
+                    lRetkey = -1
+                    Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lRecTyp, lReturnCode)
                 End If
-                If InStr(cbuff, "INGRP") = 0 And retcod = 2 And rectyp = 0 Then
-                    lOpn = New HspfOperation
-                    lOpn.Name = Trim(StrRetRem(cbuff))
-                    If IsNumeric(cbuff) Then
-                        lOpn.Id = CInt(cbuff)
+                If InStr(lBuff, "INGRP") = 0 And lReturnCode = 2 And lRecTyp = 0 Then
+                    lOperation = New HspfOperation
+                    lOperation.Name = Trim(StrRetRem(lBuff))
+                    If IsNumeric(lBuff) Then
+                        lOperation.Id = CInt(lBuff)
                     Else
-                        lOpn.Id = CInt(StrRetRem(cbuff))
+                        lOperation.Id = CInt(StrRetRem(lBuff))
                     End If
-                    lOpn.Uci = pUci
-                    lOpn.Comment = c
-                    If lOpn.Name <> "UNKNOWN" Then
-                        pOpns.Add(lOpn)
+                    lOperation.Uci = pUci
+                    lOperation.Comment = lComment
+                    If lOperation.Name <> "UNKNOWN" Then
+                        pOpns.Add(lOperation)
                     End If
-                    c = ""
-                ElseIf retcod = 2 And rectyp = -1 Then
+                    lComment = ""
+                ElseIf lReturnCode = 2 And lRecTyp = -1 Then
                     'save comment
-                    If Len(c) = 0 Then
-                        c = cbuff
+                    If lComment.Length = 0 Then
+                        lComment = lBuff
                     Else
-                        c = c & vbCrLf & cbuff
+                        lComment &= vbCrLf & lBuff
                     End If
-                ElseIf retcod = 2 And rectyp = -2 Then
+                ElseIf lReturnCode = 2 And lRecTyp = -2 Then
                     'save blank line
-                    If Len(c) = 0 Then
-                        c = " "
+                    If lComment.Length = 0 Then
+                        lComment = " "
                     Else
-                        c = c & vbCrLf & " "
+                        lComment &= vbCrLf & " "
                     End If
                 End If
             End While

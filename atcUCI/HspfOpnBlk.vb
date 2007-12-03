@@ -229,13 +229,13 @@ Public Class HspfOpnBlk
                                 End If
                                 If Len(c(i)) > 0 Then ltable.Comment = c(i)
                                 If noccur > 1 And thisoccur > 1 Then
-                                    lId.Tables.Add(ltable, ltable.Name & ":" & thisoccur)
+                                    lId.Tables.Add(ltable)
                                     If Not TableExists(ltable.Name & ":" & thisoccur) Then
                                         pTables.Add(ltable, ltable.Name & ":" & thisoccur)
                                     End If
                                 Else
                                     Try
-                                        lId.Tables.Add(ltable, ltable.Name)
+                                        lId.Tables.Add(ltable)
                                         If Not TableExists((ltable.Name)) Then
                                             pTables.Add(ltable, ltable.Name)
                                         End If
@@ -379,7 +379,7 @@ Public Class HspfOpnBlk
                 ltable.OccurCount = 1
                 ltable.OccurNum = 1
                 ltable.Opn = lId
-                lId.Tables.Add(ltable, ltable.Name)
+                lId.Tables.Add(ltable)
                 If ltable.Name = "HYDR-PARM2" Then
                     lId.FTable = New HspfFtable
                     lId.FTable.Operation = lId
@@ -432,10 +432,10 @@ Public Class HspfOpnBlk
                 End If
                 ltable.Opn = lId
                 If Not lId.TableExists(tabname) Then
-                    lId.Tables.Add(ltable, tabname)
+                    lId.Tables.Add(ltable)
                 End If
                 If Not Me.TableExists(tabname) Then
-                    Me.Tables.Add(ltable, tabname)
+                    Me.Tables.Add(ltable)
                 End If
                 Exit For
             End If
@@ -483,10 +483,10 @@ Public Class HspfOpnBlk
             End If
             ltable.Opn = lId
             If Not lId.TableExists(tabname) Then 'add to this id
-                lId.Tables.Add(ltable, tabname)
+                lId.Tables.Add(ltable)
             End If
             If Not Me.TableExists(tabname) Then 'add to this oper-type block
-                Me.Tables.Add(ltable, tabname)
+                Me.Tables.Add(ltable)
             End If
         Next vId
     End Sub

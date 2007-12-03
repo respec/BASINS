@@ -6,6 +6,19 @@ Imports System.Text
 Imports System.Collections.ObjectModel
 Imports atcUtility
 
+Public Class HspfTables
+    Inherits KeyedCollection(Of String, HspfTable)
+    Protected Overrides Function GetKeyForItem(ByVal aTable As HspfTable) As String
+        Dim lTableKey As String
+        If aTable.OccurNum > 1 Then
+            lTableKey = aTable.Name & ":" & aTable.OccurNum
+        Else
+            lTableKey = aTable.Name
+        End If
+        Return lTableKey
+    End Function
+End Class
+
 Public Class HspfTable
     Private pDef As HspfTableDef
     Private pOccurCount As Integer 'total number of occurences
@@ -22,7 +35,7 @@ Public Class HspfTable
 
     Public Property OccurCount() As Integer
         Get
-            OccurCount = pOccurCount
+            Return pOccurCount
         End Get
         Set(ByVal Value As Integer)
             pOccurCount = Value
@@ -31,7 +44,7 @@ Public Class HspfTable
 
     Public Property OccurNum() As Integer
         Get
-            OccurNum = pOccurNum
+            Return pOccurNum
         End Get
         Set(ByVal Value As Integer)
             pOccurNum = Value
@@ -40,7 +53,7 @@ Public Class HspfTable
 
     Public Property OccurIndex() As Integer
         Get
-            OccurIndex = pOccurIndex
+            Return pOccurIndex
         End Get
         Set(ByVal Value As Integer)
             pOccurIndex = Value
@@ -49,7 +62,7 @@ Public Class HspfTable
 
     Public Property Def() As HspfTableDef
         Get
-            Def = pDef
+            Return pDef
         End Get
         Set(ByVal Value As HspfTableDef)
             pDef = Value
@@ -58,7 +71,7 @@ Public Class HspfTable
 
     Public Property Comment() As String
         Get
-            Comment = pComment
+            Return pComment
         End Get
         Set(ByVal Value As String)
             pComment = Value
@@ -67,7 +80,7 @@ Public Class HspfTable
 
     Public Property TableComment() As String
         Get
-            TableComment = pTableComment
+            Return pTableComment
         End Get
         Set(ByVal Value As String)
             pTableComment = Value
@@ -76,7 +89,7 @@ Public Class HspfTable
 
     Public ReadOnly Property Name() As String
         Get
-            Name = pDef.Name
+            Return pDef.Name
         End Get
     End Property
 
@@ -93,7 +106,7 @@ Public Class HspfTable
         End Set
     End Property
 
-    Public ReadOnly Property Parms() As Collection(Of HspfParm)
+    Public ReadOnly Property Parms() As HspfParms
         Get
             Return pParms
         End Get
@@ -110,7 +123,7 @@ Public Class HspfTable
 
     Public Property Edited() As Boolean
         Get
-            Edited = pEdited
+            Return pEdited
         End Get
         Set(ByVal Value As Boolean)
             pEdited = Value
@@ -120,13 +133,13 @@ Public Class HspfTable
 
     Public ReadOnly Property EditControlName() As String
         Get
-            EditControlName = "ATCoHspf.ctlTableEdit"
+            Return "ATCoHspf.ctlTableEdit"
         End Get
     End Property
 
     Public ReadOnly Property EditAllSimilar() As Boolean
         Get
-            EditAllSimilar = pEditAllSimilar
+            Return pEditAllSimilar
         End Get
     End Property
 
@@ -138,7 +151,7 @@ Public Class HspfTable
 
     Public Property SuppID() As Integer
         Get
-            SuppID = pSuppID
+            Return pSuppID
         End Get
         Set(ByVal Value As Integer)
             pSuppID = Value
@@ -147,7 +160,7 @@ Public Class HspfTable
 
     Public Property CombineOK() As Boolean
         Get
-            CombineOK = pCombineOK
+            Return pCombineOK
         End Get
         Set(ByVal Value As Boolean)
             pCombineOK = Value
@@ -161,13 +174,11 @@ Public Class HspfTable
 
     Public Sub initTable(ByRef s As String)
         Dim lParm As HSPFParm
-        Dim vParmDef As Object
         Dim lParmDef As HSPFParmDef
         Dim unitfg As Integer
 
-        For Each vParmDef In pDef.ParmDefs
-            lParmDef = vParmDef
-            lParm = New HSPFParm
+        For Each lParmDef In pDef.ParmDefs
+            lParm = New HspfParm
             lParm.Parent = Me
             lParm.Def = lParmDef
             lParm.Value = Trim(Mid(s, lParmDef.StartCol, lParmDef.Length))
@@ -209,7 +220,7 @@ Public Class HspfTable
                 End If
             End If
             pParms.Add(lParm)
-        Next vParmDef
+        Next lParmDef
     End Sub
 
     Public Sub Edit()
@@ -465,7 +476,7 @@ notMissingTableForThisOper:
                     tname = t & ":" & i
                 End If
                 If pOpn.TableExists(tname) Then
-                    If pOpn.Tables.Item(tname).Parms(p).value > 0 Then
+                    If pOpn.Tables.Item(tname).Parms.Item(p).Value > 0 Then
                         tabcnt = tabcnt + 1
                         If tabcnt = noccur Then
                             'this is the one this table belongs to
@@ -478,13 +489,16 @@ notMissingTableForThisOper:
     End Sub
 
     Public Function TableNeededForAllQuals() As Boolean
-
-        If pDef.Name = "QUAL-INPUT" Or pDef.Name = "GQ-QALFG" Or pDef.Name = "GQ-FLG2" Or pDef.Name = "GQ-VALUES" Or pDef.Name = "QUAL-PROPS" Or pDef.Name = "GQ-QALDATA" Then
+        If pDef.Name = "QUAL-INPUT" Or _
+           pDef.Name = "GQ-QALFG" Or _
+           pDef.Name = "GQ-FLG2" Or _
+           pDef.Name = "GQ-VALUES" Or _
+           pDef.Name = "QUAL-PROPS" Or _
+           pDef.Name = "GQ-QALDATA" Then
             TableNeededForAllQuals = True
         Else
             TableNeededForAllQuals = False
         End If
-
     End Function
 
     Private Function NumericallyTheSame(ByRef ValueAsRead As String, ByRef ValueStored As String, ByRef ValueDefault As String) As Boolean
@@ -565,5 +579,4 @@ notMissingTableForThisOper:
         End If
         NumFmtRE = retval
     End Function
-
 End Class

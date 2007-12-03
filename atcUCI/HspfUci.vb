@@ -2665,7 +2665,7 @@ x:
                         Loop
                     End With
                 End If
-            ElseIf Trim(cbuff) = "END FTABLES" Then
+            ElseIf cbuff.Trim = "END FTABLES" Then
                 done = True
             ElseIf retkey = 0 Then
                 done = True

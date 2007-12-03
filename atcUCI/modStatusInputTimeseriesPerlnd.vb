@@ -139,7 +139,7 @@ Module modStatusInputTimeseriesPerlnd
                     With O.Tables.Item("PQL-AD-FLAGS")
                         For i = 1 To 20
                             ctemp = "PQADFG(" & CStr(i) & ")"
-                            pqadfg(i) = .Parms(ctemp)
+                            pqadfg(i) = .Parms(ctemp).Value
                         Next i
                     End With
                 Else

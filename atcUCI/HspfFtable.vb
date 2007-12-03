@@ -27,12 +27,12 @@ Public Class HspfFtable
     Private pOperation As HspfOperation
     Private pComment As String
 
-    Public Property Depth(ByVal row As Integer) As Double
+    Public Property Depth(ByVal aRow As Integer) As Double
         Get
-            Depth = pDepth(row)
+            Return pDepth(aRow)
         End Get
         Set(ByVal Value As Double)
-            pDepth(row) = Value
+            pDepth(aRow) = Value
         End Set
     End Property
 
@@ -45,135 +45,135 @@ Public Class HspfFtable
         End Set
     End Property
 
-    Public Property Volume(ByVal row As Integer) As Double
+    Public Property Volume(ByVal aRow As Integer) As Double
         Get
-            Volume = pVolume(row)
+            Return pVolume(aRow)
         End Get
         Set(ByVal Value As Double)
-            pVolume(row) = Value
+            pVolume(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow1(ByVal row As Integer) As Double
+    Public Property Outflow1(ByVal aRow As Integer) As Double
         Get
-            Outflow1 = pOutflow1(row)
+            Return pOutflow1(aRow)
         End Get
         Set(ByVal Value As Double)
-            pOutflow1(row) = Value
+            pOutflow1(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow2(ByVal row As Integer) As Double
+    Public Property Outflow2(ByVal aRow As Integer) As Double
         Get
-            Outflow2 = pOutflow2(row)
+            Return pOutflow2(aRow)
         End Get
         Set(ByVal Value As Double)
-            pOutflow2(row) = Value
+            pOutflow2(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow3(ByVal row As Integer) As Double
+    Public Property Outflow3(ByVal aRow As Integer) As Double
         Get
-            Outflow3 = pOutflow3(row)
+            Return pOutflow3(aRow)
         End Get
         Set(ByVal Value As Double)
-            pOutflow3(row) = Value
+            pOutflow3(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow4(ByVal row As Integer) As Double
+    Public Property Outflow4(ByVal aRow As Integer) As Double
         Get
-            Outflow4 = pOutflow4(row)
+            Return pOutflow4(aRow)
         End Get
         Set(ByVal Value As Double)
-            pOutflow4(row) = Value
+            pOutflow4(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow5(ByVal row As Integer) As Double
+    Public Property Outflow5(ByVal aRow As Integer) As Double
         Get
-            Outflow5 = pOutflow5(row)
+            Return pOutflow5(aRow)
         End Get
         Set(ByVal Value As Double)
-            pOutflow5(row) = Value
+            pOutflow5(aRow) = Value
         End Set
     End Property
 
-    Public Property DepthAsRead(ByVal row As Integer) As String
+    Public Property DepthAsRead(ByVal aRow As Integer) As String
         Get
-            DepthAsRead = pDepthAsRead(row)
+            Return pDepthAsRead(aRow)
         End Get
         Set(ByVal Value As String)
-            pDepthAsRead(row) = Value
+            pDepthAsRead(aRow) = Value
         End Set
     End Property
 
-    Public Property AreaAsRead(ByVal row As Integer) As String
+    Public Property AreaAsRead(ByVal aRow As Integer) As String
         Get
-            AreaAsRead = pAreaAsRead(row)
+            Return pAreaAsRead(aRow)
         End Get
         Set(ByVal Value As String)
-            pAreaAsRead(row) = Value
+            pAreaAsRead(aRow) = Value
         End Set
     End Property
 
-    Public Property VolumeAsRead(ByVal row As Integer) As String
+    Public Property VolumeAsRead(ByVal aRow As Integer) As String
         Get
-            VolumeAsRead = pVolumeAsRead(row)
+            Return pVolumeAsRead(aRow)
         End Get
         Set(ByVal Value As String)
-            pVolumeAsRead(row) = Value
+            pVolumeAsRead(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow1AsRead(ByVal row As Integer) As String
+    Public Property Outflow1AsRead(ByVal aRow As Integer) As String
         Get
-            Outflow1AsRead = pOutflow1AsRead(row)
+            Return pOutflow1AsRead(aRow)
         End Get
         Set(ByVal Value As String)
-            pOutflow1AsRead(row) = Value
+            pOutflow1AsRead(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow2AsRead(ByVal row As Integer) As String
+    Public Property Outflow2AsRead(ByVal aRow As Integer) As String
         Get
-            Outflow2AsRead = pOutflow2AsRead(row)
+            Return pOutflow2AsRead(aRow)
         End Get
         Set(ByVal Value As String)
-            pOutflow2AsRead(row) = Value
+            pOutflow2AsRead(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow3AsRead(ByVal row As Integer) As String
+    Public Property Outflow3AsRead(ByVal aRow As Integer) As String
         Get
-            Outflow3AsRead = pOutflow3AsRead(row)
+            Return pOutflow3AsRead(aRow)
         End Get
         Set(ByVal Value As String)
-            pOutflow3AsRead(row) = Value
+            pOutflow3AsRead(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow4AsRead(ByVal row As Integer) As String
+    Public Property Outflow4AsRead(ByVal aRow As Integer) As String
         Get
-            Outflow4AsRead = pOutflow4AsRead(row)
+            Return pOutflow4AsRead(aRow)
         End Get
         Set(ByVal Value As String)
-            pOutflow4AsRead(row) = Value
+            pOutflow4AsRead(aRow) = Value
         End Set
     End Property
 
-    Public Property Outflow5AsRead(ByVal row As Integer) As String
+    Public Property Outflow5AsRead(ByVal aRow As Integer) As String
         Get
-            Outflow5AsRead = pOutflow5AsRead(row)
+            Return pOutflow5AsRead(aRow)
         End Get
         Set(ByVal Value As String)
-            pOutflow5AsRead(row) = Value
+            pOutflow5AsRead(aRow) = Value
         End Set
     End Property
 
     Public Property Comment() As String
         Get
-            Comment = pComment
+            Return pComment
         End Get
         Set(ByVal Value As String)
             pComment = Value
@@ -182,7 +182,7 @@ Public Class HspfFtable
 
     Public Property Id() As Integer
         Get
-            Id = pId
+            Return pId
         End Get
         Set(ByVal Value As Integer)
             pId = Value
@@ -191,7 +191,7 @@ Public Class HspfFtable
 
     Public Property Nrows() As Integer
         Get
-            Nrows = pNrows
+            Return pNrows
         End Get
         Set(ByVal Value As Integer)
             pNrows = Value
@@ -201,7 +201,7 @@ Public Class HspfFtable
 
     Public Property Ncols() As Integer
         Get
-            Ncols = pNcols
+            Return pNcols
         End Get
         Set(ByVal Value As Integer)
             pNcols = Value
@@ -210,7 +210,7 @@ Public Class HspfFtable
     End Property
     Public Property Operation() As HspfOperation
         Get
-            Operation = pOperation
+            Return pOperation
         End Get
         Set(ByVal Value As HspfOperation)
             pOperation = Value
@@ -219,13 +219,13 @@ Public Class HspfFtable
 
     Public ReadOnly Property EditControlName() As String
         Get
-            EditControlName = "ATCoHspf.ctlFTableEdit"
+            Return "ATCoHspf.ctlFTableEdit"
         End Get
     End Property
 
     Public ReadOnly Property Caption() As String
         Get
-            Caption = "Ftable"
+            Return "Ftable"
         End Get
     End Property
 

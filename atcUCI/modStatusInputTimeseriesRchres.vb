@@ -104,7 +104,7 @@ Module modStatusInputTimeseriesRchres
                     With O.Tables.Item("CONS-AD-FLAGS")
                         For i = 1 To 20
                             ctemp = "COADFG(" & CStr(i) & ")"
-                            coadfg(i) = .Parms(ctemp)
+                            coadfg(i) = .Parms(ctemp).Value
                         Next i
                     End With
                 Else
