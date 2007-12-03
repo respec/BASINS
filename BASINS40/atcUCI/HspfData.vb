@@ -11,6 +11,7 @@ Option Explicit On
     End Structure
 
     Public Structure HspfCategory
+        Dim Id As Integer
         Dim Tag As String
         Dim Name As String
         Dim Comment As String 'preceeding comment
