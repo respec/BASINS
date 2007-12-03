@@ -29,6 +29,7 @@ Public Class atcGraphForm
 
     Private pXAxisType As AxisType = AxisType.DateMulti
     Private pYAxisType As AxisType = AxisType.Linear
+    Private pNeedAux As Boolean = False 'True
 
     Private Shared SaveImageExtension As String = ".png"
     Friend WithEvents mnuViewScatter As System.Windows.Forms.MenuItem
@@ -90,6 +91,32 @@ Public Class atcGraphForm
         pZgc.IsEnableVZoom = mnuViewVerticalZoom.Checked
         pZgc.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
 
+        If pNeedAux Then
+            Dim lPaneAux As GraphPane = New ZedGraph.GraphPane 'lPane.Clone
+            With lPaneAux
+                .Border.IsVisible = False
+                '    With .XAxis
+                '        .Type = lPane.XAxis.Type
+                '        .Scale.Max = lPane.XAxis.Scale.Max
+                '        .Scale.Min = lPane.XAxis.Scale.Min
+                '        .MajorTic.IsOutside = lPane.XAxis.MajorTic.IsOutside
+                '        .MajorTic.IsInside = lPane.XAxis.MajorTic.IsInside
+                '        .MinorTic.IsOutside = lPane.XAxis.MinorTic.IsOutside
+                '        .MinorTic.IsInside = lPane.XAxis.MinorTic.IsInside
+                '    End With
+                'With .YAxis
+                .YAxis.Type = AxisType.Linear
+                .YAxis.Scale.Min = 0
+                .YAxis.Scale.Max = 1
+                'End With
+            End With
+
+            pMaster.PaneList.Add(lPaneAux)
+
+            lPane.Border.IsVisible = False
+            pMaster.Border.IsVisible = False
+        End If
+
         pMaster.PaneList.Add(lPane)
 
         SetDatasets(pDataGroup)
@@ -97,7 +124,14 @@ Public Class atcGraphForm
 
     Private Sub SetDatasets(ByVal aDataGroup As atcDataGroup)
         Dim lGraphics As Graphics = Me.CreateGraphics()
-        pMaster.SetLayout(lGraphics, PaneLayout.SingleColumn)
+        If pNeedAux Then
+            Dim lProportion() As Single = {1.0, 5.0}
+            Dim lCountList() As Integer = {2}
+            pMaster.SetLayout(lGraphics, True, lCountList, lProportion)
+        Else
+            pMaster.SetLayout(lGraphics, PaneLayout.SingleColumn)
+        End If
+
         Pane.CurveList.Clear()
         If mnuViewScatter.Checked Then
             AddDatasetsScatter(aDataGroup)
