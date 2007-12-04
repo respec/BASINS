@@ -1,9 +1,10 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfStatus_NET.HspfStatus")> _
-Public Class HspfStatus
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+Imports System.Collections.ObjectModel
+Imports MapWinUtility
 
+Public Class HspfStatus
     Public Enum HspfStatusReqOptUnnEnum
         HspfStatusRequired = 1
         HspfStatusOptional = 2
@@ -24,11 +25,11 @@ Public Class HspfStatus
 
     Private pStatusType As HspfStatusTypes
     Private pOper As HspfOperation
-    Private pTableStatus As Collection 'of HspfStatusType
+    Private pTableStatus As Collection(Of HspfStatusType)
 
     Property StatusType() As HspfStatusTypes
         Get
-            StatusType = pStatusType
+            Return pStatusType
         End Get
         Set(ByVal Value As HspfStatusTypes)
             pStatusType = Value
@@ -37,88 +38,72 @@ Public Class HspfStatus
 
     ReadOnly Property TotalPossible() As Integer
         Get
-            If pTableStatus.Count() = 0 Then Build()
-            TotalPossible = pTableStatus.Count()
+            If pTableStatus.Count = 0 Then
+                Build()
+            End If
+            Return pTableStatus.Count
         End Get
     End Property
 
-    Public Sub Change(ByRef Name As String, ByRef Occur As Integer, ByRef Status As Integer)
-        Dim vTableStatus As Object
-        Dim lTableStatus As HspfStatusType
-        Dim found As Boolean
-
-        found = False
-        For Each vTableStatus In pTableStatus
-            lTableStatus = vTableStatus
-            If lTableStatus.Name = Name And lTableStatus.Occur = Occur Then
-                lTableStatus.ReqOptUnn = Status
-                found = True
+    Public Sub Change(ByRef aName As String, ByRef aOccur As Integer, ByRef aStatus As Integer)
+        Dim lFound As Boolean = False
+        For Each lTableStatus As HspfStatusType In pTableStatus
+            If lTableStatus.Name = aName And lTableStatus.Occur = aOccur Then
+                lTableStatus.ReqOptUnn = aStatus
+                lFound = True
                 Exit For
             End If
-        Next vTableStatus
-        If Not (found) Then MsgBox("Change Failed For " & Name & "(" & Occur & ")")
+        Next lTableStatus
+        If Not (lFound) Then
+            Logger.Msg("Change Failed For " & aName & "(" & aOccur & ")")
+        End If
     End Sub
 
-    Public Sub Change2(ByRef Name As String, ByRef Occur1 As Integer, ByRef Occur2 As Integer, ByRef Status As Integer)
-        Dim vTableStatus As Object
-        Dim lTableStatus As HspfStatusType
-        Dim found As Boolean
-        Dim lOccur As Integer
-
-        lOccur = (Occur2 - 1) * 1000 + Occur1
-        found = False
-        For Each vTableStatus In pTableStatus
-            lTableStatus = vTableStatus
-            If lTableStatus.Name = Name And lTableStatus.Occur = lOccur Then
-                lTableStatus.ReqOptUnn = Status
-                found = True
+    Public Sub Change2(ByRef aName As String, _
+                       ByRef aOccur1 As Integer, ByRef aOccur2 As Integer, _
+                       ByRef aStatus As Integer)
+        Dim lFound As Boolean = False
+        Dim lOccur As Integer = (aOccur2 - 1) * 1000 + aOccur1
+        For Each lTableStatus As HspfStatusType In pTableStatus
+            If lTableStatus.Name = aName And lTableStatus.Occur = lOccur Then
+                lTableStatus.ReqOptUnn = aStatus
+                lFound = True
                 Exit For
             End If
-        Next vTableStatus
-        If Not (found) Then MsgBox("Change Failed For " & Name & "(" & Occur1 & "," & Occur2 & ")")
+        Next lTableStatus
+        If Not (lFound) Then
+            Logger.Msg("Change Failed For " & aName & "(" & aOccur1 & "," & aOccur2 & ")")
+        End If
     End Sub
 
     Public Sub Update()
-        Dim j As Integer
-        Dim vTable As Object
-        Dim ltable As HspfTable
-        Dim vTableStatus As Object
-        Dim lTableStatus As HspfStatusType
-        Dim vConnection As Object
-        Dim lConnection As HspfConnection
-        Dim cOccur, lOccur As Integer
-        Dim lSub2, lSub1 As Integer
-        Dim lMember As String = Nothing
-        Dim lGroup As String = Nothing
-        Dim lMemberStatus, lGroupStatus As String
-
-        For Each vTableStatus In pTableStatus
-            lTableStatus = vTableStatus
+        For Each lTableStatus As HspfStatusType In pTableStatus
             lTableStatus.ReqOptUnn = HspfStatusReqOptUnnEnum.HspfStatusUnneeded
             lTableStatus.Present = HspfStatusPresentMissingEnum.HspfStatusMissing
-        Next vTableStatus
+        Next lTableStatus
 
         If pStatusType = HspfStatusTypes.HspfTable Then
-            For Each vTable In pOper.Tables 'should this be in another loop
-                ltable = vTable
-                For Each vTableStatus In pTableStatus
-                    lTableStatus = vTableStatus
-                    If ltable.OccurNum = lTableStatus.Occur And ltable.Name = lTableStatus.Name Then
+            For Each lTable As HspfTable In pOper.Tables 'should this be in another loop
+                For Each lTableStatus As HspfStatusType In pTableStatus
+                    If lTable.OccurNum = lTableStatus.Occur And lTable.Name = lTableStatus.Name Then
                         lTableStatus.Present = HspfStatusPresentMissingEnum.HspfStatusPresent
                         Exit For
                     End If
-                Next vTableStatus
-            Next vTable
+                Next lTableStatus
+            Next lTable
         ElseIf pStatusType = HspfStatusTypes.HspfInputTimeseries Then  'source
-            For Each vConnection In pOper.Sources 'should this be in another loop
-                lConnection = vConnection
+            For Each lConnection As HspfConnection In pOper.Sources 'should this be in another loop
+                Dim lSub2, lSub1 As Integer
+                Dim lMember As String = Nothing
+                Dim lGroup As String = Nothing
+                Dim lMemberStatus, lGroupStatus As String
                 GetConnectionInfo(True, lConnection, lGroup, lMember, lSub1, lSub2, True)
-                While Len(lGroup) > 0
-                    cOccur = (lSub2 - 1) * 1000 + lSub1
-                    For Each vTableStatus In pTableStatus
-                        lTableStatus = vTableStatus
+                While lGroup.Length > 0
+                    Dim cOccur As Integer = (lSub2 - 1) * 1000 + lSub1
+                    Dim lOccur As Integer
+                    For Each lTableStatus As HspfStatusType In pTableStatus
                         With lTableStatus
-                            j = InStr(.Name, ":")
+                            Dim j As Integer = InStr(.Name, ":")
                             lGroupStatus = Left(.Name, j - 1)
                             lMemberStatus = Right(.Name, Len(.Name) - j)
                             lOccur = .Occur
@@ -127,32 +112,35 @@ Public Class HspfStatus
                             lTableStatus.Present = HspfStatusPresentMissingEnum.HspfStatusPresent
                             Exit For
                         End If
-                    Next vTableStatus
+                    Next lTableStatus
                     GetConnectionInfo(True, lConnection, lGroup, lMember, lSub1, lSub2)
                 End While
-            Next vConnection
+            Next lConnection
         Else 'target
-            For Each vConnection In pOper.Targets
-                lConnection = vConnection
+            For Each lConnection As HspfConnection In pOper.Targets
+                Dim lSub2, lSub1 As Integer
+                Dim lMember As String = Nothing
+                Dim lGroup As String = Nothing
+                Dim lMemberStatus, lGroupStatus As String
                 GetConnectionInfo(False, lConnection, lGroup, lMember, lSub1, lSub2, True)
                 While Len(lGroup) > 0
-                    For Each vTableStatus In pTableStatus
-                        lTableStatus = vTableStatus
+                    For Each lTableStatus As HspfStatusType In pTableStatus
+                        Dim lOccur As Integer
                         With lTableStatus
-                            j = InStr(.Name, ":")
+                            Dim j As Integer = InStr(.Name, ":")
                             lGroupStatus = Left(.Name, j - 1)
                             lMemberStatus = Right(.Name, Len(.Name) - j)
                             lOccur = .Occur
                         End With
-                        cOccur = (lSub2 - 1) * 1000 + lSub1
+                        Dim cOccur As Integer = (lSub2 - 1) * 1000 + lSub1
                         If cOccur = lOccur And (lMember = lMemberStatus Or Len(lMember) = 0) And lGroup = lGroupStatus Then
                             lTableStatus.Present = HspfStatusPresentMissingEnum.HspfStatusPresent
                             Exit For
                         End If
-                    Next vTableStatus
+                    Next lTableStatus
                     GetConnectionInfo(False, lConnection, lGroup, lMember, lSub1, lSub2)
                 End While
-            Next vConnection
+            Next lConnection
         End If
 
         If pStatusType = HspfStatusTypes.HspfTable Then
@@ -201,48 +189,41 @@ Public Class HspfStatus
     End Sub
 
     Public Sub UpdateExtTargetsOutputs()
-        Dim j As Integer
-        Dim vTableStatus As Object
-        Dim lTableStatus As HspfStatusType
-        Dim vConnection As Object
-        Dim lConnection As HspfConnection
-        Dim cOccur, lOccur As Integer
-        Dim lSub2, lSub1 As Integer
-        Dim lMember As String = ""
-        Dim lGroup As String = ""
-        Dim lMemberStatus, lGroupStatus As String
+        If pTableStatus.Count = 0 Then
+            Build()
+        End If
 
-        If pTableStatus.Count() = 0 Then Build()
-
-        For Each vTableStatus In pTableStatus
-            lTableStatus = vTableStatus
+        For Each lTableStatus As HspfStatusType In pTableStatus
             lTableStatus.ReqOptUnn = HspfStatusReqOptUnnEnum.HspfStatusUnneeded
             lTableStatus.Present = HspfStatusPresentMissingEnum.HspfStatusMissing
-        Next vTableStatus
+        Next lTableStatus
 
-        For Each vConnection In pOper.Targets
-            lConnection = vConnection
-            If Left(lConnection.Target.VolName, 3) = "WDM" Then
+        For Each lConnection As HspfConnection In pOper.Targets
+            If lConnection.Target.VolName.StartsWith("WDM") Then
+                Dim lGroup As String = ""
+                Dim lMember As String = ""
+                Dim lSub2, lSub1 As Integer
+                Dim lMemberStatus, lGroupStatus As String
                 GetConnectionInfo(False, lConnection, lGroup, lMember, lSub1, lSub2, True)
-                While Len(lGroup) > 0
-                    For Each vTableStatus In pTableStatus
-                        lTableStatus = vTableStatus
+                While lGroup.Length > 0
+                    For Each lTableStatus As HspfStatusType In pTableStatus
+                        Dim lOccur As Integer
                         With lTableStatus
-                            j = InStr(.Name, ":")
-                            lGroupStatus = Left(.Name, j - 1)
-                            lMemberStatus = Right(.Name, Len(.Name) - j)
+                            Dim lColonIndex As Integer = InStr(.Name, ":")
+                            lGroupStatus = Left(.Name, lColonIndex - 1)
+                            lMemberStatus = Right(.Name, Len(.Name) - lColonIndex)
                             lOccur = .Occur
                         End With
-                        cOccur = (lSub2 - 1) * 1000 + lSub1
+                        Dim cOccur As Integer = (lSub2 - 1) * 1000 + lSub1
                         If cOccur = lOccur And (lMember = lMemberStatus Or Len(lMember) = 0) And lGroup = lGroupStatus Then
                             lTableStatus.Present = HspfStatusPresentMissingEnum.HspfStatusPresent
                             Exit For
                         End If
-                    Next vTableStatus
+                    Next lTableStatus
                     GetConnectionInfo(False, lConnection, lGroup, lMember, lSub1, lSub2)
                 End While
             End If
-        Next vConnection
+        Next lConnection
 
         Select Case pOper.Name
             Case "PERLND" : UpdateOutputTimeseriesPerlnd(pOper, Me)
@@ -260,108 +241,107 @@ Public Class HspfStatus
 
     End Sub
 
-    Private Sub GetConnectionInfo(ByRef Source As Boolean, ByRef Connection As HspfConnection, ByRef Group As String, ByRef Member As String, ByRef Sub1 As Integer, ByRef Sub2 As Integer, Optional ByRef init As Boolean = False)
+    Private Sub GetConnectionInfo(ByRef aSource As Boolean, _
+                                  ByRef aConnection As HspfConnection, _
+                                  ByRef aGroup As String, _
+                                  ByRef aMember As String, _
+                                  ByRef aSub1 As Integer, _
+                                  ByRef aSub2 As Integer, _
+                                  Optional ByRef aInit As Boolean = False)
         Dim lMassLink As HspfMassLink
-        Static massLinkPos As Integer
+        Static lMassLinkPos As Integer 'save between calls
 
-        If init Then massLinkPos = 1
-        If Connection.MassLink = 0 Then
-            If massLinkPos = 1 Then
-                If Source Then
-                    Group = Connection.Target.Group
-                    Member = Connection.Target.Member
-                    Sub1 = Connection.Target.MemSub1
-                    Sub2 = Connection.Target.MemSub2
+        If aInit Then
+            lMassLinkPos = 1
+        End If
+
+        If aConnection.MassLink = 0 Then
+            If lMassLinkPos = 1 Then
+                If aSource Then
+                    aGroup = aConnection.Target.Group
+                    aMember = aConnection.Target.Member
+                    aSub1 = aConnection.Target.MemSub1
+                    aSub2 = aConnection.Target.MemSub2
                 Else
-                    Group = Connection.Source.Group
-                    Member = Connection.Source.Member
-                    Sub1 = Connection.Source.MemSub1
-                    Sub2 = Connection.Source.MemSub2
+                    aGroup = aConnection.Source.Group
+                    aMember = aConnection.Source.Member
+                    aSub1 = aConnection.Source.MemSub1
+                    aSub2 = aConnection.Source.MemSub2
                 End If
             Else 'only wanted one
-                Group = ""
+                aGroup = ""
             End If
         Else
-            Group = "?"
-            While Group = "?"
-                If massLinkPos <= pOper.Uci.MassLinks.Count Then
-                    lMassLink = pOper.Uci.MassLinks(massLinkPos)
-                    If lMassLink.MassLinkID = Connection.MassLink Then
-                        If Source Then
-                            Group = lMassLink.Target.Group
-                            Member = lMassLink.Target.Member
-                            Sub1 = lMassLink.Target.MemSub1
-                            Sub2 = lMassLink.Target.MemSub2
+            aGroup = "?"
+            While aGroup = "?"
+                If lMassLinkPos <= pOper.Uci.MassLinks.Count Then
+                    lMassLink = pOper.Uci.MassLinks(lMassLinkPos)
+                    If lMassLink.MassLinkID = aConnection.MassLink Then
+                        If aSource Then
+                            aGroup = lMassLink.Target.Group
+                            aMember = lMassLink.Target.Member
+                            aSub1 = lMassLink.Target.MemSub1
+                            aSub2 = lMassLink.Target.MemSub2
                         Else
-                            Group = lMassLink.Source.Group
-                            Member = lMassLink.Source.Member
-                            Sub1 = lMassLink.Source.MemSub1
-                            Sub2 = lMassLink.Source.MemSub2
+                            aGroup = lMassLink.Source.Group
+                            aMember = lMassLink.Source.Member
+                            aSub1 = lMassLink.Source.MemSub1
+                            aSub2 = lMassLink.Source.MemSub2
                         End If
                     Else
-                        massLinkPos += 1
+                        lMassLinkPos += 1
                     End If
                 Else 'done
-                    Group = ""
+                    aGroup = ""
                 End If
             End While
         End If
-        massLinkPos += 1
-        If Sub1 = 0 Then Sub1 = 1
-        If Sub2 = 0 Then Sub2 = 1
+        lMassLinkPos += 1
+        If aSub1 = 0 Then aSub1 = 1
+        If aSub2 = 0 Then aSub2 = 1
 
     End Sub
 
     Private Sub Build()
-        Dim vTableDef As Object
-        Dim lTableDef As HspfTableDef
-        Dim ldim1, i, j, ldim2 As Integer
         Dim lTableStatus As HspfStatusType
-        Dim lOccur As Integer
-        Dim addMember As Boolean
-        Dim lTSGroupDef As HspfTSGroupDef
-        Dim lTSMemberDef As HspfTSMemberDef
 
-        'UPGRADE_NOTE: Object pTableStatus may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-        pTableStatus = Nothing
-        pTableStatus = New Collection
+        pTableStatus = New Collection(Of HspfStatusType)
         If pStatusType = HspfStatusTypes.HspfTable Then
             With pOper.Uci.Msg.BlockDefs(pOper.Name) 'as HspfBlockDef
-                For Each vTableDef In .TableDefs
-                    lTableDef = vTableDef
-                    For i = 1 To lTableDef.NumOccur
+                For Each lTableDef As HspfTableDef In .TableDefs
+                    For i As Integer = 1 To lTableDef.NumOccur
                         lTableStatus = New HspfStatusType
                         lTableStatus.Name = lTableDef.Name
                         lTableStatus.Occur = i
                         lTableStatus.Max = lTableDef.NumOccur
                         pTableStatus.Add(lTableStatus)
                     Next i
-                Next vTableDef
+                Next lTableDef
             End With
         ElseIf pStatusType = HspfStatusTypes.HspfInputTimeseries Or pStatusType = HspfStatusTypes.HspfOutputTimeseries Then
-            For Each lTSGroupDef In pOper.Uci.Msg.TSGroupDefs
-                If lTSGroupDef.BlockId = pOper.optyp + 120 Then
-                    For Each lTSMemberDef In lTSGroupDef.MemberDefs
+            For Each lTSGroupDef As HspfTSGroupDef In pOper.Uci.Msg.TSGroupDefs
+                If lTSGroupDef.BlockId = pOper.OpTyp + 120 Then
+                    For Each lTSMemberDef As HspfTSMemberDef In lTSGroupDef.MemberDefs
                         With lTSMemberDef
-                            addMember = False
+                            Dim lAddMember As Boolean = False
                             If pStatusType = HspfStatusTypes.HspfInputTimeseries Then
                                 If .mio > 0 Then
-                                    addMember = True
+                                    lAddMember = True
                                 End If
                             ElseIf pStatusType = HspfStatusTypes.HspfOutputTimeseries Then
                                 If .mio < 2 Then
-                                    addMember = True
+                                    lAddMember = True
                                 End If
                             End If
-                            If addMember Then
-                                'next 2 line are a kludge for performance! (impact RCHRES:CAT only?)
-                                ldim1 = .mdim1 : If ldim1 = 100 Then ldim1 = 10
-                                ldim2 = .mdim2 : If ldim2 = 100 Then ldim2 = 10
-                                For i = 1 To ldim1
-                                    For j = 1 To ldim2
+                            If lAddMember Then
+                                'next 2 lines are a kludge for performance! (impact RCHRES:CAT only?)
+                                Dim lDim1 As Integer = .mdim1 : If lDim1 = 100 Then lDim1 = 10
+                                Dim lDim2 As Integer = .mdim2 : If lDim2 = 100 Then lDim2 = 10
+                                For i As Integer = 1 To lDim1
+                                    For j As Integer = 1 To lDim2
                                         lTableStatus = New HspfStatusType
                                         lTableStatus.Name = .Parent.Name & ":" & .Name
-                                        lOccur = ((j - 1) * (1000)) + i
+                                        Dim lOccur As Integer = ((j - 1) * (1000)) + i
                                         lTableStatus.Occur = lOccur
                                         lTableStatus.Max = .mdim1 * .mdim2
                                         lTableStatus.Tag = CStr(.msect)
@@ -378,65 +358,57 @@ Public Class HspfStatus
         Update() 'current status
     End Sub
 
-    Public Function GetInfo(ByRef filterRON As Integer, Optional ByRef filterPresent As Integer = HspfStatusPresentMissingEnum.HspfStatusAny) As Collection
-        Dim vTableStatus As Object
-        Dim lTableStatus As HspfStatusType
-        Dim cGetInfo As Collection
-
-        If pTableStatus.Count() = 0 Then
+    Public Function GetInfo(ByRef aFilterRON As Integer, _
+                   Optional ByRef aFilterPresent As Integer = HspfStatusPresentMissingEnum.HspfStatusAny) _
+                   As Collection(Of HspfStatusType)
+        If pTableStatus.Count = 0 Then
             Build()
         Else
             Update()
         End If
 
-        'UPGRADE_NOTE: Object cGetInfo may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-        cGetInfo = Nothing
-        cGetInfo = New Collection
-        For Each vTableStatus In pTableStatus
-            lTableStatus = vTableStatus
-            If (filterPresent = HspfStatusPresentMissingEnum.HspfStatusAny Or (CBool(filterPresent) = lTableStatus.Present)) Then
-                If (filterRON = lTableStatus.ReqOptUnn) Then 'pbd changed
-                    cGetInfo.Add(vTableStatus)
-                ElseIf (filterRON = 2 And lTableStatus.ReqOptUnn = 4) Then
-                    cGetInfo.Add(vTableStatus)
+        Dim lGetInfo As New Collection(Of HspfStatusType)
+        For Each lTableStatus As HspfStatusType In pTableStatus
+            If (aFilterPresent = HspfStatusPresentMissingEnum.HspfStatusAny Or _
+              (CBool(aFilterPresent) = lTableStatus.Present)) Then
+                If (aFilterRON = lTableStatus.ReqOptUnn) Then 'pbd changed
+                    lGetInfo.Add(lTableStatus)
+                ElseIf (aFilterRON = 2 And lTableStatus.ReqOptUnn = 4) Then
+                    lGetInfo.Add(lTableStatus)
                 End If
             End If
-        Next vTableStatus
-        GetInfo = cGetInfo
+        Next lTableStatus
+        Return lGetInfo
     End Function
 
-    Public Function GetOutputInfo(ByRef filterRON As Integer, Optional ByRef filterPresent As Integer = HspfStatusPresentMissingEnum.HspfStatusAny) As Collection
-        Dim vTableStatus As Object
-        Dim lTableStatus As HspfStatusType
-        Dim cGetInfo As Collection
-
-        If pTableStatus.Count() = 0 Then
+    Public Function GetOutputInfo(ByRef aFilterRON As Integer, _
+                         Optional ByRef aFilterPresent As Integer = HspfStatusPresentMissingEnum.HspfStatusAny) _
+                               As Collection(Of HspfStatusType)
+        If pTableStatus.Count = 0 Then
             Build()
         Else
             Update()
         End If
 
-        'UPGRADE_NOTE: Object cGetInfo may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-        cGetInfo = Nothing
-        cGetInfo = New Collection
-        For Each vTableStatus In pTableStatus
-            lTableStatus = vTableStatus
-            If (filterPresent = HspfStatusPresentMissingEnum.HspfStatusAny Or (CBool(filterPresent) = lTableStatus.Present)) Then
-                If (filterRON = lTableStatus.ReqOptUnn) Then
-                    cGetInfo.Add(vTableStatus)
+        Dim lGetInfo As New Collection(Of HspfStatusType)
+        For Each lTableStatus As HspfStatusType In pTableStatus
+            If (aFilterPresent = HspfStatusPresentMissingEnum.HspfStatusAny Or _
+               (CBool(aFilterPresent) = lTableStatus.Present)) Then
+                If (aFilterRON = lTableStatus.ReqOptUnn) Then
+                    lGetInfo.Add(lTableStatus)
                 End If
             End If
-        Next vTableStatus
-        GetOutputInfo = cGetInfo
+        Next lTableStatus
+        Return lGetInfo
     End Function
 
-    Public Sub init(ByRef newOper As HspfOperation)
-        pOper = newOper
+    Public Sub Init(ByRef aNewOper As HspfOperation)
+        pOper = aNewOper
     End Sub
 
     Public Sub New()
         MyBase.New()
-        pTableStatus = New Collection
+        pTableStatus = New Collection(Of HspfStatusType)
         pStatusType = HspfStatusTypes.HspfTable
     End Sub
 End Class

@@ -10,7 +10,7 @@ Public Class HspfOpnSeqBlk
     Private pDelt As Integer
     Private pOpns As Collection (Of HspfOperation)
     Private pUci As HspfUci
-    Private pComment As String
+    Private pComment As String = ""
 
     Public Property Uci() As HspfUci
         Get
@@ -55,7 +55,7 @@ Public Class HspfOpnSeqBlk
     Public ReadOnly Property Opn(ByVal aIndex As Integer) As HspfOperation
         Get
             'TODO: 0 or 1 based
-            If aIndex > 0 And aIndex <= pOpns.Count() Then
+            If aIndex > 0 And aIndex <= pOpns.Count Then
                 Opn = pOpns.Item(aIndex)
             Else
                 Opn = Nothing
@@ -112,7 +112,7 @@ Public Class HspfOpnSeqBlk
         ' first call gets delt
         If pUci.FastFlag Then
             lRetkey = -1
-            GetCommentBeforeBlock("OPN SEQUENCE", pComment)
+            pComment = GetCommentBeforeBlock("OPN SEQUENCE")
             GetNextRecordFromBlock("OPN SEQUENCE", lRetkey, lBuff, lRecTyp, lReturnCode)
         Else
             Call REM_XBLOCK((Me.Uci), lOmCode, lInit, lRetkey, lBuff, lReturnCode)

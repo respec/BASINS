@@ -53,7 +53,7 @@ Option Explicit On
         Dim lIndex As Integer
         Dim lSectionID As Integer = 0
 
-        For lIndex = 1 To pSectionDefs.Count()
+        For lIndex = 1 To pSectionDefs.Count
             If pSectionDefs.Item(lIndex).Name = aSectionName Then
                 If pName <> "RCHRES" Or (pName = "RCHRES" And lIndex < 8) Then
                     lSectionID = lIndex - 1

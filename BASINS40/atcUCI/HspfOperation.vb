@@ -33,7 +33,7 @@ Public Class HspfOperation
     Private pMetSeg As HspfMetSeg
     Private pPointSources As Collection(Of HspfPoint)
     Private pUci As HspfUci
-    Private pComment As String
+    Private pComment As String = ""
     Private pSerial As Integer
     Private pDefOpnId As Integer
 
@@ -358,7 +358,7 @@ Public Class HspfOperation
     '					Next barDesc
     '				End If
     '			Case LegendType.LegMet
-    '				ReDim included(pUci.MetSegs.Count())
+    '				ReDim included(pUci.MetSegs.Count)
     '				If Not pMetSeg Is Nothing Then included(pMetSeg.Id) = True : myid = pMetSeg.Id Else myid = 0
     '				'myid = 0
     '				For	Each lSource In pSources
@@ -378,7 +378,7 @@ Public Class HspfOperation
     '				'UPGRADE_ISSUE: PictureBox property pic.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '				pic.CurrentY = (barbase - pic.TextHeight("X")) / 2
     '				started = False
-    '				For sid = 1 To pUci.MetSegs.Count()
+    '				For sid = 1 To pUci.MetSegs.Count
     '					If included(sid) Then
     '						'UPGRADE_ISSUE: PictureBox method pic.Print was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '						If started Then pic.Print(", ") Else started = True
@@ -392,7 +392,7 @@ Public Class HspfOperation
     '				Next 
     '				pic.Font = VB6.FontChangeUnderline(pic.Font, False)
     '			Case LegendType.LegPoint
-    '				ReDim included(pUci.PointSources.Count())
+    '				ReDim included(pUci.PointSources.Count)
     '				'Debug.Print pPointSources.Count
     '				For	Each pPoint In pPointSources
     '					included(pPoint.Id) = True
@@ -403,7 +403,7 @@ Public Class HspfOperation
     '				'UPGRADE_ISSUE: PictureBox method pic.TextHeight was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '				'UPGRADE_ISSUE: PictureBox property pic.CurrentY was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '				pic.CurrentY = (barbase - pic.TextHeight("X")) / 2
-    '				For sid = 1 To pUci.PointSources.Count()
+    '				For sid = 1 To pUci.PointSources.Count
     '					If included(sid) Then
     '						'UPGRADE_ISSUE: PictureBox method pic.Print was not upgraded. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="CC4C7EC0-C903-48FC-ACCC-81861D12DA4A"'
     '						If started Then pic.Print(", ") Else started = True

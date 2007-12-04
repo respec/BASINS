@@ -24,8 +24,8 @@ Public Class HspfTable
     Private pOccurCount As Integer 'total number of occurences
     Private pOccurNum As Integer 'nth occurrence
     Private pOccurIndex As Integer 'occurence with which this table is associated
-    Private pComment As String
-    Private pTableComment As String
+    Private pComment As String = ""
+    Private pTableComment As String = ""
     Private pParms As HspfParms
     Private pOpn As HspfOperation
     Private pEditAllSimilar As Boolean
@@ -273,7 +273,7 @@ Public Class HspfTable
             Dim lPendingFlag As Boolean = False
             Dim lFirstOpn As Boolean = True
             Dim lOutPend As String = Nothing 'pending record?
-            For lOperIndex As Integer = 1 To pOpn.OpnBlk.Ids.Count()
+            For lOperIndex As Integer = 1 To pOpn.OpnBlk.Ids.Count
                 On Error GoTo noTableForThisOper
                 Dim lOpn As HspfOperation = pOpn.OpnBlk.NthOper(lOperIndex)
                 'write values here
@@ -322,7 +322,7 @@ Public Class HspfTable
                         Dim lSuppStr As String = "~" & lTable.SuppID & "~"
                         lOutRec = Left(lOutRec, 10) & lSuppStr & Mid(lOutRec, 11 + lSuppStr.Length)
                     End If
-                    If lPendingFlag Then
+                    If Not lOutPend Is Nothing AndAlso lPendingFlag Then
                         If compareTableString(1, 10, lOutPend, lOutRec) And lTable.CombineOK Then
                             lOutRec = Left(lOutPend, 5) & Left(lOutRec, 5) & Right(lOutRec, lOutRec.Length - 10)
                         Else
@@ -332,9 +332,9 @@ Public Class HspfTable
                                     Dim lNCon As Integer = Me.Opn.Tables.Item("REPORT-FLAGS").ParmValue("NCON")
                                     lOutPend = Mid(lOutPend, 1, 10 + (lNCon * 70))
                                 End If
-                                lSB.AppendLine(lOutPend)
+                                lSB.AppendLine(lOutPend.TrimEnd)
                             Else
-                                lSB.AppendLine(lOutPend)
+                                lSB.AppendLine(lOutPend.TrimEnd)
                                 If Not lTable.Comment Is Nothing AndAlso lTable.Comment.Length > 0 Then
                                     'an comment associated with this operation
                                     lSB.AppendLine(lTable.Comment)
@@ -348,9 +348,9 @@ Public Class HspfTable
                             lSB.AppendLine(lOpn.Tables.Item(lTableName).Comment) 'pbd
                         Else
                             If Me.Opn.OpnBlk.Uci.GlobalBlock.emfg = 1 Then
-                                lSB.AppendLine(pDef.HeaderE)
+                                lSB.AppendLine(pDef.HeaderE.TrimEnd)
                             Else
-                                lSB.AppendLine(pDef.HeaderM)
+                                lSB.AppendLine(pDef.HeaderM.TrimEnd)
                             End If
                         End If
                         lFirstOpn = False
@@ -359,7 +359,7 @@ Public Class HspfTable
                     GoTo notMissingTableForThisOper
                 End If
 noTableForThisOper:
-                If lPendingFlag Then 'record pending
+                If Not lOutPend Is Nothing AndAlso lPendingFlag Then 'record pending
                     If lOutPend.Length > 80 Then
                         'this is a multi line table
                         If lTableName = "REPORT-CON" Then 'special case for this table
@@ -368,13 +368,13 @@ noTableForThisOper:
                         End If
                         PrintMultiLine(lSB, lOutPend)
                     Else
-                        lSB.AppendLine(lOutPend)
+                        lSB.AppendLine(lOutPend.TrimEnd)
                     End If
                     lPendingFlag = False
                 End If
 notMissingTableForThisOper:
             Next lOperIndex
-            If lPendingFlag Then 'record pending
+            If Not lOutPend Is Nothing AndAlso lPendingFlag Then 'record pending
                 If lOutPend.Length > 80 Then
                     'this is a multi line table
                     If lTableName = "REPORT-CON" Then 'special case for this table
@@ -383,7 +383,7 @@ notMissingTableForThisOper:
                     End If
                     PrintMultiLine(lSB, lOutPend)
                 Else
-                    lSB.AppendLine(lOutPend)
+                    lSB.AppendLine(lOutPend.TrimEnd)
                 End If
             End If
             lSB.AppendLine("  END " & pDef.Name)
@@ -401,7 +401,7 @@ notMissingTableForThisOper:
     End Sub
 
     Private Sub PrintMultiLine(ByRef aSB As StringBuilder, ByRef aOutPend As String)
-        aSB.AppendLine(aOutPend.Substring(0, 80)) 'first line
+        aSB.AppendLine(aOutPend.Substring(0, 80).TrimEnd) 'first line
 
         Dim lLen As Integer = aOutPend.Length
         Dim lNLinesMore As Integer = ((lLen - 10) / 70) - 1
@@ -422,7 +422,7 @@ notMissingTableForThisOper:
                 Dim lOutRec As String
                 lOutRec = aOutPend.Substring(0, 10) & _
                           aOutPend.Substring((lLineIndex * 70) + 10, lNChar)
-                aSB.AppendLine(lOutRec)
+                aSB.AppendLine(lOutRec.TrimEnd)
             End If
         Next lLineIndex
     End Sub

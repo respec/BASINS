@@ -58,28 +58,26 @@ Public Class HspfMonthData
     End Sub
 
     Public Sub ReadUciFile()
-        Dim done As Boolean
-        Dim init, OmCode As Integer
         Dim retkey, retcod As Integer
         Dim cbuff As String = Nothing
         Dim i, rectyp As Integer
         Dim myMonthDataTable As HspfMonthDataTable
 
         If pUci.FastFlag Then
-            GetCommentBeforeBlock("MONTH-DATA", pComment)
+            pComment = GetCommentBeforeBlock("MONTH-DATA")
         End If
 
-        OmCode = HspfOmCode("MONTH-DATA")
-        init = 1
-        done = False
+        Dim lOmCode As Integer = HspfOmCode("MONTH-DATA")
+        Dim lInit As Integer = 1
+        Dim lDone As Boolean = False
         retkey = -1
-        Do Until done
+        Do Until lDone
             If pUci.FastFlag Then
                 GetNextRecordFromBlock("MONTH-DATA", retkey, cbuff, rectyp, retcod)
             Else
-                Call REM_XBLOCK((Me.Uci), OmCode, init, retkey, cbuff, retcod)
+                Call REM_XBLOCK((Me.Uci), lOmCode, lInit, retkey, cbuff, retcod)
             End If
-            init = 0
+            lInit = 0
             If InStr(cbuff, "END") Then 'skip this
             ElseIf InStr(cbuff, "MONTH-DATA") > 0 Then  'another one
                 myMonthDataTable = New HspfMonthDataTable
@@ -88,7 +86,7 @@ Public Class HspfMonthData
                 If pUci.FastFlag Then
                     GetNextRecordFromBlock("MONTH-DATA", retkey, cbuff, rectyp, retcod)
                 Else
-                    Call REM_XBLOCK((Me.Uci), OmCode, init, retkey, cbuff, retcod)
+                    Call REM_XBLOCK((Me.Uci), lOmCode, lInit, retkey, cbuff, retcod)
                 End If
                 If rectyp = -1 Then
                     'this is a comment
@@ -101,17 +99,15 @@ Public Class HspfMonthData
                 End If
             End If
             If retcod <> 2 Then
-                done = True
+                lDone = True
             End If
         Loop
     End Sub
 
     Public Overrides Function ToString() As String
-        Dim j As Integer
-        Dim s, t As String
         Dim lSB As New StringBuilder
 
-        If pMonthDataTables.Count() > 0 Then 'something to write
+        If pMonthDataTables.Count > 0 Then 'something to write
             If pComment.Length > 0 Then
                 lSB.AppendLine(pComment)
             End If
@@ -119,14 +115,11 @@ Public Class HspfMonthData
             lSB.AppendLine(" ")
             For Each lMonthDataTable As HspfMonthDataTable In pMonthDataTables
                 lSB.AppendLine("  MONTH-DATA     " & myFormatI((lMonthDataTable.Id), 3))
-                s = ""
-                For j = 1 To 12
-                    'TODO:update this to PadRight
-                    t = Space(6)
-                    t = RSet(CStr(lMonthDataTable.MonthValue(j)), Len(t))
-                    s &= t
-                Next j
-                lSB.AppendLine(s)
+                Dim lStr As String = ""
+                For lMonthIndex As Integer = 1 To 12
+                    lStr &= CStr(lMonthDataTable.MonthValue(lMonthIndex)).PadLeft(6)
+                Next lMonthIndex
+                lSB.AppendLine(lStr)
                 lSB.AppendLine("  END MONTH-DATA " & myFormatI((lMonthDataTable.Id), 3))
                 lSB.AppendLine(" ")
             Next lMonthDataTable

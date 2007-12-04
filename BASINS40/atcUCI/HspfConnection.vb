@@ -17,7 +17,7 @@ Public Class HspfConnection
     Private pMassLink As Integer
     Private pUci As HspfUci
     Private pDesiredType As String
-    Private pComment As String
+    Private pComment As String = ""
 
     Public Property MFact() As Double
         Get
@@ -505,7 +505,7 @@ Public Class HspfConnection
                                 lSB.AppendLine(lMetSeg.ToStringFromSpecs(OpTyp, iCol, iLen))
                             Next
                         Next
-                        'If pUci.PointSources.Count() > 0 And pUci.MetSegs.Count() > 0 Then
+                        'If pUci.PointSources.Count > 0 And pUci.MetSegs.Count > 0 Then
                         '    lSB.AppendLine("") 'write a blank line between met segs and pt srcs
                         'End If
                         'do point sources
