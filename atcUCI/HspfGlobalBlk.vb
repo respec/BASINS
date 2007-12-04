@@ -13,7 +13,7 @@ Public Class HspfGlobalBlk
     Private pRunFg As Integer 'interp only(0) or interp and run(1)
     Private pEmFg As Integer 'english(1), metric(2) flag
     Private pIhmFg As Integer 'ihm flag (normal-0,IHM control-1)
-    Private pComment As String
+    Private pComment As String = ""
     Private pUci As HspfUci
     Private pEdited As Boolean
 
@@ -160,7 +160,7 @@ Public Class HspfGlobalBlk
 
         If pUci.FastFlag Then
             retkey = -1
-            GetCommentBeforeBlock("GLOBAL", pComment)
+            pComment = GetCommentBeforeBlock("GLOBAL")
             GetNextRecordFromBlock("GLOBAL", retkey, cbuff, rectyp, retcod)
             If Mid(cbuff, 1, 7) <> "START" Then
                 lRunInf = Trim(cbuff)
@@ -248,7 +248,6 @@ Public Class HspfGlobalBlk
         If pComment.Length > 0 Then
             lSB.AppendLine(pComment)
         End If
-        lSB.AppendLine(" ")
         lSB.AppendLine("GLOBAL")
         lSB.AppendLine("  " & pRunInf.Value.Trim)
         lSB.Append("  START       " & Format(SDate(0), "0000") & "/" & Format(SDate(1), "00") & "/" & Format(SDate(2), "00") & " " & Format(SDate(3), "00") & ":" & Format(SDate(4), "00"))

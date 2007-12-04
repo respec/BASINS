@@ -18,7 +18,7 @@ Public Class HspfOpnBlk
     Private pEdited As Boolean
     Private pTables As Collection '(Of HspfTable)
     Private pUci As HspfUci
-    Private pComment As String
+    Private pComment As String = ""
 
     Public Property Comment() As String
         Get
@@ -84,8 +84,8 @@ Public Class HspfOpnBlk
         Dim lids() As Integer
         Dim lOpn As HspfOperation
 
-        ReDim order(pIds.Count())
-        ReDim lids(pIds.Count())
+        ReDim order(pIds.Count)
+        ReDim lids(pIds.Count)
 
         cnt = 0
         For Each lOpn In Me.Ids
@@ -103,7 +103,7 @@ Public Class HspfOpnBlk
     End Function
 
     Public Function Count() As Integer
-        Count = pIds.Count()
+        Count = pIds.Count
     End Function
 
     Public Sub New()
@@ -119,7 +119,7 @@ Public Class HspfOpnBlk
 
     Public Sub setTableValues(ByRef blk As HspfBlockDef)
         If pUci.FastFlag Then
-            GetCommentBeforeBlock(pName, pComment)
+            pComment = GetCommentBeforeBlock(pName)
         End If
         Call readTables(blk)
     End Sub
@@ -137,7 +137,7 @@ Public Class HspfOpnBlk
         Dim lId As HspfOperation
         Dim vId As Object
         Dim lOpTyp As Integer
-        Dim TableComment As String = ""
+        Dim lTableComment As String = ""
         Dim lCombineOk As Boolean
 
         lOpTyp = HspfOperNum(pName)
@@ -155,7 +155,7 @@ Public Class HspfOpnBlk
                 Else
                     kflg = 0
                 End If
-                If itable < blk.TableDefs.Count() Then
+                If itable < blk.TableDefs.Count Then
                     contfg = 1 'more tables to read flag, 1 if so
                 Else
                     contfg = 0
@@ -173,7 +173,7 @@ Public Class HspfOpnBlk
                 End If
                 For thisoccur = 1 To noccur
                     If pUci.FastFlag Then
-                        GetTableComment(srec, kwd, thisoccur, TableComment)
+                        lTableComment = GetTableComment(srec, kwd, thisoccur)
                     End If
                     Call GetTableRecordsFromUCI(lOpTyp + 120, blk.TableDefs.Item(kwd).SGRP, (blk.Name), kwd, srec, thisoccur, scnt, s, c)
                     For i = 1 To scnt
@@ -204,7 +204,7 @@ Public Class HspfOpnBlk
                                 ltable.OccurCount = noccur
                                 ltable.OccurNum = thisoccur
                                 ltable.OccurIndex = 0
-                                ltable.TableComment = TableComment
+                                ltable.TableComment = lTableComment
                                 ltable.CombineOK = lCombineOk
                                 If pName = "PERLND" And ltable.Def.Parent.Name = "PQUAL" Then
                                     'need to compute proper index
@@ -263,7 +263,7 @@ Public Class HspfOpnBlk
                         ltable.OccurCount = noccur
                         ltable.OccurNum = thisoccur
                         ltable.OccurIndex = 0
-                        ltable.TableComment = TableComment
+                        ltable.TableComment = lTableComment
                         If noccur > 1 And thisoccur > 1 Then
                             If Not TableExists(ltable.Name & ":" & thisoccur) Then
                                 pTables.Add(ltable, ltable.Name & ":" & thisoccur)
@@ -524,7 +524,7 @@ Public Class HspfOpnBlk
 
         lInGroup = False
 
-        For i = 1 To lBlockDef.TableDefs.Count() 'must look thru all possible tables
+        For i = 1 To lBlockDef.TableDefs.Count 'must look thru all possible tables
             lTableDef = lBlockDef.TableDefs.Item(i)
 
             If lTableDef.OccurGroup = 0 And Not lInGroup Then
@@ -547,7 +547,7 @@ Public Class HspfOpnBlk
             Else 'this is a multiple occurence group (like pqual, iqual, gqual)
 
                 If lInGroup Then
-                    If lTableDef.OccurGroup <> lCurrentOccurGroup Or i = lBlockDef.TableDefs.Count() Then
+                    If lTableDef.OccurGroup <> lCurrentOccurGroup Or i = lBlockDef.TableDefs.Count Then
                         'we were in a multiple occurence group but have reached end of group
                         lGroupIndex = lGroupIndex + 1 'look for next occurence
                         If lGroupIndex > lLastGroupIndex Then

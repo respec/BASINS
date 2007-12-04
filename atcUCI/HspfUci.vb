@@ -37,6 +37,7 @@ Public Class HspfUci
     Private pStarterPath As String
     Private pFastFlag As Boolean
     Private pAcidphFlag As Boolean
+    Private pComment As String = ""
 
     Private pOrder As ArrayList 'for saving order of blocks
 
@@ -302,6 +303,9 @@ Public Class HspfUci
 
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
+        If pComment.Length > 0 Then
+            lSB.AppendLine(pComment)
+        End If
         lSB.AppendLine("RUN")
 
         For Each lBlock As String In pOrder
@@ -381,6 +385,7 @@ Public Class HspfUci
 
         pMsg = Nothing
         pConnections = New Collection(Of HspfConnection)
+        pGlobalBlk = New HspfGlobalBlk
         pOpnBlks = New HspfOpnBlks
         pMetSegs = New Collection(Of HspfMetSeg)
         pPointSources = New Collection(Of HspfPoint)
@@ -493,6 +498,8 @@ Public Class HspfUci
                 If pFastFlag Then
                     SaveBlockOrder(pOrder)
                 End If
+
+                pComment = GetCommentBeforeBlock("RUN")
 
                 pGlobalBlk = New HspfGlobalBlk
                 pGlobalBlk.Uci = Me
@@ -643,7 +650,7 @@ Public Class HspfUci
 
                 'check to see if we already have this met segment
                 Dim lNewSeg As Boolean = True
-                If pMetSegs.Count() > 0 Then
+                If pMetSegs.Count > 0 Then
                     For Each lMetSegExisting As HspfMetSeg In pMetSegs
                         If lMetSegExisting.Compare(lMetSeg, lOperation.Name) Then
                             lNewSeg = False
@@ -658,7 +665,7 @@ Public Class HspfUci
                 End If
 
                 If lNewSeg Then
-                    lMetSeg.Id = pMetSegs.Count() + 1
+                    lMetSeg.Id = pMetSegs.Count + 1
                     'get met seg name from precip data set
                     Dim lDsn As Integer = lMetSeg.MetSegRec(1).Source.VolId
                     If lDsn > 0 Then
@@ -718,7 +725,7 @@ Public Class HspfUci
                         Dim lRFact As Single
                         If lConnection.Target.VolName = "COPY" Then
                             lRFact = 0
-                            For lIndex As Integer = 1 To lConnection.Target.Opn.Targets.Count()
+                            For lIndex As Integer = 1 To lConnection.Target.Opn.Targets.Count
                                 If lConnection.Target.Opn.Targets.Item(lIndex).Target.VolName = "RCHRES" Then
                                     lNewPoint = True
                                     'sum up the mfacts (really for septic modeling)
@@ -815,7 +822,7 @@ Public Class HspfUci
         'need to synch collection of connections with opn connections
         RemoveConnectionsFromCollection(1) 'remove all type ext src
         For Each lOpn As HspfOperation In Me.OpnSeqBlock.Opns
-            For lSourceIndex As Integer = 1 To lOpn.Sources.Count()
+            For lSourceIndex As Integer = 1 To lOpn.Sources.Count
                 Dim lConn As HspfConnection = lOpn.Sources.Item(lSourceIndex)
                 If lConn.Typ = 1 Then
                     Me.Connections.Add(lConn)
@@ -1030,7 +1037,7 @@ Public Class HspfUci
         'remove this oper from source and target collections for other operations
         For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
             j = 1
-            Do While j <= lOpn.Targets.Count()
+            Do While j <= lOpn.Targets.Count
                 If lOpn.Targets.Item(j).Target.VolId = delid And _
                    lOpn.Targets.Item(j).Target.VolName = delname Then
                     lOpn.Targets.RemoveAt(j)
@@ -1039,7 +1046,7 @@ Public Class HspfUci
                 End If
             Loop
             j = 1
-            Do While j <= lOpn.Sources.Count()
+            Do While j <= lOpn.Sources.Count
                 If lOpn.Sources.Item(j).Source.VolId = delid And _
                    lOpn.Sources.Item(j).Source.VolName = delname Then
                     lOpn.Sources.RemoveAt(j)
@@ -1136,7 +1143,7 @@ Public Class HspfUci
     '                sj = ldate.Value(0) '.SJDay
     '                ej = ldate.Value(.numValues) '.EJDay
     '                Call findtimser("", lLocation, "PEVT", llocts)
-    '                For j = 1 To llocts.Count()
+    '                For j = 1 To llocts.Count
     '                    ldate = llocts.Item(j).Dates
     '                    tempsj = ldate.Value(0) '.SJDay
     '                    tempej = ldate.Value(.numValues) '.EJDay
@@ -1589,7 +1596,7 @@ Public Class HspfUci
         Call AddCopyToSchematic(lOperation, copyid, lPerlndMassLinkNumber, lImplndMassLinkNumber)
         Call FindUpstreamOpns(lOperation, lOperations)
 
-        Do While lOperations.Count() > 0
+        Do While lOperations.Count > 0
             lOperation = lOperations.Item(0)
             lOperations.RemoveAt(0)
             Call AddCopyToSchematic(lOperation, copyid, lPerlndMassLinkNumber, lImplndMassLinkNumber)
@@ -1946,7 +1953,7 @@ x:
         lTotalArea += LocalUpstreamArea(lOperation)
         Call FindUpstreamOpns(lOperation, lOperations)
 
-        Do While lOperations.Count() > 0
+        Do While lOperations.Count > 0
             lOperation = lOperations.Item(0)
             lOperations.RemoveAt(0)
             lTotalArea += LocalUpstreamArea(lOperation)
@@ -1986,14 +1993,14 @@ x:
         Dim j, i, found As Integer
         Dim copyOpn As HspfOperation
 
-        For i = 1 To lOpn.Sources.Count()
+        For i = 1 To lOpn.Sources.Count
             iConn = lOpn.Sources.Item(i)
             If iConn.Source.VolName = "PERLND" Or iConn.Source.VolName = "IMPLND" Then
                 'copy this record
                 'does this oper to copy already exist?
                 copyOpn = pOpnBlks.Item("COPY").OperFromID(copyid)
                 found = 0
-                For j = 1 To copyOpn.Sources.Count()
+                For j = 1 To copyOpn.Sources.Count
                     jConn = copyOpn.Sources.Item(j)
                     If jConn.Source.VolName = iConn.Source.VolName And jConn.Source.VolId = iConn.Source.VolId Then
                         found = j
@@ -2110,7 +2117,7 @@ x:
             lts = findtimser(UCase(oldn), "", "")
             'return the names of the data sets from this wdm file
             ndsn = 0
-            For i = 1 To lts.Count()
+            For i = 1 To lts.Count
                 lTimser = lts.Item(i)
                 'find a free dsn
                 If relabs = 1 Then
@@ -2446,7 +2453,7 @@ x:
         Dim lConn As HspfConnection
 
         i = 1
-        Do While i <= Me.Connections.Count()
+        Do While i <= Me.Connections.Count
             'remove this type of connections from pconnections collection
             lConn = Me.Connections.Item(i)
             If lConn.Typ = itype Then
@@ -2495,25 +2502,22 @@ x:
     End Function
 
     Private Sub ReportMissingTimsers(ByRef aReturnCode As Integer)
-        Dim coll As Collection
+        Dim lMissingTimsers As Collection(Of HspfStatusType)
         Dim i, iresp As Integer
         Dim ctxt As String
 
-        If Me.MetSegs.Count() > 0 Then
+        If Me.MetSegs.Count > 0 Then
             MetSeg2Source()
         End If
         Point2Source()
 
         ctxt = ""
-        'UPGRADE_NOTE: Object coll may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
-        coll = Nothing
         For Each lOpn As HspfOperation In pOpnSeqBlk.Opns
-            coll = Nothing
             'lOpn.InputTimeseriesStatus.Update
-            coll = lOpn.InputTimeseriesStatus.GetInfo(HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired, HspfStatus.HspfStatusPresentMissingEnum.HspfStatusMissing)
-            If coll.Count() > 0 Then
-                For i = 1 To coll.Count()
-                    ctxt = ctxt & vbCrLf & lOpn.Name & " " & lOpn.Id & " " & coll.Item(i).Name
+            lMissingTimsers = lOpn.InputTimeseriesStatus.GetInfo(HspfStatus.HspfStatusReqOptUnnEnum.HspfStatusRequired, HspfStatus.HspfStatusPresentMissingEnum.HspfStatusMissing)
+            If lMissingTimsers.Count > 0 Then
+                For i = 1 To lMissingTimsers.Count
+                    ctxt = ctxt & vbCrLf & lOpn.Name & " " & lOpn.Id & " " & lMissingTimsers.Item(i).Name
                 Next i
             End If
         Next
@@ -2536,100 +2540,98 @@ x:
     End Sub
 
     Private Sub ProcessFTables()
-        Dim retcod, OmCode, init, retkey, rectyp As Integer
-        Dim cbuff As String = Nothing
-        Dim done As Boolean
-        Dim j, i, Id As Integer
-        Dim lOpn As HspfOperation = Nothing
-        Dim tOpn As HspfOperation
+        Dim lReturnCode, lOmCode, lInit, lReturnKey, lRecordType As Integer
+        Dim lBuff As String = Nothing
+        Dim lDone As Boolean
 
-        OmCode = HspfOmCode("FTABLES")
-        init = 1
-        done = False
-        retkey = -1
-        Do Until done
+        lOmCode = HspfOmCode("FTABLES")
+        lInit = 1
+        lDone = False
+        lReturnKey = -1
+        Do Until lDone
             If Me.FastFlag Then
-                GetNextRecordFromBlock("FTABLES", retkey, cbuff, rectyp, retcod)
+                GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
             Else
-                Call REM_XBLOCK(Me, OmCode, init, retkey, cbuff, retcod)
+                Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
             End If
-            init = 0
-            If Mid(cbuff, 3, 6) = "FTABLE" Then 'this is a new one
-                Id = CShort(cbuff.Substring(11, 4))
-                'find which oper this ftable is associated with
-                For Each tOpn In Me.OpnBlks.Item("RCHRES").Ids
-                    If tOpn.Tables.Item("HYDR-PARM2").ParmValue("FTBUCI") = Id Then
-                        lOpn = tOpn
+            lInit = 0
+            If Mid(lBuff, 3, 6) = "FTABLE" Then 'this is a new one
+                Dim lId As Integer = CShort(lBuff.Substring(11, 4))
+                'find which operation this ftable is associated with
+                Dim lOperation As HspfOperation = Nothing
+                For Each lOperationToCheck As HspfOperation In Me.OpnBlks.Item("RCHRES").Ids
+                    If lOperationToCheck.Tables.Item("HYDR-PARM2").ParmValue("FTBUCI") = lId Then
+                        lOperation = lOperationToCheck
                         Exit For
                     End If
                 Next
-                If Not lOpn Is Nothing Then
+                If Not lOperation Is Nothing Then
                     If Me.FastFlag Then
-                        rectyp = -999
-                        Do Until rectyp = 0
-                            GetNextRecordFromBlock("FTABLES", retkey, cbuff, rectyp, retcod)
+                        lRecordType = -999
+                        Do Until lRecordType = 0
+                            GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
                         Loop
                     Else
-                        Call REM_XBLOCK(Me, OmCode, init, retkey, cbuff, retcod)
+                        Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
                     End If
-                    With lOpn.FTable
-                        .Nrows = CInt(Left(cbuff, 5))
-                        .Ncols = CInt(Mid(cbuff, 6, 5))
-                        i = 1
-                        Do While i <= .Nrows
+                    With lOperation.FTable
+                        .Nrows = CInt(Left(lBuff, 5))
+                        .Ncols = CInt(Mid(lBuff, 6, 5))
+                        Dim lRow As Integer = 1
+                        Do While lRow <= .Nrows
                             If Me.FastFlag Then
-                                GetNextRecordFromBlock("FTABLES", retkey, cbuff, rectyp, retcod)
+                                GetNextRecordFromBlock("FTABLES", lReturnKey, lBuff, lRecordType, lReturnCode)
                             Else
-                                rectyp = 0
-                                Call REM_XBLOCK(Me, OmCode, init, retkey, cbuff, retcod)
+                                lRecordType = 0
+                                Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
                             End If
-                            If rectyp = -1 Then
+                            If lRecordType = -1 Then
                                 'this is a comment
                                 If Len(.Comment) = 0 Then
-                                    .Comment = cbuff
+                                    .Comment = lBuff
                                 Else
-                                    .Comment = .Comment & vbCrLf & cbuff
+                                    .Comment = .Comment & vbCrLf & lBuff
                                 End If
                             Else
                                 'this is a regular record
-                                .Depth(i) = CDbl(Left(cbuff, 10))
-                                .DepthAsRead(i) = Left(cbuff, 10)
-                                .Area(i) = CDbl(Mid(cbuff, 11, 10))
-                                .AreaAsRead(i) = Mid(cbuff, 11, 10)
-                                .Volume(i) = CDbl(Mid(cbuff, 21, 10))
-                                .VolumeAsRead(i) = Mid(cbuff, 21, 10)
-                                j = .Ncols - 3
-                                If j > 0 Then
-                                    .Outflow1(i) = CDbl(Mid(cbuff, 31, 10))
-                                    .Outflow1AsRead(i) = Mid(cbuff, 31, 10)
+                                .Depth(lRow) = CDbl(Left(lBuff, 10))
+                                .DepthAsRead(lRow) = Left(lBuff, 10)
+                                .Area(lRow) = CDbl(Mid(lBuff, 11, 10))
+                                .AreaAsRead(lRow) = Mid(lBuff, 11, 10)
+                                .Volume(lRow) = CDbl(Mid(lBuff, 21, 10))
+                                .VolumeAsRead(lRow) = Mid(lBuff, 21, 10)
+                                Dim lExit As Integer = .Ncols - 3
+                                If lExit > 0 Then
+                                    .Outflow1(lRow) = CDbl(Mid(lBuff, 31, 10))
+                                    .Outflow1AsRead(lRow) = Mid(lBuff, 31, 10)
                                 End If
-                                If j > 1 Then
-                                    .Outflow2(i) = CDbl(Mid(cbuff, 41, 10))
-                                    .Outflow2AsRead(i) = Mid(cbuff, 41, 10)
+                                If lExit > 1 Then
+                                    .Outflow2(lRow) = CDbl(Mid(lBuff, 41, 10))
+                                    .Outflow2AsRead(lRow) = Mid(lBuff, 41, 10)
                                 End If
-                                If j > 2 Then
-                                    .Outflow3(i) = CDbl(Mid(cbuff, 51, 10))
-                                    .Outflow3AsRead(i) = Mid(cbuff, 51, 10)
+                                If lExit > 2 Then
+                                    .Outflow3(lRow) = CDbl(Mid(lBuff, 51, 10))
+                                    .Outflow3AsRead(lRow) = Mid(lBuff, 51, 10)
                                 End If
-                                If j > 3 Then
-                                    .Outflow4(i) = CDbl(Mid(cbuff, 61, 10))
-                                    .Outflow4AsRead(i) = Mid(cbuff, 61, 10)
+                                If lExit > 3 Then
+                                    .Outflow4(lRow) = CDbl(Mid(lBuff, 61, 10))
+                                    .Outflow4AsRead(lRow) = Mid(lBuff, 61, 10)
                                 End If
-                                If j > 4 Then
-                                    .Outflow5(i) = CDbl(Mid(cbuff, 71, 10))
-                                    .Outflow5AsRead(i) = Mid(cbuff, 71, 10)
+                                If lExit > 4 Then
+                                    .Outflow5(lRow) = CDbl(Mid(lBuff, 71, 10))
+                                    .Outflow5AsRead(lRow) = Mid(lBuff, 71, 10)
                                 End If
-                                i = i + 1
+                                lRow += 1
                             End If
                         Loop
                     End With
                 End If
-            ElseIf cbuff.Trim = "END FTABLES" Then
-                done = True
-            ElseIf retkey = 0 Then
-                done = True
-            ElseIf retcod = 10 Then
-                done = True
+            ElseIf lBuff.Trim = "END FTABLES" Then
+                lDone = True
+            ElseIf lReturnKey = 0 Then
+                lDone = True
+            ElseIf lReturnCode = 10 Then
+                lDone = True
             End If
         Loop
 
@@ -2658,8 +2660,7 @@ x:
     Public Function CatAsInt(ByRef aCategory As String) As Integer
         'turn a two character category tag into its integer equivalent
         If aCategory.Length > 0 Then
-            If Not Me.CategoryBlock Is Nothing Then
-                'have category block
+            If Not Me.CategoryBlock Is Nothing Then 'have category block
                 For Each lCategory As HspfData.HspfCategory In Me.CategoryBlock.Categories
                     If lCategory.Tag = aCategory Then
                         CatAsInt = lCategory.Id
@@ -2669,23 +2670,44 @@ x:
         End If
     End Function
 
-    Public Function IntAsCat(ByRef Member As String, ByRef sub1or2 As Integer, ByRef sint As String) As String
+    Public Function IntAsCat(ByRef aMember As String, _
+                             ByRef aSub1or2 As Integer, _
+                             ByRef aSint As String) As String
         'given a timeseries member name and a subscript, see if there is a
         'category equivalent.  if so, turn the integer category tag into its
         'two character equivalent
-        Dim i As Integer
-        IntAsCat = sint
+        IntAsCat = aSint
         If Not Me.CategoryBlock Is Nothing Then
-            If IsNumeric(sint) Then
-                i = CShort(sint)
-                If Me.CategoryBlock.Count > 0 And Me.CategoryBlock.Count >= i Then
+            If IsNumeric(aSint) Then
+                Dim lSint As Integer = CShort(aSint)
+                If Me.CategoryBlock.Count > 0 And Me.CategoryBlock.Count >= lSint Then
                     'have category block
                     'check to see if this one is valid to convert into a category tag
-                    If Member = "COTDGT" And sub1or2 = 2 Or Member = "CIVOL" And sub1or2 = 1 Or Member = "CVOL" And sub1or2 = 1 Or Member = "CRO" And sub1or2 = 1 Or Member = "CO" And sub1or2 = 2 Or Member = "CDFVOL" And sub1or2 = 2 Or Member = "CROVOL" And sub1or2 = 1 Or Member = "COVOL" And sub1or2 = 2 Then
-                        IntAsCat = Me.CategoryBlock.Value(i).Tag
+                    If aMember = "COTDGT" And aSub1or2 = 2 Or _
+                       aMember = "CIVOL" And aSub1or2 = 1 Or _
+                       aMember = "CVOL" And aSub1or2 = 1 Or _
+                       aMember = "CRO" And aSub1or2 = 1 Or _
+                       aMember = "CO" And aSub1or2 = 2 Or _
+                       aMember = "CDFVOL" And aSub1or2 = 2 Or _
+                       aMember = "CROVOL" And aSub1or2 = 1 Or _
+                       aMember = "COVOL" And aSub1or2 = 2 Then
+                        IntAsCat = Me.CategoryBlock.Value(lSint).Tag
                     End If
                 End If
             End If
         End If
     End Function
+
+    Public Sub CreateUciFromBASINS(ByRef aMsg As HspfMsg, _
+                                   ByRef aName As String, _
+                                   ByRef aOutputWdm As String, _
+                                   ByRef aMetWdms() As String, _
+                                   ByRef aWdmIds() As String, _
+                                   ByRef aMetDataDetails As String, _
+                                   ByRef aOneSeg As Boolean, _
+                                   Optional ByRef aMasterPollutantList As Collection = Nothing)
+        modCreateUci.CreateUciFromBASINS(Me, aMsg, aName, aOutputWdm, aMetWdms, _
+                                         aWdmIds, aMetDataDetails, aOneSeg, aMasterPollutantList)
+    End Sub
+
 End Class

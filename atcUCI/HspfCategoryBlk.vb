@@ -53,13 +53,13 @@ Public Class HspfCategoryBlk
 
     Public ReadOnly Property Count() As Integer
         Get
-            Count = pCategories.Count()
+            Count = pCategories.Count
         End Get
     End Property
 
     Public Property Value(ByVal Index As Integer) As HspfData.HspfCategory
         Get
-            If Index > 0 And Index <= pCategories.Count() Then
+            If Index > 0 And Index <= pCategories.Count Then
                 'TODO: check this index
                 Value = pCategories.Item(Index - 1)
             Else
@@ -70,10 +70,10 @@ Public Class HspfCategoryBlk
             End If
         End Get
         Set(ByVal Value As HspfData.HspfCategory) '????
-            If Index <= pCategories.Count() Then
+            If Index <= pCategories.Count Then
                 pCategories.RemoveAt(Index)
                 pCategories.Insert(Index, Value)
-            ElseIf Index = pCategories.Count() + 1 Then
+            ElseIf Index = pCategories.Count + 1 Then
                 pCategories.Add(Value)
             Else 'error?
             End If
@@ -97,7 +97,7 @@ Public Class HspfCategoryBlk
     End Sub
 
     Public Sub Remove(ByRef Index As Integer)
-        If Index > 0 And Index <= pCategories.Count() Then
+        If Index > 0 And Index <= pCategories.Count Then
             pCategories.RemoveAt(Index)
         End If
     End Sub
@@ -129,7 +129,7 @@ Public Class HspfCategoryBlk
         On Error GoTo ErrHand
 
         If pUci.FastFlag Then
-            GetCommentBeforeBlock("CATEGORY", pComment)
+            pComment = GetCommentBeforeBlock("CATEGORY")
         End If
 
         retcod = 0

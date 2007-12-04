@@ -96,7 +96,7 @@ Public Class HspfSpecialActionBlk
         Dim moreUvnames As Integer
 
         If pUci.FastFlag Then
-            GetCommentBeforeBlock("SPEC-ACTIONS", pComment)
+            pComment = GetCommentBeforeBlock("SPEC-ACTIONS")
         End If
 
         moreUvnames = 0
@@ -152,13 +152,13 @@ Public Class HspfSpecialActionBlk
         Dim lSB As New StringBuilder
         Dim i As Integer
 
-        If pRecords.Count() > 0 Then
+        If pRecords.Count > 0 Then
             If pComment.Length > 0 Then
                 lSB.AppendLine(pComment)
             End If
             lSB.AppendLine("SPEC-ACTIONS")
             With pRecords
-                For i = 1 To .Count()
+                For i = 1 To .Count
                     lSB.AppendLine(.Item(i).Text)
                 Next i
             End With

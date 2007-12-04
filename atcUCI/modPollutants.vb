@@ -416,7 +416,7 @@ Module modPollutants
                 nGqual = nGqual + rflag
                 isedfg = 0
                 psedfg = 0
-                For j = 1 To tPoll.Operations.Count()
+                For j = 1 To tPoll.Operations.Count
                     newOpn = tPoll.Operations.Item(j)
                     lCtype = newOpn.Name
                     lOpn = myUci.OpnBlks(newOpn.Name).Ids("K" & newOpn.Id)

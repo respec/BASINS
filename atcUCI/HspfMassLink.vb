@@ -11,7 +11,7 @@ Public Class HspfMassLink
     Private pMFact As Double
     Private pUci As HspfUci
     Private pMassLinkId As Integer
-    Private pComment As String
+    Private pComment As String = ""
 
     Public Property MFact() As Double
         Get

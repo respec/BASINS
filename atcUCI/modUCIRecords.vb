@@ -181,65 +181,54 @@ Module modUCIRecords
         End If
     End Sub
 
-    Public Sub GetCommentBeforeBlock(ByRef blockname As String, ByRef Comment As String)
-        Dim ilen, i, retkey As Integer
+    Public Function GetCommentBeforeBlock(ByRef aBlockName As String) As String
+        Dim lStartRecordIndex As Integer = -1
+        For lRecordIndex As Integer = 1 To uciRecCnt
+            If uciRec(lRecordIndex).StartsWith(aBlockName) Then 'found start of block
+                lStartRecordIndex = lRecordIndex
+                Exit For
+            End If
+        Next lRecordIndex
 
-        retkey = -1
-        Comment = ""
-        For i = 1 To uciRecCnt
-            ilen = Len(blockname)
-            If Len(uciRec(i)) >= ilen Then
-                If Left(uciRec(i), ilen) = blockname Then
-                    'found start
-                    retkey = i
+        Dim lComment As String = ""
+        If lStartRecordIndex > 1 Then
+            For lRecordIndex As Integer = lStartRecordIndex - 1 To 1 Step -1
+                If uciRec(lRecordIndex).Trim.Length = 0 Then 'found blank line
+                    If lComment.Length = 0 Then
+                        lComment = " "
+                    Else
+                        lComment = vbCrLf & lComment
+                    End If
+                ElseIf uciRec(lRecordIndex).IndexOf("***") > -1 Then 'found comment
+                    If lComment.Length = 0 Then
+                        lComment = uciRec(lRecordIndex)
+                    Else
+                        lComment = uciRec(lRecordIndex) & vbCrLf & lComment
+                    End If
+                Else 'something on this line and its not a comment
                     Exit For
                 End If
-            End If
-        Next i
-
-        'start at retkey+1
-        If retkey > -1 Then
-            If Len(Trim(uciRec(retkey - 1))) = 0 Then
-                'skip blank line immediately preceeding
-                retkey = retkey - 1
-            End If
-            For i = retkey - 1 To 0 Step -1
-                If Len(Trim(uciRec(i))) > 0 And InStr(1, uciRec(i), "***") = 0 Then
-                    'something on this line and its not a comment
-                    Exit For
-                ElseIf InStr(1, uciRec(i), "***") > 0 Then
-                    'found comment
-                    If Len(Comment) = 0 Then
-                        Comment = uciRec(i)
-                    Else
-                        Comment = uciRec(i) & vbCrLf & Comment
-                    End If
-                ElseIf Len(Trim(uciRec(i))) = 0 Then
-                    'found blank line
-                    If Len(Comment) = 0 Then
-                        Comment = " "
-                    Else
-                        Comment = " " & vbCrLf & Comment
-                    End If
-                End If
-            Next i
+            Next lRecordIndex
         End If
-    End Sub
+        Return lComment.TrimEnd
+    End Function
 
-    Public Sub GetTableComment(ByRef srec As Integer, ByRef tabname As String, ByRef thisoccur As Integer, ByRef Comment As String)
-        Dim retkey, i, noccur As Integer
+    Public Function GetTableComment(ByRef aStartRecord As Integer, _
+                                    ByRef aTableName As String, _
+                                    ByRef aThisOccur As Integer) As String
 
-        Comment = ""
-        retkey = srec
-        If thisoccur > 1 Then
-            retkey = -1
-            noccur = 1
-            For i = srec + 1 To uciRecCnt
-                If Trim(tabname) = Trim(uciRec(i)) Then
+        Dim lComment As String = ""
+        Dim lRecordKey As Integer = aStartRecord
+        Dim lOccurCount As Integer
+        If aThisOccur > 1 Then
+            lRecordKey = -1
+            lOccurCount = 1
+            For i As Integer = aStartRecord + 1 To uciRecCnt
+                If aTableName.Trim = uciRec(i).Trim Then
                     'found another occurence
-                    noccur = noccur + 1
-                    If noccur = thisoccur Then
-                        retkey = i
+                    lOccurCount += 1
+                    If lOccurCount = aThisOccur Then
+                        lRecordKey = i
                     End If
                     Exit For
                 End If
@@ -247,38 +236,29 @@ Module modUCIRecords
         End If
 
         'start at retkey+1
-        If retkey > 0 Then
-            'If Len(Trim(uciRec(retkey - 1))) = 0 Then
-            'skip blank line immediately preceeding
-            '  retkey = retkey - 1
-            'End If
-            For i = retkey - 1 To 0 Step -1
-                If Len(Trim(uciRec(i))) > 0 And InStr(1, uciRec(i), "***") = 0 Then
+        If lRecordKey > 0 Then
+            For lRecordIndex As Integer = lRecordKey - 1 To 0 Step -1
+                If uciRec(lRecordIndex).Trim.Length = 0 Then 'found blank line
+                    'dont tack it on if the preceeding line is real
+                    If lComment.Length = 0 Then
+                        lComment = " "
+                    Else
+                        lComment = vbCrLf & lComment
+                    End If
+                ElseIf uciRec(lRecordIndex).IndexOf("***") = -1 Then
                     'something on this line and its not a comment
                     Exit For
-                ElseIf InStr(1, uciRec(i), "***") > 0 Then
-                    'found comment
-                    If Len(Comment) = 0 Then
-                        Comment = uciRec(i)
+                Else 'found comment
+                    If lComment.Length = 0 Then
+                        lComment = uciRec(lRecordIndex)
                     Else
-                        Comment = uciRec(i) & vbCrLf & Comment
-                    End If
-                ElseIf Len(Trim(uciRec(i))) = 0 Then
-                    'found blank line
-                    'dont tack it on if the preceeding line is real
-                    If Len(Trim(uciRec(i - 1))) > 0 And InStr(1, uciRec(i - 1), "***") = 0 Then
-                        'something on the preceeding line and its not a comment
-                        Exit For
-                    End If
-                    If Len(Comment) = 0 Then
-                        Comment = " "
-                    Else
-                        Comment = " " & vbCrLf & Comment
+                        lComment = uciRec(lRecordIndex) & vbCrLf & lComment
                     End If
                 End If
-            Next i
+            Next lRecordIndex
         End If
-    End Sub
+        Return lComment.TrimEnd
+    End Function
 
     Public Sub DefaultBlockOrder(ByRef aOrder As ArrayList)
         Dim lOrder As New ArrayList(20)

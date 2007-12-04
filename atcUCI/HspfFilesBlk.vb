@@ -44,13 +44,13 @@ Public Class HspfFilesBlk
 
     Public ReadOnly Property Count() As Integer
         Get
-            Return pFiles.Count()
+            Return pFiles.Count
         End Get
     End Property
 
     Public Property Value(ByVal aIndex As Integer) As HspfData.HspfFile
         Get
-            If aIndex > 0 And aIndex <= pFiles.Count() Then
+            If aIndex > 0 And aIndex <= pFiles.Count Then
                 Value = pFiles.Item(aIndex)
             Else
                 Value = New HspfData.HspfFile
@@ -60,10 +60,10 @@ Public Class HspfFilesBlk
             End If
         End Get
         Set(ByVal aValue As HspfData.HspfFile) '?
-            If aIndex > 0 And aIndex <= pFiles.Count() Then
+            If aIndex > 0 And aIndex <= pFiles.Count Then
                 pFiles.RemoveAt(aIndex)
                 pFiles.Insert(aIndex, aValue)
-            ElseIf aIndex = pFiles.Count() + 1 Then
+            ElseIf aIndex = pFiles.Count + 1 Then
                 pFiles.Add(aValue)
             Else 'error?
             End If
@@ -108,14 +108,14 @@ Public Class HspfFilesBlk
     End Sub
 
     Public Sub Remove(ByRef aIndex As Integer)
-        If aIndex > 0 And aIndex <= pFiles.Count() Then
+        If aIndex > 0 And aIndex <= pFiles.Count Then
             pFiles.RemoveAt(aIndex)
         End If
     End Sub
 
     Public Sub SetTyp(ByRef aIndex As Integer, ByRef aType As String)
         Dim lFile As New HspfData.HspfFile
-        If aIndex > 0 And aIndex <= pFiles.Count() Then
+        If aIndex > 0 And aIndex <= pFiles.Count Then
             Dim lExistingFile As HspfData.HspfFile = pFiles.Item(aIndex)
             lFile.Typ = aType
             lFile.Comment = lExistingFile.Comment
@@ -151,7 +151,7 @@ Public Class HspfFilesBlk
 
         Try
             If pUci.FastFlag Then
-                GetCommentBeforeBlock("FILES", pComment)
+                pComment = GetCommentBeforeBlock("FILES")
             End If
 
             lRetcod = 0
@@ -202,21 +202,20 @@ Public Class HspfFilesBlk
 
     Public Overrides Function ToString() As String
         Dim lSb As New StringBuilder
-        Dim lFile As HspfData.HspfFile
 
         If pComment.Length > 0 Then
             lSb.AppendLine(pComment)
         End If
         lSb.AppendLine("FILES")
         If pFiles.Count > 0 Then
-            lFile = pFiles.Item(0)
+            Dim lFile As HspfData.HspfFile = pFiles.Item(0)
             If Not (lFile.Comment Is Nothing) AndAlso lFile.Comment.Length = 0 Then
                 'need to add default header
                 lSb.AppendLine("<FILE>  <UN#>***<----FILE NAME------------------------------------------------->")
             End If
         End If
 
-        For Each lFile In pFiles
+        For Each lFile As HspfData.HspfFile In pFiles
             Dim lName As String = lFile.Name
             If InStr(1, lName, ":") Then
                 'this is the absolute path name, make relative
@@ -225,7 +224,7 @@ Public Class HspfFilesBlk
                 lName = RelativeFilename(lName, lpath)
                 lFile.Name = lName
             End If
-            If lFile.Comment.Length > 0 Then
+            If Not lFile.Comment Is Nothing AndAlso lFile.Comment.Length > 0 Then
                 lSb.AppendLine(lFile.Comment)
             End If
             lSb.AppendLine(lFile.Typ.PadRight(10) & myFormatI(lFile.Unit, 3) & Space(3) & lName)
