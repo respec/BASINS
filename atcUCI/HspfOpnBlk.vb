@@ -71,9 +71,11 @@ Public Class HspfOpnBlk
         End Get
     End Property
 
-    Public Function OperFromID(ByRef Id As Integer) As HspfOperation
+    Public Function OperFromID(ByRef aId As Integer) As HspfOperation
         For Each lOperation As HspfOperation In Me.Ids
-            If lOperation.Id = Id Then Return lOperation
+            If lOperation.Id = aId Then
+                Return lOperation
+            End If
         Next
         Return Nothing
     End Function
@@ -244,7 +246,7 @@ Public Class HspfOpnBlk
                                     End Try
                                 End If
                                 If ltable.Name = "GEN-INFO" Then
-                                    lId.Description = ltable.Parms(1).Value
+                                    lId.Description = ltable.Parms(0).Value
                                 End If
                                 If ltable.Name = "HYDR-PARM2" Then
                                     lId.FTable = New HspfFtable
@@ -346,56 +348,45 @@ Public Class HspfOpnBlk
         Loop
     End Sub
 
-    Public Sub createTables(ByRef blk As HspfBlockDef)
-        Dim ltable As HspfTable
-        Dim s, kwd As String
-        Dim lId As HspfOperation
-        Dim vId As Object
-        Dim lOpTyp As Integer
-        Dim vTabList() As String
-        Dim vTab As String
+    Public Sub CreateTables(ByRef aBlockDef As HspfBlockDef)
+        Dim lTableNames() As String
         Static PERLNDtabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "PWAT-PARM1", "PWAT-PARM2", "PWAT-PARM3", "PWAT-PARM4", "MON-INTERCEP", "MON-LZETPARM", "PWAT-STATE1"}
         Static IMPLNDtabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "IWAT-PARM1", "IWAT-PARM2", "IWAT-PARM3", "IWAT-STATE1"}
         Static RCHREStabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "HYDR-PARM1", "HYDR-PARM2", "HYDR-INIT"}
 
-        lOpTyp = HspfOperNum(pName)
         'could do something here with table status info?
-        Select Case blk.Name
-            Case "PERLND" : vTabList = PERLNDtabList
-            Case "IMPLND" : vTabList = IMPLNDtabList
-            Case "RCHRES" : vTabList = RCHREStabList
-            Case Else : ReDim vTabList(-1)
+        Select Case aBlockDef.Name
+            Case "PERLND" : lTableNames = PERLNDtabList
+            Case "IMPLND" : lTableNames = IMPLNDtabList
+            Case "RCHRES" : lTableNames = RCHREStabList
+            Case Else : ReDim lTableNames(-1)
         End Select
 
-        For Each vTab In vTabList
-            kwd = vTab
-            For Each vId In pIds
-                lId = vId
-                ltable = New HspfTable
-                ltable.Opn = lId
-                ltable.Def = blk.TableDefs.Item(kwd)
-                s = ""
-                ltable.initTable((s))
-                ltable.OccurCount = 1
-                ltable.OccurNum = 1
-                ltable.Opn = lId
-                lId.Tables.Add(ltable)
-                If ltable.Name = "HYDR-PARM2" Then
-                    lId.FTable = New HspfFtable
-                    lId.FTable.Operation = lId
-                    ltable.Parms.Item(2).Value = lId.Id
-                    lId.FTable.Id = lId.Id
+        For Each lTableName As String In lTableNames
+            For Each lOperation As HspfOperation In pIds
+                Dim lTable As New HspfTable
+                lTable.Opn = lOperation
+                lTable.Def = aBlockDef.TableDefs.Item(lTableName)
+                lTable.initTable("")
+                lTable.OccurCount = 1
+                lTable.OccurNum = 1
+                lTable.Opn = lOperation
+                lOperation.Tables.Add(lTable)
+                If lTable.Name = "HYDR-PARM2" Then
+                    lOperation.FTable = New HspfFtable
+                    lOperation.FTable.Operation = lOperation
+                    lTable.Parms("FTBUCI").Value = lOperation.Id
+                    lOperation.FTable.Id = lOperation.Id
                 End If
-                If Not Me.TableExists((ltable.Name)) Then
-                    Me.Tables.Add(ltable, ltable.Name) 'pbd - needs to be added?
+                If Not Me.TableExists(lTable.Name) Then
+                    Me.Tables.Add(lTable, lTable.Name) 'pbd - needs to be added?
                 End If
-            Next vId
-        Next vTab
+            Next lOperation
+        Next lTableName
     End Sub
 
-    Public Sub AddTable(ByRef opid As Integer, ByRef tabname As String, ByRef blk As HspfBlockDef)
+    Public Sub AddTable(ByRef aOpId As Integer, ByRef aTableName As String, ByRef aBlockDef As HspfBlockDef)
         'add a table to the uci object for this operation id
-        Dim ltable As HspfTable
         Dim s, t As String
         Dim O, i As Integer
         Dim lId As HspfOperation
@@ -403,22 +394,22 @@ Public Class HspfOpnBlk
 
         For Each vId In pIds
             lId = vId
-            If lId.Id = opid Then
-                ltable = New HspfTable
-                ltable.Opn = lId
-                i = InStr(tabname, ":")
+            If lId.Id = aOpId Then
+                Dim lTable As HspfTable = New HspfTable
+                lTable.Opn = lId
+                i = InStr(aTableName, ":")
                 If i > 0 Then
-                    t = Left(tabname, i - 1)
-                    O = CShort(Right(tabname, Len(tabname) - i))
+                    t = Left(aTableName, i - 1)
+                    O = CShort(Right(aTableName, Len(aTableName) - i))
                 Else
-                    t = tabname
+                    t = aTableName
                     O = 1
                 End If
-                ltable.Def = blk.TableDefs.Item(t)
+                lTable.Def = aBlockDef.TableDefs.Item(t)
                 s = ""
-                ltable.initTable((s))
-                ltable.OccurCount = O
-                ltable.OccurNum = O
+                lTable.initTable((s))
+                lTable.OccurCount = O
+                lTable.OccurNum = O
                 If O > 1 Then
                     'set occurcounts for previous occurrances
                     If Me.TableExists(t) Then
@@ -430,12 +421,12 @@ Public Class HspfOpnBlk
                         End If
                     Next i
                 End If
-                ltable.Opn = lId
-                If Not lId.TableExists(tabname) Then
-                    lId.Tables.Add(ltable)
+                lTable.Opn = lId
+                If Not lId.TableExists(aTableName) Then
+                    lId.Tables.Add(lTable)
                 End If
-                If Not Me.TableExists(tabname) Then
-                    Me.Tables.Add(ltable)
+                If Not Me.TableExists(aTableName) Then
+                    Me.Tables.Add(lTable)
                 End If
                 Exit For
             End If
