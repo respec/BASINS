@@ -93,6 +93,7 @@ Module modCreateUci
 
             'dummy global block
             With aUci.GlobalBlock  'add global block to empty uci
+                .Comment = " "
                 .Uci = aUci
                 .RunInf.Value = "UCI Created by WinHSPF for " & lScenario
                 .emfg = 1
@@ -165,7 +166,7 @@ Module modCreateUci
                 Next
                 For Each lOpnBlk In aUci.OpnBlks  'perlnd, implnd, etc
                     If lOpnBlk.Count > 0 Then
-                        Call lOpnBlk.createTables(aMsg.BlockDefs.Item(lOpnBlk.Name))
+                        lOpnBlk.CreateTables(aMsg.BlockDefs.Item(lOpnBlk.Name))
                     End If
                 Next
 
@@ -723,11 +724,13 @@ ErrHandler:
         aUci.FilesBlock.Clear()
         aUci.FilesBlock.Uci = aUci
 
+        lFile.Comment = "<FILE>  <UN#>***<----FILE NAME------------------------------------------------->"
         lFile.Name = aScenario & ".ech"
         lFile.Typ = "MESSU"
         lFile.Unit = 24
         aUci.FilesBlock.Add(lFile)
 
+        lFile.Comment = ""
         lFile.Name = aScenario & ".out"
         lFile.Typ = " "
         lFile.Unit = 91

@@ -252,7 +252,7 @@ Public Class HspfGlobalBlk
         Dim lSB As New StringBuilder
 
         If pComment.Length > 0 Then
-            lSB.AppendLine(pComment)
+            lSB.AppendLine(pComment.TrimEnd)
         End If
         lSB.AppendLine("GLOBAL")
         lSB.AppendLine("  " & pRunInf.Value.Trim)
