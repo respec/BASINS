@@ -384,9 +384,11 @@ Public Class HspfUci
         'init others as appropriate
 
         pMsg = Nothing
+        pOpnSeqBlk = New HspfOpnSeqBlk
         pConnections = New Collection(Of HspfConnection)
         pGlobalBlk = New HspfGlobalBlk
         pOpnBlks = New HspfOpnBlks
+        pFilesBlk = New HspfFilesBlk
         pMetSegs = New Collection(Of HspfMetSeg)
         pPointSources = New Collection(Of HspfPoint)
         pMassLinks = New Collection(Of HspfMassLink)

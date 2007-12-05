@@ -184,7 +184,7 @@ Public Module Utility
         End If
         Dim lLandUses As New atcCollection
         Dim lOperations As atcCollection
-        For lOperationIndex As Integer = 1 To aUci.OpnSeqBlock.Opns.Count
+        For lOperationIndex As Integer = 0 To aUci.OpnSeqBlock.Opns.Count - 1
             Dim lOperation As atcUCI.HspfOperation = aUci.OpnSeqBlock.Opns(lOperationIndex)
             Dim lLocationKey As String = lOperation.Name.Substring(0, 1) & ":" & lOperation.Id
             If lLocations.Count = 0 OrElse lLocations.IndexFromKey(lLocationKey) >= 0 Then
