@@ -3,6 +3,7 @@ Option Strict Off
 Option Explicit On
 
 Imports System.Text
+Imports MapWinUtility
 
 Public Class HspfFtable
     Private pId As Integer
@@ -303,9 +304,8 @@ Public Class HspfFtable
         Dim lSB As New StringBuilder
         Dim i, j As Integer
         Dim t, s As String
-        Dim fmt As String
+        Dim lFmt As String = "#0.##;;0\."
 
-        fmt = "0.##"
         lSB.AppendLine("FTABLES")
         For Each lOpn As HspfOperation In pOperation.OpnBlk.Ids
             lSB.AppendLine(" ")
@@ -318,38 +318,34 @@ Public Class HspfFtable
                 Else
                     s = "     depth      area    volume"
                     For j = 1 To .Ncols - 3
-                        s = s & "  outflow" & j
+                        s &= "  outflow" & j
                     Next j
                     lSB.AppendLine(s & " ***")
                 End If
                 For i = 1 To .Nrows
-                    s = Space(10)
                     If NumericallyTheSame(.DepthAsRead(i), .Depth(i)) Then
                         s = .DepthAsRead(i)
                     Else
-                        s = Format(.Depth(i), fmt).PadLeft(Len(s))
+                        s = Format(.Depth(i), lFmt).PadLeft(10)
                     End If
-                    t = Space(10)
                     If NumericallyTheSame(.AreaAsRead(i), .Area(i)) Then
                         t = .AreaAsRead(i)
                     Else
-                        t = Format(.Area(i), fmt).PadLeft(Len(t))
+                        t = Format(.Area(i), lFmt).PadLeft(10)
                     End If
-                    s = s & t
-                    t = Space(10)
+                    s &= t
                     If NumericallyTheSame(.VolumeAsRead(i), .Volume(i)) Then
                         t = .VolumeAsRead(i)
                     Else
-                        t = Format(.Volume(i), fmt).PadLeft(Len(t))
+                        t = Format(.Volume(i), lFmt).PadLeft(10)
                     End If
-                    s = s & t
+                    s &= t
                     For j = 1 To .Ncols - 3
-                        t = Space(10)
                         If j = 1 Then
                             If NumericallyTheSame(.Outflow1AsRead(i), .Outflow1(i)) Then
                                 t = .Outflow1AsRead(i)
                             Else
-                                t = Format(.Outflow1(i), fmt).PadLeft(Len(t))
+                                t = Format(.Outflow1(i), lFmt).PadLeft(10)
                                 If t.Length > 10 Then
                                     'too many digits in the number
                                     t = RSet(atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(i)), 10), 10)
@@ -360,31 +356,31 @@ Public Class HspfFtable
                             If NumericallyTheSame(.Outflow2AsRead(i), .Outflow2(i)) Then
                                 t = .Outflow2AsRead(i)
                             Else
-                                t = Format(.Outflow2(i), fmt).PadLeft(Len(t))
+                                t = Format(.Outflow2(i), lFmt).PadLeft(10)
                             End If
                         End If
                         If j = 3 Then
                             If NumericallyTheSame(.Outflow3AsRead(i), .Outflow3(i)) Then
                                 t = .Outflow3AsRead(i)
                             Else
-                                t = Format(.Outflow3(i), fmt).PadLeft(Len(t))
+                                t = Format(.Outflow3(i), lFmt).PadLeft(10)
                             End If
                         End If
                         If j = 4 Then
                             If NumericallyTheSame(.Outflow4AsRead(i), .Outflow4(i)) Then
                                 t = .Outflow4AsRead(i)
                             Else
-                                t = Format(.Outflow4(i), fmt).PadLeft(Len(t))
+                                t = Format(.Outflow4(i), lFmt).PadLeft(10)
                             End If
                         End If
                         If j = 5 Then
                             If NumericallyTheSame(.Outflow5AsRead(i), .Outflow5(i)) Then
                                 t = .Outflow5AsRead(i)
                             Else
-                                t = Format(.Outflow5(i), fmt).PadLeft(Len(t))
+                                t = Format(.Outflow5(i), lFmt).PadLeft(10)
                             End If
                         End If
-                        s = s & t
+                        s &= t
                     Next j
                     lSB.AppendLine(s)
                 Next i
@@ -562,7 +558,6 @@ Public Class HspfFtable
             Depth(8) = dYt2
             Nrows = 8
             For i = 1 To Nrows
-
                 'get nearest base
                 If (Depth(i) > dYt1) Then
                     NearestBase = dWt1
@@ -652,7 +647,7 @@ Public Class HspfFtable
         Exit Sub
 errorhandler:
         'TODO: remove MsgBox
-        MsgBox("An error occurred while building this FTable.", , "FTable Problem")
+        logger.Msg("An error occurred while building FTable" & Me.Id, "FTable Create From XSect Problem")
         On Error Resume Next
     End Sub
 

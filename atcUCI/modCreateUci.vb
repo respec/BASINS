@@ -33,10 +33,8 @@ Friend Class Reach
 End Class
 
 Module modCreateUci
-    'land use file
-    Dim pLandUses As New Collection(Of LandUse)
-    'reach file
-    Dim pReaches As New Collection(Of Reach)
+    Dim pLandUses As Collection(Of LandUse)
+    Dim pReaches As Collection(Of Reach)
     'channel file
     Dim chanid() As String
     Dim ChanL() As Single
@@ -57,14 +55,9 @@ Module modCreateUci
     Dim ChanW12() As Single
     Dim ChanRecCnt As Integer
 
-    Dim mFilesBlock As HspfFilesBlk
-    Dim mOpnSeqBlock As HspfOpnSeqBlk
-    Dim mConnections As Collection 'of hspfconnection
-    Dim mMassLinks As Collection 'of hspfmasslink
-
-    Dim lastseg(2) As Integer
-    Dim landname(2) As String
-    Dim firstseg(2) As Integer
+    Dim pLandName(2) As String
+    Dim pLastSeg(2) As Integer
+    Dim pFirstSeg(2) As Integer
 
     Dim FacilityCount As Integer
     Dim FacilityName() As String
@@ -96,6 +89,8 @@ Module modCreateUci
         aUci.Msg = aMsg
 
         If aUci.Name.Length > 0 Then
+            pLandUses = New Collection(Of LandUse)
+            pReaches = New Collection(Of Reach)
             Dim lScenario As String = FilenameOnly(aUci.Name)
             Dim lReturnCode As Integer
             Call ReadWSDFile(aName, lReturnCode)
@@ -133,19 +128,10 @@ Module modCreateUci
                 End With
 
                 'add files block to uci
-                mFilesBlock = New HspfFilesBlk
-                CreateFilesBlock(lScenario, aOutputWdm, aMetWdms, aWdmIds)
-                mFilesBlock.Uci = aUci
-                aUci.FilesBlock = mFilesBlock
+                CreateFilesBlock(aUci, lScenario, aOutputWdm, aMetWdms, aWdmIds)
 
                 'add opn seq block
-                mOpnSeqBlock = New HspfOpnSeqBlk
-                mOpnSeqBlock.Uci = aUci
-                mOpnSeqBlock.Delt = 60
-                'add recs for each operation
                 CreateOpnSeqBlock(aUci, aOneSeg)
-                mOpnSeqBlock.Uci = aUci
-                aUci.OpnSeqBlock = mOpnSeqBlock
 
                 'set all operation types
                 Dim lOpnIndex As Integer = 1
@@ -161,7 +147,7 @@ Module modCreateUci
                 End While
 
                 'create tables for each operation
-                For Each lOpn As HspfOperation In mOpnSeqBlock.Opns
+                For Each lOpn As HspfOperation In aUci.OpnSeqBlock.Opns
                     lOpnBlk = aUci.OpnBlks.Item(lOpn.Name)
                     lOpnBlk.Ids.Add(lOpn)
                     lOpn.OpnBlk = lOpnBlk
@@ -184,7 +170,7 @@ Module modCreateUci
                 CreateConnectionsMet(aUci)
 
                 'set timeser connections
-                For Each lOpn As HspfOperation In mOpnSeqBlock.Opns
+                For Each lOpn As HspfOperation In aUci.OpnSeqBlock.Opns
                     lOpn.setTimSerConnections()
                 Next
                 'create masslinks
@@ -710,40 +696,46 @@ ErrHandler:
         End If
     End Sub
 
-    Private Sub CreateFilesBlock(ByRef s As String, ByRef outputwdm As String, ByRef metwdms() As String, ByRef wdmids() As String)
-        Dim icnt, i As Integer
-        Dim newFile As New HspfData.HspfFile
+    Private Sub CreateFilesBlock(ByRef aUci As HspfUci, _
+                                 ByRef aScenario As String, _
+                                 ByRef aWdmOutputName As String, _
+                                 ByRef aWdmMetNames() As String, _
+                                 ByRef aWdmIds() As String)
+        Dim lFile As New HspfData.HspfFile
+        aUci.FilesBlock.Clear()
+        aUci.FilesBlock.Uci = aUci
 
-        mFilesBlock.Clear()
-        newFile.Name = s & ".ech"
-        newFile.Typ = "MESSU"
-        newFile.Unit = 24
-        mFilesBlock.Add(newFile)
-        newFile.Name = s & ".out"
-        newFile.Typ = " "
-        newFile.Unit = 91
-        mFilesBlock.Add(newFile)
-        icnt = 0
-        If Len(outputwdm) > 0 Then
-            newFile.Name = outputwdm
-            icnt = icnt + 1
-            newFile.Typ = wdmids(0)
-            newFile.Unit = 25
-            mFilesBlock.Add(newFile)
+        lFile.Name = aScenario & ".ech"
+        lFile.Typ = "MESSU"
+        lFile.Unit = 24
+        aUci.FilesBlock.Add(lFile)
+
+        lFile.Name = aScenario & ".out"
+        lFile.Typ = " "
+        lFile.Unit = 91
+        aUci.FilesBlock.Add(lFile)
+
+        If aWdmOutputName.Length > 0 Then
+            lFile.Name = aWdmOutputName
+            lFile.Typ = aWdmIds(0)
+            lFile.Unit = 25
+            aUci.FilesBlock.Add(lFile)
         End If
-        For i = 1 To 3
-            If Len(metwdms(i)) > 0 Then
-                newFile.Name = metwdms(i)
-                icnt = icnt + 1
-                newFile.Typ = wdmids(i)
-                newFile.Unit = 25 + i
-                mFilesBlock.Add(newFile)
+
+        For lWdmIndex As Integer = 1 To 3
+            If Not aWdmMetNames(lWdmIndex) Is Nothing AndAlso aWdmMetNames(lWdmIndex).Length > 0 Then
+                lFile.Name = aWdmMetNames(lWdmIndex)
+                lFile.Typ = aWdmIds(lWdmIndex)
+                lFile.Unit = 25 + lWdmIndex
+                aUci.FilesBlock.Add(lFile)
             End If
-        Next i
+        Next lWdmIndex
     End Sub
 
     Private Sub CreateOpnSeqBlock(ByRef aUci As HspfUci, ByRef aOneSeg As Boolean)
         Try
+            aUci.OpnSeqBlock.Delt = 60
+            aUci.OpnSeqBlock.Uci = aUci
             If pReaches.Count > 1 Then  'reaches have to be in order, fix if needed
                 Dim lOutOfOrder As Boolean = True
                 Do Until Not lOutOfOrder
@@ -769,8 +761,8 @@ ErrHandler:
             End If
 
             'add rec to opn seq block for each land use
-            landname(2) = "PERLND"
-            landname(1) = "IMPLND"
+            pLandName(2) = "PERLND"
+            pLandName(1) = "IMPLND"
             If aOneSeg Then 'only one segment for all land uses
                 Call CreateOpnsForOneSeg(aUci)
             Else 'user wants multiple segments
@@ -790,14 +782,14 @@ ErrHandler:
                 End If
                 'newOpn.Id = i
                 lOpn.Id = CInt(pReaches(pReaches(i).Order).Id)
-                mOpnSeqBlock.Add(lOpn)
+                aUci.OpnSeqBlock.Add(lOpn)
             Next i
         Catch e As ApplicationException
             Logger.Msg(e.Message)
         End Try
     End Sub
 
-    Private Sub CreateOpnsForOneSeg(ByRef newUci As HspfUci)
+    Private Sub CreateOpnsForOneSeg(ByRef aUci As HspfUci)
         Dim UniqueNameCount As Integer
         Dim addflag As Boolean
         Dim newOpn As HspfOperation
@@ -811,19 +803,19 @@ ErrHandler:
                     If UniqueNameCount = 0 Then
                         'add it
                         newOpn = New HspfOperation
-                        newOpn.Uci = newUci
-                        newOpn.Name = landname(j)
+                        newOpn.Uci = aUci
+                        newOpn.Name = pLandName(j)
                         toperid = 101
-                        firstseg(j) = toperid
+                        pFirstSeg(j) = toperid
                         newOpn.Id = toperid
-                        lastseg(j) = toperid
+                        pLastSeg(j) = toperid
                         newOpn.Description = pLandUses(i).Name
-                        mOpnSeqBlock.Add(newOpn)
+                        aUci.OpnSeqBlock.Add(newOpn)
                         UniqueNameCount = UniqueNameCount + 1
                     Else
                         addflag = True
-                        For Each lOpn In mOpnSeqBlock.Opns
-                            If lOpn.Description = pLandUses(i).Name And lOpn.Name = landname(j) Then
+                        For Each lOpn In aUci.OpnSeqBlock.Opns
+                            If lOpn.Description = pLandUses(i).Name And lOpn.Name = pLandName(j) Then
                                 addflag = False
                                 toperid = lOpn.Id
                             End If
@@ -831,29 +823,27 @@ ErrHandler:
                         If addflag Then
                             UniqueNameCount = UniqueNameCount + 1
                             newOpn = New HspfOperation
-                            newOpn.Uci = newUci
-                            newOpn.Name = landname(j)
+                            newOpn.Uci = aUci
+                            newOpn.Name = pLandName(j)
                             newOpn.Description = pLandUses(i).Name
                             toperid = 100 + UniqueNameCount
                             newOpn.Id = toperid
-                            lastseg(j) = toperid
-                            mOpnSeqBlock.Add(newOpn)
+                            pLastSeg(j) = toperid
+                            aUci.OpnSeqBlock.Add(newOpn)
                         End If
                     End If
                     'remember what we named this land use
-                    pLandUses(i).Oper = landname(j)
+                    pLandUses(i).Oper = pLandName(j)
                     pLandUses(i).Id = toperid
                 End If
             Next i
         Next j
     End Sub
 
-    Private Sub CreateOpnsForMultSegs(ByRef newUci As HspfUci)
-        Dim toperid, ibase, j, i, ioper, k As Integer
+    Private Sub CreateOpnsForMultSegs(ByRef aUci As HspfUci)
+        Dim j, i, k As Integer
         Dim lImplndNames As New atcCollection
         Dim lPerlndNames As New atcCollection
-        Dim ndigits As Integer
-        Dim newOpn As HspfOperation
 
         'prescan to see how many perlnds and implnds per segment
         For i = 0 To pLandUses.Count - 1
@@ -870,32 +860,33 @@ ErrHandler:
             End If
         Next i
 
-        ndigits = 0
+        Dim lDigits As Integer = 0
         For i = 0 To pReaches.Count - 1
-            If pReaches(i).Id.Length > ndigits Then
-                ndigits = pReaches(i).Id.Length
+            If pReaches(i).Id.Length > lDigits Then
+                lDigits = pReaches(i).Id.Length
             End If
         Next i
 
-        If ndigits = 1 Or ndigits = 0 Then
+        Dim lBase As Integer
+        If lDigits = 1 Or lDigits = 0 Then
             'use 101, 102, 201, 202 scheme
-            ibase = 100
-        ElseIf ndigits = 2 And lPerlndNames.Count < 10 And lImplndNames.Count < 10 Then
+            lBase = 100
+        ElseIf lDigits = 2 And lPerlndNames.Count < 10 And lImplndNames.Count < 10 Then
             'use 11, 12, 21, 22 scheme
-            ibase = 10
+            lBase = 10
         Else
             'too many to use the multiple seg scheme
             Logger.Msg("There are too many segments to use this segmentation scheme." & vbCrLf & "Create will use the 'Grouped' scheme instead", MsgBoxStyle.OkOnly, "Create Problem")
-            Call CreateOpnsForOneSeg(newUci)
-            ibase = 0
+            Call CreateOpnsForOneSeg(aUci)
+            lBase = 0
         End If
 
-        If ibase > 0 Then
+        If lBase > 0 Then
             'create these perlnd operations
-            firstseg(1) = 99999
-            lastseg(1) = 0
-            firstseg(2) = 99999
-            lastseg(2) = 0
+            pFirstSeg(1) = 99999
+            pLastSeg(1) = 0
+            pFirstSeg(2) = 99999
+            pLastSeg(2) = 0
             For k = 0 To pReaches.Count - 1
                 'loop through each reach
                 For i = 0 To pLandUses.Count - 1
@@ -904,25 +895,29 @@ ErrHandler:
                         'it does
                         If pLandUses(i).Type = 2 Then
                             'add this perlnd oper
-                            newOpn = New HspfOperation
-                            newOpn.Uci = newUci
-                            newOpn.Name = "PERLND"
-                            ioper = 0
+                            Dim lOpn As New HspfOperation
+                            lOpn.Uci = aUci
+                            lOpn.Name = "PERLND"
+                            Dim lLandUseId As Integer = 0
                             For j = 0 To lPerlndNames.Count - 1
                                 If lPerlndNames(j - 1) = pLandUses(i).Name Then
                                     'this is the land use we want
-                                    ioper = j
+                                    lLandUseId = j
                                 End If
                             Next j
-                            toperid = (CDbl(pLandUses(i).Reach) * ibase) + ioper
-                            If toperid < firstseg(2) Then firstseg(2) = toperid
-                            If toperid > lastseg(2) Then lastseg(2) = toperid
-                            newOpn.Id = toperid
-                            newOpn.Description = pLandUses(i).Name
-                            mOpnSeqBlock.Add(newOpn)
+                            Dim lOperId As Integer = (CDbl(pLandUses(i).Reach) * lBase) + lLandUseId
+                            If lOperId < pFirstSeg(2) Then
+                                pFirstSeg(2) = lOperId
+                            End If
+                            If lOperId > pLastSeg(2) Then
+                                pLastSeg(2) = lOperId
+                            End If
+                            lOpn.Id = lOperId
+                            lOpn.Description = pLandUses(i).Name
+                            aUci.OpnSeqBlock.Add(lOpn)
                             'remember what we named this land use
                             pLandUses(i).Oper = "PERLND"
-                            pLandUses(i).Id = toperid
+                            pLandUses(i).Id = lOperId
                         End If
                     End If
                 Next i
@@ -932,25 +927,29 @@ ErrHandler:
                     If pLandUses(i).Reach = pReaches(k).Id Then
                         If pLandUses(i).Type = 1 Then
                             'add this implnd oper
-                            newOpn = New HspfOperation
-                            newOpn.Uci = newUci
-                            newOpn.Name = "IMPLND"
-                            ioper = 0
+                            Dim lOpn As New HspfOperation
+                            lOpn.Uci = aUci
+                            lOpn.Name = "IMPLND"
+                            Dim lLandUseId As Integer = 0
                             For j = 0 To lImplndNames.Count - 1
                                 If lImplndNames(j - 1) = pLandUses(i).Name Then
                                     'this is the land use we want
-                                    ioper = j
+                                    lLandUseId = j
                                 End If
                             Next j
-                            toperid = (CDbl(pLandUses(i).Reach) * ibase) + ioper
-                            If toperid < firstseg(1) Then firstseg(1) = toperid
-                            If toperid > lastseg(1) Then lastseg(1) = toperid
-                            newOpn.Id = toperid
-                            newOpn.Description = pLandUses(i).Name
-                            mOpnSeqBlock.Add(newOpn)
+                            Dim lOperId As Integer = (CDbl(pLandUses(i).Reach) * lBase) + lLandUseId
+                            If lOperId < pFirstSeg(1) Then
+                                pFirstSeg(1) = lOperId
+                            End If
+                            If lOperId > pLastSeg(1) Then
+                                pLastSeg(1) = lOperId
+                            End If
+                            lOpn.Id = lOperId
+                            lOpn.Description = pLandUses(i).Name
+                            aUci.OpnSeqBlock.Add(lOpn)
                             'remember what we named this land use
                             pLandUses(i).Oper = "IMPLND"
-                            pLandUses(i).Id = toperid
+                            pLandUses(i).Id = lOperId
                         End If
                     End If
                 Next i
@@ -1060,28 +1059,28 @@ ErrHandler:
         Return lLengthSurface
     End Function
 
-    Private Sub CreateBinaryOutput(ByRef myUci As HspfUci, ByRef s As String)
+    Private Sub CreateBinaryOutput(ByRef aUci As HspfUci, ByRef aScenario As String)
         'add file name to files block
         Dim newFile As New HspfData.HspfFile
-        newFile.Name = s & ".hbn"
+        newFile.Name = aScenario & ".hbn"
         newFile.Typ = "BINO"
         newFile.Unit = 92
-        mFilesBlock.Add(newFile)
+        aUci.FilesBlock.Add(newFile)
 
         'update bin output units
         Dim lOperation As HspfOperation
-        For Each lOperation In myUci.OpnBlks.Item("PERLND").Ids
+        For Each lOperation In aUci.OpnBlks.Item("PERLND").Ids
             lOperation.Tables.Item("GEN-INFO").ParmValue("BUNIT1") = 92
         Next lOperation
-        For Each lOperation In myUci.OpnBlks.Item("IMPLND").Ids
+        For Each lOperation In aUci.OpnBlks.Item("IMPLND").Ids
             lOperation.Tables.Item("GEN-INFO").ParmValue("BUNIT1") = 92
         Next lOperation
-        For Each lOperation In myUci.OpnBlks.Item("RCHRES").Ids
+        For Each lOperation In aUci.OpnBlks.Item("RCHRES").Ids
             lOperation.Tables.Item("GEN-INFO").ParmValue("BUNITE") = 92
         Next lOperation
         'add binary-info tables
-        myUci.OpnBlks.Item("PERLND").AddTableForAll("BINARY-INFO", "PERLND")
-        myUci.OpnBlks.Item("IMPLND").AddTableForAll("BINARY-INFO", "IMPLND")
-        myUci.OpnBlks.Item("RCHRES").AddTableForAll("BINARY-INFO", "RCHRES")
+        aUci.OpnBlks.Item("PERLND").AddTableForAll("BINARY-INFO", "PERLND")
+        aUci.OpnBlks.Item("IMPLND").AddTableForAll("BINARY-INFO", "IMPLND")
+        aUci.OpnBlks.Item("RCHRES").AddTableForAll("BINARY-INFO", "RCHRES")
     End Sub
 End Module
