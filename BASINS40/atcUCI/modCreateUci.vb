@@ -78,6 +78,7 @@ Module modCreateUci
                                    ByRef aWdmIds() As String, _
                                    ByRef aMetDataDetails As String, _
                                    ByRef aOneSeg As Boolean, _
+                                   ByRef aStarterUciName As String, _
                                    Optional ByRef aMasterPollutantList As Collection = Nothing)
 
         If Not IO.File.Exists(aName) Then
@@ -100,6 +101,10 @@ Module modCreateUci
 
             'On Error Resume Next
             If lReturnCode = 0 Then  'everything read okay, continue
+
+                'build initial met segment 
+                DefaultBASINSMetseg(aUci, aMetDataDetails)
+
                 'get details from the met data details
                 Dim lDelim As String = ","
                 Dim lQuote As String = """"
@@ -186,6 +191,14 @@ Module modCreateUci
 
                 'look for met segments
                 'newUci.Source2MetSeg
+
+                'get starter uci ready
+                Dim lDefUci As New HspfUci
+                lDefUci.FastReadUciForStarter(aUci.Msg, aStarterUciName)
+
+                'set default parameter values and mass links from starter
+                setDefault(aUci, lDefUci)
+                setDefaultML(aUci, lDefUci)
             End If
         End If
 
@@ -1082,5 +1095,260 @@ ErrHandler:
         aUci.OpnBlks.Item("PERLND").AddTableForAll("BINARY-INFO", "PERLND")
         aUci.OpnBlks.Item("IMPLND").AddTableForAll("BINARY-INFO", "IMPLND")
         aUci.OpnBlks.Item("RCHRES").AddTableForAll("BINARY-INFO", "RCHRES")
+    End Sub
+
+    Private Sub setDefault(ByVal myUci As HspfUci, ByVal defUci As HspfUci)
+        Dim vOpTyp As Object, loptyp As HspfOpnBlk
+        Dim vOpn As Object, lOpn As HspfOperation, dOpn As HspfOperation
+        Dim vTab As Object, lTab As HspfTable, dTab As HspfTable
+        Dim vPar As Object
+        Dim Id&
+
+        Dim OpTyps() As Object = {"PERLND", "IMPLND", "RCHRES"}
+        For Each vOpTyp In OpTyps
+            If myUci.OpnBlks(vOpTyp).Count > 0 Then
+                loptyp = myUci.OpnBlks(vOpTyp)
+                'Debug.Print lOpTyp.Name
+                For Each vOpn In loptyp.Ids
+                    lOpn = vOpn
+                    'Debug.Print lOpn.Description
+                    Id = DefaultOpnId(lOpn, defUci)
+                    If Id > 0 Then
+                        dOpn = defUci.OpnBlks(lOpn.Name).operfromid(Id)
+                        If Not dOpn Is Nothing Then
+                            For Each vTab In lOpn.Tables
+                                lTab = vTab
+                                If DefaultThisTable(loptyp.Name, lTab.Name) Then
+                                    If dOpn.TableExists(lTab.Name) Then
+                                        dTab = dOpn.Tables(lTab.Name)
+                                        'Debug.Print lTab.Name
+                                        For Each vPar In lTab.Parms
+                                            If DefaultThisParameter(loptyp.Name, lTab.Name, vPar.Name) Then
+                                                If vPar.Value <> vPar.Name Then
+                                                    vPar.Value = dTab.Parms(vPar.Name).Value
+                                                End If
+                                            End If
+                                        Next vPar
+                                    End If
+                                End If
+                            Next vTab
+                        End If
+                    End If
+                Next vOpn
+            End If
+        Next vOpTyp
+    End Sub
+
+    Private Function DefaultOpnId(ByVal lOpn As HspfOperation, ByVal defUci As HspfUci) As Long
+        Dim dOpn As HspfOperation
+        If lOpn.DefOpnId <> 0 Then
+            DefaultOpnId = lOpn.DefOpnId
+        Else
+            dOpn = matchOperWithDefault(lOpn.Name, lOpn.Description, defUci)
+            If dOpn Is Nothing Then
+                DefaultOpnId = 0
+            Else
+                DefaultOpnId = dOpn.Id
+            End If
+        End If
+    End Function
+
+    Private Function DefaultThisTable(ByVal OperName$, ByVal TableName$) As Boolean
+        If OperName = "PERLND" Or OperName = "IMPLND" Then
+            If TableName = "ACTIVITY" Or _
+               TableName = "PRINT-INFO" Or _
+               TableName = "GEN-INFO" Or _
+               TableName = "PWAT-PARM5" Then
+                DefaultThisTable = False
+            ElseIf Left(TableName, 4) = "QUAL" Then
+                DefaultThisTable = False
+            Else
+                DefaultThisTable = True
+            End If
+        ElseIf OperName = "RCHRES" Then
+            If TableName = "ACTIVITY" Or _
+               TableName = "PRINT-INFO" Or _
+               TableName = "GEN-INFO" Or _
+               TableName = "HYDR-PARM1" Then
+                DefaultThisTable = False
+            ElseIf Left(TableName, 3) = "GQ-" Then
+                DefaultThisTable = False
+            Else
+                DefaultThisTable = True
+            End If
+        Else
+            DefaultThisTable = False
+        End If
+    End Function
+
+    Private Function DefaultThisParameter(ByVal OperName$, ByVal TableName$, ByVal parmname$) As Boolean
+        DefaultThisParameter = True
+        If OperName = "PERLND" Then
+            If TableName = "PWAT-PARM2" Then
+                If parmname = "SLSUR" Or parmname = "LSUR" Then
+                    DefaultThisParameter = False
+                End If
+            ElseIf TableName = "NQUALS" Then
+                If parmname = "NQUAL" Then
+                    DefaultThisParameter = False
+                End If
+            End If
+        ElseIf OperName = "IMPLND" Then
+            If TableName = "IWAT-PARM2" Then
+                If parmname = "SLSUR" Or parmname = "LSUR" Then
+                    DefaultThisParameter = False
+                End If
+            ElseIf TableName = "NQUALS" Then
+                If parmname = "NQUAL" Then
+                    DefaultThisParameter = False
+                End If
+            End If
+        ElseIf OperName = "RCHRES" Then
+            If TableName = "HYDR-PARM2" Then
+                If parmname = "LEN" Or _
+                   parmname = "DELTH" Or _
+                   parmname = "FTBUCI" Then
+                    DefaultThisParameter = False
+                End If
+            ElseIf TableName = "GQ-GENDATA" Then
+                If parmname = "NGQUAL" Then
+                    DefaultThisParameter = False
+                End If
+            End If
+        End If
+    End Function
+
+    Private Function matchOperWithDefault(ByVal OpTypName$, ByVal OpnDesc$, ByVal defUci As HspfUci) As HspfOperation
+        Dim vOpn As Object, lOpn As HspfOperation, ctemp$
+
+        For Each vOpn In defUci.OpnBlks(OpTypName).Ids
+            lOpn = vOpn
+            If lOpn.Description = OpnDesc Then
+                matchOperWithDefault = lOpn
+                Exit Function
+            End If
+        Next vOpn
+        'a complete match not found, look for partial
+        For Each vOpn In defUci.OpnBlks(OpTypName).Ids
+            lOpn = vOpn
+            If Len(lOpn.Description) > Len(OpnDesc) Then
+                ctemp = Left(lOpn.Description, Len(OpnDesc))
+                If ctemp = OpnDesc Then
+                    matchOperWithDefault = lOpn
+                    Exit Function
+                End If
+            ElseIf Len(lOpn.Description) < Len(OpnDesc) Then
+                ctemp = Left(OpnDesc, Len(lOpn.Description))
+                If lOpn.Description = ctemp Then
+                    matchOperWithDefault = lOpn
+                    Exit Function
+                End If
+            End If
+            If Len(OpnDesc) > 4 And Len(lOpn.Description) > 4 Then
+                ctemp = Left(OpnDesc, 4)
+                If Left(lOpn.Description, 4) = ctemp Then
+                    matchOperWithDefault = lOpn
+                    Exit Function
+                End If
+            End If
+        Next vOpn
+        'not found, use first one
+        If defUci.OpnBlks(OpTypName).Count > 0 Then
+            matchOperWithDefault = defUci.OpnBlks(OpTypName).Ids(1)
+        Else
+            matchOperWithDefault = Nothing
+        End If
+    End Function
+
+    Private Sub setDefaultML(ByVal myUci As HspfUci, ByVal defUci As HspfUci)
+        Dim vML As Object, dML As HspfMassLink
+        Dim lMassLink As HspfMassLink
+
+        For Each vML In defUci.MassLinks
+            dML = vML
+            If dML.Source.volname = "PERLND" And dML.Source.member = "PERO" Then
+            ElseIf dML.Source.volname = "IMPLND" And dML.Source.member = "SURO" Then
+            ElseIf dML.Source.volname = "RCHRES" And dML.Source.group = "ROFLOW" Then
+            Else
+                'add the other ones
+                lMassLink = New HspfMassLink
+                lMassLink = dML
+                myUci.MassLinks.Add(lMassLink)
+            End If
+        Next vML
+
+    End Sub
+
+    Private Sub DefaultBASINSMetseg(ByVal myUci As HspfUci, ByVal MetDetails As String)
+        Dim r&, i&
+        Dim SDate&(6), EDate&(6)
+        Dim delim$, quote$, basedsn&, metwdmid$, lMetDetails$
+        Dim lmetseg As HspfMetSeg
+
+        lMetDetails = MetDetails
+        If Len(lMetDetails) > 0 Then
+            'get details from the met data details
+            delim = ","
+            quote = """"
+            basedsn = StrSplit(lMetDetails, delim, quote)
+            For i = 0 To 5
+                SDate(i) = StrSplit(lMetDetails, delim, quote)
+            Next i
+            For i = 0 To 5
+                EDate(i) = StrSplit(lMetDetails, delim, quote)
+            Next i
+            metwdmid = lMetDetails
+
+            lmetseg = New HspfMetSeg
+            lmetseg.Uci = myUci
+            For r = 1 To 7
+                lmetseg.MetSegRec(r).Source.VolName = metwdmid
+                lmetseg.MetSegRec(r).Sgapstrg = ""
+                lmetseg.MetSegRec(r).Ssystem = "ENGL"
+                lmetseg.MetSegRec(r).Tran = "SAME"
+                lmetseg.MetSegRec(r).typ = r
+                Select Case r
+                    Case 1
+                        lmetseg.MetSegRec(r).Source.VolId = basedsn
+                        lmetseg.MetSegRec(r).Source.Member = "PREC"
+                        lmetseg.MetSegRec(r).MFactP = 1
+                        lmetseg.MetSegRec(r).MFactR = 1
+                        lmetseg.MetSegRec(r).Sgapstrg = "ZERO"
+                    Case 2
+                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 2
+                        lmetseg.MetSegRec(r).Source.Member = "ATEM"
+                        lmetseg.MetSegRec(r).MFactP = 1
+                        lmetseg.MetSegRec(r).MFactR = 1
+                    Case 3
+                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 6
+                        lmetseg.MetSegRec(r).Source.Member = "DEWP"
+                        lmetseg.MetSegRec(r).MFactP = 1
+                        lmetseg.MetSegRec(r).MFactR = 1
+                    Case 4
+                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 3
+                        lmetseg.MetSegRec(r).Source.Member = "WIND"
+                        lmetseg.MetSegRec(r).MFactP = 1
+                        lmetseg.MetSegRec(r).MFactR = 1
+                    Case 5
+                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 4
+                        lmetseg.MetSegRec(r).Source.Member = "SOLR"
+                        lmetseg.MetSegRec(r).MFactP = 1
+                        lmetseg.MetSegRec(r).MFactR = 1
+                    Case 6
+                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 7
+                        lmetseg.MetSegRec(r).Source.Member = "CLOU"
+                        lmetseg.MetSegRec(r).MFactP = 0
+                        lmetseg.MetSegRec(r).MFactR = 1
+                    Case 7
+                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 5
+                        lmetseg.MetSegRec(r).Source.Member = "PEVT"
+                        lmetseg.MetSegRec(r).MFactP = 1
+                        lmetseg.MetSegRec(r).MFactR = 1
+                End Select
+            Next r
+            lmetseg.ExpandMetSegName(metwdmid, basedsn)
+            lmetseg.Id = myUci.MetSegs.Count + 1
+            myUci.MetSegs.Add(lmetseg)
+        End If
     End Sub
 End Module
