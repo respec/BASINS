@@ -4,24 +4,24 @@ Option Explicit On
 Imports atcUtility
 
 Module modRemoteHasslibs
-
-    Public Sub REM_GLOBLK(ByRef myUci As HspfUci, ByRef sdatim() As Integer, ByRef edatim() As Integer, ByRef outlev As Integer, ByRef spout As Integer, ByRef runfg As Integer, ByRef emfg As Integer, ByRef rninfo As String)
-        Dim M As String
-        Dim i As Integer
-
-        myUci.SendHspfMessage("GLOBLK")
-        M = myUci.WaitForChildMessage
-        For i = 0 To 5
-            sdatim(i) = CInt(StrRetRem(M))
+    Public Sub REM_GLOBLK(ByRef aUci As HspfUci, _
+                          ByRef aSDatim() As Integer, ByRef aEDatim() As Integer, _
+                          ByRef aOutLev As Integer, ByRef aSpOut As Integer, _
+                          ByRef aRunFg As Integer, ByRef aEmFg As Integer, _
+                          ByRef aRunInf As String)
+        aUci.SendHspfMessage("GLOBLK")
+        Dim lMsg As String = aUci.WaitForChildMessage
+        For i As Integer = 0 To 5
+            aSDatim(i) = CInt(StrRetRem(lMsg))
         Next
-        For i = 0 To 5
-            edatim(i) = CInt(StrRetRem(M))
+        For i As Integer = 0 To 5
+            aEDatim(i) = CInt(StrRetRem(lMsg))
         Next
-        outlev = CInt(StrRetRem(M))
-        spout = CInt(StrRetRem(M))
-        runfg = CInt(StrRetRem(M))
-        emfg = CInt(StrRetRem(M))
-        rninfo = M
+        aOutLev = CInt(StrRetRem(lMsg))
+        aSpOut = CInt(StrRetRem(lMsg))
+        aRunFg = CInt(StrRetRem(lMsg))
+        aEmFg = CInt(StrRetRem(lMsg))
+        aRunInf = lMsg
     End Sub
 
     Public Sub REM_GLOPRMI(ByRef myUci As HspfUci, ByRef ival As Integer, ByRef parmname As String)

@@ -9,6 +9,7 @@ Public Class HspfFtable
     Private pId As Integer
     Private pNrows As Integer
     Private pNcols As Integer
+    'TODO: make this a class!
     Private pDepth() As Double
     Private pArea() As Double
     Private pVolume() As Double
@@ -26,7 +27,7 @@ Public Class HspfFtable
     Private pOutflow4AsRead() As String
     Private pOutflow5AsRead() As String
     Private pOperation As HspfOperation
-    Private pComment As String
+    Private pComment As String = ""
 
     Public Property Depth(ByVal aRow As Integer) As Double
         Get
@@ -302,7 +303,6 @@ Public Class HspfFtable
 
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
-        Dim i, j As Integer
         Dim t, s As String
         Dim lFmt As String = "#0.##;;0\."
 
@@ -317,78 +317,89 @@ Public Class HspfFtable
                     lSB.AppendLine(.Comment)
                 Else
                     s = "     depth      area    volume"
-                    For j = 1 To .Ncols - 3
-                        s &= "  outflow" & j
-                    Next j
+                    For lColumn As Integer = 1 To .Ncols - 3
+                        s &= "  outflow" & lColumn
+                    Next lColumn
                     lSB.AppendLine(s & " ***")
                 End If
-                For i = 1 To .Nrows
-                    If NumericallyTheSame(.DepthAsRead(i), .Depth(i)) Then
-                        s = .DepthAsRead(i)
+                For lRow As Integer = 1 To .Nrows
+                    If NumericallyTheSame(.DepthAsRead(lRow), .Depth(lRow)) Then
+                        s = .DepthAsRead(lRow)
                     Else
-                        s = Format(.Depth(i), lFmt).PadLeft(10)
+                        s = Format(.Depth(lRow), lFmt).PadLeft(10)
                     End If
-                    If NumericallyTheSame(.AreaAsRead(i), .Area(i)) Then
-                        t = .AreaAsRead(i)
+                    If NumericallyTheSame(.AreaAsRead(lRow), .Area(lRow)) Then
+                        t = .AreaAsRead(lRow)
                     Else
-                        t = Format(.Area(i), lFmt).PadLeft(10)
-                    End If
-                    s &= t
-                    If NumericallyTheSame(.VolumeAsRead(i), .Volume(i)) Then
-                        t = .VolumeAsRead(i)
-                    Else
-                        t = Format(.Volume(i), lFmt).PadLeft(10)
+                        t = Format(.Area(lRow), lFmt).PadLeft(10)
                     End If
                     s &= t
-                    For j = 1 To .Ncols - 3
-                        If j = 1 Then
-                            If NumericallyTheSame(.Outflow1AsRead(i), .Outflow1(i)) Then
-                                t = .Outflow1AsRead(i)
+                    If NumericallyTheSame(.VolumeAsRead(lRow), .Volume(lRow)) Then
+                        t = .VolumeAsRead(lRow)
+                    Else
+                        t = Format(.Volume(lRow), lFmt).PadLeft(10)
+                    End If
+                    s &= t
+                    For lOutflowIndex As Integer = 1 To .Ncols - 3
+                        If lOutflowIndex = 1 Then
+                            If NumericallyTheSame(.Outflow1AsRead(lRow), .Outflow1(lRow)) Then
+                                t = .Outflow1AsRead(lRow)
                             Else
-                                t = Format(.Outflow1(i), lFmt).PadLeft(10)
+                                t = Format(.Outflow1(lRow), lFmt).PadLeft(10)
                                 If t.Length > 10 Then
                                     'too many digits in the number
-                                    t = RSet(atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(i)), 10), 10)
+                                    t = RSet(atcUCI.HspfTable.NumFmtRE(CSng(.Outflow1(lRow)), 10), 10)
                                 End If
                             End If
-                        End If
-                        If j = 2 Then
-                            If NumericallyTheSame(.Outflow2AsRead(i), .Outflow2(i)) Then
-                                t = .Outflow2AsRead(i)
+                        ElseIf lOutflowIndex = 2 Then
+                            If NumericallyTheSame(.Outflow2AsRead(lRow), .Outflow2(lRow)) Then
+                                t = .Outflow2AsRead(lRow)
                             Else
-                                t = Format(.Outflow2(i), lFmt).PadLeft(10)
+                                t = Format(.Outflow2(lRow), lFmt).PadLeft(10)
                             End If
-                        End If
-                        If j = 3 Then
-                            If NumericallyTheSame(.Outflow3AsRead(i), .Outflow3(i)) Then
-                                t = .Outflow3AsRead(i)
+                        elseIf lOutflowIndex = 3 Then
+                            If NumericallyTheSame(.Outflow3AsRead(lRow), .Outflow3(lRow)) Then
+                                t = .Outflow3AsRead(lRow)
                             Else
-                                t = Format(.Outflow3(i), lFmt).PadLeft(10)
+                                t = Format(.Outflow3(lRow), lFmt).PadLeft(10)
                             End If
-                        End If
-                        If j = 4 Then
-                            If NumericallyTheSame(.Outflow4AsRead(i), .Outflow4(i)) Then
-                                t = .Outflow4AsRead(i)
+                        elseIf lOutflowIndex = 4 Then
+                            If NumericallyTheSame(.Outflow4AsRead(lRow), .Outflow4(lRow)) Then
+                                t = .Outflow4AsRead(lRow)
                             Else
-                                t = Format(.Outflow4(i), lFmt).PadLeft(10)
+                                t = Format(.Outflow4(lRow), lFmt).PadLeft(10)
                             End If
-                        End If
-                        If j = 5 Then
-                            If NumericallyTheSame(.Outflow5AsRead(i), .Outflow5(i)) Then
-                                t = .Outflow5AsRead(i)
+                        ElseIf lOutflowIndex = 5 Then
+                            If NumericallyTheSame(.Outflow5AsRead(lRow), .Outflow5(lRow)) Then
+                                t = .Outflow5AsRead(lRow)
                             Else
-                                t = Format(.Outflow5(i), lFmt).PadLeft(10)
+                                t = Format(.Outflow5(lRow), lFmt).PadLeft(10)
                             End If
                         End If
                         s &= t
-                    Next j
+                    Next lOutflowIndex
                     lSB.AppendLine(s)
-                Next i
+                Next lRow
             End With
             lSB.AppendLine("  END FTABLE" & myFormatI(lOpn.FTable.Id, 3))
         Next lOpn
         lSB.AppendLine("END FTABLES")
         Return lSB.ToString
+    End Function
+
+    Private Function NumericallyTheSame(ByRef aValueAsRead As String, ByRef aValueStored As Single) As Boolean
+        'see if the current ftable value is the same as the value as read from the uci
+        '4. is the same as 4.0
+        Dim lTemp As Single
+        Dim lNumericallyTheSame As Boolean = False
+        If IsNumeric(aValueStored) AndAlso IsNumeric(aValueAsRead) Then
+            'simple case
+            lTemp = CSng(aValueAsRead)
+            If lTemp = aValueStored Then
+                lNumericallyTheSame = True
+            End If
+        End If
+        Return lNumericallyTheSame
     End Function
 
     Public Sub Edit()
@@ -408,7 +419,6 @@ Public Class HspfFtable
         pOutflow4(1) = 0
         pOutflow5(1) = 0
     End Sub
-
 
     'Public Sub FTableFromCrossSect(length!, elup!, eldown!, w1!, w2!, h!, sfp!, nch!, nfp!)
     '
@@ -506,7 +516,6 @@ Public Class HspfFtable
     'End Sub
 
     Public Sub FTableFromCrossSect(ByRef dL As Single, ByRef dYm As Single, ByRef dWm As Single, ByRef dN As Single, ByRef dS As Single, ByRef dM11 As Single, ByRef dM12 As Single, ByRef dYc As Single, ByRef dM21 As Single, ByRef dM22 As Single, ByRef dYt1 As Single, ByRef dYt2 As Single, ByRef dM31 As Single, ByRef dM32 As Single, ByRef dW11 As Single, ByRef dW12 As Single)
-
         'algorithm from tt
         Dim Depth(8) As Single
         Dim sfarea(8) As Single
@@ -689,21 +698,4 @@ errorhandler:
     '
     '    return ((((1.1 * dAcRc) - dAct1Rct1) < 0.0) && (((1.1 * dAt1Rt1) - dAt1t2Rt1t2) < 0.0));
     '}
-
-    Private Function NumericallyTheSame(ByRef ValueAsRead As String, ByRef ValueStored As Single) As Boolean
-        'see if the current ftable value is the same as the value as read from the uci
-        '4. is the same as 4.0
-        Dim rtemp1 As Single
-
-        NumericallyTheSame = False
-        If IsNumeric(ValueStored) Then
-            If IsNumeric(ValueAsRead) Then
-                'simple case
-                rtemp1 = CSng(ValueAsRead)
-                If rtemp1 = ValueStored Then
-                    NumericallyTheSame = True
-                End If
-            End If
-        End If
-    End Function
 End Class
