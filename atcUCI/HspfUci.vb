@@ -326,15 +326,19 @@ Public Class HspfUci
                         lStr = pMonthData.ToString
                     End If
                 Case "FTABLES"
-                    Dim lOpnBlk As HspfOpnBlk = OpnBlks.Item("RCHRES")
-                    If lOpnBlk.Count > 0 Then
-                        lStr = lOpnBlk.Ids.Item(1).FTable.ToString
+                    If pOpnBlks.Contains("RCHRES") Then
+                        Dim lOpnBlk As HspfOpnBlk = OpnBlks.Item("RCHRES")
+                        If lOpnBlk.Count > 0 Then
+                            lStr = lOpnBlk.Ids.Item(1).FTable.ToString
+                        End If
                     End If
                 Case "PERLND", "IMPLND", "RCHRES", "COPY", "PLTGEN", "DISPLY", _
                      "DURANL", "GENER", "MUTSIN", "BMPRAC", "REPORT"
-                    Dim lOpnBlk As HspfOpnBlk = OpnBlks.Item(lBlock)
-                    If lOpnBlk.Count > 0 Then
-                        lStr = lOpnBlk.ToString
+                    If pOpnBlks.Contains(lBlock) Then
+                        Dim lOpnBlk As HspfOpnBlk = pOpnBlks.Item(lBlock)
+                        If lOpnBlk.Count > 0 Then
+                            lStr = lOpnBlk.ToString
+                        End If
                     End If
                 Case "CONNECTIONS"
                     If pConnections.Count > 0 Then
@@ -449,7 +453,7 @@ Public Class HspfUci
         Else
             pName = aNewName
             If aFullFg <> -1 Then 'not doing starter, process wdm files
-                PreScanFilesBlock(pName, aFilesOK, aEchoFile)
+                PreScanFilesBlock(aFilesOK, aEchoFile)
                 aEchoFile = aEchoFile.Trim
             End If
             If aFilesOK Then
@@ -1170,10 +1174,11 @@ Public Class HspfUci
     'End Sub
 
     Private Function FindFreeDSN(ByVal aWdmId As Integer, ByVal aStartDSN As Integer) As Integer
-        FindFreeDSN = aStartDSN
-        While Not GetDataSetFromDsn(aWdmId, FindFreeDSN) Is Nothing
-            FindFreeDSN += 1
+        Dim lFreeDsn As Integer = aStartDSN + 1
+        While Not GetDataSetFromDsn(aWdmId, lFreeDsn) Is Nothing
+            lFreeDsn += 1
         End While
+        Return lFreeDsn
     End Function
 
     Public Sub AddExpertDsns(ByRef Id As Integer, ByRef clocn As String, ByRef basedsn As Integer, ByRef adsn() As Integer, ByRef ostr() As String)
@@ -1650,19 +1655,16 @@ Public Class HspfUci
                                       ByRef aBaseDsn As Integer, ByRef aWdmId As Integer, _
                                       ByRef aTUnit As Integer, ByRef aDescription As String, _
                                       ByRef aDsn As Integer)
-        Dim lWdmUnit As Integer
         If aWdmId = 0 Then
-            For lWdmIndex As Integer = 4 To 1 Step -1
-                If pWdmUnit(lWdmIndex) > 0 Then 'use this as the output wdm
-                    lWdmUnit = pWdmUnit(lWdmIndex)
+            For lWdmIndex As Integer = 1 To 4
+                If Not pWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
                     aWdmId = lWdmIndex
+                    Exit For
                 End If
             Next lWdmIndex
-        Else
-            lWdmUnit = pWdmUnit(aWdmId)
         End If
 
-        If lWdmUnit > 0 Then 'okay to continue
+        If aWdmId > 0 Then 'okay to continue
             Dim lScenario As String = FilenameOnly(pName)
             Dim lDsn As Integer = FindFreeDSN(aWdmId, aBaseDsn)
             Dim lGenericTs As New atcData.atcTimeseries(Nothing)
@@ -1672,9 +1674,10 @@ Public Class HspfUci
                 .SetValue("Constituent", aConstituent.ToUpper)
                 .SetValue("Location", aLocation.ToUpper)
                 .SetValue("Description", aDescription)
+                .SetValue("TU", aTUnit)
+                .SetValue("TS", 1)
             End With
             Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
-            'TODO: create dates
             'With myDateSummary
             '    .CIntvl = True
             '    .ts = 1
@@ -1761,7 +1764,7 @@ Public Class HspfUci
         End If
 
         AddWDMFile = New atcWDM.atcDataSourceWDM
-        If Not AddWDMFile.Open(Name) Then 'had a problem
+        If Not AddWDMFile.Open(aName) Then 'had a problem
             MsgBox("Could not open WDM file" & vbCr & Name, MsgBoxStyle.Exclamation, "AddWDMFile Failed")
             Return Nothing
         Else
@@ -1769,7 +1772,7 @@ Public Class HspfUci
         End If
     End Function
 
-    Public Sub PreScanFilesBlock(ByRef pName As String, ByRef FilesOK As Boolean, ByRef EchoFile As String)
+    Public Sub PreScanFilesBlock(ByRef aFilesOK As Boolean, ByRef aEchoFile As String)
         Dim i, Ind As Integer
         Dim tname, s, w, tpath As String
         Dim lFile As atcData.atcDataSource
@@ -1779,9 +1782,9 @@ Public Class HspfUci
         's = "PreScanFilesBlock entry"
         'F90_FILSTA s, Len(s)
 
-        FilesOK = True
+        aFilesOK = True
         pWdmCount = 0
-        EchoFile = ""
+        aEchoFile = ""
         i = FreeFile()
         FileOpen(i, pName, OpenMode.Input)
         Do
@@ -1804,16 +1807,16 @@ Public Class HspfUci
                                 tpath = IO.Path.GetDirectoryName(tname)
                                 If tpath.Length > 0 AndAlso Not IO.Directory.Exists(tpath) Then
                                     MsgBox("Error in Files Block:  Folder " & tpath & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
-                                    FilesOK = False
+                                    aFilesOK = False
                                 ElseIf UCase(Right(tname, 4)) = ".MUT" Then  'does this file exist
                                     If Not IO.File.Exists(tname) Then
                                         MsgBox("Error in Files Block:  Input File " & tname & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
-                                        FilesOK = False
+                                        aFilesOK = False
                                     End If
                                 End If
                                 If Left(s, 5) = "MESSU" Then
                                     'save echo file name
-                                    EchoFile = tname
+                                    aEchoFile = tname
                                 End If
                             End If
                         End If
@@ -1829,7 +1832,7 @@ Public Class HspfUci
         Exit Sub
 x:
         'TODO: myMsgBox.Show("Cannot open '" & Mid(s, 17, Len(s) - 16) & "' in PreScanFilesBlock." & vbCrLf & vbCrLf & "Error: " & Err.Description, "HSPF Files Error", "+-&OK")
-        FilesOK = False
+        aFilesOK = False
         FileClose(i)
     End Sub
 
@@ -2702,14 +2705,13 @@ x:
 
     Public Sub CreateUciFromBASINS(ByRef aMsg As HspfMsg, _
                                    ByRef aName As String, _
-                                   ByRef aOutputWdm As String, _
-                                   ByRef aMetWdms() As String, _
-                                   ByRef aWdmIds() As String, _
+                                   ByRef aDataSources As Collection(Of atcData.atcDataSource), _
                                    ByRef aMetDataDetails As String, _
                                    ByRef aOneSeg As Boolean, _
+                                   ByRef aStarterUci As String, _
                                    Optional ByRef aMasterPollutantList As Collection = Nothing)
-        modCreateUci.CreateUciFromBASINS(Me, aMsg, aName, aOutputWdm, aMetWdms, _
-                                         aWdmIds, aMetDataDetails, aOneSeg, aMasterPollutantList)
+        modCreateUci.CreateUciFromBASINS(Me, aMsg, aName, aDataSources, _
+                                         aMetDataDetails, aOneSeg, aStarterUci, _
+                                         aMasterPollutantList)
     End Sub
-
 End Class

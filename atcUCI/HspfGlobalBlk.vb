@@ -19,7 +19,7 @@ Public Class HspfGlobalBlk
 
     Public Property Edited() As Boolean
         Get
-            Edited = pEdited
+            Return pEdited
         End Get
         Set(ByVal Value As Boolean)
             pEdited = Value
@@ -29,7 +29,7 @@ Public Class HspfGlobalBlk
 
     Public Property Uci() As HspfUci
         Get
-            Uci = pUci
+            Return pUci
         End Get
         Set(ByVal Value As HspfUci)
             pUci = Value
@@ -38,13 +38,13 @@ Public Class HspfGlobalBlk
 
     Public ReadOnly Property Caption() As String
         Get
-            Caption = "Global Block"
+            Return "Global Block"
         End Get
     End Property
 
     Public Property Comment() As String
         Get
-            Comment = pComment
+            Return pComment
         End Get
         Set(ByVal Value As String)
             pComment = Value
@@ -53,13 +53,13 @@ Public Class HspfGlobalBlk
 
     Public ReadOnly Property EditControlName() As String
         Get
-            EditControlName = "ATCoHspf.ctlGlobalBlkEdit"
+            Return "ATCoHspf.ctlGlobalBlkEdit"
         End Get
     End Property
 
     Public Property RunInf() As HSPFParm
         Get
-            RunInf = pRunInf
+            Return pRunInf
         End Get
         Set(ByVal Value As HSPFParm)
             pRunInf = Value
@@ -77,12 +77,16 @@ Public Class HspfGlobalBlk
         End Get
     End Property
 
-    Public Property SDate(ByVal Index As Integer) As Integer
+    Public Property SDate(ByVal aIndex As Integer) As Integer
         Get
-            SDate = pSDate(Index)
+            If aIndex >= 0 And aIndex <= pSDate.GetUpperBound(0) Then
+                Return pSDate(aIndex)
+            Else
+                Return Nothing
+            End If
         End Get
         Set(ByVal Value As Integer)
-            pSDate(Index) = Value
+            pSDate(aIndex) = Value
             Update()
         End Set
     End Property
@@ -93,12 +97,16 @@ Public Class HspfGlobalBlk
         End Get
     End Property
 
-    Public Property EDate(ByVal Index As Integer) As Integer
+    Public Property EDate(ByVal aIndex As Integer) As Integer
         Get
-            EDate = pEDate(Index)
+            If aIndex >= 0 And aIndex <= pEDate.GetUpperBound(0) Then
+                EDate = pEDate(aIndex)
+            Else
+                Return Nothing
+            End If
         End Get
         Set(ByVal Value As Integer)
-            pEDate(Index) = Value
+            pEDate(aIndex) = Value
             Update()
         End Set
     End Property
@@ -111,7 +119,7 @@ Public Class HspfGlobalBlk
 
     Public Property outlev() As HSPFParm
         Get
-            outlev = pOutLev
+            Return pOutLev
         End Get
         Set(ByVal Value As HSPFParm)
             pOutLev = Value
@@ -121,7 +129,7 @@ Public Class HspfGlobalBlk
 
     Public Property spout() As Integer
         Get
-            spout = pSpOut
+            Return pSpOut
         End Get
         Set(ByVal Value As Integer)
             pSpOut = Value
@@ -141,7 +149,7 @@ Public Class HspfGlobalBlk
 
     Public Property emfg() As Integer
         Get
-            emfg = pEmFg
+            Return pEmFg
         End Get
         Set(ByVal Value As Integer)
             pEmFg = Value
@@ -155,7 +163,6 @@ Public Class HspfGlobalBlk
 
     Public Sub ReadUciFile()
         Dim rectyp, lOutLev, retkey, retcod As Integer
-        Dim lRunInf As String = Nothing
         Dim cbuff As String = Nothing
 
         If pUci.FastFlag Then
@@ -163,10 +170,10 @@ Public Class HspfGlobalBlk
             pComment = GetCommentBeforeBlock("GLOBAL")
             GetNextRecordFromBlock("GLOBAL", retkey, cbuff, rectyp, retcod)
             If Mid(cbuff, 1, 7) <> "START" Then
-                lRunInf = Trim(cbuff)
+                pRunInf.Value = cbuff.TrimEnd
                 GetNextRecordFromBlock("GLOBAL", retkey, cbuff, rectyp, retcod)
             Else
-                lRunInf = ""
+                pRunInf.Value = ""
             End If
             'Allow room for comments
             While rectyp < 0 And retkey < 50 '(50 is arbitrary to prevent an endless loop)
@@ -229,7 +236,7 @@ Public Class HspfGlobalBlk
                 pIhmFg = 0
             End If
         Else
-            Call REM_GLOBLK((Me.Uci), pSDate, pEDate, lOutLev, pSpOut, pRunFg, pEmFg, lRunInf)
+            Call REM_GLOBLK((Me.Uci), pSDate, pEDate, lOutLev, pSpOut, pRunFg, pEmFg, pRunInf.Value)
             Call REM_GLOPRMI((Me.Uci), pIhmFg, "IHMFG")
         End If
 
@@ -239,7 +246,6 @@ Public Class HspfGlobalBlk
         If pEDate(2) = 0 Then pEDate(2) = 31
 
         pOutLev.Value = CStr(lOutLev)
-        pRunInf.Value = lRunInf
     End Sub
 
     Public Overrides Function ToString() As String
@@ -276,7 +282,7 @@ Public Class HspfGlobalBlk
         pOutLev = New HSPFParm
         pOutLev.Parent = Me
         pOutLev.Def = readParmDef("OutLev")
-        pRunInf = New HSPFParm
+        pRunInf = New HspfParm
         pRunInf.Parent = Me
         pRunInf.Def = readParmDef("RunInf")
     End Sub

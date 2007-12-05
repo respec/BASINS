@@ -5,6 +5,7 @@ Option Explicit On
 Imports System.Collections.ObjectModel
 Imports MapWinUtility
 Imports atcUtility
+Imports atcData
 
 Friend Class LandUse
     Public Name As String
@@ -73,9 +74,7 @@ Module modCreateUci
     Friend Sub CreateUciFromBASINS(ByRef aUci As HspfUci, _
                                    ByRef aMsg As HspfMsg, _
                                    ByRef aName As String, _
-                                   ByRef aOutputWdm As String, _
-                                   ByRef aMetWdms() As String, _
-                                   ByRef aWdmIds() As String, _
+                                   ByRef aDataSources As Collection(Of atcDataSource), _
                                    ByRef aMetDataDetails As String, _
                                    ByRef aOneSeg As Boolean, _
                                    ByRef aStarterUciName As String, _
@@ -90,18 +89,33 @@ Module modCreateUci
         aUci.Msg = aMsg
 
         If aUci.Name.Length > 0 Then
+            Dim lScenario As String = FilenameOnly(aUci.Name)
+
+            'dummy global block
+            With aUci.GlobalBlock  'add global block to empty uci
+                .Uci = aUci
+                .RunInf.Value = "UCI Created by WinHSPF for " & lScenario
+                .emfg = 1
+                .outlev.Value = CStr(1)
+                .runfg = 1
+            End With
+
+            'add files block to uci
+            CreateFilesBlock(aUci, lScenario, aDataSources)
+            aUci.Save() 'TODO: required by prescanfilesblock, need in memory version of prescan...
+            Dim lFilesBlockStatus As Boolean = False
+            Dim lEchoFileName As String = ""
+            aUci.PreScanFilesBlock(lFilesBlockStatus, lEchoFileName)
+
             pLandUses = New Collection(Of LandUse)
             pReaches = New Collection(Of Reach)
-            Dim lScenario As String = FilenameOnly(aUci.Name)
             Dim lReturnCode As Integer
             Call ReadWSDFile(aName, lReturnCode)
             Call ReadRCHFile(aName, lReturnCode)
             Call ReadPTFFile(aName, lReturnCode)
             Call ReadPSRFile(aName, lReturnCode)
 
-            'On Error Resume Next
             If lReturnCode = 0 Then  'everything read okay, continue
-
                 'build initial met segment 
                 DefaultBASINSMetseg(aUci, aMetDataDetails)
 
@@ -120,20 +134,12 @@ Module modCreateUci
 
                 aUci.Initialized = True
 
-                With aUci.GlobalBlock  'add global block to empty uci
-                    .Uci = aUci
-                    .RunInf.Value = "UCI Created by WinHSPF for " & lScenario
-                    .emfg = 1
-                    .outlev.Value = CStr(1)
-                    .runfg = 1
+                With aUci.GlobalBlock  'update start and end date from met data
                     For i As Integer = 0 To 5
                         .SDate(i) = lSDate(i)
                         .EDate(i) = lEDate(i)
                     Next i
                 End With
-
-                'add files block to uci
-                CreateFilesBlock(aUci, lScenario, aOutputWdm, aMetWdms, aWdmIds)
 
                 'add opn seq block
                 CreateOpnSeqBlock(aUci, aOneSeg)
@@ -473,7 +479,7 @@ ErrHandler:
         tname = Left(newName, Len(newName) - 3) & "psr"
         FileOpen(i, tname, OpenMode.Input)
         lstr = LineInput(i) 'number of facilities
-        If lStr.Length > 0 Then
+        If lstr.Length > 0 Then
             FacilityCount = CShort(lstr)
         End If
         lstr = LineInput(i) 'blank line
@@ -497,7 +503,7 @@ ErrHandler:
             PollutantCount = 0
             Do Until EOF(i)
                 lstr = LineInput(i)
-                If lStr.Length > 0 Then
+                If lstr.Length > 0 Then
                     PollutantCount = PollutantCount + 1
                     ReDim Preserve PollutantFacID(PollutantCount)
                     ReDim Preserve PollutantName(PollutantCount)
@@ -711,9 +717,8 @@ ErrHandler:
 
     Private Sub CreateFilesBlock(ByRef aUci As HspfUci, _
                                  ByRef aScenario As String, _
-                                 ByRef aWdmOutputName As String, _
-                                 ByRef aWdmMetNames() As String, _
-                                 ByRef aWdmIds() As String)
+                                 ByRef aDataSources As Collection(Of atcData.atcDataSource))
+
         Dim lFile As New HspfData.HspfFile
         aUci.FilesBlock.Clear()
         aUci.FilesBlock.Uci = aUci
@@ -728,17 +733,20 @@ ErrHandler:
         lFile.Unit = 91
         aUci.FilesBlock.Add(lFile)
 
-        If aWdmOutputName.Length > 0 Then
-            lFile.Name = aWdmOutputName
-            lFile.Typ = aWdmIds(0)
+        Dim lOutput As atcDataSource = aDataSources(0)
+        If lOutput.Name.Length > 0 Then
+            lFile.Name = RelativeFilename(lOutput.Specification, CurDir)
+            lFile.Typ = lOutput.Name.Substring(lOutput.Name.LastIndexOf(":") + 1) & 1
             lFile.Unit = 25
             aUci.FilesBlock.Add(lFile)
         End If
 
-        For lWdmIndex As Integer = 1 To 3
-            If Not aWdmMetNames(lWdmIndex) Is Nothing AndAlso aWdmMetNames(lWdmIndex).Length > 0 Then
-                lFile.Name = aWdmMetNames(lWdmIndex)
-                lFile.Typ = aWdmIds(lWdmIndex)
+        For lWdmIndex As Integer = 1 To aDataSources.Count - 1
+            If Not aDataSources(lWdmIndex) Is Nothing AndAlso aDataSources(lWdmIndex).Name.Length > 0 Then
+                lFile.Name = RelativeFilename(aDataSources(lWdmIndex).Specification, CurDir)
+                With aDataSources(lWdmIndex)
+                    lFile.Typ = .Name.Substring(.Name.LastIndexOf(":") + 1) & lWdmIndex + 1
+                End With
                 lFile.Unit = 25 + lWdmIndex
                 aUci.FilesBlock.Add(lFile)
             End If
@@ -1028,28 +1036,22 @@ ErrHandler:
         Return lPollutantID
     End Function
 
-    Private Sub CreateDefaultOutput(ByRef myUci As HspfUci)
-        Dim vConn As Object
-        Dim lConn As HspfConnection
-        Dim wdmid, bottomid, newdsn As Integer
-
-        bottomid = 0
-        For Each vConn In myUci.Connections
-            lConn = vConn
-            If lConn.Typ = 3 Then
-                'schematic record
-                If lConn.Source.VolName = "RCHRES" And lConn.Target.VolName = "RCHRES" Then
-                    bottomid = lConn.Target.VolId
+    Private Sub CreateDefaultOutput(ByRef aUci As HspfUci)
+        Dim lOutletId As Integer = 0
+        For Each lConnection As HspfConnection In aUci.Connections
+            If lConnection.Typ = 3 Then 'schematic record
+                If lConnection.Source.VolName = "RCHRES" And _
+                   lConnection.Target.VolName = "RCHRES" Then
+                    lOutletId = lConnection.Target.VolId
                 End If
             End If
-        Next vConn
+        Next lConnection
 
-        If bottomid > 0 Then 'found watershed outlet
-            Call myUci.AddOutputWDMDataSet("RCH" & bottomid, "FLOW", 100, wdmid, newdsn)
-            myUci.AddExtTarget("RCHRES", bottomid, "HYDR", "RO", 1, 1, 1.0#, "AVER", "WDM" & CStr(wdmid), newdsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
-            'myUci.GetWDMObj(wdmid).Refresh
+        If lOutletId > 0 Then 'found watershed outlet
+            Dim lWdmId, lNewDsn As Integer
+            aUci.AddOutputWDMDataSet("RCH" & lOutletId, "FLOW", 100, lWdmId, lNewDsn)
+            aUci.AddExtTarget("RCHRES", lOutletId, "HYDR", "RO", 1, 1, 1.0#, "AVER", "WDM" & CStr(lWdmId), lNewDsn, "FLOW", 1, "ENGL", "AGGR", "REPL")
         End If
-
     End Sub
 
     Private Function DefaultLSURFromSLSUR(ByRef aSlopeSurface As Double) As Double
@@ -1114,7 +1116,7 @@ ErrHandler:
                     'Debug.Print lOpn.Description
                     Id = DefaultOpnId(lOpn, defUci)
                     If Id > 0 Then
-                        dOpn = defUci.OpnBlks(lOpn.Name).operfromid(Id)
+                        dOpn = defUci.OpnBlks(lOpn.Name).OperFromID(Id)
                         If Not dOpn Is Nothing Then
                             For Each vTab In lOpn.Tables
                                 lTab = vTab
@@ -1254,7 +1256,7 @@ ErrHandler:
         Next vOpn
         'not found, use first one
         If defUci.OpnBlks(OpTypName).Count > 0 Then
-            matchOperWithDefault = defUci.OpnBlks(OpTypName).Ids(1)
+            matchOperWithDefault = defUci.OpnBlks(OpTypName).Ids(0)
         Else
             matchOperWithDefault = Nothing
         End If
@@ -1266,9 +1268,9 @@ ErrHandler:
 
         For Each vML In defUci.MassLinks
             dML = vML
-            If dML.Source.volname = "PERLND" And dML.Source.member = "PERO" Then
-            ElseIf dML.Source.volname = "IMPLND" And dML.Source.member = "SURO" Then
-            ElseIf dML.Source.volname = "RCHRES" And dML.Source.group = "ROFLOW" Then
+            If dML.Source.VolName = "PERLND" And dML.Source.Member = "PERO" Then
+            ElseIf dML.Source.VolName = "IMPLND" And dML.Source.Member = "SURO" Then
+            ElseIf dML.Source.VolName = "RCHRES" And dML.Source.Group = "ROFLOW" Then
             Else
                 'add the other ones
                 lMassLink = New HspfMassLink
@@ -1279,14 +1281,15 @@ ErrHandler:
 
     End Sub
 
-    Private Sub DefaultBASINSMetseg(ByVal myUci As HspfUci, ByVal MetDetails As String)
+    Private Sub DefaultBASINSMetseg(ByVal aUci As HspfUci, _
+                                    ByVal aMetDetails As String)
         Dim r&, i&
         Dim SDate&(6), EDate&(6)
-        Dim delim$, quote$, basedsn&, metwdmid$, lMetDetails$
+        Dim delim$, quote$, basedsn&
         Dim lmetseg As HspfMetSeg
 
-        lMetDetails = MetDetails
-        If Len(lMetDetails) > 0 Then
+        Dim lMetDetails As String = aMetDetails
+        If lMetDetails.Length > 0 Then
             'get details from the met data details
             delim = ","
             quote = """"
@@ -1297,12 +1300,12 @@ ErrHandler:
             For i = 0 To 5
                 EDate(i) = StrSplit(lMetDetails, delim, quote)
             Next i
-            metwdmid = lMetDetails
+            Dim lMetWdmId As String = lMetDetails
 
             lmetseg = New HspfMetSeg
-            lmetseg.Uci = myUci
+            lmetseg.Uci = aUci
             For r = 1 To 7
-                lmetseg.MetSegRec(r).Source.VolName = metwdmid
+                lmetseg.MetSegRec(r).Source.VolName = lMetWdmId
                 lmetseg.MetSegRec(r).Sgapstrg = ""
                 lmetseg.MetSegRec(r).Ssystem = "ENGL"
                 lmetseg.MetSegRec(r).Tran = "SAME"
@@ -1346,9 +1349,9 @@ ErrHandler:
                         lmetseg.MetSegRec(r).MFactR = 1
                 End Select
             Next r
-            lmetseg.ExpandMetSegName(metwdmid, basedsn)
-            lmetseg.Id = myUci.MetSegs.Count + 1
-            myUci.MetSegs.Add(lmetseg)
+            lmetseg.ExpandMetSegName(lMetWdmId, basedsn)
+            lmetseg.Id = aUci.MetSegs.Count + 1
+            aUci.MetSegs.Add(lmetseg)
         End If
     End Sub
 End Module
