@@ -73,17 +73,20 @@ Module modCreateUci
 
     Friend Sub CreateUciFromBASINS(ByRef aUci As HspfUci, _
                                    ByRef aMsg As HspfMsg, _
-                                   ByRef aName As String, _
+                                   ByRef aWsdName As String, _
                                    ByRef aDataSources As Collection(Of atcDataSource), _
-                                   ByRef aMetDataDetails As String, _
+                                   ByRef aMetBaseDsn As Integer, _
+                                   ByRef aMetWdmId As String, _
+                                   ByRef aStartDate() As Integer, _
+                                   ByRef aEndDate() As Integer, _
                                    ByRef aOneSeg As Boolean, _
                                    ByRef aStarterUciName As String, _
-                                   Optional ByRef aMasterPollutantList As Collection = Nothing)
+                                   Optional ByRef aPollutantListFileName As String = "")
 
-        If Not IO.File.Exists(aName) Then
-            aUci.ErrorDescription = "WsdFileName '" & aName & "' not found"
+        If Not IO.File.Exists(aWsdName) Then
+            aUci.ErrorDescription = "WsdFileName '" & aWsdName & "' not found"
         Else
-            aUci.Name = FilenameOnly(aName) & ".uci"
+            aUci.Name = FilenameOnly(aWsdName) & ".uci"
         End If
 
         aUci.Msg = aMsg
@@ -111,34 +114,21 @@ Module modCreateUci
             pLandUses = New Collection(Of LandUse)
             pReaches = New Collection(Of Reach)
             Dim lReturnCode As Integer
-            Call ReadWSDFile(aName, lReturnCode)
-            Call ReadRCHFile(aName, lReturnCode)
-            Call ReadPTFFile(aName, lReturnCode)
-            Call ReadPSRFile(aName, lReturnCode)
+            Call ReadWSDFile(aWsdName, lReturnCode)
+            Call ReadRCHFile(aWsdName, lReturnCode)
+            Call ReadPTFFile(aWsdName, lReturnCode)
+            Call ReadPSRFile(aWsdName, lReturnCode)
 
             If lReturnCode = 0 Then  'everything read okay, continue
                 'build initial met segment 
-                DefaultBASINSMetseg(aUci, aMetDataDetails)
-
-                'get details from the met data details
-                Dim lDelim As String = ","
-                Dim lQuote As String = """"
-                Dim lBaseDsn As Integer = CInt(StrSplit(aMetDataDetails, lDelim, lQuote))
-                Dim lSDate(6) As Integer
-                For i As Integer = 0 To 5
-                    lSDate(i) = CInt(StrSplit(aMetDataDetails, lDelim, lQuote))
-                Next i
-                Dim lEDate(6) As Integer
-                For i As Integer = 0 To 5
-                    lEDate(i) = CInt(StrSplit(aMetDataDetails, lDelim, lQuote))
-                Next i
+                DefaultBASINSMetseg(aUci, aMetBaseDsn, aMetWdmId)
 
                 aUci.Initialized = True
 
                 With aUci.GlobalBlock  'update start and end date from met data
                     For i As Integer = 0 To 5
-                        .SDate(i) = lSDate(i)
-                        .EDate(i) = lEDate(i)
+                        .SDate(i) = aStartDate(i)
+                        .EDate(i) = aEndDate(i)
                     Next i
                 End With
 
@@ -191,7 +181,7 @@ Module modCreateUci
                 'set initial values in uci from basins values
                 SetInitValues(aUci)
 
-                CreatePointSourceDSNs(aUci, aMasterPollutantList)
+                CreatePointSourceDSNs(aUci, aPollutantListFileName)
 
                 CreateDefaultOutput(aUci)
                 CreateBinaryOutput(aUci, lScenario)
@@ -994,19 +984,26 @@ ErrHandler:
         WDMInd = CInt(w)
     End Function
 
-    Private Sub CreatePointSourceDSNs(ByRef myUci As HspfUci, _
-                                      ByRef MasterPollutantList As Collection)
+    Private Sub CreatePointSourceDSNs(ByRef aUci As HspfUci, _
+                                      ByRef aPollutantListFileName As String)
         Dim newwdmid As String = ""
         Dim newdsn As Integer
         Dim stanam, lLocation, sen, Con, tstype As String
         Dim jdates(1) As Single
         Dim rload(1) As Single
 
+        Dim lMasterPollutantList As New Collection
+        If aPollutantListFileName.Length > 0 Then
+            lMasterPollutantList = ReadPollutantList(aPollutantListFileName)
+        Else
+            lMasterPollutantList = Nothing
+        End If
+
         'On Error Resume Next
         sen = "PT-OBS"
         For i As Integer = 0 To PollutantCount - 1
             If CDbl(FacilityReach(PollutantFacID(i))) > 0 Then
-                Con = GetPollutantIDFromName(MasterPollutantList, PollutantName(i))
+                Con = GetPollutantIDFromName(lMasterPollutantList, PollutantName(i))
                 If Len(Con) = 0 Then
                     Con = UCase(Mid(PollutantName(i), 1, 8))
                 End If
@@ -1014,7 +1011,7 @@ ErrHandler:
                 lLocation = "RCH" & CStr(FacilityReach(PollutantFacID(i)))
                 tstype = UCase(Mid(PollutantName(i), 1, 4))
                 rload(1) = PollutantLoad(i)
-                myUci.AddPointSourceDataSet(sen, lLocation, Con, stanam, tstype, 0, jdates, rload, newwdmid, newdsn)
+                aUci.AddPointSourceDataSet(sen, lLocation, Con, stanam, tstype, 0, jdates, rload, newwdmid, newdsn)
             End If
         Next
     End Sub
@@ -1265,11 +1262,11 @@ ErrHandler:
         End If
     End Function
 
-    Private Sub setDefaultML(ByVal myUci As HspfUci, ByVal defUci As HspfUci)
+    Private Sub setDefaultML(ByVal aUci As HspfUci, ByVal aDefUci As HspfUci)
         Dim vML As Object, dML As HspfMassLink
         Dim lMassLink As HspfMassLink
 
-        For Each vML In defUci.MassLinks
+        For Each vML In aDefUci.MassLinks
             dML = vML
             If dML.Source.VolName = "PERLND" And dML.Source.Member = "PERO" Then
             ElseIf dML.Source.VolName = "IMPLND" And dML.Source.Member = "SURO" Then
@@ -1278,83 +1275,91 @@ ErrHandler:
                 'add the other ones
                 lMassLink = New HspfMassLink
                 lMassLink = dML
-                myUci.MassLinks.Add(lMassLink)
+                aUci.MassLinks.Add(lMassLink)
             End If
         Next vML
 
     End Sub
 
     Private Sub DefaultBASINSMetseg(ByVal aUci As HspfUci, _
-                                    ByVal aMetDetails As String)
-        Dim r&, i&
-        Dim SDate&(6), EDate&(6)
-        Dim delim$, quote$, basedsn&
-        Dim lmetseg As HspfMetSeg
+                                    ByVal aMetBaseDsn As Integer, _
+                                    ByVal aMetWdmId As String)
 
-        Dim lMetDetails As String = aMetDetails
-        If lMetDetails.Length > 0 Then
-            'get details from the met data details
-            delim = ","
-            quote = """"
-            basedsn = StrSplit(lMetDetails, delim, quote)
-            For i = 0 To 5
-                SDate(i) = StrSplit(lMetDetails, delim, quote)
-            Next i
-            For i = 0 To 5
-                EDate(i) = StrSplit(lMetDetails, delim, quote)
-            Next i
-            Dim lMetWdmId As String = lMetDetails
+        Dim lMetSeg As New HspfMetSeg
+        lMetSeg.Uci = aUci
+        For lRecordIndex As Integer = 1 To 7
+            lMetSeg.MetSegRec(lRecordIndex).Source.VolName = aMetWdmId
+            lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = ""
+            lMetSeg.MetSegRec(lRecordIndex).Ssystem = "ENGL"
+            lMetSeg.MetSegRec(lRecordIndex).Tran = "SAME"
+            lMetSeg.MetSegRec(lRecordIndex).typ = lRecordIndex
+            Select Case lRecordIndex
+                Case 1
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn
+                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "PREC"
+                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
+                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                    lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = "ZERO"
+                Case 2
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 2
+                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "ATEM"
+                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
+                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                Case 3
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 6
+                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "DEWP"
+                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
+                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                Case 4
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 3
+                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "WIND"
+                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
+                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                Case 5
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 4
+                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "SOLR"
+                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
+                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                Case 6
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 7
+                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "CLOU"
+                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 0
+                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                Case 7
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 5
+                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "PEVT"
+                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
+                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+            End Select
+        Next lRecordIndex
+        lMetSeg.ExpandMetSegName(aMetWdmId, aMetBaseDsn)
+        lMetSeg.Id = aUci.MetSegs.Count + 1
+        aUci.MetSegs.Add(lMetSeg)
 
-            lmetseg = New HspfMetSeg
-            lmetseg.Uci = aUci
-            For r = 1 To 7
-                lmetseg.MetSegRec(r).Source.VolName = lMetWdmId
-                lmetseg.MetSegRec(r).Sgapstrg = ""
-                lmetseg.MetSegRec(r).Ssystem = "ENGL"
-                lmetseg.MetSegRec(r).Tran = "SAME"
-                lmetseg.MetSegRec(r).typ = r
-                Select Case r
-                    Case 1
-                        lmetseg.MetSegRec(r).Source.VolId = basedsn
-                        lmetseg.MetSegRec(r).Source.Member = "PREC"
-                        lmetseg.MetSegRec(r).MFactP = 1
-                        lmetseg.MetSegRec(r).MFactR = 1
-                        lmetseg.MetSegRec(r).Sgapstrg = "ZERO"
-                    Case 2
-                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 2
-                        lmetseg.MetSegRec(r).Source.Member = "ATEM"
-                        lmetseg.MetSegRec(r).MFactP = 1
-                        lmetseg.MetSegRec(r).MFactR = 1
-                    Case 3
-                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 6
-                        lmetseg.MetSegRec(r).Source.Member = "DEWP"
-                        lmetseg.MetSegRec(r).MFactP = 1
-                        lmetseg.MetSegRec(r).MFactR = 1
-                    Case 4
-                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 3
-                        lmetseg.MetSegRec(r).Source.Member = "WIND"
-                        lmetseg.MetSegRec(r).MFactP = 1
-                        lmetseg.MetSegRec(r).MFactR = 1
-                    Case 5
-                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 4
-                        lmetseg.MetSegRec(r).Source.Member = "SOLR"
-                        lmetseg.MetSegRec(r).MFactP = 1
-                        lmetseg.MetSegRec(r).MFactR = 1
-                    Case 6
-                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 7
-                        lmetseg.MetSegRec(r).Source.Member = "CLOU"
-                        lmetseg.MetSegRec(r).MFactP = 0
-                        lmetseg.MetSegRec(r).MFactR = 1
-                    Case 7
-                        lmetseg.MetSegRec(r).Source.VolId = basedsn + 5
-                        lmetseg.MetSegRec(r).Source.Member = "PEVT"
-                        lmetseg.MetSegRec(r).MFactP = 1
-                        lmetseg.MetSegRec(r).MFactR = 1
-                End Select
-            Next r
-            lmetseg.ExpandMetSegName(lMetWdmId, basedsn)
-            lmetseg.Id = aUci.MetSegs.Count + 1
-            aUci.MetSegs.Add(lmetseg)
-        End If
     End Sub
+
+    Private Function ReadPollutantList(ByVal aFileName As String) As Collection
+
+        Dim lPollutantList As New Collection
+
+        On Error GoTo ErrHandler
+        Dim lFileUnit As Integer = FreeFile()
+        FileOpen(lFileUnit, aFileName, OpenMode.Input)
+        On Error Resume Next
+        Dim pstring As String = LineInput(lFileUnit)
+        Dim lIndex As Integer = 0
+        Do Until EOF(lFileUnit)
+            pstring = LineInput(lFileUnit)
+            lIndex = lIndex + 1
+            lPollutantList.Add(Trim(pstring), CStr(lIndex))
+        Loop
+        FileClose(lFileUnit)
+        Return lPollutantList
+        Exit Function
+
+ErrHandler:
+        Logger.Dbg("Unable to Open Pollutant List File (" & aFileName & ")", "Create Problem")
+        Return Nothing
+
+    End Function
 End Module

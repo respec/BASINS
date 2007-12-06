@@ -2704,14 +2704,18 @@ x:
     End Function
 
     Public Sub CreateUciFromBASINS(ByRef aMsg As HspfMsg, _
-                                   ByRef aName As String, _
+                                   ByRef aWsdName As String, _
                                    ByRef aDataSources As Collection(Of atcData.atcDataSource), _
-                                   ByRef aMetDataDetails As String, _
+                                   ByRef aMetBaseDsn As Integer, _
+                                   ByVal aMetWdmId As String, _
+                                   ByRef aStartDate() As Integer, _
+                                   ByRef aEndDate() As Integer, _
                                    ByRef aOneSeg As Boolean, _
                                    ByRef aStarterUci As String, _
-                                   Optional ByRef aMasterPollutantList As Collection = Nothing)
-        modCreateUci.CreateUciFromBASINS(Me, aMsg, aName, aDataSources, _
-                                         aMetDataDetails, aOneSeg, aStarterUci, _
-                                         aMasterPollutantList)
+                                   Optional ByRef aPollutantListFileName As String = "")
+        modCreateUci.CreateUciFromBASINS(Me, aMsg, aWsdName, aDataSources, _
+                                         aMetBaseDsn, aMetWdmId, aStartDate, aEndDate, _
+                                         aOneSeg, aStarterUci, _
+                                         aPollutantListFileName)
     End Sub
 End Class

@@ -21,12 +21,34 @@ Module CreateUCITest
         lDataSources.Add(lDataSource)
 
         Dim lStarterUciName As String = "starter.uci"
+        Dim lPollutantListFileName As String = "Poltnt_2.prn"
+
+        Dim lMetBaseDsn As Integer = 11
+        Dim lMetWdmId As String = "WDM2"
+        Dim lStartDate(5) As Integer
+        lStartDate(0) = 1970
+        lStartDate(1) = 1
+        lStartDate(2) = 1
+        lStartDate(3) = 0
+        lStartDate(4) = 0
+        lStartDate(5) = 0
+        Dim lEndDate(5) As Integer
+        lEndDate(0) = 1995
+        lEndDate(1) = 12
+        lEndDate(2) = 31
+        lEndDate(3) = 24
+        lEndDate(4) = 0
+        lEndDate(5) = 0
 
         Dim lHspfUci As New atcUCI.HspfUci
         lHspfUci.CreateUciFromBASINS(lMsg, "UCICreation.wsd", _
                                      lDataSources, _
-                                     "11,1970,1,1,0,0,0,1995,12,31,24,0,0,WDM2", True, _
-                                     lStarterUciName)
+                                     lMetBaseDsn, _
+                                     lMetWdmId, _
+                                     lStartDate, _
+                                     lEndDate, _
+                                     True, _
+                                     lStarterUciName, lPollutantListFileName)
         lHspfUci.Save()
     End Sub
 End Module
