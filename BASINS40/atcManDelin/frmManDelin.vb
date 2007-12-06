@@ -917,6 +917,11 @@ Public Class frmManDelin
             If GisUtil.IsField(ReachLayerIndex, "LEVEL") Then
                 LevelFieldIndex = GisUtil.FieldIndex(ReachLayerIndex, "LEVEL")
             End If
+            If LevelFieldIndex = -1 Then
+                If GisUtil.IsField(ReachLayerIndex, "STREAMLEVE") Then
+                    LevelFieldIndex = GisUtil.FieldIndex(ReachLayerIndex, "STREAMLEVE")
+                End If
+            End If
         End If
         If LevelFieldIndex = -1 Then
             MsgBox("Cannot find field 'Level' in the streams layer", MsgBoxStyle.OkOnly, "Stream Network Problem")
@@ -991,7 +996,7 @@ Public Class frmManDelin
             System.Windows.Forms.Application.DoEvents()
             lowestlevel = 999999
             For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
-                If GisUtil.FieldValue(StreamsLayerIndex, i - 1, ReachSubbasinFieldIndex) = k Then
+                If GisUtil.FieldValue(StreamsLayerIndex, i - 1, ReachSubbasinFieldIndex) = GisUtil.FieldValue(SubbasinLayerIndex, k - 1, SubbasinFieldIndex) Then
                     'this is in the subbasin of interest
                     j = GisUtil.FieldValue(StreamsLayerIndex, i - 1, LevelFieldIndex)
                     If j < lowestlevel And j > 0 Then
@@ -1004,7 +1009,7 @@ Public Class frmManDelin
             GisUtil.StartRemoveFeature(StreamsLayerIndex)
             i = 0
             Do While i < GisUtil.NumFeatures(StreamsLayerIndex)
-                If GisUtil.FieldValue(StreamsLayerIndex, i, ReachSubbasinFieldIndex) = k Then
+                If GisUtil.FieldValue(StreamsLayerIndex, i, ReachSubbasinFieldIndex) = GisUtil.FieldValue(SubbasinLayerIndex, k - 1, SubbasinFieldIndex) Then
                     'this is in the subbasin of interest
                     j = GisUtil.FieldValue(StreamsLayerIndex, i, LevelFieldIndex)
                     If j <> lowestlevel Then
@@ -1036,13 +1041,17 @@ Public Class frmManDelin
         Dim dfield As Integer
         If GisUtil.IsField(StreamsLayerIndex, "RIVRCH") Then
             rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RIVRCH")
-        Else
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "RCHID") Then
             rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RCHID")
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "COMID") Then
+            rfield = GisUtil.FieldIndex(StreamsLayerIndex, "COMID")
         End If
         If GisUtil.IsField(StreamsLayerIndex, "DSCSM") Then
             dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSCSM")
-        Else
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "DSRCHID") Then
             dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSRCHID")
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "TOCOMID") Then
+            dfield = GisUtil.FieldIndex(StreamsLayerIndex, "TOCOMID")
         End If
         Dim rval As String
         Dim dval As String
