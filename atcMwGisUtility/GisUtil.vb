@@ -1759,7 +1759,7 @@ Public Class GisUtil
         lNewShapeFile.StartEditingShapes(True)
 
         Dim issf As New MapWinGIS.Shapefile
-        If Not issf.CreateNew("temp_clip.shp", MapWinGIS.ShpfileType.SHP_POLYLINE) Then
+        If Not issf.CreateNew("temp_clip.shp", lSf.ShapefileType) Then
             Logger.Dbg("Failed to create temporary shapefile " & issf.Filename & " ErrorCode " & issf.LastErrorCode)
         End If
 
