@@ -575,6 +575,6 @@ notMissingTableForThisOper:
                 End If
             End If
         End If
-        NumFmtRE = retval
+        Return retval
     End Function
 End Class

@@ -304,7 +304,7 @@ Public Class HspfFtable
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
         Dim t, s As String
-        Dim lFmt As String = "#0.##;;0\."
+        Dim lFmt As String = "#0.0#"
 
         lSB.AppendLine("FTABLES")
         For Each lOpn As HspfOperation In pOperation.OpnBlk.Ids

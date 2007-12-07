@@ -4,6 +4,7 @@ Option Explicit On
 
 Imports System.Collections.ObjectModel
 Imports System.Text
+Imports MapWinUtility
 
 Public Class HspfOpnBlks
     Inherits KeyedCollection(Of String, HspfOpnBlk)
@@ -80,32 +81,28 @@ Public Class HspfOpnBlk
         Return Nothing
     End Function
 
-    Public Function NthOper(ByRef nth As Integer) As HspfOperation
-        Dim order() As Integer
-        Dim cnt As Integer
-        Dim lids() As Integer
-        Dim lOpn As HspfOperation
+    Public Function NthOper(ByRef aNth As Integer) As HspfOperation
+        Dim lOrder(pIds.Count) As Integer
+        Dim lIds(pIds.Count) As Integer
 
-        ReDim order(pIds.Count)
-        ReDim lids(pIds.Count)
-
-        cnt = 0
-        For Each lOpn In Me.Ids
-            cnt = cnt + 1
-            lids(cnt) = lOpn.Id
+        Dim lCnt As Integer = 0
+        For Each lOperation As HspfOperation In Me.Ids
+            lCnt += 1
+            lIds(lCnt) = lOperation.Id
         Next
 
-        'sort the order array
-        SortIntegerArray(0, cnt, lids, order)
+        SortIntegerArray(0, lCnt, lIds, lOrder)
 
-        For Each lOpn In Me.Ids
-            If lOpn.Id = lids(order(nth)) Then Return lOpn
+        For Each lOperation As HspfOperation In Me.Ids
+            If lOperation.Id = lIds(lOrder(aNth)) Then
+                Return lOperation
+            End If
         Next
         Return Nothing
     End Function
 
     Public Function Count() As Integer
-        Count = pIds.Count
+        Return pIds.Count
     End Function
 
     Public Sub New()
@@ -119,74 +116,72 @@ Public Class HspfOpnBlk
         Return pTables.Contains(aName)
     End Function
 
-    Public Sub setTableValues(ByRef blk As HspfBlockDef)
+    Public Sub setTableValues(ByRef aBlockDef As HspfBlockDef)
         If pUci.FastFlag Then
             pComment = GetCommentBeforeBlock(pName)
         End If
-        Call readTables(blk)
+        ReadTables(aBlockDef)
     End Sub
 
-    Private Sub readTables(ByRef blk As HspfBlockDef)
-        Dim kwd As String = Nothing
-        Dim retid, init, kflg, contfg, Nqual As Integer
-        Dim nGqual, noccur, thisoccur, scnt, srec As Integer
-        Dim ltable As HspfTable
-        Dim i, itable As Integer
-        Dim s() As String = {}
-        Dim c() As String = {}
-        Dim opf, opl As Integer
-        Dim sopl As String
-        Dim lId As HspfOperation
-        Dim vId As Object
-        Dim lOpTyp As Integer
-        Dim lTableComment As String = ""
-        Dim lCombineOk As Boolean
-
-        lOpTyp = HspfOperNum(pName)
-        init = 1
-        Debug.Print("Starting readTables at " & TimeOfDay)
-        itable = 0
+    Private Sub ReadTables(ByRef aBlockDef As HspfBlockDef)
+        'Logger.Dbg("Starting readTables at " & TimeOfDay)
+        Dim lOperType As HspfData.HspfOperType = HspfOperNum(pName)
+        Dim lContinueFlag As Integer
+        Dim lTableIndex As Integer = 0
         Do
             'return table names
+            Dim lInit As Integer = 1
+            Dim lKeyword As String = Nothing
+            Dim lRetId As Integer = 0
+            Dim lExistFlag As Integer
+            Dim lOccurCount As Integer
+            Dim lOccurNum As Integer
+            Dim lSRec As Integer
             If pUci.FastFlag Then
-                itable = itable + 1
-                kwd = blk.TableDefs.Item(itable).Name
-                StartingRecordofOperationTable((blk.Name), kwd, srec, noccur)
-                If srec > 0 Then
-                    kflg = 1 'does it exist, 1 if so
+                lTableIndex += 1
+                lKeyword = aBlockDef.TableDefs(lTableIndex).Name
+                StartingRecordofOperationTable((aBlockDef.Name), lKeyword, lSRec, lOccurCount)
+                If lSRec > 0 Then
+                    lExistFlag = 1 'does it exist, 1 if so
                 Else
-                    kflg = 0
+                    lExistFlag = 0
                 End If
-                If itable < blk.TableDefs.Count Then
-                    contfg = 1 'more tables to read flag, 1 if so
+                If lTableIndex < aBlockDef.TableDefs.Count Then
+                    lContinueFlag = 1 'more tables to read flag, 1 if so
                 Else
-                    contfg = 0
+                    lContinueFlag = 0
                 End If
-                retid = (lOpTyp * 1000) + itable
+                lRetId = (lOperType * 1000) + lTableIndex
             Else
-                Call REM_GTNXKW((Me.Uci), init, CInt(lOpTyp + 120), kwd, kflg, contfg, retid)
-                kwd = AddChar2Keyword(kwd)
+                Call REM_GTNXKW((Me.Uci), lInit, CInt(lOperType + 120), lKeyword, lExistFlag, lContinueFlag, lRetId)
+                lKeyword = AddChar2Keyword(lKeyword)
             End If
-            init = 0
-            If kflg > 0 And retid <> 0 Then
+            lInit = 0
+            If lExistFlag > 0 And lRetId <> 0 Then
                 'check for multiple occurences
                 If Not pUci.FastFlag Then
-                    Call REM_GETOCR((Me.Uci), retid, noccur)
+                    Call REM_GETOCR(Me.Uci, lRetId, lOccurCount)
                 End If
-                For thisoccur = 1 To noccur
+                Dim lTable As HspfTable
+                For lOccurNum = 1 To lOccurCount
+                    Dim lTableComment As String = ""
                     If pUci.FastFlag Then
-                        lTableComment = GetTableComment(srec, kwd, thisoccur)
+                        lTableComment = GetTableComment(lSRec, lKeyword, lOccurNum)
                     End If
-                    Call GetTableRecordsFromUCI(lOpTyp + 120, blk.TableDefs.Item(kwd).SGRP, (blk.Name), kwd, srec, thisoccur, scnt, s, c)
-                    For i = 1 To scnt
-                        'loop through each record
-                        opf = CInt(Left(s(i), 5))
-                        sopl = Trim(Mid(s(i), 6, 5))
-                        lCombineOk = True
-                        If Len(sopl) > 0 Then
-                            opl = CInt(sopl)
+                    Dim s() As String = {}
+                    Dim c() As String = {}
+                    Dim lScnt As Integer
+                    Call GetTableRecordsFromUCI(lOperType + 120, aBlockDef.TableDefs.Item(lKeyword).SGRP, (aBlockDef.Name), lKeyword, lSRec, lOccurNum, lScnt, s, c)
+                    For i As Integer = 1 To lScnt
+                        'loop through each record in table
+                        Dim lCombineOk As Boolean = True
+                        Dim lOperFirst As Integer = CInt(s(i).Substring(0, 5).Trim)
+                        Dim lOperLast As Integer = 0
+                        Dim lOperLastS As String = s(i).Substring(5, 5).Trim
+                        If lOperLastS.Length > 0 Then
+                            lOperLast = CInt(lOperLastS)
                         Else
-                            opl = opf
+                            lOperLast = lOperFirst
                             'check to see if this record could have been combined with the next record
                             If i > 1 Then
                                 If compareTableString(1, 10, s(i), s(i - 1)) Then
@@ -195,91 +190,91 @@ Public Class HspfOpnBlk
                                 End If
                             End If
                         End If
-                        For Each vId In pIds
-                            lId = vId
-                            If opf = lId.Id Or (opf <= lId.Id And lId.Id <= opl) Then
-                                ltable = New HspfTable
-                                ltable.Opn = lId
-                                ltable.Def = blk.TableDefs.Item(kwd)
-                                ltable.initTable((s(i)))
-                                ltable.Opn = lId
-                                ltable.OccurCount = noccur
-                                ltable.OccurNum = thisoccur
-                                ltable.OccurIndex = 0
-                                ltable.TableComment = lTableComment
-                                ltable.CombineOK = lCombineOk
-                                If pName = "PERLND" And ltable.Def.Parent.Name = "PQUAL" Then
+                        For Each lOperation As HspfOperation In pIds
+                            If lOperFirst = lOperation.Id Or _
+                              (lOperFirst <= lOperation.Id And lOperation.Id <= lOperLast) Then
+                                lTable = New HspfTable
+                                lTable.Opn = lOperation
+                                lTable.Def = aBlockDef.TableDefs.Item(lKeyword)
+                                lTable.initTable((s(i)))
+                                lTable.Opn = lOperation
+                                lTable.OccurCount = lOccurCount
+                                lTable.OccurNum = lOccurNum
+                                lTable.OccurIndex = 0
+                                lTable.TableComment = lTableComment
+                                lTable.CombineOK = lCombineOk
+                                If pName = "PERLND" And lTable.Def.Parent.Name = "PQUAL" Then
                                     'need to compute proper index
-                                    If lId.TableExists("NQUALS") Then
-                                        Nqual = lId.Tables.Item("NQUALS").ParmValue("NQUAL")
-                                        ltable.SetQualIndex(thisoccur, Nqual)
+                                    If lOperation.TableExists("NQUALS") Then
+                                        Dim lNQual As Integer = lOperation.Tables.Item("NQUALS").ParmValue("NQUAL")
+                                        lTable.SetQualIndex(lOccurNum, lNQual)
                                     End If
                                 End If
-                                If pName = "IMPLND" And ltable.Def.Parent.Name = "IQUAL" Then
+                                If pName = "IMPLND" And lTable.Def.Parent.Name = "IQUAL" Then
                                     'need to compute proper index
-                                    If lId.TableExists("NQUALS") Then
-                                        Nqual = lId.Tables.Item("NQUALS").ParmValue("NQUAL")
-                                        ltable.SetQualIndex(thisoccur, Nqual)
+                                    If lOperation.TableExists("NQUALS") Then
+                                        Dim lNQual As Integer = lOperation.Tables.Item("NQUALS").ParmValue("NQUAL")
+                                        lTable.SetQualIndex(lOccurNum, lNQual)
                                     End If
                                 End If
-                                If pName = "RCHRES" And ltable.Def.Parent.Name = "GQUAL" Then
+                                If pName = "RCHRES" And lTable.Def.Parent.Name = "GQUAL" Then
                                     'need to compute proper index
-                                    If lId.TableExists("GQ-GENDATA") Then
-                                        nGqual = lId.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
-                                        ltable.SetQualIndex(thisoccur, nGqual)
+                                    If lOperation.TableExists("GQ-GENDATA") Then
+                                        Dim lNGQual As Integer = lOperation.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
+                                        lTable.SetQualIndex(lOccurNum, lNGQual)
                                     End If
                                 End If
-                                If Len(c(i)) > 0 Then ltable.Comment = c(i)
-                                If noccur > 1 And thisoccur > 1 Then
-                                    lId.Tables.Add(ltable)
-                                    If Not TableExists(ltable.Name & ":" & thisoccur) Then
-                                        pTables.Add(ltable, ltable.Name & ":" & thisoccur)
+                                If Len(c(i)) > 0 Then lTable.Comment = c(i)
+                                If lOccurCount > 1 And lOccurNum > 1 Then
+                                    lOperation.Tables.Add(lTable)
+                                    If Not TableExists(lTable.Name & ":" & lOccurNum) Then
+                                        pTables.Add(lTable, lTable.Name & ":" & lOccurNum)
                                     End If
                                 Else
                                     Try
-                                        lId.Tables.Add(ltable)
-                                        If Not TableExists((ltable.Name)) Then
-                                            pTables.Add(ltable, ltable.Name)
+                                        lOperation.Tables.Add(lTable)
+                                        If Not TableExists((lTable.Name)) Then
+                                            pTables.Add(lTable, lTable.Name)
                                         End If
                                     Catch
-                                        Debug.Print("TableProblem:" & ltable.Name & ":" & lId.Id)
+                                        Logger.Dbg("TableProblem:" & lTable.Name & ":" & lOperation.Id)
                                     End Try
                                 End If
-                                If ltable.Name = "GEN-INFO" Then
-                                    lId.Description = ltable.Parms(0).Value
+                                If lTable.Name = "GEN-INFO" Then
+                                    lOperation.Description = lTable.Parms(0).Value
                                 End If
-                                If ltable.Name = "HYDR-PARM2" Then
-                                    lId.FTable = New HspfFtable
-                                    lId.FTable.Operation = lId
-                                    lId.FTable.Id = ltable.ParmValue("FTBUCI")
+                                If lTable.Name = "HYDR-PARM2" Then
+                                    lOperation.FTable = New HspfFtable
+                                    lOperation.FTable.Operation = lOperation
+                                    lOperation.FTable.Id = lTable.ParmValue("FTBUCI")
                                 End If
                             End If
-                        Next vId
+                        Next lOperation
                     Next i
-                    If scnt = 0 Then
+                    If lScnt = 0 Then
                         'still need to add the dummy table to this opnblk
-                        ltable = New HspfTable
-                        ltable.Opn = pIds.Item(1)
-                        ltable.Def = blk.TableDefs.Item(kwd)
-                        ltable.initTable((""))
-                        ltable.OccurCount = noccur
-                        ltable.OccurNum = thisoccur
-                        ltable.OccurIndex = 0
-                        ltable.TableComment = lTableComment
-                        If noccur > 1 And thisoccur > 1 Then
-                            If Not TableExists(ltable.Name & ":" & thisoccur) Then
-                                pTables.Add(ltable, ltable.Name & ":" & thisoccur)
+                        lTable = New HspfTable
+                        lTable.Opn = pIds.Item(1)
+                        lTable.Def = aBlockDef.TableDefs.Item(lKeyword)
+                        lTable.initTable((""))
+                        lTable.OccurCount = lOccurCount
+                        lTable.OccurNum = lOccurNum
+                        lTable.OccurIndex = 0
+                        lTable.TableComment = lTableComment
+                        If lOccurCount > 1 And lOccurNum > 1 Then
+                            If Not TableExists(lTable.Name & ":" & lOccurNum) Then
+                                pTables.Add(lTable, lTable.Name & ":" & lOccurNum)
                             End If
                         Else
-                            If Not TableExists((ltable.Name)) Then
-                                pTables.Add(ltable, ltable.Name)
+                            If Not TableExists((lTable.Name)) Then
+                                pTables.Add(lTable, lTable.Name)
                             End If
                         End If
                     End If
-                Next thisoccur
+                Next lOccurNum
             End If
-        Loop While contfg = 1
-        Debug.Print("Finishing readTables at " & TimeOfDay)
+        Loop While lContinueFlag = 1
+        'Logger.Dbg("Finishing readTables at " & TimeOfDay)
     End Sub
 
     Private Sub GetTableRecordsFromUCI(ByRef SCLU As Integer, ByRef SGRP As Integer, ByRef blockname As String, ByRef tablename As String, ByRef srec As Integer, ByRef thisoccur As Integer, ByRef scnt As Integer, ByRef s() As String, ByRef c() As String)
@@ -433,30 +428,24 @@ Public Class HspfOpnBlk
         Next vId
     End Sub
 
-    Public Sub AddTableForAll(ByRef tabname As String, ByRef opname As String)
+    Public Sub AddTableForAll(ByRef aTableName As String, ByRef aOperationName As String)
         'add a table to the uci object for all operation ids
-        Dim ltable As HspfTable
         Dim s, t As String
         Dim O, i As Integer
-        Dim lId As HspfOperation
-        Dim vId As Object
-        Dim blk As HspfBlockDef
+        Dim lBlockDef As HspfBlockDef = pUci.Msg.BlockDefs(aOperationName)
 
-        blk = pUci.Msg.BlockDefs(opname)
-
-        For Each vId In pIds
-            lId = vId
-            ltable = New HspfTable
-            ltable.Opn = lId
-            i = InStr(tabname, ":")
+        For Each lOperation As HspfOperation In pIds
+            Dim lTable As HspfTable = New HspfTable
+            ltable.Opn = lOperation
+            i = InStr(aTableName, ":")
             If i > 0 Then
-                t = Left(tabname, i - 1)
-                O = CShort(Right(tabname, Len(tabname) - i))
+                t = Left(aTableName, i - 1)
+                O = CShort(Right(aTableName, Len(aTableName) - i))
             Else
-                t = tabname
+                t = aTableName
                 O = 1
             End If
-            ltable.Def = blk.TableDefs.Item(t)
+            ltable.Def = lBlockDef.TableDefs.Item(t)
             s = ""
             ltable.initTable((s))
             ltable.OccurCount = O
@@ -472,71 +461,60 @@ Public Class HspfOpnBlk
                     End If
                 Next i
             End If
-            ltable.Opn = lId
-            If Not lId.TableExists(tabname) Then 'add to this id
-                lId.Tables.Add(ltable)
+            ltable.Opn = lOperation
+            If Not lOperation.TableExists(aTableName) Then 'add to this id
+                lOperation.Tables.Add(ltable)
             End If
-            If Not Me.TableExists(tabname) Then 'add to this oper-type block
+            If Not Me.TableExists(aTableName) Then 'add to this oper-type block
                 Me.Tables.Add(ltable)
             End If
-        Next vId
+        Next lOperation
     End Sub
 
-    Public Sub RemoveTable(ByRef opid As Integer, ByRef tabname As String)
+    Public Sub RemoveTable(ByRef aOperationId As Integer, ByRef aTableName As String)
         'remove this oper from a table, remove whole table if this is the last
-        Dim lOper As HspfOperation
-
-        lOper = OperFromID(opid)
-        lOper.Tables.Remove(tabname)
+        Dim lOperation As HspfOperation = OperFromID(aOperationId)
+        lOperation.Tables.Remove(aTableName)
     End Sub
 
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
-        Dim lTableDef As HspfTableDef
         Dim i As Integer
         Dim lTable As HspfTable
-        Dim lBlockDef As HspfBlockDef
         Dim j, k As Integer
         Dim t As String
-        Dim vId As Object
-        Dim lId As HspfOperation
         Dim ttable As HspfTable
-        Dim firstTable As Boolean
         Dim lGroupIndex, lFirstInGroup As Integer
         Dim lInGroup As Boolean
         Dim lLastInGroup, lLastGroupIndex, lCurrentOccurGroup As Integer
 
-        firstTable = True
         If pComment.Length > 0 Then
             lSB.AppendLine(pComment)
         End If
         lSB.AppendLine(pName)
-        lBlockDef = pUci.Msg.BlockDefs.Item(pName)
 
         lInGroup = False
 
-        For i = 1 To lBlockDef.TableDefs.Count 'must look thru all possible tables
-            lTableDef = lBlockDef.TableDefs.Item(i)
-
+        Dim lBlockDef As HspfBlockDef = pUci.Msg.BlockDefs.Item(pName)
+        Dim lFirstTable As Boolean = True
+        For Each lTableDef As HspfTableDef In lBlockDef.TableDefs
+            'must look thru all possible tables
             If lTableDef.OccurGroup = 0 And Not lInGroup Then
                 'the basic case
-                For Each vId In pIds
-                    lId = vId
-                    If lId.TableExists(lTableDef.Name) Then
-                        lTable = lId.Tables.Item(lTableDef.Name)
+                For Each lOperation As HspfOperation In pIds
+                    If lOperation.TableExists(lTableDef.Name) Then
+                        lTable = lOperation.Tables.Item(lTableDef.Name)
                         If lTable.TableComment.Length > 0 Then
                             lSB.AppendLine(lTable.TableComment)
                         End If
-                        If Not (firstTable) Then
+                        If Not (lFirstTable) Then
                             lSB.AppendLine(" ")
                         End If
                         lSB.AppendLine(lTable.ToString) 'this writes all like this
                         Exit For
                     End If
-                Next vId
-
+                Next lOperation
             Else 'this is a multiple occurence group (like pqual, iqual, gqual)
-
                 If lInGroup Then
                     If lTableDef.OccurGroup <> lCurrentOccurGroup Or i = lBlockDef.TableDefs.Count Then
                         'we were in a multiple occurence group but have reached end of group
@@ -560,16 +538,15 @@ Public Class HspfOpnBlk
                 End If
 
                 If lInGroup Then
-                    For Each vId In pIds
-                        lId = vId
+                    For Each lOperation As HspfOperation In pIds
                         'If lId.TableExists(lTableDef.Name) Then  'accomodate empty placeholder tables
-                        If lId.OpnBlk.TableExists((lTableDef.Name)) Then
-                            lTable = lId.OpnBlk.Tables(lTableDef.Name)
+                        If lOperation.OpnBlk.TableExists((lTableDef.Name)) Then
+                            lTable = lOperation.OpnBlk.Tables(lTableDef.Name)
                             If lTable.OccurIndex = 0 Or (lTable.OccurIndex > 0 And lTable.OccurIndex <= lGroupIndex) Then
                                 If lGroupIndex > 1 And lTable.OccurIndex = 0 Then
                                     'write the comment that applies to this table
                                     t = lTable.Name & ":" & lGroupIndex
-                                    ttable = lId.OpnBlk.Tables(t)
+                                    ttable = lOperation.OpnBlk.Tables(t)
                                     If ttable.TableComment.Length > 0 Then
                                         lSB.AppendLine(ttable.TableComment)
                                     End If
@@ -578,7 +555,7 @@ Public Class HspfOpnBlk
                                         lSB.AppendLine(lTable.TableComment)
                                     End If
                                 End If
-                                If Not (firstTable) Then
+                                If Not (lFirstTable) Then
                                     lSB.AppendLine(" ")
                                 End If
                                 If lTable.OccurIndex = 0 Then 'write out just this occurence
@@ -591,7 +568,7 @@ Public Class HspfOpnBlk
                                         If k > 1 Then
                                             t = t & ":" & k
                                         End If
-                                        ttable = lId.OpnBlk.Tables(t)
+                                        ttable = lOperation.OpnBlk.Tables(t)
                                         If ttable.OccurIndex = lGroupIndex Then
                                             j = ttable.OccurNum
                                             Exit For
@@ -607,10 +584,11 @@ Public Class HspfOpnBlk
                                 Exit For
                             End If
                         End If
-                    Next vId
+                    Next lOperation
                 End If
             End If
-        Next i
+            lFirstTable = False
+        Next lTableDef
         lSB.AppendLine("END " & pName)
         Return lSB.ToString
     End Function
