@@ -950,6 +950,57 @@ Public Class frmManDelin
         lblDefine.Text = "Indexing..."
         Me.Refresh()
 
+        'identify which fields contain the upstream and downstream reach ids
+        Dim rfield As Integer
+        Dim dfield As Integer
+        If GisUtil.IsField(StreamsLayerIndex, "RIVRCH") Then
+            rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RIVRCH")
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "RCHID") Then
+            rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RCHID")
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "COMID") Then
+            rfield = GisUtil.FieldIndex(StreamsLayerIndex, "COMID")
+        End If
+        If GisUtil.IsField(StreamsLayerIndex, "DSCSM") Then
+            dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSCSM")
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "DSRCHID") Then
+            dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSRCHID")
+        ElseIf GisUtil.IsField(StreamsLayerIndex, "TOCOMID") Then
+            dfield = GisUtil.FieldIndex(StreamsLayerIndex, "TOCOMID")
+        End If
+
+        'temporarily flag segments that have been clipped -- we'll want to know this later
+        Dim len1 As Double
+        Dim len2 As Double
+        Dim ClippedFieldIndex As Integer
+        If GisUtil.IsField(StreamsLayerIndex, "CLIPPED") Then
+            ClippedFieldIndex = GisUtil.FieldIndex(StreamsLayerIndex, "CLIPPED")
+        Else
+            'need to add it
+            ClippedFieldIndex = GisUtil.AddField(StreamsLayerIndex, "CLIPPED", 0, 10)
+        End If
+        GisUtil.StartSetFeatureValue(StreamsLayerIndex)
+        For i = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+            Dim lSearchVal As String = GisUtil.FieldValue(StreamsLayerIndex, i - 1, rfield)
+            For j = 1 To GisUtil.NumFeatures(StreamsLayerIndex)
+                If GisUtil.FieldValue(StreamsLayerIndex, j - 1, rfield) = lSearchVal And i <> j Then
+                    'this record has the same reach id, mark as a clipped segment
+                    GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, ClippedFieldIndex, i - 1, "clipped")
+                    GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, ClippedFieldIndex, j - 1, "clipped")
+                    len1 = GisUtil.FeatureLength(StreamsLayerIndex, i - 1)
+                    len2 = GisUtil.FeatureLength(StreamsLayerIndex, j - 1)
+                    If len1 < 0.05 * len2 Then
+                        'this is just a nub, mark it for deletion
+                        GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, LevelFieldIndex, i - 1, 998)
+                    End If
+                    If len2 < 0.05 * len1 Then
+                        'this is just a nub, mark it for deletion
+                        GisUtil.SetFeatureValueNoStartStop(StreamsLayerIndex, LevelFieldIndex, j - 1, 998)
+                    End If
+                End If
+            Next
+        Next i
+        GisUtil.StopSetFeatureValue(StreamsLayerIndex)
+
         'assign subbasin numbers to each reach segment
         Dim aIndex(GisUtil.NumFeatures(StreamsLayerIndex)) As Integer
         GisUtil.AssignContainingPolygons(StreamsLayerIndex, SubbasinLayerIndex, aIndex)
@@ -1037,22 +1088,7 @@ Public Class frmManDelin
             DownstreamFieldIndex = GisUtil.AddField(StreamsLayerIndex, "SUBBASINR", 1, 10)
         End If
         If DownstreamFieldIndex < minfield Then minfield = DownstreamFieldIndex
-        Dim rfield As Integer
-        Dim dfield As Integer
-        If GisUtil.IsField(StreamsLayerIndex, "RIVRCH") Then
-            rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RIVRCH")
-        ElseIf GisUtil.IsField(StreamsLayerIndex, "RCHID") Then
-            rfield = GisUtil.FieldIndex(StreamsLayerIndex, "RCHID")
-        ElseIf GisUtil.IsField(StreamsLayerIndex, "COMID") Then
-            rfield = GisUtil.FieldIndex(StreamsLayerIndex, "COMID")
-        End If
-        If GisUtil.IsField(StreamsLayerIndex, "DSCSM") Then
-            dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSCSM")
-        ElseIf GisUtil.IsField(StreamsLayerIndex, "DSRCHID") Then
-            dfield = GisUtil.FieldIndex(StreamsLayerIndex, "DSRCHID")
-        ElseIf GisUtil.IsField(StreamsLayerIndex, "TOCOMID") Then
-            dfield = GisUtil.FieldIndex(StreamsLayerIndex, "TOCOMID")
-        End If
+
         Dim rval As String
         Dim dval As String
         Dim dsubbasin As String
@@ -1405,16 +1441,22 @@ Public Class frmManDelin
             Dim lPoint As New MapWinGIS.Point
             lShape.Create(MapWinGIS.ShpfileType.SHP_POINT)
             GisUtil.EndPointsOfLine(StreamsLayerIndex, i - 1, x1, y1, x2, y2)
-            lPoint.x = x1
-            lPoint.y = y1
+            If GisUtil.FieldName(rfield, ReachLayerIndex) = "COMID" Then
+                'cheap way to see if this is nhdplus way of digitizing
+                lPoint.x = x2
+                lPoint.y = y2
+            Else
+                lPoint.x = x1
+                lPoint.y = y1
+            End If
             lShape.InsertPoint(lPoint, 0)
             success = lShapefile.EditInsertShape(lShape, lShapefile.NumShapes)
-            success = lShapefile.EditCellValue(2, lShapefile.NumShapes - 1, x1)
-            success = lShapefile.EditCellValue(3, lShapefile.NumShapes - 1, y1)
+            success = lShapefile.EditCellValue(2, lShapefile.NumShapes - 1, lPoint.x)
+            success = lShapefile.EditCellValue(3, lShapefile.NumShapes - 1, lPoint.y)
             lPoint = Nothing
             lShape = Nothing
         Next i
-        
+
         'add pcs points if checked
         Dim pcsLayerIndex As Integer
         Dim pcsFieldindex As Integer

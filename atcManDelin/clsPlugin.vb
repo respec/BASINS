@@ -82,13 +82,21 @@ Public Class PlugIn
         'on the Initialize event, then this is where you would handle it.
 
         If ItemName = DelineateMenuName & "_ManDelin" Then
-            Dim main As New frmManDelin
-            main.Initialize(pMapWin)
-            main.Show()
-            Handled = True
-            pMain = main
-            pInitialized = True
-            'TestClip()
+            Dim lCreateNew As Boolean = True
+            If Not pMain Is Nothing Then
+                If pMain.Visible = True Then
+                    pMain.BringToFront()
+                    lCreateNew = False
+                End If
+            End If
+            If lCreateNew Then
+                Dim main As New frmManDelin
+                main.Initialize(pMapWin)
+                main.Show()
+                Handled = True
+                pMain = main
+                pInitialized = True
+            End If
         End If
     End Sub
 
