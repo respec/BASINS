@@ -2,8 +2,8 @@
 Public Class atcDataSet
 
     Private Shared pNextSerial As Integer = 0 'Next serial number to be assigned
-    Private Shared pStringFormat As String = "{0} {1} {2} # {3}"
-    Private Shared pStringAttributeNames() As String = {"Scenario", "Location", "Constituent", "id"}
+    Private Shared pStringFormat As String = "{0} {1} {2}"
+    Private Shared pStringAttributeNames() As String = {"Scenario", "Location", "Constituent"}
 
     Private pSerial As Integer 'Serial number of this object
 
@@ -19,7 +19,11 @@ Public Class atcDataSet
 
     ''' <summary>Reset data attributes to an empty collection</summary>
     Public Overridable Sub Clear()
-        pAttributes = New atcDataAttributes
+        If pAttributes Is Nothing Then
+            pAttributes = New atcDataAttributes
+        Else
+            pAttributes.Clear()
+        End If
         pAttributes.Owner = Me
     End Sub
 
@@ -43,14 +47,18 @@ Public Class atcDataSet
         End Get
     End Property
 
-    ''' <summary>Formated string containing the attributes of data set in pStringAttributeNames.</summary>
+    ''' <summary>String describing this DataSet</summary>
     Public Overrides Function ToString() As String
-        Dim lLastAttribute As Integer = pStringAttributeNames.GetUpperBound(0)
-        Dim lAttrValues(lLastAttribute) As String
-        For iArg As Integer = 0 To lLastAttribute
-            lAttrValues(iArg) = pAttributes.GetFormattedValue(pStringAttributeNames(iArg), "-")
-        Next
-        Return String.Format(pStringFormat, lAttrValues)
+        Try
+            Dim lLastAttribute As Integer = pStringAttributeNames.GetUpperBound(0)
+            Dim lAttrValues(lLastAttribute) As String
+            For iArg As Integer = 0 To lLastAttribute
+                lAttrValues(iArg) = pAttributes.GetFormattedValue(pStringAttributeNames(iArg), "-")
+            Next
+            Return String.Format(pStringFormat, lAttrValues)
+        Catch ex As Exception
+            Return "# " & Serial
+        End Try
     End Function
 
     ''' <summary>Build a default format string with all arguments separated by 
