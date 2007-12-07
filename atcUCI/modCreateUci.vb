@@ -149,10 +149,10 @@ Module modCreateUci
                 End While
 
                 'create tables for each operation
-                For Each lOpn As HspfOperation In aUci.OpnSeqBlock.Opns
-                    lOpnBlk = aUci.OpnBlks.Item(lOpn.Name)
-                    lOpnBlk.Ids.Add(lOpn)
-                    lOpn.OpnBlk = lOpnBlk
+                For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
+                    lOpnBlk = aUci.OpnBlks.Item(lOperation.Name)
+                    lOpnBlk.Ids.Add(lOperation)
+                    lOperation.OpnBlk = lOpnBlk
                 Next
                 For Each lOpnBlk In aUci.OpnBlks  'perlnd, implnd, etc
                     If lOpnBlk.Count > 0 Then
@@ -804,51 +804,51 @@ ErrHandler:
     End Sub
 
     Private Sub CreateOpnsForOneSeg(ByRef aUci As HspfUci)
-        Dim UniqueNameCount As Integer
-        Dim addflag As Boolean
-        Dim newOpn As HspfOperation
-        Dim toperid As Integer
-        Dim lOpn As HspfOperation
+        Dim lUniqueNameCount As Integer
+        Dim lAddflag As Boolean
+        Dim lNewOperation As HspfOperation
+        Dim lToperId As Integer
 
         For j As Integer = 2 To 1 Step -1
-            UniqueNameCount = 0
+            lUniqueNameCount = 0
             For i As Integer = 0 To pLandUses.Count - 1
                 If pLandUses(i).Type = j Then
-                    If UniqueNameCount = 0 Then
+                    If lUniqueNameCount = 0 Then
                         'add it
-                        newOpn = New HspfOperation
-                        newOpn.Uci = aUci
-                        newOpn.Name = pLandName(j)
-                        toperid = 101
-                        pFirstSeg(j) = toperid
-                        newOpn.Id = toperid
-                        pLastSeg(j) = toperid
-                        newOpn.Description = pLandUses(i).Name
-                        aUci.OpnSeqBlock.Add(newOpn)
-                        UniqueNameCount = UniqueNameCount + 1
+                        lNewOperation = New HspfOperation
+                        lNewOperation.Uci = aUci
+                        lNewOperation.Name = pLandName(j)
+                        lToperId = 101
+                        pFirstSeg(j) = lToperId
+                        lNewOperation.Id = lToperId
+                        pLastSeg(j) = lToperId
+                        lNewOperation.Description = pLandUses(i).Name
+                        aUci.OpnSeqBlock.Add(lNewOperation)
+                        lUniqueNameCount += 1
                     Else
-                        addflag = True
-                        For Each lOpn In aUci.OpnSeqBlock.Opns
-                            If lOpn.Description = pLandUses(i).Name And lOpn.Name = pLandName(j) Then
-                                addflag = False
-                                toperid = lOpn.Id
+                        lAddflag = True
+                        For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
+                            If lOperation.Description = pLandUses(i).Name And _
+                               lOperation.Name = pLandName(j) Then
+                                lAddflag = False
+                                lToperId = lOperation.Id
                             End If
-                        Next lOpn
-                        If addflag Then
-                            UniqueNameCount = UniqueNameCount + 1
-                            newOpn = New HspfOperation
-                            newOpn.Uci = aUci
-                            newOpn.Name = pLandName(j)
-                            newOpn.Description = pLandUses(i).Name
-                            toperid = 100 + UniqueNameCount
-                            newOpn.Id = toperid
-                            pLastSeg(j) = toperid
-                            aUci.OpnSeqBlock.Add(newOpn)
+                        Next lOperation
+                        If lAddflag Then
+                            lUniqueNameCount += 1
+                            lNewOperation = New HspfOperation
+                            lNewOperation.Uci = aUci
+                            lNewOperation.Name = pLandName(j)
+                            lNewOperation.Description = pLandUses(i).Name
+                            lToperId = 100 + lUniqueNameCount
+                            lNewOperation.Id = lToperId
+                            pLastSeg(j) = lToperId
+                            aUci.OpnSeqBlock.Add(lNewOperation)
                         End If
                     End If
                     'remember what we named this land use
                     pLandUses(i).Oper = pLandName(j)
-                    pLandUses(i).Id = toperid
+                    pLandUses(i).Id = lToperId
                 End If
             Next i
         Next j
@@ -1099,61 +1099,37 @@ ErrHandler:
         aUci.OpnBlks.Item("RCHRES").AddTableForAll("BINARY-INFO", "RCHRES")
     End Sub
 
-    Private Sub setDefault(ByVal myUci As HspfUci, ByVal defUci As HspfUci)
-        Dim vOpTyp As Object, loptyp As HspfOpnBlk
-        Dim vOpn As Object, lOpn As HspfOperation, dOpn As HspfOperation
-        Dim vTab As Object, lTab As HspfTable, dTab As HspfTable
-        Dim vPar As Object
-        Dim Id&
-
-        Dim OpTyps() As Object = {"PERLND", "IMPLND", "RCHRES"}
-        For Each vOpTyp In OpTyps
-            If myUci.OpnBlks(vOpTyp).Count > 0 Then
-                loptyp = myUci.OpnBlks(vOpTyp)
-                'Debug.Print lOpTyp.Name
-                For Each vOpn In loptyp.Ids
-                    lOpn = vOpn
-                    'Debug.Print lOpn.Description
-                    Id = DefaultOpnId(lOpn, defUci)
-                    If Id > 0 Then
-                        dOpn = defUci.OpnBlks(lOpn.Name).OperFromID(Id)
-                        If Not dOpn Is Nothing Then
-                            For Each vTab In lOpn.Tables
-                                lTab = vTab
-                                If DefaultThisTable(loptyp.Name, lTab.Name) Then
-                                    If dOpn.TableExists(lTab.Name) Then
-                                        dTab = dOpn.Tables(lTab.Name)
-                                        'Debug.Print lTab.Name
-                                        For Each vPar In lTab.Parms
-                                            If DefaultThisParameter(loptyp.Name, lTab.Name, vPar.Name) Then
-                                                If vPar.Value <> vPar.Name Then
-                                                    vPar.Value = dTab.Parms(vPar.Name).Value
-                                                End If
+    Private Sub SetDefault(ByVal aUci As HspfUci, ByVal aDefaultUci As HspfUci)
+        Dim lOpTypNames() As String = {"PERLND", "IMPLND", "RCHRES"}
+        For Each lOpTypName As String In lOpTypNames
+            If aUci.OpnBlks(lOpTypName).Count > 0 Then
+                Dim lOpTyp As HspfOpnBlk = aUci.OpnBlks(lOpTypName)
+                'Logger.Dbg lOpTyp.Name
+                For Each lOperation As HspfOperation In lOpTyp.Ids
+                    'Logger.Dbg lOpn.Description
+                    Dim lOperationDefault As HspfOperation = MatchOperWithDefault(lOperation.Name, lOperation.Description, aDefaultUci)
+                    If Not lOperationDefault Is Nothing Then
+                        Logger.Dbg("Match " & lOperation.Id & ":" & lOperationDefault.Id & " " & lOperation.Description & ":" & lOperationDefault.Description)
+                        For Each lTable As HspfTable In lOperation.Tables
+                            If DefaultThisTable(lOpTyp.Name, lTable.Name) Then
+                                If lOperationDefault.TableExists(lTable.Name) Then
+                                    Dim lTableDefault As HspfTable = lOperationDefault.Tables(lTable.Name)
+                                    'Logger.Dbg lTab.Name
+                                    For Each lParm As HspfParm In lTable.Parms
+                                        If DefaultThisParameter(lOpTyp.Name, lTable.Name, lParm.Name) Then
+                                            If lParm.Value <> lParm.Name Then
+                                                lParm.Value = lTableDefault.Parms(lParm.Name).Value
                                             End If
-                                        Next vPar
-                                    End If
+                                        End If
+                                    Next lParm
                                 End If
-                            Next vTab
-                        End If
+                            End If
+                        Next lTable
                     End If
-                Next vOpn
+                Next lOperation
             End If
-        Next vOpTyp
+        Next lOpTypName
     End Sub
-
-    Private Function DefaultOpnId(ByVal lOpn As HspfOperation, ByVal defUci As HspfUci) As Long
-        Dim dOpn As HspfOperation
-        If lOpn.DefOpnId <> 0 Then
-            DefaultOpnId = lOpn.DefOpnId
-        Else
-            dOpn = matchOperWithDefault(lOpn.Name, lOpn.Description, defUci)
-            If dOpn Is Nothing Then
-                DefaultOpnId = 0
-            Else
-                DefaultOpnId = dOpn.Id
-            End If
-        End If
-    End Function
 
     Private Function DefaultThisTable(ByVal OperName$, ByVal TableName$) As Boolean
         If OperName = "PERLND" Or OperName = "IMPLND" Then
@@ -1220,49 +1196,45 @@ ErrHandler:
         End If
     End Function
 
-    Private Function matchOperWithDefault(ByVal OpTypName$, ByVal OpnDesc$, ByVal defUci As HspfUci) As HspfOperation
-        Dim vOpn As Object, lOpn As HspfOperation, ctemp$
+    Private Function MatchOperWithDefault(ByVal aOpTypName As String, _
+                                          ByVal aDescriptionDefault As String, _
+                                          ByVal aUciDefault As HspfUci) _
+                                          As HspfOperation
+        Dim lOperationMatch As HspfOperation = Nothing
 
-        For Each vOpn In defUci.OpnBlks(OpTypName).Ids
-            lOpn = vOpn
-            If lOpn.Description = OpnDesc Then
-                matchOperWithDefault = lOpn
-                Exit Function
+        For Each lOperation As HspfOperation In aUciDefault.OpnBlks(aOpTypName).Ids
+            If lOperation.Description = aDescriptionDefault Then
+                lOperationMatch = lOperation
+                Exit For
             End If
-        Next vOpn
-        'a complete match not found, look for partial
-        For Each vOpn In defUci.OpnBlks(OpTypName).Ids
-            lOpn = vOpn
-            If Len(lOpn.Description) > Len(OpnDesc) Then
-                ctemp = Left(lOpn.Description, Len(OpnDesc))
-                If ctemp = OpnDesc Then
-                    matchOperWithDefault = lOpn
-                    Exit Function
+        Next lOperation
+
+        If lOperationMatch Is Nothing Then
+            'a complete match not found, look for partial
+            For Each lOperation As HspfOperation In aUciDefault.OpnBlks(aOpTypName).Ids
+                If lOperation.Description.StartsWith(aDescriptionDefault) Then
+                    lOperationMatch = lOperation
+                    Exit For
+                ElseIf aDescriptionDefault.StartsWith(lOperation.Description) Then
+                    lOperationMatch = lOperation
+                    Exit For
+                ElseIf lOperation.Description.StartsWith(aDescriptionDefault.Substring(0, 4)) Then
+                    lOperationMatch = lOperation
+                    Exit For
                 End If
-            ElseIf Len(lOpn.Description) < Len(OpnDesc) Then
-                ctemp = Left(OpnDesc, Len(lOpn.Description))
-                If lOpn.Description = ctemp Then
-                    matchOperWithDefault = lOpn
-                    Exit Function
-                End If
-            End If
-            If Len(OpnDesc) > 4 And Len(lOpn.Description) > 4 Then
-                ctemp = Left(OpnDesc, 4)
-                If Left(lOpn.Description, 4) = ctemp Then
-                    matchOperWithDefault = lOpn
-                    Exit Function
-                End If
-            End If
-        Next vOpn
-        'not found, use first one
-        If defUci.OpnBlks(OpTypName).Count > 0 Then
-            matchOperWithDefault = defUci.OpnBlks(OpTypName).Ids(0)
-        Else
-            matchOperWithDefault = Nothing
+            Next lOperation
         End If
+
+        If lOperationMatch Is Nothing Then
+            'not found, use first one if avaluable
+            If aUciDefault.OpnBlks(aOpTypName).Count > 0 Then
+                lOperationMatch = aUciDefault.OpnBlks(aOpTypName).Ids(0)
+            End If
+        End If
+        Return lOperationMatch
     End Function
 
-    Private Sub setDefaultML(ByVal aUci As HspfUci, ByVal aDefUci As HspfUci)
+    Private Sub SetDefaultML(ByVal aUci As HspfUci, ByVal aDefUci As HspfUci)
         Dim vML As Object, dML As HspfMassLink
         Dim lMassLink As HspfMassLink
 
