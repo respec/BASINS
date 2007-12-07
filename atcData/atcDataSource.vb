@@ -6,7 +6,7 @@ Public Class atcDataSource
     Inherits atcDataPlugin
 
     Private pAttributes As atcDataAttributes
-    Private pSpecification As String
+    Private pSpecification As String = ""
     Private pFilter As String = ""
     Private pData As atcDataGroup
 
@@ -63,6 +63,22 @@ Public Class atcDataSource
             Return False
         End Get
     End Property
+
+    ''' <summary>Remove this source from memory</summary>
+    Public Overridable Sub Clear()
+        If Not pAttributes Is Nothing Then
+            pAttributes.Clear()
+            pAttributes = Nothing
+        End If
+        If Not pData Is Nothing Then
+            For Each lDataSet As atcDataSet In pData
+                lDataSet.Clear()
+            Next
+            pData.Clear()
+            pData = Nothing
+        End If
+        pSpecification = ""
+    End Sub
 
     ''' <summary>
     ''' Opens source and reads enough to determine whether it is correct type.

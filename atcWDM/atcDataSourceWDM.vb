@@ -21,12 +21,14 @@ Public Class atcDataSourceWDM
     Private pTs As Integer = 0 'default timestep, default 1 
     Private pAskAboutMissingTuTs As Boolean = True
 
-    Private Sub Clear()
-        'Specification = "<unknown>"
+    Public Overrides Sub Clear()
+        MyBase.Clear()
         pQuick = False
-
-        pDates = Nothing
-        pDates = New ArrayList
+        If pDates Is Nothing Then
+            pDates = New ArrayList
+        Else
+            pDates.Clear()
+        End If
     End Sub
 
     Public Sub New()
