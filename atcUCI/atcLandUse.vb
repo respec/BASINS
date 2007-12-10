@@ -7,7 +7,7 @@ Public Class LandUses
     Inherits KeyedCollection(Of String, LandUse)
     Protected Overrides Function GetKeyForItem(ByVal aLandUse As LandUse) As String
         Dim lKey As String
-        lKey = aLandUse.Name & ":" & aLandUse.Type & ":" & aLandUse.Reach
+        lKey = aLandUse.Description & ":" & aLandUse.Type & ":" & aLandUse.Reach
         Return lKey
     End Function
 
@@ -35,7 +35,7 @@ Public Class LandUses
                     Loop
                     If lFieldCount = 6 Then
                         'this is the normal way
-                        lLandUse.Name = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
                         lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.Reach = StrSplit(lCurrentRecord, lDelim, lQuote)
                         lLandUse.Area = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
@@ -43,7 +43,7 @@ Public Class LandUses
                         lLandUse.Distance = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                     Else
                         'if coming from old delineator might not be space delimited
-                        lLandUse.Name = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
                         If lCurrentRecord.Length > 23 Then
                             lLandUse.Distance = CSng(Mid(lCurrentRecord, lCurrentRecord.Length - 7, 8))
                             lLandUse.Slope = CSng(Mid(lCurrentRecord, lCurrentRecord.Length - 15, 8))
@@ -70,8 +70,8 @@ Public Class LandUses
 End Class
 
 Public Class LandUse
-    Public Name As String
-    Public Type As String
+    Public Description As String
+    Public Type As String  'PERLND(2) or IMPLND(1)
     Public Reach As String
     Public Area As Double
     Public Slope As Double
