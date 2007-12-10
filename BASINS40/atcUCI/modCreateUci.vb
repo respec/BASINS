@@ -455,20 +455,19 @@ ErrHandler:
     End Sub
 
     Private Sub SetInitValues(ByVal aUci As HspfUci)
-        Dim j As Integer
 
         'set init values in uci
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("PERLND").Ids
             Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
             lTable.Parms("PWATFG").Value = 1
-            Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.tag)
+            Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             If lLandUse Is Nothing Then
                 Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name)
             Else
                 lTable = lOperation.Tables.Item("GEN-INFO")
-                lTable.Parms("LSID").Value = lLandUse.Name
+                lTable.Parms("LSID").Value = lLandUse.Description
                 lTable = lOperation.Tables.Item("PWAT-PARM2")
-                If pLandUses(j).Slope > 0 Then
+                If lLandUse.Slope > 0 Then
                     lTable.Parms("SLSUR").Value = lLandUse.Slope
                 Else
                     lTable.Parms("SLSUR").Value = 0.001 'must have some slope
@@ -486,9 +485,9 @@ ErrHandler:
                 Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name)
             Else
                 lTable = lOperation.Tables.Item("GEN-INFO")
-                lTable.Parms("LSID").Value = pLandUses(j).Name
+                lTable.Parms("LSID").Value = lLandUse.Description
                 lTable = lOperation.Tables.Item("IWAT-PARM2")
-                If pLandUses(j).Slope > 0 Then
+                If lLandUse.Slope > 0 Then
                     lTable.Parms("SLSUR").Value = lLandUse.Slope
                 Else
                     lTable.Parms("SLSUR").Value = 0.001 'must have some slope
@@ -498,7 +497,7 @@ ErrHandler:
             End If
         Next lOperation
 
-        j = -1
+        Dim j As Integer = -1
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("RCHRES").Ids
             j += 1
             Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
@@ -758,14 +757,14 @@ ErrHandler:
                         pFirstSeg(j) = lToperId
                         lNewOperation.Id = lToperId
                         pLastSeg(j) = lToperId
-                        lNewOperation.Description = pLandUses(i).Name
+                        lNewOperation.Description = pLandUses(i).Description
                         lNewOperation.Tag = pLandUses(i).Reach
                         aUci.OpnSeqBlock.Add(lNewOperation)
                         lUniqueNameCount += 1
                     Else
                         lAddflag = True
                         For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
-                            If lOperation.Description = pLandUses(i).Name And _
+                            If lOperation.Description = pLandUses(i).Description And _
                                lOperation.Name = pLandName(j) Then
                                 lAddflag = False
                                 lToperId = lOperation.Id
@@ -776,7 +775,7 @@ ErrHandler:
                             lNewOperation = New HspfOperation
                             lNewOperation.Uci = aUci
                             lNewOperation.Name = pLandName(j)
-                            lNewOperation.Description = pLandUses(i).Name
+                            lNewOperation.Description = pLandUses(i).Description
                             lToperId = 100 + lUniqueNameCount
                             lNewOperation.Id = lToperId
                             pLastSeg(j) = lToperId
@@ -809,12 +808,12 @@ ErrHandler:
         'prescan to see how many perlnds and implnds per segment
         For i = 0 To pLandUses.Count - 1
             If pLandUses(i).Type = "PERLND" Then
-                If lPerlndNames.IndexFromKey(pLandUses(i).Name) = 0 Then
-                    lPerlndNames.Add(pLandUses(i).Name)
+                If lPerlndNames.IndexFromKey(pLandUses(i).Description) = 0 Then
+                    lPerlndNames.Add(pLandUses(i).Description)
                 End If
             ElseIf pLandUses(i).Type = "IMPLND" Then
-                If lImplndNames.IndexFromKey(pLandUses(i).Name) = 0 Then
-                    lImplndNames.Add(pLandUses(i).Name)
+                If lImplndNames.IndexFromKey(pLandUses(i).Description) = 0 Then
+                    lImplndNames.Add(pLandUses(i).Description)
                 End If
             End If
         Next i
@@ -859,7 +858,7 @@ ErrHandler:
                             lOpn.Name = "PERLND"
                             Dim lLandUseId As Integer = 0
                             For j = 0 To lPerlndNames.Count - 1
-                                If lPerlndNames(j - 1) = pLandUses(i).Name Then
+                                If lPerlndNames(j - 1) = pLandUses(i).Description Then
                                     'this is the land use we want
                                     lLandUseId = j
                                 End If
@@ -872,7 +871,7 @@ ErrHandler:
                                 pLastSeg(2) = lOperId
                             End If
                             lOpn.Id = lOperId
-                            lOpn.Description = pLandUses(i).Name
+                            lOpn.Description = pLandUses(i).Description
                             aUci.OpnSeqBlock.Add(lOpn)
                             'remember what we named this land use
                             pLandUses(i).Oper = "PERLND"
@@ -891,7 +890,7 @@ ErrHandler:
                             lOpn.Name = "IMPLND"
                             Dim lLandUseId As Integer = 0
                             For j = 0 To lImplndNames.Count - 1
-                                If lImplndNames(j - 1) = pLandUses(i).Name Then
+                                If lImplndNames(j - 1) = pLandUses(i).Description Then
                                     'this is the land use we want
                                     lLandUseId = j
                                 End If
@@ -904,7 +903,7 @@ ErrHandler:
                                 pLastSeg(1) = lOperId
                             End If
                             lOpn.Id = lOperId
-                            lOpn.Description = pLandUses(i).Name
+                            lOpn.Description = pLandUses(i).Description
                             aUci.OpnSeqBlock.Add(lOpn)
                             'remember what we named this land use
                             pLandUses(i).Oper = "IMPLND"
