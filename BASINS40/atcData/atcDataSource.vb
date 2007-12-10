@@ -70,12 +70,13 @@ Public Class atcDataSource
             pAttributes.Clear()
             pAttributes = Nothing
         End If
-        If Not pData Is Nothing Then
+        If pData Is Nothing Then
+            pData = New atcDataGroup
+        Else
             For Each lDataSet As atcDataSet In pData
                 lDataSet.Clear()
             Next
             pData.Clear()
-            pData = Nothing
         End If
         pSpecification = ""
     End Sub
