@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.vb" />
     <Compile Include="atcMDB.vb" />
+    <Compile Include="atcLandUse.vb" />
     <Compile Include="Hass_Ent.vb">
       <SubType>Code</SubType>
     </Compile>

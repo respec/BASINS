@@ -7,16 +7,6 @@ Imports MapWinUtility
 Imports atcUtility
 Imports atcData
 
-Friend Class LandUse
-    Public Name As String
-    Public Type As String
-    Public Reach As String
-    Public Area As Double
-    Public Slope As Double
-    Public Distance As Double
-    Public Id As Integer
-    Public Oper As String
-End Class
 Friend Class Reach
     Public Id As String
     Public Name As String
@@ -34,7 +24,7 @@ Friend Class Reach
 End Class
 
 Module modCreateUci
-    Dim pLandUses As Collection(Of LandUse)
+    Dim pLandUses As LandUses
     Dim pReaches As Collection(Of Reach)
     'channel file
     Dim chanid() As String
@@ -111,10 +101,10 @@ Module modCreateUci
             Dim lEchoFileName As String = ""
             aUci.PreScanFilesBlock(lFilesBlockStatus, lEchoFileName)
 
-            pLandUses = New Collection(Of LandUse)
-            pReaches = New Collection(Of Reach)
             Dim lReturnCode As Integer
-            Call ReadWSDFile(aWsdName, lReturnCode)
+            pLandUses = New LandUses
+            lReturnCode = pLandUses.Open(aWsdName)
+            pReaches = New Collection(Of Reach)
             Call ReadRCHFile(aWsdName, lReturnCode)
             Call ReadPTFFile(aWsdName, lReturnCode)
             Call ReadPSRFile(aWsdName, lReturnCode)
@@ -195,7 +185,7 @@ Module modCreateUci
 
                 'set default parameter values and mass links from starter
                 setDefault(aUci, lDefUci)
-                setDefaultML(aUci, lDefUci)
+                SetDefaultMassLink(aUci, lDefUci)
             End If
         End If
 
@@ -203,99 +193,51 @@ Module modCreateUci
 
     End Sub
 
-    Private Sub ReadWSDFile(ByRef aName As String, ByRef aReturnCode As Integer)
-        aReturnCode = 0
-        Dim lDelim As String = " "
-        Dim lQuote As String = """"
-
-        'read wsd file
-        Dim lFileUnit As Integer = FreeFile()
-        On Error GoTo ErrHandler
-        Dim lName As String = FilenameOnly(aName) & ".wsd"
-        FileOpen(lFileUnit, lName, OpenMode.Input)
-        Dim lStr As String = LineInput(lFileUnit) 'header line
-        Do Until EOF(lFileUnit)
-            lStr = LineInput(lFileUnit)
-            Dim lLandUse As New LandUse
-            'count the number of fields in this string
-            Dim lStrTemp As String = lStr
-            Dim lFieldCount As Integer = 0
-            Do While StrSplit(lStrTemp, lDelim, lQuote).Length > 0
-                lFieldCount += 1
-            Loop
-            If lFieldCount = 6 Then
-                'this is the normal way
-                lLandUse.Name = StrSplit(lStr, lDelim, lQuote)
-                lLandUse.Type = CInt(StrSplit(lStr, lDelim, lQuote))
-                lLandUse.Reach = StrSplit(lStr, lDelim, lQuote)
-                lLandUse.Area = CDbl(StrSplit(lStr, lDelim, lQuote))
-                lLandUse.Slope = CDbl(StrSplit(lStr, lDelim, lQuote))
-                lLandUse.Distance = CDbl(StrSplit(lStr, lDelim, lQuote))
-            Else
-                'if coming from old delineator might not be space delimited
-                lLandUse.Name = StrSplit(lStr, lDelim, lQuote)
-                If lStr.Length > 23 Then
-                    lLandUse.Distance = CSng(Mid(lStr, lStr.Length - 7, 8))
-                    lLandUse.Slope = CSng(Mid(lStr, lStr.Length - 15, 8))
-                    lLandUse.Area = CSng(Mid(lStr, lStr.Length - 23, 8))
-                End If
-                lLandUse.Type = CInt(StrSplit(lStr, lDelim, lQuote))
-                lLandUse.Reach = StrSplit(lStr, lDelim, lQuote)
-            End If
-            pLandUses.Add(lLandUse)
-        Loop
-        FileClose(lFileUnit)
-        Exit Sub
-ErrHandler:
-        Logger.Msg("Problem reading file " & lName, "Create Problem")
-        aReturnCode = 1
-    End Sub
-
-    Private Sub ReadRCHFile(ByRef newName As String, ByRef ret As Integer)
-        Dim tname, quote, delim, lstr, tstr As String
+    Private Sub ReadRCHFile(ByRef aName As String, ByRef aReturnCode As Integer)
+        Dim tname, quote, lstr, tstr As String
         Dim i, amax As Integer
 
-        ret = 0
-        delim = " "
+        aReturnCode = 0
+        Dim lSpace As String = " "
         quote = """"
 
         'read rch file
         i = FreeFile()
         On Error GoTo ErrHandler
-        tname = Left(newName, Len(newName) - 3) & "rch"
+        tname = FilenameNoExt(aName) & ".rch"
         FileOpen(i, tname, OpenMode.Input)
         lstr = LineInput(i) 'header line
         Do Until EOF(i)
             lstr = LineInput(i)
             Dim lReach As New Reach
-            lReach.Id = StrSplit(lstr, delim, quote)
-            lReach.Name = StrSplit(lstr, delim, quote)
-            lReach.WsId = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            lReach.NExits = CInt(StrSplit(lstr, delim, quote))
-            tstr = StrSplit(lstr, delim, quote)
-            lReach.Type = StrSplit(lstr, delim, quote)
-            lReach.Length = CDbl(StrSplit(lstr, delim, quote))
-            lReach.DeltH = CDbl(StrSplit(lstr, delim, quote))
-            lReach.Elev = CDbl(StrSplit(lstr, delim, quote))
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            lReach.DownID = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            lReach.Depth = CDbl(StrSplit(lstr, delim, quote))
-            lReach.Width = CDbl(StrSplit(lstr, delim, quote))
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            tstr = StrSplit(lstr, delim, quote)
-            lReach.Manning = CDbl(StrSplit(lstr, delim, quote))
+            lReach.Id = StrSplit(lstr, lSpace, quote)
+            lReach.Name = StrSplit(lstr, lSpace, quote)
+            lReach.WsId = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            lReach.NExits = CInt(StrSplit(lstr, lSpace, quote))
+            tstr = StrSplit(lstr, lSpace, quote)
+            lReach.Type = StrSplit(lstr, lSpace, quote)
+            lReach.Length = CDbl(StrSplit(lstr, lSpace, quote))
+            lReach.DeltH = CDbl(StrSplit(lstr, lSpace, quote))
+            lReach.Elev = CDbl(StrSplit(lstr, lSpace, quote))
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            lReach.DownID = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            lReach.Depth = CDbl(StrSplit(lstr, lSpace, quote))
+            lReach.Width = CDbl(StrSplit(lstr, lSpace, quote))
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            tstr = StrSplit(lstr, lSpace, quote)
+            lReach.Manning = CDbl(StrSplit(lstr, lSpace, quote))
             lReach.Order = pReaches.Count
             pReaches.Add(lReach)
         Loop
@@ -303,7 +245,7 @@ ErrHandler:
         Exit Sub
 ErrHandler:
         Logger.Msg("Problem reading file " & tname, "Create Problem")
-        ret = 2
+        aReturnCode = 2
     End Sub
 
     Public Sub ReadPTFFile(ByRef newName As String, ByRef ret As Integer)
@@ -1131,69 +1073,74 @@ ErrHandler:
         Next lOpTypName
     End Sub
 
-    Private Function DefaultThisTable(ByVal OperName$, ByVal TableName$) As Boolean
-        If OperName = "PERLND" Or OperName = "IMPLND" Then
-            If TableName = "ACTIVITY" Or _
-               TableName = "PRINT-INFO" Or _
-               TableName = "GEN-INFO" Or _
-               TableName = "PWAT-PARM5" Then
-                DefaultThisTable = False
-            ElseIf Left(TableName, 4) = "QUAL" Then
-                DefaultThisTable = False
+    Private Function DefaultThisTable(ByVal aOperationName As String, ByVal aTableName As String) As Boolean
+        Dim lDefaultThisTable As Boolean
+        If aOperationName = "PERLND" Or aOperationName = "IMPLND" Then
+            If aTableName = "ACTIVITY" Or _
+               aTableName = "PRINT-INFO" Or _
+               aTableName = "GEN-INFO" Or _
+               aTableName = "PWAT-PARM5" Then
+                lDefaultThisTable = False
+            ElseIf aTableName.StartsWith("QUAL") Then
+                lDefaultThisTable = False
             Else
-                DefaultThisTable = True
+                lDefaultThisTable = True
             End If
-        ElseIf OperName = "RCHRES" Then
-            If TableName = "ACTIVITY" Or _
-               TableName = "PRINT-INFO" Or _
-               TableName = "GEN-INFO" Or _
-               TableName = "HYDR-PARM1" Then
-                DefaultThisTable = False
-            ElseIf Left(TableName, 3) = "GQ-" Then
-                DefaultThisTable = False
+        ElseIf aOperationName = "RCHRES" Then
+            If aTableName = "ACTIVITY" Or _
+               aTableName = "PRINT-INFO" Or _
+               aTableName = "GEN-INFO" Or _
+               aTableName = "HYDR-PARM1" Then
+                lDefaultThisTable = False
+            ElseIf aTableName.StartsWith("GQ-") Then
+                lDefaultThisTable = False
             Else
-                DefaultThisTable = True
+                lDefaultThisTable = True
             End If
         Else
-            DefaultThisTable = False
+            lDefaultThisTable = False
         End If
+        Return lDefaultThisTable
     End Function
 
-    Private Function DefaultThisParameter(ByVal OperName$, ByVal TableName$, ByVal parmname$) As Boolean
-        DefaultThisParameter = True
-        If OperName = "PERLND" Then
-            If TableName = "PWAT-PARM2" Then
-                If parmname = "SLSUR" Or parmname = "LSUR" Then
-                    DefaultThisParameter = False
+    Private Function DefaultThisParameter(ByVal aOperationName As String, _
+                                          ByVal aTableName As String, _
+                                          ByVal aParmName As String) As Boolean
+        Dim lDefaultThisParameter As Boolean = True
+        If aOperationName = "PERLND" Then
+            If aTableName = "PWAT-PARM2" Then
+                If aParmName = "SLSUR" Or aParmName = "LSUR" Then
+                    lDefaultThisParameter = False
                 End If
-            ElseIf TableName = "NQUALS" Then
-                If parmname = "NQUAL" Then
-                    DefaultThisParameter = False
-                End If
-            End If
-        ElseIf OperName = "IMPLND" Then
-            If TableName = "IWAT-PARM2" Then
-                If parmname = "SLSUR" Or parmname = "LSUR" Then
-                    DefaultThisParameter = False
-                End If
-            ElseIf TableName = "NQUALS" Then
-                If parmname = "NQUAL" Then
-                    DefaultThisParameter = False
+            ElseIf aTableName = "NQUALS" Then
+                If aParmName = "NQUAL" Then
+                    lDefaultThisParameter = False
                 End If
             End If
-        ElseIf OperName = "RCHRES" Then
-            If TableName = "HYDR-PARM2" Then
-                If parmname = "LEN" Or _
-                   parmname = "DELTH" Or _
-                   parmname = "FTBUCI" Then
-                    DefaultThisParameter = False
+        ElseIf aOperationName = "IMPLND" Then
+            If aTableName = "IWAT-PARM2" Then
+                If aParmName = "SLSUR" Or aParmName = "LSUR" Then
+                    lDefaultThisParameter = False
                 End If
-            ElseIf TableName = "GQ-GENDATA" Then
-                If parmname = "NGQUAL" Then
-                    DefaultThisParameter = False
+            ElseIf aTableName = "NQUALS" Then
+                If aParmName = "NQUAL" Then
+                    lDefaultThisParameter = False
+                End If
+            End If
+        ElseIf aOperationName = "RCHRES" Then
+            If aTableName = "HYDR-PARM2" Then
+                If aParmName = "LEN" Or _
+                   aParmName = "DELTH" Or _
+                   aParmName = "FTBUCI" Then
+                    lDefaultThisParameter = False
+                End If
+            ElseIf aTableName = "GQ-GENDATA" Then
+                If aParmName = "NGQUAL" Then
+                    lDefaultThisParameter = False
                 End If
             End If
         End If
+        Return lDefaultThisParameter
     End Function
 
     Private Function MatchOperWithDefault(ByVal aOpTypName As String, _
@@ -1234,22 +1181,24 @@ ErrHandler:
         Return lOperationMatch
     End Function
 
-    Private Sub SetDefaultML(ByVal aUci As HspfUci, ByVal aDefUci As HspfUci)
-        Dim vML As Object, dML As HspfMassLink
+    Private Sub SetDefaultMassLink(ByVal aUci As HspfUci, ByVal aDefUci As HspfUci)
         Dim lMassLink As HspfMassLink
 
-        For Each vML In aDefUci.MassLinks
-            dML = vML
-            If dML.Source.VolName = "PERLND" And dML.Source.Member = "PERO" Then
-            ElseIf dML.Source.VolName = "IMPLND" And dML.Source.Member = "SURO" Then
-            ElseIf dML.Source.VolName = "RCHRES" And dML.Source.Group = "ROFLOW" Then
-            Else
-                'add the other ones
-                lMassLink = New HspfMassLink
-                lMassLink = dML
-                aUci.MassLinks.Add(lMassLink)
-            End If
-        Next vML
+        For Each lMassLinkExist As HspfMassLink In aDefUci.MassLinks
+            With lMassLinkExist.Source
+                If .VolName = "PERLND" And _
+                   .Member = "PERO" Then
+                ElseIf .VolName = "IMPLND" And _
+                       .Member = "SURO" Then
+                ElseIf .VolName = "RCHRES" And _
+                       .Group = "ROFLOW" Then
+                Else 'add the other ones
+                    lMassLink = New HspfMassLink
+                    lMassLink = lMassLinkExist
+                    aUci.MassLinks.Add(lMassLink)
+                End If
+            End With
+        Next lMassLinkExist
 
     End Sub
 

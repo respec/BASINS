@@ -1,102 +1,93 @@
 Option Strict Off
 Option Explicit On
 
+Imports System.IO
+
 Module modUCIRecords
 
-    Private uciRec() As String
-    Private uciRecCnt As Integer
+    Private pUciRec As ArrayList
 
     Public Sub ReadUCIRecords(ByRef aFileName As String)
-        Dim lFileUnit As Integer
         Dim lCurrentRecord As String
+        Dim lStreamReader As New StreamReader(aFileName)
 
-        lFileUnit = FreeFile()
-        FileOpen(lFileUnit, aFileName, OpenMode.Input)
-        uciRecCnt = 0
-        ReDim uciRec(500)
-        Do Until EOF(lFileUnit)
-            lCurrentRecord = LineInput(lFileUnit)
-            uciRecCnt = uciRecCnt + 1
-            If UBound(uciRec) < uciRecCnt Then
-                ReDim Preserve uciRec(uciRecCnt * 2)
+        pUciRec = New ArrayList
+        Do
+            lCurrentRecord = lStreamReader.ReadLine
+            If lCurrentRecord Is Nothing Then
+                Exit Do
             End If
-            uciRec(uciRecCnt) = lCurrentRecord
+            pUciRec.Add(lCurrentRecord.TrimEnd)
         Loop
-        ReDim Preserve uciRec(uciRecCnt)
-        FileClose(lFileUnit)
     End Sub
 
     Public Function GetUCIRecord(ByRef aIndex As Integer) As String
-        If aIndex >= 0 And aIndex <= uciRec.GetUpperBound(0) Then
-            Return uciRec(aIndex)
+        If aIndex >= 0 And aIndex < pUciRec.Count Then
+            Return pUciRec(aIndex)
         Else
             Return Nothing
         End If
     End Function
 
-    Public Sub GetNextRecordFromBlock(ByRef blockname As String, ByRef retkey As Integer, ByRef cbuff As String, ByRef rectyp As Integer, ByRef retcod As Integer)
-        Dim i, ilen As Integer
+    Public Sub GetNextRecordFromBlock(ByRef aBlockName As String, _
+                                      ByRef aRecordIndex As Integer, _
+                                      ByRef aRecord As String, _
+                                      ByRef aRecordType As Integer, _
+                                      ByRef aReturnCode As Integer)
+        Dim lRecordIndex As Integer = -1
 
-        If retkey = -1 Then
-            For i = 1 To uciRecCnt
-                ilen = Len(blockname)
-                If Len(uciRec(i)) >= ilen Then
-                    If Left(uciRec(i), ilen) = blockname Then
-                        'found start
-                        retkey = i
-                        Exit For
-                    End If
+        If aRecordIndex = -1 Then 'find first record of block
+            For Each lUciRec As String In pUciRec
+                lRecordIndex += 1
+                If lUciRec.StartsWith(aBlockName) Then 'found start
+                    aRecordIndex = lRecordIndex
+                    Exit For
                 End If
-            Next i
-            retcod = 10
+            Next lUciRec
+            aReturnCode = 10
         End If
+
         'start at retkey+1
-        If retkey > -1 Then
-            For i = retkey + 1 To uciRecCnt
-                If Trim(uciRec(i)) = "END " & blockname Then
-                    retkey = 0
-                    retcod = 10
-                    Exit For
-                End If
-                If InStr(1, uciRec(i), "***") = 0 And Len(Trim(uciRec(i))) > 0 Then
-                    'found a real line of this block
-                    retkey = i
-                    cbuff = uciRec(i)
-                    rectyp = 0
-                    retcod = 2
-                    Exit For
-                ElseIf InStr(1, uciRec(i), "***") > 0 Then
-                    'found comment
-                    retkey = i
-                    cbuff = uciRec(i)
-                    rectyp = -1
-                    retcod = 2
-                    Exit For
-                ElseIf Len(Trim(uciRec(i))) = 0 And blockname <> "FTABLES" Then
-                    'found blank line
-                    retkey = i
-                    cbuff = ""
-                    rectyp = -2
-                    retcod = 2
-                    Exit For
-                End If
-            Next i
+        If aRecordIndex > -1 Then
+            aRecordIndex += 1
+            Dim lUciRec As String = pUciRec(aRecordIndex)
+            If lUciRec = "END " & aBlockName Then
+                aRecordIndex = 0
+                aReturnCode = 10
+            ElseIf lUciRec.Length = 0 And _
+                   aBlockName <> "FTABLES" Then
+                'found blank line
+                aRecord = ""
+                aRecordType = -2
+                aReturnCode = 2
+            ElseIf lUciRec.IndexOf("***") > 0 Then
+                'found comment
+                aRecord = pUciRec(aRecordIndex)
+                aRecordType = -1
+                aReturnCode = 2
+            Else 'found a real line of this block
+                aRecord = lUciRec
+                aRecordType = 0
+                aReturnCode = 2
+            End If
         End If
-        If retkey = uciRecCnt Then
-            retcod = 0
+        If aRecordIndex = pUciRec.Count - 1 Then
+            aReturnCode = 0
         End If
     End Sub
 
-    Public Sub StartingRecordofOperationTable(ByRef opname As String, ByRef kwd As String, ByRef srec As Integer, ByRef noccur As Integer)
-        Dim ostart, i, ilen, oend As Integer
-
+    Public Sub StartingRecordofOperationTable(ByRef aOperationName As String, _
+                                              ByRef aKeyword As String, _
+                                              ByRef srec As Integer, _
+                                              ByRef noccur As Integer)
+        Dim ostart, i, oend As Integer
+        Dim lOperationNameLength As Integer = aOperationName.Length
         srec = 0
         noccur = 0
         ostart = 0
-        For i = 1 To uciRecCnt
-            ilen = Len(opname)
-            If Len(uciRec(i)) >= ilen Then
-                If Left(uciRec(i), ilen) = opname Then
+        For i = 0 To pUciRec.Count - 1
+            If Len(pUciRec(i)) >= lOperationNameLength Then
+                If Left(pUciRec(i), lOperationNameLength) = aOperationName Then
                     'found start of this operation type block
                     ostart = i
                     Exit For
@@ -106,10 +97,10 @@ Module modUCIRecords
 
         oend = 0
         If ostart > 0 Then
-            For i = ostart + 1 To uciRecCnt
-                ilen = Len("END " & opname)
-                If Len(uciRec(i)) >= ilen Then
-                    If Left(uciRec(i), ilen) = "END " & opname Then
+            For i = ostart + 1 To pUciRec.Count - 1
+                lOperationNameLength = Len("END " & aOperationName)
+                If Len(pUciRec(i)) >= lOperationNameLength Then
+                    If Left(pUciRec(i), lOperationNameLength) = "END " & aOperationName Then
                         'found end of this operation type block
                         oend = i
                         Exit For
@@ -120,11 +111,11 @@ Module modUCIRecords
 
         If ostart > 0 And oend > 0 Then
             For i = ostart + 1 To oend
-                ilen = Len("  " & kwd)
-                If Len(uciRec(i)) >= ilen And InStr(1, uciRec(i), "***") = 0 Then
+                lOperationNameLength = Len("  " & aKeyword)
+                If Len(pUciRec(i)) >= lOperationNameLength And InStr(1, pUciRec(i), "***") = 0 Then
                     'If Left(uciRec(i), ilen) = "  " & kwd Then
                     'pbd -- distinguish between soil-data and soil-data2 for instance
-                    If RTrim(Left(uciRec(i), ilen + 1)) = "  " & kwd Then
+                    If RTrim(Left(pUciRec(i), lOperationNameLength + 1)) = "  " & aKeyword Then
                         'found start of this table
                         If srec = 0 Then
                             srec = i
@@ -141,10 +132,10 @@ Module modUCIRecords
 
         If noccur > 1 And initfg = 1 Then
             'first time in, need to find start of the next one of these tables
-            For i = srec + 1 To uciRecCnt
+            For i = srec + 1 To pUciRec.Count - 1
                 ilen = Len("  " & tablename)
-                If Len(uciRec(i)) >= ilen And InStr(1, uciRec(i), "***") = 0 Then
-                    If Left(uciRec(i), ilen) = "  " & tablename Then
+                If Len(pUciRec(i)) >= ilen And InStr(1, pUciRec(i), "***") = 0 Then
+                    If Left(pUciRec(i), ilen) = "  " & tablename Then
                         'found start of this table
                         'pbd 9/04 always want next occur
                         srec = i
@@ -154,37 +145,37 @@ Module modUCIRecords
             Next i
         End If
 
-        For i = srec + 1 To uciRecCnt
-            If RTrim(uciRec(i)) = "  END " & tablename Then
+        For i = srec + 1 To pUciRec.Count - 1
+            If RTrim(pUciRec(i)) = "  END " & tablename Then
                 retcod = 10
                 Exit For
             End If
-            If InStr(1, uciRec(i), "***") = 0 And Len(Trim(uciRec(i))) > 0 Then
+            If InStr(1, pUciRec(i), "***") = 0 And Len(Trim(pUciRec(i))) > 0 Then
                 'found a real line of this block
                 srec = i
-                cbuff = uciRec(i)
+                cbuff = pUciRec(i)
                 rectyp = 0
                 retcod = 2
                 Exit For
-            ElseIf InStr(1, uciRec(i), "***") > 0 Then
+            ElseIf InStr(1, pUciRec(i), "***") > 0 Then
                 'found comment
                 srec = i
-                cbuff = uciRec(i)
+                cbuff = pUciRec(i)
                 rectyp = -1
                 retcod = 3
                 Exit For
             End If
         Next i
 
-        If srec = uciRecCnt Then
+        If srec = pUciRec.Count - 1 Then
             retcod = 0
         End If
     End Sub
 
     Public Function GetCommentBeforeBlock(ByRef aBlockName As String) As String
         Dim lStartRecordIndex As Integer = -1
-        For lRecordIndex As Integer = 1 To uciRecCnt
-            If uciRec(lRecordIndex).StartsWith(aBlockName) Then 'found start of block
+        For lRecordIndex As Integer = 0 To pUciRec.Count - 1
+            If pUciRec(lRecordIndex).StartsWith(aBlockName) Then 'found start of block
                 lStartRecordIndex = lRecordIndex
                 Exit For
             End If
@@ -193,17 +184,17 @@ Module modUCIRecords
         Dim lComment As String = ""
         If lStartRecordIndex > 1 Then
             For lRecordIndex As Integer = lStartRecordIndex - 1 To 1 Step -1
-                If uciRec(lRecordIndex).Trim.Length = 0 Then 'found blank line
+                If pUciRec(lRecordIndex).Trim.Length = 0 Then 'found blank line
                     If lComment.Length = 0 Then
                         lComment = " "
                     Else
                         lComment = vbCrLf & lComment
                     End If
-                ElseIf uciRec(lRecordIndex).IndexOf("***") > -1 Then 'found comment
+                ElseIf pUciRec(lRecordIndex).IndexOf("***") > -1 Then 'found comment
                     If lComment.Length = 0 Then
-                        lComment = uciRec(lRecordIndex)
+                        lComment = pUciRec(lRecordIndex)
                     Else
-                        lComment = uciRec(lRecordIndex) & vbCrLf & lComment
+                        lComment = pUciRec(lRecordIndex) & vbCrLf & lComment
                     End If
                 Else 'something on this line and its not a comment
                     Exit For
@@ -223,8 +214,8 @@ Module modUCIRecords
         If aThisOccur > 1 Then
             lRecordKey = -1
             lOccurCount = 1
-            For i As Integer = aStartRecord + 1 To uciRecCnt
-                If aTableName.Trim = uciRec(i).Trim Then
+            For i As Integer = aStartRecord + 1 To pUciRec.Count - 1
+                If aTableName.Trim = pUciRec(i).Trim Then
                     'found another occurence
                     lOccurCount += 1
                     If lOccurCount = aThisOccur Then
@@ -238,21 +229,21 @@ Module modUCIRecords
         'start at retkey+1
         If lRecordKey > 0 Then
             For lRecordIndex As Integer = lRecordKey - 1 To 0 Step -1
-                If uciRec(lRecordIndex).Trim.Length = 0 Then 'found blank line
+                If pUciRec(lRecordIndex).Trim.Length = 0 Then 'found blank line
                     'dont tack it on if the preceeding line is real
                     If lComment.Length = 0 Then
                         lComment = " "
                     Else
                         lComment = vbCrLf & lComment
                     End If
-                ElseIf uciRec(lRecordIndex).IndexOf("***") = -1 Then
+                ElseIf pUciRec(lRecordIndex).IndexOf("***") = -1 Then
                     'something on this line and its not a comment
                     Exit For
                 Else 'found comment
                     If lComment.Length = 0 Then
-                        lComment = uciRec(lRecordIndex)
+                        lComment = pUciRec(lRecordIndex)
                     Else
-                        lComment = uciRec(lRecordIndex) & vbCrLf & lComment
+                        lComment = pUciRec(lRecordIndex) & vbCrLf & lComment
                     End If
                 End If
             Next lRecordIndex
@@ -290,8 +281,8 @@ Module modUCIRecords
     Public Sub SaveBlockOrder(ByRef aOrder As ArrayList)
         Dim lOrder As New ArrayList(20)
         Dim lConnectionFound As Boolean
-        For lRecordIndex As Integer = 1 To uciRecCnt
-            Dim lBlock As String = uciRec(lRecordIndex).Trim
+        For lRecordIndex As Integer = 0 To pUciRec.Count - 1
+            Dim lBlock As String = pUciRec(lRecordIndex).Trim
             Select Case lBlock
                 Case "GLOBAL", "FILES", "OPN SEQUENCE", "PERLND", "IMPLND", _
                      "RCHRES", "FTABLES", "COPY", "PLTGEN", "DISPLY", _
