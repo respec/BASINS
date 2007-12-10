@@ -36,6 +36,7 @@ Public Class HspfOperation
     Private pComment As String = ""
     Private pSerial As Integer
     Private pDefOpnId As Integer
+    Private pTag As String = ""
 
     Public ReadOnly Property EditControlName() As String
         Get
@@ -92,6 +93,15 @@ Public Class HspfOperation
         End Get
         Set(ByVal Value As Integer)
             pId = Value
+        End Set
+    End Property
+
+    Public Property Tag() As String
+        Get
+            Return pTag
+        End Get
+        Set(ByVal value As String)
+            pTag = value
         End Set
     End Property
 
