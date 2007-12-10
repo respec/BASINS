@@ -461,47 +461,41 @@ ErrHandler:
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("PERLND").Ids
             Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
             lTable.Parms("PWATFG").Value = 1
-            j = 0
-            Do While j <= pLandUses.Count
-                If lOperation.Id = pLandUses(j).Id And pLandUses(j).Oper = "PERLND" Then
-                    lTable = lOperation.Tables.Item("GEN-INFO")
-                    lTable.Parms("LSID").Value = pLandUses(j).Name
-                    lTable = lOperation.Tables.Item("PWAT-PARM2")
-                    If pLandUses(j).Slope > 0 Then
-                        lTable.Parms("SLSUR").Value = pLandUses(j).Slope
-                    Else
-                        lTable.Parms("SLSUR").Value = 0.001 'must have some slope
-                    End If
-                    'default lsur based on slsur
-                    lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value)
-                    Exit Do
+            Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.tag)
+            If lLandUse Is Nothing Then
+                Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name)
+            Else
+                lTable = lOperation.Tables.Item("GEN-INFO")
+                lTable.Parms("LSID").Value = lLandUse.Name
+                lTable = lOperation.Tables.Item("PWAT-PARM2")
+                If pLandUses(j).Slope > 0 Then
+                    lTable.Parms("SLSUR").Value = lLandUse.Slope
                 Else
-                    j += 1
+                    lTable.Parms("SLSUR").Value = 0.001 'must have some slope
                 End If
-            Loop
+                'default lsur based on slsur
+                lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value)
+            End If
         Next lOperation
 
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("IMPLND").Ids
             Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
             lTable.Parms("IWATFG").Value = 1
-            j = 0
-            Do While j < pLandUses.Count
-                If lOperation.Id = pLandUses(j).Id And pLandUses(j).Oper = "IMPLND" Then
-                    lTable = lOperation.Tables.Item("GEN-INFO")
-                    lTable.Parms("LSID").Value = pLandUses(j).Name
-                    lTable = lOperation.Tables.Item("IWAT-PARM2")
-                    If pLandUses(j).Slope > 0 Then
-                        lTable.Parms("SLSUR").Value = pLandUses(j).Slope
-                    Else
-                        lTable.Parms("SLSUR").Value = 0.001 'must have some slope
-                    End If
-                    'default lsur based on slsur
-                    lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value)
-                    Exit Do
+            Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
+            If lLandUse Is Nothing Then
+                Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name)
+            Else
+                lTable = lOperation.Tables.Item("GEN-INFO")
+                lTable.Parms("LSID").Value = pLandUses(j).Name
+                lTable = lOperation.Tables.Item("IWAT-PARM2")
+                If pLandUses(j).Slope > 0 Then
+                    lTable.Parms("SLSUR").Value = lLandUse.Slope
                 Else
-                    j += 1
+                    lTable.Parms("SLSUR").Value = 0.001 'must have some slope
                 End If
-            Loop
+                'default lsur based on slsur
+                lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value)
+            End If
         Next lOperation
 
         j = -1
@@ -611,7 +605,7 @@ ErrHandler:
                             lConnection.Target.VolId = CInt(pReaches(pReaches(k).Order).Id)
                         End If
                     Next k
-                    lConnection.MassLink = pLandUses(j).Type
+                    lConnection.MassLink = TypeId(pLandUses(j).Type)
                     newUci.Connections.Add(lConnection)
                 End If
             Next j
@@ -754,7 +748,7 @@ ErrHandler:
         For j As Integer = 2 To 1 Step -1
             lUniqueNameCount = 0
             For i As Integer = 0 To pLandUses.Count - 1
-                If pLandUses(i).Type = j Then
+                If TypeId(pLandUses(i).Type) = j Then
                     If lUniqueNameCount = 0 Then
                         'add it
                         lNewOperation = New HspfOperation
@@ -765,6 +759,7 @@ ErrHandler:
                         lNewOperation.Id = lToperId
                         pLastSeg(j) = lToperId
                         lNewOperation.Description = pLandUses(i).Name
+                        lNewOperation.Tag = pLandUses(i).Reach
                         aUci.OpnSeqBlock.Add(lNewOperation)
                         lUniqueNameCount += 1
                     Else
@@ -785,6 +780,7 @@ ErrHandler:
                             lToperId = 100 + lUniqueNameCount
                             lNewOperation.Id = lToperId
                             pLastSeg(j) = lToperId
+                            lNewOperation.Tag = pLandUses(i).Reach
                             aUci.OpnSeqBlock.Add(lNewOperation)
                         End If
                     End If
@@ -796,6 +792,15 @@ ErrHandler:
         Next j
     End Sub
 
+    Private Function TypeId(ByVal aType As String) As Integer
+        Dim lTypeId As Integer = 0
+        Select Case aType
+            Case "PERLND" : lTypeId = 2
+            Case "IMPLND" : ltypeId = 1
+        End Select
+        Return lTypeId
+    End Function
+
     Private Sub CreateOpnsForMultSegs(ByRef aUci As HspfUci)
         Dim j, i, k As Integer
         Dim lImplndNames As New atcCollection
@@ -803,13 +808,11 @@ ErrHandler:
 
         'prescan to see how many perlnds and implnds per segment
         For i = 0 To pLandUses.Count - 1
-            If pLandUses(i).Type = 2 Then
-                'perlnd
+            If pLandUses(i).Type = "PERLND" Then
                 If lPerlndNames.IndexFromKey(pLandUses(i).Name) = 0 Then
                     lPerlndNames.Add(pLandUses(i).Name)
                 End If
-            ElseIf pLandUses(i).Type = 1 Then
-                'implnd
+            ElseIf pLandUses(i).Type = "IMPLND" Then
                 If lImplndNames.IndexFromKey(pLandUses(i).Name) = 0 Then
                     lImplndNames.Add(pLandUses(i).Name)
                 End If
@@ -849,7 +852,7 @@ ErrHandler:
                     'look to see if this landuse rec goes to this reach
                     If pLandUses(i).Reach = pReaches(k).Id Then
                         'it does
-                        If pLandUses(i).Type = 2 Then
+                        If pLandUses(i).Type = "PERLND" Then
                             'add this perlnd oper
                             Dim lOpn As New HspfOperation
                             lOpn.Uci = aUci
@@ -881,7 +884,7 @@ ErrHandler:
                 'now add implnds
                 For i = 0 To pLandUses.Count - 1
                     If pLandUses(i).Reach = pReaches(k).Id Then
-                        If pLandUses(i).Type = 1 Then
+                        If pLandUses(i).Type = "IMPLND" Then
                             'add this implnd oper
                             Dim lOpn As New HspfOperation
                             lOpn.Uci = aUci

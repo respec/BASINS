@@ -6,7 +6,9 @@ Imports atcUtility
 Public Class LandUses
     Inherits KeyedCollection(Of String, LandUse)
     Protected Overrides Function GetKeyForItem(ByVal aLandUse As LandUse) As String
-        Return aLandUse.Name & ":" & aLandUse.Type & ":" & aLandUse.Reach
+        Dim lKey As String
+        lKey = aLandUse.Name & ":" & aLandUse.Type & ":" & aLandUse.Reach
+        Return lKey
     End Function
 
     Public Function Open(ByVal aFileName As String) As Integer
@@ -50,6 +52,11 @@ Public Class LandUses
                         lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.Reach = StrSplit(lCurrentRecord, lDelim, lQuote)
                     End If
+                    Select Case lLandUse.Type
+                        Case 1 : lLandUse.Type = "IMPLND"
+                        Case 2 : lLandUse.Type = "PERLND"
+                        Case Else : lLandUse.Type = "Unknown"
+                    End Select
                     Me.Add(lLandUse)
                 End If
             Loop
