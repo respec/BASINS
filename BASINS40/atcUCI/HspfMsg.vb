@@ -19,7 +19,9 @@ Imports MapWinUtility
     'End Property
 
     Public Sub Open(ByVal aFilename As String)
-        If Len(aFilename) = 0 Then aFilename = "HSPFmsg.mdb"
+        If aFilename.Length = 0 Then
+            aFilename = "HSPFmsg.mdb"
+        End If
         If Not IO.File.Exists(aFilename) Then
             aFilename = GetSetting("HSPF", "MessageMDB", "Path")
             If Not IO.File.Exists(aFilename) Then
@@ -45,7 +47,7 @@ Imports MapWinUtility
         Dim lSectionFieldID As Integer = lSecTable.Columns.IndexOf("ID")
         Dim lSectionFieldName As Integer = lSecTable.Columns.IndexOf("Name")
         Dim lSectionFieldBlockID As Integer = lSecTable.Columns.IndexOf("BlockID")
-        Dim critSection As String
+        Dim lCriticalSection As String
         Dim lTables As New Collection
         Dim lBlkTables As New Collection
 
@@ -67,7 +69,6 @@ Imports MapWinUtility
         Dim lTSMember As HspfTSMemberDef
 
         Dim lNumeric As Boolean
-        'Dim s As String
 
         Dim lBlkCount As Integer = lBlkTable.Rows.Count
         Dim lBlkNow As Integer
@@ -90,7 +91,7 @@ Imports MapWinUtility
             lSections = New Collection
             lBlkTables = Nothing
             lBlkTables = New Collection
-            critSection = "BlockID = " & CStr(lBlock.Id)
+            lCriticalSection = "BlockID = " & CStr(lBlock.Id)
             For Each lSecRow As DataRow In lSecTable.Rows
                 If lSecRow.Item(lSectionFieldBlockID) = lBlock.Id Then
                     lSection = New HspfSectionDef
@@ -120,7 +121,6 @@ Imports MapWinUtility
                             Else
                                 ltable.OccurGroup = lTabRow.Item(8)
                             End If
-                            'UPGRADE_NOTE: Object lParms may not be destroyed until it is garbage collected. Click for more: 'ms-help://MS.VSExpressCC.v80/dv_commoner/local/redirect.htm?keyword="6E35BFF6-CD74-4B09-9689-3E1A43DF8969"'
                             lParms = Nothing
                             lParms = New Collection
 
@@ -285,7 +285,7 @@ Imports MapWinUtility
 
     Public Property Name() As String
         Get
-            Name = pMsgFileName
+            Return pMsgFileName
         End Get
         Set(ByVal newValue As String)
             pMsgFileName = newValue
@@ -294,13 +294,13 @@ Imports MapWinUtility
 
     Public ReadOnly Property BlockDefs() As Collection
         Get 'of HspfBlockDef
-            BlockDefs = pBlockDefs
+            Return pBlockDefs
         End Get
     End Property
 
     Public ReadOnly Property TSGroupDefs() As Collection
         Get 'of HspfTSGroupDef
-            TSGroupDefs = pTSGroupDefs
+            Return pTSGroupDefs
         End Get
     End Property
 

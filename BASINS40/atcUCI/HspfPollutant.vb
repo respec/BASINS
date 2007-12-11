@@ -1,85 +1,41 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
-<System.Runtime.InteropServices.ProgId("HspfPollutant_NET.HspfPollutant")> _
 Public Class HspfPollutant
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-
-    Private pName As String
-    Private pId As Integer
-    Private pIndex As Integer
-    Private pModelType As String
     Private pTables As Collection
     Private pMassLinks As Collection
     Private pOperations As Collection
 
-    Public Property Name() As String
-        Get
-            Name = pName
-        End Get
-        Set(ByVal Value As String)
-            pName = Value
-        End Set
-    End Property
-
-    Public Property Id() As Integer
-        Get
-            Id = pId
-        End Get
-        Set(ByVal Value As Integer)
-            pId = Value
-        End Set
-    End Property
-
-    Public Property Index() As Integer
-        Get
-            Index = pIndex
-        End Get
-        Set(ByVal Value As Integer)
-            pIndex = Value
-        End Set
-    End Property
-
-    Public Property ModelType() As String
-        Get
-            ModelType = pModelType
-        End Get
-        Set(ByVal Value As String)
-            pModelType = Value
-        End Set
-    End Property
-
+    Public Name As String
+    Public Id As Integer
+    Public Index As Integer
+    Public ModelType As String
     Public ReadOnly Property Tables() As Collection 'of HspfTable
         Get
-            Tables = pTables
+            Return pTables
         End Get
     End Property
 
     Public Property MassLinks() As Collection 'of HspfMasslink
         Get
-            MassLinks = pMassLinks
+            Return pMassLinks
         End Get
         Set(ByVal Value As Collection) 'of HspfMassLinks
-            Dim lMassLink As HspfMassLink
-            Dim vMassLink As Object
-            For Each vMassLink In Value
-                lMassLink = vMassLink
+            For Each lMassLink As HspfMassLink In Value
                 pMassLinks.Add(lMassLink)
-            Next vMassLink
+            Next lMassLink
         End Set
     End Property
 
     Public Property Operations() As Collection 'of HspfOperation
         Get
-            Operations = pOperations
+            Return pOperations
         End Get
-        Set(ByVal Value As Collection) 'of HspfMassLinks
-            Dim lOperation As HspfOperation
-            Dim vOperation As Object
-            For Each vOperation In Value
-                lOperation = vOperation
+        Set(ByVal Value As Collection) 'of HspfOperation
+            For Each lOperation As HspfOperation In Value
                 pOperations.Add(lOperation)
-            Next vOperation
+            Next lOperation
         End Set
     End Property
 
@@ -88,13 +44,13 @@ Public Class HspfPollutant
         pTables = New Collection
         pOperations = New Collection
         pMassLinks = New Collection
-        pId = 0
-        pName = ""
-        pModelType = ""
-        pIndex = 0
+        Id = 0
+        Name = ""
+        ModelType = ""
+        Index = 0
     End Sub
 
-    Public Function TableExists(ByRef Name As String) As Boolean
-        Return pTables.Contains(Name)
+    Public Function TableExists(ByRef aTableName As String) As Boolean
+        Return pTables.Contains(aTableName)
     End Function
 End Class

@@ -8,7 +8,6 @@ Option Explicit On
 ''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 ''' </remarks>
 <System.Runtime.InteropServices.ProgId("HSPFParmDef_NET.HSPFParmDef")> Public Class HSPFParmDef
-    Private pName As String
     Private pTyp As Integer 'atcoDataType is in control
     Private pMin As Double
     Private pMax As Double
@@ -27,14 +26,7 @@ Option Explicit On
     ''' <summary>
     ''' Name of parameter.
     ''' </summary>
-    Public Property Name() As String
-        Get
-            Name = pName
-        End Get
-        Set(ByVal Value As String)
-            pName = Value
-        End Set
-    End Property
+    Public Name As String
 
     ''' <summary>
     ''' Type of parameter.

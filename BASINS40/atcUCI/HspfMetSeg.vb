@@ -198,7 +198,9 @@ Public Class HspfMetSeg
         End If
     End Sub
 
-    Public Function ToStringFromSpecs(ByRef aOpTyp As String, ByRef aCol() As Integer, ByRef aLen() As Integer) As String
+    Public Function ToStringFromSpecs(ByRef aOpTyp As String, _
+                                      ByRef aCol() As Integer, _
+                                      ByRef aLen() As Integer) As String
         Dim lSB As New StringBuilder
 
         Dim lFirstId As Integer = 0
@@ -316,6 +318,6 @@ Public Class HspfMetSeg
                 End If
             End With
         Next lSegRec
-        Return lSB.ToString.Remove(lSB.Length - 1)
+        Return lSB.ToString.Remove(lSB.Length - 2) 'remove CRLF
     End Function
 End Class
