@@ -462,7 +462,7 @@ ErrHandler:
             lTable.Parms("PWATFG").Value = 1
             Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             If lLandUse Is Nothing Then
-                Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name)
+                Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             Else
                 lTable = lOperation.Tables.Item("GEN-INFO")
                 lTable.Parms("LSID").Value = lLandUse.Description
@@ -482,7 +482,7 @@ ErrHandler:
             lTable.Parms("IWATFG").Value = 1
             Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             If lLandUse Is Nothing Then
-                Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name)
+                Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             Else
                 lTable = lOperation.Tables.Item("GEN-INFO")
                 lTable.Parms("LSID").Value = lLandUse.Description
@@ -583,38 +583,37 @@ ErrHandler:
         Next lopnblk
     End Sub
 
-    Private Sub CreateConnectionsSchematic(ByRef newUci As HspfUci)
-        Dim j, i, k As Integer
+    Private Sub CreateConnectionsSchematic(ByRef aUci As HspfUci)
+        Dim j, i As Integer
         Dim lConnection As HspfConnection
 
-        lConnection = New HspfConnection 'dummy to get entry point
         For i = 0 To pReaches.Count - 1
-            For j = 0 To pLandUses.Count - 1
-                'add entries for each land use to each reach
-                If pReaches(i).WsId = pLandUses(j).Reach Then
-                    lConnection = New HspfConnection
-                    lConnection.Uci = newUci
-                    lConnection.Typ = 3
-                    lConnection.Source.VolName = pLandUses(j).Oper
-                    lConnection.Source.VolId = pLandUses(j).Id
-                    lConnection.MFact = pLandUses(j).Area
-                    lConnection.Target.VolName = "RCHRES"
-                    For k = 0 To pReaches.Count - 1
-                        If pReaches(k).Order = i Then
-                            lConnection.Target.VolId = CInt(pReaches(pReaches(k).Order).Id)
-                        End If
-                    Next k
-                    lConnection.MassLink = TypeId(pLandUses(j).Type)
-                    newUci.Connections.Add(lConnection)
-                End If
-            Next j
-        Next i
+            For j = 2 To 1 Step -1
+                For Each lOperation As HspfOperation In aUci.OpnBlks.Item(pLandName(j)).Ids
+                    Try
+                        Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & i + 1)
+                        lConnection = New HspfConnection
+                        lConnection.Uci = aUci
+                        lConnection.Typ = 3
+                        lConnection.Source.VolName = lOperation.Name
+                        lConnection.Source.VolId = lOperation.Id
+                        lConnection.MFact = lLandUse.Area
+                        lConnection.Target.VolName = "RCHRES"
+                        lConnection.Target.VolId = i + 1
+                        lConnection.MassLink = TypeId(pLandUses(j).Type)
+                        aUci.Connections.Add(lConnection)
+                    Catch e As Collections.Generic.KeyNotFoundException
+                    End Try
+                Next
+            Next
+        Next
+
         For i = 0 To pReaches.Count - 1
             'add entries for each reach to reach connection
             For j = 0 To pReaches.Count - 1
                 If pReaches(pReaches(j).Order).Id = pReaches(pReaches(i).Order).DownID Then
                     lConnection = New HspfConnection
-                    lConnection.Uci = newUci
+                    lConnection.Uci = aUci
                     lConnection.Typ = 3
                     lConnection.Source.VolName = "RCHRES"
                     lConnection.Source.VolId = CInt(pReaches(pReaches(i).Order).Id)
@@ -622,7 +621,7 @@ ErrHandler:
                     lConnection.Target.VolName = "RCHRES"
                     lConnection.Target.VolId = CInt(pReaches(pReaches(j).Order).Id)
                     lConnection.MassLink = 3
-                    newUci.Connections.Add(lConnection)
+                    aUci.Connections.Add(lConnection)
                 End If
             Next j
         Next i
@@ -783,9 +782,6 @@ ErrHandler:
                             aUci.OpnSeqBlock.Add(lNewOperation)
                         End If
                     End If
-                    'remember what we named this land use
-                    pLandUses(i).Oper = pLandName(j)
-                    pLandUses(i).Id = lToperId
                 End If
             Next i
         Next j
@@ -872,10 +868,8 @@ ErrHandler:
                             End If
                             lOpn.Id = lOperId
                             lOpn.Description = pLandUses(i).Description
+                            lOpn.Tag = pLandUses(i).Reach
                             aUci.OpnSeqBlock.Add(lOpn)
-                            'remember what we named this land use
-                            pLandUses(i).Oper = "PERLND"
-                            pLandUses(i).Id = lOperId
                         End If
                     End If
                 Next i
@@ -904,10 +898,8 @@ ErrHandler:
                             End If
                             lOpn.Id = lOperId
                             lOpn.Description = pLandUses(i).Description
+                            lOpn.Tag = pLandUses(i).Reach
                             aUci.OpnSeqBlock.Add(lOpn)
-                            'remember what we named this land use
-                            pLandUses(i).Oper = "IMPLND"
-                            pLandUses(i).Id = lOperId
                         End If
                     End If
                 Next i
