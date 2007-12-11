@@ -44,11 +44,6 @@ namespace ZedGraph
         /// Number of standard deviations to display in graph (plus and minus this many are displayed)
         /// </summary>
         double standardDeviations = 3;
-
-        /// <summary>
-        /// Scale factor needed to convert standard deviations into graph scale
-        /// </summary>
-        double deviationScale = 1.0 / 6.0; // = 1 / (2 * standardDeviations);
         
         /// <summary>
         /// Percent chance exceeded to label, if there is room
@@ -177,10 +172,7 @@ namespace ZedGraph
 		/// <param name="val">The value to be converted</param>
 		override public double Linearize( double val )
 		{
-            // gausex returns +/- standard deviations of val from 0.5
-            // adding standardDeviations makes the result positive
-            // multiplying by deviationScale scales it to fit within zero to one graph scale
-            //return deviationScale * (1 - (gausex(val) + standardDeviations));
+            // gausex returns +/- standardDeviations of val from 0.5
             return (1 - (gausex(val) / standardDeviations)) / 2;
         }
 
@@ -190,7 +182,7 @@ namespace ZedGraph
 		/// </summary>
 		/// <remarks>
 		/// Knowing no direct inverse of gausex, we use successive approximation to locate 
-		/// a return value where Linearize(return value) = val
+		/// a return value where Linearize(return value) is close enough to val
 		/// </remarks>
 		/// <param name="val">The value to be converted</param>
 		override public double DeLinearize( double val )
@@ -198,7 +190,8 @@ namespace ZedGraph
             double linearized;
             double guess = 0.5;
             double guesschange = 0.25;
-            while (guesschange > 0.0001)
+            double closeEnough = Math.Pow(10, -(standardDeviations + 2));
+            while (guesschange > closeEnough)
             {
                 linearized = Linearize(guess);
                 if (val > linearized)
@@ -376,7 +369,7 @@ namespace ZedGraph
         /// <see cref="PaneBase.CalcScaleFactor"/> method, and is used to proportionally adjust
         /// font sizes, etc. according to the actual size of the graph.
         /// </param>
-        internal override void DrawLabels(Graphics g, GraphPane pane, double baseVal, int XnTics,
+        internal override void DrawLabels(Graphics g, GraphPane pane, double baseVal, int nTics,
                         float topPix, float shift, float scaleFactor)
         {
             int lNtics = Percentages.Length;
@@ -384,7 +377,7 @@ namespace ZedGraph
             MajorTic tic = _ownerAxis._majorTic;
             //			MajorGrid grid = _ownerAxis._majorGrid;
 
-            double dVal, dVal2;
+            double dVal;
             float pixVal;
             float scaledTic = tic.ScaledTic(scaleFactor);
 

@@ -19,17 +19,20 @@ Public Class atcGraphForm
 
     'Form object that contains graph(s)
     Private pMaster As ZedGraph.MasterPane
+    Private pPaneMain As ZedGraph.GraphPane
+    Private pPaneAux As ZedGraph.GraphPane
+    Private pAuxEnabled As Boolean = False
+    Public AuxFraction As Single = 0.2
 
     'Graph editing form
-    'Private WithEvents pEditor As ZedGraph.frmEdit 'frmGraphEdit
+    Private WithEvents pEditor As ZedGraph.frmEdit 'frmGraphEdit
 
     'The group of atcData displayed
     Private WithEvents pDataGroup As atcDataGroup
-    Private pNumProbabilityPoints As Integer = 98
+    Private pNumProbabilityPoints As Integer = 200
 
     Private pXAxisType As AxisType = AxisType.DateMulti
     Private pYAxisType As AxisType = AxisType.Linear
-    Private pNeedAux As Boolean = False 'True
 
     Private Shared SaveImageExtension As String = ".png"
     Friend WithEvents mnuViewScatter As System.Windows.Forms.MenuItem
@@ -37,27 +40,49 @@ Public Class atcGraphForm
     Friend WithEvents mnuViewVerticalZoom As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewHorizontalZoom As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewZoomMouse As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuEditCopyMetafile As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuFileSaveMetafile As System.Windows.Forms.MenuItem
 
     Private WithEvents pZgc As New ZedGraphControl
 
     Private Sub InitMasterPane()
-        Me.Controls.Add(pZgc)
-        pZgc.Dock = DockStyle.Fill
-        pZgc.Visible = True
-        pMaster = pZgc.MasterPane
-        pMaster.PaneList.Clear() 'remove default GraphPane
-        'pMaster.PaneFill = New Fill(Color.White, Color.MediumSlateBlue, 45.0F)
-        pMaster.Legend.IsVisible = False
-
-        Dim lPane As GraphPane = New GraphPane
-
         InitMatchingColors(FindFile("Find graph coloring rules", "GraphColors.txt"))
-        'myPane.PaneFill = New Fill(Color.White, Color.LightYellow, 45.0F)
-        With lPane
+
+        pPaneMain = New GraphPane
+        FormatPaneWithDefaults(pPaneMain)
+
+        Me.Controls.Add(pZgc)
+        With pZgc
+            .Dock = DockStyle.Fill
+            .Visible = True
+            .IsSynchronizeXAxes = True
+            .IsEnableHZoom = mnuViewHorizontalZoom.Checked
+            .IsEnableVZoom = mnuViewVerticalZoom.Checked
+            .IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
+            pMaster = .MasterPane
+        End With
+
+        With pMaster
+            .PaneList.Clear() 'remove default GraphPane
+            .Border.IsVisible = False
+            .Legend.IsVisible = False
+            .Margin.All = 10
+            .InnerPaneGap = 5
+            .IsCommonScaleFactor = True
+        End With
+
+        AuxAxisEnabled = True
+
+        SetDatasets(pDataGroup)
+    End Sub
+
+    Private Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
+        With aPane
+            .IsAlignGrids = True
+            .IsFontsScaled = False
+            .IsPenWidthScaled = False
             With .XAxis
                 .Type = pXAxisType
-                .Scale.Max = Double.NegativeInfinity
-                .Scale.Min = Double.PositiveInfinity
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
@@ -68,6 +93,7 @@ Public Class atcGraphForm
             End With
             With .YAxis
                 .Type = pYAxisType
+                .MajorGrid.IsVisible = True
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
@@ -82,57 +108,80 @@ Public Class atcGraphForm
             With .Legend
                 .Position = LegendPos.Float
                 .Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
-                .FontSpec.Size = 10
                 .IsHStack = False
             End With
+            .Border.IsVisible = False
         End With
-
-        pZgc.IsEnableHZoom = mnuViewHorizontalZoom.Checked
-        pZgc.IsEnableVZoom = mnuViewVerticalZoom.Checked
-        pZgc.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
-
-        If pNeedAux Then
-            Dim lPaneAux As GraphPane = New ZedGraph.GraphPane 'lPane.Clone
-            With lPaneAux
-                .Border.IsVisible = False
-                '    With .XAxis
-                '        .Type = lPane.XAxis.Type
-                '        .Scale.Max = lPane.XAxis.Scale.Max
-                '        .Scale.Min = lPane.XAxis.Scale.Min
-                '        .MajorTic.IsOutside = lPane.XAxis.MajorTic.IsOutside
-                '        .MajorTic.IsInside = lPane.XAxis.MajorTic.IsInside
-                '        .MinorTic.IsOutside = lPane.XAxis.MinorTic.IsOutside
-                '        .MinorTic.IsInside = lPane.XAxis.MinorTic.IsInside
-                '    End With
-                'With .YAxis
-                .YAxis.Type = AxisType.Linear
-                .YAxis.Scale.Min = 0
-                .YAxis.Scale.Max = 1
-                'End With
-            End With
-
-            pMaster.PaneList.Add(lPaneAux)
-
-            lPane.Border.IsVisible = False
-            pMaster.Border.IsVisible = False
-        End If
-
-        pMaster.PaneList.Add(lPane)
-
-        SetDatasets(pDataGroup)
     End Sub
+
+    Private Property AuxAxisEnabled() As Boolean
+        Get
+            Return pAuxEnabled
+        End Get
+        Set(ByVal aValue As Boolean)
+            If pAuxEnabled <> aValue Then
+                pMaster.PaneList.Clear()
+                Dim lGraphics As Graphics = Me.CreateGraphics()
+                pAuxEnabled = aValue
+                If pAuxEnabled Then
+                    With pPaneMain
+                        .YAxis.MinSpace = 80
+                        .Y2Axis.MinSpace = 20
+                        .Margin.All = 0
+                        .Margin.Top = 10
+                        .Margin.Bottom = 10
+                    End With
+                    pPaneAux = New ZedGraph.GraphPane
+                    FormatPaneWithDefaults(pPaneAux)
+                    With pPaneAux
+                        .Border.IsVisible = False
+                        .Margin.All = 0
+                        .Margin.Top = 10
+                        With .XAxis
+                            .Type = pXAxisType
+                            .Title.IsVisible = False
+                            .Scale.IsVisible = False
+                            .Scale.Max = pPaneMain.XAxis.Scale.Max
+                            .Scale.Min = pPaneMain.XAxis.Scale.Min
+                            .MajorTic.IsOutside = pPaneMain.XAxis.MajorTic.IsOutside
+                            .MajorTic.IsInside = pPaneMain.XAxis.MajorTic.IsInside
+                            .MinorTic.IsOutside = pPaneMain.XAxis.MinorTic.IsOutside
+                            .MinorTic.IsInside = pPaneMain.XAxis.MinorTic.IsInside
+                        End With
+                        .X2Axis.IsVisible = False
+                        With .YAxis
+                            .Type = AxisType.Linear
+                            '.Scale.Min = 0
+                            '.Scale.Max = 1
+                            .MinSpace = 80
+                        End With
+                        .Y2Axis.MinSpace = 20
+                    End With
+
+                    With pMaster
+                        .PaneList.Add(pPaneAux)
+                        .PaneList.Add(pPaneMain)
+                        .SetLayout(lGraphics, PaneLayout.SingleColumn)
+                        ResizePanes()
+                    End With
+                Else
+                    pMaster.PaneList.Add(pPaneMain)
+                    pMaster.SetLayout(lGraphics, PaneLayout.SingleColumn)
+                End If
+                pMaster.AxisChange(lGraphics)
+                Invalidate()
+                lGraphics.Dispose()
+                Me.Refresh()
+            End If
+        End Set
+    End Property
 
     Private Sub SetDatasets(ByVal aDataGroup As atcDataGroup)
         Dim lGraphics As Graphics = Me.CreateGraphics()
-        If pNeedAux Then
-            Dim lProportion() As Single = {1.0, 5.0}
-            Dim lCountList() As Integer = {2}
-            pMaster.SetLayout(lGraphics, True, lCountList, lProportion)
-        Else
-            pMaster.SetLayout(lGraphics, PaneLayout.SingleColumn)
-        End If
 
-        Pane.CurveList.Clear()
+        If Not pPaneMain Is Nothing Then pPaneMain.CurveList.Clear()
+        If Not pPaneAux Is Nothing Then pPaneAux.CurveList.Clear()
+
         If mnuViewScatter.Checked Then
             AddDatasetsScatter(aDataGroup)
         Else
@@ -156,7 +205,6 @@ Public Class atcGraphForm
                 If Not Double.IsNaN(lMin) Then Pane.XAxis.Scale.Min = lMin
                 If Not Double.IsNaN(lMax) Then Pane.XAxis.Scale.Max = lMax
             End If
-
         End If
         pMaster.AxisChange(lGraphics)
         Invalidate()
@@ -251,9 +299,11 @@ Public Class atcGraphForm
         Me.mnuViewSep1 = New System.Windows.Forms.MenuItem
         Me.mnuViewVerticalZoom = New System.Windows.Forms.MenuItem
         Me.mnuViewHorizontalZoom = New System.Windows.Forms.MenuItem
+        Me.mnuViewZoomMouse = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.mnuViewZoomMouse = New System.Windows.Forms.MenuItem
+        Me.mnuEditCopyMetafile = New System.Windows.Forms.MenuItem
+        Me.mnuFileSaveMetafile = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
@@ -263,7 +313,7 @@ Public Class atcGraphForm
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSep1, Me.mnuFileSave, Me.mnuFilePrint})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSep1, Me.mnuFileSave, Me.mnuFileSaveMetafile, Me.mnuFilePrint})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
@@ -283,13 +333,13 @@ Public Class atcGraphForm
         '
         'mnuFilePrint
         '
-        Me.mnuFilePrint.Index = 3
+        Me.mnuFilePrint.Index = 4
         Me.mnuFilePrint.Text = "Print"
         '
         'mnuEdit
         '
         Me.mnuEdit.Index = 1
-        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditGraph, Me.mnuEditSep1, Me.mnuEditCopy})
+        Me.mnuEdit.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuEditGraph, Me.mnuEditSep1, Me.mnuEditCopy, Me.mnuEditCopyMetafile})
         Me.mnuEdit.Text = "Edit"
         '
         'mnuEditGraph
@@ -346,6 +396,12 @@ Public Class atcGraphForm
         Me.mnuViewHorizontalZoom.Index = 5
         Me.mnuViewHorizontalZoom.Text = "Horizontal Zoom"
         '
+        'mnuViewZoomMouse
+        '
+        Me.mnuViewZoomMouse.Checked = True
+        Me.mnuViewZoomMouse.Index = 6
+        Me.mnuViewZoomMouse.Text = "Center Zoom on Mouse"
+        '
         'mnuAnalysis
         '
         Me.mnuAnalysis.Index = 3
@@ -358,11 +414,15 @@ Public Class atcGraphForm
         Me.mnuHelp.ShowShortcut = False
         Me.mnuHelp.Text = "Help"
         '
-        'mnuViewZoomMouse
+        'mnuEditCopyMetafile
         '
-        Me.mnuViewZoomMouse.Checked = True
-        Me.mnuViewZoomMouse.Index = 6
-        Me.mnuViewZoomMouse.Text = "Center Zoom on Mouse"
+        Me.mnuEditCopyMetafile.Index = 3
+        Me.mnuEditCopyMetafile.Text = "Copy Metafile"
+        '
+        'mnuFileSaveMetafile
+        '
+        Me.mnuFileSaveMetafile.Index = 3
+        Me.mnuFileSaveMetafile.Text = "Save Metafile"
         '
         'atcGraphForm
         '
@@ -388,7 +448,7 @@ Public Class atcGraphForm
     <CLSCompliant(False)> _
     Public ReadOnly Property Pane() As GraphPane
         Get
-            Return pZgc.MasterPane.PaneList.Item(0) ' pGraphPane
+            Return pPaneMain
         End Get
     End Property
 
@@ -428,8 +488,23 @@ Public Class atcGraphForm
         End If
     End Sub
 
+    Private Sub mnuFileSaveMetafile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveMetafile.Click
+        Dim cdlg As New SaveFileDialog
+        With cdlg
+            .Title = "Save Enhanced Windows Metafile As..."
+            .DefaultExt = ".emf"
+            If .ShowDialog = Windows.Forms.DialogResult.OK Then
+                PaneAsMetafile(Pane).Save(.FileName, System.Drawing.Imaging.ImageFormat.Emf)
+            End If
+        End With
+    End Sub
+
     Private Sub mnuEditCopy_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
         Clipboard.SetDataObject(pZgc.MasterPane.GetImage)
+    End Sub
+
+    Private Sub mnuEditCopyMetafile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopyMetafile.Click
+        MetafileHelper.PutEnhMetafileOnClipboard(Me.Handle, PaneAsMetafile(Pane))
     End Sub
 
     Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
@@ -469,15 +544,15 @@ Public Class atcGraphForm
         e.HasMorePages = False 'ends the print job
     End Sub
 
-    'Private Sub pEditor_Apply(ByVal sender As Object, ByVal e As System.EventArgs) Handles pEditor.Apply
-    '    zgc.AxisChange()
-    '    Invalidate()
-    '    Me.Refresh()
-    'End Sub
+    Private Sub pEditor_Apply(ByVal sender As Object, ByVal e As System.EventArgs) Handles pEditor.Apply
+        pZgc.AxisChange()
+        Invalidate()
+        Me.Refresh()
+    End Sub
 
     Private Sub mnuEditGraph_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditGraph.Click
-        'pEditor = New ZedGraph.frmEdit
-        'pEditor.Edit(zgc.GraphPane)
+        pEditor = New ZedGraph.frmEdit
+        pEditor.Edit(Pane)
 
         'pEditor = New frmGraphEdit
         'pEditor.Initialize(zgc.GraphPane)
@@ -489,13 +564,15 @@ Public Class atcGraphForm
             Dim lTimeseriesX As atcTimeseries = aDataGroup.ItemByIndex(0)
             Dim lTimeseriesY As atcTimeseries = aDataGroup.ItemByIndex(1)
             With Pane.XAxis
-                .Type = AxisType.Linear
+                pXAxisType = AxisType.Linear
+                .Type = pXAxisType
                 .Scale.Min = lTimeseriesX.Attributes.GetValue("Min", 0)
                 .Scale.Min = lTimeseriesX.Attributes.GetValue("Max", 1000)
             End With
 
             With Pane.YAxis
-                .Type = AxisType.Linear
+                pYAxisType = AxisType.Linear
+                .Type = pYAxisType
                 .Scale.Min = lTimeseriesY.Attributes.GetValue("Min", 0)
                 .Scale.Min = lTimeseriesY.Attributes.GetValue("Max", 1000)
             End With
@@ -525,7 +602,7 @@ Public Class atcGraphForm
         Dim lOldCurve As LineItem
 
         If mnuViewProbability.Checked Then
-            Dim lX(200) As Double
+            Dim lX(pNumProbabilityPoints) As Double
             Dim lLastIndex As Integer = lX.GetUpperBound(0)
             With Pane.XAxis
                 If .Type <> AxisType.Probability Then
@@ -548,18 +625,11 @@ Public Class atcGraphForm
             Dim lProbScale As ZedGraph.ProbabilityScale = Pane.XAxis.Scale
             Dim lAttributeName As String
             Dim lIndex As Integer
-            'percent greater than values
-            'Dim lX() As Double = lProbScale.Percentages
-            'Dim lXSd() As Double
             Dim lXFracExceed() As Double
             Dim lY() As Double
-            'Dim lDivideBy As Double = pNumProbabilityPoints + 2
 
-            'ReDim x(pNumProbabilityPoints - 1)
-            'For lIndex = 0 To pNumProbabilityPoints - 1
-            '    x(lIndex) = (lIndex + 1) / lDivideBy
-            'Next
             ReDim lY(lLastIndex)
+            'Dim lXSd() As Double
             'ReDim lXSd(lLastIndex)
             ReDim lXFracExceed(lLastIndex)
 
@@ -575,12 +645,14 @@ Public Class atcGraphForm
             With Pane.XAxis
                 .Scale.Min = lXFracExceed(0)
                 .Scale.Max = lXFracExceed(lLastIndex)
-                AddHandler .ScaleFormatEvent, AddressOf XScaleFormatEvent
+                'AddHandler .ScaleFormatEvent, AddressOf XScaleFormatEvent
                 .Scale.BaseTic = lXFracExceed(0)
                 .Title.Text = "Percent chance exceeded"
             End With
             With Pane.YAxis
                 .Type = AxisType.Log
+                .Scale.Format = "#,###"
+                .Scale.FontSpec.StringAlignment = StringAlignment.Far
                 .Scale.IsUseTenPower = False
                 If aTimeseries.Attributes.ContainsAttribute("Units") Then
                     .Title.Text = aTimeseries.Attributes.GetValue("Units")
@@ -596,7 +668,10 @@ Public Class atcGraphForm
             lCurve.Line.StepType = StepType.NonStep
             Me.Refresh()
         ElseIf mnuViewTime.Checked Then
-            If Pane.XAxis.Type <> AxisType.DateMulti Then Pane.XAxis.Type = AxisType.DateMulti
+            With Pane.XAxis
+                If .Type <> AxisType.DateMulti Then .Type = AxisType.DateMulti
+                .Title.Text = ""
+            End With
             If aTimeseries.Attributes.GetValue("point", False) Then
                 lCurve = Pane.AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
                 lCurve.Line.IsVisible = False
@@ -604,6 +679,9 @@ Public Class atcGraphForm
                 lCurve = Pane.AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
                 lCurve.Line.Width = 1
                 lCurve.Line.StepType = StepType.RearwardStep
+                If AuxAxisEnabled Then
+                    pPaneAux.AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
+                End If
             End If
 
             If Pane.CurveList.Count = 1 Then
@@ -643,6 +721,8 @@ Public Class atcGraphForm
                         .MajorTic.IsOpposite = False
                         .MinorTic.IsOpposite = False
                         .IsVisible = True
+                        .Scale.Format = "#,###.###"
+                        .Scale.FontSpec.StringAlignment = StringAlignment.Far
                         If aTimeseries.Attributes.ContainsAttribute("Units") Then
                             .Title.Text = aTimeseries.Attributes.GetValue("Units")
                             .Title.IsVisible = True
@@ -654,6 +734,8 @@ Public Class atcGraphForm
                     End With
                 Else
                     With Pane.YAxis
+                        .Scale.Format = "#,###.###"
+                        .Scale.FontSpec.StringAlignment = StringAlignment.Far
                         If aTimeseries.Attributes.ContainsAttribute("Units") Then
                             .Title.Text = aTimeseries.Attributes.GetValue("Units")
                             .Title.IsVisible = True
@@ -662,35 +744,12 @@ Public Class atcGraphForm
                 End If
             End If
         End If
-        'TODO: label Y Axis
-
-        'TODO: 3rd Y Axis above (for PREC)
-
-
-        'curve.Line.Fill = New Fill(Color.White, Color.FromArgb(60, 190, 50), 90.0F)
-        'lCurve.Line.IsSmooth = False
-        'curve.Line.SmoothTension = 0.6F
-        'curve.Symbol.Fill = New Fill(Color.White)
-        'lCurve.Symbol.Size = 10
-        'lCurve.Symbol.IsVisible = True
-
     End Sub
 
-    <CLSCompliant(False)> _
-    Public Function XScaleFormatEvent(ByVal aGraphPane As GraphPane, _
-                                      ByVal aAxis As ZedGraph.Axis, _
-                                      ByVal aVal As Double, _
-                                      ByVal aIndex As Integer) As String
-        Dim lStr As String = Format(aVal * 100, "#0.##")
-        'Logger.Dbg("LookingForXScaleTicValue:" & aIndex & ":" & aVal & ":" & lVal & ":" & lStr)
-        Return lStr
-    End Function
-
     Private Function TSCurveLabel(ByVal aTimeseries As atcTimeseries) As String
-        Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
-        Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
-        Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
-        Return lScen & " " & lCons & " at " & lLoc
+        With aTimeseries.Attributes
+            Return .GetValue("scenario") & " " & .GetValue("constituent") & " at " & .GetValue("location")
+        End With
     End Function
 
     Private Function Gausex(ByVal aExprob As Double) As Double
@@ -766,63 +825,6 @@ Public Class atcGraphForm
         ShowHelp("BASINS Details\Analysis\Time Series Functions\Graph.html")
     End Sub
 
-    'Private Sub CopyToClip(ByVal aPane As GraphPane)
-
-    '    Dim g As Graphics = Me.CreateGraphics()
-    '    Dim hdc As IntPtr = g.GetHdc()
-    '    Dim Metafile As New Metafile(hdc, EmfType.EmfOnly)
-    '    g.ReleaseHdc(hdc)
-    '    g.Dispose()
-
-    '    Dim gMeta As Graphics = Graphics.FromImage(Metafile)
-    '    aPane.Draw(gMeta)
-    '    gMeta.Dispose()
-
-    '    ClipboardMetafileHelper.PutEnhMetafileOnClipboard(Me.Handle, Metafile)
-
-    '    MessageBox.Show("Copied to ClipBoard")
-    'End Sub
-
-    'Private Class ClipboardMetafileHelper
-    '    '<DllImport("user32.dll")> Public Shared Function OpenClipboard(ByVal hWndNewOwner As IntPtr) As Boolean
-    '    'End Function
-
-    '    '<DllImport("user32.dll")> Public Shared Function EmptyClipboard() As Boolean
-    '    'End Function
-
-    '    '<DllImport("user32.dll")> Public Shared Function SetClipboardData(ByVal uFormat As uint, ByVal hMem As IntPtr) As IntPtr
-    '    'End Function
-
-    '    '<DllImport("user32.dll")> Public Shared Function CloseClipboard() As Boolean
-    '    'End Function
-
-    '    '<DllImport("gdi32.dll")> Public Shared Function CopyEnhMetaFile(ByVal hemfSrc As IntPtr, ByVal hNULL As IntPtr) As IntPtr
-    '    'End Function
-
-    '    '<DllImport("gdi32.dll")> Public Shared Function DeleteEnhMetaFile(ByVal hemf As IntPtr) As Boolean
-    '    'End Function
-
-    '    ' Metafile mf is set to a state that is not valid inside this function.
-    '    Public Shared Function PutEnhMetafileOnClipboard(ByVal hWnd As IntPtr, ByVal mf As Metafile) As Boolean
-    '        Dim bResult As Boolean = False
-    '        '    IntPtr(hEMF, hEMF2)
-    '        '    hEMF = mf.GetHenhmetafile() ' invalidates mf
-    '        '    If (not hEMF.Equals(New IntPtr(0))) Then
-    '        '    hEMF2 = CopyEnhMetaFile( hEMF, new IntPtr(0) )
-    '        '        If (!hEMF2.Equals(New IntPtr(0))) Then
-    '        '            If (OpenClipboard(hWnd)) Then
-    '        '                If (EmptyClipboard()) Then
-    '        '                IntPtr hRes = SetClipboardData( 14 /*CF_ENHMETAFILE*/, hEMF2 )
-    '        '                bResult = hRes.Equals( hEMF2 )
-    '        '                CloseClipboard()
-    '        '                End If
-    '        '            End If
-    '        '        End If
-    '        '    DeleteEnhMetaFile( hEMF );
-    '        Return bResult
-    '    End Function
-    'End Class
-
     Private Sub mnuViewTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewTime.Click
         mnuViewTime.Checked = True
         mnuViewProbability.Checked = False
@@ -858,6 +860,70 @@ Public Class atcGraphForm
         mnuViewZoomMouse.Checked = Not mnuViewZoomMouse.Checked
         pZgc.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
     End Sub
-End Class
 
+    Private Sub pZgc_ZoomEvent(ByVal sender As ZedGraph.ZedGraphControl, ByVal oldState As ZedGraph.ZoomState, ByVal newState As ZedGraph.ZoomState) Handles pZgc.ZoomEvent
+
+    End Sub
+
+    Private Sub atcGraphForm_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
+        ResizePanes()
+    End Sub
+
+    Private Sub ResizePanes()
+        If AuxAxisEnabled Then
+            Dim lOrigAuxHeight As Single = pPaneAux.Rect.Height
+            Dim lTotalPaneHeight As Single = lOrigAuxHeight + pPaneMain.Rect.Height
+            pPaneAux.Rect = New System.Drawing.Rectangle( _
+                    pPaneAux.Rect.X, pPaneAux.Rect.Y, _
+                    pPaneAux.Rect.Width, lTotalPaneHeight * AuxFraction)
+            pPaneMain.Rect = New System.Drawing.Rectangle( _
+                    pPaneMain.Rect.X, pPaneMain.Rect.Y - lOrigAuxHeight + pPaneAux.Rect.Height, _
+                    pPaneMain.Rect.Width, lTotalPaneHeight - pPaneAux.Rect.Height)
+        End If
+    End Sub
+
+    Private Function PaneAsMetafile(ByVal aPane As GraphPane) As Metafile
+        Dim g As Graphics = Me.CreateGraphics()
+        Dim hdc As IntPtr = g.GetHdc()
+        Dim lMetafile As New Metafile(hdc, EmfType.EmfOnly)
+        g.ReleaseHdc(hdc)
+        g.Dispose()
+
+        Dim gMeta As Graphics = Graphics.FromImage(lMetafile)
+        aPane.Draw(gMeta)
+        gMeta.Dispose()
+        Return lMetafile
+    End Function
+
+    Private Class MetafileHelper
+        Private Declare Function GetClipboardData Lib "user32" (ByVal wFormat As Long) As Long
+        Private Declare Function CloseClipboard Lib "user32" () As Boolean
+        Private Declare Function EmptyClipboard Lib "user32" () As Boolean
+        Private Declare Function OpenClipboard Lib "user32" (ByVal hWndNewOwner As IntPtr) As Boolean
+        Private Declare Function SetClipboardData Lib "user32" (ByVal uFormat As UInt32, ByVal hMem As IntPtr) As IntPtr
+        Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hemf As IntPtr) As Boolean
+        Private Declare Function CopyEnhMetaFile Lib "gdi32" Alias "CopyEnhMetaFileA" (ByVal hemfSrc As IntPtr, ByVal hNULL As IntPtr) As IntPtr
+        Private Declare Function CopyEnhMetaFile Lib "gdi32" Alias "CopyEnhMetaFileA" (ByVal hemfSrc As Integer, ByVal lpszFile As String) As Integer
+        ' Metafile mf is set to a state that is not valid inside this function.
+        Public Shared Function PutEnhMetafileOnClipboard(ByVal hWnd As IntPtr, ByVal mf As Metafile) As Boolean
+            Dim bResult As Boolean = False
+            Dim hEMF, hEMF2, hRes As IntPtr
+            hEMF = mf.GetHenhmetafile() ' invalidates mf
+            If (Not hEMF.Equals(New IntPtr(0))) Then
+                hEMF2 = CopyEnhMetaFile(hEMF, New IntPtr(0))
+                If (Not hEMF2.Equals(New IntPtr(0))) Then
+                    If (OpenClipboard(hWnd)) Then
+                        If (EmptyClipboard()) Then
+                            hRes = SetClipboardData(14, hEMF2) '14 /*CF_ENHMETAFILE*/
+                            bResult = hRes.Equals(hEMF2)
+                            CloseClipboard()
+                        End If
+                    End If
+                End If
+                DeleteEnhMetaFile(hEMF)
+                Return bResult
+            End If
+        End Function
+    End Class
+End Class
 
