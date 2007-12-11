@@ -82,8 +82,6 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMDataManager", ".
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMNHDPlusDataExtension", "..\D4EM\DataManager\NHDPlusDataExtension\BASINS-D4EMNHDPlusDataExtension.vbproj", "{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapWinGeoProc2005BASINS", "..\MapWindow4Dev\MapWinGeoProc\MapWinGeoProc2005BASINS.csproj", "{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMBasinsDataExtension", "..\D4EM\DataManager\BasinsDataExtension\BASINS-D4EMBasinsDataExtension.vbproj", "{6B46450E-F526-4C3C-BC4D-0D11735022BF}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMTerraServerDataExtension", "..\D4EM\DataManager\TerraServerDataExtension\BASINS-D4EMTerraServerDataExtension.vbproj", "{2E139A29-283A-4D78-B4E4-107EA5778C82}"
@@ -94,9 +92,13 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcGraph", "atcGraphExperim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZedGraph", "atcZedgraphExperimental\ZedGraph 5.1 (.net 2)\source\ZedGraph.csproj", "{2541686B-1673-43BF-AF89-3163945DB009}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ScriptRunnerExperimental", "ScriptRunner\ScriptRunnerExperimental.vbproj", "{EF59E9DF-FF44-433C-B7B3-C12F3D770260}"
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMNWISDataExtension", "..\D4EM\DataManager\NWISDataExtension\BASINS-D4EMNWISDataExtension.vbproj", "{A97D1620-BFDE-4733-B2DC-10F32323DF8E}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BASINS-D4EMSTORETDataExtension", "..\D4EM\DataManager\STORETDataExtension\BASINS-D4EMSTORETDataExtension.vbproj", "{1728A320-3935-4DBC-B62F-EF79669D1007}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ScriptRunner", "ScriptRunner\ScriptRunner.vbproj", "{EF59E9DF-FF44-433C-B7B3-C12F3D770260}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcWdmVb", "atcWdmVb\atcWdmVb.vbproj", "{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -267,10 +269,6 @@ Global
 		{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA614D8D-3AFA-4F01-8A5F-6D1887BA2AF8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AE7B1DF-7D39-4326-9A62-2EF9D62DEB98}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6B46450E-F526-4C3C-BC4D-0D11735022BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6B46450E-F526-4C3C-BC4D-0D11735022BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B46450E-F526-4C3C-BC4D-0D11735022BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -291,14 +289,22 @@ Global
 		{2541686B-1673-43BF-AF89-3163945DB009}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2541686B-1673-43BF-AF89-3163945DB009}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2541686B-1673-43BF-AF89-3163945DB009}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF59E9DF-FF44-433C-B7B3-C12F3D770260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EF59E9DF-FF44-433C-B7B3-C12F3D770260}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EF59E9DF-FF44-433C-B7B3-C12F3D770260}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF59E9DF-FF44-433C-B7B3-C12F3D770260}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A97D1620-BFDE-4733-B2DC-10F32323DF8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1728A320-3935-4DBC-B62F-EF79669D1007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1728A320-3935-4DBC-B62F-EF79669D1007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1728A320-3935-4DBC-B62F-EF79669D1007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1728A320-3935-4DBC-B62F-EF79669D1007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF59E9DF-FF44-433C-B7B3-C12F3D770260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF59E9DF-FF44-433C-B7B3-C12F3D770260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF59E9DF-FF44-433C-B7B3-C12F3D770260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF59E9DF-FF44-433C-B7B3-C12F3D770260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

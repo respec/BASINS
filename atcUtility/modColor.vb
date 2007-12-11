@@ -53,10 +53,10 @@ Public Module UtilColor
             End If
         Next
 
-        'ignoring the text of the rules, just find the next color we haven't used
-        For Each lRule In pColorMatchingRules
-            If Not pColorsUsed.Contains(lRule.Value) Then GoTo FoundColor
-        Next
+        ''ignoring the text of the rules, just find the next color we haven't used
+        'For Each lRule In pColorMatchingRules
+        '    If Not pColorsUsed.Contains(lRule.Value) Then GoTo FoundColor
+        'Next
 
         'Did not find a matching color or an unused color in the ramp - find a random one
         Do

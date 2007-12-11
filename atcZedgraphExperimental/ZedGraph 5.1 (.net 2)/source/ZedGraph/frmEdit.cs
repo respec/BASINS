@@ -8,17 +8,30 @@ using System.Windows.Forms;
 
 namespace ZedGraph
 {
+    /// <summary>
+    /// Form for the user to edit a GraphPane
+    /// </summary>
     public partial class frmEdit : Form
     {
+        /// <summary>
+        /// event fired when user presses "Apply" button
+        /// </summary>
         public event System.EventHandler Apply;
 
         private GraphPane pPane;
 
+        /// <summary>
+        /// Default constructor of frmEdit
+        /// </summary>
         public frmEdit()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Show this form for editing the specified GraphPane
+        /// </summary>
+        /// <param name="aPane">pane to edit</param>
         public void Edit(GraphPane aPane)
         {
             pPane = aPane;
@@ -190,6 +203,5 @@ namespace ZedGraph
                 txtCurveColor.BackColor = lColorDialog.Color;
             }
         }
-
-    }
+   }
 }

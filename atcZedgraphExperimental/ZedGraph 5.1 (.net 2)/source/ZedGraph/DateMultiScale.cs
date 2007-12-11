@@ -313,7 +313,7 @@ namespace ZedGraph
                 {
                     TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, shift, scaleFactor, scaledTic, 
                         ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
-                    if (labelThisYear)
+                    if (this.IsVisible && labelThisYear)
                     {
                         textHorizontalCenter = (pStartInterval + pEndInterval) / 2;
                         //if label will not extend beyond left or right edge of this axis, draw it
@@ -341,6 +341,7 @@ namespace ZedGraph
             int year;
             int month;
             int day;
+            int MonthLabelType = WhichMonthLabels(g, pane, topPix, rightPix, shift, scaleFactor, includeYear);
 
             XDate xStartInterval = new XDate(_minLinTemp);
             XDate xEndInterval;
@@ -366,6 +367,10 @@ namespace ZedGraph
             dStartInterval = xStartInterval.XLDate;
             dEndInterval = xEndInterval.XLDate;
 
+            
+
+            // draw tics and labels
+            dStartInterval = xStartInterval.XLDate;
             while (dStartInterval < _maxLinTemp)
             {
                 TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid,
@@ -373,28 +378,20 @@ namespace ZedGraph
                     ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
                 // If the width of the interval is at least wide enough for a character,
                 // try displaying a month label
-                if (pIntervalWidth > charWidth)
+                if (this.IsVisible && pIntervalWidth > charWidth)
                 {
-                    // First try to fit whole month name
-                    labelText = MonthNamesFull[month - 1];
+                    labelText = "";
+                    switch(MonthLabelType) 
+                    {
+                        case 3: labelText = MonthNamesFull[month - 1]; break;
+                        case 2: labelText = MonthNamesAbbreviated[month - 1]; break;
+                        case 1: labelText = MonthNamesAbbreviated[month - 1].Substring(0, 1); break;
+                    }
                     if (includeYear) labelText += " " + year;
                     labelSize = _fontSpec.BoundingBox(g, labelText, scaleFactor);
                     if (labelSize.Width >= pIntervalWidth)
                     {
-                        // Next try to fit abbreviated month name
-                        labelText = MonthNamesAbbreviated[month - 1];
-                        if (includeYear) labelText += " " + year;
-                        labelSize = _fontSpec.BoundingBox(g, labelText, scaleFactor);
-                        if (labelSize.Width >= pIntervalWidth)
-                        {
-                            // Finally try to fit first letter of month name
-                            labelText = labelText.Substring(0, 1);
-                            labelSize = _fontSpec.BoundingBox(g, labelText, scaleFactor);
-                            if (labelSize.Width >= pIntervalWidth)
-                            {
-                                labelText = "";
-                            }
-                        }
+                        labelText = "";
                     }
                     if (labelText.Length > 0 )
                         _fontSpec.Draw(g, pane, labelText,
@@ -408,6 +405,83 @@ namespace ZedGraph
                 dEndInterval = xEndInterval.XLDate;
                 xStartInterval.GetDate(out year, out month, out day);
             }
+        }
+
+        private int WhichMonthLabels(Graphics g, GraphPane pane,
+                    float topPix, float rightPix, float shift, float scaleFactor, bool includeYear)
+        {
+            bool FullFit = true;
+            bool AbbrevFit = true;
+            bool CharFit = true;
+
+            int year;
+            int month;
+            int day;
+
+            string yearText = "";
+
+            XDate xStartInterval = new XDate(_minLinTemp);
+            XDate xEndInterval;
+            string labelText = "0";
+            SizeF labelBox = _fontSpec.BoundingBox(g, labelText, scaleFactor);
+            float ticShift = (includeYear ? (shift + labelBox.Height / 2) : shift);
+            float charWidth = labelBox.Width;
+
+            MinorGrid grid = _ownerAxis._minorGrid;
+            MinorTic tic = _ownerAxis._minorTic;
+            float scaledTic = tic.ScaledTic(scaleFactor);
+            float textVerticalCenter = GetTextVerticalCenter(g, pane, scaledTic, labelBox.Height, shift, scaleFactor);
+
+            double dStartInterval, dEndInterval;
+            float pStartInterval, pEndInterval, pIntervalWidth;
+
+            xStartInterval.GetDate(out year, out month, out day);
+            if (day != 1) xStartInterval.SetDate(year, month, 1);
+            xEndInterval = new XDate(xStartInterval);
+            xEndInterval.AddMonths(1);
+            dStartInterval = xStartInterval.XLDate;
+            dEndInterval = xEndInterval.XLDate;
+
+            while (dStartInterval < _maxLinTemp)
+            {
+                TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid,
+                    ticShift, scaleFactor, scaledTic,
+                    ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
+                // If the width of the interval is at least wide enough for a character
+                // and we have more than 27 days, try displaying a month label
+                if (pIntervalWidth > charWidth && (dEndInterval - dStartInterval > 27))
+                {
+                    if (includeYear) yearText = " " + year;
+
+                    if (FullFit)   // First try to fit whole month name
+                    {
+                        FullFit = LabelFits(g, scaleFactor, MonthNamesFull[month - 1] + yearText, pIntervalWidth);
+                    }
+                    if (AbbrevFit) // Next try to fit abbreviated month name
+                    {
+                        AbbrevFit = LabelFits(g, scaleFactor, MonthNamesAbbreviated[month - 1] + yearText, pIntervalWidth);
+                    }
+                    if (CharFit)   // Finally try to fit first letter of month name
+                    {
+                        CharFit = LabelFits(g, scaleFactor, labelText.Substring(0, 1) + yearText, pIntervalWidth);
+                    }
+                }
+                xStartInterval.AddMonths(1); // = new XDate(endInterval);
+                xEndInterval.AddMonths(1);
+                dStartInterval = xStartInterval.XLDate;
+                dEndInterval = xEndInterval.XLDate;
+                xStartInterval.GetDate(out year, out month, out day);
+            }
+            if (FullFit) return 3;
+            if (AbbrevFit) return 2;
+            if (CharFit) return 1;
+            return 0;
+        }
+
+        private bool LabelFits(Graphics g, float scaleFactor, string labelText, float maxWidth)
+        {
+            SizeF labelSize = _fontSpec.BoundingBox(g, labelText, scaleFactor);
+            return (labelSize.Width < maxWidth);
         }
 
         internal void DrawDayLabels(Graphics g, GraphPane pane,
@@ -451,8 +525,8 @@ namespace ZedGraph
                 TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, 
                     ticShift, scaleFactor, scaledTic, 
                     ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
-                    
-                if (pIntervalWidth > 1)
+
+                if (this.IsVisible && pIntervalWidth > 1)
                 {
                     if (((int)(day / daysPerLabel)) * daysPerLabel == day)
                     {
@@ -526,7 +600,7 @@ namespace ZedGraph
                     ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
 
                 //if label will not extend beyond left or right edge of this axis, draw it
-                if ((pStartInterval - labelWidthHalf > 0) &&
+                if (this.IsVisible && (pStartInterval - labelWidthHalf > 0) &&
                         (pStartInterval + labelWidthHalf) < rightPix)
                 {
                     labelText = hour.ToString() + ":" + ((minute < 10) ? "0" : "") + minute.ToString();
@@ -609,9 +683,9 @@ namespace ZedGraph
             bool drawMonths = (nDays > 3) && (nDays < 666);
             bool drawYears = (nDays > 60);
 
-            int numLevels = (drawHoursMinutes ? 1 : 0) 
-                          + (drawDays ? 1 : 0) 
-                          + (drawMonths ? 1 : 0) 
+            int numLevels = (drawHoursMinutes ? 1 : 0)
+                          + (drawDays ? 1 : 0)
+                          + (drawMonths ? 1 : 0)
                           + (drawYears ? 1 : 0);
 
             //_ownerAxis.SetMinSpaceBuffer(g, pane, numLevels, false);
@@ -620,6 +694,8 @@ namespace ZedGraph
             _ownerAxis._majorTic.IsOpposite = true;
             _ownerAxis._minorTic.IsInside = true;
             _ownerAxis._minorTic.IsOpposite = true;
+
+            // Note: the Draw*Labels routines handle tics and IsVisible
             if (drawHoursMinutes)
             {
                 DrawHourMinuteLabels(g, pane, topPix, rightPix, shiftPos, scaleFactor);
@@ -645,7 +721,6 @@ namespace ZedGraph
             }
             _ownerAxis._majorTic.IsAllTics = false;
             _ownerAxis._minorTic.IsAllTics = false;
-
             _ownerAxis.DrawTitle(g, pane, shiftPos, scaleFactor);
         }
 

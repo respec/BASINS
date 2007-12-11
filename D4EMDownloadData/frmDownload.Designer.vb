@@ -58,11 +58,14 @@ Partial Class frmDownload
         Me.btnCancel = New System.Windows.Forms.Button
         Me.txtMetWDM = New System.Windows.Forms.TextBox
         Me.lblMetWDM = New System.Windows.Forms.Label
+        Me.grpSTORET = New System.Windows.Forms.GroupBox
+        Me.chkSTORET_Stations = New System.Windows.Forms.CheckBox
         Me.grpBASINS.SuspendLayout()
         Me.grpNWIS.SuspendLayout()
         Me.grpTerraServerWebService.SuspendLayout()
         Me.grpNLCD.SuspendLayout()
         Me.grpNHDplus.SuspendLayout()
+        Me.grpSTORET.SuspendLayout()
         Me.SuspendLayout()
         '
         'grpBASINS
@@ -320,8 +323,9 @@ Partial Class frmDownload
         '
         'lblClip
         '
+        Me.lblClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblClip.AutoSize = True
-        Me.lblClip.Location = New System.Drawing.Point(15, 417)
+        Me.lblClip.Location = New System.Drawing.Point(12, 474)
         Me.lblClip.Name = "lblClip"
         Me.lblClip.Size = New System.Drawing.Size(73, 13)
         Me.lblClip.TabIndex = 36
@@ -330,8 +334,9 @@ Partial Class frmDownload
         '
         'lblMerge
         '
+        Me.lblMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblMerge.AutoSize = True
-        Me.lblMerge.Location = New System.Drawing.Point(15, 437)
+        Me.lblMerge.Location = New System.Drawing.Point(12, 494)
         Me.lblMerge.Name = "lblMerge"
         Me.lblMerge.Size = New System.Drawing.Size(37, 13)
         Me.lblMerge.TabIndex = 38
@@ -341,7 +346,7 @@ Partial Class frmDownload
         'btnDownload
         '
         Me.btnDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnDownload.Location = New System.Drawing.Point(293, 451)
+        Me.btnDownload.Location = New System.Drawing.Point(293, 483)
         Me.btnDownload.Name = "btnDownload"
         Me.btnDownload.Size = New System.Drawing.Size(75, 23)
         Me.btnDownload.TabIndex = 29
@@ -370,8 +375,9 @@ Partial Class frmDownload
         '
         'chkClip
         '
+        Me.chkClip.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkClip.AutoSize = True
-        Me.chkClip.Location = New System.Drawing.Point(94, 417)
+        Me.chkClip.Location = New System.Drawing.Point(91, 474)
         Me.chkClip.Name = "chkClip"
         Me.chkClip.Size = New System.Drawing.Size(15, 14)
         Me.chkClip.TabIndex = 35
@@ -379,8 +385,9 @@ Partial Class frmDownload
         '
         'chkMerge
         '
+        Me.chkMerge.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkMerge.AutoSize = True
-        Me.chkMerge.Location = New System.Drawing.Point(94, 437)
+        Me.chkMerge.Location = New System.Drawing.Point(91, 494)
         Me.chkMerge.Name = "chkMerge"
         Me.chkMerge.Size = New System.Drawing.Size(15, 14)
         Me.chkMerge.TabIndex = 37
@@ -390,7 +397,7 @@ Partial Class frmDownload
         '
         Me.btnCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnCancel.Location = New System.Drawing.Point(212, 451)
+        Me.btnCancel.Location = New System.Drawing.Point(212, 483)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(75, 23)
         Me.btnCancel.TabIndex = 39
@@ -415,13 +422,36 @@ Partial Class frmDownload
         Me.lblMetWDM.TabIndex = 41
         Me.lblMetWDM.Text = "Save in WDM file"
         '
+        'grpSTORET
+        '
+        Me.grpSTORET.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.grpSTORET.Controls.Add(Me.chkSTORET_Stations)
+        Me.grpSTORET.Location = New System.Drawing.Point(12, 407)
+        Me.grpSTORET.Name = "grpSTORET"
+        Me.grpSTORET.Size = New System.Drawing.Size(356, 45)
+        Me.grpSTORET.TabIndex = 42
+        Me.grpSTORET.TabStop = False
+        Me.grpSTORET.Text = "STORET"
+        '
+        'chkSTORET_Stations
+        '
+        Me.chkSTORET_Stations.AutoSize = True
+        Me.chkSTORET_Stations.Location = New System.Drawing.Point(6, 19)
+        Me.chkSTORET_Stations.Name = "chkSTORET_Stations"
+        Me.chkSTORET_Stations.Size = New System.Drawing.Size(64, 17)
+        Me.chkSTORET_Stations.TabIndex = 17
+        Me.chkSTORET_Stations.Text = "Stations"
+        Me.chkSTORET_Stations.UseVisualStyleBackColor = True
+        '
         'frmDownload
         '
         Me.AcceptButton = Me.btnDownload
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnCancel
-        Me.ClientSize = New System.Drawing.Size(380, 486)
+        Me.ClientSize = New System.Drawing.Size(380, 518)
+        Me.Controls.Add(Me.grpSTORET)
         Me.Controls.Add(Me.lblMetWDM)
         Me.Controls.Add(Me.txtMetWDM)
         Me.Controls.Add(Me.btnCancel)
@@ -450,6 +480,8 @@ Partial Class frmDownload
         Me.grpNLCD.PerformLayout()
         Me.grpNHDplus.ResumeLayout(False)
         Me.grpNHDplus.PerformLayout()
+        Me.grpSTORET.ResumeLayout(False)
+        Me.grpSTORET.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -488,4 +520,6 @@ Partial Class frmDownload
     Friend WithEvents btnCancel As System.Windows.Forms.Button
     Friend WithEvents txtMetWDM As System.Windows.Forms.TextBox
     Friend WithEvents lblMetWDM As System.Windows.Forms.Label
+    Friend WithEvents grpSTORET As System.Windows.Forms.GroupBox
+    Friend WithEvents chkSTORET_Stations As System.Windows.Forms.CheckBox
 End Class
