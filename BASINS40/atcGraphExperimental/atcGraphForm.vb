@@ -134,25 +134,17 @@ Public Class atcGraphForm
                     pPaneAux = New ZedGraph.GraphPane
                     FormatPaneWithDefaults(pPaneAux)
                     With pPaneAux
-                        .Border.IsVisible = False
                         .Margin.All = 0
                         .Margin.Top = 10
                         With .XAxis
-                            .Type = pXAxisType
                             .Title.IsVisible = False
                             .Scale.IsVisible = False
                             .Scale.Max = pPaneMain.XAxis.Scale.Max
                             .Scale.Min = pPaneMain.XAxis.Scale.Min
-                            .MajorTic.IsOutside = pPaneMain.XAxis.MajorTic.IsOutside
-                            .MajorTic.IsInside = pPaneMain.XAxis.MajorTic.IsInside
-                            .MinorTic.IsOutside = pPaneMain.XAxis.MinorTic.IsOutside
-                            .MinorTic.IsInside = pPaneMain.XAxis.MinorTic.IsInside
                         End With
                         .X2Axis.IsVisible = False
                         With .YAxis
                             .Type = AxisType.Linear
-                            '.Scale.Min = 0
-                            '.Scale.Max = 1
                             .MinSpace = 80
                         End With
                         .Y2Axis.MinSpace = 20
@@ -494,7 +486,7 @@ Public Class atcGraphForm
             .Title = "Save Enhanced Windows Metafile As..."
             .DefaultExt = ".emf"
             If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                PaneAsMetafile(Pane).Save(.FileName, System.Drawing.Imaging.ImageFormat.Emf)
+                SaveAsMetafile(.FileName)
             End If
         End With
     End Sub
@@ -504,7 +496,7 @@ Public Class atcGraphForm
     End Sub
 
     Private Sub mnuEditCopyMetafile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEditCopyMetafile.Click
-        MetafileHelper.PutEnhMetafileOnClipboard(Me.Handle, PaneAsMetafile(Pane))
+        'MetafileHelper.PutEnhMetafileOnClipboard(Me.Handle, PaneAsMetafile(Pane))
     End Sub
 
     Private Sub mnuFilePrint_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuFilePrint.Click
@@ -882,48 +874,61 @@ Public Class atcGraphForm
         End If
     End Sub
 
-    Private Function PaneAsMetafile(ByVal aPane As GraphPane) As Metafile
+    Private Sub SaveAsMetafile(ByVal aFilename As String)
         Dim g As Graphics = Me.CreateGraphics()
         Dim hdc As IntPtr = g.GetHdc()
-        Dim lMetafile As New Metafile(hdc, EmfType.EmfOnly)
+        Dim lMetafile As New Metafile(aFilename, hdc, EmfType.EmfPlusDual)
         g.ReleaseHdc(hdc)
         g.Dispose()
 
         Dim gMeta As Graphics = Graphics.FromImage(lMetafile)
-        aPane.Draw(gMeta)
+        pZgc.MasterPane.Draw(gMeta)
         gMeta.Dispose()
-        Return lMetafile
-    End Function
+        lMetafile.Dispose()
+    End Sub
 
-    Private Class MetafileHelper
-        Private Declare Function GetClipboardData Lib "user32" (ByVal wFormat As Long) As Long
-        Private Declare Function CloseClipboard Lib "user32" () As Boolean
-        Private Declare Function EmptyClipboard Lib "user32" () As Boolean
-        Private Declare Function OpenClipboard Lib "user32" (ByVal hWndNewOwner As IntPtr) As Boolean
-        Private Declare Function SetClipboardData Lib "user32" (ByVal uFormat As UInt32, ByVal hMem As IntPtr) As IntPtr
-        Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hemf As IntPtr) As Boolean
-        Private Declare Function CopyEnhMetaFile Lib "gdi32" Alias "CopyEnhMetaFileA" (ByVal hemfSrc As IntPtr, ByVal hNULL As IntPtr) As IntPtr
-        Private Declare Function CopyEnhMetaFile Lib "gdi32" Alias "CopyEnhMetaFileA" (ByVal hemfSrc As Integer, ByVal lpszFile As String) As Integer
-        ' Metafile mf is set to a state that is not valid inside this function.
-        Public Shared Function PutEnhMetafileOnClipboard(ByVal hWnd As IntPtr, ByVal mf As Metafile) As Boolean
-            Dim bResult As Boolean = False
-            Dim hEMF, hEMF2, hRes As IntPtr
-            hEMF = mf.GetHenhmetafile() ' invalidates mf
-            If (Not hEMF.Equals(New IntPtr(0))) Then
-                hEMF2 = CopyEnhMetaFile(hEMF, New IntPtr(0))
-                If (Not hEMF2.Equals(New IntPtr(0))) Then
-                    If (OpenClipboard(hWnd)) Then
-                        If (EmptyClipboard()) Then
-                            hRes = SetClipboardData(14, hEMF2) '14 /*CF_ENHMETAFILE*/
-                            bResult = hRes.Equals(hEMF2)
-                            CloseClipboard()
-                        End If
-                    End If
-                End If
-                DeleteEnhMetaFile(hEMF)
-                Return bResult
-            End If
-        End Function
-    End Class
+    'Private Function PaneAsMetafile(ByVal aPane As GraphPane) As Metafile
+    '    Dim g As Graphics = Me.CreateGraphics()
+    '    Dim hdc As IntPtr = g.GetHdc()
+    '    Dim lMetafile As New Metafile(hdc, EmfType.EmfOnly)
+    '    g.ReleaseHdc(hdc)
+    '    g.Dispose()
+
+    '    Dim gMeta As Graphics = Graphics.FromImage(lMetafile)
+    '    aPane.Draw(gMeta)
+    '    gMeta.Dispose()
+    '    Return lMetafile
+    'End Function
+
+    'Private Class MetafileHelper
+    '    Private Declare Function GetClipboardData Lib "user32" (ByVal wFormat As Long) As Long
+    '    Private Declare Function CloseClipboard Lib "user32" () As Boolean
+    '    Private Declare Function EmptyClipboard Lib "user32" () As Boolean
+    '    Private Declare Function OpenClipboard Lib "user32" (ByVal hWndNewOwner As IntPtr) As Boolean
+    '    Private Declare Function SetClipboardData Lib "user32" (ByVal uFormat As UInt32, ByVal hMem As IntPtr) As IntPtr
+    '    Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hemf As IntPtr) As Boolean
+    '    Private Declare Function CopyEnhMetaFile Lib "gdi32" Alias "CopyEnhMetaFileA" (ByVal hemfSrc As IntPtr, ByVal hNULL As IntPtr) As IntPtr
+    '    Private Declare Function CopyEnhMetaFile Lib "gdi32" Alias "CopyEnhMetaFileA" (ByVal hemfSrc As Integer, ByVal lpszFile As String) As Integer
+    '    ' Metafile mf is set to a state that is not valid inside this function.
+    '    Public Shared Function PutEnhMetafileOnClipboard(ByVal hWnd As IntPtr, ByVal mf As Metafile) As Boolean
+    '        Dim bResult As Boolean = False
+    '        Dim hEMF, hEMF2, hRes As IntPtr
+    '        hEMF = mf.GetHenhmetafile() ' invalidates mf
+    '        If (Not hEMF.Equals(New IntPtr(0))) Then
+    '            hEMF2 = CopyEnhMetaFile(hEMF, New IntPtr(0))
+    '            If (Not hEMF2.Equals(New IntPtr(0))) Then
+    '                If (OpenClipboard(hWnd)) Then
+    '                    If (EmptyClipboard()) Then
+    '                        hRes = SetClipboardData(14, hEMF2) '14 /*CF_ENHMETAFILE*/
+    '                        bResult = hRes.Equals(hEMF2)
+    '                        CloseClipboard()
+    '                    End If
+    '                End If
+    '            End If
+    '            DeleteEnhMetaFile(hEMF)
+    '            Return bResult
+    '        End If
+    '    End Function
+    'End Class
 End Class
 
