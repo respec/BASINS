@@ -7,59 +7,15 @@ Imports MapWinUtility
 Imports atcUtility
 Imports atcData
 
-Friend Class Reach
-    Public Id As String
-    Public Name As String
-    Public WsId As String
-    Public NExits As Integer
-    Public Type As String
-    Public Length As Double
-    Public DeltH As Double
-    Public DownID As String
-    Public Elev As Double
-    Public Depth As Double
-    Public Width As Double
-    Public Manning As Double
-    Public Order As Integer
-End Class
-
 Module modCreateUci
     Dim pLandUses As LandUses
-    Dim pReaches As Collection(Of Reach)
-    'channel file
-    Dim chanid() As String
-    Dim ChanL() As Single
-    Dim ChanYm() As Single
-    Dim ChanWm() As Single
-    Dim ChanN() As Single
-    Dim ChanS() As Single
-    Dim ChanM11() As Single
-    Dim ChanM12() As Single
-    Dim ChanYc() As Single
-    Dim ChanM21() As Single
-    Dim ChanM22() As Single
-    Dim ChanYt1() As Single
-    Dim ChanYt2() As Single
-    Dim ChanM31() As Single
-    Dim ChanM32() As Single
-    Dim ChanW11() As Single
-    Dim ChanW12() As Single
-    Dim ChanRecCnt As Integer
+    Dim pReaches As Reaches
+    Dim pChannels As Channels
+    Dim pPointLoads As PointLoads
 
     Dim pLandName(2) As String
     Dim pLastSeg(2) As Integer
     Dim pFirstSeg(2) As Integer
-
-    Dim FacilityCount As Integer
-    Dim FacilityName() As String
-    Dim FacilityNpdes() As String
-    Dim FacilityReach() As String
-    Dim FacilityMile() As Single
-
-    Dim PollutantCount As Integer
-    Dim PollutantFacID() As Integer
-    Dim PollutantName() As String
-    Dim PollutantLoad() As Single
 
     Friend Sub CreateUciFromBASINS(ByRef aUci As HspfUci, _
                                    ByRef aMsg As HspfMsg, _
@@ -104,10 +60,12 @@ Module modCreateUci
             Dim lReturnCode As Integer
             pLandUses = New LandUses
             lReturnCode = pLandUses.Open(aWsdName)
-            pReaches = New Collection(Of Reach)
-            Call ReadRCHFile(aWsdName, lReturnCode)
-            Call ReadPTFFile(aWsdName, lReturnCode)
-            Call ReadPSRFile(aWsdName, lReturnCode)
+            pReaches = New Reaches
+            lReturnCode = pReaches.Open(aWsdName)
+            pChannels = New Channels
+            lReturnCode = pChannels.Open(aWsdName)
+            pPointLoads = New PointLoads
+            lReturnCode = pPointLoads.Open(aWsdName)
 
             If lReturnCode = 0 Then  'everything read okay, continue
                 'build initial met segment 
@@ -150,12 +108,12 @@ Module modCreateUci
                     End If
                 Next
 
-                For i As Integer = 1 To ChanRecCnt 'process ftables
-                    Dim lOpn As HspfOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(CShort(chanid(i)))
+                For Each lChannel As Channel In pChannels 'process ftables
+                    Dim lOpn As HspfOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(CShort(lChannel.ChanId))
                     If Not lOpn Is Nothing Then
-                        lOpn.FTable.FTableFromCrossSect(ChanL(i), ChanYm(i), ChanWm(i), ChanN(i), ChanS(i), ChanM11(i), ChanM12(i), ChanYc(i), ChanM21(i), ChanM22(i), ChanYt1(i), ChanYt2(i), ChanM31(i), ChanM32(i), ChanW11(i), ChanW12(i))
+                        lOpn.FTable.FTableFromCrossSect(lChannel.ChanL, lChannel.ChanYm, lChannel.ChanWm, lChannel.ChanN, lChannel.ChanS, lChannel.ChanM11, lChannel.ChanM12, lChannel.ChanYc, lChannel.ChanM21, lChannel.ChanM22, lChannel.ChanYt1, lChannel.ChanYt2, lChannel.ChanM31, lChannel.ChanM32, lChannel.ChanW11, lChannel.ChanW12)
                     End If
-                Next i
+                Next
 
                 'create schematic, ext src blocks
                 CreateConnectionsSchematic(aUci)
@@ -184,274 +142,13 @@ Module modCreateUci
                 lDefUci.FastReadUciForStarter(aUci.Msg, aStarterUciName)
 
                 'set default parameter values and mass links from starter
-                setDefault(aUci, lDefUci)
+                SetDefault(aUci, lDefUci)
                 SetDefaultMassLink(aUci, lDefUci)
             End If
         End If
 
         aUci.Edited = False 'all the reads set edited
 
-    End Sub
-
-    Private Sub ReadRCHFile(ByRef aName As String, ByRef aReturnCode As Integer)
-        Dim tname, quote, lstr, tstr As String
-        Dim i, amax As Integer
-
-        aReturnCode = 0
-        Dim lSpace As String = " "
-        quote = """"
-
-        'read rch file
-        i = FreeFile()
-        On Error GoTo ErrHandler
-        tname = FilenameNoExt(aName) & ".rch"
-        FileOpen(i, tname, OpenMode.Input)
-        lstr = LineInput(i) 'header line
-        Do Until EOF(i)
-            lstr = LineInput(i)
-            Dim lReach As New Reach
-            lReach.Id = StrSplit(lstr, lSpace, quote)
-            lReach.Name = StrSplit(lstr, lSpace, quote)
-            lReach.WsId = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            lReach.NExits = CInt(StrSplit(lstr, lSpace, quote))
-            tstr = StrSplit(lstr, lSpace, quote)
-            lReach.Type = StrSplit(lstr, lSpace, quote)
-            lReach.Length = CDbl(StrSplit(lstr, lSpace, quote))
-            lReach.DeltH = CDbl(StrSplit(lstr, lSpace, quote))
-            lReach.Elev = CDbl(StrSplit(lstr, lSpace, quote))
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            lReach.DownID = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            lReach.Depth = CDbl(StrSplit(lstr, lSpace, quote))
-            lReach.Width = CDbl(StrSplit(lstr, lSpace, quote))
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            tstr = StrSplit(lstr, lSpace, quote)
-            lReach.Manning = CDbl(StrSplit(lstr, lSpace, quote))
-            lReach.Order = pReaches.Count
-            pReaches.Add(lReach)
-        Loop
-        FileClose(i)
-        Exit Sub
-ErrHandler:
-        Logger.Msg("Problem reading file " & tname, "Create Problem")
-        aReturnCode = 2
-    End Sub
-
-    Public Sub ReadPTFFile(ByRef newName As String, ByRef ret As Integer)
-
-        Dim tname, quote, delim, lstr, tstr As String
-        Dim i, amax As Integer
-
-        ret = 0
-        delim = " "
-        quote = """"
-
-        'read ptf file for channel data
-        i = FreeFile()
-        On Error GoTo ErrHandler
-        tname = Left(newName, Len(newName) - 3) & "ptf"
-        FileOpen(i, tname, OpenMode.Input)
-        lstr = LineInput(i) 'header line
-        ChanRecCnt = 0
-        ReDim chanid(1)
-        ReDim ChanL(1)
-        ReDim ChanYm(1)
-        ReDim ChanWm(1)
-        ReDim ChanN(1)
-        ReDim ChanS(1)
-        ReDim ChanM11(1)
-        ReDim ChanM12(1)
-        ReDim ChanYc(1)
-        ReDim ChanM21(1)
-        ReDim ChanM22(1)
-        ReDim ChanYt1(1)
-        ReDim ChanYt2(1)
-        ReDim ChanM31(1)
-        ReDim ChanM32(1)
-        ReDim ChanW11(1)
-        ReDim ChanW12(1)
-        Do Until EOF(i)
-            lstr = LineInput(i)
-            ChanRecCnt = ChanRecCnt + 1
-            amax = UBound(chanid)
-            If ChanRecCnt > amax Then
-                ReDim Preserve chanid(amax * 2)
-                ReDim Preserve ChanL(amax * 2)
-                ReDim Preserve ChanYm(amax * 2)
-                ReDim Preserve ChanWm(amax * 2)
-                ReDim Preserve ChanN(amax * 2)
-                ReDim Preserve ChanS(amax * 2)
-                ReDim Preserve ChanM11(amax * 2)
-                ReDim Preserve ChanM12(amax * 2)
-                ReDim Preserve ChanYc(amax * 2)
-                ReDim Preserve ChanM21(amax * 2)
-                ReDim Preserve ChanM22(amax * 2)
-                ReDim Preserve ChanYt1(amax * 2)
-                ReDim Preserve ChanYt2(amax * 2)
-                ReDim Preserve ChanM31(amax * 2)
-                ReDim Preserve ChanM32(amax * 2)
-                ReDim Preserve ChanW11(amax * 2)
-                ReDim Preserve ChanW12(amax * 2)
-            End If
-            chanid(ChanRecCnt) = StrSplit(lstr, delim, quote) 'reach id
-            ChanL(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'length
-            ChanYm(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'mean depth
-            ChanWm(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'mean width
-            ChanN(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'mann n
-            ChanS(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'long slope
-            If ChanS(ChanRecCnt) < 0.0001 Then
-                ChanS(ChanRecCnt) = 0.0001
-            End If
-            tstr = StrSplit(lstr, delim, quote)
-            ChanM31(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'side slope upper left
-            ChanM21(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'side slope lower left
-            ChanW11(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'zero slope width left
-            ChanM11(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'side slope chan left
-            ChanM12(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'side slope chan right
-            ChanW12(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'zero slope width right
-            ChanM22(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'side slope lower right
-            ChanM32(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'side slope upper right
-            ChanYc(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'channel depth
-            ChanYt1(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'depth at slope change
-            ChanYt2(ChanRecCnt) = CSng(StrSplit(lstr, delim, quote)) 'channel max depth
-        Loop
-        FileClose(i)
-        Exit Sub
-ErrHandler:
-        Call MsgBox("Problem reading file " & tname, , "Create Problem")
-        ret = 3
-    End Sub
-
-    Public Sub WritePTFFile(ByRef newName As String, ByRef chanid As String, ByRef ArrayVals() As Single)
-
-        Dim tstr, lstr, delim, quote, tname, Id As String
-        Dim i, amax As Integer
-
-        i = Len(chanid)
-        If i > 0 Then 'have a reach id
-            'write ptf file
-            i = FreeFile()
-            On Error GoTo ErrHandler
-            tname = newName
-            FileOpen(i, tname, OpenMode.Output)
-            lstr = "'Reach Number','Length(ft)','Mean Depth(ft)','Mean Width (ft)'," & "'Mannings Roughness Coeff.','Long. Slope','Type of x-section','Side slope of upper FP left'," & "'Side slope of lower FP left','Zero slope FP width left(ft)','Side slope of channel left'," & "'Side slope of channel right','Zero slope FP width right(ft)','Side slope lower FP right'," & "'Side slope upper FP right','Channel Depth(ft)','Flood side slope change at depth','Max. depth'," & "'No. of exits','Fraction of flow through exit 1','Fraction of flow through exit 2'," & "'Fraction of flow through exit 3','Fraction of flow through exit 4','Fraction of flow through exit 5'"
-            PrintLine(i, lstr) 'header line
-            lstr = chanid & " " & ArrayVals(1) & " " & ArrayVals(2) & " " & ArrayVals(3) & " " & ArrayVals(4) & " " & ArrayVals(5) & " " & "Trapezoidal" & " " & ArrayVals(13) & " " & ArrayVals(12) & " " & ArrayVals(11) & " " & ArrayVals(10) & " " & ArrayVals(9) & " " & ArrayVals(8) & " " & ArrayVals(7) & " " & ArrayVals(6) & " " & ArrayVals(14) & " " & ArrayVals(15) & " " & ArrayVals(16) & " " & "1 1 0 0 0 0"
-            PrintLine(i, lstr)
-            FileClose(i)
-            Exit Sub
-        End If
-ErrHandler:
-    End Sub
-
-    Public Sub GetPTFFileIds(ByRef cnt As Integer, ByRef ArrayIds() As String)
-        Dim j As Integer
-
-        cnt = ChanRecCnt
-        ReDim ArrayIds(cnt)
-        For j = 1 To cnt
-            ArrayIds(j) = chanid(j)
-        Next j
-    End Sub
-
-    Public Sub GetPTFData(ByRef RCHId As String, ByRef ArrayVals() As Single)
-        Dim i As Integer
-        Dim Id As String
-
-        i = Len(RCHId)
-        If i > 0 Then 'have a reach id
-            Id = CStr(CShort(RCHId))
-            For i = 1 To ChanRecCnt
-                If Trim(chanid(i)) = Id Then 'found the one
-                    ArrayVals(1) = ChanL(i)
-                    ArrayVals(2) = ChanYm(i)
-                    ArrayVals(3) = ChanWm(i)
-                    ArrayVals(4) = ChanN(i)
-                    ArrayVals(5) = ChanS(i)
-                    ArrayVals(6) = ChanM32(i)
-                    ArrayVals(7) = ChanM22(i)
-                    ArrayVals(8) = ChanW12(i)
-                    ArrayVals(9) = ChanM12(i)
-                    ArrayVals(10) = ChanM11(i)
-                    ArrayVals(11) = ChanW11(i)
-                    ArrayVals(12) = ChanM21(i)
-                    ArrayVals(13) = ChanM31(i)
-                    ArrayVals(14) = ChanYc(i)
-                    ArrayVals(15) = ChanYt1(i)
-                    ArrayVals(16) = ChanYt2(i)
-                End If
-            Next i
-        End If
-    End Sub
-
-    Private Sub ReadPSRFile(ByRef newName As String, ByRef ret As Integer)
-
-        Dim tname, quote, delim, lstr, tstr As String
-        Dim amax, i, j As Integer
-
-        ret = 0
-        delim = " "
-        quote = """"
-        FacilityCount = 0
-        PollutantCount = 0
-
-        'read psr file for point source data
-        i = FreeFile()
-        On Error GoTo ErrHandler
-        tname = Left(newName, Len(newName) - 3) & "psr"
-        FileOpen(i, tname, OpenMode.Input)
-        lstr = LineInput(i) 'number of facilities
-        If lstr.Length > 0 Then
-            FacilityCount = CShort(lstr)
-        End If
-        lstr = LineInput(i) 'blank line
-        lstr = LineInput(i) 'header line
-
-        If FacilityCount > 0 Then
-            'have some facilities
-            ReDim FacilityName(FacilityCount)
-            ReDim FacilityNpdes(FacilityCount)
-            ReDim FacilityReach(FacilityCount)
-            ReDim FacilityMile(FacilityCount)
-            For j = 1 To FacilityCount
-                lstr = LineInput(i)
-                FacilityName(j - 1) = StrSplit(lstr, delim, quote)
-                FacilityNpdes(j - 1) = StrSplit(lstr, delim, quote)
-                FacilityReach(j - 1) = StrSplit(lstr, delim, quote)
-                FacilityMile(j - 1) = CSng(StrSplit(lstr, delim, quote))
-            Next j
-            If Not EOF(i) Then lstr = LineInput(i) 'blank line
-            If Not EOF(i) Then lstr = LineInput(i) 'header line
-            PollutantCount = 0
-            Do Until EOF(i)
-                lstr = LineInput(i)
-                If lstr.Length > 0 Then
-                    PollutantCount = PollutantCount + 1
-                    ReDim Preserve PollutantFacID(PollutantCount)
-                    ReDim Preserve PollutantName(PollutantCount)
-                    ReDim Preserve PollutantLoad(PollutantCount)
-                    PollutantFacID(PollutantCount - 1) = CInt(StrSplit(lstr, delim, quote))
-                    PollutantName(PollutantCount - 1) = StrSplit(lstr, delim, quote)
-                    PollutantLoad(PollutantCount - 1) = CSng(StrSplit(lstr, delim, quote))
-                End If
-            Loop
-        End If
-        FileClose(i)
-        Exit Sub
-ErrHandler:
-        Logger.Msg("Problem reading file " & tname, "Create Problem")
-        ret = 4
     End Sub
 
     Private Sub SetInitValues(ByVal aUci As HspfUci)
@@ -791,7 +488,7 @@ ErrHandler:
         Dim lTypeId As Integer = 0
         Select Case aType
             Case "PERLND" : lTypeId = 2
-            Case "IMPLND" : ltypeId = 1
+            Case "IMPLND" : lTypeId = 1
         End Select
         Return lTypeId
     End Function
@@ -922,11 +619,7 @@ ErrHandler:
 
     Private Sub CreatePointSourceDSNs(ByRef aUci As HspfUci, _
                                       ByRef aPollutantListFileName As String)
-        Dim newwdmid As String = ""
-        Dim newdsn As Integer
-        Dim stanam, lLocation, sen, Con, tstype As String
-        Dim jdates(1) As Single
-        Dim rload(1) As Single
+        
 
         Dim lMasterPollutantList As New Collection
         If aPollutantListFileName.Length > 0 Then
@@ -935,21 +628,25 @@ ErrHandler:
             lMasterPollutantList = Nothing
         End If
 
-        'On Error Resume Next
-        sen = "PT-OBS"
-        For i As Integer = 0 To PollutantCount - 1
-            If CDbl(FacilityReach(PollutantFacID(i))) > 0 Then
-                Con = GetPollutantIDFromName(lMasterPollutantList, PollutantName(i))
-                If Len(Con) = 0 Then
-                    Con = UCase(Mid(PollutantName(i), 1, 8))
+        Dim lNewWdmId As String = ""
+        Dim lNewDsn As Integer
+        Dim lJDates(1) As Single
+        Dim lRLoad(1) As Single
+        Dim lScen As String = "PT-OBS"
+        For Each lFacility As Facility In pPointLoads
+            For Each lPollutant As PollutantLoad In lFacility.PollutantLoads
+                Dim lCon As String = GetPollutantIDFromName(lMasterPollutantList, lPollutant.PollutantName)
+                If lCon.Length = 0 Then
+                    lCon = UCase(Mid(lPollutant.PollutantName, 1, 8))
                 End If
-                stanam = FacilityName(PollutantFacID(i))
-                lLocation = "RCH" & CStr(FacilityReach(PollutantFacID(i)))
-                tstype = UCase(Mid(PollutantName(i), 1, 4))
-                rload(1) = PollutantLoad(i)
-                aUci.AddPointSourceDataSet(sen, lLocation, Con, stanam, tstype, 0, jdates, rload, newwdmid, newdsn)
-            End If
+                Dim lStanam As String = lFacility.FacilityName
+                Dim lLocation As String = "RCH" & lFacility.FacilityReach
+                Dim lTstype As String = UCase(Mid(lPollutant.PollutantName, 1, 4))
+                lRLoad(1) = lPollutant.PollutantLoad
+                aUci.AddPointSourceDataSet(lScen, lLocation, lCon, lStanam, lTstype, 0, lJDates, lRLoad, lNewWdmId, lNewDsn)
+            Next
         Next
+        
     End Sub
 
     Private Function GetPollutantIDFromName(ByRef PollutantList As Collection, ByRef PollutantName As String) As String
