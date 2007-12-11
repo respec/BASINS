@@ -23,18 +23,10 @@ Public Class HspfStatus
         HspfOutputTimeseries = 3
     End Enum
 
-    Private pStatusType As HspfStatusTypes
     Private pOper As HspfOperation
     Private pTableStatus As Collection(Of HspfStatusType)
 
-    Property StatusType() As HspfStatusTypes
-        Get
-            Return pStatusType
-        End Get
-        Set(ByVal Value As HspfStatusTypes)
-            pStatusType = Value
-        End Set
-    End Property
+    Public StatusType As HspfStatusTypes
 
     ReadOnly Property TotalPossible() As Integer
         Get
@@ -82,7 +74,7 @@ Public Class HspfStatus
             lTableStatus.Present = HspfStatusPresentMissingEnum.HspfStatusMissing
         Next lTableStatus
 
-        If pStatusType = HspfStatusTypes.HspfTable Then
+        If StatusType = HspfStatusTypes.HspfTable Then
             For Each lTable As HspfTable In pOper.Tables 'should this be in another loop
                 For Each lTableStatus As HspfStatusType In pTableStatus
                     If lTable.OccurNum = lTableStatus.Occur And lTable.Name = lTableStatus.Name Then
@@ -91,7 +83,7 @@ Public Class HspfStatus
                     End If
                 Next lTableStatus
             Next lTable
-        ElseIf pStatusType = HspfStatusTypes.HspfInputTimeseries Then  'source
+        ElseIf StatusType = HspfStatusTypes.HspfInputTimeseries Then  'source
             For Each lConnection As HspfConnection In pOper.Sources 'should this be in another loop
                 Dim lSub2, lSub1 As Integer
                 Dim lMember As String = Nothing
@@ -143,7 +135,7 @@ Public Class HspfStatus
             Next lConnection
         End If
 
-        If pStatusType = HspfStatusTypes.HspfTable Then
+        If StatusType = HspfStatusTypes.HspfTable Then
             Select Case pOper.Name
                 Case "PERLND" : UpdatePerlnd(pOper, Me)
                 Case "IMPLND" : UpdateImplnd(pOper, Me)
@@ -157,7 +149,7 @@ Public Class HspfStatus
                 Case "BMPRAC" : UpdateBmprac(pOper, Me)
                 Case "REPORT" : UpdateReport(pOper, Me)
             End Select
-        ElseIf pStatusType = HspfStatusTypes.HspfInputTimeseries Then
+        ElseIf StatusType = HspfStatusTypes.HspfInputTimeseries Then
             Select Case pOper.Name
                 Case "PERLND" : UpdateInputTimeseriesPerlnd(pOper, Me)
                 Case "IMPLND" : UpdateInputTimeseriesImplnd(pOper, Me)
@@ -171,7 +163,7 @@ Public Class HspfStatus
                 Case "BMPRAC" : UpdateInputTimeseriesBmprac(pOper, Me)
                 Case "REPORT" : UpdateInputTimeseriesReport(pOper, Me)
             End Select
-        ElseIf pStatusType = HspfStatusTypes.HspfOutputTimeseries Then
+        ElseIf StatusType = HspfStatusTypes.HspfOutputTimeseries Then
             Select Case pOper.Name
                 Case "PERLND" : UpdateOutputTimeseriesPerlnd(pOper, Me)
                 Case "IMPLND" : UpdateOutputTimeseriesImplnd(pOper, Me)
@@ -306,7 +298,7 @@ Public Class HspfStatus
         Dim lTableStatus As HspfStatusType
 
         pTableStatus = New Collection(Of HspfStatusType)
-        If pStatusType = HspfStatusTypes.HspfTable Then
+        If StatusType = HspfStatusTypes.HspfTable Then
             With pOper.Uci.Msg.BlockDefs(pOper.Name) 'as HspfBlockDef
                 For Each lTableDef As HspfTableDef In .TableDefs
                     For i As Integer = 1 To lTableDef.NumOccur
@@ -318,17 +310,18 @@ Public Class HspfStatus
                     Next i
                 Next lTableDef
             End With
-        ElseIf pStatusType = HspfStatusTypes.HspfInputTimeseries Or pStatusType = HspfStatusTypes.HspfOutputTimeseries Then
+        ElseIf StatusType = HspfStatusTypes.HspfInputTimeseries Or _
+               StatusType = HspfStatusTypes.HspfOutputTimeseries Then
             For Each lTSGroupDef As HspfTSGroupDef In pOper.Uci.Msg.TSGroupDefs
                 If lTSGroupDef.BlockId = pOper.OpTyp + 120 Then
                     For Each lTSMemberDef As HspfTSMemberDef In lTSGroupDef.MemberDefs
                         With lTSMemberDef
                             Dim lAddMember As Boolean = False
-                            If pStatusType = HspfStatusTypes.HspfInputTimeseries Then
+                            If StatusType = HspfStatusTypes.HspfInputTimeseries Then
                                 If .mio > 0 Then
                                     lAddMember = True
                                 End If
-                            ElseIf pStatusType = HspfStatusTypes.HspfOutputTimeseries Then
+                            ElseIf StatusType = HspfStatusTypes.HspfOutputTimeseries Then
                                 If .mio < 2 Then
                                     lAddMember = True
                                 End If
@@ -409,6 +402,6 @@ Public Class HspfStatus
     Public Sub New()
         MyBase.New()
         pTableStatus = New Collection(Of HspfStatusType)
-        pStatusType = HspfStatusTypes.HspfTable
+        StatusType = HspfStatusTypes.HspfTable
     End Sub
 End Class

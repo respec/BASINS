@@ -1,7 +1,9 @@
 'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
+
 Imports atcUtility
+Imports MapWinUtility
 Imports System.Text
 
 Public Class HspfGlobalBlk
@@ -162,76 +164,111 @@ Public Class HspfGlobalBlk
     End Sub
 
     Public Sub ReadUciFile()
-        Dim rectyp, lOutLev, retkey, retcod As Integer
-        Dim cbuff As String = Nothing
+        Dim lRecordType, lRecordIndex, lReturnCode As Integer
+        Dim lRecord As String = Nothing
+        Dim lOutLev As Integer
 
         If pUci.FastFlag Then
-            retkey = -1
+            lRecordIndex = -1
             pComment = GetCommentBeforeBlock("GLOBAL")
-            GetNextRecordFromBlock("GLOBAL", retkey, cbuff, rectyp, retcod)
-            If Mid(cbuff, 1, 7) <> "START" Then
-                pRunInf.Value = cbuff.TrimEnd
-                GetNextRecordFromBlock("GLOBAL", retkey, cbuff, rectyp, retcod)
+            GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+            If Not lRecord.StartsWith("  START") Then
+                pRunInf.Value = lRecord.TrimEnd
+                GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
             Else
                 pRunInf.Value = ""
             End If
             'Allow room for comments
-            While rectyp < 0 And retkey < 50 '(50 is arbitrary to prevent an endless loop)
-                GetNextRecordFromBlock("GLOBAL", retkey, cbuff, rectyp, retcod)
+            While lRecordType < 0 And lRecordIndex < 50 '(50 is arbitrary to prevent an endless loop)
+                GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
             End While
 
-            pSDate(0) = CInt(Mid(cbuff, 15, 4))
-            If Len(Trim(Mid(cbuff, 20, 2))) > 0 Then
-                pSDate(1) = CInt(Mid(cbuff, 20, 2))
+            Dim lField As String = lRecord.Substring(14, 4)
+            If IsInteger(lField) Then
+                pSDate(0) = lField
+            Else
+                Logger.Dbg("StartYearParseFailed:" & lField)
+                pSDate(0) = 1996 'better than nothing?
+            End If
+            lField = lRecord.Substring(19, 2)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pSDate(1) = lField
             Else
                 pSDate(1) = 1
             End If
-            If Len(Trim(Mid(cbuff, 23, 2))) > 0 Then
-                pSDate(2) = CInt(Mid(cbuff, 23, 2))
+            lField = lRecord.Substring(22, 2)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pSDate(2) = lField
             Else
                 pSDate(2) = 1
             End If
-            If Len(Trim(Mid(cbuff, 26, 2))) > 0 Then
-                pSDate(3) = CInt(Mid(cbuff, 26, 2))
-                pSDate(4) = CInt(Mid(cbuff, 29, 2))
+            lField = lRecord.Substring(25, 2)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pSDate(3) = lField
+                pSDate(4) = lRecord.Substring(28, 2)
             Else
                 pSDate(3) = 0
                 pSDate(4) = 0
             End If
-            pEDate(0) = CInt(Mid(cbuff, 40, 4))
-            If Len(Trim(Mid(cbuff, 45, 2))) > 0 Then
-                pEDate(1) = CInt(Mid(cbuff, 45, 2))
+
+            lField = lRecord.Substring(39, 4)
+            If IsInteger(lField) Then
+                pEDate(0) = lField
+            Else
+                Logger.Dbg("EndYearParseFailed:" & lField)
+                pEDate(0) = 2007 'better than nothing?
+            End If
+            lField = lRecord.Substring(44, 2)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pEDate(1) = lField
             Else
                 pEDate(1) = 12
             End If
-            If Len(Trim(Mid(cbuff, 48, 2))) > 0 Then
-                pEDate(2) = CInt(Mid(cbuff, 48, 2))
+            lField = lRecord.Substring(47, 2)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pEDate(2) = lField
             Else
                 pEDate(2) = 31
             End If
-            If Len(Trim(Mid(cbuff, 51, 2))) > 0 Then
-                pEDate(3) = CInt(Mid(cbuff, 51, 2))
-                pEDate(4) = CInt(Mid(cbuff, 54, 2))
+            lField = lRecord.Substring(50, 2)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pSDate(3) = lField
+                pSDate(4) = lRecord.Substring(53, 2)
             Else
-                pEDate(3) = 24
-                pEDate(4) = 0
+                pSDate(3) = 0
+                pSDate(4) = 0
             End If
-            GetNextRecordFromBlock("GLOBAL", retkey, cbuff, rectyp, retcod)
-            lOutLev = CInt(Mid(cbuff, 26, 5))
-            If Len(Trim(Mid(cbuff, 31, 5))) > 0 Then
-                pSpOut = CInt(Mid(cbuff, 31, 5))
+
+            GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+            lField = lRecord.Substring(25, 5)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                lOutLev = lField
+            Else
+                lOutLev = 3
+            End If
+            lField = lRecord.Substring(30, 5)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pSpOut = lField
             Else
                 pSpOut = 2
             End If
-            GetNextRecordFromBlock("GLOBAL", retkey, cbuff, rectyp, retcod)
-            pRunFg = CInt(Mid(cbuff, 20, 5))
-            If Len(Trim(Mid(cbuff, 58, 5))) > 0 Then
-                pEmFg = CInt(Mid(cbuff, 58, 5))
+
+            GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
+            lField = lRecord.Substring(19, 5)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pRunFg = lField
+            Else
+                pRunFg = 0
+            End If
+            lField = lRecord.Substring(57, 5)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pEmFg = lField
             Else
                 pEmFg = 1
             End If
-            If Len(Trim(Mid(cbuff, 68, 5))) > 0 Then
-                pIhmFg = CInt(Mid(cbuff, 68, 5))
+            lField = lRecord.Substring(67, 5)
+            If lField.Length > 0 AndAlso IsInteger(lField) Then
+                pIhmFg = lField
             Else
                 pIhmFg = 0
             End If

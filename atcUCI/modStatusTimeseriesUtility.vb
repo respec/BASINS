@@ -6,112 +6,123 @@ Imports atcuci.HspfStatus.HspfStatusReqOptUnnEnum
 Module modStatusTimeseriesUtility
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
-    Public Sub UpdateInputTimeseriesDuranl(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateInputTimeseriesDuranl(ByRef aOperation As HspfOperation, _
+                                           ByRef aTimserStatus As HspfStatus)
         'only timser for duranl is the input timser
-        TimserStatus.Change("INPUT:TIMSER", 1, HspfStatusRequired)
+        aTimserStatus.Change("INPUT:TIMSER", 1, HspfStatusRequired)
     End Sub
 
-    Public Sub UpdateOutputTimeseriesDuranl(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateOutputTimeseriesDuranl(ByRef aOperation As HspfOperation, _
+                                            ByRef aTimserStatus As HspfStatus)
         'no output timsers for duranl
     End Sub
 
-    Public Sub UpdateInputTimeseriesCopy(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
-        Dim nmn, npt, i As Integer
+    Public Sub UpdateInputTimeseriesCopy(ByRef aOperation As HspfOperation, _
+                                         ByRef aTimserStatus As HspfStatus)
+        Dim lNMean, lNPoint As Integer
 
-        If O.TableExists("TIMESERIES") Then
-            With O.Tables.Item("TIMESERIES")
-                npt = .ParmValue("NPT")
-                nmn = .ParmValue("NMN")
+        If aOperation.TableExists("TIMESERIES") Then
+            With aOperation.Tables.Item("TIMESERIES")
+                lNPoint = .ParmValue("NPT")
+                lNMean = .ParmValue("NMN")
             End With
         Else
-            npt = 0
-            nmn = 0
+            lNPoint = 0
+            lNMean = 0
         End If
-        For i = 1 To npt
-            TimserStatus.Change("INPUT:POINT", i, HspfStatusOptional)
-        Next i
-        For i = 1 To nmn
-            TimserStatus.Change("INPUT:MEAN", i, HspfStatusOptional)
-        Next i
+        For lPointIndex As Integer = 1 To lNPoint
+            aTimserStatus.Change("INPUT:POINT", lPointIndex, HspfStatusOptional)
+        Next lPointIndex
+        For lMeanIndex As Integer = 1 To lNMean
+            aTimserStatus.Change("INPUT:MEAN", lMeanIndex, HspfStatusOptional)
+        Next lMeanIndex
     End Sub
 
-    Public Sub UpdateOutputTimeseriesCopy(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
-        Dim nmn, npt, i As Integer
+    Public Sub UpdateOutputTimeseriesCopy(ByRef aOperation As HspfOperation, _
+                                          ByRef aTimserStatus As HspfStatus)
+        Dim lNMean, lNPoint As Integer
 
-        If O.TableExists("TIMESERIES") Then
-            With O.Tables.Item("TIMESERIES")
-                npt = .ParmValue("NPT")
-                nmn = .ParmValue("NMN")
+        If aOperation.TableExists("TIMESERIES") Then
+            With aOperation.Tables.Item("TIMESERIES")
+                lNPoint = .ParmValue("NPT")
+                lNMean = .ParmValue("NMN")
             End With
         Else
-            npt = 0
-            nmn = 0
+            lNPoint = 0
+            lNMean = 0
         End If
-        For i = 1 To npt
-            TimserStatus.Change("OUTPUT:POINT", i, HspfStatusOptional)
-        Next i
-        For i = 1 To nmn
-            TimserStatus.Change("OUTPUT:MEAN", i, HspfStatusOptional)
-        Next i
+        For lPointIndex As Integer = 1 To lNPoint
+            aTimserStatus.Change("OUTPUT:POINT", lPointIndex, HspfStatusOptional)
+        Next lPointIndex
+        For lMeanIndex As Integer = 1 To lNMean
+            aTimserStatus.Change("OUTPUT:MEAN", lMeanIndex, HspfStatusOptional)
+        Next lMeanIndex
     End Sub
 
-    Public Sub UpdateInputTimeseriesPltgen(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateInputTimeseriesPltgen(ByRef aOperation As HspfOperation, _
+                                           ByRef aTimserStatus As HspfStatus)
         'only timser for pltgen is the input timser
-        Dim nmn, npt, i As Integer
+        Dim lNMean, lNPoint As Integer
 
-        If O.TableExists("PLOTINFO") Then
-            With O.Tables.Item("PLOTINFO")
-                npt = .ParmValue("NPT")
-                nmn = .ParmValue("NMN")
+        If aOperation.TableExists("PLOTINFO") Then
+            With aOperation.Tables.Item("PLOTINFO")
+                lNPoint = .ParmValue("NPT")
+                lNMean = .ParmValue("NMN")
             End With
         Else
-            npt = 0
-            nmn = 0
+            lNPoint = 0
+            lNMean = 0
         End If
-        For i = 1 To npt
-            TimserStatus.Change("INPUT:POINT", i, HspfStatusRequired)
-        Next i
-        For i = 1 To nmn
-            TimserStatus.Change("INPUT:MEAN", i, HspfStatusRequired)
-        Next i
+        For lPointIndex As Integer = 1 To lNPoint
+            aTimserStatus.Change("INPUT:POINT", lPointIndex, HspfStatusRequired)
+        Next lPointIndex
+        For lMeanIndex As Integer = 1 To lNMean
+            aTimserStatus.Change("INPUT:MEAN", lMeanIndex, HspfStatusRequired)
+        Next lMeanIndex
     End Sub
 
-    Public Sub UpdateOutputTimeseriesPltgen(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateOutputTimeseriesPltgen(ByRef aOperation As HspfOperation, _
+                                            ByRef aTimserStatus As HspfStatus)
         'no output timsers for pltgen
     End Sub
 
-    Public Sub UpdateInputTimeseriesDisply(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateInputTimeseriesDisply(ByRef aOperation As HspfOperation, _
+                                           ByRef aTimserStatus As HspfStatus)
         'only timser for disply is the input timser
-        TimserStatus.Change("INPUT:TIMSER", 1, HspfStatusRequired)
+        aTimserStatus.Change("INPUT:TIMSER", 1, HspfStatusRequired)
     End Sub
 
-    Public Sub UpdateOutputTimeseriesDisply(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateOutputTimeseriesDisply(ByRef aOperation As HspfOperation, _
+                                            ByRef aTimserStatus As HspfStatus)
         'no output timsers for disply
     End Sub
 
-    Public Sub UpdateInputTimeseriesGener(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateInputTimeseriesGener(ByRef aOperation As HspfOperation, _
+                                          ByRef aTimserStatus As HspfStatus)
         'two possible input timsers for gener
-        Dim Opcode As Integer
+        Dim lOpCode As Integer
 
-        If O.TableExists("OPCODE") Then
-            Opcode = O.Tables.Item("OPCODE").ParmValue("OPCODE")
+        If aOperation.TableExists("OPCODE") Then
+            lOpCode = aOperation.Tables.Item("OPCODE").ParmValue("OPCODE")
         Else
-            Opcode = 0
+            lOpCode = 0
         End If
-        If Opcode > 0 And Opcode <> 24 Then
-            TimserStatus.Change("INPUT:ONE", 1, HspfStatusRequired)
+        If lOpCode > 0 And lOpCode <> 24 Then
+            aTimserStatus.Change("INPUT:ONE", 1, HspfStatusRequired)
         End If
-        If Opcode > 15 And Opcode < 24 Then
-            TimserStatus.Change("INPUT:TWO", 1, HspfStatusRequired)
+        If lOpCode > 15 And lOpCode < 24 Then
+            aTimserStatus.Change("INPUT:TWO", 1, HspfStatusRequired)
         End If
     End Sub
 
-    Public Sub UpdateOutputTimeseriesGener(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateOutputTimeseriesGener(ByRef aOperation As HspfOperation, _
+                                           ByRef aTimserStatus As HspfStatus)
         'only one output timser for gener
-        TimserStatus.Change("OUTPUT:TIMSER", 1, HspfStatusOptional)
+        aTimserStatus.Change("OUTPUT:TIMSER", 1, HspfStatusOptional)
     End Sub
 
-    Public Sub UpdateInputTimeseriesMutsin(ByRef O As HspfOperation, ByRef TimserStatus As HspfStatus)
+    Public Sub UpdateInputTimeseriesMutsin(ByRef aOperation As HspfOperation, _
+                                           ByRef aTimserStatus As HspfStatus)
         'no input timsers for mutsin
     End Sub
 

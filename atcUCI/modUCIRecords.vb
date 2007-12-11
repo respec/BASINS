@@ -35,7 +35,6 @@ Module modUCIRecords
                                       ByRef aRecordType As Integer, _
                                       ByRef aReturnCode As Integer)
         Dim lRecordIndex As Integer = -1
-
         If aRecordIndex = -1 Then 'find first record of block
             For Each lUciRec As String In pUciRec
                 lRecordIndex += 1
@@ -47,7 +46,7 @@ Module modUCIRecords
             aReturnCode = 10
         End If
 
-        'start at retkey+1
+        'start at record after input aRecordIndex
         If aRecordIndex > -1 Then
             aRecordIndex += 1
             Dim lUciRec As String = pUciRec(aRecordIndex)
@@ -71,104 +70,100 @@ Module modUCIRecords
                 aReturnCode = 2
             End If
         End If
+        If Not aRecord Is Nothing Then
+            aRecord = aRecord.PadRight(80) 'ensure full record
+        End If
         If aRecordIndex = pUciRec.Count - 1 Then
             aReturnCode = 0
         End If
     End Sub
 
-    Public Sub StartingRecordofOperationTable(ByRef aOperationName As String, _
+    Public Sub StartingRecordOfOperationTable(ByRef aOperationName As String, _
                                               ByRef aKeyword As String, _
-                                              ByRef srec As Integer, _
-                                              ByRef noccur As Integer)
-        Dim ostart, i, oend As Integer
-        Dim lOperationNameLength As Integer = aOperationName.Length
-        srec = 0
-        noccur = 0
-        ostart = 0
-        For i = 0 To pUciRec.Count - 1
-            If Len(pUciRec(i)) >= lOperationNameLength Then
-                If Left(pUciRec(i), lOperationNameLength) = aOperationName Then
-                    'found start of this operation type block
-                    ostart = i
+                                              ByRef aRecIndex As Integer, _
+                                              ByRef aOccurNumber As Integer)
+        Dim lRecIndexStart As Integer = -1
+        Dim lRecIndex As Integer = -1
+        For Each lRec As String In pUciRec
+            lRecIndex += 1
+            If lRec.StartsWith(aOperationName) Then
+                'found start of this operation type block
+                lRecIndexStart = lRecIndex
+                Exit For
+            End If
+        Next lRec
+
+        Dim lRecIndexEnd As Integer = -1
+        If lRecIndexStart > 0 Then
+            For lRecIndex = lRecIndexStart + 1 To pUciRec.Count - 1
+                Dim lRec As String = pUciRec(lRecIndex)
+                If lRec.StartsWith("END " & aOperationName) Then
+                    'found end of this operation type block
+                    lRecIndexEnd = lRecIndex
                     Exit For
                 End If
-            End If
-        Next i
-
-        oend = 0
-        If ostart > 0 Then
-            For i = ostart + 1 To pUciRec.Count - 1
-                lOperationNameLength = Len("END " & aOperationName)
-                If Len(pUciRec(i)) >= lOperationNameLength Then
-                    If Left(pUciRec(i), lOperationNameLength) = "END " & aOperationName Then
-                        'found end of this operation type block
-                        oend = i
-                        Exit For
-                    End If
-                End If
-            Next i
+            Next lRecIndex
         End If
 
-        If ostart > 0 And oend > 0 Then
-            For i = ostart + 1 To oend
-                lOperationNameLength = Len("  " & aKeyword)
-                If Len(pUciRec(i)) >= lOperationNameLength And InStr(1, pUciRec(i), "***") = 0 Then
-                    'If Left(uciRec(i), ilen) = "  " & kwd Then
+        aRecIndex = 0
+        aOccurNumber = 0
+        If lRecIndexStart > -1 And lRecIndexEnd > -1 Then
+            For lRecIndex = lRecIndexStart + 1 To lRecIndexEnd
+                Dim lRec As String = pUciRec(lRecIndex)
+                If lRec.StartsWith("  " & aKeyword) Then 'found start of this table 
                     'pbd -- distinguish between soil-data and soil-data2 for instance
-                    If RTrim(Left(pUciRec(i), lOperationNameLength + 1)) = "  " & aKeyword Then
-                        'found start of this table
-                        If srec = 0 Then
-                            srec = i
-                        End If
-                        noccur = noccur + 1
+                    If aRecIndex = 0 Then
+                        aRecIndex = lRecIndex
                     End If
+                    aOccurNumber += 1
                 End If
-            Next i
+            Next lRecIndex
         End If
     End Sub
 
-    Public Sub GetNextRecordFromTable(ByRef blockname As String, ByRef tablename As String, ByRef srec As Integer, ByRef initfg As Integer, ByRef noccur As Integer, ByRef cbuff As String, ByRef rectyp As Integer, ByRef retcod As Integer)
-        Dim i, ilen As Integer
-
-        If noccur > 1 And initfg = 1 Then
+    Public Sub GetNextRecordFromTable(ByRef aBlockName As String, _
+                                      ByRef aTableName As String, _
+                                      ByRef aRecIndex As Integer, _
+                                      ByRef aInitflag As Integer, _
+                                      ByRef aOccurNumber As Integer, _
+                                      ByRef aRecord As String, _
+                                      ByRef aRecType As Integer, _
+                                      ByRef aReturnCode As Integer)
+        Dim lRecord As String
+        If aOccurNumber > 1 And aInitflag = 1 Then
             'first time in, need to find start of the next one of these tables
-            For i = srec + 1 To pUciRec.Count - 1
-                ilen = Len("  " & tablename)
-                If Len(pUciRec(i)) >= ilen And InStr(1, pUciRec(i), "***") = 0 Then
-                    If Left(pUciRec(i), ilen) = "  " & tablename Then
-                        'found start of this table
-                        'pbd 9/04 always want next occur
-                        srec = i
-                        Exit For
-                    End If
+            For lRecIndex As Integer = aRecIndex + 1 To pUciRec.Count - 1
+                lRecord = pUciRec(lRecIndex)
+                If lRecord.StartsWith("  " & aTableName) Then
+                    'found start of this table
+                    'pbd 9/04 always want next occur
+                    aRecIndex = lRecIndex
+                    Exit For
                 End If
-            Next i
+            Next lRecIndex
         End If
 
-        For i = srec + 1 To pUciRec.Count - 1
-            If RTrim(pUciRec(i)) = "  END " & tablename Then
-                retcod = 10
-                Exit For
-            End If
-            If InStr(1, pUciRec(i), "***") = 0 And Len(Trim(pUciRec(i))) > 0 Then
-                'found a real line of this block
-                srec = i
-                cbuff = pUciRec(i)
-                rectyp = 0
-                retcod = 2
-                Exit For
-            ElseIf InStr(1, pUciRec(i), "***") > 0 Then
-                'found comment
-                srec = i
-                cbuff = pUciRec(i)
-                rectyp = -1
-                retcod = 3
-                Exit For
-            End If
-        Next i
-
-        If srec = pUciRec.Count - 1 Then
-            retcod = 0
+        aRecIndex += 1
+        lRecord = pUciRec(aRecIndex)
+        If lRecord.StartsWith("  END " & aTableName) Then
+            aReturnCode = 10
+        ElseIf lRecord.IndexOf("***") > -1 Then 'found comment
+            aRecord = lRecord
+            aRecType = -1
+            aReturnCode = 3
+        ElseIf lRecord.Trim.Length = 0 And _
+               aBlockName <> "FTABLES" Then
+            'found blank line
+            aRecord = ""
+            aRecType = -2
+            aReturnCode = 2
+        Else 'found a real line of this block
+            aRecord = lRecord
+            aRecType = 0
+            aReturnCode = 2
+        End If
+        If aRecIndex = pUciRec.Count - 1 Then
+            aReturnCode = 0
         End If
     End Sub
 
@@ -214,16 +209,16 @@ Module modUCIRecords
         If aThisOccur > 1 Then
             lRecordKey = -1
             lOccurCount = 1
-            For i As Integer = aStartRecord + 1 To pUciRec.Count - 1
-                If aTableName.Trim = pUciRec(i).Trim Then
+            For lRecordIndex As Integer = aStartRecord + 1 To pUciRec.Count - 1
+                If aTableName.Trim = pUciRec(lRecordIndex).Trim Then
                     'found another occurence
                     lOccurCount += 1
                     If lOccurCount = aThisOccur Then
-                        lRecordKey = i
+                        lRecordKey = lRecordIndex
                     End If
                     Exit For
                 End If
-            Next i
+            Next lRecordIndex
         End If
 
         'start at retkey+1
@@ -304,14 +299,14 @@ Module modUCIRecords
         Next
 
         'add any blocks in pOrder that aren't in myOrder
-        Dim iprev As Integer = -1
+        Dim lPrev As Integer = -1
         For Each lBlock As String In aOrder
             Dim lFoundAt As Integer = lOrder.IndexOf(lBlock)
             If lFoundAt >= 0 Then
-                iprev = lFoundAt
+                lPrev = lFoundAt
             Else 'add this one so that myOrder has a complete set
-                iprev += 1
-                lOrder.Insert(iprev, lBlock)
+                lPrev += 1
+                lOrder.Insert(lPrev, lBlock)
             End If
         Next
         aOrder.Clear()

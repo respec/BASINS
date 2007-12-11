@@ -265,7 +265,6 @@ Public Class HspfTable
             If lOccur = 1 Then
                 lTableName = pDef.Name
             Else
-                lSB.AppendLine(" ")
                 lTableName = pDef.Name & ":" & lOccur
             End If
             lSB.AppendLine("  " & pDef.Name)

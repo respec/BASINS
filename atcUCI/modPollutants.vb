@@ -534,7 +534,7 @@ Module modPollutants
                             End If
 
                             If Not myUci.OpnBlks(lCtype).TableExists(cname) Then
-                                myUci.OpnBlks(lCtype).Tables.Add(ltable, cname)
+                                myUci.OpnBlks(lCtype).Tables.Add(ltable)
                                 If ltable.OccurNum > 1 And ltable.TableNeededForAllQuals Then
                                     'make sure all previous occurs of this table exist
                                     For i = 1 To ltable.OccurNum - 1
@@ -551,7 +551,7 @@ Module modPollutants
                                             tempTable.initTable((s))
                                             tempTable.OccurNum = i
                                             tempTable.OccurCount = ltable.OccurCount
-                                            myUci.OpnBlks(lCtype).Tables.Add(tempTable, cname)
+                                            myUci.OpnBlks(lCtype).Tables.Add(tempTable)
                                         End If
                                     Next i
                                 End If

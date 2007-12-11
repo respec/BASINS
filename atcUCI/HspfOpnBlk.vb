@@ -1,4 +1,4 @@
-'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
+'Copyright 2006-7 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
 
@@ -17,13 +17,13 @@ Public Class HspfOpnBlk
     Private pName As String
     Private pIds As HspfOperations
     Private pEdited As Boolean
-    Private pTables As Collection '(Of HspfTable)
+    Private pTables As HspfTables
     Private pUci As HspfUci
     Private pComment As String = ""
 
     Public Property Comment() As String
         Get
-            Comment = pComment
+            Return pComment
         End Get
         Set(ByVal Value As String)
             pComment = Value
@@ -32,7 +32,7 @@ Public Class HspfOpnBlk
 
     Public Property Edited() As Boolean
         Get
-            Edited = pEdited
+            Return pEdited
         End Get
         Set(ByVal Value As Boolean)
             pEdited = Value
@@ -42,7 +42,7 @@ Public Class HspfOpnBlk
 
     Public Property Name() As String
         Get
-            Name = pName
+            Return pName
         End Get
         Set(ByVal Value As String)
             pName = Value
@@ -51,24 +51,24 @@ Public Class HspfOpnBlk
 
     Public ReadOnly Property Ids() As HspfOperations
         Get
-            Ids = pIds
+            Return pIds
         End Get
     End Property
 
     Public Property Uci() As HspfUci
         Get
-            Uci = pUci
+            Return pUci
         End Get
         Set(ByVal Value As HspfUci)
             pUci = Value
         End Set
     End Property
 
-    ReadOnly Property Tables() As Collection
+    ReadOnly Property Tables() As HspfTables
         Get 'of hspftables
             'make smarter if not found!!!
             'Set Tables = pIds(1).Tables
-            Tables = pTables
+            Return pTables
         End Get
     End Property
 
@@ -109,7 +109,7 @@ Public Class HspfOpnBlk
         MyBase.New()
         pName = ""
         pIds = New HspfOperations
-        pTables = New Collection
+        pTables = New HspfTables
     End Sub
 
     Public Function TableExists(ByRef aName As String) As Boolean
@@ -140,7 +140,7 @@ Public Class HspfOpnBlk
             If pUci.FastFlag Then
                 lTableIndex += 1
                 lKeyword = aBlockDef.TableDefs(lTableIndex).Name
-                StartingRecordofOperationTable((aBlockDef.Name), lKeyword, lSRec, lOccurCount)
+                StartingRecordOfOperationTable(aBlockDef.Name, lKeyword, lSRec, lOccurCount)
                 If lSRec > 0 Then
                     lExistFlag = 1 'does it exist, 1 if so
                 Else
@@ -228,13 +228,13 @@ Public Class HspfOpnBlk
                                 If lOccurCount > 1 And lOccurNum > 1 Then
                                     lOperation.Tables.Add(lTable)
                                     If Not TableExists(lTable.Name & ":" & lOccurNum) Then
-                                        pTables.Add(lTable, lTable.Name & ":" & lOccurNum)
+                                        pTables.Add(lTable)
                                     End If
                                 Else
                                     Try
                                         lOperation.Tables.Add(lTable)
                                         If Not TableExists((lTable.Name)) Then
-                                            pTables.Add(lTable, lTable.Name)
+                                            pTables.Add(lTable)
                                         End If
                                     Catch
                                         Logger.Dbg("TableProblem:" & lTable.Name & ":" & lOperation.Id)
@@ -263,11 +263,11 @@ Public Class HspfOpnBlk
                         lTable.TableComment = lTableComment
                         If lOccurCount > 1 And lOccurNum > 1 Then
                             If Not TableExists(lTable.Name & ":" & lOccurNum) Then
-                                pTables.Add(lTable, lTable.Name & ":" & lOccurNum)
+                                pTables.Add(lTable)
                             End If
                         Else
                             If Not TableExists((lTable.Name)) Then
-                                pTables.Add(lTable, lTable.Name)
+                                pTables.Add(lTable)
                             End If
                         End If
                     End If
@@ -374,7 +374,7 @@ Public Class HspfOpnBlk
                     lOperation.FTable.Id = lOperation.Id
                 End If
                 If Not Me.TableExists(lTable.Name) Then
-                    Me.Tables.Add(lTable, lTable.Name) 'pbd - needs to be added?
+                    Me.Tables.Add(lTable) 'pbd - needs to be added?
                 End If
             Next lOperation
         Next lTableName
@@ -479,36 +479,26 @@ Public Class HspfOpnBlk
 
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
-        Dim i As Integer
-        Dim lTable As HspfTable
-        Dim j, k As Integer
-        Dim t As String
-        Dim ttable As HspfTable
-        Dim lGroupIndex, lFirstInGroup As Integer
-        Dim lInGroup As Boolean
-        Dim lLastInGroup, lLastGroupIndex, lCurrentOccurGroup As Integer
-
         If pComment.Length > 0 Then
             lSB.AppendLine(pComment)
         End If
         lSB.AppendLine(pName)
 
-        lInGroup = False
-
+        Dim lGroupIndex, lFirstInGroup As Integer
+        Dim lLastInGroup, lLastGroupIndex, lCurrentOccurGroup As Integer
+        Dim lInGroup As Boolean = False
         Dim lBlockDef As HspfBlockDef = pUci.Msg.BlockDefs.Item(pName)
         Dim lFirstTable As Boolean = True
+        Dim lTableDefIndex As Integer = 0
         For Each lTableDef As HspfTableDef In lBlockDef.TableDefs
             'must look thru all possible tables
-            If lTableDef.OccurGroup = 0 And Not lInGroup Then
-                'the basic case
+            lTableDefIndex += 1
+            If lTableDef.OccurGroup = 0 And Not lInGroup Then 'the basic case
                 For Each lOperation As HspfOperation In pIds
                     If lOperation.TableExists(lTableDef.Name) Then
-                        lTable = lOperation.Tables.Item(lTableDef.Name)
+                        Dim lTable As HspfTable = lOperation.Tables.Item(lTableDef.Name)
                         If lTable.TableComment.Length > 0 Then
                             lSB.AppendLine(lTable.TableComment)
-                        End If
-                        If Not (lFirstTable) Then
-                            lSB.AppendLine(" ")
                         End If
                         lSB.AppendLine(lTable.ToString) 'this writes all like this
                         Exit For
@@ -516,22 +506,24 @@ Public Class HspfOpnBlk
                 Next lOperation
             Else 'this is a multiple occurence group (like pqual, iqual, gqual)
                 If lInGroup Then
-                    If lTableDef.OccurGroup <> lCurrentOccurGroup Or i = lBlockDef.TableDefs.Count Then
+                    If lTableDef.OccurGroup <> lCurrentOccurGroup Or lTableDefIndex = lBlockDef.TableDefs.Count Then
                         'we were in a multiple occurence group but have reached end of group
-                        lGroupIndex = lGroupIndex + 1 'look for next occurence
+                        lGroupIndex += 1 'look for next occurence
                         If lGroupIndex > lLastGroupIndex Then
                             lInGroup = False 'no more to do
-                            If lLastInGroup > 0 Then i = lLastInGroup
+                            If lLastInGroup > 0 Then
+                                lTableDefIndex = lLastInGroup
+                            End If
                         Else
-                            lLastInGroup = i - 1 'remember which was the last table in group
-                            i = lFirstInGroup
-                            lTableDef = lBlockDef.TableDefs.Item(i)
+                            lLastInGroup = lTableDefIndex - 1 'remember which was the last table in group
+                            lTableDefIndex = lFirstInGroup
+                            lTableDef = lBlockDef.TableDefs.Item(lTableDefIndex)
                         End If
                     End If
                 Else 'start of a multiple occurence group
                     lInGroup = True
                     lGroupIndex = 1
-                    lFirstInGroup = i
+                    lFirstInGroup = lTableDefIndex
                     lLastGroupIndex = 0
                     lLastInGroup = 0
                     lCurrentOccurGroup = lTableDef.OccurGroup
@@ -541,39 +533,37 @@ Public Class HspfOpnBlk
                     For Each lOperation As HspfOperation In pIds
                         'If lId.TableExists(lTableDef.Name) Then  'accomodate empty placeholder tables
                         If lOperation.OpnBlk.TableExists((lTableDef.Name)) Then
-                            lTable = lOperation.OpnBlk.Tables(lTableDef.Name)
-                            If lTable.OccurIndex = 0 Or (lTable.OccurIndex > 0 And lTable.OccurIndex <= lGroupIndex) Then
+                            Dim lTable As HspfTable = lOperation.OpnBlk.Tables(lTableDef.Name)
+                            If lTable.OccurIndex = 0 Or _
+                              (lTable.OccurIndex > 0 And lTable.OccurIndex <= lGroupIndex) Then
                                 If lGroupIndex > 1 And lTable.OccurIndex = 0 Then
                                     'write the comment that applies to this table
-                                    t = lTable.Name & ":" & lGroupIndex
-                                    ttable = lOperation.OpnBlk.Tables(t)
-                                    If ttable.TableComment.Length > 0 Then
-                                        lSB.AppendLine(ttable.TableComment)
+                                    Dim lTableKey As String = lTable.Name & ":" & lGroupIndex
+                                    Dim lTableX As HspfTable = lOperation.OpnBlk.Tables(lTableKey)
+                                    If lTableX.TableComment.Length > 0 Then
+                                        lSB.AppendLine(lTableX.TableComment)
                                     End If
                                 Else
                                     If lTable.TableComment.Length > 0 Then
                                         lSB.AppendLine(lTable.TableComment)
                                     End If
                                 End If
-                                If Not (lFirstTable) Then
-                                    lSB.AppendLine(" ")
-                                End If
                                 If lTable.OccurIndex = 0 Then 'write out just this occurence
                                     lSB.AppendLine(lTable.ToStringByIndex(lGroupIndex))
                                 Else
                                     'special case for some p/i/gqual tables
-                                    j = 0
-                                    For k = 1 To lTable.OccurCount
-                                        t = lTable.Name
-                                        If k > 1 Then
-                                            t = t & ":" & k
+                                    Dim j As Integer = 0
+                                    For lTableOccurIndex As Integer = 1 To lTable.OccurCount
+                                        Dim lTableKey As String = lTable.Name
+                                        If lTableOccurIndex > 1 Then
+                                            lTableKey &= ":" & lTableOccurIndex
                                         End If
-                                        ttable = lOperation.OpnBlk.Tables(t)
-                                        If ttable.OccurIndex = lGroupIndex Then
-                                            j = ttable.OccurNum
+                                        Dim lTableX As HspfTable = lOperation.OpnBlk.Tables(lTableKey)
+                                        If lTableX.OccurIndex = lGroupIndex Then
+                                            j = lTableX.OccurNum
                                             Exit For
                                         End If
-                                    Next k
+                                    Next lTableOccurIndex
                                     If j > 0 Then 'write out just this occurence
                                         lSB.AppendLine(lTable.ToStringByIndex(j))
                                     End If
@@ -589,6 +579,7 @@ Public Class HspfOpnBlk
             End If
             lFirstTable = False
         Next lTableDef
+
         lSB.AppendLine("END " & pName)
         Return lSB.ToString
     End Function
