@@ -31,7 +31,7 @@ Public Class HspfOperation
     Private pEdited As Boolean
     Private pFTable As HspfFtable
     Private pMetSeg As HspfMetSeg
-    Private pPointSources As Collection(Of HspfPoint)
+    Private pPointSources As Collection(Of HspfPointSource)
     Private pUci As HspfUci
     Private pComment As String = ""
     Private pSerial As Integer
@@ -178,11 +178,11 @@ Public Class HspfOperation
     End Property
 
 
-    Public Property PointSources() As Collection(Of HspfPoint)
+    Public Property PointSources() As Collection(Of HspfPointSource)
         Get
             Return pPointSources
         End Get
-        Set(ByVal Value As Collection(Of HspfPoint))
+        Set(ByVal Value As Collection(Of HspfPointSource))
             pPointSources = Value
         End Set
     End Property
@@ -497,7 +497,7 @@ Public Class HspfOperation
         pTables = New HspfTables
         pSources = New Collection(Of HspfConnection)
         pTargets = New Collection(Of HspfConnection)
-        pPointSources = New Collection(Of HspfPoint)
+        pPointSources = New Collection(Of HspfPointSource)
         pTableStatus = New HspfStatus
         pTableStatus.init(Me)
         pInputTimeseriesStatus = New HspfStatus
