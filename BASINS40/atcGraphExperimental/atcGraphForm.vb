@@ -21,7 +21,7 @@ Public Class atcGraphForm
     Private pMaster As ZedGraph.MasterPane
     Private pPaneMain As ZedGraph.GraphPane
     Private pPaneAux As ZedGraph.GraphPane
-    Private pAuxEnabled As Boolean = False
+    Private pAuxEnabled As Boolean = True 'force change with value of false on init
     Public AuxFraction As Single = 0.2
 
     'Graph editing form
@@ -72,7 +72,7 @@ Public Class atcGraphForm
             .IsCommonScaleFactor = True
         End With
 
-        AuxAxisEnabled = True
+        AuxAxisEnabled = False
 
         SetDatasets(pDataGroup)
     End Sub
@@ -114,6 +114,7 @@ Public Class atcGraphForm
                 .Position = LegendPos.Float
                 .Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
                 .IsHStack = False
+                .Border.IsVisible = False
             End With
             .Border.IsVisible = False
         End With
@@ -704,14 +705,14 @@ Public Class atcGraphForm
                 End If
             Next
             If Not lFoundMatchingCons Then
-                lCurve.IsY2Axis = True
+                lYAxisName = "Right"
             End If
         End If
         Select Case lYAxisName.ToUpper
             Case "AUX"
+                AuxAxisEnabled = True
                 lPane = pPaneAux
                 lYAxis = pPaneAux.YAxis
-                AuxAxisEnabled = True
             Case "RIGHT"
                 lPane = pPaneMain
                 lYAxis = lPane.Y2Axis
@@ -927,7 +928,7 @@ Public Class atcGraphForm
     End Sub
 
     Private Sub ResizePanes()
-        If AuxAxisEnabled Then
+        If AuxAxisEnabled And Not pPaneAux Is Nothing Then
             Dim lOrigAuxHeight As Single = pPaneAux.Rect.Height
             Dim lTotalPaneHeight As Single = lOrigAuxHeight + pPaneMain.Rect.Height
             pPaneAux.Rect = New System.Drawing.Rectangle( _
