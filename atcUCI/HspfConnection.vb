@@ -481,7 +481,7 @@ Public Class HspfConnection
                     Case 4 : lBlockName = "EXT TARGETS"
                 End Select
                 Dim lBlockDef As HspfBlockDef = pUci.Msg.BlockDefs.Item(lBlockName)
-                Dim lTableDef As HspfTableDef = lBlockDef.TableDefs.Item(1)
+                Dim lTableDef As HspfTableDef = lBlockDef.TableDefs.Item(0)
                 'get lengths and starting positions
                 Dim lParmDefIndex As Integer = 0
                 Dim iCol(15) As Integer

@@ -1,13 +1,22 @@
 Option Strict Off
 Option Explicit On
 
+Imports System.Collections.ObjectModel
+
+Public Class HspfParmDefs
+    Inherits KeyedCollection(Of String, HSPFParmDef)
+    Protected Overrides Function GetKeyForItem(ByVal aParmDef As HSPFParmDef) As String
+        Return aParmDef.Name
+    End Function
+End Class
+
 ''' <summary>
 ''' Definition of a model parameter.
 ''' </summary>
 ''' <remarks>
 ''' Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 ''' </remarks>
-<System.Runtime.InteropServices.ProgId("HSPFParmDef_NET.HSPFParmDef")> Public Class HSPFParmDef
+Public Class HSPFParmDef
     Private pTyp As Integer 'atcoDataType is in control
     Private pMin As Double
     Private pMax As Double
@@ -27,7 +36,6 @@ Option Explicit On
     ''' Name of parameter.
     ''' </summary>
     Public Name As String
-
     ''' <summary>
     ''' Type of parameter.
     ''' </summary>

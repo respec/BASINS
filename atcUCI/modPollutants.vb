@@ -1,9 +1,9 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
+
 Module modPollutants
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
-	
-    Public Sub modPollutantsBuild(ByRef myUci As HspfUci, ByRef myMsg As HspfMsg)
+    Public Sub modPollutantsBuild(ByRef aUci As HspfUci, ByRef aMsg As HspfMsg)
         Dim vOpn As Object
         Dim lOpn As HspfOperation
         Dim i, itemp, nquals, j, nGqual, k As Integer
@@ -22,7 +22,7 @@ Module modPollutants
 
         'figure out how many p or i quals
         nquals = 0
-        For Each vOpn In myUci.OpnBlks("PERLND").Ids
+        For Each vOpn In aUci.OpnBlks("PERLND").Ids
             lOpn = vOpn
             If lOpn.TableExists("NQUALS") Then
                 itemp = lOpn.Tables.Item("NQUALS").ParmValue("NQUAL")
@@ -34,7 +34,7 @@ Module modPollutants
             End If
         Next vOpn
 
-        For Each vOpn In myUci.OpnBlks("IMPLND").Ids
+        For Each vOpn In aUci.OpnBlks("IMPLND").Ids
             lOpn = vOpn
             If lOpn.TableExists("NQUALS") Then
                 itemp = lOpn.Tables.Item("NQUALS").ParmValue("NQUAL")
@@ -48,7 +48,7 @@ Module modPollutants
 
         'figure out how many gquals
         nGqual = 0
-        For Each vOpn In myUci.OpnBlks("RCHRES").Ids
+        For Each vOpn In aUci.OpnBlks("RCHRES").Ids
             lOpn = vOpn
             If lOpn.TableExists("GQ-QALDATA") Then
                 If lOpn.TableExists("GQ-GENDATA") Then
@@ -77,9 +77,9 @@ Module modPollutants
                     Else
                         tname = "QUAL-PROPS"
                     End If
-                    If myUci.OpnBlks(lCtype).TableExists(tname) Then
+                    If aUci.OpnBlks(lCtype).TableExists(tname) Then
                         sedfg = 0
-                        For Each vOpn In myUci.OpnBlks(lCtype).Ids
+                        For Each vOpn In aUci.OpnBlks(lCtype).Ids
                             lOpn = vOpn
                             If lOpn.TableExists(tname) Then
                                 sedfg = lOpn.Tables.Item(tname).ParmValue("QSDFG")
@@ -112,12 +112,12 @@ Module modPollutants
 
                 'look through all mass-links
                 j = 0
-                Do While j <= myUci.MassLinks.Count
-                    lML = myUci.MassLinks(j)
+                Do While j <= aUci.MassLinks.Count
+                    lML = aUci.MassLinks(j)
                     If (lML.Target.Member = "IDQAL" And lML.Target.MemSub1 = k) Or (lML.Target.Member = "ISQAL" And lML.Target.MemSub2 = k) Then
 
                         tPoll.MassLinks.Add(lML)
-                        myUci.MassLinks.RemoveAt(j)
+                        aUci.MassLinks.RemoveAt(j)
 
                         If (lML.Source.Group = "PQUAL" Or lML.Source.Group = "IQUAL") Then
                             'this is type p-i-g
@@ -141,13 +141,13 @@ Module modPollutants
 
                             'remove tables and add to this collection
                             If (lCtype = "PERLND" And Not pdone) Or (lCtype = "IMPLND" And Not idone) Then
-                                For Each vOpn In myUci.OpnBlks(lCtype).Ids
+                                For Each vOpn In aUci.OpnBlks(lCtype).Ids
                                     lOpn = vOpn
                                     newOpn = New HspfOperation
                                     newOpn.Id = lOpn.Id
                                     newOpn.Name = lOpn.Name
                                     tPoll.Operations.Add(newOpn, lCtype & newOpn.Id)
-                                    For Each lTableDef In myMsg.BlockDefs(lCtype).SectionDefs(Left(lCtype, 1) & "QUAL").TableDefs
+                                    For Each lTableDef In aMsg.BlockDefs(lCtype).SectionDefs(Left(lCtype, 1) & "QUAL").TableDefs
                                         If piconn > 1 Then
                                             tname = lTableDef.Name & ":" & piconn
                                         Else
@@ -158,8 +158,8 @@ Module modPollutants
                                             tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lTable)
                                             lOpn.Tables.Remove((tname))
                                         End If
-                                        If myUci.OpnBlks(lCtype).TableExists(tname) Then
-                                            myUci.OpnBlks(lCtype).Tables.Remove(tname)
+                                        If aUci.OpnBlks(lCtype).TableExists(tname) Then
+                                            aUci.OpnBlks(lCtype).Tables.Remove(tname)
                                         End If
                                     Next lTableDef
                                     If Len(tPoll.Name) = 0 Then
@@ -181,13 +181,13 @@ Module modPollutants
 
                         If Not rdone Then
                             lCtype = "RCHRES"
-                            For Each vOpn In myUci.OpnBlks(lCtype).Ids
+                            For Each vOpn In aUci.OpnBlks(lCtype).Ids
                                 lOpn = vOpn
                                 newOpn = New HspfOperation
                                 newOpn.Id = lOpn.Id
                                 newOpn.Name = lOpn.Name
                                 tPoll.Operations.Add(newOpn, lCtype & newOpn.Id)
-                                For Each lTableDef In myMsg.BlockDefs(lCtype).SectionDefs("GQUAL").TableDefs
+                                For Each lTableDef In aMsg.BlockDefs(lCtype).SectionDefs("GQUAL").TableDefs
                                     If k > 1 Then
                                         tname = lTableDef.Name & ":" & k
                                     Else
@@ -197,8 +197,8 @@ Module modPollutants
                                         Dim lTable As HspfTable = lOpn.Tables.Item(tname)
                                         tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lTable)
                                         lOpn.Tables.Remove((tname))
-                                        If myUci.OpnBlks(lCtype).TableExists(tname) Then
-                                            myUci.OpnBlks(lCtype).Tables.Remove(tname)
+                                        If aUci.OpnBlks(lCtype).TableExists(tname) Then
+                                            aUci.OpnBlks(lCtype).Tables.Remove(tname)
                                         End If
                                     End If
                                 Next lTableDef
@@ -215,12 +215,12 @@ Module modPollutants
                 Loop
 
                 If Len(tPoll.ModelType) > 0 Then
-                    If myUci.Pollutants.Count > 0 Then
-                        tPoll.Id = myUci.Pollutants.Count + 1
+                    If aUci.Pollutants.Count > 0 Then
+                        tPoll.Id = aUci.Pollutants.Count + 1
                     Else
                         tPoll.Id = 1
                     End If
-                    myUci.Pollutants.Add(tPoll)
+                    aUci.Pollutants.Add(tPoll)
                 End If
             Next k
 
@@ -236,12 +236,12 @@ Module modPollutants
 
                 'look through all mass-links
                 j = 0
-                Do While j <= myUci.MassLinks.Count
-                    lML = myUci.MassLinks(j)
+                Do While j <= aUci.MassLinks.Count
+                    lML = aUci.MassLinks(j)
                     If ((lML.Source.Group = "PQUAL" And lML.Source.MemSub1 = k) Or (lML.Source.Group = "IQUAL" And lML.Source.MemSub1 = k)) And lML.Target.VolName = "RCHRES" Then
 
                         tPoll.MassLinks.Add(lML)
-                        myUci.MassLinks.RemoveAt(j)
+                        aUci.MassLinks.RemoveAt(j)
 
                         tPoll.ModelType = "PIOnly"
                         If lML.Source.Group = "PQUAL" Then
@@ -252,13 +252,13 @@ Module modPollutants
 
                         'remove tables and add to this collection
                         If (lCtype = "PERLND" And Not pdone) Or (lCtype = "IMPLND" And Not idone) Then
-                            For Each vOpn In myUci.OpnBlks(lCtype).Ids
+                            For Each vOpn In aUci.OpnBlks(lCtype).Ids
                                 lOpn = vOpn
                                 newOpn = New HspfOperation
                                 newOpn.Id = lOpn.Id
                                 newOpn.Name = lOpn.Name
                                 tPoll.Operations.Add(newOpn, lCtype & newOpn.Id)
-                                For Each lTableDef In myMsg.BlockDefs(lCtype).SectionDefs(Left(lCtype, 1) & "QUAL").TableDefs
+                                For Each lTableDef In aMsg.BlockDefs(lCtype).SectionDefs(Left(lCtype, 1) & "QUAL").TableDefs
                                     If k > 1 Then
                                         tname = lTableDef.Name & ":" & k
                                     Else
@@ -269,8 +269,8 @@ Module modPollutants
                                         tPoll.Operations.Item(lCtype & newOpn.Id).Tables.Add(lTable)
                                         lOpn.Tables.Remove((tname))
                                     End If
-                                    If myUci.OpnBlks(lCtype).TableExists(tname) Then
-                                        myUci.OpnBlks(lCtype).Tables.Remove(tname)
+                                    If aUci.OpnBlks(lCtype).TableExists(tname) Then
+                                        aUci.OpnBlks(lCtype).Tables.Remove(tname)
                                     End If
                                 Next lTableDef
                                 If Len(tPoll.Name) = 0 Then
@@ -290,12 +290,12 @@ Module modPollutants
                 Loop
 
                 If Len(tPoll.ModelType) > 0 Then
-                    If myUci.Pollutants.Count > 0 Then
-                        tPoll.Id = myUci.Pollutants.Count + 1
+                    If aUci.Pollutants.Count > 0 Then
+                        tPoll.Id = aUci.Pollutants.Count + 1
                     Else
                         tPoll.Id = 1
                     End If
-                    myUci.Pollutants.Add(tPoll)
+                    aUci.Pollutants.Add(tPoll)
                 End If
             Next k
 
@@ -303,7 +303,7 @@ Module modPollutants
 
     End Sub
 
-    Public Sub modPollutantsUnBuild(ByRef myUci As HspfUci, ByRef myMsg As HspfMsg)
+    Public Sub modPollutantsUnBuild(ByRef aUci As HspfUci, ByRef myMsg As HspfMsg)
         Dim lOpn As HspfOperation
         Dim i, j, nGqual As Integer
         Dim lML As HspfMassLink
@@ -323,7 +323,7 @@ Module modPollutants
         Dim changed As Boolean
         Dim s As String
 
-        If myUci.Edited = False Then
+        If aUci.Edited = False Then
             changed = False
         Else
             changed = True
@@ -333,7 +333,7 @@ Module modPollutants
         PqualCnt = 0
         IqualCnt = 0
         GqualCnt = 0
-        For Each tPoll In myUci.Pollutants
+        For Each tPoll In aUci.Pollutants
             iflag = 0
             pflag = 0
             rflag = 0
@@ -361,12 +361,12 @@ Module modPollutants
 
         'remove any lingering mls from pquals or iquals
         i = 0
-        Do While i <= myUci.MassLinks.Count
-            tML = myUci.MassLinks(i)
+        Do While i <= aUci.MassLinks.Count
+            tML = aUci.MassLinks(i)
             If tML.Source.VolName = "PERLND" And tML.Source.Group = "PQUAL" And tML.Target.VolName = "RCHRES" Then
-                myUci.MassLinks.RemoveAt(i)
+                aUci.MassLinks.RemoveAt(i)
             ElseIf tML.Source.VolName = "IMPLND" And tML.Source.Group = "IQUAL" And tML.Target.VolName = "RCHRES" Then
-                myUci.MassLinks.RemoveAt(i)
+                aUci.MassLinks.RemoveAt(i)
             Else
                 i = i + 1
             End If
@@ -377,19 +377,19 @@ Module modPollutants
         nGqual = 0
         isedcnt = 0
         psedcnt = 0
-        Do While myUci.Pollutants.Count > 0
+        Do While aUci.Pollutants.Count > 0
             'find lowest index to preserve order of pollutants
             lowestindex = 999
             lowestpos = 1
             Counter = 0
-            For Each tPoll In myUci.Pollutants
+            For Each tPoll In aUci.Pollutants
                 Counter = Counter + 1
                 If tPoll.Index < lowestindex Then
                     lowestindex = tPoll.Index
                     lowestpos = Counter
                 End If
             Next
-            tPoll = myUci.Pollutants(lowestpos)
+            tPoll = aUci.Pollutants(lowestpos)
 
             iflag = 0
             pflag = 0
@@ -419,7 +419,7 @@ Module modPollutants
                 For j = 1 To tPoll.Operations.Count
                     newOpn = tPoll.Operations.Item(j)
                     lCtype = newOpn.Name
-                    lOpn = myUci.OpnBlks(newOpn.Name).Ids("K" & newOpn.Id)
+                    lOpn = aUci.OpnBlks(newOpn.Name).Ids("K" & newOpn.Id)
                     For Each ltable In newOpn.Tables
                         If lCtype = "IMPLND" Then
                             If ltable.Name <> "NQUALS" And ltable.Name <> "IQL-AD-FLAGS" And ltable.Name <> "LAT-FACTOR" Then
@@ -533,8 +533,8 @@ Module modPollutants
                                 End With
                             End If
 
-                            If Not myUci.OpnBlks(lCtype).TableExists(cname) Then
-                                myUci.OpnBlks(lCtype).Tables.Add(ltable)
+                            If Not aUci.OpnBlks(lCtype).TableExists(cname) Then
+                                aUci.OpnBlks(lCtype).Tables.Add(ltable)
                                 If ltable.OccurNum > 1 And ltable.TableNeededForAllQuals Then
                                     'make sure all previous occurs of this table exist
                                     For i = 1 To ltable.OccurNum - 1
@@ -543,7 +543,7 @@ Module modPollutants
                                         Else
                                             cname = ltable.Name
                                         End If
-                                        If Not myUci.OpnBlks(lCtype).TableExists(cname) Then
+                                        If Not aUci.OpnBlks(lCtype).TableExists(cname) Then
                                             tempTable = New HspfTable
                                             tempTable.Opn = lOpn
                                             tempTable.Def = myMsg.BlockDefs(lCtype).TableDefs(ltable.Name)
@@ -551,7 +551,7 @@ Module modPollutants
                                             tempTable.initTable((s))
                                             tempTable.OccurNum = i
                                             tempTable.OccurCount = ltable.OccurCount
-                                            myUci.OpnBlks(lCtype).Tables.Add(tempTable)
+                                            aUci.OpnBlks(lCtype).Tables.Add(tempTable)
                                         End If
                                     Next i
                                 End If
@@ -588,8 +588,8 @@ Module modPollutants
                     End If
                     'make sure there isnt already a ml to this target
                     iexist = 0
-                    For i = 1 To myUci.MassLinks.Count
-                        tML = myUci.MassLinks(i)
+                    For i = 1 To aUci.MassLinks.Count
+                        tML = aUci.MassLinks(i)
                         If tML.Source.VolName = lML.Source.VolName And tML.Target.VolName = lML.Target.VolName And tML.Target.Group = lML.Target.Group And tML.Target.Member = lML.Target.Member And tML.Target.MemSub1 = lML.Target.MemSub1 And tML.Target.MemSub2 = lML.Target.MemSub2 Then
                             If tML.Source.Group = lML.Source.Group And tML.Source.Member = lML.Source.Member And tML.Source.MemSub1 = lML.Source.MemSub1 And tML.Source.MemSub2 = lML.Source.MemSub2 Then
                                 'exact duplicate
@@ -601,22 +601,22 @@ Module modPollutants
                         End If
                     Next i
                     If iexist > 0 Then
-                        myUci.MassLinks.RemoveAt(iexist)
+                        aUci.MassLinks.RemoveAt(iexist)
                     End If
-                    myUci.MassLinks.Add(lML)
+                    aUci.MassLinks.Add(lML)
                 Next
             End If
-            myUci.Pollutants.RemoveAt(lowestpos)
+            aUci.Pollutants.RemoveAt(lowestpos)
         Loop
 
         'set nquals
         cname = "PERLND"
-        For Each lOpn In myUci.OpnBlks(cname).Ids
+        For Each lOpn In aUci.OpnBlks(cname).Ids
             If lOpn.TableExists("NQUALS") Then
                 lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nPqual
             Else
                 If nPqual > 0 Then
-                    myUci.OpnBlks(cname).AddTableForAll("NQUALS", cname)
+                    aUci.OpnBlks(cname).AddTableForAll("NQUALS", cname)
                     lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nPqual
                 End If
             End If
@@ -625,12 +625,12 @@ Module modPollutants
             End If
         Next
         cname = "IMPLND"
-        For Each lOpn In myUci.OpnBlks(cname).Ids
+        For Each lOpn In aUci.OpnBlks(cname).Ids
             If lOpn.TableExists("NQUALS") Then
                 lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nIqual
             Else
                 If nIqual > 0 Then
-                    myUci.OpnBlks(cname).AddTableForAll("NQUALS", cname)
+                    aUci.OpnBlks(cname).AddTableForAll("NQUALS", cname)
                     lOpn.Tables.Item("NQUALS").ParmValue("NQUAL") = nIqual
                 End If
             End If
@@ -639,12 +639,12 @@ Module modPollutants
             End If
         Next
         cname = "RCHRES"
-        For Each lOpn In myUci.OpnBlks(cname).Ids
+        For Each lOpn In aUci.OpnBlks(cname).Ids
             If lOpn.TableExists("GQ-GENDATA") Then
                 lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL") = nGqual
             Else
                 If nGqual > 0 Then
-                    myUci.OpnBlks(cname).AddTableForAll("GQ-GENDATA", cname)
+                    aUci.OpnBlks(cname).AddTableForAll("GQ-GENDATA", cname)
                     lOpn.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL") = nGqual
                 End If
             End If
@@ -654,9 +654,9 @@ Module modPollutants
         Next
 
         If changed Then
-            myUci.Edited = True
+            aUci.Edited = True
         Else
-            myUci.Edited = False
+            aUci.Edited = False
         End If
     End Sub
 End Module

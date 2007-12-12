@@ -550,7 +550,7 @@ Public Class HspfUci
                         If Not pFastFlag Then
                             SendMonitorMessage("(MSG2 Setting table values for " & lOpnblk.Name & ")")
                         End If
-                        lOpnblk.setTableValues(Msg.BlockDefs.Item(lOpnblk.Name))
+                        lOpnblk.setTableValues(Msg.BlockDefs(lOpnblk.Name))
                     End If
                 Next
 

@@ -1,15 +1,16 @@
 Option Strict Off
 Option Explicit On
 
+Imports System.Collections.ObjectModel
 Imports MapWinUtility
 
-<System.Runtime.InteropServices.ProgId("HspfMsg_NET.HspfMsg")> Public Class HspfMsg
+Public Class HspfMsg
     'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
     Private pMsgFileName As String
-    Private pBlockDefs As Collection 'of HspfBlockDef
+    Private pBlockDefs As HspfBlockDefs
     Private pErrorDescription As String
-    Private pTSGroupDefs As Collection 'of HspfTSGroupDefs
+    Private pTSGroupDefs As HspfTSGroupDefs
 
     'Public WriteOnly Property Monitor() As Object
     '    Set(ByVal Value As Object)
@@ -39,7 +40,7 @@ Imports MapWinUtility
         Dim lBlock As HspfBlockDef
         Dim lBlockFieldID As Integer = lBlkTable.Columns.IndexOf("ID")
         Dim lBlockFieldName As Integer = lBlkTable.Columns.IndexOf("Name")
-        Dim lSections As New Collection
+        Dim lSections As New HspfSectionDefs
 
         'Logger.Dbg("SectionDefns")
         Dim lSecTable As DataTable = myDb.GetTable("SectionDefns")
@@ -48,13 +49,13 @@ Imports MapWinUtility
         Dim lSectionFieldName As Integer = lSecTable.Columns.IndexOf("Name")
         Dim lSectionFieldBlockID As Integer = lSecTable.Columns.IndexOf("BlockID")
         Dim lCriticalSection As String
-        Dim lTables As New Collection
-        Dim lBlkTables As New Collection
+        Dim lTable As HspfTableDef
+        Dim lBlkTableDefs As New HspfTableDefs
 
         Dim lTabTable As DataTable = myDb.GetTable("TableDefns")
         Dim lTableFieldSectionID As Integer = lTabTable.Columns.IndexOf("SectionID")
-        Dim ltable As HspfTableDef
-        Dim lParms As New Collection
+        Dim lTableDefs As HspfTableDefs
+        Dim lParms As New HspfParmDefs
 
         Dim lParmTable As DataTable = myDb.GetTable("ParmDefns")
         Dim lParmFieldTableID As Integer = lParmTable.Columns.IndexOf("TableID")
@@ -63,7 +64,7 @@ Imports MapWinUtility
 
         Dim lTSGroupTable As DataTable = myDb.GetTable("TSGroupDefns")
         Dim lTSGroup As HspfTSGroupDef
-        Dim lTSMembers As Collection
+        Dim lTSMembers As Collection(Of HspfTSMemberDef)
         Dim lTSMemberTable As DataTable = myDb.GetTable("TSMemberDefns")
         Dim lMemberFieldTSGroupID As Integer = lTSMemberTable.Columns.IndexOf("TSGroupID")
         Dim lTSMember As HspfTSMemberDef
@@ -74,7 +75,7 @@ Imports MapWinUtility
         Dim lBlkNow As Integer
 
         pBlockDefs = Nothing
-        pBlockDefs = New Collection
+        pBlockDefs = New HspfBlockDefs
 
         lBlkNow = 0
         For Each lBlockRow As DataRow In lBlkTable.Rows
@@ -88,9 +89,9 @@ Imports MapWinUtility
             lBlock.Id = lBlockRow.Item(lBlockFieldID)
             lBlock.Name = lBlockRow.Item(lBlockFieldName)
             lSections = Nothing
-            lSections = New Collection
-            lBlkTables = Nothing
-            lBlkTables = New Collection
+            lSections = New HspfSectionDefs
+            lBlkTableDefs = Nothing
+            lBlkTableDefs = New HspfTableDefs
             lCriticalSection = "BlockID = " & CStr(lBlock.Id)
             For Each lSecRow As DataRow In lSecTable.Rows
                 If lSecRow.Item(lSectionFieldBlockID) = lBlock.Id Then
@@ -98,35 +99,35 @@ Imports MapWinUtility
                     lSection.Name = lSecRow.Item(lSectionFieldName)
                     lSection.Id = lSecRow.Item(lSectionFieldID)
                     'Logger.Dbg("Section Row " & lSection.Name)
-                    lTables = Nothing
-                    lTables = New Collection
+                    lTableDefs = Nothing
+                    lTableDefs = New HspfTableDefs
 
                     'lTabTable = myDb.GetTable("TableDefns WHERE SectionID = " & CStr(lSection.Id))
                     For Each lTabRow As DataRow In lTabTable.Rows
                         If lTabRow.Item(lTableFieldSectionID) = lSection.Id Then
-                            ltable = New HspfTableDef
-                            ltable.Id = lTabRow.Item(0)
-                            ltable.Parent = lSection
-                            ltable.Name = lTabRow.Item(2)
+                            lTable = New HspfTableDef
+                            lTable.Id = lTabRow.Item(0)
+                            lTable.Parent = lSection
+                            lTable.Name = lTabRow.Item(2)
 
                             'Logger.Dbg("Table Row " & ltable.Name)
 
-                            ltable.SGRP = lTabRow.Item(3)
-                            ltable.NumOccur = lTabRow.Item(4)
-                            ltable.HeaderE = lTabRow.Item(5)
-                            ltable.HeaderM = lTabRow.Item(6)
-                            ltable.Define = FilterNull(lTabRow.Item(7), " ")
+                            lTable.SGRP = lTabRow.Item(3)
+                            lTable.NumOccur = lTabRow.Item(4)
+                            lTable.HeaderE = lTabRow.Item(5)
+                            lTable.HeaderM = lTabRow.Item(6)
+                            lTable.Define = FilterNull(lTabRow.Item(7), " ")
                             If lTabTable.Columns.Count < 9 Then
-                                ltable.OccurGroup = 0
+                                lTable.OccurGroup = 0
                             Else
-                                ltable.OccurGroup = lTabRow.Item(8)
+                                lTable.OccurGroup = lTabRow.Item(8)
                             End If
                             lParms = Nothing
-                            lParms = New Collection
+                            lParms = New HspfParmDefs
 
                             'lParmTable = myDb.GetTable("ParmDefns WHERE TableID = " & CStr(ltable.Id))
                             For Each lParmRow As DataRow In lParmTable.Rows
-                                If lParmRow.Item(lParmFieldTableID) = ltable.Id Then
+                                If lParmRow.Item(lParmFieldTableID) = lTable.Id Then
                                     lParm = New HSPFParmDef
                                     lParm.Name = lParmRow.Item(2) 'Name
                                     'Logger.Dbg("Parm Row " & lParm.Name)
@@ -178,28 +179,28 @@ Imports MapWinUtility
                                     Else
                                         lParm.Define = lParmRow.Item(9)
                                     End If
-                                    lParms.Add(lParm, lParm.Name)
+                                    lParms.Add(lParm)
                                 End If
                             Next
-                            ltable.ParmDefs = lParms
-                            updateParmsMultLines((lBlock.Name), ltable)
-                            lTables.Add(ltable, ltable.Name)
-                            lBlkTables.Add(ltable, ltable.Name)
+                            lTable.ParmDefs = lParms
+                            updateParmsMultLines((lBlock.Name), lTable)
+                            lTableDefs.Add(lTable)
+                            lBlkTableDefs.Add(lTable)
                         End If
                     Next
-                    lSection.TableDefs = lTables
-                    lSections.Add(lSection, lSection.Name)
+                    lSection.TableDefs = lTableDefs
+                    lSections.Add(lSection)
                 End If
             Next
             lBlock.SectionDefs = lSections
-            lBlock.TableDefs = lBlkTables
-            pBlockDefs.Add(lBlock, lBlock.Name)
+            lBlock.TableDefs = lBlkTableDefs
+            pBlockDefs.Add(lBlock)
         Next
 
         'Logger.Dbg("TSGroupDefns")
         'now read TS group and member info
         pTSGroupDefs = Nothing
-        pTSGroupDefs = New Collection
+        pTSGroupDefs = New HspfTSGroupDefs
         Dim lTSGroupFieldID As Integer = lTSGroupTable.Columns.IndexOf("ID")
         Dim lTSGroupFieldName As Integer = lTSGroupTable.Columns.IndexOf("Name")
         Dim lTSGroupFieldBlockID As Integer = lTSGroupTable.Columns.IndexOf("BlockID")
@@ -241,7 +242,7 @@ Imports MapWinUtility
             'End If
             lTSGroup.BlockId = lTSGroupRow.Item(lTSGroupFieldBlockID)
             lTSMembers = Nothing
-            lTSMembers = New Collection
+            lTSMembers = New Collection(Of HspfTSMemberDef)
             'lTSMemberTable = myDb.GetTable("TSMemberDefns WHERE TSGroupID = " & CStr(lTSGroup.Id))
 
             For Each lTSMemberRow As DataRow In lTSMemberTable.Rows
@@ -253,32 +254,32 @@ Imports MapWinUtility
                     lTSMember.Parent = lTSGroup
                     lTSMember.SCLU = lTSMemberRow.Item(lTSMemberFieldSCLU)
                     lTSMember.SGRP = lTSMemberRow.Item(lTSMemberFieldSGRP)
-                    lTSMember.mdim1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmdim1))
-                    lTSMember.mdim2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmdim2))
-                    lTSMember.maxsb1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmaxsb1))
-                    lTSMember.maxsb2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmaxsb2))
-                    lTSMember.mkind = FilterNull(lTSMemberRow.Item(lTSMemberFieldmkind))
-                    lTSMember.sptrn = FilterNull(lTSMemberRow.Item(lTSMemberFieldsptrn))
-                    lTSMember.msect = FilterNull(lTSMemberRow.Item(lTSMemberFieldmsect))
-                    lTSMember.mio = FilterNull(lTSMemberRow.Item(lTSMemberFieldmio))
-                    lTSMember.osvbas = FilterNull(lTSMemberRow.Item(lTSMemberFieldosvbas))
-                    lTSMember.osvoff = FilterNull(lTSMemberRow.Item(lTSMemberFieldosvoff))
-                    lTSMember.eunits = FilterNull(lTSMemberRow.Item(lTSMemberFieldeunits), " ")
-                    lTSMember.ltval1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval1))
-                    lTSMember.ltval2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval2))
-                    lTSMember.ltval3 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval3))
-                    lTSMember.ltval4 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval4))
-                    lTSMember.defn = FilterNull(lTSMemberRow.Item(lTSMemberFielddefn), " ")
-                    lTSMember.munits = FilterNull(lTSMemberRow.Item(lTSMemberFieldmunits), " ")
-                    lTSMember.ltval5 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval5))
-                    lTSMember.ltval6 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval6))
-                    lTSMember.ltval7 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval7))
-                    lTSMember.ltval8 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval8))
-                    lTSMembers.Add(lTSMember, lTSMember.Name)
+                    lTSMember.MDim1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmdim1))
+                    lTSMember.MDim2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmdim2))
+                    lTSMember.Maxsb1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmaxsb1))
+                    lTSMember.Maxsb2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldmaxsb2))
+                    lTSMember.MKind = FilterNull(lTSMemberRow.Item(lTSMemberFieldmkind))
+                    lTSMember.Sptrn = FilterNull(lTSMemberRow.Item(lTSMemberFieldsptrn))
+                    lTSMember.Msect = FilterNull(lTSMemberRow.Item(lTSMemberFieldmsect))
+                    lTSMember.Mio = FilterNull(lTSMemberRow.Item(lTSMemberFieldmio))
+                    lTSMember.OsvBas = FilterNull(lTSMemberRow.Item(lTSMemberFieldosvbas))
+                    lTSMember.OsvOff = FilterNull(lTSMemberRow.Item(lTSMemberFieldosvoff))
+                    lTSMember.EUnits = FilterNull(lTSMemberRow.Item(lTSMemberFieldeunits), " ")
+                    lTSMember.Ltval1 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval1))
+                    lTSMember.Ltval2 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval2))
+                    lTSMember.Ltval3 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval3))
+                    lTSMember.Ltval4 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval4))
+                    lTSMember.Defn = FilterNull(lTSMemberRow.Item(lTSMemberFielddefn), " ")
+                    lTSMember.MUnits = FilterNull(lTSMemberRow.Item(lTSMemberFieldmunits), " ")
+                    lTSMember.Ltval5 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval5))
+                    lTSMember.Ltval6 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval6))
+                    lTSMember.Ltval7 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval7))
+                    lTSMember.Ltval8 = FilterNull(lTSMemberRow.Item(lTSMemberFieldltval8))
+                    lTSMembers.Add(lTSMember)
                 End If
             Next
             lTSGroup.MemberDefs = lTSMembers
-            pTSGroupDefs.Add(lTSGroup, CStr(lTSGroup.Id))
+            pTSGroupDefs.Add(lTSGroup)
         Next
         Logger.Dbg("HSPFMsg:Open Finished")
     End Sub
@@ -292,14 +293,14 @@ Imports MapWinUtility
         End Set
     End Property
 
-    Public ReadOnly Property BlockDefs() As Collection
-        Get 'of HspfBlockDef
+    Public ReadOnly Property BlockDefs() As HspfBlockDefs
+        Get
             Return pBlockDefs
         End Get
     End Property
 
-    Public ReadOnly Property TSGroupDefs() As Collection
-        Get 'of HspfTSGroupDef
+    Public ReadOnly Property TSGroupDefs() As HspfTSGroupDefs
+        Get
             Return pTSGroupDefs
         End Get
     End Property
@@ -329,467 +330,467 @@ Imports MapWinUtility
 
     Private Sub updateParmsMultLines(ByRef blockname As String, ByRef ltable As HspfTableDef)
         Dim i, j As Integer
-        Dim lParm As HSPFParmDef
+        Dim lParmDef As HSPFParmDef
 
         With ltable
             If blockname = "DURANL" And .Name = "LEVELS" Then
                 For i = 1 To 6
-                    lParm = New HSPFParmDef
-                    lParm.Name = "LEVE" & CStr(15 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 76 + (i * 5)
-                    lParm.Length = 5
-                    lParm.Min = -999
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = "LEVEL(2thru21) contains the 20 possible user-specified levels for which the input time series will be analyzed."
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "LEVE" & CStr(15 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 76 + (i * 5)
+                    lParmDef.Length = 5
+                    lParmDef.Min = -999
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = "LEVEL(2thru21) contains the 20 possible user-specified levels for which the input time series will be analyzed."
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "DURANL" And .Name = "LCONC" Then
                 For i = 1 To 3 'three fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "LCONC" & CStr(7 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 71 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = -999
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "LCONC" & CStr(7 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 71 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = -999
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "PERLND" And .Name = "IRRIG-SCHED" Then
                 For i = 2 To 10 'up to 10 rows possible
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRYR" & CStr((2 * (i - 1)) + 1) 'year
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 12
-                    lParm.Length = 4
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRMO" & CStr((2 * (i - 1)) + 1) 'month
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 17
-                    lParm.Length = 2
-                    lParm.Min = 1
-                    lParm.Max = 12
-                    lParm.DefaultValue = 1
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRDY" & CStr((2 * (i - 1)) + 1) 'day
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 20
-                    lParm.Length = 2
-                    lParm.Min = 1
-                    lParm.Max = 31
-                    lParm.DefaultValue = 1
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRHR" & CStr((2 * (i - 1)) + 1) 'hour
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 23
-                    lParm.Length = 2
-                    lParm.Min = 0
-                    lParm.Max = 24
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRMI" & CStr((2 * (i - 1)) + 1) 'min
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 26
-                    lParm.Length = 2
-                    lParm.Min = 0
-                    lParm.Max = 60
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRDUR" & CStr((2 * (i - 1)) + 1) 'duration
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 28
-                    lParm.Length = 5
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRRAT" & CStr((2 * (i - 1)) + 1) 'rate
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 33
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRYR" & CStr(2 * i) '2nd year
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 49
-                    lParm.Length = 4
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRMO" & CStr(2 * i) 'month
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 54
-                    lParm.Length = 2
-                    lParm.Min = 1
-                    lParm.Max = 12
-                    lParm.DefaultValue = 1
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRDY" & CStr(2 * i) 'day
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 57
-                    lParm.Length = 2
-                    lParm.Min = 1
-                    lParm.Max = 31
-                    lParm.DefaultValue = 1
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRHR" & CStr(2 * i) 'hour
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 60
-                    lParm.Length = 2
-                    lParm.Min = 0
-                    lParm.Max = 24
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRMI" & CStr(2 * i) 'min
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 63
-                    lParm.Length = 2
-                    lParm.Min = 0
-                    lParm.Max = 60
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRDUR" & CStr(2 * i) 'duration
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 65
-                    lParm.Length = 5
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "IRRAT" & CStr(2 * i) 'rate
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = (70 * (i - 1)) + 70
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRYR" & CStr((2 * (i - 1)) + 1) 'year
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 12
+                    lParmDef.Length = 4
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRMO" & CStr((2 * (i - 1)) + 1) 'month
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 17
+                    lParmDef.Length = 2
+                    lParmDef.Min = 1
+                    lParmDef.Max = 12
+                    lParmDef.DefaultValue = 1
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRDY" & CStr((2 * (i - 1)) + 1) 'day
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 20
+                    lParmDef.Length = 2
+                    lParmDef.Min = 1
+                    lParmDef.Max = 31
+                    lParmDef.DefaultValue = 1
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRHR" & CStr((2 * (i - 1)) + 1) 'hour
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 23
+                    lParmDef.Length = 2
+                    lParmDef.Min = 0
+                    lParmDef.Max = 24
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRMI" & CStr((2 * (i - 1)) + 1) 'min
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 26
+                    lParmDef.Length = 2
+                    lParmDef.Min = 0
+                    lParmDef.Max = 60
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRDUR" & CStr((2 * (i - 1)) + 1) 'duration
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 28
+                    lParmDef.Length = 5
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRRAT" & CStr((2 * (i - 1)) + 1) 'rate
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 33
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRYR" & CStr(2 * i) '2nd year
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 49
+                    lParmDef.Length = 4
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRMO" & CStr(2 * i) 'month
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 54
+                    lParmDef.Length = 2
+                    lParmDef.Min = 1
+                    lParmDef.Max = 12
+                    lParmDef.DefaultValue = 1
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRDY" & CStr(2 * i) 'day
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 57
+                    lParmDef.Length = 2
+                    lParmDef.Min = 1
+                    lParmDef.Max = 31
+                    lParmDef.DefaultValue = 1
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRHR" & CStr(2 * i) 'hour
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 60
+                    lParmDef.Length = 2
+                    lParmDef.Min = 0
+                    lParmDef.Max = 24
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRMI" & CStr(2 * i) 'min
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 63
+                    lParmDef.Length = 2
+                    lParmDef.Min = 0
+                    lParmDef.Max = 60
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRDUR" & CStr(2 * i) 'duration
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 65
+                    lParmDef.Length = 5
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "IRRAT" & CStr(2 * i) 'rate
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = (70 * (i - 1)) + 70
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "RCHRES" And .Name = "HT-BED-DELH" Then
                 For i = 2 To 14 '100 values needed
                     For j = 1 To 7 '
-                        lParm = New HSPFParmDef
-                        lParm.Name = "DELH" & CStr((7 * (i - 1)) + j)
-                        lParm.Typ = 2 ' ATCoSng
-                        lParm.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
-                        lParm.Length = 10
-                        lParm.Min = -999
-                        lParm.Max = -999
-                        lParm.DefaultValue = 0
-                        lParm.Other = lParm.StartCol & ":" & lParm.Length
-                        lParm.Define = ""
-                        .ParmDefs.Add(lParm, lParm.Name)
+                        lParmDef = New HSPFParmDef
+                        lParmDef.Name = "DELH" & CStr((7 * (i - 1)) + j)
+                        lParmDef.Typ = 2 ' ATCoSng
+                        lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
+                        lParmDef.Length = 10
+                        lParmDef.Min = -999
+                        lParmDef.Max = -999
+                        lParmDef.DefaultValue = 0
+                        lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                        lParmDef.Define = ""
+                        .ParmDefs.Add(lParmDef)
                     Next j
                 Next i
                 For i = 1 To 2 'two more fields to tack on to make 100
-                    lParm = New HSPFParmDef
-                    lParm.Name = "DELH" & CStr(98 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 991 + (10 * (i - 1))
-                    lParm.Length = 10
-                    lParm.Min = -999
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "DELH" & CStr(98 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 991 + (10 * (i - 1))
+                    lParmDef.Length = 10
+                    lParmDef.Min = -999
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "RCHRES" And .Name = "HT-BED-DELTT" Then
                 For i = 2 To 14 '100 values needed
                     For j = 1 To 7 '
-                        lParm = New HSPFParmDef
-                        lParm.Name = "DELTT" & CStr((7 * (i - 1)) + j)
-                        lParm.Typ = 2 ' ATCoSng
-                        lParm.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
-                        lParm.Length = 10
-                        lParm.Min = -999
-                        lParm.Max = -999
-                        lParm.DefaultValue = 0
-                        lParm.Other = lParm.StartCol & ":" & lParm.Length
-                        lParm.Define = ""
-                        .ParmDefs.Add(lParm, lParm.Name)
+                        lParmDef = New HSPFParmDef
+                        lParmDef.Name = "DELTT" & CStr((7 * (i - 1)) + j)
+                        lParmDef.Typ = 2 ' ATCoSng
+                        lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
+                        lParmDef.Length = 10
+                        lParmDef.Min = -999
+                        lParmDef.Max = -999
+                        lParmDef.DefaultValue = 0
+                        lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                        lParmDef.Define = ""
+                        .ParmDefs.Add(lParmDef)
                     Next j
                 Next i
                 For i = 1 To 2 'two more fields to tack on to make 100
-                    lParm = New HSPFParmDef
-                    lParm.Name = "DELTT" & CStr(98 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 991 + (10 * (i - 1))
-                    lParm.Length = 10
-                    lParm.Min = -999
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "DELTT" & CStr(98 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 991 + (10 * (i - 1))
+                    lParmDef.Length = 10
+                    lParmDef.Min = -999
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "RCHRES" And .Name = "GQ-PHOTPM" Then
                 For i = 1 To 7 'seven fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "PHOTPM" & CStr(7 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 71 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "PHOTPM" & CStr(7 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 71 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
                 For i = 1 To 6 'six more fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "PHOTPM" & CStr(14 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 141 + (i * 10)
-                    lParm.Length = 10
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "PHOTPM" & CStr(14 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 141 + (i * 10)
+                    lParmDef.Length = 10
                     If i < 5 Then
-                        lParm.Min = 0
-                        lParm.Max = -999
-                        lParm.DefaultValue = 0
+                        lParmDef.Min = 0
+                        lParmDef.Max = -999
+                        lParmDef.DefaultValue = 0
                     ElseIf i = 5 Then
-                        lParm.Min = 0.0001
-                        lParm.Max = 10
-                        lParm.DefaultValue = 1
+                        lParmDef.Min = 0.0001
+                        lParmDef.Max = 10
+                        lParmDef.DefaultValue = 1
                     Else
-                        lParm.Min = 1
-                        lParm.Max = 2
-                        lParm.DefaultValue = 1
+                        lParmDef.Min = 1
+                        lParmDef.Max = 2
+                        lParmDef.DefaultValue = 1
                     End If
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "RCHRES" And .Name = "GQ-ALPHA" Then
                 For i = 1 To 7 'seven fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "ALPH" & CStr(7 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 71 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0.00001
-                    lParm.Max = -999
-                    lParm.DefaultValue = -999
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "ALPH" & CStr(7 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 71 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0.00001
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = -999
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
                 For i = 1 To 4 'four more fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "ALPH" & CStr(14 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 141 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0.00001
-                    lParm.Max = -999
-                    lParm.DefaultValue = -999
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "ALPH" & CStr(14 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 141 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0.00001
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = -999
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "RCHRES" And .Name = "GQ-GAMMA" Then
                 For i = 1 To 7 'seven fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "GAMM" & CStr(7 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 71 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "GAMM" & CStr(7 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 71 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
                 For i = 1 To 4 'four more fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "GAMM" & CStr(14 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 141 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "GAMM" & CStr(14 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 141 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "RCHRES" And .Name = "GQ-DELTA" Then
                 For i = 1 To 7 'seven fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "DEL" & CStr(7 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 71 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "DEL" & CStr(7 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 71 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
                 For i = 1 To 4 'four more fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "DEL" & CStr(14 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 141 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = -999
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "DEL" & CStr(14 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 141 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = -999
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "RCHRES" And .Name = "GQ-CLDFACT" Then
                 For i = 1 To 7 'seven fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "KCLD" & CStr(7 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 71 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = 1
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "KCLD" & CStr(7 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 71 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = 1
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
                 For i = 1 To 4 'four more fields to tack on
-                    lParm = New HSPFParmDef
-                    lParm.Name = "KCLD" & CStr(14 + i) 'Name
-                    lParm.Typ = 2 ' ATCoSng
-                    lParm.StartCol = 141 + (i * 10)
-                    lParm.Length = 10
-                    lParm.Min = 0
-                    lParm.Max = 1
-                    lParm.DefaultValue = 0
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "KCLD" & CStr(14 + i) 'Name
+                    lParmDef.Typ = 2 ' ATCoSng
+                    lParmDef.StartCol = 141 + (i * 10)
+                    lParmDef.Length = 10
+                    lParmDef.Min = 0
+                    lParmDef.Max = 1
+                    lParmDef.DefaultValue = 0
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "RCHRES" And .Name = "GQ-DAUGHTER" Then
                 For i = 2 To 3 '3 rows needed
                     For j = 1 To 3 'three values per row
-                        lParm = New HSPFParmDef
-                        lParm.Name = "ZERO" & CStr(i) & CStr(j)
-                        lParm.Typ = 2 ' ATCoSng
-                        lParm.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
-                        lParm.Length = 10
-                        lParm.Min = 0
-                        lParm.Max = -999
-                        lParm.DefaultValue = 0
-                        lParm.Other = lParm.StartCol & ":" & lParm.Length
-                        lParm.Define = ""
-                        .ParmDefs.Add(lParm, lParm.Name)
+                        lParmDef = New HSPFParmDef
+                        lParmDef.Name = "ZERO" & CStr(i) & CStr(j)
+                        lParmDef.Typ = 2 ' ATCoSng
+                        lParmDef.StartCol = (70 * (i - 1)) + 11 + (10 * (j - 1))
+                        lParmDef.Length = 10
+                        lParmDef.Min = 0
+                        lParmDef.Max = -999
+                        lParmDef.DefaultValue = 0
+                        lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                        lParmDef.Define = ""
+                        .ParmDefs.Add(lParmDef)
                     Next j
                 Next i
             ElseIf blockname = "REPORT" And .Name = "REPORT-SRC" Then
                 For i = 2 To 25 'up to 25 rows possible
-                    lParm = New HSPFParmDef
-                    lParm.Name = "SRCID" & CStr(i) 'Name
-                    lParm.Typ = 0 ' ATCoTxt
-                    lParm.StartCol = (70 * (i - 1)) + 11
-                    lParm.Length = 20
-                    lParm.DefaultValue = ""
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "SRCID" & CStr(i) 'Name
+                    lParmDef.Typ = 0 ' ATCoTxt
+                    lParmDef.StartCol = (70 * (i - 1)) + 11
+                    lParmDef.Length = 20
+                    lParmDef.DefaultValue = ""
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             ElseIf blockname = "REPORT" And .Name = "REPORT-CON" Then
                 For i = 2 To 20 'up to 20 rows possible
-                    lParm = New HSPFParmDef
-                    lParm.Name = "CONID" & CStr(i) 'Name
-                    lParm.Typ = 0 ' ATCoTxt
-                    lParm.StartCol = ((i - 1) * 70) + 11
-                    lParm.Length = 20
-                    lParm.DefaultValue = ""
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "TRAN" & CStr(i) 'tran
-                    lParm.Typ = 0 ' ATCoTxt
-                    lParm.StartCol = (70 * (i - 1)) + 32
-                    lParm.Length = 4
-                    lParm.DefaultValue = "SUM"
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "SIGD" & CStr(i) 'sig digits
-                    lParm.Typ = 1 ' ATCoInt
-                    lParm.StartCol = (70 * (i - 1)) + 36
-                    lParm.Length = 5
-                    lParm.Min = 2
-                    lParm.Max = 5
-                    lParm.DefaultValue = 5
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
-                    lParm = New HSPFParmDef
-                    lParm.Name = "DECPLA" & CStr(i) 'dec places
-                    lParm.Typ = 1 ' ATCoInt
-                    lParm.StartCol = (70 * (i - 1)) + 41
-                    lParm.Length = 5
-                    lParm.Min = 0
-                    lParm.Max = 3
-                    lParm.DefaultValue = 2
-                    lParm.Other = lParm.StartCol & ":" & lParm.Length
-                    lParm.Define = ""
-                    .ParmDefs.Add(lParm, lParm.Name)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "CONID" & CStr(i) 'Name
+                    lParmDef.Typ = 0 ' ATCoTxt
+                    lParmDef.StartCol = ((i - 1) * 70) + 11
+                    lParmDef.Length = 20
+                    lParmDef.DefaultValue = ""
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "TRAN" & CStr(i) 'tran
+                    lParmDef.Typ = 0 ' ATCoTxt
+                    lParmDef.StartCol = (70 * (i - 1)) + 32
+                    lParmDef.Length = 4
+                    lParmDef.DefaultValue = "SUM"
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "SIGD" & CStr(i) 'sig digits
+                    lParmDef.Typ = 1 ' ATCoInt
+                    lParmDef.StartCol = (70 * (i - 1)) + 36
+                    lParmDef.Length = 5
+                    lParmDef.Min = 2
+                    lParmDef.Max = 5
+                    lParmDef.DefaultValue = 5
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
+                    lParmDef = New HSPFParmDef
+                    lParmDef.Name = "DECPLA" & CStr(i) 'dec places
+                    lParmDef.Typ = 1 ' ATCoInt
+                    lParmDef.StartCol = (70 * (i - 1)) + 41
+                    lParmDef.Length = 5
+                    lParmDef.Min = 0
+                    lParmDef.Max = 3
+                    lParmDef.DefaultValue = 2
+                    lParmDef.Other = lParmDef.StartCol & ":" & lParmDef.Length
+                    lParmDef.Define = ""
+                    .ParmDefs.Add(lParmDef)
                 Next i
             End If
         End With
