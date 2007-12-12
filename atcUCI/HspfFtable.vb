@@ -7,8 +7,8 @@ Imports MapWinUtility
 
 Public Class HspfFtable
     Private pId As Integer
-    Private pNrows As Integer
-    Private pNcols As Integer
+    Private pNRows As Integer
+    Private pNCols As Integer
     'TODO: make this a class!
     Private pDepth() As Double
     Private pArea() As Double
@@ -515,172 +515,172 @@ Public Class HspfFtable
     '
     'End Sub
 
-    Public Sub FTableFromCrossSect(ByRef dL As Single, ByRef dYm As Single, ByRef dWm As Single, ByRef dN As Single, ByRef dS As Single, ByRef dM11 As Single, ByRef dM12 As Single, ByRef dYc As Single, ByRef dM21 As Single, ByRef dM22 As Single, ByRef dYt1 As Single, ByRef dYt2 As Single, ByRef dM31 As Single, ByRef dM32 As Single, ByRef dW11 As Single, ByRef dW12 As Single)
+    Public Sub FTableFromCrossSect(ByVal aChannel As Channel)
         'algorithm from tt
-        Dim Depth(8) As Single
-        Dim sfarea(8) As Single
-        Dim Volume(8) As Single
-        Dim disch(8) As Single
-        Dim i As Integer
-        Dim CrossSectionArea, NearestBase, HydraulicRadius As Single
-        Dim lp, dDepth, dArea, dDenominator, rp As Single
-        Dim dWt1, dWb, dWc, dWt2 As Single
+        Dim lDepth(8) As Single
+        Dim lSurfaceArea(8) As Single
+        Dim lVolume(8) As Single
+        Dim lDischarge(8) As Single
 
-        On Error GoTo errorhandler
-        'initialize parameters
-        If (dYm < dYc) Then
-            dWb = dWm - (dYm / dM11) - (dYm / dM12)
-        End If
-        If (dYm > dYc And dYm < dYt1) Then
-            dWb = dWm - dW11 - dW12 - ((dYm - dYc) / dM21) - ((dYm - dYc) / dM22) - (dYc / dM11) - (dYc / dM12)
-        End If
-        If (dYm > dYt1 And dYm < dYt2) Then
-            dWb = dWm - ((dYm - dYt1) / dM31) - ((dYm - dYt1) / dM32) - dW11 - dW12 - ((dYt1 - dYc) / dM21) - ((dYt1 - dYc) / dM22) - (dYc / dM11) - (dYc / dM12)
-        End If
-        If dWb < 0 Then
-            dWb = 0.0001
-        End If
-        If (dYm > dYt2) Then
-            'should not happen
-            dYm = -999
-        End If
-        dWc = dWb + (dYc / dM11) + (dYc / dM12)
-        dWt1 = dWc + dW11 + dW12 + ((dYt1 - dYc) / dM21) + ((dYt1 - dYc) / dM22)
-        dWt2 = dWt1 + ((dYt2 - dYt1) / dM31) + ((dYt2 - dYt1) / dM32)
+        Try
+            With aChannel
+                'initialize parameters
+                Dim dWb As Single
+                If (.DepthMean < .DepthChannel) Then
+                    dWb = .WidthMean - (.DepthMean / .SlopeSideLeft) _
+                                     - (.DepthMean / .SlopeSideRight)
+                End If
+                If (.DepthMean > .DepthChannel And .DepthMean < .DepthSlopeChange) Then
+                    dWb = .WidthMean - .WidthZeroSlopeLeft - .WidthZeroSlopeRight - ((.DepthMean - .DepthChannel) / .SlopeSideLowerFPLeft) - ((.DepthMean - .DepthChannel) / .SlopeSideLowerFPRight) - (.DepthChannel / .SlopeSideLeft) - (.DepthChannel / .SlopeSideRight)
+                End If
+                If (.DepthMean > .DepthSlopeChange And .DepthMean < .DepthMax) Then
+                    dWb = .WidthMean - ((.DepthMean - .DepthSlopeChange) / .SlopeSideUpperFPLeft) - ((.DepthMean - .DepthSlopeChange) / .SlopeSideUpperFPRight) - .WidthZeroSlopeLeft - .WidthZeroSlopeRight - ((.DepthSlopeChange - .DepthChannel) / .SlopeSideLowerFPLeft) - ((.DepthSlopeChange - .DepthChannel) / .SlopeSideLowerFPRight) - (.DepthChannel / .SlopeSideLeft) - (.DepthChannel / .SlopeSideRight)
+                End If
+                If dWb < 0 Then
+                    dWb = 0.0001
+                End If
+                If (.DepthMean > .DepthMax) Then
+                    'should not happen
+                    .DepthMean = -999
+                End If
+                Dim dWt1, dWc, dWt2 As Single
+                dWc = dWb + (.DepthChannel / .SlopeSideLeft) + (.DepthChannel / .SlopeSideRight)
+                dWt1 = dWc + .WidthZeroSlopeLeft + .WidthZeroSlopeRight + ((.DepthSlopeChange - .DepthChannel) / .SlopeSideLowerFPLeft) + ((.DepthSlopeChange - .DepthChannel) / .SlopeSideLowerFPRight)
+                dWt2 = dWt1 + ((.DepthMax - .DepthSlopeChange) / .SlopeSideUpperFPLeft) + ((.DepthMax - .DepthSlopeChange) / .SlopeSideUpperFPRight)
 
-        If dYm < 0.0# Or dWm < 0.0# Or dN < 0.0# Or dS < 0.0# Or dM11 < 0.0# Or dM12 < 0.0# Or dM21 < 0.0# Or dM22 < 0.0# Or dM31 < 0.0# Or dM32 < 0.0# Then
-            Nrows = 1
-            Ncols = 4
-            pDepth(1) = 0
-            pArea(1) = 0
-            pVolume(1) = 0
-            pOutflow1(1) = 0
-        Else
-            'calculate for eight depths
-            Depth(1) = 0.0#
-            Depth(2) = dYm / 10.0#
-            Depth(3) = dYm
-            Depth(4) = dYc
-            Depth(5) = (dYc + dYt1) / 2.0#
-            Depth(6) = dYt1
-            Depth(7) = (dYt1 + dYt2) / 2.0#
-            Depth(8) = dYt2
-            Nrows = 8
-            For i = 1 To Nrows
-                'get nearest base
-                If (Depth(i) > dYt1) Then
-                    NearestBase = dWt1
-                ElseIf (Depth(i) > dYc) Then
-                    NearestBase = dWc + dW11 + dW12
-                    'ElseIf (Depth(i) = dYc) Then
-                    '  NearestBase = dWc    pbd - should still be bottom channel width
+                If .DepthMean < 0.0# Or .WidthMean < 0.0# Or _
+                   .ManningN < 0.0# Or .SlopeProfile < 0.0# Or _
+                   .SlopeSideLeft < 0.0# Or .SlopeSideRight < 0.0# Or _
+                   .SlopeSideLowerFPLeft < 0.0# Or .SlopeSideLowerFPRight < 0.0# Or _
+                   .SlopeSideUpperFPLeft < 0.0# Or .SlopeSideUpperFPRight < 0.0# Then
+                    Nrows = 1
+                    Ncols = 4
+                    pDepth(1) = 0
+                    pArea(1) = 0
+                    pVolume(1) = 0
+                    pOutflow1(1) = 0
                 Else
-                    NearestBase = dWb
-                End If
+                    'calculate for eight depths
+                    lDepth(1) = 0.0#
+                    lDepth(2) = .DepthMean / 10.0#
+                    lDepth(3) = .DepthMean
+                    lDepth(4) = .DepthChannel
+                    lDepth(5) = (.DepthChannel + .DepthSlopeChange) / 2.0#
+                    lDepth(6) = .DepthSlopeChange
+                    lDepth(7) = (.DepthSlopeChange + .DepthMax) / 2.0#
+                    lDepth(8) = .DepthMax
+                    Nrows = 8
+                    For i As Integer = 1 To Nrows
+                        'get nearest base
+                        Dim lNearestBase As Single
+                        If (lDepth(i) > .DepthSlopeChange) Then
+                            lNearestBase = dWt1
+                        ElseIf (lDepth(i) > .DepthChannel) Then
+                            lNearestBase = dWc + .WidthZeroSlopeLeft + .WidthZeroSlopeRight
+                            'ElseIf (lDepth(i) = .DepthChannel) Then
+                            '  NearestBase = dWc    pbd - should still be bottom channel width
+                        Else
+                            lNearestBase = dWb
+                        End If
 
-                'get cross section area
-                If dYc > Depth(i) Then
-                    dDepth = Depth(i)
-                Else
-                    dDepth = dYc
-                End If
-                lp = LeftPiece(dDepth, dYt1, dM32, dYc, dM22, dM12)
-                rp = RightPiece(dDepth, dYt1, dM31, dYc, dM21, dM11)
-                CrossSectionArea = dDepth * (dWb + (lp * 0.5) + (rp * 0.5))
-                If (Depth(i) > dYc) Then
-                    If dYt1 > Depth(i) Then
-                        dDepth = Depth(i)
-                    Else
-                        dDepth = dYt1
-                    End If
-                    lp = LeftPiece(dDepth, dYt1, dM32, dYc, dM22, dM12)
-                    rp = RightPiece(dDepth, dYt1, dM31, dYc, dM21, dM11)
-                    CrossSectionArea = CrossSectionArea + (dDepth - dYc) * (dWc + dW11 + dW12 + (lp * 0.5) + (rp * 0.5))
-                End If
-                If (Depth(i) > dYt1) Then
-                    If dYt2 > Depth(i) Then
-                        dDepth = Depth(i)
-                    Else
-                        dDepth = dYt2
-                    End If
-                    lp = LeftPiece(dDepth, dYt1, dM32, dYc, dM22, dM12)
-                    rp = RightPiece(dDepth, dYt1, dM31, dYc, dM21, dM11)
-                    CrossSectionArea = CrossSectionArea + (dDepth - dYt1) * (dWt1 + (lp * 0.5) + (rp * 0.5))
-                End If
+                        'get cross section area
+                        Dim lDepthD As Single
+                        If .DepthChannel > lDepth(i) Then
+                            lDepthD = lDepth(i)
+                        Else
+                            lDepthD = .DepthChannel
+                        End If
+                        Dim lLeftPiece As Single = SidePiece(lDepthD, .DepthSlopeChange, .SlopeSideUpperFPRight, .DepthChannel, .SlopeSideLowerFPRight, .SlopeSideRight)
+                        Dim lRightPiece As Single = SidePiece(lDepthD, .DepthSlopeChange, .SlopeSideUpperFPLeft, .DepthChannel, .SlopeSideLowerFPLeft, .SlopeSideLeft)
+                        Dim lCrossSectionArea As Single = lDepthD * (dWb + (lLeftPiece * 0.5) + (lRightPiece * 0.5))
+                        If (lDepth(i) > .DepthChannel) Then
+                            If .DepthSlopeChange > lDepth(i) Then
+                                lDepthD = lDepth(i)
+                            Else
+                                lDepthD = .DepthSlopeChange
+                            End If
+                            lLeftPiece = SidePiece(lDepthD, .DepthSlopeChange, .SlopeSideUpperFPRight, .DepthChannel, .SlopeSideLowerFPRight, .SlopeSideRight)
+                            lRightPiece = SidePiece(lDepthD, .DepthSlopeChange, .SlopeSideUpperFPLeft, .DepthChannel, .SlopeSideLowerFPLeft, .SlopeSideLeft)
+                            lCrossSectionArea += (lDepthD - .DepthChannel) * (dWc + .WidthZeroSlopeLeft + .WidthZeroSlopeRight + (lLeftPiece * 0.5) + (lRightPiece * 0.5))
+                        End If
+                        If (lDepth(i) > .DepthSlopeChange) Then
+                            If .DepthMax > lDepth(i) Then
+                                lDepthD = lDepth(i)
+                            Else
+                                lDepthD = .DepthMax
+                            End If
+                            lLeftPiece = SidePiece(lDepthD, .DepthSlopeChange, .SlopeSideUpperFPRight, .DepthChannel, .SlopeSideLowerFPRight, .SlopeSideRight)
+                            lRightPiece = SidePiece(lDepthD, .DepthSlopeChange, .SlopeSideUpperFPLeft, .DepthChannel, .SlopeSideLowerFPLeft, .SlopeSideLeft)
+                            lCrossSectionArea += (lDepthD - .DepthSlopeChange) * (dWt1 + (lLeftPiece * 0.5) + (lRightPiece * 0.5))
+                        End If
 
-                'get hydraulic radius
-                dDenominator = dWb
-                If dYc > Depth(i) Then
-                    dDepth = Depth(i)
-                Else
-                    dDepth = dYc
-                End If
-                dDenominator = dDenominator + dDepth * (System.Math.Sqrt(1.0# + 1.0# / (dM11 * dM11)) + System.Math.Sqrt(1.0# + 1.0# / (dM12 * dM12)))
-                If (Depth(i) > dYc) Then
-                    If dYt1 > Depth(i) Then
-                        dDepth = Depth(i)
-                    Else
-                        dDepth = dYt1
-                    End If
-                    dDenominator = dDenominator + dW11 + dW12 + (dDepth - dYc) * (System.Math.Sqrt(1.0# + 1.0# / (dM21 * dM21)) + System.Math.Sqrt(1.0# + 1.0# / (dM22 * dM22)))
-                End If
-                If (Depth(i) > dYt1) Then
-                    If dYt2 > Depth(i) Then
-                        dDepth = Depth(i)
-                    Else
-                        dDepth = dYt2
-                    End If
-                    dDenominator = dDenominator + (dDepth - dYt1) * (System.Math.Sqrt(1.0# + 1.0# / (dM31 * dM31)) + System.Math.Sqrt(1.0# + 1.0# / (dM32 * dM32)))
-                End If
-                HydraulicRadius = CrossSectionArea / dDenominator
+                        'get hydraulic radius
+                        Dim lDenominator As Single = dWb
+                        If .DepthChannel > lDepth(i) Then
+                            lDepthD = lDepth(i)
+                        Else
+                            lDepthD = .DepthChannel
+                        End If
+                        lDenominator += lDepthD * (System.Math.Sqrt(1.0# + 1.0# / (.SlopeSideLeft * .SlopeSideLeft)) + System.Math.Sqrt(1.0# + 1.0# / (.SlopeSideRight * .SlopeSideRight)))
+                        If (lDepth(i) > .DepthChannel) Then
+                            If .DepthSlopeChange > lDepth(i) Then
+                                lDepthD = lDepth(i)
+                            Else
+                                lDepthD = .DepthSlopeChange
+                            End If
+                            lDenominator += .WidthZeroSlopeLeft + .WidthZeroSlopeRight + (lDepthD - .DepthChannel) * (System.Math.Sqrt(1.0# + 1.0# / (.SlopeSideLowerFPLeft * .SlopeSideLowerFPLeft)) + System.Math.Sqrt(1.0# + 1.0# / (.SlopeSideLowerFPRight * .SlopeSideLowerFPRight)))
+                        End If
+                        If (lDepth(i) > .DepthSlopeChange) Then
+                            If .DepthMax > lDepth(i) Then
+                                lDepthD = lDepth(i)
+                            Else
+                                lDepthD = .DepthMax
+                            End If
+                            lDenominator += (lDepthD - .DepthSlopeChange) * (System.Math.Sqrt(1.0# + 1.0# / (.SlopeSideUpperFPLeft * .SlopeSideUpperFPLeft)) + System.Math.Sqrt(1.0# + 1.0# / (.SlopeSideUpperFPRight * .SlopeSideUpperFPRight)))
+                        End If
+                        Dim lHydraulicRadius As Single = lCrossSectionArea / lDenominator
 
-                lp = LeftPiece(Depth(i), dYt1, dM32, dYc, dM22, dM12)
-                rp = RightPiece(Depth(i), dYt1, dM31, dYc, dM21, dM11)
+                        lLeftPiece = SidePiece(lDepth(i), .DepthSlopeChange, .SlopeSideUpperFPRight, .DepthChannel, .SlopeSideLowerFPRight, .SlopeSideRight)
+                        lRightPiece = SidePiece(lDepth(i), .DepthSlopeChange, .SlopeSideUpperFPLeft, .DepthChannel, .SlopeSideLowerFPLeft, .SlopeSideLeft)
 
-                sfarea(i) = dL * (NearestBase + lp + rp) / 43560.0#
-                Volume(i) = dL * CrossSectionArea / 43560.0#
-                disch(i) = 1.49 / dN * (HydraulicRadius ^ (2 / 3)) * System.Math.Sqrt(dS) * CrossSectionArea
-            Next i
+                        lSurfaceArea(i) = .Length * (lNearestBase + lLeftPiece + lRightPiece) / 43560.0#
+                        lVolume(i) = .Length * lCrossSectionArea / 43560.0#
+                        lDischarge(i) = 1.49 / .ManningN * (lHydraulicRadius ^ (2 / 3)) * System.Math.Sqrt(.SlopeProfile) * lCrossSectionArea
+                    Next i
 
-            'build ftable
-            Nrows = 8
-            Ncols = 4
-            For i = 1 To Nrows
-                pDepth(i) = Depth(i)
-                pArea(i) = sfarea(i)
-                pVolume(i) = Volume(i)
-                pOutflow1(i) = disch(i)
-            Next i
-        End If
-        On Error Resume Next
-        Exit Sub
-errorhandler:
-        'TODO: remove MsgBox
-        logger.Msg("An error occurred while building FTable" & Me.Id, "FTable Create From XSect Problem")
-        On Error Resume Next
+                    'build ftable
+                    Nrows = 8
+                    Ncols = 4
+                    For i As Integer = 1 To Nrows
+                        pDepth(i) = lDepth(i)
+                        pArea(i) = lSurfaceArea(i)
+                        pVolume(i) = lVolume(i)
+                        pOutflow1(i) = lDischarge(i)
+                    Next i
+                End If
+            End With
+        Catch e As ApplicationException
+            Logger.Msg("Error occurred while building FTable" & Me.Id, "FTable Create From XSect Problem")
+        End Try
     End Sub
 
-    Private Function LeftPiece(ByRef Depth As Single, ByRef dYt1 As Single, ByRef dM32 As Single, ByRef dYc As Single, ByRef dM22 As Single, ByRef dM12 As Single) As Single
-        'get left piece
-        If (Depth > dYt1) Then
-            LeftPiece = (Depth - dYt1) / dM32
-        ElseIf (Depth > dYc) Then
-            LeftPiece = (Depth - dYc) / dM22
+    Private Function SidePiece(ByRef aDepth As Single, _
+                               ByRef aDepthSlopeChange As Single, _
+                               ByRef aSideSlopeUpperFP As Single, _
+                               ByRef aDepthChannel As Single, _
+                               ByRef aSideSlopeLowerFP As Single, _
+                               ByRef aSlopeSide As Single) As Single
+        Dim lSidePiece As Single
+        If (aDepth > aDepthSlopeChange) Then
+            lSidePiece = (aDepth - aDepthSlopeChange) / aSideSlopeUpperFP
+        ElseIf (aDepth > aDepthChannel) Then
+            lSidePiece = (aDepth - aDepthChannel) / aSideSlopeLowerFP
         Else
-            LeftPiece = Depth / dM12
+            lSidePiece = aDepth / aSlopeSide
         End If
+        Return lSidePiece
     End Function
 
-    Private Function RightPiece(ByRef Depth As Single, ByRef dYt1 As Single, ByRef dM31 As Single, ByRef dYc As Single, ByRef dM21 As Single, ByRef dM11 As Single) As Single
-        'get right piece
-        If (Depth > dYt1) Then
-            RightPiece = (Depth - dYt1) / dM31
-        ElseIf (Depth > dYc) Then
-            RightPiece = (Depth - dYc) / dM21
-        Else
-            RightPiece = Depth / dM11
-        End If
-    End Function
 
     'bool CPTFData:: DataValid (void)
     '{

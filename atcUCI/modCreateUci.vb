@@ -109,9 +109,9 @@ Module modCreateUci
                 Next
 
                 For Each lChannel As Channel In pChannels 'process ftables
-                    Dim lOpn As HspfOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(CShort(lChannel.ChanId))
+                    Dim lOpn As HspfOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(CShort(lChannel.Id))
                     If Not lOpn Is Nothing Then
-                        lOpn.FTable.FTableFromCrossSect(lChannel.ChanL, lChannel.ChanYm, lChannel.ChanWm, lChannel.ChanN, lChannel.ChanS, lChannel.ChanM11, lChannel.ChanM12, lChannel.ChanYc, lChannel.ChanM21, lChannel.ChanM22, lChannel.ChanYt1, lChannel.ChanYt2, lChannel.ChanM31, lChannel.ChanM32, lChannel.ChanW11, lChannel.ChanW12)
+                        lOpn.FTable.FTableFromCrossSect(lChannel)
                     End If
                 Next
 
@@ -634,15 +634,15 @@ Module modCreateUci
         Dim lRLoad(1) As Single
         Dim lScen As String = "PT-OBS"
         For Each lFacility As Facility In pPointLoads
-            For Each lPollutant As PollutantLoad In lFacility.PollutantLoads
-                Dim lCon As String = GetPollutantIDFromName(lMasterPollutantList, lPollutant.PollutantName)
+            For Each lPollutant As Pollutant In lFacility.Pollutants
+                Dim lCon As String = GetPollutantIDFromName(lMasterPollutantList, lPollutant.Name)
                 If lCon.Length = 0 Then
-                    lCon = UCase(Mid(lPollutant.PollutantName, 1, 8))
+                    lCon = UCase(Mid(lPollutant.Name, 1, 8))
                 End If
-                Dim lStanam As String = lFacility.FacilityName
-                Dim lLocation As String = "RCH" & lFacility.FacilityReach
-                Dim lTstype As String = UCase(Mid(lPollutant.PollutantName, 1, 4))
-                lRLoad(1) = lPollutant.PollutantLoad
+                Dim lStanam As String = lFacility.Name
+                Dim lLocation As String = "RCH" & lFacility.Reach
+                Dim lTstype As String = UCase(Mid(lPollutant.Name, 1, 4))
+                lRLoad(1) = lPollutant.Load
                 aUci.AddPointSourceDataSet(lScen, lLocation, lCon, lStanam, lTstype, 0, lJDates, lRLoad, lNewWdmId, lNewDsn)
             Next
         Next
