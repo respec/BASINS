@@ -148,7 +148,6 @@ Public Class HspfConnection
         Dim lRetCod As Integer
         Dim lBuff As String = Nothing
         Dim s As String
-        Dim t As String
 
         pUci = aUci
 
@@ -211,8 +210,7 @@ Public Class HspfConnection
                 lComment = ""
             ElseIf lRecTyp = -1 And lRetCod <> 1 Then
                 'save comment
-                t = Left(lBuff, 6)
-                If t = "<Name>" Then 'a cheap rule to identify the last header line
+                If lBuff.StartsWith("<Name>") Then 'a cheap rule to identify the last header line
                     lPastHeader = True
                 ElseIf lPastHeader Then
                     If lComment.Length = 0 Then
@@ -285,8 +283,7 @@ Public Class HspfConnection
                 lComment = ""
             ElseIf lRecTyp = -1 And lRetCod <> 1 Then
                 'save comment
-                t = Left(lBuff, 6)
-                If t = "<Name>" Then 'a cheap rule to identify the last header line
+                If lBuff.StartsWith("<Name>") Then 'a cheap rule to identify the last header line
                     lPastHeader = True
                 ElseIf lPastHeader Then
                     If lComment.Length = 0 Then
@@ -341,8 +338,7 @@ Public Class HspfConnection
                 lComment = ""
             ElseIf lRecTyp = -1 And lRetCod <> 1 Then
                 'save comment
-                t = Left(lBuff, 6)
-                If t = "<Name>" Then 'a cheap rule to identify the last header line
+                If lBuff.StartsWith("<Name>") Then 'a cheap rule to identify the last header line
                     lPastHeader = True
                 ElseIf lPastHeader Then
                     If lComment.Length = 0 Then
@@ -410,8 +406,7 @@ Public Class HspfConnection
                 lComment = ""
             ElseIf lRecTyp = -1 And lRetCod <> 1 Then
                 'save comment
-                t = Left(lBuff, 6)
-                If t = "<Name>" Then 'a cheap rule to identify the last header line
+                If lBuff.StartsWith("<Name>") Then 'a cheap rule to identify the last header line
                     lPastHeader = True
                 ElseIf lPastHeader Then
                     If lComment.Length = 0 Then
@@ -512,7 +507,7 @@ Public Class HspfConnection
                         '    lSB.AppendLine("") 'write a blank line between met segs and pt srcs
                         'End If
                         'do point sources
-                        For Each lPtSrc As HspfPoint In pUci.PointSources
+                        For Each lPtSrc As HspfPointSource In pUci.PointSources
                             lSB.AppendLine(lPtSrc.ToStringFromSpecs(iCol, iLen))
                         Next
                         'now do everything else

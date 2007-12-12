@@ -24,7 +24,7 @@ Public Class HspfUci
     Private pConnections As Collection(Of HspfConnection)
     Private pMassLinks As Collection(Of HspfMassLink)
     Private pMetSegs As Collection(Of HspfMetSeg)
-    Private pPointSources As Collection(Of HspfPoint)
+    Private pPointSources As Collection(Of HspfPointSource)
     Private pPollutants As Collection(Of HspfPollutant)
     Private pMonthData As HspfMonthData
     Private pErrorDescription As String
@@ -217,7 +217,7 @@ Public Class HspfUci
         End Get
     End Property
 
-    Public ReadOnly Property PointSources() As Collection(Of HspfPoint)
+    Public ReadOnly Property PointSources() As Collection(Of HspfPointSource)
         Get
             Return pPointSources
         End Get
@@ -395,7 +395,7 @@ Public Class HspfUci
         pOpnBlks = New HspfOpnBlks
         pFilesBlk = New HspfFilesBlk
         pMetSegs = New Collection(Of HspfMetSeg)
-        pPointSources = New Collection(Of HspfPoint)
+        pPointSources = New Collection(Of HspfPointSource)
         pMassLinks = New Collection(Of HspfMassLink)
         pPollutants = New Collection(Of HspfPollutant)
 
@@ -483,7 +483,7 @@ Public Class HspfUci
                     If lMsg.StartsWith("CURDIR") Then
                         lMsg = WaitForChildMessage()
                     End If
-                    If CDbl(Right(lMsg, 1)) <> 0 Or Left(lMsg, 24) = "HSPFUCI exited with code" Then
+                    If CDbl(Right(lMsg, 1)) <> 0 Or lMsg.StartsWith("HSPFUCI exited with code") Then
                         'would be helpful to include lMsg here
                         pErrorDescription = "Error interpreting UCI File '" & lName & "'." & vbCrLf & vbCrLf & "See the file '" & aEchoFile.Trim & "' for more details." '& vbCrLf & vbCrLf & M
                         SendMonitorMessage(pErrorDescription)
@@ -725,7 +725,7 @@ Public Class HspfUci
                     Dim lConnection As HspfConnection = lOpn.Sources.Item(j)
                     If (lConnection.Target.VolName = lOperationType And _
                         lConnection.Target.Group <> "EXTNL") And _
-                        (Left(lConnection.Source.VolName, 3) = "WDM") Then
+                        (lConnection.Source.VolName.StartsWith("WDM")) Then
                         'if wdm data set to rchres add to collection,
                         'or if wdm data set to copy and copy goes to rchres
                         Dim lNewPoint As Boolean = False
@@ -746,7 +746,7 @@ Public Class HspfUci
                             If Trim(lConnection.Source.VolName) = "WDM" Then
                                 lConnection.Source.VolName = "WDM1"
                             End If
-                            Dim lPoint As New HspfPoint
+                            Dim lPoint As New HspfPointSource
                             lPoint.MFact = lConnection.MFact
                             If lConnection.Target.VolName = "COPY" Then
                                 'save rfact for septics
@@ -758,9 +758,9 @@ Public Class HspfUci
                             lPoint.Ssystem = lConnection.Ssystem
                             lPoint.Target = lConnection.Target
                             'pbd -- store associated operation id for use when writing
-                            lPoint.AssocOper = lOpn.Id
+                            lPoint.AssocOperationId = lOpn.Id
                             'get point source name from any data set
-                            If Left(lPoint.Source.VolName, 3) = "WDM" Then
+                            If lPoint.Source.VolName.StartsWith("WDM") Then
                                 Dim lDsn As Integer = lPoint.Source.VolId
                                 If lDsn > 0 Then
                                     Dim lWdmId As String = lPoint.Source.VolName
@@ -773,7 +773,7 @@ Public Class HspfUci
                                 lPoint.Name = lPoint.Source.VolName & " " & lPoint.Source.VolId
                                 lPoint.Con = ""
                             End If
-                            For Each lPointExisting As HspfPoint In pPointSources
+                            For Each lPointExisting As HspfPointSource In pPointSources
                                 If lPointExisting.Name = lPoint.Name Then
                                     lPoint.Id = lPointExisting.Id
                                     Exit For
@@ -801,7 +801,7 @@ Public Class HspfUci
         Dim lOperationTypes() As String = {"RCHRES", "COPY"} 'operations with assoc pt srcs
         For Each lOperationType As String In lOperationTypes
             For Each lOpn As HspfOperation In pOpnBlks.Item(lOperationType).Ids
-                For Each lPoint As HspfPoint In lOpn.PointSources
+                For Each lPoint As HspfPointSource In lOpn.PointSources
                     Dim lConn As HspfConnection = New HspfConnection
                     lConn.Uci = Me
                     If lPoint.Source.VolName = "MUTSIN" Then
@@ -965,7 +965,7 @@ Public Class HspfUci
                 aReturnCode = CInt(Right(lMsg, 1))
             End If
             'next line fixed 10/28/03 to handle new ipc return message
-            If CDbl(Right(lMsg, 1)) <> 0 Or Left(lMsg, 24) = "HSPFUCI exited with code" Then
+            If CDbl(Right(lMsg, 1)) <> 0 Or lMsg.StartsWith("HSPFUCI exited with code") Then
                 pErrorDescription = "Fatal HSPF error while running UCI file '" & lFileName & "'." & vbCrLf & vbCrLf & "See the file '" & EchoFileName() & "' for more details."
                 SendMonitorMessage(pErrorDescription)
             End If
@@ -1783,11 +1783,11 @@ Public Class HspfUci
         FileOpen(i, pName, OpenMode.Input)
         Do
             s = LineInput(i)
-            If Left(s, Len("FILES")) = "FILES" Then 'at files block
-                While Left(s, Len("END FILES")) <> "END FILES"
+            If s.StartsWith("FILES") Then 'at files block
+                While Not s.StartsWith("END FILES")
                     s = LineInput(i)
                     If InStr(1, s, "***") = 0 Then
-                        If Left(s, 3) = "WDM" Then
+                        If s.StartsWith("WDM") Then
                             lFile = AddWDMFile(Mid(s, 17, Len(s) - 16))
                             If Not lFile Is Nothing Then
                                 pWdmCount += 1
@@ -1795,20 +1795,20 @@ Public Class HspfUci
                                 'TODO: ? pWdmUnit(Ind) = lFile.FileUnit
                                 pWDMObj(Ind) = lFile
                             End If
-                        ElseIf Left(s, Len("END FILES")) <> "END FILES" Then  'make sure the other files are ok
-                            If Len(s) > 16 Then
+                        ElseIf Not s.StartsWith("END FILES") Then  'make sure the other files are ok
+                            If s.Length > 16 Then
                                 tname = Mid(s, 17, Len(s) - 16)
                                 tpath = IO.Path.GetDirectoryName(tname)
                                 If tpath.Length > 0 AndAlso Not IO.Directory.Exists(tpath) Then
-                                    MsgBox("Error in Files Block:  Folder " & tpath & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
+                                    Logger.Msg("Error in Files Block:  Folder " & tpath & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
                                     aFilesOK = False
                                 ElseIf UCase(Right(tname, 4)) = ".MUT" Then  'does this file exist
                                     If Not IO.File.Exists(tname) Then
-                                        MsgBox("Error in Files Block:  Input File " & tname & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
+                                        Logger.Msg("Error in Files Block:  Input File " & tname & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
                                         aFilesOK = False
                                     End If
                                 End If
-                                If Left(s, 5) = "MESSU" Then
+                                If s.StartsWith("MESSU") Then
                                     'save echo file name
                                     aEchoFile = tname
                                 End If
@@ -1851,7 +1851,7 @@ x:
         For i = 1 To pFilesBlk.Count
             lHFile = pFilesBlk.Value(i)
             If Len(lHFile.Typ) > 2 Then
-                If Left(lHFile.Typ, 3) = "WDM" Then
+                If lHFile.Typ.StartsWith("WDM") Then
                     'see if this wdm is already in project
                     ifound = False
                     If ifound = False And pWdmCount < 4 Then 'add it to project
@@ -2301,15 +2301,15 @@ x:
 
     Public Sub AddPoint(ByRef wdmid As String, ByRef wdmdsn As Integer, ByRef tarid As Integer, ByRef srcname As String, ByRef targroup As String, ByRef tarmember As String, ByRef Sub1 As Integer, ByRef Sub2 As Integer)
         Dim lOpn As HspfOperation
-        Dim tPoint As HspfPoint
-        Dim idPoint As HspfPoint
+        Dim tPoint As HspfPointSource
+        Dim idPoint As HspfPointSource
         Dim Tu, lastid, runts As Integer
         Dim dsnObj As atcData.atcTimeseries
 
         lOpn = pOpnBlks.Item("RCHRES").OperFromID(tarid)
         dsnObj = Me.GetDataSetFromDsn(WDMInd(wdmid), wdmdsn)
 
-        tPoint = New HspfPoint
+        tPoint = New HspfPointSource
         tPoint.MFact = 1
         tPoint.Source.VolId = wdmdsn
         tPoint.Source.VolName = wdmid
@@ -2372,7 +2372,7 @@ x:
 
     Public Sub RemovePoint(ByRef lWdmId As String, ByRef lWdmDsn As Integer, ByRef lTarId As Integer)
         Dim lOpn As HspfOperation
-        Dim lPoint As HspfPoint
+        Dim lPoint As HspfPointSource
 
         lOpn = pOpnBlks.Item("RCHRES").OperFromID(lTarId)
 
