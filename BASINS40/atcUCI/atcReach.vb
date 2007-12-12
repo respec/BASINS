@@ -6,9 +6,7 @@ Imports atcUtility
 Public Class Reaches
     Inherits KeyedCollection(Of String, Reach)
     Protected Overrides Function GetKeyForItem(ByVal aReach As Reach) As String
-        Dim lKey As String
-        lKey = aReach.Id
-        Return lKey
+        Return aReach.Id
     End Function
 
     Public Function Open(ByVal aFileName As String) As Integer
@@ -60,14 +58,12 @@ Public Class Reaches
                     Me.Add(lReach)
                 End If
             Loop
-            Return lReturnCode
         Catch e As ApplicationException
             Logger.Msg("Problem reading file " & lName & vbCrLf & e.Message, "Create Problem")
             lReturnCode = 1
         End Try
         Return lReturnCode
     End Function
-
 End Class
 
 Public Class Reach

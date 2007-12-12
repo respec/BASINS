@@ -6,9 +6,7 @@ Imports atcUtility
 Public Class PointLoads
     Inherits KeyedCollection(Of String, Facility)
     Protected Overrides Function GetKeyForItem(ByVal aFacility As Facility) As String
-        Dim lKey As String
-        lKey = aFacility.FacilityNpdes
-        Return lKey
+        Return aFacility.Npdes
     End Function
 
     Public Function Open(ByVal aFileName As String) As Integer
@@ -29,12 +27,12 @@ Public Class PointLoads
                 For lIndex As Integer = 1 To lFacilityCount
                     lCurrentRecord = lStreamReader.ReadLine
                     Dim lFacility As New Facility
-                    lFacility.FacilityName = StrSplit(lCurrentRecord, lDelim, lQuote)
-                    lFacility.FacilityNpdes = StrSplit(lCurrentRecord, lDelim, lQuote)
-                    lFacility.FacilityReach = StrSplit(lCurrentRecord, lDelim, lQuote)
-                    lFacility.FacilityMile = CSng(StrSplit(lCurrentRecord, lDelim, lQuote))
-                    Dim lPollutantLoads As New Collection(Of PollutantLoad)
-                    lFacility.PollutantLoads = lPollutantLoads
+                    lFacility.Name = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lFacility.Npdes = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lFacility.Reach = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lFacility.Mile = CSng(StrSplit(lCurrentRecord, lDelim, lQuote))
+                    Dim lPollutants As New Collection(Of Pollutant)
+                    lFacility.Pollutants = lPollutants
                     Me.Add(lFacility)
                 Next lIndex
                 lCurrentRecord = lStreamReader.ReadLine 'blank line
@@ -45,34 +43,31 @@ Public Class PointLoads
                     If lCurrentRecord Is Nothing Then
                         Exit Do
                     Else
-                        Dim lPollutantLoad As New PollutantLoad
+                        Dim lPollutant As New Pollutant
                         Dim lIndex As Integer = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
-                        lPollutantLoad.PollutantName = StrSplit(lCurrentRecord, lDelim, lQuote)
-                        lPollutantLoad.PollutantLoad = CSng(StrSplit(lCurrentRecord, lDelim, lQuote))
-                        Me(lIndex).PollutantLoads.Add(lPollutantLoad)
+                        lPollutant.Name = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lPollutant.Load = CSng(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        Me(lIndex).Pollutants.Add(lPollutant)
                     End If
                 Loop
             End If
-
-            Return lReturnCode
         Catch e As ApplicationException
             Logger.Msg("Problem reading file " & lName & vbCrLf & e.Message, "Create Problem")
             lReturnCode = 1
         End Try
         Return lReturnCode
     End Function
-
 End Class
 
 Public Class Facility
-    Public FacilityName As String
-    Public FacilityNpdes As String
-    Public FacilityReach As String
-    Public FacilityMile As Single
-    Public PollutantLoads As Collection(Of PollutantLoad)
+    Public Name As String
+    Public Npdes As String
+    Public Reach As String
+    Public Mile As Single
+    Public Pollutants As Collection(Of Pollutant)
 End Class
 
-Public Class PollutantLoad
-    Public PollutantName As String
-    Public PollutantLoad As Single
+Public Class Pollutant
+    Public Name As String
+    Public Load As Single
 End Class

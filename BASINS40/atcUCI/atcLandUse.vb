@@ -6,8 +6,7 @@ Imports atcUtility
 Public Class LandUses
     Inherits KeyedCollection(Of String, LandUse)
     Protected Overrides Function GetKeyForItem(ByVal aLandUse As LandUse) As String
-        Dim lKey As String
-        lKey = aLandUse.Description & ":" & aLandUse.Type & ":" & aLandUse.Reach
+        Dim lKey As String = aLandUse.Description & ":" & aLandUse.Type & ":" & aLandUse.Reach
         Return lKey
     End Function
 
@@ -60,7 +59,6 @@ Public Class LandUses
                     Me.Add(lLandUse)
                 End If
             Loop
-            Return lReturnCode
         Catch e As ApplicationException
             Logger.Msg("Problem reading file " & lName & vbCrLf & e.Message, "Create Problem")
             lReturnCode = 1

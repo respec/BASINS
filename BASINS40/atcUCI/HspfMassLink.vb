@@ -5,75 +5,13 @@ Option Explicit On
 Imports System.Text
 
 Public Class HspfMassLink
-    Private pSource As HspfSrcTar
-    Private pTarget As HspfSrcTar
-    Private pTran As String
-    Private pMFact As Double
-    Private pUci As HspfUci
-    Private pMassLinkId As Integer
-    Private pComment As String = ""
-
-    Public Property MFact() As Double
-        Get
-            MFact = pMFact
-        End Get
-        Set(ByVal Value As Double)
-            pMFact = Value
-        End Set
-    End Property
-    Public Property Tran() As String
-        Get
-            Tran = pTran
-        End Get
-        Set(ByVal Value As String)
-            pTran = Value
-        End Set
-    End Property
-
-    Public Property Comment() As String
-        Get
-            Comment = pComment
-        End Get
-        Set(ByVal Value As String)
-            pComment = Value
-        End Set
-    End Property
-
-    Public Property Uci() As HspfUci
-        Get
-            Uci = pUci
-        End Get
-        Set(ByVal Value As HspfUci)
-            pUci = Value
-        End Set
-    End Property
-
-    Public Property Source() As HspfSrcTar
-        Get
-            Source = pSource
-        End Get
-        Set(ByVal Value As HspfSrcTar)
-            pSource = Value
-        End Set
-    End Property
-
-    Public Property Target() As HspfSrcTar
-        Get
-            Target = pTarget
-        End Get
-        Set(ByVal Value As HspfSrcTar)
-            pTarget = Value
-        End Set
-    End Property
-    Public Property MassLinkID() As Integer
-        Get
-            MassLinkID = pMassLinkId
-        End Get
-        Set(ByVal Value As Integer)
-            pMassLinkId = Value
-        End Set
-    End Property
-
+    Public Source As HspfSrcTar
+    Public Target As HspfSrcTar
+    Public Tran As String
+    Public MFact As Double
+    Public Uci As HspfUci
+    Public MassLinkId As Integer
+    Public Comment As String = ""
     Public ReadOnly Property EditControlName() As String
         Get
             EditControlName = "ATCoHspf.ctlMassLinkEdit"
@@ -86,133 +24,137 @@ Public Class HspfMassLink
         End Get
     End Property
 
-    Public Sub readMassLinks(ByRef myUci As HspfUci)
-        Dim retkey, init, OmCode, retcod As Integer
-        Dim cbuff As String = Nothing
-        Dim i, lId, curml As Integer
-        Dim lMassLink As HspfMassLink
-        Dim s As String
-        Dim mlcnt As Integer
-        Dim kwd As String = Nothing
-        Dim contfg, kflg, retid As Integer
-        Dim mlno(-1) As Integer
-        Dim mlkeys(-1) As Integer
-        Dim c, t As String
-        Dim pastHeader As Boolean
-        Dim rectyp As Integer
+    Public Sub readMassLinks(ByRef aUci As HspfUci)
+        Dim lMassLinkIds(-1) As Integer
+        Dim lMassLinkKeys(-1) As Integer
+        Dim lOmCode As Integer = HspfOmCode("MASS-LINKS")
+        Dim lMassLinkCount As Integer
 
-        If myUci.FastFlag Then
-            mlcnt = 1
-            ReDim Preserve mlkeys(mlcnt)
+        If aUci.FastFlag Then
+            lMassLinkCount = 1
+            ReDim Preserve lMassLinkKeys(lMassLinkCount)
         Else
-            OmCode = HspfOmCode("MASS-LINKS")
-            lId = -101
-            init = 1
-            mlcnt = 0
+            Dim lId As Integer = -101
+            Dim lInit As Integer = 1
+            Dim lContinueFlag As Integer
+            Dim lKeyFlag As Integer
+            Dim lReturnId As Integer
+            lMassLinkCount = 0
             Do
-                Call REM_GTNXKW(myUci, init, lId, kwd, kflg, contfg, retid)
-                If retid <> 0 Then
-                    mlcnt = mlcnt + 1
-                    ReDim Preserve mlno(mlcnt)
-                    ReDim Preserve mlkeys(mlcnt)
-                    mlno(mlcnt - 1) = CInt(kwd)
-                    mlkeys(mlcnt - 1) = retid
+                Dim lKeyWord As String = ""
+                Call REM_GTNXKW(aUci, lInit, lId, lKeyWord, lKeyFlag, lContinueFlag, lReturnId)
+                If lReturnId <> 0 Then
+                    lMassLinkCount += 1
+                    ReDim Preserve lMassLinkIds(lMassLinkCount)
+                    ReDim Preserve lMassLinkKeys(lMassLinkCount)
+                    lMassLinkIds(lMassLinkCount - 1) = CInt(lKeyWord)
+                    lMassLinkKeys(lMassLinkCount - 1) = lReturnId
                 End If
-                init = 0
-            Loop While contfg = 1
+                lInit = 0
+            Loop While lContinueFlag = 1
         End If
 
-        For i = 0 To mlcnt - 1
+        Dim lRecordType As Integer
+        For lMassLinkIndex As Integer = 0 To lMassLinkCount - 1
             'loop through each mass link
-            init = mlkeys(i)
-            c = ""
-            pastHeader = False
-            retkey = -1
+            Dim lInit As Integer = lMassLinkKeys(lMassLinkIndex)
+            Dim lStringComment As String = ""
+            Dim lPastHeader As Boolean = False
+            Dim lString As String = Nothing
+            Dim lReturnKey As Integer = -1
+            Dim lReturnCode As Integer
+            Dim lMassLinkId As Integer
             Do
-                If myUci.FastFlag Then
-                    GetNextRecordFromBlock("MASS-LINK", retkey, cbuff, rectyp, retcod)
-                    If Left(cbuff, 11) = "  MASS-LINK" Then
+                If aUci.FastFlag Then
+                    GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
+                    If lString.StartsWith("  MASS-LINK") Then
                         'start of a new mass link
-                        curml = CShort(Mid(cbuff, 16, 5))
-                        pastHeader = False
-                        GetNextRecordFromBlock("MASS-LINK", retkey, cbuff, rectyp, retcod)
-                    ElseIf Left(cbuff, 15) = "  END MASS-LINK" Then
+                        lMassLinkId = CShort(Mid(lString, 16, 5))
+                        lPastHeader = False
+                        GetNextRecordFromBlock("MASS-LINK", lReturnKey, lString, lRecordType, lReturnCode)
+                    ElseIf lString.StartsWith("  END MASS-LINK") Then
                         'end of a mass link
-                        rectyp = -2
+                        lRecordType = -2
                     End If
                 Else
-                    retkey = -1
-                    Call REM_XBLOCKEX(myUci, OmCode, init, retkey, cbuff, rectyp, retcod)
-                    curml = mlno(i)
+                    lReturnKey = -1
+                    Call REM_XBLOCKEX(aUci, lOmCode, lInit, lReturnKey, lString, lRecordType, lReturnCode)
+                    lMassLinkId = lMassLinkIds(lMassLinkIndex)
                 End If
-                init = 0
-                If rectyp = 0 Then
-                    lMassLink = New HspfMassLink
-                    lMassLink.Uci = myUci
-                    lMassLink.MassLinkID = curml
-                    lMassLink.Source.VolName = Trim(Left(cbuff, 6))
+                lInit = 0
+                If lRecordType = 0 Then
+                    Dim lMassLink As New HspfMassLink
+                    lMassLink.Uci = aUci
+                    lMassLink.MassLinkId = lMassLinkId
+                    lMassLink.Source.VolName = Trim(Left(lString, 6))
                     lMassLink.Source.VolId = 0
-                    lMassLink.Source.Group = Trim(Mid(cbuff, 12, 6))
-                    lMassLink.Source.Member = Trim(Mid(cbuff, 19, 6))
-                    s = Trim(Mid(cbuff, 25, 2))
-                    If Len(s) > 0 And IsNumeric(s) Then
-                        lMassLink.Source.MemSub1 = CInt(s)
-                    Else
-                        If Len(s) > 0 Then lMassLink.Source.MemSub1 = myUci.CatAsInt(s)
-                    End If
-                    s = Trim(Mid(cbuff, 27, 2))
-                    If Len(s) > 0 And IsNumeric(s) Then
-                        lMassLink.Source.MemSub2 = CInt(s)
-                    Else
-                        If Len(s) > 0 Then lMassLink.Source.MemSub2 = myUci.CatAsInt(s)
-                    End If
-                    s = Trim(Mid(cbuff, 29, 10))
-                    If Len(s) > 0 Then lMassLink.MFact = CDbl(s)
-                    lMassLink.Tran = Trim(Mid(cbuff, 39, 4))
-                    lMassLink.Target.VolName = Trim(Mid(cbuff, 44, 6))
-                    lMassLink.Target.VolId = 0
-                    s = Trim(Mid(cbuff, 55, 3))
-                    If Len(s) > 0 Then lMassLink.Target.VolIdL = CInt(s)
-                    lMassLink.Target.Group = Trim(Mid(cbuff, 59, 6))
-                    lMassLink.Target.Member = Trim(Mid(cbuff, 66, 6))
-                    s = Trim(Mid(cbuff, 72, 2))
-                    If Len(s) > 0 And IsNumeric(s) Then
-                        lMassLink.Target.MemSub1 = CInt(s)
-                    Else
-                        If Len(s) > 0 Then lMassLink.Target.MemSub1 = myUci.CatAsInt(s)
-                    End If
-                    s = Trim(Mid(cbuff, 74, 2))
-                    If Len(s) > 0 And IsNumeric(s) Then
-                        lMassLink.Target.MemSub2 = CInt(s)
-                    Else
-                        If Len(s) > 0 Then lMassLink.Target.MemSub2 = myUci.CatAsInt(s)
-                    End If
-                    lMassLink.Comment = c
-                    myUci.MassLinks.Add(lMassLink)
-                    c = ""
-                ElseIf rectyp = -1 And retcod <> 1 Then
-                    'save comment
-                    t = Left(cbuff, 6)
-                    If t = "<Name>" Then 'a cheap rule to identify the last header line
-                        pastHeader = True
-                    ElseIf pastHeader Then
-                        If Len(c) = 0 Then
-                            c = cbuff
+                    lMassLink.Source.Group = Trim(Mid(lString, 12, 6))
+                    lMassLink.Source.Member = Trim(Mid(lString, 19, 6))
+                    Dim lStr As String
+                    lStr = Trim(Mid(lString, 25, 2))
+                    If lStr.Length > 0 Then
+                        If IsNumeric(lStr) Then
+                            lMassLink.Source.MemSub1 = CInt(lStr)
                         Else
-                            c = c & vbCrLf & cbuff
+                            lMassLink.Source.MemSub1 = aUci.CatAsInt(lStr)
+                        End If
+                    End If
+                    lStr = Trim(Mid(lString, 27, 2))
+                    If lStr.Length > 0 Then
+                        If IsNumeric(lStr) Then
+                            lMassLink.Source.MemSub2 = CInt(lStr)
+                        Else
+                            lMassLink.Source.MemSub2 = aUci.CatAsInt(lStr)
+                        End If
+                    End If
+                    lStr = Trim(Mid(lString, 29, 10))
+                    If lStr.Length > 0 Then
+                        lMassLink.MFact = CDbl(lStr)
+                    End If
+                    lMassLink.Tran = Trim(Mid(lString, 39, 4))
+                    lMassLink.Target.VolName = Trim(Mid(lString, 44, 6))
+                    lMassLink.Target.VolId = 0
+                    lStr = Trim(Mid(lString, 55, 3))
+                    If Len(lStr) > 0 Then lMassLink.Target.VolIdL = CInt(lStr)
+                    lMassLink.Target.Group = Trim(Mid(lString, 59, 6))
+                    lMassLink.Target.Member = Trim(Mid(lString, 66, 6))
+                    lStr = Trim(Mid(lString, 72, 2))
+                    If Len(lStr) > 0 And IsNumeric(lStr) Then
+                        lMassLink.Target.MemSub1 = CInt(lStr)
+                    Else
+                        If Len(lStr) > 0 Then lMassLink.Target.MemSub1 = aUci.CatAsInt(lStr)
+                    End If
+                    lStr = Trim(Mid(lString, 74, 2))
+                    If Len(lStr) > 0 And IsNumeric(lStr) Then
+                        lMassLink.Target.MemSub2 = CInt(lStr)
+                    Else
+                        If Len(lStr) > 0 Then lMassLink.Target.MemSub2 = aUci.CatAsInt(lStr)
+                    End If
+                    lMassLink.Comment = lStringComment
+                    aUci.MassLinks.Add(lMassLink)
+                    lStringComment = ""
+                ElseIf lRecordType = -1 And lReturnCode <> 1 Then
+                    'save comment
+                    If lString.StartsWith("<Name>") Then 'a cheap rule to identify the last header line
+                        lPastHeader = True
+                    ElseIf lPastHeader Then
+                        If lStringComment.Length = 0 Then
+                            lStringComment = lString
+                        Else
+                            lStringComment &= vbCrLf & lString
                         End If
                     End If
                 End If
-                If retcod <> 2 Then Exit Do
+                If lReturnCode <> 2 Then Exit Do
             Loop
-        Next i
+        Next lMassLinkIndex
     End Sub
 
     Public Sub New()
         MyBase.New()
-        pSource = New HspfSrcTar
-        pTarget = New HspfSrcTar
-        pMFact = 1
+        Source = New HspfSrcTar
+        Target = New HspfSrcTar
+        MFact = 1
     End Sub
 
     Public Sub Edit()
@@ -249,7 +191,7 @@ Public Class HspfMassLink
         Next lML
 
         s = "MASS-LINK"
-        lBlockDef = pUci.Msg.BlockDefs.Item(s)
+        lBlockDef = Uci.Msg.BlockDefs.Item(s)
         lTableDef = lBlockDef.TableDefs.Item(0)
         'get lengths and starting positions
         j = 0
@@ -280,13 +222,17 @@ Public Class HspfMassLink
                     lStr.Append(Space(icol(3) - lStr.Length - 1))
                     If lML.Source.MemSub1 <> 0 Then
                         t = CStr(lML.Source.MemSub1).PadLeft(ilen(3))
-                        If lML.Source.VolName = "RCHRES" Then t = pUci.IntAsCat(lML.Source.Member, 1, t)
+                        If lML.Source.VolName = "RCHRES" Then
+                            t = Uci.IntAsCat(lML.Source.Member, 1, t)
+                        End If
                         lStr.Append(t)
                     End If
                     lStr.Append(Space(icol(4) - lStr.Length - 1))
                     If lML.Source.MemSub2 <> 0 Then
                         t = CStr(lML.Source.MemSub2).PadLeft(ilen(4))
-                        If lML.Source.VolName = "RCHRES" Then t = pUci.IntAsCat(lML.Source.Member, 2, t)
+                        If lML.Source.VolName = "RCHRES" Then
+                            t = Uci.IntAsCat(lML.Source.Member, 2, t)
+                        End If
                         lStr.Append(t)
                     End If
                     lStr.Append(Space(icol(5) - lStr.Length - 1))
@@ -304,14 +250,18 @@ Public Class HspfMassLink
                     lStr.Append(Space(icol(9) - lStr.Length - 1))
                     If lML.Target.MemSub1 <> 0 Then
                         t = CStr(lML.Target.MemSub1).PadLeft(ilen(9))
-                        If lML.Target.VolName = "RCHRES" Then t = pUci.IntAsCat(lML.Target.Member, 1, t)
+                        If lML.Target.VolName = "RCHRES" Then
+                            t = Uci.IntAsCat(lML.Target.Member, 1, t)
+                        End If
                         lStr.Append(t)
                     End If
                     lStr.Append(Space(icol(10) - lStr.Length - 1))
                     If lML.Target.MemSub2 <> 0 Then
                         t = Space(ilen(10))
                         t = RSet(CStr(lML.Target.MemSub2), Len(t))
-                        If lML.Target.VolName = "RCHRES" Then t = pUci.IntAsCat(lML.Target.Member, 2, t)
+                        If lML.Target.VolName = "RCHRES" Then
+                            t = Uci.IntAsCat(lML.Target.Member, 2, t)
+                        End If
                         lStr.Append(t)
                     End If
                     lSB.AppendLine(lStr.ToString)
@@ -323,10 +273,12 @@ Public Class HspfMassLink
         Return lSB.ToString
     End Function
 
-    Public Function FindMassLinkID(ByRef sname As String, ByRef tname As String) As Integer
-        For Each lMassLink As HspfMassLink In pUci.MassLinks
-            If lMassLink.Source.VolName = sname And lMassLink.Target.VolName = tname Then
-                Return lMassLink.MassLinkID
+    Public Function FindMassLinkID(ByVal aSourceVolName As String, _
+                                   ByVal aTargetVolName As String) As Integer
+        For Each lMassLink As HspfMassLink In Uci.MassLinks
+            If lMassLink.Source.VolName = aSourceVolName And _
+               lMassLink.Target.VolName = aTargetVolName Then
+                Return lMassLink.MassLinkId
             End If
         Next lMassLink
         Return -1
