@@ -692,16 +692,16 @@ Public Class Site
     Private pArea As Double
     Private pStatDN As Integer
     Private pDSN(9) As Integer '2-D. 1st dim = stat# (see below), and 2nd = site#
-    '1 = simulated total runoff (in)
-    '2 = observed streamflow (cfs)
-    '3 = simulated surface runoff (in)
-    '4 = simulated interflow (in)
-    '5 = simulated base flow (in)
-    '6 = precipitation (in)
-    '7 = potential evapotranspiration (in)
-    '8 = actual evapotranspiration (in)
-    '9 = upper zone storage (in)
-    '10 = lower zone storage (in)
+    '0 = simulated total runoff (in)
+    '1 = observed streamflow (cfs)
+    '2 = simulated surface runoff (in)
+    '3 = simulated interflow (in)
+    '4 = simulated base flow (in)
+    '5 = precipitation (in)
+    '6 = potential evapotranspiration (in)
+    '7 = actual evapotranspiration (in)
+    '8 = upper zone storage (in)
+    '9 = lower zone storage (in)
     Private pErrorTerm() As Double
 
     Public Sub New(ByVal aExpertSystem As ExpertSystem, ByVal aName As String, ByVal aStatDN As Integer, ByVal aDsn() As Integer)

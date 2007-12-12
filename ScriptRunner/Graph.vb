@@ -33,28 +33,16 @@ Module Graph
             Dim lDataGroup As New atcDataGroup
             Dim lSimTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(0))
             lSimTser = InchesToCfs(lSimTser, lArea)
+            lSimTser.Attributes.SetValue("YAxis", "Left")
             lDataGroup.Add(SubsetByDate(lSimTser, _
                                         lExpertSystem.SDateJ, _
                                         lExpertSystem.EDateJ, Nothing))
+
             Dim lObsTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(1))
-            lDataGroup.Add(SubsetByDate(lObsTSer, _
+            lObsTser.Attributes.SetValue("YAxis", "Left")
+            lDataGroup.Add(SubsetByDate(lObsTser, _
                                         lExpertSystem.SDateJ, _
                                         lExpertSystem.EDateJ, Nothing))
-
-            lGraphForm = New atcGraph.atcGraphForm(lDataGroup)
-            lGraphForm.Pane.YAxis.Title.Text = lCons & " (cfs)"
-            lGraphForm.Pane.XAxis.Title.Text = "Daily Mean Flow at " & lSite
-            SetGraphSpecs(lGraphForm)
-            lOutFileName = "outfiles\" & lCons & "_" & lSite & ".png"
-            lGraphForm.SaveBitmapToFile(lOutFileName)
-            With lGraphForm.Pane
-                .YAxis.Type = ZedGraph.AxisType.Log
-                .YAxis.Scale.Min = 1
-                .YAxis.Scale.IsUseTenPower = False
-            End With
-            lOutFileName = "outfiles\" & lCons & "_" & lSite & "_log.png"
-            lGraphForm.SaveBitmapToFile(lOutFileName)
-            lGraphForm.Dispose()
 
             lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Linear)
             With lGraphForm.Pane
@@ -85,6 +73,28 @@ Module Graph
             lOutFileName = "outfiles\" & lCons & "_" & lSite & "_dur.png"
             lGraphForm.SaveBitmapToFile(lOutFileName)
             lGraphForm.Dispose()
+
+            'add precip to aux axis
+            Dim lPrecTser As atcTimeseries = lWdmDataSource.DataSets.ItemByKey(lExpertSystem.Sites(lSiteIndex).Dsn(5))
+            lPrecTser.Attributes.SetValue("YAxis", "Aux")
+            lDataGroup.Add(SubsetByDate(lPrecTser, _
+                                        lExpertSystem.SDateJ, _
+                                        lExpertSystem.EDateJ, Nothing))
+            lGraphForm = New atcGraph.atcGraphForm(lDataGroup)
+            lGraphForm.Pane.YAxis.Title.Text = lCons & " (cfs)"
+            lGraphForm.Pane.XAxis.Title.Text = "Daily Mean Flow at " & lSite
+            SetGraphSpecs(lGraphForm)
+            lOutFileName = "outfiles\" & lCons & "_" & lSite & ".png"
+            lGraphForm.SaveBitmapToFile(lOutFileName)
+            With lGraphForm.Pane
+                .YAxis.Type = ZedGraph.AxisType.Log
+                .YAxis.Scale.Min = 1
+                .YAxis.Scale.IsUseTenPower = False
+            End With
+            lOutFileName = "outfiles\" & lCons & "_" & lSite & "_log.png"
+            lGraphForm.SaveBitmapToFile(lOutFileName)
+            lGraphForm.Dispose()
+
             OpenFile(lOutFileName)
         Next lSiteIndex
     End Sub
@@ -105,10 +115,6 @@ Module Graph
                 .Label.Text = "Observed"
                 .Color = System.Drawing.Color.Blue
             End With
-            .Legend.Position = LegendPos.Float
-            .Legend.Location = New Location(0.3, 0.05, CoordType.PaneFraction, AlignH.Right, AlignV.Top)
-            .Legend.FontSpec.Size = 10
-            .Legend.IsHStack = False
         End With
     End Sub
 End Module
