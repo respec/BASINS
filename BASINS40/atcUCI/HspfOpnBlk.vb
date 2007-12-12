@@ -116,7 +116,7 @@ Public Class HspfOpnBlk
         Return pTables.Contains(aName)
     End Function
 
-    Public Sub setTableValues(ByRef aBlockDef As HspfBlockDef)
+    Public Sub setTableValues(ByVal aBlockDef As HspfBlockDef)
         If pUci.FastFlag Then
             pComment = GetCommentBeforeBlock(pName)
         End If
@@ -138,7 +138,6 @@ Public Class HspfOpnBlk
             Dim lOccurNum As Integer
             Dim lSRec As Integer
             If pUci.FastFlag Then
-                lTableIndex += 1
                 lKeyword = aBlockDef.TableDefs(lTableIndex).Name
                 StartingRecordOfOperationTable(aBlockDef.Name, lKeyword, lSRec, lOccurCount)
                 If lSRec > 0 Then
@@ -146,6 +145,7 @@ Public Class HspfOpnBlk
                 Else
                     lExistFlag = 0
                 End If
+                lTableIndex += 1
                 If lTableIndex < aBlockDef.TableDefs.Count Then
                     lContinueFlag = 1 'more tables to read flag, 1 if so
                 Else
@@ -343,7 +343,7 @@ Public Class HspfOpnBlk
         Loop
     End Sub
 
-    Public Sub CreateTables(ByRef aBlockDef As HspfBlockDef)
+    Public Sub CreateTables(ByVal aBlockDef As HspfBlockDef)
         Dim lTableNames() As String
         Static PERLNDtabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "PWAT-PARM1", "PWAT-PARM2", "PWAT-PARM3", "PWAT-PARM4", "MON-INTERCEP", "MON-LZETPARM", "PWAT-STATE1"}
         Static IMPLNDtabList() As String = {"ACTIVITY", "PRINT-INFO", "GEN-INFO", "IWAT-PARM1", "IWAT-PARM2", "IWAT-PARM3", "IWAT-STATE1"}
@@ -380,7 +380,9 @@ Public Class HspfOpnBlk
         Next lTableName
     End Sub
 
-    Public Sub AddTable(ByRef aOpId As Integer, ByRef aTableName As String, ByRef aBlockDef As HspfBlockDef)
+    Public Sub AddTable(ByRef aOpId As Integer, _
+                        ByRef aTableName As String, _
+                        ByVal aBlockDef As HspfBlockDef)
         'add a table to the uci object for this operation id
         Dim s, t As String
         Dim O, i As Integer

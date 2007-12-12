@@ -250,7 +250,7 @@ Public Class HspfMassLink
 
         s = "MASS-LINK"
         lBlockDef = pUci.Msg.BlockDefs.Item(s)
-        lTableDef = lBlockDef.TableDefs.Item(1)
+        lTableDef = lBlockDef.TableDefs.Item(0)
         'get lengths and starting positions
         j = 0
         For Each lParmDef In lTableDef.ParmDefs
