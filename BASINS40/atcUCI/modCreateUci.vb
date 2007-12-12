@@ -628,10 +628,10 @@ Module modCreateUci
             lMasterPollutantList = Nothing
         End If
 
-        Dim lNewWdmId As String = ""
+        Dim lNewWdmId As Integer = 0
         Dim lNewDsn As Integer
-        Dim lJDates(1) As Single
-        Dim lRLoad(1) As Single
+        Dim lJDates(1) As Double
+        Dim lRLoad(1) As Double
         Dim lScen As String = "PT-OBS"
         For Each lFacility As Facility In pPointLoads
             For Each lPollutant As Pollutant In lFacility.Pollutants
