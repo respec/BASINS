@@ -41,7 +41,8 @@ Public Class atcGraphForm
     Friend WithEvents mnuViewHorizontalZoom As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewZoomMouse As System.Windows.Forms.MenuItem
     Friend WithEvents mnuEditCopyMetafile As System.Windows.Forms.MenuItem
-    Friend WithEvents mnuFileSaveMetafile As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuCoordinates As System.Windows.Forms.MenuItem
+    Friend WithEvents mnuCoordinatesOnMenuBar As System.Windows.Forms.MenuItem
 
     Private WithEvents pZgc As New ZedGraphControl
 
@@ -98,12 +99,16 @@ Public Class atcGraphForm
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
+                .Scale.Format = "#,###.###"
+                .Scale.FontSpec.StringAlignment = StringAlignment.Far
             End With
             With .Y2Axis
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
+                .Scale.Format = "#,###.###"
+                .Scale.FontSpec.StringAlignment = StringAlignment.Far
             End With
             With .Legend
                 .Position = LegendPos.Float
@@ -284,6 +289,7 @@ Public Class atcGraphForm
         Me.mnuEditGraph = New System.Windows.Forms.MenuItem
         Me.mnuEditSep1 = New System.Windows.Forms.MenuItem
         Me.mnuEditCopy = New System.Windows.Forms.MenuItem
+        Me.mnuEditCopyMetafile = New System.Windows.Forms.MenuItem
         Me.mnuView = New System.Windows.Forms.MenuItem
         Me.mnuViewTime = New System.Windows.Forms.MenuItem
         Me.mnuViewProbability = New System.Windows.Forms.MenuItem
@@ -294,18 +300,18 @@ Public Class atcGraphForm
         Me.mnuViewZoomMouse = New System.Windows.Forms.MenuItem
         Me.mnuAnalysis = New System.Windows.Forms.MenuItem
         Me.mnuHelp = New System.Windows.Forms.MenuItem
-        Me.mnuEditCopyMetafile = New System.Windows.Forms.MenuItem
-        Me.mnuFileSaveMetafile = New System.Windows.Forms.MenuItem
+        Me.mnuCoordinates = New System.Windows.Forms.MenuItem
+        Me.mnuCoordinatesOnMenuBar = New System.Windows.Forms.MenuItem
         Me.SuspendLayout()
         '
         'MainMenu1
         '
-        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp})
+        Me.MainMenu1.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuAnalysis, Me.mnuHelp, Me.mnuCoordinates})
         '
         'mnuFile
         '
         Me.mnuFile.Index = 0
-        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSep1, Me.mnuFileSave, Me.mnuFileSaveMetafile, Me.mnuFilePrint})
+        Me.mnuFile.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuFileSelectData, Me.mnuFileSep1, Me.mnuFileSave, Me.mnuFilePrint})
         Me.mnuFile.Text = "File"
         '
         'mnuFileSelectData
@@ -325,7 +331,7 @@ Public Class atcGraphForm
         '
         'mnuFilePrint
         '
-        Me.mnuFilePrint.Index = 4
+        Me.mnuFilePrint.Index = 3
         Me.mnuFilePrint.Text = "Print"
         '
         'mnuEdit
@@ -349,6 +355,11 @@ Public Class atcGraphForm
         Me.mnuEditCopy.Index = 2
         Me.mnuEditCopy.Shortcut = System.Windows.Forms.Shortcut.CtrlC
         Me.mnuEditCopy.Text = "Copy"
+        '
+        'mnuEditCopyMetafile
+        '
+        Me.mnuEditCopyMetafile.Index = 3
+        Me.mnuEditCopyMetafile.Text = "Copy Metafile"
         '
         'mnuView
         '
@@ -406,15 +417,17 @@ Public Class atcGraphForm
         Me.mnuHelp.ShowShortcut = False
         Me.mnuHelp.Text = "Help"
         '
-        'mnuEditCopyMetafile
+        'mnuCoordinates
         '
-        Me.mnuEditCopyMetafile.Index = 3
-        Me.mnuEditCopyMetafile.Text = "Copy Metafile"
+        Me.mnuCoordinates.Index = 5
+        Me.mnuCoordinates.MenuItems.AddRange(New System.Windows.Forms.MenuItem() {Me.mnuCoordinatesOnMenuBar})
+        Me.mnuCoordinates.Text = "Coordinates"
         '
-        'mnuFileSaveMetafile
+        'mnuCoordinatesOnMenuBar
         '
-        Me.mnuFileSaveMetafile.Index = 3
-        Me.mnuFileSaveMetafile.Text = "Save Metafile"
+        Me.mnuCoordinatesOnMenuBar.Checked = True
+        Me.mnuCoordinatesOnMenuBar.Index = 0
+        Me.mnuCoordinatesOnMenuBar.Text = "On Menu Bar"
         '
         'atcGraphForm
         '
@@ -480,16 +493,16 @@ Public Class atcGraphForm
         End If
     End Sub
 
-    Private Sub mnuFileSaveMetafile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveMetafile.Click
-        Dim cdlg As New SaveFileDialog
-        With cdlg
-            .Title = "Save Enhanced Windows Metafile As..."
-            .DefaultExt = ".emf"
-            If .ShowDialog = Windows.Forms.DialogResult.OK Then
-                SaveAsMetafile(.FileName)
-            End If
-        End With
-    End Sub
+    'Private Sub mnuFileSaveMetafile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFileSaveMetafile.Click
+    '    Dim cdlg As New SaveFileDialog
+    '    With cdlg
+    '        .Title = "Save Enhanced Windows Metafile As..."
+    '        .DefaultExt = ".emf"
+    '        If .ShowDialog = Windows.Forms.DialogResult.OK Then
+    '            SaveAsMetafile(.FileName)
+    '        End If
+    '    End With
+    'End Sub
 
     Private Sub mnuEditCopy_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles mnuEditCopy.Click
         Clipboard.SetDataObject(pZgc.MasterPane.GetImage)
@@ -584,158 +597,178 @@ Public Class atcGraphForm
     End Sub
 
     Public Sub AddDatasetTimeseries(ByVal aTimeseries As atcTimeseries)
+        If mnuViewProbability.Checked Then
+            AddToProbabilityGraph(aTimeseries)
+        ElseIf mnuViewTime.Checked Then
+            AddToTimeGraph(aTimeseries)
+        End If
+    End Sub
+
+    Private Sub AddToProbabilityGraph(ByVal aTimeseries As atcTimeseries)
         Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
         Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
         Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
-        Dim lOldCons As String
         Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
         Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
         Dim lCurve As LineItem = Nothing
-        Dim lOldCurve As LineItem
-
-        If mnuViewProbability.Checked Then
-            Dim lX(pNumProbabilityPoints) As Double
-            Dim lLastIndex As Integer = lX.GetUpperBound(0)
-            With Pane.XAxis
-                If .Type <> AxisType.Probability Then
-                    '.Type = AxisType.Linear 'for debugging 
-                    .Type = AxisType.Probability
-                    With .MajorTic
-                        .IsInside = True
-                        .IsCrossInside = True
-                        .IsOutside = False
-                        .IsCrossOutside = False
-                    End With
-                    Dim lGraphics As Graphics = Me.CreateGraphics()
-                    pMaster.AxisChange(lGraphics)
-                    lGraphics.Dispose()
-                End If
-                For lXindex As Integer = 0 To lLastIndex
-                    lX(lXindex) = 100 * .Scale.DeLinearize(lXindex / CDbl(lLastIndex))
-                Next
-            End With
-            Dim lProbScale As ZedGraph.ProbabilityScale = Pane.XAxis.Scale
-            Dim lAttributeName As String
-            Dim lIndex As Integer
-            Dim lXFracExceed() As Double
-            Dim lY() As Double
-
-            ReDim lY(lLastIndex)
-            'Dim lXSd() As Double
-            'ReDim lXSd(lLastIndex)
-            ReDim lXFracExceed(lLastIndex)
-
-            For lIndex = 0 To lLastIndex
-                'lXSd(lIndex) = Gausex(lX(lIndex) / 100)
-                lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
-                lAttributeName = "%" & Format(lX(lIndex), "00.####")
-                lY(lIndex) = aTimeseries.Attributes.GetValue(lAttributeName)
-                'Logger.Dbg(lAttributeName & " = " & lY(lIndex) & _
-                '                            " : " & lX(lIndex) & _
-                '                            " : " & lXFracExceed(lIndex))
-            Next
-            With Pane.XAxis
-                .Scale.Min = lXFracExceed(0)
-                .Scale.Max = lXFracExceed(lLastIndex)
-                'AddHandler .ScaleFormatEvent, AddressOf XScaleFormatEvent
-                .Scale.BaseTic = lXFracExceed(0)
-                .Title.Text = "Percent chance exceeded"
-            End With
-            With Pane.YAxis
-                .Type = AxisType.Log
-                .Scale.Format = "#,###"
-                .Scale.FontSpec.StringAlignment = StringAlignment.Far
-                .Scale.IsUseTenPower = False
-                If aTimeseries.Attributes.ContainsAttribute("Units") Then
-                    .Title.Text = aTimeseries.Attributes.GetValue("Units")
-                    .Title.IsVisible = True
-                End If
-            End With
-
-            'Upper right corner of chart is better for this graph type
-            Pane.Legend.Location = New Location(0.95, 0.05, CoordType.ChartFraction, AlignH.Right, AlignV.Top)
-
-            lCurve = Pane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
-            lCurve.Line.Width = 1
-            lCurve.Line.StepType = StepType.NonStep
-            Me.Refresh()
-        ElseIf mnuViewTime.Checked Then
-            With Pane.XAxis
-                If .Type <> AxisType.DateMulti Then .Type = AxisType.DateMulti
-                .Title.Text = ""
-            End With
-            If aTimeseries.Attributes.GetValue("point", False) Then
-                lCurve = Pane.AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
-                lCurve.Line.IsVisible = False
-            Else
-                lCurve = Pane.AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
-                lCurve.Line.Width = 1
-                lCurve.Line.StepType = StepType.RearwardStep
-                If AuxAxisEnabled Then
-                    pPaneAux.AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
-                End If
+        Dim lX(pNumProbabilityPoints) As Double
+        Dim lLastIndex As Integer = lX.GetUpperBound(0)
+        With Pane.XAxis
+            If .Type <> AxisType.Probability Then
+                '.Type = AxisType.Linear 'for debugging 
+                .Type = AxisType.Probability
+                With .MajorTic
+                    .IsInside = True
+                    .IsCrossInside = True
+                    .IsOutside = False
+                    .IsCrossOutside = False
+                End With
+                Dim lGraphics As Graphics = Me.CreateGraphics()
+                pMaster.AxisChange(lGraphics)
+                lGraphics.Dispose()
             End If
+            For lXindex As Integer = 0 To lLastIndex
+                lX(lXindex) = 100 * .Scale.DeLinearize(lXindex / CDbl(lLastIndex))
+            Next
+        End With
+        Dim lProbScale As ZedGraph.ProbabilityScale = Pane.XAxis.Scale
+        Dim lAttributeName As String
+        Dim lIndex As Integer
+        Dim lXFracExceed() As Double
+        Dim lY() As Double
 
-            If Pane.CurveList.Count = 1 Then
-                If aTimeseries.numValues > 0 Then
-                    Pane.XAxis.Scale.Min = aTimeseries.Attributes.GetValue("SJDay")
-                    Pane.XAxis.Scale.Max = aTimeseries.Attributes.GetValue("EJDay")
-                End If
-            ElseIf Pane.CurveList.Count > 1 AndAlso Not lCurve Is Nothing Then
-                'Expand time scale if needed to include all dates in new curve
-                If aTimeseries.numValues > 0 Then
-                    If aTimeseries.Attributes.GetValue("SJDay") < Pane.XAxis.Scale.Min Then
-                        Pane.XAxis.Scale.Min = aTimeseries.Attributes.GetValue("SJDay")
-                    End If
-                    If aTimeseries.Attributes.GetValue("EJDay") > Pane.XAxis.Scale.Max Then
-                        Pane.XAxis.Scale.Max = aTimeseries.Attributes.GetValue("EJDay")
-                    End If
-                End If
+        ReDim lY(lLastIndex)
+        'Dim lXSd() As Double
+        'ReDim lXSd(lLastIndex)
+        ReDim lXFracExceed(lLastIndex)
 
-                'Use the same Y axis as other curves with this constituent
-                Dim lFoundMatchingCons As Boolean = False
-                For Each lTs As atcTimeseries In pDataGroup
-                    lOldCurve = Pane.CurveList.Item(TSCurveLabel(lTs))
-                    If Not lOldCurve Is Nothing Then
-                        lOldCons = lTs.Attributes.GetValue("constituent")
-                        If lOldCons = lCons Then
-                            lCurve.IsY2Axis = lOldCurve.IsY2Axis
-                            lFoundMatchingCons = True
-                            Exit For
-                        End If
+        For lIndex = 0 To lLastIndex
+            'lXSd(lIndex) = Gausex(lX(lIndex) / 100)
+            lXFracExceed(lIndex) = (100 - lX(lIndex)) / 100
+            lAttributeName = "%" & Format(lX(lIndex), "00.####")
+            lY(lIndex) = aTimeseries.Attributes.GetValue(lAttributeName)
+            'Logger.Dbg(lAttributeName & " = " & lY(lIndex) & _
+            '                            " : " & lX(lIndex) & _
+            '                            " : " & lXFracExceed(lIndex))
+        Next
+        With Pane.XAxis
+            .Scale.Min = lXFracExceed(0)
+            .Scale.Max = lXFracExceed(lLastIndex)
+            'AddHandler .ScaleFormatEvent, AddressOf XScaleFormatEvent
+            .Scale.BaseTic = lXFracExceed(0)
+            .Title.Text = "Percent chance exceeded"
+        End With
+        With Pane.YAxis
+            .Type = AxisType.Log
+            .Scale.IsUseTenPower = False
+            If aTimeseries.Attributes.ContainsAttribute("Units") Then
+                .Title.Text = aTimeseries.Attributes.GetValue("Units")
+                .Title.IsVisible = True
+            End If
+        End With
+
+        'Upper right corner of chart is better for this graph type
+        Pane.Legend.Location = New Location(0.95, 0.05, CoordType.ChartFraction, AlignH.Right, AlignV.Top)
+
+        lCurve = Pane.AddCurve(lCurveLabel, lXFracExceed, lY, lCurveColor, SymbolType.None)
+        lCurve.Line.Width = 1
+        lCurve.Line.StepType = StepType.NonStep
+        Me.Refresh()
+    End Sub
+
+    Private Sub AddToTimeGraph(ByVal aTimeseries As atcTimeseries)
+        Dim lScen As String = aTimeseries.Attributes.GetValue("scenario")
+        Dim lLoc As String = aTimeseries.Attributes.GetValue("location")
+        Dim lCons As String = aTimeseries.Attributes.GetValue("constituent")
+        Dim lCurveLabel As String = TSCurveLabel(aTimeseries)
+        Dim lCurveColor As Color = GetMatchingColor(lScen & ":" & lLoc & ":" & lCons)
+
+        Dim lCurve As LineItem = Nothing
+        Dim lOldCons As String
+        Dim lOldCurve As LineItem
+        Dim lPane As GraphPane = pPaneMain
+        Dim lYAxis As Axis = pPaneMain.YAxis
+        Dim lYAxisName As String = aTimeseries.Attributes.GetValue("YAxis", "")
+        If lYAxisName.Length = 0 Then 'Does not have a pre-assigned axis
+            'Use the same Y axis as existing curve with this constituent
+            Dim lFoundMatchingCons As Boolean = False
+            For Each lTs As atcTimeseries In pDataGroup
+                lOldCurve = pPaneMain.CurveList.Item(TSCurveLabel(lTs))
+                If Not lOldCurve Is Nothing Then
+                    lOldCons = lTs.Attributes.GetValue("constituent")
+                    If lOldCons = lCons Then
+                        If lOldCurve.IsY2Axis Then lYAxisName = "RIGHT" Else lYAxisName = "LEFT"
+                        lFoundMatchingCons = True
+                        Exit For
                     End If
-                Next
-                If Not lFoundMatchingCons Then
-                    lCurve.IsY2Axis = True
                 End If
-                If lCurve.IsY2Axis Then 'make sure second Y axis is visible and tics are not shown on other Y axis
-                    With Pane.Y2Axis
-                        .MajorTic.IsOpposite = False
-                        .MinorTic.IsOpposite = False
-                        .IsVisible = True
-                        .Scale.Format = "#,###.###"
-                        .Scale.FontSpec.StringAlignment = StringAlignment.Far
-                        If aTimeseries.Attributes.ContainsAttribute("Units") Then
-                            .Title.Text = aTimeseries.Attributes.GetValue("Units")
-                            .Title.IsVisible = True
-                        End If
-                    End With
-                    With Pane.YAxis
-                        .MajorTic.IsOpposite = False
-                        .MinorTic.IsOpposite = False
-                    End With
-                Else
-                    With Pane.YAxis
-                        .Scale.Format = "#,###.###"
-                        .Scale.FontSpec.StringAlignment = StringAlignment.Far
-                        If aTimeseries.Attributes.ContainsAttribute("Units") Then
-                            .Title.Text = aTimeseries.Attributes.GetValue("Units")
-                            .Title.IsVisible = True
-                        End If
-                    End With
-                End If
+            Next
+            If Not lFoundMatchingCons Then
+                lCurve.IsY2Axis = True
             End If
         End If
+        Select Case lYAxisName.ToUpper
+            Case "AUX"
+                lPane = pPaneAux
+                lYAxis = pPaneAux.YAxis
+                AuxAxisEnabled = True
+            Case "RIGHT"
+                lPane = pPaneMain
+                lYAxis = lPane.Y2Axis
+                With lPane.YAxis
+                    .MajorTic.IsOpposite = False
+                    .MinorTic.IsOpposite = False
+                End With
+                With lYAxis
+                    .MajorTic.IsOpposite = False
+                    .MinorTic.IsOpposite = False
+                End With
+        End Select
+
+        lYAxis.IsVisible = True
+
+        With lPane
+            If .XAxis.Type <> AxisType.DateMulti Then .XAxis.Type = AxisType.DateMulti
+            .XAxis.Title.Text = "" 'TODO: remove this when spacing works for title on date axis
+            If aTimeseries.Attributes.GetValue("point", False) Then
+                lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
+                lCurve.Line.IsVisible = False
+            Else
+                lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.None)
+                lCurve.Line.Width = 1
+                lCurve.Line.StepType = StepType.RearwardStep
+            End If
+
+            If lYAxisName.ToUpper.Equals("RIGHT") Then
+                lCurve.IsY2Axis = True
+            End If
+
+            'Use units as Y axis title (if this data has units and Y axis title is not set)
+            If aTimeseries.Attributes.ContainsAttribute("Units") AndAlso _
+               (lYAxis.Title Is Nothing OrElse lYAxis.Title.Text Is Nothing OrElse lYAxis.Title.Text.Length = 0) Then
+                lYAxis.Title.Text = aTimeseries.Attributes.GetValue("Units")
+                lYAxis.Title.IsVisible = True
+            End If
+
+            Dim lSJDay As Double = aTimeseries.Attributes.GetValue("SJDay")
+            Dim lEJDay As Double = aTimeseries.Attributes.GetValue("EJDay")
+            If .CurveList.Count = 1 Then
+                If aTimeseries.numValues > 0 Then 'Set X axis to contain this date range
+                    .XAxis.Scale.Min = lSJDay
+                    .XAxis.Scale.Max = lEJDay
+                End If
+            ElseIf .CurveList.Count > 1 AndAlso Not lCurve Is Nothing Then
+                'Expand time scale if needed to include all dates in new curve
+                If aTimeseries.numValues > 0 Then
+                    If lSJDay < .XAxis.Scale.Min Then
+                        .XAxis.Scale.Min = lSJDay
+                    End If
+                    If lEJDay > .XAxis.Scale.Max Then
+                        .XAxis.Scale.Max = lEJDay
+                    End If
+                End If
+            End If
+        End With
     End Sub
 
     Private Function TSCurveLabel(ByVal aTimeseries As atcTimeseries) As String
@@ -817,6 +850,11 @@ Public Class atcGraphForm
         ShowHelp("BASINS Details\Analysis\Time Series Functions\Graph.html")
     End Sub
 
+    Private Sub mnuCoordinatesOnMenuBar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCoordinatesOnMenuBar.Click
+        mnuCoordinatesOnMenuBar.Checked = Not mnuCoordinatesOnMenuBar.Checked
+        If Not Not mnuCoordinatesOnMenuBar.Checked Then mnuCoordinates.Text = "Coordinates"
+    End Sub
+
     Private Sub mnuViewTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuViewTime.Click
         mnuViewTime.Checked = True
         mnuViewProbability.Checked = False
@@ -857,6 +895,33 @@ Public Class atcGraphForm
 
     End Sub
 
+    Private Function pZgc_MouseMoveEvent(ByVal sender As ZedGraph.ZedGraphControl, ByVal e As System.Windows.Forms.MouseEventArgs) As System.Boolean Handles pZgc.MouseMoveEvent
+        If mnuCoordinatesOnMenuBar.Checked Then
+            ' Save the mouse location
+            Dim mousePt As New PointF(e.X, e.Y)
+            Dim lPositionText As String = "Coordinates"
+            ' Find the pane that contains the current mouse location
+            Dim lPane As GraphPane = sender.MasterPane.FindChartRect(mousePt)
+            ' If pane is non-null, we have a valid location.  Otherwise, the mouse is not within any chart rect.
+            If Not lPane Is Nothing Then
+                Dim x, y As Double
+                ' Convert the mouse location to X, Y scale values
+                lPane.ReverseTransform(mousePt, x, y)
+                ' Format the status label text
+                If lPane.XAxis.Type = AxisType.DateMulti Then
+                    lPositionText = DumpDate(x)
+                Else
+                    lPositionText = DoubleToString(x)
+                End If
+                lPositionText = "(" & lPositionText & ", " & DoubleToString(y) & ")"
+            End If
+            mnuCoordinates.Text = lPositionText
+        End If
+        ' Return false to indicate we have not processed the MouseMoveEvent
+        ' ZedGraphControl should still go ahead and handle it
+        Return False
+    End Function
+
     Private Sub atcGraphForm_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Resize
         ResizePanes()
     End Sub
@@ -874,18 +939,18 @@ Public Class atcGraphForm
         End If
     End Sub
 
-    Private Sub SaveAsMetafile(ByVal aFilename As String)
-        Dim g As Graphics = Me.CreateGraphics()
-        Dim hdc As IntPtr = g.GetHdc()
-        Dim lMetafile As New Metafile(aFilename, hdc, EmfType.EmfPlusDual)
-        g.ReleaseHdc(hdc)
-        g.Dispose()
+    'Private Sub SaveAsMetafile(ByVal aFilename As String)
+    '    Dim g As Graphics = Me.CreateGraphics()
+    '    Dim hdc As IntPtr = g.GetHdc()
+    '    Dim lMetafile As New Metafile(aFilename, hdc, EmfType.EmfPlusDual)
+    '    g.ReleaseHdc(hdc)
+    '    g.Dispose()
 
-        Dim gMeta As Graphics = Graphics.FromImage(lMetafile)
-        pZgc.MasterPane.Draw(gMeta)
-        gMeta.Dispose()
-        lMetafile.Dispose()
-    End Sub
+    '    Dim gMeta As Graphics = Graphics.FromImage(lMetafile)
+    '    pZgc.MasterPane.Draw(gMeta)
+    '    gMeta.Dispose()
+    '    lMetafile.Dispose()
+    'End Sub
 
     'Private Function PaneAsMetafile(ByVal aPane As GraphPane) As Metafile
     '    Dim g As Graphics = Me.CreateGraphics()
