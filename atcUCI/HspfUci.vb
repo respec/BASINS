@@ -45,6 +45,7 @@ Public Class HspfUci
 
     Private pIPC As Object 'ATCoCtl.ATCoIPC
     Private pIPCset As Boolean
+    Private pNaN As Double = GetNaN()
 
     Public Sub SendHspfMessage(ByVal aMessage As String)
         If pIPCset Then pIPC.SendProcessMessage("HSPFUCI", aMessage)
@@ -1676,18 +1677,11 @@ Public Class HspfUci
                 .SetValue("Description", aDescription)
                 .SetValue("TU", aTUnit)
                 .SetValue("TS", 1)
+                .SetValue("TSTYPE", aConstituent.ToUpper)
             End With
             Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
-            'With myDateSummary
-            '    .CIntvl = True
-            '    .ts = 1
-            '    .Tu = tunit
-            '    .Intvl = 1
-            'End With
-            'TsDate.Summary = myDateSummary
-            'GenTs.Dates = TsDate
+            lGenericTs.Dates = lTsDate
 
-            lGenericTs.Attributes.SetValue("TSTYPE", lGenericTs.Attributes.GetValue("Constituent"))
             Dim lAddedDsn As Boolean = pWDMObj(aWdmId).AddDataset(lGenericTs, 0)
             aDsn = lDsn
         End If
@@ -2218,115 +2212,91 @@ x:
 
     End Function
 
-    Public Sub AddPointSourceDataSet(ByRef sen As String, ByRef aLocation As String, ByRef Con As String, ByRef stanam As String, ByRef tstype As String, ByRef ndates As Integer, ByRef jdates() As Single, ByRef Load() As Single, ByRef newwdmid As String, ByRef newdsn As Integer)
+    Public Sub AddPointSourceDataSet(ByRef aScenario As String, ByRef aLocation As String, ByRef aConstituent As String, _
+                                     ByRef aDescription As String, ByRef aTstype As String, ByRef aNdates As Integer, _
+                                     ByRef aJdates() As Double, ByRef aLoad() As Double, _
+                                     ByRef aWdmid As Integer, ByRef aDsn As Integer)
 
-        Dim wdmsfl, ndsn, i As Integer
-        Dim GenTs As atcData.atcTimeseries
-        Dim addeddsn As Boolean
-        Dim SDate(6) As Integer
-        Dim EDate(6) As Integer
-        Dim wdmid As Integer
-        'Dim nsteps As Integer
-        Dim aval() As Double = {}
-        Dim TsDate As atcData.atcTimeseries
-        'Dim curdate As Single
-        'Dim ival As Integer
+        If aWdmid = 0 Then
+            For lWdmIndex As Integer = 1 To 4
+                If Not pWDMObj(lWdmIndex) Is Nothing Then 'use this as the output wdm
+                    aWdmid = lWdmIndex
+                    Exit For
+                End If
+            Next lWdmIndex
+        End If
 
-        For i = 4 To 1 Step -1
-            If pWdmUnit(i) > 0 Then
-                'use this as the output wdm
-                wdmsfl = pWdmUnit(i)
-                wdmid = i
-            End If
-        Next i
-
-        If wdmsfl > 0 Then
-            'okay to continue
-            ndsn = FindFreeDSN(wdmid, 7000)
-            GenTs = New atcData.atcTimeseries(Nothing)
-            With GenTs.Attributes
-                .SetValue("ID", ndsn)
-                .SetValue("Scenario", UCase(sen))
-                .SetValue("Constituent", UCase(Con))
-                .SetValue("Location", UCase(aLocation))
-                .SetValue("Description", stanam)
+        If aWdmid > 0 Then 'okay to continue
+            Dim lDsn As Integer = FindFreeDSN(aWdmid, 7000)
+            Dim lGenericTs As New atcData.atcTimeseries(Nothing)
+            With lGenericTs.Attributes
+                .SetValue("ID", lDsn)
+                .SetValue("Scenario", aScenario.ToUpper)
+                .SetValue("Constituent", aConstituent.ToUpper)
+                .SetValue("Location", aLocation.ToUpper)
+                .SetValue("Description", aDescription)
+                .SetValue("TU", 4)  'assume daily
+                .SetValue("TS", 1)
+                .SetValue("TSTYPE", aTstype)
             End With
 
-            TsDate = New atcData.atcTimeseries(Nothing)
-            'TODO: Create dates
-            'With myDateSummary
-            '    .CIntvl = True
-            '    .ts = 1
-            '    'assume daily
-            '    .Tu = 4
-            '    .Intvl = 1
-            'End With
-            'If ndates = 0 Then 'get dates from global block
-            '    For i = 0 To 5
-            '        SDate(i) = Me.GlobalBlock.SDate(i)
-            '        EDate(i) = Me.GlobalBlock.EDate(i)
-            '    Next i
-            '    myDateSummary.SJDay = Date2J(SDate)
-            '    myDateSummary.EJDay = Date2J(EDate)
-            'Else
-            '    myDateSummary.SJDay = jdates(1)
-            '    myDateSummary.EJDay = jdates(ndates)
-            'End If
+            'set the dates
+            Dim lTsDate As atcData.atcTimeseries = New atcData.atcTimeseries(Nothing)
+            Dim lNvals As Double
+            If aNdates = 0 Then 'get dates from global block
+                Dim lSJDate As Double = Me.GlobalBlock.SDateJ
+                Dim lEJDate As Double = Me.GlobalBlock.EdateJ
+                lNvals = lEJDate - lSJDate
+                Dim lDates(lNvals) As Double
+                For lDateIndex As Integer = 0 To lNvals
+                    lDates(lDateIndex) = lSJDate + lDateIndex
+                Next
+                lTsDate.Values = lDates
+            Else   'dates were supplied as an argument
+                lNvals = aNdates
+                lTsDate.Values = aJdates
+            End If
+            lGenericTs.Dates = lTsDate
 
-            'nsteps = (myDateSummary.EJDay - myDateSummary.SJDay)
-            'ReDim aval(nsteps)
-            'If Con = "Flow" Or Con = "FLOW" Or Con = "flow" Then
-            '    'keep load in cfs
-            '    If ndates = 0 Or ndates = 1 Then 'use this value for all
-            '        For i = 0 To nsteps
-            '            aval(i) = Load(1)
-            '        Next i
-            '    Else
-            '        curdate = jdates(1)
-            '        i = 0
-            '        ival = 1
-            '        Do While curdate < jdates(ndates) 'loop through each day
-            '            aval(i) = Load(ival)
-            '            i = i + 1
-            '            curdate = curdate + 1
-            '            If ival < ndates Then
-            '                If curdate = jdates(ival + 1) Then 'increment value
-            '                    ival = ival + 1
-            '                End If
-            '            End If
-            '        Loop
-            '    End If
-            'Else
-            '    'change load from pounds per hour to pounds per day
-            '    If ndates = 0 Or ndates = 1 Then
-            '        For i = 0 To nsteps 'use this value for all
-            '            aval(i) = Load(1) * 24
-            '        Next i
-            '    Else
-            '        curdate = jdates(1)
-            '        i = 0
-            '        ival = 1
-            '        Do While curdate < jdates(ndates) 'loop through each day
-            '            aval(i) = Load(ival) * 24
-            '            i = i + 1
-            '            curdate = curdate + 1
-            '            If ival < ndates Then
-            '                If curdate = jdates(ival + 1) Then 'increment value
-            '                    ival = ival + 1
-            '                End If
-            '            End If
-            '        Loop
-            '    End If
-            'End If
-            'myDateSummary.NVALS = nsteps
-            'TsDate.Summary = myDateSummary
+            'now fill in the values
+            Dim lValues(lNvals) As Double
 
-            GenTs.Dates = TsDate
-            GenTs.Values = aval
-            GenTs.Attributes.SetValue("TSTYPE", tstype)
+            Dim lMultiplier As Double
+            Dim lCurDate As Double
+            If aConstituent.ToUpper = "FLOW" Then
+                'keep load in cfs
+                lMultiplier = 1.0
+            Else
+                'change load from pounds per hour to pounds per day
+                lMultiplier = 24
+            End If
 
-            addeddsn = pWDMObj(wdmid).AddDataset(GenTs)
+            If aNdates = 0 Or aNdates = 1 Then 'use this value for all
+                For lValueIndex As Integer = 0 To lNvals
+                    lValues(lValueIndex) = aLoad(1) * lMultiplier
+                Next
+            Else  'use values passed in
+                lCurDate = aJdates(1)
+                Dim lDayCounter As Integer = 0
+                Dim lValueCounter As Integer = 1
+                Do While lCurDate < aJdates(aNdates) 'loop through each day
+                    lValues(lDayCounter) = aLoad(lValueCounter) * lMultiplier
+                    lDayCounter = lDayCounter + 1
+                    lCurDate = lCurDate + 1
+                    If lValueCounter < aNdates Then
+                        If lCurDate = aJdates(lValueCounter + 1) Then 'increment value
+                            lValueCounter = lValueCounter + 1
+                        End If
+                    End If
+                Loop
+            End If
+
+            lGenericTs.Values = lValues
+
+            Dim lAddedDsn As Boolean = pWDMObj(aWdmid).AddDataset(lGenericTs, 0)
+            aDsn = lDsn
         End If
+
     End Sub
 
     Public Sub AddPoint(ByRef wdmid As String, ByRef wdmdsn As Integer, ByRef tarid As Integer, ByRef srcname As String, ByRef targroup As String, ByRef tarmember As String, ByRef Sub1 As Integer, ByRef Sub2 As Integer)
