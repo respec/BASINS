@@ -5,14 +5,16 @@ Imports atcUtility
 
 Public Class PointLoads
     Inherits KeyedCollection(Of String, Facility)
+    Private pWatershed As Watershed
     Protected Overrides Function GetKeyForItem(ByVal aFacility As Facility) As String
         Return aFacility.Npdes
     End Function
 
-    Public Function Open(ByVal aFileName As String) As Integer
+    Friend Function Open(ByVal aWatershed) As Integer
         'read psr file
+        pWatershed = aWatershed
         Dim lReturnCode As Integer = 0
-        Dim lName As String = FilenameOnly(aFileName) & ".psr"
+        Dim lName As String = aWatershed.Name & ".psr"
 
         Try
             Dim lDelim As String = " "

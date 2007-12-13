@@ -11,6 +11,9 @@ Module modUCIRecords
         Dim lCurrentRecord As String
         Dim lStreamReader As New StreamReader(aFileName)
 
+        If Not pUciRec Is Nothing Then
+            pUciRec = Nothing
+        End If
         pUciRec = New ArrayList
         Do
             lCurrentRecord = lStreamReader.ReadLine

@@ -9,18 +9,13 @@ Imports atcData
 Imports atcSegmentation
 
 Module modCreateUci
-    Dim pLandUses As LandUses
-    Dim pReaches As Reaches
-    Dim pChannels As Channels
-    Dim pPointLoads As PointLoads
-
+    Dim pWatershed As Watershed
     Dim pLandName(2) As String
     Dim pLastSeg(2) As Integer
     Dim pFirstSeg(2) As Integer
 
-    Friend Sub CreateUciFromBASINS(ByRef aUci As HspfUci, _
-                                   ByRef aMsg As HspfMsg, _
-                                   ByRef aWsdName As String, _
+    Friend Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
+                                   ByRef aUci As HspfUci, _
                                    ByRef aDataSources As Collection(Of atcDataSource), _
                                    ByRef aMetBaseDsn As Integer, _
                                    ByRef aMetWdmId As String, _
@@ -29,136 +24,112 @@ Module modCreateUci
                                    ByRef aOneSeg As Boolean, _
                                    ByRef aStarterUciName As String, _
                                    Optional ByRef aPollutantListFileName As String = "")
+        pWatershed = aWatershed
 
-        If Not IO.File.Exists(aWsdName) Then
-            aUci.ErrorDescription = "WsdFileName '" & aWsdName & "' not found"
-        Else
-            aUci.Name = FilenameOnly(aWsdName) & ".uci"
-        End If
+        aUci.Name = aWatershed.Name & ".uci"
+        'dummy global block
+        With aUci.GlobalBlock  'add global block to empty uci
+            .Comment = " "
+            .Uci = aUci
+            .RunInf.Value = "UCI Created by WinHSPF for " & aWatershed.Name
+            .emfg = 1
+            .outlev.Value = CStr(1)
+            .runfg = 1
+        End With
 
-        aUci.Msg = aMsg
+        'add files block to uci
+        CreateFilesBlock(aUci, aWatershed.Name, aDataSources)
+        aUci.Save() 'TODO: required by prescanfilesblock, need in memory version of prescan...
+        ReadUCIRecords(aUci.Name)
+        Dim lEchoFileName As String = ""
+        Dim lFilesBlockStatus As Boolean = aUci.PreScanFilesBlock(lEchoFileName)
 
-        If aUci.Name.Length > 0 Then
-            Dim lScenario As String = FilenameOnly(aUci.Name)
+        'build initial met segment 
+        DefaultBASINSMetseg(aUci, aMetBaseDsn, aMetWdmId)
 
-            'dummy global block
-            With aUci.GlobalBlock  'add global block to empty uci
-                .Comment = " "
-                .Uci = aUci
-                .RunInf.Value = "UCI Created by WinHSPF for " & lScenario
-                .emfg = 1
-                .outlev.Value = CStr(1)
-                .runfg = 1
-            End With
+        aUci.Initialized = True
 
-            'add files block to uci
-            CreateFilesBlock(aUci, lScenario, aDataSources)
-            aUci.Save() 'TODO: required by prescanfilesblock, need in memory version of prescan...
-            Dim lFilesBlockStatus As Boolean = False
-            Dim lEchoFileName As String = ""
-            aUci.PreScanFilesBlock(lFilesBlockStatus, lEchoFileName)
+        With aUci.GlobalBlock  'update start and end date from met data
+            For lDateIndex As Integer = 0 To 5
+                .SDate(lDateIndex) = aStartDate(lDateIndex)
+                .EDate(lDateIndex) = aEndDate(lDateIndex)
+            Next lDateIndex
+        End With
 
-            Dim lReturnCode As Integer
-            pLandUses = New LandUses
-            lReturnCode = pLandUses.Open(aWsdName)
-            pReaches = New Reaches
-            lReturnCode = pReaches.Open(aWsdName)
-            pChannels = New Channels
-            lReturnCode = pChannels.Open(aWsdName)
-            pPointLoads = New PointLoads
-            lReturnCode = pPointLoads.Open(aWsdName)
+        'add opn seq block
+        CreateOpnSeqBlock(aUci, aOneSeg)
 
-            If lReturnCode = 0 Then  'everything read okay, continue
-                'build initial met segment 
-                DefaultBASINSMetseg(aUci, aMetBaseDsn, aMetWdmId)
+        'set all operation types
+        Dim lOpnIndex As Integer = 1
+        Dim lOpnName As String = HspfOperName(lOpnIndex)
+        Dim lOpnBlk As HspfOpnBlk
+        While lOpnName <> "UNKNOWN"
+            lOpnBlk = New HspfOpnBlk
+            lOpnBlk.Name = lOpnName
+            lOpnBlk.Uci = aUci
+            aUci.OpnBlks.Add(lOpnBlk)
+            lOpnIndex += 1
+            lOpnName = HspfOperName(lOpnIndex)
+        End While
 
-                aUci.Initialized = True
-
-                With aUci.GlobalBlock  'update start and end date from met data
-                    For i As Integer = 0 To 5
-                        .SDate(i) = aStartDate(i)
-                        .EDate(i) = aEndDate(i)
-                    Next i
-                End With
-
-                'add opn seq block
-                CreateOpnSeqBlock(aUci, aOneSeg)
-
-                'set all operation types
-                Dim lOpnIndex As Integer = 1
-                Dim lOpnName As String = HspfOperName(lOpnIndex)
-                Dim lOpnBlk As HspfOpnBlk
-                While lOpnName <> "UNKNOWN"
-                    lOpnBlk = New HspfOpnBlk
-                    lOpnBlk.Name = lOpnName
-                    lOpnBlk.Uci = aUci
-                    aUci.OpnBlks.Add(lOpnBlk)
-                    lOpnIndex += 1
-                    lOpnName = HspfOperName(lOpnIndex)
-                End While
-
-                'create tables for each operation
-                For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
-                    lOpnBlk = aUci.OpnBlks.Item(lOperation.Name)
-                    lOpnBlk.Ids.Add(lOperation)
-                    lOperation.OpnBlk = lOpnBlk
-                Next
-                For Each lOpnBlk In aUci.OpnBlks  'perlnd, implnd, etc
-                    If lOpnBlk.Count > 0 Then
-                        lOpnBlk.CreateTables(aMsg.BlockDefs.Item(lOpnBlk.Name))
-                    End If
-                Next
-
-                For Each lChannel As Channel In pChannels 'process ftables
-                    Dim lOpn As HspfOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(CShort(lChannel.Id))
-                    If Not lOpn Is Nothing Then
-                        lOpn.FTable.FTableFromCrossSect(lChannel)
-                    End If
-                Next
-
-                'create schematic, ext src blocks
-                CreateConnectionsSchematic(aUci)
-                CreateConnectionsMet(aUci)
-
-                'set timeser connections
-                For Each lOpn As HspfOperation In aUci.OpnSeqBlock.Opns
-                    lOpn.setTimSerConnections()
-                Next
-                'create masslinks
-                CreateMassLinks(aUci)
-
-                'set initial values in uci from basins values
-                SetInitValues(aUci)
-
-                CreatePointSourceDSNs(aUci, aPollutantListFileName)
-
-                CreateDefaultOutput(aUci)
-                CreateBinaryOutput(aUci, lScenario)
-
-                'look for met segments
-                'newUci.Source2MetSeg
-
-                'get starter uci ready
-                Dim lDefUci As New HspfUci
-                lDefUci.FastReadUciForStarter(aUci.Msg, aStarterUciName)
-
-                'set default parameter values and mass links from starter
-                SetDefault(aUci, lDefUci)
-                SetDefaultMassLink(aUci, lDefUci)
+        'create tables for each operation
+        For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
+            lOpnBlk = aUci.OpnBlks.Item(lOperation.Name)
+            lOpnBlk.Ids.Add(lOperation)
+            lOperation.OpnBlk = lOpnBlk
+        Next
+        For Each lOpnBlk In aUci.OpnBlks  'perlnd, implnd, etc
+            If lOpnBlk.Count > 0 Then
+                lOpnBlk.CreateTables(aUci.Msg.BlockDefs.Item(lOpnBlk.Name))
             End If
-        End If
+        Next
+
+        For Each lChannel As Channel In pWatershed.Channels 'process ftables
+            Dim lOperation As HspfOperation = aUci.OpnBlks.Item("RCHRES").OperFromID(CShort(lChannel.Reach.Id))
+            If Not lOperation Is Nothing Then
+                lOperation.FTable.FTableFromCrossSect(lChannel)
+            End If
+        Next
+
+        'create schematic, ext src blocks
+        CreateConnectionsSchematic(aUci)
+        CreateConnectionsMet(aUci)
+
+        'set timeser connections
+        For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
+            lOperation.setTimSerConnections()
+        Next
+        'create masslinks
+        CreateMassLinks(aUci)
+
+        'set initial values in uci from basins values
+        SetInitValues(aUci)
+
+        CreatePointSourceDSNs(aUci, aPollutantListFileName)
+
+        CreateDefaultOutput(aUci)
+        CreateBinaryOutput(aUci, aWatershed.Name)
+
+        'look for met segments
+        'newUci.Source2MetSeg
+
+        'get starter uci ready
+        Dim lDefUci As New HspfUci
+        lDefUci.FastReadUciForStarter(aUci.Msg, aStarterUciName)
+
+        'set default parameter values and mass links from starter
+        SetDefault(aUci, lDefUci)
+        SetDefaultMassLink(aUci, lDefUci)
 
         aUci.Edited = False 'all the reads set edited
-
     End Sub
 
     Private Sub SetInitValues(ByVal aUci As HspfUci)
-
         'set init values in uci
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("PERLND").Ids
             Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
             lTable.Parms("PWATFG").Value = 1
-            Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
+            Dim lLandUse As LandUse = pWatershed.LandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             If lLandUse Is Nothing Then
                 Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             Else
@@ -178,7 +149,7 @@ Module modCreateUci
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("IMPLND").Ids
             Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
             lTable.Parms("IWATFG").Value = 1
-            Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
+            Dim lLandUse As LandUse = pWatershed.LandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             If lLandUse Is Nothing Then
                 Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
             Else
@@ -195,23 +166,23 @@ Module modCreateUci
             End If
         Next lOperation
 
-        Dim j As Integer = -1
+        Dim lReachIndex As Integer = -1
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("RCHRES").Ids
-            j += 1
+            lReachIndex += 1
             Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
             lTable.Parms("HYDRFG").Value = 1
             lTable = lOperation.Tables.Item("GEN-INFO")
-            Dim lStr As String = pReaches(pReaches(j).Order).Name
+            Dim lStr As String = pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Name
             Dim lLen As Integer = lStr.Length
             If lLen < 19 And _
-              (Not IsNumeric(pReaches(pReaches(j).Order).Id) Or _
-               pReaches(pReaches(j).Order).Id.Length > 5) Then
-                lStr &= " " & Right(pReaches(pReaches(j).Order).Id, 19 - lLen)
+              (Not IsNumeric(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Id) Or _
+               pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Id.Length > 5) Then
+                lStr &= " " & Right(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Id, 19 - lLen)
             End If
             lTable.Parms("RCHID").Value = lStr
-            lTable.Parms("NEXITS").Value = pReaches(pReaches(j).Order).NExits
+            lTable.Parms("NEXITS").Value = pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).NExits
             lTable.Parms("PUNITE").Value = 91
-            If pReaches(pReaches(j).Order).Type = "R" Then
+            If pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Type = "R" Then
                 lTable.Parms("LKFG").Value = 1
             End If
             lTable = lOperation.Tables.Item("HYDR-PARM1")
@@ -220,20 +191,18 @@ Module modCreateUci
             lTable.Parms("AUX3FG").Value = 1
             lTable.Parms("ODFVF1").Value = 4
             lTable = lOperation.Tables.Item("HYDR-PARM2")
-            lTable.Parms("LEN").Value = pReaches(pReaches(j).Order).Length
-            lTable.Parms("DELTH").Value = System.Math.Round(pReaches(pReaches(j).Order).DeltH, 0)
+            lTable.Parms("LEN").Value = pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).Length
+            lTable.Parms("DELTH").Value = System.Math.Round(pWatershed.Reaches(pWatershed.Reaches(lReachIndex).Order).DeltH, 0)
         Next lOperation
     End Sub
 
     Private Sub CreateMassLinks(ByRef aUci As HspfUci)
         Dim lMassLink As HspfMassLink
-        Dim lopnblk As HspfOpnBlk
-
-        For Each lopnblk In aUci.OpnBlks
-            If lopnblk.Name = "PERLND" Then
-                lMassLink = New HspfMassLink
-                lMassLink.Uci = aUci
-                lMassLink.MassLinkID = 2
+        For Each lOpnBlk As HspfOpnBlk In aUci.OpnBlks
+            lMassLink = New HspfMassLink
+            lMassLink.Uci = aUci
+            If lOpnBlk.Name = "PERLND" Then
+                lMassLink.MassLinkId = 2
                 lMassLink.Source.VolName = "PERLND"
                 lMassLink.Source.VolId = 0
                 lMassLink.Source.Group = "PWATER"
@@ -245,11 +214,8 @@ Module modCreateUci
                 lMassLink.Target.Group = "INFLOW"
                 lMassLink.Target.Member = "IVOL"
                 aUci.MassLinks.Add(lMassLink)
-
-            ElseIf lopnblk.Name = "IMPLND" Then
-                lMassLink = New HspfMassLink
-                lMassLink.Uci = aUci
-                lMassLink.MassLinkID = 1
+            ElseIf lOpnBlk.Name = "IMPLND" Then
+                lMassLink.MassLinkId = 1
                 lMassLink.Source.VolName = "IMPLND"
                 lMassLink.Source.VolId = 0
                 lMassLink.Source.Group = "IWATER"
@@ -261,11 +227,8 @@ Module modCreateUci
                 lMassLink.Target.Group = "INFLOW"
                 lMassLink.Target.Member = "IVOL"
                 aUci.MassLinks.Add(lMassLink)
-
-            ElseIf lopnblk.Name = "RCHRES" Then
-                lMassLink = New HspfMassLink
-                lMassLink.Uci = aUci
-                lMassLink.MassLinkID = 3
+            ElseIf lOpnBlk.Name = "RCHRES" Then
+                lMassLink.MassLinkId = 3
                 lMassLink.Source.VolName = "RCHRES"
                 lMassLink.Source.VolId = 0
                 lMassLink.Source.Group = "ROFLOW"
@@ -278,18 +241,17 @@ Module modCreateUci
                 lMassLink.Target.Member = ""
                 aUci.MassLinks.Add(lMassLink)
             End If
-        Next lopnblk
+        Next lOpnBlk
     End Sub
 
     Private Sub CreateConnectionsSchematic(ByRef aUci As HspfUci)
-        Dim j, i As Integer
         Dim lConnection As HspfConnection
 
-        For i = 0 To pReaches.Count - 1
-            For j = 2 To 1 Step -1
+        For Each lReach As Reach In pWatershed.Reaches
+            For j As Integer = 2 To 1 Step -1
                 For Each lOperation As HspfOperation In aUci.OpnBlks.Item(pLandName(j)).Ids
                     Try
-                        Dim lLandUse As LandUse = pLandUses(lOperation.Description & ":" & lOperation.Name & ":" & i + 1)
+                        Dim lLandUse As LandUse = pWatershed.LandUses(lOperation.Description & ":" & lOperation.Name & ":" & lReach.Id)
                         lConnection = New HspfConnection
                         lConnection.Uci = aUci
                         lConnection.Typ = 3
@@ -297,8 +259,8 @@ Module modCreateUci
                         lConnection.Source.VolId = lOperation.Id
                         lConnection.MFact = lLandUse.Area
                         lConnection.Target.VolName = "RCHRES"
-                        lConnection.Target.VolId = i + 1
-                        lConnection.MassLink = TypeId(pLandUses(j).Type)
+                        lConnection.Target.VolId = lReach.Id
+                        lConnection.MassLink = TypeId(pWatershed.LandUses(j).Type)
                         aUci.Connections.Add(lConnection)
                     Catch e As Collections.Generic.KeyNotFoundException
                     End Try
@@ -306,23 +268,23 @@ Module modCreateUci
             Next
         Next
 
-        For i = 0 To pReaches.Count - 1
+        For Each lReachUpstream As Reach In pWatershed.Reaches
             'add entries for each reach to reach connection
-            For j = 0 To pReaches.Count - 1
-                If pReaches(pReaches(j).Order).Id = pReaches(pReaches(i).Order).DownID Then
+            For Each lReachDownstream As Reach In pWatershed.Reaches
+                If lReachDownstream.Id = lReachUpstream.DownID Then
                     lConnection = New HspfConnection
                     lConnection.Uci = aUci
                     lConnection.Typ = 3
                     lConnection.Source.VolName = "RCHRES"
-                    lConnection.Source.VolId = CInt(pReaches(pReaches(i).Order).Id)
+                    lConnection.Source.VolId = lReachUpstream.Id
                     lConnection.MFact = 1.0#
                     lConnection.Target.VolName = "RCHRES"
-                    lConnection.Target.VolId = CInt(pReaches(pReaches(j).Order).Id)
+                    lConnection.Target.VolId = lReachDownstream.Id
                     lConnection.MassLink = 3
                     aUci.Connections.Add(lConnection)
                 End If
-            Next j
-        Next i
+            Next
+        Next
     End Sub
 
     Private Sub CreateConnectionsMet(ByRef aUci As HspfUci)
@@ -382,20 +344,20 @@ Module modCreateUci
         Try
             aUci.OpnSeqBlock.Delt = 60
             aUci.OpnSeqBlock.Uci = aUci
-            If pReaches.Count > 1 Then  'reaches have to be in order, fix if needed
+            If pWatershed.Reaches.Count > 1 Then  'reaches have to be in order, fix if needed
                 Dim lOutOfOrder As Boolean = True
                 Do Until Not lOutOfOrder
                     lOutOfOrder = False
                     Dim i As Integer = 1
-                    Do Until i = pReaches.Count - 1
-                        Dim lStringToFind As String = pReaches(pReaches(i).Order).DownID
+                    Do Until i = pWatershed.Reaches.Count - 1
+                        Dim lStringToFind As String = pWatershed.Reaches(pWatershed.Reaches(i).Order).DownID
                         Dim j As Integer = 1
-                        Do Until j = pReaches.Count - 1
-                            If pReaches(pReaches(j).Order).Id = lStringToFind And j < i Then
+                        Do Until j = pWatershed.Reaches.Count - 1
+                            If pWatershed.Reaches(pWatershed.Reaches(j).Order).Id = lStringToFind And j < i Then
                                 'reaches are out of order, swap places
-                                Dim lOrder As Integer = pReaches(i).Order
-                                pReaches(i).Order = pReaches(j).Order
-                                pReaches(j).Order = lOrder
+                                Dim lOrder As Integer = pWatershed.Reaches(i).Order
+                                pWatershed.Reaches(i).Order = pWatershed.Reaches(j).Order
+                                pWatershed.Reaches(j).Order = lOrder
                                 lOutOfOrder = True
                             Else
                                 j += 1
@@ -416,18 +378,19 @@ Module modCreateUci
             End If
 
             'add record to opn seq block for each reach
-            For i As Integer = 0 To pReaches.Count - 1
+            For i As Integer = 0 To pWatershed.Reaches.Count - 1
                 'now add each rchres to opn seq block
                 Dim lOpn As New HspfOperation
                 lOpn.Uci = aUci
                 lOpn.Name = "RCHRES"
-                If IsNumeric(pReaches(pReaches(i).Order).Id) And pReaches(pReaches(i).Order).Id.Length < 5 Then
-                    lOpn.Description = pReaches(pReaches(i).Order).Name
+                If IsNumeric(pWatershed.Reaches(pWatershed.Reaches(i).Order).Id) And _
+                             pWatershed.Reaches(pWatershed.Reaches(i).Order).Id.Length < 5 Then
+                    lOpn.Description = pWatershed.Reaches(pWatershed.Reaches(i).Order).Name
                 Else
-                    lOpn.Description = pReaches(pReaches(i).Order).Name & " (" & pReaches(pReaches(i).Order).Id & ")"
+                    lOpn.Description = pWatershed.Reaches(pWatershed.Reaches(i).Order).Name & " (" & pWatershed.Reaches(pWatershed.Reaches(i).Order).Id & ")"
                 End If
                 'newOpn.Id = i
-                lOpn.Id = CInt(pReaches(pReaches(i).Order).Id)
+                lOpn.Id = CInt(pWatershed.Reaches(pWatershed.Reaches(i).Order).Id)
                 aUci.OpnSeqBlock.Add(lOpn)
             Next i
         Catch e As ApplicationException
@@ -443,8 +406,8 @@ Module modCreateUci
 
         For j As Integer = 2 To 1 Step -1
             lUniqueNameCount = 0
-            For i As Integer = 0 To pLandUses.Count - 1
-                If TypeId(pLandUses(i).Type) = j Then
+            For i As Integer = 0 To pWatershed.LandUses.Count - 1
+                If TypeId(pWatershed.LandUses(i).Type) = j Then
                     If lUniqueNameCount = 0 Then
                         'add it
                         lNewOperation = New HspfOperation
@@ -454,14 +417,14 @@ Module modCreateUci
                         pFirstSeg(j) = lToperId
                         lNewOperation.Id = lToperId
                         pLastSeg(j) = lToperId
-                        lNewOperation.Description = pLandUses(i).Description
-                        lNewOperation.Tag = pLandUses(i).Reach
+                        lNewOperation.Description = pWatershed.LandUses(i).Description
+                        lNewOperation.Tag = pWatershed.LandUses(i).Reach.Id
                         aUci.OpnSeqBlock.Add(lNewOperation)
                         lUniqueNameCount += 1
                     Else
                         lAddflag = True
                         For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
-                            If lOperation.Description = pLandUses(i).Description And _
+                            If lOperation.Description = pWatershed.LandUses(i).Description And _
                                lOperation.Name = pLandName(j) Then
                                 lAddflag = False
                                 lToperId = lOperation.Id
@@ -472,11 +435,11 @@ Module modCreateUci
                             lNewOperation = New HspfOperation
                             lNewOperation.Uci = aUci
                             lNewOperation.Name = pLandName(j)
-                            lNewOperation.Description = pLandUses(i).Description
+                            lNewOperation.Description = pWatershed.LandUses(i).Description
                             lToperId = 100 + lUniqueNameCount
                             lNewOperation.Id = lToperId
                             pLastSeg(j) = lToperId
-                            lNewOperation.Tag = pLandUses(i).Reach
+                            lNewOperation.Tag = pWatershed.LandUses(i).Reach.Id
                             aUci.OpnSeqBlock.Add(lNewOperation)
                         End If
                     End If
@@ -500,22 +463,22 @@ Module modCreateUci
         Dim lPerlndNames As New atcCollection
 
         'prescan to see how many perlnds and implnds per segment
-        For i = 0 To pLandUses.Count - 1
-            If pLandUses(i).Type = "PERLND" Then
-                If lPerlndNames.IndexFromKey(pLandUses(i).Description) = 0 Then
-                    lPerlndNames.Add(pLandUses(i).Description)
+        For i = 0 To pWatershed.LandUses.Count - 1
+            If pWatershed.LandUses(i).Type = "PERLND" Then
+                If lPerlndNames.IndexFromKey(pWatershed.LandUses(i).Description) = 0 Then
+                    lPerlndNames.Add(pWatershed.LandUses(i).Description)
                 End If
-            ElseIf pLandUses(i).Type = "IMPLND" Then
-                If lImplndNames.IndexFromKey(pLandUses(i).Description) = 0 Then
-                    lImplndNames.Add(pLandUses(i).Description)
+            ElseIf pWatershed.LandUses(i).Type = "IMPLND" Then
+                If lImplndNames.IndexFromKey(pWatershed.LandUses(i).Description) = 0 Then
+                    lImplndNames.Add(pWatershed.LandUses(i).Description)
                 End If
             End If
         Next i
 
         Dim lDigits As Integer = 0
-        For i = 0 To pReaches.Count - 1
-            If pReaches(i).Id.Length > lDigits Then
-                lDigits = pReaches(i).Id.Length
+        For i = 0 To pWatershed.Reaches.Count - 1
+            If pWatershed.Reaches(i).Id.Length > lDigits Then
+                lDigits = pWatershed.Reaches(i).Id.Length
             End If
         Next i
 
@@ -539,25 +502,25 @@ Module modCreateUci
             pLastSeg(1) = 0
             pFirstSeg(2) = 99999
             pLastSeg(2) = 0
-            For k = 0 To pReaches.Count - 1
+            For k = 0 To pWatershed.Reaches.Count - 1
                 'loop through each reach
-                For i = 0 To pLandUses.Count - 1
+                For i = 0 To pWatershed.LandUses.Count - 1
                     'look to see if this landuse rec goes to this reach
-                    If pLandUses(i).Reach = pReaches(k).Id Then
+                    If pWatershed.LandUses(i).Reach.Id = pWatershed.Reaches(k).Id Then
                         'it does
-                        If pLandUses(i).Type = "PERLND" Then
+                        If pWatershed.LandUses(i).Type = "PERLND" Then
                             'add this perlnd oper
                             Dim lOpn As New HspfOperation
                             lOpn.Uci = aUci
                             lOpn.Name = "PERLND"
                             Dim lLandUseId As Integer = 0
                             For j = 0 To lPerlndNames.Count - 1
-                                If lPerlndNames(j - 1) = pLandUses(i).Description Then
+                                If lPerlndNames(j - 1) = pWatershed.LandUses(i).Description Then
                                     'this is the land use we want
                                     lLandUseId = j
                                 End If
                             Next j
-                            Dim lOperId As Integer = (CDbl(pLandUses(i).Reach) * lBase) + lLandUseId
+                            Dim lOperId As Integer = (CDbl(pWatershed.LandUses(i).Reach.Id) * lBase) + lLandUseId
                             If lOperId < pFirstSeg(2) Then
                                 pFirstSeg(2) = lOperId
                             End If
@@ -565,29 +528,29 @@ Module modCreateUci
                                 pLastSeg(2) = lOperId
                             End If
                             lOpn.Id = lOperId
-                            lOpn.Description = pLandUses(i).Description
-                            lOpn.Tag = pLandUses(i).Reach
+                            lOpn.Description = pWatershed.LandUses(i).Description
+                            lOpn.Tag = pWatershed.LandUses(i).Reach.Id
                             aUci.OpnSeqBlock.Add(lOpn)
                         End If
                     End If
                 Next i
 
                 'now add implnds
-                For i = 0 To pLandUses.Count - 1
-                    If pLandUses(i).Reach = pReaches(k).Id Then
-                        If pLandUses(i).Type = "IMPLND" Then
+                For i = 0 To pWatershed.LandUses.Count - 1
+                    If pWatershed.LandUses(i).Reach.Id = pWatershed.Reaches(k).Id Then
+                        If pWatershed.LandUses(i).Type = "IMPLND" Then
                             'add this implnd oper
                             Dim lOpn As New HspfOperation
                             lOpn.Uci = aUci
                             lOpn.Name = "IMPLND"
                             Dim lLandUseId As Integer = 0
                             For j = 0 To lImplndNames.Count - 1
-                                If lImplndNames(j - 1) = pLandUses(i).Description Then
+                                If lImplndNames(j - 1) = pWatershed.LandUses(i).Description Then
                                     'this is the land use we want
                                     lLandUseId = j
                                 End If
                             Next j
-                            Dim lOperId As Integer = (CDbl(pLandUses(i).Reach) * lBase) + lLandUseId
+                            Dim lOperId As Integer = (CDbl(pWatershed.LandUses(i).Reach.Id) * lBase) + lLandUseId
                             If lOperId < pFirstSeg(1) Then
                                 pFirstSeg(1) = lOperId
                             End If
@@ -595,8 +558,8 @@ Module modCreateUci
                                 pLastSeg(1) = lOperId
                             End If
                             lOpn.Id = lOperId
-                            lOpn.Description = pLandUses(i).Description
-                            lOpn.Tag = pLandUses(i).Reach
+                            lOpn.Description = pWatershed.LandUses(i).Description
+                            lOpn.Tag = pWatershed.LandUses(i).Reach.Id
                             aUci.OpnSeqBlock.Add(lOpn)
                         End If
                     End If
@@ -620,7 +583,7 @@ Module modCreateUci
 
     Private Sub CreatePointSourceDSNs(ByRef aUci As HspfUci, _
                                       ByRef aPollutantListFileName As String)
-        
+
 
         Dim lMasterPollutantList As New Collection
         If aPollutantListFileName.Length > 0 Then
@@ -634,7 +597,7 @@ Module modCreateUci
         Dim lJDates(1) As Double
         Dim lRLoad(1) As Double
         Dim lScen As String = "PT-OBS"
-        For Each lFacility As Facility In pPointLoads
+        For Each lFacility As Facility In pWatershed.PointLoads
             For Each lPollutant As Pollutant In lFacility.Pollutants
                 Dim lCon As String = GetPollutantIDFromName(lMasterPollutantList, lPollutant.Name)
                 If lCon.Length = 0 Then
@@ -647,7 +610,7 @@ Module modCreateUci
                 aUci.AddPointSourceDataSet(lScen, lLocation, lCon, lStanam, lTstype, 0, lJDates, lRLoad, lNewWdmId, lNewDsn)
             Next
         Next
-        
+
     End Sub
 
     Private Function GetPollutantIDFromName(ByRef PollutantList As Collection, ByRef PollutantName As String) As String
@@ -905,7 +868,7 @@ Module modCreateUci
             lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = ""
             lMetSeg.MetSegRec(lRecordIndex).Ssystem = "ENGL"
             lMetSeg.MetSegRec(lRecordIndex).Tran = "SAME"
-            lMetSeg.MetSegRec(lRecordIndex).typ = lRecordIndex
+            lMetSeg.MetSegRec(lRecordIndex).Typ = lRecordIndex
             Select Case lRecordIndex
                 Case 1
                     lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn

@@ -145,8 +145,7 @@ Public Class HspfMassLink
                         End If
                     End If
                 End If
-                If lReturnCode <> 2 Then Exit Do
-            Loop
+            Loop While lReturnCode = 2
         Next lMassLinkIndex
     End Sub
 
