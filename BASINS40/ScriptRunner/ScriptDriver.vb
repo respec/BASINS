@@ -16,8 +16,8 @@ Public Module ScriptDriver
         'ScriptSQLLiteTester.ScriptMain(aMapWin)
         'ScriptStatTest.ScriptMain(aMapWin)
         'HSPFOutputReports.ScriptMain(aMapWin)
-        'CreateUCITest.ScriptMain(aMapWin)
-        Graph.ScriptMain(aMapWin)
+        CreateUCITest.ScriptMain(aMapWin)
+        'Graph.ScriptMain(aMapWin)
         'ScriptWdmCreateFromGrids.ScriptMain(aMapWin)
     End Sub
 End Module

@@ -82,11 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.vb" />
-    <Compile Include="atcChannel.vb" />
     <Compile Include="atcMDB.vb" />
-    <Compile Include="atcLandUse.vb" />
-    <Compile Include="atcPointLoad.vb" />
-    <Compile Include="atcReach.vb" />
     <Compile Include="Hass_Ent.vb">
       <SubType>Code</SubType>
     </Compile>
@@ -248,6 +244,11 @@
     <ProjectReference Include="..\atcData\atcData.vbproj">
       <Project>{A9A00CAD-9EAD-4228-AB08-6DC3BAF253AA}</Project>
       <Name>atcData</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation.vbproj">
+      <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
+      <Name>atcSegmentation</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\atcUtility\atcUtility.vbproj">

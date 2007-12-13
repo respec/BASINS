@@ -6,6 +6,7 @@ Imports System.Collections.ObjectModel
 Imports MapWinUtility
 Imports atcUtility
 Imports atcData
+Imports atcSegmentation
 
 Module modCreateUci
     Dim pLandUses As LandUses

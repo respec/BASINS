@@ -4,6 +4,7 @@ Option Explicit On
 
 Imports System.Text
 Imports MapWinUtility
+Imports atcSegmentation
 
 Public Class HspfFtable
     Private pId As Integer

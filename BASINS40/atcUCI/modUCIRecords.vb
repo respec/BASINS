@@ -59,7 +59,7 @@ Module modUCIRecords
                 aRecord = ""
                 aRecordType = -2
                 aReturnCode = 2
-            ElseIf lUciRec.IndexOf("***") > 0 Then
+            ElseIf lUciRec.IndexOf("***") > -1 Then
                 'found comment
                 aRecord = pUciRec(aRecordIndex)
                 aRecordType = -1
