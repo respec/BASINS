@@ -100,6 +100,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ScriptRunner", "ScriptRunne
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcWdmVb", "atcWdmVb\atcWdmVb.vbproj", "{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "atcSegmentation", "atcSegmentation\atcSegmentation.vbproj", "{813E3F46-36CA-4320-BB05-325EEC553D3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -305,6 +307,10 @@ Global
 		{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6A5957F-4848-471C-AC0D-FAF5AB7DD152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{813E3F46-36CA-4320-BB05-325EEC553D3D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

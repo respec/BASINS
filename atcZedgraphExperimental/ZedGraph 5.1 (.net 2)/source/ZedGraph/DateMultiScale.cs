@@ -143,11 +143,7 @@ namespace ZedGraph
                 if (!applyAngle)
                     _fontSpec.Angle = 0;
 
-                SizeF maxSpace = new SizeF(0, 0);
-
                 string tmpStr = "0000";
-
-                SizeF sizeF = _fontSpec.BoundingBox(g, tmpStr, scaleFactor);
 
                 double nDays = _maxLinearized - _minLinearized;
                 bool drawHoursMinutes = (nDays <= 3);
@@ -160,13 +156,9 @@ namespace ZedGraph
                               + (drawMonths ? 1 : 0)
                               + (drawYears ? 1 : 0);
 
-                sizeF.Height *= numLevels;
-                sizeF.Height *= 1.1F;
+                SizeF maxSpace = _fontSpec.BoundingBox(g, tmpStr, scaleFactor);
 
-                if (sizeF.Height > maxSpace.Height)
-                    maxSpace.Height = sizeF.Height;
-                if (sizeF.Width > maxSpace.Width)
-                    maxSpace.Width = sizeF.Width;
+                maxSpace.Height *= numLevels * 1.1F;
 
                 _fontSpec.Angle = saveAngle;
 
@@ -721,7 +713,7 @@ namespace ZedGraph
             }
             _ownerAxis._majorTic.IsAllTics = false;
             _ownerAxis._minorTic.IsAllTics = false;
-            _ownerAxis.DrawTitle(g, pane, shiftPos, scaleFactor);
+            _ownerAxis.DrawTitle(g, pane, 0, scaleFactor);
         }
 
     #endregion
