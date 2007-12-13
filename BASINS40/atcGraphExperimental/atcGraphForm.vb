@@ -100,7 +100,7 @@ Public Class atcGraphForm
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
                 .Scale.Format = "#,###.###"
-                .Scale.FontSpec.StringAlignment = StringAlignment.Far
+                .Scale.Align = AlignP.Inside
             End With
             With .Y2Axis
                 .MajorTic.IsOutside = False
@@ -108,7 +108,7 @@ Public Class atcGraphForm
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
                 .Scale.Format = "#,###.###"
-                .Scale.FontSpec.StringAlignment = StringAlignment.Far
+                .Scale.Align = AlignP.Inside
             End With
             With .Legend
                 .Position = LegendPos.Float
@@ -704,7 +704,8 @@ Public Class atcGraphForm
                     End If
                 End If
             Next
-            If Not lFoundMatchingCons Then
+            If Not lFoundMatchingCons AndAlso Pane.CurveList.Count > 0 Then
+                'Put new curve on right axis if we already have a non-matching curve
                 lYAxisName = "Right"
             End If
         End If
