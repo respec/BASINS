@@ -5,14 +5,16 @@ Imports atcUtility
 
 Public Class Channels
     Inherits KeyedCollection(Of String, Channel)
+    Private pWatershed As Watershed
     Protected Overrides Function GetKeyForItem(ByVal aChannel As Channel) As String
-        Return aChannel.Id
+        Return aChannel.Reach.Id
     End Function
 
-    Public Function Open(ByVal aFileName As String) As Integer
+    Friend Function Open(ByVal aWatershed As Watershed) As Integer
         'read ptf file
+        pWatershed = aWatershed
         Dim lReturnCode As Integer = 0
-        Dim lName As String = FilenameOnly(aFileName) & ".ptf"
+        Dim lName As String = pWatershed.Name & ".ptf"
 
         Try
             Dim lDelim As String = " "
@@ -26,7 +28,8 @@ Public Class Channels
                     Exit Do
                 Else
                     Dim lChannel As New Channel
-                    lChannel.Id = StrSplit(lCurrentRecord, lDelim, lQuote) 'reach id
+                    Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lChannel.Reach = aWatershed.Reaches(lReachId)
                     lChannel.Length = CSng(StrSplit(lCurrentRecord, lDelim, lQuote))
                     lChannel.DepthMean = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'mean depth
                     lChannel.WidthMean = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'mean width
@@ -44,7 +47,7 @@ Public Class Channels
                     lChannel.WidthZeroSlopeRight = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'zero slope width right
                     lChannel.SlopeSideLowerFPRight = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'side slope lower right
                     lChannel.SlopeSideUpperFPRight = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'side slope upper right
-                    lChannel.DepthChannel  = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'channel depth
+                    lChannel.DepthChannel = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'channel depth
                     lChannel.DepthSlopeChange = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'depth at slope change
                     lChannel.DepthMax = CSng(StrSplit(lCurrentRecord, lDelim, lQuote)) 'channel max depth
                     Me.Add(lChannel)
@@ -59,7 +62,7 @@ Public Class Channels
 End Class
 
 Public Class Channel
-    Public Id As String   'reach id
+    Public Reach As Reach    'reach id
     Public Length As Single    'length
     Public DepthMean As Single   'mean depth
     Public WidthMean As Single   'mean width

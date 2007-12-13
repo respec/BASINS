@@ -5,20 +5,22 @@ Imports atcUtility
 
 Public Class LandUses
     Inherits KeyedCollection(Of String, LandUse)
+    Private pWatershed As Watershed
     Protected Overrides Function GetKeyForItem(ByVal aLandUse As LandUse) As String
-        Dim lKey As String = aLandUse.Description & ":" & aLandUse.Type & ":" & aLandUse.Reach
+        Dim lKey As String = aLandUse.Description & ":" & aLandUse.Type & ":" & aLandUse.Reach.Id
         Return lKey
     End Function
 
-    Public Function Open(ByVal aFileName As String) As Integer
+    Friend Function Open(ByVal aWatershed As Watershed) As Integer
+        pWatershed = aWatershed
         'read wsd file
         Dim lReturnCode As Integer = 0
-        Dim lName As String = FilenameOnly(aFileName) & ".wsd"
+        Dim lName As String = pWatershed.Name & ".wsd"
         Try
             Dim lDelim As String = " "
             Dim lQuote As String = """"
             Dim lCurrentRecord As String
-            Dim lStreamReader As New StreamReader(aFileName)
+            Dim lStreamReader As New StreamReader(lName)
             lCurrentRecord = lStreamReader.ReadLine 'first line is header
             Do
                 lCurrentRecord = lStreamReader.ReadLine
@@ -36,7 +38,8 @@ Public Class LandUses
                         'this is the normal way
                         lLandUse.Description = StrSplit(lCurrentRecord, lDelim, lQuote)
                         lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
-                        lLandUse.Reach = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Reach = pWatershed.Reaches(lReachId)
                         lLandUse.Area = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.Slope = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                         lLandUse.Distance = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
@@ -49,7 +52,8 @@ Public Class LandUses
                             lLandUse.Area = CSng(Mid(lCurrentRecord, lCurrentRecord.Length - 23, 8))
                         End If
                         lLandUse.Type = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
-                        lLandUse.Reach = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        Dim lReachId As String = StrSplit(lCurrentRecord, lDelim, lQuote)
+                        lLandUse.Reach = pWatershed.Reaches(lReachId)
                     End If
                     Select Case lLandUse.Type
                         Case 1 : lLandUse.Type = "IMPLND"
@@ -70,7 +74,7 @@ End Class
 Public Class LandUse
     Public Description As String  'Land use description like Urban, Forest, etc.
     Public Type As String         'PERLND(2) or IMPLND(1)
-    Public Reach As String        'Reach that this land use type contributes to
+    Public Reach As Reach        'Reach that this land use type contributes to
     Public Area As Double         'Area of this land use contributing to this reach
     Public Slope As Double        'Average slope of this subbasin, not land use specific
     Public Distance As Double     'Overland flow distance

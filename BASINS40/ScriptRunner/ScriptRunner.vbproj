@@ -166,6 +166,11 @@
       <Name>atcSeasons</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\atcSegmentation\atcSegmentation.vbproj">
+      <Project>{813E3F46-36CA-4320-BB05-325EEC553D3D}</Project>
+      <Name>atcSegmentation</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\atcTableSQLite\atcTableSQLite.vbproj">
       <Project>{C59D3153-2857-499C-B640-924E5ABE2E74}</Project>
       <Name>atcTableSQLite</Name>

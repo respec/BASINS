@@ -2,6 +2,7 @@ Imports System.Collections.ObjectModel
 Imports MapWindow.Interfaces
 Imports atcUCI
 Imports atcUtility
+Imports atcSegmentation
 
 Module CreateUCITest
 
@@ -40,15 +41,20 @@ Module CreateUCITest
         lEndDate(4) = 0
         lEndDate(5) = 0
 
-        Dim lHspfUci As New atcUCI.HspfUci
-        lHspfUci.CreateUciFromBASINS(lMsg, "UCICreation.wsd", _
-                                     lDataSources, _
-                                     lMetBaseDsn, _
-                                     lMetWdmId, _
-                                     lStartDate, _
-                                     lEndDate, _
-                                     True, _
-                                     lStarterUciName, lPollutantListFileName)
-        lHspfUci.Save()
+        Dim lWatershedName As String = "UCICreation"
+        Dim lWatershed As New Watershed
+        If lWatershed.Open(lWatershedName) = 0 Then  'everything read okay, continue
+            Dim lHspfUci As New atcUCI.HspfUci
+            lHspfUci.Msg = lMsg
+            lHspfUci.CreateUciFromBASINS(lWatershed, _
+                                         lDataSources, _
+                                         lMetBaseDsn, _
+                                         lMetWdmId, _
+                                         lStartDate, _
+                                         lEndDate, _
+                                         True, _
+                                         lStarterUciName, lPollutantListFileName)
+            lHspfUci.Save()
+        End If
     End Sub
 End Module

@@ -4,8 +4,9 @@ Option Explicit On
 
 Imports System.Text
 Imports System.Collections.ObjectModel
-Imports atcUtility
 Imports MapWinUtility
+Imports atcUtility
+Imports atcSegmentation
 
 Public Class HspfUci
     Declare Function GetCurrentProcessId Lib "kernel32" () As Integer
@@ -454,7 +455,7 @@ Public Class HspfUci
         Else
             pName = aNewName
             If aFullFg <> -1 Then 'not doing starter, process wdm files
-                PreScanFilesBlock(aFilesOK, aEchoFile)
+                aFilesOK = PreScanFilesBlock(aEchoFile)
                 aEchoFile = aEchoFile.Trim
             End If
             If aFilesOK Then
@@ -1757,78 +1758,64 @@ Public Class HspfUci
             End Try
         End If
 
-        AddWDMFile = New atcWDM.atcDataSourceWDM
-        If Not AddWDMFile.Open(aName) Then 'had a problem
-            MsgBox("Could not open WDM file" & vbCr & Name, MsgBoxStyle.Exclamation, "AddWDMFile Failed")
+        Dim lWDMFile As New atcWDM.atcDataSourceWDM
+        If Not lWDMFile.Open(aName) Then 'had a problem
+            Logger.Msg("Could not open WDM file" & vbCr & aName, MsgBoxStyle.Exclamation, "AddWDMFile Failed")
             Return Nothing
         Else
-            TserFiles.AddRange(AddWDMFile.DataSets)
+            TserFiles.AddRange(lWDMFile.DataSets)
         End If
+        Return lWDMFile
     End Function
 
-    Public Sub PreScanFilesBlock(ByRef aFilesOK As Boolean, ByRef aEchoFile As String)
-        Dim i, Ind As Integer
-        Dim tname, s, w, tpath As String
-        Dim lFile As atcData.atcDataSource
-
-        On Error GoTo x
-
-        's = "PreScanFilesBlock entry"
-        'F90_FILSTA s, Len(s)
-
-        aFilesOK = True
-        pWdmCount = 0
-        aEchoFile = ""
-        i = FreeFile()
-        FileOpen(i, pName, OpenMode.Input)
-        Do
-            s = LineInput(i)
-            If s.StartsWith("FILES") Then 'at files block
-                While Not s.StartsWith("END FILES")
-                    s = LineInput(i)
-                    If InStr(1, s, "***") = 0 Then
-                        If s.StartsWith("WDM") Then
-                            lFile = AddWDMFile(Mid(s, 17, Len(s) - 16))
-                            If Not lFile Is Nothing Then
-                                pWdmCount += 1
-                                Ind = WDMInd(Left(s, 4))
-                                'TODO: ? pWdmUnit(Ind) = lFile.FileUnit
-                                pWDMObj(Ind) = lFile
-                            End If
-                        ElseIf Not s.StartsWith("END FILES") Then  'make sure the other files are ok
-                            If s.Length > 16 Then
-                                tname = Mid(s, 17, Len(s) - 16)
-                                tpath = IO.Path.GetDirectoryName(tname)
-                                If tpath.Length > 0 AndAlso Not IO.Directory.Exists(tpath) Then
-                                    Logger.Msg("Error in Files Block:  Folder " & tpath & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
-                                    aFilesOK = False
-                                ElseIf UCase(Right(tname, 4)) = ".MUT" Then  'does this file exist
-                                    If Not IO.File.Exists(tname) Then
-                                        Logger.Msg("Error in Files Block:  Input File " & tname & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
-                                        aFilesOK = False
-                                    End If
-                                End If
-                                If s.StartsWith("MESSU") Then
-                                    'save echo file name
-                                    aEchoFile = tname
-                                End If
+    Public Function PreScanFilesBlock(ByRef aEchoFile As String) As Boolean
+        Dim lFilesOK As Boolean = True
+        Try
+            Dim lString As String = Nothing
+            Dim lReturnKey As Integer = -1
+            Dim lReturnCode As Integer
+            Dim lRecordType As Integer
+            pWdmCount = 0
+            aEchoFile = ""
+            Do
+                GetNextRecordFromBlock("FILES", lReturnKey, lString, lRecordType, lReturnCode)
+                If lReturnCode <> 10 AndAlso lRecordType = 0 Then
+                    Dim lFileName As String = lString.Substring(16).Trim
+                    Dim lFilePath As String
+                    If lString.StartsWith("WDM") Then
+                        Dim lFile As atcData.atcDataSource = AddWDMFile(lFileName)
+                        If Not lFile Is Nothing Then
+                            pWdmCount += 1
+                            Dim lInd As Integer = WDMInd(Left(lString, 4))
+                            'TODO: ? pWdmUnit(Ind) = lFile.FileUnit
+                            pWDMObj(lInd) = lFile
+                        End If
+                    ElseIf lString.Length > 16 Then 'make sure the other files are ok
+                        lFilePath = IO.Path.GetDirectoryName(lFileName)
+                        If lFilePath.Length > 0 AndAlso Not IO.Directory.Exists(lFilePath) Then
+                            Logger.Msg("Error in Files Block:  Folder " & lFilePath & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
+                            lFilesOK = False
+                        ElseIf UCase(Right(lFileName, 4)) = ".MUT" Then  'does this file exist
+                            If Not IO.File.Exists(lFileName) Then
+                                Logger.Msg("Error in Files Block:  Input File " & lFileName & " does not exist.", MsgBoxStyle.OkOnly, "Open UCI Problem")
+                                lFilesOK = False
                             End If
                         End If
+                        If lString.StartsWith("MESSU") Then 'save echo file name
+                            aEchoFile = lFileName.Trim
+                        End If
                     End If
-                End While
-                Exit Do
-            End If
-        Loop
-        FileClose(i)
-        's = "PreScanFilesBlock exit"
-        'F90_FILSTA s, Len(s)
-        System.Windows.Forms.Application.DoEvents()
-        Exit Sub
-x:
-        'TODO: myMsgBox.Show("Cannot open '" & Mid(s, 17, Len(s) - 16) & "' in PreScanFilesBlock." & vbCrLf & vbCrLf & "Error: " & Err.Description, "HSPF Files Error", "+-&OK")
-        aFilesOK = False
-        FileClose(i)
-    End Sub
+                End If
+            Loop While lReturnCode = 2
+            's = "PreScanFilesBlock exit"
+            'F90_FILSTA s, Len(s)
+            System.Windows.Forms.Application.DoEvents()
+        Catch ex As Exception
+            'TODO: myMsgBox.Show("Cannot open '" & Mid(s, 17, Len(s) - 16) & "' in PreScanFilesBlock." & vbCrLf & vbCrLf & "Error: " & Err.Description, "HSPF Files Error", "+-&OK")
+            lFilesOK = False
+        End Try
+        Return lFilesOK
+    End Function
 
     Public Sub SetWDMFiles()
         Dim Ind, i, iret As Integer
@@ -2530,7 +2517,7 @@ x:
                 Call REM_XBLOCK(Me, lOmCode, lInit, lReturnKey, lBuff, lReturnCode)
             End If
             lInit = 0
-            If Mid(lBuff, 3, 6) = "FTABLE" Then 'this is a new one
+            If lBuff.Substring(2, 6) = "FTABLE" Then 'this is a new one
                 Dim lId As Integer = CShort(lBuff.Substring(11, 4))
                 'find which operation this ftable is associated with
                 Dim lOperation As HspfOperation = Nothing
@@ -2562,7 +2549,7 @@ x:
                             End If
                             If lRecordType = -1 Then
                                 'this is a comment
-                                If Len(.Comment) = 0 Then
+                                If .Comment.Length = 0 Then
                                     .Comment = lBuff
                                 Else
                                     .Comment = .Comment & vbCrLf & lBuff
@@ -2673,8 +2660,7 @@ x:
         End If
     End Function
 
-    Public Sub CreateUciFromBASINS(ByRef aMsg As HspfMsg, _
-                                   ByRef aWsdName As String, _
+    Public Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
                                    ByRef aDataSources As Collection(Of atcData.atcDataSource), _
                                    ByRef aMetBaseDsn As Integer, _
                                    ByVal aMetWdmId As String, _
@@ -2683,7 +2669,7 @@ x:
                                    ByRef aOneSeg As Boolean, _
                                    ByRef aStarterUci As String, _
                                    Optional ByRef aPollutantListFileName As String = "")
-        modCreateUci.CreateUciFromBASINS(Me, aMsg, aWsdName, aDataSources, _
+        modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
                                          aMetBaseDsn, aMetWdmId, aStartDate, aEndDate, _
                                          aOneSeg, aStarterUci, _
                                          aPollutantListFileName)

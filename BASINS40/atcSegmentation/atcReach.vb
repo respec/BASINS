@@ -5,14 +5,16 @@ Imports atcUtility
 
 Public Class Reaches
     Inherits KeyedCollection(Of String, Reach)
+    Private pWatershed As Watershed
     Protected Overrides Function GetKeyForItem(ByVal aReach As Reach) As String
         Return aReach.Id
     End Function
 
-    Public Function Open(ByVal aFileName As String) As Integer
+    Friend Function Open(ByVal aWatershed As Watershed) As Integer
         'read rch file
+        pWatershed = aWatershed
         Dim lReturnCode As Integer = 0
-        Dim lName As String = FilenameOnly(aFileName) & ".rch"
+        Dim lName As String = pWatershed.Name & ".rch"
 
         Try
             Dim lDelim As String = " "
