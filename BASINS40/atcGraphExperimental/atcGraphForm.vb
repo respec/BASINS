@@ -86,8 +86,10 @@ Public Class atcGraphForm
                 .Type = pXAxisType
                 .MajorTic.IsOutside = False
                 .MajorTic.IsInside = True
+                .MajorTic.IsOpposite = True
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
+                .MinorTic.IsOpposite = True
             End With
             With .X2Axis
                 .IsVisible = False
