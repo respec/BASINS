@@ -453,29 +453,29 @@ Module modCreateUci
     End Function
 
     Private Sub CreateOpnsForMultSegs(ByRef aUci As HspfUci)
-        Dim j, i, k As Integer
-        Dim lImplndNames As New atcCollection
-        Dim lPerlndNames As New atcCollection
 
         'prescan to see how many perlnds and implnds per segment
-        For i = 0 To pWatershed.LandUses.Count - 1
-            If pWatershed.LandUses(i).Type = "PERLND" Then
-                If lPerlndNames.IndexFromKey(pWatershed.LandUses(i).Description) = 0 Then
-                    lPerlndNames.Add(pWatershed.LandUses(i).Description)
+        Dim lImplndNames As New atcCollection
+        Dim lPerlndNames As New atcCollection
+        For Each lLandUse As LandUse In pWatershed.LandUses
+            If lLandUse.Type = "PERLND" Then
+                If lPerlndNames.IndexFromKey(lLandUse.Description) = -1 Then
+                    lPerlndNames.Add(lLandUse.Description)
                 End If
-            ElseIf pWatershed.LandUses(i).Type = "IMPLND" Then
-                If lImplndNames.IndexFromKey(pWatershed.LandUses(i).Description) = 0 Then
-                    lImplndNames.Add(pWatershed.LandUses(i).Description)
+            ElseIf lLandUse.Type = "IMPLND" Then
+                If lImplndNames.IndexFromKey(lLandUse.Description) = -1 Then
+                    lImplndNames.Add(lLandUse.Description)
                 End If
             End If
-        Next i
+        Next
 
+        'figure out the max number of digits in the reach ids
         Dim lDigits As Integer = 0
-        For i = 0 To pWatershed.Reaches.Count - 1
-            If pWatershed.Reaches(i).Id.Length > lDigits Then
-                lDigits = pWatershed.Reaches(i).Id.Length
+        For Each lReach As Reach In pWatershed.Reaches
+            If lReach.Id.Length > lDigits Then
+                lDigits = lReach.Id.Length
             End If
-        Next i
+        Next
 
         Dim lBase As Integer
         If lDigits = 1 Or lDigits = 0 Then
@@ -497,69 +497,40 @@ Module modCreateUci
             pLastSeg(1) = 0
             pFirstSeg(2) = 99999
             pLastSeg(2) = 0
-            For k = 0 To pWatershed.Reaches.Count - 1
+            For Each lReach As Reach In pWatershed.Reaches
                 'loop through each reach
-                For i = 0 To pWatershed.LandUses.Count - 1
-                    'look to see if this landuse rec goes to this reach
-                    If pWatershed.LandUses(i).Reach.Id = pWatershed.Reaches(k).Id Then
-                        'it does
-                        If pWatershed.LandUses(i).Type = "PERLND" Then
-                            'add this perlnd oper
-                            Dim lOpn As New HspfOperation
-                            lOpn.Uci = aUci
-                            lOpn.Name = "PERLND"
+                For lType As Integer = 1 To 2
+                    For Each lLandUse As LandUse In pWatershed.LandUses
+                        'look to see if this landuse rec goes to this reach
+                        If lLandUse.Reach.Id = lReach.Id Then
+                            'it does
                             Dim lLandUseId As Integer = 0
-                            For j = 0 To lPerlndNames.Count - 1
-                                If lPerlndNames(j - 1) = pWatershed.LandUses(i).Description Then
-                                    'this is the land use we want
-                                    lLandUseId = j
+                            If lLandUse.Type = "PERLND" And lType = 1 Then
+                                lLandUseId = lPerlndNames.IndexFromKey(lLandUse.Description) + 1
+                            ElseIf lLandUse.Type = "IMPLND" And lType = 2 Then
+                                lLandUseId = lImplndNames.IndexFromKey(lLandUse.Description) + 1
+                            End If
+                            If lLandUseId > 0 Then
+                                'add this oper
+                                Dim lOpn As New HspfOperation
+                                lOpn.Uci = aUci
+                                lOpn.Name = lLandUse.Type
+                                Dim lOperId As Integer = (CDbl(lLandUse.Reach.Id) * lBase) + lLandUseId
+                                If lOperId < pFirstSeg(2) Then
+                                    pFirstSeg(2) = lOperId
                                 End If
-                            Next j
-                            Dim lOperId As Integer = (CDbl(pWatershed.LandUses(i).Reach.Id) * lBase) + lLandUseId
-                            If lOperId < pFirstSeg(2) Then
-                                pFirstSeg(2) = lOperId
-                            End If
-                            If lOperId > pLastSeg(2) Then
-                                pLastSeg(2) = lOperId
-                            End If
-                            lOpn.Id = lOperId
-                            lOpn.Description = pWatershed.LandUses(i).Description
-                            lOpn.Tag = pWatershed.LandUses(i).Reach.Id
-                            aUci.OpnSeqBlock.Add(lOpn)
-                        End If
-                    End If
-                Next i
-
-                'now add implnds
-                For i = 0 To pWatershed.LandUses.Count - 1
-                    If pWatershed.LandUses(i).Reach.Id = pWatershed.Reaches(k).Id Then
-                        If pWatershed.LandUses(i).Type = "IMPLND" Then
-                            'add this implnd oper
-                            Dim lOpn As New HspfOperation
-                            lOpn.Uci = aUci
-                            lOpn.Name = "IMPLND"
-                            Dim lLandUseId As Integer = 0
-                            For j = 0 To lImplndNames.Count - 1
-                                If lImplndNames(j - 1) = pWatershed.LandUses(i).Description Then
-                                    'this is the land use we want
-                                    lLandUseId = j
+                                If lOperId > pLastSeg(2) Then
+                                    pLastSeg(2) = lOperId
                                 End If
-                            Next j
-                            Dim lOperId As Integer = (CDbl(pWatershed.LandUses(i).Reach.Id) * lBase) + lLandUseId
-                            If lOperId < pFirstSeg(1) Then
-                                pFirstSeg(1) = lOperId
+                                lOpn.Id = lOperId
+                                lOpn.Description = lLandUse.Description
+                                lLandUse.ModelID = lOperId
+                                aUci.OpnSeqBlock.Add(lOpn)
                             End If
-                            If lOperId > pLastSeg(1) Then
-                                pLastSeg(1) = lOperId
-                            End If
-                            lOpn.Id = lOperId
-                            lOpn.Description = pWatershed.LandUses(i).Description
-                            lOpn.Tag = pWatershed.LandUses(i).Reach.Id
-                            aUci.OpnSeqBlock.Add(lOpn)
                         End If
-                    End If
-                Next i
-            Next k
+                    Next
+                Next
+            Next
         End If
 
     End Sub
