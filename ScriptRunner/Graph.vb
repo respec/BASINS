@@ -43,19 +43,24 @@ Module Graph
             lDataGroup.Add(SubsetByDate(lObsTser, _
                                         lExpertSystem.SDateJ, _
                                         lExpertSystem.EDateJ, Nothing))
+            Dim lYMax As Double = 2500 'todo: compute this
 
             lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Linear)
             With lGraphForm.Pane
                 .XAxis.Title.Text = "Observed"
                 .XAxis.Type = ZedGraph.AxisType.Log
                 .XAxis.Scale.Min = 1
+                .XAxis.Scale.Max = lYmax
                 .XAxis.Scale.IsUseTenPower = False
+                .XAxis.Scale.MaxAuto = False
+                .XAxis.MajorGrid.IsVisible = True
                 .YAxis.Title.Text = "Simulated"
                 .YAxis.Type = ZedGraph.AxisType.Log
-                .YAxis.Scale.Min = 1
                 .YAxis.Scale.IsUseTenPower = False
                 .YAxis.Scale.Max = .XAxis.Scale.Max
+                .YAxis.Scale.Min = .XAxis.Scale.Min
                 .YAxis.Scale.MaxAuto = False
+                .CurveList.Item(0).Label.Text = "Flow at Upper Marlboro"
             End With
             lOutFileName = "outfiles\" & lCons & "_" & lSite & "_scat.png"
             lGraphForm.SaveBitmapToFile(lOutFileName)
@@ -66,7 +71,9 @@ Module Graph
             With lGraphForm.Pane
                 .YAxis.Title.Text = lCons & " (cfs)"
                 .YAxis.Type = ZedGraph.AxisType.Log
-                .YAxis.Scale.Min = 1
+                .YAxis.Scale.Min = 1   'note need to do both
+                .YAxis.Scale.Max = lYMax
+                .YAxis.Scale.MaxAuto = False
                 .YAxis.Scale.IsUseTenPower = False
                 .XAxis.Title.Text = "Percent of Time " & lCons & " exceeded at " & lSite
             End With
@@ -81,14 +88,26 @@ Module Graph
                                         lExpertSystem.SDateJ, _
                                         lExpertSystem.EDateJ, Nothing))
             lGraphForm = New atcGraph.atcGraphForm(lDataGroup)
-            lGraphForm.Pane.YAxis.Title.Text = lCons & " (cfs)"
-            lGraphForm.Pane.XAxis.Title.Text = "Daily Mean Flow at " & lSite
+            With lGraphForm.Pane
+                .YAxis.Scale.Min = 1   'note need to do both
+                .YAxis.Scale.Max = lYMax
+                .YAxis.Title.Text = lCons & " (cfs)"
+                .XAxis.Title.Text = "Daily Mean Flow at " & lSite
+            End With
+            With lGraphForm.PaneAux
+                .CurveList.Item(0).Color = Drawing.Color.Blue
+                .CurveList.Item(0).Label.Text = "Upper Marlboro"
+                .YAxis.Title.Text = "Precip (in)"
+            End With
             SetGraphSpecs(lGraphForm)
             lOutFileName = "outfiles\" & lCons & "_" & lSite & ".png"
             lGraphForm.SaveBitmapToFile(lOutFileName)
+
             With lGraphForm.Pane
                 .YAxis.Type = ZedGraph.AxisType.Log
                 .YAxis.Scale.Min = 1
+                .YAxis.Scale.Max = lYMax
+                .YAxis.Scale.MaxAuto = False
                 .YAxis.Scale.IsUseTenPower = False
             End With
             lOutFileName = "outfiles\" & lCons & "_" & lSite & "_log.png"
