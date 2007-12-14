@@ -74,8 +74,9 @@ End Class
 Public Class LandUse
     Public Description As String  'Land use description like Urban, Forest, etc.
     Public Type As String         'PERLND(2) or IMPLND(1)
-    Public Reach As Reach        'Reach that this land use type contributes to
+    Public Reach As Reach         'Reach that this land use type contributes to
     Public Area As Double         'Area of this land use contributing to this reach
     Public Slope As Double        'Average slope of this subbasin, not land use specific
     Public Distance As Double     'Overland flow distance
+    Public ModelID As Integer     'Assigned id for this land use type, e.g. 101 for Forest land uses 
 End Class

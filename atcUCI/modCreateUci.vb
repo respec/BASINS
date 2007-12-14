@@ -126,45 +126,48 @@ Module modCreateUci
 
     Private Sub SetInitValues(ByVal aUci As HspfUci)
         'set init values in uci
+
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("PERLND").Ids
-            Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
-            lTable.Parms("PWATFG").Value = 1
-            Dim lLandUse As LandUse = pWatershed.LandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
-            If lLandUse Is Nothing Then
-                Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
-            Else
-                lTable = lOperation.Tables.Item("GEN-INFO")
-                lTable.Parms("LSID").Value = lLandUse.Description
-                lTable = lOperation.Tables.Item("PWAT-PARM2")
-                If lLandUse.Slope > 0 Then
-                    lTable.Parms("SLSUR").Value = lLandUse.Slope
-                Else
-                    lTable.Parms("SLSUR").Value = 0.001 'must have some slope
+            For Each lLandUse As LandUse In pWatershed.LandUses
+                If lOperation.Id = lLandUse.ModelID Then  'found a match
+                    If lLandUse.Type = "PERLND" Then
+                        Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
+                        lTable.Parms("PWATFG").Value = 1
+                        lTable = lOperation.Tables.Item("GEN-INFO")
+                        lTable.Parms("LSID").Value = lLandUse.Description
+                        lTable = lOperation.Tables.Item("PWAT-PARM2")
+                        If lLandUse.Slope > 0 Then
+                            lTable.Parms("SLSUR").Value = lLandUse.Slope
+                        Else
+                            lTable.Parms("SLSUR").Value = 0.001 'must have some slope
+                        End If
+                        lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value) 'default lsur based on slsur
+                    End If
+                    Exit For
                 End If
-                'default lsur based on slsur
-                lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value)
-            End If
-        Next lOperation
+            Next
+        Next
 
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("IMPLND").Ids
-            Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
-            lTable.Parms("IWATFG").Value = 1
-            Dim lLandUse As LandUse = pWatershed.LandUses(lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
-            If lLandUse Is Nothing Then
-                Logger.Dbg("Missing Landuse" & lOperation.Description & ":" & lOperation.Name & ":" & lOperation.Tag)
-            Else
-                lTable = lOperation.Tables.Item("GEN-INFO")
-                lTable.Parms("LSID").Value = lLandUse.Description
-                lTable = lOperation.Tables.Item("IWAT-PARM2")
-                If lLandUse.Slope > 0 Then
-                    lTable.Parms("SLSUR").Value = lLandUse.Slope
-                Else
-                    lTable.Parms("SLSUR").Value = 0.001 'must have some slope
+            For Each lLandUse As LandUse In pWatershed.LandUses
+                If lOperation.Id = lLandUse.ModelID Then  'found a match
+                    If lLandUse.Type = "IMPLND" Then
+                        Dim lTable As HspfTable = lOperation.Tables.Item("ACTIVITY")
+                        lTable.Parms("IWATFG").Value = 1
+                        lTable = lOperation.Tables.Item("GEN-INFO")
+                        lTable.Parms("LSID").Value = lLandUse.Description
+                        lTable = lOperation.Tables.Item("IWAT-PARM2")
+                        If lLandUse.Slope > 0 Then
+                            lTable.Parms("SLSUR").Value = lLandUse.Slope
+                        Else
+                            lTable.Parms("SLSUR").Value = 0.001 'must have some slope
+                        End If
+                        lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value) 'default lsur based on slsur
+                    End If
+                    Exit For
                 End If
-                'default lsur based on slsur
-                lTable.Parms("LSUR").Value = DefaultLSURFromSLSUR(lTable.Parms("SLSUR").Value)
-            End If
-        Next lOperation
+            Next
+        Next
 
         Dim lReachIndex As Integer = -1
         For Each lOperation As HspfOperation In aUci.OpnBlks.Item("RCHRES").Ids
@@ -247,43 +250,34 @@ Module modCreateUci
     Private Sub CreateConnectionsSchematic(ByRef aUci As HspfUci)
         Dim lConnection As HspfConnection
 
-        For Each lReach As Reach In pWatershed.Reaches
-            For j As Integer = 2 To 1 Step -1
-                For Each lOperation As HspfOperation In aUci.OpnBlks.Item(pLandName(j)).Ids
-                    Try
-                        Dim lLandUse As LandUse = pWatershed.LandUses(lOperation.Description & ":" & lOperation.Name & ":" & lReach.Id)
-                        lConnection = New HspfConnection
-                        lConnection.Uci = aUci
-                        lConnection.Typ = 3
-                        lConnection.Source.VolName = lOperation.Name
-                        lConnection.Source.VolId = lOperation.Id
-                        lConnection.MFact = lLandUse.Area
-                        lConnection.Target.VolName = "RCHRES"
-                        lConnection.Target.VolId = lReach.Id
-                        lConnection.MassLink = TypeId(pWatershed.LandUses(j).Type)
-                        aUci.Connections.Add(lConnection)
-                    Catch e As Collections.Generic.KeyNotFoundException
-                    End Try
-                Next
-            Next
+        For Each lLandUse As LandUse In pWatershed.LandUses
+            lConnection = New HspfConnection
+            lConnection.Uci = aUci
+            lConnection.Typ = 3
+            lConnection.Source.VolName = lLandUse.Type
+            lConnection.Source.VolId = lLandUse.ModelID
+            lConnection.MFact = lLandUse.Area
+            lConnection.Target.VolName = "RCHRES"
+            lConnection.Target.VolId = lLandUse.Reach.Id
+            lConnection.MassLink = TypeId(lLandUse.Type)
+            aUci.Connections.Add(lConnection)
         Next
 
         For Each lReachUpstream As Reach In pWatershed.Reaches
             'add entries for each reach to reach connection
-            For Each lReachDownstream As Reach In pWatershed.Reaches
-                If lReachDownstream.Id = lReachUpstream.DownID Then
-                    lConnection = New HspfConnection
-                    lConnection.Uci = aUci
-                    lConnection.Typ = 3
-                    lConnection.Source.VolName = "RCHRES"
-                    lConnection.Source.VolId = lReachUpstream.Id
-                    lConnection.MFact = 1.0#
-                    lConnection.Target.VolName = "RCHRES"
-                    lConnection.Target.VolId = lReachDownstream.Id
-                    lConnection.MassLink = 3
-                    aUci.Connections.Add(lConnection)
-                End If
-            Next
+            If lReachUpstream.DownID > 0 Then
+                Dim lReachDownstream As Reach = pWatershed.Reaches(lReachUpstream.DownID)
+                lConnection = New HspfConnection
+                lConnection.Uci = aUci
+                lConnection.Typ = 3
+                lConnection.Source.VolName = "RCHRES"
+                lConnection.Source.VolId = lReachUpstream.Id
+                lConnection.MFact = 1.0#
+                lConnection.Target.VolName = "RCHRES"
+                lConnection.Target.VolId = lReachDownstream.Id
+                lConnection.MassLink = 3
+                aUci.Connections.Add(lConnection)
+            End If
         Next
     End Sub
 
@@ -406,8 +400,8 @@ Module modCreateUci
 
         For j As Integer = 2 To 1 Step -1
             lUniqueNameCount = 0
-            For i As Integer = 0 To pWatershed.LandUses.Count - 1
-                If TypeId(pWatershed.LandUses(i).Type) = j Then
+            For Each lLandUse As LandUse In pWatershed.LandUses
+                If TypeId(lLandUse.Type) = j Then
                     If lUniqueNameCount = 0 Then
                         'add it
                         lNewOperation = New HspfOperation
@@ -416,18 +410,19 @@ Module modCreateUci
                         lToperId = 101
                         pFirstSeg(j) = lToperId
                         lNewOperation.Id = lToperId
+                        lLandUse.ModelID = lToperId
                         pLastSeg(j) = lToperId
-                        lNewOperation.Description = pWatershed.LandUses(i).Description
-                        lNewOperation.Tag = pWatershed.LandUses(i).Reach.Id
+                        lNewOperation.Description = lLandUse.Description
                         aUci.OpnSeqBlock.Add(lNewOperation)
                         lUniqueNameCount += 1
                     Else
                         lAddflag = True
                         For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
-                            If lOperation.Description = pWatershed.LandUses(i).Description And _
+                            If lOperation.Description = lLandUse.Description And _
                                lOperation.Name = pLandName(j) Then
                                 lAddflag = False
                                 lToperId = lOperation.Id
+                                lLandUse.ModelID = lToperId
                             End If
                         Next lOperation
                         If lAddflag Then
@@ -435,16 +430,16 @@ Module modCreateUci
                             lNewOperation = New HspfOperation
                             lNewOperation.Uci = aUci
                             lNewOperation.Name = pLandName(j)
-                            lNewOperation.Description = pWatershed.LandUses(i).Description
+                            lNewOperation.Description = lLandUse.Description
                             lToperId = 100 + lUniqueNameCount
                             lNewOperation.Id = lToperId
+                            lLandUse.ModelID = lToperId
                             pLastSeg(j) = lToperId
-                            lNewOperation.Tag = pWatershed.LandUses(i).Reach.Id
                             aUci.OpnSeqBlock.Add(lNewOperation)
                         End If
                     End If
                 End If
-            Next i
+            Next
         Next j
     End Sub
 
