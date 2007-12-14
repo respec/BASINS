@@ -452,6 +452,13 @@ Public Class atcGraphForm
     End Property
 
     <CLSCompliant(False)> _
+    Public ReadOnly Property PaneAux() As GraphPane
+        Get
+            Return pPaneAux
+        End Get
+    End Property
+
+    <CLSCompliant(False)> _
     Public ReadOnly Property Pane() As GraphPane
         Get
             Return pPaneMain
