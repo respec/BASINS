@@ -73,11 +73,11 @@ namespace ZedGraph
 		LinearAsOrdinal,
 		/// <summary> An exponential axis </summary>
 		Exponent,
-        /// <summary> A probability axis </summary>
-        Probability,
-        /// <summary> A cartesian axis with calendar dates or times using one or more rows of labeling </summary>
-        DateMulti
-    }
+		/// <summary> A probability axis </summary>
+		Probability,
+		/// <summary> A cartesian axis with calendar dates or times using one or more rows of labeling </summary>
+		DateMulti
+	}
 
 	/// <summary>
 	/// Enumeration type for the various types of fills that can be used with <see cref="Bar"/>

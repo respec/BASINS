@@ -816,11 +816,11 @@ namespace ZedGraph
 					return new DateAsOrdinalScale( oldScale, _ownerAxis );
 				case AxisType.LinearAsOrdinal:
 					return new LinearAsOrdinalScale( oldScale, _ownerAxis );
-                case AxisType.Probability:
-                    return new ProbabilityScale(oldScale, _ownerAxis);
-                case AxisType.DateMulti:
-                    return new DateMultiScale(oldScale, _ownerAxis);
-                default:
+				case AxisType.Probability:
+					return new ProbabilityScale(oldScale, _ownerAxis);
+				case AxisType.DateMulti:
+					return new DateMultiScale(oldScale, _ownerAxis);
+				default:
 					throw new Exception( "Implementation Error: Invalid AxisType" );
 			}
 		}
@@ -2772,7 +2772,6 @@ namespace ZedGraph
 			// Must take into account Log, and Reverse Axes
 			double denom = ( _maxLinTemp - _minLinTemp );
 			double ratio;
-			// JLK 11/2006
 			if (Math.Abs(denom) > 1e-100)
 				ratio = ( Linearize( x ) - _minLinTemp ) / denom;
 			else
