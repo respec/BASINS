@@ -2666,12 +2666,11 @@ x:
                                    ByVal aMetWdmId As String, _
                                    ByRef aStartDate() As Integer, _
                                    ByRef aEndDate() As Integer, _
-                                   ByRef aOneSeg As Boolean, _
                                    ByRef aStarterUci As String, _
                                    Optional ByRef aPollutantListFileName As String = "")
         modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
                                          aMetBaseDsn, aMetWdmId, aStartDate, aEndDate, _
-                                         aOneSeg, aStarterUci, _
+                                         aStarterUci, _
                                          aPollutantListFileName)
     End Sub
 End Class

@@ -21,7 +21,6 @@ Module modCreateUci
                                    ByRef aMetWdmId As String, _
                                    ByRef aStartDate() As Integer, _
                                    ByRef aEndDate() As Integer, _
-                                   ByRef aOneSeg As Boolean, _
                                    ByRef aStarterUciName As String, _
                                    Optional ByRef aPollutantListFileName As String = "")
         pWatershed = aWatershed
@@ -57,7 +56,7 @@ Module modCreateUci
         End With
 
         'add opn seq block
-        CreateOpnSeqBlock(aUci, aOneSeg)
+        CreateOpnSeqBlock(aUci)
 
         'set all operation types
         Dim lOpnIndex As Integer = 1
@@ -334,7 +333,7 @@ Module modCreateUci
         Next lWdmIndex
     End Sub
 
-    Private Sub CreateOpnSeqBlock(ByRef aUci As HspfUci, ByRef aOneSeg As Boolean)
+    Private Sub CreateOpnSeqBlock(ByRef aUci As HspfUci)
         Try
             aUci.OpnSeqBlock.Delt = 60
             aUci.OpnSeqBlock.Uci = aUci
@@ -365,11 +364,7 @@ Module modCreateUci
             'add rec to opn seq block for each land use
             pLandName(2) = "PERLND"
             pLandName(1) = "IMPLND"
-            If aOneSeg Then 'only one segment for all land uses
-                Call CreateOpnsForOneSeg(aUci)
-            Else 'user wants multiple segments
-                Call CreateOpnsForMultSegs(aUci)
-            End If
+            CreateOpns(aUci)
 
             'add record to opn seq block for each reach
             For i As Integer = 0 To pWatershed.Reaches.Count - 1
@@ -392,30 +387,15 @@ Module modCreateUci
         End Try
     End Sub
 
-    Private Sub CreateOpnsForOneSeg(ByRef aUci As HspfUci)
-        Dim lUniqueNameCount As Integer
-        Dim lAddflag As Boolean
-        Dim lNewOperation As HspfOperation
-        Dim lToperId As Integer
+    Private Sub CreateOpnsForOneSeg(ByRef aUci As HspfUci, ByRef aBase As Integer, ByRef aModelSeg As Integer)
 
+        Dim lAddflag As Boolean
+        Dim lToperId As Integer
         For j As Integer = 2 To 1 Step -1
-            lUniqueNameCount = 0
+            Dim lUniqueNameCount As Integer = 0
             For Each lLandUse As LandUse In pWatershed.LandUses
                 If TypeId(lLandUse.Type) = j Then
-                    If lUniqueNameCount = 0 Then
-                        'add it
-                        lNewOperation = New HspfOperation
-                        lNewOperation.Uci = aUci
-                        lNewOperation.Name = pLandName(j)
-                        lToperId = 101
-                        pFirstSeg(j) = lToperId
-                        lNewOperation.Id = lToperId
-                        lLandUse.ModelID = lToperId
-                        pLastSeg(j) = lToperId
-                        lNewOperation.Description = lLandUse.Description
-                        aUci.OpnSeqBlock.Add(lNewOperation)
-                        lUniqueNameCount += 1
-                    Else
+                    If lLandUse.Reach.SegmentId = aModelSeg Then 'is this landuse part of this model segment?
                         lAddflag = True
                         For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
                             If lOperation.Description = lLandUse.Description And _
@@ -427,15 +407,18 @@ Module modCreateUci
                         Next lOperation
                         If lAddflag Then
                             lUniqueNameCount += 1
-                            lNewOperation = New HspfOperation
+                            Dim lNewOperation As New HspfOperation
                             lNewOperation.Uci = aUci
                             lNewOperation.Name = pLandName(j)
                             lNewOperation.Description = lLandUse.Description
-                            lToperId = 100 + lUniqueNameCount
+                            lToperId = (aBase * aModelSeg) + lUniqueNameCount
                             lNewOperation.Id = lToperId
                             lLandUse.ModelID = lToperId
                             pLastSeg(j) = lToperId
                             aUci.OpnSeqBlock.Add(lNewOperation)
+                            If lUniqueNameCount = 1 Then
+                                pFirstSeg(j) = lToperId
+                            End If
                         End If
                     End If
                 End If
@@ -452,7 +435,7 @@ Module modCreateUci
         Return lTypeId
     End Function
 
-    Private Sub CreateOpnsForMultSegs(ByRef aUci As HspfUci)
+    Private Sub CreateOpns(ByRef aUci As HspfUci)
 
         'prescan to see how many perlnds and implnds per segment
         Dim lImplndNames As New atcCollection
@@ -469,69 +452,41 @@ Module modCreateUci
             End If
         Next
 
-        'figure out the max number of digits in the reach ids
-        Dim lDigits As Integer = 0
+        'figure out the number of segments desired
+        Dim lSegmentIds As New atcCollection
         For Each lReach As Reach In pWatershed.Reaches
-            If lReach.Id.Length > lDigits Then
-                lDigits = lReach.Id.Length
+            If lSegmentIds.IndexFromKey(lReach.SegmentId) = -1 Then
+                lSegmentIds.Add(lReach.SegmentId)
             End If
         Next
 
+        pFirstSeg(1) = 99999
+        pLastSeg(1) = 0
+        pFirstSeg(2) = 99999
+        pLastSeg(2) = 0
         Dim lBase As Integer
-        If lDigits = 1 Or lDigits = 0 Then
+        If lSegmentIds.Count < 10 Then
             'use 101, 102, 201, 202 scheme
             lBase = 100
-        ElseIf lDigits = 2 And lPerlndNames.Count < 10 And lImplndNames.Count < 10 Then
+        ElseIf lSegmentIds.Count >= 10 And lPerlndNames.Count < 10 And lImplndNames.Count < 10 Then
             'use 11, 12, 21, 22 scheme
             lBase = 10
         Else
-            'too many to use the multiple seg scheme
+            'too many segments and land uses to use the multiple seg scheme
             Logger.Msg("There are too many segments to use this segmentation scheme." & vbCrLf & "Create will use the 'Grouped' scheme instead", MsgBoxStyle.OkOnly, "Create Problem")
-            Call CreateOpnsForOneSeg(aUci)
-            lBase = 0
+            lSegmentIds.Clear()
+            lSegmentIds.Add(1)
+            For Each lReach As Reach In pWatershed.Reaches
+                lReach.SegmentId = 1
+            Next
+            lBase = 100
         End If
 
-        If lBase > 0 Then
-            'create these perlnd operations
-            pFirstSeg(1) = 99999
-            pLastSeg(1) = 0
-            pFirstSeg(2) = 99999
-            pLastSeg(2) = 0
-            For Each lReach As Reach In pWatershed.Reaches
-                'loop through each reach
-                For lType As Integer = 1 To 2
-                    For Each lLandUse As LandUse In pWatershed.LandUses
-                        'look to see if this landuse rec goes to this reach
-                        If lLandUse.Reach.Id = lReach.Id Then
-                            'it does
-                            Dim lLandUseId As Integer = 0
-                            If lLandUse.Type = "PERLND" And lType = 1 Then
-                                lLandUseId = lPerlndNames.IndexFromKey(lLandUse.Description) + 1
-                            ElseIf lLandUse.Type = "IMPLND" And lType = 2 Then
-                                lLandUseId = lImplndNames.IndexFromKey(lLandUse.Description) + 1
-                            End If
-                            If lLandUseId > 0 Then
-                                'add this oper
-                                Dim lOpn As New HspfOperation
-                                lOpn.Uci = aUci
-                                lOpn.Name = lLandUse.Type
-                                Dim lOperId As Integer = (CDbl(lLandUse.Reach.Id) * lBase) + lLandUseId
-                                If lOperId < pFirstSeg(2) Then
-                                    pFirstSeg(2) = lOperId
-                                End If
-                                If lOperId > pLastSeg(2) Then
-                                    pLastSeg(2) = lOperId
-                                End If
-                                lOpn.Id = lOperId
-                                lOpn.Description = lLandUse.Description
-                                lLandUse.ModelID = lOperId
-                                aUci.OpnSeqBlock.Add(lOpn)
-                            End If
-                        End If
-                    Next
-                Next
-            Next
-        End If
+        'create these operations for each segment
+        For Each lSegmentId As Integer In lSegmentIds
+            'loop through each segment
+            CreateOpnsForOneSeg(aUci, lBase, lSegmentId)
+        Next
 
     End Sub
 

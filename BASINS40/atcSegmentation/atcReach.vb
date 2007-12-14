@@ -57,6 +57,17 @@ Public Class Reaches
                     lTempString = StrSplit(lCurrentRecord, lDelim, lQuote)
                     lReach.Manning = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
                     lReach.Order = Me.Count
+                    lTempString = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lTempString = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lTempString = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lTempString = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lTempString = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    lTempString = StrSplit(lCurrentRecord, lDelim, lQuote)
+                    If IsNumeric(lCurrentRecord) Then
+                        lReach.SegmentId = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
+                    Else
+                        lReach.SegmentId = 1
+                    End If
                     Me.Add(lReach)
                 End If
             Loop
@@ -82,4 +93,5 @@ Public Class Reach
     Public Width As Double     'Mean width
     Public Manning As Double   'Mannings n
     Public Order As Integer    'Order of reaches upstream to downstream
+    Public SegmentId As Integer  'Model Segment to which this reach and its contributing area belongs
 End Class

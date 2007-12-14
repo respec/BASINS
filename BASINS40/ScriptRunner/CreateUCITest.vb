@@ -52,7 +52,6 @@ Module CreateUCITest
                                          lMetWdmId, _
                                          lStartDate, _
                                          lEndDate, _
-                                         True, _
                                          lStarterUciName, lPollutantListFileName)
             lHspfUci.Save()
         End If
