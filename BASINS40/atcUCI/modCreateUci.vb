@@ -387,54 +387,6 @@ Module modCreateUci
         End Try
     End Sub
 
-    Private Sub CreateOpnsForOneSeg(ByRef aUci As HspfUci, ByRef aBase As Integer, ByRef aModelSeg As Integer)
-
-        Dim lAddflag As Boolean
-        Dim lToperId As Integer
-        For j As Integer = 2 To 1 Step -1
-            Dim lUniqueNameCount As Integer = 0
-            For Each lLandUse As LandUse In pWatershed.LandUses
-                If TypeId(lLandUse.Type) = j Then
-                    If lLandUse.Reach.SegmentId = aModelSeg Then 'is this landuse part of this model segment?
-                        lAddflag = True
-                        For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
-                            If lOperation.Description = lLandUse.Description And _
-                               lOperation.Name = pLandName(j) Then
-                                lAddflag = False
-                                lToperId = lOperation.Id
-                                lLandUse.ModelID = lToperId
-                            End If
-                        Next lOperation
-                        If lAddflag Then
-                            lUniqueNameCount += 1
-                            Dim lNewOperation As New HspfOperation
-                            lNewOperation.Uci = aUci
-                            lNewOperation.Name = pLandName(j)
-                            lNewOperation.Description = lLandUse.Description
-                            lToperId = (aBase * aModelSeg) + lUniqueNameCount
-                            lNewOperation.Id = lToperId
-                            lLandUse.ModelID = lToperId
-                            pLastSeg(j) = lToperId
-                            aUci.OpnSeqBlock.Add(lNewOperation)
-                            If lUniqueNameCount = 1 Then
-                                pFirstSeg(j) = lToperId
-                            End If
-                        End If
-                    End If
-                End If
-            Next
-        Next j
-    End Sub
-
-    Private Function TypeId(ByVal aType As String) As Integer
-        Dim lTypeId As Integer = 0
-        Select Case aType
-            Case "PERLND" : lTypeId = 2
-            Case "IMPLND" : lTypeId = 1
-        End Select
-        Return lTypeId
-    End Function
-
     Private Sub CreateOpns(ByRef aUci As HspfUci)
 
         'prescan to see how many perlnds and implnds per segment
@@ -485,10 +437,74 @@ Module modCreateUci
         'create these operations for each segment
         For Each lSegmentId As Integer In lSegmentIds
             'loop through each segment
-            CreateOpnsForOneSeg(aUci, lBase, lSegmentId)
+            CreateOpnsForOneSeg(aUci, lBase, lSegmentId, lPerlndNames, lImplndNames)
         Next
 
     End Sub
+
+    Private Sub CreateOpnsForOneSeg(ByRef aUci As HspfUci, ByRef aBase As Integer, ByRef aModelSeg As Integer, _
+                                    ByRef aPerlndNames As atcCollection, ByRef aImplndNames As atcCollection)
+
+        Dim lAddflag As Boolean
+        Dim lToperId As Integer
+        For j As Integer = 2 To 1 Step -1 'loop through perlnds then implnds
+            Dim lUniqueNameCount As Integer = 0
+            For Each lLandUse As LandUse In pWatershed.LandUses 'loop through each landuse record
+                If TypeId(lLandUse.Type) = j Then
+                    If lLandUse.Reach.SegmentId = aModelSeg Then 'is this landuse part of this model segment?
+                        lAddflag = True
+                        For Each lOperation As HspfOperation In aUci.OpnSeqBlock.Opns
+                            If lOperation.Description = lLandUse.Description And _
+                               lOperation.Name = pLandName(j) And _
+                               lLandUse.ModelID > 0 Then
+                                'have already added one of these for this model segment, so don't add again
+                                lAddflag = False
+                                lToperId = lOperation.Id
+                            End If
+                        Next lOperation
+                        If lAddflag Then
+                            lUniqueNameCount += 1
+                            Dim lNewOperation As New HspfOperation
+                            lNewOperation.Uci = aUci
+                            lNewOperation.Name = pLandName(j)
+                            lNewOperation.Description = lLandUse.Description
+                            If aPerlndNames.IndexFromKey(lLandUse.Description) > -1 Then
+                                lToperId = (aBase * aModelSeg) + aPerlndNames.IndexFromKey(lLandUse.Description) + 1
+                            ElseIf aImplndNames.IndexFromKey(lLandUse.Description) > -1 Then
+                                lToperId = (aBase * aModelSeg) + aImplndNames.IndexFromKey(lLandUse.Description) + 1
+                            Else
+                                lToperId = (aBase * aModelSeg) + lUniqueNameCount
+                            End If
+                            lNewOperation.Id = lToperId
+                            lLandUse.ModelID = lToperId
+                            pLastSeg(j) = lToperId
+                            aUci.OpnSeqBlock.Add(lNewOperation)
+                            If lUniqueNameCount = 1 Then
+                                pFirstSeg(j) = lToperId
+                            End If
+                            'set the model id for any other records of this type, segment, and description
+                            For Each lLandUseCheck As LandUse In pWatershed.LandUses
+                                If lLandUse.Type = lLandUseCheck.Type And _
+                                   lLandUse.Reach.SegmentId = lLandUseCheck.Reach.SegmentId And _
+                                   lLandUse.Description = lLandUseCheck.Description Then
+                                    lLandUseCheck.ModelID = lToperId
+                                End If
+                            Next
+                        End If
+                    End If
+                End If
+            Next
+        Next j
+    End Sub
+
+    Private Function TypeId(ByVal aType As String) As Integer
+        Dim lTypeId As Integer = 0
+        Select Case aType
+            Case "PERLND" : lTypeId = 2
+            Case "IMPLND" : lTypeId = 1
+        End Select
+        Return lTypeId
+    End Function
 
     Public Function WDMInd(ByRef wdmid As String) As Integer
         Dim w As String
