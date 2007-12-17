@@ -223,7 +223,7 @@ namespace ZedGraph
         {
             int ticInt = (int)tic;
             if (ticInt >= 0 && ticInt < Percentages.Length)
-                return Percentages[ticInt] / 100.0;
+                return Linearize(Percentages[ticInt] / 100.0);
             else
                 return 0;
         }
@@ -402,7 +402,7 @@ namespace ZedGraph
                 for (int i = firstTic; i < lNtics + firstTic; i++)
                 {
                     dVal = CalcMajorTicValue(baseVal, i);
-                    double linVal = Linearize(dVal);
+                    double linVal = dVal; // Linearize(dVal);
 
                     // If we're before the start of the scale, just go to the next tic
                     if (linVal < _minLinTemp)
