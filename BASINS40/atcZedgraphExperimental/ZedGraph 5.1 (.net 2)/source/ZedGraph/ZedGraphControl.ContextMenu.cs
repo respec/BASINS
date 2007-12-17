@@ -383,7 +383,8 @@ namespace ZedGraph
 					String ext = System.IO.Path.GetExtension( DefaultFileName ).ToLower();
 					switch (ext)
 					{
-						case ".emf": _saveFileDialog.FilterIndex = 1; break;
+						case ".emf":
+						case ".wmf": _saveFileDialog.FilterIndex = 1; break;
 						case ".png": _saveFileDialog.FilterIndex = 2; break;
 						case ".gif": _saveFileDialog.FilterIndex = 3; break;
 						case ".jpeg":
@@ -401,37 +402,53 @@ namespace ZedGraph
 
 				if ( _saveFileDialog.ShowDialog() == DialogResult.OK )
 				{
-					Stream myStream = _saveFileDialog.OpenFile();
-					if ( myStream != null )
-					{
-						if ( _saveFileDialog.FilterIndex == 1 )
-						{
-							myStream.Close();
-							SaveEmfFile( _saveFileDialog.FileName );
-						}
-						else
-						{
-							ImageFormat format = ImageFormat.Png;
-                            switch (_saveFileDialog.FilterIndex)
-							{
-								case 2: format = ImageFormat.Png; break;
-								case 3: format = ImageFormat.Gif; break;
-								case 4: format = ImageFormat.Jpeg; break;
-								case 5: format = ImageFormat.Tiff; break;
-								case 6: format = ImageFormat.Bmp; break;
-							}
-
-							ImageRender().Save( myStream, format );
-							//_masterPane.GetImage().Save( myStream, format );
-							myStream.Close();
-						}
-                        return _saveFileDialog.FileName;
-					}
+					SaveIn( _saveFileDialog.FileName );
+					return _saveFileDialog.FileName;
 				}
 			}
 			return "";
 		}
 
+		/// <summary>
+		/// Save the current graph in a file without asking the user.
+		/// </summary>
+		/// <param name="fileName">
+		/// Full path of file to save in. Extension describes which format the file will be.
+		/// (.emf .png .gif .jpg .tif or .bmp)
+		/// </param>
+		/// <remarks>
+		/// See also <see cref="SaveAs()" /> <see cref="SaveAsBitmap" /> and <see cref="SaveAsEmf" /> methods.
+		/// </remarks>
+		public void SaveIn( String fileName )
+		{
+			ImageFormat format = ImageFormat.Png;
+			switch ( System.IO.Path.GetExtension(fileName).ToLower() )
+			{
+				case ".emf":
+				case ".wmf" : format = ImageFormat.Emf; break;
+				case ".png": format = ImageFormat.Png; break;
+				case ".gif": format = ImageFormat.Gif; break;
+				case ".jpeg":
+				case ".jpg": format = ImageFormat.Jpeg; break;
+				case ".tiff":
+				case ".tif": format = ImageFormat.Tiff; break;
+				case ".bmp": format = ImageFormat.Bmp; break;
+			}
+			if ( format == ImageFormat.Emf || format == ImageFormat.Wmf )
+			{
+				SaveEmfFile( fileName );
+			}
+			else
+			{
+				Stream myStream = new System.IO.FileStream( fileName, FileMode.Create );
+				if (myStream != null)
+				{
+					ImageRender().Save( myStream, format );
+					myStream.Close();
+				}
+			}
+		}
+			
 		/// <summary>
 		/// Handler for the "Save Image As" context menu item.  Copies the current image to the selected
 		/// Bitmap file.

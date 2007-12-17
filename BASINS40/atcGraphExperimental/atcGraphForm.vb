@@ -34,6 +34,7 @@ Public Class atcGraphForm
     Private pXAxisType As AxisType = AxisType.DateMulti
     Private pYAxisType As AxisType = AxisType.Linear
 
+    Private Const DefaultAxisLabelFormat As String = "#,##0.###"
     Private Shared SaveImageExtension As String = ".png"
     Friend WithEvents mnuViewScatter As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
@@ -90,6 +91,7 @@ Public Class atcGraphForm
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
                 .MinorTic.IsOpposite = True
+                .Scale.Format = DefaultAxisLabelFormat
             End With
             With .X2Axis
                 .IsVisible = False
@@ -101,7 +103,7 @@ Public Class atcGraphForm
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
-                .Scale.Format = "#,###.###"
+                .Scale.Format = DefaultAxisLabelFormat
                 .Scale.Align = AlignP.Inside
             End With
             With .Y2Axis
@@ -109,7 +111,7 @@ Public Class atcGraphForm
                 .MajorTic.IsInside = True
                 .MinorTic.IsOutside = False
                 .MinorTic.IsInside = True
-                .Scale.Format = "#,###.###"
+                .Scale.Format = DefaultAxisLabelFormat
                 .Scale.Align = AlignP.Inside
             End With
             With .Legend
