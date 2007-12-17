@@ -908,4 +908,80 @@ Finished:
                 aTimeseries.Attributes.SetValue(lAttrName, lBin.Item(lPercentileIndex - lAccumulatedCount))
         End Select
     End Sub
+
+    ''' <summary>
+    ''' fit a line through a set of data points using least squares regression.
+    ''' </summary>
+    ''' <param name="aTSer1"></param>
+    ''' <param name="aTSer2"></param>
+    ''' <param name="aACoef">'a' coefficient in regression line (y=ax+b)</param>
+    ''' <param name="aBCoef">'b' coefficient in regression line (y=ax+b)</param>
+    ''' <param name="aRSquare">'r squared', the coefficient of determination</param>
+    ''' <remarks>from fortran-newaqt-FITLIN</remarks>
+    Public Sub FitLine(ByVal aTSer1 As atcTimeseries, ByVal aTSer2 As atcTimeseries, _
+                ByRef aACoef As Double, ByRef aBCoef As Double, ByRef aRSquare As Double)
+        'TODO: make this more robust - check time spans, time interval, etc
+        Dim lNote As String = ""
+        Dim lSum1 As Double = 0.0
+        Dim lVal1 As Double
+        Dim lAvg1 As Double
+
+        Dim lSum2 As Double = 0.0
+        Dim lVal2 As Double
+        Dim lAvg2 As Double
+        Dim lSkipCount As Integer = 0
+        Dim lGoodCount As Integer = 0
+
+        For lIndex As Integer = 1 To aTSer1.numValues
+            lVal1 = aTSer1.Values(lIndex)
+            lVal2 = aTSer2.Values(lIndex)
+            If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
+                lSum1 += lVal1
+                lSum2 += lVal2
+                lGoodCount += 1
+            Else
+                lSkipCount += 1
+                If lSkipCount = 1 Then
+                    lNote = "*** Note - compare skipped index " & lIndex
+                End If
+            End If
+        Next
+        If lNote.Length > 0 Then
+            lNote &= " and " & lSkipCount - 1 & " more" & vbCrLf
+        End If
+
+        If (lSum1 > 0.0 And lSum2 > 0.0 And lGoodCount > 0) Then 'go ahead and compute
+            lAvg1 = lSum1 / lGoodCount
+            lAvg2 = lSum2 / lGoodCount
+
+            Dim lSum3 As Double = 0.0
+            Dim lSum4 As Double = 0.0
+            For lIndex As Integer = 1 To aTSer1.numValues
+                lVal1 = aTSer1.Values(lIndex)
+                lVal2 = aTSer2.Values(lIndex)
+                If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
+                    lSum3 += (lVal1 - lAvg1) * (lVal2 - lAvg2)
+                    lSum4 += (lVal2 - lAvg2) * (lVal2 - lAvg2)
+                End If
+            Next lIndex
+            aACoef = lSum3 / lSum4
+            aBCoef = lAvg1 - (aACoef * lAvg2)
+
+            lSum1 = 0
+            lSum2 = 0
+            For lIndex As Integer = 1 To aTSer1.numValues
+                lVal1 = aTSer1.Values(lIndex)
+                lVal2 = aTSer2.Values(lIndex)
+                If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
+                    lSum1 += ((aACoef * lVal2 + aBCoef - lAvg1) * (aACoef * lVal2) + aBCoef - lAvg1)
+                    lSum2 += (lVal1 - lAvg1) * (lVal1 - lAvg1)
+                End If
+            Next lIndex
+            aRSquare = lSum1 / lSum2
+        Else 'regression doesnt make sense, return NaN
+            aACoef = Double.NaN
+            aBCoef = Double.NaN
+            aRSquare = Double.NaN
+        End If
+    End Sub
 End Module
