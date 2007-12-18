@@ -61,6 +61,10 @@ namespace ZedGraph
             this.cboWhichCurve = new System.Windows.Forms.ComboBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.btnApply = new System.Windows.Forms.Button();
+            this.txtAxisMinorGridColor = new System.Windows.Forms.TextBox();
+            this.lblAxisMinorGrid = new System.Windows.Forms.Label();
+            this.chkAxisMinorGridVisible = new System.Windows.Forms.CheckBox();
+            this.lblAxisMinorGridColor = new System.Windows.Forms.Label();
             this.grpAxis.SuspendLayout();
             this.grpCurve.SuspendLayout();
             this.SuspendLayout();
@@ -69,6 +73,10 @@ namespace ZedGraph
             // 
             this.grpAxis.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpAxis.Controls.Add(this.lblAxisMinorGridColor);
+            this.grpAxis.Controls.Add(this.txtAxisMinorGridColor);
+            this.grpAxis.Controls.Add(this.lblAxisMinorGrid);
+            this.grpAxis.Controls.Add(this.chkAxisMinorGridVisible);
             this.grpAxis.Controls.Add(this.txtAxisMajorGridColor);
             this.grpAxis.Controls.Add(this.lblAxisMajorGridColor);
             this.grpAxis.Controls.Add(this.lblAxisMajorGrid);
@@ -89,7 +97,7 @@ namespace ZedGraph
             this.grpAxis.Controls.Add(this.cboWhichAxis);
             this.grpAxis.Location = new System.Drawing.Point(6, 6);
             this.grpAxis.Name = "grpAxis";
-            this.grpAxis.Size = new System.Drawing.Size(298, 150);
+            this.grpAxis.Size = new System.Drawing.Size(298, 165);
             this.grpAxis.TabIndex = 5;
             this.grpAxis.TabStop = false;
             this.grpAxis.Text = "Axis Properties";
@@ -288,7 +296,7 @@ namespace ZedGraph
             this.grpCurve.Controls.Add(this.lblCurve);
             this.grpCurve.Controls.Add(this.cboCurveAxis);
             this.grpCurve.Controls.Add(this.cboWhichCurve);
-            this.grpCurve.Location = new System.Drawing.Point(6, 162);
+            this.grpCurve.Location = new System.Drawing.Point(6, 177);
             this.grpCurve.Name = "grpCurve";
             this.grpCurve.Size = new System.Drawing.Size(298, 126);
             this.grpCurve.TabIndex = 6;
@@ -395,7 +403,7 @@ namespace ZedGraph
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(6, 294);
+            this.btnApply.Location = new System.Drawing.Point(6, 309);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(75, 23);
             this.btnApply.TabIndex = 7;
@@ -403,11 +411,51 @@ namespace ZedGraph
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
+            // txtAxisMinorGridColor
+            // 
+            this.txtAxisMinorGridColor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.txtAxisMinorGridColor.Location = new System.Drawing.Point(201, 138);
+            this.txtAxisMinorGridColor.Name = "txtAxisMinorGridColor";
+            this.txtAxisMinorGridColor.Size = new System.Drawing.Size(91, 20);
+            this.txtAxisMinorGridColor.TabIndex = 29;
+            this.toolTip1.SetToolTip(this.txtAxisMinorGridColor, "Color of Major Grid");
+            this.txtAxisMinorGridColor.Click += new System.EventHandler(this.txtAxisMinorGridColor_Click);
+            // 
+            // lblAxisMinorGrid
+            // 
+            this.lblAxisMinorGrid.AutoSize = true;
+            this.lblAxisMinorGrid.Location = new System.Drawing.Point(6, 141);
+            this.lblAxisMinorGrid.Name = "lblAxisMinorGrid";
+            this.lblAxisMinorGrid.Size = new System.Drawing.Size(55, 13);
+            this.lblAxisMinorGrid.TabIndex = 28;
+            this.lblAxisMinorGrid.Text = "Minor Grid";
+            this.toolTip1.SetToolTip(this.lblAxisMinorGrid, "Range of data currently displayed");
+            // 
+            // chkAxisMinorGridVisible
+            // 
+            this.chkAxisMinorGridVisible.AutoSize = true;
+            this.chkAxisMinorGridVisible.Location = new System.Drawing.Point(81, 140);
+            this.chkAxisMinorGridVisible.Name = "chkAxisMinorGridVisible";
+            this.chkAxisMinorGridVisible.Size = new System.Drawing.Size(55, 17);
+            this.chkAxisMinorGridVisible.TabIndex = 27;
+            this.chkAxisMinorGridVisible.Text = "visible";
+            this.chkAxisMinorGridVisible.UseVisualStyleBackColor = true;
+            // 
+            // lblAxisMinorGridColor
+            // 
+            this.lblAxisMinorGridColor.AutoSize = true;
+            this.lblAxisMinorGridColor.Location = new System.Drawing.Point(164, 141);
+            this.lblAxisMinorGridColor.Name = "lblAxisMinorGridColor";
+            this.lblAxisMinorGridColor.Size = new System.Drawing.Size(31, 13);
+            this.lblAxisMinorGridColor.TabIndex = 30;
+            this.lblAxisMinorGridColor.Text = "Color";
+            this.toolTip1.SetToolTip(this.lblAxisMinorGridColor, "Range of data currently displayed");
+            // 
             // frmEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(310, 326);
+            this.ClientSize = new System.Drawing.Size(310, 339);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.grpCurve);
             this.Controls.Add(this.grpAxis);
@@ -455,6 +503,10 @@ namespace ZedGraph
         private System.Windows.Forms.Label lblCurveColor;
         private System.Windows.Forms.Label lblCurveWidth;
         private System.Windows.Forms.TextBox txtCurveWidth;
+        private System.Windows.Forms.Label lblAxisMinorGridColor;
+        private System.Windows.Forms.TextBox txtAxisMinorGridColor;
+        private System.Windows.Forms.Label lblAxisMinorGrid;
+        private System.Windows.Forms.CheckBox chkAxisMinorGridVisible;
 
     }
 }

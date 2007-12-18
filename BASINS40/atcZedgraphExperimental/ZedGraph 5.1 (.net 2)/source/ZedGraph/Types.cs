@@ -75,8 +75,8 @@ namespace ZedGraph
 		Exponent,
 		/// <summary> A probability axis </summary>
 		Probability,
-		/// <summary> A cartesian axis with calendar dates or times using one or more rows of labeling </summary>
-		DateMulti
+		/// <summary> A cartesian axis with calendar dates or times using one or two rows of labeling </summary>
+		DateDual
 	}
 
 	/// <summary>

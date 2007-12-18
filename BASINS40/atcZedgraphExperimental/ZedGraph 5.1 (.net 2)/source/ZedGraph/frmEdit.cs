@@ -75,7 +75,7 @@ namespace ZedGraph
                 txtAxisDisplayMaximum.Text = aAxis.Scale.Max.ToString();
                 switch (aAxis.Type)
                 {
-                    case AxisType.DateMulti:
+                    case AxisType.DateDual:
                         cboAxisType.SelectedIndex = 0;
                         txtAxisDisplayMinimum.Text = XDate.ToString(aAxis.Scale.Min);
                         txtAxisDisplayMaximum.Text = XDate.ToString(aAxis.Scale.Max);
@@ -86,6 +86,8 @@ namespace ZedGraph
                 }
                 chkAxisMajorGridVisible.Checked = aAxis.MajorGrid.IsVisible;
                 txtAxisMajorGridColor.BackColor = aAxis.MajorGrid.Color;
+                chkAxisMinorGridVisible.Checked = aAxis.MinorGrid.IsVisible;
+                txtAxisMinorGridColor.BackColor = aAxis.MinorGrid.Color;
             }
         }
 
@@ -107,7 +109,7 @@ namespace ZedGraph
                 switch (cboAxisType.SelectedIndex)
                 {
                     case 0: 
-                        lNewType = AxisType.DateMulti;
+                        lNewType = AxisType.DateDual;
                         //TODO: parse min/max date from textboxes
                         break;
                     case 1: lNewType = AxisType.Linear;    break;
@@ -120,6 +122,8 @@ namespace ZedGraph
                 }
                 aAxis.MajorGrid.IsVisible = chkAxisMajorGridVisible.Checked;
                 aAxis.MajorGrid.Color = txtAxisMajorGridColor.BackColor;
+                aAxis.MinorGrid.IsVisible = chkAxisMinorGridVisible.Checked;
+                aAxis.MinorGrid.Color = txtAxisMinorGridColor.BackColor;
             }
         }
 
@@ -201,6 +205,16 @@ namespace ZedGraph
             if (lColorDialog.ShowDialog() == DialogResult.OK)
             {
                 txtCurveColor.BackColor = lColorDialog.Color;
+            }
+        }
+
+        private void txtAxisMinorGridColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog lColorDialog = new ColorDialog();
+            lColorDialog.Color = txtAxisMinorGridColor.BackColor;
+            if (lColorDialog.ShowDialog() == DialogResult.OK)
+            {
+                txtAxisMinorGridColor.BackColor = lColorDialog.Color;
             }
         }
    }

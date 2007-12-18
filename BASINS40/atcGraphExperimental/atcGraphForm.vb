@@ -31,10 +31,12 @@ Public Class atcGraphForm
     Private WithEvents pDataGroup As atcDataGroup
     Private pNumProbabilityPoints As Integer = 200
 
-    Private pXAxisType As AxisType = AxisType.DateMulti
+    Private pXAxisType As AxisType = AxisType.DateDual
     Private pYAxisType As AxisType = AxisType.Linear
 
     Private Const DefaultAxisLabelFormat As String = "#,##0.###"
+    Private Shared DefaultMajorGridColor As Color = Color.FromArgb(255, 200, 200, 200)
+    Private Shared DefaultMinorGridColor As Color = Color.FromArgb(255, 240, 240, 240)
     Private Shared SaveImageExtension As String = ".png"
     Friend WithEvents mnuViewScatter As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
@@ -92,6 +94,18 @@ Public Class atcGraphForm
                 .MinorTic.IsInside = True
                 .MinorTic.IsOpposite = True
                 .Scale.Format = DefaultAxisLabelFormat
+                With .MajorGrid
+                    .Color = DefaultMajorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+                With .MinorGrid
+                    .Color = DefaultMinorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
             End With
             With .X2Axis
                 .IsVisible = False
@@ -105,6 +119,18 @@ Public Class atcGraphForm
                 .MinorTic.IsInside = True
                 .Scale.Format = DefaultAxisLabelFormat
                 .Scale.Align = AlignP.Inside
+                With .MajorGrid
+                    .Color = DefaultMajorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+                With .MinorGrid
+                    .Color = DefaultMinorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
             End With
             With .Y2Axis
                 .MajorTic.IsOutside = False
@@ -113,6 +139,18 @@ Public Class atcGraphForm
                 .MinorTic.IsInside = True
                 .Scale.Format = DefaultAxisLabelFormat
                 .Scale.Align = AlignP.Inside
+                With .MajorGrid
+                    .Color = DefaultMajorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+                With .MinorGrid
+                    .Color = DefaultMinorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
             End With
             With .Legend
                 .Position = LegendPos.Float
@@ -218,7 +256,7 @@ Public Class atcGraphForm
 
     <CLSCompliant(False)> _
     Public Sub New(Optional ByVal aDataGroup As atcData.atcDataGroup = Nothing, _
-                   Optional ByVal aXAxisType As ZedGraph.AxisType = AxisType.DateMulti, _
+                   Optional ByVal aXAxisType As ZedGraph.AxisType = AxisType.DateDual, _
                    Optional ByVal aYAxisType As ZedGraph.AxisType = AxisType.Linear)
         MyBase.New()
         InitializeComponent() 'required by Windows Form Designer
@@ -230,7 +268,7 @@ Public Class atcGraphForm
             Case AxisType.Probability
                 mnuViewProbability.Checked = True
                 mnuViewTime.Checked = False
-            Case AxisType.Date, AxisType.DateMulti
+            Case AxisType.Date, AxisType.DateDual
                 mnuViewTime.Checked = True
             Case AxisType.Linear
                 mnuViewScatter.Checked = True
@@ -753,7 +791,7 @@ Public Class atcGraphForm
         lYAxis.IsVisible = True
 
         With lPane
-            If .XAxis.Type <> AxisType.DateMulti Then .XAxis.Type = AxisType.DateMulti
+            If .XAxis.Type <> AxisType.DateDual Then .XAxis.Type = AxisType.DateDual
             .XAxis.Title.Text = "" 'TODO: remove this when spacing works for title on date axis
             If aTimeseries.Attributes.GetValue("point", False) Then
                 lCurve = .AddCurve(lCurveLabel, New atcTimeseriesPointList(aTimeseries), lCurveColor, SymbolType.Plus)
@@ -933,7 +971,7 @@ Public Class atcGraphForm
                 ' Convert the mouse location to X, Y scale values
                 lPane.ReverseTransform(mousePt, x, y)
                 ' Format the status label text
-                If lPane.XAxis.Type = AxisType.DateMulti Then
+                If lPane.XAxis.Type = AxisType.DateDual Then
                     lPositionText = DumpDate(x)
                 Else
                     lPositionText = DoubleToString(x)
