@@ -818,8 +818,8 @@ namespace ZedGraph
 					return new LinearAsOrdinalScale( oldScale, _ownerAxis );
 				case AxisType.Probability:
 					return new ProbabilityScale(oldScale, _ownerAxis);
-				case AxisType.DateMulti:
-					return new DateMultiScale(oldScale, _ownerAxis);
+				case AxisType.DateDual:
+					return new DateDualScale(oldScale, _ownerAxis);
 				default:
 					throw new Exception( "Implementation Error: Invalid AxisType" );
 			}
@@ -2101,7 +2101,7 @@ namespace ZedGraph
 			}
 		}
 
-		internal void DrawGrid( Graphics g, GraphPane pane, double baseVal, float topPix, float scaleFactor )
+		virtual internal void DrawGrid( Graphics g, GraphPane pane, double baseVal, float topPix, float scaleFactor )
 		{
 			MajorTic tic = _ownerAxis._majorTic;
 			MajorGrid grid = _ownerAxis._majorGrid;

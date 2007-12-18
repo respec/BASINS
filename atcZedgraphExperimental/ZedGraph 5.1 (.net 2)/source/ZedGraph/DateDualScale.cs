@@ -46,7 +46,7 @@ namespace ZedGraph
 	/// <author> John Champion, Mark Gray </author>
 	/// <version> $Revision: 1.12 $ $Date: 2006/08/25 05:19:09 $ </version>
 	[Serializable]
-	class DateMultiScale : Scale, ISerializable //, ICloneable
+	class DateDualScale : Scale, ISerializable //, ICloneable
 	{
 		/// <summary> Full names of months for labeling when there is room </summary>
 		private string[] MonthNamesFull = System.Globalization.DateTimeFormatInfo.CurrentInfo.MonthNames; //{"", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
@@ -68,7 +68,7 @@ namespace ZedGraph
 		/// (containing object) for this new object.
 		/// </summary>
 		/// <param name="owner">The owner, or containing object, of this instance</param>
-		public DateMultiScale( Axis owner )
+		public DateDualScale( Axis owner )
 			: base( owner )
 		{
 			_ownerAxis._majorTic.IsInside = true;
@@ -83,7 +83,7 @@ namespace ZedGraph
 		/// <param name="rhs">The <see cref="DateScale" /> object from which to copy</param>
 		/// <param name="owner">The <see cref="Axis" /> object that will own the
 		/// new instance of <see cref="DateScale" /></param>
-		public DateMultiScale( Scale rhs, Axis owner )
+		public DateDualScale( Scale rhs, Axis owner )
 			: base( rhs, owner )
 		{
 		}
@@ -96,7 +96,7 @@ namespace ZedGraph
 		/// <returns>A new <see cref="Scale" /> clone.</returns>
 		public override Scale Clone( Axis owner )
 		{
-			return new DateMultiScale( this, owner );
+			return new DateDualScale( this, owner );
 		}
 
 	#endregion
@@ -775,7 +775,7 @@ namespace ZedGraph
 		/// </param>
 		/// <param name="context">A <see cref="StreamingContext"/> instance that contains the serialized data
 		/// </param>
-		protected DateMultiScale(SerializationInfo info, StreamingContext context)
+		protected DateDualScale(SerializationInfo info, StreamingContext context)
 			: base(info, context)
 		{
 			// The schema value is just a file version parameter.  You can use it to make future versions
