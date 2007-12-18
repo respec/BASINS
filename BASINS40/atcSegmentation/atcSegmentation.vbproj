@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="atcChannel.vb" />
     <Compile Include="atcLandUse.vb" />
+    <Compile Include="atcMetSegment.vb" />
     <Compile Include="atcPointLoad.vb" />
     <Compile Include="atcReach.vb" />
     <Compile Include="atcWatershed.vb" />
