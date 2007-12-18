@@ -43,8 +43,12 @@ Module modCreateUci
         Dim lEchoFileName As String = ""
         Dim lFilesBlockStatus As Boolean = aUci.PreScanFilesBlock(lEchoFileName)
 
-        'build initial met segment 
-        DefaultBASINSMetseg(aUci, aMetBaseDsn, aMetWdmId)
+        If aWatershed.MetSegments Is Nothing Then
+            'build initial met segment 
+            DefaultBASINSMetseg(aUci, aMetBaseDsn, aMetWdmId)
+        Else
+            CreateBASINSMetsegs(aUci)
+        End If
 
         aUci.Initialized = True
 
@@ -285,7 +289,43 @@ Module modCreateUci
             Dim lOpTypes() As String = {"PERLND", "IMPLND", "RCHRES"} 'operations with assoc met segs
             For Each lOpTyp As String In lOpTypes
                 For Each lOpn As HspfOperation In aUci.OpnBlks.Item(lOpTyp).Ids
-                    lOpn.MetSeg = aUci.MetSegs.Item(0)
+                    If aUci.MetSegs.Count = 1 Then
+                        lOpn.MetSeg = aUci.MetSegs.Item(0)
+                    Else
+                        'figure out which met seg to use
+                        Dim lOpnSet As Boolean = False
+                        If lOpTyp = "RCHRES" Then
+                            For Each lReach As Reach In pWatershed.Reaches
+                                If lReach.Id = lOpn.Id Then
+                                    For Each lMetSeg As HspfMetSeg In aUci.MetSegs
+                                        If lMetSeg.Id = lReach.SegmentId Then
+                                            lOpn.MetSeg = lMetSeg
+                                            lOpnSet = True
+                                            Exit For
+                                        End If
+                                    Next
+                                    Exit For
+                                End If
+                            Next
+                        Else  'PERLND or IMPLND
+                            For Each lLanduse As LandUse In pWatershed.LandUses
+                                If lLanduse.Type = lOpTyp And lLanduse.ModelID = lOpn.Id Then
+                                    For Each lMetSeg As HspfMetSeg In aUci.MetSegs
+                                        If lMetSeg.Id = lLanduse.Reach.SegmentId Then
+                                            lOpn.MetSeg = lMetSeg
+                                            lOpnSet = True
+                                            Exit For
+                                        End If
+                                    Next
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        If Not lOpnSet Then
+                            'if you haven't been able to find a corresponding met seg, just use the first one
+                            lOpn.MetSeg = aUci.MetSegs.Item(0)
+                        End If
+                    End If
                 Next
             Next
         Else
@@ -848,6 +888,33 @@ Module modCreateUci
         lMetSeg.ExpandMetSegName(aMetWdmId, aMetBaseDsn)
         lMetSeg.Id = aUci.MetSegs.Count + 1
         aUci.MetSegs.Add(lMetSeg)
+
+    End Sub
+
+    Private Sub CreateBASINSMetsegs(ByVal aUci As HspfUci)
+
+        For Each lMetSegment As MetSegment In pWatershed.MetSegments
+            Dim lMetSeg As New HspfMetSeg
+            lMetSeg.Uci = aUci
+            For lRecordIndex As Integer = 1 To 7
+                lMetSeg.MetSegRec(lRecordIndex).Source.VolName = lMetSegment.WdmId(lRecordIndex)
+                lMetSeg.MetSegRec(lRecordIndex).Source.VolId = lMetSegment.Dsn(lRecordIndex)
+                lMetSeg.MetSegRec(lRecordIndex).Source.Member = lMetSegment.Tstype(lRecordIndex)
+                lMetSeg.MetSegRec(lRecordIndex).MFactP = lMetSegment.MfactPI(lRecordIndex)
+                lMetSeg.MetSegRec(lRecordIndex).MFactR = lMetSegment.MfactR(lRecordIndex)
+                lMetSeg.MetSegRec(lRecordIndex).Ssystem = "ENGL"
+                lMetSeg.MetSegRec(lRecordIndex).Tran = "SAME"
+                lMetSeg.MetSegRec(lRecordIndex).Typ = lRecordIndex
+                If lRecordIndex = 1 Then
+                    lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = "ZERO"
+                Else
+                    lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = ""
+                End If
+            Next
+            lMetSeg.ExpandMetSegName(lMetSegment.WdmId(1), lMetSegment.Dsn(1))
+            lMetSeg.Id = lMetSegment.Id
+            aUci.MetSegs.Add(lMetSeg)
+        Next
 
     End Sub
 

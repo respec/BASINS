@@ -3,6 +3,7 @@ Public Class Watershed
     Public Reaches As Reaches
     Public Channels As Channels
     Public PointLoads As PointLoads
+    Public MetSegments As MetSegments
     Public Name As String = ""
 
     Public Function Open(ByVal aName As String) As Integer
@@ -23,6 +24,12 @@ Public Class Watershed
         If Not PointLoads Is Nothing Then PointLoads = Nothing
         PointLoads = New PointLoads
         lReturnCode += Me.PointLoads.Open(Me)
+
+        If Not MetSegments Is Nothing Then MetSegments = Nothing
+        MetSegments = New MetSegments
+        If Me.MetSegments.Open(Me) <> 0 Then
+            MetSegments = Nothing
+        End If
 
         Return lReturnCode
     End Function
