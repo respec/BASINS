@@ -1,6 +1,7 @@
 Imports atcUtility
 Imports atcData
 Imports atcWDM
+Imports atcGraph
 Imports HspfSupport
 Imports MapWindow.Interfaces
 Imports ZedGraph
@@ -132,7 +133,7 @@ Module Graph
                                         lExpertSystem.EDateJ, Nothing))
             lGraphForm = New atcGraph.atcGraphForm(lDataGroup)
             With lGraphForm.Pane
-                .YAxis.Scale.Min = 1
+                .YAxis.Scale.Min = 0
                 .YAxis.Scale.Max = lYMax
                 .YAxis.Title.Text = lCons & " (cfs)"
                 .XAxis.Title.Text = "Daily Mean Flow at " & lSite
@@ -162,39 +163,5 @@ Module Graph
 
             OpenFile(lOutFileName & ".png")
         Next lSiteIndex
-    End Sub
-
-    Private Sub AddLine(ByVal aPane As ZedGraph.GraphPane, _
-                        ByVal aACoef As Double, ByVal aBCoef As Double, _
-                        Optional ByVal aLineStyle As Drawing.Drawing2D.DashStyle = Drawing.Drawing2D.DashStyle.Solid)
-        With aPane
-            Dim lXValues(1) As Double
-            lXValues(0) = .XAxis.Scale.Min
-            lXValues(1) = .XAxis.Scale.Max
-            Dim lYValues(1) As Double
-            lYValues(0) = (aACoef * lXValues(0)) + aBCoef
-            lYValues(1) = (aACoef * lXValues(1)) + aBCoef
-            Dim lCurve As LineItem = Nothing
-            lCurve = .AddCurve("", lXValues, lYValues, Drawing.Color.Blue, SymbolType.None)
-            lCurve.Line.Style = aLineStyle
-            .CurveList.Add(lCurve)
-        End With
-    End Sub
-
-    Private Sub SetGraphSpecs(ByRef aGraphForm As atcGraph.atcGraphForm)
-        aGraphForm.WindowState = Windows.Forms.FormWindowState.Maximized
-        With aGraphForm.Pane
-            .YAxis.MajorGrid.IsVisible = True
-            .YAxis.MinorGrid.IsVisible = True
-            With .CurveList(0)
-                .Label.Text = "Simulated"
-                .Color = System.Drawing.Color.Red
-            End With
-            With .CurveList(1)
-                .Label.Text = "Observed"
-                .Color = System.Drawing.Color.Blue
-            End With
-        End With
-        Windows.Forms.Application.DoEvents()
     End Sub
 End Module
