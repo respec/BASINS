@@ -27,11 +27,11 @@ using System.Security.Permissions;
 namespace ZedGraph
 {
 	/// <summary>
-	/// The DateMultiScale class inherits from the <see cref="Scale" /> class, and implements
-	/// the features specific to <see cref="AxisType.DateMulti" />.
+	/// The DateDualScale class inherits from the <see cref="Scale" /> class, and implements
+	/// the features specific to <see cref="AxisType.DateDual" />.
 	/// </summary>
 	/// <remarks>
-	/// DateMultiScale is a cartesian axis labeled with calendar dates / times.  The data values are
+	/// DateDualScale is a cartesian axis labeled with calendar dates / times.  The data values are
 	/// modified Julian days where day zero starts at midnight, 30 December 1899. Incrementing a Julian
 	/// day value by one means adding one day. An hour is a change of 1/24 (approximately 0.04167). 
 	/// Appropriate values for this scale are returned by the System.DateTime.ToOADate method and by
@@ -105,18 +105,18 @@ namespace ZedGraph
 
 		/// <summary>
 		/// Return the <see cref="AxisType" /> for this <see cref="Scale" />, which is
-		/// <see cref="AxisType.DateMulti" />.
+		/// <see cref="AxisType.DateDual" />.
 		/// </summary>
 		public override AxisType Type
 		{
-			get { return AxisType.DateMulti; }
+			get { return AxisType.DateDual; }
 		}
 
 		/// <summary>
 		/// Gets or sets the minimum value for this scale.
 		/// </summary>
 		/// <remarks>
-		/// The set property is specifically adapted for <see cref="AxisType.DateMulti" /> scales,
+		/// The set property is specifically adapted for <see cref="AxisType.DateDual" /> scales,
 		/// in that it automatically limits the value to the range of valid dates for the
 		/// <see cref="XDate" /> struct.
 		/// </remarks>
@@ -130,7 +130,7 @@ namespace ZedGraph
 		/// Gets or sets the maximum value for this scale.
 		/// </summary>
 		/// <remarks>
-		/// The set property is specifically adapted for <see cref="AxisType.DateMulti" /> scales,
+		/// The set property is specifically adapted for <see cref="AxisType.DateDual" /> scales,
 		/// in that it automatically limits the value to the range of valid dates for the
 		/// <see cref="XDate" /> struct.
 		/// </remarks>
@@ -144,19 +144,14 @@ namespace ZedGraph
 #region methods
 
 
-		private void DrawWhich(double numDays, out int numLevels,
-					 out bool[] drawThese)
+		private bool[] DrawWhich(double numDays)
 		{
-			drawThese = new bool[(int)DateUnit.Millisecond];
+			bool[] drawThese = new bool[(int)DateUnit.Millisecond];
 			drawThese[(int)DateUnit.Hour] = (numDays <= 3);
 			drawThese[(int)DateUnit.Day] = (numDays <= 60);
 			drawThese[(int)DateUnit.Month] = (numDays > 3) && (numDays < 666);
 			drawThese[(int)DateUnit.Year] = (numDays > 60);
-			numLevels = 0;
-			foreach (bool lDrawThis in drawThese)
-			{
-				if (lDrawThis) numLevels++;
-			}
+			return drawThese;
 		}
 
 		internal override SizeF GetScaleMaxSpace(Graphics g, GraphPane pane, float scaleFactor, bool applyAngle)
@@ -169,14 +164,16 @@ namespace ZedGraph
 				if (!applyAngle)
 					_fontSpec.Angle = 0;
 
-				string tmpStr = "0000";
+				SizeF maxSpace = _fontSpec.BoundingBox(g, "0000", scaleFactor);
 
-				bool[] drawThese;
-				int numLevels;
-				DrawWhich((_maxLinearized - _minLinearized), out numLevels, out drawThese);
-				SizeF maxSpace = _fontSpec.BoundingBox(g, tmpStr, scaleFactor);
+				bool[] drawThese = DrawWhich(_maxLinearized - _minLinearized);
+				int numLevels = 0;
+				foreach (bool lDrawThis in drawThese)
+				{
+					if (lDrawThis) numLevels++;
+				}
 
-				maxSpace.Height *= numLevels * 1.1F;
+				maxSpace.Height *= numLevels;
 
 				_fontSpec.Angle = saveAngle;
 
@@ -209,9 +206,9 @@ namespace ZedGraph
 		{
 			// get the Y position of the center of the axis labels
 			// (the axis itself is referenced at zero)
-			SizeF maxLabelSize = GetScaleMaxSpace(g, pane, scaleFactor, true);
+			//SizeF maxLabelSize = GetScaleMaxSpace(g, pane, scaleFactor, true);
 			float charHeight = _fontSpec.GetHeight(scaleFactor);
-			float maxSpace = maxLabelSize.Height;
+			float maxSpace = charHeight;
 			float textTop, textVerticalCenter;
 			if (_ownerAxis.MajorTic.IsOutside)
 				textTop = scaledTic + charHeight * _labelGap;
@@ -237,6 +234,7 @@ namespace ZedGraph
 												 float topPix,
 												 MinorTic tic,
 												 MinorGrid grid,
+												 bool drawGrid,
 												 float shift,
 												 float scaleFactor,
 												 float scaledTic,
@@ -246,9 +244,6 @@ namespace ZedGraph
 												 out float pEndInterval,
 												 out float pIntervalWidth)
 		{
-			Pen ticPen = tic.GetPen(pane, scaleFactor);
-			Pen gridPen = grid.GetPen(pane, scaleFactor);
-
 			bool movedStart = false;
 			bool movedEnd = false;
 			if (dStartInterval < _minLinTemp)
@@ -267,20 +262,30 @@ namespace ZedGraph
 			pIntervalWidth = pEndInterval - pStartInterval;
 			if (pIntervalWidth > 0)
 			{
+				Pen lPen;
+				if (drawGrid)
+					lPen = grid.GetPen(pane, scaleFactor);
+				else
+					lPen = tic.GetPen(pane, scaleFactor);
+				
 				if (!movedStart)
 				{
-					tic.Draw(g, pane, ticPen, pStartInterval, topPix, shift, scaledTic);
-					grid.Draw(g, gridPen, pStartInterval, topPix);
+					if (drawGrid)
+						grid.Draw(g, lPen, pStartInterval, topPix);
+					else 
+						tic.Draw(g, pane, lPen, pStartInterval, topPix, shift, scaledTic);
 				}
 				if (!movedEnd && pIntervalWidth > 2)
 				{
-					tic.Draw(g, pane, ticPen, pEndInterval, topPix, shift, scaledTic);
-					grid.Draw(g, gridPen, pEndInterval, topPix);
+					if (drawGrid)
+						grid.Draw(g, lPen, pEndInterval, topPix);
+					else
+						tic.Draw(g, pane, lPen, pEndInterval, topPix, shift, scaledTic);
 				}
 			}
 		}
 
-		internal void DrawYearLabels(Graphics g, GraphPane pane,
+		internal void DrawYearLabels(Graphics g, GraphPane pane, MinorTic tic, MinorGrid grid, bool drawGrid,
 					float topPix, float rightPix, float shift, float scaleFactor)
 		{
 			int year;
@@ -294,8 +299,6 @@ namespace ZedGraph
 			float labelWidth = labelBox.Width + 4;
 			float labelWidthHalf = labelWidth / 2;
 
-			MajorGrid grid = _ownerAxis._majorGrid;
-			MajorTic tic = _ownerAxis._majorTic;
 			float scaledTic = tic.ScaledTic(scaleFactor);
 			float textVerticalCenter = GetTextVerticalCenter(g, pane, scaledTic, labelBox.Height, shift, scaleFactor);
 			float textHorizontalCenter;
@@ -321,7 +324,7 @@ namespace ZedGraph
 				bool labelThisYear = ((year / yearsPerLabel) * yearsPerLabel == year);
 				if (labelThisYear || ((year / yearsPerTic) * yearsPerTic == year))
 				{
-					TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, shift, scaleFactor, scaledTic, 
+					TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, drawGrid, shift, scaleFactor, scaledTic, 
 						ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
 					if (this.IsVisible && labelThisYear)
 					{
@@ -345,7 +348,7 @@ namespace ZedGraph
 			}
 		}
 
-		internal void DrawMonthLabels(Graphics g, GraphPane pane,
+		internal void DrawMonthLabels(Graphics g, GraphPane pane, MinorTic tic, MinorGrid grid, bool drawGrid,
 					float topPix, float rightPix, float shift, float scaleFactor, bool includeYear)
 		{
 			int year;
@@ -359,9 +362,6 @@ namespace ZedGraph
 			SizeF labelBox = _fontSpec.BoundingBox(g, labelText, scaleFactor);
 			float ticShift = (includeYear ? (shift + labelBox.Height / 2) : shift);
 			float charWidth = labelBox.Width;
-
-			MinorGrid grid = _ownerAxis._minorGrid;
-			MinorTic tic = _ownerAxis._minorTic;
 			float scaledTic = tic.ScaledTic(scaleFactor);
 			float textVerticalCenter = GetTextVerticalCenter(g, pane, scaledTic, labelBox.Height, shift, scaleFactor);
 
@@ -383,7 +383,7 @@ namespace ZedGraph
 			dStartInterval = xStartInterval.XLDate;
 			while (dStartInterval < _maxLinTemp)
 			{
-				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid,
+				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, drawGrid,
 					ticShift, scaleFactor, scaledTic,
 					ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
 				// If the width of the interval is at least wide enough for a character,
@@ -454,7 +454,7 @@ namespace ZedGraph
 
 			while (dStartInterval < _maxLinTemp)
 			{
-				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid,
+				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, false,
 					ticShift, scaleFactor, scaledTic,
 					ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
 				// If the width of the interval is at least wide enough for a character
@@ -494,7 +494,7 @@ namespace ZedGraph
 			return (labelSize.Width < maxWidth);
 		}
 
-		internal void DrawDayLabels(Graphics g, GraphPane pane,
+		internal void DrawDayLabels(Graphics g, GraphPane pane, MinorTic tic, MinorGrid grid, bool drawGrid,
 			float topPix, float rightPix, float shift, float scaleFactor, bool includeMonthYear)
 		{
 			int year;
@@ -508,9 +508,6 @@ namespace ZedGraph
 			float labelWidth = labelBox.Width + 4;
 			float labelWidthHalf = labelWidth / 2;
 			float ticShift = (includeMonthYear ? (shift + labelBox.Height / 2) : shift);
-
-			MajorGrid grid = _ownerAxis._majorGrid;
-			MajorTic tic = _ownerAxis._majorTic;
 			float scaledTic = tic.ScaledTic(scaleFactor);
 			float textVerticalCenter = GetTextVerticalCenter(g, pane, scaledTic, labelBox.Height, shift, scaleFactor);
 			float textHorizontalCenter;
@@ -532,8 +529,8 @@ namespace ZedGraph
 
 			while (dStartInterval < _maxLinTemp)
 			{
-				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, 
-					ticShift, scaleFactor, scaledTic, 
+				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, drawGrid,
+					ticShift + (includeMonthYear ? scaledTic : 0), scaleFactor, scaledTic, 
 					ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
 
 				if (this.IsVisible && pIntervalWidth > 1)
@@ -561,7 +558,7 @@ namespace ZedGraph
 			}
 		}
 
-		internal void DrawHourMinuteLabels(Graphics g, GraphPane pane,
+		internal void DrawHourMinuteLabels(Graphics g, GraphPane pane, MinorTic tic, MinorGrid grid, bool drawGrid,
 			float topPix, float rightPix, float shift, float scaleFactor)
 		{
 			XDate xStartInterval = new XDate(_minLinTemp);
@@ -571,9 +568,6 @@ namespace ZedGraph
 			SizeF labelBox = _fontSpec.BoundingBox(g, labelText, scaleFactor);
 			float labelWidth = labelBox.Width + 4;
 			float labelWidthHalf = labelWidth / 2;
-
-			MajorGrid grid = _ownerAxis._majorGrid;
-			MajorTic tic = _ownerAxis._majorTic;
 			float scaledTic = tic.ScaledTic(scaleFactor);
 			float textVerticalCenter = GetTextVerticalCenter(g, pane, scaledTic, labelBox.Height, shift, scaleFactor);
 
@@ -606,7 +600,7 @@ namespace ZedGraph
 				dtEndInterval = dtStartInterval.AddMinutes(minutesPerLabel);
 				dEndInterval = dtEndInterval.ToOADate();
 
-				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, shift, scaleFactor, scaledTic,
+				TruncateIntervalDrawTicGrid(g, pane, topPix, tic, grid, drawGrid, shift, scaleFactor, scaledTic,
 					ref dStartInterval, ref dEndInterval, out pStartInterval, out pEndInterval, out pIntervalWidth);
 
 				//if label will not extend beyond left or right edge of this axis, draw it
@@ -649,11 +643,14 @@ namespace ZedGraph
 		/// </param>
 		override internal void Draw(Graphics g, GraphPane pane, float scaleFactor, float shiftPos)
 		{
-			MajorGrid majorGrid = _ownerAxis._majorGrid;
-			MajorTic majorTic = _ownerAxis._majorTic;
-			MinorTic minorTic = _ownerAxis._minorTic;
-			float charWidth = _fontSpec.GetWidth(g, scaleFactor);
-
+			Draw(g, pane, scaleFactor, shiftPos, false);
+		}
+		override internal void DrawGrid(Graphics g, GraphPane pane, double baseVal, float topPix, float scaleFactor)
+		{
+			Draw(g, pane, scaleFactor, 0, true); // TODO: need shiftPos if not primary axis
+		}
+		internal void Draw(Graphics g, GraphPane pane, float scaleFactor, float shiftPos, bool drawGrid)
+		{
 			float rightPix,
 					topPix;
 
@@ -672,52 +669,60 @@ namespace ZedGraph
 			if (_min >= _max)
 				return;
 
-			Pen pen = new Pen(_ownerAxis.Color,
-						pane.ScaledPenWidth(majorTic._penWidth, scaleFactor));
+			MajorGrid majorGrid = _ownerAxis._majorGrid;
+			MajorTic majorTic = _ownerAxis._majorTic;
+			MinorTic tic = _ownerAxis._minorTic;
+			MinorGrid grid = _ownerAxis._minorGrid;
 
-			// redraw the axis border
-			if (_ownerAxis.IsAxisSegmentVisible)
-				g.DrawLine(pen, 0.0F, shiftPos, rightPix, shiftPos);
-
-			// Draw a zero-value line if needed
-			if (majorGrid._isZeroLine && _min < 0.0 && _max > 0.0)
+			if (!drawGrid)
 			{
-				float zeroPix = LocalTransform(0.0);
-				g.DrawLine(pen, zeroPix, 0.0F, zeroPix, topPix);
+				Pen pen = new Pen(_ownerAxis.Color,
+							pane.ScaledPenWidth(majorTic._penWidth, scaleFactor));
+
+				// redraw the axis border
+				if (_ownerAxis.IsAxisSegmentVisible)
+					g.DrawLine(pen, 0.0F, shiftPos, rightPix, shiftPos);
+
+				// Draw a zero-value line if needed
+				if (majorGrid._isZeroLine && _min < 0.0 && _max > 0.0)
+				{
+					float zeroPix = LocalTransform(0.0);
+					g.DrawLine(pen, zeroPix, 0.0F, zeroPix, topPix);
+				}
+				_ownerAxis.DrawTitle(g, pane, 0, scaleFactor);
 			}
 
 			// draw the time scales that fit best
-			bool[] drawThese;
-			int numLevels;
-			DrawWhich((_maxLinTemp - _minLinTemp), out numLevels, out drawThese);
+			bool[] drawThese = DrawWhich((_maxLinTemp - _minLinTemp));
 
-			// Note: the Draw*Labels routines draw tics and check IsVisible for labels
+			// Note: the Draw*Labels routines draw tics or grids too
 			if (drawThese[(int)DateUnit.Hour])
 			{
-				DrawHourMinuteLabels(g, pane, topPix, rightPix, shiftPos, scaleFactor);
+				DrawHourMinuteLabels(g, pane, tic, grid, drawGrid, topPix, rightPix, shiftPos, scaleFactor);
 				shiftPos += _fontSpec.GetHeight(scaleFactor) * 1.1F;
+				tic = majorTic;
+				grid = majorGrid;
 			}
 
 			if (drawThese[(int)DateUnit.Day])
 			{
-				DrawDayLabels(g, pane, topPix, rightPix, shiftPos, scaleFactor, !drawThese[(int)DateUnit.Month]);
+				DrawDayLabels(g, pane, tic, grid, drawGrid, topPix, rightPix, shiftPos, scaleFactor, !drawThese[(int)DateUnit.Month]);
 				shiftPos += _fontSpec.GetHeight(scaleFactor) * 1.1F;
+				tic = majorTic;
+				grid = majorGrid;
 			}
 
 			if (drawThese[(int)DateUnit.Month])
 			{
-				DrawMonthLabels(g, pane, topPix, rightPix, shiftPos, scaleFactor, !drawThese[(int)DateUnit.Year]);
+				DrawMonthLabels(g, pane, tic, grid, drawGrid, topPix, rightPix, shiftPos, scaleFactor, !drawThese[(int)DateUnit.Year]);
 				shiftPos += _fontSpec.GetHeight(scaleFactor) * 1.1F;
 			}
 
 			if (drawThese[(int)DateUnit.Year])
 			{
-				DrawYearLabels(g, pane, topPix, rightPix, shiftPos, scaleFactor);
+				DrawYearLabels(g, pane, majorTic, majorGrid, drawGrid, topPix, rightPix, shiftPos, scaleFactor);
 				shiftPos += _fontSpec.GetHeight(scaleFactor) * 1.1F;
 			}
-			//_ownerAxis._majorTic.IsAllTics = false;
-			//_ownerAxis._minorTic.IsAllTics = false;
-			_ownerAxis.DrawTitle(g, pane, 0, scaleFactor);
 		}
 
 		/// <summary>
@@ -732,32 +737,7 @@ namespace ZedGraph
 		/// </returns>
 		override internal double CalcMajorTicValue(double baseVal, double tic)
 		{
-			double MajorTicValue = 0;
-            //// find the time scales that will be drawn
-            //bool[] drawThese;
-            //int numLevels;
-            //DrawWhich((_maxLinearized - _minLinearized), out numLevels, out drawThese);
-
-            //if (drawThese[(int)DateUnit.Hour] && drawThese[(int)DateUnit.Day])
-            //{
-            //    //DrawHourMinuteLabels
-            //}
-
-            //if (drawThese[(int)DateUnit.Day])
-            //{
-            //    //DrawDayLabels
-            //}
-
-            //if (drawThese[(int)DateUnit.Month])
-            //{
-            //    //DrawMonthLabels
-            //}
-
-            //if (drawThese[(int)DateUnit.Year])
-            //{
-            //    //DrawYearLabels
-            //}
-			return MajorTicValue;
+			return 0;
 		}
 
 	#endregion
