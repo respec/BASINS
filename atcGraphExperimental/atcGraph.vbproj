@@ -106,6 +106,7 @@
     <Compile Include="frmGraphEdit.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modGraph.vb" />
     <EmbeddedResource Include="atcGraphEdit.resx">
       <DependentUpon>atcGraphEdit.vb</DependentUpon>
       <SubType>Designer</SubType>

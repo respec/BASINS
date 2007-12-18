@@ -912,32 +912,32 @@ Finished:
     ''' <summary>
     ''' fit a line through a set of data points using least squares regression.
     ''' </summary>
-    ''' <param name="aTSer1"></param>
-    ''' <param name="aTSer2"></param>
+    ''' <param name="aTSerX"></param>
+    ''' <param name="aTSerY"></param>
     ''' <param name="aACoef">'a' coefficient in regression line (y=ax+b)</param>
     ''' <param name="aBCoef">'b' coefficient in regression line (y=ax+b)</param>
     ''' <param name="aRSquare">'r squared', the coefficient of determination</param>
     ''' <remarks>from fortran-newaqt-FITLIN</remarks>
-    Public Sub FitLine(ByVal aTSer1 As atcTimeseries, ByVal aTSer2 As atcTimeseries, _
+    Public Sub FitLine(ByVal aTSerX As atcTimeseries, ByVal aTSerY As atcTimeseries, _
                 ByRef aACoef As Double, ByRef aBCoef As Double, ByRef aRSquare As Double)
         'TODO: make this more robust - check time spans, time interval, etc
         Dim lNote As String = ""
-        Dim lSum1 As Double = 0.0
-        Dim lVal1 As Double
-        Dim lAvg1 As Double
+        Dim lSumX As Double = 0.0
+        Dim lValX As Double
+        Dim lAvgX As Double
 
-        Dim lSum2 As Double = 0.0
-        Dim lVal2 As Double
-        Dim lAvg2 As Double
+        Dim lSumY As Double = 0.0
+        Dim lValY As Double
+        Dim lAvgY As Double
         Dim lSkipCount As Integer = 0
         Dim lGoodCount As Integer = 0
 
-        For lIndex As Integer = 1 To aTSer1.numValues
-            lVal1 = aTSer1.Values(lIndex)
-            lVal2 = aTSer2.Values(lIndex)
-            If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
-                lSum1 += lVal1
-                lSum2 += lVal2
+        For lIndex As Integer = 1 To aTSerX.numValues
+            lValX = aTSerX.Values(lIndex)
+            lValY = aTSerY.Values(lIndex)
+            If Not Double.IsNaN(lValX) And Not Double.IsNaN(lValY) Then
+                lSumX += lValX
+                lSumY += lValY
                 lGoodCount += 1
             Else
                 lSkipCount += 1
@@ -950,34 +950,34 @@ Finished:
             lNote &= " and " & lSkipCount - 1 & " more" & vbCrLf
         End If
 
-        If (lSum1 > 0.0 And lSum2 > 0.0 And lGoodCount > 0) Then 'go ahead and compute
-            lAvg1 = lSum1 / lGoodCount
-            lAvg2 = lSum2 / lGoodCount
+        If (lSumX > 0.0 And lSumY > 0.0 And lGoodCount > 0) Then 'go ahead and compute
+            lAvgX = lSumX / lGoodCount
+            lAvgY = lSumY / lGoodCount
 
             Dim lSum3 As Double = 0.0
             Dim lSum4 As Double = 0.0
-            For lIndex As Integer = 1 To aTSer1.numValues
-                lVal1 = aTSer1.Values(lIndex)
-                lVal2 = aTSer2.Values(lIndex)
-                If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
-                    lSum3 += (lVal1 - lAvg1) * (lVal2 - lAvg2)
-                    lSum4 += (lVal2 - lAvg2) * (lVal2 - lAvg2)
+            For lIndex As Integer = 1 To aTSerX.numValues
+                lValX = aTSerX.Values(lIndex)
+                lValY = aTSerY.Values(lIndex)
+                If Not Double.IsNaN(lValX) And Not Double.IsNaN(lValY) Then
+                    lSum3 += (lValX - lAvgX) * (lValY - lAvgY)
+                    lSum4 += (lValY - lAvgY) * (lValY - lAvgY)
                 End If
             Next lIndex
             aACoef = lSum3 / lSum4
-            aBCoef = lAvg1 - (aACoef * lAvg2)
+            aBCoef = lAvgX - (aACoef * lAvgY)
 
-            lSum1 = 0
-            lSum2 = 0
-            For lIndex As Integer = 1 To aTSer1.numValues
-                lVal1 = aTSer1.Values(lIndex)
-                lVal2 = aTSer2.Values(lIndex)
-                If Not Double.IsNaN(lVal1) And Not Double.IsNaN(lVal2) Then
-                    lSum1 += ((aACoef * lVal2 + aBCoef - lAvg1) * (aACoef * lVal2) + aBCoef - lAvg1)
-                    lSum2 += (lVal1 - lAvg1) * (lVal1 - lAvg1)
+            Dim lSum5 As Double = 0
+            Dim lSum6 As Double = 0
+            For lIndex As Integer = 1 To aTSerX.numValues
+                lValX = aTSerX.Values(lIndex)
+                lValY = aTSerY.Values(lIndex)
+                If Not Double.IsNaN(lValX) And Not Double.IsNaN(lValY) Then
+                    lSum5 += ((aACoef * lValY + aBCoef - lAvgX) * (aACoef * lValY) + aBCoef - lAvgX)
+                    lSum6 += (lValX - lAvgX) * (lValX - lAvgX)
                 End If
             Next lIndex
-            aRSquare = lSum1 / lSum2
+            aRSquare = lSum5 / lSum6
         Else 'regression doesnt make sense, return NaN
             aACoef = Double.NaN
             aBCoef = Double.NaN
