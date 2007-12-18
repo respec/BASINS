@@ -7,10 +7,15 @@ Public Module modGraph
                        Optional ByVal aLineStyle As Drawing.Drawing2D.DashStyle = Drawing.Drawing2D.DashStyle.Solid)
         With aPane
             Dim lXValues(1) As Double
-            lXValues(0) = .XAxis.Scale.Min
-            lXValues(1) = .XAxis.Scale.Max
             Dim lYValues(1) As Double
-            lYValues(0) = (aACoef * lXValues(0)) + aBCoef
+            If aBCoef > 0 Then
+                lXValues(0) = .XAxis.Scale.Min
+                lYValues(0) = (aACoef * lXValues(0)) + aBCoef
+            Else
+                lYValues(0) = .YAxis.Scale.Min
+                lXValues(0) = (lYValues(0) - aBCoef) / aACoef
+            End If
+            lXValues(1) = .XAxis.Scale.Max
             lYValues(1) = (aACoef * lXValues(1)) + aBCoef
             Dim lCurve As LineItem = .AddCurve("", lXValues, lYValues, Drawing.Color.Blue, SymbolType.None)
             lCurve.Line.Style = aLineStyle

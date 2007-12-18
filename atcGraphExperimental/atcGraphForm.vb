@@ -603,12 +603,18 @@ Public Class atcGraphForm
                 Dim lXValues() As Double = lTimeseriesX.Values
                 Dim lYValues() As Double = lTimeseriesY.Values
                 Dim lSymbol As SymbolType
-                If lXValues.GetUpperBound(0) < 100 Then
+                Dim lNPts As Integer = lXValues.GetUpperBound(0)
+                If lNPts < 100 Then
                     lSymbol = SymbolType.Star
                 Else
-                    lSymbol = SymbolType.XCross 'TODO: user defined type - very small
+                    lSymbol = SymbolType.Circle
                 End If
                 lCurve = Pane.AddCurve(TSCurveLabel(lTimeseriesY), lXValues, lYValues, lCurveColor, lSymbol)
+                If lNPts >= 1000 Then
+                    lCurve.Symbol.Size = 1
+                ElseIf lNPts >= 100 Then
+                    lCurve.Symbol.Size = 2
+                End If
                 lCurve.Line.IsVisible = False
             End With
         End If

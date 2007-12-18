@@ -77,7 +77,8 @@ Module Graph
                 '45 degree line
                 AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot)
                 'regression line 
-                FitLine(lDataGroup.ItemByIndex(0), lDataGroup.ItemByIndex(1), lACoef, lBCoef, lRSquare)
+                'TODO: figure out why this seems backwards!
+                FitLine(lDataGroup.ItemByIndex(1), lDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
                 AddLine(lGraphForm.Pane, lACoef, lBCoef)
 
                 Dim lText As New TextObj

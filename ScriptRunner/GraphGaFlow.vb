@@ -72,14 +72,16 @@ Module GraphGaFlow
             '45 degree line
             AddLine(lGraphForm.Pane, 1, 0, Drawing.Drawing2D.DashStyle.Dot)
             'regression line 
-            FitLine(lDataGroup.ItemByIndex(0), lDataGroup.ItemByIndex(1), lACoef, lBCoef, lRSquare)
+            'TODO: figure out why this seems backwards!
+            FitLine(lDataGroup.ItemByIndex(1), lDataGroup.ItemByIndex(0), lACoef, lBCoef, lRSquare)
+            Dim lCorrCoef = Math.Sqrt(lRSquare)
             AddLine(lGraphForm.Pane, lACoef, lBCoef)
             SaveFileString("CompareStats.txt", CompareStats(lDataGroup.ItemByIndex(0), lDataGroup.ItemByIndex(1)))
 
             Dim lText As New TextObj
             Dim lFmt As String = "###,##0.###"
             lText.Text = "Y = " & DoubleToString(lACoef, , lFmt) & " X + " & DoubleToString(lBCoef, , lFmt) & vbLf & _
-                         "R Squared = " & DoubleToString(lRSquare, , lFmt)
+                         "Corr Coef = " & DoubleToString(lCorrCoef, , lFmt)
             'TODO: turn off border
             lText.Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
             .GraphObjList.Add(lText)
@@ -106,7 +108,7 @@ Module GraphGaFlow
         lGraphForm.Dispose()
 
         lGraphForm = New atcGraph.atcGraphForm(lDataGroup, AxisType.Probability)
-        SetGraphSpecs(lGraphForm)
+        SetGraphSpecs(lGraphForm, "Buford", "Norcross")
         With lGraphForm.Pane
             .YAxis.Title.Text = lCons & " (cfs)"
             .YAxis.Type = ZedGraph.AxisType.Log
@@ -129,7 +131,7 @@ Module GraphGaFlow
             .XAxis.Title.Text = "Daily Mean Flow"
             .XAxis.MajorTic.IsOutside = True
         End With
-        SetGraphSpecs(lGraphForm)
+        SetGraphSpecs(lGraphForm, "Buford", "Norcross")
         lOutFileName = lCons
         lGraphForm.SaveBitmapToFile(lOutFileName & ".png")
         lGraphForm.ZedGraphCtrl.SaveIn(lOutFileName & ".emf")
