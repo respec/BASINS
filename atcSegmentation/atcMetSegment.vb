@@ -29,13 +29,18 @@ Public Class MetSegments
                 Else
                     Dim lMetSeg As New MetSegment
                     lMetSeg.Id = StrSplit(lCurrentRecord, lDelim, lQuote)
-                    For lIndex As Integer = 1 To 7
-                        lMetSeg.WdmId(lIndex) = StrSplit(lCurrentRecord, lDelim, lQuote)
-                        lMetSeg.Dsn(lIndex) = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
-                        lMetSeg.Tstype(lIndex) = StrSplit(lCurrentRecord, lDelim, lQuote)
-                        lMetSeg.MfactPI(lIndex) = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
-                        lMetSeg.MfactR(lIndex) = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
-                    Next
+                    While lCurrentRecord.Length > 0
+                        Dim lDataType As New DataType
+                        With lDataType
+                            .WdmID = StrSplit(lCurrentRecord, lDelim, lQuote)
+                            .Dsn = CInt(StrSplit(lCurrentRecord, lDelim, lQuote))
+                            .Name = StrSplit(lCurrentRecord, lDelim, lQuote)
+                            .MFactPI = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                            .MFactR = CDbl(StrSplit(lCurrentRecord, lDelim, lQuote))
+                        End With
+                        lMetSeg.DataTypes.Add(lDataType)
+                        lCurrentRecord = lCurrentRecord.Trim
+                    End While
                     Me.Add(lMetSeg)
                 End If
             Loop
@@ -50,9 +55,25 @@ End Class
 Public Class MetSegment
     Public Id As Integer 'met segment id
     '1-prec, 2-atem, 3-dewp, 4-wind, 5-solr, 6-clou, 7-pevt
-    Public WdmId(7) As String
-    Public Dsn(7) As Integer
-    Public Tstype(7) As String
-    Public MfactPI(7) As Double
-    Public MfactR(7) As Double
+    Public DataTypes As New DataTypes
+    'Public WdmId(7) As String
+    'Public Dsn(7) As Integer
+    'Public Tstype(7) As String
+    'Public MfactPI(7) As Double
+    'Public MfactR(7) As Double
+End Class
+
+Public Class DataTypes
+    Inherits KeyedCollection(Of String, DataType)
+    Protected Overrides Function GetKeyForItem(ByVal aDataType As DataType) As String
+        Return aDataType.Name
+    End Function
+End Class
+
+Public Class DataType
+    Public WdmID As String
+    Public Dsn As Integer
+    Public Name As String
+    Public MFactPI As Double
+    Public MFactR As Double
 End Class
