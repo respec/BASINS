@@ -1057,6 +1057,7 @@ Public Class GisUtil
             If lLayer Is Nothing Then
                 AddLayer = False
             Else
+                lLayer.Name = aLayerName
                 lLayer.Visible = False
                 AddLayer = True
                 GetMappingObject.Project.Modified = True
