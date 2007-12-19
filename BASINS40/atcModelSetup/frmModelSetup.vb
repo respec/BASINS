@@ -2,12 +2,17 @@ Imports atcUtility
 Imports atcMwGisUtility
 Imports MapWinUtility
 Imports System.Drawing
+Imports atcData
+Imports atcSegmentation
+Imports System.Collections.ObjectModel
 
 Public Class frmModelSetup
     Inherits System.Windows.Forms.Form
 
     Public pModelName As String
+    Friend WithEvents lstMet As System.Windows.Forms.ListBox
     Public pMetStations As atcCollection
+    Public pMetBaseDsns As atcCollection
 
 #Region " Windows Form Designer generated code "
 
@@ -182,6 +187,7 @@ Public Class frmModelSetup
         Me.ofdCustom = New System.Windows.Forms.OpenFileDialog
         Me.ofdClass = New System.Windows.Forms.OpenFileDialog
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
+        Me.lstMet = New System.Windows.Forms.ListBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
@@ -801,6 +807,7 @@ Public Class frmModelSetup
         '
         'TabPage6
         '
+        Me.TabPage6.Controls.Add(Me.lstMet)
         Me.TabPage6.Controls.Add(Me.GroupBox2)
         Me.TabPage6.Location = New System.Drawing.Point(4, 25)
         Me.TabPage6.Name = "TabPage6"
@@ -942,6 +949,18 @@ Public Class frmModelSetup
         Me.ofdMetWDM.Filter = "Met WDM files (*.wdm)|*.wdm"
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
+        '
+        'lstMet
+        '
+        Me.lstMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstMet.FormattingEnabled = True
+        Me.lstMet.ItemHeight = 16
+        Me.lstMet.Location = New System.Drawing.Point(21, 97)
+        Me.lstMet.Name = "lstMet"
+        Me.lstMet.Size = New System.Drawing.Size(474, 228)
+        Me.lstMet.TabIndex = 1
         '
         'frmModelSetup
         '
@@ -1534,12 +1553,12 @@ Public Class frmModelSetup
             End If
         Else
             If SetupHSPF(OutputPath, BaseOutputName) Then
-                'If CreateUCI(OutputPath & "\" & BaseOutputName & ".uci") Then
-                'StartWinHSPF(OutputPath & "\" & BaseOutputName & ".uci")
-                'End If
-
-                'below is the old way of creating a uci, in WinHSPF
-                StartWinHSPF(OutputPath & "\" & BaseOutputName & ".wsd")
+                If CreateUCI(OutputPath & "\" & BaseOutputName & ".uci", txtMetWDMName.Text) Then
+                    StartWinHSPF(OutputPath & "\" & BaseOutputName & ".uci")
+                Else
+                    'below is the old way of creating a uci, in WinHSPF
+                    StartWinHSPF(OutputPath & "\" & BaseOutputName & ".wsd")
+                End If
             End If
         End If
     End Sub
@@ -1865,6 +1884,11 @@ Public Class frmModelSetup
         lblStatus.Text = "Writing PSR file"
         Me.Refresh()
         WritePSRFile(BaseFileName & ".psr", cUniqueSubids, cOutSubs)
+
+        'write seg file
+        lblStatus.Text = "Writing SEG file"
+        Me.Refresh()
+        WriteSEGFile(BaseFileName & ".seg")
 
         'write map file
         lblStatus.Text = "Writing MAP file"
@@ -2648,6 +2672,34 @@ ErrHand:
         FileClose(OutFile)
     End Sub
 
+    Private Sub WriteSEGFile(ByVal aSegFileName As String)
+
+        Dim lOutFile As Integer = FreeFile()
+        FileOpen(lOutFile, aSegFileName, OpenMode.Output)
+
+        WriteLine(lOutFile, "SegID", "PrecWdmId", "PrecDsn", "PrecTstype", "PrecMFactPI", "PrecMFactR", _
+                                     "AtemWdmId", "AtemDsn", "AtemTstype", "AtemMFactPI", "AtemMFactR", _
+                                     "DewpWdmId", "DewpDsn", "DewpTstype", "DewpMFactPI", "DewpMFactR", _
+                                     "WindWdmId", "WindDsn", "WindTstype", "WindMFactPI", "WindMFactR", _
+                                     "SolrWdmId", "SolrDsn", "SolrTstype", "SolrMFactPI", "SolrMFactR", _
+                                     "ClouWdmId", "ClouDsn", "ClouTstype", "ClouMFactPI", "ClouMFactR", _
+                                     "PevtWdmId", "PevtDsn", "PevtTstype", "PevtMFactPI", "PevtMFactR")
+
+        For Each lIndex As Integer In lstMet.SelectedIndices
+            Dim lBaseDsn As Integer = pMetBaseDsns(lIndex)
+            PrintLine(lOutFile, CStr(lIndex + 1) & " WDM2 " & CStr(lBaseDsn) & " PREC 1 1" & _
+                                                   " WDM2 " & CStr(lBaseDsn + 2) & " ATEM 1 1" & _
+                                                   " WDM2 " & CStr(lBaseDsn + 6) & " DEWP 1 1" & _
+                                                   " WDM2 " & CStr(lBaseDsn + 3) & " WIND 1 1" & _
+                                                   " WDM2 " & CStr(lBaseDsn + 4) & " SOLR 1 1" & _
+                                                   " WDM2 " & CStr(lBaseDsn + 7) & " CLOU 0 1" & _
+                                                   " WDM2 " & CStr(lBaseDsn + 5) & " PEVT 1 1")
+        Next
+
+        FileClose(lOutFile)
+
+    End Sub
+
     Private Sub WriteMAPFile(ByVal aMapFileName As String)
         Dim lOutFile As Integer
         Dim i As Integer
@@ -2830,31 +2882,88 @@ ErrHand:
         End If
     End Sub
 
-    Private Function CreateUCI(ByVal aUciName As String) As Boolean
+    Private Function CreateUCI(ByVal aUciName As String, ByVal aMetWDMName As String) As Boolean
         CreateUCI = False
 
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-
+        ChDriveDir(PathNameOnly(aUciName))
         'get message file ready
         Dim lMsg As New atcUCI.HspfMsg
         lMsg.Open("hspfmsg.mdb")
 
         'get starter uci ready
-        Dim lStarterName As String = "starter.uci"
-        Dim lStarterPath As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\starter\" & lStarterName
+        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
+        Dim lStarterUciName As String = "starter.uci"
+        Dim lStarterPath As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\starter\" & lStarterUciName
         If Not FileExists(lStarterPath) Then
-            lStarterPath = FindFile("Please locate " & lStarterName, lStarterName)
+            lStarterPath = "\basins\models\hspf\bin\starter\" & lStarterUciName
+            If Not FileExists(lStarterPath) Then
+                lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
+            End If
         End If
+        lStarterUciName = lStarterPath
 
         'location master pollutant list 
         Dim lPollutantListFileName As String = "poltnt_2.prn"
         Dim lPollutantListPath As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\" & lPollutantListFileName
         If Not FileExists(lPollutantListPath) Then
-            lPollutantListPath = FindFile("Please locate " & lPollutantListFileName, lPollutantListFileName)
+            lPollutantListPath = "\basins\models\hspf\bin\" & lPollutantListFileName
+            If Not FileExists(lPollutantListPath) Then
+                lPollutantListPath = FindFile("Please locate " & lPollutantListFileName, lPollutantListFileName)
+            End If
         End If
+        lPollutantListFileName = lPollutantListPath
 
-        Dim lUci As New atcUCI.HspfUci
-        'lUci.CreateUciFromBASINS(lMsg)
+        'open project wdm
+        Dim lDataSources As New Collection(Of atcData.atcDataSource)
+        Dim lDataSource As New atcWDM.atcDataSourceWDM
+        Dim lProjectWDMName As String = FilenameOnly(aUciName) & ".wdm"
+        Dim lFound As Boolean = False
+        For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+            If lBASINSDataSource.Specification.ToUpper = lProjectWDMName.ToUpper Then
+                'found it in the BASINS data sources
+                lDataSource = lBASINSDataSource
+                lFound = True
+                Exit For
+            End If
+        Next
+        If Not lFound Then
+            If lDataSource.Open(lProjectWDMName) Then
+                'need to open it here
+                lFound = True
+            End If
+        End If
+        lDataSources.Add(lDataSource)
+
+        'open met wdm
+        lDataSource = New atcWDM.atcDataSourceWDM
+        lFound = False
+        For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+            If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
+                'found it in the BASINS data sources
+                lDataSource = lBASINSDataSource
+                lFound = True
+                Exit For
+            End If
+        Next
+        If Not lFound Then
+            If lDataSource.Open(aMetWDMName) Then
+                'need to open it here
+                lFound = True
+            End If
+        End If
+        lDataSources.Add(lDataSource)
+
+        Dim lWatershedName As String = FilenameOnly(aUciName)
+        Dim lWatershed As New Watershed
+        If lWatershed.Open(lWatershedName) = 0 Then  'everything read okay, continue
+            Dim lHspfUci As New atcUCI.HspfUci
+            lHspfUci.Msg = lMsg
+            lHspfUci.CreateUciFromBASINS(lWatershed, _
+                                         lDataSources, _
+                                         lStarterUciName, lPollutantListFileName)
+            lHspfUci.Save()
+            Return True
+        End If
 
     End Function
 
@@ -2887,14 +2996,38 @@ ErrHand:
 
     Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
         BuildListofMetStationNames()
+        lstMet.Items.Clear()
+        For Each lMetStation As String In pMetStations
+            lstMet.Items.Add(lMetStation)
+        Next
+        If lstMet.Items.Count > 0 Then
+            lstMet.SelectedIndex = 0
+        End If
     End Sub
 
     Private Function BuildListofMetStationNames() As Boolean
         pMetStations = New atcCollection
         pMetStations.Clear()
+        pMetBaseDsns = New atcCollection
+        pMetBaseDsns.Clear()
+        Dim lDataSource As New atcWDM.atcDataSourceWDM
         If FileExists(txtMetWDMName.Text) Then
-            Dim lDataSource As New atcWDM.atcDataSourceWDM
-            If lDataSource.Open(txtMetWDMName.Text) Then
+            Dim lFound As Boolean = False
+            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+                If lBASINSDataSource.Specification.ToUpper = txtMetWDMName.Text.ToUpper Then
+                    'found it in the BASINS data sources
+                    lDataSource = lBASINSDataSource
+                    lFound = True
+                    Exit For
+                End If
+            Next
+            If Not lFound Then
+                If lDataSource.Open(txtMetWDMName.Text) Then
+                    'need to open it here
+                    lFound = True
+                End If
+            End If
+            If lFound Then
                 For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
                     If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
                         Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
@@ -2906,7 +3039,7 @@ ErrHand:
                         'find pevt dataset at the same location
                         Dim lPevtFound As Boolean = False
                         For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
-                            If lDataSet2.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet2.Attributes.GetValue("Constituent") = "PEVT" And _
+                            If lDataSet2.Attributes.GetValue("Constituent") = "PEVT" And _
                                lDataSet2.Attributes.GetValue("Location") = lLoc Then
                                 Dim lSJDay2 As Double = lDataSet2.Dates.Value(0)
                                 Dim lEJDay2 As Double = lDataSet2.Dates.Value(lDataSet2.Dates.numValues)
@@ -2928,6 +3061,7 @@ ErrHand:
                             J2Date(lEJDay, lEdate)
                             Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
                             pMetStations.Add(lLeadingChar & lLoc & ":" & lStanam & " " & lDateString)
+                            pMetBaseDsns.Add(lDsn)
                         End If
                     End If
                 Next
