@@ -52,21 +52,21 @@ Module modCreateUci
 
         'get start and end dates from prec and pevt datasets
         Dim lWdmId As String = aMetWdmId
-        Dim lWdmIndex As Integer = CInt(Mid(lWdmId, 4))
+        Dim lWdmIndex As Integer = lWdmId.Substring(3)
         Dim lDsn As Integer = aMetBaseDsn
         If Not aWatershed.MetSegments Is Nothing Then
-            lWdmId = aWatershed.MetSegments(0).WdmId(1)
-            lWdmIndex = CInt(Mid(lWdmId, 4))
-            lDsn = aWatershed.MetSegments(0).Dsn(1)
+            lWdmId = aWatershed.MetSegments(0).DataTypes("PREC").WdmID
+            lWdmIndex = lWdmId.Substring(3)
+            lDsn = aWatershed.MetSegments(0).DataTypes("PREC").Dsn
         End If
         Dim lDataSet As atcData.atcTimeseries = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
         Dim lSJDate As Double = lDataSet.Dates.Value(0)
         Dim lEJDate As Double = lDataSet.Dates.Value(lDataSet.numValues)
         If Not aWatershed.MetSegments Is Nothing Then
             'also check dates of PEVT dataset
-            lWdmId = aWatershed.MetSegments(0).WdmId(7)
-            lWdmIndex = CInt(Mid(lWdmId, 4))
-            lDsn = aWatershed.MetSegments(0).Dsn(7)
+            lWdmId = aWatershed.MetSegments(0).DataTypes("PEVT").WdmID
+            lWdmIndex = lWdmId.Substring(3)
+            lDsn = aWatershed.MetSegments(0).DataTypes("PEVT").Dsn
             lDataSet = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
             Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
             Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues)
@@ -136,7 +136,7 @@ Module modCreateUci
         'create masslinks
         CreateMassLinks(aUci)
 
-        'set initial values in uci from basins values
+        'set initial values in uci from BASINS values
         SetInitValues(aUci)
 
         CreatePointSourceDSNs(aUci, aPollutantListFileName)
@@ -144,10 +144,7 @@ Module modCreateUci
         CreateDefaultOutput(aUci)
         CreateBinaryOutput(aUci, aWatershed.Name)
 
-        'look for met segments
-        'newUci.Source2MetSeg
-
-        'get starter uci ready
+        'get starter uci ready for use defaulting parameters and mass links
         Dim lDefUci As New HspfUci
         lDefUci.FastReadUciForStarter(aUci.Msg, aStarterUciName)
 
@@ -927,12 +924,16 @@ Module modCreateUci
         For Each lMetSegment As MetSegment In pWatershed.MetSegments
             Dim lMetSeg As New HspfMetSeg
             lMetSeg.Uci = aUci
-            For lRecordIndex As Integer = 1 To 7
-                lMetSeg.MetSegRec(lRecordIndex).Source.VolName = lMetSegment.WdmId(lRecordIndex)
-                lMetSeg.MetSegRec(lRecordIndex).Source.VolId = lMetSegment.Dsn(lRecordIndex)
-                lMetSeg.MetSegRec(lRecordIndex).Source.Member = lMetSegment.Tstype(lRecordIndex)
-                lMetSeg.MetSegRec(lRecordIndex).MFactP = lMetSegment.MfactPI(lRecordIndex)
-                lMetSeg.MetSegRec(lRecordIndex).MFactR = lMetSegment.MfactR(lRecordIndex)
+            Dim lRecordIndex As Integer = 0
+            For Each lDataType As DataType In lMetSegment.DataTypes
+                lRecordIndex += 1
+                With lDataType
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolName = .WdmID
+                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = .Dsn
+                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = .Name
+                    lMetSeg.MetSegRec(lRecordIndex).MFactP = .MFactPI
+                    lMetSeg.MetSegRec(lRecordIndex).MFactR = .MFactR
+                End With
                 lMetSeg.MetSegRec(lRecordIndex).Ssystem = "ENGL"
                 lMetSeg.MetSegRec(lRecordIndex).Tran = "SAME"
                 lMetSeg.MetSegRec(lRecordIndex).Typ = lRecordIndex
@@ -942,7 +943,9 @@ Module modCreateUci
                     lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = ""
                 End If
             Next
-            lMetSeg.ExpandMetSegName(lMetSegment.WdmId(1), lMetSegment.Dsn(1))
+            With lMetSegment.DataTypes("PREC")
+                lMetSeg.ExpandMetSegName(.WdmID, .Dsn)
+            End With
             lMetSeg.Id = lMetSegment.Id
             aUci.MetSegs.Add(lMetSeg)
         Next
