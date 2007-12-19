@@ -41,14 +41,14 @@
     <BaseAddress>285212672</BaseAddress>
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningLevel>1</WarningLevel>
     <NoWarn>42016,42017,42018,42019,42032</NoWarn>
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MapWinUtility, Version=1.0.2298.26079, Culture=neutral">
@@ -101,6 +101,7 @@
     <Compile Include="frmGraphEdit.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="modGraph.vb" />
     <EmbeddedResource Include="atcGraphEdit.resx">
       <DependentUpon>atcGraphEdit.vb</DependentUpon>
       <SubType>Designer</SubType>
