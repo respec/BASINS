@@ -7,6 +7,7 @@ Imports System.Collections.ObjectModel
 Imports MapWinUtility
 Imports atcUtility
 Imports atcSegmentation
+Imports atcData
 
 Public Class HspfUci
     Declare Function GetCurrentProcessId Lib "kernel32" () As Integer
@@ -1759,13 +1760,26 @@ Public Class HspfUci
         End If
 
         Dim lWDMFile As New atcWDM.atcDataSourceWDM
-        If Not lWDMFile.Open(aName) Then 'had a problem
-            Logger.Msg("Could not open WDM file" & vbCr & aName, MsgBoxStyle.Exclamation, "AddWDMFile Failed")
-            Return Nothing
-        Else
-            TserFiles.AddRange(lWDMFile.DataSets)
+        Dim lFound As Boolean = False
+        For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
+            If lBASINSDataSource.Specification.ToUpper = IO.Path.GetFullPath(aName).ToUpper Then
+                'found it in the BASINS data sources
+                lWDMFile = lBASINSDataSource
+                lFound = True
+                Exit For
+            End If
+        Next
+
+        If Not lFound Then
+            If Not lWDMFile.Open(aName) Then 'had a problem
+                Logger.Msg("Could not open WDM file" & vbCr & aName, MsgBoxStyle.Exclamation, "AddWDMFile Failed")
+                Return Nothing
+            Else
+                TserFiles.AddRange(lWDMFile.DataSets)
+            End If
         End If
         Return lWDMFile
+
     End Function
 
     Public Function PreScanFilesBlock(ByRef aEchoFile As String) As Boolean
