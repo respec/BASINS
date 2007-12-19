@@ -49,7 +49,7 @@
     <Compile Include="ZedGraph\BasicArrayPointList.cs" />
     <Compile Include="ZedGraph\Border.cs" />
     <Compile Include="ZedGraph\BoxObj.cs" />
-    <Compile Include="ZedGraph\DateMultiScale.cs" />
+    <Compile Include="ZedGraph\DateDualScale.cs" />
     <Compile Include="ZedGraph\frmEdit.cs">
       <SubType>Form</SubType>
     </Compile>
