@@ -164,5 +164,74 @@ Module Graph
 
             OpenFile(lOutFileName & ".png")
         Next lSiteIndex
+
+        GraphFtables(lHspfUci)
+    End Sub
+
+    Sub GraphFtables(ByVal aUCI As atcUCI.HspfUci)
+        For Each lOperation As atcUCI.HspfOperation In aUCI.OpnBlks("RCHRES").Ids
+            Dim lNRows As Integer = lOperation.FTable.Nrows
+            If lNRows > 0 Then
+                Dim lZgc As New ZedGraphControl
+                With lZgc
+                    '.Dock = DockStyle.Fill
+                    .Height = 500
+                    .Width = 500
+                    .Visible = True
+                    .IsSynchronizeXAxes = True
+                    '.IsEnableHZoom = mnuViewHorizontalZoom.Checked
+                    '.IsEnableVZoom = mnuViewVerticalZoom.Checked
+                    '.IsZoomOnMouseCenter = mnuViewZoomMouse.Checked
+                End With
+                With lZgc.MasterPane
+                    .Border.IsVisible = False
+                    .Legend.IsVisible = False
+                    .Margin.All = 10
+                    .InnerPaneGap = 5
+                    .IsCommonScaleFactor = True
+                End With
+                Dim lPaneMain As GraphPane = lZgc.MasterPane.PaneList(0)
+                Dim lXAxisType As AxisType = AxisType.Linear
+                Dim lYAxisType As AxisType = AxisType.Linear
+                FormatPaneWithDefaults(lPaneMain, lXAxisType, lYAxisType)
+                lPaneMain.Title.Text = "FTable for Reach " & lOperation.Id
+                lPaneMain.XAxis.Title.Text = "Depth (ft)"
+                lPaneMain.XAxis.MajorGrid.IsVisible = True
+                lPaneMain.YAxis.Title.Text = "Outflow (cfs)"
+
+                Dim lX(lNRows) As Double
+                Dim lY(lNRows) As Double
+                For lExit As Integer = 1 To lOperation.FTable.Ncols - 3
+                    For lRow As Integer = 1 To lNRows
+                        With lOperation.FTable
+                            lX(lRow) = .Depth(lRow)
+                            Select Case lExit
+                                Case 1 : lY(lRow) = .Outflow1(lRow)
+                                Case 2 : lY(lRow) = .Outflow2(lRow)
+                                Case 3 : lY(lRow) = .Outflow3(lRow)
+                            End Select
+                        End With
+                    Next
+                    Dim lCurve As ZedGraph.CurveItem = lPaneMain.AddCurve("Exit " & lExit, _
+                                                                          lX, lY, _
+                                                                          Drawing.Color.Black, _
+                                                                          SymbolType.Star)
+                Next
+                Dim lControl As New Windows.Forms.Control
+                Dim lGraphics As System.Drawing.Graphics = lControl.CreateGraphics()
+                lZgc.MasterPane.AxisChange(lGraphics)
+                lZgc.SaveIn("Reach" & lOperation.Id & "_Ftable.emf")
+
+                lPaneMain.YAxis.Type = AxisType.Log
+                lPaneMain.YAxis.Scale.Min = 1
+                lPaneMain.YAxis.Scale.Max = 1000000.0
+                lPaneMain.YAxis.Scale.MaxAuto = False
+                lZgc.MasterPane.AxisChange(lGraphics)
+                lZgc.SaveIn("Reach" & lOperation.Id & "_Ftable_Log.emf")
+
+                lGraphics.Dispose()
+                lControl.Dispose()
+            End If
+        Next
     End Sub
 End Module
