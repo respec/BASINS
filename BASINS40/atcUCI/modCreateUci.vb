@@ -17,12 +17,10 @@ Module modCreateUci
     Friend Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
                                    ByRef aUci As HspfUci, _
                                    ByRef aDataSources As Collection(Of atcDataSource), _
-                                   ByRef aMetBaseDsn As Integer, _
-                                   ByRef aMetWdmId As String, _
-                                   ByRef aStartDate() As Integer, _
-                                   ByRef aEndDate() As Integer, _
                                    ByRef aStarterUciName As String, _
-                                   Optional ByRef aPollutantListFileName As String = "")
+                                   Optional ByRef aPollutantListFileName As String = "", _
+                                   Optional ByRef aMetBaseDsn As Integer = 11, _
+                                   Optional ByRef aMetWdmId As String = "WDM2")
         pWatershed = aWatershed
 
         aUci.Name = aWatershed.Name & ".uci"
@@ -52,10 +50,43 @@ Module modCreateUci
 
         aUci.Initialized = True
 
+        'get start and end dates from prec and pevt datasets
+        Dim lWdmId As String = aMetWdmId
+        Dim lWdmIndex As Integer = CInt(Mid(lWdmId, 4))
+        Dim lDsn As Integer = aMetBaseDsn
+        If Not aWatershed.MetSegments Is Nothing Then
+            lWdmId = aWatershed.MetSegments(0).WdmId(1)
+            lWdmIndex = CInt(Mid(lWdmId, 4))
+            lDsn = aWatershed.MetSegments(0).Dsn(1)
+        End If
+        Dim lDataSet As atcData.atcTimeseries = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
+        Dim lSJDate As Double = lDataSet.Dates.Value(0)
+        Dim lEJDate As Double = lDataSet.Dates.Value(lDataSet.numValues)
+        If Not aWatershed.MetSegments Is Nothing Then
+            'also check dates of PEVT dataset
+            lWdmId = aWatershed.MetSegments(0).WdmId(7)
+            lWdmIndex = CInt(Mid(lWdmId, 4))
+            lDsn = aWatershed.MetSegments(0).Dsn(7)
+            lDataSet = aUci.GetDataSetFromDsn(lWdmIndex, lDsn)
+            Dim lSJDate2 As Double = lDataSet.Dates.Value(0)
+            Dim lEJDate2 As Double = lDataSet.Dates.Value(lDataSet.numValues)
+            If lSJDate2 > lSJDate Then
+                lSJDate = lSJDate2
+            End If
+            If lEJDate2 < lEJDate Then
+                lEJDate = lEJDate2
+            End If
+        End If
+
+        'set start and end dates in global block
+        Dim lStartDate(6) As Integer
+        Dim lEndDate(6) As Integer
+        J2Date(lSJDate, lStartDate)
+        J2Date(lEJDate, lEndDate)
         With aUci.GlobalBlock  'update start and end date from met data
             For lDateIndex As Integer = 0 To 5
-                .SDate(lDateIndex) = aStartDate(lDateIndex)
-                .EDate(lDateIndex) = aEndDate(lDateIndex)
+                .SDate(lDateIndex) = lStartDate(lDateIndex)
+                .EDate(lDateIndex) = lEndDate(lDateIndex)
             Next lDateIndex
         End With
 

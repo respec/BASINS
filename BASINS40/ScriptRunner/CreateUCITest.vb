@@ -26,20 +26,6 @@ Module CreateUCITest
 
         Dim lMetBaseDsn As Integer = 11
         Dim lMetWdmId As String = "WDM2"
-        Dim lStartDate(5) As Integer
-        lStartDate(0) = 1970
-        lStartDate(1) = 1
-        lStartDate(2) = 1
-        lStartDate(3) = 0
-        lStartDate(4) = 0
-        lStartDate(5) = 0
-        Dim lEndDate(5) As Integer
-        lEndDate(0) = 1995
-        lEndDate(1) = 12
-        lEndDate(2) = 31
-        lEndDate(3) = 24
-        lEndDate(4) = 0
-        lEndDate(5) = 0
 
         Dim lWatershedName As String = "UCICreation"
         Dim lWatershed As New Watershed
@@ -48,10 +34,6 @@ Module CreateUCITest
             lHspfUci.Msg = lMsg
             lHspfUci.CreateUciFromBASINS(lWatershed, _
                                          lDataSources, _
-                                         lMetBaseDsn, _
-                                         lMetWdmId, _
-                                         lStartDate, _
-                                         lEndDate, _
                                          lStarterUciName, lPollutantListFileName)
             lHspfUci.Save()
         End If
