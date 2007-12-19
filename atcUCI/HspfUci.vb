@@ -2662,15 +2662,12 @@ x:
 
     Public Sub CreateUciFromBASINS(ByRef aWatershed As Watershed, _
                                    ByRef aDataSources As Collection(Of atcData.atcDataSource), _
-                                   ByRef aMetBaseDsn As Integer, _
-                                   ByVal aMetWdmId As String, _
-                                   ByRef aStartDate() As Integer, _
-                                   ByRef aEndDate() As Integer, _
                                    ByRef aStarterUci As String, _
-                                   Optional ByRef aPollutantListFileName As String = "")
+                                   Optional ByRef aPollutantListFileName As String = "", _
+                                   Optional ByRef aMetBaseDsn As Integer = 11, _
+                                   Optional ByVal aMetWdmId As String = "WDM2")
         modCreateUci.CreateUciFromBASINS(aWatershed, Me, aDataSources, _
-                                         aMetBaseDsn, aMetWdmId, aStartDate, aEndDate, _
                                          aStarterUci, _
-                                         aPollutantListFileName)
+                                         aPollutantListFileName, aMetBaseDsn, aMetWdmId)
     End Sub
 End Class
