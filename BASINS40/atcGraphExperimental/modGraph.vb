@@ -1,6 +1,11 @@
+Imports System.Drawing
 Imports ZedGraph
 
 Public Module modGraph
+    Friend Const DefaultAxisLabelFormat As String = "#,##0.###"
+    Friend DefaultMajorGridColor As Color = Color.FromArgb(255, 225, 225, 225)
+    Friend DefaultMinorGridColor As Color = Color.FromArgb(255, 245, 245, 245)
+
     <CLSCompliant(False)> _
     Public Sub AddLine(ByRef aPane As ZedGraph.GraphPane, _
                        ByVal aACoef As Double, ByVal aBCoef As Double, _
@@ -41,5 +46,90 @@ Public Module modGraph
             End With
         End With
         Windows.Forms.Application.DoEvents()
+    End Sub
+
+    <CLSCompliant(False)> _
+    Public Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane, _
+                                      ByVal aXAxisType As AxisType, _
+                                      ByVal aYAxisType As AxisType)
+        With aPane
+            .IsAlignGrids = True
+            .IsFontsScaled = False
+            .IsPenWidthScaled = False
+            With .XAxis
+                .Type = aXAxisType
+                .MajorTic.IsOutside = False
+                .MajorTic.IsInside = True
+                .MajorTic.IsOpposite = True
+                .MinorTic.IsOutside = False
+                .MinorTic.IsInside = True
+                .MinorTic.IsOpposite = True
+                .Scale.Format = DefaultAxisLabelFormat
+                With .MajorGrid
+                    .Color = DefaultMajorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+                With .MinorGrid
+                    .Color = DefaultMinorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+            End With
+            With .X2Axis
+                .IsVisible = False
+            End With
+            With .YAxis
+                .Type = aYAxisType
+                .MajorGrid.IsVisible = True
+                .MajorTic.IsOutside = False
+                .MajorTic.IsInside = True
+                .MinorTic.IsOutside = False
+                .MinorTic.IsInside = True
+                .Scale.Format = DefaultAxisLabelFormat
+                .Scale.Align = AlignP.Inside
+                With .MajorGrid
+                    .Color = DefaultMajorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+                With .MinorGrid
+                    .Color = DefaultMinorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+            End With
+            With .Y2Axis
+                .MajorTic.IsOutside = False
+                .MajorTic.IsInside = True
+                .MinorTic.IsOutside = False
+                .MinorTic.IsInside = True
+                .Scale.Format = DefaultAxisLabelFormat
+                .Scale.Align = AlignP.Inside
+                With .MajorGrid
+                    .Color = DefaultMajorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+                With .MinorGrid
+                    .Color = DefaultMinorGridColor
+                    .DashOn = 0
+                    .DashOff = 0
+                    .IsVisible = True
+                End With
+            End With
+            With .Legend
+                .Position = LegendPos.Float
+                .Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
+                .IsHStack = False
+                .Border.IsVisible = False
+            End With
+            .Border.IsVisible = False
+        End With
     End Sub
 End Module

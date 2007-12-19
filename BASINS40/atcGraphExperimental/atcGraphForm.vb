@@ -34,9 +34,6 @@ Public Class atcGraphForm
     Private pXAxisType As AxisType = AxisType.DateDual
     Private pYAxisType As AxisType = AxisType.Linear
 
-    Private Const DefaultAxisLabelFormat As String = "#,##0.###"
-    Private Shared DefaultMajorGridColor As Color = Color.FromArgb(255, 200, 200, 200)
-    Private Shared DefaultMinorGridColor As Color = Color.FromArgb(255, 240, 240, 240)
     Private Shared SaveImageExtension As String = ".png"
     Friend WithEvents mnuViewScatter As System.Windows.Forms.MenuItem
     Friend WithEvents mnuViewSep1 As System.Windows.Forms.MenuItem
@@ -53,7 +50,7 @@ Public Class atcGraphForm
         InitMatchingColors(FindFile("Find graph coloring rules", "GraphColors.txt"))
 
         pPaneMain = New GraphPane
-        FormatPaneWithDefaults(pPaneMain)
+        FormatPaneWithDefaults(pPaneMain, pXAxisType, pYAxisType)
 
         Me.Controls.Add(pZgc)
         With pZgc
@@ -80,88 +77,6 @@ Public Class atcGraphForm
         SetDatasets(pDataGroup)
     End Sub
 
-    Private Sub FormatPaneWithDefaults(ByVal aPane As ZedGraph.GraphPane)
-        With aPane
-            .IsAlignGrids = True
-            .IsFontsScaled = False
-            .IsPenWidthScaled = False
-            With .XAxis
-                .Type = pXAxisType
-                .MajorTic.IsOutside = False
-                .MajorTic.IsInside = True
-                .MajorTic.IsOpposite = True
-                .MinorTic.IsOutside = False
-                .MinorTic.IsInside = True
-                .MinorTic.IsOpposite = True
-                .Scale.Format = DefaultAxisLabelFormat
-                With .MajorGrid
-                    .Color = DefaultMajorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-                With .MinorGrid
-                    .Color = DefaultMinorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-            End With
-            With .X2Axis
-                .IsVisible = False
-            End With
-            With .YAxis
-                .Type = pYAxisType
-                .MajorGrid.IsVisible = True
-                .MajorTic.IsOutside = False
-                .MajorTic.IsInside = True
-                .MinorTic.IsOutside = False
-                .MinorTic.IsInside = True
-                .Scale.Format = DefaultAxisLabelFormat
-                .Scale.Align = AlignP.Inside
-                With .MajorGrid
-                    .Color = DefaultMajorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-                With .MinorGrid
-                    .Color = DefaultMinorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-            End With
-            With .Y2Axis
-                .MajorTic.IsOutside = False
-                .MajorTic.IsInside = True
-                .MinorTic.IsOutside = False
-                .MinorTic.IsInside = True
-                .Scale.Format = DefaultAxisLabelFormat
-                .Scale.Align = AlignP.Inside
-                With .MajorGrid
-                    .Color = DefaultMajorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-                With .MinorGrid
-                    .Color = DefaultMinorGridColor
-                    .DashOn = 0
-                    .DashOff = 0
-                    .IsVisible = True
-                End With
-            End With
-            With .Legend
-                .Position = LegendPos.Float
-                .Location = New Location(0.05, 0.05, CoordType.ChartFraction, AlignH.Left, AlignV.Top)
-                .IsHStack = False
-                .Border.IsVisible = False
-            End With
-            .Border.IsVisible = False
-        End With
-    End Sub
-
     Private Property AuxAxisEnabled() As Boolean
         Get
             Return pAuxEnabled
@@ -180,7 +95,7 @@ Public Class atcGraphForm
                         .Margin.Bottom = 10
                     End With
                     pPaneAux = New ZedGraph.GraphPane
-                    FormatPaneWithDefaults(pPaneAux)
+                    FormatPaneWithDefaults(pPaneAux, pXAxisType, pYAxisType)
                     With pPaneAux
                         .Margin.All = 0
                         .Margin.Top = 10
