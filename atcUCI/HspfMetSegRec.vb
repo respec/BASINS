@@ -2,6 +2,15 @@
 Option Strict Off
 Option Explicit On
 
+Imports System.Collections.ObjectModel
+
+Public Class HspfMetSegRecords
+    Inherits KeyedCollection(Of String, HspfMetSegRecord)
+    Protected Overrides Function GetKeyForItem(ByVal aMetSegRecord As HspfMetSegRecord) As String
+        Return aMetSegRecord.Name
+    End Function
+End Class
+
 Public Class HspfMetSegRecord
     Public Enum MetSegRecordType
         msrUNK = 0
@@ -18,12 +27,13 @@ Public Class HspfMetSegRecord
     Public MFactP As Double
     Public MFactR As Double
     Public Typ As Integer
+    Public Name As String
     Public Tran As String
     Public Sgapstrg As String
     Public Ssystem As String
     Public Source As HspfSrcTar
 
-    Public Function Compare(ByRef aTargetMetSegRecord As HspfMetSegRecord, _
+    Public Function Compare(ByVal aTargetMetSegRecord As HspfMetSegRecord, _
                             ByRef aOperationName As String) As Boolean
         Compare = True
         If aOperationName = "PERLND" Or aOperationName = "IMPLND" Then

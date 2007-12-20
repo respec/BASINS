@@ -869,49 +869,51 @@ Module modCreateUci
         Dim lMetSeg As New HspfMetSeg
         lMetSeg.Uci = aUci
         For lRecordIndex As Integer = 1 To 7
-            lMetSeg.MetSegRec(lRecordIndex).Source.VolName = aMetWdmId
-            lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = ""
-            lMetSeg.MetSegRec(lRecordIndex).Ssystem = "ENGL"
-            lMetSeg.MetSegRec(lRecordIndex).Tran = "SAME"
-            lMetSeg.MetSegRec(lRecordIndex).Typ = lRecordIndex
+            Dim lMetSegRecord As New HspfMetSegRecord
+            lMetSegRecord.Source.VolName = aMetWdmId
+            lMetSegRecord.Sgapstrg = ""
+            lMetSegRecord.Ssystem = "ENGL"
+            lMetSegRecord.Tran = "SAME"
+            lMetSegRecord.Typ = lRecordIndex
             Select Case lRecordIndex
                 Case 1
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn
-                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "PREC"
-                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
-                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
-                    lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = "ZERO"
+                    lMetSegRecord.Source.VolId = aMetBaseDsn
+                    lMetSegRecord.Source.Member = "PREC"
+                    lMetSegRecord.MFactP = 1
+                    lMetSegRecord.MFactR = 1
+                    lMetSegRecord.Sgapstrg = "ZERO"
                 Case 2
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 2
-                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "ATEM"
-                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
-                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                    lMetSegRecord.Source.VolId = aMetBaseDsn + 2
+                    lMetSegRecord.Source.Member = "ATEM"
+                    lMetSegRecord.MFactP = 1
+                    lMetSegRecord.MFactR = 1
                 Case 3
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 6
-                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "DEWP"
-                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
-                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                    lMetSegRecord.Source.VolId = aMetBaseDsn + 6
+                    lMetSegRecord.Source.Member = "DEWP"
+                    lMetSegRecord.MFactP = 1
+                    lMetSegRecord.MFactR = 1
                 Case 4
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 3
-                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "WIND"
-                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
-                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                    lMetSegRecord.Source.VolId = aMetBaseDsn + 3
+                    lMetSegRecord.Source.Member = "WIND"
+                    lMetSegRecord.MFactP = 1
+                    lMetSegRecord.MFactR = 1
                 Case 5
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 4
-                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "SOLR"
-                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
-                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                    lMetSegRecord.Source.VolId = aMetBaseDsn + 4
+                    lMetSegRecord.Source.Member = "SOLR"
+                    lMetSegRecord.MFactP = 1
+                    lMetSegRecord.MFactR = 1
                 Case 6
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 7
-                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "CLOU"
-                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 0
-                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                    lMetSegRecord.Source.VolId = aMetBaseDsn + 7
+                    lMetSegRecord.Source.Member = "CLOU"
+                    lMetSegRecord.MFactP = 0
+                    lMetSegRecord.MFactR = 1
                 Case 7
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = aMetBaseDsn + 5
-                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = "PEVT"
-                    lMetSeg.MetSegRec(lRecordIndex).MFactP = 1
-                    lMetSeg.MetSegRec(lRecordIndex).MFactR = 1
+                    lMetSegRecord.Source.VolId = aMetBaseDsn + 5
+                    lMetSegRecord.Source.Member = "PEVT"
+                    lMetSegRecord.MFactP = 1
+                    lMetSegRecord.MFactR = 1
             End Select
+            lMetSeg.MetSegRecs.Add(lMetSegRecord)
         Next lRecordIndex
         lMetSeg.ExpandMetSegName(aMetWdmId, aMetBaseDsn)
         lMetSeg.Id = aUci.MetSegs.Count + 1
@@ -927,21 +929,23 @@ Module modCreateUci
             Dim lRecordIndex As Integer = 0
             For Each lDataType As DataType In lMetSegment.DataTypes
                 lRecordIndex += 1
+                Dim lMetSegRecord As New HspfMetSegRecord
                 With lDataType
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolName = .WdmID
-                    lMetSeg.MetSegRec(lRecordIndex).Source.VolId = .Dsn
-                    lMetSeg.MetSegRec(lRecordIndex).Source.Member = .Name
-                    lMetSeg.MetSegRec(lRecordIndex).MFactP = .MFactPI
-                    lMetSeg.MetSegRec(lRecordIndex).MFactR = .MFactR
+                    lMetSegRecord.Source.VolName = .WdmID
+                    lMetSegRecord.Source.VolId = .Dsn
+                    lMetSegRecord.Source.Member = .Name
+                    lMetSegRecord.MFactP = .MFactPI
+                    lMetSegRecord.MFactR = .MFactR
                 End With
-                lMetSeg.MetSegRec(lRecordIndex).Ssystem = "ENGL"
-                lMetSeg.MetSegRec(lRecordIndex).Tran = "SAME"
-                lMetSeg.MetSegRec(lRecordIndex).Typ = lRecordIndex
+                lMetSegRecord.Ssystem = "ENGL"
+                lMetSegRecord.Tran = "SAME"
+                lMetSegRecord.Typ = lRecordIndex
                 If lRecordIndex = 1 Then
-                    lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = "ZERO"
+                    lMetSegRecord.Sgapstrg = "ZERO"
                 Else
-                    lMetSeg.MetSegRec(lRecordIndex).Sgapstrg = ""
+                    lMetSegRecord.Sgapstrg = ""
                 End If
+                lMetSeg.MetSegRecs.Add(lMetSegRecord)
             Next
             With lMetSegment.DataTypes("PREC")
                 lMetSeg.ExpandMetSegName(.WdmID, .Dsn)
