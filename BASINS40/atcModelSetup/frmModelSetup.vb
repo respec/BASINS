@@ -11,6 +11,7 @@ Public Class frmModelSetup
     Friend pModelName As String
     Friend WithEvents lstMet As System.Windows.Forms.ListBox
     Friend pMetStations As atcCollection
+    Friend WithEvents AtcGridMet As atcControls.atcGrid
     Friend pMetBaseDsns As atcCollection
 
 #Region " Windows Form Designer generated code "
@@ -172,6 +173,8 @@ Public Class frmModelSetup
         Me.cboYear = New System.Windows.Forms.ComboBox
         Me.Label6 = New System.Windows.Forms.Label
         Me.TabPage6 = New System.Windows.Forms.TabPage
+        Me.AtcGridMet = New atcControls.atcGrid
+        Me.lstMet = New System.Windows.Forms.ListBox
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.txtMetWDMName = New System.Windows.Forms.TextBox
         Me.cmdSelectWDM = New System.Windows.Forms.Button
@@ -186,7 +189,6 @@ Public Class frmModelSetup
         Me.ofdCustom = New System.Windows.Forms.OpenFileDialog
         Me.ofdClass = New System.Windows.Forms.OpenFileDialog
         Me.ofdMetWDM = New System.Windows.Forms.OpenFileDialog
-        Me.lstMet = New System.Windows.Forms.ListBox
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.TabPage2.SuspendLayout()
@@ -395,6 +397,7 @@ Public Class frmModelSetup
                     Or System.Windows.Forms.AnchorStyles.Left) _
                     Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.AtcGridPervious.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridPervious.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.AtcGridPervious.LineColor = System.Drawing.Color.Empty
         Me.AtcGridPervious.LineWidth = 0.0!
         Me.AtcGridPervious.Location = New System.Drawing.Point(14, 148)
@@ -806,6 +809,7 @@ Public Class frmModelSetup
         '
         'TabPage6
         '
+        Me.TabPage6.Controls.Add(Me.AtcGridMet)
         Me.TabPage6.Controls.Add(Me.lstMet)
         Me.TabPage6.Controls.Add(Me.GroupBox2)
         Me.TabPage6.Location = New System.Drawing.Point(4, 25)
@@ -814,6 +818,35 @@ Public Class frmModelSetup
         Me.TabPage6.TabIndex = 5
         Me.TabPage6.Text = "Met Segments"
         Me.TabPage6.UseVisualStyleBackColor = True
+        '
+        'AtcGridMet
+        '
+        Me.AtcGridMet.AllowHorizontalScrolling = True
+        Me.AtcGridMet.AllowNewValidValues = False
+        Me.AtcGridMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.AtcGridMet.CellBackColor = System.Drawing.Color.Empty
+        Me.AtcGridMet.Font = New System.Drawing.Font("Microsoft Sans Serif", 7.8!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.AtcGridMet.LineColor = System.Drawing.Color.Empty
+        Me.AtcGridMet.LineWidth = 0.0!
+        Me.AtcGridMet.Location = New System.Drawing.Point(21, 187)
+        Me.AtcGridMet.Name = "AtcGridMet"
+        Me.AtcGridMet.Size = New System.Drawing.Size(474, 149)
+        Me.AtcGridMet.Source = Nothing
+        Me.AtcGridMet.TabIndex = 19
+        '
+        'lstMet
+        '
+        Me.lstMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lstMet.FormattingEnabled = True
+        Me.lstMet.ItemHeight = 16
+        Me.lstMet.Location = New System.Drawing.Point(21, 97)
+        Me.lstMet.Name = "lstMet"
+        Me.lstMet.Size = New System.Drawing.Size(474, 84)
+        Me.lstMet.TabIndex = 1
         '
         'GroupBox2
         '
@@ -948,18 +981,6 @@ Public Class frmModelSetup
         Me.ofdMetWDM.Filter = "Met WDM files (*.wdm)|*.wdm"
         Me.ofdMetWDM.InitialDirectory = "/BASINS/data/"
         Me.ofdMetWDM.Title = "Select Met WDM File"
-        '
-        'lstMet
-        '
-        Me.lstMet.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lstMet.FormattingEnabled = True
-        Me.lstMet.ItemHeight = 16
-        Me.lstMet.Location = New System.Drawing.Point(21, 97)
-        Me.lstMet.Name = "lstMet"
-        Me.lstMet.Size = New System.Drawing.Size(474, 228)
-        Me.lstMet.TabIndex = 1
         '
         'frmModelSetup
         '
@@ -1421,6 +1442,70 @@ Public Class frmModelSetup
             Next i
         End With
         AtcGridPervious.Refresh()
+
+    End Sub
+
+    Private Sub SetMetSegmentGrid()
+
+        If AtcGridMet.Source Is Nothing Then Exit Sub
+
+        Dim lSubbasinsLayerName As String = cboSubbasins.Items(cboSubbasins.SelectedIndex)
+        Dim lSubbasinsLayerIndex As Integer = GisUtil.LayerIndex(lSubbasinsLayerName)
+
+        Dim lSubbasinsFieldName As String = cboSub1.Items(cboSub1.SelectedIndex)
+        Dim lSubbasinsFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinsLayerIndex, lSubbasinsFieldName)
+
+        Dim lUniqueModelSegments As New atcCollection
+        If cboSub3.SelectedIndex > 0 Then
+            'see if we have some model segments in the subbasin dbf
+            Dim lModelSegmentFieldName As String = cboSub3.Items(cboSub3.SelectedIndex)
+            Dim lModelSegmentFieldIndex As Integer = GisUtil.FieldIndex(lSubbasinsLayerIndex, lModelSegmentFieldName)
+            For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinsLayerIndex)
+                Dim lModelSegment As String = GisUtil.FieldValue(lSubbasinsLayerIndex, lIndex - 1, lModelSegmentFieldIndex)
+                If lUniqueModelSegments.IndexFromKey(lModelSegment) = -1 Then
+                    lUniqueModelSegments.Add(lModelSegment)
+                End If
+            Next
+        End If
+
+        AtcGridMet.Clear()
+        With AtcGridMet.Source
+            .Columns = 2
+            .ColorCells = True
+            .FixedRows = 1
+            .FixedColumns = 1
+            .CellColor(0, 0) = SystemColors.ControlDark
+            .CellColor(0, 1) = SystemColors.ControlDark
+            If lUniqueModelSegments.Count > 0 Then
+                .Rows = 1 + lUniqueModelSegments.Count
+                .CellValue(0, 0) = "Model Segment"
+                .CellValue(0, 1) = "Met Station"
+                For lIndex As Integer = 1 To lUniqueModelSegments.Count
+                    .CellValue(lIndex, 0) = lUniqueModelSegments(lIndex - 1)
+                    .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    If pMetStations.Count > 0 Then
+                        .CellValue(lIndex, 1) = pMetStations(0)
+                        .CellEditable(lIndex, 1) = True
+                    End If
+                Next
+            Else
+                .Rows = 1 + GisUtil.NumFeatures(lSubbasinsLayerIndex)
+                .CellValue(0, 0) = "Subbasin"
+                .CellValue(0, 1) = "Met Station"
+                For lIndex As Integer = 1 To GisUtil.NumFeatures(lSubbasinsLayerIndex)
+                    .CellValue(lIndex, 0) = GisUtil.FieldValue(lSubbasinsLayerIndex, lIndex - 1, lSubbasinsFieldIndex)
+                    .CellColor(lIndex, 0) = SystemColors.ControlDark
+                    If pMetStations.Count > 0 Then
+                        .CellValue(lIndex, 1) = pMetStations(0)
+                        .CellEditable(lIndex, 1) = True
+                    End If
+                Next
+            End If
+        End With
+
+        AtcGridMet.ValidValues = pMetStations
+        AtcGridMet.SizeAllColumnsToContents()
+        AtcGridMet.Refresh()
 
     End Sub
 
@@ -2103,6 +2188,11 @@ ErrHand:
         cboOutlets.Items.Add("<none>")
         cboMet.Items.Add("<none>")
 
+        With AtcGridMet
+            .Source = New atcControls.atcGridSource
+            .AllowHorizontalScrolling = False
+        End With
+
         Dim lyr As Long
         For lyr = 0 To GisUtil.NumLayers() - 1
             ctemp = GisUtil.LayerName(lyr)
@@ -2147,7 +2237,7 @@ ErrHand:
 
         With AtcGridPervious
             .Source = New atcControls.atcGridSource
-            .Font = New Font(.Font, FontStyle.Bold)
+            '.Font = New Font(.Font, FontStyle.Bold)
             .AllowHorizontalScrolling = False
         End With
 
@@ -2222,6 +2312,7 @@ ErrHand:
 
     Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
         BuildListofMetStationNames(txtMetWDMName.Text, pMetStations, pMetBaseDsns)
+        SetMetSegmentGrid()
         lstMet.Items.Clear()
         For Each lMetStation As String In pMetStations
             lstMet.Items.Add(lMetStation)
@@ -2229,6 +2320,14 @@ ErrHand:
         If lstMet.Items.Count > 0 Then
             lstMet.SelectedIndex = 0
         End If
+    End Sub
+
+    Private Sub cboSub1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSub1.SelectedIndexChanged
+        SetMetSegmentGrid()
+    End Sub
+
+    Private Sub cboSub3_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboSub3.SelectedIndexChanged
+        SetMetSegmentGrid()
     End Sub
 
 End Class
