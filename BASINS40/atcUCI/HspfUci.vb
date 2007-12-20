@@ -319,7 +319,7 @@ Public Class HspfUci
                 Case "FILES"
                     lStr = pFilesBlk.ToString
                 Case "CATEGORY"
-                    If Not pCategoryBlk Is Nothing AndAlso pCategoryBlk.Count > 0 Then
+                    If Not pCategoryBlk Is Nothing AndAlso pCategoryBlk.Categories.Count > 0 Then
                         lStr = pCategoryBlk.ToString
                     End If
                 Case "OPN SEQUENCE"
@@ -676,7 +676,9 @@ Public Class HspfUci
                 If lNewSeg Then
                     lMetSeg.Id = pMetSegs.Count + 1
                     'get met seg name from precip data set
-                    If lMetSeg.MetSegRecs.Count > 0 AndAlso lMetSeg.MetSegRecs("PREC").Source.VolId > 0 Then
+                    If lMetSeg.MetSegRecs.Count > 0 AndAlso _
+                       lMetSeg.MetSegRecs.Contains("PREC") AndAlso _
+                       lMetSeg.MetSegRecs("PREC").Source.VolId > 0 Then
                         With lMetSeg.MetSegRecs("PREC").Source
                             If pWdmCount > 0 Then
                                 lMetSeg.ExpandMetSegName(.VolName, .VolId)
@@ -2635,7 +2637,7 @@ x:
         'turn a two character category tag into its integer equivalent
         If aCategory.Length > 0 Then
             If Not Me.CategoryBlock Is Nothing Then 'have category block
-                For Each lCategory As HspfData.HspfCategory In Me.CategoryBlock.Categories
+                For Each lCategory As HspfCategory In Me.CategoryBlock.Categories
                     If lCategory.Tag = aCategory Then
                         CatAsInt = lCategory.Id
                     End If
@@ -2654,7 +2656,7 @@ x:
         If Not Me.CategoryBlock Is Nothing Then
             If IsNumeric(aSint) Then
                 Dim lSint As Integer = CShort(aSint)
-                If Me.CategoryBlock.Count > 0 And Me.CategoryBlock.Count >= lSint Then
+                If Me.CategoryBlock.Categories.Count > 0 And Me.CategoryBlock.Categories.Count >= lSint Then
                     'have category block
                     'check to see if this one is valid to convert into a category tag
                     If aMember = "COTDGT" And aSub1or2 = 2 Or _

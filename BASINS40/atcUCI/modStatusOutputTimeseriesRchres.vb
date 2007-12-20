@@ -34,11 +34,10 @@ Module modStatusOutputTimeseriesRchres
                     AUX2FG = 0
                 End If
                 TimserStatus.Change("HYDR:VOL", 1, HspfStatusOptional)
-                If Not O.Uci.CategoryBlock Is Nothing Then
-                    'have category block
-                    For i = 1 To O.Uci.CategoryBlock.Count
-                        TimserStatus.Change("HYDR:CVOL", i, HspfStatusOptional)
-                    Next i
+                If Not O.Uci.CategoryBlock Is Nothing Then 'have category block
+                    For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                        TimserStatus.Change("HYDR:CVOL", lCategory.Id, HspfStatusOptional)
+                    Next lCategory
                 End If
 
                 TimserStatus.Change("HYDR:DEP", 1, HspfStatusOptional)
@@ -57,53 +56,48 @@ Module modStatusOutputTimeseriesRchres
                     TimserStatus.Change("HYDR:TAU", 1, HspfStatusOptional)
                 End If
                 TimserStatus.Change("HYDR:RO", 1, HspfStatusOptional)
-                If Not O.Uci.CategoryBlock Is Nothing Then
-                    'have category block
-                    For i = 1 To O.Uci.CategoryBlock.Count
-                        TimserStatus.Change("HYDR:CRO", i, HspfStatusOptional)
-                    Next i
+                If Not O.Uci.CategoryBlock Is Nothing Then 'have category block
+                    For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                        TimserStatus.Change("HYDR:CRO", lCategory.Id, HspfStatusOptional)
+                    Next lCategory
                 End If
 
                 TimserStatus.Change("ROFLOW:ROVOL", 1, HspfStatusOptional)
-                If Not O.Uci.CategoryBlock Is Nothing Then
-                    'have category block
-                    For i = 1 To O.Uci.CategoryBlock.Count
-                        TimserStatus.Change("ROFLOW:CROVOL", i, HspfStatusOptional)
-                    Next i
+                If Not O.Uci.CategoryBlock Is Nothing Then 'have category block
+                    For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                        TimserStatus.Change("ROFLOW:CROVOL", lCategory.Id, HspfStatusOptional)
+                    Next lCategory
                 End If
 
                 If nExits > 1 Then
                     For i = 1 To nExits
                         TimserStatus.Change("HYDR:O", i, HspfStatusOptional)
-                        If Not O.Uci.CategoryBlock Is Nothing Then
-                            'have category block
-                            For j = 1 To O.Uci.CategoryBlock.Count
-                                TimserStatus.Change2("HYDR:CO", i, j, HspfStatusOptional)
-                                TimserStatus.Change2("HYDR:CDFVOL", i, j, HspfStatusOptional)
-                                TimserStatus.Change2("HYDR:COVOL", i, j, HspfStatusOptional)
-                                TimserStatus.Change2("OFLOW:COVOL", i, j, HspfStatusOptional)
-                            Next j
+                        If Not O.Uci.CategoryBlock Is Nothing Then 'have category block
+                            For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                                TimserStatus.Change2("HYDR:CO", i, lCategory.Id, HspfStatusOptional)
+                                TimserStatus.Change2("HYDR:CDFVOL", i, lCategory.Id, HspfStatusOptional)
+                                TimserStatus.Change2("HYDR:COVOL", i, lCategory.Id, HspfStatusOptional)
+                                TimserStatus.Change2("OFLOW:COVOL", i, lCategory.Id, HspfStatusOptional)
+                            Next lCategory
                         End If
                         TimserStatus.Change("OFLOW:OVOL", i, HspfStatusOptional)
                         TimserStatus.Change("HYDR:OVOL", i, HspfStatusOptional)
                     Next i
                 End If
                 TimserStatus.Change("HYDR:IVOL", 1, HspfStatusOptional)
-                If Not O.Uci.CategoryBlock Is Nothing Then
-                    'have category block
-                    For i = 1 To O.Uci.CategoryBlock.Count
-                        TimserStatus.Change("HYDR:CIVOL", i, HspfStatusOptional)
-                    Next i
+                If Not O.Uci.CategoryBlock Is Nothing Then 'have category block
+                    For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                        TimserStatus.Change("HYDR:CIVOL", lCategory.Id, HspfStatusOptional)
+                    Next lCategory
                 End If
 
                 TimserStatus.Change("HYDR:PRSUPY", 1, HspfStatusOptional)
                 TimserStatus.Change("HYDR:VOLEV", 1, HspfStatusOptional)
                 TimserStatus.Change("HYDR:ROVOL", 1, HspfStatusOptional)
-                If Not O.Uci.CategoryBlock Is Nothing Then
-                    'have category block
-                    For i = 1 To O.Uci.CategoryBlock.Count
-                        TimserStatus.Change("HYDR:CROVOL", i, HspfStatusOptional)
-                    Next i
+                If Not O.Uci.CategoryBlock Is Nothing Then 'have category block
+                    For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                        TimserStatus.Change("HYDR:CROVOL", lCategory.Id, HspfStatusOptional)
+                    Next lCategory
                 End If
 
                 TimserStatus.Change("HYDR:RIRDEM", 1, HspfStatusOptional)

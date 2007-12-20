@@ -4,7 +4,6 @@ Imports System.Data.Odbc
 ''' Opens a MDB file and returns tables within it as DataTable
 ''' </summary>
 Public Class atcMDB
-
     Private pConnection As OdbcConnection
 
     ''' <summary>
@@ -23,11 +22,10 @@ Public Class atcMDB
     ''' <remarks>aTableName can be a query, "SELECT * from " will be prepended within GetTable</remarks>
     Public Function GetTable(ByVal aTableName As String) As DataTable
         pConnection.Open()
-        Dim myBlkDA As New OdbcDataAdapter("SELECT * from " & aTableName, pConnection)
-        Dim myBlkDS As New DataSet
-        myBlkDA.Fill(myBlkDS)
-        GetTable = myBlkDS.Tables(0)
+        Dim lOdbcDataAdapter As New OdbcDataAdapter("SELECT * from " & aTableName, pConnection)
+        Dim lDataSet As New DataSet
+        lOdbcDataAdapter.Fill(lDataSet)
+        GetTable = lDataSet.Tables(0)
         pConnection.Close()
     End Function
-
 End Class

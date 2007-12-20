@@ -47,20 +47,18 @@ Module modStatusInputTimeseriesRchres
                 If O.Uci.CategoryBlock Is Nothing Then
                     'not using category block
                     TimserStatus.Change("INFLOW:IVOL", 1, HspfStatusOptional)
-                Else
-                    'have category block
-                    For i = 1 To O.Uci.CategoryBlock.Count
-                        TimserStatus.Change("INFLOW:CIVOL", i, HspfStatusOptional)
-                    Next i
+                Else 'have category block
+                    For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                        TimserStatus.Change("INFLOW:CIVOL", lCategory.Id, HspfStatusOptional)
+                    Next lCategory
                 End If
                 If O.Uci.CategoryBlock Is Nothing Then
                     'not using category block
                     TimserStatus.Change("EXTNL:IVOL", 1, HspfStatusOptional)
-                Else
-                    'have category block
-                    For i = 1 To O.Uci.CategoryBlock.Count
-                        TimserStatus.Change("EXTNL:CIVOL", i, HspfStatusOptional)
-                    Next i
+                Else 'have category block
+                    For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                        TimserStatus.Change("EXTNL:CIVOL", lCategory.Id, HspfStatusOptional)
+                    Next lCategory
                 End If
                 TimserStatus.Change("EXTNL:PREC", 1, HspfStatusOptional)
                 TimserStatus.Change("EXTNL:POTEV", 1, HspfStatusOptional)
@@ -68,13 +66,11 @@ Module modStatusInputTimeseriesRchres
                     If Odfvfg(i) < 0 Then
                         TimserStatus.Change("EXTNL:COLIND", i, HspfStatusRequired)
                     End If
-                    If O.Uci.CategoryBlock Is Nothing Then
-                        'not using category block
+                    If O.Uci.CategoryBlock Is Nothing Then 'not using category block
                         If Odgtfg(i) > 0 Then
                             TimserStatus.Change("EXTNL:OUTDGT", Odgtfg(i), HspfStatusRequired)
                         End If
-                    Else
-                        'have category block
+                    Else 'have category block
                         If Odgtfg(i) > 0 Then
                             'make optional since we cant don't accomodate string versions of sub1,sub2
                             TimserStatus.Change("EXTNL:COTDGT", Odgtfg(i), HspfStatusOptional)

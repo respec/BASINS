@@ -15,8 +15,8 @@ Public Class HspfGlobalBlk
     Private pRunFg As Integer 'interp only(0) or interp and run(1)
     Private pEmFg As Integer 'english(1), metric(2) flag
     Private pIhmFg As Integer 'ihm flag (normal-0,IHM control-1)
-    Private pComment As String = ""
-    Private pUci As HspfUci
+    Public Comment As String = ""
+    Public Uci As HspfUci
     Private pEdited As Boolean
 
     Public Property Edited() As Boolean
@@ -25,16 +25,7 @@ Public Class HspfGlobalBlk
         End Get
         Set(ByVal Value As Boolean)
             pEdited = Value
-            If Value Then pUci.Edited = True
-        End Set
-    End Property
-
-    Public Property Uci() As HspfUci
-        Get
-            Return pUci
-        End Get
-        Set(ByVal Value As HspfUci)
-            pUci = Value
+            If Value Then Me.Uci.Edited = True
         End Set
     End Property
 
@@ -42,15 +33,6 @@ Public Class HspfGlobalBlk
         Get
             Return "Global Block"
         End Get
-    End Property
-
-    Public Property Comment() As String
-        Get
-            Return pComment
-        End Get
-        Set(ByVal Value As String)
-            pComment = Value
-        End Set
     End Property
 
     Public ReadOnly Property EditControlName() As String
@@ -168,9 +150,9 @@ Public Class HspfGlobalBlk
         Dim lRecord As String = Nothing
         Dim lOutLev As Integer
 
-        If pUci.FastFlag Then
+        If Me.Uci.FastFlag Then
             lRecordIndex = -1
-            pComment = GetCommentBeforeBlock("GLOBAL")
+            Me.Comment = GetCommentBeforeBlock("GLOBAL")
             GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
             If Not lRecord.StartsWith("  START") Then
                 pRunInf.Value = lRecord.TrimEnd
@@ -232,11 +214,11 @@ Public Class HspfGlobalBlk
             End If
             lField = lRecord.Substring(50, 2)
             If lField.Length > 0 AndAlso IsInteger(lField) Then
-                pSDate(3) = lField
-                pSDate(4) = lRecord.Substring(53, 2)
+                pEDate(3) = lField
+                pEDate(4) = lRecord.Substring(53, 2)
             Else
-                pSDate(3) = 0
-                pSDate(4) = 0
+                pEDate(3) = 0
+                pEDate(4) = 0
             End If
 
             GetNextRecordFromBlock("GLOBAL", lRecordIndex, lRecord, lRecordType, lReturnCode)
@@ -288,8 +270,8 @@ Public Class HspfGlobalBlk
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
 
-        If pComment.Length > 0 Then
-            lSB.AppendLine(pComment.TrimEnd)
+        If Me.Comment.Length > 0 Then
+            lSB.AppendLine(Me.Comment.TrimEnd)
         End If
         lSB.AppendLine("GLOBAL")
         lSB.AppendLine("  " & pRunInf.Value.Trim)
@@ -307,7 +289,7 @@ Public Class HspfGlobalBlk
 
     Private Sub Update()
         'Call F90_PUTGLO(pSDate(0), pEDate(0), pOutLev, pSpOut, pRunFg, pEmFg, pRunInf, Len(pRunInf))
-        pUci.Edited = True
+        Me.Uci.Edited = True
     End Sub
 
     'Public Function Check() As String

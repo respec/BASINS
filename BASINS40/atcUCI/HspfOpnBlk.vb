@@ -14,21 +14,12 @@ Public Class HspfOpnBlks
 End Class
 
 Public Class HspfOpnBlk
-    Private pName As String
     Private pIds As HspfOperations
     Private pEdited As Boolean
     Private pTables As HspfTables
     Private pUci As HspfUci
-    Private pComment As String = ""
-
-    Public Property Comment() As String
-        Get
-            Return pComment
-        End Get
-        Set(ByVal Value As String)
-            pComment = Value
-        End Set
-    End Property
+    Public Comment As String = ""
+    Public Name As String = ""
 
     Public Property Edited() As Boolean
         Get
@@ -37,15 +28,6 @@ Public Class HspfOpnBlk
         Set(ByVal Value As Boolean)
             pEdited = Value
             If Value Then pUci.Edited = True
-        End Set
-    End Property
-
-    Public Property Name() As String
-        Get
-            Return pName
-        End Get
-        Set(ByVal Value As String)
-            pName = Value
         End Set
     End Property
 
@@ -107,7 +89,6 @@ Public Class HspfOpnBlk
 
     Public Sub New()
         MyBase.New()
-        pName = ""
         pIds = New HspfOperations
         pTables = New HspfTables
     End Sub
@@ -118,14 +99,14 @@ Public Class HspfOpnBlk
 
     Public Sub setTableValues(ByVal aBlockDef As HspfBlockDef)
         If pUci.FastFlag Then
-            pComment = GetCommentBeforeBlock(pName)
+            Comment = GetCommentBeforeBlock(Me.Name)
         End If
         ReadTables(aBlockDef)
     End Sub
 
     Private Sub ReadTables(ByRef aBlockDef As HspfBlockDef)
         'Logger.Dbg("Starting readTables at " & TimeOfDay)
-        Dim lOperType As HspfData.HspfOperType = HspfOperNum(pName)
+        Dim lOperType As HspfData.HspfOperType = HspfOperNum(Me.Name)
         Dim lContinueFlag As Integer
         Dim lTableIndex As Integer = 0
         Do
@@ -203,21 +184,21 @@ Public Class HspfOpnBlk
                                 lTable.OccurIndex = 0
                                 lTable.TableComment = lTableComment
                                 lTable.CombineOK = lCombineOk
-                                If pName = "PERLND" And lTable.Def.Parent.Name = "PQUAL" Then
+                                If Me.Name = "PERLND" And lTable.Def.Parent.Name = "PQUAL" Then
                                     'need to compute proper index
                                     If lOperation.TableExists("NQUALS") Then
                                         Dim lNQual As Integer = lOperation.Tables.Item("NQUALS").ParmValue("NQUAL")
                                         lTable.SetQualIndex(lOccurNum, lNQual)
                                     End If
                                 End If
-                                If pName = "IMPLND" And lTable.Def.Parent.Name = "IQUAL" Then
+                                If Me.Name = "IMPLND" And lTable.Def.Parent.Name = "IQUAL" Then
                                     'need to compute proper index
                                     If lOperation.TableExists("NQUALS") Then
                                         Dim lNQual As Integer = lOperation.Tables.Item("NQUALS").ParmValue("NQUAL")
                                         lTable.SetQualIndex(lOccurNum, lNQual)
                                     End If
                                 End If
-                                If pName = "RCHRES" And lTable.Def.Parent.Name = "GQUAL" Then
+                                If Me.Name = "RCHRES" And lTable.Def.Parent.Name = "GQUAL" Then
                                     'need to compute proper index
                                     If lOperation.TableExists("GQ-GENDATA") Then
                                         Dim lNGQual As Integer = lOperation.Tables.Item("GQ-GENDATA").ParmValue("NGQUAL")
@@ -481,15 +462,15 @@ Public Class HspfOpnBlk
 
     Public Overrides Function ToString() As String
         Dim lSB As New StringBuilder
-        If pComment.Length > 0 Then
-            lSB.AppendLine(pComment)
+        If Comment.Length > 0 Then
+            lSB.AppendLine(Comment)
         End If
-        lSB.AppendLine(pName)
+        lSB.AppendLine(Me.Name)
 
         Dim lGroupIndex, lFirstInGroup As Integer
         Dim lLastInGroup, lLastGroupIndex, lCurrentOccurGroup As Integer
         Dim lInGroup As Boolean = False
-        Dim lBlockDef As HspfBlockDef = pUci.Msg.BlockDefs.Item(pName)
+        Dim lBlockDef As HspfBlockDef = pUci.Msg.BlockDefs.Item(Me.Name)
         Dim lFirstTable As Boolean = True
         Dim lTableDefIndex As Integer = 0
         For Each lTableDef As HspfTableDef In lBlockDef.TableDefs
@@ -582,7 +563,7 @@ Public Class HspfOpnBlk
             lFirstTable = False
         Next lTableDef
 
-        lSB.AppendLine("END " & pName)
+        lSB.AppendLine("END " & Me.Name)
         Return lSB.ToString
     End Function
 

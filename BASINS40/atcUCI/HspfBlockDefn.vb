@@ -4,6 +4,10 @@ Option Explicit On
 
 Imports System.Collections.ObjectModel
 
+''' <summary>
+''' Keyed Collection of HspfBlockDef
+''' </summary>
+''' <remarks>Key is Name</remarks>
 Public Class HspfBlockDefs
     Inherits KeyedCollection(Of String, HspfBlockDef)
     Protected Overrides Function GetKeyForItem(ByVal aHspfBlockDef As HspfBlockDef) As String

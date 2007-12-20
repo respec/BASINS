@@ -1,19 +1,12 @@
+'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 Option Strict Off
 Option Explicit On
-<System.Runtime.InteropServices.ProgId("HspfData_NET.HspfData")> Public Class HspfData
-    'Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license
 
+Public Class HspfData
     Public Structure HspfFile
         Dim Typ As String 'valid are MESSU, WDM(x), DSSx or blank
         Dim Unit As Integer 'use 21-99
         Dim Name As String 'complete path
-        Dim Comment As String 'preceeding comment
-    End Structure
-
-    Public Structure HspfCategory
-        Dim Id As Integer
-        Dim Tag As String
-        Dim Name As String
         Dim Comment As String 'preceeding comment
     End Structure
 
