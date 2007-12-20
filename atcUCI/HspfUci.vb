@@ -847,62 +847,60 @@ Public Class HspfUci
                 If Not lOperation.MetSeg Is Nothing Then
                     For Each lMetSegRecord As HspfMetSegRecord In lOperation.MetSeg.MetSegRecs
                         With lMetSegRecord
-                            If .Typ <> 0 Then 'type exists
-                                If (lOperation.Name = "RCHRES" And .MFactR > 0.0#) Or _
+                            If (lOperation.Name = "RCHRES" And .MFactR > 0.0#) Or _
                                    (lOperation.Name = "PERLND" And .MFactP > 0.0#) Or _
                                    (lOperation.Name = "IMPLND" And .MFactP > 0.0#) Then
-                                    Dim lConnection As New HspfConnection
-                                    lConnection.Uci = Me
-                                    lConnection.Typ = 1
-                                    'set source components
-                                    lConnection.Source.Group = .Source.Group
-                                    lConnection.Source.Member = .Source.Member
-                                    lConnection.Source.MemSub1 = .Source.MemSub1
-                                    lConnection.Source.MemSub2 = .Source.MemSub2
-                                    lConnection.Source.VolId = .Source.VolId
-                                    lConnection.Source.VolIdL = .Source.VolIdL
-                                    lConnection.Source.VolName = .Source.VolName
-                                    lConnection.Ssystem = .Ssystem
-                                    lConnection.Sgapstrg = .Sgapstrg
-                                    lConnection.Target.Group = "EXTNL"
-                                    If lOperation.Name = "RCHRES" Then
-                                        lConnection.MFact = .MFactR
-                                        Select Case .Typ
-                                            Case 1 : lConnection.Target.Member = "PREC"
-                                            Case 2 : lConnection.Target.Member = "GATMP"
-                                            Case 3 : lConnection.Target.Member = "DEWTMP"
-                                            Case 4 : lConnection.Target.Member = "WIND"
-                                            Case 5 : lConnection.Target.Member = "SOLRAD"
-                                            Case 6 : lConnection.Target.Member = "CLOUD"
-                                            Case 7 : lConnection.Target.Member = "POTEV"
-                                        End Select
-                                    Else
-                                        lConnection.MFact = .MFactP
-                                        Select Case .Typ
-                                            Case 1 : lConnection.Target.Member = "PREC"
-                                            Case 2 : lConnection.Target.Member = "GATMP"
-                                            Case 3 : lConnection.Target.Member = "DTMPG"
-                                            Case 4 : lConnection.Target.Member = "WINMOV"
-                                            Case 5 : lConnection.Target.Member = "SOLRAD"
-                                            Case 6 : lConnection.Target.Member = "CLOUD"
-                                            Case 7 : lConnection.Target.Member = "PETINP"
-                                        End Select
-                                        If .Typ = 2 Then
-                                            'get right air temp member name
-                                            If lOperation.MetSeg.AirType = 1 Then
-                                                lConnection.Target.Member = "GATMP"
-                                            ElseIf lOperation.MetSeg.AirType = 2 Then
-                                                lConnection.Target.Member = "AIRTMP"
-                                                lConnection.Target.Group = "ATEMP"
-                                            End If
+                                Dim lConnection As New HspfConnection
+                                lConnection.Uci = Me
+                                lConnection.Typ = 1
+                                'set source components
+                                lConnection.Source.Group = .Source.Group
+                                lConnection.Source.Member = .Source.Member
+                                lConnection.Source.MemSub1 = .Source.MemSub1
+                                lConnection.Source.MemSub2 = .Source.MemSub2
+                                lConnection.Source.VolId = .Source.VolId
+                                lConnection.Source.VolIdL = .Source.VolIdL
+                                lConnection.Source.VolName = .Source.VolName
+                                lConnection.Ssystem = .Ssystem
+                                lConnection.Sgapstrg = .Sgapstrg
+                                lConnection.Target.Group = "EXTNL"
+                                If lOperation.Name = "RCHRES" Then
+                                    lConnection.MFact = .MFactR
+                                    Select Case .Name
+                                        Case "PREC" : lConnection.Target.Member = "PREC"
+                                        Case "ATEM" : lConnection.Target.Member = "GATMP"
+                                        Case "DEWP" : lConnection.Target.Member = "DEWTMP"
+                                        Case "WIND" : lConnection.Target.Member = "WIND"
+                                        Case "SOLR" : lConnection.Target.Member = "SOLRAD"
+                                        Case "CLOU" : lConnection.Target.Member = "CLOUD"
+                                        Case "PEVT" : lConnection.Target.Member = "POTEV"
+                                    End Select
+                                Else
+                                    lConnection.MFact = .MFactP
+                                    Select Case .Name
+                                        Case "PREC" : lConnection.Target.Member = "PREC"
+                                        Case "ATEM" : lConnection.Target.Member = "GATMP"
+                                        Case "DEWP" : lConnection.Target.Member = "DTMPG"
+                                        Case "WIND" : lConnection.Target.Member = "WINMOV"
+                                        Case "SOLR" : lConnection.Target.Member = "SOLRAD"
+                                        Case "CLOU" : lConnection.Target.Member = "CLOUD"
+                                        Case "PEVT" : lConnection.Target.Member = "PETINP"
+                                    End Select
+                                    If .Name = "ATEM" Then
+                                        'get right air temp member name
+                                        If lOperation.MetSeg.AirType = 1 Then
+                                            lConnection.Target.Member = "GATMP"
+                                        ElseIf lOperation.MetSeg.AirType = 2 Then
+                                            lConnection.Target.Member = "AIRTMP"
+                                            lConnection.Target.Group = "ATEMP"
                                         End If
                                     End If
-                                    lConnection.Tran = .Tran
-                                    lConnection.Target.VolName = lOperation.Name
-                                    lConnection.Target.VolId = lOperation.Id
-                                    'Me.Connections.Add lConn
-                                    lOperation.Sources.Add(lConnection)
                                 End If
+                                lConnection.Tran = .Tran
+                                lConnection.Target.VolName = lOperation.Name
+                                lConnection.Target.VolId = lOperation.Id
+                                'Me.Connections.Add lConn
+                                lOperation.Sources.Add(lConnection)
                             End If
                         End With
                     Next lMetSegRecord
