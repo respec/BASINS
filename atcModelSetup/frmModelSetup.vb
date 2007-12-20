@@ -4,15 +4,14 @@ Imports MapWinUtility
 Imports System.Drawing
 Imports atcData
 Imports atcSegmentation
-Imports System.Collections.ObjectModel
 
 Public Class frmModelSetup
     Inherits System.Windows.Forms.Form
 
-    Public pModelName As String
+    Friend pModelName As String
     Friend WithEvents lstMet As System.Windows.Forms.ListBox
-    Public pMetStations As atcCollection
-    Public pMetBaseDsns As atcCollection
+    Friend pMetStations As atcCollection
+    Friend pMetBaseDsns As atcCollection
 
 #Region " Windows Form Designer generated code "
 
@@ -1446,46 +1445,6 @@ Public Class frmModelSetup
         End If
     End Sub
 
-    Private Sub StartWinHSPF(ByVal ucommand As String)
-        Dim WinHSPFexe As String
-
-        'todo:  get this from the registry
-        WinHSPFexe = "c:\basins\models\hspf\bin\winhspf.exe"
-        If Not FileExists(WinHSPFexe) Then
-            WinHSPFexe = "d:\basins\models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(WinHSPFexe) Then
-            WinHSPFexe = "e:\basins\models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(WinHSPFexe) Then
-            Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-            WinHSPFexe = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\winhspf.exe"
-        End If
-        If Not FileExists(WinHSPFexe) Then
-            WinHSPFexe = FindFile("Please locate WinHSPF.exe", "WinHSPF.exe")
-        End If
-        If FileExists(WinHSPFexe) Then
-            Process.Start(WinHSPFexe, ucommand)
-        Else
-            MsgBox("Cannot find WinHSPF.exe", MsgBoxStyle.Critical, "BASINS HSPF Problem")
-        End If
-    End Sub
-
-    Public Sub StartAQUATOX(ByVal ucommand$)
-        Dim AQUATOXexe$
-        'Dim reg As New ATCoRegistry
-
-        'todo:  get this from the registry
-        'AQUATOXexe = reg.RegGetString(HKEY_LOCAL_MACHINE, "SOFTWARE\Eco Modeling\AQUATOX\ExePath", "") & "\AQUATOX.exe"
-        AQUATOXexe = "\basins\models\AQUATOX\AQUATOX.exe"
-
-        If FileExists(AQUATOXexe) Then
-            Process.Start(AQUATOXexe, ucommand)
-        Else
-            MsgBox("Cannot find AQUATOX.exe", MsgBoxStyle.Critical, "BASINS AQUATOX Problem")
-        End If
-    End Sub
-
     Private Sub cmdHelp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdHelp.Click
         'MsgBox("Help is not yet implemented.", MsgBoxStyle.Critical, "BASINS " & pModelName & " Problem")
         ShowHelp("BASINS Details\Watershed and Instream Model Setup\HSPF.html")
@@ -1546,6 +1505,7 @@ Public Class frmModelSetup
             OutputPath = DriveLetter & ":\BASINS\modelout\" & tbxName.Text
         End If
         BaseOutputName = tbxName.Text
+        Dim lMetWDM As String = txtMetWDMName.Text
 
         If pModelName = "AQUATOX" Then
             If SetupAQUATOX(OutputPath, BaseOutputName) Then
@@ -1553,7 +1513,7 @@ Public Class frmModelSetup
             End If
         Else
             If SetupHSPF(OutputPath, BaseOutputName) Then
-                If CreateUCI(OutputPath & "\" & BaseOutputName & ".uci", txtMetWDMName.Text) Then
+                If CreateUCI(OutputPath & "\" & BaseOutputName & ".uci", lMetWDM) Then
                     StartWinHSPF(OutputPath & "\" & BaseOutputName & ".uci")
                 Else
                     'below is the old way of creating a uci, in WinHSPF
@@ -1684,16 +1644,20 @@ Public Class frmModelSetup
             'add tiles if not already on map
             'figure out how many polygons to overlay, for status message
             totalpolygoncount = 0
+            Dim lTileFileNames As New Collection
             For j = 1 To cluTiles.Count
                 'loop thru each land use tile
                 NewFileName = luPathName & "\" & cluTiles(j) & ".shp"
-                If Not GisUtil.AddLayer(NewFileName, cluTiles(j)) Then
-                    MsgBox("The GIRAS Landuse Shapefile " & NewFileName & "does not exist." & _
-                           vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "HSPF Problem")
-                    EnableControls(True)
-                    Exit Function
+                lTileFileNames.Add(NewFileName)
+                If Not GisUtil.IsLayerByFileName(NewFileName) Then
+                    If Not GisUtil.AddLayer(NewFileName, cluTiles(j)) Then
+                        MsgBox("The GIRAS Landuse Shapefile " & NewFileName & "does not exist." & _
+                               vbCrLf & "Run the Download tool to bring this data into your project.", vbOKOnly, "HSPF Problem")
+                        EnableControls(True)
+                        Exit Function
+                    End If
                 End If
-                totalpolygoncount = totalpolygoncount + GisUtil.NumFeatures(GisUtil.LayerIndex(cluTiles(j)))
+                totalpolygoncount = totalpolygoncount + GisUtil.NumFeatures(GisUtil.LayerIndex(NewFileName))
             Next j
             totalpolygoncount = totalpolygoncount * cSelectedSubbasins.Count
 
@@ -1707,7 +1671,7 @@ Public Class frmModelSetup
             polygoncount = 0
             lastdisplayed = 0
             LanduseFieldName = "LUCODE"
-            For j = 1 To cluTiles.Count
+            For j = 1 To lTileFileNames.Count
                 'loop thru each land use tile
                 If j = 1 Then
                     bfirst = True
@@ -1715,11 +1679,11 @@ Public Class frmModelSetup
                     bfirst = False
                 End If
                 'lblStatus.Text = "Overlaying Land Use and Subbasins (" & Int(polygoncount / totalpolygoncount * 100) & "%)"
-                lblStatus.Text = "Overlaying Land Use and Subbasins (Tile " & j & " of " & cluTiles.Count & ")"
+                lblStatus.Text = "Overlaying Land Use and Subbasins (Tile " & j & " of " & lTileFileNames.Count & ")"
                 Me.Refresh()
 
                 'do overlay
-                GisUtil.Overlay(cluTiles(j), LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
+                GisUtil.Overlay(lTileFileNames(j), LanduseFieldName, SubbasinThemeName, SubbasinFieldName, _
                                 luPathName & "\overlay.shp", bfirst)
             Next j
 
@@ -1873,22 +1837,41 @@ Public Class frmModelSetup
         'write wsd file
         lblStatus.Text = "Writing WSD file"
         Me.Refresh()
-        WriteWSDFile(BaseFileName & ".wsd", cArea, cLucode, cSubid, cSubSlope, ReclassifyFile)
+        WriteWSDFile(BaseFileName & ".wsd", cArea, cLucode, cSubid, cSubSlope, ReclassifyFile, AtcGridPervious)
 
         'write rch file (and ptf)
         lblStatus.Text = "Writing RCH and PTF files"
         Me.Refresh()
-        WriteRCHFile(BaseFileName & ".rch", cUniqueSubids)
+        Dim LayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+        Dim StreamsIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
+        Dim StreamsRIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
+        Dim Len2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
+        Dim Slo2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
+        Dim Wid2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
+        Dim Dep2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
+        Dim MinelIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
+        Dim MaxelIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
+        Dim SnameIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
+        WriteRCHFile(BaseFileName & ".rch", cUniqueSubids, LayerIndex, StreamsIndex, StreamsRIndex, Len2Index, _
+                     Slo2Index, Wid2Index, Dep2Index, MinelIndex, MaxelIndex, SnameIndex)
 
         'write psr file
         lblStatus.Text = "Writing PSR file"
         Me.Refresh()
-        WritePSRFile(BaseFileName & ".psr", cUniqueSubids, cOutSubs)
+        Dim OutletsLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+        Dim PointLayerIndex As Integer = GisUtil.FieldIndex(OutletsLayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
+        Dim lYear As String = cboYear.Items(cboYear.SelectedIndex)
+        WritePSRFile(BaseFileName & ".psr", cUniqueSubids, cOutSubs, OutletsLayerIndex, PointLayerIndex, _
+                     chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
 
         'write seg file
         lblStatus.Text = "Writing SEG file"
         Me.Refresh()
-        WriteSEGFile(BaseFileName & ".seg")
+        Dim lMetIndices As New Collection
+        For Each lIndex As Integer In lstMet.SelectedIndices
+            lMetIndices.Add(lIndex)
+        Next
+        WriteSEGFile(BaseFileName & ".seg", lMetIndices, pMetBaseDsns)
 
         'write map file
         lblStatus.Text = "Writing MAP file"
@@ -1957,13 +1940,28 @@ ErrHand:
         'write rch file (and ptf)
         lblStatus.Text = "Writing RCH and PTF files"
         Me.Refresh()
-        WriteRCHFile(BaseFileName & ".rch", cUniqueStreamIds)
+        Dim LayerIndex As Integer = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
+        Dim StreamsIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
+        Dim StreamsRIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
+        Dim Len2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
+        Dim Slo2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
+        Dim Wid2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
+        Dim Dep2Index As Integer = GisUtil.FieldIndex(LayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
+        Dim MinelIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
+        Dim MaxelIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
+        Dim SnameIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
+        WriteRCHFile(BaseFileName & ".rch", cUniqueStreamIds, LayerIndex, StreamsIndex, StreamsRIndex, Len2Index, _
+                     Slo2Index, Wid2Index, Dep2Index, MinelIndex, MaxelIndex, SnameIndex)
 
         'write psr file
         lblStatus.Text = "Writing PSR file"
         Me.Refresh()
         Dim cOutSubs As New Collection
-        WritePSRFile(BaseFileName & ".psr", cUniqueStreamIds, cOutSubs)
+        Dim OutletsLayerIndex As Integer = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
+        Dim PointLayerIndex As Integer = GisUtil.FieldIndex(LayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
+        Dim lYear As String = cboYear.Items(cboYear.SelectedIndex)
+        WritePSRFile(BaseFileName & ".psr", cUniqueStreamIds, cOutSubs, OutletsLayerIndex, PointLayerIndex, _
+                     chkCustom.Checked, lblCustom.Text, chkCalculate.Checked, lYear)
 
         'start aquatox
         lblStatus.Text = "Starting AQUATOX"
@@ -2045,696 +2043,6 @@ ErrHand:
         End If
     End Function
 
-    Private Sub WriteWSDFile(ByVal WsdFileName As String, ByVal cArea As Collection, ByVal cLucode As Collection, ByVal cSubid As Collection, _
-                             ByVal cSubslope As Collection, ByVal ReclassifyFile As String)
-        Dim OutFile As Integer
-        Dim i As Integer, j As Integer, k As Integer
-        Dim incollection As Boolean
-        Dim percentimperv As Double
-        Dim tarea As Double, stype As String
-        Dim tmpDbf As IatcTable
-        Dim PerArea(,) As Single
-        Dim ImpArea(,) As Single
-        Dim length() As Single
-        Dim slope() As Single
-        Dim UseSimpleGrid As Boolean
-        Dim spos As Long
-        Dim lpos As Long
-        Dim luname As String = ""
-        Dim multiplier As Single
-        Dim subbasin As String
-        Dim useit As Boolean
-
-        'if simple reclassifyfile exists, read it in
-        Dim cRcode As New Collection
-        Dim cRname As New Collection
-        UseSimpleGrid = False
-        If Len(ReclassifyFile) > 0 And AtcGridPervious.ColumnWidth(0) = 0 Then
-            'have the simple percent pervious grid, need to know which 
-            'lucodes correspond to which lugroups
-            UseSimpleGrid = True
-            'open dbf file
-            tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(ReclassifyFile)
-            For i = 1 To tmpDbf.NumRecords
-                tmpDbf.CurrentRecord = i
-                cRcode.Add(tmpDbf.Value(1))
-                cRname.Add(tmpDbf.Value(2))
-            Next i
-        End If
-
-        'create summary array 
-        '  area of each land use group in each subbasin
-
-        'build collection of unique subbasin ids
-        Dim cUniqueSubids As New Collection
-        For i = 1 To cSubid.Count
-            incollection = False
-            For j = 1 To cUniqueSubids.Count
-                If cUniqueSubids(j) = cSubid(i) Then
-                    incollection = True
-                    Exit For
-                End If
-            Next j
-            If Not incollection Then
-                cUniqueSubids.Add(cSubid(i))
-            End If
-        Next i
-
-        'build collection of unique landuse groups
-        Dim cUniqueLugroups As New Collection
-        For i = 1 To AtcGridPervious.Source.Rows
-            incollection = False
-            For j = 1 To cUniqueLugroups.Count
-                If cUniqueLugroups(j) = AtcGridPervious.Source.CellValue(i, 1) Then
-                    incollection = True
-                    Exit For
-                End If
-            Next j
-            If Not incollection Then
-                cUniqueLugroups.Add(AtcGridPervious.Source.CellValue(i, 1))
-            End If
-        Next i
-
-        ReDim PerArea(cUniqueSubids.Count, cUniqueLugroups.Count)
-        ReDim ImpArea(cUniqueSubids.Count, cUniqueLugroups.Count)
-        ReDim length(cUniqueSubids.Count)
-        ReDim slope(cUniqueSubids.Count)
-
-        'loop through each polygon (or grid subid/lucode combination)
-        'and populate array with area values
-        If UseSimpleGrid Then
-            For i = 1 To cSubid.Count
-
-                'find subbasin position in the area array
-                For j = 1 To cUniqueSubids.Count
-                    If cSubid(i) = cUniqueSubids(j) Then
-                        spos = j
-                        Exit For
-                    End If
-                Next j
-                'find lugroup that corresponds to this lucode
-                For j = 1 To cRcode.Count
-                    If cLucode(i) = cRcode(j) Then
-                        luname = cRname(j)
-                        Exit For
-                    End If
-                Next j
-                'find percent perv that corresponds to this lugroup
-                For j = 1 To AtcGridPervious.Source.Rows
-                    If luname = AtcGridPervious.Source.CellValue(j, 1) Then
-                        percentimperv = AtcGridPervious.Source.CellValue(j, 2)
-                        Exit For
-                    End If
-                Next j
-                'find lugroup position in the area array
-                For j = 1 To cUniqueLugroups.Count
-                    If luname = cUniqueLugroups(j) Then
-                        lpos = j
-                        Exit For
-                    End If
-                Next j
-
-                PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * (100 - percentimperv) / 100)
-                ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * percentimperv / 100)
-                length(spos) = 0.0
-                slope(spos) = cSubslope(i) / 100.0
-
-            Next i
-
-        Else
-            'using custom table for landuse classification
-            For i = 1 To cSubid.Count
-                'loop through each polygon (or grid subid/lucode combination)
-
-                'find subbasin position in the area array
-                For j = 1 To cUniqueSubids.Count
-                    If cSubid(i) = cUniqueSubids(j) Then
-                        spos = j
-                        Exit For
-                    End If
-                Next j
-
-                'find lugroup that corresponds to this lucode, could be multiple matches
-                For j = 1 To AtcGridPervious.Source.Rows
-                    luname = ""
-                    lpos = -1
-                    If AtcGridPervious.Source.CellValue(j, 0) <> "" Then
-                        If cLucode(i) = AtcGridPervious.Source.CellValue(j, 0) Then
-                            'see if any of these are subbasin-specific
-                            percentimperv = AtcGridPervious.Source.CellValue(j, 2)
-                            If IsNumeric(AtcGridPervious.Source.CellValue(j, 3)) Then
-                                multiplier = CSng(AtcGridPervious.Source.CellValue(j, 3))
-                            Else
-                                multiplier = 1.0
-                            End If
-                            subbasin = AtcGridPervious.Source.CellValue(j, 4)
-                            If Len(subbasin) > 0 And subbasin <> "Invalid Field Number" Then
-                                'this row is subbasin-specific
-                                If subbasin = cSubid(i) Then
-                                    'we want this one now
-                                    luname = AtcGridPervious.Source.CellValue(j, 1)
-                                End If
-                            Else
-                                'make sure that no other rows of this lucode are 
-                                'subbasin-specific for this subbasin and that we 
-                                'should therefore not use this row
-                                useit = True
-                                For k = 1 To AtcGridPervious.Source.Rows
-                                    If k <> j Then
-                                        If AtcGridPervious.Source.CellValue(k, 0) = AtcGridPervious.Source.CellValue(j, 0) Then
-                                            'this other row has same lucode
-                                            If AtcGridPervious.Source.CellValue(k, 1) = AtcGridPervious.Source.CellValue(j, 1) Then
-                                                'and the same group name
-                                                subbasin = AtcGridPervious.Source.CellValue(k, 4)
-                                                If Len(subbasin) > 0 Then
-                                                    'and its subbasin-specific
-                                                    If subbasin = cSubid(i) Then
-                                                        'and its specific to this subbasin
-                                                        useit = False
-                                                    End If
-                                                End If
-                                            End If
-                                        End If
-                                    End If
-                                Next k
-                                If useit Then
-                                    'we want this one now
-                                    luname = AtcGridPervious.Source.CellValue(j, 1)
-                                End If
-                            End If
-
-                            If Len(luname) > 0 Then
-                                'find lugroup position in the area array
-                                For k = 1 To cUniqueLugroups.Count
-                                    If luname = cUniqueLugroups(k) Then
-                                        lpos = k
-                                        Exit For
-                                    End If
-                                Next k
-                            End If
-
-                            If lpos > 0 Then
-                                PerArea(spos, lpos) = PerArea(spos, lpos) + (cArea(i) * multiplier * (100 - percentimperv) / 100)
-                                ImpArea(spos, lpos) = ImpArea(spos, lpos) + (cArea(i) * multiplier * percentimperv / 100)
-                                length(spos) = 0.0 'were not computing lsur since winhspf does that
-                                slope(spos) = cSubslope(i) / 100.0
-                            End If
-
-                        End If
-                    End If
-                Next j
-
-            Next i
-        End If
-
-        OutFile = FreeFile()
-        FileOpen(OutFile, WsdFileName, OpenMode.Output)
-        WriteLine(OutFile, "LU Name", "Type (1=Impervious, 2=Pervious)", "Watershd-ID", "Area", "Slope", "Distance")
-
-        'now write
-        For i = 1 To cUniqueSubids.Count
-            For j = 1 To cUniqueLugroups.Count
-                stype = "2"
-                tarea = PerArea(i, j) / 4046.8564
-                If CInt(tarea) > 0 Then
-                    PrintLine(OutFile, Chr(34) & cUniqueLugroups(j) & Chr(34), " " & stype & " ", cUniqueSubids(i), Format(tarea, "0."), Format(slope(i), "0.000000"), Format(length(i), "0.0000"))
-                End If
-                stype = "1"
-                tarea = ImpArea(i, j) / 4046.8564
-                If CInt(tarea) > 0 Then
-                    PrintLine(OutFile, Chr(34) & cUniqueLugroups(j) & Chr(34), " " & stype & " ", cUniqueSubids(i), Format(tarea, "0."), Format(slope(i), "0.000000"), Format(length(i), "0.0000"))
-                End If
-            Next j
-        Next i
-
-        FileClose(OutFile)
-    End Sub
-
-    Private Sub WriteRCHFile(ByVal RchFileName$, ByVal cUniqueSubids As Collection)
-        Dim OutFile As Integer, OutFile2 As Integer
-        Dim PtfFileName As String
-        Dim sname As String
-        Dim cDOWN$, cLENGTH#, cDEPTH#, cWIDTH#, cSLOPE#, cMINEL#, cMAXEL#, cELEV#
-        Dim LayerIndex As Long
-        Dim StreamsIndex As Long
-        Dim StreamsRIndex As Long
-        Dim Len2Index As Long
-        Dim Slo2Index As Long
-        Dim Wid2Index As Long
-        Dim Dep2Index As Long
-        Dim MinelIndex As Long
-        Dim MaxelIndex As Long
-        Dim SnameIndex As Long
-        Dim i As Long, j As Long
-
-        OutFile = FreeFile()
-        FileOpen(OutFile, RchFileName, OpenMode.Output)
-        WriteLine(OutFile, "Rivrch", "Pname", "Watershed-ID", "HeadwaterFlag", _
-                  "Exits", "Milept", "Stream/Resevoir Type", "Segl", _
-                  "Delth", "Elev", "Ulcsm", "Urcsm", "Dscsm", "Ccsm", _
-                  "Mnflow", "Mnvelo", "Svtnflow", "Svtnvelo", "Pslope", _
-                  "Pdepth", "Pwidth", "Pmile", "Ptemp", "Pph", "Pk1", _
-                  "Pk2", "Pk3", "Pmann", "Psod", "Pbgdo", _
-                  "Pbgnh3", "Pbgbod5", "Pbgbod", "Level")
-
-        OutFile2 = FreeFile()
-        PtfFileName = Mid(RchFileName, 1, Len(RchFileName) - 3) & "ptf"
-        FileOpen(OutFile2, PtfFileName, OpenMode.Output)
-        WriteLine(OutFile2, "Reach Number", "Length(ft)", _
-            "Mean Depth(ft)", "Mean Width (ft)", _
-            "Mannings Roughness Coeff.", "Long. Slope", _
-            "Type of x-section", "Side slope of upper FP left", _
-            "Side slope of lower FP left", "Zero slope FP width left(ft)", _
-            "Side slope of channel left", "Side slope of channel right", _
-            "Zero slope FP width right(ft)", "Side slope lower FP right", _
-            "Side slope upper FP right", "Channel Depth(ft)", _
-            "Flood side slope change at depth", "Max. depth", _
-            "No. of exits", "Fraction of flow through exit 1", _
-            "Fraction of flow through exit 2", "Fraction of flow through exit 3", _
-            "Fraction of flow through exit 4", "Fraction of flow through exit 5")
-
-        'set field indexes
-        LayerIndex = GisUtil.LayerIndex(cboStreams.Items(cboStreams.SelectedIndex))
-        StreamsIndex = GisUtil.FieldIndex(LayerIndex, cboStream1.Items(cboStream1.SelectedIndex))
-        StreamsRIndex = GisUtil.FieldIndex(LayerIndex, cboStream2.Items(cboStream2.SelectedIndex))
-        Len2Index = GisUtil.FieldIndex(LayerIndex, cboStream3.Items(cboStream3.SelectedIndex))
-        Slo2Index = GisUtil.FieldIndex(LayerIndex, cboStream4.Items(cboStream4.SelectedIndex))
-        Wid2Index = GisUtil.FieldIndex(LayerIndex, cboStream5.Items(cboStream5.SelectedIndex))
-        Dep2Index = GisUtil.FieldIndex(LayerIndex, cboStream6.Items(cboStream6.SelectedIndex))
-        MinelIndex = GisUtil.FieldIndex(LayerIndex, cboStream7.Items(cboStream7.SelectedIndex))
-        MaxelIndex = GisUtil.FieldIndex(LayerIndex, cboStream8.Items(cboStream8.SelectedIndex))
-        SnameIndex = GisUtil.FieldIndex(LayerIndex, cboStream9.Items(cboStream9.SelectedIndex))
-
-        For i = 1 To GisUtil.NumFeatures(LayerIndex)
-            'is this subbasin in the list?
-            For j = 1 To cUniqueSubids.Count
-                GisUtil.FieldValue(LayerIndex, i - 1, StreamsIndex)
-                If cUniqueSubids(j) = GisUtil.FieldValue(LayerIndex, i - 1, StreamsIndex) Then
-                    'in list, output it
-                    sname = GisUtil.FieldValue(LayerIndex, i - 1, SnameIndex)
-                    If Len(Trim(sname)) = 0 Then
-                        sname = "STREAM " + cUniqueSubids(j)
-                    End If
-                    cDOWN = GisUtil.FieldValue(LayerIndex, i - 1, StreamsRIndex)
-                    If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, Len2Index)) Then
-                        cLENGTH = (CSng(GisUtil.FieldValue(LayerIndex, i - 1, Len2Index)) * 3.28) / 5280
-                    Else
-                        cLENGTH = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, Slo2Index)) Then
-                        cSLOPE = CSng(GisUtil.FieldValue(LayerIndex, i - 1, Slo2Index)) / 100
-                    Else
-                        cSLOPE = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, Wid2Index)) Then
-                        cWIDTH = CSng(GisUtil.FieldValue(LayerIndex, i - 1, Wid2Index)) * 3.28
-                    Else
-                        cWIDTH = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, Dep2Index)) Then
-                        cDEPTH = CSng(GisUtil.FieldValue(LayerIndex, i - 1, Dep2Index)) * 3.28
-                    Else
-                        cDEPTH = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, MinelIndex)) Then
-                        cMINEL = CSng(GisUtil.FieldValue(LayerIndex, i - 1, MinelIndex)) * 3.28
-                    Else
-                        cMINEL = 0.0#
-                    End If
-                    If IsNumeric(GisUtil.FieldValue(LayerIndex, i - 1, MaxelIndex)) Then
-                        cMAXEL = CSng(GisUtil.FieldValue(LayerIndex, i - 1, MaxelIndex)) * 3.28
-                    Else
-                        cMAXEL = 0.0#
-                    End If
-                    cELEV = ((cMAXEL + cMINEL) / 2)
-                    PrintLine(OutFile, cUniqueSubids(j) & " " & Chr(34) & sname & Chr(34) & " " & cUniqueSubids(j) & " " & _
-                           " 0 1 0 S " & Format(cLENGTH, "0.00") & " " & Format(Math.Abs(cMAXEL - cMINEL), "0.00") & " " & _
-                           Format(cELEV, "0.") & " 0 0 " & cDOWN & " 0 0 0 0 0 " & _
-                           Format(cSLOPE, "0.000000") & " " & Format(cDEPTH, "0.0000") & " " & Format(cWIDTH, "0.000") & _
-                           " 0 0 0 0 0 0 0 0 0 0 0 0 0")
-                    PrintLine(OutFile2, cUniqueSubids(j) & " " & Format(cLENGTH * 5280.0#, "0.") & " " & _
-                           Format(cDEPTH, "0.00000") & " " & Format(cWIDTH, "0.00000") & " 0.05 " & _
-                           Format(cSLOPE, "0.00000") & " " & "Trapezoidal" & " " & _
-                           "0.5 0.5 " & Format(cWIDTH, "0.000") & " 1 1 " & Format(cWIDTH, "0.000") & _
-                           " 0.5 0.5 " & Format(cDEPTH * 1.25, "0.0000") & " " & Format(cDEPTH * 1.875, "0.0000") & " " & _
-                           Format(cDEPTH * 62.5, "0.000") & " 1 1 0 0 0 0")
-                    If (2 * cDEPTH) > cWIDTH Then
-                        'problem
-                        MsgBox("The depth and width values specified for Reach " & cUniqueSubids(j) & ", coupled with the trapezoidal" & vbCrLf & _
-                               "cross section assumptions of WinHSPF, indicate a physical imposibility." & vbCrLf & _
-                               "(Given 1:1 side slopes, the depth of the channel cannot be more than half the width.)" & vbCrLf & vbCrLf & _
-                               "This problem can be corrected in WinHSPF by revising the FTABLE or by " & vbCrLf & _
-                               "importing the ptf with modifications to the width and depth values." & vbCrLf & _
-                               "See the WinHSPF manual for more information.", vbOKOnly, "Channel Problem")
-                    End If
-                End If
-            Next j
-        Next i
-        FileClose(OutFile)
-        FileClose(OutFile2)
-    End Sub
-
-    Private Sub WritePSRFile(ByVal PsrFileName$, ByVal cUniqueSubids As Collection, ByVal cOutSubs As Collection)
-        Dim OutFile As Integer
-        Dim i As Integer, j As Long, k As Long
-        Dim PointIndex As Long, LayerIndex As Long, pcsLayerIndex As Long
-        Dim npdesIndex As Long, flowIndex As Long, cuIndex As Long, facIndex As Long
-        Dim flow As Single
-        Dim facname As String
-        Dim huc As String
-        Dim mipt As Single
-        Dim dbffilename As String
-        Dim dbname As String = ""
-        Dim lnpdes As Object
-        Dim ctemp As String
-        Dim tmpDbf As IatcTable
-        Dim ParmCode(0) As String, ParmName(0) As String
-        Dim RowCount As Long = 0
-        Dim prevdbf As String
-        Dim YearField As Long, ParmField As Long
-        Dim LoadField As Long, NPDESField As Long
-        Dim dbrcount As Long
-        Dim TableYear(0) As String
-        Dim TableParm(0) As String
-        Dim TableLoad(0) As String
-        Dim TableNPDES(0) As String
-        Dim tPoll As String
-        Dim tValue As String
-        Dim iFound As Boolean
-
-        OutFile = FreeFile()
-        FileOpen(OutFile, PsrFileName, OpenMode.Output)
-
-        Dim cNPDES As New Collection
-        Dim cSubbasin As New Collection
-        Dim cFlow As New Collection
-        Dim cMipt As New Collection
-        Dim cFacName As New Collection
-        Dim cHuc As New Collection
-
-        If cOutSubs.Count > 0 Then
-
-            'set field indexes
-            LayerIndex = GisUtil.LayerIndex(cboOutlets.Items(cboOutlets.SelectedIndex))
-            PointIndex = GisUtil.FieldIndex(LayerIndex, cboPoint.Items(cboPoint.SelectedIndex))
-
-            'build collection of npdes sites to output
-            For i = 1 To cOutSubs.Count
-                For j = 1 To cUniqueSubids.Count
-                    If cOutSubs(i) = cUniqueSubids(j) Then
-                        'found this subbasin in selected list
-                        If Len(GisUtil.FieldValue(LayerIndex, i - 1, PointIndex)) > 0 Then
-                            cNPDES.Add(GisUtil.FieldValue(LayerIndex, i - 1, PointIndex))
-                            cSubbasin.Add(cOutSubs(i))
-                        End If
-                    End If
-                Next j
-            Next i
-
-            'If cNPDES.Count = 0 Then
-            '  MsgBox("No point sources have been added to the outlets layer." & vbCrLf & _
-            '  "To add point sources, update the outlets layer using the" & vbCrLf & _
-            '  "BASINS watershed delineator or update it manually.", vbOKOnly, "BASINS HSPF Information")
-            'End If
-
-            If Not chkCustom.Checked Then
-                'use pcs data
-                If GisUtil.IsLayer("Permit Compliance System") Then
-                    'set pcs shape file
-                    pcsLayerIndex = GisUtil.LayerIndex("Permit Compliance System")
-                    npdesIndex = GisUtil.FieldIndex(pcsLayerIndex, "NPDES")
-                    flowIndex = GisUtil.FieldIndex(pcsLayerIndex, "FLOW_RATE")
-                    facIndex = GisUtil.FieldIndex(pcsLayerIndex, "FAC_NAME")
-                    cuIndex = GisUtil.FieldIndex(pcsLayerIndex, "BCU")
-                    If npdesIndex > -1 Then
-                        For i = 1 To cNPDES.Count
-                            flow = 0.0#
-                            facname = ""
-                            huc = ""
-                            mipt = 0.0#
-                            If Len(Trim(cNPDES(i))) > 0 Then
-                                For j = 1 To GisUtil.NumFeatures(pcsLayerIndex)
-                                    If GisUtil.FieldValue(pcsLayerIndex, j - 1, npdesIndex) = cNPDES(i) Then
-                                        'this is the one
-                                        If IsNumeric(GisUtil.FieldValue(pcsLayerIndex, j - 1, flowIndex)) Then
-                                            flow = GisUtil.FieldValue(pcsLayerIndex, j - 1, flowIndex) * 1.55
-                                        Else
-                                            flow = 0.0
-                                        End If
-                                        facname = GisUtil.FieldValue(pcsLayerIndex, j - 1, facIndex)
-                                        If chkCalculate.Checked Then
-                                            'calculate mile point on stream
-                                            'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), FilenameOnly(OutletsJoinThemeName), PCSIdField, pNPDES(j))
-                                            'mipt = dist / 1609.3
-                                        Else
-                                            mipt = 0.0#
-                                        End If
-                                        huc = GisUtil.FieldValue(pcsLayerIndex, j - 1, cuIndex)
-                                        Exit For
-                                    End If
-                                Next j
-                            End If
-                            cFlow.Add(flow)
-                            cMipt.Add(mipt)
-                            cFacName.Add(facname)
-                            cHuc.Add(huc)
-                        Next i
-                    End If
-                    'check for dbf associated with each npdes point
-                    i = 1
-                    dbname = PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs\"
-                    For Each lnpdes In cNPDES
-                        dbffilename = Trim(cHuc(i)) & ".dbf"
-                        If Len(Dir(dbname & dbffilename)) > 0 And Len(Trim(lnpdes)) > 0 Then
-                            'yes, it exists
-                            i = i + 1
-                        Else
-                            'remove from collection
-                            cNPDES.Remove(i)
-                            cSubbasin.Remove(i)
-                            cFlow.Remove(i)
-                            cMipt.Remove(i)
-                            cFacName.Remove(i)
-                            cHuc.Remove(i)
-                        End If
-                    Next lnpdes
-                Else
-                    'no pcs layer, clear out
-                    Do While cNPDES.Count > 0
-                        cNPDES.Remove(1)
-                    Loop
-                End If
-
-            Else
-                'using custom table
-                'must have these fields in this order:
-                'pcsid (same as outlets layer)
-                'facname
-                'load (flow or other value) lbs/yr or cfs
-                'parm (flow or other name)
-                tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lblCustom.Text)
-
-                i = 1
-                Do While i <= cNPDES.Count
-                    If chkCalculate.Checked Then
-                        'calculate mile point on stream
-                        'dist = myGISTools.NearestPositionOnLineToPoint(StreamsThemeName, StreamsField, cSubbasin(i), FilenameOnly(OutletsJoinThemeName), PCSIdField, pNPDES(j))
-                        'mipt = dist / 1609.3
-                    Else
-                        mipt = 0.0#
-                    End If
-                    cMipt.Add(mipt)
-                    iFound = False
-                    For j = 1 To tmpDbf.NumRecords
-                        tmpDbf.CurrentRecord = j
-                        If cNPDES(i) = tmpDbf.Value(1) Then
-                            cFacName.Add(tmpDbf.Value(2))
-                            iFound = True
-                            Exit For
-                        End If
-                    Next j
-                    If Not iFound Then
-                        cNPDES.Remove(i)
-                        cSubbasin.Remove(i)
-                        cMipt.Remove(i)
-                    Else
-                        i = i + 1
-                    End If
-                Loop
-            End If
-        End If
-
-        'write first part of point source file
-        PrintLine(OutFile, " " & CStr(cNPDES.Count))
-        PrintLine(OutFile, " ")
-        WriteLine(OutFile, "Facility Name", "Npdes", "Cuseg", "Mi")
-        For i = 1 To cNPDES.Count
-            ctemp = Chr(34) & cFacName(i) & Chr(34) & " " & cNPDES(i) & " " & cSubbasin(i) & " " & Format(cMipt(i), "0.000000")
-            PrintLine(OutFile, ctemp)
-        Next i
-
-        If Not chkCustom.Checked Then
-            'read in Permitted Discharges Parameter Table
-            If cNPDES.Count > 0 Then
-                'open dbf file
-                tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(PathNameOnly(GisUtil.LayerFileName(pcsLayerIndex)) & "\pcs3_prm.dbf")
-                RowCount = tmpDbf.NumRecords
-                ReDim ParmCode(RowCount)
-                ReDim ParmName(RowCount)
-                For i = 1 To RowCount
-                    tmpDbf.CurrentRecord = i
-                    ParmCode(i) = tmpDbf.Value(1)
-                    ParmName(i) = tmpDbf.Value(2)
-                Next i
-            End If
-        End If
-
-        PrintLine(OutFile, " ")
-        WriteLine(OutFile, "Ordinal Number", "Pollutant", "Load (lbs/hr)")
-        If Not chkCustom.Checked Then
-            'using pcs data
-            prevdbf = ""
-            For j = 1 To cNPDES.Count
-                'open dbf file
-                dbffilename = dbname & Trim(cHuc(j)) & ".dbf"
-                If Len(Dir(dbffilename)) > 0 Then
-                    If dbffilename <> prevdbf Then
-                        tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(dbffilename)
-                        prevdbf = dbffilename
-                        For k = 1 To tmpDbf.NumFields
-                            If UCase(tmpDbf.FieldName(k)) = "YEAR" Then
-                                YearField = k
-                            End If
-                            If UCase(tmpDbf.FieldName(k)) = "PARM" Then
-                                ParmField = k
-                            End If
-                            If UCase(tmpDbf.FieldName(k)) = "LOAD" Then
-                                LoadField = k
-                            End If
-                            If UCase(tmpDbf.FieldName(k)) = "NPDES" Then
-                                NPDESField = k
-                            End If
-                        Next k
-                        dbrcount = tmpDbf.NumRecords
-                        ReDim TableYear(dbrcount)
-                        ReDim TableParm(dbrcount)
-                        ReDim TableLoad(dbrcount)
-                        ReDim TableNPDES(dbrcount)
-                        For k = 1 To dbrcount
-                            tmpDbf.CurrentRecord = k
-                            TableYear(k) = tmpDbf.Value(YearField)
-                            TableParm(k) = tmpDbf.Value(ParmField)
-                            TableLoad(k) = tmpDbf.Value(LoadField)
-                            TableNPDES(k) = tmpDbf.Value(NPDESField)
-                        Next k
-                    End If
-                    For k = 1 To dbrcount
-                        If TableNPDES(k) = cNPDES(j) And TableYear(k) = cboYear.Items(cboYear.SelectedIndex) Then
-                            'found one, output it
-                            tPoll = ""
-                            For i = 0 To RowCount - 1
-                                If TableParm(k) = ParmCode(i) Then
-                                    tPoll = ParmName(i)
-                                    Exit For
-                                End If
-                            Next i
-                            tValue = TableLoad(k) / 8760 'lbs/hr
-                            ctemp = CStr(j - 1) & " " & Chr(34) & Trim(tPoll) & Chr(34) & " " & Format(CSng(tValue), "0.000000")
-                            PrintLine(OutFile, ctemp)
-                        End If
-                    Next k
-                End If
-            Next j
-            'now output flows
-            For j = 1 To cNPDES.Count
-                ctemp = CStr(j - 1) & " Flow " & Format(cFlow(j), "0.000000")
-                PrintLine(OutFile, ctemp)
-            Next j
-        Else
-            'using custom data
-            tmpDbf = atcUtility.atcTableOpener.OpenAnyTable(lblCustom.Text)
-            For i = 1 To cNPDES.Count
-                For j = 1 To tmpDbf.NumRecords
-                    tmpDbf.CurrentRecord = j
-                    If cNPDES(i) = tmpDbf.Value(1) Then
-                        If UCase(tmpDbf.Value(4)) = "FLOW" Then
-                            ctemp = CStr(i - 1) & " Flow " & Format(CStr(tmpDbf.Value(3)), "0.000000")
-                        Else
-                            tValue = CSng(tmpDbf.Value(3)) / 8760 'lbs/hr
-                            ctemp = CStr(i - 1) & " " & Chr(34) & Trim(tmpDbf.Value(4)) & Chr(34) & " " & Format(CStr(tValue), "0.000000")
-                        End If
-                        PrintLine(OutFile, ctemp)
-                    End If
-                Next j
-            Next i
-        End If
-
-        FileClose(OutFile)
-    End Sub
-
-    Private Sub WriteSEGFile(ByVal aSegFileName As String)
-
-        Dim lOutFile As Integer = FreeFile()
-        FileOpen(lOutFile, aSegFileName, OpenMode.Output)
-
-        WriteLine(lOutFile, "SegID", "PrecWdmId", "PrecDsn", "PrecTstype", "PrecMFactPI", "PrecMFactR", _
-                                     "AtemWdmId", "AtemDsn", "AtemTstype", "AtemMFactPI", "AtemMFactR", _
-                                     "DewpWdmId", "DewpDsn", "DewpTstype", "DewpMFactPI", "DewpMFactR", _
-                                     "WindWdmId", "WindDsn", "WindTstype", "WindMFactPI", "WindMFactR", _
-                                     "SolrWdmId", "SolrDsn", "SolrTstype", "SolrMFactPI", "SolrMFactR", _
-                                     "ClouWdmId", "ClouDsn", "ClouTstype", "ClouMFactPI", "ClouMFactR", _
-                                     "PevtWdmId", "PevtDsn", "PevtTstype", "PevtMFactPI", "PevtMFactR")
-
-        For Each lIndex As Integer In lstMet.SelectedIndices
-            Dim lBaseDsn As Integer = pMetBaseDsns(lIndex)
-            PrintLine(lOutFile, CStr(lIndex + 1) & " WDM2 " & CStr(lBaseDsn) & " PREC 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 2) & " ATEM 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 6) & " DEWP 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 3) & " WIND 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 4) & " SOLR 1 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 7) & " CLOU 0 1" & _
-                                                   " WDM2 " & CStr(lBaseDsn + 5) & " PEVT 1 1")
-        Next
-
-        FileClose(lOutFile)
-
-    End Sub
-
-    Private Sub WriteMAPFile(ByVal aMapFileName As String)
-        Dim lOutFile As Integer
-        Dim i As Integer
-        Dim lTemp As String
-
-        lOutFile = FreeFile()
-        FileOpen(lOutFile, aMapFileName, OpenMode.Output)
-
-        lTemp = "EXT " & GisUtil.MapExtentXmin & " " & GisUtil.MapExtentYmax & " " & GisUtil.MapExtentXmax & " " & GisUtil.MapExtentYmin
-        PrintLine(lOutFile, lTemp)
-
-        For i = 0 To GisUtil.NumLayers - 1
-            If GisUtil.LayerType(i) = 1 Or GisUtil.LayerType(i) = 2 Or GisUtil.LayerType(i) = 3 Then
-                'shapefile
-                lTemp = "LYR '" + GisUtil.LayerFileName(i) & "', " & GisUtil.LayerColor(i)
-                If GisUtil.LayerType(i) = 3 Then
-                    'polygon 
-                    If Not GisUtil.LayerTransparent(i) Then
-                        lTemp = lTemp & ",Style Transparent "
-                    End If
-                    lTemp = lTemp & ",Outline " & GisUtil.LayerOutlineColor(i)
-                End If
-                'hide the layers not turned on
-                If Not GisUtil.LayerVisible(i) Then
-                    lTemp = lTemp & ",Hide"
-                End If
-                'add theme name as caption
-                lTemp = lTemp & ",Name '" & GisUtil.LayerName(i) & "'"
-                PrintLine(lOutFile, lTemp)
-            End If
-        Next i
-        FileClose(lOutFile)
-
-    End Sub
-
     Private Sub chkCustom_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkCustom.CheckedChanged
         If chkCustom.Checked Then
             If ofdCustom.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -2771,6 +2079,9 @@ ErrHand:
 
     Public Sub InitializeUI()
         Dim ctemp As String
+
+        pMetStations = New atcCollection
+        pMetBaseDsns = New atcCollection
 
         cboLanduse.Items.Add("USGS GIRAS Shapefile")
         cboLanduse.Items.Add("NLCD Grid")
@@ -2882,91 +2193,6 @@ ErrHand:
         End If
     End Sub
 
-    Private Function CreateUCI(ByVal aUciName As String, ByVal aMetWDMName As String) As Boolean
-        CreateUCI = False
-
-        ChDriveDir(PathNameOnly(aUciName))
-        'get message file ready
-        Dim lMsg As New atcUCI.HspfMsg
-        lMsg.Open("hspfmsg.mdb")
-
-        'get starter uci ready
-        Dim lBasinsBinLoc As String = PathNameOnly(System.Reflection.Assembly.GetEntryAssembly.Location)
-        Dim lStarterUciName As String = "starter.uci"
-        Dim lStarterPath As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\starter\" & lStarterUciName
-        If Not FileExists(lStarterPath) Then
-            lStarterPath = "\basins\models\hspf\bin\starter\" & lStarterUciName
-            If Not FileExists(lStarterPath) Then
-                lStarterPath = FindFile("Please locate " & lStarterUciName, lStarterUciName)
-            End If
-        End If
-        lStarterUciName = lStarterPath
-
-        'location master pollutant list 
-        Dim lPollutantListFileName As String = "poltnt_2.prn"
-        Dim lPollutantListPath As String = Mid(lBasinsBinLoc, 1, Len(lBasinsBinLoc) - 3) & "models\hspf\bin\" & lPollutantListFileName
-        If Not FileExists(lPollutantListPath) Then
-            lPollutantListPath = "\basins\models\hspf\bin\" & lPollutantListFileName
-            If Not FileExists(lPollutantListPath) Then
-                lPollutantListPath = FindFile("Please locate " & lPollutantListFileName, lPollutantListFileName)
-            End If
-        End If
-        lPollutantListFileName = lPollutantListPath
-
-        'open project wdm
-        Dim lDataSources As New Collection(Of atcData.atcDataSource)
-        Dim lDataSource As New atcWDM.atcDataSourceWDM
-        Dim lProjectWDMName As String = FilenameOnly(aUciName) & ".wdm"
-        Dim lFound As Boolean = False
-        For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
-            If lBASINSDataSource.Specification.ToUpper = lProjectWDMName.ToUpper Then
-                'found it in the BASINS data sources
-                lDataSource = lBASINSDataSource
-                lFound = True
-                Exit For
-            End If
-        Next
-        If Not lFound Then
-            If lDataSource.Open(lProjectWDMName) Then
-                'need to open it here
-                lFound = True
-            End If
-        End If
-        lDataSources.Add(lDataSource)
-
-        'open met wdm
-        lDataSource = New atcWDM.atcDataSourceWDM
-        lFound = False
-        For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
-            If lBASINSDataSource.Specification.ToUpper = aMetWDMName.ToUpper Then
-                'found it in the BASINS data sources
-                lDataSource = lBASINSDataSource
-                lFound = True
-                Exit For
-            End If
-        Next
-        If Not lFound Then
-            If lDataSource.Open(aMetWDMName) Then
-                'need to open it here
-                lFound = True
-            End If
-        End If
-        lDataSources.Add(lDataSource)
-
-        Dim lWatershedName As String = FilenameOnly(aUciName)
-        Dim lWatershed As New Watershed
-        If lWatershed.Open(lWatershedName) = 0 Then  'everything read okay, continue
-            Dim lHspfUci As New atcUCI.HspfUci
-            lHspfUci.Msg = lMsg
-            lHspfUci.CreateUciFromBASINS(lWatershed, _
-                                         lDataSources, _
-                                         lStarterUciName, lPollutantListFileName)
-            lHspfUci.Save()
-            Return True
-        End If
-
-    End Function
-
     Private Sub cboMet_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMet.SelectedIndexChanged
 
         'fill in met wdm file name as appropriate
@@ -2995,7 +2221,7 @@ ErrHand:
     End Sub
 
     Private Sub txtMetWDMName_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtMetWDMName.TextChanged
-        BuildListofMetStationNames()
+        BuildListofMetStationNames(txtMetWDMName.Text, pMetStations, pMetBaseDsns)
         lstMet.Items.Clear()
         For Each lMetStation As String In pMetStations
             lstMet.Items.Add(lMetStation)
@@ -3005,112 +2231,4 @@ ErrHand:
         End If
     End Sub
 
-    Private Function BuildListofMetStationNames() As Boolean
-        pMetStations = New atcCollection
-        pMetStations.Clear()
-        pMetBaseDsns = New atcCollection
-        pMetBaseDsns.Clear()
-        Dim lDataSource As New atcWDM.atcDataSourceWDM
-        If FileExists(txtMetWDMName.Text) Then
-            Dim lFound As Boolean = False
-            For Each lBASINSDataSource As atcDataSource In atcDataManager.DataSources
-                If lBASINSDataSource.Specification.ToUpper = txtMetWDMName.Text.ToUpper Then
-                    'found it in the BASINS data sources
-                    lDataSource = lBASINSDataSource
-                    lFound = True
-                    Exit For
-                End If
-            Next
-            If Not lFound Then
-                If lDataSource.Open(txtMetWDMName.Text) Then
-                    'need to open it here
-                    lFound = True
-                End If
-            End If
-            If lFound Then
-                For Each lDataSet As atcData.atcTimeseries In lDataSource.DataSets
-                    If lDataSet.Attributes.GetValue("Scenario") = "OBSERVED" And lDataSet.Attributes.GetValue("Constituent") = "PREC" Then
-                        Dim lLoc As String = lDataSet.Attributes.GetValue("Location")
-                        Dim lStanam As String = lDataSet.Attributes.GetValue("Stanam")
-                        Dim lDsn As Integer = lDataSet.Attributes.GetValue("Id")
-                        'get the common dates from prec and pevt at this location
-                        Dim lSJDay As Double = lDataSet.Dates.Value(0)
-                        Dim lEJDay As Double = lDataSet.Dates.Value(lDataSet.Dates.numValues)
-                        'find pevt dataset at the same location
-                        Dim lPevtFound As Boolean = False
-                        For Each lDataSet2 As atcData.atcTimeseries In lDataSource.DataSets
-                            If lDataSet2.Attributes.GetValue("Constituent") = "PEVT" And _
-                               lDataSet2.Attributes.GetValue("Location") = lLoc Then
-                                Dim lSJDay2 As Double = lDataSet2.Dates.Value(0)
-                                Dim lEJDay2 As Double = lDataSet2.Dates.Value(lDataSet2.Dates.numValues)
-                                If lSJDay2 > lSJDay Then lSJDay = lSJDay2
-                                If lEJDay2 < lEJDay Then lEJDay = lEJDay2
-                                lPevtFound = True
-                                Exit For
-                            End If
-                        Next
-                        If lPevtFound Then
-                            Dim lLeadingChar As String = ""
-                            If IsBASINSMetWDM(lDataSource.DataSets, lDsn, lLoc) Then
-                                'full set available here
-                                lLeadingChar = "*"
-                            End If
-                            Dim lSdate(6) As Integer
-                            Dim lEdate(6) As Integer
-                            J2Date(lSJDay, lSdate)
-                            J2Date(lEJDay, lEdate)
-                            Dim lDateString As String = "(" & lSdate(0) & "/" & lSdate(1) & "/" & lSdate(2) & "-" & lEdate(0) & "/" & lEdate(1) & "/" & lEdate(2) & ")"
-                            pMetStations.Add(lLeadingChar & lLoc & ":" & lStanam & " " & lDateString)
-                            pMetBaseDsns.Add(lDsn)
-                        End If
-                    End If
-                Next
-            End If
-        End If
-        Return True
-    End Function
-
-    Private Function IsBASINSMetWDM(ByVal aDataSets As atcData.atcDataGroup, ByVal aBaseDsn As Integer, ByVal aLoc As String) As Boolean
-        Dim lCheckCount As Integer = 0
-        For Each lDataSet As atcData.atcTimeseries In aDataSets
-            If lDataSet.Attributes.GetValue("Location") = aLoc Then
-                If lDataSet.Attributes.GetValue("ID") = aBaseDsn Then
-                    If lDataSet.Attributes.GetValue("TSTYPE") = "PREC" Then
-                        lCheckCount += 1
-                    End If
-                ElseIf lDataSet.Attributes.GetValue("ID") = aBaseDsn + 2 Then
-                    If lDataSet.Attributes.GetValue("TSTYPE") = "ATEM" Then
-                        lCheckCount += 1
-                    End If
-                ElseIf lDataSet.Attributes.GetValue("ID") = aBaseDsn + 3 Then
-                    If lDataSet.Attributes.GetValue("TSTYPE") = "WIND" Then
-                        lCheckCount += 1
-                    End If
-                ElseIf lDataSet.Attributes.GetValue("ID") = aBaseDsn + 4 Then
-                    If lDataSet.Attributes.GetValue("TSTYPE") = "SOLR" Then
-                        lCheckCount += 1
-                    End If
-                ElseIf lDataSet.Attributes.GetValue("ID") = aBaseDsn + 5 Then
-                    If lDataSet.Attributes.GetValue("TSTYPE") = "PEVT" Then
-                        lCheckCount += 1
-                    End If
-                ElseIf lDataSet.Attributes.GetValue("ID") = aBaseDsn + 6 Then
-                    If lDataSet.Attributes.GetValue("TSTYPE") = "DEWP" Then
-                        lCheckCount += 1
-                    End If
-                ElseIf lDataSet.Attributes.GetValue("ID") = aBaseDsn + 7 Then
-                    If lDataSet.Attributes.GetValue("TSTYPE") = "CLOU" Then
-                        lCheckCount += 1
-                    End If
-                End If
-            End If
-        Next
-
-        If lCheckCount = 7 Then
-            Return True
-        Else
-            Return False
-        End If
-
-    End Function
 End Class

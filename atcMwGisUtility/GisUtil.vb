@@ -1097,6 +1097,23 @@ Public Class GisUtil
         Return False
     End Function
 
+    ''' <summary>Layer part of project?</summary>
+    ''' <param name="aLayerFileName">
+    '''     <para>file name of layer to compare to layers in project</para>
+    ''' </param>
+    Public Shared Function IsLayerByFileName(ByVal aLayerFileName As String) As Boolean
+        For i As Integer = 0 To GetMappingObject.Layers.NumLayers - 1
+            Try
+                If aLayerFileName.ToUpper = LayerFromIndex(i).FileName.ToUpper Then
+                    Return True
+                End If
+            Catch
+                Logger.Dbg("Layer " & i & " of " & GetMappingObject.Layers.NumLayers & " Problem")
+            End Try
+        Next i
+        Return False
+    End Function
+
     ''' <summary>Layer visible flag</summary>
     ''' <param name="aLayerName">
     '''     <para>Name of layer</para>
