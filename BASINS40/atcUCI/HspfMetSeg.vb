@@ -30,55 +30,44 @@ Public Class HspfMetSeg
         lMetSegRec.Tran = aNewConnection.Tran
         lMetSegRec.Sgapstrg = aNewConnection.Sgapstrg
         lMetSegRec.Ssystem = aNewConnection.Ssystem
-        lMetSegRec.Typ = Str2Type(aNewConnection.Target.Member)
+        lMetSegRec.Name = Str2Name(aNewConnection.Target.Member)
 
         Dim lResult As Boolean = True
 
         If aNewConnection.Target.VolName = "PERLND" Or _
            aNewConnection.Target.VolName = "IMPLND" Or _
            aNewConnection.Target.VolName = "RCHRES" Then
-            Dim lTyp As Integer = lMetSegRec.Typ
-            If lTyp <> HspfMetSegRecord.MetSegRecordType.msrUNK Then
-                If pMetSegRecs(lTyp).Source.VolName.Length > 0 Then
-                    'dont add if already have this type of record
-                    lResult = False
-                Else
-                    pMetSegRecs(lTyp) = Nothing
-                    pMetSegRecs(lTyp) = lMetSegRec
-                    If aNewConnection.Target.Member = "GATMP" Then
-                        AirType = 1
-                    ElseIf aNewConnection.Target.Member = "AIRTMP" Then
-                        AirType = 2
-                    End If
-                End If
-            Else ' not needed
+            If pMetSegRecs(lMetSegRec.Name).Source.VolName.Length > 0 Then
+                'dont add if already have this type of record
                 lResult = False
+            Else
+                pMetSegRecs.Add(lMetSegRec)
+                If aNewConnection.Target.Member = "GATMP" Then
+                    AirType = 1
+                ElseIf aNewConnection.Target.Member = "AIRTMP" Then
+                    AirType = 2
+                End If
             End If
-        Else
-            lResult = False
-        End If
-
-        If Not lResult Then
-            lMetSegRec = Nothing
         End If
         Return lResult
     End Function
 
-    Private Function Str2Type(ByRef aStr As String) As HspfMetSegRecord.MetSegRecordType
+    Private Function Str2Name(ByRef aStr As String) As String
+        Dim lName As String = ""
         Select Case aStr
-            Case "PREC" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrPREC
-            Case "GATMP" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrGATMP
-            Case "AIRTMP" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrGATMP
-            Case "DTMPG" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrDTMPG
-            Case "DEWTMP" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrDTMPG
-            Case "WINMOV" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrWINMOV
-            Case "WIND" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrWINMOV
-            Case "SOLRAD" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrSOLRAD
-            Case "CLOUD" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrCLOUD
-            Case "PETINP" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrPETINP
-            Case "POTEV" : Str2Type = HspfMetSegRecord.MetSegRecordType.msrPETINP
-            Case Else : Str2Type = HspfMetSegRecord.MetSegRecordType.msrUNK
+            Case "PREC" : lName = "PREC"
+            Case "GATMP" : lName = "ATEM"
+            Case "AIRTMP" : lName = "ATEM"
+            Case "DTMPG" : lName = "DEWP"
+            Case "DEWTMP" : lName = "DEWP"
+            Case "WINMOV" : lName = "WIND"
+            Case "WIND" : lName = "WIND"
+            Case "SOLRAD" : lName = "SOLR"
+            Case "CLOUD" : lName = "CLOU"
+            Case "PETINP" : lName = "CLOU"
+            Case "POTEV" : lName = "PEVT"
         End Select
+        Return lName
     End Function
 
     Public Function Compare(ByRef newMetSeg As HspfMetSeg, ByRef opname As String) As Boolean
@@ -99,7 +88,6 @@ Public Class HspfMetSeg
                     lMetSegRec.Source = .Source
                     lMetSegRec.Ssystem = .Ssystem
                     lMetSegRec.Tran = .Tran
-                    lMetSegRec.Typ = .Typ
                 End If
             End With
         Next lMetSegRec
@@ -183,90 +171,88 @@ Public Class HspfMetSeg
         Dim lInit As Boolean = True
         For Each lMetSegRec As HspfMetSegRecord In pMetSegRecs
             With lMetSegRec
-                If .Typ <> 0 Then 'type exists
-                    If (aOpTyp = "RCHRES" And .MFactR > 0.0#) Or _
+                If (aOpTyp = "RCHRES" And .MFactR > 0.0#) Or _
                        (aOpTyp = "PERLND" And .MFactP > 0.0#) Or _
                        (aOpTyp = "IMPLND" And .MFactP > 0.0#) Then
-                        'have this type of met seg record
-                        If lInit Then
-                            lSB.AppendLine("*** Met Seg " & Name)
-                            lInit = False
-                        End If
-                        Dim lStr As New StringBuilder
-                        lStr.Append(.Source.VolName.Trim.PadRight(aCol(1) - 1))
-                        lStr.Append(CStr(.Source.VolId).PadLeft(aLen(1)))
-                        lStr.Append(Space(aCol(2) - lStr.Length - 1))
-                        lStr.Append(.Source.Member)
-                        lStr.Append(Space(aCol(3) - lStr.Length - 1))
-                        If .Source.MemSub1 <> 0 Then
-                            lStr.Append(CStr(.Source.MemSub1).PadLeft(aLen(3)))
-                        End If
-                        lStr.Append(Space(aCol(4) - lStr.Length - 1))
-                        lStr.Append(.Ssystem)
-                        lStr.Append(Space(aCol(5) - lStr.Length - 1))
-                        lStr.Append(.Sgapstrg)
-                        lStr.Append(Space(aCol(6) - lStr.Length - 1))
-                        If aOpTyp = "RCHRES" Then
-                            If .MFactR <> 1 Then
-                                lStr.Append(CStr(.MFactR).PadLeft(aLen(6)))
-                            End If
-                        Else
-                            If .MFactP <> 1 Then
-                                lStr.Append(CStr(.MFactP).PadLeft(aLen(6)))
-                            End If
-                        End If
-                        lStr.Append(Space(aCol(7) - lStr.Length - 1))
-                        lStr.Append(.Tran)
-                        lStr.Append(Space(aCol(8) - lStr.Length - 1))
-                        lStr.Append(aOpTyp)
-                        lStr.Append(Space(aCol(9) - lStr.Length - 1))
-                        lStr.Append(CStr(aFirstId).PadLeft(aLen(9)))
-                        If aLastId > 0 Then
-                            lStr.Append(Space(aCol(10) - lStr.Length - 1))
-                            lStr.Append(CStr(aLastId).PadLeft(aLen(9)))
-                        End If
-                        lStr.Append(Space(aCol(11) - lStr.Length - 1))
-                        If aOpTyp <> "RCHRES" And AirType = 2 And .Typ = 2 Then
-                            lStr.Append("ATEMP")
-                        Else
-                            lStr.Append("EXTNL")
-                        End If
-                        lStr.Append(Space(aCol(12) - lStr.Length - 1))
-
-                        Dim lMember As String = ""
-                        If aOpTyp = "RCHRES" Then
-                            Select Case .Typ
-                                Case 1 : lMember = "PREC"
-                                Case 2 : lMember = "GATMP"
-                                Case 3 : lMember = "DEWTMP"
-                                Case 4 : lMember = "WIND"
-                                Case 5 : lMember = "SOLRAD"
-                                Case 6 : lMember = "CLOUD"
-                                Case 7 : lMember = "POTEV"
-                            End Select
-                        Else
-                            Select Case .Typ
-                                Case 1 : lMember = "PREC"
-                                Case 2 : lMember = "GATMP"
-                                Case 3 : lMember = "DTMPG"
-                                Case 4 : lMember = "WINMOV"
-                                Case 5 : lMember = "SOLRAD"
-                                Case 6 : lMember = "CLOUD"
-                                Case 7 : lMember = "PETINP"
-                            End Select
-                            If .Typ = 2 Then
-                                'get right air temp member name
-                                If AirType = 1 Then
-                                    lMember = "GATMP"
-                                ElseIf AirType = 2 Then
-                                    lMember = "AIRTMP"
-                                End If
-                            End If
-                        End If
-                        lStr.Append(lMember)
-                        lStr.Append(Space(aCol(13) - lStr.Length - 1))
-                        lSB.AppendLine(lStr.ToString)
+                    'have this type of met seg record
+                    If lInit Then
+                        lSB.AppendLine("*** Met Seg " & Name)
+                        lInit = False
                     End If
+                    Dim lStr As New StringBuilder
+                    lStr.Append(.Source.VolName.Trim.PadRight(aCol(1) - 1))
+                    lStr.Append(CStr(.Source.VolId).PadLeft(aLen(1)))
+                    lStr.Append(Space(aCol(2) - lStr.Length - 1))
+                    lStr.Append(.Source.Member)
+                    lStr.Append(Space(aCol(3) - lStr.Length - 1))
+                    If .Source.MemSub1 <> 0 Then
+                        lStr.Append(CStr(.Source.MemSub1).PadLeft(aLen(3)))
+                    End If
+                    lStr.Append(Space(aCol(4) - lStr.Length - 1))
+                    lStr.Append(.Ssystem)
+                    lStr.Append(Space(aCol(5) - lStr.Length - 1))
+                    lStr.Append(.Sgapstrg)
+                    lStr.Append(Space(aCol(6) - lStr.Length - 1))
+                    If aOpTyp = "RCHRES" Then
+                        If .MFactR <> 1 Then
+                            lStr.Append(CStr(.MFactR).PadLeft(aLen(6)))
+                        End If
+                    Else
+                        If .MFactP <> 1 Then
+                            lStr.Append(CStr(.MFactP).PadLeft(aLen(6)))
+                        End If
+                    End If
+                    lStr.Append(Space(aCol(7) - lStr.Length - 1))
+                    lStr.Append(.Tran)
+                    lStr.Append(Space(aCol(8) - lStr.Length - 1))
+                    lStr.Append(aOpTyp)
+                    lStr.Append(Space(aCol(9) - lStr.Length - 1))
+                    lStr.Append(CStr(aFirstId).PadLeft(aLen(9)))
+                    If aLastId > 0 Then
+                        lStr.Append(Space(aCol(10) - lStr.Length - 1))
+                        lStr.Append(CStr(aLastId).PadLeft(aLen(9)))
+                    End If
+                    lStr.Append(Space(aCol(11) - lStr.Length - 1))
+                    If aOpTyp <> "RCHRES" And AirType = 2 And .Name = "ATEM" Then
+                        lStr.Append("ATEMP")
+                    Else
+                        lStr.Append("EXTNL")
+                    End If
+                    lStr.Append(Space(aCol(12) - lStr.Length - 1))
+
+                    Dim lMember As String = ""
+                    If aOpTyp = "RCHRES" Then
+                        Select Case .Name
+                            Case "PREC" : lMember = "PREC"
+                            Case "ATEM" : lMember = "GATMP"
+                            Case "DEWP" : lMember = "DEWTMP"
+                            Case "WIND" : lMember = "WIND"
+                            Case "SOLR" : lMember = "SOLRAD"
+                            Case "CLOU" : lMember = "CLOUD"
+                            Case "PEVT" : lMember = "POTEV"
+                        End Select
+                    Else
+                        Select Case .Name
+                            Case "PREC" : lMember = "PREC"
+                            Case "ATEM" : lMember = "GATMP"
+                            Case "DEWP" : lMember = "DTMPG"
+                            Case "WIND" : lMember = "WINMOV"
+                            Case "SOLR" : lMember = "SOLRAD"
+                            Case "CLOU" : lMember = "CLOUD"
+                            Case "PEVT" : lMember = "PETINP"
+                        End Select
+                        If .Name = "ATEM" Then
+                            'get right air temp member name
+                            If AirType = 1 Then
+                                lMember = "GATMP"
+                            ElseIf AirType = 2 Then
+                                lMember = "AIRTMP"
+                            End If
+                        End If
+                    End If
+                    lStr.Append(lMember)
+                    lStr.Append(Space(aCol(13) - lStr.Length - 1))
+                    lSB.AppendLine(lStr.ToString)
                 End If
             End With
         Next lMetSegRec

@@ -43,7 +43,7 @@ Module modCreateUci
 
         If aWatershed.MetSegments Is Nothing Then
             'build initial met segment 
-            DefaultBASINSMetseg(aUci, aMetBaseDsn, aMetWdmId)
+            aUci.MetSegs.Add(DefaultBASINSMetseg(aUci, aMetBaseDsn, aMetWdmId))
         Else
             CreateBASINSMetsegs(aUci)
         End If
@@ -862,89 +862,64 @@ Module modCreateUci
 
     End Sub
 
-    Private Sub DefaultBASINSMetseg(ByVal aUci As HspfUci, _
-                                    ByVal aMetBaseDsn As Integer, _
-                                    ByVal aMetWdmId As String)
+    Private Function DefaultBASINSMetseg(ByVal aUci As HspfUci, _
+                                         ByVal aMetBaseDsn As Integer, _
+                                         ByVal aMetWdmId As String) As HspfMetSeg
 
         Dim lMetSeg As New HspfMetSeg
         lMetSeg.Uci = aUci
-        For lRecordIndex As Integer = 1 To 7
-            Dim lMetSegRecord As New HspfMetSegRecord
-            lMetSegRecord.Source.VolName = aMetWdmId
-            lMetSegRecord.Sgapstrg = ""
-            lMetSegRecord.Ssystem = "ENGL"
-            lMetSegRecord.Tran = "SAME"
-            lMetSegRecord.Typ = lRecordIndex
-            Select Case lRecordIndex
-                Case 1
-                    lMetSegRecord.Source.VolId = aMetBaseDsn
-                    lMetSegRecord.Source.Member = "PREC"
-                    lMetSegRecord.MFactP = 1
-                    lMetSegRecord.MFactR = 1
-                    lMetSegRecord.Sgapstrg = "ZERO"
-                Case 2
-                    lMetSegRecord.Source.VolId = aMetBaseDsn + 2
-                    lMetSegRecord.Source.Member = "ATEM"
-                    lMetSegRecord.MFactP = 1
-                    lMetSegRecord.MFactR = 1
-                Case 3
-                    lMetSegRecord.Source.VolId = aMetBaseDsn + 6
-                    lMetSegRecord.Source.Member = "DEWP"
-                    lMetSegRecord.MFactP = 1
-                    lMetSegRecord.MFactR = 1
-                Case 4
-                    lMetSegRecord.Source.VolId = aMetBaseDsn + 3
-                    lMetSegRecord.Source.Member = "WIND"
-                    lMetSegRecord.MFactP = 1
-                    lMetSegRecord.MFactR = 1
-                Case 5
-                    lMetSegRecord.Source.VolId = aMetBaseDsn + 4
-                    lMetSegRecord.Source.Member = "SOLR"
-                    lMetSegRecord.MFactP = 1
-                    lMetSegRecord.MFactR = 1
-                Case 6
-                    lMetSegRecord.Source.VolId = aMetBaseDsn + 7
-                    lMetSegRecord.Source.Member = "CLOU"
-                    lMetSegRecord.MFactP = 0
-                    lMetSegRecord.MFactR = 1
-                Case 7
-                    lMetSegRecord.Source.VolId = aMetBaseDsn + 5
-                    lMetSegRecord.Source.Member = "PEVT"
-                    lMetSegRecord.MFactP = 1
-                    lMetSegRecord.MFactR = 1
-            End Select
-            lMetSeg.MetSegRecs.Add(lMetSegRecord)
-        Next lRecordIndex
+        lMetSeg.MetSegRecs.Add(CreateMetSeqRecord(aMetWdmId, aMetBaseDsn, "PREC", 1, 1, "ZERO"))
+        lMetSeg.MetSegRecs.Add(CreateMetSeqRecord(aMetWdmId, aMetBaseDsn + 2, "ATEM", 1, 1, "ZERO"))
+        lMetSeg.MetSegRecs.Add(CreateMetSeqRecord(aMetWdmId, aMetBaseDsn + 6, "DEWP", 1, 1, "ZERO"))
+        lMetSeg.MetSegRecs.Add(CreateMetSeqRecord(aMetWdmId, aMetBaseDsn + 3, "WIND", 1, 1, "ZERO"))
+        lMetSeg.MetSegRecs.Add(CreateMetSeqRecord(aMetWdmId, aMetBaseDsn + 4, "SOLR", 1, 1, "ZERO"))
+        lMetSeg.MetSegRecs.Add(CreateMetSeqRecord(aMetWdmId, aMetBaseDsn + 7, "CLOU", 1, 1, "ZERO"))
+        lMetSeg.MetSegRecs.Add(CreateMetSeqRecord(aMetWdmId, aMetBaseDsn + 5, "PEVT", 1, 1, "ZERO"))
+
         lMetSeg.ExpandMetSegName(aMetWdmId, aMetBaseDsn)
         lMetSeg.Id = aUci.MetSegs.Count + 1
-        aUci.MetSegs.Add(lMetSeg)
+        Return lMetSeg
+    End Function
 
-    End Sub
+    Private Function CreateMetSeqRecord _
+                         (ByVal aMetWdmId As String, ByVal aVolId As Integer, ByVal aMember As String, _
+                          ByVal aMFactP As Integer, ByVal aMFactR As Integer, ByVal aSgapstrg As String) _
+                          As HspfMetSegRecord
+        Dim lMetSegRecord As New HspfMetSegRecord
+        lMetSegRecord.Source.VolName = aMetWdmId
+        lMetSegRecord.Sgapstrg = ""
+        lMetSegRecord.Ssystem = "ENGL"
+        lMetSegRecord.Tran = "SAME"
+        lMetSegRecord.Source.VolId = aVolId
+        lMetSegRecord.Source.Member = aMember
+        lMetSegRecord.MFactP = aMFactP
+        lMetSegRecord.MFactR = aMFactR
+        lMetSegRecord.Sgapstrg = aSgapstrg
+        Return lMetSegRecord
+    End Function
 
     Private Sub CreateBASINSMetsegs(ByVal aUci As HspfUci)
 
         For Each lMetSegment As MetSegment In pWatershed.MetSegments
             Dim lMetSeg As New HspfMetSeg
             lMetSeg.Uci = aUci
-            Dim lRecordIndex As Integer = 0
             For Each lDataType As DataType In lMetSegment.DataTypes
-                lRecordIndex += 1
                 Dim lMetSegRecord As New HspfMetSegRecord
                 With lDataType
+                    lMetSegRecord.Name = .Name
                     lMetSegRecord.Source.VolName = .WdmID
                     lMetSegRecord.Source.VolId = .Dsn
                     lMetSegRecord.Source.Member = .Name
                     lMetSegRecord.MFactP = .MFactPI
                     lMetSegRecord.MFactR = .MFactR
+                    If .Name = "PREC" Then
+                        lMetSegRecord.Sgapstrg = "ZERO"
+                    Else
+                        lMetSegRecord.Sgapstrg = ""
+                    End If
                 End With
                 lMetSegRecord.Ssystem = "ENGL"
                 lMetSegRecord.Tran = "SAME"
-                lMetSegRecord.Typ = lRecordIndex
-                If lRecordIndex = 1 Then
-                    lMetSegRecord.Sgapstrg = "ZERO"
-                Else
-                    lMetSegRecord.Sgapstrg = ""
-                End If
                 lMetSeg.MetSegRecs.Add(lMetSegRecord)
             Next
             With lMetSegment.DataTypes("PREC")
