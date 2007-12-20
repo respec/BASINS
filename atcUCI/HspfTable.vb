@@ -274,18 +274,18 @@ Public Class HspfTable
             Dim lOutPend As String = Nothing 'pending record?
             For lOperIndex As Integer = 1 To pOpn.OpnBlk.Ids.Count
                 On Error GoTo noTableForThisOper
-                Dim lOpn As HspfOperation = pOpn.OpnBlk.NthOper(lOperIndex)
+                Dim lOperation As HspfOperation = pOpn.OpnBlk.NthOper(lOperIndex)
                 'write values here
                 If Err.Number Then Resume
-                If Not (lOpn.TableExists(lTableName)) Then
+                If Not (lOperation.TableExists(lTableName)) Then
                     'no Table for this Operation
                 Else
-                    Dim lTable As HspfTable = lOpn.Tables.Item(lTableName)
-                    Dim lOutRec As String = myFormatI((lOpn.Id), 5) & Space(5)
+                    Dim lTable As HspfTable = lOperation.Tables.Item(lTableName)
+                    Dim lOutRec As String = myFormatI((lOperation.Id), 5) & Space(5)
                     Dim lOutValue As String
                     For Each lParm As HspfParm In lTable.Parms
                         With lParm
-                            Dim lValue As String = lParm.Value
+                            Dim lValue As String = .Value
                             lOutRec = lOutRec & Space(.Def.StartCol - lOutRec.Length - 1) 'pad prev field
                             If .Def.Typ = 0 Then ' ATCoTxt 'left justify strings
                                 If .Def.Length < lValue.Length Then
@@ -343,8 +343,8 @@ Public Class HspfTable
                     End If
                     lPendingFlag = True
                     If lFirstOpn Then
-                        If lOpn.Tables.Item(lTableName).Comment.Length > 0 Then 'an associated comment
-                            lSB.AppendLine(lOpn.Tables.Item(lTableName).Comment) 'pbd
+                        If lOperation.Tables.Item(lTableName).Comment.Length > 0 Then 'an associated comment
+                            lSB.AppendLine(lOperation.Tables.Item(lTableName).Comment) 'pbd
                         Else
                             If Me.Opn.OpnBlk.Uci.GlobalBlock.emfg = 1 Then
                                 lSB.AppendLine(pDef.HeaderE.TrimEnd)

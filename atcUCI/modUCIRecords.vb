@@ -159,7 +159,7 @@ Module modUCIRecords
             'found blank line
             aRecord = ""
             aRecType = -2
-            aReturnCode = 2
+            aReturnCode = 3 'treat like comment
         Else 'found a real line of this block
             aRecord = lRecord
             aRecType = 0
@@ -180,8 +180,8 @@ Module modUCIRecords
         Next lRecordIndex
 
         Dim lComment As String = ""
-        If lStartRecordIndex > 1 Then
-            For lRecordIndex As Integer = lStartRecordIndex - 1 To 1 Step -1
+        If lStartRecordIndex > 0 Then
+            For lRecordIndex As Integer = lStartRecordIndex - 1 To 0 Step -1
                 If pUciRec(lRecordIndex).Trim.Length = 0 Then 'found blank line
                     If lComment.Length = 0 Then
                         lComment = " "

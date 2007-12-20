@@ -11,38 +11,20 @@ Imports MapWinUtility
 ''' </summary>
 ''' <remarks>Copyright 2006 AQUA TERRA Consultants - Royalty-free use permitted under open source license</remarks>
 Public Class HspfCategoryBlk
-    Private pCategories As Collection(Of HspfData.HspfCategory)
-    Private pUci As HspfUci
-    Private pComment As String
+    Private pCategories As Collection(Of HspfCategory)
+    Friend Uci As HspfUci
+    Public Comment As String
 
-    Public ReadOnly Property Categories() As Collection(Of HspfData.HspfCategory)
+    Public ReadOnly Property Categories() As Collection(Of HspfCategory)
         Get
             Return pCategories
         End Get
     End Property
 
-    Friend Property Uci() As HspfUci
-        Get
-            Return pUci
-        End Get
-        Set(ByVal Value As HspfUci)
-            pUci = Value
-        End Set
-    End Property
-
     Public ReadOnly Property Caption() As String
         Get
-            Caption = "Category Block"
+            Return "Category Block"
         End Get
-    End Property
-
-    Public Property Comment() As String
-        Get
-            Comment = pComment
-        End Get
-        Set(ByVal Value As String)
-            pComment = Value
-        End Set
     End Property
 
     Public ReadOnly Property EditControlName() As String
@@ -51,25 +33,19 @@ Public Class HspfCategoryBlk
         End Get
     End Property
 
-    Public ReadOnly Property Count() As Integer
-        Get
-            Count = pCategories.Count
-        End Get
-    End Property
-
-    Public Property Value(ByVal Index As Integer) As HspfData.HspfCategory
+    Public Property Value(ByVal Index As Integer) As HspfCategory
         Get
             If Index > 0 And Index <= pCategories.Count Then
                 'TODO: check this index
                 Value = pCategories.Item(Index - 1)
             Else
-                Value = New HspfData.HspfCategory
+                Value = New HspfCategory
                 Value.Name = ""
                 Value.Tag = ""
                 Value.Id = pCategories.Count + 1
             End If
         End Get
-        Set(ByVal Value As HspfData.HspfCategory) '????
+        Set(ByVal Value As HspfCategory) '????
             If Index <= pCategories.Count Then
                 pCategories.RemoveAt(Index)
                 pCategories.Insert(Index, Value)
@@ -84,21 +60,21 @@ Public Class HspfCategoryBlk
         pCategories.Clear()
     End Sub
 
-    Public Sub Add(ByRef newValue As HspfData.HspfCategory)
-        pCategories.Add(newValue)
+    Public Sub Add(ByRef aCategory As HspfCategory)
+        pCategories.Add(aCategory)
     End Sub
 
-    Public Sub AddFromSpecs(ByRef newName As String, ByRef Tag As String)
-        Dim newCategory As New HspfData.HspfCategory
-        newCategory.Name = newName
-        newCategory.Tag = Tag
-        newCategory.Id = pCategories.Count + 1
-        pCategories.Add(newCategory)
+    Public Sub AddFromSpecs(ByRef aName As String, ByRef aTag As String)
+        Dim lCategory As New HspfCategory
+        lCategory.Name = aName
+        lCategory.Tag = aTag
+        lCategory.Id = pCategories.Count + 1
+        pCategories.Add(lCategory)
     End Sub
 
-    Public Sub Remove(ByRef Index As Integer)
-        If Index > 0 And Index <= pCategories.Count Then
-            pCategories.RemoveAt(Index)
+    Public Sub Remove(ByRef aIndex As Integer)
+        If aIndex >= 0 And aIndex <= pCategories.Count Then
+            pCategories.RemoveAt(aIndex)
         End If
     End Sub
 
@@ -108,11 +84,11 @@ Public Class HspfCategoryBlk
 
     Public Sub New()
         MyBase.New()
-        pCategories = New Collection(Of HspfData.HspfCategory)
+        pCategories = New Collection(Of HspfCategory)
     End Sub
 
     Private Sub Update()
-        pUci.Edited = True
+        Uci.Edited = True
     End Sub
 
     'Public Function Check() As String
@@ -121,73 +97,74 @@ Public Class HspfCategoryBlk
     'End Function
 
     Friend Sub ReadUciFile()
-        Dim lCategory As HspfData.HspfCategory
-        Dim c As String
-        Dim retkey, init, retcod, OmCode, rectyp As Integer
-        Dim cbuff As String = Nothing
-
         On Error GoTo ErrHand
-
-        If pUci.FastFlag Then
-            pComment = GetCommentBeforeBlock("CATEGORY")
+        If Uci.FastFlag Then
+            Comment = GetCommentBeforeBlock("CATEGORY")
         End If
 
-        retcod = 0
-        init = 1
-        OmCode = HspfOmCode("CATEGORY")
-        c = ""
-        retkey = -1
+        Dim lInit As Integer = 1
+        Dim lOmCode As Integer = HspfOmCode("CATEGORY")
+        Dim lComment As String = ""
+        Dim lRetKey As Integer = -1
+        Dim lRetCod As Integer = 0
+        Dim lRecTyp As Integer
+        Dim lCBuff As String = Nothing
+
+
         Do
-            If pUci.FastFlag Then
-                GetNextRecordFromBlock("CATEGORY", retkey, cbuff, rectyp, retcod)
+            If Uci.FastFlag Then
+                GetNextRecordFromBlock("CATEGORY", lRetKey, lCBuff, lRecTyp, lRetCod)
             Else
-                retkey = -1
-                Call REM_XBLOCKEX((Me.Uci), OmCode, init, retkey, cbuff, rectyp, retcod)
+                lRetKey = -1
+                Call REM_XBLOCKEX((Me.Uci), lOmCode, lInit, lRetKey, lCBuff, lRecTyp, lRetCod)
             End If
-            If retcod = 10 Then Exit Do
-            If rectyp = 0 Then
-                If Len(Trim(Mid(cbuff, 4, 2))) > 0 Then
-                    lCategory.Tag = StrRetRem(cbuff)
+
+            If lRetCod = 10 Then
+                Exit Do
+            ElseIf lRecTyp = 0 Then
+                Dim lCategory As New HspfCategory
+                If lCBuff.Substring(3, 2).Trim.Length > 0 Then
+                    lCategory.Tag = StrRetRem(lCBuff)
                 Else
                     lCategory.Tag = ""
                 End If
-                lCategory.Name = cbuff
-                lCategory.Comment = c
+                lCategory.Name = lCBuff.Trim
+                lCategory.Comment = lComment.Trim
                 lCategory.Id = pCategories.Count + 1
                 pCategories.Add(lCategory)
-                c = ""
-            ElseIf rectyp = -1 And init = 0 Then  'dont save first comment, its the header
+                lComment = ""
+            ElseIf lRecTyp = -1 And lInit = 0 Then  'dont save first comment, its the header
                 'save comment
-                If Len(c) = 0 Then
-                    c = cbuff
+                If lComment.Length = 0 Then
+                    lComment = lCBuff
                 Else
-                    c = c & vbCrLf & cbuff
+                    lComment &= vbCrLf & lCBuff
                 End If
-            ElseIf retcod = 2 And rectyp = -2 Then
+            ElseIf lRetCod = 2 And lRecTyp = -2 Then
                 'save blank line
-                If Len(c) = 0 Then
-                    c = " "
+                If lComment.Length = 0 Then
+                    lComment = " "
                 Else
-                    c = c & vbCrLf & " "
+                    lComment &= vbCrLf & " "
                 End If
             End If
-            init = 0
+            lInit = 0
         Loop
 
         Exit Sub
 
 ErrHand:
-        Logger.Msg(Err.Description & vbCr & vbCr & cbuff, MsgBoxStyle.Critical, "Error in ReadUciFile")
+        Logger.Msg(Err.Description & vbCr & vbCr & lCBuff, MsgBoxStyle.Critical, "Error in ReadUciFile")
     End Sub
 
     Public Overrides Function ToString() As String
         Dim lSb As New StringBuilder
-        If pComment.Length > 0 Then
-            lSb.AppendLine(pComment)
+        If Comment.Length > 0 Then
+            lSb.AppendLine(Comment)
         End If
         lSb.AppendLine("CATEGORY")
         lSb.AppendLine("   <> <----catnam----> *** ")
-        For Each lCategory As HspfData.HspfCategory In pCategories
+        For Each lCategory As HspfCategory In pCategories
             If lCategory.Comment.Length > 0 Then
                 lSb.AppendLine(lCategory.Comment)
             End If
@@ -196,4 +173,11 @@ ErrHand:
         lSb.AppendLine("END CATEGORY")
         Return lSb.ToString
     End Function
+End Class
+
+Public Class HspfCategory
+    Public Id As Integer
+    Public Tag As String
+    Public Name As String
+    Public Comment As String 'preceeding comment
 End Class

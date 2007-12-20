@@ -179,11 +179,10 @@ Module modStatusTimeseriesUtility
 
         'group inflow
         TimserStatus.Change("INFLOW:IVOL", 1, HspfStatusOptional)
-        If Not O.Uci.CategoryBlock Is Nothing Then
-            'have category block
-            For i = 1 To O.Uci.CategoryBlock.Count
-                TimserStatus.Change("INFLOW:CIVOL", i, HspfStatusOptional)
-            Next i
+        If Not O.Uci.CategoryBlock Is Nothing Then 'have category block
+            For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                TimserStatus.Change("INFLOW:CIVOL", lCategory.Id, HspfStatusOptional)
+            Next lCategory
         End If
         For i = 1 To nCons
             TimserStatus.Change("INFLOW:ICON", i, HspfStatusOptional)
@@ -237,9 +236,9 @@ Module modStatusTimeseriesUtility
         TimserStatus.Change("RECEIV:IVOL", 1, HspfStatusOptional)
         If Not O.Uci.CategoryBlock Is Nothing Then
             'have category block
-            For i = 1 To O.Uci.CategoryBlock.Count
-                TimserStatus.Change("RECEIV:CIVOL", i, HspfStatusOptional)
-            Next i
+            For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                TimserStatus.Change("RECEIV:CIVOL", lCategory.Id, HspfStatusOptional)
+            Next lCategory
         End If
         For i = 1 To nCons
             TimserStatus.Change("RECEIV:ICON", 1, HspfStatusOptional)
@@ -277,9 +276,9 @@ Module modStatusTimeseriesUtility
         TimserStatus.Change("ROFLOW:ROVOL", 1, HspfStatusOptional)
         If Not O.Uci.CategoryBlock Is Nothing Then
             'have category block
-            For i = 1 To O.Uci.CategoryBlock.Count
-                TimserStatus.Change("ROFLOW:CROVOL", i, HspfStatusOptional)
-            Next i
+            For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                TimserStatus.Change("ROFLOW:CROVOL", lCategory.Id, HspfStatusOptional)
+            Next lCategory
         End If
         For i = 1 To nCons
             TimserStatus.Change("ROFLOW:ROCON", 1, HspfStatusOptional)
@@ -317,9 +316,9 @@ Module modStatusTimeseriesUtility
         TimserStatus.Change("REMOVE:RMVOL", 1, HspfStatusOptional)
         If Not O.Uci.CategoryBlock Is Nothing Then
             'have category block
-            For i = 1 To O.Uci.CategoryBlock.Count
-                TimserStatus.Change("REMOVE:CRMVOL", i, HspfStatusOptional)
-            Next i
+            For Each lCategory As HspfCategory In O.Uci.CategoryBlock.Categories
+                TimserStatus.Change("REMOVE:CRMVOL", lCategory.Id, HspfStatusOptional)
+            Next lCategory
         End If
         For i = 1 To nCons
             TimserStatus.Change("REMOVE:RMCON", 1, HspfStatusOptional)

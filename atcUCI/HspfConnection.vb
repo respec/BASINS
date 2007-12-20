@@ -142,12 +142,12 @@ Public Class HspfConnection
         End Get
     End Property
 
-    Public Sub readTimSer(ByRef aUci As HspfUci)
+    Public Sub ReadTimSer(ByRef aUci As HspfUci)
         Dim lConnection As HspfConnection
         Dim lRecTyp As Integer
         Dim lRetCod As Integer
         Dim lBuff As String = Nothing
-        Dim s As String
+        Dim lStr As String
 
         pUci = aUci
 
@@ -172,38 +172,39 @@ Public Class HspfConnection
                 lConnection.Source.VolName = Trim(Left(lBuff, 6))
                 lConnection.Source.VolId = CInt(Mid(lBuff, 7, 4))
                 lConnection.Source.Member = Trim(Mid(lBuff, 12, 6))
-                s = Trim(Mid(lBuff, 18, 2))
-                If s.Length > 0 Then
-                    lConnection.Source.MemSub1 = CInt(s)
+                lStr = lBuff.Substring(17, 2).Trim
+                If lStr.Length > 0 Then
+                    lConnection.Source.MemSub1 = CInt(lStr)
                 End If
-                lConnection.Ssystem = Mid(lBuff, 21, 4)
-                lConnection.Sgapstrg = Mid(lBuff, 25, 4)
-                s = Trim(Mid(lBuff, 29, 10))
-                lConnection.MFactAsRead = Mid(lBuff, 29, 10)
-                If s.Length > 0 Then
-                    lConnection.MFact = CDbl(s)
+                lConnection.Ssystem = lBuff.Substring(20, 4)
+                lConnection.Sgapstrg = lBuff.Substring(24, 4)
+
+                lConnection.MFactAsRead = lBuff.Substring(28, 10)
+                lStr = lBuff.Substring(28, 10).Trim
+                If lStr.Length > 0 Then
+                    lConnection.MFact = CDbl(lStr)
                 End If
-                s = Mid(lBuff, 39, 4)
-                If s.Length > 0 Then
-                    lConnection.Tran = s
+                lStr = lBuff.Substring(38, 4)
+                If lStr.Length > 0 Then
+                    lConnection.Tran = lStr
                 End If
                 lConnection.Target.VolName = Trim(Mid(lBuff, 44, 6))
                 lConnection.Target.VolId = CInt(Mid(lBuff, 51, 3))
-                s = Trim(Mid(lBuff, 55, 3))
-                If s.Length > 0 Then lConnection.Target.VolIdL = CInt(s)
-                lConnection.Target.Group = Trim(Mid(lBuff, 59, 6))
-                lConnection.Target.Member = Trim(Mid(lBuff, 66, 6))
-                s = Trim(Mid(lBuff, 72, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Target.MemSub1 = CInt(s)
+                lStr = lBuff.Substring(54, 3).Trim
+                If lStr.Length > 0 Then lConnection.Target.VolIdL = CInt(lStr)
+                lConnection.Target.Group = lBuff.Substring(58, 6).Trim
+                lConnection.Target.Member = lBuff.Substring(65, 6).Trim
+                lStr = lBuff.Substring(71, 2).Trim
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Target.MemSub1 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then lConnection.Target.MemSub1 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then lConnection.Target.MemSub1 = aUci.CatAsInt(lStr)
                 End If
-                s = Trim(Mid(lBuff, 74, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Target.MemSub2 = CInt(s)
+                lStr = lBuff.Substring(73, 2).Trim
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Target.MemSub2 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then lConnection.Target.MemSub2 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then lConnection.Target.MemSub2 = aUci.CatAsInt(lStr)
                 End If
                 lConnection.Comment = lComment
                 aUci.Connections.Add(lConnection)
@@ -240,43 +241,43 @@ Public Class HspfConnection
                 lConnection = New HspfConnection
                 lConnection.Uci = aUci
                 lConnection.Typ = 2
-                lConnection.Source.VolName = Trim(Left(lBuff, 6))
-                lConnection.Source.VolId = CInt(Mid(lBuff, 7, 4))
-                lConnection.Source.Group = Trim(Mid(lBuff, 12, 6))
-                lConnection.Source.Member = Trim(Mid(lBuff, 19, 6))
-                s = Trim(Mid(lBuff, 25, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Source.MemSub1 = CInt(s)
+                lConnection.Source.VolName = lBuff.Substring(0, 6).Trim
+                lConnection.Source.VolId = CInt(lBuff.Substring(6, 4))
+                lConnection.Source.Group = lBuff.Substring(11, 6).Trim
+                lConnection.Source.Member = lBuff.Substring(18, 6).Trim
+                lStr = lBuff.Substring(24, 2).Trim
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Source.MemSub1 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then lConnection.Source.MemSub1 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then lConnection.Source.MemSub1 = aUci.CatAsInt(lStr)
                 End If
-                s = Trim(Mid(lBuff, 27, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Source.MemSub2 = CInt(s)
+                lStr = lBuff.Substring(26, 2).Trim
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Source.MemSub2 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then lConnection.Source.MemSub2 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then lConnection.Source.MemSub2 = aUci.CatAsInt(lStr)
                 End If
-                s = Trim(Mid(lBuff, 29, 10))
-                lConnection.MFactAsRead = Mid(lBuff, 29, 10)
-                If s.Length > 0 Then lConnection.MFact = CDbl(s)
-                lConnection.Tran = Trim(Mid(lBuff, 39, 4))
-                lConnection.Target.VolName = Trim(Mid(lBuff, 44, 6))
-                lConnection.Target.VolId = CInt(Mid(lBuff, 51, 3))
-                s = Trim(Mid(lBuff, 55, 3))
-                If s.Length > 0 Then lConnection.Target.VolIdL = CInt(s)
+                lConnection.MFactAsRead = lBuff.Substring(28, 10)
+                lStr = lBuff.Substring(28, 10).Trim
+                If lStr.Length > 0 Then lConnection.MFact = CDbl(lStr)
+                lConnection.Tran = lBuff.Substring(38, 4).Trim
+                lConnection.Target.VolName = lBuff.Substring(43, 6).Trim
+                lConnection.Target.VolId = CInt(lBuff.Substring(50, 3))
+                lStr = Trim(Mid(lBuff, 55, 3))
+                If lStr.Length > 0 Then lConnection.Target.VolIdL = CInt(lStr)
                 lConnection.Target.Group = Trim(Mid(lBuff, 59, 6))
                 lConnection.Target.Member = Trim(Mid(lBuff, 66, 6))
-                s = Trim(Mid(lBuff, 72, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Target.MemSub1 = CInt(s)
+                lStr = Trim(Mid(lBuff, 72, 2))
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Target.MemSub1 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then lConnection.Target.MemSub1 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then lConnection.Target.MemSub1 = aUci.CatAsInt(lStr)
                 End If
-                s = Trim(Mid(lBuff, 74, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Target.MemSub2 = CInt(s)
+                lStr = Trim(Mid(lBuff, 74, 2))
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Target.MemSub2 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then lConnection.Target.MemSub2 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then lConnection.Target.MemSub2 = aUci.CatAsInt(lStr)
                 End If
                 lConnection.Comment = lComment
                 aUci.Connections.Add(lConnection)
@@ -315,23 +316,23 @@ Public Class HspfConnection
                 lConnection.Typ = 3
                 lConnection.Source.VolName = Trim(Left(lBuff, 6))
                 lConnection.Source.VolId = CInt(Mid(lBuff, 7, 4))
-                s = Trim(Mid(lBuff, 29, 10))
+                lStr = Trim(Mid(lBuff, 29, 10))
                 lConnection.MFactAsRead = Mid(lBuff, 29, 10)
-                If s.Length > 0 Then lConnection.MFact = CDbl(s)
+                If lStr.Length > 0 Then lConnection.MFact = CDbl(lStr)
                 lConnection.Target.VolName = Trim(Mid(lBuff, 44, 6))
                 lConnection.Target.VolId = CInt(Mid(lBuff, 50, 4))
                 lConnection.MassLink = CInt(Mid(lBuff, 57, 4))
-                s = Trim(Mid(lBuff, 72, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Target.MemSub1 = CInt(s)
+                lStr = Trim(Mid(lBuff, 72, 2))
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Target.MemSub1 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then lConnection.Target.MemSub1 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then lConnection.Target.MemSub1 = aUci.CatAsInt(lStr)
                 End If
-                s = Trim(Mid(lBuff, 74, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Target.MemSub2 = CInt(s)
+                lStr = Trim(Mid(lBuff, 74, 2))
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Target.MemSub2 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then lConnection.Target.MemSub2 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then lConnection.Target.MemSub2 = aUci.CatAsInt(lStr)
                 End If
                 lConnection.Comment = lComment
                 aUci.Connections.Add(lConnection)
@@ -372,32 +373,32 @@ Public Class HspfConnection
                 lConnection.Source.VolId = CInt(Mid(lBuff, 7, 4))
                 lConnection.Source.Group = Trim(Mid(lBuff, 12, 6))
                 lConnection.Source.Member = Trim(Mid(lBuff, 19, 6))
-                s = Trim(Mid(lBuff, 25, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Source.MemSub1 = CInt(s)
+                lStr = Trim(Mid(lBuff, 25, 2))
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Source.MemSub1 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then
-                        lConnection.Source.MemSub1 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then
+                        lConnection.Source.MemSub1 = aUci.CatAsInt(lStr)
                     End If
                 End If
-                s = Trim(Mid(lBuff, 27, 2))
-                If s.Length > 0 And IsNumeric(s) Then
-                    lConnection.Source.MemSub2 = CInt(s)
+                lStr = Trim(Mid(lBuff, 27, 2))
+                If lStr.Length > 0 And IsNumeric(lStr) Then
+                    lConnection.Source.MemSub2 = CInt(lStr)
                 Else
-                    If s.Length > 0 Then
-                        lConnection.Source.MemSub1 = aUci.CatAsInt(s)
+                    If lStr.Length > 0 Then
+                        lConnection.Source.MemSub1 = aUci.CatAsInt(lStr)
                     End If
                 End If
-                s = Trim(Mid(lBuff, 29, 10))
+                lStr = Trim(Mid(lBuff, 29, 10))
                 lConnection.MFactAsRead = Mid(lBuff, 29, 10)
-                If s.Length > 0 Then lConnection.MFact = CDbl(s)
-                s = Trim(Mid(lBuff, 39, 4))
-                If s.Length > 0 Then lConnection.Tran = s
+                If lStr.Length > 0 Then lConnection.MFact = CDbl(lStr)
+                lStr = Trim(Mid(lBuff, 39, 4))
+                If lStr.Length > 0 Then lConnection.Tran = lStr
                 lConnection.Target.VolName = Trim(Mid(lBuff, 44, 6))
                 lConnection.Target.VolId = CInt(Mid(lBuff, 50, 4))
                 lConnection.Target.Member = Trim(Mid(lBuff, 55, 6))
-                s = Trim(Mid(lBuff, 61, 2))
-                If s.Length > 0 Then lConnection.Target.MemSub1 = CInt(s)
+                lStr = Trim(Mid(lBuff, 61, 2))
+                If lStr.Length > 0 Then lConnection.Target.MemSub1 = CInt(lStr)
                 lConnection.Ssystem = Trim(Mid(lBuff, 64, 4))
                 lConnection.Sgapstrg = Trim(Mid(lBuff, 69, 4))
                 lConnection.Amdstrg = Trim(Mid(lBuff, 74, 4))
@@ -497,10 +498,10 @@ Public Class HspfConnection
                         lSB.AppendLine("<-Volume-> <Member> SsysSgap<--Mult-->Tran <-Target vols> <-Grp> <-Member-> ***")
                         lSB.AppendLine("<Name>   x <Name> x tem strg<-factor->strg <Name>   x   x        <Name> x x ***")
                         'do met segs - operations with assoc met segs
-                        Static lOpTypes() As String = {"PERLND", "IMPLND", "RCHRES"}
-                        For Each OpTyp As String In lOpTypes
+                        Static lOperationTypes() As String = {"PERLND", "IMPLND", "RCHRES"}
+                        For Each lOperationType As String In lOperationTypes
                             For Each lMetSeg As HspfMetSeg In pUci.MetSegs
-                                lSB.AppendLine(lMetSeg.ToStringFromSpecs(OpTyp, iCol, iLen))
+                                lSB.AppendLine(lMetSeg.ToStringFromSpecs(lOperationType, iCol, iLen))
                             Next
                         Next
                         'If pUci.PointSources.Count > 0 And pUci.MetSegs.Count > 0 Then
